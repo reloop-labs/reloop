@@ -1,0 +1,13 @@
+{
+  "extends": "@reloop/typescript-config/internal-package.json",
+  "include": ["src"],
+  "exclude": ["node_modules"],
+  "compilerOptions": {
+    "lib": ["dom", "ES2022"],
+    "composite": false,
+    "emitDeclarationOnly": false,
+    "declarationMap": false,
+    "declaration": false,
+    "baseUrl": "."
+  }
+}

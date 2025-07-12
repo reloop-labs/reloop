@@ -1,0 +1,62 @@
+{
+  "name": "@reloop/ui",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "imports": {
+    "#*": "./src/*"
+  },
+  "exports": {
+    "./lib/*": {
+      "types": "./dist/src/lib/*.d.ts",
+      "default": "./src/lib/*.ts"
+    },
+    "./components/*": {
+      "types": "./dist/src/components/*.d.ts",
+      "default": "./src/components/*.tsx"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "git clean -xdf .cache .turbo dist node_modules",
+    "dev": "tsc",
+    "format": "prettier --check . --ignore-path ../../.gitignore",
+    "lint": "eslint",
+    "postui-add": "prettier src --write --list-different",
+    "typecheck": "tsc --noEmit --emitDeclarationOnly false",
+    "ui-add": "pnpm dlx shadcn@canary add"
+  },
+  "dependencies": {
+    "@radix-ui/react-avatar": "catalog:",
+    "@radix-ui/react-dialog": "catalog:",
+    "@radix-ui/react-dropdown-menu": "catalog:",
+    "@radix-ui/react-icons": "catalog:",
+    "@radix-ui/react-label": "catalog:",
+    "@radix-ui/react-slot": "catalog:",
+    "@radix-ui/react-toast": "catalog:",
+    "@radix-ui/react-tooltip": "catalog:",
+    "class-variance-authority": "catalog:",
+    "next-themes": "catalog:",
+    "radix-ui": "catalog:",
+    "sonner": "catalog:",
+    "tailwind-merge": "catalog:"
+  },
+  "devDependencies": {
+    "@reloop/eslint-config": "workspace:*",
+    "@reloop/prettier-config": "workspace:*",
+    "@reloop/tailwind-config": "workspace:*",
+    "@reloop/typescript-config": "workspace:*",
+    "@types/react": "catalog:",
+    "eslint": "catalog:",
+    "prettier": "catalog:",
+    "react": "catalog:",
+    "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "react": "catalog:"
+  },
+  "prettier": "@reloop/prettier-config"
+}

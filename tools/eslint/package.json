@@ -1,0 +1,35 @@
+{
+  "name": "@reloop/eslint-config",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "clean": "git clean -xdf .cache .turbo node_modules",
+    "format": "prettier --check . --ignore-path ../../.gitignore",
+    "typecheck": "tsc --noEmit"
+  },
+  "exports": {
+    "./base": "./base.js",
+    "./react": "./react.js"
+  },
+  "prettier": "@reloop/prettier-config",
+  "devDependencies": {
+    "@eslint/js": "catalog:",
+    "@reloop/prettier-config": "workspace:*",
+    "@reloop/typescript-config": "workspace:*",
+    "@types/eslint-config-prettier": "catalog:",
+    "eslint": "catalog:",
+    "eslint-config-prettier": "catalog:",
+    "eslint-plugin-import": "catalog:",
+    "eslint-plugin-only-warn": "catalog:",
+    "eslint-plugin-react": "catalog:",
+    "eslint-plugin-react-hooks": "catalog:",
+    "eslint-plugin-turbo": "catalog:",
+    "globals": "catalog:",
+    "typescript": "catalog:",
+    "typescript-eslint": "catalog:"
+  },
+  "dependencies": {
+    "eslint-config-turbo": "catalog:"
+  }
+}

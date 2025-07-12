@@ -1,0 +1,76 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: ./apps/web/Dockerfile
+      args:
+        # Backend API server - used at build time to create the bundle
+        PUBLIC_SERVER_URL: http://localhost:3035
+    ports:
+      - 8085:80
+    healthcheck:
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      test:
+        ['CMD-SHELL', 'curl --fail --silent http://localhost:80/healthcheck']
+    depends_on:
+      - server
+
+  server:
+    build:
+      context: .
+      dockerfile: ./apps/server/Dockerfile
+    ports:
+      - 3035:3000
+    environment:
+      - SERVER_AUTH_SECRET=${SERVER_AUTH_SECRET:-please_change_this_in_production}
+      - SERVER_POSTGRES_URL=postgres://postgres:postgres@db:5432/postgres
+      - SERVER_HOST=0.0.0.0
+      - SERVER_PORT=3000
+      - PUBLIC_WEB_URL=http://localhost:8085
+    healthcheck:
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      test:
+        [
+          'CMD-SHELL',
+          'wget --quiet --spider http://$$SERVER_HOST:$$SERVER_PORT/healthcheck',
+        ]
+    depends_on:
+      - db
+
+  db:
+    image: docker.io/postgres:latest
+    ports:
+      - 5432:5432
+    command: ['postgres', '-c', 'log_statement=all']
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      test: ['CMD', 'pg_isready', '-U', 'postgres', '-d', 'postgres']
+
+  drizzle:
+    restart: 'no'
+    command: /bin/sh
+    build:
+      context: .
+      dockerfile: ./packages/db/Dockerfile
+    environment:
+      - DB_POSTGRES_URL=postgres://postgres:postgres@db:5432/postgres
+      - TURBO_UI=true
+    profiles:
+      # Using profiles to avoid starting this container by default.
+      # We only use this to run `pnpm db:push`
+      - drizzle
+
+volumes:
+  postgres_data:

@@ -1,0 +1,38 @@
+{
+  "name": "server",
+  "type": "module",
+  "scripts": {
+    "build": "tsup",
+    "clean": "git clean -xdf .cache .turbo dist node_modules",
+    "dev": "pnpm env:run tsx watch src/index.ts",
+    "env:copy-example": "shx -- cp -n .env.example .env",
+    "env:remove": "shx -- rm -f .env",
+    "env:run": "dotenv --",
+    "format": "prettier --check . --ignore-path ../../.gitignore",
+    "lint": "eslint",
+    "start": "NODE_ENV=production pnpm env:run node dist/index.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "prettier": "@reloop/prettier-config",
+  "dependencies": {
+    "@hono/node-server": "catalog:",
+    "@hono/trpc-server": "catalog:",
+    "@reloop/api": "workspace:*",
+    "@reloop/auth": "workspace:*",
+    "@reloop/db": "workspace:*",
+    "hono": "catalog:",
+    "valibot": "catalog:"
+  },
+  "devDependencies": {
+    "@reloop/eslint-config": "workspace:*",
+    "@reloop/prettier-config": "workspace:*",
+    "@reloop/typescript-config": "workspace:*",
+    "@types/node": "catalog:",
+    "dotenv-cli": "catalog:",
+    "eslint": "catalog:",
+    "shx": "catalog:",
+    "tsup": "catalog:",
+    "tsx": "catalog:",
+    "typescript": "catalog:"
+  }
+}

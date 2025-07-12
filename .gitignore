@@ -1,0 +1,12 @@
+node_modules/
+dist/
+out/
+
+.cache/
+.turbo/
+
+.env*
+!.env.example
+
+.DS_Store
+.vscode

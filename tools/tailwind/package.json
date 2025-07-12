@@ -1,0 +1,22 @@
+{
+  "name": "@reloop/tailwind-config",
+  "type": "module",
+  "scripts": {
+    "clean": "git clean -xdf .cache .turbo node_modules",
+    "format": "prettier --check . --ignore-path ../../.gitignore",
+    "lint": "eslint"
+  },
+  "exports": {
+    "./style.css": "./style.css"
+  },
+  "prettier": "@reloop/prettier-config",
+  "dependencies": {
+    "eslint": "catalog:",
+    "tailwindcss": "catalog:",
+    "tailwindcss-animate": "catalog:"
+  },
+  "devDependencies": {
+    "@reloop/eslint-config": "workspace:*",
+    "@reloop/prettier-config": "workspace:*"
+  }
+}

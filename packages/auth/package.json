@@ -1,0 +1,32 @@
+{
+  "name": "@reloop/auth",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./client": "./src/client.ts",
+    "./server": "./src/server.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "git clean -xdf .cache .turbo dist node_modules",
+    "dev": "tsc",
+    "format": "prettier --check . --ignore-path ../../.gitignore",
+    "auth:schema:generate": "pnpx @better-auth/cli generate --config ./src/cli-config.ts --output ../db/src/schemas/auth.ts",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit"
+  },
+  "prettier": "@reloop/prettier-config",
+  "dependencies": {
+    "@reloop/db": "workspace:*",
+    "better-auth": "catalog:"
+  },
+  "devDependencies": {
+    "@reloop/eslint-config": "workspace:*",
+    "@reloop/prettier-config": "workspace:*",
+    "@reloop/typescript-config": "workspace:*",
+    "@types/node": "catalog:",
+    "eslint": "catalog:",
+    "typescript": "catalog:"
+  }
+}

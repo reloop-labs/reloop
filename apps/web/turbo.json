@@ -1,0 +1,19 @@
+{
+  "$schema": "https://turborepo.org/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "dev": {
+      "env": ["PUBLIC_*", "PROD"],
+      "inputs": ["$TURBO_DEFAULT$", ".env"],
+      "persistent": true
+    },
+    "build": {
+      "env": ["PUBLIC_*", "PROD"],
+      "inputs": ["$TURBO_DEFAULT$", ".env"]
+    },
+    "start": {
+      "env": ["PUBLIC_*", "PROD"],
+      "persistent": true
+    }
+  }
+}

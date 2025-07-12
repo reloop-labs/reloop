@@ -1,0 +1,43 @@
+{
+  "name": "@reloop/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./client": {
+      "types": "./dist/src/client/index.d.ts",
+      "default": "./src/client/index.ts"
+    },
+    "./server": {
+      "types": "./dist/src/server/index.d.ts",
+      "default": "./src/server/index.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "git clean -xdf .cache .turbo dist node_modules",
+    "dev": "tsc",
+    "format": "prettier --check . --ignore-path ../../.gitignore",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit --emitDeclarationOnly false"
+  },
+  "prettier": "@reloop/prettier-config",
+  "dependencies": {
+    "@reloop/auth": "workspace:*",
+    "@reloop/db": "workspace:*",
+    "@trpc/client": "catalog:",
+    "@trpc/server": "catalog:",
+    "superjson": "catalog:",
+    "url-join": "catalog:",
+    "valibot": "catalog:"
+  },
+  "devDependencies": {
+    "@reloop/eslint-config": "workspace:*",
+    "@reloop/prettier-config": "workspace:*",
+    "@reloop/typescript-config": "workspace:*",
+    "eslint": "catalog:",
+    "prettier": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:"
+  }
+}

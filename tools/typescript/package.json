@@ -1,0 +1,8 @@
+{
+  "name": "@reloop/typescript-config",
+  "type": "module",
+  "private": true,
+  "files": [
+    "*.json"
+  ]
+}
