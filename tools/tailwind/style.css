@@ -917,7 +917,7 @@
   --bg-sub-300: var(--neutral-300);
   --bg-soft-200: var(--neutral-200);
   --bg-weak-50: var(--neutral-50);
-  --bg-white-0: var(--neutral-0);
+  --bg-white-0: var(--neutral-50);
 
   --text-strong-950: var(--neutral-950);
   --text-sub-600: var(--neutral-600);
@@ -1081,4 +1081,8 @@
 
 .animate-spinnerFade {
   animation: spinnerFade 1.2s linear infinite;
+}
+
+body {
+  font-family: 'BasierCircle', Helvetica, sans-serif;
 }
