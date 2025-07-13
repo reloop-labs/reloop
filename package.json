@@ -29,5 +29,9 @@
   },
   "engines": {
     "node": ">=22.10.0"
+  },
+  "dependencies": {
+    "@reloop/tailwind-config": "workspace:*",
+    "@reloop/ui": "workspace:*"
   }
 }
