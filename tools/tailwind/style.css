@@ -355,6 +355,334 @@
   --color-stable-base: var(--stable-base);
   --color-stable-light: var(--stable-light);
   --color-stable-lighter: var(--stable-lighter);
+
+  --text-title-h1: 3.5rem;
+  --text-title-h2: 3rem;
+  --text-title-h3: 2.5rem;
+  --text-title-h4: 2rem;
+  --text-title-h5: 1.5rem;
+  --text-title-h6: 1.25rem;
+
+  --text-label-xl: 1.5rem;
+  --text-label-lg: 1.125rem;
+  --text-label-md: 1rem;
+  --text-label-sm: 0.875rem;
+  --text-label-xs: 0.75rem;
+
+  --text-paragraph-xl: 1.5rem;
+  --text-paragraph-lg: 1.125rem;
+  --text-paragraph-md: 1rem;
+  --text-paragraph-sm: 0.875rem;
+  --text-paragraph-xs: 0.75rem;
+
+  --text-subheading-md: 1rem;
+  --text-subheading-sm: 0.875rem;
+  --text-subheading-xs: 0.75rem;
+  --text-subheading-2xs: 0.6875rem;
+
+  --text-doc-label: 1.125rem;
+  --text-doc-paragraph: 1.125rem;
+
+  /* Line Heights - Using --spacing theme variables for leading utilities */
+  /* These will create custom spacing values that can be used with leading-* utilities */
+  --spacing-title-h1: 4rem;
+  --spacing-title-h2: 3.5rem;
+  --spacing-title-h3: 3rem;
+  --spacing-title-h4: 2.5rem;
+  --spacing-title-h5: 2rem;
+  --spacing-title-h6: 1.75rem;
+
+  --spacing-label-xl: 2rem;
+  --spacing-label-lg: 1.5rem;
+  --spacing-label-md: 1.5rem;
+  --spacing-label-sm: 1.25rem;
+  --spacing-label-xs: 1rem;
+
+  --spacing-paragraph-xl: 2rem;
+  --spacing-paragraph-lg: 1.5rem;
+  --spacing-paragraph-md: 1.5rem;
+  --spacing-paragraph-sm: 1.25rem;
+  --spacing-paragraph-xs: 1rem;
+
+  --spacing-subheading-md: 1.5rem;
+  --spacing-subheading-sm: 1.25rem;
+  --spacing-subheading-xs: 1rem;
+  --spacing-subheading-2xs: 0.75rem;
+
+  --spacing-doc-label: 2rem;
+  --spacing-doc-paragraph: 2rem;
+
+  /* Letter Spacing - Using --tracking-* theme variables */
+  --tracking-title-h1: -0.01em;
+  --tracking-title-h2: -0.01em;
+  --tracking-title-h3: -0.01em;
+  --tracking-title-h4: -0.005em;
+  --tracking-title-h5: 0em;
+  --tracking-title-h6: 0em;
+
+  --tracking-label-xl: -0.015em;
+  --tracking-label-lg: -0.015em;
+  --tracking-label-md: -0.011em;
+  --tracking-label-sm: -0.006em;
+  --tracking-label-xs: 0em;
+
+  --tracking-paragraph-xl: -0.015em;
+  --tracking-paragraph-lg: -0.015em;
+  --tracking-paragraph-md: -0.011em;
+  --tracking-paragraph-sm: -0.006em;
+  --tracking-paragraph-xs: 0em;
+
+  --tracking-subheading-md: 0.06em;
+  --tracking-subheading-sm: 0.06em;
+  --tracking-subheading-xs: 0.04em;
+  --tracking-subheading-2xs: 0.02em;
+
+  --tracking-doc-label: -0.015em;
+  --tracking-doc-paragraph: -0.015em;
+
+  /* Font Weights */
+  --font-weight-title-h1: 500;
+  --font-weight-title-h2: 500;
+  --font-weight-title-h3: 500;
+  --font-weight-title-h4: 500;
+  --font-weight-title-h5: 500;
+  --font-weight-title-h6: 500;
+
+  --font-weight-label-xl: 500;
+  --font-weight-label-lg: 500;
+  --font-weight-label-md: 500;
+  --font-weight-label-sm: 500;
+  --font-weight-label-xs: 500;
+
+  --font-weight-paragraph-xl: 400;
+  --font-weight-paragraph-lg: 400;
+  --font-weight-paragraph-md: 400;
+  --font-weight-paragraph-sm: 400;
+  --font-weight-paragraph-xs: 400;
+
+  --font-weight-subheading-md: 500;
+  --font-weight-subheading-sm: 500;
+  --font-weight-subheading-xs: 500;
+  --font-weight-subheading-2xs: 500;
+
+  --font-weight-doc-label: 500;
+  --font-weight-doc-paragraph: 400;
+
+  /* Box Shadows */
+  --shadow-regular-xs: 0 1px 2px 0 #0a0d1408;
+  --shadow-regular-sm: 0 2px 4px #1b1c1d0a;
+  --shadow-regular-md: 0 16px 32px -12px #0e121b1a;
+
+  --shadow-button-primary-focus:
+    0 0 0 2px theme(--color-bg-white-0),
+    0 0 0 4px theme(--color-primary-alpha-10);
+  --shadow-button-important-focus:
+    0 0 0 2px theme(--color-bg-white-0),
+    0 0 0 4px theme(--color-neutral-alpha-16);
+  --shadow-button-error-focus:
+    0 0 0 2px theme(--color-bg-white-0), 0 0 0 4px theme(--color-red-alpha-10);
+
+  --shadow-fancy-buttons-neutral: 0 1px 2px 0 #1b1c1d7a, 0 0 0 1px #242628;
+  --shadow-fancy-buttons-primary:
+    0 1px 2px 0 #0e121b3d, 0 0 0 1px theme(--color-primary-base);
+  --shadow-fancy-buttons-error:
+    0 1px 2px 0 #0e121b3d, 0 0 0 1px theme(--color-error-base);
+  --shadow-fancy-buttons-stroke:
+    0 1px 3px 0 #0e121b1f, 0 0 0 1px theme(--color-stroke-soft-200);
+
+  --shadow-toggle-switch: 0 6px 10px 0 #0e121b0f, 0 2px 4px 0 #0e121b08;
+  --shadow-switch-thumb: 0 4px 8px 0 #1b1c1d0f, 0 2px 4px 0 #0e121b14;
+  --shadow-tooltip: 0 12px 24px 0 #0e121b0f, 0 1px 2px 0 #0e121b08;
+
+  --shadow-custom-xs:
+    0 0 0 1px rgba(51, 51, 51, 0.04), 0 4px 8px -2px rgba(51, 51, 51, 0.06),
+    0 2px 4px rgba(51, 51, 51, 0.04), 0 1px 2px rgba(51, 51, 51, 0.04),
+    inset 0 -1px 1px -0.5px rgba(51, 51, 51, 0.06);
+
+  --shadow-custom-sm:
+    0 0 0 1px rgba(51, 51, 51, 0.04), 0 16px 8px -8px rgba(51, 51, 51, 0.01),
+    0 12px 6px -6px rgba(51, 51, 51, 0.02),
+    0 5px 5px -2.5px rgba(51, 51, 51, 0.08),
+    0 1px 3px -1.5px rgba(51, 51, 51, 0.16),
+    inset 0 -0.5px 0.5px rgba(51, 51, 51, 0.08);
+
+  --shadow-custom-md:
+    0 0 0 1px rgba(51, 51, 51, 0.04), 0 1px 1px 0.5px rgba(51, 51, 51, 0.04),
+    0 3px 3px -1.5px rgba(51, 51, 51, 0.02),
+    0 6px 6px -3px rgba(51, 51, 51, 0.04),
+    0 12px 12px -6px rgba(51, 51, 51, 0.04),
+    0 24px 24px -12px rgba(51, 51, 51, 0.04),
+    0 48px 48px -24px rgba(51, 51, 51, 0.04),
+    inset 0 -1px 1px -0.5px rgba(51, 51, 51, 0.06);
+
+  --shadow-custom-lg:
+    0 0 0 1px rgba(51, 51, 51, 0.04), 0 1px 1px 0.5px rgba(51, 51, 51, 0.04),
+    0 3px 3px -1.5px rgba(51, 51, 51, 0.02),
+    0 6px 6px -3px rgba(51, 51, 51, 0.04),
+    0 12px 12px -6px rgba(51, 51, 51, 0.04),
+    0 24px 24px -12px rgba(51, 51, 51, 0.04),
+    0 48px 48px -24px rgba(51, 51, 51, 0.04),
+    0 96px 96px -32px rgba(51, 51, 51, 0.06),
+    inset 0 -1px 1px -0.5px rgba(51, 51, 51, 0.06);
+
+  --radius-10: 0.625rem;
+  --radius-20: 1.25rem;
+}
+
+@layer components {
+  .title-h1 {
+    font-size: theme(--text-title-h1);
+    line-height: theme(--spacing-title-h1);
+    letter-spacing: theme(--tracking-title-h1);
+    font-weight: theme(--font-weight-title-h1);
+  }
+
+  .title-h2 {
+    font-size: theme(--text-title-h2);
+    line-height: theme(--spacing-title-h2);
+    letter-spacing: theme(--tracking-title-h2);
+    font-weight: theme(--font-weight-title-h2);
+  }
+
+  .title-h3 {
+    font-size: theme(--text-title-h3);
+    line-height: theme(--spacing-title-h3);
+    letter-spacing: theme(--tracking-title-h3);
+    font-weight: theme(--font-weight-title-h3);
+  }
+
+  .title-h4 {
+    font-size: theme(--text-title-h4);
+    line-height: theme(--spacing-title-h4);
+    letter-spacing: theme(--tracking-title-h4);
+    font-weight: theme(--font-weight-title-h4);
+  }
+
+  .title-h5 {
+    font-size: theme(--text-title-h5);
+    line-height: theme(--spacing-title-h5);
+    letter-spacing: theme(--tracking-title-h5);
+    font-weight: theme(--font-weight-title-h5);
+  }
+
+  .title-h6 {
+    font-size: theme(--text-title-h6);
+    line-height: theme(--spacing-title-h6);
+    letter-spacing: theme(--tracking-title-h6);
+    font-weight: theme(--font-weight-title-h6);
+  }
+
+  .label-xl {
+    font-size: theme(--text-label-xl);
+    line-height: theme(--spacing-label-xl);
+    letter-spacing: theme(--tracking-label-xl);
+    font-weight: theme(--font-weight-label-xl);
+  }
+
+  .label-lg {
+    font-size: theme(--text-label-lg);
+    line-height: theme(--spacing-label-lg);
+    letter-spacing: theme(--tracking-label-lg);
+    font-weight: theme(--font-weight-label-lg);
+  }
+
+  .label-md {
+    font-size: theme(--text-label-md);
+    line-height: theme(--spacing-label-md);
+    letter-spacing: theme(--tracking-label-md);
+    font-weight: theme(--font-weight-label-md);
+  }
+
+  .label-sm {
+    font-size: theme(--text-label-sm);
+    line-height: theme(--spacing-label-sm);
+    letter-spacing: theme(--tracking-label-sm);
+    font-weight: theme(--font-weight-label-sm);
+  }
+
+  .label-xs {
+    font-size: theme(--text-label-xs);
+    line-height: theme(--spacing-label-xs);
+    letter-spacing: theme(--tracking-label-xs);
+    font-weight: theme(--font-weight-label-xs);
+  }
+
+  .paragraph-xl {
+    font-size: theme(--text-paragraph-xl);
+    line-height: theme(--spacing-paragraph-xl);
+    letter-spacing: theme(--tracking-paragraph-xl);
+    font-weight: theme(--font-weight-paragraph-xl);
+  }
+
+  .paragraph-lg {
+    font-size: theme(--text-paragraph-lg);
+    line-height: theme(--spacing-paragraph-lg);
+    letter-spacing: theme(--tracking-paragraph-lg);
+    font-weight: theme(--font-weight-paragraph-lg);
+  }
+
+  .paragraph-md {
+    font-size: theme(--text-paragraph-md);
+    line-height: theme(--spacing-paragraph-md);
+    letter-spacing: theme(--tracking-paragraph-md);
+    font-weight: theme(--font-weight-paragraph-md);
+  }
+
+  .paragraph-sm {
+    font-size: theme(--text-paragraph-sm);
+    line-height: theme(--spacing-paragraph-sm);
+    letter-spacing: theme(--tracking-paragraph-sm);
+    font-weight: theme(--font-weight-paragraph-sm);
+  }
+
+  .paragraph-xs {
+    font-size: theme(--text-paragraph-xs);
+    line-height: theme(--spacing-paragraph-xs);
+    letter-spacing: theme(--tracking-paragraph-xs);
+    font-weight: theme(--font-weight-paragraph-xs);
+  }
+
+  .subheading-md {
+    font-size: theme(--text-subheading-md);
+    line-height: theme(--spacing-subheading-md);
+    letter-spacing: theme(--tracking-subheading-md);
+    font-weight: theme(--font-weight-subheading-md);
+  }
+
+  .subheading-sm {
+    font-size: theme(--text-subheading-sm);
+    line-height: theme(--spacing-subheading-sm);
+    letter-spacing: theme(--tracking-subheading-sm);
+    font-weight: theme(--font-weight-subheading-sm);
+  }
+
+  .subheading-xs {
+    font-size: theme(--text-subheading-xs);
+    line-height: theme(--spacing-subheading-xs);
+    letter-spacing: theme(--tracking-subheading-xs);
+    font-weight: theme(--font-weight-subheading-xs);
+  }
+
+  .subheading-2xs {
+    font-size: theme(--text-subheading-2xs);
+    line-height: theme(--spacing-subheading-2xs);
+    letter-spacing: theme(--tracking-subheading-2xs);
+    font-weight: theme(--font-weight-subheading-2xs);
+  }
+
+  .doc-label {
+    font-size: theme(--text-doc-label);
+    line-height: theme(--spacing-doc-label);
+    letter-spacing: theme(--tracking-doc-label);
+    font-weight: theme(--font-weight-doc-label);
+  }
+
+  .doc-paragraph {
+    font-size: theme(--text-doc-paragraph);
+    line-height: theme(--spacing-doc-paragraph);
+    letter-spacing: theme(--tracking-doc-paragraph);
+    font-weight: theme(--font-weight-doc-paragraph);
+  }
 }
 
 :root {
