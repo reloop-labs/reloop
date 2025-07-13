@@ -1,0 +1,6 @@
+@import '@reloop/tailwind-config/style.css';
+
+.text-outline {
+  -webkit-text-stroke: 1.5px var(--color-gray-300);
+  -webkit-text-fill-color: transparent;
+}

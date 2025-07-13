@@ -200,6 +200,55 @@ importers:
         specifier: 'catalog:'
         version: 2.5.4
 
+  apps/dashboard:
+    dependencies:
+      '@reloop/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      next:
+        specifier: 'catalog:'
+        version: 15.3.5(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      next-themes:
+        specifier: 'catalog:'
+        version: 0.4.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      react:
+        specifier: 'catalog:'
+        version: 19.1.0
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.1.0(react@19.1.0)
+    devDependencies:
+      '@reloop/eslint-config':
+        specifier: workspace:*
+        version: link:../../tools/eslint
+      '@reloop/prettier-config':
+        specifier: workspace:*
+        version: link:../../tools/prettier
+      '@reloop/tailwind-config':
+        specifier: workspace:*
+        version: link:../../tools/tailwind
+      '@reloop/typescript-config':
+        specifier: workspace:*
+        version: link:../../tools/typescript
+      '@tailwindcss/postcss':
+        specifier: 'catalog:'
+        version: 4.1.11
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.0.13
+      '@types/react':
+        specifier: 'catalog:'
+        version: 19.1.8
+      '@types/react-dom':
+        specifier: 'catalog:'
+        version: 19.1.6(@types/react@19.1.8)
+      tailwindcss:
+        specifier: 'catalog:'
+        version: 4.1.11
+      typescript:
+        specifier: 'catalog:'
+        version: 5.8.3
+
   apps/server:
     dependencies:
       '@hono/node-server':
