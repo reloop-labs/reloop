@@ -13,7 +13,7 @@ export const buttonVariants = tv({
   slots: {
     root: [
       // base
-      'group relative inline-flex items-center justify-center whitespace-nowrap outline-none',
+      'group relative inline-flex items-center justify-center whitespace-nowrap outline-none cursor-pointer',
       'transition duration-200 ease-out',
       // focus
       'focus:outline-none',
@@ -45,19 +45,19 @@ export const buttonVariants = tv({
     },
     size: {
       medium: {
-        root: 'h-10 gap-3 rounded-10 px-3.5 text-label-sm',
+        root: 'h-10 gap-3 rounded-10 px-3.5 label-sm',
         icon: '-mx-1',
       },
       small: {
-        root: 'h-9 gap-3 rounded-lg px-3 text-label-sm',
+        root: 'h-9 gap-3 rounded-lg px-3 label-sm',
         icon: '-mx-1',
       },
       xsmall: {
-        root: 'h-8 gap-2.5 rounded-lg px-2.5 text-label-sm',
+        root: 'h-8 gap-2.5 rounded-lg px-2.5 label-sm',
         icon: '-mx-1',
       },
       xxsmall: {
-        root: 'h-7 gap-2.5 rounded-lg px-2 text-label-sm',
+        root: 'h-7 gap-2.5 rounded-lg px-2 label-sm',
         icon: '-mx-1',
       },
     },

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { ThemeProvider } from 'next-themes';
+import { IconsSprite } from '@reloop/ui/components/icon';
 
 export const metadata: Metadata = {
   title: 'Reloop',
@@ -15,7 +16,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`antialiased bg-bg-white-0 text-text-strong-950`}>
+      <body className={`antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -23,6 +24,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
+          <IconsSprite />
         </ThemeProvider>
       </body>
     </html>

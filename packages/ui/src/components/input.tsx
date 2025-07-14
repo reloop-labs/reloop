@@ -42,7 +42,7 @@ export const inputVariants = tv({
     ],
     input: [
       // base
-      'w-full bg-transparent bg-none text-paragraph-sm text-text-strong-950 outline-none',
+      'w-full bg-transparent bg-none paragraph-sm text-text-strong-950 outline-none',
       'transition duration-200 ease-out',
       // placeholder
       'placeholder:select-none placeholder:text-text-soft-400 placeholder:transition placeholder:duration-200 placeholder:ease-out',
@@ -72,7 +72,7 @@ export const inputVariants = tv({
     ],
     affix: [
       // base
-      'shrink-0 bg-bg-white-0 text-paragraph-sm text-text-sub-600',
+      'shrink-0 bg-bg-white-0 paragraph-sm text-text-sub-600',
       'flex items-center justify-center truncate',
       'transition duration-200 ease-out',
       // placeholder state
@@ -82,7 +82,7 @@ export const inputVariants = tv({
     ],
     inlineAffix: [
       // base
-      'text-paragraph-sm text-text-sub-600',
+      'paragraph-sm text-text-sub-600',
       // placeholder state
       'group-has-[:placeholder-shown]:text-text-soft-400',
       // focus state

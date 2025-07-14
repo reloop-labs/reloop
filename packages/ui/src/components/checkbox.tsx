@@ -163,7 +163,7 @@ const Checkbox = React.forwardRef<
             'group-data-[state=indeterminate]/checkbox:invisible',
           )}
           style={{
-            ['--total-length']: TOTAL_LENGTH_CHECK,
+            ['--total-length' as string]: TOTAL_LENGTH_CHECK,
           }}
         />
         <IconIndeterminate
@@ -177,7 +177,7 @@ const Checkbox = React.forwardRef<
             'invisible group-data-[state=indeterminate]/checkbox:visible',
           )}
           style={{
-            ['--total-length']: TOTAL_LENGTH_INDETERMINATE,
+            ['--total-length' as string]: TOTAL_LENGTH_INDETERMINATE,
           }}
         />
       </CheckboxPrimitive.Indicator>
