@@ -12,8 +12,8 @@ import * as Divider from '@reloop/ui/components/divider';
 const Page = () => {
   const [showPassword, setShowPassword] = useState(false);
   return (
-    <div className="h-dvh grid grid-cols-2">
-      <div className="border-r h-full border-gray-200">
+    <div className="h-dvh grid md:grid-cols-2">
+      <div className="border-r h-full border-stroke-soft-200 md:block hidden">
         <Logo className="w-10 h-10" />
       </div>
       <div className="justify-center flex flex-col items-center">
@@ -113,7 +113,7 @@ const Page = () => {
                 d="M7.63 3.426A3.68 3.68 0 0 1 10.22 4.44L12.146 2.5A6.5 6.5 0 0 0 7.63.749a6.74 6.74 0 0 0-6.03 3.72l2.236 1.736c.544-1.603 2.03-2.78 3.794-2.78"
               />
             </svg>
-            with Google
+          Continue with Google
           </Button.Root>
           <div className="flex items-center gap-1 justify-center">
             <p className="text-paragraph-sm text-text-sub-600">
