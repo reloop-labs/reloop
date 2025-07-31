@@ -1,0 +1,38 @@
+{
+	"name": "docs",
+	"version": "0.0.0",
+	"private": true,
+	"scripts": {
+		"build": "next build",
+		"dev": "next dev --turbo",
+		"start": "next start",
+		"postinstall": "fumadocs-mdx"
+	},
+	"dependencies": {
+		"@reloop/ui": "workspace:*",
+		"@radix-ui/react-collapsible": "^1.1.11",
+		"@radix-ui/react-popover": "^1.1.14",
+		"@radix-ui/react-presence": "^1.1.4",
+		"@radix-ui/react-scroll-area": "^1.2.9",
+		"class-variance-authority": "^0.7.1",
+		"fumadocs-core": "^15.6.5",
+		"fumadocs-mdx": "catalog:ui",
+		"fumadocs-ui": "catalog:ui",
+		"lucide-react": "^0.525.0",
+		"next": "catalog:ui",
+		"next-themes": "^0.4.6",
+		"react": "catalog:ui",
+		"react-dom": "catalog:ui",
+		"tailwind-merge": "^3.3.1"
+	},
+	"devDependencies": {
+		"@types/node": "catalog:",
+		"@types/react": "catalog:ui",
+		"@types/react-dom": "catalog:ui",
+		"typescript": "catalog:",
+		"@types/mdx": "catalog:ui",
+		"@tailwindcss/postcss": "catalog:ui",
+		"tailwindcss": "catalog:ui",
+		"postcss": "catalog:ui"
+	}
+}

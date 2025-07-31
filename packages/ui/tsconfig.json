@@ -1,0 +1,9 @@
+{
+	"extends": "@reloop/ts/internal-package.json",
+	"compilerOptions": {
+		"lib": ["ES2022", "dom", "dom.iterable"],
+		"jsx": "preserve"
+	},
+	"include": ["src"],
+	"exclude": ["node_modules"]
+}

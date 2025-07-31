@@ -1,0 +1,16 @@
+{
+	"cSpell.words": [
+		"cmdk",
+		"fumadocs",
+		"jwkss",
+		"reloop",
+		"sonner",
+		"turborepo"
+	],
+	"editor.defaultFormatter": "biomejs.biome",
+	"editor.formatOnSave": true,
+	"editor.codeActionsOnSave": {
+		"source.organizeImports.biome": "explicit",
+		"source.fixAll.biome": "explicit"
+	}
+}

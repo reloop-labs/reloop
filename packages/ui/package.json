@@ -1,0 +1,67 @@
+{
+	"name": "@reloop/ui",
+	"private": true,
+	"version": "0.1.0",
+	"type": "module",
+	"files": [
+		"dist"
+	],
+	"exports": {
+		"./utils/*": {
+			"types": "./dist/src/lib/*.d.ts",
+			"default": "./src/lib/*.ts"
+		},
+		"./hooks/*": {
+			"types": "./dist/src/hooks/*.d.ts",
+			"default": "./src/hooks/*.ts"
+		},
+		"./components/*": {
+			"types": "./dist/src/components/*.d.ts",
+			"default": "./src/components/*.tsx"
+		}
+	},
+	"scripts": {
+		"build": "bun run build:js && bun run build:types",
+		"build:js": "bun build src/index.ts --outdir dist --target node",
+		"build:types": "tsc --emitDeclarationOnly --declaration --outDir dist",
+		"dev": "bun run build --watch",
+		"clean": "rm -rf dist"
+	},
+	"dependencies": {
+		"@radix-ui/react-accordion": "catalog:ui",
+		"@radix-ui/react-avatar": "catalog:ui",
+		"@radix-ui/react-checkbox": "catalog:ui",
+		"@radix-ui/react-dialog": "catalog:ui",
+		"@radix-ui/react-dropdown-menu": "catalog:ui",
+		"@radix-ui/react-icons": "catalog:ui",
+		"@radix-ui/react-label": "catalog:ui",
+		"@radix-ui/react-popover": "catalog:ui",
+		"@radix-ui/react-radio-group": "catalog:ui",
+		"@radix-ui/react-scroll-area": "catalog:ui",
+		"@radix-ui/react-select": "catalog:ui",
+		"@radix-ui/react-slider": "catalog:ui",
+		"@radix-ui/react-slot": "catalog:ui",
+		"@radix-ui/react-switch": "catalog:ui",
+		"@radix-ui/react-tabs": "catalog:ui",
+		"@radix-ui/react-toast": "catalog:ui",
+		"@radix-ui/react-tooltip": "catalog:ui",
+		"class-variance-authority": "catalog:ui",
+		"cmdk": "catalog:ui",
+		"merge-refs": "catalog:ui",
+		"next-themes": "catalog:ui",
+		"radix-ui": "catalog:ui",
+		"react-aria-components": "catalog:ui",
+		"react-day-picker": "catalog:ui",
+		"react-otp-input": "catalog:ui",
+		"sonner": "catalog:ui",
+		"tailwind-merge": "catalog:ui",
+		"tailwind-variants": "catalog:ui"
+	},
+	"devDependencies": {
+		"@reloop/ts": "workspace:*"
+	},
+	"peerDependencies": {
+		"react": "catalog:ui",
+		"react-dom": "catalog:ui"
+	}
+}

@@ -1,0 +1,47 @@
+{
+	"name": "@reloop/db",
+	"private": true,
+	"type": "module",
+	"exports": {
+		".": {
+			"types": "./dist/src/index.d.ts",
+			"default": "./src/index.ts"
+		},
+		"./client": {
+			"types": "./dist/src/client.d.ts",
+			"default": "./src/client.ts"
+		},
+		"./schema": {
+			"types": "./dist/src/schema.d.ts",
+			"default": "./src/schema.ts"
+		}
+	},
+	"scripts": {
+		"build": "tsc --build",
+		"clean": "git clean -xdf .cache .turbo dist node_modules",
+		"dev": "tsc --build tsconfig.package.json",
+		"env:copy-example": "shx -- cp -n .env.example .env",
+		"env:remove": "shx -- rm -f .env",
+		"env:run": "dotenv --",
+		"format": "prettier --check . --ignore-path ../../.gitignore",
+		"lint": "eslint",
+		"push": "bun env:run drizzle-kit push",
+		"studio": "bun env:run drizzle-kit studio",
+		"typecheck": "tsc --build --noEmit --emitDeclarationOnly false"
+	},
+	"dependencies": {
+		"drizzle-orm": "catalog:db",
+		"drizzle-typebox": "catalog:db",
+		"pg": "catalog:db",
+		"valibot": "catalog:db"
+	},
+	"devDependencies": {
+		"@reloop/ts": "workspace:*",
+		"@types/node": "catalog:",
+		"@types/pg": "catalog:db",
+		"dotenv-cli": "catalog:db",
+		"drizzle-kit": "catalog:db",
+		"shx": "catalog:db",
+		"typescript": "catalog:"
+	}
+}

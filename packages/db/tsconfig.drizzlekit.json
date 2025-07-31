@@ -1,0 +1,5 @@
+{
+	"extends": "@reloop/ts/base.json",
+	"include": ["drizzle.config.ts"],
+	"exclude": ["node_modules"]
+}
