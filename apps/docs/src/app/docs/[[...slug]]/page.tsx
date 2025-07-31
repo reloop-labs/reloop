@@ -1,3 +1,4 @@
+import { Icon } from "@reloop/ui/components/icon";
 import { createRelativeLink } from "fumadocs-ui/mdx";
 import {
 	DocsBody,
@@ -27,6 +28,7 @@ export default async function Page(props: {
 					components={getMDXComponents({
 						// this allows you to link to other pages with relative file paths
 						a: createRelativeLink(source, page),
+						Icon: Icon,
 					})}
 				/>
 			</DocsBody>
