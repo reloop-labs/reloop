@@ -1,0 +1,145 @@
+---
+title: Project Structure
+description: Understand how the codebase is organized across apps, packages, and tools in this modern monorepo setup.
+---
+
+# Project Structure
+
+This monorepo maintains clean separation between frontend applications, backend services, and reusable packages. The architecture follows modern best practices for scalable development with efficient dependency management and build optimization.
+
+## Apps
+
+The `apps/` directory contains all deployable applications, each serving specific user-facing or internal functionality.
+
+<Cards>
+  <Card icon={<Icon name="globe" />} title="Web">
+    **Main Frontend Application** - The primary user-facing web application featuring custom font loading (BasierCircle), PWA capabilities with web manifest, and optimized asset delivery.
+
+    - **Features**: PWA support, custom fonts, responsive design
+    - **Assets**: Icons, manifests, and web app resources
+  </Card>
+
+  <Card icon={<Icon name="monitor" />} title="Main">
+    **Core Application** - Secondary application handling core business logic and main user workflows.
+
+    - **Purpose**: Primary business logic implementation
+    - **Assets**: SVG icons and static resources
+  </Card>
+
+  <Card icon={<Icon name="book-open" />} title="Docs">
+    **Documentation Site** - Comprehensive developer documentation, API references, and user guides with advanced search, TOC navigation, and theme switching.
+
+    - **Features**: Search API, theme toggle, language support, responsive sidebar
+    - **Content**: Project structure, tech stack documentation, guides
+  </Card>
+
+  <Card icon={<Icon name="shield-check" />} title="Admin">
+    **Administrative Dashboard** - Internal admin interface for system management and configuration.
+
+    - **Purpose**: Administrative controls and system management
+    - **Access**: Internal team usage
+  </Card>
+
+  <Card icon={<Icon name="server" />} title="Server">
+    **Backend API Server** - Core backend service handling authentication, database operations, and business logic.
+
+    - **Features**: Database schema management, authentication, API routing
+    - **Infrastructure**: Docker Compose setup, environment configuration
+  </Card>
+
+  <Card icon={<Icon name="mail" />} title="Mail">
+    **Email Service** - Dedicated service for handling transactional emails, notifications, and email-related functionality.
+
+    - **Purpose**: Email processing and delivery
+    - **Integration**: Connects with main applications for notifications
+  </Card>
+</Cards>
+
+## Packages
+
+The `packages/` directory contains shared libraries and utilities that can be consumed across multiple applications.
+
+<Cards>
+  <Card icon={<Icon name="palette" />} title="@repo/ui">
+    **Design System & Component Library** - Comprehensive UI component library with modern React patterns. Includes 50+ components ranging from basic inputs to complex data visualizations.
+
+    - **Components**: Buttons, forms, tables, modals, navigation, data display
+    - **Features**: Polymorphic components, accessibility built-in
+    - **Utilities**: Custom hooks, helper functions, styling utilities
+  </Card>
+
+  <Card icon={<Icon name="database" />} title="@repo/db">
+    **Database Layer** - Centralized database management with schema definitions and database utilities.
+
+    - **Schemas**: Auth, audience management, email configurations
+    - **Features**: Type-safe queries, migrations, Docker setup
+    - **Tools**: Database client, schema validation, development utilities
+  </Card>
+
+  <Card icon={<Icon name="key" />} title="@repo/auth">
+    **Authentication Package** - Shared authentication logic, configurations, and utilities for consistent auth across applications.
+
+    - **Features**: Auth configuration, client/server utilities, CLI integration
+    - **Integration**: Works seamlessly with database and UI packages
+    - **Security**: Modern auth patterns and best practices
+  </Card>
+</Cards>
+
+## Tools & Configuration
+
+The `tools/` directory houses shared configuration and development utilities that ensure consistency across the monorepo.
+
+<Cards>
+  <Card icon={<Icon name="paintbrush" />} title="Tailwind Configuration">
+    **Shared Styling Setup** - Centralized Tailwind CSS configuration ensuring consistent design tokens and styling across all applications.
+
+    - **Purpose**: Design system foundation
+    - **Benefits**: Consistent theming, reduced duplication
+  </Card>
+
+  <Card icon={<Icon name="code" />} title="TypeScript Configuration">
+    **Type Safety Foundation** - Multiple TypeScript configurations optimized for different environments and use cases.
+
+    - **Configs**: Base, Next.js, Vite, internal packages
+    - **Benefits**: Consistent type checking, optimized builds
+  </Card>
+</Cards>
+
+## Development Infrastructure
+
+### Build System
+- **Monorepo Management**: Intelligent build system with caching and parallel execution
+- **Package Manager**: Fast package management and JavaScript runtime
+- **Code Quality**: Modern linting and formatting for consistent code quality
+
+### Git Hooks & Quality
+- **Automated Hooks**: Git hooks for pre-commit checks
+- **Pre-commit**: Code quality enforcement before commits
+- **Build Cache**: Build artifact caching for faster development
+
+### Environment Management
+- **Containerization**: Containerized database and services
+- **Configuration**: Secure configuration management
+- **Development Tools**: Hot reloading, debugging, and testing utilities
+
+## Key Features
+
+### Monorepo Benefits
+- **Shared Dependencies**: Efficient package management across projects
+- **Type Safety**: End-to-end TypeScript with shared types
+- **Consistent Tooling**: Unified linting, formatting, and build processes
+- **Code Reuse**: Shared components, utilities, and configurations
+
+### Development Experience
+- **Fast Builds**: Intelligent caching and parallel execution
+- **Hot Reloading**: Instant feedback during development
+- **Type Checking**: Real-time validation across the codebase
+- **Code Quality**: Automated formatting and linting
+
+### Production Ready
+- **PWA Support**: Progressive Web App capabilities
+- **Performance**: Optimized builds and asset delivery
+- **Security**: Modern authentication and security practices
+- **Scalability**: Modular architecture for easy expansion
+
+This structure provides a solid foundation for scaling development teams and maintaining code quality while ensuring efficient development workflows and consistent user experiences across all applications.
