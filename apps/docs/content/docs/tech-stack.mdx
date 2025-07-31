@@ -1,0 +1,91 @@
+---
+title: Tech Stack
+description: A beginner-friendly breakdown of our entire technology stack.
+---
+
+# 🧱 Tech Stack
+
+We use a modern, modular tech stack designed for scalability, performance, and developer happiness. Here’s a categorized breakdown:
+
+---
+
+## 🖥️ Frontend
+
+- **[Next.js](https://nextjs.org/):**
+  Our **marketing site** and **dashboard** are built using Next.js — a powerful React framework with support for SSR, routing, and static generation.
+
+- **[TypeScript](https://www.typescriptlang.org/):**
+  A superset of JavaScript that adds type safety and better tooling. It’s used across both frontend and backend.
+
+- **[Tailwind CSS](https://tailwindcss.com/):**
+  A utility-first CSS framework that helps us build beautiful UIs with speed and consistency.
+
+- **[Radix UI](https://www.radix-ui.com/):**
+  A set of unstyled, accessible UI primitives used to build robust and flexible UI components.
+
+- **[SWR](https://swr.vercel.app/):**
+  A React hook library for data fetching with features like caching, revalidation, and real-time updates.
+
+- **[Fumadocs](https://fumadocs.vercel.app/):**
+  We use Fumadocs to build our developer docs with MDX, versioning, and clean navigation — all backed by Next.js.
+
+---
+
+## 🛠️ Backend & API
+
+- **[ElisaJS](https://elisa.js.org/):**
+  A fast, modern, type-safe backend framework used to build APIs and services.
+
+- **[Postfix](http://www.postfix.org/):**
+  A trusted Mail Transfer Agent (MTA) used to send transactional and system emails.
+
+- **[Dovecot](https://www.dovecot.org/):**
+  Works alongside Postfix to manage email delivery and storage.
+
+- **[Rspamd](https://rspamd.com/):**
+  An advanced spam filtering system used for analyzing and tracking email deliverability.
+
+---
+
+## 💾 Database & Caching
+
+- **[PostgreSQL](https://www.postgresql.org/):**
+  Our primary relational database. Ideal for structured data, reliability, and performance.
+
+- **[Redis](https://redis.io/):**
+  Used for **caching**, **session storage**, and **real-time operations**.
+
+---
+
+## 🧱 Infrastructure & Monorepo
+
+- **[Bun](https://bun.sh/):**
+  A fast JS runtime that powers our **monorepo workspace**, manages dependencies, and runs scripts.
+
+- **[Turborepo](https://turbo.build/repo):**
+  Used for task caching and orchestrating builds in the monorepo setup — dramatically improving CI and local dev speed.
+
+---
+
+## 🧼 Tooling & DX
+
+- **[Biome](https://biomejs.dev/):**
+  All-in-one formatter and linter used across the entire codebase. It replaces ESLint, Prettier, and more — with blazing speed.
+
+- **[Husky](https://typicode.github.io/husky):**
+  Enforces Git hooks like pre-commit and commit-msg to keep commits clean and safe.
+
+---
+
+## 🧑‍💻 Developer Languages
+
+- **[TypeScript](https://www.typescriptlang.org/):**
+  Our primary language across the frontend, backend, and shared code.
+
+- **[SQL](https://www.postgresql.org/docs/current/sql.html):**
+  Used in raw form and with query builders for PostgreSQL interaction.
+
+- **[Markdown + MDX](https://mdxjs.com/):**
+  Used in our documentation stack via Fumadocs, allowing JSX in markdown files.
+
+---
