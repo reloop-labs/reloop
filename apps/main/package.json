@@ -18,7 +18,7 @@
 		"@types/node": "catalog:",
 		"@types/react": "^19",
 		"@types/react-dom": "^19",
-		"@tailwindcss/postcss": "^4",
+		"@tailwindcss/postcss": "catalog:ui",
 		"tailwindcss": "^4"
 	}
 }
