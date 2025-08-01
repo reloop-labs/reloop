@@ -1,4 +1,5 @@
-FROM oven/bun:latest
+# Build stage
+FROM oven/bun:latest AS builder
 
 ENV NODE_ENV=production
 ENV BUN_TELEMETRY_DISABLED=1
@@ -7,9 +8,34 @@ ENV HUSKY=0
 
 WORKDIR /reloop
 
-COPY . .
+# Copy package files first for better caching
+COPY package.json bun.lockb* ./
+COPY packages/*/package.json ./packages/*/
 
+# Install dependencies
 RUN bun install
 
+# Copy source code
+COPY . .
+
+# Build the docs
 RUN bun run --filter=docs build
 
+# Production stage
+FROM oven/bun:slim AS production
+
+ENV NODE_ENV=production
+ENV BUN_TELEMETRY_DISABLED=1
+
+WORKDIR /reloop
+
+# Copy only the built application and necessary files
+COPY --from=builder /reloop/packages/docs/dist ./packages/docs/dist
+COPY --from=builder /reloop/packages/docs/package.json ./packages/docs/package.json
+COPY --from=builder /reloop/package.json ./package.json
+COPY --from=builder /reloop/node_modules ./node_modules
+
+# Expose port (adjust based on your docs app)
+EXPOSE 3000
+
+CMD ["bun", "run", "--filter=docs", "start"]
