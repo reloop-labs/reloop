@@ -12,7 +12,7 @@ WORKDIR /app
 COPY . .
 
 # Install dependencies (respects workspace and bun.lockb)
-RUN bun install --frozen-lockfile
+RUN bun install
 
 # Build the docs app
 RUN bun run --filter=docs build
@@ -30,10 +30,10 @@ COPY --from=builder /app/apps/docs ./apps/docs
 COPY --from=builder /app/packages ./packages
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/bun.lockb ./bun.lockb
+COPY --from=builder /app/bun.lock ./bun.lock
 
 # Expose the port your docs app runs on
 EXPOSE 3000
 
 # Start the docs app
-CMD ["bun", "run", "--filter=docs", "start"]
+CMD ["next", "start"]

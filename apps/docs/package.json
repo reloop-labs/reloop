@@ -10,20 +10,20 @@
 	},
 	"dependencies": {
 		"@reloop/ui": "workspace:*",
-		"@radix-ui/react-collapsible": "^1.1.11",
-		"@radix-ui/react-popover": "^1.1.14",
-		"@radix-ui/react-presence": "^1.1.4",
-		"@radix-ui/react-scroll-area": "^1.2.9",
-		"class-variance-authority": "^0.7.1",
-		"fumadocs-core": "^15.6.5",
+		"@radix-ui/react-collapsible": "catalog:ui",
+		"@radix-ui/react-popover": "catalog:ui",
+		"@radix-ui/react-presence": "catalog:ui",
+		"@radix-ui/react-scroll-area": "catalog:ui",
+		"class-variance-authority": "catalog:ui",
+		"fumadocs-core": "catalog:ui",
 		"fumadocs-mdx": "catalog:ui",
 		"fumadocs-ui": "catalog:ui",
 		"lucide-react": "^0.525.0",
 		"next": "catalog:ui",
-		"next-themes": "^0.4.6",
+		"next-themes": "catalog:ui",
 		"react": "catalog:ui",
 		"react-dom": "catalog:ui",
-		"tailwind-merge": "^3.3.1"
+		"tailwind-merge": "catalog:ui"
 	},
 	"devDependencies": {
 		"@types/node": "catalog:",
