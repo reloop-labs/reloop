@@ -1,0 +1,14 @@
+FROM oven/bun:1-alpine AS base
+WORKDIR /app
+ENV NODE_ENV=production
+ENV BUN_TELEMETRY_DISABLED=1
+ENV CI=1
+
+# =========================================================================== #
+FROM base AS installer
+# Copy workspace files from root
+COPY ./ ./reloop
+
+WORKDIR /reloop
+
+RUN bun install
