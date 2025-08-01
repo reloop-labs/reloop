@@ -1,5 +1,5 @@
 {
-	"extends": "@reloop/ts/internal-package.json",
+	"extends": "@reloop/ts/next.json",
 	"compilerOptions": {
 		"target": "ES2017",
 		"lib": ["dom", "dom.iterable", "esnext"],
@@ -19,10 +19,7 @@
 			{
 				"name": "next"
 			}
-		],
-		"paths": {
-			"@/*": ["./src/*"]
-		}
+		]
 	},
 	"include": [
 		"./**/*.ts",

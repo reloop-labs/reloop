@@ -1,0 +1,39 @@
+# Build stage
+FROM oven/bun:latest AS builder
+
+ENV NODE_ENV=production
+ENV BUN_TELEMETRY_DISABLED=1
+ENV CI=1
+ENV HUSKY=0
+
+WORKDIR /app
+
+# Copy everything (entire monorepo context is needed)
+COPY . .
+
+# Install dependencies (respects workspace and bun.lockb)
+RUN bun install
+
+# Build the docs app
+RUN bun run --filter=web build
+
+# Production stage
+FROM oven/bun:slim AS production
+
+ENV NODE_ENV=production
+ENV BUN_TELEMETRY_DISABLED=1
+
+WORKDIR /app
+
+# Copy built output and runtime files
+COPY --from=builder /app/apps/web ./apps/web
+COPY --from=builder /app/packages ./packages
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/bun.lockb ./bun.lockb
+
+# Expose the port your docs app runs on
+EXPOSE 3000
+
+# Start the docs app
+CMD ["bun", "run", "--filter=web", "start"]
