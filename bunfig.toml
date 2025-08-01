@@ -1,3 +1,0 @@
-[install]
-production = true
-hoist-pattern = ["*"]
