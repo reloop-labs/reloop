@@ -4,7 +4,7 @@ FROM oven/bun:alpine AS base
 FROM base AS deps
 WORKDIR /app
 COPY . .
-RUN bun install --frozen-lockfile
+RUN bun --filter=docs install
 
 # Stage 2: Build the application
 FROM base AS builder
