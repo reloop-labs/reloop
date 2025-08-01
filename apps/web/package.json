@@ -11,6 +11,7 @@
 	"dependencies": {
 		"next": "catalog:ui",
 		"react": "catalog:ui",
+		"@reloop/ui": "workspace:*",
 		"react-dom": "catalog:ui"
 	},
 	"devDependencies": {

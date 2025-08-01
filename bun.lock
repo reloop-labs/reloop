@@ -91,6 +91,7 @@
       "name": "web",
       "version": "0.1.0",
       "dependencies": {
+        "@reloop/ui": "workspace:*",
         "next": "catalog:ui",
         "react": "catalog:ui",
         "react-dom": "catalog:ui",
