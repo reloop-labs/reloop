@@ -24,8 +24,6 @@
 		"baseUrl": "../../",
 		"paths": {
 			"@web/*": ["apps/web/src/*"],
-			"@api": ["apps/api/src/index.ts"],
-			"@api/*": ["apps/api/src/*"],
 			"@ui/*": ["packages/ui/src/*"]
 		}
 	},
