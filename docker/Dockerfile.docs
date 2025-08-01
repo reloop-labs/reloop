@@ -10,3 +10,6 @@ WORKDIR /reloop
 COPY . .
 
 RUN bun install
+
+RUN bun run --filter=docs build
+

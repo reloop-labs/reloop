@@ -1,8 +1,8 @@
+import { Icon } from "@reloop/ui/components/icon";
 import type { TOCItemType } from "fumadocs-core/server";
 import type { AnchorProviderProps } from "fumadocs-core/toc";
 import { I18nLabel } from "fumadocs-ui/contexts/i18n";
 import { type ComponentProps, forwardRef, type ReactNode } from "react";
-import { Edit } from "@/icons";
 import { cn } from "../../lib/cn";
 import { buttonVariants } from "../ui/button";
 import {
@@ -175,7 +175,13 @@ export function DocsPage({
 				<div className="flex flex-row flex-wrap items-center justify-between gap-4 empty:hidden">
 					{editOnGithub && (
 						<EditOnGitHub
-							href={`https://github.com/${editOnGithub.owner}/${editOnGithub.repo}/blob/${editOnGithub.sha}/${editOnGithub.path.startsWith("/") ? editOnGithub.path.slice(1) : editOnGithub.path}`}
+							href={`https://github.com/${editOnGithub.owner}/${
+								editOnGithub.repo
+							}/blob/${editOnGithub.sha}/${
+								editOnGithub.path.startsWith("/")
+									? editOnGithub.path.slice(1)
+									: editOnGithub.path
+							}`}
 						/>
 					)}
 					{lastUpdate && <PageLastUpdate date={new Date(lastUpdate)} />}
@@ -213,7 +219,7 @@ export function EditOnGitHub(props: ComponentProps<"a">) {
 		>
 			{props.children ?? (
 				<>
-					<Edit className="size-3.5" />
+					<Icon name="edit" className="size-3.5" />
 					<I18nLabel label="editOnGithub" />
 				</>
 			)}
