@@ -20,7 +20,6 @@ WORKDIR /app
 ENV NODE_ENV=production
 COPY --from=builder /app/apps/docs/public ./docs/public
 COPY --from=builder /app/apps/docs/.next ./docs/.next
-COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/apps/docs/package.json ./docs/package.json
 
 EXPOSE 3000
