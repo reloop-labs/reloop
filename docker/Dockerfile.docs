@@ -1,12 +1,10 @@
-FROM oven/bun:1-alpine AS base
-WORKDIR /app
+FROM oven/bun:1-alpine
 ENV NODE_ENV=production
 ENV BUN_TELEMETRY_DISABLED=1
 ENV CI=1
 
-# =========================================================================== #
-FROM base AS installer
-# Copy workspace files from root
+ENV PROJECT_ROOT=/reloop/
+
 COPY ./ ./reloop
 
 WORKDIR /reloop
