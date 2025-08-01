@@ -1,0 +1,12 @@
+workspace = true
+
+[install]
+# Automatically installs packages across all apps/packages
+hoist = true
+
+[workspace]
+packages = [
+  "apps/*",
+  "packages/*",
+  "tools/*"
+]
