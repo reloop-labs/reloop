@@ -56,13 +56,7 @@ function Divider({
 }: React.HTMLAttributes<HTMLDivElement> &
 	VariantProps<typeof dividerVariants>) {
 	return (
-		// biome-ignore lint/a11y/useFocusableInteractive: ignore
-		<div
-			// biome-ignore lint/a11y/useAriaPropsForRole: ignore
-			role="separator"
-			className={dividerVariants({ variant, class: className })}
-			{...rest}
-		/>
+		<div className={dividerVariants({ variant, class: className })} {...rest} />
 	);
 }
 Divider.displayName = DIVIDER_ROOT_NAME;
