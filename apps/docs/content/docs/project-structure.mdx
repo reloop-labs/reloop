@@ -7,49 +7,59 @@ description: Understand how the codebase is organized across apps, packages, and
 
 This monorepo maintains clean separation between frontend applications, backend services, and reusable packages. The architecture follows modern best practices for scalable development with efficient dependency management and build optimization.
 
+<Callout type="info">
+  Want to understand the technologies powering this structure? Check out our **[Tech Stack](/tech-stack)** page for detailed technology choices and explanations.
+</Callout>
+
 ## Apps
 
 The `apps/` directory contains all deployable applications, each serving specific user-facing or internal functionality.
 
 <Cards>
-  <Card icon={<Icon name="globe" />} title="Web">
+  <Card icon={<Icon name="globe" />} title="Web" href="/apps/web">
     **Main Frontend Application** - The primary user-facing web application featuring custom font loading (BasierCircle), PWA capabilities with web manifest, and optimized asset delivery.
 
+    - **Location**: `apps/web/`
     - **Features**: PWA support, custom fonts, responsive design
     - **Assets**: Icons, manifests, and web app resources
   </Card>
 
-  <Card icon={<Icon name="monitor" />} title="Main">
+  <Card icon={<Icon name="monitor" />} title="Main" href="/apps/main">
     **Core Application** - Secondary application handling core business logic and main user workflows.
 
+    - **Location**: `apps/main/`
     - **Purpose**: Primary business logic implementation
     - **Assets**: SVG icons and static resources
   </Card>
 
-  <Card icon={<Icon name="book-open" />} title="Docs">
+  <Card icon={<Icon name="book-open" />} title="Docs" href="/apps/docs">
     **Documentation Site** - Comprehensive developer documentation, API references, and user guides with advanced search, TOC navigation, and theme switching.
 
+    - **Location**: `apps/docs/`
     - **Features**: Search API, theme toggle, language support, responsive sidebar
     - **Content**: Project structure, tech stack documentation, guides
   </Card>
 
-  <Card icon={<Icon name="shield-check" />} title="Admin">
+  <Card icon={<Icon name="shield-check" />} title="Admin" href="/apps/admin">
     **Administrative Dashboard** - Internal admin interface for system management and configuration.
 
+    - **Location**: `apps/admin/`
     - **Purpose**: Administrative controls and system management
     - **Access**: Internal team usage
   </Card>
 
-  <Card icon={<Icon name="server" />} title="Server">
+  <Card icon={<Icon name="server" />} title="Server" href="/apps/server">
     **Backend API Server** - Core backend service handling authentication, database operations, and business logic.
 
+    - **Location**: `apps/server/`
     - **Features**: Database schema management, authentication, API routing
     - **Infrastructure**: Docker Compose setup, environment configuration
   </Card>
 
-  <Card icon={<Icon name="mail" />} title="Mail">
+  <Card icon={<Icon name="mail" />} title="Mail" href="/apps/mail">
     **Email Service** - Dedicated service for handling transactional emails, notifications, and email-related functionality.
 
+    - **Location**: `apps/mail/`
     - **Purpose**: Email processing and delivery
     - **Integration**: Connects with main applications for notifications
   </Card>
@@ -60,25 +70,28 @@ The `apps/` directory contains all deployable applications, each serving specifi
 The `packages/` directory contains shared libraries and utilities that can be consumed across multiple applications.
 
 <Cards>
-  <Card icon={<Icon name="palette" />} title="@repo/ui">
+  <Card icon={<Icon name="palette" />} title="@repo/ui" href="/packages/ui">
     **Design System & Component Library** - Comprehensive UI component library with modern React patterns. Includes 50+ components ranging from basic inputs to complex data visualizations.
 
+    - **Location**: `packages/ui/`
     - **Components**: Buttons, forms, tables, modals, navigation, data display
     - **Features**: Polymorphic components, accessibility built-in
     - **Utilities**: Custom hooks, helper functions, styling utilities
   </Card>
 
-  <Card icon={<Icon name="database" />} title="@repo/db">
+  <Card icon={<Icon name="database" />} title="@repo/db" href="/packages/db">
     **Database Layer** - Centralized database management with schema definitions and database utilities.
 
+    - **Location**: `packages/db/`
     - **Schemas**: Auth, audience management, email configurations
     - **Features**: Type-safe queries, migrations, Docker setup
     - **Tools**: Database client, schema validation, development utilities
   </Card>
 
-  <Card icon={<Icon name="key" />} title="@repo/auth">
+  <Card icon={<Icon name="key" />} title="@repo/auth" href="/packages/auth">
     **Authentication Package** - Shared authentication logic, configurations, and utilities for consistent auth across applications.
 
+    - **Location**: `packages/auth/`
     - **Features**: Auth configuration, client/server utilities, CLI integration
     - **Integration**: Works seamlessly with database and UI packages
     - **Security**: Modern auth patterns and best practices
@@ -90,16 +103,18 @@ The `packages/` directory contains shared libraries and utilities that can be co
 The `tools/` directory houses shared configuration and development utilities that ensure consistency across the monorepo.
 
 <Cards>
-  <Card icon={<Icon name="paintbrush" />} title="Tailwind Configuration">
+  <Card icon={<Icon name="paintbrush" />} title="Tailwind Configuration" href="/tools/tailwind">
     **Shared Styling Setup** - Centralized Tailwind CSS configuration ensuring consistent design tokens and styling across all applications.
 
+    - **Location**: `tools/tailwind/`
     - **Purpose**: Design system foundation
     - **Benefits**: Consistent theming, reduced duplication
   </Card>
 
-  <Card icon={<Icon name="code" />} title="TypeScript Configuration">
+  <Card icon={<Icon name="code" />} title="TypeScript Configuration" href="/tools/typescript">
     **Type Safety Foundation** - Multiple TypeScript configurations optimized for different environments and use cases.
 
+    - **Location**: `tools/typescript/`
     - **Configs**: Base, Next.js, Vite, internal packages
     - **Benefits**: Consistent type checking, optimized builds
   </Card>
@@ -107,39 +122,85 @@ The `tools/` directory houses shared configuration and development utilities tha
 
 ## Development Infrastructure
 
-### Build System
-- **Monorepo Management**: Intelligent build system with caching and parallel execution
-- **Package Manager**: Fast package management and JavaScript runtime
-- **Code Quality**: Modern linting and formatting for consistent code quality
+<Tabs defaultValue="build-system">
+  <TabsList>
+    <TabsTrigger value="build-system">Build System</TabsTrigger>
+    <TabsTrigger value="quality">Code Quality</TabsTrigger>
+    <TabsTrigger value="environment">Environment</TabsTrigger>
+  </TabsList>
 
-### Git Hooks & Quality
-- **Automated Hooks**: Git hooks for pre-commit checks
-- **Pre-commit**: Code quality enforcement before commits
-- **Build Cache**: Build artifact caching for faster development
+  <TabsContent value="build-system">
+    ### Build System
+    - **Monorepo Management**: Intelligent build system with caching and parallel execution
+    - **Package Manager**: Fast package management and JavaScript runtime
+    - **Task Orchestration**: Coordinated builds across multiple applications and packages
+  </TabsContent>
 
-### Environment Management
-- **Containerization**: Containerized database and services
-- **Configuration**: Secure configuration management
-- **Development Tools**: Hot reloading, debugging, and testing utilities
+  <TabsContent value="quality">
+    ### Git Hooks & Quality
+    - **Automated Hooks**: Git hooks for pre-commit checks
+    - **Pre-commit**: Code quality enforcement before commits
+    - **Build Cache**: Build artifact caching for faster development
+    - **Linting & Formatting**: Consistent code style across the entire codebase
+  </TabsContent>
 
-## Key Features
+  <TabsContent value="environment">
+    ### Environment Management
+    - **Containerization**: Containerized database and services
+    - **Configuration**: Secure configuration management
+    - **Development Tools**: Hot reloading, debugging, and testing utilities
+    - **Docker Compose**: Local development environment setup
+  </TabsContent>
+</Tabs>
 
-### Monorepo Benefits
-- **Shared Dependencies**: Efficient package management across projects
-- **Type Safety**: End-to-end TypeScript with shared types
-- **Consistent Tooling**: Unified linting, formatting, and build processes
-- **Code Reuse**: Shared components, utilities, and configurations
+## Key Benefits
 
-### Development Experience
-- **Fast Builds**: Intelligent caching and parallel execution
-- **Hot Reloading**: Instant feedback during development
-- **Type Checking**: Real-time validation across the codebase
-- **Code Quality**: Automated formatting and linting
+<div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+  <div className="p-6 border rounded-lg">
+    <h3 className="text-lg font-semibold mb-3">🔄 Monorepo Advantages</h3>
+    <ul className="space-y-2 text-sm">
+      <li>• **Shared Dependencies**: Efficient package management across projects</li>
+      <li>• **Type Safety**: End-to-end type safety with shared types</li>
+      <li>• **Consistent Tooling**: Unified linting, formatting, and build processes</li>
+      <li>• **Code Reuse**: Shared components, utilities, and configurations</li>
+    </ul>
+  </div>
 
-### Production Ready
-- **PWA Support**: Progressive Web App capabilities
-- **Performance**: Optimized builds and asset delivery
-- **Security**: Modern authentication and security practices
-- **Scalability**: Modular architecture for easy expansion
+  <div className="p-6 border rounded-lg">
+    <h3 className="text-lg font-semibold mb-3">⚡ Development Experience</h3>
+    <ul className="space-y-2 text-sm">
+      <li>• **Fast Builds**: Intelligent caching and parallel execution</li>
+      <li>• **Hot Reloading**: Instant feedback during development</li>
+      <li>• **Type Checking**: Real-time validation across the codebase</li>
+      <li>• **Code Quality**: Automated formatting and linting</li>
+    </ul>
+  </div>
+
+  <div className="p-6 border rounded-lg">
+    <h3 className="text-lg font-semibold mb-3">🚀 Production Ready</h3>
+    <ul className="space-y-2 text-sm">
+      <li>• **PWA Support**: Progressive Web App capabilities</li>
+      <li>• **Performance**: Optimized builds and asset delivery</li>
+      <li>• **Security**: Modern authentication and security practices</li>
+      <li>• **Scalability**: Modular architecture for easy expansion</li>
+    </ul>
+  </div>
+
+  <div className="p-6 border rounded-lg">
+    <h3 className="text-lg font-semibold mb-3">🛠️ Developer Tooling</h3>
+    <ul className="space-y-2 text-sm">
+      <li>• **Modern Toolchain**: Latest development tools and practices</li>
+      <li>• **Documentation**: Comprehensive guides and API references</li>
+      <li>• **Testing**: Automated testing and quality assurance</li>
+      <li>• **CI/CD Ready**: Optimized for continuous integration</li>
+    </ul>
+  </div>
+</div>
+
+<Callout type="tip">
+  **Getting Started**: New to the codebase? Start by exploring the `apps/docs` for comprehensive guides, then check out `packages/ui` for available components, and finally dive into the specific app you'll be working on.
+</Callout>
+
+---
 
 This structure provides a solid foundation for scaling development teams and maintaining code quality while ensuring efficient development workflows and consistent user experiences across all applications.

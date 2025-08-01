@@ -1,3 +1,11 @@
 @import "tailwindcss";
-@import "fumadocs-ui/css/neutral.css";
+@import "fumadocs-ui/css/black.css";
 @import "fumadocs-ui/css/preset.css";
+
+:root {
+	--color-fd-background: hsl(0, 0%, 100%);
+}
+
+.dark {
+	--color-fd-background: hsl(0, 0%, 0%);
+}
