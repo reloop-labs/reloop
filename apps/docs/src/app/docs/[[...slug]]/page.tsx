@@ -7,9 +7,14 @@ import {
 	DocsTitle,
 } from "fumadocs-ui/page";
 import { notFound } from "next/navigation";
+import {
+	NextjsIcon,
+	RadixUIIcon,
+	SWRIcon,
+	TailwindCSSIcon,
+} from "@/components/icons/Tech";
 import { source } from "@/lib/source";
 import { getMDXComponents } from "@/mdx-components";
-
 export default async function Page(props: {
 	params: Promise<{ slug?: string[] }>;
 }) {
@@ -29,6 +34,10 @@ export default async function Page(props: {
 						// this allows you to link to other pages with relative file paths
 						a: createRelativeLink(source, page),
 						Icon: Icon,
+						NextjsIcon: NextjsIcon,
+						RadixUIIcon: RadixUIIcon,
+						TailwindCSSIcon: TailwindCSSIcon,
+						SWRIcon: SWRIcon,
 					})}
 				/>
 			</DocsBody>

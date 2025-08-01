@@ -1,91 +1,151 @@
 ---
-title: Tech stack
-description: A beginner-friendly breakdown of our entire technology stack.
+title: Tech Stack
+description: A comprehensive breakdown of our modern technology stack designed for scalability, performance, and developer happiness.
 ---
 
-# Technology Overview
+# Technology Stack
 
-We use a modern, modular tech stack designed for scalability, performance, and developer happiness. Here’s a categorized breakdown:
+We use a modern, modular tech stack designed for scalability, performance, and developer happiness. Each technology is carefully chosen to work seamlessly together in our monorepo architecture.
 
----
+<Callout type="info">
+  Curious about how these technologies are organized? Check out our **[Project Structure](/project-structure)** page to understand the codebase layout and architecture.
+</Callout>
 
-## Frontend
+## Frontend Technologies
 
-- **[Next.js](https://nextjs.org/):**
-  Our **marketing site** and **dashboard** are built using Next.js — a powerful React framework with support for SSR, routing, and static generation.
+Building modern, responsive, and performant user interfaces.
 
-- **[TypeScript](https://www.typescriptlang.org/):**
-  A superset of JavaScript that adds type safety and better tooling. It’s used across both frontend and backend.
+<Cards>
+  <Card icon={<NextjsIcon />} title="Next.js" href="https://nextjs.org/">
+    - **Used in**: Web, Main, Docs, Admin apps
+  </Card>
 
-- **[Tailwind CSS](https://tailwindcss.com/):**
-  A utility-first CSS framework that helps us build beautiful UIs with speed and consistency.
+  <Card icon={<TailwindCSSIcon />} title="Tailwind CSS" href="https://tailwindcss.com/">
+    - **Used in**: All frontend applications
+  </Card>
 
-- **[Radix UI](https://www.radix-ui.com/):**
-  A set of unstyled, accessible UI primitives used to build robust and flexible UI components.
+  <Card icon={<RadixUIIcon />} title="Radix UI" href="https://www.radix-ui.com/">
+    - **Used in**: @reloop/ui package
+  </Card>
 
-- **[SWR](https://swr.vercel.app/):**
-  A React hook library for data fetching with features like caching, revalidation, and real-time updates.
+  <Card icon={<SWRIcon />} title="SWR" href="https://swr.vercel.app/">
+    - **Used in**: Frontend applications
+  </Card>
 
-- **[Fumadocs](https://fumadocs.vercel.app/):**
-  We use Fumadocs to build our developer docs with MDX, versioning, and clean navigation — all backed by Next.js.
+  <Card icon={<Icon name="book-closed" />} title="Fumadocs" href="https://fumadocs.vercel.app/">
+    - **Used in**: Docs application
+  </Card>
+</Cards>
 
----
+## Backend & API
 
-## 🛠️ Backend & API
+Robust server-side technologies for handling business logic and data processing.
 
-- **[ElisaJS](https://elisa.js.org/):**
-  A fast, modern, type-safe backend framework used to build APIs and services.
+<Cards>
+  <Card icon={<Icon name="server" />} title="ElisaJS" href="https://elisa.js.org/">
+    **Backend Framework** - Fast, modern, type-safe framework for building APIs and services.
 
-- **[Postfix](http://www.postfix.org/):**
-  A trusted Mail Transfer Agent (MTA) used to send transactional and system emails.
+    - **Used in**: Server application
+    - **Benefits**: Type safety, performance, modern patterns
+    - **Features**: Built-in validation, middleware support
+  </Card>
 
-- **[Dovecot](https://www.dovecot.org/):**
-  Works alongside Postfix to manage email delivery and storage.
+  <Card icon={<Icon name="mail" />} title="Postfix" href="http://www.postfix.org/">
+    **Mail Transfer Agent** - Trusted MTA for sending transactional and system emails.
 
-- **[Rspamd](https://rspamd.com/):**
-  An advanced spam filtering system used for analyzing and tracking email deliverability.
+    - **Used in**: Email infrastructure
+    - **Benefits**: Reliability, security, performance
+    - **Features**: SMTP, anti-spam, delivery optimization
+  </Card>
 
----
+  <Card icon={<Icon name="inbox" />} title="Dovecot" href="https://www.dovecot.org/">
+    **Email Server** - Works alongside Postfix to manage email delivery and storage.
 
-## Database & Caching
+    - **Used in**: Email infrastructure
+    - **Benefits**: IMAP/POP3 support, security
+    - **Features**: Mail storage, user authentication
+  </Card>
 
-- **[PostgreSQL](https://www.postgresql.org/):**
-  Our primary relational database. Ideal for structured data, reliability, and performance.
+  <Card icon={<Icon name="shield" />} title="Rspamd" href="https://rspamd.com/">
+    **Spam Filtering** - Advanced spam filtering system for email deliverability analysis.
 
-- **[Redis](https://redis.io/):**
-  Used for **caching**, **session storage**, and **real-time operations**.
+    - **Used in**: Email infrastructure
+    - **Benefits**: Machine learning, real-time analysis
+    - **Features**: Reputation tracking, content analysis
+  </Card>
+</Cards>
 
----
+## Database & Storage
+
+Reliable data storage and caching solutions for optimal performance.
+
+<Cards>
+  <Card icon={<Icon name="database" />} title="PostgreSQL" href="https://www.postgresql.org/">
+    **Primary Database** - Our main relational database for structured data with excellent reliability and performance.
+
+    - **Used in**: All applications requiring data persistence
+    - **Benefits**: ACID compliance, scalability, JSON support
+    - **Features**: Advanced indexing, full-text search, extensions
+  </Card>
+
+  <Card icon={<Icon name="zap" />} title="Redis" href="https://redis.io/">
+    **Caching & Sessions** - In-memory data store for caching, session storage, and real-time operations.
+
+    - **Used in**: Backend services, session management
+    - **Benefits**: Sub-millisecond latency, high throughput
+    - **Features**: Pub/sub, data structures, persistence
+  </Card>
+</Cards>
 
 ## Infrastructure & Monorepo
 
-- **[Bun](https://bun.sh/):**
-  A fast JS runtime that powers our **monorepo workspace**, manages dependencies, and runs scripts.
+Tools that power our development workflow and deployment pipeline.
 
-- **[Turborepo](https://turbo.build/repo):**
-  Used for task caching and orchestrating builds in the monorepo setup — dramatically improving CI and local dev speed.
+<Cards>
+  <Card icon={<Icon name="package" />} title="Bun" href="https://bun.sh/">
+    **JavaScript Runtime** - Fast runtime that powers our monorepo workspace, dependency management, and script execution.
+
+    - **Used in**: Development workflow, package management
+    - **Benefits**: Speed, built-in bundler, TypeScript support
+    - **Features**: Hot reloading, test runner, package manager
+  </Card>
+
+  <Card icon={<Icon name="layers" />} title="Turborepo" href="https://turbo.build/repo">
+    **Monorepo Orchestration** - Task caching and build orchestration for dramatically improved CI and local development speed.
+
+    - **Used in**: Build pipeline, development workflow
+    - **Benefits**: Incremental builds, remote caching
+    - **Features**: Parallel execution, dependency graph, pipeline optimization
+  </Card>
+</Cards>
+
+## Developer Experience
+
+Tools that enhance code quality, consistency, and development workflow.
+
+<Cards>
+  <Card icon={<Icon name="scan" />} title="Biome" href="https://biomejs.dev/">
+    **Code Quality** - All-in-one formatter and linter that replaces ESLint and Prettier with blazing speed.
+
+    - **Used in**: All applications and packages
+    - **Benefits**: Fast performance, unified tooling
+    - **Features**: Linting, formatting, import sorting
+  </Card>
+
+  <Card icon={<Icon name="git-branch" />} title="Husky" href="https://typicode.github.io/husky">
+    **Git Hooks** - Enforces Git hooks like pre-commit and commit-msg to maintain code quality.
+
+    - **Used in**: Development workflow
+    - **Benefits**: Automated quality checks, consistent commits
+    - **Features**: Pre-commit hooks, commit message validation
+  </Card>
+</Cards>
+
+
+<Callout type="tip">
+  **Want to contribute?** All these technologies work together in our monorepo structure. Check out the **[Project Structure](/project-structure)** page to understand how everything is organized, then dive into the specific app or package you want to work on.
+</Callout>
 
 ---
 
-## Tooling & DX
-
-- **[Biome](https://biomejs.dev/):**
-  All-in-one formatter and linter used across the entire codebase. It replaces ESLint, Prettier, and more — with blazing speed.
-
-- **[Husky](https://typicode.github.io/husky):**
-  Enforces Git hooks like pre-commit and commit-msg to keep commits clean and safe.
-
----
-
-##  Developer Languages
-
-- **[TypeScript](https://www.typescriptlang.org/):**
-  Our primary language across the frontend, backend, and shared code.
-
-- **[SQL](https://www.postgresql.org/docs/current/sql.html):**
-  Used in raw form and with query builders for PostgreSQL interaction.
-
-- **[Markdown + MDX](https://mdxjs.com/):**
-  Used in our documentation stack via Fumadocs, allowing JSX in markdown files.
-
----
+This tech stack provides a solid foundation for building modern, scalable applications while maintaining excellent developer experience and code quality across the entire monorepo.
