@@ -72,7 +72,6 @@
 	},
 	"scripts": {
 		"check": "biome check --write .",
-		"prepare": "husky",
 		"dev": "turbo dev",
 		"build": "turbo build",
 		"check-types": "turbo check-types",
