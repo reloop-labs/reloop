@@ -1,6 +1,7 @@
 import * as Button from "@reloop/ui/components/button";
 import * as FancyButton from "@reloop/ui/components/fancy-button";
 import { Logo } from "@reloop/ui/components/logo";
+import { ThemeToggle } from "./ThemeToggle";
 
 export const Header = () => {
 	return (
@@ -14,6 +15,7 @@ export const Header = () => {
 					Login
 				</Button.Root>
 				<FancyButton.Root size="xsmall">Get Started</FancyButton.Root>
+				<ThemeToggle />
 			</div>
 		</header>
 	);

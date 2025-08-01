@@ -53,7 +53,7 @@
 				"noArrayIndexKey": "off"
 			},
 			"style": {
-				"noParameterAssign": "error",
+				"noParameterAssign": "off",
 				"useAsConstAssertion": "error",
 				"useDefaultParameterLast": "error",
 				"useEnumInitializers": "error",
