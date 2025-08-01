@@ -24,15 +24,8 @@
 		"baseUrl": "../../",
 		"paths": {
 			"@web/*": ["apps/web/src/*"],
-			"@web/public/*": ["apps/web/public/*"],
-			"@web/components": ["apps/web/src/components/index.ts"],
-			"@web/layouts": ["apps/web/app/src/layouts/index.ts"],
-			"@web/stores": ["apps/web/app/src/stores/index.ts"],
-			"@web/libs": ["apps/web/app/src/libs/index.ts"],
 			"@api": ["apps/api/src/index.ts"],
 			"@api/*": ["apps/api/src/*"],
-			"@libs": ["packages/libs/src/index.ts"],
-			"@libs/*": ["packages/libs/src/*"],
 			"@ui/*": ["packages/ui/src/*"]
 		}
 	},
