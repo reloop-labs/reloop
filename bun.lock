@@ -97,6 +97,7 @@
         "react-dom": "catalog:ui",
       },
       "devDependencies": {
+        "@reloop/tailwind": "workspace:*",
         "@reloop/ts": "workspace:*",
         "@tailwindcss/postcss": "catalog:ui",
         "@types/node": "catalog:",
