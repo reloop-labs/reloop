@@ -20,6 +20,7 @@ import {
 	SWRIcon,
 	TailwindCSSIcon,
 	TurborepoIcon,
+	TypeScriptIcon,
 } from "@/components/icons/Tech";
 import { source } from "@/lib/source";
 import { getMDXComponents } from "@/mdx-components";
@@ -54,6 +55,7 @@ export default async function Page(props: {
 						BiomejsIcon: BiomejsIcon,
 						KubernetesIcon: KubernetesIcon,
 						DockerIcon: DockerIcon,
+						TypeScriptIcon: TypeScriptIcon,
 					})}
 				/>
 			</DocsBody>

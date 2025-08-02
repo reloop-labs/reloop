@@ -73,97 +73,16 @@ The `packages/` directory contains shared libraries and utilities that can be co
 The `tools/` directory houses shared configuration and development utilities that ensure consistency across the monorepo.
 
 <Cards>
-  <Card icon={<Icon name="paintbrush" />} title="@reloop/tailwind" href="/tools/tailwind">
+  <Card icon={<TailwindCSSIcon />} title="@reloop/tailwind" href="/tools/tailwind">
     **Shared Styling Setup** - Centralized Tailwind CSS configuration.
     - **Location**: `tools/tailwind/`
   </Card>
 
-  <Card icon={<Icon name="code" />} title="@reloop/ts" href="/tools/typescript">
+  <Card icon={<TypeScriptIcon />} title="@reloop/ts" href="/tools/typescript">
     **Typescript Config**
     - **Location**: `tools/typescript/`
   </Card>
 </Cards>
-
-## Development Infrastructure
-
-<Tabs defaultValue="build-system">
-  <TabsList>
-    <TabsTrigger value="build-system">Build System</TabsTrigger>
-    <TabsTrigger value="quality">Code Quality</TabsTrigger>
-    <TabsTrigger value="environment">Environment</TabsTrigger>
-  </TabsList>
-
-  <TabsContent value="build-system">
-    ### Build System
-    - **Monorepo Management**: Intelligent build system with caching and parallel execution
-    - **Package Manager**: Fast package management and JavaScript runtime
-    - **Task Orchestration**: Coordinated builds across multiple applications and packages
-  </TabsContent>
-
-  <TabsContent value="quality">
-    ### Git Hooks & Quality
-    - **Automated Hooks**: Git hooks for pre-commit checks
-    - **Pre-commit**: Code quality enforcement before commits
-    - **Build Cache**: Build artifact caching for faster development
-    - **Linting & Formatting**: Consistent code style across the entire codebase
-  </TabsContent>
-
-  <TabsContent value="environment">
-    ### Environment Management
-    - **Containerization**: Containerized database and services
-    - **Configuration**: Secure configuration management
-    - **Development Tools**: Hot reloading, debugging, and testing utilities
-    - **Docker Compose**: Local development environment setup
-  </TabsContent>
-</Tabs>
-
-## Key Benefits
-
-<div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-  <div className="p-6 border rounded-lg">
-    <h3 className="text-lg font-semibold mb-3">🔄 Monorepo Advantages</h3>
-    <ul className="space-y-2 text-sm">
-      <li>• **Shared Dependencies**: Efficient package management across projects</li>
-      <li>• **Type Safety**: End-to-end type safety with shared types</li>
-      <li>• **Consistent Tooling**: Unified linting, formatting, and build processes</li>
-      <li>• **Code Reuse**: Shared components, utilities, and configurations</li>
-    </ul>
-  </div>
-
-  <div className="p-6 border rounded-lg">
-    <h3 className="text-lg font-semibold mb-3">⚡ Development Experience</h3>
-    <ul className="space-y-2 text-sm">
-      <li>• **Fast Builds**: Intelligent caching and parallel execution</li>
-      <li>• **Hot Reloading**: Instant feedback during development</li>
-      <li>• **Type Checking**: Real-time validation across the codebase</li>
-      <li>• **Code Quality**: Automated formatting and linting</li>
-    </ul>
-  </div>
-
-  <div className="p-6 border rounded-lg">
-    <h3 className="text-lg font-semibold mb-3">🚀 Production Ready</h3>
-    <ul className="space-y-2 text-sm">
-      <li>• **PWA Support**: Progressive Web App capabilities</li>
-      <li>• **Performance**: Optimized builds and asset delivery</li>
-      <li>• **Security**: Modern authentication and security practices</li>
-      <li>• **Scalability**: Modular architecture for easy expansion</li>
-    </ul>
-  </div>
-
-  <div className="p-6 border rounded-lg">
-    <h3 className="text-lg font-semibold mb-3">🛠️ Developer Tooling</h3>
-    <ul className="space-y-2 text-sm">
-      <li>• **Modern Toolchain**: Latest development tools and practices</li>
-      <li>• **Documentation**: Comprehensive guides and API references</li>
-      <li>• **Testing**: Automated testing and quality assurance</li>
-      <li>• **CI/CD Ready**: Optimized for continuous integration</li>
-    </ul>
-  </div>
-</div>
-
-<Callout type="tip">
-  **Getting Started**: New to the codebase? Start by exploring the `apps/docs` for comprehensive guides, then check out `packages/ui` for available components, and finally dive into the specific app you'll be working on.
-</Callout>
 
 ---
 
