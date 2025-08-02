@@ -129,7 +129,7 @@ const FooterLinks = () => {
 						</Link>
 					</div>
 				</div>
-				<div className="border-gray-200 border-r border-dashed py-10 pl-10">
+				<div className="border-gray-200 border-dashed py-10 pl-10">
 					<p className="label-md pb-6">Company</p>
 					<div className="flex flex-col gap-3 text-[15px] text-gray-600">
 						<Link href="/company/about-us">
