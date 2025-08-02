@@ -18,6 +18,20 @@ export const baseOptions: BaseLayoutProps = {
 	links: [
 		{
 			icon: <Icon name="terminal" />,
+			text: "How to Contribute",
+			url: "/how-to-contribute",
+			// secondary items will be displayed differently on navbar
+			secondary: false,
+		},
+		{
+			icon: <Icon name="terminal" />,
+			text: "How to Selfhost",
+			url: "/how-to-contribute",
+			// secondary items will be displayed differently on navbar
+			secondary: false,
+		},
+		{
+			icon: <Icon name="terminal" />,
 			text: "Blog",
 			url: "/blog",
 			// secondary items will be displayed differently on navbar

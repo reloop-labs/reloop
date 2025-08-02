@@ -42,36 +42,25 @@ Building modern, responsive, and performant user interfaces.
 Robust server-side technologies for handling business logic and data processing.
 
 <Cards>
-  <Card icon={<Icon name="server" />} title="ElisaJS" href="https://elisa.js.org/">
+  <Card icon={<ElysiaJSIcon />} title="ElisaJS" href="https://elisa.js.org/">
     **Backend Framework** - Fast, modern, type-safe framework for building APIs and services.
-
-    - **Used in**: Server application
-    - **Benefits**: Type safety, performance, modern patterns
-    - **Features**: Built-in validation, middleware support
+    - **Used in**: Server
   </Card>
 
   <Card icon={<Icon name="mail" />} title="Postfix" href="http://www.postfix.org/">
     **Mail Transfer Agent** - Trusted MTA for sending transactional and system emails.
-
     - **Used in**: Email infrastructure
-    - **Benefits**: Reliability, security, performance
-    - **Features**: SMTP, anti-spam, delivery optimization
   </Card>
 
   <Card icon={<Icon name="inbox" />} title="Dovecot" href="https://www.dovecot.org/">
     **Email Server** - Works alongside Postfix to manage email delivery and storage.
 
     - **Used in**: Email infrastructure
-    - **Benefits**: IMAP/POP3 support, security
-    - **Features**: Mail storage, user authentication
   </Card>
 
   <Card icon={<Icon name="shield" />} title="Rspamd" href="https://rspamd.com/">
     **Spam Filtering** - Advanced spam filtering system for email deliverability analysis.
-
     - **Used in**: Email infrastructure
-    - **Benefits**: Machine learning, real-time analysis
-    - **Features**: Reputation tracking, content analysis
   </Card>
 </Cards>
 
@@ -80,20 +69,12 @@ Robust server-side technologies for handling business logic and data processing.
 Reliable data storage and caching solutions for optimal performance.
 
 <Cards>
-  <Card icon={<Icon name="database" />} title="PostgreSQL" href="https://www.postgresql.org/">
-    **Primary Database** - Our main relational database for structured data with excellent reliability and performance.
-
-    - **Used in**: All applications requiring data persistence
-    - **Benefits**: ACID compliance, scalability, JSON support
-    - **Features**: Advanced indexing, full-text search, extensions
+  <Card icon={<PostgreSQLIcon />} title="PostgreSQL" href="https://www.postgresql.org/">
+  - **Used in**: Auth, Server, email
   </Card>
 
-  <Card icon={<Icon name="zap" />} title="Redis" href="https://redis.io/">
-    **Caching & Sessions** - In-memory data store for caching, session storage, and real-time operations.
-
-    - **Used in**: Backend services, session management
-    - **Benefits**: Sub-millisecond latency, high throughput
-    - **Features**: Pub/sub, data structures, persistence
+  <Card icon={<RedisIcon />} title="Redis" href="https://redis.io/">
+      - **Used in**: Server and auth
   </Card>
 </Cards>
 
@@ -102,20 +83,13 @@ Reliable data storage and caching solutions for optimal performance.
 Tools that power our development workflow and deployment pipeline.
 
 <Cards>
-  <Card icon={<Icon name="package" />} title="Bun" href="https://bun.sh/">
-    **JavaScript Runtime** - Fast runtime that powers our monorepo workspace, dependency management, and script execution.
-
-    - **Used in**: Development workflow, package management
-    - **Benefits**: Speed, built-in bundler, TypeScript support
-    - **Features**: Hot reloading, test runner, package manager
+  <Card icon={<BunIcon />} title="Bun" href="https://bun.sh/">
   </Card>
-
-  <Card icon={<Icon name="layers" />} title="Turborepo" href="https://turbo.build/repo">
-    **Monorepo Orchestration** - Task caching and build orchestration for dramatically improved CI and local development speed.
-
-    - **Used in**: Build pipeline, development workflow
-    - **Benefits**: Incremental builds, remote caching
-    - **Features**: Parallel execution, dependency graph, pipeline optimization
+  <Card icon={<TurborepoIcon />} title="Turborepo" href="https://turbo.build/repo">
+  </Card>
+    <Card icon={<KubernetesIcon />} title="Kubernetes (k8s)" href="https://typicode.github.io/husky">
+  </Card>
+    <Card icon={<DockerIcon />} title="Kubernetes (k8s)" href="https://typicode.github.io/husky">
   </Card>
 </Cards>
 
@@ -124,26 +98,19 @@ Tools that power our development workflow and deployment pipeline.
 Tools that enhance code quality, consistency, and development workflow.
 
 <Cards>
-  <Card icon={<Icon name="scan" />} title="Biome" href="https://biomejs.dev/">
-    **Code Quality** - All-in-one formatter and linter that replaces ESLint and Prettier with blazing speed.
-
-    - **Used in**: All applications and packages
-    - **Benefits**: Fast performance, unified tooling
-    - **Features**: Linting, formatting, import sorting
+  <Card icon={<BiomejsIcon />} title="Biome" href="https://biomejs.dev/">
+    - Linting, formatting, import sorting
   </Card>
 
-  <Card icon={<Icon name="git-branch" />} title="Husky" href="https://typicode.github.io/husky">
-    **Git Hooks** - Enforces Git hooks like pre-commit and commit-msg to maintain code quality.
-
-    - **Used in**: Development workflow
-    - **Benefits**: Automated quality checks, consistent commits
-    - **Features**: Pre-commit hooks, commit message validation
+  <Card icon={<Icon name="share" />} title="Husky" href="https://typicode.github.io/husky">
+    - Pre-commit hooks, commit message validation
   </Card>
+
 </Cards>
 
 
-<Callout type="tip">
-  **Want to contribute?** All these technologies work together in our monorepo structure. Check out the **[Project Structure](/project-structure)** page to understand how everything is organized, then dive into the specific app or package you want to work on.
+<Callout type="tip" title="Want to contribute?">
+   All these technologies work together in our monorepo structure. Check out the **[Project Structure](/project-structure)** page to understand how everything is organized, then dive into the specific app or package you want to work on.
 </Callout>
 
 ---
