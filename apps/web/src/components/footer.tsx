@@ -1,4 +1,5 @@
 import { Logo } from "@reloop/ui/components/logo";
+import Link from "next/link";
 
 export const Footer = () => {
 	return (
@@ -41,53 +42,108 @@ const FooterLinks = () => {
 				<div className="border-gray-200 border-r border-dashed py-10 pl-10">
 					<p className="label-md pb-6">Product</p>
 					<div className="flex flex-col gap-3 text-[15px] text-gray-600">
-						<p>Campaigns</p>
-						<p>Email Analytics</p>
-						<p>Transaction Emails</p>
-						<p>Email Validation</p>
-						<p>Email Templates</p>
-						<p>Deliverable</p>
+						<Link href="/product/campaigns">
+							<p>Campaigns</p>
+						</Link>
+						<Link href="/product/email-analytics">
+							<p>Email Analytics</p>
+						</Link>
+						<Link href="/product/transaction-emails">
+							<p>Transaction Emails</p>
+						</Link>
+						<Link href="/product/email-validation">
+							<p>Email Validation</p>
+						</Link>
+						<Link href="/product/email-templates">
+							<p>Email Templates</p>
+						</Link>
+						<Link href="/product/deliverability">
+							<p>Deliverability</p>
+						</Link>
 					</div>
 				</div>
 
 				<div className="border-gray-200 border-r border-dashed py-10 pl-10">
 					<p className="label-md pb-6">Docs</p>
 					<div className="flex flex-col gap-3 text-[15px] text-gray-600">
-						<p>Getting Started</p>
-						<p>API Reference</p>
-						<p>Campain Builder</p>
-						<p>Integration</p>
-						<p>Webhooks</p>
-						<p>SDKs</p>
+						<Link href="/docs/getting-started">
+							<p>Getting Started</p>
+						</Link>
+						<Link href="/docs/api-reference">
+							<p>API Reference</p>
+						</Link>
+						<Link href="/docs/campaign-builder">
+							<p>Campaign Builder</p>
+						</Link>
+						<Link href="/docs/integration">
+							<p>Integration</p>
+						</Link>
+						<Link href="/docs/webhooks">
+							<p>Webhooks</p>
+						</Link>
+						<Link href="/docs/SDKs">
+							<p>SDKs</p>
+						</Link>
 					</div>
 				</div>
 				<div className="border-gray-200 border-r border-dashed py-10 pl-10">
 					<p className="label-md pb-6">Resources</p>
 					<div className="flex flex-col gap-3 text-[15px] text-gray-600">
-						<p>Changelog</p>
-						<p>Self-hosting Guide</p>
-						<p>Status</p>
-						<p>Community</p>
-						<p>Glossary</p>
+						<Link href="/resources/changelog">
+							<p>Changelog</p>
+						</Link>
+						<Link href="/resources/self-hosting-guide">
+							<p>Self-hosting Guide</p>
+						</Link>
+						<Link href="/resources/status">
+							<p>Status</p>
+						</Link>
+						<Link href="/resources/community">
+							<p>Community</p>
+						</Link>
+						<Link href="/resources/glossary">
+							<p>Glossary</p>
+						</Link>
+						<Link href="/resources/tools">
+							<p>Tools</p>
+						</Link>
 					</div>
 				</div>
 				<div className="border-gray-200 border-r border-dashed py-10 pl-10">
 					<p className="label-md pb-6">Philosophy</p>
 					<div className="flex flex-col gap-3 text-[15px] text-gray-600">
-						<p>Why Reloop</p>
-						<p>Why Open-source</p>
-						<p>What we stand for</p>
-						<p>Our Product Beliefs</p>
-						<p>Engineering</p>
+						<Link href="/philosophy/why-reloop">
+							<p>Why Reloop</p>
+						</Link>
+						<Link href="/philosophy/why-open-source">
+							<p>Why Open-source</p>
+						</Link>
+						<Link href="/philosophy/what-we-stand-for">
+							<p>What we stand for</p>
+						</Link>
+						<Link href="/philosophy/our-product-beliefs">
+							<p>Our Product Beliefs</p>
+						</Link>
+						<Link href="/philosophy/engineering">
+							<p>Engineering</p>
+						</Link>
 					</div>
 				</div>
-				<div className="border-gray-200 border-r border-dashed py-10 pl-10">
+				<div className="border-gray-200 border-dashed py-10 pl-10">
 					<p className="label-md pb-6">Company</p>
 					<div className="flex flex-col gap-3 text-[15px] text-gray-600">
-						<p>About us</p>
-						<p>Blog</p>
-						<p>Contact us</p>
-						<p>License</p>
+						<Link href="/company/about-us">
+							<p>About Us</p>
+						</Link>
+						<Link href="/company/blog">
+							<p>Blog</p>
+						</Link>
+						<Link href="/company/contact-us">
+							<p>Contact Us</p>
+						</Link>
+						<Link href="/company/license">
+							<p>License</p>
+						</Link>
 					</div>
 				</div>
 			</div>
