@@ -24,6 +24,7 @@ import {
 } from "@/components/icons/Tech";
 import { source } from "@/lib/source";
 import { getMDXComponents } from "@/mdx-components";
+
 export default async function Page(props: {
 	params: Promise<{ slug?: string[] }>;
 }) {
