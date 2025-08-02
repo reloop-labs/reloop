@@ -9,7 +9,6 @@ export const Header = () => {
 			<div className="flex items-center">
 				<Logo className="h-8 w-8 rounded-full lg:h-10 lg:w-10" />
 			</div>
-			<div>Email</div>
 			<div className="flex items-center gap-2">
 				<Button.Root size="xsmall" mode="stroke" variant="neutral">
 					Login
