@@ -8,10 +8,18 @@ import {
 } from "fumadocs-ui/page";
 import { notFound } from "next/navigation";
 import {
+	BiomejsIcon,
+	BunIcon,
+	DockerIcon,
+	ElysiaJSIcon,
+	KubernetesIcon,
 	NextjsIcon,
+	PostgreSQLIcon,
 	RadixUIIcon,
+	RedisIcon,
 	SWRIcon,
 	TailwindCSSIcon,
+	TurborepoIcon,
 } from "@/components/icons/Tech";
 import { source } from "@/lib/source";
 import { getMDXComponents } from "@/mdx-components";
@@ -38,6 +46,14 @@ export default async function Page(props: {
 						RadixUIIcon: RadixUIIcon,
 						TailwindCSSIcon: TailwindCSSIcon,
 						SWRIcon: SWRIcon,
+						ElysiaJSIcon: ElysiaJSIcon,
+						PostgreSQLIcon: PostgreSQLIcon,
+						RedisIcon: RedisIcon,
+						BunIcon: BunIcon,
+						TurborepoIcon: TurborepoIcon,
+						BiomejsIcon: BiomejsIcon,
+						KubernetesIcon: KubernetesIcon,
+						DockerIcon: DockerIcon,
 					})}
 				/>
 			</DocsBody>
