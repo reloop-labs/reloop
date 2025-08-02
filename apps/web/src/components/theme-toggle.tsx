@@ -1,7 +1,5 @@
 "use client";
 
-// The following code is a React component that toggles the theme between light and dark modes.
-
 import * as Button from "@reloop/ui/components/button";
 import { Icon } from "@reloop/ui/components/icon";
 import { useTheme } from "next-themes";
