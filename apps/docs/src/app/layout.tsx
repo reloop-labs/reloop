@@ -1,29 +1,38 @@
 import "@/app/global.css";
 import { IconsSprite } from "@reloop/ui/components/icon";
-import { DocsLayout } from "fumadocs-ui/layouts/notebook";
 import { RootProvider } from "fumadocs-ui/provider";
-import { Inter } from "next/font/google";
+import {
+	Geist_Mono as createMono,
+	Geist as createSans,
+} from "next/font/google";
 import type { ReactNode } from "react";
-import { baseOptions } from "@/app/layout.config";
-import { source } from "@/lib/source";
+import { cn } from "@/lib/cn";
 
-const inter = Inter({
+const sans = createSans({
 	subsets: ["latin"],
+	variable: "--font-sans",
+	weight: "variable",
+});
+
+const mono = createMono({
+	subsets: ["latin"],
+	variable: "--font-mono",
+	weight: "variable",
 });
 
 export default function Layout({ children }: { children: ReactNode }) {
 	return (
-		<html lang="en" className={inter.className} suppressHydrationWarning>
+		<html
+			lang="en"
+			className={cn(
+				"touch-manipulation scroll-smooth font-sans antialiased",
+				sans.variable,
+				mono.variable,
+			)}
+			suppressHydrationWarning
+		>
 			<body className="flex min-h-screen flex-col">
-				<RootProvider>
-					<DocsLayout
-						tree={source.pageTree}
-						{...baseOptions}
-						nav={{ ...baseOptions.nav, mode: "top" }}
-					>
-						{children}
-					</DocsLayout>
-				</RootProvider>
+				<RootProvider>{children}</RootProvider>
 				<IconsSprite />
 			</body>
 		</html>
