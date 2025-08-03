@@ -89,7 +89,13 @@
 		"db:stop": "turbo -F server db:stop",
 		"db:down": "turbo -F server db:down"
 	},
-	"dependencies": {},
+	"dependencies": {
+		"class-variance-authority": "^0.7.1",
+		"fumadocs-ui": "^15.6.8",
+		"lucide-react": "^0.536.0",
+		"react": "^19.1.1",
+		"tailwind-merge": "^3.3.1"
+	},
 	"devDependencies": {
 		"turbo": "^2.5.4",
 		"@biomejs/biome": "^2.0.0",
