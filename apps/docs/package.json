@@ -22,8 +22,7 @@
 		"next": "catalog:ui",
 		"next-themes": "catalog:ui",
 		"react": "catalog:ui",
-		"react-dom": "catalog:ui",
-		"tailwind-merge": "catalog:ui"
+		"react-dom": "catalog:ui"
 	},
 	"devDependencies": {
 		"@types/node": "catalog:",
