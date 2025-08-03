@@ -1,5 +1,6 @@
 {
 	"title": "How to Self Host",
-	"description": "The description of root folder (optional)",
-	"root": true
+	"description": "Guide to Hosting It Yourself",
+	"root": true,
+	"icon": "server"
 }

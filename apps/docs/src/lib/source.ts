@@ -1,9 +1,15 @@
+import { Icon } from "@reloop/ui/components/icon";
 import { loader } from "fumadocs-core/source";
+import { createElement } from "react";
 import { docs } from "@/.source";
 
-// See https://fumadocs.vercel.app/docs/headless/source-api for more info
 export const source = loader({
-	// it assigns a URL to your pages
+	icon(icon) {
+		if (!icon) return;
+		if (icon) {
+			return createElement(Icon, { name: icon });
+		}
+	},
 	baseUrl: "/",
 	source: docs.toFumadocsSource(),
 });
