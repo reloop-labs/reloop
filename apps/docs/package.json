@@ -9,21 +9,30 @@
 		"postinstall": "fumadocs-mdx"
 	},
 	"dependencies": {
-		"@reloop/ui": "workspace:*",
+		"@ai-sdk/openai-compatible": "catalog:ui",
+		"@ai-sdk/react": "catalog:ui",
 		"@radix-ui/react-collapsible": "catalog:ui",
+		"@radix-ui/react-dialog": "catalog:ui",
 		"@radix-ui/react-popover": "catalog:ui",
 		"@radix-ui/react-presence": "catalog:ui",
 		"@radix-ui/react-scroll-area": "catalog:ui",
+		"@reloop/ui": "workspace:*",
+		"ai": "catalog:ui",
 		"class-variance-authority": "catalog:ui",
 		"fumadocs-core": "catalog:ui",
 		"fumadocs-mdx": "catalog:ui",
 		"fumadocs-ui": "catalog:ui",
-		"lucide-react": "^0.525.0",
+		"hast-util-to-jsx-runtime": "catalog:ui",
+		"lucide-react": "catalog:ui",
 		"next": "catalog:ui",
 		"next-themes": "catalog:ui",
 		"react": "catalog:ui",
 		"react-dom": "catalog:ui",
-		"tailwind-merge": "catalog:ui"
+		"remark": "catalog:ui",
+		"remark-gfm": "catalog:ui",
+		"remark-rehype": "catalog:ui",
+		"tailwind-merge": "catalog:ui",
+		"zod": "catalog:ui"
 	},
 	"devDependencies": {
 		"@types/node": "catalog:",
