@@ -16,26 +16,44 @@ export const baseOptions: BaseLayoutProps = {
 	},
 	// see https://fumadocs.dev/docs/ui/navigation/links
 	links: [
+		// {
+		// 	icon: <Icon name="terminal" />,
+		// 	text: "Project Structure",
+		// 	url: "/project-structure",
+		// 	// secondary items will be displayed differently on navbar
+		// 	secondary: false,
+		// },
+		// {
+		// 	icon: <Icon name="terminal" />,
+		// 	text: "How to Contribute",
+		// 	url: "/docs/how-to-contribute",
+		// 	// secondary items will be displayed differently on navbar
+		// 	secondary: false,
+		// },
+		// {
+		// 	icon: <Icon name="terminal" />,
+		// 	text: "test1",
+		// 	url: "/docs/test1",
+		// 	// secondary items will be displayed differently on navbar
+		// 	secondary: false,
+		// },
+		// {
+		// 	icon: <Icon name="terminal" />,
+		// 	text: "Local Setup",
+		// 	url: "/local-setup",
+		// 	// secondary items will be displayed differently on navbar
+		// 	secondary: false,
+		// },
 		{
 			icon: <Icon name="terminal" />,
 			text: "How to Contribute",
 			url: "/how-to-contribute",
-			// secondary items will be displayed differently on navbar
-			secondary: false,
 		},
+
 		{
 			icon: <Icon name="terminal" />,
-			text: "How to Selfhost",
-			url: "/how-to-contribute",
-			// secondary items will be displayed differently on navbar
-			secondary: false,
-		},
-		{
-			icon: <Icon name="terminal" />,
-			text: "Blog",
-			url: "/blog",
-			// secondary items will be displayed differently on navbar
-			secondary: false,
+			text: "How to Self Host",
+			url: "/how-to-self-host",
 		},
 	],
 };
