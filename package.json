@@ -99,10 +99,11 @@
 		"db:down": "turbo -F server db:down"
 	},
 	"devDependencies": {
-		"turbo": "^2.5.4",
-		"@biomejs/biome": "^2.0.0",
+		"@biomejs/biome": "2.1.2",
 		"husky": "^9.1.7",
-		"lint-staged": "^15.5.0"
+		"lint-staged": "^15.5.0",
+		"turbo": "^2.5.4",
+		"ultracite": "5.1.2"
 	},
 	"lint-staged": {
 		"*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}": [
