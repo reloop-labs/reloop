@@ -1,9 +1,9 @@
-'use client';
-import { type ButtonHTMLAttributes, useState } from 'react';
-import dynamic from 'next/dynamic';
+"use client";
+import dynamic from "next/dynamic";
+import { type ButtonHTMLAttributes, useState } from "react";
 
 // lazy load the dialog
-const SearchAI = dynamic(() => import('./search'), { ssr: false });
+const SearchAI = dynamic(() => import("./search"), { ssr: false });
 
 /**
  * The trigger component for AI search dialog.
@@ -11,16 +11,16 @@ const SearchAI = dynamic(() => import('./search'), { ssr: false });
  * Use it like a normal button component.
  */
 export function AISearchTrigger(
-  props: ButtonHTMLAttributes<HTMLButtonElement>,
+	props: ButtonHTMLAttributes<HTMLButtonElement>,
 ) {
-  const [open, setOpen] = useState<boolean>();
+	const [open, setOpen] = useState<boolean>();
 
-  return (
-    <>
-      {open !== undefined ? (
-        <SearchAI open={open} onOpenChange={setOpen} />
-      ) : null}
-      <button {...props} onClick={() => setOpen(true)} />
-    </>
-  );
+	return (
+		<>
+			{open !== undefined ? (
+				<SearchAI open={open} onOpenChange={setOpen} />
+			) : null}
+			<button {...props} onClick={() => setOpen(true)} />
+		</>
+	);
 }
