@@ -23,8 +23,8 @@ import {
 	useState,
 } from "react";
 import type { z } from "zod";
-import type { ProvideLinksToolSchema } from "../../../lib/chat/inkeep-qa-schema";
-import { cn } from "../../../lib/cn";
+import type { ProvideLinksToolSchema } from "@/lib/chat/inkeep-qa-schema";
+import { cn } from "@/lib/cn";
 import { buttonVariants } from "../ui/button";
 import { Markdown } from "./markdown";
 
