@@ -4,12 +4,12 @@
 
 :root {
 	--color-fd-background: hsl(0, 0%, 100%);
-	--fd-layout-width: 1400px;
 }
 
 .dark {
 	--color-fd-background: hsl(0, 0%, 0%);
 }
+
 [data-theme-toggle] svg {
 	@apply fill-none;
 }
@@ -27,15 +27,5 @@
 }
 
 #nd-sidebar [data-hide-if-empty] {
-	@apply hidden;
-}
-
-/* Hide unnecessary links on mobile */
-#nd-sidebar-mobile a[href="/"],
-#nd-sidebar-mobile a[href="/docs"].lg\:hidden {
-	@apply hidden;
-}
-
-.landing-page #nd-subnav button[data-search] + button {
 	@apply hidden;
 }
