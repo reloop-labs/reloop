@@ -9,8 +9,6 @@
 		"postinstall": "fumadocs-mdx"
 	},
 	"dependencies": {
-		"@ai-sdk/openai-compatible": "catalog:ui",
-		"@ai-sdk/react": "catalog:ui",
 		"@radix-ui/react-collapsible": "catalog:ui",
 		"@radix-ui/react-dialog": "catalog:ui",
 		"@radix-ui/react-popover": "catalog:ui",
