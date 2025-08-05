@@ -23,7 +23,7 @@
 		"noEmit": true,
 		"baseUrl": "../../",
 		"paths": {
-			"@web/*": ["apps/web/src/*"],
+			"@web/*": ["apps/frontend/web/src/*"],
 			"@ui/*": ["packages/ui/src/*"]
 		}
 	},
