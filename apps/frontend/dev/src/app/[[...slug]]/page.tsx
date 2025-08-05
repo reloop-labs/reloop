@@ -34,7 +34,7 @@ export default async function Page(props: {
 	const params = await props.params;
 	const page = source.getPage(params.slug);
 	if (!page) notFound();
-
+	console.log("Page data:", params.slug);
 	const MDXContent = page.data.body;
 
 	return (
@@ -42,21 +42,22 @@ export default async function Page(props: {
 			tabMode="navbar"
 			tree={source.pageTree}
 			{...baseOptions}
+			githubUrl="https://github.com/reloop-labs/reloop"
 			nav={{ ...baseOptions.nav, mode: "top" }}
 			sidebar={{
 				collapsible: false,
 				tabs: [
 					{
-						title: "API",
-						url: "/api-reference",
+						title: "Apps",
+						url: "/apps",
 					},
 					{
-						title: "Self Host",
-						url: "/how-to-self-host",
+						title: "Deploy",
+						url: "/deploy",
 					},
 					{
-						title: "Contribute",
-						url: "/how-to-contribute",
+						title: "Setup",
+						url: "/setup",
 					},
 				],
 			}}
@@ -65,10 +66,18 @@ export default async function Page(props: {
 				tableOfContent={{ style: "clerk" }}
 				toc={page.data.toc}
 				full={page.data.full}
+				editOnGithub={{
+					sha: "tree/main/apps/frontend/dev/content/docs",
+					owner: "reloop-labs",
+					repo: "reloop",
+					path: `/${params.slug?.join("/")}.mdx`,
+				}}
 			>
 				<DocsTitle>{page.data.title}</DocsTitle>
-				<DocsDescription>{page.data.description}</DocsDescription>
-				<div className="flex flex-row items-center gap-2 border-b pt-2 pb-6">
+				<DocsDescription className="mb-1">
+					{page.data.description}
+				</DocsDescription>
+				<div className="flex flex-row items-center gap-2 border-b pb-6">
 					<LLMCopyButton markdownUrl={`${page.url}.mdx`} />
 					<ViewOptions
 						markdownUrl={`${page.url}.mdx`}
