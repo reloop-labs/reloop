@@ -9,7 +9,6 @@ import {
 } from "fumadocs-ui/page";
 import { notFound } from "next/navigation";
 import { baseOptions } from "@/app/layout.config";
-import { LLMCopyButton, ViewOptions } from "@/components/ai/page-actions";
 import {
 	BiomejsIcon,
 	BunIcon,
@@ -25,6 +24,7 @@ import {
 	TurborepoIcon,
 	TypeScriptIcon,
 } from "@/components/icons/Tech";
+import { LLMCopyButton, ViewOptions } from "@/components/page-actions";
 import { source } from "@/lib/source";
 import { getMDXComponents } from "@/mdx-components";
 

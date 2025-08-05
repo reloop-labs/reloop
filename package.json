@@ -60,12 +60,8 @@
 				"postcss": "8.5.6",
 				"@ai-sdk/openai-compatible": "1.0.0",
 				"@ai-sdk/react": "2.0.0",
-				"ai": "5.0.0",
 				"hast-util-to-jsx-runtime": "2.3.6",
 				"lucide-react": "0.525.0",
-				"remark": "15.0.1",
-				"remark-gfm": "4.0.1",
-				"remark-rehype": "11.1.2",
 				"zod": "4.0.14"
 			},
 			"db": {

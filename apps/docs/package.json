@@ -17,7 +17,6 @@
 		"@radix-ui/react-presence": "catalog:ui",
 		"@radix-ui/react-scroll-area": "catalog:ui",
 		"@reloop/ui": "workspace:*",
-		"ai": "catalog:ui",
 		"class-variance-authority": "catalog:ui",
 		"fumadocs-core": "catalog:ui",
 		"fumadocs-mdx": "catalog:ui",
@@ -28,9 +27,6 @@
 		"next-themes": "catalog:ui",
 		"react": "catalog:ui",
 		"react-dom": "catalog:ui",
-		"remark": "catalog:ui",
-		"remark-gfm": "catalog:ui",
-		"remark-rehype": "catalog:ui",
 		"tailwind-merge": "catalog:ui",
 		"zod": "catalog:ui"
 	},
