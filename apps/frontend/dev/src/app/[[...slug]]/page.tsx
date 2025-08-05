@@ -67,10 +67,10 @@ export default async function Page(props: {
 				toc={page.data.toc}
 				full={page.data.full}
 				editOnGithub={{
-					sha: "tree/main/apps/frontend/dev/content/docs",
 					owner: "reloop-labs",
 					repo: "reloop",
-					path: `/${params.slug?.join("/")}.mdx`,
+					path: `/${params.slug?.join("/")}.mdx?plain=1`,
+					sha: "main/apps/frontend/dev/content/docs",
 				}}
 			>
 				<DocsTitle>{page.data.title}</DocsTitle>
