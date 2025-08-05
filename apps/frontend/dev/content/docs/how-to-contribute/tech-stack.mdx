@@ -1,0 +1,118 @@
+---
+title: Tech Stack
+description: A comprehensive breakdown of our modern technology stack designed for scalability, performance, and developer happiness.
+---
+
+# Technology Stack
+
+We use a modern, modular tech stack designed for scalability, performance, and developer happiness. Each technology is carefully chosen to work seamlessly together in our monorepo architecture.
+
+<Callout type="info">
+  Curious about how these technologies are organized? Check out our **[Project Structure](/project-structure)** page to understand the codebase layout and architecture.
+</Callout>
+
+## Frontend Technologies
+
+Building modern, responsive, and performant user interfaces.
+
+<Cards>
+  <Card icon={<NextjsIcon />} title="Next.js" href="https://nextjs.org/">
+    - **Used in**: Web, Main, Docs, Admin apps
+  </Card>
+
+  <Card icon={<TailwindCSSIcon />} title="Tailwind CSS" href="https://tailwindcss.com/">
+    - **Used in**: All frontend applications
+  </Card>
+
+  <Card icon={<RadixUIIcon />} title="Radix UI" href="https://www.radix-ui.com/">
+    - **Used in**: @reloop/ui package
+  </Card>
+
+  <Card icon={<SWRIcon />} title="SWR" href="https://swr.vercel.app/">
+    - **Used in**: Frontend applications
+  </Card>
+
+  <Card icon={<Icon name="book-closed" />} title="Fumadocs" href="https://fumadocs.vercel.app/">
+    - **Used in**: Docs application
+  </Card>
+</Cards>
+
+## Backend & API
+
+Robust server-side technologies for handling business logic and data processing.
+
+<Cards>
+  <Card icon={<ElysiaJSIcon />} title="ElysiaJS" href="https://elysiajs.com/">
+    **Backend Framework** - Fast, modern, type-safe framework for building APIs and services.
+    - **Used in**: Server
+  </Card>
+
+  <Card icon={<Icon name="mail" />} title="Postfix" href="http://www.postfix.org/">
+    **Mail Transfer Agent** - Trusted MTA for sending transactional and system emails.
+    - **Used in**: Email infrastructure
+  </Card>
+
+  <Card icon={<Icon name="inbox" />} title="Dovecot" href="https://www.dovecot.org/">
+    **Email Server** - Works alongside Postfix to manage email delivery and storage.
+    - **Used in**: Email infrastructure
+  </Card>
+
+  <Card icon={<Icon name="shield-check" />} title="Rspamd" href="https://rspamd.com/">
+    **Spam Filtering** - Advanced spam filtering system for email deliverability analysis.
+    - **Used in**: Email infrastructure
+  </Card>
+</Cards>
+
+## Database & Storage
+
+Reliable data storage and caching solutions for optimal performance.
+
+<Cards>
+  <Card icon={<PostgreSQLIcon />} title="PostgreSQL" href="https://www.postgresql.org/">
+    - **Used in**: Auth, Server, Email
+  </Card>
+
+  <Card icon={<RedisIcon />} title="Redis" href="https://redis.io/">
+    - **Used in**: Server and Auth
+  </Card>
+</Cards>
+
+## Infrastructure & Monorepo
+
+Tools that power our development workflow and deployment pipeline.
+
+<Cards>
+  <Card icon={<BunIcon />} title="Bun" href="https://bun.sh/">
+  </Card>
+
+  <Card icon={<TurborepoIcon />} title="Turborepo" href="https://turbo.build/repo">
+  </Card>
+
+  <Card icon={<KubernetesIcon />} title="Kubernetes (k8s)" href="https://kubernetes.io/">
+  </Card>
+
+  <Card icon={<DockerIcon />} title="Docker" href="https://www.docker.com/">
+  </Card>
+</Cards>
+
+## Developer Experience
+
+Tools that enhance code quality, consistency, and development workflow.
+
+<Cards>
+  <Card icon={<BiomejsIcon />} title="Biome" href="https://biomejs.dev/">
+    - Linting, formatting, import sorting
+  </Card>
+
+  <Card icon={<Icon name="share" />} title="Husky" href="https://typicode.github.io/husky">
+    - Pre-commit hooks, commit message validation
+  </Card>
+</Cards>
+
+<Callout type="tip" title="Want to contribute?">
+   All these technologies work together in our monorepo structure. Check out the **[Project Structure](/project-structure)** page to understand how everything is organized, then dive into the specific app or package you want to work on.
+</Callout>
+
+---
+
+This tech stack provides a solid foundation for building modern, scalable applications while maintaining excellent developer experience and code quality across the entire monorepo.

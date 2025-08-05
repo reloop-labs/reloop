@@ -1,0 +1,91 @@
+@import "tailwindcss";
+@import "fumadocs-ui/css/black.css";
+@import "fumadocs-ui/css/preset.css";
+
+@font-face {
+	font-family: "BasierCircle";
+	src: url("/font/BasierCircle/basiercircle-bold-webfont.woff2") format("woff2");
+	font-weight: 700;
+	font-style: normal;
+}
+@font-face {
+	font-family: "BasierCircle";
+	src: url("/font/BasierCircle/basiercircle-bolditalic-webfont") format("woff2");
+	font-weight: 700;
+	font-style: italic;
+}
+@font-face {
+	font-family: "BasierCircle";
+	src: url("/font/BasierCircle/basiercircle-medium-webfont.woff2")
+		format("woff2");
+	font-weight: 500;
+	font-style: normal;
+}
+@font-face {
+	font-family: "BasierCircle";
+	src: url("/font/BasierCircle/basiercircle-mediumitalic-webfont.woff2")
+		format("woff2");
+	font-weight: 500;
+	font-style: italic;
+}
+@font-face {
+	font-family: "BasierCircle";
+	src: url("/font/BasierCircle/basiercircle-regular-webfont.woff2")
+		format("woff2");
+	font-weight: 400;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: "BasierCircle";
+	src: url("/font/BasierCircle/basiercircle-regularitalic-webfont.woff2")
+		format("woff2");
+	font-weight: 400;
+	font-style: italic;
+}
+@font-face {
+	font-family: "BasierCircle";
+	src: url("/font/BasierCircle/basiercircle-semibold-webfont.woff2")
+		format("woff2");
+	font-weight: 600;
+	font-style: normal;
+}
+@font-face {
+	font-family: "BasierCircle";
+	src: url("/font/BasierCircle/basiercircle-semibolditalic-webfont.woff2")
+		format("woff2");
+	font-weight: 600;
+	font-style: italic;
+}
+
+:root {
+	--color-fd-background: hsl(0, 0%, 100%);
+}
+
+.dark {
+	--color-fd-background: hsl(0, 0%, 0%);
+}
+
+[data-theme-toggle] svg {
+	@apply fill-none;
+}
+
+#nd-subnav > div {
+	@apply container border-x;
+}
+
+#nd-docs-layout {
+	@apply container mx-auto p-0 border-x;
+}
+
+#nd-tocnav {
+	@apply translate-y-px;
+}
+
+#nd-sidebar [data-hide-if-empty] {
+	@apply hidden;
+}
+
+body {
+	font-family: "BasierCircle", Helvetica, sans-serif;
+}
