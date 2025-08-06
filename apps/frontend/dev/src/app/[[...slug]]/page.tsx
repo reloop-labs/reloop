@@ -66,6 +66,10 @@ export default async function Page(props: {
 						title: "Setup",
 						url: "/setup",
 					},
+					{
+						title: "API",
+						url: "/api",
+					},
 				],
 			}}
 		>

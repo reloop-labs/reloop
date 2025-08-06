@@ -64,7 +64,11 @@
 				"zod": "4.0.14",
 				"@better-fetch/fetch": "^1.1.18",
 				"react-markdown": "^10.1.0",
-				"rehype-highlight": "^7.0.2"
+				"rehype-highlight": "^7.0.2",
+				"shiki": "^3.9.2",
+				"fumadocs-openapi": "^9.1.9",
+				"ajv": "^8.17.1"
+
 			},
 			"db": {
 				"@types/pg": "8.15.4",
