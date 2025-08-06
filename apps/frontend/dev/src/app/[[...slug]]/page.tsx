@@ -47,6 +47,14 @@ export default async function Page(props: {
 				collapsible: false,
 				tabs: [
 					{
+						title: "SDK",
+						url: "/sdk",
+					},
+					{
+						title: "Integrations",
+						url: "/integrations",
+					},
+					{
 						title: "Apps",
 						url: "/apps",
 					},
