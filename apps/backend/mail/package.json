@@ -6,7 +6,7 @@
 		"dev": "bun run --watch src/index.ts"
 	},
 	"dependencies": {
-		"elysia": "latest"
+		"elysia": "catalog:backend"
 	},
 	"devDependencies": {
 		"bun-types": "latest"

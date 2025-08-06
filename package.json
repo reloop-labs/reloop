@@ -4,7 +4,7 @@
 	"workspaces": {
 		"packages": [
 			"apps/frontend/*",
-			"apps/frontend/*",
+			"apps/backend/*",
 			"packages/*",
 			"tools/*"
 		],
@@ -76,7 +76,9 @@
 				"pg": "8.16.3",
 				"valibot": "1.1.0"
 			},
-			"backend": {}
+			"backend": {
+				"elysia": "latest"
+			}
 		}
 	},
 	"scripts": {
