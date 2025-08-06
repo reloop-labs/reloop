@@ -9,6 +9,7 @@
 		"postinstall": "fumadocs-mdx"
 	},
 	"dependencies": {
+		"@better-fetch/fetch": "catalog:ui",
 		"@radix-ui/react-collapsible": "catalog:ui",
 		"@radix-ui/react-dialog": "catalog:ui",
 		"@radix-ui/react-popover": "catalog:ui",
@@ -25,6 +26,8 @@
 		"next-themes": "catalog:ui",
 		"react": "catalog:ui",
 		"react-dom": "catalog:ui",
+		"react-markdown": "catalog:ui",
+		"rehype-highlight": "catalog:ui",
 		"tailwind-merge": "catalog:ui",
 		"zod": "catalog:ui"
 	},
