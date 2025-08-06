@@ -6,7 +6,8 @@
 		"build": "next build",
 		"dev": "next dev --turbo",
 		"start": "next start",
-		"postinstall": "fumadocs-mdx"
+		"postinstall": "fumadocs-mdx",
+		"prebuild": "bun ./scripts/generate-docs.mjs"
 	},
 	"dependencies": {
 		"@radix-ui/react-collapsible": "catalog:ui",
