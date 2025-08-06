@@ -42,8 +42,6 @@ export default async function Page(props: {
 
 	const MDXContent = page.data.body;
 
-	console.log("Page slug:", params.slug?.[0]);
-
 	const { data: releases } = await betterFetch<
 		{
 			id: number;
@@ -55,8 +53,6 @@ export default async function Page(props: {
 			published_at: string;
 		}[]
 	>("https://api.github.com/repos/reloop-labs/reloop/releases");
-
-	console.log("Releases data:", releases);
 
 	const messages = releases
 		?.filter((release) => !release.prerelease)
@@ -71,8 +67,6 @@ export default async function Page(props: {
 			}),
 			url: release.html_url,
 		}));
-
-	console.log("Messages:", messages);
 
 	function getContent(content: string) {
 		const lines = content.split("\n");

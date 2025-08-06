@@ -61,7 +61,10 @@
 				"postcss": "8.5.6",
 				"hast-util-to-jsx-runtime": "2.3.6",
 				"lucide-react": "0.525.0",
-				"zod": "4.0.14"
+				"zod": "4.0.14",
+				"@better-fetch/fetch": "^1.1.18",
+				"react-markdown": "^10.1.0",
+				"rehype-highlight": "^7.0.2"
 			},
 			"db": {
 				"@types/pg": "8.15.4",
