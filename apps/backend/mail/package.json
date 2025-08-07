@@ -23,7 +23,8 @@
 		"@opentelemetry/semantic-conventions": "catalog:backend"
 	},
 	"devDependencies": {
-		"@react-email/preview-server": "catalog:backend"
+		"@react-email/preview-server": "catalog:ui",
+		"bun-types": "catalog:backend"
 	},
 	"module": "src/index.js",
 	"overrides": {

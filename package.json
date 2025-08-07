@@ -50,6 +50,7 @@
 				"next": "15.4.2",
 				"react": "19.1.0",
 				"react-dom": "19.1.0",
+				"react-email": "4.2.8",
 				"fumadocs-ui": "15.4.0",
 				"fumadocs-core": "15.4.0",
 				"fumadocs-mdx": "11.7.0",
@@ -68,7 +69,8 @@
 				"shiki": "3.9.2",
 				"fumadocs-openapi": "9.1.9",
 				"ajv": "8.17.1",
-				"@react-email/components": "0.5.0"
+				"@react-email/components": "0.5.0",
+				"@react-email/preview-server": "4.2.8"
 			},
 			"db": {
 				"@types/pg": "8.15.4",
@@ -94,7 +96,7 @@
 				"@opentelemetry/resources": "2.0.1",
 				"@opentelemetry/sdk-trace-node": "2.0.1",
 				"@opentelemetry/semantic-conventions": "1.36.0",
-				"@react-email/preview-server": "4.2.8"
+				"bun-types":"latest"
 			}
 		}
 	},
@@ -120,7 +122,6 @@
 		"@biomejs/biome": "2.1.2",
 		"husky": "9.1.7",
 		"lint-staged": "15.5.0",
-		"react-email": "4.2.8",
 		"turbo": "2.5.5",
 		"ultracite": "5.1.2"
 	},
