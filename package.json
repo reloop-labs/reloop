@@ -96,7 +96,8 @@
 				"@opentelemetry/resources": "2.0.1",
 				"@opentelemetry/sdk-trace-node": "2.0.1",
 				"@opentelemetry/semantic-conventions": "1.36.0",
-				"bun-types":"latest"
+				"bun-types": "latest",
+				"@opentelemetry/exporter-trace-otlp-proto": "0.203.0"
 			}
 		}
 	},
@@ -117,7 +118,9 @@
 		"db:stop": "turbo -F server db:stop",
 		"db:down": "turbo -F server db:down"
 	},
-	"dependencies": {},
+	"dependencies": {
+
+	},
 	"devDependencies": {
 		"@biomejs/biome": "2.1.2",
 		"husky": "9.1.7",

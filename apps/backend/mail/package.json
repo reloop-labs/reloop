@@ -20,7 +20,14 @@
 		"@opentelemetry/instrumentation-http": "catalog:backend",
 		"@opentelemetry/resources": "catalog:backend",
 		"@opentelemetry/sdk-trace-node": "catalog:backend",
-		"@opentelemetry/semantic-conventions": "catalog:backend"
+		"@opentelemetry/semantic-conventions": "catalog:backend",
+		"@elysiajs/opentelemetry": "catalog:backend",
+		"@react-email/components":"catalog:ui",
+		"@opentelemetry/exporter-trace-otlp-proto": "catalog:backend",
+		"react": "catalog:ui",
+		"react-dom": "catalog:ui",
+		"react-email": "catalog:ui"
+
 	},
 	"devDependencies": {
 		"@react-email/preview-server": "catalog:ui",
