@@ -18,11 +18,11 @@ RUN bun run --filter=docs build
 FROM base AS runner
 WORKDIR /app
 ENV NODE_ENV=production
-COPY --from=builder /app/docs/public ./docs/public
-COPY --from=builder /app/docs/.next ./docs/.next
+COPY --from=builder /app/apps/frontend/docs/public ./docs/public
+COPY --from=builder /app/apps/frontend/docs/.next ./docs/.next
 COPY --from=deps /app/node_modules ./docs/node_modules
 COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/apps/docs/package.json ./docs/package.json
+COPY --from=deps /app/apps/frontend/docs/package.json ./docs/package.json
 
 EXPOSE 3000
 CMD ["bun", "--cwd","docs" ,"start"]
