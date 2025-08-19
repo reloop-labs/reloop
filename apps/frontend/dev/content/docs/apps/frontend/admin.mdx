@@ -1,6 +1,203 @@
 ---
 title: Admin
-description: Introduction
+description: Learn how to set up and run the Reloop frontend web service locally and in production.
 ---
 
-## Welcome to developer Docs
+# Frontend Admin Service
+
+> Powers Reloop's landing pages, marketing sites, and public-facing web interfaces. This Next.js application serves as the primary entry point for users discovering and engaging with the Reloop platform.
+
+<Callout type="info" title="Prerequisite">
+Make sure you've completed the [local setup guide](/setup) first (clone repo, install Bun, and set up dependencies).
+</Callout>
+
+---
+
+## Quick Start
+
+```bash
+# One command to get started
+cd apps/frontend/web && cp .env.example .env && bun i && bun dev
+```
+
+Open [http://localhost:3002](http://localhost:3002) 🎉
+
+### Verify Everything Works
+
+After starting the dev server, you should see:
+- ✅ Landing page loads without errors
+- ✅ Hot reload works when editing files
+- ✅ Console shows no critical errors
+- ✅ API endpoints respond (check Network tab)
+
+---
+
+## Service Info
+
+* **Location:** `/apps/frontend/web`
+* **Port:** `3002` (configurable in `package.json`)
+* **Tech Stack:** Next.js 14, React, TypeScript, Tailwind CSS
+* **Tech Stack Guide:** [Frontend Technologies](/setup/tech-stack#frontend-technologies)
+* **Part of Monorepo:** Yes (run with filters or inside service dir)
+
+---
+
+## Environment Setup
+
+Create `.env` file:
+
+```bash
+# Development
+NEXT_PUBLIC_WEB_URL="http://localhost:3002"
+NEXT_PUBLIC_API_URL="http://localhost:3001"
+
+# Production
+NEXT_PUBLIC_WEB_URL="https://reloop.sh"
+NEXT_PUBLIC_API_URL="https://api.reloop.sh"
+
+# Optional: Analytics & Monitoring
+NEXT_PUBLIC_ANALYTICS_ID=""
+```
+
+| Variable                   | Required | Description                                          |
+| -------------------------- | -------- | ---------------------------------------------------- |
+| `NEXT_PUBLIC_WEB_URL`      | ✅        | Base URL for frontend, used in redirects & API calls |
+| `NEXT_PUBLIC_API_URL`      | ✅        | Backend API endpoint for data fetching               |
+| `NEXT_PUBLIC_ANALYTICS_ID` | ❌        | Analytics tracking ID (Google Analytics, etc.)      |
+
+---
+
+## Development Commands
+
+```bash
+# Install dependencies
+bun i
+
+# Start dev server
+bun dev
+# or from monorepo root with filter
+bun run --filter=web dev
+
+# Build for production
+bun run build
+# or from monorepo root
+bun run --filter=web build
+
+# Start production server locally
+bun run start
+# or from monorepo root
+bun run --filter=web start
+
+# Run tests
+bun run test
+bun run test:watch  # Watch mode
+
+# Lint & format code
+bun run lint && bun run format
+
+# Type checking
+bun run type-check
+```
+
+---
+
+## Common Development Workflows
+
+### Working with API Integration
+```bash
+# Start both web and API services
+bun run --filter=web dev &
+bun run --filter=api dev &
+
+# Check API connectivity
+curl http://localhost:3001/health
+```
+
+
+---
+
+## Service Integration
+
+This web service integrates with other Reloop services:
+
+* **API Service** (`/apps/backend/api`) - Fetches dynamic content and user data
+* **Auth Service** - Handles user authentication flows
+* **Admin Dashboard** (`/apps/frontend/admin`) - Shares components and design system
+
+### Cross-Service Communication
+```bash
+# Check all services are running
+bun run dev  # from monorepo root
+
+# Verify connectivity
+curl http://localhost:3001/health  # API
+curl http://localhost:3002         # Web
+curl http://localhost:3003         # Admin (if applicable)
+```
+
+---
+
+## Troubleshooting
+
+### Port Issues
+**Port already in use?**
+```bash
+# Check what's using the port
+lsof -i :3002
+
+# Kill the process (replace PID)
+kill -9 <PID>
+
+# Or update port in package.json
+```
+
+```json
+{
+  "scripts": {
+    "dev": "next dev -p 3003"
+  }
+}
+```
+
+### Build/Install Issues
+**Bun install fails?**
+```bash
+# Clear cache and reinstall
+rm -rf ~/.bun/install/cache
+rm -rf node_modules
+bun i
+
+# Check Bun version
+bun --version
+```
+
+---
+
+## Contributing
+
+* Always run `bun lint && bun format` before committing
+* Keep environment files (`.env.example`) up to date if new vars are added
+* Test your changes across different screen sizes
+* Verify API integrations work with latest backend changes
+* Update this documentation when adding new features or workflows
+
+---
+
+## Getting Help
+
+**Common Questions:**
+- **Service won't start?** Check the troubleshooting section above
+- **API integration issues?** Verify both web and API services are running
+- **Build failing?** Run type-check and lint commands first
+- **Need to add new features?** Check the tech stack guide for approved libraries
+
+**Still stuck?** Check the monorepo root README or ask in the team chat.
+
+---
+
+## Notes
+
+* This service is part of the **Reloop monorepo** - changes here may affect other services
+* Commands can be run inside this directory or from the root using filters
+* Always set up `.env` before starting development
+* Keep the API service running when developing features that require data fetching
