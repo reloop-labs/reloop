@@ -7,6 +7,10 @@ on:
     paths:
       - 'apps/frontend/docs/**'
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   build_and_publish:
     runs-on: ubuntu-latest

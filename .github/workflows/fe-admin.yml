@@ -1,16 +1,15 @@
-name: FE Web Docker
+name: FE Admin Docker
 
 on:
   push:
     branches:
       - main
     paths:
-      - 'apps/frontend/web/**'
+      - 'apps/frontend/admin/**'
 
 permissions:
   contents: read
   packages: write
-
 
 jobs:
   build_and_publish:
@@ -25,10 +24,10 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push web image
+      - name: Build and push admin image
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: ./apps/frontend/web/Dockerfile
+          file: ./apps/frontend/admin/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/fe-web:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/fe-admin:latest

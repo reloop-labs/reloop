@@ -1,0 +1,9 @@
+@import "@reloop/tailwind/style.css";
+
+@custom-variant dark (&:where(.dark, .dark *));
+@custom-variant light (&:where(.light, .light *));
+
+.text-outline {
+	-webkit-text-stroke: 1.5px var(--color-gray-300);
+	-webkit-text-fill-color: transparent;
+}
