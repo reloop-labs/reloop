@@ -118,9 +118,7 @@
 		"db:stop": "turbo -F server db:stop",
 		"db:down": "turbo -F server db:down"
 	},
-	"dependencies": {
-
-	},
+	"dependencies": {},
 	"devDependencies": {
 		"@biomejs/biome": "2.1.2",
 		"husky": "9.1.7",
