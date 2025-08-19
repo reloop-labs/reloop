@@ -1,6 +1,85 @@
 ---
 title: Web
-description: Web the landing page of the Reloop
+description: Learn how to set up and run the Reloop frontend web service locally and in production.
 ---
 
-## Welcome to developer Docs
+# Frontend Web Service
+
+> Powers Reloop's landing pages and marketing sites
+
+## 🚀 Quick Start
+
+```bash
+# One command to get started
+cd apps/frontend/web && cp .env.example .env && bun i && bun dev
+```
+
+Open [http://localhost:3002](http://localhost:3002) 🎉
+
+---
+
+## 📁 Service Info
+
+- **Location:** `/apps/frontend/web`
+- **Port:** `3002` (configurable in `package.json`)
+- **Stack:** Next.js + Bun
+- **Tech Stack Guide:** [Frontend Technologies](/setup/tech-stack#frontend-technologies)
+
+---
+
+## ⚙️ Environment Setup
+
+Create `.env` file:
+
+```bash
+# Development
+NEXT_PUBLIC_WEB_URL="http://localhost:3001/"
+
+# Production
+NEXT_PUBLIC_WEB_URL="https://reloop.sh/"
+```
+
+---
+
+## 🛠️ Development Commands
+
+```bash
+# Install dependencies
+bun i
+
+# Start dev server
+bun dev
+# or with filter (from monorepo root)
+bun run --filter=dev dev
+
+# Build for production
+bun run --filter=web build
+
+# Start production server
+bun run --filter=web start
+```
+
+---
+
+## 🔧 Troubleshooting
+
+**Port already in use?**
+Update the port in `package.json`:
+```json
+{
+  "scripts": {
+    "dev": "next dev -p 3003"
+  }
+}
+```
+
+**Environment issues?**
+Make sure your `.env` file exists and has the correct `NEXT_PUBLIC_WEB_URL` value.
+
+---
+
+## 📝 Notes
+
+- Part of the Reloop monorepo
+- Commands can be run from service directory or monorepo root (with filters)
+- Always set up `.env` before starting development

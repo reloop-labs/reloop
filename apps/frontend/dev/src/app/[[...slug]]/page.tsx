@@ -1,12 +1,7 @@
 import { Icon } from "@reloop/ui/components/icon";
 import { DocsLayout } from "fumadocs-ui/layouts/notebook";
 import { createRelativeLink } from "fumadocs-ui/mdx";
-import {
-	DocsBody,
-	DocsDescription,
-	DocsPage,
-	DocsTitle,
-} from "fumadocs-ui/page";
+import { DocsBody, DocsPage } from "fumadocs-ui/page";
 import { notFound } from "next/navigation";
 import { baseOptions } from "@/app/layout.config";
 import {
@@ -84,11 +79,7 @@ export default async function Page(props: {
 					sha: "main/apps/frontend/dev/content/docs",
 				}}
 			>
-				<DocsTitle>{page.data.title}</DocsTitle>
-				<DocsDescription className="mb-1">
-					{page.data.description}
-				</DocsDescription>
-				<div className="flex flex-row items-center gap-2 border-b pb-6">
+				<div className="flex flex-row items-center gap-2">
 					<LLMCopyButton markdownUrl={`${page.url}.mdx`} />
 					<ViewOptions
 						markdownUrl={`${page.url}.mdx`}
