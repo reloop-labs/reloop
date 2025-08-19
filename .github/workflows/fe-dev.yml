@@ -1,12 +1,11 @@
-name: Docs CI/CD
+name: FE Dev Docker
 
 on:
   push:
     branches:
       - main
     paths:
-      - 'apps/frontend/docs/**'
-      - 'docker/**'
+      - 'apps/frontend/dev/**'
 
 jobs:
   build_and_publish:
@@ -21,10 +20,10 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push docs image
+      - name: Build and push dev image
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: ./docker/Dockerfile.docs
+          file: ./apps/frontend/dev/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/docs-service:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/fe-dev:latest

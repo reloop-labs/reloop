@@ -1,12 +1,11 @@
-name: Web CI/CD
+name: FE Main Docker
 
 on:
   push:
     branches:
       - main
     paths:
-      - 'apps/frontend/web/**'
-      - 'docker/**'
+      - 'apps/frontend/main/**'
 
 jobs:
   build_and_publish:
@@ -25,6 +24,6 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: ./docker/Dockerfile.web
+          file: ./apps/frontend/main/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/web-service:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/fe-main:latest

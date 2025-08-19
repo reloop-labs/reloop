@@ -1,12 +1,11 @@
-name: Admin CI/CD
+name: FE Web Docker
 
 on:
   push:
     branches:
       - main
     paths:
-      - 'apps/frontend/docs/**'  #please change it when you create admin app
-      - 'docker/**'
+      - 'apps/frontend/web/**'
 
 jobs:
   build_and_publish:
@@ -21,10 +20,10 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push admin image
+      - name: Build and push web image
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: ./docker/Dockerfile.admin
+          file: ./apps/frontend/web/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/admin-service:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/fe-web:latest
