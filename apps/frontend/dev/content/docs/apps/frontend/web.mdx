@@ -7,7 +7,12 @@ description: Learn how to set up and run the Reloop frontend web service locally
 
 > Powers Reloop's landing pages and marketing sites
 
-## 🚀 Quick Start
+<Callout type="info" title="Pre requisite">
+ Make sure you've completed the [local setup guide](/setup) first.
+</Callout>
+
+## Quick Start
+
 
 ```bash
 # One command to get started
@@ -18,16 +23,15 @@ Open [http://localhost:3002](http://localhost:3002) 🎉
 
 ---
 
-## 📁 Service Info
+## Service Info
 
 - **Location:** `/apps/frontend/web`
 - **Port:** `3002` (configurable in `package.json`)
-- **Stack:** Next.js + Bun
 - **Tech Stack Guide:** [Frontend Technologies](/setup/tech-stack#frontend-technologies)
 
 ---
 
-## ⚙️ Environment Setup
+## Environment Setup
 
 Create `.env` file:
 
@@ -41,7 +45,7 @@ NEXT_PUBLIC_WEB_URL="https://reloop.sh/"
 
 ---
 
-## 🛠️ Development Commands
+## Development Commands
 
 ```bash
 # Install dependencies
@@ -61,7 +65,7 @@ bun run --filter=web start
 
 ---
 
-## 🔧 Troubleshooting
+## Troubleshooting
 
 **Port already in use?**
 Update the port in `package.json`:
@@ -78,7 +82,7 @@ Make sure your `.env` file exists and has the correct `NEXT_PUBLIC_WEB_URL` valu
 
 ---
 
-## 📝 Notes
+## Notes
 
 - Part of the Reloop monorepo
 - Commands can be run from service directory or monorepo root (with filters)
