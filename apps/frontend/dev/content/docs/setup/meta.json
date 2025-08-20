@@ -2,5 +2,21 @@
 	"title": "How to Contribute",
 	"description": "Steps to Contribute Effectively",
 	"root": true,
-	"icon": "share"
+	"pages": [
+		"---Introduction---",
+		"index",
+		"tech-stack",
+		"project-structure",
+		"architecture",
+		"---Frontend---",
+		"frontend/web",
+		"frontend/main",
+		"frontend/admin",
+		"frontend/docs",
+		"frontend/dev",
+		"---Backend---",
+		"backend/server",
+		"backend/mail",
+		"backend/webhook"
+	]
 }

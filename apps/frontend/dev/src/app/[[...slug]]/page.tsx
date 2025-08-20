@@ -46,13 +46,14 @@ export default async function Page(props: {
 						url: "/sdk",
 					},
 					{
+						title: "API",
+						url: "/api",
+					},
+					{
 						title: "Integrations",
 						url: "/integrations",
 					},
-					{
-						title: "Apps",
-						url: "/apps",
-					},
+
 					{
 						title: "Deploy",
 						url: "/deploy",
@@ -60,10 +61,6 @@ export default async function Page(props: {
 					{
 						title: "Setup",
 						url: "/setup",
-					},
-					{
-						title: "API",
-						url: "/api",
 					},
 				],
 			}}
