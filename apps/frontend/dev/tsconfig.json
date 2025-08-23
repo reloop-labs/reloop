@@ -1,4 +1,5 @@
 {
+	"extends": "@reloop/ts/next.json",
 	"compilerOptions": {
 		"baseUrl": ".",
 		"target": "ESNext",

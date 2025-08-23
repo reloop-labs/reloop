@@ -2,7 +2,7 @@ import { Icon } from "@reloop/ui/components/icon";
 import { DocsLayout } from "fumadocs-ui/layouts/notebook";
 import { createRelativeLink } from "fumadocs-ui/mdx";
 import { DocsBody, DocsPage } from "fumadocs-ui/page";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { baseOptions } from "@/app/layout.config";
 import {
 	BiomejsIcon,
@@ -27,6 +27,12 @@ export default async function Page(props: {
 	params: Promise<{ slug?: string[] }>;
 }) {
 	const params = await props.params;
+
+	// If we're on the home page (no slug or empty slug), redirect to the new home page
+	if (!params.slug || params.slug.length === 0) {
+		redirect("/");
+	}
+
 	const page = source.getPage(params.slug);
 	if (!page) notFound();
 	const MDXContent = page.data.body;
@@ -111,13 +117,25 @@ export default async function Page(props: {
 }
 
 export async function generateStaticParams() {
-	return source.generateParams();
+	const params = source.generateParams();
+	// Filter out the home page since it's handled by page.tsx
+	return params.filter((param) => param.slug && param.slug.length > 0);
 }
 
 export async function generateMetadata(props: {
 	params: Promise<{ slug?: string[] }>;
 }) {
 	const params = await props.params;
+
+	// If we're on the home page, return default metadata
+	if (!params.slug || params.slug.length === 0) {
+		return {
+			title: "Reloop - Modern Email Infrastructure",
+			description:
+				"The modern email infrastructure for developers. Build, send, and track emails with ease.",
+		};
+	}
+
 	const page = source.getPage(params.slug);
 	if (!page) notFound();
 
