@@ -1,115 +1,113 @@
 ---
 title: Project Structure
-description: Understand how the codebase is organized across apps, packages, and tools in this modern monorepo setup.
+description: Quick overview of the monorepo organization - apps, packages, and tools.
 ---
 
 # Project Structure
 
-This monorepo maintains clean separation between frontend applications, backend services, and reusable packages. The architecture follows modern best practices for scalable development with efficient dependency management and build optimization.
+A modern monorepo with clear separation between apps, shared packages, and development tools.
 
-<Callout type="info" title="Want to know more about Tech Stack?">
-  Want to understand the technologies powering this structure? Check out our **[Tech Stack](/setup/tech-stack)** page for detailed technology choices and explanations.
+<Callout type="info" title="Tech Stack">
+  See **[Tech Stack](/setup/tech-stack)** for technology details.
 </Callout>
 
-## File structure
-<Files>
-  <Folder name="reloop" defaultOpen>
-    <Folder name="apps" >
-      <Folder name="web" />
-      <Folder name="main" />
-      <Folder name="docs" />
-      <Folder name="admin" />
-      <Folder name="server" />
-      <Folder name="mail" />
-    </Folder>
+## Quick Overview
 
-    <Folder name="packages">
-      <Folder name="ui" />
-      <Folder name="db" />
-      <Folder name="auth" />
-    </Folder>
-
-    <Folder name="tools">
-      <Folder name="tailwind" />
-      <Folder name="typescript" />
-    </Folder>
-  </Folder>
-</Files>
-
+```
+reloop/
+├── apps/
+│   ├── backend/
+│   │   ├── auth/      # Authentication service
+│   │   ├── mail/      # Email service
+│   │   ├── server/    # Main API server
+│   │   └── webhook/   # Webhook handler
+│   └── frontend/
+│       ├── admin/     # Admin dashboard
+│       ├── dev/       # Development docs
+│       ├── docs/      # Production docs
+│       ├── main/      # Core app
+│       └── web/       # Marketing site
+├── packages/          # Shared libraries
+└── tools/            # Dev configs & utilities
+```
 
 ## Apps
 
-The `apps/` directory contains all deployable applications, each serving specific user-facing or internal functionality.
+### Backend Services
 
 <Cards>
-<Card icon={<Icon name="globe" />} title="Web" href="/apps/web">
-  **Marketing Site** – Hosts all branding, company info, and public-facing content.
-  - **Location**: `apps/web/`
+<Card icon={<Icon name="server" />} title="Server" href="/apps/backend/server">
+  Main API server & business logic
 </Card>
 
-  <Card icon={<Icon name="home" />} title="Main" href="/apps/main">
-    **Core Application Dashboard** - Handling core business logic and main user workflows.
-    - **Location**: `apps/main/`
-  </Card>
+<Card icon={<Icon name="key" />} title="Auth" href="/apps/backend/auth">
+  Authentication service
+</Card>
 
-  <Card icon={<Icon name="book-closed" />} title="Docs" href="/apps/docs">
-    **Documentation Site** - Comprehensive developer documentation, API references, and user guides.
-    - **Location**: `apps/docs/`
-  </Card>
+<Card icon={<Icon name="mail" />} title="Mail" href="/apps/backend/mail">
+  Email service & templates
+</Card>
 
-  <Card icon={<Icon name="shield-check" />} title="Admin" href="/apps/admin">
-    **Administrative Dashboard** - Internal admin interface for system management and configuration.
-    - **Location**: `apps/admin/`
-  </Card>
+<Card icon={<Icon name="webhook" />} title="Webhook" href="/apps/backend/webhook">
+  Webhook handler service
+</Card>
+</Cards>
 
-  <Card icon={<Icon name="server" />} title="Server" href="/apps/server">
-    **Backend API Server** - Core backend service handling authentication, database operations, and business logic.
-    - **Location**: `apps/server/`
-  </Card>
+### Frontend Applications
 
-  <Card icon={<Icon name="mail" />} title="Mail" href="/apps/mail">
-    **Email Service** - Dedicated service for handling transactional emails, marketing emails, email-related functionality.
-    - **Location**: `apps/mail/`
-  </Card>
+<Cards>
+<Card icon={<Icon name="home" />} title="Main" href="/apps/frontend/main">
+  Core application dashboard
+</Card>
+
+<Card icon={<Icon name="shield-check" />} title="Admin" href="/apps/frontend/admin">
+  Internal admin interface
+</Card>
+
+<Card icon={<Icon name="globe" />} title="Web" href="/apps/frontend/web">
+  Marketing site & public content
+</Card>
+
+<Card icon={<Icon name="book-closed" />} title="Docs" href="/apps/frontend/docs">
+  Production documentation
+</Card>
+
+<Card icon={<Icon name="code" />} title="Dev" href="/apps/frontend/dev">
+  Development documentation
+</Card>
 </Cards>
 
 ## Packages
 
-The `packages/` directory contains shared libraries and utilities that can be consumed across multiple applications.
-
 <Cards>
-  <Card icon={<Icon name="element-5" />} title="@reloop/ui" href="/packages/ui">
-    **Design System & Component Library**
-    - **Location**: `packages/ui/`
-  </Card>
+<Card icon={<Icon name="element-5" />} title="@reloop/ui" href="/packages/ui">
+  Design system & components
+</Card>
 
-  <Card icon={<Icon name="database" />} title="@reloop/db" href="/packages/db">
-    **Database Schema** - Centralized database management with schema definitions and database utilities.
-    - **Location**: `packages/db/`
-  </Card>
+<Card icon={<Icon name="database" />} title="@reloop/db" href="/packages/db">
+  Database schema & utilities
+</Card>
 
-  <Card icon={<Icon name="key" />} title="@reloop/auth" href="/packages/auth">
-    **Authentication Package** - Shared authentication logic, configurations, and utilities for consistent auth across applications.
-    - **Location**: `packages/auth/`
-  </Card>
+<Card icon={<Icon name="key" />} title="@reloop/auth" href="/packages/auth">
+  Authentication logic
+</Card>
 </Cards>
 
-## Tools & Configuration
-
-The `tools/` directory houses shared configuration and development utilities that ensure consistency across the monorepo.
+## Tools
 
 <Cards>
-  <Card icon={<TailwindCSSIcon />} title="@reloop/tailwind" href="/tools/tailwind">
-    **Shared Styling Setup** - Centralized Tailwind CSS configuration.
-    - **Location**: `tools/tailwind/`
-  </Card>
+<Card icon={<TailwindCSSIcon />} title="@reloop/tailwind" href="/tools/tailwind">
+  Tailwind CSS config
+</Card>
 
-  <Card icon={<TypeScriptIcon />} title="@reloop/ts" href="/tools/typescript">
-    **Typescript Config**
-    - **Location**: `tools/typescript/`
-  </Card>
+<Card icon={<TypeScriptIcon />} title="@reloop/ts" href="/tools/typescript">
+  TypeScript configs
+</Card>
 </Cards>
 
----
+## Key Benefits
 
-This structure provides a solid foundation for scaling development teams and maintaining code quality while ensuring efficient development workflows and consistent user experiences across all applications.
+- **Shared code**: Reusable packages across apps
+- **Consistent tooling**: Unified configs and build setup
+- **Clear boundaries**: Each app has a specific purpose
+- **Easy scaling**: Add new apps without affecting others
