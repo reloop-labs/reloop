@@ -1,9 +1,4 @@
-import { Icon } from "@reloop/ui/components/icon";
-import { DocsLayout } from "fumadocs-ui/layouts/notebook";
-import { createRelativeLink } from "fumadocs-ui/mdx";
-import { DocsBody, DocsPage } from "fumadocs-ui/page";
-import { notFound, redirect } from "next/navigation";
-import { baseOptions } from "@/app/layout.config";
+import { baseOptions } from "@dev/app/layout.config";
 import {
 	BiomejsIcon,
 	BunIcon,
@@ -18,10 +13,16 @@ import {
 	TailwindCSSIcon,
 	TurborepoIcon,
 	TypeScriptIcon,
-} from "@/components/icons/Tech";
-import { LLMCopyButton, ViewOptions } from "@/components/page-actions";
-import { source } from "@/lib/source";
-import { getMDXComponents } from "@/mdx-components";
+} from "@dev/components/icons/Tech";
+import { LLMCopyButton, ViewOptions } from "@dev/components/page-actions";
+import { source } from "@dev/lib/source";
+import { getMDXComponents } from "@dev/mdx-components";
+import { Icon } from "@reloop/ui/components/icon";
+import { DocsLayout } from "fumadocs-ui/layouts/notebook";
+import { createRelativeLink } from "fumadocs-ui/mdx";
+import { DocsBody, DocsPage } from "fumadocs-ui/page";
+import { notFound, redirect } from "next/navigation";
+import HomePage from "./home-page";
 
 export default async function Page(props: {
 	params: Promise<{ slug?: string[] }>;
@@ -30,7 +31,7 @@ export default async function Page(props: {
 
 	// If we're on the home page (no slug or empty slug), redirect to the new home page
 	if (!params.slug || params.slug.length === 0) {
-		redirect("/");
+		return <HomePage />;
 	}
 
 	const page = source.getPage(params.slug);

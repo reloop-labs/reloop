@@ -1,18 +1,5 @@
 import { betterFetch } from "@better-fetch/fetch";
-import { Icon } from "@reloop/ui/components/icon";
-import { DocsLayout } from "fumadocs-ui/layouts/notebook";
-import defaultMdxComponents, { createRelativeLink } from "fumadocs-ui/mdx";
-import {
-	DocsBody,
-	DocsDescription,
-	DocsPage,
-	DocsTitle,
-} from "fumadocs-ui/page";
-import Link from "next/link";
-import { notFound } from "next/navigation";
-import Markdown from "react-markdown";
-import rehypeHighlight from "rehype-highlight";
-import { baseOptions } from "@/app/layout.config";
+import { baseOptions } from "@dev/app/layout.config";
 import {
 	BiomejsIcon,
 	BunIcon,
@@ -27,11 +14,24 @@ import {
 	TailwindCSSIcon,
 	TurborepoIcon,
 	TypeScriptIcon,
-} from "@/components/icons/Tech";
-import { LLMCopyButton, ViewOptions } from "@/components/page-actions";
-import { cn } from "@/lib/cn";
-import { source } from "@/lib/source";
-import { getMDXComponents } from "@/mdx-components";
+} from "@dev/components/icons/Tech";
+import { LLMCopyButton, ViewOptions } from "@dev/components/page-actions";
+import { cn } from "@dev/lib/cn";
+import { source } from "@dev/lib/source";
+import { getMDXComponents } from "@dev/mdx-components";
+import { Icon } from "@reloop/ui/components/icon";
+import { DocsLayout } from "fumadocs-ui/layouts/notebook";
+import defaultMdxComponents, { createRelativeLink } from "fumadocs-ui/mdx";
+import {
+	DocsBody,
+	DocsDescription,
+	DocsPage,
+	DocsTitle,
+} from "fumadocs-ui/page";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import Markdown from "react-markdown";
+import rehypeHighlight from "rehype-highlight";
 
 export default async function Page(props: {
 	params: Promise<{ slug?: string[] }>;

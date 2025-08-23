@@ -8,8 +8,8 @@
 	],
 	"exports": {
 		"./utils/*": {
-			"types": "./dist/src/lib/*.d.ts",
-			"default": "./src/lib/*.ts"
+			"types": "./dist/src/utils/*.d.ts",
+			"default": "./src/utils/*.ts"
 		},
 		"./hooks/*": {
 			"types": "./dist/src/hooks/*.d.ts",
