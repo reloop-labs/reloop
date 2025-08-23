@@ -1,6 +1,220 @@
 ---
 title: Dev
-description: Introduction
+description: Learn how to set up and run the Reloop developer documentation service locally and in production.
 ---
 
-## Welcome to developer Docs
+# Developer Documentation Service
+
+> Powers Reloop's developer documentation, API reference, SDK guides, and technical resources. This Next.js application built with Fumadocs serves as the central hub for developers integrating with and contributing to the Reloop platform.
+
+<Callout type="info" title="Prerequisite">
+Make sure you've completed the [local setup guide](/setup) first (clone repo, install Bun, and set up dependencies).
+</Callout>
+
+---
+// integrate video how to run the service
+## Quick Start
+
+```bash
+# One command to get started
+cd apps/frontend/dev && bun i && bun dev
+```
+
+Open [http://localhost:3004](http://localhost:3004) 🎉
+
+---
+
+## Service Info
+
+* **Location:** `/apps/frontend/dev`
+* **Port:** `3004` (configurable in `package.json`)
+* **Tech Stack Guide:** [Frontend Technologies](/setup/tech-stack#frontend-technologies)
+* **Part of Monorepo:** Yes (run with filters or inside service dir)
+* **Documentation Framework:** Fumadocs MDX with OpenAPI integration
+
+---
+
+## Environment Setup
+
+The dev service typically doesn't require environment variables for local development, but you can create a `.env` file if needed:
+
+```bash
+# Development (optional)
+NEXT_PUBLIC_DOCS_URL="http://localhost:3004"
+NEXT_PUBLIC_API_URL="http://localhost:3001"
+
+# Production
+NEXT_PUBLIC_DOCS_URL="https://docs.reloop.sh"
+NEXT_PUBLIC_API_URL="https://api.reloop.sh"
+```
+
+| Variable                   | Required | Description                                          |
+| -------------------------- | -------- | ---------------------------------------------------- |
+| `NEXT_PUBLIC_DOCS_URL`     | ❌        | Base URL for documentation site                      |
+| `NEXT_PUBLIC_API_URL`      | ❌        | Backend API endpoint for API documentation           |
+
+---
+
+## Development Commands
+
+```bash
+# Install dependencies
+bun i
+
+# Start dev server
+bun dev
+# or from monorepo root with filter
+bun run --filter=dev dev
+
+# Build for production
+bun run build
+# or from monorepo root
+bun run --filter=dev build
+
+# Start production server locally
+bun run start
+# or from monorepo root
+bun run --filter=dev start
+
+# Generate API documentation from OpenAPI spec
+bun run prebuild
+# or manually
+bun ./scripts/generate-docs.mjs
+
+# Lint & format code
+bun run lint && bun run format
+
+# Type checking
+bun run type-check
+```
+
+---
+
+## Documentation Structure
+
+The dev service organizes documentation into several key sections:
+
+### Core Documentation
+* **Setup Guides** (`/setup`) - Installation and configuration instructions
+* **API Reference** (`/api`) - Auto-generated from OpenAPI specification
+* **SDK Documentation** (`/sdk`) - Language-specific integration guides
+* **Integrations** (`/integrations`) - Third-party service integrations
+* **Deployment** (`/deploy`) - Production deployment guides
+
+### Content Management
+* **MDX Files** - Written in Markdown with React components
+* **OpenAPI Integration** - Auto-generates API docs from `openapi.json`
+* **Search Functionality** - Built-in search across all documentation
+* **Theme Support** - Dark/light mode with Next.js themes
+
+---
+
+## Content Development
+
+### Adding New Documentation
+
+1. **Create MDX files** in the appropriate directory under `content/docs/`
+2. **Use frontmatter** for metadata:
+   ```mdx
+   ---
+   title: Your Page Title
+   description: Brief description for SEO
+   ---
+   ```
+
+3. **Leverage Fumadocs components** for enhanced documentation:
+   ```mdx
+   <Callout type="info" title="Note">
+   Important information for developers
+   </Callout>
+   ```
+
+### API Documentation
+
+The service automatically generates API documentation from the OpenAPI specification:
+
+```bash
+# Update API docs (runs automatically on build)
+bun ./scripts/generate-docs.mjs
+```
+
+**Configuration:** `scripts/generate-docs.mjs`
+- Input: `./openapi.json`
+- Output: `./content/docs/api`
+- Includes descriptions and examples
+
+---
+
+## Troubleshooting
+
+### Port Issues
+**Port already in use?**
+```bash
+# Check what's using the port
+lsof -i :3004
+
+# Kill the process (replace PID)
+kill -9 <PID>
+
+# Or update port in package.json
+```
+
+```json
+{
+  "scripts": {
+    "dev": "next dev --turbo --port=3005"
+  }
+}
+```
+
+### Build/Install Issues
+**Bun install fails?**
+```bash
+# Clear cache and reinstall
+rm -rf ~/.bun/install/cache
+rm -rf node_modules
+bun i
+
+# Check Bun version
+bun --version
+```
+
+### Documentation Generation Issues
+**API docs not updating?**
+```bash
+# Regenerate API documentation
+bun ./scripts/generate-docs.mjs
+
+# Check OpenAPI spec validity
+cat openapi.json | jq .
+```
+
+### Fumadocs Issues
+**MDX components not rendering?**
+```bash
+# Rebuild Fumadocs cache
+rm -rf .next
+bun run postinstall
+bun dev
+```
+
+---
+
+## Notes
+
+* This service is part of the **Reloop monorepo** - changes here may affect other services
+* Commands can be run inside this directory or from the root using filters
+* API documentation is auto-generated - update `openapi.json` to refresh API docs
+* Fumadocs provides built-in search, navigation, and theming
+* The service uses Turbo mode for faster development builds
+
+---
+
+## Contributing
+
+* Always run `bun lint && bun format` before committing
+* Update API documentation by modifying `openapi.json` and regenerating
+* Keep documentation structure consistent with existing patterns
+* Use Fumadocs components for enhanced user experience
+* Update this documentation when adding new features or workflows
+* Ensure all links and references are working correctly
