@@ -1,0 +1,38 @@
+{
+	"name": "auth",
+	"main": "src/index.ts",
+	"type": "module",
+	"scripts": {
+		"build": "tsdown",
+		"check-types": "tsc --noEmit",
+		"compile": "bun build --compile --minify --sourcemap --bytecode ./src/index.ts --outfile server",
+		"dev": "bun run --hot src/index.ts",
+		"start": "bun run dist/index.js",
+		"auth:generate": "npx @better-auth/cli@latest generate --output ./src/db/schema/auth.ts",
+		"db:push": "drizzle-kit push",
+		"db:studio": "drizzle-kit studio",
+		"db:generate": "drizzle-kit generate",
+		"db:migrate": "drizzle-kit migrate",
+		"db:start": "docker compose up -d",
+		"db:watch": "docker compose up",
+		"db:stop": "docker compose stop",
+		"db:down": "docker compose down"
+	},
+	"dependencies": {
+		"dotenv": "catalog:backend",
+		"zod": "catalog:ui",
+		"elysia": "catalog:backend",
+		"@elysiajs/cors": "catalog:backend",
+		"drizzle-orm": "catalog:db",
+		"pg": "catalog:db",
+		"better-auth": "catalog:"
+	},
+	"devDependencies": {
+		"tsdown": "catalog:backend",
+		"typescript": "catalog:",
+		"@types/bun": "catalog:backend",
+		"drizzle-kit": "catalog:db",
+		"@types/pg": "catalog:db",
+		"@better-auth/cli": "catalog:backend"
+	}
+}
