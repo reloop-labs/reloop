@@ -1,4 +1,4 @@
-import "@/app/global.css";
+import "@dev/global.css";
 import { cn } from "@dev/lib/cn";
 import { IconsSprite } from "@reloop/ui/components/icon";
 import { RootProvider } from "fumadocs-ui/provider";
