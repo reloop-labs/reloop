@@ -7,7 +7,6 @@ const config = {
 	reactStrictMode: true,
 	basePath: "/dev",
 	assetPrefix: "/dev",
-	trailingSlash: true,
 };
 
 export default withMDX(config);
