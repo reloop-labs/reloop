@@ -10,6 +10,7 @@ RUN bun --filter=dev install
 FROM base AS builder
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN bun run --filter=dev build
@@ -18,6 +19,7 @@ RUN bun run --filter=dev build
 FROM base AS runner
 WORKDIR /app
 ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
 COPY --from=builder /app/apps/frontend/dev/public ./dev/public
 COPY --from=builder /app/apps/frontend/dev/.next ./dev/.next
 COPY --from=deps /app/node_modules ./dev/node_modules
