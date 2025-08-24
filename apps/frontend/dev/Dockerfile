@@ -20,15 +20,19 @@ RUN bun run --filter=dev build
 # Stage 3: Production server
 FROM base AS runner
 WORKDIR /app
+
 # Runtime environment variables (can be overridden from outside)
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-# Add other runtime ENVs that can be overridden
 ENV PORT=3000
-COPY --from=builder /app/apps/frontend/dev/public ./dev/public
-COPY --from=builder /app/apps/frontend/dev/.next ./dev/.next
-COPY --from=deps /app/node_modules ./dev/node_modules
-COPY --from=deps /app/apps/frontend/dev/package.json ./dev/package.json
+ENV HOSTNAME=0.0.0.0
+
+# Copy standalone build
+COPY --from=builder /app/apps/frontend/dev/public ./public
+COPY --from=builder /app/apps/frontend/dev/.next/standalone ./
+COPY --from=builder /app/apps/frontend/dev/.next/standalone/apps/frontend/dev ./
+COPY --from=builder /app/apps/frontend/dev/.next/static ./.next/static
 
 EXPOSE 3000
-CMD ["bun", "--cwd","dev" ,"start"]
+
+CMD ["bun", "run", "server.js"]

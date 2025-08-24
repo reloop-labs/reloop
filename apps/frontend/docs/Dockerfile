@@ -24,4 +24,5 @@ COPY --from=deps /app/node_modules ./docs/node_modules
 COPY --from=deps /app/apps/frontend/docs/package.json ./docs/package.json
 
 EXPOSE 3000
-CMD ["bun", "--cwd","docs" ,"start"]
+
+CMD HOSTNAME="0.0.0.0" node server.js

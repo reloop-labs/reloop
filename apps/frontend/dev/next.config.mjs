@@ -6,6 +6,7 @@ const withMDX = createMDX();
 const config = {
 	reactStrictMode: true,
 	basePath: "/dev",
+	output: "standalone",
 };
 
 export default withMDX(config);
