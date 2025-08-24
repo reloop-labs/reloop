@@ -1,6 +1,6 @@
 {
+	"extends": "@reloop/ts/next.json",
 	"compilerOptions": {
-		"baseUrl": ".",
 		"target": "ESNext",
 		"lib": ["dom", "dom.iterable", "esnext"],
 		"allowJs": true,
@@ -15,10 +15,6 @@
 		"isolatedModules": true,
 		"jsx": "preserve",
 		"incremental": true,
-		"paths": {
-			"@/.source": ["./.source/index.ts"],
-			"@/*": ["./src/*"]
-		},
 		"plugins": [
 			{
 				"name": "next"

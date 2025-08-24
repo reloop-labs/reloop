@@ -1,7 +1,7 @@
-import { docs } from "@dev/.source";
 import { Icon } from "@reloop/ui/components/icon";
 import { loader } from "fumadocs-core/source";
 import { createElement } from "react";
+import { docs } from "../../.source";
 
 export const source = loader({
 	icon(icon) {
