@@ -10,6 +10,9 @@ RUN bun --filter=web install
 FROM base AS builder
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
+# Use ARG for build-time variables that can be overridden
+ARG NODE_ENV=production
+ENV NODE_ENV=${NODE_ENV}
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN bun run --filter=web build
@@ -17,11 +20,21 @@ RUN bun run --filter=web build
 # Stage 3: Production server
 FROM base AS runner
 WORKDIR /app
+
+# Runtime environment variables (can be overridden from outside)
 ENV NODE_ENV=production
-COPY --from=builder /app/apps/frontend/web/public ./web/public
-COPY --from=builder /app/apps/frontend/web/.next ./web/.next
-COPY --from=deps /app/node_modules ./web/node_modules
-COPY --from=deps /app/apps/frontend/web/package.json ./web/package.json
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
+
+# Copy standalone build
+COPY --from=builder /app/apps/frontend/web/public ./public
+COPY --from=builder /app/apps/frontend/web/.next/standalone ./
+COPY --from=builder /app/apps/frontend/web/.next/standalone/apps/frontend/web ./
+COPY --from=builder /app/apps/frontend/web/.next/static ./.next/static
+
+RUN rm -rf apps
 
 EXPOSE 3000
-CMD ["bun", "--cwd","web" ,"start"]
+
+CMD ["bun", "run", "server.js"]

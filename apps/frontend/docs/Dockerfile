@@ -33,6 +33,8 @@ COPY --from=builder /app/apps/frontend/docs/.next/standalone ./
 COPY --from=builder /app/apps/frontend/docs/.next/standalone/apps/frontend/docs ./
 COPY --from=builder /app/apps/frontend/docs/.next/static ./.next/static
 
+RUN rm -rf apps
+
 EXPOSE 3000
 
 CMD ["bun", "run", "server.js"]
