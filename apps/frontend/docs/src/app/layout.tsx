@@ -1,5 +1,5 @@
-import "@/app/global.css";
-import { cn } from "@dev/lib/cn";
+import "@docs/app/global.css";
+import { cn } from "@docs/lib/cn";
 import { IconsSprite } from "@reloop/ui/components/icon";
 import { RootProvider } from "fumadocs-ui/provider";
 import type { ReactNode } from "react";
