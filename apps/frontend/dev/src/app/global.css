@@ -5,13 +5,15 @@
 
 @font-face {
 	font-family: "BasierCircle";
-	src: url("/dev/font/BasierCircle/basiercircle-bold-webfont.woff2") format("woff2");
+	src: url("/dev/font/BasierCircle/basiercircle-bold-webfont.woff2")
+		format("woff2");
 	font-weight: 700;
 	font-style: normal;
 }
 @font-face {
 	font-family: "BasierCircle";
-	src: url("/dev/font/BasierCircle/basiercircle-bolditalic-webfont") format("woff2");
+	src: url("/dev/font/BasierCircle/basiercircle-bolditalic-webfont")
+		format("woff2");
 	font-weight: 700;
 	font-style: italic;
 }
