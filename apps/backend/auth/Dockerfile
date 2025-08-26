@@ -29,6 +29,20 @@ ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
+# Database Configuration
+ENV DATABASE_URL=""
+
+# Better Auth Configuration
+ENV BETTER_AUTH_SECRET=""
+
+# Google OAuth (Optional)
+ENV GOOGLE_CLIENT_ID=""
+ENV GOOGLE_CLIENT_SECRET=""
+
+# GitHub OAuth (Optional)
+ENV GITHUB_CLIENT_ID=""
+ENV GITHUB_CLIENT_SECRET=""
+
 # Copy standalone build
 COPY --from=builder /app/apps/backend/auth/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules

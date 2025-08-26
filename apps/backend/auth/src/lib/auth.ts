@@ -16,7 +16,7 @@ export const auth = betterAuth({
 		provider: "pg",
 		schema: schema,
 	}),
-	basePath: "/api/auth",
+	basePath: "/api/auth/v1",
 	telemetry: { enabled: false },
 	emailAndPassword: { enabled: true },
 	socialProviders: {
@@ -62,7 +62,7 @@ const getSchema = async () => {
 };
 
 export const OpenAPI = {
-	getPaths: async (prefix = "/auth/api") => {
+	getPaths: async (prefix = "/api/auth/v1") => {
 		try {
 			const { paths } = await getSchema();
 			const reference: Record<string, any> = {};

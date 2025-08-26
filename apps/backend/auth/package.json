@@ -15,7 +15,6 @@
 		"db:migrate": "drizzle-kit migrate"
 	},
 	"dependencies": {
-		"@bogeychan/elysia-logger": "catalog:backend",
 		"@elysiajs/bearer": "catalog:backend",
 		"@elysiajs/cors": "catalog:backend",
 		"@elysiajs/cron": "catalog:backend",
@@ -36,6 +35,7 @@
 		"drizzle-orm": "catalog:db",
 		"drizzle-typebox": "catalog:db",
 		"elysia": "catalog:backend",
+		"logixlysia": "catalog:backend",
 		"pg": "catalog:db",
 		"zod": "catalog:ui"
 	},
