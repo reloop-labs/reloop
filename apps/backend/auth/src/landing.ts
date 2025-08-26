@@ -1,17 +1,32 @@
 import Elysia from "elysia";
-import { db } from "./db";
+import { db } from "./db/pg";
+import { redis } from "./db/redis";
 
-export const landing = new Elysia().get("/", async () => {
-	let dbStatus = "UNKNOWN";
-	let dbError = "";
-	try {
-		await db.execute("SELECT 1 as test");
-		dbStatus = "CONNECTED";
-	} catch (dbErr) {
-		dbStatus = "DISCONNECTED";
-		dbError = dbErr instanceof Error ? dbErr.message : String(dbErr);
-	}
-	return `
+export const landing = new Elysia()
+	.get("/", async () => {
+		let dbStatus = "UNKNOWN";
+		let dbError = "";
+		let redisStatus = "UNKNOWN";
+		let redisError = "";
+
+		try {
+			await db.execute("SELECT 1 as test");
+			dbStatus = "CONNECTED";
+		} catch (dbErr) {
+			dbStatus = "DISCONNECTED";
+			dbError = dbErr instanceof Error ? dbErr.message : String(dbErr);
+		}
+
+		try {
+			await redis.ping();
+			redisStatus = "CONNECTED";
+		} catch (redisErr) {
+			redisStatus = "DISCONNECTED";
+			redisError =
+				redisErr instanceof Error ? redisErr.message : String(redisErr);
+		}
+
+		return `
 ╔════════════════════════════════════════════════════════╗
 ║                     AUTH SERVICE                       ║
 ╠════════════════════════════════════════════════════════╣
@@ -28,8 +43,10 @@ export const landing = new Elysia().get("/", async () => {
 ║                                                        ║
 ╠════════════════════════════════════════════════════════╣
 ║ DATABASE STATUS: ${dbStatus.padEnd(25)}             ║
+║ REDIS STATUS: ${redisStatus.padEnd(27)}             ║
 ║                                                        ║
-${dbError ? `║ ERROR: ${dbError.substring(0, 50).padEnd(50)} ║` : "║                                                        ║"}
+${dbError ? `║ DB ERROR: ${dbError.substring(0, 50).padEnd(50)} ║` : "║                                                        ║"}
+${redisError ? `║ REDIS ERROR: ${redisError.substring(0, 50).padEnd(50)} ║` : "║                                                        ║"}
 ╠════════════════════════════════════════════════════════╣
 ║ QUICK START:                                           ║
 ║ curl -X POST /api/auth/login \                          ║
@@ -50,4 +67,25 @@ ${dbError ? `║ ERROR: ${dbError.substring(0, 50).padEnd(50)} ║` : "║      
                     Made with ❤️ for developers
 
 `;
-});
+	})
+	.get("/health/redis", async () => {
+		try {
+			const startTime = Date.now();
+			await redis.ping();
+			const responseTime = Date.now() - startTime;
+
+			return {
+				status: "connected",
+				responseTime: `${responseTime}ms`,
+				timestamp: new Date().toISOString(),
+				redisUrl: process.env.REDIS_URL || "not configured",
+			};
+		} catch (error) {
+			return {
+				status: "disconnected",
+				error: error instanceof Error ? error.message : String(error),
+				timestamp: new Date().toISOString(),
+				redisUrl: process.env.REDIS_URL || "not configured",
+			};
+		}
+	});

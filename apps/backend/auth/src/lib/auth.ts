@@ -8,7 +8,8 @@ import {
 	openAPI,
 	organization,
 } from "better-auth/plugins";
-import { db } from "../db";
+import { db } from "../db/pg";
+import { redis } from "../db/redis";
 import * as schema from "../db/schema/auth";
 
 export const auth = betterAuth({
@@ -16,6 +17,18 @@ export const auth = betterAuth({
 		provider: "pg",
 		schema: schema,
 	}),
+	secondaryStorage: {
+		get: async (key) => {
+			return await redis.get(key);
+		},
+		set: async (key, value, ttl) => {
+			if (ttl) await redis.set(key, value, { EX: ttl });
+			else await redis.set(key, value);
+		},
+		delete: async (key) => {
+			await redis.del(key);
+		},
+	},
 	basePath: "/api/auth/v1",
 	telemetry: { enabled: false },
 	emailAndPassword: { enabled: true },
