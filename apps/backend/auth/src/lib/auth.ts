@@ -1,5 +1,13 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import {
+	admin,
+	apiKey,
+	bearer,
+	jwt,
+	openAPI,
+	organization,
+} from "better-auth/plugins";
 import { db } from "../db";
 import * as schema from "../db/schema/auth";
 
@@ -8,11 +16,85 @@ export const auth = betterAuth({
 		provider: "pg",
 		schema: schema,
 	}),
+	basePath: "/api/auth",
 	telemetry: { enabled: false },
-	trustedOrigins: [process.env.CORS_ORIGIN || ""],
-	emailAndPassword: {
-		enabled: true,
+	emailAndPassword: { enabled: true },
+	socialProviders: {
+		google: {
+			clientId: process.env.GOOGLE_CLIENT_ID as string,
+			clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+		},
+		github: {
+			clientId: process.env.GITHUB_CLIENT_ID as string,
+			clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
+		},
 	},
 	secret: process.env.BETTER_AUTH_SECRET,
-	baseURL: process.env.BETTER_AUTH_URL,
+	session: {
+		expiresIn: 60 * 60 * 24 * 7,
+		updateAge: 60 * 60 * 24,
+	},
+	trustedOrigins: ["*"],
+	plugins: [
+		jwt(),
+		bearer(),
+		admin(),
+		apiKey({ defaultPrefix: "rl" }),
+		organization(),
+		openAPI({ path: "/docs" }),
+	],
+	advanced: {
+		cookiePrefix: "reloop",
+		ipAddress: {
+			ipAddressHeaders: ["x-client-ip", "x-forwarded-for"],
+			disableIpTracking: false,
+		},
+	},
 });
+
+let _schema: ReturnType<typeof auth.api.generateOpenAPISchema> | null = null;
+
+const getSchema = async () => {
+	if (!_schema) {
+		_schema = auth.api.generateOpenAPISchema();
+	}
+	return _schema;
+};
+
+export const OpenAPI = {
+	getPaths: async (prefix = "/auth/api") => {
+		try {
+			const { paths } = await getSchema();
+			const reference: Record<string, any> = {};
+
+			for (const path of Object.keys(paths)) {
+				const pathData = paths[path];
+				if (!pathData) continue;
+
+				const key = prefix + path;
+				reference[key] = { ...pathData };
+
+				for (const method of Object.keys(pathData)) {
+					const operation = reference[key][method];
+					if (operation && typeof operation === "object") {
+						operation.tags = ["Better Auth"];
+					}
+				}
+			}
+
+			return reference;
+		} catch (error) {
+			console.error("Failed to generate OpenAPI paths:", error);
+			return {};
+		}
+	},
+	components: async () => {
+		try {
+			const { components } = await getSchema();
+			return components;
+		} catch (error) {
+			console.error("Failed to generate OpenAPI components:", error);
+			return {};
+		}
+	},
+} as const;

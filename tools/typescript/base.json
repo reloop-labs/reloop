@@ -24,6 +24,7 @@
 		"baseUrl": "../../",
 		"paths": {
 			"@web/*": ["apps/frontend/web/src/*"],
+			"@auth/*": ["apps/backend/auth/src/*"],
 			"@dev/*": ["apps/frontend/dev/src/*"],
 			"@docs/*": ["apps/frontend/docs/src/*"],
 			"@main/*": ["apps/frontend/main/src/*"],

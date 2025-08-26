@@ -1,4 +1,5 @@
 {
+	"extends": "@reloop/ts/base.json",
 	"compilerOptions": {
 		"target": "ESNext",
 		"module": "ESNext",
@@ -6,13 +7,11 @@
 		"verbatimModuleSyntax": true,
 		"strict": true,
 		"skipLibCheck": true,
-		"baseUrl": "./",
-		"paths": {
-			"@/*": ["./src/*"]
-		},
 		"outDir": "./dist",
 		"types": ["bun"],
-		"composite": true,
-		"jsx": "react-jsx"
+		"composite": false,
+		"jsx": "react-jsx",
+		"declaration": false,
+		"declarationMap": false
 	}
 }
