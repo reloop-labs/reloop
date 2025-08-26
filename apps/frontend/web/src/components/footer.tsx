@@ -147,6 +147,9 @@ const FooterLinks = () => {
 						<Link href="/company/terms-and-conditions">
 							<p>Terms and Conditions</p>
 						</Link>
+						<Link href="/company/privacy">
+							<p>Privacy Policy</p>
+						</Link>
 					</div>
 				</div>
 			</div>
