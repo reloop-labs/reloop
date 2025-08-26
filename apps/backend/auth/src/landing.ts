@@ -1,6 +1,16 @@
 import Elysia from "elysia";
+import { db } from "./db";
 
-export const landing = new Elysia().get("/", () => {
+export const landing = new Elysia().get("/", async () => {
+	let dbStatus = "UNKNOWN";
+	let dbError = "";
+	try {
+		await db.execute("SELECT 1 as test");
+		dbStatus = "CONNECTED";
+	} catch (dbErr) {
+		dbStatus = "DISCONNECTED";
+		dbError = dbErr instanceof Error ? dbErr.message : String(dbErr);
+	}
 	return `
 ╔════════════════════════════════════════════════════════╗
 ║                     AUTH SERVICE                       ║
@@ -16,6 +26,10 @@ export const landing = new Elysia().get("/", () => {
 ║                  ONLINE & READY                        ║
 ║                 Version: v1.0.0                        ║
 ║                                                        ║
+╠════════════════════════════════════════════════════════╣
+║ DATABASE STATUS: ${dbStatus.padEnd(25)}             ║
+║                                                        ║
+${dbError ? `║ ERROR: ${dbError.substring(0, 50).padEnd(50)} ║` : "║                                                        ║"}
 ╠════════════════════════════════════════════════════════╣
 ║ QUICK START:                                           ║
 ║ curl -X POST /api/auth/login \                          ║
