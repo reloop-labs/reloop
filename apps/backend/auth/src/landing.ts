@@ -43,7 +43,7 @@ export const landing = new Elysia()
 ║                                                        ║
 ╠════════════════════════════════════════════════════════╣
 ║ DATABASE STATUS: ${dbStatus.padEnd(25)}             ║
-║ REDIS STATUS: ${redisStatus.padEnd(27)}             ║
+║ REDIS STATUS: ${redisStatus.padEnd(27)}              ║
 ║                                                        ║
 ${dbError ? `║ DB ERROR: ${dbError.substring(0, 50).padEnd(50)} ║` : "║                                                        ║"}
 ${redisError ? `║ REDIS ERROR: ${redisError.substring(0, 50).padEnd(50)} ║` : "║                                                        ║"}
