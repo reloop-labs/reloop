@@ -3,6 +3,10 @@ FROM oven/bun:alpine AS base
 # Stage 1: Install dependencies
 FROM base AS deps
 WORKDIR /app
+
+# Install Python and build dependencies for native modules
+RUN apk add --no-cache python3 make g++
+
 COPY . .
 RUN bun --filter=auth install
 
@@ -26,7 +30,7 @@ ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
 # Copy standalone build
-COPY --from=builder /app/apps/frontend/auth/dist ./dist
+COPY --from=builder /app/apps/backend/auth/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 
 EXPOSE 3000
