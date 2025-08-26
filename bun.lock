@@ -36,7 +36,7 @@
         "elysia": "catalog:backend",
         "logixlysia": "catalog:backend",
         "pg": "catalog:db",
-        "redis": "^5.8.2",
+        "redis": "catalog:db",
         "zod": "catalog:ui",
       },
       "devDependencies": {
@@ -357,6 +357,7 @@
       "drizzle-orm": "0.44.3",
       "drizzle-typebox": "0.3.3",
       "pg": "8.16.3",
+      "redis": "^5.8.2",
       "shx": "0.4.0",
       "valibot": "1.1.0",
     },

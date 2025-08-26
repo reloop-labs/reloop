@@ -37,7 +37,7 @@
 		"elysia": "catalog:backend",
 		"logixlysia": "catalog:backend",
 		"pg": "catalog:db",
-		"redis": "catalog:bd",
+		"redis": "catalog:db",
 		"zod": "catalog:ui"
 	},
 	"devDependencies": {
