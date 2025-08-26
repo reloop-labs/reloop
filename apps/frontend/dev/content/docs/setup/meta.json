@@ -14,6 +14,7 @@
 		"frontend/docs",
 		"frontend/dev",
 		"---Backend---",
+		"backend/auth",
 		"backend/server",
 		"backend/mail",
 		"backend/webhook"

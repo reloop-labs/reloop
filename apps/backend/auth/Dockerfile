@@ -34,4 +34,4 @@ COPY --from=builder /app/node_modules ./node_modules
 
 EXPOSE 3000
 
-CMD ["bun", "run", "/dist/server.js"]
+CMD ["bun", "run", "dist/index.js"]
