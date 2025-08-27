@@ -1,24 +1,6 @@
 {
-	"pages": [
-		{
-			"name": "API Services",
-			"url": "/service"
-		},
-		{
-			"name": "Auth Service",
-			"url": "/service/auth"
-		},
-		{
-			"name": "Mail Service",
-			"url": "/service/mail"
-		},
-		{
-			"name": "Webhook Service",
-			"url": "/service/webhook"
-		},
-		{
-			"name": "Server Service",
-			"url": "/service/server"
-		}
-	]
+	"title": "API Services",
+	"description": "Guide to API Services",
+	"root": true,
+	"pages": ["index", "auth", "mail", "webhook", "server"]
 }

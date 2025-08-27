@@ -21,15 +21,39 @@ import { Icon } from "@reloop/ui/components/icon";
 import { DocsLayout } from "fumadocs-ui/layouts/notebook";
 import { createRelativeLink } from "fumadocs-ui/mdx";
 import { DocsBody, DocsPage } from "fumadocs-ui/page";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import HomePage from "./home-page";
+
+export async function generateMetadata(props: {
+	params: Promise<{ slug?: string[] }>;
+}) {
+	const params = await props.params;
+	if (!params.slug || params.slug.length === 0) {
+		return {
+			title: "Reloop - Modern Email Infrastructure",
+			description:
+				"The modern email infrastructure for developers. Build, send, and track emails with ease.",
+		};
+	}
+
+	const page = source.getPage(params.slug);
+	if (!page) notFound();
+
+	return {
+		title: page.data.title,
+		description: page.data.description,
+	};
+}
+
+export async function generateStaticParams() {
+	const params = source.generateParams();
+	return params.filter((param) => param.slug && param.slug.length > 0);
+}
 
 export default async function Page(props: {
 	params: Promise<{ slug?: string[] }>;
 }) {
 	const params = await props.params;
-
-	// If we're on the home page (no slug or empty slug), redirect to the new home page
 	if (!params.slug || params.slug.length === 0) {
 		return <HomePage />;
 	}
@@ -60,7 +84,6 @@ export default async function Page(props: {
 						title: "Integrations",
 						url: "/integrations",
 					},
-
 					{
 						title: "Deploy",
 						url: "/deploy",
@@ -115,65 +138,4 @@ export default async function Page(props: {
 			</DocsPage>
 		</DocsLayout>
 	);
-}
-
-export async function generateStaticParams() {
-	const params = source.generateParams();
-	// Filter out the home page since it's handled by page.tsx
-	// Include service overview pages but exclude API documentation pages that cause build issues
-	return params.filter((param) => {
-		if (!param.slug || param.slug.length === 0) return false;
-
-		const slugPath = param.slug.join("/");
-
-		// Exclude API documentation pages that cause build issues
-		// These are the auto-generated API reference pages, not the service overview pages
-		if (
-			(slugPath.startsWith("setup/backend/auth/") ||
-				slugPath.startsWith("service/auth/")) &&
-			(slugPath.includes("impersonateUser") ||
-				slugPath.includes("banUser") ||
-				slugPath.includes("unbanUser") ||
-				slugPath.includes("removeUser") ||
-				slugPath.includes("setRole") ||
-				slugPath.includes("createUser") ||
-				slugPath.includes("updateUser") ||
-				slugPath.includes("listUsers") ||
-				slugPath.includes("listUserSessions") ||
-				slugPath.includes("revokeUserSession") ||
-				slugPath.includes("revokeUserSessions") ||
-				slugPath.includes("setUserPassword") ||
-				slugPath.includes("api/auth/v1/") ||
-				slugPath.includes("getApiAuth") ||
-				slugPath.includes("socialSignIn"))
-		) {
-			return false;
-		}
-
-		// Include service overview pages (they should be statically generated)
-		return true;
-	});
-}
-
-export async function generateMetadata(props: {
-	params: Promise<{ slug?: string[] }>;
-}) {
-	const params = await props.params;
-
-	// If we're on the home page, return default metadata
-	if (!params.slug || params.slug.length === 0) {
-		return {
-			title: "Reloop - Modern Email Infrastructure",
-			description:
-				"The modern email infrastructure for developers. Build, send, and track emails with ease.",
-		};
-	}
-
-	const page = source.getPage(params.slug);
-	if (!page) notFound();
-
-	return {
-		title: page.data.title,
-		description: page.data.description,
-	};
 }
