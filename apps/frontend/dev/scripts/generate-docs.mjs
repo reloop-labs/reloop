@@ -2,11 +2,11 @@ import { generateFiles } from "fumadocs-openapi";
 
 const API_URL = "https://reloop.sh/api/auth/docs/json";
 
-void generateFiles({
-	input: [API_URL],
-	output: "./content/docs/service/auth/",
-	includeDescription: true,
-});
+//void generateFiles({
+//	input: [API_URL],
+//	output: "./content/docs/service/auth/",
+//	includeDescription: true,
+//});
 
 // TODO: Add generation for other services when their OpenAPI specs are available
 // Example for mail service:
