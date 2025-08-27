@@ -1,21 +1,24 @@
 import * as Button from "@reloop/ui/components/button";
-import * as FancyButton from "@reloop/ui/components/fancy-button";
 import { Logo } from "@reloop/ui/components/logo";
 import { ThemeToggle } from "./theme-toggle";
 
 export const Header = () => {
 	return (
-		<header className="relative z-10 flex h-16 w-full flex-1 items-center justify-between gap-4 bg-gray-200 px-4 lg:h-auto lg:w-auto lg:rounded-3xl lg:bg-white lg:p-[18px] lg:shadow-custom-xs">
-			<div className="flex items-center">
-				<Logo className="h-8 w-8 rounded-full lg:h-10 lg:w-10" />
-			</div>
-			<div className="flex items-center gap-2">
-				<Button.Root size="xsmall" mode="stroke" variant="neutral">
-					Login
-				</Button.Root>
-				<FancyButton.Root size="xsmall">Get Started</FancyButton.Root>
-				<ThemeToggle />
-			</div>
-		</header>
+		<div className="sticky top-0 border-stroke-soft-100 border-b bg-bg-white-0">
+			<header className="relative z-10 mx-auto flex h-16 w-full max-w-7xl flex-1 items-center justify-between gap-4 px-4 lg:p-[18px]">
+				<div className="flex items-center">
+					<Logo className="h-8 w-8 rounded-full lg:h-10 lg:w-10" />
+				</div>
+				<div className="flex items-center gap-2">
+					<Button.Root size="xsmall" mode="stroke" variant="neutral">
+						Login
+					</Button.Root>
+					<Button.Root size="xsmall" variant="neutral">
+						Get Started
+					</Button.Root>
+					<ThemeToggle />
+				</div>
+			</header>
+		</div>
 	);
 };

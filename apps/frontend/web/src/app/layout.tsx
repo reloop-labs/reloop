@@ -25,11 +25,7 @@ export default function RootLayout({
 					enableSystem
 					disableTransitionOnChange
 				>
-					<div className="relative z-50 w-full flex-col items-center xl:container lg:mt-6 lg:flex xl:mx-auto">
-						<div className="relative z-20 flex w-full items-center justify-center mac:justify-stretch gap-8">
-							<Header />
-						</div>
-					</div>
+					<Header />
 					{children}
 					<div className="mt-10">
 						<Footer />

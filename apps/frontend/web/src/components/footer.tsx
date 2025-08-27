@@ -4,17 +4,19 @@ import Link from "next/link";
 export const Footer = () => {
 	return (
 		<footer>
-			<div className="mx-auto border-gray-200 border-t border-b border-dashed">
+			<div className="mx-auto border-stroke-soft-100 border-t border-b">
 				<FooterTitle />
 			</div>
-			<div className="mx-auto border-gray-200 border-b border-dashed">
+			<div className="mx-auto border-stroke-soft-100 border-b">
 				<FooterLinks />
 			</div>
-			<div className="relative">
-				<p className="text-center font-bold text-[300px] text-gray-400 text-outline leading-96">
-					Reloop
-				</p>
-				<div className="absolute inset-0 bottom-0 w-full bg-gradient-to-t from-white to-white/0" />
+			<div className="-mb-10">
+				<div className="relative">
+					<p className="text-center font-bold text-[300px] text-outline text-stroke-soft-100 leading-96">
+						Reloop
+					</p>
+					<div className="absolute inset-0 bottom-0 w-full bg-gradient-to-t from-white to-white/50 dark:from-black dark:to-black/70" />
+				</div>
 			</div>
 		</footer>
 	);
@@ -22,7 +24,7 @@ export const Footer = () => {
 
 const FooterTitle = () => {
 	return (
-		<div className="mx-auto flex max-w-5xl flex-col items-start gap-5 border-gray-200 border-r border-l border-dashed pt-10 pb-16">
+		<div className="mx-auto flex max-w-5xl flex-col items-start gap-5 border-stroke-soft-100 border-r border-l pt-10 pb-16">
 			<div className="flex w-full flex-col items-center justify-center">
 				<Logo className="h-16 w-16 rounded-full" />
 				<p className="text-center font-medium text-[28px] leading-9">
@@ -37,9 +39,9 @@ const FooterTitle = () => {
 
 const FooterLinks = () => {
 	return (
-		<div className="mx-auto flex max-w-5xl flex-col items-start gap-5 border-gray-200 border-r border-l border-dashed">
+		<div className="mx-auto flex max-w-5xl flex-col items-start gap-5 border-stroke-soft-100 border-r border-l ">
 			<div className="grid w-full grid-cols-5">
-				<div className="border-gray-200 border-r border-dashed py-10 pl-10">
+				<div className="border-stroke-soft-100 border-r py-10 pl-10">
 					<p className="label-md pb-6">Product</p>
 					<div className="flex flex-col gap-3 text-[15px] text-gray-600">
 						<Link href="/product/campaigns">
@@ -63,7 +65,7 @@ const FooterLinks = () => {
 					</div>
 				</div>
 
-				<div className="border-gray-200 border-r border-dashed py-10 pl-10">
+				<div className="border-stroke-soft-100 border-r py-10 pl-10">
 					<p className="label-md pb-6">Docs</p>
 					<div className="flex flex-col gap-3 text-[15px] text-gray-600">
 						<Link href="/docs/getting-started">
@@ -86,7 +88,7 @@ const FooterLinks = () => {
 						</Link>
 					</div>
 				</div>
-				<div className="border-gray-200 border-r border-dashed py-10 pl-10">
+				<div className="border-stroke-soft-100 border-r py-10 pl-10">
 					<p className="label-md pb-6">Resources</p>
 					<div className="flex flex-col gap-3 text-[15px] text-gray-600">
 						<Link href="/resources/changelog">
@@ -109,7 +111,7 @@ const FooterLinks = () => {
 						</Link>
 					</div>
 				</div>
-				<div className="border-gray-200 border-r border-dashed py-10 pl-10">
+				<div className="border-stroke-soft-100 border-r py-10 pl-10">
 					<p className="label-md pb-6">Philosophy</p>
 					<div className="flex flex-col gap-3 text-[15px] text-gray-600">
 						<Link href="/philosophy/why-reloop">
@@ -129,7 +131,7 @@ const FooterLinks = () => {
 						</Link>
 					</div>
 				</div>
-				<div className="border-gray-200 border-dashed py-10 pl-10">
+				<div className="border-stroke-soft-100 py-10 pl-10">
 					<p className="label-md pb-6">Company</p>
 					<div className="flex flex-col gap-3 text-[15px] text-gray-600">
 						<Link href="/company/about-us">
