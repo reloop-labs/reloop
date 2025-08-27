@@ -120,7 +120,39 @@ export default async function Page(props: {
 export async function generateStaticParams() {
 	const params = source.generateParams();
 	// Filter out the home page since it's handled by page.tsx
-	return params.filter((param) => param.slug && param.slug.length > 0);
+	// Include service overview pages but exclude API documentation pages that cause build issues
+	return params.filter((param) => {
+		if (!param.slug || param.slug.length === 0) return false;
+
+		const slugPath = param.slug.join("/");
+
+		// Exclude API documentation pages that cause build issues
+		// These are the auto-generated API reference pages, not the service overview pages
+		if (
+			(slugPath.startsWith("setup/backend/auth/") ||
+				slugPath.startsWith("service/auth/")) &&
+			(slugPath.includes("impersonateUser") ||
+				slugPath.includes("banUser") ||
+				slugPath.includes("unbanUser") ||
+				slugPath.includes("removeUser") ||
+				slugPath.includes("setRole") ||
+				slugPath.includes("createUser") ||
+				slugPath.includes("updateUser") ||
+				slugPath.includes("listUsers") ||
+				slugPath.includes("listUserSessions") ||
+				slugPath.includes("revokeUserSession") ||
+				slugPath.includes("revokeUserSessions") ||
+				slugPath.includes("setUserPassword") ||
+				slugPath.includes("api/auth/v1/") ||
+				slugPath.includes("getApiAuth") ||
+				slugPath.includes("socialSignIn"))
+		) {
+			return false;
+		}
+
+		// Include service overview pages (they should be statically generated)
+		return true;
+	});
 }
 
 export async function generateMetadata(props: {

@@ -1,0 +1,202 @@
+---
+title: Webhook Service
+description: Webhook management and event delivery service API documentation
+---
+
+# Webhook Service
+
+The Reloop Webhook Service provides reliable webhook management and event delivery capabilities for real-time integrations.
+
+## Overview
+
+- **Base URL:** `/api/webhook`
+- **Version:** v1
+- **Authentication:** Bearer tokens, API keys
+- **Rate Limits:** 1000 webhook deliveries per minute per API key
+
+## Quick Start
+
+### 1. Create a Webhook
+
+```bash
+curl -X POST https://reloop.sh/api/webhook/v1/webhooks \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -d '{
+    "name": "User Registration Webhook",
+    "url": "https://your-app.com/webhooks/user-registered",
+    "events": ["user.created", "user.updated"],
+    "secret": "your-webhook-secret"
+  }'
+```
+
+### 2. Receive Webhook Events
+
+Your webhook endpoint will receive POST requests with event data:
+
+```json
+{
+  "id": "evt_123456789",
+  "type": "user.created",
+  "data": {
+    "user_id": "user_123",
+    "email": "user@example.com",
+    "created_at": "2024-01-01T00:00:00Z"
+  },
+  "timestamp": "2024-01-01T00:00:00Z"
+}
+```
+
+## Core Features
+
+### Webhook Management
+- Create and manage webhook endpoints
+- Event filtering and routing
+- Webhook secret management
+- Version control for webhook configurations
+
+### Event Delivery
+- Reliable event delivery with retries
+- Event ordering and deduplication
+- Delivery status tracking
+- Dead letter queue for failed deliveries
+
+### Event Types
+- User lifecycle events
+- Email delivery events
+- System events and alerts
+- Custom event support
+
+### Security
+- Webhook signature verification
+- IP allowlisting
+- Rate limiting per webhook
+- Event encryption support
+
+## API Endpoints
+
+### Webhook Management
+- `GET /api/webhook/v1/webhooks` - List webhooks
+- `POST /api/webhook/v1/webhooks` - Create webhook
+- `PUT /api/webhook/v1/webhooks/{id}` - Update webhook
+- `DELETE /api/webhook/v1/webhooks/{id}` - Delete webhook
+
+### Event Management
+- `GET /api/webhook/v1/events` - List events
+- `GET /api/webhook/v1/events/{id}` - Get event details
+- `POST /api/webhook/v1/events/retry` - Retry failed delivery
+
+### Delivery Management
+- `GET /api/webhook/v1/deliveries` - List deliveries
+- `GET /api/webhook/v1/deliveries/{id}` - Get delivery details
+- `POST /api/webhook/v1/deliveries/{id}/retry` - Retry delivery
+
+## Event Types
+
+### User Events
+- `user.created` - New user registered
+- `user.updated` - User profile updated
+- `user.deleted` - User account deleted
+- `user.verified` - Email verification completed
+
+### Email Events
+- `email.sent` - Email sent successfully
+- `email.delivered` - Email delivered to recipient
+- `email.opened` - Email opened by recipient
+- `email.clicked` - Link in email clicked
+- `email.bounced` - Email bounced back
+
+### System Events
+- `system.maintenance` - System maintenance scheduled
+- `system.error` - System error occurred
+- `api.rate_limit` - Rate limit exceeded
+
+## Webhook Security
+
+### Signature Verification
+
+Each webhook request includes a signature header for verification:
+
+```bash
+# Verify webhook signature
+curl -X POST https://your-app.com/webhooks \
+  -H "Content-Type: application/json" \
+  -H "X-Webhook-Signature: sha256=..." \
+  -d '{"event": "data"}'
+```
+
+### Signature Verification (Node.js)
+
+```javascript
+const crypto = require('crypto');
+
+function verifyWebhookSignature(payload, signature, secret) {
+  const expectedSignature = crypto
+    .createHmac('sha256', secret)
+    .update(payload)
+    .digest('hex');
+
+  return crypto.timingSafeEqual(
+    Buffer.from(signature.replace('sha256=', '')),
+    Buffer.from(expectedSignature)
+  );
+}
+```
+
+## Error Handling
+
+### Retry Logic
+
+Failed webhook deliveries are automatically retried with exponential backoff:
+
+- **1st retry:** 1 minute delay
+- **2nd retry:** 5 minutes delay
+- **3rd retry:** 15 minutes delay
+- **4th retry:** 60 minutes delay
+- **5th retry:** 4 hours delay
+
+After 5 failed attempts, the event is moved to the dead letter queue.
+
+### HTTP Status Codes
+
+Your webhook endpoint should return appropriate HTTP status codes:
+
+- `200` - Event processed successfully
+- `4xx` - Client error (will be retried)
+- `5xx` - Server error (will be retried)
+
+## Best Practices
+
+### Webhook Endpoint Design
+- Return 200 status code quickly
+- Process events asynchronously
+- Implement idempotency
+- Log all incoming events
+
+### Security
+- Always verify webhook signatures
+- Use HTTPS for webhook URLs
+- Implement IP allowlisting
+- Rotate webhook secrets regularly
+
+### Reliability
+- Handle duplicate events gracefully
+- Implement proper error handling
+- Monitor webhook delivery rates
+- Set up alerts for failed deliveries
+
+## SDKs
+
+We provide SDKs for popular programming languages:
+
+- [JavaScript/TypeScript SDK](/sdk/javascript)
+- [Python SDK](/sdk/python)
+- [Go SDK](/sdk/go)
+- [Rust SDK](/sdk/rust)
+
+## Support
+
+For additional help, please refer to:
+- [API Reference](/service/webhook/reference)
+- [Event Types](/service/webhook/events)
+- [Security Guide](/service/webhook/security)

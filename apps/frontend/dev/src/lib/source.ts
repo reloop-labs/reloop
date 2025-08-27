@@ -17,4 +17,6 @@ export const source = loader({
 		attachFile: attachFile as (node: any, file?: any) => any,
 	},
 });
+
+// Create openapi instance without configuration for now
 export const openapi = createOpenAPI();
