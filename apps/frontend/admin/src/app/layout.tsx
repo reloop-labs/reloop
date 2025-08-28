@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { IconsSprite } from "@reloop/ui/components/icon";
-import { Footer } from "@web/components/footer";
-import { Header } from "@web/components/header";
 import { ThemeProvider } from "next-themes";
 
 export const metadata: Metadata = {
@@ -25,15 +23,7 @@ export default function RootLayout({
 					enableSystem
 					disableTransitionOnChange
 				>
-					<div className="relative z-50 w-full flex-col items-center xl:container lg:mt-6 lg:flex xl:mx-auto">
-						<div className="relative z-20 flex w-full items-center justify-center mac:justify-stretch gap-8">
-							<Header />
-						</div>
-					</div>
 					{children}
-					<div className="mt-10">
-						<Footer />
-					</div>
 					<IconsSprite />
 				</ThemeProvider>
 			</body>
