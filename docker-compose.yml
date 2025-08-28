@@ -10,9 +10,7 @@ services:
       POSTGRES_USER: reloop
       POSTGRES_PASSWORD: reloop123
     ports:
-      - target: 5432
-        published: 5432
-        protocol: tcp
+      - "5432:5432"
     command: ["postgres", "-c", "log_statement=all"]
     healthcheck:
       interval: 30s
@@ -26,7 +24,14 @@ services:
     volumes:
       - ./docker-data/redis:/data
     ports:
-      - target: 6379
-        published: 6379
-        protocol: tcp
+      - "6379:6379"
+    restart: unless-stopped
+
+  reloop-proxy:
+    image: caddy:latest
+    container_name: reloop-proxy
+    ports:
+      - "80:80"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
     restart: unless-stopped
