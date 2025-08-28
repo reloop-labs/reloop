@@ -20,20 +20,21 @@ RUN bun run --filter=admin build
 # Stage 3: Production server
 FROM base AS runner
 WORKDIR /app
+
 # Runtime environment variables (can be overridden from outside)
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
-
 # Copy standalone build
-COPY --from=builder /app/apps/frontend/admin/public ./admin/public
-COPY --from=builder /app/apps/frontend/admin/.next ./admin/.next
-COPY --from=deps /app/node_modules ./admin/node_modules
-COPY --from=deps /app/apps/frontend/admin/package.json ./admin/package.json
+COPY --from=builder /app/apps/frontend/admin/public ./public
+COPY --from=builder /app/apps/frontend/admin/.next/standalone ./
+COPY --from=builder /app/apps/frontend/admin/.next/standalone/apps/frontend/admin ./
+COPY --from=builder /app/apps/frontend/admin/.next/static ./.next/static
 
 RUN rm -rf apps
 
 EXPOSE 3000
-CMD ["bun", "--cwd","admin" ,"start"]
+
+CMD ["bun", "run", "server.js"]

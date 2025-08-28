@@ -1,0 +1,9 @@
+reloop.local {
+    # Frontend
+    reverse_proxy 172.17.0.1:3000
+
+    # API
+    handle_path /api/auth* {
+        reverse_proxy 172.17.0.1:4000
+    }
+}
