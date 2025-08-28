@@ -7,8 +7,8 @@ export default function Home() {
 				Email for Developers & Marketing teams
 			</h1>
 			<h2 className="mx-auto mt-6 max-w-lg text-center text-lg text-text-sub-600 leading-8">
-				Reloop secure, reliable, and scalable email infrastructure ensuring
-				99.9% inbox placement, not spam.{" "}
+				Reloop provides secure, reliable, and scalable email infrastructure with
+				99.9% inbox placement never spam.{" "}
 			</h2>
 
 			<div className="mt-10 flex items-center justify-center gap-4">
