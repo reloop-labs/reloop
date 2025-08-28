@@ -33,7 +33,9 @@ const Page = () => {
 					</Link>
 				</div>
 			</header>
-			<div className="flex h-[calc(100vh-150px)] flex-col items-center justify-center">
+			<div
+				className={`flex flex-col items-center justify-center ${showEmail ? "h-[calc(100vh-64px)]" : "h-[calc(100vh-150px)]"}`}
+			>
 				<div className="flex w-full max-w-[440px] flex-col gap-6 p-5 md:p-8">
 					<div className="flex flex-col items-center justify-center gap-2">
 						<div className="space-y-1 text-center">
