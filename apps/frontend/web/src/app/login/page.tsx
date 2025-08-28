@@ -6,6 +6,7 @@ import * as Input from "@reloop/ui/components/input";
 import * as Label from "@reloop/ui/components/label";
 import * as LinkButton from "@reloop/ui/components/link-button";
 import { Logo } from "@reloop/ui/components/logo";
+import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -60,74 +61,94 @@ const Page = () => {
 						<Icon name="github" className="h-5 w-5" />
 						Login with GitHub
 					</Button.Root>
-					<Button.Root
-						mode="stroke"
-						variant="neutral"
-						className="h-12 w-full"
-						onClick={() => setShowEmail(true)}
-					>
-						<Icon name="social-mail" className="h-[17.5px] w-[17.5px]" />
-						Login with Email
-					</Button.Root>
+					{!showEmail && (
+						<Button.Root
+							mode="stroke"
+							variant="neutral"
+							className="h-12 w-full"
+							onClick={() => setShowEmail(true)}
+						>
+							<Icon name="social-mail" className="h-[17.5px] w-[17.5px]" />
+							Login with Email
+						</Button.Root>
+					)}
 				</div>
-				{showEmail && (
-					<>
-						<div className="flex flex-col gap-3">
-							<div className="flex flex-col gap-1">
-								<Label.Root htmlFor="email">
-									Email Address
-									<Label.Asterisk />
-								</Label.Root>
-								<Input.Root>
-									<Input.Wrapper>
-										<Input.Input
-											id="email"
-											type="email"
-											placeholder="hello@reloop.com"
-										/>
-									</Input.Wrapper>
-								</Input.Root>
+				<AnimatePresence>
+					{showEmail && (
+						<motion.div
+							initial={{ opacity: 0, height: 0, y: -20 }}
+							animate={{ opacity: 1, height: "auto", y: 0 }}
+							exit={{ opacity: 0, height: 0, y: -20 }}
+							transition={{
+								duration: 0.3,
+								ease: "easeOut",
+								opacity: { duration: 0.2 },
+								height: { duration: 0.3 },
+							}}
+							className="overflow-hidden"
+						>
+							<div className="flex flex-col gap-3">
+								<Divider.Root variant="line-text">OR</Divider.Root>
+								<div className="flex flex-col gap-1">
+									<Label.Root htmlFor="email">
+										Email Address
+										<Label.Asterisk />
+									</Label.Root>
+									<Input.Root>
+										<Input.Wrapper>
+											<Input.Input
+												className="h-12 font-medium"
+												id="email"
+												type="email"
+												placeholder="hello@reloop.com"
+											/>
+										</Input.Wrapper>
+									</Input.Root>
+								</div>
+								<div className="flex flex-col gap-1">
+									<Label.Root htmlFor="password1">
+										Password <Label.Asterisk />
+									</Label.Root>
+									<Input.Root>
+										<Input.Wrapper>
+											<Input.Input
+												id="password1"
+												type={showPassword ? "text" : "password"}
+												placeholder="••••••••••"
+												className="h-12 font-medium"
+											/>
+											<button
+												type="button"
+												onClick={() => setShowPassword((s) => !s)}
+											>
+												{showPassword ? (
+													<Icon
+														name="eye-outline"
+														className="size-5 fill-none text-text-soft-400 group-has-[disabled]:text-text-disabled-300"
+													/>
+												) : (
+													<Icon
+														name="eye-slash-outline"
+														className="size-5 fill-none text-text-soft-400 group-has-[disabled]:text-text-disabled-300"
+													/>
+												)}
+											</button>
+										</Input.Wrapper>
+									</Input.Root>
+								</div>
+								<div className="flex items-center gap-1">
+									<p className="text-paragraph-sm text-text-sub-600">
+										Forgot password?
+									</p>
+									<LinkButton.Root variant="black">Reset it</LinkButton.Root>
+								</div>
 							</div>
-							<div className="flex flex-col gap-1">
-								<Label.Root htmlFor="password1">
-									Password <Label.Asterisk />
-								</Label.Root>
-								<Input.Root>
-									<Input.Wrapper>
-										<Input.Input
-											id="password1"
-											type={showPassword ? "text" : "password"}
-											placeholder="••••••••••"
-										/>
-										<button
-											type="button"
-											onClick={() => setShowPassword((s) => !s)}
-										>
-											{showPassword ? (
-												<Icon
-													name="eye-outline"
-													className="size-5 fill-none text-text-soft-400 group-has-[disabled]:text-text-disabled-300"
-												/>
-											) : (
-												<Icon
-													name="eye-slash-outline"
-													className="size-5 fill-none text-text-soft-400 group-has-[disabled]:text-text-disabled-300"
-												/>
-											)}
-										</button>
-									</Input.Wrapper>
-								</Input.Root>
-							</div>
-							<div className="flex items-center gap-1">
-								<p className="text-paragraph-sm text-text-sub-600">
-									Forgot password?
-								</p>
-								<LinkButton.Root variant="black">Reset it</LinkButton.Root>
-							</div>
-						</div>
-						<Button.Root variant="neutral">Login</Button.Root>
-					</>
-				)}
+							<Button.Root variant="neutral" className="mt-4 h-12 w-full">
+								Login
+							</Button.Root>
+						</motion.div>
+					)}
+				</AnimatePresence>
 				<div className="flex items-center justify-center gap-1">
 					<p className="text-paragraph-sm text-text-sub-600">
 						Don't have an account?
