@@ -143,7 +143,7 @@ export const buttonVariants = tv({
 			class: {
 				root: [
 					// base
-					"bg-bg-white-0 text-text-sub-600 shadow-regular-xs ring-stroke-soft-200",
+					"bg-bg-white-0 shadow-regular-xs ring-stroke-soft-200",
 					// hover
 					"hover:bg-bg-weak-50 hover:text-text-strong-950 hover:shadow-none hover:ring-transparent",
 					// focus

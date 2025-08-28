@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { IconsSprite } from "@reloop/ui/components/icon";
-import { Footer } from "@web/components/footer";
-import { Header } from "@web/components/header";
 import { ThemeProvider } from "next-themes";
 
 export const metadata: Metadata = {
@@ -25,11 +23,7 @@ export default function RootLayout({
 					enableSystem
 					disableTransitionOnChange
 				>
-					<Header />
 					{children}
-					<div className="mt-10">
-						<Footer />
-					</div>
 					<IconsSprite />
 				</ThemeProvider>
 			</body>
