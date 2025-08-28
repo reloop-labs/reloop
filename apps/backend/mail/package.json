@@ -4,7 +4,10 @@
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"dev": "bun run --watch src/index.ts",
-		"email": "email dev --dir src/emails"
+		"email": "email dev --dir src/emails",
+		"db:generate": "drizzle-kit generate",
+		"db:migrate": "drizzle-kit migrate",
+		"db:studio": "drizzle-kit studio"
 	},
 	"dependencies": {
 		"@elysiajs/bearer": "catalog:backend",
@@ -26,11 +29,19 @@
 		"@opentelemetry/exporter-trace-otlp-proto": "catalog:backend",
 		"react": "catalog:ui",
 		"react-dom": "catalog:ui",
-		"react-email": "catalog:ui"
+		"react-email": "catalog:ui",
+		"nodemailer": "catalog:backend",
+		"node-imap": "catalog:backend",
+		"mailparser": "catalog:backend",
+		"pg": "catalog:db"
 	},
 	"devDependencies": {
 		"@react-email/preview-server": "catalog:ui",
-		"bun-types": "catalog:backend"
+		"bun-types": "catalog:backend",
+		"@types/nodemailer": "catalog:backend",
+		"@types/node-imap": "catalog:backend",
+		"@types/pg": "catalog:db",
+		"drizzle-kit": "catalog:db"
 	},
 	"module": "src/index.js",
 	"overrides": {
