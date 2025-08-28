@@ -33,15 +33,12 @@ const Page = () => {
 					</Link>
 				</div>
 			</header>
-			<div className="flex h-[calc(100vh-64px)] flex-col items-center justify-center">
+			<div className="flex h-[calc(100vh-150px)] flex-col items-center justify-center">
 				<div className="flex w-full max-w-[440px] flex-col gap-6 p-5 md:p-8">
 					<div className="flex flex-col items-center justify-center gap-2">
 						<div className="space-y-1 text-center">
-							<h2 className="title-h6 md:title-h5 text-text-strong-950">
-								Create your account
-							</h2>
-							<h2 className="paragraph-sm md:paragraph-md text-text-sub-600">
-								Join us and get started today.
+							<h2 className="title-h5 md:title-h5 text-text-strong-950">
+								Let's create your account{" "}
 							</h2>
 						</div>
 					</div>
@@ -166,7 +163,7 @@ const Page = () => {
 						)}
 					</AnimatePresence>
 					<p className="text-center text-xs">
-						By signing up, you agree to our <br />
+						By creating an account, you agree to our <br />
 						<Link
 							href="/terms"
 							className={LinkButton.linkButtonVariants({
