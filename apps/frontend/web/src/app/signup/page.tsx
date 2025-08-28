@@ -4,6 +4,7 @@ import * as Divider from "@reloop/ui/components/divider";
 import { Icon } from "@reloop/ui/components/icon";
 import * as Input from "@reloop/ui/components/input";
 import * as Label from "@reloop/ui/components/label";
+import * as LinkButton from "@reloop/ui/components/link-button";
 import { Logo } from "@reloop/ui/components/logo";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
@@ -20,21 +21,28 @@ const Page = () => {
 					<Logo className="h-8 w-8 rounded-full lg:h-10 lg:w-10" />
 				</div>
 				<div className="flex items-center gap-2">
-					<Button.Root size="xsmall" mode="stroke" variant="neutral">
+					<Link
+						href="/login"
+						className={Button.buttonVariants({
+							variant: "neutral",
+							mode: "stroke",
+							size: "xsmall",
+						}).root()}
+					>
 						Login
-					</Button.Root>
+					</Link>
 				</div>
 			</header>
 			<div className="flex h-[calc(100vh-64px)] flex-col items-center justify-center">
 				<div className="flex w-full max-w-[440px] flex-col gap-6 p-5 md:p-8">
 					<div className="flex flex-col items-center justify-center gap-2">
 						<div className="space-y-1 text-center">
-							<div className="title-h6 md:title-h5 text-text-strong-950">
+							<h2 className="title-h6 md:title-h5 text-text-strong-950">
 								Create your account
-							</div>
-							<div className="paragraph-sm md:paragraph-md text-text-sub-600">
+							</h2>
+							<h2 className="paragraph-sm md:paragraph-md text-text-sub-600">
 								Join us and get started today.
-							</div>
+							</h2>
 						</div>
 					</div>
 					<div className="grid grid-cols-1 gap-2">
@@ -159,8 +167,23 @@ const Page = () => {
 					</AnimatePresence>
 					<p className="text-center text-xs">
 						By signing up, you agree to our <br />
-						<span className="font-medium">Terms of Service</span> and{" "}
-						<span className="font-medium">Privacy Policy</span>
+						<Link
+							href="/terms"
+							className={LinkButton.linkButtonVariants({
+								variant: "black",
+							}).root({ className: "text-xs!" })}
+						>
+							Terms of Service
+						</Link>{" "}
+						and{" "}
+						<Link
+							href="/privacy"
+							className={LinkButton.linkButtonVariants({
+								variant: "black",
+							}).root({ className: "text-xs!" })}
+						>
+							Privacy Policy
+						</Link>
 					</p>
 				</div>
 			</div>
