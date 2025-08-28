@@ -12,7 +12,8 @@
 		"next": "catalog:ui",
 		"react": "catalog:ui",
 		"@reloop/ui": "workspace:*",
-		"react-dom": "catalog:ui"
+		"react-dom": "catalog:ui",
+		"motion": "catalog:ui"
 	},
 	"devDependencies": {
 		"@reloop/tailwind": "workspace:*",

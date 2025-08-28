@@ -31,7 +31,7 @@ const Page = () => {
 					</div>
 				</div>
 				<div className="grid grid-cols-1 gap-2">
-					<Button.Root mode="stroke" variant="neutral" className="w-full">
+					<Button.Root mode="stroke" variant="neutral" className="h-12 w-full">
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
 							className="h-4 w-4"
@@ -56,14 +56,14 @@ const Page = () => {
 						</svg>
 						Login with Google
 					</Button.Root>
-					<Button.Root mode="stroke" variant="neutral" className="w-full">
+					<Button.Root mode="stroke" variant="neutral" className="h-12 w-full">
 						<Icon name="github" className="h-5 w-5" />
 						Login with GitHub
 					</Button.Root>
 					<Button.Root
 						mode="stroke"
 						variant="neutral"
-						className="w-full"
+						className="h-12 w-full"
 						onClick={() => setShowEmail(true)}
 					>
 						<Icon name="social-mail" className="h-[17.5px] w-[17.5px]" />
