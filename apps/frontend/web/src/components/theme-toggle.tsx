@@ -19,7 +19,7 @@ export function ThemeToggle() {
 				mode="stroke"
 				variant="neutral"
 				onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-				className="size-8 rounded-full"
+				className="flex size-8 items-center justify-center rounded-full p-0"
 			>
 				<motion.div
 					key={theme}
