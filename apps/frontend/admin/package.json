@@ -12,14 +12,17 @@
 		"next": "catalog:ui",
 		"react": "catalog:ui",
 		"@reloop/ui": "workspace:*",
-		"react-dom": "catalog:ui"
+		"react-dom": "catalog:ui",
+		"motion": "catalog:ui"
 	},
 	"devDependencies": {
-		"typescript": "catalog:",
+		"@reloop/tailwind": "workspace:*",
+		"@reloop/ts": "workspace:*",
+		"@tailwindcss/postcss": "catalog:ui",
 		"@types/node": "catalog:",
 		"@types/react": "catalog:ui",
 		"@types/react-dom": "catalog:ui",
-		"@tailwindcss/postcss": "catalog:ui",
-		"tailwindcss": "catalog:ui"
+		"tailwindcss": "catalog:ui",
+		"typescript": "catalog:"
 	}
 }
