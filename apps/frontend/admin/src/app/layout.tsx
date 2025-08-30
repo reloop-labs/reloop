@@ -24,9 +24,7 @@ export default function RootLayout({
 					enableSystem
 					disableTransitionOnChange
 				>
-					<AppWrapper>
-						{children}
-					</AppWrapper>
+					<AppWrapper>{children}</AppWrapper>
 					<IconsSprite />
 				</ThemeProvider>
 			</body>
