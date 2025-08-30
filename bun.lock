@@ -112,11 +112,14 @@
       "version": "0.1.0",
       "dependencies": {
         "@reloop/ui": "workspace:*",
+        "motion": "catalog:ui",
         "next": "catalog:ui",
         "react": "catalog:ui",
         "react-dom": "catalog:ui",
       },
       "devDependencies": {
+        "@reloop/tailwind": "workspace:*",
+        "@reloop/ts": "workspace:*",
         "@tailwindcss/postcss": "catalog:ui",
         "@types/node": "catalog:",
         "@types/react": "catalog:ui",
