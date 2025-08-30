@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { IconsSprite } from "@reloop/ui/components/icon";
 import { ThemeProvider } from "next-themes";
+import AppWrapper from "../components/AppWrapper";
 
 export const metadata: Metadata = {
 	title: "Reloop",
@@ -23,7 +24,9 @@ export default function RootLayout({
 					enableSystem
 					disableTransitionOnChange
 				>
-					{children}
+					<AppWrapper>
+						{children}
+					</AppWrapper>
 					<IconsSprite />
 				</ThemeProvider>
 			</body>
