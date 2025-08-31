@@ -1,6 +1,9 @@
 FROM ubuntu:22.04
 
-LABEL maintainer="Reloop Mail Server"
+LABEL maintainer="https://github.com/reloop-labs"
+LABEL author="Rudra Patel <https://github.com/rudra-2>"
+LABEL description="Postfix mail server configuration by Rudra Patel for ReloopLabs"
+LABEL version="1.0.0"
 
 ARG DEBIAN_FRONTEND=noninteractive
 ENV LC_ALL=C
