@@ -80,7 +80,7 @@ fi
 # Create .env file if it doesn't exist
 if [ ! -f .env ]; then
     echo "% % Creating .env file from template... % %"
-    cp env.example .env
+    cp env.example.mail .env
     echo "⚠️  IMPORTANT: Please edit .env file with your settings:"
 echo "   - Set DOMAIN to your primary domain (e.g., rudraa.me)"
 echo "   - MAIL_HOSTNAME will auto-detect from hostname (or set manually)"
