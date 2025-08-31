@@ -1,0 +1,59 @@
+# Basic Postfix configuration
+smtpd_banner = $myhostname ESMTP $mail_name
+biff = no
+append_dot_mydomain = no
+readme_directory = no
+compatibility_level = 3.6
+
+# Hostname configuration
+myhostname = ${MAIL_HOSTNAME}
+mydomain = ${MAIL_HOSTNAME#*.}
+
+# TLS parameters
+smtpd_tls_cert_file = /etc/ssl/mail/cert.pem
+smtpd_tls_key_file = /etc/ssl/mail/key.pem
+smtpd_tls_security_level = may
+smtp_tls_security_level = may
+smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
+
+# Network configuration
+inet_interfaces = all
+inet_protocols = all
+mynetworks = 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+
+# Virtual domain configuration with PostgreSQL
+virtual_mailbox_domains = pgsql:/etc/postfix/sql/pgsql_virtual_domains_maps.cf
+virtual_alias_maps = pgsql:/etc/postfix/sql/pgsql_virtual_alias_maps.cf
+virtual_mailbox_maps = pgsql:/etc/postfix/sql/pgsql_virtual_mailbox_maps.cf
+
+# Dovecot integration
+smtpd_sasl_type = dovecot
+smtpd_sasl_path = private:/var/spool/postfix/private/auth
+smtpd_sasl_auth_enable = yes
+smtpd_sasl_security_options = noanonymous
+smtpd_sasl_local_domain = $myhostname
+virtual_transport = lmtp:inet:dovecot:26
+
+# Sender login maps for authentication
+smtpd_sender_login_maps = pgsql:/etc/postfix/sql/pgsql_sender_login_maps.cf
+smtpd_sender_restrictions = permit_sasl_authenticated, permit_mynetworks, reject_sender_login_mismatch, reject_non_fqdn_sender, reject_unknown_sender_domain
+
+# Rspamd integration
+smtpd_milters = inet:rspamd:11332
+non_smtpd_milters = inet:rspamd:11332
+milter_mail_macros = i {mail_addr} {client_addr} {client_name} {auth_authen}
+milter_protocol = 6
+milter_default_action = accept
+
+# Restrictions
+smtpd_relay_restrictions = permit_mynetworks permit_sasl_authenticated defer_unauth_destination
+smtpd_recipient_restrictions = permit_sasl_authenticated, permit_mynetworks, reject_unauth_destination
+
+# Other settings
+alias_maps = hash:/etc/aliases
+alias_database = hash:/etc/aliases
+mydestination = localhost.localdomain, localhost
+relayhost = 
+mailbox_size_limit = 0
+recipient_delimiter = +
+message_size_limit = 102400000
