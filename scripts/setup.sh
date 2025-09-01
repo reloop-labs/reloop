@@ -124,7 +124,8 @@ if [ ! -f .env ]; then
     sed -i "s/DOMAIN=$DOMAIN/DOMAIN=$DOMAIN/g" .env
     echo "   Using domain: $DOMAIN"
 else
-    echo ":) .env file already exists, using existing configuration"
+    DOMAIN=$(grep "^DOMAIN=" .env | cut -d'=' -f2)
+    echo ":) .env file already exists, using existing configuration (DOMAIN=$DOMAIN)"
 fi
 
 echo ""
