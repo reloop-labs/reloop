@@ -1,12 +1,9 @@
 #!/bin/bash
 
-# Reloop Mail Server Setup Script
-# ===============================
-
 set -e
 
-echo "^-^ Setting up Reloop Mail Server..."
-echo "==================================="
+echo "^-^ Setting up Reloop Complete Application Stack..."
+echo "=================================================="
 echo ""
 
 # Check if running as root
@@ -44,119 +41,187 @@ if ! docker info > /dev/null 2>&1; then
     exit 1
 fi
 
-echo "✅ Prerequisites check passed"
+echo ">>> Prerequisites check passed"
 echo ""
 
 # Create necessary directories
-echo "📁 Creating directories..."
-mkdir -p data/{redis,rspamd,vmail,postfix}
-mkdir -p data/rspamd/dkim
-mkdir -p logs/{postfix,dovecot,rspamd}
-mkdir -p ssl
+echo ">>> Creating directories..."
+mkdir -p docker-data/{postgres,redis,rspamd,vmail,postfix,dovecot,caddy}
+mkdir -p docker-data/rspamd/dkim
+mkdir -p docker-data/{postfix,dovecot,rspamd}/logs
+mkdir -p docker-data/ssl
 
 # Set proper permissions for Rspamd DKIM directory
 echo "!! Setting Rspamd permissions..."
-sudo chown -R 11333:11333 data/rspamd/dkim
+sudo chown -R 11333:11333 docker-data/rspamd/dkim
 echo ":) Directories created and permissions set"
 echo ""
 
 # Generate SSL certificates if they don't exist
-if [ ! -f ssl/cert.pem ] || [ ! -f ssl/key.pem ]; then
+if [ ! -f docker-data/ssl/cert.pem ] || [ ! -f docker-data/ssl/key.pem ]; then
     echo "!! Generating self-signed SSL certificates..."
     openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-        -keyout ssl/key.pem \
-        -out ssl/cert.pem \
-        -subj "/C=US/ST=State/L=City/O=Reloop/CN=mail.localhost"
+        -keyout docker-data/ssl/key.pem \
+        -out docker-data/ssl/cert.pem \
+        -subj "/C=US/ST=State/L=City/O=Reloop/CN=reloop.localhost"
     
     # Set proper permissions
-    chmod 600 ssl/key.pem
-    chmod 644 ssl/cert.pem
+    chmod 600 docker-data/ssl/key.pem
+    chmod 644 docker-data/ssl/cert.pem
     echo ":) Self-signed certificates generated"
-    echo "⚠️  For production, replace with proper certificates"
+    echo " !! For production, replace with proper certificates"
 else
     echo ":) SSL certificates already exist"
 fi
 
-# Create .env file if it doesn't exist
+# Check if .env exists and ask for domain
 if [ ! -f .env ]; then
-    echo "% % Creating .env file from template... % %"
-    cp env.example.mail .env
-    echo "⚠️  IMPORTANT: Please edit .env file with your settings:"
-echo "   - Set DOMAIN to your primary domain (e.g., rudraa.me)"
-echo "   - MAIL_HOSTNAME will auto-detect from hostname (or set manually)"
-echo "   - Configure your remote PostgreSQL database"
-echo "   - Update Redis password"
     echo ""
-    echo "   Run: nano .env"
+    echo ">>> Domain Configuration"
+    echo "======================"
+    echo "Enter your domain name (e.g., yourdomain.com):"
+    read -p "Domain: " DOMAIN
+    
+    # Validate domain input
+    if [ -z "$DOMAIN" ]; then
+        echo "Using default domain: localhost"
+        DOMAIN="localhost"
+    fi
+    
     echo ""
-    read -p "Press Enter after you've configured the .env file..."
+    echo ">>> Creating .env file..."
+    cat > .env << EOF
+# Reloop Application Configuration
+# ===============================
+
+# Domain Configuration
+DOMAIN=$DOMAIN
+
+# Database Configuration
+DB_HOST=reloop-postgres
+DB_NAME=reloop
+DB_USER=reloop
+DB_PASSWORD=reloop123
+
+# Redis Configuration
+REDIS_PASSWORD=reloop123
+REDIS_HOST=reloop-redis
+REDIS_PORT=6379
+
+# Timezone
+TZ=UTC
+
+EOF
+    echo ">>> .env file created with domain: $DOMAIN"
 else
-    echo ":) .env file already exists"
+    echo ":) .env file already exists, using existing configuration"
+    DOMAIN=$(grep "^DOMAIN=" .env | cut -d'=' -f2)
+    if [ -z "$DOMAIN" ]; then
+        DOMAIN="localhost"
+    fi
+    echo "   Using domain: $DOMAIN"
 fi
 
-# Check if .env is properly configured
-if ! grep -q "your_remote_postgresql_host" .env; then
-    echo ":) .env file appears to be configured"
-else
-    echo "⚠️  .env file still contains default values"
-    echo "Please configure it before continuing"
-    exit 1
-fi
 
-# Build and start containers
-echo "🐳 Building and starting containers..."
-$DOCKER_COMPOSE_CMD build --no-cache
-$DOCKER_COMPOSE_CMD up -d
+echo ""
+echo ">>> Updating Caddyfile..."
+cat > Caddyfile << EOF
+# Reloop Application Reverse Proxy Configuration
+# =============================================
+
+# Main domain configuration
+$DOMAIN {
+    # Enable automatic HTTPS (for development, will use self-signed certs)
+    tls internal
+    
+    # Route /dashboard to fe-main
+    handle_path /dashboard* {
+        reverse_proxy reloop-main:3000
+    }
+    
+    # Route /dev to fe-dev
+    handle_path /dev* {
+        reverse_proxy reloop-dev:3000
+    }
+    
+    # Route /docs to fe-docs
+    handle_path /docs* {
+        reverse_proxy reloop-docs:3000
+    }
+    
+    # Route /admin to fe-admin
+    handle_path /admin* {
+        reverse_proxy reloop-admin:3000
+    }
+    
+    # Route root / to fe-web
+    handle {
+        reverse_proxy reloop-web:3000
+    }
+    
+    # API routes (if needed)
+    handle_path /api/auth* {
+        reverse_proxy reloop-postfix:587
+    }
+    
+    # Health check endpoint
+    handle_path /health {
+        respond "OK" 200
+    }
+}
+EOF
+echo " Caddyfile updated for domain: $DOMAIN"
+
+
+echo ""
+echo "~~Starting containers..."
+$DOCKER_COMPOSE_CMD -f docker-compose.setup.yml up -d
 
 echo ""
 echo "...Waiting for services to start..."
-sleep 10
+sleep 15
 
-# Check service status
+
 echo ""
 echo "#Service Status:"
-$DOCKER_COMPOSE_CMD ps
+$DOCKER_COMPOSE_CMD -f docker-compose.setup.yml ps
+
 
 echo ""
-echo "---Checking service health---"
-
-# Check if services are running
-if $DOCKER_COMPOSE_CMD ps | grep -q "Up"; then
-    echo ":) All services are running"
-else
-    echo "X-X Some services failed to start X-X"
-    echo "Check logs with: $DOCKER_COMPOSE_CMD logs"
-    exit 1
-fi
-
+echo " :) Reloop Complete Application Stack setup complete!"
 echo ""
-echo "🎉 Reloop Mail Server setup complete!"
+echo " Application URLs:"
+echo "   Main Dashboard: http://$DOMAIN/dashboard"
+echo "   Development: http://$DOMAIN/dev"
+echo "   Documentation: http://$DOMAIN/docs"
+echo "   Admin Panel: http://$DOMAIN/admin"
+echo "   Web App: http://$DOMAIN/"
 echo ""
-echo "📧 Mail Server Information:"
-echo "   SMTP: localhost:25 (or your server IP)"
-echo "   SMTPS: localhost:465"
-echo "   Submission: localhost:587"
-echo "   IMAP: localhost:143"
-echo "   IMAPS: localhost:993"
-echo "   POP3: localhost:110"
-echo "   POP3S: localhost:995"
+echo " Mail Server Information:"
+echo "   SMTP: $DOMAIN:25"
+echo "   SMTPS: $DOMAIN:465"
+echo "   Submission: $DOMAIN:587"
+echo "   IMAP: $DOMAIN:143"
+echo "   IMAPS: $DOMAIN:993"
+echo "   POP3: $DOMAIN:110"
+echo "   POP3S: $DOMAIN:995"
 echo ""
 echo "  @ Next steps:"
 echo "   1. Configure your DNS records (A, MX, SPF, DKIM, DMARC)"
-echo "   2. Set up your remote PostgreSQL database"
+echo "   2. Set up your database with initial data"
 echo "   3. Add users to your database"
-echo "   4. Test mail client connections"
-echo "   5. Monitor logs: docker-compose logs -f"
+echo "   4. Test application access"
+echo "   5. Monitor logs: docker-compose -f docker-compose.setup.yml logs -f"
 echo ""
 echo "  @ Useful commands:"
-echo "   View logs: $DOCKER_COMPOSE_CMD logs -f"
-echo "   Stop services: $DOCKER_COMPOSE_CMD down"
-echo "   Restart services: $DOCKER_COMPOSE_CMD restart"
-echo "   Check status: $DOCKER_COMPOSE_CMD ps"
+echo "   View logs: $DOCKER_COMPOSE_CMD -f docker-compose.setup.yml logs -f"
+echo "   Stop services: $DOCKER_COMPOSE_CMD -f docker-compose.setup.yml down"
+echo "   Restart services: $DOCKER_COMPOSE_CMD -f docker-compose.setup.yml restart"
+echo "   Check status: $DOCKER_COMPOSE_CMD -f docker-compose.setup.yml ps"
 echo ""
 echo "  @ DKIM Key Management:"
-echo "   Generate DKIM key: sudo rspamadm dkim_keygen -s mail -d yourdomain.com -k data/rspamd/dkim/yourdomain.com/mail.private > data/rspamd/dkim/yourdomain.com/mail.txt"
-echo "   Set permissions: sudo chown -R 11333:11333 data/rspamd/dkim/yourdomain.com/"
-echo "   Restart Rspamd: $DOCKER_COMPOSE_CMD restart rspamd"
+echo "   Generate DKIM key: sudo rspamadm dkim_keygen -s mail -d $DOMAIN -k docker-data/rspamd/dkim/$DOMAIN/mail.private > docker-data/rspamd/dkim/$DOMAIN/mail.txt"
+echo "   Set permissions: sudo chown -R 11333:11333 docker-data/rspamd/dkim/$DOMAIN/"
+echo "   Restart Rspamd: $DOCKER_COMPOSE_CMD -f docker-compose.setup.yml restart reloop-rspamd"
 echo ""
 echo " For detailed setup instructions, check the README.md file"
