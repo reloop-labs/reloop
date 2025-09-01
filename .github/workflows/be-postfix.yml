@@ -5,13 +5,13 @@ on:
     branches: [ main ]
     paths:
       - 'apps/backend/postfix/**'
-      - 'docker-compose.yml'
+      - 'docker-compose.setup.yml'
       - '.github/workflows/be-postfix.yml'
   pull_request:
     branches: [ main ]
     paths:
       - 'apps/backend/postfix/**'
-      - 'docker-compose.yml'
+      - 'docker-compose.setup.yml'
       - '.github/workflows/be-postfix.yml'
 
 env:
