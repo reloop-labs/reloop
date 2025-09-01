@@ -109,93 +109,32 @@ if [ ! -f .env ]; then
     echo "======================"
     echo "Enter your domain name (e.g., yourdomain.com):"
     read -p "Domain: " DOMAIN
-    
-    # Validate domain input
     if [ -z "$DOMAIN" ]; then
         echo "Using default domain: localhost"
         DOMAIN="localhost"
     fi
-    
     echo ""
     echo ">>> Creating .env file..."
-    cat > .env << EOF
-# Reloop Application Configuration
-# ===============================
-
-# Domain Configuration
-DOMAIN=$DOMAIN
-
-# Database Configuration
-DB_HOST=reloop-postgres
-DB_NAME=reloop
-DB_USER=reloop
-DB_PASSWORD=reloop123
-
-# Redis Configuration
-REDIS_PASSWORD=reloop123
-REDIS_HOST=reloop-redis
-REDIS_PORT=6379
-
-# Timezone
-TZ=UTC
-EOF
+    curl -fsSL "$REPO_URL/env.example.mail" -o .env
+    if [ $? -ne 0 ]; then
+        echo "X-X Failed to download .env X-X"
+        exit 1
+    fi
     echo ">>> .env file created with domain: $DOMAIN"
+    sed -i "s/DOMAIN=$DOMAIN/DOMAIN=$DOMAIN/g" .env
+    echo "   Using domain: $DOMAIN"
 else
     echo ":) .env file already exists, using existing configuration"
-    DOMAIN=$(grep "^DOMAIN=" .env | cut -d'=' -f2)
-    if [ -z "$DOMAIN" ]; then
-        DOMAIN="localhost"
-    fi
-    echo "   Using domain: $DOMAIN"
 fi
 
 echo ""
 echo ">>> Updating Caddyfile..."
-cat > Caddyfile << EOF
-# Reloop Application Reverse Proxy Configuration
-# =============================================
-
-# Main domain configuration
-$DOMAIN {
-    # Enable automatic HTTPS (for development, will use self-signed certs)
-    tls internal
-    
-    # Route /dashboard to fe-main
-    handle_path /dashboard* {
-        reverse_proxy reloop-main:3000
-    }
-    
-    # Route /dev to fe-dev
-    handle_path /dev* {
-        reverse_proxy reloop-dev:3000
-    }
-    
-    # Route /docs to fe-docs
-    handle_path /docs* {
-        reverse_proxy reloop-docs:3000
-    }
-    
-    # Route /admin to fe-admin
-    handle_path /admin* {
-        reverse_proxy reloop-admin:3000
-    }
-    
-    # Route root / to fe-web
-    handle {
-        reverse_proxy reloop-web:3000
-    }
-    
-    # API routes (if needed)
-    handle_path /api/auth* {
-        reverse_proxy reloop-postfix:587
-    }
-    
-    # Health check endpoint
-    handle_path /health {
-        respond "OK" 200
-    }
-}
-EOF
+curl -fsSL "$REPO_URL/Caddyfile" -o Caddyfile
+if [ $? -ne 0 ]; then
+    echo "X-X Failed to download Caddyfile X-X"
+    exit 1
+fi
+sed -i "s/\$DOMAIN/$DOMAIN/g" Caddyfile
 echo " Caddyfile updated for domain: $DOMAIN"
 
 echo ""
