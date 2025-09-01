@@ -54,21 +54,18 @@ A comprehensive application stack including mail server, frontend applications, 
 ### One-Command Setup
 
 ```bash
-# Download and run the setup script
 curl -fsSL https://raw.githubusercontent.com/your-repo/reloop/main/scripts/setup.sh | bash
 ```
 
 Or manually:
 
 ```bash
-# Clone the repository
+
 git clone https://github.com/your-repo/reloop.git
 cd reloop
 
-# Make the setup script executable
 chmod +x scripts/setup.sh
 
-# Run the setup script
 ./scripts/setup.sh
 ```
 
@@ -109,16 +106,13 @@ After setup, access your applications at:
 Edit the `.env` file to configure your application:
 
 ```bash
-# Domain Configuration
 DOMAIN=yourdomain.com
 
-# Database Configuration
 DB_HOST=reloop-postgres
 DB_NAME=reloop
 DB_USER=reloop
 DB_PASSWORD=your_secure_password
 
-# Redis Configuration
 REDIS_PASSWORD=your_redis_password
 ```
 
@@ -134,19 +128,15 @@ To use a custom domain instead of localhost:
 ## Management Commands
 
 ```bash
-# View all services
 docker-compose -f docker-compose.setup.yml ps
 
-# View logs
 docker-compose -f docker-compose.setup.yml logs -f
 
-# Stop all services
 docker-compose -f docker-compose.setup.yml down
 
-# Restart services
+
 docker-compose -f docker-compose.setup.yml restart
 
-# Update images and restart
 docker-compose -f docker-compose.setup.yml pull
 docker-compose -f docker-compose.setup.yml up -d
 ```
@@ -163,11 +153,9 @@ docker-compose -f docker-compose.setup.yml up -d
 ### Logs
 
 ```bash
-# View specific service logs
 docker-compose -f docker-compose.setup.yml logs reloop-main
 docker-compose -f docker-compose.setup.yml logs reloop-proxy
 
-# Follow logs in real-time
 docker-compose -f docker-compose.setup.yml logs -f
 ```
 
@@ -191,4 +179,4 @@ For issues and questions:
 
 ## License
 
-[Your License Here]
+

@@ -44,6 +44,36 @@ fi
 echo ">>> Prerequisites check passed"
 echo ""
 
+
+REPO_URL="https://raw.githubusercontent.com/reloop-labs/reloop/main"
+
+
+echo ">>> Downloading configuration files..."
+
+if [ ! -f docker-compose.setup.yml ]; then
+    echo "Downloading docker-compose.setup.yml..."
+    curl -fsSL "$REPO_URL/docker-compose.setup.yml" -o docker-compose.setup.yml
+    if [ $? -ne 0 ]; then
+        echo "X-X Failed to download docker-compose.setup.yml X-X"
+        exit 1
+    fi
+    echo ":) docker-compose.setup.yml downloaded"
+else
+    echo ":) docker-compose.setup.yml already exists"
+fi
+
+if [ ! -f env.example.mail ]; then
+    echo "Downloading env.example.mail..."
+    curl -fsSL "$REPO_URL/env.example.mail" -o env.example.mail
+    if [ $? -ne 0 ]; then
+        echo "X-X Failed to download env.example.mail X-X"
+        exit 1
+    fi
+    echo ":) env.example.mail downloaded"
+else
+    echo ":) env.example.mail already exists"
+fi
+
 # Create necessary directories
 echo ">>> Creating directories..."
 mkdir -p docker-data/{postgres,redis,rspamd,vmail,postfix,dovecot,caddy}
@@ -57,7 +87,6 @@ sudo chown -R 11333:11333 docker-data/rspamd/dkim
 echo ":) Directories created and permissions set"
 echo ""
 
-# Generate SSL certificates if they don't exist
 if [ ! -f docker-data/ssl/cert.pem ] || [ ! -f docker-data/ssl/key.pem ]; then
     echo "!! Generating self-signed SSL certificates..."
     openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
@@ -74,7 +103,6 @@ else
     echo ":) SSL certificates already exist"
 fi
 
-# Check if .env exists and ask for domain
 if [ ! -f .env ]; then
     echo ""
     echo ">>> Domain Configuration"
@@ -110,7 +138,6 @@ REDIS_PORT=6379
 
 # Timezone
 TZ=UTC
-
 EOF
     echo ">>> .env file created with domain: $DOMAIN"
 else
@@ -121,7 +148,6 @@ else
     fi
     echo "   Using domain: $DOMAIN"
 fi
-
 
 echo ""
 echo ">>> Updating Caddyfile..."
@@ -172,7 +198,6 @@ $DOMAIN {
 EOF
 echo " Caddyfile updated for domain: $DOMAIN"
 
-
 echo ""
 echo "~~Starting containers..."
 $DOCKER_COMPOSE_CMD -f docker-compose.setup.yml up -d
@@ -181,11 +206,9 @@ echo ""
 echo "...Waiting for services to start..."
 sleep 15
 
-
 echo ""
 echo "#Service Status:"
 $DOCKER_COMPOSE_CMD -f docker-compose.setup.yml ps
-
 
 echo ""
 echo " :) Reloop Complete Application Stack setup complete!"
