@@ -7,8 +7,6 @@ import { landing } from "./landing";
 import { auth, OpenAPI } from "./lib/auth";
 import { loader } from "./loader";
 
-await loader();
-
 new Elysia({ prefix: "/api/auth", name: "Auth Service" })
 	.use(serverTiming())
 	.use(
@@ -35,6 +33,9 @@ new Elysia({ prefix: "/api/auth", name: "Auth Service" })
 	)
 	.mount("/", auth.handler)
 	.use(landing)
+	.onStart(async () => {
+		await loader();
+	})
 	.listen(process.env.PORT || 3000, () => {
 		console.log("Auth Server is running on http://localhost:3000/api/auth");
 	});

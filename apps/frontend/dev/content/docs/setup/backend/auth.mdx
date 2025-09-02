@@ -1,6 +1,219 @@
 ---
-title:  Auth
-description: Introduction
+title: Auth
+description: Learn how to set up and run the Reloop authentication service locally and in production.
 ---
 
-## Welcome to Auth Docs
+# Authentication Service
+
+> Powers Reloop's user authentication, authorization, and session management. This Elysia.js service provides secure OAuth flows, JWT token handling, and user management for the entire Reloop platform.
+
+<Callout type="info" title="Prerequisite">
+Make sure you've completed the [local setup guide](/setup) first (clone repo, install Bun, and set up dependencies).
+</Callout>
+
+---
+// integrate video how to run the service
+## Quick Start
+
+```bash
+# One command to get started
+cd apps/backend/auth && cp env.example .env && bun i && bun dev
+```
+
+The service will be available at [http://localhost:3010/api/auth](http://localhost:3010/api/auth) 🎉
+
+---
+
+## Service Info
+
+* **Location:** `/apps/backend/auth`
+* **Port:** `3010` (configurable in `.env`)
+* **Tech Stack:** Elysia.js, Better Auth, PostgreSQL, Redis
+* **Part of Monorepo:** Yes (run with filters or inside service dir)
+* **API Base:** `/api/auth`
+
+---
+
+## Environment Setup
+
+Create `.env` file:
+
+```bash
+# Database Configuration
+DATABASE_URL=postgresql://user:password@localhost:5432/auth_db
+
+# Better Auth Configuration
+BETTER_AUTH_SECRET=your-super-secret-key-here-make-it-long-and-random
+
+# Google OAuth (Optional)
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+
+# GitHub OAuth (Optional)
+GITHUB_CLIENT_ID=your-github-client-id
+GITHUB_CLIENT_SECRET=your-github-client-secret
+
+# Server Configuration
+NODE_ENV=development
+PORT=3010
+HOSTNAME=0.0.0.0
+```
+
+| Variable                | Required | Description                                    |
+| ----------------------- | -------- | ---------------------------------------------- |
+| `DATABASE_URL`          | `YES`       | PostgreSQL connection string for user data     |
+| `BETTER_AUTH_SECRET`    | `YES`        | Secret key for JWT tokens and encryption      |
+| `GOOGLE_CLIENT_ID`      | `NO`        | Google OAuth client ID for Google sign-in     |
+| `GOOGLE_CLIENT_SECRET`  | `NO`        | Google OAuth client secret                    |
+| `GITHUB_CLIENT_ID`      | `NO`        | GitHub OAuth client ID for GitHub sign-in     |
+| `GITHUB_CLIENT_SECRET`  | `NO`        | GitHub OAuth client secret                    |
+| `PORT`                  | `NO`        | Server port (defaults to 3010)                |
+| `HOSTNAME`              | `NO`        | Server hostname (defaults to 0.0.0.0)        |
+
+---
+
+## Development Commands
+
+```bash
+# Install dependencies
+bun i
+
+# Start dev server with hot reload
+bun dev
+# or from monorepo root with filter
+bun run --filter=auth dev
+
+# Build for production
+bun run build
+# or from monorepo root
+bun run --filter=auth build
+
+# Start production server locally
+bun run start
+# or from monorepo root
+bun run --filter=auth start
+
+# Type checking
+bun run check-types
+
+# Database operations
+bun run db:push      # Push schema changes to DB
+bun run db:studio    # Open Drizzle Studio
+bun run db:generate  # Generate migrations
+bun run db:migrate   # Run migrations
+
+# Auth schema generation
+bun run auth:generate # Generate Better Auth schema
+```
+
+---
+
+## Docker Development
+
+### Using Docker Compose (Recommended)
+
+```bash
+cd apps/backend/auth
+docker-compose up --build
+```
+
+This starts:
+- PostgreSQL database on port 5432
+- Auth service on port 3010
+
+### Direct Docker
+
+```bash
+# Build image
+docker build -f apps/backend/auth/Dockerfile -t auth-service .
+
+# Run container
+docker run -p 3010:3010 \
+  -e DATABASE_URL="postgresql://user:password@host:5432/db" \
+  -e BETTER_AUTH_SECRET="your-secret-key" \
+  auth-service
+```
+
+---
+
+## API Endpoints
+
+* **Health Check:** `GET /api/auth/status`
+* **API Docs:** `GET /api/auth/docs` (Swagger/OpenAPI)
+* **Auth Routes:** All authentication endpoints under `/api/auth/*`
+* **Landing Page:** Root `/` for service information
+
+---
+
+## Troubleshooting
+
+### Database Connection Issues
+**Can't connect to PostgreSQL?**
+```bash
+# Check if PostgreSQL is running
+docker ps | grep postgres
+
+# Verify connection string format
+DATABASE_URL=postgresql://username:password@host:port/database_name
+
+# Test connection manually
+psql "postgresql://username:password@localhost:5432/auth_db"
+```
+
+### Port Issues
+**Port already in use?**
+```bash
+# Check what's using the port
+lsof -i :3010
+
+# Kill the process (replace PID)
+kill -9 <PID>
+
+# Or update port in .env
+PORT=3001
+```
+
+### Build/Install Issues
+**Bun install fails?**
+```bash
+# Clear cache and reinstall
+rm -rf ~/.bun/install/cache
+rm -rf node_modules
+bun i
+
+# Check Bun version
+bun --version
+```
+
+### Auth Secret Issues
+**Invalid auth secret?**
+```bash
+# Generate a new secure secret
+openssl rand -base64 32
+
+# Update .env file
+BETTER_AUTH_SECRET=your-new-secret-here
+```
+
+---
+
+## Notes
+
+* This service is part of the **Reloop monorepo** - changes here may affect other services
+* Commands can be run inside this directory or from the root using filters
+* Always set up `.env` before starting development
+* The service requires a running PostgreSQL database
+* Better Auth handles all authentication flows automatically
+* OAuth providers are optional - the service works without them
+
+---
+
+## Contributing
+
+* Always run `bun run check-types` before committing
+* Keep environment files (`.env.example`) up to date if new vars are added
+* Test authentication flows with different OAuth providers
+* Verify database migrations work correctly
+* Update this documentation when adding new features or workflows
+* Follow the existing code style and patterns
+* Test both development and production builds
