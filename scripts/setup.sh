@@ -134,7 +134,7 @@ if [ $? -ne 0 ]; then
     echo "X-X Failed to download Caddyfile X-X"
     exit 1
 fi
-sed -i "s/\$DOMAIN/$DOMAIN/g" Caddyfile
+sed -i "s/localhost/$DOMAIN/g" Caddyfile
 echo " Caddyfile updated for domain: $DOMAIN"
 
 echo ""
