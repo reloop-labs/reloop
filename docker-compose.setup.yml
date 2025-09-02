@@ -56,7 +56,7 @@ services:
       - reloop-network
 
   reloop-rspamd:
-    image: rspamd/rspamd:3.7
+    image: relooplabs/be-rspamd:latest
     container_name: reloop-rspamd
     hostname: rspamd
     depends_on:
