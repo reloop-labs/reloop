@@ -16,7 +16,7 @@ fi
 # Check if Docker and Docker Compose are installed
 if ! command -v docker &> /dev/null; then
     echo "X-X Docker is not installed. Please install Docker first. X-X"
-    echo "Run: curl -fsSL https://get.docker.com -o get-docker.sh && sudo sh get-docker.sh"
+    curl -fsSL https://get.docker.com -o get-docker.sh && sudo sh get-docker.sh
     exit 1
 fi
 
@@ -29,15 +29,14 @@ elif command -v docker-compose &> /dev/null; then
     DOCKER_COMPOSE_CMD="docker-compose"
 else
     echo "X-X Docker Compose is not installed. Please install Docker Compose first. X-X"
-    echo "Run: sudo curl -L \"https://github.com/docker/compose/releases/latest/download/docker-compose-\$(uname -s)-\$(uname -m)\" -o /usr/local/bin/docker-compose && sudo chmod +x /usr/local/bin/docker-compose"
-    exit 1
+    sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-\$(uname -s)-\$(uname -m)" -o /usr/local/bin/docker-compose && sudo chmod +x /usr/local/bin/docker-compose
 fi
 
 # Check if Docker is running
 if ! docker info > /dev/null 2>&1; then
     echo "X-X Docker is not running or not accessible X-X"
     echo "Please start Docker and ensure your user is in the docker group"
-    echo "Run: sudo usermod -aG docker \$USER && newgrp docker"
+    sudo usermod -aG docker \$USER && newgrp docker
     exit 1
 fi
 
