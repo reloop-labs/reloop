@@ -10,20 +10,20 @@ import { loader } from "./loader";
 await loader();
 
 new Elysia({ prefix: "/api/auth", name: "Auth Service" })
+	.use(serverTiming())
 	.use(
 		logixlysia({
 			config: {
-				useColors: true,
 				showStartupMessage: true,
-				startupMessageFormat: "banner",
-				timestamp: {
-					translateTime: "HH:MM:ss.SSS yyyy-mm-dd",
-				},
+				startupMessageFormat: "simple",
+				timestamp: { translateTime: "dd-mm-yyyy HH:MM:ss.SSS" },
+				logFilePath: "./logs/example.log",
 				ip: true,
+				customLogFormat:
+					"🦊 {now} {level} {duration} {method} {pathname} {status} {message} {ip}",
 			},
 		}),
 	)
-	.use(serverTiming())
 	.use(
 		swagger({
 			path: "/docs",
