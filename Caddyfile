@@ -1,6 +1,6 @@
 localhost {
 
-    tls internal
+    tls EMAIL
     
     handle_path /dashboard* {
         reverse_proxy reloop-main:3000

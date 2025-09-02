@@ -134,6 +134,9 @@ if [ $? -ne 0 ]; then
     echo "X-X Failed to download Caddyfile X-X"
     exit 1
 fi
+echo "Enter your email for SSL Certificate:"
+read -p "Email: " SSL_EMAIL
+sed -i "s/EMAIL/$SSL_EMAIL/g" Caddyfile
 sed -i "s/localhost/$DOMAIN/g" Caddyfile
 echo " Caddyfile updated for domain: $DOMAIN"
 

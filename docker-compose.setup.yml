@@ -44,6 +44,7 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - ./docker-data/caddy:/data
       - ./docker-data/caddy:/config
+      - ./docker-data/ssl :/etc/ssl/caddy
     restart: unless-stopped
     depends_on:
       - reloop-main
