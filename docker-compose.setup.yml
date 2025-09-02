@@ -44,6 +44,7 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - ./docker-data/caddy:/data
       - ./docker-data/caddy:/config
+      - ./docker-data/ssl :/etc/ssl/caddy
     restart: unless-stopped
     depends_on:
       - reloop-main
@@ -70,9 +71,7 @@ services:
     restart: always
     networks:
       - reloop-network
-      - mail-network:
-          aliases:
-            - rspamd
+      - mail-network
 
   reloop-dovecot:
     image: relooplabs/be-dovecot:latest
@@ -107,9 +106,7 @@ services:
         hard: 40000
     networks:
       - reloop-network
-      - mail-network:
-          aliases:
-            - dovecot
+      - mail-network
 
   reloop-postfix:
     image: relooplabs/be-postfix:latest
@@ -138,9 +135,7 @@ services:
     restart: always
     networks:
       - reloop-network
-      - mail-network:
-          aliases:
-            - postfix
+      - mail-network
 
   reloop-main:
     image: relooplabs/fe-main:latest

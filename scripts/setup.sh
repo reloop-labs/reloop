@@ -16,7 +16,7 @@ fi
 # Check if Docker and Docker Compose are installed
 if ! command -v docker &> /dev/null; then
     echo "X-X Docker is not installed. Please install Docker first. X-X"
-    echo "Run: curl -fsSL https://get.docker.com -o get-docker.sh && sudo sh get-docker.sh"
+    curl -fsSL https://get.docker.com -o get-docker.sh && sudo sh get-docker.sh
     exit 1
 fi
 
@@ -29,15 +29,14 @@ elif command -v docker-compose &> /dev/null; then
     DOCKER_COMPOSE_CMD="docker-compose"
 else
     echo "X-X Docker Compose is not installed. Please install Docker Compose first. X-X"
-    echo "Run: sudo curl -L \"https://github.com/docker/compose/releases/latest/download/docker-compose-\$(uname -s)-\$(uname -m)\" -o /usr/local/bin/docker-compose && sudo chmod +x /usr/local/bin/docker-compose"
-    exit 1
+    sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-\$(uname -s)-\$(uname -m)" -o /usr/local/bin/docker-compose && sudo chmod +x /usr/local/bin/docker-compose
 fi
 
 # Check if Docker is running
 if ! docker info > /dev/null 2>&1; then
     echo "X-X Docker is not running or not accessible X-X"
     echo "Please start Docker and ensure your user is in the docker group"
-    echo "Run: sudo usermod -aG docker \$USER && newgrp docker"
+    sudo usermod -aG docker \$USER && newgrp docker
     exit 1
 fi
 
@@ -135,8 +134,38 @@ if [ $? -ne 0 ]; then
     echo "X-X Failed to download Caddyfile X-X"
     exit 1
 fi
-sed -i "s/\$DOMAIN/$DOMAIN/g" Caddyfile
+echo "Enter your email for SSL Certificate:"
+read -p "Email: " SSL_EMAIL
+sed -i "s/EMAIL/$SSL_EMAIL/g" Caddyfile
+sed -i "s/localhost/$DOMAIN/g" Caddyfile
 echo " Caddyfile updated for domain: $DOMAIN"
+
+echo ""
+echo ">>> Firewall applying "
+sudo ufw allow 22/tcp    # SSH
+sudo ufw allow 25/tcp    # SMTP
+sudo ufw allow 465/tcp    # SMTPS
+sudo ufw allow 587/tcp    # SMTP Submission
+sudo ufw allow 143/tcp    # IMAP
+sudo ufw allow 993/tcp    # IMAPS
+sudo ufw allow 110/tcp    # POP3
+sudo ufw allow 995/tcp    # POP3S
+sudo ufw allow 80/tcp     # HTTP
+sudo ufw allow 443/tcp    # HTTPS
+sudo ufw allow 3001/tcp   # fe-main (dashboard)
+sudo ufw allow 3002/tcp   # fe-dev
+sudo ufw allow 3003/tcp   # fe-docs
+sudo ufw allow 3004/tcp   # fe-admin
+sudo ufw allow 3005/tcp   # fe-
+echo "Do you want postgres and redis externally available??(y/n)"
+read -p "Enter your choice: " POSTGRES_REDIS
+if [ "$POSTGRES_REDIS" == "y" ]; then
+    sudo ufw allow 5432/tcp   # PostgreSQL
+    sudo ufw allow 6379/tcp   # Redis
+fi
+sudo ufw enable
+echo ":) Firewall applied"
+echo ""
 
 echo ""
 echo "~~Starting containers..."
