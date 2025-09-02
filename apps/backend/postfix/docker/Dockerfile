@@ -35,8 +35,8 @@ RUN groupadd -g 102 postfix 2>/dev/null || true \
     && useradd -g postfix -u 101 -d /var/spool/postfix -s /usr/sbin/nologin postfix 2>/dev/null || true
 
 
-COPY postfix.sh /postfix.sh
-COPY supervisord.conf /etc/supervisor/supervisord.conf
+COPY ./docker/postfix.sh /postfix.sh
+COPY ./docker/supervisord.conf /etc/supervisor/supervisord.conf
 
 
 COPY ../config/main.cf /etc/postfix/main.cf

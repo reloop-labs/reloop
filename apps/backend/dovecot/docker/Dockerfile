@@ -35,8 +35,8 @@ RUN groupadd -g 5000 vmail 2>/dev/null || true \
     && useradd -g vmail -u 5000 vmail -d /var/vmail -s /usr/sbin/nologin 2>/dev/null || true
 
 
-COPY dovecot.sh /dovecot.sh
-COPY supervisord.conf /etc/supervisor/supervisord.conf
+COPY ./docker/dovecot.sh /dovecot.sh
+COPY ./docker/supervisord.conf /etc/supervisor/supervisord.conf
 
 
 COPY ../config/dovecot.conf /etc/dovecot/dovecot.conf
@@ -46,9 +46,9 @@ RUN chmod +x /dovecot.sh
 
 RUN mkdir -p /var/vmail /var/log/mail /usr/lib/dovecot/sieve
 
-COPY spam-to-folder.sieve /usr/lib/dovecot/sieve/spam-to-folder.sieve
-COPY report-spam.sieve /usr/lib/dovecot/sieve/report-spam.sieve
-COPY report-ham.sieve /usr/lib/dovecot/sieve/report-ham.sieve
+COPY ./docker/spam-to-folder.sieve /usr/lib/dovecot/sieve/spam-to-folder.sieve
+COPY ./docker/report-spam.sieve /usr/lib/dovecot/sieve/report-spam.sieve
+COPY ./docker/report-ham.sieve /usr/lib/dovecot/sieve/report-ham.sieve
 
 EXPOSE 110 143 993 995
 
