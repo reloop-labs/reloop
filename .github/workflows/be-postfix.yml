@@ -1,4 +1,4 @@
-name: Build and Push Postfix Docker Image
+name: be-postfix
 
 on:
   push:
