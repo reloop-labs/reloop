@@ -138,6 +138,33 @@ sed -i "s/localhost/$DOMAIN/g" Caddyfile
 echo " Caddyfile updated for domain: $DOMAIN"
 
 echo ""
+echo ">>> Firewall applying "
+sudo ufw allow 22/tcp    # SSH
+sudo ufw allow 25/tcp    # SMTP
+sudo ufw allow 465/tcp    # SMTPS
+sudo ufw allow 587/tcp    # SMTP Submission
+sudo ufw allow 143/tcp    # IMAP
+sudo ufw allow 993/tcp    # IMAPS
+sudo ufw allow 110/tcp    # POP3
+sudo ufw allow 995/tcp    # POP3S
+sudo ufw allow 80/tcp     # HTTP
+sudo ufw allow 443/tcp    # HTTPS
+sudo ufw allow 3001/tcp   # fe-main (dashboard)
+sudo ufw allow 3002/tcp   # fe-dev
+sudo ufw allow 3003/tcp   # fe-docs
+sudo ufw allow 3004/tcp   # fe-admin
+sudo ufw allow 3005/tcp   # fe-
+echo "Do you want postgres and redis externally available??(y/n)"
+read -p "Enter your choice: " POSTGRES_REDIS
+if [ "$POSTGRES_REDIS" == "y" ]; then
+    sudo ufw allow 5432/tcp   # PostgreSQL
+    sudo ufw allow 6379/tcp   # Redis
+fi
+sudo ufw enable
+echo ":) Firewall applied"
+echo ""
+
+echo ""
 echo "~~Starting containers..."
 $DOCKER_COMPOSE_CMD -f docker-compose.setup.yml up -d
 
