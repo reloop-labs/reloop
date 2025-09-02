@@ -1,9 +1,29 @@
-reloop.local {
-    # Frontend
-    reverse_proxy 172.17.0.1:3000
+localhost {
 
-    # API
-    handle_path /api/auth* {
-        reverse_proxy 172.17.0.1:4000
+    tls internal
+    
+    handle_path /dashboard* {
+        reverse_proxy reloop-main:3000
     }
+    
+    handle_path /dev* {
+        reverse_proxy reloop-dev:3000
+    }
+    
+    handle_path /docs* {
+        reverse_proxy reloop-docs:3000
+    }
+    
+    handle_path /admin* {
+        reverse_proxy reloop-admin:3000
+    }
+    
+    handle {
+        reverse_proxy reloop-web:3000
+    }
+    
+    handle_path /api/auth* {
+       
+    }
+    
 }
