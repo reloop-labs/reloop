@@ -1,4 +1,13 @@
 reloop.local {
+    # API service (running locally on port 3002)
+    handle /dev* {
+        reverse_proxy host.docker.internal:3004 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+
     # Main app (running locally - everything else)
     handle {
         reverse_proxy host.docker.internal:3001 {
