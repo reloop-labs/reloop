@@ -2,19 +2,19 @@ localhost {
 
     tls EMAIL
     
-    handle_path /dashboard* {
+    handle /dashboard* {
         reverse_proxy reloop-main:3000
     }
     
-    handle_path /dev* {
+    handle /dev* {
         reverse_proxy reloop-dev:3000
     }
     
-    handle_path /docs* {
+    handle /docs* {
         reverse_proxy reloop-docs:3000
     }
     
-    handle_path /admin* {
+    handle /admin* {
         reverse_proxy reloop-admin:3000
     }
     
@@ -22,7 +22,7 @@ localhost {
         reverse_proxy reloop-web:3000
     }
     
-    handle_path /api/auth* {
+    handle /api/auth* {
        
     }
     
