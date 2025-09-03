@@ -54,3 +54,21 @@ cd reloop
 ```sh
 bun install
 ```
+
+### 4. Configure Hosts File
+
+**Important:** This step is crucial for running multiple servers on the same network. Since Reloop consists of several services (backend, frontend, mail, etc.) that need to communicate with each other, you must add a local domain entry to your hosts file.
+
+This allows all services to run on different ports but appear to be on the same domain, enabling proper communication between components.
+
+```sh
+echo "127.0.0.1 reloop.local" | sudo tee -a /etc/hosts
+```
+
+**What this does:**
+- Maps `reloop.local` to your local machine (`127.0.0.1`)
+- Enables services to communicate using the same domain name
+- Prevents network conflicts when running multiple servers
+- Allows proper routing between frontend, backend, and other services
+
+**Note:** You may need to enter your system password when running this command with `sudo`.
