@@ -1,4 +1,5 @@
 import * as Button from "@reloop/ui/components/button";
+import Link from "next/link";
 
 export default function Home() {
 	return (
@@ -12,16 +13,25 @@ export default function Home() {
 			</h2>
 
 			<div className="mt-10 flex items-center justify-center gap-4">
-				<Button.Root variant="neutral" className="h-12 rounded-full px-6">
-					Get Early Access
-				</Button.Root>
-				<Button.Root
-					mode="stroke"
-					variant="neutral"
-					className="h-12 rounded-full px-6"
+				<Link
+					href="/login"
+					className={Button.buttonVariants({
+						variant: "neutral",
+					}).root({ className: "h-12 rounded-full px-6" })}
 				>
-					View on GitHub
-				</Button.Root>
+					Get Early Access
+				</Link>
+				<a
+					target="_blank"
+					href="https://docs.reloop.io"
+					className={Button.buttonVariants({
+						mode: "stroke",
+						variant: "neutral",
+					}).root({ className: "h-12 rounded-full px-6" })}
+					rel="noopener"
+				>
+					View it on GitHub
+				</a>
 			</div>
 		</div>
 	);

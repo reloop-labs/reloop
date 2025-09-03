@@ -113,7 +113,10 @@
 	"scripts": {
 		"fe:dev:dev": "bun run --filter=dev dev",
 		"fe:dev:build": "bun run --filter=dev build",
-		"fe:start:start": "bun run --filter=dev start",
+		"fe:dev:start": "bun run --filter=dev start",
+		"fe:web:dev": "bun run --filter=web dev",
+		"fe:web:build": "bun run --filter=web build",
+		"fe:web:start": "bun run --filter=web start",
 		"check": "biome check --write .",
 		"dev": "turbo dev",
 		"build": "turbo build",
