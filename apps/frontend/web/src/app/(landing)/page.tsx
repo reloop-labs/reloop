@@ -14,7 +14,7 @@ export default function Home() {
 
 			<div className="mt-10 flex items-center justify-center gap-4">
 				<Link
-					href="/login"
+					href="/contact"
 					className={Button.buttonVariants({
 						variant: "neutral",
 					}).root({ className: "h-12 rounded-full px-6" })}
@@ -23,7 +23,7 @@ export default function Home() {
 				</Link>
 				<a
 					target="_blank"
-					href="https://docs.reloop.io"
+					href="https://github.com/reloop-labs/reloop"
 					className={Button.buttonVariants({
 						mode: "stroke",
 						variant: "neutral",
