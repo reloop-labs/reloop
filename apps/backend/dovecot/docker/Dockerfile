@@ -8,7 +8,7 @@ LABEL version="1.0.0"
 ARG DEBIAN_FRONTEND=noninteractive
 ENV LC_ALL=C
 
-# Install required packages with retry mechanism
+
 RUN apt-get clean && \
     apt-get update --fix-missing && \
     apt-get install -y --no-install-recommends \
@@ -34,22 +34,22 @@ RUN apt-get clean && \
 RUN groupadd -g 5000 vmail 2>/dev/null || true \
     && useradd -g vmail -u 5000 vmail -d /var/vmail -s /usr/sbin/nologin 2>/dev/null || true
 
-# Copy configuration files
-COPY dovecot.sh /dovecot.sh
-COPY supervisord.conf /etc/supervisor/supervisord.conf
 
-# Make scripts executable
+COPY ./docker/dovecot.sh /dovecot.sh
+COPY ./docker/supervisord.conf /etc/supervisor/supervisord.conf
+
+
+COPY ../config/dovecot.conf /etc/dovecot/dovecot.conf
+COPY ../config/conf.d/ /etc/dovecot/conf.d/
+
 RUN chmod +x /dovecot.sh
 
-# Create necessary directories
 RUN mkdir -p /var/vmail /var/log/mail /usr/lib/dovecot/sieve
 
-# Copy sieve scripts
-COPY spam-to-folder.sieve /usr/lib/dovecot/sieve/spam-to-folder.sieve
-COPY report-spam.sieve /usr/lib/dovecot/sieve/report-spam.sieve
-COPY report-ham.sieve /usr/lib/dovecot/sieve/report-ham.sieve
+COPY ./docker/spam-to-folder.sieve /usr/lib/dovecot/sieve/spam-to-folder.sieve
+COPY ./docker/report-spam.sieve /usr/lib/dovecot/sieve/report-spam.sieve
+COPY ./docker/report-ham.sieve /usr/lib/dovecot/sieve/report-ham.sieve
 
-# Expose ports
 EXPOSE 110 143 993 995
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]
