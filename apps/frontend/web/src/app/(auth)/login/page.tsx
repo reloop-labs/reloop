@@ -1,4 +1,5 @@
 "use client";
+import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/components/button";
 import * as Divider from "@reloop/ui/components/divider";
 import { Icon } from "@reloop/ui/components/icon";
@@ -13,6 +14,15 @@ import { useState } from "react";
 const Page = () => {
 	const [showPassword, setShowPassword] = useState(false);
 	const [showEmail, setShowEmail] = useState(false);
+	const [loading, setLoading] = useState<{
+		name: "google" | "github" | "email";
+		loading: boolean;
+	}>({ name: "email", loading: false });
+	const [error, setError] = useState<{
+		name: "google" | "github" | "email";
+		error: string | null;
+	}>({ name: "email", error: null });
+
 	return (
 		<div className="flex h-dvh flex-col items-center justify-center">
 			<div className="flex w-full max-w-[440px] flex-col gap-6 p-5 md:p-8">
@@ -32,7 +42,24 @@ const Page = () => {
 					</div>
 				</div>
 				<div className="grid grid-cols-1 gap-2">
-					<Button.Root mode="stroke" variant="neutral" className="h-12 w-full">
+					<Button.Root
+						disabled={loading.name === "google" && loading.loading}
+						onClick={async () => {
+							try {
+								setLoading({ name: "google", loading: true });
+								await authClient.signIn.social({ provider: "google" });
+							} catch (error) {
+								console.error(error);
+								setError({
+									name: "google",
+									error: "Failed to login with Google",
+								});
+							}
+						}}
+						mode="stroke"
+						variant="neutral"
+						className="h-12 w-full"
+					>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
 							className="h-4 w-4"
@@ -57,7 +84,24 @@ const Page = () => {
 						</svg>
 						Login with Google
 					</Button.Root>
-					<Button.Root mode="stroke" variant="neutral" className="h-12 w-full">
+					<Button.Root
+						disabled={loading.name === "github" && loading.loading}
+						mode="stroke"
+						variant="neutral"
+						className="h-12 w-full"
+						onClick={async () => {
+							try {
+								setLoading({ name: "github", loading: true });
+								await authClient.signIn.social({ provider: "github" });
+							} catch (error) {
+								console.error(error);
+								setError({
+									name: "github",
+									error: "Failed to login with GitHub",
+								});
+							}
+						}}
+					>
 						<Icon name="github" className="h-5 w-5" />
 						Login with GitHub
 					</Button.Root>
@@ -143,7 +187,12 @@ const Page = () => {
 									<LinkButton.Root variant="black">Reset it</LinkButton.Root>
 								</div>
 							</div>
-							<Button.Root variant="neutral" className="mt-4 h-12 w-full">
+							<Button.Root
+								onClick={() => {}}
+								disabled={loading.name === "email" && loading.loading}
+								variant="neutral"
+								className="mt-4 h-12 w-full"
+							>
 								Login
 							</Button.Root>
 						</motion.div>

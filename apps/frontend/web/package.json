@@ -3,7 +3,7 @@
 	"version": "0.1.0",
 	"private": true,
 	"scripts": {
-		"dev": "next dev --turbopack --port=3001",
+		"dev": "next dev --turbopack --port=3000",
 		"build": "next build",
 		"start": "next start",
 		"lint": "next lint"
@@ -13,7 +13,8 @@
 		"react": "catalog:ui",
 		"@reloop/ui": "workspace:*",
 		"react-dom": "catalog:ui",
-		"motion": "catalog:ui"
+		"motion": "catalog:ui",
+		"@reloop/auth": "workspace:*"
 	},
 	"devDependencies": {
 		"@reloop/tailwind": "workspace:*",

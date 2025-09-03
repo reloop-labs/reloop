@@ -1,18 +1,19 @@
-import { createAuthClient as createBetterAuthClient } from "better-auth/react";
+import { createAuthClient } from "better-auth/client";
+import {
+	adminClient,
+	apiKeyClient,
+	jwtClient,
+	organizationClient,
+} from "better-auth/client/plugins";
 
-export interface AuthClientOptions {
-	apiBaseUrl: string;
-}
-
-export const createAuthClient = ({ apiBaseUrl }: AuthClientOptions) =>
-	createBetterAuthClient({
-		baseURL: apiBaseUrl,
-
-		/**
-		 * Only uncomment the line below if you are using plugins, so that
-		 * your types can be correctly inferred.
-		 * Ensure that you are using the client-side version of the plugin,
-		 * e.g. `adminClient` instead of `admin`.
-		 */
-		// plugins: []
-	});
+export const authClient = createAuthClient({
+	basePath: "/api/auth/v1/",
+	plugins: [adminClient(), apiKeyClient(), jwtClient(), organizationClient()],
+	additionalFields: {
+		user: {
+			activeOrganization: {
+				type: "string",
+			},
+		},
+	},
+});

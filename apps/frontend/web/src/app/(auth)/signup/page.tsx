@@ -8,11 +8,20 @@ import * as LinkButton from "@reloop/ui/components/link-button";
 import { Logo } from "@reloop/ui/components/logo";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
+import { authClient } from "packages/auth/src/client";
 import { useState } from "react";
 
 const Page = () => {
 	const [showPassword, setShowPassword] = useState(false);
 	const [showEmail, setShowEmail] = useState(false);
+	const [loading, setLoading] = useState<{
+		name: "google" | "github" | "email";
+		loading: boolean;
+	}>({ name: "email", loading: false });
+	const [error, setError] = useState<{
+		name: "google" | "github" | "email";
+		error: string | null;
+	}>({ name: "email", error: null });
 
 	return (
 		<div>
@@ -51,6 +60,18 @@ const Page = () => {
 							mode="stroke"
 							variant="neutral"
 							className="h-12 w-full"
+							onClick={async () => {
+								try {
+									setLoading({ name: "google", loading: true });
+									await authClient.signIn.social({ provider: "google" });
+								} catch (error) {
+									console.error(error);
+									setError({
+										name: "google",
+										error: "Failed to login with Google",
+									});
+								}
+							}}
 						>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -77,9 +98,22 @@ const Page = () => {
 							Sign up with Google
 						</Button.Root>
 						<Button.Root
+							disabled={loading.name === "github" && loading.loading}
 							mode="stroke"
 							variant="neutral"
 							className="h-12 w-full"
+							onClick={async () => {
+								try {
+									setLoading({ name: "github", loading: true });
+									await authClient.signIn.social({ provider: "github" });
+								} catch (error) {
+									console.error(error);
+									setError({
+										name: "github",
+										error: "Failed to login with GitHub",
+									});
+								}
+							}}
 						>
 							<Icon name="github" className="h-5 w-5" />
 							Sign up with GitHub

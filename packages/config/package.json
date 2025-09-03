@@ -1,0 +1,37 @@
+{
+	"name": "@reloop/config",
+	"private": true,
+	"type": "module",
+	"exports": {
+		".": {
+			"types": "./dist/src/index.d.ts",
+			"default": "./src/index.ts"
+		},
+		"./app": {
+			"types": "./dist/src/app.d.ts",
+			"default": "./src/app.ts"
+		},
+		"./database": {
+			"types": "./dist/src/database.d.ts",
+			"default": "./src/database.ts"
+		},
+		"./mail": {
+			"types": "./dist/src/mail.d.ts",
+			"default": "./src/mail.ts"
+		}
+	},
+	"scripts": {
+		"build": "tsc --build",
+		"clean": "git clean -xdf .cache .turbo dist node_modules",
+		"dev": "tsc --build tsconfig.package.json",
+		"format": "prettier --check . --ignore-path ../../.gitignore",
+		"lint": "eslint",
+		"typecheck": "tsc --build --noEmit --emitDeclarationOnly false"
+	},
+	"dependencies": {},
+	"devDependencies": {
+		"@reloop/ts": "workspace:*",
+		"@types/node": "catalog:",
+		"typescript": "catalog:"
+	}
+}

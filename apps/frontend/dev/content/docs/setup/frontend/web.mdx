@@ -20,14 +20,14 @@ Make sure you've completed the [local setup guide](/setup) first (clone repo, in
 cd apps/frontend/web && cp .env.example .env && bun i && bun dev
 ```
 
-Open [http://localhost:3002](http://localhost:3002) 🎉
+Open [http://localhost:3000](http://localhost:3000) 🎉
 
 ---
 
 ## Service Info
 
 * **Location:** `/apps/frontend/web`
-* **Port:** `3002` (configurable in `package.json`)
+* **Port:** `3000` (configurable in `package.json`)
 * **Tech Stack Guide:** [Frontend Technologies](/setup/tech-stack#frontend-technologies)
 * **Part of Monorepo:** Yes (run with filters or inside service dir)
 
@@ -39,7 +39,7 @@ Create `.env` file:
 
 ```bash
 # Development
-NEXT_PUBLIC_WEB_URL="http://localhost:3002"
+NEXT_PUBLIC_WEB_URL="http://localhost:3000"
 NEXT_PUBLIC_API_URL="http://localhost:3001"
 
 # Production
@@ -98,7 +98,7 @@ bun run type-check
 **Port already in use?**
 ```bash
 # Check what's using the port
-lsof -i :3002
+lsof -i :3000
 
 # Kill the process (replace PID)
 kill -9 <PID>

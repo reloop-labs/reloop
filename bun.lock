@@ -224,6 +224,7 @@
       "name": "web",
       "version": "0.1.0",
       "dependencies": {
+        "@reloop/auth": "workspace:*",
         "@reloop/ui": "workspace:*",
         "motion": "catalog:ui",
         "next": "catalog:ui",
@@ -248,6 +249,14 @@
         "@reloop/db": "workspace:*",
         "better-auth": "catalog:",
       },
+      "devDependencies": {
+        "@reloop/ts": "workspace:*",
+        "@types/node": "catalog:",
+        "typescript": "catalog:",
+      },
+    },
+    "packages/config": {
+      "name": "@reloop/config",
       "devDependencies": {
         "@reloop/ts": "workspace:*",
         "@types/node": "catalog:",
@@ -1263,6 +1272,8 @@
     "@redis/time-series": ["@redis/time-series@5.8.2", "", { "peerDependencies": { "@redis/client": "^5.8.2" } }, "sha512-g2NlHM07fK8H4k+613NBsk3y70R2JIM2dPMSkhIjl2Z17SYvaYKdusz85d7VYOrZBWtDrHV/WD2E3vGu+zni8A=="],
 
     "@reloop/auth": ["@reloop/auth@workspace:packages/auth"],
+
+    "@reloop/config": ["@reloop/config@workspace:packages/config"],
 
     "@reloop/db": ["@reloop/db@workspace:packages/db"],
 
