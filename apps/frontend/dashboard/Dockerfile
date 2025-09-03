@@ -4,7 +4,7 @@ FROM oven/bun:alpine AS base
 FROM base AS deps
 WORKDIR /app
 COPY . .
-RUN bun --filter=main install
+RUN bun --filter=dashboard install
 
 # Stage 2: Build the application
 FROM base AS builder
@@ -15,7 +15,7 @@ ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN bun run --filter=main build
+RUN bun run --filter=dashboard build
 
 # Stage 3: Production server
 FROM base AS runner
@@ -28,10 +28,10 @@ ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
 # Copy standalone build
-COPY --from=builder /app/apps/frontend/main/public ./public
-COPY --from=builder /app/apps/frontend/main/.next/standalone ./
-COPY --from=builder /app/apps/frontend/main/.next/standalone/apps/frontend/main ./
-COPY --from=builder /app/apps/frontend/main/.next/static ./.next/static
+COPY --from=builder /app/apps/frontend/dashboard/public ./public
+COPY --from=builder /app/apps/frontend/dashboard/.next/standalone ./
+COPY --from=builder /app/apps/frontend/dashboard/.next/standalone/apps/frontend/dashboard ./
+COPY --from=builder /app/apps/frontend/dashboard/.next/static ./.next/static
 
 RUN rm -rf apps
 

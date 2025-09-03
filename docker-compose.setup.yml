@@ -47,7 +47,7 @@ services:
       - ./docker-data/ssl :/etc/ssl/caddy
     restart: unless-stopped
     depends_on:
-      - reloop-main
+      - reloop-dashboard
       - reloop-dev
       - reloop-docs
       - reloop-admin
@@ -137,9 +137,9 @@ services:
       - reloop-network
       - mail-network
 
-  reloop-main:
-    image: relooplabs/fe-main:latest
-    container_name: reloop-main
+  reloop-dashboard:
+    image: relooplabs/fe-dashboard:latest
+    container_name: reloop-dashboard
     ports:
       - "3001:3000"
     depends_on:

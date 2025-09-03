@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'apps/frontend/main/**'
+      - 'apps/frontend/dashboard/**'
 
 permissions:
   contents: read
@@ -28,6 +28,6 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: ./apps/frontend/main/Dockerfile
+          file: ./apps/frontend/dashboard/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/fe-main:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/fe-dashboard:latest
