@@ -17,6 +17,21 @@ export const auth = betterAuth({
 		provider: "pg",
 		schema: schema,
 	}),
+	user: {
+		additionalFields: {
+			activeOrganizationId: {
+				type: "string",
+				required: false,
+				input: true,
+			},
+			mode: {
+				type: "string",
+				required: false,
+				input: true,
+				defaultValue: "dev",
+			},
+		},
+	},
 	secondaryStorage: {
 		get: async (key) => {
 			return await redis.get(key);

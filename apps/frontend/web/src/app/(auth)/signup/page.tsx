@@ -10,9 +10,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { authClient } from "packages/auth/src/client";
 import { useState } from "react";
+import { SignupForm } from "./signup-form";
 
 const Page = () => {
-	const [showPassword, setShowPassword] = useState(false);
 	const [showEmail, setShowEmail] = useState(false);
 	const [loading, setLoading] = useState<{
 		name: "google" | "github" | "email";
@@ -130,76 +130,7 @@ const Page = () => {
 							</Button.Root>
 						)}
 					</div>
-					<AnimatePresence>
-						{showEmail && (
-							<motion.div
-								initial={{ opacity: 0, height: 0, y: -20 }}
-								animate={{ opacity: 1, height: "auto", y: 0 }}
-								exit={{ opacity: 0, height: 0, y: -20 }}
-								transition={{
-									duration: 0.3,
-									ease: "easeOut",
-									opacity: { duration: 0.2 },
-									height: { duration: 0.3 },
-								}}
-								className="overflow-hidden"
-							>
-								<div className="flex flex-col gap-3">
-									<Divider.Root variant="line-text">OR</Divider.Root>
-									<div className="flex flex-col gap-1">
-										<Label.Root htmlFor="email">
-											Email Address
-											<Label.Asterisk />
-										</Label.Root>
-										<Input.Root>
-											<Input.Wrapper>
-												<Input.Input
-													className="h-12 font-medium"
-													id="email"
-													type="email"
-													placeholder="hello@reloop.com"
-												/>
-											</Input.Wrapper>
-										</Input.Root>
-									</div>
-									<div className="flex flex-col gap-1">
-										<Label.Root htmlFor="password1">
-											Password <Label.Asterisk />
-										</Label.Root>
-										<Input.Root>
-											<Input.Wrapper>
-												<Input.Input
-													id="password1"
-													type={showPassword ? "text" : "password"}
-													placeholder="••••••••••"
-													className="h-12 font-medium"
-												/>
-												<button
-													type="button"
-													onClick={() => setShowPassword((s) => !s)}
-												>
-													{showPassword ? (
-														<Icon
-															name="eye-outline"
-															className="size-5 fill-none text-text-soft-400 group-has-[disabled]:text-text-disabled-300"
-														/>
-													) : (
-														<Icon
-															name="eye-slash-outline"
-															className="size-5 fill-none text-text-soft-400 group-has-[disabled]:text-text-disabled-300"
-														/>
-													)}
-												</button>
-											</Input.Wrapper>
-										</Input.Root>
-									</div>
-								</div>
-								<Button.Root variant="neutral" className="mt-4 h-12 w-full">
-									Create Account
-								</Button.Root>
-							</motion.div>
-						)}
-					</AnimatePresence>
+					<AnimatePresence>{showEmail && <SignupForm />}</AnimatePresence>
 					<p className="text-center text-xs">
 						By creating an account, you agree to our <br />
 						<Link

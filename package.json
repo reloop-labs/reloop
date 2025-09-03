@@ -49,6 +49,8 @@
 				"tailwind": "4.0.0",
 				"tailwindcss-animate": "1.0.7",
 				"next": "15.4.2",
+				"@hookform/resolvers": "^5.2.1",
+				"react-hook-form": "^7.62.0",
 				"react": "19.1.0",
 				"react-dom": "19.1.0",
 				"react-email": "4.2.8",

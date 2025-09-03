@@ -11,7 +11,7 @@ const Spinner = ({
 
 	return (
 		<div
-			className="relative"
+			className="relative opacity-50"
 			style={{
 				height: size,
 				width: size,
