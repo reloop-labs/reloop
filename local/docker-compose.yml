@@ -19,8 +19,6 @@ services:
       retries: 3
       test: ["CMD", "pg_isready", "-U", "reloop", "-d", "reloop"]
     restart: unless-stopped
-    networks:
-      - reloop-network
 
   reloop-redis:
     image: redis:alpine
@@ -31,8 +29,7 @@ services:
     ports:
       - "6379:6379"
     restart: unless-stopped
-    networks:
-      - reloop-network
+
 
   reloop-proxy:
     image: caddy:latest
@@ -45,19 +42,8 @@ services:
       - ../docker-data/caddy:/data
       - ../docker-data/caddy:/config
     restart: unless-stopped
-    networks:
-      - reloop-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
-networks:
-  reloop-network:
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.20.0.0/16
-  mail-network:
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.21.0.0/16
+
+

@@ -1,29 +1,10 @@
 reloop.local {
-
-    tls internal
-
-    handle /dashboard* {
-        reverse_proxy reloop-main:3000
-    }
-
-    handle /dev* {
-        reverse_proxy reloop-dev:3000
-    }
-
-    handle /docs* {
-        reverse_proxy reloop-docs:3000
-    }
-
-    handle /admin* {
-        reverse_proxy reloop-admin:3000
-    }
-
+    # Main app (running locally - everything else)
     handle {
-        reverse_proxy reloop-web:3000
+        reverse_proxy host.docker.internal:3001 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
     }
-
-    handle /api/auth* {
-        reverse_proxy reloop-auth:3000
-    }
-
 }
