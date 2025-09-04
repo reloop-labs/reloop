@@ -8,7 +8,7 @@ import { BatchSpanProcessor } from "@opentelemetry/sdk-trace-node";
 import { createInsertSchema } from "drizzle-typebox";
 import { Elysia, t } from "elysia";
 import { table } from "./db/schema";
-import { auth } from "./plugins/auth";
+import { domainRouter } from "./routers/domain";
 
 const _createUser = createInsertSchema(table.user, {
 	// Replace email with Elysia's email type
@@ -40,8 +40,28 @@ const app = new Elysia()
 			],
 		}),
 	)
-	.use(swagger())
-	.mount(auth.handler)
+	.mount("/api/domain", domainRouter)
+	.use(swagger({
+		documentation: {
+			info: {
+				title: "Reloop Mail Server API",
+				version: "1.0.0",
+				description: "API for managing mail server domains, DKIM keys, and DNS records"
+			},
+			servers: [
+				{
+					url: "http://localhost:3000",
+					description: "Development server"
+				}
+			],
+			tags: [
+				{
+					name: "Domain Management",
+					description: "Operations for managing mail domains"
+				}
+			]
+		}
+	}))
 	.get("/auth", ({ bearer }) => bearer, {
 		beforeHandle({ bearer, set, status }) {
 			if (!bearer) {
@@ -62,8 +82,12 @@ const app = new Elysia()
 		},
 	)
 	.get("/", () => "Hello, Elysia with Bearer Auth and Cron!")
+	.get("/health", () => ({ status: "ok", timestamp: new Date().toISOString() }))
 	.listen(3000);
 
 console.log(
 	`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`,
 );
+console.log(`📧 Mail API available at ${app.server?.hostname}:${app.server?.port}/api`);
+console.log(`📚 Swagger docs available at ${app.server?.hostname}:${app.server?.port}/swagger`);
+console.log(`🔗 Domain API endpoint: ${app.server?.hostname}:${app.server?.port}/api/domain/add`);
