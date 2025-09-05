@@ -1,7 +1,6 @@
-import * as Button from "@reloop/ui/components/button";
 import { Logo } from "@reloop/ui/components/logo";
 import Link from "next/link";
-import { ThemeToggle } from "./theme-toggle";
+import { HeaderAction } from "./header.action";
 
 export const Header = () => {
 	return (
@@ -12,29 +11,7 @@ export const Header = () => {
 						<Logo className="h-8 w-8 rounded-full lg:h-10 lg:w-10" />
 					</Link>
 				</div>
-				<div className="flex items-center gap-2">
-					<Link
-						href="/login"
-						className={Button.buttonVariants({
-							variant: "neutral",
-							mode: "stroke",
-							size: "xsmall",
-						}).root()}
-					>
-						Login
-					</Link>
-					<Link
-						href="/login"
-						className={Button.buttonVariants({
-							variant: "neutral",
-
-							size: "xsmall",
-						}).root()}
-					>
-						Get Started
-					</Link>
-					<ThemeToggle />
-				</div>
+				<HeaderAction />
 			</header>
 		</div>
 	);

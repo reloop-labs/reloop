@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Footer } from "@dashboard/components/footer";
+import { Navbar } from "@dashboard/components/navbar";
+import { IconsSprite } from "@reloop/ui/components/icon";
+import { ThemeProvider } from "next-themes";
 
 export const metadata: Metadata = {
 	title: "Create Next App",
@@ -12,8 +16,20 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html lang="en">
-			<body className={"antialiased"}>{children}</body>
+		<html lang="en" suppressHydrationWarning>
+			<body className={"bg-bg-white-0 text-text-strong-950 antialiased"}>
+				<ThemeProvider
+					attribute="class"
+					defaultTheme="system"
+					enableSystem
+					disableTransitionOnChange
+				>
+					<Navbar />
+					{children}
+					<IconsSprite />
+					<Footer />
+				</ThemeProvider>
+			</body>
 		</html>
 	);
 }

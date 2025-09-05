@@ -12,7 +12,13 @@
 		"next": "catalog:ui",
 		"react": "catalog:ui",
 		"@reloop/ui": "workspace:*",
-		"react-dom": "catalog:ui"
+		"react-dom": "catalog:ui",
+		"motion": "catalog:ui",
+		"@reloop/auth": "workspace:*",
+		"@hookform/resolvers": "catalog:ui",
+		"react-hook-form": "catalog:ui",
+		"sonner": "catalog:ui",
+		"better-auth": "catalog:"
 	},
 	"devDependencies": {
 		"typescript": "catalog:",

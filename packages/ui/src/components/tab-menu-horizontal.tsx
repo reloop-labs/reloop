@@ -66,7 +66,7 @@ const TabMenuHorizontalList = React.forwardRef<
 			<TabsPrimitive.List
 				ref={mergeRefs(forwardedRef, listRef)}
 				className={cn(
-					"group/tab-list relative flex h-12 items-center gap-6 whitespace-nowrap border-stroke-soft-200 border-y",
+					"group/tab-list relative flex h-12 items-center gap-6 whitespace-nowrap border-stroke-soft-200",
 					className,
 				)}
 				{...rest}
@@ -76,7 +76,7 @@ const TabMenuHorizontalList = React.forwardRef<
 				{/* Floating Bg */}
 				<div
 					className={cn(
-						"-bottom-px absolute left-0 h-0.5 bg-primary-base opacity-0 transition-all duration-300 group-has-[[data-state=active]]/tab-list:opacity-100",
+						"-bottom-0.5 absolute left-0 h-[3px] bg-bg-strong-950 opacity-0 transition-all duration-300 group-has-[[data-state=active]]/tab-list:opacity-100",
 						{
 							hidden: !mounted,
 						},
