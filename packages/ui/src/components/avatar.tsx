@@ -53,6 +53,9 @@ export const avatarVariants = tv({
 			"20": {
 				root: "size-5 text-label-xs",
 			},
+			"16": {
+				root: "size-4 text-label-xs",
+			},
 		},
 		color: {
 			gray: {
@@ -122,6 +125,12 @@ export const avatarVariants = tv({
 			size: "20",
 			class: {
 				indicator: "-right-1 scale-[.3125]",
+			},
+		},
+		{
+			size: "16",
+			class: {
+				indicator: "-right-1 scale-[.25]",
 			},
 		},
 	],

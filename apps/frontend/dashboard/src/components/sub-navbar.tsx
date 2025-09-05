@@ -24,7 +24,7 @@ export const SubNavbar = () => {
 
 	return (
 		<TabMenuHorizontal.Root defaultValue={"/"} value={pathname || "/"}>
-			<TabMenuHorizontal.List className="h-10 gap-0 border-b! px-4 py-0">
+			<TabMenuHorizontal.List className="h-10 gap-0 border-b! px-3 py-0">
 				{items.map(({ label, path }) => (
 					<TabMenuHorizontal.Trigger
 						className="cursor-pointer px-2.5 py-0! text-sm"

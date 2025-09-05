@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Footer } from "@dashboard/components/footer";
 import { Navbar } from "@dashboard/components/navbar";
+import { CreateOrganizationModal } from "@dashboard/components/organization/create-organization";
+import SWRProvider from "@dashboard/providers/swr.config";
 import { IconsSprite } from "@reloop/ui/components/icon";
 import { ThemeProvider } from "next-themes";
 
@@ -24,10 +26,13 @@ export default function RootLayout({
 					enableSystem
 					disableTransitionOnChange
 				>
-					<Navbar />
-					{children}
-					<IconsSprite />
-					<Footer />
+					<SWRProvider>
+						<Navbar />
+						{children}
+						<IconsSprite />
+						<Footer />
+						<CreateOrganizationModal />
+					</SWRProvider>
 				</ThemeProvider>
 			</body>
 		</html>
