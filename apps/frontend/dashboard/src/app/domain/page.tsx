@@ -1,5 +1,5 @@
 const DomainPage = () => {
-	return <div>DomainPage</div>;
+	return <div className="h-screen">DomainPage</div>;
 };
 
 export default DomainPage;

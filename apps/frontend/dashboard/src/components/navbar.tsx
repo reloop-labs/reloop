@@ -1,12 +1,11 @@
 import * as Avatar from "@reloop/ui/components/avatar";
-import * as Breadcrumb from "@reloop/ui/components/breadcrumb";
 import { Logo } from "@reloop/ui/components/logo";
 import { OrganizationNavbar } from "./organization-navbar";
 import { SubNavbar } from "./sub-navbar";
 
 export const Navbar = () => {
 	return (
-		<div>
+		<div className="sticky top-0 z-[1] bg-bg-white-0">
 			<div className="flex items-center justify-between border-stroke-soft-100 border-b px-3">
 				<div className="flex items-center pt-3">
 					<Logo className="h-8 w-8 rounded-full lg:h-10 lg:w-10" />

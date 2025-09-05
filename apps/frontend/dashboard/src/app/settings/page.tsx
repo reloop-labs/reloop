@@ -1,6 +1,6 @@
 const SettingsPage = () => {
 	return (
-		<div className="mb-64">
+		<div className="mb-64 h-screen">
 			<div className="border-stroke-soft-100 border-b">
 				<div className="mx-auto max-w-7xl">
 					<h1 className="py-10 text-title-h3">Settings</h1>
