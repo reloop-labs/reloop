@@ -14,7 +14,7 @@ const Team = () => {
 	return (
 		<div className="px-10 pt-5 pb-10">
 			<div className="space-y-1">
-				<div className="text-2xl text-text-strong-950">Team</div>
+				<div className="font-medium text-2xl text-text-strong-950">Team</div>
 				<div className="text-paragraph-sm text-text-sub-600">
 					Manage your team and invite new members.
 				</div>

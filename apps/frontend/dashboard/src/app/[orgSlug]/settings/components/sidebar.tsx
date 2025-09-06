@@ -18,6 +18,11 @@ const list = [
 		path: "/settings/team",
 		iconName: "users",
 	},
+	{
+		title: "Security",
+		path: "/settings/security",
+		iconName: "shield-check",
+	},
 ];
 
 export const SideBar = () => {

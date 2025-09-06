@@ -158,5 +158,7 @@
 		]
 	},
 	"packageManager": "bun@1.2.19",
-	"dependencies": {}
+	"dependencies": {
+		"nuqs": "^2.6.0"
+	}
 }

@@ -66,7 +66,7 @@ export const InviteForm = () => {
 
 	return (
 		<div className="my-4 rounded-xl border border-stroke-soft-200 bg-neutral-alpha-10">
-			<p className="p-4 text-text-strong-950">
+			<p className="p-4 font-medium text-text-strong-950">
 				Invite a new member by email address
 			</p>
 			<form
