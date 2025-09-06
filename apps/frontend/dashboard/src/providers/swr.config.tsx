@@ -6,7 +6,7 @@ const SWRProvider = ({ children }: { children: React.ReactNode }) => {
 	return (
 		<SWRConfig
 			value={{
-				refreshInterval: 3000,
+				refreshInterval: 100000,
 				revalidateOnFocus: true,
 				revalidateOnReconnect: true,
 				revalidateOnMount: true,

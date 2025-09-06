@@ -69,12 +69,6 @@ export const auth = betterAuth({
 		admin(),
 		apiKey({ defaultPrefix: "rl" }),
 		organization({
-			teams: {
-				enabled: true,
-				defaultTeam: {
-					enabled: false,
-				},
-			},
 			ac,
 			roles: {
 				orgAdmin,

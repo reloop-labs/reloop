@@ -22,12 +22,6 @@ export const authClient = createAuthClient({
 				dev,
 				marketing,
 			},
-			teams: {
-				enabled: true,
-				defaultTeam: {
-					enabled: false,
-				},
-			},
 		}),
 		inferAdditionalFields<AuthInstance>({}),
 	],
