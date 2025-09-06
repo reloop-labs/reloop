@@ -80,9 +80,6 @@ export const OrganizationNavbar = () => {
 											"rounded-lg bg-neutral-alpha-10",
 									)}
 									onClick={() => {
-										authClient.organization.setActive({
-											organizationId: organization.id,
-										});
 										authClient.updateUser({
 											activeOrganizationId: organization.id,
 										});

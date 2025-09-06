@@ -7,6 +7,14 @@ export const MemberList = () => {
 		"organization-member",
 		async () => (await authClient.organization.listMembers({})).data,
 	);
-	console.log("🚀 ~ MemberList ~ data:", data);
-	return <div> MemberList</div>;
+	return (
+		<div>
+			{data?.members?.map((member) => (
+				<div className="flex justify-between">
+					<div>{member.user.email}</div>
+					<div>{member.role}</div>
+				</div>
+			))}
+		</div>
+	);
 };

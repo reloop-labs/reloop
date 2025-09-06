@@ -4,7 +4,6 @@ import { adminAc, defaultStatements } from "better-auth/plugins/admin/access";
 const statement = {
 	...defaultStatements,
 	orgs: ["create", "share", "update", "delete"],
-	members: ["invite", "remove"],
 	apiKey: ["create", "update", "delete", "read"],
 	templates: ["create", "update", "delete", "read"],
 } as const;

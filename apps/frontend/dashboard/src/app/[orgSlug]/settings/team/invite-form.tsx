@@ -6,7 +6,6 @@ import * as Button from "@reloop/ui/components/button";
 import { Icon } from "@reloop/ui/components/icon";
 import * as Input from "@reloop/ui/components/input";
 import * as Label from "@reloop/ui/components/label";
-import * as Modal from "@reloop/ui/components/modal";
 import * as Select from "@reloop/ui/components/select";
 import Spinner from "@reloop/ui/components/spinner";
 import { useState } from "react";
@@ -51,7 +50,7 @@ export const InviteForm = () => {
 			for (const user of users) {
 				await authClient.organization.inviteMember({
 					email: user.email,
-					role: user.role,
+					role: "admin",
 					organizationId: session?.user.activeOrganizationId,
 				});
 			}
@@ -159,12 +158,7 @@ export const InviteForm = () => {
 					</Button.Root>
 				</div>
 				<div className="flex justify-end border-stroke-soft-100 border-t p-4">
-					<Button.Root
-						className="w-24"
-						type="submit"
-						variant="neutral"
-						disabled={loading}
-					>
+					<Button.Root type="submit" variant="neutral" disabled={loading}>
 						{loading && <Spinner color="var(--text-strong-950)" />}
 						{loading ? "Inviting..." : "Invite"}
 					</Button.Root>

@@ -15,25 +15,32 @@ const Home = () => {
 	);
 
 	useEffect(() => {
-		if (!isPending && !organizationsLoading && organizations) {
-			if (!organizations || organizations.length === 0) {
-				console.log("No organizations found");
-				return;
-			}
-			if (!activeOrganizationId) {
-				const firstOrg = organizations[0];
-				if (firstOrg?.slug) {
-					router.push(`/${firstOrg.slug}`);
+		const handleRedirect = async () => {
+			if (!isPending && !organizationsLoading && organizations) {
+				if (!organizations || organizations.length === 0) {
+					console.log("No organizations found");
+					return;
 				}
-				return;
+				if (!activeOrganizationId) {
+					const firstOrg = organizations[0];
+					if (firstOrg?.slug) {
+						await authClient.organization.setActive({
+							organizationId: firstOrg.id,
+						});
+						router.push(`/${firstOrg.slug}`);
+					}
+					return;
+				}
+				const activeOrg = organizations.find(
+					(org) => org.id === activeOrganizationId,
+				);
+				if (activeOrg?.slug) {
+					router.push(`/${activeOrg.slug}`);
+				}
 			}
-			const activeOrg = organizations.find(
-				(org) => org.id === activeOrganizationId,
-			);
-			if (activeOrg?.slug) {
-				router.push(`/${activeOrg.slug}`);
-			}
-		}
+		};
+
+		handleRedirect();
 	}, [
 		isPending,
 		organizationsLoading,

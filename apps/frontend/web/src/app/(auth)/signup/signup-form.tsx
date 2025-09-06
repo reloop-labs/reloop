@@ -91,7 +91,6 @@ export const SignupForm = () => {
 				toast.error(org.error.message);
 				return;
 			}
-			await authClient.organization.setActive({ organizationId: org.data.id });
 			await authClient.updateUser({ activeOrganizationId: org.data.id });
 			router.push(`/${org.data.slug}`);
 		} catch (e) {
