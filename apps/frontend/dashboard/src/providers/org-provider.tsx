@@ -2,7 +2,7 @@
 
 import { authClient } from "@reloop/auth/client";
 import Spinner from "@reloop/ui/components/spinner";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { createContext, type ReactNode, useContext } from "react";
 import useSWR from "swr";
 
@@ -16,6 +16,7 @@ type Organization = NonNullable<
 type UserOrganizationContextType = {
 	user: User;
 	activeOrganization: Organization;
+	push: (path: string, changeSlug?: boolean) => void;
 };
 
 // Create the context
@@ -43,7 +44,7 @@ export const UserOrganizationProvider = ({
 		"organizations",
 		async () => (await authClient.organization.list()).data,
 	);
-
+	const { push } = useRouter();
 	const activeOrganization = organizations?.find(
 		(organization) => organization.slug === orgSlug,
 	);
@@ -66,9 +67,18 @@ export const UserOrganizationProvider = ({
 		return <div>Organization not found</div>;
 	}
 
+	const onPush = (path: string, changeSlug?: boolean) => {
+		if (changeSlug) {
+			push(`${path}`);
+			return;
+		}
+		push(`/${activeOrganization.slug}${path}`);
+	};
+
 	const contextValue: UserOrganizationContextType = {
 		user: session.user,
 		activeOrganization,
+		push: onPush,
 	};
 
 	return (

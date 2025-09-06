@@ -19,7 +19,7 @@ export const OrganizationNavbar = () => {
 	);
 	const { setState } = useOrgStore();
 	const { refetch } = authClient.useSession();
-	const { activeOrganization } = useUserOrganization();
+	const { activeOrganization, push } = useUserOrganization();
 	const activeOrganizationIndex = data?.findIndex(
 		(organization) => organization.id === activeOrganization.id,
 	);
@@ -88,6 +88,7 @@ export const OrganizationNavbar = () => {
 										});
 										refetch();
 										setOpen(false);
+										push(organization.slug, true);
 									}}
 								>
 									<div className="flex flex-1 items-center gap-2">
