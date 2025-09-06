@@ -27,7 +27,9 @@ export const OrganizationNavbar = () => {
 	);
 	const [idx, setIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
-	const tab = buttonRefs.current[idx ?? -1];
+
+	const currentIdx = idx !== undefined ? idx : activeOrganizationIndex;
+	const tab = buttonRefs.current[currentIdx ?? -1];
 	const rect = tab?.getBoundingClientRect();
 
 	return (
@@ -43,9 +45,6 @@ export const OrganizationNavbar = () => {
 			<Popover.Root>
 				<Popover.Trigger asChild>
 					<Button.Root
-						onClick={async () => {
-							setIdx(activeOrganizationIndex);
-						}}
 						variant="neutral"
 						mode="ghost"
 						size="xxsmall"
@@ -72,20 +71,11 @@ export const OrganizationNavbar = () => {
 									}}
 									key={organization.id}
 									onPointerEnter={() => setIdx(idx)}
-									onPointerLeave={() => {
-										if (
-											activeOrganizationIndex !== undefined &&
-											activeOrganizationIndex !== -1
-										) {
-											setIdx(activeOrganizationIndex);
-										} else if (data.length > 0) {
-											setIdx(0);
-										}
-									}}
+									onPointerLeave={() => setIdx(undefined)}
 									className={cn(
 										"flex w-full cursor-pointer items-center justify-start px-3 py-1.5 font-normal",
 										!rect &&
-											activeOrganizationIndex === idx &&
+											currentIdx === idx &&
 											"rounded-lg bg-neutral-alpha-10",
 									)}
 								>
@@ -104,16 +94,7 @@ export const OrganizationNavbar = () => {
 							))}
 							<button
 								onPointerEnter={() => setIdx(data.length)}
-								onPointerLeave={() => {
-									if (
-										activeOrganizationIndex !== undefined &&
-										activeOrganizationIndex !== -1
-									) {
-										setIdx(activeOrganizationIndex);
-									} else if (data.length > 0) {
-										setIdx(0);
-									}
-								}}
+								onPointerLeave={() => setIdx(undefined)}
 								ref={(el) => {
 									if (el) {
 										buttonRefs.current[data.length] = el;
@@ -121,7 +102,12 @@ export const OrganizationNavbar = () => {
 								}}
 								key="create-organization"
 								type="button"
-								className="flex w-full cursor-pointer items-center justify-start gap-2 px-3 py-1.5 font-normal"
+								className={cn(
+									"flex w-full cursor-pointer items-center justify-start gap-2 px-3 py-1.5 font-normal",
+									!rect &&
+										currentIdx === data.length &&
+										"rounded-lg bg-neutral-alpha-10",
+								)}
 								onClick={() => setState(true)}
 							>
 								<Icon name="plus-outline" className="h-4 w-4" />
