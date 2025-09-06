@@ -19,7 +19,6 @@ const items = [
 
 export const SubNavbar = () => {
 	const pathname = usePathname();
-	console.log("🚀 ~ SubNavbar ~ pathname:", pathname);
 	const { push } = useRouter();
 
 	return (

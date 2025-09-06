@@ -18,7 +18,7 @@ export const OrganizationNavbar = () => {
 	const { data: session } = authClient.useSession();
 	const activeOrganization = session?.user.activeOrganizationId;
 	const activeOrganizationData = data?.find(
-		(organization) => organization.slug === activeOrganization,
+		(organization) => organization.id === activeOrganization,
 	);
 
 	return (
@@ -61,7 +61,7 @@ export const OrganizationNavbar = () => {
 								className={cn(
 									"flex w-full justify-start px-2 py-0.5 font-normal",
 									activeOrganizationData?.slug === organization.slug &&
-										"bg-neutral-alpha-10 text-text-strong-950",
+										"group bg-neutral-alpha-10 text-text-strong-950",
 								)}
 							>
 								<div className="flex flex-1 items-center gap-2">
@@ -72,14 +72,14 @@ export const OrganizationNavbar = () => {
 									/>
 									<p>{organization.name}</p>
 								</div>
-								<Icon
-									name={
-										activeOrganizationData?.slug === organization.slug
-											? "check"
-											: "chevron-right"
-									}
-									className="h-4 w-4"
-								/>
+								{activeOrganizationData?.slug === organization.slug ? (
+									<Icon name="check" className="h-4 w-4" />
+								) : (
+									<Icon
+										name="chevron-right"
+										className="hidden h-4 w-4 group-hover:block"
+									/>
+								)}
 							</Button.Root>
 						))}
 					</div>

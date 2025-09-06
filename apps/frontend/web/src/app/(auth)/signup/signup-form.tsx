@@ -86,12 +86,12 @@ export const SignupForm = () => {
 				slug: organizationSlug,
 				keepCurrentActiveOrganization: true,
 			});
-
 			if (org.error) {
 				changeStatus("idle");
 				toast.error(org.error.message);
 				return;
 			}
+			await authClient.updateUser({ activeOrganizationId: org.data.id });
 			router.push("/onboarding");
 		} catch (e) {
 			changeStatus("idle");
