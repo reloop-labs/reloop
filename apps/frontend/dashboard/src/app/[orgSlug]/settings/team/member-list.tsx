@@ -1,10 +1,11 @@
+import { useUserOrganization } from "@dashboard/providers/org-provider";
 import { authClient } from "@reloop/auth/client";
 import useSWR from "swr";
 
 export const MemberList = () => {
-	const { data: session } = authClient.useSession();
-	const { data, isLoading } = useSWR(
-		"organization-member",
+	const { activeOrganization } = useUserOrganization();
+	const { data } = useSWR(
+		`organization-member-${activeOrganization.id}`,
 		async () => (await authClient.organization.listMembers({})).data,
 	);
 	return (

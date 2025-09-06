@@ -9,7 +9,7 @@ export const InviteList = () => {
 		isLoading,
 		error,
 	} = useSWR(
-		"invitations",
+		`invitations-${activeOrganization.id}`,
 		async () => (await authClient.organization.listInvitations()).data,
 	);
 	return (
