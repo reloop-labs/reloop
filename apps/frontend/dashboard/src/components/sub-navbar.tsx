@@ -26,20 +26,24 @@ export const SubNavbar = () => {
 	const pathname = usePathname();
 	const { push } = useRouter();
 
-	// Find active index based on pathname
-	const activeIndex = items.findIndex((item) => {
-		if (item.path === "/") return pathname === "/";
-		if (item.path === "/settings/*") return pathname.startsWith("/settings");
-		return pathname === item.path;
-	});
+	const getTabValue = (pathname: string) => {
+		const matchingItem = items.find((item) => {
+			if (item.path === "/") return pathname === "/";
+			return pathname.startsWith(item.path);
+		});
+		return matchingItem?.path || "/";
+	};
 
+	const activeIndex = items.findIndex(
+		(item) => item.path === getTabValue(pathname),
+	);
 	const currentIdx = hoveredIdx !== undefined ? hoveredIdx : activeIndex;
 	const tab = buttonRefs.current[currentIdx];
 	const rect =
 		hoveredIdx !== undefined ? tab?.getBoundingClientRect() : undefined;
 
 	return (
-		<TabMenuHorizontal.Root defaultValue={"/"} value={pathname || "/"}>
+		<TabMenuHorizontal.Root defaultValue={"/"} value={getTabValue(pathname)}>
 			<TabMenuHorizontal.List className="relative h-10 gap-0 border-b! px-3 py-0">
 				{items.map(({ label, path }, index) => (
 					<TabMenuHorizontal.Trigger
