@@ -1,4 +1,5 @@
 "use client";
+import { useUserOrganization } from "@dashboard/providers/org-provider";
 import { Icon } from "@reloop/ui/components/icon";
 import { cn } from "@reloop/ui/utils/cn";
 import { AnimatePresence, motion } from "motion/react";
@@ -23,7 +24,9 @@ export const SideBar = () => {
 	const [idx, setIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLAnchorElement[]>([]);
 	const pathname = usePathname();
-	const activeIndex = list.findIndex((item) => item.path === pathname);
+	const pathWithoutSlug = pathname.replace(/^\/[^/]+/, "") || "/";
+	const activeIndex = list.findIndex((item) => item.path === pathWithoutSlug);
+	const { activeOrganization } = useUserOrganization();
 	const currentIdx = idx !== undefined ? idx : activeIndex;
 	const tab = buttonRefs.current[currentIdx];
 	const rect = tab?.getBoundingClientRect();
@@ -35,7 +38,7 @@ export const SideBar = () => {
 					return (
 						<Link
 							key={path + index}
-							href={path}
+							href={`/${activeOrganization.slug}${path}`}
 							ref={(el) => {
 								if (el) {
 									buttonRefs.current[index] = el;
