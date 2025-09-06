@@ -1,4 +1,13 @@
 import { betterAuth } from "better-auth";
+import {
+	admin,
+	apiKey,
+	bearer,
+	jwt,
+	openAPI,
+	organization,
+} from "better-auth/plugins";
+import { ac, dev, marketing, admin as orgAdmin } from "./permissions";
 
 export const auth = betterAuth({
 	user: {
@@ -17,6 +26,28 @@ export const auth = betterAuth({
 		},
 	},
 	basePath: "/api/auth/v1",
+	plugins: [
+		jwt(),
+		bearer(),
+		admin(),
+		apiKey({ defaultPrefix: "rl" }),
+		organization({
+			teams: {
+				enabled: true,
+				defaultTeam: {
+					enabled: false,
+				},
+			},
+			ac,
+			roles: {
+				orgAdmin,
+				dev,
+				marketing,
+			},
+			sendInvitationEmail: async () => {},
+		}),
+		openAPI({ path: "/docs" }),
+	],
 });
 
 export type AuthInstance = typeof auth;

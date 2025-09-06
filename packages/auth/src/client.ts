@@ -8,6 +8,7 @@ import {
 import { createAuthClient } from "better-auth/react";
 import { ac, admin, dev, marketing } from "./permissions";
 import type { AuthInstance } from "./server";
+
 export const authClient = createAuthClient({
 	basePath: "/api/auth/v1/",
 	plugins: [
@@ -20,6 +21,12 @@ export const authClient = createAuthClient({
 				admin,
 				dev,
 				marketing,
+			},
+			teams: {
+				enabled: true,
+				defaultTeam: {
+					enabled: false,
+				},
 			},
 		}),
 		inferAdditionalFields<AuthInstance>({}),

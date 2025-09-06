@@ -19,7 +19,7 @@ const list = [
 	},
 ];
 
-export const SizeBar = () => {
+export const SideBar = () => {
 	const [idx, setIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLAnchorElement[]>([]);
 	const pathname = usePathname();
@@ -29,7 +29,7 @@ export const SizeBar = () => {
 	const rect = tab?.getBoundingClientRect();
 
 	return (
-		<div className="sticky top-0 flex w-64 flex-col gap-2">
+		<div className="sticky top-28 z-10 flex w-64 flex-col gap-2 pt-5">
 			<div className="relative">
 				{list.map(({ path, title, iconName }, index) => {
 					return (

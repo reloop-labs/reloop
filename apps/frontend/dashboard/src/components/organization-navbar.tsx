@@ -1,5 +1,6 @@
 "use client";
 
+import { useUserOrganization } from "@dashboard/providers/org-provider";
 import { useOrgStore } from "@dashboard/store/use-org-store";
 import { authClient } from "@reloop/auth/client";
 import * as Avatar from "@reloop/ui/components/avatar";
@@ -17,17 +18,17 @@ export const OrganizationNavbar = () => {
 		async () => (await authClient.organization.list()).data,
 	);
 	const { setState } = useOrgStore();
-	const { data: session } = authClient.useSession();
-	const activeOrganization = session?.user.activeOrganizationId;
+	const { refetch } = authClient.useSession();
+	const { activeOrganization } = useUserOrganization();
 	const activeOrganizationIndex = data?.findIndex(
-		(organization) => organization.id === activeOrganization,
+		(organization) => organization.id === activeOrganization.id,
 	);
 	const activeOrganizationData = data?.find(
-		(organization) => organization.id === activeOrganization,
+		(organization) => organization.id === activeOrganization.id,
 	);
 	const [idx, setIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
-
+	const [open, setOpen] = useState(false);
 	const currentIdx = idx !== undefined ? idx : activeOrganizationIndex;
 	const tab = buttonRefs.current[currentIdx ?? -1];
 	const rect = tab?.getBoundingClientRect();
@@ -42,7 +43,7 @@ export const OrganizationNavbar = () => {
 					<p>{activeOrganizationData?.name}</p>
 				)}
 			</div>
-			<Popover.Root>
+			<Popover.Root open={open} onOpenChange={setOpen}>
 				<Popover.Trigger asChild>
 					<Button.Root
 						variant="neutral"
@@ -78,6 +79,16 @@ export const OrganizationNavbar = () => {
 											currentIdx === idx &&
 											"rounded-lg bg-neutral-alpha-10",
 									)}
+									onClick={() => {
+										authClient.organization.setActive({
+											organizationId: organization.id,
+										});
+										authClient.updateUser({
+											activeOrganizationId: organization.id,
+										});
+										refetch();
+										setOpen(false);
+									}}
 								>
 									<div className="flex flex-1 items-center gap-2">
 										<Avatar.Root
@@ -87,7 +98,7 @@ export const OrganizationNavbar = () => {
 										/>
 										<p>{organization.name}</p>
 									</div>
-									{organization.id === activeOrganization && (
+									{organization.id === activeOrganization.id && (
 										<Icon name="check" className="h-4 w-4" />
 									)}
 								</button>
