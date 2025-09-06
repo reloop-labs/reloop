@@ -3,6 +3,7 @@ import { Icon } from "@reloop/ui/components/icon";
 import { cn } from "@reloop/ui/utils/cn";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useRef, useState } from "react";
 
 const list = [
@@ -21,32 +22,39 @@ const list = [
 export const SizeBar = () => {
 	const [idx, setIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLAnchorElement[]>([]);
-	const tab = buttonRefs.current[idx ?? -1];
+	const pathname = usePathname();
+	const activeIndex = list.findIndex((item) => item.path === pathname);
+	const currentIdx = idx !== undefined ? idx : activeIndex;
+	const tab = buttonRefs.current[currentIdx];
 	const rect = tab?.getBoundingClientRect();
 
 	return (
 		<div className="flex w-64 flex-col gap-2">
 			<div className="relative">
-				{list.map(({ path, title, iconName }, index) => (
-					<Link
-						key={path + index}
-						href={path}
-						ref={(el) => {
-							if (el) {
-								buttonRefs.current[index] = el;
-							}
-						}}
-						onPointerEnter={() => setIdx(index)}
-						onPointerLeave={() => setIdx(undefined)}
-						className={cn(
-							!rect && idx === index && "bg-neutral-alpha-10",
-							"flex h-12 items-center justify-start gap-2 px-4 text-left",
-						)}
-					>
-						<Icon name={iconName} className="h-4 w-4" />
-						<span>{title}</span>
-					</Link>
-				))}
+				{list.map(({ path, title, iconName }, index) => {
+					return (
+						<Link
+							key={path + index}
+							href={path}
+							ref={(el) => {
+								if (el) {
+									buttonRefs.current[index] = el;
+								}
+							}}
+							onPointerEnter={() => setIdx(index)}
+							onPointerLeave={() => setIdx(undefined)}
+							className={cn(
+								"flex h-12 items-center justify-start gap-2 px-4 text-left",
+								!rect &&
+									currentIdx === index &&
+									"rounded-lg bg-neutral-alpha-10",
+							)}
+						>
+							<Icon name={iconName} className="h-4 w-4" />
+							<span>{title}</span>
+						</Link>
+					);
+				})}
 				<AnimatePresence>
 					{rect ? (
 						<motion.div
