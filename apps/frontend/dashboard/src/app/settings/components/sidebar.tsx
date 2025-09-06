@@ -1,50 +1,97 @@
-import * as Button from "@reloop/ui/components/button";
+"use client";
 import { Icon } from "@reloop/ui/components/icon";
+import { cn } from "@reloop/ui/utils/cn";
+import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
+import { useRef, useState } from "react";
 
 const list = [
 	{
 		title: "Genera",
 		path: "/settings",
-		iconName: "settings",
+		iconName: "gear",
 	},
 	{
 		title: "Members",
-		path: "/settings",
-		iconName: "members",
-	},
-	{
-		title: "Genera",
-		path: "/settings",
-		iconName: "settings",
-	},
-	{
-		title: "Genera",
-		path: "/settings",
-		iconName: "settings",
-	},
-	{
-		title: "Genera",
-		path: "/settings",
-		iconName: "settings",
+		path: "/settings/members",
+		iconName: "users",
 	},
 ];
 
 export const SizeBar = () => {
+	const [idx, setIdx] = useState<number | undefined>(undefined);
+	const buttonRefs = useRef<HTMLAnchorElement[]>([]);
+	const tab = buttonRefs.current[idx ?? -1];
+	const rect = tab?.getBoundingClientRect();
+
 	return (
 		<div className="flex w-64 flex-col gap-2">
-			{list.map(({ path, title, iconName }) => (
-				<Link
-					href={path}
-					className={Button.buttonVariants({
-						mode: "ghost",
-						variant: "neutral",
-					}).root({ className: "h-12" })}
-				>
-					<Icon name={iconName} />
-					<span>{title}</span>
-				</Link>
-			))}
+			<div className="relative">
+				{list.map(({ path, title, iconName }, index) => (
+					<Link
+						key={path + index}
+						href={path}
+						ref={(el) => {
+							if (el) {
+								buttonRefs.current[index] = el;
+							}
+						}}
+						onPointerEnter={() => setIdx(index)}
+						onPointerLeave={() => setIdx(undefined)}
+						className={cn(
+							!rect && idx === index && "bg-neutral-alpha-10",
+							"flex h-12 items-center justify-start gap-2 px-4 text-left",
+						)}
+					>
+						<Icon name={iconName} className="h-4 w-4" />
+						<span>{title}</span>
+					</Link>
+				))}
+				<AnimatePresence>
+					{rect ? (
+						<motion.div
+							className="absolute top-0 left-0 rounded-lg bg-neutral-alpha-10"
+							initial={{
+								pointerEvents: "none",
+								width: rect.width,
+								height: rect.height,
+								left:
+									rect.left -
+									(tab?.offsetParent?.getBoundingClientRect().left || 0),
+								top:
+									rect.top -
+									(tab?.offsetParent?.getBoundingClientRect().top || 0),
+								opacity: 0,
+							}}
+							animate={{
+								pointerEvents: "none",
+								width: rect.width,
+								height: rect.height,
+								left:
+									rect.left -
+									(tab?.offsetParent?.getBoundingClientRect().left || 0),
+								top:
+									rect.top -
+									(tab?.offsetParent?.getBoundingClientRect().top || 0),
+								opacity: 1,
+							}}
+							exit={{
+								pointerEvents: "none",
+								opacity: 0,
+								width: rect.width,
+								height: rect.height,
+								left:
+									rect.left -
+									(tab?.offsetParent?.getBoundingClientRect().left || 0),
+								top:
+									rect.top -
+									(tab?.offsetParent?.getBoundingClientRect().top || 0),
+							}}
+							transition={{ duration: 0.14 }}
+						/>
+					) : null}
+				</AnimatePresence>
+			</div>
 		</div>
 	);
 };
