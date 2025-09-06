@@ -1,8 +1,9 @@
 "use client";
+import { useUserOrganization } from "@dashboard/providers/org-provider";
 import * as TabMenuHorizontal from "@reloop/ui/components/tab-menu-horizontal";
 import { cn } from "@reloop/ui/utils/cn";
 import { AnimatePresence, motion } from "motion/react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useRef, useState } from "react";
 
 const items = [
@@ -24,12 +25,14 @@ export const SubNavbar = () => {
 	const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 	const pathname = usePathname();
-	const { push } = useRouter();
+	const { push } = useUserOrganization();
 
 	const getTabValue = (pathname: string) => {
+		const pathWithoutSlug = pathname.replace(/^\/[^/]+/, "") || "/";
+
 		const matchingItem = items.find((item) => {
-			if (item.path === "/") return pathname === "/";
-			return pathname.startsWith(item.path);
+			if (item.path === "/") return pathWithoutSlug === "/";
+			return pathWithoutSlug.startsWith(item.path);
 		});
 		return matchingItem?.path || "/";
 	};
