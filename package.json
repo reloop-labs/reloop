@@ -76,7 +76,8 @@
 				"@react-email/preview-server": "4.2.8",
 				"swr": "^2.3.6",
 				"zustand": "^5.0.8",
-				"nuqs": "^2.6.0"
+				"nuqs": "^2.6.0",
+				"@tanstack/react-table": "^8.21.3"
 			},
 			"db": {
 				"@types/pg": "8.15.4",

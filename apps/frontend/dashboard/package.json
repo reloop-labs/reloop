@@ -22,7 +22,8 @@
 		"zod": "catalog:ui",
 		"swr": "catalog:ui",
 		"zustand": "catalog:ui",
-		"nuqs": "catalog:ui"
+		"nuqs": "catalog:ui",
+		"@tanstack/react-table": "catalog:ui"
 	},
 	"devDependencies": {
 		"typescript": "catalog:",

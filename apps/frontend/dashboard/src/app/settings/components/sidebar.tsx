@@ -29,7 +29,7 @@ export const SizeBar = () => {
 	const rect = tab?.getBoundingClientRect();
 
 	return (
-		<div className="flex w-64 flex-col gap-2">
+		<div className="sticky top-0 flex w-64 flex-col gap-2">
 			<div className="relative">
 				{list.map(({ path, title, iconName }, index) => {
 					return (

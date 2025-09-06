@@ -32,7 +32,7 @@ export const InviteTabs = () => {
 
 	return (
 		<TabMenuHorizontal.Root defaultValue="members" value={tabValue}>
-			<TabMenuHorizontal.List className="relative h-10 gap-0 border-b! border-b-transparent px-3 py-0">
+			<TabMenuHorizontal.List className="relative h-10 gap-0 border-b! px-3 py-0">
 				{items.map(({ label, path }, index) => (
 					<TabMenuHorizontal.Trigger
 						ref={(el) => {

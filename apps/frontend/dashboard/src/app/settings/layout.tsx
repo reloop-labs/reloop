@@ -9,7 +9,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 				</div>
 			</div>
 			<div className="mx-auto flex max-w-5xl">
-				<div className="pt-5">
+				<div className="sticky top-0 pt-5">
 					<SizeBar />
 				</div>
 				<div className="flex-1">{children}</div>

@@ -2,10 +2,12 @@
 
 import { useQueryState } from "nuqs";
 import { InviteForm } from "./invite-form";
+import { InviteList } from "./invite-list";
 import { InviteTabs } from "./invite-tabs";
+import { MemberList } from "./member-list";
 
 const Team = () => {
-	const [tabValue, setTabValue] = useQueryState("tab", {
+	const [tabValue] = useQueryState("tab", {
 		defaultValue: "members",
 	});
 
@@ -18,20 +20,18 @@ const Team = () => {
 				</div>
 			</div>
 			<InviteForm />
-			<div className="my-4 rounded-xl border border-stroke-soft-200 bg-neutral-alpha-10">
-				<InviteTabs />
-				<div className="mx-0.5 mb-0.5 rounded-lg bg-bg-white-0">
-					{tabValue === "members" && (
-						<div className="p-4">
-							<div className="text-2xl text-text-strong-950">Members</div>
-						</div>
-					)}
-					{tabValue === "invites" && (
-						<div className="p-4">
-							<div className="text-2xl text-text-strong-950">Invites</div>
-						</div>
-					)}
-				</div>
+			<InviteTabs />
+			<div className="mx-0.5 mb-0.5 rounded-lg bg-bg-white-0">
+				{tabValue === "members" && (
+					<div className="p-4">
+						<MemberList />
+					</div>
+				)}
+				{tabValue === "invites" && (
+					<div className="p-4">
+						<InviteList />
+					</div>
+				)}
 			</div>
 		</div>
 	);
