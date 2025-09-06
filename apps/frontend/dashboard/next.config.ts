@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
 	basePath: "/dashboard",
 	output: "standalone",
-	allowedDevOrigins: ["*"],
+	allowedDevOrigins: ["reloop.local", "*.reloop.local"],
 };
 
 export default nextConfig;

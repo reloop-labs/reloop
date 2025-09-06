@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/components/button";
 import { Icon } from "@reloop/ui/components/icon";
 import * as Input from "@reloop/ui/components/input";
@@ -35,16 +36,25 @@ export const InviteMember = ({ onClose }: { onClose: () => void }) => {
 			users: [{ email: "", role: "dev" }],
 		},
 	});
-
+	const { data: session } = authClient.useSession();
 	const { fields, append, remove } = useFieldArray({
 		control: form.control,
 		name: "users",
 	});
 
 	const onSubmit = async (data: InviteValues) => {
+		if (!session?.user.activeOrganizationId) return;
 		setLoading(true);
+		const { users } = data;
 		try {
 			toast.success("Team members invited successfully!");
+			for (const user of users) {
+				await authClient.organization.inviteMember({
+					email: user.email,
+					role: user.role,
+					organizationId: session?.user.activeOrganizationId,
+				});
+			}
 			form.reset({ users: [{ email: "", role: "dev" }] });
 			onClose();
 		} catch (error) {

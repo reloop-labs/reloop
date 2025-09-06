@@ -11,7 +11,7 @@ import {
 import { db } from "../db/pg";
 import { redis } from "../db/redis";
 import * as schema from "../db/schema/auth";
-
+import { ac, dev, marketing, admin as orgAdmin } from "./permissions";
 export const auth = betterAuth({
 	database: drizzleAdapter(db, {
 		provider: "pg",
@@ -68,7 +68,15 @@ export const auth = betterAuth({
 		bearer(),
 		admin(),
 		apiKey({ defaultPrefix: "rl" }),
-		organization(),
+		organization({
+			ac,
+			roles: {
+				orgAdmin,
+				dev,
+				marketing,
+			},
+			sendInvitationEmail: async () => {},
+		}),
 		openAPI({ path: "/docs" }),
 	],
 	advanced: {

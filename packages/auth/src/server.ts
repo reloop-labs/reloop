@@ -1,4 +1,5 @@
 import { betterAuth } from "better-auth";
+
 export const auth = betterAuth({
 	user: {
 		additionalFields: {

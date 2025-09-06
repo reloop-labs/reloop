@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
 	output: "standalone",
-	allowedDevOrigins: ["*"],
+	allowedDevOrigins: ["reloop.local", "*.reloop.local"],
 };
 
 export default nextConfig;
