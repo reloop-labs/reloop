@@ -7,7 +7,7 @@ export const Navbar = () => {
 	return (
 		<div className="sticky top-0 z-[1] bg-bg-white-0">
 			<div className="flex items-center justify-between border-stroke-soft-100 border-b px-3">
-				<div className="flex items-center pt-3">
+				<div className="flex items-center pt-2 pb-1.5">
 					<Logo className="h-8 w-8 rounded-full lg:h-10 lg:w-10" />
 					<div className="flex items-center gap-2">
 						<p className="flex size-5 select-none items-center justify-center text-text-disabled-300">

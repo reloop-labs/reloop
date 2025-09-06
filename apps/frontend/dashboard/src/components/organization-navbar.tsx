@@ -6,12 +6,13 @@ import * as Avatar from "@reloop/ui/components/avatar";
 import * as Button from "@reloop/ui/components/button";
 import { Icon } from "@reloop/ui/components/icon";
 import * as Popover from "@reloop/ui/components/popover";
+import { cn } from "@reloop/ui/utils/cn";
 import { AnimatePresence, motion } from "motion/react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import useSWR from "swr";
 
 export const OrganizationNavbar = () => {
-	const { data, isLoading, error } = useSWR(
+	const { data, isLoading } = useSWR(
 		"organization",
 		async () => (await authClient.organization.list()).data,
 	);
@@ -24,27 +25,26 @@ export const OrganizationNavbar = () => {
 	const activeOrganizationData = data?.find(
 		(organization) => organization.id === activeOrganization,
 	);
-	const [idx, setIdx] = useState<number>(activeOrganizationIndex || 0);
-	const [buttonRefs] = useState<HTMLButtonElement[]>([]);
-	const tab = buttonRefs[idx ?? -1];
+	const [idx, setIdx] = useState<number | undefined>(undefined);
+	const buttonRefs = useRef<HTMLButtonElement[]>([]);
+	const tab = buttonRefs.current[idx ?? -1];
 	const rect = tab?.getBoundingClientRect();
 
 	return (
 		<div className="flex items-center gap-2">
 			<div className="flex items-center gap-2">
 				<Avatar.Root color="purple" size="20" placeholderType="company" />
-				<p>{activeOrganizationData?.name}</p>
+				{isLoading ? (
+					<div className="h-4 w-20 animate-pulse rounded-full bg-neutral-alpha-10" />
+				) : (
+					<p>{activeOrganizationData?.name}</p>
+				)}
 			</div>
 			<Popover.Root>
 				<Popover.Trigger asChild>
 					<Button.Root
 						onClick={async () => {
-							try {
-								const organizations = await authClient.organization.list();
-								console.log(organizations);
-							} catch (error) {
-								console.error(error);
-							}
+							setIdx(activeOrganizationIndex);
 						}}
 						variant="neutral"
 						mode="ghost"
@@ -67,15 +67,27 @@ export const OrganizationNavbar = () => {
 									type="button"
 									ref={(el) => {
 										if (el) {
-											buttonRefs[idx] = el;
+											buttonRefs.current[idx] = el;
 										}
 									}}
 									key={organization.id}
 									onPointerEnter={() => setIdx(idx)}
 									onPointerLeave={() => {
-										activeOrganizationIndex && setIdx(activeOrganizationIndex);
+										if (
+											activeOrganizationIndex !== undefined &&
+											activeOrganizationIndex !== -1
+										) {
+											setIdx(activeOrganizationIndex);
+										} else if (data.length > 0) {
+											setIdx(0);
+										}
 									}}
-									className="flex w-full cursor-pointer items-center justify-start px-3 py-1.5 font-normal"
+									className={cn(
+										"flex w-full cursor-pointer items-center justify-start px-3 py-1.5 font-normal",
+										!rect &&
+											activeOrganizationIndex === idx &&
+											"rounded-lg bg-neutral-alpha-10",
+									)}
 								>
 									<div className="flex flex-1 items-center gap-2">
 										<Avatar.Root
@@ -93,11 +105,18 @@ export const OrganizationNavbar = () => {
 							<button
 								onPointerEnter={() => setIdx(data.length)}
 								onPointerLeave={() => {
-									activeOrganizationIndex && setIdx(activeOrganizationIndex);
+									if (
+										activeOrganizationIndex !== undefined &&
+										activeOrganizationIndex !== -1
+									) {
+										setIdx(activeOrganizationIndex);
+									} else if (data.length > 0) {
+										setIdx(0);
+									}
 								}}
 								ref={(el) => {
 									if (el) {
-										buttonRefs[data.length] = el;
+										buttonRefs.current[data.length] = el;
 									}
 								}}
 								key="create-organization"
