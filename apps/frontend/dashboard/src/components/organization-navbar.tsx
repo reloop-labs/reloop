@@ -6,7 +6,8 @@ import * as Avatar from "@reloop/ui/components/avatar";
 import * as Button from "@reloop/ui/components/button";
 import { Icon } from "@reloop/ui/components/icon";
 import * as Popover from "@reloop/ui/components/popover";
-import { cn } from "@reloop/ui/utils/cn";
+import { AnimatePresence, motion } from "motion/react";
+import { useState } from "react";
 import useSWR from "swr";
 
 export const OrganizationNavbar = () => {
@@ -17,9 +18,16 @@ export const OrganizationNavbar = () => {
 	const { setState } = useOrgStore();
 	const { data: session } = authClient.useSession();
 	const activeOrganization = session?.user.activeOrganizationId;
+	const activeOrganizationIndex = data?.findIndex(
+		(organization) => organization.id === activeOrganization,
+	);
 	const activeOrganizationData = data?.find(
 		(organization) => organization.id === activeOrganization,
 	);
+	const [idx, setIdx] = useState<number>(activeOrganizationIndex || 0);
+	const [buttonRefs] = useState<HTMLButtonElement[]>([]);
+	const tab = buttonRefs[idx ?? -1];
+	const rect = tab?.getBoundingClientRect();
 
 	return (
 		<div className="flex items-center gap-2">
@@ -52,48 +60,100 @@ export const OrganizationNavbar = () => {
 					side="bottom"
 					align="start"
 				>
-					<div className="px-2 pt-2">
-						{data?.map((organization) => (
-							<Button.Root
-								variant="neutral"
-								mode="ghost"
-								key={organization.id}
-								className={cn(
-									"flex w-full justify-start px-2 py-0.5 font-normal",
-									activeOrganizationData?.slug === organization.slug &&
-										"group bg-neutral-alpha-10 text-text-strong-950",
-								)}
+					{data && (
+						<div className="relative p-2">
+							{data?.map((organization, idx) => (
+								<button
+									type="button"
+									ref={(el) => {
+										if (el) {
+											buttonRefs[idx] = el;
+										}
+									}}
+									key={organization.id}
+									onPointerEnter={() => setIdx(idx)}
+									onPointerLeave={() => {
+										activeOrganizationIndex && setIdx(activeOrganizationIndex);
+									}}
+									className="flex w-full cursor-pointer items-center justify-start px-3 py-1.5 font-normal"
+								>
+									<div className="flex flex-1 items-center gap-2">
+										<Avatar.Root
+											color="purple"
+											size="16"
+											placeholderType="company"
+										/>
+										<p>{organization.name}</p>
+									</div>
+									{organization.id === activeOrganization && (
+										<Icon name="check" className="h-4 w-4" />
+									)}
+								</button>
+							))}
+							<button
+								onPointerEnter={() => setIdx(data.length)}
+								onPointerLeave={() => {
+									activeOrganizationIndex && setIdx(activeOrganizationIndex);
+								}}
+								ref={(el) => {
+									if (el) {
+										buttonRefs[data.length] = el;
+									}
+								}}
+								key="create-organization"
+								type="button"
+								className="flex w-full cursor-pointer items-center justify-start gap-2 px-3 py-1.5 font-normal"
+								onClick={() => setState(true)}
 							>
-								<div className="flex flex-1 items-center gap-2">
-									<Avatar.Root
-										color="purple"
-										size="16"
-										placeholderType="company"
+								<Icon name="plus-outline" className="h-4 w-4" />
+								<p className="text-sm">Create Organization</p>
+							</button>
+							<AnimatePresence>
+								{rect ? (
+									<motion.div
+										className="absolute top-0 left-0 rounded-lg bg-neutral-alpha-10"
+										initial={{
+											pointerEvents: "none",
+											width: rect.width,
+											height: rect.height,
+											left:
+												rect.left -
+												(tab?.offsetParent?.getBoundingClientRect().left || 0),
+											top:
+												rect.top -
+												(tab?.offsetParent?.getBoundingClientRect().top || 0),
+											opacity: 0,
+										}}
+										animate={{
+											pointerEvents: "none",
+											width: rect.width,
+											height: rect.height,
+											left:
+												rect.left -
+												(tab?.offsetParent?.getBoundingClientRect().left || 0),
+											top:
+												rect.top -
+												(tab?.offsetParent?.getBoundingClientRect().top || 0),
+											opacity: 1,
+										}}
+										exit={{
+											pointerEvents: "none",
+											opacity: 0,
+											width: rect.width,
+											height: rect.height,
+											left:
+												rect.left -
+												(tab?.offsetParent?.getBoundingClientRect().left || 0),
+											top:
+												rect.top -
+												(tab?.offsetParent?.getBoundingClientRect().top || 0),
+										}}
+										transition={{ duration: 0.14 }}
 									/>
-									<p>{organization.name}</p>
-								</div>
-								{activeOrganizationData?.slug === organization.slug ? (
-									<Icon name="check" className="h-4 w-4" />
-								) : (
-									<Icon
-										name="chevron-right"
-										className="hidden h-4 w-4 group-hover:block"
-									/>
-								)}
-							</Button.Root>
-						))}
-					</div>
-					<div className="border-stroke-soft-200 px-2 pb-2">
-						<Button.Root
-							variant="neutral"
-							mode="ghost"
-							className="flex w-full justify-start px-2 py-0.5"
-							onClick={() => setState(true)}
-						>
-							<Icon name="plus-outline" className="h-4 w-4" />
-							Create Organization
-						</Button.Root>
-					</div>
+								) : null}
+							</AnimatePresence>
+						</div>
+					)}
 				</Popover.Content>
 			</Popover.Root>
 		</div>
