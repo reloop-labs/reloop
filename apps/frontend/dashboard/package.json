@@ -21,7 +21,8 @@
 		"better-auth": "catalog:",
 		"zod": "catalog:ui",
 		"swr": "catalog:ui",
-		"zustand": "catalog:ui"
+		"zustand": "catalog:ui",
+		"nuqs": "catalog:ui"
 	},
 	"devDependencies": {
 		"typescript": "catalog:",
