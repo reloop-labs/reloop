@@ -51,7 +51,7 @@ export const InviteMember = ({ onClose }: { onClose: () => void }) => {
 			for (const user of users) {
 				await authClient.organization.inviteMember({
 					email: user.email,
-					role: user.role,
+					role: "member",
 					organizationId: session?.user.activeOrganizationId,
 				});
 			}

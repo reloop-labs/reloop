@@ -59,6 +59,7 @@ export const UserOrganizationProvider = ({
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
 	const [isSettingDefaultOrg, setIsSettingDefaultOrg] = useState(false);
+	const [hasInitialized, setHasInitialized] = useState(false);
 
 	const activeOrganization = organizations?.find(
 		(organization) => organization.slug === orgSlug,
@@ -73,7 +74,8 @@ export const UserOrganizationProvider = ({
 				!sessionLoading &&
 				!organizationsLoading &&
 				organizations &&
-				!isSettingDefaultOrg
+				!isSettingDefaultOrg &&
+				!hasInitialized
 			) {
 				// Ensure session is synced with user's activeOrganizationId
 				if (session?.user?.activeOrganizationId) {
@@ -104,6 +106,7 @@ export const UserOrganizationProvider = ({
 						setIsSettingDefaultOrg(true);
 						push(`/${sessionActiveOrg.slug}`);
 						setIsSettingDefaultOrg(false);
+						setHasInitialized(true);
 						return;
 					}
 				}
@@ -119,6 +122,7 @@ export const UserOrganizationProvider = ({
 							if (targetOrg?.slug) {
 								push(`/${targetOrg.slug}`);
 								setIsSettingDefaultOrg(false);
+								setHasInitialized(true);
 								return;
 							}
 						}
@@ -137,11 +141,15 @@ export const UserOrganizationProvider = ({
 								console.error("Failed to set default organization:", error);
 							} finally {
 								setIsSettingDefaultOrg(false);
+								setHasInitialized(true);
 							}
 						} else {
 							setIsSettingDefaultOrg(false);
+							setHasInitialized(true);
 						}
 					}
+				} else {
+					setHasInitialized(true);
 				}
 			}
 		};
@@ -153,6 +161,7 @@ export const UserOrganizationProvider = ({
 		organizations,
 		activeOrganization,
 		isSettingDefaultOrg,
+		hasInitialized,
 		push,
 		session?.user?.activeOrganizationId,
 		orgSlug,
