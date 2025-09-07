@@ -15,7 +15,7 @@ export const selectVariants = tv({
 	slots: {
 		triggerRoot: [
 			// base
-			"group/trigger min-w-0 shrink-0 bg-bg-white-0 shadow-regular-xs outline-none ring-1 ring-inset ring-stroke-soft-200",
+			"group/trigger min-w-0 shrink-0 bg-bg-white-0 outline-none ring-1 ring-inset ring-stroke-soft-200",
 			"text-paragraph-sm text-text-strong-950",
 			"flex items-center text-left",
 			"transition duration-200 ease-out",
@@ -281,7 +281,7 @@ const SelectTrigger = React.forwardRef<
 		>
 			<Slottable>{children}</Slottable>
 			<SelectPrimitives.Icon asChild>
-				<Icon name="arrow-down" className={triggerArrow()} />
+				<Icon name="chevron-down" className={triggerArrow()} />
 			</SelectPrimitives.Icon>
 		</SelectPrimitives.Trigger>
 	);

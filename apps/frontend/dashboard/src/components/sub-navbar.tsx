@@ -16,6 +16,10 @@ const items = [
 		path: "/domain",
 	},
 	{
+		label: "Mailboxes",
+		path: "/mailboxes",
+	},
+	{
 		label: "Settings",
 		path: "/settings",
 	},
