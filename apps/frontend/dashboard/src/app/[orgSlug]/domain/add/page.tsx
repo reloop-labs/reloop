@@ -11,7 +11,7 @@ const NewDomainPage = () => {
 	return (
 		<div className="mx-auto max-w-3xl">
 			<div className="my-10 flex items-center gap-3">
-				<Globe />
+				<Globe className="rounded-full" iconClassName="h-8 w-8" />
 				<div>
 					<h1 className="font-medium text-title-h4 leading-8">Add Domain</h1>
 					<p className="text-paragraph-sm text-text-sub-600">
