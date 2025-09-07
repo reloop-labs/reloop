@@ -7,7 +7,7 @@ import { Globe } from "../globe";
 
 const NewDomainPage = () => {
 	return (
-		<div className="mx-auto max-w-5xl">
+		<div className="mx-auto max-w-3xl">
 			<div className="my-10 flex items-center gap-3">
 				<Globe />
 				<div>

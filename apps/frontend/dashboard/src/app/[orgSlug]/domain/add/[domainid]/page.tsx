@@ -1,12 +1,46 @@
 "use client";
 import * as Button from "@reloop/ui/components/button";
 import { Icon } from "@reloop/ui/components/icon";
+import * as Table from "@reloop/ui/components/table";
+import * as React from "react";
 
 import { Globe } from "../../globe";
 
+// Sample DNS records data
+const dnsRecords = [
+	{
+		type: "MX",
+		host: "send.test",
+		value: "feedback-smtp.ap-north...",
+		priority: "10",
+		ttl: "Auto",
+	},
+	{
+		type: "TXT",
+		host: "send.test",
+		value: "v=spf1 include:amazons...",
+		priority: "",
+		ttl: "Auto",
+	},
+	{
+		type: "TXT",
+		host: "resend._domainkey.test",
+		value: "p=MIGfMA0GCSqGSIb3DQEB...",
+		priority: "",
+		ttl: "Auto",
+	},
+	{
+		type: "TXT",
+		host: "_dmarc",
+		value: "v=DMARC1; p=none",
+		priority: "",
+		ttl: "Auto",
+	},
+];
+
 const NewDomainPage = () => {
 	return (
-		<div className="mx-auto max-w-5xl">
+		<div className="mx-auto max-w-3xl">
 			<div className="my-10 flex items-center gap-3">
 				<Globe />
 				<div>
@@ -42,17 +76,70 @@ const NewDomainPage = () => {
 					<p className="font-medium text-text-sub-600 text-title-h5">
 						DNS Records
 					</p>
-					<div className="my-4 rounded-xl border border-stroke-soft-200 bg-neutral-alpha-10">
-						<div className="space-y-1 px-4 py-4">
-							<div className="font-medium text-text-strong-950 leading-4">
-								DKIM, SPF, and DMARC
-							</div>
-							<div className="text-paragraph-sm text-text-sub-600">
-								Add the DNS records to your domain to start sending emails.
-							</div>
+					<div className="mt-5 space-y-1 py-4">
+						<div className="font-medium text-text-strong-950 leading-4">
+							DKIM, SPF, and DMARC
 						</div>
-						<div className="mx-0.5 mb-0.5 rounded-lg bg-bg-white-0 p-4" />
+						<div className="text-paragraph-sm text-text-sub-600">
+							Add the DNS records to your domain to start sending emails.
+						</div>
 					</div>
+					<div className="w-full">
+						<Table.Root>
+							<Table.Header>
+								<Table.Row>
+									<Table.Head className="w-20 font-medium text-sm">
+										Type
+									</Table.Head>
+									<Table.Head className="w-48 font-medium text-sm">
+										Host / Name
+									</Table.Head>
+									<Table.Head className="font-medium text-sm">Value</Table.Head>
+									<Table.Head className="w-20 font-medium text-sm">
+										Priority
+									</Table.Head>
+									<Table.Head className="w-20 font-medium text-sm">
+										TTL
+									</Table.Head>
+								</Table.Row>
+							</Table.Header>
+							<Table.Body>
+								{dnsRecords.map((record, index) => (
+									<React.Fragment key={index}>
+										<Table.Row>
+											<Table.Cell className="h-10">
+												<span className="inline-flex items-center py-0.5 font-medium text-sm">
+													{record.type}
+												</span>
+											</Table.Cell>
+											<Table.Cell className="h-10">
+												<code className="text-label-sm text-text-strong-950">
+													{record.host}
+												</code>
+											</Table.Cell>
+											<Table.Cell className="h-10">
+												<code className="break-all text-label-sm text-text-strong-950">
+													{record.value}
+												</code>
+											</Table.Cell>
+											<Table.Cell className="h-10">
+												<span className="text-label-sm text-text-strong-950">
+													{record.priority}
+												</span>
+											</Table.Cell>
+											<Table.Cell className="h-10">
+												<span className="text-label-sm text-text-strong-950">
+													{record.ttl}
+												</span>
+											</Table.Cell>
+										</Table.Row>
+										{index < dnsRecords.length - 1 && <Table.RowDivider />}
+									</React.Fragment>
+								))}
+							</Table.Body>
+						</Table.Root>
+					</div>
+
 					<Button.Root className="mt-5" size="xsmall" variant="neutral">
 						I have add the DNS records
 					</Button.Root>
