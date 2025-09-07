@@ -190,7 +190,13 @@ interface GeneratedGridSettings {
 	gridGap: number;
 }
 
-export const Globe = () => {
+export const Globe = ({
+	className,
+	iconClassName,
+}: {
+	className?: string;
+	iconClassName?: string;
+}) => {
 	const { resolvedTheme } = useTheme();
 	const backgroundGridSettingsForEffect: GeneratedGridSettings = {
 		color: resolvedTheme === "dark" ? "#FFFFFF" : "#000000",
@@ -200,11 +206,19 @@ export const Globe = () => {
 		gridGap: 1,
 	};
 	return (
-		<div className="relative h-16 w-16 overflow-hidden rounded-xl border-2 border-stroke-soft-100">
+		<div
+			className={cn(
+				"relative h-16 w-16 overflow-hidden rounded-xl border-2 border-stroke-soft-100",
+				className,
+			)}
+		>
 			<div className="relative flex h-full w-full items-center justify-center">
-				<Icon name="globe" className="relative h-8 w-8 opacity-80" />
+				<Icon
+					name="globe"
+					className={cn("relative h-8 w-8 opacity-80", iconClassName)}
+				/>
 				<FlickeringGrid
-					className="absolute inset-0 z-0"
+					className={cn("absolute inset-0 z-0")}
 					{...backgroundGridSettingsForEffect}
 					startImmediately={true}
 				/>

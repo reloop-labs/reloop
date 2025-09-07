@@ -3,9 +3,6 @@
   "workspaces": {
     "": {
       "name": "reloop",
-      "dependencies": {
-        "nuqs": "^2.6.0",
-      },
       "devDependencies": {
         "@biomejs/biome": "2.1.2",
         "husky": "9.1.7",
@@ -140,6 +137,7 @@
         "@reloop/ui": "workspace:*",
         "@tanstack/react-table": "catalog:ui",
         "better-auth": "catalog:",
+        "dayjs": "catalog:ui",
         "motion": "catalog:ui",
         "next": "catalog:ui",
         "nuqs": "catalog:ui",
@@ -424,6 +422,7 @@
       "ajv": "8.17.1",
       "class-variance-authority": "0.7.1",
       "cmdk": "1.1.1",
+      "dayjs": "^1.11.18",
       "fumadocs-core": "15.4.0",
       "fumadocs-mdx": "11.7.0",
       "fumadocs-openapi": "9.1.9",
@@ -1828,6 +1827,8 @@
     "date-fns": ["date-fns@4.1.0", "", {}, "sha512-Ukq0owbQXxa/U3EGtsdVBkR1w7KOQ5gIBqdH2hkvknzZPYvBxb/aa6E8L7tmjFtkwZBu3UXBbjIgPo/Ez4xaNg=="],
 
     "date-fns-jalali": ["date-fns-jalali@4.1.0-0", "", {}, "sha512-hTIP/z+t+qKwBDcmmsnmjWTduxCg+5KfdqWQvb2X/8C9+knYY6epN/pfxdDuyVlSVeFz0sM5eEfwIUQ70U4ckg=="],
+
+    "dayjs": ["dayjs@1.11.18", "", {}, "sha512-zFBQ7WFRvVRhKcWoUh+ZA1g2HVgUbsZm9sbddh8EC5iv93sui8DVVz1Npvz+r6meo9VKfa8NyLWBsQK1VvIKPA=="],
 
     "debounce": ["debounce@2.2.0", "", {}, "sha512-Xks6RUDLZFdz8LIdR6q0MTH44k7FikOmnh5xkSjMig6ch45afc8sjTjRQf3P6ax8dMgcQrYO/AR2RGWURrruqw=="],
 
