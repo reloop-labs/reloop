@@ -202,7 +202,7 @@ export const Globe = () => {
 	return (
 		<div className="relative h-16 w-16 overflow-hidden rounded-xl border-2 border-stroke-soft-100">
 			<div className="relative flex h-full w-full items-center justify-center">
-				<Icon name="globe" className="relative z-[1] h-8 w-8 opacity-80" />
+				<Icon name="globe" className="relative h-8 w-8 opacity-80" />
 				<FlickeringGrid
 					className="absolute inset-0 z-0"
 					{...backgroundGridSettingsForEffect}

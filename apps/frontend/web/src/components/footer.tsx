@@ -39,7 +39,7 @@ const FooterTitle = () => {
 
 const FooterLinks = () => {
 	return (
-		<div className="mx-auto flex max-w-5xl flex-col items-start gap-5 border-stroke-soft-100 border-r border-l ">
+		<div className="mx-auto flex max-w-5xl flex-col items-start gap-5 border-stroke-soft-100 border-r border-l">
 			<div className="grid w-full grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
 				<div className="border-stroke-soft-100 border-r py-6 pl-6 sm:py-8 sm:pl-8 md:py-10 md:pl-10">
 					<p className="label-md pb-6">Product</p>

@@ -1,4 +1,5 @@
 "use client";
+import { useUserOrganization } from "@dashboard/providers/org-provider";
 import * as Button from "@reloop/ui/components/button";
 import { Icon } from "@reloop/ui/components/icon";
 import * as Input from "@reloop/ui/components/input";
@@ -6,6 +7,7 @@ import * as Label from "@reloop/ui/components/label";
 import { Globe } from "../globe";
 
 const NewDomainPage = () => {
+	const { push } = useUserOrganization();
 	return (
 		<div className="mx-auto max-w-3xl">
 			<div className="my-10 flex items-center gap-3">
@@ -41,7 +43,14 @@ const NewDomainPage = () => {
 								</Input.Root>
 							</div>
 							<div className="flex w-96 justify-end">
-								<Button.Root className="mt-5" variant="neutral">
+								<Button.Root
+									onClick={() => {
+										push("/domain/add/example.com");
+									}}
+									type="button"
+									className="mt-5"
+									variant="neutral"
+								>
 									Add Domain
 								</Button.Root>
 							</div>
