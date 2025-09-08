@@ -6,6 +6,7 @@ import logixlysia from "logixlysia";
 import { landing } from "./landing";
 import { auth, OpenAPI } from "./lib/auth";
 import { loader } from "./loader";
+import { statsRoutes } from "./routes/stats";
 
 const port = Number(process.env.PORT || 3000);
 
@@ -35,33 +36,7 @@ const app = new Elysia({ prefix: "/api/auth", name: "Auth Service" })
 	)
 	.mount("/", auth.handler)
 	.use(landing)
-	.get("/stats/users", async () => {
-		try {
-			const { db } = await import("./db/pg");
-			const { user } = await import("./db/schema/auth");
-			const { count } = await import("drizzle-orm");
-
-			const result = await db.select({ total: count() }).from(user);
-
-			const totalUsers = result[0]?.total || 0;
-
-			return {
-				totalUsers,
-				timestamp: new Date().toISOString(),
-			};
-		} catch (error) {
-			console.error("❌ Error fetching user count:", error);
-			console.error("🔍 Error details:", {
-				message: error instanceof Error ? error.message : String(error),
-				stack: error instanceof Error ? error.stack : undefined,
-			});
-			return {
-				error: "Failed to fetch user count",
-				totalUsers: 0,
-				timestamp: new Date().toISOString(),
-			};
-		}
-	})
+	.use(statsRoutes)
 	.onStart(async () => {
 		await loader();
 	})

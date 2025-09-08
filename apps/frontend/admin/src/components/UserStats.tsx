@@ -2,7 +2,7 @@
 
 import { Icon } from "@reloop/ui/components/icon";
 import { useEffect, useState } from "react";
-import { authApi } from "../lib/api";
+import { statsApi } from "../lib/stats";
 
 interface UserStatsData {
 	totalUsers: number;
@@ -22,10 +22,10 @@ export default function UserStats() {
 				setError(null);
 
 				// Type-safe API call with Eden
-				const { data, error } = await (authApi as any)["stats/users"].get();
+				const { data, error } = await statsApi.getUsers();
 
 				if (error) {
-					throw new Error(`API error: ${error.message}`);
+					throw new Error(`API error: ${error.value}`);
 				}
 
 				setStats(data);

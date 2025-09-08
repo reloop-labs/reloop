@@ -8,7 +8,7 @@ import { cn } from "@reloop/ui/utils/cn";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { authApi } from "../../lib/api";
+import { statsApi } from "../../lib/stats";
 
 interface SidebarItem {
 	id: string;
@@ -146,7 +146,7 @@ const Sidebar = () => {
 	useEffect(() => {
 		const fetchUserCount = async () => {
 			try {
-				const { data, error } = await (authApi as any)["stats/users"].get();
+				const { data, error } = await statsApi.getUsers();
 				if (!error && data) {
 					setUserCount(data.totalUsers);
 				}
