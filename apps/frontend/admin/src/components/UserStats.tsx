@@ -22,7 +22,7 @@ export default function UserStats() {
 				setError(null);
 
 				// Type-safe API call with Eden
-				const { data, error } = await authApi.api.auth.stats.users.get();
+				const { data, error } = await (authApi as any)["stats/users"].get();
 
 				if (error) {
 					throw new Error(`API error: ${error.message}`);

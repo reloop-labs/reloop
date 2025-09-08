@@ -1,7 +1,7 @@
-import { edenTreaty } from "@elysiajs/eden";
+import { treaty } from "@elysiajs/eden";
 
-// Type-safe API client for the auth service
-export const authApi = edenTreaty("http://localhost:3010");
+const port = process.env.PORT || 3010;
 
-// Export types for use in components
+export const authApi = treaty(`http://localhost:${port}/api/auth`);
+
 export type AuthApi = typeof authApi;

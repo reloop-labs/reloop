@@ -146,7 +146,7 @@ const Sidebar = () => {
 	useEffect(() => {
 		const fetchUserCount = async () => {
 			try {
-				const { data, error } = await authApi.api.auth.stats.users.get();
+				const { data, error } = await (authApi as any)["stats/users"].get();
 				if (!error && data) {
 					setUserCount(data.totalUsers);
 				}

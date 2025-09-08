@@ -14,7 +14,8 @@
 		"@reloop/ui": "workspace:*",
 		"react-dom": "catalog:ui",
 		"motion": "catalog:ui",
-		"@elysiajs/eden": "workspace:*"
+		"@elysiajs/eden": "catalog:ui",
+		"elysia": "latest"
 	},
 	"devDependencies": {
 		"@reloop/tailwind": "workspace:*",
