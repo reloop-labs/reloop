@@ -7,7 +7,8 @@ import { Logo } from "@reloop/ui/components/logo";
 import { cn } from "@reloop/ui/utils/cn";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { authApi } from "../../lib/api";
 
 interface SidebarItem {
 	id: string;
@@ -18,7 +19,7 @@ interface SidebarItem {
 	children?: SidebarItem[];
 }
 
-const sidebarItems: SidebarItem[] = [
+const getSidebarItems = (userCount: number | null): SidebarItem[] => [
 	{
 		id: "dashboard",
 		label: "Dashboard",
@@ -30,6 +31,7 @@ const sidebarItems: SidebarItem[] = [
 		label: "Users",
 		href: "/users",
 		iconName: "users",
+		badge: userCount !== null ? userCount.toString() : undefined,
 		// children: [
 		// 	{
 		// 		id: "all-users",
@@ -138,7 +140,23 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
 
 const Sidebar = () => {
 	const [isCollapsed, setIsCollapsed] = useState(false);
+	const [userCount, setUserCount] = useState<number | null>(null);
 	const pathname = usePathname();
+
+	useEffect(() => {
+		const fetchUserCount = async () => {
+			try {
+				const { data, error } = await authApi.api.auth.stats.users.get();
+				if (!error && data) {
+					setUserCount(data.totalUsers);
+				}
+			} catch (error) {
+				console.error("Failed to fetch user count:", error);
+			}
+		};
+
+		fetchUserCount();
+	}, []);
 
 	const isActive = (href: string) => {
 		if (href === "/") {
@@ -184,7 +202,7 @@ const Sidebar = () => {
 
 			{/* Navigation */}
 			<nav className="flex-1 space-y-2 overflow-y-auto p-4">
-				{sidebarItems.map((item) => (
+				{getSidebarItems(userCount).map((item) => (
 					<SidebarItem
 						key={item.id}
 						item={item}

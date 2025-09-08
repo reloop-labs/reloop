@@ -13,7 +13,8 @@
 		"react": "catalog:ui",
 		"@reloop/ui": "workspace:*",
 		"react-dom": "catalog:ui",
-		"motion": "catalog:ui"
+		"motion": "catalog:ui",
+		"@elysiajs/eden": "workspace:*"
 	},
 	"devDependencies": {
 		"@reloop/tailwind": "workspace:*",
