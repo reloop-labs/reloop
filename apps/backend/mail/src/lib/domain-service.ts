@@ -56,13 +56,21 @@ export class DomainService {
         if (existingDomain) {
           console.log(`Domain ${domain} already exists, returning existing details`);
           
-          const existingDkimKeys = await db.query.dkimKeys.findFirst({
-            where: eq(schema.dkimKeys.domain, domain),
+          const existingAliasDomain = await db.query.aliasDomain.findFirst({
+            where: eq(schema.aliasDomain.aliasDomain, domain),
           });
 
-          const existingDnsRecords = await db.query.dnsRecords.findMany({
-            where: eq(schema.dnsRecords.domain, domain),
-          });
+          const existingDkimKeys = existingAliasDomain
+            ? await db.query.dkimKeys.findFirst({
+                where: eq(schema.dkimKeys.aliasDomain, existingAliasDomain.aliasDomain),
+              })
+            : undefined;
+
+          const existingDnsRecords = existingAliasDomain
+            ? await db.query.dnsRecord.findMany({
+                where: eq(schema.dnsRecord.aliasDomain, existingAliasDomain.aliasDomain),
+              })
+            : [];
 
           const adminLocalPart = adminEmail.split('@')[0];
           const adminUsername = `${adminLocalPart}@${domain}`;
@@ -104,32 +112,55 @@ export class DomainService {
       await db.transaction(async (tx: any) => {
         await tx.insert(schema.domain).values({
           domain,
-          aRecord: serverIP,
+          organizationId: "system",
+          userId: "system",
           mailboxes,
           mailboxQuota,
           quota,
           rateLimit,
-          active: 1,
+          active: true,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+
+        await tx.insert(schema.aliasDomain).values({
+          aliasDomain: domain,
+          targetDomain: domain,
+          userId: "system",
+          organizationId: "system",
+          active: true,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         });
 
         await tx.insert(schema.dkimKeys).values({
-          domain,
+          organizationId: "system",
+          userId: "system",
+          aliasDomain: domain,
           selector: dkimKeys.selector,
           publicKey: dkimKeys.publicKey,
           privateKey: dkimKeys.privateKey,
           keyLength: 2048,
           algorithm: "rsa",
+          createdAt: new Date(),
+          updatedAt: new Date(),
         });
 
         for (const record of dnsRecords) {
-          await tx.insert(schema.dnsRecords).values({
-            domain,
+          await tx.insert(schema.dnsRecord).values({
+            id: Date.now(),
+            aliasDomain: domain,
+            organizationId: "system",
+            userId: "system",
             recordType: record.type,
             name: record.name,
             value: record.value,
-            ttl: record.ttl,
+            ttl: record.ttl ?? 3600,
             priority: record.priority,
             description: record.description,
+            isVerified: false,
+            createdAt: new Date(),
+            updatedAt: new Date(),
           });
         }
 
@@ -143,19 +174,25 @@ export class DomainService {
           password: hashedPassword,
           passwordEncode: "MD5-CRYPT",
           fullName: adminFullName,
-          isAdmin: 1,
+          isAdmin: true,
           maildir: `${domain}/${adminLocalPart}/`,
           quota: mailboxQuota,
           localPart: adminLocalPart,
           domain,
-          active: 1,
+          active: true,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         });
 
-        await tx.insert(schema.alias).values({
+        await tx.insert(schema.userAlias).values({
           address: adminUsername,
           goto: adminUsername,
           domain,
-          active: 1,
+          userId: "system",
+          organizationId: "system",
+          active: true,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         });
       });
 

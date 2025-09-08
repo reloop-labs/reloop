@@ -6,6 +6,9 @@
 		"dev": "bun run --watch src/index.ts",
 		"email": "email dev --dir src/emails",
 		"migrate": "bun run src/db/migrate.ts",
+		"db:generate": "drizzle-kit generate",
+		"db:migrate": "drizzle-kit migrate",
+		"db:push": "drizzle-kit push",
 		"build": "bun build src/index.ts --outdir dist",
 		"start": "bun run dist/index.js",
 		"test-api": "bun run test-api.js"
@@ -16,6 +19,7 @@
 		"@elysiajs/server-timing": "catalog:backend",
 		"@elysiajs/swagger": "catalog:backend",
 		"@paralleldrive/cuid2": "catalog:backend",
+		"better-auth": "catalog:backend",
 		"drizzle-orm": "catalog:db",
 		"drizzle-typebox": "catalog:db",
 		"elysia": "catalog:backend",
@@ -31,12 +35,15 @@
 		"react": "catalog:ui",
 		"react-dom": "catalog:ui",
 		"react-email": "catalog:ui",
-		"pg": "catalog:db"
+		"pg": "catalog:db",
+		"nodemailer": "catalog:backend"
 	},
 	"devDependencies": {
 		"@react-email/preview-server": "catalog:ui",
 		"bun-types": "catalog:backend",
-		"@types/pg": "catalog:db"
+		"@types/pg": "catalog:db",
+		"@types/nodemailer": "catalog:backend",
+		"drizzle-kit": "catalog:db"
 	},
 	"module": "src/index.js",
 	"overrides": {

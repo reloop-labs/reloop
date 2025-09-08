@@ -9,6 +9,8 @@ import { createInsertSchema } from "drizzle-typebox";
 import { Elysia, t } from "elysia";
 import { table } from "./db/schema";
 import { domainRouter } from "./routers/domain";
+import { mailRouter } from "./routers/mail";
+import { auth } from "./plugins/auth";
 
 const _createUser = createInsertSchema(table.user, {
 	// Replace email with Elysia's email type
@@ -41,6 +43,8 @@ const app = new Elysia()
 		}),
 	)
 	.mount("/api/domain", domainRouter)
+	.mount("/api/mail", mailRouter)
+	.mount("/api/auth", auth.handler)
 	.use(swagger({
 		documentation: {
 			info: {
@@ -58,6 +62,10 @@ const app = new Elysia()
 				{
 					name: "Domain Management",
 					description: "Operations for managing mail domains"
+				},
+				{
+					name: "Mail Service",
+					description: "Operations for sending emails and managing mail functionality"
 				}
 			]
 		}
@@ -91,3 +99,5 @@ console.log(
 console.log(`📧 Mail API available at ${app.server?.hostname}:${app.server?.port}/api`);
 console.log(`📚 Swagger docs available at ${app.server?.hostname}:${app.server?.port}/swagger`);
 console.log(`🔗 Domain API endpoint: ${app.server?.hostname}:${app.server?.port}/api/domain/add`);
+console.log(`📮 Mail API endpoint:`);
+console.log(`   - Send email: ${app.server?.hostname}:${app.server?.port}/api/mail/send`);
