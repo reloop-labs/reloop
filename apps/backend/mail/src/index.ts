@@ -5,12 +5,12 @@ import { serverTiming } from "@elysiajs/server-timing";
 import { swagger } from "@elysiajs/swagger";
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-proto";
 import { BatchSpanProcessor } from "@opentelemetry/sdk-trace-node";
+import { table } from "@reloop/db/schema";
 import { createInsertSchema } from "drizzle-typebox";
 import { Elysia, t } from "elysia";
-import { table } from "./db/schema";
+import { auth } from "./plugins/auth";
 import { domainRouter } from "./routers/domain";
 import { mailRouter } from "./routers/mail";
-import { auth } from "./plugins/auth";
 
 const _createUser = createInsertSchema(table.user, {
 	// Replace email with Elysia's email type
@@ -45,31 +45,35 @@ const app = new Elysia()
 	.mount("/api/domain", domainRouter)
 	.mount("/api/mail", mailRouter)
 	.mount("/api/auth", auth.handler)
-	.use(swagger({
-		documentation: {
-			info: {
-				title: "Reloop Mail Server API",
-				version: "1.0.0",
-				description: "API for managing mail server domains, DKIM keys, and DNS records"
-			},
-			servers: [
-				{
-					url: "http://localhost:3000",
-					description: "Development server"
-				}
-			],
-			tags: [
-				{
-					name: "Domain Management",
-					description: "Operations for managing mail domains"
+	.use(
+		swagger({
+			documentation: {
+				info: {
+					title: "Reloop Mail Server API",
+					version: "1.0.0",
+					description:
+						"API for managing mail server domains, DKIM keys, and DNS records",
 				},
-				{
-					name: "Mail Service",
-					description: "Operations for sending emails and managing mail functionality"
-				}
-			]
-		}
-	}))
+				servers: [
+					{
+						url: "http://localhost:3000",
+						description: "Development server",
+					},
+				],
+				tags: [
+					{
+						name: "Domain Management",
+						description: "Operations for managing mail domains",
+					},
+					{
+						name: "Mail Service",
+						description:
+							"Operations for sending emails and managing mail functionality",
+					},
+				],
+			},
+		}),
+	)
 	.get("/auth", ({ bearer }) => bearer, {
 		beforeHandle({ bearer, set, status }) {
 			if (!bearer) {
@@ -91,13 +95,22 @@ const app = new Elysia()
 	)
 	.get("/", () => "Hello, Elysia with Bearer Auth and Cron!")
 	.get("/health", () => ({ status: "ok", timestamp: new Date().toISOString() }))
+	.get("/health", () => ({ status: "ok", timestamp: new Date().toISOString() }))
 	.listen(3000);
 
 console.log(
 	`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`,
 );
-console.log(`📧 Mail API available at ${app.server?.hostname}:${app.server?.port}/api`);
-console.log(`📚 Swagger docs available at ${app.server?.hostname}:${app.server?.port}/swagger`);
-console.log(`🔗 Domain API endpoint: ${app.server?.hostname}:${app.server?.port}/api/domain/add`);
-console.log(`📮 Mail API endpoint:`);
-console.log(`   - Send email: ${app.server?.hostname}:${app.server?.port}/api/mail/send`);
+console.log(
+	`📧 Mail API available at ${app.server?.hostname}:${app.server?.port}/api`,
+);
+console.log(
+	`📚 Swagger docs available at ${app.server?.hostname}:${app.server?.port}/swagger`,
+);
+console.log(
+	`🔗 Domain API endpoint: ${app.server?.hostname}:${app.server?.port}/api/domain/add`,
+);
+console.log("📮 Mail API endpoint:");
+console.log(
+	`   - Send email: ${app.server?.hostname}:${app.server?.port}/api/mail/send`,
+);

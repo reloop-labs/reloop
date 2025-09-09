@@ -1,8 +1,8 @@
+import * as schema from "@reloop/db";
+import { db } from "@reloop/db";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { bearer, jwt, organization } from "better-auth/plugins";
-import { db } from "../db";
-import * as schema from "../db/schema";
 
 export const auth = betterAuth({
 	database: drizzleAdapter(db, {
@@ -18,11 +18,7 @@ export const auth = betterAuth({
 		updateAge: 60 * 60 * 24,
 	},
 	trustedOrigins: ["*"],
-	plugins: [
-		jwt(),
-		bearer(),
-		organization(),
-	],
+	plugins: [jwt(), bearer(), organization()],
 	advanced: {
 		cookiePrefix: "reloop",
 		ipAddress: {

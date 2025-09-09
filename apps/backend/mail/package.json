@@ -5,7 +5,7 @@
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"dev": "bun run --watch src/index.ts",
 		"email": "email dev --dir src/emails",
-		"migrate": "bun run src/db/migrate.ts",
+		"migrate": "bun run --cwd ../../packages/db migrate",
 		"db:generate": "drizzle-kit generate",
 		"db:migrate": "drizzle-kit migrate",
 		"db:push": "drizzle-kit push",

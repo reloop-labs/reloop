@@ -1,6 +1,6 @@
-import Elysia from "elysia";
-import { db } from "./db/pg";
-import { redis } from "./db/redis";
+import { db } from "@reloop/db";
+import { Elysia } from "elysia";
+import { redis } from "./redis";
 
 export const landing = new Elysia()
 	.get("/", async () => {

@@ -1,4 +1,5 @@
 import { drizzle, type NodePgDatabase } from "drizzle-orm/node-postgres";
+import * as v from "valibot";
 
 import * as schema from "./schema";
 
@@ -19,3 +20,16 @@ export const createDb = (opts?: DatabaseClientOptions): DatabaseInstance => {
 		},
 	});
 };
+
+const envSchema = v.object({
+	DB_POSTGRES_URL: v.optional(
+		v.string(),
+		"postgresql://localhost:5432/postgres",
+	),
+});
+
+const env = v.parse(envSchema, process.env);
+
+export const db = createDb({
+	databaseUrl: env.DB_POSTGRES_URL,
+});

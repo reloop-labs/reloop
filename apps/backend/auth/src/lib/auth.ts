@@ -1,3 +1,5 @@
+import * as schema from "@reloop/db";
+import { db } from "@reloop/db";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import {
@@ -8,9 +10,7 @@ import {
 	openAPI,
 	organization,
 } from "better-auth/plugins";
-import { db } from "../db/pg";
-import { redis } from "../db/redis";
-import * as schema from "../db/schema/auth";
+import { redis } from "../redis";
 export const auth = betterAuth({
 	database: drizzleAdapter(db, {
 		provider: "pg",

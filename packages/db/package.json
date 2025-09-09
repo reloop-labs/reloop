@@ -27,7 +27,11 @@
 		"lint": "eslint",
 		"push": "bun env:run drizzle-kit push",
 		"studio": "bun env:run drizzle-kit studio",
-		"typecheck": "tsc --build --noEmit --emitDeclarationOnly false"
+		"typecheck": "tsc --build --noEmit --emitDeclarationOnly false",
+		"db:generate": "bun env:run drizzle-kit generate",
+		"db:migrate": "bun env:run drizzle-kit migrate",
+		"db:push": "bun env:run drizzle-kit push",
+		"migrate": "bun run src/migrate.ts"
 	},
 	"dependencies": {
 		"drizzle-orm": "catalog:db",
