@@ -11,18 +11,18 @@
 	"dependencies": {
 		"next": "catalog:ui",
 		"react": "catalog:ui",
-		"@reloop/ui": "workspace:*",
+		"@ui": "workspace:*",
 		"react-dom": "catalog:ui",
 		"motion": "catalog:ui",
-		"@reloop/auth": "workspace:*",
+		"@auth": "workspace:*",
 		"@hookform/resolvers": "catalog:ui",
 		"react-hook-form": "catalog:ui",
 		"sonner": "catalog:ui",
 		"better-auth": "catalog:"
 	},
 	"devDependencies": {
-		"@reloop/tailwind": "workspace:*",
-		"@reloop/ts": "workspace:*",
+		"@tailwind": "workspace:*",
+		"@ts": "workspace:*",
 		"@tailwindcss/postcss": "catalog:ui",
 		"@types/node": "catalog:",
 		"@types/react": "catalog:ui",

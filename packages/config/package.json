@@ -1,5 +1,5 @@
 {
-	"name": "@reloop/config",
+	"name": "@config",
 	"private": true,
 	"type": "module",
 	"exports": {
@@ -30,7 +30,7 @@
 	},
 	"dependencies": {},
 	"devDependencies": {
-		"@reloop/ts": "workspace:*",
+		"@ts": "workspace:*",
 		"@types/node": "catalog:",
 		"typescript": "catalog:"
 	}

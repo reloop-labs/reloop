@@ -1,7 +1,7 @@
 "use client";
 
-import * as Button from "@reloop/ui/components/button";
-import { Icon } from "@reloop/ui/components/icon";
+import * as Button from "@ui/components/button";
+import { Icon } from "@ui/components/icon";
 import { motion } from "framer-motion";
 import { useTheme } from "next-themes";
 

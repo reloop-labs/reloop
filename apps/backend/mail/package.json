@@ -19,7 +19,7 @@
 		"@elysiajs/server-timing": "catalog:backend",
 		"@elysiajs/swagger": "catalog:backend",
 		"@paralleldrive/cuid2": "catalog:backend",
-		"better-auth": "catalog:backend",
+		"better-auth": "catalog:",
 		"drizzle-orm": "catalog:db",
 		"drizzle-typebox": "catalog:db",
 		"elysia": "catalog:backend",

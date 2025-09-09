@@ -1,5 +1,5 @@
+import { and, db, domains, eq, mailboxes } from "@db";
 import { render } from "@react-email/render";
-import { and, db, domains, eq, mailboxes } from "@reloop/db";
 import { createHash } from "crypto";
 import { createTransport, type Transporter } from "nodemailer";
 

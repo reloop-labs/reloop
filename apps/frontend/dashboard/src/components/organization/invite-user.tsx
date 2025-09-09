@@ -1,14 +1,14 @@
 "use client";
 
+import { authClient } from "@auth/client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { authClient } from "@reloop/auth/client";
-import * as Button from "@reloop/ui/components/button";
-import { Icon } from "@reloop/ui/components/icon";
-import * as Input from "@reloop/ui/components/input";
-import * as Label from "@reloop/ui/components/label";
-import * as Modal from "@reloop/ui/components/modal";
-import * as Select from "@reloop/ui/components/select";
-import Spinner from "@reloop/ui/components/spinner";
+import * as Button from "@ui/components/button";
+import { Icon } from "@ui/components/icon";
+import * as Input from "@ui/components/input";
+import * as Label from "@ui/components/label";
+import * as Modal from "@ui/components/modal";
+import * as Select from "@ui/components/select";
+import Spinner from "@ui/components/spinner";
 import { useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";

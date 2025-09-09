@@ -1,5 +1,5 @@
 {
-	"name": "@reloop/ui",
+	"name": "@ui",
 	"private": true,
 	"version": "0.1.0",
 	"type": "module",
@@ -58,7 +58,7 @@
 		"tailwind-variants": "catalog:ui"
 	},
 	"devDependencies": {
-		"@reloop/ts": "workspace:*"
+		"@ts": "workspace:*"
 	},
 	"peerDependencies": {
 		"react": "catalog:ui",

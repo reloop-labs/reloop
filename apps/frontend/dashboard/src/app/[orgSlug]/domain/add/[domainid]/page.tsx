@@ -1,8 +1,8 @@
 "use client";
 import { useUserOrganization } from "@dashboard/providers/org-provider";
-import * as Button from "@reloop/ui/components/button";
-import { Icon } from "@reloop/ui/components/icon";
-import * as Table from "@reloop/ui/components/table";
+import * as Button from "@ui/components/button";
+import { Icon } from "@ui/components/icon";
+import * as Table from "@ui/components/table";
 import { motion } from "motion/react";
 import * as React from "react";
 import { Globe } from "../../globe";

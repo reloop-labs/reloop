@@ -1,5 +1,5 @@
 {
-	"name": "@reloop/tailwind",
+	"name": "@tailwind",
 	"type": "module",
 	"scripts": {
 		"clean": "git clean -xdf .cache .turbo node_modules",

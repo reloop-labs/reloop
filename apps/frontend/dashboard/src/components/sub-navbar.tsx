@@ -1,7 +1,7 @@
 "use client";
 import { useUserOrganization } from "@dashboard/providers/org-provider";
-import * as TabMenuHorizontal from "@reloop/ui/components/tab-menu-horizontal";
-import { cn } from "@reloop/ui/utils/cn";
+import * as TabMenuHorizontal from "@ui/components/tab-menu-horizontal";
+import { cn } from "@ui/utils/cn";
 import { AnimatePresence, motion } from "motion/react";
 import { usePathname } from "next/navigation";
 import { useRef, useState } from "react";

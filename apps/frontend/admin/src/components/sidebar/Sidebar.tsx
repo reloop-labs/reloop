@@ -1,10 +1,10 @@
 "use client";
 
-import { Root as Badge } from "@reloop/ui/components/badge";
-import * as Button from "@reloop/ui/components/button";
-import { Icon } from "@reloop/ui/components/icon";
-import { Logo } from "@reloop/ui/components/logo";
-import { cn } from "@reloop/ui/utils/cn";
+import { Root as Badge } from "@ui/components/badge";
+import * as Button from "@ui/components/button";
+import { Icon } from "@ui/components/icon";
+import { Logo } from "@ui/components/logo";
+import { cn } from "@ui/utils/cn";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";

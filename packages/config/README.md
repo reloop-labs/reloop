@@ -1,4 +1,4 @@
-# @reloop/config
+# @config
 
 Configuration package for the Reloop application that exports JSON configuration objects with TypeScript types.
 
@@ -14,7 +14,7 @@ Configuration package for the Reloop application that exports JSON configuration
 ### Basic Import
 
 ```typescript
-import { config } from '@reloop/config';
+import { config } from '@config';
 
 // Access the full configuration
 console.log(config.app.name); // "Reloop"
@@ -25,7 +25,7 @@ console.log(config.mail.smtp.port); // 587
 ### Individual Module Imports
 
 ```typescript
-import { appConfig, databaseConfig, mailConfig } from '@reloop/config';
+import { appConfig, databaseConfig, mailConfig } from '@config';
 
 // Use specific configuration sections
 const port = appConfig.port;
@@ -36,7 +36,7 @@ const smtpPort = mailConfig.smtp.port;
 ### Type Safety
 
 ```typescript
-import type { Config, AppConfig, DatabaseConfig, MailConfig } from '@reloop/config';
+import type { Config, AppConfig, DatabaseConfig, MailConfig } from '@config';
 
 // All configuration objects are fully typed
 function setupApp(config: AppConfig) {

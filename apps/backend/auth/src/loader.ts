@@ -1,4 +1,4 @@
-import { db } from "@reloop/db";
+import { db } from "@db";
 import { redis } from "./redis";
 
 export const loader = async () => {

@@ -1,7 +1,7 @@
 "use client";
 import { useUserOrganization } from "@dashboard/providers/org-provider";
-import { Icon } from "@reloop/ui/components/icon";
-import { cn } from "@reloop/ui/utils/cn";
+import { Icon } from "@ui/components/icon";
+import { cn } from "@ui/utils/cn";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";

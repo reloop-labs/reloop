@@ -1,7 +1,7 @@
 "use client";
 
-import { Icon } from "@reloop/ui/components/icon";
-import { cn } from "@reloop/ui/utils/cn";
+import { Icon } from "@ui/components/icon";
+import { cn } from "@ui/utils/cn";
 import { useTheme } from "next-themes";
 import type React from "react";
 import { useEffect, useMemo, useRef, useState } from "react";

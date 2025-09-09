@@ -1,5 +1,5 @@
-import * as schema from "@reloop/db";
-import { db, eq } from "@reloop/db";
+import * as schema from "@db";
+import { db, eq } from "@db";
 import { DKIMGenerator, type DNSRecord } from "./dkim";
 
 export interface AddDomainRequest {

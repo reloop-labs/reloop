@@ -10,8 +10,8 @@
 	},
 	"dependencies": {
 		"@hookform/resolvers": "catalog:ui",
-		"@reloop/auth": "workspace:*",
-		"@reloop/ui": "workspace:*",
+		"@auth": "workspace:*",
+		"@ui": "workspace:*",
 		"@tanstack/react-table": "catalog:ui",
 		"better-auth": "catalog:",
 		"dayjs": "catalog:ui",

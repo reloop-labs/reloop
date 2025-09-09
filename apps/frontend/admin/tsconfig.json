@@ -1,5 +1,5 @@
 {
-	"extends": "@reloop/ts/next.json",
+	"extends": "@ts/next.json",
 	"compilerOptions": {
 		"target": "ES2017",
 		"lib": ["dom", "dom.iterable", "esnext"],

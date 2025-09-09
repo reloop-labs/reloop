@@ -22,7 +22,7 @@ RUN pnpm install --global turbo@^2
 COPY . .
 
 # https://turbo.build/repo/docs/guides/tools/docker#the-solution
-RUN turbo prune @reloop/db --docker \
+RUN turbo prune @db --docker \
     && pnpm install --frozen-lockfile
 
 CMD ["/bin/sh"]

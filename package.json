@@ -152,8 +152,7 @@
 		"@biomejs/biome": "2.1.2",
 		"husky": "9.1.7",
 		"lint-staged": "15.5.0",
-		"turbo": "2.5.5",
-		"ultracite": "5.1.2"
+		"turbo": "2.5.5"
 	},
 	"lint-staged": {
 		"*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}": [

@@ -1,6 +1,6 @@
 "use client";
-import * as TabMenuHorizontal from "@reloop/ui/components/tab-menu-horizontal";
-import { cn } from "@reloop/ui/utils/cn";
+import * as TabMenuHorizontal from "@ui/components/tab-menu-horizontal";
+import { cn } from "@ui/utils/cn";
 import { AnimatePresence, motion } from "motion/react";
 import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";

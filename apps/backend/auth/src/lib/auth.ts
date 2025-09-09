@@ -1,5 +1,5 @@
-import * as schema from "@reloop/db";
-import { db } from "@reloop/db";
+import * as schema from "@db";
+import { db } from "@db";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import {

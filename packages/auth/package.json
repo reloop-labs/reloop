@@ -1,5 +1,5 @@
 {
-	"name": "@reloop/auth",
+	"name": "@auth",
 	"version": "0.1.0",
 	"private": true,
 	"type": "module",
@@ -16,11 +16,11 @@
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
-		"@reloop/db": "workspace:*",
+		"@db": "workspace:*",
 		"better-auth": "catalog:"
 	},
 	"devDependencies": {
-		"@reloop/ts": "workspace:*",
+		"@ts": "workspace:*",
 		"@types/node": "catalog:",
 		"typescript": "catalog:"
 	}

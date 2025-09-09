@@ -1,5 +1,5 @@
 {
-	"name": "@reloop/db",
+	"name": "@db",
 	"private": true,
 	"type": "module",
 	"exports": {
@@ -40,7 +40,7 @@
 		"valibot": "catalog:db"
 	},
 	"devDependencies": {
-		"@reloop/ts": "workspace:*",
+		"@ts": "workspace:*",
 		"@types/node": "catalog:",
 		"@types/pg": "catalog:db",
 		"dotenv-cli": "catalog:db",

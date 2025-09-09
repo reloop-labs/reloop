@@ -1,3 +1,4 @@
+import { table } from "@db/schema";
 import { bearer } from "@elysiajs/bearer";
 import { cron } from "@elysiajs/cron";
 import { opentelemetry } from "@elysiajs/opentelemetry";
@@ -5,7 +6,6 @@ import { serverTiming } from "@elysiajs/server-timing";
 import { swagger } from "@elysiajs/swagger";
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-proto";
 import { BatchSpanProcessor } from "@opentelemetry/sdk-trace-node";
-import { table } from "@reloop/db/schema";
 import { createInsertSchema } from "drizzle-typebox";
 import { Elysia, t } from "elysia";
 import { auth } from "./plugins/auth";
