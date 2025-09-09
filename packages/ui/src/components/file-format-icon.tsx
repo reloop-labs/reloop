@@ -1,7 +1,7 @@
 // AlignUI FileFormatIcon v0.0.0
 
 import type * as React from "react";
-import { tv, type VariantProps } from "@/utils/tv";
+import { tv, type VariantProps } from "../utils/tv";
 
 export const fileFormatIconVariants = tv({
 	slots: {

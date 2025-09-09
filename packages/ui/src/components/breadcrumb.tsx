@@ -3,7 +3,7 @@
 import { Slot } from "@radix-ui/react-slot";
 import { cn } from "@reloop/ui/cn";
 import * as React from "react";
-import type { PolymorphicComponentProps } from "@/utils/polymorphic";
+import type { PolymorphicComponentProps } from "../utils/polymorphic";
 
 const BREADCRUMB_ROOT_NAME = "BreadcrumbRoot";
 const BREADCRUMB_ITEM_NAME = "BreadcrumbItem";

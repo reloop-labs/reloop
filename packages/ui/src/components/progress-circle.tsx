@@ -2,7 +2,7 @@
 
 import { cn } from "@reloop/ui/cn";
 import * as React from "react";
-import { tv, type VariantProps } from "@/utils/tv";
+import { tv, type VariantProps } from "../utils/tv";
 
 export const progressCircleVariants = tv({
 	slots: {

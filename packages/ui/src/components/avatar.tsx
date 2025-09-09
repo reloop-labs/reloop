@@ -3,8 +3,8 @@
 import { Slot } from "@radix-ui/react-slot";
 import { cn } from "@reloop/ui/cn";
 import * as React from "react";
-import { recursiveCloneChildren } from "@/utils/recursive-clone-children";
-import { tv, type VariantProps } from "@/utils/tv";
+import { recursiveCloneChildren } from "../utils/recursive-clone-children";
+import { tv, type VariantProps } from "../utils/tv";
 import { IconEmptyCompany, IconEmptyUser } from "./avatar-empty-icons";
 
 export const AVATAR_ROOT_NAME = "AvatarRoot";

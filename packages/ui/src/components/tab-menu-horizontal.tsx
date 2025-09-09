@@ -8,7 +8,7 @@ import { cn } from "@reloop/ui/cn";
 import { useTabObserver } from "@reloop/ui/hooks/use-tab-observer";
 import mergeRefs from "merge-refs";
 import * as React from "react";
-import type { PolymorphicComponentProps } from "@/utils/polymorphic";
+import type { PolymorphicComponentProps } from "../utils/polymorphic";
 
 const TabMenuHorizontalContent = TabsPrimitive.Content;
 TabMenuHorizontalContent.displayName = "TabMenuHorizontalContent";

@@ -1,9 +1,9 @@
 // AlignUI Alert v0.0.0
 
 import * as React from "react";
-import type { PolymorphicComponentProps } from "@/utils/polymorphic";
-import { recursiveCloneChildren } from "@/utils/recursive-clone-children";
-import { type ClassValue, tv, type VariantProps } from "@/utils/tv";
+import type { PolymorphicComponentProps } from "../utils/polymorphic";
+import { recursiveCloneChildren } from "../utils/recursive-clone-children";
+import { type ClassValue, tv, type VariantProps } from "../utils/tv";
 import { Icon } from "./icon";
 
 const ALERT_ROOT_NAME = "AlertRoot";

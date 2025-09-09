@@ -2,9 +2,9 @@
 
 import { Slot } from "@radix-ui/react-slot";
 import * as React from "react";
-import type { PolymorphicComponentProps } from "@/utils/polymorphic";
-import { recursiveCloneChildren } from "@/utils/recursive-clone-children";
-import { tv, type VariantProps } from "@/utils/tv";
+import type { PolymorphicComponentProps } from "../utils/polymorphic";
+import { recursiveCloneChildren } from "../utils/recursive-clone-children";
+import { tv, type VariantProps } from "../utils/tv";
 
 const INPUT_ROOT_NAME = "InputRoot";
 const INPUT_WRAPPER_NAME = "InputWrapper";

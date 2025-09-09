@@ -3,9 +3,9 @@
 import { Slot } from "@radix-ui/react-slot";
 import { cn } from "@reloop/ui/cn";
 import * as React from "react";
-import type { PolymorphicComponentProps } from "@/utils/polymorphic";
-import { recursiveCloneChildren } from "@/utils/recursive-clone-children";
-import { tv, type VariantProps } from "@/utils/tv";
+import type { PolymorphicComponentProps } from "../utils/polymorphic";
+import { recursiveCloneChildren } from "../utils/recursive-clone-children";
+import { tv, type VariantProps } from "../utils/tv";
 
 const VERTICAL_STEPPER_ROOT_NAME = "VerticalStepperRoot";
 const VERTICAL_STEPPER_ARROW_NAME = "VerticalStepperArrow";
