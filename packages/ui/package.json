@@ -3,9 +3,6 @@
 	"version": "1.0.0",
 	"private": true,
 	"sideEffects": false,
-	"files": [
-		"globals.css"
-	],
 	"scripts": {
 		"clean": "rm -rf .turbo node_modules",
 		"lint": "biome check .",
@@ -76,7 +73,8 @@
 		"./link-button": "./src/components/link-button.tsx",
 		"./divider": "./src/components/divider.tsx",
 		"./use-loading": "./src/hooks/use-loading.ts",
-		"./theme-toggle": "./src/components/theme-toggle.tsx"
+		"./theme-toggle": "./src/components/theme-toggle.tsx",
+		"./style.css": "./src/style.css"
 	},
 	"dependencies": {
 		"@radix-ui/react-accordion": "catalog:ui",
@@ -106,10 +104,12 @@
 		"react-otp-input": "catalog:ui",
 		"sonner": "catalog:ui",
 		"tailwind-merge": "catalog:ui",
-		"tailwind-variants": "catalog:ui"
+		"tailwind-variants": "catalog:ui",
+		"tailwindcss": "catalog:ui"
 	},
 	"devDependencies": {
-		"@reloop/tsconfig": "workspace:*"
+		"@reloop/tsconfig": "workspace:*",
+		"@tailwindcss/postcss": "catalog:ui"
 	},
 	"peerDependencies": {
 		"react": "catalog:ui",

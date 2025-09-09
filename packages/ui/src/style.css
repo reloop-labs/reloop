@@ -1,7 +1,5 @@
 @import "tailwindcss";
 
-@plugin 'tailwindcss-animate';
-
 @theme {
 	/* AlignUI Raw Colors */
 	--color-gray-950: 20.46% 0 0;

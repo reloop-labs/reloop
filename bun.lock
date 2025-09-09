@@ -337,6 +337,7 @@
         "sonner": "catalog:ui",
         "tailwind-merge": "catalog:ui",
         "tailwind-variants": "catalog:ui",
+        "tailwindcss": "catalog:ui",
       },
       "devDependencies": {
         "@reloop/tsconfig": "workspace:*",
