@@ -23,8 +23,6 @@
 		"env:copy-example": "shx -- cp -n .env.example .env",
 		"env:remove": "shx -- rm -f .env",
 		"env:run": "dotenv --",
-		"format": "prettier --check . --ignore-path ../../.gitignore",
-		"lint": "eslint",
 		"push": "bun env:run drizzle-kit push",
 		"studio": "bun env:run drizzle-kit studio",
 		"typecheck": "tsc --build --noEmit --emitDeclarationOnly false",
