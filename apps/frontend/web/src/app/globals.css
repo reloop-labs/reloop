@@ -1,3 +1,4 @@
+@import "tailwindcss";
 @import "@reloop/ui/style.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
