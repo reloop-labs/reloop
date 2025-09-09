@@ -1,8 +1,8 @@
 // AlignUI Modal v0.0.0
 
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { cn } from "@ui/utils/cn";
 import * as React from "react";
+import { cn } from "@/utils/cn";
 import * as CompactButton from "./compact-button";
 import { Icon } from "./icon";
 

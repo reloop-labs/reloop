@@ -3,9 +3,9 @@
 "use client";
 
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
-import { cn } from "@ui/utils/cn";
-import type { PolymorphicComponentProps } from "@ui/utils/polymorphic";
 import * as React from "react";
+import { cn } from "@/utils/cn";
+import type { PolymorphicComponentProps } from "@/utils/polymorphic";
 import { Icon } from "./icon";
 
 const DropdownMenu = DropdownMenuPrimitive.Root;

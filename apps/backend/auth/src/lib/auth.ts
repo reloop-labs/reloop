@@ -1,5 +1,5 @@
-import * as schema from "@db";
-import { db } from "@db";
+import { db } from "@reloop/db/client";
+import * as schema from "@reloop/db/schema";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import {
@@ -10,7 +10,8 @@ import {
 	openAPI,
 	organization,
 } from "better-auth/plugins";
-import { redis } from "../redis";
+import { redis } from "./redis";
+
 export const auth = betterAuth({
 	database: drizzleAdapter(db, {
 		provider: "pg",
@@ -36,11 +37,11 @@ export const auth = betterAuth({
 			return await redis.get(key);
 		},
 		set: async (key, value, ttl) => {
-			if (ttl) await redis.set(key, value, { EX: ttl });
+			if (ttl) await redis.set(key, value, ttl);
 			else await redis.set(key, value);
 		},
 		delete: async (key) => {
-			await redis.del(key);
+			await redis.delete(key);
 		},
 	},
 	basePath: "/api/auth/v1",

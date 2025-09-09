@@ -17,7 +17,7 @@ import {
 import { LLMCopyButton, ViewOptions } from "@dev/components/page-actions";
 import { source } from "@dev/lib/source";
 import { getMDXComponents } from "@dev/mdx-components";
-import { Icon } from "@ui/components/icon";
+import { Icon } from "@reloop/ui/components/icon";
 import { DocsLayout } from "fumadocs-ui/layouts/notebook";
 import { createRelativeLink } from "fumadocs-ui/mdx";
 import { DocsBody, DocsPage } from "fumadocs-ui/page";

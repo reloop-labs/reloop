@@ -1,0 +1,3 @@
+{
+	"extends": "@reloop/tsconfig/base.json"
+}

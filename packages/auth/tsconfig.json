@@ -1,5 +1,5 @@
 {
-	"extends": "@ts/internal-package.json",
+	"extends": "@reloop/tsconfig/base.json",
 	"include": ["src"],
 	"exclude": ["node_modules"],
 	"compilerOptions": {

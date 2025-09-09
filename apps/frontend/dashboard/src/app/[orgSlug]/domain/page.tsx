@@ -1,15 +1,15 @@
 "use client";
 import { useUserOrganization } from "@dashboard/providers/org-provider";
-import * as Button from "@ui/components/button";
-import { Icon } from "@ui/components/icon";
-import * as Popover from "@ui/components/popover";
-import * as StatusBadge from "@ui/components/status-badge";
-import * as Table from "@ui/components/table";
-import { cn } from "@ui/utils/cn";
+import * as Button from "@reloop/ui/components/button";
+import { Icon } from "@reloop/ui/components/icon";
+import * as Popover from "@reloop/ui/components/popover";
+import * as StatusBadge from "@reloop/ui/components/status-badge";
+import * as Table from "@reloop/ui/components/table";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Link from "next/link";
 import * as React from "react";
+import { cn } from "@/utils/cn";
 
 // Initialize dayjs with relative time plugin
 dayjs.extend(relativeTime);

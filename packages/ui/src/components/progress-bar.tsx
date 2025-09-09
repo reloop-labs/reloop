@@ -1,7 +1,7 @@
 // AlignUI ProgressBar v0.0.0
 
-import { tv, type VariantProps } from "@ui/utils/tv";
 import * as React from "react";
+import { tv, type VariantProps } from "@/utils/tv";
 
 export const progressBarVariants = tv({
 	slots: {

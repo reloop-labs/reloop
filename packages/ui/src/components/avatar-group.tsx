@@ -1,8 +1,8 @@
 // AlignUI AvatarGroup v0.0.0
 
-import { recursiveCloneChildren } from "@ui/utils/recursive-clone-children";
-import { tv, type VariantProps } from "@ui/utils/tv";
 import * as React from "react";
+import { recursiveCloneChildren } from "@/utils/recursive-clone-children";
+import { tv, type VariantProps } from "@/utils/tv";
 import { AVATAR_ROOT_NAME } from "./avatar";
 
 const AVATAR_GROUP_ROOT_NAME = "AvatarGroupRoot";

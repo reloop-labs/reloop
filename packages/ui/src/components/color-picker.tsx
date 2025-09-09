@@ -1,6 +1,5 @@
 "use client";
 
-import { cn } from "@ui/utils/cn";
 import * as React from "react";
 import {
 	ColorArea as AriaColorArea,
@@ -23,6 +22,7 @@ import {
 	composeRenderProps,
 	parseColor,
 } from "react-aria-components";
+import { cn } from "@/utils/cn";
 
 const ColorField = AriaColorField;
 const ColorPicker = AriaColorPicker;
@@ -139,7 +139,7 @@ const EyeDropperButton = React.forwardRef<
 	const state = React.useContext(ColorPickerStateContext)!;
 
 	// eslint-disable-next-line
-	// @ts-ignore
+	// @reloop/tsconfig-ignore
 	if (typeof EyeDropper === "undefined") {
 		return null;
 	}
@@ -150,7 +150,7 @@ const EyeDropperButton = React.forwardRef<
 			aria-label="Eye dropper"
 			onClick={() => {
 				// eslint-disable-next-line
-				// @ts-ignore
+				// @reloop/tsconfig-ignore
 				new EyeDropper()
 					.open()
 					.then((result: { sRGBHex: string }) =>

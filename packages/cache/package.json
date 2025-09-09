@@ -1,0 +1,13 @@
+{
+	"name": "@reloop/cache",
+	"version": "0.0.1",
+	"private": true,
+	"exports": {
+		"./redis-client": "./src/redis-client.ts",
+		"./health": "./src/health.ts"
+	},
+	"dependencies": {
+		"redis": "catalog:db",
+		"@types/redis": "catalog:db"
+	}
+}

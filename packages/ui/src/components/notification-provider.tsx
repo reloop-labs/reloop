@@ -1,6 +1,6 @@
 "use client";
 
-import { useNotification } from "@ui/hooks/use-notification";
+import { useNotification } from "@reloop/ui/hooks/use-notification";
 import * as Notification from "./notification";
 
 const NotificationProvider = () => {

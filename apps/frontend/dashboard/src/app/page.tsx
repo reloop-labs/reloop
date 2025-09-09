@@ -1,5 +1,5 @@
 "use client";
-import Spinner from "@ui/components/spinner";
+import Spinner from "@reloop/ui/components/spinner";
 import { useRouter } from "next/navigation";
 import { authClient } from "packages/auth/src/client";
 import { useEffect } from "react";

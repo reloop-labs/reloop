@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import SWRProvider from "@dashboard/providers/swr.config";
-import { IconsSprite } from "@ui/components/icon";
+import { IconsSprite } from "@reloop/ui/components/icon";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { NuqsAdapter } from "nuqs/adapters/next/app";

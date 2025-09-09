@@ -1,9 +1,9 @@
 // AlignUI FileUpload v0.0.0
 
 import { Slot } from "@radix-ui/react-slot";
-import { cn } from "@ui/utils/cn";
-import type { PolymorphicComponentProps } from "@ui/utils/polymorphic";
 import * as React from "react";
+import { cn } from "@/utils/cn";
+import type { PolymorphicComponentProps } from "@/utils/polymorphic";
 
 const FileUpload = React.forwardRef<
 	HTMLLabelElement,

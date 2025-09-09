@@ -1,5 +1,5 @@
 {
-	"extends": "@ts/base.json",
+	"extends": "@reloop/tsconfig/base.json",
 	"compilerOptions": {
 		"target": "ESNext",
 		"module": "ESNext",
@@ -12,6 +12,7 @@
 		"composite": false,
 		"jsx": "react-jsx",
 		"declaration": false,
-		"declarationMap": false
+		"declarationMap": false,
+		"baseUrl": "."
 	}
 }

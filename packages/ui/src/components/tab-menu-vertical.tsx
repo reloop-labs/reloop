@@ -1,9 +1,9 @@
 "use client";
 
 import * as TabsPrimitive from "@radix-ui/react-tabs";
-import { cn } from "@ui/utils/cn";
-import type { PolymorphicComponentProps } from "@ui/utils/polymorphic";
 import * as React from "react";
+import { cn } from "@/utils/cn";
+import type { PolymorphicComponentProps } from "@/utils/polymorphic";
 
 const TabMenuVerticalContent = TabsPrimitive.Content;
 TabMenuVerticalContent.displayName = "TabMenuVerticalContent";

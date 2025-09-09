@@ -3,14 +3,14 @@
 import { authClient } from "@auth/client";
 import { useUserOrganization } from "@dashboard/providers/org-provider";
 import { useOrgStore } from "@dashboard/store/use-org-store";
-import * as Avatar from "@ui/components/avatar";
-import * as Button from "@ui/components/button";
-import { Icon } from "@ui/components/icon";
-import * as Popover from "@ui/components/popover";
-import { cn } from "@ui/utils/cn";
+import * as Avatar from "@reloop/ui/components/avatar";
+import * as Button from "@reloop/ui/components/button";
+import { Icon } from "@reloop/ui/components/icon";
+import * as Popover from "@reloop/ui/components/popover";
 import { AnimatePresence, motion } from "motion/react";
 import { useRef, useState } from "react";
 import useSWR from "swr";
+import { cn } from "@/utils/cn";
 
 export const OrganizationNavbar = () => {
 	const { data, isLoading } = useSWR(

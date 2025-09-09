@@ -15,7 +15,7 @@
 		"@radix-ui/react-popover": "catalog:ui",
 		"@radix-ui/react-presence": "catalog:ui",
 		"@radix-ui/react-scroll-area": "catalog:ui",
-		"@ui": "workspace:*",
+		"@reloop/ui": "workspace:*",
 		"class-variance-authority": "catalog:ui",
 		"fumadocs-core": "catalog:ui",
 		"fumadocs-mdx": "catalog:ui",

@@ -1,4 +1,4 @@
-import { Icon } from "@ui/components/icon";
+import { Icon } from "@reloop/ui/components/icon";
 import { loader } from "fumadocs-core/source";
 import { attachFile, createOpenAPI } from "fumadocs-openapi/server";
 import { createElement } from "react";

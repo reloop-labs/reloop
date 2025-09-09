@@ -1,5 +1,5 @@
 import { drizzle, type NodePgDatabase } from "drizzle-orm/node-postgres";
-import * as schema from "./schemas/index";
+import * as schema from "./schema/index";
 
 export interface DatabaseClientOptions {
 	databaseUrl?: string;

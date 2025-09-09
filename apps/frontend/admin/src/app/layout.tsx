@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { IconsSprite } from "@ui/components/icon";
+import { IconsSprite } from "@reloop/ui/components/icon";
 import { ThemeProvider } from "next-themes";
 import AppWrapper from "../components/AppWrapper";
 

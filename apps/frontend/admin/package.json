@@ -11,13 +11,12 @@
 	"dependencies": {
 		"next": "catalog:ui",
 		"react": "catalog:ui",
-		"@ui": "workspace:*",
+		"@reloop/ui": "workspace:*",
 		"react-dom": "catalog:ui",
 		"motion": "catalog:ui"
 	},
 	"devDependencies": {
-		"@tailwind": "workspace:*",
-		"@ts": "workspace:*",
+		"@reloop/tsconfig": "workspace:*",
 		"@tailwindcss/postcss": "catalog:ui",
 		"@types/node": "catalog:",
 		"@types/react": "catalog:ui",

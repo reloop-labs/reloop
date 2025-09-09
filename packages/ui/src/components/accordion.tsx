@@ -3,9 +3,9 @@
 "use client";
 
 import * as AccordionPrimitive from "@radix-ui/react-accordion";
-import { cn } from "@ui/utils/cn";
-import type { PolymorphicComponentProps } from "@ui/utils/polymorphic";
 import * as React from "react";
+import { cn } from "@/utils/cn";
+import type { PolymorphicComponentProps } from "@/utils/polymorphic";
 import { Icon } from "./icon";
 
 const ACCORDION_ITEM_NAME = "AccordionItem";

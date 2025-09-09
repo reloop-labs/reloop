@@ -1,8 +1,10 @@
 {
-	"extends": "@ts/internal-package.json",
+	"extends": "@reloop/tsconfig/react-library.json",
 	"compilerOptions": {
-		"lib": ["ES2022", "dom", "dom.iterable"],
-		"jsx": "preserve"
+		"baseUrl": ".",
+		"paths": {
+			"@/*": ["./src/*"]
+		}
 	},
 	"include": ["src"],
 	"exclude": ["node_modules"]

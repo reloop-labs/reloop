@@ -1,4 +1,4 @@
-import { Logo } from "@ui/components/logo";
+import { Logo } from "@reloop/ui/components/logo";
 import { ThemeToggle } from "./theme-toggle";
 
 const links = [

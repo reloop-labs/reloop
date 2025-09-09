@@ -1,20 +1,11 @@
 {
-	"name": "@db",
+	"name": "@reloop/db",
 	"private": true,
-	"type": "module",
 	"exports": {
-		".": {
-			"types": "./dist/src/index.d.ts",
-			"default": "./src/index.ts"
-		},
-		"./client": {
-			"types": "./dist/src/client.d.ts",
-			"default": "./src/client.ts"
-		},
-		"./schema": {
-			"types": "./dist/src/schemas/index.d.ts",
-			"default": "./src/schemas/index.ts"
-		}
+		"./client": "./src/client.ts",
+		"./schema": "./src/schema/index.ts",
+		"./index": "./src/index.ts",
+		"./utils": "./src/utils/*"
 	},
 	"scripts": {
 		"build": "tsc --build",
@@ -35,10 +26,11 @@
 	"dependencies": {
 		"drizzle-orm": "catalog:db",
 		"drizzle-typebox": "catalog:db",
-		"pg": "catalog:db"
+		"pg": "catalog:db",
+		"redis": "catalog:db"
 	},
 	"devDependencies": {
-		"@ts": "workspace:*",
+		"@reloop/tsconfig": "workspace:*",
 		"@types/node": "catalog:",
 		"@types/pg": "catalog:db",
 		"dotenv-cli": "catalog:db",

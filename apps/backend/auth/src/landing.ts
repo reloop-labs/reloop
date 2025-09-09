@@ -1,6 +1,6 @@
-import { db } from "@db";
+import { db } from "@reloop/db/client";
 import { Elysia } from "elysia";
-import { redis } from "./redis";
+import { redis } from "./lib/redis";
 
 export const landing = new Elysia()
 	.get("/", async () => {
@@ -18,7 +18,7 @@ export const landing = new Elysia()
 		}
 
 		try {
-			await redis.ping();
+			await redis.healthCheck();
 			redisStatus = "CONNECTED";
 		} catch (redisErr) {
 			redisStatus = "DISCONNECTED";
@@ -71,7 +71,7 @@ ${redisError ? `║ REDIS ERROR: ${redisError.substring(0, 50).padEnd(50)} ║` 
 	.get("/health/redis", async () => {
 		try {
 			const startTime = Date.now();
-			await redis.ping();
+			await redis.healthCheck();
 			const responseTime = Date.now() - startTime;
 
 			return {

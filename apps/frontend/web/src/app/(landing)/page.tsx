@@ -1,4 +1,4 @@
-import * as Button from "@ui/components/button";
+import * as Button from "@reloop/ui/components/button";
 import Link from "next/link";
 
 export default function Home() {

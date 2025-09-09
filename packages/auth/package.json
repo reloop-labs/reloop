@@ -14,11 +14,11 @@
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
-		"@db": "workspace:*",
+		"@reloop/db": "workspace:*",
 		"better-auth": "catalog:"
 	},
 	"devDependencies": {
-		"@ts": "workspace:*",
+		"@reloop/tsconfig": "workspace:*",
 		"@types/node": "catalog:",
 		"typescript": "catalog:"
 	}

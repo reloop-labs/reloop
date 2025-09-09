@@ -1,8 +1,0 @@
-{
-	"name": "@ts",
-	"type": "module",
-	"private": true,
-	"files": [
-		"*.json"
-	]
-}

@@ -40,7 +40,7 @@ Create `.env` file:
 
 ```bash
 # Database Configuration
-DATABASE_URL=postgresql://user:password@localhost:5432/auth_db
+PG_URL=postgresql://user:password@localhost:5432/auth_db
 
 # Better Auth Configuration
 BETTER_AUTH_SECRET=your-super-secret-key-here-make-it-long-and-random
@@ -61,7 +61,7 @@ HOSTNAME=0.0.0.0
 
 | Variable                | Required | Description                                    |
 | ----------------------- | -------- | ---------------------------------------------- |
-| `DATABASE_URL`          | `YES`       | PostgreSQL connection string for user data     |
+| `PG_URL`                | `YES`       | PostgreSQL connection string for user data     |
 | `BETTER_AUTH_SECRET`    | `YES`        | Secret key for JWT tokens and encryption      |
 | `GOOGLE_CLIENT_ID`      | `NO`        | Google OAuth client ID for Google sign-in     |
 | `GOOGLE_CLIENT_SECRET`  | `NO`        | Google OAuth client secret                    |
@@ -129,7 +129,7 @@ docker build -f apps/backend/auth/Dockerfile -t auth-service .
 
 # Run container
 docker run -p 3010:3010 \
-  -e DATABASE_URL="postgresql://user:password@host:5432/db" \
+  -e PG_URL="postgresql://user:password@host:5432/db" \
   -e BETTER_AUTH_SECRET="your-secret-key" \
   auth-service
 ```
@@ -154,7 +154,7 @@ docker run -p 3010:3010 \
 docker ps | grep postgres
 
 # Verify connection string format
-DATABASE_URL=postgresql://username:password@host:port/database_name
+PG_URL=postgresql://username:password@host:port/database_name
 
 # Test connection manually
 psql "postgresql://username:password@localhost:5432/auth_db"

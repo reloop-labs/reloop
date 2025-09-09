@@ -1,7 +1,7 @@
 // AlignUI Kbd v0.0.0
 
-import { cn } from "@ui/utils/cn";
 import type * as React from "react";
+import { cn } from "@/utils/cn";
 
 function Kbd({ className, ...rest }: React.HTMLAttributes<HTMLDivElement>) {
 	return (

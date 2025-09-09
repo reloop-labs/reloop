@@ -1,6 +1,6 @@
 // AlignUI Divider v0.0.0
 
-import { tv, type VariantProps } from "@ui/utils/tv";
+import { tv, type VariantProps } from "@/utils/tv";
 
 const DIVIDER_ROOT_NAME = "DividerRoot";
 

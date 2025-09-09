@@ -1,11 +1,11 @@
 "use client";
-import * as Button from "@ui/components/button";
-import * as Divider from "@ui/components/divider";
-import { Icon } from "@ui/components/icon";
-import * as Input from "@ui/components/input";
-import * as Label from "@ui/components/label";
-import * as LinkButton from "@ui/components/link-button";
-import { Logo } from "@ui/components/logo";
+import * as Button from "@reloop/ui/components/button";
+import * as Divider from "@reloop/ui/components/divider";
+import { Icon } from "@reloop/ui/components/icon";
+import * as Input from "@reloop/ui/components/input";
+import * as Label from "@reloop/ui/components/label";
+import * as LinkButton from "@reloop/ui/components/link-button";
+import { Logo } from "@reloop/ui/components/logo";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { authClient } from "packages/auth/src/client";

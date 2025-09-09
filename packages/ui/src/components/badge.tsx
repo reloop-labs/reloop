@@ -1,10 +1,10 @@
 // AlignUI Badge v0.0.0
 
 import { Slot } from "@radix-ui/react-slot";
-import type { PolymorphicComponentProps } from "@ui/utils/polymorphic";
-import { recursiveCloneChildren } from "@ui/utils/recursive-clone-children";
-import { tv, type VariantProps } from "@ui/utils/tv";
 import * as React from "react";
+import type { PolymorphicComponentProps } from "@/utils/polymorphic";
+import { recursiveCloneChildren } from "@/utils/recursive-clone-children";
+import { tv, type VariantProps } from "@/utils/tv";
 
 const BADGE_ROOT_NAME = "BadgeRoot";
 const BADGE_ICON_NAME = "BadgeIcon";

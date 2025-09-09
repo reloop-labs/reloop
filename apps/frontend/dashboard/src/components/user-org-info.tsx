@@ -1,7 +1,7 @@
 "use client";
 
 import { useUserOrganization } from "@dashboard/providers/org-provider";
-import * as Avatar from "@ui/components/avatar";
+import * as Avatar from "@reloop/ui/components/avatar";
 
 /**
  * Example component demonstrating how to use the UserOrganization context
