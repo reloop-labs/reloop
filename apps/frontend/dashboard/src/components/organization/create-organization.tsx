@@ -1,14 +1,14 @@
 "use client";
 
-import { authClient } from "@auth/client";
 import { useOrgStore } from "@dashboard/store/use-org-store";
-import * as Button from "@reloop/ui/components/button";
-import * as FileUpload from "@reloop/ui/components/file-upload";
-import { Icon } from "@reloop/ui/components/icon";
-import * as Input from "@reloop/ui/components/input";
-import * as Label from "@reloop/ui/components/label";
-import * as Modal from "@reloop/ui/components/modal";
-import Spinner from "@reloop/ui/components/spinner";
+import { authClient } from "@reloop/authclient";
+import * as Button from "@reloop/ui/button";
+import * as FileUpload from "@reloop/ui/file-upload";
+import { Icon } from "@reloop/ui/icon";
+import * as Input from "@reloop/ui/input";
+import * as Label from "@reloop/ui/label";
+import * as Modal from "@reloop/ui/modal";
+import Spinner from "@reloop/ui/spinner";
 import { useState } from "react";
 import { toast } from "sonner";
 import { InviteMember } from "./invite-user";

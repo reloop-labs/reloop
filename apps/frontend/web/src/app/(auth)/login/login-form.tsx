@@ -1,15 +1,15 @@
 "use client";
 
-import { authClient } from "@auth/client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as Button from "@reloop/ui/components/button";
-import * as Divider from "@reloop/ui/components/divider";
-import { Icon } from "@reloop/ui/components/icon";
-import * as Input from "@reloop/ui/components/input";
-import * as Label from "@reloop/ui/components/label";
-import * as LinkButton from "@reloop/ui/components/link-button";
-import Spinner from "@reloop/ui/components/spinner";
-import { useLoading } from "@reloop/ui/hooks/use-loading";
+import { authClient } from "@reloop/auth/client";
+import * as Button from "@reloop/ui/button";
+import * as Divider from "@reloop/ui/divider";
+import { Icon } from "@reloop/ui/icon";
+import * as Input from "@reloop/ui/input";
+import * as Label from "@reloop/ui/label";
+import * as LinkButton from "@reloop/ui/link-button";
+import Spinner from "@reloop/ui/spinner";
+import { useLoading } from "@reloop/ui/use-loading";
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";

@@ -1,10 +1,10 @@
 "use client";
-import { useUserOrganization } from "@dashboard/providers/org-provider";
-import * as Button from "@reloop/ui/components/button";
-import { Icon } from "@reloop/ui/components/icon";
-import * as Table from "@reloop/ui/components/table";
+import * as Button from "@reloop/ui/button";
+import { Icon } from "@reloop/ui/icon";
+import * as Table from "@reloop/ui/table";
 import { motion } from "motion/react";
 import * as React from "react";
+import { useUserOrganization } from "src/providers/org-provider";
 import { Globe } from "../../globe";
 
 const dnsRecords = [

@@ -1,9 +1,9 @@
 "use client";
-import { authClient } from "@auth/client";
-import * as Button from "@reloop/ui/components/button";
-import { Icon } from "@reloop/ui/components/icon";
-import * as LinkButton from "@reloop/ui/components/link-button";
-import { Logo } from "@reloop/ui/components/logo";
+import { authClient } from "@reloop/auth/client";
+import * as Button from "@reloop/ui/button";
+import { Icon } from "@reloop/ui/icon";
+import * as LinkButton from "@reloop/ui/link-button";
+import { Logo } from "@reloop/ui/logo";
 import { AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useState } from "react";

@@ -1,10 +1,10 @@
 "use client";
 
-import { Icon } from "@reloop/ui/components/icon";
+import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
 import { useTheme } from "next-themes";
 import type React from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { cn } from "@/utils/cn";
 
 interface FlickeringGridProps extends React.HTMLAttributes<HTMLDivElement> {
 	squareSize?: number;

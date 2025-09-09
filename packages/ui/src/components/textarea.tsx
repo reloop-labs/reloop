@@ -1,7 +1,7 @@
 // AlignUI Textarea v0.0.0
 
+import { cn } from "@reloop/ui/cn";
 import * as React from "react";
-import { cn } from "@/utils/cn";
 
 const TEXTAREA_ROOT_NAME = "TextareaRoot";
 const TEXTAREA_NAME = "Textarea";

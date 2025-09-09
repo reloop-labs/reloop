@@ -1,9 +1,9 @@
-import { authClient } from "@auth/client";
 import { useUserOrganization } from "@dashboard/providers/org-provider";
-import * as Avatar from "@reloop/ui/components/avatar";
-import * as Dropdown from "@reloop/ui/components/dropdown";
-import * as Select from "@reloop/ui/components/select";
-import Spinner from "@reloop/ui/components/spinner";
+import { authClient } from "@reloop/authclient";
+import * as Avatar from "@reloop/ui/avatar";
+import * as Dropdown from "@reloop/ui/dropdown";
+import * as Select from "@reloop/ui/select";
+import Spinner from "@reloop/ui/spinner";
 import useSWR from "swr";
 
 const getInitials = (email: string) => {

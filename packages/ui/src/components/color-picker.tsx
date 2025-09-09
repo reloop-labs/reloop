@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@reloop/ui/cn";
 import * as React from "react";
 import {
 	ColorArea as AriaColorArea,
@@ -22,7 +23,6 @@ import {
 	composeRenderProps,
 	parseColor,
 } from "react-aria-components";
-import { cn } from "@/utils/cn";
 
 const ColorField = AriaColorField;
 const ColorPicker = AriaColorPicker;

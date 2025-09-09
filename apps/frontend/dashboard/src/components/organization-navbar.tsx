@@ -1,16 +1,16 @@
 "use client";
 
-import { authClient } from "@auth/client";
 import { useUserOrganization } from "@dashboard/providers/org-provider";
 import { useOrgStore } from "@dashboard/store/use-org-store";
-import * as Avatar from "@reloop/ui/components/avatar";
-import * as Button from "@reloop/ui/components/button";
-import { Icon } from "@reloop/ui/components/icon";
-import * as Popover from "@reloop/ui/components/popover";
+import { authClient } from "@reloop/authclient";
+import * as Avatar from "@reloop/ui/avatar";
+import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
+import * as Popover from "@reloop/ui/popover";
 import { AnimatePresence, motion } from "motion/react";
 import { useRef, useState } from "react";
 import useSWR from "swr";
-import { cn } from "@/utils/cn";
 
 export const OrganizationNavbar = () => {
 	const { data, isLoading } = useSWR(

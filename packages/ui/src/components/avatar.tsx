@@ -1,8 +1,8 @@
 // AlignUI Avatar v0.0.0
 
 import { Slot } from "@radix-ui/react-slot";
+import { cn } from "@reloop/ui/cn";
 import * as React from "react";
-import { cn } from "@/utils/cn";
 import { recursiveCloneChildren } from "@/utils/recursive-clone-children";
 import { tv, type VariantProps } from "@/utils/tv";
 import { IconEmptyCompany, IconEmptyUser } from "./avatar-empty-icons";

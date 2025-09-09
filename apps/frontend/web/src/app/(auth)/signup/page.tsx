@@ -1,14 +1,11 @@
 "use client";
-import * as Button from "@reloop/ui/components/button";
-import * as Divider from "@reloop/ui/components/divider";
-import { Icon } from "@reloop/ui/components/icon";
-import * as Input from "@reloop/ui/components/input";
-import * as Label from "@reloop/ui/components/label";
-import * as LinkButton from "@reloop/ui/components/link-button";
-import { Logo } from "@reloop/ui/components/logo";
-import { AnimatePresence, motion } from "framer-motion";
+import { authClient } from "@reloop/auth/client";
+import * as Button from "@reloop/ui/button";
+import { Icon } from "@reloop/ui/icon";
+import * as LinkButton from "@reloop/ui/link-button";
+import { Logo } from "@reloop/ui/logo";
+import { AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { authClient } from "packages/auth/src/client";
 import { useState } from "react";
 import { SignupForm } from "./signup-form";
 

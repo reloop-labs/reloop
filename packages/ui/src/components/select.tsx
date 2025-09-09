@@ -5,8 +5,8 @@
 import * as ScrollAreaPrimitives from "@radix-ui/react-scroll-area";
 import * as SelectPrimitives from "@radix-ui/react-select";
 import { Slottable } from "@radix-ui/react-slot";
+import { cn } from "@reloop/ui/cn";
 import * as React from "react";
-import { cn } from "@/utils/cn";
 import type { PolymorphicComponentProps } from "@/utils/polymorphic";
 import { tv, type VariantProps } from "@/utils/tv";
 import { Icon } from "./icon";

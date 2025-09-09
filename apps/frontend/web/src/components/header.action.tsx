@@ -1,7 +1,7 @@
 "use client";
 
-import { authClient } from "@auth/client";
-import * as Button from "@reloop/ui/components/button";
+import { authClient } from "@reloop/auth/client";
+import * as Button from "@reloop/ui/button";
 import Link from "next/link";
 
 export const HeaderAction = () => {

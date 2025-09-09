@@ -1,8 +1,8 @@
 // AlignUI DigitInput v0.0.0
 
+import { cn } from "@reloop/ui/cn";
 import * as React from "react";
 import OtpInput, { type OTPInputProps } from "react-otp-input";
-import { cn } from "@/utils/cn";
 
 type OtpOptions = Omit<OTPInputProps, "renderInput">;
 

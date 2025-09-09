@@ -4,10 +4,10 @@
 
 import { Slottable } from "@radix-ui/react-slot";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
+import { cn } from "@reloop/ui/cn";
 import { useTabObserver } from "@reloop/ui/hooks/use-tab-observer";
 import mergeRefs from "merge-refs";
 import * as React from "react";
-import { cn } from "@/utils/cn";
 import type { PolymorphicComponentProps } from "@/utils/polymorphic";
 
 const TabMenuHorizontalContent = TabsPrimitive.Content;

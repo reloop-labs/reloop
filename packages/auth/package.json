@@ -1,8 +1,7 @@
 {
-	"name": "@auth",
+	"name": "@reloop/auth",
 	"version": "0.1.0",
 	"private": true,
-	"type": "module",
 	"exports": {
 		"./client": "./src/client.ts",
 		"./server": "./src/server.ts"
@@ -14,7 +13,6 @@
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
-		"@reloop/db": "workspace:*",
 		"better-auth": "catalog:"
 	},
 	"devDependencies": {

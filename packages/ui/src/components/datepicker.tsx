@@ -2,9 +2,9 @@
 
 "use client";
 
+import { cn } from "@reloop/ui/cn";
 import type * as React from "react";
 import { DayPicker } from "react-day-picker";
-import { cn } from "@/utils/cn";
 import { compactButtonVariants } from "./compact-button";
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>;

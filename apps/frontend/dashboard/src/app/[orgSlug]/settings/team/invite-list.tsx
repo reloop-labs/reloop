@@ -1,7 +1,7 @@
-import { authClient } from "@auth/client";
 import { useUserOrganization } from "@dashboard/providers/org-provider";
-import Spinner from "@reloop/ui/components/spinner";
-import * as StatusBadge from "@reloop/ui/components/status-badge";
+import { authClient } from "@reloop/authclient";
+import Spinner from "@reloop/ui/spinner";
+import * as StatusBadge from "@reloop/ui/status-badge";
 import useSWR from "swr";
 
 const formatDate = (date: Date) => {

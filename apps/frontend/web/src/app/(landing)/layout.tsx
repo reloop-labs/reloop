@@ -1,6 +1,5 @@
-import { Footer } from "@web/components/footer";
-import { Header } from "@web/components/header";
-
+import { Footer } from "@fe/web/components/footer";
+import { Header } from "@fe/web/components/header";
 export default function LandingLayout({
 	children,
 }: Readonly<{

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { IconsSprite } from "@reloop/ui/components/icon";
+import { IconsSprite } from "@reloop/ui/icon";
 import { ThemeProvider } from "next-themes";
 
 export const metadata: Metadata = {

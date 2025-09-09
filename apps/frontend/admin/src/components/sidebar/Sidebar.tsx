@@ -1,13 +1,13 @@
 "use client";
 
-import { Root as Badge } from "@reloop/ui/components/badge";
-import * as Button from "@reloop/ui/components/button";
-import { Icon } from "@reloop/ui/components/icon";
-import { Logo } from "@reloop/ui/components/logo";
+import { Root as Badge } from "@reloop/ui/badge";
+import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
+import { Logo } from "@reloop/ui/logo";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { cn } from "@/utils/cn";
 
 interface SidebarItem {
 	id: string;

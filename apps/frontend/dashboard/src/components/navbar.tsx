@@ -1,5 +1,5 @@
-import * as Avatar from "@reloop/ui/components/avatar";
-import { Logo } from "@reloop/ui/components/logo";
+import * as Avatar from "@reloop/ui/avatar";
+import { Logo } from "@reloop/ui/logo";
 import { OrganizationNavbar } from "./organization-navbar";
 import { SubNavbar } from "./sub-navbar";
 

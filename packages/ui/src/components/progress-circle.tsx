@@ -1,7 +1,7 @@
 // AlignUI ProgressCircle v0.0.0
 
+import { cn } from "@reloop/ui/cn";
 import * as React from "react";
-import { cn } from "@/utils/cn";
 import { tv, type VariantProps } from "@/utils/tv";
 
 export const progressCircleVariants = tv({

@@ -1,11 +1,11 @@
 "use client";
 import { useUserOrganization } from "@dashboard/providers/org-provider";
-import { Icon } from "@reloop/ui/components/icon";
+import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRef, useState } from "react";
-import { cn } from "@/utils/cn";
 
 const list = [
 	{

@@ -1,7 +1,7 @@
 // AlignUI Table v0.0.0
 
+import { cn } from "@reloop/ui/cn";
 import * as React from "react";
-import { cn } from "@/utils/cn";
 import * as Divider from "./divider";
 
 const Table = React.forwardRef<

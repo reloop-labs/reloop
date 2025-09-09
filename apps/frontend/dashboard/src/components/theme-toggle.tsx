@@ -1,9 +1,9 @@
 "use client";
 
-import { Icon } from "@reloop/ui/components/icon";
+import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
 import { motion } from "framer-motion";
 import { useTheme } from "next-themes";
-import { cn } from "@/utils/cn";
 
 export function ThemeToggle() {
 	const { theme, setTheme } = useTheme();

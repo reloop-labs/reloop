@@ -1,4 +1,4 @@
-import { ThemeToggle } from "@web/components/theme-toggle";
+import { ThemeToggle } from "@reloop/ui/theme-toggle";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
 	return (

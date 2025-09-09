@@ -1,9 +1,9 @@
 "use client";
 import { useUserOrganization } from "@dashboard/providers/org-provider";
-import * as Button from "@reloop/ui/components/button";
-import { Icon } from "@reloop/ui/components/icon";
-import * as Input from "@reloop/ui/components/input";
-import * as Label from "@reloop/ui/components/label";
+import * as Button from "@reloop/ui/button";
+import { Icon } from "@reloop/ui/icon";
+import * as Input from "@reloop/ui/input";
+import * as Label from "@reloop/ui/label";
 import { Globe } from "../globe";
 
 const NewDomainPage = () => {

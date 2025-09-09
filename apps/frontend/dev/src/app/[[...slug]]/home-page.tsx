@@ -1,5 +1,5 @@
-import { Root as Button } from "@reloop/ui/components/button";
-import { Logo } from "@reloop/ui/components/logo";
+import { Root as Button } from "@reloop/ui/button";
+import { Logo } from "@reloop/ui/logo";
 import Link from "next/link";
 
 export default function HomePage() {

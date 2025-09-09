@@ -3,8 +3,8 @@
 "use client";
 
 import * as AccordionPrimitive from "@radix-ui/react-accordion";
+import { cn } from "@reloop/ui/cn";
 import * as React from "react";
-import { cn } from "@/utils/cn";
 import type { PolymorphicComponentProps } from "@/utils/polymorphic";
 import { Icon } from "./icon";
 

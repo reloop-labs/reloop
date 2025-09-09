@@ -2,8 +2,8 @@
 
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 import { Slottable } from "@radix-ui/react-slot";
+import { cn } from "@reloop/ui/cn";
 import * as React from "react";
-import { cn } from "@/utils/cn";
 
 const PopoverRoot = PopoverPrimitive.Root;
 const PopoverTrigger = PopoverPrimitive.Trigger;

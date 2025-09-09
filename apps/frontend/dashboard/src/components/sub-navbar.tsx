@@ -1,10 +1,10 @@
 "use client";
 import { useUserOrganization } from "@dashboard/providers/org-provider";
-import * as TabMenuHorizontal from "@reloop/ui/components/tab-menu-horizontal";
+import { cn } from "@reloop/ui/cn";
+import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
 import { AnimatePresence, motion } from "motion/react";
 import { usePathname } from "next/navigation";
 import { useRef, useState } from "react";
-import { cn } from "@/utils/cn";
 
 const items = [
 	{

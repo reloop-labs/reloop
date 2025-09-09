@@ -1,7 +1,7 @@
 "use client";
 
-import { authClient } from "@auth/client";
-import Spinner from "@reloop/ui/components/spinner";
+import { authClient } from "@reloop/auth/client";
+import Spinner from "@reloop/ui/spinner";
 import {
 	useParams,
 	usePathname,
