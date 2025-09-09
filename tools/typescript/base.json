@@ -28,7 +28,8 @@
 			"@dev/*": ["apps/frontend/dev/src/*"],
 			"@docs/*": ["apps/frontend/docs/src/*"],
 			"@dashboard/*": ["apps/frontend/dashboard/src/*"],
-			"@ui/*": ["packages/ui/src/*"]
+			"@ui/*": ["packages/ui/src/*"],
+			"@db/*": ["packages/db/src/*"]
 		}
 	},
 	"exclude": ["node_modules", "build", "dist"]

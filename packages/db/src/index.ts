@@ -22,4 +22,4 @@ export {
 	type DatabaseInstance,
 	db,
 } from "./client";
-export * from "./schema";
+export * from "./schemas/index";
