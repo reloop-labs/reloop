@@ -13,5 +13,4 @@ export const auth = betterAuth({
 		enabled: true,
 	},
 	secret: process.env.BETTER_AUTH_SECRET,
-	baseURL: process.env.BETTER_AUTH_URL,
 });

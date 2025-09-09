@@ -20,5 +20,5 @@ export const createDb = (opts?: DatabaseClientOptions): DatabaseInstance => {
 };
 
 export const db = createDb({
-	databaseUrl: process.env.PG_DATABASE_URL!,
+	databaseUrl: process.env.PG_URL!,
 });
