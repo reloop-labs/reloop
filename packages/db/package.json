@@ -29,6 +29,7 @@
 		"db:generate": "bun env:run drizzle-kit generate",
 		"db:migrate": "bun env:run drizzle-kit migrate",
 		"db:push": "bun env:run drizzle-kit push",
+		"db:studio": "bun env:run drizzle-kit studio",
 		"migrate": "bun run src/migrate.ts"
 	},
 	"dependencies": {

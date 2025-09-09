@@ -279,7 +279,6 @@
     "packages/db": {
       "name": "@db",
       "dependencies": {
-        "@config": "workspace:*",
         "drizzle-orm": "catalog:db",
         "drizzle-typebox": "catalog:db",
         "pg": "catalog:db",
@@ -333,14 +332,6 @@
       "peerDependencies": {
         "react": "catalog:ui",
         "react-dom": "catalog:ui",
-      },
-    },
-    "tools/config": {
-      "name": "@config",
-      "devDependencies": {
-        "@ts": "workspace:*",
-        "@types/node": "catalog:",
-        "typescript": "catalog:",
       },
     },
     "tools/tailwind": {
@@ -578,8 +569,6 @@
     "@clack/core": ["@clack/core@0.5.0", "", { "dependencies": { "picocolors": "^1.0.0", "sisteransi": "^1.0.5" } }, "sha512-p3y0FIOwaYRUPRcMO7+dlmLh8PSRcrjuTndsiA0WAFbWES0mLZlrjVoBRZ9DzkPFJZG6KGkJmoEAY0ZcVWTkow=="],
 
     "@clack/prompts": ["@clack/prompts@0.11.0", "", { "dependencies": { "@clack/core": "0.5.0", "picocolors": "^1.0.0", "sisteransi": "^1.0.5" } }, "sha512-pMN5FcrEw9hUkZA4f+zLlzivQSeQf5dRGJjSUbvVYDLvpKCdQx5OaknvKzgbtXOizhP+SJJJjqEbOe55uKKfAw=="],
-
-    "@config": ["@config@workspace:tools/config"],
 
     "@date-fns/tz": ["@date-fns/tz@1.2.0", "", {}, "sha512-LBrd7MiJZ9McsOgxqWX7AaxrDjcFVjWH/tIKJd7pnR7McaslGYOP1QmmiBXdJH/H/yLCT+rcQ7FaPBUxRGUtrg=="],
 
