@@ -1,5 +1,5 @@
-import { db } from "./db/pg";
-import { redis } from "./db/redis";
+import { db } from "@reloop/db";
+import { redis } from "./redis";
 
 export const loader = async () => {
 	try {
