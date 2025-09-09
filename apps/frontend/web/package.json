@@ -13,6 +13,7 @@
 		"react": "catalog:ui",
 		"@reloop/ui": "workspace:*",
 		"@reloop/auth": "workspace:*",
+		"@reloop/tailwind": "workspace:*",
 		"react-dom": "catalog:ui",
 		"motion": "catalog:ui",
 		"@hookform/resolvers": "catalog:ui",

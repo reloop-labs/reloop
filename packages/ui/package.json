@@ -73,8 +73,7 @@
 		"./link-button": "./src/components/link-button.tsx",
 		"./divider": "./src/components/divider.tsx",
 		"./use-loading": "./src/hooks/use-loading.ts",
-		"./theme-toggle": "./src/components/theme-toggle.tsx",
-		"./style.css": "./src/style.css"
+		"./theme-toggle": "./src/components/theme-toggle.tsx"
 	},
 	"dependencies": {
 		"@radix-ui/react-accordion": "catalog:ui",
