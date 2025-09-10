@@ -4,7 +4,7 @@ import { getEmailInlineStyles, getEmailThemeClasses } from "./theme";
 
 export function Footer() {
 	const themeClasses = getEmailThemeClasses();
-	const lightStyles = getEmailInlineStyles("light");
+	const lightStyles = getEmailInlineStyles();
 
 	return (
 		<Section className="w-full">

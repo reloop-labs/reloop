@@ -2,12 +2,12 @@ import {
 	Body,
 	Container,
 	Heading,
+	Link,
 	Preview,
+	Section,
 	Text,
 } from "@react-email/components";
-
-import { Footer } from "../components/footer";
-import { GetStarted } from "../components/get-started";
+import { Logo } from "@reloop/ui/components/logo";
 import {
 	EmailThemeProvider,
 	getEmailInlineStyles,
@@ -15,18 +15,26 @@ import {
 } from "../components/theme";
 
 interface Props {
-	fullName: string;
+	customerName: string;
+	teamName: string;
+	link: string;
 }
 
-export const GetStartedEmail = ({ fullName = "" }: Props) => {
-	const firstName = fullName ? fullName.split(" ").at(0) : "";
-	const text = `${firstName ? `Hi ${firstName}, ` : ""}Just checking in to help you get started. Here are a few things you can try today.`;
+export const InvoiceEmail = ({
+	customerName = "Customer",
+	teamName = "Reloop",
+	link = "https://reloop.sh/",
+}: Props) => {
+	const text = `You've Received an Invoice from ${teamName}`;
 	const themeClasses = getEmailThemeClasses();
 	const lightStyles = getEmailInlineStyles();
-	console.log(lightStyles);
+
 	return (
 		<EmailThemeProvider preview={<Preview>{text}</Preview>}>
-			<Body className={`mx-auto my-auto font-sans ${themeClasses.body}`}>
+			<Body
+				className={`mx-auto my-auto font-sans ${themeClasses.body}`}
+				style={lightStyles.body}
+			>
 				<Container
 					className={`mx-auto my-[40px] max-w-[600px] p-[20px] ${themeClasses.container}`}
 					style={{
@@ -35,11 +43,12 @@ export const GetStartedEmail = ({ fullName = "" }: Props) => {
 						borderColor: lightStyles.container.borderColor,
 					}}
 				>
+					<Logo />
 					<Heading
 						className={`mx-0 my-[30px] p-0 text-center font-normal text-[21px] ${themeClasses.heading}`}
 						style={{ color: lightStyles.text.color }}
 					>
-						Hello from Reloop!
+						You've Received an Invoice <br /> from {teamName}
 					</Heading>
 
 					<br />
@@ -48,33 +57,25 @@ export const GetStartedEmail = ({ fullName = "" }: Props) => {
 						className={`font-medium ${themeClasses.text}`}
 						style={{ color: lightStyles.text.color }}
 					>
-						{firstName ? `Hi ${firstName},` : "Hello,"}
+						Hi {customerName},
 					</span>
-
-					<Text className={themeClasses.text} style={{ color: "black" }}>
-						Just checking in to help you get started.
-					</Text>
-
 					<Text
-						className={`text-[14px] ${themeClasses.text}`}
+						className={themeClasses.text}
 						style={{ color: lightStyles.text.color }}
 					>
-						Best,
-						<br />
-						Reloop
+						Please review your invoice and make sure to pay it on time. If you
+						have any questions, feel free to reply to this email.
 					</Text>
 
+					<Section className="mt-[50px] mb-[50px] text-center">
+						<Link href={link}>View invoice</Link>
+					</Section>
+
 					<br />
-
-					<GetStarted />
-
-					<br />
-
-					<Footer />
 				</Container>
 			</Body>
 		</EmailThemeProvider>
 	);
 };
 
-export default GetStartedEmail;
+export default InvoiceEmail;

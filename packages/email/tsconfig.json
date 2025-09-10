@@ -1,6 +1,6 @@
 {
   "extends": "@reloop/ts/internal-package.json",
-  "include": ["src/**/*", "emails/**/*", "components/**/*"],
+  "include": ["src/**/*", "emails/**/*", "components/**/*", "./**/*"],
   "exclude": ["node_modules", "dist"],
   "compilerOptions": {
     "lib": ["dom", "ES2022"],

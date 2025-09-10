@@ -1,5 +1,5 @@
 {
-	"name": "email",
+	"name": "@reloop/email",
 	"module": "index.ts",
 	"type": "module",
 	"private": true,

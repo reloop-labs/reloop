@@ -5,7 +5,7 @@ import {
 	Preview,
 	Text,
 } from "@react-email/components";
-
+import { Logo } from "@reloop/ui/components/logo";
 import { Footer } from "../components/footer";
 import { GetStarted } from "../components/get-started";
 import {
@@ -18,15 +18,18 @@ interface Props {
 	fullName: string;
 }
 
-export const GetStartedEmail = ({ fullName = "" }: Props) => {
+export const WelcomeEmail = ({ fullName = "" }: Props) => {
 	const firstName = fullName ? fullName.split(" ").at(0) : "";
-	const text = `${firstName ? `Hi ${firstName}, ` : ""}Just checking in to help you get started. Here are a few things you can try today.`;
+	const text = `${firstName ? `Hi ${firstName}, ` : ""}Welcome to Midday! I'm Pontus, one of the founders. It's really important to us that you have a great experience ramping up.`;
 	const themeClasses = getEmailThemeClasses();
 	const lightStyles = getEmailInlineStyles();
-	console.log(lightStyles);
+
 	return (
 		<EmailThemeProvider preview={<Preview>{text}</Preview>}>
-			<Body className={`mx-auto my-auto font-sans ${themeClasses.body}`}>
+			<Body
+				className={`mx-auto my-auto font-sans ${themeClasses.body}`}
+				style={lightStyles.body}
+			>
 				<Container
 					className={`mx-auto my-[40px] max-w-[600px] p-[20px] ${themeClasses.container}`}
 					style={{
@@ -35,11 +38,12 @@ export const GetStartedEmail = ({ fullName = "" }: Props) => {
 						borderColor: lightStyles.container.borderColor,
 					}}
 				>
+					<Logo />
 					<Heading
 						className={`mx-0 my-[30px] p-0 text-center font-normal text-[21px] ${themeClasses.heading}`}
 						style={{ color: lightStyles.text.color }}
 					>
-						Hello from Reloop!
+						Welcome to Reloop
 					</Heading>
 
 					<br />
@@ -50,20 +54,17 @@ export const GetStartedEmail = ({ fullName = "" }: Props) => {
 					>
 						{firstName ? `Hi ${firstName},` : "Hello,"}
 					</span>
-
-					<Text className={themeClasses.text} style={{ color: "black" }}>
-						Just checking in to help you get started.
-					</Text>
-
 					<Text
-						className={`text-[14px] ${themeClasses.text}`}
+						className={themeClasses.text}
 						style={{ color: lightStyles.text.color }}
 					>
-						Best,
+						Welcome to Reloop!
 						<br />
-						Reloop
 					</Text>
 
+					<br />
+
+					<br />
 					<br />
 
 					<GetStarted />
@@ -77,4 +78,4 @@ export const GetStartedEmail = ({ fullName = "" }: Props) => {
 	);
 };
 
-export default GetStartedEmail;
+export default WelcomeEmail;

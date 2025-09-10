@@ -19,6 +19,15 @@ export const emailTheme = {
 		accent: "#fefefe",
 		secondary: "#6b7280",
 	},
+	// System theme colors that adapt based on user's system preference
+	system: {
+		background: "var(--email-bg, #ffffff)",
+		foreground: "var(--email-fg, #0e0e0e)",
+		muted: "var(--email-muted, #6b7280)",
+		border: "var(--email-border, #e5e7eb)",
+		accent: "var(--email-accent, #0e0e0e)",
+		secondary: "var(--email-secondary, #9ca3af)",
+	},
 } as const;
 
 // Industry-standard dark mode CSS for email clients
@@ -28,10 +37,28 @@ export const getEmailDarkModeCSS = () => {
     :root {
       color-scheme: light dark;
       supported-color-schemes: light dark;
+      
+      /* CSS custom properties for system theme adaptation */
+      --email-bg: ${emailTheme.light.background};
+      --email-fg: ${emailTheme.light.foreground};
+      --email-muted: ${emailTheme.light.muted};
+      --email-border: ${emailTheme.light.border};
+      --email-accent: ${emailTheme.light.accent};
+      --email-secondary: ${emailTheme.light.secondary};
     }
 
     /* Apple Mail, iOS Mail, and some webview clients */
     @media (prefers-color-scheme: dark) {
+      :root {
+        /* Override CSS custom properties for dark mode */
+        --email-bg: ${emailTheme.dark.background};
+        --email-fg: ${emailTheme.dark.foreground};
+        --email-muted: ${emailTheme.dark.muted};
+        --email-border: ${emailTheme.dark.border};
+        --email-accent: ${emailTheme.dark.accent};
+        --email-secondary: ${emailTheme.dark.secondary};
+      }
+      
       .email-body {
         background-color: ${emailTheme.dark.background} !important;
         color: ${emailTheme.dark.foreground} !important;
@@ -241,29 +268,29 @@ export function getEmailThemeClasses() {
 	};
 }
 
-// Utility to get inline styles (fallback for older email clients)
-export function getEmailInlineStyles(mode: "light" | "dark" = "light") {
-	const theme = emailTheme[mode];
+// Utility to get inline styles with system theme support
+export function getEmailInlineStyles() {
+	// Use CSS custom properties that automatically adapt to system theme
 	return {
 		body: {
-			backgroundColor: theme.background,
-			color: theme.foreground,
+			backgroundColor: "var(--email-bg)",
+			color: "var(--email-fg)",
 		},
 		container: {
-			borderColor: theme.border,
+			borderColor: "var(--email-border)",
 		},
 		text: {
-			color: theme.foreground,
+			color: "var(--email-fg)",
 		},
 		mutedText: {
-			color: theme.muted,
+			color: "var(--email-muted)",
 		},
 		secondaryText: {
-			color: theme.secondary,
+			color: "var(--email-secondary)",
 		},
 		button: {
-			color: theme.accent,
-			borderColor: theme.accent,
+			color: "var(--email-accent)",
+			borderColor: "var(--email-accent)",
 		},
 	};
 }
@@ -272,6 +299,7 @@ export function getEmailInlineStyles(mode: "light" | "dark" = "light") {
 export function useEmailTheme() {
 	return {
 		classes: getEmailThemeClasses(),
-		lightStyles: getEmailInlineStyles("light"),
+		styles: getEmailInlineStyles(), // Now uses system theme by default
+		theme: emailTheme, // Access to all theme variants if needed
 	};
 }
