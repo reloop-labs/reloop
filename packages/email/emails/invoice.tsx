@@ -7,7 +7,6 @@ import {
 	Section,
 	Text,
 } from "@react-email/components";
-import { Logo } from "@reloop/ui/components/logo";
 import {
 	EmailThemeProvider,
 	getEmailInlineStyles,
@@ -43,7 +42,6 @@ export const InvoiceEmail = ({
 						borderColor: lightStyles.container.borderColor,
 					}}
 				>
-					<Logo />
 					<Heading
 						className={`mx-0 my-[30px] p-0 text-center font-normal text-[21px] ${themeClasses.heading}`}
 						style={{ color: lightStyles.text.color }}

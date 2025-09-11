@@ -5,7 +5,6 @@ import {
 	Preview,
 	Text,
 } from "@react-email/components";
-import { Logo } from "@reloop/ui/components/logo";
 import { GetStarted } from "../components/get-started";
 import {
 	EmailThemeProvider,
@@ -37,7 +36,6 @@ export const WelcomeEmail = ({ fullName = "" }: Props) => {
 						borderColor: lightStyles.container.borderColor,
 					}}
 				>
-					<Logo />
 					<Heading
 						className={`mx-0 my-[30px] p-0 text-center font-normal text-[21px] ${themeClasses.heading}`}
 						style={{ color: lightStyles.text.color }}
