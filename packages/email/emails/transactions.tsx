@@ -10,7 +10,6 @@ import {
 } from "@react-email/components";
 import { Logo } from "@reloop/ui/components/logo";
 import { format } from "date-fns";
-import { Footer } from "../components/footer";
 import {
 	EmailThemeProvider,
 	getEmailInlineStyles,
@@ -209,7 +208,6 @@ export const TransactionsEmail = ({
 					</Section>
 
 					<br />
-					<Footer />
 				</Container>
 			</Body>
 		</EmailThemeProvider>

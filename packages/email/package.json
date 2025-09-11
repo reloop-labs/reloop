@@ -1,26 +1,33 @@
 {
 	"name": "@reloop/email",
-	"module": "index.ts",
-	"type": "module",
+	"version": "1.0.0",
 	"private": true,
+	"main": "index.ts",
+	"exports": {
+		"./emails/*": "./emails/*.tsx",
+		"./locales": "./locales/index.ts",
+		"./render": "./render.ts"
+	},
 	"scripts": {
-		"build": "tsc --build --verbose",
-		"clean": "git clean -xdf .cache .turbo dist node_modules",
-		"dev": "email dev -p 3006",
-		"format": "prettier --check . --ignore-path ../../.gitignore",
-		"lint": "eslint",
-		"typecheck": "tsc --noEmit"
-	},
-	"devDependencies": {
-		"@types/bun": "latest",
-		"react-email": "catalog:ui"
-	},
-	"peerDependencies": {
-		"typescript": "catalog:"
+		"clean": "rm -rf .turbo node_modules",
+		"lint": "biome check .",
+		"format": "biome format --write .",
+		"typecheck": "tsc --noEmit",
+		"dev": "email dev -p 3003",
+		"build": "email build",
+		"start": "email start"
 	},
 	"dependencies": {
 		"@react-email/components": "catalog:ui",
+		"@react-email/render": "catalog:ui",
+		"@react-email/tailwind": "catalog:ui",
+		"date-fns": "catalog:backend",
+		"react-email": "catalog:ui",
 		"react": "catalog:ui",
 		"react-dom": "catalog:ui"
+	},
+	"devDependencies": {
+		"typescript": "workspace:",
+		"@types/bun": "catalog:backend"
 	}
 }

@@ -78,7 +78,9 @@
 				"zustand": "^5.0.8",
 				"nuqs": "^2.6.0",
 				"@tanstack/react-table": "^8.21.3",
-				"dayjs": "^1.11.18"
+				"dayjs": "^1.11.18",
+				"@react-email/tailwind": "^1.2.2",
+				"@react-email/render": "^1.2.3"
 			},
 			"db": {
 				"@types/pg": "8.15.4",
@@ -116,7 +118,8 @@
 				"@bogeychan/elysia-logger": "^0.1.10",
 				"logixlysia": "^5.1.1",
 				"nodemailer": "6.9.7",
-				"@types/nodemailer": "6.4.14"
+				"@types/nodemailer": "6.4.14",
+				"date-fns": "^4.1.0"
 			}
 		}
 	},
@@ -161,5 +164,7 @@
 		]
 	},
 	"packageManager": "bun@1.2.19",
-	"dependencies": {}
+	"dependencies": {
+		"@responsive-email/react-email": "^0.0.4"
+	}
 }

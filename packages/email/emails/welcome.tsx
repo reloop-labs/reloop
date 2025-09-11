@@ -6,7 +6,6 @@ import {
 	Text,
 } from "@react-email/components";
 import { Logo } from "@reloop/ui/components/logo";
-import { Footer } from "../components/footer";
 import { GetStarted } from "../components/get-started";
 import {
 	EmailThemeProvider,
@@ -70,8 +69,6 @@ export const WelcomeEmail = ({ fullName = "" }: Props) => {
 					<GetStarted />
 
 					<br />
-
-					<Footer />
 				</Container>
 			</Body>
 		</EmailThemeProvider>

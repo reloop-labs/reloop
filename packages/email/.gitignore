@@ -1,10 +1,12 @@
 # dependencies (bun install)
 node_modules
 
+
 # output
 out
 dist
 *.tgz
+.react-email
 
 # code coverage
 coverage
