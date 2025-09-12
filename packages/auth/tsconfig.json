@@ -1,11 +1,11 @@
 {
-  "extends": "@reloop/tsconfig/base.json",
-  "include": ["emails", "components"],
-  "exclude": ["node_modules"],
-  "compilerOptions": {
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "jsx": "react-jsx",
-    "jsxImportSource": "react"
-  }
+	"extends": "@reloop/tsconfig/base.json",
+	"include": ["emails", "components"],
+	"exclude": ["node_modules"],
+	"compilerOptions": {
+		"module": "NodeNext",
+		"moduleResolution": "NodeNext",
+		"jsx": "react-jsx",
+		"jsxImportSource": "react"
+	}
 }
