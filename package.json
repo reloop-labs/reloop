@@ -119,7 +119,8 @@
 				"logixlysia": "^5.1.1",
 				"nodemailer": "6.9.7",
 				"@types/nodemailer": "6.4.14",
-				"date-fns": "^4.1.0"
+				"date-fns": "^4.1.0",
+				"@elysiajs/eden": "^1.3.3"
 			}
 		}
 	},

@@ -14,12 +14,14 @@
 		"@reloop/ui": "workspace:*",
 		"@reloop/auth": "workspace:*",
 		"@reloop/tailwind": "workspace:*",
-		"react-dom": "catalog:ui",
-		"motion": "catalog:ui",
 		"@hookform/resolvers": "catalog:ui",
 		"react-hook-form": "catalog:ui",
 		"sonner": "catalog:ui",
-		"better-auth": "catalog:"
+		"better-auth": "catalog:",
+		"@reloop/api": "workspace:*",
+		"react-dom": "catalog:ui",
+		"motion": "catalog:ui",
+		"@elysiajs/eden": "catalog:backend"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",
