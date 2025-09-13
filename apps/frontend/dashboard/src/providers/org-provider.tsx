@@ -28,6 +28,7 @@ type UserOrganizationContextType = {
 	user: User;
 	activeOrganization: Organization;
 	push: (path: string, changeSlug?: boolean) => void;
+	mutateOrganizations: () => void;
 };
 
 // Create the context
@@ -51,7 +52,11 @@ export const UserOrganizationProvider = ({
 }) => {
 	const { data: session, isPending: sessionLoading } = authClient.useSession();
 	const { orgSlug } = useParams();
-	const { data: organizations, isLoading: organizationsLoading } = useSWR(
+	const {
+		data: organizations,
+		isLoading: organizationsLoading,
+		mutate: mutateOrganizations,
+	} = useSWR(
 		"organizations",
 		async () => (await authClient.organization.list()).data,
 	);
@@ -202,6 +207,7 @@ export const UserOrganizationProvider = ({
 		user: session.user,
 		activeOrganization,
 		push: onPush,
+		mutateOrganizations,
 	};
 
 	return (

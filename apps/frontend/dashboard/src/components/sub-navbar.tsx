@@ -12,8 +12,20 @@ const items = [
 		path: "/",
 	},
 	{
+		label: "Contacts",
+		path: "/contacts",
+	},
+	{
+		label: "API Keys",
+		path: "/api-keys",
+	},
+	{
 		label: "Domain",
 		path: "/domain",
+	},
+	{
+		label: "Webhooks",
+		path: "/webhooks",
 	},
 	{
 		label: "Mailboxes",

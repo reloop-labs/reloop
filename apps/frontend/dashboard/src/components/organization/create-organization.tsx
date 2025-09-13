@@ -1,5 +1,6 @@
 "use client";
 
+import { useUserOrganization } from "@dashboard/providers/org-provider";
 import { useOrgStore } from "@dashboard/store/use-org-store";
 import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
@@ -16,6 +17,7 @@ import { InviteMember } from "./invite-user";
 export const CreateOrganizationModal = () => {
 	const { open, setState } = useOrgStore();
 	const { refetch } = authClient.useSession();
+	const { mutateOrganizations } = useUserOrganization();
 	const [organizationName, setOrganizationName] = useState("");
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [showInviteMember, setShowInviteMember] = useState(false);
@@ -39,6 +41,7 @@ export const CreateOrganizationModal = () => {
 			await authClient.updateUser({
 				activeOrganizationId: organization.data.id,
 			});
+			mutateOrganizations();
 			refetch();
 			setIsSubmitting(false);
 			setShowInviteMember(true);
