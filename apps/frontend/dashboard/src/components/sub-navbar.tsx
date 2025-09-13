@@ -20,6 +20,10 @@ const items = [
 		path: "/api-keys",
 	},
 	{
+		label: "Logs",
+		path: "/logs",
+	},
+	{
 		label: "Domain",
 		path: "/domain",
 	},
