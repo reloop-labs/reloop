@@ -43,7 +43,8 @@
 		"bun-types": "catalog:backend",
 		"@types/pg": "catalog:db",
 		"@types/nodemailer": "catalog:backend",
-		"drizzle-kit": "catalog:db"
+		"drizzle-kit": "catalog:db",
+		"@reloop/tsconfig": "workspace:*"
 	},
 	"module": "src/index.js",
 	"overrides": {

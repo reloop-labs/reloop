@@ -83,6 +83,7 @@
       },
       "devDependencies": {
         "@react-email/preview-server": "catalog:ui",
+        "@reloop/tsconfig": "workspace:*",
         "@types/nodemailer": "catalog:backend",
         "@types/pg": "catalog:db",
         "bun-types": "catalog:backend",

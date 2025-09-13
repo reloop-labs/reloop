@@ -1,18 +1,18 @@
 {
+	"extends": "@reloop/tsconfig/base.json",
 	"compilerOptions": {
-		"target": "ES2022",
-		"lib": ["ES2022"],
+		"target": "ESNext",
 		"module": "ESNext",
 		"moduleResolution": "bundler",
-		"allowSyntheticDefaultImports": true,
-		"esModuleInterop": true,
-		"allowJs": true,
-		"checkJs": false,
+		"verbatimModuleSyntax": true,
 		"strict": true,
-		"forceConsistentCasingInFileNames": true,
 		"skipLibCheck": true,
-		"types": ["bun-types"]
-	},
-	"include": ["src/**/*"],
-	"exclude": ["node_modules", "dist"]
+		"outDir": "./dist",
+		"types": ["bun"],
+		"composite": false,
+		"jsx": "react-jsx",
+		"declaration": false,
+		"declarationMap": false,
+		"baseUrl": "."
+	}
 }

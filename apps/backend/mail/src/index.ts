@@ -17,7 +17,10 @@ const _createUser = createInsertSchema(table.user, {
 	email: t.String({ format: "email" }),
 });
 
-const app = new Elysia()
+const app = new Elysia({
+	prefix: "/api/mail",
+	name: "Mail Service",
+})
 	.use(serverTiming())
 	.use(bearer())
 	.use(
