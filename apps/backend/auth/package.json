@@ -35,7 +35,8 @@
 		"redis": "catalog:db",
 		"zod": "catalog:ui",
 		"@reloop/db": "workspace:*",
-		"@reloop/cache": "workspace:*"
+		"@reloop/cache": "workspace:*",
+		"@elysiajs/eden": "catalog:backend"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",
