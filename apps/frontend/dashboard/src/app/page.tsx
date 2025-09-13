@@ -1,7 +1,7 @@
 "use client";
+import { authClient } from "@reloop/auth/client";
 import Spinner from "@reloop/ui/spinner";
 import { useRouter } from "next/navigation";
-import { authClient } from "packages/auth/src/client";
 import { useEffect } from "react";
 import useSWR from "swr";
 

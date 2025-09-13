@@ -1,5 +1,5 @@
 import { useUserOrganization } from "@dashboard/providers/org-provider";
-import { authClient } from "@reloop/authclient";
+import { authClient } from "@reloop/auth/client";
 import Spinner from "@reloop/ui/spinner";
 import * as StatusBadge from "@reloop/ui/status-badge";
 import useSWR from "swr";

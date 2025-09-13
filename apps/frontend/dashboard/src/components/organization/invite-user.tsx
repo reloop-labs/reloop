@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { authClient } from "@reloop/authclient";
+import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";

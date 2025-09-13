@@ -24,7 +24,8 @@
 		"sonner": "catalog:ui",
 		"swr": "catalog:ui",
 		"zod": "catalog:ui",
-		"zustand": "catalog:ui"
+		"zustand": "catalog:ui",
+		"@reloop/tailwind": "workspace:*"
 	},
 	"devDependencies": {
 		"typescript": "catalog:",

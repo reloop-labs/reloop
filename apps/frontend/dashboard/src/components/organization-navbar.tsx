@@ -2,7 +2,7 @@
 
 import { useUserOrganization } from "@dashboard/providers/org-provider";
 import { useOrgStore } from "@dashboard/store/use-org-store";
-import { authClient } from "@reloop/authclient";
+import { authClient } from "@reloop/auth/client";
 import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";

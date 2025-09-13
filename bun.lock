@@ -121,11 +121,17 @@
       "name": "admin",
       "version": "0.1.0",
       "dependencies": {
+        "@hookform/resolvers": "catalog:ui",
+        "@reloop/auth": "workspace:*",
+        "@reloop/tailwind": "workspace:*",
         "@reloop/ui": "workspace:*",
+        "better-auth": "catalog:",
         "motion": "catalog:ui",
         "next": "catalog:ui",
         "react": "catalog:ui",
         "react-dom": "catalog:ui",
+        "react-hook-form": "catalog:ui",
+        "sonner": "catalog:ui",
       },
       "devDependencies": {
         "@reloop/tsconfig": "workspace:*",
@@ -143,6 +149,7 @@
       "dependencies": {
         "@hookform/resolvers": "catalog:ui",
         "@reloop/auth": "workspace:*",
+        "@reloop/tailwind": "workspace:*",
         "@reloop/ui": "workspace:*",
         "@tanstack/react-table": "catalog:ui",
         "better-auth": "catalog:",

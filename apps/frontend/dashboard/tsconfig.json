@@ -1,7 +1,10 @@
 {
 	"extends": "@reloop/tsconfig/nextjs.json",
 	"compilerOptions": {
-		"baseUrl": "."
+		"baseUrl": ".",
+		"paths": {
+			"@dashboard/*": ["./src/*"]
+		}
 	},
 	"include": [
 		"./**/*.ts",

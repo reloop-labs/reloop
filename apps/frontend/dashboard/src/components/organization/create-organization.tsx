@@ -1,7 +1,7 @@
 "use client";
 
 import { useOrgStore } from "@dashboard/store/use-org-store";
-import { authClient } from "@reloop/authclient";
+import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
 import * as FileUpload from "@reloop/ui/file-upload";
 import { Icon } from "@reloop/ui/icon";
