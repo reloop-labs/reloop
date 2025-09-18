@@ -4,7 +4,7 @@ import Link from "next/link";
 export const Footer = () => {
 	return (
 		<footer className="overflow-hidden">
-			<div className="mx-auto border-stroke-soft-100 border-t border-b">
+			<div className="mx-auto max-w-7xl border-stroke-soft-100 border-t border-b">
 				<FooterTitle />
 			</div>
 			<div className="mx-auto border-stroke-soft-100 border-b">
@@ -24,7 +24,7 @@ export const Footer = () => {
 
 const FooterTitle = () => {
 	return (
-		<div className="mx-auto flex max-w-5xl flex-col items-start gap-5 border-stroke-soft-100 border-r border-l pt-6 pb-12 sm:pt-8 sm:pb-14 md:pt-10 md:pb-16">
+		<div className="mx-auto flex max-w-7xl flex-col items-start gap-5 border-stroke-soft-100 border-r border-l pt-6 pb-12 sm:pt-8 sm:pb-14 md:pt-10 md:pb-16">
 			<div className="flex w-full flex-col items-center justify-center">
 				<Logo className="h-12 w-12 rounded-full sm:h-14 sm:w-14 md:h-16 md:w-16" />
 				<p className="text-center font-medium text-[20px] leading-7 sm:text-[24px] sm:leading-8 md:text-[28px] md:leading-9">
