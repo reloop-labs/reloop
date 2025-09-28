@@ -1,5 +1,4 @@
 import * as Button from "@reloop/ui/button";
-import Link from "next/link";
 
 const CommunityPage = () => {
 	return (

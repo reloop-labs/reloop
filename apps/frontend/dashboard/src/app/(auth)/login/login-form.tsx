@@ -11,6 +11,7 @@ import * as LinkButton from "@reloop/ui/link-button";
 import Spinner from "@reloop/ui/spinner";
 import { useLoading } from "@reloop/ui/use-loading";
 import { motion } from "motion/react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -145,12 +146,14 @@ export const LoginForm = () => {
 					{errors.password && (
 						<p className="text-error-base text-sm">{errors.password.message}</p>
 					)}
-					<div className="flex items-center gap-1">
+					<Link href="/reset-password" className="flex items-center gap-1">
 						<p className="text-paragraph-sm text-text-sub-600">
 							Forgot password?
 						</p>
-						<LinkButton.Root variant="black">Reset it</LinkButton.Root>
-					</div>
+						<LinkButton.Root type="button" variant="black">
+							Reset it
+						</LinkButton.Root>
+					</Link>
 				</div>
 				<Button.Root
 					type="submit"

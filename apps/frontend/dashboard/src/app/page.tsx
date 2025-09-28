@@ -16,7 +16,7 @@ const Home = () => {
 
 	useEffect(() => {
 		const handleRedirect = async () => {
-			if (!isPending && !organizationsLoading && organizations) {
+			if (!isPending && !organizationsLoading && organizations && session) {
 				if (!organizations || organizations.length === 0) {
 					console.log("No organizations found");
 					return;
@@ -36,6 +36,10 @@ const Home = () => {
 				);
 				if (activeOrg?.slug) {
 					router.push(`/${activeOrg.slug}`);
+				}
+			} else {
+				if (!isPending) {
+					router.push("/login");
 				}
 			}
 		};
