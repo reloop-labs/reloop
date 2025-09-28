@@ -92,7 +92,7 @@ export const SignupForm = () => {
 				return;
 			}
 			await authClient.updateUser({ activeOrganizationId: org.data.id });
-			router.push(`/dashboard/${org.data.slug}`);
+			router.push(`/${org.data.slug}`);
 		} catch (e) {
 			changeStatus("idle");
 			if (e instanceof Error && e.message) {

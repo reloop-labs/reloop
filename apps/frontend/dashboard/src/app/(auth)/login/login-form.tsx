@@ -63,7 +63,7 @@ export const LoginForm = () => {
 				}
 				return;
 			}
-			router.push("/dashboard");
+			router.push("/");
 		} catch (e) {
 			changeStatus("idle");
 			if (e instanceof Error && e.message) {
