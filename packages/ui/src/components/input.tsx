@@ -226,6 +226,7 @@ const Input = React.forwardRef<
 	React.InputHTMLAttributes<HTMLInputElement> &
 		InputSharedProps & {
 			asChild?: boolean;
+			size?: "medium" | "small" | "xsmall";
 		}
 >(
 	(

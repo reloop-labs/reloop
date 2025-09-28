@@ -1,5 +1,124 @@
+"use client";
+
+import { useUserOrganization } from "@dashboard/providers/org-provider";
+import { useOrgStore } from "@dashboard/store/use-org-store";
+import { authClient } from "@reloop/auth/client";
+import * as Button from "@reloop/ui/button";
+import * as FileUpload from "@reloop/ui/file-upload";
+import { Icon } from "@reloop/ui/icon";
+import * as Input from "@reloop/ui/input";
+import * as Label from "@reloop/ui/label";
+import * as Modal from "@reloop/ui/modal";
+import Spinner from "@reloop/ui/spinner";
+import { useState } from "react";
+import { toast } from "sonner";
+
 const SettingsPage = () => {
-	return <p>dlfjlskl</p>;
+	const { activeOrganization } = useUserOrganization();
+	const [organizationName, setOrganizationName] = useState(
+		activeOrganization.name,
+	);
+	const [organizationLogo, setOrganizationLogo] = useState(
+		activeOrganization.logo,
+	);
+	const [slug, setSlug] = useState(activeOrganization.slug);
+
+	return (
+		<div className="w-full flex-1 px-10 pt-5 pb-10">
+			<div className="border-stroke-soft-100 border-b pt-5 pb-7">
+				<p className="font-medium text-2xl text-text-strong-950">General</p>
+				<p className="text-paragraph-sm text-text-sub-600">
+					General Change the settings for your current workspace
+				</p>
+			</div>
+			<div className="w-full space-y-5 pt-10">
+				<div>
+					<div className="flex items-center gap-4">
+						<FileUpload.Root className="h-20 w-20">
+							<FileUpload.Icon
+								name="image-upload"
+								as={Icon}
+								className="h-6 w-6"
+							/>
+						</FileUpload.Root>
+						<div>
+							<Label.Root htmlFor="email">Workspace logo</Label.Root>
+							<p className="-mt-0.5 pb-2 text-paragraph-xs text-text-sub-600">
+								Recommended size 1:1, up to 10MB.
+							</p>
+							<Button.Root variant="neutral" size="xxsmall">
+								<Icon name="camera" className="h-4 w-4" />
+								Upload Logo
+							</Button.Root>
+						</div>
+					</div>
+				</div>
+				<div className="grid grid-cols-1 gap-3">
+					<div>
+						<Label.Root htmlFor="email">Name</Label.Root>
+						<Input.Root className="mt-1 w-full">
+							<Input.Wrapper className="w-full">
+								<Input.Input
+									type="text"
+									placeholder="Organization Name"
+									value={organizationName}
+									onChange={(e) => setOrganizationName(e.target.value.trim())}
+								/>
+							</Input.Wrapper>
+						</Input.Root>
+					</div>
+					<div>
+						<Label.Root htmlFor="slug">Slug</Label.Root>
+						<Input.Root className="mt-1 w-full">
+							<Input.Wrapper>
+								<Input.Input
+									id="slug"
+									type="text"
+									placeholder="Organization Slug"
+									value={slug}
+									onChange={(e) => setSlug(e.target.value.trim())}
+								/>
+								<button
+									type="button"
+									className="flex items-center justify-center"
+								>
+									<Icon
+										name="copy"
+										className="size-5 text-text-soft-400 group-has-[disabled]:text-text-disabled-300"
+									/>
+								</button>
+							</Input.Wrapper>
+						</Input.Root>
+					</div>
+				</div>
+				<div className="flex justify-end">
+					<Button.Root variant="neutral" size="xxsmall">
+						Save Changes
+					</Button.Root>
+				</div>
+				<p className="font-medium text-label-md text-text-strong-950">
+					Danger zone
+				</p>
+				<div className="rounded-xl border border-error-light py-2 pr-2.5 pl-3">
+					<div className="flex items-center justify-between">
+						<div>
+							<p className="font-medium text-label-sm text-text-strong-950">
+								Delete workspace
+							</p>
+							<p className="text-paragraph-xs text-text-sub-600">
+								Delete your workspace and all of its data. This action is
+								irreversible.
+							</p>
+						</div>
+						<Button.Root variant="error" size="xsmall">
+							<Icon name="trash" className="size-3 text-white" />
+							Delete workspace
+						</Button.Root>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
 };
 
 export default SettingsPage;

@@ -330,6 +330,22 @@ export const IconsSprite = () => (
 					strokeLinejoin="round"
 				/>
 			</symbol>
+			<symbol id="camera" viewBox="0 0 24 24" fill="none">
+				<path
+					d="M2 9.38747C2 7.4178 3.39027 5.72195 5.32169 5.33566L5.45748 5.3085C6.44514 5.11097 7.31388 4.52918 7.87258 3.69113C8.57693 2.6346 9.7627 2 11.0325 2H12.9675C14.2373 2 15.4231 2.6346 16.1274 3.69113C16.6861 4.52918 17.5549 5.11097 18.5425 5.3085L18.6783 5.33566C20.6097 5.72195 22 7.4178 22 9.38747V14C22 16.8003 22 18.2004 21.455 19.27C20.9757 20.2108 20.2108 20.9757 19.27 21.455C18.2004 22 16.8003 22 14 22H10C7.19974 22 5.79961 22 4.73005 21.455C3.78924 20.9757 3.02433 20.2108 2.54497 19.27C2 18.2004 2 16.8003 2 14V9.38747Z"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+				<path
+					d="M16 13C16 15.2091 14.2091 17 12 17C9.79086 17 8 15.2091 8 13C8 10.7909 9.79086 9 12 9C14.2091 9 16 10.7909 16 13Z"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
 			<symbol id="headphone" viewBox="0 0 24 24">
 				<path
 					opacity="0.12"
