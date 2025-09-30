@@ -25,7 +25,6 @@ export const AdaptiveLayout: React.FC<AdaptiveLayoutProps> = ({
 				<MainSidebar />
 				<div className="flex flex-1 flex-col">
 					<main className="flex-1">{children}</main>
-					{showFooter && <Footer />}
 				</div>
 			</div>
 		);
