@@ -25,6 +25,7 @@
 		"swr": "catalog:ui",
 		"zod": "catalog:ui",
 		"zustand": "catalog:ui",
+		"usehooks-ts": "catalog:ui",
 		"@reloop/tailwind": "workspace:*"
 	},
 	"devDependencies": {

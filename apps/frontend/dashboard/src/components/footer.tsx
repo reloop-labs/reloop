@@ -1,4 +1,5 @@
 import { Logo } from "@reloop/ui/logo";
+import { LayoutToggleButton } from "./layout/layout-toggle-button";
 import { ThemeToggle } from "./theme-toggle";
 
 const links = [
@@ -22,6 +23,7 @@ export const Footer = () => {
 				</div>
 				<div className="flex items-center gap-2">
 					<p className="text-sm">All system Normal</p>
+					<LayoutToggleButton size="small" />
 					<ThemeToggle />
 				</div>
 			</div>

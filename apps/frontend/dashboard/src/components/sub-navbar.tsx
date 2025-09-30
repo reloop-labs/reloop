@@ -1,45 +1,12 @@
 "use client";
+import { mainNavigation } from "@dashboard/constants";
 import { useUserOrganization } from "@dashboard/providers/org-provider";
 import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
 import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
 import { AnimatePresence, motion } from "motion/react";
 import { usePathname } from "next/navigation";
 import { useRef, useState } from "react";
-
-const items = [
-	{
-		label: "Overview",
-		path: "/",
-	},
-	{
-		label: "Contacts",
-		path: "/contacts",
-	},
-	{
-		label: "API Keys",
-		path: "/api-keys",
-	},
-	{
-		label: "Logs",
-		path: "/logs",
-	},
-	{
-		label: "Domain",
-		path: "/domain",
-	},
-	{
-		label: "Webhooks",
-		path: "/webhooks",
-	},
-	{
-		label: "Mailboxes",
-		path: "/mailboxes",
-	},
-	{
-		label: "Settings",
-		path: "/settings",
-	},
-];
 
 export const SubNavbar = () => {
 	const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
@@ -50,14 +17,14 @@ export const SubNavbar = () => {
 	const getTabValue = (pathname: string) => {
 		const pathWithoutSlug = pathname.replace(/^\/[^/]+/, "") || "/";
 
-		const matchingItem = items.find((item) => {
+		const matchingItem = mainNavigation.find((item) => {
 			if (item.path === "/") return pathWithoutSlug === "/";
 			return pathWithoutSlug.startsWith(item.path);
 		});
 		return matchingItem?.path || "/";
 	};
 
-	const activeIndex = items.findIndex(
+	const activeIndex = mainNavigation.findIndex(
 		(item) => item.path === getTabValue(pathname),
 	);
 	const currentIdx = hoveredIdx !== undefined ? hoveredIdx : activeIndex;
@@ -68,7 +35,7 @@ export const SubNavbar = () => {
 	return (
 		<TabMenuHorizontal.Root defaultValue={"/"} value={getTabValue(pathname)}>
 			<TabMenuHorizontal.List className="relative h-10 gap-0 border-b! px-3 py-0">
-				{items.map(({ label, path }, index) => (
+				{mainNavigation.map(({ label, path, iconName }, index) => (
 					<TabMenuHorizontal.Trigger
 						ref={(el) => {
 							if (el) {
@@ -78,13 +45,14 @@ export const SubNavbar = () => {
 						onPointerEnter={() => setHoveredIdx(index)}
 						onPointerLeave={() => setHoveredIdx(undefined)}
 						className={cn(
-							"cursor-pointer px-2.5 py-0! text-sm",
+							"flex cursor-pointer items-center gap-2 px-2.5 py-0! text-sm",
 							!rect && currentIdx === index && "text-text-strong-950",
 						)}
 						key={path}
 						value={path}
 						onClick={() => push(path)}
 					>
+						<Icon name={iconName} className="h-4 w-4" />
 						{label}
 					</TabMenuHorizontal.Trigger>
 				))}
