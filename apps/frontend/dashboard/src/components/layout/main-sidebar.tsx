@@ -23,8 +23,6 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
 	const pathname = usePathname();
 	const { activeOrganization } = useUserOrganization();
 	const { isSidebarCollapsed, toggleSidebarCollapse } = useLayout();
-
-	// Extract the path after the organization slug
 	const pathWithoutSlug = pathname.replace(/^\/[^/]+/, "") || "";
 	const activeIndex = mainNavigation.findIndex((item) => {
 		if (item.path === "/" && pathWithoutSlug === "/") return true;
@@ -45,7 +43,6 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
 			animate={{ width: isSidebarCollapsed ? 56 : 224 }}
 			transition={{ duration: 0.2, ease: "easeInOut" }}
 		>
-			{/* Header */}
 			<div className="flex items-center justify-between border-stroke-soft-100 border-b p-2">
 				<AnimatePresence mode="wait">
 					{!isSidebarCollapsed && (
@@ -87,10 +84,8 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
 					</Button.Icon>
 				</Button.Root>
 			</div>
-
-			{/* Navigation */}
 			<div className="flex-1 overflow-y-auto p-2">
-				<div className="relative">
+				<div className="relative space-y-1">
 					{mainNavigation.map(({ path, label, iconName }, index) => {
 						const href = `/${activeOrganization.slug}${path}`;
 
@@ -113,7 +108,7 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
 								)}
 								title={isSidebarCollapsed ? label : undefined}
 							>
-								<Icon name={iconName} className="h-3 w-3 shrink-0" />
+								<Icon name={iconName} className="h-4 w-4 shrink-0" />
 								<AnimatePresence mode="wait">
 									{!isSidebarCollapsed && (
 										<motion.span
@@ -135,7 +130,7 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
 					<AnimatePresence>
 						{rect && (
 							<motion.div
-								className="absolute top-0 left-0 rounded-lg bg-neutral-alpha-10"
+								className="absolute top-0 left-0 rounded-lg border border-stroke-soft-200 bg-neutral-alpha-10"
 								initial={{
 									pointerEvents: "none",
 									width: rect.width,
@@ -170,8 +165,6 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
 					</AnimatePresence>
 				</div>
 			</div>
-
-			{/* User Section */}
 			<div className="border-stroke-soft-100 border-t p-2">
 				<div
 					className={cn(
