@@ -29,8 +29,7 @@ export const SubNavbar = () => {
 	);
 	const currentIdx = hoveredIdx !== undefined ? hoveredIdx : activeIndex;
 	const tab = buttonRefs.current[currentIdx];
-	const rect =
-		hoveredIdx !== undefined ? tab?.getBoundingClientRect() : undefined;
+	const rect = tab?.getBoundingClientRect();
 
 	return (
 		<TabMenuHorizontal.Root defaultValue={"/"} value={getTabValue(pathname)}>
@@ -46,7 +45,9 @@ export const SubNavbar = () => {
 						onPointerLeave={() => setHoveredIdx(undefined)}
 						className={cn(
 							"flex cursor-pointer items-center gap-2 px-2.5 py-0! text-sm",
-							!rect && currentIdx === index && "text-text-strong-950",
+							hoveredIdx === undefined &&
+								activeIndex === index &&
+								"text-text-strong-950",
 						)}
 						key={path}
 						value={path}
@@ -57,7 +58,7 @@ export const SubNavbar = () => {
 					</TabMenuHorizontal.Trigger>
 				))}
 				<AnimatePresence>
-					{rect ? (
+					{rect && activeIndex !== -1 ? (
 						<motion.div
 							className="absolute top-0 left-0 rounded-lg bg-neutral-alpha-10"
 							initial={{
