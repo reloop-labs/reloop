@@ -70,10 +70,10 @@ export const SignupForm = () => {
 			});
 			if (auth.error) {
 				changeStatus("idle");
-				if (auth.error.code === "USER_ALREADY_EXISTS") {
+				if (auth.error.code === "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL") {
 					setError("email", {
 						type: "manual",
-						message: "User already exists",
+						message: auth.error.message,
 					});
 				} else {
 					toast.error(auth.error.message);
