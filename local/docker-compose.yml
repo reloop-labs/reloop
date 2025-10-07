@@ -2,7 +2,7 @@ name: reloop-local
 
 services:
   reloop-postgres:
-    image: postgres:alpine
+    image: postgres:17-alpine
     container_name: reloop-postgres
     volumes:
       - ../docker-data/postgres:/var/lib/postgresql/data
@@ -21,7 +21,7 @@ services:
     restart: unless-stopped
 
   reloop-redis:
-    image: redis:alpine
+    image: redis:7-alpine
     container_name: reloop-redis
     command: redis-server --requirepass reloop123
     volumes:
@@ -32,7 +32,7 @@ services:
 
 
   reloop-proxy:
-    image: caddy:latest
+    image: caddy:2-alpine
     container_name: reloop-proxy
     ports:
       - "80:80"
