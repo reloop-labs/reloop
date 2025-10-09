@@ -1,0 +1,110 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+  # Prometheus receiver for metrics
+  prometheus:
+    config:
+      scrape_configs:
+        - job_name: 'otel-collector'
+          scrape_interval: 10s
+          static_configs:
+            - targets: ['localhost:8888']
+
+processors:
+  # Batch processor for better performance
+  batch:
+    timeout: 1s
+    send_batch_size: 1024
+    send_batch_max_size: 2048
+
+  # Memory limiter to prevent OOM
+  memory_limiter:
+    limit_mib: 512
+    spike_limit_mib: 128
+    check_interval: 5s
+
+  # Resource processor to add metadata
+  resource:
+    attributes:
+      - key: service.name
+        value: reloop-service
+        action: upsert
+      - key: deployment.environment
+        value: local
+        action: upsert
+
+  # Attributes processor for data transformation
+  attributes:
+    actions:
+      - key: remove_attributes
+        action: delete
+        keys: ["unwanted.attribute"]
+
+exporters:
+  # ClickHouse exporter for metrics and traces
+  clickhouse:
+    endpoint: tcp://reloop-clickhouse:9000
+    database: reloop_analytics
+    username: reloop
+    password: reloop123
+    table_name: otel_metrics
+    timeout_settings:
+      timeout: 5s
+    retry_on_failure:
+      enabled: true
+      initial_interval: 5s
+      max_interval: 30s
+      max_elapsed_time: 300s
+
+  # Prometheus exporter for metrics
+  prometheus:
+    endpoint: "0.0.0.0:8889"
+    namespace: reloop
+    const_labels:
+      service: reloop-service
+    send_timestamps: true
+    metric_relabeling:
+      - source_labels: [__name__]
+        regex: 'go_.*'
+        action: drop
+
+  # Logging exporter for debugging
+  logging:
+    loglevel: info
+    sampling_initial: 5
+    sampling_thereafter: 200
+
+  # OTLP exporter for forwarding to other systems
+  otlp:
+    endpoint: http://reloop-clickhouse:8123
+    tls:
+      insecure: true
+
+service:
+  pipelines:
+    metrics:
+      receivers: [otlp, prometheus]
+      processors: [memory_limiter, batch, resource, attributes]
+      exporters: [clickhouse, prometheus, logging]
+
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, batch, resource, attributes]
+      exporters: [clickhouse, logging]
+
+    logs:
+      receivers: [otlp]
+      processors: [memory_limiter, batch, resource, attributes]
+      exporters: [logging]
+
+  extensions: []
+  telemetry:
+    logs:
+      level: info
+    metrics:
+      address: 0.0.0.0:8888

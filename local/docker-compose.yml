@@ -45,5 +45,66 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
+  reloop-clickhouse:
+    image: clickhouse/clickhouse-server:24.8-alpine
+    container_name: reloop-clickhouse
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    volumes:
+      - ../docker-data/clickhouse:/var/lib/clickhouse
+      - ./grafana/config/clickhouse-config.xml:/etc/clickhouse-server/config.xml
+    environment:
+      CLICKHOUSE_DB: reloop_analytics
+      CLICKHOUSE_USER: reloop
+      CLICKHOUSE_PASSWORD: reloop123
+    command: ["clickhouse-server", "--config-file=/etc/clickhouse-server/config.xml"]
+    healthcheck:
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      test: ["CMD", "clickhouse-client", "--query", "SELECT 1"]
+    restart: unless-stopped
 
+  reloop-otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.100.0
+    container_name: reloop-otel-collector
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ./grafana/config/otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    ports:
+      - "4317:4317"   # OTLP gRPC receiver
+      - "4318:4318"   # OTLP HTTP receiver
+      - "8888:8888"   # Prometheus metrics
+      - "8889:8889"   # Prometheus exporter metrics
+    depends_on:
+      - reloop-clickhouse
+    restart: unless-stopped
+  reloop-grafana:
+    image: grafana/grafana:10.4.0
+    container_name: reloop-grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../docker-data/grafana:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: reloop123
+      GF_USERS_ALLOW_SIGN_UP: false
+      GF_INSTALL_PLUGINS: grafana-clickhouse-datasource
+    depends_on:
+      - reloop-clickhouse
+    restart: unless-stopped
 
+  # Optional: Loki for log aggregation
+  reloop-loki:
+    image: grafana/loki:2.9.0
+    container_name: reloop-loki
+    ports:
+      - "3100:3100"
+    volumes:
+      - ../docker-data/loki:/loki
+      - ./grafana/config/loki-config.yaml:/etc/loki/local-config.yaml
+    command: ["-config.file=/etc/loki/local-config.yaml"]
+    restart: unless-stopped
