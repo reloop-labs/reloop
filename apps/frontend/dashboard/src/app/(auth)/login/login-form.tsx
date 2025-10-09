@@ -146,7 +146,7 @@ export const LoginForm = () => {
 					{errors.password && (
 						<p className="text-error-base text-sm">{errors.password.message}</p>
 					)}
-					<Link href="/reset-password" className="flex items-center gap-1">
+					<Link href="/forgot-password" className="flex items-center gap-1">
 						<p className="text-paragraph-sm text-text-sub-600">
 							Forgot password?
 						</p>

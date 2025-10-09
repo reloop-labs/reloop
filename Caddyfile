@@ -23,7 +23,7 @@ localhost {
     }
 
     handle /api/auth* {
-
+        reverse_proxy localhost:3010
     }
 
 }

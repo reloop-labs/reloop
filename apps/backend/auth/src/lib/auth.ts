@@ -10,6 +10,7 @@ import {
 	openAPI,
 	organization,
 } from "better-auth/plugins";
+import { sendPasswordResetEmail } from "./email-service";
 import { redis } from "./redis";
 
 export const auth = betterAuth({
@@ -46,7 +47,23 @@ export const auth = betterAuth({
 	},
 	basePath: "/api/auth/v1",
 	telemetry: { enabled: false },
-	emailAndPassword: { enabled: true },
+	emailAndPassword: {
+		enabled: true,
+		sendResetPassword: async ({ user, url, token }, request) => {
+			console.log("🔐 Password reset requested for:", user.email);
+			console.log("🔗 Reset URL:", url);
+			console.log("🔑 Token:", token);
+
+			try {
+				console.log("📧 Attempting to send email...");
+				await sendPasswordResetEmail(user.email, url);
+				console.log(`✅ Password reset email sent to ${user.email}`);
+			} catch (error) {
+				console.error("❌ Failed to send password reset email:", error);
+				throw new Error("Failed to send password reset email");
+			}
+		},
+	},
 	socialProviders: {
 		google: {
 			clientId: process.env.GOOGLE_CLIENT_ID as string,
