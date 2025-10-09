@@ -1,6 +1,6 @@
 "use client";
 
-import { SubNavbar } from "@dashboard/components/sub-navbar";
+import { MainSubNavbar } from "@dashboard/components/layout/main-sub-navbar";
 import { useUserOrganization } from "@dashboard/providers/org-provider";
 import * as Avatar from "@reloop/ui/avatar";
 import { cn } from "@reloop/ui/cn";
@@ -40,7 +40,7 @@ export const MainTopbar: React.FC<MainTopbarProps> = ({ className }) => {
 				</div>
 			</div>
 			<div>
-				<SubNavbar />
+				<MainSubNavbar />
 			</div>
 		</div>
 	);

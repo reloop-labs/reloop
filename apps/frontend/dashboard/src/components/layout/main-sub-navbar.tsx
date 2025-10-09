@@ -8,7 +8,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { usePathname } from "next/navigation";
 import { useRef, useState } from "react";
 
-export const SubNavbar = () => {
+export const MainSubNavbar = () => {
 	const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 	const pathname = usePathname();

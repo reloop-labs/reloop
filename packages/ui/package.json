@@ -52,6 +52,7 @@
 		"./postcss": "./postcss.config.js",
 		"./progress": "./src/components/progress.tsx",
 		"./radio-group": "./src/components/radio-group.tsx",
+		"./radio": "./src/components/radio.tsx",
 		"./scroll-area": "./src/components/scroll-area.tsx",
 		"./select": "./src/components/select.tsx",
 		"./sheet": "./src/components/sheet.tsx",

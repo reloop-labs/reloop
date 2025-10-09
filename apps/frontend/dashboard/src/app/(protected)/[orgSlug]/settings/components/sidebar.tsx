@@ -23,6 +23,11 @@ const list = [
 		path: "/settings/security",
 		iconName: "shield-check",
 	},
+	{
+		title: "Appearance",
+		path: "/settings/appearance",
+		iconName: "swatch-book",
+	},
 ];
 
 export const SideBar = () => {
