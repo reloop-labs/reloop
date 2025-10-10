@@ -2,7 +2,8 @@
 
 import { useLayout } from "@dashboard/providers/layout-provider";
 import { cn } from "@reloop/ui/cn";
-import { Icon } from "@reloop/ui/icon";
+import { SidebarLayoutIcon } from "./sidebar-layout-icon";
+import { TopbarLayoutIcon } from "./topbar-layout-icon";
 
 interface LayoutToggleButtonProps {
 	className?: string;
@@ -17,12 +18,12 @@ export const LayoutToggleButton: React.FC<LayoutToggleButtonProps> = ({
 		{
 			value: "sidebar",
 			label: "Sidebar",
-			icon: "grid-5",
+			icon: SidebarLayoutIcon,
 		},
 		{
 			value: "topbar",
 			label: "Topbar",
-			icon: "grid-5",
+			icon: TopbarLayoutIcon,
 		},
 	];
 
@@ -40,19 +41,11 @@ export const LayoutToggleButton: React.FC<LayoutToggleButtonProps> = ({
 							: "border-stroke-soft-100 hover:border-stroke-soft-200",
 					)}
 				>
+					<p className={cn("text-sm", "font-medium text-primary-600")}>
+						{option.label}
+					</p>
 					<div className="flex items-center justify-center gap-2 pt-2">
-						<Icon
-							name={option.icon}
-							className={cn(
-								"h-20 w-20",
-								layoutMode === option.value
-									? "text-primary-600"
-									: "text-text-sub-600",
-							)}
-						/>
-						<p className={cn("text-sm", "font-medium text-primary-600")}>
-							{option.label}
-						</p>
+						<option.icon />
 					</div>
 				</button>
 			))}

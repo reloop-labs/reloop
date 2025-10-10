@@ -46,8 +46,8 @@ export function ThemeToggleAppearance() {
 					<Image
 						src={option.image}
 						alt={`${option.label} theme preview`}
-						width={132}
-						height={105}
+						width={120}
+						height={80}
 						className="rounded-lg"
 					/>
 					<div className="flex items-center justify-center gap-2 pt-2">
