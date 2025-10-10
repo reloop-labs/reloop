@@ -18,13 +18,10 @@ const SettingsPage = () => {
 	const [organizationName, setOrganizationName] = useState(
 		activeOrganization.name,
 	);
-	const [organizationLogo, setOrganizationLogo] = useState(
-		activeOrganization.logo,
-	);
 	const [slug, setSlug] = useState(activeOrganization.slug);
 
 	return (
-		<div className="w-full flex-1 px-10 pt-5 pb-10">
+		<div>
 			<div className="border-stroke-soft-100 border-b pt-5 pb-7">
 				<p className="font-medium text-2xl text-text-strong-950">General</p>
 				<p className="text-paragraph-sm text-text-sub-600">

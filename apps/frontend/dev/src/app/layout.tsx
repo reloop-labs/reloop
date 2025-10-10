@@ -1,8 +1,8 @@
-import "@dev/app/global.css";
-import { cn } from "@dev/lib/cn";
+import "../app/global.css";
 import { IconsSprite } from "@reloop/ui/icon";
 import { RootProvider } from "fumadocs-ui/provider";
 import type { ReactNode } from "react";
+import { cn } from "../lib/cn";
 
 export default function Layout({ children }: { children: ReactNode }) {
 	return (

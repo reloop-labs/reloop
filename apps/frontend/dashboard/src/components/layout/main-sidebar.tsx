@@ -36,11 +36,11 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
 	return (
 		<motion.div
 			className={cn(
-				"sticky top-0 z-10 flex h-screen flex-col border-stroke-soft-100 border-r bg-bg-white-0",
-				isSidebarCollapsed ? "w-14" : "w-56",
+				"sticky top-0 z-10 flex h-screen flex-col border-stroke-soft-100 border-r bg-neutral-alpha-10/30",
+				isSidebarCollapsed ? "w-14" : "w-60",
 				className,
 			)}
-			animate={{ width: isSidebarCollapsed ? 56 : 224 }}
+			animate={{ width: isSidebarCollapsed ? 56 : 240 }}
 			transition={{ duration: 0.2, ease: "easeInOut" }}
 		>
 			<div className="flex items-center justify-between border-stroke-soft-100 border-b p-2">

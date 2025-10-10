@@ -12,7 +12,7 @@ const Team = () => {
 	});
 
 	return (
-		<div className="px-10 pt-5 pb-10">
+		<div>
 			<div>
 				<p className="font-medium text-2xl text-text-strong-950">Team</p>
 				<p className="text-paragraph-sm text-text-sub-600">
