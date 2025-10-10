@@ -1,5 +1,5 @@
 import { Logo } from "@reloop/ui/logo";
-import { LayoutToggleButton } from "./layout/layout-toggle-button";
+import { LayoutToggleButton } from "../app/(protected)/[orgSlug]/settings/appearance/layout-toggle-button";
 import { ThemeToggle } from "./theme-toggle";
 
 const links = [
