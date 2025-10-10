@@ -84,7 +84,7 @@ services:
     image: grafana/grafana:10.4.0
     container_name: reloop-grafana
     ports:
-      - "3000:3000"
+      - "3400:3000"
     volumes:
       - ../docker-data/grafana:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning

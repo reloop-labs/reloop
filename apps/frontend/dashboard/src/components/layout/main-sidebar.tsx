@@ -23,10 +23,10 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
 	const pathname = usePathname();
 	const { activeOrganization } = useUserOrganization();
 	const { isSidebarCollapsed, toggleSidebarCollapse } = useLayout();
-	const pathWithoutSlug = pathname.replace(/^\/[^/]+/, "") || "";
+	const pathWithoutSlug = pathname.replace(/^\/[^/]+/, "") || "/";
 	const activeIndex = mainNavigation.findIndex((item) => {
-		if (item.path === "/" && pathWithoutSlug === "/") return true;
-		return pathWithoutSlug.startsWith(item.path) && item.path !== "/";
+		if (item.path === "/") return pathWithoutSlug === "/";
+		return pathWithoutSlug.startsWith(item.path);
 	});
 
 	const currentIdx = idx !== undefined ? idx : activeIndex;

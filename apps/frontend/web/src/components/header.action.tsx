@@ -2,7 +2,6 @@
 
 import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
-import Link from "next/link";
 
 export const HeaderAction = () => {
 	const { useSession } = authClient;
@@ -28,8 +27,8 @@ export const HeaderAction = () => {
 
 	return (
 		<div className="flex items-center gap-2">
-			<Link
-				href="/login"
+			<a
+				href="/dashboard/login"
 				className={Button.buttonVariants({
 					variant: "neutral",
 					mode: "stroke",
@@ -37,16 +36,16 @@ export const HeaderAction = () => {
 				}).root()}
 			>
 				Login
-			</Link>
-			<Link
-				href="/login"
+			</a>
+			<a
+				href="/dashboard/sign-up"
 				className={Button.buttonVariants({
 					variant: "neutral",
 					size: "xsmall",
 				}).root()}
 			>
 				Get Started
-			</Link>
+			</a>
 		</div>
 	);
 };
