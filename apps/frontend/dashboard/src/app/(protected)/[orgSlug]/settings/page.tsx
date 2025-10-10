@@ -1,19 +1,17 @@
 "use client";
 
+import { useLayout } from "@dashboard/providers/layout-provider";
 import { useUserOrganization } from "@dashboard/providers/org-provider";
-import { useOrgStore } from "@dashboard/store/use-org-store";
-import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
 import * as FileUpload from "@reloop/ui/file-upload";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
-import * as Modal from "@reloop/ui/modal";
-import Spinner from "@reloop/ui/spinner";
 import { useState } from "react";
-import { toast } from "sonner";
 
 const SettingsPage = () => {
+	const { layoutMode } = useLayout();
+	const isTopbar = layoutMode === "topbar";
 	const { activeOrganization } = useUserOrganization();
 	const [organizationName, setOrganizationName] = useState(
 		activeOrganization.name,
@@ -22,13 +20,18 @@ const SettingsPage = () => {
 
 	return (
 		<div>
-			<div className="border-stroke-soft-100 border-b pt-5 pb-7">
-				<p className="font-medium text-2xl text-text-strong-950">General</p>
-				<p className="text-paragraph-sm text-text-sub-600">
-					General Change the settings for your current workspace
-				</p>
-			</div>
-			<div className="w-full space-y-5 pt-10">
+			{isTopbar && (
+				<div className="mb-5 border-stroke-soft-100 border-b p-5 pb-7">
+					<div className="flex items-center gap-2">
+						<Icon name="gear" className="h-5 w-5" />
+						<p className="font-medium text-2xl text-text-strong-950">General</p>
+					</div>
+					<p className="text-paragraph-sm text-text-sub-600">
+						General Change the settings for your current workspace
+					</p>
+				</div>
+			)}
+			<div className="w-full space-y-5 pt-5">
 				<div>
 					<div className="flex items-center gap-4">
 						<FileUpload.Root className="h-20 w-20">
