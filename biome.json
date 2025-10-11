@@ -36,6 +36,9 @@
 				"useExhaustiveDependencies": "info",
 				"noUnknownFunction": "info"
 			},
+			"complexity": {
+				"noStaticOnlyClass": "off"
+			},
 			"a11y": {
 				"noSvgWithoutTitle": "off",
 				"noAriaHiddenOnFocusable": "off"
