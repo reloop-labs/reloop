@@ -27,7 +27,8 @@
 		"drizzle-orm": "catalog:db",
 		"drizzle-typebox": "catalog:db",
 		"pg": "catalog:db",
-		"redis": "catalog:db"
+		"redis": "catalog:db",
+		"@paralleldrive/cuid2": "catalog:backend"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",

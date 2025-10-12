@@ -1,14 +1,15 @@
 import { RedisCache } from "@reloop/cache/redis-client";
 import { db } from "@reloop/db/client";
+import { logger } from "@reloop/logger";
 
 const redis = new RedisCache("auth");
 export const loader = async () => {
 	try {
 		await redis.healthCheck();
-		console.log("Redis connected");
+		logger.info("Redis connected");
 		await db.execute("SELECT 1 as test");
-		console.log("Postgres connected");
+		logger.info("Postgres connected");
 	} catch (e) {
-		console.error(e);
+		logger.error("Error during service initialization", { error: e instanceof Error ? e.message : String(e) });
 	}
 };

@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { serverTiming } from "@elysiajs/server-timing";
 import { swagger } from "@elysiajs/swagger";
+import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
 import { landing } from "./landing";
 import { loader } from "./loader";
@@ -8,7 +9,7 @@ import { domainRoutes } from "./routes/domain";
 import { validationRoutes } from "./routes/validation";
 
 const port = Number(process.env.PORT || 3000);
-
+console.log(process.env.NODE_ENV);
 const app = new Elysia({ prefix: "/api/domain", name: "Domain Service" })
 	.use(serverTiming())
 	.use(swagger({ path: "/docs" }))
@@ -19,7 +20,7 @@ const app = new Elysia({ prefix: "/api/domain", name: "Domain Service" })
 		await loader();
 	})
 	.listen(port, () => {
-		console.log(
+		logger.info(
 			`Domain Server is running on http://localhost:${port}/api/domain`,
 		);
 	});

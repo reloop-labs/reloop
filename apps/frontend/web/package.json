@@ -19,15 +19,17 @@
 		"@hookform/resolvers": "catalog:ui",
 		"react-hook-form": "catalog:ui",
 		"sonner": "catalog:ui",
-		"better-auth": "catalog:"
+		"better-auth": "catalog:",
+		"next-themes": "catalog:ui",
+		"tailwindcss": "catalog:ui",
+		"@tailwindcss/postcss": "catalog:ui",
+		"postcss": "catalog:ui"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",
-		"@tailwindcss/postcss": "catalog:ui",
 		"@types/node": "catalog:",
 		"@types/react": "catalog:ui",
 		"@types/react-dom": "catalog:ui",
-		"tailwindcss": "catalog:ui",
 		"typescript": "catalog:"
 	}
 }

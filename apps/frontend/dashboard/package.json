@@ -26,9 +26,11 @@
 		"zod": "catalog:ui",
 		"zustand": "catalog:ui",
 		"usehooks-ts": "catalog:ui",
+		"next-themes": "catalog:ui",
 		"@reloop/tailwind": "workspace:*"
 	},
 	"devDependencies": {
+		"@reloop/tsconfig": "workspace:*",
 		"typescript": "catalog:",
 		"@types/node": "catalog:",
 		"@types/react": "catalog:ui",

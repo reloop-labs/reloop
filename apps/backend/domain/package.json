@@ -35,6 +35,7 @@
 		"zod": "catalog:ui",
 		"@reloop/db": "workspace:*",
 		"@reloop/cache": "workspace:*",
+		"@reloop/logger": "workspace:*",
 		"@elysiajs/eden": "catalog:backend"
 	},
 	"devDependencies": {

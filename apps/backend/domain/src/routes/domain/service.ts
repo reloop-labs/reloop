@@ -1,5 +1,6 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
+import { logger } from "@reloop/logger";
 import { and, count, desc, eq, like } from "drizzle-orm";
 import { status } from "elysia";
 import type { DomainModel } from "./model";
@@ -12,6 +13,8 @@ type UpdateDomainBody = DomainModel.UpdateDomainBody;
 
 export class DomainService {
     static async createDomain(data: CreateDomainBody): Promise<DomainResponse> {
+        logger.info("Creating domain", { domain: data.domain, organizationId: data.organizationId, userId: data.userId });
+
         try {
             const existingDomain = await db
                 .select()
@@ -20,6 +23,7 @@ export class DomainService {
                 .limit(1);
 
             if (existingDomain.length > 0) {
+                logger.warn("Domain already exists", { domain: data.domain });
                 throw status(409, "Domain already exists" as const);
             }
 
@@ -33,10 +37,14 @@ export class DomainService {
                 .returning();
 
             if (!newDomain[0]) {
+                logger.error("Failed to create domain - no data returned", { domain: data.domain });
                 throw status(500, "Failed to create domain" as const);
             }
+
+            logger.info("Domain created successfully", { domain: data.domain, id: newDomain[0].domain });
             return DomainService.formatDomainResponse(newDomain[0]);
         } catch (error) {
+            logger.error("Error creating domain", { domain: data.domain, error: error instanceof Error ? error.message : String(error) });
             if (error instanceof Error && error.message.includes("already exists")) {
                 throw status(409, "Domain already exists" as const);
             }
@@ -45,59 +53,91 @@ export class DomainService {
     }
 
     static async getDomain(domainName: string): Promise<DomainResponse> {
-        const result = await db
-            .select()
-            .from(schema.domain)
-            .where(eq(schema.domain.domain, domainName))
-            .limit(1);
+        logger.info("Getting domain", { domain: domainName });
 
-        if (result.length === 0) {
-            throw status(404, "Domain not found" as const);
-        }
+        try {
+            const result = await db
+                .select()
+                .from(schema.domain)
+                .where(eq(schema.domain.domain, domainName))
+                .limit(1);
 
-        if (!result[0]) {
-            throw status(404, "Domain not found" as const);
+            if (result.length === 0) {
+                logger.warn("Domain not found", { domain: domainName });
+                throw status(404, "Domain not found" as const);
+            }
+
+            if (!result[0]) {
+                logger.warn("Domain not found - null result", { domain: domainName });
+                throw status(404, "Domain not found" as const);
+            }
+
+            logger.info("Domain retrieved successfully", { domain: domainName });
+            return DomainService.formatDomainResponse(result[0]);
+        } catch (error) {
+            logger.error("Error getting domain", { domain: domainName, error: error instanceof Error ? error.message : String(error) });
+            throw error;
         }
-        return DomainService.formatDomainResponse(result[0]);
     }
 
     static async updateDomain(
         domainName: string,
         data: UpdateDomainBody,
     ): Promise<DomainResponse> {
-        const existingDomain = await db
-            .select()
-            .from(schema.domain)
-            .where(eq(schema.domain.domain, domainName))
-            .limit(1);
+        logger.info("Updating domain", { domain: domainName, updateData: data });
 
-        if (existingDomain.length === 0) {
-            throw status(404, "Domain not found" as const);
+        try {
+            const existingDomain = await db
+                .select()
+                .from(schema.domain)
+                .where(eq(schema.domain.domain, domainName))
+                .limit(1);
+
+            if (existingDomain.length === 0) {
+                logger.warn("Domain not found for update", { domain: domainName });
+                throw status(404, "Domain not found" as const);
+            }
+
+            const updatedDomain = await db
+                .update(schema.domain)
+                .set({
+                    ...data,
+                    updatedAt: new Date(),
+                })
+                .where(eq(schema.domain.domain, domainName))
+                .returning();
+
+            if (!updatedDomain[0]) {
+                logger.error("Failed to update domain - no data returned", { domain: domainName });
+                throw status(500, "Failed to update domain" as const);
+            }
+
+            logger.info("Domain updated successfully", { domain: domainName });
+            return DomainService.formatDomainResponse(updatedDomain[0]);
+        } catch (error) {
+            logger.error("Error updating domain", { domain: domainName, error: error instanceof Error ? error.message : String(error) });
+            throw error;
         }
-
-        const updatedDomain = await db
-            .update(schema.domain)
-            .set({
-                ...data,
-                updatedAt: new Date(),
-            })
-            .where(eq(schema.domain.domain, domainName))
-            .returning();
-
-        if (!updatedDomain[0]) {
-            throw status(500, "Failed to update domain" as const);
-        }
-        return DomainService.formatDomainResponse(updatedDomain[0]);
     }
 
     static async deleteDomain(domainName: string): Promise<void> {
-        const result = await db
-            .delete(schema.domain)
-            .where(eq(schema.domain.domain, domainName))
-            .returning();
+        logger.info("Deleting domain", { domain: domainName });
 
-        if (result.length === 0) {
-            throw status(404, "Domain not found" as const);
+        try {
+            const result = await db
+                .delete(schema.domain)
+                .where(eq(schema.domain.domain, domainName))
+                .returning();
+
+            if (result.length === 0) {
+                logger.warn("Domain not found for deletion", { domain: domainName });
+                throw status(404, "Domain not found" as const);
+            }
+
+            logger.info("Domain deleted successfully", { domain: domainName });
+        } catch (error) {
+            logger.error("Error deleting domain", { domain: domainName, error: error instanceof Error ? error.message : String(error) });
+            throw error;
         }
     }
 
@@ -105,42 +145,51 @@ export class DomainService {
         const { page = 1, limit = 10, active, organizationId, userId } = query;
         const offset = (page - 1) * limit;
 
-        const conditions = [];
-        if (active !== undefined) {
-            conditions.push(eq(schema.domain.active, active));
+        logger.info("Listing domains", { page, limit, active, organizationId, userId });
+
+        try {
+            const conditions = [];
+            if (active !== undefined) {
+                conditions.push(eq(schema.domain.active, active));
+            }
+            if (organizationId) {
+                conditions.push(eq(schema.domain.organizationId, organizationId));
+            }
+            if (userId) {
+                conditions.push(eq(schema.domain.userId, userId));
+            }
+
+            const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+            const totalResult = await db
+                .select({ count: count() })
+                .from(schema.domain)
+                .where(whereClause);
+
+            const total = totalResult[0]?.count || 0;
+
+            const domains = await db
+                .select()
+                .from(schema.domain)
+                .where(whereClause)
+                .orderBy(desc(schema.domain.createdAt))
+                .limit(limit)
+                .offset(offset);
+
+            logger.info("Domains listed successfully", { total, page, limit, count: domains.length });
+
+            return {
+                domains: domains.map((domain) =>
+                    DomainService.formatDomainResponse(domain),
+                ),
+                total,
+                page,
+                limit,
+            };
+        } catch (error) {
+            logger.error("Error listing domains", { query, error: error instanceof Error ? error.message : String(error) });
+            throw error;
         }
-        if (organizationId) {
-            conditions.push(eq(schema.domain.organizationId, organizationId));
-        }
-        if (userId) {
-            conditions.push(eq(schema.domain.userId, userId));
-        }
-
-        const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
-
-        const totalResult = await db
-            .select({ count: count() })
-            .from(schema.domain)
-            .where(whereClause);
-
-        const total = totalResult[0]?.count || 0;
-
-        const domains = await db
-            .select()
-            .from(schema.domain)
-            .where(whereClause)
-            .orderBy(desc(schema.domain.createdAt))
-            .limit(limit)
-            .offset(offset);
-
-        return {
-            domains: domains.map((domain) =>
-                DomainService.formatDomainResponse(domain),
-            ),
-            total,
-            page,
-            limit,
-        };
     }
 
     static async searchDomains(
@@ -150,46 +199,64 @@ export class DomainService {
         const { page = 1, limit = 10, active } = query;
         const offset = (page - 1) * limit;
 
-        const conditions = [like(schema.domain.domain, `%${searchTerm}%`)];
-        if (active !== undefined) {
-            conditions.push(eq(schema.domain.active, active));
+        logger.info("Searching domains", { searchTerm, page, limit, active });
+
+        try {
+            const conditions = [like(schema.domain.domain, `%${searchTerm}%`)];
+            if (active !== undefined) {
+                conditions.push(eq(schema.domain.active, active));
+            }
+
+            const whereClause = and(...conditions);
+
+            const totalResult = await db
+                .select({ count: count() })
+                .from(schema.domain)
+                .where(whereClause);
+
+            const total = totalResult[0]?.count || 0;
+
+            const domains = await db
+                .select()
+                .from(schema.domain)
+                .where(whereClause)
+                .orderBy(desc(schema.domain.createdAt))
+                .limit(limit)
+                .offset(offset);
+
+            logger.info("Domain search completed", { searchTerm, total, page, limit, count: domains.length });
+
+            return {
+                domains: domains.map((domain) =>
+                    DomainService.formatDomainResponse(domain),
+                ),
+                total,
+                page,
+                limit,
+            };
+        } catch (error) {
+            logger.error("Error searching domains", { searchTerm, query, error: error instanceof Error ? error.message : String(error) });
+            throw error;
         }
-
-        const whereClause = and(...conditions);
-
-        const totalResult = await db
-            .select({ count: count() })
-            .from(schema.domain)
-            .where(whereClause);
-
-        const total = totalResult[0]?.count || 0;
-
-        const domains = await db
-            .select()
-            .from(schema.domain)
-            .where(whereClause)
-            .orderBy(desc(schema.domain.createdAt))
-            .limit(limit)
-            .offset(offset);
-
-        return {
-            domains: domains.map((domain) =>
-                DomainService.formatDomainResponse(domain),
-            ),
-            total,
-            page,
-            limit,
-        };
     }
 
     static async domainExists(domainName: string): Promise<boolean> {
-        const result = await db
-            .select({ domain: schema.domain.domain })
-            .from(schema.domain)
-            .where(eq(schema.domain.domain, domainName))
-            .limit(1);
+        logger.info("Checking if domain exists", { domain: domainName });
 
-        return result.length > 0;
+        try {
+            const result = await db
+                .select({ domain: schema.domain.domain })
+                .from(schema.domain)
+                .where(eq(schema.domain.domain, domainName))
+                .limit(1);
+
+            const exists = result.length > 0;
+            logger.info("Domain existence check completed", { domain: domainName, exists });
+            return exists;
+        } catch (error) {
+            logger.error("Error checking domain existence", { domain: domainName, error: error instanceof Error ? error.message : String(error) });
+            throw error;
+        }
     }
 
     private static formatDomainResponse(domain: {

@@ -4,7 +4,7 @@ import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as LinkButton from "@reloop/ui/link-button";
 import { Logo } from "@reloop/ui/logo";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "motion/react";
 import Link from "next/link";
 import { useState } from "react";
 import { LoginForm } from "./login-form";
