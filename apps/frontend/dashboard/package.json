@@ -11,23 +11,24 @@
 	"dependencies": {
 		"@hookform/resolvers": "catalog:ui",
 		"@reloop/auth": "workspace:*",
+		"@reloop/tailwind": "workspace:*",
 		"@reloop/ui": "workspace:*",
 		"@tanstack/react-table": "catalog:ui",
 		"better-auth": "catalog:",
 		"dayjs": "catalog:ui",
+		"framer-motion": "catalog:ui",
 		"motion": "catalog:ui",
 		"next": "catalog:ui",
+		"next-themes": "catalog:ui",
 		"nuqs": "catalog:ui",
 		"react": "catalog:ui",
 		"react-dom": "catalog:ui",
 		"react-hook-form": "catalog:ui",
 		"sonner": "catalog:ui",
 		"swr": "catalog:ui",
-		"zod": "catalog:ui",
-		"zustand": "catalog:ui",
 		"usehooks-ts": "catalog:ui",
-		"next-themes": "catalog:ui",
-		"@reloop/tailwind": "workspace:*"
+		"zod": "catalog:ui",
+		"zustand": "catalog:ui"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",

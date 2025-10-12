@@ -1,5 +1,6 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
+import { sendPasswordResetEmail } from "@reloop/email";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import {
@@ -10,7 +11,6 @@ import {
 	openAPI,
 	organization,
 } from "better-auth/plugins";
-import { sendPasswordResetEmail } from "./email-service";
 import { redis } from "./redis";
 
 export const auth = betterAuth({

@@ -81,7 +81,8 @@
 				"dayjs": "^1.11.18",
 				"@react-email/tailwind": "^1.2.2",
 				"@react-email/render": "^1.2.3",
-				"@responsive-email/react-email": "^0.0.4"
+				"@responsive-email/react-email": "^0.0.4",
+				"framer-motion": "^12.23.24"
 			},
 			"db": {
 				"@types/pg": "8.15.4",
