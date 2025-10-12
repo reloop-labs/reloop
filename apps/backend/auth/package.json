@@ -33,9 +33,11 @@
 		"logixlysia": "catalog:backend",
 		"pg": "catalog:db",
 		"redis": "catalog:db",
+		"resend": "catalog:backend",
 		"zod": "catalog:ui",
 		"@reloop/db": "workspace:*",
 		"@reloop/cache": "workspace:*",
+		"@reloop/email": "workspace:*",
 		"@elysiajs/eden": "catalog:backend"
 	},
 	"devDependencies": {

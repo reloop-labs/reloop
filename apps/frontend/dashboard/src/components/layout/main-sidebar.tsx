@@ -21,7 +21,7 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
 	const [idx, setIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLAnchorElement[]>([]);
 	const pathname = usePathname();
-	const { activeOrganization } = useUserOrganization();
+	const { user, activeOrganization } = useUserOrganization();
 	const { isSidebarCollapsed, toggleSidebarCollapse } = useLayout();
 	const pathWithoutSlug = pathname.replace(/^\/[^/]+/, "") || "/";
 	const activeIndex = mainNavigation.findIndex((item) => {
@@ -183,10 +183,10 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
 								transition={{ duration: 0.15 }}
 							>
 								<p className="truncate font-medium text-sm text-text-strong-950">
-									User Name
+									{user.name}
 								</p>
 								<p className="truncate text-text-sub-600 text-xs">
-									user@example.com
+									{user.email}
 								</p>
 							</motion.div>
 						)}

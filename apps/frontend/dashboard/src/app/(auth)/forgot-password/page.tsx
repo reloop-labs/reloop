@@ -5,9 +5,10 @@ import * as LinkButton from "@reloop/ui/link-button";
 import { Logo } from "@reloop/ui/logo";
 import { AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { ResetPasswordForm } from "./reset-password-form";
+// Removed unused useState import
+import { ForgotPasswordForm } from "./forgot-password-form";
 
-const Page = () => {
+const ForgotPassword = () => {
 	return (
 		<div>
 			<header className="relative mx-auto flex h-16 w-full max-w-7xl flex-1 items-center justify-between gap-4 px-4 lg:p-[18px]">
@@ -34,15 +35,15 @@ const Page = () => {
 					<div className="flex flex-col items-center justify-center gap-2">
 						<div className="space-y-1 text-center">
 							<h2 className="title-h5 md:title-h5 text-text-strong-950">
-								Reset your password
+								Forgot your password?
 							</h2>
 							<p className="text-paragraph-sm text-text-sub-600">
-								Enter your new password below
+								No worries, we'll send you reset instructions.
 							</p>
 						</div>
 					</div>
 					<AnimatePresence>
-						<ResetPasswordForm />
+						<ForgotPasswordForm />
 					</AnimatePresence>
 					<div className="flex items-center justify-center gap-1">
 						<p className="text-paragraph-sm text-text-sub-600">
@@ -63,4 +64,4 @@ const Page = () => {
 	);
 };
 
-export default Page;
+export default ForgotPassword;

@@ -4,7 +4,8 @@
 	"private": true,
 	"main": "index.ts",
 	"exports": {
-		"./emails/*": "./emails/*.tsx",
+		".": "./index.ts",
+		"./emails/*": "./emails/*",
 		"./locales": "./locales/index.ts",
 		"./render": "./render.ts"
 	},
@@ -24,10 +25,12 @@
 		"date-fns": "catalog:backend",
 		"react-email": "catalog:ui",
 		"react": "catalog:ui",
-		"react-dom": "catalog:ui"
+		"react-dom": "catalog:ui",
+		"resend": "catalog:backend"
 	},
 	"devDependencies": {
-		"typescript": "workspace:",
-		"@types/bun": "catalog:backend"
+		"@react-email/preview-server": "4.2.8",
+		"@types/bun": "catalog:backend",
+		"typescript": "workspace:"
 	}
 }

@@ -23,7 +23,6 @@ localhost {
     }
 
     handle /api/auth* {
-
     }
 
 }
