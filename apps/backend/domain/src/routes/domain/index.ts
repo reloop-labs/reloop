@@ -4,7 +4,7 @@ import { DomainModel } from "./model";
 import { DomainService } from "./service";
 
 export const domainRoutes = new Elysia({
-    prefix: "/",
+    prefix: "/v1",
     name: "DomainRoutes",
 })
     .post(
@@ -86,10 +86,8 @@ export const domainRoutes = new Elysia({
             },
         },
     )
-
-    // List domains with pagination and filters
     .get(
-        "/",
+        "/list",
         async ({ query }) => {
             return await DomainService.listDomains(query);
         },
@@ -106,8 +104,6 @@ export const domainRoutes = new Elysia({
             },
         },
     )
-
-    // Search domains
     .get(
         "/search/:term",
         async ({ params: { term }, query }) => {
@@ -129,8 +125,6 @@ export const domainRoutes = new Elysia({
             },
         },
     )
-
-    // Check if domain exists
     .head(
         "/:domain",
         async ({ params: { domain } }) => {
@@ -152,6 +146,4 @@ export const domainRoutes = new Elysia({
             },
         },
     )
-
-    // Include validation routes
     .use(validationRoutes);

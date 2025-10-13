@@ -6,7 +6,6 @@ export const validationRoutes = new Elysia({
     prefix: "/validation",
     name: "ValidationRoutes",
 })
-    // Validate DNS records
     .post(
         "/dns",
         async ({ body }) => {
