@@ -31,12 +31,12 @@ export const landing = new Elysia()
 ║                    DOMAIN SERVICE                      ║
 ╠════════════════════════════════════════════════════════╣
 ║                                                        ║
-║           █████╗ ██╗   ██╗████████╗██╗  ██╗            ║
-║          ██╔══██╗██║   ██║╚══██╔══╝██║  ██║            ║
-║          ███████║██║   ██║   ██║   ███████║            ║
-║          ██╔══██║██║   ██║   ██║   ██╔══██║            ║
-║          ██║  ██║╚██████╔╝   ██║   ██║  ██║            ║
-║          ╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝            ║
+║   ██████╗  ██████╗ ███╗   ███╗ █████╗ ██╗███╗   ██╗    ║
+║   ██╔══██╗██╔═══██╗████╗ ████║██╔══██╗██║████╗  ██║    ║
+║   ██║  ██║██║   ██║██╔████╔██║███████║██║██╔██╗ ██║    ║
+║   ██║  ██║██║   ██║██║╚██╔╝██║██╔══██║██║██║╚██╗██║    ║
+║   ██████╔╝╚██████╔╝██║ ╚═╝ ██║██║  ██║██║██║ ╚████║    ║
+║   ╚═════╝  ╚═════╝ ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝    ║
 ║                                                        ║
 ║                  ONLINE & READY                        ║
 ║                 Version: v1.0.0                        ║
@@ -50,21 +50,21 @@ ${redisError ? `║ REDIS ERROR: ${redisError.substring(0, 50).padEnd(50)} ║` 
 ╠════════════════════════════════════════════════════════╣
 ║ QUICK START:                                           ║
 ║ curl -X GET /api/domain/check \                         ║
-║   -H "Content-Type: application/json" \                ║
+║   -H "Content-Type: application/json" \                 ║
 ║   -d '{"domain":"example.com"}'                        ║
 ╠════════════════════════════════════════════════════════╣
 ║ - SUPPORT                                              ║
 ║ - https://reloop.sh/dev/setup/backend/domain           ║
 ║ - https://github.com/reloop-labs/reloop                ║
 ╠════════════════════════════════════════════════════════╣
-║  "The best security is invisible security"             ║
+║  "In domains we trust, in DNS we verify"               ║
 ║                    - Your Reloop Team                  ║
 ╚════════════════════════════════════════════════════════╝
 
 
     Powered by ☕ Coffee, 🍕 Pizza & 💻 Late Night Coding
 
-                    Made with ❤️ for developers
+                Made with ❤️ for developers
 
 `;
 	})
