@@ -4,11 +4,7 @@ import { logger } from "@reloop/logger";
 import { and, count, desc, eq, like } from "drizzle-orm";
 import { status } from "elysia";
 import { DNSService } from "../dns/dns.service";
-import type { DomainModel } from "./model";
-
-type DomainListResponse = DomainModel.DomainListResponse;
-type DomainQuery = DomainModel.DomainQuery;
-type DomainResponse = DomainModel.DomainResponse;
+import type { DomainTypes } from "./domain.type";
 
 export class DomainService {
     static async createDomain(
@@ -16,7 +12,7 @@ export class DomainService {
         userId: string,
         domain: string,
         serverIP = "127.0.0.1",
-    ): Promise<DomainResponse> {
+    ): Promise<DomainTypes.DomainResponse> {
         logger.info("Creating domain", {
             domain: domain,
             organizationId: organizationId,
@@ -94,7 +90,7 @@ export class DomainService {
         }
     }
 
-    static async getDomain(domainName: string): Promise<DomainResponse> {
+    static async getDomain(domainName: string): Promise<DomainTypes.DomainResponse> {
         logger.info("Getting domain", { domain: domainName });
 
         try {
@@ -149,7 +145,7 @@ export class DomainService {
         }
     }
 
-    static async listDomains(query: DomainQuery): Promise<DomainListResponse> {
+    static async listDomains(query: DomainTypes.DomainQuery): Promise<DomainTypes.DomainListResponse> {
         const { page = 1, limit = 10, active, organizationId, userId } = query;
         const offset = (page - 1) * limit;
 
@@ -217,8 +213,8 @@ export class DomainService {
 
     static async searchDomains(
         searchTerm: string,
-        query: Omit<DomainQuery, "organizationId" | "userId">,
-    ): Promise<DomainListResponse> {
+        query: Omit<DomainTypes.DomainQuery, "organizationId" | "userId">,
+    ): Promise<DomainTypes.DomainListResponse> {
         const { page = 1, limit = 10, active } = query;
         const offset = (page - 1) * limit;
 
@@ -309,7 +305,7 @@ export class DomainService {
         active: boolean;
         createdAt: Date;
         updatedAt: Date;
-    }): DomainResponse {
+    }): DomainTypes.DomainResponse {
         return {
             domain: domain.domain,
             organizationId: domain.organizationId,
@@ -322,5 +318,125 @@ export class DomainService {
             createdAt: domain.createdAt.toISOString(),
             updatedAt: domain.updatedAt.toISOString(),
         };
+    }
+}
+
+export class DomainServiceHandler {
+    static async createDomain(
+        organizationId: string,
+        userId: string,
+        body: DomainTypes.CreateDomainRequest,
+    ): Promise<DomainTypes.DomainResponse> {
+        logger.info("Creating domain", {
+            domain: body.domain,
+            organizationId,
+            userId,
+            serverIP: body.serverIP,
+        });
+
+        try {
+            const domain = await DomainService.createDomain(
+                organizationId,
+                userId,
+                body.domain,
+                body.serverIP || "127.0.0.1",
+            );
+
+            logger.info("Domain created successfully", {
+                domain: body.domain,
+                organizationId,
+                userId,
+            });
+
+            return domain;
+        } catch (error) {
+            logger.error("Error creating domain", {
+                domain: body.domain,
+                organizationId,
+                userId,
+                error: error instanceof Error ? error.message : String(error),
+            });
+            throw error;
+        }
+    }
+
+    static async getDomain(domainName: string): Promise<DomainTypes.DomainResponse> {
+        logger.info("Getting domain", { domain: domainName });
+
+        try {
+            const domain = await DomainService.getDomain(domainName);
+            logger.info("Domain retrieved successfully", { domain: domainName });
+            return domain;
+        } catch (error) {
+            logger.error("Error getting domain", {
+                domain: domainName,
+                error: error instanceof Error ? error.message : String(error),
+            });
+            throw error;
+        }
+    }
+
+    static async deleteDomain(domainName: string): Promise<{ message: string }> {
+        logger.info("Deleting domain", { domain: domainName });
+
+        try {
+            await DomainService.deleteDomain(domainName);
+            const response = { message: "Domain deleted successfully" };
+            logger.info("Domain deleted successfully", { domain: domainName });
+            return response;
+        } catch (error) {
+            logger.error("Error deleting domain", {
+                domain: domainName,
+                error: error instanceof Error ? error.message : String(error),
+            });
+            throw error;
+        }
+    }
+
+    static async listDomains(query: DomainTypes.DomainQuery): Promise<DomainTypes.DomainListResponse> {
+        logger.info("Listing domains", { query });
+
+        try {
+            const result = await DomainService.listDomains(query);
+            logger.info("Domains listed successfully", {
+                total: result.total,
+                page: result.page,
+                limit: result.limit,
+                count: result.domains.length,
+            });
+            return result;
+        } catch (error) {
+            logger.error("Error listing domains", {
+                query,
+                error: error instanceof Error ? error.message : String(error),
+            });
+            throw error;
+        }
+    }
+
+    static async searchDomains(
+        searchTerm: string,
+        query: Omit<DomainTypes.DomainQuery, "organizationId" | "userId">,
+    ): Promise<DomainTypes.DomainListResponse> {
+        logger.info("Searching domains", { searchTerm, query });
+
+        try {
+            const result = await DomainService.searchDomains(searchTerm, query);
+            logger.info("Domain search completed", {
+                searchTerm,
+                total: result.total,
+                page: result.page,
+                limit: result.limit,
+                count: result.domains.length,
+            });
+            return result;
+        } catch (error) {
+            logger.error("Error searching domains", {
+                searchTerm,
+                query,
+                error: error instanceof Error ? error.message : String(error),
+            });
+            throw error;
+        }
     }
 }

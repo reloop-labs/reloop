@@ -6,8 +6,8 @@ import { Elysia } from "elysia";
 import { landing } from "./landing";
 import { loader } from "./loader";
 import { dnsRoutes } from "./routes/dns/dns.index";
-import { domainRoutes } from "./routes/domain";
-import { validationRoutes } from "./routes/validation";
+import { domainRoutes } from "./routes/domain/domain.index";
+import { validationRoutes } from "./routes/validation/validation.index";
 
 const port = Number(process.env.PORT || 3000);
 const app = new Elysia({ prefix: "/api/domain", name: "Domain Service" })

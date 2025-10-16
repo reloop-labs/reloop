@@ -1,7 +1,7 @@
 import { Elysia, status, t } from "elysia";
 import { authMiddleware } from "../../middleware/auth";
-import { DomainModel } from "./model";
-import { DomainService } from "./service";
+import { DomainModel } from "./domain.model";
+import { DomainServiceHandler } from "./domain.service";
 
 export const domainRoutes = new Elysia({
     prefix: "/v1",
@@ -11,15 +11,14 @@ export const domainRoutes = new Elysia({
     .post(
         "/add",
         async ({ body, user }) => {
-            if (user.activeOrganizationId) {
-                return await DomainService.createDomain(
-                    user.activeOrganizationId,
-                    user.id,
-                    body.domain,
-                    body.serverIP || "127.0.0.1"
-                );
+            if (!user.activeOrganizationId) {
+                throw status(403, "User is not a member of an organization" as const);
             }
-            throw status(403, "User is not a member of an organization" as const);
+            return await DomainServiceHandler.createDomain(
+                user.activeOrganizationId,
+                user.id,
+                body
+            );
         },
         {
             auth: true,
@@ -41,9 +40,8 @@ export const domainRoutes = new Elysia({
     // Get domain by domain name
     .get(
         "/:domain",
-        async ({ params: { domain }, user }) => {
-            console.log(`Getting domain for user: ${user.id}`);
-            return await DomainService.getDomain(domain);
+        async ({ params: { domain } }) => {
+            return await DomainServiceHandler.getDomain(domain);
         },
         {
             auth: true, // Require authentication for this route
@@ -61,10 +59,8 @@ export const domainRoutes = new Elysia({
     // Delete domain
     .delete(
         "/:domain",
-        async ({ params: { domain }, user }) => {
-            console.log(`Deleting domain for user: ${user.id}`);
-            await DomainService.deleteDomain(domain);
-            return { message: "Domain deleted successfully" };
+        async ({ params: { domain } }) => {
+            return await DomainServiceHandler.deleteDomain(domain);
         },
         {
             auth: true, // Require authentication for this route
@@ -82,7 +78,7 @@ export const domainRoutes = new Elysia({
     .get(
         "/list",
         async ({ query }) => {
-            return await DomainService.listDomains(query);
+            return await DomainServiceHandler.listDomains(query);
         },
         {
             query: DomainModel.domainQuery,
@@ -100,7 +96,7 @@ export const domainRoutes = new Elysia({
     .get(
         "/search/:term",
         async ({ params: { term }, query }) => {
-            return await DomainService.searchDomains(term, query);
+            return await DomainServiceHandler.searchDomains(term, query);
         },
         {
             query: t.Object({

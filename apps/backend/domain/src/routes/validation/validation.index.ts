@@ -1,7 +1,7 @@
 import { Elysia } from "elysia";
 import { authMiddleware } from "../../middleware/auth";
-import { ValidationModel } from "./model";
-import { ValidationService } from "./service";
+import { ValidationModel } from "./validation.model";
+import { ValidationServiceHandler } from "./validation.service";
 
 export const validationRoutes = new Elysia({
     prefix: "/validation",
@@ -11,7 +11,7 @@ export const validationRoutes = new Elysia({
     .post(
         "/dns",
         async ({ body }) => {
-            return await ValidationService.validateDnsRecords(body);
+            return await ValidationServiceHandler.validateDnsRecords(body);
         },
         {
             body: ValidationModel.dnsValidationBody,

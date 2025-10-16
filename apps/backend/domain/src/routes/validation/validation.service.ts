@@ -1,17 +1,14 @@
+import { logger } from "@reloop/logger";
 import { lookup, resolveCname, resolveMx, resolveTxt } from "dns";
 import { promisify } from "util";
-import type { ValidationModel } from "./model";
-
-type DnsValidationBody = ValidationModel.DnsValidationBody;
-type DnsValidationResponse = ValidationModel.DnsValidationResponse;
-type DnsRecord = ValidationModel.DnsRecord;
+import type { ValidationTypes } from "./validation.type";
 
 export class ValidationService {
     static async validateDnsRecords(
-        data: DnsValidationBody,
-    ): Promise<DnsValidationResponse> {
+        data: ValidationTypes.DnsValidationRequest,
+    ): Promise<ValidationTypes.DnsValidationResult> {
         const { domain, recordTypes = ["MX", "A", "TXT", "CNAME"] } = data;
-        const records: DnsRecord[] = [];
+        const records: ValidationTypes.DnsRecordData[] = [];
         const missingRecords: string[] = [];
         const errors: string[] = [];
         let isValid = true;
@@ -106,7 +103,7 @@ export class ValidationService {
         };
     }
 
-    private static async resolveMxRecords(domain: string): Promise<DnsRecord[]> {
+    private static async resolveMxRecords(domain: string): Promise<ValidationTypes.DnsRecordData[]> {
         return new Promise((resolve, reject) => {
             resolveMx(domain, (err, addresses) => {
                 if (err) {
@@ -114,7 +111,7 @@ export class ValidationService {
                     return;
                 }
 
-                const records: DnsRecord[] = [];
+                const records: ValidationTypes.DnsRecordData[] = [];
                 if (addresses && Array.isArray(addresses)) {
                     addresses.forEach((address) => {
                         records.push({
@@ -131,7 +128,7 @@ export class ValidationService {
         });
     }
 
-    private static async resolveTxtRecords(domain: string): Promise<DnsRecord[]> {
+    private static async resolveTxtRecords(domain: string): Promise<ValidationTypes.DnsRecordData[]> {
         return new Promise((resolve, reject) => {
             resolveTxt(domain, (err, addresses) => {
                 if (err) {
@@ -139,7 +136,7 @@ export class ValidationService {
                     return;
                 }
 
-                const records: DnsRecord[] = [];
+                const records: ValidationTypes.DnsRecordData[] = [];
                 if (addresses && Array.isArray(addresses)) {
                     addresses.forEach((address) => {
                         // TXT records can be arrays of strings, join them
@@ -159,7 +156,7 @@ export class ValidationService {
 
     private static async resolveCnameRecords(
         domain: string,
-    ): Promise<DnsRecord[]> {
+    ): Promise<ValidationTypes.DnsRecordData[]> {
         return new Promise((resolve, reject) => {
             resolveCname(domain, (err, addresses) => {
                 if (err) {
@@ -167,7 +164,7 @@ export class ValidationService {
                     return;
                 }
 
-                const records: DnsRecord[] = [];
+                const records: ValidationTypes.DnsRecordData[] = [];
                 if (addresses && Array.isArray(addresses)) {
                     addresses.forEach((address) => {
                         records.push({
@@ -181,5 +178,35 @@ export class ValidationService {
                 resolve(records);
             });
         });
+    }
+}
+
+export class ValidationServiceHandler {
+    static async validateDnsRecords(
+        body: ValidationTypes.DnsValidationRequest,
+    ): Promise<ValidationTypes.DnsValidationResult> {
+        logger.info("Validating DNS records", {
+            domain: body.domain,
+            recordTypes: body.recordTypes,
+        });
+
+        try {
+            const result = await ValidationService.validateDnsRecords(body);
+            logger.info("DNS validation completed", {
+                domain: body.domain,
+                isValid: result.isValid,
+                recordsCount: result.records.length,
+                missingRecords: result.missingRecords,
+                errors: result.errors,
+            });
+            return result;
+        } catch (error) {
+            logger.error("Error validating DNS records", {
+                domain: body.domain,
+                recordTypes: body.recordTypes,
+                error: error instanceof Error ? error.message : String(error),
+            });
+            throw error;
+        }
     }
 }
