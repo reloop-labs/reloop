@@ -1,3 +1,4 @@
+
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
@@ -5,46 +6,60 @@ import { and, count, desc, eq, like } from "drizzle-orm";
 import { status } from "elysia";
 import type { DomainModel } from "./model";
 
-type CreateDomainBody = DomainModel.CreateDomainBody;
 type DomainListResponse = DomainModel.DomainListResponse;
 type DomainQuery = DomainModel.DomainQuery;
 type DomainResponse = DomainModel.DomainResponse;
-type UpdateDomainBody = DomainModel.UpdateDomainBody;
 
 export class DomainService {
-    static async createDomain(data: CreateDomainBody): Promise<DomainResponse> {
-        logger.info("Creating domain", { domain: data.domain, organizationId: data.organizationId, userId: data.userId });
+    static async createDomain(
+        organizationId: string,
+        userId: string,
+        domain: string,
+    ): Promise<DomainResponse> {
+        logger.info("Creating domain", {
+            domain: domain,
+            organizationId: organizationId,
+            userId: userId,
+        });
 
         try {
             const existingDomain = await db
                 .select()
                 .from(schema.domain)
-                .where(eq(schema.domain.domain, data.domain))
+                .where(eq(schema.domain.domain, domain))
                 .limit(1);
 
             if (existingDomain.length > 0) {
-                logger.warn("Domain already exists", { domain: data.domain });
+                logger.warn("Domain already exists", { domain: domain });
                 throw status(409, "Domain already exists" as const);
             }
 
             const newDomain = await db
                 .insert(schema.domain)
                 .values({
-                    ...data,
+                    userId: userId,
+                    organizationId: organizationId,
+                    mailboxes: 50,
+                    mailboxQuota: 5368709120,
+                    quota: 10737418240,
+                    rateLimit: 12,
+                    active: true,
+                    domain: domain,
                     createdAt: new Date(),
                     updatedAt: new Date(),
                 })
                 .returning();
 
             if (!newDomain[0]) {
-                logger.error("Failed to create domain - no data returned", { domain: data.domain });
+                logger.error("Failed to create domain - no data returned", { domain, });
                 throw status(500, "Failed to create domain" as const);
             }
-
-            logger.info("Domain created successfully", { domain: data.domain, id: newDomain[0].domain });
+            logger.info("Domain created successfully", { domain, id: newDomain[0].domain, });
             return DomainService.formatDomainResponse(newDomain[0]);
         } catch (error) {
-            logger.error("Error creating domain", { domain: data.domain, error: error instanceof Error ? error.message : String(error) });
+            logger.error("Error creating domain", {
+                domain, error: error instanceof Error ? error.message : String(error),
+            });
             if (error instanceof Error && error.message.includes("already exists")) {
                 throw status(409, "Domain already exists" as const);
             }
@@ -75,50 +90,15 @@ export class DomainService {
             logger.info("Domain retrieved successfully", { domain: domainName });
             return DomainService.formatDomainResponse(result[0]);
         } catch (error) {
-            logger.error("Error getting domain", { domain: domainName, error: error instanceof Error ? error.message : String(error) });
+            logger.error("Error getting domain", {
+                domain: domainName,
+                error: error instanceof Error ? error.message : String(error),
+            });
             throw error;
         }
     }
 
-    static async updateDomain(
-        domainName: string,
-        data: UpdateDomainBody,
-    ): Promise<DomainResponse> {
-        logger.info("Updating domain", { domain: domainName, updateData: data });
 
-        try {
-            const existingDomain = await db
-                .select()
-                .from(schema.domain)
-                .where(eq(schema.domain.domain, domainName))
-                .limit(1);
-
-            if (existingDomain.length === 0) {
-                logger.warn("Domain not found for update", { domain: domainName });
-                throw status(404, "Domain not found" as const);
-            }
-
-            const updatedDomain = await db
-                .update(schema.domain)
-                .set({
-                    ...data,
-                    updatedAt: new Date(),
-                })
-                .where(eq(schema.domain.domain, domainName))
-                .returning();
-
-            if (!updatedDomain[0]) {
-                logger.error("Failed to update domain - no data returned", { domain: domainName });
-                throw status(500, "Failed to update domain" as const);
-            }
-
-            logger.info("Domain updated successfully", { domain: domainName });
-            return DomainService.formatDomainResponse(updatedDomain[0]);
-        } catch (error) {
-            logger.error("Error updating domain", { domain: domainName, error: error instanceof Error ? error.message : String(error) });
-            throw error;
-        }
-    }
 
     static async deleteDomain(domainName: string): Promise<void> {
         logger.info("Deleting domain", { domain: domainName });
@@ -136,7 +116,10 @@ export class DomainService {
 
             logger.info("Domain deleted successfully", { domain: domainName });
         } catch (error) {
-            logger.error("Error deleting domain", { domain: domainName, error: error instanceof Error ? error.message : String(error) });
+            logger.error("Error deleting domain", {
+                domain: domainName,
+                error: error instanceof Error ? error.message : String(error),
+            });
             throw error;
         }
     }
@@ -145,7 +128,13 @@ export class DomainService {
         const { page = 1, limit = 10, active, organizationId, userId } = query;
         const offset = (page - 1) * limit;
 
-        logger.info("Listing domains", { page, limit, active, organizationId, userId });
+        logger.info("Listing domains", {
+            page,
+            limit,
+            active,
+            organizationId,
+            userId,
+        });
 
         try {
             const conditions = [];
@@ -159,7 +148,8 @@ export class DomainService {
                 conditions.push(eq(schema.domain.userId, userId));
             }
 
-            const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+            const whereClause =
+                conditions.length > 0 ? and(...conditions) : undefined;
 
             const totalResult = await db
                 .select({ count: count() })
@@ -176,7 +166,12 @@ export class DomainService {
                 .limit(limit)
                 .offset(offset);
 
-            logger.info("Domains listed successfully", { total, page, limit, count: domains.length });
+            logger.info("Domains listed successfully", {
+                total,
+                page,
+                limit,
+                count: domains.length,
+            });
 
             return {
                 domains: domains.map((domain) =>
@@ -187,7 +182,10 @@ export class DomainService {
                 limit,
             };
         } catch (error) {
-            logger.error("Error listing domains", { query, error: error instanceof Error ? error.message : String(error) });
+            logger.error("Error listing domains", {
+                query,
+                error: error instanceof Error ? error.message : String(error),
+            });
             throw error;
         }
     }
@@ -224,7 +222,13 @@ export class DomainService {
                 .limit(limit)
                 .offset(offset);
 
-            logger.info("Domain search completed", { searchTerm, total, page, limit, count: domains.length });
+            logger.info("Domain search completed", {
+                searchTerm,
+                total,
+                page,
+                limit,
+                count: domains.length,
+            });
 
             return {
                 domains: domains.map((domain) =>
@@ -235,7 +239,11 @@ export class DomainService {
                 limit,
             };
         } catch (error) {
-            logger.error("Error searching domains", { searchTerm, query, error: error instanceof Error ? error.message : String(error) });
+            logger.error("Error searching domains", {
+                searchTerm,
+                query,
+                error: error instanceof Error ? error.message : String(error),
+            });
             throw error;
         }
     }
@@ -251,10 +259,16 @@ export class DomainService {
                 .limit(1);
 
             const exists = result.length > 0;
-            logger.info("Domain existence check completed", { domain: domainName, exists });
+            logger.info("Domain existence check completed", {
+                domain: domainName,
+                exists,
+            });
             return exists;
         } catch (error) {
-            logger.error("Error checking domain existence", { domain: domainName, error: error instanceof Error ? error.message : String(error) });
+            logger.error("Error checking domain existence", {
+                domain: domainName,
+                error: error instanceof Error ? error.message : String(error),
+            });
             throw error;
         }
     }

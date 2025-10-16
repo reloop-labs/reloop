@@ -4,13 +4,6 @@ export namespace DomainModel {
     // Create domain request
     export const createDomainBody = t.Object({
         domain: t.String({ minLength: 1, maxLength: 255 }),
-        organizationId: t.String(),
-        userId: t.String(),
-        mailboxes: t.Number({ minimum: 0 }),
-        mailboxQuota: t.Number({ minimum: 0 }),
-        quota: t.Number({ minimum: 0 }),
-        rateLimit: t.Optional(t.Number({ minimum: 0 })),
-        active: t.Boolean(),
     })
 
     export type CreateDomainBody = typeof createDomainBody.static

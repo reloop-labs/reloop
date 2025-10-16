@@ -9,7 +9,6 @@ import { domainRoutes } from "./routes/domain";
 import { validationRoutes } from "./routes/validation";
 
 const port = Number(process.env.PORT || 3000);
-console.log(process.env.NODE_ENV);
 const app = new Elysia({ prefix: "/api/domain", name: "Domain Service" })
 	.use(serverTiming())
 	.use(swagger({ path: "/docs" }))

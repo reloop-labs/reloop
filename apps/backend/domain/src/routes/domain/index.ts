@@ -1,4 +1,5 @@
 import { Elysia, status, t } from "elysia";
+import { authMiddleware } from "../../middleware/auth";
 import { validationRoutes } from "../validation";
 import { DomainModel } from "./model";
 import { DomainService } from "./service";
@@ -7,22 +8,28 @@ export const domainRoutes = new Elysia({
     prefix: "/v1",
     name: "DomainRoutes",
 })
+    .use(authMiddleware)
     .post(
-        "/",
-        async ({ body }) => {
-            return await DomainService.createDomain(body);
+        "/add",
+        async ({ body, user }) => {
+            if (user.activeOrganizationId) {
+                return await DomainService.createDomain(user.activeOrganizationId, user.id, body.domain);
+            }
+            throw status(403, "User is not a member of an organization" as const);
         },
         {
+            auth: true,
             body: DomainModel.createDomainBody,
             response: {
                 201: DomainModel.domainResponse,
                 409: DomainModel.domainAlreadyExists,
                 400: DomainModel.invalidDomain,
+                403: DomainModel.unauthorized,
             },
             detail: {
                 tags: ["Domains"],
-                summary: "Create a new domain",
-                description: "Creates a new domain with the specified configuration",
+                summary: "Add a new domain",
+                description: "Adds a new domain to the user's organization",
             },
         },
     )
@@ -30,10 +37,12 @@ export const domainRoutes = new Elysia({
     // Get domain by domain name
     .get(
         "/:domain",
-        async ({ params: { domain } }) => {
+        async ({ params: { domain }, user }) => {
+            console.log(`Getting domain for user: ${user.id}`);
             return await DomainService.getDomain(domain);
         },
         {
+            auth: true, // Require authentication for this route
             response: {
                 200: DomainModel.domainResponse,
                 404: DomainModel.domainNotFound,
@@ -45,36 +54,16 @@ export const domainRoutes = new Elysia({
             },
         },
     )
-
-    // Update domain
-    .put(
-        "/:domain",
-        async ({ params: { domain }, body }) => {
-            return await DomainService.updateDomain(domain, body);
-        },
-        {
-            body: DomainModel.updateDomainBody,
-            response: {
-                200: DomainModel.domainResponse,
-                404: DomainModel.domainNotFound,
-                400: DomainModel.invalidDomain,
-            },
-            detail: {
-                tags: ["Domains"],
-                summary: "Update domain",
-                description: "Updates an existing domain configuration",
-            },
-        },
-    )
-
     // Delete domain
     .delete(
         "/:domain",
-        async ({ params: { domain } }) => {
+        async ({ params: { domain }, user }) => {
+            console.log(`Deleting domain for user: ${user.id}`);
             await DomainService.deleteDomain(domain);
             return { message: "Domain deleted successfully" };
         },
         {
+            auth: true, // Require authentication for this route
             response: {
                 200: t.Object({ message: t.String() }),
                 404: DomainModel.domainNotFound,
@@ -125,25 +114,3 @@ export const domainRoutes = new Elysia({
             },
         },
     )
-    .head(
-        "/:domain",
-        async ({ params: { domain } }) => {
-            const exists = await DomainService.domainExists(domain);
-            if (!exists) {
-                throw status(404, "Domain not found" as const);
-            }
-            return;
-        },
-        {
-            response: {
-                200: t.Void(),
-                404: DomainModel.domainNotFound,
-            },
-            detail: {
-                tags: ["Domains"],
-                summary: "Check domain existence",
-                description: "Checks if a domain exists without returning its data",
-            },
-        },
-    )
-    .use(validationRoutes);
