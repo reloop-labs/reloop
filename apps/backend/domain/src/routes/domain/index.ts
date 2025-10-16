@@ -1,6 +1,5 @@
 import { Elysia, status, t } from "elysia";
 import { authMiddleware } from "../../middleware/auth";
-import { validationRoutes } from "../validation";
 import { DomainModel } from "./model";
 import { DomainService } from "./service";
 
@@ -13,7 +12,12 @@ export const domainRoutes = new Elysia({
         "/add",
         async ({ body, user }) => {
             if (user.activeOrganizationId) {
-                return await DomainService.createDomain(user.activeOrganizationId, user.id, body.domain);
+                return await DomainService.createDomain(
+                    user.activeOrganizationId,
+                    user.id,
+                    body.domain,
+                    body.serverIP || "127.0.0.1"
+                );
             }
             throw status(403, "User is not a member of an organization" as const);
         },

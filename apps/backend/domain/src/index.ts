@@ -5,6 +5,7 @@ import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
 import { landing } from "./landing";
 import { loader } from "./loader";
+import { dnsRoutes } from "./routes/dns";
 import { domainRoutes } from "./routes/domain";
 import { validationRoutes } from "./routes/validation";
 
@@ -14,6 +15,7 @@ const app = new Elysia({ prefix: "/api/domain", name: "Domain Service" })
 	.use(swagger({ path: "/docs" }))
 	.use(landing)
 	.use(domainRoutes)
+	.use(dnsRoutes)
 	.use(validationRoutes)
 	.onStart(async () => {
 		await loader();

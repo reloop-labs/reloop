@@ -1,9 +1,9 @@
-
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
 import { and, count, desc, eq, like } from "drizzle-orm";
 import { status } from "elysia";
+import { DNSService } from "../../lib/dns-service";
 import type { DomainModel } from "./model";
 
 type DomainListResponse = DomainModel.DomainListResponse;
@@ -15,6 +15,7 @@ export class DomainService {
         organizationId: string,
         userId: string,
         domain: string,
+        serverIP = "127.0.0.1",
     ): Promise<DomainResponse> {
         logger.info("Creating domain", {
             domain: domain,
@@ -51,14 +52,40 @@ export class DomainService {
                 .returning();
 
             if (!newDomain[0]) {
-                logger.error("Failed to create domain - no data returned", { domain, });
+                logger.error("Failed to create domain - no data returned", { domain });
                 throw status(500, "Failed to create domain" as const);
             }
-            logger.info("Domain created successfully", { domain, id: newDomain[0].domain, });
+
+            // Generate DNS records and DKIM keys
+            try {
+                await DNSService.generateAndInsertDNSRecords(
+                    domain,
+                    organizationId,
+                    userId,
+                    serverIP,
+                );
+                logger.info("DNS records and DKIM keys generated successfully", {
+                    domain,
+                });
+            } catch (dnsError) {
+                logger.error("Failed to generate DNS records and DKIM keys", {
+                    domain,
+                    error:
+                        dnsError instanceof Error ? dnsError.message : String(dnsError),
+                });
+                // Continue with domain creation even if DNS generation fails
+                // The domain can still be created and DNS records can be generated later
+            }
+
+            logger.info("Domain created successfully", {
+                domain,
+                id: newDomain[0].domain,
+            });
             return DomainService.formatDomainResponse(newDomain[0]);
         } catch (error) {
             logger.error("Error creating domain", {
-                domain, error: error instanceof Error ? error.message : String(error),
+                domain,
+                error: error instanceof Error ? error.message : String(error),
             });
             if (error instanceof Error && error.message.includes("already exists")) {
                 throw status(409, "Domain already exists" as const);
@@ -97,8 +124,6 @@ export class DomainService {
             throw error;
         }
     }
-
-
 
     static async deleteDomain(domainName: string): Promise<void> {
         logger.info("Deleting domain", { domain: domainName });
@@ -272,6 +297,7 @@ export class DomainService {
             throw error;
         }
     }
+
 
     private static formatDomainResponse(domain: {
         domain: string;
