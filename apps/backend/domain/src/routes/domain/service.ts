@@ -3,7 +3,7 @@ import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
 import { and, count, desc, eq, like } from "drizzle-orm";
 import { status } from "elysia";
-import { DNSService } from "../../lib/dns-service";
+import { DNSService } from "../dns/service";
 import type { DomainModel } from "./model";
 
 type DomainListResponse = DomainModel.DomainListResponse;
@@ -297,7 +297,6 @@ export class DomainService {
             throw error;
         }
     }
-
 
     private static formatDomainResponse(domain: {
         domain: string;
