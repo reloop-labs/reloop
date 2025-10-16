@@ -1,54 +1,19 @@
+import { generateKeyPair } from "node:crypto";
+import { promisify } from "node:util";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
-import { generateKeyPair } from "crypto";
 import { and, eq } from "drizzle-orm";
-import { promisify } from "util";
-import type { DNSModel } from "./model";
+import type { DNSTypes } from "./dns.type";
 
 const generateKeyPairAsync = promisify(generateKeyPair);
 
-export interface DKIMKeyPair {
-    publicKey: string;
-    privateKey: string;
-    selector: string;
-}
-
-export interface DNSRecord {
-    type: string;
-    name: string;
-    value: string;
-    ttl?: number;
-    priority?: number;
-    description?: string;
-}
-
-export interface DNSRecordData {
-    recordType: string;
-    name: string;
-    value: string;
-    ttl: number;
-    priority?: number;
-    description?: string;
-    isVerified: boolean;
-}
-
-type DNSRecordResponse = DNSModel.DNSRecordResponse;
-type DKIMKeysResponse = DNSModel.DKIMKeysResponse;
-type GenerateDNSBody = DNSModel.GenerateDNSBody;
-type GenerateDNSResponse = DNSModel.GenerateDNSResponse;
-type VerifyDNSBody = DNSModel.VerifyDNSBody;
-type VerifyDNSResponse = DNSModel.VerifyDNSResponse;
-type DeleteDNSResponse = DNSModel.DeleteDNSResponse;
 
 export class DNSService {
-    /**
-     * Generate DKIM key pair
-     */
     static async generateKeyPair(
         selector = "mail",
         keyLength = 2048,
-    ): Promise<DKIMKeyPair> {
+    ): Promise<DNSTypes.DKIMKeyPair> {
         try {
             const { publicKey, privateKey } = await generateKeyPairAsync("rsa", {
                 modulusLength: keyLength,
@@ -72,14 +37,11 @@ export class DNSService {
         }
     }
 
-    /**
-     * Generate DKIM DNS record
-     */
     static generateDKIMRecord(
         domain: string,
         selector: string,
         publicKey: string,
-    ): DNSRecord {
+    ): DNSTypes.DNSRecord {
         // Remove PEM headers and format the public key for DNS
         const cleanPublicKey = publicKey
             .replace(/-----BEGIN PUBLIC KEY-----/, "")
@@ -97,10 +59,7 @@ export class DNSService {
         };
     }
 
-    /**
-     * Generate SPF record
-     */
-    static generateSPFRecord(domain: string, serverIP: string): DNSRecord {
+    static generateSPFRecord(domain: string, serverIP: string): DNSTypes.DNSRecord {
         const spfValue = `v=spf1 ip4:${serverIP} mx a:${domain} ~all`;
 
         return {
@@ -112,10 +71,7 @@ export class DNSService {
         };
     }
 
-    /**
-     * Generate DMARC record
-     */
-    static generateDMARCRecord(domain: string): DNSRecord {
+    static generateDMARCRecord(domain: string): DNSTypes.DNSRecord {
         const dmarcValue = `v=DMARC1; p=quarantine; rua=mailto:dmarc@${domain}; ruf=mailto:dmarc@${domain}; sp=quarantine; adkim=r; aspf=r;`;
 
         return {
@@ -127,10 +83,7 @@ export class DNSService {
         };
     }
 
-    /**
-     * Generate MX record
-     */
-    static generateMXRecord(domain: string, priority = 10): DNSRecord {
+    static generateMXRecord(domain: string, priority = 10): DNSTypes.DNSRecord {
         return {
             type: "MX",
             name: domain,
@@ -141,10 +94,7 @@ export class DNSService {
         };
     }
 
-    /**
-     * Generate A record
-     */
-    static generateARecord(domain: string, serverIP: string): DNSRecord {
+    static generateARecord(domain: string, serverIP: string): DNSTypes.DNSRecord {
         return {
             type: "A",
             name: domain,
@@ -154,10 +104,7 @@ export class DNSService {
         };
     }
 
-    /**
-     * Generate all DNS records for a domain
-     */
-    static generateAllDNSRecords(domain: string, serverIP: string): DNSRecord[] {
+    static generateAllDNSRecords(domain: string, serverIP: string): DNSTypes.DNSRecord[] {
         return [
             DNSService.generateARecord(domain, serverIP),
             DNSService.generateMXRecord(domain),
@@ -166,9 +113,6 @@ export class DNSService {
         ];
     }
 
-    /**
-     * Generate and insert DNS records for a domain
-     */
     static async generateAndInsertDNSRecords(
         domain: string,
         organizationId: string,
@@ -200,7 +144,7 @@ export class DNSService {
             dnsRecords.push(dkimRecord);
 
             // Convert to database format
-            const dnsRecordData: DNSRecordData[] = dnsRecords.map((record) => ({
+            const dnsRecordData: DNSTypes.DNSRecordData[] = dnsRecords.map((record) => ({
                 recordType: record.type,
                 name: record.name,
                 value: record.value,
@@ -256,10 +200,7 @@ export class DNSService {
         }
     }
 
-    /**
-     * Get DNS records for a domain
-     */
-    static async getDNSRecords(domain: string): Promise<DNSRecordData[]> {
+    static async getDNSRecords(domain: string): Promise<DNSTypes.DNSRecordData[]> {
         logger.info("Getting DNS records for domain", { domain });
 
         try {
@@ -286,16 +227,7 @@ export class DNSService {
         }
     }
 
-    /**
-     * Get DKIM keys for a domain
-     */
-    static async getDKIMKeys(domain: string): Promise<{
-        selector: string;
-        publicKey: string;
-        privateKey: string;
-        keyLength: number;
-        algorithm: string;
-    } | null> {
+    static async getDKIMKeys(domain: string): Promise<DNSTypes.DKIMKeysResponse | null> {
         logger.info("Getting DKIM keys for domain", { domain });
 
         try {
@@ -329,9 +261,6 @@ export class DNSService {
         }
     }
 
-    /**
-     * Verify DNS record
-     */
     static async verifyDNSRecord(
         domain: string,
         recordType: string,
@@ -370,9 +299,6 @@ export class DNSService {
         }
     }
 
-    /**
-     * Delete DNS records for a domain
-     */
     static async deleteDNSRecords(domain: string): Promise<void> {
         logger.info("Deleting DNS records for domain", { domain });
 
@@ -397,10 +323,7 @@ export class DNSService {
 }
 
 export class DNSServiceHandler {
-    /**
-     * Get DNS records for a domain
-     */
-    static async getDNSRecords(domain: string): Promise<DNSRecordResponse[]> {
+    static async getDNSRecords(domain: string): Promise<DNSTypes.DNSRecordResponse[]> {
         logger.info("Getting DNS records for domain", { domain });
 
         try {
@@ -419,10 +342,7 @@ export class DNSServiceHandler {
         }
     }
 
-    /**
-     * Get DKIM keys for a domain
-     */
-    static async getDKIMKeys(domain: string): Promise<DKIMKeysResponse | null> {
+    static async getDKIMKeys(domain: string): Promise<DNSTypes.DKIMKeysResponse | null> {
         logger.info("Getting DKIM keys for domain", { domain });
 
         try {
@@ -438,13 +358,10 @@ export class DNSServiceHandler {
         }
     }
 
-    /**
-     * Verify DNS record
-     */
     static async verifyDNSRecord(
         domain: string,
-        body: VerifyDNSBody,
-    ): Promise<VerifyDNSResponse> {
+        body: DNSTypes.VerifyDNSBody,
+    ): Promise<DNSTypes.VerifyDNSResponse> {
         logger.info("Verifying DNS record", {
             domain,
             recordType: body.recordType,
@@ -475,15 +392,12 @@ export class DNSServiceHandler {
         }
     }
 
-    /**
-     * Generate DNS records for a domain
-     */
     static async generateDNSRecords(
         domain: string,
         organizationId: string,
         userId: string,
-        body: GenerateDNSBody,
-    ): Promise<GenerateDNSResponse> {
+        body: DNSTypes.GenerateDNSBody,
+    ): Promise<DNSTypes.GenerateDNSResponse> {
         logger.info("Generating DNS records for domain", {
             domain,
             organizationId,
@@ -501,7 +415,7 @@ export class DNSServiceHandler {
                 body.dkimSelector || "mail",
             );
 
-            const response = {
+            const response: DNSTypes.GenerateDNSResponse = {
                 message: "DNS records and DKIM keys generated successfully",
                 domain,
                 serverIP: body.serverIP || "127.0.0.1",
@@ -521,15 +435,12 @@ export class DNSServiceHandler {
         }
     }
 
-    /**
-     * Delete DNS records for a domain
-     */
-    static async deleteDNSRecords(domain: string): Promise<DeleteDNSResponse> {
+    static async deleteDNSRecords(domain: string): Promise<DNSTypes.DeleteDNSResponse> {
         logger.info("Deleting DNS records for domain", { domain });
 
         try {
             await DNSService.deleteDNSRecords(domain);
-            const response = {
+            const response: DNSTypes.DeleteDNSResponse = {
                 message: "DNS records and DKIM keys deleted successfully",
             };
             logger.info("DNS records deleted successfully", { domain });

@@ -1,7 +1,7 @@
 import { Elysia, status, t } from "elysia";
 import { authMiddleware } from "../../middleware/auth";
-import { DNSModel } from "./model";
-import { DNSServiceHandler } from "./service";
+import { DNSModel } from "./dns.model";
+import { DNSServiceHandler } from "./dns.service";
 
 export const dnsRoutes = new Elysia({
     prefix: "/v1/dns",
@@ -11,7 +11,6 @@ export const dnsRoutes = new Elysia({
     .get(
         "/:domain",
         async ({ params: { domain } }) => {
-            console.log(`Getting DNS records for domain: ${domain}`);
             return await DNSServiceHandler.getDNSRecords(domain);
         },
         {

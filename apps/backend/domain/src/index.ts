@@ -5,7 +5,7 @@ import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
 import { landing } from "./landing";
 import { loader } from "./loader";
-import { dnsRoutes } from "./routes/dns";
+import { dnsRoutes } from "./routes/dns/dns.index";
 import { domainRoutes } from "./routes/domain";
 import { validationRoutes } from "./routes/validation";
 
