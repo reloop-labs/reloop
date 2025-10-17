@@ -115,12 +115,12 @@
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",
-		"@tailwindcss/postcss": "catalog:ui",
-		"@types/react": "catalog:ui",
-		"@types/react-dom": "catalog:ui"
+		"@tailwindcss/postcss": "catalog:ui"
 	},
 	"peerDependencies": {
 		"react": "catalog:ui",
-		"react-dom": "catalog:ui"
+		"react-dom": "catalog:ui",
+		"@types/react": "catalog:ui",
+		"@types/react-dom": "catalog:ui"
 	}
 }
