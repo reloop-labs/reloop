@@ -169,6 +169,6 @@
 		"lint-staged": "16.2.4",
 		"turbo": "2.5.8"
 	},
-	"packageManager": "bun@1.2.19",
+	"packageManager": "bun@1.3.0",
 	"dependencies": {}
 }
