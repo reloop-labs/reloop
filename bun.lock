@@ -3,13 +3,6 @@
   "workspaces": {
     "": {
       "name": "reloop",
-      "dependencies": {
-        "@reloop/tsconfig": "workspace:*",
-        "@types/react": "^19.2.2",
-        "@types/react-dom": "^19.2.2",
-        "react": "^19.2.0",
-        "react-dom": "^19.2.0",
-      },
       "devDependencies": {
         "@biomejs/biome": "2.2.6",
         "husky": "9.1.7",
@@ -43,7 +36,6 @@
         "drizzle-orm": "catalog:db",
         "drizzle-typebox": "catalog:db",
         "elysia": "catalog:backend",
-        "logixlysia": "catalog:backend",
         "pg": "catalog:db",
         "redis": "catalog:db",
         "resend": "catalog:backend",
@@ -86,7 +78,6 @@
         "drizzle-orm": "catalog:db",
         "drizzle-typebox": "catalog:db",
         "elysia": "catalog:backend",
-        "logixlysia": "catalog:backend",
         "pg": "catalog:db",
         "redis": "catalog:db",
         "zod": "catalog:ui",
@@ -434,10 +425,8 @@
         "motion": "catalog:ui",
         "next-themes": "catalog:ui",
         "radix-ui": "catalog:ui",
-        "react": "catalog:ui",
         "react-aria-components": "catalog:ui",
         "react-day-picker": "catalog:ui",
-        "react-dom": "catalog:ui",
         "react-otp-input": "catalog:ui",
         "sonner": "catalog:ui",
         "tailwind-merge": "catalog:ui",
@@ -449,6 +438,10 @@
         "@tailwindcss/postcss": "catalog:ui",
         "@types/react": "catalog:ui",
         "@types/react-dom": "catalog:ui",
+      },
+      "peerDependencies": {
+        "react": "catalog:ui",
+        "react-dom": "catalog:ui",
       },
     },
   },
@@ -482,7 +475,6 @@
       "date-fns": "^4.1.0",
       "dotenv": "16.4.7",
       "elysia": "latest",
-      "logixlysia": "^5.1.1",
       "nodemailer": "6.9.7",
       "pino": "^10.0.0",
       "pino-pretty": "^13.1.2",
@@ -2239,8 +2231,6 @@
 
     "log-update": ["log-update@6.1.0", "", { "dependencies": { "ansi-escapes": "^7.0.0", "cli-cursor": "^5.0.0", "slice-ansi": "^7.1.0", "strip-ansi": "^7.1.0", "wrap-ansi": "^9.0.0" } }, "sha512-9ie8ItPR6tjY5uYJh8K/Zrv/RMZ5VOlOWvtZdEHYSTFKZfIBPQa9tOAEeAWhd+AnIneLJ22w5fjOYtoutpWq5w=="],
 
-    "logixlysia": ["logixlysia@5.3.0", "", { "dependencies": { "chalk": "^5.6.2", "elysia": "^1.4.10", "pino": "^10.0.0", "pino-pretty": "^13.1.2" }, "peerDependencies": { "typescript": "^5.2.2" }, "os": [ "linux", "win32", "darwin", ] }, "sha512-RXjITx+o3ejV3XHaqjTGyoxeKFi6V0fY+uVO1K+VGDGOVic3ViVRFxOTF9+SxvmZAMNTa/G6566qLNEmkYDmFw=="],
-
     "long": ["long@5.3.2", "", {}, "sha512-mNAgZ1GmyNhD7AuqnTG3/VQ26o760+ZYBPKjPvugO8+nLbYfX6TVpJPseBvopbdY+qpZ/lKUnmEc1LeZYS3QAA=="],
 
     "longest-streak": ["longest-streak@3.1.0", "", {}, "sha512-9Ri+o0JYgehTaVBBDoMqIl8GXtbWg711O3srftcHhZ0dqnETqLaoIK0x17fUw9rFSlK/0NlsKe0Ahhyl5pXE2g=="],
@@ -3271,8 +3261,6 @@
 
     "log-update/strip-ansi": ["strip-ansi@7.1.2", "", { "dependencies": { "ansi-regex": "^6.0.1" } }, "sha512-gmBGslpoQJtgnMAvOVqGZpEz9dyoKTCzy2nfz/n8aIFhN/jCE/rCmcxabB6jOOHV+0WNnylOxaxBQPSvcWklhA=="],
 
-    "logixlysia/chalk": ["chalk@5.6.2", "", {}, "sha512-7NzBL0rN6fMUW+f7A6Io4h40qQlG+xGmtMxfbnH/K7TAtt8JQWVQK+6g0UXKMeVJoyV5EkkNsErQ8pVD3bLHbA=="],
-
     "next/@swc/helpers": ["@swc/helpers@0.5.15", "", { "dependencies": { "tslib": "^2.8.0" } }, "sha512-JQ5TuMi45Owi4/BIMAJBoSQoOJu12oOk/gADqlcUL9JEdHB8vyjUSsxqeNXnmXHjYKMi2WcYtezGEEhqUI/E2g=="],
 
     "next/postcss": ["postcss@8.4.31", "", { "dependencies": { "nanoid": "^3.3.6", "picocolors": "^1.0.0", "source-map-js": "^1.0.2" } }, "sha512-PS08Iboia9mts/2ygV3eLpY5ghnUcfLV/EXTOW1E2qYxJKGGBUtNjN76FYHnMs36RmARn41bC0AZmn+rR0OVpQ=="],
@@ -3592,8 +3580,6 @@
     "@scalar/themes/@scalar/types/nanoid": ["nanoid@5.1.6", "", { "bin": { "nanoid": "bin/nanoid.js" } }, "sha512-c7+7RQ+dMB5dPwwCp4ee1/iV/q2P6aK1mTZcfr1BTuVlyW9hJYiMPybJCcnBlQtuSmTIWNeazm/zqNoZSSElBg=="],
 
     "@scalar/themes/@scalar/types/type-fest": ["type-fest@4.41.0", "", {}, "sha512-TeTSQ6H5YHvpqVwBRcnLDCBnDOHWYu7IvGbHT6N8AOymcr9PJGjc1GTtiWZTYg0NCgYwvnYWEkVChQAr9bjfwA=="],
-
-    "@scalar/themes/@scalar/types/zod": ["zod@3.24.3", "", {}, "sha512-HhY1oqzWCQWuUqvBFnsyrtZRhyPeR7SUGv+C4+MsisMuVfSPx8HpwWqH8tRahSlt6M3PiFAcoeFhZAqIXTxoSg=="],
 
     "@shikijs/rehype/shiki/@shikijs/core": ["@shikijs/core@3.13.0", "", { "dependencies": { "@shikijs/types": "3.13.0", "@shikijs/vscode-textmate": "^10.0.2", "@types/hast": "^3.0.4", "hast-util-to-html": "^9.0.5" } }, "sha512-3P8rGsg2Eh2qIHekwuQjzWhKI4jV97PhvYjYUzGqjvJfqdQPz+nMlfWahU24GZAyW1FxFI1sYjyhfh5CoLmIUA=="],
 

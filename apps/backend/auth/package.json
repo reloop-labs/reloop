@@ -30,7 +30,6 @@
 		"drizzle-orm": "catalog:db",
 		"drizzle-typebox": "catalog:db",
 		"elysia": "catalog:backend",
-		"logixlysia": "catalog:backend",
 		"pg": "catalog:db",
 		"redis": "catalog:db",
 		"resend": "catalog:backend",
