@@ -42,7 +42,6 @@ export class DNSService {
         selector: string,
         publicKey: string,
     ): DNSTypes.DNSRecord {
-        // Remove PEM headers and format the public key for DNS
         const cleanPublicKey = publicKey
             .replace(/-----BEGIN PUBLIC KEY-----/, "")
             .replace(/-----END PUBLIC KEY-----/, "")
@@ -129,13 +128,10 @@ export class DNSService {
         });
 
         try {
-            // Generate DKIM key pair
             const dkimKeyPair = await DNSService.generateKeyPair(dkimSelector);
 
-            // Generate all DNS records
             const dnsRecords = DNSService.generateAllDNSRecords(domain, serverIP);
 
-            // Add DKIM record to the list
             const dkimRecord = DNSService.generateDKIMRecord(
                 domain,
                 dkimSelector,
@@ -143,7 +139,6 @@ export class DNSService {
             );
             dnsRecords.push(dkimRecord);
 
-            // Convert to database format
             const dnsRecordData: DNSTypes.DNSRecordData[] = dnsRecords.map((record) => ({
                 recordType: record.type,
                 name: record.name,
@@ -153,11 +148,9 @@ export class DNSService {
                 description: record.description,
                 isVerified: false,
             }));
-
-            // Insert DNS records into database one by one
             for (const record of dnsRecordData) {
                 await db.insert(schema.dnsRecord).values({
-                    id: Math.floor(Math.random() * 1000000000), // Generate a random ID for now
+                    id: Math.floor(Math.random() * 1000000000),
                     aliasDomain: domain,
                     organizationId,
                     userId,
@@ -173,7 +166,6 @@ export class DNSService {
                 });
             }
 
-            // Insert DKIM keys into database
             await db.insert(schema.dkimKeys).values({
                 organizationId,
                 userId,
@@ -269,8 +261,6 @@ export class DNSService {
         logger.info("Verifying DNS record", { domain, recordType, name });
 
         try {
-            // This would typically involve making a DNS query to verify the record exists
-            // For now, we'll just mark it as verified in the database
             await db
                 .update(schema.dnsRecord)
                 .set({ isVerified: true, updatedAt: new Date() })

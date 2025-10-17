@@ -36,15 +36,13 @@ export const domainRoutes = new Elysia({
             },
         },
     )
-
-    // Get domain by domain name
     .get(
         "/:domain",
         async ({ params: { domain } }) => {
             return await DomainServiceHandler.getDomain(domain);
         },
         {
-            auth: true, // Require authentication for this route
+            auth: true,
             response: {
                 200: DomainModel.domainResponse,
                 404: DomainModel.domainNotFound,
@@ -56,14 +54,13 @@ export const domainRoutes = new Elysia({
             },
         },
     )
-    // Delete domain
     .delete(
         "/:domain",
         async ({ params: { domain } }) => {
             return await DomainServiceHandler.deleteDomain(domain);
         },
         {
-            auth: true, // Require authentication for this route
+            auth: true,
             response: {
                 200: t.Object({ message: t.String() }),
                 404: DomainModel.domainNotFound,

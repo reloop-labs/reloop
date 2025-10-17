@@ -25,7 +25,7 @@ export class ValidationService {
                                 type: "A",
                                 name: domain,
                                 value: result.address,
-                                ttl: 300, // Default TTL
+                                ttl: 300,
                             });
                         } catch {
                             missingRecords.push("A");
@@ -139,7 +139,6 @@ export class ValidationService {
                 const records: ValidationTypes.DnsRecordData[] = [];
                 if (addresses && Array.isArray(addresses)) {
                     addresses.forEach((address) => {
-                        // TXT records can be arrays of strings, join them
                         const value = Array.isArray(address) ? address.join("") : address;
                         records.push({
                             type: "TXT",
