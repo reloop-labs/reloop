@@ -111,14 +111,14 @@
 		"sonner": "catalog:ui",
 		"tailwind-merge": "catalog:ui",
 		"tailwind-variants": "catalog:ui",
-		"tailwindcss": "catalog:ui"
+		"tailwindcss": "catalog:ui",
+		"react": "catalog:ui",
+		"react-dom": "catalog:ui"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",
-		"@tailwindcss/postcss": "catalog:ui"
-	},
-	"peerDependencies": {
-		"react": "catalog:ui",
-		"react-dom": "catalog:ui"
+		"@tailwindcss/postcss": "catalog:ui",
+		"@types/react": "catalog:ui",
+		"@types/react-dom": "catalog:ui"
 	}
 }

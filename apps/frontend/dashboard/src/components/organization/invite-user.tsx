@@ -15,10 +15,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 const userSchema = z.object({
-	email: z
-		.string()
-		.min(1, "Email is required")
-		.email("Please enter a valid email address"),
+	email: z.email("Please enter a valid email address"),
 	role: z.enum(["dev", "marketing", "admin"]),
 });
 
@@ -113,11 +110,8 @@ export const InviteMember = ({ onClose }: { onClose: () => void }) => {
 								<div>
 									<Select.Root
 										disabled={loading}
-										onValueChange={(value) =>
-											form.setValue(
-												`users.${index}.role`,
-												value as "dev" | "marketing" | "admin",
-											)
+										onValueChange={(value: "dev" | "marketing" | "admin") =>
+											form.setValue(`users.${index}.role`, value)
 										}
 										defaultValue={field.role}
 									>

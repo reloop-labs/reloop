@@ -1,5 +1,5 @@
 {
-	"extends": "@reloop/ts/internal-package.json",
+	"extends": "@reloop/tsconfig/base.json",
 	"include": ["src/**/*", "emails/**/*", "components/**/*", "./**/*"],
 	"exclude": ["node_modules", "dist"],
 	"compilerOptions": {
