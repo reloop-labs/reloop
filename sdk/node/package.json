@@ -1,0 +1,17 @@
+{
+	"name": "reloop-sdk-node",
+	"version": "1.0.0",
+	"description": "Reloop Node.js SDK",
+	"main": "hello_world.js",
+	"scripts": {
+		"start": "node hello_world.js",
+		"hello": "node hello_world.js"
+	},
+	"keywords": [
+		"reloop",
+		"sdk",
+		"node"
+	],
+	"author": "Reloop",
+	"license": "MIT"
+}

@@ -1,0 +1,19 @@
+{
+	"name": "reloop/sdk-php",
+	"description": "Reloop PHP SDK",
+	"type": "library",
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Reloop"
+		}
+	],
+	"require": {
+		"php": ">=7.4"
+	},
+	"autoload": {
+		"psr-4": {
+			"Reloop\\": "src/"
+		}
+	}
+}
