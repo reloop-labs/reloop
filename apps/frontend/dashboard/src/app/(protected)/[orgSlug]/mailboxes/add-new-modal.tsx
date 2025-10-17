@@ -1,6 +1,6 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
+import { valibotResolver } from "@hookform/resolvers/valibot";
 import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
@@ -12,18 +12,28 @@ import * as Select from "@reloop/ui/select";
 import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
+import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { z } from "zod";
+import * as v from "valibot";
 
 // Form validation schema
-const mailboxSchema = z.object({
-	emailName: z.string().min(1, "Email name is required"),
-	selectedDomain: z.string().min(1, "Please select a domain"),
-	password: z.string().min(6, "Password must be at least 6 characters"),
+const mailboxSchema = v.object({
+	emailName: v.pipe(
+		v.string("Email name is required"),
+		v.minLength(1, "Email name is required"),
+	),
+	selectedDomain: v.pipe(
+		v.string("Please select a domain"),
+		v.minLength(1, "Please select a domain"),
+	),
+	password: v.pipe(
+		v.string("Password is required"),
+		v.minLength(6, "Password must be at least 6 characters"),
+	),
 });
 
-type MailboxFormValues = z.infer<typeof mailboxSchema>;
+type MailboxFormValues = v.InferInput<typeof mailboxSchema>;
 
 export const AddNewMailboxModal = ({
 	open,
@@ -37,7 +47,7 @@ export const AddNewMailboxModal = ({
 	const [showDetails, setShowDetails] = useState(true);
 	const [showServerDetails, setShowServerDetails] = useState(false);
 	const form = useForm<MailboxFormValues>({
-		resolver: zodResolver(mailboxSchema),
+		resolver: valibotResolver(mailboxSchema) as Resolver<MailboxFormValues>,
 		defaultValues: {
 			emailName: "",
 			selectedDomain: "",

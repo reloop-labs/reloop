@@ -1,6 +1,6 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
+import { valibotResolver } from "@hookform/resolvers/valibot";
 import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
 import * as Divider from "@reloop/ui/divider";
@@ -14,19 +14,24 @@ import { motion } from "motion/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { z } from "zod";
+import * as v from "valibot";
 
-const loginSchema = z.object({
-	email: z
-		.string()
-		.min(1, "Email is required")
-		.email("Please enter a valid email address"),
-	password: z.string().min(1, "Password is required"),
+const loginSchema = v.object({
+	email: v.pipe(
+		v.string("Email is required"),
+		v.minLength(1, "Email is required"),
+		v.email("Please enter a valid email address"),
+	),
+	password: v.pipe(
+		v.string("Password is required"),
+		v.minLength(1, "Password is required"),
+	),
 });
 
-type LoginFormData = z.infer<typeof loginSchema>;
+type LoginFormData = v.InferInput<typeof loginSchema>;
 
 export const LoginForm = () => {
 	const [showPassword, setShowPassword] = useState(false);
@@ -39,7 +44,7 @@ export const LoginForm = () => {
 		formState: { errors, isValid },
 		setError,
 	} = useForm<LoginFormData>({
-		resolver: zodResolver(loginSchema),
+		resolver: valibotResolver(loginSchema) as Resolver<LoginFormData>,
 		mode: "onChange",
 	});
 

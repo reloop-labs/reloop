@@ -1,6 +1,6 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
+import { valibotResolver } from "@hookform/resolvers/valibot";
 import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
 import * as Input from "@reloop/ui/input";
@@ -9,17 +9,19 @@ import Spinner from "@reloop/ui/spinner";
 import { useLoading } from "@reloop/ui/use-loading";
 import { motion } from "motion/react";
 import { useState } from "react";
+import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import * as v from "valibot";
 
-const forgotPasswordSchema = z.object({
-	email: z
-		.string()
-		.min(1, "Email is required")
-		.email("Please enter a valid email address"),
+const forgotPasswordSchema = v.object({
+	email: v.pipe(
+		v.string("Email is required"),
+		v.minLength(1, "Email is required"),
+		v.email("Please enter a valid email address"),
+	),
 });
 
-type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
+type ForgotPasswordFormData = v.InferInput<typeof forgotPasswordSchema>;
 
 export const ForgotPasswordForm = () => {
 	const [emailSent, setEmailSent] = useState(false);
@@ -30,7 +32,9 @@ export const ForgotPasswordForm = () => {
 		handleSubmit,
 		formState: { errors, isValid },
 	} = useForm<ForgotPasswordFormData>({
-		resolver: zodResolver(forgotPasswordSchema),
+		resolver: valibotResolver(
+			forgotPasswordSchema,
+		) as Resolver<ForgotPasswordFormData>,
 		mode: "onChange",
 	});
 

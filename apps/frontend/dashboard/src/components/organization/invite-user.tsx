@@ -1,6 +1,6 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
+import { valibotResolver } from "@hookform/resolvers/valibot";
 import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
@@ -10,25 +10,29 @@ import * as Modal from "@reloop/ui/modal";
 import * as Select from "@reloop/ui/select";
 import Spinner from "@reloop/ui/spinner";
 import { useState } from "react";
+import type { Resolver } from "react-hook-form";
 import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { z } from "zod";
+import * as v from "valibot";
 
-const userSchema = z.object({
-	email: z.email("Please enter a valid email address"),
-	role: z.enum(["dev", "marketing", "admin"]),
+const userSchema = v.object({
+	email: v.pipe(
+		v.string("Email is required"),
+		v.email("Please enter a valid email address"),
+	),
+	role: v.picklist(["dev", "marketing", "admin"], "Please select a valid role"),
 });
 
-const formSchema = z.object({
-	users: z.array(userSchema).min(1, "Add at least one user"),
+const formSchema = v.object({
+	users: v.pipe(v.array(userSchema), v.minLength(1, "Add at least one user")),
 });
 
-type InviteValues = z.infer<typeof formSchema>;
+type InviteValues = v.InferInput<typeof formSchema>;
 
 export const InviteMember = ({ onClose }: { onClose: () => void }) => {
 	const [loading, setLoading] = useState(false);
 	const form = useForm<InviteValues>({
-		resolver: zodResolver(formSchema),
+		resolver: valibotResolver(formSchema) as Resolver<InviteValues>,
 		defaultValues: {
 			users: [{ email: "", role: "dev" }],
 		},

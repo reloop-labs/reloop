@@ -27,7 +27,7 @@
 		"sonner": "catalog:ui",
 		"swr": "catalog:ui",
 		"usehooks-ts": "catalog:ui",
-		"zod": "catalog:ui",
+		"valibot": "catalog:db",
 		"zustand": "catalog:ui"
 	},
 	"devDependencies": {

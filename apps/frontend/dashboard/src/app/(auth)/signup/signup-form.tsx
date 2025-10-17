@@ -1,6 +1,6 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
+import { valibotResolver } from "@hookform/resolvers/valibot";
 import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
 import * as Divider from "@reloop/ui/divider";
@@ -13,32 +13,33 @@ import { generateId } from "better-auth";
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { z } from "zod";
+import * as v from "valibot";
 
-const signupSchema = z
-	.object({
-		email: z
-			.string()
-			.min(1, "Email is required")
-			.email("Please enter a valid email address"),
-		password: z
-			.string()
-			.min(1, "Password is required")
-			.min(8, "Password must be at least 8 characters")
-			.regex(
-				/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-				"Password must contain at least one lowercase letter, one uppercase letter, and one number",
-			),
-		confirmPassword: z.string().min(1, "Please confirm your password"),
-	})
-	.refine((data) => data.password === data.confirmPassword, {
-		message: "Passwords don't match",
-		path: ["confirmPassword"],
-	});
+const signupSchema = v.object({
+	email: v.pipe(
+		v.string("Email is required"),
+		v.minLength(1, "Email is required"),
+		v.email("Please enter a valid email address"),
+	),
+	password: v.pipe(
+		v.string("Password is required"),
+		v.minLength(1, "Password is required"),
+		v.minLength(8, "Password must be at least 8 characters"),
+		v.regex(
+			/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+			"Password must contain at least one lowercase letter, one uppercase letter, and one number",
+		),
+	),
+	confirmPassword: v.pipe(
+		v.string("Please confirm your password"),
+		v.minLength(1, "Please confirm your password"),
+	),
+});
 
-type SignupFormData = z.infer<typeof signupSchema>;
+type SignupFormData = v.InferInput<typeof signupSchema>;
 
 export const SignupForm = () => {
 	const [showPassword, setShowPassword] = useState(false);
@@ -51,11 +52,20 @@ export const SignupForm = () => {
 		formState: { errors, isValid },
 		setError,
 	} = useForm<SignupFormData>({
-		resolver: zodResolver(signupSchema),
+		resolver: valibotResolver(signupSchema) as Resolver<SignupFormData>,
 		mode: "onChange",
 	});
 
 	const onSubmit = async (data: SignupFormData) => {
+		// Manual password confirmation validation
+		if (data.password !== data.confirmPassword) {
+			setError("confirmPassword", {
+				type: "manual",
+				message: "Passwords don't match",
+			});
+			return;
+		}
+
 		try {
 			changeStatus("loading");
 			const name = data.email.split("@")[0]?.replace(/[^a-zA-Z0-9]/g, "") ?? "";
