@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { serverTiming } from "@elysiajs/server-timing";
 import { swagger } from "@elysiajs/swagger";
+import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
 import { landing } from "./landing";
 import { auth, OpenAPI } from "./lib/auth";
@@ -27,7 +28,7 @@ const app = new Elysia({ prefix: "/api/auth", name: "Auth Service" })
 		await loader();
 	})
 	.listen(port, () => {
-		console.log(`Auth Server is running on http://localhost:${port}/api/auth`);
+		logger.info(`Auth Server is running on http://localhost:${port}/api/auth`);
 	});
 
 export type App = typeof app;

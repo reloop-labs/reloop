@@ -1,6 +1,7 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { sendPasswordResetEmail } from "@reloop/email";
+import { logger } from "@reloop/logger";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import {
@@ -50,16 +51,16 @@ export const auth = betterAuth({
 	emailAndPassword: {
 		enabled: true,
 		sendResetPassword: async ({ user, url, token }, request) => {
-			console.log("🔐 Password reset requested for:", user.email);
-			console.log("🔗 Reset URL:", url);
-			console.log("🔑 Token:", token);
+			logger.info("🔐 Password reset requested for:", user.email);
+			logger.info("🔗 Reset URL:", url);
+			logger.info("🔑 Token:", token);
 
 			try {
-				console.log("📧 Attempting to send email...");
+				logger.info("📧 Attempting to send email...");
 				await sendPasswordResetEmail(user.email, url);
-				console.log(`✅ Password reset email sent to ${user.email}`);
+				logger.info(`✅ Password reset email sent to ${user.email}`);
 			} catch (error) {
-				console.error("❌ Failed to send password reset email:", error);
+				logger.error("❌ Failed to send password reset email:", error);
 				throw new Error("Failed to send password reset email");
 			}
 		},
@@ -86,7 +87,7 @@ export const auth = betterAuth({
 		admin(),
 		apiKey({ defaultPrefix: "rl" }),
 		organization({
-			sendInvitationEmail: async () => {},
+			sendInvitationEmail: async () => { },
 		}),
 		openAPI({ path: "/docs" }),
 	],
@@ -131,7 +132,7 @@ export const OpenAPI = {
 
 			return reference;
 		} catch (error) {
-			console.error("Failed to generate OpenAPI paths:", error);
+			logger.error("Failed to generate OpenAPI paths:", error);
 			return {};
 		}
 	},
@@ -140,7 +141,7 @@ export const OpenAPI = {
 			const { components } = await getSchema();
 			return components;
 		} catch (error) {
-			console.error("Failed to generate OpenAPI components:", error);
+			logger.error("Failed to generate OpenAPI components:", error);
 			return {};
 		}
 	},
