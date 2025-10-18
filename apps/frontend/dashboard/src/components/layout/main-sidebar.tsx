@@ -43,7 +43,7 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
 			animate={{ width: isSidebarCollapsed ? 56 : 240 }}
 			transition={{ duration: 0.2, ease: "easeInOut" }}
 		>
-			<div className="flex items-center justify-between border-stroke-soft-100 border-b p-2">
+			<div className="flex h-12 items-center justify-between border-stroke-soft-100 border-b px-2">
 				<AnimatePresence mode="wait">
 					{!isSidebarCollapsed && (
 						<motion.div

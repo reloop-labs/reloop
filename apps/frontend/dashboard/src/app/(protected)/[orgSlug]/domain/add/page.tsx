@@ -22,7 +22,7 @@ const NewDomainPage = () => {
 			<div className="relative my-10 ml-8 border-stroke-soft-200 border-l py-10">
 				<div className="relative flex flex-col pl-10">
 					<div className="-left-3.5 absolute top-1 rounded-full bg-bg-white-0 p-2">
-						<div className=" h-3 w-3 rounded-full border-2 bg-bg-white-0" />
+						<div className="h-3 w-3 rounded-full border-2 bg-bg-white-0" />
 					</div>
 					<div className="flex gap-10">
 						<div>
@@ -76,7 +76,7 @@ const NewDomainPage = () => {
 				</div>
 				<div className="relative mt-10 pl-10">
 					<div className="-left-3.5 absolute top-1 rounded-full bg-bg-white-0 p-2">
-						<div className=" h-3 w-3 rounded-full border-2 border-stroke-soft-200 bg-bg-white-0" />
+						<div className="h-3 w-3 rounded-full border-2 border-stroke-soft-200 bg-bg-white-0" />
 					</div>
 					<p className="font-medium text-text-sub-600 text-title-h5">
 						DNS Records
