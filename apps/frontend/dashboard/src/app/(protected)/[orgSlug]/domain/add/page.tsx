@@ -1,13 +1,46 @@
 "use client";
 import { useUserOrganization } from "@dashboard/providers/org-provider";
+import { valibotResolver } from "@hookform/resolvers/valibot";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
+import type { Resolver } from "react-hook-form";
+import { useForm } from "react-hook-form";
+import * as v from "valibot";
 import { Globe } from "../globe";
+
+const domainSchema = v.object({
+	domain: v.pipe(
+		v.string("Domain is required"),
+		v.minLength(1, "Domain is required"),
+		v.regex(
+			/^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/,
+			"Please enter a valid domain name",
+		),
+	),
+});
+
+type DomainFormValues = v.InferInput<typeof domainSchema>;
 
 const NewDomainPage = () => {
 	const { push } = useUserOrganization();
+
+	const form = useForm<DomainFormValues>({
+		resolver: valibotResolver(domainSchema) as Resolver<DomainFormValues>,
+		defaultValues: {
+			domain: "",
+		},
+	});
+
+	const handleAddDomain = (domain: string) => {
+		push(`/domain/add/${domain}`);
+	};
+
+	const onSubmit = (data: DomainFormValues) => {
+		handleAddDomain(data.domain);
+	};
+
 	return (
 		<div className="mx-auto max-w-3xl">
 			<div className="my-10 flex items-center gap-3">
@@ -30,30 +63,36 @@ const NewDomainPage = () => {
 							<p className="text-paragraph-sm text-text-sub-600">
 								Add a new domain send emails from your domain
 							</p>
-							<div className="mt-5 w-96">
-								<Label.Root htmlFor="email">
-									Name
-									<Label.Asterisk />
-								</Label.Root>
-								<Input.Root>
-									<Input.Affix>https://</Input.Affix>
-									<Input.Wrapper>
-										<Input.Input placeholder="www.example.com" />
-									</Input.Wrapper>
-								</Input.Root>
-							</div>
-							<div className="flex w-96 justify-end">
-								<Button.Root
-									onClick={() => {
-										push("/domain/add/example.com");
-									}}
-									type="button"
-									className="mt-5"
-									variant="neutral"
-								>
-									Add Domain
-								</Button.Root>
-							</div>
+							<form onSubmit={form.handleSubmit(onSubmit)} className="w-96">
+								<div className="mt-5">
+									<Label.Root htmlFor="domain">
+										Domain
+										<Label.Asterisk />
+									</Label.Root>
+									<Input.Root
+										hasError={!!form.formState?.errors?.domain?.message}
+									>
+										<Input.Affix>https://</Input.Affix>
+										<Input.Wrapper>
+											<Input.Input
+												id="domain"
+												placeholder="www.example.com"
+												{...form.register("domain")}
+											/>
+										</Input.Wrapper>
+									</Input.Root>
+									{form.formState.errors.domain && (
+										<p className="mt-1 text-error-base text-paragraph-sm">
+											{form.formState.errors.domain.message}
+										</p>
+									)}
+								</div>
+								<div className="flex w-96 justify-end">
+									<Button.Root type="submit" className="mt-5" variant="neutral">
+										Add Domain
+									</Button.Root>
+								</div>
+							</form>
 						</div>
 						<div className="mt-24 h-fit rounded-2xl border border-stroke-soft-200 p-4">
 							<div className="flex items-center gap-2 uppercase">
