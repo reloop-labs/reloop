@@ -6,6 +6,7 @@
 	"exports": {
 		".": "./src/index.ts",
 		"./auth": "./src/auth.ts",
+		"./email": "./src/email.ts",
 		"./types": "./src/types.ts"
 	},
 	"scripts": {

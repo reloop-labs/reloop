@@ -10,7 +10,7 @@ import { domainRoutes } from "./routes/domain/domain.index";
 import { validationRoutes } from "./routes/validation/validation.index";
 
 const port = Number(process.env.PORT || 3000);
-const app = new Elysia({ prefix: "/api/domain", name: "Domain Service" })
+const emailService = new Elysia({ prefix: "/api/domain", name: "Domain Service" })
 	.use(serverTiming())
 	.use(swagger({ path: "/docs" }))
 	.use(landing)
@@ -26,4 +26,4 @@ const app = new Elysia({ prefix: "/api/domain", name: "Domain Service" })
 		);
 	});
 
-export type App = typeof app;
+export type EmailService = typeof emailService;

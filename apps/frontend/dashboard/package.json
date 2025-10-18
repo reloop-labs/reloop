@@ -28,7 +28,9 @@
 		"swr": "catalog:ui",
 		"usehooks-ts": "catalog:ui",
 		"valibot": "catalog:db",
-		"zustand": "catalog:ui"
+		"zustand": "catalog:ui",
+		"@reloop/api": "workspace:*",
+		"axios": "catalog:"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",

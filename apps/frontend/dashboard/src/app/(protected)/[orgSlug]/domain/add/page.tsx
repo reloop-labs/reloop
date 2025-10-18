@@ -5,6 +5,8 @@ import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
+import { toast } from "@reloop/ui/toast";
+import axios from "axios";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import * as v from "valibot";
@@ -37,8 +39,24 @@ const NewDomainPage = () => {
 		push(`/domain/add/${domain}`);
 	};
 
-	const onSubmit = (data: DomainFormValues) => {
-		handleAddDomain(data.domain);
+	const onSubmit = async ({ domain }: DomainFormValues) => {
+		try {
+			const response = await axios.post(
+				"/api/domain/v1/add",
+				{ domain },
+				{
+					headers: {
+						credentials: "include",
+					},
+				},
+			);
+			toast.success("Domain added successfully");
+			handleAddDomain(domain);
+		} catch (error: any) {
+			if (error.response?.data) {
+				toast.error(error.response.data);
+			}
+		}
 	};
 
 	return (
