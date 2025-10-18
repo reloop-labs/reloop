@@ -72,11 +72,9 @@ export const dnsRoutes = new Elysia({
     .post(
         "/:domain/generate",
         async ({ params: { domain }, body, user }) => {
-            console.log(`Generating DNS records for domain: ${domain}`);
             if (!user.activeOrganizationId) {
                 throw status(403, "User is not a member of an organization" as const);
             }
-
             return await DNSServiceHandler.generateDNSRecords(
                 domain,
                 user.activeOrganizationId,

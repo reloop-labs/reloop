@@ -25,7 +25,6 @@ export namespace DomainTypes {
 
     export interface CreateDomainRequest {
         domain: string;
-        serverIP?: string;
     }
 
     export interface DomainListQuery {

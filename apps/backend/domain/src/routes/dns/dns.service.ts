@@ -1,5 +1,6 @@
 import { generateKeyPair } from "node:crypto";
 import { promisify } from "node:util";
+import { createId } from "@paralleldrive/cuid2";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
@@ -7,7 +8,6 @@ import { and, eq } from "drizzle-orm";
 import type { DNSTypes } from "./dns.type";
 
 const generateKeyPairAsync = promisify(generateKeyPair);
-
 
 export class DNSService {
     static async generateKeyPair(
@@ -58,7 +58,10 @@ export class DNSService {
         };
     }
 
-    static generateSPFRecord(domain: string, serverIP: string): DNSTypes.DNSRecord {
+    static generateSPFRecord(
+        domain: string,
+        serverIP: string,
+    ): DNSTypes.DNSRecord {
         const spfValue = `v=spf1 ip4:${serverIP} mx a:${domain} ~all`;
 
         return {
@@ -103,7 +106,10 @@ export class DNSService {
         };
     }
 
-    static generateAllDNSRecords(domain: string, serverIP: string): DNSTypes.DNSRecord[] {
+    static generateAllDNSRecords(
+        domain: string,
+        serverIP: string,
+    ): DNSTypes.DNSRecord[] {
         return [
             DNSService.generateARecord(domain, serverIP),
             DNSService.generateMXRecord(domain),
@@ -119,80 +125,117 @@ export class DNSService {
         serverIP: string,
         dkimSelector = "mail",
     ): Promise<void> {
-        logger.info("Generating DNS records for domain", {
-            domain,
-            organizationId,
-            userId,
-            serverIP,
-            dkimSelector,
-        });
+        logger.info(
+            {
+                domain,
+                organizationId,
+                userId,
+                serverIP,
+                dkimSelector,
+            },
+            "DNS records generation Details",
+        );
 
         try {
+            const existingAliasDomain = await db
+                .select()
+                .from(schema.aliasDomain)
+                .where(eq(schema.aliasDomain.aliasDomain, domain))
+                .limit(1);
+
+            if (existingAliasDomain.length === 0) {
+                throw new Error(
+                    `Alias domain '${domain}' does not exist. Please create the alias domain first.`,
+                );
+            }
+
             const dkimKeyPair = await DNSService.generateKeyPair(dkimSelector);
 
             const dnsRecords = DNSService.generateAllDNSRecords(domain, serverIP);
-
             const dkimRecord = DNSService.generateDKIMRecord(
                 domain,
                 dkimSelector,
                 dkimKeyPair.publicKey,
             );
             dnsRecords.push(dkimRecord);
-
-            const dnsRecordData: DNSTypes.DNSRecordData[] = dnsRecords.map((record) => ({
-                recordType: record.type,
-                name: record.name,
-                value: record.value,
-                ttl: record.ttl || 3600,
-                priority: record.priority,
-                description: record.description,
-                isVerified: false,
-            }));
-            for (const record of dnsRecordData) {
-                await db.insert(schema.dnsRecord).values({
-                    id: Math.floor(Math.random() * 1000000000),
-                    aliasDomain: domain,
-                    organizationId,
-                    userId,
-                    recordType: record.recordType,
+            const dnsRecordData: DNSTypes.DNSRecordData[] = dnsRecords.map(
+                (record) => ({
+                    recordType: record.type,
                     name: record.name,
                     value: record.value,
-                    ttl: record.ttl,
+                    ttl: record.ttl || 3600,
                     priority: record.priority,
                     description: record.description,
-                    isVerified: record.isVerified,
+                    isVerified: false,
+                }),
+            );
+            for (const record of dnsRecordData) {
+                try {
+                    await db.insert(schema.dnsRecord).values({
+                        id: Number.parseInt(createId().replace(/\D/g, "").slice(0, 15), 10),
+                        aliasDomain: domain,
+                        organizationId,
+                        userId,
+                        recordType: record.recordType,
+                        name: record.name,
+                        value: record.value,
+                        ttl: record.ttl,
+                        priority: record.priority,
+                        description: record.description,
+                        isVerified: record.isVerified,
+                        createdAt: new Date(),
+                        updatedAt: new Date(),
+                    });
+                } catch (dbError) {
+                    logger.error("Failed to insert DNS record", {
+                        domain,
+                        record,
+                        error: dbError instanceof Error ? dbError.message : String(dbError),
+                    });
+                    throw new Error(`Failed to insert DNS record: ${dbError instanceof Error ? dbError.message : String(dbError)}`);
+                }
+            }
+
+            try {
+                await db.insert(schema.dkimKeys).values({
+                    organizationId,
+                    userId,
+                    aliasDomain: domain,
+                    selector: dkimKeyPair.selector,
+                    publicKey: dkimKeyPair.publicKey,
+                    privateKey: dkimKeyPair.privateKey,
+                    keyLength: 2048,
+                    algorithm: "rsa-sha256",
                     createdAt: new Date(),
                     updatedAt: new Date(),
                 });
+            } catch (dbError) {
+                logger.error("Failed to insert DKIM keys", {
+                    domain,
+                    error: dbError instanceof Error ? dbError.message : String(dbError),
+                });
+                throw new Error(`Failed to insert DKIM keys: ${dbError instanceof Error ? dbError.message : String(dbError)}`);
             }
-
-            await db.insert(schema.dkimKeys).values({
-                organizationId,
-                userId,
-                aliasDomain: domain,
-                selector: dkimKeyPair.selector,
-                publicKey: dkimKeyPair.publicKey,
-                privateKey: dkimKeyPair.privateKey,
-                keyLength: 2048,
-                algorithm: "rsa-sha256",
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            });
 
             logger.info("DNS records and DKIM keys generated successfully", {
                 domain,
                 recordCount: dnsRecordData.length,
             });
         } catch (error) {
-            logger.error("Error generating DNS records", {
-                domain,
-                error: error instanceof Error ? error.message : String(error),
-            });
+            logger.error(
+                {
+                    domain,
+                    error: error instanceof Error ? error.message : String(error),
+                },
+                '"Error generating DNS records"',
+            );
             throw error;
         }
     }
 
-    static async getDNSRecords(domain: string): Promise<DNSTypes.DNSRecordData[]> {
+    static async getDNSRecords(
+        domain: string,
+    ): Promise<DNSTypes.DNSRecordData[]> {
         logger.info("Getting DNS records for domain", { domain });
 
         try {
@@ -219,7 +262,9 @@ export class DNSService {
         }
     }
 
-    static async getDKIMKeys(domain: string): Promise<DNSTypes.DKIMKeysResponse | null> {
+    static async getDKIMKeys(
+        domain: string,
+    ): Promise<DNSTypes.DKIMKeysResponse | null> {
         logger.info("Getting DKIM keys for domain", { domain });
 
         try {
@@ -313,7 +358,9 @@ export class DNSService {
 }
 
 export class DNSServiceHandler {
-    static async getDNSRecords(domain: string): Promise<DNSTypes.DNSRecordResponse[]> {
+    static async getDNSRecords(
+        domain: string,
+    ): Promise<DNSTypes.DNSRecordResponse[]> {
         logger.info("Getting DNS records for domain", { domain });
 
         try {
@@ -332,7 +379,9 @@ export class DNSServiceHandler {
         }
     }
 
-    static async getDKIMKeys(domain: string): Promise<DNSTypes.DKIMKeysResponse | null> {
+    static async getDKIMKeys(
+        domain: string,
+    ): Promise<DNSTypes.DKIMKeysResponse | null> {
         logger.info("Getting DKIM keys for domain", { domain });
 
         try {
@@ -425,7 +474,9 @@ export class DNSServiceHandler {
         }
     }
 
-    static async deleteDNSRecords(domain: string): Promise<DNSTypes.DeleteDNSResponse> {
+    static async deleteDNSRecords(
+        domain: string,
+    ): Promise<DNSTypes.DeleteDNSResponse> {
         logger.info("Deleting DNS records for domain", { domain });
 
         try {

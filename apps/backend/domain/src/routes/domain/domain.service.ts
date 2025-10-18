@@ -11,26 +11,23 @@ export class DomainService {
         organizationId: string,
         userId: string,
         domain: string,
-        serverIP = "127.0.0.1",
+        serverIP = "mail.reloop.sh",
     ): Promise<DomainTypes.DomainResponse> {
-        logger.info("Creating domain", {
+        logger.info({
             domain: domain,
             organizationId: organizationId,
             userId: userId,
-        });
-
+        }, "Creating domain");
         try {
             const existingDomain = await db
                 .select()
                 .from(schema.domain)
-                .where(eq(schema.domain.domain, domain))
+                .where(and(eq(schema.domain.domain, domain), eq(schema.domain.organizationId, organizationId)))
                 .limit(1);
-
             if (existingDomain.length > 0) {
-                logger.warn("Domain already exists", { domain: domain });
+                logger.warn("Domain already exists", { domain });
                 throw status(409, "Domain already exists" as const);
             }
-
             const newDomain = await db
                 .insert(schema.domain)
                 .values({
@@ -331,7 +328,6 @@ export class DomainServiceHandler {
             domain: body.domain,
             organizationId,
             userId,
-            serverIP: body.serverIP,
         });
 
         try {
@@ -339,7 +335,7 @@ export class DomainServiceHandler {
                 organizationId,
                 userId,
                 body.domain,
-                body.serverIP || "127.0.0.1",
+                'mail.reloop.sh'
             );
 
             logger.info("Domain created successfully", {

@@ -1,6 +1,6 @@
 {
 	"extends": "@reloop/tsconfig/base.json",
-	"include": ["emails", "components"],
+	"include": ["src/**/*"],
 	"exclude": ["node_modules"],
 	"compilerOptions": {
 		"module": "NodeNext",

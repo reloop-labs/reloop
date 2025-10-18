@@ -1,47 +1,44 @@
-import { auth } from "@reloop/auth/server";
+import type { Session } from "@reloop/auth/server";
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
 
-export const authMiddleware = new Elysia({ name: "better-auth" })
-    .macro({
-        auth: {
-            async resolve({ status, request: { headers } }) {
-                try {
-                    const session = await auth.api.getSession({ headers });
-                    if (session) {
-                        logger.info("User authenticated via cookie", { userId: session.user.id, });
-                        return {
-                            user: session.user,
-                            session: session.session,
-                            authMethod: "cookie" as const,
-                        };
-                    }
-                    const apiKey =
-                        headers.get("x-api-key") ||
-                        headers.get("authorization")?.replace("Bearer ", "");
-                    if (apiKey) {
-                        const apiKeySession = await auth.api.getSession({
-                            headers: new Headers({
-                                authorization: `Bearer ${apiKey}`,
-                            }),
-                        });
+if (process.env.NODE_ENV !== "production") {
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+}
 
-                        if (apiKeySession) {
-                            logger.info("User authenticated via API key", { userId: apiKeySession.user.id, });
-                            return {
-                                user: apiKeySession.user,
-                                session: apiKeySession.session,
-                                authMethod: "apiKey" as const,
-                            };
-                        }
-                    }
-                    return status(401, "Authentication required");
-                } catch (error) {
-                    logger.error("Authentication error", {
-                        error: error instanceof Error ? error.message : "Unknown error",
-                    });
-                    return status(401, "Authentication failed");
+export const authMiddleware = new Elysia({ name: "better-auth" }).macro({
+    auth: {
+        async resolve({ status, request: { headers } }) {
+            try {
+                const response = await fetch(
+                    `${process.env.BASE_URL}/api/auth/v1/get-session`,
+                    {
+                        method: "GET",
+                        headers: new Headers({
+                            "Content-Type": "application/json",
+                            Cookie: headers.get("cookie") || "",
+                        }),
+                    },
+                );
+                const session: Session | null = await response.json();
+                if (session) {
+                    logger.info(
+                        { userId: session.user },
+                        "User authenticated via cookie",
+                    );
+                    return {
+                        user: session.user,
+                        session: session.session,
+                        authMethod: "cookie" as const,
+                    };
                 }
+                return status(401, "Authentication required");
+            } catch (error) {
+                logger.error("Authentication error", {
+                    error: error instanceof Error ? error.message : "Unknown error",
+                });
+                return status(401, "Authentication failed");
             }
-        }
-    });
+        },
+    },
+});

@@ -1,4 +1,5 @@
 import "dotenv/config";
+import cors from "@elysiajs/cors";
 import { serverTiming } from "@elysiajs/server-timing";
 import { swagger } from "@elysiajs/swagger";
 import { logger } from "@reloop/logger";
@@ -12,6 +13,7 @@ const port = Number(process.env.PORT || 3000);
 
 const app = new Elysia({ prefix: "/api/auth", name: "Auth Service" })
 	.use(serverTiming())
+	.use(cors({ origin: "*", }))
 	.use(
 		swagger({
 			path: "/docs",

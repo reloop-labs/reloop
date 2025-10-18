@@ -3,7 +3,6 @@ import { t } from 'elysia'
 export namespace DomainModel {
     export const createDomainBody = t.Object({
         domain: t.String({ minLength: 1, maxLength: 255, description: "Domain name (e.g., send.reloop.com)" }),
-        serverIP: t.Optional(t.String({ description: "Server IP address for DNS records (default: 127.0.0.1)" })),
     })
 
     export type CreateDomainBody = typeof createDomainBody.static

@@ -10,6 +10,7 @@ import {
 import { ac, dev, marketing, admin as orgAdmin } from "./permissions";
 
 export const auth = betterAuth({
+	baseURL: process.env.BASE_URL || "https://reloop.local",
 	user: {
 		additionalFields: {
 			activeOrganizationId: {
