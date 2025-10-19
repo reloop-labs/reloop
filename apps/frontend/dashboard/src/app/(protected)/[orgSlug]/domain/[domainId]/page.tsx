@@ -1,46 +1,35 @@
 "use client";
-import { useUserOrganization } from "@dashboard/providers/org-provider";
-import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
-
+import Spinner from "@reloop/ui/spinner";
 import * as Table from "@reloop/ui/table";
 import { motion } from "motion/react";
+import { useParams } from "next/navigation";
 import * as React from "react";
+import useSWR from "swr";
 import { Globe } from "../globe";
 
-const dnsRecords = [
-	{
-		type: "MX",
-		host: "send.test",
-		value: "feedback-smtp.ap-northelfajs;lajf ;lj sdjlds",
-		priority: "10",
-		ttl: "Auto",
-	},
-	{
-		type: "TXT",
-		host: "send.test",
-		value: "v=spf1 include:amazonss;elfjasd; jds;jds;lka j",
-		priority: "",
-		ttl: "Auto",
-	},
-	{
-		type: "TXT",
-		host: "test._domainkey.test",
-		value: "p=MIGfMA0GCSqGSIb3DQEBs;elfjasd; jds;jds;lka j",
-		priority: "",
-		ttl: "Auto",
-	},
-	{
-		type: "TXT",
-		host: "_dmarc",
-		value: "v=DMARC1; p=none",
-		priority: "",
-		ttl: "Auto",
-	},
-];
+interface DNSRecord {
+	recordType: string;
+	name: string;
+	value: string;
+	ttl: number;
+	priority?: number;
+	description?: string;
+	isVerified: boolean;
+}
+
 const DomainPage = () => {
-	const { activeOrganization } = useUserOrganization();
+	const { domainId } = useParams();
 	const [copiedItems, setCopiedItems] = React.useState<Set<string>>(new Set());
+
+	const {
+		data: dnsRecords,
+		error,
+		isLoading,
+	} = useSWR<DNSRecord[]>(domainId ? `/api/domain/v1/dns/${domainId}` : null, {
+		revalidateOnFocus: false,
+		revalidateOnReconnect: true,
+	});
 
 	const copyToClipboard = async (text: string, itemId: string) => {
 		try {
@@ -58,13 +47,59 @@ const DomainPage = () => {
 		}
 	};
 
+	if (isLoading) {
+		return (
+			<div className="mx-auto mb-28 flex h-96 max-w-3xl items-center justify-center">
+				<Spinner />
+			</div>
+		);
+	}
+
+	if (error) {
+		return (
+			<div className="mx-auto max-w-3xl">
+				<div className="my-10 flex items-center gap-3">
+					<Globe className="rounded-full" iconClassName="h-8 w-8" />
+					<div>
+						<p className="text-paragraph-sm text-text-sub-600">Domain</p>
+						<h1 className="font-medium text-title-h4 leading-8">{domainId}</h1>
+					</div>
+				</div>
+				<div className="rounded-lg border border-red-200 bg-red-50 p-4">
+					<p className="text-red-800">
+						Failed to load DNS records. Please try again.
+					</p>
+				</div>
+			</div>
+		);
+	}
+
+	if (!dnsRecords || dnsRecords.length === 0) {
+		return (
+			<div className="mx-auto max-w-3xl">
+				<div className="my-10 flex items-center gap-3">
+					<Globe className="rounded-full" iconClassName="h-8 w-8" />
+					<div>
+						<p className="text-paragraph-sm text-text-sub-600">Domain</p>
+						<h1 className="font-medium text-title-h4 leading-8">{domainId}</h1>
+					</div>
+				</div>
+				<div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4">
+					<p className="text-yellow-800">
+						No DNS records found for this domain.
+					</p>
+				</div>
+			</div>
+		);
+	}
+
 	return (
 		<div className="mx-auto max-w-3xl">
 			<div className="my-10 flex items-center gap-3">
 				<Globe className="rounded-full" iconClassName="h-8 w-8" />
 				<div>
 					<p className="text-paragraph-sm text-text-sub-600">Domain</p>
-					<h1 className="font-medium text-title-h4 leading-8">play.com</h1>
+					<h1 className="font-medium text-title-h4 leading-8">{domainId}</h1>
 				</div>
 			</div>
 			<div className="relative mb-10 rounded-2xl border border-stroke-soft-200 p-10">
@@ -104,18 +139,18 @@ const DomainPage = () => {
 									<Table.Row>
 										<Table.Cell className="h-10">
 											<span className="inline-flex items-center py-0.5 font-medium text-sm">
-												{record.type}
+												{record.recordType}
 											</span>
 										</Table.Cell>
 										<Table.Cell className="h-10">
 											<div className="flex items-center gap-2">
 												<code className="text-label-sm text-text-strong-950">
-													{record.host}
+													{record.name}
 												</code>
 												<button
 													type="button"
 													onClick={() =>
-														copyToClipboard(record.host, `host-${index}`)
+														copyToClipboard(record.name, `host-${index}`)
 													}
 													className="opacity-0 transition-opacity group-hover/row:opacity-100"
 													title="Copy host name"
@@ -193,7 +228,7 @@ const DomainPage = () => {
 										</Table.Cell>
 										<Table.Cell className="h-10">
 											<span className="text-label-sm text-text-strong-950">
-												{record.priority}
+												{record.priority || ""}
 											</span>
 										</Table.Cell>
 										<Table.Cell className="h-10">
