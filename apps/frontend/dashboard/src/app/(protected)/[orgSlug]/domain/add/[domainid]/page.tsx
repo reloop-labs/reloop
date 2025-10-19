@@ -2,8 +2,6 @@
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
-import * as Table from "@reloop/ui/table";
-import { motion } from "motion/react";
 import { useParams } from "next/navigation";
 import * as React from "react";
 import { useUserOrganization } from "src/providers/org-provider";
@@ -113,126 +111,132 @@ const NewDomainPage = () => {
 	);
 
 	const renderRecordTable = (records: DNSRecord[], startIndex: number) => (
-		<Table.Root>
-			<Table.Header>
-				<Table.Row>
-					<Table.Head className="w-20 font-medium text-sm">Type</Table.Head>
-					<Table.Head className="w-48 font-medium text-sm">
-						Host / Name
-					</Table.Head>
-					<Table.Head className="max-w-0 font-medium text-sm">Value</Table.Head>
-					<Table.Head className="w-20 font-medium text-sm">Priority</Table.Head>
-					<Table.Head className="w-20 font-medium text-sm">TTL</Table.Head>
-				</Table.Row>
-			</Table.Header>
-			<Table.Body>
+		<div className="w-full overflow-hidden rounded-lg border border-stroke-soft-200">
+			{/* Header */}
+			<div className="grid grid-cols-[1fr_2fr_3fr_1fr_1fr] gap-4 border-stroke-soft-200 border-b bg-bg-weak-50 px-4 py-3">
+				<div className="font-medium text-sm text-text-sub-600">Type</div>
+				<div className="font-medium text-sm text-text-sub-600">Record name</div>
+				<div className="font-medium text-sm text-text-sub-600">Value</div>
+				<div className="font-medium text-sm text-text-sub-600">TTL</div>
+				<div className="font-medium text-sm text-text-sub-600">Status</div>
+			</div>
+
+			{/* Body */}
+			<div className="bg-white">
 				{records.map((record, idx) => {
 					const index = startIndex + idx;
 					return (
 						<React.Fragment key={index}>
-							<Table.Row>
-								<Table.Cell className="h-10">
-									<span className="inline-flex items-center py-0.5 font-medium text-sm">
+							<div className="group grid grid-cols-[1fr_2fr_3fr_1fr_1fr] gap-4 px-4 py-3 hover:bg-bg-weak-50">
+								{/* Type */}
+								<div className="flex items-center">
+									<span className="font-medium text-sm text-text-strong-950">
 										{record.recordType}
 									</span>
-								</Table.Cell>
-								<Table.Cell className="h-10">
-									<div className="flex items-center gap-2">
-										<code className="text-label-sm text-text-strong-950">
-											{record.name}
+								</div>
+
+								{/* Record name */}
+								<div className="flex min-w-0 items-center gap-2">
+									<button
+										type="button"
+										onClick={() =>
+											copyToClipboard(record.name, `host-${index}`)
+										}
+										className={`cursor-pointer truncate text-left text-sm transition-colors ${
+											copiedItems.has(`host-${index}`)
+												? "text-green-600"
+												: "text-text-strong-950 hover:text-text-strong-950/80"
+										}`}
+										title="Click to copy record name"
+									>
+										<code className="text-sm">
+											{copiedItems.has(`host-${index}`)
+												? "Copied"
+												: record.name}
 										</code>
-										<button
-											type="button"
-											onClick={() =>
-												copyToClipboard(record.name, `host-${index}`)
+									</button>
+									<button
+										type="button"
+										onClick={() =>
+											copyToClipboard(record.name, `host-${index}`)
+										}
+										className="flex-shrink-0 transition-opacity"
+										title="Copy record name"
+									>
+										<Icon
+											name={copiedItems.has(`host-${index}`) ? "check" : "copy"}
+											className={`h-3.5 w-3.5 transition-colors ${
+												copiedItems.has(`host-${index}`)
+													? "text-green-600"
+													: "text-text-sub-600 hover:text-text-strong-950"
+											}`}
+										/>
+									</button>
+								</div>
+
+								{/* Value */}
+								<div className="flex min-w-0 items-center gap-2">
+									<button
+										type="button"
+										onClick={() =>
+											copyToClipboard(record.value, `value-${index}`)
+										}
+										className="flex-1 cursor-pointer truncate text-left text-sm text-text-strong-950"
+									>
+										{record.value}
+									</button>
+									<button
+										type="button"
+										onClick={() =>
+											copyToClipboard(record.value, `value-${index}`)
+										}
+										className="flex-shrink-0 cursor-pointer transition-opacity"
+										title="Copy value"
+									>
+										<Icon
+											name={
+												copiedItems.has(`value-${index}`) ? "check" : "copy"
 											}
-											className="opacity-0 transition-opacity group-hover/row:opacity-100"
-											title="Copy host name"
-										>
-											<motion.div
-												animate={
-													copiedItems.has(`host-${index}`)
-														? "copied"
-														: "default"
-												}
-												transition={{ duration: 0.2, ease: "easeInOut" }}
-											>
-												<Icon
-													name={
-														copiedItems.has(`host-${index}`) ? "check" : "copy"
-													}
-													className={`h-3 w-3 transition-colors ${
-														copiedItems.has(`host-${index}`)
-															? "text-green-600"
-															: "text-text-sub-600 hover:text-text-strong-950"
-													}`}
-												/>
-											</motion.div>
-										</button>
-									</div>
-								</Table.Cell>
-								<Table.Cell className="h-10 max-w-0">
-									<div className="flex min-w-0 items-center gap-2">
-										<button
-											type="button"
-											onClick={() =>
-												copyToClipboard(record.value, `value-${index}`)
-											}
-											className="flex-1 cursor-pointer truncate text-left text-label-sm text-text-strong-950"
-										>
-											{record.value}
-										</button>
-										<button
-											type="button"
-											onClick={() =>
-												copyToClipboard(record.value, `value-${index}`)
-											}
-											className="flex-shrink-0 cursor-pointer opacity-0 transition-opacity group-hover/row:opacity-100"
-											title="Copy value"
-										>
-											<motion.div
-												animate={
-													copiedItems.has(`value-${index}`)
-														? "copied"
-														: "default"
-												}
-												variants={{
-													default: { scale: 1 },
-													copied: { scale: 1.1 },
-												}}
-												transition={{ duration: 0.2, ease: "easeInOut" }}
-											>
-												<Icon
-													name={
-														copiedItems.has(`value-${index}`) ? "check" : "copy"
-													}
-													className={`h-3 w-3 transition-colors ${
-														copiedItems.has(`value-${index}`)
-															? "text-green-600"
-															: "text-text-sub-600 hover:text-text-strong-950"
-													}`}
-												/>
-											</motion.div>
-										</button>
-									</div>
-								</Table.Cell>
-								<Table.Cell className="h-10">
-									<span className="text-label-sm text-text-strong-950">
-										{record.priority}
-									</span>
-								</Table.Cell>
-								<Table.Cell className="h-10">
-									<span className="text-label-sm text-text-strong-950">
+											className={`h-3.5 w-3.5 transition-colors ${
+												copiedItems.has(`value-${index}`)
+													? "text-green-600"
+													: "text-text-sub-600 hover:text-text-strong-950"
+											}`}
+										/>
+									</button>
+								</div>
+
+								{/* TTL */}
+								<div className="flex items-center">
+									<span className="text-sm text-text-strong-950">
 										{record.ttl}
 									</span>
-								</Table.Cell>
-							</Table.Row>
-							{idx < records.length - 1 && <Table.RowDivider />}
+								</div>
+
+								{/* Status */}
+								<div className="flex items-center gap-2">
+									<div
+										className={`h-2 w-2 rounded-full ${
+											record.isVerified ? "bg-green-500" : "bg-orange-500"
+										}`}
+									/>
+									<span
+										className={`text-sm ${
+											record.isVerified ? "text-green-600" : "text-orange-600"
+										}`}
+									>
+										{record.isVerified ? "Verified" : "Pending"}
+									</span>
+								</div>
+							</div>
+							{idx < records.length - 1 && (
+								<div className="border-stroke-soft-200 border-b" />
+							)}
 						</React.Fragment>
 					);
 				})}
-			</Table.Body>
-		</Table.Root>
+			</div>
+		</div>
 	);
 
 	return (
@@ -272,14 +276,13 @@ const NewDomainPage = () => {
 						<div className="-left-3.5 absolute top-1 rounded-full bg-bg-white-0 p-2">
 							<div className="h-3 w-3 rounded-full border-2 bg-bg-white-0" />
 						</div>
-						<p className="font-medium text-title-h5">DNS Records</p>
-						<div className="mt-5 space-y-1 py-4">
-							<div className="font-medium text-text-strong-950 leading-4">
-								DKIM and SPF
+						<div className="mb-6 space-y-1">
+							<div className="font-medium text-base text-text-strong-950">
+								DKIM and SPF{" "}
+								<span className="text-text-sub-600">(Required)</span>
 							</div>
-							<div className="text-paragraph-sm text-text-sub-600">
-								Add these DNS records to your domain to authenticate your
-								emails.
+							<div className="text-sm text-text-sub-600">
+								Enable email signing and specify authorized senders.
 							</div>
 						</div>
 						<div className="w-full">{renderRecordTable(otherRecords, 0)}</div>
@@ -292,13 +295,12 @@ const NewDomainPage = () => {
 						<div className="-left-3.5 absolute top-1 rounded-full bg-bg-white-0 p-2">
 							<div className="h-3 w-3 rounded-full border-2 bg-bg-white-0" />
 						</div>
-						<p className="font-medium text-title-h5">DMARC Policy</p>
-						<div className="mt-5 space-y-1 py-4">
-							<div className="font-medium text-text-strong-950 leading-4">
-								DMARC
+						<div className="mb-6 space-y-1">
+							<div className="font-medium text-base text-text-strong-950">
+								DMARC <span className="text-text-sub-600">(Recommended)</span>
 							</div>
-							<div className="text-paragraph-sm text-text-sub-600">
-								Add the DMARC record to set your email authentication policy.
+							<div className="text-sm text-text-sub-600">
+								Set authentication policies and receive reports.
 							</div>
 						</div>
 						<div className="w-full">
