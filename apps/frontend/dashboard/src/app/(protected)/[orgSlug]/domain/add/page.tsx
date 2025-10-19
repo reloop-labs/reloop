@@ -10,6 +10,7 @@ import { useLoading } from "@reloop/ui/use-loading";
 import axios from "axios";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
+import { useSWRConfig } from "swr";
 import * as v from "valibot";
 import { Globe } from "../globe";
 
@@ -29,6 +30,7 @@ type DomainFormValues = v.InferInput<typeof domainSchema>;
 const NewDomainPage = () => {
 	const { push } = useUserOrganization();
 	const { changeStatus, status } = useLoading();
+	const { mutate } = useSWRConfig();
 
 	const { register, handleSubmit, formState, setError } =
 		useForm<DomainFormValues>({
@@ -50,6 +52,10 @@ const NewDomainPage = () => {
 				{ domain },
 				{ headers: { credentials: "include" } },
 			);
+
+			// Mutate the DNS records cache to trigger a fresh fetch
+			await mutate(`/api/domain/v1/dns/${domain}`);
+
 			handleAddDomain(domain);
 		} catch (error) {
 			changeStatus("idle");

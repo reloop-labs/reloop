@@ -1,46 +1,38 @@
 "use client";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
+import Spinner from "@reloop/ui/spinner";
 import * as Table from "@reloop/ui/table";
 import { motion } from "motion/react";
+import { useParams } from "next/navigation";
 import * as React from "react";
 import { useUserOrganization } from "src/providers/org-provider";
+import useSWR from "swr";
 import { Globe } from "../../globe";
 
-const dnsRecords = [
-	{
-		type: "MX",
-		host: "send.test",
-		value: "feedback-smtp.ap-northelfajs;lajf ;lj sdjlds",
-		priority: "10",
-		ttl: "Auto",
-	},
-	{
-		type: "TXT",
-		host: "send.test",
-		value: "v=spf1 include:amazonss;elfjasd; jds;jds;lka j",
-		priority: "",
-		ttl: "Auto",
-	},
-	{
-		type: "TXT",
-		host: "test._domainkey.test",
-		value: "p=MIGfMA0GCSqGSIb3DQEBs;elfjasd; jds;jds;lka j",
-		priority: "",
-		ttl: "Auto",
-	},
-	{
-		type: "TXT",
-		host: "_dmarc",
-		value: "v=DMARC1; p=none",
-		priority: "",
-		ttl: "Auto",
-	},
-];
+interface DNSRecord {
+	recordType: string;
+	name: string;
+	value: string;
+	ttl: number;
+	priority?: number;
+	description?: string;
+	isVerified: boolean;
+}
 
 const NewDomainPage = () => {
 	const [copiedItems, setCopiedItems] = React.useState<Set<string>>(new Set());
 	const { push } = useUserOrganization();
+	const { domainid } = useParams();
+
+	const {
+		data: dnsRecords,
+		error,
+		isLoading,
+	} = useSWR<DNSRecord[]>(domainid ? `/api/domain/v1/dns/${domainid}` : null, {
+		revalidateOnFocus: false,
+		revalidateOnReconnect: true,
+	});
 	const copyToClipboard = async (text: string, itemId: string) => {
 		try {
 			await navigator.clipboard.writeText(text);
@@ -56,6 +48,57 @@ const NewDomainPage = () => {
 			console.error("Failed to copy text: ", err);
 		}
 	};
+
+	if (isLoading) {
+		return (
+			<div className="mx-auto mb-28 flex h-96 max-w-3xl items-center justify-center">
+				<Spinner />
+			</div>
+		);
+	}
+
+	if (error) {
+		return (
+			<div className="mx-auto mb-28 max-w-3xl">
+				<div className="my-10 flex items-center gap-3">
+					<Globe className="rounded-full" iconClassName="h-8 w-8" />
+					<div>
+						<h1 className="font-medium text-title-h4 leading-8">Add Domain</h1>
+						<p className="text-paragraph-sm text-text-sub-600">
+							Add a new domain and start sending emails from your domain
+						</p>
+					</div>
+				</div>
+				<div className="rounded-lg border border-red-200 bg-red-50 p-4">
+					<p className="text-red-800">
+						Failed to load DNS records. Please try again.
+					</p>
+				</div>
+			</div>
+		);
+	}
+
+	if (!dnsRecords || dnsRecords.length === 0) {
+		return (
+			<div className="mx-auto mb-28 max-w-3xl">
+				<div className="my-10 flex items-center gap-3">
+					<Globe className="rounded-full" iconClassName="h-8 w-8" />
+					<div>
+						<h1 className="font-medium text-title-h4 leading-8">Add Domain</h1>
+						<p className="text-paragraph-sm text-text-sub-600">
+							Add a new domain and start sending emails from your domain
+						</p>
+					</div>
+				</div>
+				<div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4">
+					<p className="text-yellow-800">
+						No DNS records found for this domain. Please generate DNS records
+						first.
+					</p>
+				</div>
+			</div>
+		);
+	}
 
 	return (
 		<div className="mx-auto mb-28 max-w-3xl">
@@ -83,13 +126,13 @@ const NewDomainPage = () => {
 						</div>
 						<p className="w-60 text-sm text-text-sub-600">New added domain</p>
 						<p className="mt-3 w-96 rounded-lg border border-success-light px-3 py-1.5">
-							dkim.example.com
+							{domainid}
 						</p>
 					</div>
 				</div>
 				<div className="relative mt-10 pl-10">
 					<div className="-left-3.5 absolute top-1 rounded-full bg-bg-white-0 p-2">
-						<div className=" h-3 w-3 rounded-full border-2 bg-bg-white-0" />
+						<div className="h-3 w-3 rounded-full border-2 bg-bg-white-0" />
 					</div>
 					<p className="font-medium text-title-h5">DNS Records</p>
 					<div className="mt-5 space-y-1 py-4">
@@ -127,18 +170,18 @@ const NewDomainPage = () => {
 										<Table.Row>
 											<Table.Cell className="h-10">
 												<span className="inline-flex items-center py-0.5 font-medium text-sm">
-													{record.type}
+													{record.recordType}
 												</span>
 											</Table.Cell>
 											<Table.Cell className="h-10">
 												<div className="flex items-center gap-2">
 													<code className="text-label-sm text-text-strong-950">
-														{record.host}
+														{record.name}
 													</code>
 													<button
 														type="button"
 														onClick={() =>
-															copyToClipboard(record.host, `host-${index}`)
+															copyToClipboard(record.name, `host-${index}`)
 														}
 														className="opacity-0 transition-opacity group-hover/row:opacity-100"
 														title="Copy host name"
