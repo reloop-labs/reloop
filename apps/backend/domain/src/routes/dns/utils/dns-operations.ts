@@ -61,10 +61,10 @@ export async function generateAndInsertDNSRecords(
 
         await insertDKIMKeys(dkimKeyPair, domain, organizationId, userId);
 
-        logger.info("DNS records and DKIM keys generated successfully", {
+        logger.info({
             domain,
             recordCount: dnsRecordData.length,
-        });
+        }, "DNS records and DKIM keys generated successfully");
     } catch (error) {
         logger.error(
             {

@@ -184,27 +184,27 @@ export class ValidationServiceHandler {
     static async validateDnsRecords(
         body: ValidationTypes.DnsValidationRequest,
     ): Promise<ValidationTypes.DnsValidationResult> {
-        logger.info("Validating DNS records", {
+        logger.info({
             domain: body.domain,
             recordTypes: body.recordTypes,
-        });
+        }, "Validating DNS records");
 
         try {
             const result = await ValidationService.validateDnsRecords(body);
-            logger.info("DNS validation completed", {
+            logger.info({
                 domain: body.domain,
                 isValid: result.isValid,
                 recordsCount: result.records.length,
                 missingRecords: result.missingRecords,
                 errors: result.errors,
-            });
+            }, "DNS validation completed");
             return result;
         } catch (error) {
-            logger.error("Error validating DNS records", {
+            logger.error({
                 domain: body.domain,
                 recordTypes: body.recordTypes,
                 error: error instanceof Error ? error.message : String(error),
-            });
+            }, "Error validating DNS records");
             throw error;
         }
     }

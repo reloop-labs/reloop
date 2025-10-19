@@ -12,7 +12,7 @@ export const domainRoutes = new Elysia({
         "/add",
         async ({ body, user }) => {
             if (!user.activeOrganizationId) {
-                throw status(403, "User is not a member of an organization" as const);
+                throw status(403, { message: "User is not a member of an organization" });
             }
             return await DomainServiceHandler.createDomain(
                 user.activeOrganizationId,

@@ -48,20 +48,20 @@ export class DNSServiceHandler {
     static async getDNSRecords(
         domain: string,
     ): Promise<DNSTypes.DNSRecordResponse[]> {
-        logger.info("Getting DNS records for domain", { domain });
+        logger.info({ domain }, "Getting DNS records for domain");
 
         try {
             const records = await DNSService.getDNSRecords(domain);
-            logger.info("DNS records retrieved successfully", {
+            logger.info({
                 domain,
                 count: records.length,
-            });
+            }, "DNS records retrieved successfully");
             return records;
         } catch (error) {
-            logger.error("Error getting DNS records", {
+            logger.error({
                 domain,
                 error: error instanceof Error ? error.message : String(error),
-            });
+            }, "Error getting DNS records");
             throw error;
         }
     }
@@ -69,17 +69,17 @@ export class DNSServiceHandler {
     static async getDKIMKeys(
         domain: string,
     ): Promise<DNSTypes.DKIMKeysResponse | null> {
-        logger.info("Getting DKIM keys for domain", { domain });
+        logger.info({ domain }, "Getting DKIM keys for domain");
 
         try {
             const keys = await DNSService.getDKIMKeys(domain);
-            logger.info("DKIM keys retrieved successfully", { domain });
+            logger.info({ domain }, "DKIM keys retrieved successfully");
             return keys;
         } catch (error) {
-            logger.error("Error getting DKIM keys", {
+            logger.error({
                 domain,
                 error: error instanceof Error ? error.message : String(error),
-            });
+            }, "Error getting DKIM keys");
             throw error;
         }
     }
@@ -88,11 +88,11 @@ export class DNSServiceHandler {
         domain: string,
         body: DNSTypes.VerifyDNSBody,
     ): Promise<DNSTypes.VerifyDNSResponse> {
-        logger.info("Verifying DNS record", {
+        logger.info({
             domain,
             recordType: body.recordType,
             name: body.name,
-        });
+        }, "Verifying DNS record");
 
         try {
             const verified = await DNSService.verifyDNSRecord(
@@ -100,20 +100,20 @@ export class DNSServiceHandler {
                 body.recordType,
                 body.name,
             );
-            logger.info("DNS record verification completed", {
+            logger.info({
                 domain,
                 recordType: body.recordType,
                 name: body.name,
                 verified,
-            });
+            }, "DNS record verification completed");
             return { verified };
         } catch (error) {
-            logger.error("Error verifying DNS record", {
+            logger.error({
                 domain,
                 recordType: body.recordType,
                 name: body.name,
                 error: error instanceof Error ? error.message : String(error),
-            });
+            }, "Error verifying DNS record");
             throw error;
         }
     }
@@ -124,13 +124,13 @@ export class DNSServiceHandler {
         userId: string,
         body: DNSTypes.GenerateDNSBody,
     ): Promise<DNSTypes.GenerateDNSResponse> {
-        logger.info("Generating DNS records for domain", {
+        logger.info({
             domain,
             organizationId,
             userId,
             serverDomain: body.serverDomain,
             dkimSelector: body.dkimSelector,
-        });
+        }, "Generating DNS records for domain");
 
         try {
             await DNSService.generateAndInsertDNSRecords(
@@ -151,12 +151,12 @@ export class DNSServiceHandler {
             logger.info({ ...response }, "DNS records generated successfully");
             return response;
         } catch (error) {
-            logger.error("Error generating DNS records", {
+            logger.error({
                 domain,
                 organizationId,
                 userId,
                 error: error instanceof Error ? error.message : String(error),
-            });
+            }, "Error generating DNS records");
             throw error;
         }
     }
@@ -164,20 +164,20 @@ export class DNSServiceHandler {
     static async deleteDNSRecords(
         domain: string,
     ): Promise<DNSTypes.DeleteDNSResponse> {
-        logger.info("Deleting DNS records for domain", { domain });
+        logger.info({ domain }, "Deleting DNS records for domain");
 
         try {
             await DNSService.deleteDNSRecords(domain);
             const response: DNSTypes.DeleteDNSResponse = {
                 message: "DNS records and DKIM keys deleted successfully",
             };
-            logger.info("DNS records deleted successfully", { domain });
+            logger.info({ domain }, "DNS records deleted successfully");
             return response;
         } catch (error) {
-            logger.error("Error deleting DNS records", {
+            logger.error({
                 domain,
                 error: error instanceof Error ? error.message : String(error),
-            });
+            }, "Error deleting DNS records");
             throw error;
         }
     }

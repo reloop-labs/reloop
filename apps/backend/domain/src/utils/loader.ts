@@ -10,6 +10,6 @@ export const loader = async () => {
 		await db.execute("SELECT 1 as test");
 		logger.info("Postgres connected");
 	} catch (e) {
-		logger.error("Error during service initialization", { error: e instanceof Error ? e.message : String(e) });
+		logger.error({ error: e instanceof Error ? e.message : String(e) }, "Error during service initialization");
 	}
 };

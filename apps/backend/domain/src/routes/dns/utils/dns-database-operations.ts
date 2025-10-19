@@ -28,11 +28,11 @@ export async function insertDNSRecord(
             updatedAt: new Date(),
         });
     } catch (dbError) {
-        logger.error("Failed to insert DNS record", {
+        logger.error({
             domain,
             record,
             error: dbError instanceof Error ? dbError.message : String(dbError),
-        });
+        }, "Failed to insert DNS record");
         throw new Error(`Failed to insert DNS record: ${dbError instanceof Error ? dbError.message : String(dbError)}`);
     }
 }
@@ -57,10 +57,10 @@ export async function insertDKIMKeys(
             updatedAt: new Date(),
         });
     } catch (dbError) {
-        logger.error("Failed to insert DKIM keys", {
+        logger.error({
             domain,
             error: dbError instanceof Error ? dbError.message : String(dbError),
-        });
+        }, "Failed to insert DKIM keys");
         throw new Error(`Failed to insert DKIM keys: ${dbError instanceof Error ? dbError.message : String(dbError)}`);
     }
 }
@@ -68,7 +68,7 @@ export async function insertDKIMKeys(
 export async function getDNSRecords(
     domain: string,
 ): Promise<DNSTypes.DNSRecordData[]> {
-    logger.info("Getting DNS records for domain", { domain });
+    logger.info({ domain }, "Getting DNS records for domain");
 
     try {
         const records = await db
@@ -86,10 +86,10 @@ export async function getDNSRecords(
             isVerified: record.isVerified,
         }));
     } catch (error) {
-        logger.error("Error getting DNS records", {
+        logger.error({
             domain,
             error: error instanceof Error ? error.message : String(error),
-        });
+        }, "Error getting DNS records");
         throw error;
     }
 }
@@ -97,7 +97,7 @@ export async function getDNSRecords(
 export async function getDKIMKeys(
     domain: string,
 ): Promise<DNSTypes.DKIMKeysResponse | null> {
-    logger.info("Getting DKIM keys for domain", { domain });
+    logger.info({ domain }, "Getting DKIM keys for domain");
 
     try {
         const keys = await db
@@ -122,10 +122,10 @@ export async function getDKIMKeys(
             algorithm: key.algorithm,
         };
     } catch (error) {
-        logger.error("Error getting DKIM keys", {
+        logger.error({
             domain,
             error: error instanceof Error ? error.message : String(error),
-        });
+        }, "Error getting DKIM keys");
         throw error;
     }
 }
@@ -135,7 +135,7 @@ export async function verifyDNSRecord(
     recordType: string,
     name: string,
 ): Promise<boolean> {
-    logger.info("Verifying DNS record", { domain, recordType, name });
+    logger.info({ domain, recordType, name }, "Verifying DNS record");
 
     try {
         await db
@@ -149,25 +149,25 @@ export async function verifyDNSRecord(
                 ),
             );
 
-        logger.info("DNS record marked as verified", {
+        logger.info({
             domain,
             recordType,
             name,
-        });
+        }, "DNS record marked as verified");
         return true;
     } catch (error) {
-        logger.error("Error verifying DNS record", {
+        logger.error({
             domain,
             recordType,
             name,
             error: error instanceof Error ? error.message : String(error),
-        });
+        }, "Error verifying DNS record");
         return false;
     }
 }
 
 export async function deleteDNSRecords(domain: string): Promise<void> {
-    logger.info("Deleting DNS records for domain", { domain });
+    logger.info({ domain }, "Deleting DNS records for domain");
 
     try {
         await db
@@ -178,12 +178,12 @@ export async function deleteDNSRecords(domain: string): Promise<void> {
             .delete(schema.dkimKeys)
             .where(eq(schema.dkimKeys.aliasDomain, domain));
 
-        logger.info("DNS records and DKIM keys deleted successfully", { domain });
+        logger.info({ domain }, "DNS records and DKIM keys deleted successfully");
     } catch (error) {
-        logger.error("Error deleting DNS records", {
+        logger.error({
             domain,
             error: error instanceof Error ? error.message : String(error),
-        });
+        }, "Error deleting DNS records");
         throw error;
     }
 }

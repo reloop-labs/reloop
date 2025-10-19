@@ -34,9 +34,9 @@ export const authMiddleware = new Elysia({ name: "better-auth" }).macro({
                 }
                 return status(401, "Authentication required");
             } catch (error) {
-                logger.error("Authentication error", {
+                logger.error({
                     error: error instanceof Error ? error.message : "Unknown error",
-                });
+                }, "Authentication error");
                 return status(401, "Authentication failed");
             }
         },
