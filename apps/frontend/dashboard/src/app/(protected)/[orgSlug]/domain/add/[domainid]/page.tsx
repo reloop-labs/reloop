@@ -100,6 +100,141 @@ const NewDomainPage = () => {
 		);
 	}
 
+	// Separate DMARC records from DKIM/SPF records
+	const dmarcRecords = dnsRecords.filter(
+		(record) =>
+			record.name.includes("_dmarc") ||
+			(record.recordType === "TXT" && record.value.includes("v=DMARC")),
+	);
+	const otherRecords = dnsRecords.filter(
+		(record) =>
+			!record.name.includes("_dmarc") &&
+			!(record.recordType === "TXT" && record.value.includes("v=DMARC")),
+	);
+
+	const renderRecordTable = (records: DNSRecord[], startIndex: number) => (
+		<Table.Root>
+			<Table.Header>
+				<Table.Row>
+					<Table.Head className="w-20 font-medium text-sm">Type</Table.Head>
+					<Table.Head className="w-48 font-medium text-sm">
+						Host / Name
+					</Table.Head>
+					<Table.Head className="max-w-0 font-medium text-sm">Value</Table.Head>
+					<Table.Head className="w-20 font-medium text-sm">Priority</Table.Head>
+					<Table.Head className="w-20 font-medium text-sm">TTL</Table.Head>
+				</Table.Row>
+			</Table.Header>
+			<Table.Body>
+				{records.map((record, idx) => {
+					const index = startIndex + idx;
+					return (
+						<React.Fragment key={index}>
+							<Table.Row>
+								<Table.Cell className="h-10">
+									<span className="inline-flex items-center py-0.5 font-medium text-sm">
+										{record.recordType}
+									</span>
+								</Table.Cell>
+								<Table.Cell className="h-10">
+									<div className="flex items-center gap-2">
+										<code className="text-label-sm text-text-strong-950">
+											{record.name}
+										</code>
+										<button
+											type="button"
+											onClick={() =>
+												copyToClipboard(record.name, `host-${index}`)
+											}
+											className="opacity-0 transition-opacity group-hover/row:opacity-100"
+											title="Copy host name"
+										>
+											<motion.div
+												animate={
+													copiedItems.has(`host-${index}`)
+														? "copied"
+														: "default"
+												}
+												transition={{ duration: 0.2, ease: "easeInOut" }}
+											>
+												<Icon
+													name={
+														copiedItems.has(`host-${index}`) ? "check" : "copy"
+													}
+													className={`h-3 w-3 transition-colors ${
+														copiedItems.has(`host-${index}`)
+															? "text-green-600"
+															: "text-text-sub-600 hover:text-text-strong-950"
+													}`}
+												/>
+											</motion.div>
+										</button>
+									</div>
+								</Table.Cell>
+								<Table.Cell className="h-10 max-w-0">
+									<div className="flex min-w-0 items-center gap-2">
+										<button
+											type="button"
+											onClick={() =>
+												copyToClipboard(record.value, `value-${index}`)
+											}
+											className="flex-1 cursor-pointer truncate text-left text-label-sm text-text-strong-950"
+										>
+											{record.value}
+										</button>
+										<button
+											type="button"
+											onClick={() =>
+												copyToClipboard(record.value, `value-${index}`)
+											}
+											className="flex-shrink-0 cursor-pointer opacity-0 transition-opacity group-hover/row:opacity-100"
+											title="Copy value"
+										>
+											<motion.div
+												animate={
+													copiedItems.has(`value-${index}`)
+														? "copied"
+														: "default"
+												}
+												variants={{
+													default: { scale: 1 },
+													copied: { scale: 1.1 },
+												}}
+												transition={{ duration: 0.2, ease: "easeInOut" }}
+											>
+												<Icon
+													name={
+														copiedItems.has(`value-${index}`) ? "check" : "copy"
+													}
+													className={`h-3 w-3 transition-colors ${
+														copiedItems.has(`value-${index}`)
+															? "text-green-600"
+															: "text-text-sub-600 hover:text-text-strong-950"
+													}`}
+												/>
+											</motion.div>
+										</button>
+									</div>
+								</Table.Cell>
+								<Table.Cell className="h-10">
+									<span className="text-label-sm text-text-strong-950">
+										{record.priority}
+									</span>
+								</Table.Cell>
+								<Table.Cell className="h-10">
+									<span className="text-label-sm text-text-strong-950">
+										{record.ttl}
+									</span>
+								</Table.Cell>
+							</Table.Row>
+							{idx < records.length - 1 && <Table.RowDivider />}
+						</React.Fragment>
+					);
+				})}
+			</Table.Body>
+		</Table.Root>
+	);
+
 	return (
 		<div className="mx-auto mb-28 max-w-3xl">
 			<div className="my-10 flex items-center gap-3">
@@ -130,151 +265,49 @@ const NewDomainPage = () => {
 						</p>
 					</div>
 				</div>
-				<div className="relative mt-10 pl-10">
-					<div className="-left-3.5 absolute top-1 rounded-full bg-bg-white-0 p-2">
-						<div className="h-3 w-3 rounded-full border-2 bg-bg-white-0" />
-					</div>
-					<p className="font-medium text-title-h5">DNS Records</p>
-					<div className="mt-5 space-y-1 py-4">
-						<div className="font-medium text-text-strong-950 leading-4">
-							DKIM, SPF, and DMARC
-						</div>
-						<div className="text-paragraph-sm text-text-sub-600">
-							Add the DNS records to your domain to start sending emails.
-						</div>
-					</div>
-					<div className="w-full">
-						<Table.Root>
-							<Table.Header>
-								<Table.Row>
-									<Table.Head className="w-20 font-medium text-sm">
-										Type
-									</Table.Head>
-									<Table.Head className="w-48 font-medium text-sm">
-										Host / Name
-									</Table.Head>
-									<Table.Head className="max-w-0 font-medium text-sm">
-										Value
-									</Table.Head>
-									<Table.Head className="w-20 font-medium text-sm">
-										Priority
-									</Table.Head>
-									<Table.Head className="w-20 font-medium text-sm">
-										TTL
-									</Table.Head>
-								</Table.Row>
-							</Table.Header>
-							<Table.Body>
-								{dnsRecords.map((record, index) => (
-									<React.Fragment key={index}>
-										<Table.Row>
-											<Table.Cell className="h-10">
-												<span className="inline-flex items-center py-0.5 font-medium text-sm">
-													{record.recordType}
-												</span>
-											</Table.Cell>
-											<Table.Cell className="h-10">
-												<div className="flex items-center gap-2">
-													<code className="text-label-sm text-text-strong-950">
-														{record.name}
-													</code>
-													<button
-														type="button"
-														onClick={() =>
-															copyToClipboard(record.name, `host-${index}`)
-														}
-														className="opacity-0 transition-opacity group-hover/row:opacity-100"
-														title="Copy host name"
-													>
-														<motion.div
-															animate={
-																copiedItems.has(`host-${index}`)
-																	? "copied"
-																	: "default"
-															}
-															transition={{ duration: 0.2, ease: "easeInOut" }}
-														>
-															<Icon
-																name={
-																	copiedItems.has(`host-${index}`)
-																		? "check"
-																		: "copy"
-																}
-																className={`h-3 w-3 transition-colors ${
-																	copiedItems.has(`host-${index}`)
-																		? "text-green-600"
-																		: "text-text-sub-600 hover:text-text-strong-950"
-																}`}
-															/>
-														</motion.div>
-													</button>
-												</div>
-											</Table.Cell>
-											<Table.Cell className="h-10 max-w-0">
-												<div className="flex min-w-0 items-center gap-2">
-													<button
-														type="button"
-														onClick={() =>
-															copyToClipboard(record.value, `value-${index}`)
-														}
-														className="flex-1 cursor-pointer truncate text-left text-label-sm text-text-strong-950"
-													>
-														{record.value}
-													</button>
-													<button
-														type="button"
-														onClick={() =>
-															copyToClipboard(record.value, `value-${index}`)
-														}
-														className="flex-shrink-0 cursor-pointer opacity-0 transition-opacity group-hover/row:opacity-100"
-														title="Copy value"
-													>
-														<motion.div
-															animate={
-																copiedItems.has(`value-${index}`)
-																	? "copied"
-																	: "default"
-															}
-															variants={{
-																default: { scale: 1 },
-																copied: { scale: 1.1 },
-															}}
-															transition={{ duration: 0.2, ease: "easeInOut" }}
-														>
-															<Icon
-																name={
-																	copiedItems.has(`value-${index}`)
-																		? "check"
-																		: "copy"
-																}
-																className={`h-3 w-3 transition-colors ${
-																	copiedItems.has(`value-${index}`)
-																		? "text-green-600"
-																		: "text-text-sub-600 hover:text-text-strong-950"
-																}`}
-															/>
-														</motion.div>
-													</button>
-												</div>
-											</Table.Cell>
-											<Table.Cell className="h-10">
-												<span className="text-label-sm text-text-strong-950">
-													{record.priority}
-												</span>
-											</Table.Cell>
-											<Table.Cell className="h-10">
-												<span className="text-label-sm text-text-strong-950">
-													{record.ttl}
-												</span>
-											</Table.Cell>
-										</Table.Row>
-										{index < dnsRecords.length - 1 && <Table.RowDivider />}
-									</React.Fragment>
-								))}
-							</Table.Body>
-						</Table.Root>
-					</div>
 
+				{/* DKIM and SPF Records */}
+				{otherRecords.length > 0 && (
+					<div className="relative mt-10 pl-10">
+						<div className="-left-3.5 absolute top-1 rounded-full bg-bg-white-0 p-2">
+							<div className="h-3 w-3 rounded-full border-2 bg-bg-white-0" />
+						</div>
+						<p className="font-medium text-title-h5">DNS Records</p>
+						<div className="mt-5 space-y-1 py-4">
+							<div className="font-medium text-text-strong-950 leading-4">
+								DKIM and SPF
+							</div>
+							<div className="text-paragraph-sm text-text-sub-600">
+								Add these DNS records to your domain to authenticate your
+								emails.
+							</div>
+						</div>
+						<div className="w-full">{renderRecordTable(otherRecords, 0)}</div>
+					</div>
+				)}
+
+				{/* DMARC Records */}
+				{dmarcRecords.length > 0 && (
+					<div className="relative mt-10 pl-10">
+						<div className="-left-3.5 absolute top-1 rounded-full bg-bg-white-0 p-2">
+							<div className="h-3 w-3 rounded-full border-2 bg-bg-white-0" />
+						</div>
+						<p className="font-medium text-title-h5">DMARC Policy</p>
+						<div className="mt-5 space-y-1 py-4">
+							<div className="font-medium text-text-strong-950 leading-4">
+								DMARC
+							</div>
+							<div className="text-paragraph-sm text-text-sub-600">
+								Add the DMARC record to set your email authentication policy.
+							</div>
+						</div>
+						<div className="w-full">
+							{renderRecordTable(dmarcRecords, otherRecords.length)}
+						</div>
+					</div>
+				)}
+
+				<div className="relative mt-10 pl-10">
 					<Button.Root
 						onClick={() => {
 							push("/domain");
