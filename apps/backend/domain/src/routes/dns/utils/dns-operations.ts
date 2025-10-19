@@ -56,7 +56,6 @@ export async function generateDNSRecords(
             }),
         );
 
-        // Extract SPF, DKIM, and DMARC values to return
         const spfValue = dnsRecords.find(r => r.value.startsWith("v=spf1"))?.value || "";
         const dkimValue = dnsRecords.find(r => r.value.startsWith("v=DKIM1"))?.value || "";
         const dmarcValue = dnsRecords.find(r => r.value.startsWith("v=DMARC1"))?.value || "";
@@ -85,9 +84,6 @@ export async function generateDNSRecords(
     }
 }
 
-/**
- * Insert DNS records and DKIM keys into the database
- */
 export async function insertDNSRecords(
     dnsRecordData: DNSTypes.DNSRecordData[],
     dkimKeyPair: { publicKey: string; privateKey: string; selector: string },
@@ -128,10 +124,6 @@ export async function insertDNSRecords(
     }
 }
 
-/**
- * Generate and insert DNS records for a domain (convenience function)
- * Checks for existing records and returns them if found
- */
 export async function generateAndInsertDNSRecords(
     domain: string,
     organizationId: string,
@@ -150,7 +142,6 @@ export async function generateAndInsertDNSRecords(
         "DNS records generation and insertion",
     );
 
-    // Check if the domain already has DNS records
     const existingRecords = await getDNSRecords(domain, organizationId);
     if (existingRecords.length > 0) {
         logger.info({
@@ -158,7 +149,6 @@ export async function generateAndInsertDNSRecords(
             dnsRecords: existingRecords,
         }, "DNS records already exist for domain");
 
-        // Extract and return existing SPF, DKIM, and DMARC records
         const spf = existingRecords.find(r => r.recordType === "TXT" && r.value.startsWith("v=spf1"));
         const dkim = existingRecords.find(r => r.recordType === "TXT" && r.value.startsWith("v=DKIM1"));
         const dmarc = existingRecords.find(r => r.recordType === "TXT" && r.value.startsWith("v=DMARC1"));
@@ -170,11 +160,9 @@ export async function generateAndInsertDNSRecords(
         };
     }
 
-    // Generate DNS records
     const { dnsRecordData, dkimKeyPair, spfRecord, dkimRecord, dmarcRecord } =
         await generateDNSRecords(domain, serverDomain, dkimSelector);
 
-    // Insert DNS records
     await insertDNSRecords(dnsRecordData, dkimKeyPair, domain, organizationId, userId);
 
     return {

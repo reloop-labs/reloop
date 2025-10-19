@@ -1,18 +1,27 @@
 import "dotenv/config";
+import { fromTypes, openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
-import { swagger } from "@elysiajs/swagger";
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
-import { landing } from "./routes/landing/landing.index";
-import { loader } from "./utils/loader";
 import { dnsRoutes } from "./routes/dns/dns.index";
 import { domainRoutes } from "./routes/domain/domain.index";
+import { landing } from "./routes/landing/landing.index";
 import { validationRoutes } from "./routes/validation/validation.index";
+import { loader } from "./utils/loader";
 
 const port = Number(process.env.PORT || 3000);
-const emailService = new Elysia({ prefix: "/api/domain", name: "Domain Service" })
+const emailService = new Elysia({
+	prefix: "/api/domain",
+	name: "Domain Service",
+})
+	.use(openapi({
+		references: fromTypes(
+			process.env.NODE_ENV === 'production'
+				? 'dist/index.d.ts'
+				: 'src/index.ts'
+		)
+	}))
 	.use(serverTiming())
-	.use(swagger({ path: "/docs" }))
 	.use(landing)
 	.use(domainRoutes)
 	.use(dnsRoutes)
