@@ -1,4 +1,7 @@
+import { db } from "@reloop/db/client";
+import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
+import { and, eq } from "drizzle-orm";
 import type { DNSTypes } from "./dns.type";
 import {
     deleteDNSRecords,
@@ -128,13 +131,29 @@ export class DNSServiceHandler {
         }, "Generating DNS records for domain");
 
         try {
-            await generateAndInsertDNSRecords(
+            const dnsRecords = await generateAndInsertDNSRecords(
                 domain,
                 organizationId,
                 userId,
                 body.serverDomain || domain,
                 body.dkimSelector || "mail",
             );
+
+            // Update the domain table with the generated DNS record values
+            await db
+                .update(schema.domain)
+                .set({
+                    spfRecord: dnsRecords.spfRecord,
+                    dkimRecord: dnsRecords.dkimRecord,
+                    dmarcRecord: dnsRecords.dmarcRecord,
+                    updatedAt: new Date(),
+                })
+                .where(
+                    and(
+                        eq(schema.domain.domain, domain),
+                        eq(schema.domain.organizationId, organizationId),
+                    ),
+                );
 
             const response: DNSTypes.GenerateDNSResponse = {
                 message: "DNS records and DKIM keys generated successfully",
@@ -143,7 +162,12 @@ export class DNSServiceHandler {
                 dkimSelector: body.dkimSelector || "mail",
             };
 
-            logger.info({ ...response }, "DNS records generated successfully");
+            logger.info({
+                ...response,
+                spfRecord: dnsRecords.spfRecord,
+                dkimRecord: dnsRecords.dkimRecord,
+                dmarcRecord: dnsRecords.dmarcRecord,
+            }, "DNS records generated successfully");
             return response;
         } catch (error) {
             logger.error({

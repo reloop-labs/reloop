@@ -90,24 +90,3 @@ export const domainRoutes = new Elysia({
             },
         },
     )
-    .get(
-        "/search/:term",
-        async ({ params: { term }, query }) => {
-            return await DomainServiceHandler.searchDomains(term, query);
-        },
-        {
-            query: t.Object({
-                page: t.Optional(t.Number({ minimum: 1, default: 1 })),
-                limit: t.Optional(t.Number({ minimum: 1, maximum: 100, default: 10 })),
-                active: t.Optional(t.Boolean()),
-            }),
-            response: {
-                200: DomainModel.domainListResponse,
-            },
-            detail: {
-                tags: ["Domains"],
-                summary: "Search domains",
-                description: "Search domains by domain name with pagination",
-            },
-        },
-    )

@@ -3,7 +3,10 @@ import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
 import { and, count, desc, eq, like } from "drizzle-orm";
 import { status } from "elysia";
-import { DNSService } from "../dns/dns.service";
+import {
+    generateDNSRecords,
+    insertDNSRecords,
+} from "../dns/utils/dns-operations";
 import type { DomainTypes } from "./domain.type";
 
 export class DomainService {
@@ -13,21 +16,30 @@ export class DomainService {
         domain: string,
         serverIP = "mail.reloop.sh",
     ): Promise<DomainTypes.DomainResponse> {
-        logger.info({
-            domain: domain,
-            organizationId: organizationId,
-            userId: userId,
-        }, "Creating domain");
+        logger.info(
+            {
+                domain: domain,
+                organizationId: organizationId,
+                userId: userId,
+            },
+            "Creating domain",
+        );
         try {
             const existingDomain = await db
                 .select()
                 .from(schema.domain)
-                .where(and(eq(schema.domain.domain, domain), eq(schema.domain.organizationId, organizationId)))
+                .where(
+                    and(
+                        eq(schema.domain.domain, domain),
+                        eq(schema.domain.organizationId, organizationId),
+                    ),
+                )
                 .limit(1);
             if (existingDomain.length > 0) {
                 logger.warn({ domain }, "Domain already exists");
                 throw status(409, { message: "Domain already exists" });
             }
+            const dnsRecords = await generateDNSRecords(domain, serverIP);
             const newDomain = await db
                 .insert(schema.domain)
                 .values({
@@ -44,43 +56,58 @@ export class DomainService {
                     trackingDomain: false,
                     createdAt: new Date(),
                     updatedAt: new Date(),
+                    spfRecord: dnsRecords.spfRecord,
+                    dkimRecord: dnsRecords.dkimRecord,
+                    dmarcRecord: dnsRecords.dmarcRecord,
                 })
                 .returning();
-
             if (!newDomain[0]) {
                 logger.error({ domain }, "Failed to create domain - no data returned");
                 throw status(500, { message: "Failed to create domain" });
             }
-
-            // Generate DNS records and DKIM keys
             try {
-                await DNSService.generateAndInsertDNSRecords(
+                await insertDNSRecords(
+                    dnsRecords.dnsRecordData,
+                    dnsRecords.dkimKeyPair,
                     domain,
                     organizationId,
                     userId,
-                    serverIP,
                 );
-                logger.info({
-                    domain,
-                }, "DNS records and DKIM keys generated successfully");
+                logger.info(
+                    {
+                        domain,
+                        spfRecord: dnsRecords.spfRecord,
+                        dkimRecord: dnsRecords.dkimRecord,
+                        dmarcRecord: dnsRecords.dmarcRecord,
+                    },
+                    "DNS records generated and stored successfully",
+                );
             } catch (dnsError) {
-                logger.error({
-                    domain,
-                    error:
-                        dnsError instanceof Error ? dnsError.message : String(dnsError),
-                }, "Failed to generate DNS records and DKIM keys");
+                logger.error(
+                    {
+                        domain,
+                        error:
+                            dnsError instanceof Error ? dnsError.message : String(dnsError),
+                    },
+                    "Failed to generate DNS records and DKIM keys",
+                );
             }
-
-            logger.info({
-                domain,
-                id: newDomain[0].domain,
-            }, "Domain created successfully");
+            logger.info(
+                {
+                    domain,
+                    id: newDomain[0].id,
+                },
+                "Domain created successfully",
+            );
             return DomainService.formatDomainResponse(newDomain[0]);
         } catch (error) {
-            logger.error({
-                domain,
-                error: error instanceof Error ? error.message : String(error),
-            }, "Error creating domain");
+            logger.error(
+                {
+                    domain,
+                    error: error instanceof Error ? error.message : String(error),
+                },
+                "Error creating domain",
+            );
             if (error instanceof Error && error.message.includes("already exists")) {
                 throw status(409, { message: "Domain already exists" });
             }
@@ -88,7 +115,9 @@ export class DomainService {
         }
     }
 
-    static async getDomain(domainName: string): Promise<DomainTypes.DomainResponse> {
+    static async getDomain(
+        domainName: string,
+    ): Promise<DomainTypes.DomainResponse> {
         logger.info({ domain: domainName }, "Getting domain");
 
         try {
@@ -111,10 +140,13 @@ export class DomainService {
             logger.info({ domain: domainName }, "Domain retrieved successfully");
             return DomainService.formatDomainResponse(result[0]);
         } catch (error) {
-            logger.error({
-                domain: domainName,
-                error: error instanceof Error ? error.message : String(error),
-            }, "Error getting domain");
+            logger.error(
+                {
+                    domain: domainName,
+                    error: error instanceof Error ? error.message : String(error),
+                },
+                "Error getting domain",
+            );
             throw error;
         }
     }
@@ -135,25 +167,33 @@ export class DomainService {
 
             logger.info({ domain: domainName }, "Domain deleted successfully");
         } catch (error) {
-            logger.error({
-                domain: domainName,
-                error: error instanceof Error ? error.message : String(error),
-            }, "Error deleting domain");
+            logger.error(
+                {
+                    domain: domainName,
+                    error: error instanceof Error ? error.message : String(error),
+                },
+                "Error deleting domain",
+            );
             throw error;
         }
     }
 
-    static async listDomains(query: DomainTypes.DomainQuery): Promise<DomainTypes.DomainListResponse> {
+    static async listDomains(
+        query: DomainTypes.DomainQuery,
+    ): Promise<DomainTypes.DomainListResponse> {
         const { page = 1, limit = 10, status, organizationId, userId } = query;
         const offset = (page - 1) * limit;
 
-        logger.info({
-            page,
-            limit,
-            status,
-            organizationId,
-            userId,
-        }, "Listing domains");
+        logger.info(
+            {
+                page,
+                limit,
+                status,
+                organizationId,
+                userId,
+            },
+            "Listing domains",
+        );
 
         try {
             const conditions = [];
@@ -185,12 +225,15 @@ export class DomainService {
                 .limit(limit)
                 .offset(offset);
 
-            logger.info({
-                total,
-                page,
-                limit,
-                count: domains.length,
-            }, "Domains listed successfully");
+            logger.info(
+                {
+                    total,
+                    page,
+                    limit,
+                    count: domains.length,
+                },
+                "Domains listed successfully",
+            );
 
             return {
                 domains: domains.map((domain) =>
@@ -201,10 +244,13 @@ export class DomainService {
                 limit,
             };
         } catch (error) {
-            logger.error({
-                query,
-                error: error instanceof Error ? error.message : String(error),
-            }, "Error listing domains");
+            logger.error(
+                {
+                    query,
+                    error: error instanceof Error ? error.message : String(error),
+                },
+                "Error listing domains",
+            );
             throw error;
         }
     }
@@ -241,13 +287,16 @@ export class DomainService {
                 .limit(limit)
                 .offset(offset);
 
-            logger.info({
-                searchTerm,
-                total,
-                page,
-                limit,
-                count: domains.length,
-            }, "Domain search completed");
+            logger.info(
+                {
+                    searchTerm,
+                    total,
+                    page,
+                    limit,
+                    count: domains.length,
+                },
+                "Domain search completed",
+            );
 
             return {
                 domains: domains.map((domain) =>
@@ -258,11 +307,14 @@ export class DomainService {
                 limit,
             };
         } catch (error) {
-            logger.error({
-                searchTerm,
-                query,
-                error: error instanceof Error ? error.message : String(error),
-            }, "Error searching domains");
+            logger.error(
+                {
+                    searchTerm,
+                    query,
+                    error: error instanceof Error ? error.message : String(error),
+                },
+                "Error searching domains",
+            );
             throw error;
         }
     }
@@ -278,16 +330,22 @@ export class DomainService {
                 .limit(1);
 
             const exists = result.length > 0;
-            logger.info({
-                domain: domainName,
-                exists,
-            }, "Domain existence check completed");
+            logger.info(
+                {
+                    domain: domainName,
+                    exists,
+                },
+                "Domain existence check completed",
+            );
             return exists;
         } catch (error) {
-            logger.error({
-                domain: domainName,
-                error: error instanceof Error ? error.message : String(error),
-            }, "Error checking domain existence");
+            logger.error(
+                {
+                    domain: domainName,
+                    error: error instanceof Error ? error.message : String(error),
+                },
+                "Error checking domain existence",
+            );
             throw error;
         }
     }
@@ -347,39 +405,50 @@ export class DomainServiceHandler {
         userId: string,
         body: DomainTypes.CreateDomainRequest,
     ): Promise<DomainTypes.DomainResponse> {
-        logger.info({
-            domain: body.domain,
-            organizationId,
-            userId,
-        }, "Creating domain");
+        logger.info(
+            {
+                domain: body.domain,
+                organizationId,
+                userId,
+            },
+            "Creating domain",
+        );
 
         try {
             const domain = await DomainService.createDomain(
                 organizationId,
                 userId,
                 body.domain,
-                'mail.reloop.sh'
+                "mail.reloop.sh",
             );
 
-            logger.info({
-                domain: body.domain,
-                organizationId,
-                userId,
-            }, "Domain created successfully");
+            logger.info(
+                {
+                    domain: body.domain,
+                    organizationId,
+                    userId,
+                },
+                "Domain created successfully",
+            );
 
             return domain;
         } catch (error) {
-            logger.error({
-                domain: body.domain,
-                organizationId,
-                userId,
-                error: error instanceof Error ? error.message : String(error),
-            }, "Error creating domain");
+            logger.error(
+                {
+                    domain: body.domain,
+                    organizationId,
+                    userId,
+                    error: error instanceof Error ? error.message : String(error),
+                },
+                "Error creating domain",
+            );
             throw error;
         }
     }
 
-    static async getDomain(domainName: string): Promise<DomainTypes.DomainResponse> {
+    static async getDomain(
+        domainName: string,
+    ): Promise<DomainTypes.DomainResponse> {
         logger.info({ domain: domainName }, "Getting domain");
 
         try {
@@ -387,10 +456,13 @@ export class DomainServiceHandler {
             logger.info({ domain: domainName }, "Domain retrieved successfully");
             return domain;
         } catch (error) {
-            logger.error({
-                domain: domainName,
-                error: error instanceof Error ? error.message : String(error),
-            }, "Error getting domain");
+            logger.error(
+                {
+                    domain: domainName,
+                    error: error instanceof Error ? error.message : String(error),
+                },
+                "Error getting domain",
+            );
             throw error;
         }
     }
@@ -404,31 +476,42 @@ export class DomainServiceHandler {
             logger.info({ domain: domainName }, "Domain deleted successfully");
             return response;
         } catch (error) {
-            logger.error({
-                domain: domainName,
-                error: error instanceof Error ? error.message : String(error),
-            }, "Error deleting domain");
+            logger.error(
+                {
+                    domain: domainName,
+                    error: error instanceof Error ? error.message : String(error),
+                },
+                "Error deleting domain",
+            );
             throw error;
         }
     }
 
-    static async listDomains(query: DomainTypes.DomainQuery): Promise<DomainTypes.DomainListResponse> {
+    static async listDomains(
+        query: DomainTypes.DomainQuery,
+    ): Promise<DomainTypes.DomainListResponse> {
         logger.info({ query }, "Listing domains");
 
         try {
             const result = await DomainService.listDomains(query);
-            logger.info({
-                total: result.total,
-                page: result.page,
-                limit: result.limit,
-                count: result.domains.length,
-            }, "Domains listed successfully");
+            logger.info(
+                {
+                    total: result.total,
+                    page: result.page,
+                    limit: result.limit,
+                    count: result.domains.length,
+                },
+                "Domains listed successfully",
+            );
             return result;
         } catch (error) {
-            logger.error({
-                query,
-                error: error instanceof Error ? error.message : String(error),
-            }, "Error listing domains");
+            logger.error(
+                {
+                    query,
+                    error: error instanceof Error ? error.message : String(error),
+                },
+                "Error listing domains",
+            );
             throw error;
         }
     }
@@ -441,20 +524,26 @@ export class DomainServiceHandler {
 
         try {
             const result = await DomainService.searchDomains(searchTerm, query);
-            logger.info({
-                searchTerm,
-                total: result.total,
-                page: result.page,
-                limit: result.limit,
-                count: result.domains.length,
-            }, "Domain search completed");
+            logger.info(
+                {
+                    searchTerm,
+                    total: result.total,
+                    page: result.page,
+                    limit: result.limit,
+                    count: result.domains.length,
+                },
+                "Domain search completed",
+            );
             return result;
         } catch (error) {
-            logger.error({
-                searchTerm,
-                query,
-                error: error instanceof Error ? error.message : String(error),
-            }, "Error searching domains");
+            logger.error(
+                {
+                    searchTerm,
+                    query,
+                    error: error instanceof Error ? error.message : String(error),
+                },
+                "Error searching domains",
+            );
             throw error;
         }
     }
