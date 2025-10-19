@@ -46,7 +46,7 @@ export class DomainService {
 
             if (!newDomain[0]) {
                 logger.error({ domain }, "Failed to create domain - no data returned");
-                throw status(500, "Failed to create domain" as const);
+                throw status(500, { message: "Failed to create domain" });
             }
 
             // Generate DNS records and DKIM keys
@@ -81,7 +81,7 @@ export class DomainService {
                 error: error instanceof Error ? error.message : String(error),
             }, "Error creating domain");
             if (error instanceof Error && error.message.includes("already exists")) {
-                throw status(409, "Domain already exists" as const);
+                throw status(409, { message: "Domain already exists" });
             }
             throw error;
         }
@@ -99,12 +99,12 @@ export class DomainService {
 
             if (result.length === 0) {
                 logger.warn({ domain: domainName }, "Domain not found");
-                throw status(404, "Domain not found" as const);
+                throw status(404, { message: "Domain not found" });
             }
 
             if (!result[0]) {
                 logger.warn({ domain: domainName }, "Domain not found - null result");
-                throw status(404, "Domain not found" as const);
+                throw status(404, { message: "Domain not found" });
             }
 
             logger.info({ domain: domainName }, "Domain retrieved successfully");
@@ -129,7 +129,7 @@ export class DomainService {
 
             if (result.length === 0) {
                 logger.warn({ domain: domainName }, "Domain not found for deletion");
-                throw status(404, "Domain not found" as const);
+                throw status(404, { message: "Domain not found" });
             }
 
             logger.info({ domain: domainName }, "Domain deleted successfully");

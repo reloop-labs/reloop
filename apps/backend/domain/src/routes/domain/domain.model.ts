@@ -41,15 +41,23 @@ export namespace DomainModel {
 
     export type DomainQuery = typeof domainQuery.static
 
-    export const domainNotFound = t.Literal('Domain not found')
+    export const domainNotFound = t.Object({
+        message: t.Literal('Domain not found')
+    })
     export type DomainNotFound = typeof domainNotFound.static
 
-    export const domainAlreadyExists = t.Literal('Domain already exists')
+    export const domainAlreadyExists = t.Object({
+        message: t.Literal('Domain already exists')
+    })
     export type DomainAlreadyExists = typeof domainAlreadyExists.static
 
-    export const invalidDomain = t.Literal('Invalid domain format')
+    export const invalidDomain = t.Object({
+        message: t.Literal('Invalid domain format')
+    })
     export type InvalidDomain = typeof invalidDomain.static
 
-    export const unauthorized = t.Literal('Unauthorized access')
+    export const unauthorized = t.Object({
+        message: t.Literal('Unauthorized access')
+    })
     export type Unauthorized = typeof unauthorized.static
 }

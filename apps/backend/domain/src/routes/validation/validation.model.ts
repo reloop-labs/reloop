@@ -33,6 +33,8 @@ export namespace ValidationModel {
     export type DnsValidationResponse = typeof dnsValidationResponse.static
 
     // DNS validation error
-    export const dnsValidationError = t.Literal('DNS validation failed')
+    export const dnsValidationError = t.Object({
+        message: t.Literal('DNS validation failed')
+    })
     export type DnsValidationError = typeof dnsValidationError.static
 }

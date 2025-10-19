@@ -33,7 +33,7 @@ export const dnsRoutes = new Elysia({
             console.log(`Getting DKIM keys for domain: ${domain}`);
             const keys = await DNSServiceHandler.getDKIMKeys(domain);
             if (!keys) {
-                throw status(404, "DKIM keys not found" as const);
+                throw status(404, { message: "DKIM keys not found" });
             }
             return keys;
         },
@@ -76,7 +76,7 @@ export const dnsRoutes = new Elysia({
         "/:domain/generate",
         async ({ params: { domain }, body, user }) => {
             if (!user.activeOrganizationId) {
-                throw status(403, "User is not a member of an organization");
+                throw status(403, { message: "User is not a member of an organization" });
             }
             return await DNSServiceHandler.generateDNSRecords(
                 domain,

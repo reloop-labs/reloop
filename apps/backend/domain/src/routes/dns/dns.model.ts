@@ -60,10 +60,16 @@ export namespace DNSModel {
     });
 
     // Error responses
-    export const dnsRecordsNotFound = t.Literal("DNS records not found");
-    export const dkimKeysNotFound = t.Literal("DKIM keys not found");
-    export const dnsRecordNotFound = t.Literal("DNS record not found");
-    export const unauthorized = t.Literal(
-        "User is not a member of an organization",
-    );
+    export const dnsRecordsNotFound = t.Object({
+        message: t.Literal("DNS records not found")
+    });
+    export const dkimKeysNotFound = t.Object({
+        message: t.Literal("DKIM keys not found")
+    });
+    export const dnsRecordNotFound = t.Object({
+        message: t.Literal("DNS record not found")
+    });
+    export const unauthorized = t.Object({
+        message: t.Literal("User is not a member of an organization")
+    });
 }
