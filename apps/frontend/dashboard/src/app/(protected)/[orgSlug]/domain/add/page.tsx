@@ -6,7 +6,6 @@ import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
 import Spinner from "@reloop/ui/spinner";
-import { toast } from "@reloop/ui/toast";
 import { useLoading } from "@reloop/ui/use-loading";
 import axios from "axios";
 import type { Resolver } from "react-hook-form";
@@ -31,12 +30,13 @@ const NewDomainPage = () => {
 	const { push } = useUserOrganization();
 	const { changeStatus, status } = useLoading();
 
-	const form = useForm<DomainFormValues>({
-		resolver: valibotResolver(domainSchema) as Resolver<DomainFormValues>,
-		defaultValues: {
-			domain: "",
-		},
-	});
+	const { register, handleSubmit, formState, setError } =
+		useForm<DomainFormValues>({
+			resolver: valibotResolver(domainSchema) as Resolver<DomainFormValues>,
+			defaultValues: {
+				domain: "",
+			},
+		});
 
 	const handleAddDomain = (domain: string) => {
 		push(`/domain/add/${domain}`);
@@ -51,11 +51,15 @@ const NewDomainPage = () => {
 				{ headers: { credentials: "include" } },
 			);
 			handleAddDomain(domain);
-		} catch (error: any) {
+		} catch (error) {
 			changeStatus("idle");
-			toast.error(
-				error.response?.data?.message || "An unexpected error occurred",
-			);
+			const errorMessage = axios.isAxiosError(error)
+				? error.response?.data?.message || "An unexpected error occurred"
+				: "An unexpected error occurred";
+			setError("domain", {
+				type: "manual",
+				message: errorMessage,
+			});
 		}
 	};
 
@@ -81,27 +85,26 @@ const NewDomainPage = () => {
 							<p className="text-paragraph-sm text-text-sub-600">
 								Add a new domain send emails from your domain
 							</p>
-							<form onSubmit={form.handleSubmit(onSubmit)} className="w-96">
+							<form onSubmit={handleSubmit(onSubmit)} className="w-96">
 								<div className="mt-5">
 									<Label.Root htmlFor="domain">
 										Domain
 										<Label.Asterisk />
 									</Label.Root>
-									<Input.Root
-										hasError={!!form.formState?.errors?.domain?.message}
-									>
+									<Input.Root hasError={!!formState?.errors?.domain?.message}>
 										<Input.Affix>https://</Input.Affix>
 										<Input.Wrapper>
 											<Input.Input
 												id="domain"
 												placeholder="www.example.com"
-												{...form.register("domain")}
+												{...register("domain")}
+												disabled={status === "loading"}
 											/>
 										</Input.Wrapper>
 									</Input.Root>
-									{form.formState.errors.domain && (
+									{formState.errors.domain && (
 										<p className="mt-1 text-error-base text-paragraph-sm">
-											{form.formState.errors.domain.message}
+											{formState.errors.domain.message}
 										</p>
 									)}
 								</div>
@@ -110,7 +113,7 @@ const NewDomainPage = () => {
 										type="submit"
 										className="mt-5"
 										variant="neutral"
-										disabled={status === "loading" || !form.formState.isValid}
+										disabled={status === "loading" || !formState.isValid}
 									>
 										{status === "loading" && (
 											<Spinner color="var(--text-strong-950)" />
