@@ -30,7 +30,8 @@
 		"valibot": "catalog:db",
 		"zustand": "catalog:ui",
 		"@reloop/api": "workspace:*",
-		"axios": "catalog:"
+		"axios": "catalog:",
+		"babel-plugin-react-compiler": "catalog:ui"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",

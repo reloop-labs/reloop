@@ -29,7 +29,8 @@
 		"react-markdown": "catalog:ui",
 		"rehype-highlight": "catalog:ui",
 		"tailwind-merge": "catalog:ui",
-		"zod": "catalog:ui"
+		"zod": "catalog:ui",
+		"babel-plugin-react-compiler": "catalog:ui"
 	},
 	"devDependencies": {
 		"@types/node": "catalog:",

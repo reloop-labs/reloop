@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
 	basePath: "/dashboard",
 	output: "standalone",
 	allowedDevOrigins: ["reloop.local", "*.reloop.local"],
+	reactCompiler: true,
 };
 
 export default nextConfig;

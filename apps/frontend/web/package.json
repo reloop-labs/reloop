@@ -23,7 +23,8 @@
 		"next-themes": "catalog:ui",
 		"tailwindcss": "catalog:ui",
 		"@tailwindcss/postcss": "catalog:ui",
-		"postcss": "catalog:ui"
+		"postcss": "catalog:ui",
+		"babel-plugin-react-compiler": "catalog:ui"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",
