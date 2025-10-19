@@ -8,6 +8,13 @@
       "when": 1760882866558,
       "tag": "0000_lying_luckman",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1760890210731,
+      "tag": "0001_fair_stryfe",
+      "breakpoints": true
     }
   ]
 }

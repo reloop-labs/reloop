@@ -1,0 +1,1 @@
+ALTER TABLE "domain_dns_record" ADD COLUMN "domain" text NOT NULL;

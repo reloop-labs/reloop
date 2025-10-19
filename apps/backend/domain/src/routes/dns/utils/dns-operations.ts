@@ -32,9 +32,18 @@ export async function generateAndInsertDNSRecords(
         "DNS records generation Details",
     );
 
+    // TODO: Check if the domain already has DNS records
+    const dnsRecords = await getDNSRecords(domain, organizationId);
+    if (dnsRecords.length > 0) {
+        logger.info({
+            domain,
+            dnsRecords,
+        }, "DNS records already exist for domain");
+        return;
+    }
+
     try {
         const dkimKeyPair = await generateDKIMKeyPair(dkimSelector);
-
         const dnsRecords = generateAllDNSRecords(domain, serverDomain);
         const dkimRecord = generateDKIMRecord(
             domain,

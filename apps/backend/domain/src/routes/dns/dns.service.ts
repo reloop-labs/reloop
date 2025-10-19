@@ -9,26 +9,19 @@ import {
 } from "./utils/dns-operations";
 
 export class DNSService {
-    static async generateAndInsertDNSRecords(
-        domain: string,
-        organizationId: string,
-        userId: string,
-        serverDomain: string,
-        dkimSelector = "mail",
-    ): Promise<void> {
-        return generateAndInsertDNSRecords(domain, organizationId, userId, serverDomain, dkimSelector);
-    }
 
     static async getDNSRecords(
         domain: string,
+        organizationId: string,
     ): Promise<DNSTypes.DNSRecordData[]> {
-        return getDNSRecords(domain);
+        return getDNSRecords(domain, organizationId);
     }
 
     static async getDKIMKeys(
         domain: string,
+        organizationId: string,
     ): Promise<DNSTypes.DKIMKeysResponse | null> {
-        return getDKIMKeys(domain);
+        return getDKIMKeys(domain, organizationId);
     }
 
     static async verifyDNSRecord(
@@ -39,19 +32,20 @@ export class DNSService {
         return verifyDNSRecord(domain, recordType, name);
     }
 
-    static async deleteDNSRecords(domain: string): Promise<void> {
-        return deleteDNSRecords(domain);
+    static async deleteDNSRecords(domain: string, organizationId: string): Promise<void> {
+        return deleteDNSRecords(domain, organizationId);
     }
 }
 
 export class DNSServiceHandler {
     static async getDNSRecords(
         domain: string,
+        organizationId: string,
     ): Promise<DNSTypes.DNSRecordResponse[]> {
         logger.info({ domain }, "Getting DNS records for domain");
 
         try {
-            const records = await DNSService.getDNSRecords(domain);
+            const records = await DNSService.getDNSRecords(domain, organizationId);
             logger.info({
                 domain,
                 count: records.length,
@@ -68,12 +62,13 @@ export class DNSServiceHandler {
 
     static async getDKIMKeys(
         domain: string,
+        organizationId: string,
     ): Promise<DNSTypes.DKIMKeysResponse | null> {
-        logger.info({ domain }, "Getting DKIM keys for domain");
+        logger.info({ domain, organizationId }, "Getting DKIM keys for domain");
 
         try {
-            const keys = await DNSService.getDKIMKeys(domain);
-            logger.info({ domain }, "DKIM keys retrieved successfully");
+            const keys = await DNSService.getDKIMKeys(domain, organizationId);
+            logger.info({ domain, organizationId }, "DKIM keys retrieved successfully");
             return keys;
         } catch (error) {
             logger.error({
@@ -133,7 +128,7 @@ export class DNSServiceHandler {
         }, "Generating DNS records for domain");
 
         try {
-            await DNSService.generateAndInsertDNSRecords(
+            await generateAndInsertDNSRecords(
                 domain,
                 organizationId,
                 userId,
@@ -163,11 +158,12 @@ export class DNSServiceHandler {
 
     static async deleteDNSRecords(
         domain: string,
+        organizationId: string,
     ): Promise<DNSTypes.DeleteDNSResponse> {
         logger.info({ domain }, "Deleting DNS records for domain");
 
         try {
-            await DNSService.deleteDNSRecords(domain);
+            await DNSService.deleteDNSRecords(domain, organizationId);
             const response: DNSTypes.DeleteDNSResponse = {
                 message: "DNS records and DKIM keys deleted successfully",
             };

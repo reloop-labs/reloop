@@ -1,4 +1,3 @@
-import { createId } from "@paralleldrive/cuid2";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
@@ -12,20 +11,33 @@ export async function insertDNSRecord(
     userId: string,
 ): Promise<void> {
     try {
-        await db.insert(schema.dnsRecord).values({
-            id: Number.parseInt(createId().replace(/\D/g, "").slice(0, 15), 10),
-            aliasDomain: domain,
+        const domainRecord = await db
+            .select({ id: schema.domain.id })
+            .from(schema.domain)
+            .where(
+                and(
+                    eq(schema.domain.domain, domain),
+                    eq(schema.domain.organizationId, organizationId),
+                ),
+            )
+            .limit(1);
+
+        if (domainRecord.length === 0 || !domainRecord[0]) {
+            throw new Error(`Domain ${domain} not found for organization ${organizationId}`);
+        }
+
+        await db.insert(schema.domainDnsRecord).values({
+            domainId: domainRecord[0].id,
             organizationId,
             userId,
-            recordType: record.recordType,
+            recordType: record.recordType as "A" | "AAAA" | "CNAME" | "MX" | "TXT" | "NS" | "SRV" | "CAA" | "SPF" | "DKIM" | "DMARC",
             name: record.name,
             value: record.value,
             ttl: record.ttl,
             priority: record.priority,
             description: record.description,
             isVerified: record.isVerified,
-            createdAt: new Date(),
-            updatedAt: new Date(),
+            domain,
         });
     } catch (dbError) {
         logger.error({
@@ -41,21 +53,25 @@ export async function insertDKIMKeys(
     dkimKeyPair: DNSTypes.DKIMKeyPair,
     domain: string,
     organizationId: string,
-    userId: string,
+    _userId: string,
 ): Promise<void> {
     try {
-        await db.insert(schema.dkimKeys).values({
-            organizationId,
-            userId,
-            aliasDomain: domain,
+        await db
+            .update(schema.domain)
+            .set({
+                dkimSelector: dkimKeyPair.selector,
+                updatedAt: new Date(),
+            })
+            .where(
+                and(
+                    eq(schema.domain.domain, domain),
+                    eq(schema.domain.organizationId, organizationId),
+                ),
+            );
+        logger.info({
+            domain,
             selector: dkimKeyPair.selector,
-            publicKey: dkimKeyPair.publicKey,
-            privateKey: dkimKeyPair.privateKey,
-            keyLength: 2048,
-            algorithm: "rsa-sha256",
-            createdAt: new Date(),
-            updatedAt: new Date(),
-        });
+        }, "DKIM selector updated in domain table");
     } catch (dbError) {
         logger.error({
             domain,
@@ -67,14 +83,16 @@ export async function insertDKIMKeys(
 
 export async function getDNSRecords(
     domain: string,
+    organizationId: string,
 ): Promise<DNSTypes.DNSRecordData[]> {
     logger.info({ domain }, "Getting DNS records for domain");
 
     try {
+
         const records = await db
             .select()
-            .from(schema.dnsRecord)
-            .where(eq(schema.dnsRecord.aliasDomain, domain));
+            .from(schema.domainDnsRecord)
+            .where(and(eq(schema.domainDnsRecord.domain, domain), eq(schema.domainDnsRecord.organizationId, organizationId)));
 
         return records.map((record) => ({
             recordType: record.recordType,
@@ -96,31 +114,23 @@ export async function getDNSRecords(
 
 export async function getDKIMKeys(
     domain: string,
+    organizationId: string,
 ): Promise<DNSTypes.DKIMKeysResponse | null> {
     logger.info({ domain }, "Getting DKIM keys for domain");
 
     try {
-        const keys = await db
-            .select()
-            .from(schema.dkimKeys)
-            .where(eq(schema.dkimKeys.aliasDomain, domain))
+        const domainRecord = await db
+            .select({ dkimSelector: schema.domain.dkimSelector, })
+            .from(schema.domain)
+            .where(and(eq(schema.domain.domain, domain), eq(schema.domain.organizationId, organizationId)))
             .limit(1);
 
-        if (keys.length === 0) {
+        if (domainRecord.length === 0 || !domainRecord[0]) {
+            logger.warn({ domain }, "Domain not found when getting DKIM keys");
             return null;
         }
-
-        const key = keys[0];
-        if (!key) {
-            return null;
-        }
-        return {
-            selector: key.selector,
-            publicKey: key.publicKey,
-            privateKey: key.privateKey,
-            keyLength: key.keyLength,
-            algorithm: key.algorithm,
-        };
+        logger.warn({ domain }, "DKIM keys storage not fully implemented in schema");
+        return null;
     } catch (error) {
         logger.error({
             domain,
@@ -138,14 +148,25 @@ export async function verifyDNSRecord(
     logger.info({ domain, recordType, name }, "Verifying DNS record");
 
     try {
+        const domainRecord = await db
+            .select({ id: schema.domain.id })
+            .from(schema.domain)
+            .where(eq(schema.domain.domain, domain))
+            .limit(1);
+
+        if (domainRecord.length === 0 || !domainRecord[0]) {
+            logger.warn({ domain }, "Domain not found when verifying DNS record");
+            return false;
+        }
+
         await db
-            .update(schema.dnsRecord)
+            .update(schema.domainDnsRecord)
             .set({ isVerified: true, updatedAt: new Date() })
             .where(
                 and(
-                    eq(schema.dnsRecord.aliasDomain, domain),
-                    eq(schema.dnsRecord.recordType, recordType),
-                    eq(schema.dnsRecord.name, name),
+                    eq(schema.domainDnsRecord.domainId, domainRecord[0].id),
+                    eq(schema.domainDnsRecord.recordType, recordType as "A" | "AAAA" | "CNAME" | "MX" | "TXT" | "NS" | "SRV" | "CAA" | "SPF" | "DKIM" | "DMARC"),
+                    eq(schema.domainDnsRecord.name, name),
                 ),
             );
 
@@ -166,19 +187,14 @@ export async function verifyDNSRecord(
     }
 }
 
-export async function deleteDNSRecords(domain: string): Promise<void> {
-    logger.info({ domain }, "Deleting DNS records for domain");
+export async function deleteDNSRecords(domain: string, organizationId: string): Promise<void> {
+    logger.info({ domain, organizationId }, "Deleting DNS records for domain");
 
     try {
         await db
-            .delete(schema.dnsRecord)
-            .where(eq(schema.dnsRecord.aliasDomain, domain));
-
-        await db
-            .delete(schema.dkimKeys)
-            .where(eq(schema.dkimKeys.aliasDomain, domain));
-
-        logger.info({ domain }, "DNS records and DKIM keys deleted successfully");
+            .delete(schema.domainDnsRecord)
+            .where(and(eq(schema.domainDnsRecord.domain, domain), eq(schema.domainDnsRecord.organizationId, organizationId)));
+        logger.info({ domain, organizationId }, "DNS records deleted successfully");
     } catch (error) {
         logger.error({
             domain,

@@ -10,8 +10,11 @@ export const dnsRoutes = new Elysia({
     .use(authMiddleware)
     .get(
         "/:domain",
-        async ({ params: { domain } }) => {
-            return await DNSServiceHandler.getDNSRecords(domain);
+        async ({ params: { domain }, user }) => {
+            if (!user.activeOrganizationId) {
+                throw status(403, { message: "User is not a member of an organization" });
+            }
+            return await DNSServiceHandler.getDNSRecords(domain, user.activeOrganizationId);
         },
         {
             auth: true,
@@ -29,9 +32,12 @@ export const dnsRoutes = new Elysia({
     )
     .get(
         "/:domain/dkim",
-        async ({ params: { domain } }) => {
+        async ({ params: { domain }, user }) => {
+            if (!user.activeOrganizationId) {
+                throw status(403, { message: "User is not a member of an organization" });
+            }
             console.log(`Getting DKIM keys for domain: ${domain}`);
-            const keys = await DNSServiceHandler.getDKIMKeys(domain);
+            const keys = await DNSServiceHandler.getDKIMKeys(domain, user.activeOrganizationId);
             if (!keys) {
                 throw status(404, { message: "DKIM keys not found" });
             }
@@ -53,7 +59,10 @@ export const dnsRoutes = new Elysia({
     )
     .post(
         "/:domain/verify",
-        async ({ params: { domain }, body }) => {
+        async ({ params: { domain }, body, user }) => {
+            if (!user.activeOrganizationId) {
+                throw status(403, { message: "User is not a member of an organization" });
+            }
             console.log(`Verifying DNS record for domain: ${domain}`);
             return await DNSServiceHandler.verifyDNSRecord(domain, body);
         },
@@ -103,9 +112,11 @@ export const dnsRoutes = new Elysia({
     )
     .delete(
         "/:domain",
-        async ({ params: { domain } }) => {
-            console.log(`Deleting DNS records for domain: ${domain}`);
-            return await DNSServiceHandler.deleteDNSRecords(domain);
+        async ({ params: { domain }, user }) => {
+            if (!user.activeOrganizationId) {
+                throw status(403, { message: "User is not a member of an organization" });
+            }
+            return await DNSServiceHandler.deleteDNSRecords(domain, user.activeOrganizationId);
         },
         {
             auth: true,

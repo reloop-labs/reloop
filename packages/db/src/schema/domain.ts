@@ -91,6 +91,7 @@ export const domainDnsRecord = pgTable(
         priority: integer("priority"),
         weight: integer("weight"),
         port: integer("port"),
+        domain: text("domain").notNull(),
         description: text("description"),
         isVerified: boolean("is_verified").notNull().default(false),
         verificationError: text("verification_error"),
