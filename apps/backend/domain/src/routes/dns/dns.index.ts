@@ -15,6 +15,7 @@ export const dnsRoutes = new Elysia({
         },
         {
             auth: true,
+            params: DNSModel.domainParams,
             response: {
                 200: t.Array(DNSModel.dnsRecordResponse),
                 404: DNSModel.dnsRecordsNotFound,
@@ -38,6 +39,7 @@ export const dnsRoutes = new Elysia({
         },
         {
             auth: true,
+            params: DNSModel.domainParams,
             response: {
                 200: DNSModel.dkimKeysResponse,
                 404: DNSModel.dkimKeysNotFound,
@@ -57,6 +59,7 @@ export const dnsRoutes = new Elysia({
         },
         {
             auth: true,
+            params: DNSModel.domainParams,
             body: DNSModel.verifyDNSBody,
             response: {
                 200: DNSModel.verifyDNSResponse,
@@ -73,7 +76,7 @@ export const dnsRoutes = new Elysia({
         "/:domain/generate",
         async ({ params: { domain }, body, user }) => {
             if (!user.activeOrganizationId) {
-                throw status(403, "User is not a member of an organization" as const);
+                throw status(403, "User is not a member of an organization");
             }
             return await DNSServiceHandler.generateDNSRecords(
                 domain,
@@ -84,6 +87,7 @@ export const dnsRoutes = new Elysia({
         },
         {
             auth: true,
+            params: DNSModel.domainParams,
             body: DNSModel.generateDNSBody,
             response: {
                 200: DNSModel.generateDNSResponse,
@@ -105,6 +109,7 @@ export const dnsRoutes = new Elysia({
         },
         {
             auth: true,
+            params: DNSModel.domainParams,
             response: {
                 200: DNSModel.deleteDNSResponse,
                 404: DNSModel.dnsRecordsNotFound,
