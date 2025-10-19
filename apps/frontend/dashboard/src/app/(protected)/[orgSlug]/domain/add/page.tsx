@@ -5,7 +5,9 @@ import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
+import Spinner from "@reloop/ui/spinner";
 import { toast } from "@reloop/ui/toast";
+import { useLoading } from "@reloop/ui/use-loading";
 import axios from "axios";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
@@ -27,6 +29,7 @@ type DomainFormValues = v.InferInput<typeof domainSchema>;
 
 const NewDomainPage = () => {
 	const { push } = useUserOrganization();
+	const { changeStatus, status } = useLoading();
 
 	const form = useForm<DomainFormValues>({
 		resolver: valibotResolver(domainSchema) as Resolver<DomainFormValues>,
@@ -41,21 +44,18 @@ const NewDomainPage = () => {
 
 	const onSubmit = async ({ domain }: DomainFormValues) => {
 		try {
-			const response = await axios.post(
+			changeStatus("loading");
+			await axios.post(
 				"/api/domain/v1/add",
 				{ domain },
-				{
-					headers: {
-						credentials: "include",
-					},
-				},
+				{ headers: { credentials: "include" } },
 			);
-			toast.success("Domain added successfully");
 			handleAddDomain(domain);
 		} catch (error: any) {
-			if (error.response?.data) {
-				toast.error(error.response.data);
-			}
+			changeStatus("idle");
+			toast.error(
+				error.response?.data?.message || "An unexpected error occurred",
+			);
 		}
 	};
 
@@ -106,8 +106,16 @@ const NewDomainPage = () => {
 									)}
 								</div>
 								<div className="flex w-96 justify-end">
-									<Button.Root type="submit" className="mt-5" variant="neutral">
-										Add Domain
+									<Button.Root
+										type="submit"
+										className="mt-5"
+										variant="neutral"
+										disabled={status === "loading" || !form.formState.isValid}
+									>
+										{status === "loading" && (
+											<Spinner color="var(--text-strong-950)" />
+										)}
+										{status === "loading" ? "Adding Domain..." : "Add Domain"}
 									</Button.Root>
 								</div>
 							</form>
