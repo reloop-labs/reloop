@@ -11,14 +11,25 @@ export namespace DomainTypes {
     export type Unauthorized = typeof DomainModel.unauthorized.static;
 
     export interface DomainData {
+        id: string;
         domain: string;
         organizationId: string;
         userId: string;
-        mailboxes: number;
-        mailboxQuota: number;
-        quota: number;
-        rateLimit: number | null;
-        active: boolean;
+        domainType: "custom" | "subdomain" | "system";
+        status: "start-verify" | "verifying" | "active" | "suspended" | "failed";
+        userVerified: boolean;
+        systemVerified: boolean;
+        dnsConfigured: boolean;
+        nameservers: string[] | null;
+        spfRecord: string | null;
+        dkimRecord: string | null;
+        dkimSelector: string;
+        dmarcRecord: string | null;
+        dmarcPolicy: string;
+        trackingDomain: boolean;
+        verificationFailedReason: string | null;
+        deletedAt: Date | null;
+        lastVerifiedAt: Date | null;
         createdAt: Date;
         updatedAt: Date;
     }
@@ -30,7 +41,7 @@ export namespace DomainTypes {
     export interface DomainListQuery {
         page?: number;
         limit?: number;
-        active?: boolean;
+        status?: "start-verify" | "verifying" | "active" | "suspended" | "failed";
         organizationId?: string;
         userId?: string;
     }
@@ -38,6 +49,6 @@ export namespace DomainTypes {
     export interface SearchDomainQuery {
         page?: number;
         limit?: number;
-        active?: boolean;
+        status?: "start-verify" | "verifying" | "active" | "suspended" | "failed";
     }
 }

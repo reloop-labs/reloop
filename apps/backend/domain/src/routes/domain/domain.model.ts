@@ -8,14 +8,25 @@ export namespace DomainModel {
     export type CreateDomainBody = typeof createDomainBody.static
 
     export const domainResponse = t.Object({
+        id: t.String({ description: "Unique domain identifier" }),
         domain: t.String({ description: "Domain name (e.g., send.reloop.com)" }),
         organizationId: t.String(),
         userId: t.String(),
-        mailboxes: t.Number(),
-        mailboxQuota: t.Number({ description: "Mailbox quota in bytes (default: 5GB)" }),
-        quota: t.Number(),
-        rateLimit: t.Union([t.Number(), t.Null()]),
-        active: t.Boolean(),
+        domainType: t.Union([t.Literal("custom"), t.Literal("subdomain"), t.Literal("system")], { description: "Type of domain" }),
+        status: t.Union([t.Literal("start-verify"), t.Literal("verifying"), t.Literal("active"), t.Literal("suspended"), t.Literal("failed")], { description: "Domain verification status" }),
+        userVerified: t.Boolean({ description: "Whether user has verified the domain" }),
+        systemVerified: t.Boolean({ description: "Whether system has verified the domain" }),
+        dnsConfigured: t.Boolean({ description: "Whether DNS is properly configured" }),
+        nameservers: t.Union([t.Array(t.String()), t.Null()], { description: "Domain nameservers" }),
+        spfRecord: t.Union([t.String(), t.Null()], { description: "SPF DNS record" }),
+        dkimRecord: t.Union([t.String(), t.Null()], { description: "DKIM DNS record" }),
+        dkimSelector: t.String({ description: "DKIM selector (default: reloop)" }),
+        dmarcRecord: t.Union([t.String(), t.Null()], { description: "DMARC DNS record" }),
+        dmarcPolicy: t.String({ description: "DMARC policy (default: none)" }),
+        trackingDomain: t.Boolean({ description: "Whether domain is used for tracking" }),
+        verificationFailedReason: t.Union([t.String(), t.Null()], { description: "Reason for verification failure" }),
+        deletedAt: t.Union([t.String(), t.Null()], { description: "Soft delete timestamp" }),
+        lastVerifiedAt: t.Union([t.String(), t.Null()], { description: "Last verification timestamp" }),
         createdAt: t.String(),
         updatedAt: t.String(),
     })
@@ -34,7 +45,7 @@ export namespace DomainModel {
     export const domainQuery = t.Object({
         page: t.Optional(t.Number({ minimum: 1, default: 1 })),
         limit: t.Optional(t.Number({ minimum: 1, maximum: 100, default: 10 })),
-        active: t.Optional(t.Boolean()),
+        status: t.Optional(t.Union([t.Literal("start-verify"), t.Literal("verifying"), t.Literal("active"), t.Literal("suspended"), t.Literal("failed")])),
         organizationId: t.Optional(t.String()),
         userId: t.Optional(t.String()),
     })

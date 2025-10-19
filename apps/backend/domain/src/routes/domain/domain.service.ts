@@ -33,12 +33,15 @@ export class DomainService {
                 .values({
                     userId: userId,
                     organizationId: organizationId,
-                    mailboxes: 50,
-                    mailboxQuota: 5368709120,
-                    quota: 10737418240,
-                    rateLimit: 12,
-                    active: true,
                     domain: domain,
+                    domainType: "custom",
+                    status: "start-verify",
+                    userVerified: false,
+                    systemVerified: false,
+                    dnsConfigured: false,
+                    dkimSelector: "reloop",
+                    dmarcPolicy: "none",
+                    trackingDomain: false,
                     createdAt: new Date(),
                     updatedAt: new Date(),
                 })
@@ -66,8 +69,6 @@ export class DomainService {
                     error:
                         dnsError instanceof Error ? dnsError.message : String(dnsError),
                 }, "Failed to generate DNS records and DKIM keys");
-                // Continue with domain creation even if DNS generation fails
-                // The domain can still be created and DNS records can be generated later
             }
 
             logger.info({
@@ -143,21 +144,21 @@ export class DomainService {
     }
 
     static async listDomains(query: DomainTypes.DomainQuery): Promise<DomainTypes.DomainListResponse> {
-        const { page = 1, limit = 10, active, organizationId, userId } = query;
+        const { page = 1, limit = 10, status, organizationId, userId } = query;
         const offset = (page - 1) * limit;
 
         logger.info({
             page,
             limit,
-            active,
+            status,
             organizationId,
             userId,
         }, "Listing domains");
 
         try {
             const conditions = [];
-            if (active !== undefined) {
-                conditions.push(eq(schema.domain.active, active));
+            if (status !== undefined) {
+                conditions.push(eq(schema.domain.status, status));
             }
             if (organizationId) {
                 conditions.push(eq(schema.domain.organizationId, organizationId));
@@ -212,15 +213,15 @@ export class DomainService {
         searchTerm: string,
         query: Omit<DomainTypes.DomainQuery, "organizationId" | "userId">,
     ): Promise<DomainTypes.DomainListResponse> {
-        const { page = 1, limit = 10, active } = query;
+        const { page = 1, limit = 10, status } = query;
         const offset = (page - 1) * limit;
 
-        logger.info({ searchTerm, page, limit, active }, "Searching domains");
+        logger.info({ searchTerm, page, limit, status }, "Searching domains");
 
         try {
             const conditions = [like(schema.domain.domain, `%${searchTerm}%`)];
-            if (active !== undefined) {
-                conditions.push(eq(schema.domain.active, active));
+            if (status !== undefined) {
+                conditions.push(eq(schema.domain.status, status));
             }
 
             const whereClause = and(...conditions);
@@ -292,26 +293,48 @@ export class DomainService {
     }
 
     private static formatDomainResponse(domain: {
+        id: string;
         domain: string;
         organizationId: string;
         userId: string;
-        mailboxes: number;
-        mailboxQuota: number;
-        quota: number;
-        rateLimit: number | null;
-        active: boolean;
+        domainType: "custom" | "subdomain" | "system";
+        status: "start-verify" | "verifying" | "active" | "suspended" | "failed";
+        userVerified: boolean;
+        systemVerified: boolean;
+        dnsConfigured: boolean;
+        nameservers: string[] | null;
+        spfRecord: string | null;
+        dkimRecord: string | null;
+        dkimSelector: string;
+        dmarcRecord: string | null;
+        dmarcPolicy: string;
+        trackingDomain: boolean;
+        verificationFailedReason: string | null;
+        deletedAt: Date | null;
+        lastVerifiedAt: Date | null;
         createdAt: Date;
         updatedAt: Date;
     }): DomainTypes.DomainResponse {
         return {
+            id: domain.id,
             domain: domain.domain,
             organizationId: domain.organizationId,
             userId: domain.userId,
-            mailboxes: domain.mailboxes,
-            mailboxQuota: domain.mailboxQuota,
-            quota: domain.quota,
-            rateLimit: domain.rateLimit,
-            active: domain.active,
+            domainType: domain.domainType,
+            status: domain.status,
+            userVerified: domain.userVerified,
+            systemVerified: domain.systemVerified,
+            dnsConfigured: domain.dnsConfigured,
+            nameservers: domain.nameservers,
+            spfRecord: domain.spfRecord,
+            dkimRecord: domain.dkimRecord,
+            dkimSelector: domain.dkimSelector,
+            dmarcRecord: domain.dmarcRecord,
+            dmarcPolicy: domain.dmarcPolicy,
+            trackingDomain: domain.trackingDomain,
+            verificationFailedReason: domain.verificationFailedReason,
+            deletedAt: domain.deletedAt?.toISOString() ?? null,
+            lastVerifiedAt: domain.lastVerifiedAt?.toISOString() ?? null,
             createdAt: domain.createdAt.toISOString(),
             updatedAt: domain.updatedAt.toISOString(),
         };
