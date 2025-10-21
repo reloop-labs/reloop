@@ -1,5 +1,4 @@
 "use client";
-import * as Divider from "@reloop/ui/divider";
 import Spinner from "@reloop/ui/spinner";
 import { useParams } from "next/navigation";
 import * as React from "react";

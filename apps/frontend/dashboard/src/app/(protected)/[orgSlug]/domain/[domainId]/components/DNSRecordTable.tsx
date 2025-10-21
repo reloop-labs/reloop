@@ -43,13 +43,13 @@ export const DNSRecordTable = ({
 					<div className="py-2.5">TTL</div>
 				</div>
 				{records.map((record, index) => (
-					<div key={index} className="group/row contents hover:bg-bg-weak-50">
-						<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
+					<div key={index} className="group/row contents">
+						<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
 							<span className="inline-flex items-center py-0.5 pl-5 font-medium text-sm">
 								{record.recordType}
 							</span>
 						</div>
-						<div className="flex min-w-0 items-center border-stroke-soft-200 border-t py-2.5 pr-4">
+						<div className="flex min-w-0 items-center border-stroke-soft-200 border-t py-2.5 pr-4 group-hover/row:bg-bg-weak-50">
 							<button
 								type="button"
 								onClick={() =>
@@ -78,7 +78,7 @@ export const DNSRecordTable = ({
 								</motion.div>
 							</button>
 						</div>
-						<div className="flex min-w-0 items-center border-stroke-soft-200 border-t py-2.5 pr-4">
+						<div className="flex min-w-0 items-center border-stroke-soft-200 border-t py-2.5 pr-4 group-hover/row:bg-bg-weak-50">
 							<button
 								type="button"
 								onClick={() =>
@@ -111,12 +111,12 @@ export const DNSRecordTable = ({
 								</motion.div>
 							</button>
 						</div>
-						<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
+						<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
 							<span className="text-label-sm text-text-strong-950">
 								{record.priority || ""}
 							</span>
 						</div>
-						<div className="flex items-center border-stroke-soft-200 border-t py-2.5.5">
+						<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
 							<span className="text-label-sm text-text-strong-950">
 								{record.ttl}
 							</span>

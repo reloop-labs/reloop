@@ -22,7 +22,7 @@ export const DomainHeader = ({
 	status,
 }: DomainHeaderProps) => {
 	return (
-		<div className="pt-16 pb-8">
+		<div className="pt-10 pb-8">
 			<Button.Root variant="neutral" mode="stroke" size="xxsmall">
 				<Button.Icon>
 					<Icon name="chevron-left" className="h-4 w-4" />
