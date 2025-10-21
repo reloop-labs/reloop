@@ -64,6 +64,31 @@ export async function invalidateOrganizationCache(organizationId: string): Promi
     }
 }
 
+export async function invalidateDomainListCache(organizationId: string): Promise<void> {
+    try {
+        const pattern = `domains:${organizationId}:*`;
+        const keys = await redis.keys(pattern);
+
+        if (keys.length > 0) {
+            await redis.deleteMany(keys);
+            logger.info(
+                { organizationId, keysDeleted: keys.length, cache: 'invalidated' },
+                "Domain list cache invalidated"
+            );
+        } else {
+            logger.info(
+                { organizationId, cache: 'no_keys_found' },
+                "No domain list cache keys found to invalidate"
+            );
+        }
+    } catch (error) {
+        logger.error(
+            { organizationId, error: error instanceof Error ? error.message : String(error) },
+            "Failed to invalidate domain list cache"
+        );
+    }
+}
+
 export async function invalidateDNSRecordsCache(domain: string, organizationId: string): Promise<void> {
     try {
         const dnsKey = generateDNSRecordsCacheKey(domain, organizationId);

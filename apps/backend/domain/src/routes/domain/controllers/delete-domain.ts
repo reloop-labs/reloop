@@ -2,6 +2,7 @@ import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import {
     invalidateDomainCache,
+    invalidateDomainListCache,
     invalidateOrganizationCache,
 } from "@reloop/domain/utils/cache-helpers";
 import { logger } from "@reloop/logger";
@@ -48,6 +49,7 @@ export async function deleteDomain(
             .set({ deletedAt: now, updatedAt: now })
             .where(eq(schema.domainDnsRecord.domainId, domainId));
         await invalidateDomainCache(domainName, organizationId);
+        await invalidateDomainListCache(organizationId);
         await invalidateOrganizationCache(organizationId);
 
         logger.info(
