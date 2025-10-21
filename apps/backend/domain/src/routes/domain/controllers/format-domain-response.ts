@@ -1,4 +1,4 @@
-import type { DomainTypes } from "../domain.type";
+import type { DomainTypes } from "@reloop/domain/routes/domain/domain.type";
 
 export function formatDomainResponse(
     domain: {

@@ -1,7 +1,6 @@
-import { logger } from "@reloop/logger";
 import { lookup, resolveCname, resolveMx, resolveTxt } from "dns";
 import { promisify } from "util";
-import type { ValidationTypes } from "./validation.type";
+import type { ValidationTypes } from "@reloop/domain/routes/validation/validation.type";
 
 export class ValidationService {
     static async validateDnsRecords(

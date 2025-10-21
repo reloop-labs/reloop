@@ -1,6 +1,6 @@
 import { Elysia } from "elysia";
-import { authMiddleware } from "../../middleware/auth";
-import { validateDnsRoute } from "./routes/validate-dns.route";
+import { authMiddleware } from "@reloop/domain/middleware/auth";
+import { validateDnsRoute } from "@reloop/domain/routes/validation/routes/validate-dns.route";
 
 export const validationRoutes = new Elysia({
     prefix: "/validation",

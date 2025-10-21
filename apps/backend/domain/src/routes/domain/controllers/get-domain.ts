@@ -3,8 +3,8 @@ import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
-import type { DomainTypes } from "../domain.type";
-import { formatDomainResponse } from "./format-domain-response";
+import type { DomainTypes } from "@reloop/domain/routes/domain/domain.type";
+import { formatDomainResponse } from "@reloop/domain/routes/domain/controllers/format-domain-response";
 
 export async function getDomain(
     domainName: string,

@@ -1,15 +1,15 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { logger } from "@reloop/logger";
-import { and, eq } from "drizzle-orm";
+import type { DNSTypes } from "@reloop/domain/routes/dns/dns.type";
 import {
     convertToDNSRecordData,
     type GeneratedDNSData,
     generateDNSData,
     getExistingDNSRecords,
     insertDNSRecords,
-} from "../../../utils";
-import type { DNSTypes } from "../dns.type";
+} from "@reloop/domain/utils";
+import { logger } from "@reloop/logger";
+import { and, eq } from "drizzle-orm";
 
 export async function generateDNSRecords(
     domain: string,

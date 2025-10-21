@@ -2,8 +2,8 @@ import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
 import { and, count, desc, eq, isNull, like } from "drizzle-orm";
-import type { DomainTypes } from "../domain.type";
-import { formatDomainResponse } from "./format-domain-response";
+import type { DomainTypes } from "@reloop/domain/routes/domain/domain.type";
+import { formatDomainResponse } from "@reloop/domain/routes/domain/controllers/format-domain-response";
 
 export async function searchDomains(
     searchTerm: string,

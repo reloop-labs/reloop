@@ -1,7 +1,7 @@
 import { Elysia, status, t } from "elysia";
-import { authMiddleware } from "../../../middleware/auth";
-import { deleteDomainHandler } from "../controllers/delete-domain";
-import { DomainModel } from "../domain.model";
+import { authMiddleware } from "@reloop/domain/middleware/auth";
+import { deleteDomainHandler } from "@reloop/domain/routes/domain/controllers/delete-domain";
+import { DomainModel } from "@reloop/domain/routes/domain/domain.model";
 
 export const deleteDomainRoute = new Elysia()
     .use(authMiddleware)

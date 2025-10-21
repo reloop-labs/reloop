@@ -19,7 +19,8 @@
 			"@reloop/db": ["../../packages/db/src/*"],
 			"@reloop/cache": ["../../packages/cache/src/*"],
 			"@reloop/ui": ["../../packages/ui/src/*"],
-			"@reloop/auth": ["../../packages/auth/src/*"]
+			"@reloop/auth": ["../../packages/auth/src/*"],
+			"@reloop/domain": ["../../apps/backend/domain/src/*"]
 		}
 	}
 }

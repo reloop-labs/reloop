@@ -1,7 +1,7 @@
 import { Elysia } from "elysia";
-import { authMiddleware } from "../../../middleware/auth";
-import { validateDnsRecordsHandler } from "../controllers/validate-dns-records";
-import { ValidationModel } from "../validation.model";
+import { authMiddleware } from "@reloop/domain/middleware/auth";
+import { validateDnsRecordsHandler } from "@reloop/domain/routes/validation/controllers/validate-dns-records";
+import { ValidationModel } from "@reloop/domain/routes/validation/validation.model";
 
 export const validateDnsRoute = new Elysia()
     .use(authMiddleware)

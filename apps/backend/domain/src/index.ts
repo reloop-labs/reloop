@@ -1,26 +1,28 @@
 import "dotenv/config";
 import { fromTypes, openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
+import { dnsRoutes } from "@reloop/domain/routes/dns/dns.route";
+import { domainRoutes } from "@reloop/domain/routes/domain/domain.routes";
+import { landing } from "@reloop/domain/routes/landing/landing.index";
+import { validationRoutes } from "@reloop/domain/routes/validation/validation.routes";
+import { loader } from "@reloop/domain/utils/loader";
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
-import { dnsRoutes } from "./routes/dns/dns.route";
-import { domainRoutes } from "./routes/domain/domain.routes";
-import { landing } from "./routes/landing/landing.index";
-import { validationRoutes } from "./routes/validation/validation.routes";
-import { loader } from "./utils/loader";
 
 const port = Number(process.env.PORT || 3000);
 const emailService = new Elysia({
 	prefix: "/api/domain",
 	name: "Domain Service",
 })
-	.use(openapi({
-		references: fromTypes(
-			process.env.NODE_ENV === 'production'
-				? 'dist/index.d.ts'
-				: 'src/index.ts'
-		)
-	}))
+	.use(
+		openapi({
+			references: fromTypes(
+				process.env.NODE_ENV === "production"
+					? "dist/index.d.ts"
+					: "src/index.ts",
+			),
+		}),
+	)
 	.use(serverTiming())
 	.use(landing)
 	.use(domainRoutes)

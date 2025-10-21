@@ -1,6 +1,6 @@
 import { db } from "@reloop/db/client";
 import { Elysia } from "elysia";
-import { redis } from "../../lib/redis";
+import { redis } from "@reloop/domain/lib/redis";
 
 export const landing = new Elysia()
     .get("/", async () => {
@@ -49,8 +49,8 @@ ${dbError ? `║ DB ERROR: ${dbError.substring(0, 50).padEnd(50)} ║` : "║   
 ${redisError ? `║ REDIS ERROR: ${redisError.substring(0, 50).padEnd(50)} ║` : "║                                                        ║"}
 ╠════════════════════════════════════════════════════════╣
 ║ QUICK START:                                           ║
-║ curl -X GET /api/domain/check \                         ║
-║   -H "Content-Type: application/json" \                 ║
+║ curl -X GET /api/domain/check \\                        ║
+║   -H "Content-Type: application/json" \\                 ║
 ║   -d '{"domain":"example.com"}'                        ║
 ╠════════════════════════════════════════════════════════╣
 ║ - SUPPORT                                              ║

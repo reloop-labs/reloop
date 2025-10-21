@@ -1,4 +1,4 @@
-import type { ValidationModel } from "./validation.model";
+import type { ValidationModel } from "@reloop/domain/routes/validation/validation.model";
 
 export namespace ValidationTypes {
     export type DnsValidationBody = typeof ValidationModel.dnsValidationBody.static;

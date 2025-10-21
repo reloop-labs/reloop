@@ -13,6 +13,9 @@
 		"jsx": "react-jsx",
 		"declaration": false,
 		"declarationMap": false,
-		"baseUrl": "."
+		"baseUrl": ".",
+		"paths": {
+			"@reloop/domain/*": ["./src/*"]
+		}
 	}
 }

@@ -1,7 +1,7 @@
 import { Elysia, status } from "elysia";
-import { authMiddleware } from "../../../middleware/auth";
-import { listDomainsHandler } from "../controllers/list-domains";
-import { DomainModel } from "../domain.model";
+import { authMiddleware } from "@reloop/domain/middleware/auth";
+import { listDomainsHandler } from "@reloop/domain/routes/domain/controllers/list-domains";
+import { DomainModel } from "@reloop/domain/routes/domain/domain.model";
 
 export const listDomainsRoute = new Elysia()
     .use(authMiddleware)

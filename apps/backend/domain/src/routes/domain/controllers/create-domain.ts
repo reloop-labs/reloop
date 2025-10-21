@@ -1,15 +1,15 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { logger } from "@reloop/logger";
-import { and, eq } from "drizzle-orm";
-import { status } from "elysia";
-import { getExistingDNSRecords } from "../../../utils";
 import {
     generateDNSRecords,
     insertDNSRecordsToDatabase,
-} from "../../dns/controllers/generate-dns-records";
-import type { DomainTypes } from "../domain.type";
-import { formatDomainResponse } from "./format-domain-response";
+} from "@reloop/domain/routes/dns/controllers/generate-dns-records";
+import { formatDomainResponse } from "@reloop/domain/routes/domain/controllers/format-domain-response";
+import type { DomainTypes } from "@reloop/domain/routes/domain/domain.type";
+import { getExistingDNSRecords } from "@reloop/domain/utils";
+import { logger } from "@reloop/logger";
+import { and, eq } from "drizzle-orm";
+import { status } from "elysia";
 
 export async function createDomain(
     organizationId: string,
@@ -91,7 +91,11 @@ export async function createDomain(
         }
         if (!existingRecords) {
             try {
-                const generatedDNS = await generateDNSRecords(domain, serverIP, "reloop");
+                const generatedDNS = await generateDNSRecords(
+                    domain,
+                    serverIP,
+                    "reloop",
+                );
                 await insertDNSRecordsToDatabase(
                     domain,
                     organizationId,

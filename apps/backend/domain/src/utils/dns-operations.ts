@@ -1,13 +1,13 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { logger } from "@reloop/logger";
-import { and, eq } from "drizzle-orm";
-import type { DNSTypes } from "../routes/dns/dns.type";
-import { generateDKIMKeyPair } from "./dkim-key-generator";
+import type { DNSTypes } from "@reloop/domain/routes/dns/dns.type";
+import { generateDKIMKeyPair } from "@reloop/domain/utils/dkim-key-generator";
 import {
     generateAllDNSRecords,
     generateDKIMRecord,
-} from "./dns-record-generator";
+} from "@reloop/domain/utils/dns-record-generator";
+import { logger } from "@reloop/logger";
+import { and, eq } from "drizzle-orm";
 
 export interface GeneratedDNSData {
     dnsRecords: DNSTypes.DNSRecord[];
