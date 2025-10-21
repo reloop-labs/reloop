@@ -1,12 +1,14 @@
 "use client";
 import { useUserOrganization } from "@dashboard/providers/org-provider";
 import * as Button from "@reloop/ui/button";
+import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Kbd from "@reloop/ui/kbd";
-import Spinner from "@reloop/ui/spinner";
+import * as Select from "@reloop/ui/select";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useState } from "react";
 import useSWR from "swr";
 import { DomainTable } from "./domain-table";
 import { EmptyState } from "./empty-state";
@@ -35,6 +37,8 @@ interface DomainListResponse {
 export const DomainListSidebar = () => {
 	const { activeOrganization } = useUserOrganization();
 	const { domainId } = useParams();
+	const [statusFilter, setStatusFilter] = useState<string>("all");
+	const [searchQuery, setSearchQuery] = useState<string>("");
 
 	const { data, error, isLoading } = useSWR<DomainListResponse>(
 		activeOrganization?.id
@@ -45,6 +49,17 @@ export const DomainListSidebar = () => {
 			revalidateOnReconnect: true,
 		},
 	);
+
+	// Filter domains based on status and search query
+	const filteredDomains =
+		data?.domains?.filter((domain) => {
+			const matchesStatus =
+				statusFilter === "all" || domain.status === statusFilter;
+			const matchesSearch =
+				searchQuery === "" ||
+				domain.domain.toLowerCase().includes(searchQuery.toLowerCase());
+			return matchesStatus && matchesSearch;
+		}) || [];
 
 	return (
 		<div className="mx-auto max-w-3xl">
@@ -81,19 +96,45 @@ export const DomainListSidebar = () => {
 					<EmptyState />
 				) : (
 					<div>
-						<div className="flex justify-between">
-							<Input.Root>
-								<Input.Wrapper>
-									<Input.Input type="text" placeholder="Placeholder text..." />
-									<Input.Icon
-										as={() => <Icon name="search" className="h-4 w-4" />}
-									/>
-								</Input.Wrapper>
-							</Input.Root>
+						<div className="mt-10 flex items-center gap-3">
+							<div className="flex-1">
+								<Input.Root size="small" className="rounded-xl">
+									<Input.Wrapper>
+										<Input.Icon
+											as={() => <Icon name="search" className="h-4 w-4" />}
+										/>
+										<Input.Input
+											type="text"
+											placeholder="Search domains..."
+											value={searchQuery}
+											onChange={(e) => setSearchQuery(e.target.value)}
+										/>
+									</Input.Wrapper>
+								</Input.Root>
+							</div>
+							<div className="w-40">
+								<Select.Root
+									size="small"
+									value={statusFilter}
+									onValueChange={setStatusFilter}
+								>
+									<Select.Trigger className="rounded-xl">
+										<Select.Value placeholder="Status" />
+									</Select.Trigger>
+									<Select.Content className="w-full flex-1">
+										<Select.Item value="all">All Status</Select.Item>
+										<Select.Item value="start-verify">Start Verify</Select.Item>
+										<Select.Item value="verifying">Verifying</Select.Item>
+										<Select.Item value="active">Active</Select.Item>
+										<Select.Item value="suspended">Suspended</Select.Item>
+										<Select.Item value="failed">Failed</Select.Item>
+									</Select.Content>
+								</Select.Root>
+							</div>
 						</div>
 						<div className="mt-4">
 							<DomainTable
-								domains={data.domains}
+								domains={filteredDomains}
 								activeOrganizationSlug={activeOrganization.slug}
 								currentDomainId={domainId as string}
 								isLoading={isLoading}
