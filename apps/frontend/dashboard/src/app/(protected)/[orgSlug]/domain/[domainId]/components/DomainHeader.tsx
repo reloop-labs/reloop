@@ -60,13 +60,13 @@ export const DomainHeader = ({
 				<div>
 					{isLoading ? (
 						<div className="flex items-center gap-1.5">
-							<Skeleton className="h-4 w-12" />
-							<Skeleton className="h-4 w-1" />
-							<Skeleton className="h-4 w-20" />
-							<Skeleton className="h-4 w-1" />
+							<Skeleton className="h-4 w-12 rounded-full" />
+							<Skeleton className="h-1 w-1 rounded-full" />
+							<Skeleton className="h-4 w-20 rounded-full" />
+							<Skeleton className="h-1 w-1 rounded-full" />
 							<div className="flex items-center gap-1">
 								<Skeleton className="h-3.5 w-3.5 rounded-full" />
-								<Skeleton className="h-4 w-16" />
+								<Skeleton className="h-4 w-16 rounded-full" />
 							</div>
 						</div>
 					) : (
@@ -93,18 +93,14 @@ export const DomainHeader = ({
 							</div>
 						</div>
 					)}
-					{isLoading ? (
-						<Skeleton className="mt-2 h-8 w-48" />
-					) : (
-						<h1 className="font-medium text-title-h4 leading-8">{domainId}</h1>
-					)}
+					<h1 className="font-medium text-title-h4 leading-8">{domainId}</h1>
 				</div>
 
 				<div className="flex items-center gap-2">
 					{isLoading ? (
 						<>
 							<Skeleton className="h-9 w-32 rounded-lg" />
-							<Skeleton className="h-8 w-8 rounded-lg" />
+							<Skeleton className="h-9 w-9 rounded-lg" />
 						</>
 					) : isFailed ? (
 						<Button.Root

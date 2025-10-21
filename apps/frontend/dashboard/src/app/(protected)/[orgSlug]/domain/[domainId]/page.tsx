@@ -21,13 +21,14 @@ const DomainPage = () => {
 	const { domainId } = useParams();
 	const [copiedItems, setCopiedItems] = React.useState<Set<string>>(new Set());
 
-	const { data: dnsRecords, error } = useSWR<DNSRecord[]>(
-		domainId ? `/api/domain/v1/dns/${domainId}` : null,
-		{
-			revalidateOnFocus: false,
-			revalidateOnReconnect: true,
-		},
-	);
+	const {
+		data: dnsRecords,
+		error,
+		isLoading,
+	} = useSWR<DNSRecord[]>(domainId ? `/api/domain/v1/dns/${domainId}` : null, {
+		revalidateOnFocus: false,
+		revalidateOnReconnect: true,
+	});
 
 	const copyToClipboard = async (text: string, itemId: string) => {
 		try {
@@ -107,8 +108,9 @@ const DomainPage = () => {
 				onRestart={handleRestart}
 				onGoToDocs={handleGoToDocs}
 				onRemoveDomain={handleRemoveDomain}
+				isLoading={isLoading}
 			/>
-			<StatusBanner status="pending" />
+			<StatusBanner status="pending" isLoading={isLoading} />
 			<div className="my-9">
 				<div className="w-full border-stroke-soft-200 border-t border-dotted" />
 			</div>
@@ -117,6 +119,7 @@ const DomainPage = () => {
 				dmarcRecords={dmarcRecords}
 				onCopyToClipboard={copyToClipboard}
 				copiedItems={copiedItems}
+				isLoading={isLoading}
 				onHowToAddRecords={handleHowToAddRecords}
 			/>
 		</div>

@@ -1,12 +1,14 @@
 "use client";
 
 import * as Alert from "@reloop/ui/alert";
+import { Skeleton } from "@reloop/ui/skeleton";
 
 interface StatusBannerProps {
 	status: "pending" | "success" | "error" | "warning";
+	isLoading?: boolean;
 }
 
-export const StatusBanner = ({ status }: StatusBannerProps) => {
+export const StatusBanner = ({ status, isLoading }: StatusBannerProps) => {
 	const getStatusVariant = () => {
 		switch (status) {
 			case "pending":
@@ -73,7 +75,9 @@ export const StatusBanner = ({ status }: StatusBannerProps) => {
 
 	const { title, description } = getStatusContent();
 
-	return (
+	return isLoading ? (
+		<Skeleton className="h-20 w-full animate-pulse rounded-xl" />
+	) : (
 		<Alert.Root
 			variant="lighter"
 			status={getStatusVariant()}

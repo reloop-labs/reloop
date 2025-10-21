@@ -20,6 +20,7 @@ interface DNSRecordsSectionProps {
 	onCopyToClipboard?: (text: string, itemId: string) => void;
 	copiedItems?: Set<string>;
 	onHowToAddRecords?: () => void;
+	isLoading?: boolean;
 }
 
 export const DNSRecordsSection = ({
@@ -28,6 +29,7 @@ export const DNSRecordsSection = ({
 	onCopyToClipboard,
 	copiedItems = new Set(),
 	onHowToAddRecords,
+	isLoading,
 }: DNSRecordsSectionProps) => {
 	return (
 		<div className="mb-24">
@@ -57,6 +59,8 @@ export const DNSRecordsSection = ({
 					records={dkimSpfRecords}
 					onCopyToClipboard={onCopyToClipboard}
 					copiedItems={copiedItems}
+					isLoading={isLoading}
+					loadingRows={4}
 				/>
 			</div>
 
@@ -75,6 +79,8 @@ export const DNSRecordsSection = ({
 					records={dmarcRecords}
 					onCopyToClipboard={onCopyToClipboard}
 					copiedItems={copiedItems}
+					isLoading={isLoading}
+					loadingRows={1}
 				/>
 			</div>
 		</div>
