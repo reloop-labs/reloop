@@ -1,10 +1,14 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
+import { formatDomainResponse } from "@reloop/domain/routes/domain/controllers/format-domain-response";
+import type { DomainTypes } from "@reloop/domain/routes/domain/domain.type";
+import {
+    generateDomainCacheKey,
+    getCachedOrFetch,
+} from "@reloop/domain/utils/cache-helpers";
 import { logger } from "@reloop/logger";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
-import type { DomainTypes } from "@reloop/domain/routes/domain/domain.type";
-import { formatDomainResponse } from "@reloop/domain/routes/domain/controllers/format-domain-response";
 
 export async function getDomain(
     domainName: string,
@@ -13,7 +17,10 @@ export async function getDomain(
 
     try {
         const result = await db.query.domain.findFirst({
-            where: and(eq(schema.domain.domain, domainName), isNull(schema.domain.deletedAt)),
+            where: and(
+                eq(schema.domain.domain, domainName),
+                isNull(schema.domain.deletedAt),
+            ),
             with: {
                 dnsRecords: true,
             },
@@ -40,10 +47,24 @@ export async function getDomain(
 
 export async function getDomainHandler(
     domainName: string,
+    organizationId?: string,
 ): Promise<DomainTypes.DomainResponse> {
-    logger.info({ domain: domainName }, "Getting domain");
+    logger.info({ domain: domainName, organizationId }, "Getting domain");
 
     try {
+        // If we have organizationId, use caching
+        if (organizationId) {
+            const cacheKey = generateDomainCacheKey(domainName, organizationId);
+            const domain = await getCachedOrFetch(
+                cacheKey,
+                () => getDomain(domainName),
+                { domain: domainName, organizationId, operation: 'getDomain' }
+            );
+            logger.info({ domain: domainName, organizationId }, "Domain retrieved successfully");
+            return domain;
+        }
+
+        // Fallback to direct database query if no organizationId
         const domain = await getDomain(domainName);
         logger.info({ domain: domainName }, "Domain retrieved successfully");
         return domain;
@@ -51,6 +72,7 @@ export async function getDomainHandler(
         logger.error(
             {
                 domain: domainName,
+                organizationId,
                 error: error instanceof Error ? error.message : String(error),
             },
             "Error getting domain",

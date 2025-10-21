@@ -1,9 +1,13 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
+import { formatDomainResponse } from "@reloop/domain/routes/domain/controllers/format-domain-response";
+import type { DomainTypes } from "@reloop/domain/routes/domain/domain.type";
+import {
+    generateDomainListCacheKey,
+    getCachedOrFetch,
+} from "@reloop/domain/utils/cache-helpers";
 import { logger } from "@reloop/logger";
 import { and, count, desc, eq, isNull } from "drizzle-orm";
-import type { DomainTypes } from "@reloop/domain/routes/domain/domain.type";
-import { formatDomainResponse } from "@reloop/domain/routes/domain/controllers/format-domain-response";
 
 export async function listDomains(
     query: DomainTypes.DomainQuery,
@@ -25,7 +29,10 @@ export async function listDomains(
     );
 
     try {
-        const conditions = [isNull(schema.domain.deletedAt), eq(schema.domain.organizationId, organizationId)];
+        const conditions = [
+            isNull(schema.domain.deletedAt),
+            eq(schema.domain.organizationId, organizationId),
+        ];
         if (status !== undefined) conditions.push(eq(schema.domain.status, status));
         const whereClause = and(...conditions);
         const totalResult = await db
@@ -81,8 +88,16 @@ export async function listDomainsHandler(
     logger.info({ query, organizationId, userId }, "Listing domains");
 
     try {
-        const result = await listDomains(query, organizationId, userId);
-        logger.info({ query, organizationId, userId }, "Domains listed successfully");
+        const cacheKey = generateDomainListCacheKey(organizationId, query);
+        const result = await getCachedOrFetch(
+            cacheKey,
+            () => listDomains(query, organizationId, userId),
+            { organizationId, operation: "listDomains" },
+        );
+        logger.info(
+            { query, organizationId, userId },
+            "Domains listed successfully",
+        );
         return result;
     } catch (error) {
         logger.error(

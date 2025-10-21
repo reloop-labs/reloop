@@ -8,6 +8,10 @@ import {
     getExistingDNSRecords,
     insertDNSRecords,
 } from "@reloop/domain/utils";
+import {
+    invalidateDNSRecordsCache,
+    invalidateDomainCache,
+} from "@reloop/domain/utils/cache-helpers";
 import { logger } from "@reloop/logger";
 import { and, eq } from "drizzle-orm";
 
@@ -164,6 +168,11 @@ export async function generateDNSRecordsHandler(
             },
             "DNS records generated successfully",
         );
+
+        // Invalidate caches after successful DNS record generation
+        await invalidateDomainCache(domain, organizationId);
+        await invalidateDNSRecordsCache(domain, organizationId);
+
         return response;
     } catch (error) {
         logger.error(

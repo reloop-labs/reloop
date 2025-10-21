@@ -1,17 +1,30 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
+import {
+    invalidateDomainCache,
+    invalidateOrganizationCache,
+} from "@reloop/domain/utils/cache-helpers";
 import { logger } from "@reloop/logger";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
-export async function deleteDomain(domainName: string, organizationId: string): Promise<void> {
+export async function deleteDomain(
+    domainName: string,
+    organizationId: string,
+): Promise<void> {
     logger.info({ domain: domainName }, "Soft deleting domain");
 
     try {
         const domainResult = await db
             .select({ id: schema.domain.id })
             .from(schema.domain)
-            .where(and(eq(schema.domain.domain, domainName), isNull(schema.domain.deletedAt), eq(schema.domain.organizationId, organizationId)))
+            .where(
+                and(
+                    eq(schema.domain.domain, domainName),
+                    isNull(schema.domain.deletedAt),
+                    eq(schema.domain.organizationId, organizationId),
+                ),
+            )
             .limit(1);
 
         const domainId = domainResult[0]?.id;
@@ -34,7 +47,15 @@ export async function deleteDomain(domainName: string, organizationId: string): 
             .update(schema.domainDnsRecord)
             .set({ deletedAt: now, updatedAt: now })
             .where(eq(schema.domainDnsRecord.domainId, domainId));
-        logger.info({ domain: domainName }, "Domain and DNS records deleted successfully");
+
+        // Invalidate caches after successful deletion
+        await invalidateDomainCache(domainName, organizationId);
+        await invalidateOrganizationCache(organizationId);
+
+        logger.info(
+            { domain: domainName },
+            "Domain and DNS records deleted successfully",
+        );
     } catch (error) {
         logger.error(
             {
@@ -47,7 +68,10 @@ export async function deleteDomain(domainName: string, organizationId: string): 
     }
 }
 
-export async function deleteDomainHandler(domain: string, organizationId: string): Promise<{ message: string }> {
+export async function deleteDomainHandler(
+    domain: string,
+    organizationId: string,
+): Promise<{ message: string }> {
     logger.info({ domain, organizationId }, "Deleting domain");
 
     try {

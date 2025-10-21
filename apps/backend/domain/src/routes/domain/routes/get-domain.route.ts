@@ -1,29 +1,33 @@
-import { Elysia, t } from "elysia";
 import { authMiddleware } from "@reloop/domain/middleware/auth";
 import { getDomainHandler } from "@reloop/domain/routes/domain/controllers/get-domain";
 import { DomainModel } from "@reloop/domain/routes/domain/domain.model";
+import { Elysia, status, t } from "elysia";
 
-export const getDomainRoute = new Elysia()
-    .use(authMiddleware)
-    .get(
-        "/:domain",
-        async ({ params: { domain } }) => {
-            return await getDomainHandler(domain);
+export const getDomainRoute = new Elysia().use(authMiddleware).get(
+    "/:domain",
+    async ({ params: { domain }, user }) => {
+        if (!user.activeOrganizationId) {
+            throw status(403, {
+                message: "User is not a member of an organization",
+            });
+        }
+        return await getDomainHandler(domain, user.activeOrganizationId);
+    },
+    {
+        auth: true,
+        params: t.Object({
+            domain: DomainModel.domainParam,
+        }),
+        response: {
+            200: DomainModel.domainResponse,
+            404: DomainModel.domainNotFound,
+            400: DomainModel.invalidDomain,
+            403: DomainModel.unauthorized,
         },
-        {
-            auth: true,
-            params: t.Object({
-                domain: DomainModel.domainParam,
-            }),
-            response: {
-                200: DomainModel.domainResponse,
-                404: DomainModel.domainNotFound,
-                400: DomainModel.invalidDomain,
-            },
-            detail: {
-                tags: ["Domains"],
-                summary: "Get domain by name",
-                description: "Retrieves a domain by its domain name",
-            },
+        detail: {
+            tags: ["Domains"],
+            summary: "Get domain by name",
+            description: "Retrieves a domain by its domain name",
         },
-    );
+    },
+);

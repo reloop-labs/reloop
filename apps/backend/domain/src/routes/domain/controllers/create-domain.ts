@@ -7,6 +7,7 @@ import {
 import { formatDomainResponse } from "@reloop/domain/routes/domain/controllers/format-domain-response";
 import type { DomainTypes } from "@reloop/domain/routes/domain/domain.type";
 import { getExistingDNSRecords } from "@reloop/domain/utils";
+import { invalidateOrganizationCache } from "@reloop/domain/utils/cache-helpers";
 import { logger } from "@reloop/logger";
 import { and, eq } from "drizzle-orm";
 import { status } from "elysia";
@@ -153,6 +154,10 @@ export async function createDomain(
             },
             "Domain created successfully",
         );
+
+        // Invalidate organization cache after successful domain creation
+        await invalidateOrganizationCache(organizationId);
+
         if (!domainWithDnsRecords) {
             logger.error(
                 { domain },

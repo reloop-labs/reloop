@@ -1,12 +1,17 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import type { DNSTypes } from "@reloop/domain/routes/dns/dns.type";
+import {
+    invalidateDNSRecordsCache,
+    invalidateDomainCache,
+} from "@reloop/domain/utils/cache-helpers";
 import { logger } from "@reloop/logger";
 import { and, eq } from "drizzle-orm";
 
 export async function verifyDNSRecordHandler(
     domain: string,
     body: DNSTypes.VerifyDNSBody,
+    organizationId: string,
 ): Promise<DNSTypes.VerifyDNSResponse> {
     logger.info(
         {
@@ -62,6 +67,10 @@ export async function verifyDNSRecordHandler(
             },
             "DNS record marked as verified",
         );
+
+        // Invalidate caches after successful verification
+        await invalidateDomainCache(domain, organizationId);
+        await invalidateDNSRecordsCache(domain, organizationId);
 
         return { verified: true };
     } catch (error) {
