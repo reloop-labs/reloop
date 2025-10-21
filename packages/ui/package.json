@@ -80,7 +80,8 @@
 		"./link-button": "./src/components/link-button.tsx",
 		"./divider": "./src/components/divider.tsx",
 		"./use-loading": "./src/hooks/use-loading.ts",
-		"./theme-toggle": "./src/components/theme-toggle.tsx"
+		"./theme-toggle": "./src/components/theme-toggle.tsx",
+		"./horizontal-stepper": "./src/components/horizontal-stepper.tsx"
 	},
 	"dependencies": {
 		"@radix-ui/react-accordion": "catalog:ui",

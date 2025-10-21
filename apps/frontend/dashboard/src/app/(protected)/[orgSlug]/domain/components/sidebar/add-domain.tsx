@@ -8,11 +8,11 @@ import * as Label from "@reloop/ui/label";
 import Spinner from "@reloop/ui/spinner";
 import { useLoading } from "@reloop/ui/use-loading";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { useSWRConfig } from "swr";
 import * as v from "valibot";
-import { Globe } from "../../globe";
 
 const domainSchema = v.object({
 	domain: v.pipe(
@@ -31,7 +31,7 @@ export const AddDomainSidebar = () => {
 	const { push } = useUserOrganization();
 	const { changeStatus, status } = useLoading();
 	const { mutate } = useSWRConfig();
-
+	const { back } = useRouter();
 	const { register, handleSubmit, formState, setError } =
 		useForm<DomainFormValues>({
 			resolver: valibotResolver(domainSchema) as Resolver<DomainFormValues>,
@@ -67,92 +67,129 @@ export const AddDomainSidebar = () => {
 	};
 
 	return (
-		<div className="mx-auto max-w-3xl">
-			<div className="my-10 flex gap-3">
-				<Icon name="globe" className="ml-4 h-8 w-8 rounded-full" />
-				<div className="ml-4">
-					<h1 className="font-medium text-title-h4 leading-8">Add Domain</h1>
+		<div className="mx-auto max-w-3xl pt-10 pb-8">
+			<Button.Root
+				onClick={() => back()}
+				variant="neutral"
+				mode="stroke"
+				size="xxsmall"
+			>
+				<Button.Icon>
+					<Icon name="chevron-left" className="h-4 w-4" />
+				</Button.Icon>
+				Back
+			</Button.Root>
+			<div className="flex w-full items-center justify-between border-stroke-soft-200 border-b border-dashed pt-6 pb-6">
+				<div>
+					<h1 className="font-medium text-title-h5 leading-8">Add Domain</h1>
 					<p className="text-paragraph-sm text-text-sub-600">
-						Add a new domain and start sending emails from your domain
+						You need a domain to send emails from your own domain
 					</p>
+				</div>
+
+				<Button.Root
+					variant="neutral"
+					mode="stroke"
+					size="xsmall"
+					onClick={() => window.open("https://reloop.sh/docs/domain", "_blank")}
+				>
+					<Icon name="file-text" className="h-4 w-4" />
+					Go to docs
+				</Button.Root>
+			</div>
+
+			<div className="my-6 gap-3">
+				<h2 className="font-semibold text-gray-900 text-lg">Add Domain</h2>
+				<p className="text-paragraph-sm text-text-sub-600">
+					Add a new domain and start sending emails from your domain
+				</p>
+			</div>
+			<div className="flex gap-6">
+				<form onSubmit={handleSubmit(onSubmit)} className="w-full space-y-3">
+					<div>
+						<Label.Root
+							htmlFor="domain"
+							className="mb-2 block font-medium text-gray-700 text-sm"
+						>
+							Domain Name
+							<Label.Asterisk />
+						</Label.Root>
+						<div className="relative">
+							<Input.Root
+								hasError={!!formState?.errors?.domain?.message}
+								className="w-full"
+							>
+								<Input.Affix className="bg-gray-50 text-gray-500">
+									https://
+								</Input.Affix>
+								<Input.Wrapper>
+									<Input.Input
+										id="domain"
+										placeholder="www.example.com"
+										{...register("domain")}
+										disabled={status === "loading"}
+										className="pl-4"
+									/>
+								</Input.Wrapper>
+							</Input.Root>
+							{formState.errors.domain && (
+								<div className="mt-2 flex items-center gap-2">
+									<Icon name="alert-circle" className="h-4 w-4 text-red-500" />
+									<p className="text-red-600 text-sm">
+										{formState.errors.domain.message}
+									</p>
+								</div>
+							)}
+						</div>
+					</div>
+					<div className="flex justify-end">
+						<Button.Root
+							type="submit"
+							variant="neutral"
+							size="small"
+							disabled={status === "loading" || !formState.isValid}
+							className="min-w-[140px]"
+						>
+							{status === "loading" ? (
+								<>
+									<Spinner color="white" />
+									Adding Domain...
+								</>
+							) : (
+								<>
+									Add Domain
+									<Icon
+										name="undo"
+										className="h-5 w-5 scale-y-[-1] rounded-md bg-bg-white-0/10 p-1"
+									/>
+								</>
+							)}
+						</Button.Root>
+					</div>
+				</form>
+				<div className="mt-[29px] mb-10 w-96 rounded-2xl border border-stroke-soft-200 p-4">
+					<div className="flex items-center gap-2 text-xs uppercase">
+						<Icon name="bulb" className="h-3 w-3" />
+						<p>Recommendations</p>
+					</div>
+					<p className="pt-2 text-sm text-text-sub-600">
+						Use separate domain for domain reputation
+					</p>
+					<div className="pt-3 text-sm text-text-sub-600">
+						<p>Subdomain example:</p>
+						<ul className="list-disc pl-5">
+							<li>marketing.example.com</li>
+							<li>send.example.com</li>
+							<li>transection.example.com</li>
+						</ul>
+					</div>
 				</div>
 			</div>
-			<div className="relative my-10 ml-8 border-stroke-soft-200 border-l py-10">
-				<div className="relative flex flex-col pl-10">
-					<div className="-left-3.5 absolute top-1 rounded-full bg-bg-white-0 p-2">
-						<div className="h-3 w-3 rounded-full border-2 bg-bg-white-0" />
-					</div>
-					<div className="flex gap-10">
-						<div>
-							<p className="font-medium text-title-h5">Domain</p>
-							<p className="text-paragraph-sm text-text-sub-600">
-								Add a new domain send emails from your domain
-							</p>
-							<form onSubmit={handleSubmit(onSubmit)} className="w-96">
-								<div className="mt-5">
-									<Label.Root htmlFor="domain">
-										Domain
-										<Label.Asterisk />
-									</Label.Root>
-									<Input.Root hasError={!!formState?.errors?.domain?.message}>
-										<Input.Affix>https://</Input.Affix>
-										<Input.Wrapper>
-											<Input.Input
-												id="domain"
-												placeholder="www.example.com"
-												{...register("domain")}
-												disabled={status === "loading"}
-											/>
-										</Input.Wrapper>
-									</Input.Root>
-									{formState.errors.domain && (
-										<p className="mt-1 text-error-base text-paragraph-sm">
-											{formState.errors.domain.message}
-										</p>
-									)}
-								</div>
-								<div className="flex w-96 justify-end">
-									<Button.Root
-										type="submit"
-										className="mt-5"
-										variant="neutral"
-										disabled={status === "loading" || !formState.isValid}
-									>
-										{status === "loading" && (
-											<Spinner color="var(--text-strong-950)" />
-										)}
-										{status === "loading" ? "Adding Domain..." : "Add Domain"}
-									</Button.Root>
-								</div>
-							</form>
-						</div>
-						<div className="mt-24 h-fit rounded-2xl border border-stroke-soft-200 p-4">
-							<div className="flex items-center gap-2 uppercase">
-								<Icon name="bulb" className="h-4 w-4" />
-								<p>Recommendations</p>
-							</div>
-							<p className="w-60 pt-2 text-sm text-text-sub-600">
-								Use separate domain for domain reputation
-							</p>
-							<div className="pt-3 text-sm text-text-sub-600">
-								<p>Subdomain example:</p>
-								<ul className="list-disc pl-5">
-									<li>marketing.example.com</li>
-									<li>send.example.com</li>
-									<li>transection.example.com</li>
-								</ul>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div className="relative mt-10 pl-10">
-					<div className="-left-3.5 absolute top-1 rounded-full bg-bg-white-0 p-2">
-						<div className="h-3 w-3 rounded-full border-2 border-stroke-soft-200 bg-bg-white-0" />
-					</div>
-					<p className="font-medium text-text-sub-600 text-title-h5">
-						DNS Records
-					</p>
-				</div>
+			<div className="mb-6 gap-3 border-stroke-soft-200 border-t border-dashed pt-6">
+				<h2 className="font-semibold text-lg text-text-sub-600">DNS Records</h2>
+				<p className="text-paragraph-sm text-text-sub-600">
+					Add DNS records to your domain to start sending emails
+				</p>
 			</div>
 		</div>
 	);
