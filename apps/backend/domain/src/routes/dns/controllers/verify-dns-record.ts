@@ -1,8 +1,8 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
+import type { DNSTypes } from "@reloop/domain/routes/dns/dns.type";
 import { logger } from "@reloop/logger";
 import { and, eq } from "drizzle-orm";
-import type { DNSTypes } from "@reloop/domain/routes/dns/dns.type";
 
 export async function verifyDNSRecordHandler(
     domain: string,
@@ -35,25 +35,45 @@ export async function verifyDNSRecordHandler(
             .where(
                 and(
                     eq(schema.domainDnsRecord.domainId, domainRecord[0].id),
-                    eq(schema.domainDnsRecord.recordType, body.recordType as "A" | "AAAA" | "CNAME" | "MX" | "TXT" | "NS" | "SRV" | "CAA" | "SPF" | "DKIM" | "DMARC"),
+                    eq(
+                        schema.domainDnsRecord.recordType,
+                        body.recordType as
+                        | "A"
+                        | "AAAA"
+                        | "CNAME"
+                        | "MX"
+                        | "TXT"
+                        | "NS"
+                        | "SRV"
+                        | "CAA"
+                        | "SPF"
+                        | "DKIM"
+                        | "DMARC",
+                    ),
                     eq(schema.domainDnsRecord.name, body.name),
                 ),
             );
 
-        logger.info({
-            domain,
-            recordType: body.recordType,
-            name: body.name,
-        }, "DNS record marked as verified");
+        logger.info(
+            {
+                domain,
+                recordType: body.recordType,
+                name: body.name,
+            },
+            "DNS record marked as verified",
+        );
 
         return { verified: true };
     } catch (error) {
-        logger.error({
-            domain,
-            recordType: body.recordType,
-            name: body.name,
-            error: error instanceof Error ? error.message : String(error),
-        }, "Error verifying DNS record");
+        logger.error(
+            {
+                domain,
+                recordType: body.recordType,
+                name: body.name,
+                error: error instanceof Error ? error.message : String(error),
+            },
+            "Error verifying DNS record",
+        );
         return { verified: false };
     }
 }

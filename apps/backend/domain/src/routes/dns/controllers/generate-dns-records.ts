@@ -29,8 +29,6 @@ export async function generateDNSRecords(
         },
         "Generating DNS records",
     );
-
-    // Generate new DNS data
     const dnsData = await generateDNSData(domain, serverDomain, dkimSelector);
 
     return {
@@ -56,7 +54,6 @@ export async function insertDNSRecordsToDatabase(
         "Inserting DNS records to database",
     );
 
-    // Get domain ID for insertion
     const domainRecord = await db
         .select({ id: schema.domain.id })
         .from(schema.domain)
@@ -74,7 +71,6 @@ export async function insertDNSRecordsToDatabase(
         );
     }
 
-    // Insert DNS records
     const dnsRecordData = convertToDNSRecordData(dnsData.dnsRecords);
     await insertDNSRecords(
         dnsRecordData,
@@ -104,7 +100,6 @@ export async function generateDNSRecordsHandler(
     );
 
     try {
-        // Check if DNS records already exist
         const existingRecords = await getExistingDNSRecords(domain, organizationId);
 
         if (existingRecords) {
@@ -126,22 +121,18 @@ export async function generateDNSRecordsHandler(
             return response;
         }
 
-        // Generate DNS records
         const dnsRecords = await generateDNSRecords(
             domain,
             body.serverDomain || domain,
             body.dkimSelector || "mail",
         );
 
-        // Insert DNS records to database
         await insertDNSRecordsToDatabase(
             domain,
             organizationId,
             userId,
             dnsRecords.dnsData,
         );
-
-        // Update the domain table with the generated DNS record values
         await db
             .update(schema.domain)
             .set({
