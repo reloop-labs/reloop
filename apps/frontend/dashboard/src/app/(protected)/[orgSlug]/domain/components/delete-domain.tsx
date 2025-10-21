@@ -78,7 +78,7 @@ export const DeleteDomainModal = ({ domains }: DeleteDomainModalProps) => {
 			open={!!deleteId}
 			onOpenChange={(open) => !open && setDeleteId(null)}
 		>
-			<Modal.Content className="max-w-md">
+			<Modal.Content className="data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom-4 data-[state=open]:zoom-in-95 data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-bottom-4 data-[state=closed]:zoom-out-95 max-w-md duration-200 data-[state=closed]:animate-out data-[state=open]:animate-in">
 				<Modal.Body>
 					<h2 className="mb-2 font-semibold text-gray-900 text-xl">
 						Delete Domain
