@@ -42,7 +42,7 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 ## 🔗 Links
 
 - **Live Documentation**: [dev.reloop.sh](https://dev.reloop.sh)
-- **Product Website**: [reloop.com](https://reloop.com)
+- **Product Website**: [reloop.com](https://reloop.sh)
 - **API Dashboard**: [app.reloop.com](https://app.reloop.com)
 
 ---

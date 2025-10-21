@@ -13,7 +13,7 @@ const DomainLayout = ({ children }: { children: React.ReactNode }) => {
 						<Icon name="globe" className="h-4 w-4" />
 						<p className="font-medium text-sm">Domain</p>
 						<a
-							href="https://reloop.com/docs/domain"
+							href="https://reloop.sh/docs/domain"
 							target="_blank"
 							rel="noopener noreferrer"
 						>

@@ -38,7 +38,7 @@ export const EmptyState = () => {
 					<p className="mb-2 text-left text-text-sub-600 text-xs">Learn more</p>
 					<div className="flex gap-2">
 						<a
-							href="https://reloop.com/docs/domain"
+							href="https://reloop.sh/docs/domain"
 							target="_blank"
 							rel="noopener noreferrer"
 							className="flex items-center gap-2 rounded-2xl border border-stroke-soft-200 p-2 hover:border-stroke-soft-200 hover:bg-bg-weak-50"
@@ -63,7 +63,7 @@ export const EmptyState = () => {
 							<p className="pr-4 font-medium">Domain,DNS,MX Records</p>
 						</a>
 						<a
-							href="https://reloop.com/docs/domain"
+							href="https://reloop.sh/docs/domain"
 							target="_blank"
 							rel="noopener noreferrer"
 							className="flex items-center gap-2 rounded-2xl border border-stroke-soft-200 p-2 hover:border-stroke-soft-200 hover:bg-bg-weak-50"

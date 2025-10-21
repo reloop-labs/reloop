@@ -4,14 +4,12 @@ import * as Button from "@reloop/ui/button";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
+import { useRouter } from "next/navigation";
 
 interface DomainHeaderProps {
 	domainId: string;
 	lastUpdated?: string;
 	status?: "pending" | "verified" | "failed";
-	onRestart?: () => void;
-	onGoToDocs?: () => void;
-	onRemoveDomain?: () => void;
 	isLoading?: boolean;
 	isFailed?: boolean;
 }
@@ -19,13 +17,11 @@ interface DomainHeaderProps {
 export const DomainHeader = ({
 	domainId,
 	lastUpdated = "20 minutes ago",
-	onRestart,
-	onGoToDocs,
-	onRemoveDomain,
 	status,
 	isLoading,
 	isFailed,
 }: DomainHeaderProps) => {
+	const { back } = useRouter();
 	const getStatusColor = (status?: "pending" | "verified" | "failed") => {
 		switch (status) {
 			case "verified":
@@ -50,7 +46,12 @@ export const DomainHeader = ({
 	};
 	return (
 		<div className="pt-10 pb-8">
-			<Button.Root variant="neutral" mode="stroke" size="xxsmall">
+			<Button.Root
+				onClick={() => back()}
+				variant="neutral"
+				mode="stroke"
+				size="xxsmall"
+			>
 				<Button.Icon>
 					<Icon name="chevron-left" className="h-4 w-4" />
 				</Button.Icon>
@@ -103,12 +104,7 @@ export const DomainHeader = ({
 							<Skeleton className="h-9 w-9 rounded-lg" />
 						</>
 					) : isFailed ? (
-						<Button.Root
-							variant="error"
-							size="small"
-							mode="lighter"
-							onClick={onRestart}
-						>
+						<Button.Root variant="error" size="small" mode="lighter">
 							Try Again
 						</Button.Root>
 					) : (
@@ -116,7 +112,6 @@ export const DomainHeader = ({
 							<Button.Root
 								variant="neutral"
 								size="small"
-								onClick={onRestart}
 								className="font-semibold"
 							>
 								Verify DNS Records
@@ -128,12 +123,20 @@ export const DomainHeader = ({
 									</Button.Root>
 								</Dropdown.Trigger>
 								<Dropdown.Content align="end" className="w-48">
-									<Dropdown.Item onClick={onGoToDocs} className="gap-2">
+									<Dropdown.Item
+										onClick={() =>
+											window.open("https://reloop.sh/docs/domain", "_blank")
+										}
+										className="gap-2"
+									>
 										<Icon name="file-text" className="h-4 w-4" />
 										Go to docs
 									</Dropdown.Item>
 									<Dropdown.Item
-										onClick={onRemoveDomain}
+										onClick={() => {
+											// TODO: Implement remove domain functionality
+											console.log("Remove domain");
+										}}
 										className="gap-2 text-error-base"
 									>
 										<Icon name="trash" className="h-4 w-4" />

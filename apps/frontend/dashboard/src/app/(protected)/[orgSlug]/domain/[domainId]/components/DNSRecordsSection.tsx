@@ -19,7 +19,6 @@ interface DNSRecordsSectionProps {
 	dmarcRecords: DNSRecord[];
 	onCopyToClipboard?: (text: string, itemId: string) => void;
 	copiedItems?: Set<string>;
-	onHowToAddRecords?: () => void;
 	isLoading?: boolean;
 }
 
@@ -28,7 +27,6 @@ export const DNSRecordsSection = ({
 	dmarcRecords,
 	onCopyToClipboard,
 	copiedItems = new Set(),
-	onHowToAddRecords,
 	isLoading,
 }: DNSRecordsSectionProps) => {
 	return (
@@ -39,7 +37,12 @@ export const DNSRecordsSection = ({
 					variant="neutral"
 					mode="stroke"
 					size="xsmall"
-					onClick={onHowToAddRecords}
+					onClick={() =>
+						window.open(
+							"https://reloop.sh/docs/domain#add-dns-records",
+							"_blank",
+						)
+					}
 					className="gap-2"
 				>
 					<Icon name="file-text" className="h-4 w-4" />
@@ -63,8 +66,6 @@ export const DNSRecordsSection = ({
 					loadingRows={4}
 				/>
 			</div>
-
-			{/* DMARC Section */}
 			<div>
 				<div className="mb-4">
 					<h3 className="font-medium text-sm">

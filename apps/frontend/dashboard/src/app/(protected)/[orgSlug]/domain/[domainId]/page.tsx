@@ -46,7 +46,6 @@ const DomainPage = () => {
 		}
 	};
 
-	// Separate records by type for the new UI structure
 	const dkimSpfRecords =
 		dnsRecords?.filter(
 			(record) => record.recordType === "MX" || record.recordType === "TXT",
@@ -55,37 +54,10 @@ const DomainPage = () => {
 	const dmarcRecords =
 		dnsRecords?.filter((record) => record.name.includes("_dmarc")) || [];
 
-	const handleRestart = () => {
-		// TODO: Implement restart functionality
-		console.log("Restart domain");
-	};
-
-	const handleGoToDocs = () => {
-		// TODO: Implement docs navigation
-		console.log("Go to docs");
-	};
-
-	const handleRemoveDomain = () => {
-		// TODO: Implement remove domain functionality
-		console.log("Remove domain");
-	};
-
-	const handleHowToAddRecords = () => {
-		// TODO: Implement how to add records functionality
-		console.log("How to add records");
-	};
-
 	if (error) {
 		return (
 			<div className="mx-auto max-w-3xl">
-				<DomainHeader
-					domainId={domainId as string}
-					status="failed"
-					onRestart={handleRestart}
-					onGoToDocs={handleGoToDocs}
-					onRemoveDomain={handleRemoveDomain}
-					isFailed
-				/>
+				<DomainHeader domainId={domainId as string} status="failed" isFailed />
 				<div className="pt-20">
 					<SomethingWentWrong
 						errorType="server"
@@ -105,9 +77,6 @@ const DomainPage = () => {
 			<DomainHeader
 				domainId={domainId as string}
 				status={dnsRecords ? "pending" : "verified"}
-				onRestart={handleRestart}
-				onGoToDocs={handleGoToDocs}
-				onRemoveDomain={handleRemoveDomain}
 				isLoading={isLoading}
 			/>
 			<StatusBanner status="pending" isLoading={isLoading} />
@@ -120,7 +89,6 @@ const DomainPage = () => {
 				onCopyToClipboard={copyToClipboard}
 				copiedItems={copiedItems}
 				isLoading={isLoading}
-				onHowToAddRecords={handleHowToAddRecords}
 			/>
 		</div>
 	);
