@@ -2,6 +2,7 @@ import type { DomainModel } from "./domain.model";
 
 export namespace DomainTypes {
     export type DomainResponse = typeof DomainModel.domainResponse.static;
+    export type DnsRecordResponse = typeof DomainModel.dnsRecordResponse.static;
     export type DomainListResponse = typeof DomainModel.domainListResponse.static;
     export type CreateDomainBody = typeof DomainModel.createDomainBody.static;
     export type DomainQuery = typeof DomainModel.domainQuery.static;

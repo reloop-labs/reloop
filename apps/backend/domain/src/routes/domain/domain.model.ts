@@ -21,6 +21,35 @@ export namespace DomainModel {
 
     export type CreateDomainBody = typeof createDomainBody.static;
 
+    export const dnsRecordResponse = t.Object({
+        id: t.String({ description: "Unique DNS record identifier" }),
+        recordType: t.Union([
+            t.Literal("A"),
+            t.Literal("AAAA"),
+            t.Literal("CNAME"),
+            t.Literal("MX"),
+            t.Literal("TXT"),
+            t.Literal("NS"),
+            t.Literal("SRV"),
+            t.Literal("CAA"),
+            t.Literal("SPF"),
+            t.Literal("DKIM"),
+            t.Literal("DMARC")
+        ], { description: "DNS record type" }),
+        name: t.String({ description: "DNS record name" }),
+        value: t.String({ description: "DNS record value" }),
+        ttl: t.Number({ description: "Time to live in seconds" }),
+        priority: t.Union([t.Number(), t.Null()], { description: "Record priority (for MX records)" }),
+        weight: t.Union([t.Number(), t.Null()], { description: "Record weight (for SRV records)" }),
+        port: t.Union([t.Number(), t.Null()], { description: "Record port (for SRV records)" }),
+        description: t.Union([t.String(), t.Null()], { description: "Record description" }),
+        isVerified: t.Boolean({ description: "Whether the record is verified" }),
+        verificationError: t.Union([t.String(), t.Null()], { description: "Verification error message" }),
+        isActive: t.Boolean({ description: "Whether the record is active" }),
+        createdAt: t.String(),
+        updatedAt: t.String(),
+    });
+
     export const domainResponse = t.Object({
         id: t.String({ description: "Unique domain identifier" }),
         domain: t.String({ description: "Domain name (e.g., send.reloop.com)" }),
@@ -69,6 +98,7 @@ export namespace DomainModel {
         verificationFailedReason: t.Union([t.String(), t.Null()], {
             description: "Reason for verification failure",
         }),
+        dnsRecords: t.Array(dnsRecordResponse, { description: "DNS records for the domain" }),
         deletedAt: t.Union([t.String(), t.Null()], {
             description: "Soft delete timestamp",
         }),

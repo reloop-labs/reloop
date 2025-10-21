@@ -4,7 +4,7 @@ import { serverTiming } from "@elysiajs/server-timing";
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
 import { dnsRoutes } from "./routes/dns/dns.index";
-import { domainRoutes } from "./routes/domain/domain.index";
+import { domainRoutes } from "./routes/domain/domain.routes";
 import { landing } from "./routes/landing/landing.index";
 import { validationRoutes } from "./routes/validation/validation.index";
 import { loader } from "./utils/loader";
