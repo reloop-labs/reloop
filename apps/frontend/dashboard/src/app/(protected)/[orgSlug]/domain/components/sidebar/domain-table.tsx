@@ -1,4 +1,5 @@
 "use client";
+import { Icon as BadgeIcon, Root as BadgeRoot } from "@reloop/ui/badge";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { AnimatePresence, motion } from "motion/react";
@@ -26,23 +27,6 @@ interface DomainTableProps {
 	loadingRows?: number;
 }
 
-const getStatusColor = (status: Domain["status"]) => {
-	switch (status) {
-		case "active":
-			return "bg-green-500";
-		case "verifying":
-			return "bg-yellow-500";
-		case "start-verify":
-			return "bg-blue-500";
-		case "suspended":
-			return "bg-orange-500";
-		case "failed":
-			return "bg-red-500";
-		default:
-			return "bg-gray-500";
-	}
-};
-
 const getStatusLabel = (status: Domain["status"]) => {
 	switch (status) {
 		case "active":
@@ -50,13 +34,44 @@ const getStatusLabel = (status: Domain["status"]) => {
 		case "verifying":
 			return "Verifying";
 		case "start-verify":
-			return "Verify";
+			return "Not Started";
 		case "suspended":
 			return "Suspended";
 		case "failed":
 			return "Failed";
 		default:
 			return status;
+	}
+};
+
+const getStatusColor = (status: Domain["status"]) => {
+	switch (status) {
+		case "start-verify":
+			return "gray";
+		case "verifying":
+			return "orange";
+		case "active":
+			return "green";
+		case "failed":
+		case "suspended":
+			return "red";
+		default:
+			return "gray";
+	}
+};
+
+const getStatusIcon = (status: Domain["status"]) => {
+	switch (status) {
+		case "start-verify":
+			return "minus-circle";
+		case "verifying":
+			return "clock";
+		case "active":
+			return "check-circle";
+		case "failed":
+			return "cross-circle";
+		default:
+			return "minus-circle";
 	}
 };
 
@@ -158,13 +173,17 @@ export const DomainTable = ({
 											{...getAnimationProps(index + 1, 1)}
 											className="flex items-center gap-2"
 										>
-											<div
-												className={`h-2 w-2 flex-shrink-0 rounded-full ${getStatusColor(domain.status)}`}
-												title={getStatusLabel(domain.status)}
-											/>
-											<span className="text-label-sm text-text-strong-950">
+											<BadgeRoot
+												variant="lighter"
+												color={getStatusColor(domain.status)}
+												className="rounded-sm p-2 text-label-xs capitalize"
+											>
+												<BadgeIcon
+													as={Icon}
+													name={getStatusIcon(domain.status)}
+												/>
 												{getStatusLabel(domain.status)}
-											</span>
+											</BadgeRoot>
 										</motion.div>
 									</div>
 									<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
@@ -182,7 +201,7 @@ export const DomainTable = ({
 											className="flex items-center justify-center rounded p-1 hover:bg-bg-weak-100"
 										>
 											<Icon
-												name="more-horizontal"
+												name="more-vertical"
 												className="h-4 w-4 text-text-sub-600 hover:text-text-strong-950"
 											/>
 										</motion.button>

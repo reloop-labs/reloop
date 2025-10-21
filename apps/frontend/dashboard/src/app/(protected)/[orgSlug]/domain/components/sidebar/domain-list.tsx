@@ -2,6 +2,7 @@
 import { useUserOrganization } from "@dashboard/providers/org-provider";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
+import * as Input from "@reloop/ui/input";
 import * as Kbd from "@reloop/ui/kbd";
 import Spinner from "@reloop/ui/spinner";
 import Link from "next/link";
@@ -79,14 +80,26 @@ export const DomainListSidebar = () => {
 				) : !data?.domains || data.domains.length === 0 ? (
 					<EmptyState />
 				) : (
-					<div className="mt-4">
-						<DomainTable
-							domains={data.domains}
-							activeOrganizationSlug={activeOrganization.slug}
-							currentDomainId={domainId as string}
-							isLoading={isLoading}
-							loadingRows={4}
-						/>
+					<div>
+						<div className="flex justify-between">
+							<Input.Root>
+								<Input.Wrapper>
+									<Input.Input type="text" placeholder="Placeholder text..." />
+									<Input.Icon
+										as={() => <Icon name="search" className="h-4 w-4" />}
+									/>
+								</Input.Wrapper>
+							</Input.Root>
+						</div>
+						<div className="mt-4">
+							<DomainTable
+								domains={data.domains}
+								activeOrganizationSlug={activeOrganization.slug}
+								currentDomainId={domainId as string}
+								isLoading={isLoading}
+								loadingRows={4}
+							/>
+						</div>
 					</div>
 				)}
 			</div>
