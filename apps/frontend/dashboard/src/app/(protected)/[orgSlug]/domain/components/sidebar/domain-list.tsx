@@ -92,7 +92,7 @@ export const DomainListSidebar = () => {
 							Failed to load domains
 						</p>
 					</div>
-				) : !data?.domains || data.domains.length === 0 ? (
+				) : data?.domains && data.domains.length === 0 ? (
 					<EmptyState />
 				) : (
 					<div>

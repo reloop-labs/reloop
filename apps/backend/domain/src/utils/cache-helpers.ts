@@ -52,8 +52,6 @@ export async function invalidateDomainCache(domain: string, organizationId: stri
 
 export async function invalidateOrganizationCache(organizationId: string): Promise<void> {
     try {
-        // Note: This is a simplified approach. In production, you might want to use Redis patterns
-        // to delete all keys matching a pattern like `domains:${organizationId}:*`
         logger.info(
             { organizationId, cache: 'invalidated' },
             "Organization cache invalidated (manual cleanup may be needed)"

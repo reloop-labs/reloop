@@ -47,8 +47,6 @@ export async function deleteDomain(
             .update(schema.domainDnsRecord)
             .set({ deletedAt: now, updatedAt: now })
             .where(eq(schema.domainDnsRecord.domainId, domainId));
-
-        // Invalidate caches after successful deletion
         await invalidateDomainCache(domainName, organizationId);
         await invalidateOrganizationCache(organizationId);
 

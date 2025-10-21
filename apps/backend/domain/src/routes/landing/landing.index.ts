@@ -1,32 +1,34 @@
 import { db } from "@reloop/db/client";
-import { Elysia } from "elysia";
 import { redis } from "@reloop/domain/lib/redis";
+import { Elysia } from "elysia";
 
 export const landing = new Elysia()
-    .get("/", async () => {
-        let dbStatus = "UNKNOWN";
-        let dbError = "";
-        let redisStatus = "UNKNOWN";
-        let redisError = "";
+    .get(
+        "/",
+        async () => {
+            let dbStatus = "UNKNOWN";
+            let dbError = "";
+            let redisStatus = "UNKNOWN";
+            let redisError = "";
 
-        try {
-            await db.execute("SELECT 1 as test");
-            dbStatus = "CONNECTED";
-        } catch (dbErr) {
-            dbStatus = "DISCONNECTED";
-            dbError = dbErr instanceof Error ? dbErr.message : String(dbErr);
-        }
+            try {
+                await db.execute("SELECT 1 as test");
+                dbStatus = "CONNECTED";
+            } catch (dbErr) {
+                dbStatus = "DISCONNECTED";
+                dbError = dbErr instanceof Error ? dbErr.message : String(dbErr);
+            }
 
-        try {
-            await redis.healthCheck();
-            redisStatus = "CONNECTED";
-        } catch (redisErr) {
-            redisStatus = "DISCONNECTED";
-            redisError =
-                redisErr instanceof Error ? redisErr.message : String(redisErr);
-        }
+            try {
+                await redis.healthCheck();
+                redisStatus = "CONNECTED";
+            } catch (redisErr) {
+                redisStatus = "DISCONNECTED";
+                redisError =
+                    redisErr instanceof Error ? redisErr.message : String(redisErr);
+            }
 
-        return `
+            return `
 ╔════════════════════════════════════════════════════════╗
 ║                    DOMAIN SERVICE                      ║
 ╠════════════════════════════════════════════════════════╣
@@ -50,7 +52,7 @@ ${redisError ? `║ REDIS ERROR: ${redisError.substring(0, 50).padEnd(50)} ║` 
 ╠════════════════════════════════════════════════════════╣
 ║ QUICK START:                                           ║
 ║ curl -X GET /api/domain/check \\                        ║
-║   -H "Content-Type: application/json" \\                 ║
+║   -H "Content-Type: application/json" \\                ║
 ║   -d '{"domain":"example.com"}'                        ║
 ╠════════════════════════════════════════════════════════╣
 ║ - SUPPORT                                              ║
@@ -67,56 +69,66 @@ ${redisError ? `║ REDIS ERROR: ${redisError.substring(0, 50).padEnd(50)} ║` 
                 Made with ❤️ for developers
 
 `;
-    }, {
-        detail: {
-            tags: ["Service"],
-            summary: "Health check for Domain Service",
-            description: "Checks the health of the Domain Service",
         },
-    })
-    .get("/health/redis", async () => {
-        try {
-            const startTime = Date.now();
-            await redis.healthCheck();
-            const responseTime = Date.now() - startTime;
+        {
+            detail: {
+                tags: ["Service"],
+                summary: "Health check for Domain Service",
+                description: "Checks the health of the Domain Service",
+            },
+        },
+    )
+    .get(
+        "/health/redis",
+        async () => {
+            try {
+                const startTime = Date.now();
+                await redis.healthCheck();
+                const responseTime = Date.now() - startTime;
 
-            return {
-                status: "CONNECTED",
-                responseTime: `${responseTime}ms`,
-                timestamp: new Date().toISOString(),
-            };
-        } catch (error) {
-            return {
-                status: "DISCONNECTED",
-                error: error instanceof Error ? error.message : String(error),
-                timestamp: new Date().toISOString(),
-            };
-        }
-    }, {
-        detail: {
-            tags: ["Service"],
-            summary: "Health check for Redis",
-            description: "Checks the health of the Redis database",
+                return {
+                    status: "CONNECTED",
+                    responseTime: `${responseTime}ms`,
+                    timestamp: new Date().toISOString(),
+                };
+            } catch (error) {
+                return {
+                    status: "DISCONNECTED",
+                    error: error instanceof Error ? error.message : String(error),
+                    timestamp: new Date().toISOString(),
+                };
+            }
         },
-    })
-    .get("/health/postgres", async () => {
-        try {
-            await db.execute("SELECT 1 as test");
-            return {
-                status: "CONNECTED",
-                timestamp: new Date().toISOString(),
-            };
-        } catch (error) {
-            return {
-                status: "DISCONNECTED",
-                error: error instanceof Error ? error.message : String(error),
-                timestamp: new Date().toISOString(),
-            };
-        }
-    }, {
-        detail: {
-            tags: ["Service"],
-            summary: "Health check for Postgres",
-            description: "Checks the health of the Postgres database",
+        {
+            detail: {
+                tags: ["Service"],
+                summary: "Health check for Redis",
+                description: "Checks the health of the Redis database",
+            },
         },
-    });
+    )
+    .get(
+        "/health/postgres",
+        async () => {
+            try {
+                await db.execute("SELECT 1 as test");
+                return {
+                    status: "CONNECTED",
+                    timestamp: new Date().toISOString(),
+                };
+            } catch (error) {
+                return {
+                    status: "DISCONNECTED",
+                    error: error instanceof Error ? error.message : String(error),
+                    timestamp: new Date().toISOString(),
+                };
+            }
+        },
+        {
+            detail: {
+                tags: ["Service"],
+                summary: "Health check for Postgres",
+                description: "Checks the health of the Postgres database",
+            },
+        },
+    );

@@ -7,7 +7,7 @@ import * as Kbd from "@reloop/ui/kbd";
 import * as Modal from "@reloop/ui/modal";
 import axios from "axios";
 import { useQueryState } from "nuqs";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
 
@@ -33,28 +33,33 @@ export const DeleteDomainModal = ({ domains }: DeleteDomainModalProps) => {
 	const [deleteId, setDeleteId] = useQueryState("delete");
 	const [isDeleting, setIsDeleting] = useState(false);
 	const [confirmationText, setConfirmationText] = useState("");
+	const [isCopied, setIsCopied] = useState(false);
 	const { mutate } = useSWRConfig();
 	const { activeOrganization } = useUserOrganization();
-
-	// Find the domain to delete based on the ID from URL
 	const domainToDelete = domains.find((domain) => domain.id === deleteId);
+
+	useEffect(() => {
+		if (isCopied) {
+			const timer = setTimeout(() => {
+				setIsCopied(false);
+			}, 1000);
+			return () => clearTimeout(timer);
+		}
+	}, [isCopied]);
 
 	const handleDelete = async () => {
 		if (!domainToDelete) return;
 
 		setIsDeleting(true);
 		try {
-			await axios.delete("/api/domain/v1/delete", {
-				data: { domainId: domainToDelete.id },
+			await axios.delete(`/api/domain/v1/${domainToDelete.domain}`, {
 				headers: { credentials: "include" },
 			});
-
-			// Invalidate and refetch the domains list
 			await mutate(
 				`/api/domain/v1/list?organizationId=${activeOrganization?.id}&limit=100`,
 			);
 
-			toast.success("Domain deleted successfully");
+			toast.success(`${domainToDelete.domain} deleted successfully`);
 			setDeleteId(null);
 			setConfirmationText("");
 		} catch (error) {
@@ -97,12 +102,22 @@ export const DeleteDomainModal = ({ domains }: DeleteDomainModalProps) => {
 								{domainToDelete?.domain}
 								<button
 									type="button"
-									onClick={() =>
-										navigator.clipboard.writeText(domainToDelete?.domain || "")
-									}
+									onClick={async () => {
+										try {
+											await navigator.clipboard.writeText(
+												domainToDelete?.domain || "",
+											);
+											setIsCopied(true);
+										} catch {
+											toast.error("Failed to copy domain");
+										}
+									}}
 									className="ml-1 text-gray-500 hover:text-gray-700"
 								>
-									<Icon name="copy" className="h-3 w-3" />
+									<Icon
+										name={isCopied ? "check" : "copy"}
+										className={`h-3 w-3 ${isCopied ? "text-green-600" : ""}`}
+									/>
 								</button>
 							</span>{" "}
 							to confirm.
