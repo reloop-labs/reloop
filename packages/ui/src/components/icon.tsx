@@ -938,6 +938,24 @@ export const IconsSprite = () => (
 					fill="currentColor"
 				/>
 			</symbol>
+			<symbol id="time" viewBox="0 0 24 24" fill="none">
+				<rect
+					opacity="0.12"
+					x={2}
+					y={2}
+					width={20}
+					height={20}
+					rx={10}
+					fill="currentColor"
+				/>
+				<path
+					d="M12 8V12L15 14M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22Z"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
 			<symbol id="briefcase" viewBox="0 0 24 24">
 				<path
 					fillRule="evenodd"
