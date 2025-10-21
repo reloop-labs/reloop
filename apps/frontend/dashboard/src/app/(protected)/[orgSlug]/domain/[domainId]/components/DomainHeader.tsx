@@ -1,10 +1,16 @@
 "use client";
 
 import * as Button from "@reloop/ui/button";
-import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
+import {
+	Content as PopoverContent,
+	Root as PopoverRoot,
+	Trigger as PopoverTrigger,
+} from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useRouter } from "next/navigation";
+import { useQueryState } from "nuqs";
+import { DeleteDomainModal } from "../../components/delete-domain";
 
 interface DomainHeaderProps {
 	domainId: string;
@@ -22,6 +28,7 @@ export const DomainHeader = ({
 	isFailed,
 }: DomainHeaderProps) => {
 	const { back } = useRouter();
+	const [, setDeleteId] = useQueryState("delete");
 	const getStatusColor = (status?: "pending" | "verified" | "failed") => {
 		switch (status) {
 			case "verified":
@@ -44,6 +51,7 @@ export const DomainHeader = ({
 				return "time";
 		}
 	};
+
 	return (
 		<div className="pt-10 pb-8">
 			<Button.Root
@@ -116,38 +124,60 @@ export const DomainHeader = ({
 							>
 								Verify DNS Records
 							</Button.Root>
-							<Dropdown.Root>
-								<Dropdown.Trigger asChild>
+							<PopoverRoot>
+								<PopoverTrigger asChild>
 									<Button.Root variant="neutral" mode="stroke" size="xsmall">
 										<Icon name="more-vertical" className="h-4 w-4 rotate-90" />
 									</Button.Root>
-								</Dropdown.Trigger>
-								<Dropdown.Content align="end" className="w-48">
-									<Dropdown.Item
-										onClick={() =>
-											window.open("https://reloop.sh/docs/domain", "_blank")
-										}
-										className="gap-2"
-									>
-										<Icon name="file-text" className="h-4 w-4" />
-										Go to docs
-									</Dropdown.Item>
-									<Dropdown.Item
-										onClick={() => {
-											// TODO: Implement remove domain functionality
-											console.log("Remove domain");
-										}}
-										className="gap-2 text-error-base"
-									>
-										<Icon name="trash" className="h-4 w-4" />
-										Remove domain
-									</Dropdown.Item>
-								</Dropdown.Content>
-							</Dropdown.Root>
+								</PopoverTrigger>
+								<PopoverContent align="end" className="w-48 p-2">
+									<div className="flex flex-col gap-1">
+										<Button.Root
+											variant="neutral"
+											mode="ghost"
+											size="small"
+											onClick={() =>
+												window.open("https://reloop.sh/docs/domain", "_blank")
+											}
+											className="w-full justify-start"
+										>
+											<Icon name="file-text" className="h-4 w-4" />
+											Go to docs
+										</Button.Root>
+										<Button.Root
+											variant="error"
+											mode="ghost"
+											size="small"
+											onClick={() => setDeleteId(domainId)}
+											className="w-full justify-start text-red-600 hover:bg-red-50"
+										>
+											<Icon name="trash" className="h-4 w-4" />
+											Remove domain
+										</Button.Root>
+									</div>
+								</PopoverContent>
+							</PopoverRoot>
 						</>
 					)}
 				</div>
 			</div>
+			<DeleteDomainModal
+				domains={[
+					{
+						id: domainId,
+						domain: domainId,
+						organizationId: "",
+						userId: "",
+						domainType: "custom" as const,
+						status: "active" as const,
+						userVerified: false,
+						systemVerified: false,
+						dnsConfigured: false,
+						createdAt: "",
+						updatedAt: "",
+					},
+				]}
+			/>
 		</div>
 	);
 };
