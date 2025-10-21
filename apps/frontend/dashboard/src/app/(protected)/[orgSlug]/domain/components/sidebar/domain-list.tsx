@@ -121,7 +121,7 @@ export const DomainListSidebar = () => {
 									<Select.Trigger className="rounded-xl">
 										<Select.Value placeholder="Status" />
 									</Select.Trigger>
-									<Select.Content className="w-full flex-1">
+									<Select.Content className="w-40">
 										<Select.Item value="all">All Status</Select.Item>
 										<Select.Item value="start-verify">Start Verify</Select.Item>
 										<Select.Item value="verifying">Verifying</Select.Item>

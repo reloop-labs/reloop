@@ -6,6 +6,7 @@ import { Globe } from "../../globe";
 
 export const EmptyState = () => {
 	const { activeOrganization } = useUserOrganization();
+
 	return (
 		<div>
 			<div className="flex h-[calc(100dvh-300px)] items-center justify-center">

@@ -1,6 +1,12 @@
 "use client";
+import { useUserOrganization } from "@dashboard/providers/org-provider";
 import { Icon as BadgeIcon, Root as BadgeRoot } from "@reloop/ui/badge";
 import { Icon } from "@reloop/ui/icon";
+import {
+	Content as PopoverContent,
+	Root as PopoverRoot,
+	Trigger as PopoverTrigger,
+} from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
@@ -95,6 +101,7 @@ export const DomainTable = ({
 	isLoading,
 	loadingRows = 3,
 }: DomainTableProps) => {
+	const { push } = useUserOrganization();
 	const formatDate = (dateString: string) => {
 		const date = new Date(dateString);
 		return date.toLocaleDateString("en-US", {
@@ -102,6 +109,14 @@ export const DomainTable = ({
 			day: "numeric",
 			year: "numeric",
 		});
+	};
+
+	const handleDeleteDomain = (domainId: string, domainName: string) => {
+		console.log(`Delete domain: ${domainName} (${domainId})`);
+	};
+
+	const handleViewDetails = (domainName: string) => {
+		push(`/domain/${domainName}`);
 	};
 
 	return (
@@ -195,16 +210,46 @@ export const DomainTable = ({
 										</motion.span>
 									</div>
 									<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
-										<motion.button
+										<motion.div
 											{...getAnimationProps(index + 1, 3)}
-											type="button"
-											className="flex items-center justify-center rounded p-1 hover:bg-bg-weak-100"
+											className="flex items-center justify-center"
 										>
-											<Icon
-												name="more-vertical"
-												className="h-4 w-4 text-text-sub-600 hover:text-text-strong-950"
-											/>
-										</motion.button>
+											<PopoverRoot>
+												<PopoverTrigger asChild>
+													<button
+														type="button"
+														className="flex items-center justify-center rounded p-1 hover:bg-bg-weak-100"
+													>
+														<Icon
+															name="more-vertical"
+															className="h-4 w-4 text-text-sub-600 hover:text-text-strong-950"
+														/>
+													</button>
+												</PopoverTrigger>
+												<PopoverContent align="end" className="w-48 p-2">
+													<div className="flex flex-col gap-1">
+														<button
+															type="button"
+															onClick={() => handleViewDetails(domain.domain)}
+															className="flex w-full cursor-pointer items-center gap-2 rounded-lg p-2 text-left text-text-strong-950 hover:bg-bg-weak-50 focus:bg-bg-weak-50"
+														>
+															<Icon name="eye-outline" className="h-4 w-4" />
+															View Details
+														</button>
+														<button
+															type="button"
+															onClick={() =>
+																handleDeleteDomain(domain.id, domain.domain)
+															}
+															className="flex w-full cursor-pointer items-center gap-2 rounded-lg p-2 text-left text-red-600 hover:bg-red-50 focus:bg-red-50"
+														>
+															<Icon name="trash" className="h-4 w-4" />
+															Delete
+														</button>
+													</div>
+												</PopoverContent>
+											</PopoverRoot>
+										</motion.div>
 									</div>
 								</div>
 							))}
