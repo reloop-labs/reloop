@@ -1,8 +1,8 @@
 "use client";
-import Spinner from "@reloop/ui/spinner";
+import { SomethingWentWrong } from "@dashboard/components/somthing-went-wrong";
 import { useParams } from "next/navigation";
 import * as React from "react";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 import { DNSRecordsSection } from "./components/DNSRecordsSection";
 import { DomainHeader } from "./components/DomainHeader";
 import { StatusBanner } from "./components/StatusBanner";
@@ -21,14 +21,13 @@ const DomainPage = () => {
 	const { domainId } = useParams();
 	const [copiedItems, setCopiedItems] = React.useState<Set<string>>(new Set());
 
-	const {
-		data: dnsRecords,
-		error,
-		isLoading,
-	} = useSWR<DNSRecord[]>(domainId ? `/api/domain/v1/dns/${domainId}` : null, {
-		revalidateOnFocus: false,
-		revalidateOnReconnect: true,
-	});
+	const { data: dnsRecords, error } = useSWR<DNSRecord[]>(
+		domainId ? `/api/domain/v1/dns/${domainId}` : null,
+		{
+			revalidateOnFocus: false,
+			revalidateOnReconnect: true,
+		},
+	);
 
 	const copyToClipboard = async (text: string, itemId: string) => {
 		try {
@@ -75,14 +74,6 @@ const DomainPage = () => {
 		console.log("How to add records");
 	};
 
-	if (isLoading) {
-		return (
-			<div className="mx-auto mb-28 flex h-96 max-w-3xl items-center justify-center">
-				<Spinner />
-			</div>
-		);
-	}
-
 	if (error) {
 		return (
 			<div className="mx-auto max-w-3xl">
@@ -92,23 +83,18 @@ const DomainPage = () => {
 					onRestart={handleRestart}
 					onGoToDocs={handleGoToDocs}
 					onRemoveDomain={handleRemoveDomain}
+					isFailed
 				/>
-				<StatusBanner status="warning" />
-			</div>
-		);
-	}
-
-	if (!dnsRecords || dnsRecords.length === 0) {
-		return (
-			<div className="mx-auto max-w-3xl">
-				<DomainHeader
-					domainId={domainId as string}
-					status="pending"
-					onRestart={handleRestart}
-					onGoToDocs={handleGoToDocs}
-					onRemoveDomain={handleRemoveDomain}
-				/>
-				<StatusBanner status="warning" />
+				<div className="pt-20">
+					<SomethingWentWrong
+						errorType="server"
+						title="Failed to Load Domain Information"
+						description="We couldn't load the DNS records for this domain. This might be due to a temporary server issue or network problem."
+						onRetry={() => mutate(`/api/domain/v1/dns/${domainId}`)}
+						refreshText="Reload Page"
+						onRefresh={() => window.location.reload()}
+					/>
+				</div>
 			</div>
 		);
 	}
@@ -117,7 +103,7 @@ const DomainPage = () => {
 		<div className="mx-auto max-w-3xl">
 			<DomainHeader
 				domainId={domainId as string}
-				status="pending"
+				status={dnsRecords ? "pending" : "verified"}
 				onRestart={handleRestart}
 				onGoToDocs={handleGoToDocs}
 				onRemoveDomain={handleRemoveDomain}

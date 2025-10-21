@@ -1,7 +1,6 @@
 "use client";
 
 import * as Alert from "@reloop/ui/alert";
-import { Icon } from "@reloop/ui/icon";
 
 interface StatusBannerProps {
 	status: "pending" | "success" | "error" | "warning";
@@ -57,6 +56,21 @@ export const StatusBanner = ({ status }: StatusBannerProps) => {
 		}
 	};
 
+	const getBorderClass = () => {
+		switch (status) {
+			case "pending":
+				return "border-warning-base";
+			case "success":
+				return "border-success-base";
+			case "error":
+				return "border-error-base";
+			case "warning":
+				return "border-warning-base";
+			default:
+				return "border-warning-base";
+		}
+	};
+
 	const { title, description } = getStatusContent();
 
 	return (
@@ -64,7 +78,7 @@ export const StatusBanner = ({ status }: StatusBannerProps) => {
 			variant="lighter"
 			status={getStatusVariant()}
 			size="large"
-			className="w-full rounded-xl border border-warning-base text-paragraph-sm shadow-regular-md ring-1 ring-stroke-soft-200 ring-inset"
+			className={`w-full rounded-xl border ${getBorderClass()} text-paragraph-sm shadow-regular-md ring-1 ring-stroke-soft-200 ring-inset`}
 		>
 			<div className="space-y-2.5">
 				<div className="space-y-1">
