@@ -1,6 +1,7 @@
 "use client";
 import { useUserOrganization } from "@dashboard/providers/org-provider";
 import { Icon as BadgeIcon, Root as BadgeRoot } from "@reloop/ui/badge";
+import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import {
 	Content as PopoverContent,
@@ -10,6 +11,7 @@ import {
 import { Skeleton } from "@reloop/ui/skeleton";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
+import { useQueryState } from "nuqs";
 
 interface Domain {
 	id: string;
@@ -102,6 +104,8 @@ export const DomainTable = ({
 	loadingRows = 3,
 }: DomainTableProps) => {
 	const { push } = useUserOrganization();
+	const [, setDeleteId] = useQueryState("delete");
+
 	const formatDate = (dateString: string) => {
 		const date = new Date(dateString);
 		return date.toLocaleDateString("en-US", {
@@ -111,8 +115,8 @@ export const DomainTable = ({
 		});
 	};
 
-	const handleDeleteDomain = (domainId: string, domainName: string) => {
-		console.log(`Delete domain: ${domainName} (${domainId})`);
+	const handleDeleteDomain = (domainId: string) => {
+		setDeleteId(domainId);
 	};
 
 	const handleViewDetails = (domainName: string) => {
@@ -216,36 +220,40 @@ export const DomainTable = ({
 										>
 											<PopoverRoot>
 												<PopoverTrigger asChild>
-													<button
-														type="button"
-														className="flex items-center justify-center rounded p-1 hover:bg-bg-weak-100"
+													<Button.Root
+														variant="neutral"
+														mode="ghost"
+														size="xxsmall"
+														className="rounded p-1"
 													>
 														<Icon
 															name="more-vertical"
 															className="h-4 w-4 text-text-sub-600 hover:text-text-strong-950"
 														/>
-													</button>
+													</Button.Root>
 												</PopoverTrigger>
 												<PopoverContent align="end" className="w-48 p-2">
 													<div className="flex flex-col gap-1">
-														<button
-															type="button"
+														<Button.Root
+															variant="neutral"
+															mode="ghost"
+															size="small"
 															onClick={() => handleViewDetails(domain.domain)}
-															className="flex w-full cursor-pointer items-center gap-2 rounded-lg p-2 text-left text-text-strong-950 hover:bg-bg-weak-50 focus:bg-bg-weak-50"
+															className="w-full justify-start"
 														>
 															<Icon name="eye-outline" className="h-4 w-4" />
 															View Details
-														</button>
-														<button
-															type="button"
-															onClick={() =>
-																handleDeleteDomain(domain.id, domain.domain)
-															}
-															className="flex w-full cursor-pointer items-center gap-2 rounded-lg p-2 text-left text-red-600 hover:bg-red-50 focus:bg-red-50"
+														</Button.Root>
+														<Button.Root
+															variant="error"
+															mode="ghost"
+															size="small"
+															onClick={() => handleDeleteDomain(domain.id)}
+															className="w-full justify-start text-red-600 hover:bg-red-50"
 														>
 															<Icon name="trash" className="h-4 w-4" />
 															Delete
-														</button>
+														</Button.Root>
 													</div>
 												</PopoverContent>
 											</PopoverRoot>

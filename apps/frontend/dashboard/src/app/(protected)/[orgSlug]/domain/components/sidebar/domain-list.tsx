@@ -1,7 +1,6 @@
 "use client";
 import { useUserOrganization } from "@dashboard/providers/org-provider";
 import * as Button from "@reloop/ui/button";
-import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Kbd from "@reloop/ui/kbd";
@@ -10,6 +9,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import useSWR from "swr";
+import { DeleteDomainModal } from "../delete-domain";
 import { DomainTable } from "./domain-table";
 import { EmptyState } from "./empty-state";
 
@@ -144,6 +144,7 @@ export const DomainListSidebar = () => {
 					</div>
 				)}
 			</div>
+			<DeleteDomainModal domains={data?.domains || []} />
 		</div>
 	);
 };
