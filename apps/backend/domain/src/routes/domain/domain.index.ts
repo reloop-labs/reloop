@@ -43,9 +43,13 @@ export const domainRoutes = new Elysia({
         },
         {
             auth: true,
+            params: t.Object({
+                domain: DomainModel.domainParam
+            }),
             response: {
                 200: DomainModel.domainResponse,
                 404: DomainModel.domainNotFound,
+                400: DomainModel.invalidDomain,
             },
             detail: {
                 tags: ["Domains"],
@@ -56,14 +60,21 @@ export const domainRoutes = new Elysia({
     )
     .delete(
         "/:domain",
-        async ({ params: { domain } }) => {
-            return await DomainServiceHandler.deleteDomain(domain);
+        async ({ params: { domain }, user }) => {
+            if (!user.activeOrganizationId) {
+                throw status(403, { message: "User is not a member of an organization" });
+            }
+            return await DomainServiceHandler.deleteDomain(domain, user.activeOrganizationId);
         },
         {
             auth: true,
+            params: t.Object({
+                domain: DomainModel.domainParam
+            }),
             response: {
                 200: t.Object({ message: t.String() }),
                 404: DomainModel.domainNotFound,
+                400: DomainModel.invalidDomain,
             },
             detail: {
                 tags: ["Domains"],
@@ -74,14 +85,19 @@ export const domainRoutes = new Elysia({
     )
     .get(
         "/list",
-        async ({ query }) => {
-            return await DomainServiceHandler.listDomains(query);
+        async ({ query, user }) => {
+            if (!user.activeOrganizationId) {
+                throw status(403, { message: "User is not a member of an organization" });
+            }
+            return await DomainServiceHandler.listDomains(query, user.activeOrganizationId, user.id);
         },
         {
             query: DomainModel.domainQuery,
             response: {
                 200: DomainModel.domainListResponse,
+                403: DomainModel.unauthorized,
             },
+            auth: true,
             detail: {
                 tags: ["Domains"],
                 summary: "List domains",

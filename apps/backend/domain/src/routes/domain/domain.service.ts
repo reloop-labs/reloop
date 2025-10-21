@@ -1,7 +1,7 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
-import { and, count, desc, eq, like } from "drizzle-orm";
+import { and, count, desc, eq, isNull, like } from "drizzle-orm";
 import { status } from "elysia";
 import {
     generateDNSRecords,
@@ -124,7 +124,7 @@ export class DomainService {
             const result = await db
                 .select()
                 .from(schema.domain)
-                .where(eq(schema.domain.domain, domainName))
+                .where(and(eq(schema.domain.domain, domainName), isNull(schema.domain.deletedAt)))
                 .limit(1);
 
             if (result.length === 0) {
@@ -151,21 +151,37 @@ export class DomainService {
         }
     }
 
-    static async deleteDomain(domainName: string): Promise<void> {
-        logger.info({ domain: domainName }, "Deleting domain");
+    static async deleteDomain(domainName: string, organizationId: string): Promise<void> {
+        logger.info({ domain: domainName }, "Soft deleting domain");
 
         try {
-            const result = await db
-                .delete(schema.domain)
-                .where(eq(schema.domain.domain, domainName))
-                .returning();
+            const domainResult = await db
+                .select({ id: schema.domain.id })
+                .from(schema.domain)
+                .where(and(eq(schema.domain.domain, domainName), isNull(schema.domain.deletedAt), eq(schema.domain.organizationId, organizationId)))
+                .limit(1);
 
-            if (result.length === 0) {
+            const domainId = domainResult[0]?.id;
+            if (!domainId) {
                 logger.warn({ domain: domainName }, "Domain not found for deletion");
                 throw status(404, { message: "Domain not found" });
             }
+            const now = new Date();
+            const domainUpdateResult = await db
+                .update(schema.domain)
+                .set({ deletedAt: now, updatedAt: now })
+                .where(eq(schema.domain.id, domainId))
+                .returning();
 
-            logger.info({ domain: domainName }, "Domain deleted successfully");
+            if (domainUpdateResult.length === 0) {
+                logger.warn({ domain: domainName }, "Failed to delete domain");
+                throw status(500, { message: "Failed to delete domain" });
+            }
+            await db
+                .update(schema.domainDnsRecord)
+                .set({ deletedAt: now, updatedAt: now })
+                .where(eq(schema.domainDnsRecord.domainId, domainId));
+            logger.info({ domain: domainName }, "Domain and DNS records deleted successfully");
         } catch (error) {
             logger.error(
                 {
@@ -180,8 +196,10 @@ export class DomainService {
 
     static async listDomains(
         query: DomainTypes.DomainQuery,
+        organizationId: string,
+        userId: string,
     ): Promise<DomainTypes.DomainListResponse> {
-        const { page = 1, limit = 10, status, organizationId, userId } = query;
+        const { page = 1, limit = 10, status } = query;
         const offset = (page - 1) * limit;
 
         logger.info(
@@ -196,27 +214,14 @@ export class DomainService {
         );
 
         try {
-            const conditions = [];
-            if (status !== undefined) {
-                conditions.push(eq(schema.domain.status, status));
-            }
-            if (organizationId) {
-                conditions.push(eq(schema.domain.organizationId, organizationId));
-            }
-            if (userId) {
-                conditions.push(eq(schema.domain.userId, userId));
-            }
-
-            const whereClause =
-                conditions.length > 0 ? and(...conditions) : undefined;
-
+            const conditions = [isNull(schema.domain.deletedAt), eq(schema.domain.organizationId, organizationId)];
+            if (status !== undefined) conditions.push(eq(schema.domain.status, status));
+            const whereClause = and(...conditions);
             const totalResult = await db
                 .select({ count: count() })
                 .from(schema.domain)
                 .where(whereClause);
-
             const total = totalResult[0]?.count || 0;
-
             const domains = await db
                 .select()
                 .from(schema.domain)
@@ -265,18 +270,16 @@ export class DomainService {
         logger.info({ searchTerm, page, limit, status }, "Searching domains");
 
         try {
-            const conditions = [like(schema.domain.domain, `%${searchTerm}%`)];
-            if (status !== undefined) {
-                conditions.push(eq(schema.domain.status, status));
-            }
-
+            const conditions = [
+                like(schema.domain.domain, `%${searchTerm}%`),
+                isNull(schema.domain.deletedAt)
+            ];
+            if (status !== undefined) conditions.push(eq(schema.domain.status, status));
             const whereClause = and(...conditions);
-
             const totalResult = await db
                 .select({ count: count() })
                 .from(schema.domain)
                 .where(whereClause);
-
             const total = totalResult[0]?.count || 0;
 
             const domains = await db
@@ -326,7 +329,7 @@ export class DomainService {
             const result = await db
                 .select({ domain: schema.domain.domain })
                 .from(schema.domain)
-                .where(eq(schema.domain.domain, domainName))
+                .where(and(eq(schema.domain.domain, domainName), isNull(schema.domain.deletedAt)))
                 .limit(1);
 
             const exists = result.length > 0;
@@ -467,18 +470,19 @@ export class DomainServiceHandler {
         }
     }
 
-    static async deleteDomain(domainName: string): Promise<{ message: string }> {
-        logger.info({ domain: domainName }, "Deleting domain");
+    static async deleteDomain(domain: string, organizationId: string): Promise<{ message: string }> {
+        logger.info({ domain, organizationId }, "Deleting domain");
 
         try {
-            await DomainService.deleteDomain(domainName);
+            await DomainService.deleteDomain(domain, organizationId);
             const response = { message: "Domain deleted successfully" };
-            logger.info({ domain: domainName }, "Domain deleted successfully");
+            logger.info({ domain, organizationId }, "Domain deleted successfully");
             return response;
         } catch (error) {
             logger.error(
                 {
-                    domain: domainName,
+                    domain,
+                    organizationId,
                     error: error instanceof Error ? error.message : String(error),
                 },
                 "Error deleting domain",
@@ -489,25 +493,21 @@ export class DomainServiceHandler {
 
     static async listDomains(
         query: DomainTypes.DomainQuery,
+        organizationId: string,
+        userId: string,
     ): Promise<DomainTypes.DomainListResponse> {
-        logger.info({ query }, "Listing domains");
+        logger.info({ query, organizationId, userId }, "Listing domains");
 
         try {
-            const result = await DomainService.listDomains(query);
-            logger.info(
-                {
-                    total: result.total,
-                    page: result.page,
-                    limit: result.limit,
-                    count: result.domains.length,
-                },
-                "Domains listed successfully",
-            );
+            const result = await DomainService.listDomains(query, organizationId, userId);
+            logger.info({ query, organizationId, userId }, "Domains listed successfully");
             return result;
         } catch (error) {
             logger.error(
                 {
                     query,
+                    organizationId,
+                    userId,
                     error: error instanceof Error ? error.message : String(error),
                 },
                 "Error listing domains",
