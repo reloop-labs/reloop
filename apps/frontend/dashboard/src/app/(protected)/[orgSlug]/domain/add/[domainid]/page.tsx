@@ -1,4 +1,5 @@
 "use client";
+import type { DNSRecord, DomainResponse } from "@reloop/api";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
@@ -8,26 +9,17 @@ import { useUserOrganization } from "src/providers/org-provider";
 import useSWR from "swr";
 import { Globe } from "../../globe";
 
-interface DNSRecord {
-	recordType: string;
-	name: string;
-	value: string;
-	ttl: number;
-	priority?: number;
-	description?: string;
-	isVerified: boolean;
-}
-
 const NewDomainPage = () => {
 	const [copiedItems, setCopiedItems] = React.useState<Set<string>>(new Set());
 	const { push } = useUserOrganization();
-	const { domainid } = useParams();
+	const { domainId } = useParams();
+	console.log("🚀 ~ NewDomainPage ~ domainId:", domainId);
 
 	const {
-		data: dnsRecords,
+		data: domainData,
 		error,
 		isLoading,
-	} = useSWR<DNSRecord[]>(domainid ? `/api/domain/v1/dns/${domainid}` : null, {
+	} = useSWR<DomainResponse>(domainId ? `/api/domain/v1/${domainId}` : null, {
 		revalidateOnFocus: false,
 		revalidateOnReconnect: true,
 	});
@@ -76,7 +68,11 @@ const NewDomainPage = () => {
 		);
 	}
 
-	if (!dnsRecords || dnsRecords.length === 0) {
+	if (
+		!domainData ||
+		!domainData.dnsRecords ||
+		domainData.dnsRecords.length === 0
+	) {
 		return (
 			<div className="mx-auto mb-28 max-w-3xl">
 				<div className="my-10 flex items-center gap-3">
@@ -99,12 +95,12 @@ const NewDomainPage = () => {
 	}
 
 	// Separate DMARC records from DKIM/SPF records
-	const dmarcRecords = dnsRecords.filter(
+	const dmarcRecords = domainData.dnsRecords.filter(
 		(record) =>
 			record.name.includes("_dmarc") ||
 			(record.recordType === "TXT" && record.value.includes("v=DMARC")),
 	);
-	const otherRecords = dnsRecords.filter(
+	const otherRecords = domainData.dnsRecords.filter(
 		(record) =>
 			!record.name.includes("_dmarc") &&
 			!(record.recordType === "TXT" && record.value.includes("v=DMARC")),
@@ -265,7 +261,7 @@ const NewDomainPage = () => {
 						</div>
 						<p className="w-60 text-sm text-text-sub-600">New added domain</p>
 						<p className="mt-3 w-96 rounded-lg border border-success-light px-3 py-1.5">
-							{domainid}
+							{domainId}
 						</p>
 					</div>
 				</div>

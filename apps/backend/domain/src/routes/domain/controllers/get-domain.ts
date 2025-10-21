@@ -12,14 +12,16 @@ import { status } from "elysia";
 
 export async function getDomain(
     domainName: string,
+    organizationId: string,
 ): Promise<DomainTypes.DomainResponse> {
-    logger.info({ domain: domainName }, "Getting domain");
+    logger.info({ domain: domainName, organizationId }, "Getting domain");
 
     try {
         const result = await db.query.domain.findFirst({
             where: and(
                 eq(schema.domain.domain, domainName),
                 isNull(schema.domain.deletedAt),
+                eq(schema.domain.organizationId, organizationId),
             ),
             with: {
                 dnsRecords: true,
@@ -47,26 +49,19 @@ export async function getDomain(
 
 export async function getDomainHandler(
     domainName: string,
-    organizationId?: string,
+    organizationId: string,
 ): Promise<DomainTypes.DomainResponse> {
     logger.info({ domain: domainName, organizationId }, "Getting domain");
 
     try {
-        // If we have organizationId, use caching
-        if (organizationId) {
-            const cacheKey = generateDomainCacheKey(domainName, organizationId);
-            const domain = await getCachedOrFetch(
-                cacheKey,
-                () => getDomain(domainName),
-                { domain: domainName, organizationId, operation: 'getDomain' }
-            );
-            logger.info({ domain: domainName, organizationId }, "Domain retrieved successfully");
-            return domain;
-        }
 
-        // Fallback to direct database query if no organizationId
-        const domain = await getDomain(domainName);
-        logger.info({ domain: domainName }, "Domain retrieved successfully");
+        const cacheKey = generateDomainCacheKey(domainName, organizationId);
+        const domain = await getCachedOrFetch(
+            cacheKey,
+            () => getDomain(domainName, organizationId),
+            { domain: domainName, organizationId, operation: 'getDomain' }
+        );
+        logger.info({ domain: domainName, organizationId }, "Domain retrieved successfully");
         return domain;
     } catch (error) {
         logger.error(
