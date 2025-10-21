@@ -52,7 +52,8 @@ export const DNSRecordsSection = ({
 			<div className="mt-6 mb-8">
 				<div className="mb-4">
 					<h3 className="font-medium text-sm">
-						DKIM and SPF <span className="text-text-sub-600">(Required)</span>
+						DKIM and SPF{" "}
+						<span className="font-normal text-text-sub-600">(Required)</span>
 					</h3>
 					<p className="text-[13.5px] text-text-sub-600">
 						Enable email signing and specify authorized senders.

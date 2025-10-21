@@ -1,5 +1,6 @@
 "use client";
 import { SomethingWentWrong } from "@dashboard/components/somthing-went-wrong";
+import type { DomainResponse } from "@reloop/api";
 import { useParams } from "next/navigation";
 import * as React from "react";
 import useSWR, { mutate } from "swr";
@@ -7,25 +8,15 @@ import { DNSRecordsSection } from "./components/DNSRecordsSection";
 import { DomainHeader } from "./components/DomainHeader";
 import { StatusBanner } from "./components/StatusBanner";
 
-interface DNSRecord {
-	recordType: string;
-	name: string;
-	value: string;
-	ttl: number;
-	priority?: number;
-	description?: string;
-	isVerified: boolean;
-}
-
 const DomainPage = () => {
 	const { domainId } = useParams();
 	const [copiedItems, setCopiedItems] = React.useState<Set<string>>(new Set());
 
 	const {
-		data: dnsRecords,
+		data: domainData,
 		error,
 		isLoading,
-	} = useSWR<DNSRecord[]>(domainId ? `/api/domain/v1/dns/${domainId}` : null, {
+	} = useSWR<DomainResponse>(domainId ? `/api/domain/v1/${domainId}` : null, {
 		revalidateOnFocus: false,
 		revalidateOnReconnect: true,
 	});
@@ -46,13 +37,44 @@ const DomainPage = () => {
 		}
 	};
 
+	// Map domain status to component status
+	const mapDomainStatus = (status: string) => {
+		switch (status) {
+			case "active":
+				return "verified";
+			case "failed":
+				return "failed";
+			default:
+				return "pending";
+		}
+	};
+
+	// Map domain status to banner status
+	const mapBannerStatus = (status: string) => {
+		switch (status) {
+			case "active":
+				return "success";
+			case "failed":
+				return "error";
+			case "start-verify":
+			case "verifying":
+				return "pending";
+			case "suspended":
+				return "warning";
+			default:
+				return "pending";
+		}
+	};
+
 	const dkimSpfRecords =
-		dnsRecords?.filter(
+		domainData?.dnsRecords?.filter(
 			(record) => record.recordType === "MX" || record.recordType === "TXT",
 		) || [];
 
 	const dmarcRecords =
-		dnsRecords?.filter((record) => record.name.includes("_dmarc")) || [];
+		domainData?.dnsRecords?.filter((record) =>
+			record.name.includes("_dmarc"),
+		) || [];
 
 	if (error) {
 		return (
@@ -62,8 +84,8 @@ const DomainPage = () => {
 					<SomethingWentWrong
 						errorType="server"
 						title="Failed to Load Domain Information"
-						description="We couldn't load the DNS records for this domain. This might be due to a temporary server issue or network problem."
-						onRetry={() => mutate(`/api/domain/v1/dns/${domainId}`)}
+						description="We couldn't load the domain information. This might be due to a temporary server issue or network problem."
+						onRetry={() => mutate(`/api/domain/v1/${domainId}`)}
 						refreshText="Reload Page"
 						onRefresh={() => window.location.reload()}
 					/>
@@ -75,13 +97,16 @@ const DomainPage = () => {
 	return (
 		<div className="mx-auto max-w-3xl">
 			<DomainHeader
-				domainId={domainId as string}
-				status={dnsRecords ? "pending" : "verified"}
+				domainId={domainData?.domain || (domainId as string)}
+				status={mapDomainStatus(domainData?.status || "pending")}
 				isLoading={isLoading}
 			/>
-			<StatusBanner status="pending" isLoading={isLoading} />
+			<StatusBanner
+				status={mapBannerStatus(domainData?.status || "pending")}
+				isLoading={isLoading}
+			/>
 			<div className="my-9">
-				<div className="w-full border-stroke-soft-200 border-t border-dotted" />
+				<div className="w-full border-stroke-soft-200 border-t border-dashed" />
 			</div>
 			<DNSRecordsSection
 				dkimSpfRecords={dkimSpfRecords}

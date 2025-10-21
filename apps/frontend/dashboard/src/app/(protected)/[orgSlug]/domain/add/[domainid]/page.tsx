@@ -7,7 +7,6 @@ import { useParams, useRouter } from "next/navigation";
 import * as React from "react";
 import { useUserOrganization } from "src/providers/org-provider";
 import useSWR from "swr";
-import { Globe } from "../../globe";
 
 const NewDomainPage = () => {
 	const [copiedItems, setCopiedItems] = React.useState<Set<string>>(new Set());
