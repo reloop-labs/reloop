@@ -99,9 +99,9 @@ export const AddDomainSidebar = () => {
 			</div>
 
 			<div className="my-6 gap-3">
-				<h2 className="font-semibold text-gray-900 text-lg">Add Domain</h2>
+				<h2 className="font-semibold text-gray-900 text-lg">Domain</h2>
 				<p className="text-paragraph-sm text-text-sub-600">
-					Add a new domain and start sending emails from your domain
+					Add a subdomain (eg. marketing.example.com)
 				</p>
 			</div>
 			<div className="flex gap-6">
@@ -170,7 +170,7 @@ export const AddDomainSidebar = () => {
 				<div className="mt-[29px] mb-10 w-96 rounded-2xl border border-stroke-soft-200 p-4">
 					<div className="flex items-center gap-2 text-xs uppercase">
 						<Icon name="bulb" className="h-3 w-3" />
-						<p>Recommendations</p>
+						<p>Pro Tip</p>
 					</div>
 					<p className="pt-2 text-sm text-text-sub-600">
 						Use separate domain for domain reputation
