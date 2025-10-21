@@ -1,17 +1,14 @@
 import { Elysia } from "elysia";
-import { authMiddleware } from "../../middleware/auth";
-import { ValidationModel } from "./validation.model";
-import { ValidationServiceHandler } from "./validation.service";
+import { authMiddleware } from "../../../middleware/auth";
+import { validateDnsRecordsHandler } from "../controllers/validate-dns-records";
+import { ValidationModel } from "../validation.model";
 
-export const validationRoutes = new Elysia({
-    prefix: "/validation",
-    name: "ValidationRoutes",
-})
+export const validateDnsRoute = new Elysia()
     .use(authMiddleware)
     .post(
         "/dns",
         async ({ body }) => {
-            return await ValidationServiceHandler.validateDnsRecords(body);
+            return await validateDnsRecordsHandler(body);
         },
         {
             body: ValidationModel.dnsValidationBody,

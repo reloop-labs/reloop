@@ -1,4 +1,4 @@
-import type { DNSTypes } from "../dns.type";
+import type { DNSTypes } from "../routes/dns/dns.type";
 
 export function generateDKIMRecord(
     domain: string,

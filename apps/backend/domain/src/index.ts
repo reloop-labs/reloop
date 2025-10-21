@@ -3,10 +3,10 @@ import { fromTypes, openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
-import { dnsRoutes } from "./routes/dns/dns.index";
+import { dnsRoutes } from "./routes/dns/dns.route";
 import { domainRoutes } from "./routes/domain/domain.routes";
 import { landing } from "./routes/landing/landing.index";
-import { validationRoutes } from "./routes/validation/validation.index";
+import { validationRoutes } from "./routes/validation/validation.routes";
 import { loader } from "./utils/loader";
 
 const port = Number(process.env.PORT || 3000);
