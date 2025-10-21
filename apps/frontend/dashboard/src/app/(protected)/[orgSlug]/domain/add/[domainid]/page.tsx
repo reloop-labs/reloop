@@ -3,7 +3,7 @@ import type { DNSRecord, DomainResponse } from "@reloop/api";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import * as React from "react";
 import { useUserOrganization } from "src/providers/org-provider";
 import useSWR from "swr";
@@ -13,6 +13,7 @@ const NewDomainPage = () => {
 	const [copiedItems, setCopiedItems] = React.useState<Set<string>>(new Set());
 	const { push } = useUserOrganization();
 	const { domainId } = useParams();
+	const { back } = useRouter();
 	console.log("🚀 ~ NewDomainPage ~ domainId:", domainId);
 
 	const {
@@ -41,23 +42,57 @@ const NewDomainPage = () => {
 
 	if (isLoading) {
 		return (
-			<div className="mx-auto mb-28 flex h-96 max-w-3xl items-center justify-center">
-				<Spinner />
+			<div className="mx-auto max-w-3xl pt-10 pb-8">
+				<Button.Root
+					onClick={() => back()}
+					variant="neutral"
+					mode="stroke"
+					size="xxsmall"
+				>
+					<Button.Icon>
+						<Icon name="chevron-left" className="h-4 w-4" />
+					</Button.Icon>
+					Back
+				</Button.Root>
+				<div className="flex h-96 items-center justify-center">
+					<Spinner />
+				</div>
 			</div>
 		);
 	}
 
 	if (error) {
 		return (
-			<div className="mx-auto mb-28 max-w-3xl">
-				<div className="my-10 flex items-center gap-3">
-					<Globe className="rounded-full" iconClassName="h-8 w-8" />
+			<div className="mx-auto max-w-3xl pt-10 pb-8">
+				<Button.Root
+					onClick={() => back()}
+					variant="neutral"
+					mode="stroke"
+					size="xxsmall"
+				>
+					<Button.Icon>
+						<Icon name="chevron-left" className="h-4 w-4" />
+					</Button.Icon>
+					Back
+				</Button.Root>
+				<div className="flex w-full items-center justify-between border-stroke-soft-200 border-b border-dashed pt-6 pb-6">
 					<div>
-						<h1 className="font-medium text-title-h4 leading-8">Add Domain</h1>
+						<h1 className="font-medium text-title-h5 leading-8">Add Domain</h1>
 						<p className="text-paragraph-sm text-text-sub-600">
-							Add a new domain and start sending emails from your domain
+							You need a domain to send emails from your own domain
 						</p>
 					</div>
+					<Button.Root
+						variant="neutral"
+						mode="stroke"
+						size="xsmall"
+						onClick={() =>
+							window.open("https://reloop.sh/docs/domain", "_blank")
+						}
+					>
+						<Icon name="file-text" className="h-4 w-4" />
+						Go to docs
+					</Button.Root>
 				</div>
 				<div className="rounded-lg border border-red-200 bg-red-50 p-4">
 					<p className="text-red-800">
@@ -74,15 +109,36 @@ const NewDomainPage = () => {
 		domainData.dnsRecords.length === 0
 	) {
 		return (
-			<div className="mx-auto mb-28 max-w-3xl">
-				<div className="my-10 flex items-center gap-3">
-					<Globe className="rounded-full" iconClassName="h-8 w-8" />
+			<div className="mx-auto max-w-3xl pt-10 pb-8">
+				<Button.Root
+					onClick={() => back()}
+					variant="neutral"
+					mode="stroke"
+					size="xxsmall"
+				>
+					<Button.Icon>
+						<Icon name="chevron-left" className="h-4 w-4" />
+					</Button.Icon>
+					Back
+				</Button.Root>
+				<div className="flex w-full items-center justify-between border-stroke-soft-200 border-b border-dashed pt-6 pb-6">
 					<div>
-						<h1 className="font-medium text-title-h4 leading-8">Add Domain</h1>
+						<h1 className="font-medium text-title-h5 leading-8">Add Domain</h1>
 						<p className="text-paragraph-sm text-text-sub-600">
-							Add a new domain and start sending emails from your domain
+							You need a domain to send emails from your own domain
 						</p>
 					</div>
+					<Button.Root
+						variant="neutral"
+						mode="stroke"
+						size="xsmall"
+						onClick={() =>
+							window.open("https://reloop.sh/docs/domain", "_blank")
+						}
+					>
+						<Icon name="file-text" className="h-4 w-4" />
+						Go to docs
+					</Button.Root>
 				</div>
 				<div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4">
 					<p className="text-yellow-800">
@@ -236,21 +292,39 @@ const NewDomainPage = () => {
 	);
 
 	return (
-		<div className="mx-auto mb-28 max-w-3xl">
-			<div className="my-10 flex items-center gap-3">
-				<Globe className="rounded-full" iconClassName="h-8 w-8" />
+		<div className="mx-auto max-w-3xl pt-10 pb-8">
+			<div className="flex w-full items-center justify-between border-stroke-soft-200 border-b border-dashed pt-6 pb-6">
 				<div>
-					<h1 className="font-medium text-title-h4 leading-8">Add Domain</h1>
+					<h1 className="font-medium text-title-h5 leading-8">Domain Added</h1>
 					<p className="text-paragraph-sm text-text-sub-600">
-						Add a new domain and start sending emails from your domain
+						You have successfully added the domain
 					</p>
 				</div>
+				<div className="flex items-center gap-2">
+					<Button.Root
+						onClick={() => {
+							push("/domain");
+						}}
+						size="xsmall"
+						variant="neutral"
+					>
+						I have add the DNS records
+					</Button.Root>
+					<Button.Root
+						variant="neutral"
+						mode="stroke"
+						size="xsmall"
+						onClick={() =>
+							window.open("https://reloop.sh/docs/domain", "_blank")
+						}
+					>
+						<Icon name="file-text" className="h-4 w-4" />
+					</Button.Root>
+				</div>
 			</div>
-			<div className="relative my-10 ml-8 border-stroke-soft-200 border-l pt-10 pb-20">
-				<div className="relative flex flex-col pl-10">
-					<div className="-left-3.5 absolute top-4 rounded-full bg-bg-white-0 p-2">
-						<div className="h-3 w-3 rounded-full border-2 border-success-base bg-bg-white-0" />
-					</div>
+
+			<div className="relative my-10">
+				<div className="relative flex flex-col">
 					<div className="rounded-2xl border border-success-light bg-success-base/5 p-4">
 						<div className="flex items-center gap-2">
 							<p className="font-medium text-title-h6">Domain</p>
@@ -268,10 +342,7 @@ const NewDomainPage = () => {
 
 				{/* DKIM and SPF Records */}
 				{otherRecords.length > 0 && (
-					<div className="relative mt-10 pl-10">
-						<div className="-left-3.5 absolute top-1 rounded-full bg-bg-white-0 p-2">
-							<div className="h-3 w-3 rounded-full border-2 bg-bg-white-0" />
-						</div>
+					<div className="relative mt-10">
 						<div className="mb-6 space-y-1">
 							<div className="font-medium text-base text-text-strong-950">
 								DKIM and SPF{" "}
@@ -287,10 +358,7 @@ const NewDomainPage = () => {
 
 				{/* DMARC Records */}
 				{dmarcRecords.length > 0 && (
-					<div className="relative mt-10 pl-10">
-						<div className="-left-3.5 absolute top-1 rounded-full bg-bg-white-0 p-2">
-							<div className="h-3 w-3 rounded-full border-2 bg-bg-white-0" />
-						</div>
+					<div className="relative mt-10">
 						<div className="mb-6 space-y-1">
 							<div className="font-medium text-base text-text-strong-950">
 								DMARC <span className="text-text-sub-600">(Recommended)</span>
@@ -305,7 +373,7 @@ const NewDomainPage = () => {
 					</div>
 				)}
 
-				<div className="relative mt-10 pl-10">
+				<div className="relative mt-10">
 					<Button.Root
 						onClick={() => {
 							push("/domain");
