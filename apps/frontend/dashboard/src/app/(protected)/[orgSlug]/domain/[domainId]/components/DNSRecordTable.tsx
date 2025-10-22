@@ -1,5 +1,7 @@
 "use client";
 
+import { getAnimationProps } from "@dashboard/utils/domain";
+import type { DNSRecord } from "@reloop/api/types";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import {
@@ -8,62 +10,34 @@ import {
 } from "@reloop/ui/status-badge";
 import { AnimatePresence, motion } from "motion/react";
 
-interface DNSRecord {
-	recordType: string;
-	name: string;
-	value: string;
-	ttl: number;
-	priority?: number;
-	description?: string;
-	isVerified: boolean;
-	status?: string;
-}
-
-function getAnimationProps(row: number, column: number) {
-	return {
-		initial: { opacity: 0, y: "-100%" },
-		animate: { opacity: 1, y: 0 },
-		exit: { opacity: 0, y: "100%" },
-		transition: {
-			duration: 0.5,
-			delay: row * 0.07 + column * 0.1,
-			ease: [0.65, 0, 0.35, 1] as const,
-		},
-	};
-}
-
-function getStatusBadgeStatus(status?: string) {
-	switch (status?.toLowerCase()) {
-		case "active":
-		case "completed":
-			return "completed";
-		case "pending":
-			return "pending";
-		case "error":
-		case "failed":
-			return "failed";
-		default:
-			return "completed";
+function getStatusBadgeStatus(record: DNSRecord) {
+	if (record.isVerified && record.isActive) {
+		return "completed";
 	}
-}
-
-function getStatusIcon(status?: string) {
-	switch (status?.toLowerCase()) {
-		case "active":
-		case "completed":
-			return "check";
-		case "pending":
-			return "clock";
-		case "error":
-		case "failed":
-			return "x";
-		default:
-			return "check";
+	if (record.isVerified && !record.isActive) {
+		return "pending";
 	}
+	return "failed";
 }
 
-function getStatusLabel(status?: string) {
-	return status || "Active";
+function getStatusIcon(record: DNSRecord) {
+	if (record.isVerified && record.isActive) {
+		return "check";
+	}
+	if (record.isVerified && !record.isActive) {
+		return "clock";
+	}
+	return "x";
+}
+
+function getStatusLabel(record: DNSRecord) {
+	if (record.isVerified && record.isActive) {
+		return "Active";
+	}
+	if (record.isVerified && !record.isActive) {
+		return "Pending";
+	}
+	return "Failed";
 }
 
 interface DNSRecordTableProps {
@@ -242,13 +216,13 @@ export const DNSRecordTable = ({
 										>
 											<StatusBadgeRoot
 												variant="light"
-												status={getStatusBadgeStatus(record.status)}
+												status={getStatusBadgeStatus(record)}
 											>
 												<StatusBadgeIcon
 													as={Icon}
-													name={getStatusIcon(record.status)}
+													name={getStatusIcon(record)}
 												/>
-												{getStatusLabel(record.status)}
+												{getStatusLabel(record)}
 											</StatusBadgeRoot>
 										</motion.div>
 									</div>

@@ -1,18 +1,9 @@
 "use client";
 
+import type { DNSRecord } from "@reloop/api/types";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import { DNSRecordTable } from "./DNSRecordTable";
-
-interface DNSRecord {
-	recordType: string;
-	name: string;
-	value: string;
-	ttl: number;
-	priority?: number;
-	description?: string;
-	isVerified: boolean;
-}
 
 interface DNSRecordsSectionProps {
 	dkimSpfRecords: DNSRecord[];

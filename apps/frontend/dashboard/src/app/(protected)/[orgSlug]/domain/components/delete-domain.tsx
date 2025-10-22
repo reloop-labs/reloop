@@ -1,5 +1,6 @@
 "use client";
 import { useUserOrganization } from "@dashboard/providers/org-provider";
+import type { Domain } from "@reloop/api/types";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
@@ -10,20 +11,6 @@ import { useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
-
-interface Domain {
-	id: string;
-	domain: string;
-	organizationId: string;
-	userId: string;
-	domainType: "custom" | "subdomain" | "system";
-	status: "start-verify" | "verifying" | "active" | "suspended" | "failed";
-	userVerified: boolean;
-	systemVerified: boolean;
-	dnsConfigured: boolean;
-	createdAt: string;
-	updatedAt: string;
-}
 
 interface DeleteDomainModalProps {
 	domains: Domain[];

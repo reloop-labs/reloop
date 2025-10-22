@@ -1,3 +1,4 @@
+import type { Domain, DomainStatus } from "@reloop/api/types";
 import type { DomainModel } from "@reloop/domain/routes/domain/domain.model";
 
 export namespace DomainTypes {
@@ -7,28 +8,17 @@ export namespace DomainTypes {
     export type CreateDomainBody = typeof DomainModel.createDomainBody.static;
     export type DomainQuery = typeof DomainModel.domainQuery.static;
     export type DomainNotFound = typeof DomainModel.domainNotFound.static;
-    export type DomainAlreadyExists = typeof DomainModel.domainAlreadyExists.static;
+    export type DomainAlreadyExists =
+        typeof DomainModel.domainAlreadyExists.static;
     export type InvalidDomain = typeof DomainModel.invalidDomain.static;
     export type Unauthorized = typeof DomainModel.unauthorized.static;
 
-    export interface DomainData {
-        id: string;
-        domain: string;
-        organizationId: string;
-        userId: string;
-        domainType: "custom" | "subdomain" | "system";
-        status: "start-verify" | "verifying" | "active" | "suspended" | "failed";
-        userVerified: boolean;
-        systemVerified: boolean;
-        dnsConfigured: boolean;
-        nameservers: string[] | null;
-        spfRecord: string | null;
-        dkimRecord: string | null;
-        dkimSelector: string;
-        dmarcRecord: string | null;
-        dmarcPolicy: string;
-        trackingDomain: boolean;
-        verificationFailedReason: string | null;
+    // Use centralized Domain type but with Date types for backend
+    export interface DomainData
+        extends Omit<
+            Domain,
+            "createdAt" | "updatedAt" | "deletedAt" | "lastVerifiedAt"
+        > {
         deletedAt: Date | null;
         lastVerifiedAt: Date | null;
         createdAt: Date;
@@ -42,7 +32,7 @@ export namespace DomainTypes {
     export interface DomainListQuery {
         page?: number;
         limit?: number;
-        status?: "start-verify" | "verifying" | "active" | "suspended" | "failed";
+        status?: DomainStatus;
         organizationId?: string;
         userId?: string;
     }
@@ -50,6 +40,6 @@ export namespace DomainTypes {
     export interface SearchDomainQuery {
         page?: number;
         limit?: number;
-        status?: "start-verify" | "verifying" | "active" | "suspended" | "failed";
+        status?: DomainStatus;
     }
 }

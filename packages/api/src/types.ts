@@ -2,13 +2,15 @@ export type { StatsRoutes } from "../../../apps/backend/auth/src/routes/stats.js
 export type { EmailService } from "../../../apps/backend/domain/src/index.js";
 
 // Domain types
+export type DomainStatus = "start-verify" | "verifying" | "active" | "suspended" | "failed";
+
 export interface Domain {
     id: string;
     domain: string;
     organizationId: string;
     userId: string;
     domainType: "custom" | "subdomain" | "system";
-    status: "start-verify" | "verifying" | "active" | "suspended" | "failed";
+    status: DomainStatus;
     userVerified: boolean;
     systemVerified: boolean;
     dnsConfigured: boolean;

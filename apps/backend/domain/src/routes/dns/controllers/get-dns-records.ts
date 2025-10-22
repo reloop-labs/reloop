@@ -11,7 +11,7 @@ import { and, eq } from "drizzle-orm";
 export async function getDNSRecordsHandler(
     domain: string,
     organizationId: string,
-): Promise<DNSTypes.DNSRecordResponse[]> {
+): Promise<DNSTypes.DNSRecordResponse> {
     logger.info({ domain }, "Getting DNS records for domain");
 
     try {

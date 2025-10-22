@@ -12,7 +12,7 @@ export namespace DNSModel {
         }),
     });
 
-    export const dnsRecordResponse = t.Object({
+    export const dnsRecordResponse = t.Array(t.Object({
         recordType: t.String(),
         name: t.String(),
         value: t.String(),
@@ -20,7 +20,7 @@ export namespace DNSModel {
         priority: t.Optional(t.Number()),
         description: t.Optional(t.String()),
         isVerified: t.Boolean(),
-    });
+    }));
 
     export const dkimKeysResponse = t.Object({
         selector: t.String(),

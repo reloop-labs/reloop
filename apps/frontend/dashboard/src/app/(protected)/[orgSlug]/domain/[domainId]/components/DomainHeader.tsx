@@ -1,5 +1,6 @@
 "use client";
 
+import type { Domain } from "@reloop/api/types";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import {
@@ -173,9 +174,19 @@ export const DomainHeader = ({
 						userVerified: false,
 						systemVerified: false,
 						dnsConfigured: false,
+						nameservers: null,
+						spfRecord: null,
+						dkimRecord: null,
+						dkimSelector: "reloop",
+						dmarcRecord: null,
+						dmarcPolicy: "none",
+						trackingDomain: false,
+						verificationFailedReason: null,
+						deletedAt: null,
+						lastVerifiedAt: null,
 						createdAt: "",
 						updatedAt: "",
-					},
+					} satisfies Domain,
 				]}
 			/>
 		</div>
