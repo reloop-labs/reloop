@@ -15,6 +15,7 @@ export namespace DomainModel {
         domain: t.String({
             minLength: 1,
             maxLength: 255,
+            pattern: domainPattern.source,
             description: "Domain name (e.g., send.reloop.com)",
         }),
     });
