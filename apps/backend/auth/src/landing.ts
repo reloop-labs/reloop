@@ -49,8 +49,8 @@ ${dbError ? `║ DB ERROR: ${dbError.substring(0, 50).padEnd(50)} ║` : "║   
 ${redisError ? `║ REDIS ERROR: ${redisError.substring(0, 50).padEnd(50)} ║` : "║                                                        ║"}
 ╠════════════════════════════════════════════════════════╣
 ║ QUICK START:                                           ║
-║ curl -X POST /api/auth/login \                          ║
-║   -H "Content-Type: application/json" \                 ║
+║ curl -X POST /api/auth/login                           ║
+║   -H "Content-Type: application/json"                  ║
 ║   -d '{"email":"dev@reloop.sh","password":"pass"}'     ║
 ╠════════════════════════════════════════════════════════╣
 ║ - SUPPORT                                              ║

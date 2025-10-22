@@ -2,91 +2,91 @@ import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import type { DNSTypes } from "@reloop/domain/routes/dns/dns.type";
 import {
-    invalidateDNSRecordsCache,
-    invalidateDomainCache,
+	invalidateDNSRecordsCache,
+	invalidateDomainCache,
 } from "@reloop/domain/utils/cache-helpers";
 import { logger } from "@reloop/logger";
 import { and, eq } from "drizzle-orm";
 
 export async function verifyDNSRecordHandler(
-    domain: string,
-    body: DNSTypes.VerifyDNSBody,
-    organizationId: string,
+	domain: string,
+	body: DNSTypes.VerifyDNSBody,
+	organizationId: string,
 ): Promise<DNSTypes.VerifyDNSResponse> {
-    logger.info(
-        {
-            domain,
-            recordType: body.recordType,
-            name: body.name,
-        },
-        "Verifying DNS record",
-    );
+	logger.info(
+		{
+			domain,
+			recordType: body.recordType,
+			name: body.name,
+		},
+		"Verifying DNS record",
+	);
 
-    try {
-        const domainRecord = await db
-            .select({ id: schema.domain.id })
-            .from(schema.domain)
-            .where(eq(schema.domain.domain, domain))
-            .limit(1);
+	try {
+		const domainRecord = await db
+			.select({ id: schema.domain.id })
+			.from(schema.domain)
+			.where(eq(schema.domain.domain, domain))
+			.limit(1);
 
-        if (domainRecord.length === 0 || !domainRecord[0]) {
-            logger.warn({ domain }, "Domain not found when verifying DNS record");
-            return { verified: false };
-        }
+		if (domainRecord.length === 0 || !domainRecord[0]) {
+			logger.warn({ domain }, "Domain not found when verifying DNS record");
+			return { verified: false };
+		}
 
-        await db
-            .update(schema.domainDnsRecord)
-            .set({
-                isVerified: true,
-                status: "active",
-                updatedAt: new Date()
-            })
-            .where(
-                and(
-                    eq(schema.domainDnsRecord.domainId, domainRecord[0].id),
-                    eq(
-                        schema.domainDnsRecord.recordType,
-                        body.recordType as
-                        | "A"
-                        | "AAAA"
-                        | "CNAME"
-                        | "MX"
-                        | "TXT"
-                        | "NS"
-                        | "SRV"
-                        | "CAA"
-                        | "SPF"
-                        | "DKIM"
-                        | "DMARC",
-                    ),
-                    eq(schema.domainDnsRecord.name, body.name),
-                ),
-            );
+		await db
+			.update(schema.domainDnsRecord)
+			.set({
+				isVerified: true,
+				status: "active",
+				updatedAt: new Date(),
+			})
+			.where(
+				and(
+					eq(schema.domainDnsRecord.domainId, domainRecord[0].id),
+					eq(
+						schema.domainDnsRecord.recordType,
+						body.recordType as
+							| "A"
+							| "AAAA"
+							| "CNAME"
+							| "MX"
+							| "TXT"
+							| "NS"
+							| "SRV"
+							| "CAA"
+							| "SPF"
+							| "DKIM"
+							| "DMARC",
+					),
+					eq(schema.domainDnsRecord.name, body.name),
+				),
+			);
 
-        logger.info(
-            {
-                domain,
-                recordType: body.recordType,
-                name: body.name,
-            },
-            "DNS record marked as verified",
-        );
+		logger.info(
+			{
+				domain,
+				recordType: body.recordType,
+				name: body.name,
+			},
+			"DNS record marked as verified",
+		);
 
-        // Invalidate caches after successful verification
-        await invalidateDomainCache(domain, organizationId);
-        await invalidateDNSRecordsCache(domain, organizationId);
+		// Invalidate caches after successful verification
+		await invalidateDomainCache(domain, organizationId);
+		await invalidateDNSRecordsCache(domain, organizationId);
 
-        return { verified: true };
-    } catch (error) {
-        logger.error(
-            {
-                domain,
-                recordType: body.recordType,
-                name: body.name,
-                error: error instanceof Error ? error.message : String(error),
-            },
-            "Error verifying DNS record",
-        );
-        return { verified: false };
-    }
+		return { verified: true };
+	} catch (error) {
+		logger.error(
+			{
+				domain,
+				recordType: body.recordType,
+				name: body.name,
+				error: error instanceof Error ? error.message : String(error),
+			},
+			"Error verifying DNS record",
+		);
+		return { verified: false };
+	}
 }

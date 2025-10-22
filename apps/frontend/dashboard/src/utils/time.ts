@@ -10,21 +10,21 @@ dayjs.extend(duration);
 
 // Customize the relative time locale for better formatting
 dayjs.updateLocale("en", {
-    relativeTime: {
-        future: "in %s",
-        past: "%s ago",
-        s: "a few seconds",
-        m: "1 min",
-        mm: "%d min",
-        h: "1 hour",
-        hh: "%d hours",
-        d: "1 day",
-        dd: "%d days",
-        M: "1 month",
-        MM: "%d months",
-        y: "1 year",
-        yy: "%d years",
-    },
+	relativeTime: {
+		future: "in %s",
+		past: "%s ago",
+		s: "a few seconds",
+		m: "1 min",
+		mm: "%d min",
+		h: "1 hour",
+		hh: "%d hours",
+		d: "1 day",
+		dd: "%d days",
+		M: "1 month",
+		MM: "%d months",
+		y: "1 year",
+		yy: "%d years",
+	},
 });
 
 /**
@@ -33,9 +33,9 @@ dayjs.updateLocale("en", {
  * @returns Formatted relative time string
  */
 export const formatRelativeTime = (
-    date: string | Date | dayjs.Dayjs,
+	date: string | Date | dayjs.Dayjs,
 ): string => {
-    return dayjs(date).fromNow();
+	return dayjs(date).fromNow();
 };
 
 /**
@@ -45,37 +45,37 @@ export const formatRelativeTime = (
  * @returns Formatted relative time string
  */
 export const formatRelativeTimeWithOptions = (
-    date: string | Date | dayjs.Dayjs,
-    options: {
-        /** Whether to show "just now" for very recent times */
-        showJustNow?: boolean;
-        /** Threshold in seconds for "just now" (default: 30) */
-        justNowThreshold?: number;
-        /** Whether to show "today" for same day */
-        showToday?: boolean;
-    } = {},
+	date: string | Date | dayjs.Dayjs,
+	options: {
+		/** Whether to show "just now" for very recent times */
+		showJustNow?: boolean;
+		/** Threshold in seconds for "just now" (default: 30) */
+		justNowThreshold?: number;
+		/** Whether to show "today" for same day */
+		showToday?: boolean;
+	} = {},
 ): string => {
-    const {
-        showJustNow = true,
-        justNowThreshold = 30,
-        showToday = false,
-    } = options;
+	const {
+		showJustNow = true,
+		justNowThreshold = 30,
+		showToday = false,
+	} = options;
 
-    const now = dayjs();
-    const targetDate = dayjs(date);
-    const diffInSeconds = now.diff(targetDate, "second");
+	const now = dayjs();
+	const targetDate = dayjs(date);
+	const diffInSeconds = now.diff(targetDate, "second");
 
-    // Show "just now" for very recent times
-    if (showJustNow && diffInSeconds < justNowThreshold) {
-        return "just now";
-    }
+	// Show "just now" for very recent times
+	if (showJustNow && diffInSeconds < justNowThreshold) {
+		return "just now";
+	}
 
-    // Show "today" for same day
-    if (showToday && targetDate.isSame(now, "day")) {
-        return "today";
-    }
+	// Show "today" for same day
+	if (showToday && targetDate.isSame(now, "day")) {
+		return "today";
+	}
 
-    return targetDate.fromNow();
+	return targetDate.fromNow();
 };
 
 /**
@@ -84,32 +84,32 @@ export const formatRelativeTimeWithOptions = (
  * @returns Human-readable relative time string
  */
 export const formatHumanRelativeTime = (
-    date: string | Date | dayjs.Dayjs,
+	date: string | Date | dayjs.Dayjs,
 ): string => {
-    const targetDate = dayjs(date);
-    const now = dayjs();
-    const diffInMinutes = now.diff(targetDate, "minute");
-    const diffInHours = now.diff(targetDate, "hour");
-    const diffInDays = now.diff(targetDate, "day");
-    const diffInMonths = now.diff(targetDate, "month");
-    const diffInYears = now.diff(targetDate, "year");
+	const targetDate = dayjs(date);
+	const now = dayjs();
+	const diffInMinutes = now.diff(targetDate, "minute");
+	const diffInHours = now.diff(targetDate, "hour");
+	const diffInDays = now.diff(targetDate, "day");
+	const diffInMonths = now.diff(targetDate, "month");
+	const diffInYears = now.diff(targetDate, "year");
 
-    if (diffInMinutes < 1) {
-        return "just now";
-    }
-    if (diffInMinutes < 60) {
-        return `${diffInMinutes} min ago`;
-    }
-    if (diffInHours < 24) {
-        return `${diffInHours} hour${diffInHours === 1 ? "" : "s"} ago`;
-    }
-    if (diffInDays < 30) {
-        return `${diffInDays} day${diffInDays === 1 ? "" : "s"} ago`;
-    }
-    if (diffInMonths < 12) {
-        return `${diffInMonths} month${diffInMonths === 1 ? "" : "s"} ago`;
-    }
-    return `${diffInYears} year${diffInYears === 1 ? "" : "s"} ago`;
+	if (diffInMinutes < 1) {
+		return "just now";
+	}
+	if (diffInMinutes < 60) {
+		return `${diffInMinutes} min ago`;
+	}
+	if (diffInHours < 24) {
+		return `${diffInHours} hour${diffInHours === 1 ? "" : "s"} ago`;
+	}
+	if (diffInDays < 30) {
+		return `${diffInDays} day${diffInDays === 1 ? "" : "s"} ago`;
+	}
+	if (diffInMonths < 12) {
+		return `${diffInMonths} month${diffInMonths === 1 ? "" : "s"} ago`;
+	}
+	return `${diffInYears} year${diffInYears === 1 ? "" : "s"} ago`;
 };
 
 /**
@@ -119,11 +119,11 @@ export const formatHumanRelativeTime = (
  * @returns Whether the date is within the range
  */
 export const isWithinTimeRange = (
-    date: string | Date | dayjs.Dayjs,
-    range: string,
+	date: string | Date | dayjs.Dayjs,
+	range: string,
 ): boolean => {
-    const targetDate = dayjs(date);
-    const now = dayjs();
-    const rangeDate = now.subtract(dayjs.duration(range));
-    return targetDate.isAfter(rangeDate);
+	const targetDate = dayjs(date);
+	const now = dayjs();
+	const rangeDate = now.subtract(dayjs.duration(range));
+	return targetDate.isAfter(rangeDate);
 };

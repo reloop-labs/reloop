@@ -45,12 +45,12 @@ export const auth = betterAuth({
 				dev,
 				marketing,
 			},
-			sendInvitationEmail: async () => { },
+			sendInvitationEmail: async () => {},
 		}),
 		openAPI({ path: "/docs" }),
 	],
 });
 
 export type AuthInstance = typeof auth;
-export type User = typeof auth.$Infer.Session.user
-export type Session = typeof auth.$Infer.Session
+export type User = typeof auth.$Infer.Session.user;
+export type Session = typeof auth.$Infer.Session;

@@ -86,7 +86,7 @@ const MailboxesPage = () => {
 				<div className="mx-auto flex max-w-3xl items-center justify-between">
 					<div className="flex items-center gap-4 py-10">
 						<div>
-							<h1 className="font-medium text-title-h4 ">Mailboxes</h1>
+							<h1 className="font-medium text-title-h4">Mailboxes</h1>
 						</div>
 					</div>
 					<Button.Root

@@ -109,7 +109,7 @@ export class RedisCache {
 			const fullPattern = this.getKey(pattern);
 			const keys = await redis.keys(fullPattern);
 			// Remove the prefix from the returned keys
-			return keys.map(key => key.replace(`${this.prefix}:`, ''));
+			return keys.map((key) => key.replace(`${this.prefix}:`, ""));
 		} catch (error) {
 			console.error(
 				`Redis keys error for ${this.prefix} cache, pattern "${pattern}":`,
@@ -124,7 +124,7 @@ export class RedisCache {
 		try {
 			const redis = await this.getRedisClient();
 			if (keys.length === 0) return;
-			const prefixedKeys = keys.map(key => this.getKey(key));
+			const prefixedKeys = keys.map((key) => this.getKey(key));
 			await redis.del(prefixedKeys);
 		} catch (error) {
 			console.error(
