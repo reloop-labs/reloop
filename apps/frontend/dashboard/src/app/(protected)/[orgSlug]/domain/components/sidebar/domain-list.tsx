@@ -1,7 +1,13 @@
 "use client";
 import { useUserOrganization } from "@dashboard/providers/org-provider";
+import {
+	getStatusColorClass,
+	getStatusIcon,
+	getStatusLabel,
+} from "@dashboard/utils/domain";
 import type { DomainListResponse } from "@reloop/api";
 import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Kbd from "@reloop/ui/kbd";
@@ -102,12 +108,72 @@ export const DomainListSidebar = () => {
 										<Select.Value placeholder="Status" />
 									</Select.Trigger>
 									<Select.Content className="w-40">
-										<Select.Item value="all">All Status</Select.Item>
-										<Select.Item value="start-verify">Start Verify</Select.Item>
-										<Select.Item value="verifying">Verifying</Select.Item>
-										<Select.Item value="active">Active</Select.Item>
-										<Select.Item value="suspended">Suspended</Select.Item>
-										<Select.Item value="failed">Failed</Select.Item>
+										<Select.Item value="all">
+											<div className="flex items-center gap-2 text-sm">
+												<Icon name="globe" className="h-4 w-4" />
+												All Status
+											</div>
+										</Select.Item>
+										<Select.Item value="start-verify">
+											<div className="flex items-center gap-2 text-sm">
+												<Icon
+													name={getStatusIcon("start-verify")}
+													className={cn(
+														"h-4 w-4",
+														getStatusColorClass("start-verify"),
+													)}
+												/>
+												{getStatusLabel("start-verify")}
+											</div>
+										</Select.Item>
+										<Select.Item value="verifying">
+											<div className="flex items-center gap-2 text-sm">
+												<Icon
+													name={getStatusIcon("verifying")}
+													className={cn(
+														"h-4 w-4",
+														getStatusColorClass("verifying"),
+													)}
+												/>
+												{getStatusLabel("verifying")}
+											</div>
+										</Select.Item>
+										<Select.Item value="active">
+											<div className="flex items-center gap-2 text-sm">
+												<Icon
+													name={getStatusIcon("active")}
+													className={cn(
+														"h-4 w-4",
+														getStatusColorClass("active"),
+													)}
+												/>
+												{getStatusLabel("active")}
+											</div>
+										</Select.Item>
+										<Select.Item value="suspended">
+											<div className="flex items-center gap-2 text-sm">
+												<Icon
+													name={getStatusIcon("suspended")}
+													className={cn(
+														"h-4 w-4",
+														getStatusColorClass("suspended"),
+													)}
+												/>
+												{getStatusLabel("suspended")}
+											</div>
+										</Select.Item>
+										<Select.Item value="failed">
+											<div className="flex items-center gap-2 text-sm">
+												<Icon
+													name={getStatusIcon("failed")}
+													className={cn(
+														"h-4 w-4",
+														getStatusColorClass("failed"),
+													)}
+												/>
+												{getStatusLabel("failed")}
+											</div>
+										</Select.Item>
 									</Select.Content>
 								</Select.Root>
 							</div>
