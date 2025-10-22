@@ -6,6 +6,7 @@ import {
 	getStatusIcon,
 	getStatusLabel,
 } from "@dashboard/utils/domain";
+import { formatRelativeTime } from "@dashboard/utils/time";
 import type { Domain } from "@reloop/api/types";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
@@ -38,15 +39,6 @@ export const DomainTable = ({
 	const { push } = useUserOrganization();
 	const [, setDeleteId] = useQueryState("delete");
 
-	const formatDate = (dateString: string) => {
-		const date = new Date(dateString);
-		return date.toLocaleDateString("en-US", {
-			month: "short",
-			day: "numeric",
-			year: "numeric",
-		});
-	};
-
 	const handleDeleteDomain = (domainId: string) => {
 		setDeleteId(domainId);
 	};
@@ -58,7 +50,7 @@ export const DomainTable = ({
 	return (
 		<AnimatePresence mode="wait">
 			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-200 text-paragraph-sm shadow-regular-md ring-stroke-soft-200 ring-inset">
-				<div className="grid grid-cols-[1fr_minmax(120px,auto)_minmax(100px,auto)_minmax(40px,auto)]">
+				<div className="grid grid-cols-[1fr_minmax(200px,auto)_minmax(100px,auto)_minmax(40px,auto)]">
 					<div className="bg-bg-weak-50 pl-5 font-medium text-text-sub-600">
 						<div className="py-2.5">Domain</div>
 					</div>
@@ -66,7 +58,7 @@ export const DomainTable = ({
 						<div className="py-2.5">Status</div>
 					</div>
 					<div className="bg-bg-weak-50 font-medium text-text-sub-600">
-						<div className="py-2.5">Created</div>
+						<div className="py-2.5">Created At</div>
 					</div>
 					<div className="bg-bg-weak-50 font-medium text-text-sub-600">
 						<div className="py-2.5" />
@@ -116,7 +108,7 @@ export const DomainTable = ({
 														getStatusColorClass(domain.status),
 													)}
 												/>
-												<span className="text-label-sm text-text-strong-950">
+												<span className="font-medium text-label-sm text-text-strong-950">
 													{domain.domain}
 												</span>
 											</Link>
@@ -129,7 +121,7 @@ export const DomainTable = ({
 										>
 											<div
 												className={cn(
-													"flex items-center gap-2.5 rounded-lg px-2.5 py-0.5 font-medium text-label-xs capitalize",
+													"flex items-center gap-2.5 rounded-lg py-0.5 pl-3 font-medium text-label-xs capitalize",
 													getStatusColorClass(domain.status),
 												)}
 											>
@@ -146,7 +138,7 @@ export const DomainTable = ({
 											{...getAnimationProps(index + 1, 2)}
 											className="text-label-sm text-text-strong-950"
 										>
-											{formatDate(domain.createdAt)}
+											{formatRelativeTime(domain.createdAt)}
 										</motion.span>
 									</div>
 									<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
