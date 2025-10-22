@@ -1,7 +1,7 @@
 "use client";
 
 import { getAnimationProps } from "@dashboard/utils/domain";
-import type { DNSRecord } from "@reloop/api/types";
+import type { DNSRecord, DNSRecordStatus } from "@reloop/api/types";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import {
@@ -10,34 +10,33 @@ import {
 } from "@reloop/ui/status-badge";
 import { AnimatePresence, motion } from "motion/react";
 
-function getStatusBadgeStatus(record: DNSRecord) {
-	if (record.isVerified && record.isActive) {
-		return "completed";
+function getStatusDisplay(status: DNSRecordStatus) {
+	switch (status) {
+		case "active":
+			return {
+				label: "Active",
+				icon: "check-circle",
+				variant: "light" as const,
+			};
+		case "verifying":
+			return { label: "Verifying", icon: "clock", variant: "light" as const };
+		case "start-verify":
+			return { label: "Pending", icon: "clock", variant: "light" as const };
+		case "failed":
+			return {
+				label: "Failed",
+				icon: "cross-circle",
+				variant: "light" as const,
+			};
+		case "suspended":
+			return {
+				label: "Suspended",
+				icon: "pause-circle",
+				variant: "light" as const,
+			};
+		default:
+			return { label: "Pending", icon: "clock", variant: "light" as const };
 	}
-	if (record.isVerified && !record.isActive) {
-		return "pending";
-	}
-	return "failed";
-}
-
-function getStatusIcon(record: DNSRecord) {
-	if (record.isVerified && record.isActive) {
-		return "check";
-	}
-	if (record.isVerified && !record.isActive) {
-		return "clock";
-	}
-	return "x";
-}
-
-function getStatusLabel(record: DNSRecord) {
-	if (record.isVerified && record.isActive) {
-		return "Active";
-	}
-	if (record.isVerified && !record.isActive) {
-		return "Pending";
-	}
-	return "Failed";
 }
 
 interface DNSRecordTableProps {
@@ -215,14 +214,13 @@ export const DNSRecordTable = ({
 											className="flex items-center"
 										>
 											<StatusBadgeRoot
-												variant="light"
-												status={getStatusBadgeStatus(record)}
+												variant={getStatusDisplay(record.status).variant}
 											>
 												<StatusBadgeIcon
 													as={Icon}
-													name={getStatusIcon(record)}
+													name={getStatusDisplay(record.status).icon}
 												/>
-												{getStatusLabel(record)}
+												{getStatusDisplay(record.status).label}
 											</StatusBadgeRoot>
 										</motion.div>
 									</div>

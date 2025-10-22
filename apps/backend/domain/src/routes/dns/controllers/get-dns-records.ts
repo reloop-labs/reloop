@@ -37,6 +37,7 @@ export async function getDNSRecordsHandler(
                     priority: record.priority ?? undefined,
                     description: record.description ?? undefined,
                     isVerified: record.isVerified,
+                    status: record.status,
                 }));
             },
             { domain, organizationId, operation: "getDNSRecords" },

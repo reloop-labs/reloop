@@ -17,6 +17,8 @@ export interface GeneratedDNSData {
     dmarcRecord: string;
 }
 
+export type DNSRecordStatus = "start-verify" | "verifying" | "active" | "suspended" | "failed";
+
 export interface DNSRecordData {
     recordType: string;
     name: string;
@@ -25,6 +27,7 @@ export interface DNSRecordData {
     priority?: number;
     description?: string;
     isVerified: boolean;
+    status: DNSRecordStatus;
 }
 
 /**
@@ -122,6 +125,7 @@ export async function insertDNSRecords(
             priority: record.priority,
             description: record.description,
             isVerified: record.isVerified,
+            status: record.status,
             domain,
         });
     }
@@ -158,6 +162,7 @@ export function convertToDNSRecordData(
         priority: record.priority,
         description: record.description,
         isVerified: false,
+        status: "start-verify",
     }));
 }
 

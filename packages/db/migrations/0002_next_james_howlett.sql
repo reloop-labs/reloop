@@ -1,0 +1,1 @@
+ALTER TABLE "domain_dns_record" ADD COLUMN "status" "domain_status" DEFAULT 'start-verify' NOT NULL;

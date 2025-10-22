@@ -20,6 +20,7 @@ export namespace DNSModel {
         priority: t.Optional(t.Number()),
         description: t.Optional(t.String()),
         isVerified: t.Boolean(),
+        status: t.String(),
     }));
 
     export const dkimKeysResponse = t.Object({

@@ -28,6 +28,8 @@ export namespace DNSTypes {
         description?: string;
     }
 
+    export type DNSRecordStatus = "start-verify" | "verifying" | "active" | "suspended" | "failed";
+
     export interface DNSRecordData {
         recordType: string;
         name: string;
@@ -36,6 +38,7 @@ export namespace DNSTypes {
         priority?: number;
         description?: string;
         isVerified: boolean;
+        status: DNSRecordStatus;
     }
 
 }

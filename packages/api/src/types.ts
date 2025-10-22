@@ -28,6 +28,8 @@ export interface Domain {
     updatedAt: string;
 }
 
+export type DNSRecordStatus = "start-verify" | "verifying" | "active" | "suspended" | "failed";
+
 export interface DNSRecord {
     id: string;
     recordType: string;
@@ -41,6 +43,7 @@ export interface DNSRecord {
     isVerified: boolean;
     verificationError?: string;
     isActive: boolean;
+    status: DNSRecordStatus;
     createdAt: string;
     updatedAt: string;
 }

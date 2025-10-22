@@ -86,6 +86,7 @@ export const domainDnsRecord = pgTable(
             .references(() => user.id, { onDelete: "cascade" }),
         recordType: dnsRecordTypeEnum("record_type").notNull(),
         name: text("name").notNull(),
+        status: domainStatusEnum("status").notNull().default("start-verify"),
         value: text("value").notNull(),
         ttl: integer("ttl").notNull().default(3600),
         priority: integer("priority"),

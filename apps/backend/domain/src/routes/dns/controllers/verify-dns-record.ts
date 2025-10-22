@@ -36,7 +36,11 @@ export async function verifyDNSRecordHandler(
 
         await db
             .update(schema.domainDnsRecord)
-            .set({ isVerified: true, updatedAt: new Date() })
+            .set({
+                isVerified: true,
+                status: "active",
+                updatedAt: new Date()
+            })
             .where(
                 and(
                     eq(schema.domainDnsRecord.domainId, domainRecord[0].id),
