@@ -41,6 +41,7 @@ export function formatDomainResponse(
         isVerified: boolean;
         verificationError: string | null;
         isActive: boolean;
+        status: "start-verify" | "verifying" | "active" | "suspended" | "failed";
         deletedAt: Date | null;
         createdAt: Date;
         updatedAt: Date;
@@ -77,6 +78,7 @@ export function formatDomainResponse(
             isVerified: record.isVerified,
             verificationError: record.verificationError,
             isActive: record.isActive,
+            status: record.status,
             createdAt: record.createdAt.toISOString(),
             updatedAt: record.updatedAt.toISOString(),
         })),

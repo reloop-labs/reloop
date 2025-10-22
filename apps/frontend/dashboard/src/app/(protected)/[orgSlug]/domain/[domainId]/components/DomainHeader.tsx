@@ -1,6 +1,7 @@
 "use client";
 
-import type { Domain } from "@reloop/api/types";
+import { getStatusColorClass, getStatusIcon } from "@dashboard/utils/domain";
+import type { Domain, DomainStatus } from "@reloop/api/types";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import {
@@ -16,42 +17,20 @@ import { DeleteDomainModal } from "../../components/delete-domain";
 interface DomainHeaderProps {
 	domainId: string;
 	lastUpdated?: string;
-	status?: "pending" | "verified" | "failed";
+	status?: DomainStatus;
 	isLoading?: boolean;
 	isFailed?: boolean;
 }
 
 export const DomainHeader = ({
 	domainId,
-	lastUpdated = "20 minutes ago",
-	status,
+	lastUpdated,
+	status = "start-verify",
 	isLoading,
 	isFailed,
 }: DomainHeaderProps) => {
 	const { back } = useRouter();
 	const [, setDeleteId] = useQueryState("delete");
-	const getStatusColor = (status?: "pending" | "verified" | "failed") => {
-		switch (status) {
-			case "verified":
-				return "text-success-base";
-			case "failed":
-				return "text-error-base";
-			case "pending":
-			default:
-				return "text-warning-base";
-		}
-	};
-
-	const getStatusIcon = (status?: "pending" | "verified" | "failed") => {
-		switch (status) {
-			case "verified":
-				return "check-circle";
-			case "failed":
-				return "cross-circle";
-			default:
-				return "time";
-		}
-	};
 
 	return (
 		<div className="pt-10 pb-8">
@@ -94,7 +73,7 @@ export const DomainHeader = ({
 								•
 							</p>
 							<div
-								className={`flex items-center gap-1 ${getStatusColor(status)}`}
+								className={`flex items-center gap-1 ${getStatusColorClass(status)}`}
 							>
 								<Icon name={getStatusIcon(status)} className="h-3.5 w-3.5" />
 								<p className="font-medium text-paragraph-sm capitalize">

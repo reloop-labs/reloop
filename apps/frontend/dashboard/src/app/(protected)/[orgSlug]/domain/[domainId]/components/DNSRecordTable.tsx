@@ -1,43 +1,16 @@
 "use client";
 
-import { getAnimationProps } from "@dashboard/utils/domain";
-import type { DNSRecord, DNSRecordStatus } from "@reloop/api/types";
+import {
+	getAnimationProps,
+	getStatusColorClass,
+	getStatusIcon,
+	getStatusLabel,
+} from "@dashboard/utils/domain";
+import type { DNSRecord } from "@reloop/api/types";
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
-import {
-	Icon as StatusBadgeIcon,
-	Root as StatusBadgeRoot,
-} from "@reloop/ui/status-badge";
 import { AnimatePresence, motion } from "motion/react";
-
-function getStatusDisplay(status: DNSRecordStatus) {
-	switch (status) {
-		case "active":
-			return {
-				label: "Active",
-				icon: "check-circle",
-				variant: "light" as const,
-			};
-		case "verifying":
-			return { label: "Verifying", icon: "clock", variant: "light" as const };
-		case "start-verify":
-			return { label: "Pending", icon: "clock", variant: "light" as const };
-		case "failed":
-			return {
-				label: "Failed",
-				icon: "cross-circle",
-				variant: "light" as const,
-			};
-		case "suspended":
-			return {
-				label: "Suspended",
-				icon: "pause-circle",
-				variant: "light" as const,
-			};
-		default:
-			return { label: "Pending", icon: "clock", variant: "light" as const };
-	}
-}
 
 interface DNSRecordTableProps {
 	records: DNSRecord[];
@@ -213,15 +186,18 @@ export const DNSRecordTable = ({
 											{...getAnimationProps(index + 1, 5)}
 											className="flex items-center"
 										>
-											<StatusBadgeRoot
-												variant={getStatusDisplay(record.status).variant}
+											<div
+												className={cn(
+													"flex items-center gap-2.5 rounded-lg px-2.5 py-0.5 font-medium text-label-xs capitalize",
+													getStatusColorClass(record.status),
+												)}
 											>
-												<StatusBadgeIcon
-													as={Icon}
-													name={getStatusDisplay(record.status).icon}
+												<Icon
+													name={getStatusIcon(record.status)}
+													className="h-3.5 w-3.5"
 												/>
-												{getStatusDisplay(record.status).label}
-											</StatusBadgeRoot>
+												{getStatusLabel(record.status)}
+											</div>
 										</motion.div>
 									</div>
 								</div>

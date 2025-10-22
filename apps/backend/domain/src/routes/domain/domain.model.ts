@@ -47,6 +47,16 @@ export namespace DomainModel {
         verificationError: t.Union([t.String(), t.Null()], { description: "Verification error message" }),
         isActive: t.Boolean({ description: "Whether the record is active" }),
         createdAt: t.String(),
+        status: t.Union(
+            [
+                t.Literal("start-verify"),
+                t.Literal("verifying"),
+                t.Literal("active"),
+                t.Literal("suspended"),
+                t.Literal("failed"),
+            ],
+            { description: "Domain verification status" },
+        ),
         updatedAt: t.String(),
     });
 

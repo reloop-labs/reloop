@@ -1,53 +1,60 @@
 "use client";
 
+import type { DomainStatus } from "@reloop/api/types";
 import * as Alert from "@reloop/ui/alert";
 import { Skeleton } from "@reloop/ui/skeleton";
 
 interface StatusBannerProps {
-	status: "pending" | "success" | "error" | "warning";
+	status: DomainStatus;
 	isLoading?: boolean;
 }
 
 export const StatusBanner = ({ status, isLoading }: StatusBannerProps) => {
 	const getStatusVariant = () => {
 		switch (status) {
-			case "pending":
+			case "start-verify":
 				return "warning";
-			case "success":
+			case "verifying":
 				return "success";
-			case "error":
+			case "active":
 				return "error";
-			case "warning":
+			case "suspended":
 				return "warning";
-			default:
+			case "failed":
 				return "warning";
 		}
 	};
 
 	const getStatusContent = () => {
 		switch (status) {
-			case "pending":
+			case "start-verify":
 				return {
 					title: "Looking for DNS Records in your domain provider...",
 					description:
 						"It may take a few minutes or hours, depending on the DNS provider propagation time.",
 				};
-			case "success":
+			case "verifying":
 				return {
 					title: "DNS Records Found",
 					description: "We found the DNS records in your domain provider.",
 				};
-			case "error":
+			case "active":
 				return {
 					title: "No DNS Records Found",
 					description:
 						"We couldn't find the DNS records in your domain provider. Please check your DNS settings.",
 				};
-			case "warning":
+			case "suspended":
 				return {
 					title: "No DNS Records Found",
 					description:
 						"We couldn't find the DNS records in your domain provider. Please check your DNS settings.",
+				};
+			case "failed":
+				return {
+					title: "Looking for DNS Records in your domain provider...",
+					description:
+						"It may take a few minutes or hours, depending on the DNS provider propagation time.",
 				};
 			default:
 				return {
@@ -60,15 +67,15 @@ export const StatusBanner = ({ status, isLoading }: StatusBannerProps) => {
 
 	const getBorderClass = () => {
 		switch (status) {
-			case "pending":
+			case "start-verify":
 				return "border-warning-base";
-			case "success":
+			case "verifying":
 				return "border-success-base";
-			case "error":
+			case "active":
 				return "border-error-base";
-			case "warning":
+			case "suspended":
 				return "border-warning-base";
-			default:
+			case "failed":
 				return "border-warning-base";
 		}
 	};

@@ -37,35 +37,6 @@ const DomainPage = () => {
 		}
 	};
 
-	// Map domain status to component status
-	const mapDomainStatus = (status: string) => {
-		switch (status) {
-			case "active":
-				return "verified";
-			case "failed":
-				return "failed";
-			default:
-				return "pending";
-		}
-	};
-
-	// Map domain status to banner status
-	const mapBannerStatus = (status: string) => {
-		switch (status) {
-			case "active":
-				return "success";
-			case "failed":
-				return "error";
-			case "start-verify":
-			case "verifying":
-				return "pending";
-			case "suspended":
-				return "warning";
-			default:
-				return "pending";
-		}
-	};
-
 	const dkimSpfRecords =
 		domainData?.dnsRecords?.filter(
 			(record) => record.recordType === "MX" || record.recordType === "TXT",
@@ -98,11 +69,11 @@ const DomainPage = () => {
 		<div className="mx-auto max-w-3xl">
 			<DomainHeader
 				domainId={domainData?.domain || (domainId as string)}
-				status={mapDomainStatus(domainData?.status || "pending")}
+				status={domainData?.status || "start-verify"}
 				isLoading={isLoading}
 			/>
 			<StatusBanner
-				status={mapBannerStatus(domainData?.status || "pending")}
+				status={domainData?.status || "start-verify"}
 				isLoading={isLoading}
 			/>
 			<div className="my-9">
