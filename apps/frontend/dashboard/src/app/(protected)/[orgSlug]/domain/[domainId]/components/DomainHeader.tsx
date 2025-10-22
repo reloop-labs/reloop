@@ -1,6 +1,7 @@
 "use client";
 
 import { getStatusColorClass, getStatusIcon } from "@dashboard/utils/domain";
+import { formatRelativeTime } from "@dashboard/utils/time";
 import type { Domain, DomainStatus } from "@reloop/api/types";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
@@ -67,7 +68,11 @@ export const DomainHeader = ({
 								•
 							</p>
 							<p className="font-medium text-paragraph-sm text-text-sub-600">
-								{isFailed ? "---" : lastUpdated}
+								{isFailed
+									? "---"
+									: lastUpdated
+										? formatRelativeTime(lastUpdated)
+										: "---"}
 							</p>
 							<p className="font-semibold text-paragraph-sm text-text-sub-600">
 								•

@@ -13,15 +13,15 @@ export const StatusBanner = ({ status, isLoading }: StatusBannerProps) => {
 	const getStatusVariant = () => {
 		switch (status) {
 			case "start-verify":
-				return "warning";
+				return "feature";
 			case "verifying":
-				return "success";
+				return "warning";
 			case "active":
-				return "error";
+				return "success";
 			case "suspended":
-				return "warning";
+				return "error";
 			case "failed":
-				return "warning";
+				return "error";
 		}
 	};
 
@@ -29,32 +29,32 @@ export const StatusBanner = ({ status, isLoading }: StatusBannerProps) => {
 		switch (status) {
 			case "start-verify":
 				return {
-					title: "Looking for DNS Records in your domain provider...",
+					title: "Start verifying your domain DNS records",
 					description:
-						"It may take a few minutes or hours, depending on the DNS provider propagation time.",
+						"Once you have added the DNS records, click the button above to verify them.",
 				};
 			case "verifying":
 				return {
-					title: "DNS Records Found",
-					description: "We found the DNS records in your domain provider.",
+					title: "We are verifying the DNS records...",
+					description:
+						"It may take a few minutes or hours, depending on the DNS provider propagation time.",
 				};
 			case "active":
 				return {
-					title: "No DNS Records Found",
+					title: "DNS Records Found",
 					description:
-						"We couldn't find the DNS records in your domain provider. Please check your DNS settings.",
+						"We found the DNS records in your domain provider. We are verifying them now.",
 				};
 			case "suspended":
 				return {
-					title: "No DNS Records Found",
+					title: "We Suspended Your Domain",
 					description:
-						"We couldn't find the DNS records in your domain provider. Please check your DNS settings.",
+						"We suspended your domain because it looks suspicious. Please contact support if you think this is a mistake.",
 				};
 			case "failed":
 				return {
-					title: "Looking for DNS Records in your domain provider...",
-					description:
-						"It may take a few minutes or hours, depending on the DNS provider propagation time.",
+					title: "We couldn't find the DNS records in your domain provider.",
+					description: "Please check your DNS settings and try again.",
 				};
 			default:
 				return {
@@ -68,15 +68,15 @@ export const StatusBanner = ({ status, isLoading }: StatusBannerProps) => {
 	const getBorderClass = () => {
 		switch (status) {
 			case "start-verify":
-				return "border-warning-base";
+				return "";
 			case "verifying":
-				return "border-success-base";
+				return "border-warning-base";
 			case "active":
-				return "border-error-base";
+				return "border-success-base";
 			case "suspended":
-				return "border-warning-base";
+				return "border-error-base";
 			case "failed":
-				return "border-warning-base";
+				return "border-error-base";
 		}
 	};
 

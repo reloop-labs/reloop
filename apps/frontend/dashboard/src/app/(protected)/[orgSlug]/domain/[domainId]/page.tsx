@@ -71,6 +71,7 @@ const DomainPage = () => {
 				domainId={domainData?.domain || (domainId as string)}
 				status={domainData?.status || "start-verify"}
 				isLoading={isLoading}
+				lastUpdated={domainData?.createdAt || undefined}
 			/>
 			<StatusBanner
 				status={domainData?.status || "start-verify"}
