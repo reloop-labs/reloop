@@ -10,13 +10,13 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import * as Kbd from "@reloop/ui/kbd";
 import * as Select from "@reloop/ui/select";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import useSWR from "swr";
 import { DeleteDomainModal } from "../delete-domain";
+import { DomainSDK } from "./domain-sdk";
 import { DomainTable } from "./domain-table";
 import { EmptyState } from "./empty-state";
 
@@ -64,10 +64,7 @@ export const DomainListSidebar = () => {
 						<Icon name="plus" className="h-4 w-4" />
 						Add domain
 					</Link>
-					<Button.Root variant="neutral" size="xsmall" mode="stroke">
-						<Icon name="code" className="h-4 w-4" />
-						API <Kbd.Root>P</Kbd.Root>
-					</Button.Root>
+					<DomainSDK />
 				</div>
 			</div>
 			<div>
