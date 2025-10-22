@@ -2,6 +2,7 @@
 import { useUserOrganization } from "@dashboard/providers/org-provider";
 import { Icon as BadgeIcon, Root as BadgeRoot } from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import {
 	Content as PopoverContent,
@@ -52,19 +53,19 @@ const getStatusLabel = (status: Domain["status"]) => {
 	}
 };
 
-const getStatusColor = (status: Domain["status"]) => {
+const getStatusColorClass = (status: Domain["status"]) => {
 	switch (status) {
 		case "start-verify":
-			return "gray";
+			return "text-text-sub-600";
 		case "verifying":
-			return "orange";
+			return "text-warning-base";
 		case "active":
-			return "green";
+			return "text-success-base";
 		case "failed":
 		case "suspended":
-			return "red";
+			return "text-error-base";
 		default:
-			return "gray";
+			return "text-text-sub-600";
 	}
 };
 
@@ -73,7 +74,7 @@ const getStatusIcon = (status: Domain["status"]) => {
 		case "start-verify":
 			return "minus-circle";
 		case "verifying":
-			return "clock";
+			return "time";
 		case "active":
 			return "check-circle";
 		case "failed":
@@ -179,7 +180,10 @@ export const DomainTable = ({
 											>
 												<Icon
 													name="globe"
-													className="h-4 w-4 text-text-sub-600"
+													className={cn(
+														"h-4 w-4",
+														getStatusColorClass(domain.status),
+													)}
 												/>
 												<span className="text-label-sm text-text-strong-950">
 													{domain.domain}
@@ -192,17 +196,19 @@ export const DomainTable = ({
 											{...getAnimationProps(index + 1, 1)}
 											className="flex items-center gap-2"
 										>
-											<BadgeRoot
-												variant="lighter"
-												color={getStatusColor(domain.status)}
-												className="rounded-sm p-2 text-label-xs capitalize"
+											<div
+												className={cn(
+													"flex items-center gap-2.5 rounded-lg px-2.5 py-0.5 font-medium text-label-xs capitalize",
+													getStatusColorClass(domain.status),
+												)}
 											>
 												<BadgeIcon
 													as={Icon}
 													name={getStatusIcon(domain.status)}
+													className="h-3.5 w-3.5"
 												/>
 												{getStatusLabel(domain.status)}
-											</BadgeRoot>
+											</div>
 										</motion.div>
 									</div>
 									<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">

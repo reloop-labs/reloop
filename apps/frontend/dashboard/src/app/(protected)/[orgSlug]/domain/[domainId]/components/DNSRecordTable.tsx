@@ -2,6 +2,10 @@
 
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
+import {
+	Icon as StatusBadgeIcon,
+	Root as StatusBadgeRoot,
+} from "@reloop/ui/status-badge";
 import { AnimatePresence, motion } from "motion/react";
 
 interface DNSRecord {
@@ -12,6 +16,7 @@ interface DNSRecord {
 	priority?: number;
 	description?: string;
 	isVerified: boolean;
+	status?: string;
 }
 
 function getAnimationProps(row: number, column: number) {
@@ -25,6 +30,40 @@ function getAnimationProps(row: number, column: number) {
 			ease: [0.65, 0, 0.35, 1] as const,
 		},
 	};
+}
+
+function getStatusBadgeStatus(status?: string) {
+	switch (status?.toLowerCase()) {
+		case "active":
+		case "completed":
+			return "completed";
+		case "pending":
+			return "pending";
+		case "error":
+		case "failed":
+			return "failed";
+		default:
+			return "completed";
+	}
+}
+
+function getStatusIcon(status?: string) {
+	switch (status?.toLowerCase()) {
+		case "active":
+		case "completed":
+			return "check";
+		case "pending":
+			return "clock";
+		case "error":
+		case "failed":
+			return "x";
+		default:
+			return "check";
+	}
+}
+
+function getStatusLabel(status?: string) {
+	return status || "Active";
 }
 
 interface DNSRecordTableProps {
@@ -45,7 +84,7 @@ export const DNSRecordTable = ({
 	return (
 		<AnimatePresence mode="wait">
 			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-200 text-paragraph-sm shadow-regular-md ring-stroke-soft-200 ring-inset">
-				<div className="grid grid-cols-[minmax(80px,auto)_minmax(192px,auto)_1fr_minmax(80px,auto)_minmax(80px,auto)]">
+				<div className="grid grid-cols-[minmax(80px,auto)_minmax(120px,auto)_1fr_minmax(80px,auto)_minmax(80px,auto)_minmax(100px,auto)]">
 					<div className="bg-bg-weak-50 pl-5 font-medium text-text-sub-600">
 						<div className="py-2.5">Type</div>
 					</div>
@@ -61,6 +100,9 @@ export const DNSRecordTable = ({
 					<div className="bg-bg-weak-50 font-medium text-text-sub-600">
 						<div className="py-2.5">TTL</div>
 					</div>
+					<div className="bg-bg-weak-50 font-medium text-text-sub-600">
+						<div className="py-2.5">Status</div>
+					</div>
 					{isLoading
 						? // Skeleton loading state
 							Array.from({ length: loadingRows }).map((_, index) => (
@@ -71,8 +113,8 @@ export const DNSRecordTable = ({
 										</div>
 									</div>
 									<div className="flex min-w-0 items-center border-stroke-soft-200 border-t py-2.5 pr-4">
-										<div className="max-w-36 flex-1">
-											<Skeleton className="my-1 h-4 w-24" />
+										<div className="max-w-24 flex-1">
+											<Skeleton className="my-1 h-4 w-20" />
 										</div>
 									</div>
 									<div className="flex min-w-0 items-center border-stroke-soft-200 border-t py-2.5 pr-4">
@@ -85,6 +127,9 @@ export const DNSRecordTable = ({
 									</div>
 									<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
 										<Skeleton className="h-4 w-12" />
+									</div>
+									<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
+										<Skeleton className="h-4 w-16" />
 									</div>
 								</div>
 							))
@@ -107,7 +152,7 @@ export const DNSRecordTable = ({
 											}
 											className="flex w-full min-w-0 cursor-pointer items-center gap-2"
 										>
-											<div className="max-w-36 flex-1 truncate text-left text-label-sm text-text-strong-950">
+											<div className="max-w-24 flex-1 truncate text-left text-label-sm text-text-strong-950">
 												{record.name}
 											</div>
 
@@ -189,6 +234,23 @@ export const DNSRecordTable = ({
 										>
 											{record.ttl}
 										</motion.span>
+									</div>
+									<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
+										<motion.div
+											{...getAnimationProps(index + 1, 5)}
+											className="flex items-center"
+										>
+											<StatusBadgeRoot
+												variant="light"
+												status={getStatusBadgeStatus(record.status)}
+											>
+												<StatusBadgeIcon
+													as={Icon}
+													name={getStatusIcon(record.status)}
+												/>
+												{getStatusLabel(record.status)}
+											</StatusBadgeRoot>
+										</motion.div>
 									</div>
 								</div>
 							))}
