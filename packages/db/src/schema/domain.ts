@@ -14,6 +14,10 @@ import {
 } from "drizzle-orm/pg-core";
 import { organization, user } from "./auth";
 
+// Custom ID generation functions with prefixes
+const createDomainId = () => `dom_${createId()}`;
+const createDnsRecordId = () => `dns_rec_${createId()}`;
+
 export const domainTypeEnum = pgEnum("domain_type", [
 	"custom",
 	"subdomain",
@@ -44,7 +48,7 @@ export const domain = pgTable(
 	"domain",
 	{
 		id: text("id")
-			.$defaultFn(() => createId())
+			.$defaultFn(() => createDomainId())
 			.primaryKey(),
 		domain: varchar("domain", { length: 255 }).notNull(),
 		organizationId: text("organization_id")
@@ -102,7 +106,7 @@ export const domainDnsRecord = pgTable(
 	"domain_dns_record",
 	{
 		id: text("id")
-			.$defaultFn(() => createId())
+			.$defaultFn(() => createDnsRecordId())
 			.primaryKey(),
 		domainId: text("domain_id")
 			.notNull()
