@@ -20,7 +20,8 @@
 			"@reloop/cache": ["../../packages/cache/src/*"],
 			"@reloop/ui": ["../../packages/ui/src/*"],
 			"@reloop/auth": ["../../packages/auth/src/*"],
-			"@reloop/domain": ["../../apps/backend/domain/src/*"]
+			"@reloop/domain": ["../../apps/backend/domain/src/*"],
+			"@reloop/webhook": ["../../apps/backend/webhook/src/*"]
 		}
 	}
 }
