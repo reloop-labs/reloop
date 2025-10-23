@@ -13,13 +13,11 @@ import {
 } from "drizzle-orm/pg-core";
 import { organization, user } from "./auth";
 
-// Custom ID generation functions with prefixes
-const createWebhookEventId = () => `whk_evt_${createId()}`;
-const createWebhookId = () => `whk_${createId()}`;
-const createWebhookSubscriptionId = () => `whk_sub_${createId()}`;
-const createWebhookDeliveryId = () => `whk_dli_${createId()}`;
+const createWebhookEventId = () => `whevt_${createId()}`;
+const createWebhookId = () => `wh_${createId()}`;
+const createWebhookSubscriptionId = () => `whsub_${createId()}`;
+const createWebhookDeliveryId = () => `whde_${createId()}`;
 
-// Enums for webhook status and event categories
 export const webhookStatusEnum = pgEnum("webhook_status", [
     "active",
     "paused",
@@ -34,8 +32,6 @@ export const webhookDeliveryStatusEnum = pgEnum("webhook_delivery_status", [
     "retrying",
 ]);
 
-
-// Master table for webhook events
 export const webhookEvent = pgTable(
     "webhook_event",
     {
@@ -59,7 +55,6 @@ export const webhookEvent = pgTable(
     ],
 );
 
-// Main webhook configuration table
 export const webhook = pgTable(
     "webhook",
     {
@@ -104,7 +99,6 @@ export const webhook = pgTable(
     ],
 );
 
-// Junction table for webhook event subscriptions
 export const webhookEventSubscription = pgTable(
     "webhook_event_subscription",
     {
@@ -176,7 +170,6 @@ export const webhookDelivery = pgTable(
     ],
 );
 
-// Relations
 export const webhookEventRelations = relations(webhookEvent, ({ many }) => ({
     subscriptions: many(webhookEventSubscription),
     deliveries: many(webhookDelivery),
@@ -223,7 +216,6 @@ export const webhookDeliveryRelations = relations(
     }),
 );
 
-// Export tables and types
 export const webhookTables = {
     webhookEvent,
     webhook,

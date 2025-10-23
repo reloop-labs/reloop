@@ -12,7 +12,7 @@ import {
 import { organization, user } from "./auth";
 
 // Custom ID generation functions with prefixes
-const createAudienceGroupId = () => `aud_grp_${createId()}`;
+const createAudienceGroupId = () => `audgrp_${createId()}`;
 const createAudienceId = () => `aud_${createId()}`;
 
 export const audienceStatusEnum = pgEnum("audience_status", [

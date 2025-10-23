@@ -15,8 +15,8 @@ import {
 import { organization, user } from "./auth";
 
 // Custom ID generation functions with prefixes
-const createDomainId = () => `dom_${createId()}`;
-const createDnsRecordId = () => `dns_rec_${createId()}`;
+const createDomainId = () => `dm_${createId()}`;
+const createDnsRecordId = () => `dnsrec_${createId()}`;
 
 export const domainTypeEnum = pgEnum("domain_type", [
 	"custom",
