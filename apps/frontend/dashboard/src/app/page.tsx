@@ -18,7 +18,6 @@ const Home = () => {
 		const handleRedirect = async () => {
 			if (!isPending && !organizationsLoading && organizations && session) {
 				if (!organizations || organizations.length === 0) {
-					console.log("No organizations found");
 					return;
 				}
 				if (!activeOrganizationId) {

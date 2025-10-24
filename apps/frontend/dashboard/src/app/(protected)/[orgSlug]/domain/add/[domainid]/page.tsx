@@ -1,11 +1,11 @@
 "use client";
+import { useUserOrganization } from "@dashboard/providers/org-provider";
 import type { DomainResponse } from "@reloop/api";
 import * as Alert from "@reloop/ui/alert";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import { useParams, useRouter } from "next/navigation";
 import * as React from "react";
-import { useUserOrganization } from "src/providers/org-provider";
 import useSWR from "swr";
 import { DNSRecordTable } from "../../[domainId]/components/DNSRecordTable";
 
@@ -14,7 +14,6 @@ const NewDomainPage = () => {
 	const { push } = useUserOrganization();
 	const { domainId } = useParams();
 	const { back } = useRouter();
-	console.log("🚀 ~ NewDomainPage ~ domainId:", domainId);
 
 	const { data: domainData, isLoading } = useSWR<DomainResponse>(
 		domainId ? `/api/domain/v1/${domainId}` : null,
@@ -34,8 +33,8 @@ const NewDomainPage = () => {
 					return newSet;
 				});
 			}, 2000);
-		} catch (err) {
-			console.error("Failed to copy text: ", err);
+		} catch {
+			// Handle copy error silently
 		}
 	};
 
@@ -115,7 +114,7 @@ const NewDomainPage = () => {
 						size="xsmall"
 						variant="neutral"
 					>
-						I have add the DNS records
+						I have added the DNS records
 					</Button.Root>
 					<Button.Root
 						variant="neutral"

@@ -20,10 +20,9 @@ const SWRProvider = ({ children }: { children: React.ReactNode }) => {
 				revalidateOnReconnect: true,
 				revalidateOnMount: true,
 				onError: (error) => {
+					// Handle SWR errors silently or with proper error reporting
 					if (axios.isAxiosError(error)) {
-						console.error("SWR Error:", error.response?.data || error.message);
-					} else {
-						console.error("SWR Error:", error);
+						// Log to error reporting service if needed
 					}
 				},
 			}}

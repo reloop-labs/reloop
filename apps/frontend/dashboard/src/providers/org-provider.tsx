@@ -84,19 +84,12 @@ export const UserOrganizationProvider = ({
 			) {
 				// Ensure session is synced with user's activeOrganizationId
 				if (session?.user?.activeOrganizationId) {
-					console.log(
-						"🔄 Ensuring session is synced with user activeOrganizationId:",
-						session.user.activeOrganizationId,
-					);
 					try {
 						await authClient.organization.setActive({
 							organizationId: session.user.activeOrganizationId,
 						});
 					} catch (error) {
-						console.error(
-							"Failed to sync session with user activeOrganizationId:",
-							error,
-						);
+						// Handle sync error silently
 					}
 				}
 
@@ -143,7 +136,7 @@ export const UserOrganizationProvider = ({
 								});
 								push(`/${firstOrg.slug}`);
 							} catch (error) {
-								console.error("Failed to set default organization:", error);
+								// Handle organization setting error silently
 							} finally {
 								setIsSettingDefaultOrg(false);
 								setHasInitialized(true);

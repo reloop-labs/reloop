@@ -56,7 +56,7 @@ export const ForgotPasswordForm = () => {
 			changeStatus("idle");
 			if (e instanceof Error && e.message) {
 			} else {
-				console.error("An unexpected error occurred.");
+				// Handle unexpected error
 			}
 		}
 	};

@@ -27,7 +27,7 @@ const response = await fetch('/api/v1/add', {
 });
 
 const result = await response.json();
-console.log(result);`,
+// Handle the result as needed`,
 		list: `// List all domains
 const response = await fetch('/api/v1/list?page=1&limit=10', {
   headers: {
@@ -36,7 +36,7 @@ const response = await fetch('/api/v1/list?page=1&limit=10', {
 });
 
 const domains = await response.json();
-console.log(domains);`,
+// Handle the domains data as needed`,
 		delete: `// Delete a domain
 const response = await fetch('/api/v1/delete', {
   method: 'DELETE',
@@ -50,7 +50,7 @@ const response = await fetch('/api/v1/delete', {
 });
 
 const result = await response.json();
-console.log(result);`,
+// Handle the result as needed`,
 		details: `// Get domain details
 const response = await fetch('/api/v1/details?domain=example.com', {
   headers: {
@@ -59,7 +59,7 @@ const response = await fetch('/api/v1/details?domain=example.com', {
 });
 
 const domainDetails = await response.json();
-console.log(domainDetails);`,
+// Handle the domain details as needed`,
 	},
 	python: {
 		add: `# Add a new domain
@@ -238,8 +238,8 @@ export const DomainSDK = () => {
 		try {
 			await navigator.clipboard.writeText(text);
 			// You could add a toast notification here
-		} catch (err) {
-			console.error("Failed to copy text: ", err);
+		} catch {
+			// Handle copy error silently
 		}
 	};
 
@@ -297,7 +297,7 @@ export const DomainSDK = () => {
 										size="small"
 										mode="stroke"
 										className="flex h-auto flex-col items-start p-3"
-										onClick={() => setSelectedOperation(op.id)}
+										onClick={() => setSelectedOperation(op.id as Operation)}
 									>
 										<span className="font-medium text-label-sm">
 											{op.label}

@@ -60,7 +60,6 @@ export async function GET() {
 
 		return NextResponse.json({ sessions: mockSessions });
 	} catch (error) {
-		console.error("Error fetching sessions:", error);
 		return NextResponse.json(
 			{ error: "Failed to fetch sessions" },
 			{ status: 500 },
@@ -85,7 +84,6 @@ export async function DELETE(request: NextRequest) {
 
 		return NextResponse.json({ success: true });
 	} catch (error) {
-		console.error("Error terminating session:", error);
 		return NextResponse.json(
 			{ error: "Failed to terminate session" },
 			{ status: 500 },

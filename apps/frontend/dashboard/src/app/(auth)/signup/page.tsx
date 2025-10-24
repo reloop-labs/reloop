@@ -62,7 +62,6 @@ const Page = () => {
 									setLoading({ name: "google", loading: true });
 									await authClient.signIn.social({ provider: "google" });
 								} catch (error) {
-									console.error(error);
 									setError({
 										name: "google",
 										error: "Failed to login with Google",
@@ -104,7 +103,6 @@ const Page = () => {
 									setLoading({ name: "github", loading: true });
 									await authClient.signIn.social({ provider: "github" });
 								} catch (error) {
-									console.error(error);
 									setError({
 										name: "github",
 										error: "Failed to login with GitHub",

@@ -93,7 +93,6 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 				const { sessions } = await response.json();
 				setSessions(sessions);
 			} catch (error) {
-				console.error("Error fetching sessions:", error);
 				toast.error("Failed to load sessions");
 				// Fallback to mock data
 				setSessions(mockSessions);
@@ -119,7 +118,6 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 			setSessions((prev) => prev.filter((session) => session.id !== sessionId));
 			toast.success("Session terminated successfully");
 		} catch (error) {
-			console.error("Error terminating session:", error);
 			toast.error("Failed to terminate session");
 		} finally {
 			setTerminatingSession(null);
@@ -137,7 +135,6 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 			setSessions((prev) => prev.filter((session) => session.isCurrent));
 			toast.success("All other sessions terminated successfully");
 		} catch (error) {
-			console.error("Error terminating all sessions:", error);
 			toast.error("Failed to terminate all sessions");
 		}
 	};

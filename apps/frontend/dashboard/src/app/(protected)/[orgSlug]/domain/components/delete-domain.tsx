@@ -50,7 +50,6 @@ export const DeleteDomainModal = ({ domains }: DeleteDomainModalProps) => {
 			setDeleteId(null);
 			setConfirmationText("");
 		} catch (error) {
-			console.error("Error deleting domain:", error);
 			const errorMessage = axios.isAxiosError(error)
 				? error.response?.data?.message || "Failed to delete domain"
 				: "Failed to delete domain";

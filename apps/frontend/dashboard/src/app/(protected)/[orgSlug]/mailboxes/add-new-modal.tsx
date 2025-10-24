@@ -82,19 +82,18 @@ export const AddNewMailboxModal = ({
 		);
 	};
 
-	const onSubmit = async (data: MailboxFormValues) => {
+	const onSubmit = async (_data: MailboxFormValues) => {
 		setIsSubmitting(true);
 		try {
 			// Here you would make the API call to create the mailbox
-			const fullEmail = `${data.emailName}@${data.selectedDomain}`;
+			// const fullEmail = `${data.emailName}@${data.selectedDomain}`;
 			await new Promise((resolve) => setTimeout(resolve, 1000));
 
 			refetch();
 			setShowDetails(true);
 			toast.success("Mailbox created successfully!");
 			form.reset();
-		} catch (error) {
-			console.error("Error creating mailbox:", error);
+		} catch {
 			toast.error("Failed to create mailbox");
 		} finally {
 			setIsSubmitting(false);

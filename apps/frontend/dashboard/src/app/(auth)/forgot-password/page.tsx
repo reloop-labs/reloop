@@ -3,9 +3,8 @@
 import * as Button from "@reloop/ui/button";
 import * as LinkButton from "@reloop/ui/link-button";
 import { Logo } from "@reloop/ui/logo";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "motion/react";
 import Link from "next/link";
-// Removed unused useState import
 import { ForgotPasswordForm } from "./forgot-password-form";
 
 const ForgotPassword = () => {

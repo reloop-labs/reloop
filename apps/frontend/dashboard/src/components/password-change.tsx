@@ -117,7 +117,6 @@ export const PasswordChange = ({ className }: PasswordChangeProps) => {
 				confirmPassword: "",
 			});
 		} catch (error) {
-			console.error("Error changing password:", error);
 			toast.error(
 				error instanceof Error ? error.message : "Failed to change password",
 			);
