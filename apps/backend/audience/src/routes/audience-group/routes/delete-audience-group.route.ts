@@ -1,11 +1,12 @@
 import { authMiddleware } from "@reloop/audience/middleware/auth";
 import { AudienceGroupModel } from "@reloop/audience/routes/audience-group/audience-group.model";
 import { deleteAudienceGroupHandler } from "@reloop/audience/routes/audience-group/controllers/delete-audience-group";
+import type { User } from "@reloop/auth/server";
 import { Elysia, status, t } from "elysia";
 
 export const deleteAudienceGroupRoute = new Elysia().use(authMiddleware).delete(
     "/delete/:id",
-    async ({ params, user }: { params: { id: string }; user: any }) => {
+    async ({ params, user }: { params: { id: string }; user: User }) => {
         if (!user.activeOrganizationId) {
             throw status(403, {
                 message: "User is not a member of an organization",

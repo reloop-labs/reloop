@@ -1,11 +1,12 @@
 import { authMiddleware } from "@reloop/audience/middleware/auth";
 import { AudienceModel } from "@reloop/audience/routes/audience/audience.model";
 import { getAudienceHandler } from "@reloop/audience/routes/audience/controllers/get-audience";
+import type { User } from "@reloop/auth/server";
 import { Elysia, status, t } from "elysia";
 
 export const getAudienceRoute = new Elysia().use(authMiddleware).get(
     "/get/:id",
-    async ({ params, user }: { params: { id: string }; user: any }) => {
+    async ({ params, user }: { params: { id: string }; user: User }) => {
         if (!user.activeOrganizationId) {
             throw status(403, {
                 message: "User is not a member of an organization",
