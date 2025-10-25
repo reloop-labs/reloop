@@ -1,6 +1,6 @@
 "use client";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
-import type { AudienceListResponse, AudienceGroup } from "@reloop/api/types";
+import type { AudienceGroup, AudienceListResponse } from "@reloop/api/types";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
@@ -25,17 +25,18 @@ export const AudienceList = ({ groupId }: AudienceListProps) => {
 	const [showBulkImport, setShowBulkImport] = useState(false);
 
 	// Fetch audience group details
-	const { data: groupData, error: groupError, isLoading: groupLoading } = useSWR<AudienceGroup>(
-		`/api/audience/v1/audience-groups/${groupId}`,
-		{
-			revalidateOnFocus: true,
-			revalidateOnReconnect: true,
-		},
-	);
+	const {
+		data: groupData,
+		error: groupError,
+		isLoading: groupLoading,
+	} = useSWR<AudienceGroup>(`/api/audience/v1/audience-groups/${groupId}`, {
+		revalidateOnFocus: true,
+		revalidateOnReconnect: true,
+	});
 
 	// Fetch audiences for this group
 	const { data, error, isLoading } = useSWR<AudienceListResponse>(
-		`/api/audience/v1/audiences?audienceGroupId=${groupId}&limit=100`,
+		`/api/audience/v1/audience?audienceGroupId=${groupId}&limit=100`,
 		{
 			revalidateOnFocus: true,
 			revalidateOnReconnect: true,
@@ -51,9 +52,13 @@ export const AudienceList = ({ groupId }: AudienceListProps) => {
 				searchQuery === "" ||
 				audience.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
 				(audience.firstName &&
-					audience.firstName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+					audience.firstName
+						.toLowerCase()
+						.includes(searchQuery.toLowerCase())) ||
 				(audience.lastName &&
-					audience.lastName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+					audience.lastName
+						.toLowerCase()
+						.includes(searchQuery.toLowerCase())) ||
 				(audience.phone &&
 					audience.phone.toLowerCase().includes(searchQuery.toLowerCase()));
 			return matchesStatus && matchesSearch;
@@ -61,7 +66,7 @@ export const AudienceList = ({ groupId }: AudienceListProps) => {
 
 	const handleSubscribe = async (audienceId: string) => {
 		try {
-			await fetch(`/api/audience/v1/audiences/${audienceId}/subscribe`, {
+			await fetch(`/api/audience/v1/audience/${audienceId}/subscribe`, {
 				method: "POST",
 				headers: { credentials: "include" },
 			});
@@ -74,7 +79,7 @@ export const AudienceList = ({ groupId }: AudienceListProps) => {
 
 	const handleUnsubscribe = async (audienceId: string) => {
 		try {
-			await fetch(`/api/audience/v1/audiences/${audienceId}/unsubscribe`, {
+			await fetch(`/api/audience/v1/audience/${audienceId}/unsubscribe`, {
 				method: "POST",
 				headers: { credentials: "include" },
 			});
@@ -87,7 +92,7 @@ export const AudienceList = ({ groupId }: AudienceListProps) => {
 
 	const handleDelete = async (audienceId: string) => {
 		try {
-			await fetch(`/api/audience/v1/audiences/${audienceId}`, {
+			await fetch(`/api/audience/v1/audience/${audienceId}`, {
 				method: "DELETE",
 				headers: { credentials: "include" },
 			});
@@ -124,10 +129,13 @@ export const AudienceList = ({ groupId }: AudienceListProps) => {
 					</p>
 				</div>
 			) : data?.audiences && data.audiences.length === 0 ? (
-				<EmptyState groupId={groupId} groupName={groupData?.name || "Unknown"} />
+				<EmptyState
+					groupId={groupId}
+					groupName={groupData?.name || "Unknown"}
+				/>
 			) : (
 				<div>
-					<div className="flex items-center justify-between mb-6">
+					<div className="mb-6 flex items-center justify-between">
 						<div className="flex items-center gap-3">
 							<div className="flex-1">
 								<Input.Root size="small" className="rounded-xl">
@@ -162,13 +170,19 @@ export const AudienceList = ({ groupId }: AudienceListProps) => {
 										</Select.Item>
 										<Select.Item value="subscribed">
 											<div className="flex items-center gap-2 text-sm">
-												<Icon name="check-circle" className="h-4 w-4 text-success-base" />
+												<Icon
+													name="check-circle"
+													className="h-4 w-4 text-success-base"
+												/>
 												Subscribed
 											</div>
 										</Select.Item>
 										<Select.Item value="unsubscribed">
 											<div className="flex items-center gap-2 text-sm">
-												<Icon name="minus-circle" className="h-4 w-4 text-text-sub-600" />
+												<Icon
+													name="minus-circle"
+													className="h-4 w-4 text-text-sub-600"
+												/>
 												Unsubscribed
 											</div>
 										</Select.Item>

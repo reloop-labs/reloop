@@ -41,15 +41,15 @@ A comprehensive audiences management service built with Elysia, providing full C
 - `DELETE /v1/audience-groups/:id` - Delete audience group
 
 ### Audience
-- `POST /v1/audiences` - Create audience
-- `GET /v1/audiences` - List audiences
-- `GET /v1/audiences/:id` - Get audience
-- `PUT /v1/audiences/:id` - Update audience
-- `DELETE /v1/audiences/:id` - Delete audience
-- `POST /v1/audiences/bulk-import` - Bulk import audiences
-- `POST /v1/audiences/:id/subscribe` - Subscribe audience
-- `POST /v1/audiences/:id/unsubscribe` - Unsubscribe audience
-- `GET /v1/audiences/search` - Advanced search audiences
+- `POST /v1/audience` - Create audience
+- `GET /v1/audience` - List audiences
+- `GET /v1/audience/:id` - Get audience
+- `PUT /v1/audience/:id` - Update audience
+- `DELETE /v1/audience/:id` - Delete audience
+- `POST /v1/audience/bulk-import` - Bulk import audiences
+- `POST /v1/audience/:id/subscribe` - Subscribe audience
+- `POST /v1/audience/:id/unsubscribe` - Unsubscribe audience
+- `GET /v1/audience/search` - Advanced search audiences
 
 ## Architecture
 

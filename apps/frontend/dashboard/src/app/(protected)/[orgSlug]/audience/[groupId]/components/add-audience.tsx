@@ -87,14 +87,14 @@ export const AddAudience = ({
 		try {
 			changeStatus("loading");
 			await axios.post(
-				"/api/audience/v1/audiences",
+				"/api/audience/v1/audience",
 				{
 					...data,
 					audienceGroupId: groupId,
 				},
 				{ headers: { credentials: "include" } },
 			);
-			await mutate(`/api/audience/v1/audiences?audienceGroupId=${groupId}`);
+			await mutate(`/api/audience/v1/audience?audienceGroupId=${groupId}`);
 			toast.success("Audience added successfully");
 			reset();
 			onOpenChange(false);

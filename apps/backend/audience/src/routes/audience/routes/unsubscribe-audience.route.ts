@@ -4,7 +4,7 @@ import { unsubscribeAudienceHandler } from "@reloop/audience/routes/audience/con
 import { Elysia, status, t } from "elysia";
 
 export const unsubscribeAudienceRoute = new Elysia().use(authMiddleware).post(
-    "/audiences/:id/unsubscribe",
+    "/audience/:id/unsubscribe",
     async ({ params, body, user }: { params: { id: string }; body: any; user: any }) => {
         if (!user.activeOrganizationId) {
             throw status(403, {

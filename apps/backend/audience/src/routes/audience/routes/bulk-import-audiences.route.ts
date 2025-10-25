@@ -4,7 +4,7 @@ import { bulkImportAudiencesHandler } from "@reloop/audience/routes/audience/con
 import { Elysia, status } from "elysia";
 
 export const bulkImportAudiencesRoute = new Elysia().use(authMiddleware).post(
-    "/audiences/bulk-import",
+    "/audience/bulk-import",
     async ({ body, user }) => {
         if (!user.activeOrganizationId) {
             throw status(403, {

@@ -27,7 +27,7 @@ const AudienceDetailPage = ({ params }: AudienceDetailPageProps) => {
 		data: audienceData,
 		error: audienceError,
 		isLoading: audienceLoading,
-	} = useSWR<Audience>(`/api/audience/v1/audiences/${params.audienceId}`, {
+	} = useSWR<Audience>(`/api/audience/v1/audience/${params.audienceId}`, {
 		revalidateOnFocus: true,
 		revalidateOnReconnect: true,
 	});

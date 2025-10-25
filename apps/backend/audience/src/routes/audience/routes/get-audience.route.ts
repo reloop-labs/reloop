@@ -4,7 +4,7 @@ import { getAudienceHandler } from "@reloop/audience/routes/audience/controllers
 import { Elysia, status, t } from "elysia";
 
 export const getAudienceRoute = new Elysia().use(authMiddleware).get(
-    "/audiences/:id",
+    "/audience/:id",
     async ({ params, user }: { params: { id: string }; user: any }) => {
         if (!user.activeOrganizationId) {
             throw status(403, {
