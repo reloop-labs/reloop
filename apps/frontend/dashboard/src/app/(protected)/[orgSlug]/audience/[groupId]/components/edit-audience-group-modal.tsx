@@ -61,11 +61,16 @@ export const EditAudienceGroupModal = ({
 	const onSubmit = async (data: AudienceGroupFormValues) => {
 		try {
 			changeStatus("loading");
-			await axios.put(`/api/audience-group/v1/update/${group.id}`, data, {
+			await axios.put(`/api/audience/v1/groups/update/${group.id}`, data, {
 				headers: { credentials: "include" },
 			});
-
-			await mutate(`/api/audience-group/v1/get/${group.id}`);
+			await mutate(`/api/audience/v1/groups/get/${group.id}`);
+			// Reset form with the updated values
+			reset({
+				name: data.name,
+				description: data.description || "",
+			});
+			changeStatus("idle");
 			toast.success("Audience group updated successfully");
 			onOpenChange(false);
 		} catch (error) {
@@ -79,7 +84,7 @@ export const EditAudienceGroupModal = ({
 
 	const handleOpenChange = (newOpen: boolean) => {
 		if (!newOpen) {
-			// Reset form when closing
+			changeStatus("idle");
 			reset({
 				name: group.name,
 				description: group.description || "",

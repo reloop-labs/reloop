@@ -171,7 +171,9 @@ export const AudienceGroupHeader = ({
 						</Button.Root>
 					</div>
 					{group.description && (
-						<p className="mt-2 text-text-sub-600">{group.description}</p>
+						<p className="-mt-1 text-sm text-text-sub-600">
+							{group.description}
+						</p>
 					)}
 				</div>
 
