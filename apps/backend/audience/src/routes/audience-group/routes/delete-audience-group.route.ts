@@ -4,7 +4,7 @@ import { deleteAudienceGroupHandler } from "@reloop/audience/routes/audience-gro
 import { Elysia, status, t } from "elysia";
 
 export const deleteAudienceGroupRoute = new Elysia().use(authMiddleware).delete(
-    "/audience-groups/:id",
+    "/:id",
     async ({ params, user }: { params: { id: string }; user: any }) => {
         if (!user.activeOrganizationId) {
             throw status(403, {

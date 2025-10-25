@@ -2,6 +2,7 @@ import "dotenv/config";
 import { fromTypes, openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 import { audienceRoutes } from "@reloop/audience/routes/audience/audience.routes";
+import { audienceGroupRoutes } from "@reloop/audience/routes/audience-group/audience-group.routes";
 import { landing } from "@reloop/audience/routes/landing/landing.index";
 import { loader } from "@reloop/audience/utils/loader";
 import { logger } from "@reloop/logger";
@@ -24,6 +25,7 @@ const audienceService = new Elysia({
     .use(serverTiming())
     .use(landing)
     .use(audienceRoutes)
+    .use(audienceGroupRoutes)
     .onStart(async () => {
         await loader();
     })

@@ -4,7 +4,7 @@ import { updateAudienceGroupHandler } from "@reloop/audience/routes/audience-gro
 import { Elysia, status, t } from "elysia";
 
 export const updateAudienceGroupRoute = new Elysia().use(authMiddleware).put(
-    "/audience-groups/:id",
+    "/:id",
     async ({ params, body, user }: { params: { id: string }; body: any; user: any }) => {
         if (!user.activeOrganizationId) {
             throw status(403, {
