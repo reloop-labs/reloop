@@ -11,7 +11,7 @@
       },
     },
     "apps/backend/audience": {
-      "name": "audiences",
+      "name": "audience",
       "dependencies": {
         "@elysiajs/bearer": "catalog:backend",
         "@elysiajs/cors": "catalog:backend",
@@ -1785,7 +1785,7 @@
 
     "atomic-sleep": ["atomic-sleep@1.0.0", "", {}, "sha512-kNOjDqAh7px0XWNI+4QbzoiR/nTkHAWNud2uvnJquD1/x5a7EQZMJT0AczqK0Qn67oY/TTQ1LbUKajZpp3I9tQ=="],
 
-    "audiences": ["audiences@workspace:apps/backend/audience"],
+    "audience": ["audience@workspace:apps/backend/audience"],
 
     "auth": ["auth@workspace:apps/backend/auth"],
 
