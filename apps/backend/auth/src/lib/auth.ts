@@ -4,6 +4,7 @@ import { sendPasswordResetEmail } from "@reloop/email";
 import { logger } from "@reloop/logger";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { createAuthMiddleware } from "better-auth/api";
 import {
 	admin,
 	apiKey,
@@ -46,9 +47,18 @@ export const auth = betterAuth({
 			await redis.delete(key);
 		},
 	},
+	after: createAuthMiddleware(async (ctx) => {
+		if (ctx.path.startsWith("/sign-up")) {
+			const newSession = ctx.context.newSession;
+			if (newSession) {
+				logger.info("🔐 User registered:", newSession.user);
+			}
+		}
+	}),
 	basePath: "/api/auth/v1",
 	telemetry: { enabled: false },
 	emailAndPassword: {
+		autoSignIn: true,
 		enabled: true,
 		sendResetPassword: async ({ user, url, token }, request) => {
 			logger.info("🔐 Password reset requested for:", user.email);
@@ -87,7 +97,7 @@ export const auth = betterAuth({
 		admin(),
 		apiKey({ defaultPrefix: "rl" }),
 		organization({
-			sendInvitationEmail: async () => {},
+			sendInvitationEmail: async () => { },
 		}),
 		openAPI({ path: "/docs" }),
 	],
