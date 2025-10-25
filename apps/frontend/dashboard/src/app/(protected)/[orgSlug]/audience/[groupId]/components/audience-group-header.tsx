@@ -112,7 +112,7 @@ export const AudienceGroupHeader = ({
 	}
 
 	return (
-		<div className="pt-10 pb-8">
+		<div className="pt-10">
 			<Button.Root
 				onClick={() => back()}
 				variant="neutral"
@@ -199,23 +199,43 @@ export const AudienceGroupHeader = ({
 					</PopoverRoot>
 				</div>
 			</div>
-			<div className="mt-4 flex gap-6">
-				<div className="flex items-center gap-2">
-					<Icon name="check-circle" className="h-4 w-4 text-success-base" />
-					<span className="font-medium text-sm text-text-strong-950">
-						{group.subscribedCount} subscribed
-					</span>
-				</div>
-				<div className="flex items-center gap-2">
-					<Icon name="minus-circle" className="h-4 w-4 text-text-sub-600" />
-					<span className="font-medium text-sm text-text-strong-950">
-						{group.unsubscribedCount} unsubscribed
-					</span>
-				</div>
-			</div>
 
-			<div className="my-9">
-				<div className="w-full border-stroke-soft-200 border-t border-dashed" />
+			<div className="my-8 w-full border-stroke-soft-200 border-b border-dashed pb-8">
+				<div className="flex gap-8">
+					<div className="">
+						<div className="flex items-center gap-1.5">
+							<Icon name="users" className="h-4 w-4 text-blue-600" />
+							<span className="font-medium text-sm text-text-sub-600">
+								Audience
+							</span>
+						</div>
+						<span className="ml-5 font-bold text-2xl text-text-strong-950">
+							{group.audienceCount}
+						</span>
+					</div>
+					<div className="">
+						<div className="flex items-center gap-2">
+							<Icon name="bell-plus" className="h-4 w-4 text-success-base" />
+							<span className="font-medium text-sm text-text-sub-600">
+								Subscribed
+							</span>
+						</div>
+						<span className="text-left font-bold text-2xl text-text-strong-950">
+							{group.subscribedCount}
+						</span>
+					</div>
+					<div className="">
+						<div className="flex items-center gap-2">
+							<Icon name="bell-minus" className="h-4 w-4 text-text-sub-600" />
+							<span className="font-medium text-sm text-text-sub-600">
+								Unsubscribed
+							</span>
+						</div>
+						<span className="font-bold text-2xl text-text-strong-950">
+							{group.unsubscribedCount}
+						</span>
+					</div>
+				</div>
 			</div>
 
 			{/* Edit Group Modal */}
