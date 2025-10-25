@@ -17,7 +17,7 @@ export const AudienceGroupListSidebar = () => {
 
 	const { data, error, isLoading } = useSWR<AudienceGroupListResponse>(
 		activeOrganization?.id
-			? `/api/audience/v1/audience-groups?organizationId=${activeOrganization.id}&limit=100`
+			? `/api/audience/v1/groups/list?organizationId=${activeOrganization.id}&limit=100`
 			: null,
 		{
 			revalidateOnFocus: true,

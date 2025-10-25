@@ -29,14 +29,14 @@ export const AudienceList = ({ groupId }: AudienceListProps) => {
 		data: groupData,
 		error: groupError,
 		isLoading: groupLoading,
-	} = useSWR<AudienceGroup>(`/api/audience/v1/audience-groups/${groupId}`, {
+	} = useSWR<AudienceGroup>(`/api/audience/v1/groups/get/${groupId}`, {
 		revalidateOnFocus: true,
 		revalidateOnReconnect: true,
 	});
 
 	// Fetch audiences for this group
 	const { data, error, isLoading } = useSWR<AudienceListResponse>(
-		`/api/audience/v1/audience?audienceGroupId=${groupId}&limit=100`,
+		`/api/audience/v1/list?audienceGroupId=${groupId}&limit=100`,
 		{
 			revalidateOnFocus: true,
 			revalidateOnReconnect: true,
@@ -66,7 +66,7 @@ export const AudienceList = ({ groupId }: AudienceListProps) => {
 
 	const handleSubscribe = async (audienceId: string) => {
 		try {
-			await fetch(`/api/audience/v1/audience/${audienceId}/subscribe`, {
+			await fetch(`/api/audience/v1/subscribe/${audienceId}`, {
 				method: "POST",
 				headers: { credentials: "include" },
 			});
@@ -79,7 +79,7 @@ export const AudienceList = ({ groupId }: AudienceListProps) => {
 
 	const handleUnsubscribe = async (audienceId: string) => {
 		try {
-			await fetch(`/api/audience/v1/audience/${audienceId}/unsubscribe`, {
+			await fetch(`/api/audience/v1/unsubscribe/${audienceId}`, {
 				method: "POST",
 				headers: { credentials: "include" },
 			});
@@ -92,7 +92,7 @@ export const AudienceList = ({ groupId }: AudienceListProps) => {
 
 	const handleDelete = async (audienceId: string) => {
 		try {
-			await fetch(`/api/audience/v1/audience/${audienceId}`, {
+			await fetch(`/api/audience/v1/delete/${audienceId}`, {
 				method: "DELETE",
 				headers: { credentials: "include" },
 			});

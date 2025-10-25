@@ -209,7 +209,7 @@ export const BulkImport = ({
 		try {
 			changeStatus("loading");
 			const response = await axios.post(
-				"/api/audience/v1/audience/bulk-import",
+				"/api/audience/v1/bulk-import",
 				{
 					audienceGroupId: groupId,
 					audiences: csvData,
@@ -221,7 +221,7 @@ export const BulkImport = ({
 			setImportResult(result);
 
 			if (result.successful > 0) {
-				await mutate(`/api/audience/v1/audience?audienceGroupId=${groupId}`);
+				await mutate(`/api/audience/v1/list?audienceGroupId=${groupId}`);
 				toast.success(`Successfully imported ${result.successful} audiences`);
 			}
 

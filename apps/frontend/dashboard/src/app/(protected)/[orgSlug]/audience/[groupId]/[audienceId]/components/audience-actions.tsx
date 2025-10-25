@@ -88,12 +88,12 @@ export const AudienceActions = ({
 		try {
 			changeStatus("loading");
 			const response = await axios.post(
-				`/api/audience/v1/audience/${audience.id}/subscribe`,
+				`/api/audience/v1/subscribe/${audience.id}`,
 				data,
 				{ headers: { credentials: "include" } },
 			);
 
-			await mutate(`/api/audience/v1/audience/${audience.id}`);
+			await mutate(`/api/audience/v1/get/${audience.id}`);
 			onUpdate(response.data);
 			toast.success("Audience subscribed successfully");
 			setShowSubscribeDialog(false);
@@ -111,12 +111,12 @@ export const AudienceActions = ({
 		try {
 			changeStatus("loading");
 			const response = await axios.post(
-				`/api/audience/v1/audience/${audience.id}/unsubscribe`,
+				`/api/audience/v1/unsubscribe/${audience.id}`,
 				data,
 				{ headers: { credentials: "include" } },
 			);
 
-			await mutate(`/api/audience/v1/audience/${audience.id}`);
+			await mutate(`/api/audience/v1/get/${audience.id}`);
 			onUpdate(response.data);
 			toast.success("Audience unsubscribed successfully");
 			setShowUnsubscribeDialog(false);
@@ -134,12 +134,12 @@ export const AudienceActions = ({
 		try {
 			changeStatus("loading");
 			const response = await axios.put(
-				`/api/audience/v1/audience/${audience.id}`,
+				`/api/audience/v1/update/${audience.id}`,
 				{ audienceGroupId: data.audienceGroupId },
 				{ headers: { credentials: "include" } },
 			);
 
-			await mutate(`/api/audience/v1/audience/${audience.id}`);
+			await mutate(`/api/audience/v1/get/${audience.id}`);
 			onUpdate(response.data);
 			toast.success("Audience moved successfully");
 			setShowMoveDialog(false);
@@ -155,7 +155,7 @@ export const AudienceActions = ({
 	const handleDelete = async () => {
 		try {
 			changeStatus("loading");
-			await axios.delete(`/api/audience/v1/audience/${audience.id}`, {
+			await axios.delete(`/api/audience/v1/delete/${audience.id}`, {
 				headers: { credentials: "include" },
 			});
 

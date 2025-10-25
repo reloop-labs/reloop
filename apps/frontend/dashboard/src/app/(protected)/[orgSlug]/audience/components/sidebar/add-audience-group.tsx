@@ -51,7 +51,7 @@ export const AddAudienceGroupSidebar = () => {
 		try {
 			changeStatus("loading");
 			await axios.post(
-				"/api/audience/v1/audience-groups",
+				"/api/audience/v1/groups/add",
 				{
 					name,
 					description: description || undefined,
@@ -59,7 +59,7 @@ export const AddAudienceGroupSidebar = () => {
 				{ headers: { credentials: "include" } },
 			);
 			await mutate(
-				`/api/audience/v1/audience-groups?organizationId=${activeOrganization.id}`,
+				`/api/audience/v1/groups/list?organizationId=${activeOrganization.id}`,
 			);
 			push("/audience");
 		} catch (error) {

@@ -27,7 +27,7 @@ const AudienceDetailPage = ({ params }: AudienceDetailPageProps) => {
 		data: audienceData,
 		error: audienceError,
 		isLoading: audienceLoading,
-	} = useSWR<Audience>(`/api/audience/v1/audience/${params.audienceId}`, {
+	} = useSWR<Audience>(`/api/audience/v1/get/${params.audienceId}`, {
 		revalidateOnFocus: true,
 		revalidateOnReconnect: true,
 	});
@@ -35,7 +35,7 @@ const AudienceDetailPage = ({ params }: AudienceDetailPageProps) => {
 	// Fetch audience groups for move functionality
 	const { data: groupsData } = useSWR<AudienceGroupListResponse>(
 		activeOrganization?.id
-			? `/api/audience/v1/audience-groups?organizationId=${activeOrganization.id}&limit=100`
+			? `/api/audience/v1/groups/list?organizationId=${activeOrganization.id}&limit=100`
 			: null,
 		{
 			revalidateOnFocus: false,

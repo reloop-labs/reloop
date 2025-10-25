@@ -65,12 +65,12 @@ export const AudienceMetadata = ({
 			}
 
 			const response = await axios.put(
-				`/api/audience/v1/audience/${audience.id}`,
+				`/api/audience/v1/update/${audience.id}`,
 				{ metadata: parsedMetadata },
 				{ headers: { credentials: "include" } },
 			);
 
-			await mutate(`/api/audience/v1/audience/${audience.id}`);
+			await mutate(`/api/audience/v1/get/${audience.id}`);
 			onUpdate(response.data);
 			toast.success("Metadata updated successfully");
 			setIsEditing(false);

@@ -27,11 +27,11 @@ export const DeleteAudienceGroupModal = ({
 
 		try {
 			changeStatus("loading");
-			await axios.delete(`/api/audience/v1/audience-groups/${deleteId}`, {
+			await axios.delete(`/api/audience/v1/groups/delete/${deleteId}`, {
 				headers: { credentials: "include" },
 			});
 
-			await mutate("/api/audience/v1/audience-groups");
+			await mutate("/api/audience/v1/groups/list");
 			toast.success("Audience group deleted successfully");
 			setDeleteId(null);
 		} catch (error) {

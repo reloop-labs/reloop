@@ -76,12 +76,12 @@ export const AudienceDetails = ({
 		try {
 			changeStatus("loading");
 			const response = await axios.put(
-				`/api/audience/v1/audience/${audience.id}`,
+				`/api/audience/v1/update/${audience.id}`,
 				data,
 				{ headers: { credentials: "include" } },
 			);
 
-			await mutate(`/api/audience/v1/audience/${audience.id}`);
+			await mutate(`/api/audience/v1/get/${audience.id}`);
 			onUpdate(response.data);
 			toast.success("Audience updated successfully");
 			setIsEditing(false);
