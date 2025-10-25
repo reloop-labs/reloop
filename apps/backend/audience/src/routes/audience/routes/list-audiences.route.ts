@@ -21,7 +21,7 @@ export const listAudiencesRoute = new Elysia().use(authMiddleware).get(
             403: AudienceModel.unauthorized,
         },
         detail: {
-            tags: ["Audiences"],
+            tags: ["Audience"],
             summary: "List audiences",
             description:
                 "Retrieves a paginated list of audiences with optional filtering and search",

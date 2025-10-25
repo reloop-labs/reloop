@@ -1,5 +1,5 @@
-import type { AudienceTypes } from "@reloop/audience/routes/audience/audience.type";
-import { formatAudienceGroupResponse } from "@reloop/audience/routes/audience/controllers/format-audience-group-response";
+import type { AudienceGroupTypes } from "@reloop/audience/routes/audience-group/audience-group.type";
+import { formatAudienceGroupResponse } from "@reloop/audience/routes/audience-group/controllers/format-audience-group-response";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
@@ -9,7 +9,7 @@ import { status } from "elysia";
 export async function getAudienceGroup(
     groupId: string,
     organizationId: string,
-): Promise<AudienceTypes.AudienceGroupResponse> {
+): Promise<AudienceGroupTypes.AudienceGroupResponse> {
     logger.info(
         {
             groupId,
@@ -79,6 +79,6 @@ export async function getAudienceGroup(
 export async function getAudienceGroupHandler(
     groupId: string,
     organizationId: string,
-): Promise<AudienceTypes.AudienceGroupResponse> {
+): Promise<AudienceGroupTypes.AudienceGroupResponse> {
     return getAudienceGroup(groupId, organizationId);
 }

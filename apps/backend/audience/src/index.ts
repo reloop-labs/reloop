@@ -9,8 +9,8 @@ import { Elysia } from "elysia";
 
 const port = Number(process.env.PORT || 3014);
 const audienceService = new Elysia({
-    prefix: "/api/audiences",
-    name: "Audiences Service",
+    prefix: "/api/audience",
+    name: "Audience Service",
 })
     .use(
         openapi({
@@ -29,7 +29,7 @@ const audienceService = new Elysia({
     })
     .listen(port, () => {
         logger.info(
-            `Audiences Server is running on http://localhost:${port}/api/audiences`,
+            `Audience Server is running on http://localhost:${port}/api/audience`,
         );
     });
 

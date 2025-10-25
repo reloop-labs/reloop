@@ -1,7 +1,7 @@
 import { authMiddleware } from "@reloop/audience/middleware/auth";
 import { AudienceModel } from "@reloop/audience/routes/audience/audience.model";
-import { AudienceGroupModel } from "@reloop/audience/routes/audience-group/audience-group.model";
 import { createAudienceHandler } from "@reloop/audience/routes/audience/controllers/create-audience";
+import { AudienceGroupModel } from "@reloop/audience/routes/audience-group/audience-group.model";
 import { Elysia, status } from "elysia";
 
 export const createAudienceRoute = new Elysia().use(authMiddleware).post(
@@ -25,7 +25,7 @@ export const createAudienceRoute = new Elysia().use(authMiddleware).post(
             403: AudienceModel.unauthorized,
         },
         detail: {
-            tags: ["Audiences"],
+            tags: ["Audience"],
             summary: "Create a new audience",
             description: "Adds a new audience to an audience group",
         },

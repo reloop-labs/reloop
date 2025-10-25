@@ -49,7 +49,7 @@ export const AudienceGroupTable = ({
 						<div className="py-2.5">Group Name</div>
 					</div>
 					<div className="bg-bg-weak-50 font-medium text-text-sub-600">
-						<div className="py-2.5">Audiences</div>
+						<div className="py-2.5">Audience</div>
 					</div>
 					<div className="bg-bg-weak-50 font-medium text-text-sub-600">
 						<div className="py-2.5">Subscribed</div>
@@ -170,7 +170,7 @@ export const AudienceGroupTable = ({
 															className="w-full justify-start"
 														>
 															<Icon name="eye-outline" className="h-4 w-4" />
-															View Audiences
+															View Audience
 														</Button.Root>
 														<Button.Root
 															variant="error"

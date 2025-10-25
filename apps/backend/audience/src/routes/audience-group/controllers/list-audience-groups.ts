@@ -1,5 +1,5 @@
-import type { AudienceTypes } from "@reloop/audience/routes/audience/audience.type";
-import { formatAudienceGroupResponse } from "@reloop/audience/routes/audience/controllers/format-audience-group-response";
+import type { AudienceGroupTypes } from "@reloop/audience/routes/audience-group/audience-group.type";
+import { formatAudienceGroupResponse } from "@reloop/audience/routes/audience-group/controllers/format-audience-group-response";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
@@ -7,8 +7,8 @@ import { and, count, desc, eq, ilike, isNull, sql } from "drizzle-orm";
 
 export async function listAudienceGroups(
     organizationId: string,
-    query: AudienceTypes.AudienceGroupListQuery,
-): Promise<AudienceTypes.AudienceGroupListResponse> {
+    query: AudienceGroupTypes.AudienceGroupListQuery,
+): Promise<AudienceGroupTypes.AudienceGroupListResponse> {
     logger.info(
         {
             organizationId,
@@ -117,7 +117,7 @@ export async function listAudienceGroups(
 
 export async function listAudienceGroupsHandler(
     organizationId: string,
-    query: AudienceTypes.AudienceGroupListQuery,
-): Promise<AudienceTypes.AudienceGroupListResponse> {
+    query: AudienceGroupTypes.AudienceGroupListQuery,
+): Promise<AudienceGroupTypes.AudienceGroupListResponse> {
     return listAudienceGroups(organizationId, query);
 }

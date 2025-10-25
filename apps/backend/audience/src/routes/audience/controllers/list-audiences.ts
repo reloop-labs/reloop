@@ -81,7 +81,7 @@ export async function listAudiences(
                 page,
                 limit,
             },
-            "Audiences listed successfully",
+            "Audience listed successfully",
         );
 
         return {

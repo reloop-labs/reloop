@@ -21,7 +21,7 @@ export const searchAudiencesRoute = new Elysia().use(authMiddleware).get(
             403: AudienceModel.unauthorized,
         },
         detail: {
-            tags: ["Audiences"],
+            tags: ["Audience"],
             summary: "Search audiences",
             description:
                 "Performs advanced search across audience fields including metadata",

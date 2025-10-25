@@ -23,7 +23,7 @@ export const bulkImportAudiencesRoute = new Elysia().use(authMiddleware).post(
             403: AudienceModel.unauthorized,
         },
         detail: {
-            tags: ["Audiences"],
+            tags: ["Audience"],
             summary: "Bulk import audiences",
             description: "Imports multiple audiences into an audience group at once",
         },

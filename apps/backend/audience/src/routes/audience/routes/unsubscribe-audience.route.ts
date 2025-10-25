@@ -29,7 +29,7 @@ export const unsubscribeAudienceRoute = new Elysia().use(authMiddleware).post(
             403: AudienceModel.unauthorized,
         },
         detail: {
-            tags: ["Audiences"],
+            tags: ["Audience"],
             summary: "Unsubscribe an audience",
             description: "Changes an audience's status to unsubscribed",
         },

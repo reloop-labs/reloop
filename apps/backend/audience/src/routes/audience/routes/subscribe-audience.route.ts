@@ -29,7 +29,7 @@ export const subscribeAudienceRoute = new Elysia().use(authMiddleware).post(
             403: AudienceModel.unauthorized,
         },
         detail: {
-            tags: ["Audiences"],
+            tags: ["Audience"],
             summary: "Subscribe an audience",
             description: "Changes an audience's status to subscribed",
         },

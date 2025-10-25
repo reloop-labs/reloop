@@ -30,7 +30,7 @@ export const updateAudienceRoute = new Elysia().use(authMiddleware).put(
             403: AudienceModel.unauthorized,
         },
         detail: {
-            tags: ["Audiences"],
+            tags: ["Audience"],
             summary: "Update an audience",
             description: "Updates an existing audience's information",
         },

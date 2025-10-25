@@ -147,7 +147,7 @@ export const AudienceGroupListTopbar = () => {
 						<Table.Row>
 							<Table.Head>Name</Table.Head>
 							<Table.Head>Description</Table.Head>
-							<Table.Head>Audiences</Table.Head>
+							<Table.Head>Audience</Table.Head>
 							<Table.Head>Created</Table.Head>
 							<Table.Head className="text-right">Actions</Table.Head>
 						</Table.Row>
@@ -186,7 +186,7 @@ export const AudienceGroupListTopbar = () => {
 										<Link
 											href={`/${activeOrganization?.slug}/audience/${group.id}`}
 											className={Button.buttonVariants({
-												variant: "ghost",
+												mode: "ghost",
 												size: "xsmall",
 											}).root()}
 										>
@@ -194,7 +194,7 @@ export const AudienceGroupListTopbar = () => {
 											View
 										</Link>
 										<Button.Root
-											variant="ghost"
+											mode="ghost"
 											size="xsmall"
 											onClick={() => {
 												// Handle edit
@@ -204,7 +204,7 @@ export const AudienceGroupListTopbar = () => {
 											Edit
 										</Button.Root>
 										<Button.Root
-											variant="ghost"
+											mode="ghost"
 											size="xsmall"
 											onClick={() => {
 												// Handle delete

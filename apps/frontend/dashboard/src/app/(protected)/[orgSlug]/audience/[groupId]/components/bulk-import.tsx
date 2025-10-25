@@ -266,7 +266,7 @@ export const BulkImport = ({
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
 			<Dialog.Content className="max-w-4xl">
 				<Dialog.Header>
-					<Dialog.Title>Bulk Import Audiences to "{groupName}"</Dialog.Title>
+					<Dialog.Title>Bulk Import Audience to "{groupName}"</Dialog.Title>
 					<Dialog.Description>
 						Import up to 1000 audiences from a CSV file. Download the example
 						template to see the required format.

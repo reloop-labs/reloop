@@ -1,4 +1,4 @@
-# Audiences Service
+# Audience Service
 
 A comprehensive audiences management service built with Elysia, providing full CRUD operations, bulk import, advanced search, and status management for audience groups and individual audiences.
 
@@ -10,7 +10,7 @@ A comprehensive audiences management service built with Elysia, providing full C
 - **Update**: Update audience group name and description
 - **Delete**: Soft delete audience groups
 
-### Audiences
+### Audience
 - **Create**: Add individual audiences to groups
 - **Read**: Get single audience or list with advanced filtering
 - **Update**: Update audience information and group membership
@@ -40,7 +40,7 @@ A comprehensive audiences management service built with Elysia, providing full C
 - `PUT /v1/audience-groups/:id` - Update audience group
 - `DELETE /v1/audience-groups/:id` - Delete audience group
 
-### Audiences
+### Audience
 - `POST /v1/audiences` - Create audience
 - `GET /v1/audiences` - List audiences
 - `GET /v1/audiences/:id` - Get audience
