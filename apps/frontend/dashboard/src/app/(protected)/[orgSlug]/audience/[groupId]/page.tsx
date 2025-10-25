@@ -30,17 +30,13 @@ const AudienceGroupPage = () => {
 		revalidateOnFocus: true,
 		revalidateOnReconnect: true,
 	});
-
-	// Fetch audiences for this group
-	const { data, error, isLoading } = useSWR<AudienceListResponse>(
+	const { data, isLoading } = useSWR<AudienceListResponse>(
 		`/api/audience/v1/list?audienceGroupId=${groupId}&limit=100`,
 		{
 			revalidateOnFocus: true,
 			revalidateOnReconnect: true,
 		},
 	);
-
-	// Filter audiences based on status and search query
 	const filteredAudiences =
 		data?.audiences?.filter((audience) => {
 			const matchesStatus =
@@ -48,16 +44,9 @@ const AudienceGroupPage = () => {
 			const matchesSearch =
 				searchQuery === "" ||
 				audience.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-				(audience.firstName &&
-					audience.firstName
-						.toLowerCase()
-						.includes(searchQuery.toLowerCase())) ||
-				(audience.lastName &&
-					audience.lastName
-						.toLowerCase()
-						.includes(searchQuery.toLowerCase())) ||
-				(audience.phone &&
-					audience.phone.toLowerCase().includes(searchQuery.toLowerCase()));
+				audience.firstName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+				audience.lastName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+				audience.phone?.toLowerCase().includes(searchQuery.toLowerCase());
 			return matchesStatus && matchesSearch;
 		}) || [];
 
@@ -67,7 +56,6 @@ const AudienceGroupPage = () => {
 				method: "POST",
 				headers: { credentials: "include" },
 			});
-			// Refresh data
 			window.location.reload();
 		} catch (error) {
 			console.error("Failed to subscribe audience:", error);
@@ -80,7 +68,6 @@ const AudienceGroupPage = () => {
 				method: "POST",
 				headers: { credentials: "include" },
 			});
-			// Refresh data
 			window.location.reload();
 		} catch (error) {
 			console.error("Failed to unsubscribe audience:", error);
@@ -93,7 +80,6 @@ const AudienceGroupPage = () => {
 				method: "DELETE",
 				headers: { credentials: "include" },
 			});
-			// Refresh data
 			window.location.reload();
 		} catch (error) {
 			console.error("Failed to delete audience:", error);
@@ -116,7 +102,11 @@ const AudienceGroupPage = () => {
 
 	return (
 		<div className="mx-auto max-w-3xl">
-			<AudienceGroupHeader group={groupData || null} isLoading={groupLoading} />
+			<AudienceGroupHeader
+				group={groupData || null}
+				isLoading={groupLoading}
+				isFailed={!!groupError}
+			/>
 
 			{groupError ? (
 				<div className="flex flex-col items-center justify-center gap-2 p-4">
@@ -132,8 +122,8 @@ const AudienceGroupPage = () => {
 				/>
 			) : (
 				<div>
-					<div className="mb-6 flex items-center justify-between">
-						<div className="flex items-center gap-3">
+					<div className="mb-6 flex items-center justify-between gap-3">
+						<div className="flex w-full items-center gap-3">
 							<div className="flex-1">
 								<Input.Root size="small" className="rounded-xl">
 									<Input.Wrapper>
@@ -149,16 +139,17 @@ const AudienceGroupPage = () => {
 									</Input.Wrapper>
 								</Input.Root>
 							</div>
-							<div className="w-40">
+							<div className="w-48">
 								<Select.Root
 									size="small"
 									value={statusFilter}
 									onValueChange={setStatusFilter}
+									disabled={isLoading}
 								>
 									<Select.Trigger className="rounded-xl">
 										<Select.Value placeholder="Status" />
 									</Select.Trigger>
-									<Select.Content className="w-40">
+									<Select.Content className="w-48">
 										<Select.Item value="all">
 											<div className="flex items-center gap-2 text-sm">
 												<Icon name="users" className="h-4 w-4" />
@@ -168,7 +159,7 @@ const AudienceGroupPage = () => {
 										<Select.Item value="subscribed">
 											<div className="flex items-center gap-2 text-sm">
 												<Icon
-													name="check-circle"
+													name="bell-plus"
 													className="h-4 w-4 text-success-base"
 												/>
 												Subscribed
@@ -177,7 +168,7 @@ const AudienceGroupPage = () => {
 										<Select.Item value="unsubscribed">
 											<div className="flex items-center gap-2 text-sm">
 												<Icon
-													name="minus-circle"
+													name="bell-minus"
 													className="h-4 w-4 text-text-sub-600"
 												/>
 												Unsubscribed
@@ -187,25 +178,14 @@ const AudienceGroupPage = () => {
 								</Select.Root>
 							</div>
 						</div>
-						<div className="flex items-center gap-2">
-							<Button.Root
-								variant="neutral"
-								mode="stroke"
-								size="xsmall"
-								onClick={() => setShowBulkImport(true)}
-							>
-								<Icon name="upload" className="h-4 w-4" />
-								Import CSV
-							</Button.Root>
-							<Button.Root
-								variant="neutral"
-								size="xsmall"
-								onClick={() => setShowAddAudience(true)}
-							>
-								<Icon name="plus" className="h-4 w-4" />
-								Add audience
-							</Button.Root>
-						</div>
+						<Button.Root
+							variant="neutral"
+							mode="stroke"
+							size="xsmall"
+							onClick={() => setShowBulkImport(true)}
+						>
+							<Icon name="file-download" className="h-4 w-4" />
+						</Button.Root>
 					</div>
 
 					<div className="mt-4">
