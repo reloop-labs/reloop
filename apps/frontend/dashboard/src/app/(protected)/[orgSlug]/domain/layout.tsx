@@ -1,5 +1,5 @@
 "use client";
-import { useLayout } from "@dashboard/providers/layout-provider";
+import { useLayout } from "@fe/dashboard/providers/layout-provider";
 import { Icon } from "@reloop/ui/icon";
 
 const DomainLayout = ({ children }: { children: React.ReactNode }) => {

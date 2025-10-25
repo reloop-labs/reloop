@@ -1,7 +1,7 @@
 "use client";
 
-import { useLayout } from "@dashboard/providers/layout-provider";
-import { useUserOrganization } from "@dashboard/providers/org-provider";
+import { useLayout } from "@fe/dashboard/providers/layout-provider";
+import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import * as Button from "@reloop/ui/button";
 import * as FileUpload from "@reloop/ui/file-upload";
 import { Icon } from "@reloop/ui/icon";

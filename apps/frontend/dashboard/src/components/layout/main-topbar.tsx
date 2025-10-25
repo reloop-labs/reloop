@@ -1,7 +1,7 @@
 "use client";
 
-import { MainSubNavbar } from "@dashboard/components/layout/main-sub-navbar";
-import { useUserOrganization } from "@dashboard/providers/org-provider";
+import { MainSubNavbar } from "@fe/dashboard/components/layout/main-sub-navbar";
+import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import * as Avatar from "@reloop/ui/avatar";
 import { cn } from "@reloop/ui/cn";
 import { Logo } from "@reloop/ui/logo";

@@ -1,6 +1,6 @@
 "use client";
 
-import { useLayout } from "@dashboard/providers/layout-provider";
+import { useLayout } from "@fe/dashboard/providers/layout-provider";
 import { cn } from "@reloop/ui/cn";
 import { SidebarLayoutIcon } from "./sidebar-layout-icon";
 import { TopbarLayoutIcon } from "./topbar-layout-icon";

@@ -1,7 +1,7 @@
 "use client";
 
-import { Footer } from "@dashboard/components/footer";
-import { useLayout } from "@dashboard/providers/layout-provider";
+import { Footer } from "@fe/dashboard/components/footer";
+import { useLayout } from "@fe/dashboard/providers/layout-provider";
 import { cn } from "@reloop/ui/cn";
 import { MainSidebar } from "./main-sidebar";
 import { MainTopbar } from "./main-topbar";

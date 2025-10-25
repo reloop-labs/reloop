@@ -1,4 +1,4 @@
-import { UserOrgInfo } from "@dashboard/components/user-org-info";
+import { UserOrgInfo } from "@fe/dashboard/components/user-org-info";
 
 export default function Home() {
 	return (

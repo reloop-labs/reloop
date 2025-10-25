@@ -5,7 +5,7 @@ import {
 	getStatusColorClass,
 	getStatusIcon,
 	getStatusLabel,
-} from "@dashboard/utils/domain";
+} from "@fe/dashboard/utils/domain";
 import type { DNSRecord } from "@reloop/api/types";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";

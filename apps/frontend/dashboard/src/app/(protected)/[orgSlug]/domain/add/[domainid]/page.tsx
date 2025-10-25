@@ -1,5 +1,5 @@
 "use client";
-import { useUserOrganization } from "@dashboard/providers/org-provider";
+import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import type { DomainResponse } from "@reloop/api";
 import * as Alert from "@reloop/ui/alert";
 import * as Button from "@reloop/ui/button";

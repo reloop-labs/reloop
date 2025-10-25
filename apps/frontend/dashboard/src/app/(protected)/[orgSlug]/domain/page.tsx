@@ -1,5 +1,5 @@
 "use client";
-import { useLayout } from "@dashboard/providers/layout-provider";
+import { useLayout } from "@fe/dashboard/providers/layout-provider";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 

@@ -1,7 +1,7 @@
 "use client";
-import { PasswordChange } from "@dashboard/components/password-change";
-import { SessionManagement } from "@dashboard/components/session-management";
-import { useLayout } from "@dashboard/providers/layout-provider";
+import { PasswordChange } from "@fe/dashboard/components/password-change";
+import { SessionManagement } from "@fe/dashboard/components/session-management";
+import { useLayout } from "@fe/dashboard/providers/layout-provider";
 import { Icon } from "@reloop/ui/icon";
 
 const SecurityPage = () => {

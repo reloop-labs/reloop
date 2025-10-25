@@ -1,5 +1,5 @@
 "use client";
-import { useUserOrganization } from "@dashboard/providers/org-provider";
+import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";

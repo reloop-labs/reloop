@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import SWRProvider from "@dashboard/providers/swr.config";
+import SWRProvider from "@fe/dashboard/providers/swr.config";
 import { IconsSprite } from "@reloop/ui/icon";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "next-themes";

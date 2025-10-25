@@ -1,12 +1,12 @@
 "use client";
-import { useUserOrganization } from "@dashboard/providers/org-provider";
+import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import {
 	getAnimationProps,
 	getStatusColorClass,
 	getStatusIcon,
 	getStatusLabel,
-} from "@dashboard/utils/domain";
-import { formatRelativeTime } from "@dashboard/utils/time";
+} from "@fe/dashboard/utils/domain";
+import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import type { Domain } from "@reloop/api/types";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";

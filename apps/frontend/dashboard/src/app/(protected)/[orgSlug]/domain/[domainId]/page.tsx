@@ -1,5 +1,5 @@
 "use client";
-import { SomethingWentWrong } from "@fe/dashboard/components/somthing-went-wrong";
+import { SomethingWentWrong } from "@fe/dashboard/components/something-went-wrong";
 import type { DomainResponse } from "@reloop/api";
 import { useParams } from "next/navigation";
 import * as React from "react";

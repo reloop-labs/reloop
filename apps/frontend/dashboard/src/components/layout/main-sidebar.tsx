@@ -1,8 +1,8 @@
 "use client";
 
-import { mainNavigation } from "@dashboard/constants";
-import { useLayout } from "@dashboard/providers/layout-provider";
-import { useUserOrganization } from "@dashboard/providers/org-provider";
+import { mainNavigation } from "@fe/dashboard/constants";
+import { useLayout } from "@fe/dashboard/providers/layout-provider";
+import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";

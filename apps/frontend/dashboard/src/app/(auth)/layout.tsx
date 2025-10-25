@@ -1,4 +1,4 @@
-import { ThemeToggle } from "@dashboard/components/theme-toggle";
+import { ThemeToggle } from "@fe/dashboard/components/theme-toggle";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
 	return (

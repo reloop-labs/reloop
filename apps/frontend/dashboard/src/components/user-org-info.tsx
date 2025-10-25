@@ -1,6 +1,6 @@
 "use client";
 
-import { useUserOrganization } from "@dashboard/providers/org-provider";
+import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import * as Avatar from "@reloop/ui/avatar";
 
 /**

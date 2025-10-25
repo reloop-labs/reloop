@@ -1,7 +1,7 @@
 "use client";
 
-import { getStatusColorClass, getStatusIcon } from "@dashboard/utils/domain";
-import { formatRelativeTime } from "@dashboard/utils/time";
+import { getStatusColorClass, getStatusIcon } from "@fe/dashboard/utils/domain";
+import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import type { Domain, DomainStatus } from "@reloop/api/types";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";

@@ -1,5 +1,5 @@
 "use client";
-import { useLayout } from "@dashboard/providers/layout-provider";
+import { useLayout } from "@fe/dashboard/providers/layout-provider";
 import { AddDomainSidebar } from "../components/sidebar/add-domain";
 import { AddDomainTopbar } from "../components/topbar/add-domain";
 

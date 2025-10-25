@@ -1,7 +1,7 @@
 "use client";
 
-import { LayoutToggleButton } from "@dashboard/app/(protected)/[orgSlug]/settings/appearance/layout-toggle-button";
-import { useLayout } from "@dashboard/providers/layout-provider";
+import { LayoutToggleButton } from "@fe/dashboard/app/(protected)/[orgSlug]/settings/appearance/layout-toggle-button";
+import { useLayout } from "@fe/dashboard/providers/layout-provider";
 import { Icon } from "@reloop/ui/icon";
 import { ThemeToggleAppearance } from "./theme-toggle";
 

@@ -1,4 +1,4 @@
-import { useUserOrganization } from "@dashboard/providers/org-provider";
+import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { authClient } from "@reloop/auth/client";
 import Spinner from "@reloop/ui/spinner";
 import * as StatusBadge from "@reloop/ui/status-badge";

@@ -1,4 +1,4 @@
-import { useUserOrganization } from "@dashboard/providers/org-provider";
+import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { authClient } from "@reloop/auth/client";
 import * as Avatar from "@reloop/ui/avatar";
 import * as Dropdown from "@reloop/ui/dropdown";

@@ -1,5 +1,5 @@
 "use client";
-import { useLayout } from "@dashboard/providers/layout-provider";
+import { useLayout } from "@fe/dashboard/providers/layout-provider";
 import { Icon } from "@reloop/ui/icon";
 import { SideBar } from "./components/sidebar";
 import { SettingsTabs } from "./components/tabs";
