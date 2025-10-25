@@ -1,6 +1,6 @@
 import { authMiddleware } from "@reloop/audience/middleware/auth";
-import { AudienceModel } from "@reloop/audience/routes/audience/audience.model";
-import { createAudienceGroupHandler } from "@reloop/audience/routes/audience/controllers/create-audience-group";
+import { AudienceGroupModel } from "@reloop/audience/routes/audience-group/audience-group.model";
+import { createAudienceGroupHandler } from "@reloop/audience/routes/audience-group/controllers/create-audience-group";
 import { Elysia, status } from "elysia";
 
 export const createAudienceGroupRoute = new Elysia().use(authMiddleware).post(
@@ -19,12 +19,12 @@ export const createAudienceGroupRoute = new Elysia().use(authMiddleware).post(
     },
     {
         auth: true,
-        body: AudienceModel.createAudienceGroupBody,
+        body: AudienceGroupModel.createAudienceGroupBody,
         response: {
-            201: AudienceModel.audienceGroupResponse,
-            409: AudienceModel.validationError,
-            400: AudienceModel.validationError,
-            403: AudienceModel.unauthorized,
+            201: AudienceGroupModel.audienceGroupResponse,
+            409: AudienceGroupModel.validationError,
+            400: AudienceGroupModel.validationError,
+            403: AudienceGroupModel.unauthorized,
         },
         detail: {
             tags: ["Audience Groups"],

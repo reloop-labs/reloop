@@ -1,5 +1,6 @@
 import { authMiddleware } from "@reloop/audience/middleware/auth";
 import { AudienceModel } from "@reloop/audience/routes/audience/audience.model";
+import { AudienceGroupModel } from "@reloop/audience/routes/audience-group/audience-group.model";
 import { createAudienceHandler } from "@reloop/audience/routes/audience/controllers/create-audience";
 import { Elysia, status } from "elysia";
 
@@ -19,7 +20,7 @@ export const createAudienceRoute = new Elysia().use(authMiddleware).post(
         response: {
             201: AudienceModel.audienceResponse,
             409: AudienceModel.audienceAlreadyExists,
-            404: AudienceModel.audienceGroupNotFound,
+            404: AudienceGroupModel.audienceGroupNotFound,
             400: AudienceModel.invalidEmail,
             403: AudienceModel.unauthorized,
         },

@@ -1,6 +1,6 @@
 import { authMiddleware } from "@reloop/audience/middleware/auth";
-import { AudienceModel } from "@reloop/audience/routes/audience/audience.model";
-import { updateAudienceGroupHandler } from "@reloop/audience/routes/audience/controllers/update-audience-group";
+import { AudienceGroupModel } from "@reloop/audience/routes/audience-group/audience-group.model";
+import { updateAudienceGroupHandler } from "@reloop/audience/routes/audience-group/controllers/update-audience-group";
 import { Elysia, status, t } from "elysia";
 
 export const updateAudienceGroupRoute = new Elysia().use(authMiddleware).put(
@@ -22,13 +22,13 @@ export const updateAudienceGroupRoute = new Elysia().use(authMiddleware).put(
         params: t.Object({
             id: t.String(),
         }),
-        body: AudienceModel.updateAudienceGroupBody,
+        body: AudienceGroupModel.updateAudienceGroupBody,
         response: {
-            200: AudienceModel.audienceGroupResponse,
-            404: AudienceModel.audienceGroupNotFound,
-            409: AudienceModel.validationError,
-            400: AudienceModel.validationError,
-            403: AudienceModel.unauthorized,
+            200: AudienceGroupModel.audienceGroupResponse,
+            404: AudienceGroupModel.audienceGroupNotFound,
+            409: AudienceGroupModel.validationError,
+            400: AudienceGroupModel.validationError,
+            403: AudienceGroupModel.unauthorized,
         },
         detail: {
             tags: ["Audience Groups"],

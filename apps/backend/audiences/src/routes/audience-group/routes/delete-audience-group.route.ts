@@ -1,6 +1,6 @@
 import { authMiddleware } from "@reloop/audience/middleware/auth";
-import { AudienceModel } from "@reloop/audience/routes/audience/audience.model";
-import { deleteAudienceGroupHandler } from "@reloop/audience/routes/audience/controllers/delete-audience-group";
+import { AudienceGroupModel } from "@reloop/audience/routes/audience-group/audience-group.model";
+import { deleteAudienceGroupHandler } from "@reloop/audience/routes/audience-group/controllers/delete-audience-group";
 import { Elysia, status, t } from "elysia";
 
 export const deleteAudienceGroupRoute = new Elysia().use(authMiddleware).delete(
@@ -25,8 +25,8 @@ export const deleteAudienceGroupRoute = new Elysia().use(authMiddleware).delete(
             200: t.Object({
                 message: t.String(),
             }),
-            404: AudienceModel.audienceGroupNotFound,
-            403: AudienceModel.unauthorized,
+            404: AudienceGroupModel.audienceGroupNotFound,
+            403: AudienceGroupModel.unauthorized,
         },
         detail: {
             tags: ["Audience Groups"],

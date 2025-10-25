@@ -1,6 +1,6 @@
 import { authMiddleware } from "@reloop/audience/middleware/auth";
-import { AudienceModel } from "@reloop/audience/routes/audience/audience.model";
-import { getAudienceGroupHandler } from "@reloop/audience/routes/audience/controllers/get-audience-group";
+import { AudienceGroupModel } from "@reloop/audience/routes/audience-group/audience-group.model";
+import { getAudienceGroupHandler } from "@reloop/audience/routes/audience-group/controllers/get-audience-group";
 import { Elysia, status, t } from "elysia";
 
 export const getAudienceGroupRoute = new Elysia().use(authMiddleware).get(
@@ -19,9 +19,9 @@ export const getAudienceGroupRoute = new Elysia().use(authMiddleware).get(
             id: t.String(),
         }),
         response: {
-            200: AudienceModel.audienceGroupResponse,
-            404: AudienceModel.audienceGroupNotFound,
-            403: AudienceModel.unauthorized,
+            200: AudienceGroupModel.audienceGroupResponse,
+            404: AudienceGroupModel.audienceGroupNotFound,
+            403: AudienceGroupModel.unauthorized,
         },
         detail: {
             tags: ["Audience Groups"],

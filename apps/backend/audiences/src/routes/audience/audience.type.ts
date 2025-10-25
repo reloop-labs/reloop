@@ -1,13 +1,6 @@
 import type { AudienceModel } from "@reloop/audience/routes/audience/audience.model";
 
 export namespace AudienceTypes {
-    // Audience Group Types
-    export type AudienceGroupResponse = typeof AudienceModel.audienceGroupResponse.static;
-    export type AudienceGroupListResponse = typeof AudienceModel.audienceGroupListResponse.static;
-    export type CreateAudienceGroupBody = typeof AudienceModel.createAudienceGroupBody.static;
-    export type UpdateAudienceGroupBody = typeof AudienceModel.updateAudienceGroupBody.static;
-    export type AudienceGroupQuery = typeof AudienceModel.audienceGroupQuery.static;
-
     // Audience Types
     export type AudienceResponse = typeof AudienceModel.audienceResponse.static;
     export type AudienceListResponse = typeof AudienceModel.audienceListResponse.static;
@@ -27,7 +20,6 @@ export namespace AudienceTypes {
     export type SearchAudiencesQuery = typeof AudienceModel.searchAudiencesQuery.static;
 
     // Error Types
-    export type AudienceGroupNotFound = typeof AudienceModel.audienceGroupNotFound.static;
     export type AudienceNotFound = typeof AudienceModel.audienceNotFound.static;
     export type AudienceAlreadyExists = typeof AudienceModel.audienceAlreadyExists.static;
     export type InvalidEmail = typeof AudienceModel.invalidEmail.static;
@@ -35,20 +27,6 @@ export namespace AudienceTypes {
     export type ValidationError = typeof AudienceModel.validationError.static;
 
     // Internal Data Types
-    export interface AudienceGroupData {
-        id: string;
-        name: string;
-        description: string | null;
-        organizationId: string;
-        userId: string;
-        deletedAt: Date | null;
-        createdAt: Date;
-        updatedAt: Date;
-        audienceCount?: number;
-        subscribedCount?: number;
-        unsubscribedCount?: number;
-    }
-
     export interface AudienceData {
         id: string;
         email: string;
@@ -63,16 +41,6 @@ export namespace AudienceTypes {
         unsubscribedAt: Date | null;
         createdAt: Date;
         updatedAt: Date;
-    }
-
-    export interface CreateAudienceGroupRequest {
-        name: string;
-        description?: string;
-    }
-
-    export interface UpdateAudienceGroupRequest {
-        name?: string;
-        description?: string;
     }
 
     export interface CreateAudienceRequest {
@@ -113,14 +81,6 @@ export namespace AudienceTypes {
 
     export interface UnsubscribeAudienceRequest {
         reason?: string;
-    }
-
-    export interface AudienceGroupListQuery {
-        page?: number;
-        limit?: number;
-        search?: string;
-        organizationId?: string;
-        userId?: string;
     }
 
     export interface AudienceListQuery {
