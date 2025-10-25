@@ -2,10 +2,12 @@
 import type { AudienceGroup } from "@reloop/api/types";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
+import * as Input from "@reloop/ui/input";
+import * as Kbd from "@reloop/ui/kbd";
 import * as Modal from "@reloop/ui/modal";
-import { useLoading } from "@reloop/ui/use-loading";
 import axios from "axios";
 import { useQueryState } from "nuqs";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
 
@@ -17,90 +19,135 @@ export const DeleteAudienceGroupModal = ({
 	audienceGroups,
 }: DeleteAudienceGroupModalProps) => {
 	const [deleteId, setDeleteId] = useQueryState("delete");
+	const [isDeleting, setIsDeleting] = useState(false);
+	const [confirmationText, setConfirmationText] = useState("");
+	const [isCopied, setIsCopied] = useState(false);
 	const { mutate } = useSWRConfig();
-	const { changeStatus, status } = useLoading();
 
 	const groupToDelete = audienceGroups.find((group) => group.id === deleteId);
 
-	const handleDelete = async () => {
-		if (!deleteId) return;
+	useEffect(() => {
+		if (isCopied) {
+			const timer = setTimeout(() => {
+				setIsCopied(false);
+			}, 1000);
+			return () => clearTimeout(timer);
+		}
+	}, [isCopied]);
 
+	const handleDelete = async () => {
+		if (!groupToDelete) return;
+
+		setIsDeleting(true);
 		try {
-			changeStatus("loading");
-			await axios.delete(`/api/audience/v1/groups/delete/${deleteId}`, {
+			await axios.delete(`/api/audience/v1/groups/delete/${groupToDelete.id}`, {
 				headers: { credentials: "include" },
 			});
-
 			await mutate("/api/audience/v1/groups/list");
-			toast.success("Audience group deleted successfully");
+
+			toast.success(`${groupToDelete.name} deleted successfully`);
 			setDeleteId(null);
+			setConfirmationText("");
 		} catch (error) {
-			changeStatus("idle");
 			const errorMessage = axios.isAxiosError(error)
 				? error.response?.data?.message || "Failed to delete audience group"
 				: "Failed to delete audience group";
 			toast.error(errorMessage);
+		} finally {
+			setIsDeleting(false);
 		}
 	};
 
 	const handleCancel = () => {
 		setDeleteId(null);
+		setConfirmationText("");
 	};
 
 	return (
 		<Modal.Root
 			open={!!deleteId}
-			onOpenChange={(open: boolean) => !open && setDeleteId(null)}
+			onOpenChange={(open) => !open && setDeleteId(null)}
 		>
-			<Modal.Content className="max-w-md">
-				<Modal.Header
-					iconName="alert-triangle"
-					title="Delete Audience Group"
-					description={`Are you sure you want to delete "${groupToDelete?.name}"? This action cannot be undone and will remove all audiences in this group.`}
-				/>
+			<Modal.Content className="data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom-4 data-[state=open]:zoom-in-95 data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-bottom-4 data-[state=closed]:zoom-out-95 max-w-md duration-200 data-[state=closed]:animate-out data-[state=open]:animate-in">
+				<Modal.Body>
+					<h2 className="mb-2 font-semibold text-gray-900 text-xl">
+						Delete Audience Group
+					</h2>
+					<p className="text-gray-600 text-sm">
+						Are you sure you want to delete this audience group?
+					</p>
+					<p className="mb-4 font-medium text-red-600 text-sm">
+						This can not be undone.
+					</p>
 
-				<div className="my-4 rounded-lg bg-red-50 p-3">
-					<div className="flex items-start gap-2">
-						<Icon name="info" className="mt-0.5 h-4 w-4 text-red-600" />
-						<div className="text-red-800 text-sm">
-							<p className="font-medium">This will permanently delete:</p>
-							<ul className="mt-1 list-disc pl-4">
-								<li>The audience group "{groupToDelete?.name}"</li>
-								<li>
-									All {groupToDelete?.audienceCount || 0} audiences in this
-									group
-								</li>
-								<li>All associated metadata and history</li>
-							</ul>
-						</div>
+					<div className="mb-4">
+						<p className="mb-2 text-gray-700 text-sm">
+							Type{" "}
+							<span className="inline-flex items-center gap-1 rounded-md bg-gray-100 px-2 py-1 font-mono text-gray-800 text-xs">
+								{groupToDelete?.name}
+								<button
+									type="button"
+									onClick={async () => {
+										try {
+											await navigator.clipboard.writeText(
+												groupToDelete?.name || "",
+											);
+											setIsCopied(true);
+										} catch {
+											toast.error("Failed to copy group name");
+										}
+									}}
+									className="ml-1 text-gray-500 hover:text-gray-700"
+								>
+									<Icon
+										name={isCopied ? "check" : "copy"}
+										className={`h-3 w-3 ${isCopied ? "text-green-600" : ""}`}
+									/>
+								</button>
+							</span>{" "}
+							to confirm.
+						</p>
+						<Input.Root>
+							<Input.Wrapper size="xsmall">
+								<Input.Input
+									type="text"
+									value={confirmationText}
+									onChange={(e) => setConfirmationText(e.target.value)}
+									placeholder="Enter group name"
+								/>
+							</Input.Wrapper>
+						</Input.Root>
 					</div>
-				</div>
+				</Modal.Body>
 
-				<Modal.Footer className="flex gap-2">
-					<Button.Root
-						variant="neutral"
-						mode="stroke"
-						onClick={handleCancel}
-						disabled={status === "loading"}
-					>
-						Cancel
-					</Button.Root>
+				<Modal.Footer className="flex items-center justify-end gap-3">
 					<Button.Root
 						variant="error"
+						size="small"
 						onClick={handleDelete}
-						disabled={status === "loading"}
+						disabled={isDeleting || confirmationText !== groupToDelete?.name}
 					>
-						{status === "loading" ? (
+						{isDeleting ? (
 							<>
 								<Icon name="loader" className="h-4 w-4 animate-spin" />
 								Deleting...
 							</>
 						) : (
 							<>
-								<Icon name="trash" className="h-4 w-4" />
 								Delete Group
+								<Icon name="undo" className="h-3 w-3 scale-y-[-1]" />
 							</>
 						)}
+					</Button.Root>
+					<Button.Root
+						variant="neutral"
+						size="small"
+						mode="stroke"
+						onClick={handleCancel}
+						disabled={isDeleting}
+					>
+						Cancel
+						<Kbd.Root className="bg-bg-weak-50 text-xs">Esc</Kbd.Root>
 					</Button.Root>
 				</Modal.Footer>
 			</Modal.Content>
