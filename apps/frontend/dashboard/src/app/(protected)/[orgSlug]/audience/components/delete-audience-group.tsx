@@ -69,114 +69,145 @@ export const DeleteAudienceGroupModal = ({
 			onOpenChange={(open) => !open && setDeleteId(null)}
 		>
 			<Modal.Content className="data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom-4 data-[state=open]:zoom-in-95 data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-bottom-4 data-[state=closed]:zoom-out-95 max-w-md duration-200 data-[state=closed]:animate-out data-[state=open]:animate-in">
-				<Modal.Body>
-					<h2 className="mb-2 font-semibold text-gray-900 text-xl">
-						Delete Audience Group
-					</h2>
-					<p className="text-gray-600 text-sm">
-						Are you sure you want to delete this audience group?
-					</p>
-					<p className="mb-4 font-medium text-red-600 text-sm">
-						This can not be undone.
-					</p>
-
-					{/* Audience Details */}
-
-					<div className="mb-4">
-						<p className="mb-2 text-gray-700 text-sm">
-							Type{" "}
-							<span className="inline-flex items-center gap-1 rounded-md bg-gray-100 px-2 py-1 font-mono text-gray-800 text-xs">
-								{groupToDelete?.name}
-								<button
-									type="button"
-									onClick={async () => {
-										try {
-											await navigator.clipboard.writeText(
-												groupToDelete?.name || "",
-											);
-											setIsCopied(true);
-										} catch {
-											toast.error("Failed to copy group name");
-										}
-									}}
-									className="ml-1 text-gray-500 hover:text-gray-700"
-								>
-									<Icon
-										name={isCopied ? "check" : "copy"}
-										className={`h-3 w-3 ${isCopied ? "text-green-600" : ""}`}
-									/>
-								</button>
-							</span>{" "}
-							to confirm.
+				<form
+					onSubmit={(e) => {
+						e.preventDefault();
+						if (confirmationText === groupToDelete?.name && !isDeleting) {
+							handleDelete();
+						}
+					}}
+				>
+					<Modal.Body>
+						<h2 className="mb-2 font-semibold text-gray-900 text-xl">
+							Delete Audience Group
+						</h2>
+						<p className="text-gray-600 text-sm">
+							Are you sure you want to delete this audience group?
 						</p>
-						<Input.Root>
-							<Input.Wrapper size="xsmall">
-								<Input.Input
-									type="text"
-									value={confirmationText}
-									onChange={(e) => setConfirmationText(e.target.value)}
-									placeholder="Enter group name"
-								/>
-							</Input.Wrapper>
-						</Input.Root>
-					</div>
-					<div className="mb-4 rounded-lg border border-gray-200 bg-gray-50 p-4">
-						<h3 className="mb-3 font-medium text-gray-900 text-sm">
-							{groupToDelete?.name}
-						</h3>
-						<div className="grid grid-cols-3 gap-4">
-							<div className="text-center">
-								<div className="font-semibold text-gray-900 text-lg">
-									{groupToDelete?.audienceCount || 0}
-								</div>
-								<div className="text-gray-600 text-xs">Audience</div>
+						<p className="mb-4 font-medium text-red-600 text-sm">
+							This can not be undone.
+						</p>
+
+						<div className="mb-4">
+							<p className="mb-2 text-gray-700 text-sm">
+								Type{" "}
+								<span className="inline-flex items-center gap-1 rounded-md bg-gray-100 px-2 py-1 font-mono text-gray-800 text-xs">
+									{groupToDelete?.name}
+									<button
+										type="button"
+										onClick={async () => {
+											try {
+												await navigator.clipboard.writeText(
+													groupToDelete?.name || "",
+												);
+												setIsCopied(true);
+											} catch {
+												toast.error("Failed to copy group name");
+											}
+										}}
+										className="ml-1 text-gray-500 hover:text-gray-700"
+									>
+										<Icon
+											name={isCopied ? "check" : "copy"}
+											className={`h-3 w-3 ${isCopied ? "text-green-600" : ""}`}
+										/>
+									</button>
+								</span>{" "}
+								to confirm.
+							</p>
+							<Input.Root>
+								<Input.Wrapper size="xsmall">
+									<Input.Input
+										type="text"
+										value={confirmationText}
+										onChange={(e) => setConfirmationText(e.target.value)}
+										placeholder="Enter group name"
+									/>
+								</Input.Wrapper>
+							</Input.Root>
+						</div>
+						<div className="mb-4 overflow-hidden rounded-lg border border-gray-200 bg-white">
+							<div className="border-gray-200 border-b bg-gray-50 px-4 py-3">
+								<h3 className="font-medium text-gray-900 text-sm">
+									{groupToDelete?.name}
+								</h3>
 							</div>
-							<div className="text-center">
-								<div className="font-semibold text-green-600 text-lg">
-									{groupToDelete?.subscribedCount || 0}
+							<div className="divide-y divide-gray-200">
+								<div className="flex items-center justify-between px-4 py-2">
+									<div className="flex items-center gap-2">
+										<div className="h-2 w-2 rounded-full bg-gray-400" />
+										<span className="font-medium text-gray-700 text-sm">
+											Total Audience
+										</span>
+									</div>
+									<div className="text-right">
+										<div className="font-semibold text-gray-900 text-lg">
+											{groupToDelete?.audienceCount || 0}
+										</div>
+									</div>
 								</div>
-								<div className="text-gray-600 text-xs">Subscribed</div>
-							</div>
-							<div className="text-center">
-								<div className="font-semibold text-lg text-red-600">
-									{groupToDelete?.unsubscribedCount || 0}
+								<div className="flex items-center justify-between px-4 py-2">
+									<div className="flex items-center gap-2">
+										<div className="h-2 w-2 rounded-full bg-green-500" />
+										<span className="font-medium text-gray-700 text-sm">
+											Subscribed
+										</span>
+									</div>
+									<div className="text-right">
+										<div className="font-semibold text-green-600 text-lg">
+											{groupToDelete?.subscribedCount || 0}
+										</div>
+									</div>
 								</div>
-								<div className="text-gray-600 text-xs">Unsubscribed</div>
+								<div className="flex items-center justify-between px-4 py-2">
+									<div className="flex items-center gap-2">
+										<div className="h-2 w-2 rounded-full bg-red-500" />
+										<span className="font-medium text-gray-700 text-sm">
+											Unsubscribed
+										</span>
+									</div>
+									<div className="text-right">
+										<div className="font-semibold text-lg text-red-600">
+											{groupToDelete?.unsubscribedCount || 0}
+										</div>
+									</div>
+								</div>
 							</div>
 						</div>
-					</div>
-				</Modal.Body>
+					</Modal.Body>
 
-				<Modal.Footer className="flex items-center justify-end gap-3">
-					<Button.Root
-						variant="error"
-						size="small"
-						onClick={handleDelete}
-						disabled={isDeleting || confirmationText !== groupToDelete?.name}
-					>
-						{isDeleting ? (
-							<>
-								<Icon name="loader" className="h-4 w-4 animate-spin" />
-								Deleting...
-							</>
-						) : (
-							<>
-								Delete Group
-								<Icon name="undo" className="h-3 w-3 scale-y-[-1]" />
-							</>
-						)}
-					</Button.Root>
-					<Button.Root
-						variant="neutral"
-						size="small"
-						mode="stroke"
-						onClick={handleCancel}
-						disabled={isDeleting}
-					>
-						Cancel
-						<Kbd.Root className="bg-bg-weak-50 text-xs">Esc</Kbd.Root>
-					</Button.Root>
-				</Modal.Footer>
+					<Modal.Footer className="flex items-center justify-end gap-3">
+						<Button.Root
+							type="submit"
+							variant="error"
+							size="small"
+							disabled={isDeleting || confirmationText !== groupToDelete?.name}
+						>
+							{isDeleting ? (
+								<>
+									<Icon name="loader" className="h-4 w-4 animate-spin" />
+									Deleting...
+								</>
+							) : (
+								<>
+									Delete Group
+									<Icon name="undo" className="h-3 w-3 scale-y-[-1]" />
+								</>
+							)}
+						</Button.Root>
+						<Button.Root
+							type="button"
+							variant="neutral"
+							size="small"
+							mode="stroke"
+							onClick={handleCancel}
+							disabled={isDeleting}
+						>
+							Cancel
+							<Kbd.Root className="bg-bg-weak-50 text-xs">Esc</Kbd.Root>
+						</Button.Root>
+					</Modal.Footer>
+				</form>
 			</Modal.Content>
 		</Modal.Root>
 	);
