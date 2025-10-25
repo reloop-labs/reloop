@@ -101,7 +101,7 @@ export const audienceGroupRelations = relations(
             fields: [audienceGroup.userId],
             references: [user.id],
         }),
-        audiences: many(audience),
+        audience: many(audience),
     }),
 );
 

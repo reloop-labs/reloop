@@ -1,4 +1,4 @@
-export * from "./audiences";
+export * from "./audience";
 export * from "./auth";
 export * from "./domain";
 export * from "./mailbox";
