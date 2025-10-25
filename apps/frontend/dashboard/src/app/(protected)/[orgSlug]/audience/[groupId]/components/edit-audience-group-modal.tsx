@@ -4,6 +4,7 @@ import type { AudienceGroup } from "@reloop/api/types";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
+import * as Kbd from "@reloop/ui/kbd";
 import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
@@ -89,103 +90,108 @@ export const EditAudienceGroupModal = ({
 
 	return (
 		<Modal.Root open={open} onOpenChange={handleOpenChange}>
-			<Modal.Content className="max-w-[440px]">
-				<Modal.Header>
-					<Modal.Title>Edit Audience Group</Modal.Title>
-					<Modal.Description>
-						Update the name and description of your audience group
-					</Modal.Description>
-				</Modal.Header>
-
+			<Modal.Content className="data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom-4 data-[state=open]:zoom-in-95 data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-bottom-4 data-[state=closed]:zoom-out-95 max-w-md duration-200 data-[state=closed]:animate-out data-[state=open]:animate-in">
 				<form onSubmit={handleSubmit(onSubmit)}>
-					<Modal.Body className="space-y-4">
-						<div>
-							<Label.Root
-								htmlFor="edit-name"
-								className="mb-2 block font-medium text-gray-700 text-sm"
-							>
-								Group Name
-								<Label.Asterisk />
-							</Label.Root>
-							<div className="relative">
-								<Input.Root
-									hasError={!!formState?.errors?.name?.message}
-									className="w-full"
-								>
-									<Input.Wrapper>
-										<Input.Input
-											id="edit-name"
-											placeholder="e.g., Newsletter Subscribers"
-											{...register("name")}
-											disabled={status === "loading"}
-										/>
-									</Input.Wrapper>
-								</Input.Root>
-								{formState.errors.name && (
-									<div className="mt-2 flex items-center gap-2">
-										<Icon
-											name="alert-circle"
-											className="h-4 w-4 text-red-500"
-										/>
-										<p className="text-red-600 text-sm">
-											{formState.errors.name.message}
-										</p>
-									</div>
-								)}
-							</div>
-						</div>
-						<div>
-							<Label.Root
-								htmlFor="edit-description"
-								className="mb-2 block font-medium text-gray-700 text-sm"
-							>
-								Description (Optional)
-							</Label.Root>
-							<div className="relative">
-								<Textarea.Root
-									id="edit-description"
-									className="text-sm"
-									placeholder="Describe this audience group..."
-									{...register("description")}
-									disabled={status === "loading"}
-									rows={3}
-									hasError={!!formState?.errors?.description?.message}
-								>
-									<Textarea.CharCounter
-										className="text-xs"
-										current={watch("description")?.length || 0}
-										max={1000}
-									/>
-								</Textarea.Root>
+					<Modal.Body>
+						<h2 className="mb-2 font-semibold text-gray-900 text-xl">
+							Edit Audience Group
+						</h2>
+						<p className="text-gray-600 text-sm">
+							Update the name and description of your audience group
+						</p>
 
-								{formState.errors.description && (
-									<div className="mt-2 flex items-center gap-2">
-										<Icon
-											name="alert-circle"
-											className="h-4 w-4 text-red-500"
+						<div className="mt-4 space-y-4">
+							<div>
+								<Label.Root
+									htmlFor="edit-name"
+									className="mb-2 block font-medium text-gray-700 text-sm"
+								>
+									Group Name
+									<Label.Asterisk />
+								</Label.Root>
+								<div className="relative">
+									<Input.Root
+										hasError={!!formState?.errors?.name?.message}
+										className="w-full"
+									>
+										<Input.Wrapper size="xsmall">
+											<Input.Input
+												id="edit-name"
+												placeholder="e.g., Newsletter Subscribers"
+												{...register("name")}
+												disabled={status === "loading"}
+											/>
+										</Input.Wrapper>
+									</Input.Root>
+									{formState.errors.name && (
+										<div className="mt-2 flex items-center gap-2">
+											<Icon
+												name="alert-circle"
+												className="h-4 w-4 text-red-500"
+											/>
+											<p className="text-red-600 text-sm">
+												{formState.errors.name.message}
+											</p>
+										</div>
+									)}
+								</div>
+							</div>
+							<div>
+								<Label.Root
+									htmlFor="edit-description"
+									className="mb-2 block font-medium text-gray-700 text-sm"
+								>
+									Description (Optional)
+								</Label.Root>
+								<div className="relative">
+									<Textarea.Root
+										id="edit-description"
+										className="text-sm"
+										placeholder="Describe this audience group..."
+										{...register("description")}
+										disabled={status === "loading"}
+										rows={3}
+										hasError={!!formState?.errors?.description?.message}
+									>
+										<Textarea.CharCounter
+											className="text-xs"
+											current={watch("description")?.length || 0}
+											max={1000}
 										/>
-										<p className="text-red-600 text-sm">
-											{formState.errors.description?.message}
-										</p>
-									</div>
-								)}
+									</Textarea.Root>
+
+									{formState.errors.description && (
+										<div className="mt-2 flex items-center gap-2">
+											<Icon
+												name="alert-circle"
+												className="h-4 w-4 text-red-500"
+											/>
+											<p className="text-red-600 text-sm">
+												{formState.errors.description?.message}
+											</p>
+										</div>
+									)}
+								</div>
 							</div>
 						</div>
 					</Modal.Body>
 
-					<Modal.Footer className="flex justify-end gap-2">
+					<Modal.Footer className="flex items-center justify-end gap-3">
 						<Button.Root
 							type="button"
 							variant="neutral"
+							size="small"
 							mode="stroke"
 							onClick={() => onOpenChange(false)}
 							disabled={status === "loading"}
 						>
 							Cancel
+							<Kbd.Root className="bg-bg-weak-50 text-xs">Esc</Kbd.Root>
 						</Button.Root>
 						<Button.Root
 							type="submit"
 							variant="neutral"
+							size="small"
 							disabled={status === "loading" || !formState.isValid}
 						>
 							{status === "loading" ? (
@@ -195,8 +201,8 @@ export const EditAudienceGroupModal = ({
 								</>
 							) : (
 								<>
-									<Icon name="check" className="h-4 w-4" />
 									Save Changes
+									<Icon name="undo" className="h-3 w-3 scale-y-[-1]" />
 								</>
 							)}
 						</Button.Root>
