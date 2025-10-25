@@ -12,6 +12,7 @@ import { Skeleton } from "@reloop/ui/skeleton";
 import { useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useState } from "react";
+import { toast } from "sonner";
 import { EditAudienceGroupModal } from "./edit-audience-group-modal";
 
 interface AudienceGroupHeaderProps {
@@ -29,6 +30,17 @@ export const AudienceGroupHeader = ({
 
 	const handleEditClick = () => {
 		setShowEditModal(true);
+	};
+
+	const handleCopyId = async () => {
+		if (group?.id) {
+			try {
+				await navigator.clipboard.writeText(group.id);
+				toast.success("Audience ID copied to clipboard");
+			} catch (error) {
+				toast.error("Failed to copy ID");
+			}
+		}
 	};
 
 	if (isLoading) {
@@ -200,7 +212,7 @@ export const AudienceGroupHeader = ({
 				</div>
 			</div>
 
-			<div className="my-8 w-full border-stroke-soft-200 border-b border-dashed pb-8">
+			<div className="my-8 flex w-full items-center justify-between border-stroke-soft-200 border-b border-dashed pb-8">
 				<div className="flex gap-8">
 					<div className="">
 						<div className="flex items-center gap-1.5">
@@ -209,12 +221,12 @@ export const AudienceGroupHeader = ({
 								Audience
 							</span>
 						</div>
-						<span className="ml-5 font-bold text-2xl text-text-strong-950">
+						<span className="font-bold text-2xl text-text-strong-950">
 							{group.audienceCount}
 						</span>
 					</div>
 					<div className="">
-						<div className="flex items-center gap-2">
+						<div className="flex items-center gap-1.5">
 							<Icon name="bell-plus" className="h-4 w-4 text-success-base" />
 							<span className="font-medium text-sm text-text-sub-600">
 								Subscribed
@@ -225,7 +237,7 @@ export const AudienceGroupHeader = ({
 						</span>
 					</div>
 					<div className="">
-						<div className="flex items-center gap-2">
+						<div className="flex items-center gap-1.5">
 							<Icon name="bell-minus" className="h-4 w-4 text-text-sub-600" />
 							<span className="font-medium text-sm text-text-sub-600">
 								Unsubscribed
@@ -234,6 +246,28 @@ export const AudienceGroupHeader = ({
 						<span className="font-bold text-2xl text-text-strong-950">
 							{group.unsubscribedCount}
 						</span>
+					</div>
+				</div>
+				<div className="flex flex-col gap-2">
+					<div className="flex items-center gap-1.5">
+						<Icon name="key" className="h-4 w-4 text-text-sub-600" />
+						<span className="font-medium text-sm text-text-sub-600">
+							Audience ID
+						</span>
+					</div>
+					<div className="flex items-center gap-2 overflow-hidden rounded-lg border border-stroke-soft-200 bg-bg-weak-50 py-0.5 pr-0.5 pl-2">
+						<span className="w-42 truncate font-medium text-xs">
+							{group.id}
+						</span>
+						<Button.Root
+							variant="neutral"
+							mode="ghost"
+							size="xxsmall"
+							onClick={handleCopyId}
+							className="h-6 w-6 p-0"
+						>
+							<Icon name="copy" className="h-3 w-3" />
+						</Button.Root>
 					</div>
 				</div>
 			</div>
