@@ -80,6 +80,8 @@ export const DeleteAudienceGroupModal = ({
 						This can not be undone.
 					</p>
 
+					{/* Audience Details */}
+
 					<div className="mb-4">
 						<p className="mb-2 text-gray-700 text-sm">
 							Type{" "}
@@ -117,6 +119,31 @@ export const DeleteAudienceGroupModal = ({
 								/>
 							</Input.Wrapper>
 						</Input.Root>
+					</div>
+					<div className="mb-4 rounded-lg border border-gray-200 bg-gray-50 p-4">
+						<h3 className="mb-3 font-medium text-gray-900 text-sm">
+							{groupToDelete?.name}
+						</h3>
+						<div className="grid grid-cols-3 gap-4">
+							<div className="text-center">
+								<div className="font-semibold text-gray-900 text-lg">
+									{groupToDelete?.audienceCount || 0}
+								</div>
+								<div className="text-gray-600 text-xs">Audience</div>
+							</div>
+							<div className="text-center">
+								<div className="font-semibold text-green-600 text-lg">
+									{groupToDelete?.subscribedCount || 0}
+								</div>
+								<div className="text-gray-600 text-xs">Subscribed</div>
+							</div>
+							<div className="text-center">
+								<div className="font-semibold text-lg text-red-600">
+									{groupToDelete?.unsubscribedCount || 0}
+								</div>
+								<div className="text-gray-600 text-xs">Unsubscribed</div>
+							</div>
+						</div>
 					</div>
 				</Modal.Body>
 
