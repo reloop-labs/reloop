@@ -179,39 +179,85 @@ export const AudienceGroupHeader = ({
 							Try Again
 						</Button.Root>
 					) : group ? (
-						<PopoverRoot>
-							<PopoverTrigger asChild>
-								<Button.Root variant="neutral" mode="stroke" size="xsmall">
-									<Icon name="more-vertical" className="h-4 w-4 rotate-90" />
-								</Button.Root>
-							</PopoverTrigger>
-							<PopoverContent align="end" className="w-48 p-2">
-								<div className="flex flex-col gap-1">
-									<Button.Root
-										variant="neutral"
-										mode="ghost"
-										size="small"
-										onClick={() =>
-											window.open("https://reloop.sh/docs/audience", "_blank")
-										}
-										className="w-full justify-start"
-									>
-										<Icon name="file-text" className="h-4 w-4" />
-										Go to docs
+						<>
+							<PopoverRoot>
+								<PopoverTrigger asChild>
+									<Button.Root variant="neutral" size="xsmall">
+										<Icon name="plus" className="h-4 w-4" />
+										Add audience
 									</Button.Root>
-									<Button.Root
-										variant="error"
-										mode="ghost"
-										size="small"
-										onClick={() => setDeleteId(group.id)}
-										className="w-full justify-start text-red-600 hover:bg-red-50"
-									>
-										<Icon name="trash" className="h-4 w-4" />
-										Delete group
+								</PopoverTrigger>
+								<PopoverContent
+									showArrow
+									align="end"
+									side="bottom"
+									className="p-2"
+									sideOffset={3}
+								>
+									<div className="flex flex-col gap-1">
+										<Button.Root
+											variant="neutral"
+											mode="ghost"
+											size="small"
+											onClick={() => {
+												// TODO: Implement import CSV functionality
+												toast.info("Import CSV functionality coming soon");
+											}}
+											className="w-full justify-start"
+										>
+											<Icon name="file-upload" className="h-4 w-4" />
+											Import CSV
+										</Button.Root>
+										<Button.Root
+											variant="neutral"
+											mode="ghost"
+											size="small"
+											onClick={() => {
+												// TODO: Implement add manually functionality
+												toast.info("Add manually functionality coming soon");
+											}}
+											className="w-full justify-start"
+										>
+											<Icon name="user-plus" className="h-4 w-4" />
+											Add manually
+										</Button.Root>
+									</div>
+								</PopoverContent>
+							</PopoverRoot>
+							<PopoverRoot>
+								<PopoverTrigger asChild>
+									<Button.Root variant="neutral" mode="stroke" size="xsmall">
+										<Icon name="more-vertical" className="h-4 w-4 rotate-90" />
 									</Button.Root>
-								</div>
-							</PopoverContent>
-						</PopoverRoot>
+								</PopoverTrigger>
+								<PopoverContent align="end" side="bottom" className="p-2">
+									<div className="flex flex-col gap-1">
+										<Button.Root
+											variant="neutral"
+											mode="ghost"
+											size="small"
+											onClick={() =>
+												window.open("https://reloop.sh/docs/audience", "_blank")
+											}
+											className="w-full justify-start"
+										>
+											<Icon name="file-text" className="h-4 w-4" />
+											Go to docs
+										</Button.Root>
+										<Button.Root
+											variant="error"
+											mode="ghost"
+											size="small"
+											onClick={() => setDeleteId(group.id)}
+											className="w-full justify-start text-red-600 hover:bg-red-50"
+										>
+											<Icon name="trash" className="h-4 w-4" />
+											Delete group
+										</Button.Root>
+									</div>
+								</PopoverContent>
+							</PopoverRoot>
+						</>
 					) : null}
 				</div>
 			</div>
