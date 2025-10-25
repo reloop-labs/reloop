@@ -56,7 +56,6 @@ export async function bulkImportAudiences(
                 email: audience.email,
                 firstName: audience.firstName || null,
                 lastName: audience.lastName || null,
-                phone: audience.phone || null,
                 metadata: audience.metadata || null,
                 organizationId,
                 audienceGroupId: body.audienceGroupId,

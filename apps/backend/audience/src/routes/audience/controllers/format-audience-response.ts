@@ -8,7 +8,6 @@ export function formatAudienceResponse(
         email: audience.email,
         firstName: audience.firstName,
         lastName: audience.lastName,
-        phone: audience.phone,
         metadata: audience.metadata,
         organizationId: audience.organizationId,
         status: audience.status,

@@ -33,7 +33,6 @@ export async function searchAudiences(
             ilike(schema.audience.email, searchTerm),
             ilike(schema.audience.firstName, searchTerm),
             ilike(schema.audience.lastName, searchTerm),
-            ilike(schema.audience.phone, searchTerm),
             // Search in metadata JSON fields
             sql`${schema.audience.metadata}::text ILIKE ${searchTerm}`,
         );

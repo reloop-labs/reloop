@@ -67,9 +67,6 @@ export async function updateAudience(
         if (body.lastName !== undefined) {
             updateData.lastName = body.lastName;
         }
-        if (body.phone !== undefined) {
-            updateData.phone = body.phone;
-        }
         if (body.metadata !== undefined) {
             updateData.metadata = body.metadata;
         }

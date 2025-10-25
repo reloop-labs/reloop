@@ -1,5 +1,5 @@
 "use client";
-import { isValidEmail, isValidPhone } from "@fe/dashboard/utils/audience";
+import { isValidEmail } from "@fe/dashboard/utils/audience";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Label from "@reloop/ui/label";
@@ -16,7 +16,6 @@ interface BulkImportAudience {
 	email: string;
 	firstName?: string;
 	lastName?: string;
-	phone?: string;
 	status?: "subscribed" | "unsubscribed";
 }
 
@@ -77,8 +76,6 @@ export const BulkImport = ({
 				firstName:
 					row.firstname || row.first_name || row.first || row.fname || "",
 				lastName: row.lastname || row.last_name || row.last || row.lname || "",
-				phone:
-					row.phone || row.phone_number || row.telephone || row.mobile || "",
 				status: row.status === "unsubscribed" ? "unsubscribed" : "subscribed",
 			};
 
@@ -113,14 +110,6 @@ export const BulkImport = ({
 				errors.push({
 					email: audience.email,
 					error: "Invalid email format",
-				});
-			}
-
-			// Validate phone if provided
-			if (audience.phone && !isValidPhone(audience.phone)) {
-				errors.push({
-					email: audience.email,
-					error: "Invalid phone format",
 				});
 			}
 
@@ -233,10 +222,10 @@ export const BulkImport = ({
 
 	const downloadExampleCSV = () => {
 		const exampleData = [
-			["email", "firstName", "lastName", "phone", "status"],
-			["john@example.com", "John", "Doe", "+1 (555) 123-4567", "subscribed"],
-			["jane@example.com", "Jane", "Smith", "+1 (555) 987-6543", "subscribed"],
-			["bob@example.com", "Bob", "Johnson", "", "unsubscribed"],
+			["email", "firstName", "lastName", "status"],
+			["john@example.com", "John", "Doe", "subscribed"],
+			["jane@example.com", "Jane", "Smith", "subscribed"],
+			["bob@example.com", "Bob", "Johnson", "unsubscribed"],
 		];
 
 		const csvContent = exampleData.map((row) => row.join(",")).join("\n");
@@ -286,8 +275,7 @@ export const BulkImport = ({
 							</Button.Root>
 						</div>
 						<p className="mt-2 text-sm text-text-sub-600">
-							CSV should include columns: email, firstName, lastName, phone,
-							status
+							CSV should include columns: email, firstName, lastName, status
 						</p>
 					</div>
 
@@ -345,7 +333,6 @@ export const BulkImport = ({
 										<Table.Row>
 											<Table.Head>Email</Table.Head>
 											<Table.Head>Name</Table.Head>
-											<Table.Head>Phone</Table.Head>
 											<Table.Head>Status</Table.Head>
 										</Table.Row>
 									</Table.Header>
@@ -360,7 +347,6 @@ export const BulkImport = ({
 														? `${audience.firstName || ""} ${audience.lastName || ""}`.trim()
 														: "—"}
 												</Table.Cell>
-												<Table.Cell>{audience.phone || "—"}</Table.Cell>
 												<Table.Cell>
 													<span
 														className={`inline-flex items-center gap-1 rounded-full px-2 py-1 font-medium text-xs ${
@@ -387,7 +373,7 @@ export const BulkImport = ({
 										{csvData.length > 10 && (
 											<Table.Row>
 												<Table.Cell
-													colSpan={4}
+													colSpan={3}
 													className="text-center text-sm text-text-sub-600"
 												>
 													... and {csvData.length - 10} more

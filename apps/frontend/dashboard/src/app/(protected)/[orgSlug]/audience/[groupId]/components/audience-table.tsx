@@ -71,15 +71,12 @@ export const AudienceTable = ({
 	return (
 		<AnimatePresence mode="wait">
 			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-200 text-paragraph-sm shadow-regular-md ring-stroke-soft-200 ring-inset">
-				<div className="grid grid-cols-[1fr_minmax(200px,auto)_minmax(120px,auto)_minmax(100px,auto)_minmax(40px,auto)]">
+				<div className="grid grid-cols-[1fr_minmax(200px,auto)_minmax(100px,auto)_minmax(40px,auto)]">
 					<div className="bg-bg-weak-50 pl-5 font-medium text-text-sub-600">
 						<div className="py-2.5">Audience</div>
 					</div>
 					<div className="bg-bg-weak-50 font-medium text-text-sub-600">
 						<div className="py-2.5">Status</div>
-					</div>
-					<div className="bg-bg-weak-50 font-medium text-text-sub-600">
-						<div className="py-2.5">Phone</div>
 					</div>
 					<div className="bg-bg-weak-50 font-medium text-text-sub-600">
 						<div className="py-2.5">Added</div>
@@ -101,9 +98,6 @@ export const AudienceTable = ({
 											<Skeleton className="h-2 w-2 rounded-full" />
 											<Skeleton className="h-4 w-16" />
 										</div>
-									</div>
-									<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
-										<Skeleton className="h-4 w-20" />
 									</div>
 									<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
 										<Skeleton className="h-4 w-20" />
@@ -168,20 +162,12 @@ export const AudienceTable = ({
 											{...getAnimationProps(index + 1, 2)}
 											className="text-label-sm text-text-strong-950"
 										>
-											{audience.phone || "—"}
-										</motion.span>
-									</div>
-									<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
-										<motion.span
-											{...getAnimationProps(index + 1, 3)}
-											className="text-label-sm text-text-strong-950"
-										>
 											{formatRelativeTime(audience.addedAt)}
 										</motion.span>
 									</div>
 									<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
 										<motion.div
-											{...getAnimationProps(index + 1, 4)}
+											{...getAnimationProps(index + 1, 3)}
 											className="flex items-center justify-center"
 										>
 											<PopoverRoot>

@@ -61,7 +61,6 @@ export const audience = pgTable(
         email: varchar("email", { length: 255 }).notNull(),
         firstName: varchar("first_name", { length: 255 }),
         lastName: varchar("last_name", { length: 255 }),
-        phone: varchar("phone", { length: 50 }),
         metadata: jsonb("metadata").$type<Record<string, unknown>>(),
         organizationId: text("organization_id")
             .notNull()

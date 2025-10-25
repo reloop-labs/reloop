@@ -22,12 +22,6 @@ export namespace AudienceModel {
                 description: "Audience last name",
             }),
         ),
-        phone: t.Optional(
-            t.String({
-                maxLength: 50,
-                description: "Audience phone number",
-            }),
-        ),
         metadata: t.Optional(
             t.Record(t.String(), t.Unknown(), {
                 description: "Custom metadata for the audience",
@@ -57,12 +51,6 @@ export namespace AudienceModel {
                 description: "Audience last name",
             }),
         ),
-        phone: t.Optional(
-            t.String({
-                maxLength: 50,
-                description: "Audience phone number",
-            }),
-        ),
         metadata: t.Optional(
             t.Record(t.String(), t.Unknown(), {
                 description: "Custom metadata for the audience",
@@ -83,9 +71,6 @@ export namespace AudienceModel {
         }),
         lastName: t.Union([t.String(), t.Null()], {
             description: "Audience last name",
-        }),
-        phone: t.Union([t.String(), t.Null()], {
-            description: "Audience phone number",
         }),
         metadata: t.Union([t.Record(t.String(), t.Unknown()), t.Null()], {
             description: "Custom metadata for the audience",
@@ -140,7 +125,6 @@ export namespace AudienceModel {
                 }),
                 firstName: t.Optional(t.String({ maxLength: 255 })),
                 lastName: t.Optional(t.String({ maxLength: 255 })),
-                phone: t.Optional(t.String({ maxLength: 50 })),
                 metadata: t.Optional(t.Record(t.String(), t.Unknown())),
                 status: t.Optional(
                     t.Union([t.Literal("subscribed"), t.Literal("unsubscribed")], {

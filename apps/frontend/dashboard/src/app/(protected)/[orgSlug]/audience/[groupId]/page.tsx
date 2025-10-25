@@ -45,8 +45,7 @@ const AudienceGroupPage = () => {
 				searchQuery === "" ||
 				audience.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
 				audience.firstName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-				audience.lastName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-				audience.phone?.toLowerCase().includes(searchQuery.toLowerCase());
+				audience.lastName?.toLowerCase().includes(searchQuery.toLowerCase());
 			return matchesStatus && matchesSearch;
 		}) || [];
 

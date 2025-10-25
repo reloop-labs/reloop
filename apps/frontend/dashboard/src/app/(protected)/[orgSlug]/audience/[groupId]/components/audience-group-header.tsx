@@ -216,7 +216,7 @@ export const AudienceGroupHeader = ({
 				</div>
 			</div>
 
-			<div className="mt-3 mb-8 flex w-full items-center justify-between border-stroke-soft-200 border-b border-dashed pb-8">
+			<div className="my-3 flex w-full items-center justify-between border-stroke-soft-200 border-b border-dashed pb-8">
 				<div className="flex gap-8">
 					<div className="">
 						<div className="flex items-center gap-1.5">

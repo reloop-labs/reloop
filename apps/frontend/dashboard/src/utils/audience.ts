@@ -45,28 +45,6 @@ export const getStatusIcon = (status: AudienceStatus): string => {
     }
 };
 
-/**
- * Format phone number for display
- */
-export const formatPhoneNumber = (phone: string | null): string => {
-    if (!phone) return "";
-
-    // Remove all non-digit characters
-    const digits = phone.replace(/\D/g, "");
-
-    // Format as (XXX) XXX-XXXX for US numbers
-    if (digits.length === 10) {
-        return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
-    }
-
-    // Format as +X (XXX) XXX-XXXX for international numbers
-    if (digits.length === 11 && digits[0] === "1") {
-        return `+1 (${digits.slice(1, 4)}) ${digits.slice(4, 7)}-${digits.slice(7)}`;
-    }
-
-    // Return original if doesn't match common patterns
-    return phone;
-};
 
 /**
  * Get full name from first and last name
@@ -121,14 +99,6 @@ export const isValidEmail = (email: string): boolean => {
     return emailPattern.test(email);
 };
 
-/**
- * Validate phone number format (basic validation)
- */
-export const isValidPhone = (phone: string): boolean => {
-    if (!phone) return true; // Phone is optional
-    const phonePattern = /^[+]?[1-9][\d]{0,15}$/;
-    return phonePattern.test(phone.replace(/\D/g, ""));
-};
 
 /**
  * Format metadata for display

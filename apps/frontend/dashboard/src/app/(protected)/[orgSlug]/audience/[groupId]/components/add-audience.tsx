@@ -1,5 +1,5 @@
 "use client";
-import { isValidEmail, isValidPhone } from "@fe/dashboard/utils/audience";
+import { isValidEmail } from "@fe/dashboard/utils/audience";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
@@ -35,17 +35,6 @@ const addAudienceSchema = v.object({
 		v.pipe(
 			v.string(),
 			v.maxLength(255, "Last name must be less than 255 characters"),
-		),
-	),
-	phone: v.optional(
-		v.pipe(
-			v.string(),
-			v.maxLength(50, "Phone must be less than 50 characters"),
-			v.custom(
-				(phone: unknown) =>
-					typeof phone === "string" && (!phone || isValidPhone(phone)),
-				"Please enter a valid phone number",
-			),
 		),
 	),
 	status: v.optional(
@@ -86,7 +75,6 @@ export const AddAudience = ({
 			email: "",
 			firstName: "",
 			lastName: "",
-			phone: "",
 			status: "subscribed",
 		},
 	});
@@ -227,37 +215,6 @@ export const AddAudience = ({
 								</div>
 							)}
 						</div>
-					</div>
-
-					<div>
-						<Label.Root
-							htmlFor="phone"
-							className="mb-2 block font-medium text-gray-700 text-sm"
-						>
-							Phone Number
-						</Label.Root>
-						<Input.Root
-							hasError={!!formState?.errors?.phone?.message}
-							className="w-full"
-						>
-							<Input.Wrapper>
-								<Input.Input
-									id="phone"
-									type="tel"
-									placeholder="+1 (555) 123-4567"
-									{...register("phone")}
-									disabled={status === "loading"}
-								/>
-							</Input.Wrapper>
-						</Input.Root>
-						{formState.errors.phone && (
-							<div className="mt-2 flex items-center gap-2">
-								<Icon name="alert-circle" className="h-4 w-4 text-red-500" />
-								<p className="text-red-600 text-sm">
-									{formState.errors.phone.message}
-								</p>
-							</div>
-						)}
 					</div>
 
 					<div>

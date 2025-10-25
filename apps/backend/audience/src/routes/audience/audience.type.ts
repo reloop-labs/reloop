@@ -32,7 +32,6 @@ export namespace AudienceTypes {
         email: string;
         firstName: string | null;
         lastName: string | null;
-        phone: string | null;
         metadata: Record<string, unknown> | null;
         organizationId: string;
         status: "subscribed" | "unsubscribed";
@@ -47,7 +46,6 @@ export namespace AudienceTypes {
         email: string;
         firstName?: string;
         lastName?: string;
-        phone?: string;
         metadata?: Record<string, unknown>;
         audienceGroupId: string;
         status?: "subscribed" | "unsubscribed";
@@ -56,7 +54,6 @@ export namespace AudienceTypes {
     export interface UpdateAudienceRequest {
         firstName?: string;
         lastName?: string;
-        phone?: string;
         metadata?: Record<string, unknown>;
         audienceGroupId?: string;
     }
@@ -65,7 +62,6 @@ export namespace AudienceTypes {
         email: string;
         firstName?: string;
         lastName?: string;
-        phone?: string;
         metadata?: Record<string, unknown>;
         status?: "subscribed" | "unsubscribed";
     }

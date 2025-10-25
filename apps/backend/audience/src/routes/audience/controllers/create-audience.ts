@@ -64,7 +64,6 @@ export async function createAudience(
                 email: body.email,
                 firstName: body.firstName || null,
                 lastName: body.lastName || null,
-                phone: body.phone || null,
                 metadata: body.metadata || null,
                 organizationId,
                 audienceGroupId: body.audienceGroupId,

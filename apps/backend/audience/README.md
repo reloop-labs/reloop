@@ -27,7 +27,7 @@ A comprehensive audiences management service built with Elysia, providing full C
 - **Status Tracking**: Track subscription status and timestamps
 
 ### Advanced Search
-- **Multi-field Search**: Search across email, name, phone, and metadata
+- **Multi-field Search**: Search across email, name, and metadata
 - **Filtering**: Filter by status, group, organization
 - **Pagination**: Efficient pagination for large datasets
 
