@@ -7,7 +7,7 @@ import { updateAudienceGroupRoute } from "@reloop/audience/routes/audience-group
 import { Elysia } from "elysia";
 
 export const audienceGroupRoutes = new Elysia({
-    prefix: "/v1/audience-groups",
+    prefix: "/v1/groups",
     name: "AudienceGroupRoutes",
 })
     .use(authMiddleware)

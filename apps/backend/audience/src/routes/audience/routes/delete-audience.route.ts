@@ -4,7 +4,7 @@ import { deleteAudienceHandler } from "@reloop/audience/routes/audience/controll
 import { Elysia, status, t } from "elysia";
 
 export const deleteAudienceRoute = new Elysia().use(authMiddleware).delete(
-    "/audience/:id",
+    "/delete/:id",
     async ({ params, user }: { params: { id: string }; user: any }) => {
         if (!user.activeOrganizationId) {
             throw status(403, {

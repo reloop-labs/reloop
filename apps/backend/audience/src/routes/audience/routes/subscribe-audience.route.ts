@@ -4,7 +4,7 @@ import { subscribeAudienceHandler } from "@reloop/audience/routes/audience/contr
 import { Elysia, status, t } from "elysia";
 
 export const subscribeAudienceRoute = new Elysia().use(authMiddleware).post(
-    "/audience/:id/subscribe",
+    "/subscribe/:id",
     async ({ params, body, user }: { params: { id: string }; body: any; user: any }) => {
         if (!user.activeOrganizationId) {
             throw status(403, {
