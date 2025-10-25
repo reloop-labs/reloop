@@ -1,21 +1,16 @@
 "use client";
 import { isValidEmail, isValidPhone } from "@fe/dashboard/utils/audience";
-import { valibotResolver } from "@hookform/resolvers/valibot";
 import * as Button from "@reloop/ui/button";
-import * as Dialog from "@reloop/ui/dialog";
 import { Icon } from "@reloop/ui/icon";
 import * as Label from "@reloop/ui/label";
-import * as Select from "@reloop/ui/select";
+import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import * as Table from "@reloop/ui/table";
 import { useLoading } from "@reloop/ui/use-loading";
 import axios from "axios";
 import { useCallback, useState } from "react";
-import type { Resolver } from "react-hook-form";
-import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
-import * as v from "valibot";
 
 interface BulkImportAudience {
 	email: string;
@@ -57,24 +52,17 @@ export const BulkImport = ({
 	);
 	const [isValidating, setIsValidating] = useState(false);
 
-	const { register, handleSubmit, formState, setError, reset } = useForm({
-		resolver: valibotResolver(
-			v.object({
-				file: v.any(),
-			}),
-		) as Resolver<any>,
-	});
-
 	const parseCSV = (csvText: string): BulkImportAudience[] => {
 		const lines = csvText.split("\n").filter((line) => line.trim());
 		if (lines.length === 0) return [];
 
-		const headers = lines[0].split(",").map((h) => h.trim().toLowerCase());
+		const headers =
+			lines[0]?.split(",").map((h) => h.trim().toLowerCase()) || [];
 		const data: BulkImportAudience[] = [];
 
 		for (let i = 1; i < lines.length; i++) {
-			const values = lines[i].split(",").map((v) => v.trim());
-			const row: any = {};
+			const values = lines[i]?.split(",").map((v) => v.trim()) || [];
+			const row: Record<string, string> = {};
 
 			headers.forEach((header, index) => {
 				const value = values[index] || "";
@@ -240,7 +228,6 @@ export const BulkImport = ({
 	const handleCancel = () => {
 		setCsvData([]);
 		setImportResult(null);
-		reset();
 		onOpenChange(false);
 	};
 
@@ -263,15 +250,15 @@ export const BulkImport = ({
 	};
 
 	return (
-		<Dialog.Root open={open} onOpenChange={onOpenChange}>
-			<Dialog.Content className="max-w-4xl">
-				<Dialog.Header>
-					<Dialog.Title>Bulk Import Audience to "{groupName}"</Dialog.Title>
-					<Dialog.Description>
+		<Modal.Root open={open} onOpenChange={onOpenChange}>
+			<Modal.Content className="max-w-4xl">
+				<Modal.Header>
+					<Modal.Title>Bulk Import Audience to "{groupName}"</Modal.Title>
+					<Modal.Description>
 						Import up to 1000 audiences from a CSV file. Download the example
 						template to see the required format.
-					</Dialog.Description>
-				</Dialog.Header>
+					</Modal.Description>
+				</Modal.Header>
 
 				<div className="space-y-6">
 					{/* File Upload */}
@@ -459,7 +446,7 @@ export const BulkImport = ({
 					)}
 				</div>
 
-				<Dialog.Footer className="flex gap-2">
+				<Modal.Footer className="flex gap-2">
 					<Button.Root
 						type="button"
 						variant="neutral"
@@ -489,8 +476,8 @@ export const BulkImport = ({
 							)}
 						</Button.Root>
 					)}
-				</Dialog.Footer>
-			</Dialog.Content>
-		</Dialog.Root>
+				</Modal.Footer>
+			</Modal.Content>
+		</Modal.Root>
 	);
 };

@@ -2,10 +2,10 @@
 import { isValidEmail, isValidPhone } from "@fe/dashboard/utils/audience";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import * as Button from "@reloop/ui/button";
-import * as Dialog from "@reloop/ui/dialog";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
+import * as Modal from "@reloop/ui/modal";
 import * as Select from "@reloop/ui/select";
 import Spinner from "@reloop/ui/spinner";
 import { useLoading } from "@reloop/ui/use-loading";
@@ -21,7 +21,7 @@ const addAudienceSchema = v.object({
 		v.string("Email is required"),
 		v.minLength(1, "Email is required"),
 		v.custom(
-			(email) => isValidEmail(email),
+			(email: unknown) => typeof email === "string" && isValidEmail(email),
 			"Please enter a valid email address",
 		),
 	),
@@ -42,7 +42,8 @@ const addAudienceSchema = v.object({
 			v.string(),
 			v.maxLength(50, "Phone must be less than 50 characters"),
 			v.custom(
-				(phone) => !phone || isValidPhone(phone),
+				(phone: unknown) =>
+					typeof phone === "string" && (!phone || isValidPhone(phone)),
 				"Please enter a valid phone number",
 			),
 		),
@@ -69,19 +70,26 @@ export const AddAudience = ({
 }: AddAudienceProps) => {
 	const { changeStatus, status } = useLoading();
 	const { mutate } = useSWRConfig();
-	const { register, handleSubmit, formState, setError, reset } =
-		useForm<AddAudienceFormValues>({
-			resolver: valibotResolver(
-				addAudienceSchema,
-			) as Resolver<AddAudienceFormValues>,
-			defaultValues: {
-				email: "",
-				firstName: "",
-				lastName: "",
-				phone: "",
-				status: "subscribed",
-			},
-		});
+	const {
+		register,
+		handleSubmit,
+		formState,
+		setError,
+		reset,
+		watch,
+		setValue,
+	} = useForm<AddAudienceFormValues>({
+		resolver: valibotResolver(
+			addAudienceSchema,
+		) as Resolver<AddAudienceFormValues>,
+		defaultValues: {
+			email: "",
+			firstName: "",
+			lastName: "",
+			phone: "",
+			status: "subscribed",
+		},
+	});
 
 	const onSubmit = async (data: AddAudienceFormValues) => {
 		try {
@@ -116,15 +124,15 @@ export const AddAudience = ({
 	};
 
 	return (
-		<Dialog.Root open={open} onOpenChange={onOpenChange}>
-			<Dialog.Content className="max-w-md">
-				<Dialog.Header>
-					<Dialog.Title>Add Audience to "{groupName}"</Dialog.Title>
-					<Dialog.Description>
+		<Modal.Root open={open} onOpenChange={onOpenChange}>
+			<Modal.Content className="max-w-md">
+				<Modal.Header>
+					<Modal.Title>Add Audience to "{groupName}"</Modal.Title>
+					<Modal.Description>
 						Add a new audience to this group. All fields except email are
 						optional.
-					</Dialog.Description>
-				</Dialog.Header>
+					</Modal.Description>
+				</Modal.Header>
 
 				<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 					<div>
@@ -260,12 +268,9 @@ export const AddAudience = ({
 							Subscription Status
 						</Label.Root>
 						<Select.Root
-							value={formState.watch("status")}
+							value={watch("status")}
 							onValueChange={(value) => {
-								formState.setValue(
-									"status",
-									value as "subscribed" | "unsubscribed",
-								);
+								setValue("status", value as "subscribed" | "unsubscribed");
 							}}
 						>
 							<Select.Trigger className="w-full">
@@ -294,7 +299,7 @@ export const AddAudience = ({
 						</Select.Root>
 					</div>
 
-					<Dialog.Footer className="flex gap-2">
+					<Modal.Footer className="flex gap-2">
 						<Button.Root
 							type="button"
 							variant="neutral"
@@ -321,9 +326,9 @@ export const AddAudience = ({
 								</>
 							)}
 						</Button.Root>
-					</Dialog.Footer>
+					</Modal.Footer>
 				</form>
-			</Dialog.Content>
-		</Dialog.Root>
+			</Modal.Content>
+		</Modal.Root>
 	);
 };

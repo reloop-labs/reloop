@@ -36,7 +36,7 @@ export const AddAudienceGroupSidebar = () => {
 	const { changeStatus, status } = useLoading();
 	const { mutate } = useSWRConfig();
 	const { back } = useRouter();
-	const { register, handleSubmit, formState, setError } =
+	const { register, handleSubmit, formState, setError, watch } =
 		useForm<AudienceGroupFormValues>({
 			resolver: valibotResolver(
 				audienceGroupSchema,
@@ -46,6 +46,8 @@ export const AddAudienceGroupSidebar = () => {
 				description: "",
 			},
 		});
+
+	const descriptionValue = watch("description");
 
 	const onSubmit = async ({ name, description }: AudienceGroupFormValues) => {
 		try {
@@ -160,13 +162,18 @@ export const AddAudienceGroupSidebar = () => {
 						<div className="relative">
 							<Textarea.Root
 								id="description"
+								className="text-sm"
 								placeholder="Describe this audience group..."
 								{...register("description")}
 								disabled={status === "loading"}
 								rows={3}
 								hasError={!!formState?.errors?.description?.message}
 							>
-								<Textarea.CharCounter current={78} max={200} />
+								<Textarea.CharCounter
+									className="text-xs"
+									current={descriptionValue?.length || 0}
+									max={500}
+								/>
 							</Textarea.Root>
 
 							{formState.errors.description && (
