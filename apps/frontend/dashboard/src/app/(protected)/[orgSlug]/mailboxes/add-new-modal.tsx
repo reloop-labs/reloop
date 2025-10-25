@@ -130,7 +130,7 @@ export const AddNewMailboxModal = ({
 								<p className="col-span-3 font-medium text-sm text-text-strong-950">
 									play@exaple.com
 								</p>
-								<Icon name="copy" className="h-3 w-3" />
+								<Icon name="clipboard-copy" className="h-3 w-3" />
 							</div>
 
 							<div className="grid grid-cols-6 items-center gap-2">
@@ -140,7 +140,7 @@ export const AddNewMailboxModal = ({
 								<p className="col-span-3 font-medium text-text-strong-950 leading-5">
 									••••••••••
 								</p>
-								<Icon name="copy" className="h-3 w-3" />
+								<Icon name="clipboard-copy" className="h-3 w-3" />
 							</div>
 							<div className="grid grid-cols-6 items-center gap-2">
 								<p className="col-span-2 font-medium text-sm text-text-sub-600">

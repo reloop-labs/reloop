@@ -325,7 +325,7 @@ export const DomainSDK = () => {
 										)
 									}
 								>
-									<Icon name="copy" className="h-4 w-4" />
+									<Icon name="clipboard-copy" className="h-4 w-4" />
 									Copy
 								</Button.Root>
 							</div>

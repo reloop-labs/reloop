@@ -83,7 +83,7 @@ const SettingsPage = () => {
 									className="flex items-center justify-center"
 								>
 									<Icon
-										name="copy"
+										name="clipboard-copy"
 										className="size-5 text-text-soft-400 group-has-[disabled]:text-text-disabled-300"
 									/>
 								</button>

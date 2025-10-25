@@ -266,7 +266,7 @@ export const AudienceGroupHeader = ({
 							onClick={handleCopyId}
 							className="h-6 w-6 p-0"
 						>
-							<Icon name="copy" className="h-3 w-3" />
+							<Icon name="clipboard-copy" className="h-3 w-3" />
 						</Button.Root>
 					</div>
 				</div>

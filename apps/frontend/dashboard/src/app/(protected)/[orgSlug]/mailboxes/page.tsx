@@ -150,7 +150,7 @@ const MailboxesPage = () => {
 													title="Copy password"
 												>
 													<Icon
-														name="copy"
+														name="clipboard-copy"
 														className="h-3 w-3 text-text-sub-600"
 													/>
 												</button>
