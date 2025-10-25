@@ -1,0 +1,496 @@
+"use client";
+import { isValidEmail, isValidPhone } from "@fe/dashboard/utils/audience";
+import { valibotResolver } from "@hookform/resolvers/valibot";
+import * as Button from "@reloop/ui/button";
+import * as Dialog from "@reloop/ui/dialog";
+import { Icon } from "@reloop/ui/icon";
+import * as Label from "@reloop/ui/label";
+import * as Select from "@reloop/ui/select";
+import Spinner from "@reloop/ui/spinner";
+import * as Table from "@reloop/ui/table";
+import { useLoading } from "@reloop/ui/use-loading";
+import axios from "axios";
+import { useCallback, useState } from "react";
+import type { Resolver } from "react-hook-form";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { useSWRConfig } from "swr";
+import * as v from "valibot";
+
+interface BulkImportAudience {
+	email: string;
+	firstName?: string;
+	lastName?: string;
+	phone?: string;
+	status?: "subscribed" | "unsubscribed";
+}
+
+interface BulkImportError {
+	email: string;
+	error: string;
+}
+
+interface BulkImportResult {
+	successful: number;
+	failed: number;
+	errors: BulkImportError[];
+}
+
+interface BulkImportProps {
+	groupId: string;
+	groupName: string;
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
+}
+
+export const BulkImport = ({
+	groupId,
+	groupName,
+	open,
+	onOpenChange,
+}: BulkImportProps) => {
+	const { changeStatus, status } = useLoading();
+	const { mutate } = useSWRConfig();
+	const [csvData, setCsvData] = useState<BulkImportAudience[]>([]);
+	const [importResult, setImportResult] = useState<BulkImportResult | null>(
+		null,
+	);
+	const [isValidating, setIsValidating] = useState(false);
+
+	const { register, handleSubmit, formState, setError, reset } = useForm({
+		resolver: valibotResolver(
+			v.object({
+				file: v.any(),
+			}),
+		) as Resolver<any>,
+	});
+
+	const parseCSV = (csvText: string): BulkImportAudience[] => {
+		const lines = csvText.split("\n").filter((line) => line.trim());
+		if (lines.length === 0) return [];
+
+		const headers = lines[0].split(",").map((h) => h.trim().toLowerCase());
+		const data: BulkImportAudience[] = [];
+
+		for (let i = 1; i < lines.length; i++) {
+			const values = lines[i].split(",").map((v) => v.trim());
+			const row: any = {};
+
+			headers.forEach((header, index) => {
+				const value = values[index] || "";
+				if (value) {
+					row[header] = value;
+				}
+			});
+
+			// Map common column names
+			const audience: BulkImportAudience = {
+				email: row.email || row.e_mail || row.email_address || "",
+				firstName:
+					row.firstname || row.first_name || row.first || row.fname || "",
+				lastName: row.lastname || row.last_name || row.last || row.lname || "",
+				phone:
+					row.phone || row.phone_number || row.telephone || row.mobile || "",
+				status: row.status === "unsubscribed" ? "unsubscribed" : "subscribed",
+			};
+
+			// Only add if email is present
+			if (audience.email) {
+				data.push(audience);
+			}
+		}
+
+		return data;
+	};
+
+	const validateAudiences = (
+		audiences: BulkImportAudience[],
+	): BulkImportError[] => {
+		const errors: BulkImportError[] = [];
+		const seenEmails = new Set<string>();
+
+		audiences.forEach((audience, index) => {
+			// Check for duplicate emails in the import
+			if (seenEmails.has(audience.email)) {
+				errors.push({
+					email: audience.email,
+					error: "Duplicate email in import file",
+				});
+				return;
+			}
+			seenEmails.add(audience.email);
+
+			// Validate email
+			if (!isValidEmail(audience.email)) {
+				errors.push({
+					email: audience.email,
+					error: "Invalid email format",
+				});
+			}
+
+			// Validate phone if provided
+			if (audience.phone && !isValidPhone(audience.phone)) {
+				errors.push({
+					email: audience.email,
+					error: "Invalid phone format",
+				});
+			}
+
+			// Check required fields
+			if (!audience.email.trim()) {
+				errors.push({
+					email: `Row ${index + 2}`,
+					error: "Email is required",
+				});
+			}
+		});
+
+		return errors;
+	};
+
+	const handleFileUpload = useCallback(
+		(event: React.ChangeEvent<HTMLInputElement>) => {
+			const file = event.target.files?.[0];
+			if (!file) return;
+
+			if (!file.name.toLowerCase().endsWith(".csv")) {
+				toast.error("Please select a CSV file");
+				return;
+			}
+
+			const reader = new FileReader();
+			reader.onload = (e) => {
+				const csvText = e.target?.result as string;
+				const parsed = parseCSV(csvText);
+
+				if (parsed.length === 0) {
+					toast.error("No valid data found in CSV file");
+					return;
+				}
+
+				if (parsed.length > 1000) {
+					toast.error(
+						"CSV file contains more than 1000 rows. Please split into smaller files.",
+					);
+					return;
+				}
+
+				setCsvData(parsed);
+				setImportResult(null);
+			};
+			reader.readAsText(file);
+		},
+		[],
+	);
+
+	const handleValidate = async () => {
+		if (csvData.length === 0) {
+			toast.error("Please upload a CSV file first");
+			return;
+		}
+
+		setIsValidating(true);
+		const errors = validateAudiences(csvData);
+
+		setImportResult({
+			successful: csvData.length - errors.length,
+			failed: errors.length,
+			errors,
+		});
+		setIsValidating(false);
+	};
+
+	const handleImport = async () => {
+		if (csvData.length === 0) {
+			toast.error("Please upload a CSV file first");
+			return;
+		}
+
+		try {
+			changeStatus("loading");
+			const response = await axios.post(
+				"/api/audience/v1/audiences/bulk-import",
+				{
+					audienceGroupId: groupId,
+					audiences: csvData,
+				},
+				{ headers: { credentials: "include" } },
+			);
+
+			const result: BulkImportResult = response.data;
+			setImportResult(result);
+
+			if (result.successful > 0) {
+				await mutate(`/api/audience/v1/audiences?audienceGroupId=${groupId}`);
+				toast.success(`Successfully imported ${result.successful} audiences`);
+			}
+
+			if (result.failed > 0) {
+				toast.error(`${result.failed} audiences failed to import`);
+			}
+		} catch (error) {
+			changeStatus("idle");
+			const errorMessage = axios.isAxiosError(error)
+				? error.response?.data?.message || "Failed to import audiences"
+				: "Failed to import audiences";
+			toast.error(errorMessage);
+		}
+	};
+
+	const handleCancel = () => {
+		setCsvData([]);
+		setImportResult(null);
+		reset();
+		onOpenChange(false);
+	};
+
+	const downloadExampleCSV = () => {
+		const exampleData = [
+			["email", "firstName", "lastName", "phone", "status"],
+			["john@example.com", "John", "Doe", "+1 (555) 123-4567", "subscribed"],
+			["jane@example.com", "Jane", "Smith", "+1 (555) 987-6543", "subscribed"],
+			["bob@example.com", "Bob", "Johnson", "", "unsubscribed"],
+		];
+
+		const csvContent = exampleData.map((row) => row.join(",")).join("\n");
+		const blob = new Blob([csvContent], { type: "text/csv" });
+		const url = window.URL.createObjectURL(blob);
+		const a = document.createElement("a");
+		a.href = url;
+		a.download = "audience-import-example.csv";
+		a.click();
+		window.URL.revokeObjectURL(url);
+	};
+
+	return (
+		<Dialog.Root open={open} onOpenChange={onOpenChange}>
+			<Dialog.Content className="max-w-4xl">
+				<Dialog.Header>
+					<Dialog.Title>Bulk Import Audiences to "{groupName}"</Dialog.Title>
+					<Dialog.Description>
+						Import up to 1000 audiences from a CSV file. Download the example
+						template to see the required format.
+					</Dialog.Description>
+				</Dialog.Header>
+
+				<div className="space-y-6">
+					{/* File Upload */}
+					<div>
+						<Label.Root className="mb-2 block font-medium text-gray-700 text-sm">
+							CSV File
+							<Label.Asterisk />
+						</Label.Root>
+						<div className="flex items-center gap-4">
+							<input
+								type="file"
+								accept=".csv"
+								onChange={handleFileUpload}
+								className="block w-full text-gray-500 text-sm file:mr-4 file:rounded-full file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:font-semibold file:text-blue-700 file:text-sm hover:file:bg-blue-100"
+							/>
+							<Button.Root
+								type="button"
+								variant="neutral"
+								mode="stroke"
+								size="small"
+								onClick={downloadExampleCSV}
+							>
+								<Icon name="download" className="h-4 w-4" />
+								Download Example
+							</Button.Root>
+						</div>
+						<p className="mt-2 text-sm text-text-sub-600">
+							CSV should include columns: email, firstName, lastName, phone,
+							status
+						</p>
+					</div>
+
+					{/* Preview Data */}
+					{csvData.length > 0 && (
+						<div>
+							<div className="mb-4 flex items-center justify-between">
+								<h3 className="font-medium text-lg">
+									Preview ({csvData.length} audiences)
+								</h3>
+								<div className="flex gap-2">
+									<Button.Root
+										variant="neutral"
+										mode="stroke"
+										size="small"
+										onClick={handleValidate}
+										disabled={isValidating}
+									>
+										{isValidating ? (
+											<>
+												<Spinner color="current" />
+												Validating...
+											</>
+										) : (
+											<>
+												<Icon name="check-circle" className="h-4 w-4" />
+												Validate
+											</>
+										)}
+									</Button.Root>
+									<Button.Root
+										variant="neutral"
+										size="small"
+										onClick={handleImport}
+										disabled={status === "loading"}
+									>
+										{status === "loading" ? (
+											<>
+												<Spinner color="white" />
+												Importing...
+											</>
+										) : (
+											<>
+												<Icon name="upload" className="h-4 w-4" />
+												Import All
+											</>
+										)}
+									</Button.Root>
+								</div>
+							</div>
+
+							<div className="max-h-64 overflow-auto rounded-lg border border-stroke-soft-200">
+								<Table.Root>
+									<Table.Header>
+										<Table.Row>
+											<Table.Head>Email</Table.Head>
+											<Table.Head>Name</Table.Head>
+											<Table.Head>Phone</Table.Head>
+											<Table.Head>Status</Table.Head>
+										</Table.Row>
+									</Table.Header>
+									<Table.Body>
+										{csvData.slice(0, 10).map((audience, index) => (
+											<Table.Row key={index}>
+												<Table.Cell className="font-medium">
+													{audience.email}
+												</Table.Cell>
+												<Table.Cell>
+													{audience.firstName || audience.lastName
+														? `${audience.firstName || ""} ${audience.lastName || ""}`.trim()
+														: "—"}
+												</Table.Cell>
+												<Table.Cell>{audience.phone || "—"}</Table.Cell>
+												<Table.Cell>
+													<span
+														className={`inline-flex items-center gap-1 rounded-full px-2 py-1 font-medium text-xs ${
+															audience.status === "subscribed"
+																? "bg-green-100 text-green-800"
+																: "bg-gray-100 text-gray-800"
+														}`}
+													>
+														<Icon
+															name={
+																audience.status === "subscribed"
+																	? "check-circle"
+																	: "minus-circle"
+															}
+															className="h-3 w-3"
+														/>
+														{audience.status === "subscribed"
+															? "Subscribed"
+															: "Unsubscribed"}
+													</span>
+												</Table.Cell>
+											</Table.Row>
+										))}
+										{csvData.length > 10 && (
+											<Table.Row>
+												<Table.Cell
+													colSpan={4}
+													className="text-center text-sm text-text-sub-600"
+												>
+													... and {csvData.length - 10} more
+												</Table.Cell>
+											</Table.Row>
+										)}
+									</Table.Body>
+								</Table.Root>
+							</div>
+						</div>
+					)}
+
+					{/* Import Results */}
+					{importResult && (
+						<div className="rounded-lg border border-stroke-soft-200 p-4">
+							<h3 className="mb-4 font-medium text-lg">Import Results</h3>
+							<div className="mb-4 grid grid-cols-3 gap-4">
+								<div className="text-center">
+									<div className="font-bold text-2xl text-green-600">
+										{importResult.successful}
+									</div>
+									<div className="text-sm text-text-sub-600">Successful</div>
+								</div>
+								<div className="text-center">
+									<div className="font-bold text-2xl text-red-600">
+										{importResult.failed}
+									</div>
+									<div className="text-sm text-text-sub-600">Failed</div>
+								</div>
+								<div className="text-center">
+									<div className="font-bold text-2xl text-blue-600">
+										{importResult.successful + importResult.failed}
+									</div>
+									<div className="text-sm text-text-sub-600">Total</div>
+								</div>
+							</div>
+
+							{importResult.errors.length > 0 && (
+								<div>
+									<h4 className="mb-2 font-medium">Errors:</h4>
+									<div className="max-h-32 space-y-1 overflow-auto">
+										{importResult.errors.map((error, index) => (
+											<div
+												key={index}
+												className="flex items-center gap-2 text-red-600 text-sm"
+											>
+												<Icon name="alert-circle" className="h-4 w-4" />
+												<span className="font-medium">{error.email}:</span>
+												<span>{error.error}</span>
+											</div>
+										))}
+									</div>
+								</div>
+							)}
+						</div>
+					)}
+				</div>
+
+				<Dialog.Footer className="flex gap-2">
+					<Button.Root
+						type="button"
+						variant="neutral"
+						mode="stroke"
+						onClick={handleCancel}
+						disabled={status === "loading"}
+					>
+						{importResult ? "Close" : "Cancel"}
+					</Button.Root>
+					{!importResult && csvData.length > 0 && (
+						<Button.Root
+							type="button"
+							variant="neutral"
+							onClick={handleImport}
+							disabled={status === "loading"}
+						>
+							{status === "loading" ? (
+								<>
+									<Spinner color="white" />
+									Importing...
+								</>
+							) : (
+								<>
+									<Icon name="upload" className="h-4 w-4" />
+									Import All
+								</>
+							)}
+						</Button.Root>
+					)}
+				</Dialog.Footer>
+			</Dialog.Content>
+		</Dialog.Root>
+	);
+};

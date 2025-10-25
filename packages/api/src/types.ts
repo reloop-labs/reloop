@@ -68,3 +68,55 @@ export interface DomainListResponse {
 	page: number;
 	limit: number;
 }
+
+// Audience types
+export type AudienceStatus = "subscribed" | "unsubscribed";
+
+export interface Audience {
+	id: string;
+	email: string;
+	firstName: string | null;
+	lastName: string | null;
+	phone: string | null;
+	metadata: Record<string, unknown> | null;
+	organizationId: string;
+	status: AudienceStatus;
+	audienceGroupId: string;
+	audienceGroupName: string;
+	addedAt: string;
+	unsubscribedAt: string | null;
+	createdAt: string;
+	updatedAt: string;
+}
+
+export interface AudienceGroup {
+	id: string;
+	name: string;
+	description: string | null;
+	organizationId: string;
+	userId: string;
+	audienceCount: number;
+	subscribedCount: number;
+	unsubscribedCount: number;
+	deletedAt: string | null;
+	createdAt: string;
+	updatedAt: string;
+}
+
+export interface AudienceResponse extends Audience { }
+
+export interface AudienceListResponse {
+	audiences: Audience[];
+	total: number;
+	page: number;
+	limit: number;
+}
+
+export interface AudienceGroupResponse extends AudienceGroup { }
+
+export interface AudienceGroupListResponse {
+	audienceGroups: AudienceGroup[];
+	total: number;
+	page: number;
+	limit: number;
+}
