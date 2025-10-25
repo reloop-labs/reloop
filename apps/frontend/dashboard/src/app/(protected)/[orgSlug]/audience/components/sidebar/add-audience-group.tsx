@@ -52,7 +52,7 @@ export const AddAudienceGroupSidebar = () => {
 	const onSubmit = async ({ name, description }: AudienceGroupFormValues) => {
 		try {
 			changeStatus("loading");
-			await axios.post(
+			const response = await axios.post(
 				"/api/audience/v1/groups/add",
 				{
 					name,
@@ -63,7 +63,7 @@ export const AddAudienceGroupSidebar = () => {
 			await mutate(
 				`/api/audience/v1/groups/list?organizationId=${activeOrganization.id}`,
 			);
-			push("/audience");
+			push(`/audience/${response.data.id}`);
 		} catch (error) {
 			changeStatus("idle");
 			const errorMessage = axios.isAxiosError(error)
@@ -203,8 +203,8 @@ export const AddAudienceGroupSidebar = () => {
 								<>
 									Create Group
 									<Icon
-										name="users"
-										className="h-5 w-5 rounded-md bg-bg-white-0/10 p-1"
+										name="undo"
+										className="h-5 w-5 scale-y-[-1] rounded-md bg-bg-white-0/10 p-1"
 									/>
 								</>
 							)}
