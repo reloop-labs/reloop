@@ -11,8 +11,8 @@ export const mainNavigation: MainNavigationItem[] = [
 		iconName: "house",
 	},
 	{
-		label: "Contacts",
-		path: "/contacts",
+		label: "Audience",
+		path: "/audience",
 		iconName: "users",
 	},
 	{
