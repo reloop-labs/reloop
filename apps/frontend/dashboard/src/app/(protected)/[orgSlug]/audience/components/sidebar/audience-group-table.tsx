@@ -18,7 +18,6 @@ import { useQueryState } from "nuqs";
 interface AudienceGroupTableProps {
 	audienceGroups: AudienceGroup[];
 	activeOrganizationSlug: string;
-	currentGroupId?: string;
 	isLoading?: boolean;
 	loadingRows?: number;
 }
@@ -26,7 +25,6 @@ interface AudienceGroupTableProps {
 export const AudienceGroupTable = ({
 	audienceGroups,
 	activeOrganizationSlug,
-	currentGroupId,
 	isLoading,
 	loadingRows = 3,
 }: AudienceGroupTableProps) => {
@@ -44,15 +42,18 @@ export const AudienceGroupTable = ({
 	return (
 		<AnimatePresence mode="wait">
 			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-200 text-paragraph-sm shadow-regular-md ring-stroke-soft-200 ring-inset">
-				<div className="grid grid-cols-[1fr_minmax(200px,auto)_minmax(150px,auto)_minmax(100px,auto)_minmax(40px,auto)]">
+				<div className="grid grid-cols-[1fr_minmax(80px,auto)_minmax(80px,auto)_minmax(80px,auto)_minmax(100px,auto)_minmax(40px,auto)]">
 					<div className="bg-bg-weak-50 pl-5 font-medium text-text-sub-600">
 						<div className="py-2.5">Group Name</div>
 					</div>
 					<div className="bg-bg-weak-50 font-medium text-text-sub-600">
-						<div className="py-2.5">Audience</div>
+						<div className="px-3 py-2.5">Audience</div>
 					</div>
 					<div className="bg-bg-weak-50 font-medium text-text-sub-600">
-						<div className="py-2.5">Subscribed</div>
+						<div className="px-3 py-2.5">Subscribed</div>
+					</div>
+					<div className="bg-bg-weak-50 font-medium text-text-sub-600">
+						<div className="px-3 py-2.5">Unsubscribed</div>
 					</div>
 					<div className="bg-bg-weak-50 font-medium text-text-sub-600">
 						<div className="py-2.5">Created At</div>
@@ -70,10 +71,19 @@ export const AudienceGroupTable = ({
 										</div>
 									</div>
 									<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
-										<Skeleton className="h-4 w-16" />
+										<div className="px-3">
+											<Skeleton className="h-4 w-16" />
+										</div>
 									</div>
 									<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
-										<Skeleton className="h-4 w-12" />
+										<div className="px-3">
+											<Skeleton className="h-4 w-12" />
+										</div>
+									</div>
+									<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
+										<div className="px-3">
+											<Skeleton className="h-4 w-12" />
+										</div>
 									</div>
 									<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
 										<Skeleton className="h-4 w-20" />
@@ -92,9 +102,7 @@ export const AudienceGroupTable = ({
 										>
 											<Link
 												href={`/${activeOrganizationSlug}/audience/${group.id}`}
-												className={`flex items-center gap-2 transition-colors hover:text-blue-600 ${
-													currentGroupId === group.id ? "text-blue-600" : ""
-												}`}
+												className="flex items-center gap-2"
 											>
 												<Icon
 													name="users"
@@ -104,11 +112,6 @@ export const AudienceGroupTable = ({
 													<span className="font-medium text-label-sm text-text-strong-950">
 														{group.name}
 													</span>
-													{group.description && (
-														<span className="text-label-xs text-text-sub-600">
-															{group.description}
-														</span>
-													)}
 												</div>
 											</Link>
 										</motion.div>
@@ -116,7 +119,7 @@ export const AudienceGroupTable = ({
 									<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
 										<motion.div
 											{...getAnimationProps(index + 1, 1)}
-											className="flex items-center gap-2"
+											className="flex items-center gap-2 px-3 font-medium"
 										>
 											<span className="text-label-sm text-text-strong-950">
 												{group.audienceCount}
@@ -126,7 +129,7 @@ export const AudienceGroupTable = ({
 									<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
 										<motion.div
 											{...getAnimationProps(index + 1, 2)}
-											className="flex items-center gap-2"
+											className="flex items-center gap-2 px-3 font-medium"
 										>
 											<span className="text-label-sm text-text-strong-950">
 												{group.subscribedCount}
@@ -134,8 +137,18 @@ export const AudienceGroupTable = ({
 										</motion.div>
 									</div>
 									<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
-										<motion.span
+										<motion.div
 											{...getAnimationProps(index + 1, 3)}
+											className="flex items-center gap-2 px-3 font-medium"
+										>
+											<span className="text-label-sm text-text-strong-950">
+												{group.audienceCount - group.subscribedCount}
+											</span>
+										</motion.div>
+									</div>
+									<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
+										<motion.span
+											{...getAnimationProps(index + 1, 4)}
 											className="text-label-sm text-text-strong-950"
 										>
 											{formatRelativeTime(group.createdAt)}
@@ -143,7 +156,7 @@ export const AudienceGroupTable = ({
 									</div>
 									<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
 										<motion.div
-											{...getAnimationProps(index + 1, 4)}
+											{...getAnimationProps(index + 1, 5)}
 											className="flex items-center justify-center"
 										>
 											<PopoverRoot>

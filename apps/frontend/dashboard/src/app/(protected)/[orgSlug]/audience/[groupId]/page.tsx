@@ -22,8 +22,6 @@ const AudienceGroupPage = () => {
 	const [searchQuery, setSearchQuery] = useState<string>("");
 	const [showAddAudience, setShowAddAudience] = useState(false);
 	const [showBulkImport, setShowBulkImport] = useState(false);
-
-	// Fetch audience group details
 	const {
 		data: groupData,
 		error: groupError,
