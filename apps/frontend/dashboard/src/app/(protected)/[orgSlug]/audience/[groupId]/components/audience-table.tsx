@@ -128,14 +128,14 @@ export const AudienceTable = ({
 												/>
 												<div className="flex flex-col">
 													<span className="font-medium text-label-sm text-text-strong-950">
+														{audience.email}
+													</span>
+													<span className="text-label-xs text-text-sub-600">
 														{getDisplayName(
 															audience.firstName,
 															audience.lastName,
 															audience.email,
 														)}
-													</span>
-													<span className="text-label-xs text-text-sub-600">
-														{audience.email}
 													</span>
 												</div>
 											</Link>
@@ -147,7 +147,7 @@ export const AudienceTable = ({
 											className="flex items-center gap-2"
 										>
 											<div
-												className={`flex items-center gap-2.5 rounded-lg py-0.5 pl-3 font-medium text-label-xs capitalize ${getStatusColorClass(audience.status)}`}
+												className={`flex items-center gap-1 rounded-lg py-0.5 font-medium text-label-xs capitalize ${getStatusColorClass(audience.status)}`}
 											>
 												<Icon
 													name={getStatusIcon(audience.status)}

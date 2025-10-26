@@ -283,7 +283,7 @@ export const AudienceGroupHeader = ({
 					</div>
 					<div className="">
 						<div className="flex items-center gap-1.5">
-							<Icon name="bell-plus" className="h-4 w-4 text-success-base" />
+							<Icon name="check-circle" className="h-4 w-4 text-success-base" />
 							<span className="font-medium text-sm text-text-sub-600">
 								Subscribed
 							</span>
@@ -298,7 +298,7 @@ export const AudienceGroupHeader = ({
 					</div>
 					<div className="">
 						<div className="flex items-center gap-1.5">
-							<Icon name="bell-minus" className="h-4 w-4 text-text-sub-600" />
+							<Icon name="minus-circle" className="h-4 w-4 text-text-sub-600" />
 							<span className="font-medium text-sm text-text-sub-600">
 								Unsubscribed
 							</span>

@@ -117,10 +117,7 @@ const AudienceGroupPage = () => {
 					</p>
 				</div>
 			) : data?.audiences && data.audiences.length === 0 ? (
-				<EmptyState
-					groupId={groupId as string}
-					groupName={groupData?.name || "Unknown"}
-				/>
+				<EmptyState />
 			) : (
 				<div>
 					<div className="mb-6 flex items-center justify-between gap-3">
@@ -202,8 +199,6 @@ const AudienceGroupPage = () => {
 					</div>
 				</div>
 			)}
-
-			{/* Modals */}
 			<AddAudience
 				groupId={groupId as string}
 				groupName={groupData?.name || "Unknown"}

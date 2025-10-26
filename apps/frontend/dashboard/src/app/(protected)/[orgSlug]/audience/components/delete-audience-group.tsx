@@ -135,7 +135,7 @@ export const DeleteAudienceGroupModal = ({
 							<div className="divide-y divide-gray-200">
 								<div className="flex items-center justify-between px-4 py-2">
 									<div className="flex items-center gap-2">
-										<div className="h-2 w-2 rounded-full bg-gray-400" />
+										<Icon name="users" className="h-4 w-4 text-blue-600" />
 										<span className="font-medium text-gray-700 text-sm">
 											Total Audience
 										</span>
@@ -148,7 +148,10 @@ export const DeleteAudienceGroupModal = ({
 								</div>
 								<div className="flex items-center justify-between px-4 py-2">
 									<div className="flex items-center gap-2">
-										<div className="h-2 w-2 rounded-full bg-green-500" />
+										<Icon
+											name="check-circle"
+											className="h-4 w-4 text-green-600"
+										/>
 										<span className="font-medium text-gray-700 text-sm">
 											Subscribed
 										</span>
@@ -161,7 +164,10 @@ export const DeleteAudienceGroupModal = ({
 								</div>
 								<div className="flex items-center justify-between px-4 py-2">
 									<div className="flex items-center gap-2">
-										<div className="h-2 w-2 rounded-full bg-red-500" />
+										<Icon
+											name="minus-circle"
+											className="h-4 w-4 text-red-600"
+										/>
 										<span className="font-medium text-gray-700 text-sm">
 											Unsubscribed
 										</span>
