@@ -2,36 +2,26 @@
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import type { Audience, AudienceGroupListResponse } from "@reloop/api/types";
 import { Icon } from "@reloop/ui/icon";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 import useSWR from "swr";
 import { AudienceActions } from "./components/audience-actions";
 import { AudienceDetails } from "./components/audience-details";
 import { AudienceHeader } from "./components/audience-header";
 
-interface AudienceDetailPageProps {
-	params: {
-		groupId: string;
-		audienceId: string;
-	};
-}
-
-const AudienceDetailPage = ({ params }: AudienceDetailPageProps) => {
+const AudienceDetailPage = () => {
+	const { audienceId, groupId } = useParams();
 	const { activeOrganization } = useUserOrganization();
 	const router = useRouter();
-	const [audience, setAudience] = useState<Audience | null>(null);
 
-	// Fetch audience details
 	const {
 		data: audienceData,
 		error: audienceError,
 		isLoading: audienceLoading,
-	} = useSWR<Audience>(`/api/audience/v1/get/${params.audienceId}`, {
+	} = useSWR<Audience>(`/api/audience/v1/get/${audienceId}`, {
 		revalidateOnFocus: true,
 		revalidateOnReconnect: true,
 	});
 
-	// Fetch audience groups for move functionality
 	const { data: groupsData } = useSWR<AudienceGroupListResponse>(
 		activeOrganization?.id
 			? `/api/audience/v1/groups/list?organizationId=${activeOrganization.id}&limit=100`
@@ -42,20 +32,8 @@ const AudienceDetailPage = ({ params }: AudienceDetailPageProps) => {
 		},
 	);
 
-	// Update local state when data changes
-	useState(() => {
-		if (audienceData) {
-			setAudience(audienceData);
-		}
-	});
-
-	const handleUpdate = (updatedAudience: Audience) => {
-		setAudience(updatedAudience);
-	};
-
 	const handleDelete = () => {
-		// Navigate back to the audience group page
-		router.push(`/${activeOrganization.slug}/audience/${params.groupId}`);
+		router.push(`/${activeOrganization.slug}/audience/${groupId}`);
 	};
 
 	if (audienceError) {
@@ -74,20 +52,17 @@ const AudienceDetailPage = ({ params }: AudienceDetailPageProps) => {
 	return (
 		<div className="mx-auto max-w-3xl">
 			<AudienceHeader
-				audience={audience || audienceData || null}
+				audience={audienceData || null}
 				isLoading={audienceLoading}
 			/>
 
 			<div className="space-y-6">
-				<AudienceDetails
-					audience={audience || audienceData || null}
-					onUpdate={handleUpdate}
-				/>
+				<AudienceDetails audience={audienceData || null} onUpdate={() => {}} />
 
 				<AudienceActions
-					audience={audience || audienceData || null}
+					audience={audienceData || null}
 					audienceGroups={groupsData?.audienceGroups || []}
-					onUpdate={handleUpdate}
+					onUpdate={() => {}}
 					onDelete={handleDelete}
 				/>
 			</div>
