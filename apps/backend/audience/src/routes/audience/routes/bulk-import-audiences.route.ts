@@ -1,6 +1,7 @@
 import { authMiddleware } from "@reloop/audience/middleware/auth";
 import { AudienceModel } from "@reloop/audience/routes/audience/audience.model";
 import { bulkImportAudiencesHandler } from "@reloop/audience/routes/audience/controllers/bulk-import-audiences";
+import { AudienceGroupModel } from "@reloop/audience/routes/audience-group/audience-group.model";
 import { Elysia, status } from "elysia";
 
 export const bulkImportAudiencesRoute = new Elysia().use(authMiddleware).post(
@@ -18,7 +19,7 @@ export const bulkImportAudiencesRoute = new Elysia().use(authMiddleware).post(
         body: AudienceModel.bulkImportAudiencesBody,
         response: {
             200: AudienceModel.bulkImportResponse,
-            404: AudienceModel.audienceGroupNotFound,
+            404: AudienceGroupModel.audienceGroupNotFound,
             400: AudienceModel.validationError,
             403: AudienceModel.unauthorized,
         },

@@ -187,7 +187,7 @@ const BulkImportPage = () => {
 					audienceGroupId: groupId,
 					audiences: csvData,
 				},
-				{ headers: { credentials: "include" } },
+				{ withCredentials: true },
 			);
 
 			const result: BulkImportResult = response.data;
@@ -202,11 +202,12 @@ const BulkImportPage = () => {
 				toast.error(`${result.failed} audiences failed to import`);
 			}
 		} catch (error) {
-			changeStatus("idle");
 			const errorMessage = axios.isAxiosError(error)
 				? error.response?.data?.message || "Failed to import audiences"
 				: "Failed to import audiences";
 			toast.error(errorMessage);
+		} finally {
+			changeStatus("idle");
 		}
 	};
 
