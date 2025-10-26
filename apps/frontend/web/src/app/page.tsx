@@ -4,7 +4,7 @@ import Link from "next/link";
 export default function Home() {
 	return (
 		<div>
-			<h1 className="title-h3 mt-20 text-center font-medium leading-[60px] tracking-tight">
+			<h1 className="title-h2 mx-auto mt-20 max-w-xl text-center font-semibold">
 				Email for Developers & Marketing teams
 			</h1>
 			<h2 className="mx-auto mt-6 max-w-lg text-center text-lg text-text-sub-600 leading-8">
@@ -17,7 +17,7 @@ export default function Home() {
 					href="/contact"
 					className={Button.buttonVariants({
 						variant: "neutral",
-					}).root({ className: "h-12 rounded-full px-6" })}
+					}).root({})}
 				>
 					Get Early Access
 				</Link>
@@ -27,7 +27,7 @@ export default function Home() {
 					className={Button.buttonVariants({
 						mode: "stroke",
 						variant: "neutral",
-					}).root({ className: "h-12 rounded-full px-6" })}
+					}).root({})}
 					rel="noopener"
 				>
 					View it on GitHub
