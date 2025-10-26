@@ -1,6 +1,7 @@
 "use client";
 import { isValidEmail } from "@fe/dashboard/utils/audience";
 import type { AudienceGroup } from "@reloop/api/types";
+import * as Alert from "@reloop/ui/alert";
 import * as Button from "@reloop/ui/button";
 import * as FileFormatIcon from "@reloop/ui/file-format-icon";
 import { Icon } from "@reloop/ui/icon";
@@ -407,7 +408,7 @@ const BulkImportPage = () => {
 							)}
 
 							<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-200 text-paragraph-sm shadow-regular-md ring-stroke-soft-200 ring-inset">
-								<div className="grid grid-cols-[1fr_minmax(200px,auto)_minmax(100px,auto)]">
+								<div className="grid grid-cols-[1fr_minmax(200px,auto)_minmax(100px,auto)_minmax(120px,auto)]">
 									<div className="bg-bg-weak-50 pl-5 font-medium text-text-sub-600">
 										<div className="py-2.5">Audience</div>
 									</div>
@@ -417,8 +418,14 @@ const BulkImportPage = () => {
 									<div className="bg-bg-weak-50 font-medium text-text-sub-600">
 										<div className="py-2.5">Validation</div>
 									</div>
+									<div className="bg-bg-weak-50 font-medium text-text-sub-600">
+										<div className="py-2.5">Import Status</div>
+									</div>
 									{csvData.slice(0, 20).map((audience, index) => {
 										const error = validationErrors.find(
+											(e) => e.email === audience.email,
+										);
+										const importError = importResult?.errors.find(
 											(e) => e.email === audience.email,
 										);
 										return (
@@ -488,6 +495,34 @@ const BulkImportPage = () => {
 														</div>
 													)}
 												</div>
+												<div className="flex items-start border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
+													{importResult ? (
+														importError ? (
+															<div className="flex items-start gap-1 pr-3 text-error-base">
+																<Icon
+																	name="cross-circle"
+																	className="mt-0.5 h-3.5 w-3.5 shrink-0"
+																/>
+																<span className="max-w-[140px] break-words text-label-xs">
+																	{importError.error}
+																</span>
+															</div>
+														) : (
+															<div className="flex items-center gap-1 text-success-base">
+																<Icon
+																	name="check-circle"
+																	className="h-3.5 w-3.5"
+																/>
+																<span className="text-label-xs">Imported</span>
+															</div>
+														)
+													) : (
+														<div className="flex items-center gap-1 text-text-sub-600">
+															<Icon name="clock" className="h-3.5 w-3.5" />
+															<span className="text-label-xs">Pending</span>
+														</div>
+													)}
+												</div>
 											</div>
 										);
 									})}
@@ -517,47 +552,61 @@ const BulkImportPage = () => {
 
 					{/* Import Results */}
 					{importResult && (
-						<div className="space-y-4 border-stroke-soft-200 border-b border-dashed pt-6 pb-6">
-							<h3 className="font-semibold text-lg">Import Results</h3>
-							<div className="rounded-lg border border-stroke-soft-200 p-6">
-								<div className="mb-6 grid grid-cols-3 gap-6">
-									<div className="text-center">
-										<div className="font-bold text-3xl text-green-600">
-											{importResult.successful}
-										</div>
-										<div className="text-sm text-text-sub-600">Successful</div>
+						<div className="space-y-6 border-stroke-soft-200 border-b border-dashed pt-6 pb-6">
+							<div className="flex items-center gap-2">
+								<Icon
+									name="check-circle"
+									className="h-5 w-5 text-success-base"
+								/>
+								<h3 className="font-semibold text-lg">Import Results</h3>
+							</div>
+
+							{/* Stats Cards */}
+							<div className="grid grid-cols-3 gap-4">
+								<div className="rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-6 shadow-regular-md ring-stroke-soft-200 ring-inset">
+									<div className="mb-2 flex items-center gap-2">
+										<Icon
+											name="check-circle"
+											className="h-4 w-4 text-success-base"
+										/>
+										<span className="font-medium text-sm text-success-base">
+											Successful
+										</span>
 									</div>
-									<div className="text-center">
-										<div className="font-bold text-3xl text-red-600">
-											{importResult.failed}
-										</div>
-										<div className="text-sm text-text-sub-600">Failed</div>
-									</div>
-									<div className="text-center">
-										<div className="font-bold text-3xl text-blue-600">
-											{importResult.successful + importResult.failed}
-										</div>
-										<div className="text-sm text-text-sub-600">Total</div>
+									<div className="font-bold text-2xl text-success-base">
+										{importResult.successful}
 									</div>
 								</div>
 
-								{importResult.errors.length > 0 && (
-									<div>
-										<h4 className="mb-4 font-medium text-lg">Errors:</h4>
-										<div className="max-h-48 space-y-2 overflow-auto">
-											{importResult.errors.map((error, index) => (
-												<div
-													key={index}
-													className="flex items-center gap-2 rounded-md bg-red-50 p-3 text-red-700"
-												>
-													<Icon name="alert-circle" className="h-4 w-4" />
-													<span className="font-medium">{error.email}:</span>
-													<span>{error.error}</span>
-												</div>
-											))}
-										</div>
+								<div className="rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-6 shadow-regular-md ring-stroke-soft-200 ring-inset">
+									<div className="mb-2 flex items-center gap-2">
+										<Icon
+											name="cross-circle"
+											className="h-4 w-4 text-error-base"
+										/>
+										<span className="font-medium text-error-base text-sm">
+											Failed
+										</span>
 									</div>
-								)}
+									<div className="font-bold text-2xl text-error-base">
+										{importResult.failed}
+									</div>
+								</div>
+
+								<div className="rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-6 shadow-regular-md ring-stroke-soft-200 ring-inset">
+									<div className="mb-2 flex items-center gap-2">
+										<Icon
+											name="users"
+											className="h-4 w-4 text-information-base"
+										/>
+										<span className="font-medium text-blue-600 text-sm">
+											Total
+										</span>
+									</div>
+									<div className="font-bold text-2xl text-text-strong-950">
+										{importResult.successful + importResult.failed}
+									</div>
+								</div>
 							</div>
 						</div>
 					)}
