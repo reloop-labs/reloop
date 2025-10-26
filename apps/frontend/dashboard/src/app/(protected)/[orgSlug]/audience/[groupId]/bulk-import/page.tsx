@@ -5,7 +5,6 @@ import * as Button from "@reloop/ui/button";
 import * as FileFormatIcon from "@reloop/ui/file-format-icon";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
-import * as Table from "@reloop/ui/table";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { useLoading } from "@reloop/ui/use-loading";
 import axios from "axios";
@@ -43,7 +42,9 @@ const BulkImportPage = () => {
 	const [importResult, setImportResult] = useState<BulkImportResult | null>(
 		null,
 	);
-	const [isValidating, setIsValidating] = useState(false);
+	const [validationErrors, setValidationErrors] = useState<BulkImportError[]>(
+		[],
+	);
 
 	const {
 		data: groupData,
@@ -156,6 +157,9 @@ const BulkImportPage = () => {
 
 			setCsvData(parsed);
 			setImportResult(null);
+			// Automatically validate on file upload
+			const errors = validateAudiences(parsed);
+			setValidationErrors(errors);
 		};
 		reader.readAsText(file);
 	}, []);
@@ -168,23 +172,6 @@ const BulkImportPage = () => {
 		multiple: false,
 		maxFiles: 1,
 	});
-
-	const handleValidate = async () => {
-		if (csvData.length === 0) {
-			toast.error("Please upload a CSV file first");
-			return;
-		}
-
-		setIsValidating(true);
-		const errors = validateAudiences(csvData);
-
-		setImportResult({
-			successful: csvData.length - errors.length,
-			failed: errors.length,
-			errors,
-		});
-		setIsValidating(false);
-	};
 
 	const handleImport = async () => {
 		if (csvData.length === 0) {
@@ -373,7 +360,7 @@ const BulkImportPage = () => {
 
 					{/* Preview Data */}
 					{csvData.length > 0 && (
-						<div className="space-y-4">
+						<div className="mt-10 space-y-4">
 							<div className="flex items-center justify-between">
 								<h3 className="font-semibold text-lg">
 									Preview ({csvData.length} audiences)
@@ -381,25 +368,6 @@ const BulkImportPage = () => {
 								<div className="flex gap-3">
 									<Button.Root
 										variant="neutral"
-										mode="stroke"
-										size="small"
-										onClick={handleValidate}
-										disabled={isValidating}
-									>
-										{isValidating ? (
-											<>
-												<Spinner color="current" />
-												Validating...
-											</>
-										) : (
-											<>
-												<Icon name="check-circle" className="h-4 w-4" />
-												Validate
-											</>
-										)}
-									</Button.Root>
-									<Button.Root
-										variant="primary"
 										size="small"
 										onClick={handleImport}
 										disabled={status === "loading"}
@@ -411,7 +379,7 @@ const BulkImportPage = () => {
 											</>
 										) : (
 											<>
-												<Icon name="upload" className="h-4 w-4" />
+												<Icon name="file-upload" className="h-4 w-4" />
 												Import All
 											</>
 										)}
@@ -419,68 +387,136 @@ const BulkImportPage = () => {
 								</div>
 							</div>
 
-							<div className="max-h-96 overflow-auto rounded-lg border border-stroke-soft-200">
-								<Table.Root>
-									<Table.Header>
-										<Table.Row>
-											<Table.Head>Email</Table.Head>
-											<Table.Head>Name</Table.Head>
-											<Table.Head>Status</Table.Head>
-										</Table.Row>
-									</Table.Header>
-									<Table.Body>
-										{csvData.slice(0, 20).map((audience, index) => (
-											<Table.Row key={index}>
-												<Table.Cell className="font-medium">
-													{audience.email}
-												</Table.Cell>
-												<Table.Cell>
-													{audience.firstName || audience.lastName
-														? `${audience.firstName || ""} ${audience.lastName || ""}`.trim()
-														: "—"}
-												</Table.Cell>
-												<Table.Cell>
-													<span
-														className={`inline-flex items-center gap-1 rounded-full px-2 py-1 font-medium text-xs ${
-															audience.status === "subscribed"
-																? "bg-green-100 text-green-800"
-																: "bg-gray-100 text-gray-800"
-														}`}
-													>
+							{/* Validation Summary */}
+							{validationErrors.length > 0 && (
+								<div className="rounded-lg border border-red-200 bg-red-50 p-4">
+									<div className="mb-2 flex items-center gap-2">
+										<Icon
+											name="alert-circle"
+											className="h-4 w-4 text-red-600"
+										/>
+										<span className="font-medium text-red-800">
+											{validationErrors.length} validation errors found
+										</span>
+									</div>
+									<div className="text-red-700 text-sm">
+										Please fix these errors before importing
+									</div>
+								</div>
+							)}
+
+							<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-200 text-paragraph-sm shadow-regular-md ring-stroke-soft-200 ring-inset">
+								<div className="grid grid-cols-[1fr_minmax(200px,auto)_minmax(100px,auto)]">
+									<div className="bg-bg-weak-50 pl-5 font-medium text-text-sub-600">
+										<div className="py-2.5">Audience</div>
+									</div>
+									<div className="bg-bg-weak-50 font-medium text-text-sub-600">
+										<div className="py-2.5">Status</div>
+									</div>
+									<div className="bg-bg-weak-50 font-medium text-text-sub-600">
+										<div className="py-2.5">Validation</div>
+									</div>
+									{csvData.slice(0, 20).map((audience, index) => {
+										const error = validationErrors.find(
+											(e) => e.email === audience.email,
+										);
+										return (
+											<div
+												key={`audience-${index}`}
+												className="group/row contents"
+											>
+												<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
+													<div className="flex items-center gap-2 pl-5">
 														<Icon
-															name={
-																audience.status === "subscribed"
-																	? "check-circle"
-																	: "minus-circle"
-															}
-															className="h-3 w-3"
+															name="user"
+															className="h-4 w-4 text-text-sub-600"
 														/>
-														{audience.status === "subscribed"
-															? "Subscribed"
-															: "Unsubscribed"}
-													</span>
-												</Table.Cell>
-											</Table.Row>
-										))}
-										{csvData.length > 20 && (
-											<Table.Row>
-												<Table.Cell
-													colSpan={3}
-													className="text-center text-sm text-text-sub-600"
-												>
+														<div className="flex flex-col">
+															<span className="font-medium text-label-sm text-text-strong-950">
+																{audience.email}
+															</span>
+															<span className="text-label-xs text-text-sub-600">
+																{audience.firstName || audience.lastName
+																	? `${audience.firstName || ""} ${audience.lastName || ""}`.trim()
+																	: "—"}
+															</span>
+														</div>
+													</div>
+												</div>
+												<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
+													<div className="flex items-center gap-2">
+														<div
+															className={`flex items-center gap-1 rounded-lg py-0.5 font-medium text-label-xs capitalize ${
+																audience.status === "subscribed"
+																	? "text-success-base"
+																	: "text-text-sub-600"
+															}`}
+														>
+															<Icon
+																name={
+																	audience.status === "subscribed"
+																		? "check-circle"
+																		: "minus-circle"
+																}
+																className="h-3.5 w-3.5"
+															/>
+															{audience.status === "subscribed"
+																? "Subscribed"
+																: "Unsubscribed"}
+														</div>
+													</div>
+												</div>
+												<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
+													{error ? (
+														<div className="flex items-center gap-1 text-red-600">
+															<Icon
+																name="alert-circle"
+																className="h-3.5 w-3.5"
+															/>
+															<span className="text-label-xs">
+																{error.error}
+															</span>
+														</div>
+													) : (
+														<div className="flex items-center gap-1 text-green-600">
+															<Icon
+																name="check-circle"
+																className="h-3.5 w-3.5"
+															/>
+															<span className="text-label-xs">Valid</span>
+														</div>
+													)}
+												</div>
+											</div>
+										);
+									})}
+									{csvData.length > 20 && (
+										<div className="contents">
+											<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
+												<div className="pl-5 text-center text-sm text-text-sub-600">
 													... and {csvData.length - 20} more
-												</Table.Cell>
-											</Table.Row>
-										)}
-									</Table.Body>
-								</Table.Root>
+												</div>
+											</div>
+											<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
+												<div className="text-center text-sm text-text-sub-600">
+													—
+												</div>
+											</div>
+											<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
+												<div className="text-center text-sm text-text-sub-600">
+													—
+												</div>
+											</div>
+										</div>
+									)}
+								</div>
 							</div>
 						</div>
 					)}
 
 					{/* Import Results */}
 					{importResult && (
-						<div className="space-y-4">
+						<div className="space-y-4 border-stroke-soft-200 border-b border-dashed pt-6 pb-6">
 							<h3 className="font-semibold text-lg">Import Results</h3>
 							<div className="rounded-lg border border-stroke-soft-200 p-6">
 								<div className="mb-6 grid grid-cols-3 gap-6">
