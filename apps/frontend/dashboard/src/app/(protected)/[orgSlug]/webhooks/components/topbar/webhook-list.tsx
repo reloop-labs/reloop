@@ -58,21 +58,24 @@ export const WebhookListTopbar = () => {
 		}) || [];
 
 	return (
-		<div className="mx-auto max-w-6xl">
-			<div className="flex items-center justify-between pt-10">
-				<p className="font-medium text-2xl">
-					Webhook{data?.webhooks.length !== 1 ? "s" : ""}
-				</p>
-				<div className="flex items-center gap-2">
-					<Button.Root
-						variant="neutral"
-						size="xsmall"
-						onClick={() => setIsCreateModalOpen(true)}
-					>
-						<Icon name="plus" className="h-4 w-4" />
-						Add webhook
-					</Button.Root>
+		<div className="mx-auto max-w-6xl p-6">
+			<div className="mb-6 flex items-center justify-between">
+				<div>
+					<h1 className="font-medium text-2xl">
+						Webhook{data?.webhooks.length !== 1 ? "s" : ""}
+					</h1>
+					<p className="text-sm text-text-sub-600">
+						Manage your webhooks and monitor their delivery status.
+					</p>
 				</div>
+				<Button.Root
+					variant="neutral"
+					size="small"
+					onClick={() => setIsCreateModalOpen(true)}
+				>
+					<Icon name="plus" className="h-4 w-4" />
+					Add webhook
+				</Button.Root>
 			</div>
 
 			<div>
@@ -87,54 +90,56 @@ export const WebhookListTopbar = () => {
 					<EmptyState onCreateWebhook={() => setIsCreateModalOpen(true)} />
 				) : (
 					<div>
-						<div className="mt-10 flex items-center gap-3">
-							<div className="flex-1">
-								<Input.Root size="small" className="rounded-xl">
-									<Input.Wrapper>
-										<Input.Icon
-											as={() => <Icon name="search" className="h-4 w-4" />}
-										/>
-										<Input.Input
-											type="text"
-											placeholder="Search webhooks..."
-											value={searchQuery}
-											onChange={(e) => setSearchQuery(e.target.value)}
-										/>
-									</Input.Wrapper>
-								</Input.Root>
-							</div>
-							<div className="w-40">
-								<Select.Root
-									size="small"
-									value={statusFilter}
-									onValueChange={setStatusFilter}
-								>
-									<Select.Trigger className="rounded-xl">
-										<Select.Value placeholder="All statuses" />
-									</Select.Trigger>
-									<Select.Content>
-										<Select.Item value="all">All statuses</Select.Item>
-										<Select.Item value="active">Active</Select.Item>
-										<Select.Item value="paused">Paused</Select.Item>
-										<Select.Item value="disabled">Disabled</Select.Item>
-										<Select.Item value="failed">Failed</Select.Item>
-									</Select.Content>
-								</Select.Root>
+						<div className="mb-6">
+							<div className="flex items-center gap-3">
+								<div className="flex-1">
+									<Input.Root>
+										<Input.Wrapper size="small">
+											<Input.Icon>
+												<Icon name="search" className="h-4 w-4" />
+											</Input.Icon>
+											<Input.Input
+												placeholder="Search webhooks..."
+												value={searchQuery}
+												onChange={(e) => setSearchQuery(e.target.value)}
+											/>
+										</Input.Wrapper>
+									</Input.Root>
+								</div>
+								<div className="w-40">
+									<Select.Root
+										size="small"
+										value={statusFilter}
+										onValueChange={setStatusFilter}
+									>
+										<Select.Trigger className="rounded-xl">
+											<Select.Value placeholder="All statuses" />
+										</Select.Trigger>
+										<Select.Content>
+											<Select.Item value="all">All statuses</Select.Item>
+											<Select.Item value="active">Active</Select.Item>
+											<Select.Item value="paused">Paused</Select.Item>
+											<Select.Item value="disabled">Disabled</Select.Item>
+											<Select.Item value="failed">Failed</Select.Item>
+										</Select.Content>
+									</Select.Root>
+								</div>
 							</div>
 						</div>
 
-						<div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+						<div className="rounded-lg border border-stroke-soft-200">
 							{isLoading
 								? Array.from({ length: 6 }).map((_, i) => (
 										<div
 											key={i}
-											className="h-32 animate-pulse rounded-xl bg-gray-100"
+											className="h-16 animate-pulse rounded bg-gray-100"
 										/>
 									))
 								: filteredWebhooks.map((webhook) => (
 										<Link
 											key={webhook.id}
 											href={`/${activeOrganization?.slug}/webhooks/${webhook.id}`}
+											className="block border-stroke-soft-200 border-b p-4 transition-colors last:border-b-0 hover:bg-bg-weak-50"
 										>
 											<WebhookCard webhook={webhook} />
 										</Link>
