@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { IconsSprite } from "@reloop/ui/icon";
+import { Footer } from "@reloop/web/components/footer";
+import { Header } from "@reloop/web/components/header";
 import { ThemeProvider } from "next-themes";
-import { Footer } from "@/components/footer";
-import { Header } from "@/components/header";
 
 export const metadata: Metadata = {
 	title: "Reloop",

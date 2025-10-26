@@ -22,7 +22,8 @@
 			"@reloop/auth": ["../../packages/auth/src/*"],
 			"@reloop/domain": ["../../apps/backend/domain/src/*"],
 			"@reloop/webhook": ["../../apps/backend/webhook/src/*"],
-			"@reloop/audience": ["../../apps/backend/audience/src/*"]
+			"@reloop/audience": ["../../apps/backend/audience/src/*"],
+			"@reloop/web": ["../../apps/frontend/web/src/*"]
 		}
 	}
 }

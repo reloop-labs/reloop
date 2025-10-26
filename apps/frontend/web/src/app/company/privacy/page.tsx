@@ -1,4 +1,4 @@
-import PageLayout from "@web/components/pageLayout";
+import PageLayout from "@reloop/web/components/page-layout";
 
 const PrivacyPage = () => {
 	return (
