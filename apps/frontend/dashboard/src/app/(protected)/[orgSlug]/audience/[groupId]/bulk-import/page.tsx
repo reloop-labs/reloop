@@ -3,7 +3,6 @@ import { isValidEmail } from "@fe/dashboard/utils/audience";
 import type { AudienceGroup } from "@reloop/api/types";
 import * as Button from "@reloop/ui/button";
 import * as FileFormatIcon from "@reloop/ui/file-format-icon";
-import * as FileUpload from "@reloop/ui/file-upload";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
 import * as Table from "@reloop/ui/table";
@@ -348,19 +347,17 @@ const BulkImportPage = () => {
 				<div className="w-full space-y-3">
 					<div>
 						<div className="w-full max-w-[500px]">
-							<FileUpload.Root
+							<div
 								{...getRootProps()}
-								className={`transition-colors duration-200 ${
+								className={`flex cursor-pointer flex-col items-center justify-center gap-4 rounded-lg border border-dashed p-8 transition-colors duration-200 ${
 									isDragActive
 										? "border-blue-400 bg-blue-50"
-										: "border-stroke-sub-300"
+										: "border-stroke-sub-300 hover:border-stroke-sub-400"
 								}`}
 							>
 								<input {...getInputProps()} />
-								<FileUpload.Icon>
-									<FileFormatIcon.Root format="CSV" color="green" />
-								</FileUpload.Icon>
-								<div className="space-y-2">
+								<FileFormatIcon.Root format="CSV" color="green" />
+								<div className="space-y-2 text-center">
 									<div className="font-medium text-sm text-text-strong-950">
 										{isDragActive
 											? "Drop the CSV file here..."
@@ -370,7 +367,7 @@ const BulkImportPage = () => {
 										CSV format only, up to 1000 rows.
 									</div>
 								</div>
-							</FileUpload.Root>
+							</div>
 						</div>
 					</div>
 
