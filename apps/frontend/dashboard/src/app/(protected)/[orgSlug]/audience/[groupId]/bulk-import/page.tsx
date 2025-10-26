@@ -346,10 +346,10 @@ const BulkImportPage = () => {
 			<div className="flex gap-6">
 				<div className="w-full space-y-3">
 					<div>
-						<div className="w-full max-w-[500px]">
+						<div className="w-full">
 							<div
 								{...getRootProps()}
-								className={`flex cursor-pointer flex-col items-center justify-center gap-4 rounded-lg border border-dashed p-8 transition-colors duration-200 ${
+								className={`flex cursor-pointer flex-col items-center justify-center gap-4 rounded-lg border border-stroke-sub-100 border-dashed p-8 transition-colors duration-200 ${
 									isDragActive
 										? "border-blue-400 bg-blue-50"
 										: "border-stroke-sub-300 hover:border-stroke-sub-400"
