@@ -251,7 +251,9 @@ const BulkImportPage = () => {
 					Unable to load the audience group. Please try again.
 				</p>
 				<Button.Root onClick={handleBack} variant="neutral" mode="stroke">
-					<Icon name="arrow-left" className="h-4 w-4" />
+					<Button.Icon>
+						<Icon name="chevron-left" className="h-4 w-4" />
+					</Button.Icon>
 					Back to Audience Group
 				</Button.Root>
 			</div>
@@ -367,26 +369,28 @@ const BulkImportPage = () => {
 								<h3 className="font-semibold text-lg">
 									Preview ({csvData.length} audiences)
 								</h3>
-								<div className="flex gap-3">
-									<Button.Root
-										variant="neutral"
-										size="small"
-										onClick={handleImport}
-										disabled={status === "loading"}
-									>
-										{status === "loading" ? (
-											<>
-												<Spinner color="white" />
-												Importing...
-											</>
-										) : (
-											<>
-												<Icon name="file-upload" className="h-4 w-4" />
-												Import All
-											</>
-										)}
-									</Button.Root>
-								</div>
+								{!importResult && (
+									<div className="flex gap-3">
+										<Button.Root
+											variant="neutral"
+											size="small"
+											onClick={handleImport}
+											disabled={status === "loading"}
+										>
+											{status === "loading" ? (
+												<>
+													<Spinner color="white" />
+													Importing...
+												</>
+											) : (
+												<>
+													<Icon name="file-upload" className="h-4 w-4" />
+													Import All
+												</>
+											)}
+										</Button.Root>
+									</div>
+								)}
 							</div>
 
 							{/* Validation Summary */}
@@ -553,12 +557,24 @@ const BulkImportPage = () => {
 					{/* Import Results */}
 					{importResult && (
 						<div className="space-y-6 border-stroke-soft-200 border-b border-dashed pt-6 pb-6">
-							<div className="flex items-center gap-2">
-								<Icon
-									name="check-circle"
-									className="h-5 w-5 text-success-base"
-								/>
-								<h3 className="font-semibold text-lg">Import Results</h3>
+							<div className="flex items-center justify-between">
+								<div className="flex items-center gap-2">
+									<Icon
+										name="check-circle"
+										className="h-5 w-5 text-success-base"
+									/>
+									<h3 className="font-semibold text-lg">Import Results</h3>
+								</div>
+								<Button.Root
+									onClick={handleBack}
+									variant="neutral"
+									size="small"
+								>
+									Continue
+									<Button.Icon>
+										<Icon name="chevron-right" className="h-4 w-4" />
+									</Button.Icon>
+								</Button.Root>
 							</div>
 
 							{/* Stats Cards */}

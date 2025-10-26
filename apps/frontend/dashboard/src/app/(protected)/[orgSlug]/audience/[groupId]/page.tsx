@@ -84,6 +84,51 @@ const AudienceGroupPage = () => {
 		}
 	};
 
+	const handleDownloadCSV = () => {
+		if (!data?.audiences || data.audiences.length === 0) {
+			return;
+		}
+
+		// Create CSV headers
+		const headers = [
+			"Email",
+			"First Name",
+			"Last Name",
+			"Status",
+			"Added At",
+			"Unsubscribed At",
+		];
+
+		// Create CSV rows
+		const csvRows = data.audiences.map((audience) => [
+			audience.email,
+			audience.firstName || "",
+			audience.lastName || "",
+			audience.status,
+			audience.addedAt,
+			audience.unsubscribedAt || "",
+		]);
+
+		// Combine headers and rows
+		const csvContent = [headers, ...csvRows]
+			.map((row) => row.map((field) => `"${field}"`).join(","))
+			.join("\n");
+
+		// Create and download the file
+		const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+		const link = document.createElement("a");
+		const url = URL.createObjectURL(blob);
+		link.setAttribute("href", url);
+		link.setAttribute(
+			"download",
+			`${groupData?.name || "audience"}-export.csv`,
+		);
+		link.style.visibility = "hidden";
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+	};
+
 	// Listen for custom events from empty state
 	useState(() => {
 		const handleOpenAddAudience = () => setShowAddAudience(true);
@@ -182,9 +227,8 @@ const AudienceGroupPage = () => {
 							variant="neutral"
 							mode="stroke"
 							size="xsmall"
-							onClick={() =>
-								router.push(`/${orgSlug}/audience/${groupId}/bulk-import`)
-							}
+							onClick={handleDownloadCSV}
+							disabled={!data?.audiences || data.audiences.length === 0}
 						>
 							<Icon name="file-download" className="h-4 w-4" />
 						</Button.Root>
