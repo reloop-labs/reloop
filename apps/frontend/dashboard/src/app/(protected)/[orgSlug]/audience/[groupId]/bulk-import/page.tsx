@@ -305,7 +305,7 @@ const BulkImportPage = () => {
 			</div>
 			<div className="my-6 gap-3">
 				<div className="flex items-center gap-2">
-					<h2 className="font-semibold text-gray-900 text-lg">CSV File</h2>
+					<h2 className="font-semibold text-lg">CSV File</h2>
 					<Tooltip.Provider delayDuration={0}>
 						<Tooltip.Root>
 							<Tooltip.Trigger asChild>
@@ -378,7 +378,7 @@ const BulkImportPage = () => {
 					{csvData.length > 0 && (
 						<div className="space-y-4">
 							<div className="flex items-center justify-between">
-								<h3 className="font-semibold text-gray-900 text-lg">
+								<h3 className="font-semibold text-lg">
 									Preview ({csvData.length} audiences)
 								</h3>
 								<div className="flex gap-3">
@@ -484,9 +484,7 @@ const BulkImportPage = () => {
 					{/* Import Results */}
 					{importResult && (
 						<div className="space-y-4">
-							<h3 className="font-semibold text-gray-900 text-lg">
-								Import Results
-							</h3>
+							<h3 className="font-semibold text-lg">Import Results</h3>
 							<div className="rounded-lg border border-stroke-soft-200 p-6">
 								<div className="mb-6 grid grid-cols-3 gap-6">
 									<div className="text-center">
