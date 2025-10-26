@@ -1,5 +1,4 @@
 "use client";
-import { isValidEmail } from "@fe/dashboard/utils/audience";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import type { Audience } from "@reloop/api/types";
 import * as Button from "@reloop/ui/button";
@@ -50,7 +49,7 @@ export const AudienceDetails = ({
 	const { mutate } = useSWRConfig();
 	const [isEditing, setIsEditing] = useState(false);
 
-	const { register, handleSubmit, formState, setError, reset } =
+	const { register, handleSubmit, formState, reset } =
 		useForm<AudienceDetailsFormValues>({
 			resolver: valibotResolver(
 				audienceDetailsSchema,
@@ -90,17 +89,31 @@ export const AudienceDetails = ({
 
 	return (
 		<div className="rounded-lg border border-stroke-soft-200 p-6">
+			{/* Header with icon and title */}
 			<div className="mb-6 flex items-center justify-between">
-				<h2 className="font-medium text-lg">Audience Details</h2>
+				<div className="flex items-center gap-3">
+					<div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100">
+						<Icon name="user" className="h-5 w-5 text-blue-600" />
+					</div>
+					<div>
+						<h2 className="font-semibold text-gray-900 text-lg">
+							Audience Details
+						</h2>
+						<p className="text-gray-500 text-sm">
+							Manage audience information and preferences
+						</p>
+					</div>
+				</div>
 				{!isEditing ? (
 					<Button.Root
 						variant="neutral"
 						mode="stroke"
 						size="small"
 						onClick={() => setIsEditing(true)}
+						className="transition-colors hover:bg-gray-50"
 					>
 						<Icon name="edit" className="h-4 w-4" />
-						Edit
+						Edit Details
 					</Button.Root>
 				) : (
 					<div className="flex gap-2">
@@ -110,6 +123,7 @@ export const AudienceDetails = ({
 							size="small"
 							onClick={handleCancel}
 							disabled={status === "loading"}
+							className="transition-colors hover:bg-gray-50"
 						>
 							Cancel
 						</Button.Root>
@@ -118,6 +132,7 @@ export const AudienceDetails = ({
 							size="small"
 							onClick={handleSubmit(onSubmit)}
 							disabled={status === "loading" || !formState.isValid}
+							className="transition-colors hover:bg-gray-700"
 						>
 							{status === "loading" ? (
 								<>
@@ -127,7 +142,7 @@ export const AudienceDetails = ({
 							) : (
 								<>
 									<Icon name="check" className="h-4 w-4" />
-									Save
+									Save Changes
 								</>
 							)}
 						</Button.Root>
@@ -135,26 +150,33 @@ export const AudienceDetails = ({
 				)}
 			</div>
 
-			<div className="space-y-4">
+			{/* Form fields */}
+			<div className="space-y-6">
 				{/* Email (read-only) */}
-				<div>
-					<Label.Root className="mb-2 block font-medium text-gray-700 text-sm">
+				<div className="space-y-2">
+					<Label.Root className="block font-medium text-gray-700 text-sm">
 						Email Address
 					</Label.Root>
-					<div className="flex items-center gap-2 rounded-lg border border-stroke-soft-200 bg-gray-50 px-3 py-2">
-						<Icon name="mail" className="h-4 w-4 text-text-sub-600" />
-						<span className="text-text-strong-950">{audience.email}</span>
+					<div className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
+						<Icon name="mail" className="h-4 w-4 text-gray-500" />
+						<span className="font-medium text-gray-900">{audience.email}</span>
+						<div className="ml-auto">
+							<span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-1 font-medium text-blue-800 text-xs">
+								Primary
+							</span>
+						</div>
 					</div>
-					<p className="mt-1 text-text-sub-600 text-xs">
-						Email address cannot be changed
+					<p className="text-gray-500 text-xs">
+						Email address cannot be changed. This is the primary identifier for
+						this audience.
 					</p>
 				</div>
 
 				{/* First Name */}
-				<div>
+				<div className="space-y-2">
 					<Label.Root
 						htmlFor="firstName"
-						className="mb-2 block font-medium text-gray-700 text-sm"
+						className="block font-medium text-gray-700 text-sm"
 					>
 						First Name
 					</Label.Root>
@@ -169,21 +191,24 @@ export const AudienceDetails = ({
 									placeholder="Enter first name"
 									{...register("firstName")}
 									disabled={status === "loading"}
+									className="transition-colors focus:ring-2 focus:ring-blue-500"
 								/>
 							</Input.Wrapper>
 						</Input.Root>
 					) : (
-						<div className="flex items-center gap-2 rounded-lg border border-stroke-soft-200 bg-gray-50 px-3 py-2">
-							<Icon name="user" className="h-4 w-4 text-text-sub-600" />
-							<span className="text-text-strong-950">
-								{audience.firstName || "—"}
+						<div className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
+							<Icon name="user" className="h-4 w-4 text-gray-500" />
+							<span className="font-medium text-gray-900">
+								{audience.firstName || (
+									<span className="text-gray-400 italic">Not provided</span>
+								)}
 							</span>
 						</div>
 					)}
 					{formState.errors.firstName && (
-						<div className="mt-2 flex items-center gap-2">
+						<div className="flex items-center gap-2 rounded-lg bg-red-50 p-3">
 							<Icon name="alert-circle" className="h-4 w-4 text-red-500" />
-							<p className="text-red-600 text-sm">
+							<p className="text-red-700 text-sm">
 								{formState.errors.firstName.message}
 							</p>
 						</div>
@@ -191,10 +216,10 @@ export const AudienceDetails = ({
 				</div>
 
 				{/* Last Name */}
-				<div>
+				<div className="space-y-2">
 					<Label.Root
 						htmlFor="lastName"
-						className="mb-2 block font-medium text-gray-700 text-sm"
+						className="block font-medium text-gray-700 text-sm"
 					>
 						Last Name
 					</Label.Root>
@@ -209,27 +234,43 @@ export const AudienceDetails = ({
 									placeholder="Enter last name"
 									{...register("lastName")}
 									disabled={status === "loading"}
+									className="transition-colors focus:ring-2 focus:ring-blue-500"
 								/>
 							</Input.Wrapper>
 						</Input.Root>
 					) : (
-						<div className="flex items-center gap-2 rounded-lg border border-stroke-soft-200 bg-gray-50 px-3 py-2">
-							<Icon name="user" className="h-4 w-4 text-text-sub-600" />
-							<span className="text-text-strong-950">
-								{audience.lastName || "—"}
+						<div className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
+							<Icon name="user" className="h-4 w-4 text-gray-500" />
+							<span className="font-medium text-gray-900">
+								{audience.lastName || (
+									<span className="text-gray-400 italic">Not provided</span>
+								)}
 							</span>
 						</div>
 					)}
 					{formState.errors.lastName && (
-						<div className="mt-2 flex items-center gap-2">
+						<div className="flex items-center gap-2 rounded-lg bg-red-50 p-3">
 							<Icon name="alert-circle" className="h-4 w-4 text-red-500" />
-							<p className="text-red-600 text-sm">
+							<p className="text-red-700 text-sm">
 								{formState.errors.lastName.message}
 							</p>
 						</div>
 					)}
 				</div>
 			</div>
+
+			{/* Edit mode indicator */}
+			{isEditing && (
+				<div className="mt-6 rounded-lg bg-blue-50 p-4">
+					<div className="flex items-center gap-2">
+						<Icon name="info" className="h-4 w-4 text-blue-600" />
+						<p className="text-blue-800 text-sm">
+							You're editing audience details. Changes will be saved immediately
+							when you click "Save Changes".
+						</p>
+					</div>
+				</div>
+			)}
 		</div>
 	);
 };

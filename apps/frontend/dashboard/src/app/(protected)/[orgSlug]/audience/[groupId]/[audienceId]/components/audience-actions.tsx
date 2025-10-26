@@ -175,7 +175,19 @@ export const AudienceActions = ({
 		<div className="space-y-4">
 			{/* Subscription Actions */}
 			<div className="rounded-lg border border-stroke-soft-200 p-6">
-				<h3 className="mb-4 font-medium text-lg">Subscription Status</h3>
+				<div className="mb-4 flex items-center gap-3">
+					<div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-100">
+						<Icon name="mail" className="h-5 w-5 text-green-600" />
+					</div>
+					<div>
+						<h3 className="font-semibold text-gray-900 text-lg">
+							Subscription Status
+						</h3>
+						<p className="text-gray-500 text-sm">
+							Manage audience subscription preferences
+						</p>
+					</div>
+				</div>
 				<div className="flex gap-3">
 					{audience.status === "subscribed" ? (
 						<Button.Root
@@ -183,6 +195,7 @@ export const AudienceActions = ({
 							mode="stroke"
 							size="small"
 							onClick={() => setShowUnsubscribeDialog(true)}
+							className="transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-700"
 						>
 							<Icon name="minus-circle" className="h-4 w-4" />
 							Unsubscribe
@@ -192,6 +205,7 @@ export const AudienceActions = ({
 							variant="neutral"
 							size="small"
 							onClick={() => setShowSubscribeDialog(true)}
+							className="transition-colors hover:border-green-200 hover:bg-green-50 hover:text-green-700"
 						>
 							<Icon name="check-circle" className="h-4 w-4" />
 							Subscribe
@@ -202,12 +216,25 @@ export const AudienceActions = ({
 
 			{/* Move to Different Group */}
 			<div className="rounded-lg border border-stroke-soft-200 p-6">
-				<h3 className="mb-4 font-medium text-lg">Move to Different Group</h3>
+				<div className="mb-4 flex items-center gap-3">
+					<div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100">
+						<Icon name="arrow-right" className="h-5 w-5 text-blue-600" />
+					</div>
+					<div>
+						<h3 className="font-semibold text-gray-900 text-lg">
+							Move to Different Group
+						</h3>
+						<p className="text-gray-500 text-sm">
+							Transfer audience to another group
+						</p>
+					</div>
+				</div>
 				<Button.Root
 					variant="neutral"
 					mode="stroke"
 					size="small"
 					onClick={() => setShowMoveDialog(true)}
+					className="transition-colors hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
 				>
 					<Icon name="arrow-right" className="h-4 w-4" />
 					Move Audience
@@ -216,14 +243,37 @@ export const AudienceActions = ({
 
 			{/* Delete Action */}
 			<div className="rounded-lg border border-red-200 bg-red-50 p-6">
-				<h3 className="mb-2 font-medium text-lg text-red-800">Danger Zone</h3>
-				<p className="mb-4 text-red-700 text-sm">
-					Permanently delete this audience. This action cannot be undone.
-				</p>
+				<div className="mb-4 flex items-center gap-3">
+					<div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100">
+						<Icon name="trash" className="h-5 w-5 text-red-600" />
+					</div>
+					<div>
+						<h3 className="font-semibold text-lg text-red-900">Danger Zone</h3>
+						<p className="text-red-700 text-sm">
+							Permanently delete this audience
+						</p>
+					</div>
+				</div>
+				<div className="mb-4 rounded-lg bg-red-100 p-4">
+					<div className="flex items-start gap-2">
+						<Icon
+							name="alert-triangle"
+							className="mt-0.5 h-4 w-4 text-red-600"
+						/>
+						<div className="text-red-800 text-sm">
+							<p className="font-medium">This action cannot be undone</p>
+							<p className="mt-1">
+								This will permanently delete the audience and all associated
+								data.
+							</p>
+						</div>
+					</div>
+				</div>
 				<Button.Root
 					variant="error"
 					size="small"
 					onClick={() => setShowDeleteDialog(true)}
+					className="transition-colors hover:bg-red-700"
 				>
 					<Icon name="trash" className="h-4 w-4" />
 					Delete Audience
