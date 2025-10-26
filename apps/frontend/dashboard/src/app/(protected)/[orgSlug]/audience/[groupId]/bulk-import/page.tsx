@@ -2,11 +2,12 @@
 import { isValidEmail } from "@fe/dashboard/utils/audience";
 import type { AudienceGroup } from "@reloop/api/types";
 import * as Button from "@reloop/ui/button";
+import * as FileFormatIcon from "@reloop/ui/file-format-icon";
 import * as FileUpload from "@reloop/ui/file-upload";
 import { Icon } from "@reloop/ui/icon";
-import * as Label from "@reloop/ui/label";
 import Spinner from "@reloop/ui/spinner";
 import * as Table from "@reloop/ui/table";
+import * as Tooltip from "@reloop/ui/tooltip";
 import { useLoading } from "@reloop/ui/use-loading";
 import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
@@ -270,34 +271,82 @@ const BulkImportPage = () => {
 	}
 
 	return (
-		<div className="mx-auto max-w-4xl">
-			{/* Header */}
-			<div className="mb-8">
-				<div className="mb-4 flex items-center gap-2 text-sm text-text-sub-600">
-					<Button.Root
-						variant="neutral"
-						mode="stroke"
-						size="xsmall"
-						onClick={handleBack}
-					>
-						<Icon name="arrow-left" className="h-4 w-4" />
-						Back to Audience Group
-					</Button.Root>
+		<div className="mx-auto max-w-3xl pt-10 pb-8">
+			<Button.Root
+				onClick={handleBack}
+				variant="neutral"
+				mode="stroke"
+				size="xxsmall"
+			>
+				<Button.Icon>
+					<Icon name="chevron-left" className="h-4 w-4" />
+				</Button.Icon>
+				Back
+			</Button.Root>
+			<div className="flex w-full items-center justify-between border-stroke-soft-200 border-b border-dashed pt-6 pb-6">
+				<div>
+					<h1 className="font-medium text-title-h5 leading-8">
+						Bulk Import Audience
+					</h1>
+					<p className="text-paragraph-sm text-text-sub-600">
+						Import up to 1000 audiences to "{groupData.name}" from a CSV file
+					</p>
 				</div>
-				<h1 className="font-bold text-2xl">Bulk Import Audience</h1>
-				<p className="text-text-sub-600">
-					Import up to 1000 audiences to "{groupData.name}" from a CSV file.
+
+				<Button.Root
+					variant="neutral"
+					mode="stroke"
+					size="xsmall"
+					onClick={downloadExampleCSV}
+				>
+					<Icon name="file-download" className="h-4 w-4" />
+					Download Example
+				</Button.Root>
+			</div>
+			<div className="my-6 gap-3">
+				<div className="flex items-center gap-2">
+					<h2 className="font-semibold text-gray-900 text-lg">CSV File</h2>
+					<Tooltip.Provider delayDuration={0}>
+						<Tooltip.Root>
+							<Tooltip.Trigger asChild>
+								<button
+									type="button"
+									className="inline-flex items-center justify-center"
+								>
+									<Icon
+										name="info-outline"
+										className="h-3.5 w-3.5 text-text-sub-600"
+									/>
+								</button>
+							</Tooltip.Trigger>
+							<Tooltip.Content size="medium" variant="light" side="top">
+								<div className="space-y-3">
+									<p className="font-medium">CSV Format Requirements</p>
+									<p className="text-sm">
+										Use proper CSV format for best results
+									</p>
+									<div className="text-sm">
+										<p className="mb-2 font-medium">Required columns:</p>
+										<ul className="list-disc space-y-1 pl-4">
+											<li>email (required)</li>
+											<li>firstName (optional)</li>
+											<li>lastName (optional)</li>
+											<li>status (subscribed/unsubscribed)</li>
+										</ul>
+									</div>
+								</div>
+							</Tooltip.Content>
+						</Tooltip.Root>
+					</Tooltip.Provider>
+				</div>
+				<p className="text-paragraph-sm text-text-sub-600">
+					Upload a CSV file with audience data (email, firstName, lastName,
+					status)
 				</p>
 			</div>
-
-			<div className="space-y-8">
-				{/* File Upload */}
-				<div>
-					<Label.Root className="mb-4 block font-medium text-gray-700 text-lg">
-						CSV File
-						<Label.Asterisk />
-					</Label.Root>
-					<div className="flex items-center gap-4">
+			<div className="flex gap-6">
+				<div className="w-full space-y-3">
+					<div>
 						<div className="w-full max-w-[500px]">
 							<FileUpload.Root
 								{...getRootProps()}
@@ -309,188 +358,178 @@ const BulkImportPage = () => {
 							>
 								<input {...getInputProps()} />
 								<FileUpload.Icon>
-									<Icon name="upload-cloud" className="h-8 w-8" />
+									<FileFormatIcon.Root format="CSV" color="green" />
 								</FileUpload.Icon>
 								<div className="space-y-2">
-									<div className="text-label-lg text-text-strong-950">
+									<div className="font-medium text-sm text-text-strong-950">
 										{isDragActive
 											? "Drop the CSV file here..."
 											: "Choose a CSV file or drag & drop it here."}
 									</div>
-									<div className="text-paragraph-sm text-text-sub-600">
+									<div className="text-text-sub-600 text-xs">
 										CSV format only, up to 1000 rows.
 									</div>
 								</div>
-								<FileUpload.Button>Browse File</FileUpload.Button>
 							</FileUpload.Root>
 						</div>
-						<Button.Root
-							type="button"
-							variant="neutral"
-							mode="stroke"
-							size="medium"
-							onClick={downloadExampleCSV}
-						>
-							<Icon name="download" className="h-4 w-4" />
-							Download Example
-						</Button.Root>
 					</div>
-					<p className="mt-3 text-sm text-text-sub-600">
-						CSV should include columns: email, firstName, lastName, status
-					</p>
-				</div>
 
-				{/* Preview Data */}
-				{csvData.length > 0 && (
-					<div>
-						<div className="mb-6 flex items-center justify-between">
-							<h2 className="font-medium text-xl">
-								Preview ({csvData.length} audiences)
-							</h2>
-							<div className="flex gap-3">
-								<Button.Root
-									variant="neutral"
-									mode="stroke"
-									size="medium"
-									onClick={handleValidate}
-									disabled={isValidating}
-								>
-									{isValidating ? (
-										<>
-											<Spinner color="current" />
-											Validating...
-										</>
-									) : (
-										<>
-											<Icon name="check-circle" className="h-4 w-4" />
-											Validate
-										</>
-									)}
-								</Button.Root>
-								<Button.Root
-									variant="primary"
-									size="medium"
-									onClick={handleImport}
-									disabled={status === "loading"}
-								>
-									{status === "loading" ? (
-										<>
-											<Spinner color="white" />
-											Importing...
-										</>
-									) : (
-										<>
-											<Icon name="upload" className="h-4 w-4" />
-											Import All
-										</>
-									)}
-								</Button.Root>
+					{/* Preview Data */}
+					{csvData.length > 0 && (
+						<div className="space-y-4">
+							<div className="flex items-center justify-between">
+								<h3 className="font-semibold text-gray-900 text-lg">
+									Preview ({csvData.length} audiences)
+								</h3>
+								<div className="flex gap-3">
+									<Button.Root
+										variant="neutral"
+										mode="stroke"
+										size="small"
+										onClick={handleValidate}
+										disabled={isValidating}
+									>
+										{isValidating ? (
+											<>
+												<Spinner color="current" />
+												Validating...
+											</>
+										) : (
+											<>
+												<Icon name="check-circle" className="h-4 w-4" />
+												Validate
+											</>
+										)}
+									</Button.Root>
+									<Button.Root
+										variant="primary"
+										size="small"
+										onClick={handleImport}
+										disabled={status === "loading"}
+									>
+										{status === "loading" ? (
+											<>
+												<Spinner color="white" />
+												Importing...
+											</>
+										) : (
+											<>
+												<Icon name="upload" className="h-4 w-4" />
+												Import All
+											</>
+										)}
+									</Button.Root>
+								</div>
 							</div>
-						</div>
 
-						<div className="max-h-96 overflow-auto rounded-lg border border-stroke-soft-200">
-							<Table.Root>
-								<Table.Header>
-									<Table.Row>
-										<Table.Head>Email</Table.Head>
-										<Table.Head>Name</Table.Head>
-										<Table.Head>Status</Table.Head>
-									</Table.Row>
-								</Table.Header>
-								<Table.Body>
-									{csvData.slice(0, 20).map((audience, index) => (
-										<Table.Row key={index}>
-											<Table.Cell className="font-medium">
-												{audience.email}
-											</Table.Cell>
-											<Table.Cell>
-												{audience.firstName || audience.lastName
-													? `${audience.firstName || ""} ${audience.lastName || ""}`.trim()
-													: "—"}
-											</Table.Cell>
-											<Table.Cell>
-												<span
-													className={`inline-flex items-center gap-1 rounded-full px-2 py-1 font-medium text-xs ${
-														audience.status === "subscribed"
-															? "bg-green-100 text-green-800"
-															: "bg-gray-100 text-gray-800"
-													}`}
-												>
-													<Icon
-														name={
-															audience.status === "subscribed"
-																? "check-circle"
-																: "minus-circle"
-														}
-														className="h-3 w-3"
-													/>
-													{audience.status === "subscribed"
-														? "Subscribed"
-														: "Unsubscribed"}
-												</span>
-											</Table.Cell>
-										</Table.Row>
-									))}
-									{csvData.length > 20 && (
+							<div className="max-h-96 overflow-auto rounded-lg border border-stroke-soft-200">
+								<Table.Root>
+									<Table.Header>
 										<Table.Row>
-											<Table.Cell
-												colSpan={3}
-												className="text-center text-sm text-text-sub-600"
-											>
-												... and {csvData.length - 20} more
-											</Table.Cell>
+											<Table.Head>Email</Table.Head>
+											<Table.Head>Name</Table.Head>
+											<Table.Head>Status</Table.Head>
 										</Table.Row>
-									)}
-								</Table.Body>
-							</Table.Root>
+									</Table.Header>
+									<Table.Body>
+										{csvData.slice(0, 20).map((audience, index) => (
+											<Table.Row key={index}>
+												<Table.Cell className="font-medium">
+													{audience.email}
+												</Table.Cell>
+												<Table.Cell>
+													{audience.firstName || audience.lastName
+														? `${audience.firstName || ""} ${audience.lastName || ""}`.trim()
+														: "—"}
+												</Table.Cell>
+												<Table.Cell>
+													<span
+														className={`inline-flex items-center gap-1 rounded-full px-2 py-1 font-medium text-xs ${
+															audience.status === "subscribed"
+																? "bg-green-100 text-green-800"
+																: "bg-gray-100 text-gray-800"
+														}`}
+													>
+														<Icon
+															name={
+																audience.status === "subscribed"
+																	? "check-circle"
+																	: "minus-circle"
+															}
+															className="h-3 w-3"
+														/>
+														{audience.status === "subscribed"
+															? "Subscribed"
+															: "Unsubscribed"}
+													</span>
+												</Table.Cell>
+											</Table.Row>
+										))}
+										{csvData.length > 20 && (
+											<Table.Row>
+												<Table.Cell
+													colSpan={3}
+													className="text-center text-sm text-text-sub-600"
+												>
+													... and {csvData.length - 20} more
+												</Table.Cell>
+											</Table.Row>
+										)}
+									</Table.Body>
+								</Table.Root>
+							</div>
 						</div>
-					</div>
-				)}
+					)}
 
-				{/* Import Results */}
-				{importResult && (
-					<div className="rounded-lg border border-stroke-soft-200 p-6">
-						<h2 className="mb-6 font-medium text-xl">Import Results</h2>
-						<div className="mb-6 grid grid-cols-3 gap-6">
-							<div className="text-center">
-								<div className="font-bold text-3xl text-green-600">
-									{importResult.successful}
-								</div>
-								<div className="text-sm text-text-sub-600">Successful</div>
-							</div>
-							<div className="text-center">
-								<div className="font-bold text-3xl text-red-600">
-									{importResult.failed}
-								</div>
-								<div className="text-sm text-text-sub-600">Failed</div>
-							</div>
-							<div className="text-center">
-								<div className="font-bold text-3xl text-blue-600">
-									{importResult.successful + importResult.failed}
-								</div>
-								<div className="text-sm text-text-sub-600">Total</div>
-							</div>
-						</div>
-
-						{importResult.errors.length > 0 && (
-							<div>
-								<h3 className="mb-4 font-medium text-lg">Errors:</h3>
-								<div className="max-h-48 space-y-2 overflow-auto">
-									{importResult.errors.map((error, index) => (
-										<div
-											key={index}
-											className="flex items-center gap-2 rounded-md bg-red-50 p-3 text-red-700"
-										>
-											<Icon name="alert-circle" className="h-4 w-4" />
-											<span className="font-medium">{error.email}:</span>
-											<span>{error.error}</span>
+					{/* Import Results */}
+					{importResult && (
+						<div className="space-y-4">
+							<h3 className="font-semibold text-gray-900 text-lg">
+								Import Results
+							</h3>
+							<div className="rounded-lg border border-stroke-soft-200 p-6">
+								<div className="mb-6 grid grid-cols-3 gap-6">
+									<div className="text-center">
+										<div className="font-bold text-3xl text-green-600">
+											{importResult.successful}
 										</div>
-									))}
+										<div className="text-sm text-text-sub-600">Successful</div>
+									</div>
+									<div className="text-center">
+										<div className="font-bold text-3xl text-red-600">
+											{importResult.failed}
+										</div>
+										<div className="text-sm text-text-sub-600">Failed</div>
+									</div>
+									<div className="text-center">
+										<div className="font-bold text-3xl text-blue-600">
+											{importResult.successful + importResult.failed}
+										</div>
+										<div className="text-sm text-text-sub-600">Total</div>
+									</div>
 								</div>
+
+								{importResult.errors.length > 0 && (
+									<div>
+										<h4 className="mb-4 font-medium text-lg">Errors:</h4>
+										<div className="max-h-48 space-y-2 overflow-auto">
+											{importResult.errors.map((error, index) => (
+												<div
+													key={index}
+													className="flex items-center gap-2 rounded-md bg-red-50 p-3 text-red-700"
+												>
+													<Icon name="alert-circle" className="h-4 w-4" />
+													<span className="font-medium">{error.email}:</span>
+													<span>{error.error}</span>
+												</div>
+											))}
+										</div>
+									</div>
+								)}
 							</div>
-						)}
-					</div>
-				)}
+						</div>
+					)}
+				</div>
 			</div>
 		</div>
 	);

@@ -67,6 +67,7 @@
 		"./table": "./src/components/table.tsx",
 		"./tabs": "./src/components/tabs.tsx",
 		"./textarea": "./src/components/textarea.tsx",
+		"./file-format-icon": "./src/components/file-format-icon.tsx",
 		"./toaster": "./src/components/toaster.tsx",
 		"./tooltip": "./src/components/tooltip.tsx",
 		"./time-range-input": "./src/components/time-range-input.tsx",
