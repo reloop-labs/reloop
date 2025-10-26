@@ -105,6 +105,8 @@ const AudienceGroupPage = () => {
 				group={groupData || null}
 				isLoading={groupLoading}
 				isFailed={!!groupError}
+				onOpenAddAudience={() => setShowAddAudience(true)}
+				onOpenBulkImport={() => setShowBulkImport(true)}
 			/>
 
 			{groupError ? (

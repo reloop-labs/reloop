@@ -12,6 +12,11 @@ export const createAudienceRoute = new Elysia().use(authMiddleware).post(
                 message: "User is not a member of an organization",
             });
         }
+        if (!user.activeOrganizationId) {
+            throw status(403, {
+                message: "User is not a member of an organization",
+            });
+        }
         return await createAudienceHandler(user.activeOrganizationId, body);
     },
     {

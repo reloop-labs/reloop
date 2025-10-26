@@ -27,7 +27,7 @@ A comprehensive audiences management service built with Elysia, providing full C
 - **Status Tracking**: Track subscription status and timestamps
 
 ### Advanced Search
-- **Multi-field Search**: Search across email, name, and metadata
+- **Multi-field Search**: Search across email and name
 - **Filtering**: Filter by status, group, organization
 - **Pagination**: Efficient pagination for large datasets
 
@@ -65,7 +65,7 @@ The service follows the same patterns as the domain service:
 
 Uses the existing audience schema from `@reloop/db`:
 - `audience_group`: Groups for organizing audiences
-- `audience`: Individual audience records with metadata
+- `audience`: Individual audience records
 
 ## Authentication
 

@@ -20,12 +20,16 @@ interface AudienceGroupHeaderProps {
 	group: AudienceGroup | null;
 	isLoading: boolean;
 	isFailed?: boolean;
+	onOpenAddAudience?: () => void;
+	onOpenBulkImport?: () => void;
 }
 
 export const AudienceGroupHeader = ({
 	group,
 	isLoading,
 	isFailed,
+	onOpenAddAudience,
+	onOpenBulkImport,
 }: AudienceGroupHeaderProps) => {
 	const { back } = useRouter();
 	const [, setDeleteId] = useQueryState("delete");
@@ -200,8 +204,7 @@ export const AudienceGroupHeader = ({
 											mode="ghost"
 											size="small"
 											onClick={() => {
-												// TODO: Implement import CSV functionality
-												toast.info("Import CSV functionality coming soon");
+												onOpenBulkImport?.();
 											}}
 											className="w-full justify-start"
 										>
@@ -213,8 +216,7 @@ export const AudienceGroupHeader = ({
 											mode="ghost"
 											size="small"
 											onClick={() => {
-												// TODO: Implement add manually functionality
-												toast.info("Add manually functionality coming soon");
+												onOpenAddAudience?.();
 											}}
 											className="w-full justify-start"
 										>

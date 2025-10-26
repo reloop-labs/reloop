@@ -78,7 +78,6 @@ export interface Audience {
 	firstName: string | null;
 	lastName: string | null;
 	phone: string | null;
-	metadata: Record<string, unknown> | null;
 	organizationId: string;
 	status: AudienceStatus;
 	audienceGroupId: string;

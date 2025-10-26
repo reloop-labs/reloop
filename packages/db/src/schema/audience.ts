@@ -2,7 +2,6 @@ import { createId } from "@paralleldrive/cuid2";
 import { relations } from "drizzle-orm";
 import {
     index,
-    jsonb,
     pgEnum,
     pgTable,
     text,
@@ -61,7 +60,6 @@ export const audience = pgTable(
         email: varchar("email", { length: 255 }).notNull(),
         firstName: varchar("first_name", { length: 255 }),
         lastName: varchar("last_name", { length: 255 }),
-        metadata: jsonb("metadata").$type<Record<string, unknown>>(),
         organizationId: text("organization_id")
             .notNull()
             .references(() => organization.id, { onDelete: "cascade" }),

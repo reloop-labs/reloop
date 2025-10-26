@@ -22,11 +22,6 @@ export namespace AudienceModel {
                 description: "Audience last name",
             }),
         ),
-        metadata: t.Optional(
-            t.Record(t.String(), t.Unknown(), {
-                description: "Custom metadata for the audience",
-            }),
-        ),
         audienceGroupId: t.String({ description: "Audience group ID" }),
         status: t.Optional(
             t.Union([t.Literal("subscribed"), t.Literal("unsubscribed")], {
@@ -51,11 +46,6 @@ export namespace AudienceModel {
                 description: "Audience last name",
             }),
         ),
-        metadata: t.Optional(
-            t.Record(t.String(), t.Unknown(), {
-                description: "Custom metadata for the audience",
-            }),
-        ),
         audienceGroupId: t.Optional(
             t.String({ description: "Audience group ID" }),
         ),
@@ -71,9 +61,6 @@ export namespace AudienceModel {
         }),
         lastName: t.Union([t.String(), t.Null()], {
             description: "Audience last name",
-        }),
-        metadata: t.Union([t.Record(t.String(), t.Unknown()), t.Null()], {
-            description: "Custom metadata for the audience",
         }),
         organizationId: t.String({ description: "Organization ID" }),
         status: t.Union([t.Literal("subscribed"), t.Literal("unsubscribed")], {
@@ -103,7 +90,7 @@ export namespace AudienceModel {
     export const audienceQuery = t.Object({
         page: t.Optional(t.Number({ minimum: 1, default: 1 })),
         limit: t.Optional(t.Number({ minimum: 1, maximum: 100, default: 10 })),
-        search: t.Optional(t.String({ description: "Search by email, name, or metadata" })),
+        search: t.Optional(t.String({ description: "Search by email or name" })),
         status: t.Optional(
             t.Union([t.Literal("subscribed"), t.Literal("unsubscribed")]),
         ),
@@ -125,7 +112,6 @@ export namespace AudienceModel {
                 }),
                 firstName: t.Optional(t.String({ maxLength: 255 })),
                 lastName: t.Optional(t.String({ maxLength: 255 })),
-                metadata: t.Optional(t.Record(t.String(), t.Unknown())),
                 status: t.Optional(
                     t.Union([t.Literal("subscribed"), t.Literal("unsubscribed")], {
                         default: "subscribed",

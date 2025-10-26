@@ -466,7 +466,6 @@ export const AudienceActions = ({
 								<p className="font-medium">This will permanently delete:</p>
 								<ul className="mt-1 list-disc pl-4">
 									<li>The audience record</li>
-									<li>All associated metadata</li>
 									<li>Subscription history</li>
 								</ul>
 							</div>

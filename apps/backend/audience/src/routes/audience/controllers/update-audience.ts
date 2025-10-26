@@ -67,9 +67,6 @@ export async function updateAudience(
         if (body.lastName !== undefined) {
             updateData.lastName = body.lastName;
         }
-        if (body.metadata !== undefined) {
-            updateData.metadata = body.metadata;
-        }
         if (body.audienceGroupId !== undefined) {
             updateData.audienceGroupId = body.audienceGroupId;
         }

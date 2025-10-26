@@ -8,7 +8,6 @@ import useSWR from "swr";
 import { AudienceActions } from "./components/audience-actions";
 import { AudienceDetails } from "./components/audience-details";
 import { AudienceHeader } from "./components/audience-header";
-import { AudienceMetadata } from "./components/audience-metadata";
 
 interface AudienceDetailPageProps {
 	params: {
@@ -81,11 +80,6 @@ const AudienceDetailPage = ({ params }: AudienceDetailPageProps) => {
 
 			<div className="space-y-6">
 				<AudienceDetails
-					audience={audience || audienceData || null}
-					onUpdate={handleUpdate}
-				/>
-
-				<AudienceMetadata
 					audience={audience || audienceData || null}
 					onUpdate={handleUpdate}
 				/>

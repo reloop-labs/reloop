@@ -24,7 +24,7 @@ export const searchAudiencesRoute = new Elysia().use(authMiddleware).get(
             tags: ["Audience"],
             summary: "Search audiences",
             description:
-                "Performs advanced search across audience fields including metadata",
+                "Performs advanced search across audience fields",
         },
     },
 );

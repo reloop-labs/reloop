@@ -100,34 +100,3 @@ export const isValidEmail = (email: string): boolean => {
 };
 
 
-/**
- * Format metadata for display
- */
-export const formatMetadata = (
-    metadata: Record<string, unknown> | null,
-): string => {
-    if (!metadata || Object.keys(metadata).length === 0) {
-        return "No metadata";
-    }
-
-    try {
-        return JSON.stringify(metadata, null, 2);
-    } catch {
-        return "Invalid metadata";
-    }
-};
-
-/**
- * Parse metadata from string
- */
-export const parseMetadata = (
-    metadataString: string,
-): Record<string, unknown> | null => {
-    if (!metadataString.trim()) return null;
-
-    try {
-        return JSON.parse(metadataString);
-    } catch {
-        return null;
-    }
-};
