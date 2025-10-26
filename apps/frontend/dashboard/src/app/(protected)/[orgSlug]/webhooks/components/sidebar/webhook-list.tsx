@@ -1,7 +1,6 @@
 "use client";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import * as Button from "@reloop/ui/button";
-import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Select from "@reloop/ui/select";
@@ -73,6 +72,18 @@ export const WebhookListSidebar = () => {
 						<Icon name="plus" className="h-4 w-4" />
 						Add webhook
 					</Button.Root>
+					<Link
+						href="https://reloop.sh/docs/learn/webhook"
+						target="_blank"
+						rel="noopener noreferrer"
+						className={Button.buttonVariants({
+							variant: "neutral",
+							size: "xsmall",
+							mode: "stroke",
+						}).root()}
+					>
+						<Icon name="book-closed" className="h-4 w-4" />
+					</Link>
 				</div>
 			</div>
 
