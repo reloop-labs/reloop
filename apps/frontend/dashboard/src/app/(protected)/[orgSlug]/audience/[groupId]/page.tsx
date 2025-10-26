@@ -5,23 +5,22 @@ import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Select from "@reloop/ui/select";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import useSWR from "swr";
 import { AddAudience } from "./components/add-audience";
 import { AudienceGroupHeader } from "./components/audience-group-header";
 import { AudienceTable } from "./components/audience-table";
-import { BulkImport } from "./components/bulk-import";
 import { EmptyState } from "./components/empty-state";
 
 const AudienceGroupPage = () => {
-	const { groupId } = useParams();
+	const { groupId, orgSlug } = useParams();
+	const router = useRouter();
 
 	const { activeOrganization } = useUserOrganization();
 	const [statusFilter, setStatusFilter] = useState<string>("all");
 	const [searchQuery, setSearchQuery] = useState<string>("");
 	const [showAddAudience, setShowAddAudience] = useState(false);
-	const [showBulkImport, setShowBulkImport] = useState(false);
 	const {
 		data: groupData,
 		error: groupError,
@@ -88,7 +87,8 @@ const AudienceGroupPage = () => {
 	// Listen for custom events from empty state
 	useState(() => {
 		const handleOpenAddAudience = () => setShowAddAudience(true);
-		const handleOpenBulkImport = () => setShowBulkImport(true);
+		const handleOpenBulkImport = () =>
+			router.push(`/${orgSlug}/audience/${groupId}/bulk-import`);
 
 		window.addEventListener("openAddAudience", handleOpenAddAudience);
 		window.addEventListener("openBulkImport", handleOpenBulkImport);
@@ -106,7 +106,9 @@ const AudienceGroupPage = () => {
 				isLoading={groupLoading}
 				isFailed={!!groupError}
 				onOpenAddAudience={() => setShowAddAudience(true)}
-				onOpenBulkImport={() => setShowBulkImport(true)}
+				onOpenBulkImport={() =>
+					router.push(`/${orgSlug}/audience/${groupId}/bulk-import`)
+				}
 			/>
 
 			{groupError ? (
@@ -180,7 +182,9 @@ const AudienceGroupPage = () => {
 							variant="neutral"
 							mode="stroke"
 							size="xsmall"
-							onClick={() => setShowBulkImport(true)}
+							onClick={() =>
+								router.push(`/${orgSlug}/audience/${groupId}/bulk-import`)
+							}
 						>
 							<Icon name="file-download" className="h-4 w-4" />
 						</Button.Root>
@@ -204,13 +208,6 @@ const AudienceGroupPage = () => {
 				groupName={groupData?.name || "Unknown"}
 				open={showAddAudience}
 				onOpenChange={setShowAddAudience}
-			/>
-
-			<BulkImport
-				groupId={groupId as string}
-				groupName={groupData?.name || "Unknown"}
-				open={showBulkImport}
-				onOpenChange={setShowBulkImport}
 			/>
 		</div>
 	);

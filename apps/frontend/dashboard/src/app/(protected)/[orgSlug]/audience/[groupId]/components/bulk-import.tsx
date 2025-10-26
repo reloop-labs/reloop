@@ -1,6 +1,7 @@
 "use client";
 import { isValidEmail } from "@fe/dashboard/utils/audience";
 import * as Button from "@reloop/ui/button";
+import * as FileUpload from "@reloop/ui/file-upload";
 import { Icon } from "@reloop/ui/icon";
 import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
@@ -9,6 +10,7 @@ import * as Table from "@reloop/ui/table";
 import { useLoading } from "@reloop/ui/use-loading";
 import axios from "axios";
 import { useCallback, useState } from "react";
+import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
 
@@ -125,40 +127,46 @@ export const BulkImport = ({
 		return errors;
 	};
 
-	const handleFileUpload = useCallback(
-		(event: React.ChangeEvent<HTMLInputElement>) => {
-			const file = event.target.files?.[0];
-			if (!file) return;
+	const handleFileUpload = useCallback((files: File[]) => {
+		const file = files[0];
+		if (!file) return;
 
-			if (!file.name.toLowerCase().endsWith(".csv")) {
-				toast.error("Please select a CSV file");
+		if (!file.name.toLowerCase().endsWith(".csv")) {
+			toast.error("Please select a CSV file");
+			return;
+		}
+
+		const reader = new FileReader();
+		reader.onload = (e) => {
+			const csvText = e.target?.result as string;
+			const parsed = parseCSV(csvText);
+
+			if (parsed.length === 0) {
+				toast.error("No valid data found in CSV file");
 				return;
 			}
 
-			const reader = new FileReader();
-			reader.onload = (e) => {
-				const csvText = e.target?.result as string;
-				const parsed = parseCSV(csvText);
+			if (parsed.length > 1000) {
+				toast.error(
+					"CSV file contains more than 1000 rows. Please split into smaller files.",
+				);
+				return;
+			}
 
-				if (parsed.length === 0) {
-					toast.error("No valid data found in CSV file");
-					return;
-				}
+			setCsvData(parsed);
+			setImportResult(null);
+		};
+		reader.readAsText(file);
+	}, []);
 
-				if (parsed.length > 1000) {
-					toast.error(
-						"CSV file contains more than 1000 rows. Please split into smaller files.",
-					);
-					return;
-				}
-
-				setCsvData(parsed);
-				setImportResult(null);
-			};
-			reader.readAsText(file);
+	const { getRootProps, getInputProps, isDragActive } = useDropzone({
+		onDrop: handleFileUpload,
+		accept: {
+			"text/csv": [".csv"],
 		},
-		[],
-	);
+		multiple: false,
+		maxFiles: 1,
+	});
 
 	const handleValidate = async () => {
 		if (csvData.length === 0) {
@@ -257,12 +265,32 @@ export const BulkImport = ({
 							<Label.Asterisk />
 						</Label.Root>
 						<div className="flex items-center gap-4">
-							<input
-								type="file"
-								accept=".csv"
-								onChange={handleFileUpload}
-								className="block w-full text-gray-500 text-sm file:mr-4 file:rounded-full file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:font-semibold file:text-blue-700 file:text-sm hover:file:bg-blue-100"
-							/>
+							<div className="w-full max-w-[400px]">
+								<FileUpload.Root
+									{...getRootProps()}
+									className={`transition-colors duration-200 ${
+										isDragActive
+											? "border-blue-400 bg-blue-50"
+											: "border-stroke-sub-300"
+									}`}
+								>
+									<input {...getInputProps()} />
+									<FileUpload.Icon>
+										<Icon name="upload-cloud" className="h-6 w-6" />
+									</FileUpload.Icon>
+									<div className="space-y-1.5">
+										<div className="text-label-sm text-text-strong-950">
+											{isDragActive
+												? "Drop the CSV file here..."
+												: "Choose a CSV file or drag & drop it here."}
+										</div>
+										<div className="text-paragraph-xs text-text-sub-600">
+											CSV format only, up to 1000 rows.
+										</div>
+									</div>
+									<FileUpload.Button>Browse File</FileUpload.Button>
+								</FileUpload.Root>
+							</div>
 							<Button.Root
 								type="button"
 								variant="neutral"
