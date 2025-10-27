@@ -196,8 +196,13 @@ export const WebhookHeader = ({
 							<p className="font-semibold text-paragraph-sm text-text-sub-600">
 								•
 							</p>
-							<div className={`flex items-center gap-1 ${getStatusColor(webhook?.status || "")}`}>
-								<Icon name={getStatusIcon(webhook?.status || "")} className="h-3.5 w-3.5" />
+							<div
+								className={`flex items-center gap-1 ${getStatusColor(webhook?.status || "")}`}
+							>
+								<Icon
+									name={getStatusIcon(webhook?.status || "")}
+									className="h-3.5 w-3.5"
+								/>
 								<p className="font-medium text-paragraph-sm">
 									{webhook?.status || "Unknown"}
 								</p>
@@ -243,8 +248,8 @@ export const WebhookHeader = ({
 						</Button.Root>
 					) : webhook ? (
 						<>
-							<Button.Root 
-								variant="neutral" 
+							<Button.Root
+								variant="neutral"
 								size="xsmall"
 								onClick={() => onOpenSettings?.()}
 							>

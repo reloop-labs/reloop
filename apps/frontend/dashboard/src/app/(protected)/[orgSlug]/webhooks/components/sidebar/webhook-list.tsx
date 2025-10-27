@@ -146,7 +146,6 @@ export const WebhookListSidebar = () => {
 					</div>
 				)}
 			</div>
-
 			<CreateWebhookModal
 				isOpen={isCreateModalOpen}
 				onClose={() => setIsCreateModalOpen(false)}

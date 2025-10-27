@@ -1,8 +1,7 @@
 "use client";
 import { SomethingWentWrong } from "@fe/dashboard/components/something-went-wrong";
-import * as TabMenu from "@reloop/ui/tab-menu-horizontal";
+import { Icon } from "@reloop/ui/icon";
 import { useParams } from "next/navigation";
-import * as React from "react";
 import useSWR from "swr";
 import { DeliveryLogs } from "./components/delivery-logs";
 import { EventSubscriptions } from "./components/event-subscriptions";
@@ -32,7 +31,6 @@ interface WebhookData {
 
 const WebhookDetailPage = () => {
 	const { webhookId } = useParams();
-	const [activeTab, setActiveTab] = React.useState("overview");
 
 	const {
 		data: webhookData,
@@ -45,7 +43,7 @@ const WebhookDetailPage = () => {
 
 	if (error) {
 		return (
-			<div className="mx-auto max-w-6xl">
+			<div className="mx-auto max-w-3xl">
 				<SomethingWentWrong />
 			</div>
 		);
@@ -53,7 +51,7 @@ const WebhookDetailPage = () => {
 
 	if (isLoading) {
 		return (
-			<div className="mx-auto max-w-6xl">
+			<div className="mx-auto max-w-3xl">
 				<div className="animate-pulse">
 					<div className="mb-4 h-8 w-1/3 rounded bg-gray-200" />
 					<div className="mb-8 h-4 w-1/2 rounded bg-gray-200" />
@@ -69,7 +67,7 @@ const WebhookDetailPage = () => {
 
 	if (!webhookData) {
 		return (
-			<div className="mx-auto max-w-6xl">
+			<div className="mx-auto max-w-3xl">
 				<div className="py-12 text-center">
 					<h2 className="mb-2 font-semibold text-2xl text-gray-900">
 						Webhook not found
@@ -82,41 +80,64 @@ const WebhookDetailPage = () => {
 		);
 	}
 
-	const tabs = [
-		{ id: "overview", label: "Overview" },
-		{ id: "events", label: "Events" },
-		{ id: "deliveries", label: "Deliveries" },
-		{ id: "settings", label: "Settings" },
-	];
-
 	return (
-		<div className="mx-auto max-w-6xl">
-			<WebhookHeader webhook={webhookData} />
+		<div className="mx-auto max-w-3xl">
+			<WebhookHeader
+				webhook={webhookData}
+				isLoading={isLoading}
+				isFailed={!!error}
+				onOpenSettings={() => {
+					// Scroll to settings section
+					const settingsElement = document.getElementById("settings-section");
+					if (settingsElement) {
+						settingsElement.scrollIntoView({ behavior: "smooth" });
+					}
+				}}
+				onDeleteWebhook={() => {
+					// This will be handled by the WebhookSettings component
+					console.log("Delete webhook requested");
+				}}
+			/>
 
-			<div className="mt-8">
-				<TabMenu.Root value={activeTab} onValueChange={setActiveTab}>
-					<TabMenu.List>
-						{tabs.map((tab) => (
-							<TabMenu.Trigger key={tab.id} value={tab.id}>
-								{tab.label}
-							</TabMenu.Trigger>
-						))}
-					</TabMenu.List>
-				</TabMenu.Root>
+			<div className="space-y-8">
+				{/* Overview Section */}
+				<div>
+					<div className="mb-6 flex items-center gap-2">
+						<Icon name="activity" className="h-5 w-5 text-gray-500" />
+						<h2 className="font-semibold text-gray-900 text-xl">Overview</h2>
+					</div>
+					<WebhookOverview webhook={webhookData} />
+				</div>
 
-				<div className="mt-6">
-					{activeTab === "overview" && (
-						<WebhookOverview webhook={webhookData} />
-					)}
-					{activeTab === "events" && (
-						<EventSubscriptions webhookId={webhookData.id} />
-					)}
-					{activeTab === "deliveries" && (
-						<DeliveryLogs webhookId={webhookData.id} />
-					)}
-					{activeTab === "settings" && (
-						<WebhookSettings webhook={webhookData} />
-					)}
+				{/* Event Subscriptions Section */}
+				<div>
+					<div className="mb-6 flex items-center gap-2">
+						<Icon name="bell" className="h-5 w-5 text-gray-500" />
+						<h2 className="font-semibold text-gray-900 text-xl">
+							Event Subscriptions
+						</h2>
+					</div>
+					<EventSubscriptions webhookId={webhookData.id} />
+				</div>
+
+				{/* Delivery Logs Section */}
+				<div>
+					<div className="mb-6 flex items-center gap-2">
+						<Icon name="clock" className="h-5 w-5 text-gray-500" />
+						<h2 className="font-semibold text-gray-900 text-xl">
+							Delivery Logs
+						</h2>
+					</div>
+					<DeliveryLogs webhookId={webhookData.id} />
+				</div>
+
+				{/* Settings Section */}
+				<div id="settings-section">
+					<div className="mb-6 flex items-center gap-2">
+						<Icon name="settings" className="h-5 w-5 text-gray-500" />
+						<h2 className="font-semibold text-gray-900 text-xl">Settings</h2>
+					</div>
+					<WebhookSettings webhook={webhookData} />
 				</div>
 			</div>
 		</div>
