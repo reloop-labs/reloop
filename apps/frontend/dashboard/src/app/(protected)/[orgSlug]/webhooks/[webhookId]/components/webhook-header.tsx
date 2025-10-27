@@ -78,13 +78,13 @@ export const WebhookHeader = ({
 }: WebhookHeaderProps) => {
 	const { back } = useRouter();
 
-	const handleCopyId = async () => {
-		if (webhook?.id) {
+	const handleCopySecret = async () => {
+		if (webhook?.secret) {
 			try {
-				await navigator.clipboard.writeText(webhook.id);
-				toast.success("Webhook ID copied to clipboard");
+				await navigator.clipboard.writeText(webhook.secret);
+				toast.success("Webhook secret copied to clipboard");
 			} catch {
-				toast.error("Failed to copy ID");
+				toast.error("Failed to copy secret");
 			}
 		}
 	};
@@ -196,8 +196,13 @@ export const WebhookHeader = ({
 							<p className="font-semibold text-paragraph-sm text-text-sub-600">
 								•
 							</p>
-							<div className={`flex items-center gap-1 ${getStatusColor(webhook?.status || "")}`}>
-								<Icon name={getStatusIcon(webhook?.status || "")} className="h-3.5 w-3.5" />
+							<div
+								className={`flex items-center gap-1 ${getStatusColor(webhook?.status || "")}`}
+							>
+								<Icon
+									name={getStatusIcon(webhook?.status || "")}
+									className="h-3.5 w-3.5"
+								/>
 								<p className="font-medium text-paragraph-sm">
 									{webhook?.status || "Unknown"}
 								</p>
@@ -243,8 +248,8 @@ export const WebhookHeader = ({
 						</Button.Root>
 					) : webhook ? (
 						<>
-							<Button.Root 
-								variant="neutral" 
+							<Button.Root
+								variant="neutral"
 								size="xsmall"
 								onClick={() => onOpenSettings?.()}
 							>
@@ -356,7 +361,7 @@ export const WebhookHeader = ({
 					<div className="flex items-center gap-1.5">
 						<Icon name="key" className="h-4 w-4 text-text-sub-600" />
 						<span className="font-medium text-sm text-text-sub-600">
-							Webhook ID
+							Webhook Secret
 						</span>
 					</div>
 					<div className="flex items-center gap-2 overflow-hidden rounded-lg border border-stroke-soft-200 bg-bg-weak-50 py-0.5 pr-0.5 pl-2">
@@ -365,14 +370,15 @@ export const WebhookHeader = ({
 						) : (
 							<>
 								<span className="w-42 truncate font-medium text-xs">
-									{webhook?.id || ""}
+									{webhook?.secret || "No secret set"}
 								</span>
 								<Button.Root
 									variant="neutral"
 									mode="ghost"
 									size="xxsmall"
-									onClick={handleCopyId}
+									onClick={handleCopySecret}
 									className="h-6 w-6 p-0"
+									disabled={!webhook?.secret}
 								>
 									<Icon name="clipboard-copy" className="h-3 w-3" />
 								</Button.Root>
