@@ -45,7 +45,7 @@ export const LayoutToggleButton: React.FC<LayoutToggleButtonProps> = ({
 						{option.label}
 					</p>
 					<div className="flex items-center justify-center gap-2 pt-2">
-						<option.icon />
+						<option.icon defaultSystemTheme />
 					</div>
 				</button>
 			))}

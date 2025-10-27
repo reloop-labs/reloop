@@ -231,7 +231,7 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 						) : error ? (
 							<div className="col-span-5 p-6 text-center">
 								<Icon
-									name="alert-circle"
+									name="info-outline"
 									className="mx-auto mb-2 h-8 w-8 text-red-500"
 								/>
 								<p className="text-sm text-text-sub-600">

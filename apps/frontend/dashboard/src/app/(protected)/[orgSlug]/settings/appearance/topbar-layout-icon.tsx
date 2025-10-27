@@ -2,9 +2,15 @@
 
 import { useTheme } from "next-themes";
 
-export const TopbarLayoutIcon = () => {
-	const { theme } = useTheme();
-
+export const TopbarLayoutIcon = ({
+	isDark,
+	defaultSystemTheme,
+}: {
+	isDark?: boolean;
+	defaultSystemTheme?: boolean;
+}) => {
+	const { theme, systemTheme } = useTheme();
+	const currentTheme = defaultSystemTheme ? systemTheme : theme;
 	// Define colors for light and dark themes
 	const colors = {
 		light: {
@@ -29,7 +35,8 @@ export const TopbarLayoutIcon = () => {
 		},
 	};
 
-	const currentColors = theme === "dark" ? colors.dark : colors.light;
+	const currentColors =
+		currentTheme === "dark" || isDark ? colors.dark : colors.light;
 
 	return (
 		<svg

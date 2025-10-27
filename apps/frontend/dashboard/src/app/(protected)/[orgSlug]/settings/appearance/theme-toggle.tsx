@@ -1,31 +1,46 @@
 "use client";
 
+import { useLayout } from "@fe/dashboard/providers/layout-provider";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import Image from "next/image";
 import { useTheme } from "next-themes";
+import { SidebarLayoutIcon } from "./sidebar-layout-icon";
+import { TopbarLayoutIcon } from "./topbar-layout-icon";
 
 export function ThemeToggleAppearance() {
 	const { theme, setTheme } = useTheme();
-
+	const { layoutMode } = useLayout();
+	const isTopbar = layoutMode === "topbar";
 	const themeOptions = [
 		{
 			value: "light",
 			label: "Light",
 			icon: "sun",
 			image: "/dashboard/ui-light.png",
+			layoutIcon: isTopbar ? <TopbarLayoutIcon /> : <SidebarLayoutIcon />,
 		},
 		{
 			value: "dark",
 			label: "Dark",
 			icon: "moon",
 			image: "/dashboard/ui-dark.png",
+			layoutIcon: isTopbar ? (
+				<TopbarLayoutIcon isDark />
+			) : (
+				<SidebarLayoutIcon isDark />
+			),
 		},
 		{
 			value: "system",
 			label: "System",
 			icon: "monitor",
 			image: "/dashboard/ui-system.png",
+			layoutIcon: isTopbar ? (
+				<TopbarLayoutIcon defaultSystemTheme />
+			) : (
+				<SidebarLayoutIcon defaultSystemTheme />
+			),
 		},
 	];
 
@@ -43,13 +58,7 @@ export function ThemeToggleAppearance() {
 							: "border-stroke-soft-100 hover:border-stroke-soft-200",
 					)}
 				>
-					<Image
-						src={option.image}
-						alt={`${option.label} theme preview`}
-						width={120}
-						height={80}
-						className="rounded-lg"
-					/>
+					{option.layoutIcon}
 					<div className="flex items-center justify-center gap-2 pt-2">
 						<Icon
 							name={option.icon}
