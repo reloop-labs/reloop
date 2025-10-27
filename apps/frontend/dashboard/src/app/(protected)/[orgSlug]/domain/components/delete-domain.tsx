@@ -80,7 +80,6 @@ export const DeleteDomainModal = ({ domains }: DeleteDomainModalProps) => {
 					<p className="mb-4 font-medium text-red-600 text-sm">
 						This can not be undone.
 					</p>
-
 					<div className="mb-4">
 						<p className="mb-2 text-gray-700 text-sm">
 							Type{" "}
@@ -120,7 +119,6 @@ export const DeleteDomainModal = ({ domains }: DeleteDomainModalProps) => {
 						</Input.Root>
 					</div>
 				</Modal.Body>
-
 				<Modal.Footer className="flex items-center justify-end gap-3">
 					<Button.Root
 						variant="error"
