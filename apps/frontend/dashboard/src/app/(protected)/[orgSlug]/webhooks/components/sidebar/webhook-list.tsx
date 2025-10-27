@@ -9,7 +9,7 @@ import { useState } from "react";
 import useSWR from "swr";
 import { CreateWebhookModal } from "./create-webhook-modal";
 import { EmptyState } from "./empty-state";
-import { WebhookCard } from "./webhook-card";
+import { WebhookTable } from "./webhook-table";
 
 interface WebhookData {
 	id: string;
@@ -135,22 +135,13 @@ export const WebhookListSidebar = () => {
 							</div>
 						</div>
 
-						<div className="mt-6 space-y-3">
-							{isLoading
-								? Array.from({ length: 3 }).map((_, i) => (
-										<div
-											key={i}
-											className="h-20 animate-pulse rounded-xl bg-gray-100"
-										/>
-									))
-								: filteredWebhooks.map((webhook) => (
-										<Link
-											key={webhook.id}
-											href={`/${activeOrganization?.slug}/webhooks/${webhook.id}`}
-										>
-											<WebhookCard webhook={webhook} />
-										</Link>
-									))}
+						<div className="mt-4">
+							<WebhookTable
+								webhooks={filteredWebhooks}
+								activeOrganizationSlug={activeOrganization?.slug || ""}
+								isLoading={isLoading}
+								loadingRows={4}
+							/>
 						</div>
 					</div>
 				)}
