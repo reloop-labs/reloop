@@ -198,31 +198,33 @@ export const CreateWebhookModal = ({
 												No events found
 											</div>
 										) : (
-											<>
-												{Object.entries(eventsByCategory).map(
-													([category, events]) => (
-														<Select.Group key={category}>
-															<Select.GroupLabel className="px-2 py-1.5 font-semibold text-gray-700 text-xs uppercase tracking-wider">
-																{category}
-															</Select.GroupLabel>
-															{events.map((event) => (
-																<Select.Item key={event.id} value={event.id}>
-																	<div className="flex flex-col gap-1">
-																		<span className="font-medium text-gray-900 text-sm leading-tight">
-																			{event.name}
+											Object.entries(eventsByCategory).map(
+												([category, events]) => (
+													<Select.Group key={category}>
+														<Select.GroupLabel className="px-2 py-1.5 font-semibold text-gray-700 text-xs uppercase tracking-wider">
+															{category}
+														</Select.GroupLabel>
+														{events.map((event) => (
+															<Select.Item key={event.id} value={event.id}>
+																<Icon
+																	name={getEventIcon(event)}
+																	className={`h-4 w-4 flex-shrink-0 ${getEventIconColor(event)}`}
+																/>
+																<div className="flex flex-col gap-1">
+																	<span className="font-medium text-gray-900 text-sm leading-tight">
+																		{event.name}
+																	</span>
+																	{event.description && (
+																		<span className="text-gray-500 text-xs leading-relaxed">
+																			{event.description}
 																		</span>
-																		{event.description && (
-																			<span className="text-gray-500 text-xs leading-relaxed">
-																				{event.description}
-																			</span>
-																		)}
-																	</div>
-																</Select.Item>
-															))}
-														</Select.Group>
-													),
-												)}
-											</>
+																	)}
+																</div>
+															</Select.Item>
+														))}
+													</Select.Group>
+												),
+											)
 										)}
 									</Select.Content>
 								</Select.Root>
@@ -261,4 +263,39 @@ export const CreateWebhookModal = ({
 			</Modal.Content>
 		</Modal.Root>
 	);
+};
+
+const getEventIcon = (event: Event) => {
+	if (event.category === "email") {
+		return "mail";
+	}
+	if (event.category === "domain") {
+		return "globe";
+	}
+	if (event.category === "audience") {
+		return "users";
+	}
+	return "circle-dots";
+};
+
+const getEventIconColor = (event: Event): string => {
+	const operation = event.name.split(".").pop()?.toLowerCase();
+
+	switch (operation) {
+		case "create":
+			return "text-green-600";
+		case "update":
+			return "text-amber-600";
+		case "delete":
+			return "text-red-600";
+		case "sent":
+		case "opened":
+		case "clicked":
+			return "text-blue-600";
+		case "failed":
+		case "bounced":
+			return "text-red-600";
+		default:
+			return "text-gray-600";
+	}
 };
