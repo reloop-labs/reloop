@@ -88,13 +88,7 @@ const WebhookDetailPage = () => {
 				onDeleteWebhook={() => {}}
 			/>
 
-			<div className="space-y-8">
-				<div className="mb-6 flex items-center gap-2">
-					<Icon name="clock" className="h-5 w-5 text-gray-500" />
-					<h2 className="font-semibold text-gray-900 text-xl">Delivery Logs</h2>
-				</div>
-				<DeliveryLogs webhookId={webhookData.id} />
-			</div>
+			<DeliveryLogs webhookId={webhookData.id} />
 		</div>
 	);
 };

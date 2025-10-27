@@ -120,90 +120,54 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 
 	return (
 		<div className="space-y-6">
-			{/* Filters */}
-			<div className="rounded-lg border border-gray-200 bg-white p-6">
-				<div className="mb-4 flex items-center gap-4">
-					<div className="flex-1">
-						<Input.Root size="small">
-							<Input.Wrapper>
-								<Input.Icon
-									as={() => <Icon name="search" className="h-4 w-4" />}
-								/>
-								<Input.Input
-									type="text"
-									placeholder="Search deliveries..."
-									value={searchQuery}
-									onChange={(e) => setSearchQuery(e.target.value)}
-								/>
-							</Input.Wrapper>
-						</Input.Root>
-					</div>
-					<div className="w-40">
-						<Select.Root
-							size="small"
-							value={statusFilter}
-							onValueChange={setStatusFilter}
-						>
-							<Select.Trigger>
-								<Select.Value placeholder="All statuses" />
-							</Select.Trigger>
-							<Select.Content>
-								<Select.Item value="all">All statuses</Select.Item>
-								<Select.Item value="success">Success</Select.Item>
-								<Select.Item value="failed">Failed</Select.Item>
-								<Select.Item value="pending">Pending</Select.Item>
-								<Select.Item value="retrying">Retrying</Select.Item>
-							</Select.Content>
-						</Select.Root>
-					</div>
-					<div className="w-32">
-						<select
-							value={dateRange}
-							onChange={(e) => setDateRange(e.target.value)}
-							className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-						>
-							<option value="1d">Last 24 hours</option>
-							<option value="7d">Last 7 days</option>
-							<option value="30d">Last 30 days</option>
-							<option value="90d">Last 90 days</option>
-						</select>
-					</div>
+			<div className="mb-4 flex items-center gap-4">
+				<div className="flex-1">
+					<Input.Root size="small">
+						<Input.Wrapper>
+							<Input.Icon
+								as={() => <Icon name="search" className="h-4 w-4" />}
+							/>
+							<Input.Input
+								type="text"
+								placeholder="Search deliveries..."
+								value={searchQuery}
+								onChange={(e) => setSearchQuery(e.target.value)}
+							/>
+						</Input.Wrapper>
+					</Input.Root>
 				</div>
-
-				{/* Stats */}
-				<div className="grid grid-cols-4 gap-4">
-					<div className="text-center">
-						<div className="font-semibold text-2xl text-gray-900">
-							{data?.deliveries?.filter((d) => d.status === "success").length ||
-								0}
-						</div>
-						<div className="text-gray-500 text-sm">Successful</div>
-					</div>
-					<div className="text-center">
-						<div className="font-semibold text-2xl text-red-600">
-							{data?.deliveries?.filter((d) => d.status === "failed").length ||
-								0}
-						</div>
-						<div className="text-gray-500 text-sm">Failed</div>
-					</div>
-					<div className="text-center">
-						<div className="font-semibold text-2xl text-yellow-600">
-							{data?.deliveries?.filter((d) => d.status === "pending").length ||
-								0}
-						</div>
-						<div className="text-gray-500 text-sm">Pending</div>
-					</div>
-					<div className="text-center">
-						<div className="font-semibold text-2xl text-blue-600">
-							{data?.deliveries?.filter((d) => d.status === "retrying")
-								.length || 0}
-						</div>
-						<div className="text-gray-500 text-sm">Retrying</div>
-					</div>
+				<div className="w-40">
+					<Select.Root
+						size="small"
+						value={statusFilter}
+						onValueChange={setStatusFilter}
+					>
+						<Select.Trigger>
+							<Select.Value placeholder="All statuses" />
+						</Select.Trigger>
+						<Select.Content>
+							<Select.Item value="all">All statuses</Select.Item>
+							<Select.Item value="success">Success</Select.Item>
+							<Select.Item value="failed">Failed</Select.Item>
+							<Select.Item value="pending">Pending</Select.Item>
+							<Select.Item value="retrying">Retrying</Select.Item>
+						</Select.Content>
+					</Select.Root>
+				</div>
+				<div className="w-32">
+					<select
+						value={dateRange}
+						onChange={(e) => setDateRange(e.target.value)}
+						className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+					>
+						<option value="1d">Last 24 hours</option>
+						<option value="7d">Last 7 days</option>
+						<option value="30d">Last 30 days</option>
+						<option value="90d">Last 90 days</option>
+					</select>
 				</div>
 			</div>
 
-			{/* Delivery List */}
 			<div className="rounded-lg border border-gray-200 bg-white">
 				{isLoading ? (
 					<div className="p-6">
