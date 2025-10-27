@@ -173,21 +173,12 @@ export const WebhookTable = ({
 															className="h-4 w-4 text-text-sub-600"
 														/>
 
-														<div className="flex max-w-xs flex-col">
-															<span
-																className={cn(
-																	"truncate font-medium text-label-xs text-text-sub-600",
-																)}
-															>
-																{webhook.name}
-															</span>
-															<span
-																className={cn(
-																	"truncate text-label-xs text-text-sub-400 text-xs",
-																)}
-															>
-																{webhook.url}
-															</span>
+														<div
+															className={cn(
+																"truncate text-label-xs text-text-sub-400 text-xs",
+															)}
+														>
+															{webhook.url}
 														</div>
 													</Link>
 												</motion.div>
@@ -199,7 +190,7 @@ export const WebhookTable = ({
 												>
 													<div
 														className={cn(
-															"flex items-center rounded-full border px-1 py-0.5 font-medium text-xs",
+															"py flex items-center rounded-full border px-1 font-medium text-xs",
 															getStatusColor(webhook.status),
 														)}
 													>
