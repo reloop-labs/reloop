@@ -1,12 +1,9 @@
 "use client";
 import { SomethingWentWrong } from "@fe/dashboard/components/something-went-wrong";
-import { Icon } from "@reloop/ui/icon";
 import { useParams } from "next/navigation";
 import useSWR from "swr";
 import { DeliveryLogs } from "./components/delivery-logs";
-import { EventSubscriptions } from "./components/event-subscriptions";
 import { WebhookHeader } from "./components/webhook-header";
-import { WebhookSettings } from "./components/webhook-settings";
 
 interface WebhookData {
 	id: string;
@@ -44,22 +41,6 @@ const WebhookDetailPage = () => {
 		return (
 			<div className="mx-auto max-w-3xl">
 				<SomethingWentWrong />
-			</div>
-		);
-	}
-
-	if (isLoading) {
-		return (
-			<div className="mx-auto max-w-3xl">
-				<div className="animate-pulse">
-					<div className="mb-4 h-8 w-1/3 rounded bg-gray-200" />
-					<div className="mb-8 h-4 w-1/2 rounded bg-gray-200" />
-					<div className="space-y-4">
-						<div className="h-4 rounded bg-gray-200" />
-						<div className="h-4 w-3/4 rounded bg-gray-200" />
-						<div className="h-4 w-1/2 rounded bg-gray-200" />
-					</div>
-				</div>
 			</div>
 		);
 	}

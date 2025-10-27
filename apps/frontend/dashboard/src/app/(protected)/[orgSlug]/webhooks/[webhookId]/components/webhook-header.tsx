@@ -114,7 +114,7 @@ export const WebhookHeader = ({
 					</Button.Icon>
 					Back
 				</Button.Root>
-				<div className="flex items-end justify-between pt-6">
+				<div className="flex justify-between pt-6">
 					<div>
 						<div className="flex items-center gap-1.5">
 							<p className="font-medium text-paragraph-sm text-text-sub-600">
@@ -165,67 +165,68 @@ export const WebhookHeader = ({
 				</Button.Icon>
 				Back
 			</Button.Root>
-			<div className="flex items-end justify-between pt-6">
+			<div className="flex justify-between pt-6">
 				<div>
 					{isLoading ? (
-						<div className="flex items-center gap-1.5">
-							<Skeleton className="h-4 w-12 rounded-full" />
-							<Skeleton className="h-1 w-1 rounded-full" />
-							<Skeleton className="h-4 w-20 rounded-full" />
-							<Skeleton className="h-1 w-1 rounded-full" />
-							<div className="flex items-center gap-1">
-								<Skeleton className="h-3.5 w-3.5 rounded-full" />
-								<Skeleton className="h-4 w-16 rounded-full" />
+						<>
+							<div className="flex items-center gap-1.5">
+								<Skeleton className="h-4 w-12 rounded-full" />
+								<Skeleton className="h-1 w-1 rounded-full" />
+								<Skeleton className="h-4 w-20 rounded-full" />
+								<Skeleton className="h-1 w-1 rounded-full" />
+								<div className="flex items-center gap-1">
+									<Skeleton className="h-3.5 w-3.5 rounded-full" />
+									<Skeleton className="h-4 w-16 rounded-full" />
+								</div>
 							</div>
-						</div>
+							<Skeleton className="mt-2 mb-4 h-8 w-48 rounded-lg" />
+						</>
 					) : (
-						<div className="flex items-center gap-1.5">
-							<p className="font-medium text-paragraph-sm text-text-sub-600">
-								Webhook{" "}
-							</p>
-							<p className="font-semibold text-paragraph-sm text-text-sub-600">
-								•
-							</p>
-							<p className="font-medium text-paragraph-sm text-text-sub-600">
-								{isFailed
-									? "---"
-									: webhook?.createdAt
-										? formatRelativeTime(webhook.createdAt)
-										: "---"}
-							</p>
-							<p className="font-semibold text-paragraph-sm text-text-sub-600">
-								•
-							</p>
-							<div
-								className={`flex items-center gap-1 ${getStatusColor(webhook?.status || "")}`}
-							>
-								<Icon
-									name={getStatusIcon(webhook?.status || "")}
-									className="h-3.5 w-3.5"
-								/>
-								<p className="font-medium text-paragraph-sm">
-									{webhook?.status || "Unknown"}
+						<>
+							<div className="flex items-center gap-1.5">
+								<p className="font-medium text-paragraph-sm text-text-sub-600">
+									Webhook{" "}
 								</p>
+								<p className="font-semibold text-paragraph-sm text-text-sub-600">
+									•
+								</p>
+								<p className="font-medium text-paragraph-sm text-text-sub-600">
+									{isFailed
+										? "---"
+										: webhook?.createdAt
+											? formatRelativeTime(webhook.createdAt)
+											: "---"}
+								</p>
+								<p className="font-semibold text-paragraph-sm text-text-sub-600">
+									•
+								</p>
+								<div
+									className={`flex items-center gap-1 ${getStatusColor(webhook?.status || "")}`}
+								>
+									<Icon
+										name={getStatusIcon(webhook?.status || "")}
+										className="h-3.5 w-3.5"
+									/>
+									<p className="font-medium text-paragraph-sm">
+										{webhook?.status || "Unknown"}
+									</p>
+								</div>
 							</div>
-						</div>
-					)}
-					{isLoading ? (
-						<Skeleton className="mt-2 mb-4 h-8 w-48 rounded-lg" />
-					) : (
-						<div className="flex items-center">
-							<h1 className="font-semibold text-title-h4">
-								{webhook?.url || "Loading..."}
-							</h1>
-							<Button.Root
-								variant="neutral"
-								mode="ghost"
-								size="xxsmall"
-								onClick={handleCopyUrl}
-								className="mt-1"
-							>
-								<Icon name="clipboard-copy" className="h-5 w-5" />
-							</Button.Root>
-						</div>
+							<div className="flex items-center">
+								<h1 className="font-semibold text-title-h4">
+									{webhook?.url || "Loading..."}
+								</h1>
+								<Button.Root
+									variant="neutral"
+									mode="ghost"
+									size="xxsmall"
+									onClick={handleCopyUrl}
+									className="mt-1"
+								>
+									<Icon name="clipboard-copy" className="h-5 w-5" />
+								</Button.Root>
+							</div>
+						</>
 					)}
 				</div>
 
@@ -305,99 +306,137 @@ export const WebhookHeader = ({
 				</div>
 			</div>
 
-			<div className="mt-8 mb-3 flex w-full items-center justify-between border-stroke-soft-200 border-b border-dashed pb-8">
-				<div className="flex gap-8">
-					<div className="">
+			{isLoading ? (
+				<div className="mt-8 mb-3 flex w-full items-center justify-between border-stroke-soft-200 border-b border-dashed pb-8">
+					<div className="flex gap-8">
+						<div className="">
+							<div className="flex items-center gap-1.5">
+								<Icon name="webhook" className="h-4 w-4 text-blue-600" />
+								<span className="font-medium text-sm text-text-sub-600">
+									Total Deliveries
+								</span>
+							</div>
+							<Skeleton className="h-8 w-12" />
+						</div>
+						<div className="">
+							<div className="flex items-center gap-1.5">
+								<Icon
+									name="check-circle"
+									className="h-4 w-4 text-success-base"
+								/>
+								<span className="font-medium text-sm text-text-sub-600">
+									Successful
+								</span>
+							</div>
+							<Skeleton className="h-8 w-12" />
+						</div>
+						<div className="">
+							<div className="flex items-center gap-1.5">
+								<Icon name="cross-circle" className="h-4 w-4 text-red-600" />
+								<span className="font-medium text-sm text-text-sub-600">
+									Failed
+								</span>
+							</div>
+							<Skeleton className="h-8 w-12" />
+						</div>
+						<div className="">
+							<div className="flex items-center gap-1.5">
+								<Icon name="activity-2" className="h-5 w-5 text-green-600" />
+								<span className="font-medium text-sm text-text-sub-600">
+									Success Rate
+								</span>
+							</div>
+							<Skeleton className="h-8 w-12" />
+						</div>
+					</div>
+					<div className="flex flex-col gap-2">
 						<div className="flex items-center gap-1.5">
-							<Icon name="webhook" className="h-4 w-4 text-blue-600" />
+							<Icon name="key" className="h-4 w-4 text-text-sub-600" />
 							<span className="font-medium text-sm text-text-sub-600">
-								Total Deliveries
+								Webhook Secret
 							</span>
 						</div>
-						{isLoading ? (
-							<Skeleton className="h-8 w-12" />
-						) : (
+						<div className="flex items-center gap-2 overflow-hidden rounded-lg border border-stroke-soft-200 bg-bg-weak-50 py-0.5 pr-0.5 pl-2">
+							<Skeleton className="h-4 w-32" />
+						</div>
+					</div>
+				</div>
+			) : (
+				<div className="mt-8 mb-3 flex w-full items-center justify-between border-stroke-soft-200 border-b border-dashed pb-8">
+					<div className="flex gap-8">
+						<div className="">
+							<div className="flex items-center gap-1.5">
+								<Icon name="webhook" className="h-4 w-4 text-blue-600" />
+								<span className="font-medium text-sm text-text-sub-600">
+									Total Deliveries
+								</span>
+							</div>
 							<span className="font-bold text-2xl text-text-strong-950">
 								{(webhook?.successCount || 0) + (webhook?.failureCount || 0)}
 							</span>
-						)}
-					</div>
-					<div className="">
-						<div className="flex items-center gap-1.5">
-							<Icon name="check-circle" className="h-4 w-4 text-success-base" />
-							<span className="font-medium text-sm text-text-sub-600">
-								Successful
-							</span>
 						</div>
-						{isLoading ? (
-							<Skeleton className="h-8 w-12" />
-						) : (
+						<div className="">
+							<div className="flex items-center gap-1.5">
+								<Icon
+									name="check-circle"
+									className="h-4 w-4 text-success-base"
+								/>
+								<span className="font-medium text-sm text-text-sub-600">
+									Successful
+								</span>
+							</div>
 							<span className="text-left font-bold text-2xl text-text-strong-950">
 								{webhook?.successCount || 0}
 							</span>
-						)}
-					</div>
-					<div className="">
-						<div className="flex items-center gap-1.5">
-							<Icon name="cross-circle" className="h-4 w-4 text-red-600" />
-							<span className="font-medium text-sm text-text-sub-600">
-								Failed
-							</span>
 						</div>
-						{isLoading ? (
-							<Skeleton className="h-8 w-12" />
-						) : (
+						<div className="">
+							<div className="flex items-center gap-1.5">
+								<Icon name="cross-circle" className="h-4 w-4 text-red-600" />
+								<span className="font-medium text-sm text-text-sub-600">
+									Failed
+								</span>
+							</div>
 							<span className="font-bold text-2xl text-text-strong-950">
 								{webhook?.failureCount || 0}
 							</span>
-						)}
-					</div>
-					<div className="">
-						<div className="flex items-center gap-1.5">
-							<Icon name="activity-2" className="h-5 w-5 text-green-600" />
-							<span className="font-medium text-sm text-text-sub-600">
-								Success Rate
-							</span>
 						</div>
-						{isLoading ? (
-							<Skeleton className="h-8 w-12" />
-						) : (
+						<div className="">
+							<div className="flex items-center gap-1.5">
+								<Icon name="activity-2" className="h-5 w-5 text-green-600" />
+								<span className="font-medium text-sm text-text-sub-600">
+									Success Rate
+								</span>
+							</div>
 							<span className="font-bold text-2xl text-text-strong-950">
 								{successRate}%
 							</span>
-						)}
+						</div>
+					</div>
+					<div className="flex flex-col gap-2">
+						<div className="flex items-center gap-1.5">
+							<Icon name="key" className="h-4 w-4 text-text-sub-600" />
+							<span className="font-medium text-sm text-text-sub-600">
+								Webhook Secret
+							</span>
+						</div>
+						<div className="flex items-center gap-2 overflow-hidden rounded-lg border border-stroke-soft-200 bg-bg-weak-50 py-0.5 pr-0.5 pl-2">
+							<span className="w-42 truncate font-medium text-xs">
+								{webhook?.secret || "No secret set"}
+							</span>
+							<Button.Root
+								variant="neutral"
+								mode="ghost"
+								size="xxsmall"
+								onClick={handleCopySecret}
+								className="h-6 w-6 p-0"
+								disabled={!webhook?.secret}
+							>
+								<Icon name="clipboard-copy" className="h-3 w-3" />
+							</Button.Root>
+						</div>
 					</div>
 				</div>
-				<div className="flex flex-col gap-2">
-					<div className="flex items-center gap-1.5">
-						<Icon name="key" className="h-4 w-4 text-text-sub-600" />
-						<span className="font-medium text-sm text-text-sub-600">
-							Webhook Secret
-						</span>
-					</div>
-					<div className="flex items-center gap-2 overflow-hidden rounded-lg border border-stroke-soft-200 bg-bg-weak-50 py-0.5 pr-0.5 pl-2">
-						{isLoading ? (
-							<Skeleton className="h-4 w-32" />
-						) : (
-							<>
-								<span className="w-42 truncate font-medium text-xs">
-									{webhook?.secret || "No secret set"}
-								</span>
-								<Button.Root
-									variant="neutral"
-									mode="ghost"
-									size="xxsmall"
-									onClick={handleCopySecret}
-									className="h-6 w-6 p-0"
-									disabled={!webhook?.secret}
-								>
-									<Icon name="clipboard-copy" className="h-3 w-3" />
-								</Button.Root>
-							</>
-						)}
-					</div>
-				</div>
-			</div>
+			)}
 		</div>
 	);
 };
