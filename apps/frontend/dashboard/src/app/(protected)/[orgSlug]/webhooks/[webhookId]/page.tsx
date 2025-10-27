@@ -6,7 +6,6 @@ import useSWR from "swr";
 import { DeliveryLogs } from "./components/delivery-logs";
 import { EventSubscriptions } from "./components/event-subscriptions";
 import { WebhookHeader } from "./components/webhook-header";
-import { WebhookOverview } from "./components/webhook-overview";
 import { WebhookSettings } from "./components/webhook-settings";
 
 interface WebhookData {
@@ -86,59 +85,15 @@ const WebhookDetailPage = () => {
 				webhook={webhookData}
 				isLoading={isLoading}
 				isFailed={!!error}
-				onOpenSettings={() => {
-					// Scroll to settings section
-					const settingsElement = document.getElementById("settings-section");
-					if (settingsElement) {
-						settingsElement.scrollIntoView({ behavior: "smooth" });
-					}
-				}}
-				onDeleteWebhook={() => {
-					// This will be handled by the WebhookSettings component
-					console.log("Delete webhook requested");
-				}}
+				onDeleteWebhook={() => {}}
 			/>
 
 			<div className="space-y-8">
-				{/* Overview Section */}
-				<div>
-					<div className="mb-6 flex items-center gap-2">
-						<Icon name="activity" className="h-5 w-5 text-gray-500" />
-						<h2 className="font-semibold text-gray-900 text-xl">Overview</h2>
-					</div>
-					<WebhookOverview webhook={webhookData} />
+				<div className="mb-6 flex items-center gap-2">
+					<Icon name="clock" className="h-5 w-5 text-gray-500" />
+					<h2 className="font-semibold text-gray-900 text-xl">Delivery Logs</h2>
 				</div>
-
-				{/* Event Subscriptions Section */}
-				<div>
-					<div className="mb-6 flex items-center gap-2">
-						<Icon name="bell" className="h-5 w-5 text-gray-500" />
-						<h2 className="font-semibold text-gray-900 text-xl">
-							Event Subscriptions
-						</h2>
-					</div>
-					<EventSubscriptions webhookId={webhookData.id} />
-				</div>
-
-				{/* Delivery Logs Section */}
-				<div>
-					<div className="mb-6 flex items-center gap-2">
-						<Icon name="clock" className="h-5 w-5 text-gray-500" />
-						<h2 className="font-semibold text-gray-900 text-xl">
-							Delivery Logs
-						</h2>
-					</div>
-					<DeliveryLogs webhookId={webhookData.id} />
-				</div>
-
-				{/* Settings Section */}
-				<div id="settings-section">
-					<div className="mb-6 flex items-center gap-2">
-						<Icon name="settings" className="h-5 w-5 text-gray-500" />
-						<h2 className="font-semibold text-gray-900 text-xl">Settings</h2>
-					</div>
-					<WebhookSettings webhook={webhookData} />
-				</div>
+				<DeliveryLogs webhookId={webhookData.id} />
 			</div>
 		</div>
 	);

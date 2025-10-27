@@ -214,23 +214,16 @@ export const WebhookHeader = ({
 					) : (
 						<div className="flex items-center">
 							<h1 className="font-semibold text-title-h4">
-								{webhook?.name || "Loading..."}
+								{webhook?.url || "Loading..."}
 							</h1>
-						</div>
-					)}
-					{webhook?.url && !isLoading && (
-						<div className="-mt-1 flex items-center gap-2">
-							<p className="max-w-md truncate text-sm text-text-sub-600">
-								{webhook.url}
-							</p>
 							<Button.Root
 								variant="neutral"
 								mode="ghost"
 								size="xxsmall"
 								onClick={handleCopyUrl}
-								className="h-6 w-6 p-0"
+								className="mt-1"
 							>
-								<Icon name="clipboard-copy" className="h-3 w-3" />
+								<Icon name="clipboard-copy" className="h-5 w-5" />
 							</Button.Root>
 						</div>
 					)}
@@ -253,8 +246,8 @@ export const WebhookHeader = ({
 								size="xsmall"
 								onClick={() => onOpenSettings?.()}
 							>
-								<Icon name="settings" className="h-4 w-4" />
-								Settings
+								<Icon name="pause" className="h-4 w-4" />
+								Disable webhook
 							</Button.Root>
 							<PopoverRoot>
 								<PopoverTrigger asChild>
@@ -275,6 +268,24 @@ export const WebhookHeader = ({
 										>
 											<Icon name="file-text" className="h-4 w-4" />
 											Go to docs
+										</Button.Root>
+										<Button.Root
+											variant="neutral"
+											mode="ghost"
+											size="small"
+											className="w-full justify-start"
+										>
+											<Icon name="rotate-cw" className="h-4 w-4" />
+											Rotate secret
+										</Button.Root>
+										<Button.Root
+											variant="neutral"
+											mode="ghost"
+											size="small"
+											className="w-full justify-start"
+										>
+											<Icon name="pause" className="h-4 w-4" />
+											Disable webhook
 										</Button.Root>
 										<Button.Root
 											variant="error"
@@ -298,7 +309,7 @@ export const WebhookHeader = ({
 				<div className="flex gap-8">
 					<div className="">
 						<div className="flex items-center gap-1.5">
-							<Icon name="activity" className="h-4 w-4 text-blue-600" />
+							<Icon name="webhook" className="h-4 w-4 text-blue-600" />
 							<span className="font-medium text-sm text-text-sub-600">
 								Total Deliveries
 							</span>
@@ -328,7 +339,7 @@ export const WebhookHeader = ({
 					</div>
 					<div className="">
 						<div className="flex items-center gap-1.5">
-							<Icon name="x-circle" className="h-4 w-4 text-red-600" />
+							<Icon name="cross-circle" className="h-4 w-4 text-red-600" />
 							<span className="font-medium text-sm text-text-sub-600">
 								Failed
 							</span>
@@ -343,7 +354,7 @@ export const WebhookHeader = ({
 					</div>
 					<div className="">
 						<div className="flex items-center gap-1.5">
-							<Icon name="trending-up" className="h-4 w-4 text-green-600" />
+							<Icon name="activity-2" className="h-5 w-5 text-green-600" />
 							<span className="font-medium text-sm text-text-sub-600">
 								Success Rate
 							</span>
