@@ -10,6 +10,7 @@ import * as Modal from "@reloop/ui/modal";
 import * as Select from "@reloop/ui/select";
 import { useLoading } from "@reloop/ui/use-loading";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
@@ -59,6 +60,7 @@ export const CreateWebhookModal = ({
 	const { activeOrganization } = useUserOrganization();
 	const { changeStatus, status } = useLoading();
 	const { mutate } = useSWRConfig();
+	const router = useRouter();
 	const [selectedEventId, setSelectedEventId] = useState<string>("");
 
 	const { data: eventsData, isLoading: eventsLoading } =
@@ -67,12 +69,13 @@ export const CreateWebhookModal = ({
 			revalidateOnReconnect: true,
 		});
 
-	const { register, handleSubmit, formState } = useForm<WebhookFormValues>({
-		resolver: valibotResolver(webhookSchema) as Resolver<WebhookFormValues>,
-		defaultValues: {
-			url: "",
-		},
-	});
+	const { register, handleSubmit, formState, reset, setError } =
+		useForm<WebhookFormValues>({
+			resolver: valibotResolver(webhookSchema) as Resolver<WebhookFormValues>,
+			defaultValues: {
+				url: "",
+			},
+		});
 
 	const onSubmit = async (data: WebhookFormValues) => {
 		if (!activeOrganization?.id) return;
@@ -85,7 +88,7 @@ export const CreateWebhookModal = ({
 		try {
 			changeStatus("loading");
 			const webhookName = new URL(data.url).hostname;
-			await axios.post(
+			const response = await axios.post(
 				"/api/webhook/v1/add",
 				{
 					name: webhookName,
@@ -94,26 +97,37 @@ export const CreateWebhookModal = ({
 				{ headers: { credentials: "include" } },
 			);
 			await mutate(
-				`/api/webhook/v1/list?organizationId=${activeOrganization.id}`,
+				`/api/webhook/v1/list?organizationId=${activeOrganization.id}&limit=100`,
 			);
-			toast.success("Webhook created successfully");
+			reset();
 			setSelectedEventId("");
 			changeStatus("idle");
 			onClose();
+			const webhookId = response.data?.webhook?.id || response.data?.id;
+			if (webhookId) {
+				router.push(`/${activeOrganization.slug}/webhooks/${webhookId}`);
+			}
 		} catch (error) {
 			changeStatus("idle");
-			const errorMessage = axios.isAxiosError(error)
-				? error.response?.data?.message || "An unexpected error occurred"
-				: "An unexpected error occurred";
-			toast.error(errorMessage);
+			if (axios.isAxiosError(error)) {
+				const responseData = error.response?.data?.message;
+				if (responseData) {
+					setError("url", {
+						type: "server",
+						message: responseData,
+					});
+				} else {
+					toast.error(responseData);
+				}
+			} else {
+				toast.error("An unexpected error occurred.");
+			}
 		}
 	};
 
-	// Filter active events only
 	const filteredEvents =
 		eventsData?.events?.filter((event) => event.isActive) || [];
 
-	// Group events by category
 	const eventsByCategory = filteredEvents.reduce(
 		(acc, event) => {
 			if (!acc[event.category]) {
