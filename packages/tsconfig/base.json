@@ -23,7 +23,8 @@
 			"@reloop/domain": ["../../apps/backend/domain/src/*"],
 			"@reloop/webhook": ["../../apps/backend/webhook/src/*"],
 			"@reloop/audience": ["../../apps/backend/audience/src/*"],
-			"@reloop/web": ["../../apps/frontend/web/src/*"]
+			"@reloop/web": ["../../apps/frontend/web/src/*"],
+			"@reloop/fe-dev": ["../../apps/frontend/dev/src/*"]
 		}
 	}
 }

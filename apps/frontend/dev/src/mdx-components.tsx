@@ -1,4 +1,4 @@
-import { openapi } from "@dev/lib/source";
+import { openapi } from "@reloop/fe-dev/lib/source";
 import { APIPage } from "fumadocs-openapi/ui";
 import * as File from "fumadocs-ui/components/files";
 import * as TabsComponents from "fumadocs-ui/components/tabs";

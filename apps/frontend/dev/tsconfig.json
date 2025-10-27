@@ -15,6 +15,10 @@
 		"isolatedModules": true,
 		"jsx": "preserve",
 		"incremental": true,
+		"baseUrl": ".",
+		"paths": {
+			"@reloop/fe-dev/*": ["./src/*"]
+		},
 		"plugins": [
 			{
 				"name": "next"
