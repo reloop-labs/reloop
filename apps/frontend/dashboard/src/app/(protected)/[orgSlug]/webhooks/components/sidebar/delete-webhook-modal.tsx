@@ -3,6 +3,7 @@ import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
+import * as Kbd from "@reloop/ui/kbd";
 import * as Modal from "@reloop/ui/modal";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -137,14 +138,18 @@ export const DeleteWebhookModal = ({ webhooks }: DeleteWebhookModalProps) => {
 						<Button.Root
 							type="button"
 							variant="neutral"
+							mode="stroke"
+							size="small"
 							onClick={handleCancel}
 							disabled={isDeleting}
 						>
 							Cancel
+							<Kbd.Root className="bg-bg-weak-50 text-xs">Esc</Kbd.Root>
 						</Button.Root>
 						<Button.Root
 							type="submit"
 							variant="error"
+							size="small"
 							disabled={
 								confirmationText !== webhookToDelete?.name || isDeleting
 							}
@@ -156,8 +161,8 @@ export const DeleteWebhookModal = ({ webhooks }: DeleteWebhookModalProps) => {
 								</>
 							) : (
 								<>
-									<Icon name="trash-2" className="mr-2 h-4 w-4" />
 									Delete Webhook
+									<Icon name="undo" className="h-3 w-3 scale-y-[-1]" />
 								</>
 							)}
 						</Button.Root>
