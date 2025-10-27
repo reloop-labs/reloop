@@ -74,7 +74,7 @@ export const WebhookListTopbar = () => {
 					onClick={() => setIsCreateModalOpen(true)}
 				>
 					<Icon name="plus" className="h-4 w-4" />
-					Add webhook
+					Create webhook
 				</Button.Root>
 			</div>
 
