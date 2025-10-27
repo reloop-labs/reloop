@@ -6,10 +6,10 @@ import * as Input from "@reloop/ui/input";
 import * as Kbd from "@reloop/ui/kbd";
 import * as Modal from "@reloop/ui/modal";
 import axios from "axios";
-import { useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useSWRConfig } from "swr";
 
 interface WebhookData {
 	id: string;
@@ -28,19 +28,19 @@ interface DeleteWebhookModalProps {
 
 export const DeleteWebhookModal = ({ webhooks }: DeleteWebhookModalProps) => {
 	const [deleteId, setDeleteId] = useQueryState("delete");
-	const [confirmationText, setConfirmationText] = useState("");
+	const [confirmationUrl, setConfirmationUrl] = useState("");
 	const [isDeleting, setIsDeleting] = useState(false);
-	const [isCopied, setIsCopied] = useState(false);
+	const [isUrlCopied, setIsUrlCopied] = useState(false);
 	const { activeOrganization } = useUserOrganization();
-	const router = useRouter();
+	const { mutate } = useSWRConfig();
 
 	const webhookToDelete = webhooks.find((webhook) => webhook.id === deleteId);
 
 	const handleDelete = async () => {
 		if (!webhookToDelete || !activeOrganization) return;
 
-		if (confirmationText !== webhookToDelete.name) {
-			toast.error("Please enter the webhook name to confirm deletion");
+		if (confirmationUrl !== webhookToDelete.url) {
+			toast.error("Please enter the correct webhook URL to confirm deletion");
 			return;
 		}
 
@@ -52,8 +52,10 @@ export const DeleteWebhookModal = ({ webhooks }: DeleteWebhookModalProps) => {
 
 			toast.success("Webhook deleted successfully");
 			setDeleteId(null);
-			setConfirmationText("");
-			router.refresh();
+			setConfirmationUrl("");
+			mutate(
+				`/api/webhook/v1/list?organizationId=${activeOrganization.id}&limit=100`,
+			);
 		} catch (error) {
 			const errorMessage = axios.isAxiosError(error)
 				? error.response?.data?.message || "Failed to delete webhook"
@@ -66,7 +68,7 @@ export const DeleteWebhookModal = ({ webhooks }: DeleteWebhookModalProps) => {
 
 	const handleCancel = () => {
 		setDeleteId(null);
-		setConfirmationText("");
+		setConfirmationUrl("");
 	};
 
 	return (
@@ -78,7 +80,7 @@ export const DeleteWebhookModal = ({ webhooks }: DeleteWebhookModalProps) => {
 				<form
 					onSubmit={(e) => {
 						e.preventDefault();
-						if (confirmationText === webhookToDelete?.name && !isDeleting) {
+						if (confirmationUrl === webhookToDelete?.url && !isDeleting) {
 							handleDelete();
 						}
 					}}
@@ -96,27 +98,27 @@ export const DeleteWebhookModal = ({ webhooks }: DeleteWebhookModalProps) => {
 
 						<div className="mb-4">
 							<p className="mb-2 text-gray-700 text-sm">
-								Type{" "}
-								<span className="inline-flex items-center gap-1 rounded-md bg-gray-100 px-2 py-1 font-mono text-gray-800 text-xs">
-									{webhookToDelete?.name}
+								Type URL{" "}
+								<span className="inline-flex max-w-xs items-center gap-1 truncate rounded-md bg-gray-100 px-2 py-1 font-mono text-gray-800 text-xs">
+									{webhookToDelete?.url}
 									<button
 										type="button"
 										onClick={async () => {
 											try {
 												await navigator.clipboard.writeText(
-													webhookToDelete?.name || "",
+													webhookToDelete?.url || "",
 												);
-												setIsCopied(true);
-												setTimeout(() => setIsCopied(false), 2000);
+												setIsUrlCopied(true);
+												setTimeout(() => setIsUrlCopied(false), 2000);
 											} catch {
-												toast.error("Failed to copy webhook name");
+												toast.error("Failed to copy webhook URL");
 											}
 										}}
 										className="ml-1 text-gray-500 hover:text-gray-700"
 									>
 										<Icon
-											name={isCopied ? "check" : "copy"}
-											className={`h-3 w-3 ${isCopied ? "text-green-600" : ""}`}
+											name={isUrlCopied ? "check" : "copy"}
+											className={`h-3 w-3 ${isUrlCopied ? "text-green-600" : ""}`}
 										/>
 									</button>
 								</span>{" "}
@@ -126,9 +128,9 @@ export const DeleteWebhookModal = ({ webhooks }: DeleteWebhookModalProps) => {
 								<Input.Wrapper size="xsmall">
 									<Input.Input
 										type="text"
-										value={confirmationText}
-										onChange={(e) => setConfirmationText(e.target.value)}
-										placeholder="Enter webhook name"
+										value={confirmationUrl}
+										onChange={(e) => setConfirmationUrl(e.target.value)}
+										placeholder="Enter webhook URL"
 									/>
 								</Input.Wrapper>
 							</Input.Root>
@@ -150,9 +152,7 @@ export const DeleteWebhookModal = ({ webhooks }: DeleteWebhookModalProps) => {
 							type="submit"
 							variant="error"
 							size="small"
-							disabled={
-								confirmationText !== webhookToDelete?.name || isDeleting
-							}
+							disabled={confirmationUrl !== webhookToDelete?.url || isDeleting}
 						>
 							{isDeleting ? (
 								<>
