@@ -1031,6 +1031,42 @@ export const IconsSprite = () => (
 					fill="currentColor"
 				/>
 			</symbol>
+			<symbol id="arrow-left-rec" fill="none" viewBox="0 0 24 24">
+				<rect
+					opacity="0.12"
+					x={2}
+					y={2}
+					width={20}
+					height={20}
+					rx={5}
+					fill="currentColor"
+				/>
+				<path
+					d="M11 7.99996L7 12M7 12L11 16M7 12H17M10 22H14C16.8003 22 18.2004 22 19.27 21.455C20.2108 20.9757 20.9757 20.2108 21.455 19.27C22 18.2004 22 16.8003 22 14V10C22 7.19974 22 5.79961 21.455 4.73005C20.9757 3.78924 20.2108 3.02433 19.27 2.54497C18.2004 2 16.8003 2 14 2H10C7.19974 2 5.79961 2 4.73005 2.54497C3.78924 3.02433 3.02433 3.78924 2.54497 4.73005C2 5.79961 2 7.19974 2 10V14C2 16.8003 2 18.2004 2.54497 19.27C3.02433 20.2108 3.78924 20.9757 4.73005 21.455C5.79961 22 7.19974 22 10 22Z"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
+			<symbol id="arrow-right-rec" fill="none" viewBox="0 0 24 24">
+				<rect
+					opacity="0.12"
+					x={2}
+					y={2}
+					width={20}
+					height={20}
+					rx={5}
+					fill="currentColor"
+				/>
+				<path
+					d="M13 8L17 12.0001M17 12.0001L13 16.0001M17 12.0001H7M10 22H14C16.8003 22 18.2004 22 19.27 21.455C20.2108 20.9757 20.9757 20.2108 21.455 19.27C22 18.2004 22 16.8003 22 14V10C22 7.19974 22 5.79961 21.455 4.73005C20.9757 3.78924 20.2108 3.02433 19.27 2.54497C18.2004 2 16.8003 2 14 2H10C7.19974 2 5.79961 2 4.73005 2.54497C3.78924 3.02433 3.02433 3.78924 2.54497 4.73005C2 5.79961 2 7.19974 2 10V14C2 16.8003 2 18.2004 2.54497 19.27C3.02433 20.2108 3.78924 20.9757 4.73005 21.455C5.79961 22 7.19974 22 10 22Z"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
 			<symbol id="checkbox-circle" viewBox="0 0 24 24">
 				<circle opacity="0.12" cx="12" cy="12" r="10" fill="currentColor" />
 				<path

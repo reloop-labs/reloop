@@ -63,13 +63,6 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
 						</motion.div>
 					)}
 				</AnimatePresence>
-
-				{isSidebarCollapsed && (
-					<div className="flex w-full justify-center">
-						<Logo className="h-8 w-8 rounded-full" />
-					</div>
-				)}
-
 				<Button.Root
 					variant="neutral"
 					mode="ghost"
@@ -79,7 +72,7 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
 				>
 					<Button.Icon>
 						<Icon
-							name={isSidebarCollapsed ? "sidebar-right" : "sidebar-left"}
+							name={isSidebarCollapsed ? "arrow-right-rec" : "arrow-left-rec"}
 						/>
 					</Button.Icon>
 				</Button.Root>
