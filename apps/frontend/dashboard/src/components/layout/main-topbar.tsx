@@ -94,8 +94,8 @@ export const MainTopbar: React.FC<MainTopbarProps> = ({ className }) => {
 														currentOrgIdx === idx &&
 														"rounded-lg bg-neutral-alpha-10",
 												)}
-												onClick={() => {
-													authClient.updateUser({
+												onClick={async () => {
+													await authClient.updateUser({
 														activeOrganizationId: organization.id,
 													});
 													refetch();

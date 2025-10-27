@@ -5,6 +5,7 @@ import {
 	type ReactNode,
 	useCallback,
 	useContext,
+	useEffect,
 	useState,
 } from "react";
 
@@ -43,20 +44,47 @@ export const LayoutProvider = ({
 		defaultSidebarCollapsed,
 	);
 
+	// Load initial values from localStorage on mount
+	useEffect(() => {
+		const savedLayoutMode = localStorage.getItem("layoutMode") as LayoutMode;
+		const savedSidebarCollapsed = localStorage.getItem("isSidebarCollapsed");
+
+		if (
+			savedLayoutMode &&
+			(savedLayoutMode === "sidebar" || savedLayoutMode === "topbar")
+		) {
+			setLayoutModeState(savedLayoutMode);
+		}
+
+		if (savedSidebarCollapsed !== null) {
+			setSidebarCollapsedState(savedSidebarCollapsed === "true");
+		}
+	}, []);
+
 	const toggleLayoutMode = useCallback(() => {
-		setLayoutModeState((prev) => (prev === "sidebar" ? "topbar" : "sidebar"));
+		setLayoutModeState((prev) => {
+			const newMode = prev === "sidebar" ? "topbar" : "sidebar";
+			localStorage.setItem("layoutMode", newMode);
+			return newMode;
+		});
 	}, []);
 
 	const setLayoutMode = useCallback((mode: LayoutMode) => {
 		setLayoutModeState(mode);
+		localStorage.setItem("layoutMode", mode);
 	}, []);
 
 	const toggleSidebarCollapse = useCallback(() => {
-		setSidebarCollapsedState((prev) => !prev);
+		setSidebarCollapsedState((prev) => {
+			const newCollapsed = !prev;
+			localStorage.setItem("isSidebarCollapsed", newCollapsed.toString());
+			return newCollapsed;
+		});
 	}, []);
 
 	const setSidebarCollapsed = useCallback((collapsed: boolean) => {
 		setSidebarCollapsedState(collapsed);
+		localStorage.setItem("isSidebarCollapsed", collapsed.toString());
 	}, []);
 
 	const contextValue: LayoutContextType = {
