@@ -21,6 +21,7 @@
 		"db:migrate": "bun env:run drizzle-kit migrate",
 		"db:push": "bun env:run drizzle-kit push",
 		"db:studio": "bun env:run drizzle-kit studio",
+		"db:seed": "bun env:run bun run src/utils/seed.ts",
 		"migrate": "bun run src/migrate.ts"
 	},
 	"dependencies": {
