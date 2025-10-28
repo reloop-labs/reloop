@@ -164,10 +164,11 @@
 		"dev:all": "turbo dev --filter='dashboard' --filter='dev' --filter='docs' --filter='web' --filter='audience' --filter='auth' --filter='domain' --filter='mail' --filter='webhook'",
 		"docker:up": "docker compose -f local/docker-compose.yml up -d",
 		"docker:down": "docker compose -f local/docker-compose.yml down",
-		"db:push": "bun run --filter=db push",
-		"db:studio": "bun run --filter=db studio",
-		"db:generate": "bun run --filter=db generate",
-		"db:migrate": "bun run --filter=db migrate"
+		"db:push": "bun run --filter=@reloop/db push",
+		"db:studio": "bun run --filter=@reloop/db studio",
+		"db:generate": "bun run --filter=@reloop/db generate",
+		"db:migrate": "bun run --filter=@reloop/db migrate",
+		"db:seed": "bun run --filter=@reloop/db seed"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.2.6",
