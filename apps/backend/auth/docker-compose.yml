@@ -6,7 +6,7 @@ services:
       context: ../..
       dockerfile: apps/backend/auth/Dockerfile
     ports:
-      - "3000:3000"
+      - "8000:8000"
     environment:
       - PG_URL=postgresql://auth_user:auth_password@postgres:5432/auth_db
       - BETTER_AUTH_SECRET=your-super-secret-key-here-make-it-long-and-random
@@ -15,7 +15,6 @@ services:
       - GITHUB_CLIENT_ID=
       - GITHUB_CLIENT_SECRET=
       - NODE_ENV=production
-      - PORT=3000
       - HOSTNAME=0.0.0.0
       - REDIS_PASSWORD=reloop123
       - REDIS_HOST=redis

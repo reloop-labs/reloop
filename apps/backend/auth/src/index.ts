@@ -9,7 +9,7 @@ import { auth, OpenAPI } from "./lib/auth";
 import { loader } from "./loader";
 import { statsRoutes } from "./routes/stats";
 
-const port = Number(process.env.PORT || 3000);
+const port = 8000;
 
 const app = new Elysia({ prefix: "/api/auth", name: "Auth Service" })
 	.use(serverTiming())

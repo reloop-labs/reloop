@@ -20,14 +20,14 @@ Make sure you've completed the [local setup guide](/setup) first (clone repo, in
 cd apps/backend/auth && cp env.example .env && bun i && bun dev
 ```
 
-The service will be available at [http://localhost:3010/api/auth](http://localhost:3010/api/auth) 🎉
+The service will be available at [http://localhost:8000/api/auth](http://localhost:8000/api/auth) 🎉
 
 ---
 
 ## Service Info
 
 * **Location:** `/apps/backend/auth`
-* **Port:** `3010` (configurable in `.env`)
+* **Port:** `8000` (hardcoded)
 * **Tech Stack:** Elysia.js, Better Auth, PostgreSQL, Redis
 * **Part of Monorepo:** Yes (run with filters or inside service dir)
 * **API Base:** `/api/auth`
@@ -55,7 +55,6 @@ GITHUB_CLIENT_SECRET=your-github-client-secret
 
 # Server Configuration
 NODE_ENV=development
-PORT=3010
 HOSTNAME=0.0.0.0
 ```
 
@@ -67,7 +66,6 @@ HOSTNAME=0.0.0.0
 | `GOOGLE_CLIENT_SECRET`  | `NO`        | Google OAuth client secret                    |
 | `GITHUB_CLIENT_ID`      | `NO`        | GitHub OAuth client ID for GitHub sign-in     |
 | `GITHUB_CLIENT_SECRET`  | `NO`        | GitHub OAuth client secret                    |
-| `PORT`                  | `NO`        | Server port (defaults to 3010)                |
 | `HOSTNAME`              | `NO`        | Server hostname (defaults to 0.0.0.0)        |
 
 ---
@@ -119,7 +117,7 @@ docker-compose up --build
 
 This starts:
 - PostgreSQL database on port 5432
-- Auth service on port 3010
+- Auth service on port 8000
 
 ### Direct Docker
 
@@ -128,7 +126,7 @@ This starts:
 docker build -f apps/backend/auth/Dockerfile -t auth-service .
 
 # Run container
-docker run -p 3010:3010 \
+docker run -p 8000:8000 \
   -e PG_URL="postgresql://user:password@host:5432/db" \
   -e BETTER_AUTH_SECRET="your-secret-key" \
   auth-service
@@ -164,13 +162,12 @@ psql "postgresql://username:password@localhost:5432/auth_db"
 **Port already in use?**
 ```bash
 # Check what's using the port
-lsof -i :3010
+lsof -i :8000
 
 # Kill the process (replace PID)
 kill -9 <PID>
 
-# Or update port in .env
-PORT=3001
+# Port is hardcoded to 8000
 ```
 
 ### Build/Install Issues

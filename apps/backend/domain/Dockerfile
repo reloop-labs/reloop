@@ -32,6 +32,6 @@ ENV HOSTNAME=0.0.0.0
 COPY --from=builder /app/apps/backend/domain/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 
-EXPOSE 3000
+EXPOSE 8011
 
 CMD ["bun", "run", "dist/index.js"]

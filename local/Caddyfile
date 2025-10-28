@@ -8,35 +8,35 @@ reloop.local {
         }
     }
     handle /api/auth* {
-        reverse_proxy host.docker.internal:3010 {
+        reverse_proxy host.docker.internal:8000 {
             header_up Host {host}
             header_up X-Forwarded-Proto {scheme}
             header_up X-Forwarded-For {remote}
         }
     }
     handle /api/domain* {
-        reverse_proxy host.docker.internal:3011 {
+        reverse_proxy host.docker.internal:8011 {
             header_up Host {host}
             header_up X-Forwarded-Proto {scheme}
             header_up X-Forwarded-For {remote}
         }
     }
     handle /api/audience* {
-        reverse_proxy host.docker.internal:3014 {
+        reverse_proxy host.docker.internal:8014 {
             header_up Host {host}
             header_up X-Forwarded-Proto {scheme}
             header_up X-Forwarded-For {remote}
         }
     }
     handle /api/webhook* {
-        reverse_proxy host.docker.internal:3013 {
+        reverse_proxy host.docker.internal:8013 {
             header_up Host {host}
             header_up X-Forwarded-Proto {scheme}
             header_up X-Forwarded-For {remote}
         }
     }
     handle /api/mail* {
-        reverse_proxy host.docker.internal:3015 {
+        reverse_proxy host.docker.internal:8015 {
             header_up Host {host}
             header_up X-Forwarded-Proto {scheme}
             header_up X-Forwarded-For {remote}

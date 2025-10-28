@@ -25,13 +25,12 @@ FROM base AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
-ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
 # Copy standalone build
 COPY --from=builder /app/apps/backend/auth/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 
-EXPOSE 3000
+EXPOSE 8000
 
 CMD ["bun", "run", "dist/index.js"]

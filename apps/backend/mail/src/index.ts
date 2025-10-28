@@ -7,7 +7,7 @@ import { loader } from "@reloop/be-mail/utils/loader.js";
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
 
-const port = Number(process.env.PORT || 3015);
+const port = 8015;
 const mailService = new Elysia({
     prefix: "/api/mail",
     name: "Mail Service",

@@ -8,7 +8,7 @@ import { loader } from "@reloop/audience/utils/loader";
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
 
-const port = Number(process.env.PORT || 3014);
+const port = 8014;
 const audienceService = new Elysia({
     prefix: "/api/audience",
     name: "Audience Service",

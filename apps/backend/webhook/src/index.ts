@@ -9,7 +9,7 @@ import { subscriptionRoutes } from "@reloop/webhook/routes/subscription/subscrip
 import { webhookRoutes } from "@reloop/webhook/routes/webhook/webhook.routes";
 import { Elysia } from "elysia";
 
-const port = Number(process.env.PORT || 3013);
+const port = 8013;
 const webhookService = new Elysia({
 	prefix: "/api/webhook",
 	name: "Webhook Service",
