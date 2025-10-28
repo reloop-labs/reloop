@@ -38,9 +38,9 @@ virtual_mailbox_maps = pgsql:/etc/postfix/sql/pgsql_virtual_mailbox_maps.cf
 # smtpd_sasl_local_domain = $myhostname
 # virtual_transport = lmtp:inet:dovecot:26
 
-# Sender login maps for authentication (simplified for local testing)
-# smtpd_sender_login_maps = pgsql:/etc/postfix/sql/pgsql_sender_login_maps.cf
-# smtpd_sender_restrictions = permit_sasl_authenticated, permit_mynetworks, reject_sender_login_mismatch, reject_non_fqdn_sender, reject_unknown_sender_domain
+# Sender login maps for authentication
+smtpd_sender_login_maps = pgsql:/etc/postfix/sql/pgsql_sender_login_maps.cf
+smtpd_sender_restrictions = permit_mynetworks, reject_non_fqdn_sender, reject_unknown_sender_domain, check_sender_access pgsql:/etc/postfix/sql/pgsql_virtual_domains_maps.cf
 
 # Rspamd integration (disabled for local testing)
 # smtpd_milters = inet:rspamd:11332
@@ -49,9 +49,9 @@ virtual_mailbox_maps = pgsql:/etc/postfix/sql/pgsql_virtual_mailbox_maps.cf
 # milter_protocol = 6
 # milter_default_action = accept
 
-# Restrictions (simplified for local testing)
-smtpd_relay_restrictions = permit_mynetworks defer_unauth_destination
-smtpd_recipient_restrictions = permit_mynetworks, reject_unauth_destination
+# Restrictions for domain validation
+smtpd_relay_restrictions = permit_mynetworks, check_recipient_access pgsql:/etc/postfix/sql/pgsql_virtual_domains_maps.cf, defer_unauth_destination
+smtpd_recipient_restrictions = permit_mynetworks, check_recipient_access pgsql:/etc/postfix/sql/pgsql_virtual_domains_maps.cf, reject_unauth_destination
 
 # Other settings
 alias_maps = hash:/etc/aliases
