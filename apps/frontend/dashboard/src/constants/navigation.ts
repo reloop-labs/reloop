@@ -36,11 +36,6 @@ export const mainNavigation: MainNavigationItem[] = [
 		iconName: "webhook",
 	},
 	{
-		label: "Mailboxes",
-		path: "/mailboxes",
-		iconName: "mail",
-	},
-	{
 		label: "Settings",
 		path: "/settings",
 		iconName: "gear",

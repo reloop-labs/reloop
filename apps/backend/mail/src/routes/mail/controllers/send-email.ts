@@ -2,7 +2,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { postfixClient } from "@reloop/be-mail/lib/postfix-client";
 import type { MailTypes } from "@reloop/be-mail/routes/mail/mail.type.js";
 import { db } from "@reloop/db/client";
-import { domain, emailLog, mailbox } from "@reloop/db/schema";
+import { domain, emailLog } from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
 import { eq } from "drizzle-orm";
 
@@ -30,15 +30,7 @@ export async function sendEmail(
         }
 
         // Check if user has a mailbox for this domain
-        const mailboxRecord = await db
-            .select()
-            .from(mailbox)
-            .where(eq(mailbox.username, emailData.from))
-            .limit(1);
 
-        if (mailboxRecord.length === 0) {
-            throw new Error(`Mailbox ${emailData.from} not found or not authorized`);
-        }
 
         // Send email via Postfix
         const result = await postfixClient.sendEmail({
@@ -58,7 +50,7 @@ export async function sendEmail(
             organizationId,
             domainId: domainRecord[0]?.id || "",
             fromEmail: emailData.from,
-            fromName: mailboxRecord[0]?.fullName,
+            fromName: emailData.from.split("@")[0],
             toEmails: Array.isArray(emailData.to) ? emailData.to : [emailData.to],
             ccEmails: emailData.cc
                 ? Array.isArray(emailData.cc)
