@@ -66,20 +66,6 @@ services:
       test: ["CMD", "clickhouse-client", "--query", "SELECT 1"]
     restart: unless-stopped
 
-  reloop-otel-collector:
-    image: otel/opentelemetry-collector-contrib:0.100.0
-    container_name: reloop-otel-collector
-    command: ["--config=/etc/otel-collector-config.yaml"]
-    volumes:
-      - ./grafana/config/otel-collector-config.yaml:/etc/otel-collector-config.yaml
-    ports:
-      - "4317:4317"   # OTLP gRPC receiver
-      - "4318:4318"   # OTLP HTTP receiver
-      - "8888:8888"   # Prometheus metrics
-      - "8889:8889"   # Prometheus exporter metrics
-    depends_on:
-      - reloop-clickhouse
-    restart: unless-stopped
   reloop-grafana:
     image: grafana/grafana:10.4.0
     container_name: reloop-grafana
@@ -107,4 +93,12 @@ services:
       - ../docker-data/loki:/loki
       - ./grafana/config/loki-config.yaml:/etc/loki/local-config.yaml
     command: ["-config.file=/etc/loki/local-config.yaml"]
+    restart: unless-stopped
+
+  reloop-mailpit:
+    image: axllent/mailpit:latest
+    container_name: reloop-mailpit
+    ports:
+      - "1025:1025"  # SMTP port for sending test emails
+      - "8025:8025"  # Web UI port for viewing captured emails
     restart: unless-stopped
