@@ -52,10 +52,6 @@
 				"@hookform/resolvers": "5.2.1",
 				"react-hook-form": "^7.62.0",
 				"react-email": "4.2.8",
-				"fumadocs-ui": "15.4.0",
-				"fumadocs-core": "15.4.0",
-				"fumadocs-mdx": "11.7.0",
-				"@types/mdx": "2.0.13",
 				"@tailwindcss/postcss": "4.1.11",
 				"tailwindcss": "4.1.11",
 				"postcss": "8.5.6",
@@ -85,7 +81,11 @@
 				"next": "^16.0.0",
 				"react": "^19.2.0",
 				"react-dom": "^19.2.0",
-				"react-dropzone": "^14.3.8"
+				"react-dropzone": "^14.3.8",
+				"@types/mdx": "^2.0.13",
+				"fumadocs-mdx": "^13.0.2",
+				"fumadocs-core": "^16.0.5",
+				"fumadocs-ui": "^16.0.5"
 			},
 			"db": {
 				"@types/pg": "8.15.4",

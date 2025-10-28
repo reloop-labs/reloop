@@ -9,7 +9,7 @@ import { loader } from "@reloop/domain/utils/loader";
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
 
-const port = Number(process.env.PORT || 3000);
+const port = Number(process.env.PORT || 3011);
 const emailService = new Elysia({
 	prefix: "/api/domain",
 	name: "Domain Service",

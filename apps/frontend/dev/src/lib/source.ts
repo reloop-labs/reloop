@@ -1,8 +1,8 @@
+import { docs } from "@reloop/fe-dev/.source";
 import { Icon } from "@reloop/ui/icon";
 import { loader } from "fumadocs-core/source";
-import { attachFile, createOpenAPI } from "fumadocs-openapi/server";
+import { createOpenAPI } from "fumadocs-openapi/server";
 import { createElement } from "react";
-import { docs } from "../../.source";
 
 export const source = loader({
 	icon(icon) {
@@ -11,11 +11,8 @@ export const source = loader({
 			return createElement(Icon, { name: icon });
 		}
 	},
-	baseUrl: "/",
+	baseUrl: "/dev",
 	source: docs.toFumadocsSource(),
-	pageTree: {
-		attachFile: attachFile as (node: any, file?: any) => any,
-	},
 });
 
 // Create openapi instance without configuration for now
