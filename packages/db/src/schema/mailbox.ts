@@ -14,6 +14,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { organization, user } from "./auth";
 import { domain } from "./domain";
+import { emailPriorityEnum, emailStatusEnum } from "./email";
 
 export const mailbox = pgTable(
 	"mailbox",
@@ -47,23 +48,6 @@ export const mailbox = pgTable(
 	],
 );
 
-// Enums for email status and priority
-export const emailStatusEnum = pgEnum("email_status", [
-	"pending",
-	"sent",
-	"delivered",
-	"failed",
-	"bounced",
-	"spam",
-	"archived",
-]);
-
-export const emailPriorityEnum = pgEnum("email_priority", [
-	"low",
-	"normal",
-	"high",
-	"urgent",
-]);
 
 export const emailFolderEnum = pgEnum("email_folder", [
 	"inbox",

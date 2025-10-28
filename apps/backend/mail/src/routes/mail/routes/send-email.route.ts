@@ -1,43 +1,27 @@
-import { formatSendEmailResponse } from "@reloop/be-mail/routes/mail/controllers/format-mail-response";
-import { sendEmail } from "@reloop/be-mail/routes/mail/controllers/send-email";
-import {
-    sendEmailBodySchema,
-    sendEmailResponseSchema,
-} from "@reloop/be-mail/routes/mail/mail.type";
-import { t } from "elysia";
+import { authMiddleware } from "@reloop/be-mail/middleware/auth";
+import { sendEmailHandler } from "@reloop/be-mail/routes/mail/controllers/send-email.js";
+import { MailModel } from "@reloop/be-mail/routes/mail/mail.model.js";
+import { Elysia, status } from "elysia";
 
-export const sendEmailRoute = new Elysia().post(
+export const sendEmailRoute = new Elysia().use(authMiddleware).post(
     "/send",
-    async ({ body, auth, set }) => {
-        try {
-            if (!auth.user) {
-                set.status = 401;
-                return { error: "Authentication required" };
-            }
-
-            // For now, we'll use a default organization ID
-            // In a real implementation, this would come from the authenticated user
-            const organizationId = "default-org-id"; // TODO: Get from auth context
-
-            const result = await sendEmail(body, auth.user.id, organizationId);
-            return formatSendEmailResponse(result);
-        } catch (error) {
-            set.status = 500;
-            return {
-                error: error instanceof Error ? error.message : "Failed to send email",
-            };
+    async ({ body, user }) => {
+        if (!user.activeOrganizationId) {
+            throw status(403, {
+                message: "User is not a member of an organization",
+            });
         }
+        return await sendEmailHandler(user.activeOrganizationId, user.id, body);
     },
     {
-        body: sendEmailBodySchema,
+        auth: true,
+        body: MailModel.sendEmailBody,
         response: {
-            200: sendEmailResponseSchema,
-            401: t.Object({
-                error: t.String(),
-            }),
-            500: t.Object({
-                error: t.String(),
-            }),
+            200: MailModel.sendEmailResponse,
+            401: MailModel.unauthorized,
+            403: MailModel.forbidden,
+            400: MailModel.badRequest,
+            500: MailModel.internalServerError,
         },
         detail: {
             tags: ["Mail"],

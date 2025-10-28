@@ -1,27 +1,25 @@
 import { createId } from "@paralleldrive/cuid2";
 import { postfixClient } from "@reloop/be-mail/lib/postfix-client";
-import { emailLog } from "@reloop/be-mail/routes/mail/mail.model";
-import type {
-    SendEmailBody,
-    SendEmailResponse,
-} from "@reloop/be-mail/routes/mail/mail.type";
+import type { MailTypes } from "@reloop/be-mail/routes/mail/mail.type.js";
 import { db } from "@reloop/db/client";
-import { domain } from "@reloop/db/schema/domain";
-import { mailbox } from "@reloop/db/schema/mailbox";
+import { domain, emailLog, mailbox } from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
 import { eq } from "drizzle-orm";
 
 export async function sendEmail(
-    emailData: SendEmailBody,
+    emailData: MailTypes.SendEmailRequest,
     userId: string,
     organizationId: string,
-): Promise<SendEmailResponse> {
+): Promise<MailTypes.SendEmailHandlerResponse> {
     const messageId = createId();
     const timestamp = new Date().toISOString();
 
     try {
         // Validate sender email belongs to user's organization
         const domainName = emailData.from.split("@")[1];
+        if (!domainName) {
+            throw new Error("Invalid 'from' email address");
+        }
         const domainRecord = await db
             .select()
             .from(domain)
@@ -60,9 +58,9 @@ export async function sendEmail(
             messageId: result.messageId,
             organizationId,
             userId,
-            domainId: domainRecord[0].id,
+            domainId: domainRecord[0]?.id || "",
             fromEmail: emailData.from,
-            fromName: mailboxRecord[0].fullName,
+            fromName: mailboxRecord[0]?.fullName,
             toEmails: Array.isArray(emailData.to) ? emailData.to : [emailData.to],
             ccEmails: emailData.cc
                 ? Array.isArray(emailData.cc)
@@ -135,6 +133,50 @@ export async function sendEmail(
             "Failed to send email",
         );
 
+        throw error;
+    }
+}
+
+export async function sendEmailHandler(
+    organizationId: string,
+    userId: string,
+    body: MailTypes.SendEmailRequest,
+): Promise<MailTypes.SendEmailHandlerResponse> {
+    logger.info(
+        {
+            from: body.from,
+            to: body.to,
+            organizationId,
+            userId,
+        },
+        "Sending email",
+    );
+
+    try {
+        const result = await sendEmail(body, userId, organizationId);
+
+        logger.info(
+            {
+                from: body.from,
+                to: body.to,
+                organizationId,
+                userId,
+            },
+            "Email sent successfully",
+        );
+
+        return result;
+    } catch (error) {
+        logger.error(
+            {
+                from: body.from,
+                to: body.to,
+                organizationId,
+                userId,
+                error: error instanceof Error ? error.message : String(error),
+            },
+            "Error sending email",
+        );
         throw error;
     }
 }

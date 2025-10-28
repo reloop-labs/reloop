@@ -1,8 +1,9 @@
 import "dotenv/config";
 import { fromTypes, openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
-import { mailRoutes } from "@reloop/be-mail/routes/mail/mail.routes";
-import { loader } from "@reloop/be-mail/utils/loader";
+import { landing } from "@reloop/be-mail/routes/landing/landing.index.js";
+import { mailRoutes } from "@reloop/be-mail/routes/mail/mail.routes.js";
+import { loader } from "@reloop/be-mail/utils/loader.js";
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
 
@@ -21,6 +22,7 @@ const mailService = new Elysia({
         }),
     )
     .use(serverTiming())
+    .use(landing)
     .use(mailRoutes)
     .onStart(async () => {
         await loader();

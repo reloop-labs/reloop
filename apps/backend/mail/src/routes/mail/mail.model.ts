@@ -1,113 +1,112 @@
-import { createId } from "@paralleldrive/cuid2";
-import { organization, user } from "@reloop/db/schema/auth";
-import { domain } from "@reloop/db/schema/domain";
-import { relations } from "drizzle-orm";
-import {
-    bigint,
-    boolean,
-    index,
-    jsonb,
-    pgEnum,
-    pgTable,
-    text,
-    timestamp,
-    varchar,
-} from "drizzle-orm/pg-core";
+import { t } from "elysia";
 
-// Email status enum
-export const emailStatusEnum = pgEnum("email_status", [
-    "pending",
-    "sent",
-    "delivered",
-    "failed",
-    "bounced",
-    "spam",
-    "archived",
-]);
+export namespace MailModel {
+    // Email validation pattern
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// Email priority enum
-export const emailPriorityEnum = pgEnum("email_priority", [
-    "low",
-    "normal",
-    "high",
-    "urgent",
-]);
+    export const sendEmailBody = t.Object({
+        from: t.String({
+            pattern: emailPattern.source,
+            description: "Sender email address",
+            examples: ["user@example.com"],
+        }),
+        to: t.Union([t.String(), t.Array(t.String())], {
+            description: "Recipient email address(es)",
+            examples: ["recipient@example.com", ["user1@example.com", "user2@example.com"]],
+        }),
+        subject: t.String({
+            minLength: 1,
+            maxLength: 255,
+            description: "Email subject",
+            examples: ["Test Email"],
+        }),
+        text: t.Optional(
+            t.String({
+                description: "Plain text content",
+                examples: ["This is a test email"],
+            }),
+        ),
+        html: t.Optional(
+            t.String({
+                description: "HTML content",
+                examples: ["<h1>Test Email</h1><p>This is a test email</p>"],
+            }),
+        ),
+        replyTo: t.Optional(
+            t.String({
+                pattern: emailPattern.source,
+                description: "Reply-to email address",
+                examples: ["noreply@example.com"],
+            }),
+        ),
+        cc: t.Optional(
+            t.Union([t.String(), t.Array(t.String())], {
+                description: "CC email address(es)",
+                examples: ["cc@example.com"],
+            }),
+        ),
+        bcc: t.Optional(
+            t.Union([t.String(), t.Array(t.String())], {
+                description: "BCC email address(es)",
+                examples: ["bcc@example.com"],
+            }),
+        ),
+    });
 
-// Email sending log table
-export const emailLog = pgTable(
-    "email_log",
-    {
-        id: text("id")
-            .$defaultFn(() => createId())
-            .primaryKey(),
-        messageId: varchar("message_id", { length: 500 }).notNull().unique(),
-        organizationId: text("organization_id")
-            .notNull()
-            .references(() => organization.id, { onDelete: "cascade" }),
-        userId: text("user_id")
-            .notNull()
-            .references(() => user.id, { onDelete: "cascade" }),
-        domainId: text("domain_id")
-            .notNull()
-            .references(() => domain.id, { onDelete: "cascade" }),
-        fromEmail: varchar("from_email", { length: 255 }).notNull(),
-        fromName: varchar("from_name", { length: 255 }),
-        toEmails: jsonb("to_emails").$type<string[]>().notNull(),
-        ccEmails: jsonb("cc_emails").$type<string[]>(),
-        bccEmails: jsonb("bcc_emails").$type<string[]>(),
-        replyTo: varchar("reply_to", { length: 255 }),
-        subject: text("subject").notNull(),
-        textBody: text("text_body"),
-        htmlBody: text("html_body"),
-        status: emailStatusEnum("status").notNull().default("pending"),
-        priority: emailPriorityEnum("priority").notNull().default("normal"),
-        errorMessage: text("error_message"),
-        provider: varchar("provider", { length: 100 }).notNull().default("postfix"),
-        providerMessageId: varchar("provider_message_id", { length: 500 }),
-        size: bigint("size", { mode: "number" }).notNull().default(0),
-        headers: jsonb("headers").$type<Record<string, string>>(),
-        sentAt: timestamp("sent_at"),
-        deliveredAt: timestamp("delivered_at"),
-        failedAt: timestamp("failed_at"),
-        createdAt: timestamp("created_at").notNull().defaultNow(),
-        updatedAt: timestamp("updated_at")
-            .notNull()
-            .defaultNow()
-            .$onUpdate(() => new Date()),
-    },
-    (table) => [
-        index("email_log_idx_message_id").on(table.messageId),
-        index("email_log_idx_organization_id").on(table.organizationId),
-        index("email_log_idx_user_id").on(table.userId),
-        index("email_log_idx_domain_id").on(table.domainId),
-        index("email_log_idx_from_email").on(table.fromEmail),
-        index("email_log_idx_status").on(table.status),
-        index("email_log_idx_provider").on(table.provider),
-        index("email_log_idx_sent_at").on(table.sentAt),
-        index("email_log_idx_created_at").on(table.createdAt),
-        index("email_log_idx_org_status").on(table.organizationId, table.status),
-        index("email_log_idx_user_status").on(table.userId, table.status),
-        index("email_log_idx_domain_status").on(table.domainId, table.status),
-    ],
-);
+    export type SendEmailBody = typeof sendEmailBody.static;
 
-export const emailLogRelations = relations(emailLog, ({ one }) => ({
-    organization: one(organization, {
-        fields: [emailLog.organizationId],
-        references: [organization.id],
-    }),
-    user: one(user, {
-        fields: [emailLog.userId],
-        references: [user.id],
-    }),
-    domain: one(domain, {
-        fields: [emailLog.domainId],
-        references: [domain.id],
-    }),
-}));
+    export const sendEmailResponse = t.Object({
+        success: t.Boolean({
+            description: "Whether the email was sent successfully",
+        }),
+        messageId: t.String({
+            description: "Unique message ID",
+        }),
+        status: t.String({
+            description: "Email status",
+        }),
+        timestamp: t.String({
+            description: "Timestamp when email was sent",
+        }),
+    });
 
-export const emailLogTables = {
-    emailLog,
-} as const;
+    export type SendEmailResponse = typeof sendEmailResponse.static;
 
-export type EmailLogTable = typeof emailLogTables;
+    export const unauthorized = t.Object({
+        message: t.Literal("Authentication required"),
+    });
+    export type Unauthorized = typeof unauthorized.static;
+
+    export const forbidden = t.Object({
+        message: t.Literal("User is not a member of an organization"),
+    });
+    export type Forbidden = typeof forbidden.static;
+
+    export const badRequest = t.Object({
+        message: t.String({
+            description: "Error message",
+        }),
+    });
+    export type BadRequest = typeof badRequest.static;
+
+    export const internalServerError = t.Object({
+        message: t.String({
+            description: "Error message",
+        }),
+    });
+    export type InternalServerError = typeof internalServerError.static;
+
+    export const domainNotFound = t.Object({
+        message: t.String({
+            description: "Domain not found or not authorized",
+        }),
+    });
+    export type DomainNotFound = typeof domainNotFound.static;
+
+    export const mailboxNotFound = t.Object({
+        message: t.String({
+            description: "Mailbox not found or not authorized",
+        }),
+    });
+    export type MailboxNotFound = typeof mailboxNotFound.static;
+}

@@ -1,57 +1,31 @@
-import { t } from "elysia";
+import type { MailModel } from "@reloop/be-mail/routes/mail/mail.model.js";
 
-export const sendEmailBodySchema = t.Object({
-    from: t.String({
-        description: "Sender email address",
-        examples: ["user@example.com"]
-    }),
-    to: t.Union([t.String(), t.Array(t.String())], {
-        description: "Recipient email address(es)",
-        examples: ["recipient@example.com", ["user1@example.com", "user2@example.com"]]
-    }),
-    subject: t.String({
-        description: "Email subject",
-        examples: ["Test Email"]
-    }),
-    text: t.Optional(t.String({
-        description: "Plain text content",
-        examples: ["This is a test email"]
-    })),
-    html: t.Optional(t.String({
-        description: "HTML content",
-        examples: ["<h1>Test Email</h1><p>This is a test email</p>"]
-    })),
-    replyTo: t.Optional(t.String({
-        description: "Reply-to email address",
-        examples: ["noreply@example.com"]
-    })),
-    cc: t.Optional(t.Union([t.String(), t.Array(t.String())], {
-        description: "CC email address(es)",
-        examples: ["cc@example.com"]
-    })),
-    bcc: t.Optional(t.Union([t.String(), t.Array(t.String())], {
-        description: "BCC email address(es)",
-        examples: ["bcc@example.com"]
-    })),
-});
+export namespace MailTypes {
+    export type SendEmailBody = typeof MailModel.sendEmailBody.static;
+    export type SendEmailResponse = typeof MailModel.sendEmailResponse.static;
+    export type Unauthorized = typeof MailModel.unauthorized.static;
+    export type Forbidden = typeof MailModel.forbidden.static;
+    export type BadRequest = typeof MailModel.badRequest.static;
+    export type InternalServerError = typeof MailModel.internalServerError.static;
+    export type DomainNotFound = typeof MailModel.domainNotFound.static;
+    export type MailboxNotFound = typeof MailModel.mailboxNotFound.static;
 
-export const sendEmailResponseSchema = t.Object({
-    success: t.Boolean({ description: "Whether the email was sent successfully" }),
-    messageId: t.String({ description: "Unique message ID" }),
-    status: t.String({ description: "Email status" }),
-    timestamp: t.String({ description: "Timestamp when email was sent" }),
-});
+    // Internal interfaces for controller use
+    export interface SendEmailRequest {
+        from: string;
+        to: string | string[];
+        subject: string;
+        text?: string;
+        html?: string;
+        replyTo?: string;
+        cc?: string | string[];
+        bcc?: string | string[];
+    }
 
-export const healthResponseSchema = t.Object({
-    status: t.String({ description: "Service status" }),
-    smtp: t.Object({
-        connected: t.Boolean({ description: "SMTP connection status" }),
-        host: t.String({ description: "SMTP host" }),
-        port: t.Number({ description: "SMTP port" }),
-    }),
-    timestamp: t.String({ description: "Health check timestamp" }),
-});
-
-export type SendEmailBody = typeof sendEmailBodySchema.static;
-export type SendEmailResponse = typeof sendEmailResponseSchema.static;
-export type HealthResponse = typeof healthResponseSchema.static;
+    export interface SendEmailHandlerResponse {
+        success: boolean;
+        messageId: string;
+        status: string;
+        timestamp: string;
+    }
+}
