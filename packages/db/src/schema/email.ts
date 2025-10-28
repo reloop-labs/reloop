@@ -10,7 +10,7 @@ import {
     timestamp,
     varchar,
 } from "drizzle-orm/pg-core";
-import { organization, user } from "./auth";
+import { organization } from "./auth";
 import { domain } from "./domain";
 
 // Custom ID generation function with prefix
@@ -46,9 +46,6 @@ export const emailLog = pgTable(
         organizationId: text("organization_id")
             .notNull()
             .references(() => organization.id, { onDelete: "cascade" }),
-        userId: text("user_id")
-            .notNull()
-            .references(() => user.id, { onDelete: "cascade" }),
         domainId: text("domain_id")
             .notNull()
             .references(() => domain.id, { onDelete: "cascade" }),
@@ -80,7 +77,6 @@ export const emailLog = pgTable(
     (table) => [
         index("email_log_idx_message_id").on(table.messageId),
         index("email_log_idx_organization_id").on(table.organizationId),
-        index("email_log_idx_user_id").on(table.userId),
         index("email_log_idx_domain_id").on(table.domainId),
         index("email_log_idx_from_email").on(table.fromEmail),
         index("email_log_idx_status").on(table.status),
@@ -88,7 +84,6 @@ export const emailLog = pgTable(
         index("email_log_idx_sent_at").on(table.sentAt),
         index("email_log_idx_created_at").on(table.createdAt),
         index("email_log_idx_org_status").on(table.organizationId, table.status),
-        index("email_log_idx_user_status").on(table.userId, table.status),
         index("email_log_idx_domain_status").on(table.domainId, table.status),
     ],
 );
@@ -97,10 +92,6 @@ export const emailLogRelations = relations(emailLog, ({ one }) => ({
     organization: one(organization, {
         fields: [emailLog.organizationId],
         references: [organization.id],
-    }),
-    user: one(user, {
-        fields: [emailLog.userId],
-        references: [user.id],
     }),
     domain: one(domain, {
         fields: [emailLog.domainId],

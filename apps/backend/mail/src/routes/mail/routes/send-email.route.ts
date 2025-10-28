@@ -11,7 +11,7 @@ export const sendEmailRoute = new Elysia().use(authMiddleware).post(
                 message: "User is not a member of an organization",
             });
         }
-        return await sendEmailHandler(user.activeOrganizationId, user.id, body);
+        return await sendEmailHandler(user.activeOrganizationId, body);
     },
     {
         auth: true,

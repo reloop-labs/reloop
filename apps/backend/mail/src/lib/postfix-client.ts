@@ -110,6 +110,6 @@ const smtpPass = process.env.SMTP_PASS;
 export const postfixClient = new PostfixClient({
     host: smtpHost,
     port: smtpPort,
-    secure: false, // Postfix typically uses port 25/587 without TLS
+    secure: false,
     auth: smtpUser && smtpPass ? { user: smtpUser, pass: smtpPass } : undefined,
 });

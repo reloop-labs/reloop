@@ -8,7 +8,6 @@ import { eq } from "drizzle-orm";
 
 export async function sendEmail(
     emailData: MailTypes.SendEmailRequest,
-    userId: string,
     organizationId: string,
 ): Promise<MailTypes.SendEmailHandlerResponse> {
     const messageId = createId();
@@ -57,7 +56,6 @@ export async function sendEmail(
         await db.insert(emailLog).values({
             messageId: result.messageId,
             organizationId,
-            userId,
             domainId: domainRecord[0]?.id || "",
             fromEmail: emailData.from,
             fromName: mailboxRecord[0]?.fullName,
@@ -88,7 +86,6 @@ export async function sendEmail(
                 messageId: result.messageId,
                 from: emailData.from,
                 to: emailData.to,
-                userId,
                 organizationId,
             },
             "Email sent and logged successfully",
@@ -103,13 +100,10 @@ export async function sendEmail(
     } catch (error) {
         const errorMessage =
             error instanceof Error ? error.message : "Unknown error";
-
-        // Log failed email attempt
         await db.insert(emailLog).values({
             messageId,
             organizationId,
-            userId,
-            domainId: "", // Will be empty if domain validation failed
+            domainId: "",
             fromEmail: emailData.from,
             toEmails: Array.isArray(emailData.to) ? emailData.to : [emailData.to],
             subject: emailData.subject,
@@ -127,7 +121,6 @@ export async function sendEmail(
                 error: errorMessage,
                 from: emailData.from,
                 to: emailData.to,
-                userId,
                 organizationId,
             },
             "Failed to send email",
@@ -139,7 +132,6 @@ export async function sendEmail(
 
 export async function sendEmailHandler(
     organizationId: string,
-    userId: string,
     body: MailTypes.SendEmailRequest,
 ): Promise<MailTypes.SendEmailHandlerResponse> {
     logger.info(
@@ -147,20 +139,17 @@ export async function sendEmailHandler(
             from: body.from,
             to: body.to,
             organizationId,
-            userId,
         },
         "Sending email",
     );
 
     try {
-        const result = await sendEmail(body, userId, organizationId);
-
+        const result = await sendEmail(body, organizationId);
         logger.info(
             {
                 from: body.from,
                 to: body.to,
                 organizationId,
-                userId,
             },
             "Email sent successfully",
         );
@@ -172,7 +161,6 @@ export async function sendEmailHandler(
                 from: body.from,
                 to: body.to,
                 organizationId,
-                userId,
                 error: error instanceof Error ? error.message : String(error),
             },
             "Error sending email",
