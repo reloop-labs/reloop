@@ -42,6 +42,13 @@ reloop.local {
             header_up X-Forwarded-For {remote}
         }
     }
+    handle /api/mail* {
+        reverse_proxy host.docker.internal:3015 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
     handle /dashboard* {
         reverse_proxy host.docker.internal:3001 {
             header_up Host {host}
