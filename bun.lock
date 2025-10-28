@@ -137,11 +137,13 @@
       },
     },
     "apps/backend/mail": {
-      "name": "mail",
-      "version": "1.0.50",
+      "name": "fe-mail",
       "dependencies": {
         "@elysiajs/bearer": "catalog:backend",
+        "@elysiajs/cors": "catalog:backend",
         "@elysiajs/cron": "catalog:backend",
+        "@elysiajs/eden": "catalog:backend",
+        "@elysiajs/openapi": "catalog:backend",
         "@elysiajs/opentelemetry": "catalog:backend",
         "@elysiajs/server-timing": "catalog:backend",
         "@elysiajs/swagger": "catalog:backend",
@@ -153,24 +155,29 @@
         "@opentelemetry/sdk-trace-node": "catalog:backend",
         "@opentelemetry/semantic-conventions": "catalog:backend",
         "@paralleldrive/cuid2": "catalog:backend",
-        "@react-email/components": "catalog:ui",
+        "@reloop/auth": "workspace:*",
+        "@reloop/cache": "workspace:*",
+        "@reloop/db": "workspace:*",
+        "@reloop/logger": "workspace:*",
+        "@types/nodemailer": "catalog:backend",
         "better-auth": "catalog:",
+        "dotenv": "catalog:backend",
         "drizzle-orm": "catalog:db",
         "drizzle-typebox": "catalog:db",
         "elysia": "catalog:backend",
         "nodemailer": "catalog:backend",
         "pg": "catalog:db",
-        "react": "catalog:ui",
-        "react-dom": "catalog:ui",
-        "react-email": "catalog:ui",
+        "redis": "catalog:db",
+        "zod": "catalog:ui",
       },
       "devDependencies": {
-        "@react-email/preview-server": "catalog:ui",
+        "@better-auth/cli": "catalog:backend",
         "@reloop/tsconfig": "workspace:*",
-        "@types/nodemailer": "catalog:backend",
+        "@types/bun": "catalog:backend",
         "@types/pg": "catalog:db",
-        "bun-types": "catalog:backend",
         "drizzle-kit": "catalog:db",
+        "tsdown": "catalog:backend",
+        "typescript": "catalog:",
       },
     },
     "apps/backend/webhook": {
@@ -2121,6 +2128,8 @@
 
     "fdir": ["fdir@6.5.0", "", { "peerDependencies": { "picomatch": "^3 || ^4" }, "optionalPeers": ["picomatch"] }, "sha512-tIbYtZbucOs0BRGqPJkshJUYdL+SDH7dVM8gjy+ERp3WAUjLEFJE+02kanyHtwjWOnwrKYBiwAmM0p4kLJAnXg=="],
 
+    "fe-mail": ["fe-mail@workspace:apps/backend/mail"],
+
     "fflate": ["fflate@0.8.2", "", {}, "sha512-cPJU47OaAoCbg0pBvzsgpTPhmhqI5eJjh/JIu8tPj5q+T7iLvW/JAYUqmE7KOB4R1ZyEhzBaIQpQpardBF5z8A=="],
 
     "file-selector": ["file-selector@2.1.2", "", { "dependencies": { "tslib": "^2.7.0" } }, "sha512-QgXo+mXTe8ljeqUFaX3QVHc5osSItJ/Km+xpocx0aSqWGMSCf6qYs/VnzZgS864Pjn5iceMRFigeAV7AfTlaig=="],
@@ -2382,8 +2391,6 @@
     "lucide-react": ["lucide-react@0.525.0", "", { "peerDependencies": { "react": "^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0" } }, "sha512-Tm1txJ2OkymCGkvwoHt33Y2JpN5xucVq1slHcgE6Lk0WjDfjgKWor5CdVER8U6DvcfMwh4M8XxmpTiyzfmfDYQ=="],
 
     "magic-string": ["magic-string@0.30.19", "", { "dependencies": { "@jridgewell/sourcemap-codec": "^1.5.5" } }, "sha512-2N21sPY9Ws53PZvsEpVtNuSW+ScYbQdp4b9qUaL+9QkHUrGFKo56Lg9Emg5s9V/qrtNBmiR01sYhUOwu3H+VOw=="],
-
-    "mail": ["mail@workspace:apps/backend/mail"],
 
     "markdown-extensions": ["markdown-extensions@2.0.0", "", {}, "sha512-o5vL7aDWatOTX8LzaS1WMoaoxIiLRQJuIKKe2wAw6IeULDHaqbiqiggmx+pKvZDb1Sj+pE46Sn1T7lCqfFtg1Q=="],
 

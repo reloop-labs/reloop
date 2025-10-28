@@ -3,4 +3,4 @@ password = ${DB_PASSWORD}
 hosts = ${DB_HOST}
 dbname = ${DB_NAME}
 
-query = SELECT username FROM mailbox WHERE username='%s' AND active = 1
+query = SELECT username FROM mailbox WHERE username='%s' AND active = true

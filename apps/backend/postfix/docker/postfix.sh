@@ -18,6 +18,16 @@ sed -i "s/\${DB_PASSWORD}/$DB_PASSWORD/g" /etc/postfix/sql/*.cf
 sed -i "s/\${MAIL_HOSTNAME}/$MAIL_HOSTNAME/g" /etc/postfix/main.cf
 sed -i "s/\${DOMAIN}/$DOMAIN/g" /etc/postfix/main.cf
 
+# Configure relay host for Mailpit if specified
+if [ "$MAIL_RELAY_MODE" = "mailpit" ]; then
+  echo "Configuring Postfix to relay emails to Mailpit"
+  postconf -e "relayhost = [$MAIL_RELAY_HOST]:$MAIL_RELAY_PORT"
+  postconf -e "smtp_use_tls = no"
+  postconf -e "smtp_tls_security_level = none"
+else
+  echo "Postfix configured for direct delivery"
+fi
+
 # Set permissions
 chown -R postfix:postfix /var/spool/postfix
 chmod -R 755 /var/spool/postfix
