@@ -4,7 +4,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 
 dayjs.extend(relativeTime);
 
-import { DomainListSidebar } from "./components/sidebar/domain-list";
+import { DomainListSidebar } from "./components/domain-list";
 
 const DomainPage = () => {
 	return <DomainListSidebar />;

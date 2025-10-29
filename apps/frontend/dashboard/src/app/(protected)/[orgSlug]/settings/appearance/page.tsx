@@ -1,6 +1,5 @@
 "use client";
 
-import { LayoutToggleButton } from "@fe/dashboard/app/(protected)/[orgSlug]/settings/appearance/layout-toggle-button";
 import { Icon } from "@reloop/ui/icon";
 import { ThemeToggleAppearance } from "./theme-toggle";
 
@@ -32,19 +31,7 @@ const AppearancePage = () => {
 					<ThemeToggleAppearance />
 				</div>
 			</div>
-			<div className="w-full space-y-8 pt-10">
-				<div>
-					<div className="mb-6">
-						<p className="font-medium text-label-md text-text-strong-950">
-							Layout
-						</p>
-						<p className="text-paragraph-sm text-text-sub-600">
-							Choose your preferred layout for the application.
-						</p>
-					</div>
-					<LayoutToggleButton />
-				</div>
-			</div>
+			{/* Layout switching removed */}
 		</div>
 	);
 };

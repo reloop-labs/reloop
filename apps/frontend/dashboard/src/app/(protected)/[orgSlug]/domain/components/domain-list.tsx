@@ -15,7 +15,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import useSWR from "swr";
-import { DeleteDomainModal } from "../delete-domain";
+import { DeleteDomainModal } from "./delete-domain";
 import { DomainSDK } from "./domain-sdk";
 import { DomainTable } from "./domain-table";
 import { EmptyState } from "./empty-state";

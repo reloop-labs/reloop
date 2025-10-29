@@ -1,6 +1,6 @@
 "use client";
 
-import { WebhookListSidebar } from "./components/sidebar/webhook-list";
+import { WebhookListSidebar } from "./components/webhook-list";
 
 const WebhooksPage = () => {
 	return <WebhookListSidebar />;

@@ -7,8 +7,8 @@ import * as Input from "@reloop/ui/input";
 import Link from "next/link";
 import { useState } from "react";
 import useSWR from "swr";
-import { DeleteAudienceGroupModal } from "../../components/delete-audience-group";
 import { AudienceGroupTable } from "./audience-group-table";
+import { DeleteAudienceGroupModal } from "./delete-audience-group";
 import { EmptyState } from "./empty-state";
 
 export const AudienceGroupListSidebar = () => {

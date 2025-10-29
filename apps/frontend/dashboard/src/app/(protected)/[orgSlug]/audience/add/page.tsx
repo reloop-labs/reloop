@@ -1,5 +1,5 @@
 "use client";
-import { AddAudienceGroupSidebar } from "../components/sidebar/add-audience-group";
+import { AddAudienceGroupSidebar } from "../components/add-audience-group";
 
 const AddAudienceGroupPage = () => {
 	return <AddAudienceGroupSidebar />;

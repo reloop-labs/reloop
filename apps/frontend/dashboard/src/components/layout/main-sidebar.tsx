@@ -1,7 +1,6 @@
 "use client";
 
 import { mainNavigation } from "@fe/dashboard/constants";
-import { useLayout } from "@fe/dashboard/providers/layout-provider";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { useOrgStore } from "@fe/dashboard/store/use-org-store";
 import { authClient } from "@reloop/auth/client";
@@ -14,7 +13,7 @@ import * as Popover from "@reloop/ui/popover";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useSWR from "swr";
 
 interface MainSidebarProps {
@@ -30,7 +29,24 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
 	const pathname = usePathname();
 	const { user, activeOrganization, push } = useUserOrganization();
 	const { setState } = useOrgStore();
-	const { isSidebarCollapsed, toggleSidebarCollapse } = useLayout();
+	const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
+	useEffect(() => {
+		try {
+			const saved = localStorage.getItem("isSidebarCollapsed");
+			if (saved !== null) {
+				setIsSidebarCollapsed(saved === "true");
+			}
+		} catch {}
+	}, []);
+	const toggleSidebarCollapse = () => {
+		setIsSidebarCollapsed((prev) => {
+			const next = !prev;
+			try {
+				localStorage.setItem("isSidebarCollapsed", String(next));
+			} catch {}
+			return next;
+		});
+	};
 	const { data: organizations } = useSWR(
 		"organizations",
 		async () => (await authClient.organization.list()).data,

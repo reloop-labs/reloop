@@ -237,10 +237,7 @@ export const DomainSDK = () => {
 	const copyToClipboard = async (text: string) => {
 		try {
 			await navigator.clipboard.writeText(text);
-			// You could add a toast notification here
-		} catch {
-			// Handle copy error silently
-		}
+		} catch {}
 	};
 
 	return (
@@ -257,7 +254,6 @@ export const DomainSDK = () => {
 				</Drawer.Header>
 				<Drawer.Body className="p-5">
 					<div className="space-y-6">
-						{/* Language Selection */}
 						<div>
 							<h3 className="mb-3 text-label-md text-text-strong-950">
 								Language
@@ -282,7 +278,6 @@ export const DomainSDK = () => {
 							</div>
 						</div>
 
-						{/* Operation Selection */}
 						<div>
 							<h3 className="mb-3 text-label-md text-text-strong-950">
 								Operations
@@ -310,7 +305,6 @@ export const DomainSDK = () => {
 							</div>
 						</div>
 
-						{/* Code Example */}
 						<div>
 							<div className="mb-3 flex items-center justify-between">
 								<h3 className="text-label-md text-text-strong-950">
@@ -338,7 +332,6 @@ export const DomainSDK = () => {
 							</div>
 						</div>
 
-						{/* API Endpoints */}
 						<div>
 							<h3 className="mb-3 text-label-md text-text-strong-950">
 								API Endpoints

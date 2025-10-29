@@ -1,6 +1,4 @@
 "use client";
-
-import { useLayout } from "@fe/dashboard/providers/layout-provider";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { useTheme } from "next-themes";
@@ -8,7 +6,6 @@ import { SidebarLayoutIcon } from "./sidebar-layout-icon";
 
 export function ThemeToggleAppearance() {
 	const { theme, setTheme } = useTheme();
-	useLayout();
 	const themeOptions = [
 		{
 			value: "light",
