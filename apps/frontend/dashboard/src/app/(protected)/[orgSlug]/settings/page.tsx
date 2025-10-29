@@ -1,6 +1,5 @@
 "use client";
 
-import { useLayout } from "@fe/dashboard/providers/layout-provider";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import * as Button from "@reloop/ui/button";
 import * as FileUpload from "@reloop/ui/file-upload";
@@ -10,8 +9,6 @@ import * as Label from "@reloop/ui/label";
 import { useState } from "react";
 
 const SettingsPage = () => {
-	const { layoutMode } = useLayout();
-	const isTopbar = layoutMode === "topbar";
 	const { activeOrganization } = useUserOrganization();
 	const [organizationName, setOrganizationName] = useState(
 		activeOrganization.name,
@@ -20,17 +17,15 @@ const SettingsPage = () => {
 
 	return (
 		<div>
-			{isTopbar && (
-				<div className="mb-5 border-stroke-soft-100 border-b p-5 pb-7">
-					<div className="flex items-center gap-2">
-						<Icon name="gear" className="h-5 w-5" />
-						<p className="font-medium text-2xl text-text-strong-950">General</p>
-					</div>
-					<p className="text-paragraph-sm text-text-sub-600">
-						General Change the settings for your current workspace
-					</p>
+			<div className="mb-5 border-stroke-soft-100 border-b p-5 pb-7">
+				<div className="flex items-center gap-2">
+					<Icon name="gear" className="h-5 w-5" />
+					<p className="font-medium text-2xl text-text-strong-950">General</p>
 				</div>
-			)}
+				<p className="text-paragraph-sm text-text-sub-600">
+					General Change the settings for your current workspace
+				</p>
+			</div>
 			<div className="w-full space-y-5 pt-5">
 				<div>
 					<div className="flex items-center gap-4">

@@ -9,7 +9,7 @@ import {
 	useState,
 } from "react";
 
-type LayoutMode = "sidebar" | "topbar";
+type LayoutMode = "sidebar";
 
 interface LayoutContextType {
 	layoutMode: LayoutMode;
@@ -32,7 +32,7 @@ export const useLayout = () => {
 
 export const LayoutProvider = ({
 	children,
-	defaultMode = "topbar",
+	defaultMode = "sidebar",
 	defaultSidebarCollapsed = false,
 }: {
 	children: ReactNode;
@@ -49,11 +49,11 @@ export const LayoutProvider = ({
 		const savedLayoutMode = localStorage.getItem("layoutMode") as LayoutMode;
 		const savedSidebarCollapsed = localStorage.getItem("isSidebarCollapsed");
 
-		if (
-			savedLayoutMode &&
-			(savedLayoutMode === "sidebar" || savedLayoutMode === "topbar")
-		) {
+		if (savedLayoutMode === "sidebar") {
 			setLayoutModeState(savedLayoutMode);
+		} else {
+			setLayoutModeState("sidebar");
+			localStorage.setItem("layoutMode", "sidebar");
 		}
 
 		if (savedSidebarCollapsed !== null) {
@@ -62,16 +62,13 @@ export const LayoutProvider = ({
 	}, []);
 
 	const toggleLayoutMode = useCallback(() => {
-		setLayoutModeState((prev) => {
-			const newMode = prev === "sidebar" ? "topbar" : "sidebar";
-			localStorage.setItem("layoutMode", newMode);
-			return newMode;
-		});
+		setLayoutModeState("sidebar");
+		localStorage.setItem("layoutMode", "sidebar");
 	}, []);
 
-	const setLayoutMode = useCallback((mode: LayoutMode) => {
-		setLayoutModeState(mode);
-		localStorage.setItem("layoutMode", mode);
+	const setLayoutMode = useCallback((_mode: LayoutMode) => {
+		setLayoutModeState("sidebar");
+		localStorage.setItem("layoutMode", "sidebar");
 	}, []);
 
 	const toggleSidebarCollapse = useCallback(() => {

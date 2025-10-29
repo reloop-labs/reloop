@@ -3,44 +3,33 @@
 import { useLayout } from "@fe/dashboard/providers/layout-provider";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import Image from "next/image";
 import { useTheme } from "next-themes";
 import { SidebarLayoutIcon } from "./sidebar-layout-icon";
-import { TopbarLayoutIcon } from "./topbar-layout-icon";
 
 export function ThemeToggleAppearance() {
 	const { theme, setTheme } = useTheme();
-	const { layoutMode } = useLayout();
-	const isTopbar = layoutMode === "topbar";
+	useLayout();
 	const themeOptions = [
 		{
 			value: "light",
 			label: "Light",
 			icon: "sun",
 			image: "/dashboard/ui-light.png",
-			layoutIcon: isTopbar ? <TopbarLayoutIcon /> : <SidebarLayoutIcon />,
+			layoutIcon: <SidebarLayoutIcon />,
 		},
 		{
 			value: "dark",
 			label: "Dark",
 			icon: "moon",
 			image: "/dashboard/ui-dark.png",
-			layoutIcon: isTopbar ? (
-				<TopbarLayoutIcon isDark />
-			) : (
-				<SidebarLayoutIcon isDark />
-			),
+			layoutIcon: <SidebarLayoutIcon isDark />,
 		},
 		{
 			value: "system",
 			label: "System",
 			icon: "monitor",
 			image: "/dashboard/ui-system.png",
-			layoutIcon: isTopbar ? (
-				<TopbarLayoutIcon defaultSystemTheme />
-			) : (
-				<SidebarLayoutIcon defaultSystemTheme />
-			),
+			layoutIcon: <SidebarLayoutIcon defaultSystemTheme />,
 		},
 	];
 

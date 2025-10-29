@@ -1,28 +1,8 @@
 "use client";
-import { useLayout } from "@fe/dashboard/providers/layout-provider";
 import { Icon } from "@reloop/ui/icon";
-import { SideBar } from "./components/sidebar";
 import { SettingsTabs } from "./components/tabs";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
-	const { layoutMode } = useLayout();
-
-	if (layoutMode === "topbar") {
-		return (
-			<div className="mb-64">
-				<div className="border-stroke-soft-100 border-b">
-					<div className="mx-auto max-w-5xl">
-						<h1 className="py-10 text-title-h3">Settings</h1>
-					</div>
-				</div>
-				<div className="mx-auto flex max-w-5xl">
-					<SideBar />
-					<div className="w-full flex-1 px-10 pt-5 pb-10">{children}</div>
-				</div>
-			</div>
-		);
-	}
-
 	return (
 		<div className="mb-64">
 			<div className="flex items-center gap-2 border-stroke-soft-100 border-b px-4 py-3.5">

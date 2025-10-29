@@ -3,7 +3,6 @@
 import { useLayout } from "@fe/dashboard/providers/layout-provider";
 import { cn } from "@reloop/ui/cn";
 import { SidebarLayoutIcon } from "./sidebar-layout-icon";
-import { TopbarLayoutIcon } from "./topbar-layout-icon";
 
 interface LayoutToggleButtonProps {
 	className?: string;
@@ -20,11 +19,6 @@ export const LayoutToggleButton: React.FC<LayoutToggleButtonProps> = ({
 			label: "Sidebar",
 			icon: SidebarLayoutIcon,
 		},
-		{
-			value: "topbar",
-			label: "Topbar",
-			icon: TopbarLayoutIcon,
-		},
 	];
 
 	return (
@@ -33,7 +27,7 @@ export const LayoutToggleButton: React.FC<LayoutToggleButtonProps> = ({
 				<button
 					type="button"
 					key={option.value}
-					onClick={() => setLayoutMode(option.value as "sidebar" | "topbar")}
+					onClick={() => setLayoutMode("sidebar")}
 					className={cn(
 						"rounded-xl border px-3 pt-2 pb-2.5 transition-all duration-200",
 						layoutMode === option.value
