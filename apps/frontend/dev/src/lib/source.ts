@@ -11,7 +11,7 @@ export const source = loader({
 			return createElement(Icon, { name: icon });
 		}
 	},
-	baseUrl: "/dev",
+	baseUrl: "/",
 	source: docs.toFumadocsSource(),
 });
 

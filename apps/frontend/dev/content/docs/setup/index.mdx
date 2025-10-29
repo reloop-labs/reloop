@@ -9,27 +9,13 @@ Get Reloop running on your local machine for development.
 
 import { Callout } from 'fumadocs-ui/components/callout'
 
-<Callout>
-  **Prerequisite:** Make sure <strong>Bun</strong> is installed before starting.
-</Callout>
 
-## Option 1: One-Command Setup
-
-Run this single command to clone, navigate, and install everything:
-
-```sh
-git clone git@github.com:reloop-labs/reloop.git && cd reloop && bun install
-```
-
----
-
-## Option 2: Manual Setup
-
-Follow these steps if you prefer to run commands individually:
 
 ### Install Bun
 
-If you don't have Bun installed, run:
+<Callout>
+  **Prerequisite:** Make sure <strong>Bun</strong> is installed before starting.
+</Callout>
 
 ```sh
 curl -fsSL https://bun.sh/install | bash
@@ -37,7 +23,10 @@ curl -fsSL https://bun.sh/install | bash
 
 **More details:** [https://bun.com/get](https://bun.com/get)
 
+
+
 ### 1. Clone the Repository
+
 
 ```sh
 git clone git@github.com:reloop-labs/reloop.git
@@ -72,3 +61,154 @@ echo "127.0.0.1 reloop.local" | sudo tee -a /etc/hosts
 - Allows proper routing between frontend, backend, and other services
 
 **Note:** You may need to enter your system password when running this command with `sudo`.
+
+### 5. Start Docker Services
+
+**Prerequisite:** Make sure Docker is installed and running on your system.
+
+Navigate to the local configuration directory and start all required services:
+
+```sh
+cd local
+docker compose up
+```
+
+This command will start all the necessary Docker containers for:
+- PostgreSQL database
+- Redis cache
+- ClickHouse analytics database
+- Grafana monitoring
+- Loki logging
+- Caddy reverse proxy
+
+### 6. Setup the Database
+
+Navigate to the database package directory and run the database setup commands:
+
+```sh
+cd packages/db
+```
+
+**Push database schema:**
+```sh
+bun run db:push
+```
+*This creates the database tables and schema using Drizzle ORM.*
+
+**Open database studio (optional):**
+```sh
+bun run db:studio
+```
+*This opens a visual UI for the database using Drizzle Studio.*
+
+**Seed the database:**
+```sh
+bun run db:seed
+```
+*This populates the database with default/initial data.*
+
+### 7. Start Frontend Services
+
+Reloop includes multiple frontend applications. You can start them individually or all together:
+
+**Main Web Application (Public Website):**
+```sh
+bun run fe:web:dev
+```
+*Starts the public-facing website on http://localhost:3000*
+
+**Admin Dashboard:**
+```sh
+bun run fe:admin:dev
+```
+*Starts the admin interface for managing users and system settings*
+
+**User Dashboard:**
+```sh
+bun run fe:dashboard:dev
+```
+*Starts the main user dashboard for managing domains, audiences, and campaigns*
+
+**Development Documentation:**
+```sh
+bun run fe:dev:dev
+```
+*Starts the development documentation site on http://localhost:3004*
+
+**Public Documentation:**
+```sh
+bun run fe:docs:dev
+```
+*Starts the public documentation site*
+
+### 8. Start Backend Services
+
+Reloop's backend consists of several microservices. Start them as needed:
+
+**Authentication Service:**
+```sh
+bun run be:auth:dev
+```
+*Handles user authentication, sessions, and permissions*
+
+**Domain Management Service:**
+```sh
+bun run be:domain:dev
+```
+*Manages domain registration, DNS configuration, and domain validation*
+
+**Audience Management Service:**
+```sh
+bun run be:audience:dev
+```
+*Handles audience creation, management, and segmentation*
+
+**Webhook Service:**
+```sh
+bun run be:webhook:dev
+```
+*Manages webhook subscriptions, deliveries, and event processing*
+
+**Mail Service:**
+```sh
+bun run be:mail:dev
+```
+*Handles email sending, templates, and mail server integration*
+
+
+### 9. Service Ports and URLs
+
+When running locally, services will be available at:
+
+| Service | URL | Port | Description |
+|---------|-----|------|-------------|
+| Web App | http://localhost:3000 | 3000 | Main public website |
+| Admin | http://localhost:3001 | 3001 | Admin dashboard |
+| Dashboard | http://localhost:3002 | 3002 | User dashboard |
+| Docs | http://localhost:3003 | 3003 | Public documentation |
+| Dev Docs | http://localhost:3004 | 3004 | Development documentation |
+| Auth API | http://localhost:4001 | 4001 | Authentication service |
+| Domain API | http://localhost:4002 | 4002 | Domain management |
+| Audience API | http://localhost:4003 | 4003 | Audience management |
+| Webhook API | http://localhost:4004 | 4004 | Webhook service |
+| Mail API | http://localhost:4005 | 4005 | Mail service |
+
+### 10. Development Workflow
+
+1. **Start Docker services** (PostgreSQL, Redis, etc.)
+2. **Setup database** (push schema, seed data)
+3. **Start backend services** (auth, domain, audience, etc.)
+4. **Start frontend services** (web, dashboard, admin, etc.)
+5. **Access applications** through their respective URLs
+
+**Quick start command:**
+```sh
+# Terminal 1: Start Docker
+cd local && docker compose up
+
+# Terminal 2: Setup database
+cd packages/db && bun run db:push && bun run db:seed
+
+# Terminal 3: Start all services
+bun run dev
+```
