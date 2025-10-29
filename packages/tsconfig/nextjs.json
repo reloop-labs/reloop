@@ -15,6 +15,7 @@
 			"@reloop/cache": ["../../packages/cache/src/*"],
 			"@reloop/ui": ["../../packages/ui/src/*"],
 			"@reloop/auth": ["../../packages/auth/src/*"],
+			"@reloop/domain": ["../../apps/backend/domain/src/*"],
 			"@fe/dashboard": ["../../apps/frontend/dashboard/src/*"],
 			"@fe/web": ["../../apps/frontend/web/src/*"]
 		}
