@@ -5,6 +5,7 @@ import * as LinkButton from "@reloop/ui/link-button";
 import { Logo } from "@reloop/ui/logo";
 import { AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import { Suspense } from "react";
 import { ResetPasswordForm } from "./reset-password-form";
 
 const Page = () => {
@@ -42,7 +43,9 @@ const Page = () => {
 						</div>
 					</div>
 					<AnimatePresence>
-						<ResetPasswordForm />
+						<Suspense fallback={null}>
+							<ResetPasswordForm />
+						</Suspense>
 					</AnimatePresence>
 					<div className="flex items-center justify-center gap-1">
 						<p className="text-paragraph-sm text-text-sub-600">
