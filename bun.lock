@@ -533,6 +533,9 @@
       "name": "@reloop/inngest",
       "version": "0.0.1",
       "dependencies": {
+        "@reloop/db": "workspace:*",
+        "@reloop/logger": "workspace:*",
+        "drizzle-orm": "catalog:db",
         "inngest": "catalog:backend",
       },
       "devDependencies": {
