@@ -17,7 +17,7 @@ on:
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: relooplabs/be-domain
+  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/be-domain
 
 jobs:
   build-and-push:
