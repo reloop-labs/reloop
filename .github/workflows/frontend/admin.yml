@@ -1,11 +1,11 @@
-name: FE Dev Docker
+name: FE Admin Docker
 
 on:
   push:
     branches:
       - main
     paths:
-      - 'apps/frontend/dev/**'
+      - 'apps/frontend/admin/**'
 
 permissions:
   contents: read
@@ -24,10 +24,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push dev image
+      - name: Build and push admin image
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: ./apps/frontend/dev/Dockerfile
+          file: ./apps/frontend/admin/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/fe-dev:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/fe-admin:latest
+

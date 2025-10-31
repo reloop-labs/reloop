@@ -1,4 +1,4 @@
-name: be-dovecot
+name: BE Dovecot
 
 on:
   push:
@@ -6,13 +6,13 @@ on:
     paths:
       - 'apps/backend/dovecot/**'
       - 'docker-compose.setup.yml'
-      - '.github/workflows/be-dovecot.yml'
+      - '.github/workflows/backend/dovecot.yml'
   pull_request:
     branches: [ main ]
     paths:
       - 'apps/backend/dovecot/**'
       - 'docker-compose.setup.yml'
-      - '.github/workflows/be-dovecot.yml'
+      - '.github/workflows/backend/dovecot.yml'
 
 env:
   REGISTRY: docker.io
@@ -62,3 +62,4 @@ jobs:
 
       - name: Image digest
         run: echo ${{ steps.build.outputs.digest }}
+

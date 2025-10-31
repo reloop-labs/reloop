@@ -1,5 +1,9 @@
+"use client";
+
+import { ApiKeyListSidebar } from "./components/api-key-list";
+
 const ApiKeysPage = () => {
-	return <div>ApiKeys</div>;
+	return <ApiKeyListSidebar />;
 };
 
 export default ApiKeysPage;

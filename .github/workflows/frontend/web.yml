@@ -1,15 +1,16 @@
-name: FE Main Docker
+name: FE Web Docker
 
 on:
   push:
     branches:
       - main
     paths:
-      - 'apps/frontend/dashboard/**'
+      - 'apps/frontend/web/**'
 
 permissions:
   contents: read
   packages: write
+
 
 jobs:
   build_and_publish:
@@ -28,6 +29,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: ./apps/frontend/dashboard/Dockerfile
+          file: ./apps/frontend/web/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/fe-dashboard:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/fe-web:latest
+

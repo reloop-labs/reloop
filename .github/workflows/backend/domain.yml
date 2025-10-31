@@ -1,22 +1,22 @@
-name: be-rspamd
+name: BE Domain
 
 on:
   push:
     branches: [ main ]
     paths:
-      - 'apps/backend/rspamd/**'
+      - 'apps/backend/domain/**'
       - 'docker-compose.setup.yml'
-      - '.github/workflows/be-rspamd.yml'
+      - '.github/workflows/backend/domain.yml'
   pull_request:
     branches: [ main ]
     paths:
-      - 'apps/backend/rspamd/**'
+      - 'apps/backend/domain/**'
       - 'docker-compose.setup.yml'
-      - '.github/workflows/be-rspamd.yml'
+      - '.github/workflows/backend/domain.yml'
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: relooplabs/be-rspamd
+  IMAGE_NAME: relooplabs/be-domain
 
 jobs:
   build-and-push:
@@ -51,8 +51,8 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./apps/backend/rspamd
-          file: ./apps/backend/rspamd/docker/Dockerfile
+          context: .
+          file: ./apps/backend/domain/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -62,3 +62,4 @@ jobs:
 
       - name: Image digest
         run: echo ${{ steps.build.outputs.digest }}
+
