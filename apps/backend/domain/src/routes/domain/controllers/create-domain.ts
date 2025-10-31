@@ -11,6 +11,7 @@ import {
 	invalidateDomainListCache,
 	invalidateOrganizationCache,
 } from "@reloop/domain/utils/cache-helpers";
+import { inngest } from "@reloop/inngest/client";
 import { logger } from "@reloop/logger";
 import { and, eq } from "drizzle-orm";
 import { status } from "elysia";
@@ -164,7 +165,6 @@ export async function createDomain(
 
 		// Trigger domain verification workflow via Inngest
 		try {
-			const { inngest } = await import("@reloop/inngest/lib/inngest-client");
 			await inngest.send({
 				name: "verify/domain",
 				data: {

@@ -1,8 +1,8 @@
 import "dotenv/config";
 import { fromTypes, openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
+import { inngest } from "@reloop/inngest/client";
 import { webhookDeliver } from "@reloop/inngest/functions/webhook";
-import { inngest } from "@reloop/inngest/lib/inngest-client";
 import { logger } from "@reloop/logger";
 import { deliveryRoutes } from "@reloop/webhook/routes/delivery/delivery.routes";
 import { eventRoutes } from "@reloop/webhook/routes/event/event.routes";

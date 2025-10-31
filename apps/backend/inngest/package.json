@@ -16,7 +16,8 @@
 		"elysia": "catalog:backend",
 		"inngest": "catalog:backend",
 		"@reloop/db": "workspace:*",
-		"@reloop/logger": "workspace:*"
+		"@reloop/logger": "workspace:*",
+		"@reloop/inngest": "workspace:*"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",

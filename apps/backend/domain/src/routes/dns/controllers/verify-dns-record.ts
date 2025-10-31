@@ -5,6 +5,7 @@ import {
 	invalidateDNSRecordsCache,
 	invalidateDomainCache,
 } from "@reloop/domain/utils/cache-helpers";
+import { inngest } from "@reloop/inngest/client";
 import { logger } from "@reloop/logger";
 import { and, eq } from "drizzle-orm";
 
@@ -74,7 +75,6 @@ export async function verifyDNSRecordHandler(
 
 		// Trigger DNS verification workflow via Inngest for background verification
 		try {
-			const { inngest } = await import("@reloop/inngest/lib/inngest-client");
 			const dnsRecord = await db.query.domainDnsRecord.findFirst({
 				where: and(
 					eq(schema.domainDnsRecord.domainId, domainRecord[0].id),

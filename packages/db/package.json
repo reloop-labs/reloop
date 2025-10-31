@@ -29,7 +29,8 @@
 		"drizzle-typebox": "catalog:db",
 		"pg": "catalog:db",
 		"redis": "catalog:db",
-		"@paralleldrive/cuid2": "catalog:backend"
+		"@paralleldrive/cuid2": "catalog:backend",
+		"@reloop/inngest": "workspace:*"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",

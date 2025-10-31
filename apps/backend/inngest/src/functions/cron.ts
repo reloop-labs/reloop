@@ -1,8 +1,8 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
+import { inngest } from "@reloop/inngest/client";
 import { logger } from "@reloop/logger";
 import { and, eq, isNull, lt } from "drizzle-orm";
-import { inngest } from "../lib/inngest-client";
 
 // Domain verification cron job
 export const cronDomainVerification = inngest.createFunction(
@@ -35,15 +35,16 @@ export const cronDomainVerification = inngest.createFunction(
         // Trigger verification for each domain
         await step.run("trigger-verifications", async () => {
             await Promise.all(
-                domains.map((domain: { id: string; domain: string; organizationId: string }) =>
-                    inngest.send({
-                        name: "verify/domain",
-                        data: {
-                            domainId: domain.id,
-                            domain: domain.domain,
-                            organizationId: domain.organizationId,
-                        },
-                    }),
+                domains.map(
+                    (domain: { id: string; domain: string; organizationId: string }) =>
+                        inngest.send({
+                            name: "verify/domain",
+                            data: {
+                                domainId: domain.id,
+                                domain: domain.domain,
+                                organizationId: domain.organizationId,
+                            },
+                        }),
                 ),
             );
 

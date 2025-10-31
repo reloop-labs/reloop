@@ -1,0 +1,19 @@
+{
+	"name": "@reloop/inngest",
+	"version": "0.0.1",
+	"private": true,
+	"exports": {
+		"./client": "./src/client.ts",
+		"./server": "./src/server.ts",
+		"./functions/webhook": "../../apps/backend/inngest/src/functions/webhook.ts",
+		"./functions": "../../apps/backend/inngest/src/functions/index.ts",
+		"./index": "./src/index.ts"
+	},
+	"dependencies": {
+		"inngest": "catalog:backend"
+	},
+	"devDependencies": {
+		"@reloop/tsconfig": "workspace:*",
+		"typescript": "catalog:"
+	}
+}

@@ -1,9 +1,9 @@
+import { createHmac } from "node:crypto";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
+import { inngest } from "@reloop/inngest/client";
 import { logger } from "@reloop/logger";
 import { and, eq, isNull } from "drizzle-orm";
-import { inngest } from "../lib/inngest-client";
-
 
 export const webhookDeliver = inngest.createFunction(
     {
@@ -14,7 +14,24 @@ export const webhookDeliver = inngest.createFunction(
     {
         event: "webhook/deliver",
     },
-    async ({ event, step }: { event: { data: { deliveryId: string; webhookId: string; eventId: string; eventData: Record<string, unknown>; requestUrl: string; requestHeaders?: Record<string, string>; requestBody?: Record<string, unknown>; maxAttempts: number } }; step: any }) => {
+    async ({
+        event,
+        step,
+    }: {
+        event: {
+            data: {
+                deliveryId: string;
+                webhookId: string;
+                eventId: string;
+                eventData: Record<string, unknown>;
+                requestUrl: string;
+                requestHeaders?: Record<string, string>;
+                requestBody?: Record<string, unknown>;
+                maxAttempts: number;
+            };
+        };
+        step: any;
+    }) => {
         const {
             deliveryId,
             webhookId,
@@ -61,10 +78,8 @@ export const webhookDeliver = inngest.createFunction(
             };
 
             if (webhook.secret) {
-                const crypto = await import("node:crypto");
                 const payload = JSON.stringify(eventData);
-                const signature = crypto
-                    .createHmac("sha256", webhook.secret)
+                const signature = createHmac("sha256", webhook.secret)
                     .update(payload)
                     .digest("hex");
                 defaultHeaders["X-Webhook-Signature"] = `sha256=${signature}`;
@@ -124,7 +139,9 @@ export const webhookDeliver = inngest.createFunction(
                     responseHeaders: response.headers,
                     lastAttemptAt: new Date(),
                     completedAt: isSuccess ? new Date() : null,
-                    errorMessage: isSuccess ? null : `HTTP ${response.status}: ${response.statusText}`,
+                    errorMessage: isSuccess
+                        ? null
+                        : `HTTP ${response.status}: ${response.statusText}`,
                 })
                 .where(eq(schema.webhookDelivery.id, deliveryId));
 
@@ -177,4 +194,3 @@ export const webhookDeliver = inngest.createFunction(
         };
     },
 );
-

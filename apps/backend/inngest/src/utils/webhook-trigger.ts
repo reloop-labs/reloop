@@ -1,8 +1,8 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
+import { inngest } from "@reloop/inngest/client";
 import { logger } from "@reloop/logger";
 import { eq } from "drizzle-orm";
-import { inngest } from "../lib/inngest-client";
 
 interface TriggerWebhookDeliveryParams {
     eventId: string;
@@ -33,7 +33,8 @@ export async function triggerWebhookDelivery({
             if (!sub.isEnabled || !sub.webhook) return false;
             if (sub.webhook.status !== "active") return false;
             if (sub.webhook.deletedAt !== null) return false;
-            if (organizationId && sub.webhook.organizationId !== organizationId) return false;
+            if (organizationId && sub.webhook.organizationId !== organizationId)
+                return false;
             return true;
         });
 

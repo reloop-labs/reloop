@@ -1,6 +1,6 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { inngest } from "@reloop/inngest/lib/inngest-client";
+import { inngest } from "@reloop/inngest/client";
 import { logger } from "@reloop/logger";
 import { and, eq } from "drizzle-orm";
 import { status } from "elysia";

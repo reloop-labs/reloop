@@ -1,8 +1,8 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
+import { inngest } from "@reloop/inngest/client";
 import { logger } from "@reloop/logger";
 import { and, eq, isNull } from "drizzle-orm";
-import { inngest } from "../lib/inngest-client";
 
 // Domain verification workflow
 export const verifyDomain = inngest.createFunction(
@@ -14,7 +14,15 @@ export const verifyDomain = inngest.createFunction(
     {
         event: "verify/domain",
     },
-    async ({ event, step }: { event: { data: { domainId: string; domain: string; organizationId: string } }; step: any }) => {
+    async ({
+        event,
+        step,
+    }: {
+        event: {
+            data: { domainId: string; domain: string; organizationId: string };
+        };
+        step: any;
+    }) => {
         const { domainId, domain, organizationId } = event.data;
 
         // Fetch domain details
@@ -43,7 +51,9 @@ export const verifyDomain = inngest.createFunction(
             const records = domainRecord.dnsRecords || [];
             const foundRecords = new Set(
                 records
-                    .filter((r: { recordType: string }) => requiredRecords.includes(r.recordType))
+                    .filter((r: { recordType: string }) =>
+                        requiredRecords.includes(r.recordType),
+                    )
                     .map((r: { recordType: string }) => r.recordType),
             );
 
@@ -52,7 +62,9 @@ export const verifyDomain = inngest.createFunction(
             return {
                 allFound,
                 foundRecords: Array.from(foundRecords),
-                missingRecords: requiredRecords.filter((type) => !foundRecords.has(type)),
+                missingRecords: requiredRecords.filter(
+                    (type) => !foundRecords.has(type),
+                ),
             };
         });
 
@@ -113,8 +125,30 @@ export const verifyDNSRecord = inngest.createFunction(
     {
         event: "verify/dns-record",
     },
-    async ({ event, step }: { event: { data: { dnsRecordId: string; domainId: string; recordType: string; name: string; value: string; organizationId: string } }; step: any }) => {
-        const { dnsRecordId, domainId: _domainId, recordType, name, value: _value, organizationId } = event.data;
+    async ({
+        event,
+        step,
+    }: {
+        event: {
+            data: {
+                dnsRecordId: string;
+                domainId: string;
+                recordType: string;
+                name: string;
+                value: string;
+                organizationId: string;
+            };
+        };
+        step: any;
+    }) => {
+        const {
+            dnsRecordId,
+            domainId: _domainId,
+            recordType,
+            name,
+            value: _value,
+            organizationId,
+        } = event.data;
 
         // Fetch DNS record
         const dnsRecord = await step.run("fetch-dns-record", async () => {
@@ -197,4 +231,3 @@ export const verifyDNSRecord = inngest.createFunction(
         };
     },
 );
-

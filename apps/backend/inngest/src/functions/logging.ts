@@ -1,6 +1,6 @@
 import { db } from "@reloop/db/client";
+import { inngest } from "@reloop/inngest/client";
 import { logger } from "@reloop/logger";
-import { inngest } from "../lib/inngest-client";
 
 // Event logging function
 export const logEvent = inngest.createFunction(
@@ -12,8 +12,23 @@ export const logEvent = inngest.createFunction(
     {
         event: "log/event",
     },
-    async ({ event, step }: { event: { data: { eventType: string; eventData: Record<string, unknown>; organizationId?: string; userId?: string; metadata?: Record<string, unknown> } }; step: any }) => {
-        const { eventType, eventData, organizationId, userId, metadata } = event.data;
+    async ({
+        event,
+        step,
+    }: {
+        event: {
+            data: {
+                eventType: string;
+                eventData: Record<string, unknown>;
+                organizationId?: string;
+                userId?: string;
+                metadata?: Record<string, unknown>;
+            };
+        };
+        step: any;
+    }) => {
+        const { eventType, eventData, organizationId, userId, metadata } =
+            event.data;
 
         // Log to console/file
         await step.run("log-to-stdout", async () => {
@@ -71,4 +86,3 @@ export const logEvent = inngest.createFunction(
         };
     },
 );
-
