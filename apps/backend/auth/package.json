@@ -36,7 +36,7 @@
 		"zod": "catalog:ui",
 		"@reloop/db": "workspace:*",
 		"@reloop/cache": "workspace:*",
-		"@reloop/email": "workspace:*",
+		"@reloop/react-email": "workspace:*",
 		"@reloop/logger": "workspace:*",
 		"@elysiajs/eden": "catalog:backend"
 	},
