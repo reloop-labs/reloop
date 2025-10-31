@@ -1,4 +1,4 @@
-name: BE Domain
+name: BE Domain Docker
 
 on:
   push:

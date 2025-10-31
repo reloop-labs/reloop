@@ -1,4 +1,4 @@
-name: BE Dovecot
+name: BE Dovecot Docker
 
 on:
   push:

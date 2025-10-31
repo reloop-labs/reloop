@@ -1,4 +1,4 @@
-name: BE Auth
+name: BE Auth Docker
 
 on:
   push:

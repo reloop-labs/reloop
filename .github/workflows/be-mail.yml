@@ -1,4 +1,4 @@
-name: BE Mail
+name: BE Mail Docker
 
 on:
   push:

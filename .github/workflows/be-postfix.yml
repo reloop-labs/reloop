@@ -1,4 +1,4 @@
-name: BE Postfix
+name: BE Postfix Docker
 
 on:
   push:

@@ -1,4 +1,4 @@
-name: BE Rspamd
+name: BE Rspamd Docker
 
 on:
   push:

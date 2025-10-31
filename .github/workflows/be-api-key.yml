@@ -1,4 +1,4 @@
-name: BE API Key
+name: BE API Key Docker
 
 on:
   push:
