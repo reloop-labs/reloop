@@ -1,22 +1,22 @@
-name: BE Domain
+name: BE Postfix
 
 on:
   push:
     branches: [ main ]
     paths:
-      - 'apps/backend/domain/**'
+      - 'apps/backend/postfix/**'
       - 'docker-compose.setup.yml'
-      - '.github/workflows/backend/domain.yml'
+      - '.github/workflows/be-postfix.yml'
   pull_request:
     branches: [ main ]
     paths:
-      - 'apps/backend/domain/**'
+      - 'apps/backend/postfix/**'
       - 'docker-compose.setup.yml'
-      - '.github/workflows/backend/domain.yml'
+      - '.github/workflows/be-postfix.yml'
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: relooplabs/be-domain
+  IMAGE_NAME: relooplabs/be-postfix
 
 jobs:
   build-and-push:
@@ -51,8 +51,8 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: .
-          file: ./apps/backend/domain/Dockerfile
+          context: ./apps/backend/postfix
+          file: ./apps/backend/postfix/docker/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

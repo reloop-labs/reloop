@@ -1,22 +1,22 @@
-name: BE Rspamd
+name: BE Auth
 
 on:
   push:
     branches: [ main ]
     paths:
-      - 'apps/backend/rspamd/**'
+      - 'apps/backend/auth/**'
       - 'docker-compose.setup.yml'
-      - '.github/workflows/backend/rspamd.yml'
+      - '.github/workflows/be-auth.yml'
   pull_request:
     branches: [ main ]
     paths:
-      - 'apps/backend/rspamd/**'
+      - 'apps/backend/auth/**'
       - 'docker-compose.setup.yml'
-      - '.github/workflows/backend/rspamd.yml'
+      - '.github/workflows/be-auth.yml'
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: relooplabs/be-rspamd
+  IMAGE_NAME: relooplabs/be-auth
 
 jobs:
   build-and-push:
@@ -51,8 +51,8 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./apps/backend/rspamd
-          file: ./apps/backend/rspamd/docker/Dockerfile
+          context: .
+          file: ./apps/backend/auth/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

@@ -1,22 +1,22 @@
-name: BE API Key
+name: BE Dovecot
 
 on:
   push:
     branches: [ main ]
     paths:
-      - 'apps/backend/api-key/**'
+      - 'apps/backend/dovecot/**'
       - 'docker-compose.setup.yml'
-      - '.github/workflows/backend/api-key.yml'
+      - '.github/workflows/be-dovecot.yml'
   pull_request:
     branches: [ main ]
     paths:
-      - 'apps/backend/api-key/**'
+      - 'apps/backend/dovecot/**'
       - 'docker-compose.setup.yml'
-      - '.github/workflows/backend/api-key.yml'
+      - '.github/workflows/be-dovecot.yml'
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: relooplabs/be-api-key
+  IMAGE_NAME: relooplabs/be-dovecot
 
 jobs:
   build-and-push:
@@ -51,8 +51,8 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: .
-          file: ./apps/backend/api-key/Dockerfile
+          context: ./apps/backend/dovecot
+          file: ./apps/backend/dovecot/docker/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

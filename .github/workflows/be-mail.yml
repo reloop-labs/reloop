@@ -1,22 +1,22 @@
-name: BE Auth
+name: BE Mail
 
 on:
   push:
     branches: [ main ]
     paths:
-      - 'apps/backend/auth/**'
+      - 'apps/backend/mail/**'
       - 'docker-compose.setup.yml'
-      - '.github/workflows/backend/auth.yml'
+      - '.github/workflows/be-mail.yml'
   pull_request:
     branches: [ main ]
     paths:
-      - 'apps/backend/auth/**'
+      - 'apps/backend/mail/**'
       - 'docker-compose.setup.yml'
-      - '.github/workflows/backend/auth.yml'
+      - '.github/workflows/be-mail.yml'
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: relooplabs/be-auth
+  IMAGE_NAME: relooplabs/be-mail
 
 jobs:
   build-and-push:
@@ -52,7 +52,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./apps/backend/auth/Dockerfile
+          file: ./apps/backend/mail/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
