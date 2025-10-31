@@ -13,6 +13,7 @@ on:
       - 'apps/backend/api-key/**'
       - 'docker-compose.setup.yml'
       - '.github/workflows/be-api-key.yml'
+  workflow_dispatch:
 
 env:
   REGISTRY: docker.io
