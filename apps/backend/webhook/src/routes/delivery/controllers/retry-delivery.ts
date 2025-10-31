@@ -1,5 +1,6 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
+import { inngest } from "@reloop/inngest/lib/inngest-client";
 import { logger } from "@reloop/logger";
 import { and, eq } from "drizzle-orm";
 import { status } from "elysia";
@@ -26,6 +27,7 @@ export async function retryDelivery(
             ),
             with: {
                 webhook: true,
+                event: true,
             },
         });
 
@@ -49,21 +51,40 @@ export async function retryDelivery(
             });
         }
 
-        // Update delivery status to retrying and reset retry timestamp
+        // Update delivery status to retrying and trigger Inngest
         await db
             .update(schema.webhookDelivery)
             .set({
                 status: "retrying",
-                nextRetryAt: new Date(), // Retry immediately
+                nextRetryAt: new Date(),
             })
             .where(eq(schema.webhookDelivery.id, deliveryId));
+
+        // Trigger Inngest webhook delivery
+        await inngest.send({
+            name: "webhook/deliver",
+            data: {
+                deliveryId: delivery.id,
+                webhookId: delivery.webhookId,
+                eventId: delivery.eventId,
+                eventData: delivery.eventData as Record<string, unknown>,
+                requestUrl: delivery.requestUrl,
+                requestHeaders: delivery.requestHeaders as
+                    | Record<string, string>
+                    | undefined,
+                requestBody: delivery.requestBody as
+                    | Record<string, unknown>
+                    | undefined,
+                maxAttempts: delivery.maxAttempts,
+            },
+        });
 
         logger.info(
             {
                 deliveryId,
                 organizationId,
             },
-            "Delivery retry initiated successfully",
+            "Delivery retry initiated successfully via Inngest",
         );
 
         return { message: "Delivery retry initiated successfully" };

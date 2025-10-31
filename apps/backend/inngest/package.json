@@ -1,0 +1,27 @@
+{
+	"name": "inngest",
+	"main": "src/index.ts",
+	"type": "module",
+	"scripts": {
+		"build": "tsdown",
+		"check-types": "tsc --noEmit",
+		"compile": "bun build --compile --minify --sourcemap --bytecode ./src/index.ts --outfile server",
+		"dev": "bun run --hot src/index.ts",
+		"start": "bun run dist/index.js"
+	},
+	"dependencies": {
+		"@elysiajs/cors": "catalog:backend",
+		"dotenv": "catalog:backend",
+		"drizzle-orm": "catalog:db",
+		"elysia": "catalog:backend",
+		"inngest": "catalog:backend",
+		"@reloop/db": "workspace:*",
+		"@reloop/logger": "workspace:*"
+	},
+	"devDependencies": {
+		"@reloop/tsconfig": "workspace:*",
+		"tsdown": "catalog:backend",
+		"typescript": "catalog:",
+		"@types/bun": "catalog:backend"
+	}
+}

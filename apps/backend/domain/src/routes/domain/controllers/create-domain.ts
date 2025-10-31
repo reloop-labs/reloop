@@ -162,6 +162,28 @@ export async function createDomain(
 		await invalidateDomainListCache(organizationId);
 		await invalidateOrganizationCache(organizationId);
 
+		// Trigger domain verification workflow via Inngest
+		try {
+			const { inngest } = await import("@reloop/inngest/lib/inngest-client");
+			await inngest.send({
+				name: "verify/domain",
+				data: {
+					domainId: newDomain[0].id,
+					domain: domain,
+					organizationId: organizationId,
+				},
+			});
+			logger.info({ domainId: newDomain[0].id, domain }, "Domain verification triggered");
+		} catch (error) {
+			logger.warn(
+				{
+					domain,
+					error: error instanceof Error ? error.message : String(error),
+				},
+				"Failed to trigger domain verification, will be picked up by cron",
+			);
+		}
+
 		if (!domainWithDnsRecords) {
 			logger.error(
 				{ domain },

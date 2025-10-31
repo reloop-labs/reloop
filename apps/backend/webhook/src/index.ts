@@ -1,6 +1,8 @@
 import "dotenv/config";
 import { fromTypes, openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
+import { webhookDeliver } from "@reloop/inngest/functions/webhook";
+import { inngest } from "@reloop/inngest/lib/inngest-client";
 import { logger } from "@reloop/logger";
 import { deliveryRoutes } from "@reloop/webhook/routes/delivery/delivery.routes";
 import { eventRoutes } from "@reloop/webhook/routes/event/event.routes";
@@ -8,6 +10,7 @@ import { landing } from "@reloop/webhook/routes/landing/landing.index";
 import { subscriptionRoutes } from "@reloop/webhook/routes/subscription/subscription.routes";
 import { webhookRoutes } from "@reloop/webhook/routes/webhook/webhook.routes";
 import { Elysia } from "elysia";
+import { serve } from "inngest/elysia";
 
 const port = 8013;
 const webhookService = new Elysia({
@@ -24,6 +27,12 @@ const webhookService = new Elysia({
 		}),
 	)
 	.use(serverTiming())
+	.use(
+		serve({
+			client: inngest,
+			functions: [webhookDeliver],
+		}),
+	)
 	.use(landing)
 	.use(webhookRoutes)
 	.use(eventRoutes)

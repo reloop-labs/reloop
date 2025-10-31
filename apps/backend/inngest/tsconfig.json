@@ -15,8 +15,7 @@
 		"declarationMap": false,
 		"baseUrl": ".",
 		"paths": {
-			"@reloop/webhook/*": ["./src/*"],
-			"@reloop/inngest/*": ["../../inngest/src/*"]
+			"@reloop/inngest/*": ["./src/*"]
 		}
 	}
 }

@@ -47,17 +47,17 @@ export async function verifyDNSRecordHandler(
 					eq(
 						schema.domainDnsRecord.recordType,
 						body.recordType as
-							| "A"
-							| "AAAA"
-							| "CNAME"
-							| "MX"
-							| "TXT"
-							| "NS"
-							| "SRV"
-							| "CAA"
-							| "SPF"
-							| "DKIM"
-							| "DMARC",
+						| "A"
+						| "AAAA"
+						| "CNAME"
+						| "MX"
+						| "TXT"
+						| "NS"
+						| "SRV"
+						| "CAA"
+						| "SPF"
+						| "DKIM"
+						| "DMARC",
 					),
 					eq(schema.domainDnsRecord.name, body.name),
 				),
@@ -71,6 +71,52 @@ export async function verifyDNSRecordHandler(
 			},
 			"DNS record marked as verified",
 		);
+
+		// Trigger DNS verification workflow via Inngest for background verification
+		try {
+			const { inngest } = await import("@reloop/inngest/lib/inngest-client");
+			const dnsRecord = await db.query.domainDnsRecord.findFirst({
+				where: and(
+					eq(schema.domainDnsRecord.domainId, domainRecord[0].id),
+					eq(schema.domainDnsRecord.recordType, body.recordType as
+						| "A"
+						| "AAAA"
+						| "CNAME"
+						| "MX"
+						| "TXT"
+						| "NS"
+						| "SRV"
+						| "CAA"
+						| "SPF"
+						| "DKIM"
+						| "DMARC"),
+					eq(schema.domainDnsRecord.name, body.name),
+				),
+			});
+
+			if (dnsRecord) {
+				await inngest.send({
+					name: "verify/dns-record",
+					data: {
+						dnsRecordId: dnsRecord.id,
+						domainId: domainRecord[0].id,
+						recordType: body.recordType,
+						name: body.name,
+						value: dnsRecord.value,
+						organizationId: organizationId,
+					},
+				});
+				logger.info({ dnsRecordId: dnsRecord.id }, "DNS record verification triggered");
+			}
+		} catch (error) {
+			logger.warn(
+				{
+					domain,
+					error: error instanceof Error ? error.message : String(error),
+				},
+				"Failed to trigger DNS verification, will continue with manual verification",
+			);
+		}
 
 		// Invalidate caches after successful verification
 		await invalidateDomainCache(domain, organizationId);

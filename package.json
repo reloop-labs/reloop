@@ -128,7 +128,8 @@
 				"pino": "^10.0.0",
 				"pino-pretty": "^13.1.2",
 				"resend": "^3.2.0",
-				"@elysiajs/openapi": "^1.4.11"
+				"@elysiajs/openapi": "^1.4.11",
+				"inngest": "^3.44.4"
 			}
 		}
 	},
@@ -163,10 +164,13 @@
 		"be:api-key:dev": "bun run --filter=api-key dev",
 		"be:api-key:build": "bun run --filter=api-key build",
 		"be:api-key:start": "bun run --filter=api-key start",
+		"be:inngest:dev": "bun run --filter=inngest dev",
+		"be:inngest:build": "bun run --filter=inngest build",
+		"be:inngest:start": "bun run --filter=inngest start",
 		"check": "biome check --write .",
 		"frontend:dev": "turbo dev --filter='dashboard' --filter='dev' --filter='docs' --filter='web'",
-		"backend:dev": "turbo dev --filter='audience' --filter='auth' --filter='domain' --filter='mail' --filter='webhook' --filter='api-key'",
-		"reloop:dev": "turbo dev --filter='dashboard' --filter='dev' --filter='docs' --filter='web' --filter='audience' --filter='auth' --filter='domain' --filter='mail' --filter='webhook' --filter='api-key'",
+		"backend:dev": "turbo dev --filter='audience' --filter='auth' --filter='domain' --filter='mail' --filter='webhook' --filter='api-key' --filter='inngest'",
+		"reloop:dev": "turbo dev --filter='dashboard' --filter='dev' --filter='docs' --filter='web' --filter='audience' --filter='auth' --filter='domain' --filter='mail' --filter='webhook' --filter='api-key' --filter='inngest'",
 		"docker:up": "docker compose -f local/docker-compose.yml up -d",
 		"docker:down": "docker compose -f local/docker-compose.yml down",
 		"db:push": "bun run --filter=@reloop/db push",
