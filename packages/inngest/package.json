@@ -5,12 +5,15 @@
 	"exports": {
 		"./client": "./src/client.ts",
 		"./server": "./src/server.ts",
-		"./functions/webhook": "../../apps/backend/inngest/src/functions/webhook.ts",
-		"./functions": "../../apps/backend/inngest/src/functions/index.ts",
+		"./functions/webhook": "./src/functions/webhook.ts",
+		"./functions": "./src/functions/index.ts",
 		"./index": "./src/index.ts"
 	},
 	"dependencies": {
-		"inngest": "catalog:backend"
+		"inngest": "catalog:backend",
+		"drizzle-orm": "catalog:db",
+		"@reloop/db": "workspace:*",
+		"@reloop/logger": "workspace:*"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",

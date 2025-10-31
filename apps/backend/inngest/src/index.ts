@@ -12,7 +12,7 @@ import {
     verifyDNSRecord,
     verifyDomain,
     webhookDeliver,
-} from "./functions";
+} from "@reloop/inngest/functions";
 
 const port = 8014;
 
