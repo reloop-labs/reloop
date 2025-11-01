@@ -13,7 +13,8 @@
 		"inngest": "catalog:backend",
 		"drizzle-orm": "catalog:db",
 		"@reloop/db": "workspace:*",
-		"@reloop/logger": "workspace:*"
+		"@reloop/logger": "workspace:*",
+		"@reloop/analytics": "workspace:*"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",

@@ -1,0 +1,26 @@
+{
+	"name": "@reloop/analytics",
+	"version": "0.0.1",
+	"private": true,
+	"type": "module",
+	"exports": {
+		"./web": "./src/web/index.ts",
+		"./backend": "./src/backend/index.ts",
+		"./client": "./src/client.ts",
+		"./schema": "./src/schema.ts",
+		"./index": "./src/index.ts"
+	},
+	"scripts": {
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@clickhouse/client": "^0.2.8",
+		"@paralleldrive/cuid2": "catalog:backend"
+	},
+	"devDependencies": {
+		"@reloop/tsconfig": "workspace:*",
+		"@types/node": "catalog:",
+		"typescript": "catalog:"
+	}
+}
+

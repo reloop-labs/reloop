@@ -1,6 +1,7 @@
 import { db } from "@reloop/db/client";
 import { inngest } from "@reloop/inngest/client";
 import { logger } from "@reloop/logger";
+import analytics from "@reloop/analytics/backend";
 
 // Event logging function
 export const logEvent = inngest.createFunction(
@@ -45,23 +46,55 @@ export const logEvent = inngest.createFunction(
             );
         });
 
-        // Store event in database if needed
-        // This is a placeholder - you might want to create an events table
+        // Store event in ClickHouse analytics database
         await step.run("store-event", async () => {
-            // Placeholder: Store event in database
-            // In production, you might want to:
-            // 1. Create an events table
-            // 2. Store structured event data
-            // 3. Enable event querying and analytics
+            const analyticsInstance = analytics();
 
-            logger.debug(
-                {
+            // Determine distinct_id (userId takes precedence)
+            const distinctId = userId || organizationId || "anonymous";
+
+            // Combine eventData and metadata into properties
+            const properties = {
+                ...eventData,
+                ...(metadata || {}),
+            };
+
+            try {
+                await analyticsInstance.s.event(
                     eventType,
-                    organizationId,
-                    userId,
-                },
-                "Event stored",
-            );
+                    distinctId,
+                    properties,
+                    {
+                        organizationId: organizationId || null,
+                        requestContext: {
+                            // Extract any relevant context from eventData
+                            userAgent: eventData.userAgent as string,
+                            url: eventData.url as string,
+                            referer: eventData.referer as string,
+                        },
+                    },
+                );
+
+                logger.debug(
+                    {
+                        eventType,
+                        organizationId,
+                        userId,
+                    },
+                    "Event stored in ClickHouse",
+                );
+            } catch (error) {
+                logger.error(
+                    {
+                        error,
+                        eventType,
+                        organizationId,
+                        userId,
+                    },
+                    "Failed to store event in ClickHouse",
+                );
+                // Don't throw - we want to continue even if analytics fails
+            }
         });
 
         // Trigger any follow-up actions based on event type
