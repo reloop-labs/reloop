@@ -66,12 +66,6 @@ export const logEvent = inngest.createFunction(
                     properties,
                     {
                         organizationId: organizationId || null,
-                        requestContext: {
-                            // Extract any relevant context from eventData
-                            userAgent: eventData.userAgent as string,
-                            url: eventData.url as string,
-                            referer: eventData.referer as string,
-                        },
                     },
                 );
 

@@ -2,7 +2,6 @@ import type { AnalyticsClientOptions } from "../client.js";
 import { AnalyticsTracker } from "./tracker.js";
 import type { Properties } from "./types.js";
 import { PulseHTTPError } from "./types.js";
-import type { RequestContext } from "./utils/properties.js";
 
 export interface AnalyticsConfig extends AnalyticsClientOptions {
 	// Additional config options can be added here
@@ -22,7 +21,6 @@ export default function analytics(config?: AnalyticsConfig | string) {
 			properties: Properties = {},
 			options?: {
 				organizationId?: string | null;
-				requestContext?: RequestContext;
 			},
 		): Promise<number> {
 			try {
@@ -44,7 +42,6 @@ export default function analytics(config?: AnalyticsConfig | string) {
 			properties: Properties = {},
 			options?: {
 				organizationId?: string | null;
-				requestContext?: RequestContext;
 			},
 		): Promise<number> {
 			try {
@@ -69,4 +66,3 @@ export default function analytics(config?: AnalyticsConfig | string) {
 
 export { AnalyticsTracker } from "./tracker.js";
 export * from "./types.js";
-export type { RequestContext } from "./utils/properties.js";

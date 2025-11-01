@@ -24,17 +24,13 @@ export async function trackEvent(
 		// Use the analytics backend package to track the event
 		const analyticsInstance = analytics();
 
-		// Track the event - the analytics package will generate the UUID
+		// Track the event - just pass properties as-is, no enrichment
 		await analyticsInstance.s.event(
 			event,
 			userId,
 			properties || {},
 			{
 				organizationId: organization_id || null,
-				requestContext: {
-					// Extract request context if available
-					// This could be enhanced with actual request headers if passed
-				},
 			},
 		);
 

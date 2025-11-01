@@ -1,9 +1,9 @@
 export type Properties = { [key: string]: string | number | Properties };
 
 export class PulseHTTPError extends Error {
-	statusCode: number;
+	statusCode;
 
-	constructor(statusCode: number, message: string = "") {
+	constructor(statusCode: number, message = "") {
 		super(message);
 		this.name = "PulseHTTPError";
 		this.statusCode = statusCode;

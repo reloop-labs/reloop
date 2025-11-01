@@ -4,14 +4,12 @@ import type {
 } from "../client.js";
 import { createAnalyticsClient } from "../client.js";
 import type { Properties } from "./types.js";
-import { getProperties, type RequestContext } from "./utils/properties.js";
 
 export interface TrackOptions {
 	name: string;
 	userId: string;
 	properties?: Properties;
 	organizationId?: string | null;
-	requestContext?: RequestContext;
 }
 
 export class AnalyticsTracker {
@@ -27,20 +25,12 @@ export class AnalyticsTracker {
 		properties: Properties = {},
 		options?: {
 			organizationId?: string | null;
-			requestContext?: RequestContext;
 		},
 	): Promise<void> {
-		// Auto-enrich with backend properties from request context
-		const enrichedProperties = {
-			...getProperties(options?.requestContext),
-			...properties,
-			__pulse_client_lib: "pulse_node",
-		};
-
-		// Send event via HTTP API
+		// Just do a fetch call with the input properties as-is, no enrichment
 		await this.client.track({
 			event: name,
-			properties: enrichedProperties,
+			properties: properties,
 			distinct_id: userId,
 			user_id: userId,
 			organization_id: options?.organizationId || undefined,
@@ -52,7 +42,6 @@ export class AnalyticsTracker {
 		properties: Properties = {},
 		options?: {
 			organizationId?: string | null;
-			requestContext?: RequestContext;
 		},
 	): Promise<void> {
 		await this.event("$identify", userId, properties, options);
