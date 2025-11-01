@@ -1,5 +1,3 @@
-import { userAgent, navigator } from "./global.js";
-
 const FACEBOOK = "Facebook";
 const MOBILE = "Mobile";
 const IOS = "iOS";
@@ -82,42 +80,56 @@ export function detectBrowser(
 
 	if (userAgent.includes(" OPR/") && userAgent.includes("Mini")) {
 		return OPERA_MINI;
-	} else if (userAgent.includes(" OPR/")) {
+	}
+	if (userAgent.includes(" OPR/")) {
 		return OPERA;
-	} else if (BLACKBERRY_REGEX.test(userAgent)) {
+	}
+	if (BLACKBERRY_REGEX.test(userAgent)) {
 		return BLACKBERRY;
-	} else if (
-		userAgent.includes("IE" + MOBILE) ||
-		userAgent.includes("WPDesktop")
-	) {
+	}
+	if (userAgent.includes("IE" + MOBILE) || userAgent.includes("WPDesktop")) {
 		return INTERNET_EXPLORER_MOBILE;
-	} else if (userAgent.includes(SAMSUNG_BROWSER)) {
+	}
+	if (userAgent.includes(SAMSUNG_BROWSER)) {
 		return SAMSUNG_INTERNET;
-	} else if (userAgent.includes(EDGE) || userAgent.includes("Edg/")) {
+	}
+	if (userAgent.includes(EDGE) || userAgent.includes("Edg/")) {
 		return MICROSOFT_EDGE;
-	} else if (userAgent.includes("FBIOS")) {
+	}
+	if (userAgent.includes("FBIOS")) {
 		return FACEBOOK + " " + MOBILE;
-	} else if (userAgent.includes("UCWEB") || userAgent.includes("UCBrowser")) {
+	}
+	if (userAgent.includes("UCWEB") || userAgent.includes("UCBrowser")) {
 		return "UC Browser";
-	} else if (userAgent.includes("CriOS")) {
+	}
+	if (userAgent.includes("CriOS")) {
 		return CHROME_IOS;
-	} else if (userAgent.includes("CrMo")) {
+	}
+	if (userAgent.includes("CrMo")) {
 		return CHROME;
-	} else if (userAgent.includes(ANDROID) && userAgent.includes(SAFARI)) {
+	}
+	if (userAgent.includes(ANDROID) && userAgent.includes(SAFARI)) {
 		return ANDROID_MOBILE;
-	} else if (userAgent.includes(CHROME)) {
+	}
+	if (userAgent.includes(CHROME)) {
 		return CHROME;
-	} else if (userAgent.includes("FxiOS")) {
+	}
+	if (userAgent.includes("FxiOS")) {
 		return FIREFOX_IOS;
-	} else if (userAgent.toLowerCase().includes(KONQUEROR.toLowerCase())) {
+	}
+	if (userAgent.toLowerCase().includes(KONQUEROR.toLowerCase())) {
 		return KONQUEROR;
-	} else if (safariCheck(userAgent, vendor)) {
+	}
+	if (safariCheck(userAgent, vendor)) {
 		return userAgent.includes(MOBILE) ? MOBILE_SAFARI : SAFARI;
-	} else if (userAgent.includes(FIREFOX)) {
+	}
+	if (userAgent.includes(FIREFOX)) {
 		return FIREFOX;
-	} else if (userAgent.includes("MSIE") || userAgent.includes("Trident/")) {
+	}
+	if (userAgent.includes("MSIE") || userAgent.includes("Trident/")) {
 		return INTERNET_EXPLORER;
-	} else if (userAgent.includes("Gecko")) {
+	}
+	if (userAgent.includes("Gecko")) {
 		return FIREFOX;
 	}
 
@@ -125,10 +137,10 @@ export function detectBrowser(
 }
 
 const versionRegexes: Record<string, RegExp[]> = {
-	[INTERNET_EXPLORER_MOBILE]: [new RegExp("rv:" + BROWSER_VERSION_REGEX_SUFFIX)],
-	[MICROSOFT_EDGE]: [
-		new RegExp(EDGE + "?\\/" + BROWSER_VERSION_REGEX_SUFFIX),
+	[INTERNET_EXPLORER_MOBILE]: [
+		new RegExp("rv:" + BROWSER_VERSION_REGEX_SUFFIX),
 	],
+	[MICROSOFT_EDGE]: [new RegExp(EDGE + "?\\/" + BROWSER_VERSION_REGEX_SUFFIX)],
 	[CHROME]: [
 		new RegExp("(" + CHROME + "|CrMo)\\/" + BROWSER_VERSION_REGEX_SUFFIX),
 	],
@@ -176,9 +188,9 @@ export function detectBrowserVersion(
 
 	for (let i = 0; i < regexes.length; i++) {
 		const regex = regexes[i];
-		const matches = userAgent.match(regex);
+		const matches = regex ? userAgent.match(regex) : null;
 		if (matches) {
-			return parseFloat(matches[matches.length - 2]);
+			return Number.parseFloat(matches[matches.length - 2] || "0");
 		}
 	}
 
@@ -192,97 +204,94 @@ const osMatchers: [
 		| ((match: RegExpMatchArray | null, userAgent: string) => [string, string])
 	),
 ][] = [
-	[
-		new RegExp(XBOX + "; " + XBOX + " (.*?)[);]", "i"),
-		(match) => {
-			return [XBOX, (match && match[1]) || ""];
-		},
-	],
-	[new RegExp(NINTENDO, "i"), [NINTENDO, ""]],
-	[new RegExp(PLAYSTATION, "i"), [PLAYSTATION, ""]],
-	[BLACKBERRY_REGEX, [BLACKBERRY, ""]],
-	[
-		new RegExp(WINDOWS, "i"),
-		(_, userAgent) => {
-			if (/Phone/.test(userAgent) || /WPDesktop/.test(userAgent)) {
-				return [WINDOWS_PHONE, ""];
-			}
-
-			if (
-				new RegExp(MOBILE).test(userAgent) &&
-				!/IEMobile\b/.test(userAgent)
-			) {
-				return [WINDOWS + " " + MOBILE, ""];
-			}
-
-			const match = /Windows NT ([0-9.]+)/i.exec(userAgent);
-			if (match && match[1]) {
-				const version = match[1];
-				let osVersion = windowsVersionMap[version] || "";
-
-				if (/arm/i.test(userAgent)) {
-					osVersion = "RT";
+		[
+			new RegExp(XBOX + "; " + XBOX + " (.*?)[);]", "i"),
+			(match) => {
+				return [XBOX, (match && match[1]) || ""];
+			},
+		],
+		[new RegExp(NINTENDO, "i"), [NINTENDO, ""]],
+		[new RegExp(PLAYSTATION, "i"), [PLAYSTATION, ""]],
+		[BLACKBERRY_REGEX, [BLACKBERRY, ""]],
+		[
+			new RegExp(WINDOWS, "i"),
+			(_, userAgent) => {
+				if (/Phone/.test(userAgent) || /WPDesktop/.test(userAgent)) {
+					return [WINDOWS_PHONE, ""];
 				}
 
-				return [WINDOWS, osVersion];
-			}
+				if (new RegExp(MOBILE).test(userAgent) && !/IEMobile\b/.test(userAgent)) {
+					return [WINDOWS + " " + MOBILE, ""];
+				}
 
-			return [WINDOWS, ""];
-		},
-	],
-	[
-		/((iPhone|iPad|iPod).*?OS (\d+)_(\d+)_?(\d+)?|iPhone)/,
-		(match) => {
-			if (match && match[3]) {
-				const versionParts = [match[3], match[4], match[5] || "0"];
-				return [IOS, versionParts.join(".")];
-			}
-			return [IOS, ""];
-		},
-	],
-	[
-		/(watch.*\/(\d+\.\d+\.\d+)|watch os,(\d+\.\d+),)/i,
-		(match) => {
-			let version = "";
-			if (match && match.length >= 3) {
-				version = !match[2] ? match[3] : match[2];
-			}
-			return ["watchOS", version];
-		},
-	],
-	[
-		new RegExp(
-			"(" + ANDROID + " (\\d+)\\.(\\d+)\\.?(\\d+)?|" + ANDROID + ")",
-			"i",
-		),
-		(match) => {
-			if (match && match[2]) {
-				const versionParts = [match[2], match[3], match[4] || "0"];
-				return [ANDROID, versionParts.join(".")];
-			}
-			return [ANDROID, ""];
-		},
-	],
-	[
-		/Mac OS X (\d+)[_.](\d+)[_.]?(\d+)?/i,
-		(match) => {
-			const result: [string, string] = ["Mac OS X", ""];
-			if (match && match[1]) {
-				const versionParts = [match[1], match[2], match[3] || "0"];
-				result[1] = versionParts.join(".");
-			}
-			return result;
-		},
-	],
-	[/Mac/i, ["Mac OS X", ""]],
-	[/CrOS/, [CHROME_OS, ""]],
-	[/Linux|debian/i, ["Linux", ""]],
-];
+				const match = /Windows NT ([0-9.]+)/i.exec(userAgent);
+				if (match && match[1]) {
+					const version = match[1];
+					let osVersion = windowsVersionMap[version] || "";
+
+					if (/arm/i.test(userAgent)) {
+						osVersion = "RT";
+					}
+
+					return [WINDOWS, osVersion];
+				}
+
+				return [WINDOWS, ""];
+			},
+		],
+		[
+			/((iPhone|iPad|iPod).*?OS (\d+)_(\d+)_?(\d+)?|iPhone)/,
+			(match) => {
+				if (match && match[3]) {
+					const versionParts = [match[3], match[4], match[5] || "0"];
+					return [IOS, versionParts.join(".")];
+				}
+				return [IOS, ""];
+			},
+		],
+		[
+			/(watch.*\/(\d+\.\d+\.\d+)|watch os,(\d+\.\d+),)/i,
+			(match) => {
+				let version = "";
+				if (match && match.length >= 3) {
+					version = !match[2] ? match[3] || "" : match[2] || "";
+				}
+				return ["watchOS", version];
+			},
+		],
+		[
+			new RegExp(
+				"(" + ANDROID + " (\\d+)\\.(\\d+)\\.?(\\d+)?|" + ANDROID + ")",
+				"i",
+			),
+			(match) => {
+				if (match && match[2]) {
+					const versionParts = [match[2], match[3], match[4] || "0"];
+					return [ANDROID, versionParts.join(".")];
+				}
+				return [ANDROID, ""];
+			},
+		],
+		[
+			/Mac OS X (\d+)[_.](\d+)[_.]?(\d+)?/i,
+			(match) => {
+				const result: [string, string] = ["Mac OS X", ""];
+				if (match && match[1]) {
+					const versionParts = [match[1], match[2], match[3] || "0"];
+					result[1] = versionParts.join(".");
+				}
+				return result;
+			},
+		],
+		[/Mac/i, ["Mac OS X", ""]],
+		[/CrOS/, [CHROME_OS, ""]],
+		[/Linux|debian/i, ["Linux", ""]],
+	];
 
 export function detectOS(userAgent: string): [string, string] {
 	for (let i = 0; i < osMatchers.length; i++) {
-		const [regex, resultOrFn] = osMatchers[i];
-		const match = regex.exec(userAgent);
+		const [regex, resultOrFn] = osMatchers[i] || [/(?:)/, () => ["", ""]];
+		const match = regex ? regex.exec(userAgent) : null;
 
 		const result =
 			match &&
@@ -301,36 +310,47 @@ export function detectOS(userAgent: string): [string, string] {
 export function detectDevice(userAgent: string): string {
 	if (NINTENDO_REGEX.test(userAgent)) {
 		return NINTENDO;
-	} else if (PLAYSTATION_REGEX.test(userAgent)) {
+	}
+	if (PLAYSTATION_REGEX.test(userAgent)) {
 		return PLAYSTATION;
-	} else if (XBOX_REGEX.test(userAgent)) {
+	}
+	if (XBOX_REGEX.test(userAgent)) {
 		return XBOX;
-	} else if (new RegExp(OUYA, "i").test(userAgent)) {
+	}
+	if (new RegExp(OUYA, "i").test(userAgent)) {
 		return OUYA;
-	} else if (
-		new RegExp("(" + WINDOWS_PHONE + "|WPDesktop)", "i").test(userAgent)
-	) {
+	}
+	if (new RegExp("(" + WINDOWS_PHONE + "|WPDesktop)", "i").test(userAgent)) {
 		return WINDOWS_PHONE;
-	} else if (/iPad/.test(userAgent)) {
+	}
+	if (/iPad/.test(userAgent)) {
 		return IPAD;
-	} else if (/iPod/.test(userAgent)) {
+	}
+	if (/iPod/.test(userAgent)) {
 		return "iPod Touch";
-	} else if (/iPhone/.test(userAgent)) {
+	}
+	if (/iPhone/.test(userAgent)) {
 		return "iPhone";
-	} else if (/(watch)(?: ?os[,/]|\d,\d\/)[\d.]+/i.test(userAgent)) {
+	}
+	if (/(watch)(?: ?os[,/]|\d,\d\/)[\d.]+/i.test(userAgent)) {
 		return APPLE_WATCH;
-	} else if (BLACKBERRY_REGEX.test(userAgent)) {
+	}
+	if (BLACKBERRY_REGEX.test(userAgent)) {
 		return BLACKBERRY;
-	} else if (/(kobo)\s(ereader|touch)/i.test(userAgent)) {
+	}
+	if (/(kobo)\s(ereader|touch)/i.test(userAgent)) {
 		return "Kobo";
-	} else if (new RegExp(NOKIA, "i").test(userAgent)) {
+	}
+	if (new RegExp(NOKIA, "i").test(userAgent)) {
 		return NOKIA;
-	} else if (
+	}
+	if (
 		/(kf[a-z]{2}wi|aeo[c-r]{2})( bui|\))/i.test(userAgent) ||
 		/(kf[a-z]+)( bui|\)).+silk\//i.test(userAgent)
 	) {
 		return "Kindle Fire";
-	} else if (/(Android|ZTE)/i.test(userAgent)) {
+	}
+	if (/(Android|ZTE)/i.test(userAgent)) {
 		if (
 			!new RegExp(MOBILE).test(userAgent) ||
 			/(9138B|TB782B|Nexus [97]|pixel c|HUAWEISHT|BTV|noble nook|smart ultra 6)/i.test(
@@ -340,27 +360,25 @@ export function detectDevice(userAgent: string): string {
 			if (
 				(/pixel[\daxl ]{1,6}/i.test(userAgent) &&
 					!/pixel c/i.test(userAgent)) ||
-				/(huaweimed-al00|tah-|APA|SM-G92|i980|zte|U304AA)/i.test(
-					userAgent,
-				) ||
+				/(huaweimed-al00|tah-|APA|SM-G92|i980|zte|U304AA)/i.test(userAgent) ||
 				(/lmy47v/i.test(userAgent) && !/QTAQZ3/i.test(userAgent))
 			) {
 				return ANDROID;
 			}
 			return ANDROID_TABLET;
-		} else {
-			return ANDROID;
 		}
-	} else if (new RegExp("(pda|" + MOBILE + ")", "i").test(userAgent)) {
+		return ANDROID;
+	}
+	if (new RegExp("(pda|" + MOBILE + ")", "i").test(userAgent)) {
 		return GENERIC_MOBILE;
-	} else if (
+	}
+	if (
 		new RegExp(TABLET, "i").test(userAgent) &&
 		!new RegExp(TABLET + " pc", "i").test(userAgent)
 	) {
 		return GENERIC_TABLET;
-	} else {
-		return "";
 	}
+	return "";
 }
 
 export function detectDeviceType(userAgent: string): string {
@@ -374,20 +392,22 @@ export function detectDeviceType(userAgent: string): string {
 		device === GENERIC_TABLET
 	) {
 		return TABLET;
-	} else if (
+	}
+	if (
 		device === NINTENDO ||
 		device === XBOX ||
 		device === PLAYSTATION ||
 		device === OUYA
 	) {
 		return "Console";
-	} else if (device === APPLE_WATCH) {
-		return "Wearable";
-	} else if (device) {
-		return MOBILE;
-	} else {
-		return "Desktop";
 	}
+	if (device === APPLE_WATCH) {
+		return "Wearable";
+	}
+	if (device) {
+		return MOBILE;
+	}
+	return "Desktop";
 }
 
 export function browserLanguage(): string {
@@ -397,4 +417,3 @@ export function browserLanguage(): string {
 		""
 	);
 }
-

@@ -1,9 +1,7 @@
-import { createId } from "@paralleldrive/cuid2";
-import type { ClickHouseClient } from "../client.js";
-import { clickHouseClient } from "../client.js";
-import { createTables, type EventData } from "../schema.js";
-import type { Properties } from "./utils/types.js";
-import { getProperties } from "./utils/properties.js";
+import type { AnalyticsClient } from "../client.js";
+import { analyticsClient } from "../client.js";
+import { getProperties } from "../utils/properties.js";
+import type { Properties } from "../utils/types.js";
 
 export interface TrackOptions {
 	distinctId: string;
@@ -11,7 +9,7 @@ export interface TrackOptions {
 	properties?: Properties;
 	organizationId?: string | null;
 	userId?: string | null;
-	client?: ClickHouseClient;
+	client?: AnalyticsClient;
 }
 
 export async function track(options: TrackOptions): Promise<void> {
@@ -21,48 +19,19 @@ export async function track(options: TrackOptions): Promise<void> {
 		properties = {},
 		organizationId,
 		userId,
-		client = clickHouseClient,
+		client = analyticsClient,
 	} = options;
-
-	// Ensure tables exist
-	await createTables(client);
 
 	// Auto-enrich with web properties
 	const enrichedProperties = { ...getProperties(), ...properties };
 
-	const eventData: EventData = {
-		uuid: createId(),
+	// Send event via HTTP API
+	await client.track({
 		event,
-		properties: JSON.stringify(enrichedProperties),
+		properties: enrichedProperties,
 		distinct_id: distinctId,
-		organization_id: organizationId || null,
-		user_id: userId || null,
-		timestamp: new Date(),
-		created_at: new Date(),
-	};
-
-	const database = client.config.database || "reloop_analytics";
-
-	// Format timestamp for ClickHouse DateTime64
-	const formatDateTime = (date: Date) => {
-		return date.toISOString().replace("T", " ").substring(0, 23);
-	};
-
-	await client.insert({
-		table: `${database}.events`,
-		values: [
-			{
-				uuid: eventData.uuid,
-				event: eventData.event,
-				properties: eventData.properties,
-				distinct_id: eventData.distinct_id,
-				organization_id: eventData.organization_id,
-				user_id: eventData.user_id,
-				timestamp: formatDateTime(eventData.timestamp),
-				created_at: formatDateTime(eventData.created_at),
-			},
-		],
-		format: "JSONEachRow",
+		user_id: userId || undefined,
+		organization_id: organizationId || undefined,
 	});
 }
 
@@ -72,7 +41,7 @@ export async function identify(
 	options?: {
 		organizationId?: string | null;
 		userId?: string | null;
-		client?: ClickHouseClient;
+		client?: AnalyticsClient;
 	},
 ): Promise<void> {
 	await track({
@@ -84,4 +53,3 @@ export async function identify(
 		client: options?.client,
 	});
 }
-

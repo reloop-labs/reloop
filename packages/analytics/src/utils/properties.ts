@@ -1,13 +1,13 @@
-import { userAgent, navigator, location } from "./global.js";
-import type { Properties } from "./types.js";
 import { campaignParams } from "./campaign.js";
+import { location, navigator, userAgent } from "./global.js";
 import { referrerInfo, searchInfo } from "./referrer.js";
+import type { Properties } from "./types.js";
 import {
-	detectOS,
+	browserLanguage,
 	detectBrowser,
 	detectBrowserVersion,
 	detectDeviceType,
-	browserLanguage,
+	detectOS,
 } from "./user-agent.js";
 
 function timestamp(): number {
@@ -36,9 +36,7 @@ export function getProperties(): Properties {
 		$host: location?.host || "",
 		$pathname: location?.pathname || "",
 		$raw_user_agent:
-			userAgent.length > 1000
-				? userAgent.substring(0, 997) + "..."
-				: userAgent,
+			userAgent.length > 1000 ? userAgent.substring(0, 997) + "..." : userAgent,
 		$browser_version: browserVersion || "",
 		$browser_language: browserLanguage(),
 		$screen_height: (globalThis as any)?.screen?.height || 0,
@@ -54,4 +52,3 @@ export function getProperties(): Properties {
 
 	return properties;
 }
-

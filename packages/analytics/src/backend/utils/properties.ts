@@ -1,13 +1,12 @@
-import type { Properties } from "../types.js";
-import { campaignParams } from "./campaign.js";
-import { getReferrerInfo, searchInfo } from "./referrer.js";
 import {
-	detectOS,
 	detectBrowser,
 	detectBrowserVersion,
 	detectDeviceType,
-} from "./user-agent.js";
-
+	detectOS,
+} from "../../utils/user-agent.js";
+import type { Properties } from "../types.js";
+import { campaignParams } from "./campaign.js";
+import { getReferrerInfo, searchInfo } from "./referrer.js";
 export interface RequestContext {
 	url?: string;
 	userAgent?: string;
@@ -78,4 +77,3 @@ export function getProperties(context?: RequestContext): Properties {
 
 	return properties;
 }
-

@@ -7,14 +7,12 @@
 		"./web": "./src/web/index.ts",
 		"./backend": "./src/backend/index.ts",
 		"./client": "./src/client.ts",
-		"./schema": "./src/schema.ts",
 		"./index": "./src/index.ts"
 	},
 	"scripts": {
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
-		"@clickhouse/client": "^0.2.8",
 		"@paralleldrive/cuid2": "catalog:backend"
 	},
 	"devDependencies": {
@@ -23,4 +21,3 @@
 		"typescript": "catalog:"
 	}
 }
-

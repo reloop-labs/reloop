@@ -1,5 +1,4 @@
 import { document } from "./global.js";
-import type { Properties } from "./types.js";
 
 const URL_REGEX_PREFIX = "https?://(.*)";
 
@@ -27,13 +26,14 @@ export function searchEngine(): string | null {
 
 	if (referrer.search(URL_REGEX_PREFIX + "google.([^/?]*)") === 0) {
 		return "google";
-	} else if (referrer.search(URL_REGEX_PREFIX + "bing.com") === 0) {
+	}
+	if (referrer.search(URL_REGEX_PREFIX + "bing.com") === 0) {
 		return "bing";
-	} else if (referrer.search(URL_REGEX_PREFIX + "yahoo.com") === 0) {
+	}
+	if (referrer.search(URL_REGEX_PREFIX + "yahoo.com") === 0) {
 		return "yahoo";
-	} else if (
-		referrer.search(URL_REGEX_PREFIX + "duckduckgo.com") === 0
-	) {
+	}
+	if (referrer.search(URL_REGEX_PREFIX + "duckduckgo.com") === 0) {
 		return "duckduckgo";
 	}
 
@@ -73,4 +73,3 @@ export function referrerInfo(): Record<string, string> {
 		$referring_domain: referringDomain(),
 	};
 }
-

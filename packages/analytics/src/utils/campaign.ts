@@ -1,5 +1,4 @@
 import { document } from "./global.js";
-import type { Properties } from "./types.js";
 
 export const CAMPAIGN_PARAMS = [
 	"utm_source",
@@ -40,7 +39,7 @@ export function campaignParams(
 	if (!document) return params;
 
 	campaignKeywords.forEach((key) => {
-		const value = getQueryParam(document.URL, key);
+		const value = getQueryParam(document?.URL || "", key);
 		if (value.length) {
 			params[key] = value;
 		}

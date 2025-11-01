@@ -1,5 +1,3 @@
-import type { Properties } from "../types.js";
-
 export const CAMPAIGN_PARAMS = [
 	"utm_source",
 	"utm_medium",

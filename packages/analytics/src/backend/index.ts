@@ -1,21 +1,19 @@
+import type { AnalyticsClientOptions } from "../client.js";
 import { AnalyticsTracker } from "./tracker.js";
-import type { ClickHouseClientOptions } from "../client.js";
 import type { Properties } from "./types.js";
-import type { RequestContext } from "./utils/properties.js";
 import { PulseHTTPError } from "./types.js";
+import type { RequestContext } from "./utils/properties.js";
 
-export interface AnalyticsConfig extends ClickHouseClientOptions {
+export interface AnalyticsConfig extends AnalyticsClientOptions {
 	// Additional config options can be added here
 }
 
 export default function analytics(config?: AnalyticsConfig | string) {
-	// If config is a string, treat it as a domain/URL (for backward compatibility)
-	const clickHouseConfig: ClickHouseClientOptions | undefined =
-		typeof config === "string"
-			? { url: config }
-			: config;
+	// If config is a string, treat it as an API URL (for backward compatibility)
+	const apiConfig: AnalyticsClientOptions | undefined =
+		typeof config === "string" ? { apiUrl: config } : config;
 
-	const tracker = new AnalyticsTracker(clickHouseConfig);
+	const tracker = new AnalyticsTracker(apiConfig);
 
 	const s = {
 		async event(
@@ -69,7 +67,6 @@ export default function analytics(config?: AnalyticsConfig | string) {
 	return { s, c };
 }
 
-export * from "./types.js";
 export { AnalyticsTracker } from "./tracker.js";
+export * from "./types.js";
 export type { RequestContext } from "./utils/properties.js";
-
