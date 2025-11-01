@@ -1,5 +1,26 @@
 reloop.local {
-    # API service (running locally on port 3002)
+    # Frontend routes (most specific first)
+    handle /dashboard* {
+        reverse_proxy host.docker.internal:3001 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+    handle /admin* {
+        reverse_proxy host.docker.internal:3002 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+    handle /docs* {
+        reverse_proxy host.docker.internal:3003 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
     handle /dev* {
         reverse_proxy host.docker.internal:3004 {
             header_up Host {host}
@@ -7,8 +28,17 @@ reloop.local {
             header_up X-Forwarded-For {remote}
         }
     }
+
+    # API routes
     handle /api/auth* {
         reverse_proxy host.docker.internal:8000 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+    handle /api/api-key* {
+        reverse_proxy host.docker.internal:8012 {
             header_up Host {host}
             header_up X-Forwarded-Proto {scheme}
             header_up X-Forwarded-For {remote}
@@ -21,15 +51,15 @@ reloop.local {
             header_up X-Forwarded-For {remote}
         }
     }
-    handle /api/audience* {
-        reverse_proxy host.docker.internal:8014 {
+    handle /api/webhook* {
+        reverse_proxy host.docker.internal:8013 {
             header_up Host {host}
             header_up X-Forwarded-Proto {scheme}
             header_up X-Forwarded-For {remote}
         }
     }
-    handle /api/webhook* {
-        reverse_proxy host.docker.internal:8013 {
+    handle /api/audience* {
+        reverse_proxy host.docker.internal:8014 {
             header_up Host {host}
             header_up X-Forwarded-Proto {scheme}
             header_up X-Forwarded-For {remote}
@@ -42,15 +72,22 @@ reloop.local {
             header_up X-Forwarded-For {remote}
         }
     }
-    handle /dashboard* {
-        reverse_proxy host.docker.internal:3001 {
+    handle /api/analytics* {
+        reverse_proxy host.docker.internal:8016 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+    handle /api/inngest* {
+        reverse_proxy host.docker.internal:8017 {
             header_up Host {host}
             header_up X-Forwarded-Proto {scheme}
             header_up X-Forwarded-For {remote}
         }
     }
 
-    # Main app (running locally - everything else)
+    # Main app (catch-all - everything else)
     handle {
         reverse_proxy host.docker.internal:3000 {
             header_up Host {host}

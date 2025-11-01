@@ -6,7 +6,7 @@ import { loader } from "./utils/loader";
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
 
-const port = 8012;
+const port = 8016;
 const analyticsService = new Elysia({
 	prefix: "/api/analytics",
 	name: "Analytics Service",

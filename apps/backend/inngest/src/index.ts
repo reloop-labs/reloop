@@ -15,7 +15,7 @@ import { landing } from "@reloop/inngest/routes/landing/landing.index";
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
 
-const port = 8014;
+const port = 8017;
 
 const functions = [
     webhookDeliver,
