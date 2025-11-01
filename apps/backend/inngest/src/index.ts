@@ -1,8 +1,6 @@
 import "dotenv/config";
 import { cors } from "@elysiajs/cors";
 import { inngest } from "@reloop/inngest/client";
-import { logger } from "@reloop/logger";
-import { Elysia } from "elysia";
 import {
     cronDNSVerification,
     cronDomainVerification,
@@ -13,6 +11,9 @@ import {
     verifyDomain,
     webhookDeliver,
 } from "@reloop/inngest/functions";
+import { landing } from "@reloop/inngest/routes/landing/landing.index";
+import { logger } from "@reloop/logger";
+import { Elysia } from "elysia";
 
 const port = 8014;
 
@@ -40,6 +41,7 @@ const inngestService = new Elysia({
     name: "Inngest Service",
 })
     .use(cors())
+    .use(landing)
     .all("*", ({ request }) => handler(request))
     .listen(port, () => {
         logger.info(
