@@ -1,7 +1,7 @@
 import type { AnalyticsClient } from "../client.js";
 import { analyticsClient } from "../client.js";
-import { getProperties } from "../utils/properties.js";
-import type { Properties } from "../utils/types.js";
+import { getProperties } from "./utils/properties.js";
+import type { Properties } from "./utils/types.js";
 
 export interface TrackOptions {
 	distinctId: string;
