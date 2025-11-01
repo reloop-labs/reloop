@@ -1,0 +1,39 @@
+{
+	"name": "analytics",
+	"main": "src/index.ts",
+	"type": "module",
+	"scripts": {
+		"build": "tsdown",
+		"check-types": "tsc --noEmit",
+		"compile": "bun build --compile --minify --sourcemap --bytecode ./src/index.ts --outfile server",
+		"dev": "bun run --hot src/index.ts",
+		"start": "bun run dist/index.js"
+	},
+	"dependencies": {
+		"@clickhouse/client": "catalog:backend",
+		"@elysiajs/cors": "catalog:backend",
+		"@elysiajs/cron": "catalog:backend",
+		"@elysiajs/opentelemetry": "catalog:backend",
+		"@elysiajs/openapi": "catalog:backend",
+		"@elysiajs/server-timing": "catalog:backend",
+		"@elysiajs/swagger": "catalog:backend",
+		"@opentelemetry/exporter-trace-otlp-http": "catalog:backend",
+		"@opentelemetry/exporter-trace-otlp-proto": "catalog:backend",
+		"@opentelemetry/instrumentation-express": "catalog:backend",
+		"@opentelemetry/instrumentation-http": "catalog:backend",
+		"@opentelemetry/resources": "catalog:backend",
+		"@opentelemetry/sdk-trace-node": "catalog:backend",
+		"@opentelemetry/semantic-conventions": "catalog:backend",
+		"dotenv": "catalog:backend",
+		"elysia": "catalog:backend",
+		"zod": "catalog:ui",
+		"@reloop/analytics": "workspace:*",
+		"@reloop/logger": "workspace:*"
+	},
+	"devDependencies": {
+		"@reloop/tsconfig": "workspace:*",
+		"tsdown": "catalog:backend",
+		"typescript": "catalog:",
+		"@types/bun": "catalog:backend"
+	}
+}

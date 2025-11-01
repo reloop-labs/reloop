@@ -50,6 +50,7 @@
 				"tailwind-variants": "1.0.0",
 				"tailwindcss-animate": "1.0.7",
 				"@hookform/resolvers": "5.2.1",
+				"@number-flow/react": "^0.5.10",
 				"react-hook-form": "^7.62.0",
 				"react-email": "4.2.8",
 				"@tailwindcss/postcss": "4.1.11",
@@ -100,6 +101,7 @@
 				"redis": "^5.8.2"
 			},
 			"backend": {
+				"@clickhouse/client": "^1.12.1",
 				"dotenv": "16.4.7",
 				"tsdown": "0.12.9",
 				"elysia": "latest",
@@ -186,7 +188,6 @@
 		"turbo": "2.5.8"
 	},
 	"packageManager": "bun@1.3.0",
-	"dependencies": {},
 	"trustedDependencies": [
 		"@tailwindcss/oxide",
 		"dev",
