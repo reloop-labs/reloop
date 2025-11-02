@@ -1,6 +1,6 @@
 # reloop-email
 
-Official Reloop Node.js SDK for integrating with Reloop services (mail, domain, webhook, audience).
+Official Reloop Node.js SDK for integrating with Reloop services.
 
 ## Installation
 
@@ -14,7 +14,7 @@ npm install reloop-email
 import Reloop from 'reloop-email';
 
 const reloop = new Reloop({
-  url: 'https://api.reloop.sh',
+  url: 'https://reloop.sh',
   key: 'your-api-key'
 });
 
@@ -31,12 +31,12 @@ const result = await reloop.mail.send({
 
 The Reloop SDK requires two configuration parameters:
 
-- `url` - Your Reloop API base URL (e.g., `https://api.reloop.sh`)
+- `url` - Your Reloop API base URL (e.g., `https://reloop.sh`)
 - `key` - Your API key
 
 ```typescript
 const reloop = new Reloop({
-  url: 'https://api.reloop.sh',
+  url: 'https://reloop.sh',
   key: 'your-api-key'
 });
 ```
