@@ -1,4 +1,4 @@
-# Analytics Service API
+# tracehub Service API
 
-[Read more about the service](https://reloop.sh/dev/analytics-service)
+[Read more about the service](https://reloop.sh/dev/tracehub-service)
 

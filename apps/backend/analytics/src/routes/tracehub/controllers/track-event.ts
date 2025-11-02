@@ -1,11 +1,11 @@
 import analytics from "@reloop/analytics/backend";
 import { logger } from "@reloop/logger";
 import { status } from "elysia";
-import type { AnalyticsTypes } from "../analytics.type";
+import type { TraceHubTypes } from "../tracehub.type";
 
 export async function trackEvent(
-	body: AnalyticsTypes.TrackEventBody,
-): Promise<AnalyticsTypes.TrackEventResponse> {
+	body: TraceHubTypes.TrackEventBody,
+): Promise<TraceHubTypes.TrackEventResponse> {
 	const {
 		event,
 		properties = {},
@@ -25,8 +25,8 @@ export async function trackEvent(
 			"Tracking event",
 		);
 
-		// Use the analytics backend package to track the event
-		const analyticsInstance = analytics();
+		// Use the tracehub backend package to track the event
+		const tracehubInstance = analytics();
 
 		// Transform properties to match Properties type (filter null, convert boolean to string)
 		const transformedProperties: Record<string, string | number> = {};
@@ -39,7 +39,7 @@ export async function trackEvent(
 				}
 			}
 		}
-		await analyticsInstance.s.event(event, userId, transformedProperties, {
+		await tracehubInstance.s.event(event, userId, transformedProperties, {
 			organizationId: organization_id || null,
 		});
 		const uuid = crypto.randomUUID();
@@ -75,7 +75,7 @@ export async function trackEvent(
 }
 
 export async function trackEventHandler(
-	body: AnalyticsTypes.TrackEventBody,
-): Promise<AnalyticsTypes.TrackEventResponse> {
+	body: TraceHubTypes.TrackEventBody,
+): Promise<TraceHubTypes.TrackEventResponse> {
 	return await trackEvent(body);
 }

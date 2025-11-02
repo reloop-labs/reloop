@@ -1,5 +1,5 @@
 {
-	"name": "analytics",
+	"name": "@reloop/tracehub",
 	"main": "src/index.ts",
 	"type": "module",
 	"scripts": {

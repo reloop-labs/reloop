@@ -1,6 +1,6 @@
 import { t } from "elysia";
 
-export namespace AnalyticsModel {
+export namespace TraceHubModel {
 	export const trackEventBody = t.Object({
 		event: t.String({
 			minLength: 1,
