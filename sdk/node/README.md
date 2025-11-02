@@ -1,17 +1,17 @@
-# @reloop/sdk-node
+# reloop-email
 
 Official Reloop Node.js SDK for integrating with Reloop services (mail, domain, webhook, audience).
 
 ## Installation
 
 ```bash
-npm install @reloop/sdk-node
+npm install reloop-email
 ```
 
 ## Quick Start
 
 ```typescript
-import Reloop from '@reloop/sdk-node';
+import Reloop from 'reloop-email';
 
 const reloop = new Reloop({
   url: 'https://api.reloop.sh',
@@ -303,7 +303,7 @@ import {
   RateLimitError,
   ServerError,
   ValidationError
-} from '@reloop/sdk-node';
+} from 'reloop-email';
 
 try {
   await reloop.mail.send({...});
@@ -333,7 +333,7 @@ import type {
   DomainResponse,
   WebhookResponse,
   AudienceResponse
-} from '@reloop/sdk-node';
+} from 'reloop-email';
 ```
 
 ## Requirements
@@ -342,7 +342,7 @@ import type {
 
 ## License
 
-MIT
+Apache-2.0
 
 ## Support
 

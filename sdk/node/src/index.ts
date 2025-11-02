@@ -9,7 +9,7 @@ import { WebhookService } from "./services/webhook.js";
  *
  * @example
  * ```typescript
- * import Reloop from '@reloop/sdk-node';
+ * import Reloop from 'reloop-email';
  *
  * const reloop = new Reloop({
  *   url: 'https://api.reloop.sh',
@@ -47,8 +47,7 @@ export class Reloop {
 
 export default Reloop;
 
+export type { ReloopConfig } from "./client.js";
+export * from "./errors.js";
 // Export types
 export * from "./types.js";
-export * from "./errors.js";
-export type { ReloopConfig } from "./client.js";
-
