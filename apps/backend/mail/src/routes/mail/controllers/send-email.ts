@@ -100,22 +100,6 @@ export async function sendEmail(
     } catch (error) {
         const errorMessage =
             error instanceof Error ? error.message : "Unknown error";
-        await db.insert(emailLog).values({
-            messageId,
-            organizationId,
-            domainId: "",
-            fromEmail: emailData.from,
-            toEmails: Array.isArray(emailData.to) ? emailData.to : [emailData.to],
-            subject: emailData.subject,
-            textBody: emailData.text,
-            htmlBody: emailData.html,
-            status: "failed",
-            errorMessage,
-            provider: "postfix",
-            size: (emailData.text?.length || 0) + (emailData.html?.length || 0),
-            failedAt: new Date(),
-        });
-
         logger.error(
             {
                 error: errorMessage,
