@@ -4,7 +4,7 @@ import type { MailTypes } from "@reloop/be-mail/routes/mail/mail.type.js";
 import { db } from "@reloop/db/client";
 import { domain, emailLog } from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
-import { eq } from "drizzle-orm";
+import { and, eq, or, sql } from "drizzle-orm";
 
 export async function sendEmail(
     emailData: MailTypes.SendEmailRequest,
@@ -22,7 +22,15 @@ export async function sendEmail(
         const domainRecord = await db
             .select()
             .from(domain)
-            .where(eq(domain.domain, domainName))
+            .where(
+                and(
+                    eq(domain.organizationId, organizationId),
+                    or(
+                        eq(domain.domain, domainName),
+                        sql`${domainName} LIKE ('%.' || ${domain.domain})`
+                    )
+                )
+            )
             .limit(1);
 
         if (domainRecord.length === 0) {
