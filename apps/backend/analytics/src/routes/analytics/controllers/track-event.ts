@@ -1,14 +1,18 @@
 import analytics from "@reloop/analytics/backend";
-import type { AnalyticsTypes } from "../analytics.type";
 import { logger } from "@reloop/logger";
 import { status } from "elysia";
+import type { AnalyticsTypes } from "../analytics.type";
 
 export async function trackEvent(
 	body: AnalyticsTypes.TrackEventBody,
 ): Promise<AnalyticsTypes.TrackEventResponse> {
-	const { event, properties = {}, distinct_id, user_id, organization_id } = body;
-
-	// Use user_id or distinct_id or "anonymous" as fallback
+	const {
+		event,
+		properties = {},
+		distinct_id,
+		user_id,
+		organization_id,
+	} = body;
 	const userId = user_id || distinct_id || "anonymous";
 
 	try {
@@ -24,19 +28,20 @@ export async function trackEvent(
 		// Use the analytics backend package to track the event
 		const analyticsInstance = analytics();
 
-		// Track the event - just pass properties as-is, no enrichment
-		await analyticsInstance.s.event(
-			event,
-			userId,
-			properties || {},
-			{
-				organizationId: organization_id || null,
-			},
-		);
-
-		// Generate a UUID for the response (the analytics package generates one internally)
-		// For now, we'll return a success response
-		// In a real implementation, you might want to capture the UUID from the tracker
+		// Transform properties to match Properties type (filter null, convert boolean to string)
+		const transformedProperties: Record<string, string | number> = {};
+		if (properties) {
+			for (const [key, value] of Object.entries(properties)) {
+				if (value !== null) {
+					// Convert boolean to string, keep string/number as-is
+					transformedProperties[key] =
+						typeof value === "boolean" ? String(value) : value;
+				}
+			}
+		}
+		await analyticsInstance.s.event(event, userId, transformedProperties, {
+			organizationId: organization_id || null,
+		});
 		const uuid = crypto.randomUUID();
 
 		logger.info(
@@ -74,4 +79,3 @@ export async function trackEventHandler(
 ): Promise<AnalyticsTypes.TrackEventResponse> {
 	return await trackEvent(body);
 }
-
