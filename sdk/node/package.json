@@ -1,17 +1,49 @@
 {
-	"name": "reloop-sdk-node",
+	"name": "reloop-email",
 	"version": "1.0.0",
-	"description": "Reloop Node.js SDK",
-	"main": "hello_world.js",
+	"description": "Official Reloop Node.js SDK for integrating with Reloop services",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"type": "module",
+	"files": [
+		"dist",
+		"README.md",
+		"LICENSE"
+	],
 	"scripts": {
-		"start": "node hello_world.js",
-		"hello": "node hello_world.js"
+		"build": "tsc",
+		"prepublishOnly": "npm run build",
+		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"keywords": [
 		"reloop",
 		"sdk",
-		"node"
+		"node",
+		"email",
+		"mail",
+		"domain",
+		"webhook",
+		"audience"
 	],
 	"author": "Reloop",
-	"license": "MIT"
+	"license": "Apache-2.0",
+	"engines": {
+		"node": ">=18.0.0"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/reloop-labs/reloop.git",
+		"directory": "sdk/node"
+	},
+	"devDependencies": {
+		"@types/node": "^20.0.0",
+		"typescript": "^5.9.2"
+	},
+	"peerDependencies": {},
+	"exports": {
+		".": {
+			"import": "./dist/index.js",
+			"types": "./dist/index.d.ts"
+		}
+	}
 }
