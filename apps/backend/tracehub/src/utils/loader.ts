@@ -1,18 +1,23 @@
-import { analyticsClient, checkHealth } from "@reloop/analytics/client";
 import { logger } from "@reloop/logger";
+import { ensureTableExists, getClickHouseClient } from "./clickhouse";
 
 export const loader = async () => {
 	try {
-		const isHealthy = await checkHealth(analyticsClient);
-		if (isHealthy) {
-			logger.info("tracehub API health check passed");
-		} else {
-			logger.warn("tracehub API health check failed");
-		}
+		// Ensure ClickHouse table exists
+		await ensureTableExists();
+
+		// Check ClickHouse connection health
+		const client = getClickHouseClient();
+		await client.query({
+			query: "SELECT 1 as test",
+			format: "JSON",
+		});
+
+		logger.info("ClickHouse connection health check passed");
 	} catch (e) {
 		logger.error(
 			{ error: e instanceof Error ? e.message : String(e) },
-			"Error during tracehub API initialization",
+			"Error during ClickHouse initialization",
 		);
 	}
 };

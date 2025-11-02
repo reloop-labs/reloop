@@ -27,7 +27,6 @@
 		"dotenv": "catalog:backend",
 		"elysia": "catalog:backend",
 		"zod": "catalog:ui",
-		"@reloop/analytics": "workspace:*",
 		"@reloop/logger": "workspace:*"
 	},
 	"devDependencies": {

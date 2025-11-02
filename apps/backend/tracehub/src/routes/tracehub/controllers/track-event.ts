@@ -1,6 +1,6 @@
-import analytics from "@reloop/analytics/backend";
 import { logger } from "@reloop/logger";
 import { status } from "elysia";
+import { insertEvent } from "../../../utils/clickhouse";
 import type { TraceHubTypes } from "../tracehub.type";
 
 export async function trackEvent(
@@ -14,6 +14,7 @@ export async function trackEvent(
 		organization_id,
 	} = body;
 	const userId = user_id || distinct_id || "anonymous";
+	const distinctId = distinct_id || userId;
 
 	try {
 		logger.info(
@@ -25,10 +26,7 @@ export async function trackEvent(
 			"Tracking event",
 		);
 
-		// Use the tracehub backend package to track the event
-		const tracehubInstance = analytics();
-
-		// Transform properties to match Properties type (filter null, convert boolean to string)
+		// Transform properties to match database type (filter null, convert boolean to string)
 		const transformedProperties: Record<string, string | number> = {};
 		if (properties) {
 			for (const [key, value] of Object.entries(properties)) {
@@ -39,10 +37,15 @@ export async function trackEvent(
 				}
 			}
 		}
-		await tracehubInstance.s.event(event, userId, transformedProperties, {
-			organizationId: organization_id || null,
-		});
-		const uuid = crypto.randomUUID();
+
+		// Store event directly in ClickHouse
+		const uuid = await insertEvent(
+			event,
+			userId,
+			distinctId,
+			transformedProperties,
+			organization_id || null,
+		);
 
 		logger.info(
 			{
