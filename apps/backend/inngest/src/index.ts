@@ -2,6 +2,7 @@ import "dotenv/config";
 import { cors } from "@elysiajs/cors";
 import { inngest } from "@reloop/inngest/client";
 import {
+    cronActiveDomainMonitoring,
     cronDNSVerification,
     cronDomainVerification,
     cronHealthChecks,
@@ -21,6 +22,7 @@ const functions = [
     webhookDeliver,
     cronDomainVerification,
     cronDNSVerification,
+    cronActiveDomainMonitoring,
     cronWebhookCleanup,
     cronHealthChecks,
     verifyDomain,

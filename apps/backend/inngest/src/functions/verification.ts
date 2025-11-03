@@ -1,3 +1,4 @@
+import * as dns from "node:dns/promises";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { inngest } from "@reloop/inngest/client";
@@ -170,30 +171,214 @@ export const verifyDNSRecord = inngest.createFunction(
             return record;
         });
 
-        // Verify DNS record (simplified - you would use actual DNS lookup here)
+        // Verify DNS record with actual DNS lookup
         const verified = await step.run("perform-dns-lookup", async () => {
             try {
-                // In a real implementation, you would perform actual DNS lookup here
-                // For now, we'll simulate verification
-                // You can use dns.promises.resolveTxt() or similar for actual DNS verification
-
                 logger.info(
                     {
                         dnsRecordId,
                         domain: dnsRecord.domain.domain,
                         recordType,
                         name,
+                        expectedValue: dnsRecord.value,
                     },
                     "Performing DNS lookup",
                 );
 
-                // Placeholder: In production, implement actual DNS lookup
-                // const dns = await import("node:dns/promises");
-                // const records = await dns.resolveTxt(name);
-                // const found = records.some((record) => record.includes(value));
+                const maxRetries = 3;
+                let lastError: Error | null = null;
 
-                // For now, return true if the record exists in the database
-                return true;
+                // Retry logic with exponential backoff
+                for (let attempt = 0; attempt < maxRetries; attempt++) {
+                    try {
+                        if (attempt > 0) {
+                            const delay = 2 ** (attempt - 1) * 1000; // 1s, 2s, 4s
+                            await new Promise((resolve) => setTimeout(resolve, delay));
+                        }
+
+                        let found = false;
+                        const expectedValue = dnsRecord.value;
+
+                        // Perform DNS lookup based on record type
+                        switch (recordType.toUpperCase()) {
+                            case "TXT":
+                            case "SPF":
+                            case "DKIM":
+                            case "DMARC":
+                                {
+                                    const records = await Promise.race([
+                                        dns.resolveTxt(name),
+                                        new Promise<never>((_, reject) =>
+                                            setTimeout(
+                                                () => reject(new Error("DNS query timeout")),
+                                                10000, // 10 second timeout
+                                            ),
+                                        ),
+                                    ]);
+
+                                    // Flatten TXT records (they come as arrays of strings)
+                                    const flattenedRecords = records.flat();
+                                    // Check if any record contains the expected value
+                                    found = flattenedRecords.some((record) =>
+                                        Array.isArray(record)
+                                            ? record.join("").includes(expectedValue)
+                                            : record.includes(expectedValue),
+                                    );
+
+                                    // For SPF/DKIM/DMARC, also check if the record starts with the correct prefix
+                                    if (!found && recordType.toUpperCase() !== "TXT") {
+                                        const prefix =
+                                            recordType.toUpperCase() === "SPF"
+                                                ? "v=spf1"
+                                                : recordType.toUpperCase() === "DKIM"
+                                                    ? "v=DKIM1"
+                                                    : "v=DMARC1";
+
+                                        found = flattenedRecords.some((record) => {
+                                            const recordStr = Array.isArray(record)
+                                                ? record.join("")
+                                                : record;
+                                            return (
+                                                recordStr.includes(expectedValue) ||
+                                                recordStr.startsWith(prefix)
+                                            );
+                                        });
+                                    }
+                                }
+                                break;
+
+                            case "MX":
+                                {
+                                    const records = await Promise.race([
+                                        dns.resolveMx(name),
+                                        new Promise<never>((_, reject) =>
+                                            setTimeout(
+                                                () => reject(new Error("DNS query timeout")),
+                                                10000,
+                                            ),
+                                        ),
+                                    ]);
+
+                                    // Check if any MX record matches the expected exchange
+                                    found = records.some(
+                                        (mx) =>
+                                            mx.exchange.toLowerCase() ===
+                                            expectedValue.toLowerCase() ||
+                                            mx.exchange
+                                                .toLowerCase()
+                                                .endsWith(`.${expectedValue.toLowerCase()}`),
+                                    );
+                                }
+                                break;
+
+                            case "A":
+                                {
+                                    const records = await Promise.race([
+                                        dns.resolve4(name),
+                                        new Promise<never>((_, reject) =>
+                                            setTimeout(
+                                                () => reject(new Error("DNS query timeout")),
+                                                10000,
+                                            ),
+                                        ),
+                                    ]);
+
+                                    found = records.some((ip) => ip === expectedValue);
+                                }
+                                break;
+
+                            case "AAAA":
+                                {
+                                    const records = await Promise.race([
+                                        dns.resolve6(name),
+                                        new Promise<never>((_, reject) =>
+                                            setTimeout(
+                                                () => reject(new Error("DNS query timeout")),
+                                                10000,
+                                            ),
+                                        ),
+                                    ]);
+
+                                    found = records.some((ip) => ip === expectedValue);
+                                }
+                                break;
+
+                            case "CNAME":
+                                {
+                                    const records = await Promise.race([
+                                        dns.resolveCname(name),
+                                        new Promise<never>((_, reject) =>
+                                            setTimeout(
+                                                () => reject(new Error("DNS query timeout")),
+                                                10000,
+                                            ),
+                                        ),
+                                    ]);
+
+                                    found = records.some((cname) => cname === expectedValue);
+                                }
+                                break;
+
+                            default:
+                                logger.warn(
+                                    { recordType, dnsRecordId },
+                                    "Unsupported record type for DNS verification",
+                                );
+                                // For unsupported types, return true to avoid blocking
+                                return true;
+                        }
+
+                        if (found) {
+                            logger.info(
+                                { dnsRecordId, recordType, name },
+                                "DNS record verified successfully",
+                            );
+                            return true;
+                        }
+                        logger.warn(
+                            {
+                                dnsRecordId,
+                                recordType,
+                                name,
+                                expectedValue,
+                            },
+                            "DNS record not found or value mismatch",
+                        );
+                        return false;
+                    } catch (error) {
+                        lastError =
+                            error instanceof Error ? error : new Error(String(error));
+
+                        // Don't retry on certain errors
+                        if (
+                            lastError.message.includes("ENOTFOUND") ||
+                            lastError.message.includes("ENODATA")
+                        ) {
+                            break;
+                        }
+
+                        if (attempt < maxRetries - 1) {
+                            logger.warn(
+                                {
+                                    dnsRecordId,
+                                    attempt: attempt + 1,
+                                    maxRetries,
+                                    error: lastError.message,
+                                },
+                                "DNS lookup failed, retrying",
+                            );
+                        }
+                    }
+                }
+
+                logger.error(
+                    {
+                        dnsRecordId,
+                        error: lastError?.message || "Unknown error",
+                    },
+                    "DNS lookup failed after retries",
+                );
+                return false;
             } catch (error) {
                 logger.error(
                     {
@@ -208,20 +393,31 @@ export const verifyDNSRecord = inngest.createFunction(
 
         // Update DNS record status
         await step.run("update-dns-record-status", async () => {
+            const verificationError = verified
+                ? null
+                : `DNS record verification failed: Expected value not found for ${recordType} record at ${name}`;
+
             await db
                 .update(schema.domainDnsRecord)
                 .set({
                     isVerified: verified,
                     isActive: verified ? true : false,
-                    verificationError: verified ? null : "DNS record not found",
+                    status: verified ? "active" : "failed",
+                    verificationError,
                     updatedAt: new Date(),
                 })
                 .where(eq(schema.domainDnsRecord.id, dnsRecordId));
 
             if (verified) {
-                logger.info({ dnsRecordId }, "DNS record verified successfully");
+                logger.info(
+                    { dnsRecordId, recordType, name },
+                    "DNS record verified successfully",
+                );
             } else {
-                logger.warn({ dnsRecordId }, "DNS record verification failed");
+                logger.warn(
+                    { dnsRecordId, recordType, name, expectedValue: dnsRecord.value },
+                    "DNS record verification failed",
+                );
             }
         });
 

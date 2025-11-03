@@ -92,12 +92,11 @@ export const domain = pgTable(
 		index("domain_idx_dns_configured").on(table.dnsConfigured),
 		index("domain_idx_created_at").on(table.createdAt),
 		index("domain_idx_deleted_at").on(table.deletedAt),
-		// Composite indexes for common queries
+		index("domain_idx_last_verified_at").on(table.lastVerifiedAt),
 		index("domain_idx_org_status").on(table.organizationId, table.status),
 		index("domain_idx_org_deleted").on(table.organizationId, table.deletedAt),
 		index("domain_idx_user_status").on(table.userId, table.status),
 		index("domain_idx_status_verified").on(table.status, table.userVerified),
-		// Unique constraint: one domain per organization (unless deleted)
 		unique("domain_unique_org_domain").on(table.organizationId, table.domain),
 	],
 );
