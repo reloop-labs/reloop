@@ -1,5 +1,4 @@
 import "dotenv/config";
-import { cors } from "@elysiajs/cors";
 import { inngest } from "@reloop/inngest/client";
 import {
     cronActiveDomainMonitoring,
@@ -15,6 +14,7 @@ import {
 import { landing } from "@reloop/inngest/routes/landing/landing.index";
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
+import { serve } from "inngest/bun";
 
 const port = 8017;
 
@@ -30,21 +30,24 @@ const functions = [
     logEvent,
 ];
 
-// Create serve handler for Inngest
-import { serve } from "inngest/bun";
 
 const handler = serve({
     client: inngest,
     functions,
 });
 
+const inngestHandler = new Elysia().all("/v1", ({ request }) =>
+    handler(request)
+);
+
+
 const inngestService = new Elysia({
     prefix: "/api/inngest",
     name: "Inngest Service",
 })
-    .use(cors())
+    //.use(cors())
     .use(landing)
-    .all("*", ({ request }) => handler(request))
+    .use(inngestHandler)
     .listen(port, () => {
         logger.info(
             `Inngest Service is running on http://localhost:${port}/api/inngest`,
