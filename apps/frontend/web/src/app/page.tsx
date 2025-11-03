@@ -3,8 +3,8 @@ import Link from "next/link";
 
 export default function Home() {
 	return (
-		<div>
-			<h1 className="title-h2 mx-auto mt-20 max-w-xl text-center font-semibold">
+		<div className="mx-auto max-w-7xl border-stroke-soft-100 border-r border-l pt-20">
+			<h1 className="title-h2 mx-auto max-w-xl text-center font-semibold">
 				Email for Developers & Marketing teams
 			</h1>
 			<h2 className="mx-auto mt-6 max-w-lg text-center text-lg text-text-sub-600 leading-8">

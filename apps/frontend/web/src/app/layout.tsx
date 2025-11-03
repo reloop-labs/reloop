@@ -27,9 +27,7 @@ export default function RootLayout({
 				>
 					<Header />
 					{children}
-					<div className="mt-10">
-						<Footer />
-					</div>
+					<Footer />
 					<IconsSprite />
 				</ThemeProvider>
 			</body>
