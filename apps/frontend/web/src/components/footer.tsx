@@ -123,8 +123,8 @@ const links = [
 export const Footer = () => {
 	return (
 		<footer className="border-stroke-soft-100 border-t border-r">
-			<div className="mx-auto max-w-7xl border-stroke-soft-100 border-r border-b border-l px-6 py-10">
-				<div className="grid gap-12 md:grid-cols-5">
+			<div className="mx-auto max-w-7xl border-stroke-soft-100 border-r border-b border-l">
+				<div className="grid gap-12 px-6 py-10 md:grid-cols-5">
 					<div className="md:col-span-2">
 						<div>
 							<Link href="/" aria-label="go home" className="block size-fit">
@@ -217,7 +217,9 @@ export const Footer = () => {
 						))}
 					</div>
 				</div>
+				<div className="border-stroke-soft-100 border-t py-7" />
 			</div>
+			<div className="mx-auto max-w-7xl border-stroke-soft-100 border-r border-l py-10" />
 		</footer>
 	);
 };
