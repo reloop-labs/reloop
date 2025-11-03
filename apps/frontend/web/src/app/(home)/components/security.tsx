@@ -38,7 +38,7 @@ export default function Security() {
 	return (
 		<div className="border-stroke-soft-100 border-t border-b">
 			<div className="mx-auto max-w-7xl border-stroke-soft-100 border-r border-l">
-				<div className="flex h-full justify-between">
+				<div className="flex items-stretch justify-between">
 					{/* Left Section */}
 					<div className="space-y-6 py-20 pl-10">
 						<h2 className="max-w-2xl font-semibold text-3xl text-text-strong-950">
@@ -59,7 +59,7 @@ export default function Security() {
 					</div>
 
 					{/* Right Section - Compliance Badges */}
-					<div className="grid h-full w-full max-w-sm grid-cols-3 divide-x divide-stroke-soft-100 border-stroke-soft-100 border-l">
+					<div className="grid w-full max-w-sm grid-cols-3 divide-x divide-stroke-soft-100 self-stretch border-stroke-soft-100 border-l">
 						{securityFeatures.map((feature, index) => (
 							<div
 								key={index}
