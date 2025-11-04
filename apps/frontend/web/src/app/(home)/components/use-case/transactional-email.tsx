@@ -60,14 +60,14 @@ const Card = ({ card }: CardProps) => {
 	return (
 		<motion.div
 			layout
-			initial={{ opacity: 0, y: -20, scale: 0.95 }}
+			initial={{ opacity: 0, y: -100, scale: 0.9 }}
 			animate={{ opacity: 1, y: 0, scale: 1 }}
 			exit={{ opacity: 0, y: 20, scale: 0.95 }}
 			transition={{
-				layout: { duration: 0.3, ease: "easeOut" },
-				opacity: { duration: 0.2 },
-				y: { duration: 0.3, ease: "easeOut" },
-				scale: { duration: 0.2 },
+				layout: { duration: 0.4, ease: [0.4, 0, 0.2, 1] },
+				opacity: { duration: 0.3, ease: "easeOut" },
+				y: { duration: 0.4, ease: [0.4, 0, 0.2, 1] },
+				scale: { duration: 0.3, ease: "easeOut" },
 			}}
 			className={`rounded-2xl border ${card.borderColor || "border-verified-base/50"} bg-bg-white-0 px-4 py-3`}
 		>
