@@ -9,9 +9,9 @@ export default function Home() {
 	return (
 		<div>
 			<Hero />
+			<UseCase />
 			<Scale />
 			<Security />
-			<UseCase />
 			<Company />
 			<CTA />
 			<Faq />

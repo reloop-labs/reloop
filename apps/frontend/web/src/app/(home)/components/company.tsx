@@ -3,18 +3,6 @@ export default function Company() {
 		// Row 1
 		{ name: "CURSOR", logo: null },
 		{ name: "Spotify", logo: "spotify" },
-		{ name: "ahrefs", logo: null },
-		{ name: "SoundCloud", logo: "soundcloud" },
-		// Row 2
-		{ name: "Basecamp", logo: "basecamp" },
-		{ name: "", logo: null }, // Blurred placeholder
-		{ name: "GoDaddy", logo: "godaddy" },
-		{ name: "airbnb", logo: "airbnb" },
-		// Row 3
-		{ name: "GitHub", logo: null },
-		{ name: "Vercel", logo: "vercel" },
-		{ name: "ngrok", logo: null },
-		{ name: "Beacon", logo: null },
 	];
 
 	const renderLogo = (logo: string | null) => {
@@ -116,7 +104,7 @@ export default function Company() {
 	};
 
 	return (
-		<div className="border-stroke-soft-100 border-t">
+		<div className="border-stroke-soft-100 border-t border-b">
 			<div className="mx-auto max-w-7xl border-stroke-soft-100 border-r border-l">
 				<div className="flex items-center justify-between border-stroke-soft-100 border-b px-10 py-4">
 					<span className="text-sm text-text-sub-600">[02] COMPANY</span>
