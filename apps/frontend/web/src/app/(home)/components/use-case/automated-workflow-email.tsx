@@ -3,59 +3,56 @@ import { Icon } from "@reloop/ui/icon";
 
 const cardsData = [
 	{
-		id: 1,
-		title: "Welcome Email",
-		icon: "mail",
-		color: "information-base",
-		borderColor: "border-information-base/50",
-		iconBg: "bg-information-base/20",
-		iconColor: "text-information-base",
-		message: "Welcome email sent to",
-		highlight: "acma@reloop.com",
-	},
-	{
 		id: 2,
 		title: "Welcome Email",
 		icon: "mail",
 		color: "verified-base",
-		borderColor: "border-verified-base/50",
+		borderColor: "border-verified-base",
 		iconBg: "bg-verified-base/20",
 		iconColor: "text-verified-base",
 		message: "Welcome email sent to",
+		textColor: "text-verified-base",
 		highlight: "acma@reloop.com",
+		subtitle: "Day 1",
 	},
 	{
 		id: 3,
 		title: "Feature Request",
 		icon: "rocket",
 		color: "success-base",
-		borderColor: "border-success-base/50",
+		borderColor: "border-success-base",
 		iconBg: "bg-success-base/20",
 		iconColor: "text-success-base",
 		message: "Feature request sent to",
+		textColor: "text-success-base",
 		highlight: "acma@reloop.com",
+		subtitle: "Day 2",
 	},
 	{
 		id: 4,
 		title: "Product Update",
 		icon: "bulb",
 		color: "warning-base",
-		borderColor: "border-warning-base/50",
+		borderColor: "border-warning-base",
 		iconBg: "bg-warning-base/20",
 		iconColor: "text-warning-base",
 		message: "Product update sent to",
 		highlight: "acma@reloop.com",
+		textColor: "text-warning-base",
+		subtitle: "Day 3",
 	},
 	{
 		id: 5,
 		title: "Automation Complete",
 		icon: "check-circle",
 		color: "verified-base",
-		borderColor: "border-verified-base/50",
+		borderColor: "border-verified-base",
 		iconBg: "bg-verified-base/20",
 		iconColor: "text-verified-base",
 		message: "Automation workflow completed for",
 		highlight: "acma@reloop.com",
+		textColor: "text-verified-base",
+		subtitle: "Day 4",
 	},
 ];
 
@@ -81,7 +78,7 @@ const Card = ({ card }: CardProps) => {
 					<p className="font-semibold text-sm">{card.title}</p>
 				</div>
 				<p className="rounded-md border border-stroke-soft-100 bg-bg-weak-50 px-2 py-0.5 font-medium text-text-sub-600 text-xs">
-					Automation
+					{card.subtitle}
 				</p>
 			</div>
 			<div className="mt-3 border-stroke-soft-100 border-t pt-2">
@@ -139,7 +136,7 @@ export const AutomatedWorkflowEmail = () => {
 						}}
 					/>
 					<div className="relative mx-auto max-w-xl p-16">
-						<div className="mb-10 flex justify-center">
+						<div className="flex justify-center">
 							<div className="flex w-fit items-center gap-2 rounded-xl border border-success-base/50 bg-bg-white-0 py-2 pr-3 pl-2">
 								<div className="flex h-5 w-5 items-center justify-center rounded-sm border border-stroke-soft-100 bg-success-base/20">
 									<Icon
@@ -150,11 +147,48 @@ export const AutomatedWorkflowEmail = () => {
 								<p className="font-semibold text-xs">New User Signup</p>
 							</div>
 						</div>
+						<div className="-mt-1.5">
+							<div className="flex flex-col items-center">
+								<div className="h-px w-px rounded-full border border-success-base bg-bg-white-0 p-1" />
+								<div className="h-10 w-px border-success-base border-l" />
+								<Icon
+									name="chevron-down"
+									className="-mt-2.5 h-4 w-4 text-success-base"
+								/>
+							</div>
+						</div>
 						<div className="relative">
-							<div className="relative space-y-10">
-								{cardsData.map((card) => {
-									return <Card key={card.id} card={card} />;
+							<div className="relative">
+								{cardsData.map((card, index) => {
+									return (
+										<div key={card.id} className="relative">
+											<Card card={card} />
+											<div className="flex flex-col items-center">
+												<div
+													className={`h-px w-px rounded-full border ${card.textColor || "border-verified-base/50"} -mt-1.5 bg-bg-white-0 p-1`}
+												/>
+												<div
+													className={`h-10 w-px border-l ${card.textColor || "border-verified-base/50"}`}
+												/>
+												<Icon
+													name="chevron-down"
+													className={`-mt-2.5 h-4 w-4 ${card.textColor || "border-verified-base/50"}`}
+												/>
+											</div>
+										</div>
+									);
 								})}
+							</div>
+						</div>
+						<div className="flex justify-center">
+							<div className="flex w-fit items-center gap-2 rounded-xl border border-error-base/50 bg-bg-white-0 py-2 pr-3 pl-2">
+								<div className="flex h-5 w-5 items-center justify-center rounded-sm border border-stroke-soft-100 bg-error-base/20">
+									<Icon
+										name="check-circle"
+										className="h-3 w-3 stroke-1 text-error-base"
+									/>
+								</div>
+								<p className="font-semibold text-xs">Automation Complete</p>
 							</div>
 						</div>
 					</div>
