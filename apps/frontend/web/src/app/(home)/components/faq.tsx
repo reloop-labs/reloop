@@ -82,6 +82,7 @@ const Faq = () => {
 										<Accordion.Item
 											className="rounded-none border-stroke-soft-100 border-b bg-transparent p-0! ring-0 hover:bg-transparent has-[:focus-visible]:bg-transparent data-[state=open]:bg-transparent"
 											value={itemValue}
+											key={questionIndex}
 										>
 											<Accordion.Trigger className="flex w-full items-center justify-between px-10 py-7 text-left font-medium text-base">
 												{faq.question}
