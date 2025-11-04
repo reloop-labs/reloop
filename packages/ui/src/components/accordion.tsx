@@ -54,7 +54,7 @@ const AccordionTrigger = React.forwardRef<
 				// base
 				"w-[calc(100%+theme(space.7))] text-left text-label-sm text-text-strong-950",
 				"grid auto-cols-auto grid-flow-col grid-cols-[auto,minmax(0,1fr)] items-center gap-2.5",
-				"-m-3.5 p-3.5 outline-none",
+				"outline-none",
 				// focus
 				"focus:outline-none",
 				className,
