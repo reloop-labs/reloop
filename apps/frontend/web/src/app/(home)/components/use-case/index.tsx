@@ -1,6 +1,5 @@
 import { AutomatedWorkflowEmail } from "./automated-workflow-email";
 import { MarketingEmail } from "./marketing-email";
-import { NotificationEmail } from "./notification-email";
 import { SystemAdminEmail } from "./system-admin-email";
 import { TransactionalEmail } from "./transactional-email";
 
@@ -16,7 +15,6 @@ export default function UseCase() {
 					<TransactionalEmail />
 					<AutomatedWorkflowEmail />
 					<MarketingEmail />
-					<NotificationEmail />
 					<SystemAdminEmail />
 				</div>
 			</div>
