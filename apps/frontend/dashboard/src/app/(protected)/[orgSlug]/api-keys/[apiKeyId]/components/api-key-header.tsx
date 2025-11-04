@@ -117,7 +117,8 @@ export const ApiKeyHeader = ({
 		);
 	}
 
-	const displayName = apiKey?.name || apiKey?.start || apiKey?.prefix || "Unnamed";
+	const displayName =
+		apiKey?.name || apiKey?.start || apiKey?.prefix || "Unnamed";
 	const displayPrefix = apiKey?.start || apiKey?.prefix || "---";
 
 	return (
@@ -243,10 +244,7 @@ export const ApiKeyHeader = ({
 											mode="ghost"
 											size="small"
 											onClick={() =>
-												window.open(
-													"https://reloop.sh/docs/api-keys",
-													"_blank",
-												)
+												window.open("https://reloop.sh/docs/api-keys", "_blank")
 											}
 											className="w-full justify-start"
 										>
@@ -311,10 +309,7 @@ export const ApiKeyHeader = ({
 						</div>
 						<div className="">
 							<div className="flex items-center gap-1.5">
-								<Icon
-									name="activity-2"
-									className="h-4 w-4 text-success-base"
-								/>
+								<Icon name="activity-2" className="h-4 w-4 text-success-base" />
 								<span className="font-medium text-sm text-text-sub-600">
 									Remaining
 								</span>
@@ -348,10 +343,7 @@ export const ApiKeyHeader = ({
 						</div>
 						<div className="">
 							<div className="flex items-center gap-1.5">
-								<Icon
-									name="activity-2"
-									className="h-4 w-4 text-success-base"
-								/>
+								<Icon name="activity-2" className="h-4 w-4 text-success-base" />
 								<span className="font-medium text-sm text-text-sub-600">
 									Remaining
 								</span>
@@ -397,4 +389,3 @@ export const ApiKeyHeader = ({
 		</div>
 	);
 };
-

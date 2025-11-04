@@ -7,12 +7,12 @@ import { updateWebhookRoute } from "@reloop/webhook/routes/webhook/routes/update
 import { Elysia } from "elysia";
 
 export const webhookRoutes = new Elysia({
-    prefix: "/v1",
-    name: "WebhookRoutes",
+	prefix: "/v1",
+	name: "WebhookRoutes",
 })
-    .use(authMiddleware)
-    .use(createWebhookRoute)
-    .use(getWebhookRoute)
-    .use(updateWebhookRoute)
-    .use(deleteWebhookRoute)
-    .use(listWebhooksRoute);
+	.use(authMiddleware)
+	.use(createWebhookRoute)
+	.use(getWebhookRoute)
+	.use(updateWebhookRoute)
+	.use(deleteWebhookRoute)
+	.use(listWebhooksRoute);

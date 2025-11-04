@@ -1,6 +1,6 @@
 import { Elysia } from "elysia";
-import { TraceHubModel } from "../tracehub.model";
 import { trackEventHandler } from "../controllers/track-event";
+import { TraceHubModel } from "../tracehub.model";
 
 export const trackRoute = new Elysia().post(
 	"/track",

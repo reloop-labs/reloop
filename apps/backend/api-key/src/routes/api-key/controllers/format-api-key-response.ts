@@ -57,4 +57,3 @@ export function formatApiKeyWithKeyResponse(
 		metadata: apiKey.metadata,
 	};
 }
-

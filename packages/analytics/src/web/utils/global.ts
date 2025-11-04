@@ -11,4 +11,3 @@ export const navigator = global?.navigator;
 export const document = global?.document;
 export const location = global?.location;
 export const userAgent = navigator?.userAgent;
-

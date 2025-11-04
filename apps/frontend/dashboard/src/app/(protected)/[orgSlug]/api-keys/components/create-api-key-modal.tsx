@@ -101,7 +101,7 @@ export const CreateApiKeyModal = ({
 				{ headers: { credentials: "include" } },
 			);
 
-			await mutate(`/api/api-key/v1/?limit=100`);
+			await mutate("/api/api-key/v1/?limit=100");
 
 			setCreatedApiKey(response.data);
 			changeStatus("idle");
@@ -163,9 +163,7 @@ export const CreateApiKeyModal = ({
 						</p>
 
 						<div className="mb-4 space-y-2">
-							<Label.Root className="font-medium text-sm">
-								API Key
-							</Label.Root>
+							<Label.Root className="font-medium text-sm">API Key</Label.Root>
 							<div className="flex items-center gap-2 rounded-lg border border-stroke-soft-200 bg-bg-weak-50 p-3">
 								{keyRevealed ? (
 									<>
@@ -284,7 +282,10 @@ export const CreateApiKeyModal = ({
 							</div>
 
 							<div>
-								<Label.Root htmlFor="enabled" className="flex items-center gap-2">
+								<Label.Root
+									htmlFor="enabled"
+									className="flex items-center gap-2"
+								>
 									<input
 										id="enabled"
 										type="checkbox"
@@ -426,4 +427,3 @@ export const CreateApiKeyModal = ({
 		</Modal.Root>
 	);
 };
-

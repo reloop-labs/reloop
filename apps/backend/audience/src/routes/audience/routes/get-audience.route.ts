@@ -5,29 +5,29 @@ import type { User } from "@reloop/auth/server";
 import { Elysia, status, t } from "elysia";
 
 export const getAudienceRoute = new Elysia().use(authMiddleware).get(
-    "/get/:id",
-    async ({ params, user }: { params: { id: string }; user: User }) => {
-        if (!user.activeOrganizationId) {
-            throw status(403, {
-                message: "User is not a member of an organization",
-            });
-        }
-        return await getAudienceHandler(params.id, user.activeOrganizationId);
-    },
-    {
-        auth: true,
-        params: t.Object({
-            id: t.String(),
-        }),
-        response: {
-            200: AudienceModel.audienceResponse,
-            404: AudienceModel.audienceNotFound,
-            403: AudienceModel.unauthorized,
-        },
-        detail: {
-            tags: ["Audience"],
-            summary: "Get an audience",
-            description: "Retrieves a specific audience by ID",
-        },
-    },
+	"/get/:id",
+	async ({ params, user }: { params: { id: string }; user: User }) => {
+		if (!user.activeOrganizationId) {
+			throw status(403, {
+				message: "User is not a member of an organization",
+			});
+		}
+		return await getAudienceHandler(params.id, user.activeOrganizationId);
+	},
+	{
+		auth: true,
+		params: t.Object({
+			id: t.String(),
+		}),
+		response: {
+			200: AudienceModel.audienceResponse,
+			404: AudienceModel.audienceNotFound,
+			403: AudienceModel.unauthorized,
+		},
+		detail: {
+			tags: ["Audience"],
+			summary: "Get an audience",
+			description: "Retrieves a specific audience by ID",
+		},
+	},
 );

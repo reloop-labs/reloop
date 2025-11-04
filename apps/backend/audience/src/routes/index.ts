@@ -3,5 +3,5 @@ import { audienceGroupRoutes } from "@reloop/audience/routes/audience-group/audi
 import { Elysia } from "elysia";
 
 export const allAudienceRoutes = new Elysia()
-    .use(audienceRoutes)
-    .use(audienceGroupRoutes);
+	.use(audienceRoutes)
+	.use(audienceGroupRoutes);

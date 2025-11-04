@@ -4,26 +4,26 @@ import { SubscriptionModel } from "@reloop/webhook/routes/subscription/subscript
 import { Elysia, status } from "elysia";
 
 export const listSubscriptionsRoute = new Elysia().use(authMiddleware).get(
-    "/list",
-    async ({ query, user }) => {
-        if (!user.activeOrganizationId) {
-            throw status(403, {
-                message: "User is not a member of an organization",
-            });
-        }
-        return await listSubscriptionsHandler(query, user.activeOrganizationId);
-    },
-    {
-        query: SubscriptionModel.subscriptionQuery,
-        response: {
-            200: SubscriptionModel.subscriptionListResponse,
-            403: SubscriptionModel.unauthorized,
-        },
-        auth: true,
-        detail: {
-            tags: ["Subscriptions"],
-            summary: "List subscriptions",
-            description: "Retrieves a paginated list of webhook event subscriptions",
-        },
-    },
+	"/list",
+	async ({ query, user }) => {
+		if (!user.activeOrganizationId) {
+			throw status(403, {
+				message: "User is not a member of an organization",
+			});
+		}
+		return await listSubscriptionsHandler(query, user.activeOrganizationId);
+	},
+	{
+		query: SubscriptionModel.subscriptionQuery,
+		response: {
+			200: SubscriptionModel.subscriptionListResponse,
+			403: SubscriptionModel.unauthorized,
+		},
+		auth: true,
+		detail: {
+			tags: ["Subscriptions"],
+			summary: "List subscriptions",
+			description: "Retrieves a paginated list of webhook event subscriptions",
+		},
+	},
 );

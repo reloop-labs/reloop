@@ -13,4 +13,3 @@ export class PulseHTTPError extends Error {
 		return `${this.name}: ${this.statusCode}, ${this.message}`;
 	}
 }
-

@@ -1,7 +1,7 @@
+import type { ApiKeyTypes } from "@reloop/api-key/routes/api-key/api-key.type";
+import { formatApiKeyResponse } from "@reloop/api-key/routes/api-key/controllers/format-api-key-response";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { formatApiKeyResponse } from "@reloop/api-key/routes/api-key/controllers/format-api-key-response";
-import type { ApiKeyTypes } from "@reloop/api-key/routes/api-key/api-key.type";
 import { logger } from "@reloop/logger";
 import { and, eq } from "drizzle-orm";
 import { status } from "elysia";
@@ -11,10 +11,7 @@ export async function getApiKey(
 	organizationId: string,
 	userId: string,
 ): Promise<ApiKeyTypes.ApiKeyResponse> {
-	logger.info(
-		{ apiKeyId, organizationId, userId },
-		"Getting API key",
-	);
+	logger.info({ apiKeyId, organizationId, userId }, "Getting API key");
 
 	try {
 		const result = await db.query.apikey.findFirst({
@@ -71,4 +68,3 @@ export async function getApiKeyHandler(
 		throw error;
 	}
 }
-

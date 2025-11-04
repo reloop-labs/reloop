@@ -13,15 +13,13 @@ export type PropertiesValue =
 export interface AnalyticsClient {
 	apiUrl: string;
 	timeout: number;
-	track(
-		body: {
-			event: string;
-			properties?: Record<string, PropertiesValue>;
-			distinct_id?: string;
-			user_id?: string;
-			organization_id?: string;
-		},
-	): Promise<{
+	track(body: {
+		event: string;
+		properties?: Record<string, PropertiesValue>;
+		distinct_id?: string;
+		user_id?: string;
+		organization_id?: string;
+	}): Promise<{
 		uuid: string;
 		event: string;
 		message: string;
@@ -63,7 +61,8 @@ export function createAnalyticsClient(
 						message: `HTTP ${response.status}: ${response.statusText}`,
 					}));
 					throw new Error(
-						errorData.message || `HTTP ${response.status}: ${response.statusText}`,
+						errorData.message ||
+							`HTTP ${response.status}: ${response.statusText}`,
 					);
 				}
 

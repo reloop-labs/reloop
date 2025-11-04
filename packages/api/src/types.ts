@@ -1,5 +1,3 @@
-
-
 // Domain types
 export type DomainStatus =
 	| "start-verify"
@@ -101,7 +99,7 @@ export interface AudienceGroup {
 	updatedAt: string;
 }
 
-export interface AudienceResponse extends Audience { }
+export interface AudienceResponse extends Audience {}
 
 export interface AudienceListResponse {
 	audiences: Audience[];
@@ -110,7 +108,7 @@ export interface AudienceListResponse {
 	limit: number;
 }
 
-export interface AudienceGroupResponse extends AudienceGroup { }
+export interface AudienceGroupResponse extends AudienceGroup {}
 
 export interface AudienceGroupListResponse {
 	audienceGroups: AudienceGroup[];

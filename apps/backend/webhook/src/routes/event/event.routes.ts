@@ -4,9 +4,9 @@ import { listEventsRoute } from "@reloop/webhook/routes/event/routes/list-events
 import { Elysia } from "elysia";
 
 export const eventRoutes = new Elysia({
-    prefix: "/events",
-    name: "EventRoutes",
+	prefix: "/events",
+	name: "EventRoutes",
 })
-    .use(authMiddleware)
-    .use(listEventsRoute)
-    .use(getEventRoute);
+	.use(authMiddleware)
+	.use(listEventsRoute)
+	.use(getEventRoute);

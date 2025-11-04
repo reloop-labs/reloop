@@ -37,7 +37,7 @@ export const ApiKeyListSidebar = () => {
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
 	const { data, error, isLoading } = useSWR<ApiKeyListResponse>(
-		activeOrganization?.id ? `/api/api-key/v1/?limit=100` : null,
+		activeOrganization?.id ? "/api/api-key/v1/?limit=100" : null,
 		{
 			revalidateOnFocus: true,
 			revalidateOnReconnect: true,
@@ -156,4 +156,3 @@ export const ApiKeyListSidebar = () => {
 		</div>
 	);
 };
-

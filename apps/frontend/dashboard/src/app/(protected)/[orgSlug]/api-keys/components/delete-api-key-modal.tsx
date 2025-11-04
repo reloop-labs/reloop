@@ -40,7 +40,11 @@ export const DeleteApiKeyModal = ({ apiKeys }: DeleteApiKeyModalProps) => {
 	const handleDelete = async () => {
 		if (!apiKeyToDelete || !activeOrganization) return;
 
-		const displayName = apiKeyToDelete.name || apiKeyToDelete.start || apiKeyToDelete.prefix || "Unnamed";
+		const displayName =
+			apiKeyToDelete.name ||
+			apiKeyToDelete.start ||
+			apiKeyToDelete.prefix ||
+			"Unnamed";
 		if (confirmationName !== displayName) {
 			toast.error("Please enter the correct API key name to confirm deletion");
 			return;
@@ -55,7 +59,7 @@ export const DeleteApiKeyModal = ({ apiKeys }: DeleteApiKeyModalProps) => {
 			toast.success("API key deleted successfully");
 			setDeleteId(null);
 			setConfirmationName("");
-			mutate(`/api/api-key/v1/?limit=100`);
+			mutate("/api/api-key/v1/?limit=100");
 		} catch (error) {
 			const errorMessage = axios.isAxiosError(error)
 				? error.response?.data?.message || "Failed to delete API key"
@@ -71,7 +75,11 @@ export const DeleteApiKeyModal = ({ apiKeys }: DeleteApiKeyModalProps) => {
 		setConfirmationName("");
 	};
 
-	const displayName = apiKeyToDelete?.name || apiKeyToDelete?.start || apiKeyToDelete?.prefix || "Unnamed";
+	const displayName =
+		apiKeyToDelete?.name ||
+		apiKeyToDelete?.start ||
+		apiKeyToDelete?.prefix ||
+		"Unnamed";
 
 	return (
 		<Modal.Root
@@ -172,4 +180,3 @@ export const DeleteApiKeyModal = ({ apiKeys }: DeleteApiKeyModalProps) => {
 		</Modal.Root>
 	);
 };
-

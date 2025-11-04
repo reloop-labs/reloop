@@ -1,10 +1,10 @@
+import { createHash } from "node:crypto";
+import type { ApiKeyTypes } from "@reloop/api-key/routes/api-key/api-key.type";
+import { formatApiKeyResponse } from "@reloop/api-key/routes/api-key/controllers/format-api-key-response";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { formatApiKeyResponse } from "@reloop/api-key/routes/api-key/controllers/format-api-key-response";
-import type { ApiKeyTypes } from "@reloop/api-key/routes/api-key/api-key.type";
 import { logger } from "@reloop/logger";
-import { createHash } from "node:crypto";
-import { eq, and } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { status } from "elysia";
 
 function hashApiKey(key: string): string {
@@ -14,7 +14,10 @@ function hashApiKey(key: string): string {
 export async function validateApiKey(
 	apiKey: string,
 ): Promise<ApiKeyTypes.ApiKeyData | null> {
-	logger.info({ apiKey: apiKey.substring(0, 12) + "..." }, "Validating API key");
+	logger.info(
+		{ apiKey: apiKey.substring(0, 12) + "..." },
+		"Validating API key",
+	);
 
 	try {
 		// Hash the provided key
@@ -22,11 +25,17 @@ export async function validateApiKey(
 
 		// Find API key by hash
 		const result = await db.query.apikey.findFirst({
-			where: and(eq(schema.apikey.key, hashedKey), eq(schema.apikey.enabled, true)),
+			where: and(
+				eq(schema.apikey.key, hashedKey),
+				eq(schema.apikey.enabled, true),
+			),
 		});
 
 		if (!result) {
-			logger.warn({ apiKey: apiKey.substring(0, 12) + "..." }, "API key not found");
+			logger.warn(
+				{ apiKey: apiKey.substring(0, 12) + "..." },
+				"API key not found",
+			);
 			return null;
 		}
 
@@ -63,7 +72,10 @@ export async function validateApiKey(
 export async function validateApiKeyHandler(
 	apiKey: string,
 ): Promise<{ valid: boolean; apiKey?: ApiKeyTypes.ApiKeyResponse }> {
-	logger.info({ apiKey: apiKey.substring(0, 12) + "..." }, "Validating API key");
+	logger.info(
+		{ apiKey: apiKey.substring(0, 12) + "..." },
+		"Validating API key",
+	);
 
 	try {
 		const validated = await validateApiKey(apiKey);
@@ -85,4 +97,3 @@ export async function validateApiKeyHandler(
 		return { valid: false };
 	}
 }
-

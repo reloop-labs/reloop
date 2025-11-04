@@ -1,7 +1,4 @@
-import type {
-	AnalyticsClient,
-	AnalyticsClientOptions,
-} from "../client.js";
+import type { AnalyticsClient, AnalyticsClientOptions } from "../client.js";
 import { createAnalyticsClient } from "../client.js";
 import type { Properties } from "./types.js";
 

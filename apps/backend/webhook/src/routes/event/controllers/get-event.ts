@@ -6,82 +6,82 @@ import { eq } from "drizzle-orm";
 import { status } from "elysia";
 
 export async function getEvent(
-    eventId: string,
+	eventId: string,
 ): Promise<EventTypes.EventResponse> {
-    logger.info(
-        {
-            eventId,
-        },
-        "Getting event",
-    );
+	logger.info(
+		{
+			eventId,
+		},
+		"Getting event",
+	);
 
-    try {
-        const event = await db.query.webhookEvent.findFirst({
-            where: eq(schema.webhookEvent.id, eventId),
-        });
+	try {
+		const event = await db.query.webhookEvent.findFirst({
+			where: eq(schema.webhookEvent.id, eventId),
+		});
 
-        if (!event) {
-            logger.warn({ eventId }, "Event not found");
-            throw status(404, { message: "Event not found" });
-        }
+		if (!event) {
+			logger.warn({ eventId }, "Event not found");
+			throw status(404, { message: "Event not found" });
+		}
 
-        logger.info(
-            {
-                eventId,
-            },
-            "Event retrieved successfully",
-        );
+		logger.info(
+			{
+				eventId,
+			},
+			"Event retrieved successfully",
+		);
 
-        return {
-            id: event.id,
-            name: event.name,
-            description: event.description,
-            category: event.category,
-            isActive: event.isActive,
-            createdAt: event.createdAt.toISOString(),
-            updatedAt: event.updatedAt.toISOString(),
-        };
-    } catch (error) {
-        logger.error(
-            {
-                eventId,
-                error: error instanceof Error ? error.message : String(error),
-            },
-            "Error getting event",
-        );
-        throw error;
-    }
+		return {
+			id: event.id,
+			name: event.name,
+			description: event.description,
+			category: event.category,
+			isActive: event.isActive,
+			createdAt: event.createdAt.toISOString(),
+			updatedAt: event.updatedAt.toISOString(),
+		};
+	} catch (error) {
+		logger.error(
+			{
+				eventId,
+				error: error instanceof Error ? error.message : String(error),
+			},
+			"Error getting event",
+		);
+		throw error;
+	}
 }
 
 export async function getEventHandler(
-    eventId: string,
+	eventId: string,
 ): Promise<EventTypes.EventResponse> {
-    logger.info(
-        {
-            eventId,
-        },
-        "Getting event",
-    );
+	logger.info(
+		{
+			eventId,
+		},
+		"Getting event",
+	);
 
-    try {
-        const event = await getEvent(eventId);
+	try {
+		const event = await getEvent(eventId);
 
-        logger.info(
-            {
-                eventId,
-            },
-            "Event retrieved successfully",
-        );
+		logger.info(
+			{
+				eventId,
+			},
+			"Event retrieved successfully",
+		);
 
-        return event;
-    } catch (error) {
-        logger.error(
-            {
-                eventId,
-                error: error instanceof Error ? error.message : String(error),
-            },
-            "Error getting event",
-        );
-        throw error;
-    }
+		return event;
+	} catch (error) {
+		logger.error(
+			{
+				eventId,
+				error: error instanceof Error ? error.message : String(error),
+			},
+			"Error getting event",
+		);
+		throw error;
+	}
 }

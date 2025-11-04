@@ -173,7 +173,10 @@ export async function createDomain(
 					organizationId: organizationId,
 				},
 			});
-			logger.info({ domainId: newDomain[0].id, domain }, "Domain verification triggered");
+			logger.info(
+				{ domainId: newDomain[0].id, domain },
+				"Domain verification triggered",
+			);
 		} catch (error) {
 			logger.warn(
 				{

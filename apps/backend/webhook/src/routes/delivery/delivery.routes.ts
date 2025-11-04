@@ -5,10 +5,10 @@ import { retryDeliveryRoute } from "@reloop/webhook/routes/delivery/routes/retry
 import { Elysia } from "elysia";
 
 export const deliveryRoutes = new Elysia({
-    prefix: "/deliveries",
-    name: "DeliveryRoutes",
+	prefix: "/deliveries",
+	name: "DeliveryRoutes",
 })
-    .use(authMiddleware)
-    .use(getDeliveryRoute)
-    .use(listDeliveriesRoute)
-    .use(retryDeliveryRoute);
+	.use(authMiddleware)
+	.use(getDeliveryRoute)
+	.use(listDeliveriesRoute)
+	.use(retryDeliveryRoute);

@@ -7,13 +7,13 @@ import { updateAudienceGroupRoute } from "@reloop/audience/routes/audience-group
 import { Elysia } from "elysia";
 
 export const audienceGroupRoutes = new Elysia({
-    prefix: "/v1/groups",
-    name: "AudienceGroupRoutes",
+	prefix: "/v1/groups",
+	name: "AudienceGroupRoutes",
 })
-    .use(authMiddleware)
-    // Audience Group Routes
-    .use(createAudienceGroupRoute)
-    .use(getAudienceGroupRoute)
-    .use(listAudienceGroupsRoute)
-    .use(updateAudienceGroupRoute)
-    .use(deleteAudienceGroupRoute);
+	.use(authMiddleware)
+	// Audience Group Routes
+	.use(createAudienceGroupRoute)
+	.use(getAudienceGroupRoute)
+	.use(listAudienceGroupsRoute)
+	.use(updateAudienceGroupRoute)
+	.use(deleteAudienceGroupRoute);

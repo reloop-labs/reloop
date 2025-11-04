@@ -343,4 +343,3 @@ export interface AudienceGroupResponse {
 	createdAt: string;
 	updatedAt: string;
 }
-

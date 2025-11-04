@@ -3,8 +3,8 @@ import { sendEmailRoute } from "@reloop/be-mail/routes/mail/routes/send-email.ro
 import { Elysia } from "elysia";
 
 export const mailRoutes = new Elysia({
-    prefix: "/v1",
-    name: "MailRoutes",
+	prefix: "/v1",
+	name: "MailRoutes",
 })
-    .use(authMiddleware)
-    .use(sendEmailRoute);
+	.use(authMiddleware)
+	.use(sendEmailRoute);

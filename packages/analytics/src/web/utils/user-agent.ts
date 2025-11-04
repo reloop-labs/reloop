@@ -204,89 +204,89 @@ const osMatchers: [
 		| ((match: RegExpMatchArray | null, userAgent: string) => [string, string])
 	),
 ][] = [
-		[
-			new RegExp(XBOX + "; " + XBOX + " (.*?)[);]", "i"),
-			(match) => {
-				return [XBOX, (match && match[1]) || ""];
-			},
-		],
-		[new RegExp(NINTENDO, "i"), [NINTENDO, ""]],
-		[new RegExp(PLAYSTATION, "i"), [PLAYSTATION, ""]],
-		[BLACKBERRY_REGEX, [BLACKBERRY, ""]],
-		[
-			new RegExp(WINDOWS, "i"),
-			(_, userAgent) => {
-				if (/Phone/.test(userAgent) || /WPDesktop/.test(userAgent)) {
-					return [WINDOWS_PHONE, ""];
+	[
+		new RegExp(XBOX + "; " + XBOX + " (.*?)[);]", "i"),
+		(match) => {
+			return [XBOX, (match && match[1]) || ""];
+		},
+	],
+	[new RegExp(NINTENDO, "i"), [NINTENDO, ""]],
+	[new RegExp(PLAYSTATION, "i"), [PLAYSTATION, ""]],
+	[BLACKBERRY_REGEX, [BLACKBERRY, ""]],
+	[
+		new RegExp(WINDOWS, "i"),
+		(_, userAgent) => {
+			if (/Phone/.test(userAgent) || /WPDesktop/.test(userAgent)) {
+				return [WINDOWS_PHONE, ""];
+			}
+
+			if (new RegExp(MOBILE).test(userAgent) && !/IEMobile\b/.test(userAgent)) {
+				return [WINDOWS + " " + MOBILE, ""];
+			}
+
+			const match = /Windows NT ([0-9.]+)/i.exec(userAgent);
+			if (match && match[1]) {
+				const version = match[1];
+				let osVersion = windowsVersionMap[version] || "";
+
+				if (/arm/i.test(userAgent)) {
+					osVersion = "RT";
 				}
 
-				if (new RegExp(MOBILE).test(userAgent) && !/IEMobile\b/.test(userAgent)) {
-					return [WINDOWS + " " + MOBILE, ""];
-				}
+				return [WINDOWS, osVersion];
+			}
 
-				const match = /Windows NT ([0-9.]+)/i.exec(userAgent);
-				if (match && match[1]) {
-					const version = match[1];
-					let osVersion = windowsVersionMap[version] || "";
-
-					if (/arm/i.test(userAgent)) {
-						osVersion = "RT";
-					}
-
-					return [WINDOWS, osVersion];
-				}
-
-				return [WINDOWS, ""];
-			},
-		],
-		[
-			/((iPhone|iPad|iPod).*?OS (\d+)_(\d+)_?(\d+)?|iPhone)/,
-			(match) => {
-				if (match && match[3]) {
-					const versionParts = [match[3], match[4], match[5] || "0"];
-					return [IOS, versionParts.join(".")];
-				}
-				return [IOS, ""];
-			},
-		],
-		[
-			/(watch.*\/(\d+\.\d+\.\d+)|watch os,(\d+\.\d+),)/i,
-			(match) => {
-				let version = "";
-				if (match && match.length >= 3) {
-					version = !match[2] ? match[3] || "" : match[2] || "";
-				}
-				return ["watchOS", version];
-			},
-		],
-		[
-			new RegExp(
-				"(" + ANDROID + " (\\d+)\\.(\\d+)\\.?(\\d+)?|" + ANDROID + ")",
-				"i",
-			),
-			(match) => {
-				if (match && match[2]) {
-					const versionParts = [match[2], match[3], match[4] || "0"];
-					return [ANDROID, versionParts.join(".")];
-				}
-				return [ANDROID, ""];
-			},
-		],
-		[
-			/Mac OS X (\d+)[_.](\d+)[_.]?(\d+)?/i,
-			(match) => {
-				const result: [string, string] = ["Mac OS X", ""];
-				if (match && match[1]) {
-					const versionParts = [match[1], match[2], match[3] || "0"];
-					result[1] = versionParts.join(".");
-				}
-				return result;
-			},
-		],
-		[/Mac/i, ["Mac OS X", ""]],
-		[/CrOS/, [CHROME_OS, ""]],
-		[/Linux|debian/i, ["Linux", ""]],
-	];
+			return [WINDOWS, ""];
+		},
+	],
+	[
+		/((iPhone|iPad|iPod).*?OS (\d+)_(\d+)_?(\d+)?|iPhone)/,
+		(match) => {
+			if (match && match[3]) {
+				const versionParts = [match[3], match[4], match[5] || "0"];
+				return [IOS, versionParts.join(".")];
+			}
+			return [IOS, ""];
+		},
+	],
+	[
+		/(watch.*\/(\d+\.\d+\.\d+)|watch os,(\d+\.\d+),)/i,
+		(match) => {
+			let version = "";
+			if (match && match.length >= 3) {
+				version = !match[2] ? match[3] || "" : match[2] || "";
+			}
+			return ["watchOS", version];
+		},
+	],
+	[
+		new RegExp(
+			"(" + ANDROID + " (\\d+)\\.(\\d+)\\.?(\\d+)?|" + ANDROID + ")",
+			"i",
+		),
+		(match) => {
+			if (match && match[2]) {
+				const versionParts = [match[2], match[3], match[4] || "0"];
+				return [ANDROID, versionParts.join(".")];
+			}
+			return [ANDROID, ""];
+		},
+	],
+	[
+		/Mac OS X (\d+)[_.](\d+)[_.]?(\d+)?/i,
+		(match) => {
+			const result: [string, string] = ["Mac OS X", ""];
+			if (match && match[1]) {
+				const versionParts = [match[1], match[2], match[3] || "0"];
+				result[1] = versionParts.join(".");
+			}
+			return result;
+		},
+	],
+	[/Mac/i, ["Mac OS X", ""]],
+	[/CrOS/, [CHROME_OS, ""]],
+	[/Linux|debian/i, ["Linux", ""]],
+];
 
 export function detectOS(userAgent: string): [string, string] {
 	for (let i = 0; i < osMatchers.length; i++) {

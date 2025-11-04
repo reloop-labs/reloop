@@ -45,4 +45,3 @@ export const authMiddleware = new Elysia({ name: "better-auth" }).macro({
 		},
 	},
 });
-

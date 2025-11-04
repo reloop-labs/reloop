@@ -1,14 +1,14 @@
-import { db } from "@reloop/db/client";
-import * as schema from "@reloop/db/schema";
+import { createHash, randomBytes } from "node:crypto";
+import { createId } from "@paralleldrive/cuid2";
+import type { ApiKeyTypes } from "@reloop/api-key/routes/api-key/api-key.type";
 import {
 	formatApiKeyResponse,
 	formatApiKeyWithKeyResponse,
 } from "@reloop/api-key/routes/api-key/controllers/format-api-key-response";
-import type { ApiKeyTypes } from "@reloop/api-key/routes/api-key/api-key.type";
+import { db } from "@reloop/db/client";
+import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
-import { createId } from "@paralleldrive/cuid2";
-import { randomBytes, createHash } from "node:crypto";
-import { eq, and } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { status } from "elysia";
 
 const API_KEY_PREFIX = "rl";
@@ -53,9 +53,7 @@ export async function createApiKey(
 		const keyId = createId();
 
 		const now = new Date();
-		const expiresAt = request.expiresAt
-			? new Date(request.expiresAt)
-			: null;
+		const expiresAt = request.expiresAt ? new Date(request.expiresAt) : null;
 
 		// Set defaults
 		const enabled = request.enabled ?? true;
@@ -157,4 +155,3 @@ export async function createApiKeyHandler(
 		throw error;
 	}
 }
-

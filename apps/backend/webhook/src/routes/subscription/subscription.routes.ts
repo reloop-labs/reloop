@@ -5,10 +5,10 @@ import { unsubscribeEventRoute } from "@reloop/webhook/routes/subscription/route
 import { Elysia } from "elysia";
 
 export const subscriptionRoutes = new Elysia({
-    prefix: "/subscriptions",
-    name: "SubscriptionRoutes",
+	prefix: "/subscriptions",
+	name: "SubscriptionRoutes",
 })
-    .use(authMiddleware)
-    .use(subscribeEventRoute)
-    .use(unsubscribeEventRoute)
-    .use(listSubscriptionsRoute);
+	.use(authMiddleware)
+	.use(subscribeEventRoute)
+	.use(unsubscribeEventRoute)
+	.use(listSubscriptionsRoute);

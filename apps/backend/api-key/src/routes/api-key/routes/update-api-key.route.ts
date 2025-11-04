@@ -1,6 +1,6 @@
 import { authMiddleware } from "@reloop/api-key/middleware/auth";
-import { updateApiKeyHandler } from "@reloop/api-key/routes/api-key/controllers/update-api-key";
 import { ApiKeyModel } from "@reloop/api-key/routes/api-key/api-key.model";
+import { updateApiKeyHandler } from "@reloop/api-key/routes/api-key/controllers/update-api-key";
 import { Elysia, status, t } from "elysia";
 
 export const updateApiKeyRoute = new Elysia().use(authMiddleware).patch(
@@ -11,7 +11,12 @@ export const updateApiKeyRoute = new Elysia().use(authMiddleware).patch(
 				message: "User is not a member of an organization",
 			});
 		}
-		return await updateApiKeyHandler(id, user.activeOrganizationId, user.id, body);
+		return await updateApiKeyHandler(
+			id,
+			user.activeOrganizationId,
+			user.id,
+			body,
+		);
 	},
 	{
 		auth: true,
@@ -31,4 +36,3 @@ export const updateApiKeyRoute = new Elysia().use(authMiddleware).patch(
 		},
 	},
 );
-

@@ -34,4 +34,3 @@ const apiKeyService = new Elysia({
 	});
 
 export type ApiKeyService = typeof apiKeyService;
-

@@ -16,4 +16,3 @@ export const apiKeyRoutes = new Elysia({
 	.use(listApiKeysRoute)
 	.use(updateApiKeyRoute)
 	.use(deleteApiKeyRoute);
-

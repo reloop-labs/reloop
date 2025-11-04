@@ -126,7 +126,8 @@ export const ApiKeyTable = ({
 									</div>
 								))
 							: apiKeys.map((apiKey, index) => {
-									const displayName = apiKey.name || apiKey.start || apiKey.prefix || "Unnamed";
+									const displayName =
+										apiKey.name || apiKey.start || apiKey.prefix || "Unnamed";
 									const displayPrefix = apiKey.start || apiKey.prefix || "---";
 
 									return (
@@ -157,7 +158,7 @@ export const ApiKeyTable = ({
 															</div>
 															<div
 																className={cn(
-																	"truncate text-label-xs text-text-sub-400 text-xs font-mono",
+																	"truncate font-mono text-label-xs text-text-sub-400 text-xs",
 																)}
 															>
 																{displayPrefix}
@@ -263,9 +264,7 @@ export const ApiKeyTable = ({
 																	variant="error"
 																	mode="ghost"
 																	size="small"
-																	onClick={() =>
-																		handleDeleteApiKey(apiKey.id)
-																	}
+																	onClick={() => handleDeleteApiKey(apiKey.id)}
 																	className="w-full justify-start text-red-600 hover:bg-red-50"
 																>
 																	<Icon name="trash" className="h-4 w-4" />
@@ -286,4 +285,3 @@ export const ApiKeyTable = ({
 		</>
 	);
 };
-

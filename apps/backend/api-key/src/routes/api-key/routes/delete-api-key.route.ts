@@ -1,6 +1,6 @@
 import { authMiddleware } from "@reloop/api-key/middleware/auth";
-import { deleteApiKeyHandler } from "@reloop/api-key/routes/api-key/controllers/delete-api-key";
 import { ApiKeyModel } from "@reloop/api-key/routes/api-key/api-key.model";
+import { deleteApiKeyHandler } from "@reloop/api-key/routes/api-key/controllers/delete-api-key";
 import { Elysia, status, t } from "elysia";
 
 export const deleteApiKeyRoute = new Elysia().use(authMiddleware).delete(
@@ -32,4 +32,3 @@ export const deleteApiKeyRoute = new Elysia().use(authMiddleware).delete(
 		},
 	},
 );
-

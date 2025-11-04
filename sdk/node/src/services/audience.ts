@@ -35,7 +35,9 @@ export class AudienceService {
 	 * @returns Promise resolving to the audience
 	 */
 	async get(id: string): Promise<AudienceResponse> {
-		return this.client.get<AudienceResponse>(`/api/audience/v1/get/${encodeURIComponent(id)}`);
+		return this.client.get<AudienceResponse>(
+			`/api/audience/v1/get/${encodeURIComponent(id)}`,
+		);
 	}
 
 	/**
@@ -44,7 +46,10 @@ export class AudienceService {
 	 * @returns Promise resolving to the list of audiences
 	 */
 	async list(query?: AudienceQuery): Promise<AudienceListResponse> {
-		return this.client.get<AudienceListResponse>("/api/audience/v1/list", query);
+		return this.client.get<AudienceListResponse>(
+			"/api/audience/v1/list",
+			query,
+		);
 	}
 
 	/**
@@ -53,7 +58,10 @@ export class AudienceService {
 	 * @param data Audience update data
 	 * @returns Promise resolving to the updated audience
 	 */
-	async update(id: string, data: UpdateAudienceRequest): Promise<AudienceResponse> {
+	async update(
+		id: string,
+		data: UpdateAudienceRequest,
+	): Promise<AudienceResponse> {
 		return this.client.put<AudienceResponse>(
 			`/api/audience/v1/update/${encodeURIComponent(id)}`,
 			data,
@@ -76,8 +84,13 @@ export class AudienceService {
 	 * @param data Bulk import data
 	 * @returns Promise resolving to bulk import results
 	 */
-	async bulkImport(data: BulkImportAudiencesRequest): Promise<BulkImportResponse> {
-		return this.client.post<BulkImportResponse>("/api/audience/v1/bulk-import", data);
+	async bulkImport(
+		data: BulkImportAudiencesRequest,
+	): Promise<BulkImportResponse> {
+		return this.client.post<BulkImportResponse>(
+			"/api/audience/v1/bulk-import",
+			data,
+		);
 	}
 
 	/**
@@ -118,7 +131,10 @@ export class AudienceService {
 	 * @returns Promise resolving to the list of matching audiences
 	 */
 	async search(query: SearchAudiencesQuery): Promise<AudienceListResponse> {
-		return this.client.get<AudienceListResponse>("/api/audience/v1/search", query);
+		return this.client.get<AudienceListResponse>(
+			"/api/audience/v1/search",
+			query,
+		);
 	}
 
 	/**
@@ -126,8 +142,13 @@ export class AudienceService {
 	 * @param data Audience group creation data
 	 * @returns Promise resolving to the created audience group
 	 */
-	async createGroup(data: CreateAudienceGroupRequest): Promise<AudienceGroupResponse> {
-		return this.client.post<AudienceGroupResponse>("/api/audience/v1/groups/add", data);
+	async createGroup(
+		data: CreateAudienceGroupRequest,
+	): Promise<AudienceGroupResponse> {
+		return this.client.post<AudienceGroupResponse>(
+			"/api/audience/v1/groups/add",
+			data,
+		);
 	}
 
 	/**
@@ -146,8 +167,13 @@ export class AudienceService {
 	 * @param query Query parameters for filtering and pagination
 	 * @returns Promise resolving to the list of audience groups
 	 */
-	async listGroups(query?: AudienceGroupQuery): Promise<AudienceGroupListResponse> {
-		return this.client.get<AudienceGroupListResponse>("/api/audience/v1/groups/list", query);
+	async listGroups(
+		query?: AudienceGroupQuery,
+	): Promise<AudienceGroupListResponse> {
+		return this.client.get<AudienceGroupListResponse>(
+			"/api/audience/v1/groups/list",
+			query,
+		);
 	}
 
 	/**
@@ -177,4 +203,3 @@ export class AudienceService {
 		);
 	}
 }
-

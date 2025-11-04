@@ -11,20 +11,20 @@ import { updateAudienceRoute } from "@reloop/audience/routes/audience/routes/upd
 import { Elysia } from "elysia";
 
 export const audienceRoutes = new Elysia({
-    prefix: "/v1",
-    name: "AudienceRoutes",
+	prefix: "/v1",
+	name: "AudienceRoutes",
 })
-    .use(authMiddleware)
-    // Audience Routes
-    .use(createAudienceRoute)
-    .use(getAudienceRoute)
-    .use(listAudiencesRoute)
-    .use(updateAudienceRoute)
-    .use(deleteAudienceRoute)
-    // Bulk Operations
-    .use(bulkImportAudiencesRoute)
-    // Status Management
-    .use(subscribeAudienceRoute)
-    .use(unsubscribeAudienceRoute)
-    // Search
-    .use(searchAudiencesRoute);
+	.use(authMiddleware)
+	// Audience Routes
+	.use(createAudienceRoute)
+	.use(getAudienceRoute)
+	.use(listAudiencesRoute)
+	.use(updateAudienceRoute)
+	.use(deleteAudienceRoute)
+	// Bulk Operations
+	.use(bulkImportAudiencesRoute)
+	// Status Management
+	.use(subscribeAudienceRoute)
+	.use(unsubscribeAudienceRoute)
+	// Search
+	.use(searchAudiencesRoute);

@@ -1,6 +1,6 @@
+import type { ApiKeyTypes } from "@reloop/api-key/routes/api-key/api-key.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import type { ApiKeyTypes } from "@reloop/api-key/routes/api-key/api-key.type";
 import { logger } from "@reloop/logger";
 import { and, eq } from "drizzle-orm";
 import { status } from "elysia";
@@ -10,10 +10,7 @@ export async function deleteApiKey(
 	organizationId: string,
 	userId: string,
 ): Promise<void> {
-	logger.info(
-		{ apiKeyId, organizationId, userId },
-		"Deleting API key",
-	);
+	logger.info({ apiKeyId, organizationId, userId }, "Deleting API key");
 
 	try {
 		// Check if API key exists and belongs to user/organization
@@ -81,4 +78,3 @@ export async function deleteApiKeyHandler(
 		throw error;
 	}
 }
-

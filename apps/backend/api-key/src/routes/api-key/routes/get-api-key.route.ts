@@ -1,6 +1,6 @@
 import { authMiddleware } from "@reloop/api-key/middleware/auth";
-import { getApiKeyHandler } from "@reloop/api-key/routes/api-key/controllers/get-api-key";
 import { ApiKeyModel } from "@reloop/api-key/routes/api-key/api-key.model";
+import { getApiKeyHandler } from "@reloop/api-key/routes/api-key/controllers/get-api-key";
 import { Elysia, status, t } from "elysia";
 
 export const getApiKeyRoute = new Elysia().use(authMiddleware).get(
@@ -30,4 +30,3 @@ export const getApiKeyRoute = new Elysia().use(authMiddleware).get(
 		},
 	},
 );
-

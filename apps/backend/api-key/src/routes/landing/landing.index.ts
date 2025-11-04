@@ -1,5 +1,5 @@
-import { db } from "@reloop/db/client";
 import { redis } from "@reloop/api-key/lib/redis";
+import { db } from "@reloop/db/client";
 import { Elysia } from "elysia";
 
 export const landing = new Elysia()
@@ -131,4 +131,3 @@ ${redisError ? `║ REDIS ERROR: ${redisError.substring(0, 50).padEnd(50)} ║` 
 			},
 		},
 	);
-

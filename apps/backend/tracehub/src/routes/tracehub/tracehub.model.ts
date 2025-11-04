@@ -7,9 +7,13 @@ export namespace TraceHubModel {
 			description: "Event name (e.g., 'user_signed_up', 'page_viewed')",
 		}),
 		properties: t.Optional(
-			t.Record(t.String(), t.Union([t.String(), t.Number(), t.Boolean(), t.Null()]), {
-				description: "Event properties as key-value pairs",
-			}),
+			t.Record(
+				t.String(),
+				t.Union([t.String(), t.Number(), t.Boolean(), t.Null()]),
+				{
+					description: "Event properties as key-value pairs",
+				},
+			),
 		),
 		distinct_id: t.Optional(
 			t.String({
@@ -44,4 +48,3 @@ export namespace TraceHubModel {
 
 	export type ErrorResponse = typeof errorResponse.static;
 }
-

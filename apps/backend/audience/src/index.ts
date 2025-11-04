@@ -10,29 +10,29 @@ import { Elysia } from "elysia";
 
 const port = 8014;
 const audienceService = new Elysia({
-    prefix: "/api/audience",
-    name: "Audience Service",
+	prefix: "/api/audience",
+	name: "Audience Service",
 })
-    .use(
-        openapi({
-            references: fromTypes(
-                process.env.NODE_ENV === "production"
-                    ? "dist/index.d.ts"
-                    : "src/index.ts",
-            ),
-        }),
-    )
-    .use(serverTiming())
-    .use(landing)
-    .use(audienceRoutes)
-    .use(audienceGroupRoutes)
-    .onStart(async () => {
-        await loader();
-    })
-    .listen(port, () => {
-        logger.info(
-            `Audience Server is running on http://localhost:${port}/api/audience`,
-        );
-    });
+	.use(
+		openapi({
+			references: fromTypes(
+				process.env.NODE_ENV === "production"
+					? "dist/index.d.ts"
+					: "src/index.ts",
+			),
+		}),
+	)
+	.use(serverTiming())
+	.use(landing)
+	.use(audienceRoutes)
+	.use(audienceGroupRoutes)
+	.onStart(async () => {
+		await loader();
+	})
+	.listen(port, () => {
+		logger.info(
+			`Audience Server is running on http://localhost:${port}/api/audience`,
+		);
+	});
 
 export type AudienceService = typeof audienceService;

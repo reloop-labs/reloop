@@ -13,4 +13,3 @@ export class MailService {
 		return this.client.post<SendEmailResponse>("/api/mail/v1/send", data);
 	}
 }
-

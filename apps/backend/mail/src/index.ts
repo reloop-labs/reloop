@@ -9,26 +9,26 @@ import { Elysia } from "elysia";
 
 const port = 8015;
 const mailService = new Elysia({
-    prefix: "/api/mail",
-    name: "Mail Service",
+	prefix: "/api/mail",
+	name: "Mail Service",
 })
-    .use(
-        openapi({
-            references: fromTypes(
-                process.env.NODE_ENV === "production"
-                    ? "dist/index.d.ts"
-                    : "src/index.ts",
-            ),
-        }),
-    )
-    .use(serverTiming())
-    .use(landing)
-    .use(mailRoutes)
-    .onStart(async () => {
-        await loader();
-    })
-    .listen(port, () => {
-        logger.info(`Mail Server is running on http://localhost:${port}/api/mail`);
-    });
+	.use(
+		openapi({
+			references: fromTypes(
+				process.env.NODE_ENV === "production"
+					? "dist/index.d.ts"
+					: "src/index.ts",
+			),
+		}),
+	)
+	.use(serverTiming())
+	.use(landing)
+	.use(mailRoutes)
+	.onStart(async () => {
+		await loader();
+	})
+	.listen(port, () => {
+		logger.info(`Mail Server is running on http://localhost:${port}/api/mail`);
+	});
 
 export type MailService = typeof mailService;

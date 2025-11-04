@@ -5,71 +5,71 @@ import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
 export async function deleteAudienceGroup(
-    groupId: string,
-    organizationId: string,
+	groupId: string,
+	organizationId: string,
 ): Promise<{ message: string }> {
-    logger.info(
-        {
-            groupId,
-            organizationId,
-        },
-        "Deleting audience group",
-    );
+	logger.info(
+		{
+			groupId,
+			organizationId,
+		},
+		"Deleting audience group",
+	);
 
-    try {
-        // Check if audience group exists
-        const existingGroup = await db.query.audienceGroup.findFirst({
-            where: and(
-                eq(schema.audienceGroup.id, groupId),
-                eq(schema.audienceGroup.organizationId, organizationId),
-                isNull(schema.audienceGroup.deletedAt),
-            ),
-        });
+	try {
+		// Check if audience group exists
+		const existingGroup = await db.query.audienceGroup.findFirst({
+			where: and(
+				eq(schema.audienceGroup.id, groupId),
+				eq(schema.audienceGroup.organizationId, organizationId),
+				isNull(schema.audienceGroup.deletedAt),
+			),
+		});
 
-        if (!existingGroup) {
-            logger.warn({ groupId, organizationId }, "Audience group not found");
-            throw status(404, { message: "Audience group not found" });
-        }
+		if (!existingGroup) {
+			logger.warn({ groupId, organizationId }, "Audience group not found");
+			throw status(404, { message: "Audience group not found" });
+		}
 
-        // Soft delete the audience group
-        await db
-            .update(schema.audienceGroup)
-            .set({
-                deletedAt: new Date(),
-                updatedAt: new Date(),
-            })
-            .where(
-                and(
-                    eq(schema.audienceGroup.id, groupId),
-                    eq(schema.audienceGroup.organizationId, organizationId),
-                ),
-            );
+		// Soft delete the audience group
+		await db
+			.update(schema.audienceGroup)
+			.set({
+				deletedAt: new Date(),
+				updatedAt: new Date(),
+			})
+			.where(
+				and(
+					eq(schema.audienceGroup.id, groupId),
+					eq(schema.audienceGroup.organizationId, organizationId),
+				),
+			);
 
-        logger.info(
-            {
-                groupId,
-                organizationId,
-            },
-            "Audience group deleted successfully",
-        );
+		logger.info(
+			{
+				groupId,
+				organizationId,
+			},
+			"Audience group deleted successfully",
+		);
 
-        return { message: "Audience group deleted successfully" };
-    } catch (error) {
-        logger.error(
-            {
-                groupId,
-                organizationId,
-                error: error instanceof Error ? error.message : String(error),
-            },
-            "Error deleting audience group",
-        );
-        throw error;
-    }
+		return { message: "Audience group deleted successfully" };
+	} catch (error) {
+		logger.error(
+			{
+				groupId,
+				organizationId,
+				error: error instanceof Error ? error.message : String(error),
+			},
+			"Error deleting audience group",
+		);
+		throw error;
+	}
 }
 
 export async function deleteAudienceGroupHandler(
-    groupId: string,
-    organizationId: string,
+	groupId: string,
+	organizationId: string,
 ): Promise<{ message: string }> {
-    return deleteAudienceGroup(groupId, organizationId);
+	return deleteAudienceGroup(groupId, organizationId);
 }

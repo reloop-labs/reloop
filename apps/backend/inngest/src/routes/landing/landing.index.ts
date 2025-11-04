@@ -2,21 +2,21 @@ import { db } from "@reloop/db/client";
 import { Elysia } from "elysia";
 
 export const landing = new Elysia()
-    .get(
-        "/",
-        async () => {
-            let dbStatus = "UNKNOWN";
-            let dbError = "";
+	.get(
+		"/",
+		async () => {
+			let dbStatus = "UNKNOWN";
+			let dbError = "";
 
-            try {
-                await db.execute("SELECT 1 as test");
-                dbStatus = "CONNECTED";
-            } catch (dbErr) {
-                dbStatus = "DISCONNECTED";
-                dbError = dbErr instanceof Error ? dbErr.message : String(dbErr);
-            }
+			try {
+				await db.execute("SELECT 1 as test");
+				dbStatus = "CONNECTED";
+			} catch (dbErr) {
+				dbStatus = "DISCONNECTED";
+				dbError = dbErr instanceof Error ? dbErr.message : String(dbErr);
+			}
 
-            return `
+			return `
 ╔════════════════════════════════════════════════════════╗
 ║                    INNGEST SERVICE                    ║
 ╠════════════════════════════════════════════════════════╣
@@ -55,38 +55,37 @@ ${dbError ? `║ DB ERROR: ${dbError.substring(0, 50).padEnd(50)} ║` : "║   
                 Made with ❤️ for developers
 
 `;
-        },
-        {
-            detail: {
-                tags: ["Service"],
-                summary: "Health check for Inngest Service",
-                description: "Checks the health of the Inngest Service",
-            },
-        },
-    )
-    .get(
-        "/health/postgres",
-        async () => {
-            try {
-                await db.execute("SELECT 1 as test");
-                return {
-                    status: "CONNECTED",
-                    timestamp: new Date().toISOString(),
-                };
-            } catch (error) {
-                return {
-                    status: "DISCONNECTED",
-                    error: error instanceof Error ? error.message : String(error),
-                    timestamp: new Date().toISOString(),
-                };
-            }
-        },
-        {
-            detail: {
-                tags: ["Service"],
-                summary: "Health check for Postgres",
-                description: "Checks the health of the Postgres database",
-            },
-        },
-    );
-
+		},
+		{
+			detail: {
+				tags: ["Service"],
+				summary: "Health check for Inngest Service",
+				description: "Checks the health of the Inngest Service",
+			},
+		},
+	)
+	.get(
+		"/health/postgres",
+		async () => {
+			try {
+				await db.execute("SELECT 1 as test");
+				return {
+					status: "CONNECTED",
+					timestamp: new Date().toISOString(),
+				};
+			} catch (error) {
+				return {
+					status: "DISCONNECTED",
+					error: error instanceof Error ? error.message : String(error),
+					timestamp: new Date().toISOString(),
+				};
+			}
+		},
+		{
+			detail: {
+				tags: ["Service"],
+				summary: "Health check for Postgres",
+				description: "Checks the health of the Postgres database",
+			},
+		},
+	);

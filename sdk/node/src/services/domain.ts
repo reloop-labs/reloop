@@ -1,11 +1,11 @@
 import type { HTTPClient } from "../client.js";
 import type {
 	CreateDomainRequest,
+	DKIMKeysResponse,
+	DNSRecordsResponse,
 	DomainListResponse,
 	DomainQuery,
 	DomainResponse,
-	DKIMKeysResponse,
-	DNSRecordsResponse,
 	GenerateDNSRecordsResponse,
 	VerifyDNSRecordRequest,
 	VerifyDNSRecordResponse,
@@ -29,7 +29,9 @@ export class DomainService {
 	 * @returns Promise resolving to the domain
 	 */
 	async get(domain: string): Promise<DomainResponse> {
-		return this.client.get<DomainResponse>(`/api/domain/v1/${encodeURIComponent(domain)}`);
+		return this.client.get<DomainResponse>(
+			`/api/domain/v1/${encodeURIComponent(domain)}`,
+		);
 	}
 
 	/**
@@ -117,4 +119,3 @@ export class DomainService {
 		);
 	}
 }
-

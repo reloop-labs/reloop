@@ -6,149 +6,149 @@ import { and, eq, inArray, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
 export async function subscribeEvent(
-    webhookId: string,
-    eventIds: string[],
-    organizationId: string,
+	webhookId: string,
+	eventIds: string[],
+	organizationId: string,
 ): Promise<SubscriptionTypes.SubscriptionResponse[]> {
-    logger.info(
-        {
-            webhookId,
-            eventIds,
-            organizationId,
-        },
-        "Subscribing webhook to events",
-    );
+	logger.info(
+		{
+			webhookId,
+			eventIds,
+			organizationId,
+		},
+		"Subscribing webhook to events",
+	);
 
-    try {
-        // Verify webhook exists and belongs to organization
-        const webhook = await db.query.webhook.findFirst({
-            where: and(
-                eq(schema.webhook.id, webhookId),
-                eq(schema.webhook.organizationId, organizationId),
-                isNull(schema.webhook.deletedAt),
-            ),
-        });
+	try {
+		// Verify webhook exists and belongs to organization
+		const webhook = await db.query.webhook.findFirst({
+			where: and(
+				eq(schema.webhook.id, webhookId),
+				eq(schema.webhook.organizationId, organizationId),
+				isNull(schema.webhook.deletedAt),
+			),
+		});
 
-        if (!webhook) {
-            logger.warn({ webhookId, organizationId }, "Webhook not found");
-            throw status(404, { message: "Webhook not found" });
-        }
+		if (!webhook) {
+			logger.warn({ webhookId, organizationId }, "Webhook not found");
+			throw status(404, { message: "Webhook not found" });
+		}
 
-        // Verify all events exist
-        const events = await db.query.webhookEvent.findMany({
-            where: inArray(schema.webhookEvent.id, eventIds),
-        });
+		// Verify all events exist
+		const events = await db.query.webhookEvent.findMany({
+			where: inArray(schema.webhookEvent.id, eventIds),
+		});
 
-        if (events.length !== eventIds.length) {
-            logger.warn({ eventIds }, "Some events not found");
-            throw status(404, { message: "Some events not found" });
-        }
+		if (events.length !== eventIds.length) {
+			logger.warn({ eventIds }, "Some events not found");
+			throw status(404, { message: "Some events not found" });
+		}
 
-        // Create subscriptions
-        const subscriptions = [];
-        for (const eventId of eventIds) {
-            // Check if subscription already exists
-            const existingSubscription =
-                await db.query.webhookEventSubscription.findFirst({
-                    where: and(
-                        eq(schema.webhookEventSubscription.webhookId, webhookId),
-                        eq(schema.webhookEventSubscription.eventId, eventId),
-                    ),
-                });
+		// Create subscriptions
+		const subscriptions = [];
+		for (const eventId of eventIds) {
+			// Check if subscription already exists
+			const existingSubscription =
+				await db.query.webhookEventSubscription.findFirst({
+					where: and(
+						eq(schema.webhookEventSubscription.webhookId, webhookId),
+						eq(schema.webhookEventSubscription.eventId, eventId),
+					),
+				});
 
-            if (existingSubscription) {
-                logger.warn({ webhookId, eventId }, "Subscription already exists");
-                continue; // Skip existing subscriptions
-            }
+			if (existingSubscription) {
+				logger.warn({ webhookId, eventId }, "Subscription already exists");
+				continue; // Skip existing subscriptions
+			}
 
-            const newSubscription = await db
-                .insert(schema.webhookEventSubscription)
-                .values({
-                    webhookId: webhookId,
-                    eventId: eventId,
-                    isEnabled: true,
-                    createdAt: new Date(),
-                    updatedAt: new Date(),
-                })
-                .returning();
+			const newSubscription = await db
+				.insert(schema.webhookEventSubscription)
+				.values({
+					webhookId: webhookId,
+					eventId: eventId,
+					isEnabled: true,
+					createdAt: new Date(),
+					updatedAt: new Date(),
+				})
+				.returning();
 
-            if (newSubscription[0]) {
-                subscriptions.push({
-                    id: newSubscription[0].id,
-                    webhookId: newSubscription[0].webhookId,
-                    eventId: newSubscription[0].eventId,
-                    isEnabled: newSubscription[0].isEnabled,
-                    createdAt: newSubscription[0].createdAt.toISOString(),
-                    updatedAt: newSubscription[0].updatedAt.toISOString(),
-                });
-            }
-        }
+			if (newSubscription[0]) {
+				subscriptions.push({
+					id: newSubscription[0].id,
+					webhookId: newSubscription[0].webhookId,
+					eventId: newSubscription[0].eventId,
+					isEnabled: newSubscription[0].isEnabled,
+					createdAt: newSubscription[0].createdAt.toISOString(),
+					updatedAt: newSubscription[0].updatedAt.toISOString(),
+				});
+			}
+		}
 
-        logger.info(
-            {
-                webhookId,
-                eventIds,
-                subscriptionsCreated: subscriptions.length,
-            },
-            "Event subscriptions created successfully",
-        );
+		logger.info(
+			{
+				webhookId,
+				eventIds,
+				subscriptionsCreated: subscriptions.length,
+			},
+			"Event subscriptions created successfully",
+		);
 
-        return subscriptions;
-    } catch (error) {
-        logger.error(
-            {
-                webhookId,
-                eventIds,
-                organizationId,
-                error: error instanceof Error ? error.message : String(error),
-            },
-            "Error subscribing to events",
-        );
-        throw error;
-    }
+		return subscriptions;
+	} catch (error) {
+		logger.error(
+			{
+				webhookId,
+				eventIds,
+				organizationId,
+				error: error instanceof Error ? error.message : String(error),
+			},
+			"Error subscribing to events",
+		);
+		throw error;
+	}
 }
 
 export async function subscribeEventHandler(
-    webhookId: string,
-    body: SubscriptionTypes.SubscribeRequest,
-    organizationId: string,
+	webhookId: string,
+	body: SubscriptionTypes.SubscribeRequest,
+	organizationId: string,
 ): Promise<SubscriptionTypes.SubscriptionResponse[]> {
-    logger.info(
-        {
-            webhookId,
-            eventIds: body.eventIds,
-            organizationId,
-        },
-        "Subscribing webhook to events",
-    );
+	logger.info(
+		{
+			webhookId,
+			eventIds: body.eventIds,
+			organizationId,
+		},
+		"Subscribing webhook to events",
+	);
 
-    try {
-        const subscriptions = await subscribeEvent(
-            webhookId,
-            body.eventIds,
-            organizationId,
-        );
+	try {
+		const subscriptions = await subscribeEvent(
+			webhookId,
+			body.eventIds,
+			organizationId,
+		);
 
-        logger.info(
-            {
-                webhookId,
-                eventIds: body.eventIds,
-                subscriptionsCreated: subscriptions.length,
-            },
-            "Event subscriptions created successfully",
-        );
+		logger.info(
+			{
+				webhookId,
+				eventIds: body.eventIds,
+				subscriptionsCreated: subscriptions.length,
+			},
+			"Event subscriptions created successfully",
+		);
 
-        return subscriptions;
-    } catch (error) {
-        logger.error(
-            {
-                webhookId,
-                eventIds: body.eventIds,
-                organizationId,
-                error: error instanceof Error ? error.message : String(error),
-            },
-            "Error subscribing to events",
-        );
-        throw error;
-    }
+		return subscriptions;
+	} catch (error) {
+		logger.error(
+			{
+				webhookId,
+				eventIds: body.eventIds,
+				organizationId,
+				error: error instanceof Error ? error.message : String(error),
+			},
+			"Error subscribing to events",
+		);
+		throw error;
+	}
 }

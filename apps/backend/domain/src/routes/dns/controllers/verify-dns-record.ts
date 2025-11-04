@@ -48,17 +48,17 @@ export async function verifyDNSRecordHandler(
 					eq(
 						schema.domainDnsRecord.recordType,
 						body.recordType as
-						| "A"
-						| "AAAA"
-						| "CNAME"
-						| "MX"
-						| "TXT"
-						| "NS"
-						| "SRV"
-						| "CAA"
-						| "SPF"
-						| "DKIM"
-						| "DMARC",
+							| "A"
+							| "AAAA"
+							| "CNAME"
+							| "MX"
+							| "TXT"
+							| "NS"
+							| "SRV"
+							| "CAA"
+							| "SPF"
+							| "DKIM"
+							| "DMARC",
 					),
 					eq(schema.domainDnsRecord.name, body.name),
 				),
@@ -78,18 +78,21 @@ export async function verifyDNSRecordHandler(
 			const dnsRecord = await db.query.domainDnsRecord.findFirst({
 				where: and(
 					eq(schema.domainDnsRecord.domainId, domainRecord[0].id),
-					eq(schema.domainDnsRecord.recordType, body.recordType as
-						| "A"
-						| "AAAA"
-						| "CNAME"
-						| "MX"
-						| "TXT"
-						| "NS"
-						| "SRV"
-						| "CAA"
-						| "SPF"
-						| "DKIM"
-						| "DMARC"),
+					eq(
+						schema.domainDnsRecord.recordType,
+						body.recordType as
+							| "A"
+							| "AAAA"
+							| "CNAME"
+							| "MX"
+							| "TXT"
+							| "NS"
+							| "SRV"
+							| "CAA"
+							| "SPF"
+							| "DKIM"
+							| "DMARC",
+					),
 					eq(schema.domainDnsRecord.name, body.name),
 				),
 			});
@@ -106,7 +109,10 @@ export async function verifyDNSRecordHandler(
 						organizationId: organizationId,
 					},
 				});
-				logger.info({ dnsRecordId: dnsRecord.id }, "DNS record verification triggered");
+				logger.info(
+					{ dnsRecordId: dnsRecord.id },
+					"DNS record verification triggered",
+				);
 			}
 		} catch (error) {
 			logger.warn(

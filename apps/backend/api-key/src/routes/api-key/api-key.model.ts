@@ -282,4 +282,3 @@ export namespace ApiKeyModel {
 	});
 	export type Forbidden = typeof forbidden.static;
 }
-

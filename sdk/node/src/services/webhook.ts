@@ -25,7 +25,9 @@ export class WebhookService {
 	 * @returns Promise resolving to the webhook
 	 */
 	async get(id: string): Promise<WebhookResponse> {
-		return this.client.get<WebhookResponse>(`/api/webhook/v1/${encodeURIComponent(id)}`);
+		return this.client.get<WebhookResponse>(
+			`/api/webhook/v1/${encodeURIComponent(id)}`,
+		);
 	}
 
 	/**
@@ -43,8 +45,14 @@ export class WebhookService {
 	 * @param data Webhook update data
 	 * @returns Promise resolving to the updated webhook
 	 */
-	async update(id: string, data: UpdateWebhookRequest): Promise<WebhookResponse> {
-		return this.client.put<WebhookResponse>(`/api/webhook/v1/${encodeURIComponent(id)}`, data);
+	async update(
+		id: string,
+		data: UpdateWebhookRequest,
+	): Promise<WebhookResponse> {
+		return this.client.put<WebhookResponse>(
+			`/api/webhook/v1/${encodeURIComponent(id)}`,
+			data,
+		);
 	}
 
 	/**
@@ -53,7 +61,8 @@ export class WebhookService {
 	 * @returns Promise resolving to a success message
 	 */
 	async delete(id: string): Promise<{ message: string }> {
-		return this.client.delete<{ message: string }>(`/api/webhook/v1/${encodeURIComponent(id)}`);
+		return this.client.delete<{ message: string }>(
+			`/api/webhook/v1/${encodeURIComponent(id)}`,
+		);
 	}
 }
-

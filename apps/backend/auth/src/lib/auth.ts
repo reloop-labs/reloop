@@ -97,7 +97,7 @@ export const auth = betterAuth({
 		admin(),
 		apiKey({ defaultPrefix: "rl" }),
 		organization({
-			sendInvitationEmail: async () => { },
+			sendInvitationEmail: async () => {},
 		}),
 		openAPI({ path: "/docs" }),
 	],
