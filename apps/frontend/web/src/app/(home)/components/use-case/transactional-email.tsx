@@ -24,8 +24,8 @@ const cardsData = [
 		borderColor: "border-success-base/50",
 		iconBg: "bg-success-base/20",
 		iconColor: "text-success-base",
-		message: "Your order #12345 has been confirmed and will ship to",
-		highlight: "123 Main St",
+		message: "Order confirmation sent to",
+		highlight: "acma@reloop.com",
 	},
 	{
 		id: 3,
@@ -35,7 +35,7 @@ const cardsData = [
 		borderColor: "border-information-base/50",
 		iconBg: "bg-information-base/20",
 		iconColor: "text-information-base",
-		message: "Please verify your account by clicking the link sent to",
+		message: "Account verification sent to",
 		highlight: "acma@reloop.com",
 	},
 	{
@@ -46,9 +46,8 @@ const cardsData = [
 		borderColor: "border-warning-base/50",
 		iconBg: "bg-warning-base/20",
 		iconColor: "text-warning-base",
-		message: "Payment of",
-		highlight: "$99.00",
-		extra: "has been processed for order #12345.",
+		message: "Payment receipt sent to",
+		highlight: "acma@reloop.com",
 	},
 ];
 
@@ -92,7 +91,6 @@ const Card = ({ card }: CardProps) => {
 					<span className="font-semibold text-text-strong-950">
 						{card.highlight}
 					</span>
-					{card.extra ? <> {card.extra}</> : "."}
 				</p>
 			</div>
 		</motion.div>
@@ -121,8 +119,11 @@ export const TransactionalEmail = () => {
 					...cardData,
 					uniqueId: `${cardData.id}-${Date.now()}`,
 				};
-				// Limit to 5 cards maximum to prevent overflow
-				const updatedCards = [newCard, ...prevCards].slice(0, 5);
+				const updatedCards = [newCard, ...prevCards];
+				// When it reaches 20 cards, remove the last 10 elements
+				if (updatedCards.length >= 20) {
+					return updatedCards.slice(0, 10);
+				}
 				return updatedCards;
 			});
 		}, 3000);
@@ -173,7 +174,7 @@ export const TransactionalEmail = () => {
 						}}
 					/>
 					<div className="relative z-10 mx-auto max-w-xl p-16">
-						<div className="relative max-h-96 overflow-hidden">
+						<div className="relative max-h-72 overflow-hidden">
 							<div className="relative space-y-4">
 								<AnimatePresence mode="popLayout" initial={false}>
 									{cards.map((card) => {
@@ -181,7 +182,7 @@ export const TransactionalEmail = () => {
 									})}
 								</AnimatePresence>
 							</div>
-							<div className="pointer-events-none absolute right-0 bottom-0 left-0 h-16 bg-gradient-to-t from-bg-white-0 to-bg-white-0/0" />
+							<div className="pointer-events-none absolute right-0 bottom-0 left-0 h-10 bg-gradient-to-t from-bg-white-0 to-bg-white-0/0" />
 						</div>
 					</div>
 				</div>
