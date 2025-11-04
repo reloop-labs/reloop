@@ -1,8 +1,10 @@
 "use client";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
+import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 
-const cards = [
+const cardsData = [
 	{
 		id: 1,
 		title: "Password Reset",
@@ -50,7 +52,61 @@ const cards = [
 	},
 ];
 
+type CardProps = {
+	card: (typeof cardsData)[number];
+};
+
+const Card = ({ card }: CardProps) => {
+	return (
+		<motion.div
+			layout
+			className={`rounded-2xl border ${card.borderColor || "border-verified-base/50"} bg-bg-white-0 px-4 py-3`}
+		>
+			<div className="flex items-center justify-between">
+				<div className="flex items-center gap-2">
+					<div
+						className={`flex h-6 w-6 items-center justify-center rounded-lg border border-stroke-soft-100 ${card.iconBg || "bg-verified-base/20"}`}
+					>
+						<Icon
+							name={card.icon || "key"}
+							className={`h-3 w-3 ${card.iconColor || "text-verified-base"}`}
+						/>
+					</div>
+					<p className="font-semibold text-sm">{card.title}</p>
+				</div>
+				<p className="rounded-md border border-stroke-soft-100 bg-bg-weak-50 px-2 py-0.5 font-medium text-text-sub-600 text-xs">
+					Transactional
+				</p>
+			</div>
+			<div className="mt-3 border-stroke-soft-100 border-t pt-2">
+				<p className="font-medium text-sm text-text-sub-600">
+					{card.message}{" "}
+					<span className="font-semibold text-text-strong-950">
+						{card.highlight}
+					</span>
+					{card.extra ? <> {card.extra}</> : "."}
+				</p>
+			</div>
+		</motion.div>
+	);
+};
+
 export const TransactionalEmail = () => {
+	const [cards, setCards] = useState<typeof cardsData>(cardsData);
+	const currentIndexRef = useRef(0);
+
+	useEffect(() => {
+		const interval = setInterval(() => {
+			currentIndexRef.current =
+				(currentIndexRef.current + 1) % cardsData.length;
+			setCards((prevCards) => [
+				cardsData[currentIndexRef.current] as (typeof cardsData)[number],
+				...prevCards,
+			]);
+		}, 3000);
+		return () => clearInterval(interval);
+	}, []);
+
 	return (
 		<div className="relative flex border-stroke-soft-100 border-b">
 			<div className="relative z-10 flex w-full border-stroke-soft-100">
@@ -95,50 +151,13 @@ export const TransactionalEmail = () => {
 						}}
 					/>
 					<div className="relative z-10 mx-auto max-w-xl p-16">
-						<div className="relative overflow-hidden">
+						<div className="relative max-h-[350px] overflow-hidden">
 							<div className="relative space-y-4">
-								{cards.map((card, index) => {
-									const shadowClasses = [
-										"shadow-lg",
-										"shadow-md",
-										"shadow-sm",
-										"shadow-sm",
-									];
-									const shadowClass = shadowClasses[index] || "shadow-sm";
-
-									return (
-										<div
-											key={card.id}
-											className={`rounded-2xl border ${card.borderColor || "border-verified-base/50"} bg-bg-white-0 px-4 py-3 ${shadowClass}`}
-										>
-											<div className="flex items-center justify-between">
-												<div className="flex items-center gap-2">
-													<div
-														className={`flex h-6 w-6 items-center justify-center rounded-lg border border-stroke-soft-100 ${card.iconBg || "bg-verified-base/20"}`}
-													>
-														<Icon
-															name={card.icon || "key"}
-															className={`h-3 w-3 ${card.iconColor || "text-verified-base"}`}
-														/>
-													</div>
-													<p className="font-semibold text-sm">{card.title}</p>
-												</div>
-												<p className="rounded-md border border-stroke-soft-100 bg-bg-weak-50 px-2 py-0.5 font-medium text-text-sub-600 text-xs">
-													Transactional
-												</p>
-											</div>
-											<div className="mt-3 border-stroke-soft-100 border-t pt-2">
-												<p className="font-medium text-sm text-text-sub-600">
-													{card.message}{" "}
-													<span className="font-semibold text-text-strong-950">
-														{card.highlight}
-													</span>
-													{card.extra ? <> {card.extra}</> : "."}
-												</p>
-											</div>
-										</div>
-									);
-								})}
+								<AnimatePresence mode="popLayout">
+									{cards.map((card, i) => {
+										return <Card key={`${card.id}-${i}`} card={card} />;
+									})}
+								</AnimatePresence>
 							</div>
 						</div>
 					</div>
