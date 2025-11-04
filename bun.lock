@@ -475,6 +475,7 @@
         "@tailwindcss/postcss": "catalog:ui",
         "babel-plugin-react-compiler": "catalog:ui",
         "better-auth": "catalog:",
+        "framer-motion": "^12.23.24",
         "motion": "catalog:ui",
         "next": "catalog:ui",
         "next-themes": "catalog:ui",
