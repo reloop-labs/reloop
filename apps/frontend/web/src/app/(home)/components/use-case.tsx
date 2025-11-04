@@ -95,13 +95,13 @@ const TransactionalEmail = () => {
 								</p>
 							</div>
 						</div>
-						<div className="rounded-2xl border border-verified-base/50 bg-bg-white-0 px-4 py-3">
+						<div className="rounded-2xl border border-success-base/50 bg-bg-white-0 px-4 py-3">
 							<div className="flex items-center justify-between">
 								<div className="flex items-center gap-2">
-									<div className="flex h-6 w-6 items-center justify-center rounded-lg border border-stroke-soft-100 bg-verified-base/20">
-										<Icon name="key" className="h-3 w-3 text-verified-base" />
+									<div className="flex h-6 w-6 items-center justify-center rounded-lg border border-stroke-soft-100 bg-success-base/20">
+										<Icon name="box" className="h-3 w-3 text-success-base" />
 									</div>
-									<p className="font-semibold text-sm">Password Reset</p>
+									<p className="font-semibold text-sm">Order Confirmation</p>
 								</div>
 								<p className="rounded-md border border-stroke-soft-100 bg-bg-weak-50 px-2 py-0.5 font-medium text-text-sub-600 text-xs">
 									Transactional
@@ -109,11 +109,61 @@ const TransactionalEmail = () => {
 							</div>
 							<div className="mt-3 border-stroke-soft-100 border-t pt-2">
 								<p className="font-medium text-sm text-text-sub-600">
-									Password reset instructions sent to{" "}
+									Your order #12345 has been confirmed and will ship to{" "}
+									<span className="font-semibold text-text-strong-950">
+										123 Main St
+									</span>
+									.
+								</p>
+							</div>
+						</div>
+						<div className="rounded-2xl border border-information-base/50 bg-bg-white-0 px-4 py-3">
+							<div className="flex items-center justify-between">
+								<div className="flex items-center gap-2">
+									<div className="flex h-6 w-6 items-center justify-center rounded-lg border border-stroke-soft-100 bg-information-base/20">
+										<Icon
+											name="verified"
+											className="h-3 w-3 text-information-base"
+										/>
+									</div>
+									<p className="font-semibold text-sm">Account Verification</p>
+								</div>
+								<p className="rounded-md border border-stroke-soft-100 bg-bg-weak-50 px-2 py-0.5 font-medium text-text-sub-600 text-xs">
+									Transactional
+								</p>
+							</div>
+							<div className="mt-3 border-stroke-soft-100 border-t pt-2">
+								<p className="font-medium text-sm text-text-sub-600">
+									Please verify your account by clicking the link sent to{" "}
 									<span className="font-semibold text-text-strong-950">
 										acma@reloop.com
 									</span>
 									.
+								</p>
+							</div>
+						</div>
+						<div className="rounded-2xl border border-warning-base/50 bg-bg-white-0 px-4 py-3">
+							<div className="flex items-center justify-between">
+								<div className="flex items-center gap-2">
+									<div className="flex h-6 w-6 items-center justify-center rounded-lg border border-stroke-soft-100 bg-warning-base/20">
+										<Icon
+											name="invoice"
+											className="h-3 w-3 text-warning-base"
+										/>
+									</div>
+									<p className="font-semibold text-sm">Payment Receipt</p>
+								</div>
+								<p className="rounded-md border border-stroke-soft-100 bg-bg-weak-50 px-2 py-0.5 font-medium text-text-sub-600 text-xs">
+									Transactional
+								</p>
+							</div>
+							<div className="mt-3 border-stroke-soft-100 border-t pt-2">
+								<p className="font-medium text-sm text-text-sub-600">
+									Payment of{" "}
+									<span className="font-semibold text-text-strong-950">
+										$99.00
+									</span>{" "}
+									has been processed for order #12345.
 								</p>
 							</div>
 						</div>
