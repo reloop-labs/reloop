@@ -1,8 +1,6 @@
 "use client";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
-import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
 
 const cards = [
 	{
@@ -53,15 +51,6 @@ const cards = [
 ];
 
 export const TransactionalEmail = () => {
-	const [currentIndex, setCurrentIndex] = useState(0);
-
-	useEffect(() => {
-		const interval = setInterval(() => {
-			setCurrentIndex((prev) => (prev + 1) % cards.length);
-		}, 3000); // Rotate every 3 seconds
-
-		return () => clearInterval(interval);
-	}, []);
 	return (
 		<div className="relative flex border-stroke-soft-100 border-b">
 			<div className="relative z-10 flex w-full border-stroke-soft-100">
@@ -106,188 +95,51 @@ export const TransactionalEmail = () => {
 						}}
 					/>
 					<div className="relative z-10 mx-auto max-w-xl p-16">
-						<div className="relative h-[280px] overflow-hidden">
+						<div className="relative overflow-hidden">
 							<div className="relative space-y-4">
-								<AnimatePresence mode="popLayout">
-									{/* Top Card */}
-									<motion.div
-										key={`top-${currentIndex}`}
-										className={`rounded-2xl border ${cards[currentIndex]?.borderColor || "border-verified-base/50"} bg-bg-white-0 px-4 py-3 shadow-lg`}
-										initial={{
-											opacity: 0,
-											y: -100,
-											scale: 0.8,
-										}}
-										animate={{
-											opacity: 1,
-											y: 0,
-											scale: 1,
-										}}
-										exit={{
-											opacity: 0,
-											y: 200,
-											scale: 0.9,
-										}}
-										transition={{
-											type: "spring",
-											stiffness: 100,
-											damping: 15,
-										}}
-									>
-										<div className="flex items-center justify-between">
-											<div className="flex items-center gap-2">
-												<div
-													className={`flex h-6 w-6 items-center justify-center rounded-lg border border-stroke-soft-100 ${cards[currentIndex]?.iconBg || "bg-verified-base/20"}`}
-												>
-													<Icon
-														name={cards[currentIndex]?.icon || "key"}
-														className={`h-3 w-3 ${cards[currentIndex]?.iconColor || "text-verified-base"}`}
-													/>
+								{cards.map((card, index) => {
+									const shadowClasses = [
+										"shadow-lg",
+										"shadow-md",
+										"shadow-sm",
+										"shadow-sm",
+									];
+									const shadowClass = shadowClasses[index] || "shadow-sm";
+
+									return (
+										<div
+											key={card.id}
+											className={`rounded-2xl border ${card.borderColor || "border-verified-base/50"} bg-bg-white-0 px-4 py-3 ${shadowClass}`}
+										>
+											<div className="flex items-center justify-between">
+												<div className="flex items-center gap-2">
+													<div
+														className={`flex h-6 w-6 items-center justify-center rounded-lg border border-stroke-soft-100 ${card.iconBg || "bg-verified-base/20"}`}
+													>
+														<Icon
+															name={card.icon || "key"}
+															className={`h-3 w-3 ${card.iconColor || "text-verified-base"}`}
+														/>
+													</div>
+													<p className="font-semibold text-sm">{card.title}</p>
 												</div>
-												<p className="font-semibold text-sm">
-													{cards[currentIndex]?.title}
+												<p className="rounded-md border border-stroke-soft-100 bg-bg-weak-50 px-2 py-0.5 font-medium text-text-sub-600 text-xs">
+													Transactional
 												</p>
 											</div>
-											<p className="rounded-md border border-stroke-soft-100 bg-bg-weak-50 px-2 py-0.5 font-medium text-text-sub-600 text-xs">
-												Transactional
-											</p>
+											<div className="mt-3 border-stroke-soft-100 border-t pt-2">
+												<p className="font-medium text-sm text-text-sub-600">
+													{card.message}{" "}
+													<span className="font-semibold text-text-strong-950">
+														{card.highlight}
+													</span>
+													{card.extra ? <> {card.extra}</> : "."}
+												</p>
+											</div>
 										</div>
-										<div className="mt-3 border-stroke-soft-100 border-t pt-2">
-											<p className="font-medium text-sm text-text-sub-600">
-												{cards[currentIndex]?.message}{" "}
-												<span className="font-semibold text-text-strong-950">
-													{cards[currentIndex]?.highlight}
-												</span>
-												{cards[currentIndex]?.extra ? (
-													<> {cards[currentIndex].extra}</>
-												) : (
-													"."
-												)}
-											</p>
-										</div>
-									</motion.div>
-
-									{/* Second Card */}
-									{(() => {
-										const nextCard = cards[(currentIndex + 1) % cards.length];
-										return (
-											<motion.div
-												key={`behind-1-${(currentIndex + 1) % cards.length}`}
-												className={`rounded-2xl border ${nextCard?.borderColor || "border-success-base/50"} bg-bg-white-0 px-4 py-3 shadow-md`}
-												initial={{
-													opacity: 0,
-													y: -100,
-													scale: 0.8,
-												}}
-												animate={{
-													opacity: 1,
-													y: 0,
-													scale: 1,
-												}}
-												exit={{
-													opacity: 0,
-													y: 200,
-													scale: 0.9,
-												}}
-												transition={{
-													type: "spring",
-													stiffness: 100,
-													damping: 15,
-												}}
-											>
-												<div className="flex items-center justify-between">
-													<div className="flex items-center gap-2">
-														<div
-															className={`flex h-6 w-6 items-center justify-center rounded-lg border border-stroke-soft-100 ${nextCard?.iconBg || "bg-success-base/20"}`}
-														>
-															<Icon
-																name={nextCard?.icon || "box"}
-																className={`h-3 w-3 ${nextCard?.iconColor || "text-success-base"}`}
-															/>
-														</div>
-														<p className="font-semibold text-sm">
-															{nextCard?.title}
-														</p>
-													</div>
-													<p className="rounded-md border border-stroke-soft-100 bg-bg-weak-50 px-2 py-0.5 font-medium text-text-sub-600 text-xs">
-														Transactional
-													</p>
-												</div>
-												<div className="mt-3 border-stroke-soft-100 border-t pt-2">
-													<p className="font-medium text-sm text-text-sub-600">
-														{nextCard?.message}{" "}
-														<span className="font-semibold text-text-strong-950">
-															{nextCard?.highlight}
-														</span>
-														{nextCard?.extra ? <> {nextCard.extra}</> : "."}
-													</p>
-												</div>
-											</motion.div>
-										);
-									})()}
-
-									{/* Third Card */}
-									{(() => {
-										const thirdCard = cards[(currentIndex + 2) % cards.length];
-										return (
-											<motion.div
-												key={`behind-2-${(currentIndex + 2) % cards.length}`}
-												className={`rounded-2xl border ${thirdCard?.borderColor || "border-information-base/50"} bg-bg-white-0 px-4 py-3 shadow-sm`}
-												initial={{
-													opacity: 0,
-													y: -100,
-													scale: 0.8,
-												}}
-												animate={{
-													opacity: 1,
-													y: 0,
-													scale: 1,
-												}}
-												exit={{
-													opacity: 0,
-													y: 200,
-													scale: 0.9,
-												}}
-												transition={{
-													type: "spring",
-													stiffness: 100,
-													damping: 15,
-												}}
-											>
-												<div className="flex items-center justify-between">
-													<div className="flex items-center gap-2">
-														<div
-															className={`flex h-6 w-6 items-center justify-center rounded-lg border border-stroke-soft-100 ${thirdCard?.iconBg || "bg-information-base/20"}`}
-														>
-															<Icon
-																name={thirdCard?.icon || "verified"}
-																className={`h-3 w-3 ${thirdCard?.iconColor || "text-information-base"}`}
-															/>
-														</div>
-														<p className="font-semibold text-sm">
-															{thirdCard?.title}
-														</p>
-													</div>
-													<p className="rounded-md border border-stroke-soft-100 bg-bg-weak-50 px-2 py-0.5 font-medium text-text-sub-600 text-xs">
-														Transactional
-													</p>
-												</div>
-												<div className="mt-3 border-stroke-soft-100 border-t pt-2">
-													<p className="font-medium text-sm text-text-sub-600">
-														{thirdCard?.message}{" "}
-														<span className="font-semibold text-text-strong-950">
-															{thirdCard?.highlight}
-														</span>
-														{thirdCard?.extra ? <> {thirdCard.extra}</> : "."}
-													</p>
-												</div>
-											</motion.div>
-										);
-									})()}
-								</AnimatePresence>
+									);
+								})}
 							</div>
-							{/* Bottom fade gradient */}
-							<div className="pointer-events-none absolute top-0 left-0 h-full w-full bg-[linear-gradient(0deg,rgba(0,0,0,1)_0%,rgba(0,0,0,0)_20%,rgba(0,0,0,0)_90%,rgba(0,0,0,0)_100%)]" />
 						</div>
 					</div>
 				</div>
