@@ -53,13 +53,22 @@ const cardsData = [
 ];
 
 type CardProps = {
-	card: (typeof cardsData)[number];
+	card: (typeof cardsData)[number] & { uniqueId?: string };
 };
 
 const Card = ({ card }: CardProps) => {
 	return (
 		<motion.div
 			layout
+			initial={{ opacity: 0, y: -20, scale: 0.95 }}
+			animate={{ opacity: 1, y: 0, scale: 1 }}
+			exit={{ opacity: 0, y: 20, scale: 0.95 }}
+			transition={{
+				layout: { duration: 0.3, ease: "easeOut" },
+				opacity: { duration: 0.2 },
+				y: { duration: 0.3, ease: "easeOut" },
+				scale: { duration: 0.2 },
+			}}
 			className={`rounded-2xl border ${card.borderColor || "border-verified-base/50"} bg-bg-white-0 px-4 py-3`}
 		>
 			<div className="flex items-center justify-between">
@@ -91,18 +100,32 @@ const Card = ({ card }: CardProps) => {
 	);
 };
 
+type CardWithId = (typeof cardsData)[number] & { uniqueId: string };
+
 export const TransactionalEmail = () => {
-	const [cards, setCards] = useState<typeof cardsData>(cardsData);
+	const [cards, setCards] = useState<CardWithId[]>(() =>
+		cardsData.map((card, index) => ({
+			...card,
+			uniqueId: `${card.id}-${Date.now()}-${index}`,
+		})),
+	);
 	const currentIndexRef = useRef(0);
 
 	useEffect(() => {
 		const interval = setInterval(() => {
 			currentIndexRef.current =
 				(currentIndexRef.current + 1) % cardsData.length;
-			setCards((prevCards) => [
-				cardsData[currentIndexRef.current] as (typeof cardsData)[number],
-				...prevCards,
-			]);
+			setCards((prevCards) => {
+				const cardData = cardsData[currentIndexRef.current];
+				if (!cardData) return prevCards;
+				const newCard: CardWithId = {
+					...cardData,
+					uniqueId: `${cardData.id}-${Date.now()}`,
+				};
+				// Limit to 5 cards maximum to prevent overflow
+				const updatedCards = [newCard, ...prevCards].slice(0, 5);
+				return updatedCards;
+			});
 		}, 3000);
 		return () => clearInterval(interval);
 	}, []);
@@ -151,14 +174,15 @@ export const TransactionalEmail = () => {
 						}}
 					/>
 					<div className="relative z-10 mx-auto max-w-xl p-16">
-						<div className="relative max-h-[350px] overflow-hidden">
+						<div className="relative max-h-96 overflow-hidden">
 							<div className="relative space-y-4">
-								<AnimatePresence mode="popLayout">
-									{cards.map((card, i) => {
-										return <Card key={`${card.id}-${i}`} card={card} />;
+								<AnimatePresence mode="popLayout" initial={false}>
+									{cards.map((card) => {
+										return <Card key={card.uniqueId} card={card} />;
 									})}
 								</AnimatePresence>
 							</div>
+							<div className="pointer-events-none absolute right-0 bottom-0 left-0 h-16 bg-gradient-to-t from-bg-white-0 to-bg-white-0/0" />
 						</div>
 					</div>
 				</div>
