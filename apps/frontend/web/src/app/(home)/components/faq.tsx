@@ -59,7 +59,7 @@ const faqCategories = [
 
 const Faq = () => {
 	return (
-		<div className="border-stroke-soft-100">
+		<div className="border-stroke-soft-100 border-t">
 			<div className="mx-auto max-w-7xl border-stroke-soft-100 border-r border-l">
 				<div className="flex items-center justify-between border-stroke-soft-100 border-b px-10 py-4">
 					<span className="text-sm text-text-sub-600">[05] FAQ</span>
