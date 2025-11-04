@@ -10,14 +10,10 @@ export const AutomatedWorkflowEmail = () => {
 						name="route"
 						className="h-3.5 w-3.5 stroke-1 text-text-sub-600"
 					/>
-					<p className="font-semibold text-text-sub-600 text-xs">
-						Automated / Workflow
-					</p>
+					<p className="font-semibold text-text-sub-600 text-xs">Automation</p>
 				</div>
 				<div className="flex-1 pt-3">
-					<h2 className="mb-2 font-semibold text-3xl">
-						Automated / Workflow Emails
-					</h2>
+					<h2 className="mb-2 font-semibold text-3xl">Automated Emails</h2>
 					<p className="text-text-sub-600 tracking-wide">
 						Drive engagement and automate user journeys.
 					</p>

@@ -132,7 +132,7 @@ export const TransactionalEmail = () => {
 
 	return (
 		<div className="relative flex border-stroke-soft-100 border-b">
-			<div className="relative z-10 flex w-full border-stroke-soft-100">
+			<div className="relative flex w-full border-stroke-soft-100">
 				<div className="w-1/3 border-stroke-soft-100 border-r p-10">
 					<div className="flex items-center gap-2">
 						<Icon
@@ -173,7 +173,7 @@ export const TransactionalEmail = () => {
 							backgroundSize: "10px 10px",
 						}}
 					/>
-					<div className="relative z-10 mx-auto max-w-xl p-16">
+					<div className="relative mx-auto max-w-xl p-16">
 						<div className="relative max-h-72 overflow-hidden">
 							<div className="relative space-y-4">
 								<AnimatePresence mode="popLayout" initial={false}>
