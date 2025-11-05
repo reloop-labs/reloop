@@ -131,7 +131,11 @@ export const TransactionalEmail = () => {
 	}, []);
 
 	return (
-		<div className="relative flex border-stroke-soft-100 border-b">
+		<div className="relative flex flex-col border-stroke-soft-100 border-b">
+			<div className="flex w-full items-center justify-between border-stroke-soft-100 border-b px-10 py-4">
+				<span className="text-sm text-text-sub-600">1/4</span>
+				<span className="text-sm text-text-sub-600">/transaction</span>
+			</div>
 			<div className="relative flex w-full border-stroke-soft-100">
 				<div className="w-1/3 border-stroke-soft-100 border-r p-10">
 					<div className="flex items-center gap-2">
