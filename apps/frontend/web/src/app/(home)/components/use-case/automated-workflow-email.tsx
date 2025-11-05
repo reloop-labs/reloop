@@ -236,7 +236,6 @@ export const AutomatedWorkflowEmail = () => {
 								return (
 									<div key={card.id} className="relative">
 										<Card card={card} cardDelay={cardDelay} />
-										{/* Connecting Line after each card (except last) */}
 										{index < cardsData.length - 1 && (
 											<motion.div
 												initial={{ height: 0, opacity: 0 }}
@@ -246,7 +245,7 @@ export const AutomatedWorkflowEmail = () => {
 													duration: 0.8,
 													ease: [0.4, 0, 0.2, 1],
 												}}
-												className="flex flex-col items-center overflow-hidden"
+												className="flex flex-col items-center"
 											>
 												<motion.div
 													initial={{ scale: 0 }}
@@ -306,7 +305,6 @@ export const AutomatedWorkflowEmail = () => {
 											duration: 0.8,
 											ease: [0.4, 0, 0.2, 1],
 										}}
-										className="overflow-hidden"
 									>
 										<div className="flex flex-col items-center">
 											<motion.div
@@ -316,7 +314,7 @@ export const AutomatedWorkflowEmail = () => {
 													delay: finalArrowDelay + 0.1,
 													duration: 0.5,
 												}}
-												className="h-px w-px rounded-full border border-verified-base bg-bg-white-0 p-1"
+												className="-mt-1.5 z-10 h-px w-px rounded-full border border-verified-base bg-bg-white-0 p-1"
 											/>
 											<motion.div
 												initial={{ scaleY: 0 }}
