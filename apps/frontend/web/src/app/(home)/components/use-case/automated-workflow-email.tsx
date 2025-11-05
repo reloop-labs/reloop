@@ -2,6 +2,7 @@
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import { motion } from "framer-motion";
+import { useState } from "react";
 
 const cardsData = [
 	{
@@ -116,6 +117,12 @@ const Card = ({ card, cardDelay }: CardProps) => {
 };
 
 export const AutomatedWorkflowEmail = () => {
+	const [animationKey, setAnimationKey] = useState(0);
+
+	const handleReplay = () => {
+		setAnimationKey((prev) => prev + 1);
+	};
+
 	return (
 		<div className="relative flex border-stroke-soft-100 border-r border-b">
 			<div className="relative flex w-full border-stroke-soft-100">
@@ -149,6 +156,19 @@ export const AutomatedWorkflowEmail = () => {
 					</div>
 				</div>
 				<div className="relative flex-1 border-stroke-soft-100 border-r">
+					{/* Replay Button */}
+					<Button.Root
+						variant="neutral"
+						mode="ghost"
+						size="small"
+						onClick={handleReplay}
+						className="absolute top-4 right-4 z-10"
+					>
+						<Icon
+							name="refresh-cw"
+							className="h-3.5 w-3.5 stroke-1 text-text-sub-600"
+						/>
+					</Button.Root>
 					<div
 						className="absolute inset-0 z-0"
 						style={{
@@ -157,7 +177,10 @@ export const AutomatedWorkflowEmail = () => {
 							backgroundSize: "10px 10px",
 						}}
 					/>
-					<div className="relative mx-auto max-w-xl p-16">
+					<div
+						key={animationKey}
+						className="relative mx-auto min-h-[600px] max-w-xl p-16"
+					>
 						{/* New User Signup Badge */}
 						<motion.div
 							initial={{ opacity: 0, scale: 0.8, y: -20 }}
@@ -187,10 +210,10 @@ export const AutomatedWorkflowEmail = () => {
 
 						{/* Initial Connecting Line */}
 						<motion.div
-							initial={{ height: 0, opacity: 0 }}
-							animate={{ height: "auto", opacity: 1 }}
+							initial={{ opacity: 0 }}
+							animate={{ opacity: 1 }}
 							transition={{ delay: 1.2, duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
-							className="-mt-1.5 overflow-hidden"
+							className="-mt-1.5"
 						>
 							<div className="flex flex-col items-center">
 								<motion.div
@@ -238,8 +261,8 @@ export const AutomatedWorkflowEmail = () => {
 										<Card card={card} cardDelay={cardDelay} />
 										{index < cardsData.length - 1 && (
 											<motion.div
-												initial={{ height: 0, opacity: 0 }}
-												animate={{ height: "auto", opacity: 1 }}
+												initial={{ opacity: 0 }}
+												animate={{ opacity: 1 }}
 												transition={{
 													delay: arrowDelay,
 													duration: 0.8,
@@ -298,8 +321,8 @@ export const AutomatedWorkflowEmail = () => {
 							return (
 								<>
 									<motion.div
-										initial={{ height: 0, opacity: 0 }}
-										animate={{ height: "auto", opacity: 1 }}
+										initial={{ opacity: 0 }}
+										animate={{ opacity: 1 }}
 										transition={{
 											delay: finalArrowDelay,
 											duration: 0.8,

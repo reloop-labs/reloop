@@ -352,6 +352,16 @@ export const IconsSprite = () => (
 				/>
 			</symbol>
 
+			<symbol id="refresh-cw" viewBox="0 0 24 24" fill="none">
+				<circle opacity="0.12" cx={12} cy={12} r={10} fill="currentColor" />
+				<path
+					d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.44444 2 12 2C18.6667 2 22 7.5 22 7.5M22 7.5V4M22 7.5H18.5"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
 			<symbol id="minus-circle" viewBox="0 0 24 24" fill="none">
 				<circle opacity="0.12" cx={12} cy={12} r={10} fill="currentColor" />
 				<path
