@@ -1,5 +1,7 @@
+"use client";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
+import { motion } from "framer-motion";
 
 const cardsData = [
 	{
@@ -58,38 +60,58 @@ const cardsData = [
 
 type CardProps = {
 	card: (typeof cardsData)[number];
+	cardDelay: number;
 };
 
-const Card = ({ card }: CardProps) => {
+const Card = ({ card, cardDelay }: CardProps) => {
 	return (
-		<div
+		<motion.div
+			initial={{ opacity: 0, y: 20, scale: 0.95 }}
+			animate={{ opacity: 1, y: 0, scale: 1 }}
+			transition={{
+				delay: cardDelay,
+				duration: 0.8,
+				ease: [0.4, 0, 0.2, 1],
+			}}
 			className={`rounded-2xl border ${card.borderColor || "border-verified-base/50"} bg-bg-white-0 px-4 py-3`}
 		>
 			<div className="flex items-center justify-between">
 				<div className="flex items-center gap-2">
-					<div
+					<motion.div
+						initial={{ scale: 0, rotate: -180 }}
+						animate={{ scale: 1, rotate: 0 }}
+						transition={{
+							duration: 0.6,
+							delay: cardDelay + 0.1,
+							ease: [0.34, 1.56, 0.64, 1],
+						}}
 						className={`flex h-6 w-6 items-center justify-center rounded-lg border border-stroke-soft-100 ${card.iconBg || "bg-verified-base/20"}`}
 					>
 						<Icon
 							name={card.icon || "route"}
 							className={`h-3 w-3 ${card.iconColor || "text-verified-base"}`}
 						/>
-					</div>
+					</motion.div>
 					<p className="font-semibold text-sm">{card.title}</p>
 				</div>
 				<p className="rounded-md border border-stroke-soft-100 bg-bg-weak-50 px-2 py-0.5 font-medium text-text-sub-600 text-xs">
 					{card.subtitle}
 				</p>
 			</div>
-			<div className="mt-3 border-stroke-soft-100 border-t pt-2">
+			<motion.div
+				initial={{ opacity: 0 }}
+				animate={{ opacity: 1 }}
+				transition={{ delay: cardDelay + 0.3, duration: 0.5 }}
+				className="mt-3 border-stroke-soft-100 border-t pt-2"
+			>
 				<p className="font-medium text-sm text-text-sub-600">
 					{card.message}{" "}
 					<span className="font-semibold text-text-strong-950">
 						{card.highlight}
 					</span>
 				</p>
-			</div>
-		</div>
+			</motion.div>
+		</motion.div>
 	);
 };
 
@@ -136,61 +158,227 @@ export const AutomatedWorkflowEmail = () => {
 						}}
 					/>
 					<div className="relative mx-auto max-w-xl p-16">
-						<div className="flex justify-center">
+						{/* New User Signup Badge */}
+						<motion.div
+							initial={{ opacity: 0, scale: 0.8, y: -20 }}
+							animate={{ opacity: 1, scale: 1, y: 0 }}
+							transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
+							className="flex justify-center"
+						>
 							<div className="flex w-fit items-center gap-2 rounded-xl border border-success-base/50 bg-bg-white-0 py-2 pr-3 pl-2">
-								<div className="flex h-5 w-5 items-center justify-center rounded-sm border border-stroke-soft-100 bg-success-base/20">
+								<motion.div
+									initial={{ scale: 0, rotate: -180 }}
+									animate={{ scale: 1, rotate: 0 }}
+									transition={{
+										delay: 0.2,
+										duration: 0.6,
+										ease: [0.34, 1.56, 0.64, 1],
+									}}
+									className="flex h-5 w-5 items-center justify-center rounded-sm border border-stroke-soft-100 bg-success-base/20"
+								>
 									<Icon
 										name="user-plus"
 										className="h-3 w-3 stroke-1 text-success-base"
 									/>
-								</div>
+								</motion.div>
 								<p className="font-semibold text-xs">New User Signup</p>
 							</div>
-						</div>
-						<div className="-mt-1.5">
+						</motion.div>
+
+						{/* Initial Connecting Line */}
+						<motion.div
+							initial={{ height: 0, opacity: 0 }}
+							animate={{ height: "auto", opacity: 1 }}
+							transition={{ delay: 1.2, duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
+							className="-mt-1.5 overflow-hidden"
+						>
 							<div className="flex flex-col items-center">
-								<div className="h-px w-px rounded-full border border-success-base bg-bg-white-0 p-1" />
-								<div className="h-10 w-px border-success-base border-l" />
-								<Icon
-									name="chevron-down"
-									className="-mt-2.5 h-4 w-4 text-success-base"
+								<motion.div
+									initial={{ scale: 0 }}
+									animate={{ scale: 1 }}
+									transition={{ delay: 1.3, duration: 0.5 }}
+									className="h-px w-px rounded-full border border-success-base bg-bg-white-0 p-1"
 								/>
+								<motion.div
+									initial={{ scaleY: 0 }}
+									animate={{ scaleY: 1 }}
+									transition={{
+										delay: 1.4,
+										duration: 0.6,
+										ease: [0.4, 0, 0.2, 1],
+									}}
+									className="h-10 w-px origin-top border-success-base border-l"
+								/>
+								<motion.div
+									initial={{ opacity: 0, y: -10 }}
+									animate={{ opacity: 1, y: 0 }}
+									transition={{ delay: 1.5, duration: 0.5 }}
+								>
+									<Icon
+										name="chevron-down"
+										className="-mt-2.5 h-4 w-4 text-success-base"
+									/>
+								</motion.div>
 							</div>
-						</div>
+						</motion.div>
+
+						{/* Workflow Cards */}
 						<div className="relative">
-							<div className="relative">
-								{cardsData.map((card, index) => {
-									return (
-										<div key={card.id} className="relative">
-											<Card card={card} />
-											<div className="flex flex-col items-center">
-												<div
+							{cardsData.map((card, index) => {
+								// Each card appears after previous arrow completes
+								// Card duration: 0.8s, pause: 0.2s, Arrow duration: 0.8s
+								// Total per card+arrow cycle: 0.8 + 0.2 + 0.8 = 1.8s
+								// First card starts at 2.0s (after initial badge + arrow)
+								const cardDelay = 2.0 + index * 1.8;
+								// Arrow appears after card completes (card duration 0.8s + pause 0.2s)
+								const arrowDelay = cardDelay + 0.8 + 0.2;
+
+								return (
+									<div key={card.id} className="relative">
+										<Card card={card} cardDelay={cardDelay} />
+										{/* Connecting Line after each card (except last) */}
+										{index < cardsData.length - 1 && (
+											<motion.div
+												initial={{ height: 0, opacity: 0 }}
+												animate={{ height: "auto", opacity: 1 }}
+												transition={{
+													delay: arrowDelay,
+													duration: 0.8,
+													ease: [0.4, 0, 0.2, 1],
+												}}
+												className="flex flex-col items-center overflow-hidden"
+											>
+												<motion.div
+													initial={{ scale: 0 }}
+													animate={{ scale: 1 }}
+													transition={{
+														delay: arrowDelay + 0.1,
+														duration: 0.5,
+													}}
 													className={`h-px w-px rounded-full border ${card.textColor || "border-verified-base/50"} -mt-1.5 bg-bg-white-0 p-1`}
 												/>
-												<div
-													className={`h-10 w-px border-l ${card.textColor || "border-verified-base/50"}`}
+												<motion.div
+													initial={{ scaleY: 0 }}
+													animate={{ scaleY: 1 }}
+													transition={{
+														delay: arrowDelay + 0.2,
+														duration: 0.6,
+														ease: [0.4, 0, 0.2, 1],
+													}}
+													className={`h-10 w-px origin-top border-l ${card.textColor || "border-verified-base/50"}`}
 												/>
+												<motion.div
+													initial={{ opacity: 0, y: -10 }}
+													animate={{ opacity: 1, y: 0 }}
+													transition={{
+														delay: arrowDelay + 0.3,
+														duration: 0.5,
+													}}
+												>
+													<Icon
+														name="chevron-down"
+														className={`-mt-2.5 h-4 w-4 ${card.textColor || "text-verified-base"}`}
+													/>
+												</motion.div>
+											</motion.div>
+										)}
+									</div>
+								);
+							})}
+						</div>
+
+						{/* Final Connecting Line */}
+						{(() => {
+							// Last card appears at: 2.0 + (cardsData.length - 1) * 1.8
+							const lastCardDelay = 2.0 + (cardsData.length - 1) * 1.8;
+							// Final arrow appears after last card completes (card duration 0.8s + pause 0.2s)
+							const finalArrowDelay = lastCardDelay + 0.8 + 0.2;
+							// Final badge appears after final arrow completes (arrow duration 0.8s + pause 0.2s)
+							const finalBadgeDelay = finalArrowDelay + 0.8 + 0.2;
+
+							return (
+								<>
+									<motion.div
+										initial={{ height: 0, opacity: 0 }}
+										animate={{ height: "auto", opacity: 1 }}
+										transition={{
+											delay: finalArrowDelay,
+											duration: 0.8,
+											ease: [0.4, 0, 0.2, 1],
+										}}
+										className="overflow-hidden"
+									>
+										<div className="flex flex-col items-center">
+											<motion.div
+												initial={{ scale: 0 }}
+												animate={{ scale: 1 }}
+												transition={{
+													delay: finalArrowDelay + 0.1,
+													duration: 0.5,
+												}}
+												className="h-px w-px rounded-full border border-verified-base bg-bg-white-0 p-1"
+											/>
+											<motion.div
+												initial={{ scaleY: 0 }}
+												animate={{ scaleY: 1 }}
+												transition={{
+													delay: finalArrowDelay + 0.2,
+													duration: 0.6,
+													ease: [0.4, 0, 0.2, 1],
+												}}
+												className="h-10 w-px origin-top border-verified-base border-l"
+											/>
+											<motion.div
+												initial={{ opacity: 0, y: -10 }}
+												animate={{ opacity: 1, y: 0 }}
+												transition={{
+													delay: finalArrowDelay + 0.3,
+													duration: 0.5,
+												}}
+											>
 												<Icon
 													name="chevron-down"
-													className={`-mt-2.5 h-4 w-4 ${card.textColor || "border-verified-base/50"}`}
+													className="-mt-2.5 h-4 w-4 text-verified-base"
 												/>
-											</div>
+											</motion.div>
 										</div>
-									);
-								})}
-							</div>
-						</div>
-						<div className="flex justify-center">
-							<div className="flex w-fit items-center gap-2 rounded-xl border border-error-base/50 bg-bg-white-0 py-2 pr-3 pl-2">
-								<div className="flex h-5 w-5 items-center justify-center rounded-sm border border-stroke-soft-100 bg-error-base/20">
-									<Icon
-										name="check-circle"
-										className="h-3 w-3 stroke-1 text-error-base"
-									/>
-								</div>
-								<p className="font-semibold text-xs">Automation Complete</p>
-							</div>
-						</div>
+									</motion.div>
+
+									{/* Automation Complete Badge */}
+									<motion.div
+										initial={{ opacity: 0, scale: 0.8, y: 20 }}
+										animate={{ opacity: 1, scale: 1, y: 0 }}
+										transition={{
+											delay: finalBadgeDelay,
+											duration: 0.8,
+											ease: [0.4, 0, 0.2, 1],
+										}}
+										className="flex justify-center"
+									>
+										<div className="flex w-fit items-center gap-2 rounded-xl border border-error-base/50 bg-bg-white-0 py-2 pr-3 pl-2">
+											<motion.div
+												initial={{ scale: 0, rotate: -180 }}
+												animate={{ scale: 1, rotate: 0 }}
+												transition={{
+													delay: finalBadgeDelay + 0.2,
+													duration: 0.6,
+													ease: [0.34, 1.56, 0.64, 1],
+												}}
+												className="flex h-5 w-5 items-center justify-center rounded-sm border border-stroke-soft-100 bg-error-base/20"
+											>
+												<Icon
+													name="check-circle"
+													className="h-3 w-3 stroke-1 text-error-base"
+												/>
+											</motion.div>
+											<p className="font-semibold text-xs">
+												Automation Complete
+											</p>
+										</div>
+									</motion.div>
+								</>
+							);
+						})()}
 					</div>
 				</div>
 			</div>
