@@ -8,7 +8,6 @@ const config = {
 	basePath: "/dev",
 	output: "standalone",
 	allowedDevOrigins: ["reloop.local", "*.reloop.local"],
-	reactCompiler: true,
 };
 
 export default withMDX(config);
