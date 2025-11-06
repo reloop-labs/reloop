@@ -1,4 +1,4 @@
-import type { DNSModel } from "@reloop/domain/routes/dns/dns.model";
+	import type { DNSModel } from "@reloop/domain/routes/dns/dns.model";
 
 export namespace DNSTypes {
 	export type DNSRecordResponse = typeof DNSModel.dnsRecordResponse.static;
@@ -46,3 +46,4 @@ export namespace DNSTypes {
 		status: DNSRecordStatus;
 	}
 }
+	
