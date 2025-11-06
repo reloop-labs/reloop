@@ -17,7 +17,7 @@ const LinkType = z.union([
 	z.string(), // catch all
 ]);
 
-const LinkSchema = z.looseObject({
+const LinkSchema = z.object({
 	label: z.string().nullish(), // the value of the footnote, e.g. `1`
 	url: z.string(),
 	title: z.string().nullish(),
@@ -41,7 +41,7 @@ const KnownAnswerConfidence = z.enum([
 
 const AnswerConfidence = z.union([KnownAnswerConfidence, z.string()]); // evolvable
 
-const AIAnnotationsToolSchema = z.looseObject({
+const AIAnnotationsToolSchema = z.object({
 	answerConfidence: AnswerConfidence,
 });
 
