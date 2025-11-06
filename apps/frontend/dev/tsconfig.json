@@ -18,7 +18,8 @@
 		"baseUrl": ".",
 		"paths": {
 			"@reloop/fe-dev/*": ["./src/*"],
-			"@reloop/fe-dev/.source": [".source"]
+			"@reloop/fe-dev/.source": [".source"],
+			"@be/domain/*": ["../../backend/domain/src/*"]
 		},
 		"plugins": [
 			{
