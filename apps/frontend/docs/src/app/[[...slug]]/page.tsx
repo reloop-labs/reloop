@@ -1,4 +1,4 @@
-import { baseOptions } from "@docs/app/layout.config";
+import { baseOptions } from "@fe/docs/app/layout.config";
 import {
 	BiomejsIcon,
 	BunIcon,
@@ -13,10 +13,10 @@ import {
 	TailwindCSSIcon,
 	TurborepoIcon,
 	TypeScriptIcon,
-} from "@docs/components/icons/Tech";
-import { LLMCopyButton, ViewOptions } from "@docs/components/page-actions";
-import { source } from "@docs/lib/source";
-import { getMDXComponents } from "@docs/mdx-components";
+} from "@fe/docs/components/icons/Tech";
+import { LLMCopyButton, ViewOptions } from "@fe/docs/components/page-actions";
+import { source } from "@fe/docs/lib/source";
+import { getMDXComponents } from "@fe/docs/mdx-components";
 import { Icon } from "@reloop/ui/icon";
 import { DocsLayout } from "fumadocs-ui/layouts/notebook";
 import { createRelativeLink } from "fumadocs-ui/mdx";

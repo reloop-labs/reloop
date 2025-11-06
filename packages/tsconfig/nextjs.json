@@ -17,7 +17,8 @@
 			"@reloop/auth": ["../../packages/auth/src/*"],
 			"@reloop/domain": ["../../apps/backend/domain/src/*"],
 			"@fe/dashboard": ["../../apps/frontend/dashboard/src/*"],
-			"@fe/web": ["../../apps/frontend/web/src/*"]
+			"@fe/web": ["../../apps/frontend/web/src/*"],
+			"@fe/docs": ["../../apps/frontend/docs/src/*"]
 		}
 	}
 }
