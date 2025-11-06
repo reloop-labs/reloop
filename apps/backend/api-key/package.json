@@ -10,7 +10,6 @@
 		"start": "bun run dist/index.js"
 	},
 	"dependencies": {
-		"@elysiajs/bearer": "catalog:backend",
 		"@elysiajs/cors": "catalog:backend",
 		"@elysiajs/cron": "catalog:backend",
 		"@elysiajs/opentelemetry": "catalog:backend",
