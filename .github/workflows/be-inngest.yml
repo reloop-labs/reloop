@@ -1,23 +1,23 @@
-name: BE Analytics Docker
+name: BE Inngest Docker
 
 on:
   push:
     branches: [ main ]
     paths:
-      - 'apps/backend/analytics/**'
+      - 'apps/backend/inngest/**'
       - 'docker-compose.setup.yml'
-      - '.github/workflows/be-analytics.yml'
+      - '.github/workflows/be-inngest.yml'
   pull_request:
     branches: [ main ]
     paths:
-      - 'apps/backend/analytics/**'
+      - 'apps/backend/inngest/**'
       - 'docker-compose.setup.yml'
-      - '.github/workflows/be-analytics.yml'
+      - '.github/workflows/be-inngest.yml'
   workflow_dispatch:
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/be-analytics
+  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/be-inngest
 
 jobs:
   build-and-push:
@@ -54,7 +54,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./apps/backend/analytics/Dockerfile
+          file: ./apps/backend/inngest/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
