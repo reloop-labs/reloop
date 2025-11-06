@@ -4,7 +4,7 @@
 		"baseUrl": ".",
 		"paths": {
 			"@fe/dashboard/*": ["./src/*"],
-			"@reloop/domain/*": ["../../backend/domain/src/*"]
+			"@be/domain/*": ["../../backend/domain/src/*"]
 		}
 	},
 	"include": [

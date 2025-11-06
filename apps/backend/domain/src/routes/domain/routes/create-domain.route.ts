@@ -1,6 +1,6 @@
-import { authMiddleware } from "@reloop/domain/middleware/auth";
-import { createDomainHandler } from "@reloop/domain/routes/domain/controllers/create-domain";
-import { DomainModel } from "@reloop/domain/routes/domain/domain.model";
+import { authMiddleware } from "@be/domain/middleware/auth";
+import { createDomainHandler } from "@be/domain/routes/domain/controllers/create-domain";
+import { DomainModel } from "@be/domain/routes/domain/domain.model";
 import { Elysia, status } from "elysia";
 
 export const createDomainRoute = new Elysia().use(authMiddleware).post(

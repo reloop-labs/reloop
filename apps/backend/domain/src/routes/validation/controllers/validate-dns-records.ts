@@ -1,5 +1,5 @@
-import { ValidationService } from "@reloop/domain/routes/validation/validation.service";
-import type { ValidationTypes } from "@reloop/domain/routes/validation/validation.type";
+import { ValidationService } from "@be/domain/routes/validation/validation.service";
+import type { ValidationTypes } from "@be/domain/routes/validation/validation.type";
 import { logger } from "@reloop/logger";
 
 export async function validateDnsRecordsHandler(

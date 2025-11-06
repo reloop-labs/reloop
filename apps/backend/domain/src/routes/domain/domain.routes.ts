@@ -1,8 +1,8 @@
-import { authMiddleware } from "@reloop/domain/middleware/auth";
-import { createDomainRoute } from "@reloop/domain/routes/domain/routes/create-domain.route";
-import { deleteDomainRoute } from "@reloop/domain/routes/domain/routes/delete-domain.route";
-import { getDomainRoute } from "@reloop/domain/routes/domain/routes/get-domain.route";
-import { listDomainsRoute } from "@reloop/domain/routes/domain/routes/list-domains.route";
+import { authMiddleware } from "@be/domain/middleware/auth";
+import { createDomainRoute } from "@be/domain/routes/domain/routes/create-domain.route";
+import { deleteDomainRoute } from "@be/domain/routes/domain/routes/delete-domain.route";
+import { getDomainRoute } from "@be/domain/routes/domain/routes/get-domain.route";
+import { listDomainsRoute } from "@be/domain/routes/domain/routes/list-domains.route";
 import { Elysia } from "elysia";
 
 export const domainRoutes = new Elysia({

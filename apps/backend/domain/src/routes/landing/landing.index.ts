@@ -1,5 +1,5 @@
+import { redis } from "@be/domain/lib/redis";
 import { db } from "@reloop/db/client";
-import { redis } from "@reloop/domain/lib/redis";
 import { Elysia } from "elysia";
 
 export const landing = new Elysia()

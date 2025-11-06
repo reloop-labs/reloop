@@ -4,7 +4,7 @@
 		"baseUrl": ".",
 		"paths": {
 			"@reloop/web/*": ["./src/*"],
-			"@reloop/domain/*": ["../../backend/domain/src/*"]
+			"@be/domain/*": ["../../backend/domain/src/*"]
 		}
 	},
 	"include": [

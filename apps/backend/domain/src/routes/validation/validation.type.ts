@@ -1,4 +1,4 @@
-import type { ValidationModel } from "@reloop/domain/routes/validation/validation.model";
+import type { ValidationModel } from "@be/domain/routes/validation/validation.model";
 
 export namespace ValidationTypes {
 	export type DnsValidationBody =

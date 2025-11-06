@@ -1,6 +1,6 @@
 import { generateKeyPair } from "node:crypto";
 import { promisify } from "node:util";
-import type { DNSTypes } from "@reloop/domain/routes/dns/dns.type";
+import type { DNSTypes } from "@be/domain/routes/dns/dns.type";
 
 const generateKeyPairAsync = promisify(generateKeyPair);
 

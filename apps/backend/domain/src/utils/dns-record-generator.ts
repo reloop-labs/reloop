@@ -1,4 +1,4 @@
-import type { DNSTypes } from "@reloop/domain/routes/dns/dns.type";
+import type { DNSTypes } from "@be/domain/routes/dns/dns.type";
 
 export function generateDKIMRecord(
 	domain: string,

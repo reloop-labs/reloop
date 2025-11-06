@@ -1,5 +1,5 @@
+import type { DomainModel } from "@be/domain/routes/domain/domain.model";
 import type { Domain, DomainStatus } from "@reloop/api/types";
-import type { DomainModel } from "@reloop/domain/routes/domain/domain.model";
 
 export namespace DomainTypes {
 	export type DomainResponse = typeof DomainModel.domainResponse.static;

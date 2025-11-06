@@ -1,6 +1,6 @@
-import { authMiddleware } from "@reloop/domain/middleware/auth";
-import { getDKIMKeysHandler } from "@reloop/domain/routes/dns/controllers/get-dkim-keys";
-import { DNSModel } from "@reloop/domain/routes/dns/dns.model";
+import { authMiddleware } from "@be/domain/middleware/auth";
+import { getDKIMKeysHandler } from "@be/domain/routes/dns/controllers/get-dkim-keys";
+import { DNSModel } from "@be/domain/routes/dns/dns.model";
 import { Elysia, status } from "elysia";
 
 export const getDKIMKeysRoute = new Elysia().use(authMiddleware).get(

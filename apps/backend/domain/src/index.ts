@@ -1,11 +1,11 @@
 import "dotenv/config";
+import { dnsRoutes } from "@be/domain/routes/dns/dns.route";
+import { domainRoutes } from "@be/domain/routes/domain/domain.routes";
+import { landing } from "@be/domain/routes/landing/landing.index";
+import { validationRoutes } from "@be/domain/routes/validation/validation.routes";
+import { loader } from "@be/domain/utils/loader";
 import { fromTypes, openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
-import { dnsRoutes } from "@reloop/domain/routes/dns/dns.route";
-import { domainRoutes } from "@reloop/domain/routes/domain/domain.routes";
-import { landing } from "@reloop/domain/routes/landing/landing.index";
-import { validationRoutes } from "@reloop/domain/routes/validation/validation.routes";
-import { loader } from "@reloop/domain/utils/loader";
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
 
