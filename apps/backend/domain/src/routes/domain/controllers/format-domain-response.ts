@@ -1,4 +1,4 @@
-import type { DomainTypes } from "@reloop/domain/routes/domain/domain.type";
+import type { DomainTypes } from "@be/domain/routes/domain/domain.type";
 
 export function formatDomainResponse(
 	domain: {
@@ -30,17 +30,17 @@ export function formatDomainResponse(
 		organizationId: string;
 		userId: string;
 		recordType:
-			| "A"
-			| "AAAA"
-			| "CNAME"
-			| "MX"
-			| "TXT"
-			| "NS"
-			| "SRV"
-			| "CAA"
-			| "SPF"
-			| "DKIM"
-			| "DMARC";
+		| "A"
+		| "AAAA"
+		| "CNAME"
+		| "MX"
+		| "TXT"
+		| "NS"
+		| "SRV"
+		| "CAA"
+		| "SPF"
+		| "DKIM"
+		| "DMARC";
 		name: string;
 		value: string;
 		ttl: number;

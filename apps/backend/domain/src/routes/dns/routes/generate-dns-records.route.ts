@@ -1,6 +1,6 @@
-import { authMiddleware } from "@reloop/domain/middleware/auth";
-import { generateDNSRecordsHandler } from "@reloop/domain/routes/dns/controllers/generate-dns-records";
-import { DNSModel } from "@reloop/domain/routes/dns/dns.model";
+import { authMiddleware } from "@be/domain/middleware/auth";
+import { generateDNSRecordsHandler } from "@be/domain/routes/dns/controllers/generate-dns-records";
+import { DNSModel } from "@be/domain/routes/dns/dns.model";
 import { Elysia, status } from "elysia";
 
 export const generateDNSRecordsRoute = new Elysia().use(authMiddleware).post(

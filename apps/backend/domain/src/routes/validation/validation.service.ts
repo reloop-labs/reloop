@@ -1,4 +1,4 @@
-import type { ValidationTypes } from "@reloop/domain/routes/validation/validation.type";
+import type { ValidationTypes } from "@be/domain/routes/validation/validation.type";
 import { lookup, resolveCname, resolveMx, resolveTxt } from "dns";
 import { promisify } from "util";
 

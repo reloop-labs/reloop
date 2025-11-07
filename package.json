@@ -62,7 +62,7 @@
 				"@better-fetch/fetch": "1.1.18",
 				"react-markdown": "10.1.0",
 				"rehype-highlight": "7.0.2",
-				"shiki": "3.9.2",
+				"shiki": "3.14.0",
 				"fumadocs-openapi": "9.1.9",
 				"ajv": "8.17.1",
 				"@react-email/components": "0.5.0",
@@ -104,9 +104,8 @@
 				"@clickhouse/client": "^1.12.1",
 				"dotenv": "16.4.7",
 				"tsdown": "0.12.9",
-				"elysia": "latest",
+				"elysia": "1.4.15",
 				"@elysiajs/cors": "^1.2.0",
-				"@elysiajs/bearer": "latest",
 				"@elysiajs/cron": "1.3.0",
 				"@elysiajs/server-timing": "1.3.0",
 				"@elysiajs/swagger": "1.3.1",
@@ -139,9 +138,9 @@
 		"fe:dev:dev": "bun run --filter=dev dev",
 		"fe:dev:build": "bun run --filter=dev build",
 		"fe:dev:start": "bun run --filter=dev start",
-		"fe:admin:dev": "bun run --filter=admin dev",
-		"fe:admin:build": "bun run --filter=admin build",
-		"fe:admin:start": "bun run --filter=admin start",
+		"fe:docs:dev": "bun run --filter=docs dev",
+		"fe:docs:build": "bun run --filter=docs build",
+		"fe:docs:start": "bun run --filter=docs start",
 		"fe:web:dev": "bun run --filter=web dev",
 		"fe:web:build": "bun run --filter=web build",
 		"fe:web:start": "bun run --filter=web start",
@@ -169,10 +168,13 @@
 		"be:inngest:dev": "bun run --filter=inngest dev",
 		"be:inngest:build": "bun run --filter=inngest build",
 		"be:inngest:start": "bun run --filter=inngest start",
+		"be:tracehub:dev": "bun run --filter=tracehub dev",
+		"be:tracehub:build": "bun run --filter=tracehub build",
+		"be:tracehub:start": "bun run --filter=tracehub start",
 		"check": "biome check --write .",
 		"frontend:dev": "turbo dev --filter='dashboard' --filter='dev' --filter='docs' --filter='web'",
-		"backend:dev": "turbo dev --filter='audience' --filter='auth' --filter='domain' --filter='mail' --filter='webhook' --filter='api-key' --filter='inngest'",
-		"reloop:dev": "turbo dev --filter='dashboard' --filter='dev' --filter='docs' --filter='web' --filter='audience' --filter='auth' --filter='domain' --filter='mail' --filter='webhook' --filter='api-key' --filter='inngest'",
+		"backend:dev": "turbo dev --filter='audience' --filter='auth' --filter='domain' --filter='mail' --filter='webhook' --filter='api-key' --filter='inngest' --filter='tracehub'",
+		"reloop:dev": "turbo dev --filter='dashboard' --filter='dev' --filter='docs' --filter='web' --filter='audience' --filter='auth' --filter='domain' --filter='mail' --filter='webhook' --filter='api-key' --filter='inngest' --filter='tracehub'",
 		"docker:up": "docker compose -f local/docker-compose.yml up -d",
 		"docker:down": "docker compose -f local/docker-compose.yml down",
 		"docker-prod:up": "docker compose -f prod/docker-compose.yml up -d",
@@ -199,8 +201,5 @@
 		"docs",
 		"protobufjs"
 	],
-	"dependencies": {
-		"global": "^4.4.0",
-		"inngest-cli": "^1.13.1"
-	}
+	"dependencies": {}
 }

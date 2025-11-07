@@ -1,4 +1,4 @@
-import { redis } from "@reloop/domain/lib/redis";
+import { redis } from "@be/domain/lib/redis";
 import { logger } from "@reloop/logger";
 
 /**

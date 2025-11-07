@@ -37,7 +37,7 @@ interface ApiKeyData {
 }
 
 interface ApiKeyHeaderProps {
-	apiKey: ApiKeyData | null;
+	apiKey: ApiKeyData | undefined;
 	isLoading: boolean;
 	isFailed?: boolean;
 	onDeleteApiKey?: () => void;

@@ -1,11 +1,11 @@
-import { db } from "@reloop/db/client";
-import * as schema from "@reloop/db/schema";
-import type { DNSTypes } from "@reloop/domain/routes/dns/dns.type";
-import { generateDKIMKeyPair } from "@reloop/domain/utils/dkim-key-generator";
+import type { DNSTypes } from "@be/domain/routes/dns/dns.type";
+import { generateDKIMKeyPair } from "@be/domain/utils/dkim-key-generator";
 import {
 	generateAllDNSRecords,
 	generateDKIMRecord,
-} from "@reloop/domain/utils/dns-record-generator";
+} from "@be/domain/utils/dns-record-generator";
+import { db } from "@reloop/db/client";
+import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
 import { and, eq } from "drizzle-orm";
 

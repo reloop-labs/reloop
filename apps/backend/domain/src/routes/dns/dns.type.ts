@@ -1,5 +1,4 @@
-	import type { DNSModel } from "@reloop/domain/routes/dns/dns.model";
-
+import type { DNSModel } from "@be/domain/routes/dns/dns.model";
 export namespace DNSTypes {
 	export type DNSRecordResponse = typeof DNSModel.dnsRecordResponse.static;
 	export type DKIMKeysResponse = typeof DNSModel.dkimKeysResponse.static;

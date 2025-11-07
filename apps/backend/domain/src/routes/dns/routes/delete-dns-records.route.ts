@@ -1,6 +1,6 @@
-import { authMiddleware } from "@reloop/domain/middleware/auth";
-import { deleteDNSRecordsHandler } from "@reloop/domain/routes/dns/controllers/delete-dns-records";
-import { DNSModel } from "@reloop/domain/routes/dns/dns.model";
+import { authMiddleware } from "@be/domain/middleware/auth";
+import { deleteDNSRecordsHandler } from "@be/domain/routes/dns/controllers/delete-dns-records";
+import { DNSModel } from "@be/domain/routes/dns/dns.model";
 import { Elysia, status } from "elysia";
 
 export const deleteDNSRecordsRoute = new Elysia().use(authMiddleware).delete(

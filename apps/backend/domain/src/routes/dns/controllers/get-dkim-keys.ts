@@ -1,6 +1,6 @@
+import type { DNSTypes } from "@be/domain/routes/dns/dns.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import type { DNSTypes } from "@reloop/domain/routes/dns/dns.type";
 import { logger } from "@reloop/logger";
 import { and, eq } from "drizzle-orm";
 

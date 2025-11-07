@@ -1,10 +1,10 @@
-import { db } from "@reloop/db/client";
-import * as schema from "@reloop/db/schema";
-import type { DNSTypes } from "@reloop/domain/routes/dns/dns.type";
+import type { DNSTypes } from "@be/domain/routes/dns/dns.type";
 import {
 	invalidateDNSRecordsCache,
 	invalidateDomainCache,
-} from "@reloop/domain/utils/cache-helpers";
+} from "@be/domain/utils/cache-helpers";
+import { db } from "@reloop/db/client";
+import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
 import { and, eq } from "drizzle-orm";
 

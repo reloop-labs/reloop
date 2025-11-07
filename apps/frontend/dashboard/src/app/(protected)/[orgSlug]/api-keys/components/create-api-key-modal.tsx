@@ -240,7 +240,7 @@ export const CreateApiKeyModal = ({
 							<div>
 								<Label.Root htmlFor="name">
 									Name
-									<Label.Asterisk required={false} />
+									<Label.Asterisk />
 								</Label.Root>
 								<Input.Root className="mt-1">
 									<Input.Wrapper>
@@ -262,7 +262,7 @@ export const CreateApiKeyModal = ({
 							<div>
 								<Label.Root htmlFor="expiresAt">
 									Expires At
-									<Label.Asterisk required={false} />
+									<Label.Asterisk />
 								</Label.Root>
 								<Input.Root className="mt-1">
 									<Input.Wrapper>
@@ -370,7 +370,7 @@ export const CreateApiKeyModal = ({
 							<div>
 								<Label.Root htmlFor="permissions">
 									Permissions
-									<Label.Asterisk required={false} />
+									<Label.Asterisk />
 								</Label.Root>
 								<Input.Root className="mt-1">
 									<Input.Wrapper>

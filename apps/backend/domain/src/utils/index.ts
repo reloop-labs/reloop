@@ -1,4 +1,4 @@
-export { generateDKIMKeyPair } from "@reloop/domain/utils/dkim-key-generator";
+export { generateDKIMKeyPair } from "@be/domain/utils/dkim-key-generator";
 export {
 	convertToDNSRecordData,
 	type DNSRecordData,
@@ -6,11 +6,11 @@ export {
 	generateDNSData,
 	getExistingDNSRecords,
 	insertDNSRecords,
-} from "@reloop/domain/utils/dns-operations";
+} from "@be/domain/utils/dns-operations";
 export {
 	generateAllDNSRecords,
 	generateDKIMRecord,
 	generateDMARCRecord,
 	generateMXRecord,
 	generateSPFRecord,
-} from "@reloop/domain/utils/dns-record-generator";
+} from "@be/domain/utils/dns-record-generator";

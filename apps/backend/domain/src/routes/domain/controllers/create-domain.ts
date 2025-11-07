@@ -1,16 +1,16 @@
-import { db } from "@reloop/db/client";
-import * as schema from "@reloop/db/schema";
 import {
 	generateDNSRecords,
 	insertDNSRecordsToDatabase,
-} from "@reloop/domain/routes/dns/controllers/generate-dns-records";
-import { formatDomainResponse } from "@reloop/domain/routes/domain/controllers/format-domain-response";
-import type { DomainTypes } from "@reloop/domain/routes/domain/domain.type";
-import { getExistingDNSRecords } from "@reloop/domain/utils";
+} from "@be/domain/routes/dns/controllers/generate-dns-records";
+import { formatDomainResponse } from "@be/domain/routes/domain/controllers/format-domain-response";
+import type { DomainTypes } from "@be/domain/routes/domain/domain.type";
+import { getExistingDNSRecords } from "@be/domain/utils";
 import {
 	invalidateDomainListCache,
 	invalidateOrganizationCache,
-} from "@reloop/domain/utils/cache-helpers";
+} from "@be/domain/utils/cache-helpers";
+import { db } from "@reloop/db/client";
+import * as schema from "@reloop/db/schema";
 import { inngest } from "@reloop/inngest/client";
 import { logger } from "@reloop/logger";
 import { and, eq } from "drizzle-orm";

@@ -1,7 +1,7 @@
+import { formatDomainResponse } from "@be/domain/routes/domain/controllers/format-domain-response";
+import type { DomainTypes } from "@be/domain/routes/domain/domain.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { formatDomainResponse } from "@reloop/domain/routes/domain/controllers/format-domain-response";
-import type { DomainTypes } from "@reloop/domain/routes/domain/domain.type";
 import { logger } from "@reloop/logger";
 import { and, count, desc, eq, isNull, like } from "drizzle-orm";
 
