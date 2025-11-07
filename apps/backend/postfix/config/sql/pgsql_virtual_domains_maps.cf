@@ -1,6 +1,6 @@
-user = ${DB_USER}
-password = ${DB_PASSWORD}
-hosts = ${DB_HOST}
-dbname = ${DB_NAME}
+user = 
+password = 
+hosts = 
+dbname = 
 
 query = SELECT domain FROM domain WHERE domain='%s' AND deleted_at IS NULL

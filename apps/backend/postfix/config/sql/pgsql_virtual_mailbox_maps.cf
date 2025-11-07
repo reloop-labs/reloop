@@ -1,6 +1,6 @@
-user = ${DB_USER}
-password = ${DB_PASSWORD}
-hosts = ${DB_HOST}
-dbname = ${DB_NAME}
+user = 
+password = 
+hosts = 
+dbname = 
 
 query = SELECT mail_dir FROM mailbox WHERE username='%s' AND active = true

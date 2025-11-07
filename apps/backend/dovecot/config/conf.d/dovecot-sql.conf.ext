@@ -1,5 +1,5 @@
 driver = pgsql
-connect = host=${DB_HOST} dbname=${DB_NAME} user=${DB_USER} password=${DB_PASSWORD}
+connect = host= dbname= user= password=
 
 default_pass_scheme = MD5-CRYPT
 

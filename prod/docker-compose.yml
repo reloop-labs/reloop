@@ -3,7 +3,7 @@ name: reloop-prod
 services:
   reloop-postgres:
     image: postgres:17-alpine
-    container_name: reloop-postgres
+    container_name: reloopsh-postgres
     volumes:
       - ../docker-data/postgres:/var/lib/postgresql/data
     environment:
@@ -19,20 +19,24 @@ services:
       retries: 3
       test: ["CMD", "pg_isready", "-U", "reloop", "-d", "reloop"]
     restart: unless-stopped
+    networks:
+      - mail-network
 
   reloop-redis:
     image: redis:7-alpine
-    container_name: reloop-redis
+    container_name: reloopsh-redis
     command: redis-server --requirepass reloop123
     volumes:
       - ../docker-data/redis:/data
     ports:
       - "6379:6379"
     restart: unless-stopped
+    networks:
+      - mail-network
 
   reloop-proxy:
     image: caddy:2-alpine
-    container_name: reloop-proxy
+    container_name: reloopsh-proxy
     ports:
       - "80:80"
       - "443:443"
@@ -46,7 +50,7 @@ services:
 
   reloop-clickhouse:
     image: clickhouse/clickhouse-server:24.8-alpine
-    container_name: reloop-clickhouse
+    container_name: reloopsh-clickhouse
     ports:
       - "8123:8123"
       - "9000:9000"
@@ -74,7 +78,7 @@ services:
 
   reloop-grafana:
     image: grafana/grafana:10.4.0
-    container_name: reloop-grafana
+    container_name: reloopsh-grafana
     ports:
       - "3400:3000"
     volumes:
@@ -92,7 +96,7 @@ services:
   # Optional: Loki for log aggregation
   reloop-loki:
     image: grafana/loki:2.9.0
-    container_name: reloop-loki
+    container_name: reloopsh-loki
     ports:
       - "3100:3100"
     volumes:
@@ -103,7 +107,7 @@ services:
 
   reloop-mailpit:
     image: axllent/mailpit:latest
-    container_name: reloop-mailpit
+    container_name: reloopsh-mailpit
     ports:
       - "1025:1025"  # SMTP port for sending test emails
       - "8025:8025"  # Web UI port for viewing captured emails
@@ -111,51 +115,96 @@ services:
 
   reloop-postfix:
     image: reloopsh/be-postfix:latest
-    container_name: reloop-postfix
-    ports:
-      - "25:25"
-      - "587:587"
-      - "465:465"
-    volumes:
-      - ../docker-data/postfix:/var/spool/postfix
-      - ../apps/backend/postfix/config/main.cf:/etc/postfix/main.cf
-      - ../apps/backend/postfix/config/master.cf:/etc/postfix/master.cf
-      - ../apps/backend/postfix/config/sql:/etc/postfix/sql
-    environment:
-      - MAIL_HOSTNAME=mail.reloop.local
-      - DOMAIN=reloop.local
-      - PG_URL=postgresql://reloop:reloop123@reloop-postgres:5432/reloop
+    container_name: reloopsh-postfix
+    hostname: postfix
     depends_on:
       - reloop-postgres
       - reloop-dovecot
       - reloop-rspamd
+    cap_add:
+      - NET_BIND_SERVICE
+    volumes:
+      - ../apps/backend/postfix/config/main.cf:/etc/postfix/main.cf
+      - ../apps/backend/postfix/config/master.cf:/etc/postfix/master.cf
+      - ../apps/backend/postfix/config/sql:/etc/postfix/sql
+      - ../docker-data/postfix:/var/spool/postfix
+      - ../docker-data/rspamd:/var/lib/rspamd
+    environment:
+      - TZ=UTC
+      - DB_HOST=reloop-postgres
+      - DB_NAME=reloop
+      - DB_USER=reloop
+      - DB_PASSWORD=reloop123
+      - REDIS_PASSWORD=reloop123
+      - MAIL_HOSTNAME=mail.reloop.local
+      - DOMAIN=reloop.local
+    ports:
+      - "25:25"
+      - "465:465"
+      - "587:587"
     restart: unless-stopped
+    networks:
+      - mail-network
 
   reloop-dovecot:
     image: reloopsh/be-dovecot:latest
-    container_name: reloop-dovecot
-    ports:
-      - "993:993"
-      - "995:995"
-      - "143:143"
-    volumes:
-      - ../docker-data/dovecot:/var/mail
-      - ../apps/backend/dovecot/config/dovecot.conf:/etc/dovecot/dovecot.conf
-      - ../apps/backend/dovecot/config/conf.d:/etc/dovecot/conf.d
-    environment:
-      - PG_URL=postgresql://reloop:reloop123@reloop-postgres:5432/reloop
+    container_name: reloopsh-dovecot
+    hostname: dovecot
     depends_on:
+      - reloop-redis
       - reloop-postgres
+    cap_add:
+      - NET_BIND_SERVICE
+    volumes:
+      - ../apps/backend/dovecot/config/conf.d:/etc/dovecot/conf.d
+      - ../apps/backend/dovecot/config/dovecot.conf:/etc/dovecot/dovecot.conf
+      - ../docker-data/dovecot:/var/mail
+      - ../docker-data/rspamd:/var/lib/rspamd
+    environment:
+      - DB_HOST=reloop-postgres
+      - DB_NAME=reloop
+      - DB_USER=reloop
+      - DB_PASSWORD=reloop123
+      - TZ=UTC
+      - REDIS_PASSWORD=reloop123
+    ports:
+      - "143:143"
+      - "993:993"
+      - "110:110"
+      - "995:995"
     restart: unless-stopped
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 20000
+        hard: 40000
+    networks:
+      - mail-network
 
   reloop-rspamd:
     image: reloopsh/be-rspamd:latest
-    container_name: reloop-rspamd
+    container_name: reloopsh-rspamd
+    hostname: rspamd
+    depends_on:
+      - reloop-redis
+    environment:
+      - TZ=UTC
+      - REDIS_PASSWORD=reloop123
+    volumes:
+      - ../apps/backend/rspamd/config/local.d:/etc/rspamd/local.d
+      - ../apps/backend/rspamd/config/rspamd.conf:/etc/rspamd/rspamd.conf
+      - ../docker-data/rspamd:/var/lib/rspamd
     ports:
       - "11332:11332"
       - "11334:11334"
-    volumes:
-      - ../docker-data/rspamd:/var/lib/rspamd
-      - ../apps/backend/rspamd/config/rspamd.conf:/etc/rspamd/rspamd.conf
-      - ../apps/backend/rspamd/config/local.d:/etc/rspamd/local.d
     restart: unless-stopped
+    networks:
+      - mail-network
+
+networks:
+  mail-network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/16
