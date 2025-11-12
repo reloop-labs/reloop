@@ -17,7 +17,7 @@ CMD \
     postconf -e "myorigin=${MYORIGIN:-localhost}" && \
     postconf -e "mydestination=" && \
     postconf -e "inet_interfaces=all" && \
-    postconf -e "mynetworks=127.0.0.0/8, [::1]/128, [fe80::]/10" && \
+    postconf -e "mynetworks=127.0.0.0/8, [::1]/128, [fe80::]/10, 172.20.0.0/16" && \
     echo 'submission inet n - n - - smtpd' >> /etc/postfix/master.cf && \
     newaliases && \
     postfix start-fg
