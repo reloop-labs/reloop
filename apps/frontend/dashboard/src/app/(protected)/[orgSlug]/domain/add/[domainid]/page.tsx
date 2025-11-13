@@ -17,10 +17,6 @@ const NewDomainPage = () => {
 
 	const { data: domainData, isLoading } = useSWR<DomainResponse>(
 		domainId ? `/api/domain/v1/${domainId}` : null,
-		{
-			revalidateOnFocus: false,
-			revalidateOnReconnect: true,
-		},
 	);
 	const copyToClipboard = async (text: string, itemId: string) => {
 		try {
@@ -39,9 +35,10 @@ const NewDomainPage = () => {
 	};
 
 	if (
-		!domainData ||
-		!domainData.dnsRecords ||
-		domainData.dnsRecords.length === 0
+		(!domainData ||
+			!domainData.dnsRecords ||
+			domainData.dnsRecords.length === 0) &&
+		!isLoading
 	) {
 		return (
 			<div className="mx-auto max-w-3xl pt-10 pb-8">
@@ -86,12 +83,12 @@ const NewDomainPage = () => {
 	}
 
 	// Separate DMARC records from DKIM/SPF records
-	const dmarcRecords = domainData.dnsRecords.filter(
+	const dmarcRecords = domainData?.dnsRecords.filter(
 		(record) =>
 			record.name.includes("_dmarc") ||
 			(record.recordType === "TXT" && record.value.includes("v=DMARC")),
 	);
-	const otherRecords = domainData.dnsRecords.filter(
+	const otherRecords = domainData?.dnsRecords.filter(
 		(record) =>
 			!record.name.includes("_dmarc") &&
 			!(record.recordType === "TXT" && record.value.includes("v=DMARC")),
@@ -149,51 +146,45 @@ const NewDomainPage = () => {
 				</Alert.Root>
 
 				{/* DKIM and SPF Records */}
-				{otherRecords.length > 0 && (
-					<div className="relative mt-10">
-						<div className="mb-6 space-y-1">
-							<div className="font-medium text-base text-text-strong-950">
-								DKIM and SPF{" "}
-								<span className="text-text-sub-600">(Required)</span>
-							</div>
-							<div className="text-sm text-text-sub-600">
-								Enable email signing and specify authorized senders.
-							</div>
+				<div className="relative mt-10">
+					<div className="mb-6 space-y-1">
+						<div className="font-medium text-base text-text-strong-950">
+							DKIM and SPF <span className="text-text-sub-600">(Required)</span>
 						</div>
-						<div className="w-full">
-							<DNSRecordTable
-								records={otherRecords}
-								onCopyToClipboard={copyToClipboard}
-								copiedItems={copiedItems}
-								isLoading={isLoading}
-								loadingRows={1}
-							/>
+						<div className="text-sm text-text-sub-600">
+							Enable email signing and specify authorized senders.
 						</div>
 					</div>
-				)}
+					<div className="w-full">
+						<DNSRecordTable
+							records={otherRecords}
+							onCopyToClipboard={copyToClipboard}
+							copiedItems={copiedItems}
+							isLoading={isLoading}
+							loadingRows={1}
+						/>
+					</div>
+				</div>
 
-				{/* DMARC Records */}
-				{dmarcRecords.length > 0 && (
-					<div className="relative mt-10">
-						<div className="mb-6 space-y-1">
-							<div className="font-medium text-base text-text-strong-950">
-								DMARC <span className="text-text-sub-600">(Recommended)</span>
-							</div>
-							<div className="text-sm text-text-sub-600">
-								Set authentication policies and receive reports.
-							</div>
+				<div className="relative mt-10">
+					<div className="mb-6 space-y-1">
+						<div className="font-medium text-base text-text-strong-950">
+							DMARC <span className="text-text-sub-600">(Recommended)</span>
 						</div>
-						<div className="w-full">
-							<DNSRecordTable
-								records={dmarcRecords}
-								onCopyToClipboard={copyToClipboard}
-								copiedItems={copiedItems}
-								isLoading={isLoading}
-								loadingRows={1}
-							/>
+						<div className="text-sm text-text-sub-600">
+							Set authentication policies and receive reports.
 						</div>
 					</div>
-				)}
+					<div className="w-full">
+						<DNSRecordTable
+							records={dmarcRecords}
+							onCopyToClipboard={copyToClipboard}
+							copiedItems={copiedItems}
+							isLoading={isLoading}
+							loadingRows={1}
+						/>
+					</div>
+				</div>
 
 				<Button.Root
 					onClick={() => {

@@ -13,7 +13,7 @@ import { Skeleton } from "@reloop/ui/skeleton";
 import { AnimatePresence, motion } from "motion/react";
 
 interface DNSRecordTableProps {
-	records: DNSRecord[];
+	records?: DNSRecord[];
 	onCopyToClipboard?: (text: string, itemId: string) => void;
 	copiedItems?: Set<string>;
 	isLoading?: boolean;
@@ -79,7 +79,7 @@ export const DNSRecordTable = ({
 									</div>
 								</div>
 							))
-						: records.map((record, index) => (
+						: records?.map((record, index) => (
 								<div key={`record-${index}`} className="group/row contents">
 									<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
 										<motion.span
