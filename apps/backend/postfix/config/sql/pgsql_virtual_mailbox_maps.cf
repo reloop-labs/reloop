@@ -3,4 +3,6 @@ password = ${DB_PASSWORD}
 hosts = ${DB_HOST}
 dbname = ${DB_NAME}
 
-query = SELECT mail_dir FROM mailbox WHERE username='%s' AND active = true
+# Since we don't have mailbox table, generate mail_dir based on user email
+# Format: /var/mail/domain/user/
+query = SELECT CONCAT('/var/mail/', SPLIT_PART('%s', '@', 2), '/', SPLIT_PART('%s', '@', 1), '/') FROM "user" WHERE email='%s'

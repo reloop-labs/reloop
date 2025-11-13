@@ -1,0 +1,138 @@
+name: reloop-prod
+
+services:
+  reloop-postgres:
+    image: postgres:17-alpine
+    container_name: reloopsh-postgres
+    volumes:
+      - ../docker-data/postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: reloop
+      POSTGRES_USER: reloop
+      POSTGRES_PASSWORD: reloop123
+    ports:
+      - "5432:5432"
+    command: ["postgres", "-c", "log_statement=all"]
+    healthcheck:
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      test: ["CMD", "pg_isready", "-U", "reloop", "-d", "reloop"]
+    restart: unless-stopped
+    networks:
+      - mail-network
+
+  reloop-redis:
+    image: redis:7-alpine
+    container_name: reloopsh-redis
+    command: redis-server --requirepass reloop123
+    volumes:
+      - ../docker-data/redis:/data
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    networks:
+      - mail-network
+
+  reloop-proxy:
+    image: caddy:2-alpine
+    container_name: reloopsh-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ../docker-data/caddy:/data
+      - ../docker-data/caddy:/config
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  reloop-clickhouse:
+    image: clickhouse/clickhouse-server:24.8-alpine
+    container_name: reloopsh-clickhouse
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    volumes:
+      - ../docker-data/clickhouse:/var/lib/clickhouse
+    environment:
+      CLICKHOUSE_DB: reloop
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+      CLICKHOUSE_PASSWORD: reloop123
+      CLICKHOUSE_USER: default
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    cap_add:
+      - SYS_NICE
+      - NET_ADMIN
+      - IPC_LOCK
+    healthcheck:
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8123/ping"]
+    restart: unless-stopped
+
+  reloop-grafana:
+    image: grafana/grafana:10.4.0
+    container_name: reloopsh-grafana
+    ports:
+      - "3400:3000"
+    volumes:
+      - ../docker-data/grafana:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: reloop123
+      GF_USERS_ALLOW_SIGN_UP: false
+      GF_INSTALL_PLUGINS: grafana-clickhouse-datasource
+    depends_on:
+      - reloop-clickhouse
+    restart: unless-stopped
+
+  reloop-loki:
+    image: grafana/loki:2.9.0
+    container_name: reloopsh-loki
+    ports:
+      - "3100:3100"
+    volumes:
+      - ../docker-data/loki:/loki
+      - ./grafana/config/loki-config.yaml:/etc/loki/local-config.yaml
+    command: ["-config.file=/etc/loki/local-config.yaml"]
+    restart: unless-stopped
+
+  reloop-mailpit:
+    image: axllent/mailpit:latest
+    container_name: reloopsh-mailpit
+    ports:
+      - "1025:1025"  # SMTP port for sending test emails
+      - "8025:8025"  # Web UI port for viewing captured emails
+    restart: unless-stopped
+
+  reloop-postfix:
+    build: .
+    container_name: postfix-min
+    environment:
+      MYHOSTNAME: "localhost"
+      MYORIGIN: "localhost"
+      MYNETWORKS: "127.0.0.0/8"
+      PGHOST: reloopsh-postgres
+      PGUSER: reloop
+      PGPASSWORD: reloop123
+      PGDATABASE: reloop
+    ports:
+      - "587:587"
+    networks:
+      - mail-network 
+    restart: unless-stopped
+
+networks:
+  mail-network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/16
