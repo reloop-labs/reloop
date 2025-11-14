@@ -1,0 +1,122 @@
+---
+title: Domain
+description: Learn how to set up and run the Reloop Domain Service for managing domains, DNS records, and email authentication.
+---
+
+# Domain Service
+
+> Manages domain configuration, DNS record generation (SPF, DKIM, DMARC), and domain verification for email sending. This service helps users configure their existing domains to send emails through Reloop.
+
+<Callout type="info" title="Prerequisite">
+Make sure you've completed the [local setup guide](/setup) first (clone repo, install Bun, and set up dependencies). You also need PostgreSQL and Redis running.
+</Callout>
+
+## Service Info
+
+| Property      | Value                                                          |
+| ------------- | -------------------------------------------------------------- |
+| **API Base URL** | [https://reloop.local/api/domain](https://reloop.local/api/domain) |
+| **API Docs**  | [https://reloop.local/api/domain/openapi](https://reloop.local/api/domain/openapi) |
+| **Default Port** | `8011`                                                         |
+| **Location**  | `/apps/backend/domain`                                         |
+| **Dependency** | `auth`                                                         |
+
+
+### Environment Variables Reference
+
+| Variable                | Status      | Default                                    |
+| ----------------------- | ----------- | ------------------------------------------ |
+| `PG_URL`                | `optional` | `postgresql://user:pass@localhost:5432/db` |
+| `REDIS_URL`              | `optional` | `redis://localhost:6379`                   |
+| `BASE_URL`               | `optional` | `http://localhost:8000`                    |
+| `NODE_ENV`               | `optional`  | `development`                              |
+| `PORT`                   | `optional`   | `8011`                                      |
+
+
+
+## Environment Setup
+
+Create a `.env` file in the `apps/backend/domain` directory:
+
+```bash
+PG_URL=postgresql://user:password@localhost:5432/reloop_db
+REDIS_URL=redis://localhost:6379
+BASE_URL=http://localhost:8000
+NODE_ENV=development
+PORT=8011
+```
+
+### Start the Service
+
+```bash
+bun run --filter=domain dev
+```
+
+**Expected output:**
+```
+Domain Server is running on http://localhost:8011/api/domain
+Redis connected
+Postgres connected
+```
+### Verify Service is Running
+
+```bash
+# Check health endpoint
+curl http://localhost:8011/api/domain/
+
+# Check Redis health
+curl http://localhost:8011/api/domain/health/redis
+
+# Check Postgres health
+curl http://localhost:8011/api/domain/health/postgres
+```
+
+**Expected response:** Service status with ASCII art showing database connections.
+
+---
+## How It Works: Internal Flow
+
+### 1. Domain 
+
+```
+Create Domain Controller → Checks if domain exists
+    ↓
+Generate DNS Records → Creates MX, SPF, DKIM, DMARC
+    ↓
+Database Insert → Stores domain + DNS records
+    ↓
+Cache Invalidation → Clears domain list cache
+    ↓
+Inngest Trigger → Starts verification workflow
+    ↓
+Response → Returns domain with DNS records
+```
+
+### 2. DNS Related Details
+
+**MX Record:**
+- Type: `MX`
+- Name: `send.example.com`
+- Value: `mail.reloop.sh`
+- Priority: `10`
+- **Purpose:** Tells email servers where to deliver incoming emails
+
+**SPF Record:**
+- Type: `TXT`
+- Name: `send.example.com`
+- Value: `v=spf1 include:mail.reloop.sh ~all`
+- **Purpose:** Authorizes mail.reloop.sh to send emails on behalf of the domain
+
+**DKIM Record:**
+- Type: `TXT`
+- Name: `reloop._domainkey.send.example.com`
+- Value: `v=DKIM1; k=rsa; p=[public key]`
+- **Purpose:** Provides public key for email signature verification
+- **How it's generated:** Creates 2048-bit RSA key pair, stores private key, publishes public key
+
+**DMARC Record:**
+- Type: `TXT`
+- Name: `_dmarc.send.example.com`
+- Value: `v=DMARC1; p=none;`
+- **Purpose:** Sets email authentication policy (monitor mode)
+

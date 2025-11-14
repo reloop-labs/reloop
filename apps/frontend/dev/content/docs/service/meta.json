@@ -1,6 +1,0 @@
-{
-	"title": "API Services",
-	"description": "Guide to API Services",
-	"root": true,
-	"pages": ["index", "auth", "mail", "webhook", "server"]
-}
