@@ -4,7 +4,6 @@ import {
 	boolean,
 	index,
 	integer,
-	jsonb,
 	pgEnum,
 	pgTable,
 	text,
@@ -15,8 +14,8 @@ import {
 import { organization, user } from "./auth";
 
 // Custom ID generation functions with prefixes
-const createDomainId = () => `dm_${createId()}`;
-const createDnsRecordId = () => `dnsrec_${createId()}`;
+const createDomainId = () => `domain_${createId()}`;
+const createDnsRecordId = () => `dns_${createId()}`;
 
 export const domainTypeEnum = pgEnum("domain_type", [
 	"custom",
@@ -61,17 +60,6 @@ export const domain = pgTable(
 		status: domainStatusEnum("status").notNull().default("start-verify"),
 		userVerified: boolean("user_verified").notNull().default(false),
 		systemVerified: boolean("system_verified").notNull().default(false),
-		dnsConfigured: boolean("dns_configured").notNull().default(false),
-		nameservers: jsonb("nameservers").$type<string[]>(),
-		spfRecord: text("spf_record"),
-		dkimRecord: text("dkim_record"),
-		dkimSelector: varchar("dkim_selector", { length: 255 })
-			.notNull()
-			.default("reloop"),
-		dmarcRecord: text("dmarc_record"),
-		dmarcPolicy: varchar("dmarc_policy", { length: 50 })
-			.notNull()
-			.default("none"),
 		trackingDomain: boolean("tracking_domain").notNull().default(false),
 		verificationFailedReason: text("verification_failed_reason"),
 		deletedAt: timestamp("deleted_at"),
@@ -89,7 +77,6 @@ export const domain = pgTable(
 		index("domain_idx_status").on(table.status),
 		index("domain_idx_user_verified").on(table.userVerified),
 		index("domain_idx_system_verified").on(table.systemVerified),
-		index("domain_idx_dns_configured").on(table.dnsConfigured),
 		index("domain_idx_created_at").on(table.createdAt),
 		index("domain_idx_deleted_at").on(table.deletedAt),
 		index("domain_idx_last_verified_at").on(table.lastVerifiedAt),
@@ -125,10 +112,7 @@ export const domainDnsRecord = pgTable(
 		weight: integer("weight"),
 		port: integer("port"),
 		domain: text("domain").notNull(),
-		description: text("description"),
-		isVerified: boolean("is_verified").notNull().default(false),
 		verificationError: text("verification_error"),
-		isActive: boolean("is_active").notNull().default(true),
 		deletedAt: timestamp("deleted_at"),
 		createdAt: timestamp("created_at").notNull().defaultNow(),
 		updatedAt: timestamp("updated_at")
@@ -140,19 +124,10 @@ export const domainDnsRecord = pgTable(
 		index("domain_dns_record_idx_domain_id").on(table.domainId),
 		index("domain_dns_record_idx_record_type").on(table.recordType),
 		index("domain_dns_record_idx_name").on(table.name),
-		index("domain_dns_record_idx_is_verified").on(table.isVerified),
 		index("domain_dns_record_idx_deleted_at").on(table.deletedAt),
 		index("domain_dns_record_idx_domain_type").on(
 			table.domainId,
 			table.recordType,
-		),
-		index("domain_dns_record_idx_domain_verified").on(
-			table.domainId,
-			table.isVerified,
-		),
-		index("domain_dns_record_idx_domain_active").on(
-			table.domainId,
-			table.isActive,
 		),
 		unique("domain_dns_record_unique_record").on(
 			table.domainId,

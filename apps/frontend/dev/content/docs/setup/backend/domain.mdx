@@ -65,6 +65,84 @@ curl http://localhost:8011/api/domain/health/postgres
 
 ---
 
+## Database Schema
+
+The domain service uses two main tables to store domain and DNS record information. The schema is defined in `packages/db/src/schema/domain.ts`.
+
+### Enums
+
+The schema defines three enums used across the domain tables:
+
+| Enum | Value |
+|------|-------|
+| **Domain Type** | `custom`, `subdomain`, `system` |
+| **Domain Status** | `start-verify`, `verifying`, `active`, `suspended`, `failed` |
+| **DNS Record Type** | `A`, `AAAA`, `CNAME`, `MX`, `TXT`, `NS`, `SRV`, `CAA`, `SPF`, `DKIM`, `DMARC` |
+
+### Domain Table
+
+The `domain` table stores domain information and verification status.
+
+| Column | Type | Constraints | Default |
+|--------|------|-------------|---------|
+| `id` | `text` | Primary Key | `domain_{cuid}` |
+| `domain` | `varchar(255)` | Not Null | - |
+| `organizationId` | `text` | Not Null, FK → `organization.id` | - |
+| `userId` | `text` | Not Null, FK → `user.id` | - |
+| `domainType` | `domain_type` enum | Not Null | `custom` |
+| `status` | `domain_status` enum | Not Null | `start-verify` |
+| `userVerified` | `boolean` | Not Null | `false` |
+| `systemVerified` | `boolean` | Not Null | `false` |
+| `trackingDomain` | `boolean` | Not Null | `false` |
+| `verificationFailedReason` | `text` | Nullable | - |
+| `deletedAt` | `timestamp` | Nullable | - |
+| `lastVerifiedAt` | `timestamp` | Nullable | - |
+| `createdAt` | `timestamp` | Not Null | `now()` |
+| `updatedAt` | `timestamp` | Not Null | `now()` |
+
+**Key Constraints:**
+- Unique constraint on `(organizationId, domain)` - prevents duplicate domains per organization
+- Foreign keys cascade delete to `organization` and `user` tables
+
+### Domain DNS Record Table
+
+The `domain_dns_record` table stores individual DNS records associated with domains.
+
+| Column | Type | Constraints | Default |
+|--------|------|-------------|---------|
+| `id` | `text` | Primary Key | `dns_{cuid}` |
+| `domainId` | `text` | Not Null, FK → `domain.id` | - |
+| `organizationId` | `text` | Not Null, FK → `organization.id` | - |
+| `userId` | `text` | Not Null, FK → `user.id` | - |
+| `recordType` | `dns_record_type` enum | Not Null | - |
+| `name` | `text` | Not Null | - |
+| `status` | `domain_status` enum | Not Null | `start-verify` |
+| `value` | `text` | Not Null | - |
+| `ttl` | `integer` | Not Null | `3600` |
+| `priority` | `integer` | Nullable | - |
+| `weight` | `integer` | Nullable | - |
+| `port` | `integer` | Nullable | - |
+| `domain` | `text` | Not Null | - |
+| `verificationError` | `text` | Nullable | - |
+| `deletedAt` | `timestamp` | Nullable | - |
+| `createdAt` | `timestamp` | Not Null | `now()` |
+| `updatedAt` | `timestamp` | Not Null | `now()` |
+
+**Key Constraints:**
+- Unique constraint on `(domainId, recordType, name, value)` - prevents duplicate records
+- Foreign keys cascade delete to `domain`, `organization`, and `user` tables
+
+### Relationships
+
+- **Domain → Organization**: Many-to-one (domain belongs to one organization)
+- **Domain → User**: Many-to-one (domain created by one user)
+- **Domain → DNS Records**: One-to-many (domain has many DNS records)
+- **DNS Record → Domain**: Many-to-one (DNS record belongs to one domain)
+- **DNS Record → Organization**: Many-to-one (DNS record belongs to one organization)
+- **DNS Record → User**: Many-to-one (DNS record created by one user)
+
+---
+
 ### DNS Related Details
 
 **MX Record:**
