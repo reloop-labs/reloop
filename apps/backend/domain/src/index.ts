@@ -1,4 +1,5 @@
 import "dotenv/config";
+import { domainConfig } from "@be/domain/domain.config";
 import { dnsRoutes } from "@be/domain/routes/dns/dns.route";
 import { domainRoutes } from "@be/domain/routes/domain/domain.routes";
 import { landing } from "@be/domain/routes/landing/landing.index";
@@ -9,7 +10,7 @@ import { serverTiming } from "@elysiajs/server-timing";
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
 
-const port = 8011;
+const port = domainConfig.port;
 const emailService = new Elysia({
 	prefix: "/api/domain",
 	name: "Domain Service",
@@ -17,7 +18,7 @@ const emailService = new Elysia({
 	.use(
 		openapi({
 			references: fromTypes(
-				process.env.NODE_ENV === "production"
+				domainConfig.NODE_ENV === "production"
 					? "dist/index.d.ts"
 					: "src/index.ts",
 			),

@@ -24,27 +24,17 @@ Make sure you've completed the [local setup guide](/setup) first (clone repo, in
 
 ### Environment Variables Reference
 
-| Variable                | Status      | Default                                    |
-| ----------------------- | ----------- | ------------------------------------------ |
-| `PG_URL`                | `optional` | `postgresql://user:pass@localhost:5432/db` |
-| `REDIS_URL`              | `optional` | `redis://localhost:6379`                   |
-| `BASE_URL`               | `optional` | `http://localhost:8000`                    |
-| `NODE_ENV`               | `optional`  | `development`                              |
-| `PORT`                   | `optional`   | `8011`                                      |
+All environment variables are accessed through `domainConfig` and have default values defined in `apps/backend/domain/src/domain.config.ts`.
 
+| Variable                      | Status      | Default                                                      |
+| ----------------------------- | ----------- | ------------------------------------------------------------ |
+| `PG_URL`                      | `optional`  | `postgresql://reloop:reloop123@localhost:5432/reloop`        |
+| `REDIS_URL`                   | `optional`  | `redis://:reloop123@localhost:6379`                          |
+| `BASE_URL`                    | `optional`  | `https://reloop.local`                                       |
+| `NODE_ENV`                    | `optional`  | `development`                                                |
+| `PORT`                        | `optional`  | `8011`                                                       |
+| `NODE_TLS_REJECT_UNAUTHORIZED` | `optional` | `0` (automatically set to `0` in non-production environments) |
 
-
-## Environment Setup
-
-Create a `.env` file in the `apps/backend/domain` directory:
-
-```bash
-PG_URL=postgresql://user:password@localhost:5432/reloop_db
-REDIS_URL=redis://localhost:6379
-BASE_URL=http://localhost:8000
-NODE_ENV=development
-PORT=8011
-```
 
 ### Start the Service
 
@@ -74,25 +64,8 @@ curl http://localhost:8011/api/domain/health/postgres
 **Expected response:** Service status with ASCII art showing database connections.
 
 ---
-## How It Works: Internal Flow
 
-### 1. Domain 
-
-```
-Create Domain Controller → Checks if domain exists
-    ↓
-Generate DNS Records → Creates MX, SPF, DKIM, DMARC
-    ↓
-Database Insert → Stores domain + DNS records
-    ↓
-Cache Invalidation → Clears domain list cache
-    ↓
-Inngest Trigger → Starts verification workflow
-    ↓
-Response → Returns domain with DNS records
-```
-
-### 2. DNS Related Details
+### DNS Related Details
 
 **MX Record:**
 - Type: `MX`

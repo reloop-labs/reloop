@@ -1,9 +1,10 @@
+import { domainConfig } from "@be/domain/domain.config";
 import type { Session } from "@reloop/auth/server";
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
 
-if (process.env.NODE_ENV !== "production") {
-	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+if (domainConfig.NODE_ENV !== "production") {
+	domainConfig.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 }
 
 export const authMiddleware = new Elysia({ name: "better-auth" }).macro({
@@ -11,7 +12,7 @@ export const authMiddleware = new Elysia({ name: "better-auth" }).macro({
 		async resolve({ status, request: { headers } }) {
 			try {
 				const response = await fetch(
-					`${process.env.BASE_URL}/api/auth/v1/get-session`,
+					`${domainConfig.BASE_URL}/api/auth/v1/get-session`,
 					{
 						method: "GET",
 						headers: new Headers({
