@@ -130,8 +130,6 @@ export namespace DomainModel {
 				t.Literal("failed"),
 			]),
 		),
-		organizationId: t.Optional(t.String()),
-		userId: t.Optional(t.String()),
 	});
 
 	export type DomainQuery = typeof domainQuery.static;
