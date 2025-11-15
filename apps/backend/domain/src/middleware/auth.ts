@@ -5,7 +5,7 @@ import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
 
 if (domainConfig.NODE_ENV !== "production") {
-	domainConfig.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 }
 
 export const authMiddleware = new Elysia({ name: "better-auth" }).macro({
@@ -23,6 +23,8 @@ export const authMiddleware = new Elysia({ name: "better-auth" }).macro({
 					},
 				);
 				const session: Session | null = await response.json();
+
+				logger.info(session, "Session");
 				if (session) {
 					logger.info(
 						{ userId: session.user },

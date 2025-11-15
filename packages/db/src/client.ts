@@ -20,5 +20,6 @@ export const createDb = (opts?: DatabaseClientOptions): DatabaseInstance => {
 };
 
 export const db = createDb({
-	databaseUrl: process.env.PG_URL!,
+	databaseUrl:
+		process.env.PG_URL || "postgresql://reloop:reloop123@localhost:5432/reloop",
 });

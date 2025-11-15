@@ -26,7 +26,7 @@ export async function searchDomains(
 			.where(whereClause);
 		const total = totalResult[0]?.count || 0;
 
-		const result = await db.query.domain.findMany({
+		const domains = await db.query.domain.findMany({
 			where: whereClause,
 			orderBy: desc(schema.domain.createdAt),
 			limit: limit,
@@ -42,15 +42,13 @@ export async function searchDomains(
 				total,
 				page,
 				limit,
-				count: result.length,
+				count: domains.length,
 			},
 			"Domain search completed",
 		);
 
 		return {
-			domains: result.map((domain) =>
-				formatDomainResponse(domain, domain.dnsRecords || []),
-			),
+			domains,
 			total,
 			page,
 			limit,

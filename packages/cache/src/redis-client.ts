@@ -4,17 +4,19 @@ export class RedisCache {
 	private redis: RedisClientType | null = null;
 	private prefix: string;
 	private defaultTTL: number;
+	private redisUrl?: string;
 
-	constructor(prefix: string, defaultTTL: number = 30 * 60) {
+	constructor(prefix: string, defaultTTL: number = 30 * 60, redisUrl?: string) {
 		this.prefix = prefix;
 		this.defaultTTL = defaultTTL;
+		this.redisUrl = redisUrl;
 	}
 
 	private async getRedisClient(): Promise<RedisClientType> {
 		if (this.redis?.isOpen) {
 			return this.redis;
 		}
-		const redisUrl = process.env.REDIS_URL;
+		const redisUrl = this.redisUrl || process.env.REDIS_URL;
 		if (!redisUrl) {
 			throw new Error("REDIS_URL environment variable is required");
 		}

@@ -1,4 +1,3 @@
-import { formatDomainResponse } from "@be/domain/routes/domain/controllers/format-domain-response";
 import type { DomainTypes } from "@be/domain/routes/domain/domain.type";
 import {
 	generateDomainListCacheKey,
@@ -40,7 +39,7 @@ export async function listDomains(
 			.from(schema.domain)
 			.where(whereClause);
 		const total = totalResult[0]?.count || 0;
-		const result = await db.query.domain.findMany({
+		const domains = await db.query.domain.findMany({
 			where: whereClause,
 			orderBy: desc(schema.domain.createdAt),
 			limit: limit,
@@ -50,20 +49,8 @@ export async function listDomains(
 			},
 		});
 
-		logger.info(
-			{
-				total,
-				page,
-				limit,
-				count: result.length,
-			},
-			"Domains listed successfully",
-		);
-
 		return {
-			domains: result.map((domain) =>
-				formatDomainResponse(domain, domain.dnsRecords || []),
-			),
+			domains,
 			total,
 			page,
 			limit,
