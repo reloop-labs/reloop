@@ -194,7 +194,7 @@ const NewDomainPage = () => {
 					variant="neutral"
 					className="mt-5"
 				>
-					I have add the DNS records
+					I have added the DNS records
 				</Button.Root>
 			</div>
 		</div>
