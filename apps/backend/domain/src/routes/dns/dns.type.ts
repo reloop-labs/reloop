@@ -15,7 +15,6 @@ export namespace DNSTypes {
 	export interface DKIMKeyPair {
 		publicKey: string;
 		privateKey: string;
-		selector: string;
 	}
 
 	export interface DNSRecord {
@@ -45,4 +44,3 @@ export namespace DNSTypes {
 		status: DNSRecordStatus;
 	}
 }
-	

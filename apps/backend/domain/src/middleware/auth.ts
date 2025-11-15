@@ -1,4 +1,5 @@
 import { domainConfig } from "@be/domain/domain.config";
+import { errorCodes } from "@be/domain/domain.error-code";
 import type { Session } from "@reloop/auth/server";
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
@@ -27,13 +28,23 @@ export const authMiddleware = new Elysia({ name: "better-auth" }).macro({
 						{ userId: session.user },
 						"User authenticated via cookie",
 					);
+					if (!session?.user?.activeOrganizationId) {
+						return status(401, {
+							message: "User is not a member of an organization",
+							code: errorCodes.NOT_MEMBER_OF_ORGANIZATION,
+						});
+					}
 					return {
 						user: session.user,
 						session: session.session,
 						authMethod: "cookie" as const,
 					};
 				}
-				return status(401, { message: "Authentication required" });
+				return status(401, {
+					message: "Authentication required",
+					statusCodeText: "Unauthorized",
+					errorCode: errorCodes.UNAUTHORIZED,
+				});
 			} catch (error) {
 				logger.error(
 					{
@@ -41,7 +52,10 @@ export const authMiddleware = new Elysia({ name: "better-auth" }).macro({
 					},
 					"Authentication error",
 				);
-				return status(401, { message: "Authentication failed" });
+				return status(401, {
+					message: "Authentication failed",
+					errorCode: errorCodes.UNAUTHORIZED,
+				});
 			}
 		},
 	},

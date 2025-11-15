@@ -1,17 +1,25 @@
 import { authMiddleware } from "@be/domain/middleware/auth";
 import { createDomainHandler } from "@be/domain/routes/domain/controllers/create-domain";
 import { DomainModel } from "@be/domain/routes/domain/domain.model";
-import { Elysia, status } from "elysia";
+import { Elysia } from "elysia";
+import { domainErrorResponse } from "../domain.error-code";
 
 export const createDomainRoute = new Elysia().use(authMiddleware).post(
 	"/add",
 	async ({ body, user }) => {
-		if (!user.activeOrganizationId) {
-			throw status(403, {
-				message: "User is not a member of an organization",
+		const { id: userId, activeOrganizationId: organizationId } = user;
+		const { domain } = body;
+		try {
+			return await createDomainHandler({
+				organizationId,
+				domain,
+				userId,
 			});
+		} catch (error) {
+			const errorMessage =
+				error instanceof Error ? error.message : String(error);
+			domainErrorResponse(errorMessage);
 		}
-		return await createDomainHandler(user.activeOrganizationId, user.id, body);
 	},
 	{
 		auth: true,

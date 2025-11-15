@@ -7,14 +7,14 @@ import {
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 
 export interface GeneratedDNSData {
-	dnsRecords: DNSTypes.DNSRecord[];
 	dkimKeyPair: DNSTypes.DKIMKeyPair;
 	spfRecord: string;
 	dkimRecord: string;
 	dmarcRecord: string;
+	mxRecord: string;
 }
 
 export type DNSRecordStatus =
@@ -35,59 +35,29 @@ export interface DNSRecordData {
 	status: DNSRecordStatus;
 }
 
-/**
- * Generates DNS records and DKIM key pair for a domain
- */
-export async function generateDNSData(
+export async function generateDNSRecords(
 	domain: string,
-	serverDomain: string,
-	dkimSelector = "mail",
 ): Promise<GeneratedDNSData> {
-	logger.info(
-		{
-			domain,
-			serverDomain,
-			dkimSelector,
-		},
-		"Generating DNS data for domain",
-	);
-
-	// Generate DKIM key pair
-	const dkimKeyPair = await generateDKIMKeyPair(dkimSelector);
-
-	// Generate all DNS records
-	const dnsRecords = generateAllDNSRecords(domain, serverDomain);
-
-	// Generate DKIM record
-	const dkimRecord = generateDKIMRecord(
-		domain,
-		dkimSelector,
-		dkimKeyPair.publicKey,
-	);
-
-	// Add DKIM record to the list
+	const dkimKeyPair = await generateDKIMKeyPair();
+	const dnsRecords = generateAllDNSRecords(domain);
+	const dkimRecord = generateDKIMRecord(domain, dkimKeyPair.publicKey);
 	dnsRecords.push(dkimRecord);
-
-	// Extract specific record values
 	const spfValue =
 		dnsRecords.find((r) => r.value.startsWith("v=spf1"))?.value || "";
 	const dkimValue =
 		dnsRecords.find((r) => r.value.startsWith("v=DKIM1"))?.value || "";
 	const dmarcValue =
 		dnsRecords.find((r) => r.value.startsWith("v=DMARC1"))?.value || "";
-
+	const mxValue = dnsRecords.find((r) => r.type === "MX")?.value || "";
 	return {
-		dnsRecords,
 		dkimKeyPair,
 		spfRecord: spfValue,
 		dkimRecord: dkimValue,
 		dmarcRecord: dmarcValue,
+		mxRecord: mxValue,
 	};
 }
 
-/**
- * Inserts DNS records into the database
- */
 export async function insertDNSRecords(
 	dnsRecordData: DNSRecordData[],
 	dkimKeyPair: DNSTypes.DKIMKeyPair,
@@ -171,44 +141,43 @@ export function convertToDNSRecordData(
 	}));
 }
 
-/**
- * Checks if DNS records already exist for a domain
- */
-export async function getExistingDNSRecords(
-	domain: string,
-	organizationId: string,
-): Promise<{
+export async function getExistingDNSRecords(params: {
+	domain: string;
+	organizationId: string;
+}): Promise<{
 	spfRecord: string;
 	dkimRecord: string;
 	dmarcRecord: string;
+	mxRecord: string;
 } | null> {
-	const existingRecords = await db
-		.select()
-		.from(schema.domainDnsRecord)
-		.where(
-			and(
-				eq(schema.domainDnsRecord.domain, domain),
-				eq(schema.domainDnsRecord.organizationId, organizationId),
-			),
-		);
+	const { domain, organizationId } = params;
+	const existingRecords = await db.query.domainDnsRecord.findMany({
+		where: and(
+			eq(schema.domainDnsRecord.domain, domain),
+			eq(schema.domainDnsRecord.organizationId, organizationId),
+			isNull(schema.domainDnsRecord.deletedAt),
+		),
+	});
 
-	if (existingRecords.length === 0) {
-		return null;
-	}
+	if (existingRecords.length < 4) return null;
 
-	const spf = existingRecords.find(
+	const mxRecord = existingRecords.find(
+		(r) => r.recordType === "MX" && r.value.includes("reloop.sh"),
+	);
+	const spfRecord = existingRecords.find(
 		(r) => r.recordType === "TXT" && r.value.startsWith("v=spf1"),
 	);
-	const dkim = existingRecords.find(
+	const dkimRecord = existingRecords.find(
 		(r) => r.recordType === "TXT" && r.value.startsWith("v=DKIM1"),
 	);
-	const dmarc = existingRecords.find(
+	const dmarcRecord = existingRecords.find(
 		(r) => r.recordType === "TXT" && r.value.startsWith("v=DMARC1"),
 	);
 
 	return {
-		spfRecord: spf?.value || "",
-		dkimRecord: dkim?.value || "",
-		dmarcRecord: dmarc?.value || "",
+		spfRecord: spfRecord?.value || "",
+		dkimRecord: dkimRecord?.value || "",
+		dmarcRecord: dmarcRecord?.value || "",
+		mxRecord: mxRecord?.value || "",
 	};
 }

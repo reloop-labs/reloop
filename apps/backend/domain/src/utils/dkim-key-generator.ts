@@ -1,16 +1,14 @@
 import { generateKeyPair } from "node:crypto";
 import { promisify } from "node:util";
+import { domainConfig } from "@be/domain/domain.config";
 import type { DNSTypes } from "@be/domain/routes/dns/dns.type";
 
 const generateKeyPairAsync = promisify(generateKeyPair);
 
-export async function generateDKIMKeyPair(
-	selector = "mail",
-	keyLength = 2048,
-): Promise<DNSTypes.DKIMKeyPair> {
+export async function generateDKIMKeyPair(): Promise<DNSTypes.DKIMKeyPair> {
 	try {
 		const { publicKey, privateKey } = await generateKeyPairAsync("rsa", {
-			modulusLength: keyLength,
+			modulusLength: domainConfig.constants.keyLength,
 			publicKeyEncoding: {
 				type: "spki",
 				format: "pem",
@@ -24,7 +22,6 @@ export async function generateDKIMKeyPair(
 		return {
 			publicKey,
 			privateKey,
-			selector,
 		};
 	} catch (error) {
 		throw new Error(`Failed to generate DKIM key pair: ${error}`);

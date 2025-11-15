@@ -15,34 +15,6 @@ import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
 import { and, eq } from "drizzle-orm";
 
-export async function generateDNSRecords(
-	domain: string,
-	serverDomain: string,
-	dkimSelector = "mail",
-): Promise<{
-	spfRecord: string;
-	dkimRecord: string;
-	dmarcRecord: string;
-	dnsData: GeneratedDNSData;
-}> {
-	logger.info(
-		{
-			domain,
-			serverDomain,
-			dkimSelector,
-		},
-		"Generating DNS records",
-	);
-	const dnsData = await generateDNSData(domain, serverDomain, dkimSelector);
-
-	return {
-		spfRecord: dnsData.spfRecord,
-		dkimRecord: dnsData.dkimRecord,
-		dmarcRecord: dnsData.dmarcRecord,
-		dnsData,
-	};
-}
-
 export async function insertDNSRecordsToDatabase(
 	domain: string,
 	organizationId: string,

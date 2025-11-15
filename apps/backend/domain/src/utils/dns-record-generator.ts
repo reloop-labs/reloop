@@ -1,8 +1,8 @@
+import { domainConfig } from "@be/domain/domain.config";
 import type { DNSTypes } from "@be/domain/routes/dns/dns.type";
 
 export function generateDKIMRecord(
 	domain: string,
-	selector: string,
 	publicKey: string,
 ): DNSTypes.DNSRecord {
 	const cleanPublicKey = publicKey
@@ -14,18 +14,15 @@ export function generateDKIMRecord(
 
 	return {
 		type: "TXT",
-		name: `${selector}._domainkey.${domain}`,
+		name: `${domainConfig.DKIM_SELECTOR}._domainkey.${domain}`,
 		value: dkimValue,
 		ttl: 3600,
 		description: "DKIM public key for email authentication",
 	};
 }
 
-export function generateSPFRecord(
-	domain: string,
-	serverDomain: string,
-): DNSTypes.DNSRecord {
-	const spfValue = `v=spf1 include:${serverDomain} ~all`;
+export function generateSPFRecord(domain: string): DNSTypes.DNSRecord {
+	const spfValue = `v=spf1 include:${domainConfig.HOST_DOMAIN} ~all`;
 
 	return {
 		type: "TXT",
@@ -48,28 +45,21 @@ export function generateDMARCRecord(domain: string): DNSTypes.DNSRecord {
 	};
 }
 
-export function generateMXRecord(
-	domain: string,
-	serverDomain: string,
-	priority = 10,
-): DNSTypes.DNSRecord {
+export function generateMXRecord(domain: string): DNSTypes.DNSRecord {
 	return {
 		type: "MX",
 		name: domain,
-		value: serverDomain,
-		priority,
+		value: domainConfig.HOST_DOMAIN,
+		priority: domainConfig.constants.mxPriority,
 		ttl: 3600,
 		description: "Mail exchange record",
 	};
 }
 
-export function generateAllDNSRecords(
-	domain: string,
-	serverDomain: string,
-): DNSTypes.DNSRecord[] {
+export function generateAllDNSRecords(domain: string): DNSTypes.DNSRecord[] {
 	return [
-		generateMXRecord(domain, serverDomain),
-		generateSPFRecord(domain, serverDomain),
+		generateMXRecord(domain),
+		generateSPFRecord(domain),
 		generateDMARCRecord(domain),
 	];
 }

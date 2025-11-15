@@ -5,10 +5,7 @@ import { getDomainRoute } from "@be/domain/routes/domain/routes/get-domain.route
 import { listDomainsRoute } from "@be/domain/routes/domain/routes/list-domains.route";
 import { Elysia } from "elysia";
 
-export const domainRoutes = new Elysia({
-	prefix: "/v1",
-	name: "DomainRoutes",
-})
+export const domainRoutes = new Elysia({ prefix: "/v1", name: "DomainRoutes" })
 	.use(authMiddleware)
 	.use(createDomainRoute)
 	.use(getDomainRoute)

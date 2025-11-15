@@ -13,7 +13,7 @@ export namespace DomainModel {
 
 	export const createDomainBody = t.Object({
 		domain: t.String({
-			minLength: 1,
+			minLength: 4,
 			maxLength: 255,
 			pattern: domainPattern.source,
 			description: "Domain name (e.g., send.reloop.com)",

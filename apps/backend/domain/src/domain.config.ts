@@ -6,4 +6,11 @@ export const domainConfig = {
 	BASE_URL: process.env.BASE_URL || "https://reloop.local",
 	NODE_ENV: process.env.NODE_ENV || "development",
 	NODE_TLS_REJECT_UNAUTHORIZED: process.env.NODE_TLS_REJECT_UNAUTHORIZED || "0",
+	HOST_DOMAIN: process.env.HOST_DOMAIN || "reloop.sh",
+	DKIM_SELECTOR: process.env.DKIM_SELECTOR || "reloop",
+
+	constants: {
+		keyLength: 2048,
+		mxPriority: 10,
+	},
 };
