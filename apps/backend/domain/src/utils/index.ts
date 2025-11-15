@@ -1,9 +1,7 @@
 export { generateDKIMKeyPair } from "@be/domain/utils/dkim-key-generator";
 export {
-	convertToDNSRecordData,
 	type DNSRecordData,
 	type GeneratedDNSData,
-	generateDNSRecords,
 	getExistingDNSRecords,
 	insertDNSRecords,
 } from "@be/domain/utils/dns-operations";

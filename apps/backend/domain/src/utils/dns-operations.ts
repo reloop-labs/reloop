@@ -1,12 +1,6 @@
 import type { DNSTypes } from "@be/domain/routes/dns/dns.type";
-import { generateDKIMKeyPair } from "@be/domain/utils/dkim-key-generator";
-import {
-	generateAllDNSRecords,
-	generateDKIMRecord,
-} from "@be/domain/utils/dns-record-generator";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { logger } from "@reloop/logger";
 import { and, eq, isNull } from "drizzle-orm";
 
 export interface GeneratedDNSData {
@@ -33,48 +27,13 @@ export interface DNSRecordData {
 	status: DNSRecordStatus;
 }
 
-export async function generateDNSRecords(
-	domain: string,
-): Promise<GeneratedDNSData> {
-	const dkimKeyPair = await generateDKIMKeyPair();
-	const dnsRecords = generateAllDNSRecords(domain);
-	const dkimRecord = generateDKIMRecord(domain, dkimKeyPair.publicKey);
-	dnsRecords.push(dkimRecord);
-	const spfValue =
-		dnsRecords.find((r) => r.value.startsWith("v=spf1"))?.value || "";
-	const dkimValue =
-		dnsRecords.find((r) => r.value.startsWith("v=DKIM1"))?.value || "";
-	const dmarcValue =
-		dnsRecords.find((r) => r.value.startsWith("v=DMARC1"))?.value || "";
-	const mxValue = dnsRecords.find((r) => r.type === "MX")?.value || "";
-	return {
-		dkimKeyPair,
-		spfRecord: spfValue,
-		dkimRecord: dkimValue,
-		dmarcRecord: dmarcValue,
-		mxRecord: mxValue,
-	};
-}
-
 export async function insertDNSRecords(
 	dnsRecordData: DNSRecordData[],
-	dkimKeyPair: DNSTypes.DKIMKeyPair,
 	domain: string,
 	organizationId: string,
 	userId: string,
 	domainId: string,
 ): Promise<void> {
-	logger.info(
-		{
-			domain,
-			organizationId,
-			userId,
-			recordCount: dnsRecordData.length,
-		},
-		"Inserting DNS records into database",
-	);
-
-	// Insert DNS records
 	for (const record of dnsRecordData) {
 		await db.insert(schema.domainDnsRecord).values({
 			domainId,
@@ -100,30 +59,6 @@ export async function insertDNSRecords(
 			domain,
 		});
 	}
-
-	logger.info(
-		{
-			domain,
-			recordCount: dnsRecordData.length,
-		},
-		"DNS records inserted successfully",
-	);
-}
-
-/**
- * Converts DNS records to database format
- */
-export function convertToDNSRecordData(
-	dnsRecords: DNSTypes.DNSRecord[],
-): DNSRecordData[] {
-	return dnsRecords.map((record) => ({
-		recordType: record.type,
-		name: record.name,
-		value: record.value,
-		ttl: record.ttl || 3600,
-		priority: record.priority,
-		status: "start-verify",
-	}));
 }
 
 export async function getExistingDNSRecords(params: {

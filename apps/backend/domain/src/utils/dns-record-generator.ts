@@ -1,11 +1,12 @@
 import { domainConfig } from "@be/domain/domain.config";
 import type { DNSTypes } from "@be/domain/routes/dns/dns.type";
+import { generateDKIMKeyPair } from "./dkim-key-generator";
 
-export function generateDKIMRecord(
+export async function generateDKIMRecord(
 	domain: string,
-	publicKey: string,
-): DNSTypes.DNSRecord {
-	const cleanPublicKey = publicKey
+): Promise<DNSTypes.DNSRecord> {
+	const dkimKeyPair = await generateDKIMKeyPair();
+	const cleanPublicKey = dkimKeyPair.publicKey
 		.replace(/-----BEGIN PUBLIC KEY-----/, "")
 		.replace(/-----END PUBLIC KEY-----/, "")
 		.replace(/\s/g, "");
@@ -17,7 +18,7 @@ export function generateDKIMRecord(
 		name: `${domainConfig.DKIM_SELECTOR}._domainkey.${domain}`,
 		value: dkimValue,
 		ttl: 3600,
-		description: "DKIM public key for email authentication",
+		privateKey: dkimKeyPair.privateKey,
 	};
 }
 
@@ -29,7 +30,6 @@ export function generateSPFRecord(domain: string): DNSTypes.DNSRecord {
 		name: domain,
 		value: spfValue,
 		ttl: 3600,
-		description: "SPF record for email authentication",
 	};
 }
 
@@ -41,7 +41,6 @@ export function generateDMARCRecord(domain: string): DNSTypes.DNSRecord {
 		name: `_dmarc.${domain}`,
 		value: dmarcValue,
 		ttl: 3600,
-		description: "DMARC policy for email authentication",
 	};
 }
 
@@ -52,14 +51,23 @@ export function generateMXRecord(domain: string): DNSTypes.DNSRecord {
 		value: domainConfig.HOST_DOMAIN,
 		priority: domainConfig.constants.mxPriority,
 		ttl: 3600,
-		description: "Mail exchange record",
 	};
 }
 
-export function generateAllDNSRecords(domain: string): DNSTypes.DNSRecord[] {
-	return [
-		generateMXRecord(domain),
-		generateSPFRecord(domain),
-		generateDMARCRecord(domain),
-	];
+export async function generateAllDNSRecords(domain: string): Promise<{
+	mxRecord: DNSTypes.DNSRecord;
+	spfRecord: DNSTypes.DNSRecord;
+	dmarcRecord: DNSTypes.DNSRecord;
+	dkimRecord: DNSTypes.DNSRecord;
+}> {
+	const dkimRecord = await generateDKIMRecord(domain);
+	const spfRecord = generateSPFRecord(domain);
+	const dmarcRecord = generateDMARCRecord(domain);
+	const mxRecord = generateMXRecord(domain);
+	return {
+		mxRecord,
+		spfRecord,
+		dmarcRecord,
+		dkimRecord,
+	};
 }

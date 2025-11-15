@@ -1,6 +1,6 @@
-import { insertDNSRecordsToDatabase } from "@be/domain/routes/dns/controllers/generate-dns-records";
 import type { DomainTypes } from "@be/domain/routes/domain/domain.type";
-import { generateDNSRecords } from "@be/domain/utils/dns-operations";
+import { generateAllDNSRecords } from "@be/domain/utils";
+import { createId } from "@paralleldrive/cuid2";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
@@ -22,9 +22,13 @@ export async function createDomain(params: {
 			),
 		});
 		if (existingDomain) throw new Error("Domain already exists");
-		const dnsRecords = await generateDNSRecords(domain);
+
+		const dnsRecords = await generateAllDNSRecords(domain);
+		const { dkimRecord, spfRecord, dmarcRecord, mxRecord } = dnsRecords;
 		logger.info(dnsRecords, "DNS records generated and stored successfully");
+		const domainId = `domain_${createId()}`;
 		await db.insert(schema.domain).values({
+			id: domainId,
 			userId: userId,
 			organizationId: organizationId,
 			domain: domain,
@@ -35,13 +39,44 @@ export async function createDomain(params: {
 			createdAt: new Date(),
 			updatedAt: new Date(),
 		});
-
-		await insertDNSRecordsToDatabase(
-			domain,
+		const dnsRecordIds = {
+			domainId,
 			organizationId,
 			userId,
-			dnsRecords,
-		);
+			domain,
+		};
+		await db.insert(schema.domainDnsRecord).values([
+			{
+				...dnsRecordIds,
+				recordType: dkimRecord.type,
+				name: dkimRecord.name,
+				value: dkimRecord.value,
+				ttl: dkimRecord.ttl,
+				priority: dkimRecord.priority,
+				privateKey: dkimRecord.privateKey,
+			},
+			{
+				...dnsRecordIds,
+				recordType: spfRecord.type,
+				name: spfRecord.name,
+				value: spfRecord.value,
+				ttl: spfRecord.ttl,
+			},
+			{
+				...dnsRecordIds,
+				recordType: dmarcRecord.type,
+				name: dmarcRecord.name,
+				value: dmarcRecord.value,
+				ttl: dmarcRecord.ttl,
+			},
+			{
+				...dnsRecordIds,
+				recordType: mxRecord.type,
+				name: mxRecord.name,
+				value: mxRecord.value,
+				ttl: mxRecord.ttl,
+			},
+		]);
 		const domainWithDnsRecords = await db.query.domain.findFirst({
 			where: and(
 				eq(schema.domain.domain, domain),

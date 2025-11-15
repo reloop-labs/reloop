@@ -1,4 +1,5 @@
 import type { DNSModel } from "@be/domain/routes/dns/dns.model";
+import type { dnsRecordTypeEnum } from "@reloop/db/schema";
 export namespace DNSTypes {
 	export type DNSRecordResponse = typeof DNSModel.dnsRecordResponse.static;
 	export type DKIMKeysResponse = typeof DNSModel.dkimKeysResponse.static;
@@ -17,13 +18,26 @@ export namespace DNSTypes {
 		privateKey: string;
 	}
 
+	export enum DNSRecordType {
+		A = "A",
+		AAAA = "AAAA",
+		CNAME = "CNAME",
+		MX = "MX",
+		TXT = "TXT",
+		NS = "NS",
+		SRV = "SRV",
+		CAA = "CAA",
+		SPF = "SPF",
+		DKIM = "DKIM",
+		DMARC = "DMARC",
+	}
 	export interface DNSRecord {
-		type: string;
+		type: DNSRecordType;
 		name: string;
 		value: string;
 		ttl?: number;
 		priority?: number;
-		description?: string;
+		privateKey?: string;
 	}
 
 	export type DNSRecordStatus =
