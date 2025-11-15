@@ -1,16 +1,11 @@
 import { authMiddleware } from "@be/domain/middleware/auth";
 import { DomainModel } from "@be/domain/model/domain.model";
 import { deleteDomainHandler } from "@be/domain/routes/domain/controllers/delete-domain";
-import { Elysia, status, t } from "elysia";
+import { Elysia, t } from "elysia";
 
 export const deleteDomainRoute = new Elysia().use(authMiddleware).delete(
 	"/:domain",
 	async ({ params: { domain }, user }) => {
-		if (!user.activeOrganizationId) {
-			throw status(403, {
-				message: "User is not a member of an organization",
-			});
-		}
 		return await deleteDomainHandler(domain, user.activeOrganizationId);
 	},
 	{
@@ -19,7 +14,7 @@ export const deleteDomainRoute = new Elysia().use(authMiddleware).delete(
 			domain: DomainModel.domainParam,
 		}),
 		response: {
-			200: t.Object({ message: t.String() }),
+			200: DomainModel.domainResponse,
 			404: DomainModel.domainNotFound,
 			400: DomainModel.invalidDomain,
 			403: DomainModel.unauthorized,

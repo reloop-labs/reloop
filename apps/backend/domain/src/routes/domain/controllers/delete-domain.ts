@@ -1,3 +1,4 @@
+import type { DomainTypes } from "@be/domain/types/domain.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
@@ -7,28 +8,33 @@ import { status } from "elysia";
 export async function deleteDomain(
 	domainName: string,
 	organizationId: string,
-): Promise<void> {
+): Promise<DomainTypes.DomainResponse> {
 	logger.info({ domain: domainName }, "Soft deleting domain");
 
 	try {
-		const domainResult = await db
-			.select({ id: schema.domain.id })
-			.from(schema.domain)
-			.where(
-				and(
-					eq(schema.domain.domain, domainName),
-					isNull(schema.domain.deletedAt),
-					eq(schema.domain.organizationId, organizationId),
-				),
-			)
-			.limit(1);
+		// Fetch the domain with DNS records before deletion
+		const domainWithDnsRecords = await db.query.domain.findFirst({
+			where: and(
+				eq(schema.domain.domain, domainName),
+				isNull(schema.domain.deletedAt),
+				eq(schema.domain.organizationId, organizationId),
+			),
+			with: {
+				dnsRecords: {
+					where: isNull(schema.domainDnsRecord.deletedAt),
+				},
+			},
+		});
 
-		const domainId = domainResult[0]?.id;
-		if (!domainId) {
+		if (!domainWithDnsRecords) {
 			logger.warn({ domain: domainName }, "Domain not found for deletion");
 			throw status(404, { message: "Domain not found" });
 		}
+
+		const domainId = domainWithDnsRecords.id;
 		const now = new Date();
+
+		// Soft delete the domain
 		const domainUpdateResult = await db
 			.update(schema.domain)
 			.set({ deletedAt: now, updatedAt: now })
@@ -39,15 +45,31 @@ export async function deleteDomain(
 			logger.warn({ domain: domainName }, "Failed to delete domain");
 			throw status(500, { message: "Failed to delete domain" });
 		}
+
+		// Soft delete DNS records
 		await db
 			.update(schema.domainDnsRecord)
 			.set({ deletedAt: now, updatedAt: now })
 			.where(eq(schema.domainDnsRecord.domainId, domainId));
 
+		// Update the domain object with deletedAt timestamp
+		const deletedDomain = {
+			...domainWithDnsRecords,
+			deletedAt: now,
+			updatedAt: now,
+			dnsRecords: domainWithDnsRecords.dnsRecords.map((record) => ({
+				...record,
+				deletedAt: now,
+				updatedAt: now,
+			})),
+		};
+
 		logger.info(
 			{ domain: domainName },
 			"Domain and DNS records deleted successfully",
 		);
+
+		return deletedDomain;
 	} catch (error) {
 		logger.error(
 			{
@@ -63,14 +85,13 @@ export async function deleteDomain(
 export async function deleteDomainHandler(
 	domain: string,
 	organizationId: string,
-): Promise<{ message: string }> {
+): Promise<DomainTypes.DomainResponse> {
 	logger.info({ domain, organizationId }, "Deleting domain");
 
 	try {
-		await deleteDomain(domain, organizationId);
-		const response = { message: "Domain deleted successfully" };
+		const deletedDomain = await deleteDomain(domain, organizationId);
 		logger.info({ domain, organizationId }, "Domain deleted successfully");
-		return response;
+		return deletedDomain;
 	} catch (error) {
 		logger.error(
 			{
