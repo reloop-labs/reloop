@@ -2,7 +2,7 @@ import type { DNSTypes } from "@be/domain/routes/dns/dns.type";
 import {
 	convertToDNSRecordData,
 	type GeneratedDNSData,
-	generateDNSData,
+	generateDNSRecords,
 	getExistingDNSRecords,
 	insertDNSRecords,
 } from "@be/domain/utils";
@@ -10,6 +10,10 @@ import {
 	invalidateDNSRecordsCache,
 	invalidateDomainCache,
 } from "@be/domain/utils/cache-helpers";
+import {
+	generateAllDNSRecords,
+	generateDKIMRecord,
+} from "@be/domain/utils/dns-record-generator";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
@@ -47,7 +51,11 @@ export async function insertDNSRecordsToDatabase(
 		);
 	}
 
-	const dnsRecordData = convertToDNSRecordData(dnsData.dnsRecords);
+	const dnsRecordData = convertToDNSRecordData(
+		generateAllDNSRecords(domain).concat(
+			generateDKIMRecord(domain, dnsData.dkimKeyPair.publicKey),
+		),
+	);
 	await insertDNSRecords(
 		dnsRecordData,
 		dnsData.dkimKeyPair,
@@ -76,7 +84,10 @@ export async function generateDNSRecordsHandler(
 	);
 
 	try {
-		const existingRecords = await getExistingDNSRecords(domain, organizationId);
+		const existingRecords = await getExistingDNSRecords({
+			domain,
+			organizationId,
+		});
 
 		if (existingRecords) {
 			logger.info(
@@ -97,32 +108,14 @@ export async function generateDNSRecordsHandler(
 			return response;
 		}
 
-		const dnsRecords = await generateDNSRecords(
-			domain,
-			body.serverDomain || domain,
-			body.dkimSelector || "mail",
-		);
+		const dnsRecords = await generateDNSRecords(domain);
 
 		await insertDNSRecordsToDatabase(
 			domain,
 			organizationId,
 			userId,
-			dnsRecords.dnsData,
+			dnsRecords,
 		);
-		await db
-			.update(schema.domain)
-			.set({
-				spfRecord: dnsRecords.spfRecord,
-				dkimRecord: dnsRecords.dkimRecord,
-				dmarcRecord: dnsRecords.dmarcRecord,
-				updatedAt: new Date(),
-			})
-			.where(
-				and(
-					eq(schema.domain.domain, domain),
-					eq(schema.domain.organizationId, organizationId),
-				),
-			);
 
 		const response: DNSTypes.GenerateDNSResponse = {
 			message: "DNS records and DKIM keys generated successfully",
@@ -134,9 +127,6 @@ export async function generateDNSRecordsHandler(
 		logger.info(
 			{
 				...response,
-				spfRecord: dnsRecords.spfRecord,
-				dkimRecord: dnsRecords.dkimRecord,
-				dmarcRecord: dnsRecords.dmarcRecord,
 			},
 			"DNS records generated successfully",
 		);

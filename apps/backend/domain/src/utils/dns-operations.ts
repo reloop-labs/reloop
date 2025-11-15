@@ -30,8 +30,6 @@ export interface DNSRecordData {
 	value: string;
 	ttl: number;
 	priority?: number;
-	description?: string;
-	isVerified: boolean;
 	status: DNSRecordStatus;
 }
 
@@ -98,21 +96,10 @@ export async function insertDNSRecords(
 			value: record.value,
 			ttl: record.ttl,
 			priority: record.priority,
-			description: record.description,
-			isVerified: record.isVerified,
 			status: record.status,
 			domain,
 		});
 	}
-
-	// Update domain with DKIM selector
-	await db
-		.update(schema.domain)
-		.set({
-			dkimSelector: dkimKeyPair.selector,
-			updatedAt: new Date(),
-		})
-		.where(eq(schema.domain.id, domainId));
 
 	logger.info(
 		{
@@ -135,8 +122,6 @@ export function convertToDNSRecordData(
 		value: record.value,
 		ttl: record.ttl || 3600,
 		priority: record.priority,
-		description: record.description,
-		isVerified: false,
 		status: "start-verify",
 	}));
 }

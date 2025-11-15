@@ -46,20 +46,9 @@ export namespace DomainModel {
 		priority: t.Union([t.Number(), t.Null()], {
 			description: "Record priority (for MX records)",
 		}),
-		weight: t.Union([t.Number(), t.Null()], {
-			description: "Record weight (for SRV records)",
-		}),
-		port: t.Union([t.Number(), t.Null()], {
-			description: "Record port (for SRV records)",
-		}),
-		description: t.Union([t.String(), t.Null()], {
-			description: "Record description",
-		}),
-		isVerified: t.Boolean({ description: "Whether the record is verified" }),
 		verificationError: t.Union([t.String(), t.Null()], {
 			description: "Verification error message",
 		}),
-		isActive: t.Boolean({ description: "Whether the record is active" }),
 		createdAt: t.String(),
 		status: t.Union(
 			[
@@ -99,23 +88,6 @@ export namespace DomainModel {
 		systemVerified: t.Boolean({
 			description: "Whether system has verified the domain",
 		}),
-		dnsConfigured: t.Boolean({
-			description: "Whether DNS is properly configured",
-		}),
-		nameservers: t.Union([t.Array(t.String()), t.Null()], {
-			description: "Domain nameservers",
-		}),
-		spfRecord: t.Union([t.String(), t.Null()], {
-			description: "SPF DNS record",
-		}),
-		dkimRecord: t.Union([t.String(), t.Null()], {
-			description: "DKIM DNS record",
-		}),
-		dkimSelector: t.String({ description: "DKIM selector (default: reloop)" }),
-		dmarcRecord: t.Union([t.String(), t.Null()], {
-			description: "DMARC DNS record",
-		}),
-		dmarcPolicy: t.String({ description: "DMARC policy (default: none)" }),
 		trackingDomain: t.Boolean({
 			description: "Whether domain is used for tracking",
 		}),

@@ -109,8 +109,6 @@ export const domainDnsRecord = pgTable(
 		value: text("value").notNull(),
 		ttl: integer("ttl").notNull().default(3600),
 		priority: integer("priority"),
-		weight: integer("weight"),
-		port: integer("port"),
 		domain: text("domain").notNull(),
 		verificationError: text("verification_error"),
 		deletedAt: timestamp("deleted_at"),

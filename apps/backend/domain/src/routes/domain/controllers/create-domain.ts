@@ -1,10 +1,5 @@
 import { insertDNSRecordsToDatabase } from "@be/domain/routes/dns/controllers/generate-dns-records";
-import { formatDomainResponse } from "@be/domain/routes/domain/controllers/format-domain-response";
 import type { DomainTypes } from "@be/domain/routes/domain/domain.type";
-import {
-	invalidateDomainListCache,
-	invalidateOrganizationCache,
-} from "@be/domain/utils/cache-helpers";
 import { generateDNSRecords } from "@be/domain/utils/dns-operations";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
@@ -62,10 +57,7 @@ export async function createDomain(params: {
 		if (!domainWithDnsRecords) {
 			throw new Error("Failed to fetch domain with DNS records after creation");
 		}
-		return formatDomainResponse(
-			domainWithDnsRecords,
-			domainWithDnsRecords.dnsRecords || [],
-		);
+		return domainWithDnsRecords;
 	} catch (error) {
 		logger.error(
 			{

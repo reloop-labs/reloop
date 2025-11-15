@@ -1,4 +1,3 @@
-import { formatDomainResponse } from "@be/domain/routes/domain/controllers/format-domain-response";
 import type { DomainTypes } from "@be/domain/routes/domain/domain.type";
 import {
 	generateDomainCacheKey,
@@ -34,7 +33,7 @@ export async function getDomain(
 		}
 
 		logger.info({ domain: domainName }, "Domain retrieved successfully");
-		return formatDomainResponse(result, result.dnsRecords || []);
+		return result;
 	} catch (error) {
 		logger.error(
 			{

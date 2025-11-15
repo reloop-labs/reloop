@@ -3,7 +3,7 @@ export {
 	convertToDNSRecordData,
 	type DNSRecordData,
 	type GeneratedDNSData,
-	generateDNSData,
+	generateDNSRecords,
 	getExistingDNSRecords,
 	insertDNSRecords,
 } from "@be/domain/utils/dns-operations";
