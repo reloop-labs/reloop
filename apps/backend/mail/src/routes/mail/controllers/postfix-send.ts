@@ -19,7 +19,7 @@ export async function testPostfixSend(): Promise<TestPostfixSendResponse> {
 
 	const TEST_CONFIG = {
 		from: "test@deployx.dev",
-		to: "jxgyc.test@inbox.testmail.app",
+		to: "test-l7zewi1un@srv1.mail-tester.com",
 		subject: "Postfix Health Check",
 		text: `Postfix test email sent at ${timestamp}.\n\nIf you receive this, the mail server is operational.`,
 	};

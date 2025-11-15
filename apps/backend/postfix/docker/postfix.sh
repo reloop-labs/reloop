@@ -32,6 +32,11 @@ fi
 chown -R postfix:postfix /var/spool/postfix
 chmod -R 755 /var/spool/postfix
 
+# Initialize OpenDKIM trusted hosts
+echo "127.0.0.1" > /etc/opendkim/TrustedHosts
+echo "localhost" >> /etc/opendkim/TrustedHosts
+echo "*.${DOMAIN}" >> /etc/opendkim/TrustedHosts
+
 # Initialize Postfix
 postfix set-permissions
 postfix check

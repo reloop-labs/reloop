@@ -16,7 +16,11 @@ export const cronDomainVerification = inngest.createFunction(
 		// Find domains that need verification
 		const domains = await step.run("find-domains-to-verify", async () => {
 			const domainsToVerify = await db
-				.select()
+				.select({
+					id: schema.domain.id,
+					domain: schema.domain.domain,
+					organizationId: schema.domain.organizationId,
+				})
 				.from(schema.domain)
 				.where(
 					and(

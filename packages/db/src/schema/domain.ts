@@ -12,6 +12,7 @@ import {
 	varchar,
 } from "drizzle-orm/pg-core";
 import { organization, user } from "./auth";
+import { jsonb } from "drizzle-orm/pg-core";
 
 // Custom ID generation functions with prefixes
 const createDomainId = () => `domain_${createId()}`;
@@ -60,6 +61,18 @@ export const domain = pgTable(
 		status: domainStatusEnum("status").notNull().default("start-verify"),
 		userVerified: boolean("user_verified").notNull().default(false),
 		systemVerified: boolean("system_verified").notNull().default(false),
+		dnsConfigured: boolean("dns_configured").notNull().default(false),
+		nameservers: jsonb("nameservers").$type<string[]>(),
+		spfRecord: text("spf_record"),
+		dkimRecord: text("dkim_record"),
+		dkimPrivateKey: text("dkim_private_key"),
+		dkimSelector: varchar("dkim_selector", { length: 255 })
+			.notNull()
+			.default("reloop"),
+		dmarcRecord: text("dmarc_record"),
+		dmarcPolicy: varchar("dmarc_policy", { length: 50 })
+			.notNull()
+			.default("none"),
 		trackingDomain: boolean("tracking_domain").notNull().default(false),
 		verificationFailedReason: text("verification_failed_reason"),
 		deletedAt: timestamp("deleted_at"),

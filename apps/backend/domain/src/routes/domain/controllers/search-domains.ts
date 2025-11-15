@@ -35,6 +35,9 @@ export async function searchDomains(
 			with: {
 				dnsRecords: true,
 			},
+			columns: {
+				dkimPrivateKey: false, // Exclude private key for security
+			},
 		});
 
 		logger.info(

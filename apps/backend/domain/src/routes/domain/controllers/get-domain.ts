@@ -25,6 +25,9 @@ export async function getDomain(
 			with: {
 				dnsRecords: true,
 			},
+			columns: {
+				dkimPrivateKey: false, // Exclude private key for security
+			},
 		});
 
 		if (!result) {

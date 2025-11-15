@@ -48,6 +48,9 @@ export async function listDomains(
 			with: {
 				dnsRecords: true,
 			},
+			columns: {
+				dkimPrivateKey: false, // Exclude private key for security
+			},
 		});
 
 		logger.info(

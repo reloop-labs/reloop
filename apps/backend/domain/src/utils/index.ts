@@ -12,3 +12,7 @@ export {
 	generateMXRecord,
 	generateSPFRecord,
 } from "@be/domain/utils/dns-record-generator";
+export {
+	provisionDKIMForDomain,
+	deprovisionDKIMForDomain,
+} from "@be/domain/utils/opendkim-provisioner";

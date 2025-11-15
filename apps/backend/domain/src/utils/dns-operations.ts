@@ -27,6 +27,46 @@ export interface DNSRecordData {
 	status: DNSRecordStatus;
 }
 
+export async function generateDNSData(
+	domain: string,
+	serverDomain: string,
+	dkimSelector = "mail",
+): Promise<GeneratedDNSData> {
+	logger.info(
+		{
+			domain,
+			serverDomain,
+			dkimSelector,
+		},
+		"Generating DNS data for domain",
+	);
+
+	const dkimKeyPair = await generateDKIMKeyPair(dkimSelector);
+	const dnsRecords = generateAllDNSRecords(domain, serverDomain);
+	const dkimRecord = generateDKIMRecord(
+		domain,
+		dkimSelector,
+		dkimKeyPair.publicKey,
+	);
+
+	dnsRecords.push(dkimRecord);
+
+	const spfValue =
+		dnsRecords.find((r) => r.value.startsWith("v=spf1"))?.value || "";
+	const dkimValue =
+		dnsRecords.find((r) => r.value.startsWith("v=DKIM1"))?.value || "";
+	const dmarcValue =
+		dnsRecords.find((r) => r.value.startsWith("v=DMARC1"))?.value || "";
+
+	return {
+		dnsRecords,
+		dkimKeyPair,
+		spfRecord: spfValue,
+		dkimRecord: dkimValue,
+		dmarcRecord: dmarcValue,
+	};
+}
+
 export async function insertDNSRecords(
 	dnsRecordData: DNSRecordData[],
 	domain: string,
@@ -34,6 +74,16 @@ export async function insertDNSRecords(
 	userId: string,
 	domainId: string,
 ): Promise<void> {
+	logger.info(
+		{
+			domain,
+			organizationId,
+			userId,
+			recordCount: dnsRecordData.length,
+		},
+		"Inserting DNS records into database",
+	);
+
 	for (const record of dnsRecordData) {
 		await db.insert(schema.domainDnsRecord).values({
 			domainId,
@@ -59,12 +109,44 @@ export async function insertDNSRecords(
 			domain,
 		});
 	}
+
+	await db
+		.update(schema.domain)
+		.set({
+			dkimSelector: dkimKeyPair.selector,
+			dkimPrivateKey: dkimKeyPair.privateKey,
+			updatedAt: new Date(),
+		})
+		.where(eq(schema.domain.id, domainId));
+
+	logger.info(
+		{
+			domain,
+			recordCount: dnsRecordData.length,
+		},
+		"DNS records inserted successfully",
+	);
 }
 
-export async function getExistingDNSRecords(params: {
-	domain: string;
-	organizationId: string;
-}): Promise<{
+export function convertToDNSRecordData(
+	dnsRecords: DNSTypes.DNSRecord[],
+): DNSRecordData[] {
+	return dnsRecords.map((record) => ({
+		recordType: record.type,
+		name: record.name,
+		value: record.value,
+		ttl: record.ttl || 3600,
+		priority: record.priority,
+		description: record.description,
+		isVerified: false,
+		status: "start-verify",
+	}));
+}
+
+export async function getExistingDNSRecords(
+	domain: string,
+	organizationId: string,
+): Promise<{
 	spfRecord: string;
 	dkimRecord: string;
 	dmarcRecord: string;

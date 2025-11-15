@@ -37,6 +37,9 @@ export const verifyDomain = inngest.createFunction(
 				with: {
 					dnsRecords: true,
 				},
+				columns: {
+					dkimPrivateKey: false, // Exclude private key for security
+				},
 			});
 
 			if (!domainData) {

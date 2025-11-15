@@ -38,7 +38,7 @@ export async function deleteDomain(
 			.update(schema.domain)
 			.set({ deletedAt: now, updatedAt: now })
 			.where(eq(schema.domain.id, domainId))
-			.returning();
+			.returning({ id: schema.domain.id });
 
 		if (domainUpdateResult.length === 0) {
 			logger.warn({ domain: domainName }, "Failed to delete domain");

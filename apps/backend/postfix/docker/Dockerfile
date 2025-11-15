@@ -27,6 +27,8 @@ RUN apt-get clean && \
     net-tools \
     tzdata \
     cron \
+    opendkim \
+    opendkim-tools \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Create postfix user and group (handle existing groups/users)
@@ -34,9 +36,14 @@ RUN groupadd -g 102 postfix 2>/dev/null || true \
     && groupadd -g 103 postdrop 2>/dev/null || true \
     && useradd -g postfix -u 101 -d /var/spool/postfix -s /usr/sbin/nologin postfix 2>/dev/null || true
 
+RUN mkdir -p /etc/opendkim/keys \
+    && chown -R opendkim:opendkim /etc/opendkim \
+    && chmod -R 700 /etc/opendkim/keys \
+    && touch /etc/opendkim/KeyTable /etc/opendkim/SigningTable /etc/opendkim/TrustedHosts
 
 COPY ./docker/postfix.sh /postfix.sh
 COPY ./docker/supervisord.conf /etc/supervisor/supervisord.conf
+COPY ./docker/opendkim.conf /etc/opendkim.conf
 
 
 COPY ../config/main.cf /etc/postfix/main.cf
