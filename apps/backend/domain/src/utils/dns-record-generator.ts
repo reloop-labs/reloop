@@ -1,5 +1,5 @@
 import { domainConfig } from "@be/domain/domain.config";
-import type { DNSTypes } from "@be/domain/routes/dns/dns.type";
+import { DNSTypes } from "@be/domain/routes/dns/dns.type";
 import { generateDKIMKeyPair } from "./dkim-key-generator";
 
 export async function generateDKIMRecord(
@@ -14,7 +14,7 @@ export async function generateDKIMRecord(
 	const dkimValue = `v=DKIM1; k=rsa; p=${cleanPublicKey}`;
 
 	return {
-		type: "TXT",
+		type: DNSTypes.DNSRecordType.TXT,
 		name: `${domainConfig.DKIM_SELECTOR}._domainkey.${domain}`,
 		value: dkimValue,
 		ttl: 3600,
@@ -26,7 +26,7 @@ export function generateSPFRecord(domain: string): DNSTypes.DNSRecord {
 	const spfValue = `v=spf1 include:${domainConfig.HOST_DOMAIN} ~all`;
 
 	return {
-		type: "TXT",
+		type: DNSTypes.DNSRecordType.TXT,
 		name: domain,
 		value: spfValue,
 		ttl: 3600,
@@ -37,7 +37,7 @@ export function generateDMARCRecord(domain: string): DNSTypes.DNSRecord {
 	const dmarcValue = "v=DMARC1; p=none;";
 
 	return {
-		type: "TXT",
+		type: DNSTypes.DNSRecordType.TXT,
 		name: `_dmarc.${domain}`,
 		value: dmarcValue,
 		ttl: 3600,
@@ -46,7 +46,7 @@ export function generateDMARCRecord(domain: string): DNSTypes.DNSRecord {
 
 export function generateMXRecord(domain: string): DNSTypes.DNSRecord {
 	return {
-		type: "MX",
+		type: DNSTypes.DNSRecordType.MX,
 		name: domain,
 		value: domainConfig.HOST_DOMAIN,
 		priority: domainConfig.constants.mxPriority,

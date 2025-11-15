@@ -1,16 +1,11 @@
 import { authMiddleware } from "@be/domain/middleware/auth";
 import { getDomainHandler } from "@be/domain/routes/domain/controllers/get-domain";
 import { DomainModel } from "@be/domain/routes/domain/domain.model";
-import { Elysia, status, t } from "elysia";
+import { Elysia, t } from "elysia";
 
 export const getDomainRoute = new Elysia().use(authMiddleware).get(
 	"/:domain",
 	async ({ params: { domain }, user }) => {
-		if (!user.activeOrganizationId) {
-			throw status(403, {
-				message: "User is not a member of an organization",
-			});
-		}
 		return await getDomainHandler(domain, user.activeOrganizationId);
 	},
 	{

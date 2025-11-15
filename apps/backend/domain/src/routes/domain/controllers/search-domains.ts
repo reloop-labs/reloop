@@ -1,4 +1,3 @@
-import { formatDomainResponse } from "@be/domain/routes/domain/controllers/format-domain-response";
 import type { DomainTypes } from "@be/domain/routes/domain/domain.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";

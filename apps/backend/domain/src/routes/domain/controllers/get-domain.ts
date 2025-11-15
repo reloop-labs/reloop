@@ -23,7 +23,9 @@ export async function getDomain(
 				eq(schema.domain.organizationId, organizationId),
 			),
 			with: {
-				dnsRecords: true,
+				dnsRecords: {
+					where: isNull(schema.domainDnsRecord.deletedAt),
+				},
 			},
 		});
 

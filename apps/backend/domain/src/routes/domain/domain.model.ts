@@ -49,7 +49,7 @@ export namespace DomainModel {
 		verificationError: t.Union([t.String(), t.Null()], {
 			description: "Verification error message",
 		}),
-		createdAt: t.String(),
+		createdAt: t.Date(),
 		status: t.Union(
 			[
 				t.Literal("start-verify"),
@@ -60,7 +60,7 @@ export namespace DomainModel {
 			],
 			{ description: "Domain verification status" },
 		),
-		updatedAt: t.String(),
+		updatedAt: t.Date(),
 	});
 
 	export const domainResponse = t.Object({
@@ -97,14 +97,14 @@ export namespace DomainModel {
 		dnsRecords: t.Array(dnsRecordResponse, {
 			description: "DNS records for the domain",
 		}),
-		deletedAt: t.Union([t.String(), t.Null()], {
+		deletedAt: t.Union([t.Date(), t.Null()], {
 			description: "Soft delete timestamp",
 		}),
-		lastVerifiedAt: t.Union([t.String(), t.Null()], {
+		lastVerifiedAt: t.Union([t.Date(), t.Null()], {
 			description: "Last verification timestamp",
 		}),
-		createdAt: t.String(),
-		updatedAt: t.String(),
+		createdAt: t.Date(),
+		updatedAt: t.Date(),
 	});
 
 	export type DomainResponse = typeof domainResponse.static;

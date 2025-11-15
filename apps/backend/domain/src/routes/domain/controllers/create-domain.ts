@@ -92,6 +92,10 @@ export async function createDomain(params: {
 		if (!domainWithDnsRecords) {
 			throw new Error("Failed to fetch domain with DNS records after creation");
 		}
+		logger.info(
+			domainWithDnsRecords,
+			"Domain with DNS records fetched successfully",
+		);
 		return domainWithDnsRecords;
 	} catch (error) {
 		logger.error(
