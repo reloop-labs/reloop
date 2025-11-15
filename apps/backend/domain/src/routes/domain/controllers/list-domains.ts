@@ -1,4 +1,4 @@
-import type { DomainTypes } from "@be/domain/routes/domain/domain.type";
+import type { DomainTypes } from "@be/domain/types/domain.type";
 import {
 	generateDomainListCacheKey,
 	getCachedOrFetch,

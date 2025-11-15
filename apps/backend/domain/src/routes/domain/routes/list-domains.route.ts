@@ -1,6 +1,6 @@
 import { authMiddleware } from "@be/domain/middleware/auth";
+import { DomainModel } from "@be/domain/model/domain.model";
 import { listDomainsHandler } from "@be/domain/routes/domain/controllers/list-domains";
-import { DomainModel } from "@be/domain/routes/domain/domain.model";
 import { Elysia } from "elysia";
 
 export const listDomainsRoute = new Elysia().use(authMiddleware).get(

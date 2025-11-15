@@ -1,8 +1,8 @@
 import { authMiddleware } from "@be/domain/middleware/auth";
+import { DomainModel } from "@be/domain/model/domain.model";
 import { createDomainHandler } from "@be/domain/routes/domain/controllers/create-domain";
-import { DomainModel } from "@be/domain/routes/domain/domain.model";
 import { Elysia } from "elysia";
-import { domainErrorResponse } from "../domain.error-code";
+import { domainErrorResponse } from "../../../error/domain.error-code";
 
 export const createDomainRoute = new Elysia().use(authMiddleware).post(
 	"/add",

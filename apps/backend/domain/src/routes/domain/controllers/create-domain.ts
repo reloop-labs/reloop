@@ -1,4 +1,4 @@
-import type { DomainTypes } from "@be/domain/routes/domain/domain.type";
+import type { DomainTypes } from "@be/domain/types/domain.type";
 import { generateAllDNSRecords } from "@be/domain/utils";
 import { createId } from "@paralleldrive/cuid2";
 import { db } from "@reloop/db/client";

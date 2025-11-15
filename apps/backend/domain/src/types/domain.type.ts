@@ -1,4 +1,4 @@
-import type { DomainModel } from "@be/domain/routes/domain/domain.model";
+import type { DomainModel } from "@be/domain/model/domain.model";
 import type { Domain, DomainStatus } from "@reloop/api/types";
 
 export namespace DomainTypes {

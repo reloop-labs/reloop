@@ -1,5 +1,5 @@
 import { domainConfig } from "@be/domain/domain.config";
-import { DNSTypes } from "@be/domain/routes/dns/dns.type";
+import { DNSTypes } from "@be/domain/types/dns.type";
 import { generateDKIMKeyPair } from "./dkim-key-generator";
 
 export async function generateDKIMRecord(
