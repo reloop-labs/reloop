@@ -1,8 +1,5 @@
 import type { DomainTypes } from "@be/domain/types/domain.type";
-import {
-	generateDomainCacheKey,
-	getCachedOrFetch,
-} from "@be/domain/utils/cache-helpers";
+
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
@@ -55,12 +52,8 @@ export async function getDomainHandler(
 	logger.info({ domain: domainName, organizationId }, "Getting domain");
 
 	try {
-		const cacheKey = generateDomainCacheKey(domainName, organizationId);
-		const domain = await getCachedOrFetch(
-			cacheKey,
-			() => getDomain(domainName, organizationId),
-			{ domain: domainName, organizationId, operation: "getDomain" },
-		);
+		const domain = await getDomain(domainName, organizationId);
+
 		logger.info(
 			{ domain: domainName, organizationId },
 			"Domain retrieved successfully",

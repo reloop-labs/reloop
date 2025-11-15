@@ -20,8 +20,6 @@ export namespace DomainModel {
 		}),
 	});
 
-	export type CreateDomainBody = typeof createDomainBody.static;
-
 	export const dnsRecordResponse = t.Object({
 		id: t.String({ description: "Unique DNS record identifier" }),
 		recordType: t.Union(
@@ -107,16 +105,12 @@ export namespace DomainModel {
 		updatedAt: t.Date(),
 	});
 
-	export type DomainResponse = typeof domainResponse.static;
-
 	export const domainListResponse = t.Object({
 		domains: t.Array(domainResponse),
 		total: t.Number(),
 		page: t.Number(),
 		limit: t.Number(),
 	});
-
-	export type DomainListResponse = typeof domainListResponse.static;
 
 	export const domainQuery = t.Object({
 		page: t.Optional(t.Number({ minimum: 1, default: 1 })),
@@ -132,25 +126,19 @@ export namespace DomainModel {
 		),
 	});
 
-	export type DomainQuery = typeof domainQuery.static;
-
 	export const domainNotFound = t.Object({
 		message: t.Literal("Domain not found"),
 	});
-	export type DomainNotFound = typeof domainNotFound.static;
 
 	export const domainAlreadyExists = t.Object({
 		message: t.Literal("Domain already exists"),
 	});
-	export type DomainAlreadyExists = typeof domainAlreadyExists.static;
 
 	export const invalidDomain = t.Object({
 		message: t.Literal("Invalid domain format"),
 	});
-	export type InvalidDomain = typeof invalidDomain.static;
 
 	export const unauthorized = t.Object({
 		message: t.Literal("Unauthorized access"),
 	});
-	export type Unauthorized = typeof unauthorized.static;
 }
