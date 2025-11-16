@@ -105,25 +105,16 @@ export const DomainTable = ({
 													{...getAnimationProps(index + 1, 0)}
 													className="flex items-center gap-2 pl-5"
 												>
-													<Link
-														href={`/${activeOrganizationSlug}/domain/${domain.domain}`}
-														className={`flex items-center gap-2 transition-colors hover:text-blue-600 ${
-															currentDomainId === domain.domain
-																? "text-blue-600"
-																: ""
-														}`}
-													>
-														<Icon
-															name="globe"
-															className={cn(
-																"h-4 w-4",
-																getStatusColorClass(domain.status),
-															)}
-														/>
-														<span className="font-medium text-label-sm text-text-strong-950">
-															{domain.domain}
-														</span>
-													</Link>
+													<Icon
+														name="globe"
+														className={cn(
+															"h-4 w-4",
+															getStatusColorClass(domain.status),
+														)}
+													/>
+													<span className="font-medium text-label-sm text-text-strong-950">
+														{domain.domain}
+													</span>
 												</motion.div>
 											</div>
 											<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">

@@ -32,22 +32,28 @@ export const DNSRecordTable = ({
 			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-200 text-paragraph-sm shadow-regular-md ring-stroke-soft-200 ring-inset">
 				<div className="grid grid-cols-[minmax(80px,auto)_minmax(120px,auto)_1fr_minmax(80px,auto)_minmax(80px,auto)_minmax(100px,auto)]">
 					<div className="bg-bg-weak-50 pl-5 font-medium text-text-sub-600">
-						<div className="py-2.5">Type</div>
+						<div className="py-2.5 text-gray-800 dark:text-gray-200">Type</div>
 					</div>
 					<div className="bg-bg-weak-50 font-medium text-text-sub-600">
-						<div className="py-2.5">Host / Name</div>
+						<div className="py-2.5 text-gray-800 dark:text-gray-200">
+							Host / Name
+						</div>
 					</div>
 					<div className="bg-bg-weak-50 font-medium text-text-sub-600">
-						<div className="py-2.5">Value</div>
+						<div className="py-2.5 text-gray-800 dark:text-gray-200">Value</div>
 					</div>
 					<div className="bg-bg-weak-50 font-medium text-text-sub-600">
-						<div className="py-2.5">Priority</div>
+						<div className="py-2.5 text-gray-800 dark:text-gray-200">
+							Priority
+						</div>
 					</div>
 					<div className="bg-bg-weak-50 font-medium text-text-sub-600">
-						<div className="py-2.5">TTL</div>
+						<div className="py-2.5 text-gray-800 dark:text-gray-200">TTL</div>
 					</div>
 					<div className="bg-bg-weak-50 font-medium text-text-sub-600">
-						<div className="py-2.5">Status</div>
+						<div className="py-2.5 text-gray-800 dark:text-gray-200">
+							Status
+						</div>
 					</div>
 					{isLoading
 						? // Skeleton loading state
