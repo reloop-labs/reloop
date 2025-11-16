@@ -47,7 +47,7 @@ const DomainPage = () => {
 
 	if (error) {
 		return (
-			<div className="mx-auto max-w-3xl">
+			<div className="mx-auto max-w-3xl sm:px-8">
 				<DomainHeader domainId={domainId as string} status="failed" isFailed />
 				<div className="pt-20">
 					<SomethingWentWrong
@@ -64,7 +64,7 @@ const DomainPage = () => {
 	}
 
 	return (
-		<div className="mx-auto max-w-3xl">
+		<div className="mx-auto max-w-3xl sm:px-8">
 			<DomainHeader
 				domainId={domainData?.domain || (domainId as string)}
 				status={domainData?.status || "start-verify"}

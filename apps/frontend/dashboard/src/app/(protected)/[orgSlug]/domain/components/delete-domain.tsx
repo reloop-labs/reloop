@@ -7,6 +7,7 @@ import * as Input from "@reloop/ui/input";
 import * as Kbd from "@reloop/ui/kbd";
 import * as Modal from "@reloop/ui/modal";
 import axios from "axios";
+import { usePathname, useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -23,7 +24,17 @@ export const DeleteDomainModal = ({ domains }: DeleteDomainModalProps) => {
 	const [isCopied, setIsCopied] = useState(false);
 	const { mutate } = useSWRConfig();
 	const { activeOrganization } = useUserOrganization();
+	const pathname = usePathname();
+	const router = useRouter();
 	const domainToDelete = domains.find((domain) => domain.id === deleteId);
+
+	// Check if we're on a domain detail page (not the list page)
+	// Detail page: /{orgSlug}/domain/{domainId}
+	// List page: /{orgSlug}/domain
+	const isOnDetailPage =
+		pathname?.includes("/domain/") &&
+		!pathname?.includes("/domain/add") &&
+		pathname !== `/${activeOrganization?.slug}/domain`;
 
 	useEffect(() => {
 		if (isCopied) {
@@ -49,6 +60,14 @@ export const DeleteDomainModal = ({ domains }: DeleteDomainModalProps) => {
 			toast.success(`${domainToDelete.domain} deleted successfully`);
 			setDeleteId(null);
 			setConfirmationText("");
+
+			// Navigate to domain list if we're on a detail page
+			if (isOnDetailPage && activeOrganization) {
+				// Use setTimeout to ensure modal closes first, then navigate
+				setTimeout(() => {
+					router.push(`/${activeOrganization.slug}/domain`);
+				}, 100);
+			}
 		} catch (error) {
 			const errorMessage = axios.isAxiosError(error)
 				? error.response?.data?.message || "Failed to delete domain"

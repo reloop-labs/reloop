@@ -41,7 +41,7 @@ const NewDomainPage = () => {
 		!isLoading
 	) {
 		return (
-			<div className="mx-auto max-w-3xl pt-10 pb-8">
+			<div className="mx-auto max-w-3xl pt-10 pb-8 sm:px-8">
 				<Button.Root
 					onClick={() => back()}
 					variant="neutral"
@@ -95,7 +95,7 @@ const NewDomainPage = () => {
 	);
 
 	return (
-		<div className="mx-auto max-w-3xl pt-10 pb-8">
+		<div className="mx-auto max-w-3xl pt-10 pb-8 sm:px-8">
 			<div className="flex w-full items-center justify-between border-stroke-soft-200 border-b border-dashed pt-6 pb-6">
 				<div>
 					<h1 className="font-medium text-title-h5 leading-8">Domain Added</h1>

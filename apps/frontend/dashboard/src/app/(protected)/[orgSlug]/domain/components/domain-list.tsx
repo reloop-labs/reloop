@@ -48,7 +48,7 @@ export const DomainListSidebar = () => {
 		}) || [];
 
 	return (
-		<div className="mx-auto max-w-3xl">
+		<div className="mx-auto max-w-3xl sm:px-8">
 			<div className="flex items-center justify-between pt-10">
 				<p className="font-medium text-2xl">
 					Domain{data?.domains.length !== 1 ? "s" : ""}

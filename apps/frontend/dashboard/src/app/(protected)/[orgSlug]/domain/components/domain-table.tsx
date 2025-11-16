@@ -52,13 +52,19 @@ export const DomainTable = ({
 			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-200 text-paragraph-sm shadow-regular-md ring-stroke-soft-200 ring-inset">
 				<div className="grid grid-cols-[1fr_minmax(200px,auto)_minmax(100px,auto)_minmax(40px,auto)]">
 					<div className="bg-bg-weak-50 pl-5 font-medium text-text-sub-600">
-						<div className="py-2.5">Domain</div>
+						<div className="py-2.5 text-gray-800 dark:text-gray-200">
+							Domain
+						</div>
 					</div>
 					<div className="bg-bg-weak-50 font-medium text-text-sub-600">
-						<div className="py-2.5">Status</div>
+						<div className="py-2.5 text-gray-800 dark:text-gray-200">
+							Status
+						</div>
 					</div>
 					<div className="bg-bg-weak-50 font-medium text-text-sub-600">
-						<div className="py-2.5">Created At</div>
+						<div className="py-2.5 text-gray-800 dark:text-gray-200">
+							Created At
+						</div>
 					</div>
 					<div className="bg-bg-weak-50 font-medium text-text-sub-600">
 						<div className="py-2.5" />
@@ -87,58 +93,67 @@ export const DomainTable = ({
 							))
 						: domains.map((domain, index) => (
 								<div key={`domain-${index}`} className="group/row contents">
-									<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
-										<motion.div
-											{...getAnimationProps(index + 1, 0)}
-											className="flex items-center gap-2 pl-5"
+									<div className="group/row-item contents">
+										<Link
+											href={`/${activeOrganizationSlug}/domain/${domain.domain}`}
+											className={`group/row contents items-center gap-2 transition-colors hover:text-blue-600 ${
+												currentDomainId === domain.domain ? "text-blue-600" : ""
+											}`}
 										>
-											<Link
-												href={`/${activeOrganizationSlug}/domain/${domain.domain}`}
-												className={`flex items-center gap-2 transition-colors hover:text-blue-600 ${
-													currentDomainId === domain.domain
-														? "text-blue-600"
-														: ""
-												}`}
-											>
-												<Icon
-													name="globe"
-													className={cn(
-														"h-4 w-4",
-														getStatusColorClass(domain.status),
-													)}
-												/>
-												<span className="font-medium text-label-sm text-text-strong-950">
-													{domain.domain}
-												</span>
-											</Link>
-										</motion.div>
-									</div>
-									<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
-										<motion.div
-											{...getAnimationProps(index + 1, 1)}
-											className="flex items-center gap-2"
-										>
-											<div
-												className={cn(
-													"flex items-center gap-2.5 rounded-lg py-0.5 pl-3 font-medium text-label-xs capitalize",
-													getStatusColorClass(domain.status),
-												)}
-											>
-												<Icon
-													name={getStatusIcon(domain.status)}
-													className="h-3.5 w-3.5"
-												/>
-												{getStatusLabel(domain.status)}
+											<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
+												<motion.div
+													{...getAnimationProps(index + 1, 0)}
+													className="flex items-center gap-2 pl-5"
+												>
+													<Link
+														href={`/${activeOrganizationSlug}/domain/${domain.domain}`}
+														className={`flex items-center gap-2 transition-colors hover:text-blue-600 ${
+															currentDomainId === domain.domain
+																? "text-blue-600"
+																: ""
+														}`}
+													>
+														<Icon
+															name="globe"
+															className={cn(
+																"h-4 w-4",
+																getStatusColorClass(domain.status),
+															)}
+														/>
+														<span className="font-medium text-label-sm text-text-strong-950">
+															{domain.domain}
+														</span>
+													</Link>
+												</motion.div>
 											</div>
-										</motion.div>
-									</div>
-									<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
-										<motion.span
-											{...getAnimationProps(index + 1, 2)}
-											className="text-label-sm text-text-strong-950"
-										>
-											{formatRelativeTime(domain.createdAt)}
-										</motion.span>
+											<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
+												<motion.div
+													{...getAnimationProps(index + 1, 1)}
+													className="flex items-center gap-2"
+												>
+													<div
+														className={cn(
+															"flex items-center gap-2.5 rounded-lg py-0.5 pl-3 font-medium text-label-xs capitalize",
+															getStatusColorClass(domain.status),
+														)}
+													>
+														<Icon
+															name={getStatusIcon(domain.status)}
+															className="h-3.5 w-3.5"
+														/>
+														{getStatusLabel(domain.status)}
+													</div>
+												</motion.div>
+											</div>
+											<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
+												<motion.span
+													{...getAnimationProps(index + 1, 2)}
+													className="text-label-sm text-text-strong-950"
+												>
+													{formatRelativeTime(domain.createdAt)}
+												</motion.span>
+											</div>
+										</Link>
 									</div>
 									<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
 										<motion.div

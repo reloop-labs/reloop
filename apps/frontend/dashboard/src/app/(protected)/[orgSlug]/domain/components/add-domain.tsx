@@ -67,7 +67,7 @@ export const AddDomainSidebar = () => {
 	};
 
 	return (
-		<div className="mx-auto max-w-3xl pt-10 pb-8">
+		<div className="mx-auto max-w-3xl pt-10 pb-8 sm:px-8">
 			<Button.Root
 				onClick={() => back()}
 				variant="neutral"
@@ -99,7 +99,7 @@ export const AddDomainSidebar = () => {
 			</div>
 
 			<div className="my-6 gap-3">
-				<h2 className="font-semibold text-gray-900 text-lg">Domain</h2>
+				<h2 className="font-semibold text-lg">Domain</h2>
 				<p className="text-paragraph-sm text-text-sub-600">
 					Add a subdomain (eg. marketing.example.com)
 				</p>
@@ -109,7 +109,7 @@ export const AddDomainSidebar = () => {
 					<div>
 						<Label.Root
 							htmlFor="domain"
-							className="mb-2 block font-medium text-gray-700 text-sm"
+							className="mb-2 block font-medium text-sm"
 						>
 							Domain Name
 							<Label.Asterisk />
