@@ -34,8 +34,15 @@ export async function verifyDNSRecordHandler(params: {
 			logger.warn({ domain }, "Domain not found");
 			throw status(404, { message: "Domain not found" });
 		}
+		await db
+			.update(schema.domain)
+			.set({ status: "verifying" })
+			.where(eq(schema.domain.id, domainWithRecords.id));
+		await db
+			.update(schema.domainDnsRecord)
+			.set({ status: "verifying" })
+			.where(eq(schema.domainDnsRecord.domainId, domainWithRecords.id));
 
-		// Verify all DNS records
 		const verificationResults = await Promise.all(
 			domainWithRecords.dnsRecords.map(async (record) => {
 				let isVerified = false;
@@ -51,31 +58,24 @@ export async function verifyDNSRecordHandler(params: {
 									domainValue,
 									record.priority,
 								);
-								logger.info({ isVerified }, "MX record verified successfully");
 							} else {
 								isVerified = false;
 							}
 							break;
-
 						case "SPF":
 							isVerified = await verifySpfRecord(domainNameVerify, domainValue);
-							logger.info({ isVerified }, "SPF record verified successfully");
 							break;
-
 						case "DKIM":
 							isVerified = await verifyDkimRecord(
 								domainNameVerify,
 								domainValue,
 							);
-							logger.info({ isVerified }, "DKIM record verified successfully");
 							break;
-
 						case "DMARC":
 							isVerified = await verifyDmarcRecord(
 								domainNameVerify,
 								domainValue,
 							);
-							logger.info({ isVerified }, "DMARC record verified successfully");
 							break;
 
 						default:
@@ -95,7 +95,6 @@ export async function verifyDNSRecordHandler(params: {
 					);
 					isVerified = false;
 				}
-
 				return {
 					...record,
 					isVerified,
@@ -104,20 +103,38 @@ export async function verifyDNSRecordHandler(params: {
 		);
 
 		// Log summary
-		const verifiedCount = verificationResults.filter(
-			(r) => r.isVerified,
-		).length;
-		const totalCount = verificationResults.length;
-		logger.info(
-			{
-				domain,
-				verifiedCount,
-				totalCount,
-				verificationStatus:
-					verifiedCount === totalCount ? "all_verified" : "partial_verified",
-			},
-			`DNS records verification completed: ${verifiedCount}/${totalCount} verified`,
-		);
+
+		// Update all DNS records and domain status in one transaction
+		await db.transaction(async (tx) => {
+			await Promise.all(
+				verificationResults.map((result) =>
+					tx
+						.update(schema.domainDnsRecord)
+						.set({
+							status: result.isVerified ? "active" : "failed",
+							updatedAt: new Date(),
+						})
+						.where(eq(schema.domainDnsRecord.id, result.id)),
+				),
+			);
+			const verifiedCount = verificationResults.filter(
+				(r) => r.isVerified,
+			).length;
+
+			const domainStatus =
+				verifiedCount === verificationResults.length &&
+				verificationResults.length > 0
+					? "active"
+					: "failed";
+			await tx
+				.update(schema.domain)
+				.set({
+					status: domainStatus,
+					lastVerifiedAt: new Date(),
+					updatedAt: new Date(),
+				})
+				.where(eq(schema.domain.id, domainWithRecords.id));
+		});
 
 		return {
 			...domainWithRecords,
