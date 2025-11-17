@@ -1,8 +1,10 @@
 "use client";
 import { SomethingWentWrong } from "@fe/dashboard/components/something-went-wrong";
 import type { DomainResponse } from "@reloop/api";
+import axios from "axios";
 import { useParams } from "next/navigation";
 import * as React from "react";
+import { toast } from "sonner";
 import useSWR, { mutate } from "swr";
 import { DNSRecordsSection } from "./components/DNSRecordsSection";
 import { DomainHeader } from "./components/DomainHeader";
@@ -11,6 +13,7 @@ import { StatusBanner } from "./components/StatusBanner";
 const DomainPage = () => {
 	const { domainId } = useParams();
 	const [copiedItems, setCopiedItems] = React.useState<Set<string>>(new Set());
+	const [isVerifying, setIsVerifying] = React.useState(false);
 
 	const {
 		data: domainData,
@@ -30,8 +33,36 @@ const DomainPage = () => {
 					return newSet;
 				});
 			}, 2000);
-		} catch (err) {
+		} catch {
 			// Handle copy error silently
+		}
+	};
+
+	const handleVerifyDNS = async () => {
+		if (!domainData?.domain) {
+			toast.error("Domain information not available");
+			return;
+		}
+
+		setIsVerifying(true);
+		try {
+			await axios.post(
+				"/api/domain/v1/verify",
+				{ domain: domainData.domain },
+				{ headers: { credentials: "include" } },
+			);
+
+			// Refresh domain data after verification
+			await mutate(`/api/domain/v1/${domainId}`);
+
+			toast.success("DNS records verified successfully");
+		} catch (error) {
+			const errorMessage = axios.isAxiosError(error)
+				? error.response?.data?.message || "Failed to verify DNS records"
+				: "Failed to verify DNS records";
+			toast.error(errorMessage);
+		} finally {
+			setIsVerifying(false);
 		}
 	};
 
@@ -70,6 +101,8 @@ const DomainPage = () => {
 				status={domainData?.status || "start-verify"}
 				isLoading={isLoading}
 				lastUpdated={domainData?.createdAt || undefined}
+				onVerify={handleVerifyDNS}
+				isVerifying={isVerifying}
 			/>
 			<StatusBanner
 				status={domainData?.status || "start-verify"}

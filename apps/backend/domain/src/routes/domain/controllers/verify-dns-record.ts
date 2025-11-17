@@ -1,40 +1,35 @@
-import type { VerifyTypes } from "@be/domain/types/verify.type";
-import { VerifyService } from "@be/domain/utils/dns-record-verify.service";
+import { db } from "@reloop/db/client";
+import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
+import { and, eq, isNull } from "drizzle-orm";
+import { status } from "elysia";
 
-export async function verifyDNSRecordHandler(
-	body: VerifyTypes.DnsVerifyRequest,
-): Promise<VerifyTypes.DnsVerifyResult> {
-	logger.info(
-		{
-			domain: body.domain,
-			recordTypes: body.recordTypes,
-		},
-		"Verifying DNS records",
-	);
-
+export async function verifyDNSRecordHandler(params: {
+	domain: string;
+	organizationId: string;
+}) {
+	const { domain, organizationId } = params;
 	try {
-		const result = await VerifyService.verifyDnsRecords(body);
-		logger.info(
-			{
-				domain: body.domain,
-				isValid: result.isValid,
-				recordsCount: result.records.length,
-				missingRecords: result.missingRecords,
-				errors: result.errors,
+		const domainWithRecords = await db.query.domain.findFirst({
+			where: and(
+				eq(schema.domain.domain, domain),
+				eq(schema.domain.organizationId, organizationId),
+				isNull(schema.domain.deletedAt),
+			),
+			with: {
+				dnsRecords: {
+					where: isNull(schema.domainDnsRecord.deletedAt),
+				},
 			},
-			"DNS validation completed",
-		);
-		return result;
+		});
+
+		if (!domainWithRecords) {
+			logger.warn({ domain }, "Domain not found");
+			throw status(404, { message: "Domain not found" });
+		}
+		return domainWithRecords;
 	} catch (error) {
-		logger.error(
-			{
-				domain: body.domain,
-				recordTypes: body.recordTypes,
-				error: error instanceof Error ? error.message : String(error),
-			},
-			"Error validating DNS records",
-		);
-		throw error;
+		logger.error({ domain, error }, "Error verifying DNS records");
+		throw status(500, { message: "Internal server error" });
 	}
 }

@@ -24,7 +24,6 @@ export class VerifyService {
 								type: "A",
 								name: domain,
 								value: result.address,
-								ttl: 300,
 							});
 						} catch {
 							missingRecords.push("A");
