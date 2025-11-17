@@ -60,10 +60,11 @@ export async function generateAllDNSRecords(domain: string): Promise<{
 	dmarcRecord: DNSTypes.DNSRecord;
 	dkimRecord: DNSTypes.DNSRecord;
 }> {
-	const dkimRecord = await generateDKIMRecord(domain);
-	const spfRecord = generateSPFRecord(domain);
-	const dmarcRecord = generateDMARCRecord(domain);
-	const mxRecord = generateMXRecord(domain);
+	const domainSubString = getDomainString(domain);
+	const dkimRecord = await generateDKIMRecord(domainSubString);
+	const spfRecord = generateSPFRecord(domainSubString);
+	const dmarcRecord = generateDMARCRecord(domainSubString);
+	const mxRecord = generateMXRecord(domainSubString);
 	return {
 		mxRecord,
 		spfRecord,
@@ -71,3 +72,11 @@ export async function generateAllDNSRecords(domain: string): Promise<{
 		dkimRecord,
 	};
 }
+
+const getDomainString = (domain: string) => {
+	if (domain.split(".").length >= 3) {
+		const subDomain = domain.split(".").slice(0, -2).join(".");
+		return `send.${subDomain}`;
+	}
+	return "send";
+};

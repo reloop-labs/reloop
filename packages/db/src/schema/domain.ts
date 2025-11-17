@@ -108,7 +108,7 @@ export const domainDnsRecord = pgTable(
 		name: text("name").notNull(),
 		status: domainStatusEnum("status").notNull().default("start-verify"),
 		value: text("value").notNull(),
-		ttl: integer("ttl").notNull().default(3600),
+		ttl: text("ttl").notNull().default("Auto"),
 		priority: integer("priority"),
 		recordTypeName: dnsRecordTypeNameEnum("record_type_name").notNull(),
 		domain: text("domain").notNull(),
