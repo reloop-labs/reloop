@@ -100,7 +100,7 @@ export class VerifyService {
 		};
 	}
 
-	private static async resolveMxRecords(
+	static async resolveMxRecords(
 		domain: string,
 	): Promise<VerifyTypes.DnsRecordData[]> {
 		return new Promise((resolve, reject) => {
@@ -127,7 +127,7 @@ export class VerifyService {
 		});
 	}
 
-	private static async resolveTxtRecords(
+	static async resolveTxtRecords(
 		domain: string,
 	): Promise<VerifyTypes.DnsRecordData[]> {
 		return new Promise((resolve, reject) => {

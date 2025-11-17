@@ -9,6 +9,7 @@ export const verifyDNSRecordRoute = new Elysia().use(authMiddleware).post(
 		return await verifyDNSRecordHandler(body);
 	},
 	{
+		auth: true,
 		body: VerifyModel.dnsVerifyBody,
 		response: {
 			200: VerifyModel.dnsVerifyResponse,
