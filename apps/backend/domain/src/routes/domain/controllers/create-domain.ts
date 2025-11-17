@@ -14,14 +14,66 @@ export async function createDomain(params: {
 }): Promise<DomainTypes.DomainResponse> {
 	const { organizationId, userId, domain } = params;
 	try {
-		const existingDomain = await db.query.domain.findFirst({
+		const activeDomain = await db.query.domain.findFirst({
 			where: and(
 				eq(schema.domain.domain, domain),
 				eq(schema.domain.organizationId, organizationId),
 				isNull(schema.domain.deletedAt),
 			),
 		});
-		if (existingDomain) throw new Error("Domain already exists");
+		if (activeDomain) throw new Error("Domain already exists");
+
+		const deletedDomain = await db.query.domain.findFirst({
+			where: and(
+				eq(schema.domain.domain, domain),
+				eq(schema.domain.organizationId, organizationId),
+			),
+		});
+
+		// If domain exists and is soft-deleted, undelete it
+		if (deletedDomain?.deletedAt) {
+			const now = new Date();
+			const domainId = deletedDomain.id;
+
+			await db
+				.update(schema.domain)
+				.set({
+					deletedAt: null,
+					updatedAt: now,
+					createdAt: now,
+					status: "start-verify",
+				})
+				.where(eq(schema.domain.id, domainId));
+
+			await db
+				.update(schema.domainDnsRecord)
+				.set({
+					deletedAt: null,
+					updatedAt: now,
+				})
+				.where(eq(schema.domainDnsRecord.domainId, domainId));
+
+			// 3. Refetch the undeleted domain with DNS records (Option 2: refetch approach)
+			const undeletedDomain = await db.query.domain.findFirst({
+				where: and(
+					eq(schema.domain.domain, domain),
+					eq(schema.domain.organizationId, organizationId),
+					isNull(schema.domain.deletedAt),
+				),
+				with: {
+					dnsRecords: {
+						where: isNull(schema.domainDnsRecord.deletedAt),
+					},
+				},
+			});
+
+			if (!undeletedDomain) {
+				throw new Error("Failed to undelete domain");
+			}
+
+			logger.info({ domain }, "Domain undeleted successfully");
+			return undeletedDomain;
+		}
 
 		const dnsRecords = await generateAllDNSRecords(domain);
 		const { dkimRecord, spfRecord, dmarcRecord, mxRecord } = dnsRecords;
