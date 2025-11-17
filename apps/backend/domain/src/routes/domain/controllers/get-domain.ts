@@ -10,8 +10,6 @@ export async function getDomain(
 	domainName: string,
 	organizationId: string,
 ): Promise<DomainTypes.DomainResponse> {
-	logger.info({ domain: domainName, organizationId }, "Getting domain");
-
 	try {
 		const result = await db.query.domain.findFirst({
 			where: and(
@@ -31,7 +29,6 @@ export async function getDomain(
 			throw status(404, { message: "Domain not found" });
 		}
 
-		logger.info({ domain: domainName }, "Domain retrieved successfully");
 		return result;
 	} catch (error) {
 		logger.error(
@@ -49,16 +46,8 @@ export async function getDomainHandler(
 	domainName: string,
 	organizationId: string,
 ): Promise<DomainTypes.DomainResponse> {
-	logger.info({ domain: domainName, organizationId }, "Getting domain");
-
 	try {
-		const domain = await getDomain(domainName, organizationId);
-
-		logger.info(
-			{ domain: domainName, organizationId },
-			"Domain retrieved successfully",
-		);
-		return domain;
+		return await getDomain(domainName, organizationId);
 	} catch (error) {
 		logger.error(
 			{

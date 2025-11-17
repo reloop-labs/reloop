@@ -21,6 +21,8 @@ interface DomainHeaderProps {
 	status?: DomainStatus;
 	isLoading?: boolean;
 	isFailed?: boolean;
+	onVerify?: () => void | Promise<void>;
+	isVerifying?: boolean;
 }
 
 export const DomainHeader = ({
@@ -29,6 +31,8 @@ export const DomainHeader = ({
 	status = "start-verify",
 	isLoading,
 	isFailed,
+	onVerify,
+	isVerifying,
 }: DomainHeaderProps) => {
 	const { back } = useRouter();
 	const [, setDeleteId] = useQueryState("delete");
@@ -106,8 +110,10 @@ export const DomainHeader = ({
 								variant="neutral"
 								size="small"
 								className="font-semibold"
+								onClick={onVerify}
+								disabled={isVerifying}
 							>
-								Verify DNS Records
+								{isVerifying ? "Verifying..." : "Verify DNS Records"}
 							</Button.Root>
 							<PopoverRoot>
 								<PopoverTrigger asChild>

@@ -35,9 +35,10 @@ export const dnsRecordTypeEnum = pgEnum("dns_record_type", [
 	"CNAME",
 	"MX",
 	"TXT",
-	"NS",
-	"SRV",
-	"CAA",
+]);
+
+export const dnsRecordTypeNameEnum = pgEnum("dns_record_type_name", [
+	"MX",
 	"SPF",
 	"DKIM",
 	"DMARC",
@@ -109,6 +110,7 @@ export const domainDnsRecord = pgTable(
 		value: text("value").notNull(),
 		ttl: integer("ttl").notNull().default(3600),
 		priority: integer("priority"),
+		recordTypeName: dnsRecordTypeNameEnum("record_type_name").notNull(),
 		domain: text("domain").notNull(),
 		privateKey: text("private_key"),
 		verificationError: text("verification_error"),

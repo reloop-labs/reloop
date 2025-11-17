@@ -23,13 +23,7 @@ export const authMiddleware = new Elysia({ name: "better-auth" }).macro({
 					},
 				);
 				const session: Session | null = await response.json();
-
-				logger.info(session, "Session");
 				if (session) {
-					logger.info(
-						{ userId: session.user },
-						"User authenticated via cookie",
-					);
 					if (!session?.user?.activeOrganizationId) {
 						return status(401, {
 							message: "User is not a member of an organization",
