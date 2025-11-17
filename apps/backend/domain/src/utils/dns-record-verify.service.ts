@@ -1,13 +1,13 @@
-import type { ValidationTypes } from "@be/domain/routes/validation/validation.type";
+import type { VerifyTypes } from "@be/domain/types/verify.type";
 import { lookup, resolveCname, resolveMx, resolveTxt } from "dns";
 import { promisify } from "util";
 
-export class ValidationService {
-	static async validateDnsRecords(
-		data: ValidationTypes.DnsValidationRequest,
-	): Promise<ValidationTypes.DnsValidationResult> {
+export class VerifyService {
+	static async verifyDnsRecords(
+		data: VerifyTypes.DnsVerifyRequest,
+	): Promise<VerifyTypes.DnsVerifyResult> {
 		const { domain, recordTypes = ["MX", "A", "TXT", "CNAME"] } = data;
-		const records: ValidationTypes.DnsRecordData[] = [];
+		const records: VerifyTypes.DnsRecordData[] = [];
 		const missingRecords: string[] = [];
 		const errors: string[] = [];
 		let isValid = true;
@@ -34,8 +34,7 @@ export class ValidationService {
 
 					case "MX":
 						try {
-							const mxRecords =
-								await ValidationService.resolveMxRecords(domain);
+							const mxRecords = await VerifyService.resolveMxRecords(domain);
 							if (mxRecords.length === 0) {
 								missingRecords.push("MX");
 								isValid = false;
@@ -50,8 +49,7 @@ export class ValidationService {
 
 					case "TXT":
 						try {
-							const txtRecords =
-								await ValidationService.resolveTxtRecords(domain);
+							const txtRecords = await VerifyService.resolveTxtRecords(domain);
 							if (txtRecords.length === 0) {
 								missingRecords.push("TXT");
 								isValid = false;
@@ -67,7 +65,7 @@ export class ValidationService {
 					case "CNAME":
 						try {
 							const cnameRecords =
-								await ValidationService.resolveCnameRecords(domain);
+								await VerifyService.resolveCnameRecords(domain);
 							if (cnameRecords.length === 0) {
 								missingRecords.push("CNAME");
 								isValid = false;
@@ -104,7 +102,7 @@ export class ValidationService {
 
 	private static async resolveMxRecords(
 		domain: string,
-	): Promise<ValidationTypes.DnsRecordData[]> {
+	): Promise<VerifyTypes.DnsRecordData[]> {
 		return new Promise((resolve, reject) => {
 			resolveMx(domain, (err, addresses) => {
 				if (err) {
@@ -112,7 +110,7 @@ export class ValidationService {
 					return;
 				}
 
-				const records: ValidationTypes.DnsRecordData[] = [];
+				const records: VerifyTypes.DnsRecordData[] = [];
 				if (addresses && Array.isArray(addresses)) {
 					addresses.forEach((address) => {
 						records.push({
@@ -131,7 +129,7 @@ export class ValidationService {
 
 	private static async resolveTxtRecords(
 		domain: string,
-	): Promise<ValidationTypes.DnsRecordData[]> {
+	): Promise<VerifyTypes.DnsRecordData[]> {
 		return new Promise((resolve, reject) => {
 			resolveTxt(domain, (err, addresses) => {
 				if (err) {
@@ -139,7 +137,7 @@ export class ValidationService {
 					return;
 				}
 
-				const records: ValidationTypes.DnsRecordData[] = [];
+				const records: VerifyTypes.DnsRecordData[] = [];
 				if (addresses && Array.isArray(addresses)) {
 					addresses.forEach((address) => {
 						const value = Array.isArray(address) ? address.join("") : address;
@@ -158,7 +156,7 @@ export class ValidationService {
 
 	private static async resolveCnameRecords(
 		domain: string,
-	): Promise<ValidationTypes.DnsRecordData[]> {
+	): Promise<VerifyTypes.DnsRecordData[]> {
 		return new Promise((resolve, reject) => {
 			resolveCname(domain, (err, addresses) => {
 				if (err) {
@@ -166,7 +164,7 @@ export class ValidationService {
 					return;
 				}
 
-				const records: ValidationTypes.DnsRecordData[] = [];
+				const records: VerifyTypes.DnsRecordData[] = [];
 				if (addresses && Array.isArray(addresses)) {
 					addresses.forEach((address) => {
 						records.push({

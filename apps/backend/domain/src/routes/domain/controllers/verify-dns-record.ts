@@ -1,20 +1,20 @@
-import { ValidationService } from "@be/domain/routes/validation/validation.service";
-import type { ValidationTypes } from "@be/domain/routes/validation/validation.type";
+import type { VerifyTypes } from "@be/domain/types/verify.type";
+import { VerifyService } from "@be/domain/utils/dns-record-verify.service";
 import { logger } from "@reloop/logger";
 
-export async function validateDnsRecordsHandler(
-	body: ValidationTypes.DnsValidationRequest,
-): Promise<ValidationTypes.DnsValidationResult> {
+export async function verifyDNSRecordHandler(
+	body: VerifyTypes.DnsVerifyRequest,
+): Promise<VerifyTypes.DnsVerifyResult> {
 	logger.info(
 		{
 			domain: body.domain,
 			recordTypes: body.recordTypes,
 		},
-		"Validating DNS records",
+		"Verifying DNS records",
 	);
 
 	try {
-		const result = await ValidationService.validateDnsRecords(body);
+		const result = await VerifyService.verifyDnsRecords(body);
 		logger.info(
 			{
 				domain: body.domain,

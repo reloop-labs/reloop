@@ -2,7 +2,6 @@ import "dotenv/config";
 import { domainConfig } from "@be/domain/domain.config";
 import { domainRoutes } from "@be/domain/routes/domain/domain.routes";
 import { landing } from "@be/domain/routes/landing/landing.index";
-import { validationRoutes } from "@be/domain/routes/validation/validation.routes";
 import { loader } from "@be/domain/utils/loader";
 import { fromTypes, openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
@@ -26,7 +25,6 @@ const emailService = new Elysia({
 	.use(serverTiming())
 	.use(landing)
 	.use(domainRoutes)
-	.use(validationRoutes)
 	.onStart(async () => {
 		await loader();
 	})

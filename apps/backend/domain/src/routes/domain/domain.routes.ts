@@ -3,6 +3,7 @@ import { createDomainRoute } from "@be/domain/routes/domain/routes/create-domain
 import { deleteDomainRoute } from "@be/domain/routes/domain/routes/delete-domain.route";
 import { getDomainRoute } from "@be/domain/routes/domain/routes/get-domain.route";
 import { listDomainsRoute } from "@be/domain/routes/domain/routes/list-domains.route";
+import { verifyDNSRecordRoute } from "@be/domain/routes/domain/routes/verify-dns.route";
 import { Elysia } from "elysia";
 
 export const domainRoutes = new Elysia({ prefix: "/v1", name: "DomainRoutes" })
@@ -10,4 +11,5 @@ export const domainRoutes = new Elysia({ prefix: "/v1", name: "DomainRoutes" })
 	.use(createDomainRoute)
 	.use(getDomainRoute)
 	.use(deleteDomainRoute)
-	.use(listDomainsRoute);
+	.use(listDomainsRoute)
+	.use(verifyDNSRecordRoute);
