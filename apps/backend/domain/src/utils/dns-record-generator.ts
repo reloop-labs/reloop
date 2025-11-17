@@ -1,6 +1,7 @@
 import { domainConfig } from "@be/domain/domain.config";
 import { DNSTypes } from "@be/domain/types/dns.type";
-import { generateDKIMKeyPair } from "./dkim-key-generator";
+import { generateDKIMKeyPair } from "@be/domain/utils/dkim-key-generator";
+import { getDomainSubString } from "@be/domain/utils/domain-formatter";
 
 export async function generateDKIMRecord(
 	domain: string,
@@ -60,7 +61,7 @@ export async function generateAllDNSRecords(domain: string): Promise<{
 	dmarcRecord: DNSTypes.DNSRecord;
 	dkimRecord: DNSTypes.DNSRecord;
 }> {
-	const domainSubString = getDomainString(domain);
+	const domainSubString = getDomainSubString(domain);
 	const dkimRecord = await generateDKIMRecord(domainSubString);
 	const spfRecord = generateSPFRecord(domainSubString);
 	const dmarcRecord = generateDMARCRecord(domainSubString);
@@ -72,11 +73,3 @@ export async function generateAllDNSRecords(domain: string): Promise<{
 		dkimRecord,
 	};
 }
-
-const getDomainString = (domain: string) => {
-	if (domain.split(".").length >= 3) {
-		const subDomain = domain.split(".").slice(0, -2).join(".");
-		return `send.${subDomain}`;
-	}
-	return "send";
-};

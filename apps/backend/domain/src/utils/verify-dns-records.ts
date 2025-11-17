@@ -16,7 +16,7 @@ export async function verifyMxRecord(
 				setTimeout(() => reject(new Error("DNS query timeout")), 10000),
 			),
 		]);
-		console.log("🚀 ~ verifyMxRecord ~ records:", records);
+
 		return records.some(
 			(mx) =>
 				(mx.exchange.toLowerCase() === value.toLowerCase() ||

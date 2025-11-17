@@ -1,3 +1,4 @@
+import { getDomainHost } from "@be/domain/utils/domain-formatter";
 import {
 	verifyDkimRecord,
 	verifyDmarcRecord,
@@ -39,37 +40,47 @@ export async function verifyDNSRecordHandler(params: {
 			domainWithRecords.dnsRecords.map(async (record) => {
 				let isVerified = false;
 				const recordType = record.recordTypeName.toUpperCase();
+				const domainNameVerify = `${record.name}.${getDomainHost(domainWithRecords.domain)}`;
+				const domainValue = record.value;
 				try {
 					switch (recordType) {
 						case "MX":
 							if (record.priority !== null && record.priority !== undefined) {
 								isVerified = await verifyMxRecord(
-									domainWithRecords.domain,
-									record.value,
+									domainNameVerify,
+									domainValue,
 									record.priority,
 								);
+								logger.info({ isVerified }, "MX record verified successfully");
 							} else {
 								isVerified = false;
 							}
 							break;
 
 						case "SPF":
-							isVerified = await verifySpfRecord(
-								domainWithRecords.domain,
-								record.value,
-							);
+							isVerified = await verifySpfRecord(domainNameVerify, domainValue);
+							logger.info({ isVerified }, "SPF record verified successfully");
 							break;
 
 						case "DKIM":
-							isVerified = await verifyDkimRecord(record.name, record.value);
+							isVerified = await verifyDkimRecord(
+								domainNameVerify,
+								domainValue,
+							);
+							logger.info({ isVerified }, "DKIM record verified successfully");
 							break;
 
 						case "DMARC":
-							isVerified = await verifyDmarcRecord(record.name, record.value);
+							isVerified = await verifyDmarcRecord(
+								domainNameVerify,
+								domainValue,
+							);
+							logger.info({ isVerified }, "DMARC record verified successfully");
 							break;
 
 						default:
 							isVerified = false;
+							logger.info({ isVerified }, "Record type not supported");
 							break;
 					}
 				} catch (error) {
