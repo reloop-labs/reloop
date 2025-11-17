@@ -22,7 +22,7 @@ export interface DNSRecordData {
 	recordType: string;
 	name: string;
 	value: string;
-	ttl: number;
+	ttl: string;
 	priority?: number;
 	status: DNSRecordStatus;
 }

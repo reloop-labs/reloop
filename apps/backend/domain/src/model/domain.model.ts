@@ -44,7 +44,7 @@ export namespace DomainModel {
 		domain: t.String({ description: "Domain name" }),
 		name: t.String({ description: "DNS record name" }),
 		value: t.String({ description: "DNS record value" }),
-		ttl: t.Number({ description: "Time to live in seconds" }),
+		ttl: t.String({ description: "Time to live in seconds or Auto" }),
 		priority: t.Union([t.Number(), t.Null()], {
 			description: "Record priority (for MX records)",
 		}),

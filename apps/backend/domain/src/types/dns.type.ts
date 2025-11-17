@@ -28,7 +28,7 @@ export namespace DNSTypes {
 		type: DNSRecordType;
 		name: string;
 		value: string;
-		ttl?: number;
+		ttl: string;
 		priority?: number;
 		privateKey?: string;
 	}
@@ -44,7 +44,7 @@ export namespace DNSTypes {
 		recordType: string;
 		name: string;
 		value: string;
-		ttl: number;
+		ttl: string;
 		priority?: number;
 		description?: string;
 		isVerified: boolean;

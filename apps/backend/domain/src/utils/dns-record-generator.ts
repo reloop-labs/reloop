@@ -17,7 +17,7 @@ export async function generateDKIMRecord(
 		type: DNSTypes.DNSRecordType.TXT,
 		name: `${domainConfig.DKIM_SELECTOR}._domainkey.${domain}`,
 		value: dkimValue,
-		ttl: 3600,
+		ttl: "Auto",
 		privateKey: dkimKeyPair.privateKey,
 	};
 }
@@ -29,7 +29,7 @@ export function generateSPFRecord(domain: string): DNSTypes.DNSRecord {
 		type: DNSTypes.DNSRecordType.TXT,
 		name: domain,
 		value: spfValue,
-		ttl: 3600,
+		ttl: "Auto",
 	};
 }
 
@@ -40,7 +40,7 @@ export function generateDMARCRecord(domain: string): DNSTypes.DNSRecord {
 		type: DNSTypes.DNSRecordType.TXT,
 		name: `_dmarc.${domain}`,
 		value: dmarcValue,
-		ttl: 3600,
+		ttl: "Auto",
 	};
 }
 
@@ -50,7 +50,7 @@ export function generateMXRecord(domain: string): DNSTypes.DNSRecord {
 		name: domain,
 		value: domainConfig.HOST_DOMAIN,
 		priority: domainConfig.constants.mxPriority,
-		ttl: 3600,
+		ttl: "Auto",
 	};
 }
 

@@ -118,7 +118,7 @@ The `domain_dns_record` table stores individual DNS records associated with doma
 | `name` | `text` | Not Null | - |
 | `status` | `domain_status` enum | Not Null | `start-verify` |
 | `value` | `text` | Not Null | - |
-| `ttl` | `integer` | Not Null | `3600` |
+| `ttl` | `string` | Not Null | `Auto` |
 | `priority` | `integer` | Nullable | - |
 | `domain` | `text` | Not Null | - |
 | `verificationError` | `text` | Nullable | - |
