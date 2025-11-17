@@ -38,7 +38,7 @@ export async function verifyDNSRecordHandler(params: {
 		const verificationResults = await Promise.all(
 			domainWithRecords.dnsRecords.map(async (record) => {
 				let isVerified = false;
-				const recordType = record.recordType.toUpperCase();
+				const recordType = record.recordTypeName.toUpperCase();
 				try {
 					switch (recordType) {
 						case "MX":

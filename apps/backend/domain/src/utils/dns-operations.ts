@@ -27,6 +27,46 @@ export interface DNSRecordData {
 	status: DNSRecordStatus;
 }
 
+/**
+ * Maps recordType and value to recordTypeName enum value
+ */
+export function getRecordTypeName(
+	recordType: string,
+	value: string,
+): "MX" | "SPF" | "DKIM" | "DMARC" {
+	const upperRecordType = recordType.toUpperCase();
+
+	if (upperRecordType === "MX") {
+		return "MX";
+	}
+
+	if (upperRecordType === "TXT") {
+		if (value.startsWith("v=spf1")) {
+			return "SPF";
+		}
+		if (value.startsWith("v=DKIM1")) {
+			return "DKIM";
+		}
+		if (value.startsWith("v=DMARC1")) {
+			return "DMARC";
+		}
+	}
+
+	// Default fallback - try to infer from recordType if it's already a type name
+	if (
+		upperRecordType === "SPF" ||
+		upperRecordType === "DKIM" ||
+		upperRecordType === "DMARC"
+	) {
+		return upperRecordType as "SPF" | "DKIM" | "DMARC";
+	}
+
+	// Default to SPF if we can't determine (shouldn't happen in practice)
+	throw new Error(
+		`Unable to determine recordTypeName for recordType: ${recordType}, value: ${value}`,
+	);
+}
+
 export async function insertDNSRecords(
 	dnsRecordData: DNSRecordData[],
 	domain: string,
@@ -39,23 +79,13 @@ export async function insertDNSRecords(
 			domainId,
 			organizationId,
 			userId,
-			recordType: record.recordType as
-				| "A"
-				| "AAAA"
-				| "CNAME"
-				| "MX"
-				| "TXT"
-				| "NS"
-				| "SRV"
-				| "CAA"
-				| "SPF"
-				| "DKIM"
-				| "DMARC",
+			recordType: record.recordType as "A" | "AAAA" | "CNAME" | "MX" | "TXT",
 			name: record.name,
 			value: record.value,
 			ttl: record.ttl,
 			priority: record.priority,
 			status: record.status,
+			recordTypeName: getRecordTypeName(record.recordType, record.value),
 			domain,
 		});
 	}

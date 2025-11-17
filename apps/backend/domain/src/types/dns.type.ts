@@ -23,12 +23,6 @@ export namespace DNSTypes {
 		CNAME = "CNAME",
 		MX = "MX",
 		TXT = "TXT",
-		NS = "NS",
-		SRV = "SRV",
-		CAA = "CAA",
-		SPF = "SPF",
-		DKIM = "DKIM",
-		DMARC = "DMARC",
 	}
 	export interface DNSRecord {
 		type: DNSRecordType;

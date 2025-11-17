@@ -106,6 +106,7 @@ export async function createDomain(params: {
 				ttl: dkimRecord.ttl,
 				priority: dkimRecord.priority,
 				privateKey: dkimRecord.privateKey,
+				recordTypeName: "DKIM",
 			},
 			{
 				...dnsRecordIds,
@@ -113,6 +114,7 @@ export async function createDomain(params: {
 				name: spfRecord.name,
 				value: spfRecord.value,
 				ttl: spfRecord.ttl,
+				recordTypeName: "SPF",
 			},
 			{
 				...dnsRecordIds,
@@ -120,6 +122,7 @@ export async function createDomain(params: {
 				name: dmarcRecord.name,
 				value: dmarcRecord.value,
 				ttl: dmarcRecord.ttl,
+				recordTypeName: "DMARC",
 			},
 			{
 				...dnsRecordIds,
@@ -127,6 +130,7 @@ export async function createDomain(params: {
 				name: mxRecord.name,
 				value: mxRecord.value,
 				ttl: mxRecord.ttl,
+				recordTypeName: "MX",
 			},
 		]);
 		const domainWithDnsRecords = await db.query.domain.findFirst({
