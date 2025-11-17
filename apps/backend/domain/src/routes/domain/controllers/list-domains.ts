@@ -7,21 +7,9 @@ import { and, count, desc, eq, isNull } from "drizzle-orm";
 export async function listDomains(
 	query: DomainTypes.DomainQuery,
 	organizationId: string,
-	userId: string,
 ): Promise<DomainTypes.DomainListResponse> {
 	const { page = 1, limit = 10, status } = query;
 	const offset = (page - 1) * limit;
-
-	logger.info(
-		{
-			page,
-			limit,
-			status,
-			organizationId,
-			userId,
-		},
-		"Listing domains",
-	);
 
 	try {
 		const conditions = [
@@ -66,23 +54,16 @@ export async function listDomains(
 export async function listDomainsHandler(
 	query: DomainTypes.DomainQuery,
 	organizationId: string,
-	userId: string,
 ): Promise<DomainTypes.DomainListResponse> {
-	logger.info({ query, organizationId, userId }, "Listing domains");
-
 	try {
-		const domains = await listDomains(query, organizationId, userId);
-		logger.info(
-			{ query, organizationId, userId },
-			"Domains listed successfully",
-		);
+		const domains = await listDomains(query, organizationId);
+
 		return domains;
 	} catch (error) {
 		logger.error(
 			{
 				query,
 				organizationId,
-				userId,
 				error: error instanceof Error ? error.message : String(error),
 			},
 			"Error listing domains",

@@ -6,7 +6,7 @@ import { Elysia } from "elysia";
 export const listDomainsRoute = new Elysia().use(authMiddleware).get(
 	"/list",
 	async ({ query, user }) => {
-		return await listDomainsHandler(query, user.activeOrganizationId, user.id);
+		return await listDomainsHandler(query, user.activeOrganizationId);
 	},
 	{
 		query: DomainModel.domainQuery,
