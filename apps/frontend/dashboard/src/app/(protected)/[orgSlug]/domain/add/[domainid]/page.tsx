@@ -106,7 +106,7 @@ const NewDomainPage = () => {
 				<div className="flex items-center gap-2">
 					<Button.Root
 						onClick={() => {
-							push("/domain");
+							push(`/domain/${domainId}`);
 						}}
 						size="xsmall"
 						variant="neutral"
@@ -188,7 +188,7 @@ const NewDomainPage = () => {
 
 				<Button.Root
 					onClick={() => {
-						push("/domain");
+						push(`/domain/${domainId}`);
 					}}
 					size="small"
 					variant="neutral"
