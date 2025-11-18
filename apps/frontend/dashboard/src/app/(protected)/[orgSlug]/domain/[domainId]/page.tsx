@@ -1,6 +1,7 @@
 "use client";
 import { SomethingWentWrong } from "@fe/dashboard/components/something-went-wrong";
 import type { DomainResponse } from "@reloop/api";
+import logger from "@reloop/logger";
 import axios from "axios";
 import { useParams } from "next/navigation";
 import * as React from "react";
@@ -66,15 +67,21 @@ const DomainPage = () => {
 		}
 	};
 
+	logger.info({ domainData }, "domainData");
+
 	const dkimSpfRecords =
 		domainData?.dnsRecords?.filter(
-			(record) => record.recordType === "MX" || record.recordType === "TXT",
+			(record) =>
+				(record.recordType === "MX" || record.recordType === "TXT") &&
+				!record.name.includes("_dmarc"),
 		) || [];
 
 	const dmarcRecords =
 		domainData?.dnsRecords?.filter((record) =>
 			record.name.includes("_dmarc"),
 		) || [];
+
+	logger.info({ dkimSpfRecords, dmarcRecords }, "dkimSpfRecords, dmarcRecords");
 
 	if (error) {
 		return (

@@ -46,7 +46,7 @@ export const DNSRecordsSection = ({
 						DKIM and SPF{" "}
 						<span className="font-normal text-text-sub-600">(Required)</span>
 					</h3>
-					<p className="text-[13.5px] text-text-sub-600">
+					<p className="text-sm text-text-sub-600">
 						Enable email signing and specify authorized senders.
 					</p>
 				</div>
@@ -64,7 +64,7 @@ export const DNSRecordsSection = ({
 						DMARC{" "}
 						<span className="font-normal text-text-sub-600">(Recommended)</span>
 					</h3>
-					<p className="text-[13.5px] text-text-sub-600">
+					<p className="text-sm text-text-sub-600">
 						Set authentication policies and receive reports.
 					</p>
 				</div>

@@ -3,7 +3,7 @@ import { generateAllDNSRecords } from "@be/domain/utils";
 import { createId } from "@paralleldrive/cuid2";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { logger } from "@reloop/logger";
+import logger from "@reloop/logger";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
@@ -71,13 +71,11 @@ export async function createDomain(params: {
 				throw new Error("Failed to undelete domain");
 			}
 
-			logger.info({ domain }, "Domain undeleted successfully");
 			return undeletedDomain;
 		}
 
 		const dnsRecords = await generateAllDNSRecords(domain);
 		const { dkimRecord, spfRecord, dmarcRecord, mxRecord } = dnsRecords;
-		logger.info(dnsRecords, "DNS records generated and stored successfully");
 		const domainId = `domain_${createId()}`;
 		await db.insert(schema.domain).values({
 			id: domainId,
@@ -145,10 +143,6 @@ export async function createDomain(params: {
 		if (!domainWithDnsRecords) {
 			throw new Error("Failed to fetch domain with DNS records after creation");
 		}
-		logger.info(
-			domainWithDnsRecords,
-			"Domain with DNS records fetched successfully",
-		);
 		return domainWithDnsRecords;
 	} catch (error) {
 		logger.error(
@@ -171,12 +165,10 @@ export async function createDomainHandler(params: {
 	domain: string;
 }): Promise<DomainTypes.DomainResponse> {
 	const { organizationId, userId, domain } = params;
-	logger.info(params, "Creating domain");
 	const domainDetails = await createDomain({
 		organizationId,
 		userId,
 		domain,
 	});
-	logger.info(domainDetails, "Domain created successfully");
 	return domainDetails;
 }
