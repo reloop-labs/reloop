@@ -35,9 +35,7 @@ export const DNSRecordTable = ({
 						<div className="py-2.5 text-gray-800 dark:text-gray-200">Type</div>
 					</div>
 					<div className="bg-bg-weak-50 font-medium text-text-sub-600">
-						<div className="py-2.5 text-gray-800 dark:text-gray-200">
-							Host / Name
-						</div>
+						<div className="py-2.5 text-gray-800 dark:text-gray-200">Name</div>
 					</div>
 					<div className="bg-bg-weak-50 font-medium text-text-sub-600">
 						<div className="py-2.5 text-gray-800 dark:text-gray-200">Value</div>

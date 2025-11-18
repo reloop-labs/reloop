@@ -61,14 +61,12 @@ export async function verifyDkimRecord(
 ): Promise<boolean> {
 	try {
 		const resolveTxtPromise = promisify(resolveTxt);
-
 		const records = await Promise.race([
 			resolveTxtPromise(name),
 			new Promise<never>((_, reject) =>
 				setTimeout(() => reject(new Error("DNS query timeout")), 10000),
 			),
 		]);
-		logger.info({ records }, "aaaa  aaaaa  aaaaRecords");
 		const flattenedRecords = records.flat();
 		const combinedRecord = flattenedRecords.join("");
 
