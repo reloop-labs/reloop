@@ -35,7 +35,6 @@
 		"@reloop/cache": "workspace:*",
 		"@reloop/logger": "workspace:*",
 		"@reloop/auth": "workspace:*",
-		"@reloop/inngest": "workspace:*",
 		"@elysiajs/eden": "catalog:backend",
 		"@elysiajs/openapi": "catalog:backend",
 		"inngest": "catalog:backend"

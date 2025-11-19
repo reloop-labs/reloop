@@ -7,7 +7,6 @@ import {
 	domainDnsRecord,
 	emailLog,
 } from "@reloop/db/schema";
-import { inngest } from "@reloop/inngest/client";
 import { logger } from "@reloop/logger";
 import { and, eq, inArray, or, sql } from "drizzle-orm";
 
@@ -236,7 +235,7 @@ async function checkDomainDnsHealth(
 	const lastVerified = domainData.lastVerifiedAt;
 	const isRecent = lastVerified
 		? new Date().getTime() - new Date(lastVerified).getTime() <
-			STALE_THRESHOLD_HOURS * 60 * 60 * 1000
+		STALE_THRESHOLD_HOURS * 60 * 60 * 1000
 		: false;
 
 	if (

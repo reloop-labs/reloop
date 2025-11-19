@@ -15,8 +15,7 @@
 		"declarationMap": false,
 		"baseUrl": ".",
 		"paths": {
-			"@be/domain/*": ["./src/*"],
-			"@reloop/inngest/*": ["../../inngest/src/*"]
+			"@be/domain/*": ["./src/*"]
 		}
 	}
 }

@@ -1,6 +1,5 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { inngest } from "@reloop/inngest/client";
 import { logger } from "@reloop/logger";
 import { and, eq } from "drizzle-orm";
 import { status } from "elysia";
@@ -60,24 +59,6 @@ export async function retryDelivery(
 			})
 			.where(eq(schema.webhookDelivery.id, deliveryId));
 
-		// Trigger Inngest webhook delivery
-		await inngest.send({
-			name: "webhook/deliver",
-			data: {
-				deliveryId: delivery.id,
-				webhookId: delivery.webhookId,
-				eventId: delivery.eventId,
-				eventData: delivery.eventData as Record<string, unknown>,
-				requestUrl: delivery.requestUrl,
-				requestHeaders: delivery.requestHeaders as
-					| Record<string, string>
-					| undefined,
-				requestBody: delivery.requestBody as
-					| Record<string, unknown>
-					| undefined,
-				maxAttempts: delivery.maxAttempts,
-			},
-		});
 
 		logger.info(
 			{
