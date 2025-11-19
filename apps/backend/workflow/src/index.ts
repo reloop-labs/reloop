@@ -1,10 +1,9 @@
 import "dotenv/config";
+import { landing } from "@be/workflow/routes/landing/landing.index";
 import cors from "@elysiajs/cors";
 import { logger } from "@reloop/logger";
-import { landing } from "@reloop/workflow/routes/landing/landing.index";
 import { Elysia } from "elysia";
 import { inngestRoutes } from "./routes/inngest/inngest.router";
-
 
 const port = 8017;
 

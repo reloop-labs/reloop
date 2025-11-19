@@ -21,6 +21,7 @@
 			"@reloop/ui": ["../../packages/ui/src/*"],
 			"@reloop/auth": ["../../packages/auth/src/*"],
 			"@be/domain": ["../../apps/backend/domain/src/*"],
+			"@be/workflow": ["../../apps/backend/workflow/src/*"],
 			"@reloop/webhook": ["../../apps/backend/webhook/src/*"],
 			"@reloop/audience": ["../../apps/backend/audience/src/*"],
 			"@reloop/web": ["../../apps/frontend/web/src/*"],
