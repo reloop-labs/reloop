@@ -4,13 +4,16 @@ import type { DomainResponse } from "@reloop/api";
 import * as Alert from "@reloop/ui/alert";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
+import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
 import * as React from "react";
-import useSWR from "swr";
+import { toast } from "sonner";
+import useSWR, { mutate } from "swr";
 import { DNSRecordTable } from "../../[domainId]/components/DNSRecordTable";
 
 const NewDomainPage = () => {
 	const [copiedItems, setCopiedItems] = React.useState<Set<string>>(new Set());
+	const [isVerifying, setIsVerifying] = React.useState(false);
 	const { push } = useUserOrganization();
 	const { domainId } = useParams();
 	const { back } = useRouter();
@@ -31,6 +34,37 @@ const NewDomainPage = () => {
 			}, 2000);
 		} catch {
 			// Handle copy error silently
+		}
+	};
+
+	const handleVerifyAndNavigate = async () => {
+		if (!domainData?.domain) {
+			toast.error("Domain information not available");
+			return;
+		}
+
+		setIsVerifying(true);
+		try {
+			await axios.post(
+				"/api/domain/v1/verify",
+				{ domain: domainData.domain },
+				{ headers: { credentials: "include" } },
+			);
+
+			// Refresh domain data after verification
+			await mutate(`/api/domain/v1/${domainId}`);
+
+			toast.success("DNS records verified successfully");
+
+			// Navigate to domain detail page after successful verification
+			push(`/domain/${domainId}`);
+		} catch (error) {
+			const errorMessage = axios.isAxiosError(error)
+				? error.response?.data?.message || "Failed to verify DNS records"
+				: "Failed to verify DNS records";
+			toast.error(errorMessage);
+		} finally {
+			setIsVerifying(false);
 		}
 	};
 
@@ -105,13 +139,21 @@ const NewDomainPage = () => {
 				</div>
 				<div className="flex items-center gap-2">
 					<Button.Root
-						onClick={() => {
-							push(`/domain/${domainId}`);
-						}}
+						onClick={handleVerifyAndNavigate}
 						size="xsmall"
 						variant="neutral"
+						disabled={isVerifying}
 					>
-						I have added the DNS records
+						{isVerifying ? (
+							<>
+								<Button.Icon>
+									<Icon name="loader" className="h-4 w-4 animate-spin" />
+								</Button.Icon>
+								Verifying...
+							</>
+						) : (
+							"I have added the DNS records"
+						)}
 					</Button.Root>
 					<Button.Root
 						variant="neutral"
@@ -187,14 +229,22 @@ const NewDomainPage = () => {
 				</div>
 
 				<Button.Root
-					onClick={() => {
-						push(`/domain/${domainId}`);
-					}}
+					onClick={handleVerifyAndNavigate}
 					size="small"
 					variant="neutral"
 					className="mt-5"
+					disabled={isVerifying}
 				>
-					I have added the DNS records
+					{isVerifying ? (
+						<>
+							<Button.Icon>
+								<Icon name="loader" className="h-4 w-4 animate-spin" />
+							</Button.Icon>
+							Verifying...
+						</>
+					) : (
+						"I have added the DNS records"
+					)}
 				</Button.Root>
 			</div>
 		</div>
