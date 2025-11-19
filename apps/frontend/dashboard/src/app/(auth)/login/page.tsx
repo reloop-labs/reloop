@@ -54,7 +54,7 @@ const Page = () => {
 						}}
 						mode="stroke"
 						variant="neutral"
-						className="h-12 w-full"
+						className="h-11 w-full"
 					>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
@@ -84,7 +84,7 @@ const Page = () => {
 						disabled={loading.name === "github" && loading.loading}
 						mode="stroke"
 						variant="neutral"
-						className="h-12 w-full"
+						className="h-11 w-full"
 						onClick={async () => {
 							try {
 								setLoading({ name: "github", loading: true });
@@ -104,7 +104,7 @@ const Page = () => {
 						<Button.Root
 							mode="stroke"
 							variant="neutral"
-							className="h-12 w-full"
+							className="h-11 w-full"
 							onClick={() => setShowEmail(true)}
 						>
 							<Icon name="social-mail" className="h-[17.5px] w-[17.5px]" />

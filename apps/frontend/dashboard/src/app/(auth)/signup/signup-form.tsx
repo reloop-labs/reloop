@@ -137,7 +137,7 @@ export const SignupForm = () => {
 					<Input.Root hasError={!!errors.email}>
 						<Input.Wrapper>
 							<Input.Input
-								className="h-12 font-medium"
+								className="h-11 font-medium"
 								id="email"
 								type="email"
 								placeholder="hello@reloop.com"
@@ -160,7 +160,7 @@ export const SignupForm = () => {
 								id="password"
 								type={showPassword ? "text" : "password"}
 								placeholder="••••••••••"
-								className="h-12 font-medium"
+								className="h-11 font-medium"
 								{...register("password")}
 							/>
 							<button
@@ -197,7 +197,7 @@ export const SignupForm = () => {
 								id="confirmPassword"
 								type="password"
 								placeholder="••••••••••"
-								className="h-12 font-medium"
+								className="h-11 font-medium"
 								{...register("confirmPassword")}
 							/>
 						</Input.Wrapper>
@@ -212,7 +212,7 @@ export const SignupForm = () => {
 					type="submit"
 					disabled={status === "loading" || !isValid}
 					variant="neutral"
-					className="mt-4 h-12 w-full"
+					className="mt-4 h-11 w-full"
 				>
 					{status === "loading" && <Spinner color="var(--text-strong-950)" />}
 					{status === "loading" ? "Creating account..." : "Sign up"}

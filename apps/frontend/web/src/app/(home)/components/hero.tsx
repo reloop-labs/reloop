@@ -16,6 +16,7 @@ export default function Hero() {
 					href="/contact"
 					className={Button.buttonVariants({
 						variant: "neutral",
+						size: "small",
 					}).root({})}
 				>
 					Get Early Access
