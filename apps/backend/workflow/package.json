@@ -1,5 +1,5 @@
 {
-	"name": "inngest",
+	"name": "workflow",
 	"main": "src/index.ts",
 	"type": "module",
 	"scripts": {
@@ -16,8 +16,7 @@
 		"elysia": "catalog:backend",
 		"inngest": "catalog:backend",
 		"@reloop/db": "workspace:*",
-		"@reloop/logger": "workspace:*",
-		"@reloop/inngest": "workspace:*"
+		"@reloop/logger": "workspace:*"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",

@@ -18,15 +18,15 @@ export const landing = new Elysia()
 
 			return `
 ╔════════════════════════════════════════════════════════╗
-║                    INNGEST SERVICE                    ║
+║                   WORKFLOW SERVICE                     ║
 ╠════════════════════════════════════════════════════════╣
 ║                                                        ║
-║   ██╗███╗   ██╗███╗   ██╗ ██████╗ ███████╗███████╗████████╗║
-║   ██║████╗  ██║████╗  ██║██╔════╝██╔════╝██╔════╝╚══██╔══╝║
-║   ██║██╔██╗ ██║██╔██╗ ██║██║     █████╗  ███████╗   ██║   ║
-║   ██║██║╚██╗██║██║╚██╗██║██║     ██╔══╝  ╚════██║   ██║   ║
-║   ██║██║ ╚████║██║ ╚████║╚██████╗███████╗███████║   ██║   ║
-║   ╚═╝╚═╝  ╚═══╝╚═╝  ╚═══╝ ╚═════╝╚══════╝╚══════╝   ╚═╝   ║
+║   ██╗    ██╗ ██████╗ ██████╗ ██╗  ██╗██╗     ██╗      ║
+║   ██║    ██║██╔═══██╗██╔══██╗██║ ██╔╝██║     ██║      ║
+║   ██║ █╗ ██║██║   ██║██████╔╝█████╔╝ ██║     ██║      ║
+║   ██║███╗██║██║   ██║██╔══██╗██╔═██╗ ██║     ██║      ║
+║   ╚███╔███╔╝╚██████╔╝██║  ██║██║  ██╗███████╗███████╗ ║
+║    ╚══╝╚══╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚══════╝ ║
 ║                                                        ║
 ║                  ONLINE & READY                        ║
 ║                 Version: v1.0.0                        ║
@@ -37,12 +37,12 @@ export const landing = new Elysia()
 ${dbError ? `║ DB ERROR: ${dbError.substring(0, 50).padEnd(50)} ║` : "║                                                        ║"}
 ╠════════════════════════════════════════════════════════╣
 ║ QUICK START:                                           ║
-║ curl -X POST /api/inngest/event \\                       ║
+║ curl -X POST /api/workflow/event \\                       ║
 ║   -H "Content-Type: application/json" \\                ║
 ║   -d '{"name":"test/event","data":{}}'                 ║
 ╠════════════════════════════════════════════════════════╣
 ║ - SUPPORT                                              ║
-║ - https://reloop.sh/dev/setup/backend/inngest          ║
+║ - https://reloop.sh/dev/setup/backend/workflow         ║
 ║ - https://github.com/reloop-labs/reloop                ║
 ╠════════════════════════════════════════════════════════╣
 ║  "Automate workflows, deliver results"                  ║
@@ -59,8 +59,8 @@ ${dbError ? `║ DB ERROR: ${dbError.substring(0, 50).padEnd(50)} ║` : "║   
 		{
 			detail: {
 				tags: ["Service"],
-				summary: "Health check for Inngest Service",
-				description: "Checks the health of the Inngest Service",
+				summary: "Health check for Workflow Service",
+				description: "Checks the health of the Workflow Service",
 			},
 		},
 	)

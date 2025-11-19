@@ -15,7 +15,7 @@
 		"declarationMap": false,
 		"baseUrl": ".",
 		"paths": {
-			"@reloop/inngest/*": ["./src/*"]
+			"@reloop/workflow/*": ["./src/*"]
 		}
 	}
 }
