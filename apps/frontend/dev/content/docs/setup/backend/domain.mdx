@@ -71,13 +71,27 @@ The domain service uses two main tables to store domain and DNS record informati
 
 ### Enums
 
-The schema defines three enums used across the domain tables:
+The schema defines four enums used across the domain tables:
 
-| Enum | Value |
-|------|-------|
-| **Domain Type** | `custom`, `subdomain`, `system` |
-| **Domain Status** | `start-verify`, `verifying`, `active`, `suspended`, `failed` |
-| **DNS Record Type** | `A`, `AAAA`, `CNAME`, `MX`, `TXT`, `NS`, `SRV`, `CAA`, `SPF`, `DKIM`, `DMARC` |
+| Enum | Values | Description |
+|------|--------|-------------|
+| **Domain Type** (`domain_type`) | `custom`, `subdomain`, `system` | Type of domain: `custom` = user's own domain, `subdomain` = subdomain of user's domain, `system` = system-managed domain |
+| **Domain Status** (`domain_status`) | `start-verify`, `verifying`, `active`, `suspended`, `failed` | Verification and operational status of the domain |
+| **DNS Record Type** (`dns_record_type`) | `A`, `AAAA`, `CNAME`, `MX`, `TXT` | Standard DNS record types (RFC-compliant) |
+| **DNS Record Type Name** (`dns_record_type_name`) | `MX`, `SPF`, `DKIM`, `DMARC` | Semantic classification for email authentication records |
+
+**DNS Record Type:**
+- `A`: IPv4 address record
+- `AAAA`: IPv6 address record
+- `CNAME`: Canonical name record (alias)
+- `MX`: Mail exchange record (email routing)
+- `TXT`: Text record (used for SPF, DKIM, DMARC)
+
+**DNS Record Type Name:**
+- `MX`: Mail exchange record
+- `SPF`: Sender Policy Framework record (stored as TXT)
+- `DKIM`: DomainKeys Identified Mail record (stored as TXT)
+- `DMARC`: Domain-based Message Authentication record (stored as TXT)
 
 ### Domain Table
 
@@ -115,12 +129,14 @@ The `domain_dns_record` table stores individual DNS records associated with doma
 | `organizationId` | `text` | Not Null, FK → `organization.id` | - |
 | `userId` | `text` | Not Null, FK → `user.id` | - |
 | `recordType` | `dns_record_type` enum | Not Null | - |
+| `recordTypeName` | `dns_record_type_name` enum | Not Null | - |
 | `name` | `text` | Not Null | - |
 | `status` | `domain_status` enum | Not Null | `start-verify` |
 | `value` | `text` | Not Null | - |
 | `ttl` | `string` | Not Null | `Auto` |
 | `priority` | `integer` | Nullable | - |
 | `domain` | `text` | Not Null | - |
+| `privateKey` | `text` | Nullable | - |
 | `verificationError` | `text` | Nullable | - |
 | `deletedAt` | `timestamp` | Nullable | - |
 | `createdAt` | `timestamp` | Not Null | `now()` |
