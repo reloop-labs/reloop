@@ -1,17 +1,16 @@
 import "dotenv/config";
 import { landing } from "@be/workflow/routes/landing/landing.index";
-import cors from "@elysiajs/cors";
+import { workflowConfig } from "@be/workflow/utils/workflow.config";
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
 import { inngestRoutes } from "./routes/inngest/inngest.router";
 
-const port = 8017;
+const port = Number(workflowConfig.port);
 
 const workflowService = new Elysia({
 	prefix: "/api/workflow",
 	name: "Workflow Service",
 })
-	.use(cors())
 	.use(landing)
 	.use(inngestRoutes)
 	.listen(port, () => {
