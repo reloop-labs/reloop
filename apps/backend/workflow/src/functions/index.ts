@@ -30,7 +30,17 @@ export const verifyDomainFunction = inngest.createFunction(
 	{ id: "verify-domain", name: "Verify Domain" },
 	{ event: "verify/domain" },
 	async ({ event, step }) => {
-		const { domain, organizationId } = event.data;
+		const {
+			domain,
+			organizationId,
+			attempt = 0,
+			startedAt,
+		} = event.data as {
+			domain: string;
+			organizationId: string;
+			attempt?: number;
+			startedAt?: string; // ISO timestamp string
+		};
 
 		if (!domain || !organizationId) {
 			logger.error(
@@ -40,9 +50,27 @@ export const verifyDomainFunction = inngest.createFunction(
 			throw new Error("Missing required fields: domain or organizationId");
 		}
 
-		const result = await step.run("verify-dns-records", async () => {
-			logger.info({ domain, organizationId }, "Starting DNS verification");
+		// Set startedAt to now if this is the first attempt
+		const verificationStartedAt = startedAt ? new Date(startedAt) : new Date();
 
+		// Calculate elapsed time since verification started
+		const elapsedMs = Date.now() - verificationStartedAt.getTime();
+		const elapsedHours = elapsedMs / (1000 * 60 * 60);
+		const maxHours = 24;
+		const timeRemaining = maxHours - elapsedHours;
+
+		logger.info(
+			{
+				domain,
+				organizationId,
+				attempt: attempt + 1,
+				elapsedHours: elapsedHours.toFixed(2),
+				timeRemaining: timeRemaining.toFixed(2),
+			},
+			`Starting DNS verification (attempt ${attempt + 1}, ${timeRemaining.toFixed(2)}h remaining)`,
+		);
+
+		const result = await step.run("verify-dns-records", async () => {
 			// Fetch domain with DNS records
 			const domainWithRecords = await db.query.domain.findFirst({
 				where: and(
@@ -185,12 +213,129 @@ export const verifyDomainFunction = inngest.createFunction(
 			return verificationResult;
 		});
 
+		const isVerified = result.status === "active";
+		const verifiedCount = result.dnsRecords.filter((r) => r.isVerified).length;
+		const totalCount = result.dnsRecords.length;
+
+		// Check if 24 hours have passed
+		const hasTimeRemaining = elapsedHours < maxHours;
+
+		// If verification failed and we still have time (less than 24 hours), schedule next attempt
+		if (!isVerified && hasTimeRemaining) {
+			// Exponential backoff: 2min, 4min, 8min, 16min, 32min, 64min, 128min...
+			// But cap at 2 hours (120 minutes) to avoid too long waits
+			const backoffMinutes = Math.min(2 ** (attempt + 1), 120); // Max 2 hours
+			const backoffMs = backoffMinutes * 60 * 1000;
+
+			// Check if next retry would exceed 24 hours
+			const nextRetryTime = elapsedMs + backoffMs;
+			const nextRetryHours = nextRetryTime / (1000 * 60 * 60);
+
+			if (nextRetryHours >= maxHours) {
+				// If next retry would exceed 24 hours, stop now
+				logger.warn(
+					{
+						domain,
+						organizationId,
+						attempt: attempt + 1,
+						elapsedHours: elapsedHours.toFixed(2),
+					},
+					"Verification failed. 24-hour limit reached. Stopping retries.",
+				);
+
+				return {
+					success: false,
+					domain: result.domain,
+					status: result.status,
+					verifiedRecords: verifiedCount,
+					totalRecords: totalCount,
+					attempt: attempt + 1,
+					elapsedHours: elapsedHours.toFixed(2),
+					message: `Verification failed after 24 hours (${attempt + 1} attempts)`,
+				};
+			}
+
+			logger.info(
+				{
+					domain,
+					organizationId,
+					attempt: attempt + 1,
+					nextAttempt: attempt + 2,
+					backoffMinutes,
+					verifiedCount,
+					totalCount,
+					elapsedHours: elapsedHours.toFixed(2),
+					timeRemaining: (maxHours - nextRetryHours).toFixed(2),
+				},
+				`Verification failed. Scheduling retry in ${backoffMinutes} minutes`,
+			);
+
+			// Schedule next retry using step.sleep
+			await step.sleep(`retry-in-${backoffMinutes}-minutes`, backoffMs);
+
+			// Send event for next attempt
+			await step.sendEvent("schedule-next-retry", {
+				name: "verify/domain",
+				data: {
+					domain,
+					organizationId,
+					attempt: attempt + 1,
+					startedAt: verificationStartedAt.toISOString(), // Pass the original start time
+				},
+			});
+
+			return {
+				success: false,
+				domain: result.domain,
+				status: result.status,
+				verifiedRecords: verifiedCount,
+				totalRecords: totalCount,
+				attempt: attempt + 1,
+				elapsedHours: elapsedHours.toFixed(2),
+				timeRemaining: (maxHours - nextRetryHours).toFixed(2),
+				message: `Verification failed. Next retry scheduled in ${backoffMinutes} minutes (attempt ${attempt + 2}, ${(maxHours - nextRetryHours).toFixed(2)}h remaining)`,
+				nextAttemptIn: `${backoffMinutes} minutes`,
+			};
+		}
+
+		// Final result (either success or 24-hour limit reached)
+		if (!isVerified) {
+			logger.warn(
+				{
+					domain,
+					organizationId,
+					attempt: attempt + 1,
+					verifiedCount,
+					totalCount,
+					elapsedHours: elapsedHours.toFixed(2),
+				},
+				`Verification failed after 24 hours (${attempt + 1} attempts). Stopping retries.`,
+			);
+		} else {
+			logger.info(
+				{
+					domain,
+					organizationId,
+					attempt: attempt + 1,
+					verifiedCount,
+					totalCount,
+					elapsedHours: elapsedHours.toFixed(2),
+				},
+				"Domain verification successful!",
+			);
+		}
+
 		return {
-			success: true,
+			success: isVerified,
 			domain: result.domain,
 			status: result.status,
-			verifiedRecords: result.dnsRecords.filter((r) => r.isVerified).length,
-			totalRecords: result.dnsRecords.length,
+			verifiedRecords: verifiedCount,
+			totalRecords: totalCount,
+			attempt: attempt + 1,
+			elapsedHours: elapsedHours.toFixed(2),
+			message: isVerified
+				? "Domain verification successful!"
+				: `Verification failed after 24 hours (${attempt + 1} attempts)`,
 		};
 	},
 );
