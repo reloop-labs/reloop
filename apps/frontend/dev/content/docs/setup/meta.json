@@ -17,6 +17,7 @@
 		"backend/auth",
 		"backend/domain",
 		"backend/mail",
-		"backend/webhook"
+		"backend/webhook",
+		"backend/workflow"
 	]
 }

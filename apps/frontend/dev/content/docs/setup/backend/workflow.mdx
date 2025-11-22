@@ -1,0 +1,182 @@
+---
+title: Workflow
+description: Learn how to set up and run the Reloop Workflow Service for background job processing, domain verification, and automated workflows using Inngest.
+---
+
+# Workflow Service
+
+> Handles background job processing, automated domain verification with fixed-interval retries, and workflow orchestration using Inngest. This service ensures reliable, persistent background tasks that continue even if the service restarts.
+
+<Callout type="info" title="Prerequisite">
+Make sure you've completed the [local setup guide](/setup) first (clone repo, install Bun, and set up dependencies). You also need PostgreSQL and Redis running.
+</Callout>
+
+## Service Info
+
+| Property      | Value                                                          |
+| ------------- | -------------------------------------------------------------- |
+| **API Base URL** | [https://reloop.local/api/workflow](https://reloop.local/api/workflow) |
+| **Default Port** | `8017`                                                         |
+| **Location**  | `/apps/backend/workflow`                                         |
+| **Dependency** | `domain`, `db`                                                         |
+
+
+### Workflow Config Reference
+
+All configuration is accessed through `workflowConfig` and has default values defined in `apps/backend/workflow/src/utils/workflow.config.ts`.
+
+| Variable                      | Status      | Default                                                      |
+| ----------------------------- | ----------- | ------------------------------------------------------------ |
+| `PORT`                        | `optional`  | `8017`                                                       |
+| `domainVerification.maxAttempts` | `fixed`  | `10`                                                         |
+| `domainVerification.retryIntervalHours` | `fixed`  | `1`                                                         |
+
+
+### Start the Service
+
+```bash
+bun run --filter=workflow dev
+```
+
+**Expected output:**
+```
+Workflow Service is running on http://localhost:8017/api/workflow
+```
+
+### Verify Service is Running
+
+```bash
+# Check health endpoint
+curl http://localhost:8017/api/workflow/
+```
+
+**Expected response:** Service status with service information.
+
+---
+
+## Workflow Functions
+
+The workflow service uses [Inngest](https://www.inngest.com/) for background job processing. All workflow functions are defined in `apps/backend/workflow/src/functions/index.ts`.
+
+### Domain Verification Function
+
+The `verifyDomainFunction` automatically verifies DNS records with fixed 1-hour interval retries.
+
+**Event Name:** `verify/domain`
+
+**Event Data:**
+```typescript
+{
+  domain: string;
+  organizationId: string;
+  attempt?: number;        // Optional: current retry attempt (default: 0)
+}
+```
+
+**Note:** `maxAttempts` and `retryIntervalHours` are configured in `workflowConfig.domainVerification` and are not passed in the event data.
+
+**How It Works:**
+
+1. **Initial Attempt**: Verifies all DNS records (MX, SPF, DKIM, DMARC) immediately
+2. **Fixed Interval Retries**: If verification fails, retries every 1 hour:
+   - Attempt 1: Immediate
+   - Attempt 2: After 1 hour
+   - Attempt 3: After 1 hour (2 hours total)
+   - Attempt 4: After 1 hour (3 hours total)
+   - ...continues every 1 hour...
+   - Attempt 10: After 1 hour (9 hours total)
+3. **Maximum Attempts**: Stops after 10 attempts (default)
+4. **Automatic Stop**: Stops when verification succeeds or 10 attempts are reached
+
+**Status Updates:**
+
+- Sets domain and DNS records status to `"verifying"` at start of each attempt
+- Updates individual DNS record status: `"active"` if verified, `"failed"` if not verified
+- Updates domain status to `"active"` if all records verify successfully
+- Sets status back to `"verifying"` when scheduling next retry (if attempts remaining)
+- Updates domain status to `"failed"` if verification fails after all 10 attempts
+- DNS records keep their individual status (`"active"` or `"failed"`) based on last verification result
+---
+
+## Inngest Integration
+
+### Inngest Client
+
+The Inngest client is defined in `apps/backend/workflow/src/functions/index.ts`:
+
+```typescript
+export const inngest = new Inngest({
+  id: "workflow",
+  name: "Reloop Workflows",
+});
+```
+
+### Webhook Endpoint
+
+The service exposes a webhook endpoint for Inngest to trigger workflows:
+
+```
+POST /api/workflow/v1
+```
+
+This endpoint is handled by `apps/backend/workflow/src/routes/inngest/inngest.router.ts` and automatically routes events to registered workflow functions.
+
+### Local Development
+
+For local development, use the Inngest Dev Server:
+
+```bash
+npx inngest-cli dev
+```
+
+This will:
+- Start Inngest Dev Server on `http://localhost:8288`
+- Provide a web UI to monitor workflow executions
+- Automatically discover and register your workflow functions
+
+---
+
+## Service Architecture
+
+### File Structure
+
+```
+apps/backend/workflow/
+├── src/
+│   ├── functions/
+│   │   └── index.ts          # Inngest client and workflow functions
+│   ├── routes/
+│   │   ├── inngest/
+│   │   │   └── inngest.router.ts  # Webhook handler for Inngest
+│   │   └── landing/
+│   │       └── landing.index.ts   # Health check endpoint
+│   ├── utils/
+│   │   └── workflow.config.ts     # Service configuration
+│   └── index.ts                    # Service entry point
+```
+
+### Key Components
+
+1. **Inngest Client** (`src/functions/index.ts`): Centralized Inngest client instance
+2. **Workflow Functions** (`src/functions/index.ts`): Background job definitions
+3. **Webhook Handler** (`src/routes/inngest/inngest.router.ts`): Receives events from Inngest
+4. **Config** (`src/utils/workflow.config.ts`): Service configuration (port)
+
+### Dependencies
+
+- **Inngest**: Workflow orchestration and background job processing
+- **ElysiaJS**: Web framework for API endpoints
+- **@reloop/db**: Database client for domain verification
+- **@reloop/logger**: Logging utilities
+
+---
+
+## Production Deployment
+
+In production, configure Inngest to point to your deployed workflow service:
+
+```bash
+INNGEST_BASE_URL=https://your-workflow-service.com/api/workflow/v1
+```
+
+The workflow service will automatically register its functions with Inngest on startup.

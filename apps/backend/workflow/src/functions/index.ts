@@ -5,6 +5,7 @@ import {
 	verifyMxRecord,
 	verifySpfRecord,
 } from "@be/domain/utils/verify-dns-records";
+import { workflowConfig } from "@be/workflow/utils/workflow.config";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
@@ -24,13 +25,13 @@ export const verifyDomainFunction = inngest.createFunction(
 			domain,
 			organizationId,
 			attempt = 0,
-			startedAt,
 		} = event.data as {
 			domain: string;
 			organizationId: string;
 			attempt?: number;
-			startedAt?: string; // ISO timestamp string
 		};
+
+		const maxAttempts = workflowConfig.domainVerification.maxAttempts;
 
 		if (!domain || !organizationId) {
 			logger.error(
@@ -40,24 +41,14 @@ export const verifyDomainFunction = inngest.createFunction(
 			throw new Error("Missing required fields: domain or organizationId");
 		}
 
-		// Set startedAt to now if this is the first attempt
-		const verificationStartedAt = startedAt ? new Date(startedAt) : new Date();
-
-		// Calculate elapsed time since verification started
-		const elapsedMs = Date.now() - verificationStartedAt.getTime();
-		const elapsedHours = elapsedMs / (1000 * 60 * 60);
-		const maxHours = 24;
-		const timeRemaining = maxHours - elapsedHours;
-
 		logger.info(
 			{
 				domain,
 				organizationId,
 				attempt: attempt + 1,
-				elapsedHours: elapsedHours.toFixed(2),
-				timeRemaining: timeRemaining.toFixed(2),
+				maxAttempts,
 			},
-			`Starting DNS verification (attempt ${attempt + 1}, ${timeRemaining.toFixed(2)}h remaining)`,
+			`Starting DNS verification (attempt ${attempt + 1}/${maxAttempts})`,
 		);
 
 		const result = await step.run("verify-dns-records", async () => {
@@ -153,6 +144,14 @@ export const verifyDomainFunction = inngest.createFunction(
 				}),
 			);
 
+			// Check if verification will succeed before updating status
+			const verifiedCount = verificationResults.filter(
+				(r) => r.isVerified,
+			).length;
+			const isAllVerified =
+				verifiedCount === verificationResults.length &&
+				verificationResults.length > 0;
+
 			// Update all DNS records and domain status in one transaction
 			await db.transaction(async (tx) => {
 				await Promise.all(
@@ -166,15 +165,8 @@ export const verifyDomainFunction = inngest.createFunction(
 							.where(eq(schema.domainDnsRecord.id, result.id)),
 					),
 				);
-				const verifiedCount = verificationResults.filter(
-					(r) => r.isVerified,
-				).length;
 
-				const domainStatus =
-					verifiedCount === verificationResults.length &&
-					verificationResults.length > 0
-						? "active"
-						: "failed";
+				const domainStatus = isAllVerified ? "active" : "failed";
 				await tx
 					.update(schema.domain)
 					.set({
@@ -207,43 +199,21 @@ export const verifyDomainFunction = inngest.createFunction(
 		const verifiedCount = result.dnsRecords.filter((r) => r.isVerified).length;
 		const totalCount = result.dnsRecords.length;
 
-		// Check if 24 hours have passed
-		const hasTimeRemaining = elapsedHours < maxHours;
+		// If verification failed and we have retries left, schedule next attempt
+		if (!isVerified && attempt < maxAttempts - 1) {
+			// Set status back to "verifying" since we're going to retry
+			await db
+				.update(schema.domain)
+				.set({ status: "verifying" })
+				.where(eq(schema.domain.id, result.id));
+			await db
+				.update(schema.domainDnsRecord)
+				.set({ status: "verifying" })
+				.where(eq(schema.domainDnsRecord.domainId, result.id));
 
-		// If verification failed and we still have time (less than 24 hours), schedule next attempt
-		if (!isVerified && hasTimeRemaining) {
-			// Exponential backoff: 2min, 4min, 8min, 16min, 32min, 64min, 128min...
-			// But cap at 2 hours (120 minutes) to avoid too long waits
-			const backoffMinutes = Math.min(2 ** (attempt + 1), 120); // Max 2 hours
-			const backoffMs = backoffMinutes * 60 * 1000;
-
-			// Check if next retry would exceed 24 hours
-			const nextRetryTime = elapsedMs + backoffMs;
-			const nextRetryHours = nextRetryTime / (1000 * 60 * 60);
-
-			if (nextRetryHours >= maxHours) {
-				// If next retry would exceed 24 hours, stop now
-				logger.warn(
-					{
-						domain,
-						organizationId,
-						attempt: attempt + 1,
-						elapsedHours: elapsedHours.toFixed(2),
-					},
-					"Verification failed. 24-hour limit reached. Stopping retries.",
-				);
-
-				return {
-					success: false,
-					domain: result.domain,
-					status: result.status,
-					verifiedRecords: verifiedCount,
-					totalRecords: totalCount,
-					attempt: attempt + 1,
-					elapsedHours: elapsedHours.toFixed(2),
-					message: `Verification failed after 24 hours (${attempt + 1} attempts)`,
-				};
-			}
+			// Get retry interval from config
+			const backoffHours = workflowConfig.domainVerification.retryIntervalHours;
+			const backoffMs = backoffHours * 60 * 60 * 1000; // Convert hours to milliseconds
 
 			logger.info(
 				{
@@ -251,17 +221,15 @@ export const verifyDomainFunction = inngest.createFunction(
 					organizationId,
 					attempt: attempt + 1,
 					nextAttempt: attempt + 2,
-					backoffMinutes,
+					maxAttempts,
 					verifiedCount,
 					totalCount,
-					elapsedHours: elapsedHours.toFixed(2),
-					timeRemaining: (maxHours - nextRetryHours).toFixed(2),
 				},
-				`Verification failed. Scheduling retry in ${backoffMinutes} minutes`,
+				`Verification failed. Scheduling retry in ${backoffHours} hour (attempt ${attempt + 2}/${maxAttempts})`,
 			);
 
 			// Schedule next retry using step.sleep
-			await step.sleep(`retry-in-${backoffMinutes}-minutes`, backoffMs);
+			await step.sleep(`retry-in-${backoffHours}-hour`, backoffMs);
 
 			// Send event for next attempt
 			await step.sendEvent("schedule-next-retry", {
@@ -270,7 +238,7 @@ export const verifyDomainFunction = inngest.createFunction(
 					domain,
 					organizationId,
 					attempt: attempt + 1,
-					startedAt: verificationStartedAt.toISOString(), // Pass the original start time
+					// maxAttempts is not passed - will use default from config
 				},
 			});
 
@@ -281,25 +249,31 @@ export const verifyDomainFunction = inngest.createFunction(
 				verifiedRecords: verifiedCount,
 				totalRecords: totalCount,
 				attempt: attempt + 1,
-				elapsedHours: elapsedHours.toFixed(2),
-				timeRemaining: (maxHours - nextRetryHours).toFixed(2),
-				message: `Verification failed. Next retry scheduled in ${backoffMinutes} minutes (attempt ${attempt + 2}, ${(maxHours - nextRetryHours).toFixed(2)}h remaining)`,
-				nextAttemptIn: `${backoffMinutes} minutes`,
+				maxAttempts,
+				message: `Verification failed. Next retry scheduled in ${backoffHours} hour (attempt ${attempt + 2}/${maxAttempts})`,
+				nextAttemptIn: `${backoffHours} hour`,
 			};
 		}
 
-		// Final result (either success or 24-hour limit reached)
+		// Final result (either success or max attempts reached)
 		if (!isVerified) {
+			// Update domain status to "failed" since all attempts are exhausted
+			// DNS records status is already set correctly (active/failed) from the last verification
+			await db
+				.update(schema.domain)
+				.set({ status: "failed" })
+				.where(eq(schema.domain.id, result.id));
+
 			logger.warn(
 				{
 					domain,
 					organizationId,
 					attempt: attempt + 1,
+					maxAttempts,
 					verifiedCount,
 					totalCount,
-					elapsedHours: elapsedHours.toFixed(2),
 				},
-				`Verification failed after 24 hours (${attempt + 1} attempts). Stopping retries.`,
+				`Verification failed after ${maxAttempts} attempts. Stopping retries.`,
 			);
 		} else {
 			logger.info(
@@ -307,9 +281,9 @@ export const verifyDomainFunction = inngest.createFunction(
 					domain,
 					organizationId,
 					attempt: attempt + 1,
+					maxAttempts,
 					verifiedCount,
 					totalCount,
-					elapsedHours: elapsedHours.toFixed(2),
 				},
 				"Domain verification successful!",
 			);
@@ -318,14 +292,14 @@ export const verifyDomainFunction = inngest.createFunction(
 		return {
 			success: isVerified,
 			domain: result.domain,
-			status: result.status,
+			status: isVerified ? "active" : "failed",
 			verifiedRecords: verifiedCount,
 			totalRecords: totalCount,
 			attempt: attempt + 1,
-			elapsedHours: elapsedHours.toFixed(2),
+			maxAttempts,
 			message: isVerified
 				? "Domain verification successful!"
-				: `Verification failed after 24 hours (${attempt + 1} attempts)`,
+				: `Verification failed after ${maxAttempts} attempts`,
 		};
 	},
 );
