@@ -113,9 +113,18 @@ export const DomainHeader = ({
 								size="small"
 								className="font-semibold"
 								onClick={onVerify}
-								disabled={isVerifying}
+								disabled={isVerifying || status === "verifying"}
 							>
-								{isVerifying ? "Verifying..." : "Verify DNS Records"}
+								{isVerifying || status === "verifying" ? (
+									<>
+										<Button.Icon>
+											<Icon name="loader" className="h-4 w-4 animate-spin" />
+										</Button.Icon>
+										Verifying...
+									</>
+								) : (
+									"Verify DNS Records"
+								)}
 							</Button.Root>
 							<PopoverRoot>
 								<PopoverTrigger asChild>

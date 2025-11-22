@@ -45,23 +45,26 @@ const NewDomainPage = () => {
 
 		setIsVerifying(true);
 		try {
+			// Trigger Inngest workflow for background verification
 			await axios.post(
 				"/api/domain/v1/verify",
 				{ domain: domainData.domain },
 				{ headers: { credentials: "include" } },
 			);
 
-			// Refresh domain data after verification
+			// Refresh domain data to get "verifying" status
 			await mutate(`/api/domain/v1/${domainId}`);
 
-			toast.success("DNS records verified successfully");
+			toast.success(
+				"DNS verification started! Verification will continue in the background.",
+			);
 
-			// Navigate to domain detail page after successful verification
+			// Navigate to domain detail page to see verification progress
 			push(`/domain/${domainId}`);
 		} catch (error) {
 			const errorMessage = axios.isAxiosError(error)
-				? error.response?.data?.message || "Failed to verify DNS records"
-				: "Failed to verify DNS records";
+				? error.response?.data?.message || "Failed to start DNS verification"
+				: "Failed to start DNS verification";
 			toast.error(errorMessage);
 		} finally {
 			setIsVerifying(false);
