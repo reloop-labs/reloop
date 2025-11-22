@@ -3,6 +3,7 @@
 import { getStatusColorClass, getStatusIcon } from "@fe/dashboard/utils/domain";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import type { Domain, DomainStatus } from "@reloop/api/types";
+import { logger } from "@reloop/logger";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import {
@@ -37,6 +38,7 @@ export const DomainHeader = ({
 	const { back } = useRouter();
 	const [, setDeleteId] = useQueryState("delete");
 
+	logger.info({ isVerifying }, "isVerifying");
 	return (
 		<div className="pt-10 pb-8">
 			<Button.Root

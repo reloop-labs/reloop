@@ -1,16 +1,9 @@
-import {
-	helloWorldFunction,
-	inngest,
-	verifyDomainFunction,
-} from "@be/workflow/functions";
+import { inngest, verifyDomainFunction } from "@be/workflow/functions";
 import Elysia from "elysia";
 import type { InngestFunction } from "inngest";
 import { serve } from "inngest/bun";
 
-const functions: InngestFunction.Like[] = [
-	helloWorldFunction,
-	verifyDomainFunction,
-];
+const functions: InngestFunction.Like[] = [verifyDomainFunction];
 
 const handler = serve({ client: inngest, functions });
 

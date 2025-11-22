@@ -16,16 +16,6 @@ export const inngest = new Inngest({
 	name: "Reloop Workflows",
 });
 
-export const helloWorldFunction = inngest.createFunction(
-	{ id: "hello-world", name: "Hello World" },
-	{ event: "test/hello-world" },
-	async ({ event, step }) => {
-		await step.run("hello-world", async () => {
-			logger.info("Hello, world!");
-		});
-	},
-);
-
 export const verifyDomainFunction = inngest.createFunction(
 	{ id: "verify-domain", name: "Verify Domain" },
 	{ event: "verify/domain" },

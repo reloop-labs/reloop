@@ -1,21 +1,22 @@
 {
-	"extends": "@reloop/tsconfig/base.json",
-	"compilerOptions": {
-		"target": "ESNext",
-		"module": "ESNext",
-		"moduleResolution": "bundler",
-		"verbatimModuleSyntax": true,
-		"strict": true,
-		"skipLibCheck": true,
-		"outDir": "./dist",
-		"types": ["bun"],
-		"composite": false,
-		"jsx": "react-jsx",
-		"declaration": false,
-		"declarationMap": false,
-		"baseUrl": ".",
-		"paths": {
-			"@be/domain/*": ["./src/*"]
-		}
-	}
+  "extends": "@reloop/tsconfig/base.json",
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "verbatimModuleSyntax": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "outDir": "./dist",
+    "types": ["bun"],
+    "composite": false,
+    "jsx": "react-jsx",
+    "declaration": false,
+    "declarationMap": false,
+    "baseUrl": ".",
+    "paths": {
+      "@be/domain/*": ["./src/*"],
+      "@be/workflow/*": ["../workflow/src/*"]
+    }
+  }
 }
