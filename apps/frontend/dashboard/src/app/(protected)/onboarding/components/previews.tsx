@@ -5,11 +5,12 @@ import { LayoutDashboard, Mail, Server, ShieldCheck } from "lucide-react";
 interface SidebarPreviewProps {
 	name?: string;
 	logo?: string | null;
+	slug?: string;
 }
 
-export const SidebarPreview = ({ name, logo }: SidebarPreviewProps) => {
+export const SidebarPreview = ({ name, logo, slug }: SidebarPreviewProps) => {
 	return (
-		<div className="flex h-[500px] w-full flex-col overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-2xl">
+		<div className="flex h-full w-full flex-col overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-2xl">
 			<div className="flex items-center gap-2 border-stroke-soft-100 border-b bg-bg-white-0 p-3">
 				<div className="flex gap-1.5">
 					<div className="h-3 w-3 rounded-full bg-error-base/80" />
@@ -17,7 +18,7 @@ export const SidebarPreview = ({ name, logo }: SidebarPreviewProps) => {
 					<div className="h-3 w-3 rounded-full bg-success-base/80" />
 				</div>
 				<div className="ml-4 flex-1 rounded-md bg-bg-weak-50 px-3 py-1 text-center font-mono text-text-soft-400 text-xs">
-					app.mailinfra.com/dashboard
+					reloop.sh/dashboard/{slug}
 				</div>
 			</div>
 			<div className="flex flex-1 overflow-hidden">

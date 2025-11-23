@@ -5,14 +5,13 @@ import * as FileUpload from "@reloop/ui/file-upload";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
-import { Upload } from "lucide-react";
 import { parseAsInteger, useQueryState } from "nuqs";
 import type React from "react";
 
 interface CreateOrgStepProps {
 	data: {
 		name: string;
-		url: string;
+		slug: string;
 		logo: File | null;
 		logoPreview: string | null;
 		country: string;
@@ -23,6 +22,7 @@ interface CreateOrgStepProps {
 
 export const CreateOrgStep = ({ data, updateData }: CreateOrgStepProps) => {
 	const [step, setStep] = useQueryState("step", parseAsInteger.withDefault(1));
+
 	const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (file) {
@@ -38,7 +38,7 @@ export const CreateOrgStep = ({ data, updateData }: CreateOrgStepProps) => {
 		setStep(step + 1);
 		updateData({
 			name: data.name,
-			url: data.url.toLowerCase().replace(/\s+/g, "-"),
+			slug: data.slug.toLowerCase().replace(/\s+/g, "-"),
 		});
 	};
 
@@ -73,10 +73,11 @@ export const CreateOrgStep = ({ data, updateData }: CreateOrgStepProps) => {
 							id="company-name"
 							type="text"
 							value={data.name}
+							className="font-semibold"
 							onChange={(e) =>
 								updateData({
 									name: e.target.value,
-									url: e.target.value.toLowerCase().replace(/\s+/g, "-"),
+									slug: e.target.value.toLowerCase().replace(/\s+/g, "-"),
 								})
 							}
 							placeholder="e.g. Acme Corp"
@@ -94,8 +95,13 @@ export const CreateOrgStep = ({ data, updateData }: CreateOrgStepProps) => {
 						<Input.Input
 							id="workspace-handle"
 							type="text"
-							value={data.url}
-							onChange={(e) => updateData({ url: e.target.value })}
+							className="font-semibold"
+							value={data.slug}
+							onChange={(e) =>
+								updateData({
+									slug: e.target.value.toLowerCase().replace(/\s+/g, "-"),
+								})
+							}
 						/>
 					</Input.Wrapper>
 				</Input.Root>

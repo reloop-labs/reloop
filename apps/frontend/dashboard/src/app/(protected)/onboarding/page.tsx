@@ -16,7 +16,7 @@ import { GenerateApiKeyStep } from "./steps/generate-api-key";
 
 interface FormData {
 	name: string;
-	url: string;
+	slug: string;
 	logo: File | null;
 	logoPreview: string | null;
 	apiKey: string;
@@ -26,10 +26,10 @@ interface FormData {
 }
 
 const OnBoardingPage = () => {
-	const [step, setStep] = useQueryState("step", parseAsInteger.withDefault(1));
+	const [step] = useQueryState("step", parseAsInteger.withDefault(1));
 	const [formData, setFormData] = useState<FormData>({
 		name: "",
-		url: "",
+		slug: "",
 		logo: null,
 		logoPreview: null,
 		apiKey: "",
@@ -49,7 +49,7 @@ const OnBoardingPage = () => {
 			title: "Create your workspace",
 			component: <CreateOrgStep data={formData} updateData={updateData} />,
 			preview: (
-				<SidebarPreview name={formData.name} logo={formData.logoPreview} />
+				<SidebarPreview slug={formData.slug} logo={formData.logoPreview} />
 			),
 		},
 		2: {
