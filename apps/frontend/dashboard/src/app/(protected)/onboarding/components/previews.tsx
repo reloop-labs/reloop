@@ -12,7 +12,7 @@ interface SidebarPreviewProps {
 export const SidebarPreview = ({ name, logo, slug }: SidebarPreviewProps) => {
 	return (
 		<div className="absolute top-32 left-28">
-			<div className="relative flex h-[520px] w-full flex-col overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-2xl">
+			<div className="relative flex h-[520px] w-[480px] flex-col overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-2xl">
 				<div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-bg-white-0 to-transparent" />
 				<div className="flex items-center gap-2 border-stroke-soft-100 border-b bg-bg-white-0 p-3">
 					<div className="flex gap-1.5">
