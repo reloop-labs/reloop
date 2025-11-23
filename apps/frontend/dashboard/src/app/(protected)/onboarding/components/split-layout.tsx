@@ -24,7 +24,7 @@ export const SplitLayout = ({
 		<div className="flex min-h-screen flex-col items-center justify-center">
 			<div className="mx-auto flex max-w-6xl flex-1 flex-col items-center justify-center border-stroke-soft-200 border-r border-l">
 				<div className="w-full border-stroke-soft-200 border-t" />
-				<div className="mx-auto flex h-full bg-bg-white-0 text-text-strong-950">
+				<div className="mx-auto grid h-full grid-cols-2">
 					<div className="flex flex-col gap-6 p-10">
 						<div className="flex gap-2">
 							{onBack && (
