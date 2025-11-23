@@ -22,6 +22,7 @@
 		"next-themes": "catalog:ui",
 		"nuqs": "catalog:ui",
 		"react": "catalog:ui",
+		"shiki": "catalog:ui",
 		"react-dom": "catalog:ui",
 		"react-hook-form": "catalog:ui",
 		"sonner": "catalog:ui",
