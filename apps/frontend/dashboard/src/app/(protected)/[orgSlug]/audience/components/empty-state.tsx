@@ -7,7 +7,7 @@ export const EmptyState = () => {
 	const { activeOrganization } = useUserOrganization();
 
 	return (
-		<div>
+		<div className="sm:px-8">
 			<div className="flex h-[calc(100dvh-400px)] items-center justify-center">
 				<div className="flex flex-col items-center justify-center gap-4">
 					<Icon name="users" className="h-12 w-12" />

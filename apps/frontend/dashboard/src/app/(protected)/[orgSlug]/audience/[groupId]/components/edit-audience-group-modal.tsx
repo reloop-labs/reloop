@@ -98,9 +98,7 @@ export const EditAudienceGroupModal = ({
 			<Modal.Content className="data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom-4 data-[state=open]:zoom-in-95 data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-bottom-4 data-[state=closed]:zoom-out-95 max-w-md duration-200 data-[state=closed]:animate-out data-[state=open]:animate-in">
 				<form onSubmit={handleSubmit(onSubmit)}>
 					<Modal.Body>
-						<h2 className="mb-2 font-semibold text-gray-900 text-xl">
-							Edit Audience Group
-						</h2>
+						<h2 className="mb-2 font-semibold text-xl">Edit Audience Group</h2>
 						<p className="text-gray-600 text-sm">
 							Update the name and description of your audience group
 						</p>
@@ -109,7 +107,7 @@ export const EditAudienceGroupModal = ({
 							<div>
 								<Label.Root
 									htmlFor="edit-name"
-									className="mb-2 block font-medium text-gray-700 text-sm"
+									className="mb-2 block font-medium text-sm"
 								>
 									Group Name
 									<Label.Asterisk />
@@ -144,7 +142,7 @@ export const EditAudienceGroupModal = ({
 							<div>
 								<Label.Root
 									htmlFor="edit-description"
-									className="mb-2 block font-medium text-gray-700 text-sm"
+									className="mb-2 block font-medium text-sm"
 								>
 									Description (Optional)
 								</Label.Root>

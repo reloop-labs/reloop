@@ -3,7 +3,7 @@ import { Icon } from "@reloop/ui/icon";
 
 export const EmptyState = () => {
 	return (
-		<div className="mt-20 flex items-center justify-center">
+		<div className="mt-20 flex items-center justify-center sm:px-8">
 			<div className="flex flex-col items-center justify-center gap-4">
 				<Icon name="users" className="h-12 w-12" />
 				<div>

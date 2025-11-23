@@ -117,7 +117,7 @@ export const AddAudience = ({
 		<Modal.Root open={open} onOpenChange={onOpenChange}>
 			<Modal.Content className="data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom-4 data-[state=open]:zoom-in-95 data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-bottom-4 data-[state=closed]:zoom-out-95 max-w-md duration-200 data-[state=closed]:animate-out data-[state=open]:animate-in">
 				<Modal.Body>
-					<h2 className="mb-2 font-semibold text-gray-900 text-xl">
+					<h2 className="mb-2 font-semibold text-xl">
 						Add Audience to "{groupName}"
 					</h2>
 					<p className="mb-4 text-gray-600 text-sm">
@@ -129,7 +129,7 @@ export const AddAudience = ({
 						<div>
 							<Label.Root
 								htmlFor="email"
-								className="mb-2 block font-medium text-gray-700 text-sm"
+								className="mb-2 block font-medium text-sm"
 							>
 								Email Address
 								<Label.Asterisk />
@@ -161,7 +161,7 @@ export const AddAudience = ({
 							<div>
 								<Label.Root
 									htmlFor="firstName"
-									className="mb-2 block font-medium text-gray-700 text-sm"
+									className="mb-2 block font-medium text-sm"
 								>
 									First Name
 								</Label.Root>
@@ -194,7 +194,7 @@ export const AddAudience = ({
 							<div>
 								<Label.Root
 									htmlFor="lastName"
-									className="mb-2 block font-medium text-gray-700 text-sm"
+									className="mb-2 block font-medium text-sm"
 								>
 									Last Name
 								</Label.Root>
@@ -228,7 +228,7 @@ export const AddAudience = ({
 						<div>
 							<Label.Root
 								htmlFor="status"
-								className="mb-2 block font-medium text-gray-700 text-sm"
+								className="mb-2 block font-medium text-sm"
 							>
 								Subscription Status
 							</Label.Root>

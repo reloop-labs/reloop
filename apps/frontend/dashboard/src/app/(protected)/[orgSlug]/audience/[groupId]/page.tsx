@@ -145,7 +145,7 @@ const AudienceGroupPage = () => {
 	});
 
 	return (
-		<div className="mx-auto max-w-3xl">
+		<div className="mx-auto max-w-3xl sm:px-8">
 			<AudienceGroupHeader
 				group={groupData || null}
 				isLoading={groupLoading}

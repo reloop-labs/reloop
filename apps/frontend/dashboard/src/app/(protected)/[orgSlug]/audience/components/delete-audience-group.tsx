@@ -1,4 +1,5 @@
 "use client";
+import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import type { AudienceGroup } from "@reloop/api/types";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
@@ -6,6 +7,7 @@ import * as Input from "@reloop/ui/input";
 import * as Kbd from "@reloop/ui/kbd";
 import * as Modal from "@reloop/ui/modal";
 import axios from "axios";
+import { usePathname, useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -23,8 +25,16 @@ export const DeleteAudienceGroupModal = ({
 	const [confirmationText, setConfirmationText] = useState("");
 	const [isCopied, setIsCopied] = useState(false);
 	const { mutate } = useSWRConfig();
+	const { activeOrganization } = useUserOrganization();
+	const pathname = usePathname();
+	const router = useRouter();
 
 	const groupToDelete = audienceGroups.find((group) => group.id === deleteId);
+
+	const isOnDetailPage =
+		pathname?.includes("/audience/") &&
+		!pathname?.includes("/audience/add") &&
+		pathname !== `/${activeOrganization?.slug}/audience`;
 
 	useEffect(() => {
 		if (isCopied) {
@@ -46,8 +56,15 @@ export const DeleteAudienceGroupModal = ({
 			await mutate("/api/audience/v1/groups/list");
 
 			toast.success(`${groupToDelete.name} deleted successfully`);
+
 			setDeleteId(null);
 			setConfirmationText("");
+
+			if (isOnDetailPage && activeOrganization) {
+				setTimeout(() => {
+					router.push(`/${activeOrganization.slug}/audience`);
+				}, 100);
+			}
 		} catch (error) {
 			const errorMessage = axios.isAxiosError(error)
 				? error.response?.data?.message || "Failed to delete audience group"
@@ -78,7 +95,7 @@ export const DeleteAudienceGroupModal = ({
 					}}
 				>
 					<Modal.Body>
-						<h2 className="mb-2 font-semibold text-gray-900 text-xl">
+						<h2 className="mb-2 font-semibold text-xl">
 							Delete Audience Group
 						</h2>
 						<p className="text-gray-600 text-sm">
@@ -89,9 +106,9 @@ export const DeleteAudienceGroupModal = ({
 						</p>
 
 						<div className="mb-4">
-							<p className="mb-2 text-gray-700 text-sm">
+							<p className="mb-2 text-sm">
 								Type{" "}
-								<span className="inline-flex items-center gap-1 rounded-md bg-gray-100 px-2 py-1 font-mono text-gray-800 text-xs">
+								<span className="inline-flex items-center gap-1 rounded-md bg-bg-weak-50 px-2 py-1 font-mono text-xs">
 									{groupToDelete?.name}
 									<button
 										type="button"
