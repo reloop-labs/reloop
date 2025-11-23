@@ -27,9 +27,9 @@ export const SplitLayout = ({
 }: SplitLayoutProps) => {
 	return (
 		<div className="flex min-h-screen flex-col items-center justify-center">
-			<div className="w-full border-stroke-soft-200 border-t" />
-			<div className="flex flex-1 items-center justify-center border-stroke-soft-200 border-r border-l">
-				<div className="mx-auto flex h-full max-w-6xl bg-bg-white-0 text-text-strong-950">
+			<div className="flex flex-1 flex-col items-center justify-center border-stroke-soft-200 border-r border-l">
+				<div className="w-full border-stroke-soft-200 border-t" />
+				<div className="mx-auto flex h-full bg-bg-white-0 text-text-strong-950">
 					<div className="flex flex-col gap-6 border-stroke-soft-200 border-r p-8">
 						<div className="flex gap-2">
 							{onBack && (
@@ -73,8 +73,8 @@ export const SplitLayout = ({
 						</div>
 					</div>
 				</div>
+				<div className="w-full border-stroke-soft-200 border-b" />
 			</div>
-			<div className="w-full border-stroke-soft-200 border-b" />
 		</div>
 	);
 };
