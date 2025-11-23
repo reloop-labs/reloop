@@ -42,35 +42,11 @@ const OnBoardingPage = () => {
 		setFormData((prev) => ({ ...prev, ...newData }));
 	};
 
-	const canProceed = () => {
-		if (step === 1) return formData.name.length > 0;
-		if (step === 2) return formData.apiKey.length > 0;
-		if (step === 3) return true;
-		return false;
-	};
-
-	const handleNext = () => {
-		if (canProceed()) {
-			if (step === 3) {
-				setStep(4);
-			} else {
-				setStep(step + 1);
-			}
-		}
-	};
-
-	const handlePrevious = () => {
-		if (step > 1) {
-			setStep(step - 1);
-		}
-	};
-
 	// Configuration for each step
 	const stepsConfig = {
 		1: {
 			stepIndicator: "1/3",
 			title: "Create your workspace",
-			description: "Let's set up your team's environment.",
 			component: <CreateOrgStep data={formData} updateData={updateData} />,
 			preview: (
 				<SidebarPreview name={formData.name} logo={formData.logoPreview} />
@@ -79,14 +55,12 @@ const OnBoardingPage = () => {
 		2: {
 			stepIndicator: "2/3",
 			title: "Generate API Credentials",
-			description: "Securely connect your application to our infrastructure.",
 			component: <GenerateApiKeyStep data={formData} updateData={updateData} />,
 			preview: <ApiPreview apiKey={formData.apiKey} />,
 		},
 		3: {
 			stepIndicator: "3/3",
 			title: "Verify Sending Domain",
-			description: "Ensure high deliverability by verifying domain ownership.",
 			component: <AddDomainStep data={formData} updateData={updateData} />,
 			preview: <DomainPreview domain={formData.domain} />,
 		},
