@@ -1,4 +1,3 @@
-/** biome-ignore-all lint/security/noDangerouslySetInnerHtml: <explanation> */
 "use client";
 
 import { useTheme } from "next-themes";
@@ -44,7 +43,10 @@ export const CodeBlock = ({
 			transformers: [
 				{
 					pre(node) {
-						this.addClassToHast(node, "overflow-x-auto py-4");
+						this.addClassToHast(node, "overflow-x-auto py-4 line-numbers");
+					},
+					line(node) {
+						this.addClassToHast(node, "line");
 					},
 				},
 			],
@@ -56,9 +58,33 @@ export const CodeBlock = ({
 	}
 
 	return (
-		<div
-			dangerouslySetInnerHTML={{ __html: html }}
-			className="[&>pre]:!bg-transparent text-sm leading-6 [&>pre]:p-4"
-		/>
+		<>
+			<style>{`
+				.line-numbers {
+					counter-reset: line;
+				}
+				.line-numbers .line {
+					position: relative;
+					padding-left: 3rem;
+				}
+				.line-numbers .line::before {
+					content: counter(line);
+					counter-increment: line;
+					position: absolute;
+					left: 0;
+					width: 2.5rem;
+					text-align: right;
+					padding-right: 1rem;
+					color: hsl(var(--muted-foreground));
+					user-select: none;
+					border-right: 1px solid hsl(var(--border));
+				}
+			`}</style>
+			{/* biome-ignore lint/security/noDangerouslySetInnerHtml: Required for Shiki HTML output */}
+			<div
+				dangerouslySetInnerHTML={{ __html: html }}
+				className="[&>pre]:!bg-transparent text-sm leading-6 [&>pre]:p-4"
+			/>
+		</>
 	);
 };

@@ -26,16 +26,17 @@ export const SplitLayout = ({
 				<div className="w-full border-stroke-soft-200 border-t" />
 				<div className="mx-auto grid h-full w-full lg:grid-cols-2">
 					<div className="flex flex-col gap-4 px-12 pt-9 pb-9">
-						<div className="flex gap-2">
+						<div className="relative flex gap-2">
 							{onBack && (
-								<Button.Root
-									variant="neutral"
-									mode="ghost"
-									onClick={onBack}
-									size="xxsmall"
-								>
-									<ChevronLeft size={16} />
-								</Button.Root>
+								<div className="-left-7 -top-[2.1px] absolute">
+									<button
+										type="button"
+										onClick={onBack}
+										className="cursor-pointer text-text-soft-400 hover:text-text-strong-950"
+									>
+										<ChevronLeft size={16} />
+									</button>
+								</div>
 							)}
 							<div>
 								<div className="mb-1 font-medium text-text-soft-400 text-xs">

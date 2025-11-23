@@ -3,6 +3,7 @@
 import { CodeBlock } from "@reloop/ui/code-block";
 import { Icon } from "@reloop/ui/icon";
 import { Mail, ShieldCheck } from "lucide-react";
+import { useTheme } from "next-themes";
 
 interface SidebarPreviewProps {
 	name: string;
@@ -95,6 +96,8 @@ const myCodeString = `function hello() {
 }`;
 
 export const ApiPreview = ({ apiKey }: ApiPreviewProps) => {
+	const { resolvedTheme } = useTheme();
+	console.log("🚀 ~ ApiPreview ~ resolvedTheme:", resolvedTheme);
 	return (
 		<div>
 			<div className="flex items-center gap-4 border-stroke-soft-100 border-b bg-bg-white-0 p-3">
@@ -128,7 +131,11 @@ export const ApiPreview = ({ apiKey }: ApiPreviewProps) => {
 					<span className="text-text-soft-400 text-xs">Python</span>
 				</div>
 			</div>
-			<CodeBlock code={myCodeString} lang="bash" theme="github-dark" />
+			<CodeBlock
+				code={myCodeString}
+				lang="bash"
+				theme={resolvedTheme === "light" ? "rose-pine-dawn" : "vesper"}
+			/>
 		</div>
 	);
 };
