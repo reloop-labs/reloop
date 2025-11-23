@@ -49,7 +49,11 @@ const OnBoardingPage = () => {
 			title: "Create your workspace",
 			component: <CreateOrgStep data={formData} updateData={updateData} />,
 			preview: (
-				<SidebarPreview slug={formData.slug} logo={formData.logoPreview} />
+				<SidebarPreview
+					name={formData.name}
+					slug={formData.slug}
+					logo={formData.logoPreview}
+				/>
 			),
 		},
 		2: {

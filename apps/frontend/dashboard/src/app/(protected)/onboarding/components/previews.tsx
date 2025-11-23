@@ -1,17 +1,19 @@
 "use client";
 
+import { Icon } from "@reloop/ui/icon";
 import { Mail, ShieldCheck } from "lucide-react";
 
 interface SidebarPreviewProps {
-	name?: string;
-	logo?: string | null;
-	slug?: string;
+	name: string;
+	logo: string | null;
+	slug: string;
 }
 
 export const SidebarPreview = ({ name, logo, slug }: SidebarPreviewProps) => {
 	return (
 		<div className="absolute top-32 left-28">
-			<div className="flex h-[520px] w-full flex-col overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-2xl">
+			<div className="relative flex h-[520px] w-full flex-col overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-2xl">
+				<div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-bg-white-0 to-transparent" />
 				<div className="flex items-center gap-2 border-stroke-soft-100 border-b bg-bg-white-0 p-3">
 					<div className="flex gap-1.5">
 						<div className="h-3 w-3 rounded-full bg-error-base/80" />
@@ -23,41 +25,38 @@ export const SidebarPreview = ({ name, logo, slug }: SidebarPreviewProps) => {
 					</div>
 				</div>
 				<div className="flex flex-1 overflow-hidden">
-					<div className="flex w-64 flex-col gap-6 border-stroke-soft-100 border-r bg-bg-weak-50 p-4">
-						<div className="flex items-center gap-3 rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-2 shadow-sm">
-							<div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-stroke-soft-200 bg-bg-weak-50">
-								{logo ? (
-									<img
-										src={logo}
-										alt="Logo"
-										className="h-full w-full object-cover"
-									/>
-								) : (
-									<span className="font-bold text-lg text-text-soft-400">
-										{name && name.length > 0 ? name[0]?.toUpperCase() : "W"}
-									</span>
-								)}
+					<div className="flex w-64 flex-col gap-2 border-stroke-soft-100 border-r">
+						<div className="flex w-full items-center gap-2 border-stroke-soft-100 border-b px-4 py-2">
+							{logo ? (
+								<img src={logo} alt="Logo" className="h-6 w-6 object-cover" />
+							) : (
+								<span className="flex h-6 w-6 items-center justify-center rounded-lg border border-stroke-soft-200 p-1 font-bold text-xs">
+									{name && name.length > 0 ? name[0]?.toUpperCase() : "W"}
+								</span>
+							)}
+							<p className="text-text-soft-400">/</p>
+							<div className="truncate font-semibold text-xs">
+								{name || "Workspace"}
 							</div>
-							<div className="min-w-0">
-								<div className="truncate font-semibold text-sm text-text-strong-950">
-									{name || "Workspace"}
-								</div>
-								<div className="text-text-sub-600 text-xs">Free Plan</div>
-							</div>
+							<Icon
+								name="chevron-down"
+								className="h-3 w-3 text-text-soft-400"
+							/>
 						</div>
 
-						<div className="space-y-2">
+						<div className="space-y-1 px-4">
 							<div className="flex h-8 items-center gap-3 opacity-50">
-								<div className="h-4 w-4 rounded bg-bg-soft-200" />
-								<div className="h-2 w-20 rounded bg-bg-soft-200" />
+								<div className="h-5 w-5 rounded-full bg-bg-soft-200" />
+								<div className="h-[17px] w-40 rounded-full bg-bg-soft-200" />
+							</div>
+
+							<div className="flex h-8 items-center gap-3 opacity-50">
+								<div className="h-5 w-5 rounded-full bg-bg-soft-200" />
+								<div className="h-[17px] w-40 rounded-full bg-bg-soft-200" />
 							</div>
 							<div className="flex h-8 items-center gap-3 opacity-50">
-								<div className="h-4 w-4 rounded bg-bg-soft-200" />
-								<div className="h-2 w-16 rounded bg-bg-soft-200" />
-							</div>
-							<div className="flex h-8 items-center gap-3 opacity-50">
-								<div className="h-4 w-4 rounded bg-bg-soft-200" />
-								<div className="h-2 w-24 rounded bg-bg-soft-200" />
+								<div className="h-5 w-5 rounded-full bg-bg-soft-200" />
+								<div className="h-[17px] w-40 rounded-full bg-bg-soft-200" />
 							</div>
 						</div>
 
