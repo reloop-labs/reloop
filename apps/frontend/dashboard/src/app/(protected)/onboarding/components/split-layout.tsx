@@ -2,6 +2,7 @@
 
 import * as Button from "@reloop/ui/button";
 import { ChevronLeft } from "lucide-react";
+import { parseAsInteger, useQueryState } from "nuqs";
 import type React from "react";
 
 interface SplitLayoutProps {
@@ -9,10 +10,6 @@ interface SplitLayoutProps {
 	title: string;
 	children: React.ReactNode;
 	previewContent: React.ReactNode;
-	onBack?: () => void;
-	onNext: () => void;
-	canProceed: boolean;
-	isLastStep: boolean;
 }
 
 export const SplitLayout = ({
@@ -20,17 +17,15 @@ export const SplitLayout = ({
 	title,
 	children,
 	previewContent,
-	onBack,
-	onNext,
-	canProceed,
-	isLastStep,
 }: SplitLayoutProps) => {
+	const [step, setStep] = useQueryState("step", parseAsInteger.withDefault(1));
+	const onBack = step > 1 ? () => setStep(step - 1) : undefined;
 	return (
 		<div className="flex min-h-screen flex-col items-center justify-center">
-			<div className="flex flex-1 flex-col items-center justify-center border-stroke-soft-200 border-r border-l">
+			<div className="mx-auto flex max-w-6xl flex-1 flex-col items-center justify-center border-stroke-soft-200 border-r border-l">
 				<div className="w-full border-stroke-soft-200 border-t" />
 				<div className="mx-auto flex h-full bg-bg-white-0 text-text-strong-950">
-					<div className="flex flex-col gap-6 border-stroke-soft-200 border-r p-8">
+					<div className="flex flex-col gap-6 p-10">
 						<div className="flex gap-2">
 							{onBack && (
 								<Button.Root
@@ -43,31 +38,15 @@ export const SplitLayout = ({
 								</Button.Root>
 							)}
 							<div>
-								<div>
-									<div className="mb-2 font-medium text-sm text-text-soft-400">
-										{stepIndicator}
-									</div>
+								<div className="font-medium text-text-soft-400 text-xs">
+									{stepIndicator}
 								</div>
-								<h1 className="mb-3 font-bold text-3xl text-text-strong-950">
-									{title}
-								</h1>
+								<h1 className="font-semibold text-title-h5">{title}</h1>
 							</div>
 						</div>
 						{children}
-						{/* Footer Actions */}
-						<div className="w-full pt-6">
-							<Button.Root
-								variant="primary"
-								mode="filled"
-								onClick={onNext}
-								disabled={!canProceed}
-								className="w-full"
-							>
-								{isLastStep ? "Finish Setup" : "Continue"}
-							</Button.Root>
-						</div>
 					</div>
-					<div className="relative hidden flex-col items-center justify-center overflow-hidden p-6 lg:flex">
+					<div className="relative hidden flex-col items-center justify-center overflow-hidden border-stroke-soft-200 border-l p-6 lg:flex">
 						<div className="fade-in slide-in-from-bottom-8 relative z-10 w-full max-w-md animate-in duration-700">
 							{previewContent}
 						</div>

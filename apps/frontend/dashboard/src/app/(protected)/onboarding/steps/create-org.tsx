@@ -4,6 +4,7 @@ import * as Button from "@reloop/ui/button";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
 import { Upload } from "lucide-react";
+import { parseAsInteger, useQueryState } from "nuqs";
 import type React from "react";
 
 interface CreateOrgStepProps {
@@ -19,6 +20,7 @@ interface CreateOrgStepProps {
 }
 
 export const CreateOrgStep = ({ data, updateData }: CreateOrgStepProps) => {
+	const [step, setStep] = useQueryState("step", parseAsInteger.withDefault(1));
 	const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (file) {
@@ -30,9 +32,16 @@ export const CreateOrgStep = ({ data, updateData }: CreateOrgStepProps) => {
 		}
 	};
 
+	const onNext = () => {
+		setStep(step + 1);
+		updateData({
+			name: data.name,
+			url: data.url.toLowerCase().replace(/\s+/g, "-"),
+		});
+	};
+
 	return (
-		<div className="fade-in animate-in space-y-8 duration-500">
-			{/* Logo Section */}
+		<div className="fade-in animate-in duration-500">
 			<div>
 				<label
 					htmlFor="logo-upload"
@@ -89,51 +98,49 @@ export const CreateOrgStep = ({ data, updateData }: CreateOrgStepProps) => {
 					</div>
 				</div>
 			</div>
-
-			{/* Form Fields */}
-			<div className="space-y-5">
-				<div>
-					<label
-						htmlFor="company-name"
-						className="mb-1.5 block font-semibold text-sm text-text-strong-950"
-					>
-						Company Name
-					</label>
-					<Input.Root size="small">
-						<Input.Wrapper>
-							<Input.Input
-								id="company-name"
-								type="text"
-								value={data.name}
-								onChange={(e) =>
-									updateData({
-										name: e.target.value,
-										url: e.target.value.toLowerCase().replace(/\s+/g, "-"),
-									})
-								}
-								placeholder="e.g. Acme Corp"
-							/>
-						</Input.Wrapper>
-					</Input.Root>
-				</div>
-
-				<div className="flex flex-col gap-1">
-					<Label.Root htmlFor="workspace-handle">Workspace handle</Label.Root>
-					<Input.Root size="small">
-						<Input.Wrapper className="gap-0">
-							<Input.InlineAffix className="m">
-								reloop.sh/dashboard/
-							</Input.InlineAffix>
-							<Input.Input
-								id="workspace-handle"
-								type="text"
-								value={data.url}
-								onChange={(e) => updateData({ url: e.target.value })}
-							/>
-						</Input.Wrapper>
-					</Input.Root>
-				</div>
+			<div className="flex flex-col gap-1 pt-6">
+				<Label.Root htmlFor="company-name">Company name</Label.Root>
+				<Input.Root size="small">
+					<Input.Wrapper>
+						<Input.Input
+							id="company-name"
+							type="text"
+							value={data.name}
+							onChange={(e) =>
+								updateData({
+									name: e.target.value,
+									url: e.target.value.toLowerCase().replace(/\s+/g, "-"),
+								})
+							}
+							placeholder="e.g. Acme Corp"
+						/>
+					</Input.Wrapper>
+				</Input.Root>
 			</div>
+			<div className="flex flex-col gap-1 pt-3 pb-6">
+				<Label.Root htmlFor="workspace-handle">Workspace handle</Label.Root>
+				<Input.Root size="small">
+					<Input.Wrapper className="gap-0">
+						<Input.InlineAffix className="m">
+							reloop.sh/dashboard/
+						</Input.InlineAffix>
+						<Input.Input
+							id="workspace-handle"
+							type="text"
+							value={data.url}
+							onChange={(e) => updateData({ url: e.target.value })}
+						/>
+					</Input.Wrapper>
+				</Input.Root>
+			</div>
+			<Button.Root
+				variant="neutral"
+				className="w-full"
+				mode="filled"
+				onClick={onNext}
+			>
+				Create workspace
+			</Button.Root>
 		</div>
 	);
 };

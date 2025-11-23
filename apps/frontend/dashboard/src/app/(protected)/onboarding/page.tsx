@@ -128,10 +128,6 @@ const OnBoardingPage = () => {
 			stepIndicator={currentConfig.stepIndicator}
 			title={currentConfig.title}
 			previewContent={currentConfig.preview}
-			onBack={step > 1 ? handlePrevious : undefined}
-			onNext={handleNext}
-			canProceed={canProceed()}
-			isLastStep={step === 3}
 		>
 			{currentConfig.component}
 		</SplitLayout>
