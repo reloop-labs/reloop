@@ -22,10 +22,10 @@ export const SplitLayout = ({
 	const onBack = step > 1 ? () => setStep(step - 1) : undefined;
 	return (
 		<div className="flex min-h-screen flex-col items-center justify-center">
-			<div className="mx-auto flex max-w-6xl flex-1 flex-col items-center justify-center border-stroke-soft-200 border-r border-l">
+			<div className="flex w-full max-w-5xl flex-1 flex-col items-center justify-center border-stroke-soft-200 border-r border-l">
 				<div className="w-full border-stroke-soft-200 border-t" />
-				<div className="mx-auto grid h-full grid-cols-2">
-					<div className="flex flex-col gap-4 px-9 pt-6 pb-8">
+				<div className="mx-auto grid h-full w-full lg:grid-cols-2">
+					<div className="flex flex-col gap-4 px-12 pt-9 pb-12">
 						<div className="flex gap-2">
 							{onBack && (
 								<Button.Root
@@ -46,8 +46,8 @@ export const SplitLayout = ({
 						</div>
 						{children}
 					</div>
-					<div className="relative hidden flex-col items-center justify-center overflow-hidden border-stroke-soft-200 border-l p-6 lg:flex">
-						<div className="fade-in slide-in-from-bottom-8 relative z-10 w-full max-w-md animate-in duration-700">
+					<div className="relative hidden w-full overflow-hidden border-stroke-soft-200 border-l lg:flex">
+						<div className="fade-in slide-in-from-bottom-8 relative z-10 w-full animate-in duration-700">
 							{previewContent}
 						</div>
 					</div>
