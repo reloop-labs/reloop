@@ -5,21 +5,16 @@ import {
 	verifyMxRecord,
 	verifySpfRecord,
 } from "@be/domain/utils/verify-dns-records";
+import { inngest } from "@be/workflow/inngest";
 import { workflowConfig } from "@be/workflow/utils/workflow.config";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
 import { and, eq, isNull } from "drizzle-orm";
-import { Inngest } from "inngest";
-
-export const inngest = new Inngest({
-	id: "workflow",
-	name: "Reloop Workflows",
-});
 
 export const verifyDomainFunction = inngest.createFunction(
-	{ id: "verify-domain", name: "Verify Domain" },
-	{ event: "verify/domain" },
+	{ id: "domain-verification", name: "Domain Verification" },
+	{ event: "domain.verification" },
 	async ({ event, step }) => {
 		const {
 			domain,
@@ -34,25 +29,10 @@ export const verifyDomainFunction = inngest.createFunction(
 		const maxAttempts = workflowConfig.domainVerification.maxAttempts;
 
 		if (!domain || !organizationId) {
-			logger.error(
-				{ domain, organizationId },
-				"Missing required fields: domain or organizationId",
-			);
 			throw new Error("Missing required fields: domain or organizationId");
 		}
 
-		logger.info(
-			{
-				domain,
-				organizationId,
-				attempt: attempt + 1,
-				maxAttempts,
-			},
-			`Starting DNS verification (attempt ${attempt + 1}/${maxAttempts})`,
-		);
-
 		const result = await step.run("verify-dns-records", async () => {
-			// Fetch domain with DNS records
 			const domainWithRecords = await db.query.domain.findFirst({
 				where: and(
 					eq(schema.domain.domain, domain),
@@ -71,17 +51,6 @@ export const verifyDomainFunction = inngest.createFunction(
 				throw new Error("Domain not found");
 			}
 
-			// Set status to verifying
-			await db
-				.update(schema.domain)
-				.set({ status: "verifying" })
-				.where(eq(schema.domain.id, domainWithRecords.id));
-			await db
-				.update(schema.domainDnsRecord)
-				.set({ status: "verifying" })
-				.where(eq(schema.domainDnsRecord.domainId, domainWithRecords.id));
-
-			// Verify all DNS records
 			const verificationResults = await Promise.all(
 				domainWithRecords.dnsRecords.map(async (record) => {
 					let isVerified = false;
@@ -144,29 +113,52 @@ export const verifyDomainFunction = inngest.createFunction(
 				}),
 			);
 
-			// Check if verification will succeed before updating status
+			// Calculate counts and statuses
 			const verifiedCount = verificationResults.filter(
 				(r) => r.isVerified,
 			).length;
-			const isAllVerified =
-				verifiedCount === verificationResults.length &&
-				verificationResults.length > 0;
+			const totalCount = verificationResults.length;
+			const unverifiedCount = totalCount - verifiedCount;
+			const isAllVerified = verifiedCount === totalCount && totalCount > 0;
 
-			// Update all DNS records and domain status in one transaction
+			// Separate records into active and non-active
+			const activeRecords = verificationResults.filter((r) => r.isVerified);
+			const nonActiveRecords = verificationResults.filter((r) => !r.isVerified);
+
+			// Update DNS records: mark active ones as "active", others as "verifying"
 			await db.transaction(async (tx) => {
-				await Promise.all(
-					verificationResults.map((result) =>
-						tx
-							.update(schema.domainDnsRecord)
-							.set({
-								status: result.isVerified ? "active" : "failed",
-								updatedAt: new Date(),
-							})
-							.where(eq(schema.domainDnsRecord.id, result.id)),
-					),
-				);
+				// Update active records to "active"
+				if (activeRecords.length > 0) {
+					await Promise.all(
+						activeRecords.map((result) =>
+							tx
+								.update(schema.domainDnsRecord)
+								.set({
+									status: "active",
+									updatedAt: new Date(),
+								})
+								.where(eq(schema.domainDnsRecord.id, result.id)),
+						),
+					);
+				}
 
-				const domainStatus = isAllVerified ? "active" : "failed";
+				// Update non-active records to "verifying" (will be checked again after 1 hour)
+				if (nonActiveRecords.length > 0) {
+					await Promise.all(
+						nonActiveRecords.map((result) =>
+							tx
+								.update(schema.domainDnsRecord)
+								.set({
+									status: "verifying",
+									updatedAt: new Date(),
+								})
+								.where(eq(schema.domainDnsRecord.id, result.id)),
+						),
+					);
+				}
+
+				// Update domain status: "active" if all verified, otherwise "verifying"
+				const domainStatus = isAllVerified ? "active" : "verifying";
 				await tx
 					.update(schema.domain)
 					.set({
@@ -177,129 +169,92 @@ export const verifyDomainFunction = inngest.createFunction(
 					.where(eq(schema.domain.id, domainWithRecords.id));
 			});
 
-			const verificationResult = {
+			return {
 				...domainWithRecords,
 				dnsRecords: verificationResults,
+				verifiedCount,
+				totalCount,
+				unverifiedCount,
+				isAllVerified,
+				hasUnverifiedRecords: unverifiedCount > 0,
 			};
-
-			logger.info(
-				{
-					domain,
-					status: verificationResult.status,
-					verifiedCount: verificationResults.filter((r) => r.isVerified).length,
-					totalCount: verificationResults.length,
-				},
-				"DNS verification completed",
-			);
-
-			return verificationResult;
 		});
 
-		const isVerified = result.status === "active";
-		const verifiedCount = result.dnsRecords.filter((r) => r.isVerified).length;
-		const totalCount = result.dnsRecords.length;
-
-		// If verification failed and we have retries left, schedule next attempt
-		if (!isVerified && attempt < maxAttempts - 1) {
-			// Set status back to "verifying" since we're going to retry
-			await db
-				.update(schema.domain)
-				.set({ status: "verifying" })
-				.where(eq(schema.domain.id, result.id));
-			await db
-				.update(schema.domainDnsRecord)
-				.set({ status: "verifying" })
-				.where(eq(schema.domainDnsRecord.domainId, result.id));
-
-			// Get retry interval from config
-			const backoffHours = workflowConfig.domainVerification.retryIntervalHours;
-			const backoffMs = backoffHours * 60 * 60 * 1000; // Convert hours to milliseconds
-
-			logger.info(
-				{
-					domain,
-					organizationId,
-					attempt: attempt + 1,
-					nextAttempt: attempt + 2,
-					maxAttempts,
-					verifiedCount,
-					totalCount,
-				},
-				`Verification failed. Scheduling retry in ${backoffHours} hour (attempt ${attempt + 2}/${maxAttempts})`,
-			);
+		// If there are unverified records and we have retries left, schedule next attempt after 1 hour
+		if (result.hasUnverifiedRecords && attempt < maxAttempts - 1) {
+			const retryHours = 1;
+			const retryMs = retryHours * 60 * 60 * 1000; // 1 hour in milliseconds
 
 			// Schedule next retry using step.sleep
-			await step.sleep(`retry-in-${backoffHours}-hour`, backoffMs);
+			await step.sleep(`retry-in-${retryHours}-hour`, retryMs);
 
 			// Send event for next attempt
 			await step.sendEvent("schedule-next-retry", {
-				name: "verify/domain",
+				name: "domain.verification",
 				data: {
 					domain,
 					organizationId,
 					attempt: attempt + 1,
-					// maxAttempts is not passed - will use default from config
 				},
 			});
 
 			return {
-				success: false,
+				success: result.isAllVerified,
 				domain: result.domain,
 				status: result.status,
-				verifiedRecords: verifiedCount,
-				totalRecords: totalCount,
+				verifiedRecords: result.verifiedCount,
+				totalRecords: result.totalCount,
+				unverifiedRecords: result.unverifiedCount,
 				attempt: attempt + 1,
 				maxAttempts,
-				message: `Verification failed. Next retry scheduled in ${backoffHours} hour (attempt ${attempt + 2}/${maxAttempts})`,
-				nextAttemptIn: `${backoffHours} hour`,
+				message: `${result.verifiedCount}/${result.totalCount} records verified. Next check in ${retryHours} hour for remaining records.`,
+				nextAttemptIn: `${retryHours} hour`,
 			};
 		}
 
-		// Final result (either success or max attempts reached)
-		if (!isVerified) {
-			// Update domain status to "failed" since all attempts are exhausted
-			// DNS records status is already set correctly (active/failed) from the last verification
-			await db
-				.update(schema.domain)
-				.set({ status: "failed" })
-				.where(eq(schema.domain.id, result.id));
+		// Final result (either all verified or max attempts reached)
+		if (result.hasUnverifiedRecords) {
+			// Max attempts reached - mark unverified records as "failed"
+			const unverifiedRecords = result.dnsRecords.filter((r) => !r.isVerified);
+			await db.transaction(async (tx) => {
+				// Update unverified records to "failed"
+				await Promise.all(
+					unverifiedRecords.map((record) =>
+						tx
+							.update(schema.domainDnsRecord)
+							.set({
+								status: "failed",
+								updatedAt: new Date(),
+							})
+							.where(eq(schema.domainDnsRecord.id, record.id)),
+					),
+				);
 
-			logger.warn(
-				{
-					domain,
-					organizationId,
-					attempt: attempt + 1,
-					maxAttempts,
-					verifiedCount,
-					totalCount,
-				},
-				`Verification failed after ${maxAttempts} attempts. Stopping retries.`,
-			);
+				// Update domain status to "failed" if no records are active
+				const finalDomainStatus =
+					result.verifiedCount > 0 ? "active" : "failed";
+				await tx
+					.update(schema.domain)
+					.set({
+						status: finalDomainStatus,
+						updatedAt: new Date(),
+					})
+					.where(eq(schema.domain.id, result.id));
+			});
 		} else {
-			logger.info(
-				{
-					domain,
-					organizationId,
-					attempt: attempt + 1,
-					maxAttempts,
-					verifiedCount,
-					totalCount,
-				},
-				"Domain verification successful!",
-			);
+			return {
+				success: result.isAllVerified,
+				domain: result.domain,
+				status: result.status,
+				verifiedRecords: result.verifiedCount,
+				totalRecords: result.totalCount,
+				unverifiedRecords: result.unverifiedCount,
+				attempt: attempt + 1,
+				maxAttempts,
+				message: result.isAllVerified
+					? "Domain verification successful! All records are active."
+					: `Verification incomplete after ${maxAttempts} attempts. ${result.verifiedCount}/${result.totalCount} records verified.`,
+			};
 		}
-
-		return {
-			success: isVerified,
-			domain: result.domain,
-			status: isVerified ? "active" : "failed",
-			verifiedRecords: verifiedCount,
-			totalRecords: totalCount,
-			attempt: attempt + 1,
-			maxAttempts,
-			message: isVerified
-				? "Domain verification successful!"
-				: `Verification failed after ${maxAttempts} attempts`,
-		};
 	},
 );

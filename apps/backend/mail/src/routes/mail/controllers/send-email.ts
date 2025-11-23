@@ -235,7 +235,7 @@ async function checkDomainDnsHealth(
 	const lastVerified = domainData.lastVerifiedAt;
 	const isRecent = lastVerified
 		? new Date().getTime() - new Date(lastVerified).getTime() <
-		STALE_THRESHOLD_HOURS * 60 * 60 * 1000
+			STALE_THRESHOLD_HOURS * 60 * 60 * 1000
 		: false;
 
 	if (

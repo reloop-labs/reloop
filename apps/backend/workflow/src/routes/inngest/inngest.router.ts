@@ -1,4 +1,5 @@
-import { inngest, verifyDomainFunction } from "@be/workflow/functions";
+import { verifyDomainFunction } from "@be/workflow/functions";
+import { inngest } from "@be/workflow/inngest";
 import Elysia from "elysia";
 import type { InngestFunction } from "inngest";
 import { serve } from "inngest/bun";

@@ -1,4 +1,4 @@
-import { inngest } from "@be/workflow/functions";
+import { inngest } from "@be/workflow/inngest";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
@@ -42,7 +42,7 @@ export async function verifyDNSRecordHandler(params: {
 		// Trigger Inngest workflow for background verification with exponential backoff
 		try {
 			await inngest.send({
-				name: "verify/domain",
+				name: "domain.verification",
 				data: {
 					domain,
 					organizationId,
