@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/security/noDangerouslySetInnerHtml: <explanation> */
 "use client";
 
 import { useTheme } from "next-themes";
@@ -65,22 +66,22 @@ export const CodeBlock = ({
 				}
 				.line-numbers .line {
 					position: relative;
-					padding-left: 3rem;
+					padding-left: 2rem;
 				}
 				.line-numbers .line::before {
 					content: counter(line);
 					counter-increment: line;
 					position: absolute;
 					left: 0;
-					width: 2.5rem;
+					width: 2rem;
 					text-align: right;
 					padding-right: 1rem;
-					color: hsl(var(--muted-foreground));
+					font-size: 0.75rem;
+					color: var(--color-text-soft-400);
 					user-select: none;
-					border-right: 1px solid hsl(var(--border));
+					border-right: 1px solid var(--color-border-soft-200);
 				}
 			`}</style>
-			{/* biome-ignore lint/security/noDangerouslySetInnerHtml: Required for Shiki HTML output */}
 			<div
 				dangerouslySetInnerHTML={{ __html: html }}
 				className="[&>pre]:!bg-transparent text-sm leading-6 [&>pre]:p-4"
