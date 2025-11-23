@@ -5,6 +5,7 @@ import * as FileUpload from "@reloop/ui/file-upload";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
+import * as Select from "@reloop/ui/select";
 import { parseAsInteger, useQueryState } from "nuqs";
 import type React from "react";
 
@@ -65,50 +66,81 @@ export const CreateOrgStep = ({ data, updateData }: CreateOrgStepProps) => {
 					</div>
 				</div>
 			</div>
-			<div className="flex flex-col gap-1 pt-6">
-				<Label.Root htmlFor="company-name">Company name</Label.Root>
-				<Input.Root size="small">
-					<Input.Wrapper>
-						<Input.Input
-							id="company-name"
-							type="text"
-							value={data.name}
-							className="font-semibold"
-							onChange={(e) =>
-								updateData({
-									name: e.target.value,
-									slug: e.target.value.toLowerCase().replace(/\s+/g, "-"),
-								})
-							}
-							placeholder="e.g. Acme Corp"
-						/>
-					</Input.Wrapper>
-				</Input.Root>
-			</div>
-			<div className="flex flex-col gap-1 pt-3 pb-6">
-				<Label.Root htmlFor="workspace-handle">Workspace handle</Label.Root>
-				<Input.Root size="small">
-					<Input.Wrapper className="gap-0">
-						<Input.InlineAffix className="m">
-							reloop.sh/dashboard/
-						</Input.InlineAffix>
-						<Input.Input
-							id="workspace-handle"
-							type="text"
-							className="font-semibold"
-							value={data.slug}
-							onChange={(e) =>
-								updateData({
-									slug: e.target.value.toLowerCase().replace(/\s+/g, "-"),
-								})
-							}
-						/>
-					</Input.Wrapper>
-				</Input.Root>
+			<div className="space-y-3.5 pt-6">
+				<div className="flex flex-col gap-1">
+					<Label.Root htmlFor="company-name">Company name</Label.Root>
+					<Input.Root size="small">
+						<Input.Wrapper>
+							<Input.Input
+								id="company-name"
+								type="text"
+								value={data.name}
+								className="font-medium"
+								onChange={(e) =>
+									updateData({
+										name: e.target.value,
+										slug: e.target.value.toLowerCase().replace(/\s+/g, "-"),
+									})
+								}
+								placeholder="e.g. Acme Corp"
+							/>
+						</Input.Wrapper>
+					</Input.Root>
+				</div>
+				<div className="flex flex-col gap-1">
+					<Label.Root htmlFor="workspace-handle">Workspace handle</Label.Root>
+					<Input.Root size="small">
+						<Input.Wrapper className="gap-0">
+							<Input.InlineAffix className="m">
+								reloop.sh/dashboard/
+							</Input.InlineAffix>
+							<Input.Input
+								id="workspace-handle"
+								type="text"
+								className="font-medium"
+								value={data.slug}
+								onChange={(e) =>
+									updateData({
+										slug: e.target.value.toLowerCase().replace(/\s+/g, "-"),
+									})
+								}
+							/>
+						</Input.Wrapper>
+					</Input.Root>
+				</div>
+				<div className="flex flex-col gap-1">
+					<Label.Root htmlFor="referral">How did you hear about us?</Label.Root>
+					<Select.Root
+						size="small"
+						value={data.referral}
+						onValueChange={(value) => updateData({ referral: value })}
+					>
+						<Select.Trigger className="font-medium text-sm">
+							<Select.Value placeholder="Select an option" />
+						</Select.Trigger>
+						<Select.Content className="w-[524px]">
+							<Select.Item value="social-media" className="h-9 text-sm">
+								Social media
+							</Select.Item>
+							<Select.Item value="friend-colleague" className="h-9 p-2 text-sm">
+								Friend/Colleague
+							</Select.Item>
+							<Select.Item value="search-engine" className="h-9 p-2 text-sm">
+								Search engine
+							</Select.Item>
+							<Select.Item value="advertisement" className="h-9 p-2 text-sm">
+								Advertisement
+							</Select.Item>
+							<Select.Item value="other" className="h-9 p-2 text-sm">
+								Other
+							</Select.Item>
+						</Select.Content>
+					</Select.Root>
+				</div>
 			</div>
 			<Button.Root
 				variant="neutral"
-				className="w-full"
+				className="mt-6 w-full"
 				mode="filled"
 				onClick={onNext}
 			>

@@ -25,7 +25,7 @@ export const SplitLayout = ({
 			<div className="mx-auto flex max-w-6xl flex-1 flex-col items-center justify-center border-stroke-soft-200 border-r border-l">
 				<div className="w-full border-stroke-soft-200 border-t" />
 				<div className="mx-auto grid h-full grid-cols-2">
-					<div className="flex flex-col gap-4 p-10">
+					<div className="flex flex-col gap-4 px-9 pt-6 pb-8">
 						<div className="flex gap-2">
 							{onBack && (
 								<Button.Root
