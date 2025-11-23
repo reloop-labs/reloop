@@ -25,7 +25,7 @@ export const SidebarPreview = ({ name, logo, slug }: SidebarPreviewProps) => {
 					</div>
 				</div>
 				<div className="flex flex-1 overflow-hidden">
-					<div className="flex w-64 flex-col gap-2 border-stroke-soft-100 border-r">
+					<div className="flex w-52 flex-col gap-2 border-stroke-soft-100 border-r">
 						<div className="flex w-full items-center gap-2 border-stroke-soft-100 border-b px-4 py-2">
 							{logo ? (
 								<img src={logo} alt="Logo" className="h-6 w-6 object-cover" />

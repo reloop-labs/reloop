@@ -38,7 +38,7 @@ export const SplitLayout = ({
 								</Button.Root>
 							)}
 							<div>
-								<div className="font-medium text-text-soft-400 text-xs">
+								<div className="mb-1 font-medium text-text-soft-400 text-xs">
 									{stepIndicator}
 								</div>
 								<h1 className="font-semibold text-title-h5">{title}</h1>
