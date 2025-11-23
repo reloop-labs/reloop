@@ -7,6 +7,7 @@ import {
 	Copy,
 	Key,
 	Loader2,
+	Plus,
 	RefreshCw,
 	ShieldCheck,
 } from "lucide-react";
@@ -47,30 +48,57 @@ export const GenerateApiKeyStep = ({
 	return (
 		<div className="fade-in animate-in space-y-6 duration-500">
 			{!data.apiKey ? (
-				<div className="rounded-2xl border border-stroke-soft-200 bg-bg-weak-50 p-8 text-center">
-					<div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-bg-white-0 text-primary-base shadow-sm">
-						<Key size={32} />
+				<div className="flex h-[600px] w-full flex-col items-center justify-center bg-white p-4">
+					{/* Illustration Area */}
+					<div className="relative mb-8 flex h-64 w-64 items-center justify-center">
+						{/* The Dashed Orbit Ring */}
+						<div className="absolute inset-0 rounded-full border border-gray-200 border-dashed opacity-75" />
+
+						{/* Inner Glow/Background (Optional) */}
+						<div className="absolute h-32 w-32 rounded-full bg-gray-50 opacity-60 blur-2xl" />
+
+						{/* Center Element: The Main Key Icon */}
+						<div className="relative z-10 flex h-20 w-24 flex-col items-center justify-center rounded-xl border border-gray-100 bg-white shadow-sm">
+							<div className="mb-2 h-2 w-full rounded-t-xl bg-gray-100 opacity-50" />{" "}
+							{/* Top decoration */}
+							<Key className="h-8 w-8 text-gray-300" strokeWidth={1.5} />
+							<div className="mt-2 h-1.5 w-12 rounded-full bg-gray-100" />{" "}
+							{/* Skeleton text line */}
+						</div>
+
+						{/* Satellite Icon 1 (Top Left) - Shield */}
+						<div className="absolute top-8 left-8 flex h-10 w-10 animate-bounce-slow items-center justify-center rounded-full border border-gray-100 bg-white shadow-sm">
+							<ShieldCheck className="h-4 w-4 text-gray-300" />
+						</div>
+
+						{/* Satellite Icon 2 (Bottom Right) - Lock */}
+						<div className="absolute right-8 bottom-8 flex h-12 w-12 items-center justify-center rounded-full border border-gray-100 bg-white shadow-sm">
+							<ShieldCheck className="h-5 w-5 text-gray-300" />
+						</div>
 					</div>
-					<h3 className="mb-2 font-semibold text-lg text-text-strong-950">
-						Generate Secret Key
-					</h3>
-					<p className="mx-auto mb-6 max-w-sm text-text-sub-600">
-						You need an API key to authenticate your requests. This key grants
-						full access to your account.
-					</p>
-					<Button.Root
-						variant="neutral"
-						mode="filled"
-						onClick={generateKey}
-						disabled={loading}
-					>
-						{loading ? (
-							<Loader2 className="mr-2 animate-spin" size={18} />
-						) : (
-							<RefreshCw className="mr-2" size={18} />
-						)}
-						Generate API Key
-					</Button.Root>
+
+					{/* Text Content */}
+					<div className="max-w-md space-y-2 text-center">
+						<h3 className="font-semibold text-gray-900 text-xl">
+							No API keys generated
+						</h3>
+						<p className="text-gray-500 text-sm">
+							Create a secret key to authenticate your application and start
+							interacting with the API.
+						</p>
+					</div>
+
+					{/* Action Button */}
+					<div className="mt-8">
+						<button
+							type="button"
+							onClick={generateKey}
+							className="flex items-center gap-2 rounded-lg bg-gray-900 px-5 py-2.5 font-medium text-sm text-white shadow-sm transition-all hover:bg-gray-800 hover:shadow-md active:scale-95"
+						>
+							<Plus className="h-4 w-4" />
+							Generate Secret Key
+						</button>
+					</div>
 				</div>
 			) : (
 				<div className="space-y-6">

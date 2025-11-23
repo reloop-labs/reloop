@@ -1,6 +1,5 @@
 "use client";
 
-import * as Button from "@reloop/ui/button";
 import { ChevronLeft } from "lucide-react";
 import { parseAsInteger, useQueryState } from "nuqs";
 import type React from "react";
@@ -22,8 +21,8 @@ export const SplitLayout = ({
 	const onBack = step > 1 ? () => setStep(step - 1) : undefined;
 	return (
 		<div className="flex min-h-screen flex-col items-center justify-center">
-			<div className="flex w-full max-w-5xl flex-1 flex-col items-center justify-center border-stroke-soft-200 border-r border-l">
-				<div className="w-full border-stroke-soft-200 border-t" />
+			<div className="flex w-full max-w-5xl flex-1 flex-col items-center justify-center border-stroke-soft-100 border-r border-l">
+				<div className="w-full border-stroke-soft-100 border-t" />
 				<div className="mx-auto grid h-full w-full lg:grid-cols-2">
 					<div className="flex flex-col gap-4 px-12 pt-9 pb-9">
 						<div className="relative flex gap-2">
@@ -47,13 +46,13 @@ export const SplitLayout = ({
 						</div>
 						{children}
 					</div>
-					<div className="relative hidden w-full overflow-hidden border-stroke-soft-200 border-l lg:flex">
+					<div className="relative hidden w-full overflow-hidden border-stroke-soft-100 border-l lg:flex">
 						<div className="fade-in slide-in-from-bottom-8 relative z-10 w-full animate-in duration-700">
 							{previewContent}
 						</div>
 					</div>
 				</div>
-				<div className="w-full border-stroke-soft-200 border-b" />
+				<div className="w-full border-stroke-soft-100 border-b" />
 			</div>
 		</div>
 	);
