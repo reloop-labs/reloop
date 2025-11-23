@@ -1,5 +1,6 @@
 "use client";
 
+import * as Button from "@reloop/ui/button";
 import { CheckCircle2 } from "lucide-react";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useState } from "react";
@@ -93,27 +94,24 @@ const OnBoardingPage = () => {
 
 	if (step === 4) {
 		return (
-			<div className="flex min-h-screen items-center justify-center bg-white p-4">
+			<div className="flex min-h-screen items-center justify-center bg-bg-white-0 p-4">
 				<div className="zoom-in max-w-md animate-in text-center duration-500">
-					<div className="mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-full bg-green-100 text-green-600">
+					<div className="mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-full bg-success-lighter text-success-base">
 						<CheckCircle2 size={48} />
 					</div>
-					<h2 className="mb-4 font-bold text-3xl text-slate-900">
+					<h2 className="mb-4 font-bold text-3xl text-text-strong-950">
 						Setup Complete!
 					</h2>
-					<p className="mb-8 text-lg text-slate-500">
+					<p className="mb-8 text-lg text-text-sub-600">
 						Your workspace{" "}
-						<span className="font-semibold text-slate-900">
+						<span className="font-semibold text-text-strong-950">
 							{formData.name}
 						</span>{" "}
 						is ready. Redirecting you to the dashboard...
 					</p>
-					<button
-						type="button"
-						className="hover:-translate-y-1 w-full transform rounded-xl bg-slate-900 py-4 font-semibold text-white shadow-xl transition-all hover:shadow-2xl"
-					>
+					<Button.Root variant="neutral" mode="filled" className="w-full">
 						Go to Dashboard
-					</button>
+					</Button.Root>
 				</div>
 			</div>
 		);
