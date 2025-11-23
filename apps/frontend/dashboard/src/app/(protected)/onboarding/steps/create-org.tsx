@@ -2,8 +2,7 @@
 
 import * as Button from "@reloop/ui/button";
 import * as Input from "@reloop/ui/input";
-import * as Select from "@reloop/ui/select";
-import * as Textarea from "@reloop/ui/textarea";
+import * as Label from "@reloop/ui/label";
 import { Upload } from "lucide-react";
 import type React from "react";
 
@@ -100,7 +99,7 @@ export const CreateOrgStep = ({ data, updateData }: CreateOrgStepProps) => {
 					>
 						Company Name
 					</label>
-					<Input.Root>
+					<Input.Root size="small">
 						<Input.Wrapper>
 							<Input.Input
 								id="company-name"
@@ -118,71 +117,21 @@ export const CreateOrgStep = ({ data, updateData }: CreateOrgStepProps) => {
 					</Input.Root>
 				</div>
 
-				<div>
-					<label
-						htmlFor="workspace-handle"
-						className="mb-1.5 block font-semibold text-sm text-text-strong-950"
-					>
-						Workspace handle
-					</label>
-					<div className="flex">
-						<span className="inline-flex items-center rounded-l-10 border border-stroke-soft-200 border-r-0 bg-bg-weak-50 px-4 font-medium text-sm text-text-sub-600">
-							app.mailinfra.com/
-						</span>
-						<Input.Root className="rounded-l-none">
-							<Input.Wrapper>
-								<Input.Input
-									id="workspace-handle"
-									type="text"
-									value={data.url}
-									onChange={(e) => updateData({ url: e.target.value })}
-								/>
-							</Input.Wrapper>
-						</Input.Root>
-					</div>
-				</div>
-
-				<div>
-					<label
-						htmlFor="billing-country"
-						className="mb-1.5 block font-semibold text-sm text-text-strong-950"
-					>
-						Billing Country
-					</label>
-					<Select.Root
-						value={data.country}
-						onValueChange={(value: string) => updateData({ country: value })}
-					>
-						<Select.Trigger id="billing-country">
-							<Select.Value placeholder="Select country" />
-						</Select.Trigger>
-						<Select.Content>
-							<Select.Item value="US">United States of America</Select.Item>
-							<Select.Item value="UK">United Kingdom</Select.Item>
-							<Select.Item value="CA">Canada</Select.Item>
-							<Select.Item value="EU">European Union</Select.Item>
-							<Select.Item value="IN">India</Select.Item>
-						</Select.Content>
-					</Select.Root>
-				</div>
-
-				<div>
-					<label
-						htmlFor="referral"
-						className="mb-1.5 block font-semibold text-sm text-text-strong-950"
-					>
-						How did you hear about us?
-					</label>
-					<Textarea.Root
-						id="referral"
-						rows={3}
-						placeholder="Share how you heard about MailInfra..."
-						simple
-						value={data.referral}
-						onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-							updateData({ referral: e.target.value })
-						}
-					/>
+				<div className="flex flex-col gap-1">
+					<Label.Root htmlFor="workspace-handle">Workspace handle</Label.Root>
+					<Input.Root size="small">
+						<Input.Wrapper className="gap-0">
+							<Input.InlineAffix className="m">
+								reloop.sh/dashboard/
+							</Input.InlineAffix>
+							<Input.Input
+								id="workspace-handle"
+								type="text"
+								value={data.url}
+								onChange={(e) => updateData({ url: e.target.value })}
+							/>
+						</Input.Wrapper>
+					</Input.Root>
 				</div>
 			</div>
 		</div>

@@ -127,7 +127,6 @@ const OnBoardingPage = () => {
 		<SplitLayout
 			stepIndicator={currentConfig.stepIndicator}
 			title={currentConfig.title}
-			description={currentConfig.description}
 			previewContent={currentConfig.preview}
 			onBack={step > 1 ? handlePrevious : undefined}
 			onNext={handleNext}
