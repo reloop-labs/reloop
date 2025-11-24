@@ -32,7 +32,11 @@ export const SidebarPreview = ({ name, logo, slug }: SidebarPreviewProps) => {
 					<div className="flex w-52 flex-col gap-2 border-stroke-soft-100 border-r">
 						<div className="flex w-full items-center gap-2 border-stroke-soft-100 border-b px-4 py-2">
 							{logo ? (
-								<img src={logo} alt="Logo" className="h-6 w-6 object-cover" />
+								<img
+									src={logo}
+									alt="Logo"
+									className="h-5 w-5 rounded-sm object-cover"
+								/>
 							) : (
 								<span className="flex h-6 w-6 items-center justify-center rounded-lg border border-stroke-soft-200 p-1 font-bold text-xs">
 									{name && name.length > 0 ? name[0]?.toUpperCase() : "W"}

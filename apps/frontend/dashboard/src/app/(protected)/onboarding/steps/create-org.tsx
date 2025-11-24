@@ -1,6 +1,7 @@
 "use client";
 
 import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
 import * as FileUpload from "@reloop/ui/file-upload";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
@@ -8,6 +9,7 @@ import * as Label from "@reloop/ui/label";
 import * as Select from "@reloop/ui/select";
 import { parseAsInteger, useQueryState } from "nuqs";
 import type React from "react";
+import { useRef } from "react";
 
 interface CreateOrgStepProps {
 	data: {
@@ -23,16 +25,31 @@ interface CreateOrgStepProps {
 
 export const CreateOrgStep = ({ data, updateData }: CreateOrgStepProps) => {
 	const [step, setStep] = useQueryState("step", parseAsInteger.withDefault(1));
+	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (file) {
+			// Validate file size (10MB)
+			if (file.size > 10 * 1024 * 1024) {
+				alert("File size must be less than 10MB");
+				return;
+			}
+			// Validate file type (images only)
+			if (!file.type.startsWith("image/")) {
+				alert("Please select an image file");
+				return;
+			}
 			const reader = new FileReader();
 			reader.onloadend = () => {
 				updateData({ logo: file, logoPreview: reader.result as string });
 			};
 			reader.readAsDataURL(file);
 		}
+	};
+
+	const handleFileUploadClick = () => {
+		fileInputRef.current?.click();
 	};
 
 	const onNext = () => {
@@ -47,19 +64,49 @@ export const CreateOrgStep = ({ data, updateData }: CreateOrgStepProps) => {
 		<div className="fade-in animate-in duration-500">
 			<div>
 				<div className="flex items-center gap-4">
-					<FileUpload.Root className="h-20 w-20">
-						<FileUpload.Icon
-							name="image-upload"
-							as={Icon}
-							className="h-6 w-6"
-						/>
+					<input
+						ref={fileInputRef}
+						type="file"
+						accept="image/*"
+						onChange={handleLogoChange}
+						className="hidden"
+					/>
+					<FileUpload.Root
+						className={cn(
+							"flex h-[72px] w-[72px] cursor-pointer items-center justify-center overflow-hidden rounded-xl",
+							data.logoPreview
+								? "border border-stroke-sub-300 border-solid p-0"
+								: "border border-stroke-sub-300 p-1",
+						)}
+						data-has-logo={!!data.logoPreview}
+						onClick={handleFileUploadClick}
+					>
+						{data.logoPreview ? (
+							<img
+								src={data.logoPreview}
+								alt="Logo preview"
+								className="h-full w-full rounded-xl object-cover"
+							/>
+						) : (
+							<FileUpload.Icon
+								name="image-upload"
+								as={Icon}
+								className="h-4 w-4"
+							/>
+						)}
 					</FileUpload.Root>
 					<div>
 						<Label.Root htmlFor="email">Workspace logo</Label.Root>
 						<p className="-mt-0.5 pb-2 text-paragraph-xs text-text-sub-600">
 							Recommended size 1:1, up to 10MB.
 						</p>
-						<Button.Root variant="neutral" mode="stroke" size="xxsmall">
+						<Button.Root
+							variant="neutral"
+							mode="stroke"
+							size="xxsmall"
+							type="button"
+							onClick={handleFileUploadClick}
+						>
 							<Icon name="camera" className="h-4 w-4" />
 							Upload Logo
 						</Button.Root>
