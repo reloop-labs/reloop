@@ -2,7 +2,7 @@ import { authMiddleware } from "@be/audience/middleware/auth";
 import { AudienceGroupModel } from "@be/audience/model/audience-group.model";
 import { updateAudienceGroupHandler } from "@be/audience/routes/audience-group/controllers/update-audience-group";
 import type { User } from "@reloop/auth/server";
-import { Elysia, status, t } from "elysia";
+import { Elysia, t } from "elysia";
 
 export const updateAudienceGroupRoute = new Elysia().use(authMiddleware).put(
 	"/update/:id",
@@ -15,14 +15,10 @@ export const updateAudienceGroupRoute = new Elysia().use(authMiddleware).put(
 		body: AudienceGroupModel.UpdateAudienceGroupBody;
 		user: User;
 	}) => {
-		if (!user.activeOrganizationId) {
-			throw status(403, {
-				message: "User is not a member of an organization",
-			});
-		}
+		const { activeOrganizationId } = user;
 		return await updateAudienceGroupHandler(
 			params.id,
-			user.activeOrganizationId,
+			activeOrganizationId as string,
 			body,
 		);
 	},

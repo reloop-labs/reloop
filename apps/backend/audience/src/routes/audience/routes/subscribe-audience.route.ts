@@ -2,7 +2,7 @@ import { authMiddleware } from "@be/audience/middleware/auth";
 import { AudienceModel } from "@be/audience/model/audience.model";
 import { subscribeAudienceHandler } from "@be/audience/routes/audience/controllers/subscribe-audience";
 import type { User } from "@reloop/auth/server";
-import { Elysia, status, t } from "elysia";
+import { Elysia, t } from "elysia";
 
 export const subscribeAudienceRoute = new Elysia().use(authMiddleware).post(
 	"/subscribe/:id",
@@ -15,14 +15,10 @@ export const subscribeAudienceRoute = new Elysia().use(authMiddleware).post(
 		body: AudienceModel.SubscribeAudienceBody;
 		user: User;
 	}) => {
-		if (!user.activeOrganizationId) {
-			throw status(403, {
-				message: "User is not a member of an organization",
-			});
-		}
+		const { activeOrganizationId } = user;
 		return await subscribeAudienceHandler(
 			params.id,
-			user.activeOrganizationId,
+			activeOrganizationId as string,
 			body,
 		);
 	},

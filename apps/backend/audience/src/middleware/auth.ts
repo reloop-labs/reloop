@@ -1,4 +1,5 @@
 import { audienceConfig } from "@be/audience/audience.config";
+import { errorCodes } from "@be/audience/utils/audience.error-code";
 import type { Session } from "@reloop/auth/server";
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
@@ -19,10 +20,12 @@ export const authMiddleware = new Elysia({ name: "better-auth" }).macro({
 				);
 				const session: Session | null = await response.json();
 				if (session) {
-					logger.info(
-						{ userId: session.user },
-						"User authenticated via cookie",
-					);
+					if (!session?.user?.activeOrganizationId) {
+						return status(401, {
+							message: "User is not a member of an organization",
+							code: errorCodes.NOT_MEMBER_OF_ORGANIZATION,
+						});
+					}
 					return {
 						user: session.user,
 						session: session.session,

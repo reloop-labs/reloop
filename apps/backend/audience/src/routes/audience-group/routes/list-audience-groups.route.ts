@@ -1,17 +1,16 @@
 import { authMiddleware } from "@be/audience/middleware/auth";
 import { AudienceGroupModel } from "@be/audience/model/audience-group.model";
 import { listAudienceGroupsHandler } from "@be/audience/routes/audience-group/controllers/list-audience-groups";
-import { Elysia, status } from "elysia";
+import { Elysia } from "elysia";
 
 export const listAudienceGroupsRoute = new Elysia().use(authMiddleware).get(
 	"/list",
 	async ({ query, user }) => {
-		if (!user.activeOrganizationId) {
-			throw status(403, {
-				message: "User is not a member of an organization",
-			});
-		}
-		return await listAudienceGroupsHandler(user.activeOrganizationId, query);
+		const { activeOrganizationId } = user;
+		return await listAudienceGroupsHandler(
+			activeOrganizationId as string,
+			query,
+		);
 	},
 	{
 		auth: true,
