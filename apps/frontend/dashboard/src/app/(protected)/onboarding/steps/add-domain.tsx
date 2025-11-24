@@ -1,7 +1,9 @@
 "use client";
 
 import * as Button from "@reloop/ui/button";
+import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
+import * as Label from "@reloop/ui/label";
 import { Copy, Globe, Loader2 } from "lucide-react";
 import { useState } from "react";
 
@@ -27,20 +29,8 @@ export const AddDomainStep = ({ data, updateData }: AddDomainStepProps) => {
 
 	return (
 		<div className="fade-in animate-in space-y-6 duration-500">
-			<div className="rounded-xl border border-information-lighter bg-information-lighter p-5">
-				<p className="text-sm text-text-strong-950 leading-relaxed">
-					Adding a sending domain improves your deliverability and removes the
-					"via mailinfra.com" label from your emails.
-				</p>
-			</div>
-
-			<div>
-				<label
-					htmlFor="domain-name"
-					className="mb-1.5 block font-semibold text-sm text-text-strong-950"
-				>
-					Domain Name
-				</label>
+			<div className="flex flex-col gap-1">
+				<Label.Root htmlFor="domain-name">Domain Name</Label.Root>
 				<div className="flex gap-3">
 					<Input.Root className="flex-1">
 						<Input.Wrapper>
@@ -50,15 +40,35 @@ export const AddDomainStep = ({ data, updateData }: AddDomainStepProps) => {
 							<Input.Input
 								id="domain-name"
 								type="text"
-								placeholder="e.g. mail.yourcompany.com"
+								placeholder="e.g. news.reloop.sh"
 								value={data.domain}
 								onChange={(e) => updateData({ domain: e.target.value })}
 							/>
 						</Input.Wrapper>
 					</Input.Root>
+				</div>
+				<div className="mt-6">
+					<div className="flex items-center gap-2 text-xs uppercase">
+						<Icon name="bulb" className="h-3 w-3" />
+						<p>Pro Tip</p>
+					</div>
+					<p className="pt-2 text-sm text-text-sub-600">
+						Use separate domain for domain reputation
+					</p>
+					<div className="pt-3 text-sm text-text-sub-600">
+						<p>Subdomain example:</p>
+						<ul className="list-disc pl-5">
+							<li>marketing.example.com</li>
+							<li>send.example.com</li>
+							<li>transection.example.com</li>
+						</ul>
+					</div>
+				</div>
+				<div className="pt-5">
 					<Button.Root
 						variant="neutral"
 						mode="filled"
+						className="w-full"
 						onClick={handleVerify}
 						disabled={!data.domain || verifying}
 					>

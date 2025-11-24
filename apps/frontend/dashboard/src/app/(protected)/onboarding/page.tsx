@@ -58,15 +58,15 @@ const OnBoardingPage = () => {
 		},
 		2: {
 			stepIndicator: "2/3",
-			title: "Generate API Credentials",
-			component: <GenerateApiKeyStep data={formData} updateData={updateData} />,
-			preview: <ApiPreview apiKey={formData.apiKey} />,
+			title: "Add Domain",
+			component: <AddDomainStep data={formData} updateData={updateData} />,
+			preview: <DomainPreview domain={formData.domain} />,
 		},
 		3: {
 			stepIndicator: "3/3",
-			title: "Verify Sending Domain",
-			component: <AddDomainStep data={formData} updateData={updateData} />,
-			preview: <DomainPreview domain={formData.domain} />,
+			title: "Generate API Credentials",
+			component: <GenerateApiKeyStep data={formData} updateData={updateData} />,
+			preview: <ApiPreview apiKey={formData.apiKey} />,
 		},
 	};
 
