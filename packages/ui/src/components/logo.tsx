@@ -1,4 +1,11 @@
+import { useTheme } from "next-themes";
+
 export const Logo = ({ className }: { className?: string }) => {
+	const { resolvedTheme: theme } = useTheme();
+
+	const fillColor = theme === "dark" ? "#D2D2D2" : "#2C2C2C";
+	const strokeColor = theme === "dark" ? "#878787" : "#4D4D4D";
+
 	return (
 		<svg
 			className={className}
@@ -6,14 +13,14 @@ export const Logo = ({ className }: { className?: string }) => {
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
 		>
-			<rect x={55} y={51} width={83} height={8} fill="#2C2C2C" />
+			<rect x={55} y={51} width={83} height={8} fill={fillColor} />
 			<rect
 				x={55}
 				y={59}
 				width={75}
 				height={8}
 				transform="rotate(90 55 59)"
-				fill="#2C2C2C"
+				fill={fillColor}
 			/>
 			<rect
 				x={146}
@@ -21,7 +28,7 @@ export const Logo = ({ className }: { className?: string }) => {
 				width={46}
 				height={8}
 				transform="rotate(90 146 59)"
-				fill="#2C2C2C"
+				fill={fillColor}
 			/>
 			<rect
 				x={154}
@@ -29,7 +36,7 @@ export const Logo = ({ className }: { className?: string }) => {
 				width={44}
 				height={8}
 				transform="rotate(90 154 69)"
-				fill="#D2D2D2"
+				fill={fillColor}
 			/>
 			<rect
 				x={138}
@@ -37,7 +44,7 @@ export const Logo = ({ className }: { className?: string }) => {
 				width={46}
 				height={8}
 				transform="rotate(90 138 59)"
-				fill="#4D4D4D"
+				fill={strokeColor}
 			/>
 			<rect
 				x={130}
@@ -45,7 +52,7 @@ export const Logo = ({ className }: { className?: string }) => {
 				width={46}
 				height={8}
 				transform="rotate(90 130 59)"
-				fill="#878787"
+				fill={strokeColor}
 			/>
 			<rect
 				x={90}
@@ -53,7 +60,7 @@ export const Logo = ({ className }: { className?: string }) => {
 				width={29}
 				height={8}
 				transform="rotate(90 90 105)"
-				fill="#4D4D4D"
+				fill={strokeColor}
 			/>
 			<rect
 				x={82}
@@ -61,7 +68,7 @@ export const Logo = ({ className }: { className?: string }) => {
 				width={29}
 				height={8}
 				transform="rotate(90 82 105)"
-				fill="#878787"
+				fill={strokeColor}
 			/>
 			<rect
 				x={138}
@@ -69,7 +76,7 @@ export const Logo = ({ className }: { className?: string }) => {
 				width={8}
 				height={8}
 				transform="rotate(90 138 105)"
-				fill="#2C2C2C"
+				fill={fillColor}
 			/>
 			<rect
 				x={146}
@@ -77,7 +84,7 @@ export const Logo = ({ className }: { className?: string }) => {
 				width={8}
 				height={8}
 				transform="rotate(90 146 105)"
-				fill="#D2D2D2"
+				fill={fillColor}
 			/>
 			<rect
 				x={146}
@@ -85,7 +92,7 @@ export const Logo = ({ className }: { className?: string }) => {
 				width={8}
 				height={8}
 				transform="rotate(90 146 134)"
-				fill="#D2D2D2"
+				fill={fillColor}
 			/>
 			<rect
 				x={130}
@@ -93,7 +100,7 @@ export const Logo = ({ className }: { className?: string }) => {
 				width={8}
 				height={8}
 				transform="rotate(90 130 105)"
-				fill="#4D4D4D"
+				fill={strokeColor}
 			/>
 			<rect
 				x={122}
@@ -101,7 +108,7 @@ export const Logo = ({ className }: { className?: string }) => {
 				width={8}
 				height={8}
 				transform="rotate(90 122 105)"
-				fill="#878787"
+				fill={strokeColor}
 			/>
 			<rect
 				x={98}
@@ -109,7 +116,7 @@ export const Logo = ({ className }: { className?: string }) => {
 				width={10}
 				height={8}
 				transform="rotate(90 98 77)"
-				fill="#2C2C2C"
+				fill={fillColor}
 			/>
 			<rect
 				x={90}
@@ -117,7 +124,7 @@ export const Logo = ({ className }: { className?: string }) => {
 				width={10}
 				height={8}
 				transform="rotate(90 90 77)"
-				fill="#4D4D4D"
+				fill={strokeColor}
 			/>
 			<rect
 				x={82}
@@ -125,7 +132,7 @@ export const Logo = ({ className }: { className?: string }) => {
 				width={10}
 				height={8}
 				transform="rotate(90 82 77)"
-				fill="#878787"
+				fill={strokeColor}
 			/>
 			<rect
 				x={146}
@@ -133,7 +140,7 @@ export const Logo = ({ className }: { className?: string }) => {
 				width={21}
 				height={8}
 				transform="rotate(90 146 113)"
-				fill="#2C2C2C"
+				fill={fillColor}
 			/>
 			<rect
 				x={154}
@@ -141,7 +148,7 @@ export const Logo = ({ className }: { className?: string }) => {
 				width={20}
 				height={8}
 				transform="rotate(90 154 122)"
-				fill="#D2D2D2"
+				fill={fillColor}
 			/>
 			<rect
 				x={138}
@@ -149,7 +156,7 @@ export const Logo = ({ className }: { className?: string }) => {
 				width={21}
 				height={8}
 				transform="rotate(90 138 113)"
-				fill="#4D4D4D"
+				fill={strokeColor}
 			/>
 			<rect
 				x={130}
@@ -157,7 +164,7 @@ export const Logo = ({ className }: { className?: string }) => {
 				width={21}
 				height={8}
 				transform="rotate(90 130 113)"
-				fill="#878787"
+				fill={strokeColor}
 			/>
 			<rect
 				x={98}
@@ -165,10 +172,10 @@ export const Logo = ({ className }: { className?: string }) => {
 				width={21}
 				height={8}
 				transform="rotate(90 98 113)"
-				fill="#2C2C2C"
+				fill={fillColor}
 			/>
-			<rect x={55} y={134} width={83} height={8} fill="#2C2C2C" />
-			<rect x={63} y={142} width={83} height={8} fill="#D2D2D2" />
+			<rect x={55} y={134} width={83} height={8} fill={fillColor} />
+			<rect x={63} y={142} width={83} height={8} fill={fillColor} />
 		</svg>
 	);
 };
