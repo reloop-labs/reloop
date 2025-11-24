@@ -1,14 +1,15 @@
 import "dotenv/config";
+import { audienceConfig } from "@be/audience/audience.config";
+import { audienceRoutes } from "@be/audience/routes/audience/audience.routes";
+import { audienceGroupRoutes } from "@be/audience/routes/audience-group/audience-group.routes";
+import { landing } from "@be/audience/routes/landing/landing.index";
+import { loader } from "@be/audience/utils/loader";
 import { fromTypes, openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
-import { audienceRoutes } from "@reloop/audience/routes/audience/audience.routes";
-import { audienceGroupRoutes } from "@reloop/audience/routes/audience-group/audience-group.routes";
-import { landing } from "@reloop/audience/routes/landing/landing.index";
-import { loader } from "@reloop/audience/utils/loader";
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
 
-const port = 8014;
+const port = audienceConfig.port;
 const audienceService = new Elysia({
 	prefix: "/api/audience",
 	name: "Audience Service",
@@ -16,7 +17,7 @@ const audienceService = new Elysia({
 	.use(
 		openapi({
 			references: fromTypes(
-				process.env.NODE_ENV === "production"
+				audienceConfig.NODE_ENV === "production"
 					? "dist/index.d.ts"
 					: "src/index.ts",
 			),

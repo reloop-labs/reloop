@@ -1,17 +1,14 @@
+import { audienceConfig } from "@be/audience/audience.config";
 import type { Session } from "@reloop/auth/server";
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
-
-if (process.env.NODE_ENV !== "production") {
-	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-}
 
 export const authMiddleware = new Elysia({ name: "better-auth" }).macro({
 	auth: {
 		async resolve({ status, request: { headers } }) {
 			try {
 				const response = await fetch(
-					`${process.env.BASE_URL}/api/auth/v1/get-session`,
+					`${audienceConfig.BASE_URL}/api/auth/v1/get-session`,
 					{
 						method: "GET",
 						headers: new Headers({
