@@ -1,4 +1,4 @@
-import type { AudienceTypes } from "@reloop/audience/routes/audience/audience.type";
+import type { AudienceTypes } from "@be/audience/types/audience.type";
 
 export function formatAudienceResponse(
 	audience: AudienceTypes.AudienceData & { audienceGroup: { name: string } },

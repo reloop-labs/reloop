@@ -1,4 +1,4 @@
-import type { AudienceTypes } from "@reloop/audience/routes/audience/audience.type";
+import type { AudienceTypes } from "@be/audience/types/audience.type";
 import { formatAudienceResponse } from "@reloop/audience/routes/audience/controllers/format-audience-response";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
