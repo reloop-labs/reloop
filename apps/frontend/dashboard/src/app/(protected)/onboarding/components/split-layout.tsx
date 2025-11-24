@@ -24,8 +24,11 @@ export const SplitLayout = ({
 		<div className="flex min-h-screen flex-col items-center justify-center">
 			<div className="-translate-x-1/2 absolute top-5 left-1/2 flex items-center space-x-2">
 				<Logo className="h-10 w-10 lg:h-11 lg:w-11" />
-				<span className="-ml-2 font-semibold text-text-strong-950 text-xl">
-					Reloop
+				<span
+					className="-ml-3 -mt-1 font-semibold text-text-strong-950 text-xl"
+					style={{ fontFamily: "var(--font-outfit)" }}
+				>
+					reloop
 				</span>
 			</div>
 			<div className="flex w-full max-w-5xl flex-1 flex-col items-center justify-center border-stroke-soft-100 border-r border-l">

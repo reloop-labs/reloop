@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import SWRProvider from "@fe/dashboard/providers/swr.config";
 import { IconsSprite } from "@reloop/ui/icon";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Outfit } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
@@ -14,6 +14,12 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
 	variable: "--font-geist-mono",
 	subsets: ["latin"],
+});
+
+const outfit = Outfit({
+	variable: "--font-outfit",
+	subsets: ["latin"],
+	weight: "600",
 });
 export const metadata: Metadata = {
 	title: "Reloop Dashboard",
@@ -28,7 +34,7 @@ export default function RootLayout({
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<body
-				className={`${geistSans.variable} ${geistMono.variable} bg-bg-white-0 text-text-strong-950 antialiased`}
+				className={`${geistSans.variable} ${geistMono.variable} ${outfit.variable} bg-bg-white-0 text-text-strong-950 antialiased`}
 			>
 				<NuqsAdapter>
 					<ThemeProvider
