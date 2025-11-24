@@ -1,5 +1,5 @@
-import type { AudienceGroupTypes } from "@reloop/audience/routes/audience-group/audience-group.type";
-import { formatAudienceGroupResponse } from "@reloop/audience/routes/audience-group/controllers/format-audience-group-response";
+import type { AudienceGroupTypes } from "@be/audience/routes/audience-group/audience-group.type";
+import { formatAudienceGroupResponse } from "@be/audience/routes/audience-group/controllers/format-audience-group-response";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
