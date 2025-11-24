@@ -1,6 +1,6 @@
-import { authMiddleware } from "@reloop/audience/middleware/auth";
-import { AudienceModel } from "@reloop/audience/routes/audience/audience.model";
-import { searchAudiencesHandler } from "@reloop/audience/routes/audience/controllers/search-audiences";
+import { authMiddleware } from "@be/audience/middleware/auth";
+import { AudienceModel } from "@be/audience/model/audience.model";
+import { searchAudiencesHandler } from "@be/audience/routes/audience/controllers/search-audiences";
 import { Elysia, status } from "elysia";
 
 export const searchAudiencesRoute = new Elysia().use(authMiddleware).get(

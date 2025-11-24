@@ -1,4 +1,4 @@
-import type { AudienceGroupModel } from "@be/audience/routes/audience-group/audience-group.model";
+import type { AudienceGroupModel } from "@be/audience/model/audience-group.model";
 export namespace AudienceGroupTypes {
 	// Audience Group Types
 	export type AudienceGroupResponse =

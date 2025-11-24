@@ -1,6 +1,6 @@
-import { authMiddleware } from "@reloop/audience/middleware/auth";
-import { AudienceGroupModel } from "@reloop/audience/routes/audience-group/audience-group.model";
-import { createAudienceGroupHandler } from "@reloop/audience/routes/audience-group/controllers/create-audience-group";
+import { authMiddleware } from "@be/audience/middleware/auth";
+import { AudienceGroupModel } from "@be/audience/model/audience-group.model";
+import { createAudienceGroupHandler } from "@be/audience/routes/audience-group/controllers/create-audience-group";
 import { Elysia, status } from "elysia";
 
 export const createAudienceGroupRoute = new Elysia().use(authMiddleware).post(

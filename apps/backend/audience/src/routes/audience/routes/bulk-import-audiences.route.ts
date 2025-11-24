@@ -1,7 +1,7 @@
-import { authMiddleware } from "@reloop/audience/middleware/auth";
-import { AudienceModel } from "@reloop/audience/routes/audience/audience.model";
-import { bulkImportAudiencesHandler } from "@reloop/audience/routes/audience/controllers/bulk-import-audiences";
-import { AudienceGroupModel } from "@reloop/audience/routes/audience-group/audience-group.model";
+import { authMiddleware } from "@be/audience/middleware/auth";
+import { AudienceModel } from "@be/audience/model/audience.model";
+import { AudienceGroupModel } from "@be/audience/model/audience-group.model";
+import { bulkImportAudiencesHandler } from "@be/audience/routes/audience/controllers/bulk-import-audiences";
 import { Elysia, status } from "elysia";
 
 export const bulkImportAudiencesRoute = new Elysia().use(authMiddleware).post(

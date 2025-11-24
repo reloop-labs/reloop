@@ -1,6 +1,6 @@
-import { authMiddleware } from "@reloop/audience/middleware/auth";
-import { AudienceModel } from "@reloop/audience/routes/audience/audience.model";
-import { updateAudienceHandler } from "@reloop/audience/routes/audience/controllers/update-audience";
+import { authMiddleware } from "@be/audience/middleware/auth";
+import { AudienceModel } from "@be/audience/model/audience.model";
+import { updateAudienceHandler } from "@be/audience/routes/audience/controllers/update-audience";
 import type { User } from "@reloop/auth/server";
 import { Elysia, status, t } from "elysia";
 

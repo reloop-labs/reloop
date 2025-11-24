@@ -1,4 +1,4 @@
-import type { AudienceModel } from "@reloop/audience/routes/audience/audience.model";
+import type { AudienceModel } from "@be/audience/model/audience.model";
 
 export namespace AudienceTypes {
 	// Audience Types
