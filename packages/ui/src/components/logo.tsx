@@ -1,10 +1,12 @@
 import { useTheme } from "next-themes";
 
 export const Logo = ({ className }: { className?: string }) => {
-	const { resolvedTheme: theme } = useTheme();
+	const { theme, resolvedTheme } = useTheme();
+	const currentTheme =
+		theme === "light" || theme === "dark" ? theme : resolvedTheme;
 
-	const fillColor = theme === "dark" ? "#D2D2D2" : "#2C2C2C";
-	const strokeColor = theme === "dark" ? "#878787" : "#4D4D4D";
+	const fillColor = currentTheme === "dark" ? "#D2D2D2" : "#2C2C2C";
+	const strokeColor = currentTheme === "dark" ? "#878787" : "#4D4D4D";
 
 	return (
 		<svg
