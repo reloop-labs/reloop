@@ -230,9 +230,10 @@ interface DomainPreviewProps {
 
 export const DomainPreview = ({ domain }: DomainPreviewProps) => {
 	const domainName = domain ? domain.split(".")[0] || "Sender" : "Sender";
-	const displayDomain = domain || "example.com";
-	const senderEmail = domain ? `hello@${domain}` : "hello@example.com";
-	const replyToEmail = domain ? `noreply@${domain}` : "noreply@example.com";
+	const domainHost = domain ? domain.split(".").slice(-2).join(".") || "" : "";
+	const displayDomain = domain || "";
+	const senderEmail = domain ? `hello@${domainHost}` : "";
+	const toEmail = "sundar@google.com";
 	const avatarInitial = domainName[0]?.toUpperCase() || "S";
 
 	return (
@@ -250,29 +251,42 @@ export const DomainPreview = ({ domain }: DomainPreviewProps) => {
 
 				{/* Email Client Content */}
 				<div className="relative bg-bg-white-0 p-6">
-					{/* Subject Line Skeleton */}
-					<div className="mb-6 flex items-center gap-3">
-						<div className="h-5 w-2/3 rounded-md bg-bg-soft-200" />
-						<div className="ml-auto h-4 w-16 rounded-md bg-bg-weak-50" />
+					{/* Subject Line */}
+					<div className="mb-3 ml-14 flex w-auto justify-start gap-3">
+						<span className="font-medium text-text-strong-800">
+							Black Friday is here. 55% off on all products.
+						</span>
+						<div className="flex items-center gap-1 rounded-md border border-stroke-soft-200 bg-bg-weak-50 px-1.5 py-0">
+							<span className="text-[11px] text-text-soft-400">Inbox</span>
+							<span className="text-[10px] text-text-soft-400">×</span>
+						</div>
 					</div>
 
 					{/* Sender Row */}
 					<div className="flex items-start gap-4">
 						{/* Avatar */}
-						<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-base font-bold text-lg text-white shadow-sm">
-							{avatarInitial}
-						</div>
+						{domain ? (
+							<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-stroke-soft-100 bg-bg-soft-200 font-bold text-sm">
+								{avatarInitial}
+							</div>
+						) : (
+							<div className="h-10 w-10 rounded-full bg-bg-soft-200" />
+						)}
 
 						<div className="relative z-10 min-w-0 flex-1">
 							{/* Sender Name & Email */}
 							<div className="mb-1 flex items-center gap-2">
-								<span className="font-bold text-sm text-text-strong-950">
-									{domainName}
-								</span>
-								{domain && (
-									<span className="hidden text-text-soft-400 text-xs sm:inline">
-										&lt;{senderEmail}&gt;
-									</span>
+								{domain ? (
+									<>
+										<span className="font-bold text-sm text-text-strong-950">
+											{domainName}
+										</span>
+										<span className="hidden text-text-soft-400 text-xs sm:inline">
+											&lt;{senderEmail}&gt;
+										</span>
+									</>
+								) : (
+									<div className="mb-1 h-4 w-32 rounded bg-bg-soft-200" />
 								)}
 								<span className="ml-auto cursor-pointer text-primary-base text-xs sm:ml-2">
 									Unsubscribe
@@ -295,28 +309,44 @@ export const DomainPreview = ({ domain }: DomainPreviewProps) => {
 											from:
 										</div>
 										<div className="font-medium text-text-strong-950">
-											{domainName}{" "}
-											<span className="font-normal text-text-sub-600">
-												&lt;{senderEmail}&gt;
-											</span>
+											{domain ? (
+												<>
+													{domainName}{" "}
+													<span className="font-normal text-text-sub-600">
+														&lt;{senderEmail}&gt;
+													</span>
+												</>
+											) : (
+												<div className="h-4 w-48 rounded bg-bg-soft-200" />
+											)}
 										</div>
 
 										<div className="pr-3 text-right text-text-soft-400">
-											reply-to:
+											to:
 										</div>
-										<div className="text-primary-base">{replyToEmail}</div>
+										<div className="text-text-strong-950">{toEmail}</div>
 
 										<div className="pr-3 text-right text-text-soft-400">
 											date:
 										</div>
 										<div className="text-text-sub-600">
-											Nov 21, 2025, 12:19 AM
+											{new Date().toLocaleDateString("en-US", {
+												month: "short",
+												day: "numeric",
+												year: "numeric",
+											})}
+											,{" "}
+											{new Date().toLocaleTimeString("en-US", {
+												hour: "numeric",
+												minute: "2-digit",
+												hour12: true,
+											})}
 										</div>
 
 										<div className="pr-3 text-right text-text-soft-400">
 											subject:
 										</div>
-										<div className="font-medium text-text-strong-950">
+										<div className="text-text-strong-950">
 											Black Friday is here. 55% off...
 										</div>
 
@@ -325,13 +355,12 @@ export const DomainPreview = ({ domain }: DomainPreviewProps) => {
 											mailed-by:
 										</div>
 										<div className="flex items-center gap-2">
-											<span className="font-medium text-text-strong-950">
-												{displayDomain}
-											</span>
-											{domain && (
-												<div className="flex h-4 items-center rounded border border-success-lighter bg-success-lighter px-1.5 font-bold text-[9px] text-success-base tracking-wide">
-													PASS
-												</div>
+											{domain ? (
+												<span className="text-text-strong-950">
+													{displayDomain}
+												</span>
+											) : (
+												<div className="h-4 w-32 rounded bg-bg-soft-200" />
 											)}
 										</div>
 
@@ -339,25 +368,25 @@ export const DomainPreview = ({ domain }: DomainPreviewProps) => {
 											signed-by:
 										</div>
 										<div className="flex items-center gap-2">
-											<span className="font-medium text-text-strong-950">
-												{displayDomain}
-											</span>
-											{domain && (
-												<div className="flex h-4 items-center rounded border border-success-lighter bg-success-lighter px-1.5 font-bold text-[9px] text-success-base tracking-wide">
-													PASS
-												</div>
+											{domain ? (
+												<span className="text-text-strong-950">
+													{displayDomain}
+												</span>
+											) : (
+												<div className="h-4 w-32 rounded bg-bg-soft-200" />
 											)}
 										</div>
 
 										<div className="pr-3 text-right text-text-soft-400">
 											security:
 										</div>
+
 										<div className="flex items-center gap-1.5 text-text-sub-600">
-											<Icon name="lock" className="w-4 text-text-soft-400" />
+											<Icon
+												name="shield-check"
+												className="h-3 w-3 text-text-soft-400"
+											/>
 											<span>Standard encryption (TLS)</span>
-											<span className="ml-1 text-text-soft-400 underline decoration-dotted">
-												Learn more
-											</span>
 										</div>
 									</div>
 								</div>
