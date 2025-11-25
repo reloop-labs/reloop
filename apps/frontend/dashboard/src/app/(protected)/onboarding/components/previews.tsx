@@ -229,120 +229,133 @@ interface DomainPreviewProps {
 }
 
 export const DomainPreview = ({ domain }: DomainPreviewProps) => {
+	const domainName = domain ? domain.split(".")[0] || "Sender" : "Sender";
+	const displayDomain = domain || "example.com";
+	const senderEmail = domain ? `hello@${domain}` : "hello@example.com";
+	const replyToEmail = domain ? `noreply@${domain}` : "noreply@example.com";
+	const avatarInitial = domainName[0]?.toUpperCase() || "S";
+
 	return (
 		<div className="absolute top-10 left-10">
-			<div className="w-[1000px] transform overflow-hidden rounded-2xl border border-slate-200 font-sans shadow-2xl transition-all">
-				{/* Fake Browser/Window Header */}
-				<div className="flex items-center gap-2 border-slate-100 border-b bg-slate-50 px-4 py-3">
+			<div className="w-[1000px] transform overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-2xl transition-all">
+				{/* Browser Window Header */}
+				<div className="flex items-center gap-2 border-stroke-soft-100 border-b bg-bg-weak-50 px-4 py-3">
 					<div className="flex gap-1.5">
-						<div className="h-3 w-3 rounded-full bg-rose-400/80" />
-						<div className="h-3 w-3 rounded-full bg-amber-400/80" />
-						<div className="h-3 w-3 rounded-full bg-emerald-400/80" />
+						<div className="h-3 w-3 rounded-full bg-error-base/80" />
+						<div className="h-3 w-3 rounded-full bg-warning-base/80" />
+						<div className="h-3 w-3 rounded-full bg-success-base/80" />
 					</div>
-					<div className="ml-3 h-2.5 max-w-[140px] flex-1 rounded-full bg-slate-200" />
+					<div className="ml-3 h-2.5 max-w-[140px] flex-1 rounded-full bg-bg-soft-200" />
 				</div>
 
-				{/* Email Client Header */}
-				<div className="relative bg-white p-6">
+				{/* Email Client Content */}
+				<div className="relative bg-bg-white-0 p-6">
 					{/* Subject Line Skeleton */}
 					<div className="mb-6 flex items-center gap-3">
-						<div className="h-5 w-2/3 rounded-md bg-slate-100" />
-						<div className="ml-auto h-4 w-16 rounded-md bg-slate-50" />
+						<div className="h-5 w-2/3 rounded-md bg-bg-soft-200" />
+						<div className="ml-auto h-4 w-16 rounded-md bg-bg-weak-50" />
 					</div>
 
 					{/* Sender Row */}
 					<div className="flex items-start gap-4">
 						{/* Avatar */}
-						<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-indigo-600 font-bold text-lg text-white shadow-sm">
-							{domain}
+						<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-base font-bold text-lg text-white shadow-sm">
+							{avatarInitial}
 						</div>
 
 						<div className="relative z-10 min-w-0 flex-1">
-							{/* Sender Name & Details Toggle */}
+							{/* Sender Name & Email */}
 							<div className="mb-1 flex items-center gap-2">
-								<span className="font-bold text-slate-900 text-sm">
-									{domain ? domain.split(".")[0] : "Sender"}
+								<span className="font-bold text-sm text-text-strong-950">
+									{domainName}
 								</span>
-								<span className="hidden text-slate-400 text-xs sm:inline">
-									&lt;hello@{domain}&gt;
-								</span>
-								<span className="ml-auto cursor-pointer text-blue-600 text-xs sm:ml-2">
+								{domain && (
+									<span className="hidden text-text-soft-400 text-xs sm:inline">
+										&lt;{senderEmail}&gt;
+									</span>
+								)}
+								<span className="ml-auto cursor-pointer text-primary-base text-xs sm:ml-2">
 									Unsubscribe
 								</span>
 							</div>
 
-							<div className="mb-2 flex cursor-pointer items-center gap-1 text-slate-400 text-xs">
+							<div className="mb-2 flex cursor-pointer items-center gap-1 text-text-soft-400 text-xs">
 								to me{" "}
-								<div className="mt-0.5 h-0 w-0 border-t-[4px] border-t-slate-400 border-r-[3px] border-r-transparent border-l-[3px] border-l-transparent" />
+								<div className="mt-0.5 h-0 w-0 border-t-[4px] border-t-text-soft-400 border-r-[3px] border-r-transparent border-l-[3px] border-l-transparent" />
 							</div>
 
-							{/* The "Details" Dropdown - Skeleton Style */}
+							{/* Email Details Dropdown */}
 							<div className="fade-in slide-in-from-top-2 relative mt-2 animate-in duration-500">
-								{/* Dropdown Box */}
-								<div className="relative rounded-lg border border-slate-200 bg-white p-4 text-slate-600 text-xs leading-relaxed shadow-lg shadow-slate-200/50">
-									{/* Little Triangle Pointer */}
-									<div className="-top-1.5 absolute left-3 h-3 w-3 rotate-45 transform border-slate-200 border-t border-l bg-white" />
+								<div className="relative rounded-lg border border-stroke-soft-200 bg-bg-white-0 p-4 text-text-sub-600 text-xs leading-relaxed shadow-lg shadow-stroke-soft-200/50">
+									{/* Triangle Pointer */}
+									<div className="-top-1.5 absolute left-3 h-3 w-3 rotate-45 transform border-stroke-soft-200 border-t border-l bg-bg-white-0" />
 
-									<div className="grid grid-cols-[70px_1fr] gap-y-2.5">
-										<div className="pr-3 text-right text-slate-400">from:</div>
-										<div className="font-medium text-slate-900">
-											{domain ? domain.split(".")[0] : "Sender"}{" "}
-											<span className="font-normal text-slate-500">
-												&lt;hello@{domain}&gt;
+									<div className="grid grid-cols-[100px_1fr] gap-y-2.5">
+										<div className="pr-3 text-right text-text-soft-400">
+											from:
+										</div>
+										<div className="font-medium text-text-strong-950">
+											{domainName}{" "}
+											<span className="font-normal text-text-sub-600">
+												&lt;{senderEmail}&gt;
 											</span>
 										</div>
 
-										<div className="pr-3 text-right text-slate-400">
+										<div className="pr-3 text-right text-text-soft-400">
 											reply-to:
 										</div>
-										<div className="text-blue-600">noreply@{domain}</div>
+										<div className="text-primary-base">{replyToEmail}</div>
 
-										<div className="pr-3 text-right text-slate-400">date:</div>
-										<div className="text-slate-700">Nov 21, 2025, 12:19 AM</div>
+										<div className="pr-3 text-right text-text-soft-400">
+											date:
+										</div>
+										<div className="text-text-sub-600">
+											Nov 21, 2025, 12:19 AM
+										</div>
 
-										<div className="pr-3 text-right text-slate-400">
+										<div className="pr-3 text-right text-text-soft-400">
 											subject:
 										</div>
-										<div className="font-medium text-slate-900">
+										<div className="font-medium text-text-strong-950">
 											Black Friday is here. 55% off...
 										</div>
 
-										{/* The Verification Fields - Highlighted */}
-										<div className="pr-3 text-right text-slate-400">
+										{/* Verification Fields */}
+										<div className="pr-3 text-right text-text-soft-400">
 											mailed-by:
 										</div>
 										<div className="flex items-center gap-2">
-											<span className="font-medium text-slate-900">
-												{domain}
+											<span className="font-medium text-text-strong-950">
+												{displayDomain}
 											</span>
 											{domain && (
-												<div className="flex h-4 items-center rounded border border-emerald-100 bg-emerald-50 px-1.5 font-bold text-[9px] text-emerald-700 tracking-wide">
+												<div className="flex h-4 items-center rounded border border-success-lighter bg-success-lighter px-1.5 font-bold text-[9px] text-success-base tracking-wide">
 													PASS
 												</div>
 											)}
 										</div>
 
-										<div className="pr-3 text-right text-slate-400">
+										<div className="pr-3 text-right text-text-soft-400">
 											signed-by:
 										</div>
 										<div className="flex items-center gap-2">
-											<span className="font-medium text-slate-900">
-												{domain}
+											<span className="font-medium text-text-strong-950">
+												{displayDomain}
 											</span>
 											{domain && (
-												<div className="flex h-4 items-center rounded border border-emerald-100 bg-emerald-50 px-1.5 font-bold text-[9px] text-emerald-700 tracking-wide">
+												<div className="flex h-4 items-center rounded border border-success-lighter bg-success-lighter px-1.5 font-bold text-[9px] text-success-base tracking-wide">
 													PASS
 												</div>
 											)}
 										</div>
 
-										<div className="pr-3 text-right text-slate-400">
+										<div className="pr-3 text-right text-text-soft-400">
 											security:
 										</div>
-										<div className="flex items-center gap-1.5 text-slate-500">
-											<Icon name="lock" className="w-4 text-slate-400" />
+										<div className="flex items-center gap-1.5 text-text-sub-600">
+											<Icon name="lock" className="w-4 text-text-soft-400" />
 											<span>Standard encryption (TLS)</span>
-											<span className="ml-1 text-slate-400 underline decoration-dotted">
+											<span className="ml-1 text-text-soft-400 underline decoration-dotted">
 												Learn more
 											</span>
 										</div>
@@ -354,16 +367,16 @@ export const DomainPreview = ({ domain }: DomainPreviewProps) => {
 
 					{/* Email Body Skeleton */}
 					<div className="mt-8 space-y-4 opacity-40 blur-[0.5px]">
-						<div className="h-4 w-full rounded bg-slate-100" />
-						<div className="h-4 w-11/12 rounded bg-slate-100" />
-						<div className="h-4 w-4/5 rounded bg-slate-100" />
+						<div className="h-4 w-full rounded bg-bg-soft-200" />
+						<div className="h-4 w-11/12 rounded bg-bg-soft-200" />
+						<div className="h-4 w-4/5 rounded bg-bg-soft-200" />
 
-						<div className="mt-8 flex h-40 w-full items-center justify-center rounded-xl border border-slate-100 bg-slate-50 text-slate-300">
+						<div className="mt-8 flex h-40 w-full items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-weak-50 text-text-soft-400">
 							<Icon name="info" />
 						</div>
 
 						<div className="mt-6 flex justify-center">
-							<div className="h-10 w-32 rounded-lg bg-indigo-50" />
+							<div className="h-10 w-32 rounded-lg bg-primary-lighter" />
 						</div>
 					</div>
 				</div>
