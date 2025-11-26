@@ -60,7 +60,7 @@ export const AddNewMailboxModal = ({
 		{ value: "example.com", label: "example.com" },
 		{ value: "test.example.com", label: "test.example.com" },
 		{ value: "mail.example.com", label: "mail.example.com" },
-		{ value: "reloop.local", label: "reloop.local" },
+		{ value: "local.reloop.sh", label: "local.reloop.sh" },
 	];
 
 	// Inline select component for domain dropdown
@@ -191,7 +191,7 @@ export const AddNewMailboxModal = ({
 												IMAP
 											</p>
 											<p className="col-span-2 font-medium text-sm text-text-strong-950 leading-5">
-												reloop.local
+												local.reloop.sh
 											</p>
 											<p className="col-span-1 font-medium text-sm text-text-strong-950 leading-5">
 												143/993
@@ -202,7 +202,7 @@ export const AddNewMailboxModal = ({
 												SMTP
 											</p>
 											<p className="col-span-2 font-medium text-sm text-text-strong-950 leading-5">
-												reloop.local
+												local.reloop.sh
 											</p>
 											<p className="col-span-1 font-medium text-sm text-text-strong-950 leading-5">
 												25/465/587

@@ -51,11 +51,11 @@ bun install
 This allows all services to run on different ports but appear to be on the same domain, enabling proper communication between components.
 
 ```sh
-echo "127.0.0.1 reloop.local" | sudo tee -a /etc/hosts
+echo "127.0.0.1 local.reloop.sh" | sudo tee -a /etc/hosts
 ```
 
 **What this does:**
-- Maps `reloop.local` to your local machine (`127.0.0.1`)
+- Maps `local.reloop.sh` to your local machine (`127.0.0.1`)
 - Enables services to communicate using the same domain name
 - Prevents network conflicts when running multiple servers
 - Allows proper routing between frontend, backend, and other services

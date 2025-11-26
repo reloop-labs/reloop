@@ -1,4 +1,4 @@
-reloop.local {
+local.reloop.sh {
     # Frontend routes (most specific first)
     handle /dashboard* {
         reverse_proxy host.docker.internal:3001 {

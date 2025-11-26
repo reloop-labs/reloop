@@ -16,7 +16,7 @@ export const sendEmail = async ({ to, subject, html, from }: EmailOptions) => {
 		const { data, error } = await resend.emails.send({
 			from:
 				from ||
-				`Reloop <noreply@${process.env.EMAIL_DOMAIN || "reloop.local"}>`,
+				`Reloop <noreply@${process.env.EMAIL_DOMAIN || "local.reloop.sh"}>`,
 			to: [to],
 			subject,
 			html,

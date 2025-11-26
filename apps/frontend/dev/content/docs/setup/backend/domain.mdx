@@ -15,8 +15,8 @@ Make sure you've completed the [local setup guide](/setup) first (clone repo, in
 
 | Property      | Value                                                          |
 | ------------- | -------------------------------------------------------------- |
-| **API Base URL** | [https://reloop.local/api/domain](https://reloop.local/api/domain) |
-| **API Docs**  | [https://reloop.local/api/domain/openapi](https://reloop.local/api/domain/openapi) |
+| **API Base URL** | [https://local.reloop.sh/api/domain](https://local.reloop.sh/api/domain) |
+| **API Docs**  | [https://local.reloop.sh/api/domain/openapi](https://local.reloop.sh/api/domain/openapi) |
 | **Default Port** | `8011`                                                         |
 | **Location**  | `/apps/backend/domain`                                         |
 | **Dependency** | `auth`                                                         |
@@ -30,7 +30,7 @@ All environment variables are accessed through `domainConfig` and have default v
 | ----------------------------- | ----------- | ------------------------------------------------------------ |
 | `PG_URL`                      | `optional`  | `postgresql://reloop:reloop123@localhost:5432/reloop`        |
 | `REDIS_URL`                   | `optional`  | `redis://:reloop123@localhost:6379`                          |
-| `BASE_URL`                    | `optional`  | `https://reloop.local`                                       |
+| `BASE_URL`                    | `optional`  | `https://local.reloop.sh`                                       |
 | `NODE_ENV`                    | `optional`  | `development`                                                |
 | `PORT`                        | `optional`  | `8011`                                                       |
 | `NODE_TLS_REJECT_UNAUTHORIZED` | `optional` | `0` (automatically set to `0` in non-production environments) |

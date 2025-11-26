@@ -7,7 +7,7 @@ const config = {
 	reactStrictMode: true,
 	basePath: "/dev",
 	output: "standalone",
-	allowedDevOrigins: ["reloop.local", "*.reloop.local"],
+	allowedDevOrigins: ["local.reloop.sh", "*.local.reloop.sh"],
 };
 
 export default withMDX(config);
