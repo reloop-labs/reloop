@@ -45,7 +45,10 @@ const Page = () => {
 						onClick={async () => {
 							try {
 								setLoading({ name: "google", loading: true });
-								await authClient.signIn.social({ provider: "google" });
+								await authClient.signIn.social({
+									provider: "google",
+									callbackURL: "/dashboard",
+								});
 							} catch (error) {
 								setLoading({ name: "google", loading: false });
 								setError({
@@ -94,7 +97,10 @@ const Page = () => {
 						onClick={async () => {
 							try {
 								setLoading({ name: "github", loading: true });
-								await authClient.signIn.social({ provider: "github" });
+								await authClient.signIn.social({
+									provider: "github",
+									callbackURL: "/dashboard",
+								});
 							} catch (error) {
 								setLoading({ name: "github", loading: false });
 								setError({
