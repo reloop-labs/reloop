@@ -18,6 +18,7 @@ const Home = () => {
 		const handleRedirect = async () => {
 			if (!isPending && !organizationsLoading && organizations && session) {
 				if (!organizations || organizations.length === 0) {
+					router.push("/onboarding");
 					return;
 				}
 				if (!activeOrganizationId) {
