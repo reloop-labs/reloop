@@ -90,7 +90,7 @@ export const SignupForm = () => {
 				}
 				return;
 			}
-			router.push("/dashboard/onboarding");
+			router.push("/");
 		} catch (e) {
 			changeStatus("idle");
 			if (e instanceof Error && e.message) {
