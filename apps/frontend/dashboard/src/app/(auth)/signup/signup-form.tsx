@@ -9,7 +9,6 @@ import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
 import Spinner from "@reloop/ui/spinner";
 import { useLoading } from "@reloop/ui/use-loading";
-import { generateId } from "better-auth";
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -19,6 +18,10 @@ import { toast } from "sonner";
 import * as v from "valibot";
 
 const signupSchema = v.object({
+	name: v.pipe(
+		v.string("Name is required"),
+		v.minLength(1, "Name is required"),
+	),
 	email: v.pipe(
 		v.string("Email is required"),
 		v.minLength(1, "Email is required"),
@@ -57,7 +60,6 @@ export const SignupForm = () => {
 	});
 
 	const onSubmit = async (data: SignupFormData) => {
-		// Manual password confirmation validation
 		if (data.password !== data.confirmPassword) {
 			setError("confirmPassword", {
 				type: "manual",
@@ -68,14 +70,12 @@ export const SignupForm = () => {
 
 		try {
 			changeStatus("loading");
-			const name = data.email.split("@")[0]?.replace(/[^a-zA-Z0-9]/g, "") ?? "";
 			const mode = "dev";
-			const organizationSlug = `${name.replace(/\s+/g, "-").toLowerCase()}-${generateId()}`;
+			const { email, password, name } = data;
 			const auth = await authClient.signUp.email({
-				email: data.email,
-				password: data.password,
+				email,
+				password,
 				name,
-				activeOrganizationId: organizationSlug,
 				mode,
 			});
 			if (auth.error) {
@@ -88,20 +88,8 @@ export const SignupForm = () => {
 				} else {
 					toast.error(auth.error.message);
 				}
-
 				return;
 			}
-			const org = await authClient.organization.create({
-				name,
-				slug: organizationSlug,
-				keepCurrentActiveOrganization: true,
-			});
-			if (org.error) {
-				changeStatus("idle");
-				toast.error(org.error.message);
-				return;
-			}
-			await authClient.updateUser({ activeOrganizationId: org.data.id });
 			router.push("/dashboard/onboarding");
 		} catch (e) {
 			changeStatus("idle");
@@ -128,6 +116,27 @@ export const SignupForm = () => {
 		>
 			<form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
 				<Divider.Root variant="line-text">OR</Divider.Root>
+
+				<div className="flex flex-col gap-1">
+					<Label.Root htmlFor="name">
+						Name
+						<Label.Asterisk />
+					</Label.Root>
+					<Input.Root hasError={!!errors.name}>
+						<Input.Wrapper>
+							<Input.Input
+								className="h-11 font-medium"
+								id="name"
+								type="text"
+								placeholder="John Doe"
+								{...register("name")}
+							/>
+						</Input.Wrapper>
+					</Input.Root>
+					{errors.name && (
+						<p className="text-error-base text-sm">{errors.name.message}</p>
+					)}
+				</div>
 
 				<div className="flex flex-col gap-1">
 					<Label.Root htmlFor="email">
