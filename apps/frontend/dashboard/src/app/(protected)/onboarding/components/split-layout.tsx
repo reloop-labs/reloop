@@ -9,7 +9,8 @@ interface SplitLayoutProps {
 	stepIndicator: string;
 	title: string;
 	children: React.ReactNode;
-	previewContent: React.ReactNode;
+	previewContent?: React.ReactNode;
+	fullWidth?: boolean;
 }
 
 export const SplitLayout = ({
@@ -17,6 +18,7 @@ export const SplitLayout = ({
 	title,
 	children,
 	previewContent,
+	fullWidth = false,
 }: SplitLayoutProps) => {
 	const [step, setStep] = useQueryState("step", parseAsInteger.withDefault(1));
 	const onBack = step > 1 ? () => setStep(step - 1) : undefined;
@@ -33,8 +35,12 @@ export const SplitLayout = ({
 			</div>
 			<div className="flex w-full max-w-5xl flex-1 flex-col items-center justify-center border-stroke-soft-100 border-r border-l">
 				<div className="w-full border-stroke-soft-100 border-t" />
-				<div className="mx-auto grid h-full w-full lg:grid-cols-2">
-					<div className="flex flex-col gap-4 px-12 pt-9 pb-9">
+				<div
+					className={`mx-auto grid h-full w-full ${fullWidth ? "lg:grid-cols-1" : "lg:grid-cols-2"}`}
+				>
+					<div
+						className={`flex flex-col gap-4 ${fullWidth ? "px-12 lg:px-24" : "px-12"} pt-9 pb-9`}
+					>
 						<div className="relative flex gap-2">
 							{onBack && (
 								<div className="-left-7 -top-[2.1px] absolute">
@@ -56,11 +62,13 @@ export const SplitLayout = ({
 						</div>
 						{children}
 					</div>
-					<div className="relative hidden w-full overflow-hidden border-stroke-soft-100 border-l lg:flex">
-						<div className="fade-in slide-in-from-bottom-8 relative z-10 w-full animate-in duration-700">
-							{previewContent}
+					{!fullWidth && previewContent && (
+						<div className="relative hidden w-full overflow-hidden border-stroke-soft-100 border-l lg:flex">
+							<div className="fade-in slide-in-from-bottom-8 relative z-10 w-full animate-in duration-700">
+								{previewContent}
+							</div>
 						</div>
-					</div>
+					)}
 				</div>
 				<div className="w-full border-stroke-soft-100 border-b" />
 			</div>

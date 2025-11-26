@@ -2,75 +2,65 @@
 
 import * as Button from "@reloop/ui/button";
 import { CheckCircle2 } from "lucide-react";
-import { parseAsInteger, useQueryState } from "nuqs";
-import { useState } from "react";
+import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import {
 	ApiPreview,
+	DnsConfigPreview,
 	DomainPreview,
 	SidebarPreview,
 } from "./components/previews";
 import { SplitLayout } from "./components/split-layout";
 import { AddDomainStep } from "./steps/add-domain";
+import { ConfigureDnsStep } from "./steps/configure-dns";
 import { CreateOrgStep } from "./steps/create-org";
 import { GenerateApiKeyStep } from "./steps/generate-api-key";
 
-interface FormData {
-	name: string;
-	slug: string;
-	logo: File | null;
-	logoPreview: string | null;
-	apiKey: string;
-	domain: string;
-	country: string;
-	referral: string;
-}
-
 const OnBoardingPage = () => {
 	const [step] = useQueryState("step", parseAsInteger.withDefault(1));
-	const [formData, setFormData] = useState<FormData>({
-		name: "",
-		slug: "",
-		logo: null,
-		logoPreview: null,
-		apiKey: "",
-		domain: "",
-		country: "US",
-		referral: "",
-	});
-
-	const updateData = (newData: Partial<FormData>) => {
-		setFormData((prev) => ({ ...prev, ...newData }));
-	};
+	const [name] = useQueryState("name", parseAsString.withDefault(""));
+	const [slug] = useQueryState("slug", parseAsString.withDefault(""));
+	const [logoPreview] = useQueryState(
+		"logoPreview",
+		parseAsString.withDefault(""),
+	);
+	const [apiKey] = useQueryState("apiKey", parseAsString.withDefault(""));
+	const [domain] = useQueryState("domain", parseAsString.withDefault(""));
 
 	// Configuration for each step
 	const stepsConfig = {
 		1: {
-			stepIndicator: "1/3",
+			stepIndicator: "1/4",
 			title: "Create your workspace",
-			component: <CreateOrgStep data={formData} updateData={updateData} />,
+			component: <CreateOrgStep />,
 			preview: (
-				<SidebarPreview
-					name={formData.name}
-					slug={formData.slug}
-					logo={formData.logoPreview}
-				/>
+				<SidebarPreview name={name} slug={slug} logo={logoPreview || null} />
 			),
+			fullWidth: false,
 		},
 		2: {
-			stepIndicator: "2/3",
+			stepIndicator: "2/4",
 			title: "Add Domain",
-			component: <AddDomainStep data={formData} updateData={updateData} />,
-			preview: <DomainPreview domain={formData.domain} />,
+			component: <AddDomainStep />,
+			preview: <DomainPreview domain={domain} />,
+			fullWidth: false,
 		},
 		3: {
-			stepIndicator: "3/3",
+			stepIndicator: "3/4",
+			title: "Configure DNS",
+			component: <ConfigureDnsStep />,
+			preview: <DnsConfigPreview domain={domain} />,
+			fullWidth: false,
+		},
+		4: {
+			stepIndicator: "4/4",
 			title: "Generate API Credentials",
-			component: <GenerateApiKeyStep data={formData} updateData={updateData} />,
-			preview: <ApiPreview apiKey={formData.apiKey} />,
+			component: <GenerateApiKeyStep />,
+			preview: <ApiPreview apiKey={apiKey} />,
+			fullWidth: false,
 		},
 	};
 
-	if (step === 4) {
+	if (step === 5) {
 		return (
 			<div className="flex min-h-screen items-center justify-center bg-bg-white-0 p-4">
 				<div className="zoom-in max-w-md animate-in text-center duration-500">
@@ -82,9 +72,7 @@ const OnBoardingPage = () => {
 					</h2>
 					<p className="mb-8 text-lg text-text-sub-600">
 						Your workspace{" "}
-						<span className="font-semibold text-text-strong-950">
-							{formData.name}
-						</span>{" "}
+						<span className="font-semibold text-text-strong-950">{name}</span>{" "}
 						is ready. Redirecting you to the dashboard...
 					</p>
 					<Button.Root variant="neutral" mode="filled" className="w-full">
@@ -106,6 +94,7 @@ const OnBoardingPage = () => {
 			stepIndicator={currentConfig.stepIndicator}
 			title={currentConfig.title}
 			previewContent={currentConfig.preview}
+			fullWidth={currentConfig.fullWidth}
 		>
 			{currentConfig.component}
 		</SplitLayout>

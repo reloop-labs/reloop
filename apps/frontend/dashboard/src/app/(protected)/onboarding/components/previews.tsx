@@ -2,8 +2,17 @@
 
 import { CodeBlock } from "@reloop/ui/code-block";
 import { Icon } from "@reloop/ui/icon";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+	CloudLightning,
+	ExternalLink,
+	Globe,
+	Search,
+	Server,
+	ShieldCheck,
+} from "lucide-react";
 import { useTheme } from "next-themes";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LanguageTabs } from "./language-tabs";
 
 interface SidebarPreviewProps {
@@ -227,6 +236,220 @@ export const ApiPreview = ({ apiKey: _apiKey }: ApiPreviewProps) => {
 interface DomainPreviewProps {
 	domain?: string;
 }
+
+// --- MOCK DATA: PROVIDER GUIDES ---
+// In a real app, your backend would return the 'providerKey' based on NS lookup.
+interface ProviderConfig {
+	name: string;
+	color: string;
+	borderColor: string;
+	textColor: string;
+	icon: React.ReactNode;
+	url: string | null;
+	steps: string[];
+}
+
+type ProviderKey = "cloudflare" | "vercel" | "godaddy" | "unknown";
+
+const PROVIDERS: Record<ProviderKey, ProviderConfig> = {
+	cloudflare: {
+		name: "Cloudflare",
+		color: "from-orange-100 to-orange-50",
+		borderColor: "border-orange-200",
+		textColor: "text-orange-600",
+		icon: <CloudLightning className="h-6 w-6 text-orange-600" />,
+		url: "https://dash.cloudflare.com",
+		steps: [
+			"Go to 'DNS' > 'Records' in your dashboard.",
+			"Make sure Proxy status is set to 'DNS Only' (Grey Cloud).",
+			"Click 'Add Record' and select TXT type.",
+		],
+	},
+	vercel: {
+		name: "Vercel",
+		color: "from-zinc-100 to-zinc-50",
+		borderColor: "border-stroke-soft-200",
+		textColor: "text-text-strong-950",
+		icon: (
+			<svg
+				className="h-5 w-5 fill-current text-text-strong-950"
+				viewBox="0 0 24 24"
+			>
+				<path d="M12 1L24 22H0L12 1Z" />
+			</svg>
+		),
+		url: "https://vercel.com/dashboard",
+		steps: [
+			"Navigate to your Project Settings > Domains.",
+			"Click 'Edit' on your domain.",
+			"Scroll down to 'DNS Records' and add the values.",
+		],
+	},
+	godaddy: {
+		name: "GoDaddy",
+		color: "from-teal-100 to-teal-50",
+		borderColor: "border-teal-200",
+		textColor: "text-teal-600",
+		icon: <Server className="h-6 w-6 text-teal-600" />,
+		url: "https://dcc.godaddy.com/manage",
+		steps: [
+			"Go to 'Domain Portfolio' and select your domain.",
+			"Select 'DNS' to view your records.",
+			"Click 'Add New Record' and choose TXT.",
+		],
+	},
+	unknown: {
+		name: "DNS Provider",
+		color: "from-blue-50 to-indigo-50",
+		borderColor: "border-stroke-soft-200",
+		textColor: "text-primary-base",
+		icon: <Globe className="h-6 w-6 text-primary-base" />,
+		url: null,
+		steps: [
+			"Log in to your domain registrar.",
+			"Find the DNS Management or Name Server settings.",
+			"Look for an option to add a TXT record.",
+		],
+	},
+};
+
+interface DnsConfigPreviewProps {
+	domain?: string;
+}
+
+export const DnsConfigPreview = ({ domain }: DnsConfigPreviewProps) => {
+	const [detectedProvider, setDetectedProvider] =
+		useState<ProviderKey>("unknown");
+	const [isDetecting, setIsDetecting] = useState(false);
+
+	// --- LOGIC: SIMULATE DETECTION ---
+	// In production, this would be an API call debounced on input
+	useEffect(() => {
+		if (!domain) {
+			setDetectedProvider("unknown");
+			return;
+		}
+
+		setIsDetecting(true);
+		const timer = setTimeout(() => {
+			if (domain.includes("vercel")) setDetectedProvider("vercel");
+			else if (domain.includes("cloud")) setDetectedProvider("cloudflare");
+			else if (domain.includes("go")) setDetectedProvider("godaddy");
+			else setDetectedProvider("unknown");
+			setIsDetecting(false);
+		}, 600); // Fake network delay
+
+		return () => clearTimeout(timer);
+	}, [domain]);
+
+	const provider = PROVIDERS[detectedProvider];
+
+	return (
+		<div className="h-full w-full p-6">
+			<div className="sticky top-8">
+				<AnimatePresence mode="wait">
+					<motion.div
+						key={detectedProvider}
+						initial={{ opacity: 0, y: 10, scale: 0.98 }}
+						animate={{ opacity: 1, y: 0, scale: 1 }}
+						exit={{ opacity: 0, y: -10, scale: 0.98 }}
+						transition={{ duration: 0.3 }}
+						className={`relative overflow-hidden rounded-2xl border ${provider.borderColor} bg-bg-white-0 shadow-lg`}
+					>
+						{/* Dynamic Background Gradient */}
+						<div
+							className={`absolute inset-0 bg-gradient-to-br ${provider.color}`}
+						/>
+
+						<div className="relative h-full rounded-xl bg-bg-white-0 p-6">
+							{/* Header: Detected Provider */}
+							<div className="mb-6 flex items-center justify-between">
+								<div className="flex items-center gap-3">
+									<div
+										className={`rounded-lg border border-stroke-soft-200 bg-bg-weak-50 p-2 ${provider.textColor}`}
+									>
+										{isDetecting ? (
+											<Search className="h-6 w-6 animate-pulse" />
+										) : (
+											provider.icon
+										)}
+									</div>
+									<div>
+										<p className="mb-0.5 font-medium text-text-soft-400 text-xs uppercase tracking-wider">
+											Detected Provider
+										</p>
+										<h3 className="flex items-center gap-2 font-semibold text-lg text-text-strong-950">
+											{isDetecting ? "Scanning..." : provider.name}
+											{!isDetecting && detectedProvider !== "unknown" && (
+												<ShieldCheck className="h-4 w-4 text-success-base" />
+											)}
+										</h3>
+									</div>
+								</div>
+							</div>
+
+							{/* The Guide Steps */}
+							<div className="mb-8 space-y-4">
+								{provider.steps.map((step: string, index: number) => (
+									<motion.div
+										initial={{ opacity: 0, x: -10 }}
+										animate={{ opacity: 1, x: 0 }}
+										transition={{ delay: index * 0.1 }}
+										key={step}
+										className="flex items-start gap-3"
+									>
+										<div className="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-weak-50 font-mono text-text-sub-600 text-xs">
+											{index + 1}
+										</div>
+										<p className="text-sm text-text-sub-600 leading-relaxed">
+											{step}
+										</p>
+									</motion.div>
+								))}
+							</div>
+
+							{/* Deep Link Action */}
+							{provider.url && (
+								<motion.a
+									whileHover={{ scale: 1.02 }}
+									whileTap={{ scale: 0.98 }}
+									href={provider.url}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="group flex w-full cursor-pointer items-center justify-between rounded-lg border border-stroke-soft-200 bg-bg-weak-50 p-4 transition-all hover:border-primary-base hover:bg-bg-white-0"
+								>
+									<div className="flex items-center gap-3">
+										<div className="flex h-8 w-8 items-center justify-center rounded border border-stroke-soft-200 bg-bg-white-0">
+											{/* Generic Favicon Fetcher for visual polish */}
+											<img
+												src={`https://www.google.com/s2/favicons?domain=${provider.url}&sz=32`}
+												alt="icon"
+												className="h-4 w-4 opacity-70"
+											/>
+										</div>
+										<span className="font-medium text-sm text-text-strong-950 group-hover:text-primary-base">
+											Open {provider.name} DNS
+										</span>
+									</div>
+									<ExternalLink className="h-4 w-4 text-text-soft-400 transition-colors group-hover:text-text-sub-600" />
+								</motion.a>
+							)}
+
+							{/* Fallback tip if unknown */}
+							{detectedProvider === "unknown" && (
+								<div className="rounded-lg border border-primary-lighter bg-primary-lighter/20 p-4 text-text-sub-600 text-xs leading-relaxed">
+									<strong className="text-text-strong-950">Pro Tip:</strong>{" "}
+									Setting TTL to "1 min" or "Automatic" helps records propagate
+									faster.
+								</div>
+							)}
+						</div>
+					</motion.div>
+				</AnimatePresence>
+			</div>
+		</div>
+	);
+};
 
 export const DomainPreview = ({ domain }: DomainPreviewProps) => {
 	const domainName = domain ? domain.split(".")[0] || "Sender" : "Sender";

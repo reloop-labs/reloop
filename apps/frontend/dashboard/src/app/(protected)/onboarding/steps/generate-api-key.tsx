@@ -8,22 +8,16 @@ import {
 	Key,
 	Loader2,
 	Plus,
-	RefreshCw,
 	ShieldCheck,
 } from "lucide-react";
+import { parseAsString, useQueryState } from "nuqs";
 import { useState } from "react";
 
-interface GenerateApiKeyStepProps {
-	data: {
-		apiKey: string;
-	};
-	updateData: (newData: Partial<GenerateApiKeyStepProps["data"]>) => void;
-}
-
-export const GenerateApiKeyStep = ({
-	data,
-	updateData,
-}: GenerateApiKeyStepProps) => {
+export const GenerateApiKeyStep = () => {
+	const [apiKey, setApiKey] = useQueryState(
+		"apiKey",
+		parseAsString.withDefault(""),
+	);
 	const [loading, setLoading] = useState(false);
 	const [copied, setCopied] = useState(false);
 
@@ -34,20 +28,20 @@ export const GenerateApiKeyStep = ({
 				"mi_live_" +
 				Math.random().toString(36).substring(2, 15) +
 				Math.random().toString(36).substring(2, 15);
-			updateData({ apiKey: key });
+			setApiKey(key);
 			setLoading(false);
 		}, 1200);
 	};
 
 	const copyToClipboard = () => {
-		navigator.clipboard.writeText(data.apiKey);
+		navigator.clipboard.writeText(apiKey);
 		setCopied(true);
 		setTimeout(() => setCopied(false), 2000);
 	};
 
 	return (
 		<div className="fade-in animate-in space-y-6 duration-500">
-			{!data.apiKey ? (
+			{!apiKey ? (
 				<div className="flex h-[600px] w-full flex-col items-center justify-center bg-white p-4">
 					{/* Illustration Area */}
 					<div className="relative mb-8 flex h-64 w-64 items-center justify-center">
@@ -93,10 +87,15 @@ export const GenerateApiKeyStep = ({
 						<button
 							type="button"
 							onClick={generateKey}
-							className="flex items-center gap-2 rounded-lg bg-gray-900 px-5 py-2.5 font-medium text-sm text-white shadow-sm transition-all hover:bg-gray-800 hover:shadow-md active:scale-95"
+							disabled={loading}
+							className="flex items-center gap-2 rounded-lg bg-gray-900 px-5 py-2.5 font-medium text-sm text-white shadow-sm transition-all hover:bg-gray-800 hover:shadow-md active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
 						>
-							<Plus className="h-4 w-4" />
-							Generate Secret Key
+							{loading ? (
+								<Loader2 className="h-4 w-4 animate-spin" />
+							) : (
+								<Plus className="h-4 w-4" />
+							)}
+							{loading ? "Generating..." : "Generate Secret Key"}
 						</button>
 					</div>
 				</div>
@@ -131,7 +130,7 @@ export const GenerateApiKeyStep = ({
 										id="api-key"
 										type="text"
 										readOnly
-										value={data.apiKey}
+										value={apiKey}
 										className="pr-14 font-mono"
 									/>
 								</Input.Wrapper>

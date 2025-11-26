@@ -7,24 +7,22 @@ import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
 import * as Select from "@reloop/ui/select";
-import { parseAsInteger, useQueryState } from "nuqs";
+import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import type React from "react";
 import { useRef } from "react";
 
-interface CreateOrgStepProps {
-	data: {
-		name: string;
-		slug: string;
-		logo: File | null;
-		logoPreview: string | null;
-		country: string;
-		referral: string;
-	};
-	updateData: (newData: Partial<CreateOrgStepProps["data"]>) => void;
-}
-
-export const CreateOrgStep = ({ data, updateData }: CreateOrgStepProps) => {
+export const CreateOrgStep = () => {
 	const [step, setStep] = useQueryState("step", parseAsInteger.withDefault(1));
+	const [name, setName] = useQueryState("name", parseAsString.withDefault(""));
+	const [slug, setSlug] = useQueryState("slug", parseAsString.withDefault(""));
+	const [logoPreview, setLogoPreview] = useQueryState(
+		"logoPreview",
+		parseAsString.withDefault(""),
+	);
+	const [referral, setReferral] = useQueryState(
+		"referral",
+		parseAsString.withDefault(""),
+	);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,7 +40,7 @@ export const CreateOrgStep = ({ data, updateData }: CreateOrgStepProps) => {
 			}
 			const reader = new FileReader();
 			reader.onloadend = () => {
-				updateData({ logo: file, logoPreview: reader.result as string });
+				setLogoPreview(reader.result as string);
 			};
 			reader.readAsDataURL(file);
 		}
@@ -53,11 +51,9 @@ export const CreateOrgStep = ({ data, updateData }: CreateOrgStepProps) => {
 	};
 
 	const onNext = () => {
+		const normalizedSlug = slug.toLowerCase().replace(/\s+/g, "-");
+		setSlug(normalizedSlug);
 		setStep(step + 1);
-		updateData({
-			name: data.name,
-			slug: data.slug.toLowerCase().replace(/\s+/g, "-"),
-		});
 	};
 
 	return (
@@ -74,16 +70,16 @@ export const CreateOrgStep = ({ data, updateData }: CreateOrgStepProps) => {
 					<FileUpload.Root
 						className={cn(
 							"flex h-[72px] w-[72px] cursor-pointer items-center justify-center overflow-hidden rounded-xl",
-							data.logoPreview
+							logoPreview
 								? "border border-stroke-sub-300 border-solid p-0"
 								: "border border-stroke-sub-300 p-1",
 						)}
-						data-has-logo={!!data.logoPreview}
+						data-has-logo={!!logoPreview}
 						onClick={handleFileUploadClick}
 					>
-						{data.logoPreview ? (
+						{logoPreview ? (
 							<img
-								src={data.logoPreview}
+								src={logoPreview}
 								alt="Logo preview"
 								className="h-full w-full rounded-xl object-cover"
 							/>
@@ -121,14 +117,13 @@ export const CreateOrgStep = ({ data, updateData }: CreateOrgStepProps) => {
 							<Input.Input
 								id="company-name"
 								type="text"
-								value={data.name}
+								value={name}
 								className="font-medium"
-								onChange={(e) =>
-									updateData({
-										name: e.target.value,
-										slug: e.target.value.toLowerCase().replace(/\s+/g, "-"),
-									})
-								}
+								onChange={(e) => {
+									const newName = e.target.value;
+									setName(newName);
+									setSlug(newName.toLowerCase().replace(/\s+/g, "-"));
+								}}
 								placeholder="e.g. Acme Corp"
 							/>
 						</Input.Wrapper>
@@ -145,11 +140,9 @@ export const CreateOrgStep = ({ data, updateData }: CreateOrgStepProps) => {
 								id="workspace-handle"
 								type="text"
 								className="font-medium"
-								value={data.slug}
+								value={slug}
 								onChange={(e) =>
-									updateData({
-										slug: e.target.value.toLowerCase().replace(/\s+/g, "-"),
-									})
+									setSlug(e.target.value.toLowerCase().replace(/\s+/g, "-"))
 								}
 							/>
 						</Input.Wrapper>
@@ -159,8 +152,8 @@ export const CreateOrgStep = ({ data, updateData }: CreateOrgStepProps) => {
 					<Label.Root htmlFor="referral">How did you hear about us?</Label.Root>
 					<Select.Root
 						size="small"
-						value={data.referral}
-						onValueChange={(value) => updateData({ referral: value })}
+						value={referral}
+						onValueChange={setReferral}
 					>
 						<Select.Trigger className="font-medium text-sm">
 							<Select.Value placeholder="Select an option" />
