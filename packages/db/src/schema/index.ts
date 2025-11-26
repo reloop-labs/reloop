@@ -3,4 +3,5 @@ export * from "./audience";
 export * from "./auth";
 export * from "./domain";
 export * from "./email";
+export * from "./upload";
 export * from "./webhook";

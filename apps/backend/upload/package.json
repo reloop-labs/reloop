@@ -1,0 +1,52 @@
+{
+	"name": "upload",
+	"main": "src/index.ts",
+	"type": "module",
+	"scripts": {
+		"build": "tsdown",
+		"check-types": "tsc --noEmit",
+		"compile": "bun build --compile --minify --sourcemap --bytecode ./src/index.ts --outfile server",
+		"dev": "bun run --hot src/index.ts",
+		"start": "bun run dist/index.js"
+	},
+	"dependencies": {
+		"@elysiajs/cors": "catalog:backend",
+		"@elysiajs/cron": "catalog:backend",
+		"@elysiajs/opentelemetry": "catalog:backend",
+		"@elysiajs/server-timing": "catalog:backend",
+		"@elysiajs/static": "catalog:backend",
+		"@elysiajs/swagger": "catalog:backend",
+		"@opentelemetry/exporter-trace-otlp-http": "catalog:backend",
+		"@opentelemetry/exporter-trace-otlp-proto": "catalog:backend",
+		"@opentelemetry/instrumentation-express": "catalog:backend",
+		"@opentelemetry/instrumentation-http": "catalog:backend",
+		"@opentelemetry/resources": "catalog:backend",
+		"@opentelemetry/sdk-trace-node": "catalog:backend",
+		"@opentelemetry/semantic-conventions": "catalog:backend",
+		"@paralleldrive/cuid2": "catalog:backend",
+		"better-auth": "catalog:",
+		"dotenv": "catalog:backend",
+		"drizzle-orm": "catalog:db",
+		"drizzle-typebox": "catalog:db",
+		"elysia": "catalog:backend",
+		"pg": "catalog:db",
+		"redis": "catalog:db",
+		"zod": "catalog:ui",
+		"@reloop/db": "workspace:*",
+		"@reloop/cache": "workspace:*",
+		"@reloop/logger": "workspace:*",
+		"@reloop/auth": "workspace:*",
+		"@elysiajs/eden": "catalog:backend",
+		"@elysiajs/openapi": "catalog:backend",
+		"inngest": "catalog:backend"
+	},
+	"devDependencies": {
+		"@reloop/tsconfig": "workspace:*",
+		"tsdown": "catalog:backend",
+		"typescript": "catalog:",
+		"@types/bun": "catalog:backend",
+		"drizzle-kit": "catalog:db",
+		"@types/pg": "catalog:db",
+		"@better-auth/cli": "catalog:backend"
+	}
+}
