@@ -125,6 +125,18 @@ export const inputVariants = tv({
 				],
 			},
 		},
+		hasSuccess: {
+			true: {
+				root: [
+					// base
+					"before:ring-success-base",
+					// base
+					"hover:before:ring-success-base hover:[&:not(&:has(input:focus)):has(>:only-child)]:before:ring-success-base",
+					// focus
+					"has-[input:focus]:shadow-button-success-focus has-[input:focus]:before:ring-success-base",
+				],
+			},
+		},
 	},
 	compoundVariants: [
 		//#region affix
@@ -154,6 +166,7 @@ function InputRoot({
 	children,
 	size,
 	hasError,
+	hasSuccess,
 	asChild,
 	...rest
 }: React.HTMLAttributes<HTMLDivElement> &
@@ -166,11 +179,13 @@ function InputRoot({
 	const { root } = inputVariants({
 		size,
 		hasError,
+		hasSuccess,
 	});
 
 	const sharedProps: InputSharedProps = {
 		size,
 		hasError,
+		hasSuccess,
 	};
 
 	const extendedChildren = recursiveCloneChildren(

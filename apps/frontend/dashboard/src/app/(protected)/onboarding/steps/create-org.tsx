@@ -1,5 +1,6 @@
 "use client";
 
+import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FileUpload from "@reloop/ui/file-upload";
@@ -7,9 +8,13 @@ import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
 import * as Select from "@reloop/ui/select";
+import Spinner from "@reloop/ui/spinner";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import type React from "react";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
+
+type SlugStatus = "idle" | "checking" | "available" | "taken" | "error";
 
 export const CreateOrgStep = () => {
 	const [step, setStep] = useQueryState("step", parseAsInteger.withDefault(1));
@@ -24,16 +29,34 @@ export const CreateOrgStep = () => {
 		parseAsString.withDefault(""),
 	);
 	const fileInputRef = useRef<HTMLInputElement>(null);
+	const [slugStatus, setSlugStatus] = useState<SlugStatus>("checking");
+
+	useEffect(() => {
+		if (!slug || slug.length < 2) {
+			setSlugStatus("idle");
+			return;
+		}
+
+		setSlugStatus("checking");
+		const timeoutId = setTimeout(async () => {
+			try {
+				const { data } = await authClient.organization.checkSlug({ slug });
+				setSlugStatus(data?.status ? "available" : "taken");
+			} catch {
+				setSlugStatus("error");
+			}
+		}, 500);
+
+		return () => clearTimeout(timeoutId);
+	}, [slug]);
 
 	const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (file) {
-			// Validate file size (10MB)
 			if (file.size > 10 * 1024 * 1024) {
 				alert("File size must be less than 10MB");
 				return;
 			}
-			// Validate file type (images only)
 			if (!file.type.startsWith("image/")) {
 				alert("Please select an image file");
 				return;
@@ -50,9 +73,25 @@ export const CreateOrgStep = () => {
 		fileInputRef.current?.click();
 	};
 
-	const onNext = () => {
+	const onNext = async () => {
 		const normalizedSlug = slug.toLowerCase().replace(/\s+/g, "-");
 		setSlug(normalizedSlug);
+
+		const { error, data: organization } = await authClient.organization.create({
+			name: name,
+			keepCurrentActiveOrganization: true,
+			slug: normalizedSlug,
+			logo: logoPreview || undefined,
+			metadata: { referral },
+		});
+		if (error) {
+			toast.error(error.message || "Failed to create organization");
+			return;
+		}
+		if (organization) {
+			await authClient.updateUser({ activeOrganizationId: organization.id });
+		}
+
 		setStep(step + 1);
 	};
 
@@ -131,7 +170,11 @@ export const CreateOrgStep = () => {
 				</div>
 				<div className="flex flex-col gap-1">
 					<Label.Root htmlFor="workspace-handle">Workspace handle</Label.Root>
-					<Input.Root size="small">
+					<Input.Root
+						size="small"
+						hasError={slugStatus === "taken"}
+						hasSuccess={slugStatus === "available"}
+					>
 						<Input.Wrapper className="gap-0">
 							<Input.InlineAffix className="m">
 								reloop.sh/dashboard/
@@ -145,8 +188,32 @@ export const CreateOrgStep = () => {
 									setSlug(e.target.value.toLowerCase().replace(/\s+/g, "-"))
 								}
 							/>
+							<Spinner size={16} />
+							{slugStatus === "checking" && (
+								<Input.InlineAffix>
+									<Spinner size={16} color="var(--text-strong-950)" />
+								</Input.InlineAffix>
+							)}
+							{slugStatus === "available" && (
+								<Input.InlineAffix>
+									<Icon
+										name="check-circle"
+										className="h-4 w-4 text-green-500"
+									/>
+								</Input.InlineAffix>
+							)}
+							{slugStatus === "taken" && (
+								<Input.InlineAffix>
+									<Icon name="x-circle" className="h-4 w-4 text-red-500" />
+								</Input.InlineAffix>
+							)}
 						</Input.Wrapper>
 					</Input.Root>
+					{slugStatus === "taken" && (
+						<p className="text-paragraph-xs text-red-500">
+							This workspace handle is already taken
+						</p>
+					)}
 				</div>
 				<div className="flex flex-col gap-1">
 					<Label.Root htmlFor="referral">How did you hear about us?</Label.Root>
@@ -183,6 +250,7 @@ export const CreateOrgStep = () => {
 				className="mt-6 w-full"
 				mode="filled"
 				onClick={onNext}
+				disabled={slugStatus === "taken" || slugStatus === "checking" || !slug}
 			>
 				Create workspace
 			</Button.Root>
