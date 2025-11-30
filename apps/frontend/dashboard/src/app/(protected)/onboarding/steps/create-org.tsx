@@ -9,6 +9,7 @@ import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
 import * as Select from "@reloop/ui/select";
 import Spinner from "@reloop/ui/spinner";
+import axios from "axios";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
@@ -79,41 +80,33 @@ export const CreateOrgStep = () => {
 			const formData = new FormData();
 			formData.append("file", file);
 
-			const response = await fetch("/api/upload/v1/upload", {
-				method: "POST",
-				body: formData,
-				credentials: "include", // Include cookies for authentication
-			});
+			const { data: uploadData } = await axios.post(
+				"/api/upload/v1/upload",
+				formData,
+				{ withCredentials: true },
+			);
 
-			if (!response.ok) {
-				const errorData = await response.json().catch(() => ({}));
-				// If user doesn't have an organization yet, that's okay - we'll use base64
-				if (response.status === 401 || response.status === 403) {
-					console.log(
-						"No organization yet, will upload after organization creation",
-					);
-					setIsUploading(false);
-					return;
-				}
-				throw new Error(
-					errorData.message || "Failed to upload file. Please try again.",
-				);
-			}
-
-			const uploadData = await response.json();
 			setLogoUrl(uploadData.url);
 			toast.success("Logo uploaded successfully");
 		} catch (error) {
 			console.error("Upload error:", error);
-			// Don't show error if it's just because user has no org yet
-			// The base64 preview will be used as fallback
-			if (
-				error instanceof Error &&
-				!error.message.includes("No organization yet")
-			) {
+			if (axios.isAxiosError(error)) {
+				if (error.response?.status === 401 || error.response?.status === 403) {
+					setIsUploading(false);
+					return;
+				}
+				const errorMessage =
+					error.response?.data?.message ||
+					"Failed to upload file. Please try again.";
 				toast.error(
-					error.message || "Failed to upload logo. You can still continue.",
+					errorMessage || "Failed to upload logo. You can still continue.",
 				);
+			} else if (error instanceof Error) {
+				if (!error.message.includes("No organization yet")) {
+					toast.error(
+						error.message || "Failed to upload logo. You can still continue.",
+					);
+				}
 			}
 		} finally {
 			setIsUploading(false);
@@ -127,13 +120,7 @@ export const CreateOrgStep = () => {
 	const onNext = async () => {
 		const normalizedSlug = slug.toLowerCase().replace(/\s+/g, "-");
 		setSlug(normalizedSlug);
-
-		// Use uploaded URL if available, otherwise use base64 preview
-		const logoToUse = logoUrl || logoPreview || undefined;
-
-		// If we have base64 but no URL, try to upload after org creation
-		const hasBase64ButNoUrl = logoPreview && !logoUrl;
-
+		const logoToUse = logoUrl;
 		const { error, data: organization } = await authClient.organization.create({
 			name: name,
 			keepCurrentActiveOrganization: true,
@@ -147,45 +134,7 @@ export const CreateOrgStep = () => {
 		}
 		if (organization) {
 			await authClient.updateUser({ activeOrganizationId: organization.id });
-
-			// Small delay to ensure session is updated on backend before next step
-			// Better Auth updates the session automatically, but backend services
-			// might need a moment to see the updated session
-			await new Promise((resolve) => setTimeout(resolve, 500));
-
-			// If we had base64 but no URL, now upload it since we have an org
-			if (hasBase64ButNoUrl && logoPreview) {
-				try {
-					// Convert base64 to blob
-					const response = await fetch(logoPreview);
-					const blob = await response.blob();
-					const file = new File([blob], "logo.png", { type: blob.type });
-
-					const formData = new FormData();
-					formData.append("file", file);
-
-					const uploadResponse = await fetch("/api/upload/v1/upload", {
-						method: "POST",
-						body: formData,
-						credentials: "include",
-					});
-
-					if (uploadResponse.ok) {
-						const uploadData = await uploadResponse.json();
-						// Update organization with the uploaded logo URL
-						// Note: You might want to add an update endpoint for this
-						console.log("Logo uploaded after org creation:", uploadData.url);
-					}
-				} catch (uploadError) {
-					console.error(
-						"Failed to upload logo after org creation:",
-						uploadError,
-					);
-					// Don't block the flow if this fails
-				}
-			}
 		}
-
 		setStep(step + 1);
 	};
 
@@ -213,7 +162,7 @@ export const CreateOrgStep = () => {
 						onClick={isUploading ? undefined : handleFileUploadClick}
 					>
 						{isUploading ? (
-							<Spinner size={20} />
+							<Spinner size={20} color="var(--text-strong-950)" />
 						) : logoUrl || logoPreview ? (
 							<img
 								src={logoUrl || logoPreview}
@@ -243,7 +192,7 @@ export const CreateOrgStep = () => {
 						>
 							{isUploading ? (
 								<>
-									<Spinner size={14} />
+									<Spinner size={14} color="var(--text-strong-950)" />
 									Uploading...
 								</>
 							) : (
@@ -358,7 +307,12 @@ export const CreateOrgStep = () => {
 				className="mt-6 w-full"
 				mode="filled"
 				onClick={onNext}
-				disabled={slugStatus === "taken" || slugStatus === "checking" || !slug}
+				disabled={
+					slugStatus === "taken" ||
+					slugStatus === "checking" ||
+					!slug ||
+					isUploading
+				}
 			>
 				Create workspace
 			</Button.Root>
