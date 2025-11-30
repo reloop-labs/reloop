@@ -24,6 +24,11 @@ export const CreateOrgStep = () => {
 		"logoPreview",
 		parseAsString.withDefault(""),
 	);
+	const [logoUrl, setLogoUrl] = useQueryState(
+		"logoUrl",
+		parseAsString.withDefault(""),
+	);
+	const [isUploading, setIsUploading] = useState(false);
 	const [referral, setReferral] = useQueryState(
 		"referral",
 		parseAsString.withDefault(""),
@@ -50,22 +55,71 @@ export const CreateOrgStep = () => {
 		return () => clearTimeout(timeoutId);
 	}, [slug]);
 
-	const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleLogoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
-		if (file) {
-			if (file.size > 10 * 1024 * 1024) {
-				alert("File size must be less than 10MB");
-				return;
+		if (!file) return;
+
+		// Validate file
+		if (file.size > 10 * 1024 * 1024) {
+			toast.error("File size must be less than 10MB");
+			return;
+		}
+		if (!file.type.startsWith("image/")) {
+			toast.error("Please select an image file");
+			return;
+		}
+
+		// Show preview immediately
+		const reader = new FileReader();
+		reader.onloadend = () => {
+			setLogoPreview(reader.result as string);
+		};
+		reader.readAsDataURL(file);
+
+		// Upload to upload service
+		setIsUploading(true);
+		try {
+			const formData = new FormData();
+			formData.append("file", file);
+
+			const response = await fetch("/api/upload/v1/upload", {
+				method: "POST",
+				body: formData,
+				credentials: "include", // Include cookies for authentication
+			});
+
+			if (!response.ok) {
+				const errorData = await response.json().catch(() => ({}));
+				// If user doesn't have an organization yet, that's okay - we'll use base64
+				if (response.status === 401 || response.status === 403) {
+					console.log(
+						"No organization yet, will upload after organization creation",
+					);
+					setIsUploading(false);
+					return;
+				}
+				throw new Error(
+					errorData.message || "Failed to upload file. Please try again.",
+				);
 			}
-			if (!file.type.startsWith("image/")) {
-				alert("Please select an image file");
-				return;
+
+			const uploadData = await response.json();
+			setLogoUrl(uploadData.url);
+			toast.success("Logo uploaded successfully");
+		} catch (error) {
+			console.error("Upload error:", error);
+			// Don't show error if it's just because user has no org yet
+			// The base64 preview will be used as fallback
+			if (
+				error instanceof Error &&
+				!error.message.includes("No organization yet")
+			) {
+				toast.error(
+					error.message || "Failed to upload logo. You can still continue.",
+				);
 			}
-			const reader = new FileReader();
-			reader.onloadend = () => {
-				setLogoPreview(reader.result as string);
-			};
-			reader.readAsDataURL(file);
+		} finally {
+			setIsUploading(false);
 		}
 	};
 
@@ -77,11 +131,17 @@ export const CreateOrgStep = () => {
 		const normalizedSlug = slug.toLowerCase().replace(/\s+/g, "-");
 		setSlug(normalizedSlug);
 
+		// Use uploaded URL if available, otherwise use base64 preview
+		const logoToUse = logoUrl || logoPreview || undefined;
+
+		// If we have base64 but no URL, try to upload after org creation
+		const hasBase64ButNoUrl = logoPreview && !logoUrl;
+
 		const { error, data: organization } = await authClient.organization.create({
 			name: name,
 			keepCurrentActiveOrganization: true,
 			slug: normalizedSlug,
-			logo: logoPreview || undefined,
+			logo: logoToUse,
 			metadata: { referral },
 		});
 		if (error) {
@@ -90,6 +150,43 @@ export const CreateOrgStep = () => {
 		}
 		if (organization) {
 			await authClient.updateUser({ activeOrganizationId: organization.id });
+
+			// Small delay to ensure session is updated on backend before next step
+			// Better Auth updates the session automatically, but backend services
+			// might need a moment to see the updated session
+			await new Promise((resolve) => setTimeout(resolve, 500));
+
+			// If we had base64 but no URL, now upload it since we have an org
+			if (hasBase64ButNoUrl && logoPreview) {
+				try {
+					// Convert base64 to blob
+					const response = await fetch(logoPreview);
+					const blob = await response.blob();
+					const file = new File([blob], "logo.png", { type: blob.type });
+
+					const formData = new FormData();
+					formData.append("file", file);
+
+					const uploadResponse = await fetch("/api/upload/v1/upload", {
+						method: "POST",
+						body: formData,
+						credentials: "include",
+					});
+
+					if (uploadResponse.ok) {
+						const uploadData = await uploadResponse.json();
+						// Update organization with the uploaded logo URL
+						// Note: You might want to add an update endpoint for this
+						console.log("Logo uploaded after org creation:", uploadData.url);
+					}
+				} catch (uploadError) {
+					console.error(
+						"Failed to upload logo after org creation:",
+						uploadError,
+					);
+					// Don't block the flow if this fails
+				}
+			}
 		}
 
 		setStep(step + 1);
@@ -108,15 +205,19 @@ export const CreateOrgStep = () => {
 					/>
 					<FileUpload.Root
 						className={cn(
-							"flex h-[72px] w-[72px] cursor-pointer items-center justify-center overflow-hidden rounded-xl",
+							"flex h-[72px] w-[72px] items-center justify-center overflow-hidden rounded-xl",
 							logoPreview
 								? "border border-stroke-sub-300 border-solid p-0"
 								: "border border-stroke-sub-300 p-1",
+							isUploading && "cursor-wait opacity-50",
+							!isUploading && "cursor-pointer",
 						)}
 						data-has-logo={!!logoPreview}
-						onClick={handleFileUploadClick}
+						onClick={isUploading ? undefined : handleFileUploadClick}
 					>
-						{logoPreview ? (
+						{isUploading ? (
+							<Spinner size={20} />
+						) : logoPreview ? (
 							<img
 								src={logoPreview}
 								alt="Logo preview"
@@ -141,9 +242,19 @@ export const CreateOrgStep = () => {
 							size="xxsmall"
 							type="button"
 							onClick={handleFileUploadClick}
+							disabled={isUploading}
 						>
-							<Icon name="camera" className="h-4 w-4" />
-							Upload Logo
+							{isUploading ? (
+								<>
+									<Spinner size={14} />
+									Uploading...
+								</>
+							) : (
+								<>
+									<Icon name="camera" className="h-4 w-4" />
+									Upload Logo
+								</>
+							)}
 						</Button.Root>
 					</div>
 				</div>
