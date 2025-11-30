@@ -20,10 +20,7 @@ export const CreateOrgStep = () => {
 	const [step, setStep] = useQueryState("step", parseAsInteger.withDefault(1));
 	const [name, setName] = useQueryState("name", parseAsString.withDefault(""));
 	const [slug, setSlug] = useQueryState("slug", parseAsString.withDefault(""));
-	const [logoPreview, setLogoPreview] = useQueryState(
-		"logoPreview",
-		parseAsString.withDefault(""),
-	);
+	const [logoPreview, setLogoPreview] = useState("");
 	const [logoUrl, setLogoUrl] = useQueryState(
 		"logoUrl",
 		parseAsString.withDefault(""),
@@ -206,20 +203,20 @@ export const CreateOrgStep = () => {
 					<FileUpload.Root
 						className={cn(
 							"flex h-[72px] w-[72px] items-center justify-center overflow-hidden rounded-xl",
-							logoPreview
+							logoUrl || logoPreview
 								? "border border-stroke-sub-300 border-solid p-0"
 								: "border border-stroke-sub-300 p-1",
 							isUploading && "cursor-wait opacity-50",
 							!isUploading && "cursor-pointer",
 						)}
-						data-has-logo={!!logoPreview}
+						data-has-logo={!!(logoUrl || logoPreview)}
 						onClick={isUploading ? undefined : handleFileUploadClick}
 					>
 						{isUploading ? (
 							<Spinner size={20} />
-						) : logoPreview ? (
+						) : logoUrl || logoPreview ? (
 							<img
-								src={logoPreview}
+								src={logoUrl || logoPreview}
 								alt="Logo preview"
 								className="h-full w-full rounded-xl object-cover"
 							/>
