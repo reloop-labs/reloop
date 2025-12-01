@@ -344,7 +344,7 @@ export const CreateOrgStep = () => {
 					isUploading
 				}
 			>
-				Create workspace
+				{orgId ? "Update workspace" : "Create workspace"}
 			</Button.Root>
 		</div>
 	);
