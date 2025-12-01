@@ -23,6 +23,7 @@ const OnBoardingPage = () => {
 		"logoPreview",
 		parseAsString.withDefault(""),
 	);
+	const [logoUrl] = useQueryState("logoUrl", parseAsString.withDefault(""));
 	const [apiKey] = useQueryState("apiKey", parseAsString.withDefault(""));
 	const [domain] = useQueryState("domain", parseAsString.withDefault(""));
 
@@ -41,7 +42,7 @@ const OnBoardingPage = () => {
 			stepIndicator: "2/4",
 			title: "Add Domain",
 			component: <AddDomainStep />,
-			preview: <DomainPreview domain={domain} />,
+			preview: <DomainPreview domain={domain} logoUrl={logoUrl} />,
 			fullWidth: false,
 		},
 		3: {

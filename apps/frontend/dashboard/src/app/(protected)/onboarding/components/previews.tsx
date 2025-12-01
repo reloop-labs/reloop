@@ -235,6 +235,7 @@ export const ApiPreview = ({ apiKey: _apiKey }: ApiPreviewProps) => {
 
 interface DomainPreviewProps {
 	domain?: string;
+	logoUrl?: string;
 }
 
 // --- MOCK DATA: PROVIDER GUIDES ---
@@ -451,7 +452,7 @@ export const DnsConfigPreview = ({ domain }: DnsConfigPreviewProps) => {
 	);
 };
 
-export const DomainPreview = ({ domain }: DomainPreviewProps) => {
+export const DomainPreview = ({ domain, logoUrl }: DomainPreviewProps) => {
 	const domainName = domain ? domain.split(".")[0] || "Sender" : "Sender";
 	const domainHost = domain ? domain.split(".").slice(-2).join(".") || "" : "";
 	const displayDomain = domain || "";
@@ -489,9 +490,17 @@ export const DomainPreview = ({ domain }: DomainPreviewProps) => {
 					<div className="flex items-start gap-4">
 						{/* Avatar */}
 						{domain ? (
-							<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-stroke-soft-100 bg-bg-soft-200 font-bold text-sm">
-								{avatarInitial}
-							</div>
+							logoUrl ? (
+								<img
+									src={logoUrl}
+									alt={domainName}
+									className="h-10 w-10 shrink-0 rounded-full border-2 border-stroke-soft-100 object-cover"
+								/>
+							) : (
+								<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-stroke-soft-100 bg-bg-soft-200 font-bold text-sm">
+									{avatarInitial}
+								</div>
+							)
 						) : (
 							<div className="h-10 w-10 rounded-full bg-bg-soft-200" />
 						)}
