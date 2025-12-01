@@ -86,8 +86,10 @@ export const ConfigureDnsStep = () => {
 						copiedItems={copiedItems}
 						isLoading={isLoading}
 						loadingRows={1}
-						tableId="onboarding"
+						tableId="dkim-"
 						hideStatus={true}
+						showPriorityColumn={true}
+						nameColumnWidth="minmax(100px,auto)"
 					/>
 				</div>
 			</div>
@@ -111,6 +113,8 @@ export const ConfigureDnsStep = () => {
 						loadingRows={1}
 						tableId="dmarc-"
 						hideStatus={true}
+						showPriorityColumn={false}
+						nameColumnWidth="minmax(100px,auto)"
 					/>
 				</div>
 			</div>

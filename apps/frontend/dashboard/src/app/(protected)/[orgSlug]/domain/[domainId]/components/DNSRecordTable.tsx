@@ -20,6 +20,8 @@ interface DNSRecordTableProps {
 	loadingRows?: number;
 	tableId?: string;
 	hideStatus?: boolean;
+	showPriorityColumn?: boolean;
+	nameColumnWidth?: string;
 }
 
 export const DNSRecordTable = ({
@@ -30,17 +32,29 @@ export const DNSRecordTable = ({
 	loadingRows = 3,
 	tableId = "",
 	hideStatus = false,
+	showPriorityColumn = false,
+	nameColumnWidth = "minmax(120px,auto)",
 }: DNSRecordTableProps) => {
+	const gridColumns = ["minmax(60px,auto)", nameColumnWidth, "1fr"];
+
+	if (showPriorityColumn) {
+		gridColumns.push("minmax(56px,auto)");
+	}
+
+	gridColumns.push("minmax(80px,auto)");
+
+	if (!hideStatus) {
+		gridColumns.push("minmax(100px,auto)");
+	}
+
 	return (
 		<AnimatePresence mode="wait">
 			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-200 text-paragraph-sm shadow-regular-md ring-stroke-soft-200 ring-inset">
 				<div
-					className={cn(
-						"grid grid-cols-[minmax(80px,auto)_minmax(120px,auto)_1fr_minmax(80px,auto)_minmax(80px,auto)_minmax(100px,auto)]",
-						hideStatus
-							? "grid-cols-[minmax(80px,auto)_minmax(120px,auto)_1fr_minmax(80px,auto)_minmax(80px,auto)]"
-							: "",
-					)}
+					className={cn("grid")}
+					style={{
+						gridTemplateColumns: gridColumns.join(" "),
+					}}
 				>
 					<div className="bg-bg-weak-50 pl-5 font-medium text-text-sub-600">
 						<div className="py-2.5 text-gray-800 dark:text-gray-200">Type</div>
@@ -51,11 +65,13 @@ export const DNSRecordTable = ({
 					<div className="bg-bg-weak-50 font-medium text-text-sub-600">
 						<div className="py-2.5 text-gray-800 dark:text-gray-200">Value</div>
 					</div>
-					<div className="bg-bg-weak-50 font-medium text-text-sub-600">
-						<div className="py-2.5 text-gray-800 dark:text-gray-200">
-							Priority
+					{showPriorityColumn && (
+						<div className="bg-bg-weak-50 font-medium text-text-sub-600">
+							<div className="py-2.5 text-gray-800 dark:text-gray-200">
+								Priority
+							</div>
 						</div>
-					</div>
+					)}
 					<div className="bg-bg-weak-50 font-medium text-text-sub-600">
 						<div className="py-2.5 text-gray-800 dark:text-gray-200">TTL</div>
 					</div>
@@ -192,14 +208,16 @@ export const DNSRecordTable = ({
 											</motion.div>
 										</motion.button>
 									</div>
-									<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
-										<motion.span
-											{...getAnimationProps(index + 1, 3)}
-											className="text-label-sm text-text-strong-950"
-										>
-											{record.priority || ""}
-										</motion.span>
-									</div>
+									{showPriorityColumn && (
+										<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
+											<motion.span
+												{...getAnimationProps(index + 1, 3)}
+												className="text-label-sm text-text-strong-950"
+											>
+												{record.priority || ""}
+											</motion.span>
+										</div>
+									)}
 									<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
 										<motion.span
 											{...getAnimationProps(index + 1, 4)}
