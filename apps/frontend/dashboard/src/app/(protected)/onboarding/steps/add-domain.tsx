@@ -4,9 +4,11 @@ import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
+import axios from "axios";
 import { Globe, Loader2 } from "lucide-react";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export const AddDomainStep = () => {
 	const [domain, setDomain] = useQueryState(
@@ -16,13 +18,24 @@ export const AddDomainStep = () => {
 	const [step, setStep] = useQueryState("step", parseAsInteger.withDefault(1));
 	const [verifying, setVerifying] = useState(false);
 
-	const handleVerify = () => {
+	const handleVerify = async () => {
 		if (!domain) return;
 		setVerifying(true);
-		setTimeout(() => {
-			setVerifying(false);
+		try {
+			await axios.post(
+				"/api/domain/v1/add",
+				{ domain },
+				{ headers: { credentials: "include" } },
+			);
 			setStep(step + 1);
-		}, 1500);
+		} catch (error) {
+			const errorMessage = axios.isAxiosError(error)
+				? error.response?.data?.message || "Failed to add domain"
+				: "Failed to add domain";
+			toast.error(errorMessage);
+		} finally {
+			setVerifying(false);
+		}
 	};
 
 	return (

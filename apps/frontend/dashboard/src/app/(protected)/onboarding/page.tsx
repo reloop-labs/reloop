@@ -5,7 +5,6 @@ import { CheckCircle2 } from "lucide-react";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import {
 	ApiPreview,
-	DnsConfigPreview,
 	DomainPreview,
 	SidebarPreview,
 } from "./components/previews";
@@ -48,8 +47,8 @@ const OnBoardingPage = () => {
 			stepIndicator: "3/4",
 			title: "Configure DNS",
 			component: <ConfigureDnsStep />,
-			preview: <DnsConfigPreview domain={domain} />,
-			fullWidth: false,
+			preview: null,
+			fullWidth: true,
 		},
 		4: {
 			stepIndicator: "4/4",

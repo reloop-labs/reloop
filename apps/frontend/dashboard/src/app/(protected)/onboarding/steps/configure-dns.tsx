@@ -1,67 +1,115 @@
 "use client";
 
-import * as Button from "@reloop/ui/button";
-import { Copy } from "lucide-react";
+import type { DomainResponse } from "@reloop/api";
+import { parseAsString, useQueryState } from "nuqs";
+import * as React from "react";
+import useSWR from "swr";
+import { DNSRecordTable } from "../../[orgSlug]/domain/[domainId]/components/DNSRecordTable";
 
 export const ConfigureDnsStep = () => {
-	const records = [
-		{
-			type: "TXT",
-			name: "@",
-			value: "v=spf1 include:mailinfra.com ~all",
-		},
-		{
-			type: "CNAME",
-			name: "mte1._domainkey",
-			value: "dkim.mailinfra.com",
-		},
-	];
+	const [domain] = useQueryState("domain", parseAsString.withDefault(""));
+	const [copiedItems, setCopiedItems] = React.useState<Set<string>>(new Set());
+
+	const { data: domainData, isLoading } = useSWR<DomainResponse>(
+		domain ? `/api/domain/v1/${domain}` : null,
+	);
+
+	const copyToClipboard = async (text: string, itemId: string) => {
+		try {
+			await navigator.clipboard.writeText(text);
+			setCopiedItems((prev) => new Set(prev).add(itemId));
+			setTimeout(() => {
+				setCopiedItems((prev) => {
+					const newSet = new Set(prev);
+					newSet.delete(itemId);
+					return newSet;
+				});
+			}, 2000);
+		} catch {
+			// Handle copy error silently
+		}
+	};
+
+	// Separate DMARC records from DKIM/SPF records
+	const dmarcRecords = domainData?.dnsRecords.filter(
+		(record) =>
+			record.name.includes("_dmarc") ||
+			(record.recordType === "TXT" && record.value.includes("v=DMARC")),
+	);
+	const otherRecords = domainData?.dnsRecords.filter(
+		(record) =>
+			!record.name.includes("_dmarc") &&
+			!(record.recordType === "TXT" && record.value.includes("v=DMARC")),
+	);
+
+	if (!domain) {
+		return (
+			<div className="fade-in animate-in duration-500">
+				<p className="text-text-sub-600">
+					Please add a domain in the previous step.
+				</p>
+			</div>
+		);
+	}
+
+	if (
+		(!domainData ||
+			!domainData.dnsRecords ||
+			domainData.dnsRecords.length === 0) &&
+		!isLoading
+	) {
+		return (
+			<div className="fade-in animate-in duration-500">
+				<p className="text-text-sub-600">
+					No DNS records found for this domain. Please try again.
+				</p>
+			</div>
+		);
+	}
 
 	return (
 		<div className="fade-in animate-in duration-500">
-			<div className="mb-4 flex items-center justify-between">
-				<h3 className="font-semibold text-text-strong-950">
-					DNS Configuration
-				</h3>
-				<span className="rounded-full bg-warning-lighter px-2 py-1 font-medium text-text-strong-950 text-xs">
-					Pending Verification
-				</span>
+			{/* DKIM and SPF Records */}
+			<div className="relative mb-10">
+				<div className="mb-6 space-y-1">
+					<div className="font-medium text-base text-text-strong-950">
+						DKIM and SPF <span className="text-text-sub-600">(Required)</span>
+					</div>
+					<div className="text-sm text-text-sub-600">
+						Enable email signing and specify authorized senders.
+					</div>
+				</div>
+				<div className="w-full">
+					<DNSRecordTable
+						records={otherRecords}
+						onCopyToClipboard={copyToClipboard}
+						copiedItems={copiedItems}
+						isLoading={isLoading}
+						loadingRows={1}
+					/>
+				</div>
 			</div>
 
-			<div className="space-y-3">
-				{records.map((record, idx) => (
-					<div
-						key={idx}
-						className="group rounded-lg border border-stroke-soft-200 bg-bg-weak-50 p-4 transition-colors hover:border-primary-base"
-					>
-						<div className="mb-2 flex items-center justify-between">
-							<div className="flex items-center gap-2">
-								<span className="rounded border border-stroke-soft-200 bg-bg-white-0 px-2 py-0.5 font-bold font-mono text-text-sub-600 text-xs">
-									{record.type}
-								</span>
-								<span className="font-medium text-sm text-text-strong-950">
-									{record.name}
-								</span>
-							</div>
-							<Button.Root
-								variant="neutral"
-								mode="ghost"
-								size="xsmall"
-								className="opacity-0 transition-opacity group-hover:opacity-100"
-							>
-								<Copy size={16} />
-							</Button.Root>
-						</div>
-						<div className="break-all rounded border border-stroke-soft-100 bg-bg-white-0 p-2 font-mono text-text-sub-600 text-xs">
-							{record.value}
-						</div>
+			{/* DMARC Records */}
+			<div className="relative">
+				<div className="mb-6 space-y-1">
+					<div className="font-medium text-base text-text-strong-950">
+						DMARC <span className="text-text-sub-600">(Recommended)</span>
 					</div>
-				))}
+					<div className="text-sm text-text-sub-600">
+						Set authentication policies and receive reports.
+					</div>
+				</div>
+				<div className="w-full">
+					<DNSRecordTable
+						records={dmarcRecords}
+						onCopyToClipboard={copyToClipboard}
+						copiedItems={copiedItems}
+						isLoading={isLoading}
+						loadingRows={1}
+					/>
+				</div>
 			</div>
-			<p className="mt-4 text-text-sub-600 text-xs">
-				It may take up to 48 hours for DNS changes to propagate, although it's
-				usually much faster.
-			</p>
 		</div>
 	);
 };
