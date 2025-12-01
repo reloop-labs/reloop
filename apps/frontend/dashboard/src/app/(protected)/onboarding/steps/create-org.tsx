@@ -139,54 +139,31 @@ export const CreateOrgStep = () => {
 		setSlug(normalizedSlug);
 		const logoToUse = logoUrl;
 
-		// If orgId exists, update the organization instead of creating
+		// If orgId exists, organization is already created, just proceed to next step
 		if (orgId) {
-			try {
-				// Update organization using axios since authClient doesn't have update method
-				const { data: updatedOrg } = await axios.patch(
-					`/api/auth/v1/organization/${orgId}`,
-					{
-						name,
-						slug: normalizedSlug,
-						logo: logoToUse,
-						metadata: { referral },
-					},
-					{ withCredentials: true },
-				);
+			// Organization already exists, proceed to next step
+			// Note: Better Auth doesn't have an organization update endpoint by default
+			// If you need to update organization details, you'll need to create a custom endpoint
+			setStep(step + 1);
+			return;
+		}
 
-				if (updatedOrg) {
-					toast.success("Workspace updated successfully");
-					setStep(step + 1);
-				}
-			} catch (error) {
-				if (axios.isAxiosError(error)) {
-					const errorMessage =
-						error.response?.data?.message || "Failed to update workspace";
-					toast.error(errorMessage);
-				} else {
-					toast.error("Failed to update workspace");
-				}
-				return;
-			}
-		} else {
-			// Create new organization
-			const { error, data: organization } =
-				await authClient.organization.create({
-					name: name,
-					keepCurrentActiveOrganization: true,
-					slug: normalizedSlug,
-					logo: logoToUse,
-					metadata: { referral },
-				});
-			if (error) {
-				toast.error(error.message || "Failed to create organization");
-				return;
-			}
-			if (organization) {
-				// Set orgId in query state
-				setOrgId(organization.id);
-				await authClient.updateUser({ activeOrganizationId: organization.id });
-			}
+		// Create new organization
+		const { error, data: organization } = await authClient.organization.create({
+			name: name,
+			keepCurrentActiveOrganization: true,
+			slug: normalizedSlug,
+			logo: logoToUse,
+			metadata: { referral },
+		});
+		if (error) {
+			toast.error(error.message || "Failed to create organization");
+			return;
+		}
+		if (organization) {
+			// Set orgId in query state
+			setOrgId(organization.id);
+			await authClient.updateUser({ activeOrganizationId: organization.id });
 		}
 		setStep(step + 1);
 	};
