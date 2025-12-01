@@ -19,6 +19,7 @@ interface DNSRecordTableProps {
 	isLoading?: boolean;
 	loadingRows?: number;
 	tableId?: string;
+	hideStatus?: boolean;
 }
 
 export const DNSRecordTable = ({
@@ -28,11 +29,19 @@ export const DNSRecordTable = ({
 	isLoading,
 	loadingRows = 3,
 	tableId = "",
+	hideStatus = false,
 }: DNSRecordTableProps) => {
 	return (
 		<AnimatePresence mode="wait">
 			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-200 text-paragraph-sm shadow-regular-md ring-stroke-soft-200 ring-inset">
-				<div className="grid grid-cols-[minmax(80px,auto)_minmax(120px,auto)_1fr_minmax(80px,auto)_minmax(80px,auto)_minmax(100px,auto)]">
+				<div
+					className={cn(
+						"grid grid-cols-[minmax(80px,auto)_minmax(120px,auto)_1fr_minmax(80px,auto)_minmax(80px,auto)_minmax(100px,auto)]",
+						hideStatus
+							? "grid-cols-[minmax(80px,auto)_minmax(120px,auto)_1fr_minmax(80px,auto)_minmax(80px,auto)]"
+							: "",
+					)}
+				>
 					<div className="bg-bg-weak-50 pl-5 font-medium text-text-sub-600">
 						<div className="py-2.5 text-gray-800 dark:text-gray-200">Type</div>
 					</div>
@@ -50,11 +59,13 @@ export const DNSRecordTable = ({
 					<div className="bg-bg-weak-50 font-medium text-text-sub-600">
 						<div className="py-2.5 text-gray-800 dark:text-gray-200">TTL</div>
 					</div>
-					<div className="bg-bg-weak-50 font-medium text-text-sub-600">
-						<div className="py-2.5 text-gray-800 dark:text-gray-200">
-							Status
+					{!hideStatus && (
+						<div className="bg-bg-weak-50 font-medium text-text-sub-600">
+							<div className="py-2.5 text-gray-800 dark:text-gray-200">
+								Status
+							</div>
 						</div>
-					</div>
+					)}
 					{isLoading
 						? // Skeleton loading state
 							Array.from({ length: loadingRows }).map((_, index) => (
@@ -197,25 +208,27 @@ export const DNSRecordTable = ({
 											{record.ttl}
 										</motion.span>
 									</div>
-									<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
-										<motion.div
-											{...getAnimationProps(index + 1, 5)}
-											className="flex items-center"
-										>
-											<div
-												className={cn(
-													"flex items-center gap-2.5 rounded-lg py-0.5 pr-3 font-medium text-label-xs capitalize",
-													getStatusColorClass(record.status),
-												)}
+									{!hideStatus && (
+										<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
+											<motion.div
+												{...getAnimationProps(index + 1, 5)}
+												className="flex items-center"
 											>
-												<Icon
-													name={getStatusIcon(record.status)}
-													className="h-3.5 w-3.5"
-												/>
-												{getStatusLabel(record.status)}
-											</div>
-										</motion.div>
-									</div>
+												<div
+													className={cn(
+														"flex items-center gap-2.5 rounded-lg py-0.5 pr-3 font-medium text-label-xs capitalize",
+														getStatusColorClass(record.status),
+													)}
+												>
+													<Icon
+														name={getStatusIcon(record.status)}
+														className="h-3.5 w-3.5"
+													/>
+													{getStatusLabel(record.status)}
+												</div>
+											</motion.div>
+										</div>
+									)}
 								</div>
 							))}
 				</div>
