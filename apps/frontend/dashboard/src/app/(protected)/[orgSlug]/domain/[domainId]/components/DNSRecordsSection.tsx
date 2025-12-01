@@ -56,6 +56,7 @@ export const DNSRecordsSection = ({
 					copiedItems={copiedItems}
 					isLoading={isLoading}
 					loadingRows={4}
+					tableId="dkim-"
 				/>
 			</div>
 			<div>
@@ -74,6 +75,7 @@ export const DNSRecordsSection = ({
 					copiedItems={copiedItems}
 					isLoading={isLoading}
 					loadingRows={1}
+					tableId="dmarc-"
 				/>
 			</div>
 		</div>

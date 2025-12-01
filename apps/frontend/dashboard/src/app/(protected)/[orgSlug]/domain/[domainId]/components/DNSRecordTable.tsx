@@ -18,6 +18,7 @@ interface DNSRecordTableProps {
 	copiedItems?: Set<string>;
 	isLoading?: boolean;
 	loadingRows?: number;
+	tableId?: string;
 }
 
 export const DNSRecordTable = ({
@@ -26,6 +27,7 @@ export const DNSRecordTable = ({
 	copiedItems = new Set(),
 	isLoading,
 	loadingRows = 3,
+	tableId = "",
 }: DNSRecordTableProps) => {
 	return (
 		<AnimatePresence mode="wait">
@@ -98,7 +100,10 @@ export const DNSRecordTable = ({
 											{...getAnimationProps(index + 1, 1)}
 											type="button"
 											onClick={() =>
-												onCopyToClipboard?.(record.name, `host-${index}`)
+												onCopyToClipboard?.(
+													record.name,
+													`${tableId}host-${index}`,
+												)
 											}
 											className="flex w-full min-w-0 cursor-pointer items-center gap-2"
 										>
@@ -108,7 +113,7 @@ export const DNSRecordTable = ({
 
 											<motion.div
 												animate={
-													copiedItems.has(`host-${index}`)
+													copiedItems.has(`${tableId}host-${index}`)
 														? "copied"
 														: "default"
 												}
@@ -120,10 +125,12 @@ export const DNSRecordTable = ({
 											>
 												<Icon
 													name={
-														copiedItems.has(`host-${index}`) ? "check" : "copy"
+														copiedItems.has(`${tableId}host-${index}`)
+															? "check"
+															: "copy"
 													}
 													className={`h-3 w-3 transition-colors ${
-														copiedItems.has(`host-${index}`)
+														copiedItems.has(`${tableId}host-${index}`)
 															? "text-green-600"
 															: "text-text-sub-600 hover:text-text-strong-950"
 													}`}
@@ -136,7 +143,10 @@ export const DNSRecordTable = ({
 											{...getAnimationProps(index + 1, 2)}
 											type="button"
 											onClick={() =>
-												onCopyToClipboard?.(record.value, `value-${index}`)
+												onCopyToClipboard?.(
+													record.value,
+													`${tableId}value-${index}`,
+												)
 											}
 											className="flex w-full min-w-0 cursor-pointer items-center gap-2"
 										>
@@ -146,7 +156,7 @@ export const DNSRecordTable = ({
 
 											<motion.div
 												animate={
-													copiedItems.has(`value-${index}`)
+													copiedItems.has(`${tableId}value-${index}`)
 														? "copied"
 														: "default"
 												}
@@ -158,10 +168,12 @@ export const DNSRecordTable = ({
 											>
 												<Icon
 													name={
-														copiedItems.has(`value-${index}`) ? "check" : "copy"
+														copiedItems.has(`${tableId}value-${index}`)
+															? "check"
+															: "copy"
 													}
 													className={`h-3 w-3 transition-colors ${
-														copiedItems.has(`value-${index}`)
+														copiedItems.has(`${tableId}value-${index}`)
 															? "text-green-600"
 															: "text-text-sub-600 hover:text-text-strong-950"
 													}`}

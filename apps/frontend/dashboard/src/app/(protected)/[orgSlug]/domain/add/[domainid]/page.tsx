@@ -207,6 +207,7 @@ const NewDomainPage = () => {
 							copiedItems={copiedItems}
 							isLoading={isLoading}
 							loadingRows={1}
+							tableId="dkim-"
 						/>
 					</div>
 				</div>
@@ -227,6 +228,7 @@ const NewDomainPage = () => {
 							copiedItems={copiedItems}
 							isLoading={isLoading}
 							loadingRows={1}
+							tableId="dmarc-"
 						/>
 					</div>
 				</div>
