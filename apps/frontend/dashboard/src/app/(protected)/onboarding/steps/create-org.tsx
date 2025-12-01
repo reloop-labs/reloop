@@ -47,6 +47,19 @@ export const CreateOrgStep = () => {
 		setSlugStatus("checking");
 		const timeoutId = setTimeout(async () => {
 			try {
+				// If orgId exists, check if the slug belongs to that organization
+				if (orgId) {
+					const { data: organizations } = await authClient.organization.list();
+					const currentOrg = organizations?.find((org) => org.id === orgId);
+
+					// If slug matches current organization's slug, it's available
+					if (currentOrg?.slug === slug) {
+						setSlugStatus("available");
+						return;
+					}
+				}
+
+				// Otherwise, check slug availability normally
 				const { data } = await authClient.organization.checkSlug({ slug });
 				setSlugStatus(data?.status ? "available" : "taken");
 			} catch {
@@ -55,7 +68,7 @@ export const CreateOrgStep = () => {
 		}, 500);
 
 		return () => clearTimeout(timeoutId);
-	}, [slug]);
+	}, [slug, orgId]);
 
 	const handleLogoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
