@@ -212,7 +212,7 @@ export const ApiPreview = ({ apiKey: _apiKey }: ApiPreviewProps) => {
 	};
 
 	return (
-		<div>
+		<div className="flex h-full flex-col">
 			<div className="flex items-center gap-4 border-stroke-soft-100 border-b bg-bg-white-0 p-3">
 				<div className="flex gap-1.5">
 					<div className="h-3 w-3 rounded-full bg-error-base/80" />
@@ -224,11 +224,13 @@ export const ApiPreview = ({ apiKey: _apiKey }: ApiPreviewProps) => {
 				defaultValue={selectedLang}
 				onValueChange={handleLanguageChange}
 			/>
-			<CodeBlock
-				code={currentCode.code}
-				lang={currentCode.lang}
-				theme={resolvedTheme === "light" ? "rose-pine-dawn" : "vesper"}
-			/>
+			<div className="mt-2 max-h-[360px] flex-1 overflow-y-auto rounded-xl border border-stroke-soft-100 bg-bg-weak-50">
+				<CodeBlock
+					code={currentCode.code}
+					lang={currentCode.lang}
+					theme={resolvedTheme === "light" ? "rose-pine-dawn" : "vesper"}
+				/>
+			</div>
 		</div>
 	);
 };
