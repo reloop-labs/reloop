@@ -10,8 +10,8 @@ import {
 	Plus,
 	ShieldCheck,
 } from "lucide-react";
-import { parseAsString, useQueryState } from "nuqs";
 import { useRouter } from "next/navigation";
+import { parseAsString, useQueryState } from "nuqs";
 import { useState } from "react";
 
 export const GenerateApiKeyStep = () => {
