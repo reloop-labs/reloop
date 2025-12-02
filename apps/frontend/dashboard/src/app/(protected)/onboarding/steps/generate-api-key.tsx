@@ -11,6 +11,7 @@ import {
 	ShieldCheck,
 } from "lucide-react";
 import { parseAsString, useQueryState } from "nuqs";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export const GenerateApiKeyStep = () => {
@@ -18,6 +19,7 @@ export const GenerateApiKeyStep = () => {
 		"apiKey",
 		parseAsString.withDefault(""),
 	);
+	const router = useRouter();
 	const [loading, setLoading] = useState(false);
 	const [copied, setCopied] = useState(false);
 
@@ -150,6 +152,17 @@ export const GenerateApiKeyStep = () => {
 								)}
 							</Button.Root>
 						</div>
+					</div>
+
+					<div className="pt-4">
+						<Button.Root
+							variant="neutral"
+							mode="filled"
+							className="w-full"
+							onClick={() => router.push("/")}
+						>
+							Go to Dashboard
+						</Button.Root>
 					</div>
 				</div>
 			)}
