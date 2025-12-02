@@ -1,14 +1,20 @@
 "use client";
 
 import type { DomainResponse } from "@reloop/api";
-import { parseAsString, useQueryState } from "nuqs";
+import * as Button from "@reloop/ui/button";
+import { Icon } from "@reloop/ui/icon";
+import axios from "axios";
+import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import * as React from "react";
+import { toast } from "sonner";
 import useSWR from "swr";
 import { DNSRecordTable } from "../../[orgSlug]/domain/[domainId]/components/DNSRecordTable";
 
 export const ConfigureDnsStep = () => {
 	const [domain] = useQueryState("domain", parseAsString.withDefault(""));
+	const [, setStep] = useQueryState("step", parseAsInteger.withDefault(1));
 	const [copiedItems, setCopiedItems] = React.useState<Set<string>>(new Set());
+	const [isVerifying, setIsVerifying] = React.useState(false);
 
 	const { data: domainData, isLoading } = useSWR<DomainResponse>(
 		domain ? `/api/domain/v1/${domain}` : null,
@@ -27,6 +33,43 @@ export const ConfigureDnsStep = () => {
 			}, 2000);
 		} catch {
 			// Handle copy error silently
+		}
+	};
+
+	const handleVerifyDNS = async () => {
+		if (!domain) {
+			toast.error("Domain information not available");
+			return;
+		}
+
+		setIsVerifying(true);
+		try {
+			await axios.post(
+				"/api/domain/v1/verify",
+				{ domain },
+				{ headers: { credentials: "include" } },
+			);
+
+			toast.success(
+				"DNS verification started! Verification will continue in the background.",
+				{
+					description:
+						"You can check the verification status later in the domain settings.",
+					duration: 5000,
+				},
+			);
+
+			// Small delay to ensure button state is visible before navigation
+			await new Promise((resolve) => setTimeout(resolve, 500));
+
+			// Navigate to step 4
+			setStep(4);
+		} catch (error) {
+			const errorMessage = axios.isAxiosError(error)
+				? error.response?.data?.message || "Failed to start DNS verification"
+				: "Failed to start DNS verification";
+			toast.error(errorMessage);
+			setIsVerifying(false);
 		}
 	};
 
@@ -117,6 +160,52 @@ export const ConfigureDnsStep = () => {
 						nameColumnWidth="minmax(100px,auto)"
 					/>
 				</div>
+			</div>
+
+			{/* Verify DNS Button */}
+			<div className="mt-8">
+				<Button.Root
+					variant="neutral"
+					mode="filled"
+					className="w-full"
+					onClick={
+						domainData?.status === "verifying" ||
+						domainData?.status === "active"
+							? () => setStep(4)
+							: handleVerifyDNS
+					}
+					disabled={isVerifying || !domain}
+				>
+					{isVerifying ? (
+						<>
+							<Button.Icon>
+								<Icon name="loader" className="h-4 w-4 animate-spin" />
+							</Button.Icon>
+							Verifying DNS records...
+						</>
+					) : domainData?.status === "verifying" ? (
+						<>
+							<Button.Icon>
+								<Icon name="loader" className="h-4 w-4 animate-spin" />
+							</Button.Icon>
+							DNS verification in progress
+						</>
+					) : domainData?.status === "active" ? (
+						<>
+							<Button.Icon>
+								<Icon name="check-circle" className="h-4 w-4" />
+							</Button.Icon>
+							Continue to next step
+						</>
+					) : (
+						<>
+							<Button.Icon>
+								<Icon name="check-circle" className="h-4 w-4" />
+							</Button.Icon>
+							I have added the DNS records
+						</>
+					)}
+				</Button.Root>
 			</div>
 		</div>
 	);
