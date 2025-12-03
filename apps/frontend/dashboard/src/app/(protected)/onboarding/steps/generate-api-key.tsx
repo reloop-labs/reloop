@@ -44,7 +44,7 @@ export const GenerateApiKeyStep = () => {
 	return (
 		<div className="fade-in animate-in space-y-6 duration-500">
 			{!apiKey ? (
-				<div className="flex h-[600px] w-full flex-col items-center justify-center bg-white p-4">
+				<div className="flex w-full flex-col items-center justify-center p-4">
 					{/* Illustration Area */}
 					<div className="relative mb-8 flex h-64 w-64 items-center justify-center">
 						{/* The Dashed Orbit Ring */}
@@ -72,34 +72,20 @@ export const GenerateApiKeyStep = () => {
 							<ShieldCheck className="h-5 w-5 text-gray-300" />
 						</div>
 					</div>
-
-					{/* Text Content */}
-					<div className="max-w-md space-y-2 text-center">
-						<h3 className="font-semibold text-gray-900 text-xl">
-							No API keys generated
-						</h3>
-						<p className="text-gray-500 text-sm">
-							Create a secret key to authenticate your application and start
-							interacting with the API.
-						</p>
-					</div>
-
-					{/* Action Button */}
-					<div className="mt-8">
-						<button
-							type="button"
-							onClick={generateKey}
-							disabled={loading}
-							className="flex items-center gap-2 rounded-lg bg-gray-900 px-5 py-2.5 font-medium text-sm text-white shadow-sm transition-all hover:bg-gray-800 hover:shadow-md active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
-						>
-							{loading ? (
-								<Loader2 className="h-4 w-4 animate-spin" />
-							) : (
-								<Plus className="h-4 w-4" />
-							)}
-							{loading ? "Generating..." : "Generate Secret Key"}
-						</button>
-					</div>
+					<Button.Root
+						variant="neutral"
+						mode="filled"
+						onClick={generateKey}
+						disabled={loading}
+						className="w-full"
+					>
+						{loading ? (
+							<Loader2 className="h-4 w-4 animate-spin" />
+						) : (
+							<Plus className="h-4 w-4" />
+						)}
+						{loading ? "Generating..." : "Generate Secret Key"}
+					</Button.Root>
 				</div>
 			) : (
 				<div className="space-y-6">

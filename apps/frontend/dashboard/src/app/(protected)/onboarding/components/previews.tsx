@@ -487,26 +487,20 @@ export const DomainPreview = ({ domain, logoUrl }: DomainPreviewProps) => {
 							<span className="text-[10px] text-text-soft-400">×</span>
 						</div>
 					</div>
-
-					{/* Sender Row */}
 					<div className="flex items-start gap-4">
-						{/* Avatar */}
-						{domain ? (
-							logoUrl ? (
-								<img
-									src={logoUrl}
-									alt={domainName}
-									className="h-10 w-10 shrink-0 rounded-full border-2 border-stroke-soft-100 object-cover"
-								/>
-							) : (
-								<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-stroke-soft-100 bg-bg-soft-200 font-bold text-sm">
-									{avatarInitial}
-								</div>
-							)
+						{logoUrl ? (
+							<img
+								src={logoUrl}
+								alt={domainName}
+								className="h-10 w-10 shrink-0 rounded-full border-2 border-stroke-soft-100 object-cover"
+							/>
+						) : domain ? (
+							<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-stroke-soft-100 bg-bg-soft-200 font-bold text-sm">
+								{avatarInitial}
+							</div>
 						) : (
 							<div className="h-10 w-10 rounded-full bg-bg-soft-200" />
 						)}
-
 						<div className="relative z-10 min-w-0 flex-1">
 							{/* Sender Name & Email */}
 							<div className="mb-1 flex items-center gap-2">

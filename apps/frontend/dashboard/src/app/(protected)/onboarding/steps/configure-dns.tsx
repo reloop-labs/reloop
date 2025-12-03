@@ -163,11 +163,10 @@ export const ConfigureDnsStep = () => {
 			</div>
 
 			{/* Verify DNS Button */}
-			<div className="mt-8">
+			<div className="mt-8 flex justify-end">
 				<Button.Root
 					variant="neutral"
 					mode="filled"
-					className="w-full"
 					onClick={
 						domainData?.status === "verifying" ||
 						domainData?.status === "active"

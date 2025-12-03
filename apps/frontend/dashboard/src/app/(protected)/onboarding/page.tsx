@@ -50,7 +50,7 @@ const OnBoardingPage = () => {
 			title: "Configure DNS",
 			component: <ConfigureDnsStep />,
 			preview: <DnsConfigPreview domain={domain} />,
-			fullWidth: false,
+			fullWidth: true,
 		},
 		4: {
 			stepIndicator: "4/4",
