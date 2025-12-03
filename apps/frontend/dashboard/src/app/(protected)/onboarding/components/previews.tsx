@@ -224,7 +224,7 @@ export const ApiPreview = ({ apiKey: _apiKey }: ApiPreviewProps) => {
 				defaultValue={selectedLang}
 				onValueChange={handleLanguageChange}
 			/>
-			<div className="mt-2 max-h-[360px] flex-1 overflow-y-auto rounded-xl border border-stroke-soft-100 bg-bg-weak-50">
+			<div className="mt-2 max-h-96 flex-1 overflow-y-auto">
 				<CodeBlock
 					code={currentCode.code}
 					lang={currentCode.lang}

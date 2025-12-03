@@ -13,14 +13,14 @@ const languages = [
 		name: "Go",
 		icon: "go",
 		iconSize: "h-6 w-6",
-		iconClass: "text-black",
+		iconClass: "fill-bg-white-0 ",
 	},
 	{
 		id: "php",
 		name: "PHP",
 		icon: "php",
 		iconSize: "h-6 w-6",
-		iconClass: "text-black",
+		iconClass: "fill-bg-white-0 ",
 	},
 	{ id: "python", name: "Python", icon: "python", iconSize: "h-4 w-4" },
 ];

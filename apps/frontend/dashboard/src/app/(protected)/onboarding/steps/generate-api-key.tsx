@@ -1,15 +1,21 @@
 "use client";
 
+import * as Alert from "@reloop/ui/alert";
 import * as Button from "@reloop/ui/button";
+import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
+import * as Label from "@reloop/ui/label";
 import {
 	CheckCircle2,
+	Code,
 	Copy,
 	Key,
 	Loader2,
+	Lock,
 	Plus,
-	ShieldCheck,
+	Zap,
 } from "lucide-react";
+import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { parseAsString, useQueryState } from "nuqs";
 import { useState } from "react";
@@ -42,35 +48,219 @@ export const GenerateApiKeyStep = () => {
 	};
 
 	return (
-		<div className="fade-in animate-in space-y-6 duration-500">
+		<div className="fade-in h-full animate-in space-y-6 duration-500">
 			{!apiKey ? (
 				<div className="flex w-full flex-col items-center justify-center p-4">
 					{/* Illustration Area */}
 					<div className="relative mb-8 flex h-64 w-64 items-center justify-center">
-						{/* The Dashed Orbit Ring */}
-						<div className="absolute inset-0 rounded-full border border-gray-200 border-dashed opacity-75" />
+						{/* The Dashed Orbit Ring - Rotating */}
+						<motion.div
+							className="absolute inset-0 rounded-full border border-stroke-soft-200 border-dashed opacity-75"
+							animate={{ rotate: 360 }}
+							transition={{
+								duration: 20,
+								repeat: Number.POSITIVE_INFINITY,
+								ease: "linear",
+							}}
+						/>
 
-						{/* Inner Glow/Background (Optional) */}
-						<div className="absolute h-32 w-32 rounded-full bg-gray-50 opacity-60 blur-2xl" />
+						{/* Inner Glow/Background - Pulsing */}
+						<motion.div
+							className="absolute h-32 w-32 rounded-full bg-bg-weak-50 opacity-60 blur-2xl"
+							animate={{
+								scale: [1, 1.1, 1],
+								opacity: [0.4, 0.6, 0.4],
+							}}
+							transition={{
+								duration: 3,
+								repeat: Number.POSITIVE_INFINITY,
+								ease: "easeInOut",
+							}}
+						/>
 
-						{/* Center Element: The Main Key Icon */}
-						<div className="relative z-10 flex h-20 w-24 flex-col items-center justify-center rounded-xl border border-gray-100 bg-white shadow-sm">
-							<div className="mb-2 h-2 w-full rounded-t-xl bg-gray-100 opacity-50" />{" "}
-							{/* Top decoration */}
-							<Key className="h-8 w-8 text-gray-300" strokeWidth={1.5} />
-							<div className="mt-2 h-1.5 w-12 rounded-full bg-gray-100" />{" "}
-							{/* Skeleton text line */}
-						</div>
+						{/* Center Element: The Main Key Icon - Floating */}
+						<motion.div
+							className="relative z-10 flex h-20 w-24 flex-col items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 shadow-sm"
+							animate={{
+								y: [0, -8, 0],
+							}}
+							transition={{
+								duration: 2.5,
+								repeat: Number.POSITIVE_INFINITY,
+								ease: "easeInOut",
+							}}
+						>
+							<div className="mb-2 h-2 w-full rounded-t-xl bg-bg-weak-50 opacity-50" />
+							<motion.div
+								style={{
+									color: "rgb(156 163 175)",
+								}}
+								animate={{
+									color: [
+										"rgb(156 163 175)", // text-text-soft-400
+										"rgb(59 130 246)", // primary-blue
+										"rgb(34 197 94)", // success-green
+										"rgb(156 163 175)", // back to soft
+									],
+								}}
+								transition={{
+									duration: 4,
+									repeat: Number.POSITIVE_INFINITY,
+									ease: "easeInOut",
+								}}
+							>
+								<Key className="h-8 w-8" strokeWidth={1.5} />
+							</motion.div>
+							<div className="mt-2 h-1.5 w-12 rounded-full bg-bg-weak-50" />
+						</motion.div>
 
-						{/* Satellite Icon 1 (Top Left) - Shield */}
-						<div className="absolute top-8 left-8 flex h-10 w-10 animate-bounce-slow items-center justify-center rounded-full border border-gray-100 bg-white shadow-sm">
-							<ShieldCheck className="h-4 w-4 text-gray-300" />
-						</div>
+						{/* Satellite Icon 1 (Top Left) - Lock - Floating */}
+						<motion.div
+							className="absolute top-8 left-8 flex h-10 w-10 items-center justify-center rounded-full border border-stroke-soft-100 bg-bg-white-0 shadow-sm"
+							animate={{
+								y: [0, -12, 0],
+								rotate: [0, 5, -5, 0],
+							}}
+							transition={{
+								duration: 3,
+								repeat: Number.POSITIVE_INFINITY,
+								ease: "easeInOut",
+								delay: 0.2,
+							}}
+						>
+							<motion.div
+								style={{
+									color: "rgb(156 163 175)",
+								}}
+								animate={{
+									color: [
+										"rgb(156 163 175)", // text-text-soft-400
+										"rgb(239 68 68)", // error-red
+										"rgb(34 197 94)", // success-green
+										"rgb(156 163 175)", // back to soft
+									],
+								}}
+								transition={{
+									duration: 3.5,
+									repeat: Number.POSITIVE_INFINITY,
+									ease: "easeInOut",
+									delay: 0.5,
+								}}
+							>
+								<Lock className="h-4 w-4" />
+							</motion.div>
+						</motion.div>
 
-						{/* Satellite Icon 2 (Bottom Right) - Lock */}
-						<div className="absolute right-8 bottom-8 flex h-12 w-12 items-center justify-center rounded-full border border-gray-100 bg-white shadow-sm">
-							<ShieldCheck className="h-5 w-5 text-gray-300" />
-						</div>
+						{/* Satellite Icon 2 (Top Right) - Code - Floating */}
+						<motion.div
+							className="absolute top-8 right-8 flex h-10 w-10 items-center justify-center rounded-full border border-stroke-soft-100 bg-bg-white-0 shadow-sm"
+							animate={{
+								y: [0, -10, 0],
+								rotate: [0, -5, 5, 0],
+							}}
+							transition={{
+								duration: 2.8,
+								repeat: Number.POSITIVE_INFINITY,
+								ease: "easeInOut",
+								delay: 0.4,
+							}}
+						>
+							<motion.div
+								style={{
+									color: "rgb(156 163 175)",
+								}}
+								animate={{
+									color: [
+										"rgb(156 163 175)", // text-text-soft-400
+										"rgb(59 130 246)", // information-blue
+										"rgb(168 85 247)", // feature-purple
+										"rgb(156 163 175)", // back to soft
+									],
+								}}
+								transition={{
+									duration: 3.8,
+									repeat: Number.POSITIVE_INFINITY,
+									ease: "easeInOut",
+									delay: 1,
+								}}
+							>
+								<Code className="h-4 w-4" />
+							</motion.div>
+						</motion.div>
+
+						{/* Satellite Icon 3 (Bottom Left) - Zap - Floating */}
+						<motion.div
+							className="absolute bottom-8 left-8 flex h-10 w-10 items-center justify-center rounded-full border border-stroke-soft-100 bg-bg-white-0 shadow-sm"
+							animate={{
+								y: [0, -8, 0],
+								rotate: [0, 8, -8, 0],
+							}}
+							transition={{
+								duration: 3.2,
+								repeat: Number.POSITIVE_INFINITY,
+								ease: "easeInOut",
+								delay: 0.6,
+							}}
+						>
+							<motion.div
+								style={{
+									color: "rgb(156 163 175)",
+								}}
+								animate={{
+									color: [
+										"rgb(156 163 175)", // text-text-soft-400
+										"rgb(249 115 22)", // warning-orange
+										"rgb(234 179 8)", // away-yellow
+										"rgb(156 163 175)", // back to soft
+									],
+								}}
+								transition={{
+									duration: 3.2,
+									repeat: Number.POSITIVE_INFINITY,
+									ease: "easeInOut",
+									delay: 1.5,
+								}}
+							>
+								<Zap className="h-4 w-4" />
+							</motion.div>
+						</motion.div>
+
+						{/* Satellite Icon 4 (Bottom Right) - Lock - Floating */}
+						<motion.div
+							className="absolute right-8 bottom-8 flex h-12 w-12 items-center justify-center rounded-full border border-stroke-soft-100 bg-bg-white-0 shadow-sm"
+							animate={{
+								y: [0, -14, 0],
+								rotate: [0, -6, 6, 0],
+							}}
+							transition={{
+								duration: 2.6,
+								repeat: Number.POSITIVE_INFINITY,
+								ease: "easeInOut",
+								delay: 0.8,
+							}}
+						>
+							<motion.div
+								style={{
+									color: "rgb(156 163 175)",
+								}}
+								animate={{
+									color: [
+										"rgb(156 163 175)", // text-text-soft-400
+										"rgb(34 197 94)", // success-green
+										"rgb(59 130 246)", // information-blue
+										"rgb(156 163 175)", // back to soft
+									],
+								}}
+								transition={{
+									duration: 4.2,
+									repeat: Number.POSITIVE_INFINITY,
+									ease: "easeInOut",
+									delay: 2,
+								}}
+							>
+								<Lock className="h-5 w-5" />
+							</motion.div>
+						</motion.div>
 					</div>
 					<Button.Root
 						variant="neutral"
@@ -88,29 +278,9 @@ export const GenerateApiKeyStep = () => {
 					</Button.Root>
 				</div>
 			) : (
-				<div className="space-y-6">
-					<div className="flex gap-4 rounded-xl border border-warning-lighter bg-warning-lighter p-5">
-						<div className="mt-1 text-warning-base">
-							<ShieldCheck size={24} />
-						</div>
-						<div>
-							<h4 className="font-semibold text-text-strong-950">
-								Keep this key secret
-							</h4>
-							<p className="mt-1 text-sm text-text-sub-600 leading-relaxed">
-								We only show this key once. If you lose it, you will need to
-								generate a new one and update your applications.
-							</p>
-						</div>
-					</div>
-
-					<div>
-						<label
-							htmlFor="api-key"
-							className="mb-2 block font-semibold text-sm text-text-strong-950"
-						>
-							Your API Key
-						</label>
+				<div className="flex h-full flex-1 flex-col justify-between space-y-6">
+					<div className="flex flex-col gap-1">
+						<Label.Root htmlFor="api-key">Your API Key</Label.Root>
 						<div className="group relative">
 							<Input.Root>
 								<Input.Wrapper>
@@ -147,6 +317,9 @@ export const GenerateApiKeyStep = () => {
 							className="w-full"
 							onClick={() => router.push("/")}
 						>
+							<Button.Icon>
+								<Icon name="check-circle" className="h-4 w-4" />
+							</Button.Icon>
 							Go to Dashboard
 						</Button.Root>
 					</div>
