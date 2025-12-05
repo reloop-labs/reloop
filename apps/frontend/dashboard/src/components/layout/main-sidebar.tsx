@@ -1,6 +1,6 @@
 "use client";
 
-import { mainNavigation } from "@fe/dashboard/constants";
+import { mainNavigation, userNavigation } from "@fe/dashboard/constants";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { useOrgStore } from "@fe/dashboard/store/use-org-store";
 import { authClient } from "@reloop/auth/client";
@@ -25,8 +25,10 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
 	const [orgIdx, setOrgIdx] = useState<number | undefined>(undefined);
 	const [orgDropdownOpen, setOrgDropdownOpen] = useState(false);
 	const [userMenuOpen, setUserMenuOpen] = useState(false);
+	const [userNavIdx, setUserNavIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLAnchorElement[]>([]);
 	const orgButtonRefs = useRef<HTMLButtonElement[]>([]);
+	const userNavButtonRefs = useRef<HTMLButtonElement[]>([]);
 	const pathname = usePathname();
 	const router = useRouter();
 	const { user, activeOrganization, push } = useUserOrganization();
@@ -484,7 +486,11 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
 								isSidebarCollapsed ? "justify-center" : "justify-start",
 							)}
 						>
-							<Avatar.Root color="purple" size="16" placeholderType="company" />
+							<Avatar.Root  size="32" placeholderType="company">
+									{user.image && (
+										<Avatar.Image src={user.image} alt={user.name} />
+									)}
+								</Avatar.Root>
 							<AnimatePresence mode="wait">
 								{!isSidebarCollapsed && (
 									<motion.div
@@ -506,50 +512,102 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
 						</button>
 					</Popover.Trigger>
 					<Popover.Content
-						sideOffset={2}
-						className="w-60 p-0"
+						sideOffset={8}
+						className="w-64 p-0"
 						side="top"
-						align="end"
+						align="start"
+						showArrow={false}
 					>
-						<div className="p-2">
-							<div className="mb-2 flex items-center gap-2 border-stroke-soft-200 border-b px-3 py-2">
-								<Avatar.Root color="purple" size="32" placeholderType="company">
-									{user.image && (
-										<Avatar.Image src={user.image} alt={user.name} />
-									)}
-								</Avatar.Root>
-								<div className="min-w-0 flex-1">
-									<p className="truncate font-medium text-sm text-text-strong-950">
-										{user.name}
-									</p>
-									<p className="truncate text-text-sub-600 text-xs">
-										{user.email}
-									</p>
-								</div>
+						<div className="p-3">		
+							{/* Navigation items */}
+							<div className="relative">
+								{userNavigation.map(({ path, label, iconName, variant, action }, navIdx) => {
+									const currentUserNavIdx = userNavIdx;
+									const userNavTab = userNavButtonRefs.current[currentUserNavIdx ?? -1];
+									const userNavRect = userNavTab?.getBoundingClientRect();
+									const isDanger = variant === "danger";
+									return (
+										<button
+											key={path + label}
+											ref={(el) => {
+												if (el) {
+													userNavButtonRefs.current[navIdx] = el;
+												}
+											}}
+											type="button"
+											onPointerEnter={() => setUserNavIdx(navIdx)}
+											onPointerLeave={() => setUserNavIdx(undefined)}
+											className={cn(
+												"flex w-full cursor-pointer items-center justify-start gap-2.5 rounded-lg px-3 py-2 font-normal",
+												isDanger ? "text-red-500" : "",
+												!userNavRect && currentUserNavIdx === navIdx && (isDanger ? "bg-red-alpha-10" : "bg-neutral-alpha-10"),
+											)}
+											onClick={async () => {
+												setUserMenuOpen(false);
+												if (action === "signout") {
+													await authClient.signOut();
+													router.push("/login");
+												} else {
+													router.push(`/${activeOrganization.slug}${path}`);
+												}
+											}}
+										>
+											<Icon name={iconName} className={cn("h-4 w-4", isDanger ? "" : "text-text-sub-600")} />
+											<p className="text-sm">{label}</p>
+										</button>
+									);
+								})}
+								<AnimatePresence>
+									{(() => {
+										const userNavTab = userNavButtonRefs.current[userNavIdx ?? -1];
+										const userNavRect = userNavTab?.getBoundingClientRect();
+										const hoveredItem = userNavigation[userNavIdx ?? -1];
+										const isDanger = hoveredItem?.variant === "danger";
+										return userNavRect ? (
+											<motion.div
+												className={cn("absolute top-0 left-0 rounded-lg", isDanger ? "bg-red-alpha-10" : "bg-neutral-alpha-10")}
+												initial={{
+													pointerEvents: "none",
+													width: userNavRect.width,
+													height: userNavRect.height,
+													left:
+														userNavRect.left -
+														(userNavTab?.offsetParent?.getBoundingClientRect().left || 0),
+													top:
+														userNavRect.top -
+														(userNavTab?.offsetParent?.getBoundingClientRect().top || 0),
+													opacity: 0,
+												}}
+												animate={{
+													pointerEvents: "none",
+													width: userNavRect.width,
+													height: userNavRect.height,
+													left:
+														userNavRect.left -
+														(userNavTab?.offsetParent?.getBoundingClientRect().left || 0),
+													top:
+														userNavRect.top -
+														(userNavTab?.offsetParent?.getBoundingClientRect().top || 0),
+													opacity: 1,
+												}}
+												exit={{
+													pointerEvents: "none",
+													opacity: 0,
+													width: userNavRect.width,
+													height: userNavRect.height,
+													left:
+														userNavRect.left -
+														(userNavTab?.offsetParent?.getBoundingClientRect().left || 0),
+													top:
+														userNavRect.top -
+														(userNavTab?.offsetParent?.getBoundingClientRect().top || 0),
+												}}
+												transition={{ duration: 0.14 }}
+											/>
+										) : null;
+									})()}
+								</AnimatePresence>
 							</div>
-							<button
-								type="button"
-								className="flex w-full cursor-pointer items-center justify-start gap-2 rounded-lg px-3 py-1.5 font-normal hover:bg-neutral-alpha-5"
-								onClick={() => {
-									setUserMenuOpen(false);
-									router.push(`/${activeOrganization.slug}/settings/account`);
-								}}
-							>
-								<Icon name="user" className="h-4 w-4" />
-								<p className="text-sm">Account Settings</p>
-							</button>
-							<button
-								type="button"
-								className="flex w-full cursor-pointer items-center justify-start gap-2 rounded-lg px-3 py-1.5 font-normal hover:bg-neutral-alpha-5"
-								onClick={async () => {
-									setUserMenuOpen(false);
-									await authClient.signOut();
-									router.push("/login");
-								}}
-							>
-								<Icon name="arrow-right" className="h-4 w-4" />
-								<p className="text-sm">Sign out</p>
-							</button>
 						</div>
 					</Popover.Content>
 				</Popover.Root>
