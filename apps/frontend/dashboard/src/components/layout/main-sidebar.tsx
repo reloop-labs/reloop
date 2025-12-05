@@ -75,7 +75,7 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
 			<div className="flex h-12 items-center justify-between border-stroke-soft-100 border-b px-2">
 				{activeOrganization ? (
 					<div>
-						<Avatar.Root size="32" placeholderType="company">
+						<Avatar.Root size="24" placeholderType="company">
 							{activeOrganization.logo && (
 								<Avatar.Image
 									src={activeOrganization.logo}
