@@ -72,7 +72,7 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
 			transition={{ duration: 0.2, ease: "easeInOut" }}
 		>
 			{/* Header */}
-			<div className="flex h-12 items-center justify-between border-stroke-soft-100 border-b px-2">
+			<div className="flex h-12 items-center border-stroke-soft-100 border-b px-2">
 				{activeOrganization ? (
 					<div>
 						<Avatar.Root size="24" placeholderType="company">
@@ -97,7 +97,7 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
 							exit={{ opacity: 0, x: -10 }}
 							transition={{ duration: 0.15 }}
 						>
-							<p className="text-text-disabled-300">/</p>
+							<p className="ml-1 text-text-disabled-300">/</p>
 							<OrganizationSwitcher
 								organizations={organizations}
 								activeOrganization={activeOrganization}
@@ -114,7 +114,7 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
 					mode="ghost"
 					size="xxsmall"
 					onClick={toggleSidebarCollapse}
-					className={cn(isSidebarCollapsed && "absolute -right-4.5")}
+					className={cn(isSidebarCollapsed && "absolute -right-4.5 ", "ml-auto")}
 				>
 					<Button.Icon>
 						<Icon
