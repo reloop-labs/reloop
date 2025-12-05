@@ -33,7 +33,8 @@
 		"@reloop/api": "workspace:*",
 		"axios": "catalog:",
 		"babel-plugin-react-compiler": "catalog:ui",
-		"react-dropzone": "catalog:ui"
+		"react-dropzone": "catalog:ui",
+		"boring-avatars": "catalog:ui"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",

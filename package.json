@@ -86,7 +86,8 @@
 				"@types/mdx": "^2.0.13",
 				"fumadocs-mdx": "^13.0.2",
 				"fumadocs-core": "^16.0.5",
-				"fumadocs-ui": "^16.0.5"
+				"fumadocs-ui": "^16.0.5",
+				"boring-avatars": "^2.0.4"
 			},
 			"db": {
 				"@types/pg": "8.15.4",
@@ -205,5 +206,7 @@
 		"docs",
 		"protobufjs"
 	],
-	"dependencies": {}
+	"dependencies": {
+		
+	}
 }
