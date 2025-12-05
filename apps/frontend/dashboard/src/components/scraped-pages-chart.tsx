@@ -25,8 +25,16 @@ interface EmailStatsChartProps {
 	isLoading?: boolean;
 }
 
-// Mock data for last 7 days - email statistics
+// Mock data for last 15 days - email statistics
 const mockData: ChartDataPoint[] = [
+	{ date: "11/21", sent: 523, failed: 16, bounced: 10 },
+	{ date: "11/22", sent: 689, failed: 22, bounced: 14 },
+	{ date: "11/23", sent: 412, failed: 14, bounced: 8 },
+	{ date: "11/24", sent: 756, failed: 25, bounced: 16 },
+	{ date: "11/25", sent: 598, failed: 19, bounced: 12 },
+	{ date: "11/26", sent: 834, failed: 31, bounced: 20 },
+	{ date: "11/27", sent: 467, failed: 13, bounced: 9 },
+	{ date: "11/28", sent: 721, failed: 27, bounced: 17 },
 	{ date: "11/29", sent: 342, failed: 12, bounced: 8 },
 	{ date: "11/30", sent: 876, failed: 24, bounced: 15 },
 	{ date: "12/01", sent: 512, failed: 18, bounced: 11 },
@@ -39,15 +47,15 @@ const mockData: ChartDataPoint[] = [
 const chartConfig = {
 	sent: {
 		label: "Sent",
-		color: "#1fc16b", // green-500 / success-base
+		color: "#00BD7C", // green-500 / success-base
 	},
 	failed: {
 		label: "Failed",
-		color: "#fb3748", // red-500 / error-base
+		color: "#FD9A00", // red-500 / error-base
 	},
 	bounced: {
 		label: "Bounced",
-		color: "#fa7319", // orange-500 / warning-base
+		color: "#1447E6", // orange-500 / warning-base
 	},
 } satisfies Record<string, { label: string; color: string }>;
 
@@ -175,7 +183,7 @@ export const EmailStatsChart = ({
 						</Badge.Root>
 					</div>
 					<p className="mt-1 text-paragraph-sm text-text-sub-600">
-						Last 7 days • {totalEmails.toLocaleString()} total emails
+						Last 15 days • {totalEmails.toLocaleString()} total emails
 					</p>
 				</div>
 				<Select.Root
@@ -222,7 +230,7 @@ export const EmailStatsChart = ({
 								dataKey="sent"
 								fill={chartConfig.sent.color}
 								radius={[0, 0, 4, 4]}
-								barSize={24}
+								barSize={8}
 								className="text-[#292929]"
 								shape={<CustomGradientBar activeProperty={activeProperty} />}
 								background={{ fill: "currentColor", radius: 4 }}
@@ -232,7 +240,7 @@ export const EmailStatsChart = ({
 								dataKey="failed"
 								fill={chartConfig.failed.color}
 								radius={0}
-								barSize={24}
+								barSize={8}
 								shape={<CustomGradientBar activeProperty={activeProperty} />}
 							/>
 							<Bar
@@ -240,7 +248,7 @@ export const EmailStatsChart = ({
 								dataKey="bounced"
 								fill={chartConfig.bounced.color}
 								radius={[4, 4, 0, 0]}
-								barSize={24}
+								barSize={8}
 								shape={<CustomGradientBar activeProperty={activeProperty} />}
 							/>
 						</BarChart>
