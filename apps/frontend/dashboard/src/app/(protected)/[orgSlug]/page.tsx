@@ -1,6 +1,8 @@
 "use client";
 
+import { ApiKeyDisplay } from "@fe/dashboard/components/api-key-display";
 import { FeatureCard } from "@fe/dashboard/components/feature-card";
+import { ScrapedPagesChart } from "@fe/dashboard/components/scraped-pages-chart";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 
 const features = [
@@ -44,7 +46,7 @@ export default function Home() {
 			</div>
 
 			{/* Feature Cards Grid */}
-			<div className="flex flex-col overflow-hidden rounded-lg border border-stroke-soft-200 bg-bg-white-0 md:flex-row md:items-stretch">
+			<div className="mb-8 flex flex-col overflow-hidden rounded-lg border border-stroke-soft-200 bg-bg-white-0 md:flex-row md:items-stretch">
 				{features.map((feature, index) => (
 					<FeatureCard
 						key={feature.title}
@@ -55,6 +57,12 @@ export default function Home() {
 						isLast={index === features.length - 1}
 					/>
 				))}
+			</div>
+
+			{/* Chart and API Key Section */}
+			<div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+				<ScrapedPagesChart />
+				<ApiKeyDisplay />
 			</div>
 		</div>
 	);

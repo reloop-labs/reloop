@@ -87,7 +87,8 @@
 				"fumadocs-mdx": "^13.0.2",
 				"fumadocs-core": "^16.0.5",
 				"fumadocs-ui": "^16.0.5",
-				"boring-avatars": "^2.0.4"
+				"boring-avatars": "^2.0.4",
+				"recharts": "^2.15.0"
 			},
 			"db": {
 				"@types/pg": "8.15.4",

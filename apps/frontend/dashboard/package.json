@@ -9,6 +9,7 @@
 		"lint": "next lint"
 	},
 	"dependencies": {
+		"recharts": "catalog:ui",
 		"@hookform/resolvers": "catalog:ui",
 		"@reloop/auth": "workspace:*",
 		"@reloop/tailwind": "workspace:*",

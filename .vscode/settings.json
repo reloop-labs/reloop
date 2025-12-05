@@ -9,7 +9,7 @@
     "sonner",
     "turborepo"
   ],
-  "editor.defaultFormatter": "biomejs.biome",
+  "editor.defaultFormatter": "vscode.tunnel-forwarding",
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.organizeImports.biome": "explicit",
