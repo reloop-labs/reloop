@@ -109,16 +109,6 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
 					)}
 				</AnimatePresence>
 
-				{isSidebarCollapsed && (
-					<OrganizationSwitcher
-						organizations={organizations}
-						activeOrganization={activeOrganization}
-						onOrganizationChange={handleOrganizationChange}
-						isCollapsed={true}
-						side="right"
-					/>
-				)}
-
 				<Button.Root
 					variant="neutral"
 					mode="ghost"
