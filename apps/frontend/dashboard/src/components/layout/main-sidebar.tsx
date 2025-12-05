@@ -7,9 +7,11 @@ import { authClient } from "@reloop/auth/client";
 import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
 import * as Popover from "@reloop/ui/popover";
+import * as Tooltip from "@reloop/ui/tooltip";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -477,8 +479,8 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
 				</div>
 			</div>
 			<div className="border-stroke-soft-100 border-t p-2">
-				<Popover.Root open={userMenuOpen} onOpenChange={setUserMenuOpen}>
-					<Popover.Trigger asChild>
+				<Dropdown.Root open={userMenuOpen} onOpenChange={setUserMenuOpen}>
+					<Dropdown.Trigger asChild>
 						<button
 							type="button"
 							className={cn(
@@ -500,23 +502,31 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
 										exit={{ opacity: 0, x: -10 }}
 										transition={{ duration: 0.15 }}
 									>
-										<p className="truncate font-medium text-sm text-text-strong-950">
-											{user.name}
-										</p>
-										<p className="truncate text-text-sub-600 text-xs">
-											{user.email}
-										</p>
+										<Tooltip.Provider>
+											<Tooltip.Root>
+												<Tooltip.Trigger asChild>
+													<p className="truncate font-medium text-sm text-text-sub-600">
+														{user.email}
+													</p>
+												</Tooltip.Trigger>
+												<Tooltip.Content side="top" className="bg-neutral-alpha-10 z-50">
+												<p className="font-medium text-xs text-text-sub-600">
+													{user.email}
+												</p>
+												</Tooltip.Content>
+											</Tooltip.Root>
+										</Tooltip.Provider>
+										
 									</motion.div>
 								)}
 							</AnimatePresence>
 						</button>
-					</Popover.Trigger>
-					<Popover.Content
+					</Dropdown.Trigger>
+					<Dropdown.Content
 						sideOffset={8}
-						className="w-64 p-0"
+						className="w-64 p-2"
 						side="top"
 						align="start"
-						showArrow={false}
 					>
 						<div className="p-3">		
 							{/* Navigation items */}
@@ -609,8 +619,8 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
 								</AnimatePresence>
 							</div>
 						</div>
-					</Popover.Content>
-				</Popover.Root>
+					</Dropdown.Content>
+				</Dropdown.Root>
 			</div>
 		</motion.div>
 	);
