@@ -101,10 +101,10 @@ const CustomGradientBar = (
 
 	const isActive = activeProperty === "all" ? true : activeProperty === dataKey;
 	const numericRadius = typeof radius === "number" ? radius : 4;
-	
+
 	// Get fill color from chartConfig based on dataKey
-	const fillColor = dataKey && dataKey in chartConfig 
-		? chartConfig[dataKey as keyof typeof chartConfig].color 
+	const fillColor = dataKey && dataKey in chartConfig
+		? chartConfig[dataKey as keyof typeof chartConfig].color
 		: "var(--color-gray-400)";
 
 	return (
@@ -153,8 +153,8 @@ export const EmailStatsChart = ({
 	const totalEmails = totalSent + totalFailed + totalBounced;
 
 	// Calculate delivery rate
-	const deliveryRate = totalEmails > 0 
-		? ((totalSent / totalEmails) * 100).toFixed(1) 
+	const deliveryRate = totalEmails > 0
+		? ((totalSent / totalEmails) * 100).toFixed(1)
 		: "0";
 	const isGoodRate = Number(deliveryRate) >= 95;
 
@@ -174,7 +174,7 @@ export const EmailStatsChart = ({
 							<Badge.Icon
 								as={() => (
 									<Icon
-										name={isGoodRate ? "check-outline" : "warning-outline"}
+										name={isGoodRate ? "graph-up" : "graph-down"}
 										className="size-3.5"
 									/>
 								)}
