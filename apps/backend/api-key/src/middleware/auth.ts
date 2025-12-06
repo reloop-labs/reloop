@@ -9,36 +9,65 @@ if (process.env.NODE_ENV !== "production") {
 export const authMiddleware = new Elysia({ name: "better-auth" }).macro({
 	auth: {
 		async resolve({ status, request: { headers } }) {
+			const authUrl = `${process.env.BASE_URL}/api/auth/v1/get-session`;
+			const cookie = headers.get("cookie") || "";
+
+			logger.info(
+				{
+					baseUrl: process.env.BASE_URL,
+					authUrl,
+					hasCookie: !!cookie,
+					cookieLength: cookie.length,
+				},
+				"Attempting authentication"
+			);
+
 			try {
-				const response = await fetch(
-					`${process.env.BASE_URL}/api/auth/v1/get-session`,
+				const response = await fetch(authUrl, {
+					method: "GET",
+					headers: new Headers({
+						"Content-Type": "application/json",
+						Cookie: cookie,
+					}),
+				});
+
+				logger.info(
 					{
-						method: "GET",
-						headers: new Headers({
-							"Content-Type": "application/json",
-							Cookie: headers.get("cookie") || "",
-						}),
+						status: response.status,
+						ok: response.ok,
 					},
+					"Auth service response"
 				);
-				const session: Session | null = await response.json();
-				if (session) {
-					logger.info(
-						{ userId: session.user },
-						"User authenticated via cookie",
+
+				if (!response.ok) {
+					logger.error(
+						{ status: response.status },
+						"Auth service returned error status"
 					);
+					return status(401, { message: "Authentication failed" });
+				}
+
+				const session: Session | null = await response.json();
+
+				if (session?.user) {
+
 					return {
 						user: session.user,
 						session: session.session,
 						authMethod: "cookie" as const,
 					};
 				}
+
+				logger.warn("No session returned from auth service");
 				return status(401, { message: "Authentication required" });
 			} catch (error) {
 				logger.error(
 					{
 						error: error instanceof Error ? error.message : "Unknown error",
+						stack: error instanceof Error ? error.stack : undefined,
+						authUrl,
 					},
-					"Authentication error",
+					"Authentication error"
 				);
 				return status(401, { message: "Authentication failed" });
 			}

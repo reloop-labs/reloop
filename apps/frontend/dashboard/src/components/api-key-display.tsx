@@ -2,6 +2,7 @@
 
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { Icon } from "@reloop/ui/icon";
+import { logger } from "better-auth";
 import { useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
@@ -23,19 +24,24 @@ export const ApiKeyDisplay = () => {
 	const [isVisible, setIsVisible] = useState(false);
 
 	const { data, isLoading } = useSWR<ApiKeyListResponse>(
-		activeOrganization?.id ? "/api/api-key/v1/?limit=1" : null,
+		activeOrganization?.id ? "/api/api-key/v1" : null,
 	);
 
+	console.log(data?.apiKeys?.[0], "API key data here");
+
 	const apiKey = data?.apiKeys?.[0];
-	const displayKey = apiKey?.start || apiKey?.prefix || "";
-	const maskedKey = displayKey
-		? `${displayKey.substring(0, 4)}${"*".repeat(Math.max(0, displayKey.length - 8))}${displayKey.substring(displayKey.length - 4)}`
-		: "";
+	// Build masked key: prefix + asterisks + last 4 chars of start
+	const prefix = apiKey?.prefix || "";
+	const start = apiKey?.start || "";
+	const suffix = start.slice(-4);
+	const asteriskCount = 24; // Fixed number of asterisks for consistent display
+	const maskedKey = prefix && start ? `${prefix}${"*".repeat(asteriskCount)}${suffix}` : "";
+	const fullKey = start; // The actual key to copy/reveal
 
 	const handleCopy = async () => {
-		if (displayKey) {
+		if (fullKey) {
 			try {
-				await navigator.clipboard.writeText(displayKey);
+				await navigator.clipboard.writeText(fullKey);
 				toast.success("API key copied to clipboard");
 			} catch {
 				toast.error("Failed to copy API key");
@@ -50,7 +56,7 @@ export const ApiKeyDisplay = () => {
 					API Key
 				</h3>
 				<p className="mt-1 text-sm text-text-sub-600">
-					Start scraping right away
+					Use this key to authenticate your API requests
 				</p>
 			</div>
 
@@ -58,10 +64,10 @@ export const ApiKeyDisplay = () => {
 				<div className="flex h-12 items-center justify-center rounded-lg bg-bg-weak-50">
 					<div className="text-sm text-text-sub-600">Loading API key...</div>
 				</div>
-			) : displayKey ? (
-				<div className="flex items-center gap-2 rounded-lg bg-warning-light p-3">
-					<code className="flex-1 font-mono text-sm text-text-strong-950">
-						{isVisible ? displayKey : maskedKey}
+			) : maskedKey ? (
+				<div className="flex items-center gap-2 rounded-xl bg-bg-weak-50 p-4">
+					<code className="flex-1 font-mono text-sm text-text-sub-600">
+						{isVisible ? fullKey : maskedKey}
 					</code>
 					<button
 						onClick={() => setIsVisible(!isVisible)}

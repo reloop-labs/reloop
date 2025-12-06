@@ -6,11 +6,6 @@ import { Elysia, status } from "elysia";
 export const createApiKeyRoute = new Elysia().use(authMiddleware).post(
 	"/",
 	async ({ body, user }) => {
-		if (!user.activeOrganizationId) {
-			throw status(403, {
-				message: "User is not a member of an organization",
-			});
-		}
 		return await createApiKeyHandler(user.activeOrganizationId, user.id, body);
 	},
 	{

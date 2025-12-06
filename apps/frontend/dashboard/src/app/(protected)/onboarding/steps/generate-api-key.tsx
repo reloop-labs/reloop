@@ -1,10 +1,10 @@
 "use client";
 
-import * as Alert from "@reloop/ui/alert";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
+import axios from "axios";
 import {
 	CheckCircle2,
 	Code,
@@ -19,6 +19,7 @@ import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { parseAsString, useQueryState } from "nuqs";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export const GenerateApiKeyStep = () => {
 	const [apiKey, setApiKey] = useQueryState(
@@ -29,16 +30,21 @@ export const GenerateApiKeyStep = () => {
 	const [loading, setLoading] = useState(false);
 	const [copied, setCopied] = useState(false);
 
-	const generateKey = () => {
+	const generateKey = async () => {
 		setLoading(true);
-		setTimeout(() => {
-			const key =
-				"mi_live_" +
-				Math.random().toString(36).substring(2, 15) +
-				Math.random().toString(36).substring(2, 15);
-			setApiKey(key);
+		try {
+			const response = await axios.post("/api/api-key/v1/", {
+				name: "Default API Key",
+			});
+			setApiKey(response.data.key);
+		} catch (error) {
+			const errorMessage = axios.isAxiosError(error)
+				? error.response?.data?.message || "Failed to generate API key"
+				: "Failed to generate API key";
+			toast.error(errorMessage);
+		} finally {
 			setLoading(false);
-		}, 1200);
+		}
 	};
 
 	const copyToClipboard = () => {

@@ -13,16 +13,6 @@ export async function listApiKeys(
 	const { page = 1, limit = 10, enabled } = query;
 	const offset = (page - 1) * limit;
 
-	logger.info(
-		{
-			page,
-			limit,
-			enabled,
-			organizationId,
-			userId,
-		},
-		"Listing API keys",
-	);
 
 	try {
 		const conditions = [
@@ -47,15 +37,6 @@ export async function listApiKeys(
 			offset: offset,
 		});
 
-		logger.info(
-			{
-				total,
-				page,
-				limit,
-				count: result.length,
-			},
-			"API keys listed successfully",
-		);
 
 		return {
 			apiKeys: result.map((apiKey) => formatApiKeyResponse(apiKey)),

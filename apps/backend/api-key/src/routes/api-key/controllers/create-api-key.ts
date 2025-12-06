@@ -2,13 +2,11 @@ import { createHash, randomBytes } from "node:crypto";
 import { createId } from "@paralleldrive/cuid2";
 import type { ApiKeyTypes } from "@reloop/api-key/routes/api-key/api-key.type";
 import {
-	formatApiKeyResponse,
 	formatApiKeyWithKeyResponse,
 } from "@reloop/api-key/routes/api-key/controllers/format-api-key-response";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
-import { and, eq } from "drizzle-orm";
 import { status } from "elysia";
 
 const API_KEY_PREFIX = "rl";
@@ -26,24 +24,15 @@ function hashApiKey(key: string): string {
 function getKeyStart(key: string): string {
 	const parts = key.split("_");
 	if (parts.length >= 2) {
-		return `${parts[0]}_${parts[1].substring(0, 8)}`;
+		return `${parts[0]}_${parts[1]?.substring(0, 8) ?? ''}`;
 	}
 	return key.substring(0, 12);
 }
-
 export async function createApiKey(
 	organizationId: string,
 	userId: string,
 	request: ApiKeyTypes.CreateApiKeyRequest,
 ): Promise<ApiKeyTypes.ApiKeyWithKeyResponse> {
-	logger.info(
-		{
-			organizationId,
-			userId,
-			name: request.name,
-		},
-		"Creating API key",
-	);
 
 	try {
 		// Generate API key
@@ -95,14 +84,6 @@ export async function createApiKey(
 			throw status(500, { message: "Failed to create API key" });
 		}
 
-		logger.info(
-			{
-				id: keyId,
-				organizationId,
-				userId,
-			},
-			"API key created successfully",
-		);
 
 		return formatApiKeyWithKeyResponse(newApiKey[0], fullKey);
 	} catch (error) {
@@ -123,25 +104,8 @@ export async function createApiKeyHandler(
 	userId: string,
 	body: ApiKeyTypes.CreateApiKeyRequest,
 ): Promise<ApiKeyTypes.ApiKeyWithKeyResponse> {
-	logger.info(
-		{
-			organizationId,
-			userId,
-			name: body.name,
-		},
-		"Creating API key",
-	);
-
 	try {
 		const apiKey = await createApiKey(organizationId, userId, body);
-		logger.info(
-			{
-				id: apiKey.id,
-				organizationId,
-				userId,
-			},
-			"API key created successfully",
-		);
 		return apiKey;
 	} catch (error) {
 		logger.error(
