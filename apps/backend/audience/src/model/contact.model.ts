@@ -129,4 +129,37 @@ export namespace ContactModel {
     ),
   });
   export type ValidationError = typeof validationError.static;
+
+  // Bulk Import Models
+  export const bulkImportContactItem = t.Object({
+    email: t.String({
+      pattern: emailPattern.source,
+      description: "Contact email address",
+    }),
+    firstName: t.Optional(t.String({ maxLength: 255 })),
+    lastName: t.Optional(t.String({ maxLength: 255 })),
+  });
+
+  export const bulkImportContactsBody = t.Object({
+    contacts: t.Array(bulkImportContactItem, {
+      minItems: 1,
+      maxItems: 1000,
+      description: "Array of contacts to import",
+    }),
+  });
+
+  export type BulkImportContactsBody = typeof bulkImportContactsBody.static;
+
+  export const bulkImportResponse = t.Object({
+    created: t.Number({ description: "Number of contacts created" }),
+    skipped: t.Number({ description: "Number of contacts skipped (already exist)" }),
+    errors: t.Array(
+      t.Object({
+        email: t.String(),
+        reason: t.String(),
+      }),
+    ),
+  });
+
+  export type BulkImportResponse = typeof bulkImportResponse.static;
 }

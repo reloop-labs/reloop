@@ -1,4 +1,5 @@
 // Contact Controllers
+export * from "./bulk-import-contacts";
 export * from "./create-audience";
 export * from "./delete-audience";
 export * from "./format-audience-response";

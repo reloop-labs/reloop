@@ -98,4 +98,37 @@ export namespace TopicSubscriptionModel {
     ),
   });
   export type ValidationError = typeof validationError.static;
+
+  // Unsubscribe Model
+  export const unsubscribeBody = t.Object({
+    contactId: t.String({ description: "Contact ID to unsubscribe" }),
+    topicId: t.String({ description: "Topic ID to unsubscribe from" }),
+  });
+
+  export type UnsubscribeBody = typeof unsubscribeBody.static;
+
+  // Bulk Add Contacts to Topic
+  export const bulkAddContactsBody = t.Object({
+    topicId: t.String({ description: "Topic ID to subscribe contacts to" }),
+    contactIds: t.Array(t.String(), {
+      minItems: 1,
+      maxItems: 1000,
+      description: "Array of contact IDs to subscribe",
+    }),
+  });
+
+  export type BulkAddContactsBody = typeof bulkAddContactsBody.static;
+
+  export const bulkAddResponse = t.Object({
+    subscribed: t.Number({ description: "Number of contacts subscribed" }),
+    skipped: t.Number({ description: "Number of contacts skipped (already subscribed)" }),
+    errors: t.Array(
+      t.Object({
+        contactId: t.String(),
+        reason: t.String(),
+      }),
+    ),
+  });
+
+  export type BulkAddResponse = typeof bulkAddResponse.static;
 }
