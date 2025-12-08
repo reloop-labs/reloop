@@ -173,10 +173,34 @@ const BulkImportPage = () => {
       </div>
 
       <div className="my-6">
-        <h2 className="font-semibold text-lg">CSV File</h2>
-        <p className="text-paragraph-sm text-text-sub-600">
-          Upload a CSV file with contact data (email, firstName, lastName)
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="font-semibold text-lg">CSV File</h2>
+            <p className="text-paragraph-sm text-text-sub-600">
+              Upload a CSV file with contact data (email, firstName, lastName)
+            </p>
+          </div>
+          <Button.Root
+            variant="neutral"
+            mode="stroke"
+            size="xsmall"
+            onClick={() => {
+              const sampleCSV = `email,firstName,lastName
+john.doe@example.com,John,Doe
+jane.smith@example.com,Jane,Smith
+bob.wilson@example.com,Bob,Wilson`;
+              const blob = new Blob([sampleCSV], { type: "text/csv;charset=utf-8;" });
+              const link = document.createElement("a");
+              link.href = URL.createObjectURL(blob);
+              link.download = "contacts_sample.csv";
+              link.click();
+              URL.revokeObjectURL(link.href);
+            }}
+          >
+            <Icon name="file-download" className="h-4 w-4" />
+            Download Sample
+          </Button.Root>
+        </div>
       </div>
 
       <div className="space-y-3">

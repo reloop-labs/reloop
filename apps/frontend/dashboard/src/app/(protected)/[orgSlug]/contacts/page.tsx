@@ -34,7 +34,7 @@ const ContactsPage = () => {
 
     setIsCreating(true);
     try {
-      const response = await fetch("/api/audience/v1/contacts/create", {
+      const response = await fetch("/api/audience/v1/contacts/add", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
