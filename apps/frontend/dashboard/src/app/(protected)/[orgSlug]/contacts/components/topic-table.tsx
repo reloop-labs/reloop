@@ -1,7 +1,14 @@
 "use client";
+import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
+import {
+  Content as PopoverContent,
+  Root as PopoverRoot,
+  Trigger as PopoverTrigger,
+} from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 
 interface Topic {
@@ -28,7 +35,16 @@ export const TopicTable = ({
   loadingRows,
 }: TopicTableProps) => {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const selectedTopicId = searchParams.get("delete");
+
+  const handleViewDetails = (topicId: string) => {
+    router.push(`/${activeOrganizationSlug}/topics/${topicId}`);
+  };
+
+  const handleDelete = (topicId: string) => {
+    router.push(`?delete=${topicId}`);
+  };
 
   if (isLoading) {
     return (
@@ -87,14 +103,9 @@ export const TopicTable = ({
             >
               <div className="flex items-center gap-2 pl-5">
                 <Icon name="notification-indicator" className="h-4 w-4 text-text-sub-600" />
-                <div className="flex flex-col">
-                  <span className="font-medium text-label-sm text-text-strong-950">
-                    {topic.name}
-                  </span>
-                  <span className="text-label-xs text-text-sub-600">
-                    {topic.description || "No description"}
-                  </span>
-                </div>
+                <span className="font-medium text-label-sm text-text-strong-950">
+                  {topic.name}
+                </span>
               </div>
             </Link>
             <Link
@@ -106,12 +117,47 @@ export const TopicTable = ({
               </span>
             </Link>
             <div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
-              <Link
-                href={`?delete=${topic.id}`}
-                className="flex h-8 w-8 items-center justify-center rounded-lg text-text-sub-600 hover:bg-bg-weak-50 hover:text-error-base"
-              >
-                <Icon name="trash" className="h-4 w-4" />
-              </Link>
+              <div className="opacity-0 group-hover/row:opacity-100 transition-opacity">
+                <PopoverRoot>
+                  <PopoverTrigger asChild>
+                    <Button.Root
+                      variant="neutral"
+                      mode="ghost"
+                      size="xxsmall"
+                      className="rounded p-1"
+                    >
+                      <Icon
+                        name="more-vertical"
+                        className="h-4 w-4 text-text-sub-600 hover:text-text-strong-950"
+                      />
+                    </Button.Root>
+                  </PopoverTrigger>
+                  <PopoverContent align="end" className="w-48 p-2">
+                    <div className="flex flex-col gap-1">
+                      <Button.Root
+                        variant="neutral"
+                        mode="ghost"
+                        size="small"
+                        onClick={() => handleViewDetails(topic.id)}
+                        className="w-full justify-start"
+                      >
+                        <Icon name="eye-outline" className="h-4 w-4" />
+                        View Details
+                      </Button.Root>
+                      <Button.Root
+                        variant="error"
+                        mode="ghost"
+                        size="small"
+                        onClick={() => handleDelete(topic.id)}
+                        className="w-full justify-start"
+                      >
+                        <Icon name="trash" className="h-4 w-4" />
+                        Delete Topic
+                      </Button.Root>
+                    </div>
+                  </PopoverContent>
+                </PopoverRoot>
+              </div>
             </div>
           </div>
         ))}

@@ -90,194 +90,194 @@ export const ApiKeyTable = ({
 						</div>
 						{isLoading
 							? // Skeleton loading state
-								Array.from({ length: loadingRows }).map((_, index) => (
-									<div key={`skeleton-${index}`} className="group/row contents">
-										<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
-											<div className="my-1 pl-5">
-												<Skeleton className="h-4 w-32" />
-											</div>
-										</div>
-										<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
-											<div className="px-3">
-												<Skeleton className="h-4 w-16" />
-											</div>
-										</div>
-										<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
-											<div className="px-3">
-												<Skeleton className="h-4 w-12" />
-											</div>
-										</div>
-										<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
-											<div className="px-3">
-												<Skeleton className="h-4 w-12" />
-											</div>
-										</div>
-										<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
-											<div className="px-3">
-												<Skeleton className="h-4 w-16" />
-											</div>
-										</div>
-										<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
-											<Skeleton className="h-4 w-20" />
-										</div>
-										<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
-											<Skeleton className="h-4 w-4" />
+							Array.from({ length: loadingRows }).map((_, index) => (
+								<div key={`skeleton-${index}`} className="group/row contents">
+									<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
+										<div className="my-1 pl-5">
+											<Skeleton className="h-4 w-32" />
 										</div>
 									</div>
-								))
+									<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
+										<div className="px-3">
+											<Skeleton className="h-4 w-16" />
+										</div>
+									</div>
+									<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
+										<div className="px-3">
+											<Skeleton className="h-4 w-12" />
+										</div>
+									</div>
+									<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
+										<div className="px-3">
+											<Skeleton className="h-4 w-12" />
+										</div>
+									</div>
+									<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
+										<div className="px-3">
+											<Skeleton className="h-4 w-16" />
+										</div>
+									</div>
+									<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
+										<Skeleton className="h-4 w-20" />
+									</div>
+									<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
+										<Skeleton className="h-4 w-4" />
+									</div>
+								</div>
+							))
 							: apiKeys.map((apiKey, index) => {
-									const displayName =
-										apiKey.name || apiKey.start || apiKey.prefix || "Unnamed";
-									const displayPrefix = apiKey.start || apiKey.prefix || "---";
+								const displayName =
+									apiKey.name || apiKey.start || apiKey.prefix || "Unnamed";
+								const displayPrefix = apiKey.start || apiKey.prefix || "---";
 
-									return (
-										<div
-											key={`api-key-${index}`}
-											className="group/row contents"
-										>
-											<div className="flex items-center border-stroke-soft-200 border-t py-2 group-hover/row:bg-bg-weak-50">
-												<motion.div
-													{...getAnimationProps(index + 1, 0)}
-													className="flex items-center gap-2 pl-5"
+								return (
+									<div
+										key={`api-key-${index}`}
+										className="group/row contents"
+									>
+										<div className="flex items-center border-stroke-soft-200 border-t py-2 group-hover/row:bg-bg-weak-50">
+											<motion.div
+												{...getAnimationProps(index + 1, 0)}
+												className="flex items-center gap-2 pl-5"
+											>
+												<Link
+													href={`/${activeOrganizationSlug}/api-keys/${apiKey.id}`}
+													className="flex items-center gap-2"
 												>
-													<Link
-														href={`/${activeOrganizationSlug}/api-keys/${apiKey.id}`}
-														className="flex items-center gap-2"
-													>
-														<Icon
-															name="key"
-															className="h-4 w-4 text-text-sub-600"
-														/>
-														<div className="flex flex-col">
-															<div
-																className={cn(
-																	"truncate text-label-xs text-text-strong-950 text-xs",
-																)}
-															>
-																{displayName}
-															</div>
-															<div
-																className={cn(
-																	"truncate font-mono text-label-xs text-text-sub-400 text-xs",
-																)}
-															>
-																{displayPrefix}
-															</div>
+													<Icon
+														name="key"
+														className="h-4 w-4 text-text-sub-600"
+													/>
+													<div className="flex flex-col">
+														<div
+															className={cn(
+																"truncate text-label-xs text-text-strong-950 text-xs",
+															)}
+														>
+															{displayName}
 														</div>
-													</Link>
-												</motion.div>
-											</div>
-											<div className="flex items-center border-stroke-soft-200 border-t py-2 group-hover/row:bg-bg-weak-50">
-												<motion.div
-													{...getAnimationProps(index + 1, 1)}
-													className="flex items-center gap-2 px-3"
-												>
-													<div
-														className={cn(
-															"py flex items-center rounded-full border px-1 font-medium text-xs",
-															getStatusColor(apiKey.enabled),
-														)}
-													>
-														<Icon
-															name={getStatusIcon(apiKey.enabled)}
-															className="mr-1 h-3 w-3"
-														/>
-														{apiKey.enabled ? "Enabled" : "Disabled"}
+														<div
+															className={cn(
+																"truncate font-mono text-label-xs text-text-sub-400 text-xs",
+															)}
+														>
+															{displayPrefix}
+														</div>
 													</div>
-												</motion.div>
-											</div>
-											<div className="flex items-center border-stroke-soft-200 border-t py-2 pl-1 group-hover/row:bg-bg-weak-50">
-												<motion.div
-													{...getAnimationProps(index + 1, 2)}
-													className="flex items-center gap-2 px-3 font-medium"
+												</Link>
+											</motion.div>
+										</div>
+										<div className="flex items-center border-stroke-soft-200 border-t py-2 group-hover/row:bg-bg-weak-50">
+											<motion.div
+												{...getAnimationProps(index + 1, 1)}
+												className="flex items-center gap-2 px-3"
+											>
+												<div
+													className={cn(
+														"py flex items-center rounded-full border px-1 font-medium text-xs",
+														getStatusColor(apiKey.enabled),
+													)}
 												>
-													<span className="text-label-sm text-text-strong-950">
-														{apiKey.requestCount}
-													</span>
-												</motion.div>
-											</div>
-											<div className="flex items-center border-stroke-soft-200 border-t py-2 group-hover/row:bg-bg-weak-50">
-												<motion.div
-													{...getAnimationProps(index + 1, 3)}
-													className="flex items-center gap-2 px-3 font-medium"
-												>
-													<span className="text-label-sm text-text-strong-950">
-														{apiKey.remaining !== null ? apiKey.remaining : "∞"}
-													</span>
-												</motion.div>
-											</div>
-											<div className="flex items-center border-stroke-soft-200 border-t py-2 pr-1 group-hover/row:bg-bg-weak-50">
-												<motion.div
-													{...getAnimationProps(index + 1, 4)}
-													className="flex items-center gap-2 px-3"
-												>
-													<span className="text-label-sm text-text-strong-950">
-														{apiKey.expiresAt
-															? formatRelativeTime(apiKey.expiresAt)
-															: "Never"}
-													</span>
-												</motion.div>
-											</div>
-											<div className="flex items-center border-stroke-soft-200 border-t py-2 pr-1 group-hover/row:bg-bg-weak-50">
-												<motion.span
-													{...getAnimationProps(index + 1, 5)}
-													className="text-label-sm text-text-strong-950"
-												>
-													{formatRelativeTime(apiKey.createdAt)}
-												</motion.span>
-											</div>
-											<div className="flex items-center border-stroke-soft-200 border-t py-2 group-hover/row:bg-bg-weak-50">
-												<motion.div
-													{...getAnimationProps(index + 1, 6)}
-													className="flex items-center justify-center"
-												>
-													<PopoverRoot>
-														<PopoverTrigger asChild>
+													<Icon
+														name={getStatusIcon(apiKey.enabled)}
+														className="mr-1 h-3 w-3"
+													/>
+													{apiKey.enabled ? "Enabled" : "Disabled"}
+												</div>
+											</motion.div>
+										</div>
+										<div className="flex items-center border-stroke-soft-200 border-t py-2 pl-1 group-hover/row:bg-bg-weak-50">
+											<motion.div
+												{...getAnimationProps(index + 1, 2)}
+												className="flex items-center gap-2 px-3 font-medium"
+											>
+												<span className="text-label-sm text-text-strong-950">
+													{apiKey.requestCount}
+												</span>
+											</motion.div>
+										</div>
+										<div className="flex items-center border-stroke-soft-200 border-t py-2 group-hover/row:bg-bg-weak-50">
+											<motion.div
+												{...getAnimationProps(index + 1, 3)}
+												className="flex items-center gap-2 px-3 font-medium"
+											>
+												<span className="text-label-sm text-text-strong-950">
+													{apiKey.remaining !== null ? apiKey.remaining : "∞"}
+												</span>
+											</motion.div>
+										</div>
+										<div className="flex items-center border-stroke-soft-200 border-t py-2 pr-1 group-hover/row:bg-bg-weak-50">
+											<motion.div
+												{...getAnimationProps(index + 1, 4)}
+												className="flex items-center gap-2 px-3"
+											>
+												<span className="text-label-sm text-text-strong-950">
+													{apiKey.expiresAt
+														? formatRelativeTime(apiKey.expiresAt)
+														: "Never"}
+												</span>
+											</motion.div>
+										</div>
+										<div className="flex items-center border-stroke-soft-200 border-t py-2 pr-1 group-hover/row:bg-bg-weak-50">
+											<motion.span
+												{...getAnimationProps(index + 1, 5)}
+												className="text-label-sm text-text-strong-950"
+											>
+												{formatRelativeTime(apiKey.createdAt)}
+											</motion.span>
+										</div>
+										<div className="flex items-center border-stroke-soft-200 border-t py-2 group-hover/row:bg-bg-weak-50">
+											<motion.div
+												{...getAnimationProps(index + 1, 6)}
+												className="flex items-center justify-center"
+											>
+												<PopoverRoot>
+													<PopoverTrigger asChild>
+														<Button.Root
+															variant="neutral"
+															mode="ghost"
+															size="xxsmall"
+															className="rounded p-1"
+														>
+															<Icon
+																name="more-vertical"
+																className="h-4 w-4 text-text-sub-600 hover:text-text-strong-950"
+															/>
+														</Button.Root>
+													</PopoverTrigger>
+													<PopoverContent align="end" className="w-48 p-2">
+														<div className="flex flex-col gap-1">
 															<Button.Root
 																variant="neutral"
 																mode="ghost"
-																size="xxsmall"
-																className="rounded p-1"
+																size="small"
+																onClick={() => handleViewDetails(apiKey.id)}
+																className="w-full justify-start"
 															>
 																<Icon
-																	name="more-vertical"
-																	className="h-4 w-4 text-text-sub-600 hover:text-text-strong-950"
+																	name="eye-outline"
+																	className="h-4 w-4"
 																/>
+																View Details
 															</Button.Root>
-														</PopoverTrigger>
-														<PopoverContent align="end" className="w-48 p-2">
-															<div className="flex flex-col gap-1">
-																<Button.Root
-																	variant="neutral"
-																	mode="ghost"
-																	size="small"
-																	onClick={() => handleViewDetails(apiKey.id)}
-																	className="w-full justify-start"
-																>
-																	<Icon
-																		name="eye-outline"
-																		className="h-4 w-4"
-																	/>
-																	View Details
-																</Button.Root>
-																<Button.Root
-																	variant="error"
-																	mode="ghost"
-																	size="small"
-																	onClick={() => handleDeleteApiKey(apiKey.id)}
-																	className="w-full justify-start text-red-600 hover:bg-red-50"
-																>
-																	<Icon name="trash" className="h-4 w-4" />
-																	Delete API Key
-																</Button.Root>
-															</div>
-														</PopoverContent>
-													</PopoverRoot>
-												</motion.div>
-											</div>
+															<Button.Root
+																variant="error"
+																mode="ghost"
+																size="small"
+																onClick={() => handleDeleteApiKey(apiKey.id)}
+																className="w-full justify-start"
+															>
+																<Icon name="trash" className="h-4 w-4" />
+																Delete API Key
+															</Button.Root>
+														</div>
+													</PopoverContent>
+												</PopoverRoot>
+											</motion.div>
 										</div>
-									);
-								})}
+									</div>
+								);
+							})}
 					</div>
 				</div>
 			</AnimatePresence>

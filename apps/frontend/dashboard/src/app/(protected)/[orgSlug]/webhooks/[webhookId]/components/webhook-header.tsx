@@ -146,10 +146,10 @@ export const WebhookHeader = ({
 	const successRate =
 		webhook && webhook.successCount + webhook.failureCount > 0
 			? Math.round(
-					(webhook.successCount /
-						(webhook.successCount + webhook.failureCount)) *
-						100,
-				)
+				(webhook.successCount /
+					(webhook.successCount + webhook.failureCount)) *
+				100,
+			)
 			: 0;
 
 	return (
@@ -293,7 +293,7 @@ export const WebhookHeader = ({
 											mode="ghost"
 											size="small"
 											onClick={() => onDeleteWebhook?.()}
-											className="w-full justify-start text-red-600 hover:bg-red-50"
+											className="w-full justify-start"
 										>
 											<Icon name="trash" className="h-4 w-4" />
 											Delete webhook
