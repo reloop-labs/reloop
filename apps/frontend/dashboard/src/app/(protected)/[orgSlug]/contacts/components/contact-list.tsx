@@ -36,7 +36,7 @@ export const ContactList = () => {
 
   const { data, error, isLoading } = useSWR<ContactListResponse>(
     activeOrganization?.id
-      ? `/api/audience/v1/contacts/list?organizationId=${activeOrganization.id}&limit=${pageSize}&page=${currentPage}`
+      ? `/api/audience/v1/contacts/list?limit=${pageSize}&page=${currentPage}`
       : null,
     {
       revalidateOnFocus: true,
@@ -65,7 +65,7 @@ export const ContactList = () => {
     try {
       // Fetch all contacts for export
       const response = await fetch(
-        `/api/audience/v1/contacts/list?organizationId=${activeOrganization.id}&limit=10000`
+        `/api/audience/v1/contacts/list?limit=10000`
       );
       const allData = await response.json() as ContactListResponse;
 

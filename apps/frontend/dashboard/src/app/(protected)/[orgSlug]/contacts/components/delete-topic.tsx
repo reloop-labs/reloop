@@ -51,7 +51,7 @@ export const DeleteTopicModal = ({ topics }: DeleteTopicModalProps) => {
         withCredentials: true,
       });
       await mutate(
-        `/api/audience/v1/topics/list?organizationId=${activeOrganization.id}&limit=100`,
+        `/api/audience/v1/topics/list?limit=100`,
       );
       handleClose();
     } catch (error) {

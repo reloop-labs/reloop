@@ -61,7 +61,7 @@ const AddTopicPage = () => {
         { headers: { credentials: "include" } },
       );
       await mutate(
-        `/api/audience/v1/topics/list?organizationId=${activeOrganization.id}&limit=100`,
+        `/api/audience/v1/topics/list?limit=100`,
       );
       push(`/contacts/${response.data.id}`);
     } catch (error) {
