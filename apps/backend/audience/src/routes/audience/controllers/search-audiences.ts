@@ -1,10 +1,9 @@
 import { formatAudienceResponse } from "@be/audience/routes/audience/controllers/format-audience-response";
 import type { AudienceTypes } from "@be/audience/types/audience.type";
-
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
-import { and, count, desc, eq, ilike, or, type SQL, sql } from "drizzle-orm";
+import { and, count, desc, eq, ilike, isNull, or, type SQL } from "drizzle-orm";
 
 export async function searchAudiences(
 	organizationId: string,
@@ -26,6 +25,7 @@ export async function searchAudiences(
 		// Build where conditions
 		const whereConditions: Array<SQL<unknown>> = [
 			eq(schema.audience.organizationId, organizationId),
+			isNull(schema.audience.deletedAt),
 		];
 
 		// Advanced search across multiple fields
@@ -40,16 +40,6 @@ export async function searchAudiences(
 			whereConditions.push(searchCondition);
 		}
 
-		if (query.status) {
-			whereConditions.push(eq(schema.audience.status, query.status));
-		}
-
-		if (query.audienceGroupId) {
-			whereConditions.push(
-				eq(schema.audience.audienceGroupId, query.audienceGroupId),
-			);
-		}
-
 		// Get total count
 		const totalResult = await db
 			.select({ count: count() })
@@ -58,12 +48,9 @@ export async function searchAudiences(
 
 		const total = totalResult[0]?.count || 0;
 
-		// Get audiences with group information
+		// Get audiences
 		const audiences = await db.query.audience.findMany({
 			where: and(...whereConditions),
-			with: {
-				audienceGroup: true,
-			},
 			orderBy: desc(schema.audience.createdAt),
 			limit,
 			offset,

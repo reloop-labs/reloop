@@ -22,13 +22,6 @@ export namespace AudienceModel {
 				description: "Audience last name",
 			}),
 		),
-		audienceGroupId: t.String({ description: "Audience group ID" }),
-		status: t.Optional(
-			t.Union([t.Literal("subscribed"), t.Literal("unsubscribed")], {
-				default: "subscribed",
-				description: "Audience subscription status",
-			}),
-		),
 	});
 
 	export type CreateAudienceBody = typeof createAudienceBody.static;
@@ -46,7 +39,6 @@ export namespace AudienceModel {
 				description: "Audience last name",
 			}),
 		),
-		audienceGroupId: t.Optional(t.String({ description: "Audience group ID" })),
 	});
 
 	export type UpdateAudienceBody = typeof updateAudienceBody.static;
@@ -61,17 +53,9 @@ export namespace AudienceModel {
 			description: "Audience last name",
 		}),
 		organizationId: t.String({ description: "Organization ID" }),
-		status: t.Union([t.Literal("subscribed"), t.Literal("unsubscribed")], {
-			description: "Audience subscription status",
-		}),
-		audienceGroupId: t.String({ description: "Audience group ID" }),
-		audienceGroupName: t.String({ description: "Audience group name" }),
-		addedAt: t.String({ description: "When audience was added" }),
-		unsubscribedAt: t.Union([t.String(), t.Null()], {
-			description: "When audience was unsubscribed",
-		}),
-		createdAt: t.String(),
-		updatedAt: t.String(),
+		createdAt: t.Date(),
+		updatedAt: t.Date(),
+		deletedAt: t.Union([t.Date(), t.Null()]),
 	});
 
 	export type AudienceResponse = typeof audienceResponse.static;
@@ -89,81 +73,10 @@ export namespace AudienceModel {
 		page: t.Optional(t.Number({ minimum: 1, default: 1 })),
 		limit: t.Optional(t.Number({ minimum: 1, maximum: 100, default: 10 })),
 		search: t.Optional(t.String({ description: "Search by email or name" })),
-		status: t.Optional(
-			t.Union([t.Literal("subscribed"), t.Literal("unsubscribed")]),
-		),
-		audienceGroupId: t.Optional(t.String()),
 		organizationId: t.Optional(t.String()),
-		userId: t.Optional(t.String()),
 	});
 
 	export type AudienceQuery = typeof audienceQuery.static;
-
-	// Bulk Operations
-	export const bulkImportAudiencesBody = t.Object({
-		audienceGroupId: t.String({ description: "Audience group ID" }),
-		audiences: t.Array(
-			t.Object({
-				email: t.String({
-					pattern: emailPattern.source,
-					description: "Audience email address",
-				}),
-				firstName: t.Optional(t.String({ maxLength: 255 })),
-				lastName: t.Optional(t.String({ maxLength: 255 })),
-				status: t.Optional(
-					t.Union([t.Literal("subscribed"), t.Literal("unsubscribed")], {
-						default: "subscribed",
-					}),
-				),
-			}),
-			{
-				minItems: 1,
-				maxItems: 1000,
-				description: "List of audiences to import",
-			},
-		),
-	});
-
-	export type BulkImportAudiencesBody = typeof bulkImportAudiencesBody.static;
-
-	export const bulkImportResponse = t.Object({
-		successful: t.Number({
-			description: "Number of successfully imported audiences",
-		}),
-		failed: t.Number({ description: "Number of failed imports" }),
-		errors: t.Array(
-			t.Object({
-				email: t.String(),
-				error: t.String(),
-			}),
-			{ description: "List of import errors" },
-		),
-	});
-
-	export type BulkImportResponse = typeof bulkImportResponse.static;
-
-	// Status Management
-	export const subscribeAudienceBody = t.Object({
-		reason: t.Optional(
-			t.String({
-				maxLength: 500,
-				description: "Reason for subscription",
-			}),
-		),
-	});
-
-	export type SubscribeAudienceBody = typeof subscribeAudienceBody.static;
-
-	export const unsubscribeAudienceBody = t.Object({
-		reason: t.Optional(
-			t.String({
-				maxLength: 500,
-				description: "Reason for unsubscription",
-			}),
-		),
-	});
-
-	export type UnsubscribeAudienceBody = typeof unsubscribeAudienceBody.static;
 
 	// Search Models
 	export const searchAudiencesQuery = t.Object({
@@ -173,14 +86,17 @@ export namespace AudienceModel {
 		}),
 		page: t.Optional(t.Number({ minimum: 1, default: 1 })),
 		limit: t.Optional(t.Number({ minimum: 1, maximum: 100, default: 10 })),
-		status: t.Optional(
-			t.Union([t.Literal("subscribed"), t.Literal("unsubscribed")]),
-		),
-		audienceGroupId: t.Optional(t.String()),
 		organizationId: t.Optional(t.String()),
 	});
 
 	export type SearchAudiencesQuery = typeof searchAudiencesQuery.static;
+
+	// Delete Response
+	export const deleteResponse = t.Object({
+		success: t.Boolean(),
+	});
+
+	export type DeleteResponse = typeof deleteResponse.static;
 
 	// Error Responses
 	export const audienceNotFound = t.Object({
@@ -189,7 +105,7 @@ export namespace AudienceModel {
 	export type AudienceNotFound = typeof audienceNotFound.static;
 
 	export const audienceAlreadyExists = t.Object({
-		message: t.Literal("Audience already exists in this group"),
+		message: t.Literal("Audience already exists"),
 	});
 	export type AudienceAlreadyExists = typeof audienceAlreadyExists.static;
 

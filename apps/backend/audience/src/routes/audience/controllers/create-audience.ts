@@ -13,68 +13,46 @@ export async function createAudience(
 	logger.info(
 		{
 			email: body.email,
-			audienceGroupId: body.audienceGroupId,
 			organizationId,
 		},
 		"Creating audience",
 	);
 
 	try {
-		// Check if audience group exists and belongs to organization
-		const audienceGroup = await db.query.audienceGroup.findFirst({
-			where: and(
-				eq(schema.audienceGroup.id, body.audienceGroupId),
-				eq(schema.audienceGroup.organizationId, organizationId),
-				isNull(schema.audienceGroup.deletedAt),
-			),
-		});
-
-		if (!audienceGroup) {
-			logger.warn(
-				{ audienceGroupId: body.audienceGroupId, organizationId },
-				"Audience group not found",
-			);
-			throw status(404, { message: "Audience group not found" });
-		}
-
-		// Check if audience already exists in this group
+		// Check if audience already exists in this organization
 		const existingAudience = await db
 			.select()
 			.from(schema.audience)
 			.where(
 				and(
 					eq(schema.audience.email, body.email),
-					eq(schema.audience.audienceGroupId, body.audienceGroupId),
 					eq(schema.audience.organizationId, organizationId),
+					isNull(schema.audience.deletedAt),
 				),
 			)
 			.limit(1);
 
 		if (existingAudience.length > 0) {
 			logger.warn(
-				{ email: body.email, audienceGroupId: body.audienceGroupId },
-				"Audience already exists in this group",
+				{ email: body.email },
+				"Audience already exists in this organization",
 			);
-			throw status(409, { message: "Audience already exists in this group" });
+			throw status(409, { message: "Audience already exists" });
 		}
 
-		const newAudience = await db
+		const [newAudience] = await db
 			.insert(schema.audience)
 			.values({
 				email: body.email,
 				firstName: body.firstName || null,
 				lastName: body.lastName || null,
 				organizationId,
-				audienceGroupId: body.audienceGroupId,
-				status: body.status || "subscribed",
-				addedAt: new Date(),
-				unsubscribedAt: body.status === "unsubscribed" ? new Date() : null,
 				createdAt: new Date(),
 				updatedAt: new Date(),
 			})
 			.returning();
 
-		if (!newAudience[0]) {
+		if (!newAudience) {
 			logger.error(
 				{ email: body.email },
 				"Failed to create audience - no data returned",
@@ -82,37 +60,19 @@ export async function createAudience(
 			throw status(500, { message: "Failed to create audience" });
 		}
 
-		// Get the audience with group information
-		const audienceWithGroup = await db.query.audience.findFirst({
-			where: eq(schema.audience.id, newAudience[0].id),
-			with: {
-				audienceGroup: true,
-			},
-		});
-
-		if (!audienceWithGroup) {
-			logger.error(
-				{ email: body.email },
-				"Failed to fetch audience with group information",
-			);
-			throw status(500, { message: "Failed to fetch audience data" });
-		}
-
 		logger.info(
 			{
 				email: body.email,
-				id: newAudience[0].id,
-				audienceGroupId: body.audienceGroupId,
+				id: newAudience.id,
 			},
 			"Audience created successfully",
 		);
 
-		return formatAudienceResponse(audienceWithGroup);
+		return formatAudienceResponse(newAudience);
 	} catch (error) {
 		logger.error(
 			{
 				email: body.email,
-				audienceGroupId: body.audienceGroupId,
 				organizationId,
 				error: error instanceof Error ? error.message : String(error),
 			},

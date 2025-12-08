@@ -26,34 +26,13 @@ export async function updateAudience(
 			where: and(
 				eq(schema.audience.id, audienceId),
 				eq(schema.audience.organizationId, organizationId),
+				isNull(schema.audience.deletedAt),
 			),
 		});
 
 		if (!existingAudience) {
 			logger.warn({ audienceId, organizationId }, "Audience not found");
 			throw status(404, { message: "Audience not found" });
-		}
-
-		// If changing audience group, verify the new group exists and belongs to organization
-		if (
-			body.audienceGroupId &&
-			body.audienceGroupId !== existingAudience.audienceGroupId
-		) {
-			const audienceGroup = await db.query.audienceGroup.findFirst({
-				where: and(
-					eq(schema.audienceGroup.id, body.audienceGroupId),
-					eq(schema.audienceGroup.organizationId, organizationId),
-					isNull(schema.audienceGroup.deletedAt),
-				),
-			});
-
-			if (!audienceGroup) {
-				logger.warn(
-					{ audienceGroupId: body.audienceGroupId, organizationId },
-					"Audience group not found",
-				);
-				throw status(404, { message: "Audience group not found" });
-			}
 		}
 
 		// Update the audience
@@ -67,11 +46,8 @@ export async function updateAudience(
 		if (body.lastName !== undefined) {
 			updateData.lastName = body.lastName;
 		}
-		if (body.audienceGroupId !== undefined) {
-			updateData.audienceGroupId = body.audienceGroupId;
-		}
 
-		const updatedAudience = await db
+		const [updatedAudience] = await db
 			.update(schema.audience)
 			.set(updateData)
 			.where(
@@ -82,28 +58,12 @@ export async function updateAudience(
 			)
 			.returning();
 
-		if (!updatedAudience[0]) {
+		if (!updatedAudience) {
 			logger.error(
 				{ audienceId },
 				"Failed to update audience - no data returned",
 			);
 			throw status(500, { message: "Failed to update audience" });
-		}
-
-		// Get the updated audience with group information
-		const audienceWithGroup = await db.query.audience.findFirst({
-			where: eq(schema.audience.id, audienceId),
-			with: {
-				audienceGroup: true,
-			},
-		});
-
-		if (!audienceWithGroup) {
-			logger.error(
-				{ audienceId },
-				"Failed to fetch updated audience with group information",
-			);
-			throw status(500, { message: "Failed to fetch audience data" });
 		}
 
 		logger.info(
@@ -114,7 +74,7 @@ export async function updateAudience(
 			"Audience updated successfully",
 		);
 
-		return formatAudienceResponse(audienceWithGroup);
+		return formatAudienceResponse(updatedAudience);
 	} catch (error) {
 		logger.error(
 			{

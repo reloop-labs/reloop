@@ -4,6 +4,10 @@ import type { Session } from "@reloop/auth/server";
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
 
+if (audienceConfig.NODE_ENV !== "production") {
+	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+}
+
 export const authMiddleware = new Elysia({ name: "better-auth" }).macro({
 	auth: {
 		async resolve({ status, request: { headers } }) {

@@ -3,7 +3,7 @@ import type { AudienceTypes } from "@be/audience/types/audience.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
 export async function getAudience(
@@ -23,10 +23,8 @@ export async function getAudience(
 			where: and(
 				eq(schema.audience.id, audienceId),
 				eq(schema.audience.organizationId, organizationId),
+				isNull(schema.audience.deletedAt),
 			),
-			with: {
-				audienceGroup: true,
-			},
 		});
 
 		if (!audience) {
