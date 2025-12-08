@@ -100,6 +100,38 @@ const TopicDetailPage = () => {
     }
   };
 
+  const handleSubscribe = async (contactId: string) => {
+    try {
+      await fetch("/api/audience/v1/subscriptions/subscribe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          credentials: "include"
+        },
+        body: JSON.stringify({ contactId, topicId }),
+      });
+      await mutate(`/api/audience/v1/subscriptions/list?topicId=${topicId}&limit=100`);
+    } catch (error) {
+      console.error("Failed to subscribe contact:", error);
+    }
+  };
+
+  const handleRemove = async (contactId: string) => {
+    try {
+      await fetch("/api/audience/v1/subscriptions/remove", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          credentials: "include"
+        },
+        body: JSON.stringify({ contactId, topicId }),
+      });
+      await mutate(`/api/audience/v1/subscriptions/list?topicId=${topicId}&limit=100`);
+    } catch (error) {
+      console.error("Failed to remove contact from topic:", error);
+    }
+  };
+
   const handleDownloadCSV = () => {
     if (!subscriptionData?.subscriptions || subscriptionData.subscriptions.length === 0) {
       return;
@@ -246,6 +278,8 @@ const TopicDetailPage = () => {
               isLoading={subscriptionLoading}
               loadingRows={4}
               onUnsubscribe={handleUnsubscribe}
+              onSubscribe={handleSubscribe}
+              onRemove={handleRemove}
             />
           </div>
         </div>

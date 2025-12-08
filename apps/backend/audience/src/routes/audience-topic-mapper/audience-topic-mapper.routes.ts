@@ -4,6 +4,8 @@ import { createTopicSubscriptionRoute } from "@be/audience/routes/audience-topic
 import { deleteTopicSubscriptionRoute } from "@be/audience/routes/audience-topic-mapper/routes/delete-audience-topic-mapper.route";
 import { getTopicSubscriptionRoute } from "@be/audience/routes/audience-topic-mapper/routes/get-audience-topic-mapper.route";
 import { listTopicSubscriptionsRoute } from "@be/audience/routes/audience-topic-mapper/routes/list-audience-topic-mappers.route";
+import { removeContactFromTopicRoute } from "@be/audience/routes/audience-topic-mapper/routes/remove-contact-from-topic.route";
+import { subscribeContactRoute } from "@be/audience/routes/audience-topic-mapper/routes/subscribe-contact.route";
 import { unsubscribeContactRoute } from "@be/audience/routes/audience-topic-mapper/routes/unsubscribe-contact.route";
 import { updateTopicSubscriptionRoute } from "@be/audience/routes/audience-topic-mapper/routes/update-audience-topic-mapper.route";
 import { Elysia } from "elysia";
@@ -18,7 +20,9 @@ export const topicSubscriptionRoutes = new Elysia({
   .use(listTopicSubscriptionsRoute)
   .use(updateTopicSubscriptionRoute)
   .use(deleteTopicSubscriptionRoute)
-  // Unsubscribe
+  // Subscribe/Unsubscribe/Remove
+  .use(subscribeContactRoute)
   .use(unsubscribeContactRoute)
+  .use(removeContactFromTopicRoute)
   // Bulk Add
   .use(bulkAddContactsToTopicRoute);

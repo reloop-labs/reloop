@@ -2,6 +2,11 @@
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import * as Button from "@reloop/ui/button";
+import {
+  Content as PopoverContent,
+  Root as PopoverRoot,
+  Trigger as PopoverTrigger,
+} from "@reloop/ui/popover";
 
 interface Subscription {
   id: string;
@@ -25,6 +30,8 @@ interface ContactTableProps {
   isLoading: boolean;
   loadingRows: number;
   onUnsubscribe: (contactId: string) => void;
+  onSubscribe: (contactId: string) => void;
+  onRemove: (contactId: string) => void;
 }
 
 export const ContactTable = ({
@@ -32,6 +39,8 @@ export const ContactTable = ({
   isLoading,
   loadingRows,
   onUnsubscribe,
+  onSubscribe,
+  onRemove,
 }: ContactTableProps) => {
   if (isLoading) {
     return (
@@ -122,17 +131,60 @@ export const ContactTable = ({
               </span>
             </div>
             <div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
-              {subscription.status === "subscribed" && (
-                <Button.Root
-                  variant="neutral"
-                  mode="ghost"
-                  size="xxsmall"
-                  onClick={() => onUnsubscribe(subscription.contactId)}
-                  title="Unsubscribe"
-                >
-                  <Icon name="bell-minus" className="h-4 w-4" />
-                </Button.Root>
-              )}
+              <div className="opacity-0 group-hover/row:opacity-100 transition-opacity">
+                <PopoverRoot>
+                  <PopoverTrigger asChild>
+                    <Button.Root
+                      variant="neutral"
+                      mode="ghost"
+                      size="xxsmall"
+                      className="rounded p-1"
+                    >
+                      <Icon
+                        name="more-vertical"
+                        className="h-4 w-4 text-text-sub-600 hover:text-text-strong-950"
+                      />
+                    </Button.Root>
+                  </PopoverTrigger>
+                  <PopoverContent align="end" className="w-48 p-2">
+                    <div className="flex flex-col gap-1">
+                      {subscription.status === "subscribed" ? (
+                        <Button.Root
+                          variant="neutral"
+                          mode="ghost"
+                          size="small"
+                          onClick={() => onUnsubscribe(subscription.contactId)}
+                          className="w-full justify-start"
+                        >
+                          <Icon name="bell-minus" className="h-4 w-4" />
+                          Unsubscribe
+                        </Button.Root>
+                      ) : (
+                        <Button.Root
+                          variant="neutral"
+                          mode="ghost"
+                          size="small"
+                          onClick={() => onSubscribe(subscription.contactId)}
+                          className="w-full justify-start"
+                        >
+                          <Icon name="bell-plus" className="h-4 w-4" />
+                          Subscribe
+                        </Button.Root>
+                      )}
+                      <Button.Root
+                        variant="error"
+                        mode="ghost"
+                        size="small"
+                        onClick={() => onRemove(subscription.contactId)}
+                        className="w-full justify-start text-red-600 hover:bg-red-50"
+                      >
+                        <Icon name="trash" className="h-4 w-4" />
+                        Remove
+                      </Button.Root>
+                    </div>
+                  </PopoverContent>
+                </PopoverRoot>
+              </div>
             </div>
           </div>
         ))}
