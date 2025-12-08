@@ -71,10 +71,12 @@ const ContactsPage = () => {
               variant: "neutral",
               size: "xsmall",
             }).root()}
-            href={`/${activeOrganization.slug}/contacts/add`}
+            href="https://reloop.sh/docs/contacts"
+            target="_blank"
+            rel="noopener noreferrer"
           >
-            <Icon name="plus" className="h-4 w-4" />
-            New Topic
+            <Icon name="book-closed" className="h-4 w-4" />
+            Go to Docs
           </Link>
         </div>
       </div>
