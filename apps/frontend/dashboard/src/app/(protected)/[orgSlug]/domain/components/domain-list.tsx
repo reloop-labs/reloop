@@ -25,16 +25,22 @@ export const DomainListSidebar = () => {
 	const { domainId } = useParams();
 	const [statusFilter, setStatusFilter] = useState<string>("all");
 	const [searchQuery, setSearchQuery] = useState<string>("");
+	const [currentPage, setCurrentPage] = useState(1);
+	const pageSize = 20;
 
 	const { data, error, isLoading } = useSWR<DomainListResponse>(
 		activeOrganization?.id
-			? `/api/domain/v1/list?organizationId=${activeOrganization.id}&limit=100`
+			? `/api/domain/v1/list?organizationId=${activeOrganization.id}&limit=${pageSize}&page=${currentPage}`
 			: null,
 		{
 			revalidateOnFocus: true,
 			revalidateOnReconnect: true,
 		},
 	);
+
+	const totalPages = data ? Math.ceil(data.total / pageSize) : 1;
+	const startIndex = (currentPage - 1) * pageSize + 1;
+	const endIndex = Math.min(currentPage * pageSize, data?.total || 0);
 
 	// Filter domains based on status and search query
 	const filteredDomains =
@@ -184,6 +190,38 @@ export const DomainListSidebar = () => {
 								loadingRows={4}
 							/>
 						</div>
+
+						{/* Pagination */}
+						{data && data.total > 0 && (
+							<div className="mt-4 flex items-center justify-between text-paragraph-sm text-text-sub-600">
+								<div>
+									Showing {startIndex}–{endIndex} of {data.total} domain{data.total !== 1 ? "s" : ""}
+								</div>
+								<div className="flex items-center gap-2">
+									<Button.Root
+										variant="neutral"
+										mode="stroke"
+										size="xxsmall"
+										onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+										disabled={currentPage === 1 || isLoading}
+									>
+										<Icon name="chevron-left" className="h-4 w-4" />
+									</Button.Root>
+									<span className="px-2">
+										Page {currentPage} of {totalPages}
+									</span>
+									<Button.Root
+										variant="neutral"
+										mode="stroke"
+										size="xxsmall"
+										onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+										disabled={currentPage === totalPages || isLoading}
+									>
+										<Icon name="chevron-right" className="h-4 w-4" />
+									</Button.Root>
+								</div>
+							</div>
+						)}
 					</div>
 				)}
 			</div>
