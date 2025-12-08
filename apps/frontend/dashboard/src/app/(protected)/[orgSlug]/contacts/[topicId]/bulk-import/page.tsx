@@ -48,7 +48,7 @@ const BulkImportPage = () => {
   const [validationErrors, setValidationErrors] = useState<Array<{ email: string; error: string }>>([]);
 
   const { data: topicData, error: topicError, isLoading: topicLoading } = useSWR<Topic>(
-    `/api/audience/v1/topics/get/${topicId}`,
+    `/api/audience/v1/topics/${topicId}`,
     { revalidateOnFocus: true, revalidateOnReconnect: true },
   );
 
