@@ -36,6 +36,18 @@ export namespace TopicSubscriptionModel {
     createdAt: t.Date(),
     updatedAt: t.Date(),
     deletedAt: t.Union([t.Date(), t.Null()]),
+    contact: t.Optional(
+      t.Object({
+        id: t.String(),
+        email: t.String(),
+        firstName: t.Union([t.String(), t.Null()]),
+        lastName: t.Union([t.String(), t.Null()]),
+        organizationId: t.String(),
+        createdAt: t.Date(),
+        updatedAt: t.Date(),
+        deletedAt: t.Union([t.Date(), t.Null()]),
+      }),
+    ),
   });
 
   export type TopicSubscriptionResponse = typeof topicSubscriptionResponse.static;

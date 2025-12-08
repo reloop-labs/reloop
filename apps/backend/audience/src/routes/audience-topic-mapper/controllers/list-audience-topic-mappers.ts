@@ -41,6 +41,9 @@ export async function listTopicSubscriptions(
       orderBy: desc(schema.topicSubscription.createdAt),
       limit: limit,
       offset: offset,
+      with: {
+        contact: true,
+      },
     });
 
     return {

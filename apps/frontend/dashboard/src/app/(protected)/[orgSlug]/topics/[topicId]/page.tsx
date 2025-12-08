@@ -43,6 +43,12 @@ interface Subscription {
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
+  contact?: {
+    id: string;
+    email: string;
+    firstName: string | null;
+    lastName: string | null;
+  };
 }
 
 interface SubscriptionListResponse {

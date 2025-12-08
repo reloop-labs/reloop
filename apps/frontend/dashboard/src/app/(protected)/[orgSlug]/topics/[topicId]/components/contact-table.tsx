@@ -12,6 +12,12 @@ interface Subscription {
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
+  contact?: {
+    id: string;
+    email: string;
+    firstName: string | null;
+    lastName: string | null;
+  };
 }
 
 interface ContactTableProps {
@@ -88,7 +94,7 @@ export const ContactTable = ({
               <div className="flex items-center gap-2 pl-5">
                 <Icon name="user" className="h-4 w-4 text-text-sub-600" />
                 <span className="font-medium text-label-sm text-text-strong-950">
-                  {subscription.contactId}
+                  {subscription.contact?.email || subscription.contactId}
                 </span>
               </div>
             </div>
