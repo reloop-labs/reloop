@@ -162,4 +162,24 @@ export namespace ContactModel {
   });
 
   export type BulkImportResponse = typeof bulkImportResponse.static;
+
+  // Add Contact to Topic (combined operation)
+  export const addContactToTopicBody = t.Object({
+    email: t.String({
+      pattern: emailPattern.source,
+      description: "Contact email address",
+    }),
+    firstName: t.Optional(t.String({ maxLength: 255 })),
+    lastName: t.Optional(t.String({ maxLength: 255 })),
+    topicId: t.String({ description: "Topic ID to subscribe the contact to" }),
+  });
+
+  export type AddContactToTopicBody = typeof addContactToTopicBody.static;
+
+  export const addContactToTopicResponse = t.Object({
+    contact: contactResponse,
+    subscriptionId: t.String({ description: "Created subscription ID" }),
+  });
+
+  export type AddContactToTopicResponse = typeof addContactToTopicResponse.static;
 }

@@ -1,4 +1,5 @@
 import { authMiddleware } from "@be/audience/middleware/auth";
+import { addContactToTopicRoute } from "@be/audience/routes/audience/routes/add-contact-to-topic.route";
 import { bulkImportContactsRoute } from "@be/audience/routes/audience/routes/bulk-import-contacts.route";
 import { createContactRoute } from "@be/audience/routes/audience/routes/create-audience.route";
 import { deleteContactRoute } from "@be/audience/routes/audience/routes/delete-audience.route";
@@ -22,4 +23,6 @@ export const contactRoutes = new Elysia({
 	// Search
 	.use(searchContactsRoute)
 	// Bulk Import
-	.use(bulkImportContactsRoute);
+	.use(bulkImportContactsRoute)
+	// Add to Topic
+	.use(addContactToTopicRoute);
