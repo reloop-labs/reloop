@@ -3,8 +3,10 @@ import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
+import * as Select from "@reloop/ui/select";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useState } from "react";
+import { useQueryState, parseAsInteger } from "nuqs";
 import useSWR from "swr";
 import { toast } from "sonner";
 
@@ -29,8 +31,8 @@ interface ContactListResponse {
 export const ContactList = () => {
   const { activeOrganization } = useUserOrganization();
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 20;
+  const [currentPage, setCurrentPage] = useQueryState("page", parseAsInteger.withDefault(1));
+  const [pageSize, setPageSize] = useQueryState("limit", parseAsInteger.withDefault(10));
 
   const { data, error, isLoading } = useSWR<ContactListResponse>(
     activeOrganization?.id
@@ -217,8 +219,28 @@ export const ContactList = () => {
       {/* Pagination */}
       {data && data.total > 0 && (
         <div className="mt-4 flex items-center justify-between text-paragraph-sm text-text-sub-600">
-          <div>
-            Showing {startIndex}–{endIndex} of {data.total} contact{data.total !== 1 ? "s" : ""}
+          <div className="flex items-center gap-3">
+            <span>
+              Showing {startIndex}–{endIndex} of {data.total} contact{data.total !== 1 ? "s" : ""}
+            </span>
+            <Select.Root
+              value={String(pageSize)}
+              onValueChange={(value) => {
+                setPageSize(Number(value));
+                setCurrentPage(1);
+              }}
+              size="xsmall"
+            >
+              <Select.Trigger className="w-16 text-xs">
+                <Select.Value />
+              </Select.Trigger>
+              <Select.Content className="text-xs min-w-16">
+                <Select.Item value="10" className="text-xs">10</Select.Item>
+                <Select.Item value="20" className="text-xs">20</Select.Item>
+                <Select.Item value="50" className="text-xs">50</Select.Item>
+                <Select.Item value="100" className="text-xs">100</Select.Item>
+              </Select.Content>
+            </Select.Root>
           </div>
           <div className="flex items-center gap-2">
             <Button.Root
