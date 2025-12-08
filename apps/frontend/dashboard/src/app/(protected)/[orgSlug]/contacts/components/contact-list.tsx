@@ -4,8 +4,9 @@ import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { useState } from "react";
-import useSWR from "swr";
+import { useRef, useState } from "react";
+import useSWR, { useSWRConfig } from "swr";
+import { toast } from "sonner";
 
 interface Contact {
   id: string;
@@ -27,8 +28,11 @@ interface ContactListResponse {
 
 export const ContactList = () => {
   const { activeOrganization } = useUserOrganization();
+  const { mutate } = useSWRConfig();
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const pageSize = 20;
 
   const { data, error, isLoading } = useSWR<ContactListResponse>(
@@ -58,6 +62,125 @@ export const ContactList = () => {
       return matchesSearch;
     }) || [];
 
+  const handleDownloadCSV = async () => {
+    try {
+      // Fetch all contacts for export
+      const response = await fetch(
+        `/api/audience/v1/contacts/list?organizationId=${activeOrganization.id}&limit=10000`
+      );
+      const allData = await response.json() as ContactListResponse;
+
+      if (!allData.contacts || allData.contacts.length === 0) {
+        toast.error("No contacts to export");
+        return;
+      }
+
+      // Create CSV content
+      const headers = ["Email", "First Name", "Last Name", "Created At"];
+      const csvRows = allData.contacts.map((contact) => [
+        contact.email,
+        contact.firstName || "",
+        contact.lastName || "",
+        new Date(contact.createdAt).toISOString(),
+      ]);
+
+      const csvContent = [
+        headers.join(","),
+        ...csvRows.map((row) => row.map((cell) => `"${cell}"`).join(",")),
+      ].join("\n");
+
+      // Download file
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `contacts_${new Date().toISOString().split("T")[0]}.csv`;
+      link.click();
+      URL.revokeObjectURL(link.href);
+
+      toast.success("Contacts exported successfully");
+    } catch (error) {
+      console.error("Failed to download CSV:", error);
+      toast.error("Failed to export contacts");
+    }
+  };
+
+  const handleUploadCSV = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const text = await file.text();
+      const lines = text.split("\n").filter((line) => line.trim());
+
+      if (lines.length < 2) {
+        toast.error("CSV file is empty or has no data rows");
+        return;
+      }
+
+      // Parse headers
+      const headers = lines[0]?.split(",").map((h) => h.trim().toLowerCase().replace(/"/g, ""));
+      if (!headers) {
+        toast.error("Could not parse CSV headers");
+        return;
+      }
+      const emailIndex = headers.findIndex((h) => h === "email");
+      const firstNameIndex = headers.findIndex((h) => h === "first name" || h === "firstname");
+      const lastNameIndex = headers.findIndex((h) => h === "last name" || h === "lastname");
+
+      if (emailIndex === -1) {
+        toast.error("CSV must have an 'Email' column");
+        return;
+      }
+
+      // Parse contacts
+      const contacts: { email: string; firstName?: string; lastName?: string }[] = [];
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i]?.split(",").map((v) => v.trim().replace(/"/g, ""));
+        const email = values?.[emailIndex];
+        if (email) {
+          contacts.push({
+            email,
+            firstName: firstNameIndex >= 0 ? values?.[firstNameIndex] || undefined : undefined,
+            lastName: lastNameIndex >= 0 ? values?.[lastNameIndex] || undefined : undefined,
+          });
+        }
+      }
+
+      if (contacts.length === 0) {
+        toast.error("No valid contacts found in CSV");
+        return;
+      }
+
+      // Upload contacts via API
+      const response = await fetch("/api/audience/v1/contacts/bulk-create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ contacts }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to upload contacts");
+      }
+
+      const result = await response.json();
+      toast.success(`Successfully imported ${result.created || contacts.length} contacts`);
+
+      // Refresh the list
+      await mutate((key: string) => typeof key === 'string' && key.includes('/api/audience/v1/contacts/list'));
+    } catch (error) {
+      console.error("Failed to upload CSV:", error);
+      toast.error("Failed to import contacts");
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
+
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center gap-2 p-4">
@@ -77,8 +200,27 @@ export const ContactList = () => {
         </div>
         <h3 className="mb-2 font-medium text-lg text-text-strong-950">No contacts yet</h3>
         <p className="max-w-sm text-center text-paragraph-sm text-text-sub-600">
-          Add contacts by subscribing them to a topic.
+          Add contacts by subscribing them to a topic or importing a CSV.
         </p>
+        <div className="mt-4">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".csv"
+            onChange={handleUploadCSV}
+            className="hidden"
+          />
+          <Button.Root
+            variant="neutral"
+            mode="stroke"
+            size="small"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isUploading}
+          >
+            <Icon name="file-upload" className="h-4 w-4" />
+            {isUploading ? "Uploading..." : "Import CSV"}
+          </Button.Root>
+        </div>
       </div>
     );
   }
@@ -101,6 +243,33 @@ export const ContactList = () => {
             </Input.Wrapper>
           </Input.Root>
         </div>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".csv"
+          onChange={handleUploadCSV}
+          className="hidden"
+        />
+        <Button.Root
+          variant="neutral"
+          mode="stroke"
+          size="xsmall"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={isUploading}
+          title="Import CSV"
+        >
+          <Icon name="file-upload" className="h-4 w-4" />
+        </Button.Root>
+        <Button.Root
+          variant="neutral"
+          mode="stroke"
+          size="xsmall"
+          onClick={handleDownloadCSV}
+          disabled={!data?.contacts || data.contacts.length === 0}
+          title="Export CSV"
+        >
+          <Icon name="file-download" className="h-4 w-4" />
+        </Button.Root>
       </div>
 
       <div className="mt-4 w-full overflow-hidden rounded-xl border border-stroke-soft-200 text-paragraph-sm shadow-regular-md ring-stroke-soft-200 ring-inset">
