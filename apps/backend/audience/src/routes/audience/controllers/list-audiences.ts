@@ -1,20 +1,20 @@
-import { formatAudienceResponse } from "@be/audience/routes/audience/controllers/format-audience-response";
-import type { AudienceTypes } from "@be/audience/types/audience.type";
+import { formatContactResponse } from "@be/audience/routes/audience/controllers/format-audience-response";
+import type { ContactTypes } from "@be/audience/types/contact.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
 import { and, count, desc, eq, ilike, isNull, or, type SQL } from "drizzle-orm";
 
-export async function listAudiences(
+export async function listContacts(
 	organizationId: string,
-	query: AudienceTypes.AudienceListQuery,
-): Promise<AudienceTypes.AudienceListResponse> {
+	query: ContactTypes.ContactListQuery,
+): Promise<ContactTypes.ContactListResponse> {
 	logger.info(
 		{
 			organizationId,
 			query,
 		},
-		"Listing audiences",
+		"Listing contacts",
 	);
 
 	try {
@@ -24,15 +24,15 @@ export async function listAudiences(
 
 		// Build where conditions
 		const whereConditions: Array<SQL<unknown>> = [
-			eq(schema.audience.organizationId, organizationId),
-			isNull(schema.audience.deletedAt),
+			eq(schema.contact.organizationId, organizationId),
+			isNull(schema.contact.deletedAt),
 		];
 
 		if (query.search) {
 			const searchCondition = or(
-				ilike(schema.audience.email, `%${query.search}%`),
-				ilike(schema.audience.firstName, `%${query.search}%`),
-				ilike(schema.audience.lastName, `%${query.search}%`),
+				ilike(schema.contact.email, `%${query.search}%`),
+				ilike(schema.contact.firstName, `%${query.search}%`),
+				ilike(schema.contact.lastName, `%${query.search}%`),
 			);
 
 			if (searchCondition) {
@@ -43,20 +43,20 @@ export async function listAudiences(
 		// Get total count
 		const totalResult = await db
 			.select({ count: count() })
-			.from(schema.audience)
+			.from(schema.contact)
 			.where(and(...whereConditions));
 
 		const total = totalResult[0]?.count || 0;
 
-		// Get audiences
-		const audiences = await db.query.audience.findMany({
+		// Get contacts
+		const contacts = await db.query.contact.findMany({
 			where: and(...whereConditions),
-			orderBy: desc(schema.audience.createdAt),
+			orderBy: desc(schema.contact.createdAt),
 			limit,
 			offset,
 		});
 
-		const formattedAudiences = audiences.map(formatAudienceResponse);
+		const formattedContacts = contacts.map(formatContactResponse);
 
 		logger.info(
 			{
@@ -65,11 +65,11 @@ export async function listAudiences(
 				page,
 				limit,
 			},
-			"Audience listed successfully",
+			"Contacts listed successfully",
 		);
 
 		return {
-			audiences: formattedAudiences,
+			contacts: formattedContacts,
 			total,
 			page,
 			limit,
@@ -81,15 +81,15 @@ export async function listAudiences(
 				query,
 				error: error instanceof Error ? error.message : String(error),
 			},
-			"Error listing audiences",
+			"Error listing contacts",
 		);
 		throw error;
 	}
 }
 
-export async function listAudiencesHandler(
+export async function listContactsHandler(
 	organizationId: string,
-	query: AudienceTypes.AudienceListQuery,
-): Promise<AudienceTypes.AudienceListResponse> {
-	return listAudiences(organizationId, query);
+	query: ContactTypes.ContactListQuery,
+): Promise<ContactTypes.ContactListResponse> {
+	return listContacts(organizationId, query);
 }

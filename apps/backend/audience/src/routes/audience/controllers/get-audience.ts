@@ -1,62 +1,62 @@
-import { formatAudienceResponse } from "@be/audience/routes/audience/controllers/format-audience-response";
-import type { AudienceTypes } from "@be/audience/types/audience.type";
+import { formatContactResponse } from "@be/audience/routes/audience/controllers/format-audience-response";
+import type { ContactTypes } from "@be/audience/types/contact.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
-export async function getAudience(
-	audienceId: string,
+export async function getContact(
+	contactId: string,
 	organizationId: string,
-): Promise<AudienceTypes.AudienceResponse> {
+): Promise<ContactTypes.ContactResponse> {
 	logger.info(
 		{
-			audienceId,
+			contactId,
 			organizationId,
 		},
-		"Getting audience",
+		"Getting contact",
 	);
 
 	try {
-		const audience = await db.query.audience.findFirst({
+		const contact = await db.query.contact.findFirst({
 			where: and(
-				eq(schema.audience.id, audienceId),
-				eq(schema.audience.organizationId, organizationId),
-				isNull(schema.audience.deletedAt),
+				eq(schema.contact.id, contactId),
+				eq(schema.contact.organizationId, organizationId),
+				isNull(schema.contact.deletedAt),
 			),
 		});
 
-		if (!audience) {
-			logger.warn({ audienceId, organizationId }, "Audience not found");
-			throw status(404, { message: "Audience not found" });
+		if (!contact) {
+			logger.warn({ contactId, organizationId }, "Contact not found");
+			throw status(404, { message: "Contact not found" });
 		}
 
 		logger.info(
 			{
-				audienceId,
+				contactId,
 				organizationId,
 			},
-			"Audience retrieved successfully",
+			"Contact retrieved successfully",
 		);
 
-		return formatAudienceResponse(audience);
+		return formatContactResponse(contact);
 	} catch (error) {
 		logger.error(
 			{
-				audienceId,
+				contactId,
 				organizationId,
 				error: error instanceof Error ? error.message : String(error),
 			},
-			"Error getting audience",
+			"Error getting contact",
 		);
 		throw error;
 	}
 }
 
-export async function getAudienceHandler(
-	audienceId: string,
+export async function getContactHandler(
+	contactId: string,
 	organizationId: string,
-): Promise<AudienceTypes.AudienceResponse> {
-	return getAudience(audienceId, organizationId);
+): Promise<ContactTypes.ContactResponse> {
+	return getContact(contactId, organizationId);
 }

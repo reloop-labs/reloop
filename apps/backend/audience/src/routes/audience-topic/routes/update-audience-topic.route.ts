@@ -1,14 +1,14 @@
 import { authMiddleware } from "@be/audience/middleware/auth";
-import { AudienceTopicModel } from "@be/audience/model/audience-topic.model";
-import { updateAudienceTopicHandler } from "@be/audience/routes/audience-topic/controllers/update-audience-topic";
+import { TopicModel } from "@be/audience/model/topic.model";
+import { updateTopicHandler } from "@be/audience/routes/audience-topic/controllers/update-audience-topic";
 import { Elysia, t } from "elysia";
 
-export const updateAudienceTopicRoute = new Elysia().use(authMiddleware).patch(
+export const updateTopicRoute = new Elysia().use(authMiddleware).patch(
   "/:topicId",
   async ({ params, body, user }) => {
     const { topicId } = params;
     const { name, description } = body;
-    return await updateAudienceTopicHandler({
+    return await updateTopicHandler({
       topicId,
       organizationId: user.activeOrganizationId,
       name,
@@ -18,19 +18,19 @@ export const updateAudienceTopicRoute = new Elysia().use(authMiddleware).patch(
   {
     auth: true,
     params: t.Object({
-      topicId: t.String({ description: "Audience topic ID" }),
+      topicId: t.String({ description: "Topic ID" }),
     }),
-    body: AudienceTopicModel.updateAudienceTopicBody,
+    body: TopicModel.updateTopicBody,
     response: {
-      200: AudienceTopicModel.audienceTopicResponse,
-      404: AudienceTopicModel.audienceTopicNotFound,
-      409: AudienceTopicModel.audienceTopicAlreadyExists,
-      403: AudienceTopicModel.unauthorized,
+      200: TopicModel.topicResponse,
+      404: TopicModel.topicNotFound,
+      409: TopicModel.topicAlreadyExists,
+      403: TopicModel.unauthorized,
     },
     detail: {
-      tags: ["Audience Topics"],
-      summary: "Update an audience topic",
-      description: "Updates an existing audience topic",
+      tags: ["Topics"],
+      summary: "Update a topic",
+      description: "Updates an existing topic",
     },
   },
 );

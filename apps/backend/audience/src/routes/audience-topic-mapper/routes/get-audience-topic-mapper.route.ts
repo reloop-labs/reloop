@@ -1,28 +1,28 @@
 import { authMiddleware } from "@be/audience/middleware/auth";
-import { AudienceTopicMapperModel } from "@be/audience/model/audience-topic-mapper.model";
-import { getAudienceTopicMapperHandler } from "@be/audience/routes/audience-topic-mapper/controllers/get-audience-topic-mapper";
+import { TopicSubscriptionModel } from "@be/audience/model/topic-subscription.model";
+import { getTopicSubscriptionHandler } from "@be/audience/routes/audience-topic-mapper/controllers/get-audience-topic-mapper";
 import { Elysia, t } from "elysia";
 
-export const getAudienceTopicMapperRoute = new Elysia().use(authMiddleware).get(
-  "/:mapperId",
+export const getTopicSubscriptionRoute = new Elysia().use(authMiddleware).get(
+  "/:subscriptionId",
   async ({ params, user }) => {
-    const { mapperId } = params;
-    return await getAudienceTopicMapperHandler(mapperId, user.activeOrganizationId);
+    const { subscriptionId } = params;
+    return await getTopicSubscriptionHandler(subscriptionId, user.activeOrganizationId);
   },
   {
     auth: true,
     params: t.Object({
-      mapperId: t.String({ description: "Audience topic mapper ID" }),
+      subscriptionId: t.String({ description: "Subscription ID" }),
     }),
     response: {
-      200: AudienceTopicMapperModel.audienceTopicMapperResponse,
-      404: AudienceTopicMapperModel.notFound,
-      403: AudienceTopicMapperModel.unauthorized,
+      200: TopicSubscriptionModel.topicSubscriptionResponse,
+      404: TopicSubscriptionModel.notFound,
+      403: TopicSubscriptionModel.unauthorized,
     },
     detail: {
-      tags: ["Audience Subscriptions"],
-      summary: "Get a subscription mapping",
-      description: "Retrieves a specific audience-topic subscription by ID",
+      tags: ["Topic Subscriptions"],
+      summary: "Get a topic subscription",
+      description: "Retrieves a specific topic subscription by ID",
     },
   },
 );

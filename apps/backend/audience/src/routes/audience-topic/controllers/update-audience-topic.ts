@@ -1,60 +1,59 @@
-
-import type { AudienceTopicTypes } from "@be/audience/types/audience-topic.type";
+import type { TopicTypes } from "@be/audience/types/topic.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
-export async function updateAudienceTopic(params: {
+export async function updateTopic(params: {
   topicId: string;
   organizationId: string;
   name?: string;
   description?: string;
-}): Promise<AudienceTopicTypes.AudienceTopicResponse> {
+}): Promise<TopicTypes.TopicResponse> {
   const { topicId, organizationId, name, description } = params;
 
   try {
     // Check if topic exists
-    const existingTopic = await db.query.audienceTopic.findFirst({
+    const existingTopic = await db.query.topic.findFirst({
       where: and(
-        eq(schema.audienceTopic.id, topicId),
-        eq(schema.audienceTopic.organizationId, organizationId),
-        isNull(schema.audienceTopic.deletedAt),
+        eq(schema.topic.id, topicId),
+        eq(schema.topic.organizationId, organizationId),
+        isNull(schema.topic.deletedAt),
       ),
     });
 
     if (!existingTopic) {
-      throw status(404, { message: "Audience topic not found" });
+      throw status(404, { message: "Topic not found" });
     }
 
     // Check for duplicate name if name is being updated
     if (name && name !== existingTopic.name) {
-      const duplicateName = await db.query.audienceTopic.findFirst({
+      const duplicateName = await db.query.topic.findFirst({
         where: and(
-          eq(schema.audienceTopic.name, name),
-          eq(schema.audienceTopic.organizationId, organizationId),
-          isNull(schema.audienceTopic.deletedAt),
+          eq(schema.topic.name, name),
+          eq(schema.topic.organizationId, organizationId),
+          isNull(schema.topic.deletedAt),
         ),
       });
 
       if (duplicateName) {
-        throw status(409, { message: "Audience topic with this name already exists" });
+        throw status(409, { message: "Topic with this name already exists" });
       }
     }
 
     const [updatedTopic] = await db
-      .update(schema.audienceTopic)
+      .update(schema.topic)
       .set({
         ...(name && { name }),
         ...(description !== undefined && { description }),
         updatedAt: new Date(),
       })
-      .where(eq(schema.audienceTopic.id, topicId))
+      .where(eq(schema.topic.id, topicId))
       .returning();
 
     if (!updatedTopic) {
-      throw new Error("Failed to update audience topic");
+      throw new Error("Failed to update topic");
     }
 
     return updatedTopic;
@@ -64,17 +63,17 @@ export async function updateAudienceTopic(params: {
         topicId,
         error: error instanceof Error ? error.message : String(error),
       },
-      "Error updating audience topic",
+      "Error updating topic",
     );
     throw error;
   }
 }
 
-export async function updateAudienceTopicHandler(params: {
+export async function updateTopicHandler(params: {
   topicId: string;
   organizationId: string;
   name?: string;
   description?: string;
-}): Promise<AudienceTopicTypes.AudienceTopicResponse> {
-  return await updateAudienceTopic(params);
+}): Promise<TopicTypes.TopicResponse> {
+  return await updateTopic(params);
 }

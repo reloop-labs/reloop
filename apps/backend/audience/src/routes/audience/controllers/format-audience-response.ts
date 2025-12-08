@@ -1,16 +1,16 @@
-import type { AudienceTypes } from "@be/audience/types/audience.type";
+import type { ContactTypes } from "@be/audience/types/contact.type";
 
-export function formatAudienceResponse(
-	audience: AudienceTypes.AudienceData,
-): AudienceTypes.AudienceResponse {
+export function formatContactResponse(
+	contact: ContactTypes.ContactData,
+): ContactTypes.ContactResponse {
 	return {
-		id: audience.id,
-		email: audience.email,
-		firstName: audience.firstName,
-		lastName: audience.lastName,
-		organizationId: audience.organizationId,
-		createdAt: audience.createdAt,
-		updatedAt: audience.updatedAt,
-		deletedAt: audience.deletedAt,
+		id: contact.id,
+		email: contact.email,
+		firstName: contact.firstName,
+		lastName: contact.lastName,
+		organizationId: contact.organizationId,
+		createdAt: contact.createdAt,
+		updatedAt: contact.updatedAt,
+		deletedAt: contact.deletedAt,
 	};
 }

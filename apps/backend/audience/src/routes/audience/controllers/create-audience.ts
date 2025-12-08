@@ -1,47 +1,47 @@
-import { formatAudienceResponse } from "@be/audience/routes/audience/controllers/format-audience-response";
-import type { AudienceTypes } from "@be/audience/types/audience.type";
+import { formatContactResponse } from "@be/audience/routes/audience/controllers/format-audience-response";
+import type { ContactTypes } from "@be/audience/types/contact.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
-export async function createAudience(
+export async function createContact(
 	organizationId: string,
-	body: AudienceTypes.CreateAudienceRequest,
-): Promise<AudienceTypes.AudienceResponse> {
+	body: ContactTypes.CreateContactRequest,
+): Promise<ContactTypes.ContactResponse> {
 	logger.info(
 		{
 			email: body.email,
 			organizationId,
 		},
-		"Creating audience",
+		"Creating contact",
 	);
 
 	try {
-		// Check if audience already exists in this organization
-		const existingAudience = await db
+		// Check if contact already exists in this organization
+		const existingContact = await db
 			.select()
-			.from(schema.audience)
+			.from(schema.contact)
 			.where(
 				and(
-					eq(schema.audience.email, body.email),
-					eq(schema.audience.organizationId, organizationId),
-					isNull(schema.audience.deletedAt),
+					eq(schema.contact.email, body.email),
+					eq(schema.contact.organizationId, organizationId),
+					isNull(schema.contact.deletedAt),
 				),
 			)
 			.limit(1);
 
-		if (existingAudience.length > 0) {
+		if (existingContact.length > 0) {
 			logger.warn(
 				{ email: body.email },
-				"Audience already exists in this organization",
+				"Contact already exists in this organization",
 			);
-			throw status(409, { message: "Audience already exists" });
+			throw status(409, { message: "Contact already exists" });
 		}
 
-		const [newAudience] = await db
-			.insert(schema.audience)
+		const [newContact] = await db
+			.insert(schema.contact)
 			.values({
 				email: body.email,
 				firstName: body.firstName || null,
@@ -52,23 +52,23 @@ export async function createAudience(
 			})
 			.returning();
 
-		if (!newAudience) {
+		if (!newContact) {
 			logger.error(
 				{ email: body.email },
-				"Failed to create audience - no data returned",
+				"Failed to create contact - no data returned",
 			);
-			throw status(500, { message: "Failed to create audience" });
+			throw status(500, { message: "Failed to create contact" });
 		}
 
 		logger.info(
 			{
 				email: body.email,
-				id: newAudience.id,
+				id: newContact.id,
 			},
-			"Audience created successfully",
+			"Contact created successfully",
 		);
 
-		return formatAudienceResponse(newAudience);
+		return formatContactResponse(newContact);
 	} catch (error) {
 		logger.error(
 			{
@@ -76,15 +76,15 @@ export async function createAudience(
 				organizationId,
 				error: error instanceof Error ? error.message : String(error),
 			},
-			"Error creating audience",
+			"Error creating contact",
 		);
 		throw error;
 	}
 }
 
-export async function createAudienceHandler(
+export async function createContactHandler(
 	organizationId: string,
-	body: AudienceTypes.CreateAudienceRequest,
-): Promise<AudienceTypes.AudienceResponse> {
-	return createAudience(organizationId, body);
+	body: ContactTypes.CreateContactRequest,
+): Promise<ContactTypes.ContactResponse> {
+	return createContact(organizationId, body);
 }

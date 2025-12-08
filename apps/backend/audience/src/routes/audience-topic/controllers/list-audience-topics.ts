@@ -1,40 +1,39 @@
-
-import type { AudienceTopicTypes } from "@be/audience/types/audience-topic.type";
+import type { TopicTypes } from "@be/audience/types/topic.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
 import { and, count, desc, eq, isNull } from "drizzle-orm";
 
-export async function listAudienceTopics(
-  query: AudienceTopicTypes.AudienceTopicQuery,
+export async function listTopics(
+  query: TopicTypes.TopicListQuery,
   organizationId: string,
-): Promise<AudienceTopicTypes.AudienceTopicListResponse> {
+): Promise<TopicTypes.TopicListResponse> {
   const { page = 1, limit = 10 } = query;
   const offset = (page - 1) * limit;
 
   try {
     const conditions = [
-      isNull(schema.audienceTopic.deletedAt),
-      eq(schema.audienceTopic.organizationId, organizationId),
+      isNull(schema.topic.deletedAt),
+      eq(schema.topic.organizationId, organizationId),
     ];
     const whereClause = and(...conditions);
 
     const totalResult = await db
       .select({ count: count() })
-      .from(schema.audienceTopic)
+      .from(schema.topic)
       .where(whereClause);
 
     const total = totalResult[0]?.count || 0;
 
-    const topics = await db.query.audienceTopic.findMany({
+    const topics = await db.query.topic.findMany({
       where: whereClause,
-      orderBy: desc(schema.audienceTopic.createdAt),
+      orderBy: desc(schema.topic.createdAt),
       limit: limit,
       offset: offset,
     });
 
     return {
-      audienceTopics: topics,
+      topics: topics,
       total,
       page,
       limit,
@@ -45,15 +44,15 @@ export async function listAudienceTopics(
         query,
         error: error instanceof Error ? error.message : String(error),
       },
-      "Error listing audience topics",
+      "Error listing topics",
     );
     throw error;
   }
 }
 
-export async function listAudienceTopicsHandler(
-  query: AudienceTopicTypes.AudienceTopicQuery,
+export async function listTopicsHandler(
+  query: TopicTypes.TopicListQuery,
   organizationId: string,
-): Promise<AudienceTopicTypes.AudienceTopicListResponse> {
-  return await listAudienceTopics(query, organizationId);
+): Promise<TopicTypes.TopicListResponse> {
+  return await listTopics(query, organizationId);
 }

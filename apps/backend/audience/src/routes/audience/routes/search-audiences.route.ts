@@ -1,25 +1,25 @@
 import { authMiddleware } from "@be/audience/middleware/auth";
-import { AudienceModel } from "@be/audience/model/audience.model";
-import { searchAudiencesHandler } from "@be/audience/routes/audience/controllers/search-audiences";
+import { ContactModel } from "@be/audience/model/contact.model";
+import { searchContactsHandler } from "@be/audience/routes/audience/controllers/search-audiences";
 import { Elysia } from "elysia";
 
-export const searchAudiencesRoute = new Elysia().use(authMiddleware).get(
+export const searchContactsRoute = new Elysia().use(authMiddleware).get(
 	"/search",
 	async ({ query, user }) => {
 		const { activeOrganizationId } = user;
-		return await searchAudiencesHandler(activeOrganizationId as string, query);
+		return await searchContactsHandler(activeOrganizationId as string, query);
 	},
 	{
 		auth: true,
-		query: AudienceModel.searchAudiencesQuery,
+		query: ContactModel.searchContactsQuery,
 		response: {
-			200: AudienceModel.audienceListResponse,
-			403: AudienceModel.unauthorized,
+			200: ContactModel.contactListResponse,
+			403: ContactModel.unauthorized,
 		},
 		detail: {
-			tags: ["Audience"],
-			summary: "Search audiences",
-			description: "Performs advanced search across audience fields",
+			tags: ["Contact"],
+			summary: "Search contacts",
+			description: "Performs advanced search across contact fields",
 		},
 	},
 );

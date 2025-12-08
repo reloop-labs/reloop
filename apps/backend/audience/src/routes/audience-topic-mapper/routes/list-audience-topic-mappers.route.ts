@@ -1,25 +1,24 @@
 import { authMiddleware } from "@be/audience/middleware/auth";
-import { AudienceTopicMapperModel } from "@be/audience/model/audience-topic-mapper.model";
-
-import { listAudienceTopicMappersHandler } from "@be/audience/routes/audience-topic-mapper/controllers/list-audience-topic-mappers";
+import { TopicSubscriptionModel } from "@be/audience/model/topic-subscription.model";
+import { listTopicSubscriptionsHandler } from "@be/audience/routes/audience-topic-mapper/controllers/list-audience-topic-mappers";
 import { Elysia } from "elysia";
 
-export const listAudienceTopicMappersRoute = new Elysia().use(authMiddleware).get(
+export const listTopicSubscriptionsRoute = new Elysia().use(authMiddleware).get(
   "/list",
   async ({ query, user }) => {
-    return await listAudienceTopicMappersHandler(query, user.activeOrganizationId);
+    return await listTopicSubscriptionsHandler(query, user.activeOrganizationId);
   },
   {
     auth: true,
-    query: AudienceTopicMapperModel.audienceTopicMapperQuery,
+    query: TopicSubscriptionModel.topicSubscriptionQuery,
     response: {
-      200: AudienceTopicMapperModel.audienceTopicMapperListResponse,
-      403: AudienceTopicMapperModel.unauthorized,
+      200: TopicSubscriptionModel.topicSubscriptionListResponse,
+      403: TopicSubscriptionModel.unauthorized,
     },
     detail: {
-      tags: ["Audience Subscriptions"],
-      summary: "List subscription mappings",
-      description: "Retrieves a paginated list of audience-topic subscriptions with optional filters",
+      tags: ["Topic Subscriptions"],
+      summary: "List topic subscriptions",
+      description: "Retrieves a paginated list of topic subscriptions",
     },
   },
 );

@@ -4,49 +4,49 @@ import { logger } from "@reloop/logger";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
-export async function deleteAudienceTopicMapper(
-  mapperId: string,
+export async function deleteTopicSubscription(
+  subscriptionId: string,
   organizationId: string,
 ): Promise<{ success: boolean }> {
   try {
-    // Check if mapping exists
-    const existingMapping = await db.query.audienceTopicMapper.findFirst({
+    // Check if subscription exists
+    const existingSubscription = await db.query.topicSubscription.findFirst({
       where: and(
-        eq(schema.audienceTopicMapper.id, mapperId),
-        eq(schema.audienceTopicMapper.organizationId, organizationId),
-        isNull(schema.audienceTopicMapper.deletedAt),
+        eq(schema.topicSubscription.id, subscriptionId),
+        eq(schema.topicSubscription.organizationId, organizationId),
+        isNull(schema.topicSubscription.deletedAt),
       ),
     });
 
-    if (!existingMapping) {
-      throw status(404, { message: "Audience topic mapping not found" });
+    if (!existingSubscription) {
+      throw status(404, { message: "Topic subscription not found" });
     }
 
-    // Soft delete the mapping
+    // Soft delete the subscription
     await db
-      .update(schema.audienceTopicMapper)
+      .update(schema.topicSubscription)
       .set({
         deletedAt: new Date(),
         updatedAt: new Date(),
       })
-      .where(eq(schema.audienceTopicMapper.id, mapperId));
+      .where(eq(schema.topicSubscription.id, subscriptionId));
 
     return { success: true };
   } catch (error) {
     logger.error(
       {
-        mapperId,
+        subscriptionId,
         error: error instanceof Error ? error.message : String(error),
       },
-      "Error deleting audience topic mapping",
+      "Error deleting topic subscription",
     );
     throw error;
   }
 }
 
-export async function deleteAudienceTopicMapperHandler(
-  mapperId: string,
+export async function deleteTopicSubscriptionHandler(
+  subscriptionId: string,
   organizationId: string,
 ): Promise<{ success: boolean }> {
-  return await deleteAudienceTopicMapper(mapperId, organizationId);
+  return await deleteTopicSubscription(subscriptionId, organizationId);
 }

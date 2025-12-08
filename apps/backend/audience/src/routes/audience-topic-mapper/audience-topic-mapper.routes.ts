@@ -1,18 +1,18 @@
 import { authMiddleware } from "@be/audience/middleware/auth";
-import { createAudienceTopicMapperRoute } from "@be/audience/routes/audience-topic-mapper/routes/create-audience-topic-mapper.route";
-import { deleteAudienceTopicMapperRoute } from "@be/audience/routes/audience-topic-mapper/routes/delete-audience-topic-mapper.route";
-import { getAudienceTopicMapperRoute } from "@be/audience/routes/audience-topic-mapper/routes/get-audience-topic-mapper.route";
-import { listAudienceTopicMappersRoute } from "@be/audience/routes/audience-topic-mapper/routes/list-audience-topic-mappers.route";
-import { updateAudienceTopicMapperRoute } from "@be/audience/routes/audience-topic-mapper/routes/update-audience-topic-mapper.route";
+import { createTopicSubscriptionRoute } from "@be/audience/routes/audience-topic-mapper/routes/create-audience-topic-mapper.route";
+import { deleteTopicSubscriptionRoute } from "@be/audience/routes/audience-topic-mapper/routes/delete-audience-topic-mapper.route";
+import { getTopicSubscriptionRoute } from "@be/audience/routes/audience-topic-mapper/routes/get-audience-topic-mapper.route";
+import { listTopicSubscriptionsRoute } from "@be/audience/routes/audience-topic-mapper/routes/list-audience-topic-mappers.route";
+import { updateTopicSubscriptionRoute } from "@be/audience/routes/audience-topic-mapper/routes/update-audience-topic-mapper.route";
 import { Elysia } from "elysia";
 
-export const audienceTopicMapperRoutes = new Elysia({
+export const topicSubscriptionRoutes = new Elysia({
   prefix: "/v1/subscriptions",
-  name: "AudienceTopicMapperRoutes",
+  name: "TopicSubscriptionRoutes",
 })
   .use(authMiddleware)
-  .use(createAudienceTopicMapperRoute)
-  .use(getAudienceTopicMapperRoute)
-  .use(listAudienceTopicMappersRoute)
-  .use(updateAudienceTopicMapperRoute)
-  .use(deleteAudienceTopicMapperRoute);
+  .use(createTopicSubscriptionRoute)
+  .use(getTopicSubscriptionRoute)
+  .use(listTopicSubscriptionsRoute)
+  .use(updateTopicSubscriptionRoute)
+  .use(deleteTopicSubscriptionRoute);

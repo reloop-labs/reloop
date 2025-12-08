@@ -1,33 +1,32 @@
-
-import type { AudienceTopicTypes } from "@be/audience/types/audience-topic.type";
+import type { TopicTypes } from "@be/audience/types/topic.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import logger from "@reloop/logger";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
-export async function createAudienceTopic(params: {
+export async function createTopic(params: {
   organizationId: string;
   name: string;
   description?: string;
-}): Promise<AudienceTopicTypes.AudienceTopicResponse> {
+}): Promise<TopicTypes.TopicResponse> {
   const { organizationId, name, description } = params;
   try {
     // Check if topic with same name already exists
-    const existingTopic = await db.query.audienceTopic.findFirst({
+    const existingTopic = await db.query.topic.findFirst({
       where: and(
-        eq(schema.audienceTopic.name, name),
-        eq(schema.audienceTopic.organizationId, organizationId),
-        isNull(schema.audienceTopic.deletedAt),
+        eq(schema.topic.name, name),
+        eq(schema.topic.organizationId, organizationId),
+        isNull(schema.topic.deletedAt),
       ),
     });
 
     if (existingTopic) {
-      throw status(409, { message: "Audience topic already exists" });
+      throw status(409, { message: "Topic already exists" });
     }
 
     const [newTopic] = await db
-      .insert(schema.audienceTopic)
+      .insert(schema.topic)
       .values({
         name,
         description: description ?? null,
@@ -36,7 +35,7 @@ export async function createAudienceTopic(params: {
       .returning();
 
     if (!newTopic) {
-      throw new Error("Failed to create audience topic");
+      throw new Error("Failed to create topic");
     }
 
     return newTopic;
@@ -47,16 +46,16 @@ export async function createAudienceTopic(params: {
         organizationId,
         error: error instanceof Error ? error.message : String(error),
       },
-      "Error creating audience topic",
+      "Error creating topic",
     );
     throw error;
   }
 }
 
-export async function createAudienceTopicHandler(params: {
+export async function createTopicHandler(params: {
   organizationId: string;
   name: string;
   description?: string;
-}): Promise<AudienceTopicTypes.AudienceTopicResponse> {
-  return await createAudienceTopic(params);
+}): Promise<TopicTypes.TopicResponse> {
+  return await createTopic(params);
 }

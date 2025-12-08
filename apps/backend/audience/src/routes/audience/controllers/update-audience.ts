@@ -1,42 +1,42 @@
-import { formatAudienceResponse } from "@be/audience/routes/audience/controllers/format-audience-response";
-import type { AudienceTypes } from "@be/audience/types/audience.type";
+import { formatContactResponse } from "@be/audience/routes/audience/controllers/format-audience-response";
+import type { ContactTypes } from "@be/audience/types/contact.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
-export async function updateAudience(
-	audienceId: string,
+export async function updateContact(
+	contactId: string,
 	organizationId: string,
-	body: AudienceTypes.UpdateAudienceRequest,
-): Promise<AudienceTypes.AudienceResponse> {
+	body: ContactTypes.UpdateContactRequest,
+): Promise<ContactTypes.ContactResponse> {
 	logger.info(
 		{
-			audienceId,
+			contactId,
 			organizationId,
 			body,
 		},
-		"Updating audience",
+		"Updating contact",
 	);
 
 	try {
-		// Check if audience exists
-		const existingAudience = await db.query.audience.findFirst({
+		// Check if contact exists
+		const existingContact = await db.query.contact.findFirst({
 			where: and(
-				eq(schema.audience.id, audienceId),
-				eq(schema.audience.organizationId, organizationId),
-				isNull(schema.audience.deletedAt),
+				eq(schema.contact.id, contactId),
+				eq(schema.contact.organizationId, organizationId),
+				isNull(schema.contact.deletedAt),
 			),
 		});
 
-		if (!existingAudience) {
-			logger.warn({ audienceId, organizationId }, "Audience not found");
-			throw status(404, { message: "Audience not found" });
+		if (!existingContact) {
+			logger.warn({ contactId, organizationId }, "Contact not found");
+			throw status(404, { message: "Contact not found" });
 		}
 
-		// Update the audience
-		const updateData: Partial<typeof schema.audience.$inferInsert> = {
+		// Update the contact
+		const updateData: Partial<typeof schema.contact.$inferInsert> = {
 			updatedAt: new Date(),
 		};
 
@@ -47,51 +47,51 @@ export async function updateAudience(
 			updateData.lastName = body.lastName;
 		}
 
-		const [updatedAudience] = await db
-			.update(schema.audience)
+		const [updatedContact] = await db
+			.update(schema.contact)
 			.set(updateData)
 			.where(
 				and(
-					eq(schema.audience.id, audienceId),
-					eq(schema.audience.organizationId, organizationId),
+					eq(schema.contact.id, contactId),
+					eq(schema.contact.organizationId, organizationId),
 				),
 			)
 			.returning();
 
-		if (!updatedAudience) {
+		if (!updatedContact) {
 			logger.error(
-				{ audienceId },
-				"Failed to update audience - no data returned",
+				{ contactId },
+				"Failed to update contact - no data returned",
 			);
-			throw status(500, { message: "Failed to update audience" });
+			throw status(500, { message: "Failed to update contact" });
 		}
 
 		logger.info(
 			{
-				audienceId,
+				contactId,
 				organizationId,
 			},
-			"Audience updated successfully",
+			"Contact updated successfully",
 		);
 
-		return formatAudienceResponse(updatedAudience);
+		return formatContactResponse(updatedContact);
 	} catch (error) {
 		logger.error(
 			{
-				audienceId,
+				contactId,
 				organizationId,
 				error: error instanceof Error ? error.message : String(error),
 			},
-			"Error updating audience",
+			"Error updating contact",
 		);
 		throw error;
 	}
 }
 
-export async function updateAudienceHandler(
-	audienceId: string,
+export async function updateContactHandler(
+	contactId: string,
 	organizationId: string,
-	body: AudienceTypes.UpdateAudienceRequest,
-): Promise<AudienceTypes.AudienceResponse> {
-	return updateAudience(audienceId, organizationId, body);
+	body: ContactTypes.UpdateContactRequest,
+): Promise<ContactTypes.ContactResponse> {
+	return updateContact(contactId, organizationId, body);
 }

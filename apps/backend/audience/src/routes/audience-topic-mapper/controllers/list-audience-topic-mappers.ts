@@ -1,51 +1,50 @@
-
-import type { AudienceTopicMapperTypes } from "@be/audience/types/audience-topic-mapper.type";
+import type { TopicSubscriptionTypes } from "@be/audience/types/topic-subscription.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
 import { and, count, desc, eq, isNull } from "drizzle-orm";
 
-export async function listAudienceTopicMappers(
-  query: AudienceTopicMapperTypes.AudienceTopicMapperQuery,
+export async function listTopicSubscriptions(
+  query: TopicSubscriptionTypes.TopicSubscriptionListQuery,
   organizationId: string,
-): Promise<AudienceTopicMapperTypes.AudienceTopicMapperListResponse> {
-  const { page = 1, limit = 10, audienceId, audienceTopicId, status: subscriptionStatus } = query;
+): Promise<TopicSubscriptionTypes.TopicSubscriptionListResponse> {
+  const { page = 1, limit = 10, contactId, topicId, status: subscriptionStatus } = query;
   const offset = (page - 1) * limit;
 
   try {
     const conditions = [
-      isNull(schema.audienceTopicMapper.deletedAt),
-      eq(schema.audienceTopicMapper.organizationId, organizationId),
+      isNull(schema.topicSubscription.deletedAt),
+      eq(schema.topicSubscription.organizationId, organizationId),
     ];
 
-    if (audienceId) {
-      conditions.push(eq(schema.audienceTopicMapper.audienceId, audienceId));
+    if (contactId) {
+      conditions.push(eq(schema.topicSubscription.contactId, contactId));
     }
-    if (audienceTopicId) {
-      conditions.push(eq(schema.audienceTopicMapper.audienceTopicId, audienceTopicId));
+    if (topicId) {
+      conditions.push(eq(schema.topicSubscription.topicId, topicId));
     }
     if (subscriptionStatus) {
-      conditions.push(eq(schema.audienceTopicMapper.status, subscriptionStatus));
+      conditions.push(eq(schema.topicSubscription.status, subscriptionStatus));
     }
 
     const whereClause = and(...conditions);
 
     const totalResult = await db
       .select({ count: count() })
-      .from(schema.audienceTopicMapper)
+      .from(schema.topicSubscription)
       .where(whereClause);
 
     const total = totalResult[0]?.count || 0;
 
-    const mappings = await db.query.audienceTopicMapper.findMany({
+    const subscriptions = await db.query.topicSubscription.findMany({
       where: whereClause,
-      orderBy: desc(schema.audienceTopicMapper.createdAt),
+      orderBy: desc(schema.topicSubscription.createdAt),
       limit: limit,
       offset: offset,
     });
 
     return {
-      mappings,
+      subscriptions,
       total,
       page,
       limit,
@@ -56,15 +55,15 @@ export async function listAudienceTopicMappers(
         query,
         error: error instanceof Error ? error.message : String(error),
       },
-      "Error listing audience topic mappings",
+      "Error listing topic subscriptions",
     );
     throw error;
   }
 }
 
-export async function listAudienceTopicMappersHandler(
-  query: AudienceTopicMapperTypes.AudienceTopicMapperQuery,
+export async function listTopicSubscriptionsHandler(
+  query: TopicSubscriptionTypes.TopicSubscriptionListQuery,
   organizationId: string,
-): Promise<AudienceTopicMapperTypes.AudienceTopicMapperListResponse> {
-  return await listAudienceTopicMappers(query, organizationId);
+): Promise<TopicSubscriptionTypes.TopicSubscriptionListResponse> {
+  return await listTopicSubscriptions(query, organizationId);
 }

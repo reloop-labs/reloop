@@ -1,4 +1,4 @@
-// Audience Topic Mapper Controllers
+// TopicSubscription Controllers
 export * from "./create-audience-topic-mapper";
 export * from "./delete-audience-topic-mapper";
 export * from "./get-audience-topic-mapper";

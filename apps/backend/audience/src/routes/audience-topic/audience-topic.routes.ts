@@ -1,18 +1,18 @@
 import { authMiddleware } from "@be/audience/middleware/auth";
-import { createAudienceTopicRoute } from "@be/audience/routes/audience-topic/routes/create-audience-topic.route";
-import { deleteAudienceTopicRoute } from "@be/audience/routes/audience-topic/routes/delete-audience-topic.route";
-import { getAudienceTopicRoute } from "@be/audience/routes/audience-topic/routes/get-audience-topic.route";
-import { listAudienceTopicsRoute } from "@be/audience/routes/audience-topic/routes/list-audience-topics.route";
-import { updateAudienceTopicRoute } from "@be/audience/routes/audience-topic/routes/update-audience-topic.route";
+import { createTopicRoute } from "@be/audience/routes/audience-topic/routes/create-audience-topic.route";
+import { deleteTopicRoute } from "@be/audience/routes/audience-topic/routes/delete-audience-topic.route";
+import { getTopicRoute } from "@be/audience/routes/audience-topic/routes/get-audience-topic.route";
+import { listTopicsRoute } from "@be/audience/routes/audience-topic/routes/list-audience-topics.route";
+import { updateTopicRoute } from "@be/audience/routes/audience-topic/routes/update-audience-topic.route";
 import { Elysia } from "elysia";
 
-export const audienceTopicRoutes = new Elysia({
+export const topicRoutes = new Elysia({
   prefix: "/v1/topics",
-  name: "AudienceTopicRoutes",
+  name: "TopicRoutes",
 })
   .use(authMiddleware)
-  .use(createAudienceTopicRoute)
-  .use(getAudienceTopicRoute)
-  .use(listAudienceTopicsRoute)
-  .use(updateAudienceTopicRoute)
-  .use(deleteAudienceTopicRoute);
+  .use(createTopicRoute)
+  .use(getTopicRoute)
+  .use(listTopicsRoute)
+  .use(updateTopicRoute)
+  .use(deleteTopicRoute);

@@ -1,4 +1,4 @@
-// Audience Controllers
+// Contact Controllers
 export * from "./create-audience";
 export * from "./delete-audience";
 export * from "./format-audience-response";

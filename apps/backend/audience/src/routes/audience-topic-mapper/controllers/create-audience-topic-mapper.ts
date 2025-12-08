@@ -1,92 +1,91 @@
-
-import type { AudienceTopicMapperTypes } from "@be/audience/types/audience-topic-mapper.type";
+import type { TopicSubscriptionTypes } from "@be/audience/types/topic-subscription.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import logger from "@reloop/logger";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
-export async function createAudienceTopicMapper(params: {
+export async function createTopicSubscription(params: {
   organizationId: string;
-  audienceId: string;
-  audienceTopicId: string;
+  contactId: string;
+  topicId: string;
   subscriptionStatus?: "subscribed" | "unsubscribed";
-}): Promise<AudienceTopicMapperTypes.AudienceTopicMapperResponse> {
-  const { organizationId, audienceId, audienceTopicId, subscriptionStatus = "subscribed" } = params;
+}): Promise<TopicSubscriptionTypes.TopicSubscriptionResponse> {
+  const { organizationId, contactId, topicId, subscriptionStatus = "subscribed" } = params;
 
   try {
-    // Check if mapping already exists
-    const existingMapping = await db.query.audienceTopicMapper.findFirst({
+    // Check if subscription already exists
+    const existingSubscription = await db.query.topicSubscription.findFirst({
       where: and(
-        eq(schema.audienceTopicMapper.audienceId, audienceId),
-        eq(schema.audienceTopicMapper.audienceTopicId, audienceTopicId),
-        isNull(schema.audienceTopicMapper.deletedAt),
+        eq(schema.topicSubscription.contactId, contactId),
+        eq(schema.topicSubscription.topicId, topicId),
+        isNull(schema.topicSubscription.deletedAt),
       ),
     });
 
-    if (existingMapping) {
-      throw status(409, { message: "Audience is already mapped to this topic" });
+    if (existingSubscription) {
+      throw status(409, { message: "Contact is already subscribed to this topic" });
     }
 
-    // Verify audience exists
-    const audience = await db.query.audience.findFirst({
+    // Verify contact exists
+    const contact = await db.query.contact.findFirst({
       where: and(
-        eq(schema.audience.id, audienceId),
-        eq(schema.audience.organizationId, organizationId),
-        isNull(schema.audience.deletedAt),
+        eq(schema.contact.id, contactId),
+        eq(schema.contact.organizationId, organizationId),
+        isNull(schema.contact.deletedAt),
       ),
     });
 
-    if (!audience) {
-      throw status(404, { message: "Audience not found" });
+    if (!contact) {
+      throw status(404, { message: "Contact not found" });
     }
 
     // Verify topic exists
-    const topic = await db.query.audienceTopic.findFirst({
+    const topic = await db.query.topic.findFirst({
       where: and(
-        eq(schema.audienceTopic.id, audienceTopicId),
-        eq(schema.audienceTopic.organizationId, organizationId),
-        isNull(schema.audienceTopic.deletedAt),
+        eq(schema.topic.id, topicId),
+        eq(schema.topic.organizationId, organizationId),
+        isNull(schema.topic.deletedAt),
       ),
     });
 
     if (!topic) {
-      throw status(404, { message: "Audience topic not found" });
+      throw status(404, { message: "Topic not found" });
     }
 
-    const [newMapping] = await db
-      .insert(schema.audienceTopicMapper)
+    const [newSubscription] = await db
+      .insert(schema.topicSubscription)
       .values({
-        audienceId,
-        audienceTopicId,
+        contactId,
+        topicId,
         organizationId,
         status: subscriptionStatus,
       })
       .returning();
 
-    if (!newMapping) {
-      throw new Error("Failed to create audience topic mapping");
+    if (!newSubscription) {
+      throw new Error("Failed to create topic subscription");
     }
 
-    return newMapping;
+    return newSubscription;
   } catch (error) {
     logger.error(
       {
-        audienceId,
-        audienceTopicId,
+        contactId,
+        topicId,
         error: error instanceof Error ? error.message : String(error),
       },
-      "Error creating audience topic mapping",
+      "Error creating topic subscription",
     );
     throw error;
   }
 }
 
-export async function createAudienceTopicMapperHandler(params: {
+export async function createTopicSubscriptionHandler(params: {
   organizationId: string;
-  audienceId: string;
-  audienceTopicId: string;
+  contactId: string;
+  topicId: string;
   subscriptionStatus?: "subscribed" | "unsubscribed";
-}): Promise<AudienceTopicMapperTypes.AudienceTopicMapperResponse> {
-  return await createAudienceTopicMapper(params);
+}): Promise<TopicSubscriptionTypes.TopicSubscriptionResponse> {
+  return await createTopicSubscription(params);
 }

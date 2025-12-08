@@ -1,15 +1,15 @@
 import { authMiddleware } from "@be/audience/middleware/auth";
-import { AudienceTopicMapperModel } from "@be/audience/model/audience-topic-mapper.model";
-import { updateAudienceTopicMapperHandler } from "@be/audience/routes/audience-topic-mapper/controllers/update-audience-topic-mapper";
+import { TopicSubscriptionModel } from "@be/audience/model/topic-subscription.model";
+import { updateTopicSubscriptionHandler } from "@be/audience/routes/audience-topic-mapper/controllers/update-audience-topic-mapper";
 import { Elysia, t } from "elysia";
 
-export const updateAudienceTopicMapperRoute = new Elysia().use(authMiddleware).patch(
-  "/:mapperId",
+export const updateTopicSubscriptionRoute = new Elysia().use(authMiddleware).patch(
+  "/:subscriptionId",
   async ({ params, body, user }) => {
-    const { mapperId } = params;
+    const { subscriptionId } = params;
     const { status } = body;
-    return await updateAudienceTopicMapperHandler({
-      mapperId,
+    return await updateTopicSubscriptionHandler({
+      subscriptionId,
       organizationId: user.activeOrganizationId,
       subscriptionStatus: status,
     });
@@ -17,18 +17,18 @@ export const updateAudienceTopicMapperRoute = new Elysia().use(authMiddleware).p
   {
     auth: true,
     params: t.Object({
-      mapperId: t.String({ description: "Audience topic mapper ID" }),
+      subscriptionId: t.String({ description: "Subscription ID" }),
     }),
-    body: AudienceTopicMapperModel.updateAudienceTopicMapperBody,
+    body: TopicSubscriptionModel.updateTopicSubscriptionBody,
     response: {
-      200: AudienceTopicMapperModel.audienceTopicMapperResponse,
-      404: AudienceTopicMapperModel.notFound,
-      403: AudienceTopicMapperModel.unauthorized,
+      200: TopicSubscriptionModel.topicSubscriptionResponse,
+      404: TopicSubscriptionModel.notFound,
+      403: TopicSubscriptionModel.unauthorized,
     },
     detail: {
-      tags: ["Audience Subscriptions"],
-      summary: "Update subscription status",
-      description: "Updates the subscription status (subscribe/unsubscribe)",
+      tags: ["Topic Subscriptions"],
+      summary: "Update a topic subscription",
+      description: "Updates the status of a topic subscription",
     },
   },
 );

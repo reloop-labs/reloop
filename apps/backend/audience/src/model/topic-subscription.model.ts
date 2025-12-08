@@ -1,10 +1,10 @@
 import { t } from "elysia";
 
-export namespace AudienceTopicMapperModel {
-  // Create Audience Topic Mapper
-  export const createAudienceTopicMapperBody = t.Object({
-    audienceId: t.String({ description: "Audience ID" }),
-    audienceTopicId: t.String({ description: "Audience topic ID" }),
+export namespace TopicSubscriptionModel {
+  // Create Topic Subscription
+  export const createTopicSubscriptionBody = t.Object({
+    contactId: t.String({ description: "Contact ID" }),
+    topicId: t.String({ description: "Topic ID" }),
     status: t.Optional(
       t.Union([t.Literal("subscribed"), t.Literal("unsubscribed")], {
         default: "subscribed",
@@ -13,22 +13,22 @@ export namespace AudienceTopicMapperModel {
     ),
   });
 
-  export type CreateAudienceTopicMapperBody = typeof createAudienceTopicMapperBody.static;
+  export type CreateTopicSubscriptionBody = typeof createTopicSubscriptionBody.static;
 
-  // Update Audience Topic Mapper
-  export const updateAudienceTopicMapperBody = t.Object({
+  // Update Topic Subscription
+  export const updateTopicSubscriptionBody = t.Object({
     status: t.Union([t.Literal("subscribed"), t.Literal("unsubscribed")], {
       description: "Subscription status",
     }),
   });
 
-  export type UpdateAudienceTopicMapperBody = typeof updateAudienceTopicMapperBody.static;
+  export type UpdateTopicSubscriptionBody = typeof updateTopicSubscriptionBody.static;
 
-  // Audience Topic Mapper Response
-  export const audienceTopicMapperResponse = t.Object({
-    id: t.String({ description: "Unique mapper identifier" }),
-    audienceId: t.String({ description: "Audience ID" }),
-    audienceTopicId: t.String({ description: "Audience topic ID" }),
+  // Topic Subscription Response
+  export const topicSubscriptionResponse = t.Object({
+    id: t.String({ description: "Unique subscription identifier" }),
+    contactId: t.String({ description: "Contact ID" }),
+    topicId: t.String({ description: "Topic ID" }),
     organizationId: t.String({ description: "Organization ID" }),
     status: t.Union([t.Literal("subscribed"), t.Literal("unsubscribed")], {
       description: "Subscription status",
@@ -38,24 +38,24 @@ export namespace AudienceTopicMapperModel {
     deletedAt: t.Union([t.Date(), t.Null()]),
   });
 
-  export type AudienceTopicMapperResponse = typeof audienceTopicMapperResponse.static;
+  export type TopicSubscriptionResponse = typeof topicSubscriptionResponse.static;
 
-  // Audience Topic Mapper List Response
-  export const audienceTopicMapperListResponse = t.Object({
-    mappings: t.Array(audienceTopicMapperResponse),
+  // Topic Subscription List Response
+  export const topicSubscriptionListResponse = t.Object({
+    subscriptions: t.Array(topicSubscriptionResponse),
     total: t.Number(),
     page: t.Number(),
     limit: t.Number(),
   });
 
-  export type AudienceTopicMapperListResponse = typeof audienceTopicMapperListResponse.static;
+  export type TopicSubscriptionListResponse = typeof topicSubscriptionListResponse.static;
 
   // Query
-  export const audienceTopicMapperQuery = t.Object({
+  export const topicSubscriptionQuery = t.Object({
     page: t.Optional(t.Number({ minimum: 1, default: 1 })),
     limit: t.Optional(t.Number({ minimum: 1, maximum: 100, default: 10 })),
-    audienceId: t.Optional(t.String({ description: "Filter by audience ID" })),
-    audienceTopicId: t.Optional(t.String({ description: "Filter by topic ID" })),
+    contactId: t.Optional(t.String({ description: "Filter by contact ID" })),
+    topicId: t.Optional(t.String({ description: "Filter by topic ID" })),
     status: t.Optional(
       t.Union([t.Literal("subscribed"), t.Literal("unsubscribed")], {
         description: "Filter by subscription status",
@@ -63,7 +63,7 @@ export namespace AudienceTopicMapperModel {
     ),
   });
 
-  export type AudienceTopicMapperQuery = typeof audienceTopicMapperQuery.static;
+  export type TopicSubscriptionQuery = typeof topicSubscriptionQuery.static;
 
   // Delete Response
   export const deleteResponse = t.Object({
@@ -74,14 +74,14 @@ export namespace AudienceTopicMapperModel {
 
   // Error Responses
   export const notFound = t.Object({
-    message: t.Literal("Audience topic mapping not found"),
+    message: t.Literal("Topic subscription not found"),
   });
   export type NotFound = typeof notFound.static;
 
-  export const mappingAlreadyExists = t.Object({
-    message: t.Literal("Audience is already mapped to this topic"),
+  export const subscriptionAlreadyExists = t.Object({
+    message: t.Literal("Contact is already subscribed to this topic"),
   });
-  export type MappingAlreadyExists = typeof mappingAlreadyExists.static;
+  export type SubscriptionAlreadyExists = typeof subscriptionAlreadyExists.static;
 
   export const unauthorized = t.Object({
     message: t.Literal("Unauthorized access"),

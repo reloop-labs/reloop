@@ -1,62 +1,61 @@
-
-import type { AudienceTopicMapperTypes } from "@be/audience/types/audience-topic-mapper.type";
+import type { TopicSubscriptionTypes } from "@be/audience/types/topic-subscription.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
-export async function updateAudienceTopicMapper(params: {
-  mapperId: string;
+export async function updateTopicSubscription(params: {
+  subscriptionId: string;
   organizationId: string;
   subscriptionStatus: "subscribed" | "unsubscribed";
-}): Promise<AudienceTopicMapperTypes.AudienceTopicMapperResponse> {
-  const { mapperId, organizationId, subscriptionStatus } = params;
+}): Promise<TopicSubscriptionTypes.TopicSubscriptionResponse> {
+  const { subscriptionId, organizationId, subscriptionStatus } = params;
 
   try {
-    // Check if mapping exists
-    const existingMapping = await db.query.audienceTopicMapper.findFirst({
+    // Check if subscription exists
+    const existingSubscription = await db.query.topicSubscription.findFirst({
       where: and(
-        eq(schema.audienceTopicMapper.id, mapperId),
-        eq(schema.audienceTopicMapper.organizationId, organizationId),
-        isNull(schema.audienceTopicMapper.deletedAt),
+        eq(schema.topicSubscription.id, subscriptionId),
+        eq(schema.topicSubscription.organizationId, organizationId),
+        isNull(schema.topicSubscription.deletedAt),
       ),
     });
 
-    if (!existingMapping) {
-      throw status(404, { message: "Audience topic mapping not found" });
+    if (!existingSubscription) {
+      throw status(404, { message: "Topic subscription not found" });
     }
 
-    const [updatedMapping] = await db
-      .update(schema.audienceTopicMapper)
+    const [updatedSubscription] = await db
+      .update(schema.topicSubscription)
       .set({
         status: subscriptionStatus,
         updatedAt: new Date(),
       })
-      .where(eq(schema.audienceTopicMapper.id, mapperId))
+      .where(eq(schema.topicSubscription.id, subscriptionId))
       .returning();
 
-    if (!updatedMapping) {
-      throw new Error("Failed to update audience topic mapping");
+    if (!updatedSubscription) {
+      throw new Error("Failed to update topic subscription");
     }
 
-    return updatedMapping;
+    return updatedSubscription;
   } catch (error) {
     logger.error(
       {
-        mapperId,
+        subscriptionId,
         error: error instanceof Error ? error.message : String(error),
       },
-      "Error updating audience topic mapping",
+      "Error updating topic subscription",
     );
     throw error;
   }
 }
 
-export async function updateAudienceTopicMapperHandler(params: {
-  mapperId: string;
+export async function updateTopicSubscriptionHandler(params: {
+  subscriptionId: string;
   organizationId: string;
   subscriptionStatus: "subscribed" | "unsubscribed";
-}): Promise<AudienceTopicMapperTypes.AudienceTopicMapperResponse> {
-  return await updateAudienceTopicMapper(params);
+}): Promise<TopicSubscriptionTypes.TopicSubscriptionResponse> {
+  return await updateTopicSubscription(params);
 }

@@ -1,4 +1,4 @@
-// Audience Topic Controllers
+// Topic Controllers
 export * from "./create-audience-topic";
 export * from "./delete-audience-topic";
 export * from "./get-audience-topic";

@@ -1,27 +1,26 @@
-
-import type { AudienceTopicTypes } from "@be/audience/types/audience-topic.type";
+import type { TopicTypes } from "@be/audience/types/topic.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
-export async function getAudienceTopic(
+export async function getTopic(
   topicId: string,
   organizationId: string,
-): Promise<AudienceTopicTypes.AudienceTopicResponse> {
+): Promise<TopicTypes.TopicResponse> {
   try {
-    const result = await db.query.audienceTopic.findFirst({
+    const result = await db.query.topic.findFirst({
       where: and(
-        eq(schema.audienceTopic.id, topicId),
-        eq(schema.audienceTopic.organizationId, organizationId),
-        isNull(schema.audienceTopic.deletedAt),
+        eq(schema.topic.id, topicId),
+        eq(schema.topic.organizationId, organizationId),
+        isNull(schema.topic.deletedAt),
       ),
     });
 
     if (!result) {
-      logger.warn({ topicId }, "Audience topic not found");
-      throw status(404, { message: "Audience topic not found" });
+      logger.warn({ topicId }, "Topic not found");
+      throw status(404, { message: "Topic not found" });
     }
 
     return result;
@@ -31,15 +30,15 @@ export async function getAudienceTopic(
         topicId,
         error: error instanceof Error ? error.message : String(error),
       },
-      "Error getting audience topic",
+      "Error getting topic",
     );
     throw error;
   }
 }
 
-export async function getAudienceTopicHandler(
+export async function getTopicHandler(
   topicId: string,
   organizationId: string,
-): Promise<AudienceTopicTypes.AudienceTopicResponse> {
-  return await getAudienceTopic(topicId, organizationId);
+): Promise<TopicTypes.TopicResponse> {
+  return await getTopic(topicId, organizationId);
 }

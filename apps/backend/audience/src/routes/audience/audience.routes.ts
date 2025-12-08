@@ -1,22 +1,22 @@
 import { authMiddleware } from "@be/audience/middleware/auth";
-import { createAudienceRoute } from "@be/audience/routes/audience/routes/create-audience.route";
-import { deleteAudienceRoute } from "@be/audience/routes/audience/routes/delete-audience.route";
-import { getAudienceRoute } from "@be/audience/routes/audience/routes/get-audience.route";
-import { listAudiencesRoute } from "@be/audience/routes/audience/routes/list-audiences.route";
-import { searchAudiencesRoute } from "@be/audience/routes/audience/routes/search-audiences.route";
-import { updateAudienceRoute } from "@be/audience/routes/audience/routes/update-audience.route";
+import { createContactRoute } from "@be/audience/routes/audience/routes/create-audience.route";
+import { deleteContactRoute } from "@be/audience/routes/audience/routes/delete-audience.route";
+import { getContactRoute } from "@be/audience/routes/audience/routes/get-audience.route";
+import { listContactsRoute } from "@be/audience/routes/audience/routes/list-audiences.route";
+import { searchContactsRoute } from "@be/audience/routes/audience/routes/search-audiences.route";
+import { updateContactRoute } from "@be/audience/routes/audience/routes/update-audience.route";
 import { Elysia } from "elysia";
 
-export const audienceRoutes = new Elysia({
+export const contactRoutes = new Elysia({
 	prefix: "/v1",
-	name: "AudienceRoutes",
+	name: "ContactRoutes",
 })
 	.use(authMiddleware)
-	// Audience Routes
-	.use(createAudienceRoute)
-	.use(getAudienceRoute)
-	.use(listAudiencesRoute)
-	.use(updateAudienceRoute)
-	.use(deleteAudienceRoute)
+	// Contact Routes
+	.use(createContactRoute)
+	.use(getContactRoute)
+	.use(listContactsRoute)
+	.use(updateContactRoute)
+	.use(deleteContactRoute)
 	// Search
-	.use(searchAudiencesRoute);
+	.use(searchContactsRoute);
