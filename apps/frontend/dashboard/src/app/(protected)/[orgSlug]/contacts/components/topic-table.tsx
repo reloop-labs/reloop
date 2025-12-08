@@ -82,11 +82,11 @@ export const TopicTable = ({
         {topics.map((topic) => (
           <div key={topic.id} className="group/row contents">
             <Link
-              href={`/${activeOrganizationSlug}/contacts/${topic.id}`}
+              href={`/${activeOrganizationSlug}/topics/${topic.id}`}
               className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50"
             >
               <div className="flex items-center gap-2 pl-5">
-                <Icon name="tag" className="h-4 w-4 text-text-sub-600" />
+                <Icon name="notification-indicator" className="h-4 w-4 text-text-sub-600" />
                 <div className="flex flex-col">
                   <span className="font-medium text-label-sm text-text-strong-950">
                     {topic.name}
@@ -98,7 +98,7 @@ export const TopicTable = ({
               </div>
             </Link>
             <Link
-              href={`/${activeOrganizationSlug}/contacts/${topic.id}`}
+              href={`/${activeOrganizationSlug}/topics/${topic.id}`}
               className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50"
             >
               <span className="text-label-sm text-text-sub-600">

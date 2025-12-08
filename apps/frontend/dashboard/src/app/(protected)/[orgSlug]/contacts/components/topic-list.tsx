@@ -64,7 +64,7 @@ export const TopicList = () => {
               variant: "neutral",
               size: "xsmall",
             }).root()}
-            href={`/${activeOrganization.slug}/contacts/add`}
+            href={`/${activeOrganization.slug}/topics/add`}
           >
             <Icon name="plus" className="h-4 w-4" />
             Create topic
