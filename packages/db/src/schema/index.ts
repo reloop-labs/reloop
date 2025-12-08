@@ -1,5 +1,5 @@
 export * from "./api-key";
-export * from "./audience";
+export * from "./audiance";
 export * from "./auth";
 export * from "./domain";
 export * from "./email";
