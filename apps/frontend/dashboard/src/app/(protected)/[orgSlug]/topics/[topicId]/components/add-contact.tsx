@@ -63,7 +63,7 @@ export const AddContact = ({
         },
         { withCredentials: true },
       );
-      await mutate(`/api/audience/v1/subscriptions/list?topicId=${topicId}&limit=100`);
+      await mutate((key: string) => typeof key === 'string' && key.startsWith(`/api/audience/v1/subscriptions/list?topicId=${topicId}`));
       reset();
       onOpenChange(false);
     } catch (error) {

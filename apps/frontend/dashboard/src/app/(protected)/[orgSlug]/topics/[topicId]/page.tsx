@@ -66,6 +66,8 @@ const TopicDetailPage = () => {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [showAddContact, setShowAddContact] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 20;
 
   const {
     data: topicData,
@@ -77,12 +79,16 @@ const TopicDetailPage = () => {
   });
 
   const { data: subscriptionData, isLoading: subscriptionLoading } = useSWR<SubscriptionListResponse>(
-    `/api/audience/v1/subscriptions/list?topicId=${topicId}&limit=100`,
+    `/api/audience/v1/subscriptions/list?topicId=${topicId}&limit=${pageSize}&page=${currentPage}`,
     {
       revalidateOnFocus: true,
       revalidateOnReconnect: true,
     },
   );
+
+  const totalPages = subscriptionData ? Math.ceil(subscriptionData.total / pageSize) : 1;
+  const startIndex = (currentPage - 1) * pageSize + 1;
+  const endIndex = Math.min(currentPage * pageSize, subscriptionData?.total || 0);
 
   const handleUnsubscribe = async (contactId: string) => {
     try {
@@ -94,7 +100,7 @@ const TopicDetailPage = () => {
         },
         body: JSON.stringify({ contactId, topicId }),
       });
-      await mutate(`/api/audience/v1/subscriptions/list?topicId=${topicId}&limit=100`);
+      await mutate((key: string) => typeof key === 'string' && key.startsWith(`/api/audience/v1/subscriptions/list?topicId=${topicId}`));
     } catch (error) {
       console.error("Failed to unsubscribe contact:", error);
     }
@@ -110,7 +116,7 @@ const TopicDetailPage = () => {
         },
         body: JSON.stringify({ contactId, topicId }),
       });
-      await mutate(`/api/audience/v1/subscriptions/list?topicId=${topicId}&limit=100`);
+      await mutate((key: string) => typeof key === 'string' && key.startsWith(`/api/audience/v1/subscriptions/list?topicId=${topicId}`));
     } catch (error) {
       console.error("Failed to subscribe contact:", error);
     }
@@ -126,7 +132,7 @@ const TopicDetailPage = () => {
         },
         body: JSON.stringify({ contactId, topicId }),
       });
-      await mutate(`/api/audience/v1/subscriptions/list?topicId=${topicId}&limit=100`);
+      await mutate((key: string) => typeof key === 'string' && key.startsWith(`/api/audience/v1/subscriptions/list?topicId=${topicId}`));
     } catch (error) {
       console.error("Failed to remove contact from topic:", error);
     }
@@ -282,6 +288,38 @@ const TopicDetailPage = () => {
               onRemove={handleRemove}
             />
           </div>
+
+          {/* Pagination */}
+          {subscriptionData && subscriptionData.total > 0 && (
+            <div className="mt-4 flex items-center justify-between text-paragraph-sm text-text-sub-600">
+              <div>
+                Showing {startIndex}–{endIndex} of {subscriptionData.total} contact{subscriptionData.total !== 1 ? "s" : ""}
+              </div>
+              <div className="flex items-center gap-2">
+                <Button.Root
+                  variant="neutral"
+                  mode="stroke"
+                  size="xxsmall"
+                  onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                  disabled={currentPage === 1 || subscriptionLoading}
+                >
+                  <Icon name="chevron-left" className="h-4 w-4" />
+                </Button.Root>
+                <span className="px-2">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <Button.Root
+                  variant="neutral"
+                  mode="stroke"
+                  size="xxsmall"
+                  onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                  disabled={currentPage === totalPages || subscriptionLoading}
+                >
+                  <Icon name="chevron-right" className="h-4 w-4" />
+                </Button.Root>
+              </div>
+            </div>
+          )}
         </div>
       )}
       <AddContact
