@@ -8,6 +8,8 @@ if (!process.env.BASE_URL) process.env.BASE_URL = "https://local.reloop.sh";
 if (!process.env.NODE_ENV) process.env.NODE_ENV = "development";
 if (!process.env.NODE_TLS_REJECT_UNAUTHORIZED)
 	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+if (!process.env.BETTER_AUTH_SECRET)
+	process.env.BETTER_AUTH_SECRET = "tENkVU4GrhckuRw4Bcfh93EWgXOFcszn";
 
 export const audienceConfig = {
 	port: Number(process.env.PORT),
@@ -16,4 +18,5 @@ export const audienceConfig = {
 	BASE_URL: process.env.BASE_URL,
 	NODE_ENV: process.env.NODE_ENV,
 	NODE_TLS_REJECT_UNAUTHORIZED: process.env.NODE_TLS_REJECT_UNAUTHORIZED,
+	BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
 };
