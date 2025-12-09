@@ -4,6 +4,7 @@ import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import { Skeleton } from "@reloop/ui/skeleton";
 import Spinner from "@reloop/ui/spinner";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -237,8 +238,55 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 						</p>
 					</div>
 				</div>
-				<div className="flex items-center justify-center py-12">
-					<Spinner size={20} color="var(--text-strong-950)" />
+
+				<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 text-paragraph-sm shadow-regular-md">
+					{/* Table Header */}
+					<div className="grid grid-cols-[1fr_140px_140px_120px] border-b border-stroke-soft-200 bg-bg-weak-50">
+						<div className="px-4 py-3 font-medium text-text-sub-600 text-xs uppercase tracking-wide">
+							Session
+						</div>
+						<div className="px-4 py-3 font-medium text-text-sub-600 text-xs uppercase tracking-wide">
+							IP Address
+						</div>
+						<div className="px-4 py-3 font-medium text-text-sub-600 text-xs uppercase tracking-wide">
+							Last Active
+						</div>
+						<div className="px-4 py-3" />
+					</div>
+
+					{/* Skeleton Rows */}
+					<div className="divide-y divide-stroke-soft-200">
+						{Array.from({ length: 3 }).map((_, index) => (
+							<div
+								key={`skeleton-${index}`}
+								className="grid grid-cols-[1fr_140px_140px_120px]"
+							>
+								{/* Session Info Column */}
+								<div className="flex items-center gap-3 px-4 py-3">
+									<Skeleton className="h-10 w-10 rounded-xl" />
+									<div className="flex-1 space-y-2">
+										<Skeleton className="h-4 w-24" />
+										<Skeleton className="h-3 w-32" />
+									</div>
+								</div>
+
+								{/* IP Address Column */}
+								<div className="flex items-center px-4 py-3">
+									<Skeleton className="h-4 w-20" />
+								</div>
+
+								{/* Last Active Column */}
+								<div className="flex items-center px-4 py-3">
+									<Skeleton className="h-4 w-16" />
+								</div>
+
+								{/* Action Column */}
+								<div className="flex items-center justify-end px-4 py-3">
+									<Skeleton className="h-7 w-20 rounded-lg" />
+								</div>
+							</div>
+						))}
+					</div>
 				</div>
 			</div>
 		);
@@ -275,7 +323,7 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 
 			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 text-paragraph-sm shadow-regular-md">
 				{/* Table Header */}
-				<div className="grid grid-cols-[1fr_minmax(120px,auto)_minmax(120px,auto)_minmax(100px,auto)] border-b border-stroke-soft-200 bg-bg-weak-50">
+				<div className="grid grid-cols-[1fr_140px_140px_120px] border-b border-stroke-soft-200 bg-bg-weak-50">
 					<div className="px-4 py-3 font-medium text-text-sub-600 text-xs uppercase tracking-wide">
 						Session
 					</div>
@@ -298,7 +346,7 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 							<div
 								key={session.id}
 								className={cn(
-									"grid grid-cols-[1fr_minmax(120px,auto)_minmax(120px,auto)_minmax(100px,auto)] transition-colors",
+									"grid grid-cols-[1fr_140px_140px_120px] transition-colors",
 									isCurrent
 										? "bg-primary-light/20 hover:bg-primary-light/30"
 										: "hover:bg-bg-weak-50/50"
