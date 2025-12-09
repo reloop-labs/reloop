@@ -4,7 +4,8 @@
 		"baseUrl": ".",
 		"paths": {
 			"@fe/dashboard/*": ["./src/*"],
-			"@be/domain/*": ["../../backend/domain/src/*"]
+			"@be/domain/*": ["../../backend/domain/src/*"],
+			"@be/workflow/*": ["../../backend/workflow/src/*"]
 		}
 	},
 	"include": [

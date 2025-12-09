@@ -5,7 +5,7 @@ if (!process.env.PG_URL)
 if (!process.env.REDIS_URL)
 	process.env.REDIS_URL = "redis://:reloop123@localhost:6379";
 if (!process.env.BASE_URL) process.env.BASE_URL = "https://local.reloop.sh";
-if (!process.env.NODE_ENV) process.env.NODE_ENV = "development";
+
 if (!process.env.NODE_TLS_REJECT_UNAUTHORIZED)
 	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 if (!process.env.UPLOAD_STORAGE_PATH)
@@ -17,7 +17,7 @@ export const uploadConfig = {
 	PG_URL: process.env.PG_URL,
 	REDIS_URL: process.env.REDIS_URL,
 	BASE_URL: process.env.BASE_URL,
-	NODE_ENV: process.env.NODE_ENV,
+	NODE_ENV: process.env.NODE_ENV || "development",
 	NODE_TLS_REJECT_UNAUTHORIZED: process.env.NODE_TLS_REJECT_UNAUTHORIZED,
 	UPLOAD_STORAGE_PATH: process.env.UPLOAD_STORAGE_PATH,
 	MAX_FILE_SIZE: Number(process.env.MAX_FILE_SIZE),
