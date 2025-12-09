@@ -3,8 +3,8 @@
 import { authClient } from "@reloop/auth/client";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import Spinner from "@reloop/ui/spinner";
-import { useEffect, useState } from "react";
+import { Skeleton } from "@reloop/ui/skeleton";
+import useSWR from "swr";
 
 interface Account {
   id: string;
@@ -80,48 +80,36 @@ const getProviderInfo = (providerId: string) => {
   }
 };
 
-export const ConnectedAccounts = ({ className }: ConnectedAccountsProps) => {
-  const [accounts, setAccounts] = useState<Account[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchAccounts = async () => {
-      try {
-        const { data, error } = await authClient.listAccounts();
-        if (error) {
-          console.error("Failed to fetch accounts:", error);
-          setAccounts([]);
-        } else {
-          setAccounts(data || []);
-        }
-      } catch (error) {
-        console.error("Failed to fetch accounts:", error);
-        setAccounts([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAccounts();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className={cn("space-y-4", className)}>
-        <div>
-          <p className="font-medium text-label-md text-text-strong-950">
-            Connected Accounts
-          </p>
-          <p className="text-paragraph-sm text-text-sub-600">
-            See how you're signed in to your account
-          </p>
-        </div>
-        <div className="flex items-center justify-center py-8">
-          <Spinner size={20} color="var(--text-strong-950)" />
+const AccountSkeleton = () => (
+  <div className="rounded-xl border border-stroke-soft-100 py-2 pr-2.5 pl-3">
+    <div className="flex items-center justify-between">
+      <div className="flex items-center gap-3">
+        <Skeleton className="h-8 w-8 rounded-lg" />
+        <div className="space-y-1.5">
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-3 w-32" />
         </div>
       </div>
-    );
-  }
+      <Skeleton className="h-5 w-20 rounded-full" />
+    </div>
+  </div>
+);
+
+export const ConnectedAccounts = ({ className }: ConnectedAccountsProps) => {
+  const { data: accounts, isLoading } = useSWR<Account[]>(
+    "connected-accounts",
+    async () => {
+      const { data, error } = await authClient.listAccounts();
+      if (error) {
+        console.error("Failed to fetch accounts:", error);
+        return [];
+      }
+      return data || [];
+    },
+    {
+      revalidateOnFocus: false,
+    }
+  );
 
   return (
     <div className={cn("space-y-4", className)}>
@@ -135,46 +123,51 @@ export const ConnectedAccounts = ({ className }: ConnectedAccountsProps) => {
       </div>
 
       <div className="space-y-3">
-        {accounts.map((account) => {
-          const provider = getProviderInfo(account.providerId);
-          return (
-            <div
-              key={account.id}
-              className={cn(
-                "rounded-xl border py-2 pr-2.5 pl-3",
-                provider.borderColor,
-              )}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-bg-weak-50">
-                    {provider.useCustomIcon && account.providerId.toLowerCase() === "google" ? (
-                      <GoogleIcon className="h-4 w-4" />
-                    ) : (
-                      <Icon
-                        name={provider.icon}
-                        className="h-4 w-4 text-text-sub-600"
-                      />
-                    )}
+        {isLoading ? (
+          <>
+            <AccountSkeleton />
+            <AccountSkeleton />
+          </>
+        ) : accounts && accounts.length > 0 ? (
+          accounts.map((account) => {
+            const provider = getProviderInfo(account.providerId);
+            return (
+              <div
+                key={account.id}
+                className={cn(
+                  "rounded-xl border py-2 pr-2.5 pl-3",
+                  provider.borderColor,
+                )}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-bg-weak-50">
+                      {provider.useCustomIcon && account.providerId.toLowerCase() === "google" ? (
+                        <GoogleIcon className="h-4 w-4" />
+                      ) : (
+                        <Icon
+                          name={provider.icon}
+                          className="h-4 w-4 text-text-sub-600"
+                        />
+                      )}
+                    </div>
+                    <div>
+                      <p className="font-medium text-label-sm text-text-strong-950">
+                        {provider.name}
+                      </p>
+                      <p className="text-paragraph-xs text-text-sub-600">
+                        {provider.description}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-medium text-label-sm text-text-strong-950">
-                      {provider.name}
-                    </p>
-                    <p className="text-paragraph-xs text-text-sub-600">
-                      {provider.description}
-                    </p>
-                  </div>
+                  <span className="rounded-full bg-success-lighter px-2 py-0.5 font-medium text-success-base text-xs">
+                    Connected
+                  </span>
                 </div>
-                <span className="rounded-full bg-success-lighter px-2 py-0.5 font-medium text-success-base text-xs">
-                  Connected
-                </span>
               </div>
-            </div>
-          );
-        })}
-
-        {accounts.length === 0 && (
+            );
+          })
+        ) : (
           <div className="rounded-xl border border-stroke-soft-100 py-2 pr-2.5 pl-3">
             <p className="text-paragraph-sm text-text-sub-600">
               No connected accounts found
