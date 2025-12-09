@@ -2,15 +2,14 @@
 
 import { useTheme } from "next-themes";
 
+export type SidebarLayoutIconVariant = "light" | "dark" | "auto";
+
 export const SidebarLayoutIcon = ({
-	isDark,
-	defaultSystemTheme,
+	variant = "auto",
 }: {
-	isDark?: boolean;
-	defaultSystemTheme?: boolean;
+	variant?: SidebarLayoutIconVariant;
 }) => {
-	const { theme, systemTheme } = useTheme();
-	const currentTheme = defaultSystemTheme ? systemTheme : theme;
+	const { systemTheme } = useTheme();
 
 	// Define colors for light and dark themes
 	const colors = {
@@ -36,8 +35,15 @@ export const SidebarLayoutIcon = ({
 		},
 	};
 
-	const currentColors =
-		currentTheme === "dark" || isDark ? colors.dark : colors.light;
+	// Determine which colors to use based on variant
+	const getThemeColors = () => {
+		if (variant === "light") return colors.light;
+		if (variant === "dark") return colors.dark;
+		// For "auto", use system theme
+		return systemTheme === "dark" ? colors.dark : colors.light;
+	};
+
+	const currentColors = getThemeColors();
 
 	return (
 		<svg
