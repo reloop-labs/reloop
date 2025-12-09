@@ -319,7 +319,7 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 				{sessions.length > 1 && (
 					<Button.Root
 						variant="error"
-						mode="stroke"
+						mode="lighter"
 						size="xsmall"
 						onClick={handleTerminateAllSessions}
 						disabled={terminatingAll}

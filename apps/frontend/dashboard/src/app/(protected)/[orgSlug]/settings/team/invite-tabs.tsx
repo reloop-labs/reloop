@@ -1,4 +1,5 @@
 "use client";
+
 import { cn } from "@reloop/ui/cn";
 import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
 import { AnimatePresence, motion } from "motion/react";
@@ -27,12 +28,11 @@ export const InviteTabs = () => {
 	const activeIndex = items.findIndex((item) => item.path === tabValue);
 	const currentIdx = hoveredIdx !== undefined ? hoveredIdx : activeIndex;
 	const tab = buttonRefs.current[currentIdx];
-	const rect =
-		hoveredIdx !== undefined ? tab?.getBoundingClientRect() : undefined;
+	const rect = tab?.getBoundingClientRect();
 
 	return (
 		<TabMenuHorizontal.Root defaultValue="members" value={tabValue}>
-			<TabMenuHorizontal.List className="relative h-10 gap-0 border-b! px-3 py-0">
+			<TabMenuHorizontal.List className="relative h-10 gap-0 border-b! py-0">
 				{items.map(({ label, path }, index) => (
 					<TabMenuHorizontal.Trigger
 						ref={(el) => {
@@ -43,8 +43,10 @@ export const InviteTabs = () => {
 						onPointerEnter={() => setHoveredIdx(index)}
 						onPointerLeave={() => setHoveredIdx(undefined)}
 						className={cn(
-							"cursor-pointer px-2.5 py-0! text-sm",
-							!rect && currentIdx === index && "text-text-strong-950",
+							"flex cursor-pointer items-center gap-2 px-2.5 py-0! text-sm",
+							hoveredIdx === undefined &&
+							activeIndex === index &&
+							"text-text-strong-950",
 						)}
 						key={path}
 						value={path}
@@ -54,7 +56,7 @@ export const InviteTabs = () => {
 					</TabMenuHorizontal.Trigger>
 				))}
 				<AnimatePresence>
-					{rect ? (
+					{rect && activeIndex !== -1 ? (
 						<motion.div
 							className="absolute top-0 left-0 rounded-lg bg-neutral-alpha-10"
 							initial={{

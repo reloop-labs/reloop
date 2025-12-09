@@ -8,7 +8,7 @@
 		"compile": "bun build --compile --minify --sourcemap --bytecode ./src/index.ts --outfile server",
 		"dev": "bun run --hot src/index.ts",
 		"start": "bun run dist/index.js",
-		"auth:generate": "npx @better-auth/cli@latest generate --output ../../packages/db/src/auth-types.ts"
+		"auth:generate": "npx @better-auth/cli@latest generate --output ../../../packages/db/src/schema/auth.ts"
 	},
 	"dependencies": {
 		"@elysiajs/cors": "catalog:backend",

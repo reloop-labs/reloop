@@ -12,26 +12,27 @@ const Team = () => {
 	});
 
 	return (
-		<div>
-			<div>
-				<p className="font-medium text-2xl text-text-strong-950">Team</p>
+		<div className="w-full space-y-6 pt-5">
+			<div className="mb-6">
+				<p className="font-medium text-label-md text-text-strong-950">Team</p>
 				<p className="text-paragraph-sm text-text-sub-600">
-					Manage your team and invite new members.
+					Manage your team members and send invitations.
 				</p>
 			</div>
-			<InviteForm />
-			<InviteTabs />
-			<div className="mx-0.5 mb-0.5 rounded-lg bg-bg-white-0">
-				{tabValue === "members" && (
-					<div className="p-4">
-						<MemberList />
-					</div>
-				)}
-				{tabValue === "invites" && (
-					<div className="p-4">
-						<InviteList />
-					</div>
-				)}
+			<div className="space-y-3">
+				<p className="font-medium text-label-sm text-text-strong-950">
+					Invite Members
+				</p>
+				<InviteForm />
+			</div>
+			<div className="space-y-3">
+				<p className="font-medium text-label-sm text-text-strong-950">
+					Team Overview
+				</p>
+
+				<InviteTabs />
+				{tabValue === "members" && <MemberList />}
+				{tabValue === "invites" && <InviteList />}
 			</div>
 		</div>
 	);
