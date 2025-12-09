@@ -3,7 +3,6 @@
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { authClient } from "@reloop/auth/client";
 import * as Avatar from "@reloop/ui/avatar";
-import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
@@ -47,11 +46,11 @@ const getInitials = (name: string | null, email: string) => {
 const getRoleBadgeStyles = (role: string) => {
 	switch (role.toLowerCase()) {
 		case "owner":
-			return "bg-warning-lighter text-warning-base";
+			return "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400";
 		case "admin":
-			return "bg-primary-lighter text-primary-base";
+			return "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400";
 		default:
-			return "bg-bg-weak-50 text-text-sub-600";
+			return "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400";
 	}
 };
 
@@ -68,9 +67,6 @@ const formatRoleLabel = (role: string) => {
 	}
 };
 
-/**
- * Get animation properties for staggered animations
- */
 const getAnimationProps = (row: number, column: number) => {
 	return {
 		initial: { opacity: 0, y: "-100%" },
@@ -168,7 +164,6 @@ export const MemberList = () => {
 	if (isLoading) {
 		return (
 			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 text-paragraph-sm">
-				{/* Table Header */}
 				<div className="grid grid-cols-[1fr_100px_100px_80px] border-b border-stroke-soft-200 bg-bg-weak-50">
 					<div className="px-4 py-3 font-medium text-text-sub-600 text-xs uppercase tracking-wide">
 						Member
@@ -181,7 +176,6 @@ export const MemberList = () => {
 					</div>
 					<div className="px-4 py-3" />
 				</div>
-				{/* Skeleton Rows */}
 				<div className="divide-y divide-stroke-soft-200">
 					{Array.from({ length: 3 }).map((_, index) => (
 						<MemberSkeleton key={`skeleton-${index}`} />
@@ -193,20 +187,24 @@ export const MemberList = () => {
 
 	if (error) {
 		return (
-			<div className="flex flex-col items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-white-0 py-12">
-				<Icon name="alert-circle" className="mb-3 h-8 w-8 text-error-base" />
-				<p className="font-medium text-text-strong-950">Failed to load team members</p>
-				<p className="text-paragraph-sm text-text-sub-600">Please try again later</p>
+			<div className="flex flex-col items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-white-0 py-16">
+				<div className="flex h-12 w-12 items-center justify-center rounded-full bg-error-lighter">
+					<Icon name="alert-circle" className="h-6 w-6 text-error-base" />
+				</div>
+				<p className="mt-4 font-medium text-text-strong-950">Failed to load team members</p>
+				<p className="mt-1 text-sm text-text-sub-600">Please try again later</p>
 			</div>
 		);
 	}
 
 	if (!data?.members || data.members.length === 0) {
 		return (
-			<div className="flex flex-col items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-white-0 py-12">
-				<Icon name="users" className="mb-3 h-8 w-8 text-text-sub-600" />
-				<p className="font-medium text-text-strong-950">No team members found</p>
-				<p className="text-paragraph-sm text-text-sub-600">Invite members to get started</p>
+			<div className="flex flex-col items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-white-0 py-16">
+				<div className="flex h-12 w-12 items-center justify-center rounded-full bg-bg-weak-50">
+					<Icon name="users" className="h-6 w-6 text-text-sub-600" />
+				</div>
+				<p className="mt-4 font-medium text-text-strong-950">No team members found</p>
+				<p className="mt-1 text-sm text-text-sub-600">Invite members to get started</p>
 			</div>
 		);
 	}
@@ -248,7 +246,7 @@ export const MemberList = () => {
 												<Avatar.Image src={member.user.image} alt={member.user.name || member.user.email} />
 											) : (
 												<Avatar.Image asChild>
-													<div className="flex h-full w-full items-center justify-center font-medium text-label-sm">
+													<div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-violet-500 to-purple-600 font-medium text-white text-sm">
 														{getInitials(member.user.name, member.user.email)}
 													</div>
 												</Avatar.Image>
@@ -264,9 +262,9 @@ export const MemberList = () => {
 												{member.user.name || member.user.email.split("@")[0]}
 											</span>
 											{isOwner && (
-												<span className="text-warning-base">
+												<span className="text-amber-500">
 													<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-														<path d="M5 16L3 8l5.5 5L12 4l3.5 9L21 8l-2 8H5zm2.7-2h8.6l.9-4.4L14 12l-2-6-2 6-2.2-2.4L7.7 14z" />
+														<path d="M5 16L3 8l5.5 5L12 4l3.5 9L21 8l-2 8H5z" />
 													</svg>
 												</span>
 											)}
@@ -282,20 +280,21 @@ export const MemberList = () => {
 									<motion.div {...getAnimationProps(index + 1, 2)}>
 										{isOwner ? (
 											<span className={cn(
-												"rounded-full px-2.5 py-1 font-medium text-xs",
+												"rounded-full px-2.5 py-1 text-xs font-medium",
 												getRoleBadgeStyles(member.role)
 											)}>
 												{formatRoleLabel(member.role)}
 											</span>
 										) : (
 											<Select.Root
+												size="small"
 												defaultValue={member.role}
 												disabled={updatingRole === member.id}
 												onValueChange={(value: "admin" | "member") =>
 													handleRoleChange(member.id, value)
 												}
 											>
-												<Select.Trigger className="h-7 w-[85px] text-xs">
+												<Select.Trigger className="h-7 w-20 text-xs">
 													{updatingRole === member.id ? (
 														<Spinner size={12} color="var(--text-sub-600)" />
 													) : (
@@ -329,7 +328,7 @@ export const MemberList = () => {
 												<Dropdown.Trigger asChild>
 													<button
 														type="button"
-														className="flex h-8 w-8 items-center justify-center rounded-md text-text-sub-600 opacity-0 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 group-hover/row:opacity-100"
+														className="flex h-8 w-8 items-center justify-center rounded-lg text-text-sub-600 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950"
 													>
 														<Icon name="more-horizontal" className="h-4 w-4" />
 													</button>
@@ -345,7 +344,7 @@ export const MemberList = () => {
 														) : (
 															<Icon name="user-minus" className="h-4 w-4" />
 														)}
-														Remove Member
+														Remove from organization
 													</Dropdown.Item>
 												</Dropdown.Content>
 											</Dropdown.Root>

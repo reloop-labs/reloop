@@ -2,13 +2,11 @@
 
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { authClient } from "@reloop/auth/client";
-import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import Spinner from "@reloop/ui/spinner";
-import * as StatusBadge from "@reloop/ui/status-badge";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -31,17 +29,33 @@ const formatDate = (date: Date) => {
 	}).format(new Date(date));
 };
 
-const getStatusBadgeProps = (status: string) => {
+const getStatusStyles = (status: string) => {
 	switch (status.toLowerCase()) {
 		case "pending":
-			return { status: "pending" as const, variant: "light" as const };
+			return {
+				bg: "bg-amber-100 dark:bg-amber-900/30",
+				text: "text-amber-700 dark:text-amber-400",
+				dot: "bg-amber-500",
+			};
 		case "accepted":
-			return { status: "completed" as const, variant: "light" as const };
+			return {
+				bg: "bg-emerald-100 dark:bg-emerald-900/30",
+				text: "text-emerald-700 dark:text-emerald-400",
+				dot: "bg-emerald-500",
+			};
 		case "expired":
 		case "declined":
-			return { status: "failed" as const, variant: "light" as const };
+			return {
+				bg: "bg-red-100 dark:bg-red-900/30",
+				text: "text-red-700 dark:text-red-400",
+				dot: "bg-red-500",
+			};
 		default:
-			return { status: "disabled" as const, variant: "stroke" as const };
+			return {
+				bg: "bg-gray-100 dark:bg-gray-800",
+				text: "text-gray-600 dark:text-gray-400",
+				dot: "bg-gray-400",
+			};
 	}
 };
 
@@ -61,15 +75,12 @@ const getRoleLabel = (role: string) => {
 const getRoleBadgeStyles = (role: string) => {
 	switch (role.toLowerCase()) {
 		case "admin":
-			return "bg-primary-lighter text-primary-base";
+			return "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400";
 		default:
-			return "bg-bg-weak-50 text-text-sub-600";
+			return "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400";
 	}
 };
 
-/**
- * Get animation properties for staggered animations
- */
 const getAnimationProps = (row: number, column: number) => {
 	return {
 		initial: { opacity: 0, y: "-100%" },
@@ -84,13 +95,13 @@ const getAnimationProps = (row: number, column: number) => {
 };
 
 const InviteSkeleton = () => (
-	<div className="grid grid-cols-[1fr_80px_100px_100px_80px]">
+	<div className="grid grid-cols-[1fr_100px_100px_80px]">
 		<div className="flex items-center gap-3 px-4 py-3">
-			<Skeleton className="h-9 w-9 rounded-full" />
-			<Skeleton className="h-4 w-40" />
-		</div>
-		<div className="flex items-center px-4 py-3">
-			<Skeleton className="h-5 w-14 rounded-full" />
+			<Skeleton className="h-10 w-10 rounded-full" />
+			<div className="flex-1 space-y-2">
+				<Skeleton className="h-4 w-40" />
+				<Skeleton className="h-3 w-24" />
+			</div>
 		</div>
 		<div className="flex items-center px-4 py-3">
 			<Skeleton className="h-6 w-16 rounded-full" />
@@ -143,13 +154,9 @@ export const InviteList = () => {
 	if (isLoading) {
 		return (
 			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 text-paragraph-sm">
-				{/* Table Header */}
-				<div className="grid grid-cols-[1fr_80px_100px_100px_80px] border-b border-stroke-soft-200 bg-bg-weak-50">
+				<div className="grid grid-cols-[1fr_100px_100px_80px] border-b border-stroke-soft-200 bg-bg-weak-50">
 					<div className="px-4 py-3 font-medium text-text-sub-600 text-xs uppercase tracking-wide">
 						Email
-					</div>
-					<div className="px-4 py-3 font-medium text-text-sub-600 text-xs uppercase tracking-wide">
-						Role
 					</div>
 					<div className="px-4 py-3 font-medium text-text-sub-600 text-xs uppercase tracking-wide">
 						Status
@@ -159,7 +166,6 @@ export const InviteList = () => {
 					</div>
 					<div className="px-4 py-3" />
 				</div>
-				{/* Skeleton Rows */}
 				<div className="divide-y divide-stroke-soft-200">
 					{Array.from({ length: 3 }).map((_, index) => (
 						<InviteSkeleton key={`skeleton-${index}`} />
@@ -171,20 +177,24 @@ export const InviteList = () => {
 
 	if (error) {
 		return (
-			<div className="flex flex-col items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-white-0 py-12">
-				<Icon name="alert-circle" className="mb-3 h-8 w-8 text-error-base" />
-				<p className="font-medium text-text-strong-950">Failed to load invitations</p>
-				<p className="text-paragraph-sm text-text-sub-600">Please try again later</p>
+			<div className="flex flex-col items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-white-0 py-16">
+				<div className="flex h-12 w-12 items-center justify-center rounded-full bg-error-lighter">
+					<Icon name="alert-circle" className="h-6 w-6 text-error-base" />
+				</div>
+				<p className="mt-4 font-medium text-text-strong-950">Failed to load invitations</p>
+				<p className="mt-1 text-sm text-text-sub-600">Please try again later</p>
 			</div>
 		);
 	}
 
 	if (!invites || invites.length === 0) {
 		return (
-			<div className="flex flex-col items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-white-0 py-12">
-				<Icon name="mail" className="mb-3 h-8 w-8 text-text-sub-600" />
-				<p className="font-medium text-text-strong-950">No pending invitations</p>
-				<p className="text-paragraph-sm text-text-sub-600">All invitations have been processed</p>
+			<div className="flex flex-col items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-white-0 py-16">
+				<div className="flex h-12 w-12 items-center justify-center rounded-full bg-bg-weak-50">
+					<Icon name="mail" className="h-6 w-6 text-text-sub-600" />
+				</div>
+				<p className="mt-4 font-medium text-text-strong-950">No pending invitations</p>
+				<p className="mt-1 text-sm text-text-sub-600">Send an invitation to add team members</p>
 			</div>
 		);
 	}
@@ -193,12 +203,9 @@ export const InviteList = () => {
 		<AnimatePresence mode="wait">
 			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 text-paragraph-sm">
 				{/* Table Header */}
-				<div className="grid grid-cols-[1fr_80px_100px_100px_80px] border-b border-stroke-soft-200 bg-bg-weak-50">
+				<div className="grid grid-cols-[1fr_100px_100px_80px] border-b border-stroke-soft-200 bg-bg-weak-50">
 					<div className="px-4 py-3 font-medium text-text-sub-600 text-xs uppercase tracking-wide">
 						Email
-					</div>
-					<div className="px-4 py-3 font-medium text-text-sub-600 text-xs uppercase tracking-wide">
-						Role
 					</div>
 					<div className="px-4 py-3 font-medium text-text-sub-600 text-xs uppercase tracking-wide">
 						Status
@@ -212,14 +219,14 @@ export const InviteList = () => {
 				{/* Table Body */}
 				<div className="divide-y divide-stroke-soft-200">
 					{invites.map((invite, index) => {
-						const statusProps = getStatusBadgeProps(invite.status);
+						const statusStyles = getStatusStyles(invite.status);
 						const isPending = invite.status.toLowerCase() === "pending";
 
 						return (
 							<div
 								key={invite.id || index}
 								className={cn(
-									"group/row grid grid-cols-[1fr_80px_100px_100px_80px] transition-colors",
+									"group/row grid grid-cols-[1fr_100px_100px_80px] transition-colors",
 									"hover:bg-bg-weak-50/50"
 								)}
 							>
@@ -227,44 +234,47 @@ export const InviteList = () => {
 								<div className="flex items-center gap-3 px-4 py-3">
 									<motion.div
 										{...getAnimationProps(index + 1, 0)}
-										className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-bg-weak-50 ring-1 ring-stroke-soft-200"
+										className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600"
 									>
-										<Icon name="mail" className="h-4 w-4 text-text-sub-600" />
+										<Icon name="mail" className="h-5 w-5 text-white" />
 									</motion.div>
-									<motion.span
+									<motion.div
 										{...getAnimationProps(index + 1, 1)}
-										className="truncate font-medium text-label-sm text-text-strong-950"
+										className="min-w-0 flex-1"
 									>
-										{invite.email}
-									</motion.span>
-								</div>
-
-								{/* Role Column */}
-								<div className="flex items-center px-4 py-3">
-									<motion.span
-										{...getAnimationProps(index + 1, 2)}
-										className={cn(
-											"rounded-full px-2 py-0.5 font-medium text-xs",
-											getRoleBadgeStyles(invite.role)
-										)}
-									>
-										{getRoleLabel(invite.role)}
-									</motion.span>
+										<div className="flex items-center gap-2">
+											<span className="truncate font-medium text-label-sm text-text-strong-950">
+												{invite.email}
+											</span>
+											<span className={cn(
+												"rounded-full px-2 py-0.5 text-xs font-medium",
+												getRoleBadgeStyles(invite.role)
+											)}>
+												{getRoleLabel(invite.role)}
+											</span>
+										</div>
+									</motion.div>
 								</div>
 
 								{/* Status Column */}
 								<div className="flex items-center px-4 py-3">
-									<motion.div {...getAnimationProps(index + 1, 3)}>
-										<StatusBadge.Root {...statusProps}>
-											{invite.status.charAt(0).toUpperCase() + invite.status.slice(1)}
-										</StatusBadge.Root>
-									</motion.div>
+									<motion.span
+										{...getAnimationProps(index + 1, 2)}
+										className={cn(
+											"flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium",
+											statusStyles.bg,
+											statusStyles.text
+										)}
+									>
+										<span className={cn("h-1.5 w-1.5 rounded-full", statusStyles.dot)} />
+										{invite.status.charAt(0).toUpperCase() + invite.status.slice(1)}
+									</motion.span>
 								</div>
 
 								{/* Expires Column */}
 								<div className="flex items-center px-4 py-3">
 									<motion.span
-										{...getAnimationProps(index + 1, 4)}
+										{...getAnimationProps(index + 1, 3)}
 										className="text-text-sub-600 text-xs"
 									>
 										{formatDate(invite.expiresAt)}
@@ -274,12 +284,12 @@ export const InviteList = () => {
 								{/* Actions Column */}
 								<div className="flex items-center justify-end px-4 py-3">
 									{isPending && (
-										<motion.div {...getAnimationProps(index + 1, 5)}>
+										<motion.div {...getAnimationProps(index + 1, 4)}>
 											<Dropdown.Root>
 												<Dropdown.Trigger asChild>
 													<button
 														type="button"
-														className="flex h-8 w-8 items-center justify-center rounded-md text-text-sub-600 opacity-0 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 group-hover/row:opacity-100"
+														className="flex h-8 w-8 items-center justify-center rounded-lg text-text-sub-600 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950"
 													>
 														<Icon name="more-horizontal" className="h-4 w-4" />
 													</button>
@@ -295,7 +305,7 @@ export const InviteList = () => {
 														) : (
 															<Icon name="x-close" className="h-4 w-4" />
 														)}
-														Cancel Invitation
+														Cancel invitation
 													</Dropdown.Item>
 												</Dropdown.Content>
 											</Dropdown.Root>
