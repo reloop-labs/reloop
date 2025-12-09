@@ -9,6 +9,7 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
+import { useQueryState, parseAsInteger } from "nuqs";
 import { toast } from "sonner";
 import useSWR, { mutate } from "swr";
 
@@ -61,11 +62,12 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 	const [statusFilter, setStatusFilter] = useState("all");
 	const [searchQuery, setSearchQuery] = useState("");
 	const [expandedDelivery, setExpandedDelivery] = useState<string | null>(null);
-	const [currentPage, setCurrentPage] = useState(1);
+	const [currentPage, setCurrentPage] = useQueryState("page", parseAsInteger.withDefault(1));
+	const [pageSize, setPageSize] = useQueryState("limit", parseAsInteger.withDefault(10));
 	const [dateRange, setDateRange] = useState("7d");
 
 	const { data, error, isLoading } = useSWR<DeliveryListResponse>(
-		`/api/webhook/deliveries/list?webhookId=${webhookId}&page=${currentPage}&limit=20&status=${statusFilter === "all" ? "" : statusFilter}`,
+		`/api/webhook/deliveries/list?webhookId=${webhookId}&page=${currentPage}&limit=${pageSize}&status=${statusFilter === "all" ? "" : statusFilter}`,
 		{
 			revalidateOnFocus: false,
 			revalidateOnReconnect: true,
@@ -127,7 +129,9 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 			return matchesSearch;
 		}) || [];
 
-	const totalPages = data ? Math.ceil(data.total / 20) : 0;
+	const totalPages = data ? Math.ceil(data.total / pageSize) : 0;
+	const startIndex = data && data.total > 0 ? (currentPage - 1) * pageSize + 1 : 0;
+	const endIndex = data ? Math.min(currentPage * pageSize, data.total) : 0;
 
 	return (
 		<div className="space-y-6">
@@ -464,34 +468,55 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 					)}
 
 					{/* Pagination */}
-					{totalPages > 1 && (
+					{data && data.total > 0 && (
 						<div className="border-stroke-soft-200 border-t px-6 py-4">
 							<div className="flex items-center justify-between">
-								<div className="text-sm text-text-sub-600">
-									Page {currentPage} of {totalPages}
+								<div className="flex items-center gap-3 text-sm text-text-sub-600">
+									<span>Showing {startIndex}–{endIndex} of {data.total}</span>
+									<Select.Root
+										value={String(pageSize)}
+										onValueChange={(value) => {
+											setPageSize(Number(value));
+											setCurrentPage(1);
+										}}
+										size="xsmall"
+									>
+										<Select.Trigger className="w-16 text-xs">
+											<Select.Value />
+										</Select.Trigger>
+										<Select.Content className="text-xs min-w-16">
+											<Select.Item value="10" className="text-xs">10</Select.Item>
+											<Select.Item value="20" className="text-xs">20</Select.Item>
+											<Select.Item value="50" className="text-xs">50</Select.Item>
+											<Select.Item value="100" className="text-xs">100</Select.Item>
+										</Select.Content>
+									</Select.Root>
 								</div>
 								<div className="flex items-center gap-2">
 									<Button.Root
-										size="small"
+										size="xxsmall"
 										variant="neutral"
+										mode="stroke"
 										onClick={() =>
 											setCurrentPage((prev) => Math.max(1, prev - 1))
 										}
 										disabled={currentPage === 1}
 									>
-										<Icon name="chevron-left" className="mr-1 h-4 w-4" />
-										Previous
+										<Icon name="chevron-left" className="h-4 w-4" />
 									</Button.Root>
+									<span className="px-2 text-sm text-text-sub-600">
+										Page {currentPage} of {totalPages}
+									</span>
 									<Button.Root
-										size="small"
+										size="xxsmall"
 										variant="neutral"
+										mode="stroke"
 										onClick={() =>
 											setCurrentPage((prev) => Math.min(totalPages, prev + 1))
 										}
 										disabled={currentPage === totalPages}
 									>
-										Next
-										<Icon name="chevron-right" className="ml-1 h-4 w-4" />
+										<Icon name="chevron-right" className="h-4 w-4" />
 									</Button.Root>
 								</div>
 							</div>

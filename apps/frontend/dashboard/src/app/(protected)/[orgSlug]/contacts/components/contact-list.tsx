@@ -5,10 +5,23 @@ import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Select from "@reloop/ui/select";
 import { Skeleton } from "@reloop/ui/skeleton";
+import { motion } from "motion/react";
 import { useState } from "react";
 import { useQueryState, parseAsInteger } from "nuqs";
 import useSWR from "swr";
 import { toast } from "sonner";
+
+// Animation utility function (matching domain table)
+const getAnimationProps = (row: number, column: number) => ({
+  initial: { opacity: 0, y: "-100%" },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: "100%" },
+  transition: {
+    duration: 0.5,
+    delay: row * 0.07 + column * 0.1,
+    ease: [0.65, 0, 0.35, 1] as const,
+  },
+});
 
 interface Contact {
   id: string;
@@ -189,27 +202,27 @@ export const ContactList = () => {
                 </div>
               </div>
             ))
-            : filteredContacts.map((contact) => (
+            : filteredContacts.map((contact, index) => (
               <div key={contact.id} className="group/row contents">
                 <div className="flex items-center border-stroke-soft-200 border-t py-2.5 pl-5 group-hover/row:bg-bg-weak-50">
-                  <div className="flex items-center gap-2">
+                  <motion.div {...getAnimationProps(index, 0)} className="flex items-center gap-2">
                     <Icon name="user" className="h-4 w-4 text-text-sub-600" />
                     <span className="font-medium text-label-sm text-text-strong-950">
                       {contact.email}
                     </span>
-                  </div>
+                  </motion.div>
                 </div>
                 <div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
-                  <span className="text-label-sm text-text-sub-600">
+                  <motion.span {...getAnimationProps(index, 1)} className="text-label-sm text-text-sub-600">
                     {contact.firstName || contact.lastName
                       ? `${contact.firstName || ""} ${contact.lastName || ""}`.trim()
                       : "—"}
-                  </span>
+                  </motion.span>
                 </div>
                 <div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
-                  <span className="text-label-sm text-text-sub-600">
+                  <motion.span {...getAnimationProps(index, 2)} className="text-label-sm text-text-sub-600">
                     {new Date(contact.createdAt).toLocaleDateString()}
-                  </span>
+                  </motion.span>
                 </div>
               </div>
             ))}
@@ -218,7 +231,7 @@ export const ContactList = () => {
 
       {/* Pagination */}
       {data && data.total > 0 && (
-        <div className="mt-4 flex items-center justify-between text-paragraph-sm text-text-sub-600">
+        <div className="mt-4 pb-8 flex items-center justify-between text-paragraph-sm text-text-sub-600">
           <div className="flex items-center gap-3">
             <span>
               Showing {startIndex}–{endIndex} of {data.total} contact{data.total !== 1 ? "s" : ""}

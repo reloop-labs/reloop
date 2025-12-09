@@ -14,6 +14,7 @@ import * as Select from "@reloop/ui/select";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
+import { useQueryState, parseAsInteger } from "nuqs";
 import useSWR from "swr";
 import { DeleteDomainModal } from "./delete-domain";
 import { DomainSDK } from "./domain-sdk";
@@ -25,8 +26,8 @@ export const DomainListSidebar = () => {
 	const { domainId } = useParams();
 	const [statusFilter, setStatusFilter] = useState<string>("all");
 	const [searchQuery, setSearchQuery] = useState<string>("");
-	const [currentPage, setCurrentPage] = useState(1);
-	const pageSize = 20;
+	const [currentPage, setCurrentPage] = useQueryState("page", parseAsInteger.withDefault(1));
+	const [pageSize, setPageSize] = useQueryState("limit", parseAsInteger.withDefault(10));
 
 	const { data, error, isLoading } = useSWR<DomainListResponse>(
 		activeOrganization?.id
@@ -193,9 +194,29 @@ export const DomainListSidebar = () => {
 
 						{/* Pagination */}
 						{data && data.total > 0 && (
-							<div className="mt-4 flex items-center justify-between text-paragraph-sm text-text-sub-600">
-								<div>
-									Showing {startIndex}–{endIndex} of {data.total} domain{data.total !== 1 ? "s" : ""}
+							<div className="mt-4 pb-8 flex items-center justify-between text-paragraph-sm text-text-sub-600">
+								<div className="flex items-center gap-3">
+									<span>
+										Showing {startIndex}–{endIndex} of {data.total} domain{data.total !== 1 ? "s" : ""}
+									</span>
+									<Select.Root
+										value={String(pageSize)}
+										onValueChange={(value) => {
+											setPageSize(Number(value));
+											setCurrentPage(1);
+										}}
+										size="xsmall"
+									>
+										<Select.Trigger className="w-16 text-xs">
+											<Select.Value />
+										</Select.Trigger>
+										<Select.Content className="text-xs min-w-16">
+											<Select.Item value="10" className="text-xs">10</Select.Item>
+											<Select.Item value="20" className="text-xs">20</Select.Item>
+											<Select.Item value="50" className="text-xs">50</Select.Item>
+											<Select.Item value="100" className="text-xs">100</Select.Item>
+										</Select.Content>
+									</Select.Root>
 								</div>
 								<div className="flex items-center gap-2">
 									<Button.Root

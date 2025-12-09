@@ -7,9 +7,22 @@ import {
   Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
+import { motion } from "motion/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
+
+// Animation utility function (matching domain table)
+const getAnimationProps = (row: number, column: number) => ({
+  initial: { opacity: 0, y: "-100%" },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: "100%" },
+  transition: {
+    duration: 0.5,
+    delay: row * 0.07 + column * 0.1,
+    ease: [0.65, 0, 0.35, 1] as const,
+  },
+});
 
 interface Topic {
   id: string;
@@ -95,26 +108,26 @@ export const TopicTable = ({
         <div className="bg-bg-weak-50 font-medium text-text-sub-600">
           <div className="py-2.5" />
         </div>
-        {topics.map((topic) => (
+        {topics.map((topic, index) => (
           <div key={topic.id} className="group/row contents">
             <Link
               href={`/${activeOrganizationSlug}/topics/${topic.id}`}
               className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50"
             >
-              <div className="flex items-center gap-2 pl-5">
+              <motion.div {...getAnimationProps(index, 0)} className="flex items-center gap-2 pl-5">
                 <Icon name="notification-indicator" className="h-4 w-4 text-text-sub-600" />
                 <span className="font-medium text-label-sm text-text-strong-950">
                   {topic.name}
                 </span>
-              </div>
+              </motion.div>
             </Link>
             <Link
               href={`/${activeOrganizationSlug}/topics/${topic.id}`}
               className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50"
             >
-              <span className="text-label-sm text-text-sub-600">
+              <motion.span {...getAnimationProps(index, 1)} className="text-label-sm text-text-sub-600">
                 {new Date(topic.createdAt).toLocaleDateString()}
-              </span>
+              </motion.span>
             </Link>
             <div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
               <div className="opacity-0 group-hover/row:opacity-100 transition-opacity">
