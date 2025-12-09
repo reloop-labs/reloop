@@ -1,7 +1,10 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
-import { sendPasswordResetEmail } from "@reloop/react-email";
+import {
+	sendOrganizationInviteEmail,
+	sendPasswordResetEmail,
+} from "@reloop/react-email";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { createAuthMiddleware } from "better-auth/api";
@@ -97,7 +100,31 @@ export const auth = betterAuth({
 		admin(),
 		apiKey({ defaultPrefix: "rl" }),
 		organization({
-			sendInvitationEmail: async () => {},
+			sendInvitationEmail: async (data) => {
+				const inviteLink = `${process.env.FRONTEND_URL || "http://localhost:3000"}/accept-invitation/${data.id}`;
+
+				logger.info("📧 Organization invitation requested:", {
+					email: data.email,
+					organization: data.organization.name,
+					role: data.role,
+					inviter: data.inviter.user.email,
+				});
+
+				try {
+					await sendOrganizationInviteEmail({
+						email: data.email,
+						inviteLink,
+						organizationName: data.organization.name,
+						inviterName: data.inviter.user.name || data.inviter.user.email,
+						inviterEmail: data.inviter.user.email,
+						role: data.role,
+					});
+					logger.info(`✅ Organization invite email sent to ${data.email}`);
+				} catch (error) {
+					logger.error("❌ Failed to send organization invite email:", error);
+					// Don't throw - invitation is still created, email just failed
+				}
+			},
 		}),
 		openAPI({ path: "/docs" }),
 	],

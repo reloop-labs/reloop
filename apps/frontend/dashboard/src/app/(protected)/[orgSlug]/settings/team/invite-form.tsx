@@ -19,7 +19,7 @@ const userSchema = v.object({
 		v.string("Email is required"),
 		v.email("Please enter a valid email address"),
 	),
-	role: v.picklist(["dev", "marketing", "admin"], "Please select a valid role"),
+	role: v.picklist(["admin", "member"], "Please select a valid role"),
 });
 
 const formSchema = v.object({
@@ -33,7 +33,7 @@ export const InviteForm = () => {
 	const form = useForm<InviteValues>({
 		resolver: valibotResolver(formSchema) as Resolver<InviteValues>,
 		defaultValues: {
-			users: [{ email: "", role: "dev" }],
+			users: [{ email: "", role: "member" }],
 		},
 	});
 	const { data: session } = authClient.useSession();
@@ -51,11 +51,11 @@ export const InviteForm = () => {
 			for (const user of users) {
 				await authClient.organization.inviteMember({
 					email: user.email,
-					role: "admin",
+					role: user.role,
 					organizationId: session?.user.activeOrganizationId,
 				});
 			}
-			form.reset({ users: [{ email: "", role: "dev" }] });
+			form.reset({ users: [{ email: "", role: "member" }] });
 		} catch (error) {
 			toast.error("Failed to invite team members");
 		} finally {
@@ -63,7 +63,7 @@ export const InviteForm = () => {
 		}
 	};
 
-	const addNewUser = () => append({ email: "", role: "dev" });
+	const addNewUser = () => append({ email: "", role: "member" });
 
 	return (
 		<div className="my-4 rounded-xl border border-stroke-soft-200 bg-neutral-alpha-10">
@@ -108,7 +108,7 @@ export const InviteForm = () => {
 								<div>
 									<Select.Root
 										disabled={loading}
-										onValueChange={(value: "dev" | "marketing" | "admin") => {
+										onValueChange={(value: "admin" | "member") => {
 											form.setValue(`users.${index}.role`, value);
 										}}
 										defaultValue={field.role}
@@ -117,9 +117,8 @@ export const InviteForm = () => {
 											<Select.Value placeholder="Select role" />
 										</Select.Trigger>
 										<Select.Content>
-											<Select.Item value="dev">Developer</Select.Item>
-											<Select.Item value="marketing">Marketing</Select.Item>
-											<Select.Item value="admin">Admin</Select.Item>
+											<Select.Item value="admin">Admin (Full Access)</Select.Item>
+											<Select.Item value="member">Member (Read Only)</Select.Item>
 										</Select.Content>
 									</Select.Root>
 									{form.formState.errors.users?.[index]?.role && (

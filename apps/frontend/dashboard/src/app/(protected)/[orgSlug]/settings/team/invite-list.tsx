@@ -28,6 +28,19 @@ const getStatusBadgeProps = (status: string) => {
 	}
 };
 
+const getRoleLabel = (role: string) => {
+	switch (role.toLowerCase()) {
+		case "admin":
+			return "Admin";
+		case "member":
+			return "Member";
+		case "owner":
+			return "Owner";
+		default:
+			return role;
+	}
+};
+
 export const InviteList = () => {
 	const { activeOrganization } = useUserOrganization();
 	const {
@@ -99,7 +112,7 @@ export const InviteList = () => {
 								<div className="flex items-center gap-4 text-paragraph-sm text-text-sub-600">
 									<div className="flex items-center gap-1">
 										<span className="text-text-sub-500">Role:</span>
-										<span className="font-medium">{invite.role}</span>
+										<span className="font-medium">{getRoleLabel(invite.role)}</span>
 									</div>
 									<div className="flex items-center gap-1">
 										<span className="text-text-sub-500">Expires:</span>
