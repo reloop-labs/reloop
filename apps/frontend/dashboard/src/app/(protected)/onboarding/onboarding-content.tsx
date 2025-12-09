@@ -1,8 +1,12 @@
 "use client";
 
+import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
+import Spinner from "@reloop/ui/spinner";
 import { CheckCircle2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
+import { useEffect } from "react";
 import {
   ApiPreview,
   DnsConfigPreview,
@@ -16,6 +20,8 @@ import { CreateOrgStep } from "./steps/create-org";
 import { GenerateApiKeyStep } from "./steps/generate-api-key";
 
 export const OnBoardingContent = () => {
+  const { data: session, isPending } = authClient.useSession();
+  const router = useRouter();
   const [step] = useQueryState("step", parseAsInteger.withDefault(1));
   const [name] = useQueryState("name", parseAsString.withDefault(""));
   const [slug] = useQueryState("slug", parseAsString.withDefault(""));
@@ -26,6 +32,25 @@ export const OnBoardingContent = () => {
   const [logoUrl] = useQueryState("logoUrl", parseAsString.withDefault(""));
   const [apiKey] = useQueryState("apiKey", parseAsString.withDefault(""));
   const [domain] = useQueryState("domain", parseAsString.withDefault(""));
+
+  useEffect(() => {
+    if (!isPending && !session) {
+      router.push("/login");
+    }
+  }, [session, isPending, router]);
+
+  if (isPending) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Spinner size={32} />
+      </div>
+    );
+  }
+
+  // Don't render content if not authenticated
+  if (!session) {
+    return null;
+  }
 
   // Configuration for each step
   const stepsConfig = {
