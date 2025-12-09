@@ -31,7 +31,6 @@ type UserOrganizationContextType = {
 	mutateOrganizations: () => void;
 };
 
-// Create the context
 const UserOrganizationContext =
 	createContext<UserOrganizationContextType | null>(null);
 
@@ -82,7 +81,6 @@ export const UserOrganizationProvider = ({
 				!isSettingDefaultOrg &&
 				!hasInitialized
 			) {
-				// Ensure session is synced with user's activeOrganizationId
 				if (session?.user?.activeOrganizationId) {
 					try {
 						await authClient.organization.setActive({
@@ -90,17 +88,13 @@ export const UserOrganizationProvider = ({
 						});
 					} catch (error) {
 						console.log("Error setting active organization", { error });
-						// Handle sync error silently
 					}
 				}
 
-				// Check if current URL slug matches session's active organization
 				if (session?.user?.activeOrganizationId && orgSlug) {
 					const sessionActiveOrg = organizations.find(
 						(org) => org.id === session.user.activeOrganizationId,
 					);
-
-					// If session active org exists but slug doesn't match, redirect to correct slug
 					if (sessionActiveOrg && sessionActiveOrg.slug !== orgSlug) {
 						setIsSettingDefaultOrg(true);
 						push(`/${sessionActiveOrg.slug}`);
@@ -109,8 +103,6 @@ export const UserOrganizationProvider = ({
 						return;
 					}
 				}
-
-				// Handle case where no active organization is found in URL
 				if (!activeOrganization) {
 					if (organizations.length > 0) {
 						setIsSettingDefaultOrg(true);
