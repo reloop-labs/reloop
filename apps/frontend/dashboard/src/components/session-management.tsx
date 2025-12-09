@@ -1,5 +1,6 @@
 "use client";
 
+import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -9,18 +10,54 @@ import { toast } from "sonner";
 
 interface Session {
 	id: string;
-	device: string;
-	browser: string;
-	location?: string;
-	ipAddress?: string;
-	createdAt: string;
-	lastActiveAt: string;
-	isCurrent?: boolean;
+	token: string;
+	userId: string;
+	expiresAt: Date;
+	createdAt: Date;
+	updatedAt: Date;
+	ipAddress?: string | null;
+	userAgent?: string | null;
 }
 
 interface SessionManagementProps {
 	className?: string;
 }
+
+// Parse user agent to extract browser and device info
+const parseUserAgent = (userAgent: string | null | undefined) => {
+	if (!userAgent) return { browser: "Unknown", device: "Unknown" };
+
+	let browser = "Unknown";
+	let device = "Unknown";
+
+	// Detect browser
+	if (userAgent.includes("Chrome") && !userAgent.includes("Edg")) {
+		browser = "Chrome";
+	} else if (userAgent.includes("Firefox")) {
+		browser = "Firefox";
+	} else if (userAgent.includes("Safari") && !userAgent.includes("Chrome")) {
+		browser = "Safari";
+	} else if (userAgent.includes("Edg")) {
+		browser = "Edge";
+	} else if (userAgent.includes("Opera") || userAgent.includes("OPR")) {
+		browser = "Opera";
+	}
+
+	// Detect device/OS
+	if (userAgent.includes("Mac OS X")) {
+		device = "macOS";
+	} else if (userAgent.includes("Windows")) {
+		device = "Windows";
+	} else if (userAgent.includes("Linux") && !userAgent.includes("Android")) {
+		device = "Linux";
+	} else if (userAgent.includes("Android")) {
+		device = "Android";
+	} else if (userAgent.includes("iPhone") || userAgent.includes("iPad")) {
+		device = "iOS";
+	}
+
+	return { browser, device };
+};
 
 export const SessionManagement = ({ className }: SessionManagementProps) => {
 	const [sessions, setSessions] = useState<Session[]>([]);
@@ -28,74 +65,22 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 	const [terminatingSession, setTerminatingSession] = useState<string | null>(
 		null,
 	);
-
-	// Mock data for demonstration - replace with actual Better Auth session fetching
-	const mockSessions: Session[] = [
-		{
-			id: "1",
-			device: "macOS",
-			browser: "Chrome 138.0.0.0",
-			location: "Vancouver, Canada",
-			ipAddress: "224.0.1.1",
-			createdAt: new Date().toISOString(),
-			lastActiveAt: new Date().toISOString(),
-			isCurrent: true,
-		},
-		{
-			id: "2",
-			device: "iOS",
-			browser: "Mobile Safari 18.5",
-			location: "Québec, Canada",
-			ipAddress: "226.0.1.1",
-			createdAt: new Date(Date.now() - 11 * 60 * 60 * 1000).toISOString(),
-			lastActiveAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-		},
-		{
-			id: "3",
-			device: "Windows",
-			browser: "Mozilla Firefox 120.0",
-			location: "Paris, France",
-			ipAddress: "227.0.1.1",
-			createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-			lastActiveAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
-		},
-		{
-			id: "4",
-			device: "Linux",
-			browser: "Google Chrome 119.0",
-			location: "Berlin, Germany",
-			ipAddress: "228.0.1.1",
-			createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-			lastActiveAt: new Date(
-				Date.now() - 1 * 24 * 60 * 60 * 1000,
-			).toISOString(),
-		},
-		{
-			id: "5",
-			device: "Android",
-			browser: "Chrome Mobile 119.0",
-			location: "Tokyo, Japan",
-			ipAddress: "229.0.1.1",
-			createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-			lastActiveAt: new Date(
-				Date.now() - 2 * 24 * 60 * 60 * 1000,
-			).toISOString(),
-		},
-	];
+	const [terminatingAll, setTerminatingAll] = useState(false);
+	const { data: currentSession } = authClient.useSession();
 
 	useEffect(() => {
 		const fetchSessions = async () => {
 			try {
-				const response = await fetch("/api/sessions");
-				if (!response.ok) {
-					throw new Error("Failed to fetch sessions");
+				const { data, error } = await authClient.listSessions();
+
+				if (error) {
+					throw new Error(error.message || "Failed to fetch sessions");
 				}
-				const { sessions } = await response.json();
-				setSessions(sessions);
+
+				setSessions(data || []);
 			} catch (error) {
 				toast.error("Failed to load sessions");
-				// Fallback to mock data
-				setSessions(mockSessions);
+				setSessions([]);
 			} finally {
 				setLoading(false);
 			}
@@ -104,18 +89,16 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 		fetchSessions();
 	}, []);
 
-	const handleTerminateSession = async (sessionId: string) => {
-		setTerminatingSession(sessionId);
+	const handleTerminateSession = async (token: string) => {
+		setTerminatingSession(token);
 		try {
-			const response = await fetch(`/api/sessions?sessionId=${sessionId}`, {
-				method: "DELETE",
-			});
+			const { error } = await authClient.revokeSession({ token });
 
-			if (!response.ok) {
-				throw new Error("Failed to terminate session");
+			if (error) {
+				throw new Error(error.message || "Failed to terminate session");
 			}
 
-			setSessions((prev) => prev.filter((session) => session.id !== sessionId));
+			setSessions((prev) => prev.filter((session) => session.token !== token));
 			toast.success("Session terminated successfully");
 		} catch (error) {
 			toast.error("Failed to terminate session");
@@ -125,34 +108,24 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 	};
 
 	const handleTerminateAllSessions = async () => {
+		setTerminatingAll(true);
 		try {
-			// TODO: Implement actual session termination for all sessions
-			// await authClient.terminateAllSessions();
+			const { error } = await authClient.revokeOtherSessions();
 
-			// Mock implementation
-			await new Promise((resolve) => setTimeout(resolve, 1000));
+			if (error) {
+				throw new Error(error.message || "Failed to terminate sessions");
+			}
 
-			setSessions((prev) => prev.filter((session) => session.isCurrent));
+			// Keep only the current session
+			setSessions((prev) =>
+				prev.filter((session) => session.token === currentSession?.session?.token),
+			);
 			toast.success("All other sessions terminated successfully");
 		} catch (error) {
 			toast.error("Failed to terminate all sessions");
+		} finally {
+			setTerminatingAll(false);
 		}
-	};
-
-	const getBrowserIcon = (browser: string) => {
-		if (browser.toLowerCase().includes("chrome")) {
-			return "chrome";
-		}
-		if (browser.toLowerCase().includes("firefox")) {
-			return "firefox";
-		}
-		if (browser.toLowerCase().includes("safari")) {
-			return "safari";
-		}
-		if (browser.toLowerCase().includes("edge")) {
-			return "edge";
-		}
-		return "globe";
 	};
 
 	const getDeviceIcon = (device: string) => {
@@ -174,11 +147,27 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 		return "laptop";
 	};
 
-	const formatTimeAgo = (dateString: string) => {
-		const date = new Date(dateString);
+	const getBrowserIcon = (browser: string) => {
+		if (browser.toLowerCase().includes("chrome")) {
+			return "chrome";
+		}
+		if (browser.toLowerCase().includes("firefox")) {
+			return "firefox";
+		}
+		if (browser.toLowerCase().includes("safari")) {
+			return "safari";
+		}
+		if (browser.toLowerCase().includes("edge")) {
+			return "edge";
+		}
+		return "globe";
+	};
+
+	const formatTimeAgo = (date: Date) => {
 		const now = new Date();
+		const dateObj = new Date(date);
 		const diffInHours = Math.floor(
-			(now.getTime() - date.getTime()) / (1000 * 60 * 60),
+			(now.getTime() - dateObj.getTime()) / (1000 * 60 * 60),
 		);
 
 		if (diffInHours < 1) {
@@ -191,12 +180,16 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 		return `${diffInDays} day${diffInDays > 1 ? "s" : ""} ago`;
 	};
 
+	const isCurrentSession = (session: Session) => {
+		return session.token === currentSession?.session?.token;
+	};
+
 	if (loading) {
 		return (
 			<div className={cn("space-y-6", className)}>
 				<div className="flex items-center justify-between">
 					<div>
-						<h2 className="font-semibold text-2xl text-text-strong-950">
+						<h2 className="font-semibold text-lg text-text-strong-950">
 							Active Sessions
 						</h2>
 						<p className="text-paragraph-sm text-text-sub-600">
@@ -220,7 +213,7 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 		<div className={cn("space-y-6", className)}>
 			<div className="flex items-center justify-between">
 				<div>
-					<h2 className="font-semibold text-2xl text-text-strong-950">
+					<h2 className="font-semibold text-lg text-text-strong-950">
 						Active Sessions
 					</h2>
 					<p className="text-paragraph-sm text-text-sub-600">
@@ -233,8 +226,13 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 						mode="stroke"
 						size="small"
 						onClick={handleTerminateAllSessions}
+						disabled={terminatingAll}
 					>
-						<Icon name="log-out" className="h-4 w-4" />
+						{terminatingAll ? (
+							<div className="h-4 w-4 animate-spin rounded-full border-2 border-error-base border-t-transparent" />
+						) : (
+							<Icon name="log-out" className="h-4 w-4" />
+						)}
 						Log Out All Sessions
 					</Button.Root>
 				)}
@@ -246,80 +244,79 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 						<Table.Row>
 							<Table.Head className="w-12" />
 							<Table.Head>Browser</Table.Head>
-							<Table.Head>Location</Table.Head>
 							<Table.Head>IP Address</Table.Head>
 							<Table.Head>Last Active</Table.Head>
 							<Table.Head className="w-20" />
 						</Table.Row>
 					</Table.Header>
 					<Table.Body>
-						{sessions.map((session) => (
-							<Table.Row key={session.id}>
-								<Table.Cell>
-									<div className="flex items-center justify-center">
-										<Icon
-											name={getDeviceIcon(session.device)}
-											className="h-5 w-5 text-text-sub-600"
-										/>
-									</div>
-								</Table.Cell>
-								<Table.Cell>
-									<div className="flex items-center gap-3">
-										<Icon
-											name={getBrowserIcon(session.browser)}
-											className="h-5 w-5 text-text-sub-600"
-										/>
-										<div>
-											<div className="flex items-center gap-2">
-												<span className="font-medium text-text-strong-950">
-													{session.device}
-												</span>
-												{session.isCurrent && (
-													<span className="rounded-full bg-primary-light px-2 py-0.5 font-medium text-primary-base text-xs">
-														This device
-													</span>
-												)}
-											</div>
-											<p className="text-paragraph-sm text-text-sub-600">
-												{session.browser}
-											</p>
+						{sessions.map((session) => {
+							const { browser, device } = parseUserAgent(session.userAgent);
+							const isCurrent = isCurrentSession(session);
+
+							return (
+								<Table.Row key={session.id}>
+									<Table.Cell>
+										<div className="flex items-center justify-center">
+											<Icon
+												name={getDeviceIcon(device)}
+												className="h-5 w-5 text-text-sub-600"
+											/>
 										</div>
-									</div>
-								</Table.Cell>
-								<Table.Cell>
-									<span className="text-paragraph-sm text-text-strong-950">
-										{session.location || "Unknown"}
-									</span>
-								</Table.Cell>
-								<Table.Cell>
-									<span className="text-paragraph-sm text-text-strong-950">
-										{session.ipAddress || "--"}
-									</span>
-								</Table.Cell>
-								<Table.Cell>
-									<span className="text-paragraph-sm text-text-sub-600">
-										{formatTimeAgo(session.lastActiveAt)}
-									</span>
-								</Table.Cell>
-								<Table.Cell>
-									{!session.isCurrent && (
-										<Button.Root
-											variant="error"
-											mode="ghost"
-											size="xsmall"
-											onClick={() => handleTerminateSession(session.id)}
-											disabled={terminatingSession === session.id}
-										>
-											{terminatingSession === session.id ? (
-												<div className="h-4 w-4 animate-spin rounded-full border-2 border-error-base border-t-transparent" />
-											) : (
-												<Icon name="x" className="h-4 w-4" />
-											)}
-										</Button.Root>
-									)}
-								</Table.Cell>
-							</Table.Row>
-						))}
+									</Table.Cell>
+									<Table.Cell>
+										<div className="flex items-center gap-3">
+											<Icon
+												name={getBrowserIcon(browser)}
+												className="h-5 w-5 text-text-sub-600"
+											/>
+											<div>
+												<div className="flex items-center gap-2">
+													<span className="font-medium text-text-strong-950">
+														{device}
+													</span>
+													{isCurrent && (
+														<span className="rounded-full bg-primary-light px-2 py-0.5 font-medium text-primary-base text-xs">
+															This device
+														</span>
+													)}
+												</div>
+												<p className="text-paragraph-sm text-text-sub-600">
+													{browser}
+												</p>
+											</div>
+										</div>
+									</Table.Cell>
+									<Table.Cell>
+										<span className="text-paragraph-sm text-text-strong-950">
+											{session.ipAddress || "--"}
+										</span>
+									</Table.Cell>
+									<Table.Cell>
+										<span className="text-paragraph-sm text-text-sub-600">
+											{formatTimeAgo(session.updatedAt)}
+										</span>
+									</Table.Cell>
+									<Table.Cell>
+										{!isCurrent && (
+											<Button.Root
+												variant="error"
+												mode="ghost"
+												size="xsmall"
+												onClick={() => handleTerminateSession(session.token)}
+												disabled={terminatingSession === session.token}
+											>
+												{terminatingSession === session.token ? (
+													<div className="h-4 w-4 animate-spin rounded-full border-2 border-error-base border-t-transparent" />
+												) : (
+													<Icon name="x" className="h-4 w-4" />
+												)}
+											</Button.Root>
+										)}
+									</Table.Cell>
+								</Table.Row>
+							);
+						})}
 					</Table.Body>
 				</Table.Root>
 			</div>

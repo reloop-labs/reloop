@@ -1,5 +1,6 @@
 "use client";
 
+import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -94,20 +95,14 @@ export const PasswordChange = ({ className }: PasswordChangeProps) => {
 
 		setIsLoading(true);
 		try {
-			const response = await fetch("/api/auth/change-password", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					currentPassword: form.currentPassword,
-					newPassword: form.newPassword,
-				}),
+			const { error } = await authClient.changePassword({
+				newPassword: form.newPassword,
+				currentPassword: form.currentPassword,
+				revokeOtherSessions: true,
 			});
 
-			if (!response.ok) {
-				const errorData = await response.json();
-				throw new Error(errorData.error || "Failed to change password");
+			if (error) {
+				throw new Error(error.message || "Failed to change password");
 			}
 
 			toast.success("Password changed successfully");
