@@ -7,6 +7,17 @@ import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import {
+	Safari,
+	Chrome,
+	BraveBrowser,
+	Firefox,
+	Edge,
+	Opera,
+	Windows,
+	Apple,
+	Ubuntu,
+} from "@fe/dashboard/app/(protected)/[orgSlug]/settings/security/session-icons";
 
 interface Session {
 	id: string;
@@ -23,15 +34,18 @@ interface SessionManagementProps {
 	className?: string;
 }
 
-// Parse user agent to extract browser and device info
+// Parse user agent to extract browser, device type, and OS info
 const parseUserAgent = (userAgent: string | null | undefined) => {
-	if (!userAgent) return { browser: "Unknown", device: "Unknown" };
+	if (!userAgent) return { browser: "Unknown", device: "Unknown", isMobile: false };
 
 	let browser = "Unknown";
 	let device = "Unknown";
+	let isMobile = false;
 
 	// Detect browser
-	if (userAgent.includes("Chrome") && !userAgent.includes("Edg")) {
+	if (userAgent.includes("Brave")) {
+		browser = "Brave";
+	} else if (userAgent.includes("Chrome") && !userAgent.includes("Edg")) {
 		browser = "Chrome";
 	} else if (userAgent.includes("Firefox")) {
 		browser = "Firefox";
@@ -48,15 +62,24 @@ const parseUserAgent = (userAgent: string | null | undefined) => {
 		device = "macOS";
 	} else if (userAgent.includes("Windows")) {
 		device = "Windows";
+	} else if (userAgent.includes("Ubuntu")) {
+		device = "Ubuntu";
 	} else if (userAgent.includes("Linux") && !userAgent.includes("Android")) {
 		device = "Linux";
 	} else if (userAgent.includes("Android")) {
 		device = "Android";
+		isMobile = true;
 	} else if (userAgent.includes("iPhone") || userAgent.includes("iPad")) {
 		device = "iOS";
+		isMobile = userAgent.includes("iPhone");
 	}
 
-	return { browser, device };
+	// Also check for mobile indicators
+	if (userAgent.includes("Mobile") || userAgent.includes("Android")) {
+		isMobile = true;
+	}
+
+	return { browser, device, isMobile };
 };
 
 export const SessionManagement = ({ className }: SessionManagementProps) => {
@@ -128,23 +151,56 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 		}
 	};
 
-	const getDeviceIcon = (device: string) => {
-		if (device.toLowerCase().includes("macos")) {
-			return "laptop";
+	// Get browser icon component
+	const getBrowserIcon = (browser: string) => {
+		const iconClass = "h-4 w-4";
+		switch (browser) {
+			case "Chrome":
+				return <Chrome className={iconClass} />;
+			case "Firefox":
+				return <Firefox className={iconClass} />;
+			case "Safari":
+				return <Safari className={iconClass} />;
+			case "Edge":
+				return <Edge className={iconClass} />;
+			case "Opera":
+				return <Opera className={iconClass} />;
+			case "Brave":
+				return <BraveBrowser className={iconClass} />;
+			default:
+				return <Icon name="globe" className="h-4 w-4 text-text-sub-600" />;
 		}
-		if (device.toLowerCase().includes("ios")) {
-			return "smartphone";
+	};
+
+	// Get OS icon component
+	const getOsIcon = (device: string) => {
+		const iconClass = "h-4 w-4";
+		const deviceLower = device.toLowerCase();
+		if (deviceLower.includes("macos") || deviceLower.includes("ios")) {
+			return <Apple className={iconClass} />;
 		}
-		if (device.toLowerCase().includes("android")) {
-			return "smartphone";
+		if (deviceLower.includes("windows")) {
+			return <Windows className={iconClass} />;
 		}
-		if (device.toLowerCase().includes("windows")) {
-			return "monitor";
+		if (deviceLower.includes("ubuntu")) {
+			return <Ubuntu className={iconClass} />;
 		}
-		if (device.toLowerCase().includes("linux")) {
-			return "server";
+		if (deviceLower.includes("linux")) {
+			return <Icon name="server" className="h-4 w-4 text-text-sub-600" />;
 		}
-		return "laptop";
+		if (deviceLower.includes("android")) {
+			return <Icon name="smartphone" className="h-4 w-4 text-text-sub-600" />;
+		}
+		return <Icon name="laptop" className="h-4 w-4 text-text-sub-600" />;
+	};
+
+	// Get device type icon (mobile or desktop)
+	const getDeviceTypeIcon = (isMobile: boolean) => {
+		return isMobile ? (
+			<Icon name="smartphone" className="h-4 w-4 text-text-sub-600" />
+		) : (
+			<Icon name="monitor" className="h-4 w-4 text-text-sub-600" />
+		);
 	};
 
 	const formatTimeAgo = (date: Date) => {
@@ -246,26 +302,29 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 
 					{/* Rows */}
 					{sessions.map((session) => {
-						const { browser, device } = parseUserAgent(session.userAgent);
+						const { browser, device, isMobile } = parseUserAgent(session.userAgent);
 						const isCurrent = isCurrentSession(session);
 
 						return (
 							<div key={session.id} className="group/row contents">
-								{/* Device Column */}
+								{/* Device Column - shows OS icon and device type */}
 								<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
 									<div className="flex items-center gap-2 pl-5">
 										<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-bg-weak-50">
-											<Icon
-												name={getDeviceIcon(device)}
-												className="h-4 w-4 text-text-sub-600"
-											/>
+											{getOsIcon(device)}
+										</div>
+										<div className="flex h-6 w-6 items-center justify-center">
+											{getDeviceTypeIcon(isMobile)}
 										</div>
 									</div>
 								</div>
 
-								{/* Browser Column */}
+								{/* Browser Column - shows browser icon and info */}
 								<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
-									<div>
+									<div className="flex items-center gap-3">
+										<div className="flex h-6 w-6 items-center justify-center">
+											{getBrowserIcon(browser)}
+										</div>
 										<div className="flex items-center gap-2">
 											<span className="font-medium text-label-sm text-text-strong-950">
 												{browser} on {device}
