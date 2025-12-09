@@ -4,7 +4,7 @@ import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import * as Table from "@reloop/ui/table";
+import Spinner from "@reloop/ui/spinner";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -147,22 +147,6 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 		return "laptop";
 	};
 
-	const getBrowserIcon = (browser: string) => {
-		if (browser.toLowerCase().includes("chrome")) {
-			return "chrome";
-		}
-		if (browser.toLowerCase().includes("firefox")) {
-			return "firefox";
-		}
-		if (browser.toLowerCase().includes("safari")) {
-			return "safari";
-		}
-		if (browser.toLowerCase().includes("edge")) {
-			return "edge";
-		}
-		return "globe";
-	};
-
 	const formatTimeAgo = (date: Date) => {
 		const now = new Date();
 		const dateObj = new Date(date);
@@ -186,36 +170,31 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 
 	if (loading) {
 		return (
-			<div className={cn("space-y-6", className)}>
+			<div className={cn("space-y-4", className)}>
 				<div className="flex items-center justify-between">
 					<div>
-						<h2 className="font-semibold text-lg text-text-strong-950">
+						<p className="font-medium text-label-md text-text-strong-950">
 							Active Sessions
-						</h2>
+						</p>
 						<p className="text-paragraph-sm text-text-sub-600">
 							Monitor and manage all your active sessions.
 						</p>
 					</div>
 				</div>
 				<div className="flex items-center justify-center py-12">
-					<div className="flex items-center gap-2">
-						<div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-base border-t-transparent" />
-						<span className="text-paragraph-sm text-text-sub-600">
-							Loading sessions...
-						</span>
-					</div>
+					<Spinner size={20} color="var(--text-strong-950)" />
 				</div>
 			</div>
 		);
 	}
 
 	return (
-		<div className={cn("space-y-6", className)}>
+		<div className={cn("space-y-4", className)}>
 			<div className="flex items-center justify-between">
 				<div>
-					<h2 className="font-semibold text-lg text-text-strong-950">
+					<p className="font-medium text-label-md text-text-strong-950">
 						Active Sessions
-					</h2>
+					</p>
 					<p className="text-paragraph-sm text-text-sub-600">
 						Monitor and manage all your active sessions.
 					</p>
@@ -224,102 +203,121 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 					<Button.Root
 						variant="error"
 						mode="stroke"
-						size="small"
+						size="xsmall"
 						onClick={handleTerminateAllSessions}
 						disabled={terminatingAll}
 					>
 						{terminatingAll ? (
-							<div className="h-4 w-4 animate-spin rounded-full border-2 border-error-base border-t-transparent" />
+							<Spinner size={14} color="var(--error-base)" />
 						) : (
 							<Icon name="log-out" className="h-4 w-4" />
 						)}
-						Log Out All Sessions
+						Log Out All
 					</Button.Root>
 				)}
 			</div>
 
-			<div className="rounded-xl border border-stroke-soft-100 bg-bg-white-0">
-				<Table.Root>
-					<Table.Header>
-						<Table.Row>
-							<Table.Head className="w-12" />
-							<Table.Head>Browser</Table.Head>
-							<Table.Head>IP Address</Table.Head>
-							<Table.Head>Last Active</Table.Head>
-							<Table.Head className="w-20" />
-						</Table.Row>
-					</Table.Header>
-					<Table.Body>
-						{sessions.map((session) => {
-							const { browser, device } = parseUserAgent(session.userAgent);
-							const isCurrent = isCurrentSession(session);
+			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-200 text-paragraph-sm shadow-regular-md ring-stroke-soft-200 ring-inset">
+				<div className="grid grid-cols-[minmax(60px,auto)_1fr_minmax(120px,auto)_minmax(120px,auto)_minmax(50px,auto)]">
+					{/* Header */}
+					<div className="bg-bg-weak-50 pl-5 font-medium text-text-sub-600">
+						<div className="py-2.5 text-gray-800 dark:text-gray-200">
+							Device
+						</div>
+					</div>
+					<div className="bg-bg-weak-50 font-medium text-text-sub-600">
+						<div className="py-2.5 text-gray-800 dark:text-gray-200">
+							Browser
+						</div>
+					</div>
+					<div className="bg-bg-weak-50 font-medium text-text-sub-600">
+						<div className="py-2.5 text-gray-800 dark:text-gray-200">
+							IP Address
+						</div>
+					</div>
+					<div className="bg-bg-weak-50 font-medium text-text-sub-600">
+						<div className="py-2.5 text-gray-800 dark:text-gray-200">
+							Last Active
+						</div>
+					</div>
+					<div className="bg-bg-weak-50 font-medium text-text-sub-600">
+						<div className="py-2.5" />
+					</div>
 
-							return (
-								<Table.Row key={session.id}>
-									<Table.Cell>
-										<div className="flex items-center justify-center">
+					{/* Rows */}
+					{sessions.map((session) => {
+						const { browser, device } = parseUserAgent(session.userAgent);
+						const isCurrent = isCurrentSession(session);
+
+						return (
+							<div key={session.id} className="group/row contents">
+								{/* Device Column */}
+								<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
+									<div className="flex items-center gap-2 pl-5">
+										<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-bg-weak-50">
 											<Icon
 												name={getDeviceIcon(device)}
-												className="h-5 w-5 text-text-sub-600"
+												className="h-4 w-4 text-text-sub-600"
 											/>
 										</div>
-									</Table.Cell>
-									<Table.Cell>
-										<div className="flex items-center gap-3">
-											<Icon
-												name={getBrowserIcon(browser)}
-												className="h-5 w-5 text-text-sub-600"
-											/>
-											<div>
-												<div className="flex items-center gap-2">
-													<span className="font-medium text-text-strong-950">
-														{device}
-													</span>
-													{isCurrent && (
-														<span className="rounded-full bg-primary-light px-2 py-0.5 font-medium text-primary-base text-xs">
-															This device
-														</span>
-													)}
-												</div>
-												<p className="text-paragraph-sm text-text-sub-600">
-													{browser}
-												</p>
-											</div>
+									</div>
+								</div>
+
+								{/* Browser Column */}
+								<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
+									<div>
+										<div className="flex items-center gap-2">
+											<span className="font-medium text-label-sm text-text-strong-950">
+												{browser} on {device}
+											</span>
+											{isCurrent && (
+												<span className="rounded-full bg-primary-light px-2 py-0.5 font-medium text-primary-base text-xs">
+													This device
+												</span>
+											)}
 										</div>
-									</Table.Cell>
-									<Table.Cell>
-										<span className="text-paragraph-sm text-text-strong-950">
-											{session.ipAddress || "--"}
-										</span>
-									</Table.Cell>
-									<Table.Cell>
-										<span className="text-paragraph-sm text-text-sub-600">
-											{formatTimeAgo(session.updatedAt)}
-										</span>
-									</Table.Cell>
-									<Table.Cell>
-										{!isCurrent && (
-											<Button.Root
-												variant="error"
-												mode="ghost"
-												size="xsmall"
-												onClick={() => handleTerminateSession(session.token)}
-												disabled={terminatingSession === session.token}
-											>
-												{terminatingSession === session.token ? (
-													<div className="h-4 w-4 animate-spin rounded-full border-2 border-error-base border-t-transparent" />
-												) : (
-													<Icon name="x" className="h-4 w-4" />
-												)}
-											</Button.Root>
-										)}
-									</Table.Cell>
-								</Table.Row>
-							);
-						})}
-					</Table.Body>
-				</Table.Root>
+									</div>
+								</div>
+
+								{/* IP Address Column */}
+								<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
+									<span className="text-label-sm text-text-strong-950">
+										{session.ipAddress || "--"}
+									</span>
+								</div>
+
+								{/* Last Active Column */}
+								<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
+									<span className="text-label-sm text-text-sub-600">
+										{formatTimeAgo(session.updatedAt)}
+									</span>
+								</div>
+
+								{/* Action Column */}
+								<div className="flex items-center justify-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
+									{!isCurrent && (
+										<Button.Root
+											variant="error"
+											mode="ghost"
+											size="xxsmall"
+											onClick={() => handleTerminateSession(session.token)}
+											disabled={terminatingSession === session.token}
+										>
+											{terminatingSession === session.token ? (
+												<Spinner size={14} color="var(--error-base)" />
+											) : (
+												<Icon name="x" className="h-4 w-4" />
+											)}
+										</Button.Root>
+									)}
+								</div>
+							</div>
+						);
+					})}
+				</div>
 			</div>
 		</div>
 	);
 };
+
+

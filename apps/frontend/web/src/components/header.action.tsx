@@ -38,7 +38,7 @@ export const HeaderAction = () => {
 				Login
 			</a>
 			<a
-				href="/dashboard/sign-up"
+				href="/dashboard/signup"
 				className={Button.buttonVariants({
 					variant: "neutral",
 					size: "xsmall",
