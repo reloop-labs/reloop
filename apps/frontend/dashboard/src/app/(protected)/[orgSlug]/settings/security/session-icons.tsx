@@ -619,7 +619,7 @@ const Ubuntu = (props: SVGProps<SVGSVGElement>) => (
       cy="50"
       r="21.8"
       fill="none"
-      stroke="#fff"
+      stroke="currentColor"
       strokeWidth="8.6"
     />
     <g id="ubuntu__a">

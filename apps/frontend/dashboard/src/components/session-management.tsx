@@ -153,7 +153,7 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 
 	// Get browser icon component
 	const getBrowserIcon = (browser: string) => {
-		const iconClass = "h-4 w-4";
+		const iconClass = "h-full w-full";
 		switch (browser) {
 			case "Chrome":
 				return <Chrome className={iconClass} />;
@@ -168,13 +168,13 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 			case "Brave":
 				return <BraveBrowser className={iconClass} />;
 			default:
-				return <Icon name="globe" className="h-4 w-4 text-text-sub-600" />;
+				return <Icon name="globe" className="h-full w-full text-text-sub-600" />;
 		}
 	};
 
 	// Get OS icon component
 	const getOsIcon = (device: string) => {
-		const iconClass = "h-4 w-4";
+		const iconClass = "h-full w-full";
 		const deviceLower = device.toLowerCase();
 		if (deviceLower.includes("macos") || deviceLower.includes("ios")) {
 			return <Apple className={iconClass} />;
@@ -186,20 +186,20 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 			return <Ubuntu className={iconClass} />;
 		}
 		if (deviceLower.includes("linux")) {
-			return <Icon name="server" className="h-4 w-4 text-text-sub-600" />;
+			return <Icon name="server" className="h-full w-full text-text-sub-600" />;
 		}
 		if (deviceLower.includes("android")) {
-			return <Icon name="smartphone" className="h-4 w-4 text-text-sub-600" />;
+			return <Icon name="smartphone" className="h-full w-full text-text-sub-600" />;
 		}
-		return <Icon name="laptop" className="h-4 w-4 text-text-sub-600" />;
+		return <Icon name="laptop" className="h-full w-full text-text-sub-600" />;
 	};
 
 	// Get device type icon (mobile or desktop)
 	const getDeviceTypeIcon = (isMobile: boolean) => {
 		return isMobile ? (
-			<Icon name="smartphone" className="h-4 w-4 text-text-sub-600" />
+			<Icon name="smartphone" className="h-3 w-3 text-text-sub-600" />
 		) : (
-			<Icon name="monitor" className="h-4 w-4 text-text-sub-600" />
+			<Icon name="monitor" className="h-3 w-3 text-text-sub-600" />
 		);
 	};
 
@@ -266,107 +266,113 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 						{terminatingAll ? (
 							<Spinner size={14} color="var(--error-base)" />
 						) : (
-							<Icon name="log-out" className="h-4 w-4" />
+							<Icon name="logout" className="h-4 w-4" />
 						)}
-						Log Out All
+						Revoke All Sessions
 					</Button.Root>
 				)}
 			</div>
 
-			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-200 text-paragraph-sm shadow-regular-md ring-stroke-soft-200 ring-inset">
-				<div className="grid grid-cols-[minmax(60px,auto)_1fr_minmax(120px,auto)_minmax(120px,auto)_minmax(50px,auto)]">
-					{/* Header */}
-					<div className="bg-bg-weak-50 pl-5 font-medium text-text-sub-600">
-						<div className="py-2.5 text-gray-800 dark:text-gray-200">
-							Device
-						</div>
+			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 text-paragraph-sm shadow-regular-md">
+				{/* Table Header */}
+				<div className="grid grid-cols-[1fr_minmax(120px,auto)_minmax(120px,auto)_minmax(100px,auto)] border-b border-stroke-soft-200 bg-bg-weak-50">
+					<div className="px-4 py-3 font-medium text-text-sub-600 text-xs uppercase tracking-wide">
+						Session
 					</div>
-					<div className="bg-bg-weak-50 font-medium text-text-sub-600">
-						<div className="py-2.5 text-gray-800 dark:text-gray-200">
-							Browser
-						</div>
+					<div className="px-4 py-3 font-medium text-text-sub-600 text-xs uppercase tracking-wide">
+						IP Address
 					</div>
-					<div className="bg-bg-weak-50 font-medium text-text-sub-600">
-						<div className="py-2.5 text-gray-800 dark:text-gray-200">
-							IP Address
-						</div>
+					<div className="px-4 py-3 font-medium text-text-sub-600 text-xs uppercase tracking-wide">
+						Last Active
 					</div>
-					<div className="bg-bg-weak-50 font-medium text-text-sub-600">
-						<div className="py-2.5 text-gray-800 dark:text-gray-200">
-							Last Active
-						</div>
-					</div>
-					<div className="bg-bg-weak-50 font-medium text-text-sub-600">
-						<div className="py-2.5" />
-					</div>
+					<div className="px-4 py-3" />
+				</div>
 
-					{/* Rows */}
+				{/* Table Body */}
+				<div className="divide-y divide-stroke-soft-200">
 					{sessions.map((session) => {
 						const { browser, device, isMobile } = parseUserAgent(session.userAgent);
 						const isCurrent = isCurrentSession(session);
 
 						return (
-							<div key={session.id} className="group/row contents">
-								{/* Device Column - shows OS icon and device type */}
-								<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
-									<div className="flex items-center gap-2 pl-5">
-										<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-bg-weak-50">
-											{getOsIcon(device)}
-										</div>
-										<div className="flex h-6 w-6 items-center justify-center">
-											{getDeviceTypeIcon(isMobile)}
-										</div>
-									</div>
-								</div>
-
-								{/* Browser Column - shows browser icon and info */}
-								<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
-									<div className="flex items-center gap-3">
-										<div className="flex h-6 w-6 items-center justify-center">
+							<div
+								key={session.id}
+								className={cn(
+									"grid grid-cols-[1fr_minmax(120px,auto)_minmax(120px,auto)_minmax(100px,auto)] transition-colors",
+									isCurrent
+										? "bg-primary-light/20 hover:bg-primary-light/30"
+										: "hover:bg-bg-weak-50/50"
+								)}
+							>
+								{/* Session Info Column */}
+								<div className="flex items-center gap-3 px-4 py-3">
+									{/* Combined Device Badge */}
+									<div className="relative flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-bg-weak-50 ring-1 ring-stroke-soft-200">
+										<div className="h-5 w-5">
 											{getBrowserIcon(browser)}
 										</div>
+										{/* OS Badge */}
+										<div className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-md bg-bg-white-0 ring-1 ring-stroke-soft-200">
+											<div className="h-3 w-3">
+												{getOsIcon(device)}
+											</div>
+										</div>
+									</div>
+
+									{/* Session Details */}
+									<div className="min-w-0 flex-1">
 										<div className="flex items-center gap-2">
-											<span className="font-medium text-label-sm text-text-strong-950">
-												{browser} on {device}
+											<span className="truncate font-medium text-label-sm text-text-strong-950">
+												{browser}
 											</span>
 											{isCurrent && (
-												<span className="rounded-full bg-primary-light px-2 py-0.5 font-medium text-primary-base text-xs">
-													This device
+												<span className="flex items-center gap-1 rounded-full bg-success-lighter px-2 py-0.5 text-xs text-success-base">
+													<span className="h-1.5 w-1.5 rounded-full bg-success-base" />
+													Current
 												</span>
 											)}
+										</div>
+										<div className="flex items-center gap-1.5 text-text-sub-600 text-xs">
+											<span>{device}</span>
+											<span>•</span>
+											<span className="flex items-center gap-1">
+												{getDeviceTypeIcon(isMobile)}
+												{isMobile ? "Mobile" : "Desktop"}
+											</span>
 										</div>
 									</div>
 								</div>
 
 								{/* IP Address Column */}
-								<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
-									<span className="text-label-sm text-text-strong-950">
-										{session.ipAddress || "--"}
+								<div className="flex items-center px-4 py-3">
+									<span className="font-mono text-label-sm text-text-sub-600">
+										{session.ipAddress || "—"}
 									</span>
 								</div>
 
 								{/* Last Active Column */}
-								<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
+								<div className="flex items-center px-4 py-3">
 									<span className="text-label-sm text-text-sub-600">
 										{formatTimeAgo(session.updatedAt)}
 									</span>
 								</div>
 
 								{/* Action Column */}
-								<div className="flex items-center justify-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
+								<div className="flex items-center justify-end px-4 py-3">
 									{!isCurrent && (
 										<Button.Root
 											variant="error"
 											mode="ghost"
-											size="xxsmall"
+											size="xsmall"
 											onClick={() => handleTerminateSession(session.token)}
 											disabled={terminatingSession === session.token}
 										>
 											{terminatingSession === session.token ? (
 												<Spinner size={14} color="var(--error-base)" />
 											) : (
-												<Icon name="x" className="h-4 w-4" />
+												<Icon name="logout" className="h-4 w-4" />
 											)}
+											Revoke
 										</Button.Root>
 									)}
 								</div>
@@ -374,6 +380,17 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 						);
 					})}
 				</div>
+
+				{/* Empty State */}
+				{sessions.length === 0 && (
+					<div className="flex flex-col items-center justify-center py-12 text-center">
+						<Icon name="shield" className="mb-3 h-8 w-8 text-text-sub-600" />
+						<p className="font-medium text-text-strong-950">No active sessions</p>
+						<p className="text-sm text-text-sub-600">
+							Your session is the only active one.
+						</p>
+					</div>
+				)}
 			</div>
 		</div>
 	);
