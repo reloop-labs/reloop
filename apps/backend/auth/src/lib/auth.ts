@@ -65,11 +65,14 @@ export const auth = betterAuth({
 		enabled: true,
 		sendResetPassword: async ({ user, url, token }, request) => {
 			logger.info("🔐 Password reset requested for:", user.email);
-			logger.info("🔗 Reset URL:", url);
-			logger.info("🔑 Token:", token);
+
+			// Log reset URL and token only in development for easy testing
+			if (process.env.NODE_ENV === "development") {
+				logger.info("🔗 Reset URL (DEV):", url);
+				logger.info("🔑 Token (DEV):", token);
+			}
 
 			try {
-				logger.info("📧 Attempting to send email...");
 				await sendPasswordResetEmail(user.email, url);
 				logger.info(`✅ Password reset email sent to ${user.email}`);
 			} catch (error) {
@@ -101,7 +104,7 @@ export const auth = betterAuth({
 		apiKey({ defaultPrefix: "rl" }),
 		organization({
 			sendInvitationEmail: async (data) => {
-				const inviteLink = `${process.env.FRONTEND_URL || "http://localhost:3000"}/accept-invitation/${data.id}`;
+				const inviteLink = `${process.env.FRONTEND_URL || "http://localhost:3001"}/accept-invitation?id=${data.id}`;
 
 				logger.info("📧 Organization invitation requested:", {
 					email: data.email,
@@ -109,6 +112,11 @@ export const auth = betterAuth({
 					role: data.role,
 					inviter: data.inviter.user.email,
 				});
+
+				// Log invite URL in development for easy testing
+				if (process.env.NODE_ENV === "development") {
+					logger.info("🔗 Invite URL (DEV):", inviteLink);
+				}
 
 				try {
 					await sendOrganizationInviteEmail({
