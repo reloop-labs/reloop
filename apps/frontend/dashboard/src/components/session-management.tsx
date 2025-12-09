@@ -1,121 +1,140 @@
 "use client";
 
+import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import * as Table from "@reloop/ui/table";
-import { useEffect, useState } from "react";
+import { Skeleton } from "@reloop/ui/skeleton";
+import Spinner from "@reloop/ui/spinner";
+import { AnimatePresence, motion } from "motion/react";
+import { useState } from "react";
 import { toast } from "sonner";
+import useSWR from "swr";
+import {
+	Safari,
+	Chrome,
+	BraveBrowser,
+	Firefox,
+	Edge,
+	Opera,
+	Windows,
+	Apple,
+	Ubuntu,
+} from "@fe/dashboard/app/(protected)/[orgSlug]/settings/security/session-icons";
 
 interface Session {
 	id: string;
-	device: string;
-	browser: string;
-	location?: string;
-	ipAddress?: string;
-	createdAt: string;
-	lastActiveAt: string;
-	isCurrent?: boolean;
+	token: string;
+	userId: string;
+	expiresAt: Date;
+	createdAt: Date;
+	updatedAt: Date;
+	ipAddress?: string | null;
+	userAgent?: string | null;
 }
 
 interface SessionManagementProps {
 	className?: string;
 }
 
+// Parse user agent to extract browser, device type, and OS info
+const parseUserAgent = (userAgent: string | null | undefined) => {
+	if (!userAgent) return { browser: "Unknown", device: "Unknown", isMobile: false };
+
+	let browser = "Unknown";
+	let device = "Unknown";
+	let isMobile = false;
+
+	// Detect browser
+	if (userAgent.includes("Brave")) {
+		browser = "Brave";
+	} else if (userAgent.includes("Chrome") && !userAgent.includes("Edg")) {
+		browser = "Chrome";
+	} else if (userAgent.includes("Firefox")) {
+		browser = "Firefox";
+	} else if (userAgent.includes("Safari") && !userAgent.includes("Chrome")) {
+		browser = "Safari";
+	} else if (userAgent.includes("Edg")) {
+		browser = "Edge";
+	} else if (userAgent.includes("Opera") || userAgent.includes("OPR")) {
+		browser = "Opera";
+	}
+
+	// Detect device/OS
+	if (userAgent.includes("Mac OS X")) {
+		device = "macOS";
+	} else if (userAgent.includes("Windows")) {
+		device = "Windows";
+	} else if (userAgent.includes("Ubuntu")) {
+		device = "Ubuntu";
+	} else if (userAgent.includes("Linux") && !userAgent.includes("Android")) {
+		device = "Linux";
+	} else if (userAgent.includes("Android")) {
+		device = "Android";
+		isMobile = true;
+	} else if (userAgent.includes("iPhone") || userAgent.includes("iPad")) {
+		device = "iOS";
+		isMobile = userAgent.includes("iPhone");
+	}
+
+	// Also check for mobile indicators
+	if (userAgent.includes("Mobile") || userAgent.includes("Android")) {
+		isMobile = true;
+	}
+
+	return { browser, device, isMobile };
+};
+
+/**
+ * Get animation properties for staggered animations
+ */
+const getAnimationProps = (row: number, column: number) => {
+	return {
+		initial: { opacity: 0, y: "-100%" },
+		animate: { opacity: 1, y: 0 },
+		exit: { opacity: 0, y: "100%" },
+		transition: {
+			duration: 0.5,
+			delay: row * 0.07 + column * 0.1,
+			ease: [0.65, 0, 0.35, 1] as const,
+		},
+	};
+};
+
 export const SessionManagement = ({ className }: SessionManagementProps) => {
-	const [sessions, setSessions] = useState<Session[]>([]);
-	const [loading, setLoading] = useState(true);
 	const [terminatingSession, setTerminatingSession] = useState<string | null>(
 		null,
 	);
+	const [terminatingAll, setTerminatingAll] = useState(false);
+	const { data: currentSession } = authClient.useSession();
 
-	// Mock data for demonstration - replace with actual Better Auth session fetching
-	const mockSessions: Session[] = [
-		{
-			id: "1",
-			device: "macOS",
-			browser: "Chrome 138.0.0.0",
-			location: "Vancouver, Canada",
-			ipAddress: "224.0.1.1",
-			createdAt: new Date().toISOString(),
-			lastActiveAt: new Date().toISOString(),
-			isCurrent: true,
+	const { data: sessions = [], isLoading: loading, mutate } = useSWR<Session[]>(
+		"active-sessions",
+		async () => {
+			const { data, error } = await authClient.listSessions();
+			if (error) {
+				throw new Error(error.message || "Failed to fetch sessions");
+			}
+			return data || [];
 		},
 		{
-			id: "2",
-			device: "iOS",
-			browser: "Mobile Safari 18.5",
-			location: "Québec, Canada",
-			ipAddress: "226.0.1.1",
-			createdAt: new Date(Date.now() - 11 * 60 * 60 * 1000).toISOString(),
-			lastActiveAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-		},
-		{
-			id: "3",
-			device: "Windows",
-			browser: "Mozilla Firefox 120.0",
-			location: "Paris, France",
-			ipAddress: "227.0.1.1",
-			createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-			lastActiveAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
-		},
-		{
-			id: "4",
-			device: "Linux",
-			browser: "Google Chrome 119.0",
-			location: "Berlin, Germany",
-			ipAddress: "228.0.1.1",
-			createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-			lastActiveAt: new Date(
-				Date.now() - 1 * 24 * 60 * 60 * 1000,
-			).toISOString(),
-		},
-		{
-			id: "5",
-			device: "Android",
-			browser: "Chrome Mobile 119.0",
-			location: "Tokyo, Japan",
-			ipAddress: "229.0.1.1",
-			createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-			lastActiveAt: new Date(
-				Date.now() - 2 * 24 * 60 * 60 * 1000,
-			).toISOString(),
-		},
-	];
-
-	useEffect(() => {
-		const fetchSessions = async () => {
-			try {
-				const response = await fetch("/api/sessions");
-				if (!response.ok) {
-					throw new Error("Failed to fetch sessions");
-				}
-				const { sessions } = await response.json();
-				setSessions(sessions);
-			} catch (error) {
+			revalidateOnFocus: false,
+			onError: () => {
 				toast.error("Failed to load sessions");
-				// Fallback to mock data
-				setSessions(mockSessions);
-			} finally {
-				setLoading(false);
-			}
-		};
+			},
+		}
+	);
 
-		fetchSessions();
-	}, []);
-
-	const handleTerminateSession = async (sessionId: string) => {
-		setTerminatingSession(sessionId);
+	const handleTerminateSession = async (token: string) => {
+		setTerminatingSession(token);
 		try {
-			const response = await fetch(`/api/sessions?sessionId=${sessionId}`, {
-				method: "DELETE",
-			});
+			const { error } = await authClient.revokeSession({ token });
 
-			if (!response.ok) {
-				throw new Error("Failed to terminate session");
+			if (error) {
+				throw new Error(error.message || "Failed to terminate session");
 			}
 
-			setSessions((prev) => prev.filter((session) => session.id !== sessionId));
+			mutate(sessions.filter((session) => session.token !== token), false);
 			toast.success("Session terminated successfully");
 		} catch (error) {
 			toast.error("Failed to terminate session");
@@ -125,60 +144,84 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 	};
 
 	const handleTerminateAllSessions = async () => {
+		setTerminatingAll(true);
 		try {
-			// TODO: Implement actual session termination for all sessions
-			// await authClient.terminateAllSessions();
+			const { error } = await authClient.revokeOtherSessions();
 
-			// Mock implementation
-			await new Promise((resolve) => setTimeout(resolve, 1000));
+			if (error) {
+				throw new Error(error.message || "Failed to terminate sessions");
+			}
 
-			setSessions((prev) => prev.filter((session) => session.isCurrent));
+			// Keep only the current session
+			mutate(
+				sessions.filter((session) => session.token === currentSession?.session?.token),
+				false
+			);
 			toast.success("All other sessions terminated successfully");
 		} catch (error) {
 			toast.error("Failed to terminate all sessions");
+		} finally {
+			setTerminatingAll(false);
 		}
 	};
 
+	// Get browser icon component
 	const getBrowserIcon = (browser: string) => {
-		if (browser.toLowerCase().includes("chrome")) {
-			return "chrome";
+		const iconClass = "h-full w-full";
+		switch (browser) {
+			case "Chrome":
+				return <Chrome className={iconClass} />;
+			case "Firefox":
+				return <Firefox className={iconClass} />;
+			case "Safari":
+				return <Safari className={iconClass} />;
+			case "Edge":
+				return <Edge className={iconClass} />;
+			case "Opera":
+				return <Opera className={iconClass} />;
+			case "Brave":
+				return <BraveBrowser className={iconClass} />;
+			default:
+				return <Icon name="globe" className="h-full w-full text-text-sub-600" />;
 		}
-		if (browser.toLowerCase().includes("firefox")) {
-			return "firefox";
-		}
-		if (browser.toLowerCase().includes("safari")) {
-			return "safari";
-		}
-		if (browser.toLowerCase().includes("edge")) {
-			return "edge";
-		}
-		return "globe";
 	};
 
-	const getDeviceIcon = (device: string) => {
-		if (device.toLowerCase().includes("macos")) {
-			return "laptop";
+	// Get OS icon component
+	const getOsIcon = (device: string) => {
+		const iconClass = "h-full w-full";
+		const deviceLower = device.toLowerCase();
+		if (deviceLower.includes("macos") || deviceLower.includes("ios")) {
+			return <Apple className={iconClass} />;
 		}
-		if (device.toLowerCase().includes("ios")) {
-			return "smartphone";
+		if (deviceLower.includes("windows")) {
+			return <Windows className={iconClass} />;
 		}
-		if (device.toLowerCase().includes("android")) {
-			return "smartphone";
+		if (deviceLower.includes("ubuntu")) {
+			return <Ubuntu className={iconClass} />;
 		}
-		if (device.toLowerCase().includes("windows")) {
-			return "monitor";
+		if (deviceLower.includes("linux")) {
+			return <Icon name="server" className="h-full w-full text-text-sub-600" />;
 		}
-		if (device.toLowerCase().includes("linux")) {
-			return "server";
+		if (deviceLower.includes("android")) {
+			return <Icon name="smartphone" className="h-full w-full text-text-sub-600" />;
 		}
-		return "laptop";
+		return <Icon name="laptop" className="h-full w-full text-text-sub-600" />;
 	};
 
-	const formatTimeAgo = (dateString: string) => {
-		const date = new Date(dateString);
+	// Get device type icon (mobile or desktop)
+	const getDeviceTypeIcon = (isMobile: boolean) => {
+		return isMobile ? (
+			<Icon name="smartphone" className="h-3 w-3 text-text-sub-600" />
+		) : (
+			<Icon name="monitor" className="h-3 w-3 text-text-sub-600" />
+		);
+	};
+
+	const formatTimeAgo = (date: Date) => {
 		const now = new Date();
+		const dateObj = new Date(date);
 		const diffInHours = Math.floor(
-			(now.getTime() - date.getTime()) / (1000 * 60 * 60),
+			(now.getTime() - dateObj.getTime()) / (1000 * 60 * 60),
 		);
 
 		if (diffInHours < 1) {
@@ -191,25 +234,71 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 		return `${diffInDays} day${diffInDays > 1 ? "s" : ""} ago`;
 	};
 
+	const isCurrentSession = (session: Session) => {
+		return session.token === currentSession?.session?.token;
+	};
+
 	if (loading) {
 		return (
-			<div className={cn("space-y-6", className)}>
+			<div className={cn("space-y-4", className)}>
 				<div className="flex items-center justify-between">
 					<div>
-						<h2 className="font-semibold text-2xl text-text-strong-950">
+						<p className="font-medium text-label-md text-text-strong-950">
 							Active Sessions
-						</h2>
+						</p>
 						<p className="text-paragraph-sm text-text-sub-600">
 							Monitor and manage all your active sessions.
 						</p>
 					</div>
 				</div>
-				<div className="flex items-center justify-center py-12">
-					<div className="flex items-center gap-2">
-						<div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-base border-t-transparent" />
-						<span className="text-paragraph-sm text-text-sub-600">
-							Loading sessions...
-						</span>
+
+				<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 text-paragraph-sm shadow-regular-md">
+					{/* Table Header */}
+					<div className="grid grid-cols-[1fr_140px_140px_120px] border-b border-stroke-soft-200 bg-bg-weak-50">
+						<div className="px-4 py-3 font-medium text-text-sub-600 text-xs uppercase tracking-wide">
+							Session
+						</div>
+						<div className="px-4 py-3 font-medium text-text-sub-600 text-xs uppercase tracking-wide">
+							IP Address
+						</div>
+						<div className="px-4 py-3 font-medium text-text-sub-600 text-xs uppercase tracking-wide">
+							Last Active
+						</div>
+						<div className="px-4 py-3" />
+					</div>
+
+					{/* Skeleton Rows */}
+					<div className="divide-y divide-stroke-soft-200">
+						{Array.from({ length: 3 }).map((_, index) => (
+							<div
+								key={`skeleton-${index}`}
+								className="grid grid-cols-[1fr_140px_140px_120px]"
+							>
+								{/* Session Info Column */}
+								<div className="flex items-center gap-3 px-4 py-3">
+									<Skeleton className="h-10 w-10 rounded-xl" />
+									<div className="flex-1 space-y-2">
+										<Skeleton className="h-4 w-24" />
+										<Skeleton className="h-3 w-32" />
+									</div>
+								</div>
+
+								{/* IP Address Column */}
+								<div className="flex items-center px-4 py-3">
+									<Skeleton className="h-4 w-20" />
+								</div>
+
+								{/* Last Active Column */}
+								<div className="flex items-center px-4 py-3">
+									<Skeleton className="h-4 w-16" />
+								</div>
+
+								{/* Action Column */}
+								<div className="flex items-center justify-end px-4 py-3">
+									<Skeleton className="h-7 w-20 rounded-lg" />
+								</div>
+							</div>
+						))}
 					</div>
 				</div>
 			</div>
@@ -217,12 +306,12 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 	}
 
 	return (
-		<div className={cn("space-y-6", className)}>
+		<div className={cn("space-y-4", className)}>
 			<div className="flex items-center justify-between">
 				<div>
-					<h2 className="font-semibold text-2xl text-text-strong-950">
+					<p className="font-medium text-label-md text-text-strong-950">
 						Active Sessions
-					</h2>
+					</p>
 					<p className="text-paragraph-sm text-text-sub-600">
 						Monitor and manage all your active sessions.
 					</p>
@@ -231,98 +320,160 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 					<Button.Root
 						variant="error"
 						mode="stroke"
-						size="small"
+						size="xsmall"
 						onClick={handleTerminateAllSessions}
+						disabled={terminatingAll}
 					>
-						<Icon name="log-out" className="h-4 w-4" />
-						Log Out All Sessions
+						{terminatingAll ? (
+							<Spinner size={14} color="var(--error-base)" />
+						) : (
+							<Icon name="logout" className="h-4 w-4" />
+						)}
+						Revoke All Sessions
 					</Button.Root>
 				)}
 			</div>
 
-			<div className="rounded-xl border border-stroke-soft-100 bg-bg-white-0">
-				<Table.Root>
-					<Table.Header>
-						<Table.Row>
-							<Table.Head className="w-12" />
-							<Table.Head>Browser</Table.Head>
-							<Table.Head>Location</Table.Head>
-							<Table.Head>IP Address</Table.Head>
-							<Table.Head>Last Active</Table.Head>
-							<Table.Head className="w-20" />
-						</Table.Row>
-					</Table.Header>
-					<Table.Body>
-						{sessions.map((session) => (
-							<Table.Row key={session.id}>
-								<Table.Cell>
-									<div className="flex items-center justify-center">
-										<Icon
-											name={getDeviceIcon(session.device)}
-											className="h-5 w-5 text-text-sub-600"
-										/>
-									</div>
-								</Table.Cell>
-								<Table.Cell>
-									<div className="flex items-center gap-3">
-										<Icon
-											name={getBrowserIcon(session.browser)}
-											className="h-5 w-5 text-text-sub-600"
-										/>
-										<div>
+			<AnimatePresence mode="wait">
+				<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 text-paragraph-sm shadow-regular-md">
+					{/* Table Header */}
+					<div className="grid grid-cols-[1fr_140px_140px_120px] border-b border-stroke-soft-200 bg-bg-weak-50">
+						<div className="px-4 py-3 font-medium text-text-sub-600 text-xs uppercase tracking-wide">
+							Session
+						</div>
+						<div className="px-4 py-3 font-medium text-text-sub-600 text-xs uppercase tracking-wide">
+							IP Address
+						</div>
+						<div className="px-4 py-3 font-medium text-text-sub-600 text-xs uppercase tracking-wide">
+							Last Active
+						</div>
+						<div className="px-4 py-3" />
+					</div>
+
+					{/* Table Body */}
+					<div className="divide-y divide-stroke-soft-200">
+						{sessions.map((session, index) => {
+							const { browser, device, isMobile } = parseUserAgent(session.userAgent);
+							const isCurrent = isCurrentSession(session);
+
+							return (
+								<div
+									key={session.id}
+									className={cn(
+										"group/row grid grid-cols-[1fr_140px_140px_120px] transition-colors",
+										isCurrent
+											? "bg-primary-light/20 hover:bg-primary-light/30"
+											: "hover:bg-bg-weak-50/50"
+									)}
+								>
+									{/* Session Info Column */}
+									<div className="flex items-center gap-3 px-4 py-3">
+										{/* Combined Device Badge */}
+										<motion.div
+											{...getAnimationProps(index + 1, 0)}
+											className="relative flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-bg-weak-50 ring-1 ring-stroke-soft-200"
+										>
+											<div className="h-5 w-5">
+												{getBrowserIcon(browser)}
+											</div>
+											{/* OS Badge */}
+											<div className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-md bg-bg-white-0 ring-1 ring-stroke-soft-200">
+												<div className="h-3 w-3">
+													{getOsIcon(device)}
+												</div>
+											</div>
+										</motion.div>
+
+										{/* Session Details */}
+										<motion.div
+											{...getAnimationProps(index + 1, 1)}
+											className="min-w-0 flex-1"
+										>
 											<div className="flex items-center gap-2">
-												<span className="font-medium text-text-strong-950">
-													{session.device}
+												<span className="truncate font-medium text-label-sm text-text-strong-950">
+													{browser}
 												</span>
-												{session.isCurrent && (
-													<span className="rounded-full bg-primary-light px-2 py-0.5 font-medium text-primary-base text-xs">
-														This device
+												{isCurrent && (
+													<span className="flex items-center gap-1 rounded-full bg-success-lighter px-2 py-0.5 text-xs text-success-base">
+														<span className="h-1.5 w-1.5 rounded-full bg-success-base" />
+														Current
 													</span>
 												)}
 											</div>
-											<p className="text-paragraph-sm text-text-sub-600">
-												{session.browser}
-											</p>
-										</div>
+											<div className="flex items-center gap-1.5 text-text-sub-600 text-xs">
+												<span>{device}</span>
+												<span>•</span>
+												<span className="flex items-center gap-1">
+													{getDeviceTypeIcon(isMobile)}
+													{isMobile ? "Mobile" : "Desktop"}
+												</span>
+											</div>
+										</motion.div>
 									</div>
-								</Table.Cell>
-								<Table.Cell>
-									<span className="text-paragraph-sm text-text-strong-950">
-										{session.location || "Unknown"}
-									</span>
-								</Table.Cell>
-								<Table.Cell>
-									<span className="text-paragraph-sm text-text-strong-950">
-										{session.ipAddress || "--"}
-									</span>
-								</Table.Cell>
-								<Table.Cell>
-									<span className="text-paragraph-sm text-text-sub-600">
-										{formatTimeAgo(session.lastActiveAt)}
-									</span>
-								</Table.Cell>
-								<Table.Cell>
-									{!session.isCurrent && (
-										<Button.Root
-											variant="error"
-											mode="ghost"
-											size="xsmall"
-											onClick={() => handleTerminateSession(session.id)}
-											disabled={terminatingSession === session.id}
+
+									{/* IP Address Column */}
+									<div className="flex items-center px-4 py-3">
+										<motion.span
+											{...getAnimationProps(index + 1, 2)}
+											className="font-mono text-label-sm text-text-sub-600"
 										>
-											{terminatingSession === session.id ? (
-												<div className="h-4 w-4 animate-spin rounded-full border-2 border-error-base border-t-transparent" />
-											) : (
-												<Icon name="x" className="h-4 w-4" />
-											)}
-										</Button.Root>
-									)}
-								</Table.Cell>
-							</Table.Row>
-						))}
-					</Table.Body>
-				</Table.Root>
-			</div>
+											{session.ipAddress || "—"}
+										</motion.span>
+									</div>
+
+									{/* Last Active Column */}
+									<div className="flex items-center px-4 py-3">
+										<motion.span
+											{...getAnimationProps(index + 1, 3)}
+											className="text-label-sm text-text-sub-600"
+										>
+											{formatTimeAgo(session.updatedAt)}
+										</motion.span>
+									</div>
+
+									{/* Action Column */}
+									<div className="flex items-center justify-end px-4 py-3">
+										{!isCurrent && (
+											<motion.div {...getAnimationProps(index + 1, 4)}>
+												<Button.Root
+													variant="error"
+													mode="ghost"
+													size="xsmall"
+													onClick={() => handleTerminateSession(session.token)}
+													disabled={terminatingSession === session.token}
+												>
+													{terminatingSession === session.token ? (
+														<Spinner size={14} color="var(--error-base)" />
+													) : (
+														<Icon name="logout" className="h-4 w-4" />
+													)}
+													Revoke
+												</Button.Root>
+											</motion.div>
+										)}
+									</div>
+								</div>
+							);
+						})}
+					</div>
+
+					{/* Empty State */}
+					{sessions.length === 0 && (
+						<motion.div
+							className="flex flex-col items-center justify-center py-12 text-center"
+							initial={{ opacity: 0, y: 20 }}
+							animate={{ opacity: 1, y: 0 }}
+							transition={{ duration: 0.4, ease: [0.65, 0, 0.35, 1] }}
+						>
+							<Icon name="shield" className="mb-3 h-8 w-8 text-text-sub-600" />
+							<p className="font-medium text-text-strong-950">No active sessions</p>
+							<p className="text-sm text-text-sub-600">
+								Your session is the only active one.
+							</p>
+						</motion.div>
+					)}
+				</div>
+			</AnimatePresence>
 		</div>
 	);
 };

@@ -1,29 +1,27 @@
 import { authMiddleware } from "@be/audience/middleware/auth";
-import { AudienceModel } from "@be/audience/model/audience.model";
-import { AudienceGroupModel } from "@be/audience/model/audience-group.model";
-import { createAudienceHandler } from "@be/audience/routes/audience/controllers/create-audience";
+import { ContactModel } from "@be/audience/model/contact.model";
+import { createContactHandler } from "@be/audience/routes/audience/controllers/create-audience";
 import { Elysia } from "elysia";
 
-export const createAudienceRoute = new Elysia().use(authMiddleware).post(
+export const createContactRoute = new Elysia().use(authMiddleware).post(
 	"/add",
 	async ({ body, user }) => {
 		const { activeOrganizationId } = user;
-		return await createAudienceHandler(activeOrganizationId, body);
+		return await createContactHandler(activeOrganizationId, body);
 	},
 	{
 		auth: true,
-		body: AudienceModel.createAudienceBody,
+		body: ContactModel.createContactBody,
 		response: {
-			201: AudienceModel.audienceResponse,
-			409: AudienceModel.audienceAlreadyExists,
-			404: AudienceGroupModel.audienceGroupNotFound,
-			400: AudienceModel.invalidEmail,
-			403: AudienceModel.unauthorized,
+			201: ContactModel.contactResponse,
+			409: ContactModel.contactAlreadyExists,
+			400: ContactModel.invalidEmail,
+			403: ContactModel.unauthorized,
 		},
 		detail: {
-			tags: ["Audience"],
-			summary: "Create a new audience",
-			description: "Adds a new audience to an audience group",
+			tags: ["Contact"],
+			summary: "Create a new contact",
+			description: "Adds a new contact to the organization",
 		},
 	},
 );

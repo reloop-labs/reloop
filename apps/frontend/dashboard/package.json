@@ -21,6 +21,7 @@
 		"motion": "catalog:ui",
 		"next": "catalog:ui",
 		"next-themes": "catalog:ui",
+		"lucide-react": "catalog:ui",
 		"nuqs": "catalog:ui",
 		"react": "catalog:ui",
 		"shiki": "catalog:ui",

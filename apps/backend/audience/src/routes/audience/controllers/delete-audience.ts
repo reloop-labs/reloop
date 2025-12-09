@@ -4,67 +4,67 @@ import { logger } from "@reloop/logger";
 import { and, eq } from "drizzle-orm";
 import { status } from "elysia";
 
-export async function deleteAudience(
-	audienceId: string,
+export async function deleteContact(
+	contactId: string,
 	organizationId: string,
 ): Promise<{ message: string }> {
 	logger.info(
 		{
-			audienceId,
+			contactId,
 			organizationId,
 		},
-		"Deleting audience",
+		"Deleting contact",
 	);
 
 	try {
-		// Check if audience exists
-		const existingAudience = await db.query.audience.findFirst({
+		// Check if contact exists
+		const existingContact = await db.query.contact.findFirst({
 			where: and(
-				eq(schema.audience.id, audienceId),
-				eq(schema.audience.organizationId, organizationId),
+				eq(schema.contact.id, contactId),
+				eq(schema.contact.organizationId, organizationId),
 			),
 		});
 
-		if (!existingAudience) {
-			logger.warn({ audienceId, organizationId }, "Audience not found");
-			throw status(404, { message: "Audience not found" });
+		if (!existingContact) {
+			logger.warn({ contactId, organizationId }, "Contact not found");
+			throw status(404, { message: "Contact not found" });
 		}
 
-		// Delete the audience (hard delete as it's just removing from a group)
+		// Delete the contact (hard delete)
 		await db
-			.delete(schema.audience)
+			.delete(schema.contact)
 			.where(
 				and(
-					eq(schema.audience.id, audienceId),
-					eq(schema.audience.organizationId, organizationId),
+					eq(schema.contact.id, contactId),
+					eq(schema.contact.organizationId, organizationId),
 				),
 			);
 
 		logger.info(
 			{
-				audienceId,
+				contactId,
 				organizationId,
 			},
-			"Audience deleted successfully",
+			"Contact deleted successfully",
 		);
 
-		return { message: "Audience deleted successfully" };
+		return { message: "Contact deleted successfully" };
 	} catch (error) {
 		logger.error(
 			{
-				audienceId,
+				contactId,
 				organizationId,
 				error: error instanceof Error ? error.message : String(error),
 			},
-			"Error deleting audience",
+			"Error deleting contact",
 		);
 		throw error;
 	}
 }
 
-export async function deleteAudienceHandler(
-	audienceId: string,
+export async function deleteContactHandler(
+	contactId: string,
 	organizationId: string,
 ): Promise<{ message: string }> {
-	return deleteAudience(audienceId, organizationId);
+	return deleteContact(contactId, organizationId);
 }

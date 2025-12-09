@@ -1,30 +1,28 @@
 import { authMiddleware } from "@be/audience/middleware/auth";
-import { bulkImportAudiencesRoute } from "@be/audience/routes/audience/routes/bulk-import-audiences.route";
-import { createAudienceRoute } from "@be/audience/routes/audience/routes/create-audience.route";
-import { deleteAudienceRoute } from "@be/audience/routes/audience/routes/delete-audience.route";
-import { getAudienceRoute } from "@be/audience/routes/audience/routes/get-audience.route";
-import { listAudiencesRoute } from "@be/audience/routes/audience/routes/list-audiences.route";
-import { searchAudiencesRoute } from "@be/audience/routes/audience/routes/search-audiences.route";
-import { subscribeAudienceRoute } from "@be/audience/routes/audience/routes/subscribe-audience.route";
-import { unsubscribeAudienceRoute } from "@be/audience/routes/audience/routes/unsubscribe-audience.route";
-import { updateAudienceRoute } from "@be/audience/routes/audience/routes/update-audience.route";
+import { addContactToTopicRoute } from "@be/audience/routes/audience/routes/add-contact-to-topic.route";
+import { bulkImportContactsRoute } from "@be/audience/routes/audience/routes/bulk-import-contacts.route";
+import { createContactRoute } from "@be/audience/routes/audience/routes/create-audience.route";
+import { deleteContactRoute } from "@be/audience/routes/audience/routes/delete-audience.route";
+import { getContactRoute } from "@be/audience/routes/audience/routes/get-audience.route";
+import { listContactsRoute } from "@be/audience/routes/audience/routes/list-audiences.route";
+import { searchContactsRoute } from "@be/audience/routes/audience/routes/search-audiences.route";
+import { updateContactRoute } from "@be/audience/routes/audience/routes/update-audience.route";
 import { Elysia } from "elysia";
 
-export const audienceRoutes = new Elysia({
-	prefix: "/v1",
-	name: "AudienceRoutes",
+export const contactRoutes = new Elysia({
+	prefix: "/v1/contacts",
+	name: "ContactRoutes",
 })
 	.use(authMiddleware)
-	// Audience Routes
-	.use(createAudienceRoute)
-	.use(getAudienceRoute)
-	.use(listAudiencesRoute)
-	.use(updateAudienceRoute)
-	.use(deleteAudienceRoute)
-	// Bulk Operations
-	.use(bulkImportAudiencesRoute)
-	// Status Management
-	.use(subscribeAudienceRoute)
-	.use(unsubscribeAudienceRoute)
+	// Contact Routes
+	.use(createContactRoute)
+	.use(getContactRoute)
+	.use(listContactsRoute)
+	.use(updateContactRoute)
+	.use(deleteContactRoute)
 	// Search
-	.use(searchAudiencesRoute);
+	.use(searchContactsRoute)
+	// Bulk Import
+	.use(bulkImportContactsRoute)
+	// Add to Topic
+	.use(addContactToTopicRoute);

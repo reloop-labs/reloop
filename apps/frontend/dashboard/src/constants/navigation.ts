@@ -13,9 +13,14 @@ export const mainNavigation: MainNavigationItem[] = [
 		iconName: "house",
 	},
 	{
-		label: "Audience",
-		path: "/audience",
+		label: "Contacts",
+		path: "/contacts",
 		iconName: "users",
+	},
+	{
+		label: "Topics",
+		path: "/topics",
+		iconName: "notification-indicator",
 	},
 	{
 		label: "API Keys",

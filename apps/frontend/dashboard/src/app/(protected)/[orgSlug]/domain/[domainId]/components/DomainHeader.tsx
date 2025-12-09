@@ -151,7 +151,7 @@ export const DomainHeader = ({
 											mode="ghost"
 											size="small"
 											onClick={() => setDeleteId(domainId)}
-											className="w-full justify-start text-red-600 hover:bg-red-50"
+											className="w-full justify-start"
 										>
 											<Icon name="trash" className="h-4 w-4" />
 											Remove domain

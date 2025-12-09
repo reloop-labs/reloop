@@ -1,7 +1,9 @@
-import { audienceRoutes } from "@be/audience/routes/audience/audience.routes";
-import { audienceGroupRoutes } from "@be/audience/routes/audience-group/audience-group.routes";
+import { contactRoutes } from "@be/audience/routes/audience/audience.routes";
+import { topicRoutes } from "@be/audience/routes/audience-topic/audience-topic.routes";
+import { topicSubscriptionRoutes } from "@be/audience/routes/audience-topic-mapper/audience-topic-mapper.routes";
 import { Elysia } from "elysia";
 
-export const allAudienceRoutes = new Elysia()
-	.use(audienceRoutes)
-	.use(audienceGroupRoutes);
+export const allRoutes = new Elysia()
+	.use(contactRoutes)
+	.use(topicRoutes)
+	.use(topicSubscriptionRoutes);

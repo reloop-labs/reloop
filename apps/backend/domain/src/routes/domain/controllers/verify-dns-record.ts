@@ -76,10 +76,10 @@ export async function verifyDNSRecordHandler(params: {
 		// The Inngest function will update the status asynchronously
 		return {
 			...domainWithRecords,
-			status: "verifying",
+			status: "verifying" as const,
 			dnsRecords: domainWithRecords.dnsRecords.map((record) => ({
 				...record,
-				status: "verifying",
+				status: "verifying" as const,
 			})),
 		};
 	} catch (error) {

@@ -12,21 +12,21 @@ export function ThemeToggleAppearance() {
 			label: "Light",
 			icon: "sun",
 			image: "/dashboard/ui-light.png",
-			layoutIcon: <SidebarLayoutIcon />,
+			layoutIcon: <SidebarLayoutIcon variant="light" />,
 		},
 		{
 			value: "dark",
 			label: "Dark",
 			icon: "moon",
 			image: "/dashboard/ui-dark.png",
-			layoutIcon: <SidebarLayoutIcon isDark />,
+			layoutIcon: <SidebarLayoutIcon variant="dark" />,
 		},
 		{
 			value: "system",
 			label: "System",
 			icon: "monitor",
 			image: "/dashboard/ui-system.png",
-			layoutIcon: <SidebarLayoutIcon defaultSystemTheme />,
+			layoutIcon: <SidebarLayoutIcon variant="auto" />,
 		},
 	];
 

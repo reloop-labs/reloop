@@ -1,5 +1,6 @@
 "use client";
 
+import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -94,20 +95,14 @@ export const PasswordChange = ({ className }: PasswordChangeProps) => {
 
 		setIsLoading(true);
 		try {
-			const response = await fetch("/api/auth/change-password", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					currentPassword: form.currentPassword,
-					newPassword: form.newPassword,
-				}),
+			const { error } = await authClient.changePassword({
+				newPassword: form.newPassword,
+				currentPassword: form.currentPassword,
+				revokeOtherSessions: true,
 			});
 
-			if (!response.ok) {
-				const errorData = await response.json();
-				throw new Error(errorData.error || "Failed to change password");
+			if (error) {
+				throw new Error(error.message || "Failed to change password");
 			}
 
 			toast.success("Password changed successfully");
@@ -339,34 +334,6 @@ export const PasswordChange = ({ className }: PasswordChangeProps) => {
 					</Button.Root>
 				</div>
 			</form>
-
-			<div className="rounded-xl border border-warning-light bg-warning-50 p-4">
-				<div className="flex items-start gap-3">
-					<Icon
-						name="shield-alert"
-						className="mt-0.5 h-5 w-5 text-warning-base"
-					/>
-					<div>
-						<h4 className="font-medium text-warning-base">
-							Password Security Tips
-						</h4>
-						<ul className="mt-2 space-y-1 text-paragraph-sm text-warning-base">
-							<li>• Use a unique password that you don't use elsewhere</li>
-							<li>
-								• Include a mix of uppercase and lowercase letters, numbers, and
-								symbols
-							</li>
-							<li>
-								• Avoid using personal information like your name or birthdate
-							</li>
-							<li>
-								• Consider using a password manager to generate and store secure
-								passwords
-							</li>
-						</ul>
-					</div>
-				</div>
-			</div>
 		</div>
 	);
 };

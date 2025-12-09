@@ -77,7 +77,6 @@ export const MainNavigation: React.FC<MainNavigationProps> = ({
 			<AnimatedHoverBackground
 				rect={currentRect}
 				tabElement={currentTab}
-				className="border border-stroke-soft-200"
 			/>
 		</div>
 	);
