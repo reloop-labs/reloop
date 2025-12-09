@@ -1,7 +1,6 @@
 "use client";
 
 import { authClient } from "@reloop/auth/client";
-import logger from "@reloop/logger";
 import Spinner from "@reloop/ui/spinner";
 import {
 	useParams,
@@ -90,7 +89,7 @@ export const UserOrganizationProvider = ({
 							organizationId: session.user.activeOrganizationId,
 						});
 					} catch (error) {
-						logger.error({ error }, "Error setting active organization");
+						console.log("Error setting active organization", { error });
 						// Handle sync error silently
 					}
 				}
@@ -138,8 +137,7 @@ export const UserOrganizationProvider = ({
 								});
 								push(`/${firstOrg.slug}`);
 							} catch (error) {
-								// Handle organization setting error silently
-								logger.error({ error }, "Error setting default organization");
+								console.log("Error setting active organization", { error });
 							} finally {
 								setIsSettingDefaultOrg(false);
 								setHasInitialized(true);
