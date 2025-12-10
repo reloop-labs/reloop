@@ -1,4 +1,3 @@
-export * from "./api-key";
 export * from "./auth";
 export * from "./contact";
 export * from "./domain";

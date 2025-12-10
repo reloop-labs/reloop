@@ -12,6 +12,9 @@ import { status } from "elysia";
 const API_KEY_PREFIX = "rl";
 const API_KEY_LENGTH = 64;
 
+console.log("schema.apikey:", schema.apikey);
+console.log("schema keys:", Object.keys(schema));
+console.log("schema.apikey keys:", Object.keys(schema.apikey));
 function generateApiKey(): string {
 	const randomPart = randomBytes(API_KEY_LENGTH).toString("base64url");
 	return `${API_KEY_PREFIX}_${randomPart}`;
@@ -41,6 +44,14 @@ export async function createApiKey(
 		const keyStart = getKeyStart(fullKey);
 		const keyId = createId();
 
+		logger.info("Creating API key with key values here",
+			organizationId,
+			userId,
+			fullKey,
+			hashedKey,
+			keyStart,
+			keyId,
+		);
 		const now = new Date();
 		const expiresAt = request.expiresAt ? new Date(request.expiresAt) : null;
 
@@ -83,7 +94,7 @@ export async function createApiKey(
 			logger.error({ organizationId, userId }, "Failed to create API key");
 			throw status(500, { message: "Failed to create API key" });
 		}
-
+		logger.info("newApiKey", newApiKey);
 
 		return formatApiKeyWithKeyResponse(newApiKey[0], fullKey);
 	} catch (error) {
