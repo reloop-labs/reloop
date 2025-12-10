@@ -8,7 +8,7 @@ import Spinner from "@reloop/ui/spinner";
 import { motion } from "motion/react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 type InviteStatus = "loading" | "valid" | "invalid" | "expired" | "accepted" | "error";
 
@@ -20,7 +20,7 @@ interface InviteDetails {
   email: string;
 }
 
-const Page = () => {
+const AcceptInvitationContent = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const invitationId = searchParams.get("id");
@@ -364,6 +364,23 @@ const Page = () => {
         </p>
       </motion.div>
     </div>
+  );
+};
+
+const Page = () => {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex h-dvh flex-col items-center justify-center">
+          <div className="flex flex-col items-center gap-4">
+            <Spinner size={32} color="var(--primary-base)" />
+            <p className="text-text-sub-600">Loading invitation...</p>
+          </div>
+        </div>
+      }
+    >
+      <AcceptInvitationContent />
+    </Suspense>
   );
 };
 
