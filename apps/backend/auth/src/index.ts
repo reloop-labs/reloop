@@ -1,6 +1,5 @@
 import "dotenv/config";
 import cors from "@elysiajs/cors";
-import { serverTiming } from "@elysiajs/server-timing";
 import { swagger } from "@elysiajs/swagger";
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
@@ -8,11 +7,11 @@ import { landing } from "./landing";
 import { auth, OpenAPI } from "./lib/auth";
 import { loader } from "./loader";
 import { statsRoutes } from "./routes/stats";
+import { authConfig } from "./auth.config";
 
-const port = 8000;
+const port = authConfig.port;
 
 const app = new Elysia({ prefix: "/api/auth", name: "Auth Service" })
-	.use(serverTiming())
 	.use(cors({ origin: "*" }))
 	.use(
 		swagger({
