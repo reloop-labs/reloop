@@ -31,7 +31,6 @@
 		"elysia": "catalog:backend",
 		"pg": "catalog:db",
 		"redis": "catalog:db",
-		"resend": "catalog:backend",
 		"zod": "catalog:ui",
 		"@reloop/db": "workspace:*",
 		"@reloop/cache": "workspace:*",

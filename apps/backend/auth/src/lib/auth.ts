@@ -16,6 +16,7 @@ import {
 	openAPI,
 	organization,
 } from "better-auth/plugins";
+import { authConfig } from "../auth.config";
 import { redis } from "./redis";
 
 export const auth = betterAuth({
@@ -67,7 +68,7 @@ export const auth = betterAuth({
 			logger.info("🔐 Password reset requested for:", user.email);
 
 			// Log reset URL and token only in development for easy testing
-			if (process.env.NODE_ENV === "development") {
+			if (authConfig.NODE_ENV === "development") {
 				logger.info("🔗 Reset URL (DEV):", url);
 				logger.info("🔑 Token (DEV):", token);
 			}
@@ -83,15 +84,15 @@ export const auth = betterAuth({
 	},
 	socialProviders: {
 		google: {
-			clientId: process.env.GOOGLE_CLIENT_ID as string,
-			clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+			clientId: authConfig.GOOGLE_CLIENT_ID as string,
+			clientSecret: authConfig.GOOGLE_CLIENT_SECRET as string,
 		},
 		github: {
-			clientId: process.env.GITHUB_CLIENT_ID as string,
-			clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
+			clientId: authConfig.GITHUB_CLIENT_ID as string,
+			clientSecret: authConfig.GITHUB_CLIENT_SECRET as string,
 		},
 	},
-	secret: process.env.BETTER_AUTH_SECRET,
+	secret: authConfig.BETTER_AUTH_SECRET,
 	session: {
 		expiresIn: 60 * 60 * 24 * 7,
 		updateAge: 60 * 60 * 24,
@@ -104,7 +105,7 @@ export const auth = betterAuth({
 		apiKey({ defaultPrefix: "rl" }),
 		organization({
 			sendInvitationEmail: async (data) => {
-				const inviteLink = `${process.env.FRONTEND_URL || "http://localhost:3001"}/accept-invitation?id=${data.id}`;
+				const inviteLink = `${authConfig.BASE_URL}/accept-invitation?id=${data.id}`;
 
 				logger.info("📧 Organization invitation requested:", {
 					email: data.email,
@@ -114,7 +115,7 @@ export const auth = betterAuth({
 				});
 
 				// Log invite URL in development for easy testing
-				if (process.env.NODE_ENV === "development") {
+				if (authConfig.NODE_ENV === "development") {
 					logger.info("🔗 Invite URL (DEV):", inviteLink);
 				}
 

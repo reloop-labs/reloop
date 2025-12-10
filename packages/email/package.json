@@ -25,8 +25,7 @@
 		"date-fns": "catalog:backend",
 		"react-email": "catalog:ui",
 		"react": "catalog:ui",
-		"react-dom": "catalog:ui",
-		"resend": "catalog:backend"
+		"react-dom": "catalog:ui"
 	},
 	"devDependencies": {
 		"@react-email/preview-server": "4.2.8",

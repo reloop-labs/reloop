@@ -1,4 +1,5 @@
 import "dotenv/config";
+import { authConfig } from "./auth.config";
 import cors from "@elysiajs/cors";
 import { swagger } from "@elysiajs/swagger";
 import { logger } from "@reloop/logger";
@@ -6,8 +7,6 @@ import { Elysia } from "elysia";
 import { landing } from "./landing";
 import { auth, OpenAPI } from "./lib/auth";
 import { loader } from "./loader";
-import { statsRoutes } from "./routes/stats";
-import { authConfig } from "./auth.config";
 
 const port = authConfig.port;
 
@@ -24,7 +23,6 @@ const app = new Elysia({ prefix: "/api/auth", name: "Auth Service" })
 	)
 	.mount("/", auth.handler)
 	.use(landing)
-	.use(statsRoutes)
 	.onStart(async () => {
 		await loader();
 	})

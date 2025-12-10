@@ -1,5 +1,6 @@
 import { db } from "@reloop/db/client";
 import { Elysia } from "elysia";
+import { authConfig } from "./auth.config";
 import { redis } from "./lib/redis";
 
 export const landing = new Elysia()
@@ -78,14 +79,15 @@ ${redisError ? `║ REDIS ERROR: ${redisError.substring(0, 50).padEnd(50)} ║` 
 				status: "connected",
 				responseTime: `${responseTime}ms`,
 				timestamp: new Date().toISOString(),
-				redisUrl: process.env.REDIS_URL || "not configured",
+				redisUrl: authConfig.REDIS_URL || "not configured",
 			};
 		} catch (error) {
 			return {
 				status: "disconnected",
 				error: error instanceof Error ? error.message : String(error),
 				timestamp: new Date().toISOString(),
-				redisUrl: process.env.REDIS_URL || "not configured",
+				redisUrl: authConfig.REDIS_URL || "not configured",
 			};
 		}
 	});
+

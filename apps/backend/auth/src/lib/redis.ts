@@ -1,3 +1,3 @@
 import { RedisCache } from "@reloop/cache/redis-client";
-
-export const redis = new RedisCache("auth");
+import { authConfig } from "../auth.config";
+export const redis = new RedisCache("auth", 30 * 60, authConfig.REDIS_URL);
