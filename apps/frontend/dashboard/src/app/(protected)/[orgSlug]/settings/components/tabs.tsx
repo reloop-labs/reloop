@@ -14,6 +14,11 @@ const list = [
 		iconName: "gear",
 	},
 	{
+		title: "Account",
+		path: "/settings/account",
+		iconName: "user",
+	},
+	{
 		title: "Team",
 		path: "/settings/team",
 		iconName: "users",
@@ -65,8 +70,8 @@ export const SettingsTabs = () => {
 						className={cn(
 							"flex cursor-pointer items-center gap-2 px-2.5 py-0! text-sm",
 							hoveredIdx === undefined &&
-								activeIndex === index &&
-								"text-text-strong-950",
+							activeIndex === index &&
+							"text-text-strong-950",
 						)}
 						key={path}
 						value={path}
