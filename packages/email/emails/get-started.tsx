@@ -22,7 +22,7 @@ export const GetStartedEmail = ({ fullName = "" }: Props) => {
 	const text = `${firstName ? `Hi ${firstName}, ` : ""}Just checking in to help you get started. Here are a few things you can try today.`;
 	const themeClasses = getEmailThemeClasses();
 	const lightStyles = getEmailInlineStyles();
-	console.log(lightStyles);
+
 	return (
 		<EmailThemeProvider preview={<Preview>{text}</Preview>}>
 			<Body className={`mx-auto my-auto font-sans ${themeClasses.body}`}>

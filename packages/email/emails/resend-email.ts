@@ -11,7 +11,6 @@ export interface EmailOptions {
 }
 
 export const sendEmail = async ({ to, subject, html, from }: EmailOptions) => {
-	console.log("Email sent successfully:", { to, subject, html, from });
 };
 
 export const sendPasswordResetEmail = async (

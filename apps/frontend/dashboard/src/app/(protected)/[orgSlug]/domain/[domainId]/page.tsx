@@ -20,7 +20,6 @@ const DomainPage = () => {
 		error,
 		isLoading,
 	} = useSWR<DomainResponse>(domainId ? `/api/domain/v1/${domainId}` : null);
-	console.log("🚀 ~ DomainPage ~ domainData:", domainData);
 
 	const copyToClipboard = async (text: string, itemId: string) => {
 		try {

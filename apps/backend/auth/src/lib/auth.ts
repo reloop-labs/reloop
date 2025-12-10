@@ -128,7 +128,7 @@ export const auth = betterAuth({
 						inviterEmail: data.inviter.user.email,
 						role: data.role,
 					});
-					logger.info(`✅ Organization invite email sent to ${data.email}`);
+					logger.info(`✅ Organization invite email sent to ${data.email} using ${inviteLink}`);
 				} catch (error) {
 					logger.error("❌ Failed to send organization invite email:", error);
 					// Don't throw - invitation is still created, email just failed
