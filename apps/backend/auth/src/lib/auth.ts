@@ -105,7 +105,7 @@ export const auth = betterAuth({
 		apiKey({ defaultPrefix: "rl" }),
 		organization({
 			sendInvitationEmail: async (data) => {
-				const inviteLink = `${authConfig.BASE_URL}/accept-invitation?id=${data.id}`;
+				const inviteLink = `${authConfig.BASE_URL}/dashboard/accept-invitation?id=${data.id}`;
 
 				logger.info("📧 Organization invitation requested:", {
 					email: data.email,
