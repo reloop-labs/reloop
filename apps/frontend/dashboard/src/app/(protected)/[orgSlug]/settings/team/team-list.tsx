@@ -37,7 +37,7 @@ interface Invite {
 
 interface TeamListProps {
   searchQuery: string;
-  filter?: "all" | "invited" | "suspended" | "active";
+  filters?: ("invited" | "suspended" | "active")[];
 }
 
 const getInitials = (name: string | null, email: string) => {
@@ -121,7 +121,7 @@ const TeamSkeleton = () => (
 
 import { InviteDropdown } from "./invite-dropdown";
 
-export const TeamList = ({ searchQuery, filter }: TeamListProps) => {
+export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
   const { activeOrganization } = useUserOrganization();
   const [removingMember, setRemovingMember] = useState<string | null>(null);
   const [cancellingInvite, setCancellingInvite] = useState<string | null>(null);
@@ -168,27 +168,29 @@ export const TeamList = ({ searchQuery, filter }: TeamListProps) => {
       );
     }
 
-    // Apply type filter
-    if (filter && filter !== "all") {
-      switch (filter) {
-        case "invited":
-          // Show only pending invites
-          filteredMembers = [];
-          break;
-        case "suspended":
-          // TODO: Filter by suspended status when available
-          filteredInvites = [];
-          filteredMembers = [];
-          break;
-        case "active":
-          // Show only active members (not invites)
-          filteredInvites = [];
-          break;
+    // Apply type filter (multi-select)
+    if (filters.length > 0) {
+      const showInvited = filters.includes("invited");
+      const showSuspended = filters.includes("suspended");
+      const showActive = filters.includes("active");
+
+      // If only specific filters are selected, filter accordingly
+      if (!showInvited) {
+        filteredInvites = [];
+      }
+      if (!showActive && !showSuspended) {
+        filteredMembers = [];
+      } else if (showSuspended && !showActive) {
+        // TODO: Filter by suspended status when available
+        filteredMembers = [];
+      } else if (showActive && !showSuspended) {
+        // Show only active members
+        // filteredMembers already contains all members
       }
     }
 
     return { members: filteredMembers, invites: filteredInvites };
-  }, [membersData, invites, searchQuery, filter]);
+  }, [membersData, invites, searchQuery, filters]);
 
   const handleRemoveMember = async (memberId: string) => {
     setRemovingMember(memberId);

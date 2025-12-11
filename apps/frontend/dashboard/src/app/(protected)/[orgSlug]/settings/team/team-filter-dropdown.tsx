@@ -7,14 +7,15 @@ import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import { useRef, useState } from "react";
 
-export type TeamFilterType = "all" | "invited" | "suspended" | "active";
+export type TeamFilterOption = "invited" | "suspended" | "active";
+export type TeamFilters = TeamFilterOption[];
 
 interface TeamFilterDropdownProps {
-  value: TeamFilterType;
-  onChange: (value: TeamFilterType) => void;
+  value: TeamFilters;
+  onChange: (value: TeamFilters) => void;
 }
 
-const filterOptions: { id: TeamFilterType; label: string }[] = [
+const filterOptions: { id: TeamFilterOption; label: string }[] = [
   { id: "invited", label: "Invited" },
   { id: "suspended", label: "Suspended" },
   { id: "active", label: "Active" },
@@ -28,10 +29,19 @@ export const TeamFilterDropdown = ({ value, onChange }: TeamFilterDropdownProps)
   const currentTab = buttonRefs.current[hoverIdx ?? -1];
   const currentRect = currentTab?.getBoundingClientRect();
 
-  const hasActiveFilter = value !== "all";
+  const activeFilterCount = value.length;
+  const hasActiveFilter = activeFilterCount > 0;
 
   const handleReset = () => {
-    onChange("all");
+    onChange([]);
+  };
+
+  const handleToggle = (optionId: TeamFilterOption) => {
+    if (value.includes(optionId)) {
+      onChange(value.filter(v => v !== optionId));
+    } else {
+      onChange([...value, optionId]);
+    }
   };
 
   return (
@@ -47,7 +57,7 @@ export const TeamFilterDropdown = ({ value, onChange }: TeamFilterDropdownProps)
           <span>Filter</span>
           {hasActiveFilter && (
             <span className="ml-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary-base text-[10px] text-white">
-              1
+              {activeFilterCount}
             </span>
           )}
         </Button.Root>
@@ -67,39 +77,39 @@ export const TeamFilterDropdown = ({ value, onChange }: TeamFilterDropdownProps)
 
         {/* Filter Options */}
         <div className="relative">
-          {filterOptions.map((option, idx) => (
-            <button
-              key={option.id}
-              ref={(el) => {
-                if (el) buttonRefs.current[idx] = el;
-              }}
-              type="button"
-              onPointerEnter={() => setHoverIdx(idx)}
-              onPointerLeave={() => setHoverIdx(undefined)}
-              onClick={() => {
-                onChange(option.id === value ? "all" : option.id);
-                setIsOpen(false);
-              }}
-              className={cn(
-                "flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-2 py-2 text-sm font-normal transition-colors",
-                "text-text-strong-950",
-                !currentRect && hoverIdx === idx && "bg-neutral-alpha-10"
-              )}
-            >
-              {/* Radio circle */}
-              <div className={cn(
-                "flex h-4 w-4 items-center justify-center rounded-full border-2 transition-colors",
-                value === option.id
-                  ? "border-primary-base"
-                  : "border-stroke-soft-200"
-              )}>
-                {value === option.id && (
-                  <div className="h-2 w-2 rounded-full bg-primary-base" />
+          {filterOptions.map((option, idx) => {
+            const isChecked = value.includes(option.id);
+            return (
+              <button
+                key={option.id}
+                ref={(el) => {
+                  if (el) buttonRefs.current[idx] = el;
+                }}
+                type="button"
+                onPointerEnter={() => setHoverIdx(idx)}
+                onPointerLeave={() => setHoverIdx(undefined)}
+                onClick={() => handleToggle(option.id)}
+                className={cn(
+                  "flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-2 py-2 text-sm font-normal transition-colors",
+                  "text-text-strong-950",
+                  !currentRect && hoverIdx === idx && "bg-neutral-alpha-10"
                 )}
-              </div>
-              <span>{option.label}</span>
-            </button>
-          ))}
+              >
+                {/* Checkbox */}
+                <div className={cn(
+                  "flex h-4 w-4 items-center justify-center rounded border-2 transition-colors",
+                  isChecked
+                    ? "border-primary-base bg-primary-base"
+                    : "border-stroke-soft-200"
+                )}>
+                  {isChecked && (
+                    <Icon name="check" className="h-3 w-3 text-white" />
+                  )}
+                </div>
+                <span>{option.label}</span>
+              </button>
+            );
+          })}
           <AnimatedHoverBackground
             rect={currentRect}
             tabElement={currentTab}
