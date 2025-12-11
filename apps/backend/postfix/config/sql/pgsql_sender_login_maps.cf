@@ -1,7 +1,0 @@
-user = ${DB_USER}
-password = ${DB_PASSWORD}
-hosts = ${DB_HOST}
-dbname = ${DB_NAME}
-
-# Map sender email to user for authentication
-query = SELECT email FROM "user" WHERE email='%s'
