@@ -56,13 +56,13 @@ export const TeamFilterDropdown = ({ value, onChange }: TeamFilterDropdownProps)
           <Icon name="filter" className="h-4 w-4" />
           <span>Filter</span>
           {hasActiveFilter && (
-            <span className="ml-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary-base text-[10px] text-white">
+            <span className="absolute -top-1.5 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-neutral-900 text-[10px] text-white">
               {activeFilterCount}
             </span>
           )}
         </Button.Root>
       </Dropdown.Trigger>
-      <Dropdown.Content align="start" className="w-52 p-2">
+      <Dropdown.Content align="start" className="w-44 p-2">
         {/* Header */}
         <div className="flex items-center justify-between pb-2 mb-1 border-b border-stroke-soft-200">
           <span className="text-xs text-text-sub-600 font-medium">Filter by</span>
@@ -90,14 +90,14 @@ export const TeamFilterDropdown = ({ value, onChange }: TeamFilterDropdownProps)
                 onPointerLeave={() => setHoverIdx(undefined)}
                 onClick={() => handleToggle(option.id)}
                 className={cn(
-                  "flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-2 py-2 text-sm font-normal transition-colors",
+                  "flex w-full cursor-pointer items-center gap-2 rounded-lg px-1 py-1.5 text-xs font-normal transition-colors",
                   "text-text-strong-950",
                   !currentRect && hoverIdx === idx && "bg-neutral-alpha-10"
                 )}
               >
                 {/* Checkbox */}
                 <div className={cn(
-                  "flex h-4 w-4 items-center justify-center rounded border-2 transition-colors",
+                  "flex h-3.5 w-3.5 items-center justify-center rounded border-2 transition-colors",
                   isChecked
                     ? "border-primary-base bg-primary-base"
                     : "border-stroke-soft-200"
