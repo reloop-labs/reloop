@@ -1,5 +1,6 @@
 "use client";
 
+import { AnimatedHoverBackground } from "@fe/dashboard/components/layout/sidebar/animated-hover-background";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { authClient } from "@reloop/auth/client";
 import * as Avatar from "@reloop/ui/avatar";
@@ -9,7 +10,7 @@ import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "motion/react";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 
@@ -67,11 +68,11 @@ const getFirstChar = (name: string | null, email: string) => {
 const getRoleBadgeStyles = (role: string) => {
   switch (role.toLowerCase()) {
     case "owner":
-      return "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400";
+      return "bg-amber-900/30 border border-amber-300 text-amber-500 dark:bg-amber-900/30 dark:border-amber-300 dark:text-amber-400";
     case "admin":
-      return "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400";
+      return "bg-violet-900/30 border border-violet-600 text-violet-400 dark:bg-violet-900/30 dark:border-violet-600 dark:text-violet-400";
     default:
-      return "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400";
+      return "bg-gray-800/50 border border-gray-600 text-gray-400 dark:bg-gray-800 dark:border-gray-500 dark:text-gray-400";
   }
 };
 
@@ -102,25 +103,22 @@ const getAnimationProps = (row: number, column: number) => {
 };
 
 const TeamSkeleton = () => (
-  <div className="grid grid-cols-[1fr_100px_140px] items-center py-2">
+  <div className="grid grid-cols-[1fr_180px_165px] items-center py-2 px-4">
     <div className="flex items-center gap-3">
-      <Skeleton className="h-10 w-10 rounded-full" />
-      <div className="space-y-1.5">
-        <div className="flex items-center gap-2">
-          <Skeleton className="h-4 w-32" />
-          <Skeleton className="h-5 w-16 rounded-full" />
-        </div>
-        <Skeleton className="h-3 w-40" />
+      <Skeleton className="h-6 w-6 rounded-full" />
+      <div className="flex items-center gap-2">
+        <Skeleton className="h-4 w-24" />
+        <Skeleton className="h-3 w-32" />
       </div>
     </div>
     <Skeleton className="h-5 w-16 rounded-full" />
-    <Skeleton className="h-4 w-12" />
-    <div className="flex items-center justify-end gap-2">
-      <Skeleton className="h-6 w-20 rounded-lg" />
-      <Skeleton className="h-8 w-8 rounded-lg" />
+    <div className="flex items-center justify-end">
+      <Skeleton className="h-4 w-4 rounded" />
     </div>
   </div>
 );
+
+import { InviteDropdown } from "./invite-dropdown";
 
 export const TeamList = ({ searchQuery }: TeamListProps) => {
   const { activeOrganization } = useUserOrganization();
@@ -213,20 +211,21 @@ export const TeamList = ({ searchQuery }: TeamListProps) => {
 
   if (isLoading) {
     return (
-      <div className="w-full text-paragraph-sm">
+      <div className="w-full text-paragraph-sm rounded-xl border border-stroke-soft-200 overflow-hidden">
         {/* Header */}
-        <div className="grid grid-cols-[1fr_1fr] items-center py-2 text-text-sub-600">
+        <div className="grid grid-cols-[1fr_180px_165px] items-center py-2 px-4 text-text-sub-600 border-b border-stroke-soft-200 bg-bg-weak-50">
           <div className="flex items-center gap-2">
             <Icon name="user" className="h-4 w-4" />
-            <span className="text-sm">User</span>
+            <span className="text-xs">User</span>
           </div>
           <div className="flex items-center gap-2">
             <Icon name="user-role" className="h-4 w-4" />
-            <span className="text-sm justify-end">Role</span>
+            <span className="text-xs">Role</span>
           </div>
+          <div />
         </div>
         {/* Skeleton rows */}
-        <div className="space-y-1">
+        <div className="divide-y divide-stroke-soft-200">
           {Array.from({ length: 3 }).map((_, index) => (
             <TeamSkeleton key={`skeleton-${index}`} />
           ))}
@@ -263,9 +262,9 @@ export const TeamList = ({ searchQuery }: TeamListProps) => {
 
   return (
     <AnimatePresence mode="wait">
-      <div className="w-full text-paragraph-sm rounded-xl border border-stroke-soft-200 overflow-hidden">
+      <div className="w-full text-paragraph-sm rounded-xl border border-stroke-soft-100 overflow-hidden">
         {/* Table Header */}
-        <div className="grid grid-cols-[1fr_100px_140px] items-center py-2 px-4 text-text-sub-600 border-b border-stroke-soft-200 bg-bg-weak-50">
+        <div className="grid grid-cols-[1fr_180px_165px] items-center py-3.5 px-4 text-text-sub-600 border-b border-stroke-soft-100">
           <div className="flex items-center gap-2">
             <Icon name="user" className="h-4 w-4" />
             <span className="text-xs">User</span>
@@ -278,13 +277,13 @@ export const TeamList = ({ searchQuery }: TeamListProps) => {
         </div>
 
         {/* Combined List */}
-        <div className="divide-y divide-stroke-soft-200">
+        <div className="divide-y divide-stroke-soft-100">
           {/* Pending Invites */}
           {filteredData.invites.map((invite, index) => (
             <div
               key={`invite-${invite.id}`}
               className={cn(
-                "group/row grid grid-cols-[1fr_100px_140px] items-center py-2 px-4 transition-colors",
+                "group/row grid grid-cols-[1fr_180px_165px] items-center py-2 px-4 transition-colors",
                 "hover:bg-bg-weak-50/50"
               )}
             >
@@ -293,8 +292,8 @@ export const TeamList = ({ searchQuery }: TeamListProps) => {
                 {...getAnimationProps(index + 1, 0)}
                 className="flex items-center gap-3"
               >
-                <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-orange-600 shadow-sm">
-                  <span className="font-semibold text-white text-xs uppercase">{invite.email.charAt(0).toUpperCase()}</span>
+                <div className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-white text-xs uppercase tracking-wide shadow-sm">
+                  {invite.email.charAt(0).toUpperCase()}
                 </div>
 
                 <span className="truncate font-medium text-label-sm text-text-sub-600">
@@ -305,7 +304,7 @@ export const TeamList = ({ searchQuery }: TeamListProps) => {
               {/* Role Column */}
               <motion.div {...getAnimationProps(index + 1, 1)} className="flex items-center">
                 <span className={cn(
-                  "inline-flex rounded-full px-2.5 py-1 text-xs font-medium",
+                  "inline-flex rounded-md px-[6px] py-0.5 text-xs font-medium border-[1px] border-stroke-soft-200",
                   getRoleBadgeStyles(invite.role)
                 )}>
                   {formatRoleLabel(invite.role)}
@@ -313,42 +312,15 @@ export const TeamList = ({ searchQuery }: TeamListProps) => {
               </motion.div>
 
               {/* Actions Column */}
-              <motion.div {...getAnimationProps(index + 1, 2)} className="flex items-center justify-end gap-2">
+              <motion.div {...getAnimationProps(index + 1, 2)} className="flex items-center justify-end gap-8">
                 <span className="rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-2.5 py-1 text-xs text-text-sub-600">
-                  Invite pendi...
+                  Invite pending...
                 </span>
-                <Dropdown.Root>
-                  <Dropdown.Trigger asChild>
-                    <button
-                      type="button"
-                      className="flex h-4 w-4 items-center justify-center rounded-lg text-text-sub-600 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950"
-                    >
-                      <Icon name="more-vertical" className="h-3 w-3" />
-                    </button>
-                  </Dropdown.Trigger>
-                  <Dropdown.Content align="start" className="w-42">
-                    <Dropdown.Item className="text-sm">
-                      <Icon name="mail" className="h-[14px] w-[14px]" />
-                      Resend invite
-                    </Dropdown.Item>
-                    <Dropdown.Item className="text-sm">
-                      <Icon name="link" className="h-[14px] w-[14px]" />
-                      Copy invite link
-                    </Dropdown.Item>
-                    <Dropdown.Item
-                      className="text-error-base text-sm"
-                      onClick={() => handleCancelInvite(invite.id)}
-                      disabled={cancellingInvite === invite.id}
-                    >
-                      {cancellingInvite === invite.id ? (
-                        <Spinner size={14} color="var(--error-base)" />
-                      ) : (
-                        <Icon name="cross" className="h-[14px] w-[14px]" />
-                      )}
-                      Revoke invite
-                    </Dropdown.Item>
-                  </Dropdown.Content>
-                </Dropdown.Root>
+                <InviteDropdown
+                  inviteId={invite.id}
+                  onCancelInvite={handleCancelInvite}
+                  isCancelling={cancellingInvite === invite.id}
+                />
               </motion.div>
             </div>
           ))}
@@ -363,7 +335,7 @@ export const TeamList = ({ searchQuery }: TeamListProps) => {
               <div
                 key={`member-${member.id}`}
                 className={cn(
-                  "group/row grid grid-cols-[1fr_100px_140px] items-center py-2 px-4 transition-colors",
+                  "group/row grid grid-cols-[1fr_180px_165px] items-center py-2 px-4 transition-colors",
                   "hover:bg-bg-weak-50/50"
                 )}
               >
@@ -372,12 +344,12 @@ export const TeamList = ({ searchQuery }: TeamListProps) => {
                   {...getAnimationProps(displayIndex + 1, 0)}
                   className="flex items-center gap-3"
                 >
-                  <Avatar.Root size="24" color="gray">
+                  <Avatar.Root size="20" color="gray">
                     {member.user.image ? (
                       <Avatar.Image src={member.user.image} alt={member.user.name || member.user.email} />
                     ) : (
-                      <Avatar.Image asChild size="20">
-                        <div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-primary-base to-purple-600 font-semibold text-white text-xs uppercase tracking-wide shadow-sm">
+                      <Avatar.Image asChild>
+                        <div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-white text-xs uppercase tracking-wide shadow-sm">
                           {getFirstChar(member.user.name, member.user.email)}
                         </div>
                       </Avatar.Image>
@@ -401,7 +373,7 @@ export const TeamList = ({ searchQuery }: TeamListProps) => {
                 {/* Role Column */}
                 <motion.div {...getAnimationProps(displayIndex + 1, 1)} className="flex items-center">
                   <span className={cn(
-                    "inline-flex rounded-full px-2.5 py-1 text-xs font-medium",
+                    "inline-flex rounded-md px-[6px] py-0.5 text-xs font-medium border-[1px] border-stroke-soft-200",
                     getRoleBadgeStyles(member.role)
                   )}>
                     {formatRoleLabel(member.role)}
