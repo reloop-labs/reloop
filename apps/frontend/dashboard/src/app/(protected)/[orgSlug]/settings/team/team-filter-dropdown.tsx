@@ -64,7 +64,7 @@ export const TeamFilterDropdown = ({ value, onChange }: TeamFilterDropdownProps)
       </Dropdown.Trigger>
       <Dropdown.Content align="start" className="w-44 p-2">
         {/* Header */}
-        <div className="flex items-center justify-between pb-2 mb-1 border-b border-stroke-soft-200">
+        <div className="flex items-center justify-between pb-2 border-b border-stroke-soft-200">
           <span className="text-xs text-text-sub-600 font-medium">Filter by</span>
           <button
             type="button"

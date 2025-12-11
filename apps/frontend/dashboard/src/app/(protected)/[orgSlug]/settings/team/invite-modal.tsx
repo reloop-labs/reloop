@@ -113,8 +113,8 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col">
           <Modal.Body className="space-y-5">
             {/* Email Textarea */}
-            <div className="space-y-1.5">
-              <label className="text-paragraph-sm text-text-sub-600">
+            <div className="space-y-2">
+              <label className="text-paragraph-xs text-text-sub-600">
                 Send Invite to ...
               </label>
               <textarea
@@ -123,9 +123,9 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
                 disabled={loading}
                 className={cn(
                   "w-full min-h-[100px] px-3 py-2.5 rounded-lg",
-                  "bg-bg-white-0 border border-stroke-soft-200",
-                  "text-paragraph-sm text-text-strong-950 placeholder:text-text-sub-600",
-                  "focus:outline-none focus:ring-1 focus:ring-neutral-base/20 focus:border-neutral-base",
+                  "bg-bg-white-0 border-[0.5px] border-stroke-soft-100",
+                  "text-paragraph-xs text-text-strong-900 text-sm placeholder:text-sm placeholder:text-text-sub-600 outline-none ring-0",
+                  "focus:outline-none focus:ring-[0.5px] focus:ring-inset focus:ring-neutral-base/10 focus:border-neutral-base",
                   "resize-none transition-all",
                   "disabled:opacity-50 disabled:cursor-not-allowed"
                 )}
@@ -138,48 +138,29 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
             </div>
 
             {/* Role Select */}
-            <div className="space-y-1.5">
-              <label className="text-paragraph-sm text-text-sub-600">
+            <div className="space-y-2">
+              <label className="text-paragraph-xs text-text-sub-600">
                 Invite as
               </label>
               <Select.Root
+                size="small"
                 defaultValue="member"
                 disabled={loading}
                 onValueChange={(value: "admin" | "member") => {
                   form.setValue("role", value);
                 }}
               >
-                <Select.Trigger className="w-full">
+                <Select.Trigger className="w-full text-paragraph-xs">
                   <Select.Value placeholder="Select role" />
                 </Select.Trigger>
-                <Select.Content>
-                  <Select.Item value="member">Member</Select.Item>
-                  <Select.Item value="admin">Admin</Select.Item>
+                <Select.Content className="text-paragraph-xs">
+                  <Select.Item value="member" className="h-7">Member</Select.Item>
+                  <Select.Item value="admin" className="h-7">Admin</Select.Item>
                 </Select.Content>
               </Select.Root>
             </div>
 
-            {/* Team Select */}
-            <div className="space-y-1.5">
-              <label className="text-paragraph-sm text-text-sub-600">
-                Add to team <span className="text-text-disabled-300">(optional)</span>
-              </label>
-              <Select.Root
-                disabled={loading}
-                onValueChange={(value: string) => {
-                  form.setValue("team", value);
-                }}
-              >
-                <Select.Trigger className="w-full">
-                  <Select.Value placeholder="Search or create a team" />
-                </Select.Trigger>
-                <Select.Content>
-                  <Select.Item value="engineering">Engineering</Select.Item>
-                  <Select.Item value="design">Design</Select.Item>
-                  <Select.Item value="marketing">Marketing</Select.Item>
-                </Select.Content>
-              </Select.Root>
-            </div>
+
           </Modal.Body>
 
           {/* Footer */}
@@ -187,7 +168,7 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
             <Button.Root
               type="submit"
               variant="neutral"
-              size="small"
+              size="xsmall"
               disabled={loading}
             >
               {loading ? (
@@ -198,7 +179,7 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
               ) : (
                 <>
                   Send Invites
-                  <Icon name="corner-down-left" className="h-4 w-4 ml-1 mb-3 mr-4" />
+                  <Icon name="corner-down-left" className="w-4 h-4" />
                 </>
               )}
             </Button.Root>

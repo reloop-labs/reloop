@@ -406,7 +406,7 @@ const SelectItem = React.forwardRef<
 			<SelectPrimitives.ItemIndicator asChild>
 				<Icon
 					name="check"
-					className="-translate-y-1/2 absolute top-1/2 right-2 size-5 shrink-0 text-text-sub-600"
+					className="-translate-y-1/2 absolute top-1/2 right-2 size-3.5 shrink-0 text-text-sub-600"
 				/>
 			</SelectPrimitives.ItemIndicator>
 		</SelectPrimitives.Item>
