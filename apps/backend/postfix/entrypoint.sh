@@ -76,6 +76,33 @@ postconf -e "milter_default_action=accept"
 postconf -e "smtpd_milters=inet:localhost:8891"
 postconf -e "non_smtpd_milters=inet:localhost:8891"
 
+# ----- TLS SETUP -----
+TLS_DIR="/etc/postfix/tls"
+mkdir -p "$TLS_DIR"
+
+# Generate self-signed certificate if it doesn't exist
+if [ ! -f "$TLS_DIR/server.key" ]; then
+    echo ""
+    echo "Generating TLS certificate..."
+    openssl req -new -x509 -days 3650 -nodes \
+        -out "$TLS_DIR/server.crt" \
+        -keyout "$TLS_DIR/server.key" \
+        -subj "/CN=mail.$DOMAIN/O=$DOMAIN/C=US" 2>/dev/null
+    chmod 600 "$TLS_DIR/server.key"
+    echo "TLS certificate generated!"
+fi
+
+# Enable TLS for outbound connections (opportunistic)
+postconf -e "smtp_tls_security_level=may"
+postconf -e "smtp_tls_loglevel=1"
+postconf -e "smtp_tls_CAfile=/etc/ssl/certs/ca-certificates.crt"
+
+# Enable TLS for inbound connections
+postconf -e "smtpd_tls_security_level=may"
+postconf -e "smtpd_tls_cert_file=$TLS_DIR/server.crt"
+postconf -e "smtpd_tls_key_file=$TLS_DIR/server.key"
+postconf -e "smtpd_tls_loglevel=1"
+
 # Relay restrictions
 postconf -e "smtpd_relay_restrictions=permit_mynetworks, reject_unauth_destination"
 

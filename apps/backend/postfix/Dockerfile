@@ -8,6 +8,7 @@ RUN apt-get update && \
     postfix \
     opendkim \
     opendkim-tools \
+    openssl \
     mailutils \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
