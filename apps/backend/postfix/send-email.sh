@@ -12,12 +12,17 @@ echo -e "${BLUE}      Send Email via Postfix      ${NC}"
 echo -e "${BLUE}==================================${NC}"
 echo ""
 
-# Get sender email
+# Get sender info
 DOMAIN="${MAIL_DOMAIN:-localhost}"
-read -p "From name (default: admin): " FROM_NAME
-FROM_NAME="${FROM_NAME:-admin}"
-FROM_EMAIL="${FROM_NAME}@${DOMAIN}"
-echo -e "${GREEN}Sender: ${FROM_EMAIL}${NC}"
+
+read -p "From email username (default: admin): " FROM_USER
+FROM_USER="${FROM_USER:-admin}"
+FROM_EMAIL="${FROM_USER}@${DOMAIN}"
+
+read -p "From display name (default: ${FROM_USER}): " FROM_DISPLAY
+FROM_DISPLAY="${FROM_DISPLAY:-$FROM_USER}"
+
+echo -e "${GREEN}Sender: ${FROM_DISPLAY} <${FROM_EMAIL}>${NC}"
 echo ""
 
 # Get recipient
@@ -41,7 +46,7 @@ echo ""
 # Confirm
 echo -e "${YELLOW}==================================${NC}"
 echo -e "${YELLOW}Email Summary:${NC}"
-echo -e "  From: ${FROM_EMAIL}"
+echo -e "  From: ${FROM_DISPLAY} <${FROM_EMAIL}>"
 echo -e "  To: ${TO_EMAIL}"
 echo -e "  Subject: ${SUBJECT}"
 echo -e "${YELLOW}==================================${NC}"
@@ -53,13 +58,15 @@ if [ "$CONFIRM" != "y" ] && [ "$CONFIRM" != "Y" ]; then
     exit 0
 fi
 
-# Send the email using mail command
-echo "$BODY" | mail -s "$SUBJECT" -r "$FROM_EMAIL" "$TO_EMAIL"
+# Send the email using mail command with proper From header
+echo "$BODY" | mail -s "$SUBJECT" \
+    -a "From: ${FROM_DISPLAY} <${FROM_EMAIL}>" \
+    "$TO_EMAIL"
 
 if [ $? -eq 0 ]; then
     echo ""
     echo -e "${GREEN}✓ Email queued for delivery!${NC}"
-    echo -e "  Check Postfix logs with: docker logs postfix-minimal"
+    echo -e "  Check Postfix logs with: docker logs postfix"
 else
     echo ""
     echo -e "${RED}✗ Failed to send email${NC}"
