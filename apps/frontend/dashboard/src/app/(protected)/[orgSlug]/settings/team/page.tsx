@@ -24,9 +24,9 @@ const Team = () => {
 			{/* Search, Filter, and Invite Button */}
 			<div className="flex items-center gap-3">
 				<div className="flex-1">
-					<Input.Root size="small">
+					<Input.Root size="xsmall">
 						<Input.Wrapper>
-							<Input.Icon as={Icon} name="search" />
+							<Input.Icon as={Icon} name="search" size="xsmall" />
 							<Input.Input
 								placeholder="Search name or email"
 								value={searchQuery}
@@ -39,7 +39,7 @@ const Team = () => {
 				<Button.Root
 					variant="neutral"
 					mode="stroke"
-					size="small"
+					size="xsmall"
 				>
 					<Icon name="filter" className="h-4 w-4" />
 					<span>Filter</span>
@@ -47,7 +47,7 @@ const Team = () => {
 
 				<Button.Root
 					variant="neutral"
-					size="small"
+					size="xsmall"
 					onClick={() => setIsInviteModalOpen(true)}
 				>
 					<Icon name="user-plus" className="h-4 w-4" />

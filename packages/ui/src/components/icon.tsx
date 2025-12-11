@@ -428,6 +428,20 @@ export const IconsSprite = () => (
 					strokeLinejoin="round"
 				/>
 			</symbol>
+			<symbol
+				id="cross"
+				viewBox="0 0 24 24"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<path
+					d="M6 18L18 6M6 6L18 18"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
 			<symbol id="cross-circle" viewBox="0 0 24 24" fill="none">
 				<circle opacity="0.12" cx={12} cy={12} r={10} fill="currentColor" />
 				<path
@@ -459,15 +473,41 @@ export const IconsSprite = () => (
 				/>
 			</symbol>
 			<symbol
-				id="filter"
-				width={24}
-				height={24}
+				id="link"
 				viewBox="0 0 24 24"
-				fill="currentColor"
+				fill="none"
 				xmlns="http://www.w3.org/2000/svg"
 			>
 				<path
-					d="M3 6H21M6 12H18M10 18H14"
+					d="M12.2893 18.7484L11.5786 19.4816C9.61616 21.5061 6.43435 21.5061 4.47186 19.4816C2.50938 17.457 2.50938 14.1745 4.47186 12.1499L6.16656 10.4016C7.97808 8.53279 10.9151 8.53279 12.7267 10.4016L13 10.6836M11.7107 5.25159L12.4214 4.51843C14.3838 2.49386 17.5657 2.49386 19.5281 4.51843C21.4906 6.543 21.4906 9.82549 19.5281 11.8501L17.8334 13.5984C16.0219 15.4672 13.0849 15.4672 11.2733 13.5984L11 13.3164"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
+			<symbol
+				id="user-role"
+				viewBox="0 0 24 24"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<path
+					d="M17 10L19 12L23 8M13 6C13 8.20914 11.2091 10 9 10C6.79086 10 5 8.20914 5 6C5 3.79086 6.79086 2 9 2C11.2091 2 13 3.79086 13 6ZM5.2 22H12.8C14.5673 22 16 20.5673 16 18.8C16 16.149 13.851 14 11.2 14H6.8C4.14903 14 2 16.149 2 18.8C2 20.5673 3.43269 22 5.2 22Z"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
+			<symbol
+				id="filter"
+				viewBox="0 0 24 24"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<path
+					d="M17.75 17.75H20.75M17.75 17.75C17.75 19.4069 16.4069 20.75 14.75 20.75C13.0931 20.75 11.75 19.4069 11.75 17.75C11.75 16.0931 13.0931 14.75 14.75 14.75C16.4069 14.75 17.75 16.0931 17.75 17.75ZM0.75 10.75H3.75M3.75 10.75C3.75 12.4069 5.09315 13.75 6.75 13.75C8.40685 13.75 9.75 12.4069 9.75 10.75C9.75 9.09315 8.40685 7.75 6.75 7.75C5.09315 7.75 3.75 9.09315 3.75 10.75ZM17.75 3.75H20.75M17.75 3.75C17.75 5.40685 16.4069 6.75 14.75 6.75C13.0931 6.75 11.75 5.40685 11.75 3.75C11.75 2.09315 13.0931 0.75 14.75 0.75C16.4069 0.75 17.75 2.09315 17.75 3.75ZM0.75 17.75H8.75M12.75 10.75H20.75M0.75 3.75H8.75"
 					stroke="currentColor"
 					strokeWidth="1.5"
 					strokeLinecap="round"

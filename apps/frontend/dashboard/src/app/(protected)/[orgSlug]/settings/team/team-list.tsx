@@ -55,6 +55,15 @@ const getInitials = (name: string | null, email: string) => {
     .slice(0, 2);
 };
 
+const getFirstChar = (name: string | null, email: string) => {
+  if (name && name.length > 0) {
+    return name.charAt(0).toUpperCase();
+  }
+  const emailPart = email.split("@")[0];
+  if (!emailPart) return "?";
+  return emailPart.charAt(0).toUpperCase();
+};
+
 const getRoleBadgeStyles = (role: string) => {
   switch (role.toLowerCase()) {
     case "owner":
@@ -93,7 +102,7 @@ const getAnimationProps = (row: number, column: number) => {
 };
 
 const TeamSkeleton = () => (
-  <div className="grid grid-cols-[1fr_auto_48px] items-center py-3">
+  <div className="grid grid-cols-[1fr_100px_140px] items-center py-2">
     <div className="flex items-center gap-3">
       <Skeleton className="h-10 w-10 rounded-full" />
       <div className="space-y-1.5">
@@ -206,13 +215,13 @@ export const TeamList = ({ searchQuery }: TeamListProps) => {
     return (
       <div className="w-full text-paragraph-sm">
         {/* Header */}
-        <div className="grid grid-cols-[1fr_1fr] items-center py-3 text-text-sub-600">
+        <div className="grid grid-cols-[1fr_1fr] items-center py-2 text-text-sub-600">
           <div className="flex items-center gap-2">
             <Icon name="user" className="h-4 w-4" />
             <span className="text-sm">User</span>
           </div>
           <div className="flex items-center gap-2">
-            <Icon name="key" className="h-4 w-4" />
+            <Icon name="user-role" className="h-4 w-4" />
             <span className="text-sm justify-end">Role</span>
           </div>
         </div>
@@ -254,28 +263,28 @@ export const TeamList = ({ searchQuery }: TeamListProps) => {
 
   return (
     <AnimatePresence mode="wait">
-      <div className="w-full text-paragraph-sm">
+      <div className="w-full text-paragraph-sm rounded-xl border border-stroke-soft-200 overflow-hidden">
         {/* Table Header */}
-        <div className="grid grid-cols-[1fr_auto_48px] items-center py-3 text-text-sub-600">
+        <div className="grid grid-cols-[1fr_100px_140px] items-center py-2 px-4 text-text-sub-600 border-b border-stroke-soft-200 bg-bg-weak-50">
           <div className="flex items-center gap-2">
             <Icon name="user" className="h-4 w-4" />
-            <span className="text-sm">User</span>
+            <span className="text-xs">User</span>
           </div>
           <div className="flex items-center gap-2">
-            <Icon name="key" className="h-4 w-4" />
-            <span className="text-sm">Role</span>
+            <Icon name="user-role" className="h-4 w-4" />
+            <span className="text-xs">Role</span>
           </div>
           <div />
         </div>
 
         {/* Combined List */}
-        <div className="space-y-0">
+        <div className="divide-y divide-stroke-soft-200">
           {/* Pending Invites */}
           {filteredData.invites.map((invite, index) => (
             <div
               key={`invite-${invite.id}`}
               className={cn(
-                "group/row grid grid-cols-[1fr_auto_48px] items-center py-3 transition-colors",
+                "group/row grid grid-cols-[1fr_100px_140px] items-center py-2 px-4 transition-colors",
                 "hover:bg-bg-weak-50/50"
               )}
             >
@@ -284,56 +293,57 @@ export const TeamList = ({ searchQuery }: TeamListProps) => {
                 {...getAnimationProps(index + 1, 0)}
                 className="flex items-center gap-3"
               >
-                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-amber-500">
-                  <span className="font-medium text-white text-sm">?</span>
+                <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-orange-600 shadow-sm">
+                  <span className="font-semibold text-white text-xs uppercase">{invite.email.charAt(0).toUpperCase()}</span>
                 </div>
-                <span className="truncate font-medium text-label-sm text-text-strong-950">
+
+                <span className="truncate font-medium text-label-sm text-text-sub-600">
                   {invite.email}
                 </span>
               </motion.div>
 
               {/* Role Column */}
-              <motion.div {...getAnimationProps(index + 1, 1)} className="flex items-center gap-2">
+              <motion.div {...getAnimationProps(index + 1, 1)} className="flex items-center">
                 <span className={cn(
                   "inline-flex rounded-full px-2.5 py-1 text-xs font-medium",
                   getRoleBadgeStyles(invite.role)
                 )}>
                   {formatRoleLabel(invite.role)}
                 </span>
-                <span className="rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-2.5 py-1 text-xs text-text-sub-600">
-                  Invite pending...
-                </span>
               </motion.div>
 
               {/* Actions Column */}
-              <motion.div {...getAnimationProps(index + 1, 2)} className="flex items-center justify-end opacity-0 group-hover/row:opacity-100 transition-opacity">
+              <motion.div {...getAnimationProps(index + 1, 2)} className="flex items-center justify-end gap-2">
+                <span className="rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-2.5 py-1 text-xs text-text-sub-600">
+                  Invite pendi...
+                </span>
                 <Dropdown.Root>
                   <Dropdown.Trigger asChild>
                     <button
                       type="button"
-                      className="flex h-8 w-8 items-center justify-center rounded-lg text-text-sub-600 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950"
+                      className="flex h-4 w-4 items-center justify-center rounded-lg text-text-sub-600 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950"
                     >
-                      <Icon name="more-vertical" className="h-4 w-4" />
+                      <Icon name="more-vertical" className="h-3 w-3" />
                     </button>
                   </Dropdown.Trigger>
-                  <Dropdown.Content align="end" className="w-48">
-                    <Dropdown.Item>
-                      <Icon name="mail" className="h-4 w-4" />
+                  <Dropdown.Content align="start" className="w-42">
+                    <Dropdown.Item className="text-sm">
+                      <Icon name="mail" className="h-[14px] w-[14px]" />
                       Resend invite
                     </Dropdown.Item>
-                    <Dropdown.Item>
-                      <Icon name="link" className="h-4 w-4" />
+                    <Dropdown.Item className="text-sm">
+                      <Icon name="link" className="h-[14px] w-[14px]" />
                       Copy invite link
                     </Dropdown.Item>
                     <Dropdown.Item
-                      className="text-error-base"
+                      className="text-error-base text-sm"
                       onClick={() => handleCancelInvite(invite.id)}
                       disabled={cancellingInvite === invite.id}
                     >
                       {cancellingInvite === invite.id ? (
                         <Spinner size={14} color="var(--error-base)" />
                       ) : (
-                        <Icon name="x-close" className="h-4 w-4" />
+                        <Icon name="cross" className="h-[14px] w-[14px]" />
                       )}
                       Revoke invite
                     </Dropdown.Item>
@@ -353,7 +363,7 @@ export const TeamList = ({ searchQuery }: TeamListProps) => {
               <div
                 key={`member-${member.id}`}
                 className={cn(
-                  "group/row grid grid-cols-[1fr_auto_48px] items-center py-3 transition-colors",
+                  "group/row grid grid-cols-[1fr_100px_140px] items-center py-2 px-4 transition-colors",
                   "hover:bg-bg-weak-50/50"
                 )}
               >
@@ -362,13 +372,13 @@ export const TeamList = ({ searchQuery }: TeamListProps) => {
                   {...getAnimationProps(displayIndex + 1, 0)}
                   className="flex items-center gap-3"
                 >
-                  <Avatar.Root size="40" color="gray">
+                  <Avatar.Root size="24" color="gray">
                     {member.user.image ? (
                       <Avatar.Image src={member.user.image} alt={member.user.name || member.user.email} />
                     ) : (
-                      <Avatar.Image asChild>
-                        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-violet-500 to-purple-600 font-medium text-white text-sm">
-                          {getInitials(member.user.name, member.user.email)}
+                      <Avatar.Image asChild size="20">
+                        <div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-primary-base to-purple-600 font-semibold text-white text-xs uppercase tracking-wide shadow-sm">
+                          {getFirstChar(member.user.name, member.user.email)}
                         </div>
                       </Avatar.Image>
                     )}
@@ -379,17 +389,17 @@ export const TeamList = ({ searchQuery }: TeamListProps) => {
                         {member.user.name || member.user.email.split("@")[0]}
                       </span>
                       {isCurrentUser && (
-                        <span className="text-text-sub-600 text-xs">(You)</span>
+                        <span className="text-text-sub-600">(You)</span>
                       )}
+                      <span className="truncate text-text-sub-600 ">
+                        {member.user.email}
+                      </span>
                     </div>
-                    <span className="truncate text-text-sub-600 text-xs">
-                      {member.user.email}
-                    </span>
                   </div>
                 </motion.div>
 
                 {/* Role Column */}
-                <motion.div {...getAnimationProps(displayIndex + 1, 1)} className="flex justify-end">
+                <motion.div {...getAnimationProps(displayIndex + 1, 1)} className="flex items-center">
                   <span className={cn(
                     "inline-flex rounded-full px-2.5 py-1 text-xs font-medium",
                     getRoleBadgeStyles(member.role)
@@ -398,24 +408,22 @@ export const TeamList = ({ searchQuery }: TeamListProps) => {
                   </span>
                 </motion.div>
 
-
-
                 {/* Actions Column */}
                 <motion.div
-                  {...getAnimationProps(displayIndex + 1, 3)}
-                  className="flex items-center justify-end opacity-0 group-hover/row:opacity-100 transition-opacity"
+                  {...getAnimationProps(displayIndex + 1, 2)}
+                  className="flex items-center justify-end"
                 >
-                  <Dropdown.Root>
-                    <Dropdown.Trigger asChild>
-                      <button
-                        type="button"
-                        className="flex h-8 w-8 items-center justify-center rounded-lg text-text-sub-600 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950"
-                      >
-                        <Icon name="more-vertical" className="h-4 w-4" />
-                      </button>
-                    </Dropdown.Trigger>
-                    <Dropdown.Content align="end" className="w-48">
-                      {!isOwner && !isCurrentUser && (
+                  {!isOwner && !isCurrentUser && (
+                    <Dropdown.Root>
+                      <Dropdown.Trigger asChild>
+                        <button
+                          type="button"
+                          className="flex h-8 w-8 items-center justify-center rounded-lg text-text-sub-600 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950"
+                        >
+                          <Icon name="more-vertical" className="h-4 w-4" />
+                        </button>
+                      </Dropdown.Trigger>
+                      <Dropdown.Content align="end" className="w-48">
                         <Dropdown.Item
                           className="text-error-base"
                           onClick={() => handleRemoveMember(member.id)}
@@ -428,9 +436,9 @@ export const TeamList = ({ searchQuery }: TeamListProps) => {
                           )}
                           Remove from organization
                         </Dropdown.Item>
-                      )}
-                    </Dropdown.Content>
-                  </Dropdown.Root>
+                      </Dropdown.Content>
+                    </Dropdown.Root>
+                  )}
                 </motion.div>
               </div>
             );
