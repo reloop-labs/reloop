@@ -93,7 +93,7 @@ const getAnimationProps = (row: number, column: number) => {
 };
 
 const TeamSkeleton = () => (
-  <div className="grid grid-cols-[1fr_1fr] items-center py-3">
+  <div className="grid grid-cols-[1fr_auto_48px] items-center py-3">
     <div className="flex items-center gap-3">
       <Skeleton className="h-10 w-10 rounded-full" />
       <div className="space-y-1.5">
@@ -256,15 +256,16 @@ export const TeamList = ({ searchQuery }: TeamListProps) => {
     <AnimatePresence mode="wait">
       <div className="w-full text-paragraph-sm">
         {/* Table Header */}
-        <div className="grid grid-cols-[1fr_1fr] items-center py-3 text-text-sub-600">
+        <div className="grid grid-cols-[1fr_auto_48px] items-center py-3 text-text-sub-600">
           <div className="flex items-center gap-2">
             <Icon name="user" className="h-4 w-4" />
             <span className="text-sm">User</span>
           </div>
-          <div className="flex items-center gap-2 justify-end">
+          <div className="flex items-center gap-2">
             <Icon name="key" className="h-4 w-4" />
-            <span className="text-sm ">Role</span>
+            <span className="text-sm">Role</span>
           </div>
+          <div />
         </div>
 
         {/* Combined List */}
@@ -274,7 +275,7 @@ export const TeamList = ({ searchQuery }: TeamListProps) => {
             <div
               key={`invite-${invite.id}`}
               className={cn(
-                "group/row grid grid-cols-[1fr_1fr] items-center py-3 transition-colors",
+                "group/row grid grid-cols-[1fr_auto_48px] items-center py-3 transition-colors",
                 "hover:bg-bg-weak-50/50"
               )}
             >
@@ -292,7 +293,7 @@ export const TeamList = ({ searchQuery }: TeamListProps) => {
               </motion.div>
 
               {/* Role Column */}
-              <motion.div {...getAnimationProps(index + 1, 1)} className="flex justify-end items-center gap-2">
+              <motion.div {...getAnimationProps(index + 1, 1)} className="flex items-center gap-2">
                 <span className={cn(
                   "inline-flex rounded-full px-2.5 py-1 text-xs font-medium",
                   getRoleBadgeStyles(invite.role)
@@ -302,6 +303,10 @@ export const TeamList = ({ searchQuery }: TeamListProps) => {
                 <span className="rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-2.5 py-1 text-xs text-text-sub-600">
                   Invite pending...
                 </span>
+              </motion.div>
+
+              {/* Actions Column */}
+              <motion.div {...getAnimationProps(index + 1, 2)} className="flex items-center justify-end opacity-0 group-hover/row:opacity-100 transition-opacity">
                 <Dropdown.Root>
                   <Dropdown.Trigger asChild>
                     <button
@@ -312,6 +317,14 @@ export const TeamList = ({ searchQuery }: TeamListProps) => {
                     </button>
                   </Dropdown.Trigger>
                   <Dropdown.Content align="end" className="w-48">
+                    <Dropdown.Item>
+                      <Icon name="mail" className="h-4 w-4" />
+                      Resend invite
+                    </Dropdown.Item>
+                    <Dropdown.Item>
+                      <Icon name="link" className="h-4 w-4" />
+                      Copy invite link
+                    </Dropdown.Item>
                     <Dropdown.Item
                       className="text-error-base"
                       onClick={() => handleCancelInvite(invite.id)}
@@ -322,7 +335,7 @@ export const TeamList = ({ searchQuery }: TeamListProps) => {
                       ) : (
                         <Icon name="x-close" className="h-4 w-4" />
                       )}
-                      Cancel invitation
+                      Revoke invite
                     </Dropdown.Item>
                   </Dropdown.Content>
                 </Dropdown.Root>
@@ -340,7 +353,7 @@ export const TeamList = ({ searchQuery }: TeamListProps) => {
               <div
                 key={`member-${member.id}`}
                 className={cn(
-                  "group/row grid grid-cols-[1fr_1fr] items-center py-3 transition-colors",
+                  "group/row grid grid-cols-[1fr_auto_48px] items-center py-3 transition-colors",
                   "hover:bg-bg-weak-50/50"
                 )}
               >
@@ -390,19 +403,19 @@ export const TeamList = ({ searchQuery }: TeamListProps) => {
                 {/* Actions Column */}
                 <motion.div
                   {...getAnimationProps(displayIndex + 1, 3)}
-                  className="flex items-center justify-end"
+                  className="flex items-center justify-end opacity-0 group-hover/row:opacity-100 transition-opacity"
                 >
-                  {!isOwner && !isCurrentUser && (
-                    <Dropdown.Root>
-                      <Dropdown.Trigger asChild>
-                        <button
-                          type="button"
-                          className="flex h-8 w-8 items-center justify-center rounded-lg text-text-sub-600 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950"
-                        >
-                          <Icon name="more-vertical" className="h-4 w-4" />
-                        </button>
-                      </Dropdown.Trigger>
-                      <Dropdown.Content align="end" className="w-48">
+                  <Dropdown.Root>
+                    <Dropdown.Trigger asChild>
+                      <button
+                        type="button"
+                        className="flex h-8 w-8 items-center justify-center rounded-lg text-text-sub-600 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950"
+                      >
+                        <Icon name="more-vertical" className="h-4 w-4" />
+                      </button>
+                    </Dropdown.Trigger>
+                    <Dropdown.Content align="end" className="w-48">
+                      {!isOwner && !isCurrentUser && (
                         <Dropdown.Item
                           className="text-error-base"
                           onClick={() => handleRemoveMember(member.id)}
@@ -415,9 +428,9 @@ export const TeamList = ({ searchQuery }: TeamListProps) => {
                           )}
                           Remove from organization
                         </Dropdown.Item>
-                      </Dropdown.Content>
-                    </Dropdown.Root>
-                  )}
+                      )}
+                    </Dropdown.Content>
+                  </Dropdown.Root>
                 </motion.div>
               </div>
             );

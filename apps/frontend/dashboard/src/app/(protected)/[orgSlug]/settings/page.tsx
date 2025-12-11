@@ -273,7 +273,7 @@ const SettingsPage = () => {
 					<div className="grid grid-cols-1 gap-3">
 						<div>
 							<Label.Root htmlFor="name">Name</Label.Root>
-							<Input.Root className="mt-1 w-full">
+							<Input.Root className="mt-1 w-full" size="small">
 								<Input.Wrapper className="w-full">
 									<Input.Input
 										id="name"
@@ -291,6 +291,7 @@ const SettingsPage = () => {
 						<div>
 							<Label.Root htmlFor="slug">Slug</Label.Root>
 							<Input.Root
+								size="small"
 								className="mt-1 w-full"
 								hasError={slugStatus === "taken"}
 								hasSuccess={slugStatus === "available"}
@@ -334,7 +335,7 @@ const SettingsPage = () => {
 					<div className="flex justify-end">
 						<Button.Root
 							variant="neutral"
-							size="xxsmall"
+							size="xsmall"
 							onClick={handleSaveChanges}
 							disabled={
 								!hasChanges ||

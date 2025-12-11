@@ -458,21 +458,37 @@ export const IconsSprite = () => (
 					strokeLinejoin="round"
 				/>
 			</symbol>
-			<svg
+			<symbol
 				id="filter"
 				width={24}
 				height={24}
 				viewBox="0 0 24 24"
-				fill="none"
+				fill="currentColor"
 				xmlns="http://www.w3.org/2000/svg"
 			>
 				<path
 					d="M3 6H21M6 12H18M10 18H14"
-					stroke="#2F384C"
+					stroke="currentColor"
 					strokeWidth="1.5"
 					strokeLinecap="round"
 				/>
-			</svg>
+			</symbol>
+			<symbol
+				id="corner-down-left"
+				width={24}
+				height={24}
+				viewBox="0 0 24 24"
+				fill="currentColor"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<path
+					d="M3 16L8 21M3 16L8 11M3 16H14.6C16.8402 16 17.9603 16 18.816 15.564C19.5686 15.1805 20.1805 14.5686 20.564 13.816C21 12.9603 21 11.8402 21 9.6V3"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
 
 			<symbol id="info-outline" viewBox="0 0 24 24" fill="none">
 				<circle opacity="0.12" cx={12} cy={12} r={10} fill="currentColor" />

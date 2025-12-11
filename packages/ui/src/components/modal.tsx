@@ -100,7 +100,7 @@ function ModalHeader({
 	return (
 		<div
 			className={cn(
-				"relative flex items-start gap-3.5 py-4 pr-14 pl-5 before:absolute before:inset-x-0 before:bottom-0 before:border-stroke-soft-200 before:border-b",
+				"relative flex items-center gap-3.5 py-4 pr-14 pl-5 before:absolute before:inset-x-0 before:bottom-0 before:border-stroke-soft-200 before:border-b",
 				className,
 			)}
 			{...rest}

@@ -15,9 +15,9 @@ const Team = () => {
 		<div className="w-full space-y-6 pt-5">
 			{/* Header */}
 			<div>
-				<h1 className="font-medium text-label-lg text-text-strong-950">Members and teams</h1>
+				<h1 className="font-medium text-label-lg text-text-strong-950">Team</h1>
 				<p className="text-paragraph-sm text-text-sub-600">
-					Manage workspace members and teams, set access levels, and invite new users.
+					Manage workspace members, set access levels, and invite new users.
 				</p>
 			</div>
 
@@ -51,7 +51,7 @@ const Team = () => {
 					onClick={() => setIsInviteModalOpen(true)}
 				>
 					<Icon name="user-plus" className="h-4 w-4" />
-					<span>Invite team members</span>
+					<span>Invite members</span>
 				</Button.Root>
 			</div>
 

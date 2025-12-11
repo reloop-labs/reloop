@@ -98,7 +98,7 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
 
   return (
     <Modal.Root open={open} onOpenChange={onOpenChange}>
-      <Modal.Content className="sm:max-w-[480px]" showClose={false}>
+      <Modal.Content className="sm:max-w-[480px]" showClose={true}>
         {/* Header */}
         <Modal.Header>
           <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-bg-white-0 ring-1 ring-stroke-soft-200 ring-inset">
@@ -125,7 +125,7 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
                   "w-full min-h-[100px] px-3 py-2.5 rounded-lg",
                   "bg-bg-white-0 border border-stroke-soft-200",
                   "text-paragraph-sm text-text-strong-950 placeholder:text-text-sub-600",
-                  "focus:outline-none focus:ring-2 focus:ring-primary-base/20 focus:border-primary-base",
+                  "focus:outline-none focus:ring-1 focus:ring-neutral-base/20 focus:border-neutral-base",
                   "resize-none transition-all",
                   "disabled:opacity-50 disabled:cursor-not-allowed"
                 )}
@@ -186,13 +186,21 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
           <Modal.Footer className="justify-end">
             <Button.Root
               type="submit"
-              variant="primary"
+              variant="neutral"
               size="small"
               disabled={loading}
             >
-              {loading && <Spinner size={14} color="white" />}
-              {loading ? "Sending..." : "Send Invites"}
-              {!loading && <Icon name="corner-down-left" className="h-4 w-4" />}
+              {loading ? (
+                <>
+                  <Spinner size={14} color="white" />
+                  Sending...
+                </>
+              ) : (
+                <>
+                  Send Invites
+                  <Icon name="corner-down-left" className="h-4 w-4 ml-1 mb-3 mr-4" />
+                </>
+              )}
             </Button.Root>
           </Modal.Footer>
         </form>

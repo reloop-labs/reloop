@@ -157,7 +157,7 @@ const AccountPage = () => {
   return (
     <div className="w-full space-y-8 pt-5">
       <div>
-        <div className="flex items-center gap-2 rounded-xl p-2 bg-bg-weak-50/50 mb-5 text-text-sub-600 text-sm">
+        <div className="flex items-center gap-2 rounded-xl p-2 bg-bg-weak-50/60 mb-5 text-text-sub-600 text-sm">
           <Icon name="info-outline" className="w-4 h-4" />
           Changes to your profile will apply to all of your workspaces.
         </div>
@@ -257,7 +257,7 @@ const AccountPage = () => {
                   />
 
                   {isFirstNameFocused && (
-                    <div className="border border-stroke-sub-300 px-2 py-0.5 rounded-md text-xs bg-bg-white-0 text-text-sub-600 ring-inset ring-stroke-soft-200 flex items-center gap-1">
+                    <div className="border border-stroke-sub-300 px-1 py-[1px] rounded-md text-[10px] bg-bg-white-0 text-text-sub-600 ring-inset ring-stroke-soft-200 flex items-center gap-1">
                       <span>⏎</span>
                       <span>Enter</span>
                     </div>
@@ -286,7 +286,7 @@ const AccountPage = () => {
                     }}
                   />
                   {isLastNameFocused && (
-                    <div className="border border-stroke-sub-300 px-2 py-0.5 rounded-md text-xs bg-bg-white-0 text-text-sub-600 ring-inset ring-stroke-soft-200 flex items-center gap-1">
+                    <div className="border border-stroke-sub-300 px-1 py-[1px] rounded-md text-[10px] bg-bg-white-0 text-text-sub-600 ring-inset ring-stroke-soft-200 flex items-center gap-1">
                       <span>⏎</span>
                       <span>Enter</span>
                     </div>
@@ -297,7 +297,11 @@ const AccountPage = () => {
           </div>
 
           <div>
-            <Label.Root htmlFor="email">Primary Email Address</Label.Root>
+            <Label.Root htmlFor="email" className="flex items-center gap-1">Email Address
+              <span className="text-text-sub-600 text-xs">
+                {' '}(Read only)
+              </span>
+            </Label.Root>
             <Input.Root className="mt-1 w-full" size="small">
               <Input.Wrapper className="w-full">
                 <Input.Input
