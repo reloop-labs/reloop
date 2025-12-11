@@ -37,6 +37,7 @@ interface Invite {
 
 interface TeamListProps {
   searchQuery: string;
+  filter?: "all" | "invited" | "suspended" | "active";
 }
 
 const getInitials = (name: string | null, email: string) => {
@@ -68,11 +69,11 @@ const getFirstChar = (name: string | null, email: string) => {
 const getRoleBadgeStyles = (role: string) => {
   switch (role.toLowerCase()) {
     case "owner":
-      return "bg-amber-900/30 border border-amber-300 text-amber-500 dark:bg-amber-900/30 dark:border-amber-300 dark:text-amber-400";
+      return "border border-primary-base text-primary-base bg-primary-base/20";
     case "admin":
-      return "bg-violet-900/30 border border-violet-600 text-violet-400 dark:bg-violet-900/30 dark:border-violet-600 dark:text-violet-400";
+      return "border border-violet-500 text-violet-400 bg-violet-500/20";
     default:
-      return "bg-gray-800/50 border border-gray-600 text-gray-400 dark:bg-gray-800 dark:border-gray-500 dark:text-gray-400";
+      return "border border-stroke-soft-200 text-text-sub-600 bg-neutral-alpha-10";
   }
 };
 
@@ -120,7 +121,7 @@ const TeamSkeleton = () => (
 
 import { InviteDropdown } from "./invite-dropdown";
 
-export const TeamList = ({ searchQuery }: TeamListProps) => {
+export const TeamList = ({ searchQuery, filter }: TeamListProps) => {
   const { activeOrganization } = useUserOrganization();
   const [removingMember, setRemovingMember] = useState<string | null>(null);
   const [cancellingInvite, setCancellingInvite] = useState<string | null>(null);
@@ -146,7 +147,7 @@ export const TeamList = ({ searchQuery }: TeamListProps) => {
   const { data: session } = authClient.useSession();
   const currentUserId = session?.user?.id;
 
-  // Filter based on search query
+  // Filter based on search query and filter type
   const filteredData = useMemo(() => {
     const members = membersData?.members ?? [];
     const pendingInvites = (invites ?? []).filter(i => i.status.toLowerCase() === "pending");
@@ -154,20 +155,40 @@ export const TeamList = ({ searchQuery }: TeamListProps) => {
     let filteredMembers = members;
     let filteredInvites = pendingInvites;
 
+    // Apply search filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      filteredMembers = members.filter(
+      filteredMembers = filteredMembers.filter(
         (m) =>
           m.user.email.toLowerCase().includes(query) ||
           (m.user.name && m.user.name.toLowerCase().includes(query))
       );
-      filteredInvites = pendingInvites.filter(
+      filteredInvites = filteredInvites.filter(
         (i) => i.email.toLowerCase().includes(query)
       );
     }
 
+    // Apply type filter
+    if (filter && filter !== "all") {
+      switch (filter) {
+        case "invited":
+          // Show only pending invites
+          filteredMembers = [];
+          break;
+        case "suspended":
+          // TODO: Filter by suspended status when available
+          filteredInvites = [];
+          filteredMembers = [];
+          break;
+        case "active":
+          // Show only active members (not invites)
+          filteredInvites = [];
+          break;
+      }
+    }
+
     return { members: filteredMembers, invites: filteredInvites };
-  }, [membersData, invites, searchQuery]);
+  }, [membersData, invites, searchQuery, filter]);
 
   const handleRemoveMember = async (memberId: string) => {
     setRemovingMember(memberId);
@@ -304,7 +325,7 @@ export const TeamList = ({ searchQuery }: TeamListProps) => {
               {/* Role Column */}
               <motion.div {...getAnimationProps(index + 1, 1)} className="flex items-center">
                 <span className={cn(
-                  "inline-flex rounded-md px-[6px] py-0.5 text-xs font-medium border-[1px] border-stroke-soft-200",
+                  "inline-flex rounded-md px-[6px] py-0.5 text-[10px] font-medium border-[1px] border-stroke-soft-200",
                   getRoleBadgeStyles(invite.role)
                 )}>
                   {formatRoleLabel(invite.role)}
@@ -373,7 +394,7 @@ export const TeamList = ({ searchQuery }: TeamListProps) => {
                 {/* Role Column */}
                 <motion.div {...getAnimationProps(displayIndex + 1, 1)} className="flex items-center">
                   <span className={cn(
-                    "inline-flex rounded-md px-[6px] py-0.5 text-xs font-medium border-[1px] border-stroke-soft-200",
+                    "inline-flex rounded-md px-[6px] py-0.5 text-[10px] font-medium border-[1px] border-stroke-soft-200",
                     getRoleBadgeStyles(member.role)
                   )}>
                     {formatRoleLabel(member.role)}

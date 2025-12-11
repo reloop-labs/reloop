@@ -5,10 +5,12 @@ import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import { useState } from "react";
 import { InviteModal } from "./invite-modal";
+import { TeamFilterDropdown, type TeamFilterType } from "./team-filter-dropdown";
 import { TeamList } from "./team-list";
 
 const Team = () => {
 	const [searchQuery, setSearchQuery] = useState("");
+	const [filter, setFilter] = useState<TeamFilterType>("all");
 	const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
 	return (
@@ -36,14 +38,7 @@ const Team = () => {
 					</Input.Root>
 				</div>
 
-				<Button.Root
-					variant="neutral"
-					mode="stroke"
-					size="xsmall"
-				>
-					<Icon name="filter" className="h-4 w-4" />
-					<span>Filter</span>
-				</Button.Root>
+				<TeamFilterDropdown value={filter} onChange={setFilter} />
 
 				<Button.Root
 					variant="neutral"
@@ -56,7 +51,7 @@ const Team = () => {
 			</div>
 
 			{/* Team List */}
-			<TeamList searchQuery={searchQuery} />
+			<TeamList searchQuery={searchQuery} filter={filter} />
 
 			{/* Invite Modal */}
 			<InviteModal
