@@ -1,0 +1,9 @@
+services:
+  postfix:
+    image: reloopsh/be-postfix:latest
+    container_name: postfix
+    environment:
+      MAIL_DOMAIN: test.reloop.sh
+    ports:
+      - "25:25"
+    restart: unless-stopped

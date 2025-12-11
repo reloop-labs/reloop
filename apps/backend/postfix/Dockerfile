@@ -2,13 +2,20 @@ FROM debian:stable-slim
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install Postfix and mail utilities
+# Install Postfix, OpenDKIM, and mail utilities
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     postfix \
+    opendkim \
+    opendkim-tools \
     mailutils \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
+
+# Create OpenDKIM directories
+RUN mkdir -p /etc/opendkim/keys && \
+    chown -R opendkim:opendkim /etc/opendkim && \
+    chmod 700 /etc/opendkim/keys
 
 # Copy entrypoint script
 COPY entrypoint.sh /entrypoint.sh
