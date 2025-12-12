@@ -125,7 +125,7 @@ export const inputVariants = tv({
 				],
 			},
 		},
-		hasSuccess: {
+		hassuccess: {
 			true: {
 				root: [
 					// base
@@ -166,7 +166,7 @@ function InputRoot({
 	children,
 	size,
 	hasError,
-	hasSuccess,
+	hassuccess,
 	asChild,
 	...rest
 }: React.HTMLAttributes<HTMLDivElement> &
@@ -179,13 +179,13 @@ function InputRoot({
 	const { root } = inputVariants({
 		size,
 		hasError,
-		hasSuccess,
+		hassuccess,
 	});
 
 	const sharedProps: InputSharedProps = {
 		size,
 		hasError,
-		hasSuccess,
+		hassuccess,
 	};
 
 	const extendedChildren = recursiveCloneChildren(
@@ -239,10 +239,10 @@ InputWrapper.displayName = INPUT_WRAPPER_NAME;
 const Input = React.forwardRef<
 	HTMLInputElement,
 	React.InputHTMLAttributes<HTMLInputElement> &
-		InputSharedProps & {
-			asChild?: boolean;
-			size?: "medium" | "small" | "xsmall";
-		}
+	InputSharedProps & {
+		asChild?: boolean;
+		size?: "medium" | "small" | "xsmall";
+	}
 >(
 	(
 		{ className, type = "text", size, hasError, asChild, ...rest },

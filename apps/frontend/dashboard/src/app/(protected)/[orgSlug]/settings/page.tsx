@@ -294,7 +294,7 @@ const SettingsPage = () => {
 								size="small"
 								className="mt-1 w-full"
 								hasError={slugStatus === "taken"}
-								hasSuccess={slugStatus === "available"}
+								hassuccess={slugStatus === "available"}
 							>
 								<Input.Wrapper className="gap-0">
 									<Input.InlineAffix>reloop.sh/dashboard/</Input.InlineAffix>

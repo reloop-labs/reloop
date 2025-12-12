@@ -134,7 +134,9 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
   const { data: membersData, isLoading: membersLoading, mutate: mutateMembers } = useSWR<{ members: Member[] }>(
     `organization-member-${activeOrganization.id}`,
     async () => {
-      const result = await authClient.organization.listMembers({});
+      const result = await authClient.organization.listMembers({
+        query: { organizationId: activeOrganization.id },
+      });
       return result.data ?? { members: [] };
     },
   );
@@ -143,7 +145,9 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
   const { data: invites, isLoading: invitesLoading, mutate: mutateInvites } = useSWR<Invite[]>(
     `invitations-${activeOrganization.id}`,
     async () => {
-      const result = await authClient.organization.listInvitations();
+      const result = await authClient.organization.listInvitations({
+        query: { organizationId: activeOrganization.id },
+      });
       return result.data ?? [];
     },
   );
@@ -354,7 +358,7 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
           {/* Pending Invites */}
           {filteredData.invites.map((invite, index) => (
             <div
-              key={`invite-${invite.id}`}
+              key={`invite-${invite.id || index}`}
               className={cn(
                 "group/row grid grid-cols-[1fr_180px_165px] items-center py-2 px-4 transition-colors",
                 "hover:bg-bg-weak-50/50"
@@ -408,7 +412,7 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
 
             return (
               <div
-                key={`member-${member.id}`}
+                key={`member-${member.id || index}`}
                 className={cn(
                   "group/row grid grid-cols-[1fr_180px_165px] items-center py-2 px-4 transition-colors",
                   "hover:bg-bg-weak-50/50"

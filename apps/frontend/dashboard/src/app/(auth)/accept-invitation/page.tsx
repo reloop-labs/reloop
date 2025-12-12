@@ -13,6 +13,7 @@ import { Suspense, useEffect, useState } from "react";
 type InviteStatus = "loading" | "valid" | "invalid" | "expired" | "accepted" | "error";
 
 interface InviteDetails {
+  organizationId: string;
   organizationName: string;
   organizationSlug: string;
   inviterEmail?: string;
@@ -69,6 +70,7 @@ const AcceptInvitationContent = () => {
         }
 
         setInviteDetails({
+          organizationId: invitation.organizationId,
           organizationName: invitation.organizationName,
           organizationSlug: invitation.organizationSlug,
           role: invitation.role,
@@ -100,6 +102,16 @@ const AcceptInvitationContent = () => {
         setError(error.message || "Failed to accept invitation");
         setAccepting(false);
         return;
+      }
+
+      // Set the newly joined organization as active
+      if (inviteDetails?.organizationId) {
+        await authClient.organization.setActive({
+          organizationId: inviteDetails.organizationId,
+        });
+        await authClient.updateUser({
+          activeOrganizationId: inviteDetails.organizationId,
+        });
       }
 
       // Redirect to the organization dashboard
