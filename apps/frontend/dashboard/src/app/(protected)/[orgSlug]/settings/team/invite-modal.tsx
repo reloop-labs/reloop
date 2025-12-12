@@ -8,7 +8,7 @@ import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
 import * as Select from "@reloop/ui/select";
 import Spinner from "@reloop/ui/spinner";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -16,6 +16,7 @@ import { useSWRConfig } from "swr";
 import * as v from "valibot";
 import * as Textarea from "@reloop/ui/textarea";
 import * as Label from "@reloop/ui/label";
+import { AnimatedHoverBackground } from "@fe/dashboard/components/layout/sidebar/animated-hover-background";
 
 const formSchema = v.object({
   emails: v.pipe(
@@ -33,10 +34,20 @@ interface InviteModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
+const roleOptions = [
+  { value: "member" as const, label: "Member" },
+  { value: "admin" as const, label: "Admin" },
+];
+
 export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
   const [loading, setLoading] = useState(false);
+  const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
+  const itemRefs = useRef<HTMLButtonElement[]>([]);
   const { mutate } = useSWRConfig();
   const { data: session } = authClient.useSession();
+
+  const currentTab = itemRefs.current[hoverIdx ?? -1];
+  const currentRect = currentTab?.getBoundingClientRect();
 
   const form = useForm<InviteValues>({
     resolver: valibotResolver(formSchema) as Resolver<InviteValues>,
@@ -149,8 +160,26 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
                     <Select.Value placeholder="Select role" />
                   </Select.Trigger>
                   <Select.Content className="text-paragraph-xs min-w-[var(--radix-select-trigger-width)]">
-                    <Select.Item value="member" className="h-7">Member</Select.Item>
-                    <Select.Item value="admin" className="h-7">Admin</Select.Item>
+                    <div className="relative">
+                      {roleOptions.map((option, idx) => (
+                        <Select.Item
+                          key={option.value}
+                          value={option.value}
+                          className="h-8 data-[highlighted]:bg-transparent"
+                          ref={(el) => {
+                            if (el) itemRefs.current[idx] = el as unknown as HTMLButtonElement;
+                          }}
+                          onPointerEnter={() => setHoverIdx(idx)}
+                          onPointerLeave={() => setHoverIdx(undefined)}
+                        >
+                          {option.label}
+                        </Select.Item>
+                      ))}
+                      <AnimatedHoverBackground
+                        rect={currentRect}
+                        tabElement={currentTab}
+                      />
+                    </div>
                   </Select.Content>
                 </Select.Root>
               </div>
@@ -159,7 +188,7 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
             </Modal.Body>
 
             {/* Footer */}
-            <Modal.Footer className="justify-end border-stroke-soft-100/50">
+            <Modal.Footer className="justify-end border-stroke-soft-100/50 mt-4">
               <Button.Root
                 type="submit"
                 variant="neutral"

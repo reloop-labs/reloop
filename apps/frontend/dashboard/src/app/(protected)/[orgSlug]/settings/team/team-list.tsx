@@ -436,7 +436,7 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
                 {/* User Column - Avatar + Name + Email */}
                 <motion.div
                   {...getAnimationProps(displayIndex + 1, 0)}
-                  className="flex items-center gap-3"
+                  className="flex items-center gap-3 py-[3px]"
                 >
                   <Avatar.Root size="20" color="gray">
                     {member.user.image ? (
@@ -455,7 +455,7 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
                         {member.user.name || member.user.email.split("@")[0]}
                       </span>
                       {isCurrentUser && (
-                        <span className="text-text-sub-600">(You)</span>
+                        <span className="inline-flex rounded-md px-[6px] py-0.5 text-[10px] font-medium border border-stroke-soft-200 text-text-sub-600 bg-neutral-alpha-10">You</span>
                       )}
                       <span className="truncate text-text-sub-600 ">
                         {member.user.email}
