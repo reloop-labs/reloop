@@ -5,6 +5,7 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
+CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 echo -e "${BLUE}==================================${NC}"
@@ -12,14 +13,39 @@ echo -e "${BLUE}      Send Email via Postfix      ${NC}"
 echo -e "${BLUE}==================================${NC}"
 echo ""
 
-# Get sender info
-DOMAIN="${MAIL_DOMAIN:-localhost}"
+# Parse available domains
+if [ -n "$MAIL_DOMAINS" ]; then
+    IFS=',' read -ra DOMAINS <<< "$MAIL_DOMAINS"
+else
+    DOMAINS=("${MAIL_DOMAIN:-localhost}")
+fi
 
-read -p "From email username (default: admin): " FROM_USER
-FROM_USER="${FROM_USER:-admin}"
+# Show available domains
+echo -e "${CYAN}Available domains:${NC}"
+for i in "${!DOMAINS[@]}"; do
+    DOMAIN=$(echo "${DOMAINS[$i]}" | tr -d '[:space:]')
+    echo -e "  ${GREEN}[$((i+1))]${NC} $DOMAIN"
+done
+echo ""
+
+# Select domain
+if [ ${#DOMAINS[@]} -gt 1 ]; then
+    read -p "Select domain (1-${#DOMAINS[@]}): " DOMAIN_INDEX
+    DOMAIN_INDEX=${DOMAIN_INDEX:-1}
+    DOMAIN=$(echo "${DOMAINS[$((DOMAIN_INDEX-1))]}" | tr -d '[:space:]')
+else
+    DOMAIN=$(echo "${DOMAINS[0]}" | tr -d '[:space:]')
+fi
+
+echo -e "${GREEN}Using domain: $DOMAIN${NC}"
+echo ""
+
+# Get sender info
+read -p "From email username (e.g., noreply, hello, support): " FROM_USER
+FROM_USER="${FROM_USER:-noreply}"
 FROM_EMAIL="${FROM_USER}@${DOMAIN}"
 
-read -p "From display name (default: ${FROM_USER}): " FROM_DISPLAY
+read -p "From display name (e.g., 'Reloop Team'): " FROM_DISPLAY
 FROM_DISPLAY="${FROM_DISPLAY:-$FROM_USER}"
 
 echo -e "${GREEN}Sender: ${FROM_DISPLAY} <${FROM_EMAIL}>${NC}"
