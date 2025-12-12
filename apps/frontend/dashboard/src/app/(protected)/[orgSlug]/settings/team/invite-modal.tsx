@@ -12,7 +12,7 @@ import { useState, useRef } from "react";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { useSWRConfig } from "swr";
+import useSWR, { useSWRConfig } from "swr";
 import * as v from "valibot";
 import * as Label from "@reloop/ui/label";
 import { AnimatedHoverBackground } from "@fe/dashboard/components/layout/sidebar/animated-hover-background";
@@ -43,6 +43,7 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
   const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
   const [emailChips, setEmailChips] = useState<string[]>([]);
   const [inputValue, setInputValue] = useState("");
+  const [emailError, setEmailError] = useState<string | null>(null);
   const itemRefs = useRef<HTMLButtonElement[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const { mutate } = useSWRConfig();
@@ -50,6 +51,33 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
 
   const currentTab = itemRefs.current[hoverIdx ?? -1];
   const currentRect = currentTab?.getBoundingClientRect();
+
+  // Fetch existing members
+  const { data: membersData } = useSWR(
+    session?.user.activeOrganizationId ? `organization-member-${session.user.activeOrganizationId}` : null,
+    async () => {
+      const result = await authClient.organization.listMembers({
+        query: { organizationId: session?.user.activeOrganizationId ?? "" },
+      });
+      return result.data ?? { members: [] };
+    }
+  );
+
+  // Fetch pending invites
+  const { data: invitesData } = useSWR(
+    session?.user.activeOrganizationId ? `invitations-${session.user.activeOrganizationId}` : null,
+    async () => {
+      const result = await authClient.organization.listInvitations({
+        query: { organizationId: session?.user.activeOrganizationId ?? "" },
+      });
+      return result.data ?? [];
+    }
+  );
+
+  const existingEmails = new Set([
+    ...(membersData?.members?.map((m: { user: { email: string } }) => m.user.email.toLowerCase()) ?? []),
+    ...(invitesData?.filter((i: { status: string }) => i.status.toLowerCase() === "pending").map((i: { email: string }) => i.email.toLowerCase()) ?? []),
+  ]);
 
   const form = useForm<InviteValues>({
     resolver: valibotResolver(formSchema) as Resolver<InviteValues>,
@@ -68,14 +96,29 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
   // Add email chip
   const addEmailChip = (email: string) => {
     const trimmedEmail = email.trim().toLowerCase();
-    if (trimmedEmail && isValidEmail(trimmedEmail) && !emailChips.includes(trimmedEmail)) {
-      const newChips = [...emailChips, trimmedEmail];
-      setEmailChips(newChips);
-      form.setValue("emails", newChips.join(","));
-      setInputValue("");
-    } else if (trimmedEmail && !isValidEmail(trimmedEmail)) {
-      toast.error("Please enter a valid email address");
+    setEmailError(null);
+
+    if (!trimmedEmail) return;
+
+    if (!isValidEmail(trimmedEmail)) {
+      setEmailError("Please enter a valid email address");
+      return;
     }
+
+    if (emailChips.includes(trimmedEmail)) {
+      setEmailError("This email is already in the list");
+      return;
+    }
+
+    if (existingEmails.has(trimmedEmail)) {
+      setEmailError("This user is already a member or has a pending invite");
+      return;
+    }
+
+    const newChips = [...emailChips, trimmedEmail];
+    setEmailChips(newChips);
+    form.setValue("emails", newChips.join(","));
+    setInputValue("");
   };
 
   // Remove email chip
@@ -99,17 +142,26 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
   // Handle paste
   const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     e.preventDefault();
+    setEmailError(null);
     const pastedText = e.clipboardData.getData("text");
     const emails = pastedText.split(/[,\n\s]+/).filter((email) => email.trim());
+    let skippedCount = 0;
+
     for (const email of emails) {
       const trimmedEmail = email.trim().toLowerCase();
-      if (isValidEmail(trimmedEmail) && !emailChips.includes(trimmedEmail)) {
+      if (isValidEmail(trimmedEmail) && !emailChips.includes(trimmedEmail) && !existingEmails.has(trimmedEmail)) {
         setEmailChips((prev) => {
           const newChips = [...prev, trimmedEmail];
           form.setValue("emails", newChips.join(","));
           return newChips;
         });
+      } else if (existingEmails.has(trimmedEmail)) {
+        skippedCount++;
       }
+    }
+
+    if (skippedCount > 0) {
+      setEmailError(`${skippedCount} email${skippedCount > 1 ? 's' : ''} already ${skippedCount > 1 ? 'have' : 'has'} a member or pending invite`);
     }
     setInputValue("");
   };
@@ -119,6 +171,7 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
     if (!isOpen) {
       setEmailChips([]);
       setInputValue("");
+      setEmailError(null);
       form.reset();
     }
     onOpenChange(isOpen);
@@ -240,9 +293,9 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
                     className="flex-1 min-w-[120px] bg-transparent outline-none text-paragraph-xs text-text-sub-600 placeholder:text-text-soft-400"
                   />
                 </div>
-                {form.formState.errors.emails && (
+                {(emailError || form.formState.errors.emails) && (
                   <p className="text-error-base text-paragraph-xs">
-                    {form.formState.errors.emails.message}
+                    {emailError || form.formState.errors.emails?.message}
                   </p>
                 )}
               </div>
