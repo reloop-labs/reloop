@@ -19,6 +19,7 @@ interface ContactTableProps {
   isLoading: boolean;
   loadingRows: number;
   onUnsubscribe: (contactId: string) => void;
+  activeOrganizationSlug: string;
 }
 
 export const ContactTable = ({
@@ -26,6 +27,7 @@ export const ContactTable = ({
   isLoading,
   loadingRows,
   onUnsubscribe,
+  activeOrganizationSlug,
 }: ContactTableProps) => {
   if (isLoading) {
     return (
@@ -44,7 +46,7 @@ export const ContactTable = ({
             <div className="py-2.5" />
           </div>
           {Array.from({ length: loadingRows }).map((_, index) => (
-            <div key={`skeleton-${index}`} className="group/row contents">
+            <div key={`skeleton-${index}-${activeOrganizationSlug}`} className="group/row contents">
               <div className="flex items-center border-stroke-soft-200 border-t py-2.5">
                 <div className="flex items-center gap-2 pl-5">
                   <Skeleton className="h-4 w-4 rounded" />

@@ -91,7 +91,7 @@ export const ApiKeyTable = ({
 						{isLoading
 							? // Skeleton loading state
 							Array.from({ length: loadingRows }).map((_, index) => (
-								<div key={`skeleton-${index}`} className="group/row contents">
+								<div key={`skeleton-${index}-${activeOrganizationSlug}`} className="group/row contents">
 									<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
 										<div className="my-1 pl-5">
 											<Skeleton className="h-4 w-32" />

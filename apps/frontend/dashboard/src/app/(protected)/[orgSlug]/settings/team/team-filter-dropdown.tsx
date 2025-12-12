@@ -51,7 +51,7 @@ export const TeamFilterDropdown = ({ value, onChange }: TeamFilterDropdownProps)
           variant="neutral"
           mode="stroke"
           size="xsmall"
-          className={cn(hasActiveFilter && "border-primary-base text-primary-base")}
+
         >
           <Icon name="filter" className="h-4 w-4" />
           <span>Filter</span>
@@ -97,9 +97,9 @@ export const TeamFilterDropdown = ({ value, onChange }: TeamFilterDropdownProps)
               >
                 {/* Checkbox */}
                 <div className={cn(
-                  "flex h-3.5 w-3.5 items-center justify-center rounded border-2 transition-colors",
+                  "flex h-3.5 w-3.5 p-[1px] items-center justify-center rounded border transition-colors",
                   isChecked
-                    ? "border-primary-base bg-primary-base"
+                    ? "border-stroke-soft-900 bg-neutral-900"
                     : "border-stroke-soft-200"
                 )}>
                   {isChecked && (

@@ -20,7 +20,7 @@ const Textarea = React.forwardRef<
 			className={cn(
 				[
 					// base
-					"block w-full resize-none text-paragraph-sm text-text-strong-950 outline-none",
+					"block w-full resize-none text-paragraph-xs text-text-sub-600 outline-none",
 					!simple && [
 						"pointer-events-auto h-full min-h-[82px] bg-transparent pt-2.5 pr-2.5 pl-3",
 					],
@@ -92,17 +92,17 @@ ResizeHandle.displayName = TEXTAREA_RESIZE_HANDLE_NAME;
 type TextareaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement> &
 	(
 		| {
-				simple: true;
-				children?: never;
-				containerClassName?: never;
-				hasError?: boolean;
-		  }
+			simple: true;
+			children?: never;
+			containerClassName?: never;
+			hasError?: boolean;
+		}
 		| {
-				simple?: false;
-				children?: React.ReactNode;
-				containerClassName?: string;
-				hasError?: boolean;
-		  }
+			simple?: false;
+			children?: React.ReactNode;
+			containerClassName?: string;
+			hasError?: boolean;
+		}
 	);
 
 const TextareaRoot = React.forwardRef<HTMLTextAreaElement, TextareaProps>(

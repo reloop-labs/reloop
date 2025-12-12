@@ -117,7 +117,9 @@ export const MemberList = () => {
 	const { data, isLoading, error, mutate } = useSWR<{ members: Member[] }>(
 		`organization-member-${activeOrganization.id}`,
 		async () => {
-			const result = await authClient.organization.listMembers({});
+			const result = await authClient.organization.listMembers({
+				query: { organizationId: activeOrganization.id },
+			});
 			return result.data ?? { members: [] };
 		},
 	);
@@ -232,7 +234,7 @@ export const MemberList = () => {
 						const isOwner = member.role.toLowerCase() === "owner";
 						return (
 							<div
-								key={member.id}
+								key={member.id ? `member-${member.id}` : `member-idx-${index}`}
 								className={cn(
 									"group/row grid grid-cols-[1fr_100px_100px_80px] transition-colors",
 									"hover:bg-bg-weak-50/50"

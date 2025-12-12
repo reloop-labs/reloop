@@ -69,9 +69,9 @@ const getFirstChar = (name: string | null, email: string) => {
 const getRoleBadgeStyles = (role: string) => {
   switch (role.toLowerCase()) {
     case "owner":
-      return "border border-primary-base text-primary-base bg-primary-base/20";
+      return "border border-warning-base text-warning-base bg-warning-light/20";
     case "admin":
-      return "border border-violet-500 text-violet-400 bg-violet-500/20";
+      return "border border-feature-base text-feature-base bg-feature-light/20";
     default:
       return "border border-stroke-soft-200 text-text-sub-600 bg-neutral-alpha-10";
   }
@@ -121,6 +121,7 @@ const TeamSkeleton = () => (
 
 import { InviteDropdown } from "./invite-dropdown";
 import { RevokeInviteModal } from "./revoke-invite-modal";
+import { RemoveMemberModal } from "./remove-member-modal";
 
 export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
   const { activeOrganization } = useUserOrganization();
@@ -129,6 +130,8 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
   const [resendingInvite, setResendingInvite] = useState<string | null>(null);
   const [revokeModalOpen, setRevokeModalOpen] = useState(false);
   const [inviteToRevoke, setInviteToRevoke] = useState<{ id: string; email: string } | null>(null);
+  const [removeMemberModalOpen, setRemoveMemberModalOpen] = useState(false);
+  const [memberToRemove, setMemberToRemove] = useState<{ id: string; name: string | null; email: string } | null>(null);
 
   // Fetch members
   const { data: membersData, isLoading: membersLoading, mutate: mutateMembers } = useSWR<{ members: Member[] }>(
@@ -216,7 +219,19 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
       toast.error("Failed to remove member");
     } finally {
       setRemovingMember(null);
+      setRemoveMemberModalOpen(false);
+      setMemberToRemove(null);
     }
+  };
+
+  const handleRemoveMemberClick = (member: Member) => {
+    setMemberToRemove({ id: member.id, name: member.user.name, email: member.user.email });
+    setRemoveMemberModalOpen(true);
+  };
+
+  const handleConfirmRemoveMember = async () => {
+    if (!memberToRemove) return;
+    await handleRemoveMember(memberToRemove.id);
   };
 
   const handleCancelInvite = async (invitationId: string) => {
@@ -358,7 +373,7 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
           {/* Pending Invites */}
           {filteredData.invites.map((invite, index) => (
             <div
-              key={`invite-${invite.id || index}`}
+              key={invite.id ? `invite-${invite.id}` : `invite-idx-${index}`}
               className={cn(
                 "group/row grid grid-cols-[1fr_180px_165px] items-center py-2 px-4 transition-colors",
                 "hover:bg-bg-weak-50/50"
@@ -390,7 +405,7 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
 
               {/* Actions Column */}
               <motion.div {...getAnimationProps(index + 1, 2)} className="flex items-center justify-end gap-8">
-                <span className="whitespace-nowrap rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-2.5 py-1 text-xs text-text-sub-600">
+                <span className="whitespace-nowrap rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-2.5 py-0.5 text-[11px] text-text-sub-600">
                   Invite pending...
                 </span>
                 <InviteDropdown
@@ -412,7 +427,7 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
 
             return (
               <div
-                key={`member-${member.id || index}`}
+                key={member.id ? `member-${member.id}` : `member-idx-${index}`}
                 className={cn(
                   "group/row grid grid-cols-[1fr_180px_165px] items-center py-2 px-4 transition-colors",
                   "hover:bg-bg-weak-50/50"
@@ -471,17 +486,12 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
                           <Icon name="more-vertical" className="w-3 h-3" />
                         </Button.Root>
                       </Dropdown.Trigger>
-                      <Dropdown.Content align="end" className="w-48">
+                      <Dropdown.Content align="end" className="w-52 text-xs">
                         <Dropdown.Item
                           className="text-error-base"
-                          onClick={() => handleRemoveMember(member.id)}
-                          disabled={removingMember === member.id}
+                          onClick={() => handleRemoveMemberClick(member)}
                         >
-                          {removingMember === member.id ? (
-                            <Spinner size={14} color="var(--error-base)" />
-                          ) : (
-                            <Icon name="user-minus" className="h-4 w-4" />
-                          )}
+                          <Icon name="user-minus" className="h-3 w-3" />
                           Remove from organization
                         </Dropdown.Item>
                       </Dropdown.Content>
@@ -499,6 +509,14 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
         onConfirm={handleConfirmRevoke}
         isRevoking={cancellingInvite === inviteToRevoke?.id}
         inviteEmail={inviteToRevoke?.email ?? ""}
+      />
+      <RemoveMemberModal
+        open={removeMemberModalOpen}
+        onOpenChange={setRemoveMemberModalOpen}
+        onConfirm={handleConfirmRemoveMember}
+        isRemoving={removingMember === memberToRemove?.id}
+        memberName={memberToRemove?.name ?? ""}
+        memberEmail={memberToRemove?.email ?? ""}
       />
     </AnimatePresence>
   );

@@ -358,7 +358,7 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 
 							return (
 								<div
-									key={session.id}
+									key={session.id ? `session-${session.id}` : `session-idx-${index}`}
 									className={cn(
 										"group/row grid grid-cols-[1fr_140px_140px_120px] transition-colors",
 										isCurrent

@@ -71,7 +71,7 @@ const ModalContent = React.forwardRef<
 								>
 									<CompactButton.Icon
 										as={() => (
-											<Icon name="plus-outline" className="h-4 w-4 rotate-45" />
+											<Icon name="plus" className="h-4 w-4 rotate-45" />
 										)}
 									/>
 								</CompactButton.Root>

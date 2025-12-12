@@ -240,6 +240,7 @@ const TopicDetailPage = () => {
               isLoading={subscriptionLoading}
               loadingRows={4}
               onUnsubscribe={handleUnsubscribe}
+              activeOrganizationSlug={activeOrganization.slug}
             />
           </div>
         </div>

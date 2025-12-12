@@ -513,15 +513,31 @@ export const IconsSprite = () => (
 					strokeLinecap="round"
 				/>
 			</symbol>
+
 			<symbol
-				id="corner-down-left"
+				id="user-minus"
 				viewBox="0 0 24 24"
 				fill="none"
 				xmlns="http://www.w3.org/2000/svg"
 			>
 				<path
-					d="M3 16L8 21M3 16L8 11M3 16H14.6C16.8402 16 17.9603 16 18.816 15.564C19.5686 15.1805 20.1805 14.5686 20.564 13.816C21 12.9603 21 11.8402 21 9.6V3"
+					d="M17 10H23M13 6C13 8.20914 11.2091 10 9 10C6.79086 10 5 8.20914 5 6C5 3.79086 6.79086 2 9 2C11.2091 2 13 3.79086 13 6ZM5.2 22H12.8C14.5673 22 16 20.5673 16 18.8C16 16.149 13.851 14 11.2 14H6.8C4.14903 14 2 16.149 2 18.8C2 20.5673 3.43269 22 5.2 22Z"
 					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
+
+			<symbol
+				id="send"
+				viewBox="0 0 24 24"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<path
+					d="M13 4H10C7.19974 4 5.79961 4 4.73005 4.54497C3.78924 5.02433 3.02433 5.78924 2.54497 6.73005C2 7.79961 2 9.19974 2 12V14C2 16.8003 2 18.2004 2.54497 19.27C3.02433 20.2108 3.78924 20.9757 4.73005 21.455C5.79961 22 7.19974 22 10 22H12C14.8003 22 16.2004 22 17.27 21.455C18.2108 20.9757 18.9757 20.2108 19.455 19.27C20 18.2004 20 16.8003 20 14V11M12 12L22 2M22 2H17M22 2V7"
+					stroke="#2F384C"
 					strokeWidth="1.5"
 					strokeLinecap="round"
 					strokeLinejoin="round"

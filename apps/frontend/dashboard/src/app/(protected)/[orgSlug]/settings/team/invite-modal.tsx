@@ -14,6 +14,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
 import * as v from "valibot";
+import * as Textarea from "@reloop/ui/textarea";
 
 const formSchema = v.object({
   emails: v.pipe(
@@ -101,8 +102,8 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
       <Modal.Content className="sm:max-w-[480px]" showClose={true}>
         {/* Header */}
         <Modal.Header>
-          <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-bg-white-0 ring-1 ring-stroke-soft-200 ring-inset">
-            <Icon name="user-plus" className="size-5 text-text-sub-600" />
+          <div className="flex items-center justify-centers">
+            <Icon name="user-plus" className="h-4 w-4" />
           </div>
           <div className="flex-1">
             <Modal.Title>Invite team members</Modal.Title>
@@ -111,24 +112,18 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
 
         {/* Body */}
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col">
-          <Modal.Body className="space-y-5">
+          <Modal.Body className="space-y-2">
             {/* Email Textarea */}
             <div className="space-y-2">
               <label className="text-paragraph-xs text-text-sub-600">
                 Send Invite to ...
               </label>
-              <textarea
+              <Textarea.Root
                 {...form.register("emails")}
                 placeholder="example@email.com"
                 disabled={loading}
-                className={cn(
-                  "w-full min-h-[100px] px-3 py-2.5 rounded-lg",
-                  "bg-bg-white-0 border-[0.5px] border-stroke-soft-100",
-                  "text-paragraph-xs text-text-strong-900 text-sm placeholder:text-sm placeholder:text-text-sub-600 outline-none ring-0",
-                  "focus:outline-none focus:ring-[0.5px] focus:ring-inset focus:ring-neutral-base/10 focus:border-neutral-base",
-                  "resize-none transition-all",
-                  "disabled:opacity-50 disabled:cursor-not-allowed"
-                )}
+                className="text-sm text-text-sub-700 placeholder:text-sm placeholder:text-text-sub-200"
+
               />
               {form.formState.errors.emails && (
                 <p className="text-error-base text-paragraph-xs">
@@ -143,7 +138,7 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
                 Invite as
               </label>
               <Select.Root
-                size="small"
+                size="xsmall"
                 defaultValue="member"
                 disabled={loading}
                 onValueChange={(value: "admin" | "member") => {
@@ -153,7 +148,7 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
                 <Select.Trigger className="w-full text-paragraph-xs">
                   <Select.Value placeholder="Select role" />
                 </Select.Trigger>
-                <Select.Content className="text-paragraph-xs">
+                <Select.Content className="text-paragraph-xs min-w-[var(--radix-select-trigger-width)]">
                   <Select.Item value="member" className="h-7">Member</Select.Item>
                   <Select.Item value="admin" className="h-7">Admin</Select.Item>
                 </Select.Content>
@@ -179,7 +174,7 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
               ) : (
                 <>
                   Send Invites
-                  <Icon name="corner-down-left" className="w-4 h-4" />
+                  <Icon name="send" className="w-4 h-4" />
                 </>
               )}
             </Button.Root>

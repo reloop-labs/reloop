@@ -84,7 +84,9 @@ export const InviteList = () => {
 	} = useSWR<Invite[]>(
 		`invitations-${activeOrganization.id}`,
 		async () => {
-			const result = await authClient.organization.listInvitations();
+			const result = await authClient.organization.listInvitations({
+				query: { organizationId: activeOrganization.id },
+			});
 			return result.data ?? [];
 		},
 	);
@@ -188,7 +190,7 @@ export const InviteList = () => {
 
 						return (
 							<div
-								key={invite.id || index}
+								key={invite.id ? `invite-${invite.id}` : `invite-idx-${index}`}
 								className={cn(
 									"group/row flex items-center gap-8 rounded-lg py-4 transition-colors",
 									"hover:bg-bg-weak-50/50"
