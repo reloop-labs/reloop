@@ -252,50 +252,53 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 					</div>
 				</div>
 
-				<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 text-paragraph-sm shadow-regular-md">
+				<div className="w-full text-paragraph-sm rounded-xl border border-stroke-soft-100 overflow-hidden">
 					{/* Table Header */}
-					<div className="grid grid-cols-[1fr_140px_140px_120px] border-b border-stroke-soft-200 bg-bg-weak-50">
-						<div className="px-4 py-3 font-medium text-text-sub-600 text-xs uppercase tracking-wide">
-							Session
+					<div className="grid grid-cols-[1fr_140px_140px_80px] items-center py-3.5 px-4 text-text-sub-600 border-b border-stroke-soft-100">
+						<div className="flex items-center gap-2">
+							<Icon name="monitor" className="h-4 w-4" />
+							<span className="text-xs">Session</span>
 						</div>
-						<div className="px-4 py-3 font-medium text-text-sub-600 text-xs uppercase tracking-wide">
-							IP Address
+						<div className="flex items-center gap-2">
+							<Icon name="globe" className="h-4 w-4" />
+							<span className="text-xs">IP Address</span>
 						</div>
-						<div className="px-4 py-3 font-medium text-text-sub-600 text-xs uppercase tracking-wide">
-							Last Active
+						<div className="flex items-center gap-2">
+							<Icon name="clock" className="h-4 w-4" />
+							<span className="text-xs">Last Active</span>
 						</div>
-						<div className="px-4 py-3" />
+						<div />
 					</div>
 
 					{/* Skeleton Rows */}
-					<div className="divide-y divide-stroke-soft-200">
+					<div className="divide-y divide-stroke-soft-100">
 						{Array.from({ length: 3 }).map((_, index) => (
 							<div
 								key={`skeleton-${index}`}
-								className="grid grid-cols-[1fr_140px_140px_120px]"
+								className="grid grid-cols-[1fr_140px_140px_80px] py-2 px-4"
 							>
 								{/* Session Info Column */}
-								<div className="flex items-center gap-3 px-4 py-3">
-									<Skeleton className="h-10 w-10 rounded-xl" />
-									<div className="flex-1 space-y-2">
+								<div className="flex items-center gap-3">
+									<Skeleton className="h-5 w-5 rounded-full" />
+									<div className="flex-1 space-y-1">
 										<Skeleton className="h-4 w-24" />
 										<Skeleton className="h-3 w-32" />
 									</div>
 								</div>
 
 								{/* IP Address Column */}
-								<div className="flex items-center px-4 py-3">
+								<div className="flex items-center">
 									<Skeleton className="h-4 w-20" />
 								</div>
 
 								{/* Last Active Column */}
-								<div className="flex items-center px-4 py-3">
+								<div className="flex items-center">
 									<Skeleton className="h-4 w-16" />
 								</div>
 
 								{/* Action Column */}
-								<div className="flex items-center justify-end px-4 py-3">
-									<Skeleton className="h-7 w-20 rounded-lg" />
+								<div className="flex items-center justify-end">
+									<Skeleton className="h-6 w-6 rounded" />
 								</div>
 							</div>
 						))}
@@ -335,23 +338,26 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 			</div>
 
 			<AnimatePresence mode="wait">
-				<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 text-paragraph-sm shadow-regular-md">
+				<div className="w-full text-paragraph-sm rounded-xl border border-stroke-soft-100 overflow-hidden">
 					{/* Table Header */}
-					<div className="grid grid-cols-[1fr_140px_140px_120px] border-b border-stroke-soft-200 bg-bg-weak-50">
-						<div className="px-4 py-3 font-medium text-text-sub-600 text-xs uppercase tracking-wide">
-							Session
+					<div className="grid grid-cols-[1fr_140px_140px_80px] items-center py-3.5 px-4 text-text-sub-600 border-b border-stroke-soft-100">
+						<div className="flex items-center gap-2">
+							<Icon name="monitor" className="h-4 w-4" />
+							<span className="text-xs">Session</span>
 						</div>
-						<div className="px-4 py-3 font-medium text-text-sub-600 text-xs uppercase tracking-wide">
-							IP Address
+						<div className="flex items-center gap-2">
+							<Icon name="globe" className="h-4 w-4" />
+							<span className="text-xs">IP Address</span>
 						</div>
-						<div className="px-4 py-3 font-medium text-text-sub-600 text-xs uppercase tracking-wide">
-							Last Active
+						<div className="flex items-center gap-2">
+							<Icon name="clock" className="h-4 w-4" />
+							<span className="text-xs">Last Active</span>
 						</div>
-						<div className="px-4 py-3" />
+						<div />
 					</div>
 
 					{/* Table Body */}
-					<div className="divide-y divide-stroke-soft-200">
+					<div className="divide-y divide-stroke-soft-100">
 						{sessions.map((session, index) => {
 							const { browser, device, isMobile } = parseUserAgent(session.userAgent);
 							const isCurrent = isCurrentSession(session);
@@ -360,28 +366,18 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 								<div
 									key={session.id ? `session-${session.id}` : `session-idx-${index}`}
 									className={cn(
-										"group/row grid grid-cols-[1fr_140px_140px_120px] transition-colors",
-										isCurrent
-											? "bg-primary-light/20 hover:bg-primary-light/30"
-											: "hover:bg-bg-weak-50/50"
+										"group/row grid grid-cols-[1fr_140px_140px_80px] items-center py-2 px-4 transition-colors",
+										"hover:bg-bg-weak-50/50"
 									)}
 								>
 									{/* Session Info Column */}
-									<div className="flex items-center gap-3 px-4 py-3">
-										{/* Combined Device Badge */}
+									<div className="flex items-center gap-3">
+										{/* Browser Icon */}
 										<motion.div
 											{...getAnimationProps(index + 1, 0)}
-											className="relative flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-bg-weak-50 ring-1 ring-stroke-soft-200"
+											className="flex h-5 w-5 flex-shrink-0 items-center justify-center"
 										>
-											<div className="h-5 w-5">
-												{getBrowserIcon(browser)}
-											</div>
-											{/* OS Badge */}
-											<div className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-md bg-bg-white-0 ring-1 ring-stroke-soft-200">
-												<div className="h-3 w-3">
-													{getOsIcon(device)}
-												</div>
-											</div>
+											{getBrowserIcon(browser)}
 										</motion.div>
 
 										{/* Session Details */}
@@ -390,64 +386,54 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 											className="min-w-0 flex-1"
 										>
 											<div className="flex items-center gap-2">
-												<span className="truncate font-medium text-label-sm text-text-strong-950">
+												<span className="truncate font-medium text-label-xs text-text-strong-950">
 													{browser}
 												</span>
 												{isCurrent && (
-													<span className="flex items-center gap-1 rounded-full bg-success-lighter px-2 py-0.5 text-xs text-success-base">
-														<span className="h-1.5 w-1.5 rounded-full bg-success-base" />
+													<span className="flex items-center gap-1 rounded-md bg-success-lighter px-1 py-0.5 text-[10px] text-success-base">
+														<span className="h-1.5 w-1.5 rounded-md bg-success-base" />
 														Current
 													</span>
 												)}
 											</div>
-											<div className="flex items-center gap-1.5 text-text-sub-600 text-xs">
-												<span>{device}</span>
-												<span>•</span>
-												<span className="flex items-center gap-1">
-													{getDeviceTypeIcon(isMobile)}
-													{isMobile ? "Mobile" : "Desktop"}
-												</span>
-											</div>
+											<span className="text-text-sub-600 text-[11px]">
+												{device} • {isMobile ? "Mobile" : "Desktop"}
+											</span>
 										</motion.div>
 									</div>
 
 									{/* IP Address Column */}
-									<div className="flex items-center px-4 py-3">
-										<motion.span
-											{...getAnimationProps(index + 1, 2)}
-											className="font-mono text-label-sm text-text-sub-600"
-										>
-											{session.ipAddress || "—"}
-										</motion.span>
-									</div>
+									<motion.span
+										{...getAnimationProps(index + 1, 2)}
+										className="font-mono text-label-xs text-text-sub-600"
+									>
+										{session.ipAddress || "—"}
+									</motion.span>
 
 									{/* Last Active Column */}
-									<div className="flex items-center px-4 py-3">
-										<motion.span
-											{...getAnimationProps(index + 1, 3)}
-											className="text-label-sm text-text-sub-600"
-										>
-											{formatTimeAgo(session.updatedAt)}
-										</motion.span>
-									</div>
+									<motion.span
+										{...getAnimationProps(index + 1, 3)}
+										className="text-label-xs text-text-sub-600"
+									>
+										{formatTimeAgo(session.updatedAt)}
+									</motion.span>
 
 									{/* Action Column */}
-									<div className="flex items-center justify-end px-4 py-3">
+									<div className="flex items-center justify-end">
 										{!isCurrent && (
 											<motion.div {...getAnimationProps(index + 1, 4)}>
 												<Button.Root
-													variant="error"
+													variant="neutral"
 													mode="ghost"
-													size="xsmall"
+													size="xxsmall"
 													onClick={() => handleTerminateSession(session.token)}
 													disabled={terminatingSession === session.token}
 												>
 													{terminatingSession === session.token ? (
-														<Spinner size={14} color="var(--error-base)" />
+														<Spinner size={12} color="var(--text-sub-600)" />
 													) : (
-														<Icon name="logout" className="h-4 w-4" />
+														<Icon name="more-vertical" className="h-3 w-3" />
 													)}
-													Revoke
 												</Button.Root>
 											</motion.div>
 										)}

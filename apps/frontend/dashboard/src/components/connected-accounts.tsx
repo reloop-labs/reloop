@@ -160,7 +160,7 @@ export const ConnectedAccounts = ({ className }: ConnectedAccountsProps) => {
                       </p>
                     </div>
                   </div>
-                  <span className="rounded-full bg-success-lighter px-2 py-0.5 font-medium text-success-base text-xs">
+                  <span className="rounded-md bg-success-lighter px-2 py-0.5 font-medium text-success-base text-xs">
                     Connected
                   </span>
                 </div>

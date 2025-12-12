@@ -513,7 +513,20 @@ export const IconsSprite = () => (
 					strokeLinecap="round"
 				/>
 			</symbol>
-
+			<symbol
+				id="clock"
+				viewBox="0 0 24 24"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<path
+					d="M12 8V12L15 14M4 1L1 4M20 1L23 4M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
 			<symbol
 				id="user-minus"
 				viewBox="0 0 24 24"
@@ -537,7 +550,7 @@ export const IconsSprite = () => (
 			>
 				<path
 					d="M13 4H10C7.19974 4 5.79961 4 4.73005 4.54497C3.78924 5.02433 3.02433 5.78924 2.54497 6.73005C2 7.79961 2 9.19974 2 12V14C2 16.8003 2 18.2004 2.54497 19.27C3.02433 20.2108 3.78924 20.9757 4.73005 21.455C5.79961 22 7.19974 22 10 22H12C14.8003 22 16.2004 22 17.27 21.455C18.2108 20.9757 18.9757 20.2108 19.455 19.27C20 18.2004 20 16.8003 20 14V11M12 12L22 2M22 2H17M22 2V7"
-					stroke="#2F384C"
+					stroke="currentColor"
 					strokeWidth="1.5"
 					strokeLinecap="round"
 					strokeLinejoin="round"
