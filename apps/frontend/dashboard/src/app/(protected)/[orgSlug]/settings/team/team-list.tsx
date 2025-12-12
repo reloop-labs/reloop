@@ -13,7 +13,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
-
+import * as Button from '@reloop/ui/button'
 interface Member {
   id: string;
   role: string;
@@ -120,11 +120,15 @@ const TeamSkeleton = () => (
 );
 
 import { InviteDropdown } from "./invite-dropdown";
+import { RevokeInviteModal } from "./revoke-invite-modal";
 
 export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
   const { activeOrganization } = useUserOrganization();
   const [removingMember, setRemovingMember] = useState<string | null>(null);
   const [cancellingInvite, setCancellingInvite] = useState<string | null>(null);
+  const [resendingInvite, setResendingInvite] = useState<string | null>(null);
+  const [revokeModalOpen, setRevokeModalOpen] = useState(false);
+  const [inviteToRevoke, setInviteToRevoke] = useState<{ id: string; email: string } | null>(null);
 
   // Fetch members
   const { data: membersData, isLoading: membersLoading, mutate: mutateMembers } = useSWR<{ members: Member[] }>(
@@ -228,6 +232,52 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
     } finally {
       setCancellingInvite(null);
     }
+  };
+
+  const handleResendInvite = async (inviteId: string) => {
+    const invite = invites?.find(i => i.id === inviteId);
+    if (!invite) return;
+
+    setResendingInvite(inviteId);
+    try {
+      const { error } = await authClient.organization.inviteMember({
+        email: invite.email,
+        role: invite.role as "admin" | "member",
+        organizationId: activeOrganization.id,
+        resend: true,
+      });
+      if (error) {
+        toast.error(error.message || "Failed to resend invitation");
+        return;
+      }
+      toast.success("Invitation resent successfully");
+      mutateInvites();
+    } catch (err) {
+      toast.error("Failed to resend invitation");
+    } finally {
+      setResendingInvite(null);
+    }
+  };
+
+  const handleCopyInviteLink = (inviteId: string) => {
+    const inviteLink = `${window.location.origin}/accept-invitation?id=${inviteId}`;
+    navigator.clipboard.writeText(inviteLink);
+    toast.success("Invite link copied to clipboard");
+  };
+
+  const handleRevokeInviteClick = (inviteId: string) => {
+    const invite = invites?.find(i => i.id === inviteId);
+    if (invite) {
+      setInviteToRevoke({ id: invite.id, email: invite.email });
+      setRevokeModalOpen(true);
+    }
+  };
+
+  const handleConfirmRevoke = async () => {
+    if (!inviteToRevoke) return;
+    await handleCancelInvite(inviteToRevoke.id);
+    setRevokeModalOpen(false);
+    setInviteToRevoke(null);
   };
 
   const isLoading = membersLoading || invitesLoading;
@@ -336,13 +386,15 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
 
               {/* Actions Column */}
               <motion.div {...getAnimationProps(index + 1, 2)} className="flex items-center justify-end gap-8">
-                <span className="rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-2.5 py-1 text-xs text-text-sub-600">
+                <span className="whitespace-nowrap rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-2.5 py-1 text-xs text-text-sub-600">
                   Invite pending...
                 </span>
                 <InviteDropdown
                   inviteId={invite.id}
-                  onCancelInvite={handleCancelInvite}
-                  isCancelling={cancellingInvite === invite.id}
+                  onResendInvite={handleResendInvite}
+                  onCopyInviteLink={handleCopyInviteLink}
+                  onRevokeInvite={handleRevokeInviteClick}
+                  isResending={resendingInvite === invite.id}
                 />
               </motion.div>
             </div>
@@ -411,12 +463,9 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
                   {!isOwner && !isCurrentUser && (
                     <Dropdown.Root>
                       <Dropdown.Trigger asChild>
-                        <button
-                          type="button"
-                          className="flex h-8 w-8 items-center justify-center rounded-lg text-text-sub-600 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950"
-                        >
-                          <Icon name="more-vertical" className="h-4 w-4" />
-                        </button>
+                        <Button.Root variant="neutral" mode="ghost" size="xxsmall">
+                          <Icon name="more-vertical" className="w-3 h-3" />
+                        </Button.Root>
                       </Dropdown.Trigger>
                       <Dropdown.Content align="end" className="w-48">
                         <Dropdown.Item
@@ -440,6 +489,13 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
           })}
         </div>
       </div>
-    </AnimatePresence >
+      <RevokeInviteModal
+        open={revokeModalOpen}
+        onOpenChange={setRevokeModalOpen}
+        onConfirm={handleConfirmRevoke}
+        isRevoking={cancellingInvite === inviteToRevoke?.id}
+        inviteEmail={inviteToRevoke?.email ?? ""}
+      />
+    </AnimatePresence>
   );
 };

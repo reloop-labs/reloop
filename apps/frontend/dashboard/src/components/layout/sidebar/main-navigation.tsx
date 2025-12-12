@@ -33,7 +33,7 @@ export const MainNavigation: React.FC<MainNavigationProps> = ({
 	const currentRect = currentTab?.getBoundingClientRect();
 
 	return (
-		<div className="relative space-y-1">
+		<div className="relative">
 			{mainNavigation.map(({ path, label, iconName }, index) => {
 				const href = `/${organizationSlug}${path}`;
 

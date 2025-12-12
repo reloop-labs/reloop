@@ -102,23 +102,6 @@ const AcceptInvitationContent = () => {
         return;
       }
 
-      // Fetch the list of organizations to get the newly joined org ID
-      const { data: organizations } = await authClient.organization.list();
-      const joinedOrg = organizations?.find(
-        (org) => org.slug === inviteDetails?.organizationSlug
-      );
-
-      if (joinedOrg) {
-        // Set the joined organization as active in the session
-        await authClient.organization.setActive({
-          organizationId: joinedOrg.id,
-        });
-        // Persist the active organization ID to the user
-        await authClient.updateUser({
-          activeOrganizationId: joinedOrg.id,
-        });
-      }
-
       // Redirect to the organization dashboard
       router.push(`/${inviteDetails?.organizationSlug || "dashboard"}`);
     } catch (err) {
