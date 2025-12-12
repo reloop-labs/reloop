@@ -47,26 +47,23 @@ const getProviderInfo = (providerId: string) => {
   switch (providerId.toLowerCase()) {
     case "google":
       return {
-        name: "Google",
+        name: "Signed in with Google",
         icon: "google",
         useCustomIcon: true,
-        description: "Signed in with Google",
         borderColor: "border-stroke-soft-100",
       };
     case "github":
       return {
-        name: "GitHub",
+        name: "Signed in with GitHub",
         icon: "github",
         useCustomIcon: false,
-        description: "Signed in with GitHub",
         borderColor: "border-stroke-soft-100",
       };
     case "credential":
       return {
-        name: "Email & Password",
+        name: "Signed in with email and password",
         icon: "mail",
         useCustomIcon: false,
-        description: "Signed in with email and password",
         borderColor: "border-stroke-soft-100",
       };
     default:

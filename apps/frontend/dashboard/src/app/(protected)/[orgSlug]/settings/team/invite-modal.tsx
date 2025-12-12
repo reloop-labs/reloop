@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { useSWRConfig } from "swr";
 import * as v from "valibot";
 import * as Textarea from "@reloop/ui/textarea";
+import * as Label from "@reloop/ui/label";
 
 const formSchema = v.object({
   emails: v.pipe(
@@ -99,87 +100,87 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
 
   return (
     <Modal.Root open={open} onOpenChange={onOpenChange}>
-      <Modal.Content className="sm:max-w-[480px]" showClose={true}>
-        {/* Header */}
-        <Modal.Header>
-          <div className="flex items-center justify-centers">
-            <Icon name="user-plus" className="h-4 w-4" />
-          </div>
-          <div className="flex-1">
-            <Modal.Title>Invite team members</Modal.Title>
-          </div>
-        </Modal.Header>
-
-        {/* Body */}
-        <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col">
-          <Modal.Body className="space-y-2">
-            {/* Email Textarea */}
-            <div className="space-y-2">
-              <label className="text-paragraph-xs text-text-sub-600">
-                Send Invite to ...
-              </label>
-              <Textarea.Root
-                {...form.register("emails")}
-                placeholder="example@email.com"
-                disabled={loading}
-                className="text-sm text-text-sub-700 placeholder:text-sm placeholder:text-text-sub-200"
-
-              />
-              {form.formState.errors.emails && (
-                <p className="text-error-base text-paragraph-xs">
-                  {form.formState.errors.emails.message}
-                </p>
-              )}
+      <Modal.Content className="sm:max-w-[480px] p-0.5 border border-stroke-soft-100/50 rounded-2xl" showClose={true}>
+        <div className="border border-stroke-soft-100/50 rounded-2xl">
+          <Modal.Header className='before:border-stroke-soft-200/50'>
+            <div className="flex items-center justify-centers">
+              <Icon name="user-plus" className="h-4 w-4" />
             </div>
+            <div className="flex-1">
+              <Modal.Title>Invite team members</Modal.Title>
+            </div>
+          </Modal.Header>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col">
+            <Modal.Body className="space-y-2">
+              {/* Email Textarea */}
+              <div className='flex flex-col gap-1'>
+                <Label.Root htmlFor='email'>
+                  Send Invite to ...
+                </Label.Root>
+                <Textarea.Root
+                  {...form.register("emails")}
+                  placeholder="example@email.com"
+                  disabled={loading}
+                  id='email'
+                  className="text-sm text-text-sub-700 placeholder:text-sm placeholder:text-text-sub-200"
 
-            {/* Role Select */}
-            <div className="space-y-2">
-              <label className="text-paragraph-xs text-text-sub-600">
-                Invite as
-              </label>
-              <Select.Root
+                />
+                {form.formState.errors.emails && (
+                  <p className="text-error-base text-paragraph-xs">
+                    {form.formState.errors.emails.message}
+                  </p>
+                )}
+              </div>
+
+              {/* Role Select */}
+              <div className='flex flex-col gap-1'>
+                <Label.Root htmlFor='role'>
+                  Invite as
+                </Label.Root>
+                <Select.Root
+                  size="small"
+                  defaultValue="member"
+                  disabled={loading}
+                  onValueChange={(value: "admin" | "member") => {
+                    form.setValue("role", value);
+                  }}
+                >
+                  <Select.Trigger className="w-full text-paragraph-xs">
+                    <Select.Value placeholder="Select role" />
+                  </Select.Trigger>
+                  <Select.Content className="text-paragraph-xs min-w-[var(--radix-select-trigger-width)]">
+                    <Select.Item value="member" className="h-7">Member</Select.Item>
+                    <Select.Item value="admin" className="h-7">Admin</Select.Item>
+                  </Select.Content>
+                </Select.Root>
+              </div>
+
+
+            </Modal.Body>
+
+            {/* Footer */}
+            <Modal.Footer className="justify-end border-stroke-soft-100/50">
+              <Button.Root
+                type="submit"
+                variant="neutral"
                 size="xsmall"
-                defaultValue="member"
                 disabled={loading}
-                onValueChange={(value: "admin" | "member") => {
-                  form.setValue("role", value);
-                }}
               >
-                <Select.Trigger className="w-full text-paragraph-xs">
-                  <Select.Value placeholder="Select role" />
-                </Select.Trigger>
-                <Select.Content className="text-paragraph-xs min-w-[var(--radix-select-trigger-width)]">
-                  <Select.Item value="member" className="h-7">Member</Select.Item>
-                  <Select.Item value="admin" className="h-7">Admin</Select.Item>
-                </Select.Content>
-              </Select.Root>
-            </div>
-
-
-          </Modal.Body>
-
-          {/* Footer */}
-          <Modal.Footer className="justify-end">
-            <Button.Root
-              type="submit"
-              variant="neutral"
-              size="xsmall"
-              disabled={loading}
-            >
-              {loading ? (
-                <>
-                  <Spinner size={14} color="white" />
-                  Sending...
-                </>
-              ) : (
-                <>
-                  Send Invites
-                  <Icon name="send" className="w-4 h-4" />
-                </>
-              )}
-            </Button.Root>
-          </Modal.Footer>
-        </form>
+                {loading ? (
+                  <>
+                    <Spinner size={14} color="white" />
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    Send Invites
+                    <Icon name="enter" className="w-4 h-4 border rounded-sm p-px border-stroke-soft-100/20" />
+                  </>
+                )}
+              </Button.Root>
+            </Modal.Footer>
+          </form>
+        </div>
       </Modal.Content>
     </Modal.Root>
   );
