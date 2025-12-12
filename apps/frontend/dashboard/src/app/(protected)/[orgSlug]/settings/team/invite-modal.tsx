@@ -247,12 +247,20 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
                 <div
                   className={cn(
                     "group/chips flex flex-wrap content-start gap-1.5 px-3 py-2.5 min-h-[82px] rounded-xl bg-bg-white-0 shadow-regular-xs",
-                    "ring-1 ring-stroke-soft-200 ring-inset",
+                    "ring-1 ring-inset",
                     "transition duration-200 ease-out cursor-text",
-                    // hover
-                    "hover:[&:not(:focus-within)]:bg-bg-weak-50 hover:[&:not(:focus-within)]:ring-transparent",
-                    // focus
-                    "focus-within:shadow-button-important-focus focus-within:ring-stroke-strong-950"
+                    emailError ? [
+                      // error state
+                      "ring-error-base",
+                      "focus-within:shadow-button-error-focus focus-within:ring-error-base",
+                    ] : [
+                      // normal state
+                      "ring-stroke-soft-200",
+                      // hover
+                      "hover:[&:not(:focus-within)]:bg-bg-weak-50 hover:[&:not(:focus-within)]:ring-transparent",
+                      // focus
+                      "focus-within:shadow-button-important-focus focus-within:ring-stroke-strong-950",
+                    ]
                   )}
                   onClick={() => inputRef.current?.focus()}
                 >
