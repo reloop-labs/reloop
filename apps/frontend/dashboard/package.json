@@ -33,6 +33,7 @@
 		"valibot": "catalog:db",
 		"zustand": "catalog:ui",
 		"@reloop/api": "workspace:*",
+		"react-hotkeys-hook": "catalog:ui",
 		"axios": "catalog:",
 		"babel-plugin-react-compiler": "catalog:ui",
 		"react-dropzone": "catalog:ui",

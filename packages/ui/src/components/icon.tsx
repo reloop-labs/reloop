@@ -549,6 +549,15 @@ export const IconsSprite = () => (
 					fill="currentColor"
 				/>
 			</symbol>
+			<symbol id="command" viewBox="0 0 24 24" fill="none">
+				<path
+					d="M6 14H6.01M6 10H6.01M17.996 10H18.006M18 14H18.01M10 6H10.01M14 6H14.01M14 18L14 18.01M10 18L10 18.01M10 14H14V18C14 19.1045 14.8954 20 16 20H18C19.1046 20 20 19.1046 20 18V16C20 14.8954 19.1046 14 18 14H14V10H18C19.1046 10 20 9.10457 20 8V6C20 4.89543 19.1046 4 18 4H16C14.8954 4 14 4.89543 14 6V10H10V6C10 4.89543 9.10457 4 8 4H6C4.89543 4 4 4.89543 4 6V8C4 9.10457 4.89543 10 6 10H10V14H6C4.89543 14 4 14.8954 4 16V18C4 19.1046 4.89543 20 6 20H8C9.10457 20 10 19.1046 10 18V14Z"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
 			<symbol
 				id="send"
 				viewBox="0 0 24 24"

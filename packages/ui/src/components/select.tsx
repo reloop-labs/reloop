@@ -405,7 +405,7 @@ const SelectItem = React.forwardRef<
 			</SelectPrimitives.ItemText>
 			<SelectPrimitives.ItemIndicator asChild>
 				<Icon
-					name="check"
+					name="check-circle"
 					className="-translate-y-1/2 absolute top-1/2 right-2 size-3.5 shrink-0 text-text-sub-600"
 				/>
 			</SelectPrimitives.ItemIndicator>

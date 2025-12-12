@@ -11,6 +11,7 @@ import Spinner from "@reloop/ui/spinner";
 import { useState, useRef } from "react";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
+import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import useSWR, { useSWRConfig } from "swr";
 import * as v from "valibot";
@@ -127,6 +128,17 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
     setEmailChips(newChips);
     form.setValue("emails", newChips.join(","));
   };
+
+  // Command/Ctrl + Enter to submit form
+  useHotkeys("mod+enter", (e) => {
+    e.preventDefault();
+    // Add any pending email first
+    if (inputValue.trim()) {
+      addEmailChip(inputValue);
+    }
+    // Submit the form
+    form.handleSubmit(onSubmit)();
+  }, { enableOnFormTags: ["INPUT"] });
 
   // Handle input keydown
   const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -298,7 +310,7 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
                     }}
                     placeholder={emailChips.length === 0 ? "example@email.com" : ""}
                     disabled={loading}
-                    className="flex-1 min-w-[120px] bg-transparent outline-none text-paragraph-xs text-text-sub-600 placeholder:text-text-soft-400"
+                    className="flex-1 min-w-[120px] bg-transparent outline-none text-paragraph-sm text-text-sub-600 placeholder:text-text-soft-400"
                   />
                 </div>
                 {(emailError || form.formState.errors.emails) && (
@@ -321,10 +333,10 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
                     form.setValue("role", value);
                   }}
                 >
-                  <Select.Trigger className="w-full text-paragraph-xs">
+                  <Select.Trigger className="w-full text-paragraph-sm">
                     <Select.Value placeholder="Select role" />
                   </Select.Trigger>
-                  <Select.Content className="text-paragraph-xs min-w-[var(--radix-select-trigger-width)]">
+                  <Select.Content className="text-paragraph-sm min-w-[var(--radix-select-trigger-width)]">
                     <div className="relative">
                       {roleOptions.map((option, idx) => (
                         <Select.Item
@@ -368,7 +380,10 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
                 ) : (
                   <>
                     Send Invites
-                    <Icon name="enter" className="w-4 h-4 border rounded-sm p-px border-stroke-soft-100/20" />
+                    <span className="inline-flex items-center gap-0.5">
+                      <Icon name="command" className="w-4 h-4 border rounded-sm p-px border-stroke-soft-100/20" />
+                      <Icon name="enter" className="w-4 h-4 border rounded-sm p-px border-stroke-soft-100/20" />
+                    </span>
                   </>
                 )}
               </Button.Root>

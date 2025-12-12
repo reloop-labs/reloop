@@ -373,7 +373,7 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
           {/* Pending Invites */}
           {filteredData.invites.map((invite, index) => (
             <div
-              key={invite.id ? `invite-${invite.id}` : `invite-idx-${index}`}
+              key={invite.id && invite.id.length > 0 ? `invite-${invite.id}` : `invite-idx-${index}`}
               className={cn(
                 "group/row grid grid-cols-[1fr_180px_165px] items-center py-2 px-4 transition-colors",
                 "hover:bg-bg-weak-50/50"
@@ -427,7 +427,7 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
 
             return (
               <div
-                key={member.id ? `member-${member.id}` : `member-idx-${index}`}
+                key={member.id && member.id.length > 0 ? `member-${member.id}` : `member-idx-${index}`}
                 className={cn(
                   "group/row grid grid-cols-[1fr_180px_165px] items-center py-2 px-4 transition-colors",
                   "hover:bg-bg-weak-50/50"
