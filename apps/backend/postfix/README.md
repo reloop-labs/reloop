@@ -1,16 +1,18 @@
-# Postfix Minimal - Simple Email Sending Container
+# Postfix Multi-Domain Mail Server
 
-A minimal Docker container for sending emails via Postfix CLI.
+A Docker container for sending emails via Postfix with DKIM signing support for **multiple domains**.
 
 ## Quick Start
 
-### 1. Set Your Domain
+### 1. Configure Your Domains
 
-Edit `docker-compose.yml` and change the `MAIL_DOMAIN`:
+Edit `docker-compose.yml` and set your domains:
 
 ```yaml
 environment:
-  MAIL_DOMAIN: yourdomain.com
+  # Comma-separated list of domains
+  MAIL_DOMAINS: "domain1.com,domain2.com,domain3.com"
+  DKIM_SELECTOR: default
 ```
 
 ### 2. Build and Run
@@ -19,59 +21,69 @@ environment:
 docker-compose up -d --build
 ```
 
-### 3. Send an Email
+### 3. Get DNS Records
+
+The container will output DKIM and DMARC records for all domains:
 
 ```bash
-docker exec -it postfix-minimal send-email
+docker logs postfix
 ```
 
-Follow the interactive prompts to send your email.
+### 4. Add DNS Records
 
-## One-liner Email Send
+For each domain, add:
 
-You can also send emails non-interactively:
+| Type | Name | Value |
+|------|------|-------|
+| TXT | `default._domainkey.yourdomain.com` | DKIM public key (from logs) |
+| TXT | `_dmarc.yourdomain.com` | `v=DMARC1; p=quarantine; rua=mailto:dmarc@yourdomain.com` |
+| TXT | `yourdomain.com` | `v=spf1 ip4:YOUR_SERVER_IP -all` |
+| MX | `yourdomain.com` | `mail.yourdomain.com` (priority 10) |
+
+### 5. Send an Email
 
 ```bash
-docker exec postfix-minimal bash -c 'echo "Hello World" | mail -s "Test Subject" -r "admin@${MAIL_DOMAIN}" recipient@example.com'
+docker exec -it postfix send-email
+```
+
+Or via API:
+
+```bash
+echo "Hello World" | docker exec -i postfix mail -s "Test Subject" -r "sender@domain1.com" recipient@example.com
 ```
 
 ## Configuration
 
 | Environment Variable | Description | Default |
 |---------------------|-------------|---------|
-| `MAIL_DOMAIN` | Your sending domain | `localhost` |
+| `MAIL_DOMAINS` | Comma-separated list of sending domains | - |
+| `MAIL_DOMAIN` | Legacy: Single domain (fallback) | `localhost` |
+| `DKIM_SELECTOR` | DKIM selector name | `default` |
+
+## Persistent Storage
+
+The docker-compose.yml includes volumes to persist:
+- **DKIM keys**: `/etc/opendkim/keys` - So keys aren't regenerated on restart
+- **TLS certificates**: `/etc/postfix/tls` - Reuse SSL certs
 
 ## Logs
 
-View Postfix logs:
-
 ```bash
-docker logs -f postfix-minimal
+docker logs -f postfix
 ```
-
-## Important Notes for Production
-
-⚠️ **For production use, you must:**
-
-1. **Set up DNS records:**
-   - **A Record**: `mail.yourdomain.com` → Your server IP
-   - **MX Record**: `yourdomain.com` → `mail.yourdomain.com`
-   - **SPF Record**: `v=spf1 ip4:YOUR_SERVER_IP -all`
-   - **PTR Record**: Reverse DNS from your IP to `mail.yourdomain.com`
-
-2. **Configure DKIM** (recommended for deliverability)
-
-3. **Use TLS** for encrypted connections
-
-4. **Avoid sending from residential IPs** (likely to be blocked)
 
 ## Troubleshooting
 
 **Email not delivered?**
-- Check logs: `docker logs postfix-minimal`
-- Verify DNS records
+- Check logs: `docker logs postfix`
+- Verify DNS records are propagated
 - Check if your IP is blacklisted: [MXToolbox](https://mxtoolbox.com/blacklists.aspx)
 
+**DKIM verification failing?**
+- Ensure the DKIM TXT record matches the output from logs
+- Wait for DNS propagation (up to 48 hours)
+- Test with [mail-tester.com](https://www.mail-tester.com/)
+
 **Connection refused?**
-- Ensure port 25 is not blocked by your ISP/firewall
-- Many cloud providers block port 25 by default
+- Port 25 may be blocked by your ISP/cloud provider
+- Many cloud providers require opening a support ticket to unblock port 25

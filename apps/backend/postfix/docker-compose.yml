@@ -3,7 +3,20 @@ services:
     image: reloopsh/be-postfix:latest
     container_name: postfix
     environment:
-      MAIL_DOMAIN: test.reloop.sh
+      # Multi-domain support: comma-separated list of domains
+      MAIL_DOMAINS: "example.com,test.example.com,another-domain.com"
+      # Or use legacy single domain:
+      # MAIL_DOMAIN: example.com
+      DKIM_SELECTOR: default
     ports:
       - "25:25"
+    volumes:
+      # Persist DKIM keys across container restarts
+      - postfix-dkim-keys:/etc/opendkim/keys
+      # Persist TLS certificates
+      - postfix-tls:/etc/postfix/tls
     restart: unless-stopped
+
+volumes:
+  postfix-dkim-keys:
+  postfix-tls:
