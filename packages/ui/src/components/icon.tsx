@@ -872,6 +872,15 @@ export const IconsSprite = () => (
 					strokeLinecap="round"
 				/>
 			</symbol>
+			<symbol id="activity" fill="none" viewBox="0 0 24 24">
+				<path
+					d="M2 12H6L9 19L15 5L18 12H22"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
 			<symbol id="inbox" viewBox="0 0 24 24">
 				<path
 					opacity="0.12"
