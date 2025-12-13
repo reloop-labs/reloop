@@ -23,31 +23,31 @@ const mailboxes: Array<{
 	status: string;
 	createdAt: string;
 }> = [
-	{
-		id: "1",
-		email: "admin@example.com",
-		password: "••••••••••",
-		quota: "5 GB",
-		status: "active",
-		createdAt: dayjs().subtract(2, "days").toISOString(),
-	},
-	{
-		id: "2",
-		email: "support@example.com",
-		password: "••••••••••",
-		quota: "10 GB",
-		status: "active",
-		createdAt: dayjs().subtract(1, "week").toISOString(),
-	},
-	{
-		id: "3",
-		email: "sales@examp le.com",
-		password: "••••••••••",
-		quota: "2 GB",
-		status: "disabled",
-		createdAt: dayjs().subtract(3, "weeks").toISOString(),
-	},
-];
+		{
+			id: "1",
+			email: "admin@example.com",
+			password: "••••••••••",
+			quota: "5 GB",
+			status: "active",
+			createdAt: dayjs().subtract(2, "days").toISOString(),
+		},
+		{
+			id: "2",
+			email: "support@example.com",
+			password: "••••••••••",
+			quota: "10 GB",
+			status: "active",
+			createdAt: dayjs().subtract(1, "week").toISOString(),
+		},
+		{
+			id: "3",
+			email: "sales@examp le.com",
+			password: "••••••••••",
+			quota: "2 GB",
+			status: "disabled",
+			createdAt: dayjs().subtract(3, "weeks").toISOString(),
+		},
+	];
 
 const EmptyState = () => {
 	const { activeOrganization } = useUserOrganization();
@@ -131,7 +131,7 @@ const MailboxesPage = () => {
 										<Table.Cell className="h-10">
 											<div className="flex items-center gap-2">
 												<Icon
-													name="mail"
+													name="mail-single"
 													className="h-4 w-4 text-text-sub-600"
 												/>
 												<span className="text-label-sm text-text-strong-950">

@@ -22,7 +22,7 @@ const ContactPage = () => {
 						<div className="flex flex-col gap-6">
 							{/* Contact Header */}
 							<div className="flex items-center gap-2">
-								<Icon name="mail" className="size-5 text-teal-500" />
+								<Icon name="mail-single" className="size-5 text-teal-500" />
 								<span className="label-sm text-teal-500">Contact</span>
 							</div>
 

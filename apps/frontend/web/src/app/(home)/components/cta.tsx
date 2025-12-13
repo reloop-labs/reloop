@@ -43,7 +43,7 @@ const CTA = () => {
 						</div>
 					</div>
 					<div className="flex items-center justify-center">
-						<Icon name="mail" className="h-40 w-40" />
+						<Icon name="mail-single" className="h-40 w-40" />
 					</div>
 				</div>
 			</div>

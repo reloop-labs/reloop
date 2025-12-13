@@ -1,27 +1,15 @@
 "use client";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
+import { PageSizeDropdown } from "../../domain/components/page-size-dropdown";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import * as Select from "@reloop/ui/select";
-import { Skeleton } from "@reloop/ui/skeleton";
-import { motion } from "motion/react";
 import { useState } from "react";
 import { useQueryState, parseAsInteger } from "nuqs";
 import useSWR from "swr";
 import { toast } from "sonner";
-
-// Animation utility function (matching domain table)
-const getAnimationProps = (row: number, column: number) => ({
-  initial: { opacity: 0, y: "-100%" },
-  animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: "100%" },
-  transition: {
-    duration: 0.5,
-    delay: row * 0.07 + column * 0.1,
-    ease: [0.65, 0, 0.35, 1] as const,
-  },
-});
+import { ContactTable } from "./contact-table";
+import { DeleteContactModal } from "./delete-contact";
 
 interface Contact {
   id: string;
@@ -171,62 +159,12 @@ export const ContactList = () => {
         </Button.Root>
       </div>
 
-      <div className="mt-4 w-full overflow-hidden rounded-xl border border-stroke-soft-200 text-paragraph-sm shadow-regular-md ring-stroke-soft-200 ring-inset">
-        <div className="grid grid-cols-[1fr_minmax(180px,auto)_minmax(120px,auto)]">
-          {/* Header */}
-          <div className="bg-bg-weak-50 pl-5 font-medium text-text-sub-600">
-            <div className="py-2.5">Email</div>
-          </div>
-          <div className="bg-bg-weak-50 font-medium text-text-sub-600">
-            <div className="py-2.5">Name</div>
-          </div>
-          <div className="bg-bg-weak-50 font-medium text-text-sub-600">
-            <div className="py-2.5">Created</div>
-          </div>
-
-          {/* Loading State */}
-          {isLoading
-            ? Array.from({ length: 4 }).map((_, index) => (
-              <div key={`skeleton-${index}`} className="group/row contents">
-                <div className="flex items-center border-stroke-soft-200 border-t py-2.5 pl-5">
-                  <div className="flex items-center gap-2">
-                    <Skeleton className="h-4 w-4 rounded" />
-                    <Skeleton className="h-4 w-48 rounded" />
-                  </div>
-                </div>
-                <div className="flex items-center border-stroke-soft-200 border-t py-2.5">
-                  <Skeleton className="h-4 w-32 rounded" />
-                </div>
-                <div className="flex items-center border-stroke-soft-200 border-t py-2.5">
-                  <Skeleton className="h-4 w-20 rounded" />
-                </div>
-              </div>
-            ))
-            : filteredContacts.map((contact, index) => (
-              <div key={contact.id} className="group/row contents">
-                <div className="flex items-center border-stroke-soft-200 border-t py-2.5 pl-5 group-hover/row:bg-bg-weak-50">
-                  <motion.div {...getAnimationProps(index, 0)} className="flex items-center gap-2">
-                    <Icon name="user" className="h-4 w-4 text-text-sub-600" />
-                    <span className="font-medium text-label-sm text-text-strong-950">
-                      {contact.email}
-                    </span>
-                  </motion.div>
-                </div>
-                <div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
-                  <motion.span {...getAnimationProps(index, 1)} className="text-label-sm text-text-sub-600">
-                    {contact.firstName || contact.lastName
-                      ? `${contact.firstName || ""} ${contact.lastName || ""}`.trim()
-                      : "—"}
-                  </motion.span>
-                </div>
-                <div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
-                  <motion.span {...getAnimationProps(index, 2)} className="text-label-sm text-text-sub-600">
-                    {new Date(contact.createdAt).toLocaleDateString()}
-                  </motion.span>
-                </div>
-              </div>
-            ))}
-        </div>
+      <div className="mt-4">
+        <ContactTable
+          contacts={filteredContacts}
+          isLoading={isLoading}
+          loadingRows={4}
+        />
       </div>
 
       {/* Pagination */}
@@ -236,24 +174,13 @@ export const ContactList = () => {
             <span>
               Showing {startIndex}–{endIndex} of {data.total} contact{data.total !== 1 ? "s" : ""}
             </span>
-            <Select.Root
-              value={String(pageSize)}
+            <PageSizeDropdown
+              value={pageSize}
               onValueChange={(value) => {
-                setPageSize(Number(value));
+                setPageSize(value);
                 setCurrentPage(1);
               }}
-              size="xsmall"
-            >
-              <Select.Trigger className="w-16 text-xs">
-                <Select.Value />
-              </Select.Trigger>
-              <Select.Content className="text-xs min-w-16">
-                <Select.Item value="10" className="text-xs">10</Select.Item>
-                <Select.Item value="20" className="text-xs">20</Select.Item>
-                <Select.Item value="50" className="text-xs">50</Select.Item>
-                <Select.Item value="100" className="text-xs">100</Select.Item>
-              </Select.Content>
-            </Select.Root>
+            />
           </div>
           <div className="flex items-center gap-2">
             <Button.Root
@@ -262,6 +189,7 @@ export const ContactList = () => {
               size="xxsmall"
               onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
               disabled={currentPage === 1 || isLoading}
+              className="transition-all duration-200 hover:border-primary-base hover:bg-bg-weak-50/50"
             >
               <Icon name="chevron-left" className="h-4 w-4" />
             </Button.Root>
@@ -274,12 +202,15 @@ export const ContactList = () => {
               size="xxsmall"
               onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
               disabled={currentPage === totalPages || isLoading}
+              className="transition-all duration-200 hover:border-primary-base hover:bg-bg-weak-50/50"
             >
               <Icon name="chevron-right" className="h-4 w-4" />
             </Button.Root>
           </div>
         </div>
       )}
+
+      <DeleteContactModal contacts={data?.contacts || []} />
     </div>
   );
 };

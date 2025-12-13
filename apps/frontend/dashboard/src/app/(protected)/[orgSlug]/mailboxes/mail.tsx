@@ -214,7 +214,7 @@ export const Mail = ({
 		>
 			<div className="relative flex h-full w-full items-center justify-center">
 				<Icon
-					name="mail"
+					name="mail-single"
 					className={cn("relative h-8 w-8 opacity-80", iconClassName)}
 				/>
 				<FlickeringGrid

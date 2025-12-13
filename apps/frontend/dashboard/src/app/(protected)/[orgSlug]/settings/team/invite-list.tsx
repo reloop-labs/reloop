@@ -155,7 +155,7 @@ export const InviteList = () => {
 		return (
 			<div className="flex flex-col items-center justify-center py-16">
 				<div className="flex h-12 w-12 items-center justify-center rounded-full bg-bg-weak-50">
-					<Icon name="mail" className="h-6 w-6 text-text-sub-600" />
+					<Icon name="mail-single" className="h-6 w-6 text-text-sub-600" />
 				</div>
 				<p className="mt-4 font-medium text-text-strong-950">No pending invitations</p>
 				<p className="mt-1 text-sm text-text-sub-600">Send an invitation to add team members</p>
