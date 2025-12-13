@@ -4,11 +4,13 @@ import { valibotResolver } from "@hookform/resolvers/valibot";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
+import * as Kbd from "@reloop/ui/kbd";
 import * as Label from "@reloop/ui/label";
 import Spinner from "@reloop/ui/spinner";
 import { useLoading } from "@reloop/ui/use-loading";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { useSWRConfig } from "swr";
@@ -44,6 +46,17 @@ export const AddDomainSidebar = () => {
 		push(`/domain/add/${domain}`);
 	};
 
+	// Handle Escape key to go back
+	useEffect(() => {
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (e.key === "Escape") {
+				back();
+			}
+		};
+		window.addEventListener("keydown", handleKeyDown);
+		return () => window.removeEventListener("keydown", handleKeyDown);
+	}, [back]);
+
 	const onSubmit = async ({ domain }: DomainFormValues) => {
 		try {
 			changeStatus("loading");
@@ -68,17 +81,34 @@ export const AddDomainSidebar = () => {
 
 	return (
 		<div className="mx-auto max-w-3xl pt-10 pb-8 sm:px-8">
-			<Button.Root
+			<button
+				type="button"
 				onClick={() => back()}
-				variant="neutral"
-				mode="stroke"
-				size="xxsmall"
+				className="group flex items-center gap-1.5 px-2 py-1.5 text-paragraph-sm font-medium text-text-sub-600 transition-all duration-300 hover:text-text-strong-950 cursor-pointer"
 			>
-				<Button.Icon>
-					<Icon name="chevron-left" className="h-4 w-4" />
-				</Button.Icon>
-				Back
-			</Button.Root>
+				<div className="relative flex items-center justify-center w-3.5 h-3.5 overflow-visible">
+					{/* Arrow tail - hidden by default, slides in on hover */}
+					<div className="absolute right-[4px] h-[1.25px] w-0 bg-current transition-all duration-300 ease-out group-hover:w-2.5" />
+					{/* Chevron/Arrow head - nudges left on hover */}
+					<svg
+						width="6"
+						height="10"
+						viewBox="0 0 8 12"
+						fill="none"
+						className="absolute left-0 transition-all duration-300 ease-out group-hover:-translate-x-0.5"
+					>
+						<path
+							d="M7 1L1.5 6L7 11"
+							stroke="currentColor"
+							strokeWidth="1.5"
+							strokeLinecap="round"
+							strokeLinejoin="round"
+						/>
+					</svg>
+				</div>
+				<span className="transition-all duration-300 group-hover:tracking-wide text-xs">Back</span>
+				<Kbd.Root className="bg-bg-weak-50 text-[10px] px-1.5 py-0.5">Esc</Kbd.Root>
+			</button>
 			<div className="flex w-full items-center justify-between border-stroke-soft-200 border-b border-dashed pt-6 pb-6">
 				<div>
 					<h1 className="font-medium text-title-h5 leading-8">Add Domain</h1>
@@ -99,10 +129,6 @@ export const AddDomainSidebar = () => {
 			</div>
 
 			<div className="my-6 gap-3">
-				<h2 className="font-semibold text-lg">Domain</h2>
-				<p className="text-paragraph-sm text-text-sub-600">
-					Add a subdomain (eg. marketing.example.com)
-				</p>
 			</div>
 			<div className="flex gap-6">
 				<form onSubmit={handleSubmit(onSubmit)} className="w-full space-y-3">
@@ -119,7 +145,8 @@ export const AddDomainSidebar = () => {
 								hasError={!!formState?.errors?.domain?.message}
 								className="w-full"
 							>
-								<Input.Affix className="bg-gray-50 text-gray-500">
+								<Input.Affix className="bg-bg-white-0 text-text-strong-950
+">
 									https://
 								</Input.Affix>
 								<Input.Wrapper>
@@ -146,7 +173,7 @@ export const AddDomainSidebar = () => {
 						<Button.Root
 							type="submit"
 							variant="neutral"
-							size="small"
+							size="xsmall"
 							disabled={status === "loading" || !formState.isValid}
 							className="min-w-[140px]"
 						>
@@ -158,10 +185,7 @@ export const AddDomainSidebar = () => {
 							) : (
 								<>
 									Add Domain
-									<Icon
-										name="undo"
-										className="h-5 w-5 scale-y-[-1] rounded-md bg-bg-white-0/10 p-1"
-									/>
+									<Icon name="enter" className="w-4 h-4 border rounded-sm p-px border-stroke-soft-100/20" />
 								</>
 							)}
 						</Button.Root>
@@ -184,12 +208,6 @@ export const AddDomainSidebar = () => {
 						</ul>
 					</div>
 				</div>
-			</div>
-			<div className="mb-6 gap-3 border-stroke-soft-200 border-t border-dashed pt-6">
-				<h2 className="font-semibold text-lg text-text-sub-600">DNS Records</h2>
-				<p className="text-paragraph-sm text-text-sub-600">
-					Add DNS records to your domain to start sending emails
-				</p>
 			</div>
 		</div>
 	);

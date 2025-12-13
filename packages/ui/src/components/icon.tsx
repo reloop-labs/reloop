@@ -1424,6 +1424,20 @@ export const IconsSprite = () => (
 					strokeLinejoin="round"
 				/>
 			</symbol>
+			<symbol
+				id="arrow-left"
+				viewBox="0 0 24 24"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<path
+					d="M10 5L3 11.9999M3 11.9999L10 18.9999M3 11.9999H21"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
 			<symbol id="chevron-left" viewBox="0 0 24 24">
 				<path
 					fillRule="evenodd"
