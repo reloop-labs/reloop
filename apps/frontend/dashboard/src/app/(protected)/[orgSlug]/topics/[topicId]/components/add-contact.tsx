@@ -3,13 +3,14 @@ import { valibotResolver } from "@hookform/resolvers/valibot";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
+import * as Kbd from "@reloop/ui/kbd";
 import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
-import Spinner from "@reloop/ui/spinner";
-import { useLoading } from "@reloop/ui/use-loading";
 import axios from "axios";
+import { useState } from "react";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { useSWRConfig } from "swr";
 import * as v from "valibot";
 
@@ -38,7 +39,7 @@ export const AddContact = ({
   onOpenChange,
 }: AddContactProps) => {
   const { mutate } = useSWRConfig();
-  const { changeStatus, status } = useLoading();
+  const [isLoading, setIsLoading] = useState(false);
 
   const { register, handleSubmit, formState, setError, reset } =
     useForm<AddContactFormValues>({
@@ -52,7 +53,7 @@ export const AddContact = ({
 
   const onSubmit = async ({ email, firstName, lastName }: AddContactFormValues) => {
     try {
-      changeStatus("loading");
+      setIsLoading(true);
       await axios.post(
         "/api/audience/v1/contacts/add-to-topic",
         {
@@ -64,122 +65,133 @@ export const AddContact = ({
         { withCredentials: true },
       );
       await mutate((key: string) => typeof key === 'string' && key.startsWith(`/api/audience/v1/subscriptions/list?topicId=${topicId}`));
+      toast.success("Contact added successfully");
       reset();
       onOpenChange(false);
     } catch (error) {
       const errorMessage = axios.isAxiosError(error)
         ? error.response?.data?.message || "Failed to add contact"
         : "Failed to add contact";
+      toast.error(errorMessage);
       setError("email", {
         type: "manual",
         message: errorMessage,
       });
     } finally {
-      changeStatus("idle");
+      setIsLoading(false);
     }
+  };
+
+  const handleClose = () => {
+    reset();
+    onOpenChange(false);
   };
 
   return (
     <Modal.Root open={open} onOpenChange={onOpenChange}>
-      <Modal.Content className="max-w-md">
-        <Modal.Header>
-          <Modal.Title>Add Contact</Modal.Title>
-          <Modal.Description>
-            Add a contact to "{topicName}"
-          </Modal.Description>
-        </Modal.Header>
-
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="space-y-4 p-4">
-            <div>
-              <Label.Root htmlFor="email" className="mb-2 block font-medium text-sm">
-                Email
-                <Label.Asterisk />
-              </Label.Root>
-              <Input.Root hasError={!!formState.errors.email}>
-                <Input.Wrapper>
-                  <Input.Input
-                    id="email"
-                    type="email"
-                    placeholder="contact@example.com"
-                    {...register("email")}
-                    disabled={status === "loading"}
-                  />
-                </Input.Wrapper>
-              </Input.Root>
-              {formState.errors.email && (
-                <div className="mt-2 flex items-center gap-2">
-                  <Icon name="alert-circle" className="h-4 w-4 text-red-500" />
-                  <p className="text-red-600 text-sm">
+      <Modal.Content className="sm:max-w-[480px] p-0.5 border border-stroke-soft-100/50 rounded-2xl" showClose={true}>
+        <div className="border border-stroke-soft-100/50 rounded-2xl">
+          <Modal.Header className="before:border-stroke-soft-200/50">
+            <div className="flex items-center justify-center">
+              <Icon name="user-plus" className="h-4 w-4" />
+            </div>
+            <div className="flex-1">
+              <Modal.Title className="text-sm">Add Contact to "{topicName}"</Modal.Title>
+            </div>
+          </Modal.Header>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <Modal.Body className="space-y-4">
+              <div className="flex flex-col gap-1">
+                <Label.Root htmlFor="email">
+                  Email
+                  <Label.Asterisk />
+                </Label.Root>
+                <Input.Root size="small" hasError={!!formState.errors.email}>
+                  <Input.Wrapper>
+                    <Input.Input
+                      id="email"
+                      type="email"
+                      placeholder="contact@example.com"
+                      {...register("email")}
+                      disabled={isLoading}
+                    />
+                  </Input.Wrapper>
+                </Input.Root>
+                {formState.errors.email && (
+                  <p className="text-error-base text-paragraph-xs">
                     {formState.errors.email.message}
                   </p>
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex flex-col gap-1">
+                  <Label.Root htmlFor="firstName">
+                    First Name
+                  </Label.Root>
+                  <Input.Root size="small">
+                    <Input.Wrapper>
+                      <Input.Input
+                        id="firstName"
+                        placeholder="John"
+                        {...register("firstName")}
+                        disabled={isLoading}
+                      />
+                    </Input.Wrapper>
+                  </Input.Root>
                 </div>
-              )}
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label.Root htmlFor="firstName" className="mb-2 block font-medium text-sm">
-                  First Name
-                </Label.Root>
-                <Input.Root>
-                  <Input.Wrapper>
-                    <Input.Input
-                      id="firstName"
-                      placeholder="John"
-                      {...register("firstName")}
-                      disabled={status === "loading"}
-                    />
-                  </Input.Wrapper>
-                </Input.Root>
+                <div className="flex flex-col gap-1">
+                  <Label.Root htmlFor="lastName">
+                    Last Name
+                  </Label.Root>
+                  <Input.Root size="small">
+                    <Input.Wrapper>
+                      <Input.Input
+                        id="lastName"
+                        placeholder="Doe"
+                        {...register("lastName")}
+                        disabled={isLoading}
+                      />
+                    </Input.Wrapper>
+                  </Input.Root>
+                </div>
               </div>
-              <div>
-                <Label.Root htmlFor="lastName" className="mb-2 block font-medium text-sm">
-                  Last Name
-                </Label.Root>
-                <Input.Root>
-                  <Input.Wrapper>
-                    <Input.Input
-                      id="lastName"
-                      placeholder="Doe"
-                      {...register("lastName")}
-                      disabled={status === "loading"}
-                    />
-                  </Input.Wrapper>
-                </Input.Root>
-              </div>
-            </div>
-          </div>
-
-          <Modal.Footer>
-            <Button.Root
-              type="button"
-              variant="neutral"
-              mode="stroke"
-              onClick={() => onOpenChange(false)}
-            >
-              Cancel
-            </Button.Root>
-            <Button.Root
-              type="submit"
-              variant="neutral"
-              disabled={status === "loading" || !formState.isValid}
-            >
-              {status === "loading" ? (
-                <>
-                  <Spinner color="white" />
-                  Adding...
-                </>
-              ) : (
-                <>
-                  <Icon name="user-plus" className="h-4 w-4" />
-                  Add Contact
-                </>
-              )}
-            </Button.Root>
-          </Modal.Footer>
-        </form>
+            </Modal.Body>
+            <Modal.Footer className="justify-end border-stroke-soft-100/50 mt-4">
+              <Button.Root
+                type="button"
+                variant="neutral"
+                mode="stroke"
+                size="small"
+                onClick={handleClose}
+                disabled={isLoading}
+              >
+                Cancel
+                <Kbd.Root className="bg-bg-weak-50 text-[10px]">Esc</Kbd.Root>
+              </Button.Root>
+              <Button.Root
+                type="submit"
+                variant="neutral"
+                size="small"
+                disabled={isLoading || !formState.isValid}
+              >
+                {isLoading ? (
+                  <>
+                    <Icon name="loader" className="h-4 w-4 animate-spin" />
+                    Adding...
+                  </>
+                ) : (
+                  <>
+                    Add Contact
+                    <Icon name="enter" className="w-4 h-4 border rounded-sm p-px border-stroke-soft-100/20" />
+                  </>
+                )}
+              </Button.Root>
+            </Modal.Footer>
+          </form>
+        </div>
       </Modal.Content>
     </Modal.Root>
   );
 };
+

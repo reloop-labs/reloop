@@ -1,5 +1,6 @@
 "use client";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
+import { PageSizeDropdown } from "../../domain/components/page-size-dropdown";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
@@ -297,24 +298,13 @@ const TopicDetailPage = () => {
                 <span>
                   Showing {startIndex}–{endIndex} of {subscriptionData.total} contact{subscriptionData.total !== 1 ? "s" : ""}
                 </span>
-                <Select.Root
-                  value={String(pageSize)}
+                <PageSizeDropdown
+                  value={pageSize}
                   onValueChange={(value) => {
-                    setPageSize(Number(value));
+                    setPageSize(value);
                     setCurrentPage(1);
                   }}
-                  size="xsmall"
-                >
-                  <Select.Trigger className="w-16 text-xs">
-                    <Select.Value />
-                  </Select.Trigger>
-                  <Select.Content className="text-xs min-w-16">
-                    <Select.Item value="10" className="text-xs">10</Select.Item>
-                    <Select.Item value="20" className="text-xs">20</Select.Item>
-                    <Select.Item value="50" className="text-xs">50</Select.Item>
-                    <Select.Item value="100" className="text-xs">100</Select.Item>
-                  </Select.Content>
-                </Select.Root>
+                />
               </div>
               <div className="flex items-center gap-2">
                 <Button.Root
@@ -323,6 +313,7 @@ const TopicDetailPage = () => {
                   size="xxsmall"
                   onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                   disabled={currentPage === 1 || subscriptionLoading}
+                  className="transition-all duration-200 hover:border-primary-base hover:bg-bg-weak-50/50"
                 >
                   <Icon name="chevron-left" className="h-4 w-4" />
                 </Button.Root>
@@ -335,6 +326,7 @@ const TopicDetailPage = () => {
                   size="xxsmall"
                   onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
                   disabled={currentPage === totalPages || subscriptionLoading}
+                  className="transition-all duration-200 hover:border-primary-base hover:bg-bg-weak-50/50"
                 >
                   <Icon name="chevron-right" className="h-4 w-4" />
                 </Button.Root>
