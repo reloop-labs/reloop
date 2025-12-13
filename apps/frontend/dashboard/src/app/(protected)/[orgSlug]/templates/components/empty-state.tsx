@@ -1,13 +1,41 @@
 "use client";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 interface EmptyStateProps {
     orgSlug: string;
 }
 
 export const EmptyState = ({ orgSlug }: EmptyStateProps) => {
+    const router = useRouter();
+    const [isCreating, setIsCreating] = useState(false);
+
+    const handleCreateTemplate = async () => {
+        setIsCreating(true);
+        try {
+            const response = await fetch("/api/template/v1/create", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({
+                    name: "Untitled",
+                    content: [],
+                }),
+            });
+
+            if (response.ok) {
+                const template = await response.json();
+                router.push(`/${orgSlug}/templates/${template.id}`);
+            }
+        } catch (error) {
+            console.error("Failed to create template:", error);
+        } finally {
+            setIsCreating(false);
+        }
+    };
+
     return (
         <div className="flex flex-col items-center justify-center py-16">
             <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-bg-weak-50">
@@ -17,17 +45,20 @@ export const EmptyState = ({ orgSlug }: EmptyStateProps) => {
             <p className="mt-2 max-w-sm text-center text-sm text-text-sub-600">
                 Create your first email template to start building reusable email designs with our drag-and-drop editor.
             </p>
-            <Link
-                href={`/${orgSlug}/templates/create`}
-                className={Button.buttonVariants({
-                    variant: "primary",
-                    size: "small",
-                }).root()}
+            <Button.Root
+                variant="primary"
+                size="small"
+                onClick={handleCreateTemplate}
+                disabled={isCreating}
                 style={{ marginTop: "1.5rem" }}
             >
-                <Icon name="plus" className="h-4 w-4" />
-                Create your first template
-            </Link>
+                {isCreating ? (
+                    <Icon name="loader" className="h-4 w-4 animate-spin" />
+                ) : (
+                    <Icon name="plus" className="h-4 w-4" />
+                )}
+                {isCreating ? "Creating..." : "Create your first template"}
+            </Button.Root>
         </div>
     );
 };

@@ -4,6 +4,7 @@ import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useQueryState, parseAsInteger } from "nuqs";
 import useSWR from "swr";
@@ -30,7 +31,9 @@ interface TemplateListResponse {
 
 export const TemplateList = () => {
     const { activeOrganization } = useUserOrganization();
+    const router = useRouter();
     const [searchQuery, setSearchQuery] = useState<string>("");
+    const [isCreating, setIsCreating] = useState(false);
     const [currentPage, setCurrentPage] = useQueryState("page", parseAsInteger.withDefault(1));
     const [pageSize, setPageSize] = useQueryState("limit", parseAsInteger.withDefault(10));
 
@@ -43,6 +46,30 @@ export const TemplateList = () => {
             revalidateOnReconnect: true,
         },
     );
+
+    const handleCreateTemplate = async () => {
+        setIsCreating(true);
+        try {
+            const response = await fetch("/api/template/v1/create", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({
+                    name: "Untitled",
+                    content: [],
+                }),
+            });
+
+            if (response.ok) {
+                const template = await response.json();
+                router.push(`/${activeOrganization.slug}/templates/${template.id}`);
+            }
+        } catch (error) {
+            console.error("Failed to create template:", error);
+        } finally {
+            setIsCreating(false);
+        }
+    };
 
     const totalPages = data ? Math.ceil(data.total / pageSize) : 1;
     const startIndex = (currentPage - 1) * pageSize + 1;
@@ -65,16 +92,19 @@ export const TemplateList = () => {
                     Template{data?.templates.length !== 1 ? "s" : ""}
                 </p>
                 <div className="flex items-center gap-2">
-                    <Link
-                        className={Button.buttonVariants({
-                            variant: "neutral",
-                            size: "xsmall",
-                        }).root()}
-                        href={`/${activeOrganization.slug}/templates/create`}
+                    <Button.Root
+                        variant="neutral"
+                        size="xsmall"
+                        onClick={handleCreateTemplate}
+                        disabled={isCreating}
                     >
-                        <Icon name="plus" className="h-4 w-4" />
-                        Create template
-                    </Link>
+                        {isCreating ? (
+                            <Icon name="loader" className="h-4 w-4 animate-spin" />
+                        ) : (
+                            <Icon name="plus" className="h-4 w-4" />
+                        )}
+                        {isCreating ? "Creating..." : "Create template"}
+                    </Button.Root>
                 </div>
             </div>
             <div>
