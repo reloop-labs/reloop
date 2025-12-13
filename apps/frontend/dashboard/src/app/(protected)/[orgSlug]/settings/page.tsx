@@ -29,7 +29,7 @@ const SettingsPage = () => {
 	const [isSaving, setIsSaving] = useState(false);
 	const [slugStatus, setSlugStatus] = useState<SlugStatus>("idle");
 	const fileInputRef = useRef<HTMLInputElement>(null);
-	const slugCheckTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+	const slugCheckTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 	// Check if there are any changes
 	const hasChanges =
