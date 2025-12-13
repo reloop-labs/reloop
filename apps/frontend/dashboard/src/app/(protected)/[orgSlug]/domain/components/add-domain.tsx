@@ -84,7 +84,7 @@ export const AddDomainSidebar = () => {
 			<button
 				type="button"
 				onClick={() => back()}
-				className="group flex items-center gap-1.5 px-2 py-1.5 text-paragraph-sm font-medium text-text-sub-600 transition-all duration-300 hover:text-text-strong-950 cursor-pointer"
+				className="group flex items-center gap-1.5 px-2 py-1.5 text-paragraph-xs font-medium text-text-sub-600 transition-all duration-300 hover:text-text-strong-950 cursor-pointer"
 			>
 				<div className="relative flex items-center justify-center w-3.5 h-3.5 overflow-visible">
 					{/* Arrow tail - hidden by default, slides in on hover */}
@@ -191,21 +191,31 @@ export const AddDomainSidebar = () => {
 						</Button.Root>
 					</div>
 				</form>
-				<div className="mt-[29px] mb-10 w-96 rounded-2xl border border-stroke-soft-200 p-4">
-					<div className="flex items-center gap-2 text-xs uppercase">
-						<Icon name="bulb" className="h-3 w-3" />
-						<p>Pro Tip</p>
+				{/* Sticky Note Pro Tip */}
+				<div className="relative mt-10 mb-10 w-96">
+					<div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center">
+						<div className="relative h-3 w-3 rounded-full bg-gradient-to-br from-neutral-500 via-neutral-600 to-neutral-700 shadow-lg">
+							<div className="absolute top-0.5 left-1 h-1.5 w-1.5 rounded-full bg-white/40" />
+						</div>
+						<div className="h-2 w-[2px] bg-gradient-to-b from-neutral-500 via-neutral-600 to-neutral-700 rounded-b-full" />
 					</div>
-					<p className="pt-2 text-sm text-text-sub-600">
-						Use separate domain for domain reputation
-					</p>
-					<div className="pt-3 text-sm text-text-sub-600">
-						<p>Subdomain example:</p>
-						<ul className="list-disc pl-5">
-							<li>marketing.example.com</li>
-							<li>send.example.com</li>
-							<li>transection.example.com</li>
-						</ul>
+
+					<div className="relative rotate-2 rounded-lg border border-stroke-soft-200 bg-bg-weak-50 p-5 shadow-lg transition-transform duration-300 hover:rotate-0 hover:scale-[1.02]">
+
+						<div className="font-medium text-text-sub-600 text-xs uppercase tracking-wide flex items-center gap-1">
+							<Icon name="bulb" className="h-3 w-3" />Pro Tip
+						</div>
+						<p className="mt-2 font-medium text-text-strong-950 text-xs leading-relaxed">
+							Use separate domain for domain reputation
+						</p>
+						<div className="mt-3 text-text-sub-600 text-xs">
+							<p >Subdomain examples:</p>
+							<ul className="mt-1 space-y-0.5 pl-3">
+								<li>• marketing.example.com</li>
+								<li>• send.example.com</li>
+								<li>• transactional.example.com</li>
+							</ul>
+						</div>
 					</div>
 				</div>
 			</div>
