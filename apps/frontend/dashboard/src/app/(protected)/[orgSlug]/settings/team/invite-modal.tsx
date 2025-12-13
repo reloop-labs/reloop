@@ -281,7 +281,7 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
                       key={email}
                       className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md border border-stroke-soft-200 bg-bg-weak-50 text-paragraph-xs text-text-strong-950"
                     >
-                      <Icon name="mail" className="w-3 h-3 text-text-sub-600" />
+                      <Icon name="mail-single" className="w-3 h-3 text-text-sub-600" />
                       {email}
                       <button
                         type="button"

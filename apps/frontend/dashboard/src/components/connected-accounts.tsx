@@ -62,7 +62,7 @@ const getProviderInfo = (providerId: string) => {
     case "credential":
       return {
         name: "Signed in with email and password",
-        icon: "mail",
+        icon: "mail-single",
         useCustomIcon: false,
         borderColor: "border-stroke-soft-100",
       };
@@ -138,7 +138,7 @@ export const ConnectedAccounts = ({ className }: ConnectedAccountsProps) => {
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-bg-weak-50">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-bg-weak-50 border border-stroke-soft-200/40">
                       {provider.useCustomIcon && account.providerId.toLowerCase() === "google" ? (
                         <GoogleIcon className="h-4 w-4" />
                       ) : (
@@ -157,7 +157,7 @@ export const ConnectedAccounts = ({ className }: ConnectedAccountsProps) => {
                       </p>
                     </div>
                   </div>
-                  <span className="rounded-md bg-success-lighter px-2 py-0.5 font-medium text-success-base text-xs">
+                  <span className="rounded-md bg-success-lighter/50 px-2 py-0.5 font-medium text-success-base text-xs border border-success-base">
                     Connected
                   </span>
                 </div>
