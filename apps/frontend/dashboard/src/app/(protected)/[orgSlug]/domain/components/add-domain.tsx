@@ -1,16 +1,14 @@
 "use client";
+import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import * as Kbd from "@reloop/ui/kbd";
 import * as Label from "@reloop/ui/label";
 import Spinner from "@reloop/ui/spinner";
 import { useLoading } from "@reloop/ui/use-loading";
 import axios from "axios";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { useSWRConfig } from "swr";
@@ -33,7 +31,6 @@ export const AddDomainSidebar = () => {
 	const { push } = useUserOrganization();
 	const { changeStatus, status } = useLoading();
 	const { mutate } = useSWRConfig();
-	const { back } = useRouter();
 	const { register, handleSubmit, formState, setError } =
 		useForm<DomainFormValues>({
 			resolver: valibotResolver(domainSchema) as Resolver<DomainFormValues>,
@@ -45,17 +42,6 @@ export const AddDomainSidebar = () => {
 	const handleAddDomain = (domain: string) => {
 		push(`/domain/add/${domain}`);
 	};
-
-	// Handle Escape key to go back
-	useEffect(() => {
-		const handleKeyDown = (e: KeyboardEvent) => {
-			if (e.key === "Escape") {
-				back();
-			}
-		};
-		window.addEventListener("keydown", handleKeyDown);
-		return () => window.removeEventListener("keydown", handleKeyDown);
-	}, [back]);
 
 	const onSubmit = async ({ domain }: DomainFormValues) => {
 		try {
@@ -81,34 +67,7 @@ export const AddDomainSidebar = () => {
 
 	return (
 		<div className="mx-auto max-w-3xl pt-10 pb-8 sm:px-8">
-			<button
-				type="button"
-				onClick={() => back()}
-				className="group flex items-center gap-1.5 px-2 py-1.5 text-paragraph-xs font-medium text-text-sub-600 transition-all duration-300 hover:text-text-strong-950 cursor-pointer"
-			>
-				<div className="relative flex items-center justify-center w-3.5 h-3.5 overflow-visible">
-					{/* Arrow tail - hidden by default, slides in on hover */}
-					<div className="absolute right-[4px] h-[1.25px] w-0 bg-current transition-all duration-300 ease-out group-hover:w-2.5" />
-					{/* Chevron/Arrow head - nudges left on hover */}
-					<svg
-						width="6"
-						height="10"
-						viewBox="0 0 8 12"
-						fill="none"
-						className="absolute left-0 transition-all duration-300 ease-out group-hover:-translate-x-0.5"
-					>
-						<path
-							d="M7 1L1.5 6L7 11"
-							stroke="currentColor"
-							strokeWidth="1.5"
-							strokeLinecap="round"
-							strokeLinejoin="round"
-						/>
-					</svg>
-				</div>
-				<span className="transition-all duration-300 group-hover:tracking-wide text-xs">Back</span>
-				<Kbd.Root className="bg-bg-weak-50 text-[10px] px-1.5 py-0.5">Esc</Kbd.Root>
-			</button>
+			<AnimatedBackButton />
 			<div className="flex w-full items-center justify-between border-stroke-soft-200 border-b border-dashed pt-6 pb-6">
 				<div>
 					<h1 className="font-medium text-title-h5 leading-8">Add Domain</h1>

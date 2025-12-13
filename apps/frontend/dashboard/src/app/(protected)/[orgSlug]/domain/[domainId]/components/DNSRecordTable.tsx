@@ -133,7 +133,7 @@ export const DNSRecordTable = ({
 									{...getAnimationProps(index + 1, 0)}
 									className="flex items-center"
 								>
-									<span className="inline-flex items-center rounded-md bg-neutral-alpha-10 px-2 py-0.5 text-[11px] font-medium text-text-strong-950">
+									<span className="inline-flex items-center rounded-md bg-neutral-alpha-10 px-2 py-0.5 text-[11px] font-medium text-text-strong-950 ml-2">
 										{record.recordType}
 									</span>
 								</motion.div>
