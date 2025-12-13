@@ -1,0 +1,29 @@
+import { templateModel } from "@be/template/model/template.model";
+import { TemplateError } from "@be/template/error/template.error";
+import { logger } from "@reloop/logger";
+
+export async function getTemplate(params: {
+    id: string;
+    organizationId: string;
+}) {
+    const { id, organizationId } = params;
+
+    try {
+        const template = await templateModel.findByIdAndOrg(id, organizationId);
+
+        if (!template) {
+            throw TemplateError.notFound(id);
+        }
+
+        return template;
+    } catch (error) {
+        logger.error(
+            {
+                id,
+                error: error instanceof Error ? error.message : String(error),
+            },
+            "Error getting template",
+        );
+        throw error;
+    }
+}

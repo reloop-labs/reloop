@@ -1,0 +1,6 @@
+# Local
+.turbo
+node_modules
+dist
+*.log
+.env

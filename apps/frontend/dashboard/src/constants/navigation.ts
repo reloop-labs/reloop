@@ -38,6 +38,11 @@ export const mainNavigation: MainNavigationItem[] = [
 		iconName: "globe",
 	},
 	{
+		label: "Templates",
+		path: "/templates",
+		iconName: "layout",
+	},
+	{
 		label: "Webhooks",
 		path: "/webhooks",
 		iconName: "webhook",

@@ -1,41 +1,48 @@
 {
-	"version": "7",
-	"dialect": "postgresql",
-	"entries": [
-		{
-			"idx": 0,
-			"version": "7",
-			"when": 1760882866558,
-			"tag": "0000_lying_luckman",
-			"breakpoints": true
-		},
-		{
-			"idx": 1,
-			"version": "7",
-			"when": 1760890210731,
-			"tag": "0001_fair_stryfe",
-			"breakpoints": true
-		},
-		{
-			"idx": 2,
-			"version": "7",
-			"when": 1761112074453,
-			"tag": "0002_next_james_howlett",
-			"breakpoints": true
-		},
-		{
-			"idx": 3,
-			"version": "7",
-			"when": 1761228202392,
-			"tag": "0003_modern_wendell_rand",
-			"breakpoints": true
-		},
-		{
-			"idx": 4,
-			"version": "7",
-			"when": 1761454038330,
-			"tag": "0004_regular_amphibian",
-			"breakpoints": true
-		}
-	]
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1760882866558,
+      "tag": "0000_lying_luckman",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1760890210731,
+      "tag": "0001_fair_stryfe",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1761112074453,
+      "tag": "0002_next_james_howlett",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1761228202392,
+      "tag": "0003_modern_wendell_rand",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1761454038330,
+      "tag": "0004_regular_amphibian",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1765641156608,
+      "tag": "0005_romantic_moondragon",
+      "breakpoints": true
+    }
+  ]
 }

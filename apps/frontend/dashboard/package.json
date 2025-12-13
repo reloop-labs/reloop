@@ -37,7 +37,15 @@
 		"axios": "catalog:",
 		"babel-plugin-react-compiler": "catalog:ui",
 		"react-dropzone": "catalog:ui",
-		"boring-avatars": "catalog:ui"
+		"boring-avatars": "catalog:ui",
+		"lexical": "^0.21.0",
+		"@lexical/react": "^0.21.0",
+		"@lexical/rich-text": "^0.21.0",
+		"@lexical/utils": "^0.21.0",
+		"@lexical/selection": "^0.21.0",
+		"@lexical/history": "^0.21.0",
+		"@lexical/list": "^0.21.0",
+		"@lexical/link": "^0.21.0"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",
