@@ -90,7 +90,6 @@ const ContactsPage = () => {
           <PopoverRoot>
             <PopoverTrigger asChild>
               <Button.Root variant="neutral" size="xsmall">
-                <Icon name="plus" className="h-4 w-4" />
                 Add Contact
                 <Icon name="chevron-down" className="h-4 w-4" />
               </Button.Root>
