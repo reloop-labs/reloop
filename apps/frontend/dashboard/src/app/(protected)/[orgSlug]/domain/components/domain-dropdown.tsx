@@ -2,7 +2,7 @@
 
 import { AnimatedHoverBackground } from "@fe/dashboard/components/layout/sidebar/animated-hover-background";
 import { cn } from "@reloop/ui/cn";
-import * as Dropdown from "@reloop/ui/dropdown";
+import * as Popover from "@reloop/ui/popover";
 import { Icon } from "@reloop/ui/icon";
 import * as Button from "@reloop/ui/button";
 import { useRef, useState } from "react";
@@ -12,6 +12,7 @@ export interface DomainDropdownProps {
   domainName: string;
   onViewDetails: (name: string) => void;
   onDelete: (id: string) => void;
+  onOpenChange?: (open: boolean) => void;
 }
 
 const domainMenuItems = [
@@ -24,9 +25,10 @@ export const DomainDropdown = ({
   domainName,
   onViewDetails,
   onDelete,
+  onOpenChange,
 }: DomainDropdownProps) => {
   const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [popoverOpen, setPopoverOpen] = useState(false);
   const buttonRefs = useRef<HTMLButtonElement[]>([]);
 
   const currentTab = buttonRefs.current[hoverIdx ?? -1];
@@ -34,19 +36,24 @@ export const DomainDropdown = ({
   const hoveredItem = domainMenuItems[hoverIdx ?? -1];
   const isDanger = hoveredItem?.isDanger ?? false;
 
+  const handleOpenChange = (open: boolean) => {
+    setPopoverOpen(open);
+    onOpenChange?.(open);
+  };
+
   const handleItemClick = (itemId: string) => {
     if (itemId === "delete") {
-      setDropdownOpen(false);
+      handleOpenChange(false);
       onDelete(domainId);
     } else if (itemId === "view") {
-      setDropdownOpen(false);
+      handleOpenChange(false);
       onViewDetails(domainName);
     }
   };
 
   return (
-    <Dropdown.Root open={dropdownOpen} onOpenChange={setDropdownOpen}>
-      <Dropdown.Trigger asChild>
+    <Popover.Root open={popoverOpen} onOpenChange={handleOpenChange}>
+      <Popover.Trigger asChild>
         <Button.Root
           variant="neutral"
           mode="ghost"
@@ -58,8 +65,8 @@ export const DomainDropdown = ({
             className="h-3 w-3 text-text-sub-600 hover:text-text-strong-950"
           />
         </Button.Root>
-      </Dropdown.Trigger>
-      <Dropdown.Content align="end" className="w-40 p-1.5">
+      </Popover.Trigger>
+      <Popover.Content align="end" sideOffset={-8} className="w-40 p-1.5 rounded-xl" showArrow>
         <div className="relative">
           {domainMenuItems.map((item, idx) => (
             <button
@@ -90,7 +97,7 @@ export const DomainDropdown = ({
             isDanger={isDanger}
           />
         </div>
-      </Dropdown.Content>
-    </Dropdown.Root>
+      </Popover.Content>
+    </Popover.Root>
   );
 };

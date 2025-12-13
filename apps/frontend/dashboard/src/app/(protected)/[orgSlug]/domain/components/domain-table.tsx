@@ -14,6 +14,7 @@ import { Skeleton } from "@reloop/ui/skeleton";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useQueryState } from "nuqs";
+import { useState } from "react";
 import { DomainDropdown } from "./domain-dropdown";
 
 interface DomainTableProps {
@@ -33,6 +34,7 @@ export const DomainTable = ({
 }: DomainTableProps) => {
 	const { push } = useUserOrganization();
 	const [, setDeleteId] = useQueryState("delete");
+	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 
 	const handleDeleteDomain = (domainId: string) => {
 		setDeleteId(domainId);
@@ -89,75 +91,91 @@ export const DomainTable = ({
 								</div>
 							</div>
 						))
-						: domains.map((domain, index) => (
-							<div key={`domain-${index}`} className="group/row contents">
-								<div className="group/row-item contents">
-									<Link
-										href={`/${activeOrganizationSlug}/domain/${domain.domain}`}
-										className={`group/row contents items-center gap-2 transition-colors hover:text-blue-600 ${currentDomainId === domain.domain ? "text-blue-600" : ""
-											}`}
-									>
-										<div className="flex items-center border-stroke-soft-200/70 border-t py-2 group-hover/row:bg-bg-weak-50/50">
-											<motion.div
-												{...getAnimationProps(index + 1, 0)}
-												className="flex items-center gap-2 pl-5"
-											>
-												<Icon
-													name="globe"
-													className={cn(
-														"h-4 w-4",
-														getStatusColorClass(domain.status),
-													)}
-												/>
-												<span className="font-medium text-label-sm text-text-strong-950">
-													{domain.domain}
-												</span>
-											</motion.div>
-										</div>
-										<div className="flex items-center border-stroke-soft-200/70 border-t py-2 group-hover/row:bg-bg-weak-50/50">
-											<motion.div
-												{...getAnimationProps(index + 1, 1)}
-												className="flex items-center gap-2"
-											>
-												<div
-													className={cn(
-														"flex items-center gap-2.5 rounded-lg py-0.5 font-medium text-label-xs capitalize",
-														getStatusColorClass(domain.status),
-													)}
+						: domains.map((domain, index) => {
+							const isRowActive = activeDropdownId === domain.id;
+							return (
+								<div key={`domain-${index}`} className="group/row contents">
+									<div className="group/row-item contents">
+										<Link
+											href={`/${activeOrganizationSlug}/domain/${domain.domain}`}
+											className={`group/row contents items-center gap-2 transition-colors hover:text-blue-600 ${currentDomainId === domain.domain ? "text-blue-600" : ""
+												}`}
+										>
+											<div className={cn(
+												"flex items-center border-stroke-soft-200/70 border-t py-2 group-hover/row:bg-bg-weak-50/50",
+												isRowActive && "bg-bg-weak-50/50"
+											)}>
+												<motion.div
+													{...getAnimationProps(index + 1, 0)}
+													className="flex items-center gap-2 pl-5"
 												>
 													<Icon
-														name={getStatusIcon(domain.status)}
-														className="h-3.5 w-3.5"
+														name="globe"
+														className={cn(
+															"h-4 w-4",
+															getStatusColorClass(domain.status),
+														)}
 													/>
-													{getStatusLabel(domain.status)}
-												</div>
-											</motion.div>
-										</div>
-										<div className="flex items-center border-stroke-soft-200/70 border-t py-2 group-hover/row:bg-bg-weak-50/50">
-											<motion.span
-												{...getAnimationProps(index + 1, 2)}
-												className="text-label-sm text-text-strong-950"
-											>
-												{formatRelativeTime(domain.createdAt)}
-											</motion.span>
-										</div>
-									</Link>
+													<span className="font-medium text-label-sm text-text-strong-950">
+														{domain.domain}
+													</span>
+												</motion.div>
+											</div>
+											<div className={cn(
+												"flex items-center border-stroke-soft-200/70 border-t py-2 group-hover/row:bg-bg-weak-50/50",
+												isRowActive && "bg-bg-weak-50/50"
+											)}>
+												<motion.div
+													{...getAnimationProps(index + 1, 1)}
+													className="flex items-center gap-2"
+												>
+													<div
+														className={cn(
+															"flex items-center gap-2.5 rounded-lg py-0.5 font-medium text-label-xs capitalize",
+															getStatusColorClass(domain.status),
+														)}
+													>
+														<Icon
+															name={getStatusIcon(domain.status)}
+															className="h-3.5 w-3.5"
+														/>
+														{getStatusLabel(domain.status)}
+													</div>
+												</motion.div>
+											</div>
+											<div className={cn(
+												"flex items-center border-stroke-soft-200/70 border-t py-2 group-hover/row:bg-bg-weak-50/50",
+												isRowActive && "bg-bg-weak-50/50"
+											)}>
+												<motion.span
+													{...getAnimationProps(index + 1, 2)}
+													className="text-label-sm text-text-strong-950"
+												>
+													{formatRelativeTime(domain.createdAt)}
+												</motion.span>
+											</div>
+										</Link>
+									</div>
+									<div className={cn(
+										"flex items-center border-stroke-soft-200/70 border-t py-2 group-hover/row:bg-bg-weak-50/50",
+										isRowActive && "bg-bg-weak-50/50"
+									)}>
+										<motion.div
+											{...getAnimationProps(index + 1, 3)}
+											className="flex items-center justify-center"
+										>
+											<DomainDropdown
+												domainId={domain.id}
+												domainName={domain.domain}
+												onViewDetails={handleViewDetails}
+												onDelete={handleDeleteDomain}
+												onOpenChange={(open) => setActiveDropdownId(open ? domain.id : null)}
+											/>
+										</motion.div>
+									</div>
 								</div>
-								<div className="flex items-center border-stroke-soft-200/70 border-t py-2 group-hover/row:bg-bg-weak-50/50">
-									<motion.div
-										{...getAnimationProps(index + 1, 3)}
-										className="flex items-center justify-center"
-									>
-										<DomainDropdown
-											domainId={domain.id}
-											domainName={domain.domain}
-											onViewDetails={handleViewDetails}
-											onDelete={handleDeleteDomain}
-										/>
-									</motion.div>
-								</div>
-							</div>
-						))}
+							)
+						})}
 				</div>
 			</div>
 		</AnimatePresence>
