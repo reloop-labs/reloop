@@ -1,5 +1,5 @@
 // Set environment variables if not already set
-if (!process.env.PORT) process.env.PORT = "8016";
+if (!process.env.PORT) process.env.PORT = "8019";
 if (!process.env.PG_URL)
     process.env.PG_URL = "postgresql://reloop:reloop123@localhost:5432/reloop";
 if (!process.env.REDIS_URL)

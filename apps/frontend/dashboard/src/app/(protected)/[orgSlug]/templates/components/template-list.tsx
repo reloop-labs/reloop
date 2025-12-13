@@ -36,7 +36,7 @@ export const TemplateList = () => {
 
     const { data, error, isLoading, mutate } = useSWR<TemplateListResponse>(
         activeOrganization?.id
-            ? `/api/template/v1/list?organizationId=${activeOrganization.id}&limit=${pageSize}&page=${currentPage}`
+            ? `/api/template/v1/list?limit=${pageSize}&page=${currentPage}`
             : null,
         {
             revalidateOnFocus: true,
