@@ -1,8 +1,6 @@
 "use client";
 
 import type { DNSRecord } from "@reloop/api/types";
-import * as Button from "@reloop/ui/button";
-import { Icon } from "@reloop/ui/icon";
 import { DNSRecordTable } from "./DNSRecordTable";
 
 interface DNSRecordsSectionProps {
@@ -22,33 +20,15 @@ export const DNSRecordsSection = ({
 }: DNSRecordsSectionProps) => {
 	return (
 		<div className="mb-24">
-			<div className="flex items-center justify-between">
-				<p className="font-medium text-lg">DNS Records</p>
-				<Button.Root
-					variant="neutral"
-					mode="stroke"
-					size="xsmall"
-					onClick={() =>
-						window.open(
-							"https://reloop.sh/docs/domain#add-dns-records",
-							"_blank",
-						)
-					}
-					className="gap-2"
-				>
-					<Icon name="file-text" className="h-4 w-4" />
-					How to add records
-				</Button.Root>
-			</div>
-			<div className="mt-6 mb-8">
-				<div className="mb-4">
-					<h3 className="font-medium text-sm">
-						DKIM and SPF{" "}
-						<span className="font-normal text-text-sub-600">(Required)</span>
-					</h3>
-					<p className="text-sm text-text-sub-600">
+			{/* DKIM and SPF Section */}
+			<div className="mb-10">
+				<div className="mb-6 space-y-1">
+					<div className="font-medium text-sm text-text-strong-950">
+						DKIM and SPF <span className="text-text-sub-600 text-xs">(Required)</span>
+					</div>
+					<div className="text-xs text-text-sub-600">
 						Enable email signing and specify authorized senders.
-					</p>
+					</div>
 				</div>
 				<DNSRecordTable
 					records={dkimSpfRecords}
@@ -59,15 +39,16 @@ export const DNSRecordsSection = ({
 					tableId="dkim-"
 				/>
 			</div>
+
+			{/* DMARC Section */}
 			<div>
-				<div className="mb-4">
-					<h3 className="font-medium text-sm">
-						DMARC{" "}
-						<span className="font-normal text-text-sub-600">(Recommended)</span>
-					</h3>
-					<p className="text-sm text-text-sub-600">
+				<div className="mb-6 space-y-1">
+					<div className="font-medium text-sm text-text-strong-950">
+						DMARC <span className="text-text-sub-600 text-xs">(Recommended)</span>
+					</div>
+					<div className="text-xs text-text-sub-600">
 						Set authentication policies and receive reports.
-					</p>
+					</div>
 				</div>
 				<DNSRecordTable
 					records={dmarcRecords}
@@ -81,3 +62,4 @@ export const DNSRecordsSection = ({
 		</div>
 	);
 };
+

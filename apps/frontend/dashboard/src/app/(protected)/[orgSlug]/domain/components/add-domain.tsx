@@ -155,7 +155,6 @@ export const AddDomainSidebar = () => {
 										placeholder="www.example.com"
 										{...register("domain")}
 										disabled={status === "loading"}
-										className="pl-4"
 									/>
 								</Input.Wrapper>
 							</Input.Root>
@@ -200,7 +199,7 @@ export const AddDomainSidebar = () => {
 						<div className="h-2 w-[2px] bg-gradient-to-b from-neutral-500 via-neutral-600 to-neutral-700 rounded-b-full" />
 					</div>
 
-					<div className="relative rotate-2 rounded-lg border border-stroke-soft-200 bg-bg-weak-50 p-5 shadow-lg transition-transform duration-300 hover:rotate-0 hover:scale-[1.02]">
+					<div className="relative rotate-2 rounded-lg border border-stroke-soft-200 bg-bg-weak-50/50 p-5 shadow-lg transition-transform duration-300 hover:rotate-0 hover:scale-[1.02]">
 
 						<div className="font-medium text-text-sub-600 text-xs uppercase tracking-wide flex items-center gap-1">
 							<Icon name="bulb" className="h-3 w-3" />Pro Tip

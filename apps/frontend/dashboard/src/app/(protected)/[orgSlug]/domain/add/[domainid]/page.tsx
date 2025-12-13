@@ -176,7 +176,7 @@ const NewDomainPage = () => {
 					variant="stroke"
 					status="success"
 					size="small"
-					className="w-full border-[1px] border-success-base bg-success-base/5"
+					className="w-full border-[1px] border-success-base bg-success-base/5 rounded-xl"
 				>
 					<div className="flex gap-2">
 						<Icon

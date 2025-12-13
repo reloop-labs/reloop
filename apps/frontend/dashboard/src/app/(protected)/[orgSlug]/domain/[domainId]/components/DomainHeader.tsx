@@ -1,9 +1,11 @@
 "use client";
 
+import { AnimatedHoverBackground } from "@fe/dashboard/components/layout/sidebar/animated-hover-background";
 import { getStatusColorClass, getStatusIcon } from "@fe/dashboard/utils/domain";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import type { Domain, DomainStatus } from "@reloop/api/types";
 import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import {
 	Content as PopoverContent,
@@ -13,6 +15,7 @@ import {
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
+import { useRef, useState } from "react";
 import { DeleteDomainModal } from "../../components/delete-domain";
 
 interface DomainHeaderProps {
@@ -25,6 +28,11 @@ interface DomainHeaderProps {
 	isVerifying?: boolean;
 }
 
+const headerMenuItems = [
+	{ id: "docs", label: "Go to docs", icon: "file-text" as const, isDanger: false },
+	{ id: "delete", label: "Remove domain", icon: "trash" as const, isDanger: true },
+];
+
 export const DomainHeader = ({
 	domainId,
 	lastUpdated,
@@ -36,21 +44,44 @@ export const DomainHeader = ({
 }: DomainHeaderProps) => {
 	const { back } = useRouter();
 	const [, setDeleteId] = useQueryState("delete");
+	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
+	const buttonRefs = useRef<HTMLButtonElement[]>([]);
+
+	const currentTab = buttonRefs.current[hoverIdx ?? -1];
+	const currentRect = currentTab?.getBoundingClientRect();
+	const hoveredItem = headerMenuItems[hoverIdx ?? -1];
+	const isDanger = hoveredItem?.isDanger ?? false;
 
 	return (
 		<div className="pt-10 pb-8">
-			<Button.Root
+			<button
+				type="button"
 				onClick={() => back()}
-				variant="neutral"
-				mode="stroke"
-				size="xxsmall"
+				className="group flex items-center gap-1.5 px-2 py-1.5 text-paragraph-xs font-medium text-text-sub-600 transition-all duration-300 hover:text-text-strong-950 cursor-pointer"
 			>
-				<Button.Icon>
-					<Icon name="chevron-left" className="h-4 w-4" />
-				</Button.Icon>
-				Back
-			</Button.Root>
-			<div className="flex items-end justify-between pt-6">
+				<div className="relative flex items-center justify-center w-3.5 h-3.5 overflow-visible">
+					{/* Arrow tail - hidden by default, slides in on hover */}
+					<div className="absolute right-[4px] h-[1.25px] w-0 bg-current transition-all duration-300 ease-out group-hover:w-2.5" />
+					{/* Chevron/Arrow head - nudges left on hover */}
+					<svg
+						width="6"
+						height="10"
+						viewBox="0 0 8 12"
+						fill="none"
+						className="absolute left-0 transition-all duration-300 ease-out group-hover:-translate-x-0.5"
+					>
+						<path
+							d="M7 1L1.5 6L7 11"
+							stroke="currentColor"
+							strokeWidth="1.5"
+							strokeLinecap="round"
+							strokeLinejoin="round"
+						/>
+					</svg>
+				</div>
+				<span className="transition-all duration-300 group-hover:tracking-wide text-xs">Back</span>
+			</button>
+			<div className="flex items-center justify-between pt-6">
 				<div>
 					{isLoading ? (
 						<div className="flex items-center gap-1.5">
@@ -65,33 +96,33 @@ export const DomainHeader = ({
 						</div>
 					) : (
 						<div className="flex items-center gap-1.5">
-							<p className="font-medium text-paragraph-sm text-text-sub-600">
+							<p className="font-medium text-paragraph-xs text-text-sub-600">
 								Domain{" "}
 							</p>
-							<p className="font-semibold text-paragraph-sm text-text-sub-600">
+							<p className="font-semibold text-paragraph-xs text-text-sub-600">
 								•
 							</p>
-							<p className="font-medium text-paragraph-sm text-text-sub-600">
+							<p className="font-medium text-paragraph-xs text-text-sub-600">
 								{isFailed
 									? "---"
 									: lastUpdated
 										? formatRelativeTime(lastUpdated)
 										: "---"}
 							</p>
-							<p className="font-semibold text-paragraph-sm text-text-sub-600">
+							<p className="font-semibold text-paragraph-xs text-text-sub-600">
 								•
 							</p>
 							<div
 								className={`flex items-center gap-1 ${getStatusColorClass(status)}`}
 							>
 								<Icon name={getStatusIcon(status)} className="h-3.5 w-3.5" />
-								<p className="font-medium text-paragraph-sm capitalize">
+								<p className="font-medium text-paragraph-xs capitalize">
 									{status}
 								</p>
 							</div>
 						</div>
 					)}
-					<h1 className="font-medium text-title-h4 leading-8">{domainId}</h1>
+					<h1 className="font-medium text-title-h6 leading-8">{domainId}</h1>
 				</div>
 
 				<div className="flex items-center gap-2">
@@ -124,36 +155,61 @@ export const DomainHeader = ({
 									"Verify DNS Records"
 								)}
 							</Button.Root>
+							<Button.Root
+								variant="neutral"
+								mode="stroke"
+								size="xsmall"
+								onClick={() =>
+									window.open(
+										"https://reloop.sh/docs/domain#add-dns-records",
+										"_blank",
+									)
+								}
+							>
+								<Icon name="file-text" className="h-4 w-4" />
+							</Button.Root>
 							<PopoverRoot>
 								<PopoverTrigger asChild>
 									<Button.Root variant="neutral" mode="stroke" size="xsmall">
 										<Icon name="more-vertical" className="h-4 w-4 rotate-90" />
 									</Button.Root>
 								</PopoverTrigger>
-								<PopoverContent align="end" className="w-48 p-2">
-									<div className="flex flex-col gap-1">
-										<Button.Root
-											variant="neutral"
-											mode="ghost"
-											size="small"
-											onClick={() =>
-												window.open("https://reloop.sh/docs/domain", "_blank")
-											}
-											className="w-full justify-start"
-										>
-											<Icon name="file-text" className="h-4 w-4" />
-											Go to docs
-										</Button.Root>
-										<Button.Root
-											variant="error"
-											mode="ghost"
-											size="small"
-											onClick={() => setDeleteId(domainId)}
-											className="w-full justify-start"
-										>
-											<Icon name="trash" className="h-4 w-4" />
-											Remove domain
-										</Button.Root>
+								<PopoverContent align="end" sideOffset={8} className="w-44 p-1.5 rounded-xl" showArrow>
+									<div className="relative">
+										{headerMenuItems.map((item, idx) => (
+											<button
+												key={item.id}
+												ref={(el) => {
+													if (el) buttonRefs.current[idx] = el;
+												}}
+												type="button"
+												onPointerEnter={() => setHoverIdx(idx)}
+												onPointerLeave={() => setHoverIdx(undefined)}
+												onClick={() => {
+													if (item.id === "docs") {
+														window.open("https://reloop.sh/docs/domain", "_blank");
+													} else if (item.id === "delete") {
+														setDeleteId(domainId);
+													}
+												}}
+												className={cn(
+													"flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-xs font-normal transition-colors",
+													item.isDanger ? "text-error-base" : "text-text-strong-950",
+													!currentRect && hoverIdx === idx && (item.isDanger ? "bg-red-alpha-10" : "bg-neutral-alpha-10")
+												)}
+											>
+												<Icon
+													name={item.icon}
+													className={cn("h-3.5 w-3.5", item.isDanger ? "" : "text-text-sub-600")}
+												/>
+												<span>{item.label}</span>
+											</button>
+										))}
+										<AnimatedHoverBackground
+											rect={currentRect}
+											tabElement={currentTab}
+											isDanger={isDanger}
+										/>
 									</div>
 								</PopoverContent>
 							</PopoverRoot>
