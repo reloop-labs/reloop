@@ -8,18 +8,13 @@ import {
 } from "@fe/dashboard/utils/domain";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import type { Domain } from "@reloop/api/types";
-import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import {
-	Content as PopoverContent,
-	Root as PopoverRoot,
-	Trigger as PopoverTrigger,
-} from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useQueryState } from "nuqs";
+import { DomainDropdown } from "./domain-dropdown";
 
 interface DomainTableProps {
 	domains: Domain[];
@@ -153,45 +148,12 @@ export const DomainTable = ({
 										{...getAnimationProps(index + 1, 3)}
 										className="flex items-center justify-center"
 									>
-										<PopoverRoot>
-											<PopoverTrigger asChild>
-												<Button.Root
-													variant="neutral"
-													mode="ghost"
-													size="xxsmall"
-													className="rounded p-1"
-												>
-													<Icon
-														name="more-vertical"
-														className="h-4 w-4 text-text-sub-600 hover:text-text-strong-950"
-													/>
-												</Button.Root>
-											</PopoverTrigger>
-											<PopoverContent align="end" className="w-48 p-2">
-												<div className="flex flex-col gap-1">
-													<Button.Root
-														variant="neutral"
-														mode="ghost"
-														size="small"
-														onClick={() => handleViewDetails(domain.domain)}
-														className="w-full justify-start"
-													>
-														<Icon name="eye-outline" className="h-4 w-4" />
-														View Details
-													</Button.Root>
-													<Button.Root
-														variant="error"
-														mode="ghost"
-														size="small"
-														onClick={() => handleDeleteDomain(domain.id)}
-														className="w-full justify-start"
-													>
-														<Icon name="trash" className="h-4 w-4" />
-														Delete
-													</Button.Root>
-												</div>
-											</PopoverContent>
-										</PopoverRoot>
+										<DomainDropdown
+											domainId={domain.id}
+											domainName={domain.domain}
+											onViewDetails={handleViewDetails}
+											onDelete={handleDeleteDomain}
+										/>
 									</motion.div>
 								</div>
 							</div>

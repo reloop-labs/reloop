@@ -16,10 +16,12 @@ import { useParams } from "next/navigation";
 import { useState } from "react";
 import { useQueryState, parseAsInteger } from "nuqs";
 import useSWR from "swr";
+import { motion } from "motion/react";
 import { DeleteDomainModal } from "./delete-domain";
 import { DomainSDK } from "./domain-sdk";
 import { DomainTable } from "./domain-table";
 import { EmptyState } from "./empty-state";
+import { PageSizeDropdown } from "./page-size-dropdown";
 
 export const DomainListSidebar = () => {
 	const { activeOrganization } = useUserOrganization();
@@ -194,37 +196,42 @@ export const DomainListSidebar = () => {
 
 						{/* Pagination */}
 						{data && data.total > 0 && (
-							<div className="mt-4 pb-8 flex items-center justify-between text-paragraph-sm text-text-sub-600">
-								<div className="flex items-center gap-3">
+							<motion.div
+								initial={{ opacity: 0, y: 10 }}
+								animate={{ opacity: 1, y: 0 }}
+								transition={{ duration: 0.4, delay: 0.2, ease: [0.65, 0, 0.35, 1] }}
+								className="mt-4 pb-8 flex items-center justify-between text-paragraph-sm text-text-sub-600"
+							>
+								<motion.div
+									initial={{ opacity: 0, x: -10 }}
+									animate={{ opacity: 1, x: 0 }}
+									transition={{ duration: 0.4, delay: 0.3, ease: [0.65, 0, 0.35, 1] }}
+									className="flex items-center gap-3"
+								>
 									<span>
 										Showing {startIndex}–{endIndex} of {data.total} domain{data.total !== 1 ? "s" : ""}
 									</span>
-									<Select.Root
-										value={String(pageSize)}
+									<PageSizeDropdown
+										value={pageSize}
 										onValueChange={(value) => {
-											setPageSize(Number(value));
+											setPageSize(value);
 											setCurrentPage(1);
 										}}
-										size="xsmall"
-									>
-										<Select.Trigger className="w-16 text-xs">
-											<Select.Value />
-										</Select.Trigger>
-										<Select.Content className="text-xs min-w-16">
-											<Select.Item value="10" className="text-xs">10</Select.Item>
-											<Select.Item value="20" className="text-xs">20</Select.Item>
-											<Select.Item value="50" className="text-xs">50</Select.Item>
-											<Select.Item value="100" className="text-xs">100</Select.Item>
-										</Select.Content>
-									</Select.Root>
-								</div>
-								<div className="flex items-center gap-2">
+									/>
+								</motion.div>
+								<motion.div
+									initial={{ opacity: 0, x: 10 }}
+									animate={{ opacity: 1, x: 0 }}
+									transition={{ duration: 0.4, delay: 0.3, ease: [0.65, 0, 0.35, 1] }}
+									className="flex items-center gap-2"
+								>
 									<Button.Root
 										variant="neutral"
 										mode="stroke"
 										size="xxsmall"
 										onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
 										disabled={currentPage === 1 || isLoading}
+										className="transition-all duration-200 hover:border-primary-base hover:bg-bg-weak-50/50"
 									>
 										<Icon name="chevron-left" className="h-4 w-4" />
 									</Button.Root>
@@ -237,11 +244,12 @@ export const DomainListSidebar = () => {
 										size="xxsmall"
 										onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
 										disabled={currentPage === totalPages || isLoading}
+										className="transition-all duration-200 hover:border-primary-base hover:bg-bg-weak-50/50"
 									>
 										<Icon name="chevron-right" className="h-4 w-4" />
 									</Button.Root>
-								</div>
-							</div>
+								</motion.div>
+							</motion.div>
 						)}
 					</div>
 				)}
