@@ -196,18 +196,8 @@ export const DomainListSidebar = () => {
 
 						{/* Pagination */}
 						{data && data.total > 0 && (
-							<motion.div
-								initial={{ opacity: 0, y: 10 }}
-								animate={{ opacity: 1, y: 0 }}
-								transition={{ duration: 0.4, delay: 0.2, ease: [0.65, 0, 0.35, 1] }}
-								className="mt-4 pb-8 flex items-center justify-between text-paragraph-sm text-text-sub-600"
-							>
-								<motion.div
-									initial={{ opacity: 0, x: -10 }}
-									animate={{ opacity: 1, x: 0 }}
-									transition={{ duration: 0.4, delay: 0.3, ease: [0.65, 0, 0.35, 1] }}
-									className="flex items-center gap-3"
-								>
+							<div className="mt-4 pb-8 flex items-center justify-between text-paragraph-sm text-text-sub-600">
+								<div className="flex items-center gap-3">
 									<span>
 										Showing {startIndex}–{endIndex} of {data.total} domain{data.total !== 1 ? "s" : ""}
 									</span>
@@ -218,13 +208,8 @@ export const DomainListSidebar = () => {
 											setCurrentPage(1);
 										}}
 									/>
-								</motion.div>
-								<motion.div
-									initial={{ opacity: 0, x: 10 }}
-									animate={{ opacity: 1, x: 0 }}
-									transition={{ duration: 0.4, delay: 0.3, ease: [0.65, 0, 0.35, 1] }}
-									className="flex items-center gap-2"
-								>
+								</div>
+								<div className="flex items-center gap-2">
 									<Button.Root
 										variant="neutral"
 										mode="stroke"
@@ -248,8 +233,8 @@ export const DomainListSidebar = () => {
 									>
 										<Icon name="chevron-right" className="h-4 w-4" />
 									</Button.Root>
-								</motion.div>
-							</motion.div>
+								</div>
+							</div>
 						)}
 					</div>
 				)}
