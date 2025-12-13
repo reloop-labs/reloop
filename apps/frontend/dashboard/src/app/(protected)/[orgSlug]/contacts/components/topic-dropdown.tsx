@@ -1,7 +1,11 @@
 "use client";
 import { AnimatedHoverBackground } from "@fe/dashboard/components/layout/sidebar/animated-hover-background";
 import { cn } from "@reloop/ui/cn";
-import * as Dropdown from "@reloop/ui/dropdown";
+import {
+    Content as PopoverContent,
+    Root as PopoverRoot,
+    Trigger as PopoverTrigger,
+} from "@reloop/ui/popover";
 import { Icon } from "@reloop/ui/icon";
 import { useRef, useState } from "react";
 
@@ -21,25 +25,25 @@ export const TopicDropdown = ({
     onOpenChange,
 }: TopicDropdownProps) => {
     const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
-    const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [popoverOpen, setPopoverOpen] = useState(false);
     const buttonRefs = useRef<HTMLButtonElement[]>([]);
 
     const currentTab = buttonRefs.current[hoverIdx ?? -1];
     const currentRect = currentTab?.getBoundingClientRect();
 
     const handleOpenChange = (open: boolean) => {
-        setDropdownOpen(open);
+        setPopoverOpen(open);
         onOpenChange?.(open);
     };
 
     const handleViewDetails = () => {
         onViewDetails(topicId);
-        setDropdownOpen(false);
+        setPopoverOpen(false);
     };
 
     const handleDelete = () => {
         onDelete(topicId);
-        setDropdownOpen(false);
+        setPopoverOpen(false);
     };
 
     const menuItems = [
@@ -57,16 +61,16 @@ export const TopicDropdown = ({
     ];
 
     return (
-        <Dropdown.Root open={dropdownOpen} onOpenChange={handleOpenChange}>
-            <Dropdown.Trigger asChild>
+        <PopoverRoot open={popoverOpen} onOpenChange={handleOpenChange}>
+            <PopoverTrigger asChild>
                 <button
                     type="button"
                     className="flex h-6 w-6 items-center justify-center rounded-md transition-colors hover:bg-bg-weak-50"
                 >
                     <Icon name="more-vertical" className="h-3 w-3 text-text-sub-600" />
                 </button>
-            </Dropdown.Trigger>
-            <Dropdown.Content align="end" className="w-40 p-1.5 rounded-xl">
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-40 p-1.5 rounded-xl" sideOffset={-6}>
                 <div className="relative">
                     {menuItems.map((item, idx) => (
                         <button
@@ -93,7 +97,7 @@ export const TopicDropdown = ({
                         tabElement={currentTab}
                     />
                 </div>
-            </Dropdown.Content>
-        </Dropdown.Root>
+            </PopoverContent>
+        </PopoverRoot>
     );
 };
