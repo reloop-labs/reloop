@@ -234,7 +234,7 @@ export const DNSRecordTable = ({
 									>
 										<div
 											className={cn(
-												"inline-flex items-center gap-1.5 rounded-md px-2 py-0.5 text-[11px] font-medium capitalize",
+												"inline-flex items-center gap-1.5 rounded-md pr-2 py-0.5 text-[11px] font-medium capitalize",
 												getStatusColorClass(record.status)
 											)}
 										>
