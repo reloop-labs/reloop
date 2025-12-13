@@ -25,15 +25,15 @@ interface DNSRecordTableProps {
 
 const getGridCols = (hideStatus: boolean, showPriority: boolean) => {
 	if (hideStatus && showPriority) {
-		return "grid-cols-[60px_1fr_2fr_60px_80px]";
+		return "grid-cols-[70px_1.5fr_2fr_60px_80px]";
 	}
 	if (hideStatus && !showPriority) {
-		return "grid-cols-[60px_1fr_2fr_80px]";
+		return "grid-cols-[70px_1.5fr_2fr_80px]";
 	}
 	if (!hideStatus && showPriority) {
-		return "grid-cols-[60px_1fr_2fr_60px_80px_120px]";
+		return "grid-cols-[70px_1.5fr_2fr_60px_80px_120px]";
 	}
-	return "grid-cols-[60px_1fr_2fr_80px_120px]";
+	return "grid-cols-[70px_1.5fr_2fr_80px_120px]";
 };
 
 const RecordSkeleton = ({ hideStatus, showPriority }: { hideStatus?: boolean; showPriority?: boolean }) => (
