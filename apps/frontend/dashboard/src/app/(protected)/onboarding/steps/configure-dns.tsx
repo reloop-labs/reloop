@@ -132,7 +132,6 @@ export const ConfigureDnsStep = () => {
 						tableId="dkim-"
 						hideStatus={true}
 						showPriorityColumn={true}
-						nameColumnWidth="minmax(100px,auto)"
 					/>
 				</div>
 			</div>
@@ -157,7 +156,6 @@ export const ConfigureDnsStep = () => {
 						tableId="dmarc-"
 						hideStatus={true}
 						showPriorityColumn={false}
-						nameColumnWidth="minmax(100px,auto)"
 					/>
 				</div>
 			</div>
@@ -169,7 +167,7 @@ export const ConfigureDnsStep = () => {
 					mode="filled"
 					onClick={
 						domainData?.status === "verifying" ||
-						domainData?.status === "active"
+							domainData?.status === "active"
 							? () => setStep(4)
 							: handleVerifyDNS
 					}

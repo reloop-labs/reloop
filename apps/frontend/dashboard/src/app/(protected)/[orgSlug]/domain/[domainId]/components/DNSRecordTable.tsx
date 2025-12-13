@@ -21,8 +21,50 @@ interface DNSRecordTableProps {
 	tableId?: string;
 	hideStatus?: boolean;
 	showPriorityColumn?: boolean;
-	nameColumnWidth?: string;
 }
+
+const getGridCols = (hideStatus: boolean, showPriority: boolean) => {
+	if (hideStatus && showPriority) {
+		return "grid-cols-[60px_1fr_2fr_60px_80px]";
+	}
+	if (hideStatus && !showPriority) {
+		return "grid-cols-[60px_1fr_2fr_80px]";
+	}
+	if (!hideStatus && showPriority) {
+		return "grid-cols-[60px_1fr_2fr_60px_80px_120px]";
+	}
+	return "grid-cols-[60px_1fr_2fr_80px_120px]";
+};
+
+const RecordSkeleton = ({ hideStatus, showPriority }: { hideStatus?: boolean; showPriority?: boolean }) => (
+	<div className={cn(
+		"grid items-center py-3 px-4",
+		getGridCols(hideStatus ?? false, showPriority ?? false)
+	)}>
+		<div className="flex items-center">
+			<Skeleton className="h-4 w-8" />
+		</div>
+		<div className="flex items-center gap-2">
+			<Skeleton className="h-4 w-20" />
+		</div>
+		<div className="flex items-center gap-2">
+			<Skeleton className="h-4 w-32" />
+		</div>
+		{showPriority && (
+			<div className="flex items-center">
+				<Skeleton className="h-4 w-6" />
+			</div>
+		)}
+		<div className="flex items-center">
+			<Skeleton className="h-4 w-8" />
+		</div>
+		{!hideStatus && (
+			<div className="flex items-center">
+				<Skeleton className="h-5 w-16 rounded-md" />
+			</div>
+		)}
+	</div>
+);
 
 export const DNSRecordTable = ({
 	records,
@@ -33,222 +75,179 @@ export const DNSRecordTable = ({
 	tableId = "",
 	hideStatus = false,
 	showPriorityColumn = false,
-	nameColumnWidth = "minmax(120px,auto)",
 }: DNSRecordTableProps) => {
-	const gridColumns = ["minmax(60px,auto)", nameColumnWidth, "1fr"];
-
-	if (showPriorityColumn) {
-		gridColumns.push("minmax(56px,auto)");
-	}
-
-	gridColumns.push("minmax(80px,auto)");
-
-	if (!hideStatus) {
-		gridColumns.push("minmax(100px,auto)");
-	}
+	const gridCols = getGridCols(hideStatus, showPriorityColumn);
 
 	return (
 		<AnimatePresence mode="wait">
-			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-200 text-paragraph-sm shadow-regular-md ring-stroke-soft-200 ring-inset">
-				<div
-					className={cn("grid")}
-					style={{
-						gridTemplateColumns: gridColumns.join(" "),
-					}}
-				>
-					<div className="bg-bg-weak-50 pl-5 font-medium text-text-sub-600">
-						<div className="py-2.5 text-gray-800 dark:text-gray-200">Type</div>
+			<div className="w-full text-paragraph-sm rounded-xl border border-stroke-soft-100 overflow-hidden">
+				{/* Table Header */}
+				<div className={cn("grid items-center py-3 px-4 text-text-sub-600 border-b border-stroke-soft-100", gridCols)}>
+					<div className="flex items-center gap-2">
+						<Icon name="file-text" className="h-3.5 w-3.5" />
+						<span className="text-xs">Type</span>
 					</div>
-					<div className="bg-bg-weak-50 font-medium text-text-sub-600">
-						<div className="py-2.5 text-gray-800 dark:text-gray-200">Name</div>
+					<div className="flex items-center gap-2">
+						<Icon name="link" className="h-3.5 w-3.5" />
+						<span className="text-xs">Name</span>
 					</div>
-					<div className="bg-bg-weak-50 font-medium text-text-sub-600">
-						<div className="py-2.5 text-gray-800 dark:text-gray-200">Value</div>
+					<div className="flex items-center gap-2">
+						<Icon name="code" className="h-3.5 w-3.5" />
+						<span className="text-xs">Value</span>
 					</div>
 					{showPriorityColumn && (
-						<div className="bg-bg-weak-50 font-medium text-text-sub-600">
-							<div className="py-2.5 text-gray-800 dark:text-gray-200">
-								Priority
-							</div>
+						<div className="flex items-center gap-2">
+							<Icon name="star" className="h-3.5 w-3.5" />
+							<span className="text-xs">Pri</span>
 						</div>
 					)}
-					<div className="bg-bg-weak-50 font-medium text-text-sub-600">
-						<div className="py-2.5 text-gray-800 dark:text-gray-200">TTL</div>
+					<div className="flex items-center gap-2">
+						<Icon name="time" className="h-3.5 w-3.5" />
+						<span className="text-xs">TTL</span>
 					</div>
 					{!hideStatus && (
-						<div className="bg-bg-weak-50 font-medium text-text-sub-600">
-							<div className="py-2.5 text-gray-800 dark:text-gray-200">
-								Status
-							</div>
+						<div className="flex items-center gap-2">
+							<Icon name="check-circle" className="h-3.5 w-3.5" />
+							<span className="text-xs">Status</span>
 						</div>
 					)}
+				</div>
+
+				{/* Table Body */}
+				<div className="divide-y divide-stroke-soft-100">
 					{isLoading
-						? // Skeleton loading state
-							Array.from({ length: loadingRows }).map((_, index) => (
-								<div key={`skeleton-${index}`} className="group/row contents">
-									<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
-										<div className="pl-5">
-											<Skeleton className="h-4 w-12" />
-										</div>
-									</div>
-									<div className="flex min-w-0 items-center border-stroke-soft-200 border-t py-2.5 pr-4">
-										<div className="max-w-24 flex-1">
-											<Skeleton className="my-1 h-4 w-20" />
-										</div>
-									</div>
-									<div className="flex min-w-0 items-center border-stroke-soft-200 border-t py-2.5 pr-4">
-										<div className="flex-1">
-											<Skeleton className="h-4 w-32" />
-										</div>
-									</div>
-									<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
-										<Skeleton className="h-4 w-8" />
-									</div>
-									<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
-										<Skeleton className="h-4 w-12" />
-									</div>
-									<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
-										<Skeleton className="h-4 w-16" />
-									</div>
-								</div>
-							))
+						? Array.from({ length: loadingRows }).map((_, index) => (
+							<RecordSkeleton key={`skeleton-${index}`} hideStatus={hideStatus} showPriority={showPriorityColumn} />
+						))
 						: records?.map((record, index) => (
-								<div key={`record-${index}`} className="group/row contents">
-									<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
-										<motion.span
-											{...getAnimationProps(index + 1, 0)}
-											className="inline-flex items-center py-0.5 pl-5 font-medium text-sm"
-										>
-											{record.recordType}
-										</motion.span>
-									</div>
-									<div className="flex min-w-0 items-center border-stroke-soft-200 border-t py-2.5 pr-4 group-hover/row:bg-bg-weak-50">
-										<motion.button
-											{...getAnimationProps(index + 1, 1)}
-											type="button"
-											onClick={() =>
-												onCopyToClipboard?.(
-													record.name,
-													`${tableId}host-${index}`,
-												)
-											}
-											className="flex w-full min-w-0 cursor-pointer items-center gap-2"
-										>
-											<div className="max-w-24 flex-1 truncate text-left text-label-sm text-text-strong-950">
-												{record.name}
-											</div>
+							<div
+								key={`record-${index}`}
+								className={cn(
+									"group/row grid items-center py-3 px-4 transition-colors",
+									"hover:bg-bg-weak-50/50",
+									gridCols
+								)}
+							>
+								{/* Type Column */}
+								<motion.div
+									{...getAnimationProps(index + 1, 0)}
+									className="flex items-center"
+								>
+									<span className="inline-flex items-center rounded-md bg-neutral-alpha-10 px-2 py-0.5 text-[11px] font-medium text-text-strong-950">
+										{record.recordType}
+									</span>
+								</motion.div>
 
-											<motion.div
-												animate={
-													copiedItems.has(`${tableId}host-${index}`)
-														? "copied"
-														: "default"
-												}
-												variants={{
-													default: { scale: 1 },
-													copied: { scale: 1.1 },
-												}}
-												transition={{ duration: 0.2, ease: "easeInOut" }}
-											>
-												<Icon
-													name={
-														copiedItems.has(`${tableId}host-${index}`)
-															? "check"
-															: "copy"
-													}
-													className={`h-3 w-3 transition-colors ${
-														copiedItems.has(`${tableId}host-${index}`)
-															? "text-green-600"
-															: "text-text-sub-600 hover:text-text-strong-950"
-													}`}
-												/>
-											</motion.div>
-										</motion.button>
-									</div>
-									<div className="flex min-w-0 items-center border-stroke-soft-200 border-t py-2.5 pr-4 group-hover/row:bg-bg-weak-50">
-										<motion.button
-											{...getAnimationProps(index + 1, 2)}
-											type="button"
-											onClick={() =>
-												onCopyToClipboard?.(
-													record.value,
-													`${tableId}value-${index}`,
-												)
-											}
-											className="flex w-full min-w-0 cursor-pointer items-center gap-2"
-										>
-											<div className="flex-1 truncate text-left text-label-sm text-text-strong-950">
-												{record.value}
-											</div>
+								{/* Name Column */}
+								<motion.button
+									{...getAnimationProps(index + 1, 1)}
+									type="button"
+									onClick={() =>
+										onCopyToClipboard?.(record.name, `${tableId}host-${index}`)
+									}
+									className="flex min-w-0 max-w-full cursor-pointer items-center gap-1.5 group/copy overflow-hidden pr-2"
+								>
+									<span className="truncate font-medium text-label-sm text-text-strong-950">
+										{record.name}
+									</span>
+									<motion.div
+										animate={copiedItems.has(`${tableId}host-${index}`) ? "copied" : "default"}
+										variants={{
+											default: { scale: 1 },
+											copied: { scale: 1.1 },
+										}}
+										transition={{ duration: 0.2, ease: "easeInOut" }}
+										className="flex-shrink-0"
+									>
+										<Icon
+											name={copiedItems.has(`${tableId}host-${index}`) ? "check" : "copy"}
+											className={cn(
+												"h-3 w-3 transition-colors",
+												copiedItems.has(`${tableId}host-${index}`)
+													? "text-success-base"
+													: "text-text-sub-600 opacity-0 group-hover/copy:opacity-100"
+											)}
+										/>
+									</motion.div>
+								</motion.button>
 
-											<motion.div
-												animate={
-													copiedItems.has(`${tableId}value-${index}`)
-														? "copied"
-														: "default"
-												}
-												variants={{
-													default: { scale: 1 },
-													copied: { scale: 1.1 },
-												}}
-												transition={{ duration: 0.2, ease: "easeInOut" }}
-											>
-												<Icon
-													name={
-														copiedItems.has(`${tableId}value-${index}`)
-															? "check"
-															: "copy"
-													}
-													className={`h-3 w-3 transition-colors ${
-														copiedItems.has(`${tableId}value-${index}`)
-															? "text-green-600"
-															: "text-text-sub-600 hover:text-text-strong-950"
-													}`}
-												/>
-											</motion.div>
-										</motion.button>
-									</div>
-									{showPriorityColumn && (
-										<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
-											<motion.span
-												{...getAnimationProps(index + 1, 3)}
-												className="text-label-sm text-text-strong-950"
-											>
-												{record.priority || ""}
-											</motion.span>
-										</div>
-									)}
-									<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
-										<motion.span
-											{...getAnimationProps(index + 1, 4)}
-											className="text-label-sm text-text-strong-950"
+								{/* Value Column */}
+								<motion.button
+									{...getAnimationProps(index + 1, 2)}
+									type="button"
+									onClick={() =>
+										onCopyToClipboard?.(record.value, `${tableId}value-${index}`)
+									}
+									className="flex min-w-0 max-w-full cursor-pointer items-center gap-1.5 group/copy overflow-hidden pr-2"
+								>
+									<span className="truncate font-mono text-label-sm text-text-sub-600">
+										{record.value}
+									</span>
+									<motion.div
+										animate={copiedItems.has(`${tableId}value-${index}`) ? "copied" : "default"}
+										variants={{
+											default: { scale: 1 },
+											copied: { scale: 1.1 },
+										}}
+										transition={{ duration: 0.2, ease: "easeInOut" }}
+										className="flex-shrink-0"
+									>
+										<Icon
+											name={copiedItems.has(`${tableId}value-${index}`) ? "check" : "copy"}
+											className={cn(
+												"h-3 w-3 transition-colors",
+												copiedItems.has(`${tableId}value-${index}`)
+													? "text-success-base"
+													: "text-text-sub-600 opacity-0 group-hover/copy:opacity-100"
+											)}
+										/>
+									</motion.div>
+								</motion.button>
+
+								{/* Priority Column */}
+								{showPriorityColumn && (
+									<motion.div
+										{...getAnimationProps(index + 1, 3)}
+										className="flex items-center"
+									>
+										<span className="text-label-sm text-text-sub-600">
+											{record.priority || "-"}
+										</span>
+									</motion.div>
+								)}
+
+								{/* TTL Column */}
+								<motion.div
+									{...getAnimationProps(index + 1, showPriorityColumn ? 4 : 3)}
+									className="flex items-center"
+								>
+									<span className="text-label-sm text-text-sub-600">
+										{record.ttl}
+									</span>
+								</motion.div>
+
+								{/* Status Column */}
+								{!hideStatus && (
+									<motion.div
+										{...getAnimationProps(index + 1, showPriorityColumn ? 5 : 4)}
+										className="flex items-center"
+									>
+										<div
+											className={cn(
+												"inline-flex items-center gap-1.5 rounded-md px-2 py-0.5 text-[11px] font-medium capitalize",
+												getStatusColorClass(record.status)
+											)}
 										>
-											{record.ttl}
-										</motion.span>
-									</div>
-									{!hideStatus && (
-										<div className="flex items-center border-stroke-soft-200 border-t py-2.5 group-hover/row:bg-bg-weak-50">
-											<motion.div
-												{...getAnimationProps(index + 1, 5)}
-												className="flex items-center"
-											>
-												<div
-													className={cn(
-														"flex items-center gap-2.5 rounded-lg py-0.5 pr-3 font-medium text-label-xs capitalize",
-														getStatusColorClass(record.status),
-													)}
-												>
-													<Icon
-														name={getStatusIcon(record.status)}
-														className="h-3.5 w-3.5"
-													/>
-													{getStatusLabel(record.status)}
-												</div>
-											</motion.div>
+											<Icon
+												name={getStatusIcon(record.status)}
+												className="h-3 w-3"
+											/>
+											{getStatusLabel(record.status)}
 										</div>
-									)}
-								</div>
-							))}
+									</motion.div>
+								)}
+							</div>
+						))}
 				</div>
 			</div>
 		</AnimatePresence>

@@ -175,8 +175,8 @@ const NewDomainPage = () => {
 				<Alert.Root
 					variant="stroke"
 					status="success"
-					size="large"
-					className="w-full border border-success-base bg-success-base/5"
+					size="small"
+					className="w-full border-[1px] border-success-base bg-success-base/5"
 				>
 					<div className="flex gap-2">
 						<Icon
@@ -184,8 +184,8 @@ const NewDomainPage = () => {
 							className="mt-2 size-4 text-success-base"
 						/>
 						<div>
-							<div className="font-medium text-title-h6">{domainId}</div>
-							<div className="text-sm text-text-sub-600">New added domain</div>
+							<div className="font-medium text-label-md">{domainId}</div>
+							<div className="text-xs text-text-sub-600">New added domain</div>
 						</div>
 					</div>
 				</Alert.Root>
@@ -193,10 +193,10 @@ const NewDomainPage = () => {
 				{/* DKIM and SPF Records */}
 				<div className="relative mt-10">
 					<div className="mb-6 space-y-1">
-						<div className="font-medium text-base text-text-strong-950">
-							DKIM and SPF <span className="text-text-sub-600">(Required)</span>
+						<div className="font-medium text-sm text-text-strong-950">
+							DKIM and SPF <span className="text-text-sub-600 text-xs">(Required)</span>
 						</div>
-						<div className="text-sm text-text-sub-600">
+						<div className="text-xs text-text-sub-600">
 							Enable email signing and specify authorized senders.
 						</div>
 					</div>
@@ -214,10 +214,10 @@ const NewDomainPage = () => {
 
 				<div className="relative mt-10">
 					<div className="mb-6 space-y-1">
-						<div className="font-medium text-base text-text-strong-950">
-							DMARC <span className="text-text-sub-600">(Recommended)</span>
+						<div className="font-medium text-sm text-text-strong-950">
+							DMARC <span className="text-text-sub-600 text-xs">(Recommended)</span>
 						</div>
-						<div className="text-sm text-text-sub-600">
+						<div className="text-xs text-text-sub-600">
 							Set authentication policies and receive reports.
 						</div>
 					</div>
@@ -235,7 +235,7 @@ const NewDomainPage = () => {
 
 				<Button.Root
 					onClick={handleVerifyAndNavigate}
-					size="small"
+					size="xsmall"
 					variant="neutral"
 					className="mt-5"
 					disabled={isVerifying}
