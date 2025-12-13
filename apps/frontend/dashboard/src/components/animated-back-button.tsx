@@ -31,7 +31,7 @@ export const AnimatedBackButton = ({ showEscKey = true }: AnimatedBackButtonProp
     >
       <div className="relative flex items-center justify-center w-3.5 h-3.5 overflow-visible">
         {/* Arrow tail - hidden by default, slides in from left on hover */}
-        <div className="absolute left-[2px] h-[1.25px] w-0 bg-current transition-all duration-300 ease-out group-hover:w-2.5" />
+        <div className="absolute left-0 h-[1.25px] w-0 bg-current transition-all duration-300 ease-out group-hover:w-2" />
         {/* Chevron/Arrow head - nudges left on hover */}
         <svg
           width="6"
