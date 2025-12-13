@@ -131,22 +131,26 @@ const ContactsPage = () => {
 
       {/* Create Contact Modal */}
       <Modal.Root open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-        <Modal.Content className="data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom-4 data-[state=open]:zoom-in-95 data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-bottom-4 data-[state=closed]:zoom-out-95 max-w-lg duration-200 data-[state=closed]:animate-out data-[state=open]:animate-in">
-          <form onSubmit={handleCreateContact}>
-            <Modal.Body>
-              <h2 className="mb-6 font-semibold text-gray-900 text-xl">
-                Create Contact
-              </h2>
-              <div className="space-y-3">
-                <div>
+        <Modal.Content className="sm:max-w-[480px] p-0.5 border border-stroke-soft-100/50 rounded-2xl" showClose={true}>
+          <div className="border border-stroke-soft-100/50 rounded-2xl">
+            <Modal.Header className="before:border-stroke-soft-200/50">
+              <div className="flex items-center justify-center">
+                <Icon name="user-plus" className="h-4 w-4" />
+              </div>
+              <div className="flex-1">
+                <Modal.Title className="text-sm">Add Contact</Modal.Title>
+              </div>
+            </Modal.Header>
+            <form onSubmit={handleCreateContact}>
+              <Modal.Body className="space-y-4">
+                <div className="flex flex-col gap-1">
                   <Label.Root htmlFor="email">
                     Email
                     <Label.Asterisk />
                   </Label.Root>
-                  <Input.Root className="mt-1">
+                  <Input.Root size="small">
                     <Input.Wrapper>
                       <Input.Input
-                        className="px-2"
                         id="email"
                         type="email"
                         placeholder="contact@example.com"
@@ -159,14 +163,13 @@ const ContactsPage = () => {
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
-                  <div>
+                  <div className="flex flex-col gap-1">
                     <Label.Root htmlFor="firstName">
                       First Name
                     </Label.Root>
-                    <Input.Root className="mt-1">
+                    <Input.Root size="small">
                       <Input.Wrapper>
                         <Input.Input
-                          className="px-2"
                           id="firstName"
                           placeholder="John"
                           value={firstName}
@@ -176,14 +179,13 @@ const ContactsPage = () => {
                       </Input.Wrapper>
                     </Input.Root>
                   </div>
-                  <div>
+                  <div className="flex flex-col gap-1">
                     <Label.Root htmlFor="lastName">
                       Last Name
                     </Label.Root>
-                    <Input.Root className="mt-1">
+                    <Input.Root size="small">
                       <Input.Wrapper>
                         <Input.Input
-                          className="px-2"
                           id="lastName"
                           placeholder="Doe"
                           value={lastName}
@@ -194,43 +196,45 @@ const ContactsPage = () => {
                     </Input.Root>
                   </div>
                 </div>
-              </div>
-            </Modal.Body>
-            <Modal.Footer className="flex items-center justify-end gap-3">
-              <Button.Root
-                type="button"
-                variant="neutral"
-                mode="stroke"
-                onClick={() => {
-                  setIsCreateModalOpen(false);
-                  setEmail("");
-                  setFirstName("");
-                  setLastName("");
-                }}
-                disabled={isCreating}
-              >
-                Cancel
-                <Kbd.Root className="bg-bg-weak-50 text-xs">Esc</Kbd.Root>
-              </Button.Root>
-              <Button.Root
-                type="submit"
-                variant="neutral"
-                disabled={isCreating || !email}
-              >
-                {isCreating ? (
-                  <>
-                    <Icon name="loader-2" className="mr-2 h-4 w-4 animate-spin" />
-                    Creating...
-                  </>
-                ) : (
-                  <>
-                    Create Contact
-                    <Icon name="undo" className="h-3 w-3 scale-y-[-1]" />
-                  </>
-                )}
-              </Button.Root>
-            </Modal.Footer>
-          </form>
+              </Modal.Body>
+              <Modal.Footer className="justify-end border-stroke-soft-100/50 mt-4">
+                <Button.Root
+                  type="button"
+                  variant="neutral"
+                  mode="stroke"
+                  size="small"
+                  onClick={() => {
+                    setIsCreateModalOpen(false);
+                    setEmail("");
+                    setFirstName("");
+                    setLastName("");
+                  }}
+                  disabled={isCreating}
+                >
+                  Cancel
+                  <Kbd.Root className="bg-bg-weak-50 text-[10px]">Esc</Kbd.Root>
+                </Button.Root>
+                <Button.Root
+                  type="submit"
+                  variant="neutral"
+                  size="small"
+                  disabled={isCreating || !email}
+                >
+                  {isCreating ? (
+                    <>
+                      <Icon name="loader" className="h-4 w-4 animate-spin" />
+                      Creating...
+                    </>
+                  ) : (
+                    <>
+                      Add Contact
+                      <Icon name="enter" className="w-4 h-4 border rounded-sm p-px border-stroke-soft-100/20" />
+                    </>
+                  )}
+                </Button.Root>
+              </Modal.Footer>
+            </form>
+          </div>
         </Modal.Content>
       </Modal.Root>
     </div>
