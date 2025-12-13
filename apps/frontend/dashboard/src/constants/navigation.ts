@@ -23,6 +23,11 @@ export const mainNavigation: MainNavigationItem[] = [
 		iconName: "notification-indicator",
 	},
 	{
+		label: "Templates",
+		path: "/templates",
+		iconName: "layout",
+	},
+	{
 		label: "API Keys",
 		path: "/api-keys",
 		iconName: "key",
@@ -36,11 +41,6 @@ export const mainNavigation: MainNavigationItem[] = [
 		label: "Domain",
 		path: "/domain",
 		iconName: "globe",
-	},
-	{
-		label: "Templates",
-		path: "/templates",
-		iconName: "layout",
 	},
 	{
 		label: "Webhooks",
