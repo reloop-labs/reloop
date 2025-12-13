@@ -1,23 +1,16 @@
 "use client";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
-import {
-	getStatusColorClass,
-	getStatusIcon,
-	getStatusLabel,
-} from "@fe/dashboard/utils/domain";
 import type { DomainListResponse } from "@reloop/api";
 import * as Button from "@reloop/ui/button";
-import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import * as Select from "@reloop/ui/select";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { useQueryState, parseAsInteger } from "nuqs";
 import useSWR from "swr";
-import { motion } from "motion/react";
 import { DeleteDomainModal } from "./delete-domain";
+import { DomainFilterDropdown, type DomainStatusFilters } from "./domain-filter-dropdown";
 import { DomainSDK } from "./domain-sdk";
 import { DomainTable } from "./domain-table";
 import { EmptyState } from "./empty-state";
@@ -26,7 +19,7 @@ import { PageSizeDropdown } from "./page-size-dropdown";
 export const DomainListSidebar = () => {
 	const { activeOrganization } = useUserOrganization();
 	const { domainId } = useParams();
-	const [statusFilter, setStatusFilter] = useState<string>("all");
+	const [statusFilters, setStatusFilters] = useState<DomainStatusFilters>([]);
 	const [searchQuery, setSearchQuery] = useState<string>("");
 	const [currentPage, setCurrentPage] = useQueryState("page", parseAsInteger.withDefault(1));
 	const [pageSize, setPageSize] = useQueryState("limit", parseAsInteger.withDefault(10));
@@ -49,7 +42,7 @@ export const DomainListSidebar = () => {
 	const filteredDomains =
 		data?.domains?.filter((domain) => {
 			const matchesStatus =
-				statusFilter === "all" || domain.status === statusFilter;
+				statusFilters.length === 0 || statusFilters.includes(domain.status);
 			const matchesSearch =
 				searchQuery === "" ||
 				domain.domain.toLowerCase().includes(searchQuery.toLowerCase());
@@ -104,85 +97,10 @@ export const DomainListSidebar = () => {
 									</Input.Wrapper>
 								</Input.Root>
 							</div>
-							<div className="w-40">
-								<Select.Root
-									size="small"
-									value={statusFilter}
-									onValueChange={setStatusFilter}
-								>
-									<Select.Trigger className="rounded-xl">
-										<Select.Value placeholder="Status" />
-									</Select.Trigger>
-									<Select.Content className="w-40">
-										<Select.Item value="all">
-											<div className="flex items-center gap-2 text-sm">
-												<Icon name="globe" className="h-4 w-4" />
-												All Status
-											</div>
-										</Select.Item>
-										<Select.Item value="start-verify">
-											<div className="flex items-center gap-2 text-sm">
-												<Icon
-													name={getStatusIcon("start-verify")}
-													className={cn(
-														"h-4 w-4",
-														getStatusColorClass("start-verify"),
-													)}
-												/>
-												{getStatusLabel("start-verify")}
-											</div>
-										</Select.Item>
-										<Select.Item value="verifying">
-											<div className="flex items-center gap-2 text-sm">
-												<Icon
-													name={getStatusIcon("verifying")}
-													className={cn(
-														"h-4 w-4",
-														getStatusColorClass("verifying"),
-													)}
-												/>
-												{getStatusLabel("verifying")}
-											</div>
-										</Select.Item>
-										<Select.Item value="active">
-											<div className="flex items-center gap-2 text-sm">
-												<Icon
-													name={getStatusIcon("active")}
-													className={cn(
-														"h-4 w-4",
-														getStatusColorClass("active"),
-													)}
-												/>
-												{getStatusLabel("active")}
-											</div>
-										</Select.Item>
-										<Select.Item value="suspended">
-											<div className="flex items-center gap-2 text-sm">
-												<Icon
-													name={getStatusIcon("suspended")}
-													className={cn(
-														"h-4 w-4",
-														getStatusColorClass("suspended"),
-													)}
-												/>
-												{getStatusLabel("suspended")}
-											</div>
-										</Select.Item>
-										<Select.Item value="failed">
-											<div className="flex items-center gap-2 text-sm">
-												<Icon
-													name={getStatusIcon("failed")}
-													className={cn(
-														"h-4 w-4",
-														getStatusColorClass("failed"),
-													)}
-												/>
-												{getStatusLabel("failed")}
-											</div>
-										</Select.Item>
-									</Select.Content>
-								</Select.Root>
-							</div>
+							<DomainFilterDropdown
+								value={statusFilters}
+								onChange={setStatusFilters}
+							/>
 						</div>
 						<div className="mt-4">
 							<DomainTable

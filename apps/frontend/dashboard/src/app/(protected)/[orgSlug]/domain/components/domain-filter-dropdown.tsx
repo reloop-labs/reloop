@@ -1,27 +1,35 @@
 "use client";
 
 import { AnimatedHoverBackground } from "@fe/dashboard/components/layout/sidebar/animated-hover-background";
+import {
+  getStatusColorClass,
+  getStatusIcon,
+  getStatusLabel,
+} from "@fe/dashboard/utils/domain";
+import type { DomainStatus } from "@reloop/api/types";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import { useRef, useState } from "react";
 
-export type TeamFilterOption = "invited" | "suspended" | "active";
-export type TeamFilters = TeamFilterOption[];
+export type DomainStatusFilterOption = DomainStatus;
+export type DomainStatusFilters = DomainStatusFilterOption[];
 
-interface TeamFilterDropdownProps {
-  value: TeamFilters;
-  onChange: (value: TeamFilters) => void;
+interface DomainFilterDropdownProps {
+  value: DomainStatusFilters;
+  onChange: (value: DomainStatusFilters) => void;
 }
 
-const filterOptions: { id: TeamFilterOption; label: string }[] = [
-  { id: "invited", label: "Invited" },
-  { id: "suspended", label: "Suspended" },
+const filterOptions: { id: DomainStatusFilterOption; label: string }[] = [
+  { id: "start-verify", label: "Not Started" },
+  { id: "verifying", label: "Verifying" },
   { id: "active", label: "Active" },
+  { id: "suspended", label: "Suspended" },
+  { id: "failed", label: "Failed" },
 ];
 
-export const TeamFilterDropdown = ({ value, onChange }: TeamFilterDropdownProps) => {
+export const DomainFilterDropdown = ({ value, onChange }: DomainFilterDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
   const buttonRefs = useRef<HTMLButtonElement[]>([]);
@@ -36,7 +44,7 @@ export const TeamFilterDropdown = ({ value, onChange }: TeamFilterDropdownProps)
     onChange([]);
   };
 
-  const handleToggle = (optionId: TeamFilterOption) => {
+  const handleToggle = (optionId: DomainStatusFilterOption) => {
     if (value.includes(optionId)) {
       onChange(value.filter(v => v !== optionId));
     } else {
@@ -51,6 +59,7 @@ export const TeamFilterDropdown = ({ value, onChange }: TeamFilterDropdownProps)
           variant="neutral"
           mode="stroke"
           size="xsmall"
+          className="w-[100px]"
 
         >
           <Icon name="filter" className="h-4 w-4" />
@@ -62,7 +71,7 @@ export const TeamFilterDropdown = ({ value, onChange }: TeamFilterDropdownProps)
           )}
         </Button.Root>
       </Dropdown.Trigger>
-      <Dropdown.Content align="start" className="w-44 p-3">
+      <Dropdown.Content align="start" className="w-48 p-2">
         {/* Header */}
         <div className="flex items-center justify-between pb-2 border-b border-stroke-soft-200 px-1">
           <span className="text-xs text-text-sub-600 font-medium">Filter by</span>
@@ -106,6 +115,14 @@ export const TeamFilterDropdown = ({ value, onChange }: TeamFilterDropdownProps)
                     <Icon name="check" className="h-3 w-3 text-white" />
                   )}
                 </div>
+                {/* Status Icon */}
+                <Icon
+                  name={getStatusIcon(option.id)}
+                  className={cn(
+                    "h-3.5 w-3.5",
+                    getStatusColorClass(option.id)
+                  )}
+                />
                 <span>{option.label}</span>
               </button>
             );
