@@ -5,19 +5,21 @@ import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import { useRef, useState } from "react";
 
-interface ContactDropdownProps {
-    contactId: string;
-    contactEmail: string;
+interface TopicDropdownProps {
+    topicId: string;
+    topicName: string;
+    onViewDetails: (id: string) => void;
     onDelete: (id: string) => void;
     onOpenChange?: (open: boolean) => void;
 }
 
-export const ContactDropdown = ({
-    contactId,
-    contactEmail,
+export const TopicDropdown = ({
+    topicId,
+    topicName,
+    onViewDetails,
     onDelete,
     onOpenChange,
-}: ContactDropdownProps) => {
+}: TopicDropdownProps) => {
     const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const buttonRefs = useRef<HTMLButtonElement[]>([]);
@@ -30,24 +32,24 @@ export const ContactDropdown = ({
         onOpenChange?.(open);
     };
 
-    const handleCopyEmail = () => {
-        navigator.clipboard.writeText(contactEmail);
+    const handleViewDetails = () => {
+        onViewDetails(topicId);
         setDropdownOpen(false);
     };
 
     const handleDelete = () => {
-        onDelete(contactId);
+        onDelete(topicId);
         setDropdownOpen(false);
     };
 
     const menuItems = [
         {
-            icon: "copy" as const,
-            label: "Copy Email",
-            onClick: handleCopyEmail,
+            icon: "eye-outline" as const,
+            label: "View Details",
+            onClick: handleViewDetails,
         },
         {
-            icon: "delete" as const,
+            icon: "trash" as const,
             label: "Delete",
             onClick: handleDelete,
             className: "text-error-base",
@@ -61,7 +63,7 @@ export const ContactDropdown = ({
                     type="button"
                     className="flex h-6 w-6 items-center justify-center rounded-md transition-colors hover:bg-bg-weak-50"
                 >
-                    <Icon name="more-vertical" className="h-4 w-4 text-text-sub-600" />
+                    <Icon name="more-vertical" className="h-3 w-3 text-text-sub-600" />
                 </button>
             </Dropdown.Trigger>
             <Dropdown.Content align="end" className="w-40 p-1.5 rounded-xl">

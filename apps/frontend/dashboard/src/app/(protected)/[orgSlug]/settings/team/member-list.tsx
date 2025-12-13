@@ -332,7 +332,7 @@ export const MemberList = () => {
 														type="button"
 														className="flex h-8 w-8 items-center justify-center rounded-lg text-text-sub-600 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950"
 													>
-														<Icon name="more-horizontal" className="h-4 w-4" />
+														<Icon name="more-vertical" className="h-4 w-4" />
 													</button>
 												</Dropdown.Trigger>
 												<Dropdown.Content align="end" className="w-48">
