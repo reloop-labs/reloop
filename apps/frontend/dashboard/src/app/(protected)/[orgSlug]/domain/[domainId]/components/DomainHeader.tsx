@@ -124,7 +124,7 @@ export const DomainHeader = ({
 							>
 								{isVerifying || status === "verifying" ? (
 									<>
-										Verifying...
+										Verifying
 									</>
 								) : (
 									"Verify DNS Records"

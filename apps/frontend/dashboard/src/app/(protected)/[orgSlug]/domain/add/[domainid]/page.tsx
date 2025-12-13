@@ -152,7 +152,7 @@ const NewDomainPage = () => {
 								<Button.Icon>
 									<Icon name="loader" className="h-4 w-4 animate-spin" />
 								</Button.Icon>
-								Verifying...
+								Verifying
 							</>
 						) : (
 							"I have added the DNS records"
@@ -245,7 +245,7 @@ const NewDomainPage = () => {
 							<Button.Icon>
 								<Icon name="loader" className="h-4 w-4 animate-spin" />
 							</Button.Icon>
-							Verifying...
+							Verifying
 						</>
 					) : (
 						"I have added the DNS records"
