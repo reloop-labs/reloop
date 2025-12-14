@@ -1,5 +1,5 @@
 import { authMiddleware } from "@reloop/api-key/middleware/auth";
-import { ApiKeyModel } from "@reloop/api-key/routes/api-key/api-key.model";
+import { ApiKeyModel } from "@reloop/api-key/model/api-key.model";
 import { updateApiKeyHandler } from "@reloop/api-key/routes/api-key/controllers/update-api-key";
 import { Elysia, status, t } from "elysia";
 

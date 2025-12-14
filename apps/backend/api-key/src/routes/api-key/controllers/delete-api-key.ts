@@ -1,4 +1,4 @@
-import type { ApiKeyTypes } from "@reloop/api-key/routes/api-key/api-key.type";
+import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";

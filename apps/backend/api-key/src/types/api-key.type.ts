@@ -1,4 +1,4 @@
-import type { ApiKeyModel } from "@reloop/api-key/routes/api-key/api-key.model";
+import type { ApiKeyModel } from "@reloop/api-key/model/api-key.model";
 
 export namespace ApiKeyTypes {
 	export type ApiKeyResponse = typeof ApiKeyModel.apiKeyResponse.static;

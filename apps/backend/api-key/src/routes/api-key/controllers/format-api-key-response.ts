@@ -1,4 +1,4 @@
-import type { ApiKeyTypes } from "@reloop/api-key/routes/api-key/api-key.type";
+import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
 
 export function formatApiKeyResponse(
 	apiKey: ApiKeyTypes.ApiKeyData,
