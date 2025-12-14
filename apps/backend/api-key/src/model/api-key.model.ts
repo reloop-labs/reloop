@@ -281,4 +281,34 @@ export namespace ApiKeyModel {
 		message: t.Literal("Access forbidden"),
 	});
 	export type Forbidden = typeof forbidden.static;
+
+	export const usageStatsResponse = t.Object({
+		id: t.String({ description: "API key identifier" }),
+		requestCount: t.Number({ description: "Total request count" }),
+		remaining: t.Union([t.Number(), t.Null()], {
+			description: "Remaining requests in current window",
+		}),
+		lastRequest: t.Union([t.String(), t.Null()], {
+			description: "Last request timestamp",
+		}),
+		rateLimitEnabled: t.Boolean({
+			description: "Whether rate limiting is enabled",
+		}),
+		rateLimitMax: t.Number({
+			description: "Maximum requests per time window",
+		}),
+		rateLimitTimeWindow: t.Number({
+			description: "Rate limit time window in milliseconds",
+		}),
+		lastRefillAt: t.Union([t.String(), t.Null()], {
+			description: "Last refill timestamp",
+		}),
+	});
+	export type UsageStatsResponse = typeof usageStatsResponse.static;
+
+	export const successResponse = t.Object({
+		success: t.Boolean({ description: "Operation success status" }),
+		message: t.String({ description: "Success message" }),
+	});
+	export type SuccessResponse = typeof successResponse.static;
 }
