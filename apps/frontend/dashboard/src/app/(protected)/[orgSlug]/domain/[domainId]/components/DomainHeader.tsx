@@ -124,7 +124,7 @@ export const DomainHeader = ({
 							>
 								{isVerifying || status === "verifying" ? (
 									<>
-										<Spinner size={16} color="white" />
+										<Spinner size={16} color="currentColor" />
 										Verifying
 									</>
 								) : (

@@ -127,7 +127,7 @@ export const AddDomainSidebar = () => {
 						>
 							{status === "loading" ? (
 								<>
-									<Spinner color="white" />
+									<Spinner color="currentColor" />
 									Adding Domain...
 								</>
 							) : (

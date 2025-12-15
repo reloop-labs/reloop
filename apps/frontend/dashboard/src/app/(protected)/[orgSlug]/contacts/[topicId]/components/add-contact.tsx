@@ -167,7 +167,7 @@ export const AddContact = ({
             >
               {status === "loading" ? (
                 <>
-                  <Spinner color="white" />
+                  <Spinner color="currentColor" />
                   Adding...
                 </>
               ) : (

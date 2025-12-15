@@ -460,7 +460,7 @@ export default function TestSendPage() {
 					>
 						{status === "loading" ? (
 							<>
-								<Spinner color="white" />
+								<Spinner color="currentColor" />
 								Sending...
 							</>
 						) : (

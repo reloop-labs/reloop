@@ -196,7 +196,7 @@ const AddTopicPage = () => {
             >
               {status === "loading" ? (
                 <>
-                  <Spinner color="white" />
+                  <Spinner color="currentColor" />
                   Creating Topic...
                 </>
               ) : (

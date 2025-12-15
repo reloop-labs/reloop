@@ -129,7 +129,7 @@ export const FeedbackPopover = () => {
                                     )}
                                 >
                                     {isSubmitting ? (
-                                        <Spinner size={14} color="white" />
+                                        <Spinner size={14} color="currentColor" />
                                     ) : (
                                         <>
                                             <Icon name="send-1" className="h-4 w-4" />

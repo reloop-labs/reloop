@@ -57,7 +57,7 @@ export const RemoveMemberModal = ({
           >
             {isRemoving ? (
               <>
-                <Spinner size={14} color="white" />
+                <Spinner size={14} color="currentColor" />
                 Removing...
               </>
             ) : (

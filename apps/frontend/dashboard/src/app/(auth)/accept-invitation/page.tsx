@@ -367,7 +367,7 @@ const AcceptInvitationContent = () => {
             onClick={handleAccept}
             disabled={accepting || declining}
           >
-            {accepting ? <Spinner size={16} color="white" /> : "Accept Invitation"}
+            {accepting ? <Spinner size={16} color="currentColor" /> : "Accept Invitation"}
           </Button.Root>
         </div>
 

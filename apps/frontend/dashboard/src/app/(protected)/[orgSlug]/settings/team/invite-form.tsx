@@ -191,7 +191,7 @@ export const InviteForm = () => {
 						size="xsmall"
 						disabled={loading}
 					>
-						{loading && <Spinner size={14} color="white" />}
+						{loading && <Spinner size={14} color="currentColor" />}
 						{loading ? "Sending..." : "Send Invitations"}
 					</Button.Root>
 				</div>

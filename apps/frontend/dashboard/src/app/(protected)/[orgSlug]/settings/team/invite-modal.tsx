@@ -374,7 +374,7 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
               >
                 {loading ? (
                   <>
-                    <Spinner size={14} color="white" />
+                    <Spinner size={14} color="currentColor" />
                     Sending...
                   </>
                 ) : (

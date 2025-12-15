@@ -51,7 +51,7 @@ export const RevokeInviteModal = ({
           >
             {isRevoking ? (
               <>
-                <Spinner size={14} color="white" />
+                <Spinner size={14} color="currentColor" />
                 Revoking...
               </>
             ) : (

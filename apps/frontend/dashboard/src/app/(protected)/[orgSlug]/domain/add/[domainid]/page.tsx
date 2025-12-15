@@ -150,7 +150,7 @@ const NewDomainPage = () => {
 					{isVerifying ? (
 						<>
 							<Button.Icon>
-								<Spinner size={16} color="white" />
+								<Spinner size={16} color="currentColor" />
 							</Button.Icon>
 							Verifying
 						</>
@@ -233,7 +233,7 @@ const NewDomainPage = () => {
 					{isVerifying ? (
 						<>
 							<Button.Icon>
-								<Spinner size={16} color="white" />
+								<Spinner size={16} color="currentColor" />
 							</Button.Icon>
 							Verifying
 						</>

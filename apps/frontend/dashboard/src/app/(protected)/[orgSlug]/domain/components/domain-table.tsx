@@ -131,7 +131,7 @@ export const DomainTable = ({
 												>
 													<div
 														className={cn(
-															"flex items-center gap-2.5 rounded-lg py-0.5 font-medium text-label-xs capitalize",
+															"flex items-center gap-2.5 rounded-lg py-0.5 font-medium text-[13px] capitalize",
 															getStatusColorClass(domain.status),
 														)}
 													>

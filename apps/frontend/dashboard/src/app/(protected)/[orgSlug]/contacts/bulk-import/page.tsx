@@ -226,7 +226,7 @@ bob.wilson@example.com,Bob,Wilson`;
               <Button.Root variant="neutral" size="small" onClick={handleImport} disabled={status === "loading"}>
                 {status === "loading" ? (
                   <>
-                    <Spinner color="white" />
+                    <Spinner color="currentColor" />
                     Importing...
                   </>
                 ) : (
