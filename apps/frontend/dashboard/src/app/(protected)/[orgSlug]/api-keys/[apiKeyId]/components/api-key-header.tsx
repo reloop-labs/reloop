@@ -1,6 +1,9 @@
 "use client";
+import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
+import { AnimatedHoverBackground } from "@fe/dashboard/components/layout/sidebar/animated-hover-background";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import {
 	Content as PopoverContent,
@@ -8,9 +11,9 @@ import {
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
+import * as Avatar from "@reloop/ui/avatar";
 import axios from "axios";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
 import { EditApiKeyModal } from "../../components/edit-api-key-modal";
@@ -38,6 +41,12 @@ interface ApiKeyData {
 	updatedAt: string;
 	permissions: string | null;
 	metadata: string | null;
+	createdBy?: {
+		id: string;
+		name: string | null;
+		image: string | null;
+		email: string | null;
+	};
 }
 
 interface ApiKeyHeaderProps {
@@ -48,12 +57,19 @@ interface ApiKeyHeaderProps {
 }
 
 const getStatusColor = (enabled: boolean) => {
-	return enabled ? "text-green-600" : "text-gray-600";
+	return enabled ? "text-success-base" : "text-text-sub-600";
 };
 
 const getStatusIcon = (enabled: boolean) => {
-	return enabled ? "check-circle" : "x-circle";
+	return enabled ? "check-circle" : "cross-circle";
 };
+
+const headerMenuItems = [
+	{ id: "docs", label: "Go to docs", icon: "file-text" as const, isDanger: false },
+	{ id: "rotate", label: "Rotate key", icon: "rotate-cw" as const, isDanger: false },
+	{ id: "edit", label: "Edit API key", icon: "edit" as const, isDanger: false },
+	{ id: "delete", label: "Delete API key", icon: "trash" as const, isDanger: true },
+];
 
 export const ApiKeyHeader = ({
 	apiKey,
@@ -61,12 +77,18 @@ export const ApiKeyHeader = ({
 	isFailed,
 	onDeleteApiKey,
 }: ApiKeyHeaderProps) => {
-	const { back } = useRouter();
 	const { mutate } = useSWRConfig();
 	const [copied, setCopied] = useState(false);
 	const [isToggling, setIsToggling] = useState(false);
 	const [isRotateModalOpen, setIsRotateModalOpen] = useState(false);
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
+	const buttonRefs = useRef<HTMLButtonElement[]>([]);
+
+	const currentTab = buttonRefs.current[hoverIdx ?? -1];
+	const currentRect = currentTab?.getBoundingClientRect();
+	const hoveredItem = headerMenuItems[hoverIdx ?? -1];
+	const isDanger = hoveredItem?.isDanger ?? false;
 
 	const handleCopyPrefix = async () => {
 		const textToCopy = apiKey?.start || apiKey?.prefix || "";
@@ -111,41 +133,43 @@ export const ApiKeyHeader = ({
 		}
 	};
 
+	const handleMenuItemClick = (itemId: string) => {
+		if (itemId === "docs") {
+			window.open("https://reloop.sh/docs/api-keys", "_blank");
+		} else if (itemId === "rotate") {
+			setIsRotateModalOpen(true);
+		} else if (itemId === "edit") {
+			setIsEditModalOpen(true);
+		} else if (itemId === "delete") {
+			onDeleteApiKey?.();
+		}
+	};
+
 	if (!apiKey && !isLoading) {
 		return (
 			<div className="pt-10 pb-8">
-				<Button.Root
-					onClick={() => back()}
-					variant="neutral"
-					mode="stroke"
-					size="xxsmall"
-				>
-					<Button.Icon>
-						<Icon name="chevron-left" className="h-4 w-4" />
-					</Button.Icon>
-					Back
-				</Button.Root>
-				<div className="flex justify-between pt-6">
+				<AnimatedBackButton />
+				<div className="flex items-center justify-between pt-6">
 					<div>
 						<div className="flex items-center gap-1.5">
-							<p className="font-medium text-paragraph-sm text-text-sub-600">
+							<p className="font-medium text-paragraph-xs text-text-sub-600">
 								API Key{" "}
 							</p>
-							<p className="font-semibold text-paragraph-sm text-text-sub-600">
+							<p className="font-semibold text-paragraph-xs text-text-sub-600">
 								•
 							</p>
-							<p className="font-medium text-paragraph-sm text-text-sub-600">
+							<p className="font-medium text-paragraph-xs text-text-sub-600">
 								---
 							</p>
-							<p className="font-semibold text-paragraph-sm text-text-sub-600">
+							<p className="font-semibold text-paragraph-xs text-text-sub-600">
 								•
 							</p>
-							<div className="flex items-center gap-1 text-red-600">
+							<div className="flex items-center gap-1 text-error-base">
 								<Icon name="alert-circle" className="h-3.5 w-3.5" />
-								<p className="font-medium text-paragraph-sm">Not found</p>
+								<p className="font-medium text-paragraph-xs">Not found</p>
 							</div>
 						</div>
-						<h1 className="font-medium text-title-h4 leading-8">
+						<h1 className="font-medium text-title-h6 leading-8">
 							API key not found
 						</h1>
 					</div>
@@ -161,85 +185,55 @@ export const ApiKeyHeader = ({
 	return (
 		<>
 			<div className="pt-10 pb-8">
-				<Button.Root
-					onClick={() => back()}
-					variant="neutral"
-					mode="stroke"
-					size="xxsmall"
-				>
-					<Button.Icon>
-						<Icon name="chevron-left" className="h-4 w-4" />
-					</Button.Icon>
-					Back
-				</Button.Root>
-				<div className="flex justify-between pt-6">
+				<AnimatedBackButton />
+				<div className="flex items-center justify-between pt-6">
 					<div>
 						{isLoading ? (
-							<>
-								<div className="flex items-center gap-1.5">
-									<Skeleton className="h-4 w-12 rounded-full" />
-									<Skeleton className="h-1 w-1 rounded-full" />
-									<Skeleton className="h-4 w-20 rounded-full" />
-									<Skeleton className="h-1 w-1 rounded-full" />
-									<div className="flex items-center gap-1">
-										<Skeleton className="h-3.5 w-3.5 rounded-full" />
-										<Skeleton className="h-4 w-16 rounded-full" />
-									</div>
+							<div className="flex items-center gap-1.5">
+								<Skeleton className="h-4 w-12 rounded-full" />
+								<Skeleton className="h-1 w-1 rounded-full" />
+								<Skeleton className="h-4 w-20 rounded-full" />
+								<Skeleton className="h-1 w-1 rounded-full" />
+								<div className="flex items-center gap-1">
+									<Skeleton className="h-3.5 w-3.5 rounded-full" />
+									<Skeleton className="h-4 w-16 rounded-full" />
 								</div>
-								<Skeleton className="mt-2 mb-4 h-8 w-48 rounded-lg" />
-							</>
+							</div>
 						) : (
-							<>
-								<div className="flex items-center gap-1.5">
-									<p className="font-medium text-paragraph-sm text-text-sub-600">
-										API Key{" "}
+							<div className="flex items-center gap-1.5">
+								<p className="font-medium text-paragraph-xs text-text-sub-600">
+									API Key{" "}
+								</p>
+								<p className="font-semibold text-paragraph-xs text-text-sub-600">
+									•
+								</p>
+								<p className="font-medium text-paragraph-xs text-text-sub-600">
+									{isFailed
+										? "---"
+										: apiKey?.createdAt
+											? formatRelativeTime(apiKey.createdAt)
+											: "---"}
+								</p>
+								<p className="font-semibold text-paragraph-xs text-text-sub-600">
+									•
+								</p>
+								<div
+									className={`flex items-center gap-1 ${getStatusColor(apiKey?.enabled || false)}`}
+								>
+									<Icon
+										name={getStatusIcon(apiKey?.enabled || false)}
+										className="h-3.5 w-3.5"
+									/>
+									<p className="font-medium text-paragraph-xs">
+										{apiKey?.enabled ? "Enabled" : "Disabled"}
 									</p>
-									<p className="font-semibold text-paragraph-sm text-text-sub-600">
-										•
-									</p>
-									<p className="font-medium text-paragraph-sm text-text-sub-600">
-										{isFailed
-											? "---"
-											: apiKey?.createdAt
-												? formatRelativeTime(apiKey.createdAt)
-												: "---"}
-									</p>
-									<p className="font-semibold text-paragraph-sm text-text-sub-600">
-										•
-									</p>
-									<div
-										className={`flex items-center gap-1 ${getStatusColor(apiKey?.enabled || false)}`}
-									>
-										<Icon
-											name={getStatusIcon(apiKey?.enabled || false)}
-											className="h-3.5 w-3.5"
-										/>
-										<p className="font-medium text-paragraph-sm">
-											{apiKey?.enabled ? "Enabled" : "Disabled"}
-										</p>
-									</div>
 								</div>
-								<div className="flex items-center">
-									<h1 className="font-semibold text-title-h4">{displayName}</h1>
-									<Button.Root
-										variant="neutral"
-										mode="ghost"
-										size="xxsmall"
-										onClick={handleCopyPrefix}
-										className="mt-1"
-									>
-										<Icon
-											name={copied ? "check" : "clipboard-copy"}
-											className={`h-5 w-5 ${copied ? "text-green-600" : ""}`}
-										/>
-									</Button.Root>
-								</div>
-								{apiKey?.prefix && (
-									<p className="mt-2 font-mono text-label-sm text-text-sub-600">
-										{displayPrefix}
-									</p>
-								)}
-							</>
+							</div>
+						)}
+						{isLoading ? (
+							<Skeleton className="mt-2 h-7 w-48 rounded-lg" />
+						) : (
+							<h1 className="font-medium text-title-h6 leading-8">{displayName}</h1>
 						)}
 					</div>
 
@@ -258,6 +252,7 @@ export const ApiKeyHeader = ({
 								<Button.Root
 									variant="neutral"
 									size="xsmall"
+									className="font-semibold"
 									onClick={handleToggleEnabled}
 									disabled={isToggling}
 								>
@@ -274,53 +269,39 @@ export const ApiKeyHeader = ({
 								<PopoverRoot>
 									<PopoverTrigger asChild>
 										<Button.Root variant="neutral" mode="stroke" size="xsmall">
-											<Icon name="more-vertical" className="h-4 w-4 rotate-90" />
+											<Icon name="more-vertical" className="h-4 w-4 text-text-sub-600" />
 										</Button.Root>
 									</PopoverTrigger>
-									<PopoverContent align="end" side="bottom" className="p-2">
-										<div className="flex flex-col gap-1">
-											<Button.Root
-												variant="neutral"
-												mode="ghost"
-												size="small"
-												onClick={() =>
-													window.open("https://reloop.sh/docs/api-keys", "_blank")
-												}
-												className="w-full justify-start"
-											>
-												<Icon name="file-text" className="h-4 w-4" />
-												Go to docs
-											</Button.Root>
-											<Button.Root
-												variant="neutral"
-												mode="ghost"
-												size="small"
-												onClick={() => setIsRotateModalOpen(true)}
-												className="w-full justify-start"
-											>
-												<Icon name="rotate-cw" className="h-4 w-4" />
-												Rotate key
-											</Button.Root>
-											<Button.Root
-												variant="neutral"
-												mode="ghost"
-												size="small"
-												onClick={() => setIsEditModalOpen(true)}
-												className="w-full justify-start"
-											>
-												<Icon name="edit" className="h-4 w-4" />
-												Edit API key
-											</Button.Root>
-											<Button.Root
-												variant="error"
-												mode="ghost"
-												size="small"
-												onClick={() => onDeleteApiKey?.()}
-												className="w-full justify-start"
-											>
-												<Icon name="trash" className="h-4 w-4" />
-												Delete API key
-											</Button.Root>
+									<PopoverContent align="end" sideOffset={8} className="w-44 p-1.5 rounded-xl" showArrow>
+										<div className="relative">
+											{headerMenuItems.map((item, idx) => (
+												<button
+													key={item.id}
+													ref={(el) => {
+														if (el) buttonRefs.current[idx] = el;
+													}}
+													type="button"
+													onPointerEnter={() => setHoverIdx(idx)}
+													onPointerLeave={() => setHoverIdx(undefined)}
+													onClick={() => handleMenuItemClick(item.id)}
+													className={cn(
+														"flex w-full cursor-pointer items-center gap-2 rounded-lg pl-2 py-1.5 text-xs font-normal transition-colors",
+														item.isDanger ? "text-error-base" : "text-text-strong-950",
+														!currentRect && hoverIdx === idx && (item.isDanger ? "bg-red-alpha-10" : "bg-neutral-alpha-10")
+													)}
+												>
+													<Icon
+														name={item.icon}
+														className={cn("h-3.5 w-3.5", item.isDanger ? "" : "text-text-sub-600")}
+													/>
+													<span>{item.label}</span>
+												</button>
+											))}
+											<AnimatedHoverBackground
+												rect={currentRect}
+												tabElement={currentTab}
+												isDanger={isDanger}
+											/>
 										</div>
 									</PopoverContent>
 								</PopoverRoot>
@@ -329,94 +310,97 @@ export const ApiKeyHeader = ({
 					</div>
 				</div>
 
+				{/* Stats Section - Clean Horizontal Layout */}
 				{isLoading ? (
-					<div className="mt-8 mb-3 flex w-full items-center justify-between border-stroke-soft-200 border-b border-dashed pb-8">
-						<div className="flex gap-8">
-							<div className="">
-								<div className="flex items-center gap-1.5">
-									<Icon name="key-new" className="h-4 w-4 text-blue-600" />
-									<span className="font-medium text-sm text-text-sub-600">
-										Total Requests
-									</span>
-								</div>
-								<Skeleton className="h-8 w-12" />
+					<div className="mt-8 flex w-full items-center gap-8">
+						{[1, 2, 3, 4, 5].map((i) => (
+							<div key={i} className="flex items-center gap-2">
+								<Skeleton className="h-4 w-16 rounded" />
+								<Skeleton className="h-5 w-24 rounded" />
 							</div>
-							<div className="">
-								<div className="flex items-center gap-1.5">
-									<Icon name="activity-2" className="h-4 w-4 text-success-base" />
-									<span className="font-medium text-sm text-text-sub-600">
-										Remaining
-									</span>
-								</div>
-								<Skeleton className="h-8 w-12" />
-							</div>
-							<div className="">
-								<div className="flex items-center gap-1.5">
-									<Icon name="clock" className="h-4 w-4 text-text-sub-600" />
-									<span className="font-medium text-sm text-text-sub-600">
-										Last Request
-									</span>
-								</div>
-								<Skeleton className="h-8 w-16" />
-							</div>
-						</div>
+						))}
 					</div>
 				) : (
-					<div className="mt-8 mb-3 flex w-full items-center justify-between border-stroke-soft-200 border-b border-dashed pb-8">
-						<div className="flex gap-8">
-							<div className="">
-								<div className="flex items-center gap-1.5">
-									<Icon name="key-new" className="h-4 w-4 text-blue-600" />
-									<span className="font-medium text-sm text-text-sub-600">
-										Total Requests
-									</span>
-								</div>
-								<span className="font-bold text-2xl text-text-strong-950">
-									{apiKey?.requestCount || 0}
-								</span>
-							</div>
-							<div className="">
-								<div className="flex items-center gap-1.5">
-									<Icon name="activity-2" className="h-4 w-4 text-success-base" />
-									<span className="font-medium text-sm text-text-sub-600">
-										Remaining
-									</span>
-								</div>
-								<span className="text-left font-bold text-2xl text-text-strong-950">
-									{apiKey?.remaining !== null && apiKey?.remaining !== undefined
-										? apiKey.remaining
-										: "∞"}
-								</span>
-							</div>
-							<div className="">
-								<div className="flex items-center gap-1.5">
-									<Icon name="clock" className="h-4 w-4 text-text-sub-600" />
-									<span className="font-medium text-sm text-text-sub-600">
-										Last Request
-									</span>
-								</div>
-								<span className="font-bold text-2xl text-text-strong-950">
-									{apiKey?.lastRequest
-										? formatRelativeTime(apiKey.lastRequest)
-										: "Never"}
-								</span>
+					<div className="mt-8 flex w-full flex-wrap items-center gap-x-6 gap-y-5">
+						{/* API Key */}
+						<div className="flex items-center gap-2">
+							<Icon name="key-new" className="h-3.5 w-3.5 text-text-sub-600" />
+							<span className="text-paragraph-xs text-text-sub-600">Key</span>
+							<div
+								className="flex items-center gap-1 group/copy cursor-pointer"
+								onClick={handleCopyPrefix}
+							>
+								<code className="rounded bg-neutral-alpha-10 px-1.5 py-0.5 font-mono text-xs font-medium text-text-strong-950">
+									{displayPrefix}
+								</code>
+								<Icon
+									name={copied ? "check" : "copy"}
+									className={cn(
+										"h-3 w-3 transition-all",
+										copied
+											? "text-success-base"
+											: "text-text-sub-600 opacity-0 group-hover/copy:opacity-100"
+									)}
+								/>
 							</div>
 						</div>
-						{apiKey?.rateLimitEnabled && (
-							<div className="flex flex-col gap-2">
-								<div className="flex items-center gap-1.5">
-									<Icon name="gauge" className="h-4 w-4 text-text-sub-600" />
-									<span className="font-medium text-sm text-text-sub-600">
-										Rate Limit
-									</span>
+
+						<div className="h-4 w-px bg-stroke-soft-200" />
+
+						{/* Total Requests */}
+						<div className="flex items-center gap-2">
+							<Icon name="activity-2" className="h-3.5 w-3.5 text-text-sub-600" />
+							<span className="text-paragraph-xs text-text-sub-600">Requests</span>
+							<span className="font-medium text-paragraph-sm text-text-strong-950">
+								{(apiKey?.requestCount || 0).toLocaleString()}
+							</span>
+						</div>
+
+						<div className="h-4 w-px bg-stroke-soft-200" />
+
+						{/* Last Used */}
+						<div className="flex items-center gap-2">
+							<Icon name="clock" className="h-3.5 w-3.5 text-text-sub-600" />
+							<span className="text-paragraph-xs text-text-sub-600">Last used</span>
+							<span className="font-medium text-paragraph-sm text-text-strong-950">
+								{apiKey?.lastRequest
+									? formatRelativeTime(apiKey.lastRequest)
+									: "Never"}
+							</span>
+						</div>
+
+						<div className="h-4 w-px bg-stroke-soft-200" />
+
+						{/* Created */}
+						<div className="flex items-center gap-2">
+							<Icon name="calendar" className="h-3.5 w-3.5 text-text-sub-600" />
+							<span className="text-paragraph-xs text-text-sub-600">Created</span>
+							<span className="font-medium text-paragraph-sm text-text-strong-950">
+								{apiKey?.createdAt
+									? formatRelativeTime(apiKey.createdAt)
+									: "---"}
+							</span>
+						</div>
+
+						{/* Creator */}
+						{apiKey?.createdBy?.email && (
+							<>
+								<div className="h-4 w-px bg-stroke-soft-200" />
+								<div className="flex items-center gap-2">
+									<Icon name="user" className="h-3.5 w-3.5 text-text-sub-600" />
+									<span className="text-paragraph-xs text-text-sub-600">By</span>
+									<div className="flex items-center gap-1.5">
+										<Avatar.Root size="16">
+											{apiKey.createdBy.image ? (
+												<Avatar.Image src={apiKey.createdBy.image} alt={apiKey.createdBy.name || "User"} />
+											) : null}
+										</Avatar.Root>
+										<span className="font-medium text-paragraph-sm text-text-strong-950">
+											{apiKey.createdBy.name || apiKey.createdBy.email || "Unknown"}
+										</span>
+									</div>
 								</div>
-								<div className="rounded-lg border border-stroke-soft-200 bg-bg-weak-50 py-0.5 pr-0.5 pl-2">
-									<span className="w-42 font-medium text-xs">
-										{apiKey.rateLimitMax} /{" "}
-										{Math.round(apiKey.rateLimitTimeWindow / 1000)}s
-									</span>
-								</div>
-							</div>
+							</>
 						)}
 					</div>
 				)}

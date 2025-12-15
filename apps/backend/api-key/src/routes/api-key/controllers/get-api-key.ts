@@ -20,6 +20,7 @@ export async function getApiKey(
 				eq(schema.apikey.organizationId, organizationId),
 				eq(schema.apikey.userId, userId),
 			),
+			with: { user: true },
 		});
 
 		if (!result) {
@@ -27,8 +28,17 @@ export async function getApiKey(
 			throw status(404, { message: "API key not found" });
 		}
 
+		const { user, ...apiKeyData } = result;
 		logger.info({ apiKeyId }, "API key retrieved successfully");
-		return formatApiKeyResponse(result);
+		return formatApiKeyResponse({
+			...apiKeyData,
+			createdBy: {
+				id: user.id,
+				name: user.name,
+				image: user.image,
+				email: user.email,
+			},
+		});
 	} catch (error) {
 		logger.error(
 			{
