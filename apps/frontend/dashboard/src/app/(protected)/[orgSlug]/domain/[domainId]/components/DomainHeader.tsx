@@ -18,6 +18,7 @@ import { Skeleton } from "@reloop/ui/skeleton";
 import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 import { DeleteDomainModal } from "../../components/delete-domain";
+import Spinner from "@reloop/ui/spinner";
 
 interface DomainHeaderProps {
 	domainId: string;
@@ -117,13 +118,13 @@ export const DomainHeader = ({
 						<>
 							<Button.Root
 								variant="neutral"
-								size="small"
-								className="font-semibold"
+								size="xsmall"
 								onClick={onVerify}
 								disabled={isVerifying || status === "verifying"}
 							>
 								{isVerifying || status === "verifying" ? (
 									<>
+										<Spinner size={16} color="white" />
 										Verifying
 									</>
 								) : (
@@ -133,7 +134,7 @@ export const DomainHeader = ({
 							<PopoverRoot>
 								<PopoverTrigger asChild>
 									<Button.Root variant="neutral" mode="stroke" size="xsmall">
-										<Icon name="more-vertical" className="h-4 w-4 text-text-sub-600" />
+										<Icon name="more-vertical" className="h-3.5 w-3.5 text-text-sub-600" />
 									</Button.Root>
 								</PopoverTrigger>
 								<PopoverContent align="end" sideOffset={8} className="w-44 p-1.5 rounded-xl" showArrow>
