@@ -10,6 +10,7 @@ import useSWR from "swr";
 import { toast } from "sonner";
 import { ContactTable } from "./contact-table";
 import { DeleteContactModal } from "./delete-contact";
+import { EmptyState } from "./empty-state";
 
 interface Contact {
   id: string;
@@ -116,17 +117,7 @@ export const ContactList = () => {
   }
 
   if (!isLoading && data?.contacts && data.contacts.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-16">
-        <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-bg-weak-50">
-          <Icon name="users" className="h-8 w-8 text-text-sub-600" />
-        </div>
-        <h3 className="mb-2 font-medium text-lg text-text-strong-950">No contacts yet</h3>
-        <p className="max-w-sm text-center text-paragraph-sm text-text-sub-600">
-          Add contacts using the "Add Contact" button above.
-        </p>
-      </div>
-    );
+    return <EmptyState />;
   }
 
   return (

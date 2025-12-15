@@ -8,18 +8,169 @@ interface EmptyStateProps {
 
 export const EmptyState = ({ onAddContact }: EmptyStateProps) => {
   return (
-    <div className="flex flex-col items-center justify-center py-16">
-      <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-bg-weak-50">
-        <Icon name="user-plus" className="h-8 w-8 text-text-sub-600" />
+    <div className="flex flex-col items-center justify-center h-[calc(100dvh-150px)] animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="relative mb-8 flex items-center justify-center">
+        {/* Left side floating orbs */}
+        <div className="absolute -left-24 -top-4 flex flex-col gap-3 items-end">
+          <div
+            className="h-6 w-6 rounded-full bg-neutral-alpha-24"
+            style={{ animation: "floatOrb 3s ease-in-out infinite" }}
+          />
+          <div
+            className="h-3 w-3 rounded-full bg-neutral-alpha-16 -mr-2"
+            style={{ animation: "floatOrb 3s ease-in-out infinite 0.5s" }}
+          />
+        </div>
+
+        {/* Center icon container */}
+        <div className="relative">
+          <div className="absolute -top-3 -left-3 h-16 w-16 rounded-full bg-neutral-alpha-10 animate-pulse" />
+          <div
+            className="absolute -right-2 -bottom-2 h-12 w-12 rounded-full bg-neutral-alpha-10 animate-pulse"
+            style={{ animationDelay: "1s" }}
+          />
+          <div className="relative flex h-20 w-20 items-center justify-center rounded-2xl border border-stroke-soft-200/50 bg-bg-white-0 shadow-regular-md group">
+            <div className="relative">
+              <div
+                className="absolute inset-0 blur-xl rounded-full bg-primary-alpha-16 animate-pulse"
+                style={{ animationDuration: "2s" }}
+              />
+              {/* User plus icon with wiggle animation */}
+              <Icon
+                name="user-plus"
+                className="relative h-10 w-10 text-natural-base"
+                style={{
+                  animation: "iconWiggle 4s ease-in-out infinite",
+                }}
+              />
+            </div>
+          </div>
+          <div
+            className="absolute top-0 right-0 h-2 w-2 rounded-full bg-primary-alpha-24"
+            style={{
+              animation: "floatParticle 3s ease-in-out infinite",
+            }}
+          />
+          <div
+            className="absolute bottom-4 left-0 h-1.5 w-1.5 rounded-full bg-primary-alpha-16"
+            style={{
+              animation: "floatParticle 3s ease-in-out infinite 0.5s",
+            }}
+          />
+        </div>
+
+        {/* Right side floating orbs - mirroring left side */}
+        <div className="absolute -right-24 flex flex-col gap-3 items-start">
+          <div
+            className="h-6 w-6 rounded-full bg-neutral-alpha-24"
+            style={{ animation: "floatOrb 3s ease-in-out infinite 0.3s" }}
+          />
+          <div
+            className="h-3 w-3 rounded-full bg-neutral-alpha-16 -ml-2"
+            style={{ animation: "floatOrb 3s ease-in-out infinite 0.8s" }}
+          />
+        </div>
       </div>
-      <h3 className="mb-2 font-medium text-lg">No contacts yet</h3>
-      <p className="mb-6 max-w-sm text-center text-sm text-text-sub-600">
-        Add contacts to this topic to start managing their subscriptions.
-      </p>
-      <Button.Root variant="neutral" size="small" onClick={onAddContact}>
-        <Icon name="plus" className="h-4 w-4" />
-        Add first contact
-      </Button.Root>
+
+      {/* Content */}
+      <div className="flex max-w-md flex-col items-center text-center">
+        <h3
+          className="mb-2 font-semibold text-text-strong-950 text-xl animate-in fade-in slide-in-from-bottom-2 duration-500"
+          style={{ animationDelay: "150ms", animationFillMode: "backwards" }}
+        >
+          No contacts yet
+        </h3>
+        <p
+          className="mb-2 text-text-sub-600 text-sm animate-in fade-in slide-in-from-bottom-2 duration-500"
+          style={{ animationDelay: "250ms", animationFillMode: "backwards" }}
+        >
+          Add contacts to this topic to start managing their subscriptions.
+        </p>
+        <p
+          className="mb-6 text-text-soft-400 text-xs animate-in fade-in slide-in-from-bottom-2 duration-500"
+          style={{ animationDelay: "350ms", animationFillMode: "backwards" }}
+        >
+          Contacts can be added individually or imported in bulk.
+        </p>
+
+        {/* CTA */}
+        <div
+          className="animate-in fade-in slide-in-from-bottom-2 duration-500"
+          style={{ animationDelay: "450ms", animationFillMode: "backwards" }}
+        >
+          <Button.Root variant="neutral" size="small" onClick={onAddContact}>
+            <Icon name="plus" className="h-4 w-4" />
+            Add first contact
+          </Button.Root>
+        </div>
+
+        {/* Help link */}
+        <a
+          href="https://reloop.sh/docs/contacts"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-4 flex items-center gap-1 text-text-sub-600 text-xs transition-colors hover:text-text-strong-950 animate-in fade-in slide-in-from-bottom-2 duration-500"
+          style={{ animationDelay: "550ms", animationFillMode: "backwards" }}
+        >
+          <Icon name="book-closed" className="h-3 w-3" />
+          Learn more about contacts
+        </a>
+      </div>
+
+      {/* Custom keyframe animations */}
+      <style jsx global>{`
+				@keyframes iconWiggle {
+					0%, 100% {
+						transform: rotate(0deg) scale(1);
+					}
+					15% {
+						transform: rotate(-12deg) scale(1.05);
+					}
+					30% {
+						transform: rotate(10deg) scale(1.02);
+					}
+					45% {
+						transform: rotate(-8deg) scale(1.03);
+					}
+					60% {
+						transform: rotate(5deg) scale(1);
+					}
+					75% {
+						transform: rotate(-3deg) scale(1);
+					}
+					90% {
+						transform: rotate(0deg) scale(1);
+					}
+				}
+
+				@keyframes floatParticle {
+					0%, 100% {
+						transform: translateY(0) translateX(0) scale(1);
+						opacity: 0.6;
+					}
+					25% {
+						transform: translateY(-6px) translateX(3px) scale(1.2);
+						opacity: 1;
+					}
+					50% {
+						transform: translateY(-10px) translateX(-2px) scale(0.8);
+						opacity: 0.8;
+					}
+					75% {
+						transform: translateY(-4px) translateX(4px) scale(1.1);
+						opacity: 0.5;
+					}
+				}
+
+				@keyframes floatOrb {
+					0%, 100% {
+						transform: translateY(0);
+					}
+					50% {
+						transform: translateY(-8px);
+					}
+				}
+			`}</style>
     </div>
   );
 };

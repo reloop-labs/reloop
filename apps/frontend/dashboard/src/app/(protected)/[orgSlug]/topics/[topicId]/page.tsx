@@ -199,6 +199,8 @@ const TopicDetailPage = () => {
 
   return (
     <div className="mx-auto max-w-3xl sm:px-8">
+      <EmptyState onAddContact={() => setShowAddContact(true)} />
+
       <TopicHeader
         topic={topicData || null}
         isLoading={topicLoading}

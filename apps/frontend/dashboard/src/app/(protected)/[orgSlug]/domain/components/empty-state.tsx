@@ -2,16 +2,13 @@
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
-import { Globe3D } from "@fe/dashboard/components/three/globe-3d";
 import Link from "next/link";
-import { Suspense } from "react";
 
 export const EmptyState = () => {
 	const { activeOrganization } = useUserOrganization();
 
 	return (
 		<div className="flex flex-col items-center justify-center h-[calc(100dvh-150px)] animate-in fade-in slide-in-from-bottom-4 duration-500">
-			{/* Illustration with floating orbs */}
 			<div className="relative mb-8 flex items-center justify-center">
 				{/* Left side floating orbs */}
 				<div className="absolute -left-24 -top-4 flex flex-col gap-3 items-end">
@@ -25,22 +22,41 @@ export const EmptyState = () => {
 					/>
 				</div>
 
-				{/* Background circle */}
-				<div className="absolute h-36 w-36 rounded-full border border-stroke-soft-200/50" />
-
-				{/* 3D Globe - no box container */}
-				<div className="relative z-10">
-					<Suspense
-						fallback={
+				{/* Center icon container */}
+				<div className="relative">
+					<div className="absolute -top-3 -left-3 h-16 w-16 rounded-full bg-neutral-alpha-10 animate-pulse" />
+					<div
+						className="absolute -right-2 -bottom-2 h-12 w-12 rounded-full bg-neutral-alpha-10 animate-pulse"
+						style={{ animationDelay: "1s" }}
+					/>
+					<div className="relative flex h-20 w-20 items-center justify-center rounded-2xl border border-stroke-soft-200/50 bg-bg-white-0 shadow-regular-md group">
+						<div className="relative">
+							<div
+								className="absolute inset-0 blur-xl rounded-full bg-primary-alpha-16 animate-pulse"
+								style={{ animationDuration: "2s" }}
+							/>
+							{/* Globe icon with wiggle animation */}
 							<Icon
 								name="globe"
-								className="h-16 w-16 text-text-sub-600 animate-spin"
-								style={{ animationDuration: "3s" }}
+								className="relative h-10 w-10 text-natural-base"
+								style={{
+									animation: "globeWiggle 4s ease-in-out infinite",
+								}}
 							/>
-						}
-					>
-						<Globe3D size={160} />
-					</Suspense>
+						</div>
+					</div>
+					<div
+						className="absolute top-0 right-0 h-2 w-2 rounded-full bg-primary-alpha-24"
+						style={{
+							animation: "floatParticle 3s ease-in-out infinite",
+						}}
+					/>
+					<div
+						className="absolute bottom-4 left-0 h-1.5 w-1.5 rounded-full bg-primary-alpha-16"
+						style={{
+							animation: "floatParticle 3s ease-in-out infinite 0.5s",
+						}}
+					/>
 				</div>
 
 				{/* Right side floating orbs - mirroring left side */}
@@ -109,6 +125,49 @@ export const EmptyState = () => {
 
 			{/* Custom keyframe animations */}
 			<style jsx global>{`
+				@keyframes globeWiggle {
+					0%, 100% {
+						transform: rotate(0deg) scale(1);
+					}
+					15% {
+						transform: rotate(-12deg) scale(1.05);
+					}
+					30% {
+						transform: rotate(10deg) scale(1.02);
+					}
+					45% {
+						transform: rotate(-8deg) scale(1.03);
+					}
+					60% {
+						transform: rotate(5deg) scale(1);
+					}
+					75% {
+						transform: rotate(-3deg) scale(1);
+					}
+					90% {
+						transform: rotate(0deg) scale(1);
+					}
+				}
+
+				@keyframes floatParticle {
+					0%, 100% {
+						transform: translateY(0) translateX(0) scale(1);
+						opacity: 0.6;
+					}
+					25% {
+						transform: translateY(-6px) translateX(3px) scale(1.2);
+						opacity: 1;
+					}
+					50% {
+						transform: translateY(-10px) translateX(-2px) scale(0.8);
+						opacity: 0.8;
+					}
+					75% {
+						transform: translateY(-4px) translateX(4px) scale(1.1);
+						opacity: 0.5;
+					}
+				}
+
 				@keyframes floatOrb {
 					0%, 100% {
 						transform: translateY(0);

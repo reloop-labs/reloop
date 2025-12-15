@@ -21,14 +21,6 @@ const apiKeySchema = v.object({
 	name: v.optional(
 		v.pipe(v.string(), v.minLength(1, "Name must be at least 1 character")),
 	),
-	expiresAt: v.optional(v.union([v.string(), v.null()])),
-	enabled: v.optional(v.boolean()),
-	rateLimitEnabled: v.optional(v.boolean()),
-	rateLimitMax: v.optional(v.pipe(v.number(), v.minValue(0, "Must be >= 0"))),
-	rateLimitTimeWindow: v.optional(
-		v.pipe(v.number(), v.minValue(0, "Must be >= 0")),
-	),
-	permissions: v.optional(v.union([v.string(), v.null()])),
 });
 
 type ApiKeyFormValues = v.InferInput<typeof apiKeySchema>;
@@ -63,20 +55,13 @@ export const CreateApiKeyModal = ({
 		useState<ApiKeyWithKeyResponse | null>(null);
 	const [keyRevealed, setKeyRevealed] = useState(false);
 
-	const { register, handleSubmit, formState, reset, setError, watch } =
+	const { register, handleSubmit, formState, reset } =
 		useForm<ApiKeyFormValues>({
 			resolver: valibotResolver(apiKeySchema) as Resolver<ApiKeyFormValues>,
 			defaultValues: {
 				name: "",
-				enabled: true,
-				rateLimitEnabled: false,
-				rateLimitMax: 1000,
-				rateLimitTimeWindow: 60000,
-				permissions: "",
 			},
 		});
-
-	const rateLimitEnabled = watch("rateLimitEnabled");
 
 	const onSubmit = async (data: ApiKeyFormValues) => {
 		if (!activeOrganization?.id) return;
@@ -85,15 +70,6 @@ export const CreateApiKeyModal = ({
 			changeStatus("loading");
 			const payload: Record<string, unknown> = {};
 			if (data.name) payload.name = data.name;
-			if (data.expiresAt) payload.expiresAt = data.expiresAt;
-			if (data.enabled !== undefined) payload.enabled = data.enabled;
-			if (data.rateLimitEnabled !== undefined)
-				payload.rateLimitEnabled = data.rateLimitEnabled;
-			if (data.rateLimitMax !== undefined)
-				payload.rateLimitMax = data.rateLimitMax;
-			if (data.rateLimitTimeWindow !== undefined)
-				payload.rateLimitTimeWindow = data.rateLimitTimeWindow;
-			if (data.permissions) payload.permissions = data.permissions;
 
 			const response = await axios.post<ApiKeyWithKeyResponse>(
 				"/api/api-key/v1/",
@@ -232,11 +208,15 @@ export const CreateApiKeyModal = ({
 		<Modal.Root open={isOpen} onOpenChange={handleClose}>
 			<Modal.Content className="data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom-4 data-[state=open]:zoom-in-95 data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-bottom-4 data-[state=closed]:zoom-out-95 max-w-lg duration-200 data-[state=closed]:animate-out data-[state=open]:animate-in">
 				<form onSubmit={handleSubmit(onSubmit)}>
-					<Modal.Body>
-						<h2 className="mb-6 font-semibold text-gray-900 text-xl">
+					<Modal.Header>
+						<Modal.Title className="flex items-center gap-2">
+							<Icon name="key-new" className="h-5 w-5" />
 							Create API Key
-						</h2>
-						<div className="space-y-3">
+						</Modal.Title>
+						<Modal.Close />
+					</Modal.Header>
+					<Modal.Body>
+						<div className="space-y-4">
 							<div>
 								<Label.Root htmlFor="name">
 									Name
@@ -255,139 +235,6 @@ export const CreateApiKeyModal = ({
 								{formState.errors.name && (
 									<p className="mt-1 text-red-600 text-sm">
 										{formState.errors.name.message}
-									</p>
-								)}
-							</div>
-
-							<div>
-								<Label.Root htmlFor="expiresAt">
-									Expires At
-									<Label.Asterisk />
-								</Label.Root>
-								<Input.Root className="mt-1">
-									<Input.Wrapper>
-										<Input.Input
-											className="px-2"
-											id="expiresAt"
-											type="datetime-local"
-											{...register("expiresAt")}
-										/>
-									</Input.Wrapper>
-								</Input.Root>
-								{formState.errors.expiresAt && (
-									<p className="mt-1 text-red-600 text-sm">
-										{formState.errors.expiresAt.message}
-									</p>
-								)}
-							</div>
-
-							<div>
-								<Label.Root
-									htmlFor="enabled"
-									className="flex items-center gap-2"
-								>
-									<input
-										id="enabled"
-										type="checkbox"
-										{...register("enabled")}
-										className="rounded"
-									/>
-									<span>Enabled</span>
-								</Label.Root>
-							</div>
-
-							<div className="space-y-2 rounded-lg border border-stroke-soft-200 bg-bg-weak-50 p-3">
-								<div>
-									<Label.Root
-										htmlFor="rateLimitEnabled"
-										className="flex items-center gap-2"
-									>
-										<input
-											id="rateLimitEnabled"
-											type="checkbox"
-											{...register("rateLimitEnabled")}
-											className="rounded"
-										/>
-										<span>Enable Rate Limiting</span>
-									</Label.Root>
-								</div>
-
-								{rateLimitEnabled && (
-									<>
-										<div>
-											<Label.Root htmlFor="rateLimitMax">
-												Max Requests
-												<Label.Asterisk />
-											</Label.Root>
-											<Input.Root className="mt-1">
-												<Input.Wrapper>
-													<Input.Input
-														className="px-2"
-														id="rateLimitMax"
-														type="number"
-														placeholder="1000"
-														{...register("rateLimitMax", {
-															valueAsNumber: true,
-														})}
-													/>
-												</Input.Wrapper>
-											</Input.Root>
-											{formState.errors.rateLimitMax && (
-												<p className="mt-1 text-red-600 text-sm">
-													{formState.errors.rateLimitMax.message}
-												</p>
-											)}
-										</div>
-
-										<div>
-											<Label.Root htmlFor="rateLimitTimeWindow">
-												Time Window (ms)
-												<Label.Asterisk />
-											</Label.Root>
-											<Input.Root className="mt-1">
-												<Input.Wrapper>
-													<Input.Input
-														className="px-2"
-														id="rateLimitTimeWindow"
-														type="number"
-														placeholder="60000"
-														{...register("rateLimitTimeWindow", {
-															valueAsNumber: true,
-														})}
-													/>
-												</Input.Wrapper>
-											</Input.Root>
-											{formState.errors.rateLimitTimeWindow && (
-												<p className="mt-1 text-red-600 text-sm">
-													{formState.errors.rateLimitTimeWindow.message}
-												</p>
-											)}
-										</div>
-									</>
-								)}
-							</div>
-
-							<div>
-								<Label.Root htmlFor="permissions">
-									Permissions
-									<Label.Asterisk />
-								</Label.Root>
-								<Input.Root className="mt-1">
-									<Input.Wrapper>
-										<Input.Input
-											className="px-2"
-											id="permissions"
-											placeholder="read,write"
-											{...register("permissions")}
-										/>
-									</Input.Wrapper>
-								</Input.Root>
-								<p className="mt-1 text-gray-500 text-xs">
-									Comma-separated list of permissions
-								</p>
-								{formState.errors.permissions && (
-									<p className="mt-1 text-red-600 text-sm">
-										{formState.errors.permissions.message}
 									</p>
 								)}
 							</div>
@@ -427,3 +274,4 @@ export const CreateApiKeyModal = ({
 		</Modal.Root>
 	);
 };
+
