@@ -133,7 +133,7 @@ export const DNSRecordTable = ({
 									{...getAnimationProps(index + 1, 0)}
 									className="flex items-center"
 								>
-									<span className="inline-flex items-center rounded-md bg-neutral-alpha-10 px-2 py-0.5 text-[11px] font-medium text-text-strong-950 ml-2">
+									<span className="inline-flex items-center rounded-md dark:bg-neutral-alpha-16 bg-neutral-alpha-10 px-2 py-0.5 text-xs font-semibold text-text-strong-950 ml-2">
 										{record.recordType}
 									</span>
 								</motion.div>
@@ -234,13 +234,13 @@ export const DNSRecordTable = ({
 									>
 										<div
 											className={cn(
-												"inline-flex items-center gap-1.5 rounded-md pr-2 py-0.5 text-[11px] font-medium capitalize",
+												"inline-flex items-center gap-1.5 rounded-md pr-2 py-0.5 text-[13px] font-medium capitalize",
 												getStatusColorClass(record.status)
 											)}
 										>
 											<Icon
 												name={getStatusIcon(record.status)}
-												className="h-3 w-3"
+												className="h-3.5 w-3.5"
 											/>
 											{getStatusLabel(record.status)}
 										</div>
