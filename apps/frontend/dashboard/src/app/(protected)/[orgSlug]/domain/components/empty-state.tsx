@@ -2,54 +2,58 @@
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
+import { Globe3D } from "@fe/dashboard/components/three/globe-3d";
 import Link from "next/link";
+import { Suspense } from "react";
 
 export const EmptyState = () => {
 	const { activeOrganization } = useUserOrganization();
 
 	return (
 		<div className="flex flex-col items-center justify-center h-[calc(100dvh-150px)] animate-in fade-in slide-in-from-bottom-4 duration-500">
-			{/* Illustration */}
-			<div className="relative mb-8">
-				{/* Background decorative elements */}
-				<div className="absolute -top-3 -left-3 h-16 w-16 rounded-full bg-neutral-alpha-10 animate-pulse" />
-				<div
-					className="absolute -right-2 -bottom-2 h-12 w-12 rounded-full bg-neutral-alpha-10 animate-pulse"
-					style={{ animationDelay: "1s" }}
-				/>
-
-				{/* Main icon container */}
-				<div className="relative flex h-20 w-20 items-center justify-center rounded-2xl border border-stroke-soft-200/50 bg-bg-white-0 shadow-regular-md group">
-					<div className="relative">
-						{/* Glow effect behind icon */}
-						<div
-							className="absolute inset-0 blur-xl rounded-full bg-primary-alpha-16 animate-pulse"
-							style={{ animationDuration: "2s" }}
-						/>
-						{/* Globe with spin animation */}
-						<Icon
-							name="globe"
-							className="relative h-10 w-10 text-natural-base"
-							style={{
-								animation: "globeSpin 8s linear infinite",
-							}}
-						/>
-					</div>
+			{/* Illustration with floating orbs */}
+			<div className="relative mb-8 flex items-center justify-center">
+				{/* Left side floating orbs */}
+				<div className="absolute -left-24 -top-4 flex flex-col gap-3 items-end">
+					<div
+						className="h-6 w-6 rounded-full bg-neutral-alpha-24"
+						style={{ animation: "floatOrb 3s ease-in-out infinite" }}
+					/>
+					<div
+						className="h-3 w-3 rounded-full bg-neutral-alpha-16 -mr-2"
+						style={{ animation: "floatOrb 3s ease-in-out infinite 0.5s" }}
+					/>
 				</div>
 
-				{/* Floating particles around the globe */}
-				<div
-					className="absolute top-0 right-0 h-2 w-2 rounded-full bg-primary-alpha-24"
-					style={{
-						animation: "floatParticle 3s ease-in-out infinite",
-					}}
-				/>
-				<div
-					className="absolute bottom-4 left-0 h-1.5 w-1.5 rounded-full bg-primary-alpha-16"
-					style={{
-						animation: "floatParticle 3s ease-in-out infinite 0.5s",
-					}}
-				/>
+				{/* Background circle */}
+				<div className="absolute h-36 w-36 rounded-full border border-stroke-soft-200/50" />
+
+				{/* 3D Globe - no box container */}
+				<div className="relative z-10">
+					<Suspense
+						fallback={
+							<Icon
+								name="globe"
+								className="h-16 w-16 text-text-sub-600 animate-spin"
+								style={{ animationDuration: "3s" }}
+							/>
+						}
+					>
+						<Globe3D size={160} />
+					</Suspense>
+				</div>
+
+				{/* Right side floating orbs - mirroring left side */}
+				<div className="absolute -right-24 flex flex-col gap-3 items-start">
+					<div
+						className="h-6 w-6 rounded-full bg-neutral-alpha-24"
+						style={{ animation: "floatOrb 3s ease-in-out infinite 0.3s" }}
+					/>
+					<div
+						className="h-3 w-3 rounded-full bg-neutral-alpha-16 -ml-2"
+						style={{ animation: "floatOrb 3s ease-in-out infinite 0.8s" }}
+					/>
+				</div>
 			</div>
 
 			{/* Content */}
@@ -105,31 +109,12 @@ export const EmptyState = () => {
 
 			{/* Custom keyframe animations */}
 			<style jsx global>{`
-				@keyframes globeSpin {
-					0% {
-						transform: rotateY(0deg);
-					}
-					100% {
-						transform: rotateY(360deg);
-					}
-				}
-
-				@keyframes floatParticle {
+				@keyframes floatOrb {
 					0%, 100% {
-						transform: translateY(0) translateX(0) scale(1);
-						opacity: 0.6;
-					}
-					25% {
-						transform: translateY(-6px) translateX(3px) scale(1.2);
-						opacity: 1;
+						transform: translateY(0);
 					}
 					50% {
-						transform: translateY(-10px) translateX(-2px) scale(0.8);
-						opacity: 0.8;
-					}
-					75% {
-						transform: translateY(-4px) translateX(4px) scale(1.1);
-						opacity: 0.5;
+						transform: translateY(-8px);
 					}
 				}
 			`}</style>
