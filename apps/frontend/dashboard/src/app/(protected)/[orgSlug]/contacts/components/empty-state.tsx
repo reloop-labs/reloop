@@ -73,7 +73,7 @@ export const EmptyState = () => {
 
   return (
     <motion.div
-      className="flex flex-col items-center justify-center h-[calc(100dvh-150px)]"
+      className="flex flex-col items-center justify-center h-[calc(100dvh-300px)]"
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}

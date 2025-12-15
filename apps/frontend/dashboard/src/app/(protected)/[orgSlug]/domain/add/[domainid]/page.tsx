@@ -140,35 +140,24 @@ const NewDomainPage = () => {
 						You have successfully added the domain
 					</p>
 				</div>
-				<div className="flex items-center gap-2">
-					<Button.Root
-						onClick={handleVerifyAndNavigate}
-						size="xsmall"
-						variant="neutral"
-						disabled={isVerifying}
-					>
-						{isVerifying ? (
-							<>
-								<Button.Icon>
-									<Icon name="loader" className="h-4 w-4 animate-spin" />
-								</Button.Icon>
-								Verifying
-							</>
-						) : (
-							"I have added the DNS records"
-						)}
-					</Button.Root>
-					<Button.Root
-						variant="neutral"
-						mode="stroke"
-						size="xsmall"
-						onClick={() =>
-							window.open("https://reloop.sh/docs/domain", "_blank")
-						}
-					>
-						<Icon name="file-text" className="h-4 w-4" />
-					</Button.Root>
-				</div>
+				<Button.Root
+					onClick={handleVerifyAndNavigate}
+					size="xsmall"
+					variant="neutral"
+					disabled={isVerifying}
+				>
+					{isVerifying ? (
+						<>
+							<Button.Icon>
+								<Icon name="loader" className="h-4 w-4 animate-spin" />
+							</Button.Icon>
+							Verifying
+						</>
+					) : (
+						"I have added the DNS records"
+					)}
+				</Button.Root>
+
 			</div>
 
 			<div className="relative my-10">

@@ -75,16 +75,6 @@ export const AddDomainSidebar = () => {
 						You need a domain to send emails from your own domain
 					</p>
 				</div>
-
-				<Button.Root
-					variant="neutral"
-					mode="stroke"
-					size="xsmall"
-					onClick={() => window.open("https://reloop.sh/docs/domain", "_blank")}
-				>
-					<Icon name="file-text" className="h-4 w-4" />
-					Go to docs
-				</Button.Root>
 			</div>
 
 			<div className="my-6 gap-3">

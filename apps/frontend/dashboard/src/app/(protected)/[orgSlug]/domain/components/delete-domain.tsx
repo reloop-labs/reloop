@@ -54,7 +54,9 @@ export const DeleteDomainModal = ({ domains }: DeleteDomainModalProps) => {
 				headers: { credentials: "include" },
 			});
 			await mutate(
-				`/api/domain/v1/list?organizationId=${activeOrganization?.id}&limit=100`,
+				(key) =>
+					typeof key === "string" &&
+					key.startsWith(`/api/domain/v1/list?organizationId=${activeOrganization?.id}`),
 			);
 
 			toast.success(`${domainToDelete.domain} deleted successfully`);

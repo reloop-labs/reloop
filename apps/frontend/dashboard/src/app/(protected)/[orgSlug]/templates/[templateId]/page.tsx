@@ -181,7 +181,7 @@ const TemplateEditorPage = () => {
 
     if (error) {
         return (
-            <div className="flex flex-col items-center justify-center h-[calc(100vh-120px)]">
+            <div className="flex flex-col items-center justify-center h-[calc(100dvh-300px)]">
                 <Icon name="alert-circle" className="h-12 w-12 text-red-500" />
                 <h3 className="mt-4 font-medium text-lg">Template not found</h3>
                 <Link

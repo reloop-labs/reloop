@@ -11,7 +11,7 @@ import { useQueryState, parseAsInteger } from "nuqs";
 import useSWR from "swr";
 import { DeleteDomainModal } from "./delete-domain";
 import { DomainFilterDropdown, type DomainStatusFilters } from "./domain-filter-dropdown";
-import { DomainSDK } from "./domain-sdk";
+
 import { DomainTable } from "./domain-table";
 import { EmptyState } from "./empty-state";
 import { PageSizeDropdown } from "./page-size-dropdown";
@@ -66,7 +66,6 @@ export const DomainListSidebar = () => {
 						<Icon name="plus" className="h-4 w-4" />
 						Add domain
 					</Link>
-					<DomainSDK />
 				</div>
 			</div>
 			<div>
