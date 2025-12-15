@@ -215,7 +215,7 @@ const MailboxesPage = () => {
 															type="button"
 															className="flex items-center gap-2 rounded-lg p-2 text-paragraph-sm text-text-strong-950 transition-colors hover:bg-bg-weak-50"
 														>
-															<Icon name="key" className="h-4 w-4" />
+															<Icon name="key-new" className="h-4 w-4" />
 															Reset Password
 														</button>
 														<button

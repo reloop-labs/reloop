@@ -8,9 +8,13 @@ import {
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
+import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useSWRConfig } from "swr";
+import { EditApiKeyModal } from "../../components/edit-api-key-modal";
+import { RotateApiKeyModal } from "../../components/rotate-api-key-modal";
 
 interface ApiKeyData {
 	id: string;
@@ -58,7 +62,11 @@ export const ApiKeyHeader = ({
 	onDeleteApiKey,
 }: ApiKeyHeaderProps) => {
 	const { back } = useRouter();
+	const { mutate } = useSWRConfig();
 	const [copied, setCopied] = useState(false);
+	const [isToggling, setIsToggling] = useState(false);
+	const [isRotateModalOpen, setIsRotateModalOpen] = useState(false);
+	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
 	const handleCopyPrefix = async () => {
 		const textToCopy = apiKey?.start || apiKey?.prefix || "";
@@ -71,6 +79,35 @@ export const ApiKeyHeader = ({
 			} catch {
 				toast.error("Failed to copy prefix");
 			}
+		}
+	};
+
+	const handleToggleEnabled = async () => {
+		if (!apiKey) return;
+
+		try {
+			setIsToggling(true);
+			const endpoint = apiKey.enabled
+				? `/api/api-key/v1/${apiKey.id}/disable`
+				: `/api/api-key/v1/${apiKey.id}/enable`;
+
+			await axios.post(endpoint, {}, { headers: { credentials: "include" } });
+
+			await mutate(`/api/api-key/v1/${apiKey.id}`);
+			await mutate("/api/api-key/v1/?limit=100");
+
+			toast.success(
+				apiKey.enabled
+					? "API key disabled successfully"
+					: "API key enabled successfully",
+			);
+		} catch (error) {
+			const errorMessage = axios.isAxiosError(error)
+				? error.response?.data?.message || "Failed to toggle API key"
+				: "Failed to toggle API key";
+			toast.error(errorMessage);
+		} finally {
+			setIsToggling(false);
 		}
 	};
 
@@ -122,270 +159,285 @@ export const ApiKeyHeader = ({
 	const displayPrefix = apiKey?.start || apiKey?.prefix || "---";
 
 	return (
-		<div className="pt-10 pb-8">
-			<Button.Root
-				onClick={() => back()}
-				variant="neutral"
-				mode="stroke"
-				size="xxsmall"
-			>
-				<Button.Icon>
-					<Icon name="chevron-left" className="h-4 w-4" />
-				</Button.Icon>
-				Back
-			</Button.Root>
-			<div className="flex justify-between pt-6">
-				<div>
-					{isLoading ? (
-						<>
-							<div className="flex items-center gap-1.5">
-								<Skeleton className="h-4 w-12 rounded-full" />
-								<Skeleton className="h-1 w-1 rounded-full" />
-								<Skeleton className="h-4 w-20 rounded-full" />
-								<Skeleton className="h-1 w-1 rounded-full" />
-								<div className="flex items-center gap-1">
-									<Skeleton className="h-3.5 w-3.5 rounded-full" />
-									<Skeleton className="h-4 w-16 rounded-full" />
+		<>
+			<div className="pt-10 pb-8">
+				<Button.Root
+					onClick={() => back()}
+					variant="neutral"
+					mode="stroke"
+					size="xxsmall"
+				>
+					<Button.Icon>
+						<Icon name="chevron-left" className="h-4 w-4" />
+					</Button.Icon>
+					Back
+				</Button.Root>
+				<div className="flex justify-between pt-6">
+					<div>
+						{isLoading ? (
+							<>
+								<div className="flex items-center gap-1.5">
+									<Skeleton className="h-4 w-12 rounded-full" />
+									<Skeleton className="h-1 w-1 rounded-full" />
+									<Skeleton className="h-4 w-20 rounded-full" />
+									<Skeleton className="h-1 w-1 rounded-full" />
+									<div className="flex items-center gap-1">
+										<Skeleton className="h-3.5 w-3.5 rounded-full" />
+										<Skeleton className="h-4 w-16 rounded-full" />
+									</div>
 								</div>
-							</div>
-							<Skeleton className="mt-2 mb-4 h-8 w-48 rounded-lg" />
-						</>
-					) : (
-						<>
-							<div className="flex items-center gap-1.5">
-								<p className="font-medium text-paragraph-sm text-text-sub-600">
-									API Key{" "}
-								</p>
-								<p className="font-semibold text-paragraph-sm text-text-sub-600">
-									•
-								</p>
-								<p className="font-medium text-paragraph-sm text-text-sub-600">
-									{isFailed
-										? "---"
-										: apiKey?.createdAt
-											? formatRelativeTime(apiKey.createdAt)
-											: "---"}
-								</p>
-								<p className="font-semibold text-paragraph-sm text-text-sub-600">
-									•
-								</p>
-								<div
-									className={`flex items-center gap-1 ${getStatusColor(apiKey?.enabled || false)}`}
-								>
-									<Icon
-										name={getStatusIcon(apiKey?.enabled || false)}
-										className="h-3.5 w-3.5"
-									/>
-									<p className="font-medium text-paragraph-sm">
-										{apiKey?.enabled ? "Enabled" : "Disabled"}
+								<Skeleton className="mt-2 mb-4 h-8 w-48 rounded-lg" />
+							</>
+						) : (
+							<>
+								<div className="flex items-center gap-1.5">
+									<p className="font-medium text-paragraph-sm text-text-sub-600">
+										API Key{" "}
 									</p>
+									<p className="font-semibold text-paragraph-sm text-text-sub-600">
+										•
+									</p>
+									<p className="font-medium text-paragraph-sm text-text-sub-600">
+										{isFailed
+											? "---"
+											: apiKey?.createdAt
+												? formatRelativeTime(apiKey.createdAt)
+												: "---"}
+									</p>
+									<p className="font-semibold text-paragraph-sm text-text-sub-600">
+										•
+									</p>
+									<div
+										className={`flex items-center gap-1 ${getStatusColor(apiKey?.enabled || false)}`}
+									>
+										<Icon
+											name={getStatusIcon(apiKey?.enabled || false)}
+											className="h-3.5 w-3.5"
+										/>
+										<p className="font-medium text-paragraph-sm">
+											{apiKey?.enabled ? "Enabled" : "Disabled"}
+										</p>
+									</div>
 								</div>
-							</div>
-							<div className="flex items-center">
-								<h1 className="font-semibold text-title-h4">{displayName}</h1>
+								<div className="flex items-center">
+									<h1 className="font-semibold text-title-h4">{displayName}</h1>
+									<Button.Root
+										variant="neutral"
+										mode="ghost"
+										size="xxsmall"
+										onClick={handleCopyPrefix}
+										className="mt-1"
+									>
+										<Icon
+											name={copied ? "check" : "clipboard-copy"}
+											className={`h-5 w-5 ${copied ? "text-green-600" : ""}`}
+										/>
+									</Button.Root>
+								</div>
+								{apiKey?.prefix && (
+									<p className="mt-2 font-mono text-label-sm text-text-sub-600">
+										{displayPrefix}
+									</p>
+								)}
+							</>
+						)}
+					</div>
+
+					<div className="flex items-center gap-2">
+						{isLoading ? (
+							<>
+								<Skeleton className="h-9 w-32 rounded-lg" />
+								<Skeleton className="h-9 w-9 rounded-lg" />
+							</>
+						) : isFailed ? (
+							<Button.Root variant="error" size="small" mode="lighter">
+								Try Again
+							</Button.Root>
+						) : apiKey ? (
+							<>
 								<Button.Root
 									variant="neutral"
-									mode="ghost"
-									size="xxsmall"
-									onClick={handleCopyPrefix}
-									className="mt-1"
+									size="xsmall"
+									onClick={handleToggleEnabled}
+									disabled={isToggling}
 								>
-									<Icon
-										name={copied ? "check" : "clipboard-copy"}
-										className={`h-5 w-5 ${copied ? "text-green-600" : ""}`}
-									/>
+									{isToggling ? (
+										<Icon name="loader-2" className="h-4 w-4 animate-spin" />
+									) : (
+										<Icon
+											name={apiKey.enabled ? "pause" : "play"}
+											className="h-4 w-4"
+										/>
+									)}
+									{apiKey.enabled ? "Disable" : "Enable"} API key
 								</Button.Root>
-							</div>
-							{apiKey?.prefix && (
-								<p className="mt-2 font-mono text-label-sm text-text-sub-600">
-									{displayPrefix}
-								</p>
-							)}
-						</>
-					)}
+								<PopoverRoot>
+									<PopoverTrigger asChild>
+										<Button.Root variant="neutral" mode="stroke" size="xsmall">
+											<Icon name="more-vertical" className="h-4 w-4 rotate-90" />
+										</Button.Root>
+									</PopoverTrigger>
+									<PopoverContent align="end" side="bottom" className="p-2">
+										<div className="flex flex-col gap-1">
+											<Button.Root
+												variant="neutral"
+												mode="ghost"
+												size="small"
+												onClick={() =>
+													window.open("https://reloop.sh/docs/api-keys", "_blank")
+												}
+												className="w-full justify-start"
+											>
+												<Icon name="file-text" className="h-4 w-4" />
+												Go to docs
+											</Button.Root>
+											<Button.Root
+												variant="neutral"
+												mode="ghost"
+												size="small"
+												onClick={() => setIsRotateModalOpen(true)}
+												className="w-full justify-start"
+											>
+												<Icon name="rotate-cw" className="h-4 w-4" />
+												Rotate key
+											</Button.Root>
+											<Button.Root
+												variant="neutral"
+												mode="ghost"
+												size="small"
+												onClick={() => setIsEditModalOpen(true)}
+												className="w-full justify-start"
+											>
+												<Icon name="edit" className="h-4 w-4" />
+												Edit API key
+											</Button.Root>
+											<Button.Root
+												variant="error"
+												mode="ghost"
+												size="small"
+												onClick={() => onDeleteApiKey?.()}
+												className="w-full justify-start"
+											>
+												<Icon name="trash" className="h-4 w-4" />
+												Delete API key
+											</Button.Root>
+										</div>
+									</PopoverContent>
+								</PopoverRoot>
+							</>
+						) : null}
+					</div>
 				</div>
 
-				<div className="flex items-center gap-2">
-					{isLoading ? (
-						<>
-							<Skeleton className="h-9 w-32 rounded-lg" />
-							<Skeleton className="h-9 w-9 rounded-lg" />
-						</>
-					) : isFailed ? (
-						<Button.Root variant="error" size="small" mode="lighter">
-							Try Again
-						</Button.Root>
-					) : apiKey ? (
-						<>
-							<Button.Root
-								variant="neutral"
-								size="xsmall"
-								onClick={() => {
-									// TODO: Implement toggle enable/disable
-									toast.info("Toggle enable/disable not yet implemented");
-								}}
-							>
-								<Icon
-									name={apiKey.enabled ? "pause" : "play"}
-									className="h-4 w-4"
-								/>
-								{apiKey.enabled ? "Disable" : "Enable"} API key
-							</Button.Root>
-							<PopoverRoot>
-								<PopoverTrigger asChild>
-									<Button.Root variant="neutral" mode="stroke" size="xsmall">
-										<Icon name="more-vertical" className="h-4 w-4 rotate-90" />
-									</Button.Root>
-								</PopoverTrigger>
-								<PopoverContent align="end" side="bottom" className="p-2">
-									<div className="flex flex-col gap-1">
-										<Button.Root
-											variant="neutral"
-											mode="ghost"
-											size="small"
-											onClick={() =>
-												window.open("https://reloop.sh/docs/api-keys", "_blank")
-											}
-											className="w-full justify-start"
-										>
-											<Icon name="file-text" className="h-4 w-4" />
-											Go to docs
-										</Button.Root>
-										<Button.Root
-											variant="neutral"
-											mode="ghost"
-											size="small"
-											onClick={() => {
-												// TODO: Implement rotate
-												toast.info("Rotate API key not yet implemented");
-											}}
-											className="w-full justify-start"
-										>
-											<Icon name="rotate-cw" className="h-4 w-4" />
-											Rotate key
-										</Button.Root>
-										<Button.Root
-											variant="neutral"
-											mode="ghost"
-											size="small"
-											onClick={() => {
-												// TODO: Implement edit
-												toast.info("Edit API key not yet implemented");
-											}}
-											className="w-full justify-start"
-										>
-											<Icon name="edit" className="h-4 w-4" />
-											Edit API key
-										</Button.Root>
-										<Button.Root
-											variant="error"
-											mode="ghost"
-											size="small"
-											onClick={() => onDeleteApiKey?.()}
-											className="w-full justify-start"
-										>
-											<Icon name="trash" className="h-4 w-4" />
-											Delete API key
-										</Button.Root>
-									</div>
-								</PopoverContent>
-							</PopoverRoot>
-						</>
-					) : null}
-				</div>
+				{isLoading ? (
+					<div className="mt-8 mb-3 flex w-full items-center justify-between border-stroke-soft-200 border-b border-dashed pb-8">
+						<div className="flex gap-8">
+							<div className="">
+								<div className="flex items-center gap-1.5">
+									<Icon name="key-new" className="h-4 w-4 text-blue-600" />
+									<span className="font-medium text-sm text-text-sub-600">
+										Total Requests
+									</span>
+								</div>
+								<Skeleton className="h-8 w-12" />
+							</div>
+							<div className="">
+								<div className="flex items-center gap-1.5">
+									<Icon name="activity-2" className="h-4 w-4 text-success-base" />
+									<span className="font-medium text-sm text-text-sub-600">
+										Remaining
+									</span>
+								</div>
+								<Skeleton className="h-8 w-12" />
+							</div>
+							<div className="">
+								<div className="flex items-center gap-1.5">
+									<Icon name="clock" className="h-4 w-4 text-text-sub-600" />
+									<span className="font-medium text-sm text-text-sub-600">
+										Last Request
+									</span>
+								</div>
+								<Skeleton className="h-8 w-16" />
+							</div>
+						</div>
+					</div>
+				) : (
+					<div className="mt-8 mb-3 flex w-full items-center justify-between border-stroke-soft-200 border-b border-dashed pb-8">
+						<div className="flex gap-8">
+							<div className="">
+								<div className="flex items-center gap-1.5">
+									<Icon name="key-new" className="h-4 w-4 text-blue-600" />
+									<span className="font-medium text-sm text-text-sub-600">
+										Total Requests
+									</span>
+								</div>
+								<span className="font-bold text-2xl text-text-strong-950">
+									{apiKey?.requestCount || 0}
+								</span>
+							</div>
+							<div className="">
+								<div className="flex items-center gap-1.5">
+									<Icon name="activity-2" className="h-4 w-4 text-success-base" />
+									<span className="font-medium text-sm text-text-sub-600">
+										Remaining
+									</span>
+								</div>
+								<span className="text-left font-bold text-2xl text-text-strong-950">
+									{apiKey?.remaining !== null && apiKey?.remaining !== undefined
+										? apiKey.remaining
+										: "∞"}
+								</span>
+							</div>
+							<div className="">
+								<div className="flex items-center gap-1.5">
+									<Icon name="clock" className="h-4 w-4 text-text-sub-600" />
+									<span className="font-medium text-sm text-text-sub-600">
+										Last Request
+									</span>
+								</div>
+								<span className="font-bold text-2xl text-text-strong-950">
+									{apiKey?.lastRequest
+										? formatRelativeTime(apiKey.lastRequest)
+										: "Never"}
+								</span>
+							</div>
+						</div>
+						{apiKey?.rateLimitEnabled && (
+							<div className="flex flex-col gap-2">
+								<div className="flex items-center gap-1.5">
+									<Icon name="gauge" className="h-4 w-4 text-text-sub-600" />
+									<span className="font-medium text-sm text-text-sub-600">
+										Rate Limit
+									</span>
+								</div>
+								<div className="rounded-lg border border-stroke-soft-200 bg-bg-weak-50 py-0.5 pr-0.5 pl-2">
+									<span className="w-42 font-medium text-xs">
+										{apiKey.rateLimitMax} /{" "}
+										{Math.round(apiKey.rateLimitTimeWindow / 1000)}s
+									</span>
+								</div>
+							</div>
+						)}
+					</div>
+				)}
 			</div>
 
-			{isLoading ? (
-				<div className="mt-8 mb-3 flex w-full items-center justify-between border-stroke-soft-200 border-b border-dashed pb-8">
-					<div className="flex gap-8">
-						<div className="">
-							<div className="flex items-center gap-1.5">
-								<Icon name="key" className="h-4 w-4 text-blue-600" />
-								<span className="font-medium text-sm text-text-sub-600">
-									Total Requests
-								</span>
-							</div>
-							<Skeleton className="h-8 w-12" />
-						</div>
-						<div className="">
-							<div className="flex items-center gap-1.5">
-								<Icon name="activity-2" className="h-4 w-4 text-success-base" />
-								<span className="font-medium text-sm text-text-sub-600">
-									Remaining
-								</span>
-							</div>
-							<Skeleton className="h-8 w-12" />
-						</div>
-						<div className="">
-							<div className="flex items-center gap-1.5">
-								<Icon name="clock" className="h-4 w-4 text-text-sub-600" />
-								<span className="font-medium text-sm text-text-sub-600">
-									Last Request
-								</span>
-							</div>
-							<Skeleton className="h-8 w-16" />
-						</div>
-					</div>
-				</div>
-			) : (
-				<div className="mt-8 mb-3 flex w-full items-center justify-between border-stroke-soft-200 border-b border-dashed pb-8">
-					<div className="flex gap-8">
-						<div className="">
-							<div className="flex items-center gap-1.5">
-								<Icon name="key" className="h-4 w-4 text-blue-600" />
-								<span className="font-medium text-sm text-text-sub-600">
-									Total Requests
-								</span>
-							</div>
-							<span className="font-bold text-2xl text-text-strong-950">
-								{apiKey?.requestCount || 0}
-							</span>
-						</div>
-						<div className="">
-							<div className="flex items-center gap-1.5">
-								<Icon name="activity-2" className="h-4 w-4 text-success-base" />
-								<span className="font-medium text-sm text-text-sub-600">
-									Remaining
-								</span>
-							</div>
-							<span className="text-left font-bold text-2xl text-text-strong-950">
-								{apiKey?.remaining !== null && apiKey?.remaining !== undefined
-									? apiKey.remaining
-									: "∞"}
-							</span>
-						</div>
-						<div className="">
-							<div className="flex items-center gap-1.5">
-								<Icon name="clock" className="h-4 w-4 text-text-sub-600" />
-								<span className="font-medium text-sm text-text-sub-600">
-									Last Request
-								</span>
-							</div>
-							<span className="font-bold text-2xl text-text-strong-950">
-								{apiKey?.lastRequest
-									? formatRelativeTime(apiKey.lastRequest)
-									: "Never"}
-							</span>
-						</div>
-					</div>
-					{apiKey?.rateLimitEnabled && (
-						<div className="flex flex-col gap-2">
-							<div className="flex items-center gap-1.5">
-								<Icon name="gauge" className="h-4 w-4 text-text-sub-600" />
-								<span className="font-medium text-sm text-text-sub-600">
-									Rate Limit
-								</span>
-							</div>
-							<div className="rounded-lg border border-stroke-soft-200 bg-bg-weak-50 py-0.5 pr-0.5 pl-2">
-								<span className="w-42 font-medium text-xs">
-									{apiKey.rateLimitMax} /{" "}
-									{Math.round(apiKey.rateLimitTimeWindow / 1000)}s
-								</span>
-							</div>
-						</div>
-					)}
-				</div>
+			{/* Modals */}
+			{apiKey && (
+				<>
+					<RotateApiKeyModal
+						isOpen={isRotateModalOpen}
+						onClose={() => setIsRotateModalOpen(false)}
+						apiKeyId={apiKey.id}
+						apiKeyName={displayName}
+					/>
+					<EditApiKeyModal
+						isOpen={isEditModalOpen}
+						onClose={() => setIsEditModalOpen(false)}
+						apiKey={apiKey}
+					/>
+				</>
 			)}
-		</div>
+		</>
 	);
 };

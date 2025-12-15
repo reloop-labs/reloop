@@ -30,7 +30,7 @@ export const mainNavigation: MainNavigationItem[] = [
 	{
 		label: "API Keys",
 		path: "/api-keys",
-		iconName: "key",
+		iconName: "key-new",
 	},
 	{
 		label: "Logs",

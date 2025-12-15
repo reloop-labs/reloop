@@ -11,10 +11,15 @@ import {
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
+import axios from "axios";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useQueryState } from "nuqs";
+import { useState } from "react";
+import { toast } from "sonner";
+import { useSWRConfig } from "swr";
 import { DeleteApiKeyModal } from "./delete-api-key-modal";
+import { RotateApiKeyModal } from "./rotate-api-key-modal";
 
 interface ApiKeyData {
 	id: string;
@@ -52,7 +57,10 @@ export const ApiKeyTable = ({
 	loadingRows = 3,
 }: ApiKeyTableProps) => {
 	const { push } = useUserOrganization();
+	const { mutate } = useSWRConfig();
 	const [, setDeleteId] = useQueryState("delete");
+	const [togglingId, setTogglingId] = useState<string | null>(null);
+	const [rotateModalApiKey, setRotateModalApiKey] = useState<ApiKeyData | null>(null);
 
 	const handleDeleteApiKey = (apiKeyId: string) => {
 		setDeleteId(apiKeyId);
@@ -60,6 +68,32 @@ export const ApiKeyTable = ({
 
 	const handleViewDetails = (apiKeyId: string) => {
 		push(`/api-keys/${apiKeyId}`);
+	};
+
+	const handleToggleEnabled = async (apiKey: ApiKeyData) => {
+		try {
+			setTogglingId(apiKey.id);
+			const endpoint = apiKey.enabled
+				? `/api/api-key/v1/${apiKey.id}/disable`
+				: `/api/api-key/v1/${apiKey.id}/enable`;
+
+			await axios.post(endpoint, {}, { headers: { credentials: "include" } });
+
+			await mutate("/api/api-key/v1/?limit=100");
+
+			toast.success(
+				apiKey.enabled
+					? "API key disabled successfully"
+					: "API key enabled successfully",
+			);
+		} catch (error) {
+			const errorMessage = axios.isAxiosError(error)
+				? error.response?.data?.message || "Failed to toggle API key"
+				: "Failed to toggle API key";
+			toast.error(errorMessage);
+		} finally {
+			setTogglingId(null);
+		}
 	};
 
 	return (
@@ -145,7 +179,7 @@ export const ApiKeyTable = ({
 													className="flex items-center gap-2"
 												>
 													<Icon
-														name="key"
+														name="key-new"
 														className="h-4 w-4 text-text-sub-600"
 													/>
 													<div className="flex flex-col">
@@ -261,6 +295,34 @@ export const ApiKeyTable = ({
 																View Details
 															</Button.Root>
 															<Button.Root
+																variant="neutral"
+																mode="ghost"
+																size="small"
+																onClick={() => handleToggleEnabled(apiKey)}
+																className="w-full justify-start"
+																disabled={togglingId === apiKey.id}
+															>
+																{togglingId === apiKey.id ? (
+																	<Icon name="loader-2" className="h-4 w-4 animate-spin" />
+																) : (
+																	<Icon
+																		name={apiKey.enabled ? "pause" : "play"}
+																		className="h-4 w-4"
+																	/>
+																)}
+																{apiKey.enabled ? "Disable" : "Enable"}
+															</Button.Root>
+															<Button.Root
+																variant="neutral"
+																mode="ghost"
+																size="small"
+																onClick={() => setRotateModalApiKey(apiKey)}
+																className="w-full justify-start"
+															>
+																<Icon name="rotate-cw" className="h-4 w-4" />
+																Rotate Key
+															</Button.Root>
+															<Button.Root
 																variant="error"
 																mode="ghost"
 																size="small"
@@ -282,6 +344,14 @@ export const ApiKeyTable = ({
 				</div>
 			</AnimatePresence>
 			<DeleteApiKeyModal apiKeys={apiKeys} />
+			{rotateModalApiKey && (
+				<RotateApiKeyModal
+					isOpen={!!rotateModalApiKey}
+					onClose={() => setRotateModalApiKey(null)}
+					apiKeyId={rotateModalApiKey.id}
+					apiKeyName={rotateModalApiKey.name || rotateModalApiKey.start || rotateModalApiKey.prefix || "Unnamed"}
+				/>
+			)}
 		</>
 	);
 };

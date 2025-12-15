@@ -351,7 +351,7 @@ export const WebhookHeader = ({
 					</div>
 					<div className="flex flex-col gap-2">
 						<div className="flex items-center gap-1.5">
-							<Icon name="key" className="h-4 w-4 text-text-sub-600" />
+							<Icon name="key-new" className="h-4 w-4 text-text-sub-600" />
 							<span className="font-medium text-sm text-text-sub-600">
 								Webhook Secret
 							</span>
@@ -414,7 +414,7 @@ export const WebhookHeader = ({
 					</div>
 					<div className="flex flex-col gap-2">
 						<div className="flex items-center gap-1.5">
-							<Icon name="key" className="h-4 w-4 text-text-sub-600" />
+							<Icon name="key-new" className="h-4 w-4 text-text-sub-600" />
 							<span className="font-medium text-sm text-text-sub-600">
 								Webhook Secret
 							</span>

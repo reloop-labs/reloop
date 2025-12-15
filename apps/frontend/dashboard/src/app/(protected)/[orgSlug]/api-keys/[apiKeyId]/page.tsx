@@ -1,7 +1,10 @@
 "use client";
 import { SomethingWentWrong } from "@fe/dashboard/components/something-went-wrong";
-import { useParams } from "next/navigation";
+import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
+import { useParams, useRouter } from "next/navigation";
+import { useQueryState } from "nuqs";
 import useSWR from "swr";
+import { DeleteApiKeyModal } from "../components/delete-api-key-modal";
 import { ApiKeyHeader } from "./components/api-key-header";
 
 interface ApiKeyData {
@@ -30,6 +33,9 @@ interface ApiKeyData {
 
 const ApiKeyDetailPage = () => {
 	const { apiKeyId } = useParams();
+	const router = useRouter();
+	const { activeOrganization } = useUserOrganization();
+	const [, setDeleteId] = useQueryState("delete");
 
 	const {
 		data: apiKeyData,
@@ -39,6 +45,12 @@ const ApiKeyDetailPage = () => {
 		revalidateOnFocus: false,
 		revalidateOnReconnect: true,
 	});
+
+	const handleDeleteApiKey = () => {
+		if (apiKeyData?.id) {
+			setDeleteId(apiKeyData.id);
+		}
+	};
 
 	if (error) {
 		return (
@@ -63,15 +75,35 @@ const ApiKeyDetailPage = () => {
 		);
 	}
 
+	// Create the ApiKeyData array format expected by DeleteApiKeyModal
+	const apiKeysForModal = apiKeyData
+		? [
+			{
+				id: apiKeyData.id,
+				name: apiKeyData.name,
+				start: apiKeyData.start,
+				prefix: apiKeyData.prefix,
+				enabled: apiKeyData.enabled,
+				requestCount: apiKeyData.requestCount,
+				remaining: apiKeyData.remaining,
+				expiresAt: apiKeyData.expiresAt,
+				createdAt: apiKeyData.createdAt,
+			},
+		]
+		: [];
+
 	return (
-		<div className="mx-auto max-w-3xl">
-			<ApiKeyHeader
-				apiKey={apiKeyData}
-				isLoading={isLoading}
-				isFailed={!!error}
-				onDeleteApiKey={() => {}}
-			/>
-		</div>
+		<>
+			<div className="mx-auto max-w-3xl">
+				<ApiKeyHeader
+					apiKey={apiKeyData}
+					isLoading={isLoading}
+					isFailed={!!error}
+					onDeleteApiKey={handleDeleteApiKey}
+				/>
+			</div>
+			<DeleteApiKeyModal apiKeys={apiKeysForModal} />
+		</>
 	);
 };
 
