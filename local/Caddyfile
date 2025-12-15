@@ -81,7 +81,7 @@ local.reloop.sh {
             header_up X-Forwarded-For {remote}
         }
     }
-    handle /api/inngest* {
+    handle /api/workflow* {
         reverse_proxy host.docker.internal:8017 {
             header_up Host {host}
             header_up X-Forwarded-Proto {scheme}
@@ -107,16 +107,6 @@ local.reloop.sh {
     handle /mail* {
         uri strip_prefix /mail
         reverse_proxy host.docker.internal:8025 {
-            header_up Host {host}
-            header_up X-Forwarded-Proto {scheme}
-            header_up X-Forwarded-For {remote}
-        }
-    }
-
-    # Inngest Dev Server UI
-    handle /inngest* {
-        uri strip_prefix /inngest
-        reverse_proxy host.docker.internal:8288 {
             header_up Host {host}
             header_up X-Forwarded-Proto {scheme}
             header_up X-Forwarded-For {remote}
