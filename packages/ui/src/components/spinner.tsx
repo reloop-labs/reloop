@@ -36,7 +36,7 @@ const Spinner = ({
 							style={{
 								height: "8%",
 								width: "24%",
-								backgroundColor: color,
+								backgroundColor: color || "var(--text-strong-950)",
 								top: "-3.9%",
 								left: "-10%",
 								transform: `rotate(${deg}deg) translate(146%)`,

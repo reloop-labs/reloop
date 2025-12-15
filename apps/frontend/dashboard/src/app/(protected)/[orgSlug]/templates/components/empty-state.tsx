@@ -3,6 +3,7 @@ import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import Spinner from "@reloop/ui/spinner";
 
 interface EmptyStateProps {
     orgSlug: string;
@@ -53,7 +54,7 @@ export const EmptyState = ({ orgSlug }: EmptyStateProps) => {
                 style={{ marginTop: "1.5rem" }}
             >
                 {isCreating ? (
-                    <Icon name="loader" className="h-4 w-4 animate-spin" />
+                    <Spinner size={16} />
                 ) : (
                     <Icon name="plus" className="h-4 w-4" />
                 )}

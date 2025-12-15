@@ -16,6 +16,7 @@ import { useState } from "react";
 import { useSWRConfig } from "swr";
 import { toast } from "sonner";
 import { useQueryState } from "nuqs";
+import Spinner from "@reloop/ui/spinner";
 import { ContactList } from "./components/contact-list";
 import { ContactsTabs } from "./components/contacts-tabs";
 import { TopicList } from "./components/topic-list";
@@ -245,7 +246,7 @@ const ContactsPage = () => {
                 >
                   {isCreating ? (
                     <>
-                      <Icon name="loader" className="h-4 w-4 animate-spin" />
+                      <Spinner size={16} />
                       Creating...
                     </>
                   ) : (

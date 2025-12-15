@@ -12,6 +12,7 @@ import { useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
+import Spinner from "@reloop/ui/spinner";
 
 interface DeleteDomainModalProps {
 	domains: Domain[];
@@ -170,7 +171,7 @@ export const DeleteDomainModal = ({ domains }: DeleteDomainModalProps) => {
 						>
 							{isDeleting ? (
 								<>
-									<Icon name="loader" className="h-4 w-4 animate-spin" />
+									<Spinner size={16} />
 									Deleting...
 								</>
 							) : (

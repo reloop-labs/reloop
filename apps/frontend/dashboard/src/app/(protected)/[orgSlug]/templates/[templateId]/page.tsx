@@ -7,6 +7,7 @@ import { useParams } from "next/navigation";
 import { useState, useEffect, useCallback } from "react";
 import useSWR from "swr";
 import "./editor.css";
+import Spinner from "@reloop/ui/spinner";
 
 interface Template {
     id: string;
@@ -269,7 +270,7 @@ const TemplateEditorPage = () => {
                         <span className="text-xs text-gray-400">Editing</span>
                         <div className="h-4 w-px bg-gray-200" />
                         <Button.Root variant="primary" size="xsmall" disabled={!hasChanges} onClick={handleSave}>
-                            {isSaving ? <Icon name="loader" className="h-3 w-3 animate-spin" /> : <Icon name="send" className="h-3 w-3" />}
+                            {isSaving ? <Spinner size={12} /> : <Icon name="send" className="h-3 w-3" />}
                             Publish
                         </Button.Root>
                     </div>

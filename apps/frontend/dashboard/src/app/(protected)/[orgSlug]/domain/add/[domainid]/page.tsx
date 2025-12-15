@@ -10,6 +10,7 @@ import * as React from "react";
 import { toast } from "sonner";
 import useSWR, { mutate } from "swr";
 import { DNSRecordTable } from "../../[domainId]/components/DNSRecordTable";
+import Spinner from "@reloop/ui/spinner";
 
 const NewDomainPage = () => {
 	const [copiedItems, setCopiedItems] = React.useState<Set<string>>(new Set());
@@ -149,7 +150,7 @@ const NewDomainPage = () => {
 					{isVerifying ? (
 						<>
 							<Button.Icon>
-								<Icon name="loader" className="h-4 w-4 animate-spin" />
+								<Spinner size={16} color="white" />
 							</Button.Icon>
 							Verifying
 						</>
@@ -232,7 +233,7 @@ const NewDomainPage = () => {
 					{isVerifying ? (
 						<>
 							<Button.Icon>
-								<Icon name="loader" className="h-4 w-4 animate-spin" />
+								<Spinner size={16} color="white" />
 							</Button.Icon>
 							Verifying
 						</>

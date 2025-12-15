@@ -11,6 +11,7 @@ import useSWR from "swr";
 import { TemplateTable } from "./template-table";
 import { EmptyState } from "./empty-state";
 import { PageSizeDropdown } from "./page-size-dropdown";
+import Spinner from "@reloop/ui/spinner";
 
 interface Template {
     id: string;
@@ -99,7 +100,7 @@ export const TemplateList = () => {
                         disabled={isCreating}
                     >
                         {isCreating ? (
-                            <Icon name="loader" className="h-4 w-4 animate-spin" />
+                            <Spinner size={16} />
                         ) : (
                             <Icon name="plus" className="h-4 w-4" />
                         )}

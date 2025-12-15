@@ -8,6 +8,7 @@ import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import * as React from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
+import Spinner from "@reloop/ui/spinner";
 import { DNSRecordTable } from "../../[orgSlug]/domain/[domainId]/components/DNSRecordTable";
 
 export const ConfigureDnsStep = () => {
@@ -176,14 +177,14 @@ export const ConfigureDnsStep = () => {
 					{isVerifying ? (
 						<>
 							<Button.Icon>
-								<Icon name="loader" className="h-4 w-4 animate-spin" />
+								<Spinner size={16} />
 							</Button.Icon>
 							Verifying DNS records...
 						</>
 					) : domainData?.status === "verifying" ? (
 						<>
 							<Button.Icon>
-								<Icon name="loader" className="h-4 w-4 animate-spin" />
+								<Spinner size={16} />
 							</Button.Icon>
 							DNS verification in progress
 						</>

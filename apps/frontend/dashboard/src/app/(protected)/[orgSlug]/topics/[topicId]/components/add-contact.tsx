@@ -13,6 +13,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
 import * as v from "valibot";
+import Spinner from "@reloop/ui/spinner";
 
 const addContactSchema = v.object({
   email: v.pipe(
@@ -177,7 +178,7 @@ export const AddContact = ({
               >
                 {isLoading ? (
                   <>
-                    <Icon name="loader" className="h-4 w-4 animate-spin" />
+                    <Spinner size={16} />
                     Adding...
                   </>
                 ) : (

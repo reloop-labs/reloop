@@ -59,7 +59,6 @@ export const DomainFilterDropdown = ({ value, onChange }: DomainFilterDropdownPr
           variant="neutral"
           mode="stroke"
           size="xsmall"
-          className="w-[100px]"
 
         >
           <Icon name="filter" className="h-4 w-4" />
