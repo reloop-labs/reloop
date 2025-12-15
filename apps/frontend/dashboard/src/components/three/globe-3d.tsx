@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
+import { OrbitControls } from "@react-three/drei";
 import type { Mesh, Group } from "three";
 import * as THREE from "three";
 import { useTheme } from "next-themes";
@@ -28,17 +29,8 @@ interface PlanetProps {
 }
 
 function Planet({ colors }: PlanetProps) {
-  const groupRef = useRef<Group>(null);
-
-  useFrame((_, delta) => {
-    if (groupRef.current) {
-      // Rotate left to right (positive Y rotation)
-      groupRef.current.rotation.y += delta * 0.2;
-    }
-  });
-
   return (
-    <group ref={groupRef}>
+    <group>
       {/* Core dark sphere */}
       <mesh>
         <sphereGeometry args={[0.95, 32, 32]} />
@@ -86,7 +78,13 @@ function GlobeCanvas({ colors, size = 80, className }: Globe3DProps & { colors: 
         <directionalLight position={[3, 3, 5]} intensity={0.6} />
         <pointLight position={[-2, -2, 3]} intensity={0.2} color={colors.pointLight} />
         <Planet colors={colors} />
-
+        <OrbitControls
+          enableZoom={false}
+          enablePan={false}
+          autoRotate
+          autoRotateSpeed={1}
+          rotateSpeed={2}
+        />
       </Canvas>
     </div>
   );
