@@ -179,6 +179,14 @@ export namespace ApiKeyModel {
 		metadata: t.Union([t.String(), t.Null()], {
 			description: "JSON metadata string",
 		}),
+		createdBy: t.Optional(
+			t.Object({
+				id: t.String({ description: "User ID" }),
+				name: t.Union([t.String(), t.Null()], { description: "User name" }),
+				image: t.Union([t.String(), t.Null()], { description: "User avatar" }),
+				email: t.String({ description: "User email" }),
+			}),
+		),
 	});
 
 	export type ApiKeyResponse = typeof apiKeyResponse.static;

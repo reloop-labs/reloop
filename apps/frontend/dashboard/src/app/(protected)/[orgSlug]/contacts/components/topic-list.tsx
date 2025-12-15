@@ -29,7 +29,11 @@ interface TopicListResponse {
   limit: number;
 }
 
-export const TopicList = () => {
+interface TopicListProps {
+  hideHeader?: boolean;
+}
+
+export const TopicList = ({ hideHeader = false }: TopicListProps) => {
   const { activeOrganization } = useUserOrganization();
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useQueryState("page", parseAsInteger.withDefault(1));
@@ -61,24 +65,26 @@ export const TopicList = () => {
     }) || [];
 
   return (
-    <div className="mx-auto max-w-3xl sm:px-8">
-      <div className="flex items-center justify-between pt-10">
-        <p className="font-medium text-2xl">
-          Topic{data?.topics.length !== 1 ? "s" : ""}
-        </p>
-        <div className="flex items-center gap-2">
-          <Link
-            className={Button.buttonVariants({
-              variant: "neutral",
-              size: "xsmall",
-            }).root()}
-            href={`/${activeOrganization.slug}/topics/add`}
-          >
-            <Icon name="plus" className="h-4 w-4" />
-            Create topic
-          </Link>
+    <div className={hideHeader ? "" : "mx-auto max-w-3xl sm:px-8"}>
+      {!hideHeader && (
+        <div className="flex items-center justify-between pt-10">
+          <p className="font-medium text-2xl">
+            Topic{data?.topics.length !== 1 ? "s" : ""}
+          </p>
+          <div className="flex items-center gap-2">
+            <Link
+              className={Button.buttonVariants({
+                variant: "neutral",
+                size: "xsmall",
+              }).root()}
+              href={`/${activeOrganization.slug}/topics/add`}
+            >
+              <Icon name="plus" className="h-4 w-4" />
+              Create topic
+            </Link>
+          </div>
         </div>
-      </div>
+      )}
       <div>
         {error ? (
           <div className="flex flex-col items-center justify-center gap-2 p-4">

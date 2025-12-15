@@ -10,7 +10,7 @@ import useSWR from "swr";
 import { toast } from "sonner";
 import { ContactTable } from "./contact-table";
 import { DeleteContactModal } from "./delete-contact";
-import { EmptyState } from "./empty-state";
+import { ContactsEmptyState } from "./contacts-empty-state";
 
 interface Contact {
   id: string;
@@ -117,7 +117,7 @@ export const ContactList = () => {
   }
 
   if (!isLoading && data?.contacts && data.contacts.length === 0) {
-    return <EmptyState />;
+    return <ContactsEmptyState />;
   }
 
   return (

@@ -4,7 +4,6 @@ import { valibotResolver } from "@hookform/resolvers/valibot";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import * as Kbd from "@reloop/ui/kbd";
 import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import { useLoading } from "@reloop/ui/use-loading";
@@ -13,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
+import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
 import * as v from "valibot";
@@ -62,6 +62,12 @@ export const CreateApiKeyModal = ({
 				name: "",
 			},
 		});
+
+	// Command/Ctrl + Enter to submit form
+	useHotkeys("mod+enter", (e) => {
+		e.preventDefault();
+		handleSubmit(onSubmit)();
+	}, { enableOnFormTags: ["INPUT"] });
 
 	const onSubmit = async (data: ApiKeyFormValues) => {
 		if (!activeOrganization?.id) return;
@@ -128,77 +134,71 @@ export const CreateApiKeyModal = ({
 	if (createdApiKey) {
 		return (
 			<Modal.Root open={isOpen} onOpenChange={handleClose}>
-				<Modal.Content className="data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom-4 data-[state=open]:zoom-in-95 data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-bottom-4 data-[state=closed]:zoom-out-95 max-w-lg duration-200 data-[state=closed]:animate-out data-[state=open]:animate-in">
-					<Modal.Body>
-						<h2 className="mb-2 font-semibold text-gray-900 text-xl">
-							API Key Created
-						</h2>
-						<p className="mb-4 text-gray-600 text-sm">
-							Make sure to copy your API key now. You won't be able to see it
-							again!
-						</p>
-
-						<div className="mb-4 space-y-2">
-							<Label.Root className="font-medium text-sm">API Key</Label.Root>
-							<div className="flex items-center gap-2 rounded-lg border border-stroke-soft-200 bg-bg-weak-50 p-3">
-								{keyRevealed ? (
-									<>
-										<code className="flex-1 break-all font-mono text-xs">
-											{createdApiKey.key}
-										</code>
-										<Button.Root
-											variant="neutral"
-											mode="ghost"
-											size="xxsmall"
-											onClick={handleCopyKey}
-										>
-											<Icon name="clipboard-copy" className="h-4 w-4" />
-										</Button.Root>
-									</>
-								) : (
-									<>
-										<code className="flex-1 font-mono text-xs">
-											{"•".repeat(40)}
-										</code>
-										<Button.Root
-											variant="neutral"
-											mode="ghost"
-											size="xxsmall"
-											onClick={() => setKeyRevealed(true)}
-										>
-											<Icon name="eye" className="h-4 w-4" />
-											Reveal
-										</Button.Root>
-									</>
-								)}
+				<Modal.Content className="sm:max-w-[480px] p-0.5 border border-stroke-soft-100/50 rounded-2xl" showClose={true}>
+					<div className="border border-stroke-soft-100/50 rounded-2xl">
+						<Modal.Header className="before:border-stroke-soft-200/50">
+							<div className="flex items-center justify-centers">
+								<Icon name="key-new" className="h-4 w-4" />
 							</div>
-							{keyRevealed && (
-								<p className="text-red-600 text-xs">
-									⚠️ This is your only chance to copy the API key. Make sure to
-									save it securely.
-								</p>
-							)}
-						</div>
-					</Modal.Body>
-					<Modal.Footer className="flex items-center justify-end gap-3">
-						<Button.Root
-							type="button"
-							variant="neutral"
-							mode="stroke"
-							onClick={handleClose}
-						>
-							Close
-						</Button.Root>
-						<Button.Root
-							type="button"
-							variant="neutral"
-							onClick={handleContinue}
-							disabled={!keyRevealed}
-						>
-							Continue
-							<Icon name="chevron-right" className="h-3 w-3" />
-						</Button.Root>
-					</Modal.Footer>
+							<div className="flex-1">
+								<Modal.Title>API Key Created</Modal.Title>
+							</div>
+						</Modal.Header>
+						<Modal.Body className="space-y-2">
+							<p className="text-text-sub-600 text-paragraph-sm">
+								Make sure to copy your API key now. You won't be able to see it
+								again!
+							</p>
+
+							<div className="flex flex-col gap-1">
+								<Label.Root>API Key</Label.Root>
+								<div className="flex items-center gap-2 rounded-xl bg-bg-white-0 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200 px-3 py-2.5">
+									{keyRevealed ? (
+										<>
+											<code className="flex-1 break-all font-mono text-paragraph-xs text-text-strong-950">
+												{createdApiKey.key}
+											</code>
+											<Button.Root
+												variant="neutral"
+												mode="ghost"
+												size="xxsmall"
+												onClick={handleCopyKey}
+											>
+												<Icon name="clipboard-copy" className="h-4 w-4" />
+											</Button.Root>
+										</>
+									) : (
+										<>
+											<code className="flex-1 font-mono text-paragraph-xs text-text-sub-600">
+												{"•".repeat(40)}
+											</code>
+											<Button.Root
+												variant="neutral"
+												mode="ghost"
+												size="xxsmall"
+												onClick={() => setKeyRevealed(true)}
+											>
+												<Icon name="eye" className="h-4 w-4" />
+												Reveal
+											</Button.Root>
+										</>
+									)}
+								</div>
+							</div>
+						</Modal.Body>
+						<Modal.Footer className="justify-end border-stroke-soft-100/50 mt-4">
+							<Button.Root
+								type="button"
+								variant="neutral"
+								size="xsmall"
+								onClick={handleContinue}
+								disabled={!keyRevealed}
+							>
+								Continue
+								<Icon name="chevron-right" className="h-3 w-3" />
+							</Button.Root>
+						</Modal.Footer>
+					</div>
 				</Modal.Content>
 			</Modal.Root>
 		);
@@ -206,23 +206,24 @@ export const CreateApiKeyModal = ({
 
 	return (
 		<Modal.Root open={isOpen} onOpenChange={handleClose}>
-			<Modal.Content className="data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom-4 data-[state=open]:zoom-in-95 data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-bottom-4 data-[state=closed]:zoom-out-95 max-w-lg duration-200 data-[state=closed]:animate-out data-[state=open]:animate-in">
-				<form onSubmit={handleSubmit(onSubmit)}>
-					<Modal.Header>
-						<Modal.Title className="flex items-center gap-2">
-							<Icon name="key-new" className="h-5 w-5" />
-							Create API Key
-						</Modal.Title>
-						<Modal.Close />
-					</Modal.Header>
-					<Modal.Body>
-						<div className="space-y-4">
-							<div>
+			<Modal.Content className="sm:max-w-[480px] p-0.5 border border-stroke-soft-100/50 rounded-2xl" showClose={true}>
+				<div className="border border-stroke-soft-100/50 rounded-2xl">
+					<form onSubmit={handleSubmit(onSubmit)}>
+						<Modal.Header className="before:border-stroke-soft-200/50">
+							<div className="flex items-center justify-centers">
+								<Icon name="key-new" className="h-4 w-4" />
+							</div>
+							<div className="flex-1">
+								<Modal.Title>Create API Key</Modal.Title>
+							</div>
+						</Modal.Header>
+						<Modal.Body className="space-y-2">
+							<div className="flex flex-col gap-1">
 								<Label.Root htmlFor="name">
 									Name
 									<Label.Asterisk />
 								</Label.Root>
-								<Input.Root className="mt-1">
+								<Input.Root>
 									<Input.Wrapper>
 										<Input.Input
 											className="px-2"
@@ -233,43 +234,37 @@ export const CreateApiKeyModal = ({
 									</Input.Wrapper>
 								</Input.Root>
 								{formState.errors.name && (
-									<p className="mt-1 text-red-600 text-sm">
+									<p className="text-error-base text-paragraph-xs">
 										{formState.errors.name.message}
 									</p>
 								)}
 							</div>
-						</div>
-					</Modal.Body>
-					<Modal.Footer className="flex items-center justify-end gap-3">
-						<Button.Root
-							type="button"
-							variant="neutral"
-							mode="stroke"
-							onClick={handleClose}
-							disabled={status === "loading"}
-						>
-							Cancel
-							<Kbd.Root className="bg-bg-weak-50 text-xs">Esc</Kbd.Root>
-						</Button.Root>
-						<Button.Root
-							type="submit"
-							variant="neutral"
-							disabled={status === "loading"}
-						>
-							{status === "loading" ? (
-								<>
-									<Icon name="loader-2" className="mr-2 h-4 w-4 animate-spin" />
-									Creating...
-								</>
-							) : (
-								<>
-									Create API Key
-									<Icon name="undo" className="h-3 w-3 scale-y-[-1]" />
-								</>
-							)}
-						</Button.Root>
-					</Modal.Footer>
-				</form>
+						</Modal.Body>
+						<Modal.Footer className="justify-end border-stroke-soft-100/50 mt-4">
+							<Button.Root
+								type="submit"
+								variant="neutral"
+								size="xsmall"
+								disabled={status === "loading"}
+							>
+								{status === "loading" ? (
+									<>
+										<Icon name="loader-2" className="h-4 w-4 animate-spin" />
+										Creating...
+									</>
+								) : (
+									<>
+										Create API Key
+										<span className="inline-flex items-center gap-0.5">
+											<Icon name="command" className="w-4 h-4 border rounded-sm p-px border-stroke-soft-100/20" />
+											<Icon name="enter" className="w-4 h-4 border rounded-sm p-px border-stroke-soft-100/20" />
+										</span>
+									</>
+								)}
+							</Button.Root>
+						</Modal.Footer>
+					</form>
+				</div>
 			</Modal.Content>
 		</Modal.Root>
 	);

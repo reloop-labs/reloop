@@ -15,13 +15,17 @@ import Link from "next/link";
 import { useState } from "react";
 import { useSWRConfig } from "swr";
 import { toast } from "sonner";
+import { useQueryState } from "nuqs";
 import { ContactList } from "./components/contact-list";
+import { ContactsTabs } from "./components/contacts-tabs";
+import { TopicList } from "./components/topic-list";
 
 const ContactsPage = () => {
   const { activeOrganization } = useUserOrganization();
   const { mutate } = useSWRConfig();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
+  const [activeTab] = useQueryState("tab", { defaultValue: "contacts" });
 
   // Form state
   const [email, setEmail] = useState("");
@@ -71,7 +75,9 @@ const ContactsPage = () => {
       {/* Header */}
       <div className="flex items-center justify-between pt-10">
         <div>
-          <p className="font-medium text-2xl">Contacts</p>
+          <p className="font-medium text-2xl">
+            {activeTab === "contacts" ? "Contacts" : "Topics"}
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <Link
@@ -80,52 +86,70 @@ const ContactsPage = () => {
               mode: "stroke",
               size: "xsmall",
             }).root()}
-            href="https://reloop.sh/docs/contacts"
+            href={activeTab === "contacts" ? "https://reloop.sh/docs/contacts" : "https://reloop.sh/docs/topics"}
             target="_blank"
             rel="noopener noreferrer"
             title="Documentation"
           >
             <Icon name="book-closed" className="h-4 w-4" />
           </Link>
-          <PopoverRoot>
-            <PopoverTrigger asChild>
-              <Button.Root variant="neutral" size="xsmall">
-                Add Contact
-                <Icon name="chevron-down" className="h-4 w-4" />
-              </Button.Root>
-            </PopoverTrigger>
-            <PopoverContent align="end" side="bottom" className="p-2" sideOffset={3}>
-              <div className="flex flex-col gap-1">
-                <Button.Root
-                  variant="neutral"
-                  mode="ghost"
-                  size="small"
-                  onClick={() => setIsCreateModalOpen(true)}
-                  className="w-full justify-start"
-                >
-                  <Icon name="user-plus" className="h-4 w-4" />
-                  Add Single Contact
+          {activeTab === "contacts" ? (
+            <PopoverRoot>
+              <PopoverTrigger asChild>
+                <Button.Root variant="neutral" size="xsmall">
+                  Add Contact
+                  <Icon name="chevron-down" className="h-4 w-4" />
                 </Button.Root>
-                <Link
-                  href={`/${activeOrganization?.slug}/contacts/bulk-import`}
-                  className={Button.buttonVariants({
-                    variant: "neutral",
-                    mode: "ghost",
-                    size: "small",
-                  }).root() + " w-full justify-start"}
-                >
-                  <Icon name="file-upload" className="h-4 w-4" />
-                  Bulk Import (CSV)
-                </Link>
-              </div>
-            </PopoverContent>
-          </PopoverRoot>
+              </PopoverTrigger>
+              <PopoverContent align="end" side="bottom" className="p-2" sideOffset={3}>
+                <div className="flex flex-col gap-1">
+                  <Button.Root
+                    variant="neutral"
+                    mode="ghost"
+                    size="small"
+                    onClick={() => setIsCreateModalOpen(true)}
+                    className="w-full justify-start"
+                  >
+                    <Icon name="user-plus" className="h-4 w-4" />
+                    Add Single Contact
+                  </Button.Root>
+                  <Link
+                    href={`/${activeOrganization?.slug}/contacts/bulk-import`}
+                    className={Button.buttonVariants({
+                      variant: "neutral",
+                      mode: "ghost",
+                      size: "small",
+                    }).root() + " w-full justify-start"}
+                  >
+                    <Icon name="file-upload" className="h-4 w-4" />
+                    Bulk Import (CSV)
+                  </Link>
+                </div>
+              </PopoverContent>
+            </PopoverRoot>
+          ) : (
+            <Link
+              className={Button.buttonVariants({
+                variant: "neutral",
+                size: "xsmall",
+              }).root()}
+              href={`/${activeOrganization.slug}/topics/add`}
+            >
+              <Icon name="plus" className="h-4 w-4" />
+              Create topic
+            </Link>
+          )}
         </div>
       </div>
 
-      {/* Contacts List */}
-      <div className="mt-10">
-        <ContactList />
+      {/* Tabs */}
+      <div className="mt-6">
+        <ContactsTabs />
+      </div>
+
+      {/* Content */}
+      <div className="mt-4">
+        {activeTab === "contacts" ? <ContactList /> : <TopicList hideHeader />}
       </div>
 
       {/* Create Contact Modal */}

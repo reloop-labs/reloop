@@ -25,6 +25,7 @@ export function formatApiKeyResponse(
 		updatedAt: apiKey.updatedAt.toISOString(),
 		permissions: apiKey.permissions,
 		metadata: apiKey.metadata,
+		createdBy: apiKey.createdBy,
 	};
 }
 

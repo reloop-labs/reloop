@@ -1,9 +1,11 @@
 "use client";
 
-import { TopicList } from "../contacts/components/topic-list";
+import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
+import { redirect } from "next/navigation";
 
 const TopicsPage = () => {
-  return <TopicList />;
+  const { activeOrganization } = useUserOrganization();
+  redirect(`/${activeOrganization.slug}/contacts?tab=topics`);
 };
 
 export default TopicsPage;

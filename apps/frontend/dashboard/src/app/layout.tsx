@@ -5,7 +5,7 @@ import { IconsSprite } from "@reloop/ui/icon";
 import { Geist, Geist_Mono, Outfit } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
-
+import * as Tooltip from "@reloop/ui/tooltip";
 const geistSans = Geist({
 	variable: "--font-geist-sans",
 	subsets: ["latin"],
@@ -44,7 +44,9 @@ export default function RootLayout({
 						disableTransitionOnChange
 					>
 						<SWRProvider>
-							{children}
+							<Tooltip.Provider>
+								{children}
+							</Tooltip.Provider>
 							<IconsSprite />
 						</SWRProvider>
 					</ThemeProvider>

@@ -35,11 +35,23 @@ export async function listApiKeys(
 			orderBy: desc(schema.apikey.createdAt),
 			limit: limit,
 			offset: offset,
+			with: { user: true },
 		});
 
 
 		return {
-			apiKeys: result.map((apiKey) => formatApiKeyResponse(apiKey)),
+			apiKeys: result.map((apiKey) => {
+				const { user, ...apiKeyData } = apiKey;
+				return formatApiKeyResponse({
+					...apiKeyData,
+					createdBy: {
+						id: user.id,
+						name: user.name,
+						image: user.image,
+						email: user.email,
+					},
+				});
+			}),
 			total,
 			page,
 			limit,

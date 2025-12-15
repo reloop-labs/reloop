@@ -38,6 +38,12 @@ export namespace ApiKeyTypes {
 		updatedAt: Date;
 		permissions: string | null;
 		metadata: string | null;
+		createdBy: {
+			id: string;
+			name: string | null;
+			image: string | null;
+			email: string
+		};
 	}
 
 	export interface CreateApiKeyRequest {

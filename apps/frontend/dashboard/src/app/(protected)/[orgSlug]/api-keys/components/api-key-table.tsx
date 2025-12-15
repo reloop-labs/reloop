@@ -2,6 +2,7 @@
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { getAnimationProps } from "@fe/dashboard/utils/audience";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
+import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -11,6 +12,7 @@ import {
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
+import * as Tooltip from "@reloop/ui/tooltip";
 import axios from "axios";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
@@ -31,6 +33,12 @@ interface ApiKeyData {
 	remaining: number | null;
 	expiresAt: string | null;
 	createdAt: string;
+	createdBy?: {
+		id: string;
+		name: string | null;
+		image: string | null;
+		email: string | null;
+	};
 }
 
 interface ApiKeyTableProps {
@@ -40,14 +48,12 @@ interface ApiKeyTableProps {
 	loadingRows?: number;
 }
 
-const getStatusColor = (enabled: boolean) => {
-	return enabled
-		? "text-success-base border-success-base bg-success-light/20"
-		: "text-faded-base border-faded-base bg-faded-light/20";
+const getStatusBadgeColor = () => {
+	return "text-text-sub-600 border-stroke-soft-200 bg-neutral-alpha-10";
 };
 
-const getStatusIcon = (enabled: boolean) => {
-	return enabled ? "check-circle" : "x-circle";
+const getStatusIconColor = (enabled: boolean) => {
+	return enabled ? "text-success-base" : "text-error-base";
 };
 
 export const ApiKeyTable = ({
@@ -99,63 +105,46 @@ export const ApiKeyTable = ({
 	return (
 		<>
 			<AnimatePresence mode="wait">
-				<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-200 text-paragraph-sm shadow-regular-md ring-stroke-soft-200 ring-inset">
-					<div className="grid grid-cols-[1fr_minmax(120px,auto)_minmax(100px,auto)_minmax(100px,auto)_minmax(120px,auto)_minmax(120px,auto)_minmax(40px,auto)]">
-						<div className="bg-bg-weak-50 pl-5 font-medium text-text-sub-600">
-							<div className="py-2.5">Name</div>
+				<div className="w-full text-paragraph-sm rounded-xl border border-stroke-soft-100 overflow-hidden">
+					{/* Table Header */}
+					<div className="grid grid-cols-[2fr_1fr_1fr_1fr_80px] items-center py-3.5 px-4 text-text-sub-600 border-b border-stroke-soft-100">
+						<div className="flex items-center gap-2">
+							<Icon name="key-new" className="h-4 w-4" />
+							<span className="text-xs">Name</span>
 						</div>
-						<div className="bg-bg-weak-50 font-medium text-text-sub-600">
-							<div className="px-3 py-2.5">Status</div>
+						<div className="flex items-center gap-2">
+							<Icon name="check-circle" className="h-4 w-4" />
+							<span className="text-xs">Status</span>
 						</div>
-						<div className="bg-bg-weak-50 font-medium text-text-sub-600">
-							<div className="px-3 py-2.5">Requests</div>
+						<div className="flex items-center gap-2">
+							<Icon name="user" className="h-4 w-4" />
+							<span className="text-xs">Created By</span>
 						</div>
-						<div className="bg-bg-weak-50 font-medium text-text-sub-600">
-							<div className="px-3 py-2.5">Remaining</div>
+						<div className="flex items-center gap-2">
+							<Icon name="clock" className="h-4 w-4" />
+							<span className="text-xs">Created</span>
 						</div>
-						<div className="bg-bg-weak-50 font-medium text-text-sub-600">
-							<div className="px-3 py-2.5">Expires At</div>
-						</div>
-						<div className="bg-bg-weak-50 font-medium text-text-sub-600">
-							<div className="py-2.5">Created At</div>
-						</div>
-						<div className="bg-bg-weak-50 font-medium text-text-sub-600">
-							<div className="py-2.5" />
-						</div>
+						<div />
+					</div>
+
+					{/* Table Body */}
+					<div className="divide-y divide-stroke-soft-100">
 						{isLoading
 							? // Skeleton loading state
 							Array.from({ length: loadingRows }).map((_, index) => (
-								<div key={`skeleton-${index}-${activeOrganizationSlug}`} className="group/row contents">
-									<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
-										<div className="my-1 pl-5">
-											<Skeleton className="h-4 w-32" />
-										</div>
+								<div key={`skeleton-${index}-${activeOrganizationSlug}`} className="grid grid-cols-[2fr_1fr_1fr_1fr_80px] items-center py-2 px-4">
+									<div className="flex items-center gap-2">
+										<Skeleton className="h-4 w-4 rounded" />
+										<Skeleton className="h-4 w-24" />
 									</div>
-									<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
-										<div className="px-3">
-											<Skeleton className="h-4 w-16" />
-										</div>
-									</div>
-									<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
-										<div className="px-3">
-											<Skeleton className="h-4 w-12" />
-										</div>
-									</div>
-									<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
-										<div className="px-3">
-											<Skeleton className="h-4 w-12" />
-										</div>
-									</div>
-									<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
-										<div className="px-3">
-											<Skeleton className="h-4 w-16" />
-										</div>
-									</div>
-									<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
+									<Skeleton className="h-5 w-16 rounded-full" />
+									<div className="flex items-center gap-2">
+										<Skeleton className="h-5 w-5 rounded-full" />
 										<Skeleton className="h-4 w-20" />
 									</div>
-									<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
-										<Skeleton className="h-4 w-4" />
+									<Skeleton className="h-4 w-16" />
+									<div className="flex items-center justify-end">
+										<Skeleton className="h-4 w-4 rounded" />
 									</div>
 								</div>
 							))
@@ -167,176 +156,139 @@ export const ApiKeyTable = ({
 								return (
 									<div
 										key={`api-key-${index}`}
-										className="group/row contents"
+										className={cn(
+											"group/row grid grid-cols-[2fr_1fr_1fr_1fr_80px] items-center py-2 px-4 transition-colors",
+											"hover:bg-bg-weak-50/50"
+										)}
 									>
-										<div className="flex items-center border-stroke-soft-200 border-t py-2 group-hover/row:bg-bg-weak-50">
-											<motion.div
-												{...getAnimationProps(index + 1, 0)}
-												className="flex items-center gap-2 pl-5"
+										{/* Name Column */}
+										<motion.div
+											{...getAnimationProps(index + 1, 0)}
+											className="flex items-center gap-2"
+										>
+											<Icon name="key-new" className="h-4 w-4 text-text-sub-600 shrink-0" />
+											<Link
+												href={`/${activeOrganizationSlug}/api-keys/${apiKey.id}`}
+												className="min-w-0 flex-1"
 											>
-												<Link
-													href={`/${activeOrganizationSlug}/api-keys/${apiKey.id}`}
-													className="flex items-center gap-2"
-												>
-													<Icon
-														name="key-new"
-														className="h-4 w-4 text-text-sub-600"
-													/>
-													<div className="flex flex-col">
-														<div
-															className={cn(
-																"truncate text-label-xs text-text-strong-950 text-xs",
-															)}
-														>
-															{displayName}
-														</div>
-														<div
-															className={cn(
-																"truncate font-mono text-label-xs text-text-sub-400 text-xs",
-															)}
-														>
-															{displayPrefix}
-														</div>
-													</div>
-												</Link>
-											</motion.div>
-										</div>
-										<div className="flex items-center border-stroke-soft-200 border-t py-2 group-hover/row:bg-bg-weak-50">
-											<motion.div
-												{...getAnimationProps(index + 1, 1)}
-												className="flex items-center gap-2 px-3"
-											>
-												<div
-													className={cn(
-														"py flex items-center rounded-full border px-1 font-medium text-xs",
-														getStatusColor(apiKey.enabled),
-													)}
-												>
-													<Icon
-														name={getStatusIcon(apiKey.enabled)}
-														className="mr-1 h-3 w-3"
-													/>
-													{apiKey.enabled ? "Enabled" : "Disabled"}
+												<div className="truncate font-medium text-label-sm text-text-strong-950">
+													{displayName}
 												</div>
-											</motion.div>
-										</div>
-										<div className="flex items-center border-stroke-soft-200 border-t py-2 pl-1 group-hover/row:bg-bg-weak-50">
-											<motion.div
-												{...getAnimationProps(index + 1, 2)}
-												className="flex items-center gap-2 px-3 font-medium"
-											>
-												<span className="text-label-sm text-text-strong-950">
-													{apiKey.requestCount}
+											</Link>
+										</motion.div>
+
+										{/* Status Column */}
+										<motion.div {...getAnimationProps(index + 1, 1)} className="flex items-center">
+											<span className={cn(
+												"inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-medium border-[1px]",
+												getStatusBadgeColor()
+											)}>
+												<span className={cn("mr-1.5 h-2 w-2 rounded-full", getStatusIconColor(apiKey.enabled), apiKey.enabled ? "bg-success-base" : "bg-error-base")} />
+												{apiKey.enabled ? "Enabled" : "Disabled"}
+											</span>
+										</motion.div>
+										{/* Created By Column */}
+										<motion.div {...getAnimationProps(index + 1, 2)} className="flex items-center gap-2">
+											<Avatar.Root size="20">
+												{apiKey.createdBy?.image ? (
+													<Avatar.Image src={apiKey.createdBy.image} alt={apiKey.createdBy?.name || "User"} />
+												) : null}
+											</Avatar.Root>
+											{apiKey.createdBy?.email ? (
+												<Tooltip.Root>
+													<Tooltip.Trigger asChild>
+														<span className="text-label-sm text-text-sub-600 truncate cursor-default">
+															{apiKey.createdBy?.name || "Unknown"}
+														</span>
+													</Tooltip.Trigger>
+													<Tooltip.Content>{apiKey.createdBy.email}</Tooltip.Content>
+												</Tooltip.Root>
+											) : (
+												<span className="text-label-sm text-text-sub-600 truncate">
+													{apiKey.createdBy?.name || "Unknown"}
 												</span>
-											</motion.div>
-										</div>
-										<div className="flex items-center border-stroke-soft-200 border-t py-2 group-hover/row:bg-bg-weak-50">
-											<motion.div
-												{...getAnimationProps(index + 1, 3)}
-												className="flex items-center gap-2 px-3 font-medium"
-											>
-												<span className="text-label-sm text-text-strong-950">
-													{apiKey.remaining !== null ? apiKey.remaining : "∞"}
-												</span>
-											</motion.div>
-										</div>
-										<div className="flex items-center border-stroke-soft-200 border-t py-2 pr-1 group-hover/row:bg-bg-weak-50">
-											<motion.div
-												{...getAnimationProps(index + 1, 4)}
-												className="flex items-center gap-2 px-3"
-											>
-												<span className="text-label-sm text-text-strong-950">
-													{apiKey.expiresAt
-														? formatRelativeTime(apiKey.expiresAt)
-														: "Never"}
-												</span>
-											</motion.div>
-										</div>
-										<div className="flex items-center border-stroke-soft-200 border-t py-2 pr-1 group-hover/row:bg-bg-weak-50">
-											<motion.span
-												{...getAnimationProps(index + 1, 5)}
-												className="text-label-sm text-text-strong-950"
-											>
+											)}
+										</motion.div>
+
+										{/* Created Column */}
+										<motion.div {...getAnimationProps(index + 1, 3)} className="flex items-center">
+											<span className="text-label-sm text-text-sub-600">
 												{formatRelativeTime(apiKey.createdAt)}
-											</motion.span>
-										</div>
-										<div className="flex items-center border-stroke-soft-200 border-t py-2 group-hover/row:bg-bg-weak-50">
-											<motion.div
-												{...getAnimationProps(index + 1, 6)}
-												className="flex items-center justify-center"
-											>
-												<PopoverRoot>
-													<PopoverTrigger asChild>
+											</span>
+										</motion.div>
+
+										{/* Actions Column */}
+										<motion.div
+											{...getAnimationProps(index + 1, 4)}
+											className="flex items-center justify-end"
+										>
+											<PopoverRoot>
+												<PopoverTrigger asChild>
+													<Button.Root
+														variant="neutral"
+														mode="ghost"
+														size="xxsmall"
+													>
+														<Icon name="more-vertical" className="w-3 h-3" />
+													</Button.Root>
+												</PopoverTrigger>
+												<PopoverContent align="end" className="w-48 p-2">
+													<div className="flex flex-col gap-1">
 														<Button.Root
 															variant="neutral"
 															mode="ghost"
-															size="xxsmall"
-															className="rounded p-1"
+															size="small"
+															onClick={() => handleViewDetails(apiKey.id)}
+															className="w-full justify-start"
 														>
 															<Icon
-																name="more-vertical"
-																className="h-4 w-4 text-text-sub-600 hover:text-text-strong-950"
+																name="eye-outline"
+																className="h-4 w-4"
 															/>
+															View Details
 														</Button.Root>
-													</PopoverTrigger>
-													<PopoverContent align="end" className="w-48 p-2">
-														<div className="flex flex-col gap-1">
-															<Button.Root
-																variant="neutral"
-																mode="ghost"
-																size="small"
-																onClick={() => handleViewDetails(apiKey.id)}
-																className="w-full justify-start"
-															>
+														<Button.Root
+															variant="neutral"
+															mode="ghost"
+															size="small"
+															onClick={() => handleToggleEnabled(apiKey)}
+															className="w-full justify-start"
+															disabled={togglingId === apiKey.id}
+														>
+															{togglingId === apiKey.id ? (
+																<Icon name="loader-2" className="h-4 w-4 animate-spin" />
+															) : (
 																<Icon
-																	name="eye-outline"
+																	name={apiKey.enabled ? "pause" : "play"}
 																	className="h-4 w-4"
 																/>
-																View Details
-															</Button.Root>
-															<Button.Root
-																variant="neutral"
-																mode="ghost"
-																size="small"
-																onClick={() => handleToggleEnabled(apiKey)}
-																className="w-full justify-start"
-																disabled={togglingId === apiKey.id}
-															>
-																{togglingId === apiKey.id ? (
-																	<Icon name="loader-2" className="h-4 w-4 animate-spin" />
-																) : (
-																	<Icon
-																		name={apiKey.enabled ? "pause" : "play"}
-																		className="h-4 w-4"
-																	/>
-																)}
-																{apiKey.enabled ? "Disable" : "Enable"}
-															</Button.Root>
-															<Button.Root
-																variant="neutral"
-																mode="ghost"
-																size="small"
-																onClick={() => setRotateModalApiKey(apiKey)}
-																className="w-full justify-start"
-															>
-																<Icon name="rotate-cw" className="h-4 w-4" />
-																Rotate Key
-															</Button.Root>
-															<Button.Root
-																variant="error"
-																mode="ghost"
-																size="small"
-																onClick={() => handleDeleteApiKey(apiKey.id)}
-																className="w-full justify-start"
-															>
-																<Icon name="trash" className="h-4 w-4" />
-																Delete API Key
-															</Button.Root>
-														</div>
-													</PopoverContent>
-												</PopoverRoot>
-											</motion.div>
-										</div>
+															)}
+															{apiKey.enabled ? "Disable" : "Enable"}
+														</Button.Root>
+														<Button.Root
+															variant="neutral"
+															mode="ghost"
+															size="small"
+															onClick={() => setRotateModalApiKey(apiKey)}
+															className="w-full justify-start"
+														>
+															<Icon name="rotate-cw" className="h-4 w-4" />
+															Rotate Key
+														</Button.Root>
+														<Button.Root
+															variant="error"
+															mode="ghost"
+															size="small"
+															onClick={() => handleDeleteApiKey(apiKey.id)}
+															className="w-full justify-start"
+														>
+															<Icon name="trash" className="h-4 w-4" />
+															Delete API Key
+														</Button.Root>
+													</div>
+												</PopoverContent>
+											</PopoverRoot>
+										</motion.div>
 									</div>
 								);
 							})}
