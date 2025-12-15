@@ -49,14 +49,14 @@ export const MainNavigation: React.FC<MainNavigationProps> = ({
 						onPointerEnter={() => setHoverIdx(index)}
 						onPointerLeave={() => setHoverIdx(undefined)}
 						className={cn(
-							"flex h-8 items-center gap-2 rounded-lg px-2 text-left transition-colors",
+							"flex h-9 items-center gap-2 rounded-lg px-2 text-left transition-colors",
 							isCollapsed ? "justify-center" : "justify-start",
 							!currentRect && currentIdx === index && "bg-neutral-alpha-10",
 							"hover:bg-neutral-alpha-5",
 						)}
 						title={isCollapsed ? label : undefined}
 					>
-						<Icon name={iconName} className="h-4 w-4 shrink-0" />
+						<Icon name={iconName} className="h-[17px] w-[17px] shrink-0" />
 						<AnimatePresence mode="wait">
 							{!isCollapsed && (
 								<motion.span

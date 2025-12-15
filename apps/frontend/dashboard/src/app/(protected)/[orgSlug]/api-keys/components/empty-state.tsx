@@ -8,48 +8,133 @@ interface EmptyStateProps {
 
 export const EmptyState = ({ onCreateApiKey }: EmptyStateProps) => {
 	return (
-		<div className="flex flex-col items-center justify-center h-[calc(100dvh-150px)]">
-			{/* Illustration */}
+		<div className="flex flex-col items-center justify-center h-[calc(100dvh-150px)] animate-in fade-in slide-in-from-bottom-4 duration-500">
 			<div className="relative mb-8">
-				{/* Background decorative elements */}
-				<div className="absolute -top-3 -left-3 h-16 w-16 rounded-full bg-neutral-alpha-10" />
-				<div className="absolute -right-2 -bottom-2 h-12 w-12 rounded-full bg-neutral-alpha-10" />
-
-				{/* Main icon container */}
-				<div className="relative flex h-20 w-20 items-center justify-center rounded-2xl border border-stroke-soft-200/50 bg-bg-white-0 shadow-regular-md">
-					<Icon name="key-new" className="h-10 w-10 text-natural-base" />
+				<div className="absolute -top-3 -left-3 h-16 w-16 rounded-full bg-neutral-alpha-10 animate-pulse" />
+				<div
+					className="absolute -right-2 -bottom-2 h-12 w-12 rounded-full bg-neutral-alpha-10 animate-pulse"
+					style={{ animationDelay: "1s" }}
+				/>
+				<div className="relative flex h-20 w-20 items-center justify-center rounded-2xl border border-stroke-soft-200/50 bg-bg-white-0 shadow-regular-md group">
+					<div className="relative">
+						<div
+							className="absolute inset-0 blur-xl rounded-full bg-primary-alpha-16 animate-pulse"
+							style={{ animationDuration: "2s" }}
+						/>
+						{/* Key with wiggle animation */}
+						<Icon
+							name="key-new"
+							className="relative h-10 w-10 text-natural-base animate-key-wiggle"
+							style={{
+								animation: "keyWiggle 4s ease-in-out infinite",
+							}}
+						/>
+					</div>
 				</div>
+				<div
+					className="absolute top-0 right-0 h-2 w-2 rounded-full bg-primary-alpha-24"
+					style={{
+						animation: "floatParticle 3s ease-in-out infinite",
+					}}
+				/>
+				<div
+					className="absolute bottom-4 left-0 h-1.5 w-1.5 rounded-full bg-primary-alpha-16"
+					style={{
+						animation: "floatParticle 3s ease-in-out infinite 0.5s",
+					}}
+				/>
 			</div>
 
-			{/* Content */}
+			{/* Content with staggered animations */}
 			<div className="flex max-w-md flex-col items-center text-center">
-				<h3 className="mb-2 font-semibold text-text-strong-950 text-xl">
+				<h3
+					className="mb-2 font-semibold text-text-strong-950 text-xl animate-in fade-in slide-in-from-bottom-2 duration-500"
+					style={{ animationDelay: "150ms", animationFillMode: "backwards" }}
+				>
 					No API keys yet
 				</h3>
-				<p className="mb-2 text-text-sub-600 text-sm">
+				<p
+					className="mb-2 text-text-sub-600 text-sm animate-in fade-in slide-in-from-bottom-2 duration-500"
+					style={{ animationDelay: "250ms", animationFillMode: "backwards" }}
+				>
 					API keys allow you to authenticate requests to your application programmatically.
 				</p>
-				<p className="mb-6 text-text-soft-400 text-xs">
+				<p
+					className="mb-6 text-text-soft-400 text-xs animate-in fade-in slide-in-from-bottom-2 duration-500"
+					style={{ animationDelay: "350ms", animationFillMode: "backwards" }}
+				>
 					Create your first API key to get started with the API.
 				</p>
 
 				{/* CTA */}
-				<Button.Root variant="neutral" size="small" onClick={onCreateApiKey}>
-					<Icon name="plus" className="h-4 w-4" />
-					Create your first API key
-				</Button.Root>
+				<div
+					className="animate-in fade-in slide-in-from-bottom-2 duration-500"
+					style={{ animationDelay: "450ms", animationFillMode: "backwards" }}
+				>
+					<Button.Root variant="neutral" size="small" onClick={onCreateApiKey}>
+						<Icon name="plus" className="h-4 w-4" />
+						Create your first API key
+					</Button.Root>
+				</div>
 
 				{/* Help link */}
 				<a
 					href="https://reloop.sh/docs/api-keys"
 					target="_blank"
 					rel="noopener noreferrer"
-					className="mt-4 flex items-center gap-1 text-text-sub-600 text-xs transition-colors hover:text-text-strong-950"
+					className="mt-4 flex items-center gap-1 text-text-sub-600 text-xs transition-colors hover:text-text-strong-950 animate-in fade-in slide-in-from-bottom-2 duration-500"
+					style={{ animationDelay: "550ms", animationFillMode: "backwards" }}
 				>
 					<Icon name="book-closed" className="h-3 w-3" />
 					Learn more about API keys
 				</a>
 			</div>
+
+			{/* Custom keyframe animations */}
+			<style jsx global>{`
+				@keyframes keyWiggle {
+					0%, 100% {
+						transform: rotate(0deg) scale(1);
+					}
+					15% {
+						transform: rotate(-12deg) scale(1.05);
+					}
+					30% {
+						transform: rotate(10deg) scale(1.02);
+					}
+					45% {
+						transform: rotate(-8deg) scale(1.03);
+					}
+					60% {
+						transform: rotate(5deg) scale(1);
+					}
+					75% {
+						transform: rotate(-3deg) scale(1);
+					}
+					90% {
+						transform: rotate(0deg) scale(1);
+					}
+				}
+
+				@keyframes floatParticle {
+					0%, 100% {
+						transform: translateY(0) translateX(0) scale(1);
+						opacity: 0.6;
+					}
+					25% {
+						transform: translateY(-6px) translateX(3px) scale(1.2);
+						opacity: 1;
+					}
+					50% {
+						transform: translateY(-10px) translateX(-2px) scale(0.8);
+						opacity: 0.8;
+					}
+					75% {
+						transform: translateY(-4px) translateX(4px) scale(1.1);
+						opacity: 0.5;
+					}
+				}
+			`}</style>
 		</div>
 	);
 };

@@ -89,6 +89,9 @@
 				"fumadocs-core": "^16.0.5",
 				"fumadocs-ui": "^16.0.5",
 				"boring-avatars": "^2.0.4",
+				"@react-three/fiber": "^9.4.2",
+				"@types/three": "^0.182.0",
+				"three": "^0.182.0",
 				"recharts": "^2.15.0"
 			},
 			"db": {
@@ -211,5 +214,6 @@
 		"protobufjs"
 	],
 	"dependencies": {
+		
 	}
 }
