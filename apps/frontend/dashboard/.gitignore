@@ -18,9 +18,9 @@
 *.pem
 /.pnp
 .pnp.js
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+npm-debug*
+yarn-debug*
+yarn-error*
 
 # others
 .env*.local
