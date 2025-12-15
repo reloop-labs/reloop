@@ -1,4 +1,5 @@
 "use client";
+import { AnimatedHoverBackground } from "@fe/dashboard/components/layout/sidebar/animated-hover-background";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { getAnimationProps } from "@fe/dashboard/utils/audience";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
@@ -17,7 +18,7 @@ import axios from "axios";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useQueryState } from "nuqs";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
 import { DeleteApiKeyModal } from "./delete-api-key-modal";
@@ -54,6 +55,114 @@ const getStatusBadgeColor = () => {
 
 const getStatusIconColor = (enabled: boolean) => {
 	return enabled ? "text-success-base" : "text-error-base";
+};
+
+interface ApiKeyActionsDropdownProps {
+	apiKey: ApiKeyData;
+	onViewDetails: (id: string) => void;
+	onToggleEnabled: (apiKey: ApiKeyData) => void;
+	onRotateKey: (apiKey: ApiKeyData) => void;
+	onDeleteKey: (id: string) => void;
+	isToggling: boolean;
+	animationProps: ReturnType<typeof getAnimationProps>;
+}
+
+const ApiKeyActionsDropdown = ({
+	apiKey,
+	onViewDetails,
+	onToggleEnabled,
+	onRotateKey,
+	onDeleteKey,
+	isToggling,
+	animationProps,
+}: ApiKeyActionsDropdownProps) => {
+	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
+	const [popoverOpen, setPopoverOpen] = useState(false);
+	const buttonRefs = useRef<HTMLButtonElement[]>([]);
+
+	const toggleIcon = apiKey.enabled ? "pause" : "play";
+	const menuItems = [
+		{ id: "view", label: "View Details", icon: "eye-outline" as const, isDanger: false },
+		{
+			id: "toggle",
+			label: apiKey.enabled ? "Disable" : "Enable",
+			icon: toggleIcon as "pause" | "play",
+			isDanger: false,
+		},
+		{ id: "rotate", label: "Rotate Key", icon: "rotate-cw" as const, isDanger: false },
+		{ id: "delete", label: "Delete API Key", icon: "trash" as const, isDanger: true },
+	];
+
+	const currentTab = buttonRefs.current[hoverIdx ?? -1];
+	const currentRect = currentTab?.getBoundingClientRect();
+	const hoveredItem = menuItems[hoverIdx ?? -1];
+	const isDanger = hoveredItem?.isDanger ?? false;
+
+	const handleItemClick = (itemId: string) => {
+		if (itemId === "view") {
+			onViewDetails(apiKey.id);
+			setPopoverOpen(false);
+		} else if (itemId === "toggle") {
+			onToggleEnabled(apiKey);
+			setPopoverOpen(false);
+		} else if (itemId === "rotate") {
+			onRotateKey(apiKey);
+			setPopoverOpen(false);
+		} else if (itemId === "delete") {
+			onDeleteKey(apiKey.id);
+			setPopoverOpen(false);
+		}
+	};
+
+	return (
+		<motion.div {...animationProps} className="flex items-center justify-end">
+			<PopoverRoot open={popoverOpen} onOpenChange={setPopoverOpen}>
+				<PopoverTrigger asChild>
+					<Button.Root variant="neutral" mode="ghost" size="xxsmall">
+						<Icon name="more-vertical" className="w-3 h-3" />
+					</Button.Root>
+				</PopoverTrigger>
+				<PopoverContent align="end" sideOffset={-4} className="w-40 p-1.5 rounded-xl">
+					<div className="relative">
+						{menuItems.map((item, idx) => (
+							<button
+								key={item.id}
+								ref={(el) => {
+									if (el) buttonRefs.current[idx] = el;
+								}}
+								type="button"
+								onPointerEnter={() => setHoverIdx(idx)}
+								onPointerLeave={() => setHoverIdx(undefined)}
+								onClick={() => handleItemClick(item.id)}
+								disabled={item.id === "toggle" && isToggling}
+								className={cn(
+									"flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-xs font-normal transition-colors",
+									item.isDanger ? "text-error-base" : "text-text-strong-950",
+									!currentRect && hoverIdx === idx && (item.isDanger ? "bg-red-alpha-10" : "bg-neutral-alpha-10"),
+									isToggling && item.id === "toggle" && "opacity-50 cursor-not-allowed"
+								)}
+							>
+								{item.id === "toggle" && isToggling ? (
+									<Icon name="loader-2" className="h-3.5 w-3.5 animate-spin text-text-sub-600" />
+								) : (
+									<Icon
+										name={item.icon}
+										className={cn("h-3.5 w-3.5", item.isDanger ? "" : "text-text-sub-600")}
+									/>
+								)}
+								<span>{item.label}</span>
+							</button>
+						))}
+						<AnimatedHoverBackground
+							rect={currentRect}
+							tabElement={currentTab}
+							isDanger={isDanger}
+						/>
+					</div>
+				</PopoverContent>
+			</PopoverRoot>
+		</motion.div>
+	);
 };
 
 export const ApiKeyTable = ({
@@ -107,7 +216,7 @@ export const ApiKeyTable = ({
 			<AnimatePresence mode="wait">
 				<div className="w-full text-paragraph-sm rounded-xl border border-stroke-soft-100 overflow-hidden">
 					{/* Table Header */}
-					<div className="grid grid-cols-[2fr_1fr_1fr_1fr_80px] items-center py-3.5 px-4 text-text-sub-600 border-b border-stroke-soft-100">
+					<div className="grid grid-cols-[2fr_1fr_1fr_1fr_48px] items-center py-3.5 px-4 text-text-sub-600 border-b border-stroke-soft-100">
 						<div className="flex items-center gap-2">
 							<Icon name="key-new" className="h-4 w-4" />
 							<span className="text-xs">Name</span>
@@ -132,7 +241,7 @@ export const ApiKeyTable = ({
 						{isLoading
 							? // Skeleton loading state
 							Array.from({ length: loadingRows }).map((_, index) => (
-								<div key={`skeleton-${index}-${activeOrganizationSlug}`} className="grid grid-cols-[2fr_1fr_1fr_1fr_80px] items-center py-2 px-4">
+								<div key={`skeleton-${index}-${activeOrganizationSlug}`} className="grid grid-cols-[2fr_1fr_1fr_1fr_48px] items-center py-2 px-4">
 									<div className="flex items-center gap-2">
 										<Skeleton className="h-4 w-4 rounded" />
 										<Skeleton className="h-4 w-24" />
@@ -157,7 +266,7 @@ export const ApiKeyTable = ({
 									<div
 										key={`api-key-${index}`}
 										className={cn(
-											"group/row grid grid-cols-[2fr_1fr_1fr_1fr_80px] items-center py-2 px-4 transition-colors",
+											"group/row grid grid-cols-[2fr_1fr_1fr_1fr_48px] items-center py-2 px-4 transition-colors",
 											"hover:bg-bg-weak-50/50"
 										)}
 									>
@@ -195,13 +304,30 @@ export const ApiKeyTable = ({
 												) : null}
 											</Avatar.Root>
 											{apiKey.createdBy?.email ? (
-												<Tooltip.Root>
+												<Tooltip.Root
+
+													delayDuration={0}>
+
 													<Tooltip.Trigger asChild>
 														<span className="text-label-sm text-text-sub-600 truncate cursor-default">
 															{apiKey.createdBy?.name || "Unknown"}
 														</span>
 													</Tooltip.Trigger>
-													<Tooltip.Content>{apiKey.createdBy.email}</Tooltip.Content>
+													<Tooltip.Content
+														sideOffset={-3}
+														variant="light">
+														<div className="flex items-start gap-2 p-1">
+															<Avatar.Root size="20" className="shrink-0 mt-0.5">
+																{apiKey.createdBy?.image ? (
+																	<Avatar.Image src={apiKey.createdBy.image} alt={apiKey.createdBy?.name || "User"} />
+																) : null}
+															</Avatar.Root>
+															<div className="flex flex-col">
+																<span className="font-sm">{apiKey.createdBy?.name || "Unknown"}</span>
+																<span className="text-text-soft-400 text-xs">{apiKey.createdBy.email}</span>
+															</div>
+														</div>
+													</Tooltip.Content>
 												</Tooltip.Root>
 											) : (
 												<span className="text-label-sm text-text-sub-600 truncate">
@@ -218,77 +344,15 @@ export const ApiKeyTable = ({
 										</motion.div>
 
 										{/* Actions Column */}
-										<motion.div
-											{...getAnimationProps(index + 1, 4)}
-											className="flex items-center justify-end"
-										>
-											<PopoverRoot>
-												<PopoverTrigger asChild>
-													<Button.Root
-														variant="neutral"
-														mode="ghost"
-														size="xxsmall"
-													>
-														<Icon name="more-vertical" className="w-3 h-3" />
-													</Button.Root>
-												</PopoverTrigger>
-												<PopoverContent align="end" className="w-48 p-2">
-													<div className="flex flex-col gap-1">
-														<Button.Root
-															variant="neutral"
-															mode="ghost"
-															size="small"
-															onClick={() => handleViewDetails(apiKey.id)}
-															className="w-full justify-start"
-														>
-															<Icon
-																name="eye-outline"
-																className="h-4 w-4"
-															/>
-															View Details
-														</Button.Root>
-														<Button.Root
-															variant="neutral"
-															mode="ghost"
-															size="small"
-															onClick={() => handleToggleEnabled(apiKey)}
-															className="w-full justify-start"
-															disabled={togglingId === apiKey.id}
-														>
-															{togglingId === apiKey.id ? (
-																<Icon name="loader-2" className="h-4 w-4 animate-spin" />
-															) : (
-																<Icon
-																	name={apiKey.enabled ? "pause" : "play"}
-																	className="h-4 w-4"
-																/>
-															)}
-															{apiKey.enabled ? "Disable" : "Enable"}
-														</Button.Root>
-														<Button.Root
-															variant="neutral"
-															mode="ghost"
-															size="small"
-															onClick={() => setRotateModalApiKey(apiKey)}
-															className="w-full justify-start"
-														>
-															<Icon name="rotate-cw" className="h-4 w-4" />
-															Rotate Key
-														</Button.Root>
-														<Button.Root
-															variant="error"
-															mode="ghost"
-															size="small"
-															onClick={() => handleDeleteApiKey(apiKey.id)}
-															className="w-full justify-start"
-														>
-															<Icon name="trash" className="h-4 w-4" />
-															Delete API Key
-														</Button.Root>
-													</div>
-												</PopoverContent>
-											</PopoverRoot>
-										</motion.div>
+										<ApiKeyActionsDropdown
+											apiKey={apiKey}
+											onViewDetails={handleViewDetails}
+											onToggleEnabled={handleToggleEnabled}
+											onRotateKey={setRotateModalApiKey}
+											onDeleteKey={handleDeleteApiKey}
+											isToggling={togglingId === apiKey.id}
+											animationProps={getAnimationProps(index + 1, 4)}
+										/>
 									</div>
 								);
 							})}
