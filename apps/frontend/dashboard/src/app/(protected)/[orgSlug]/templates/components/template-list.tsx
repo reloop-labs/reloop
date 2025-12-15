@@ -10,7 +10,7 @@ import { useQueryState, parseAsInteger } from "nuqs";
 import useSWR from "swr";
 import { TemplateTable } from "./template-table";
 import { EmptyState } from "./empty-state";
-import { PageSizeDropdown } from "./page-size-dropdown";
+import { PageSizeDropdown } from "@fe/dashboard/components/page-size-dropdown";
 import Spinner from "@reloop/ui/spinner";
 
 interface Template {

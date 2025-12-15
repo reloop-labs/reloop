@@ -1,6 +1,6 @@
 "use client";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
-import { PageSizeDropdown } from "../../domain/components/page-size-dropdown";
+import { PageSizeDropdown } from "@fe/dashboard/components/page-size-dropdown";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";

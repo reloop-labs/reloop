@@ -14,7 +14,7 @@ import { DomainFilterDropdown, type DomainStatusFilters } from "./domain-filter-
 
 import { DomainTable } from "./domain-table";
 import { EmptyState } from "./empty-state";
-import { PageSizeDropdown } from "./page-size-dropdown";
+import { PageSizeDropdown } from "@fe/dashboard/components/page-size-dropdown";
 
 export const DomainListSidebar = () => {
 	const { activeOrganization } = useUserOrganization();
