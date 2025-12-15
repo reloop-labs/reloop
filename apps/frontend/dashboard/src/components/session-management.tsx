@@ -322,7 +322,6 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 				{sessions.length > 1 && (
 					<Button.Root
 						variant="error"
-						mode="lighter"
 						size="xsmall"
 						onClick={handleTerminateAllSessions}
 						disabled={terminatingAll}
@@ -432,8 +431,11 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 													{terminatingSession === session.token ? (
 														<Spinner size={12} color="var(--text-sub-600)" />
 													) : (
-														<Icon name="more-vertical" className="h-3 w-3" />
-													)}
+														<Button.Root variant="error" mode="lighter" size="xxsmall" className="text-xs">
+															Revoke
+														</Button.Root>
+													)
+													}
 												</Button.Root>
 											</motion.div>
 										)}
