@@ -35,13 +35,15 @@ export async function rotateApiKey(
   userId: string,
 ): Promise<ApiKeyTypes.ApiKeyWithKeyResponse> {
   try {
-    // Verify the API key exists and belongs to the user/org
+    // Verify the API key exists and belongs to the organization
     const existingKey = await db.query.apikey.findFirst({
       where: and(
         eq(schema.apikey.id, id),
         eq(schema.apikey.organizationId, organizationId),
-        eq(schema.apikey.userId, userId),
       ),
+      with: {
+        user: true,
+      },
     });
 
     if (!existingKey) {
@@ -73,7 +75,15 @@ export async function rotateApiKey(
 
     logger.info({ id, organizationId, userId }, "API key rotated successfully");
 
-    return formatApiKeyWithKeyResponse(updatedKey, fullKey);
+    return formatApiKeyWithKeyResponse({
+      ...updatedKey,
+      createdBy: {
+        id: existingKey.user.id,
+        name: existingKey.user.name,
+        image: existingKey.user.image,
+        email: existingKey.user.email,
+      },
+    }, fullKey);
   } catch (error) {
     logger.error(
       {

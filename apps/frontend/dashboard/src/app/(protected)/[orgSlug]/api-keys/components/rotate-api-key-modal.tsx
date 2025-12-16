@@ -1,11 +1,11 @@
 "use client";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
-import * as Kbd from "@reloop/ui/kbd";
 import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
+import Spinner from "@reloop/ui/spinner";
 import axios from "axios";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
 
@@ -35,7 +35,22 @@ export const RotateApiKeyModal = ({
   const [isRotating, setIsRotating] = useState(false);
   const [rotatedApiKey, setRotatedApiKey] = useState<ApiKeyWithKeyResponse | null>(null);
   const [keyRevealed, setKeyRevealed] = useState(false);
+  const [keyCopied, setKeyCopied] = useState(false);
   const { mutate } = useSWRConfig();
+
+  // Block browser refresh/close when key is rotated but not copied
+  useEffect(() => {
+    if (rotatedApiKey && !keyCopied) {
+      const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+        e.preventDefault();
+        e.returnValue = "You haven't copied your new API key yet. Are you sure you want to leave?";
+        return e.returnValue;
+      };
+
+      window.addEventListener("beforeunload", handleBeforeUnload);
+      return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+    }
+  }, [rotatedApiKey, keyCopied]);
 
   const handleRotate = async () => {
     try {
@@ -60,10 +75,15 @@ export const RotateApiKeyModal = ({
     }
   };
 
+  const handleRevealKey = () => {
+    setKeyRevealed(true);
+  };
+
   const handleCopyKey = async () => {
     if (rotatedApiKey?.key) {
       try {
         await navigator.clipboard.writeText(rotatedApiKey.key);
+        setKeyCopied(true);
         toast.success("API key copied to clipboard");
       } catch {
         toast.error("Failed to copy API key");
@@ -72,138 +92,185 @@ export const RotateApiKeyModal = ({
   };
 
   const handleClose = () => {
-    setRotatedApiKey(null);
-    setKeyRevealed(false);
-    onClose();
+    // Only allow closing if the key has been copied
+    if (!rotatedApiKey || keyCopied) {
+      setRotatedApiKey(null);
+      setKeyRevealed(false);
+      setKeyCopied(false);
+      onClose();
+    }
+  };
+
+  // Prevent closing via modal interactions when key is not copied
+  const handleOpenChange = (open: boolean) => {
+    if (!open && rotatedApiKey && !keyCopied) {
+      // Prevent closing - show a warning toast
+      toast.warning("Please copy your API key before closing");
+      return;
+    }
+    if (!open) {
+      handleClose();
+    }
   };
 
   // Show new key reveal screen after rotation
   if (rotatedApiKey) {
     return (
-      <Modal.Root open={isOpen} onOpenChange={handleClose}>
-        <Modal.Content className="data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom-4 data-[state=open]:zoom-in-95 data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-bottom-4 data-[state=closed]:zoom-out-95 max-w-lg duration-200 data-[state=closed]:animate-out data-[state=open]:animate-in">
-          <Modal.Body>
-            <h2 className="mb-2 font-semibold text-gray-900 text-xl">
-              API Key Rotated
-            </h2>
-            <p className="mb-4 text-gray-600 text-sm">
-              Your API key has been rotated. Make sure to copy the new key now.
-              You won't be able to see it again!
-            </p>
+      <Modal.Root open={isOpen} onOpenChange={handleOpenChange}>
+        <Modal.Content
+          className="sm:max-w-[480px] p-0.5 border border-stroke-soft-100/50 rounded-2xl"
+          showClose={keyCopied}
+          onEscapeKeyDown={(e) => {
+            if (!keyCopied) {
+              e.preventDefault();
+              toast.warning("Please copy your API key before closing");
+            }
+          }}
+          onPointerDownOutside={(e) => {
+            if (!keyCopied) {
+              e.preventDefault();
+            }
+          }}
+          onInteractOutside={(e) => {
+            if (!keyCopied) {
+              e.preventDefault();
+            }
+          }}
+        >
+          <div className="border border-stroke-soft-100/50 rounded-2xl">
+            <Modal.Header className="before:border-stroke-soft-200/50">
+              <div className="flex items-center justify-center">
+                <Icon name="check-circle" className="h-4 w-4 text-success-base" />
+              </div>
+              <div className="flex-1">
+                <Modal.Title>API Key Rotated</Modal.Title>
+              </div>
+            </Modal.Header>
+            <Modal.Body className="space-y-4">
+              <p className="text-text-sub-600 text-sm">
+                Your API key has been rotated. Make sure to copy the new key now.
+                You won't be able to see it again!
+              </p>
 
-            <div className="mb-4 space-y-2">
-              <Label.Root className="font-medium text-sm">New API Key</Label.Root>
-              <div className="flex items-center gap-2 rounded-lg border border-stroke-soft-200 bg-bg-weak-50 p-3">
-                {keyRevealed ? (
-                  <>
-                    <code className="flex-1 break-all font-mono text-xs">
-                      {rotatedApiKey.key}
-                    </code>
-                    <Button.Root
-                      variant="neutral"
-                      mode="ghost"
-                      size="xxsmall"
-                      onClick={handleCopyKey}
-                    >
-                      <Icon name="clipboard-copy" className="h-4 w-4" />
-                    </Button.Root>
-                  </>
-                ) : (
-                  <>
-                    <code className="flex-1 font-mono text-xs">
-                      {"•".repeat(40)}
-                    </code>
-                    <Button.Root
-                      variant="neutral"
-                      mode="ghost"
-                      size="xxsmall"
-                      onClick={() => setKeyRevealed(true)}
-                    >
-                      <Icon name="eye" className="h-4 w-4" />
-                      Reveal
-                    </Button.Root>
-                  </>
+              <div className="space-y-2">
+                <Label.Root>New API Key</Label.Root>
+                <div className="flex items-center gap-2 rounded-xl border border-stroke-soft-200 bg-bg-weak-50 p-3">
+                  {keyRevealed ? (
+                    <>
+                      <code className="flex-1 break-all font-mono text-xs text-text-strong-950">
+                        {rotatedApiKey.key}
+                      </code>
+                      <Button.Root
+                        variant="neutral"
+                        mode="ghost"
+                        size="xxsmall"
+                        onClick={handleCopyKey}
+                        disabled={keyCopied}
+                      >
+                        <Icon name={keyCopied ? "check" : "clipboard-copy"} className={`h-4 w-4 ${keyCopied ? "text-success-base" : ""}`} />
+                      </Button.Root>
+                    </>
+                  ) : (
+                    <>
+                      <code className="flex-1 font-mono text-xs text-text-sub-600">
+                        {"•".repeat(40)}
+                      </code>
+                      <Button.Root
+                        variant="neutral"
+                        mode="ghost"
+                        size="xxsmall"
+                        onClick={handleRevealKey}
+                      >
+                        <Icon name="eye-outline" className="h-4 w-4" />
+                      </Button.Root>
+                    </>
+                  )}
+                </div>
+                {!keyCopied && (
+                  <p className="text-error-base text-xs flex items-center gap-1">
+                    <Icon name="alert-triangle" className="h-3 w-3" />
+                    You must copy the API key before you can close this dialog.
+                  </p>
+                )}
+                {keyCopied && (
+                  <p className="text-success-base text-xs flex items-center gap-1">
+                    <Icon name="check-circle" className="h-3 w-3" />
+                    API key copied! You can now close this dialog.
+                  </p>
                 )}
               </div>
-              {keyRevealed && (
-                <p className="text-red-600 text-xs">
-                  ⚠️ This is your only chance to copy the new API key. The old
-                  key is no longer valid.
-                </p>
-              )}
-            </div>
-          </Modal.Body>
-          <Modal.Footer className="flex items-center justify-end gap-3">
-            <Button.Root
-              type="button"
-              variant="neutral"
-              onClick={handleClose}
-              disabled={!keyRevealed}
-            >
-              Done
-              <Icon name="check" className="h-3 w-3" />
-            </Button.Root>
-          </Modal.Footer>
+            </Modal.Body>
+            <Modal.Footer className="justify-end border-stroke-soft-100/50 mt-4">
+              <Button.Root
+                type="button"
+                variant="neutral"
+                size="xsmall"
+                onClick={handleClose}
+                disabled={!keyCopied}
+              >
+                Done
+                <Icon name="thumbs-up" className="h-3.5 w-3.5" />
+              </Button.Root>
+            </Modal.Footer>
+          </div>
         </Modal.Content>
       </Modal.Root>
     );
   }
 
   return (
-    <Modal.Root open={isOpen} onOpenChange={handleClose}>
-      <Modal.Content className="data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom-4 data-[state=open]:zoom-in-95 data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-bottom-4 data-[state=closed]:zoom-out-95 max-w-md duration-200 data-[state=closed]:animate-out data-[state=open]:animate-in">
-        <Modal.Body>
-          <h2 className="mb-2 font-semibold text-gray-900 text-xl">
-            Rotate API Key
-          </h2>
-          <p className="mb-4 text-gray-600 text-sm">
-            Are you sure you want to rotate this API key?
-          </p>
+    <Modal.Root open={isOpen} onOpenChange={handleOpenChange}>
+      <Modal.Content className="sm:max-w-[480px] p-0.5 border border-stroke-soft-100/50 rounded-2xl" showClose={true}>
+        <div className="border border-stroke-soft-100/50 rounded-2xl">
+          <Modal.Header className="before:border-stroke-soft-200/50">
+            <div className="flex items-center justify-centers">
+              <Icon name="rotate-cw" className="h-4 w-4" />
+            </div>
+            <div className="flex-1">
+              <Modal.Title>Rotate API Key</Modal.Title>
+            </div>
+          </Modal.Header>
+          <Modal.Body className="space-y-4">
+            <p className="text-text-sub-600 text-sm">
+              Are you sure you want to rotate this API key?
+            </p>
 
-          <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-3">
-            <div className="flex items-start gap-2">
-              <Icon name="alert-triangle" className="mt-0.5 h-4 w-4 text-amber-600" />
-              <div>
-                <p className="font-medium text-amber-800 text-sm">Warning</p>
-                <p className="text-amber-700 text-xs">
-                  This will generate a new secret for "{apiKeyName}". The old key
-                  will stop working immediately. Any applications using this key
-                  will need to be updated.
-                </p>
+            <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-3">
+              <div className="flex items-start justify-start gap-2">
+                <Icon name="alert-triangle" className="text-error-base h-6 w-6" />
+                <div>
+                  <p className="font-medium text-error-base text-sm">Warning</p>
+                  <p className="text-error-base/80 text-xs">
+                    This will generate a new secret for "{apiKeyName}". The old key
+                    will stop working immediately. Any applications using this key
+                    will need to be updated.
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        </Modal.Body>
-        <Modal.Footer className="flex items-center justify-end gap-3">
-          <Button.Root
-            type="button"
-            variant="neutral"
-            mode="stroke"
-            onClick={handleClose}
-            disabled={isRotating}
-          >
-            Cancel
-            <Kbd.Root className="bg-bg-weak-50 text-xs">Esc</Kbd.Root>
-          </Button.Root>
-          <Button.Root
-            type="button"
-            variant="primary"
-            onClick={handleRotate}
-            disabled={isRotating}
-          >
-            {isRotating ? (
-              <>
-                <Icon name="loader-2" className="mr-2 h-4 w-4 animate-spin" />
-                Rotating...
-              </>
-            ) : (
-              <>
-                <Icon name="rotate-cw" className="h-4 w-4" />
-                Rotate Key
-              </>
-            )}
-          </Button.Root>
-        </Modal.Footer>
+          </Modal.Body>
+          <Modal.Footer className="justify-end border-stroke-soft-100/50 mt-4">
+            <Button.Root
+              type="button"
+              variant="neutral"
+              size="xsmall"
+              onClick={handleRotate}
+              disabled={isRotating}
+            >
+              {isRotating ? (
+                <>
+                  <Spinner size={14} color="currentColor" />
+                  Rotating...
+                </>
+              ) : (
+                <>
+                  Rotate Key
+                  <Icon name="rotate-cw" className="h-3 w-3" />
+                </>
+              )}
+            </Button.Root>
+          </Modal.Footer>
+        </div>
       </Modal.Content>
     </Modal.Root>
   );
