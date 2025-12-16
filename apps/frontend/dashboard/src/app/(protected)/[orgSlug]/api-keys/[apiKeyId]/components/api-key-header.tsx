@@ -271,7 +271,7 @@ export const ApiKeyHeader = ({
 								<PopoverRoot>
 									<PopoverTrigger asChild>
 										<Button.Root variant="neutral" mode="stroke" size="xsmall">
-											<Icon name="more-vertical" className="h-4 w-4 text-text-sub-600" />
+											<Icon name="more-vertical" className="h-3.5 w-3.5 text-text-sub-600" />
 										</Button.Root>
 									</PopoverTrigger>
 									<PopoverContent align="end" sideOffset={8} className="w-44 p-1.5 rounded-xl" showArrow>

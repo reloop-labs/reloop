@@ -9,7 +9,7 @@ import * as Modal from "@reloop/ui/modal";
 import { useLoading } from "@reloop/ui/use-loading";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -54,6 +54,21 @@ export const CreateApiKeyModal = ({
 	const [createdApiKey, setCreatedApiKey] =
 		useState<ApiKeyWithKeyResponse | null>(null);
 	const [keyRevealed, setKeyRevealed] = useState(false);
+	const [keyCopied, setKeyCopied] = useState(false);
+
+	// Block browser refresh/close when key is created but not copied
+	useEffect(() => {
+		if (createdApiKey && !keyCopied) {
+			const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+				e.preventDefault();
+				e.returnValue = "You haven't copied your API key yet. Are you sure you want to leave?";
+				return e.returnValue;
+			};
+
+			window.addEventListener("beforeunload", handleBeforeUnload);
+			return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+		}
+	}, [createdApiKey, keyCopied]);
 
 	const { register, handleSubmit, formState, reset } =
 		useForm<ApiKeyFormValues>({
@@ -107,6 +122,7 @@ export const CreateApiKeyModal = ({
 		if (createdApiKey?.key) {
 			try {
 				await navigator.clipboard.writeText(createdApiKey.key);
+				setKeyCopied(true);
 				toast.success("API key copied to clipboard");
 			} catch {
 				toast.error("Failed to copy API key");
@@ -118,39 +134,80 @@ export const CreateApiKeyModal = ({
 		if (createdApiKey?.id && activeOrganization?.slug) {
 			setCreatedApiKey(null);
 			setKeyRevealed(false);
+			setKeyCopied(false);
 			onClose();
 			router.push(`/${activeOrganization.slug}/api-keys/${createdApiKey.id}`);
 		}
 	};
 
 	const handleClose = () => {
-		setCreatedApiKey(null);
-		setKeyRevealed(false);
-		reset();
-		onClose();
+		// Only allow closing if the key has been copied
+		if (!createdApiKey || keyCopied) {
+			setCreatedApiKey(null);
+			setKeyRevealed(false);
+			setKeyCopied(false);
+			reset();
+			onClose();
+		}
+	};
+
+	// Prevent closing via modal interactions when key is not copied
+	const handleOpenChange = (open: boolean) => {
+		if (!open && createdApiKey && !keyCopied) {
+			// Prevent closing - show a warning toast
+			toast.warning("Please copy your API key before closing");
+			return;
+		}
+		if (!open) {
+			handleClose();
+		}
 	};
 
 	// Show API key reveal screen if created
 	if (createdApiKey) {
 		return (
-			<Modal.Root open={isOpen} onOpenChange={handleClose}>
-				<Modal.Content className="sm:max-w-[480px] p-0.5 border border-stroke-soft-100/50 rounded-2xl" showClose={true}>
+			<Modal.Root open={isOpen} onOpenChange={handleOpenChange}>
+				<Modal.Content
+					className="sm:max-w-[480px] p-0.5 border border-stroke-soft-100/50 rounded-2xl"
+					showClose={keyCopied}
+					onEscapeKeyDown={(e) => {
+						if (!keyCopied) {
+							e.preventDefault();
+							toast.warning("Please copy your API key before closing");
+						}
+					}}
+					onPointerDownOutside={(e) => {
+						if (!keyCopied) {
+							e.preventDefault();
+						}
+					}}
+					onInteractOutside={(e) => {
+						if (!keyCopied) {
+							e.preventDefault();
+						}
+					}}
+				>
 					<div className="border border-stroke-soft-100/50 rounded-2xl">
 						<Modal.Header className="before:border-stroke-soft-200/50">
-							<div className="flex items-center justify-centers">
-								<Icon name="key-new" className="h-4 w-4" />
+							<div className="flex items-center justify-center">
+								<Icon name="check-circle" className="h-4 w-4 text-success-base" />
 							</div>
 							<div className="flex-1">
 								<Modal.Title>API Key Created</Modal.Title>
 							</div>
 						</Modal.Header>
-						<Modal.Body className="space-y-2">
-							<div className="flex flex-col gap-1">
-								<Label.Root>API Key</Label.Root>
-								<div className="flex items-center gap-2 rounded-xl bg-bg-white-0 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200 px-3 py-2.5">
+						<Modal.Body className="space-y-4">
+							<p className="text-text-sub-600 text-sm">
+								Your API key has been created. Make sure to copy the key now.
+								You won't be able to see it again!
+							</p>
+
+							<div className="space-y-2">
+								<Label.Root>New API Key</Label.Root>
+								<div className="flex items-center gap-2 rounded-xl border border-stroke-soft-200 bg-bg-weak-50 p-3">
 									{keyRevealed ? (
 										<>
-											<code className="flex-1 break-all font-mono text-paragraph-xs text-text-strong-950">
+											<code className="flex-1 break-all font-mono text-xs text-text-strong-950">
 												{createdApiKey.key}
 											</code>
 											<Button.Root
@@ -158,13 +215,14 @@ export const CreateApiKeyModal = ({
 												mode="ghost"
 												size="xxsmall"
 												onClick={handleCopyKey}
+												disabled={keyCopied}
 											>
-												<Icon name="clipboard-copy" className="h-4 w-4" />
+												<Icon name={keyCopied ? "check" : "clipboard-copy"} className={`h-4 w-4 ${keyCopied ? "text-success-base" : ""}`} />
 											</Button.Root>
 										</>
 									) : (
 										<>
-											<code className="flex-1 font-mono text-paragraph-xs text-text-sub-600">
+											<code className="flex-1 font-mono text-xs text-text-sub-600">
 												{"•".repeat(40)}
 											</code>
 											<Button.Root
@@ -173,12 +231,23 @@ export const CreateApiKeyModal = ({
 												size="xxsmall"
 												onClick={() => setKeyRevealed(true)}
 											>
-												<Icon name="eye" className="h-4 w-4" />
-												Reveal
+												<Icon name="eye-outline" className="h-4 w-4" />
 											</Button.Root>
 										</>
 									)}
 								</div>
+								{!keyCopied && (
+									<p className="text-error-base text-xs flex items-center gap-1">
+										<Icon name="alert-triangle" className="h-3 w-3" />
+										You must copy the API key before you can close this dialog.
+									</p>
+								)}
+								{keyCopied && (
+									<p className="text-success-base text-xs flex items-center gap-1">
+										<Icon name="check-circle" className="h-3 w-3" />
+										API key copied! You can now close this dialog.
+									</p>
+								)}
 							</div>
 						</Modal.Body>
 						<Modal.Footer className="justify-end border-stroke-soft-100/50 mt-4">
@@ -187,7 +256,7 @@ export const CreateApiKeyModal = ({
 								variant="neutral"
 								size="xsmall"
 								onClick={handleContinue}
-								disabled={!keyRevealed}
+								disabled={!keyCopied}
 							>
 								Continue
 
@@ -213,7 +282,11 @@ export const CreateApiKeyModal = ({
 								<Modal.Title>Create API Key</Modal.Title>
 							</div>
 						</Modal.Header>
-						<Modal.Body className="space-y-2">
+						<Modal.Body className="space-y-4">
+							<p className="text-text-sub-600 text-sm">
+								Create an API key to authenticate requests to Reloop from your application.
+							</p>
+
 							<div className="flex flex-col gap-1">
 								<Label.Root htmlFor="name">
 									Name
@@ -224,7 +297,7 @@ export const CreateApiKeyModal = ({
 										<Input.Input
 											className="px-2"
 											id="name"
-											placeholder="My API Key"
+											placeholder="e.g., Production Server, My App"
 											{...register("name")}
 										/>
 									</Input.Wrapper>
