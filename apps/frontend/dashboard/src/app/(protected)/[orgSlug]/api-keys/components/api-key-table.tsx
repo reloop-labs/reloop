@@ -222,7 +222,7 @@ export const ApiKeyTable = ({
 	return (
 		<>
 			<AnimatePresence mode="wait">
-				<div className="w-full text-paragraph-sm rounded-xl border border-stroke-soft-100 overflow-hidden">
+				<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-200/70 text-paragraph-sm shadow-regular-md ring-stroke-soft-200 ring-inset">
 					{/* Table Header */}
 					<div className="grid grid-cols-[2fr_1fr_1.5fr_1fr_48px] items-center py-3.5 px-4 text-text-sub-600">
 						<div className="flex items-center gap-2">
@@ -360,7 +360,7 @@ export const ApiKeyTable = ({
 												isRowActive && "bg-bg-weak-50/50"
 											)}>
 												<motion.div {...getAnimationProps(index + 1, 3)} className="flex items-center">
-													<span className="text-label-sm text-text-sub-600">
+													<span className="text-label-sm text-text-sub-600 whitespace-nowrap">
 														{formatRelativeTime(apiKey.createdAt)}
 													</span>
 												</motion.div>

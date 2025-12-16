@@ -5,14 +5,14 @@ import { PaginationControls } from "@fe/dashboard/components/pagination-controls
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import * as Select from "@reloop/ui/select";
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useQueryState, parseAsInteger } from "nuqs";
 import useSWR from "swr";
 import { ApiKeyTable } from "./api-key-table";
 import { CreateApiKeyModal } from "./create-api-key-modal";
 import { EmptyState } from "./empty-state";
+import { ApiKeyFilterDropdown, type ApiKeyFilters, type CreatedByUser } from "./api-key-filter-dropdown";
 
 interface ApiKeyData {
 	id: string;
@@ -24,6 +24,12 @@ interface ApiKeyData {
 	remaining: number | null;
 	expiresAt: string | null;
 	createdAt: string;
+	createdBy?: {
+		id: string;
+		name: string | null;
+		image: string | null;
+		email: string | null;
+	};
 }
 
 interface ApiKeyListResponse {
@@ -35,7 +41,7 @@ interface ApiKeyListResponse {
 
 export const ApiKeyListSidebar = () => {
 	const { activeOrganization } = useUserOrganization();
-	const [statusFilter, setStatusFilter] = useState<string>("all");
+	const [filters, setFilters] = useState<ApiKeyFilters>({ status: [], createdBy: [] });
 	const [searchQuery, setSearchQuery] = useState<string>("");
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 	const [currentPage, setCurrentPage] = useQueryState("page", parseAsInteger.withDefault(1));
@@ -53,13 +59,34 @@ export const ApiKeyListSidebar = () => {
 	const startIndex = (currentPage - 1) * pageSize + 1;
 	const endIndex = Math.min(currentPage * pageSize, data?.total || 0);
 
-	// Filter API keys based on status and search query
+	// Extract unique creators from API keys
+	const availableCreators = useMemo<CreatedByUser[]>(() => {
+		if (!data?.apiKeys) return [];
+		const creatorsMap = new Map<string, CreatedByUser>();
+		for (const apiKey of data.apiKeys) {
+			if (apiKey.createdBy?.id && !creatorsMap.has(apiKey.createdBy.id)) {
+				creatorsMap.set(apiKey.createdBy.id, {
+					id: apiKey.createdBy.id,
+					name: apiKey.createdBy.name,
+					image: apiKey.createdBy.image,
+				});
+			}
+		}
+		return Array.from(creatorsMap.values());
+	}, [data?.apiKeys]);
+
+	// Filter API keys based on status, creator, and search query
 	const filteredApiKeys =
 		data?.apiKeys?.filter((apiKey) => {
 			const matchesStatus =
-				statusFilter === "all" ||
-				(statusFilter === "enabled" && apiKey.enabled) ||
-				(statusFilter === "disabled" && !apiKey.enabled);
+				filters.status.length === 0 ||
+				(filters.status.includes("enabled") && apiKey.enabled) ||
+				(filters.status.includes("disabled") && !apiKey.enabled);
+
+			const matchesCreator =
+				filters.createdBy.length === 0 ||
+				(apiKey.createdBy?.id && filters.createdBy.includes(apiKey.createdBy.id));
+
 			const displayName = apiKey.name || apiKey.start || apiKey.prefix || "";
 			const matchesSearch =
 				searchQuery === "" ||
@@ -68,7 +95,7 @@ export const ApiKeyListSidebar = () => {
 					apiKey.prefix.toLowerCase().includes(searchQuery.toLowerCase())) ||
 				(apiKey.start &&
 					apiKey.start.toLowerCase().includes(searchQuery.toLowerCase()));
-			return matchesStatus && matchesSearch;
+			return matchesStatus && matchesCreator && matchesSearch;
 		}) || [];
 
 	return (
@@ -117,22 +144,11 @@ export const ApiKeyListSidebar = () => {
 									</Input.Wrapper>
 								</Input.Root>
 							</div>
-							<div className="w-40">
-								<Select.Root
-									size="small"
-									value={statusFilter}
-									onValueChange={setStatusFilter}
-								>
-									<Select.Trigger className="rounded-xl">
-										<Select.Value placeholder="All statuses" />
-									</Select.Trigger>
-									<Select.Content>
-										<Select.Item value="all">All statuses</Select.Item>
-										<Select.Item value="enabled">Enabled</Select.Item>
-										<Select.Item value="disabled">Disabled</Select.Item>
-									</Select.Content>
-								</Select.Root>
-							</div>
+							<ApiKeyFilterDropdown
+								value={filters}
+								onChange={setFilters}
+								availableCreators={availableCreators}
+							/>
 						</div>
 
 						<div className="mt-4">

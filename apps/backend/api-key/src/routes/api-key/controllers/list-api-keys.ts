@@ -15,10 +15,7 @@ export async function listApiKeys(
 
 
 	try {
-		const conditions = [
-			eq(schema.apikey.organizationId, organizationId),
-			eq(schema.apikey.userId, userId),
-		];
+		const conditions = [eq(schema.apikey.organizationId, organizationId)];
 		if (enabled !== undefined) {
 			conditions.push(eq(schema.apikey.enabled, enabled));
 		}
