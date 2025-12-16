@@ -42,7 +42,7 @@ export const PageSizeDropdown = ({
                     variant="neutral"
                     mode="stroke"
                     type="button"
-                    size="xsmall"
+                    size="xxsmall"
                     className={cn(dropdownOpen && "bg-bg-weak-50 ring-transparent hover:border-transparent")}
                 >
                     {value}

@@ -1,11 +1,14 @@
 "use client";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
+import { PageSizeDropdown } from "@fe/dashboard/components/page-size-dropdown";
+import { PaginationControls } from "@fe/dashboard/components/pagination-controls";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Select from "@reloop/ui/select";
 import Link from "next/link";
 import { useState } from "react";
+import { useQueryState, parseAsInteger } from "nuqs";
 import useSWR from "swr";
 import { ApiKeyTable } from "./api-key-table";
 import { CreateApiKeyModal } from "./create-api-key-modal";
@@ -35,14 +38,20 @@ export const ApiKeyListSidebar = () => {
 	const [statusFilter, setStatusFilter] = useState<string>("all");
 	const [searchQuery, setSearchQuery] = useState<string>("");
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+	const [currentPage, setCurrentPage] = useQueryState("page", parseAsInteger.withDefault(1));
+	const [pageSize, setPageSize] = useQueryState("limit", parseAsInteger.withDefault(10));
 
 	const { data, error, isLoading } = useSWR<ApiKeyListResponse>(
-		activeOrganization?.id ? "/api/api-key/v1/?limit=100" : null,
+		activeOrganization?.id ? `/api/api-key/v1/?limit=${pageSize}&page=${currentPage}` : null,
 		{
 			revalidateOnFocus: true,
 			revalidateOnReconnect: true,
 		},
 	);
+
+	const totalPages = data ? Math.ceil(data.total / pageSize) : 1;
+	const startIndex = (currentPage - 1) * pageSize + 1;
+	const endIndex = Math.min(currentPage * pageSize, data?.total || 0);
 
 	// Filter API keys based on status and search query
 	const filteredApiKeys =
@@ -146,6 +155,30 @@ export const ApiKeyListSidebar = () => {
 								loadingRows={4}
 							/>
 						</div>
+
+						{/* Pagination */}
+						{data && data.total > 0 && (
+							<div className="mt-4 pb-8 flex items-center justify-between text-paragraph-sm text-text-sub-600">
+								<div className="flex items-center gap-3">
+									<span>
+										Showing {startIndex}–{endIndex} of {data.total} API key{data.total !== 1 ? "s" : ""}
+									</span>
+									<PageSizeDropdown
+										value={pageSize}
+										onValueChange={(value) => {
+											setPageSize(value);
+											setCurrentPage(1);
+										}}
+									/>
+								</div>
+								<PaginationControls
+									currentPage={currentPage}
+									totalPages={totalPages}
+									onPageChange={setCurrentPage}
+									isLoading={isLoading}
+								/>
+							</div>
+						)}
 					</div>
 				)}
 			</div>

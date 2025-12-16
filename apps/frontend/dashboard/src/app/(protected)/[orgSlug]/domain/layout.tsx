@@ -5,20 +5,26 @@ import * as Kbd from "@reloop/ui/kbd";
 import { useHotkeys } from "react-hotkeys-hook";
 import { FeedbackPopover } from "@fe/dashboard/components/feedback-popover";
 import { DomainApiDetails } from "@fe/dashboard/components/api-details/domain";
+import Link from "next/link";
+import { useParams } from "next/navigation";
 
 const openDocs = () => window.open("https://reloop.sh/docs/domain", "_blank");
 
 const DomainLayout = ({ children }: { children: React.ReactNode }) => {
+	const { orgSlug } = useParams();
 	useHotkeys("d", openDocs);
 
 	return (
 		<div>
 			<div className="sticky top-0 z-10 flex h-12 items-center justify-start gap-2 border-stroke-soft-100 border-b bg-bg-white-0 px-2">
 				<div className="flex justify-between w-full items-center">
-					<div className="flex items-center gap-2">
+					<Link
+						href={`/${orgSlug}/domain`}
+						className={Button.buttonVariants({ variant: "neutral", mode: "ghost", size: "xxsmall" }).root()}
+					>
 						<Icon name="globe" className="h-4 w-4" />
-						<p className="font-medium text-sm">Domain</p>
-					</div>
+						<span className="font-medium text-sm">Domain</span>
+					</Link>
 					<div className="flex justify-end items-center">
 						<FeedbackPopover />
 						<DomainApiDetails />
