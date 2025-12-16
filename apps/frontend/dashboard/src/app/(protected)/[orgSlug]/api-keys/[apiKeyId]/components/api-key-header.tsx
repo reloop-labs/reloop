@@ -311,28 +311,18 @@ export const ApiKeyHeader = ({
 						) : null}
 					</div>
 				</div>
-
-				{/* Stats Grid */}
-				{isLoading ? (
-					<div className="mt-10 grid grid-cols-[1fr_1fr_1fr] gap-y-12">
-						{[1, 2, 3, 4, 5].map((i) => (
-							<div key={i} className="flex flex-col gap-1.5">
-								<Skeleton className="h-3 w-16 rounded" />
-								<Skeleton className="h-5 w-24 rounded" />
-							</div>
-						))}
-					</div>
-				) : (
-					<div className="mt-10 grid grid-cols-[1fr_1fr_1fr] gap-y-12">
-						{/* Token/Key */}
-						<div className="flex flex-col gap-1.5">
-							<div className="flex items-center gap-1.5">
-								<Icon name="key-new" className="h-3.5 w-3.5 text-text-sub-600" />
-								<span className="text-[10px] font-medium uppercase tracking-wider text-text-sub-600">
-									Key Prefix
-								</span>
-							</div>
-							<div
+				<div className="mt-10 grid grid-cols-[1fr_1fr_1fr] gap-y-12">
+					{/* Token/Key */}
+					<div className="flex flex-col gap-1.5">
+						<div className="flex items-center gap-1.5">
+							<Icon name="key-new" className="h-3.5 w-3.5 text-text-sub-600" />
+							<span className="text-[10px] font-medium uppercase tracking-wider text-text-sub-600">
+								Key Prefix
+							</span>
+						</div>
+						{isLoading ?
+							<Skeleton className="h-5 w-24 rounded-lg" />
+							: <div
 								className="flex items-center gap-1.5 group/copy cursor-pointer w-fit"
 								onClick={handleCopyPrefix}
 							>
@@ -348,61 +338,69 @@ export const ApiKeyHeader = ({
 											: "text-text-sub-600 opacity-0 group-hover/copy:opacity-100"
 									)}
 								/>
-							</div>
-						</div>
+							</div>}
+					</div>
 
-						{/* Total Requests */}
-						<div className="flex flex-col gap-1.5">
-							<div className="flex items-center gap-1.5">
-								<Icon name="activity-2" className="h-3.5 w-3.5 text-text-sub-600" />
-								<span className="text-[10px] font-medium uppercase tracking-wider text-text-sub-600">
-									Requests
-								</span>
-							</div>
-							<span className="font-medium text-paragraph-sm text-text-strong-950">
-								{(apiKey?.requestCount || 0).toLocaleString()} times
+					{/* Total Requests */}
+					<div className="flex flex-col gap-1.5">
+						<div className="flex items-center gap-1.5">
+							<Icon name="activity-2" className="h-3.5 w-3.5 text-text-sub-600" />
+							<span className="text-[10px] font-medium uppercase tracking-wider text-text-sub-600">
+								Requests
 							</span>
 						</div>
+						{isLoading ?
+							<Skeleton className="h-5 w-24 rounded-lg" />
+							: <span className="font-medium text-paragraph-sm text-text-strong-950">
+								{(apiKey?.requestCount || 0).toLocaleString()} times
+							</span>}
+					</div>
 
-						{/* Last Used */}
-						<div className="flex flex-col gap-1.5">
-							<div className="flex items-center gap-1.5">
-								<Icon name="clock" className="h-3.5 w-3.5 text-text-sub-600" />
-								<span className="text-[10px] font-medium uppercase tracking-wider text-text-sub-600">
-									Last Used
-								</span>
-							</div>
-							<span className="font-medium text-paragraph-sm text-text-strong-950">
+					{/* Last Used */}
+					<div className="flex flex-col gap-1.5">
+						<div className="flex items-center gap-1.5">
+							<Icon name="clock" className="h-3.5 w-3.5 text-text-sub-600" />
+							<span className="text-[10px] font-medium uppercase tracking-wider text-text-sub-600">
+								Last Used
+							</span>
+						</div>
+						{isLoading ?
+							<Skeleton className="h-5 w-24 rounded-lg" />
+							: <span className="font-medium text-paragraph-sm text-text-strong-950">
 								{apiKey?.lastRequest
 									? formatRelativeTime(apiKey.lastRequest)
 									: "No activity"}
+							</span>}
+					</div>
+
+					{/* Created */}
+					<div className="flex flex-col gap-1.5">
+						<div className="flex items-center gap-1.5">
+							<Icon name="calendar" className="h-3.5 w-3.5 text-text-sub-600" />
+							<span className="text-[10px] font-medium uppercase tracking-wider text-text-sub-600">
+								Created
 							</span>
 						</div>
-
-						{/* Created */}
-						<div className="flex flex-col gap-1.5">
-							<div className="flex items-center gap-1.5">
-								<Icon name="calendar" className="h-3.5 w-3.5 text-text-sub-600" />
-								<span className="text-[10px] font-medium uppercase tracking-wider text-text-sub-600">
-									Created
-								</span>
-							</div>
-							<span className="font-medium text-paragraph-sm text-text-strong-950">
+						{isLoading ?
+							<Skeleton className="h-5 w-24 rounded-lg" />
+							: <span className="font-medium text-paragraph-sm text-text-strong-950">
 								{apiKey?.createdAt
 									? formatRelativeTime(apiKey.createdAt)
 									: "---"}
+							</span>}
+					</div>
+
+					{/* Created By */}
+					<div className="flex flex-col gap-1.5">
+						<div className="flex items-center gap-1.5">
+							<Icon name="user" className="h-3.5 w-3.5 text-text-sub-600" />
+							<span className="text-[10px] font-medium uppercase tracking-wider text-text-sub-600">
+								Created By
 							</span>
 						</div>
-
-						{/* Created By */}
-						<div className="flex flex-col gap-1.5">
-							<div className="flex items-center gap-1.5">
-								<Icon name="user" className="h-3.5 w-3.5 text-text-sub-600" />
-								<span className="text-[10px] font-medium uppercase tracking-wider text-text-sub-600">
-									Created By
-								</span>
-							</div>
-							<div className="flex items-center gap-2">
+						{isLoading ?
+							<Skeleton className="h-5 w-24 rounded-lg" />
+							: <div className="flex items-center gap-2">
 								<Avatar.Root size="20">
 									{apiKey?.createdBy?.image ? (
 										<Avatar.Image src={apiKey.createdBy.image} alt={apiKey.createdBy.name || "User"} />
@@ -411,10 +409,9 @@ export const ApiKeyHeader = ({
 								<span className="font-medium text-paragraph-sm text-text-strong-950">
 									{apiKey?.createdBy?.email || apiKey?.createdBy?.name || "Unknown"}
 								</span>
-							</div>
-						</div>
+							</div>}
 					</div>
-				)}
+				</div>
 			</div>
 
 			{/* Modals */}
