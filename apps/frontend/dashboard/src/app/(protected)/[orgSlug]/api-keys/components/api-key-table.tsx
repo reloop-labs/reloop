@@ -202,7 +202,12 @@ export const ApiKeyTable = ({
 
 			await axios.post(endpoint, {}, { headers: { credentials: "include" } });
 
-			await mutate("/api/api-key/v1/?limit=100");
+			// Revalidate all API key caches using a matcher function
+			await mutate(
+				(key) => typeof key === "string" && key.startsWith("/api/api-key/v1/"),
+				undefined,
+				{ revalidate: true }
+			);
 
 			toast.success(
 				apiKey.enabled

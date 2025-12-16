@@ -312,28 +312,32 @@ export const ApiKeyHeader = ({
 					</div>
 				</div>
 
-				{/* Stats Section - Clean Horizontal Layout */}
+				{/* Stats Grid */}
 				{isLoading ? (
-					<div className="mt-8 flex w-full items-center gap-8">
+					<div className="mt-10 grid grid-cols-[1fr_1fr_1fr] gap-y-12">
 						{[1, 2, 3, 4, 5].map((i) => (
-							<div key={i} className="flex items-center gap-2">
-								<Skeleton className="h-4 w-16 rounded" />
+							<div key={i} className="flex flex-col gap-1.5">
+								<Skeleton className="h-3 w-16 rounded" />
 								<Skeleton className="h-5 w-24 rounded" />
 							</div>
 						))}
 					</div>
 				) : (
-					<div className="mt-8 flex w-full flex-wrap items-center gap-x-6 gap-y-5">
-						{/* API Key */}
-						<div className="flex items-center gap-2">
-							<Icon name="key-new" className="h-3.5 w-3.5 text-text-sub-600" />
-							<span className="text-paragraph-xs text-text-sub-600">Key</span>
+					<div className="mt-10 grid grid-cols-[1fr_1fr_1fr] gap-y-12">
+						{/* Token/Key */}
+						<div className="flex flex-col gap-1.5">
+							<div className="flex items-center gap-1.5">
+								<Icon name="key-new" className="h-3.5 w-3.5 text-text-sub-600" />
+								<span className="text-[10px] font-medium uppercase tracking-wider text-text-sub-600">
+									Key
+								</span>
+							</div>
 							<div
-								className="flex items-center gap-1 group/copy cursor-pointer"
+								className="flex items-center gap-1.5 group/copy cursor-pointer w-fit"
 								onClick={handleCopyPrefix}
 							>
-								<code className="rounded bg-neutral-alpha-10 px-1.5 py-0.5 font-mono text-xs font-medium text-text-strong-950">
-									{displayPrefix}
+								<code className="rounded bg-neutral-alpha-10 px-2 py-1 font-mono text-xs font-medium text-text-strong-950">
+									{displayPrefix}...
 								</code>
 								<Icon
 									name={copied ? "check" : "copy"}
@@ -347,36 +351,42 @@ export const ApiKeyHeader = ({
 							</div>
 						</div>
 
-						<div className="h-4 w-px bg-stroke-soft-200" />
-
 						{/* Total Requests */}
-						<div className="flex items-center gap-2">
-							<Icon name="activity-2" className="h-3.5 w-3.5 text-text-sub-600" />
-							<span className="text-paragraph-xs text-text-sub-600">Requests</span>
+						<div className="flex flex-col gap-1.5">
+							<div className="flex items-center gap-1.5">
+								<Icon name="activity-2" className="h-3.5 w-3.5 text-text-sub-600" />
+								<span className="text-[10px] font-medium uppercase tracking-wider text-text-sub-600">
+									Requests
+								</span>
+							</div>
 							<span className="font-medium text-paragraph-sm text-text-strong-950">
-								{(apiKey?.requestCount || 0).toLocaleString()}
+								{(apiKey?.requestCount || 0).toLocaleString()} times
 							</span>
 						</div>
 
-						<div className="h-4 w-px bg-stroke-soft-200" />
-
 						{/* Last Used */}
-						<div className="flex items-center gap-2">
-							<Icon name="clock" className="h-3.5 w-3.5 text-text-sub-600" />
-							<span className="text-paragraph-xs text-text-sub-600">Last used</span>
+						<div className="flex flex-col gap-1.5">
+							<div className="flex items-center gap-1.5">
+								<Icon name="clock" className="h-3.5 w-3.5 text-text-sub-600" />
+								<span className="text-[10px] font-medium uppercase tracking-wider text-text-sub-600">
+									Last Used
+								</span>
+							</div>
 							<span className="font-medium text-paragraph-sm text-text-strong-950">
 								{apiKey?.lastRequest
 									? formatRelativeTime(apiKey.lastRequest)
-									: "Never"}
+									: "No activity"}
 							</span>
 						</div>
 
-						<div className="h-4 w-px bg-stroke-soft-200" />
-
 						{/* Created */}
-						<div className="flex items-center gap-2">
-							<Icon name="calendar" className="h-3.5 w-3.5 text-text-sub-600" />
-							<span className="text-paragraph-xs text-text-sub-600">Created</span>
+						<div className="flex flex-col gap-1.5">
+							<div className="flex items-center gap-1.5">
+								<Icon name="calendar" className="h-3.5 w-3.5 text-text-sub-600" />
+								<span className="text-[10px] font-medium uppercase tracking-wider text-text-sub-600">
+									Created
+								</span>
+							</div>
 							<span className="font-medium text-paragraph-sm text-text-strong-950">
 								{apiKey?.createdAt
 									? formatRelativeTime(apiKey.createdAt)
@@ -384,26 +394,25 @@ export const ApiKeyHeader = ({
 							</span>
 						</div>
 
-						{/* Creator */}
-						{apiKey?.createdBy?.email && (
-							<>
-								<div className="h-4 w-px bg-stroke-soft-200" />
-								<div className="flex items-center gap-2">
-									<Icon name="user" className="h-3.5 w-3.5 text-text-sub-600" />
-									<span className="text-paragraph-xs text-text-sub-600">By</span>
-									<div className="flex items-center gap-1.5">
-										<Avatar.Root size="16">
-											{apiKey.createdBy.image ? (
-												<Avatar.Image src={apiKey.createdBy.image} alt={apiKey.createdBy.name || "User"} />
-											) : null}
-										</Avatar.Root>
-										<span className="font-medium text-paragraph-sm text-text-strong-950">
-											{apiKey.createdBy.name || apiKey.createdBy.email || "Unknown"}
-										</span>
-									</div>
-								</div>
-							</>
-						)}
+						{/* Created By */}
+						<div className="flex flex-col gap-1.5">
+							<div className="flex items-center gap-1.5">
+								<Icon name="user" className="h-3.5 w-3.5 text-text-sub-600" />
+								<span className="text-[10px] font-medium uppercase tracking-wider text-text-sub-600">
+									Created By
+								</span>
+							</div>
+							<div className="flex items-center gap-2">
+								<Avatar.Root size="20">
+									{apiKey?.createdBy?.image ? (
+										<Avatar.Image src={apiKey.createdBy.image} alt={apiKey.createdBy.name || "User"} />
+									) : null}
+								</Avatar.Root>
+								<span className="font-medium text-paragraph-sm text-text-strong-950">
+									{apiKey?.createdBy?.email || apiKey?.createdBy?.name || "Unknown"}
+								</span>
+							</div>
+						</div>
 					</div>
 				)}
 			</div>
