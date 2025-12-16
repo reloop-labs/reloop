@@ -18,6 +18,11 @@ export const mainNavigation: MainNavigationItem[] = [
 		iconName: "users",
 	},
 	{
+		label: "Topics",
+		path: "/topics",
+		iconName: "notification-indicator",
+	},
+	{
 		label: "Templates",
 		path: "/templates",
 		iconName: "layout",
