@@ -145,11 +145,6 @@ export const CreateApiKeyModal = ({
 							</div>
 						</Modal.Header>
 						<Modal.Body className="space-y-2">
-							<p className="text-text-sub-600 text-paragraph-sm">
-								Make sure to copy your API key now. You won't be able to see it
-								again!
-							</p>
-
 							<div className="flex flex-col gap-1">
 								<Label.Root>API Key</Label.Root>
 								<div className="flex items-center gap-2 rounded-xl bg-bg-white-0 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200 px-3 py-2.5">
@@ -195,7 +190,8 @@ export const CreateApiKeyModal = ({
 								disabled={!keyRevealed}
 							>
 								Continue
-								<Icon name="chevron-right" className="h-3 w-3" />
+
+								<Icon name="enter" className="w-4 h-4 border rounded-sm p-px border-stroke-soft-100/20" />
 							</Button.Root>
 						</Modal.Footer>
 					</div>
@@ -256,7 +252,6 @@ export const CreateApiKeyModal = ({
 									<>
 										Create API Key
 										<span className="inline-flex items-center gap-0.5">
-											<Icon name="command" className="w-4 h-4 border rounded-sm p-px border-stroke-soft-100/20" />
 											<Icon name="enter" className="w-4 h-4 border rounded-sm p-px border-stroke-soft-100/20" />
 										</span>
 									</>

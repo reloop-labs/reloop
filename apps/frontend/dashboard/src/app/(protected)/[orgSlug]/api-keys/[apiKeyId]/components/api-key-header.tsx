@@ -1,6 +1,7 @@
 "use client";
 import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
 import { AnimatedHoverBackground } from "@fe/dashboard/components/layout/sidebar/animated-hover-background";
+import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
@@ -77,6 +78,7 @@ export const ApiKeyHeader = ({
 	isFailed,
 	onDeleteApiKey,
 }: ApiKeyHeaderProps) => {
+	const { push } = useUserOrganization();
 	const { mutate } = useSWRConfig();
 	const [copied, setCopied] = useState(false);
 	const [isToggling, setIsToggling] = useState(false);
@@ -148,7 +150,7 @@ export const ApiKeyHeader = ({
 	if (!apiKey && !isLoading) {
 		return (
 			<div className="pt-10 pb-8">
-				<AnimatedBackButton />
+				<AnimatedBackButton onClick={() => push("/api-keys")} />
 				<div className="flex items-center justify-between pt-6">
 					<div>
 						<div className="flex items-center gap-1.5">
@@ -185,7 +187,7 @@ export const ApiKeyHeader = ({
 	return (
 		<>
 			<div className="pt-10 pb-8">
-				<AnimatedBackButton />
+				<AnimatedBackButton onClick={() => push("/api-keys")} />
 				<div className="flex items-center justify-between pt-6">
 					<div>
 						{isLoading ? (

@@ -224,7 +224,7 @@ export const ApiKeyTable = ({
 			<AnimatePresence mode="wait">
 				<div className="w-full text-paragraph-sm rounded-xl border border-stroke-soft-100 overflow-hidden">
 					{/* Table Header */}
-					<div className="grid grid-cols-[2fr_1fr_1fr_1fr_48px] items-center py-3.5 px-4 text-text-sub-600">
+					<div className="grid grid-cols-[2fr_1fr_1.5fr_1fr_48px] items-center py-3.5 px-4 text-text-sub-600">
 						<div className="flex items-center gap-2">
 							<Icon name="key-new" className="h-4 w-4" />
 							<span className="text-xs">Name</span>
@@ -245,7 +245,7 @@ export const ApiKeyTable = ({
 					</div>
 
 					{/* Table Body */}
-					<div className="grid grid-cols-[2fr_1fr_1fr_1fr_48px]">
+					<div className="grid grid-cols-[2fr_1fr_1.5fr_1fr_48px]">
 						{isLoading
 							? // Skeleton loading state
 							Array.from({ length: loadingRows }).map((_, index) => (
@@ -332,14 +332,14 @@ export const ApiKeyTable = ({
 															</Tooltip.Trigger>
 															<Tooltip.Content
 																sideOffset={-3}
-																variant="light">
+																variant="light" className="rounded-xl">
 																<div className="flex items-start gap-2 p-1">
 																	<Avatar.Root size="20" className="shrink-0 mt-0.5">
 																		{apiKey.createdBy?.image ? (
 																			<Avatar.Image src={apiKey.createdBy.image} alt={apiKey.createdBy?.name || "User"} />
 																		) : null}
 																	</Avatar.Root>
-																	<div className="flex flex-col">
+																	<div className="flex flex-col items-start justify-start">
 																		<span className="font-sm">{apiKey.createdBy?.name || "Unknown"}</span>
 																		<span className="text-text-soft-400 text-xs">{apiKey.createdBy.email}</span>
 																	</div>

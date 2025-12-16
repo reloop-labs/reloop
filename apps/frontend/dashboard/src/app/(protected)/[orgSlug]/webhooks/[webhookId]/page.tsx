@@ -39,7 +39,7 @@ const WebhookDetailPage = () => {
 
 	if (error) {
 		return (
-			<div className="mx-auto max-w-3xl">
+			<div className="mx-auto max-w-3xl sm:px-8">
 				<SomethingWentWrong />
 			</div>
 		);
@@ -47,7 +47,7 @@ const WebhookDetailPage = () => {
 
 	if (!webhookData) {
 		return (
-			<div className="mx-auto max-w-3xl">
+			<div className="mx-auto max-w-3xl sm:px-8">
 				<div className="py-12 text-center">
 					<h2 className="mb-2 font-semibold text-2xl text-gray-900">
 						Webhook not found
@@ -61,12 +61,12 @@ const WebhookDetailPage = () => {
 	}
 
 	return (
-		<div className="mx-auto max-w-3xl">
+		<div className="mx-auto max-w-3xl sm:px-8">
 			<WebhookHeader
 				webhook={webhookData}
 				isLoading={isLoading}
 				isFailed={!!error}
-				onDeleteWebhook={() => {}}
+				onDeleteWebhook={() => { }}
 			/>
 
 			<DeliveryLogs webhookId={webhookData.id} />

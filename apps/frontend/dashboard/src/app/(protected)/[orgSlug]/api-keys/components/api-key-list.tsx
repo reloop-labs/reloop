@@ -72,7 +72,7 @@ export const ApiKeyListSidebar = () => {
 		}) || [];
 
 	return (
-		<div className="mx-auto max-w-3xl">
+		<div className="mx-auto max-w-3xl sm:px-8">
 			<div className="flex items-center justify-between pt-10">
 				<p className="font-medium text-2xl">
 					API Key{data?.apiKeys.length !== 1 ? "s" : ""}
@@ -86,18 +86,6 @@ export const ApiKeyListSidebar = () => {
 						<Icon name="plus" className="h-4 w-4" />
 						Create API key
 					</Button.Root>
-					<Link
-						href="https://reloop.sh/docs/learn/api-keys"
-						target="_blank"
-						rel="noopener noreferrer"
-						className={Button.buttonVariants({
-							variant: "neutral",
-							size: "xsmall",
-							mode: "stroke",
-						}).root()}
-					>
-						<Icon name="book-closed" className="h-4 w-4" />
-					</Link>
 				</div>
 			</div>
 
