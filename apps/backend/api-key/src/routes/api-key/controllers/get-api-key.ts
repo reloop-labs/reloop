@@ -9,16 +9,14 @@ import { status } from "elysia";
 export async function getApiKey(
 	apiKeyId: string,
 	organizationId: string,
-	userId: string,
 ): Promise<ApiKeyTypes.ApiKeyResponse> {
-	logger.info({ apiKeyId, organizationId, userId }, "Getting API key");
+	logger.info({ apiKeyId, organizationId }, "Getting API key");
 
 	try {
 		const result = await db.query.apikey.findFirst({
 			where: and(
 				eq(schema.apikey.id, apiKeyId),
 				eq(schema.apikey.organizationId, organizationId),
-				eq(schema.apikey.userId, userId),
 			),
 			with: { user: true },
 		});
@@ -59,7 +57,7 @@ export async function getApiKeyHandler(
 	logger.info({ apiKeyId, organizationId, userId }, "Getting API key");
 
 	try {
-		const apiKey = await getApiKey(apiKeyId, organizationId, userId);
+		const apiKey = await getApiKey(apiKeyId, organizationId);
 		logger.info(
 			{ apiKeyId, organizationId, userId },
 			"API key retrieved successfully",

@@ -38,9 +38,6 @@ export const ApiKeyFilterDropdown = ({ value, onChange, availableCreators }: Api
   const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
   const buttonRefs = useRef<HTMLButtonElement[]>([]);
 
-  // Combine status and creator options for hover tracking
-  const allOptions = [...statusFilterOptions.map(s => ({ type: 'status' as const, ...s })), ...availableCreators.map(c => ({ type: 'creator' as const, ...c }))];
-
   const currentTab = buttonRefs.current[hoverIdx ?? -1];
   const currentRect = currentTab?.getBoundingClientRect();
 
@@ -97,76 +94,28 @@ export const ApiKeyFilterDropdown = ({ value, onChange, availableCreators }: Api
           </button>
         </div>
 
-        {/* Status Section */}
-        <div className="relative pt-2">
-          <span className="text-[10px] font-medium text-text-soft-400 uppercase tracking-wide px-1">Status</span>
-          <div className="mt-1">
-            {statusFilterOptions.map((option, idx) => {
-              const isChecked = value.status.includes(option.id);
-              return (
-                <button
-                  key={option.id}
-                  ref={(el) => {
-                    if (el) buttonRefs.current[idx] = el;
-                  }}
-                  type="button"
-                  onPointerEnter={() => setHoverIdx(idx)}
-                  onPointerLeave={() => setHoverIdx(undefined)}
-                  onClick={() => handleStatusToggle(option.id)}
-                  className={cn(
-                    "flex w-full cursor-pointer items-center gap-2 rounded-lg px-1 py-1.5 text-xs font-normal transition-colors",
-                    "text-text-strong-950",
-                    !currentRect && hoverIdx === idx && "bg-neutral-alpha-10"
-                  )}
-                >
-                  {/* Checkbox */}
-                  <div className={cn(
-                    "flex h-3.5 w-3.5 p-[1px] items-center justify-center rounded border transition-colors",
-                    isChecked
-                      ? "border-stroke-soft-900 bg-neutral-900"
-                      : "border-stroke-soft-200"
-                  )}>
-                    {isChecked && (
-                      <Icon name="check" className="h-3 w-3 text-white" />
-                    )}
-                  </div>
-                  {/* Status Icon */}
-                  <Icon
-                    name={option.icon as any}
-                    className={cn(
-                      "h-3.5 w-3.5",
-                      option.colorClass
-                    )}
-                  />
-                  <span>{option.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Created By Section */}
-        {availableCreators.length > 0 && (
-          <div className="relative pt-3 mt-2 border-t border-stroke-soft-200">
-            <span className="text-[10px] font-medium text-text-soft-400 uppercase tracking-wide px-1">Created by</span>
+        {/* All Filter Options in a single relative container */}
+        <div className="relative">
+          {/* Status Section */}
+          <div className="pt-2">
+            <span className="text-[10px] font-medium text-text-soft-400 uppercase tracking-wide px-1">Status</span>
             <div className="mt-1">
-              {availableCreators.map((creator, idx) => {
-                const globalIdx = statusFilterOptions.length + idx;
-                const isChecked = value.createdBy.includes(creator.id);
+              {statusFilterOptions.map((option, idx) => {
+                const isChecked = value.status.includes(option.id);
                 return (
                   <button
-                    key={creator.id}
+                    key={option.id}
                     ref={(el) => {
-                      if (el) buttonRefs.current[globalIdx] = el;
+                      if (el) buttonRefs.current[idx] = el;
                     }}
                     type="button"
-                    onPointerEnter={() => setHoverIdx(globalIdx)}
+                    onPointerEnter={() => setHoverIdx(idx)}
                     onPointerLeave={() => setHoverIdx(undefined)}
-                    onClick={() => handleCreatorToggle(creator.id)}
+                    onClick={() => handleStatusToggle(option.id)}
                     className={cn(
                       "flex w-full cursor-pointer items-center gap-2 rounded-lg px-1 py-1.5 text-xs font-normal transition-colors",
                       "text-text-strong-950",
-                      !currentRect && hoverIdx === globalIdx && "bg-neutral-alpha-10"
+                      !currentRect && hoverIdx === idx && "bg-neutral-alpha-10"
                     )}
                   >
                     {/* Checkbox */}
@@ -180,24 +129,76 @@ export const ApiKeyFilterDropdown = ({ value, onChange, availableCreators }: Api
                         <Icon name="check" className="h-3 w-3 text-white" />
                       )}
                     </div>
-                    {/* User Avatar */}
-                    <Avatar.Root size="16">
-                      {creator.image ? (
-                        <Avatar.Image src={creator.image} alt={creator.name || "User"} />
-                      ) : null}
-                    </Avatar.Root>
-                    <span className="truncate">{creator.name || "Unknown"}</span>
+                    {/* Status Icon */}
+                    <Icon
+                      name={option.icon as any}
+                      className={cn(
+                        "h-3.5 w-3.5",
+                        option.colorClass
+                      )}
+                    />
+                    <span>{option.label}</span>
                   </button>
                 );
               })}
             </div>
           </div>
-        )}
 
-        <AnimatedHoverBackground
-          rect={currentRect}
-          tabElement={currentTab}
-        />
+          {/* Created By Section */}
+          {availableCreators.length > 0 && (
+            <div className="pt-3 mt-2 border-t border-stroke-soft-200">
+              <span className="text-[10px] font-medium text-text-soft-400 uppercase tracking-wide px-1">Created by</span>
+              <div className="mt-1">
+                {availableCreators.map((creator, idx) => {
+                  const globalIdx = statusFilterOptions.length + idx;
+                  const isChecked = value.createdBy.includes(creator.id);
+                  return (
+                    <button
+                      key={creator.id}
+                      ref={(el) => {
+                        if (el) buttonRefs.current[globalIdx] = el;
+                      }}
+                      type="button"
+                      onPointerEnter={() => setHoverIdx(globalIdx)}
+                      onPointerLeave={() => setHoverIdx(undefined)}
+                      onClick={() => handleCreatorToggle(creator.id)}
+                      className={cn(
+                        "flex w-full cursor-pointer items-center gap-2 rounded-lg px-1 py-1.5 text-xs font-normal transition-colors",
+                        "text-text-strong-950",
+                        !currentRect && hoverIdx === globalIdx && "bg-neutral-alpha-10"
+                      )}
+                    >
+                      {/* Checkbox */}
+                      <div className={cn(
+                        "flex h-3.5 w-3.5 p-[1px] items-center justify-center rounded border transition-colors",
+                        isChecked
+                          ? "border-stroke-soft-900 bg-neutral-900"
+                          : "border-stroke-soft-200"
+                      )}>
+                        {isChecked && (
+                          <Icon name="check" className="h-3 w-3 text-white" />
+                        )}
+                      </div>
+                      {/* User Avatar */}
+                      <Avatar.Root size="16">
+                        {creator.image ? (
+                          <Avatar.Image src={creator.image} alt={creator.name || "User"} />
+                        ) : null}
+                      </Avatar.Root>
+                      <span className="truncate">{creator.name || "Unknown"}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Single AnimatedHoverBackground for all options */}
+          <AnimatedHoverBackground
+            rect={currentRect}
+            tabElement={currentTab}
+          />
+        </div>
       </Dropdown.Content>
     </Dropdown.Root>
   );
