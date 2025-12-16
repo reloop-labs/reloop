@@ -34,7 +34,6 @@ export const RotateApiKeyModal = ({
 }: RotateApiKeyModalProps) => {
   const [isRotating, setIsRotating] = useState(false);
   const [rotatedApiKey, setRotatedApiKey] = useState<ApiKeyWithKeyResponse | null>(null);
-  const [keyRevealed, setKeyRevealed] = useState(false);
   const [keyCopied, setKeyCopied] = useState(false);
   const { mutate } = useSWRConfig();
 
@@ -75,9 +74,7 @@ export const RotateApiKeyModal = ({
     }
   };
 
-  const handleRevealKey = () => {
-    setKeyRevealed(true);
-  };
+
 
   const handleCopyKey = async () => {
     if (rotatedApiKey?.key) {
@@ -95,7 +92,6 @@ export const RotateApiKeyModal = ({
     // Only allow closing if the key has been copied
     if (!rotatedApiKey || keyCopied) {
       setRotatedApiKey(null);
-      setKeyRevealed(false);
       setKeyCopied(false);
       onClose();
     }
@@ -155,36 +151,18 @@ export const RotateApiKeyModal = ({
               <div className="space-y-2">
                 <Label.Root>New API Key</Label.Root>
                 <div className="flex items-center gap-2 rounded-xl border border-stroke-soft-200 bg-bg-weak-50 p-3">
-                  {keyRevealed ? (
-                    <>
-                      <code className="flex-1 break-all font-mono text-xs text-text-strong-950">
-                        {rotatedApiKey.key}
-                      </code>
-                      <Button.Root
-                        variant="neutral"
-                        mode="ghost"
-                        size="xxsmall"
-                        onClick={handleCopyKey}
-                        disabled={keyCopied}
-                      >
-                        <Icon name={keyCopied ? "check" : "clipboard-copy"} className={`h-4 w-4 ${keyCopied ? "text-success-base" : ""}`} />
-                      </Button.Root>
-                    </>
-                  ) : (
-                    <>
-                      <code className="flex-1 font-mono text-xs text-text-sub-600">
-                        {"•".repeat(40)}
-                      </code>
-                      <Button.Root
-                        variant="neutral"
-                        mode="ghost"
-                        size="xxsmall"
-                        onClick={handleRevealKey}
-                      >
-                        <Icon name="eye-outline" className="h-4 w-4" />
-                      </Button.Root>
-                    </>
-                  )}
+                  <code className="flex-1 break-all font-mono text-xs text-text-strong-950">
+                    {rotatedApiKey.key}
+                  </code>
+                  <Button.Root
+                    variant="neutral"
+                    mode="ghost"
+                    size="xxsmall"
+                    onClick={handleCopyKey}
+                    disabled={keyCopied}
+                  >
+                    <Icon name={keyCopied ? "check" : "clipboard-copy"} className={`h-4 w-4 ${keyCopied ? "text-success-base" : ""}`} />
+                  </Button.Root>
                 </div>
                 {!keyCopied && (
                   <p className="text-error-base text-xs flex items-center gap-1">

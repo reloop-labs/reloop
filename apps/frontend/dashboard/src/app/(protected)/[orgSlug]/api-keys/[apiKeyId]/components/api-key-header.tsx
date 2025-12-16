@@ -329,7 +329,7 @@ export const ApiKeyHeader = ({
 							<div className="flex items-center gap-1.5">
 								<Icon name="key-new" className="h-3.5 w-3.5 text-text-sub-600" />
 								<span className="text-[10px] font-medium uppercase tracking-wider text-text-sub-600">
-									Key
+									Key Prefix
 								</span>
 							</div>
 							<div

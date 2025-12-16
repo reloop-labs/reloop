@@ -25,9 +25,10 @@ interface ApiKeyData {
 
 interface DeleteApiKeyModalProps {
 	apiKeys: ApiKeyData[];
+	onDeleteSuccess?: () => void;
 }
 
-export const DeleteApiKeyModal = ({ apiKeys }: DeleteApiKeyModalProps) => {
+export const DeleteApiKeyModal = ({ apiKeys, onDeleteSuccess }: DeleteApiKeyModalProps) => {
 	const [deleteId, setDeleteId] = useQueryState("delete");
 	const [confirmationName, setConfirmationName] = useState("");
 	const [isDeleting, setIsDeleting] = useState(false);
@@ -57,9 +58,12 @@ export const DeleteApiKeyModal = ({ apiKeys }: DeleteApiKeyModalProps) => {
 			});
 
 			toast.success("API key deleted successfully");
-			setDeleteId(null);
+			await setDeleteId(null);
 			setConfirmationName("");
-			mutate("/api/api-key/v1/?limit=100");
+			await mutate("/api/api-key/v1/?limit=100");
+
+			// Call the success callback if provided (e.g., to navigate back to list)
+			onDeleteSuccess?.();
 		} catch (error) {
 			const errorMessage = axios.isAxiosError(error)
 				? error.response?.data?.message || "Failed to delete API key"

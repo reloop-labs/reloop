@@ -53,7 +53,6 @@ export const CreateApiKeyModal = ({
 	const router = useRouter();
 	const [createdApiKey, setCreatedApiKey] =
 		useState<ApiKeyWithKeyResponse | null>(null);
-	const [keyRevealed, setKeyRevealed] = useState(false);
 	const [keyCopied, setKeyCopied] = useState(false);
 
 	// Block browser refresh/close when key is created but not copied
@@ -133,7 +132,6 @@ export const CreateApiKeyModal = ({
 	const handleContinue = () => {
 		if (createdApiKey?.id && activeOrganization?.slug) {
 			setCreatedApiKey(null);
-			setKeyRevealed(false);
 			setKeyCopied(false);
 			onClose();
 			router.push(`/${activeOrganization.slug}/api-keys/${createdApiKey.id}`);
@@ -144,7 +142,6 @@ export const CreateApiKeyModal = ({
 		// Only allow closing if the key has been copied
 		if (!createdApiKey || keyCopied) {
 			setCreatedApiKey(null);
-			setKeyRevealed(false);
 			setKeyCopied(false);
 			reset();
 			onClose();
@@ -205,36 +202,18 @@ export const CreateApiKeyModal = ({
 							<div className="space-y-2">
 								<Label.Root>New API Key</Label.Root>
 								<div className="flex items-center gap-2 rounded-xl border border-stroke-soft-200 bg-bg-weak-50 p-3">
-									{keyRevealed ? (
-										<>
-											<code className="flex-1 break-all font-mono text-xs text-text-strong-950">
-												{createdApiKey.key}
-											</code>
-											<Button.Root
-												variant="neutral"
-												mode="ghost"
-												size="xxsmall"
-												onClick={handleCopyKey}
-												disabled={keyCopied}
-											>
-												<Icon name={keyCopied ? "check" : "clipboard-copy"} className={`h-4 w-4 ${keyCopied ? "text-success-base" : ""}`} />
-											</Button.Root>
-										</>
-									) : (
-										<>
-											<code className="flex-1 font-mono text-xs text-text-sub-600">
-												{"•".repeat(40)}
-											</code>
-											<Button.Root
-												variant="neutral"
-												mode="ghost"
-												size="xxsmall"
-												onClick={() => setKeyRevealed(true)}
-											>
-												<Icon name="eye-outline" className="h-4 w-4" />
-											</Button.Root>
-										</>
-									)}
+									<code className="flex-1 break-all font-mono text-xs text-text-strong-950">
+										{createdApiKey.key}
+									</code>
+									<Button.Root
+										variant="neutral"
+										mode="ghost"
+										size="xxsmall"
+										onClick={handleCopyKey}
+										disabled={keyCopied}
+									>
+										<Icon name={keyCopied ? "check" : "clipboard-copy"} className={`h-4 w-4 ${keyCopied ? "text-success-base" : ""}`} />
+									</Button.Root>
 								</div>
 								{!keyCopied && (
 									<p className="text-error-base text-xs flex items-center gap-1">

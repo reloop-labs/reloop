@@ -52,6 +52,13 @@ const ApiKeyDetailPage = () => {
 		}
 	};
 
+	const handleDeleteSuccess = () => {
+		// Navigate back to API keys list after successful deletion
+		if (activeOrganization?.slug) {
+			router.push(`/${activeOrganization.slug}/api-keys`);
+		}
+	};
+
 	if (error) {
 		return (
 			<div className="mx-auto max-w-3xl sm:px-8">
@@ -102,7 +109,7 @@ const ApiKeyDetailPage = () => {
 					onDeleteApiKey={handleDeleteApiKey}
 				/>
 			</div>
-			<DeleteApiKeyModal apiKeys={apiKeysForModal} />
+			<DeleteApiKeyModal apiKeys={apiKeysForModal} onDeleteSuccess={handleDeleteSuccess} />
 		</>
 	);
 };
