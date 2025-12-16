@@ -61,7 +61,7 @@ const NewDomainPage = () => {
 			);
 
 			// Navigate to domain detail page to see verification progress
-			push(`/domain/${domainId}`);
+			push(`/domain`);
 		} catch (error) {
 			const errorMessage = axios.isAxiosError(error)
 				? error.response?.data?.message || "Failed to start DNS verification"

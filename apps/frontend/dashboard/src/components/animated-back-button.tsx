@@ -6,9 +6,10 @@ import { useEffect } from "react";
 
 interface AnimatedBackButtonProps {
   showEscKey?: boolean;
+  onClick?: () => void;
 }
 
-export const AnimatedBackButton = ({ showEscKey = true }: AnimatedBackButtonProps) => {
+export const AnimatedBackButton = ({ showEscKey = true, onClick }: AnimatedBackButtonProps) => {
   const { back } = useRouter();
 
   useEffect(() => {
@@ -26,7 +27,7 @@ export const AnimatedBackButton = ({ showEscKey = true }: AnimatedBackButtonProp
   return (
     <button
       type="button"
-      onClick={() => back()}
+      onClick={onClick || back}
       className="group flex items-center gap-1.5 px-2 py-1.5 text-paragraph-xs font-medium text-text-sub-600 transition-all duration-300 hover:text-text-strong-950 cursor-pointer"
     >
       <div className="relative flex items-center justify-center w-3.5 h-3.5 overflow-visible">
@@ -50,9 +51,11 @@ export const AnimatedBackButton = ({ showEscKey = true }: AnimatedBackButtonProp
         </svg>
       </div>
       <span className="transition-all duration-300 group-hover:tracking-wide text-xs">Back</span>
-      {showEscKey && (
-        <Kbd.Root className="bg-bg-weak-50 text-[10px] px-1.5 py-0.5">Esc</Kbd.Root>
-      )}
-    </button>
+      {
+        showEscKey && (
+          <Kbd.Root className="bg-bg-weak-50 text-[10px] px-1.5 py-0.5">Esc</Kbd.Root>
+        )
+      }
+    </button >
   );
 };
