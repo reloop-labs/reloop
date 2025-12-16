@@ -17,8 +17,10 @@ export async function enableApiKey(
       where: and(
         eq(schema.apikey.id, id),
         eq(schema.apikey.organizationId, organizationId),
-        eq(schema.apikey.userId, userId),
       ),
+      with: {
+        user: true,
+      },
     });
 
     if (!existingKey) {
@@ -28,7 +30,15 @@ export async function enableApiKey(
 
     if (existingKey.enabled) {
       logger.info({ id }, "API key is already enabled");
-      return formatApiKeyResponse(existingKey);
+      return formatApiKeyResponse({
+        ...existingKey,
+        createdBy: {
+          id: existingKey.user.id,
+          name: existingKey.user.name,
+          image: existingKey.user.image,
+          email: existingKey.user.email,
+        },
+      });
     }
 
     const now = new Date();
@@ -49,7 +59,15 @@ export async function enableApiKey(
 
     logger.info({ id, organizationId, userId }, "API key enabled successfully");
 
-    return formatApiKeyResponse(updatedKey);
+    return formatApiKeyResponse({
+      ...updatedKey,
+      createdBy: {
+        id: existingKey.user.id,
+        name: existingKey.user.name,
+        image: existingKey.user.image,
+        email: existingKey.user.email,
+      },
+    });
   } catch (error) {
     logger.error(
       {
