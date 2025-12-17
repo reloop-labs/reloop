@@ -108,7 +108,7 @@ const ContactsPage = () => {
 
       {/* Content based on tab */}
       <div className="mt-4">
-        {tabValue === "contacts" ? <ContactList /> : <PropertyList onAddProperty={() => setIsPropertyModalOpen(true)} />}
+        {tabValue === "contacts" ? <ContactList onAddContact={() => setIsContactModalOpen(true)} /> : <PropertyList onAddProperty={() => setIsPropertyModalOpen(true)} />}
       </div>
 
       {/* Add Contacts Modal */}

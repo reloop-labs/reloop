@@ -2,7 +2,6 @@
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
-import Link from "next/link";
 import { motion, type Variants } from "motion/react";
 
 // Animation variants with proper typing
@@ -68,8 +67,12 @@ const fadeInUpVariants: Variants = {
   }),
 };
 
-export const ContactsEmptyState = () => {
-  const { activeOrganization } = useUserOrganization();
+interface ContactsEmptyStateProps {
+  onAddContact?: () => void;
+}
+
+export const ContactsEmptyState = ({ onAddContact }: ContactsEmptyStateProps) => {
+  useUserOrganization();
 
   return (
     <motion.div
@@ -185,16 +188,14 @@ export const ContactsEmptyState = () => {
           animate="visible"
           custom={0.45}
         >
-          <Link
-            href={`/${activeOrganization.slug}/contacts/add`}
-            className={Button.buttonVariants({
-              variant: "neutral",
-              size: "small",
-            }).root()}
+          <Button.Root
+            variant="neutral"
+            size="small"
+            onClick={onAddContact}
           >
             <Icon name="plus" className="h-4 w-4" />
             Add your first contact
-          </Link>
+          </Button.Root>
         </motion.div>
 
         {/* Help link */}

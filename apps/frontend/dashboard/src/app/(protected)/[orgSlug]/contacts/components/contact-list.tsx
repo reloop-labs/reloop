@@ -29,7 +29,11 @@ interface ContactListResponse {
   limit: number;
 }
 
-export const ContactList = () => {
+interface ContactListProps {
+  onAddContact?: () => void;
+}
+
+export const ContactList = ({ onAddContact }: ContactListProps) => {
   const { activeOrganization } = useUserOrganization();
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [filters, setFilters] = useState<ContactFilters>([]);
@@ -112,7 +116,7 @@ export const ContactList = () => {
   }
 
   if (!isLoading && data?.contacts && data.contacts.length === 0 && !searchQuery && filters.length === 0) {
-    return <ContactsEmptyState />;
+    return <ContactsEmptyState onAddContact={onAddContact} />;
   }
 
   return (

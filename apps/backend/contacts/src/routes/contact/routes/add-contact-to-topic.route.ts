@@ -7,8 +7,8 @@ import { Elysia } from "elysia";
 export const addContactToTopicRoute = new Elysia().use(authMiddleware).post(
   "/add-to-topic",
   async ({ body, user }) => {
-    const { activeOrganizationId } = user;
-    return await addContactToTopicHandler(activeOrganizationId, body);
+    const { activeOrganizationId, id: userId } = user;
+    return await addContactToTopicHandler(activeOrganizationId, userId, body);
   },
   {
     auth: true,

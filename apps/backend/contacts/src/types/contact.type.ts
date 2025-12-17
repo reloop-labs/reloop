@@ -40,7 +40,7 @@ export namespace ContactTypes {
 
   export interface UpdateContactRequest {
     email?: string;
-    status?: "Subscribed" | "Unsubscribed";
+    status?: "subscribed" | "unsubscribed";
     properties?: { propertyId: string; value: string }[];
   }
 
@@ -48,7 +48,7 @@ export namespace ContactTypes {
     page?: number;
     limit?: number;
     search?: string;
-    status?: "Subscribed" | "Unsubscribed";
+    status?: "subscribed" | "unsubscribed";
     organizationId?: string;
   }
 
@@ -56,7 +56,7 @@ export namespace ContactTypes {
     query: string;
     page?: number;
     limit?: number;
-    status?: "Subscribed" | "Unsubscribed";
+    status?: "subscribed" | "unsubscribed";
     organizationId?: string;
   }
 }

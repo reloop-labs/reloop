@@ -189,8 +189,7 @@ export const EditContactModal = ({ open, onOpenChange, contact }: EditContactMod
       }
 
       console.log("Updating contact with payload:", {
-        email,
-        status: isSubscribed ? "Subscribed" : "Unsubscribed",
+        status: isSubscribed ? "subscribed" : "unsubscribed",
         properties: propsToUpdate,
       });
 
@@ -198,8 +197,7 @@ export const EditContactModal = ({ open, onOpenChange, contact }: EditContactMod
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          email,
-          status: isSubscribed ? "Subscribed" : "Unsubscribed",
+          status: isSubscribed ? "subscribed" : "unsubscribed",
           properties: propsToUpdate.length > 0 ? propsToUpdate : undefined,
         }),
       });
@@ -247,7 +245,9 @@ export const EditContactModal = ({ open, onOpenChange, contact }: EditContactMod
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       disabled={isSaving}
-                      placeholder="example@email.com"
+                      readOnly
+                      placeholder={email}
+                      className="cursor-not-allowed bg-bg-weak-50"
                     />
                   </Input.Wrapper>
                 </Input.Root>
@@ -335,7 +335,7 @@ export const EditContactModal = ({ open, onOpenChange, contact }: EditContactMod
                 type="submit"
                 variant="neutral"
                 size="xsmall"
-                disabled={isSaving || !email}
+                disabled={isSaving}
               >
                 {isSaving ? (
                   <>

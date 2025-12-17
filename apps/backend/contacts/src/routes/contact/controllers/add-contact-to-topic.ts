@@ -20,6 +20,7 @@ interface AddContactToTopicResult {
 
 export async function addContactToTopic(
   organizationId: string,
+  userId: string,
   body: ContactModel.AddContactToTopicBody,
 ): Promise<AddContactToTopicResult> {
   const { email, topicId } = body;
@@ -63,8 +64,9 @@ export async function addContactToTopic(
         .insert(schema.contact)
         .values({
           email: emailLower,
-          status: "Subscribed",
+          status: "subscribed",
           organizationId,
+          userId,
         })
         .returning();
 
@@ -145,7 +147,8 @@ export async function addContactToTopic(
 
 export async function addContactToTopicHandler(
   organizationId: string,
+  userId: string,
   body: ContactModel.AddContactToTopicBody,
 ): Promise<AddContactToTopicResult> {
-  return addContactToTopic(organizationId, body);
+  return addContactToTopic(organizationId, userId, body);
 }

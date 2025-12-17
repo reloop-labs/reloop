@@ -5,7 +5,7 @@ export namespace ContactModel {
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   // Contact status values
-  export const statusValues = ["Subscribed", "Unsubscribed"] as const;
+  export const statusValues = ["subscribed", "unsubscribed"] as const;
 
   // Contact Models
   export const createContactBody = t.Object({
@@ -41,7 +41,7 @@ export namespace ContactModel {
       }),
     ),
     status: t.Optional(
-      t.Union([t.Literal("Subscribed"), t.Literal("Unsubscribed")], {
+      t.Union([t.Literal("subscribed"), t.Literal("unsubscribed")], {
         description: "Contact subscription status",
       }),
     ),
@@ -84,7 +84,7 @@ export namespace ContactModel {
     limit: t.Optional(t.Number({ minimum: 1, maximum: 100, default: 10 })),
     search: t.Optional(t.String({ description: "Search by email" })),
     status: t.Optional(
-      t.Union([t.Literal("Subscribed"), t.Literal("Unsubscribed")], {
+      t.Union([t.Literal("subscribed"), t.Literal("unsubscribed")], {
         description: "Filter by status",
       }),
     ),
@@ -102,7 +102,7 @@ export namespace ContactModel {
     page: t.Optional(t.Number({ minimum: 1, default: 1 })),
     limit: t.Optional(t.Number({ minimum: 1, maximum: 100, default: 10 })),
     status: t.Optional(
-      t.Union([t.Literal("Subscribed"), t.Literal("Unsubscribed")], {
+      t.Union([t.Literal("subscribed"), t.Literal("unsubscribed")], {
         description: "Filter by status",
       }),
     ),

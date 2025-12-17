@@ -6,8 +6,8 @@ import { Elysia } from "elysia";
 export const bulkImportContactsRoute = new Elysia().use(authMiddleware).post(
   "/bulk-import",
   async ({ body, user }) => {
-    const { activeOrganizationId } = user;
-    return await bulkImportContactsHandler(activeOrganizationId, body);
+    const { activeOrganizationId, id: userId } = user;
+    return await bulkImportContactsHandler(activeOrganizationId, userId, body);
   },
   {
     auth: true,

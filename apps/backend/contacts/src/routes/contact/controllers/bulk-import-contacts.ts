@@ -12,6 +12,7 @@ interface BulkImportResult {
 
 export async function bulkImportContacts(
   organizationId: string,
+  userId: string,
   body: ContactModel.BulkImportContactsBody,
 ): Promise<BulkImportResult> {
   logger.info(
@@ -51,8 +52,9 @@ export async function bulkImportContacts(
     // Separate new contacts from existing ones
     const contactsToCreate: Array<{
       email: string;
-      status: string;
+      status: "subscribed" | "unsubscribed" | "blocked";
       organizationId: string;
+      userId: string;
     }> = [];
 
     for (const contact of body.contacts) {
@@ -63,8 +65,9 @@ export async function bulkImportContacts(
       } else {
         contactsToCreate.push({
           email: emailLower,
-          status: "Subscribed",
+          status: "subscribed",
           organizationId,
+          userId,
         });
       }
     }
@@ -100,7 +103,8 @@ export async function bulkImportContacts(
 
 export async function bulkImportContactsHandler(
   organizationId: string,
+  userId: string,
   body: ContactModel.BulkImportContactsBody,
 ): Promise<BulkImportResult> {
-  return bulkImportContacts(organizationId, body);
+  return bulkImportContacts(organizationId, userId, body);
 }

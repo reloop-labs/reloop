@@ -103,6 +103,8 @@ export async function updateContact(
 						contactId,
 						propertyId: prop.propertyId,
 						value: prop.value,
+						organizationId,
+						userId: existingContact.userId,
 					});
 					logger.info({ contactId, propertyId: prop.propertyId }, "Inserted new property value");
 				}
