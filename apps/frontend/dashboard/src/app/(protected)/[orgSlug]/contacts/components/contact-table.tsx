@@ -65,7 +65,7 @@ const formatStatusLabel = (status: string) => {
 };
 
 const ContactSkeleton = () => (
-    <div className="grid grid-cols-[1fr_120px_140px_40px] items-center py-2 px-4">
+    <div className="grid grid-cols-[1fr_180px_100px_80px] items-center py-2 px-4">
         <div className="flex items-center gap-3">
             <Skeleton className="h-4 w-4" />
             <Skeleton className="h-4 w-40" />
@@ -120,7 +120,7 @@ export const ContactTable = ({
         return (
             <div className="w-full text-paragraph-sm rounded-xl border border-stroke-soft-100 overflow-hidden">
                 {/* Header */}
-                <div className="grid grid-cols-[1fr_120px_140px_40px] items-center py-3.5 px-4 text-text-sub-600 border-b border-stroke-soft-100">
+                <div className="grid grid-cols-[1fr_180px_100px_80px] items-center py-3.5 px-4 text-text-sub-600 border-b border-stroke-soft-100">
                     <div className="flex items-center gap-2">
                         <Icon name="mail-single" className="h-4 w-4" />
                         <span className="text-xs">Email</span>
@@ -150,7 +150,7 @@ export const ContactTable = ({
             <AnimatePresence mode="wait">
                 <div className="w-full text-paragraph-sm rounded-xl border border-stroke-soft-100 overflow-hidden">
                     {/* Table Header */}
-                    <div className="grid grid-cols-[1fr_120px_140px_40px] items-center py-3.5 px-4 text-text-sub-600 border-b border-stroke-soft-100">
+                    <div className="grid grid-cols-[1fr_180px_100px_80px] items-center py-3.5 px-4 text-text-sub-600 border-b border-stroke-soft-100">
                         <div className="flex items-center gap-2">
                             <Icon name="mail-single" className="h-4 w-4" />
                             <span className="text-xs">Email</span>
@@ -172,7 +172,7 @@ export const ContactTable = ({
                             <div
                                 key={contact.id}
                                 className={cn(
-                                    "group/row grid grid-cols-[1fr_120px_140px_40px] items-center py-2 px-4 transition-colors",
+                                    "group/row grid grid-cols-[1fr_180px_100px_80px] items-center py-2 px-4 transition-colors",
                                     "hover:bg-bg-weak-50/50"
                                 )}
                             >

@@ -200,7 +200,7 @@ export const PropertyTable = ({
 
                 {/* Created At Column */}
                 <motion.div {...getAnimationProps(index + 1, 3)} className="flex items-center">
-                  <span className="text-label-sm text-text-strong-950">
+                  <span className="text-label-sm text-text-strong-950 whitespace-nowrap">
                     {formatRelativeTime(property.createdAt)}
                   </span>
                 </motion.div>
