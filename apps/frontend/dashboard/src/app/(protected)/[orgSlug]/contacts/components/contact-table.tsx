@@ -5,9 +5,8 @@ import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
-import { toast } from "sonner";
-import { useSWRConfig } from "swr";
 import { ContactDropdown } from "./contact-dropdown";
+import { DeleteContactModal } from "./delete-contact-modal";
 import { EditContactModal } from "./edit-contact-modal";
 
 interface Contact {
@@ -84,36 +83,26 @@ export const ContactTable = ({
     loadingRows = 4,
     onDelete,
 }: ContactTableProps) => {
-    const { mutate } = useSWRConfig();
-    const [deletingId, setDeletingId] = useState<string | null>(null);
     const [editingContact, setEditingContact] = useState<Contact | null>(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [deletingContact, setDeletingContact] = useState<Contact | null>(null);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
     const handleEdit = (contact: Contact) => {
         setEditingContact(contact);
         setIsEditModalOpen(true);
     };
 
-    const handleDelete = async (contact: Contact) => {
-        setDeletingId(contact.id);
-        try {
-            const response = await fetch(`/api/contacts/v1/contacts/${contact.id}`, {
-                method: "DELETE",
-            });
+    const handleDelete = (contact: Contact) => {
+        setDeletingContact(contact);
+        setIsDeleteModalOpen(true);
+    };
 
-            if (!response.ok) {
-                throw new Error("Failed to delete contact");
-            }
-
-            toast.success("Contact deleted");
-            await mutate((key: string) => typeof key === "string" && key.includes("/api/contacts/v1/contacts/list"));
-            onDelete?.(contact.id);
-        } catch (error) {
-            console.error("Failed to delete contact:", error);
-            toast.error("Failed to delete contact");
-        } finally {
-            setDeletingId(null);
+    const handleDeleteSuccess = () => {
+        if (deletingContact) {
+            onDelete?.(deletingContact.id);
         }
+        setDeletingContact(null);
     };
 
     if (isLoading) {
@@ -199,7 +188,7 @@ export const ContactTable = ({
 
                                 {/* Created At Column */}
                                 <motion.div {...getAnimationProps(index + 1, 2)} className="flex items-center">
-                                    <span className="text-label-sm text-text-strong-950">
+                                    <span className="text-label-sm text-text-strong-950 whitespace-nowrap">
                                         {formatRelativeTime(contact.createdAt)}
                                     </span>
                                 </motion.div>
@@ -213,7 +202,7 @@ export const ContactTable = ({
                                         contact={contact}
                                         onEdit={handleEdit}
                                         onDelete={handleDelete}
-                                        isDeleting={deletingId === contact.id}
+                                        isDeleting={false}
                                     />
                                 </motion.div>
                             </div>
@@ -227,6 +216,14 @@ export const ContactTable = ({
                 open={isEditModalOpen}
                 onOpenChange={setIsEditModalOpen}
                 contact={editingContact}
+            />
+
+            {/* Delete Contact Modal */}
+            <DeleteContactModal
+                contact={deletingContact}
+                open={isDeleteModalOpen}
+                onOpenChange={setIsDeleteModalOpen}
+                onDeleteSuccess={handleDeleteSuccess}
             />
         </>
     );

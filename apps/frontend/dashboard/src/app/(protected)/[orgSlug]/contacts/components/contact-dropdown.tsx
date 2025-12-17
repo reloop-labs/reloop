@@ -1,10 +1,16 @@
 "use client";
 
 import { AnimatedHoverBackground } from "@fe/dashboard/components/layout/sidebar/animated-hover-background";
+import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { cn } from "@reloop/ui/cn";
-import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import * as Button from "@reloop/ui/button";
+import {
+    Content as PopoverContent,
+    Root as PopoverRoot,
+    Trigger as PopoverTrigger,
+} from "@reloop/ui/popover";
+import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 
 interface Contact {
@@ -24,9 +30,11 @@ export interface ContactDropdownProps {
     onEdit: (contact: Contact) => void;
     onDelete: (contact: Contact) => void;
     isDeleting: boolean;
+    onOpenChange?: (open: boolean) => void;
 }
 
 const menuItems = [
+    { id: "view", label: "View Details", icon: "eye-outline" as const, isDanger: false },
     { id: "edit", label: "Edit contact", icon: "edit" as const, isDanger: false },
     { id: "delete", label: "Delete contact", icon: "trash" as const, isDanger: true },
 ];
@@ -36,10 +44,18 @@ export const ContactDropdown = ({
     onEdit,
     onDelete,
     isDeleting,
+    onOpenChange,
 }: ContactDropdownProps) => {
+    const router = useRouter();
+    const { activeOrganization } = useUserOrganization();
     const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
-    const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [popoverOpen, setPopoverOpen] = useState(false);
     const buttonRefs = useRef<HTMLButtonElement[]>([]);
+
+    const handlePopoverOpenChange = (open: boolean) => {
+        setPopoverOpen(open);
+        onOpenChange?.(open);
+    };
 
     const currentTab = buttonRefs.current[hoverIdx ?? -1];
     const currentRect = currentTab?.getBoundingClientRect();
@@ -47,23 +63,28 @@ export const ContactDropdown = ({
     const isDanger = hoveredItem?.isDanger ?? false;
 
     const handleItemClick = (itemId: string) => {
-        if (itemId === "edit") {
-            setDropdownOpen(false);
+        if (itemId === "view") {
+            setPopoverOpen(false);
+            if (activeOrganization?.slug) {
+                router.push(`/${activeOrganization.slug}/contacts/detail/${contact.id}`);
+            }
+        } else if (itemId === "edit") {
+            setPopoverOpen(false);
             onEdit(contact);
         } else if (itemId === "delete") {
-            setDropdownOpen(false);
+            setPopoverOpen(false);
             onDelete(contact);
         }
     };
 
     return (
-        <Dropdown.Root open={dropdownOpen} onOpenChange={setDropdownOpen}>
-            <Dropdown.Trigger asChild>
+        <PopoverRoot open={popoverOpen} onOpenChange={handlePopoverOpenChange}>
+            <PopoverTrigger asChild>
                 <Button.Root variant="neutral" mode="ghost" size="xxsmall" disabled={isDeleting}>
                     <Icon name="more-vertical" className="w-3 h-3" />
                 </Button.Root>
-            </Dropdown.Trigger>
-            <Dropdown.Content align="end" className="w-40 p-1.5">
+            </PopoverTrigger>
+            <PopoverContent align="end" sideOffset={-4} className="w-40 p-1.5 rounded-xl">
                 <div className="relative">
                     {menuItems.map((item, idx) => (
                         <button
@@ -96,8 +117,7 @@ export const ContactDropdown = ({
                         isDanger={isDanger}
                     />
                 </div>
-            </Dropdown.Content>
-        </Dropdown.Root>
+            </PopoverContent>
+        </PopoverRoot>
     );
 };
-
