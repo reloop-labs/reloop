@@ -4,6 +4,7 @@ import { bulkImportContactsRoute } from "@be/contacts/routes/contact/routes/bulk
 import { createContactRoute } from "@be/contacts/routes/contact/routes/create-contact.route";
 import { deleteContactRoute } from "@be/contacts/routes/contact/routes/delete-contact.route";
 import { getContactRoute } from "@be/contacts/routes/contact/routes/get-contact.route";
+import { getContactPropertiesRoute } from "@be/contacts/routes/contact/routes/get-contact-properties.route";
 import { listContactsRoute } from "@be/contacts/routes/contact/routes/list-contacts.route";
 import { searchContactsRoute } from "@be/contacts/routes/contact/routes/search-contacts.route";
 import { updateContactRoute } from "@be/contacts/routes/contact/routes/update-contact.route";
@@ -17,6 +18,7 @@ export const contactRoutes = new Elysia({
 	// Contact Routes
 	.use(createContactRoute)
 	.use(getContactRoute)
+	.use(getContactPropertiesRoute)
 	.use(listContactsRoute)
 	.use(updateContactRoute)
 	.use(deleteContactRoute)
@@ -26,3 +28,4 @@ export const contactRoutes = new Elysia({
 	.use(bulkImportContactsRoute)
 	// Add to Topic
 	.use(addContactToTopicRoute);
+

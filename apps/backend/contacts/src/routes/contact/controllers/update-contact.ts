@@ -40,6 +40,9 @@ export async function updateContact(
 			updatedAt: new Date(),
 		};
 
+		if (body.email !== undefined) {
+			updateData.email = body.email;
+		}
 		if (body.status !== undefined) {
 			updateData.status = body.status;
 		}
@@ -61,6 +64,54 @@ export async function updateContact(
 				"Failed to update contact - no data returned",
 			);
 			throw status(500, { message: "Failed to update contact" });
+		}
+
+		// Handle property values if provided
+		logger.info(
+			{ hasProperties: !!body.properties, propertiesLength: body.properties?.length },
+			"Checking for properties to update",
+		);
+
+		if (body.properties && body.properties.length > 0) {
+			for (const prop of body.properties) {
+				logger.info(
+					{ propertyId: prop.propertyId, value: prop.value },
+					"Processing property value",
+				);
+
+				// Check if property value already exists
+				const existingValue = await db.query.contactPropertyValue.findFirst({
+					where: and(
+						eq(schema.contactPropertyValue.contactId, contactId),
+						eq(schema.contactPropertyValue.propertyId, prop.propertyId),
+					),
+				});
+
+				if (existingValue) {
+					// Update existing property value
+					await db
+						.update(schema.contactPropertyValue)
+						.set({
+							value: prop.value,
+							updatedAt: new Date(),
+						})
+						.where(eq(schema.contactPropertyValue.id, existingValue.id));
+					logger.info({ id: existingValue.id }, "Updated existing property value");
+				} else {
+					// Insert new property value
+					await db.insert(schema.contactPropertyValue).values({
+						contactId,
+						propertyId: prop.propertyId,
+						value: prop.value,
+					});
+					logger.info({ contactId, propertyId: prop.propertyId }, "Inserted new property value");
+				}
+			}
+
+			logger.info(
+				{ contactId, propertiesUpdated: body.properties.length },
+				"Contact property values updated",
+			);
 		}
 
 		logger.info(
@@ -92,3 +143,4 @@ export async function updateContactHandler(
 ): Promise<ContactTypes.ContactResponse> {
 	return updateContact(contactId, organizationId, body);
 }
+

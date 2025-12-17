@@ -34,10 +34,25 @@ export namespace ContactModel {
   export type CreateContactsBody = typeof createContactsBody.static;
 
   export const updateContactBody = t.Object({
+    email: t.Optional(
+      t.String({
+        pattern: emailPattern.source,
+        description: "Contact email address",
+      }),
+    ),
     status: t.Optional(
       t.Union([t.Literal("Subscribed"), t.Literal("Unsubscribed")], {
         description: "Contact subscription status",
       }),
+    ),
+    properties: t.Optional(
+      t.Array(
+        t.Object({
+          propertyId: t.String({ description: "Property ID" }),
+          value: t.String({ description: "Property value" }),
+        }),
+        { description: "Array of property values to set for this contact" },
+      ),
     ),
   });
 

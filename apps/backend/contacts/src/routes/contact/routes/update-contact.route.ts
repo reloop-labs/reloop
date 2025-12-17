@@ -4,8 +4,8 @@ import { updateContactHandler } from "@be/contacts/routes/contact/controllers/up
 import type { User } from "@reloop/auth/server";
 import { Elysia, t } from "elysia";
 
-export const updateContactRoute = new Elysia().use(authMiddleware).put(
-	"/update/:id",
+export const updateContactRoute = new Elysia().use(authMiddleware).patch(
+	"/:id",
 	async ({
 		params,
 		body,

@@ -1,6 +1,8 @@
 "use client";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
+import { AnimatedHoverBackground } from "@fe/dashboard/components/layout/sidebar/animated-hover-background";
 import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Kbd from "@reloop/ui/kbd";
@@ -13,7 +15,7 @@ import {
   Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useSWRConfig } from "swr";
 import { toast } from "sonner";
 import Spinner from "@reloop/ui/spinner";
@@ -30,6 +32,12 @@ const ContactsPage = () => {
 
   // Contact Modal State
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+
+  // Popover hover state
+  const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
+  const buttonRefs = useRef<(HTMLButtonElement | HTMLAnchorElement)[]>([]);
+  const currentTab = buttonRefs.current[hoverIdx ?? -1];
+  const currentRect = currentTab?.getBoundingClientRect();
 
   // Property Modal State
   const [isPropertyModalOpen, setIsPropertyModalOpen] = useState(false);
@@ -88,29 +96,43 @@ const ContactsPage = () => {
                   Add contact
                 </Button.Root>
               </PopoverTrigger>
-              <PopoverContent align="end" side="bottom" className="p-2" sideOffset={3}>
-                <div className="flex flex-col gap-1">
-                  <Button.Root
-                    variant="neutral"
-                    mode="ghost"
-                    size="small"
+              <PopoverContent align="end" side="bottom" className="w-44 p-1.5" sideOffset={3}>
+                <div className="relative">
+                  <button
+                    ref={(el) => {
+                      if (el) buttonRefs.current[0] = el;
+                    }}
+                    type="button"
+                    onPointerEnter={() => setHoverIdx(0)}
+                    onPointerLeave={() => setHoverIdx(undefined)}
                     onClick={() => setIsContactModalOpen(true)}
-                    className="w-full justify-start"
+                    className={cn(
+                      "flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-xs font-normal text-text-strong-950 transition-colors",
+                      !currentRect && hoverIdx === 0 && "bg-neutral-alpha-10"
+                    )}
                   >
-                    <Icon name="user-plus" className="h-4 w-4" />
-                    Add Single Contact
-                  </Button.Root>
+                    <Icon name="user-plus" className="h-3.5 w-3.5 text-text-sub-600" />
+                    <span>Add Single Contact</span>
+                  </button>
                   <Link
+                    ref={(el) => {
+                      if (el) buttonRefs.current[1] = el;
+                    }}
                     href={`/${activeOrganization?.slug}/contacts/bulk-import`}
-                    className={Button.buttonVariants({
-                      variant: "neutral",
-                      mode: "ghost",
-                      size: "small",
-                    }).root() + " w-full justify-start"}
+                    onPointerEnter={() => setHoverIdx(1)}
+                    onPointerLeave={() => setHoverIdx(undefined)}
+                    className={cn(
+                      "flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-xs font-normal text-text-strong-950 transition-colors",
+                      !currentRect && hoverIdx === 1 && "bg-neutral-alpha-10"
+                    )}
                   >
-                    <Icon name="file-upload" className="h-4 w-4" />
-                    Bulk Import (CSV)
+                    <Icon name="file-upload" className="h-3.5 w-3.5 text-text-sub-600" />
+                    <span>Bulk Import (CSV)</span>
                   </Link>
+                  <AnimatedHoverBackground
+                    rect={currentRect}
+                    tabElement={currentTab}
+                  />
                 </div>
               </PopoverContent>
             </PopoverRoot>

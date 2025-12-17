@@ -39,7 +39,9 @@ export namespace ContactTypes {
   }
 
   export interface UpdateContactRequest {
+    email?: string;
     status?: "Subscribed" | "Unsubscribed";
+    properties?: { propertyId: string; value: string }[];
   }
 
   export interface ContactListQuery {

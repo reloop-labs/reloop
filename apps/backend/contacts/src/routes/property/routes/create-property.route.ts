@@ -1,14 +1,17 @@
+import { authMiddleware } from "@be/contacts/middleware/auth";
 import { PropertyModel } from "@be/contacts/model/property.model";
 import { createPropertyHandler } from "@be/contacts/routes/property/controllers/create-property";
+import type { User } from "@reloop/auth/server";
 import { Elysia } from "elysia";
 
-export const createPropertyRoute = new Elysia().post(
+export const createPropertyRoute = new Elysia().use(authMiddleware).post(
   "/create",
-  async ({ body, store }) => {
-    const organizationId = (store as { organizationId: string }).organizationId;
-    return createPropertyHandler(organizationId, body);
+  async ({ body, user }: { body: PropertyModel.CreatePropertyBody; user: User }) => {
+    const { activeOrganizationId } = user;
+    return createPropertyHandler(activeOrganizationId as string, body);
   },
   {
+    auth: true,
     body: PropertyModel.createPropertyBody,
     response: {
       200: PropertyModel.propertyResponse,
@@ -22,3 +25,4 @@ export const createPropertyRoute = new Elysia().post(
     },
   },
 );
+
