@@ -4,11 +4,12 @@ import { useQueryState } from "nuqs";
 import useSWR from "swr";
 import { PropertyTable } from "./property-table";
 import { PropertiesEmptyState } from "./properties-empty-state";
-import { PaginationControls } from "@fe/dashboard/components/pagination-controls";
 import { PageSizeDropdown } from "@fe/dashboard/components/page-size-dropdown";
 import * as Input from "@reloop/ui/input";
+import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import { useState } from "react";
+import { PropertyFilterDropdown, type PropertyFilters } from "./property-filter-dropdown";
 
 interface Property {
   id: string;
@@ -42,9 +43,10 @@ export const PropertyList = ({ onAddProperty }: PropertyListProps) => {
     parse: Number,
   });
   const [search, setSearch] = useState("");
-  const [typeFilter, setTypeFilter] = useQueryState("propertyType", {
-    defaultValue: "",
-  });
+  const [filters, setFilters] = useState<PropertyFilters>([]);
+
+  // Convert filters to type filter for API
+  const typeFilter = filters.length === 1 ? filters[0] : "";
 
   const buildUrl = () => {
     let url = `/api/contacts/v1/properties/list?limit=${pageSize}&page=${currentPage}`;
@@ -60,34 +62,26 @@ export const PropertyList = ({ onAddProperty }: PropertyListProps) => {
   } = useSWR<PropertyListResponse>(buildUrl());
 
   const totalPages = data ? Math.ceil(data.total / pageSize) : 1;
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
-  const handlePageSizeChange = (size: number) => {
-    setPageSize(size);
-    setCurrentPage(1);
-  };
+  const startIndex = (currentPage - 1) * pageSize + 1;
+  const endIndex = Math.min(currentPage * pageSize, data?.total || 0);
 
   const handleDeleteProperty = async (_propertyId: string) => {
     await mutate();
   };
 
-  if (!isLoading && data?.properties.length === 0 && !search && !typeFilter) {
+  if (!isLoading && data?.properties.length === 0 && !search && filters.length === 0) {
     return <PropertiesEmptyState onAddProperty={onAddProperty} />;
   }
 
   return (
-    <div className="space-y-4">
-      {/* Search and Filters */}
-      <div className="flex items-center gap-2">
+    <div>
+      <div className="flex items-center gap-3">
         <div className="flex-1">
-          <Input.Root size="small">
-            <Input.Wrapper className="w-full">
-              <Input.Icon as={Icon} name="search" />
+          <Input.Root size="xsmall">
+            <Input.Wrapper>
+              <Input.Icon as={Icon} name="search" size="xsmall" />
               <Input.Input
-                placeholder="Search properties..."
+                placeholder="Search by name"
                 value={search}
                 onChange={(e) => {
                   setSearch(e.target.value);
@@ -97,44 +91,59 @@ export const PropertyList = ({ onAddProperty }: PropertyListProps) => {
             </Input.Wrapper>
           </Input.Root>
         </div>
-        <select
-          value={typeFilter}
-          onChange={(e) => {
-            setTypeFilter(e.target.value);
-            setCurrentPage(1);
-          }}
-          className="h-9 rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-3 text-sm text-text-sub-600 outline-none focus:ring-2 focus:ring-primary-alpha-24"
-        >
-          <option value="">All types</option>
-          <option value="string">String</option>
-          <option value="number">Number</option>
-        </select>
+
+        <PropertyFilterDropdown value={filters} onChange={setFilters} />
       </div>
 
-      {/* Table */}
-      <PropertyTable
-        properties={data?.properties || []}
-        isLoading={isLoading}
-        onDelete={handleDeleteProperty}
-      />
+      <div className="mt-4">
+        <PropertyTable
+          properties={data?.properties || []}
+          isLoading={isLoading}
+          loadingRows={4}
+          onDelete={handleDeleteProperty}
+        />
+      </div>
 
       {/* Pagination */}
       {data && data.total > 0 && (
-        <div className="flex items-center justify-between pt-4 border-t border-stroke-soft-200">
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-text-sub-600">
-              Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, data.total)} of {data.total} properties
+        <div className="mt-4 pb-8 flex items-center justify-between text-paragraph-sm text-text-sub-600">
+          <div className="flex items-center gap-3">
+            <span>
+              Showing {startIndex}–{endIndex} of {data.total} propert{data.total !== 1 ? "ies" : "y"}
             </span>
             <PageSizeDropdown
               value={pageSize}
-              onValueChange={handlePageSizeChange}
+              onValueChange={(value) => {
+                setPageSize(value);
+                setCurrentPage(1);
+              }}
             />
           </div>
-          <PaginationControls
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-          />
+          <div className="flex items-center gap-2">
+            <Button.Root
+              variant="neutral"
+              mode="stroke"
+              size="xsmall"
+              onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+              disabled={currentPage === 1 || isLoading}
+              className="transition-all duration-200 hover:border-primary-base hover:bg-bg-weak-50/50"
+            >
+              <Icon name="chevron-left" className="h-4 w-4" />
+            </Button.Root>
+            <span className="px-2">
+              Page {currentPage} of {totalPages}
+            </span>
+            <Button.Root
+              variant="neutral"
+              mode="stroke"
+              size="xsmall"
+              onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+              disabled={currentPage === totalPages || isLoading}
+              className="transition-all duration-200 hover:border-primary-base hover:bg-bg-weak-50/50"
+            >
+              <Icon name="chevron-right" className="h-4 w-4" />
+            </Button.Root>
+          </div>
         </div>
       )}
     </div>

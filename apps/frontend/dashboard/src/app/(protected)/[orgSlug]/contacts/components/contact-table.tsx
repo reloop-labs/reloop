@@ -45,7 +45,9 @@ const getAnimationProps = (row: number, column: number) => {
 const getStatusBadgeStyles = (status: string) => {
     switch (status.toLowerCase()) {
         case "subscribed":
-            return "border border-feature-base text-feature-base bg-feature-light/20";
+            return "border border-success-base text-success-base bg-success-light/20";
+        case "unsubscribed":
+            return "border border-neutral-base text-neutral-base bg-neutral-light/20";
         default:
             return "border border-stroke-soft-200 text-text-sub-600 bg-neutral-alpha-10";
     }
