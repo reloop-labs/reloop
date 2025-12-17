@@ -6,6 +6,7 @@ import * as Input from "@reloop/ui/input";
 import * as Kbd from "@reloop/ui/kbd";
 import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
+import * as Select from "@reloop/ui/select";
 import {
   Content as PopoverContent,
   Root as PopoverRoot,
@@ -17,53 +18,59 @@ import { useSWRConfig } from "swr";
 import { toast } from "sonner";
 import Spinner from "@reloop/ui/spinner";
 import { ContactList } from "./components/contact-list";
+import { ContactsTabs } from "./components/contacts-tabs";
+import { PropertyList } from "./components/property-list";
+import { AddContactModal } from "./components/add-contact-modal";
+import { useQueryState } from "nuqs";
 
 const ContactsPage = () => {
   const { activeOrganization } = useUserOrganization();
   const { mutate } = useSWRConfig();
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [isCreating, setIsCreating] = useState(false);
+  const [tabValue] = useQueryState("tab", { defaultValue: "contacts" });
 
-  // Form state
-  const [email, setEmail] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  // Contact Modal State
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
-  const handleCreateContact = async (e: React.FormEvent) => {
+  // Property Modal State
+  const [isPropertyModalOpen, setIsPropertyModalOpen] = useState(false);
+  const [isCreatingProperty, setIsCreatingProperty] = useState(false);
+  const [propertyName, setPropertyName] = useState("");
+  const [propertyType, setPropertyType] = useState<"string" | "number">("string");
+  const [fallbackValue, setFallbackValue] = useState("");
+
+  const handleCreateProperty = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
+    if (!propertyName) return;
 
-    setIsCreating(true);
+    setIsCreatingProperty(true);
     try {
-      const response = await fetch("/api/audience/v1/contacts/add", {
+      const response = await fetch("/api/contacts/v1/properties/create", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          email,
-          firstName: firstName || undefined,
-          lastName: lastName || undefined,
+          name: propertyName,
+          type: propertyType,
+          fallbackValue: fallbackValue || undefined,
         }),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to create contact");
+        const data = await response.json();
+        throw new Error(data.message || "Failed to create property");
       }
 
-      toast.success("Contact created successfully");
-      setIsCreateModalOpen(false);
-      setEmail("");
-      setFirstName("");
-      setLastName("");
+      toast.success("Property created successfully");
+      setIsPropertyModalOpen(false);
+      setPropertyName("");
+      setPropertyType("string");
+      setFallbackValue("");
 
-      // Refresh the list
-      await mutate((key: string) => typeof key === 'string' && key.includes('/api/audience/v1/contacts/list'));
+      await mutate((key: string) => typeof key === 'string' && key.includes('/api/contacts/v1/properties/list'));
     } catch (error) {
-      console.error("Failed to create contact:", error);
-      toast.error("Failed to create contact");
+      console.error("Failed to create property:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to create property");
     } finally {
-      setIsCreating(false);
+      setIsCreatingProperty(false);
     }
   };
 
@@ -73,75 +80,96 @@ const ContactsPage = () => {
       <div className="flex items-center justify-between pt-10">
         <p className="font-medium text-2xl">Contacts</p>
         <div className="flex items-center gap-2">
-          <PopoverRoot>
-            <PopoverTrigger asChild>
-              <Button.Root variant="neutral" size="xsmall">
-                <Icon name="plus" className="h-4 w-4" />
-                Add contact
-              </Button.Root>
-            </PopoverTrigger>
-            <PopoverContent align="end" side="bottom" className="p-2" sideOffset={3}>
-              <div className="flex flex-col gap-1">
-                <Button.Root
-                  variant="neutral"
-                  mode="ghost"
-                  size="small"
-                  onClick={() => setIsCreateModalOpen(true)}
-                  className="w-full justify-start"
-                >
-                  <Icon name="user-plus" className="h-4 w-4" />
-                  Add Single Contact
+          {tabValue === "contacts" ? (
+            <PopoverRoot>
+              <PopoverTrigger asChild>
+                <Button.Root variant="neutral" size="xsmall">
+                  <Icon name="plus" className="h-4 w-4" />
+                  Add contact
                 </Button.Root>
-                <Link
-                  href={`/${activeOrganization?.slug}/contacts/bulk-import`}
-                  className={Button.buttonVariants({
-                    variant: "neutral",
-                    mode: "ghost",
-                    size: "small",
-                  }).root() + " w-full justify-start"}
-                >
-                  <Icon name="file-upload" className="h-4 w-4" />
-                  Bulk Import (CSV)
-                </Link>
-              </div>
-            </PopoverContent>
-          </PopoverRoot>
+              </PopoverTrigger>
+              <PopoverContent align="end" side="bottom" className="p-2" sideOffset={3}>
+                <div className="flex flex-col gap-1">
+                  <Button.Root
+                    variant="neutral"
+                    mode="ghost"
+                    size="small"
+                    onClick={() => setIsContactModalOpen(true)}
+                    className="w-full justify-start"
+                  >
+                    <Icon name="user-plus" className="h-4 w-4" />
+                    Add Single Contact
+                  </Button.Root>
+                  <Link
+                    href={`/${activeOrganization?.slug}/contacts/bulk-import`}
+                    className={Button.buttonVariants({
+                      variant: "neutral",
+                      mode: "ghost",
+                      size: "small",
+                    }).root() + " w-full justify-start"}
+                  >
+                    <Icon name="file-upload" className="h-4 w-4" />
+                    Bulk Import (CSV)
+                  </Link>
+                </div>
+              </PopoverContent>
+            </PopoverRoot>
+          ) : (
+            <Button.Root
+              variant="neutral"
+              size="xsmall"
+              onClick={() => setIsPropertyModalOpen(true)}
+            >
+              <Icon name="plus" className="h-4 w-4" />
+              Add property
+            </Button.Root>
+          )}
         </div>
       </div>
 
-      {/* Content */}
+      {/* Tabs */}
       <div className="mt-6">
-        <ContactList />
+        <ContactsTabs />
       </div>
 
-      {/* Create Contact Modal */}
-      <Modal.Root open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
+      {/* Content based on tab */}
+      <div className="mt-4">
+        {tabValue === "contacts" ? <ContactList /> : <PropertyList />}
+      </div>
+
+      {/* Add Contacts Modal */}
+      <AddContactModal
+        open={isContactModalOpen}
+        onOpenChange={setIsContactModalOpen}
+      />
+
+      {/* Add Property Modal */}
+      <Modal.Root open={isPropertyModalOpen} onOpenChange={setIsPropertyModalOpen}>
         <Modal.Content className="sm:max-w-[480px] p-0.5 border border-stroke-soft-100/50 rounded-2xl" showClose={true}>
           <div className="border border-stroke-soft-100/50 rounded-2xl">
             <Modal.Header className="before:border-stroke-soft-200/50">
               <div className="flex items-center justify-center">
-                <Icon name="user-plus" className="h-4 w-4" />
+                <Icon name="sliders-horiz-2" className="h-4 w-4" />
               </div>
               <div className="flex-1">
-                <Modal.Title className="text-sm">Add Contact</Modal.Title>
+                <Modal.Title className="text-sm">Add Property</Modal.Title>
               </div>
             </Modal.Header>
-            <form onSubmit={handleCreateContact}>
+            <form onSubmit={handleCreateProperty}>
               <Modal.Body className="space-y-4">
                 <div className="flex flex-col gap-1">
-                  <Label.Root htmlFor="email">
-                    Email
+                  <Label.Root htmlFor="propertyName">
+                    Name
                     <Label.Asterisk />
                   </Label.Root>
                   <Input.Root size="small">
                     <Input.Wrapper>
                       <Input.Input
-                        id="email"
-                        type="email"
-                        placeholder="contact@example.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        disabled={isCreating}
+                        id="propertyName"
+                        placeholder="e.g., first_name, company_name"
+                        value={propertyName}
+                        onChange={(e) => setPropertyName(e.target.value)}
+                        disabled={isCreatingProperty}
                       />
                     </Input.Wrapper>
                   </Input.Root>
@@ -149,33 +177,36 @@ const ContactsPage = () => {
 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="flex flex-col gap-1">
-                    <Label.Root htmlFor="firstName">
-                      First Name
+                    <Label.Root htmlFor="propertyType">
+                      Type
+                      <Label.Asterisk />
                     </Label.Root>
-                    <Input.Root size="small">
-                      <Input.Wrapper>
-                        <Input.Input
-                          id="firstName"
-                          placeholder="John"
-                          value={firstName}
-                          onChange={(e) => setFirstName(e.target.value)}
-                          disabled={isCreating}
-                        />
-                      </Input.Wrapper>
-                    </Input.Root>
+                    <Select.Root
+                      value={propertyType}
+                      onValueChange={(value) => setPropertyType(value as "string" | "number")}
+                      disabled={isCreatingProperty}
+                    >
+                      <Select.Trigger className="w-full">
+                        <Select.Value placeholder="Select type" />
+                      </Select.Trigger>
+                      <Select.Content>
+                        <Select.Item value="string">String</Select.Item>
+                        <Select.Item value="number">Number</Select.Item>
+                      </Select.Content>
+                    </Select.Root>
                   </div>
                   <div className="flex flex-col gap-1">
-                    <Label.Root htmlFor="lastName">
-                      Last Name
+                    <Label.Root htmlFor="fallbackValue">
+                      Fallback Value
                     </Label.Root>
                     <Input.Root size="small">
                       <Input.Wrapper>
                         <Input.Input
-                          id="lastName"
-                          placeholder="Doe"
-                          value={lastName}
-                          onChange={(e) => setLastName(e.target.value)}
-                          disabled={isCreating}
+                          id="fallbackValue"
+                          placeholder="Default value"
+                          value={fallbackValue}
+                          onChange={(e) => setFallbackValue(e.target.value)}
+                          disabled={isCreatingProperty}
                         />
                       </Input.Wrapper>
                     </Input.Root>
@@ -189,12 +220,12 @@ const ContactsPage = () => {
                   mode="stroke"
                   size="small"
                   onClick={() => {
-                    setIsCreateModalOpen(false);
-                    setEmail("");
-                    setFirstName("");
-                    setLastName("");
+                    setIsPropertyModalOpen(false);
+                    setPropertyName("");
+                    setPropertyType("string");
+                    setFallbackValue("");
                   }}
-                  disabled={isCreating}
+                  disabled={isCreatingProperty}
                 >
                   Cancel
                   <Kbd.Root className="bg-bg-weak-50 text-[10px]">Esc</Kbd.Root>
@@ -203,16 +234,16 @@ const ContactsPage = () => {
                   type="submit"
                   variant="neutral"
                   size="small"
-                  disabled={isCreating || !email}
+                  disabled={isCreatingProperty || !propertyName}
                 >
-                  {isCreating ? (
+                  {isCreatingProperty ? (
                     <>
                       <Spinner size={16} />
                       Creating...
                     </>
                   ) : (
                     <>
-                      Add Contact
+                      Add Property
                       <Icon name="enter" className="w-4 h-4 border rounded-sm p-px border-stroke-soft-100/20" />
                     </>
                   )}

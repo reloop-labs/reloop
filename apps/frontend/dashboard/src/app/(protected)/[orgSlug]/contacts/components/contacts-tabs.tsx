@@ -14,9 +14,9 @@ const items = [
     iconName: "users",
   },
   {
-    title: "Topics",
-    value: "topics",
-    iconName: "notification-indicator",
+    title: "Properties",
+    value: "properties",
+    iconName: "sliders-horiz-2",
   },
 ];
 

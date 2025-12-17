@@ -56,7 +56,7 @@ export const AddContact = ({
     try {
       setIsLoading(true);
       await axios.post(
-        "/api/audience/v1/contacts/add-to-topic",
+        "/api/contacts/v1/contacts/add-to-topic",
         {
           email,
           firstName: firstName || undefined,
@@ -65,7 +65,7 @@ export const AddContact = ({
         },
         { withCredentials: true },
       );
-      await mutate((key: string) => typeof key === 'string' && key.startsWith(`/api/audience/v1/subscriptions/list?topicId=${topicId}`));
+      await mutate((key: string) => typeof key === 'string' && key.startsWith(`/api/contacts/v1/subscriptions/list?topicId=${topicId}`));
       toast.success("Contact added successfully");
       reset();
       onOpenChange(false);

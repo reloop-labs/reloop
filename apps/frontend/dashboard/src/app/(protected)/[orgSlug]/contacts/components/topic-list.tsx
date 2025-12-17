@@ -41,7 +41,7 @@ export const TopicList = ({ hideHeader = false }: TopicListProps) => {
 
   const { data, error, isLoading } = useSWR<TopicListResponse>(
     activeOrganization?.id
-      ? `/api/audience/v1/topics/list?limit=${pageSize}&page=${currentPage}`
+      ? `/api/contacts/v1/topics/list?limit=${pageSize}&page=${currentPage}`
       : null,
     {
       revalidateOnFocus: true,

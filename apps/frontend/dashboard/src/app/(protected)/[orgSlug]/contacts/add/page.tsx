@@ -53,7 +53,7 @@ const AddTopicPage = () => {
     try {
       changeStatus("loading");
       const response = await axios.post(
-        "/api/audience/v1/topics/add",
+        "/api/contacts/v1/topics/add",
         {
           name,
           description: description || undefined,
@@ -61,7 +61,7 @@ const AddTopicPage = () => {
         { headers: { credentials: "include" } },
       );
       await mutate(
-        `/api/audience/v1/topics/list?limit=100`,
+        `/api/contacts/v1/topics/list?limit=100`,
       );
       push(`/contacts/${response.data.id}`);
     } catch (error) {

@@ -12,7 +12,7 @@ import { useState, useCallback } from "react";
 const codeExamples = {
     javascript: {
         add: `// Create a new topic
-const response = await fetch('/api/audience/v1/topics/add', {
+const response = await fetch('/api/contacts/v1/topics/add', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -26,7 +26,7 @@ const response = await fetch('/api/audience/v1/topics/add', {
 
 const result = await response.json();`,
         list: `// List all topics
-const response = await fetch('/api/audience/v1/topics/list?page=1&limit=10', {
+const response = await fetch('/api/contacts/v1/topics/list?page=1&limit=10', {
   headers: {
     'Authorization': 'Bearer YOUR_API_KEY'
   }
@@ -34,7 +34,7 @@ const response = await fetch('/api/audience/v1/topics/list?page=1&limit=10', {
 
 const topics = await response.json();`,
         delete: `// Delete a topic
-const response = await fetch('/api/audience/v1/topics/delete', {
+const response = await fetch('/api/contacts/v1/topics/delete', {
   method: 'DELETE',
   headers: {
     'Content-Type': 'application/json',
@@ -47,7 +47,7 @@ const response = await fetch('/api/audience/v1/topics/delete', {
 
 const result = await response.json();`,
         subscribe: `// Subscribe contact to topic
-const response = await fetch('/api/audience/v1/topics/subscribe', {
+const response = await fetch('/api/contacts/v1/topics/subscribe', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -65,7 +65,7 @@ const result = await response.json();`,
         add: `# Create a new topic
 import requests
 
-response = requests.post('/api/audience/v1/topics/add',
+response = requests.post('/api/contacts/v1/topics/add',
   headers={
     'Content-Type': 'application/json',
     'Authorization': 'Bearer YOUR_API_KEY'
@@ -80,7 +80,7 @@ result = response.json()`,
         list: `# List all topics
 import requests
 
-response = requests.get('/api/audience/v1/topics/list?page=1&limit=10',
+response = requests.get('/api/contacts/v1/topics/list?page=1&limit=10',
   headers={'Authorization': 'Bearer YOUR_API_KEY'}
 )
 
@@ -88,7 +88,7 @@ topics = response.json()`,
         delete: `# Delete a topic
 import requests
 
-response = requests.delete('/api/audience/v1/topics/delete',
+response = requests.delete('/api/contacts/v1/topics/delete',
   headers={
     'Content-Type': 'application/json',
     'Authorization': 'Bearer YOUR_API_KEY'
@@ -100,7 +100,7 @@ result = response.json()`,
         subscribe: `# Subscribe contact to topic
 import requests
 
-response = requests.post('/api/audience/v1/topics/subscribe',
+response = requests.post('/api/contacts/v1/topics/subscribe',
   headers={
     'Content-Type': 'application/json',
     'Authorization': 'Bearer YOUR_API_KEY'
@@ -122,7 +122,7 @@ $data = [
 ];
 
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, '/api/audience/v1/topics/add');
+curl_setopt($ch, CURLOPT_URL, '/api/contacts/v1/topics/add');
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
@@ -137,7 +137,7 @@ curl_close($ch);
         list: `<?php
 // List all topics
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, '/api/audience/v1/topics/list?page=1&limit=10');
+curl_setopt($ch, CURLOPT_URL, '/api/contacts/v1/topics/list?page=1&limit=10');
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
     'Authorization: Bearer YOUR_API_KEY'
 ]);
@@ -151,7 +151,7 @@ curl_close($ch);
 $data = ['topicId' => 'topic_123'];
 
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, '/api/audience/v1/topics/delete');
+curl_setopt($ch, CURLOPT_URL, '/api/contacts/v1/topics/delete');
 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
@@ -171,7 +171,7 @@ $data = [
 ];
 
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, '/api/audience/v1/topics/subscribe');
+curl_setopt($ch, CURLOPT_URL, '/api/contacts/v1/topics/subscribe');
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
@@ -191,25 +191,25 @@ const operations = [
         id: "add",
         label: "Create Topic",
         method: "POST",
-        endpoint: "/api/audience/v1/topics/add",
+        endpoint: "/api/contacts/v1/topics/add",
     },
     {
         id: "list",
         label: "List Topics",
         method: "GET",
-        endpoint: "/api/audience/v1/topics/list",
+        endpoint: "/api/contacts/v1/topics/list",
     },
     {
         id: "subscribe",
         label: "Subscribe",
         method: "POST",
-        endpoint: "/api/audience/v1/topics/subscribe",
+        endpoint: "/api/contacts/v1/topics/subscribe",
     },
     {
         id: "delete",
         label: "Delete Topic",
         method: "DELETE",
-        endpoint: "/api/audience/v1/topics/delete",
+        endpoint: "/api/contacts/v1/topics/delete",
     },
 ];
 

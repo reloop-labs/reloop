@@ -60,7 +60,7 @@ local.reloop.sh {
             header_up X-Forwarded-For {remote}
         }
     }
-    handle /api/audience* {
+    handle /api/contacts* {
         reverse_proxy host.docker.internal:8014 {
             header_up Host {host}
             header_up X-Forwarded-Proto {scheme}

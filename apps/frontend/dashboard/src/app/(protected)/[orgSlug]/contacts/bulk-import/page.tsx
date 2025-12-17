@@ -128,7 +128,7 @@ const BulkImportPage = () => {
       changeStatus("loading");
 
       const response = await axios.post(
-        "/api/audience/v1/contacts/bulk-import",
+        "/api/contacts/v1/contacts/bulk-import",
         { contacts: csvData },
         { withCredentials: true },
       );
@@ -137,7 +137,7 @@ const BulkImportPage = () => {
       setImportResult(result);
 
       if (result.created > 0) {
-        await mutate((key: string) => typeof key === "string" && key.includes("/api/audience/v1/contacts/list"));
+        await mutate((key: string) => typeof key === "string" && key.includes("/api/contacts/v1/contacts/list"));
         toast.success(`Successfully imported ${result.created} contacts`);
       }
     } catch (error) {

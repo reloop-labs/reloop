@@ -4,19 +4,18 @@ import { PageSizeDropdown } from "@fe/dashboard/components/page-size-dropdown";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQueryState, parseAsInteger } from "nuqs";
 import useSWR from "swr";
 import { toast } from "sonner";
 import { ContactTable } from "./contact-table";
-import { DeleteContactModal } from "./delete-contact";
 import { ContactsEmptyState } from "./contacts-empty-state";
+import { ContactFilterDropdown, type ContactFilters } from "./contact-filter-dropdown";
 
 interface Contact {
   id: string;
   email: string;
-  firstName: string | null;
-  lastName: string | null;
+  status: string;
   organizationId: string;
   createdAt: string;
   updatedAt: string;
@@ -33,43 +32,40 @@ interface ContactListResponse {
 export const ContactList = () => {
   const { activeOrganization } = useUserOrganization();
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [filters, setFilters] = useState<ContactFilters>([]);
   const [currentPage, setCurrentPage] = useQueryState("page", parseAsInteger.withDefault(1));
   const [pageSize, setPageSize] = useQueryState("limit", parseAsInteger.withDefault(10));
 
-  const { data, error, isLoading } = useSWR<ContactListResponse>(
-    activeOrganization?.id
-      ? `/api/audience/v1/contacts/list?limit=${pageSize}&page=${currentPage}`
-      : null,
-    {
-      revalidateOnFocus: true,
-      revalidateOnReconnect: true,
-    },
-  );
+  // Convert filters array to status filter string for API
+  const statusFilter = useMemo(() => {
+    if (filters.length === 0 || filters.length === 2) return "";
+    if (filters.includes("subscribed")) return "Subscribed";
+    if (filters.includes("unsubscribed")) return "Unsubscribed";
+    return "";
+  }, [filters]);
+
+  const buildUrl = () => {
+    if (!activeOrganization?.id) return null;
+    let url = `/api/contacts/v1/contacts/list?limit=${pageSize}&page=${currentPage}`;
+    if (searchQuery) url += `&search=${encodeURIComponent(searchQuery)}`;
+    if (statusFilter) url += `&status=${statusFilter}`;
+    return url;
+  };
+
+  const { data, error, isLoading } = useSWR<ContactListResponse>(buildUrl(), {
+    revalidateOnFocus: true,
+    revalidateOnReconnect: true,
+  });
 
   const totalPages = data ? Math.ceil(data.total / pageSize) : 1;
   const startIndex = (currentPage - 1) * pageSize + 1;
   const endIndex = Math.min(currentPage * pageSize, data?.total || 0);
 
-  // Filter contacts based on search query
-  const filteredContacts =
-    data?.contacts?.filter((contact) => {
-      const matchesSearch =
-        searchQuery === "" ||
-        contact.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (contact.firstName &&
-          contact.firstName.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (contact.lastName &&
-          contact.lastName.toLowerCase().includes(searchQuery.toLowerCase()));
-      return matchesSearch;
-    }) || [];
-
   const handleDownloadCSV = async () => {
     try {
       // Fetch all contacts for export
-      const response = await fetch(
-        `/api/audience/v1/contacts/list?limit=10000`
-      );
-      const allData = await response.json() as ContactListResponse;
+      const response = await fetch(`/api/contacts/v1/contacts/list?limit=10000`);
+      const allData = (await response.json()) as ContactListResponse;
 
       if (!allData.contacts || allData.contacts.length === 0) {
         toast.error("No contacts to export");
@@ -77,11 +73,10 @@ export const ContactList = () => {
       }
 
       // Create CSV content
-      const headers = ["Email", "First Name", "Last Name", "Created At"];
+      const headers = ["Email", "Status", "Created At"];
       const csvRows = allData.contacts.map((contact) => [
         contact.email,
-        contact.firstName || "",
-        contact.lastName || "",
+        contact.status,
         new Date(contact.createdAt).toISOString(),
       ]);
 
@@ -116,7 +111,7 @@ export const ContactList = () => {
     );
   }
 
-  if (!isLoading && data?.contacts && data.contacts.length === 0) {
+  if (!isLoading && data?.contacts && data.contacts.length === 0 && !searchQuery && filters.length === 0) {
     return <ContactsEmptyState />;
   }
 
@@ -124,20 +119,23 @@ export const ContactList = () => {
     <div>
       <div className="flex items-center gap-3">
         <div className="flex-1">
-          <Input.Root size="small" className="rounded-xl">
+          <Input.Root size="xsmall">
             <Input.Wrapper>
-              <Input.Icon
-                as={() => <Icon name="search" className="h-4 w-4" />}
-              />
+              <Input.Icon as={Icon} name="search" size="xsmall" />
               <Input.Input
-                type="text"
-                placeholder="Search contacts..."
+                placeholder="Search by email"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setCurrentPage(1);
+                }}
               />
             </Input.Wrapper>
           </Input.Root>
         </div>
+
+        <ContactFilterDropdown value={filters} onChange={setFilters} />
+
         <Button.Root
           variant="neutral"
           mode="stroke"
@@ -152,7 +150,7 @@ export const ContactList = () => {
 
       <div className="mt-4">
         <ContactTable
-          contacts={filteredContacts}
+          contacts={data?.contacts || []}
           isLoading={isLoading}
           loadingRows={4}
         />
@@ -177,7 +175,7 @@ export const ContactList = () => {
             <Button.Root
               variant="neutral"
               mode="stroke"
-              size="xxsmall"
+              size="xsmall"
               onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
               disabled={currentPage === 1 || isLoading}
               className="transition-all duration-200 hover:border-primary-base hover:bg-bg-weak-50/50"
@@ -190,7 +188,7 @@ export const ContactList = () => {
             <Button.Root
               variant="neutral"
               mode="stroke"
-              size="xxsmall"
+              size="xsmall"
               onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
               disabled={currentPage === totalPages || isLoading}
               className="transition-all duration-200 hover:border-primary-base hover:bg-bg-weak-50/50"
@@ -200,8 +198,6 @@ export const ContactList = () => {
           </div>
         </div>
       )}
-
-      <DeleteContactModal contacts={data?.contacts || []} />
     </div>
   );
 };

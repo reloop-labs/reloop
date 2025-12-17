@@ -12,7 +12,7 @@ import { useState, useCallback } from "react";
 const codeExamples = {
     javascript: {
         add: `// Add a new contact
-const response = await fetch('/api/audience/v1/contacts/add', {
+const response = await fetch('/api/contacts/v1/contacts/add', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -28,7 +28,7 @@ const response = await fetch('/api/audience/v1/contacts/add', {
 
 const result = await response.json();`,
         list: `// List all contacts
-const response = await fetch('/api/audience/v1/contacts/list?page=1&limit=10', {
+const response = await fetch('/api/contacts/v1/contacts/list?page=1&limit=10', {
   headers: {
     'Authorization': 'Bearer YOUR_API_KEY'
   }
@@ -36,7 +36,7 @@ const response = await fetch('/api/audience/v1/contacts/list?page=1&limit=10', {
 
 const contacts = await response.json();`,
         delete: `// Delete a contact
-const response = await fetch('/api/audience/v1/contacts/delete', {
+const response = await fetch('/api/contacts/v1/contacts/delete', {
   method: 'DELETE',
   headers: {
     'Content-Type': 'application/json',
@@ -49,7 +49,7 @@ const response = await fetch('/api/audience/v1/contacts/delete', {
 
 const result = await response.json();`,
         update: `// Update a contact
-const response = await fetch('/api/audience/v1/contacts/update', {
+const response = await fetch('/api/contacts/v1/contacts/update', {
   method: 'PATCH',
   headers: {
     'Content-Type': 'application/json',
@@ -68,7 +68,7 @@ const result = await response.json();`,
         add: `# Add a new contact
 import requests
 
-response = requests.post('/api/audience/v1/contacts/add',
+response = requests.post('/api/contacts/v1/contacts/add',
   headers={
     'Content-Type': 'application/json',
     'Authorization': 'Bearer YOUR_API_KEY'
@@ -85,7 +85,7 @@ result = response.json()`,
         list: `# List all contacts
 import requests
 
-response = requests.get('/api/audience/v1/contacts/list?page=1&limit=10',
+response = requests.get('/api/contacts/v1/contacts/list?page=1&limit=10',
   headers={'Authorization': 'Bearer YOUR_API_KEY'}
 )
 
@@ -93,7 +93,7 @@ contacts = response.json()`,
         delete: `# Delete a contact
 import requests
 
-response = requests.delete('/api/audience/v1/contacts/delete',
+response = requests.delete('/api/contacts/v1/contacts/delete',
   headers={
     'Content-Type': 'application/json',
     'Authorization': 'Bearer YOUR_API_KEY'
@@ -105,7 +105,7 @@ result = response.json()`,
         update: `# Update a contact
 import requests
 
-response = requests.patch('/api/audience/v1/contacts/update',
+response = requests.patch('/api/contacts/v1/contacts/update',
   headers={
     'Content-Type': 'application/json',
     'Authorization': 'Bearer YOUR_API_KEY'
@@ -130,7 +130,7 @@ $data = [
 ];
 
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, '/api/audience/v1/contacts/add');
+curl_setopt($ch, CURLOPT_URL, '/api/contacts/v1/contacts/add');
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
@@ -145,7 +145,7 @@ curl_close($ch);
         list: `<?php
 // List all contacts
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, '/api/audience/v1/contacts/list?page=1&limit=10');
+curl_setopt($ch, CURLOPT_URL, '/api/contacts/v1/contacts/list?page=1&limit=10');
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
     'Authorization: Bearer YOUR_API_KEY'
 ]);
@@ -159,7 +159,7 @@ curl_close($ch);
 $data = ['email' => 'john@example.com'];
 
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, '/api/audience/v1/contacts/delete');
+curl_setopt($ch, CURLOPT_URL, '/api/contacts/v1/contacts/delete');
 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
@@ -180,7 +180,7 @@ $data = [
 ];
 
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, '/api/audience/v1/contacts/update');
+curl_setopt($ch, CURLOPT_URL, '/api/contacts/v1/contacts/update');
 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PATCH');
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
@@ -200,25 +200,25 @@ const operations = [
         id: "add",
         label: "Add Contact",
         method: "POST",
-        endpoint: "/api/audience/v1/contacts/add",
+        endpoint: "/api/contacts/v1/contacts/add",
     },
     {
         id: "list",
         label: "List Contacts",
         method: "GET",
-        endpoint: "/api/audience/v1/contacts/list",
+        endpoint: "/api/contacts/v1/contacts/list",
     },
     {
         id: "update",
         label: "Update Contact",
         method: "PATCH",
-        endpoint: "/api/audience/v1/contacts/update",
+        endpoint: "/api/contacts/v1/contacts/update",
     },
     {
         id: "delete",
         label: "Delete Contact",
         method: "DELETE",
-        endpoint: "/api/audience/v1/contacts/delete",
+        endpoint: "/api/contacts/v1/contacts/delete",
     },
 ];
 

@@ -65,13 +65,13 @@ const TopicDetailPage = () => {
     data: topicData,
     error: topicError,
     isLoading: topicLoading,
-  } = useSWR<Topic>(`/api/audience/v1/topics/${topicId}`, {
+  } = useSWR<Topic>(`/api/contacts/v1/topics/${topicId}`, {
     revalidateOnFocus: true,
     revalidateOnReconnect: true,
   });
 
   const { data: subscriptionData, isLoading: subscriptionLoading } = useSWR<SubscriptionListResponse>(
-    `/api/audience/v1/subscriptions/list?topicId=${topicId}&limit=100`,
+    `/api/contacts/v1/subscriptions/list?topicId=${topicId}&limit=100`,
     {
       revalidateOnFocus: true,
       revalidateOnReconnect: true,
@@ -80,7 +80,7 @@ const TopicDetailPage = () => {
 
   const handleUnsubscribe = async (contactId: string) => {
     try {
-      await fetch("/api/audience/v1/subscriptions/unsubscribe", {
+      await fetch("/api/contacts/v1/subscriptions/unsubscribe", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -88,7 +88,7 @@ const TopicDetailPage = () => {
         },
         body: JSON.stringify({ contactId, topicId }),
       });
-      await mutate(`/api/audience/v1/subscriptions/list?topicId=${topicId}&limit=100`);
+      await mutate(`/api/contacts/v1/subscriptions/list?topicId=${topicId}&limit=100`);
     } catch (error) {
       console.error("Failed to unsubscribe contact:", error);
     }

@@ -54,7 +54,7 @@ export const AddContact = ({
     try {
       changeStatus("loading");
       await axios.post(
-        "/api/audience/v1/contacts/add-to-topic",
+        "/api/contacts/v1/contacts/add-to-topic",
         {
           email,
           firstName: firstName || undefined,
@@ -63,7 +63,7 @@ export const AddContact = ({
         },
         { withCredentials: true },
       );
-      await mutate(`/api/audience/v1/subscriptions/list?topicId=${topicId}&limit=100`);
+      await mutate(`/api/contacts/v1/subscriptions/list?topicId=${topicId}&limit=100`);
       reset();
       onOpenChange(false);
     } catch (error) {

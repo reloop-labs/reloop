@@ -1,5 +1,4 @@
 import { createId } from "@paralleldrive/cuid2";
-import { relations } from "drizzle-orm";
 import {
   index,
   pgTable,
@@ -23,8 +22,7 @@ export const contact = pgTable(
       .$defaultFn(() => createContactId())
       .primaryKey(),
     email: varchar("email", { length: 255 }).notNull(),
-    firstName: varchar("first_name", { length: 255 }),
-    lastName: varchar("last_name", { length: 255 }),
+    status: varchar("status", { length: 20 }).notNull().default("Subscribed"),
     organizationId: text("organization_id")
       .notNull()
       .references(() => organization.id, { onDelete: "cascade" }),
@@ -39,6 +37,7 @@ export const contact = pgTable(
     index("contact_idx_email").on(table.email),
     index("contact_idx_organization_id").on(table.organizationId),
     index("contact_idx_org_email").on(table.organizationId, table.email),
+    index("contact_idx_status").on(table.status),
   ],
 );
 

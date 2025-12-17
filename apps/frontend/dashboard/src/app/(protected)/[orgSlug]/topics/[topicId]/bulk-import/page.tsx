@@ -48,7 +48,7 @@ const BulkImportPage = () => {
   const [validationErrors, setValidationErrors] = useState<Array<{ email: string; error: string }>>([]);
 
   const { data: topicData, error: topicError, isLoading: topicLoading } = useSWR<Topic>(
-    `/api/audience/v1/topics/${topicId}`,
+    `/api/contacts/v1/topics/${topicId}`,
     { revalidateOnFocus: true, revalidateOnReconnect: true },
   );
 
@@ -147,7 +147,7 @@ const BulkImportPage = () => {
 
       // Step 1: Bulk import contacts
       const contactsResponse = await axios.post(
-        "/api/audience/v1/contacts/bulk-import",
+        "/api/contacts/v1/contacts/bulk-import",
         { contacts: csvData },
         { withCredentials: true },
       );
@@ -156,7 +156,7 @@ const BulkImportPage = () => {
       // Step 2: Get all contact IDs and bulk add to topic
       // For simplicity, we'll use the backend to handle this
       const subscribeResponse = await axios.post(
-        "/api/audience/v1/subscriptions/bulk-add",
+        "/api/contacts/v1/subscriptions/bulk-add",
         {
           topicId,
           contactIds: [], // Backend needs to resolve emails to IDs
@@ -170,7 +170,7 @@ const BulkImportPage = () => {
       });
 
       if (contactsResult.created > 0) {
-        await mutate(`/api/audience/v1/subscriptions/list?topicId=${topicId}&limit=100`);
+        await mutate(`/api/contacts/v1/subscriptions/list?topicId=${topicId}&limit=100`);
         toast.success(`Successfully imported ${contactsResult.created} contacts`);
       }
     } catch (error) {
