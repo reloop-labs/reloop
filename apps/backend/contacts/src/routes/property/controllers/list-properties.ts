@@ -24,35 +24,36 @@ export async function listProperties(
 
     // Build where conditions
     const whereConditions: Array<SQL<unknown>> = [
-      eq(schema.property.organizationId, organizationId),
-      isNull(schema.property.deletedAt),
+      eq(schema.contactProperty.organizationId, organizationId),
+      isNull(schema.contactProperty.deletedAt),
     ];
 
     // Filter by type
     if (query.type) {
-      whereConditions.push(eq(schema.property.type, query.type));
+      whereConditions.push(eq(schema.contactProperty.propertyType, query.type));
     }
 
     // Search by name
     if (query.search) {
-      whereConditions.push(ilike(schema.property.name, `%${query.search}%`));
+      whereConditions.push(ilike(schema.contactProperty.propertyName, `%${query.search}%`));
     }
 
     // Get total count
     const totalResult = await db
       .select({ count: count() })
-      .from(schema.property)
+      .from(schema.contactProperty)
       .where(and(...whereConditions));
 
     const total = totalResult[0]?.count || 0;
 
     // Get properties
-    const properties = await db.query.property.findMany({
-      where: and(...whereConditions),
-      orderBy: desc(schema.property.createdAt),
-      limit,
-      offset,
-    });
+    const properties = await db
+      .select()
+      .from(schema.contactProperty)
+      .where(and(...whereConditions))
+      .orderBy(desc(schema.contactProperty.createdAt))
+      .limit(limit)
+      .offset(offset);
 
     const formattedProperties = properties.map(formatPropertyResponse);
 

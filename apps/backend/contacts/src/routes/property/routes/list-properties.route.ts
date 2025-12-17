@@ -1,14 +1,17 @@
+import { authMiddleware } from "@be/contacts/middleware/auth";
 import { PropertyModel } from "@be/contacts/model/property.model";
 import { listPropertiesHandler } from "@be/contacts/routes/property/controllers/list-properties";
+import type { User } from "@reloop/auth/server";
 import { Elysia } from "elysia";
 
-export const listPropertiesRoute = new Elysia().get(
+export const listPropertiesRoute = new Elysia().use(authMiddleware).get(
   "/list",
-  async ({ query, store }) => {
-    const organizationId = (store as { organizationId: string }).organizationId;
-    return listPropertiesHandler(organizationId, query);
+  async ({ query, user }: { query: PropertyModel.PropertyQuery; user: User }) => {
+    const { activeOrganizationId } = user;
+    return listPropertiesHandler(activeOrganizationId as string, query);
   },
   {
+    auth: true,
     query: PropertyModel.propertyQuery,
     response: {
       200: PropertyModel.propertyListResponse,

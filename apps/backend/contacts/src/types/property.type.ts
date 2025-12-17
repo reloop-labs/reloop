@@ -14,13 +14,14 @@ export namespace PropertyTypes {
   export type Unauthorized = typeof PropertyModel.unauthorized.static;
   export type ValidationError = typeof PropertyModel.validationError.static;
 
-  // Internal Data Types
+  // Internal Data Types (matches contactProperty schema)
   export interface PropertyData {
     id: string;
-    name: string;
-    type: string;
-    fallbackValue: string | null;
+    propertyName: string;
+    propertyType: "string" | "number";
+    defaultValue: string | null;
     organizationId: string;
+    userId: string;
     createdAt: Date;
     updatedAt: Date;
     deletedAt: Date | null;

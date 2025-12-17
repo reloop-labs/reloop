@@ -8,7 +8,7 @@ export const createPropertyRoute = new Elysia().use(authMiddleware).post(
   "/create",
   async ({ body, user }: { body: PropertyModel.CreatePropertyBody; user: User }) => {
     const { activeOrganizationId } = user;
-    return createPropertyHandler(activeOrganizationId as string, body);
+    return createPropertyHandler(activeOrganizationId as string, user.id, body);
   },
   {
     auth: true,

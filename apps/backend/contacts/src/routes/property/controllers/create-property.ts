@@ -8,6 +8,7 @@ import { status } from "elysia";
 
 export async function createProperty(
   organizationId: string,
+  userId: string,
   body: PropertyTypes.CreatePropertyRequest,
 ): Promise<PropertyTypes.PropertyResponse> {
   logger.info(
@@ -23,12 +24,12 @@ export async function createProperty(
     // Check if property with same name already exists in this organization
     const existingProperty = await db
       .select()
-      .from(schema.property)
+      .from(schema.contactProperty)
       .where(
         and(
-          eq(schema.property.name, body.name),
-          eq(schema.property.organizationId, organizationId),
-          isNull(schema.property.deletedAt),
+          eq(schema.contactProperty.propertyName, body.name),
+          eq(schema.contactProperty.organizationId, organizationId),
+          isNull(schema.contactProperty.deletedAt),
         ),
       )
       .limit(1);
@@ -42,12 +43,13 @@ export async function createProperty(
     }
 
     const [newProperty] = await db
-      .insert(schema.property)
+      .insert(schema.contactProperty)
       .values({
-        name: body.name,
-        type: body.type,
-        fallbackValue: body.fallbackValue || null,
+        propertyName: body.name,
+        propertyType: body.type,
+        defaultValue: body.fallbackValue || null,
         organizationId,
+        userId,
         createdAt: new Date(),
         updatedAt: new Date(),
       })
@@ -85,7 +87,8 @@ export async function createProperty(
 
 export async function createPropertyHandler(
   organizationId: string,
+  userId: string,
   body: PropertyTypes.CreatePropertyRequest,
 ): Promise<PropertyTypes.PropertyResponse> {
-  return createProperty(organizationId, body);
+  return createProperty(organizationId, userId, body);
 }

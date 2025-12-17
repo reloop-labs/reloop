@@ -21,12 +21,12 @@ export async function deleteProperty(
     // Check if property exists
     const existingProperty = await db
       .select()
-      .from(schema.property)
+      .from(schema.contactProperty)
       .where(
         and(
-          eq(schema.property.id, propertyId),
-          eq(schema.property.organizationId, organizationId),
-          isNull(schema.property.deletedAt),
+          eq(schema.contactProperty.id, propertyId),
+          eq(schema.contactProperty.organizationId, organizationId),
+          isNull(schema.contactProperty.deletedAt),
         ),
       )
       .limit(1);
@@ -41,12 +41,12 @@ export async function deleteProperty(
 
     // Soft delete
     await db
-      .update(schema.property)
+      .update(schema.contactProperty)
       .set({
         deletedAt: new Date(),
         updatedAt: new Date(),
       })
-      .where(eq(schema.property.id, propertyId));
+      .where(eq(schema.contactProperty.id, propertyId));
 
     logger.info(
       { propertyId },

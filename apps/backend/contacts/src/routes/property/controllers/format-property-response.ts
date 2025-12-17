@@ -5,9 +5,9 @@ export function formatPropertyResponse(
 ): PropertyTypes.PropertyResponse {
   return {
     id: property.id,
-    name: property.name,
-    type: property.type,
-    fallbackValue: property.fallbackValue,
+    name: property.propertyName,
+    type: property.propertyType,
+    fallbackValue: property.defaultValue,
     organizationId: property.organizationId,
     createdAt: property.createdAt,
     updatedAt: property.updatedAt,

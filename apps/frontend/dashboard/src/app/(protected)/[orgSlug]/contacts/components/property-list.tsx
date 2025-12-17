@@ -28,7 +28,11 @@ interface PropertyListResponse {
   limit: number;
 }
 
-export const PropertyList = () => {
+interface PropertyListProps {
+  onAddProperty?: () => void;
+}
+
+export const PropertyList = ({ onAddProperty }: PropertyListProps) => {
   const [currentPage, setCurrentPage] = useQueryState("propertyPage", {
     defaultValue: 1,
     parse: Number,
@@ -71,7 +75,7 @@ export const PropertyList = () => {
   };
 
   if (!isLoading && data?.properties.length === 0 && !search && !typeFilter) {
-    return <PropertiesEmptyState />;
+    return <PropertiesEmptyState onAddProperty={onAddProperty} />;
   }
 
   return (
