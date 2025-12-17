@@ -57,6 +57,21 @@ export const AddContactModal = ({ open, onOpenChange }: AddContactModalProps) =>
 
   // Handle input keydown
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    // Command/Ctrl + Enter to submit
+    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault();
+      // Add any remaining input as chip first
+      if (emailInput.trim()) {
+        addEmailChip(emailInput);
+      }
+      // Submit form if there are valid emails
+      const form = e.currentTarget.closest('form');
+      if (form && validEmailCount > 0) {
+        form.requestSubmit();
+      }
+      return;
+    }
+
     if (e.key === "Enter" || e.key === "," || e.key === " ") {
       e.preventDefault();
       addEmailChip(emailInput);
@@ -161,8 +176,8 @@ export const AddContactModal = ({ open, onOpenChange }: AddContactModalProps) =>
                     <span
                       key={chip.id}
                       className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md border text-paragraph-xs ${chip.isValid
-                          ? "border-stroke-soft-200 bg-bg-weak-50 text-text-strong-950"
-                          : "border-error-base bg-red-alpha-10 text-red-600"
+                        ? "border-stroke-soft-200 bg-bg-weak-50 text-text-strong-950"
+                        : "border-error-base bg-red-alpha-10 text-red-600"
                         }`}
                     >
                       <Icon name="mail-single" className="w-3 h-3 text-text-sub-600" />
@@ -220,7 +235,10 @@ export const AddContactModal = ({ open, onOpenChange }: AddContactModalProps) =>
                 ) : (
                   <>
                     Add {validEmailCount > 0 ? validEmailCount : ""} Contact{validEmailCount !== 1 ? "s" : ""}
-                    <Icon name="enter" className="w-4 h-4 border rounded-sm p-px border-stroke-soft-100/20" />
+                    <span className="inline-flex items-center gap-0.5">
+                      <Icon name="command" className="w-4 h-4 border rounded-sm p-px border-stroke-soft-100/20" />
+                      <Icon name="enter" className="w-4 h-4 border rounded-sm p-px border-stroke-soft-100/20" />
+                    </span>
                   </>
                 )}
               </Button.Root>

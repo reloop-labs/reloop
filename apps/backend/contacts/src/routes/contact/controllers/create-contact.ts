@@ -8,6 +8,7 @@ import { status } from "elysia";
 
 export async function createContact(
 	organizationId: string,
+	userId: string,
 	body: ContactTypes.CreateContactRequest,
 ): Promise<ContactTypes.ContactResponse> {
 	logger.info(
@@ -44,8 +45,9 @@ export async function createContact(
 			.insert(schema.contact)
 			.values({
 				email: body.email,
-				status: "Subscribed",
+				status: "subscribed",
 				organizationId,
+				userId,
 				createdAt: new Date(),
 				updatedAt: new Date(),
 			})
@@ -84,6 +86,7 @@ export async function createContact(
 // Handler for creating multiple contacts at once
 export async function createContacts(
 	organizationId: string,
+	userId: string,
 	emails: string[],
 ): Promise<{ contacts: ContactTypes.ContactResponse[]; skipped: string[] }> {
 	logger.info(
@@ -99,7 +102,7 @@ export async function createContacts(
 
 	for (const email of emails) {
 		try {
-			const contact = await createContact(organizationId, { email });
+			const contact = await createContact(organizationId, userId, { email });
 			createdContacts.push(contact);
 		} catch (error) {
 			// If contact already exists, skip it
@@ -121,7 +124,8 @@ export async function createContacts(
 
 export async function createContactHandler(
 	organizationId: string,
+	userId: string,
 	body: ContactTypes.CreateContactRequest,
 ): Promise<ContactTypes.ContactResponse> {
-	return createContact(organizationId, body);
+	return createContact(organizationId, userId, body);
 }
