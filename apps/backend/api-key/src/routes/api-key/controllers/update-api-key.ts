@@ -29,6 +29,9 @@ export async function updateApiKey(
 				eq(schema.apikey.organizationId, organizationId),
 				eq(schema.apikey.userId, userId),
 			),
+			with: {
+				user: true,
+			},
 		});
 
 		if (!existing) {
@@ -92,7 +95,15 @@ export async function updateApiKey(
 		}
 
 		logger.info({ apiKeyId }, "API key updated successfully");
-		return formatApiKeyResponse(updated[0]);
+		return formatApiKeyResponse({
+			...updated[0],
+			createdBy: {
+				id: existing.user.id,
+				name: existing.user.name,
+				image: existing.user.image,
+				email: existing.user.email,
+			},
+		});
 	} catch (error) {
 		logger.error(
 			{

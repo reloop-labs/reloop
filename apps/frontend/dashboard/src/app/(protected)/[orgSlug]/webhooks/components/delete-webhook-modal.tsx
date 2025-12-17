@@ -124,7 +124,7 @@ export const DeleteWebhookModal = ({ webhooks }: DeleteWebhookModalProps) => {
 								</span>{" "}
 								to confirm.
 							</p>
-							<Input.Root>
+							<Input.Root size="small">
 								<Input.Wrapper size="xsmall">
 									<Input.Input
 										type="text"

@@ -288,7 +288,7 @@ export const GenerateApiKeyStep = () => {
 					<div className="flex flex-col gap-1">
 						<Label.Root htmlFor="api-key">Your API Key</Label.Root>
 						<div className="group relative">
-							<Input.Root>
+							<Input.Root size="small">
 								<Input.Wrapper>
 									<Input.Input
 										id="api-key"

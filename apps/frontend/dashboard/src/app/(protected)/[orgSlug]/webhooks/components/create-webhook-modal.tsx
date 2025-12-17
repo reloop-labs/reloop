@@ -153,7 +153,7 @@ export const CreateWebhookModal = ({
 									Endpoint URL
 									<Label.Asterisk />
 								</Label.Root>
-								<Input.Root className="mt-1">
+								<Input.Root className="mt-1" size="small">
 									<Input.Wrapper>
 										<Input.Input
 											className="px-2"

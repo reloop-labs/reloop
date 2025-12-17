@@ -94,7 +94,7 @@ const ContactPage = () => {
 							{/* Full Name */}
 							<div className="flex flex-col gap-2">
 								<Label.Root htmlFor="full-name">Full name</Label.Root>
-								<Input.Root>
+								<Input.Root size="small">
 									<Input.Wrapper>
 										<Input.Input
 											id="full-name"

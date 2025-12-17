@@ -95,7 +95,7 @@ export const InviteMember = ({ onClose }: { onClose: () => void }) => {
 						{fields.map((field, index) => (
 							<div key={field.id} className="flex gap-2">
 								<div className="flex-1">
-									<Input.Root>
+									<Input.Root size='small'>
 										<Input.Wrapper>
 											<Input.Input
 												placeholder="colleague@company.com"

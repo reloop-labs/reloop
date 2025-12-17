@@ -112,7 +112,7 @@ export const EditApiKeyModal = ({
                   Name
                   <Label.Asterisk />
                 </Label.Root>
-                <Input.Root>
+                <Input.Root size="small">
                   <Input.Wrapper>
                     <Input.Input
                       className="px-2"

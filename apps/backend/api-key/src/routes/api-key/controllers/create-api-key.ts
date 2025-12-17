@@ -7,14 +7,12 @@ import {
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
+import { eq } from "drizzle-orm";
 import { status } from "elysia";
 
 const API_KEY_PREFIX = "rl";
 const API_KEY_LENGTH = 64;
 
-console.log("schema.apikey:", schema.apikey);
-console.log("schema keys:", Object.keys(schema));
-console.log("schema.apikey keys:", Object.keys(schema.apikey));
 function generateApiKey(): string {
 	const randomPart = randomBytes(API_KEY_LENGTH).toString("base64url");
 	return `${API_KEY_PREFIX}_${randomPart}`;
@@ -94,9 +92,28 @@ export async function createApiKey(
 			logger.error({ organizationId, userId }, "Failed to create API key");
 			throw status(500, { message: "Failed to create API key" });
 		}
+
+		// Fetch the user info to include in the response
+		const user = await db.query.user.findFirst({
+			where: eq(schema.user.id, userId),
+		});
+
+		if (!user) {
+			logger.error({ organizationId, userId }, "User not found for API key creation");
+			throw status(500, { message: "User not found" });
+		}
+
 		logger.info("newApiKey", newApiKey);
 
-		return formatApiKeyWithKeyResponse(newApiKey[0], fullKey);
+		return formatApiKeyWithKeyResponse({
+			...newApiKey[0],
+			createdBy: {
+				id: user.id,
+				name: user.name,
+				image: user.image,
+				email: user.email,
+			},
+		}, fullKey);
 	} catch (error) {
 		logger.error(
 			{

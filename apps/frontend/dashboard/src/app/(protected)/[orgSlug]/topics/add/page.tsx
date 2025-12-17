@@ -120,6 +120,7 @@ const AddTopicPage = () => {
               <Input.Root
                 hasError={!!formState?.errors?.name?.message}
                 className="w-full"
+                size="small"
               >
                 <Input.Wrapper>
                   <Input.Input

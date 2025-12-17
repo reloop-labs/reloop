@@ -29,6 +29,9 @@ export async function validateApiKey(
 				eq(schema.apikey.key, hashedKey),
 				eq(schema.apikey.enabled, true),
 			),
+			with: {
+				user: true,
+			},
 		});
 
 		if (!result) {
@@ -57,7 +60,15 @@ export async function validateApiKey(
 			.where(eq(schema.apikey.id, result.id));
 
 		logger.info({ id: result.id }, "API key validated successfully");
-		return result;
+		return {
+			...result,
+			createdBy: {
+				id: result.user.id,
+				name: result.user.name,
+				image: result.user.image,
+				email: result.user.email,
+			},
+		};
 	} catch (error) {
 		logger.error(
 			{

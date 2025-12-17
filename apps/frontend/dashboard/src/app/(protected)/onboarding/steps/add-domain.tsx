@@ -43,7 +43,7 @@ export const AddDomainStep = () => {
 			<div className="flex flex-col gap-1">
 				<Label.Root htmlFor="domain-name">Domain Name</Label.Root>
 				<div className="flex gap-3">
-					<Input.Root className="flex-1">
+					<Input.Root className="flex-1" size="small">
 						<Input.Wrapper>
 							<Input.Icon>
 								<Globe size={18} />

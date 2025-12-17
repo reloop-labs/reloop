@@ -100,7 +100,7 @@ export const CreateOrganizationModal = () => {
 										Name
 										<Label.Asterisk />
 									</Label.Root>
-									<Input.Root className="w-full">
+									<Input.Root className="w-full" size="small">
 										<Input.Wrapper className="w-full">
 											<Input.Input
 												type="text"
