@@ -3,7 +3,7 @@ import type { PropertyTypes } from "@be/contacts/types/property.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { status } from "elysia";
 
 export async function createProperty(
@@ -29,7 +29,6 @@ export async function createProperty(
         and(
           eq(schema.contactProperty.propertyName, body.name),
           eq(schema.contactProperty.organizationId, organizationId),
-          isNull(schema.contactProperty.deletedAt),
         ),
       )
       .limit(1);

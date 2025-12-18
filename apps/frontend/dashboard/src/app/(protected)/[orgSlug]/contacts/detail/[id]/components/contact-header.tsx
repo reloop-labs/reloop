@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { useSWRConfig } from "swr";
 import { useRouter } from "next/navigation";
 import { EditContactModal } from "../../../components/edit-contact-modal";
+import { DeleteContactModal } from "../../../components/delete-contact-modal";
 
 interface ContactData {
   id: string;
@@ -98,6 +99,7 @@ export const ContactHeader = ({
   const [copied, setCopied] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
   const buttonRefs = useRef<HTMLButtonElement[]>([]);
 
@@ -124,7 +126,7 @@ export const ContactHeader = ({
 
     try {
       setIsDeleting(true);
-      const response = await fetch(`/api/contacts/v1/contacts/${contact.id}`, {
+      const response = await fetch(`/api/contacts/v1/contacts/delete/${contact.id}`, {
         method: "DELETE",
       });
 
@@ -147,11 +149,19 @@ export const ContactHeader = ({
     }
   };
 
+  const handleDeleteSuccess = () => {
+    toast.success("Contact deleted");
+    // Navigate back to contacts list
+    if (activeOrganization?.slug) {
+      router.push(`/${activeOrganization.slug}/contacts`);
+    }
+  };
+
   const handleMenuItemClick = (itemId: string) => {
     if (itemId === "edit") {
       setIsEditModalOpen(true);
     } else if (itemId === "delete") {
-      handleDelete();
+      setIsDeleteModalOpen(true);
     }
   };
 
@@ -387,6 +397,16 @@ export const ContactHeader = ({
           open={isEditModalOpen}
           onOpenChange={setIsEditModalOpen}
           contact={contact}
+        />
+      )}
+
+      {/* Delete Contact Modal */}
+      {contact && (
+        <DeleteContactModal
+          open={isDeleteModalOpen}
+          onOpenChange={setIsDeleteModalOpen}
+          contact={contact}
+          onDeleteSuccess={handleDeleteSuccess}
         />
       )}
     </>

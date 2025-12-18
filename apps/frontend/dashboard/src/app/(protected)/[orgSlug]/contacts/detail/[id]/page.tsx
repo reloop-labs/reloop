@@ -64,11 +64,13 @@ const ContactDetailPage = () => {
     }
   }
 
-  // Build property values with names
-  const propertyValuesWithNames = propertiesData?.propertyValues?.map((pv) => ({
-    ...pv,
-    name: propertyNameMap.get(pv.propertyId) || "Unknown",
-  })) || [];
+  // Build property values with names (only for properties that still exist)
+  const propertyValuesWithNames = propertiesData?.propertyValues
+    ?.filter((pv) => propertyNameMap.has(pv.propertyId)) // Only include values for existing properties
+    .map((pv) => ({
+      ...pv,
+      name: propertyNameMap.get(pv.propertyId) || "",
+    })) || [];
 
   const isLoading = contactLoading || propertiesLoading;
 

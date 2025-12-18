@@ -43,8 +43,8 @@ export const ContactList = ({ onAddContact }: ContactListProps) => {
   // Convert filters array to status filter string for API
   const statusFilter = useMemo(() => {
     if (filters.length === 0 || filters.length === 2) return "";
-    if (filters.includes("subscribed")) return "Subscribed";
-    if (filters.includes("unsubscribed")) return "Unsubscribed";
+    if (filters.includes("subscribed")) return "subscribed";
+    if (filters.includes("unsubscribed")) return "unsubscribed";
     return "";
   }, [filters]);
 

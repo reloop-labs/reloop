@@ -70,6 +70,10 @@ export const EditContactModal = ({ open, onOpenChange, contact }: EditContactMod
 
   const properties = propertiesData?.properties || [];
 
+  // Check if reserved properties exist
+  const hasFirstName = properties.some((p) => p.name === "firstName");
+  const hasLastName = properties.some((p) => p.name === "lastName");
+
   // Filter out reserved properties from the custom list
   const customProperties = properties.filter(
     (p) => !RESERVED_PROPERTIES.includes(p.name)
@@ -266,43 +270,47 @@ export const EditContactModal = ({ open, onOpenChange, contact }: EditContactMod
                 />
               </div>
 
-              {/* First Name - Always shown */}
-              <div className="flex flex-col gap-1 pt-4 border-t border-stroke-soft-100">
-                <Label.Root htmlFor="firstName">
-                  First name
-                </Label.Root>
-                <Input.Root size="small">
-                  <Input.Wrapper>
-                    <Input.Input
-                      id="firstName"
-                      type="text"
-                      value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
-                      disabled={isSaving}
-                      placeholder="Your contact name"
-                    />
-                  </Input.Wrapper>
-                </Input.Root>
-              </div>
+              {/* First Name - Only shown if property exists */}
+              {hasFirstName && (
+                <div className="flex flex-col gap-1 pt-4 border-t border-stroke-soft-100">
+                  <Label.Root htmlFor="firstName">
+                    First name
+                  </Label.Root>
+                  <Input.Root size="small">
+                    <Input.Wrapper>
+                      <Input.Input
+                        id="firstName"
+                        type="text"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        disabled={isSaving}
+                        placeholder="Your contact name"
+                      />
+                    </Input.Wrapper>
+                  </Input.Root>
+                </div>
+              )}
 
-              {/* Last Name - Always shown */}
-              <div className="flex flex-col gap-1">
-                <Label.Root htmlFor="lastName">
-                  Last name
-                </Label.Root>
-                <Input.Root size="small">
-                  <Input.Wrapper>
-                    <Input.Input
-                      id="lastName"
-                      type="text"
-                      value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
-                      disabled={isSaving}
-                      placeholder="Your contact last name"
-                    />
-                  </Input.Wrapper>
-                </Input.Root>
-              </div>
+              {/* Last Name - Only shown if property exists */}
+              {hasLastName && (
+                <div className="flex flex-col gap-1">
+                  <Label.Root htmlFor="lastName">
+                    Last name
+                  </Label.Root>
+                  <Input.Root size="small">
+                    <Input.Wrapper>
+                      <Input.Input
+                        id="lastName"
+                        type="text"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        disabled={isSaving}
+                        placeholder="Your contact last name"
+                      />
+                    </Input.Wrapper>
+                  </Input.Root>
+                </div>
+              )}
 
               {/* Custom Properties */}
               {customProperties.length > 0 && (
@@ -317,7 +325,7 @@ export const EditContactModal = ({ open, onOpenChange, contact }: EditContactMod
                           <Input.Input
                             id={`prop-${property.id}`}
                             type={property.type === "number" ? "number" : "text"}
-                            value={propertyValues[property.id] || ""}
+                            value={propertyValues[property.id]}
                             onChange={(e) => handlePropertyChange(property.id, e.target.value)}
                             disabled={isSaving}
                             placeholder={property.fallbackValue || `Enter ${property.name}`}

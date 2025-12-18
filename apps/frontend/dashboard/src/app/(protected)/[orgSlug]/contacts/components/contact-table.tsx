@@ -91,6 +91,7 @@ export const ContactTable = ({
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [deletingContact, setDeletingContact] = useState<Contact | null>(null);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 
     const handleRowClick = (contact: Contact) => {
         if (activeOrganization?.slug) {
@@ -167,58 +168,63 @@ export const ContactTable = ({
 
                     {/* Rows */}
                     <div className="divide-y divide-stroke-soft-100">
-                        {contacts.map((contact, index) => (
-                            <div
-                                key={contact.id}
-                                onClick={() => handleRowClick(contact)}
-                                className={cn(
-                                    "group/row grid grid-cols-[1fr_180px_100px_80px] items-center py-2 px-4 transition-colors cursor-pointer",
-                                    "hover:bg-bg-weak-50/50"
-                                )}
-                            >
-                                {/* Email Column */}
-                                <motion.div
-                                    {...getAnimationProps(index + 1, 0)}
-                                    className="flex items-center gap-3"
+                        {contacts.map((contact, index) => {
+                            const isRowActive = activeDropdownId === contact.id;
+                            return (
+                                <div
+                                    key={contact.id}
+                                    onClick={() => handleRowClick(contact)}
+                                    className={cn(
+                                        "group/row grid grid-cols-[1fr_180px_100px_80px] items-center py-2 px-4 transition-colors cursor-pointer",
+                                        "hover:bg-bg-weak-50/50",
+                                        isRowActive && "bg-bg-weak-50/50"
+                                    )}
                                 >
-                                    <Icon name="user" className="h-4 w-4 text-text-sub-600 flex-shrink-0" />
-                                    <span className="truncate font-medium text-label-sm text-text-strong-950">
-                                        {contact.email}
-                                    </span>
-                                </motion.div>
+                                    {/* Email Column */}
+                                    <motion.div
+                                        {...getAnimationProps(index + 1, 0)}
+                                        className="flex items-center gap-3"
+                                    >
+                                        <Icon name="user" className="h-4 w-4 text-text-sub-600 flex-shrink-0" />
+                                        <span className="truncate font-medium text-label-sm text-text-strong-950">
+                                            {contact.email}
+                                        </span>
+                                    </motion.div>
 
-                                {/* Status Column */}
-                                <motion.div {...getAnimationProps(index + 1, 1)} className="flex items-center">
-                                    <span className={cn(
-                                        "inline-flex rounded-md px-[6px] py-0.5 text-[10px] font-medium border-[1px]",
-                                        getStatusBadgeStyles(contact.status)
-                                    )}>
-                                        {formatStatusLabel(contact.status)}
-                                    </span>
-                                </motion.div>
+                                    {/* Status Column */}
+                                    <motion.div {...getAnimationProps(index + 1, 1)} className="flex items-center">
+                                        <span className={cn(
+                                            "inline-flex rounded-md px-[6px] py-0.5 text-[10px] font-medium border-[1px]",
+                                            getStatusBadgeStyles(contact.status)
+                                        )}>
+                                            {formatStatusLabel(contact.status)}
+                                        </span>
+                                    </motion.div>
 
-                                {/* Created At Column */}
-                                <motion.div {...getAnimationProps(index + 1, 2)} className="flex items-center">
-                                    <span className="text-label-sm text-text-strong-950 whitespace-nowrap">
-                                        {formatRelativeTime(contact.createdAt)}
-                                    </span>
-                                </motion.div>
+                                    {/* Created At Column */}
+                                    <motion.div {...getAnimationProps(index + 1, 2)} className="flex items-center">
+                                        <span className="text-label-sm text-text-strong-950 whitespace-nowrap">
+                                            {formatRelativeTime(contact.createdAt)}
+                                        </span>
+                                    </motion.div>
 
-                                {/* Actions Column */}
-                                <motion.div
-                                    {...getAnimationProps(index + 1, 3)}
-                                    className="flex items-center justify-end"
-                                    onClick={(e) => e.stopPropagation()}
-                                >
-                                    <ContactDropdown
-                                        contact={contact}
-                                        onEdit={handleEdit}
-                                        onDelete={handleDelete}
-                                        isDeleting={false}
-                                    />
-                                </motion.div>
-                            </div>
-                        ))}
+                                    {/* Actions Column */}
+                                    <motion.div
+                                        {...getAnimationProps(index + 1, 3)}
+                                        className="flex items-center justify-end"
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
+                                        <ContactDropdown
+                                            contact={contact}
+                                            onEdit={handleEdit}
+                                            onDelete={handleDelete}
+                                            isDeleting={false}
+                                            onOpenChange={(open) => setActiveDropdownId(open ? contact.id : null)}
+                                        />
+                                    </motion.div>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
             </AnimatePresence>

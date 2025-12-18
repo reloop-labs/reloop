@@ -2,7 +2,7 @@ import type { PropertyTypes } from "@be/contacts/types/property.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { status } from "elysia";
 
 export async function deleteProperty(
@@ -26,7 +26,6 @@ export async function deleteProperty(
         and(
           eq(schema.contactProperty.id, propertyId),
           eq(schema.contactProperty.organizationId, organizationId),
-          isNull(schema.contactProperty.deletedAt),
         ),
       )
       .limit(1);
@@ -39,13 +38,9 @@ export async function deleteProperty(
       throw status(404, { message: "Property not found" });
     }
 
-    // Soft delete
+    // Hard delete - actually remove the record
     await db
-      .update(schema.contactProperty)
-      .set({
-        deletedAt: new Date(),
-        updatedAt: new Date(),
-      })
+      .delete(schema.contactProperty)
       .where(eq(schema.contactProperty.id, propertyId));
 
     logger.info(
