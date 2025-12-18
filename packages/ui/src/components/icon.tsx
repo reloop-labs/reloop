@@ -1058,6 +1058,32 @@ export const IconsSprite = () => (
 					strokeLinejoin="round"
 				/>
 			</symbol>
+			<symbol viewBox="0 0 24 24" fill="none" id="align-top-2">
+				<svg
+					width={24}
+					height={24}
+					viewBox="0 0 24 24"
+					fill="none"
+					xmlns="http://www.w3.org/2000/svg"
+				>
+					<rect
+						opacity="0.12"
+						x={7}
+						y={6}
+						width={10}
+						height={16}
+						rx={3}
+						fill="currentColor"
+					/>
+					<path
+						d="M3 2H21M11.8 22H12.2C13.8802 22 14.7202 22 15.362 21.673C15.9265 21.3854 16.3854 20.9265 16.673 20.362C17 19.7202 17 18.8802 17 17.2V10.8C17 9.11984 17 8.27976 16.673 7.63803C16.3854 7.07354 15.9265 6.6146 15.362 6.32698C14.7202 6 13.8802 6 12.2 6H11.8C10.1198 6 9.27976 6 8.63803 6.32698C8.07354 6.6146 7.6146 7.07354 7.32698 7.63803C7 8.27976 7 9.11984 7 10.8V17.2C7 18.8802 7 19.7202 7.32698 20.362C7.6146 20.9265 8.07354 21.3854 8.63803 21.673C9.27976 22 10.1198 22 11.8 22Z"
+						stroke="currentColor"
+						strokeWidth="1.5"
+						strokeLinecap="round"
+						strokeLinejoin="round"
+					/>
+				</svg>
+			</symbol>
 
 			<symbol id="layout" fill="none" viewBox="0 0 24 24">
 				<path
