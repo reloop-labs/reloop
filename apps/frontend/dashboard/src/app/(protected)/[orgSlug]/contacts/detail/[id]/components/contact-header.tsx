@@ -304,7 +304,36 @@ export const ContactHeader = ({
         </div>
 
         {/* Stats Grid */}
-        <div className="mt-10 grid grid-cols-[1fr_1fr_1fr_1fr] gap-y-12">
+        <div className="mt-10 grid grid-cols-[1fr_1fr_1fr] gap-y-12">
+
+          {/* ID */}
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-center gap-1.5">
+              <Icon name="hash" className="h-3.5 w-3.5 text-text-sub-600" />
+              <span className="text-[10px] font-medium uppercase tracking-wider text-text-sub-600">
+                Contact ID
+              </span>
+            </div>
+            {isLoading ?
+              <Skeleton className="h-6 w-28 rounded-lg" />
+              : <div
+                className="flex items-center gap-1.5 group/copy cursor-pointer w-fit"
+                onClick={handleCopyId}
+              >
+                <code className="rounded bg-neutral-alpha-10 px-2 py-1 font-mono text-xs font-medium text-text-strong-950">
+                  {contact?.id ? `${contact.id.slice(0, 12)}...` : "---"}
+                </code>
+                <Icon
+                  name={copied ? "check" : "copy"}
+                  className={cn(
+                    "h-3 w-3 transition-all flex-shrink-0",
+                    copied
+                      ? "text-success-base"
+                      : "text-text-sub-600 opacity-0 group-hover/copy:opacity-100"
+                  )}
+                />
+              </div>}
+          </div>
 
           {/* Created */}
           <div className="flex flex-col gap-1.5">
@@ -340,41 +369,11 @@ export const ContactHeader = ({
                 {formatStatusLabel(contact?.status || "")}
               </span>}
           </div>
-
-          {/* ID */}
-          <div className="flex flex-col gap-1.5">
-            <div className="flex items-center gap-1.5">
-              <Icon name="hash" className="h-3.5 w-3.5 text-text-sub-600" />
-              <span className="text-[10px] font-medium uppercase tracking-wider text-text-sub-600">
-                ID
-              </span>
-            </div>
-            {isLoading ?
-              <Skeleton className="h-5 w-36 rounded-lg" />
-              : <div
-                className="flex items-center gap-1.5 group/copy cursor-pointer w-fit"
-                onClick={handleCopyId}
-              >
-                <code className="text-xs font-medium text-text-strong-950 truncate max-w-[140px]">
-                  {contact?.id || "---"}
-                </code>
-                <Icon
-                  name={copied ? "check" : "copy"}
-                  className={cn(
-                    "h-3 w-3 transition-all flex-shrink-0",
-                    copied
-                      ? "text-success-base"
-                      : "text-text-sub-600 opacity-0 group-hover/copy:opacity-100"
-                  )}
-                />
-              </div>}
-          </div>
         </div>
 
         {/* Properties Section */}
         {propertyValues.length > 0 && (
           <div className="mt-12">
-            <h2 className="font-medium text-title-h6 mb-6">Properties</h2>
             <div className="grid grid-cols-4 gap-y-8">
               {propertyValues.map((pv) => (
                 <div key={pv.id} className="flex flex-col gap-1">

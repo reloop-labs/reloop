@@ -111,9 +111,9 @@ export const EditPropertyModal = ({
                 <Modal.Title>Edit Property</Modal.Title>
               </div>
             </Modal.Header>
-            <Modal.Body className="space-y-4">
+            <Modal.Body className="space-y-5">
               {/* Property Name (Read-only) */}
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <label className="text-text-strong-950 text-sm font-medium">
                   Property Name
                 </label>
@@ -121,7 +121,7 @@ export const EditPropertyModal = ({
                   <Input.Wrapper>
                     <Input.Input
                       type="text"
-                      className="px-2 bg-bg-weak-50 cursor-not-allowed"
+                      className="px-2 bg-bg-weak-50 text-text-sub-600 cursor-not-allowed"
                       value={property.name}
                       disabled
                       readOnly
@@ -131,7 +131,7 @@ export const EditPropertyModal = ({
               </div>
 
               {/* Property Type (Read-only) */}
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <label className="text-text-strong-950 text-sm font-medium">
                   Property Type
                 </label>
@@ -139,7 +139,7 @@ export const EditPropertyModal = ({
                   <Input.Wrapper>
                     <Input.Input
                       type="text"
-                      className="px-2 bg-bg-weak-50 cursor-not-allowed"
+                      className="px-2 bg-bg-weak-50 text-text-sub-600 cursor-not-allowed capitalize"
                       value={property.type}
                       disabled
                       readOnly
@@ -149,7 +149,7 @@ export const EditPropertyModal = ({
               </div>
 
               {/* Fallback Value (Editable) */}
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <label className="text-text-strong-950 text-sm font-medium">
                   Default Value
                 </label>
@@ -160,7 +160,7 @@ export const EditPropertyModal = ({
                       className="px-2"
                       value={fallbackValue}
                       onChange={(e) => setFallbackValue(e.target.value)}
-                      placeholder="Enter default value"
+                      placeholder="Default value when property is empty"
                       disabled={isSubmitting}
                     />
                   </Input.Wrapper>

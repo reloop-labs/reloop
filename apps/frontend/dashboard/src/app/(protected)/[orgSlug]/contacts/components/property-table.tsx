@@ -249,7 +249,7 @@ export const PropertyTable = ({
                   className="flex items-center gap-3"
                 >
                   <Icon name="tag" className="h-4 w-4 text-text-sub-600 flex-shrink-0" />
-                  <span className="truncate font-medium text-label-sm text-text-strong-950">
+                  <span className="truncate font-medium text-label-sm text-text-sub-600">
                     {property.name}
                   </span>
                 </motion.div>
@@ -257,7 +257,7 @@ export const PropertyTable = ({
                 {/* Type Column */}
                 <motion.div {...getAnimationProps(index + 1, 1)} className="flex items-center">
                   <span className={cn(
-                    "inline-flex rounded-md px-[6px] py-0.5 text-[10px] font-medium border-[1px]",
+                    "inline-flex rounded-md px-[6px] py-0.5 text-[10px] font-medium border-[1px] text-text-sub-600",
                     getTypeBadgeStyles(property.type)
                   )}>
                     {property.type}
@@ -266,14 +266,14 @@ export const PropertyTable = ({
 
                 {/* Default Column */}
                 <motion.div {...getAnimationProps(index + 1, 2)} className="flex items-center">
-                  <span className="text-label-sm text-text-sub-600 truncate">
+                  <span className="text-label-sm text-text-sub-600 font-medium truncate">
                     {property.fallbackValue || "-"}
                   </span>
                 </motion.div>
 
                 {/* Created At Column */}
                 <motion.div {...getAnimationProps(index + 1, 3)} className="flex items-center">
-                  <span className="text-label-sm text-text-strong-950 whitespace-nowrap">
+                  <span className="truncate font-medium text-label-sm text-text-sub-600 whitespace-nowrap">
                     {formatRelativeTime(property.createdAt)}
                   </span>
                 </motion.div>

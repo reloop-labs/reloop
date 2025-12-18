@@ -56,21 +56,23 @@ const ContactDetailPage = () => {
     { revalidateOnFocus: false }
   );
 
-  // Build a map of propertyId -> property name
-  const propertyNameMap = new Map<string, string>();
-  if (allPropertiesData?.properties) {
-    for (const prop of allPropertiesData.properties) {
-      propertyNameMap.set(prop.id, prop.name);
+  // Build a map of propertyId -> property value for this contact
+  const valueMap = new Map<string, string>();
+  if (propertiesData?.propertyValues) {
+    for (const pv of propertiesData.propertyValues) {
+      valueMap.set(pv.propertyId, pv.value);
     }
   }
 
-  // Build property values with names (only for properties that still exist)
-  const propertyValuesWithNames = propertiesData?.propertyValues
-    ?.filter((pv) => propertyNameMap.has(pv.propertyId)) // Only include values for existing properties
-    .map((pv) => ({
-      ...pv,
-      name: propertyNameMap.get(pv.propertyId) || "",
-    })) || [];
+  // Build all properties with their values (show "-" if no value)
+  const allPropertiesWithValues = allPropertiesData?.properties?.map((prop) => ({
+    id: prop.id,
+    propertyId: prop.id,
+    name: prop.name,
+    value: valueMap.get(prop.id) || "-",
+    createdAt: "",
+    updatedAt: "",
+  })) || [];
 
   const isLoading = contactLoading || propertiesLoading;
 
@@ -102,7 +104,7 @@ const ContactDetailPage = () => {
       <ContactHeader
         contact={contactData}
         isLoading={isLoading}
-        propertyValues={propertyValuesWithNames}
+        propertyValues={allPropertiesWithValues}
       />
     </div>
   );
