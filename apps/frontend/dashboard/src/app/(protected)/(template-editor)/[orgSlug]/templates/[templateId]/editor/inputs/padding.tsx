@@ -65,14 +65,14 @@ export const InputPadding = () => {
 					mode="ghost"
 					onClick={() => setIsExpanded(!isExpanded)}
 					className={cn(
-						"transition-colors",
-						isExpanded && "bg-bg-weak-50 text-primary-base",
+						"h-7 w-7 transition-colors",
+						isExpanded && "bg-bg-weak-50 text-shadow-text-strong-950",
 					)}
 				>
 					<Button.Icon
 						as={Icon}
 						name="section-rect"
-						className={cn("transition-transform", isExpanded && "scale-110")}
+						className={cn("h-4 w-4 transition-transform")}
 					/>
 				</Button.Root>
 			</div>
@@ -86,21 +86,17 @@ export const InputPadding = () => {
 			>
 				{isExpanded ? (
 					<>
-						{/* Top */}
 						<PaddingInput label="Top" icon="align-top-2" iconClassName="" />
-						{/* Right */}
-						<PaddingInput
-							label="Right"
-							icon="align-top-2"
-							iconClassName="rotate-90"
-						/>
-						{/* Bottom */}
 						<PaddingInput
 							label="Bottom"
 							icon="align-top-2"
 							iconClassName="rotate-180"
 						/>
-						{/* Left */}
+						<PaddingInput
+							label="Right"
+							icon="align-top-2"
+							iconClassName="rotate-90"
+						/>
 						<PaddingInput
 							label="Left"
 							icon="align-top-2"
@@ -109,13 +105,11 @@ export const InputPadding = () => {
 					</>
 				) : (
 					<>
-						{/* Vertical (Top & Bottom) */}
 						<PaddingInput
 							label="Vertical"
 							icon="padding-x"
 							iconClassName="rotate-90"
 						/>
-						{/* Horizontal (Left & Right) */}
 						<PaddingInput
 							label="Horizontal"
 							icon="padding-x"
