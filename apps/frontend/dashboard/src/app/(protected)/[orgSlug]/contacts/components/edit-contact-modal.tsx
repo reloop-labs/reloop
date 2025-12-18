@@ -110,7 +110,7 @@ export const EditContactModal = ({ open, onOpenChange, contact }: EditContactMod
   }, [contactPropsData, properties]);
 
   // Cmd/Ctrl + Enter to submit
-  useHotkeys("mod+enter", (e) => {
+  useHotkeys("enter", (e) => {
     e.preventDefault();
     if (open && !isSaving) {
       handleSubmit(new Event('submit') as unknown as React.FormEvent);
@@ -348,13 +348,12 @@ export const EditContactModal = ({ open, onOpenChange, contact }: EditContactMod
                 {isSaving ? (
                   <>
                     <Spinner size={14} color="currentColor" />
-                    Saving...
+                    Updating...
                   </>
                 ) : (
                   <>
-                    Save
+                    Update
                     <span className="inline-flex items-center gap-0.5">
-                      <Icon name="command" className="w-4 h-4 border rounded-sm p-px border-stroke-soft-100/20" />
                       <Icon name="enter" className="w-4 h-4 border rounded-sm p-px border-stroke-soft-100/20" />
                     </span>
                   </>
