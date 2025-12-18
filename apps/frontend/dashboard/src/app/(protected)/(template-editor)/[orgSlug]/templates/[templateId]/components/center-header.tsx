@@ -7,6 +7,8 @@ import * as Popover from "@reloop/ui/popover";
 import { parseAsBoolean, useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 import * as Button from "@reloop/ui/button";
+import { motion } from "framer-motion";
+import useMeasure from "react-use-measure";
 
 interface FieldRowProps {
     label: string;
@@ -127,8 +129,10 @@ export const CenterHeader = () => {
     const [subject, setSubject] = useState("");
     const [showDetails, setShowDetails] = useQueryState('showDetails', parseAsBoolean)
 
+    const [ref, bounds] = useMeasure();
+
     return (
-        <div className="border border-stroke-soft-100/50 max-w-3xl mx-auto rounded-2xl mt-4 relative">
+        <div className="border border-stroke-soft-100/50 max-w-2xl mx-auto rounded-2xl mt-4 relative">
             <Button.Root onClick={() => setShowDetails(!showDetails)} mode="ghost" variant="neutral" size="xxsmall" className="absolute right-4 top-2">
                 <Button.Icon as={Icon} name="chevron-down" className={cn("transition-transform duration-200 h-4 w-4 text-text-soft-400", showDetails && "rotate-180")} />
             </Button.Root>
@@ -138,31 +142,44 @@ export const CenterHeader = () => {
                 onChange={setSender}
                 hideBorder={!showDetails}
             />
-            {showDetails && <>
-                <FieldRow
-                    label="From"
-                    value={from}
-                    onChange={setFrom}
-                    suffixDropdown={
-                        <DomainDropdown
-                            value={selectedDomain}
-                            onChange={setSelectedDomain}
-                        />
-                    }
-                />
-                <FieldRow
-                    label="Reply"
-                    value={reply}
-                    onChange={setReply}
-                />
-                <FieldRow
-                    label="Subject"
-                    value={subject}
-                    placeholder="Subject line"
-                    onChange={setSubject}
-                    hideBorder
-                />
-            </>}
+            <motion.div
+                initial={false}
+                animate={{
+                    height: showDetails ? bounds.height : 0,
+                    opacity: showDetails ? 1 : 0
+                }}
+                transition={{
+                    height: { duration: 0.3, ease: [0.4, 0, 0.2, 1] },
+                    opacity: { duration: 0.2, ease: "easeInOut" }
+                }}
+                style={{ overflow: "hidden" }}
+            >
+                <div ref={ref}>
+                    <FieldRow
+                        label="From"
+                        value={from}
+                        onChange={setFrom}
+                        suffixDropdown={
+                            <DomainDropdown
+                                value={selectedDomain}
+                                onChange={setSelectedDomain}
+                            />
+                        }
+                    />
+                    <FieldRow
+                        label="Reply"
+                        value={reply}
+                        onChange={setReply}
+                    />
+                    <FieldRow
+                        label="Subject"
+                        value={subject}
+                        placeholder="Subject line"
+                        onChange={setSubject}
+                        hideBorder
+                    />
+                </div>
+            </motion.div>
         </div>
     );
 };
