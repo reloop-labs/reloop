@@ -1,4 +1,19 @@
+"use client";
+
+import { CenterHeader } from "./components/center-header";
+import { LeftSidebar } from "./components/left-sidebar";
+import { RightSidebar } from "./components/right-sidebar";
+
 const Page = () => {
-    return <div>dsff</div>
-}
-export default Page
+    return (
+        <div className="flex min-h-screen">
+            <LeftSidebar />
+            <main className="flex-1">
+                <CenterHeader />
+            </main>
+            <RightSidebar />
+        </div>
+    );
+};
+
+export default Page;
