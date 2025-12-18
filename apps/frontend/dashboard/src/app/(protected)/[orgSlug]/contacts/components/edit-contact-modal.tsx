@@ -15,6 +15,8 @@ import useSWR from "swr";
 interface Contact {
   id: string;
   email: string;
+  firstName: string | null;
+  lastName: string | null;
   status: string;
   organizationId: string;
   createdAt: string;
@@ -43,9 +45,6 @@ interface EditContactModalProps {
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-// Reserved property names that always show in UI
-const RESERVED_PROPERTIES = ["firstName", "lastName"];
-
 export const EditContactModal = ({ open, onOpenChange, contact }: EditContactModalProps) => {
   const { mutate } = useSWRConfig();
   const [isSaving, setIsSaving] = useState(false);
@@ -55,7 +54,7 @@ export const EditContactModal = ({ open, onOpenChange, contact }: EditContactMod
   const [lastName, setLastName] = useState("");
   const [propertyValues, setPropertyValues] = useState<Record<string, string>>({});
 
-  // Fetch all properties for the organization
+  // Fetch all custom properties for the organization
   const { data: propertiesData } = useSWR<{ properties: Property[]; total: number }>(
     open ? "/api/contacts/v1/properties/list?limit=100" : null,
     fetcher,
@@ -67,46 +66,29 @@ export const EditContactModal = ({ open, onOpenChange, contact }: EditContactMod
     fetcher,
   );
 
-  const properties = propertiesData?.properties || [];
-
-  // Check if reserved properties exist
-  const hasFirstName = properties.some((p) => p.name === "firstName");
-  const hasLastName = properties.some((p) => p.name === "lastName");
-
-  // Filter out reserved properties from the custom list
-  const customProperties = properties.filter(
-    (p) => !RESERVED_PROPERTIES.includes(p.name)
-  );
+  // Custom properties only (firstName/lastName are now system fields on the contact)
+  const customProperties = propertiesData?.properties || [];
 
   // Reset form when contact changes or modal opens
   useEffect(() => {
     if (open && contact) {
       setEmail(contact.email);
+      setFirstName(contact.firstName || "");
+      setLastName(contact.lastName || "");
       setIsSubscribed(contact.status.toLowerCase() === "subscribed");
     }
   }, [contact, open]);
 
-  // Set property values when fetched
+  // Set custom property values when fetched
   useEffect(() => {
-    if (contactPropsData?.propertyValues && properties.length > 0) {
+    if (contactPropsData?.propertyValues) {
       const values: Record<string, string> = {};
       for (const pv of contactPropsData.propertyValues) {
         values[pv.propertyId] = pv.value;
       }
       setPropertyValues(values);
-
-      // Find firstName and lastName properties and set their values
-      const fnProp = properties.find((p) => p.name === "firstName");
-      const lnProp = properties.find((p) => p.name === "lastName");
-
-      if (fnProp && values[fnProp.id]) {
-        setFirstName(values[fnProp.id] || "");
-      }
-      if (lnProp && values[lnProp.id]) {
-        setLastName(values[lnProp.id] || "");
-      }
     }
-  }, [contactPropsData, properties]);
+  }, [contactPropsData]);
 
   // Cmd/Ctrl + Enter to submit
   useHotkeys("enter", (e) => {
@@ -134,64 +116,23 @@ export const EditContactModal = ({ open, onOpenChange, contact }: EditContactMod
     }));
   };
 
-  // Helper to create a property if it doesn't exist
-  const ensurePropertyExists = async (name: string): Promise<string | null> => {
-    const existing = properties.find((p) => p.name === name);
-    if (existing) return existing.id;
-
-    try {
-      const response = await fetch("/api/contacts/v1/properties/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, type: "string" }),
-      });
-
-      if (!response.ok) {
-        console.error(`Failed to create ${name} property`);
-        return null;
-      }
-
-      const data = await response.json();
-      return data.id;
-    } catch (error) {
-      console.error(`Error creating ${name} property:`, error);
-      return null;
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!contact) return;
 
     setIsSaving(true);
     try {
-      // Build properties array
+      // Build custom properties array (firstName/lastName are now direct fields)
       const propsToUpdate: { propertyId: string; value: string }[] = [];
-
-      // Handle firstName
-      if (firstName) {
-        const firstNameId = await ensurePropertyExists("firstName");
-        if (firstNameId) {
-          propsToUpdate.push({ propertyId: firstNameId, value: firstName });
-        }
-      }
-
-      // Handle lastName
-      if (lastName) {
-        const lastNameId = await ensurePropertyExists("lastName");
-        if (lastNameId) {
-          propsToUpdate.push({ propertyId: lastNameId, value: lastName });
-        }
-      }
-
-      // Add custom property values
       for (const [propertyId, value] of Object.entries(propertyValues)) {
-        if (value && !propsToUpdate.some(p => p.propertyId === propertyId)) {
+        if (value) {
           propsToUpdate.push({ propertyId, value });
         }
       }
 
       console.log("Updating contact with payload:", {
+        firstName,
+        lastName,
         status: isSubscribed ? "subscribed" : "unsubscribed",
         properties: propsToUpdate,
       });
@@ -200,6 +141,8 @@ export const EditContactModal = ({ open, onOpenChange, contact }: EditContactMod
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          firstName: firstName || undefined,
+          lastName: lastName || undefined,
           status: isSubscribed ? "subscribed" : "unsubscribed",
           properties: propsToUpdate.length > 0 ? propsToUpdate : undefined,
         }),
@@ -306,47 +249,43 @@ export const EditContactModal = ({ open, onOpenChange, contact }: EditContactMod
                 </div>
               </div>
 
-              {/* First Name - Only shown if property exists */}
-              {hasFirstName && (
-                <div className="flex flex-col gap-1 pt-4 border-t border-stroke-soft-100">
-                  <Label.Root htmlFor="firstName">
-                    First name
-                  </Label.Root>
-                  <Input.Root size="small">
-                    <Input.Wrapper>
-                      <Input.Input
-                        id="firstName"
-                        type="text"
-                        value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
-                        disabled={isSaving}
-                        placeholder="Your contact name"
-                      />
-                    </Input.Wrapper>
-                  </Input.Root>
-                </div>
-              )}
+              {/* First Name - System property, always shown */}
+              <div className="flex flex-col gap-1 pt-4 border-t border-stroke-soft-100">
+                <Label.Root htmlFor="firstName">
+                  First name
+                </Label.Root>
+                <Input.Root size="small">
+                  <Input.Wrapper>
+                    <Input.Input
+                      id="firstName"
+                      type="text"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      disabled={isSaving}
+                      placeholder="Your contact name"
+                    />
+                  </Input.Wrapper>
+                </Input.Root>
+              </div>
 
-              {/* Last Name - Only shown if property exists */}
-              {hasLastName && (
-                <div className="flex flex-col gap-1">
-                  <Label.Root htmlFor="lastName">
-                    Last name
-                  </Label.Root>
-                  <Input.Root size="small">
-                    <Input.Wrapper>
-                      <Input.Input
-                        id="lastName"
-                        type="text"
-                        value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
-                        disabled={isSaving}
-                        placeholder="Your contact last name"
-                      />
-                    </Input.Wrapper>
-                  </Input.Root>
-                </div>
-              )}
+              {/* Last Name - System property, always shown */}
+              <div className="flex flex-col gap-1">
+                <Label.Root htmlFor="lastName">
+                  Last name
+                </Label.Root>
+                <Input.Root size="small">
+                  <Input.Wrapper>
+                    <Input.Input
+                      id="lastName"
+                      type="text"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      disabled={isSaving}
+                      placeholder="Your contact last name"
+                    />
+                  </Input.Wrapper>
+                </Input.Root>
+              </div>
 
               {/* Custom Properties */}
               {customProperties.length > 0 && (

@@ -16,8 +16,8 @@ interface Contact {
     id: string;
     email: string;
     status: string;
-    firstName?: string;
-    lastName?: string;
+    firstName: string | null;
+    lastName: string | null;
     organizationId: string;
     createdAt: string;
     updatedAt: string;

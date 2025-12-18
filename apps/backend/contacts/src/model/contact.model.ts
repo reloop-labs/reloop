@@ -13,6 +13,8 @@ export namespace ContactModel {
       pattern: emailPattern.source,
       description: "Contact email address",
     }),
+    firstName: t.Optional(t.String({ description: "Contact first name" })),
+    lastName: t.Optional(t.String({ description: "Contact last name" })),
   });
 
   export type CreateContactBody = typeof createContactBody.static;
@@ -40,6 +42,8 @@ export namespace ContactModel {
         description: "Contact email address",
       }),
     ),
+    firstName: t.Optional(t.String({ description: "Contact first name" })),
+    lastName: t.Optional(t.String({ description: "Contact last name" })),
     status: t.Optional(
       t.Union([t.Literal("subscribed"), t.Literal("unsubscribed")], {
         description: "Contact subscription status",
@@ -61,6 +65,8 @@ export namespace ContactModel {
   export const contactResponse = t.Object({
     id: t.String({ description: "Unique contact identifier" }),
     email: t.String({ description: "Contact email address" }),
+    firstName: t.Union([t.String(), t.Null()], { description: "Contact first name" }),
+    lastName: t.Union([t.String(), t.Null()], { description: "Contact last name" }),
     status: t.String({ description: "Contact subscription status" }),
     organizationId: t.String({ description: "Organization ID" }),
     createdAt: t.Date(),

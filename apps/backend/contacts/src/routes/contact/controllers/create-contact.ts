@@ -45,6 +45,8 @@ export async function createContact(
 			.insert(schema.contact)
 			.values({
 				email: body.email,
+				firstName: body.firstName || null,
+				lastName: body.lastName || null,
 				status: "subscribed",
 				organizationId,
 				userId,

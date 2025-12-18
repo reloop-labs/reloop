@@ -6,6 +6,8 @@ export function formatContactResponse(
 	return {
 		id: contact.id,
 		email: contact.email,
+		firstName: contact.firstName,
+		lastName: contact.lastName,
 		status: contact.status,
 		organizationId: contact.organizationId,
 		createdAt: contact.createdAt,

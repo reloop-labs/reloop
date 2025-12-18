@@ -22,6 +22,8 @@ import { DeleteContactModal } from "../../../components/delete-contact-modal";
 interface ContactData {
   id: string;
   email: string;
+  firstName: string | null;
+  lastName: string | null;
   status: string;
   organizationId: string;
   createdAt: string;
@@ -311,34 +313,6 @@ export const ContactHeader = ({
 
         {/* Stats Grid */}
         <div className="mt-10 grid grid-cols-[1fr_1fr_1fr] gap-y-12 gap-x-12">
-          {/* ID */}
-          <div className="flex flex-col gap-1.5">
-            <div className="flex items-center gap-1.5">
-              <Icon name="hash" className="h-3.5 w-3.5 text-text-sub-600" />
-              <span className="text-[10px] font-medium uppercase tracking-wider text-text-sub-600">
-                Contact ID
-              </span>
-            </div>
-            {isLoading ?
-              <Skeleton className="h-6 w-28 rounded-lg" />
-              : <div
-                className="flex items-center gap-1.5 group/copy cursor-pointer w-fit"
-                onClick={handleCopyId}
-              >
-                <code className="rounded bg-neutral-alpha-10 px-2 py-1 font-mono text-xs font-medium text-text-strong-950">
-                  {contact?.id}
-                </code>
-                <Icon
-                  name={copied ? "check" : "copy"}
-                  className={cn(
-                    "h-3 w-3 transition-all flex-shrink-0",
-                    copied
-                      ? "text-success-base"
-                      : "text-text-sub-600 opacity-0 group-hover/copy:opacity-100"
-                  )}
-                />
-              </div>}
-          </div>
           {/* Created */}
           <div className="flex flex-col gap-1.5">
             <div className="flex items-center gap-1.5">
@@ -373,25 +347,71 @@ export const ContactHeader = ({
                 {formatStatusLabel(contact?.status || "")}
               </span>}
           </div>
+
+          {/* Contact ID */}
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-center gap-1.5">
+              <Icon name="hash" className="h-3.5 w-3.5 text-text-sub-600" />
+              <span className="text-[10px] font-medium uppercase tracking-wider text-text-sub-600">
+                Contact ID
+              </span>
+            </div>
+            {isLoading ?
+              <Skeleton className="h-6 w-28 rounded-lg" />
+              : <div
+                className="flex items-center gap-1.5 group/copy cursor-pointer w-fit"
+                onClick={handleCopyId}
+              >
+                <code className="rounded bg-neutral-alpha-10 px-2 py-1 font-mono text-xs font-medium text-text-strong-950">
+                  {contact?.id}
+                </code>
+                <Icon
+                  name={copied ? "check" : "copy"}
+                  className={cn(
+                    "h-3 w-3 transition-all flex-shrink-0",
+                    copied
+                      ? "text-success-base"
+                      : "text-text-sub-600 opacity-0 group-hover/copy:opacity-100"
+                  )}
+                />
+              </div>}
+          </div>
         </div>
 
-        {/* Properties Section */}
-        {propertyValues.length > 0 && (
-          <div className="mt-12">
-            <div className="grid grid-cols-4 gap-y-8">
-              {propertyValues.map((pv) => (
-                <div key={pv.id} className="flex flex-col gap-1">
-                  <span className="text-[10px] font-medium uppercase tracking-wider text-text-sub-600">
-                    {formatPropertyName(pv.name)}
-                  </span>
-                  <span className="font-medium text-paragraph-sm text-text-strong-950">
-                    {pv.value || "-"}
-                  </span>
-                </div>
-              ))}
+        {/* Properties Section - All in one grid */}
+        <div className="mt-12">
+          <h3 className="mb-4 font-medium text-paragraph-sm text-text-strong-950">Properties</h3>
+          <div className="grid grid-cols-4 gap-x-8 gap-y-8">
+            {/* System Properties */}
+            <div className="flex flex-col gap-1">
+              <span className="text-[10px] font-medium uppercase tracking-wider text-text-sub-600">
+                FIRST NAME
+              </span>
+              <span className="font-medium text-paragraph-sm text-text-strong-950">
+                {contact?.firstName || "-"}
+              </span>
             </div>
+            <div className="flex flex-col gap-1">
+              <span className="text-[10px] font-medium uppercase tracking-wider text-text-sub-600">
+                LAST NAME
+              </span>
+              <span className="font-medium text-paragraph-sm text-text-strong-950">
+                {contact?.lastName || "-"}
+              </span>
+            </div>
+            {/* Custom Properties */}
+            {propertyValues.map((pv) => (
+              <div key={pv.id} className="flex flex-col gap-1">
+                <span className="text-[10px] font-medium uppercase tracking-wider text-text-sub-600">
+                  {formatPropertyName(pv.name)}
+                </span>
+                <span className="font-medium text-paragraph-sm text-text-strong-950">
+                  {pv.value || "-"}
+                </span>
+              </div>
+            ))}
           </div>
-        )}
+        </div>
       </div>
 
       {/* Edit Contact Modal */}

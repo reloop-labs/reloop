@@ -43,6 +43,12 @@ export async function updateContact(
 		if (body.email !== undefined) {
 			updateData.email = body.email;
 		}
+		if (body.firstName !== undefined) {
+			updateData.firstName = body.firstName;
+		}
+		if (body.lastName !== undefined) {
+			updateData.lastName = body.lastName;
+		}
 		if (body.status !== undefined) {
 			updateData.status = body.status;
 		}

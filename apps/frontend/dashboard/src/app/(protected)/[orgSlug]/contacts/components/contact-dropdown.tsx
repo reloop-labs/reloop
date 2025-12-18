@@ -12,13 +12,15 @@ import {
 } from "@reloop/ui/popover";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
+import { toast } from "sonner";
+import { useSWRConfig } from "swr";
 
 interface Contact {
     id: string;
     email: string;
     status: string;
-    firstName?: string;
-    lastName?: string;
+    firstName: string | null;
+    lastName: string | null;
     organizationId: string;
     createdAt: string;
     updatedAt: string;
@@ -33,12 +35,6 @@ export interface ContactDropdownProps {
     onOpenChange?: (open: boolean) => void;
 }
 
-const menuItems = [
-    { id: "view", label: "View Details", icon: "eye-outline" as const, isDanger: false },
-    { id: "edit", label: "Edit contact", icon: "edit" as const, isDanger: false },
-    { id: "delete", label: "Delete contact", icon: "trash" as const, isDanger: true },
-];
-
 export const ContactDropdown = ({
     contact,
     onEdit,
@@ -47,10 +43,27 @@ export const ContactDropdown = ({
     onOpenChange,
 }: ContactDropdownProps) => {
     const router = useRouter();
+    const { mutate } = useSWRConfig();
     const { activeOrganization } = useUserOrganization();
     const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
     const [popoverOpen, setPopoverOpen] = useState(false);
+    const [isTogglingStatus, setIsTogglingStatus] = useState(false);
     const buttonRefs = useRef<HTMLButtonElement[]>([]);
+
+    const isSubscribed = contact.status.toLowerCase() === "subscribed";
+
+    // Dynamic menu items based on contact status
+    const menuItems = [
+        { id: "view", label: "View Details", icon: "eye-outline" as const, isDanger: false },
+        { 
+            id: "toggle-status", 
+            label: isSubscribed ? "Unsubscribe" : "Subscribe", 
+            icon: isSubscribed ? "cross-circle" : "check-circle" as const, 
+            isDanger: false 
+        },
+        { id: "edit", label: "Edit contact", icon: "edit" as const, isDanger: false },
+        { id: "delete", label: "Delete contact", icon: "trash" as const, isDanger: true },
+    ];
 
     const handlePopoverOpenChange = (open: boolean) => {
         setPopoverOpen(open);
@@ -62,12 +75,39 @@ export const ContactDropdown = ({
     const hoveredItem = menuItems[hoverIdx ?? -1];
     const isDanger = hoveredItem?.isDanger ?? false;
 
-    const handleItemClick = (itemId: string) => {
+    const handleToggleStatus = async () => {
+        setIsTogglingStatus(true);
+        try {
+            const newStatus = isSubscribed ? "unsubscribed" : "subscribed";
+            const response = await fetch(`/api/contacts/v1/contacts/${contact.id}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ status: newStatus }),
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to update status");
+            }
+
+            toast.success(`Contact ${newStatus}`);
+            await mutate((key: string) => typeof key === "string" && key.includes("/api/contacts/v1"));
+        } catch (error) {
+            console.error("Failed to toggle status:", error);
+            toast.error("Failed to update contact status");
+        } finally {
+            setIsTogglingStatus(false);
+        }
+    };
+
+    const handleItemClick = async (itemId: string) => {
         if (itemId === "view") {
             setPopoverOpen(false);
             if (activeOrganization?.slug) {
                 router.push(`/${activeOrganization.slug}/contacts/detail/${contact.id}`);
             }
+        } else if (itemId === "toggle-status") {
+            setPopoverOpen(false);
+            await handleToggleStatus();
         } else if (itemId === "edit") {
             setPopoverOpen(false);
             onEdit(contact);
@@ -80,7 +120,7 @@ export const ContactDropdown = ({
     return (
         <PopoverRoot open={popoverOpen} onOpenChange={handlePopoverOpenChange}>
             <PopoverTrigger asChild>
-                <Button.Root variant="neutral" mode="ghost" size="xxsmall" disabled={isDeleting}>
+                <Button.Root variant="neutral" mode="ghost" size="xxsmall" disabled={isDeleting || isTogglingStatus}>
                     <Icon name="more-vertical" className="w-3 h-3" />
                 </Button.Root>
             </PopoverTrigger>
@@ -96,12 +136,12 @@ export const ContactDropdown = ({
                             onPointerEnter={() => setHoverIdx(idx)}
                             onPointerLeave={() => setHoverIdx(undefined)}
                             onClick={() => handleItemClick(item.id)}
-                            disabled={item.id === "delete" && isDeleting}
+                            disabled={(item.id === "delete" && isDeleting) || (item.id === "toggle-status" && isTogglingStatus)}
                             className={cn(
                                 "flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-xs font-normal transition-colors",
                                 item.isDanger ? "text-error-base" : "text-text-strong-950",
                                 !currentRect && hoverIdx === idx && (item.isDanger ? "bg-red-alpha-10" : "bg-neutral-alpha-10"),
-                                isDeleting && item.id === "delete" && "opacity-50 cursor-not-allowed"
+                                ((isDeleting && item.id === "delete") || (isTogglingStatus && item.id === "toggle-status")) && "opacity-50 cursor-not-allowed"
                             )}
                         >
                             <Icon

@@ -23,6 +23,8 @@ export namespace ContactTypes {
   export interface ContactData {
     id: string;
     email: string;
+    firstName: string | null;
+    lastName: string | null;
     status: string;
     organizationId: string;
     createdAt: Date;
@@ -32,6 +34,8 @@ export namespace ContactTypes {
 
   export interface CreateContactRequest {
     email: string;
+    firstName?: string;
+    lastName?: string;
   }
 
   export interface CreateContactsRequest {
@@ -40,6 +44,8 @@ export namespace ContactTypes {
 
   export interface UpdateContactRequest {
     email?: string;
+    firstName?: string;
+    lastName?: string;
     status?: "subscribed" | "unsubscribed";
     properties?: { propertyId: string; value: string }[];
   }

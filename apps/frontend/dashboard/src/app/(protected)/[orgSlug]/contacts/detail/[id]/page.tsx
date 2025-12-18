@@ -7,6 +7,8 @@ import { ContactHeader } from "./components/contact-header";
 interface ContactData {
   id: string;
   email: string;
+  firstName: string | null;
+  lastName: string | null;
   status: string;
   organizationId: string;
   createdAt: string;
