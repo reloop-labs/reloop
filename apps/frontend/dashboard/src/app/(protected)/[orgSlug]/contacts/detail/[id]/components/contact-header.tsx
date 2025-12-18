@@ -45,7 +45,7 @@ interface ContactHeaderProps {
 }
 
 const getStatusColor = (status: string) => {
-  return status.toLowerCase() === "subscribed" ? "text-success-base" : "text-text-sub-600";
+  return status.toLowerCase() === "subscribed" ? "text-success-base" : "text-error-base";
 };
 
 const getStatusIcon = (status: string) => {
@@ -247,7 +247,13 @@ export const ContactHeader = ({
             {isLoading ? (
               <Skeleton className="mt-2 h-7 w-48 rounded-lg" />
             ) : (
-              <h1 className="font-medium text-title-h6 leading-8">{contact?.email}</h1>
+              <div className="flex items-center gap-2">
+                <div className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-white text-xs uppercase tracking-wide shadow-sm">
+                  {contact?.email.charAt(0).toUpperCase()}
+
+                </div>
+                <h1 className="font-medium text-title-h6 leading-8">{contact?.email}</h1>
+              </div>
             )}
           </div>
 
@@ -304,7 +310,7 @@ export const ContactHeader = ({
         </div>
 
         {/* Stats Grid */}
-        <div className="mt-10 grid grid-cols-[1fr_1fr_1fr] gap-y-12">
+        <div className="mt-10 grid grid-cols-[1fr_1fr_1fr] gap-y-12 gap-x-12">
 
           {/* ID */}
           <div className="flex flex-col gap-1.5">
@@ -321,7 +327,7 @@ export const ContactHeader = ({
                 onClick={handleCopyId}
               >
                 <code className="rounded bg-neutral-alpha-10 px-2 py-1 font-mono text-xs font-medium text-text-strong-950">
-                  {contact?.id ? `${contact.id.slice(0, 12)}...` : "---"}
+                  {contact?.id}
                 </code>
                 <Icon
                   name={copied ? "check" : "copy"}

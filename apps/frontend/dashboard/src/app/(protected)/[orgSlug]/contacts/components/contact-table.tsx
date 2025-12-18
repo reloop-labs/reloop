@@ -10,6 +10,7 @@ import { useState } from "react";
 import { ContactDropdown } from "./contact-dropdown";
 import { DeleteContactModal } from "./delete-contact-modal";
 import { EditContactModal } from "./edit-contact-modal";
+import { contact } from "../../../../../../../../../packages/db/src/schema/contact";
 
 interface Contact {
     id: string;
@@ -185,7 +186,9 @@ export const ContactTable = ({
                                         {...getAnimationProps(index + 1, 0)}
                                         className="flex items-center gap-3"
                                     >
-                                        <Icon name="user" className="h-4 w-4 text-text-sub-600 flex-shrink-0" />
+                                        <div className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-white text-xs uppercase tracking-wide shadow-sm">
+                                            {contact.email.charAt(0).toUpperCase()}
+                                        </div>
                                         <span className="truncate font-medium text-label-sm text-text-strong-950">
                                             {contact.email}
                                         </span>
