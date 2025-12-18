@@ -5,7 +5,6 @@ import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
-import * as Switch from "@reloop/ui/switch";
 import Spinner from "@reloop/ui/spinner";
 import { useState, useEffect } from "react";
 import { useSWRConfig } from "swr";
@@ -79,13 +78,13 @@ export const EditContactModal = ({ open, onOpenChange, contact }: EditContactMod
     (p) => !RESERVED_PROPERTIES.includes(p.name)
   );
 
-  // Reset form when contact changes
+  // Reset form when contact changes or modal opens
   useEffect(() => {
-    if (contact) {
+    if (open && contact) {
       setEmail(contact.email);
       setIsSubscribed(contact.status.toLowerCase() === "subscribed");
     }
-  }, [contact]);
+  }, [contact, open]);
 
   // Set property values when fetched
   useEffect(() => {
@@ -246,11 +245,11 @@ export const EditContactModal = ({ open, onOpenChange, contact }: EditContactMod
                     <Input.Input
                       id="email"
                       type="email"
-                      value={email}
+                      value={email || contact?.email || ""}
                       onChange={(e) => setEmail(e.target.value)}
                       disabled={isSaving}
                       readOnly
-                      placeholder={email}
+                      placeholder={contact?.email || "Email address"}
                       className="cursor-not-allowed bg-bg-weak-50"
                     />
                   </Input.Wrapper>
@@ -258,16 +257,53 @@ export const EditContactModal = ({ open, onOpenChange, contact }: EditContactMod
               </div>
 
               {/* Subscribed Toggle */}
-              <div className="flex flex-col gap-2 pt-2 border-t border-stroke-soft-100">
-                <Label.Root htmlFor="subscribed">
-                  Subscribed
-                </Label.Root>
-                <Switch.Root
-                  id="subscribed"
-                  checked={isSubscribed}
-                  onCheckedChange={setIsSubscribed}
-                  disabled={isSaving}
-                />
+              <div className="pt-2 border-t border-stroke-soft-100">
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => !isSaving && setIsSubscribed(!isSubscribed)}
+                  onKeyDown={(e) => {
+                    if ((e.key === 'Enter' || e.key === ' ') && !isSaving) {
+                      e.preventDefault();
+                      setIsSubscribed(!isSubscribed);
+                    }
+                  }}
+                  className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-all duration-200 ${isSubscribed
+                    ? 'border-neutral-base bg-neutral-alpha-10'
+                    : 'border-stroke-soft-200 bg-bg-white-0 hover:border-stroke-soft-300'
+                    } ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  <div className="flex flex-col gap-0.5">
+                    <span className="font-medium text-label-sm text-text-strong-950">Subscribed</span>
+                    <span className="text-paragraph-xs text-text-sub-600">
+                      {isSubscribed ? 'Receives broadcasts and campaigns' : 'Opted out from all communications'}
+                    </span>
+                  </div>
+                  <div
+                    className={`flex h-4.5 w-4.5 items-center justify-center rounded transition-all duration-200 ${isSubscribed
+                      ? 'bg-neutral-900'
+                      : 'bg-bg-white-0 border border-stroke-soft-300'
+                      }`}
+                  >
+                    {isSubscribed && (
+                      <svg
+                        width="10"
+                        height="10"
+                        viewBox="0 0 12 10"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M1 5L4.5 8.5L11 1.5"
+                          stroke="white"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    )}
+                  </div>
+                </div>
               </div>
 
               {/* First Name - Only shown if property exists */}
