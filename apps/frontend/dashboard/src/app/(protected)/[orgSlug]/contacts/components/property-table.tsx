@@ -1,14 +1,19 @@
 "use client";
 
+import { AnimatedHoverBackground } from "@fe/dashboard/components/layout/sidebar/animated-hover-background";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import * as Dropdown from "@reloop/ui/dropdown";
+import * as Button from "@reloop/ui/button";
+import {
+  Content as PopoverContent,
+  Root as PopoverRoot,
+  Trigger as PopoverTrigger,
+} from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { AnimatePresence, motion } from "motion/react";
-import { useState } from "react";
-import { toast } from "sonner";
-import { useSWRConfig } from "swr";
+import { useState, useRef } from "react";
+import { DeletePropertyModal } from "./delete-property-modal";
 
 interface Property {
   id: string;
@@ -67,35 +72,94 @@ const PropertySkeleton = () => (
   </div>
 );
 
+interface PropertyActionsPopoverProps {
+  property: Property;
+  onDelete: (property: Property) => void;
+}
+
+const PropertyActionsPopover = ({ property, onDelete }: PropertyActionsPopoverProps) => {
+  const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
+  const [popoverOpen, setPopoverOpen] = useState(false);
+  const buttonRefs = useRef<HTMLButtonElement[]>([]);
+
+  const menuItems = [
+    { id: "delete", label: "Delete property", icon: "trash" as const, isDanger: true },
+  ];
+
+  const currentTab = buttonRefs.current[hoverIdx ?? -1];
+  const currentRect = currentTab?.getBoundingClientRect();
+  const hoveredItem = menuItems[hoverIdx ?? -1];
+  const isDanger = hoveredItem?.isDanger ?? false;
+
+  const handleItemClick = (itemId: string) => {
+    if (itemId === "delete") {
+      setPopoverOpen(false);
+      onDelete(property);
+    }
+  };
+
+  return (
+    <PopoverRoot open={popoverOpen} onOpenChange={setPopoverOpen}>
+      <PopoverTrigger asChild>
+        <Button.Root variant="neutral" mode="ghost" size="xxsmall">
+          <Icon name="more-vertical" className="w-3 h-3" />
+        </Button.Root>
+      </PopoverTrigger>
+      <PopoverContent align="end" sideOffset={-4} className="w-40 p-1.5 rounded-xl">
+        <div className="relative">
+          {menuItems.map((item, idx) => (
+            <button
+              key={item.id}
+              ref={(el) => {
+                if (el) buttonRefs.current[idx] = el;
+              }}
+              type="button"
+              onPointerEnter={() => setHoverIdx(idx)}
+              onPointerLeave={() => setHoverIdx(undefined)}
+              onClick={() => handleItemClick(item.id)}
+              className={cn(
+                "flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-xs font-normal transition-colors",
+                item.isDanger ? "text-error-base" : "text-text-strong-950",
+                !currentRect && hoverIdx === idx && (item.isDanger ? "bg-red-alpha-10" : "bg-neutral-alpha-10")
+              )}
+            >
+              <Icon
+                name={item.icon}
+                className={cn("h-3.5 w-3.5", item.isDanger ? "" : "text-text-sub-600")}
+              />
+              <span>{item.label}</span>
+            </button>
+          ))}
+          <AnimatedHoverBackground
+            rect={currentRect}
+            tabElement={currentTab}
+            isDanger={isDanger}
+          />
+        </div>
+      </PopoverContent>
+    </PopoverRoot>
+  );
+};
+
 export const PropertyTable = ({
   properties,
   isLoading,
   loadingRows = 4,
   onDelete,
 }: PropertyTableProps) => {
-  const { mutate } = useSWRConfig();
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deletingProperty, setDeletingProperty] = useState<Property | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  const handleDelete = async (property: Property) => {
-    setDeletingId(property.id);
-    try {
-      const response = await fetch(`/api/contacts/v1/properties/${property.id}`, {
-        method: "DELETE",
-      });
+  const handleDelete = (property: Property) => {
+    setDeletingProperty(property);
+    setIsDeleteModalOpen(true);
+  };
 
-      if (!response.ok) {
-        throw new Error("Failed to delete property");
-      }
-
-      toast.success("Property deleted");
-      await mutate((key: string) => typeof key === "string" && key.includes("/api/contacts/v1/properties/list"));
-      onDelete?.(property.id);
-    } catch (error) {
-      console.error("Failed to delete property:", error);
-      toast.error("Failed to delete property");
-    } finally {
-      setDeletingId(null);
+  const handleDeleteSuccess = () => {
+    if (deletingProperty) {
+      onDelete?.(deletingProperty.id);
     }
+    setDeletingProperty(null);
   };
 
   if (isLoading) {
@@ -104,15 +168,15 @@ export const PropertyTable = ({
         {/* Header */}
         <div className="grid grid-cols-[1fr_100px_1fr_120px_40px] items-center py-3.5 px-4 text-text-sub-600 border-b border-stroke-soft-100">
           <div className="flex items-center gap-2">
-            <Icon name="text" className="h-4 w-4" />
+            <Icon name="tag" className="h-4 w-4" />
             <span className="text-xs">Name</span>
           </div>
           <div className="flex items-center gap-2">
-            <Icon name="database" className="h-4 w-4" />
+            <Icon name="type" className="h-4 w-4" />
             <span className="text-xs">Type</span>
           </div>
           <div className="flex items-center gap-2">
-            <Icon name="brackets" className="h-4 w-4" />
+            <Icon name="file-text" className="h-4 w-4" />
             <span className="text-xs">Fallback</span>
           </div>
           <div className="flex items-center gap-2">
@@ -132,37 +196,33 @@ export const PropertyTable = ({
   }
 
   return (
-    <AnimatePresence mode="wait">
-      <div className="w-full text-paragraph-sm rounded-xl border border-stroke-soft-100 overflow-hidden">
-        {/* Table Header */}
-        <div className="grid grid-cols-[1fr_100px_1fr_120px_40px] items-center py-3.5 px-4 text-text-sub-600 border-b border-stroke-soft-100">
-          <div className="flex items-center gap-2">
-            <Icon name="text" className="h-4 w-4" />
-            <span className="text-xs">Name</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Icon name="database" className="h-4 w-4" />
-            <span className="text-xs">Type</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Icon name="brackets" className="h-4 w-4" />
-            <span className="text-xs">Fallback</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Icon name="clock" className="h-4 w-4" />
-            <span className="text-xs">Created At</span>
-          </div>
-          <div />
-        </div>
-
-        {/* Rows */}
-        <div className="divide-y divide-stroke-soft-100">
-          {properties.length === 0 ? (
-            <div className="px-4 py-8 text-center text-text-soft-400 text-sm">
-              No properties found
+    <>
+      <AnimatePresence mode="wait">
+        <div className="w-full text-paragraph-sm rounded-xl border border-stroke-soft-100 overflow-hidden">
+          {/* Table Header */}
+          <div className="grid grid-cols-[1fr_100px_1fr_120px_40px] items-center py-3.5 px-4 text-text-sub-600 border-b border-stroke-soft-100">
+            <div className="flex items-center gap-2">
+              <Icon name="tag" className="h-4 w-4" />
+              <span className="text-xs">Name</span>
             </div>
-          ) : (
-            properties.map((property, index) => (
+            <div className="flex items-center gap-2">
+              <Icon name="type" className="h-4 w-4" />
+              <span className="text-xs">Type</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Icon name="file-text" className="h-4 w-4" />
+              <span className="text-xs">Fallback</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Icon name="clock" className="h-4 w-4" />
+              <span className="text-xs">Created At</span>
+            </div>
+            <div />
+          </div>
+
+          {/* Rows */}
+          <div className="divide-y divide-stroke-soft-100">
+            {properties.map((property, index) => (
               <div
                 key={property.id}
                 className={cn(
@@ -175,7 +235,7 @@ export const PropertyTable = ({
                   {...getAnimationProps(index + 1, 0)}
                   className="flex items-center gap-3"
                 >
-                  <Icon name="text" className="h-4 w-4 text-text-sub-600 flex-shrink-0" />
+                  <Icon name="tag" className="h-4 w-4 text-text-sub-600 flex-shrink-0" />
                   <span className="truncate font-medium text-label-sm text-text-strong-950">
                     {property.name}
                   </span>
@@ -194,7 +254,7 @@ export const PropertyTable = ({
                 {/* Fallback Column */}
                 <motion.div {...getAnimationProps(index + 1, 2)} className="flex items-center">
                   <span className="text-label-sm text-text-sub-600 truncate">
-                    {property.fallbackValue || "—"}
+                    {property.fallbackValue || "-"}
                   </span>
                 </motion.div>
 
@@ -210,32 +270,24 @@ export const PropertyTable = ({
                   {...getAnimationProps(index + 1, 4)}
                   className="flex items-center justify-end"
                 >
-                  <Dropdown.Root>
-                    <Dropdown.Trigger asChild>
-                      <button
-                        type="button"
-                        className="p-1 rounded-md hover:bg-neutral-alpha-10 transition-colors"
-                        disabled={deletingId === property.id}
-                      >
-                        <Icon name="more-horizontal" className="h-4 w-4 text-text-sub-600" />
-                      </button>
-                    </Dropdown.Trigger>
-                    <Dropdown.Content align="end" className="min-w-[140px]">
-                      <Dropdown.Item
-                        className="text-red-600 focus:text-red-600"
-                        onClick={() => handleDelete(property)}
-                      >
-                        <Icon name="trash" className="h-4 w-4" />
-                        Delete
-                      </Dropdown.Item>
-                    </Dropdown.Content>
-                  </Dropdown.Root>
+                  <PropertyActionsPopover
+                    property={property}
+                    onDelete={handleDelete}
+                  />
                 </motion.div>
               </div>
-            ))
-          )}
+            ))}
+          </div>
         </div>
-      </div>
-    </AnimatePresence>
+      </AnimatePresence>
+
+      {/* Delete Property Modal */}
+      <DeletePropertyModal
+        property={deletingProperty}
+        open={isDeleteModalOpen}
+        onOpenChange={setIsDeleteModalOpen}
+        onDeleteSuccess={handleDeleteSuccess}
+      />
+    </>
   );
 };

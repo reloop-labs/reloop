@@ -1,14 +1,17 @@
+import { authMiddleware } from "@be/contacts/middleware/auth";
 import { PropertyModel } from "@be/contacts/model/property.model";
 import { deletePropertyHandler } from "@be/contacts/routes/property/controllers/delete-property";
+import type { User } from "@reloop/auth/server";
 import { Elysia, t } from "elysia";
 
-export const deletePropertyRoute = new Elysia().delete(
+export const deletePropertyRoute = new Elysia().use(authMiddleware).delete(
   "/:propertyId",
-  async ({ params, store }) => {
-    const organizationId = (store as { organizationId: string }).organizationId;
-    return deletePropertyHandler(organizationId, params.propertyId);
+  async ({ params, user }: { params: { propertyId: string }; user: User }) => {
+    const { activeOrganizationId } = user;
+    return deletePropertyHandler(activeOrganizationId as string, params.propertyId);
   },
   {
+    auth: true,
     params: t.Object({
       propertyId: t.String({ description: "Property ID to delete" }),
     }),
