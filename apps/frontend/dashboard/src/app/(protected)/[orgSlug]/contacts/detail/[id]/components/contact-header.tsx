@@ -311,7 +311,6 @@ export const ContactHeader = ({
 
         {/* Stats Grid */}
         <div className="mt-10 grid grid-cols-[1fr_1fr_1fr] gap-y-12 gap-x-12">
-
           {/* ID */}
           <div className="flex flex-col gap-1.5">
             <div className="flex items-center gap-1.5">
@@ -340,7 +339,6 @@ export const ContactHeader = ({
                 />
               </div>}
           </div>
-
           {/* Created */}
           <div className="flex flex-col gap-1.5">
             <div className="flex items-center gap-1.5">
