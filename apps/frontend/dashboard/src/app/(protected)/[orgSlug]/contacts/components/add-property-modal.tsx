@@ -188,7 +188,7 @@ export const AddPropertyModal = ({ open, onOpenChange }: AddPropertyModalProps) 
               {/* Fallback Value - Full Width */}
               <div className="flex flex-col gap-1 space-y-1">
                 <Label.Root htmlFor="fallbackValue">
-                  Fallback Value
+                  Default Value
                 </Label.Root>
                 <Input.Root size="small">
                   <Input.Wrapper>

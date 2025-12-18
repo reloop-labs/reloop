@@ -185,12 +185,12 @@ export const PropertyTable = ({
             <span className="text-xs">Name</span>
           </div>
           <div className="flex items-center gap-2">
-            <Icon name="type" className="h-4 w-4" />
+            <Icon name="file-code" className="h-4 w-4" />
             <span className="text-xs">Type</span>
           </div>
           <div className="flex items-center gap-2">
             <Icon name="file-text" className="h-4 w-4" />
-            <span className="text-xs">Fallback</span>
+            <span className="text-xs">Default</span>
           </div>
           <div className="flex items-center gap-2">
             <Icon name="clock" className="h-4 w-4" />
@@ -219,12 +219,12 @@ export const PropertyTable = ({
               <span className="text-xs">Name</span>
             </div>
             <div className="flex items-center gap-2">
-              <Icon name="type" className="h-4 w-4" />
+              <Icon name="file-code" className="h-4 w-4" />
               <span className="text-xs">Type</span>
             </div>
             <div className="flex items-center gap-2">
               <Icon name="file-text" className="h-4 w-4" />
-              <span className="text-xs">Fallback</span>
+              <span className="text-xs">Default</span>
             </div>
             <div className="flex items-center gap-2">
               <Icon name="clock" className="h-4 w-4" />
@@ -264,7 +264,7 @@ export const PropertyTable = ({
                   </span>
                 </motion.div>
 
-                {/* Fallback Column */}
+                {/* Default Column */}
                 <motion.div {...getAnimationProps(index + 1, 2)} className="flex items-center">
                   <span className="text-label-sm text-text-sub-600 truncate">
                     {property.fallbackValue || "-"}

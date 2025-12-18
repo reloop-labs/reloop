@@ -1,9 +1,11 @@
 "use client";
+import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { AnimatePresence, motion } from "motion/react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ContactDropdown } from "./contact-dropdown";
 import { DeleteContactModal } from "./delete-contact-modal";
@@ -83,10 +85,18 @@ export const ContactTable = ({
     loadingRows = 4,
     onDelete,
 }: ContactTableProps) => {
+    const router = useRouter();
+    const { activeOrganization } = useUserOrganization();
     const [editingContact, setEditingContact] = useState<Contact | null>(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [deletingContact, setDeletingContact] = useState<Contact | null>(null);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+    const handleRowClick = (contact: Contact) => {
+        if (activeOrganization?.slug) {
+            router.push(`/${activeOrganization.slug}/contacts/detail/${contact.id}`);
+        }
+    };
 
     const handleEdit = (contact: Contact) => {
         setEditingContact(contact);
@@ -160,8 +170,9 @@ export const ContactTable = ({
                         {contacts.map((contact, index) => (
                             <div
                                 key={contact.id}
+                                onClick={() => handleRowClick(contact)}
                                 className={cn(
-                                    "group/row grid grid-cols-[1fr_180px_100px_80px] items-center py-2 px-4 transition-colors",
+                                    "group/row grid grid-cols-[1fr_180px_100px_80px] items-center py-2 px-4 transition-colors cursor-pointer",
                                     "hover:bg-bg-weak-50/50"
                                 )}
                             >
@@ -170,7 +181,7 @@ export const ContactTable = ({
                                     {...getAnimationProps(index + 1, 0)}
                                     className="flex items-center gap-3"
                                 >
-                                    <Icon name="mail-single" className="h-4 w-4 text-text-sub-600 flex-shrink-0" />
+                                    <Icon name="user" className="h-4 w-4 text-text-sub-600 flex-shrink-0" />
                                     <span className="truncate font-medium text-label-sm text-text-strong-950">
                                         {contact.email}
                                     </span>
@@ -197,6 +208,7 @@ export const ContactTable = ({
                                 <motion.div
                                     {...getAnimationProps(index + 1, 3)}
                                     className="flex items-center justify-end"
+                                    onClick={(e) => e.stopPropagation()}
                                 >
                                     <ContactDropdown
                                         contact={contact}

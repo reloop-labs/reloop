@@ -151,7 +151,7 @@ export const EditPropertyModal = ({
               {/* Fallback Value (Editable) */}
               <div className="space-y-2">
                 <label className="text-text-strong-950 text-sm font-medium">
-                  Fallback Value
+                  Default Value
                 </label>
                 <Input.Root size="small">
                   <Input.Wrapper>
@@ -160,7 +160,7 @@ export const EditPropertyModal = ({
                       className="px-2"
                       value={fallbackValue}
                       onChange={(e) => setFallbackValue(e.target.value)}
-                      placeholder="Enter fallback value"
+                      placeholder="Enter default value"
                       disabled={isSubmitting}
                     />
                   </Input.Wrapper>
@@ -180,13 +180,12 @@ export const EditPropertyModal = ({
                 {isSubmitting ? (
                   <>
                     <Spinner size={14} color="currentColor" />
-                    Saving...
+                    Updating...
                   </>
                 ) : (
                   <>
-                    Save
+                    Update
                     <span className="inline-flex items-center gap-0.5">
-                      <Icon name="command" className="w-4 h-4 border rounded-sm p-px border-stroke-soft-100/20" />
                       <Icon name="enter" className="w-4 h-4 border rounded-sm p-px border-stroke-soft-100/20" />
                     </span>
                   </>
