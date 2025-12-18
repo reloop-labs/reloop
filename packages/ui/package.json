@@ -22,6 +22,7 @@
 		"./code-block": "./src/components/code-block.tsx",
 		"./button": "./src/components/button.tsx",
 		"./calendar": "./src/components/calendar.tsx",
+		"./color-picker": "./src/components/color-picker.tsx",
 		"./file-upload": "./src/components/file-upload.tsx",
 		"./toast": "./src/components/toast.tsx",
 		"./logo": "./src/components/logo.tsx",
