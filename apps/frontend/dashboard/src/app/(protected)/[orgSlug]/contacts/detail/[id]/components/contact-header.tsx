@@ -295,20 +295,6 @@ export const ContactHeader = ({
 
         {/* Stats Grid */}
         <div className="mt-10 grid grid-cols-[1fr_1fr_1fr_1fr] gap-y-12">
-          {/* Email Address */}
-          <div className="flex flex-col gap-1.5">
-            <div className="flex items-center gap-1.5">
-              <Icon name="mail-single" className="h-3.5 w-3.5 text-text-sub-600" />
-              <span className="text-[10px] font-medium uppercase tracking-wider text-text-sub-600">
-                Email Address
-              </span>
-            </div>
-            {isLoading ?
-              <Skeleton className="h-5 w-32 rounded-lg" />
-              : <span className="font-medium text-paragraph-sm text-text-strong-950">
-                {contact?.email || "---"}
-              </span>}
-          </div>
 
           {/* Created */}
           <div className="flex flex-col gap-1.5">

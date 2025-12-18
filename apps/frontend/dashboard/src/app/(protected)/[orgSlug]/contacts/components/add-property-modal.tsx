@@ -27,6 +27,7 @@ export const AddPropertyModal = ({ open, onOpenChange }: AddPropertyModalProps) 
   const { mutate } = useSWRConfig();
   const [isCreating, setIsCreating] = useState(false);
   const [propertyName, setPropertyName] = useState("");
+  const [nameError, setNameError] = useState("");
   const [propertyType, setPropertyType] = useState<"string" | "number">("string");
   const [fallbackValue, setFallbackValue] = useState("");
 
@@ -41,10 +42,28 @@ export const AddPropertyModal = ({ open, onOpenChange }: AddPropertyModalProps) 
   const handleOpenChange = (isOpen: boolean) => {
     if (!isOpen) {
       setPropertyName("");
+      setNameError("");
       setPropertyType("string");
       setFallbackValue("");
     }
     onOpenChange(isOpen);
+  };
+
+  // Validate property name - only letters, numbers, and underscores
+  const validatePropertyName = (name: string): boolean => {
+    const validPattern = /^[a-zA-Z0-9_]*$/;
+    return validPattern.test(name);
+  };
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setPropertyName(value);
+
+    if (value && !validatePropertyName(value)) {
+      setNameError("Name can only contain letters, numbers, and underscores");
+    } else {
+      setNameError("");
+    }
   };
 
   // Command/Ctrl + Enter to submit form
@@ -57,7 +76,7 @@ export const AddPropertyModal = ({ open, onOpenChange }: AddPropertyModalProps) 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!propertyName) return;
+    if (!propertyName || nameError) return;
 
     setIsCreating(true);
     try {
@@ -100,29 +119,34 @@ export const AddPropertyModal = ({ open, onOpenChange }: AddPropertyModalProps) 
             </div>
           </Modal.Header>
           <form onSubmit={handleSubmit} className="flex flex-col">
-            <Modal.Body className="space-y-2">
+            <Modal.Body className="space-y-4">
               {/* Property Name */}
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-1 space-y-1">
                 <Label.Root htmlFor="propertyName">
                   Name
                   <Label.Asterisk />
                 </Label.Root>
-                <Input.Root size="small">
+                <Input.Root size="small" hasError={!!nameError}>
                   <Input.Wrapper>
                     <Input.Input
                       ref={nameInputRef}
                       id="propertyName"
                       placeholder="e.g., first_name, company_name"
                       value={propertyName}
-                      onChange={(e) => setPropertyName(e.target.value)}
+                      onChange={handleNameChange}
                       disabled={isCreating}
                     />
                   </Input.Wrapper>
                 </Input.Root>
+                {nameError ? (
+                  <p className="text-error-base text-xs">{nameError}</p>
+                ) : (
+                  <p className="text-text-sub-600 text-xs">Letters, numbers, and underscores only</p>
+                )}
               </div>
 
               {/* Property Type - Full Width */}
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-1 space-y-1">
                 <Label.Root htmlFor="propertyType">
                   Type
                   <Label.Asterisk />
@@ -162,7 +186,7 @@ export const AddPropertyModal = ({ open, onOpenChange }: AddPropertyModalProps) 
               </div>
 
               {/* Fallback Value - Full Width */}
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-1 space-y-1">
                 <Label.Root htmlFor="fallbackValue">
                   Fallback Value
                 </Label.Root>
@@ -186,7 +210,7 @@ export const AddPropertyModal = ({ open, onOpenChange }: AddPropertyModalProps) 
                 type="submit"
                 variant="neutral"
                 size="xsmall"
-                disabled={isCreating || !propertyName}
+                disabled={isCreating || !propertyName || !!nameError}
               >
                 {isCreating ? (
                   <>

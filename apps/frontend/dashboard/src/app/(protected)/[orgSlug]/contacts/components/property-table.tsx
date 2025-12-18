@@ -14,6 +14,7 @@ import { Skeleton } from "@reloop/ui/skeleton";
 import { AnimatePresence, motion } from "motion/react";
 import { useState, useRef } from "react";
 import { DeletePropertyModal } from "./delete-property-modal";
+import { EditPropertyModal } from "./edit-property-modal";
 
 interface Property {
   id: string;
@@ -49,9 +50,9 @@ const getAnimationProps = (row: number, column: number) => {
 const getTypeBadgeStyles = (type: string) => {
   switch (type.toLowerCase()) {
     case "string":
-      return "border border-feature-base text-feature-base bg-feature-light/20";
+      return "border border-primary-base text-primary-base bg-primary-light/20";
     case "number":
-      return "border border-purple-500 text-purple-600 bg-purple-100/20";
+      return "border border-violet-500 text-violet-600 bg-violet-100/20";
     default:
       return "border border-stroke-soft-200 text-text-sub-600 bg-neutral-alpha-10";
   }
@@ -74,15 +75,17 @@ const PropertySkeleton = () => (
 
 interface PropertyActionsPopoverProps {
   property: Property;
+  onEdit: (property: Property) => void;
   onDelete: (property: Property) => void;
 }
 
-const PropertyActionsPopover = ({ property, onDelete }: PropertyActionsPopoverProps) => {
+const PropertyActionsPopover = ({ property, onEdit, onDelete }: PropertyActionsPopoverProps) => {
   const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
   const [popoverOpen, setPopoverOpen] = useState(false);
   const buttonRefs = useRef<HTMLButtonElement[]>([]);
 
   const menuItems = [
+    { id: "edit", label: "Edit property", icon: "edit" as const, isDanger: false },
     { id: "delete", label: "Delete property", icon: "trash" as const, isDanger: true },
   ];
 
@@ -92,7 +95,10 @@ const PropertyActionsPopover = ({ property, onDelete }: PropertyActionsPopoverPr
   const isDanger = hoveredItem?.isDanger ?? false;
 
   const handleItemClick = (itemId: string) => {
-    if (itemId === "delete") {
+    if (itemId === "edit") {
+      setPopoverOpen(false);
+      onEdit(property);
+    } else if (itemId === "delete") {
       setPopoverOpen(false);
       onDelete(property);
     }
@@ -147,8 +153,15 @@ export const PropertyTable = ({
   loadingRows = 4,
   onDelete,
 }: PropertyTableProps) => {
+  const [editingProperty, setEditingProperty] = useState<Property | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [deletingProperty, setDeletingProperty] = useState<Property | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  const handleEdit = (property: Property) => {
+    setEditingProperty(property);
+    setIsEditModalOpen(true);
+  };
 
   const handleDelete = (property: Property) => {
     setDeletingProperty(property);
@@ -272,6 +285,7 @@ export const PropertyTable = ({
                 >
                   <PropertyActionsPopover
                     property={property}
+                    onEdit={handleEdit}
                     onDelete={handleDelete}
                   />
                 </motion.div>
@@ -280,6 +294,13 @@ export const PropertyTable = ({
           </div>
         </div>
       </AnimatePresence>
+
+      {/* Edit Property Modal */}
+      <EditPropertyModal
+        property={editingProperty}
+        open={isEditModalOpen}
+        onOpenChange={setIsEditModalOpen}
+      />
 
       {/* Delete Property Modal */}
       <DeletePropertyModal
