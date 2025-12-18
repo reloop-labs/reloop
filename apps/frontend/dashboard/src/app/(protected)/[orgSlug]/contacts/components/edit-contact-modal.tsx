@@ -155,6 +155,8 @@ export const EditContactModal = ({ open, onOpenChange, contact }: EditContactMod
 
       toast.success("Contact updated successfully");
       handleOpenChange(false);
+      // Invalidate both the specific contact and general contacts API cache
+      await mutate(`/api/contacts/v1/contacts/get/${contact.id}`);
       await mutate((key: string) => typeof key === 'string' && key.includes('/api/contacts/v1'));
     } catch (error) {
       console.error("Failed to update contact:", error);
