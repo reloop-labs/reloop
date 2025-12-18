@@ -18,9 +18,7 @@ export const RightAction = () => {
 					</div>
 				</div>
 			</div>
-			<div className="border-stroke-soft-100/50 border-b px-4 py-3">
-				<Editbody />
-			</div>
+			<Editbody />
 		</div>
 	);
 };
