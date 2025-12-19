@@ -12,7 +12,7 @@ import {
 import { organization, user } from "./auth";
 import { contact } from "./contact";
 
-const visibilityEnum = pgEnum("visibility", [
+export const visibilityEnum = pgEnum("visibility", [
   "private",
   "public",
 ]);
@@ -23,8 +23,8 @@ export const enrollmentStatusEnum = pgEnum("enrollment_status", [
 ]);
 
 
-const createTopicEnrollmentId = () => `enr_${createId()}`
-const createTopicId = () => `tpc_${createId()}`;
+export const createTopicEnrollmentId = () => `enr_${createId()}`
+export const createTopicId = () => `tpc_${createId()}`;
 
 export const topic = pgTable(
   "topic",
