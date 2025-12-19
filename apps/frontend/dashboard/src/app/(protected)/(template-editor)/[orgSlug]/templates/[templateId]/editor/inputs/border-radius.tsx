@@ -6,7 +6,6 @@ import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
 import * as Tooltip from "@reloop/ui/tooltip";
-import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 
 interface RadiusInputProps {
@@ -21,27 +20,21 @@ const RadiusInput = ({
 	placeholder = "0",
 }: RadiusInputProps) => {
 	const cornerStyles = {
-		tl: "rounded-tl-lg",
-		tr: "rounded-tr-lg",
-		bl: "rounded-bl-lg",
-		br: "rounded-br-lg",
+		tl: "rounded-tl-lg border-t-1 border-l-1",
+		tr: "rounded-tr-lg border-t-1 border-r-1",
+		bl: "rounded-bl-lg border-b-1 border-l-1",
+		br: "rounded-br-lg border-b-1 border-r-1",
 	};
 
 	return (
 		<Tooltip.Root>
 			<Tooltip.Trigger asChild>
-				<motion.div
-					className="flex-1"
-					initial={{ opacity: 0, scale: 0.8 }}
-					animate={{ opacity: 1, scale: 1 }}
-					exit={{ opacity: 0, scale: 0.8 }}
-					transition={{ duration: 0.15, ease: "easeOut" }}
-				>
+				<div className="flex-1">
 					<Input.Root size="xsmall">
 						<Input.Wrapper>
 							<div
 								className={cn(
-									"h-3 w-3 border-2 border-text-sub-600",
+									"h-3 w-3 border-text-sub-600",
 									cornerStyles[corner],
 								)}
 							/>
@@ -52,7 +45,7 @@ const RadiusInput = ({
 							/>
 						</Input.Wrapper>
 					</Input.Root>
-				</motion.div>
+				</div>
 			</Tooltip.Trigger>
 			<Tooltip.Content
 				size="xsmall"
@@ -93,49 +86,38 @@ export const InputBorderRadius = () => {
 				</Button.Root>
 			</div>
 
-			<motion.div
-				layout
+			<div
 				className={cn(
 					"grid gap-1.5",
 					isExpanded ? "grid-cols-4" : "grid-cols-1",
 				)}
-				transition={{ duration: 0.2, ease: "easeInOut" }}
 			>
-				<AnimatePresence mode="popLayout">
-					{isExpanded ? (
-						<>
-							<RadiusInput label="Top Left" corner="tl" />
-							<RadiusInput label="Top Right" corner="tr" />
-							<RadiusInput label="Bottom Left" corner="bl" />
-							<RadiusInput label="Bottom Right" corner="br" />
-						</>
-					) : (
-						<motion.div
-							key="single"
-							className="flex-1"
-							initial={{ opacity: 0 }}
-							animate={{ opacity: 1 }}
-							exit={{ opacity: 0 }}
-						>
-							<Input.Root size="xsmall">
-								<Input.Wrapper>
-									<Input.Icon
-										as={Icon}
-										name="maximize-2"
-										className="h-3.5 w-3.5 text-text-sub-600"
-									/>
-									<Input.Input
-										type="text"
-										placeholder="0"
-										className="text-center"
-									/>
-									<span className="pr-2 text-text-sub-600 text-xs">px</span>
-								</Input.Wrapper>
-							</Input.Root>
-						</motion.div>
-					)}
-				</AnimatePresence>
-			</motion.div>
+				{isExpanded ? (
+					<>
+						<RadiusInput label="Top Left" corner="tl" />
+						<RadiusInput label="Top Right" corner="tr" />
+						<RadiusInput label="Bottom Left" corner="bl" />
+						<RadiusInput label="Bottom Right" corner="br" />
+					</>
+				) : (
+					<div key="single" className="flex-1">
+						<Input.Root size="xsmall">
+							<Input.Wrapper>
+								<Input.Icon
+									as={Icon}
+									name="maximize"
+									className="h-3.5 w-3.5 text-text-sub-600"
+								/>
+								<Input.Input
+									type="text"
+									placeholder="0"
+									className="text-center"
+								/>
+							</Input.Wrapper>
+						</Input.Root>
+					</div>
+				)}
+			</div>
 		</div>
 	);
 };
