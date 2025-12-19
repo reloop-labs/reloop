@@ -23,7 +23,7 @@ export const enrollmentStatusEnum = pgEnum("enrollment_status", [
 ]);
 
 
-const createTopicSubscriptionId = () => `sub_${createId()}`
+const createTopicEnrollmentId = () => `enr_${createId()}`
 const createTopicId = () => `tpc_${createId()}`;
 
 export const topic = pgTable(
@@ -61,7 +61,7 @@ export const topicEnrollment = pgTable(
   "topic_enrollment",
   {
     id: text("id")
-      .$defaultFn(() => createTopicSubscriptionId())
+      .$defaultFn(() => createTopicEnrollmentId())
       .primaryKey(),
     contactId: text("contact_id")
       .notNull()
@@ -80,14 +80,13 @@ export const topicEnrollment = pgTable(
       .$onUpdate(() => new Date()),
   },
   (table) => [
-    index("topic_subscription_idx_contact_id").on(table.contactId),
-    index("topic_subscription_idx_topic_id").on(table.topicId),
-    index("topic_subscription_idx_organization_id").on(table.organizationId),
-    index("topic_subscription_idx_status").on(table.status),
-    unique("topic_subscription_unique").on(table.contactId, table.topicId),
+    index("topic_enrollment_idx_contact_id").on(table.contactId),
+    index("topic_enrollment_idx_topic_id").on(table.topicId),
+    index("topic_enrollment_idx_organization_id").on(table.organizationId),
+    index("topic_enrollment_idx_status").on(table.status),
+    unique("topic_enrollment_unique").on(table.contactId, table.topicId),
   ],
 );
-
 
 export const contactRelations = relations(contact, ({ one, many }) => ({
   organization: one(organization, {

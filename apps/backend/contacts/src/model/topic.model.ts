@@ -15,9 +15,9 @@ export namespace TopicModel {
       }),
     ),
     autoEnroll: t.Optional(
-      t.Union([t.Literal("enabled"), t.Literal("disabled")], {
-        default: "enabled",
-        description: "Auto enroll setting - enabled means all contacts are automatically subscribed",
+      t.Union([t.Literal("enrolled"), t.Literal("unenrolled")], {
+        default: "enrolled",
+        description: "Auto enroll setting - enrolled means all contacts are automatically enrolled",
       }),
     ),
   });
@@ -40,8 +40,8 @@ export namespace TopicModel {
       }),
     ),
     autoEnroll: t.Optional(
-      t.Union([t.Literal("enabled"), t.Literal("disabled")], {
-        description: "Auto enroll setting - enabled means all contacts are automatically subscribed",
+      t.Union([t.Literal("enrolled"), t.Literal("unenrolled")], {
+        description: "Auto enroll setting - enrolled means all contacts are automatically enrolled",
       }),
     ),
   });
@@ -55,8 +55,8 @@ export namespace TopicModel {
     description: t.Union([t.String(), t.Null()], {
       description: "Topic description",
     }),
-    autoEnroll: t.Union([t.Literal("enabled"), t.Literal("disabled")], {
-      description: "Auto enroll setting - enabled means all contacts are automatically subscribed",
+    autoEnroll: t.Union([t.Literal("enrolled"), t.Literal("unenrolled")], {
+      description: "Auto enroll setting - enrolled means all contacts are automatically enrolled",
     }),
     organizationId: t.String({ description: "Organization ID" }),
     createdAt: t.Date(),
