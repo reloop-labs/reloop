@@ -1,3 +1,4 @@
+import { relations } from "drizzle-orm";
 import {
 	boolean,
 	integer,
@@ -24,7 +25,9 @@ export const apikey = pgTable("apikey", {
 	lastRefillAt: timestamp("last_refill_at"),
 	enabled: boolean("enabled").notNull().default(true),
 	rateLimitEnabled: boolean("rate_limit_enabled").notNull().default(true),
-	rateLimitTimeWindow: integer("rate_limit_time_window").notNull().default(86400000),
+	rateLimitTimeWindow: integer("rate_limit_time_window")
+		.notNull()
+		.default(86400000),
 	rateLimitMax: integer("rate_limit_max").notNull().default(10),
 	requestCount: integer("request_count").notNull().default(0),
 	remaining: integer("remaining"),
@@ -35,3 +38,10 @@ export const apikey = pgTable("apikey", {
 	permissions: text("permissions"),
 	metadata: text("metadata"),
 });
+
+export const apikeyRelations = relations(apikey, ({ one }) => ({
+	user: one(user, {
+		fields: [apikey.userId],
+		references: [user.id],
+	}),
+}));

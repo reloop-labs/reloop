@@ -14,6 +14,12 @@ export namespace TopicModel {
         description: "Topic description",
       }),
     ),
+    autoEnroll: t.Optional(
+      t.Union([t.Literal("enabled"), t.Literal("disabled")], {
+        default: "enabled",
+        description: "Auto enroll setting - enabled means all contacts are automatically subscribed",
+      }),
+    ),
   });
 
   export type CreateTopicBody = typeof createTopicBody.static;
@@ -33,6 +39,11 @@ export namespace TopicModel {
         description: "Topic description",
       }),
     ),
+    autoEnroll: t.Optional(
+      t.Union([t.Literal("enabled"), t.Literal("disabled")], {
+        description: "Auto enroll setting - enabled means all contacts are automatically subscribed",
+      }),
+    ),
   });
 
   export type UpdateTopicBody = typeof updateTopicBody.static;
@@ -43,6 +54,9 @@ export namespace TopicModel {
     name: t.String({ description: "Topic name" }),
     description: t.Union([t.String(), t.Null()], {
       description: "Topic description",
+    }),
+    autoEnroll: t.Union([t.Literal("enabled"), t.Literal("disabled")], {
+      description: "Auto enroll setting - enabled means all contacts are automatically subscribed",
     }),
     organizationId: t.String({ description: "Organization ID" }),
     createdAt: t.Date(),
