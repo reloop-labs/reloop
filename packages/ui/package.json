@@ -17,6 +17,7 @@
 		"./currency-input": "./src/components/currency-input.tsx",
 		"./submit-button": "./src/components/submit-button.tsx",
 		"./avatar": "./src/components/avatar.tsx",
+		"./segmented-control": "./src/components/segmented-control.tsx",
 		"./tab-menu-horizontal": "./src/components/tab-menu-horizontal.tsx",
 		"./use-tab-observer": "./src/hooks/use-tab-observer.ts",
 		"./code-block": "./src/components/code-block.tsx",
