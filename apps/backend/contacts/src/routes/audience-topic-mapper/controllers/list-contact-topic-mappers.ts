@@ -1,14 +1,17 @@
-import type { TopicSubscriptionTypes } from "@be/contacts/types/topic-subscription.type";
+import type { TopicEnrollmentModel } from "@be/contacts/model/topic-enrollment.model";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
 import { and, count, desc, eq, isNull } from "drizzle-orm";
 
-export async function listTopicSubscriptions(
-  query: TopicSubscriptionTypes.TopicSubscriptionListQuery,
+type TopicEnrollmentQuery = TopicEnrollmentModel.TopicEnrollmentQuery;
+type TopicEnrollmentListResponse = TopicEnrollmentModel.TopicEnrollmentListResponse;
+
+export async function listTopicEnrollments(
+  query: TopicEnrollmentQuery,
   organizationId: string,
-): Promise<TopicSubscriptionTypes.TopicSubscriptionListResponse> {
-  const { page = 1, limit = 10, contactId, topicId, status: subscriptionStatus } = query;
+): Promise<TopicEnrollmentListResponse> {
+  const { page = 1, limit = 10, contactId, topicId, status: enrollmentStatus } = query;
   const offset = (page - 1) * limit;
 
   try {
@@ -23,8 +26,8 @@ export async function listTopicSubscriptions(
     if (topicId) {
       conditions.push(eq(schema.topicSubscription.topicId, topicId));
     }
-    if (subscriptionStatus) {
-      conditions.push(eq(schema.topicSubscription.status, subscriptionStatus));
+    if (enrollmentStatus) {
+      conditions.push(eq(schema.topicSubscription.status, enrollmentStatus));
     }
 
     const whereClause = and(...conditions);
@@ -36,7 +39,7 @@ export async function listTopicSubscriptions(
 
     const total = totalResult[0]?.count || 0;
 
-    const subscriptions = await db.query.topicSubscription.findMany({
+    const enrollments = await db.query.topicSubscription.findMany({
       where: whereClause,
       orderBy: desc(schema.topicSubscription.createdAt),
       limit: limit,
@@ -47,7 +50,7 @@ export async function listTopicSubscriptions(
     });
 
     return {
-      subscriptions,
+      enrollments,
       total,
       page,
       limit,
@@ -58,15 +61,16 @@ export async function listTopicSubscriptions(
         query,
         error: error instanceof Error ? error.message : String(error),
       },
-      "Error listing topic subscriptions",
+      "Error listing topic enrollments",
     );
     throw error;
   }
 }
 
 export async function listTopicSubscriptionsHandler(
-  query: TopicSubscriptionTypes.TopicSubscriptionListQuery,
+  query: TopicEnrollmentQuery,
   organizationId: string,
-): Promise<TopicSubscriptionTypes.TopicSubscriptionListResponse> {
-  return await listTopicSubscriptions(query, organizationId);
+): Promise<TopicEnrollmentListResponse> {
+  return await listTopicEnrollments(query, organizationId);
 }
+

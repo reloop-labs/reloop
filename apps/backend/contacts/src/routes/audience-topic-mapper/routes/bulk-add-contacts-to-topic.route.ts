@@ -1,5 +1,5 @@
 import { authMiddleware } from "@be/contacts/middleware/auth";
-import { TopicSubscriptionModel } from "@be/contacts/model/topic-subscription.model";
+import { TopicEnrollmentModel } from "@be/contacts/model/topic-enrollment.model";
 import { bulkAddContactsToTopicHandler } from "@be/contacts/routes/audience-topic-mapper/controllers/bulk-add-contacts-to-topic";
 import { Elysia } from "elysia";
 
@@ -11,17 +11,18 @@ export const bulkAddContactsToTopicRoute = new Elysia().use(authMiddleware).post
   },
   {
     auth: true,
-    body: TopicSubscriptionModel.bulkAddContactsBody,
+    body: TopicEnrollmentModel.bulkEnrollContactsBody,
     response: {
-      200: TopicSubscriptionModel.bulkAddResponse,
-      404: TopicSubscriptionModel.notFound,
-      400: TopicSubscriptionModel.validationError,
-      403: TopicSubscriptionModel.unauthorized,
+      200: TopicEnrollmentModel.bulkEnrollResponse,
+      404: TopicEnrollmentModel.notFound,
+      400: TopicEnrollmentModel.validationError,
+      403: TopicEnrollmentModel.unauthorized,
     },
     detail: {
-      tags: ["Topic Subscriptions"],
+      tags: ["Topic Enrollments"],
       summary: "Bulk add contacts to topic",
-      description: "Subscribe multiple contacts to an existing topic at once",
+      description: "Enroll multiple contacts in an existing topic at once",
     },
   },
 );
+

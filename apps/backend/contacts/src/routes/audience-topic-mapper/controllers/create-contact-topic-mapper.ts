@@ -1,21 +1,23 @@
-import type { TopicSubscriptionTypes } from "@be/contacts/types/topic-subscription.type";
+import type { TopicEnrollmentModel } from "@be/contacts/model/topic-enrollment.model";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import logger from "@reloop/logger";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
-export async function createTopicSubscription(params: {
+type TopicEnrollmentResponse = TopicEnrollmentModel.TopicEnrollmentResponse;
+
+export async function createTopicEnrollment(params: {
   organizationId: string;
   contactId: string;
   topicId: string;
-  subscriptionStatus?: "subscribed" | "unsubscribed";
-}): Promise<TopicSubscriptionTypes.TopicSubscriptionResponse> {
-  const { organizationId, contactId, topicId, subscriptionStatus = "subscribed" } = params;
+  enrollmentStatus?: "enrolled" | "unenrolled";
+}): Promise<TopicEnrollmentResponse> {
+  const { organizationId, contactId, topicId, enrollmentStatus = "enrolled" } = params;
 
   try {
-    // Check if subscription already exists
-    const existingSubscription = await db.query.topicSubscription.findFirst({
+    // Check if enrollment already exists
+    const existingEnrollment = await db.query.topicSubscription.findFirst({
       where: and(
         eq(schema.topicSubscription.contactId, contactId),
         eq(schema.topicSubscription.topicId, topicId),
@@ -23,8 +25,8 @@ export async function createTopicSubscription(params: {
       ),
     });
 
-    if (existingSubscription) {
-      throw status(409, { message: "Contact is already subscribed to this topic" });
+    if (existingEnrollment) {
+      throw status(409, { message: "Contact is already enrolled in this topic" });
     }
 
     // Verify contact exists
@@ -53,21 +55,21 @@ export async function createTopicSubscription(params: {
       throw status(404, { message: "Topic not found" });
     }
 
-    const [newSubscription] = await db
+    const [newEnrollment] = await db
       .insert(schema.topicSubscription)
       .values({
         contactId,
         topicId,
         organizationId,
-        status: subscriptionStatus,
+        status: enrollmentStatus,
       })
       .returning();
 
-    if (!newSubscription) {
-      throw new Error("Failed to create topic subscription");
+    if (!newEnrollment) {
+      throw new Error("Failed to create topic enrollment");
     }
 
-    return newSubscription;
+    return newEnrollment;
   } catch (error) {
     logger.error(
       {
@@ -75,7 +77,7 @@ export async function createTopicSubscription(params: {
         topicId,
         error: error instanceof Error ? error.message : String(error),
       },
-      "Error creating topic subscription",
+      "Error creating topic enrollment",
     );
     throw error;
   }
@@ -85,7 +87,13 @@ export async function createTopicSubscriptionHandler(params: {
   organizationId: string;
   contactId: string;
   topicId: string;
-  subscriptionStatus?: "subscribed" | "unsubscribed";
-}): Promise<TopicSubscriptionTypes.TopicSubscriptionResponse> {
-  return await createTopicSubscription(params);
+  subscriptionStatus?: "enrolled" | "unenrolled";
+}): Promise<TopicEnrollmentResponse> {
+  return await createTopicEnrollment({
+    organizationId: params.organizationId,
+    contactId: params.contactId,
+    topicId: params.topicId,
+    enrollmentStatus: params.subscriptionStatus,
+  });
 }
+

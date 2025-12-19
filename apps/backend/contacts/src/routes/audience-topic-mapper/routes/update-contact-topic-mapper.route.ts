@@ -1,15 +1,15 @@
 import { authMiddleware } from "@be/contacts/middleware/auth";
-import { TopicSubscriptionModel } from "@be/contacts/model/topic-subscription.model";
+import { TopicEnrollmentModel } from "@be/contacts/model/topic-enrollment.model";
 import { updateTopicSubscriptionHandler } from "@be/contacts/routes/audience-topic-mapper/controllers/update-contact-topic-mapper";
 import { Elysia, t } from "elysia";
 
-export const updateTopicSubscriptionRoute = new Elysia().use(authMiddleware).patch(
-  "/:subscriptionId",
+export const updateTopicEnrollmentRoute = new Elysia().use(authMiddleware).patch(
+  "/:enrollmentId",
   async ({ params, body, user }) => {
-    const { subscriptionId } = params;
+    const { enrollmentId } = params;
     const { status } = body;
     return await updateTopicSubscriptionHandler({
-      subscriptionId,
+      subscriptionId: enrollmentId,
       organizationId: user.activeOrganizationId,
       subscriptionStatus: status,
     });
@@ -17,18 +17,19 @@ export const updateTopicSubscriptionRoute = new Elysia().use(authMiddleware).pat
   {
     auth: true,
     params: t.Object({
-      subscriptionId: t.String({ description: "Subscription ID" }),
+      enrollmentId: t.String({ description: "Enrollment ID" }),
     }),
-    body: TopicSubscriptionModel.updateTopicSubscriptionBody,
+    body: TopicEnrollmentModel.updateTopicEnrollmentBody,
     response: {
-      200: TopicSubscriptionModel.topicSubscriptionResponse,
-      404: TopicSubscriptionModel.notFound,
-      403: TopicSubscriptionModel.unauthorized,
+      200: TopicEnrollmentModel.topicEnrollmentResponse,
+      404: TopicEnrollmentModel.notFound,
+      403: TopicEnrollmentModel.unauthorized,
     },
     detail: {
-      tags: ["Topic Subscriptions"],
-      summary: "Update a topic subscription",
-      description: "Updates the status of a topic subscription",
+      tags: ["Topic Enrollments"],
+      summary: "Update a topic enrollment",
+      description: "Updates the status of a topic enrollment",
     },
   },
 );
+

@@ -1,9 +1,9 @@
 import { authMiddleware } from "@be/contacts/middleware/auth";
-import { TopicSubscriptionModel } from "@be/contacts/model/topic-subscription.model";
+import { TopicEnrollmentModel } from "@be/contacts/model/topic-enrollment.model";
 import { createTopicSubscriptionHandler } from "@be/contacts/routes/audience-topic-mapper/controllers/create-contact-topic-mapper";
 import { Elysia } from "elysia";
 
-export const createTopicSubscriptionRoute = new Elysia().use(authMiddleware).post(
+export const createTopicEnrollmentRoute = new Elysia().use(authMiddleware).post(
   "/add",
   async ({ body, user }) => {
     const { activeOrganizationId: organizationId } = user;
@@ -17,17 +17,18 @@ export const createTopicSubscriptionRoute = new Elysia().use(authMiddleware).pos
   },
   {
     auth: true,
-    body: TopicSubscriptionModel.createTopicSubscriptionBody,
+    body: TopicEnrollmentModel.createTopicEnrollmentBody,
     response: {
-      201: TopicSubscriptionModel.topicSubscriptionResponse,
-      409: TopicSubscriptionModel.subscriptionAlreadyExists,
-      404: TopicSubscriptionModel.notFound,
-      403: TopicSubscriptionModel.unauthorized,
+      201: TopicEnrollmentModel.topicEnrollmentResponse,
+      409: TopicEnrollmentModel.enrollmentAlreadyExists,
+      404: TopicEnrollmentModel.notFound,
+      403: TopicEnrollmentModel.unauthorized,
     },
     detail: {
-      tags: ["Topic Subscriptions"],
-      summary: "Subscribe contact to a topic",
-      description: "Creates a subscription between a contact and a topic",
+      tags: ["Topic Enrollments"],
+      summary: "Enroll contact in a topic",
+      description: "Creates an enrollment between a contact and a topic",
     },
   },
 );
+

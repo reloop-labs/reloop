@@ -1,4 +1,5 @@
-import type { TopicSubscriptionModel } from "@be/contacts/model/topic-subscription.model";
+
+import type { TopicEnrollmentModel } from "@be/contacts/model/topic-enrollment.model";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
@@ -6,14 +7,14 @@ import { and, eq, inArray, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
 interface BulkAddResult {
-  subscribed: number;
+  enrolled: number;
   skipped: number;
   errors: Array<{ contactId: string; reason: string }>;
 }
 
 export async function bulkAddContactsToTopic(
   organizationId: string,
-  body: TopicSubscriptionModel.BulkAddContactsBody,
+  body: TopicEnrollmentModel.BulkEnrollContactsBody,
 ): Promise<BulkAddResult> {
   const { topicId, contactIds } = body;
 
@@ -27,7 +28,7 @@ export async function bulkAddContactsToTopic(
   );
 
   const result: BulkAddResult = {
-    subscribed: 0,
+    enrolled: 0,
     skipped: 0,
     errors: [],
   };
@@ -38,7 +39,6 @@ export async function bulkAddContactsToTopic(
       where: and(
         eq(schema.topic.id, topicId),
         eq(schema.topic.organizationId, organizationId),
-        isNull(schema.topic.deletedAt),
       ),
     });
 
@@ -74,12 +74,12 @@ export async function bulkAddContactsToTopic(
 
     const alreadySubscribed = new Set(existingSubscriptions.map((s) => s.contactId));
 
-    // Prepare subscriptions to create
-    const subscriptionsToCreate: Array<{
+    // Prepare enrollments to create
+    const enrollmentsToCreate: Array<{
       contactId: string;
       topicId: string;
       organizationId: string;
-      status: "subscribed" | "unsubscribed";
+      status: "enrolled" | "unenrolled";
     }> = [];
 
     for (const contactId of contactIds) {
@@ -91,26 +91,26 @@ export async function bulkAddContactsToTopic(
       } else if (alreadySubscribed.has(contactId)) {
         result.skipped++;
       } else {
-        subscriptionsToCreate.push({
+        enrollmentsToCreate.push({
           contactId,
           topicId,
           organizationId,
-          status: "subscribed",
+          status: "enrolled",
         });
       }
     }
 
-    // Batch insert new subscriptions
-    if (subscriptionsToCreate.length > 0) {
-      await db.insert(schema.topicSubscription).values(subscriptionsToCreate);
-      result.subscribed = subscriptionsToCreate.length;
+    // Batch insert new enrollments
+    if (enrollmentsToCreate.length > 0) {
+      await db.insert(schema.topicSubscription).values(enrollmentsToCreate);
+      result.enrolled = enrollmentsToCreate.length;
     }
 
     logger.info(
       {
         organizationId,
         topicId,
-        subscribed: result.subscribed,
+        enrolled: result.enrolled,
         skipped: result.skipped,
         errors: result.errors.length,
       },
@@ -132,7 +132,7 @@ export async function bulkAddContactsToTopic(
 
 export async function bulkAddContactsToTopicHandler(
   organizationId: string,
-  body: TopicSubscriptionModel.BulkAddContactsBody,
+  body: TopicEnrollmentModel.BulkEnrollContactsBody,
 ): Promise<BulkAddResult> {
   return bulkAddContactsToTopic(organizationId, body);
 }

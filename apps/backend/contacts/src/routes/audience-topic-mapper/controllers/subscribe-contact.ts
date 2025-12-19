@@ -1,16 +1,16 @@
-import type { TopicSubscriptionModel } from "@be/contacts/model/topic-subscription.model";
+import type { TopicEnrollmentModel } from "@be/contacts/model/topic-enrollment.model";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
-type TopicSubscriptionResponse = TopicSubscriptionModel.TopicSubscriptionResponse;
+type TopicEnrollmentResponse = TopicEnrollmentModel.TopicEnrollmentResponse;
 
-export async function subscribeContact(
+export async function enrollContact(
   organizationId: string,
-  body: TopicSubscriptionModel.UnsubscribeBody,
-): Promise<TopicSubscriptionResponse> {
+  body: TopicEnrollmentModel.UnenrollBody,
+): Promise<TopicEnrollmentResponse> {
   const { contactId, topicId } = body;
 
   logger.info(
@@ -19,12 +19,12 @@ export async function subscribeContact(
       contactId,
       topicId,
     },
-    "Subscribing contact to topic",
+    "Enrolling contact in topic",
   );
 
   try {
-    // Find existing subscription
-    const existingSubscription = await db.query.topicSubscription.findFirst({
+    // Find existing enrollment
+    const existingEnrollment = await db.query.topicSubscription.findFirst({
       where: and(
         eq(schema.topicSubscription.contactId, contactId),
         eq(schema.topicSubscription.topicId, topicId),
@@ -33,35 +33,35 @@ export async function subscribeContact(
       ),
     });
 
-    if (!existingSubscription) {
+    if (!existingEnrollment) {
       logger.warn(
         { contactId, topicId },
-        "Subscription not found",
+        "Enrollment not found",
       );
-      throw status(404, { message: "Topic subscription not found" });
+      throw status(404, { message: "Topic enrollment not found" });
     }
 
-    // Update to subscribed
+    // Update to enrolled
     const [updated] = await db
       .update(schema.topicSubscription)
       .set({
-        status: "subscribed",
+        status: "enrolled",
         updatedAt: new Date(),
       })
-      .where(eq(schema.topicSubscription.id, existingSubscription.id))
+      .where(eq(schema.topicSubscription.id, existingEnrollment.id))
       .returning();
 
     if (!updated) {
-      throw new Error("Failed to update subscription");
+      throw new Error("Failed to update enrollment");
     }
 
     logger.info(
       {
-        subscriptionId: updated.id,
+        enrollmentId: updated.id,
         contactId,
         topicId,
       },
-      "Contact subscribed successfully",
+      "Contact enrolled successfully",
     );
 
     return updated;
@@ -72,7 +72,7 @@ export async function subscribeContact(
         topicId,
         error: error instanceof Error ? error.message : String(error),
       },
-      "Error subscribing contact",
+      "Error enrolling contact",
     );
     throw error;
   }
@@ -80,7 +80,8 @@ export async function subscribeContact(
 
 export async function subscribeContactHandler(
   organizationId: string,
-  body: TopicSubscriptionModel.UnsubscribeBody,
-): Promise<TopicSubscriptionResponse> {
-  return subscribeContact(organizationId, body);
+  body: TopicEnrollmentModel.UnenrollBody,
+): Promise<TopicEnrollmentResponse> {
+  return enrollContact(organizationId, body);
 }
+

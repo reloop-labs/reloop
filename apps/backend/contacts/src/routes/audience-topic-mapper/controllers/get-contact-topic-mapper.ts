@@ -1,44 +1,47 @@
-import type { TopicSubscriptionTypes } from "@be/contacts/types/topic-subscription.type";
+import type { TopicEnrollmentModel } from "@be/contacts/model/topic-enrollment.model";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
-export async function getTopicSubscription(
-  subscriptionId: string,
+type TopicEnrollmentResponse = TopicEnrollmentModel.TopicEnrollmentResponse;
+
+export async function getTopicEnrollment(
+  enrollmentId: string,
   organizationId: string,
-): Promise<TopicSubscriptionTypes.TopicSubscriptionResponse> {
+): Promise<TopicEnrollmentResponse> {
   try {
     const result = await db.query.topicSubscription.findFirst({
       where: and(
-        eq(schema.topicSubscription.id, subscriptionId),
+        eq(schema.topicSubscription.id, enrollmentId),
         eq(schema.topicSubscription.organizationId, organizationId),
         isNull(schema.topicSubscription.deletedAt),
       ),
     });
 
     if (!result) {
-      logger.warn({ subscriptionId }, "Topic subscription not found");
-      throw status(404, { message: "Topic subscription not found" });
+      logger.warn({ enrollmentId }, "Topic enrollment not found");
+      throw status(404, { message: "Topic enrollment not found" });
     }
 
     return result;
   } catch (error) {
     logger.error(
       {
-        subscriptionId,
+        enrollmentId,
         error: error instanceof Error ? error.message : String(error),
       },
-      "Error getting topic subscription",
+      "Error getting topic enrollment",
     );
     throw error;
   }
 }
 
 export async function getTopicSubscriptionHandler(
-  subscriptionId: string,
+  enrollmentId: string,
   organizationId: string,
-): Promise<TopicSubscriptionTypes.TopicSubscriptionResponse> {
-  return await getTopicSubscription(subscriptionId, organizationId);
+): Promise<TopicEnrollmentResponse> {
+  return await getTopicEnrollment(enrollmentId, organizationId);
 }
+

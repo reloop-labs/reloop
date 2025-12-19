@@ -1,28 +1,29 @@
 import { authMiddleware } from "@be/contacts/middleware/auth";
-import { TopicSubscriptionModel } from "@be/contacts/model/topic-subscription.model";
+import { TopicEnrollmentModel } from "@be/contacts/model/topic-enrollment.model";
 import { deleteTopicSubscriptionHandler } from "@be/contacts/routes/audience-topic-mapper/controllers/delete-contact-topic-mapper";
 import { Elysia, t } from "elysia";
 
-export const deleteTopicSubscriptionRoute = new Elysia().use(authMiddleware).delete(
-  "/:subscriptionId",
+export const deleteTopicEnrollmentRoute = new Elysia().use(authMiddleware).delete(
+  "/:enrollmentId",
   async ({ params, user }) => {
-    const { subscriptionId } = params;
-    return await deleteTopicSubscriptionHandler(subscriptionId, user.activeOrganizationId);
+    const { enrollmentId } = params;
+    return await deleteTopicSubscriptionHandler(enrollmentId, user.activeOrganizationId);
   },
   {
     auth: true,
     params: t.Object({
-      subscriptionId: t.String({ description: "Subscription ID" }),
+      enrollmentId: t.String({ description: "Enrollment ID" }),
     }),
     response: {
-      200: TopicSubscriptionModel.deleteResponse,
-      404: TopicSubscriptionModel.notFound,
-      403: TopicSubscriptionModel.unauthorized,
+      200: TopicEnrollmentModel.deleteResponse,
+      404: TopicEnrollmentModel.notFound,
+      403: TopicEnrollmentModel.unauthorized,
     },
     detail: {
-      tags: ["Topic Subscriptions"],
-      summary: "Delete a topic subscription",
-      description: "Soft deletes a topic subscription",
+      tags: ["Topic Enrollments"],
+      summary: "Delete a topic enrollment",
+      description: "Soft deletes a topic enrollment",
     },
   },
 );
+

@@ -48,6 +48,7 @@ export const topic = pgTable(
       .notNull()
       .defaultNow()
       .$onUpdate(() => new Date()),
+    deletedAt: timestamp("deleted_at"),
   },
   (table) => [
     index("topic_idx_organization_id").on(table.organizationId),
@@ -78,6 +79,7 @@ export const topicEnrollment = pgTable(
       .notNull()
       .defaultNow()
       .$onUpdate(() => new Date()),
+    deletedAt: timestamp("deleted_at"),
   },
   (table) => [
     index("topic_enrollment_idx_contact_id").on(table.contactId),
@@ -128,3 +130,8 @@ export type NewTopicEnrollment = typeof topicEnrollment.$inferInsert;
 export type Topic = typeof topic.$inferSelect;
 export type NewTopic = typeof topic.$inferInsert;
 
+// Backward compatibility aliases - TODO: Remove after migration
+export const topicSubscription = topicEnrollment;
+export const subscriptionStatusEnum = enrollmentStatusEnum;
+export type TopicSubscription = TopicEnrollment;
+export type NewTopicSubscription = NewTopicEnrollment;
