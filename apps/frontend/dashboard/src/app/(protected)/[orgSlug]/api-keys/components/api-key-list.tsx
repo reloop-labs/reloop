@@ -106,10 +106,8 @@ export const ApiKeyListSidebar = () => {
 			const matchesSearch =
 				searchQuery === "" ||
 				displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-				(apiKey.prefix &&
-					apiKey.prefix.toLowerCase().includes(searchQuery.toLowerCase())) ||
-				(apiKey.start &&
-					apiKey.start.toLowerCase().includes(searchQuery.toLowerCase()));
+				apiKey.prefix?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+				apiKey.start?.toLowerCase().includes(searchQuery.toLowerCase());
 			return matchesStatus && matchesCreator && matchesSearch;
 		}) || [];
 
