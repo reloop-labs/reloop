@@ -221,7 +221,6 @@ export const AddPropertyModal = ({ open, onOpenChange }: AddPropertyModalProps) 
                   <>
                     Add Property
                     <span className="inline-flex items-center gap-0.5">
-                      <Icon name="command" className="w-4 h-4 border rounded-sm p-px border-stroke-soft-100/20" />
                       <Icon name="enter" className="w-4 h-4 border rounded-sm p-px border-stroke-soft-100/20" />
                     </span>
                   </>

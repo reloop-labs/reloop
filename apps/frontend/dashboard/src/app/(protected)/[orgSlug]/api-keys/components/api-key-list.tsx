@@ -1,18 +1,21 @@
 "use client";
-import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { PageSizeDropdown } from "@fe/dashboard/components/page-size-dropdown";
 import { PaginationControls } from "@fe/dashboard/components/pagination-controls";
+import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import Link from "next/link";
+import { parseAsInteger, useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
-import { useQueryState, parseAsInteger } from "nuqs";
 import useSWR from "swr";
+import {
+	ApiKeyFilterDropdown,
+	type ApiKeyFilters,
+	type CreatedByUser,
+} from "./api-key-filter-dropdown";
 import { ApiKeyTable } from "./api-key-table";
 import { CreateApiKeyModal } from "./create-api-key-modal";
 import { EmptyState } from "./empty-state";
-import { ApiKeyFilterDropdown, type ApiKeyFilters, type CreatedByUser } from "./api-key-filter-dropdown";
 
 interface ApiKeyData {
 	id: string;
@@ -41,14 +44,25 @@ interface ApiKeyListResponse {
 
 export const ApiKeyListSidebar = () => {
 	const { activeOrganization } = useUserOrganization();
-	const [filters, setFilters] = useState<ApiKeyFilters>({ status: [], createdBy: [] });
+	const [filters, setFilters] = useState<ApiKeyFilters>({
+		status: [],
+		createdBy: [],
+	});
 	const [searchQuery, setSearchQuery] = useState<string>("");
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-	const [currentPage, setCurrentPage] = useQueryState("page", parseAsInteger.withDefault(1));
-	const [pageSize, setPageSize] = useQueryState("limit", parseAsInteger.withDefault(10));
+	const [currentPage, setCurrentPage] = useQueryState(
+		"page",
+		parseAsInteger.withDefault(1),
+	);
+	const [pageSize, setPageSize] = useQueryState(
+		"limit",
+		parseAsInteger.withDefault(10),
+	);
 
 	const { data, error, isLoading } = useSWR<ApiKeyListResponse>(
-		activeOrganization?.id ? `/api/api-key/v1/?limit=${pageSize}&page=${currentPage}` : null,
+		activeOrganization?.id
+			? `/api/api-key/v1/?limit=${pageSize}&page=${currentPage}`
+			: null,
 		{
 			revalidateOnFocus: true,
 			revalidateOnReconnect: true,
@@ -85,7 +99,8 @@ export const ApiKeyListSidebar = () => {
 
 			const matchesCreator =
 				filters.createdBy.length === 0 ||
-				(apiKey.createdBy?.id && filters.createdBy.includes(apiKey.createdBy.id));
+				(apiKey.createdBy?.id &&
+					filters.createdBy.includes(apiKey.createdBy.id));
 
 			const displayName = apiKey.name || apiKey.start || apiKey.prefix || "";
 			const matchesSearch =
@@ -162,10 +177,11 @@ export const ApiKeyListSidebar = () => {
 
 						{/* Pagination */}
 						{data && data.total > 0 && (
-							<div className="mt-4 pb-8 flex items-center justify-between text-paragraph-sm text-text-sub-600">
+							<div className="mt-4 flex items-center justify-between pb-8 text-paragraph-sm text-text-sub-600">
 								<div className="flex items-center gap-3">
 									<span>
-										Showing {startIndex}–{endIndex} of {data.total} API key{data.total !== 1 ? "s" : ""}
+										Showing {startIndex}–{endIndex} of {data.total} API key
+										{data.total !== 1 ? "s" : ""}
 									</span>
 									<PageSizeDropdown
 										value={pageSize}

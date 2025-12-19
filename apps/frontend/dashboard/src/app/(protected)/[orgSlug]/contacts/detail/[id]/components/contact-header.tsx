@@ -7,431 +7,472 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import {
-  Content as PopoverContent,
-  Root as PopoverRoot,
-  Trigger as PopoverTrigger,
+	Content as PopoverContent,
+	Root as PopoverRoot,
+	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
+import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
-import { useRouter } from "next/navigation";
-import { EditContactModal } from "../../../components/edit-contact-modal";
 import { DeleteContactModal } from "../../../components/delete-contact-modal";
+import { EditContactModal } from "../../../components/edit-contact-modal";
 
 interface ContactData {
-  id: string;
-  email: string;
-  firstName: string | null;
-  lastName: string | null;
-  status: string;
-  organizationId: string;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
+	id: string;
+	email: string;
+	firstName: string | null;
+	lastName: string | null;
+	status: string;
+	organizationId: string;
+	createdAt: string;
+	updatedAt: string;
+	deletedAt: string | null;
 }
 
 interface PropertyValueWithName {
-  id: string;
-  propertyId: string;
-  value: string;
-  name: string;
-  createdAt: string;
-  updatedAt: string;
+	id: string;
+	propertyId: string;
+	value: string;
+	name: string;
+	createdAt: string;
+	updatedAt: string;
 }
 
 interface ContactHeaderProps {
-  contact: ContactData | undefined;
-  isLoading: boolean;
-  propertyValues: PropertyValueWithName[];
+	contact: ContactData | undefined;
+	isLoading: boolean;
+	propertyValues: PropertyValueWithName[];
 }
 
 const getStatusColor = (status: string) => {
-  return status.toLowerCase() === "subscribed" ? "text-success-base" : "text-error-base";
+	return status.toLowerCase() === "subscribed"
+		? "text-success-base"
+		: "text-error-base";
 };
 
 const getStatusIcon = (status: string) => {
-  return status.toLowerCase() === "subscribed" ? "check-circle" : "cross-circle";
+	return status.toLowerCase() === "subscribed"
+		? "check-circle"
+		: "cross-circle";
 };
 
 const getStatusBadgeStyles = (status: string) => {
-  switch (status.toLowerCase()) {
-    case "subscribed":
-      return "border border-success-base text-success-base bg-success-light/20";
-    case "unsubscribed":
-      return "border border-error-base text-error-base bg-error-light/20";
-    default:
-      return "border border-stroke-soft-200 text-text-sub-600 bg-neutral-alpha-10";
-  }
+	switch (status.toLowerCase()) {
+		case "subscribed":
+			return "border border-success-base text-success-base bg-success-light/20";
+		case "unsubscribed":
+			return "border border-error-base text-error-base bg-error-light/20";
+		default:
+			return "border border-stroke-soft-200 text-text-sub-600 bg-neutral-alpha-10";
+	}
 };
 
 const formatStatusLabel = (status: string) => {
-  switch (status.toLowerCase()) {
-    case "subscribed":
-      return "Subscribed";
-    case "unsubscribed":
-      return "Unsubscribed";
-    default:
-      return status;
-  }
+	switch (status.toLowerCase()) {
+		case "subscribed":
+			return "Subscribed";
+		case "unsubscribed":
+			return "Unsubscribed";
+		default:
+			return status;
+	}
 };
 
 // Convert camelCase to Title Case (e.g., "firstName" -> "FIRST NAME")
 const formatPropertyName = (name: string) => {
-  return name
-    .replace(/([A-Z])/g, ' $1')
-    .replace(/^./, str => str.toUpperCase())
-    .toUpperCase()
-    .trim();
+	return name
+		.replace(/([A-Z])/g, " $1")
+		.replace(/^./, (str) => str.toUpperCase())
+		.toUpperCase()
+		.trim();
 };
 
 const headerMenuItems = [
-  { id: "edit", label: "Edit contact", icon: "edit" as const, isDanger: false },
-  { id: "delete", label: "Delete contact", icon: "trash" as const, isDanger: true },
+	{ id: "edit", label: "Edit contact", icon: "edit" as const, isDanger: false },
+	{
+		id: "delete",
+		label: "Delete contact",
+		icon: "trash" as const,
+		isDanger: true,
+	},
 ];
 
 export const ContactHeader = ({
-  contact,
-  isLoading,
-  propertyValues,
+	contact,
+	isLoading,
+	propertyValues,
 }: ContactHeaderProps) => {
-  const { push, activeOrganization } = useUserOrganization();
-  const router = useRouter();
-  const { mutate } = useSWRConfig();
-  const [copied, setCopied] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
-  const buttonRefs = useRef<HTMLButtonElement[]>([]);
+	const { push, activeOrganization } = useUserOrganization();
+	const router = useRouter();
+	const { mutate } = useSWRConfig();
+	const [copied, setCopied] = useState(false);
+	const [isDeleting, setIsDeleting] = useState(false);
+	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
+	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 
-  const currentTab = buttonRefs.current[hoverIdx ?? -1];
-  const currentRect = currentTab?.getBoundingClientRect();
-  const hoveredItem = headerMenuItems[hoverIdx ?? -1];
-  const isDanger = hoveredItem?.isDanger ?? false;
+	const currentTab = buttonRefs.current[hoverIdx ?? -1];
+	const currentRect = currentTab?.getBoundingClientRect();
+	const hoveredItem = headerMenuItems[hoverIdx ?? -1];
+	const isDanger = hoveredItem?.isDanger ?? false;
 
-  const handleCopyId = async () => {
-    if (contact?.id) {
-      try {
-        await navigator.clipboard.writeText(contact.id);
-        toast.success("Contact ID copied to clipboard");
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-      } catch {
-        toast.error("Failed to copy ID");
-      }
-    }
-  };
+	const handleCopyId = async () => {
+		if (contact?.id) {
+			try {
+				await navigator.clipboard.writeText(contact.id);
+				toast.success("Contact ID copied to clipboard");
+				setCopied(true);
+				setTimeout(() => setCopied(false), 2000);
+			} catch {
+				toast.error("Failed to copy ID");
+			}
+		}
+	};
 
-  const handleDelete = async () => {
-    if (!contact) return;
+	const handleDelete = async () => {
+		if (!contact) return;
 
-    try {
-      setIsDeleting(true);
-      const response = await fetch(`/api/contacts/v1/contacts/delete/${contact.id}`, {
-        method: "DELETE",
-      });
+		try {
+			setIsDeleting(true);
+			const response = await fetch(
+				`/api/contacts/v1/contacts/delete/${contact.id}`,
+				{
+					method: "DELETE",
+				},
+			);
 
-      if (!response.ok) {
-        throw new Error("Failed to delete contact");
-      }
+			if (!response.ok) {
+				throw new Error("Failed to delete contact");
+			}
 
-      toast.success("Contact deleted");
-      await mutate((key: string) => typeof key === "string" && key.includes("/api/contacts/v1/contacts"));
+			toast.success("Contact deleted");
+			await mutate(
+				(key: string) =>
+					typeof key === "string" && key.includes("/api/contacts/v1/contacts"),
+			);
 
-      // Navigate back to contacts list
-      if (activeOrganization?.slug) {
-        router.push(`/${activeOrganization.slug}/contacts`);
-      }
-    } catch (error) {
-      console.error("Failed to delete contact:", error);
-      toast.error("Failed to delete contact");
-    } finally {
-      setIsDeleting(false);
-    }
-  };
+			// Navigate back to contacts list
+			if (activeOrganization?.slug) {
+				router.push(`/${activeOrganization.slug}/contacts`);
+			}
+		} catch (error) {
+			console.error("Failed to delete contact:", error);
+			toast.error("Failed to delete contact");
+		} finally {
+			setIsDeleting(false);
+		}
+	};
 
-  const handleDeleteSuccess = () => {
-    toast.success("Contact deleted");
-    // Navigate back to contacts list
-    if (activeOrganization?.slug) {
-      router.push(`/${activeOrganization.slug}/contacts`);
-    }
-  };
+	const handleDeleteSuccess = () => {
+		toast.success("Contact deleted");
+		// Navigate back to contacts list
+		if (activeOrganization?.slug) {
+			router.push(`/${activeOrganization.slug}/contacts`);
+		}
+	};
 
-  const handleMenuItemClick = (itemId: string) => {
-    if (itemId === "edit") {
-      setIsEditModalOpen(true);
-    } else if (itemId === "delete") {
-      setIsDeleteModalOpen(true);
-    }
-  };
+	const handleMenuItemClick = (itemId: string) => {
+		if (itemId === "edit") {
+			setIsEditModalOpen(true);
+		} else if (itemId === "delete") {
+			setIsDeleteModalOpen(true);
+		}
+	};
 
-  if (!contact && !isLoading) {
-    return (
-      <div className="pt-10 pb-8">
-        <AnimatedBackButton onClick={() => push("/contacts")} />
-        <div className="flex items-center justify-between pt-6">
-          <div>
-            <div className="flex items-center gap-1.5">
-              <p className="font-medium text-paragraph-xs text-text-sub-600">
-                Contact{" "}
-              </p>
-              <p className="font-semibold text-paragraph-xs text-text-sub-600">
-                •
-              </p>
-              <p className="font-medium text-paragraph-xs text-text-sub-600">
-                ---
-              </p>
-              <p className="font-semibold text-paragraph-xs text-text-sub-600">
-                •
-              </p>
-              <div className="flex items-center gap-1 text-error-base">
-                <Icon name="alert-circle" className="h-3.5 w-3.5" />
-                <p className="font-medium text-paragraph-xs">Not found</p>
-              </div>
-            </div>
-            <h1 className="font-medium text-title-h6 leading-8">
-              Contact not found
-            </h1>
-          </div>
-        </div>
-      </div>
-    );
-  }
+	if (!contact && !isLoading) {
+		return (
+			<div className="pt-10 pb-8">
+				<AnimatedBackButton onClick={() => push("/contacts")} />
+				<div className="flex items-center justify-between pt-6">
+					<div>
+						<div className="flex items-center gap-1.5">
+							<p className="font-medium text-paragraph-xs text-text-sub-600">
+								Contact{" "}
+							</p>
+							<p className="font-semibold text-paragraph-xs text-text-sub-600">
+								•
+							</p>
+							<p className="font-medium text-paragraph-xs text-text-sub-600">
+								---
+							</p>
+							<p className="font-semibold text-paragraph-xs text-text-sub-600">
+								•
+							</p>
+							<div className="flex items-center gap-1 text-error-base">
+								<Icon name="alert-circle" className="h-3.5 w-3.5" />
+								<p className="font-medium text-paragraph-xs">Not found</p>
+							</div>
+						</div>
+						<h1 className="font-medium text-title-h6 leading-8">
+							Contact not found
+						</h1>
+					</div>
+				</div>
+			</div>
+		);
+	}
 
-  return (
-    <>
-      <div className="pt-10 pb-8">
-        <AnimatedBackButton onClick={() => push("/contacts")} />
-        <div className="flex items-center justify-between pt-6">
-          <div>
-            {isLoading ? (
-              <div className="flex items-center gap-1.5">
-                <Skeleton className="h-4 w-12 rounded-full" />
-                <Skeleton className="h-1 w-1 rounded-full" />
-                <Skeleton className="h-4 w-20 rounded-full" />
-                <Skeleton className="h-1 w-1 rounded-full" />
-                <div className="flex items-center gap-1">
-                  <Skeleton className="h-3.5 w-3.5 rounded-full" />
-                  <Skeleton className="h-4 w-16 rounded-full" />
-                </div>
-              </div>
-            ) : (
-              <div className="flex items-center gap-1.5">
-                <p className="font-medium text-paragraph-xs text-text-sub-600">
-                  Contact{" "}
-                </p>
-                <p className="font-semibold text-paragraph-xs text-text-sub-600">
-                  •
-                </p>
-                <p className="font-medium text-paragraph-xs text-text-sub-600">
-                  {contact?.createdAt
-                    ? formatRelativeTime(contact.createdAt)
-                    : "---"}
-                </p>
-                <p className="font-semibold text-paragraph-xs text-text-sub-600">
-                  •
-                </p>
-                <div
-                  className={`flex items-center gap-1 ${getStatusColor(contact?.status || "")}`}
-                >
-                  <Icon
-                    name={getStatusIcon(contact?.status || "")}
-                    className="h-3.5 w-3.5"
-                  />
-                  <p className="font-medium text-paragraph-xs">
-                    {formatStatusLabel(contact?.status || "")}
-                  </p>
-                </div>
-              </div>
-            )}
-            {isLoading ? (
-              <Skeleton className="mt-2 h-7 w-48 rounded-lg" />
-            ) : (
-              <div className="flex items-center gap-2">
-                <div className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-white text-xs uppercase tracking-wide shadow-sm">
-                  {contact?.email.charAt(0).toUpperCase()}
+	return (
+		<>
+			<div className="pt-10 pb-8">
+				<AnimatedBackButton onClick={() => push("/contacts")} />
+				<div className="flex items-center justify-between pt-6">
+					<div>
+						{isLoading ? (
+							<div className="flex items-center gap-1.5">
+								<Skeleton className="h-4 w-12 rounded-full" />
+								<Skeleton className="h-1 w-1 rounded-full" />
+								<Skeleton className="h-4 w-20 rounded-full" />
+								<Skeleton className="h-1 w-1 rounded-full" />
+								<div className="flex items-center gap-1">
+									<Skeleton className="h-3.5 w-3.5 rounded-full" />
+									<Skeleton className="h-4 w-16 rounded-full" />
+								</div>
+							</div>
+						) : (
+							<div className="flex items-center gap-1.5">
+								<p className="font-medium text-paragraph-xs text-text-sub-600">
+									Contact{" "}
+								</p>
+								<p className="font-semibold text-paragraph-xs text-text-sub-600">
+									•
+								</p>
+								<p className="font-medium text-paragraph-xs text-text-sub-600">
+									{contact?.createdAt
+										? formatRelativeTime(contact.createdAt)
+										: "---"}
+								</p>
+								<p className="font-semibold text-paragraph-xs text-text-sub-600">
+									•
+								</p>
+								<div
+									className={`flex items-center gap-1 ${getStatusColor(contact?.status || "")}`}
+								>
+									<Icon
+										name={getStatusIcon(contact?.status || "")}
+										className="h-3.5 w-3.5"
+									/>
+									<p className="font-medium text-paragraph-xs">
+										{formatStatusLabel(contact?.status || "")}
+									</p>
+								</div>
+							</div>
+						)}
+						{isLoading ? (
+							<Skeleton className="mt-2 h-7 w-48 rounded-lg" />
+						) : (
+							<div className="flex items-center gap-1">
+								<div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-white text-xs uppercase tracking-wide shadow-sm">
+									{contact?.email.charAt(0).toUpperCase()}
+								</div>
+								<h1 className="font-medium text-title-h6 leading-8">
+									{contact?.email}
+								</h1>
+							</div>
+						)}
+					</div>
 
-                </div>
-                <h1 className="font-medium text-title-h6 leading-8">{contact?.email}</h1>
-              </div>
-            )}
-          </div>
+					<div className="flex items-center gap-2">
+						{isLoading ? (
+							<Skeleton className="h-9 w-9 rounded-lg" />
+						) : contact ? (
+							<PopoverRoot>
+								<PopoverTrigger asChild>
+									<Button.Root variant="neutral" mode="stroke" size="xsmall">
+										<Icon
+											name="more-vertical"
+											className="h-3.5 w-3.5 text-text-sub-600"
+										/>
+									</Button.Root>
+								</PopoverTrigger>
+								<PopoverContent
+									align="end"
+									sideOffset={8}
+									className="w-44 rounded-xl p-1.5"
+									showArrow
+								>
+									<div className="relative">
+										{headerMenuItems.map((item, idx) => (
+											<button
+												key={item.id}
+												ref={(el) => {
+													if (el) buttonRefs.current[idx] = el;
+												}}
+												type="button"
+												onPointerEnter={() => setHoverIdx(idx)}
+												onPointerLeave={() => setHoverIdx(undefined)}
+												onClick={() => handleMenuItemClick(item.id)}
+												disabled={item.id === "delete" && isDeleting}
+												className={cn(
+													"flex w-full cursor-pointer items-center gap-2 rounded-lg py-1.5 pl-2 font-normal text-xs transition-colors",
+													item.isDanger
+														? "text-error-base"
+														: "text-text-strong-950",
+													!currentRect &&
+														hoverIdx === idx &&
+														(item.isDanger
+															? "bg-red-alpha-10"
+															: "bg-neutral-alpha-10"),
+												)}
+											>
+												<Icon
+													name={item.icon}
+													className={cn(
+														"h-4 w-4",
+														item.isDanger ? "" : "text-text-sub-600",
+													)}
+												/>
+												<span>{item.label}</span>
+											</button>
+										))}
+										<AnimatedHoverBackground
+											rect={currentRect}
+											tabElement={currentTab}
+											isDanger={isDanger}
+										/>
+									</div>
+								</PopoverContent>
+							</PopoverRoot>
+						) : null}
+					</div>
+				</div>
 
-          <div className="flex items-center gap-2">
-            {isLoading ? (
-              <>
-                <Skeleton className="h-9 w-9 rounded-lg" />
-              </>
-            ) : contact ? (
-              <>
-                <PopoverRoot>
-                  <PopoverTrigger asChild>
-                    <Button.Root variant="neutral" mode="stroke" size="xsmall">
-                      <Icon name="more-vertical" className="h-3.5 w-3.5 text-text-sub-600" />
-                    </Button.Root>
-                  </PopoverTrigger>
-                  <PopoverContent align="end" sideOffset={8} className="w-44 p-1.5 rounded-xl" showArrow>
-                    <div className="relative">
-                      {headerMenuItems.map((item, idx) => (
-                        <button
-                          key={item.id}
-                          ref={(el) => {
-                            if (el) buttonRefs.current[idx] = el;
-                          }}
-                          type="button"
-                          onPointerEnter={() => setHoverIdx(idx)}
-                          onPointerLeave={() => setHoverIdx(undefined)}
-                          onClick={() => handleMenuItemClick(item.id)}
-                          disabled={item.id === "delete" && isDeleting}
-                          className={cn(
-                            "flex w-full cursor-pointer items-center gap-2 rounded-lg pl-2 py-1.5 text-xs font-normal transition-colors",
-                            item.isDanger ? "text-error-base" : "text-text-strong-950",
-                            !currentRect && hoverIdx === idx && (item.isDanger ? "bg-red-alpha-10" : "bg-neutral-alpha-10")
-                          )}
-                        >
-                          <Icon
-                            name={item.icon}
-                            className={cn("h-3.5 w-3.5", item.isDanger ? "" : "text-text-sub-600")}
-                          />
-                          <span>{item.label}</span>
-                        </button>
-                      ))}
-                      <AnimatedHoverBackground
-                        rect={currentRect}
-                        tabElement={currentTab}
-                        isDanger={isDanger}
-                      />
-                    </div>
-                  </PopoverContent>
-                </PopoverRoot>
-              </>
-            ) : null}
-          </div>
-        </div>
+				{/* Stats Grid */}
+				<div className="mt-10 grid grid-cols-[1fr_1fr_1fr] gap-x-12 gap-y-12">
+					{/* Created */}
+					<div className="flex flex-col gap-1.5">
+						<div className="flex items-center gap-1.5">
+							<Icon name="calendar" className="h-3.5 w-3.5 text-text-sub-600" />
+							<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
+								Created
+							</span>
+						</div>
+						{isLoading ? (
+							<Skeleton className="h-5 w-24 rounded-lg" />
+						) : (
+							<span className="font-medium text-paragraph-sm text-text-strong-950">
+								{contact?.createdAt
+									? formatRelativeTime(contact.createdAt)
+									: "---"}
+							</span>
+						)}
+					</div>
 
-        {/* Stats Grid */}
-        <div className="mt-10 grid grid-cols-[1fr_1fr_1fr] gap-y-12 gap-x-12">
-          {/* Created */}
-          <div className="flex flex-col gap-1.5">
-            <div className="flex items-center gap-1.5">
-              <Icon name="calendar" className="h-3.5 w-3.5 text-text-sub-600" />
-              <span className="text-[10px] font-medium uppercase tracking-wider text-text-sub-600">
-                Created
-              </span>
-            </div>
-            {isLoading ?
-              <Skeleton className="h-5 w-24 rounded-lg" />
-              : <span className="font-medium text-paragraph-sm text-text-strong-950">
-                {contact?.createdAt
-                  ? formatRelativeTime(contact.createdAt)
-                  : "---"}
-              </span>}
-          </div>
+					{/* Status */}
+					<div className="flex flex-col gap-1.5">
+						<div className="flex items-center gap-1.5">
+							<Icon
+								name="check-circle"
+								className="h-3.5 w-3.5 text-text-sub-600"
+							/>
+							<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
+								Status
+							</span>
+						</div>
+						{isLoading ? (
+							<Skeleton className="h-5 w-20 rounded-lg" />
+						) : (
+							<span
+								className={cn(
+									"inline-flex w-fit rounded-md border-[1px] px-[6px] py-0.5 font-medium text-[10px]",
+									getStatusBadgeStyles(contact?.status || ""),
+								)}
+							>
+								{formatStatusLabel(contact?.status || "")}
+							</span>
+						)}
+					</div>
 
-          {/* Status */}
-          <div className="flex flex-col gap-1.5">
-            <div className="flex items-center gap-1.5">
-              <Icon name="check-circle" className="h-3.5 w-3.5 text-text-sub-600" />
-              <span className="text-[10px] font-medium uppercase tracking-wider text-text-sub-600">
-                Status
-              </span>
-            </div>
-            {isLoading ?
-              <Skeleton className="h-5 w-20 rounded-lg" />
-              : <span className={cn(
-                "inline-flex w-fit rounded-md px-[6px] py-0.5 text-[10px] font-medium border-[1px]",
-                getStatusBadgeStyles(contact?.status || "")
-              )}>
-                {formatStatusLabel(contact?.status || "")}
-              </span>}
-          </div>
+					{/* Contact ID */}
+					<div className="flex flex-col gap-1.5">
+						<div className="flex items-center gap-1.5">
+							<Icon name="hash" className="h-3.5 w-3.5 text-text-sub-600" />
+							<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
+								Contact ID
+							</span>
+						</div>
+						{isLoading ? (
+							<Skeleton className="h-6 w-28 rounded-lg" />
+						) : (
+							<button
+								className="group/copy flex w-fit cursor-pointer items-center gap-1.5"
+								type="button"
+								onClick={handleCopyId}
+							>
+								<code className="rounded bg-neutral-alpha-10 px-2 py-1 font-medium font-mono text-text-strong-950 text-xs">
+									{contact?.id}
+								</code>
+								<Icon
+									name={copied ? "check" : "copy"}
+									className={cn(
+										"h-3 w-3 flex-shrink-0 transition-all",
+										copied ? "text-success-base" : "text-text-sub-600",
+									)}
+								/>
+							</button>
+						)}
+					</div>
+				</div>
 
-          {/* Contact ID */}
-          <div className="flex flex-col gap-1.5">
-            <div className="flex items-center gap-1.5">
-              <Icon name="hash" className="h-3.5 w-3.5 text-text-sub-600" />
-              <span className="text-[10px] font-medium uppercase tracking-wider text-text-sub-600">
-                Contact ID
-              </span>
-            </div>
-            {isLoading ?
-              <Skeleton className="h-6 w-28 rounded-lg" />
-              : <div
-                className="flex items-center gap-1.5 group/copy cursor-pointer w-fit"
-                onClick={handleCopyId}
-              >
-                <code className="rounded bg-neutral-alpha-10 px-2 py-1 font-mono text-xs font-medium text-text-strong-950">
-                  {contact?.id}
-                </code>
-                <Icon
-                  name={copied ? "check" : "copy"}
-                  className={cn(
-                    "h-3 w-3 transition-all flex-shrink-0",
-                    copied
-                      ? "text-success-base"
-                      : "text-text-sub-600 opacity-0 group-hover/copy:opacity-100"
-                  )}
-                />
-              </div>}
-          </div>
-        </div>
+				{/* Properties Section - All in one grid */}
+				<div className="mt-12">
+					<h3 className="mb-4 font-medium text-paragraph-sm text-text-strong-950">
+						Properties
+					</h3>
+					<div className="grid grid-cols-4 gap-x-8 gap-y-8">
+						{/* System Properties */}
+						<div className="flex flex-col gap-1">
+							<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
+								FIRST NAME
+							</span>
+							<span className="font-medium text-paragraph-sm text-text-strong-950">
+								{contact?.firstName || "-"}
+							</span>
+						</div>
+						<div className="flex flex-col gap-1">
+							<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
+								LAST NAME
+							</span>
+							<span className="font-medium text-paragraph-sm text-text-strong-950">
+								{contact?.lastName || "-"}
+							</span>
+						</div>
+						{/* Custom Properties */}
+						{propertyValues.map((pv) => (
+							<div key={pv.id} className="flex flex-col gap-1">
+								<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
+									{formatPropertyName(pv.name)}
+								</span>
+								<span className="font-medium text-paragraph-sm text-text-strong-950">
+									{pv.value || "-"}
+								</span>
+							</div>
+						))}
+					</div>
+				</div>
+			</div>
 
-        {/* Properties Section - All in one grid */}
-        <div className="mt-12">
-          <h3 className="mb-4 font-medium text-paragraph-sm text-text-strong-950">Properties</h3>
-          <div className="grid grid-cols-4 gap-x-8 gap-y-8">
-            {/* System Properties */}
-            <div className="flex flex-col gap-1">
-              <span className="text-[10px] font-medium uppercase tracking-wider text-text-sub-600">
-                FIRST NAME
-              </span>
-              <span className="font-medium text-paragraph-sm text-text-strong-950">
-                {contact?.firstName || "-"}
-              </span>
-            </div>
-            <div className="flex flex-col gap-1">
-              <span className="text-[10px] font-medium uppercase tracking-wider text-text-sub-600">
-                LAST NAME
-              </span>
-              <span className="font-medium text-paragraph-sm text-text-strong-950">
-                {contact?.lastName || "-"}
-              </span>
-            </div>
-            {/* Custom Properties */}
-            {propertyValues.map((pv) => (
-              <div key={pv.id} className="flex flex-col gap-1">
-                <span className="text-[10px] font-medium uppercase tracking-wider text-text-sub-600">
-                  {formatPropertyName(pv.name)}
-                </span>
-                <span className="font-medium text-paragraph-sm text-text-strong-950">
-                  {pv.value || "-"}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+			{/* Edit Contact Modal */}
+			{contact && (
+				<EditContactModal
+					open={isEditModalOpen}
+					onOpenChange={setIsEditModalOpen}
+					contact={contact}
+				/>
+			)}
 
-      {/* Edit Contact Modal */}
-      {contact && (
-        <EditContactModal
-          open={isEditModalOpen}
-          onOpenChange={setIsEditModalOpen}
-          contact={contact}
-        />
-      )}
-
-      {/* Delete Contact Modal */}
-      {contact && (
-        <DeleteContactModal
-          open={isDeleteModalOpen}
-          onOpenChange={setIsDeleteModalOpen}
-          contact={contact}
-          onDeleteSuccess={handleDeleteSuccess}
-        />
-      )}
-    </>
-  );
+			{/* Delete Contact Modal */}
+			{contact && (
+				<DeleteContactModal
+					open={isDeleteModalOpen}
+					onOpenChange={setIsDeleteModalOpen}
+					contact={contact}
+					onDeleteSuccess={handleDeleteSuccess}
+				/>
+			)}
+		</>
+	);
 };
