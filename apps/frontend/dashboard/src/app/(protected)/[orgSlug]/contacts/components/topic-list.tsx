@@ -4,10 +4,10 @@ import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import Link from "next/link";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useState } from "react";
 import useSWR from "swr";
+import { CreateTopicModal } from "./create-topic-modal";
 import { DeleteTopicModal } from "./delete-topic";
 import { EmptyState } from "./empty-state";
 import { TopicTable } from "./topic-table";
@@ -36,6 +36,7 @@ interface TopicListProps {
 export const TopicList = ({ hideHeader = false }: TopicListProps) => {
 	const { activeOrganization } = useUserOrganization();
 	const [searchQuery, setSearchQuery] = useState<string>("");
+	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 	const [currentPage, setCurrentPage] = useQueryState(
 		"page",
 		parseAsInteger.withDefault(1),
@@ -77,16 +78,14 @@ export const TopicList = ({ hideHeader = false }: TopicListProps) => {
 						Topic{data?.topics.length !== 1 ? "s" : ""}
 					</p>
 					<div className="flex items-center gap-2">
-						<Link
-							className={Button.buttonVariants({
-								variant: "neutral",
-								size: "xsmall",
-							}).root()}
-							href={`/${activeOrganization.slug}/topics/add`}
+						<Button.Root
+							variant="neutral"
+							size="xsmall"
+							onClick={() => setIsCreateModalOpen(true)}
 						>
 							<Icon name="plus" className="h-4 w-4" />
 							Create topic
-						</Link>
+						</Button.Root>
 					</div>
 				</div>
 			)}
@@ -99,7 +98,7 @@ export const TopicList = ({ hideHeader = false }: TopicListProps) => {
 						</p>
 					</div>
 				) : data?.topics && data.topics.length === 0 ? (
-					<EmptyState />
+					<EmptyState onCreateClick={() => setIsCreateModalOpen(true)} />
 				) : (
 					<div>
 						<div className="mt-10 flex items-center gap-3">
@@ -179,6 +178,10 @@ export const TopicList = ({ hideHeader = false }: TopicListProps) => {
 				)}
 			</div>
 			<DeleteTopicModal topics={data?.topics || []} />
+			<CreateTopicModal
+				open={isCreateModalOpen}
+				onOpenChange={setIsCreateModalOpen}
+			/>
 		</div>
 	);
 };

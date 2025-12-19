@@ -1,9 +1,7 @@
 "use client";
-import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import { motion, type Variants } from "motion/react";
-import Link from "next/link";
 
 // Animation variants with proper typing
 const floatOrbVariants: Variants = {
@@ -68,9 +66,11 @@ const fadeInUpVariants: Variants = {
 	}),
 };
 
-export const EmptyState = () => {
-	const { activeOrganization } = useUserOrganization();
+interface EmptyStateProps {
+	onCreateClick?: () => void;
+}
 
+export const EmptyState = ({ onCreateClick }: EmptyStateProps) => {
 	return (
 		<motion.div
 			className="flex h-[calc(100dvh-300px)] flex-col items-center justify-center"
@@ -186,16 +186,10 @@ export const EmptyState = () => {
 					animate="visible"
 					custom={0.45}
 				>
-					<Link
-						href={`/${activeOrganization.slug}/contacts/add`}
-						className={Button.buttonVariants({
-							variant: "neutral",
-							size: "small",
-						}).root()}
-					>
+					<Button.Root variant="neutral" size="small" onClick={onCreateClick}>
 						<Icon name="plus" className="h-4 w-4" />
 						Create your first topic
-					</Link>
+					</Button.Root>
 				</motion.div>
 
 				{/* Help link */}
