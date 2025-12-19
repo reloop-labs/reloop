@@ -7,7 +7,6 @@ import { Skeleton } from "@reloop/ui/skeleton";
 import { AnimatePresence, motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { contact } from "../../../../../../../../../packages/db/src/schema/contact";
 import { ContactDropdown } from "./contact-dropdown";
 import { DeleteContactModal } from "./delete-contact-modal";
 import { EditContactModal } from "./edit-contact-modal";

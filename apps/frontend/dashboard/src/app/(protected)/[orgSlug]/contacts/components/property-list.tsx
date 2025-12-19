@@ -2,7 +2,6 @@
 
 import { PageSizeDropdown } from "@fe/dashboard/components/page-size-dropdown";
 import { PaginationControls } from "@fe/dashboard/components/pagination-controls";
-import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import { useQueryState } from "nuqs";

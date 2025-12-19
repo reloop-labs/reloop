@@ -15,7 +15,6 @@ import { Skeleton } from "@reloop/ui/skeleton";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
-import { useSWRConfig } from "swr";
 import { DeleteContactModal } from "../../../components/delete-contact-modal";
 import { EditContactModal } from "../../../components/edit-contact-modal";
 
@@ -106,9 +105,7 @@ export const ContactHeader = ({
 }: ContactHeaderProps) => {
 	const { push, activeOrganization } = useUserOrganization();
 	const router = useRouter();
-	const { mutate } = useSWRConfig();
 	const [copied, setCopied] = useState(false);
-	const [isDeleting, setIsDeleting] = useState(false);
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
@@ -129,40 +126,6 @@ export const ContactHeader = ({
 			} catch {
 				toast.error("Failed to copy ID");
 			}
-		}
-	};
-
-	const handleDelete = async () => {
-		if (!contact) return;
-
-		try {
-			setIsDeleting(true);
-			const response = await fetch(
-				`/api/contacts/v1/contacts/delete/${contact.id}`,
-				{
-					method: "DELETE",
-				},
-			);
-
-			if (!response.ok) {
-				throw new Error("Failed to delete contact");
-			}
-
-			toast.success("Contact deleted");
-			await mutate(
-				(key: string) =>
-					typeof key === "string" && key.includes("/api/contacts/v1/contacts"),
-			);
-
-			// Navigate back to contacts list
-			if (activeOrganization?.slug) {
-				router.push(`/${activeOrganization.slug}/contacts`);
-			}
-		} catch (error) {
-			console.error("Failed to delete contact:", error);
-			toast.error("Failed to delete contact");
-		} finally {
-			setIsDeleting(false);
 		}
 	};
 
@@ -305,7 +268,6 @@ export const ContactHeader = ({
 												onPointerEnter={() => setHoverIdx(idx)}
 												onPointerLeave={() => setHoverIdx(undefined)}
 												onClick={() => handleMenuItemClick(item.id)}
-												disabled={item.id === "delete" && isDeleting}
 												className={cn(
 													"flex w-full cursor-pointer items-center gap-2 rounded-lg py-1.5 pl-2 font-normal text-xs transition-colors",
 													item.isDanger
