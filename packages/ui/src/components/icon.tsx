@@ -1067,6 +1067,15 @@ export const IconsSprite = () => (
 					strokeLinejoin="round"
 				/>
 			</symbol>
+			<symbol viewBox="0 0 24 24" fill="none" id="menu">
+				<path
+					d="M3 6H21M3 12H21M3 18H21"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
 			<symbol viewBox="0 0 24 24" fill="none" id="align-top-2">
 				<rect
 					opacity="0.12"
