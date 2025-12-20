@@ -35,6 +35,7 @@ interface TopicTableProps {
 		topicId: string,
 		currentValue: "private" | "public",
 	) => void;
+	onEdit?: (topicId: string) => void;
 }
 
 // Badge styles matching the "Admin"/"Member" style from the image
@@ -59,6 +60,7 @@ export const TopicTable = ({
 	loadingRows = 4,
 	onToggleEnrollment,
 	onToggleVisibility,
+	onEdit,
 }: TopicTableProps) => {
 	const [, setDeleteId] = useQueryState("delete");
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
@@ -244,6 +246,7 @@ export const TopicTable = ({
 													autoEnroll={topic.autoEnroll}
 													visibility={topic.visibility}
 													onViewDetails={handleViewDetails}
+													onEdit={onEdit}
 													onDelete={handleDelete}
 													onToggleEnrollment={onToggleEnrollment}
 													onToggleVisibility={onToggleVisibility}

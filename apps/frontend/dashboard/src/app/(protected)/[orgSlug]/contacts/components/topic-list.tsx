@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import useSWR, { useSWRConfig } from "swr";
 import { CreateTopicModal } from "./create-topic-modal";
 import { DeleteTopicModal } from "./delete-topic";
+import { EditTopicModal } from "./edit-topic-modal";
 import { EmptyState } from "./empty-state";
 import { TopicTable } from "./topic-table";
 
@@ -42,6 +43,7 @@ export const TopicList = ({ hideHeader = false }: TopicListProps) => {
 	const { mutate } = useSWRConfig();
 	const [searchQuery, setSearchQuery] = useState<string>("");
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+	const [editTopicId, setEditTopicId] = useState<string | null>(null);
 	const [currentPage, setCurrentPage] = useQueryState(
 		"page",
 		parseAsInteger.withDefault(1),
@@ -177,6 +179,7 @@ export const TopicList = ({ hideHeader = false }: TopicListProps) => {
 								loadingRows={4}
 								onToggleEnrollment={handleToggleEnrollment}
 								onToggleVisibility={handleToggleVisibility}
+								onEdit={(topicId) => setEditTopicId(topicId)}
 							/>
 						</div>
 
@@ -211,6 +214,11 @@ export const TopicList = ({ hideHeader = false }: TopicListProps) => {
 			<CreateTopicModal
 				open={isCreateModalOpen}
 				onOpenChange={setIsCreateModalOpen}
+			/>
+			<EditTopicModal
+				open={!!editTopicId}
+				onOpenChange={(open) => !open && setEditTopicId(null)}
+				topic={data?.topics?.find((t) => t.id === editTopicId) || null}
 			/>
 		</div>
 	);

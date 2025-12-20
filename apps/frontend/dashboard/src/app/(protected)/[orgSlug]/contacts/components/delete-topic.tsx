@@ -57,10 +57,14 @@ export const DeleteTopicModal = ({ topics }: DeleteTopicModalProps) => {
 
 		setIsDeleting(true);
 		try {
-			await axios.delete(`/api/contacts/v1/topics/delete/${topicToDelete.id}`, {
+			await axios.delete(`/api/contacts/v1/topics/${topicToDelete.id}`, {
 				withCredentials: true,
 			});
-			await mutate("/api/contacts/v1/topics/list?limit=100");
+			await mutate(
+				(key: string) =>
+					typeof key === "string" &&
+					key.startsWith("/api/contacts/v1/topics/list"),
+			);
 
 			toast.success(`${topicToDelete.name} deleted successfully`);
 			handleClose();

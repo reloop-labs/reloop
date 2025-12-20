@@ -16,6 +16,7 @@ interface TopicDropdownProps {
 	autoEnroll?: "enrolled" | "unenrolled";
 	visibility?: "private" | "public";
 	onViewDetails: (id: string) => void;
+	onEdit?: (id: string) => void;
 	onDelete: (id: string) => void;
 	onToggleEnrollment?: (
 		id: string,
@@ -31,6 +32,7 @@ export const TopicDropdown = ({
 	autoEnroll = "unenrolled",
 	visibility = "private",
 	onViewDetails,
+	onEdit,
 	onDelete,
 	onToggleEnrollment,
 	onToggleVisibility,
@@ -58,6 +60,11 @@ export const TopicDropdown = ({
 		setPopoverOpen(false);
 	};
 
+	const handleEdit = () => {
+		onEdit?.(topicId);
+		setPopoverOpen(false);
+	};
+
 	const handleToggleEnrollment = () => {
 		onToggleEnrollment?.(topicId, autoEnroll);
 		setPopoverOpen(false);
@@ -76,6 +83,12 @@ export const TopicDropdown = ({
 			icon: "eye-outline" as const,
 			label: "View Details",
 			onClick: handleViewDetails,
+		},
+		{
+			icon: "edit" as const,
+			label: "Edit Topic",
+			onClick: handleEdit,
+			hidden: !onEdit,
 		},
 		{
 			icon: enrollmentIcon as "user-minus" | "user-plus",
