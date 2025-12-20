@@ -1,5 +1,4 @@
 "use client";
-import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
@@ -7,7 +6,7 @@ import * as Kbd from "@reloop/ui/kbd";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import axios from "axios";
-import { useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -28,13 +27,12 @@ interface DeleteTopicModalProps {
 }
 
 export const DeleteTopicModal = ({ topics }: DeleteTopicModalProps) => {
+	const { orgSlug } = useParams();
 	const [deleteId, setDeleteId] = useQueryState("delete");
 	const [isDeleting, setIsDeleting] = useState(false);
 	const [confirmationText, setConfirmationText] = useState("");
 	const [isCopied, setIsCopied] = useState(false);
 	const { mutate } = useSWRConfig();
-	const { activeOrganization } = useUserOrganization();
-	const _router = useRouter();
 
 	const topicToDelete = topics.find((topic) => topic.id === deleteId);
 
@@ -60,20 +58,23 @@ export const DeleteTopicModal = ({ topics }: DeleteTopicModalProps) => {
 			await axios.delete(`/api/contacts/v1/topics/${topicToDelete.id}`, {
 				withCredentials: true,
 			});
-			await mutate(
-				(key: string) =>
-					typeof key === "string" &&
-					key.startsWith("/api/contacts/v1/topics/list"),
-			);
 
 			toast.success(`${topicToDelete.name} deleted successfully`);
+
+			if (orgSlug) {
+				window.location.href = `/dashboard/${orgSlug}/topics`;
+				return;
+			}
 			handleClose();
+			mutate(
+				(key: string) =>
+					typeof key === "string" && key.startsWith("/api/contacts/v1/topics"),
+			);
 		} catch (error) {
 			const errorMessage = axios.isAxiosError(error)
 				? error.response?.data?.message || "Failed to delete topic"
 				: "Failed to delete topic";
 			toast.error(errorMessage);
-		} finally {
 			setIsDeleting(false);
 		}
 	};

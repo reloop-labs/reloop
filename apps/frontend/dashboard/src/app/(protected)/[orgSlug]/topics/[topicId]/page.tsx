@@ -1,10 +1,13 @@
 "use client";
-import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
 import { useParams, useRouter } from "next/navigation";
+import { useQueryState } from "nuqs";
 import { useState } from "react";
-import useSWR from "swr";
+import { toast } from "sonner";
+import useSWR, { useSWRConfig } from "swr";
+import { DeleteTopicModal } from "../../contacts/components/delete-topic";
+import { EditTopicModal } from "../../contacts/components/edit-topic-modal";
 import { TopicHeader } from "./components/topic-header";
 
 interface Topic {
@@ -22,8 +25,9 @@ interface Topic {
 const TopicDetailPage = () => {
 	const { topicId, orgSlug } = useParams();
 	const router = useRouter();
-	const { activeOrganization } = useUserOrganization();
-	const [showAddContact, setShowAddContact] = useState(false);
+	const { mutate } = useSWRConfig();
+	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+	const [, setDeleteId] = useQueryState("delete");
 
 	const {
 		data: topicData,
@@ -33,6 +37,62 @@ const TopicDetailPage = () => {
 		revalidateOnFocus: true,
 		revalidateOnReconnect: true,
 	});
+
+	const handleToggleEnrollment = async (
+		topicIdParam: string,
+		currentValue: "enrolled" | "unenrolled",
+	) => {
+		const newValue = currentValue === "enrolled" ? "unenrolled" : "enrolled";
+		try {
+			const response = await fetch(`/api/contacts/v1/topics/${topicIdParam}`, {
+				method: "PATCH",
+				headers: { "Content-Type": "application/json" },
+				credentials: "include",
+				body: JSON.stringify({ autoEnroll: newValue }),
+			});
+			if (!response.ok) throw new Error("Failed to update enrollment");
+			toast.success(`Enrollment set to ${newValue}`);
+			mutate(
+				(key: string) =>
+					typeof key === "string" && key.startsWith("/api/contacts/v1/topics"),
+			);
+		} catch {
+			toast.error("Failed to update enrollment");
+		}
+	};
+
+	const handleToggleVisibility = async (
+		topicIdParam: string,
+		currentValue: "private" | "public",
+	) => {
+		const newValue = currentValue === "public" ? "private" : "public";
+		try {
+			const response = await fetch(`/api/contacts/v1/topics/${topicIdParam}`, {
+				method: "PATCH",
+				headers: { "Content-Type": "application/json" },
+				credentials: "include",
+				body: JSON.stringify({ visibility: newValue }),
+			});
+			if (!response.ok) throw new Error("Failed to update visibility");
+			toast.success(`Visibility set to ${newValue}`);
+			mutate(
+				(key: string) =>
+					typeof key === "string" && key.startsWith("/api/contacts/v1/topics"),
+			);
+		} catch {
+			toast.error("Failed to update visibility");
+		}
+	};
+
+	const handleDelete = () => {
+		if (topicData?.id) {
+			setDeleteId(topicData.id);
+		}
+	};
+
+	const handleEdit = () => {
+		setIsEditModalOpen(true);
+	};
 
 	if (topicLoading) {
 		return (
@@ -61,11 +121,25 @@ const TopicDetailPage = () => {
 				topic={topicData || null}
 				isLoading={topicLoading}
 				isFailed={!!topicError}
-				onOpenAddContact={() => setShowAddContact(true)}
+				onOpenAddContact={() => {}}
 				onOpenBulkImport={() =>
 					router.push(`/${orgSlug}/topics/${topicId}/bulk-import`)
 				}
+				onDelete={handleDelete}
+				onEdit={handleEdit}
+				onToggleEnrollment={handleToggleEnrollment}
+				onToggleVisibility={handleToggleVisibility}
 			/>
+
+			{/* Edit Topic Modal */}
+			<EditTopicModal
+				open={isEditModalOpen}
+				onOpenChange={setIsEditModalOpen}
+				topic={topicData || null}
+			/>
+
+			{/* Delete Topic Modal */}
+			<DeleteTopicModal topics={topicData ? [topicData] : []} />
 		</div>
 	);
 };

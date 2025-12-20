@@ -24,6 +24,7 @@ interface TopicDropdownProps {
 	) => void;
 	onToggleVisibility?: (id: string, currentValue: "private" | "public") => void;
 	onOpenChange?: (open: boolean) => void;
+	hideViewDetails?: boolean;
 }
 
 export const TopicDropdown = ({
@@ -37,6 +38,7 @@ export const TopicDropdown = ({
 	onToggleEnrollment,
 	onToggleVisibility,
 	onOpenChange,
+	hideViewDetails = false,
 }: TopicDropdownProps) => {
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const [popoverOpen, setPopoverOpen] = useState(false);
@@ -83,6 +85,7 @@ export const TopicDropdown = ({
 			icon: "eye-outline" as const,
 			label: "View Details",
 			onClick: handleViewDetails,
+			hidden: hideViewDetails,
 		},
 		{
 			icon: "edit" as const,
