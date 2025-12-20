@@ -3,7 +3,7 @@
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import * as Kbd from "@reloop/ui/kbd";
+
 import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
@@ -469,9 +469,10 @@ export const CreateTopicModal = ({
 									<>
 										Create Topic
 										<span className="inline-flex items-center gap-0.5">
-											<Kbd.Root className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px">
-												⌘
-											</Kbd.Root>
+											<Icon
+												name="command"
+												className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+											/>
 											<Icon
 												name="enter"
 												className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"

@@ -287,6 +287,7 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
 							{/* Email Chips Input */}
 							<div className="flex flex-col gap-1">
 								<Label.Root htmlFor="email">Send Invite to ...</Label.Root>
+								{/* biome-ignore lint/a11y/noStaticElementInteractions: Container click delegates focus to the input inside */}
 								<div
 									className={cn(
 										"group/chips flex min-h-[82px] flex-wrap content-start gap-1.5 rounded-xl bg-bg-white-0 px-3 py-2.5 shadow-regular-xs",
@@ -307,7 +308,7 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
 													"focus-within:shadow-button-important-focus focus-within:ring-stroke-strong-950",
 												],
 									)}
-									onClick={() => inputRef.current?.focus()}
+									onMouseDown={() => inputRef.current?.focus()}
 								>
 									{emailChips.map((email) => (
 										<span
