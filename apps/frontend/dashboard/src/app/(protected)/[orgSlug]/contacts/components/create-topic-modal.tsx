@@ -145,7 +145,7 @@ export const CreateTopicModal = ({
 	return (
 		<Modal.Root open={open} onOpenChange={handleOpenChange}>
 			<Modal.Content
-				className="rounded-2xl border border-stroke-soft-100/50 p-0.5 sm:max-w-[720px]"
+				className="rounded-2xl border border-stroke-soft-100/50 p-0.5 sm:max-w-[640px]"
 				showClose={true}
 			>
 				<div className="rounded-2xl border border-stroke-soft-100/50">
@@ -192,7 +192,7 @@ export const CreateTopicModal = ({
 									)}
 
 									{/* Pro Tip - Absolutely positioned at top-right of Topic Name */}
-									<div className="-top-[90px] absolute right-56 z-10 w-[160px] translate-x-full">
+									<div className="-top-[87px] absolute right-56 z-10 w-[160px] translate-x-full">
 										<div className="relative pb-3">
 											{/* Rounded bubble */}
 											<div className="relative overflow-hidden rounded-[24px] border border-neutral-300/40 bg-white/60 p-3 shadow-black/10 shadow-lg backdrop-blur-lg dark:border-neutral-600/40 dark:bg-neutral-800/80">
@@ -208,7 +208,7 @@ export const CreateTopicModal = ({
 												</div>
 
 												{/* Content */}
-												<p className="mt-2 whitespace-nowrap text-[11px] text-text-sub-600">
+												<p className="mt-1.5 whitespace-nowrap text-[11px] text-text-sub-600">
 													Use descriptive names
 												</p>
 

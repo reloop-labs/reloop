@@ -64,6 +64,9 @@ export namespace TopicModel {
     autoEnroll: t.Union([t.Literal("enrolled"), t.Literal("unenrolled")], {
       description: "Auto enroll setting - enrolled means all contacts are automatically enrolled",
     }),
+    visibility: t.Union([t.Literal("private"), t.Literal("public")], {
+      description: "Visibility setting - whether the topic is visible to everyone or just the team",
+    }),
     organizationId: t.String({ description: "Organization ID" }),
     createdAt: t.Date(),
     updatedAt: t.Date(),

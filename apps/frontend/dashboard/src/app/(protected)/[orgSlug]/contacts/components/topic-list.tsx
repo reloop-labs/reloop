@@ -1,5 +1,6 @@
 "use client";
 import { PageSizeDropdown } from "@fe/dashboard/components/page-size-dropdown";
+import { PaginationControls } from "@fe/dashboard/components/pagination-controls";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
@@ -17,6 +18,8 @@ interface Topic {
 	name: string;
 	description: string | null;
 	organizationId: string;
+	autoEnroll?: "enrolled" | "unenrolled";
+	visibility?: "private" | "public";
 	createdAt: string;
 	updatedAt: string;
 	deletedAt: string | null;
@@ -84,7 +87,7 @@ export const TopicList = ({ hideHeader = false }: TopicListProps) => {
 							onClick={() => setIsCreateModalOpen(true)}
 						>
 							<Icon name="plus" className="h-4 w-4" />
-							Create topic
+							Add topic
 						</Button.Root>
 					</div>
 				</div>
@@ -143,35 +146,12 @@ export const TopicList = ({ hideHeader = false }: TopicListProps) => {
 										}}
 									/>
 								</div>
-								<div className="flex items-center gap-2">
-									<Button.Root
-										variant="neutral"
-										mode="stroke"
-										size="xxsmall"
-										onClick={() =>
-											setCurrentPage((prev) => Math.max(1, prev - 1))
-										}
-										disabled={currentPage === 1 || isLoading}
-										className="transition-all duration-200 hover:border-primary-base hover:bg-bg-weak-50/50"
-									>
-										<Icon name="chevron-left" className="h-4 w-4" />
-									</Button.Root>
-									<span className="px-2">
-										Page {currentPage} of {totalPages}
-									</span>
-									<Button.Root
-										variant="neutral"
-										mode="stroke"
-										size="xxsmall"
-										onClick={() =>
-											setCurrentPage((prev) => Math.min(totalPages, prev + 1))
-										}
-										disabled={currentPage === totalPages || isLoading}
-										className="transition-all duration-200 hover:border-primary-base hover:bg-bg-weak-50/50"
-									>
-										<Icon name="chevron-right" className="h-4 w-4" />
-									</Button.Root>
-								</div>
+								<PaginationControls
+									currentPage={currentPage}
+									totalPages={totalPages}
+									onPageChange={setCurrentPage}
+									isLoading={isLoading}
+								/>
 							</div>
 						)}
 					</div>
