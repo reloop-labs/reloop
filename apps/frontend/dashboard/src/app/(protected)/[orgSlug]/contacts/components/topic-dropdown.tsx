@@ -1,5 +1,6 @@
 "use client";
 import { AnimatedHoverBackground } from "@fe/dashboard/components/layout/sidebar/animated-hover-background";
+import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import {
@@ -12,16 +13,27 @@ import { useRef, useState } from "react";
 interface TopicDropdownProps {
 	topicId: string;
 	topicName: string;
+	autoEnroll?: "enrolled" | "unenrolled";
+	visibility?: "private" | "public";
 	onViewDetails: (id: string) => void;
 	onDelete: (id: string) => void;
+	onToggleEnrollment?: (
+		id: string,
+		currentValue: "enrolled" | "unenrolled",
+	) => void;
+	onToggleVisibility?: (id: string, currentValue: "private" | "public") => void;
 	onOpenChange?: (open: boolean) => void;
 }
 
 export const TopicDropdown = ({
 	topicId,
-	topicName,
+	topicName: _topicName,
+	autoEnroll = "unenrolled",
+	visibility = "private",
 	onViewDetails,
 	onDelete,
+	onToggleEnrollment,
+	onToggleVisibility,
 	onOpenChange,
 }: TopicDropdownProps) => {
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
@@ -46,6 +58,19 @@ export const TopicDropdown = ({
 		setPopoverOpen(false);
 	};
 
+	const handleToggleEnrollment = () => {
+		onToggleEnrollment?.(topicId, autoEnroll);
+		setPopoverOpen(false);
+	};
+
+	const handleToggleVisibility = () => {
+		onToggleVisibility?.(topicId, visibility);
+		setPopoverOpen(false);
+	};
+
+	const enrollmentIcon = autoEnroll === "enrolled" ? "user-minus" : "user-plus";
+	const visibilityIcon = visibility === "public" ? "lock" : "globe";
+
 	const menuItems = [
 		{
 			icon: "eye-outline" as const,
@@ -53,26 +78,35 @@ export const TopicDropdown = ({
 			onClick: handleViewDetails,
 		},
 		{
+			icon: enrollmentIcon as "user-minus" | "user-plus",
+			label: autoEnroll === "enrolled" ? "Set Unenrolled" : "Set Enrolled",
+			onClick: handleToggleEnrollment,
+			hidden: !onToggleEnrollment,
+		},
+		{
+			icon: visibilityIcon as "lock" | "globe",
+			label: visibility === "public" ? "Set Private" : "Set Public",
+			onClick: handleToggleVisibility,
+			hidden: !onToggleVisibility,
+		},
+		{
 			icon: "trash" as const,
 			label: "Delete",
 			onClick: handleDelete,
 			className: "text-error-base",
 		},
-	];
+	].filter((item) => !item.hidden);
 
 	return (
 		<PopoverRoot open={popoverOpen} onOpenChange={handleOpenChange}>
 			<PopoverTrigger asChild>
-				<button
-					type="button"
-					className="flex h-6 w-6 items-center justify-center rounded-md transition-colors hover:bg-bg-weak-50"
-				>
-					<Icon name="more-vertical" className="h-3 w-3 text-text-sub-600" />
-				</button>
+				<Button.Root variant="neutral" mode="ghost" size="xxsmall">
+					<Icon name="more-vertical" className="h-3 w-3" />
+				</Button.Root>
 			</PopoverTrigger>
 			<PopoverContent
 				align="end"
-				className="w-40 rounded-xl p-1.5"
+				className="w-44 rounded-xl p-1.5"
 				sideOffset={-6}
 			>
 				<div className="relative">

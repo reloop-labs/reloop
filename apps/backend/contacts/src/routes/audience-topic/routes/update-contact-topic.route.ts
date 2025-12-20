@@ -7,12 +7,14 @@ export const updateTopicRoute = new Elysia().use(authMiddleware).patch(
   "/:topicId",
   async ({ params, body, user }) => {
     const { topicId } = params;
-    const { name, description } = body;
+    const { name, description, autoEnroll, visibility } = body;
     return await updateTopicHandler({
       topicId,
       organizationId: user.activeOrganizationId,
       name,
       description,
+      autoEnroll,
+      visibility,
     });
   },
   {

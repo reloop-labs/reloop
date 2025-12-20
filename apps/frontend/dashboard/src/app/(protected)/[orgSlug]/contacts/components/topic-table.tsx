@@ -27,6 +27,14 @@ interface TopicTableProps {
 	activeOrganizationSlug: string;
 	isLoading?: boolean;
 	loadingRows?: number;
+	onToggleEnrollment?: (
+		topicId: string,
+		currentValue: "enrolled" | "unenrolled",
+	) => void;
+	onToggleVisibility?: (
+		topicId: string,
+		currentValue: "private" | "public",
+	) => void;
 }
 
 // Badge styles matching the "Admin"/"Member" style from the image
@@ -49,6 +57,8 @@ export const TopicTable = ({
 	activeOrganizationSlug,
 	isLoading,
 	loadingRows = 4,
+	onToggleEnrollment,
+	onToggleVisibility,
 }: TopicTableProps) => {
 	const [, setDeleteId] = useQueryState("delete");
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
@@ -231,8 +241,12 @@ export const TopicTable = ({
 												<TopicDropdown
 													topicId={topic.id}
 													topicName={topic.name}
+													autoEnroll={topic.autoEnroll}
+													visibility={topic.visibility}
 													onViewDetails={handleViewDetails}
 													onDelete={handleDelete}
+													onToggleEnrollment={onToggleEnrollment}
+													onToggleVisibility={onToggleVisibility}
 													onOpenChange={(open: boolean) =>
 														setActiveDropdownId(open ? topic.id : null)
 													}

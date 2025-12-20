@@ -7,7 +7,8 @@ import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useState } from "react";
-import useSWR from "swr";
+import { toast } from "sonner";
+import useSWR, { useSWRConfig } from "swr";
 import { CreateTopicModal } from "./create-topic-modal";
 import { DeleteTopicModal } from "./delete-topic";
 import { EmptyState } from "./empty-state";
@@ -38,6 +39,7 @@ interface TopicListProps {
 
 export const TopicList = ({ hideHeader = false }: TopicListProps) => {
 	const { activeOrganization } = useUserOrganization();
+	const { mutate } = useSWRConfig();
 	const [searchQuery, setSearchQuery] = useState<string>("");
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 	const [currentPage, setCurrentPage] = useQueryState(
@@ -72,6 +74,52 @@ export const TopicList = ({ hideHeader = false }: TopicListProps) => {
 				topic.description?.toLowerCase().includes(searchQuery.toLowerCase());
 			return matchesSearch;
 		}) || [];
+
+	const handleToggleEnrollment = async (
+		topicId: string,
+		currentValue: "enrolled" | "unenrolled",
+	) => {
+		const newValue = currentValue === "enrolled" ? "unenrolled" : "enrolled";
+		try {
+			const response = await fetch(`/api/contacts/v1/topics/${topicId}`, {
+				method: "PATCH",
+				headers: { "Content-Type": "application/json" },
+				credentials: "include",
+				body: JSON.stringify({ autoEnroll: newValue }),
+			});
+			if (!response.ok) throw new Error("Failed to update enrollment");
+			toast.success(`Enrollment set to ${newValue}`);
+			mutate(
+				(key: string) =>
+					typeof key === "string" && key.startsWith("/api/contacts/v1/topics"),
+			);
+		} catch {
+			toast.error("Failed to update enrollment");
+		}
+	};
+
+	const handleToggleVisibility = async (
+		topicId: string,
+		currentValue: "private" | "public",
+	) => {
+		const newValue = currentValue === "public" ? "private" : "public";
+		try {
+			const response = await fetch(`/api/contacts/v1/topics/${topicId}`, {
+				method: "PATCH",
+				headers: { "Content-Type": "application/json" },
+				credentials: "include",
+				body: JSON.stringify({ visibility: newValue }),
+			});
+			if (!response.ok) throw new Error("Failed to update visibility");
+			toast.success(`Visibility set to ${newValue}`);
+			mutate(
+				(key: string) =>
+					typeof key === "string" && key.startsWith("/api/contacts/v1/topics"),
+			);
+		} catch {
+			toast.error("Failed to update visibility");
+		}
+	};
 
 	return (
 		<div className={hideHeader ? "" : "mx-auto max-w-3xl sm:px-8"}>
@@ -127,6 +175,8 @@ export const TopicList = ({ hideHeader = false }: TopicListProps) => {
 								activeOrganizationSlug={activeOrganization.slug}
 								isLoading={isLoading}
 								loadingRows={4}
+								onToggleEnrollment={handleToggleEnrollment}
+								onToggleVisibility={handleToggleVisibility}
 							/>
 						</div>
 

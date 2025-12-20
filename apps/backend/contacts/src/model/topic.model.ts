@@ -50,6 +50,11 @@ export namespace TopicModel {
         description: "Auto enroll setting - enrolled means all contacts are automatically enrolled",
       }),
     ),
+    visibility: t.Optional(
+      t.Union([t.Literal("private"), t.Literal("public")], {
+        description: "Visibility setting - whether the topic is visible to everyone or just the team",
+      }),
+    ),
   });
 
   export type UpdateTopicBody = typeof updateTopicBody.static;

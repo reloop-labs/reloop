@@ -10,8 +10,10 @@ export async function updateTopic(params: {
   organizationId: string;
   name?: string;
   description?: string;
+  autoEnroll?: "enrolled" | "unenrolled";
+  visibility?: "private" | "public";
 }): Promise<TopicTypes.TopicResponse> {
-  const { topicId, organizationId, name, description } = params;
+  const { topicId, organizationId, name, description, autoEnroll, visibility } = params;
 
   try {
     // Check if topic exists
@@ -47,6 +49,8 @@ export async function updateTopic(params: {
       .set({
         ...(name && { name }),
         ...(description !== undefined && { description }),
+        ...(autoEnroll && { autoEnroll }),
+        ...(visibility && { visibility }),
         updatedAt: new Date(),
       })
       .where(eq(schema.topic.id, topicId))
@@ -74,6 +78,8 @@ export async function updateTopicHandler(params: {
   organizationId: string;
   name?: string;
   description?: string;
+  autoEnroll?: "enrolled" | "unenrolled";
+  visibility?: "private" | "public";
 }): Promise<TopicTypes.TopicResponse> {
   return await updateTopic(params);
 }
