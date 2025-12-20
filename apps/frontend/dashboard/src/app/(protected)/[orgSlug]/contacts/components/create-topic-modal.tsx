@@ -8,6 +8,7 @@ import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import * as Textarea from "@reloop/ui/textarea";
+import * as Tooltip from "@reloop/ui/tooltip";
 import axios from "axios";
 import { useCallback, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -286,15 +287,52 @@ export const CreateTopicModal = ({
 								>
 									<div className="flex items-center justify-between">
 										<div>
-											<p
-												className={`font-medium text-paragraph-sm ${
-													autoEnroll === "enrolled"
-														? "text-success-base"
-														: "text-text-strong-950"
-												}`}
-											>
-												Auto Enroll Contacts
-											</p>
+											<div className="flex items-center gap-1">
+												<p
+													className={`font-medium text-paragraph-sm ${autoEnroll === "enrolled" ? "text-success-base" : "text-text-strong-950"}`}
+												>
+													Auto Enroll Contacts
+												</p>
+												<Tooltip.Root>
+													<Tooltip.Trigger asChild>
+														<button
+															type="button"
+															onClick={(e) => e.stopPropagation()}
+															className={
+																autoEnroll === "enrolled"
+																	? "text-success-base"
+																	: "text-text-sub-600 hover:text-text-strong-950"
+															}
+														>
+															<Icon
+																name="info-outline"
+																className="h-3.5 w-3.5"
+															/>
+														</button>
+													</Tooltip.Trigger>
+													<Tooltip.Content
+														side="top"
+														variant="light"
+														className="max-w-[280px] p-3"
+														sideOffset={-2}
+													>
+														<div className="space-y-2">
+															<p className="text-paragraph-xs">
+																<span className="font-semibold">Enrolled:</span>{" "}
+																All new contacts are automatically added to this
+																topic.
+															</p>
+															<p className="text-paragraph-xs">
+																<span className="font-semibold">
+																	Unenrolled:
+																</span>{" "}
+																Contacts are not added by default.they must be
+																added manually to this topic.
+															</p>
+														</div>
+													</Tooltip.Content>
+												</Tooltip.Root>
+											</div>
 											<p
 												className={`mt-0.5 text-paragraph-xs ${
 													autoEnroll === "enrolled"
@@ -336,15 +374,58 @@ export const CreateTopicModal = ({
 								>
 									<div className="flex items-center justify-between">
 										<div>
-											<p
-												className={`font-medium text-paragraph-sm ${
-													visibility === "public"
-														? "text-primary-base"
-														: "text-text-strong-950"
-												}`}
-											>
-												Public Topic
-											</p>
+											<div className="flex items-center gap-1">
+												<p
+													className={`font-medium text-paragraph-sm ${
+														visibility === "public"
+															? "text-primary-base"
+															: "text-text-strong-950"
+													}`}
+												>
+													Public Topic
+												</p>
+												<Tooltip.Root>
+													<Tooltip.Trigger asChild>
+														<button
+															type="button"
+															onClick={(e) => e.stopPropagation()}
+															className={
+																visibility === "public"
+																	? "text-primary-base"
+																	: "text-text-sub-600 hover:text-text-strong-950"
+															}
+														>
+															<Icon
+																name="info-outline"
+																className="h-3.5 w-3.5"
+															/>
+														</button>
+													</Tooltip.Trigger>
+													<Tooltip.Content
+														side="top"
+														variant="light"
+														className="max-w-[220px] p-3"
+														sideOffset={-2}
+													>
+														<div className="space-y-2">
+															<p className="text-paragraph-xs">
+																<span className="whitespace-nowrap font-semibold">
+																	Private:
+																</span>{" "}
+																Only visible on the email preferences page if
+																the contact is subscribed to it.
+															</p>
+															<p className="text-paragraph-xs">
+																<span className="whitespace-nowrap font-semibold">
+																	Public:
+																</span>{" "}
+																Always visible on the email preferences page for
+																all contacts.
+															</p>
+														</div>
+													</Tooltip.Content>
+												</Tooltip.Root>
+											</div>
 											<p
 												className={`mt-0.5 text-paragraph-xs ${
 													visibility === "public"

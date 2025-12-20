@@ -69,6 +69,7 @@ export const TopicHeader = ({
 }: TopicHeaderProps) => {
 	const { push } = useUserOrganization();
 	const [copied, setCopied] = useState(false);
+	const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 
@@ -380,7 +381,7 @@ export const TopicHeader = ({
 				</div>
 			</div>
 
-			{/* Stats Grid - Row 2: Created */}
+			{/* Stats Grid - Row 2: Created & Description */}
 			<div className="mt-12 grid grid-cols-3 gap-x-12 gap-y-12">
 				{/* Created */}
 				<div className="flex flex-col gap-1.5">
@@ -398,19 +399,47 @@ export const TopicHeader = ({
 						</span>
 					)}
 				</div>
-			</div>
 
-			{/* Description Section */}
-			{topic?.description && (
-				<div className="mt-12">
-					<h3 className="mb-2 font-medium text-paragraph-sm text-text-strong-950">
-						Description
-					</h3>
-					<p className="text-paragraph-sm text-text-sub-600">
-						{topic.description}
-					</p>
+				{/* Description */}
+				<div className="col-span-2 flex min-w-0 flex-col gap-1.5 overflow-hidden">
+					<div className="flex items-center gap-1.5">
+						<Icon name="file-text" className="h-3.5 w-3.5 text-text-sub-600" />
+						<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
+							Description
+						</span>
+					</div>
+					{isLoading ? (
+						<Skeleton className="h-5 w-48 rounded-lg" />
+					) : (
+						<div className="flex flex-col gap-1">
+							<span
+								className={cn(
+									"break-words text-paragraph-sm leading-relaxed",
+									topic?.description
+										? "text-text-strong-950"
+										: "text-text-soft-400 italic",
+									!isDescriptionExpanded &&
+										topic?.description &&
+										"line-clamp-2",
+								)}
+							>
+								{topic?.description || "No description"}
+							</span>
+							{topic?.description && topic.description.length > 100 && (
+								<button
+									type="button"
+									onClick={() =>
+										setIsDescriptionExpanded(!isDescriptionExpanded)
+									}
+									className="w-fit font-medium text-paragraph-xs text-primary-base transition-colors hover:text-primary-darker"
+								>
+									{isDescriptionExpanded ? "Show less" : "Read more..."}
+								</button>
+							)}
+						</div>
+					)}
 				</div>
-			)}
+			</div>
 		</div>
 	);
 };
