@@ -2,10 +2,15 @@
 
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
+import * as Input from "@reloop/ui/input";
+import * as Kbd from "@reloop/ui/kbd";
 import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
-import { useState } from "react";
+import * as Textarea from "@reloop/ui/textarea";
+import axios from "axios";
+import { useCallback, useRef, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
 
@@ -25,6 +30,11 @@ export const CreateTopicModal = ({
 	const [name, setName] = useState("");
 	const [description, setDescription] = useState("");
 	const [nameError, setNameError] = useState<string | null>(null);
+	const [autoEnroll, setAutoEnroll] = useState<"enrolled" | "unenrolled">(
+		"enrolled",
+	);
+	const [visibility, setVisibility] = useState<"private" | "public">("private");
+	const formRef = useRef<HTMLFormElement>(null);
 
 	const descriptionLength = description.length;
 	const isDescriptionOverLimit = descriptionLength > MAX_DESCRIPTION_LENGTH;
@@ -35,6 +45,8 @@ export const CreateTopicModal = ({
 			setName("");
 			setDescription("");
 			setNameError(null);
+			setAutoEnroll("enrolled");
+			setVisibility("private");
 		}
 		onOpenChange(isOpen);
 	};
@@ -50,55 +62,90 @@ export const CreateTopicModal = ({
 	};
 
 	// Handle form submission
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
+	const handleSubmit = useCallback(
+		async (e?: React.FormEvent) => {
+			e?.preventDefault();
 
-		if (!validateForm()) {
-			return;
-		}
-
-		if (isDescriptionOverLimit) {
-			toast.error("Description exceeds maximum length");
-			return;
-		}
-
-		setIsCreating(true);
-		try {
-			const response = await fetch("/api/contacts/v1/topics/add", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					name: name.trim(),
-					description: description.trim() || null,
-				}),
-			});
-
-			if (!response.ok) {
-				const errorData = await response.json().catch(() => ({}));
-				throw new Error(errorData.message || "Failed to create topic");
+			if (!validateForm()) {
+				return;
 			}
 
-			toast.success("Topic created successfully");
-			handleOpenChange(false);
-			await mutate(
-				(key: string) =>
-					typeof key === "string" &&
-					key.includes("/api/contacts/v1/topics/list"),
-			);
-		} catch (error) {
-			console.error("Failed to create topic:", error);
-			toast.error(
-				error instanceof Error ? error.message : "Failed to create topic",
-			);
-		} finally {
-			setIsCreating(false);
+			if (isDescriptionOverLimit) {
+				toast.error("Description exceeds maximum length");
+				return;
+			}
+
+			setIsCreating(true);
+			try {
+				await axios.post(
+					"/api/contacts/v1/topics/add",
+					{
+						name: name.trim(),
+						description: description.trim() || undefined,
+						autoEnroll,
+						visibility,
+					},
+					{ headers: { credentials: "include" } },
+				);
+
+				toast.success("Topic created successfully");
+				handleOpenChange(false);
+				await mutate(
+					(key: string) =>
+						typeof key === "string" &&
+						key.includes("/api/contacts/v1/topics/list"),
+				);
+			} catch (error) {
+				console.error("Failed to create topic:", error);
+				const errorMessage = axios.isAxiosError(error)
+					? error.response?.data?.message || "Failed to create topic"
+					: "Failed to create topic";
+				toast.error(errorMessage);
+			} finally {
+				setIsCreating(false);
+			}
+		},
+		[
+			name,
+			description,
+			autoEnroll,
+			visibility,
+			isDescriptionOverLimit,
+			mutate,
+			handleOpenChange,
+		],
+	);
+
+	// Command/Ctrl + Enter to submit
+	useHotkeys(
+		"mod+enter",
+		(e) => {
+			e.preventDefault();
+			if (open && !isCreating && name.trim() && !isDescriptionOverLimit) {
+				handleSubmit();
+			}
+		},
+		{ enableOnFormTags: true, enabled: open },
+		[open, isCreating, name, isDescriptionOverLimit, handleSubmit],
+	);
+
+	// Toggle card click handler
+	const handleAutoEnrollClick = () => {
+		if (!isCreating) {
+			setAutoEnroll(autoEnroll === "enrolled" ? "unenrolled" : "enrolled");
+		}
+	};
+
+	const handleVisibilityClick = () => {
+		if (!isCreating) {
+			setVisibility(visibility === "public" ? "private" : "public");
 		}
 	};
 
 	return (
 		<Modal.Root open={open} onOpenChange={handleOpenChange}>
 			<Modal.Content
-				className="rounded-2xl border border-stroke-soft-100/50 p-0.5 sm:max-w-[480px]"
+				className="rounded-2xl border border-stroke-soft-100/50 p-0.5 sm:max-w-[720px]"
 				showClose={true}
 			>
 				<div className="rounded-2xl border border-stroke-soft-100/50">
@@ -113,37 +160,31 @@ export const CreateTopicModal = ({
 							</p>
 						</div>
 					</Modal.Header>
-					<form onSubmit={handleSubmit} className="flex flex-col">
+					<form ref={formRef} onSubmit={handleSubmit} className="flex flex-col">
 						<Modal.Body className="relative space-y-4">
 							{/* Form Section */}
 							<div className="space-y-4">
-								<div className="border-stroke-soft-200/50 border-b border-dashed pb-4">
-									<h3 className="font-medium text-text-strong-950">
-										Topic Details
-									</h3>
-									<p className="mt-1 text-paragraph-xs text-text-sub-600">
-										Give your topic a name and description
-									</p>
-								</div>
-
 								{/* Topic Name - relative container for Pro Tip positioning */}
 								<div className="relative flex flex-col gap-1.5">
 									<Label.Root htmlFor="topic-name">
 										Topic Name
 										<span className="text-primary-base">*</span>
 									</Label.Root>
-									<input
-										id="topic-name"
-										type="text"
-										value={name}
-										onChange={(e) => {
-											setName(e.target.value);
-											if (nameError) setNameError(null);
-										}}
-										placeholder="e.g., Product Updates"
-										className="w-full rounded-xl bg-bg-white-0 px-3 py-2.5 text-paragraph-sm text-text-strong-950 shadow-regular-xs ring-1 ring-stroke-soft-200 ring-inset transition duration-200 ease-out placeholder:text-text-soft-400 hover:bg-bg-weak-50 hover:ring-transparent focus:shadow-button-important-focus focus:outline-none focus:ring-stroke-strong-950 focus:hover:bg-bg-white-0 focus:hover:ring-stroke-strong-950"
-										disabled={isCreating}
-									/>
+									<Input.Root size="small">
+										<Input.Wrapper>
+											<Input.Input
+												id="topic-name"
+												type="text"
+												value={name}
+												onChange={(e) => {
+													setName(e.target.value);
+													if (nameError) setNameError(null);
+												}}
+												placeholder="e.g., Product Updates"
+												disabled={isCreating}
+											/>
+										</Input.Wrapper>
+									</Input.Root>
 									{nameError && (
 										<p className="text-error-base text-paragraph-xs">
 											{nameError}
@@ -151,10 +192,10 @@ export const CreateTopicModal = ({
 									)}
 
 									{/* Pro Tip - Absolutely positioned at top-right of Topic Name */}
-									<div className="-top-28 absolute right-40 z-10 w-[160px] translate-x-full">
+									<div className="-top-[90px] absolute right-56 z-10 w-[160px] translate-x-full">
 										<div className="relative pb-3">
 											{/* Rounded bubble */}
-											<div className="relative overflow-hidden rounded-[24px] border border-neutral-300/40 bg-white/60 p-4 shadow-black/10 shadow-lg backdrop-blur-lg dark:border-neutral-600/40 dark:bg-neutral-800/80">
+											<div className="relative overflow-hidden rounded-[24px] border border-neutral-300/40 bg-white/60 p-3 shadow-black/10 shadow-lg backdrop-blur-lg dark:border-neutral-600/40 dark:bg-neutral-800/80">
 												{/* Glass shine effect */}
 												<div className="pointer-events-none absolute inset-0 rounded-[24px] bg-gradient-to-br from-white/50 via-transparent to-transparent dark:from-white/10" />
 
@@ -199,34 +240,136 @@ export const CreateTopicModal = ({
 								</div>
 
 								{/* Description */}
-								<div className="flex flex-col gap-1.5">
-									<Label.Root
-										htmlFor="topic-description"
-										className="text-text-sub-600"
+								<div className="relative flex flex-col gap-1.5">
+									<div className="flex items-center justify-between">
+										<Label.Root
+											htmlFor="topic-description"
+											className="text-text-sub-600"
+										>
+											Description (Optional)
+										</Label.Root>
+									</div>
+									<Textarea.Root
+										simple
+										id="topic-description"
+										value={description}
+										onChange={(e) => setDescription(e.target.value)}
+										placeholder="Describe this topic..."
+										rows={2}
+										disabled={isCreating}
+										hasError={isDescriptionOverLimit}
+										className="min-h-[60px] resize-none"
+									/>
+									<span
+										className={`absolute right-1.5 bottom-0 text-subheading-2xs ${
+											isDescriptionOverLimit
+												? "text-error-base"
+												: "text-text-soft-400"
+										}`}
 									>
-										Description (Optional)
-									</Label.Root>
-									<div className="">
-										<textarea
-											id="topic-description"
-											value={description}
-											onChange={(e) => setDescription(e.target.value)}
-											placeholder="Describe this topic..."
-											rows={4}
-											className="w-full resize-y rounded-xl bg-bg-white-0 px-3 py-2.5 text-paragraph-sm text-text-strong-950 shadow-regular-xs ring-1 ring-stroke-soft-200 ring-inset transition duration-200 ease-out placeholder:text-text-soft-400 hover:bg-bg-weak-50 hover:ring-transparent focus:shadow-button-important-focus focus:outline-none focus:ring-stroke-strong-950 focus:hover:bg-bg-white-0 focus:hover:ring-stroke-strong-950"
-											disabled={isCreating}
-										/>
-										<span
-											className={`absolute right-3 bottom-2 text-paragraph-xs ${
-												isDescriptionOverLimit
-													? "text-error-base"
-													: "text-text-soft-400"
+										{descriptionLength}/{MAX_DESCRIPTION_LENGTH}
+									</span>
+								</div>
+							</div>
+
+							{/* Auto Enroll Option */}
+							<div className="mt-4 border-stroke-soft-200/50">
+								<button
+									type="button"
+									onClick={handleAutoEnrollClick}
+									disabled={isCreating}
+									className={`w-full cursor-pointer rounded-xl border p-3 text-left transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-neutral-300 ${
+										autoEnroll === "enrolled"
+											? "border-success-base/40 bg-success-lighter"
+											: "border-stroke-soft-200 bg-bg-white-0 hover:bg-bg-weak-50"
+									} ${isCreating ? "pointer-events-none opacity-50" : ""}`}
+								>
+									<div className="flex items-center justify-between">
+										<div>
+											<p
+												className={`font-medium text-paragraph-sm ${
+													autoEnroll === "enrolled"
+														? "text-success-base"
+														: "text-text-strong-950"
+												}`}
+											>
+												Auto Enroll Contacts
+											</p>
+											<p
+												className={`mt-0.5 text-paragraph-xs ${
+													autoEnroll === "enrolled"
+														? "text-success-base"
+														: "text-text-sub-600"
+												}`}
+											>
+												{autoEnroll === "enrolled"
+													? "New contacts are automatically enrolled"
+													: "Contacts must be manually enrolled"}
+											</p>
+										</div>
+										<div
+											className={`flex h-5 w-5 items-center justify-center rounded ${
+												autoEnroll === "enrolled"
+													? "bg-success-base"
+													: "border border-stroke-soft-200"
 											}`}
 										>
-											{descriptionLength}/{MAX_DESCRIPTION_LENGTH}
-										</span>
+											{autoEnroll === "enrolled" && (
+												<Icon name="check" className="h-3 w-3 text-white" />
+											)}
+										</div>
 									</div>
-								</div>
+								</button>
+							</div>
+
+							{/* Visibility Option */}
+							<div>
+								<button
+									type="button"
+									onClick={handleVisibilityClick}
+									disabled={isCreating}
+									className={`w-full cursor-pointer rounded-xl border p-3 text-left transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-neutral-300 ${
+										visibility === "public"
+											? "border-primary-base/40 bg-primary-lighter"
+											: "border-stroke-soft-200 bg-bg-white-0 hover:bg-bg-weak-50"
+									} ${isCreating ? "pointer-events-none opacity-50" : ""}`}
+								>
+									<div className="flex items-center justify-between">
+										<div>
+											<p
+												className={`font-medium text-paragraph-sm ${
+													visibility === "public"
+														? "text-primary-base"
+														: "text-text-strong-950"
+												}`}
+											>
+												Public Topic
+											</p>
+											<p
+												className={`mt-0.5 text-paragraph-xs ${
+													visibility === "public"
+														? "text-primary-base"
+														: "text-text-sub-600"
+												}`}
+											>
+												{visibility === "public"
+													? "Topic is visible to everyone"
+													: "Topic is only visible to your team"}
+											</p>
+										</div>
+										<div
+											className={`flex h-5 w-5 items-center justify-center rounded ${
+												visibility === "public"
+													? "bg-primary-base"
+													: "border border-stroke-soft-200"
+											}`}
+										>
+											{visibility === "public" && (
+												<Icon name="check" className="h-3 w-3 text-white" />
+											)}
+										</div>
+									</div>
+								</button>
 							</div>
 						</Modal.Body>
 						<Modal.Footer className="mt-4 justify-end border-stroke-soft-100/50">
@@ -244,7 +387,15 @@ export const CreateTopicModal = ({
 								) : (
 									<>
 										Create Topic
-										<Icon name="enter" className="h-4 w-4" />
+										<span className="inline-flex items-center gap-0.5">
+											<Kbd.Root className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px">
+												⌘
+											</Kbd.Root>
+											<Icon
+												name="enter"
+												className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+											/>
+										</span>
 									</>
 								)}
 							</Button.Root>

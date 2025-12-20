@@ -7,10 +7,13 @@ import { status } from "elysia";
 
 export async function createTopic(params: {
   organizationId: string;
+  userId: string;
   name: string;
   description?: string;
+  autoEnroll?: "enrolled" | "unenrolled";
+  visibility?: "private" | "public";
 }): Promise<TopicTypes.TopicResponse> {
-  const { organizationId, name, description } = params;
+  const { organizationId, userId, name, description, autoEnroll, visibility } = params;
   try {
     // Check if topic with same name already exists
     const existingTopic = await db.query.topic.findFirst({
@@ -31,6 +34,9 @@ export async function createTopic(params: {
         name,
         description: description ?? null,
         organizationId,
+        userId,
+        autoEnroll: autoEnroll ?? "enrolled",
+        visibility: visibility ?? "private",
       })
       .returning();
 
@@ -54,8 +60,11 @@ export async function createTopic(params: {
 
 export async function createTopicHandler(params: {
   organizationId: string;
+  userId: string;
   name: string;
   description?: string;
+  autoEnroll?: "enrolled" | "unenrolled";
+  visibility?: "private" | "public";
 }): Promise<TopicTypes.TopicResponse> {
   return await createTopic(params);
 }
