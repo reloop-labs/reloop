@@ -470,6 +470,13 @@ export const EditContactModal = ({
 												setShowTopicDropdown(true);
 											}}
 											onFocus={() => setShowTopicDropdown(true)}
+											onBlur={(e) => {
+												// Close dropdown if focus leaves to outside the dropdown
+												const relatedTarget = e.relatedTarget as HTMLElement;
+												if (!relatedTarget?.closest(".absolute")) {
+													setShowTopicDropdown(false);
+												}
+											}}
 											placeholder={
 												selectedTopicIds.length === 0 ? "Add topics..." : ""
 											}
