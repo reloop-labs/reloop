@@ -450,6 +450,7 @@ export const EditContactModal = ({
 													<button
 														type="button"
 														onClick={(e) => {
+															e.preventDefault();
 															e.stopPropagation();
 															removeTopic(topicId);
 														}}
