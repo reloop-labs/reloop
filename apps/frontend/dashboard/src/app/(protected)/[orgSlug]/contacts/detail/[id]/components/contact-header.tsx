@@ -12,6 +12,7 @@ import {
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
@@ -414,12 +415,13 @@ export const ContactHeader = ({
 						) : enrolledTopics.length > 0 ? (
 							<div className="flex flex-wrap gap-2">
 								{enrolledTopics.map((topic) => (
-									<span
+									<Link
 										key={topic.id}
-										className="font-medium text-paragraph-sm text-text-strong-950 underline decoration-dashed underline-offset-2"
+										href={`/${activeOrganization?.slug}/topics/${topic.id}`}
+										className="font-medium text-paragraph-sm text-text-strong-950 underline decoration-dashed underline-offset-2 transition-colors hover:text-primary-base"
 									>
 										{topic.name}
-									</span>
+									</Link>
 								))}
 							</div>
 						) : (
