@@ -43,6 +43,7 @@ interface ContactHeaderProps {
 	contact: ContactData | undefined;
 	isLoading: boolean;
 	propertyValues: PropertyValueWithName[];
+	enrolledTopics?: { id: string; name: string }[];
 }
 
 const getStatusColor = (status: string) => {
@@ -102,6 +103,7 @@ export const ContactHeader = ({
 	contact,
 	isLoading,
 	propertyValues,
+	enrolledTopics = [],
 }: ContactHeaderProps) => {
 	const { push, activeOrganization } = useUserOrganization();
 	const router = useRouter();
@@ -302,8 +304,28 @@ export const ContactHeader = ({
 					</div>
 				</div>
 
-				{/* Stats Grid */}
-				<div className="mt-10 grid grid-cols-[1fr_1fr_1fr] gap-x-12 gap-y-12">
+				{/* Stats Grid - Row 1 */}
+				<div className="mt-10 grid grid-cols-3 gap-x-12 gap-y-6">
+					{/* Email Address */}
+					<div className="flex flex-col gap-1.5">
+						<div className="flex items-center gap-1.5">
+							<Icon
+								name="mail-single"
+								className="h-3.5 w-3.5 text-text-sub-600"
+							/>
+							<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
+								Email Address
+							</span>
+						</div>
+						{isLoading ? (
+							<Skeleton className="h-5 w-32 rounded-lg" />
+						) : (
+							<span className="font-medium text-paragraph-sm text-text-strong-950">
+								{contact?.email || "---"}
+							</span>
+						)}
+					</div>
+
 					{/* Created */}
 					<div className="flex flex-col gap-1.5">
 						<div className="flex items-center gap-1.5">
@@ -353,7 +375,7 @@ export const ContactHeader = ({
 						<div className="flex items-center gap-1.5">
 							<Icon name="hash" className="h-3.5 w-3.5 text-text-sub-600" />
 							<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
-								Contact ID
+								ID
 							</span>
 						</div>
 						{isLoading ? (
@@ -364,8 +386,8 @@ export const ContactHeader = ({
 								type="button"
 								onClick={handleCopyId}
 							>
-								<code className="rounded bg-neutral-alpha-10 px-2 py-1 font-medium font-mono text-text-strong-950 text-xs">
-									{contact?.id}
+								<code className="max-w-[120px] truncate rounded bg-neutral-alpha-10 px-2 py-1 font-medium font-mono text-text-strong-950 text-xs">
+									{contact?.id?.slice(0, 18)}...
 								</code>
 								<Icon
 									name={copied ? "check" : "copy"}
@@ -377,6 +399,35 @@ export const ContactHeader = ({
 							</button>
 						)}
 					</div>
+					<div className="col-span-2 flex flex-col gap-1.5">
+						<div className="flex items-center gap-1.5">
+							<Icon
+								name="notification-indicator"
+								className="h-3.5 w-3.5 text-text-sub-600"
+							/>
+							<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
+								Topics
+							</span>
+						</div>
+						{isLoading ? (
+							<Skeleton className="h-5 w-32 rounded-lg" />
+						) : enrolledTopics.length > 0 ? (
+							<div className="flex flex-wrap gap-2">
+								{enrolledTopics.map((topic) => (
+									<span
+										key={topic.id}
+										className="font-medium text-paragraph-sm text-text-strong-950 underline decoration-dashed underline-offset-2"
+									>
+										{topic.name}
+									</span>
+								))}
+							</div>
+						) : (
+							<span className="font-medium text-paragraph-sm text-text-soft-400 italic">
+								No topics
+							</span>
+						)}
+					</div>
 				</div>
 
 				{/* Properties Section - All in one grid */}
@@ -384,7 +435,7 @@ export const ContactHeader = ({
 					<h3 className="mb-4 font-medium text-paragraph-sm text-text-strong-950">
 						Properties
 					</h3>
-					<div className="grid grid-cols-4 gap-x-8 gap-y-8">
+					<div className="grid grid-cols-3 gap-x-8 gap-y-8">
 						{/* System Properties */}
 						<div className="flex flex-col gap-1">
 							<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">

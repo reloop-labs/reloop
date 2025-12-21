@@ -3,7 +3,6 @@ import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
 import { and, eq, isNull } from "drizzle-orm";
-import { status } from "elysia";
 
 type TopicEnrollmentResponse = TopicEnrollmentModel.TopicEnrollmentResponse;
 
@@ -34,11 +33,28 @@ export async function unenrollContact(
     });
 
     if (!existingEnrollment) {
-      logger.warn(
-        { contactId, topicId },
-        "Enrollment not found",
+      // No existing enrollment - create one with unenrolled status
+      // This handles the case where a contact is implicitly enrolled via topic's autoEnroll setting
+      const [newEnrollment] = await db
+        .insert(schema.topicSubscription)
+        .values({
+          contactId,
+          topicId,
+          organizationId,
+          status: "unenrolled",
+        })
+        .returning();
+
+      if (!newEnrollment) {
+        throw new Error("Failed to create unenrolled enrollment");
+      }
+
+      logger.info(
+        { enrollmentId: newEnrollment.id, contactId, topicId },
+        "Created new unenrolled enrollment for implicit enrollment"
       );
-      throw status(404, { message: "Topic enrollment not found" });
+
+      return newEnrollment;
     }
 
     // Update to unenrolled

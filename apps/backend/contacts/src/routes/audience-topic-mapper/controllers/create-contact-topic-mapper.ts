@@ -26,7 +26,26 @@ export async function createTopicEnrollment(params: {
     });
 
     if (existingEnrollment) {
-      throw status(409, { message: "Contact is already enrolled in this topic" });
+      // Upsert: Update existing enrollment status instead of throwing 409
+      const [updated] = await db
+        .update(schema.topicSubscription)
+        .set({
+          status: enrollmentStatus,
+          updatedAt: new Date()
+        })
+        .where(eq(schema.topicSubscription.id, existingEnrollment.id))
+        .returning();
+
+      if (!updated) {
+        throw new Error("Failed to update enrollment");
+      }
+
+      logger.info(
+        { enrollmentId: updated.id, contactId, topicId, status: enrollmentStatus },
+        "Updated existing enrollment status"
+      );
+
+      return updated;
     }
 
     // Verify contact exists

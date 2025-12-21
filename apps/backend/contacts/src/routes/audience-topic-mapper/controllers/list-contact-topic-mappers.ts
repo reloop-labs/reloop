@@ -39,7 +39,7 @@ export async function listTopicEnrollments(
 
     const total = totalResult[0]?.count || 0;
 
-    const enrollments = await db.query.topicSubscription.findMany({
+    const enrollments = await db.query.topicEnrollment.findMany({
       where: whereClause,
       orderBy: desc(schema.topicSubscription.createdAt),
       limit: limit,
