@@ -40,10 +40,13 @@ export namespace TopicModel {
       }),
     ),
     description: t.Optional(
-      t.String({
-        maxLength: 1000,
-        description: "Topic description",
-      }),
+      t.Union([
+        t.String({
+          maxLength: 1000,
+          description: "Topic description",
+        }),
+        t.Null(),
+      ]),
     ),
     autoEnroll: t.Optional(
       t.Union([t.Literal("enrolled"), t.Literal("unenrolled")], {

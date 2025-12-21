@@ -18,17 +18,17 @@ import { TopicDropdown } from "../../../contacts/components/topic-dropdown";
 interface Topic {
 	id: string;
 	name: string;
-	description: string | null;
+	description: string | undefined;
 	organizationId: string;
 	autoEnroll?: "enrolled" | "unenrolled";
 	visibility?: "private" | "public";
 	createdAt: string;
 	updatedAt: string;
-	deletedAt: string | null;
+	deletedAt: string | undefined;
 }
 
 interface TopicHeaderProps {
-	topic: Topic | null;
+	topic: Topic;
 	isLoading: boolean;
 	isFailed: boolean;
 	onOpenAddContact: () => void;
@@ -368,7 +368,7 @@ export const TopicHeader = ({
 						<div className="flex flex-col gap-1">
 							<span
 								className={cn(
-									"break-words text-paragraph-sm leading-relaxed",
+									"break-words text-[14px] leading-relaxed",
 									topic?.description
 										? "text-text-strong-950"
 										: "text-text-soft-400 italic",
@@ -385,7 +385,7 @@ export const TopicHeader = ({
 									onClick={() =>
 										setIsDescriptionExpanded(!isDescriptionExpanded)
 									}
-									className="w-fit font-medium text-paragraph-xs text-primary-base transition-colors hover:text-primary-darker"
+									className="w-fit font-medium text-[14px] text-primary-base transition-colors hover:text-primary-darker"
 								>
 									{isDescriptionExpanded ? "Show less" : "Read more..."}
 								</button>
