@@ -7,6 +7,7 @@ import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
+import * as Switch from "@reloop/ui/switch";
 import * as Textarea from "@reloop/ui/textarea";
 import * as Tooltip from "@reloop/ui/tooltip";
 import axios from "axios";
@@ -130,23 +131,10 @@ export const CreateTopicModal = ({
 		[open, isCreating, name, isDescriptionOverLimit, handleSubmit],
 	);
 
-	// Toggle card click handler
-	const handleAutoEnrollClick = () => {
-		if (!isCreating) {
-			setAutoEnroll(autoEnroll === "enrolled" ? "unenrolled" : "enrolled");
-		}
-	};
-
-	const handleVisibilityClick = () => {
-		if (!isCreating) {
-			setVisibility(visibility === "public" ? "private" : "public");
-		}
-	};
-
 	return (
 		<Modal.Root open={open} onOpenChange={handleOpenChange}>
 			<Modal.Content
-				className="rounded-2xl border border-stroke-soft-100/50 p-0.5 sm:max-w-[640px]"
+				className="rounded-2xl border border-stroke-soft-100/50 p-0.5 sm:max-w-[480px]"
 				showClose={true}
 			>
 				<div className="rounded-2xl border border-stroke-soft-100/50">
@@ -191,53 +179,6 @@ export const CreateTopicModal = ({
 											{nameError}
 										</p>
 									)}
-
-									{/* Pro Tip - Absolutely positioned at top-right of Topic Name */}
-									<div className="-top-[87px] absolute right-56 z-10 w-[160px] translate-x-full">
-										<div className="relative pb-3">
-											{/* Rounded bubble */}
-											<div className="relative overflow-hidden rounded-[24px] border border-neutral-300/40 bg-white/60 p-3 shadow-black/10 shadow-lg backdrop-blur-lg dark:border-neutral-600/40 dark:bg-neutral-800/80">
-												{/* Glass shine effect */}
-												<div className="pointer-events-none absolute inset-0 rounded-[24px] bg-gradient-to-br from-white/50 via-transparent to-transparent dark:from-white/10" />
-
-												{/* Header */}
-												<div className="relative flex items-center gap-2">
-													<Icon name="bulb" className="h-3 w-3" />
-													<span className="font-semibold text-neutral-800 text-xs dark:text-neutral-200">
-														Pro Tip
-													</span>
-												</div>
-
-												{/* Content */}
-												<p className="mt-1.5 whitespace-nowrap text-[11px] text-text-sub-600">
-													Use descriptive names
-												</p>
-
-												{/* Examples */}
-												<div className="relative mt-1.5 space-y-1 text-[10px] text-text-sub-600">
-													<ul className="list-disc pl-5">
-														<li>Product Updates</li>
-														<li>Newsletter</li>
-													</ul>
-												</div>
-											</div>
-
-											{/* Bottom-left notch */}
-											<div className="-bottom-0 absolute left-4">
-												<svg
-													width="20"
-													height="16"
-													viewBox="0 0 20 16"
-													className="drop-shadow-sm"
-												>
-													<path
-														d="M0 0 C0 0 4 0 10 0 L0 16 L0 0 Z"
-														className="fill-white/60 dark:fill-neutral-800/80"
-													/>
-												</svg>
-											</div>
-										</div>
-									</div>
 								</div>
 
 								{/* Description */}
@@ -273,36 +214,27 @@ export const CreateTopicModal = ({
 								</div>
 							</div>
 
-							{/* Auto Enroll Option */}
-							<div className="mt-4 border-stroke-soft-200/50">
-								<button
-									type="button"
-									onClick={handleAutoEnrollClick}
-									disabled={isCreating}
-									className={`w-full cursor-pointer rounded-xl border p-3 text-left transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-neutral-300 ${
-										autoEnroll === "enrolled"
-											? "border-success-base/40 bg-success-lighter"
-											: "border-stroke-soft-200 bg-bg-white-0 hover:bg-bg-weak-50"
-									} ${isCreating ? "pointer-events-none opacity-50" : ""}`}
-								>
-									<div className="flex items-center justify-between">
+							{/* Settings Section */}
+							<div className="mt-2 space-y-3">
+								{/* Auto Enroll Toggle */}
+								<div className="flex items-center justify-between rounded-xl border border-stroke-soft-200 p-3">
+									<div className="flex items-center gap-3">
+										<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-bg-weak-50">
+											<Icon
+												name="user-plus"
+												className="h-4 w-4 text-text-sub-600"
+											/>
+										</div>
 										<div>
 											<div className="flex items-center gap-1">
-												<p
-													className={`font-medium text-paragraph-sm ${autoEnroll === "enrolled" ? "text-success-base" : "text-text-strong-950"}`}
-												>
+												<p className="font-medium text-paragraph-sm text-text-strong-950">
 													Auto Enroll Contacts
 												</p>
 												<Tooltip.Root>
 													<Tooltip.Trigger asChild>
 														<button
 															type="button"
-															onClick={(e) => e.stopPropagation()}
-															className={
-																autoEnroll === "enrolled"
-																	? "text-success-base"
-																	: "text-text-sub-600 hover:text-text-strong-950"
-															}
+															className="text-text-sub-600 hover:text-text-strong-950"
 														>
 															<Icon
 																name="info-outline"
@@ -326,74 +258,48 @@ export const CreateTopicModal = ({
 																<span className="font-semibold">
 																	Unenrolled:
 																</span>{" "}
-																Contacts are not added by default.they must be
-																added manually to this topic.
+																Contacts must be added manually to this topic.
 															</p>
 														</div>
 													</Tooltip.Content>
 												</Tooltip.Root>
 											</div>
-											<p
-												className={`mt-0.5 text-paragraph-xs ${
-													autoEnroll === "enrolled"
-														? "text-success-base"
-														: "text-text-sub-600"
-												}`}
-											>
+											<p className="text-paragraph-xs text-text-sub-600">
 												{autoEnroll === "enrolled"
 													? "New contacts are automatically enrolled"
 													: "Contacts must be manually enrolled"}
 											</p>
 										</div>
-										<div
-											className={`flex h-5 w-5 items-center justify-center rounded ${
-												autoEnroll === "enrolled"
-													? "bg-success-base"
-													: "border border-stroke-soft-200"
-											}`}
-										>
-											{autoEnroll === "enrolled" && (
-												<Icon name="check" className="h-3 w-3 text-white" />
-											)}
-										</div>
 									</div>
-								</button>
-							</div>
+									<Switch.Root
+										checked={autoEnroll === "enrolled"}
+										onCheckedChange={(checked) =>
+											setAutoEnroll(checked ? "enrolled" : "unenrolled")
+										}
+										disabled={isCreating}
+										checkedColor="orange"
+									/>
+								</div>
 
-							{/* Visibility Option */}
-							<div>
-								<button
-									type="button"
-									onClick={handleVisibilityClick}
-									disabled={isCreating}
-									className={`w-full cursor-pointer rounded-xl border p-3 text-left transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-neutral-300 ${
-										visibility === "public"
-											? "border-primary-base/40 bg-primary-lighter"
-											: "border-stroke-soft-200 bg-bg-white-0 hover:bg-bg-weak-50"
-									} ${isCreating ? "pointer-events-none opacity-50" : ""}`}
-								>
-									<div className="flex items-center justify-between">
+								{/* Visibility Toggle */}
+								<div className="flex items-center justify-between rounded-xl border border-stroke-soft-200 p-3">
+									<div className="flex items-center gap-3">
+										<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-bg-weak-50">
+											<Icon
+												name={visibility === "public" ? "globe" : "lock"}
+												className="h-4 w-4 text-text-sub-600"
+											/>
+										</div>
 										<div>
 											<div className="flex items-center gap-1">
-												<p
-													className={`font-medium text-paragraph-sm ${
-														visibility === "public"
-															? "text-primary-base"
-															: "text-text-strong-950"
-													}`}
-												>
+												<p className="font-medium text-paragraph-sm text-text-strong-950">
 													Public Topic
 												</p>
 												<Tooltip.Root>
 													<Tooltip.Trigger asChild>
 														<button
 															type="button"
-															onClick={(e) => e.stopPropagation()}
-															className={
-																visibility === "public"
-																	? "text-primary-base"
-																	: "text-text-sub-600 hover:text-text-strong-950"
-															}
+															className="text-text-sub-600 hover:text-text-strong-950"
 														>
 															<Icon
 																name="info-outline"
@@ -409,48 +315,35 @@ export const CreateTopicModal = ({
 													>
 														<div className="space-y-2">
 															<p className="text-paragraph-xs">
-																<span className="whitespace-nowrap font-semibold">
-																	Private:
-																</span>{" "}
-																Only visible on the email preferences page if
-																the contact is subscribed to it.
+																<span className="font-semibold">Private:</span>{" "}
+																Only visible on preferences page if contact is
+																subscribed.
 															</p>
 															<p className="text-paragraph-xs">
-																<span className="whitespace-nowrap font-semibold">
-																	Public:
-																</span>{" "}
-																Always visible on the email preferences page for
-																all contacts.
+																<span className="font-semibold">Public:</span>{" "}
+																Always visible on preferences page for all
+																contacts.
 															</p>
 														</div>
 													</Tooltip.Content>
 												</Tooltip.Root>
 											</div>
-											<p
-												className={`mt-0.5 text-paragraph-xs ${
-													visibility === "public"
-														? "text-primary-base"
-														: "text-text-sub-600"
-												}`}
-											>
+											<p className="text-paragraph-xs text-text-sub-600">
 												{visibility === "public"
 													? "Topic is visible to everyone"
 													: "Topic is only visible to your team"}
 											</p>
 										</div>
-										<div
-											className={`flex h-5 w-5 items-center justify-center rounded ${
-												visibility === "public"
-													? "bg-primary-base"
-													: "border border-stroke-soft-200"
-											}`}
-										>
-											{visibility === "public" && (
-												<Icon name="check" className="h-3 w-3 text-white" />
-											)}
-										</div>
 									</div>
-								</button>
+									<Switch.Root
+										checked={visibility === "public"}
+										onCheckedChange={(checked) =>
+											setVisibility(checked ? "public" : "private")
+										}
+										disabled={isCreating}
+										checkedColor="orange"
+									/>
+								</div>
 							</div>
 						</Modal.Body>
 						<Modal.Footer className="mt-4 justify-end border-stroke-soft-100/50">

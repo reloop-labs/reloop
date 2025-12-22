@@ -2,10 +2,27 @@ import * as SwitchPrimitives from "@radix-ui/react-switch";
 import { cn } from "@reloop/ui/cn";
 import * as React from "react";
 
+interface SwitchProps
+	extends React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root> {
+	checkedColor?: string;
+}
+
 const Switch = React.forwardRef<
 	React.ComponentRef<typeof SwitchPrimitives.Root>,
-	React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root>
->(({ className, disabled, ...rest }, forwardedRef) => {
+	SwitchProps
+>(({ className, disabled, checkedColor, ...rest }, forwardedRef) => {
+	const [isChecked, setIsChecked] = React.useState(
+		rest.defaultChecked ?? false,
+	);
+
+	// Track internal checked state for styling
+	const checked = rest.checked !== undefined ? rest.checked : isChecked;
+
+	const handleCheckedChange = (newChecked: boolean) => {
+		setIsChecked(newChecked);
+		rest.onCheckedChange?.(newChecked);
+	};
+
 	return (
 		<SwitchPrimitives.Root
 			className={cn(
@@ -14,7 +31,9 @@ const Switch = React.forwardRef<
 			)}
 			ref={forwardedRef}
 			disabled={disabled}
-			{...rest}
+			checked={rest.checked}
+			defaultChecked={rest.defaultChecked}
+			onCheckedChange={handleCheckedChange}
 		>
 			<div
 				className={cn(
@@ -28,20 +47,25 @@ const Switch = React.forwardRef<
 						"group-focus-visible/switch:bg-bg-sub-300",
 						// pressed
 						"group-active/switch:bg-bg-soft-200",
-						// checked
-						"group-data-[state=checked]/switch:bg-primary-base",
-						// checked hover
-						"group-hover:data-[state=checked]/switch:bg-primary-darker",
-						// checked pressed
-						"group-active:data-[state=checked]/switch:bg-primary-base",
 						// focus
 						"group-focus/switch:outline-none",
+						// Default primary color when no custom color provided
+						!checkedColor && [
+							"group-data-[state=checked]/switch:bg-primary-base",
+							"group-hover:data-[state=checked]/switch:bg-primary-darker",
+							"group-active:data-[state=checked]/switch:bg-primary-base",
+						],
 					],
 					// disabled
 					disabled && [
 						"bg-bg-white-0 p-[3px] ring-1 ring-stroke-soft-200 ring-inset",
 					],
 				)}
+				style={
+					checkedColor && !disabled && checked
+						? { backgroundColor: checkedColor }
+						: undefined
+				}
 			>
 				<SwitchPrimitives.Thumb
 					className={cn(

@@ -184,7 +184,7 @@ export const TopicHeader = ({
 											onClick={() =>
 												setIsDescriptionExpanded(!isDescriptionExpanded)
 											}
-											className="mt-0.5 text-paragraph-xs text-primary-base transition-colors hover:text-primary-darker"
+											className="mt-0.5 text-primary-base text-xs transition-colors hover:text-primary-darker"
 										>
 											{isDescriptionExpanded ? "Show less" : "Read more"}
 										</button>
@@ -214,7 +214,6 @@ export const TopicHeader = ({
 				</div>
 			</div>
 
-			{/* Stats Grid - Row 1: Enrollment, Visibility, Created, Topic ID */}
 			<div className="mt-10 grid grid-cols-3 gap-x-12 gap-y-12">
 				{/* Enrollment */}
 				<div className="flex flex-col gap-1.5">
@@ -307,7 +306,7 @@ export const TopicHeader = ({
 							onClick={handleCopyId}
 						>
 							<code className="rounded bg-neutral-alpha-10 px-2 py-1 font-medium font-mono text-text-strong-950 text-xs">
-								{topic?.id?.slice(0, 12)}...
+								{topic?.id}
 							</code>
 							<Icon
 								name={copied ? "check" : "copy"}
