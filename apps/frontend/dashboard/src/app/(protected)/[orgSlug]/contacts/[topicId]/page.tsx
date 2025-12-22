@@ -151,7 +151,7 @@ const TopicDetailPage = () => {
 	return (
 		<div className="mx-auto max-w-3xl sm:px-8">
 			<TopicHeader
-				topic={topicData || null}
+				topic={topicData || undefined}
 				isLoading={topicLoading}
 				isFailed={!!topicError}
 				onOpenAddContact={() => setShowAddContact(true)}

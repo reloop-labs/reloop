@@ -18,17 +18,17 @@ import { TopicDropdown } from "../../../contacts/components/topic-dropdown";
 interface Topic {
 	id: string;
 	name: string;
-	description: string | undefined;
+	description: string | null;
 	organizationId: string;
 	autoEnroll?: "enrolled" | "unenrolled";
 	visibility?: "private" | "public";
 	createdAt: string;
 	updatedAt: string;
-	deletedAt: string | undefined;
+	deletedAt: string | null;
 }
 
 interface TopicHeaderProps {
-	topic: Topic;
+	topic: Topic | undefined;
 	isLoading: boolean;
 	isFailed: boolean;
 	onOpenAddContact: () => void;

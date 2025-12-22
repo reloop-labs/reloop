@@ -3,6 +3,7 @@ import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-butto
 import { AnimatedHoverBackground } from "@fe/dashboard/components/layout/sidebar/animated-hover-background";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
+import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -12,7 +13,6 @@ import {
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
-import * as Avatar from "@reloop/ui/avatar";
 import axios from "axios";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
@@ -66,10 +66,25 @@ const getStatusIcon = (enabled: boolean) => {
 };
 
 const headerMenuItems = [
-	{ id: "docs", label: "Go to docs", icon: "file-text" as const, isDanger: false },
-	{ id: "rotate", label: "Rotate key", icon: "rotate-cw" as const, isDanger: false },
+	{
+		id: "docs",
+		label: "Go to docs",
+		icon: "file-text" as const,
+		isDanger: false,
+	},
+	{
+		id: "rotate",
+		label: "Rotate key",
+		icon: "rotate-cw" as const,
+		isDanger: false,
+	},
 	{ id: "edit", label: "Edit API key", icon: "edit" as const, isDanger: false },
-	{ id: "delete", label: "Delete API key", icon: "trash" as const, isDanger: true },
+	{
+		id: "delete",
+		label: "Delete API key",
+		icon: "trash" as const,
+		isDanger: true,
+	},
 ];
 
 export const ApiKeyHeader = ({
@@ -235,7 +250,9 @@ export const ApiKeyHeader = ({
 						{isLoading ? (
 							<Skeleton className="mt-2 h-7 w-48 rounded-lg" />
 						) : (
-							<h1 className="font-medium text-title-h6 leading-8">{displayName}</h1>
+							<h1 className="font-medium text-title-h6 leading-8">
+								{displayName}
+							</h1>
 						)}
 					</div>
 
@@ -271,10 +288,18 @@ export const ApiKeyHeader = ({
 								<PopoverRoot>
 									<PopoverTrigger asChild>
 										<Button.Root variant="neutral" mode="stroke" size="xsmall">
-											<Icon name="more-vertical" className="h-3.5 w-3.5 text-text-sub-600" />
+											<Icon
+												name="more-vertical"
+												className="h-3.5 w-3.5 text-text-sub-600"
+											/>
 										</Button.Root>
 									</PopoverTrigger>
-									<PopoverContent align="end" sideOffset={8} className="w-44 p-1.5 rounded-xl" showArrow>
+									<PopoverContent
+										align="end"
+										sideOffset={8}
+										className="w-44 rounded-xl p-1.5"
+										showArrow
+									>
 										<div className="relative">
 											{headerMenuItems.map((item, idx) => (
 												<button
@@ -287,14 +312,23 @@ export const ApiKeyHeader = ({
 													onPointerLeave={() => setHoverIdx(undefined)}
 													onClick={() => handleMenuItemClick(item.id)}
 													className={cn(
-														"flex w-full cursor-pointer items-center gap-2 rounded-lg pl-2 py-1.5 text-xs font-normal transition-colors",
-														item.isDanger ? "text-error-base" : "text-text-strong-950",
-														!currentRect && hoverIdx === idx && (item.isDanger ? "bg-red-alpha-10" : "bg-neutral-alpha-10")
+														"flex w-full cursor-pointer items-center gap-2 rounded-lg py-1.5 pl-2 font-normal text-xs transition-colors",
+														item.isDanger
+															? "text-error-base"
+															: "text-text-strong-950",
+														!currentRect &&
+															hoverIdx === idx &&
+															(item.isDanger
+																? "bg-red-alpha-10"
+																: "bg-neutral-alpha-10"),
 													)}
 												>
 													<Icon
 														name={item.icon}
-														className={cn("h-3.5 w-3.5", item.isDanger ? "" : "text-text-sub-600")}
+														className={cn(
+															"h-3.5 w-3.5",
+															item.isDanger ? "" : "text-text-sub-600",
+														)}
 													/>
 													<span>{item.label}</span>
 												</button>
@@ -316,17 +350,20 @@ export const ApiKeyHeader = ({
 					<div className="flex flex-col gap-1.5">
 						<div className="flex items-center gap-1.5">
 							<Icon name="key-new" className="h-3.5 w-3.5 text-text-sub-600" />
-							<span className="text-[10px] font-medium uppercase tracking-wider text-text-sub-600">
+							<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
 								Key Prefix
 							</span>
 						</div>
-						{isLoading ?
+						{isLoading ? (
 							<Skeleton className="h-5 w-24 rounded-lg" />
-							: <div
-								className="flex items-center gap-1.5 group/copy cursor-pointer w-fit"
+						) : (
+							<button
+								type="button"
+								key={apiKey?.id}
+								className="group/copy flex w-fit cursor-pointer items-center gap-1.5"
 								onClick={handleCopyPrefix}
 							>
-								<code className="rounded bg-neutral-alpha-10 px-2 py-1 font-mono text-xs font-medium text-text-strong-950">
+								<code className="rounded bg-neutral-alpha-10 px-2 py-1 font-medium font-mono text-text-strong-950 text-xs">
 									{displayPrefix}...
 								</code>
 								<Icon
@@ -335,81 +372,98 @@ export const ApiKeyHeader = ({
 										"h-3 w-3 transition-all",
 										copied
 											? "text-success-base"
-											: "text-text-sub-600 opacity-0 group-hover/copy:opacity-100"
+											: "text-text-sub-600 opacity-0 group-hover/copy:opacity-100",
 									)}
 								/>
-							</div>}
+							</button>
+						)}
 					</div>
 
 					{/* Total Requests */}
 					<div className="flex flex-col gap-1.5">
 						<div className="flex items-center gap-1.5">
-							<Icon name="activity-2" className="h-3.5 w-3.5 text-text-sub-600" />
-							<span className="text-[10px] font-medium uppercase tracking-wider text-text-sub-600">
+							<Icon
+								name="activity-2"
+								className="h-3.5 w-3.5 text-text-sub-600"
+							/>
+							<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
 								Requests
 							</span>
 						</div>
-						{isLoading ?
+						{isLoading ? (
 							<Skeleton className="h-5 w-24 rounded-lg" />
-							: <span className="font-medium text-paragraph-sm text-text-strong-950">
+						) : (
+							<span className="font-medium text-paragraph-sm text-text-strong-950">
 								{(apiKey?.requestCount || 0).toLocaleString()} times
-							</span>}
+							</span>
+						)}
 					</div>
 
 					{/* Last Used */}
 					<div className="flex flex-col gap-1.5">
 						<div className="flex items-center gap-1.5">
 							<Icon name="clock" className="h-3.5 w-3.5 text-text-sub-600" />
-							<span className="text-[10px] font-medium uppercase tracking-wider text-text-sub-600">
+							<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
 								Last Used
 							</span>
 						</div>
-						{isLoading ?
+						{isLoading ? (
 							<Skeleton className="h-5 w-24 rounded-lg" />
-							: <span className="font-medium text-paragraph-sm text-text-strong-950">
+						) : (
+							<span className="font-medium text-paragraph-sm text-text-strong-950">
 								{apiKey?.lastRequest
 									? formatRelativeTime(apiKey.lastRequest)
 									: "No activity"}
-							</span>}
+							</span>
+						)}
 					</div>
 
 					{/* Created */}
 					<div className="flex flex-col gap-1.5">
 						<div className="flex items-center gap-1.5">
 							<Icon name="calendar" className="h-3.5 w-3.5 text-text-sub-600" />
-							<span className="text-[10px] font-medium uppercase tracking-wider text-text-sub-600">
+							<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
 								Created
 							</span>
 						</div>
-						{isLoading ?
+						{isLoading ? (
 							<Skeleton className="h-5 w-24 rounded-lg" />
-							: <span className="font-medium text-paragraph-sm text-text-strong-950">
+						) : (
+							<span className="font-medium text-paragraph-sm text-text-strong-950">
 								{apiKey?.createdAt
 									? formatRelativeTime(apiKey.createdAt)
 									: "---"}
-							</span>}
+							</span>
+						)}
 					</div>
 
 					{/* Created By */}
 					<div className="flex flex-col gap-1.5">
 						<div className="flex items-center gap-1.5">
 							<Icon name="user" className="h-3.5 w-3.5 text-text-sub-600" />
-							<span className="text-[10px] font-medium uppercase tracking-wider text-text-sub-600">
+							<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
 								Created By
 							</span>
 						</div>
-						{isLoading ?
+						{isLoading ? (
 							<Skeleton className="h-5 w-24 rounded-lg" />
-							: <div className="flex items-center gap-2">
+						) : (
+							<div className="flex items-center gap-2">
 								<Avatar.Root size="20">
 									{apiKey?.createdBy?.image ? (
-										<Avatar.Image src={apiKey.createdBy.image} alt={apiKey.createdBy.name || "User"} />
+										<Avatar.Image
+											src={apiKey.createdBy.image}
+											alt={apiKey.createdBy.name || "User"}
+										/>
 									) : null}
 								</Avatar.Root>
 								<span className="font-medium text-paragraph-sm text-text-strong-950">
-									{apiKey?.createdBy?.email || apiKey?.createdBy?.name || "Unknown"}
+									{apiKey?.createdBy?.email ||
+										apiKey?.createdBy?.name ||
+										"Unknown"}
 								</span>
-							</div>}
+							</div>
+						)}
 					</div>
 				</div>
 			</div>

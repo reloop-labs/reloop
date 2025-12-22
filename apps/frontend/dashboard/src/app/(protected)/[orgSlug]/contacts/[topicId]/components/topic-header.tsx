@@ -21,7 +21,7 @@ interface Topic {
 }
 
 interface TopicHeaderProps {
-	topic: Topic | null;
+	topic: Topic | undefined;
 	isLoading: boolean;
 	isFailed: boolean;
 	onOpenAddContact: () => void;
