@@ -2,14 +2,8 @@
 import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
-import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import {
-	Content as PopoverContent,
-	Root as PopoverRoot,
-	Trigger as PopoverTrigger,
-} from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -31,14 +25,8 @@ interface TopicHeaderProps {
 	topic: Topic | undefined;
 	isLoading: boolean;
 	isFailed: boolean;
-	onOpenAddContact: () => void;
-	onOpenBulkImport: () => void;
 	onDelete?: () => void;
 	onEdit?: () => void;
-	onToggleEnrollment?: (
-		topicId: string,
-		currentValue: "enrolled" | "unenrolled",
-	) => void;
 	onToggleVisibility?: (
 		topicId: string,
 		currentValue: "private" | "public",
@@ -63,11 +51,8 @@ export const TopicHeader = ({
 	topic,
 	isLoading,
 	isFailed: _isFailed,
-	onOpenAddContact,
-	onOpenBulkImport,
 	onDelete,
 	onEdit,
-	onToggleEnrollment,
 	onToggleVisibility,
 }: TopicHeaderProps) => {
 	const { push } = useUserOrganization();
@@ -179,52 +164,38 @@ export const TopicHeader = ({
 					{isLoading ? (
 						<Skeleton className="mt-2 h-7 w-48 rounded-lg" />
 					) : (
-						<h1 className="mt-1 font-medium text-title-h6 leading-8">
-							{topic?.name}
-						</h1>
+						<>
+							<h1 className="mt-1 font-medium text-title-h6 leading-8">
+								{topic?.name}
+							</h1>
+							{topic?.description && (
+								<div className="max-w-xs">
+									<p
+										className={cn(
+											"break-words text-text-sub-600 text-xs",
+											!isDescriptionExpanded && "line-clamp-1",
+										)}
+									>
+										{topic.description}
+									</p>
+									{topic.description.length > 20 && (
+										<button
+											type="button"
+											onClick={() =>
+												setIsDescriptionExpanded(!isDescriptionExpanded)
+											}
+											className="mt-0.5 text-paragraph-xs text-primary-base transition-colors hover:text-primary-darker"
+										>
+											{isDescriptionExpanded ? "Show less" : "Read more"}
+										</button>
+									)}
+								</div>
+							)}
+						</>
 					)}
 				</div>
 
 				<div className="flex items-center gap-2">
-					{/* Add Contact Dropdown */}
-					<PopoverRoot>
-						<PopoverTrigger asChild>
-							<Button.Root variant="neutral" size="xsmall">
-								Add Contact
-								<Icon name="chevron-down" className="h-4 w-4" />
-							</Button.Root>
-						</PopoverTrigger>
-						<PopoverContent
-							align="end"
-							side="bottom"
-							className="p-2"
-							sideOffset={3}
-						>
-							<div className="flex flex-col gap-1">
-								<Button.Root
-									variant="neutral"
-									mode="ghost"
-									size="small"
-									onClick={onOpenAddContact}
-									className="w-full justify-start"
-								>
-									<Icon name="user-plus" className="h-4 w-4" />
-									Add Single Contact
-								</Button.Root>
-								<Button.Root
-									variant="neutral"
-									mode="ghost"
-									size="small"
-									onClick={onOpenBulkImport}
-									className="w-full justify-start"
-								>
-									<Icon name="file-upload" className="h-4 w-4" />
-									Bulk Import (CSV)
-								</Button.Root>
-							</div>
-						</PopoverContent>
-					</PopoverRoot>
-
 					{/* Actions Menu */}
 					{isLoading ? (
 						<Skeleton className="h-9 w-9 rounded-lg" />
@@ -232,12 +203,10 @@ export const TopicHeader = ({
 						<TopicDropdown
 							topicId={topic.id}
 							topicName={topic.name}
-							autoEnroll={topic.autoEnroll}
 							visibility={topic.visibility}
 							onViewDetails={() => {}}
 							onEdit={handleEdit}
 							onDelete={handleDelete}
-							onToggleEnrollment={onToggleEnrollment}
 							onToggleVisibility={onToggleVisibility}
 							hideViewDetails
 						/>
@@ -245,38 +214,8 @@ export const TopicHeader = ({
 				</div>
 			</div>
 
-			{/* Stats Grid - Row 1: Topic ID, Enrollment, Visibility */}
+			{/* Stats Grid - Row 1: Enrollment, Visibility, Created, Topic ID */}
 			<div className="mt-10 grid grid-cols-3 gap-x-12 gap-y-12">
-				{/* Topic ID */}
-				<div className="flex flex-col gap-1.5">
-					<div className="flex items-center gap-1.5">
-						<Icon name="hash" className="h-3.5 w-3.5 text-text-sub-600" />
-						<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
-							Topic ID
-						</span>
-					</div>
-					{isLoading ? (
-						<Skeleton className="h-6 w-28 rounded-lg" />
-					) : (
-						<button
-							className="group/copy flex w-fit cursor-pointer items-center gap-1.5"
-							type="button"
-							onClick={handleCopyId}
-						>
-							<code className="rounded bg-neutral-alpha-10 px-2 py-1 font-medium font-mono text-text-strong-950 text-xs">
-								{topic?.id?.slice(0, 12)}...
-							</code>
-							<Icon
-								name={copied ? "check" : "copy"}
-								className={cn(
-									"h-3 w-3 flex-shrink-0 transition-all",
-									copied ? "text-success-base" : "text-text-sub-600",
-								)}
-							/>
-						</button>
-					)}
-				</div>
-
 				{/* Enrollment */}
 				<div className="flex flex-col gap-1.5">
 					<div className="flex items-center gap-1.5">
@@ -333,10 +272,7 @@ export const TopicHeader = ({
 						</span>
 					)}
 				</div>
-			</div>
 
-			{/* Stats Grid - Row 2: Created & Description */}
-			<div className="mt-12 grid grid-cols-3 gap-x-12 gap-y-12">
 				{/* Created */}
 				<div className="flex flex-col gap-1.5">
 					<div className="flex items-center gap-1.5">
@@ -354,43 +290,33 @@ export const TopicHeader = ({
 					)}
 				</div>
 
-				{/* Description */}
-				<div className="col-span-2 flex min-w-0 flex-col gap-1.5 overflow-hidden">
+				{/* Topic ID */}
+				<div className="flex flex-col gap-1.5">
 					<div className="flex items-center gap-1.5">
-						<Icon name="file-text" className="h-3.5 w-3.5 text-text-sub-600" />
+						<Icon name="hash" className="h-3.5 w-3.5 text-text-sub-600" />
 						<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
-							Description
+							Topic ID
 						</span>
 					</div>
 					{isLoading ? (
-						<Skeleton className="h-5 w-48 rounded-lg" />
+						<Skeleton className="h-6 w-28 rounded-lg" />
 					) : (
-						<div className="flex flex-col gap-1">
-							<span
+						<button
+							className="group/copy flex w-fit cursor-pointer items-center gap-1.5"
+							type="button"
+							onClick={handleCopyId}
+						>
+							<code className="rounded bg-neutral-alpha-10 px-2 py-1 font-medium font-mono text-text-strong-950 text-xs">
+								{topic?.id?.slice(0, 12)}...
+							</code>
+							<Icon
+								name={copied ? "check" : "copy"}
 								className={cn(
-									"break-words text-[14px] leading-relaxed",
-									topic?.description
-										? "text-text-strong-950"
-										: "text-text-soft-400 italic",
-									!isDescriptionExpanded &&
-										topic?.description &&
-										"line-clamp-2",
+									"h-3 w-3 flex-shrink-0 transition-all",
+									copied ? "text-success-base" : "text-text-sub-600",
 								)}
-							>
-								{topic?.description || "No description"}
-							</span>
-							{topic?.description && topic.description.length > 100 && (
-								<button
-									type="button"
-									onClick={() =>
-										setIsDescriptionExpanded(!isDescriptionExpanded)
-									}
-									className="w-fit font-medium text-[14px] text-primary-base transition-colors hover:text-primary-darker"
-								>
-									{isDescriptionExpanded ? "Show less" : "Read more..."}
-								</button>
-							)}
-						</div>
+							/>
+						</button>
 					)}
 				</div>
 			</div>

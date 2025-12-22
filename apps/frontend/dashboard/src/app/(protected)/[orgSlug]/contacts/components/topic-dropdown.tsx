@@ -13,15 +13,10 @@ import { useRef, useState } from "react";
 interface TopicDropdownProps {
 	topicId: string;
 	topicName: string;
-	autoEnroll?: "enrolled" | "unenrolled";
 	visibility?: "private" | "public";
 	onViewDetails: (id: string) => void;
 	onEdit?: (id: string) => void;
 	onDelete: (id: string) => void;
-	onToggleEnrollment?: (
-		id: string,
-		currentValue: "enrolled" | "unenrolled",
-	) => void;
 	onToggleVisibility?: (id: string, currentValue: "private" | "public") => void;
 	onOpenChange?: (open: boolean) => void;
 	hideViewDetails?: boolean;
@@ -30,12 +25,10 @@ interface TopicDropdownProps {
 export const TopicDropdown = ({
 	topicId,
 	topicName: _topicName,
-	autoEnroll = "unenrolled",
 	visibility = "private",
 	onViewDetails,
 	onEdit,
 	onDelete,
-	onToggleEnrollment,
 	onToggleVisibility,
 	onOpenChange,
 	hideViewDetails = false,
@@ -67,17 +60,11 @@ export const TopicDropdown = ({
 		setPopoverOpen(false);
 	};
 
-	const handleToggleEnrollment = () => {
-		onToggleEnrollment?.(topicId, autoEnroll);
-		setPopoverOpen(false);
-	};
-
 	const handleToggleVisibility = () => {
 		onToggleVisibility?.(topicId, visibility);
 		setPopoverOpen(false);
 	};
 
-	const enrollmentIcon = autoEnroll === "enrolled" ? "user-minus" : "user-plus";
 	const visibilityIcon = visibility === "public" ? "lock" : "globe";
 
 	const menuItems = [
@@ -92,12 +79,6 @@ export const TopicDropdown = ({
 			label: "Edit Topic",
 			onClick: handleEdit,
 			hidden: !onEdit,
-		},
-		{
-			icon: enrollmentIcon as "user-minus" | "user-plus",
-			label: autoEnroll === "enrolled" ? "Set Unenrolled" : "Set Enrolled",
-			onClick: handleToggleEnrollment,
-			hidden: !onToggleEnrollment,
 		},
 		{
 			icon: visibilityIcon as "lock" | "globe",

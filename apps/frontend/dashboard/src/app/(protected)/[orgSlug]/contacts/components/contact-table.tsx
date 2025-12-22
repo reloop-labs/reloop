@@ -171,8 +171,7 @@ export const ContactTable = ({
 						{contacts.map((contact, index) => {
 							const isRowActive = activeDropdownId === contact.id;
 							return (
-								<button
-									type="button"
+								<div
 									key={contact.id}
 									onClick={() => handleRowClick(contact)}
 									className={cn(
@@ -235,7 +234,7 @@ export const ContactTable = ({
 											}
 										/>
 									</motion.div>
-								</button>
+								</div>
 							);
 						})}
 					</div>

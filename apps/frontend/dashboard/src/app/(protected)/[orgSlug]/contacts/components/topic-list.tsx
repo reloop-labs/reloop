@@ -77,29 +77,6 @@ export const TopicList = ({ hideHeader = false }: TopicListProps) => {
 			return matchesSearch;
 		}) || [];
 
-	const handleToggleEnrollment = async (
-		topicId: string,
-		currentValue: "enrolled" | "unenrolled",
-	) => {
-		const newValue = currentValue === "enrolled" ? "unenrolled" : "enrolled";
-		try {
-			const response = await fetch(`/api/contacts/v1/topics/${topicId}`, {
-				method: "PATCH",
-				headers: { "Content-Type": "application/json" },
-				credentials: "include",
-				body: JSON.stringify({ autoEnroll: newValue }),
-			});
-			if (!response.ok) throw new Error("Failed to update enrollment");
-			toast.success(`Enrollment set to ${newValue}`);
-			mutate(
-				(key: string) =>
-					typeof key === "string" && key.startsWith("/api/contacts/v1/topics"),
-			);
-		} catch {
-			toast.error("Failed to update enrollment");
-		}
-	};
-
 	const handleToggleVisibility = async (
 		topicId: string,
 		currentValue: "private" | "public",
@@ -177,7 +154,6 @@ export const TopicList = ({ hideHeader = false }: TopicListProps) => {
 								activeOrganizationSlug={activeOrganization.slug}
 								isLoading={isLoading}
 								loadingRows={4}
-								onToggleEnrollment={handleToggleEnrollment}
 								onToggleVisibility={handleToggleVisibility}
 								onEdit={(topicId) => setEditTopicId(topicId)}
 							/>

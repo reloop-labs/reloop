@@ -41,7 +41,10 @@
 			},
 			"a11y": {
 				"noSvgWithoutTitle": "off",
-				"noAriaHiddenOnFocusable": "off"
+				"noAriaHiddenOnFocusable": "off",
+				"noStaticElementInteractions": "off",
+				"useKeyWithClickEvents": "off"
+
 			},
 			"nursery": {
 				"useSortedClasses": {

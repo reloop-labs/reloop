@@ -27,10 +27,6 @@ interface TopicTableProps {
 	activeOrganizationSlug: string;
 	isLoading?: boolean;
 	loadingRows?: number;
-	onToggleEnrollment?: (
-		topicId: string,
-		currentValue: "enrolled" | "unenrolled",
-	) => void;
 	onToggleVisibility?: (
 		topicId: string,
 		currentValue: "private" | "public",
@@ -58,7 +54,6 @@ export const TopicTable = ({
 	activeOrganizationSlug,
 	isLoading,
 	loadingRows = 4,
-	onToggleEnrollment,
 	onToggleVisibility,
 	onEdit,
 }: TopicTableProps) => {
@@ -243,12 +238,10 @@ export const TopicTable = ({
 												<TopicDropdown
 													topicId={topic.id}
 													topicName={topic.name}
-													autoEnroll={topic.autoEnroll}
 													visibility={topic.visibility}
 													onViewDetails={handleViewDetails}
 													onEdit={onEdit}
 													onDelete={handleDelete}
-													onToggleEnrollment={onToggleEnrollment}
 													onToggleVisibility={onToggleVisibility}
 													onOpenChange={(open: boolean) =>
 														setActiveDropdownId(open ? topic.id : null)

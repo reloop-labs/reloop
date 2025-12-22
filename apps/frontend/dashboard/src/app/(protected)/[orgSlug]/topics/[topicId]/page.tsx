@@ -1,7 +1,7 @@
 "use client";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -23,8 +23,7 @@ interface Topic {
 }
 
 const TopicDetailPage = () => {
-	const { topicId, orgSlug } = useParams();
-	const router = useRouter();
+	const { topicId } = useParams();
 	const { mutate } = useSWRConfig();
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 	const [, setDeleteId] = useQueryState("delete");
@@ -37,29 +36,6 @@ const TopicDetailPage = () => {
 		revalidateOnFocus: true,
 		revalidateOnReconnect: true,
 	});
-
-	const handleToggleEnrollment = async (
-		topicIdParam: string,
-		currentValue: "enrolled" | "unenrolled",
-	) => {
-		const newValue = currentValue === "enrolled" ? "unenrolled" : "enrolled";
-		try {
-			const response = await fetch(`/api/contacts/v1/topics/${topicIdParam}`, {
-				method: "PATCH",
-				headers: { "Content-Type": "application/json" },
-				credentials: "include",
-				body: JSON.stringify({ autoEnroll: newValue }),
-			});
-			if (!response.ok) throw new Error("Failed to update enrollment");
-			toast.success(`Enrollment set to ${newValue}`);
-			mutate(
-				(key: string) =>
-					typeof key === "string" && key.startsWith("/api/contacts/v1/topics"),
-			);
-		} catch {
-			toast.error("Failed to update enrollment");
-		}
-	};
 
 	const handleToggleVisibility = async (
 		topicIdParam: string,
@@ -121,13 +97,8 @@ const TopicDetailPage = () => {
 				topic={topicData}
 				isLoading={topicLoading}
 				isFailed={!!topicError}
-				onOpenAddContact={() => {}}
-				onOpenBulkImport={() =>
-					router.push(`/${orgSlug}/topics/${topicId}/bulk-import`)
-				}
 				onDelete={handleDelete}
 				onEdit={handleEdit}
-				onToggleEnrollment={handleToggleEnrollment}
 				onToggleVisibility={handleToggleVisibility}
 			/>
 
