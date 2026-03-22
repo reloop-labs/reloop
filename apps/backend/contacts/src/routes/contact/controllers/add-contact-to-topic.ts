@@ -5,7 +5,7 @@ import { logger } from "@reloop/logger";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
-interface AddContactToTopicResult {
+export interface AddContactToTopicResult {
   contact: {
     id: string;
     email: string;
@@ -90,10 +90,10 @@ export async function addContactToTopic(
 
     if (existingSubscription) {
       // If unsubscribed, resubscribe
-      if (existingSubscription.status === "unsubscribed") {
+      if (existingSubscription.status === "unenrolled") {
         await db
           .update(schema.topicSubscription)
-          .set({ status: "subscribed", updatedAt: new Date() })
+          .set({ status: "enrolled", updatedAt: new Date() })
           .where(eq(schema.topicSubscription.id, existingSubscription.id));
 
         logger.info({ subscriptionId: existingSubscription.id }, "Resubscribed contact");
@@ -112,7 +112,7 @@ export async function addContactToTopic(
         contactId: contact.id,
         topicId,
         organizationId,
-        status: "subscribed",
+        status: "enrolled",
       })
       .returning();
 
