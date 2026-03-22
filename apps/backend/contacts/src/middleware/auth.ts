@@ -8,7 +8,7 @@ if (contactsConfig.NODE_ENV !== "production") {
 	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 }
 
-export const authMiddleware = new Elysia({ name: "better-auth" }).macro({
+export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 	auth: {
 		async resolve({ status, request: { headers } }) {
 			try {

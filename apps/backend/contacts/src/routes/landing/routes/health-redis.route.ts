@@ -24,8 +24,8 @@ export const healthRedisRoute = new Elysia().get(
   },
   {
     detail: {
-      tags: ["Service"],
-      summary: "Health check for Redis",
+      tags: ["Health"],
+      summary: "Redis",
       description: "Checks the health of the Redis database",
     },
   },

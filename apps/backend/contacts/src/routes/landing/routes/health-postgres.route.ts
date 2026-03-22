@@ -20,8 +20,8 @@ export const healthPostgresRoute = new Elysia().get(
   },
   {
     detail: {
-      tags: ["Service"],
-      summary: "Health check for Postgres",
+      tags: ["Health"],
+      summary: "Postgres",
       description: "Checks the health of the Postgres database",
     },
   },
