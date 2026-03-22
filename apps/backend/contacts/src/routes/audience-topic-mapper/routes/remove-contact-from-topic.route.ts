@@ -5,8 +5,7 @@ import { Elysia, t } from "elysia";
 
 export const removeContactFromTopicRoute = new Elysia().use(authMiddleware).post(
   "/remove",
-  async ({ body, user }) => {
-    const { activeOrganizationId } = user;
+  async ({ body, activeOrganizationId }) => {
     return await removeContactFromTopicHandler(activeOrganizationId, body);
   },
   {

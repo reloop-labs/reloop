@@ -5,9 +5,9 @@ import { Elysia, t } from "elysia";
 
 export const getTopicEnrollmentRoute = new Elysia().use(authMiddleware).get(
   "/:enrollmentId",
-  async ({ params, user }) => {
+  async ({ params, activeOrganizationId }) => {
     const { enrollmentId } = params;
-    return await getTopicSubscriptionHandler(enrollmentId, user.activeOrganizationId);
+    return await getTopicSubscriptionHandler(enrollmentId, activeOrganizationId);
   },
   {
     auth: true,

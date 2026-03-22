@@ -1,5 +1,4 @@
 import { authMiddleware } from "@be/contacts/middleware/auth";
-import type { User } from "@reloop/auth/server";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { and, eq, isNull } from "drizzle-orm";
@@ -11,12 +10,8 @@ export const getContactPropertiesRoute = new Elysia()
     "/:id/properties",
     async ({
       params,
-      user,
-    }: {
-      params: { id: string };
-      user: User;
+      activeOrganizationId,
     }) => {
-      const { activeOrganizationId } = user;
 
       // First verify the contact belongs to this organization
       const contact = await db.query.contact.findFirst({

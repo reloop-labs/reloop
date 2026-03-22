@@ -5,8 +5,7 @@ import { Elysia } from "elysia";
 
 export const bulkAddContactsToTopicRoute = new Elysia().use(authMiddleware).post(
   "/bulk-add",
-  async ({ body, user }) => {
-    const { activeOrganizationId } = user;
+  async ({ body, activeOrganizationId }) => {
     return await bulkAddContactsToTopicHandler(activeOrganizationId, body);
   },
   {

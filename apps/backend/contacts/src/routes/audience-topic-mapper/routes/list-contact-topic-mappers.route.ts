@@ -5,8 +5,8 @@ import { Elysia } from "elysia";
 
 export const listTopicEnrollmentsRoute = new Elysia().use(authMiddleware).get(
   "/list",
-  async ({ query, user }) => {
-    return await listTopicSubscriptionsHandler(query, user.activeOrganizationId);
+  async ({ query, activeOrganizationId }) => {
+    return await listTopicSubscriptionsHandler(query, activeOrganizationId);
   },
   {
     auth: true,

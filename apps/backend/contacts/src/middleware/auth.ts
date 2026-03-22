@@ -1,46 +1,34 @@
 import { contactsConfig } from "@be/contacts/contacts.config";
-import { errorCodes } from "@be/contacts/utils/contacts.error-code";
-import type { Session } from "@reloop/auth/server";
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
+import { validateApiKey } from "./api-key-auth";
+import { validateSession } from "./cookie-auth";
 
 if (contactsConfig.NODE_ENV !== "production") {
 	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 }
 
-export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
+export const authMiddleware = new Elysia({ name: "AuthMiddleware" }).macro({
 	auth: {
 		async resolve({ status, request: { headers } }) {
 			try {
-				const response = await fetch(
-					`${contactsConfig.BASE_URL}/api/auth/v1/get-session`,
-					{
-						method: "GET",
-						headers: new Headers({
-							"Content-Type": "application/json",
-							Cookie: headers.get("cookie") || "",
-						}),
-					},
-				);
-				const session: Session | null = await response.json();
-				if (session) {
-					if (!session?.user?.activeOrganizationId) {
-						return status(401, {
-							message: "User is not a member of an organization",
-							code: errorCodes.NOT_MEMBER_OF_ORGANIZATION,
-						});
-					}
-					return {
-						user: session.user,
-						session: session.session,
-						authMethod: "cookie" as const,
-					};
-				}
+				const apiKey = headers.get("x-api-key") || headers.get("authorization")?.replace("Bearer ", "");
+				const cookie = headers.get("cookie");
+
+				// 1. Check for API Token
+				const apiKeyResult = await validateApiKey(apiKey);
+				if (apiKeyResult) return apiKeyResult;
+
+				// 2. Fallback to Session Cookie
+				const sessionResult = await validateSession(cookie);
+				if (sessionResult) return sessionResult;
+
 				return status(401, { message: "Authentication required" });
-			} catch (error) {
+			} catch (e) {
 				logger.error(
 					{
-						error: error instanceof Error ? error.message : "Unknown error",
+						error: e instanceof Error ? e.message : "Unknown error",
+						stack: e instanceof Error ? e.stack : undefined,
 					},
 					"Authentication error",
 				);

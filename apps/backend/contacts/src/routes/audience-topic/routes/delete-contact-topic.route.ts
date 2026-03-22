@@ -5,9 +5,9 @@ import { Elysia, t } from "elysia";
 
 export const deleteTopicRoute = new Elysia().use(authMiddleware).delete(
   "/:topicId",
-  async ({ params, user }) => {
+  async ({ params, activeOrganizationId }) => {
     const { topicId } = params;
-    return await deleteTopicHandler(topicId, user.activeOrganizationId);
+    return await deleteTopicHandler(topicId, activeOrganizationId);
   },
   {
     auth: true,

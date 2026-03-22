@@ -5,8 +5,7 @@ import { Elysia } from "elysia";
 
 export const unsubscribeContactRoute = new Elysia().use(authMiddleware).post(
   "/unsubscribe",
-  async ({ body, user }) => {
-    const { activeOrganizationId } = user;
+  async ({ body, activeOrganizationId }) => {
     return await unsubscribeContactHandler(activeOrganizationId, body);
   },
   {

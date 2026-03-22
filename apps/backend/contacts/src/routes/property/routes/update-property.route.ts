@@ -1,13 +1,11 @@
 import { authMiddleware } from "@be/contacts/middleware/auth";
 import { PropertyModel } from "@be/contacts/model/property.model";
 import { updatePropertyHandler } from "@be/contacts/routes/property/controllers/update-property";
-import type { User } from "@reloop/auth/server";
 import { Elysia, t } from "elysia";
 
 export const updatePropertyRoute = new Elysia().use(authMiddleware).patch(
   "/:propertyId",
-  async ({ params, body, user }: { params: { propertyId: string }; body: { fallbackValue: string | null }; user: User }) => {
-    const { activeOrganizationId } = user;
+  async ({ params, body, activeOrganizationId }) => {
     return updatePropertyHandler(activeOrganizationId as string, params.propertyId, body);
   },
   {

@@ -5,12 +5,12 @@ import { Elysia, t } from "elysia";
 
 export const updateTopicEnrollmentRoute = new Elysia().use(authMiddleware).patch(
   "/:enrollmentId",
-  async ({ params, body, user }) => {
+  async ({ params, body, activeOrganizationId }) => {
     const { enrollmentId } = params;
     const { status } = body;
     return await updateTopicSubscriptionHandler({
       subscriptionId: enrollmentId,
-      organizationId: user.activeOrganizationId,
+      organizationId: activeOrganizationId,
       subscriptionStatus: status,
     });
   },

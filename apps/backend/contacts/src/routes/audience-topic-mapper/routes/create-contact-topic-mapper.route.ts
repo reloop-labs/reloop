@@ -5,11 +5,10 @@ import { Elysia } from "elysia";
 
 export const createTopicEnrollmentRoute = new Elysia().use(authMiddleware).post(
   "/add",
-  async ({ body, user }) => {
-    const { activeOrganizationId: organizationId } = user;
+  async ({ body, activeOrganizationId }) => {
     const { contactId, topicId, status } = body;
     return await createTopicSubscriptionHandler({
-      organizationId,
+      organizationId: activeOrganizationId,
       contactId,
       topicId,
       subscriptionStatus: status,
