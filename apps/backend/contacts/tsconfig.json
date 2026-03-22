@@ -8,7 +8,7 @@
     "strict": true,
     "skipLibCheck": true,
     "outDir": "./dist",
-    "types": ["bun-types"],
+    "types": ["bun"],
     "composite": false,
     "jsx": "react-jsx",
     "declaration": false,

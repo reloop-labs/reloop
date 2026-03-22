@@ -40,6 +40,9 @@ export const authMiddleware = (app: Elysia) =>
 						return status(401, { message: "Authentication failed" });
 					}
 				},
+				detail: {
+					security: [{ apiKey: [] }],
+				},
 			};
 		},
 	});
