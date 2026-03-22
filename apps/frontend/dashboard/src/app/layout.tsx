@@ -2,24 +2,36 @@ import type { Metadata } from "next";
 import "./globals.css";
 import SWRProvider from "@fe/dashboard/providers/swr.config";
 import { IconsSprite } from "@reloop/ui/icon";
-import { Geist, Geist_Mono, Outfit } from "next/font/google";
+import * as Tooltip from "@reloop/ui/tooltip";
+
+import localFont from "next/font/local";
 import { ThemeProvider } from "next-themes";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
-import * as Tooltip from "@reloop/ui/tooltip";
-const geistSans = Geist({
-	variable: "--font-geist-sans",
-	subsets: ["latin"],
-});
 
-const geistMono = Geist_Mono({
-	variable: "--font-geist-mono",
-	subsets: ["latin"],
-});
-
-const outfit = Outfit({
-	variable: "--font-outfit",
-	subsets: ["latin"],
-	weight: "600",
+const openRunde = localFont({
+	src: [
+		{
+			path: "../../public/font/openRunde/OpenRunde-Regular.woff2",
+			weight: "400",
+			style: "normal",
+		},
+		{
+			path: "../../public/font/openRunde/OpenRunde-Medium.woff2",
+			weight: "500",
+			style: "normal",
+		},
+		{
+			path: "../../public/font/openRunde/OpenRunde-Semibold.woff2",
+			weight: "600",
+			style: "normal",
+		},
+		{
+			path: "../../public/font/openRunde/OpenRunde-Bold.woff2",
+			weight: "700",
+			style: "normal",
+		},
+	],
+	variable: "--font-open-runde",
 });
 export const metadata: Metadata = {
 	title: "Reloop Dashboard",
@@ -34,7 +46,7 @@ export default function RootLayout({
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<body
-				className={`${geistSans.variable} ${geistMono.variable} ${outfit.variable} bg-bg-white-0 text-text-strong-950 antialiased`}
+				className={`${openRunde.variable} bg-bg-white-0 font-sans text-text-strong-950 antialiased`}
 			>
 				<NuqsAdapter>
 					<ThemeProvider
@@ -44,9 +56,7 @@ export default function RootLayout({
 						disableTransitionOnChange
 					>
 						<SWRProvider>
-							<Tooltip.Provider>
-								{children}
-							</Tooltip.Provider>
+							<Tooltip.Provider>{children}</Tooltip.Provider>
 							<IconsSprite />
 						</SWRProvider>
 					</ThemeProvider>
