@@ -109,6 +109,7 @@
         "@opentelemetry/sdk-trace-node": "catalog:backend",
         "@opentelemetry/semantic-conventions": "catalog:backend",
         "@paralleldrive/cuid2": "catalog:backend",
+        "@reloop/apikey": "workspace:*",
         "@reloop/auth": "workspace:*",
         "@reloop/cache": "workspace:*",
         "@reloop/db": "workspace:*",
@@ -574,6 +575,21 @@
         "@elysiajs/eden": "catalog:backend",
       },
       "devDependencies": {
+        "@reloop/tsconfig": "workspace:*",
+        "@types/node": "catalog:",
+        "typescript": "catalog:",
+      },
+    },
+    "packages/apikey": {
+      "name": "@reloop/apikey",
+      "version": "0.1.0",
+      "dependencies": {
+        "@reloop/db": "workspace:*",
+        "drizzle-orm": "catalog:db",
+      },
+      "devDependencies": {
+        "@reloop/cache": "workspace:*",
+        "@reloop/logger": "workspace:*",
         "@reloop/tsconfig": "workspace:*",
         "@types/node": "catalog:",
         "typescript": "catalog:",
@@ -1872,6 +1888,8 @@
     "@reloop/analytics": ["@reloop/analytics@workspace:packages/analytics"],
 
     "@reloop/api": ["@reloop/api@workspace:packages/api"],
+
+    "@reloop/apikey": ["@reloop/apikey@workspace:packages/apikey"],
 
     "@reloop/auth": ["@reloop/auth@workspace:packages/auth"],
 

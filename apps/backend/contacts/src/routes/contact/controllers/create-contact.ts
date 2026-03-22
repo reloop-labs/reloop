@@ -106,7 +106,7 @@ export async function createContacts(
 		try {
 			const contact = await createContact(organizationId, userId, { email });
 			createdContacts.push(contact);
-		} catch (error) {
+		} catch {
 			// If contact already exists, skip it
 			skippedEmails.push(email);
 		}

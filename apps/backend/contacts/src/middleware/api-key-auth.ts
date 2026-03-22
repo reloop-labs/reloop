@@ -1,19 +1,6 @@
-import { db } from "@reloop/db/client";
+import { redis } from "@be/contacts/utils/loader";
+import { validateApiKey as validateApiKeyShared } from "@reloop/apikey";
 
 export async function validateApiKey(apiKey: string | null | undefined) {
-  if (!apiKey) return null;
-
-  const apiKeyRecord = await db.query.apikey.findFirst({
-    where: (apikeys, { eq, and }) =>
-      and(eq(apikeys.key, apiKey), eq(apikeys.enabled, true)),
-  });
-
-  if (apiKeyRecord) {
-    return {
-      userId: apiKeyRecord.userId,
-      activeOrganizationId: apiKeyRecord.organizationId,
-      authType: "apikey" as const,
-    };
-  }
-  return null;
+  return validateApiKeyShared(apiKey, redis);
 }

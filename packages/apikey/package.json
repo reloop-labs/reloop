@@ -1,0 +1,27 @@
+{
+	"name": "@reloop/apikey",
+	"version": "0.1.0",
+	"private": true,
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"main": "./src/index.ts",
+	"types": "./src/index.ts",
+	"scripts": {
+		"build": "tsc",
+		"clean": "git clean -xdf .cache .turbo dist node_modules",
+		"dev": "tsc",
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@reloop/db": "workspace:*",
+		"drizzle-orm": "catalog:db"
+	},
+	"devDependencies": {
+		"@reloop/cache": "workspace:*",
+		"@reloop/tsconfig": "workspace:*",
+		"@reloop/logger": "workspace:*",
+		"@types/node": "catalog:",
+		"typescript": "catalog:"
+	}
+}
