@@ -10,10 +10,7 @@ import { searchContactsRoute } from "@be/contacts/routes/contact/routes/search-c
 import { updateContactRoute } from "@be/contacts/routes/contact/routes/update-contact.route";
 import { Elysia } from "elysia";
 
-export const contactRoutes = new Elysia({
-	prefix: "/v1/contacts",
-	name: "ContactRoutes",
-})
+export const contactRoutes = new Elysia({ name: "ContactRoutes" })
 	.use(authMiddleware)
 	// Contact Routes
 	.use(createContactRoute)

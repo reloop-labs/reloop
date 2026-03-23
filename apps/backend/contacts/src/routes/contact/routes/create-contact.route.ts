@@ -4,8 +4,8 @@ import { createContactHandler } from "@be/contacts/routes/contact/controllers/cr
 import { Elysia } from "elysia";
 
 export const createContactRoute = new Elysia().use(authMiddleware).post(
-	"/add",
-	async ({ body, activeOrganizationId, userId, authType }) => {
+	"/create",
+	async ({ body, activeOrganizationId, userId }) => {
 		return await createContactHandler(activeOrganizationId, userId, body);
 	},
 	{
@@ -19,8 +19,8 @@ export const createContactRoute = new Elysia().use(authMiddleware).post(
 		},
 		detail: {
 			tags: ["Contact"],
-			summary: "Create a new contact",
-			description: "Adds a new contact to the organization",
+			summary: "Create contact",
+			description: "Creates a contact",
 		},
 	},
 );
