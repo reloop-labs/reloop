@@ -30,12 +30,15 @@ export namespace ContactTypes {
     createdAt: Date;
     updatedAt: Date;
     deletedAt: Date | null;
+    properties?: Record<string, string>;
   }
 
   export interface CreateContactRequest {
     email: string;
     firstName?: string;
     lastName?: string;
+    status?: string;
+    properties?: Record<string, string>;
   }
 
   export interface CreateContactsRequest {
@@ -46,8 +49,8 @@ export namespace ContactTypes {
     email?: string;
     firstName?: string;
     lastName?: string;
-    status?: "subscribed" | "unsubscribed";
-    properties?: { propertyId: string; value: string }[];
+    status?: "subscribed" | "unsubscribed" | "blocked";
+    properties?: Record<string, string>;
   }
 
   export interface ContactListQuery {

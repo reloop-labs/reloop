@@ -3,7 +3,7 @@ import type { ContactTypes } from "@be/contacts/types/contact.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
-import { and, count, desc, eq, ilike, isNull, type SQL } from "drizzle-orm";
+import { and, count, desc, eq, ilike, inArray, isNull, type SQL } from "drizzle-orm";
 
 export async function listContacts(
 	organizationId: string,
@@ -54,7 +54,47 @@ export async function listContacts(
 			offset,
 		});
 
-		const formattedContacts = contacts.map(formatContactResponse);
+		// Fetch all properties for these contacts
+		const contactIds = contacts.map((c) => c.id);
+		let propertyMap: Record<string, Record<string, string>> = {};
+
+		if (contactIds.length > 0) {
+			const allProperties = await db
+				.select({
+					contactId: schema.contactPropertyValue.contactId,
+					name: schema.contactProperty.propertyName,
+					value: schema.contactPropertyValue.value,
+				})
+				.from(schema.contactPropertyValue)
+				.innerJoin(
+					schema.contactProperty,
+					eq(schema.contactPropertyValue.propertyId, schema.contactProperty.id),
+				)
+				.where(inArray(schema.contactPropertyValue.contactId, contactIds));
+
+			// Group by contactId
+			propertyMap = allProperties.reduce(
+				(acc, curr) => {
+					const contactId = curr.contactId;
+					if (!acc[contactId]) {
+						acc[contactId] = {};
+					}
+					const contactProps = acc[contactId];
+					if (contactProps) {
+						contactProps[curr.name] = curr.value;
+					}
+					return acc;
+				},
+				{} as Record<string, Record<string, string>>,
+			);
+		}
+
+		const formattedContacts = contacts.map((contact) =>
+			formatContactResponse({
+				...contact,
+				properties: propertyMap[contact.id] || {},
+			}),
+		);
 
 		logger.info(
 			{

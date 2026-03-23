@@ -3,7 +3,7 @@ import type { ContactTypes } from "@be/contacts/types/contact.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, inArray, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
 export async function createContact(
@@ -47,7 +47,7 @@ export async function createContact(
 				email: body.email,
 				firstName: body.firstName || null,
 				lastName: body.lastName || null,
-				status: "subscribed",
+				status: (body.status as any) || "subscribed",
 				organizationId,
 				userId,
 				createdAt: new Date(),
@@ -63,6 +63,62 @@ export async function createContact(
 			throw status(500, { message: "Failed to create contact" });
 		}
 
+		// Handle property values if provided
+		if (body.properties && Object.keys(body.properties).length > 0) {
+			const propertyNames = Object.keys(body.properties);
+
+			// 1. Fetch existing properties for this organization
+			const existingProperties = await db
+				.select()
+				.from(schema.contactProperty)
+				.where(
+					and(
+						inArray(schema.contactProperty.propertyName, propertyNames),
+						eq(schema.contactProperty.organizationId, organizationId),
+					),
+				);
+
+			const propertyNameToId = new Map(
+				existingProperties.map((p) => [p.propertyName, p.id]),
+			);
+
+			// 2. Process each property from the request
+			for (const [name, value] of Object.entries(body.properties)) {
+				let propertyId = propertyNameToId.get(name);
+
+				if (!propertyId) {
+					// Create new property if it doesn't exist
+					const [newProp] = await db
+						.insert(schema.contactProperty)
+						.values({
+							propertyName: name,
+							propertyType: "string",
+							organizationId,
+							userId,
+							createdAt: new Date(),
+							updatedAt: new Date(),
+						})
+						.returning();
+
+					if (newProp) {
+						propertyId = newProp.id;
+						propertyNameToId.set(name, propertyId);
+					}
+				}
+
+				if (propertyId) {
+					// Insert property value
+					await db.insert(schema.contactPropertyValue).values({
+						contactId: newContact.id,
+						propertyId,
+						value,
+						organizationId,
+						userId,
+					});
+				}
+			}
+		}
+
 		logger.info(
 			{
 				email: body.email,
@@ -71,7 +127,10 @@ export async function createContact(
 			"Contact created successfully",
 		);
 
-		return formatContactResponse(newContact);
+		return formatContactResponse({
+			...newContact,
+			properties: body.properties || {},
+		});
 	} catch (error) {
 		logger.error(
 			{

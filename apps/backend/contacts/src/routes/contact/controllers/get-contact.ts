@@ -32,15 +32,41 @@ export async function getContact(
 			throw status(404, { message: "Contact not found" });
 		}
 
+		// Fetch properties for this contact
+		const properties = await db
+			.select({
+				name: schema.contactProperty.propertyName,
+				value: schema.contactPropertyValue.value,
+			})
+			.from(schema.contactPropertyValue)
+			.innerJoin(
+				schema.contactProperty,
+				eq(schema.contactPropertyValue.propertyId, schema.contactProperty.id),
+			)
+			.where(eq(schema.contactPropertyValue.contactId, contactId));
+
+		// Map properties to Record<string, string>
+		const propertiesRecord = properties.reduce(
+			(acc, curr) => {
+				acc[curr.name] = curr.value;
+				return acc;
+			},
+			{} as Record<string, string>,
+		);
+
 		logger.info(
 			{
 				contactId,
 				organizationId,
+				propertyCount: properties.length,
 			},
 			"Contact retrieved successfully",
 		);
 
-		return formatContactResponse(contact);
+		return formatContactResponse({
+			...contact,
+			properties: propertiesRecord,
+		});
 	} catch (error) {
 		logger.error(
 			{

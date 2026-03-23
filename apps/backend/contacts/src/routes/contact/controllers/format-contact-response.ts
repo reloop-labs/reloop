@@ -9,9 +9,8 @@ export function formatContactResponse(
 		firstName: contact.firstName,
 		lastName: contact.lastName,
 		status: contact.status,
-		organizationId: contact.organizationId,
+		properties: contact.properties ?? {},
 		createdAt: contact.createdAt,
 		updatedAt: contact.updatedAt,
-		deletedAt: contact.deletedAt,
 	};
 }

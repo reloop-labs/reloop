@@ -21,6 +21,11 @@ export namespace ContactModel {
         default: "subscribed",
       }),
     ),
+    properties: t.Optional(
+      t.Record(t.String(), t.String(), {
+        description: "Contact properties as key-value pairs",
+      }),
+    ),
   });
 
   export type CreateContactBody = typeof createContactBody.static;
@@ -56,13 +61,9 @@ export namespace ContactModel {
       }),
     ),
     properties: t.Optional(
-      t.Array(
-        t.Object({
-          propertyId: t.String({ description: "Property ID" }),
-          value: t.String({ description: "Property value" }),
-        }),
-        { description: "Array of property values to set for this contact" },
-      ),
+      t.Record(t.String(), t.String(), {
+        description: "Contact properties as key-value pairs to update",
+      }),
     ),
   });
 
@@ -73,7 +74,13 @@ export namespace ContactModel {
     email: t.String({ description: "Contact email address" }),
     firstName: t.Union([t.String(), t.Null()], { description: "Contact first name" }),
     lastName: t.Union([t.String(), t.Null()], { description: "Contact last name" }),
-    status: t.Union([t.Literal("subscribed"), t.Literal("unsubscribed"), t.Literal("blocked")], { description: "Contact subscription status" }),
+    status: t.Union([t.Literal("subscribed"), t.Literal("unsubscribed"), t.Literal("blocked")], {
+      description: "Contact subscription status",
+    }),
+    properties: t.Record(t.String(), t.String(), {
+      description: "Contact properties as key-value pairs",
+      default: {},
+    }),
     createdAt: t.Date(),
     updatedAt: t.Date(),
   });
