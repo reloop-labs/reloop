@@ -5,7 +5,7 @@ export namespace ContactModel {
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   // Contact status values
-  export const statusValues = ["subscribed", "unsubscribed"] as const;
+  export const statusValues = ["subscribed", "unsubscribed", "blocked"] as const;
 
   // Contact Models
   export const createContactBody = t.Object({
@@ -15,6 +15,12 @@ export namespace ContactModel {
     }),
     firstName: t.Optional(t.String({ description: "Contact first name" })),
     lastName: t.Optional(t.String({ description: "Contact last name" })),
+    status: t.Optional(
+      t.Union([t.Literal("subscribed"), t.Literal("unsubscribed"), t.Literal("blocked")], {
+        description: "Contact subscription status",
+        default: "subscribed",
+      }),
+    ),
   });
 
   export type CreateContactBody = typeof createContactBody.static;
@@ -45,7 +51,7 @@ export namespace ContactModel {
     firstName: t.Optional(t.String({ description: "Contact first name" })),
     lastName: t.Optional(t.String({ description: "Contact last name" })),
     status: t.Optional(
-      t.Union([t.Literal("subscribed"), t.Literal("unsubscribed")], {
+      t.Union([t.Literal("subscribed"), t.Literal("unsubscribed"), t.Literal("blocked")], {
         description: "Contact subscription status",
       }),
     ),
@@ -90,7 +96,7 @@ export namespace ContactModel {
     limit: t.Optional(t.Number({ minimum: 1, maximum: 100, default: 10 })),
     search: t.Optional(t.String({ description: "Search by email" })),
     status: t.Optional(
-      t.Union([t.Literal("subscribed"), t.Literal("unsubscribed")], {
+      t.Union([t.Literal("subscribed"), t.Literal("unsubscribed"), t.Literal("blocked")], {
         description: "Filter by status",
       }),
     ),
@@ -108,7 +114,7 @@ export namespace ContactModel {
     page: t.Optional(t.Number({ minimum: 1, default: 1 })),
     limit: t.Optional(t.Number({ minimum: 1, maximum: 100, default: 10 })),
     status: t.Optional(
-      t.Union([t.Literal("subscribed"), t.Literal("unsubscribed")], {
+      t.Union([t.Literal("subscribed"), t.Literal("unsubscribed"), t.Literal("blocked")], {
         description: "Filter by status",
       }),
     ),

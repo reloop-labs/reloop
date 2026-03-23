@@ -5,7 +5,7 @@ import { Elysia } from "elysia";
 
 export const createContactRoute = new Elysia().use(authMiddleware).post(
 	"/add",
-	async ({ body, userId, activeOrganizationId }) => {
+	async ({ body, activeOrganizationId, userId, authType }) => {
 		return await createContactHandler(activeOrganizationId, userId, body);
 	},
 	{
