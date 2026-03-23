@@ -19,8 +19,8 @@ export const createContactRoute = new Elysia().use(authMiddleware).post(
 		},
 		detail: {
 			tags: ["Contact"],
-			summary: "Create contact",
-			description: "Creates a contact",
+			summary: "Create Contact",
+			description: "Creates contact",
 		},
 	},
 );

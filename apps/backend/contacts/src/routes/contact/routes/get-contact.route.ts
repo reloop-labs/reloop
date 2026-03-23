@@ -4,15 +4,13 @@ import { getContactHandler } from "@be/contacts/routes/contact/controllers/get-c
 import { Elysia, t } from "elysia";
 
 export const getContactRoute = new Elysia().use(authMiddleware).get(
-	"/get/:id",
+	"/retrieve/:id",
 	async ({ params, activeOrganizationId }) => {
 		return await getContactHandler(params.id, activeOrganizationId);
 	},
 	{
 		auth: true,
-		params: t.Object({
-			id: t.String(),
-		}),
+		params: t.Object({ id: t.String() }),
 		response: {
 			200: ContactModel.contactResponse,
 			404: ContactModel.contactNotFound,
@@ -20,8 +18,8 @@ export const getContactRoute = new Elysia().use(authMiddleware).get(
 		},
 		detail: {
 			tags: ["Contact"],
-			summary: "Get a contact",
-			description: "Retrieves a specific contact by ID",
+			summary: "Retrieve Contact",
+			description: "Retrieves a contact by ID",
 		},
 	},
 );

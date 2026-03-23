@@ -73,11 +73,9 @@ export namespace ContactModel {
     email: t.String({ description: "Contact email address" }),
     firstName: t.Union([t.String(), t.Null()], { description: "Contact first name" }),
     lastName: t.Union([t.String(), t.Null()], { description: "Contact last name" }),
-    status: t.String({ description: "Contact subscription status" }),
-    organizationId: t.String({ description: "Organization ID" }),
+    status: t.Union([t.Literal("subscribed"), t.Literal("unsubscribed"), t.Literal("blocked")], { description: "Contact subscription status" }),
     createdAt: t.Date(),
     updatedAt: t.Date(),
-    deletedAt: t.Union([t.Date(), t.Null()]),
   });
 
   export type ContactResponse = typeof contactResponse.static;
