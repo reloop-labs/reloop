@@ -2,11 +2,6 @@
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
-import {
-	Content as PopoverContent,
-	Root as PopoverRoot,
-	Trigger as PopoverTrigger,
-} from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useRouter } from "next/navigation";
 
@@ -25,7 +20,6 @@ interface TopicHeaderProps {
 	isLoading: boolean;
 	isFailed: boolean;
 	onOpenAddContact: () => void;
-	onOpenBulkImport: () => void;
 }
 
 export const TopicHeader = ({
@@ -33,7 +27,6 @@ export const TopicHeader = ({
 	isLoading,
 	isFailed,
 	onOpenAddContact,
-	onOpenBulkImport,
 }: TopicHeaderProps) => {
 	const router = useRouter();
 	const { activeOrganization } = useUserOrganization();
@@ -110,44 +103,14 @@ export const TopicHeader = ({
 					)}
 				</div>
 				<div className="flex items-center gap-2">
-					<PopoverRoot>
-						<PopoverTrigger asChild>
-							<Button.Root variant="neutral" size="xsmall">
-								<Icon name="plus" className="h-4 w-4" />
-								Add Contact
-								<Icon name="chevron-down" className="h-4 w-4" />
-							</Button.Root>
-						</PopoverTrigger>
-						<PopoverContent
-							align="end"
-							side="bottom"
-							className="p-2"
-							sideOffset={3}
-						>
-							<div className="flex flex-col gap-1">
-								<Button.Root
-									variant="neutral"
-									mode="ghost"
-									size="small"
-									onClick={onOpenAddContact}
-									className="w-full justify-start"
-								>
-									<Icon name="user-plus" className="h-4 w-4" />
-									Add Single Contact
-								</Button.Root>
-								<Button.Root
-									variant="neutral"
-									mode="ghost"
-									size="small"
-									onClick={onOpenBulkImport}
-									className="w-full justify-start"
-								>
-									<Icon name="file-upload" className="h-4 w-4" />
-									Bulk Import (CSV)
-								</Button.Root>
-							</div>
-						</PopoverContent>
-					</PopoverRoot>
+					<Button.Root
+						variant="neutral"
+						size="xsmall"
+						onClick={onOpenAddContact}
+					>
+						<Icon name="plus" className="h-4 w-4" />
+						Add Contact
+					</Button.Root>
 				</div>
 			</div>
 		</div>

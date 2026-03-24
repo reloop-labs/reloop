@@ -1,11 +1,10 @@
 "use client";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
-import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Select from "@reloop/ui/select";
 import Spinner from "@reloop/ui/spinner";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useState } from "react";
 import useSWR, { useSWRConfig } from "swr";
 import { AddContact } from "./components/add-contact";
@@ -42,8 +41,7 @@ interface SubscriptionListResponse {
 }
 
 const TopicDetailPage = () => {
-	const { topicId, orgSlug } = useParams();
-	const router = useRouter();
+	const { topicId } = useParams();
 	const { mutate } = useSWRConfig();
 	const { activeOrganization } = useUserOrganization();
 	const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -86,40 +84,6 @@ const TopicDetailPage = () => {
 		}
 	};
 
-	const handleDownloadCSV = () => {
-		if (
-			!subscriptionData?.subscriptions ||
-			subscriptionData.subscriptions.length === 0
-		) {
-			return;
-		}
-
-		// Create CSV content
-		const headers = ["Contact ID", "Status", "Created At"];
-		const csvRows = subscriptionData.subscriptions.map((sub) => [
-			sub.contactId,
-			sub.status,
-			new Date(sub.createdAt).toISOString(),
-		]);
-
-		const csvContent = [headers, ...csvRows]
-			.map((row) => row.map((field) => `"${field}"`).join(","))
-			.join("\n");
-
-		const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-		const link = document.createElement("a");
-		const url = URL.createObjectURL(blob);
-		link.setAttribute("href", url);
-		link.setAttribute(
-			"download",
-			`${topicData?.name || "topic"}-subscribers.csv`,
-		);
-		link.style.visibility = "hidden";
-		document.body.appendChild(link);
-		link.click();
-		document.body.removeChild(link);
-	};
-
 	if (topicLoading) {
 		return (
 			<div className="flex h-64 items-center justify-center">
@@ -155,9 +119,6 @@ const TopicDetailPage = () => {
 				isLoading={topicLoading}
 				isFailed={!!topicError}
 				onOpenAddContact={() => setShowAddContact(true)}
-				onOpenBulkImport={() =>
-					router.push(`/${orgSlug}/contacts/${topicId}/bulk-import`)
-				}
 			/>
 
 			{subscriptionData?.subscriptions &&
@@ -221,18 +182,6 @@ const TopicDetailPage = () => {
 								</Select.Root>
 							</div>
 						</div>
-						<Button.Root
-							variant="neutral"
-							mode="stroke"
-							size="xsmall"
-							onClick={handleDownloadCSV}
-							disabled={
-								!subscriptionData?.subscriptions ||
-								subscriptionData.subscriptions.length === 0
-							}
-						>
-							<Icon name="file-download" className="h-4 w-4" />
-						</Button.Root>
 					</div>
 
 					<div className="mt-4">

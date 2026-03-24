@@ -1,6 +1,5 @@
 import { authMiddleware } from "@be/contacts/middleware/auth";
 import { addContactToTopicRoute } from "@be/contacts/routes/contact/routes/add-contact-to-topic.route";
-import { bulkImportContactsRoute } from "@be/contacts/routes/contact/routes/bulk-import-contacts.route";
 import { createContactRoute } from "@be/contacts/routes/contact/routes/create-contact.route";
 import { deleteContactRoute } from "@be/contacts/routes/contact/routes/delete-contact.route";
 import { getContactRoute } from "@be/contacts/routes/contact/routes/get-contact.route";
@@ -16,8 +15,5 @@ export const contactRoutes = new Elysia({ name: "ContactRoutes" })
 	.use(listContactsRoute)
 	.use(updateContactRoute)
 	.use(deleteContactRoute)
-	// Bulk Import
-	.use(bulkImportContactsRoute)
 	// Add to Topic
 	.use(addContactToTopicRoute);
-
