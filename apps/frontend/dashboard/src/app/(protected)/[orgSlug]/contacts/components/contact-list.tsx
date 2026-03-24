@@ -14,7 +14,6 @@ import {
 	type ContactFilters,
 } from "./contact-filter-dropdown";
 import { ContactTable } from "./contact-table";
-import { ContactsEmptyState } from "./contacts-empty-state";
 
 interface Contact {
 	id: string;
@@ -128,16 +127,6 @@ export const ContactList = ({ onAddContact }: ContactListProps) => {
 		);
 	}
 
-	if (
-		!isLoading &&
-		data?.contacts &&
-		data.contacts.length === 0 &&
-		!searchQuery &&
-		filters.length === 0
-	) {
-		return <ContactsEmptyState onAddContact={onAddContact} />;
-	}
-
 	return (
 		<div>
 			<div className="flex items-center gap-3">
@@ -175,7 +164,8 @@ export const ContactList = ({ onAddContact }: ContactListProps) => {
 				<ContactTable
 					contacts={data?.contacts || []}
 					isLoading={isLoading}
-					loadingRows={4}
+					loadingRows={6}
+					onAddContact={onAddContact}
 				/>
 			</div>
 
