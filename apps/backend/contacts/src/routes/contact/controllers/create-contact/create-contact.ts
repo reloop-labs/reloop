@@ -38,7 +38,7 @@ export async function createContact(
         email: body.email,
         firstName: body.firstName || null,
         lastName: body.lastName || null,
-        status: (body.status as any) || "subscribed",
+        status: body.status || "subscribed",
         organizationId,
         userId,
         createdAt: new Date(),

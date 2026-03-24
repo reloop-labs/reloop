@@ -25,7 +25,7 @@ export namespace ContactTypes {
     email: string;
     firstName: string | null;
     lastName: string | null;
-    status: string;
+    status: "subscribed" | "unsubscribed" | "blocked";
     organizationId: string;
     createdAt: Date;
     updatedAt: Date;
@@ -37,7 +37,7 @@ export namespace ContactTypes {
     email: string;
     firstName?: string;
     lastName?: string;
-    status?: string;
+    status?: "subscribed" | "unsubscribed" | "blocked";
     properties?: Record<string, string>;
   }
 

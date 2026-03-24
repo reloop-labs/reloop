@@ -20,14 +20,15 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 				const currentLogger = logger.child({ traceId });
 				const apiKeyResult = await validateApiKey(apiKey);
 				if (apiKeyResult) {
-					currentLogger.info({ apiKeyResult, traceId, }, "API key authentication successful");
-					return { ...apiKeyResult, traceId, logger: currentLogger };
+					const tenantLogger = currentLogger.child({ traceId, ...currentLogger });
+					tenantLogger.info({ ...apiKeyResult, }, "API key authentication successful");
+					return { ...apiKeyResult, traceId, logger: tenantLogger };
 				}
-
 				const sessionResult = await validateSession(cookie);
 				if (sessionResult) {
-					currentLogger.info({ sessionResult, traceId, }, "Session authentication successful");
-					return { ...sessionResult, traceId, logger: currentLogger };
+					const tenantLogger = currentLogger.child({ traceId, ...currentLogger });
+					tenantLogger.info({ ...sessionResult, }, "Session authentication successful");
+					return { ...sessionResult, traceId, logger: tenantLogger };
 				}
 				return status(401, { message: "Authentication required" });
 			} catch (e) {
