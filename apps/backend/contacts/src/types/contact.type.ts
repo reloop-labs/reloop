@@ -9,8 +9,6 @@ export namespace ContactTypes {
   export type UpdateContactBody = typeof ContactModel.updateContactBody.static;
   export type ContactQuery = typeof ContactModel.contactQuery.static;
 
-  // Search Types
-  export type SearchContactsQuery = typeof ContactModel.searchContactsQuery.static;
 
   // Error Types
   export type ContactNotFound = typeof ContactModel.contactNotFound.static;
@@ -39,7 +37,7 @@ export namespace ContactTypes {
     lastName?: string;
     status?: "subscribed" | "unsubscribed" | "blocked";
     properties?: Record<string, string>;
-    content: "contact";
+    object: "contact";
   }
 
   export interface CreateContactsRequest {
@@ -62,11 +60,4 @@ export namespace ContactTypes {
     organizationId?: string;
   }
 
-  export interface SearchContactsRequest {
-    query: string;
-    page?: number;
-    limit?: number;
-    status?: "subscribed" | "unsubscribed" | "blocked";
-    organizationId?: string;
-  }
 }

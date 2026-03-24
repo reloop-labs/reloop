@@ -70,7 +70,7 @@ export namespace ContactModel {
   export type UpdateContactBody = typeof updateContactBody.static;
 
   export const contactResponse = t.Object({
-    content: t.Literal("contact", { default: "contact" }),
+    object: t.Literal("contact", { default: "contact" }),
     id: t.String({ description: "Unique contact identifier" }),
     email: t.String({ description: "Contact email address" }),
     firstName: t.Union([t.String(), t.Null()], { description: "Contact first name" }),
@@ -89,7 +89,7 @@ export namespace ContactModel {
   export type ContactResponse = typeof contactResponse.static;
 
   export const contactListResponse = t.Object({
-    content: t.Literal("contact", { default: "contact" }),
+    object: t.Literal("contact", { default: "contact" }),
     contacts: t.Array(contactResponse),
     total: t.Number(),
     page: t.Number(),
@@ -112,23 +112,6 @@ export namespace ContactModel {
 
   export type ContactQuery = typeof contactQuery.static;
 
-  // Search Models
-  export const searchContactsQuery = t.Object({
-    query: t.String({
-      minLength: 1,
-      description: "Search query",
-    }),
-    page: t.Optional(t.Number({ minimum: 1, default: 1 })),
-    limit: t.Optional(t.Number({ minimum: 1, maximum: 1000, default: 100 })),
-    status: t.Optional(
-      t.Union([t.Literal("subscribed"), t.Literal("unsubscribed"), t.Literal("blocked")], {
-        description: "Filter by status",
-      }),
-    ),
-    organizationId: t.Optional(t.String()),
-  });
-
-  export type SearchContactsQuery = typeof searchContactsQuery.static;
 
   // Delete Response
   export const deleteResponse = t.Object({
