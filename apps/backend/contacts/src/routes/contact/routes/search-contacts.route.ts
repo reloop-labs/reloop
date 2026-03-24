@@ -5,8 +5,8 @@ import { Elysia } from "elysia";
 
 export const searchContactsRoute = new Elysia().use(authMiddleware).get(
 	"/search",
-	async ({ query, activeOrganizationId }) => {
-		return await searchContactsHandler(activeOrganizationId, query);
+	async ({ query, activeOrganizationId, logger }) => {
+		return await searchContactsHandler((activeOrganizationId as string), query, logger);
 	},
 	{
 		auth: true,

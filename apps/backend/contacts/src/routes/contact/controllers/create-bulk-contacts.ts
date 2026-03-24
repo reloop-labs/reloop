@@ -1,5 +1,4 @@
-import type { ContactTypes } from "@be/contacts/types/contact.type";
-import { logger } from "@reloop/logger";
+import { logger as globalLogger, type Logger } from "@reloop/logger";
 import { createContact } from "./create-contact";
 
 // Handler for creating multiple contacts at once
@@ -7,6 +6,7 @@ export async function createContacts(
   organizationId: string,
   userId: string,
   emails: string[],
+  logger: Logger = globalLogger,
 ): Promise<{ contacts: ContactTypes.ContactResponse[]; skipped: string[] }> {
   logger.info(
     {
@@ -21,7 +21,7 @@ export async function createContacts(
 
   for (const email of emails) {
     try {
-      const contact = await createContact(organizationId, userId, { email });
+      const contact = await createContact(organizationId, userId, { email }, logger);
       createdContacts.push(contact);
     } catch {
       // If contact already exists, skip it

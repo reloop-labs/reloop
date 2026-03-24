@@ -3,7 +3,7 @@ import { upsertContactProperties } from "@be/contacts/routes/contact/controllers
 import type { ContactTypes } from "@be/contacts/types/contact.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { logger } from "@reloop/logger";
+import type { Logger } from "@reloop/logger";
 import { status } from "elysia";
 import { getExistingContact } from "./get-existing-contact";
 
@@ -11,24 +11,16 @@ export async function createContact(
   organizationId: string,
   userId: string,
   body: ContactTypes.CreateContactRequest,
+  logger: Logger,
 ): Promise<ContactTypes.ContactResponse> {
   const { email } = body;
-  logger.info(
-    {
-      email,
-      organizationId,
-    },
-    "Creating contact",
-  );
+  logger.info({ email, organizationId }, "Creating contact");
 
   try {
-    const existingContact = await getExistingContact({ email, organizationId });
+    const existingContact = await getExistingContact({ email, organizationId, logger });
 
     if (existingContact) {
-      logger.warn(
-        { email },
-        "Contact already exists in this organization",
-      );
+      logger.warn({ email }, "Contact already exists in this organization");
       throw status(409, { message: "Contact already exists" });
     }
 
@@ -61,6 +53,7 @@ export async function createContact(
         organizationId,
         userId,
         body.properties,
+        logger,
       );
     }
 

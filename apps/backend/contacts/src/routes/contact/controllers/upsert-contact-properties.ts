@@ -1,6 +1,6 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { logger } from "@reloop/logger";
+import { logger as globalLogger, type Logger } from "@reloop/logger";
 import { and, eq, inArray } from "drizzle-orm";
 
 /**
@@ -12,6 +12,7 @@ export async function upsertContactProperties(
   organizationId: string,
   userId: string,
   properties: Record<string, string>,
+  logger: Logger = globalLogger,
 ): Promise<void> {
   if (Object.keys(properties).length === 0) return;
 

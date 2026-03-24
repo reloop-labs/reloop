@@ -16,6 +16,7 @@ const baseLogger = pino({
 	}),
 });
 
+export type Logger = typeof logger;
 export const logger = Object.assign(baseLogger, {
 	/**
 	 * Log an HTTP request with method and endpoint

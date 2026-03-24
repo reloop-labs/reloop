@@ -57,7 +57,7 @@ export namespace ContactTypes {
     page?: number;
     limit?: number;
     search?: string;
-    status?: "subscribed" | "unsubscribed";
+    status?: "subscribed" | "unsubscribed" | "blocked";
     organizationId?: string;
   }
 
@@ -65,7 +65,7 @@ export namespace ContactTypes {
     query: string;
     page?: number;
     limit?: number;
-    status?: "subscribed" | "unsubscribed";
+    status?: "subscribed" | "unsubscribed" | "blocked";
     organizationId?: string;
   }
 }

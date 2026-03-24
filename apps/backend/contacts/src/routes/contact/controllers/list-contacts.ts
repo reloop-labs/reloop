@@ -2,12 +2,13 @@ import { formatContactResponse } from "@be/contacts/routes/contact/controllers/f
 import type { ContactTypes } from "@be/contacts/types/contact.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { logger } from "@reloop/logger";
+import { logger as globalLogger, type Logger } from "@reloop/logger";
 import { and, count, desc, eq, ilike, inArray, isNull, type SQL } from "drizzle-orm";
 
 export async function listContacts(
 	organizationId: string,
 	query: ContactTypes.ContactListQuery,
+	logger: Logger = globalLogger,
 ): Promise<ContactTypes.ContactListResponse> {
 	logger.info(
 		{
@@ -128,6 +129,7 @@ export async function listContacts(
 export async function listContactsHandler(
 	organizationId: string,
 	query: ContactTypes.ContactListQuery,
+	logger: Logger = globalLogger,
 ): Promise<ContactTypes.ContactListResponse> {
-	return listContacts(organizationId, query);
+	return listContacts(organizationId, query, logger);
 }
