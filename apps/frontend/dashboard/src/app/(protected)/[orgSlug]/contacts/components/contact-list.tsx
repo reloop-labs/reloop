@@ -45,21 +45,28 @@ interface ContactListProps {
 const SummaryCard = ({
 	label,
 	count,
+	icon,
 	isLoading,
 }: {
 	label: string;
 	count?: number;
+	icon: string;
 	isLoading: boolean;
 }) => (
-	<div className="flex flex-col gap-1">
-		<p className="font-medium text-text-sub-600 text-xs uppercase tracking-wider">
-			{label}
-		</p>
-		{isLoading ? (
-			<div className="h-7 w-16 animate-pulse rounded bg-bg-surface-200" />
-		) : (
-			<p className="font-semibold text-xl">{count?.toLocaleString() || 0}</p>
-		)}
+	<div className="flex items-center gap-3 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 py-3">
+		<div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-bg-weak-50">
+			<Icon name={icon} className="h-4 w-4 text-text-sub-600" />
+		</div>
+		<div className="flex flex-col">
+			<p className="text-text-sub-600 text-xs">{label}</p>
+			{isLoading ? (
+				<div className="mt-0.5 h-5 w-12 animate-pulse rounded bg-bg-weak-50" />
+			) : (
+				<p className="font-semibold text-sm text-text-strong-950">
+					{count?.toLocaleString() || 0}
+				</p>
+			)}
+		</div>
 	</div>
 );
 
@@ -154,19 +161,22 @@ export const ContactList = ({ onAddContact }: ContactListProps) => {
 	return (
 		<div>
 			{/* Summary Cards */}
-			<div className="mb-3 grid grid-cols-1 gap-4 sm:grid-cols-3">
+			<div className="mb-4 grid grid-cols-3 gap-3">
 				<SummaryCard
 					label="Total Contacts"
+					icon="users"
 					count={data?.totalContacts}
 					isLoading={isLoading}
 				/>
 				<SummaryCard
 					label="Subscribed"
+					icon="check-circle"
 					count={data?.subscribedContacts}
 					isLoading={isLoading}
 				/>
 				<SummaryCard
 					label="Unsubscribed"
+					icon="minus-circle"
 					count={data?.unsubscribedContacts}
 					isLoading={isLoading}
 				/>
