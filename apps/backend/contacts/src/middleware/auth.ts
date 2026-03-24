@@ -16,15 +16,19 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 					headers.get("x-api-key") ||
 					headers.get("authorization")?.replace("Bearer ", "");
 				const cookie = headers.get("cookie");
-
-				// 1. Check for API Token
+				const traceId = crypto.randomUUID();
+				const currentLogger = logger.child({ traceId });
 				const apiKeyResult = await validateApiKey(apiKey);
-				if (apiKeyResult) return { ...apiKeyResult };
+				if (apiKeyResult) {
+					currentLogger.info({ apiKeyResult, traceId, }, "API key authentication successful");
+					return { ...apiKeyResult, traceId, logger: currentLogger };
+				}
 
-				// 2. Fallback to Session Cookie
 				const sessionResult = await validateSession(cookie);
-				if (sessionResult) return { ...sessionResult };
-
+				if (sessionResult) {
+					currentLogger.info({ sessionResult, traceId, }, "Session authentication successful");
+					return { ...sessionResult, traceId, logger: currentLogger };
+				}
 				return status(401, { message: "Authentication required" });
 			} catch (e) {
 				logger.error(
