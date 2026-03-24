@@ -2,7 +2,6 @@
 import { PageSizeDropdown } from "@fe/dashboard/components/page-size-dropdown";
 import { PaginationControls } from "@fe/dashboard/components/pagination-controls";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
-import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import { parseAsInteger, useQueryState } from "nuqs";
@@ -34,11 +33,7 @@ interface TopicListResponse {
 	limit: number;
 }
 
-interface TopicListProps {
-	hideHeader?: boolean;
-}
-
-export const TopicList = ({ hideHeader = false }: TopicListProps) => {
+export const TopicList = () => {
 	const { activeOrganization } = useUserOrganization();
 	const { mutate } = useSWRConfig();
 	const [searchQuery, setSearchQuery] = useState<string>("");
@@ -101,24 +96,7 @@ export const TopicList = ({ hideHeader = false }: TopicListProps) => {
 	};
 
 	return (
-		<div className={hideHeader ? "" : "mx-auto max-w-3xl sm:px-8"}>
-			{!hideHeader && (
-				<div className="flex items-center justify-between pt-10">
-					<p className="font-medium text-2xl">
-						Topic{data?.topics.length !== 1 ? "s" : ""}
-					</p>
-					<div className="flex items-center gap-2">
-						<Button.Root
-							variant="neutral"
-							size="xsmall"
-							onClick={() => setIsCreateModalOpen(true)}
-						>
-							<Icon name="plus" className="h-4 w-4" />
-							Add topic
-						</Button.Root>
-					</div>
-				</div>
-			)}
+		<div>
 			<div>
 				{error ? (
 					<div className="flex flex-col items-center justify-center gap-2 p-4">

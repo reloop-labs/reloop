@@ -35,7 +35,9 @@ export const TopicHeader = ({
 		return (
 			<div className="pt-10 pb-6">
 				<Button.Root
-					onClick={() => router.push(`/${activeOrganization.slug}/contacts`)}
+					onClick={() =>
+						router.push(`/${activeOrganization.slug}/contacts?tab=topics`)
+					}
 					variant="neutral"
 					mode="stroke"
 					size="xxsmall"
@@ -58,7 +60,9 @@ export const TopicHeader = ({
 		return (
 			<div className="pt-10 pb-6">
 				<Button.Root
-					onClick={() => router.push(`/${activeOrganization.slug}/contacts`)}
+					onClick={() =>
+						router.push(`/${activeOrganization.slug}/contacts?tab=topics`)
+					}
 					variant="neutral"
 					mode="stroke"
 					size="xxsmall"
@@ -80,7 +84,9 @@ export const TopicHeader = ({
 	return (
 		<div className="pt-10 pb-6">
 			<Button.Root
-				onClick={() => router.push(`/${activeOrganization.slug}/contacts`)}
+				onClick={() =>
+					router.push(`/${activeOrganization.slug}/contacts?tab=topics`)
+				}
 				variant="neutral"
 				mode="stroke"
 				size="xxsmall"

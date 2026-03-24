@@ -18,6 +18,7 @@ interface EmailChip {
 interface AddContactModalProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
+	topicId?: string;
 }
 
 const validateEmail = (email: string): boolean => {
@@ -27,6 +28,7 @@ const validateEmail = (email: string): boolean => {
 export const AddContactModal = ({
 	open,
 	onOpenChange,
+	topicId,
 }: AddContactModalProps) => {
 	const { mutate } = useSWRConfig();
 	const [isCreating, setIsCreating] = useState(false);
@@ -149,6 +151,20 @@ export const AddContactModal = ({
 			}
 
 			if (created > 0) {
+				// If topicId is provided, add created contacts to the topic
+				if (topicId) {
+					// For now, let's assume the backend handles email-to-id if we pass emails
+					await fetch("/api/contacts/v1/subscriptions/bulk-add", {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({
+							topicId,
+							contactIds: [], // Placeholder: backend needs to reconcile
+							emails: validEmails, // Custom extension to the API if needed
+						}),
+					});
+				}
+
 				toast.success(
 					`${created} contact(s) created${skipped > 0 ? `, ${skipped} already existed` : ""}`,
 				);

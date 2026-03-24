@@ -7,20 +7,8 @@ import Spinner from "@reloop/ui/spinner";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import useSWR, { useSWRConfig } from "swr";
-import { AddContact } from "./components/add-contact";
 import { ContactTable } from "./components/contact-table";
 import { EmptyState } from "./components/empty-state";
-import { TopicHeader } from "./components/topic-header";
-
-interface Topic {
-	id: string;
-	name: string;
-	description: string | null;
-	organizationId: string;
-	createdAt: string;
-	updatedAt: string;
-	deletedAt: string | null;
-}
 
 interface Subscription {
 	id: string;
@@ -46,17 +34,6 @@ const TopicDetailPage = () => {
 	const { activeOrganization } = useUserOrganization();
 	const [statusFilter, setStatusFilter] = useState<string>("all");
 	const [searchQuery, setSearchQuery] = useState<string>("");
-	const [showAddContact, setShowAddContact] = useState(false);
-
-	const {
-		data: topicData,
-		error: topicError,
-		isLoading: topicLoading,
-	} = useSWR<Topic>(`/api/contacts/v1/topics/${topicId}`, {
-		revalidateOnFocus: true,
-		revalidateOnReconnect: true,
-	});
-
 	const { data: subscriptionData, isLoading: subscriptionLoading } =
 		useSWR<SubscriptionListResponse>(
 			`/api/contacts/v1/subscriptions/list?topicId=${topicId}&limit=100`,
@@ -84,27 +61,6 @@ const TopicDetailPage = () => {
 		}
 	};
 
-	if (topicLoading) {
-		return (
-			<div className="flex h-64 items-center justify-center">
-				<Spinner />
-			</div>
-		);
-	}
-
-	if (topicError) {
-		return (
-			<div className="mx-auto max-w-3xl sm:px-8">
-				<div className="flex flex-col items-center justify-center gap-2 p-4">
-					<Icon name="alert-circle" className="h-8 w-8 text-red-500" />
-					<p className="text-center text-sm text-text-sub-600">
-						Failed to load topic
-					</p>
-				</div>
-			</div>
-		);
-	}
-
 	const filteredSubscriptions =
 		subscriptionData?.subscriptions?.filter((sub) => {
 			const matchesStatus =
@@ -113,17 +69,10 @@ const TopicDetailPage = () => {
 		}) || [];
 
 	return (
-		<div className="mx-auto max-w-3xl sm:px-8">
-			<TopicHeader
-				topic={topicData || undefined}
-				isLoading={topicLoading}
-				isFailed={!!topicError}
-				onOpenAddContact={() => setShowAddContact(true)}
-			/>
-
+		<>
 			{subscriptionData?.subscriptions &&
 			subscriptionData.subscriptions.length === 0 ? (
-				<EmptyState onAddContact={() => setShowAddContact(true)} />
+				<EmptyState />
 			) : (
 				<div>
 					<div className="mb-6 flex items-center justify-between gap-3">
@@ -195,13 +144,7 @@ const TopicDetailPage = () => {
 					</div>
 				</div>
 			)}
-			<AddContact
-				topicId={topicId as string}
-				topicName={topicData?.name || "Unknown"}
-				open={showAddContact}
-				onOpenChange={setShowAddContact}
-			/>
-		</div>
+		</>
 	);
 };
 

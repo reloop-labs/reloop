@@ -61,7 +61,7 @@ export const TopicTable = ({
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 
 	const handleViewDetails = (topicId: string) => {
-		window.location.href = `/dashboard/${activeOrganizationSlug}/topics/${topicId}`;
+		window.location.href = `/dashboard/${activeOrganizationSlug}/contacts/topics/${topicId}`;
 	};
 
 	const handleDelete = (topicId: string) => {
@@ -125,7 +125,7 @@ export const TopicTable = ({
 									<div key={topic.id} className="group/row contents">
 										{/* Name Column (clickable link) */}
 										<Link
-											href={`/${activeOrganizationSlug}/topics/${topic.id}`}
+											href={`/${activeOrganizationSlug}/contacts/topics/${topic.id}`}
 											className="group/row contents"
 										>
 											<div

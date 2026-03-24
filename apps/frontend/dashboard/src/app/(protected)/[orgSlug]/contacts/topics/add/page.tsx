@@ -9,7 +9,6 @@ import Spinner from "@reloop/ui/spinner";
 import * as Textarea from "@reloop/ui/textarea";
 import { useLoading } from "@reloop/ui/use-loading";
 import axios from "axios";
-import { useRouter } from "next/navigation";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { useSWRConfig } from "swr";
@@ -35,7 +34,6 @@ const AddTopicPage = () => {
 	const { push } = useUserOrganization();
 	const { changeStatus, status } = useLoading();
 	const { mutate } = useSWRConfig();
-	const { back } = useRouter();
 	const { register, handleSubmit, formState, setError, watch } =
 		useForm<TopicFormValues>({
 			resolver: valibotResolver(topicSchema) as Resolver<TopicFormValues>,
@@ -59,7 +57,7 @@ const AddTopicPage = () => {
 				{ headers: { credentials: "include" } },
 			);
 			await mutate("/api/contacts/v1/topics/list?limit=100");
-			push(`/contacts/${response.data.id}`);
+			push(`/contacts/topics/${response.data.id}`);
 		} catch (error) {
 			changeStatus("idle");
 			const errorMessage = axios.isAxiosError(error)
@@ -73,27 +71,7 @@ const AddTopicPage = () => {
 	};
 
 	return (
-		<div className="mx-auto max-w-3xl pt-10 pb-8 sm:px-8">
-			<Button.Root
-				onClick={() => back()}
-				variant="neutral"
-				mode="stroke"
-				size="xxsmall"
-			>
-				<Button.Icon>
-					<Icon name="chevron-left" className="h-4 w-4" />
-				</Button.Icon>
-				Back
-			</Button.Root>
-			<div className="flex w-full items-center justify-between border-stroke-soft-200 border-b border-dashed pt-6 pb-6">
-				<div>
-					<h1 className="font-medium text-title-h5 leading-8">Create Topic</h1>
-					<p className="text-paragraph-sm text-text-sub-600">
-						Create a new topic to organize your contacts
-					</p>
-				</div>
-			</div>
-
+		<>
 			<div className="my-6 gap-3">
 				<h2 className="font-semibold text-lg">Topic Details</h2>
 				<p className="text-paragraph-sm text-text-sub-600">
@@ -211,7 +189,7 @@ const AddTopicPage = () => {
 					</div>
 				</div>
 			</div>
-		</div>
+		</>
 	);
 };
 

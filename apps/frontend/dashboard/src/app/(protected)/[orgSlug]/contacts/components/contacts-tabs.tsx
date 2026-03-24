@@ -1,10 +1,11 @@
 "use client";
 
+import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
 import { AnimatePresence, motion } from "motion/react";
-import { useQueryState } from "nuqs";
+import { usePathname, useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 
 const items = [
@@ -18,23 +19,38 @@ const items = [
 		value: "properties",
 		iconName: "sliders-horiz-2",
 	},
+	{
+		title: "Topics",
+		value: "topics",
+		iconName: "notification-indicator",
+	},
 ];
 
 export const ContactsTabs = () => {
+	const router = useRouter();
+	const pathname = usePathname();
+	const { activeOrganization } = useUserOrganization();
 	const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
-	const [tabValue, setTabValue] = useQueryState("tab", {
-		defaultValue: "contacts",
-	});
+
+	const isPropertiesPage = pathname.includes("/contacts/properties");
+	const isTopicsPage = pathname.includes("/contacts/topics");
+	const effectiveTabValue = isPropertiesPage
+		? "properties"
+		: isTopicsPage
+			? "topics"
+			: "contacts";
 
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 
-	const activeIndex = items.findIndex((item) => item.value === tabValue);
+	const activeIndex = items.findIndex(
+		(item) => item.value === effectiveTabValue,
+	);
 	const currentIdx = hoveredIdx !== undefined ? hoveredIdx : activeIndex;
 	const tab = buttonRefs.current[currentIdx];
 	const rect = tab?.getBoundingClientRect();
 
 	return (
-		<TabMenuHorizontal.Root defaultValue="contacts" value={tabValue}>
+		<TabMenuHorizontal.Root defaultValue="contacts" value={effectiveTabValue}>
 			<TabMenuHorizontal.List className="relative h-10 gap-0 border-b! py-0">
 				{items.map(({ value, title, iconName }, index) => (
 					<TabMenuHorizontal.Trigger
@@ -54,7 +70,13 @@ export const ContactsTabs = () => {
 						key={value}
 						value={value}
 						onClick={() => {
-							setTabValue(value);
+							if (value === "properties") {
+								router.push(`/${activeOrganization.slug}/contacts/properties`);
+							} else if (value === "topics") {
+								router.push(`/${activeOrganization.slug}/contacts/topics`);
+							} else {
+								router.push(`/${activeOrganization.slug}/contacts`);
+							}
 						}}
 					>
 						<Icon name={iconName} className="h-4 w-4" />
