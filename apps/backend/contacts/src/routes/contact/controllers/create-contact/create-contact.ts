@@ -14,16 +14,15 @@ export async function createContact(
   logger: Logger,
 ): Promise<ContactTypes.ContactResponse> {
   const { email } = body;
-  logger.info({ email, organizationId }, "Creating contact");
-
+  logger.info({ email, organizationId }, "Searching for existing contact");
   try {
     const existingContact = await getExistingContact({ email, organizationId, logger });
-
     if (existingContact) {
       logger.warn({ email }, "Contact already exists in this organization");
       throw status(409, { message: "Contact already exists" });
     }
 
+    logger.warn({ email }, "Contact not found, creating new contact");
     const [newContact] = await db
       .insert(schema.contact)
       .values({
@@ -40,13 +39,12 @@ export async function createContact(
 
     if (!newContact) {
       logger.error(
-        { email: body.email },
+        { email },
         "Failed to create contact - no data returned",
       );
       throw status(500, { message: "Failed to create contact" });
     }
-
-    // Handle property values if provided
+    logger.info({ ...newContact }, "Contact added");
     if (body.properties && Object.keys(body.properties).length > 0) {
       await upsertContactProperties(
         newContact.id,
@@ -56,7 +54,6 @@ export async function createContact(
         logger,
       );
     }
-
     logger.info(
       {
         email: body.email,
@@ -64,7 +61,6 @@ export async function createContact(
       },
       "Contact created successfully",
     );
-
     return formatContactResponse({
       ...newContact,
       properties: body.properties || {},

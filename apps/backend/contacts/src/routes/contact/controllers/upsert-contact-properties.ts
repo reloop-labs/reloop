@@ -3,10 +3,6 @@ import * as schema from "@reloop/db/schema";
 import { logger as globalLogger, type Logger } from "@reloop/logger";
 import { and, eq, inArray } from "drizzle-orm";
 
-/**
- * Resolves property names to IDs (creating them if they don't exist)
- * and upserts the property values for a specific contact.
- */
 export async function upsertContactProperties(
   contactId: string,
   organizationId: string,
@@ -15,16 +11,14 @@ export async function upsertContactProperties(
   logger: Logger = globalLogger,
 ): Promise<void> {
   if (Object.keys(properties).length === 0) return;
-
   const propertyNames = Object.keys(properties);
-
   logger.info(
     { contactId, organizationId, propertyCount: propertyNames.length },
-    "Upserting contact properties",
+    "Adding properties to contact",
   );
 
   try {
-    // 1. Fetch existing properties for this organization
+    logger.info({ propertyNames }, "searching for existing properties");
     const existingProperties = await db
       .select()
       .from(schema.contactProperty)
@@ -34,17 +28,12 @@ export async function upsertContactProperties(
           eq(schema.contactProperty.organizationId, organizationId),
         ),
       );
-
-    const propertyNameToId = new Map(
-      existingProperties.map((p) => [p.propertyName, p.id]),
-    );
-
-    // 2. Process each property from the request
+    const propertyNameToId = new Map(existingProperties.map((p) => [p.propertyName, p.id]));
+    logger.info({ ...propertyNameToId }, "Property name to ID map");
     for (const [name, value] of Object.entries(properties)) {
       let propertyId = propertyNameToId.get(name);
-
       if (!propertyId) {
-        // Create new property definition if it doesn't exist
+        logger.info({ name }, "Creating new property definition");
         const [newProp] = await db
           .insert(schema.contactProperty)
           .values({
@@ -65,7 +54,7 @@ export async function upsertContactProperties(
       }
 
       if (propertyId) {
-        // Check if property value already exists for this contact
+        logger.info({ name, id: propertyId }, "Checking if property value already exists for this contact");
         const existingValue = await db.query.contactPropertyValue.findFirst({
           where: and(
             eq(schema.contactPropertyValue.contactId, contactId),
@@ -74,16 +63,15 @@ export async function upsertContactProperties(
         });
 
         if (existingValue) {
-          // Update existing property value
+          logger.info({ name, id: propertyId }, "Updating existing property value");
           await db
             .update(schema.contactPropertyValue)
-            .set({
-              value: value,
-              updatedAt: new Date(),
-            })
+            .set({ value: value, updatedAt: new Date() })
             .where(eq(schema.contactPropertyValue.id, existingValue.id));
+
+          logger.info({ name, id: propertyId }, "Updated existing property value");
         } else {
-          // Insert new property value
+          logger.info({ name, id: propertyId }, "Inserting new property value");
           await db.insert(schema.contactPropertyValue).values({
             contactId,
             propertyId,
@@ -91,6 +79,7 @@ export async function upsertContactProperties(
             organizationId,
             userId,
           });
+          logger.info({ name, id: propertyId }, "Inserted new property value");
         }
       }
     }
