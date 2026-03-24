@@ -94,6 +94,9 @@ export namespace ContactModel {
     total: t.Number(),
     page: t.Number(),
     limit: t.Number(),
+    totalContacts: t.Number({ description: "Total number of contacts in organization" }),
+    subscribedContacts: t.Number({ description: "Total number of subscribed contacts" }),
+    unsubscribedContacts: t.Number({ description: "Total number of unsubscribed contacts" }),
   });
 
   export type ContactListResponse = typeof contactListResponse.static;

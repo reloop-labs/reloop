@@ -33,11 +33,35 @@ interface ContactListResponse {
 	total: number;
 	page: number;
 	limit: number;
+	totalContacts: number;
+	subscribedContacts: number;
+	unsubscribedContacts: number;
 }
 
 interface ContactListProps {
 	onAddContact?: () => void;
 }
+
+const SummaryCard = ({
+	label,
+	count,
+	isLoading,
+}: {
+	label: string;
+	count?: number;
+	isLoading: boolean;
+}) => (
+	<div className="flex flex-col gap-1">
+		<p className="font-medium text-text-sub-600 text-xs uppercase tracking-wider">
+			{label}
+		</p>
+		{isLoading ? (
+			<div className="h-7 w-16 animate-pulse rounded bg-bg-surface-200" />
+		) : (
+			<p className="font-semibold text-xl">{count?.toLocaleString() || 0}</p>
+		)}
+	</div>
+);
 
 export const ContactList = ({ onAddContact }: ContactListProps) => {
 	const { activeOrganization } = useUserOrganization();
@@ -129,6 +153,25 @@ export const ContactList = ({ onAddContact }: ContactListProps) => {
 
 	return (
 		<div>
+			{/* Summary Cards */}
+			<div className="mb-3 grid grid-cols-1 gap-4 sm:grid-cols-3">
+				<SummaryCard
+					label="Total Contacts"
+					count={data?.totalContacts}
+					isLoading={isLoading}
+				/>
+				<SummaryCard
+					label="Subscribed"
+					count={data?.subscribedContacts}
+					isLoading={isLoading}
+				/>
+				<SummaryCard
+					label="Unsubscribed"
+					count={data?.unsubscribedContacts}
+					isLoading={isLoading}
+				/>
+			</div>
+
 			<div className="flex items-center gap-3">
 				<div className="flex-1">
 					<Input.Root size="xsmall">

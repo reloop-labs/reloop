@@ -41,6 +41,46 @@ export async function listContacts(
 			.from(schema.contact)
 			.where(and(...whereConditions));
 		const total = totalResult[0]?.count || 0;
+		const [
+			totalSummaryResult,
+			subscribedSummaryResult,
+			unsubscribedSummaryResult,
+		] = await Promise.all([
+			db
+				.select({ count: count() })
+				.from(schema.contact)
+				.where(
+					and(
+						eq(schema.contact.organizationId, organizationId),
+						isNull(schema.contact.deletedAt),
+					),
+				),
+			db
+				.select({ count: count() })
+				.from(schema.contact)
+				.where(
+					and(
+						eq(schema.contact.organizationId, organizationId),
+						eq(schema.contact.status, "subscribed"),
+						isNull(schema.contact.deletedAt),
+					),
+				),
+			db
+				.select({ count: count() })
+				.from(schema.contact)
+				.where(
+					and(
+						eq(schema.contact.organizationId, organizationId),
+						eq(schema.contact.status, "unsubscribed"),
+						isNull(schema.contact.deletedAt),
+					),
+				),
+		]);
+
+		const totalContacts = totalSummaryResult[0]?.count || 0;
+		const subscribedContacts = subscribedSummaryResult[0]?.count || 0;
+		const unsubscribedContacts = unsubscribedSummaryResult[0]?.count || 0;
+
 		const contacts = await db.query.contact.findMany({
 			where: and(...whereConditions),
 			orderBy: desc(schema.contact.createdAt),
@@ -85,7 +125,16 @@ export async function listContacts(
 			}),
 		);
 		logger.info({ total, page, limit }, "Contacts listed successfully");
-		return { object: "contact", contacts: formattedContacts, total, page, limit };
+		return {
+			object: "contact",
+			contacts: formattedContacts,
+			total,
+			page,
+			limit,
+			totalContacts,
+			subscribedContacts,
+			unsubscribedContacts,
+		};
 	} catch (error) {
 		logger.error(
 			{

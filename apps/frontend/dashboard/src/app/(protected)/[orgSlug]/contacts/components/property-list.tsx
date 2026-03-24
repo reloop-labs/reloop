@@ -51,7 +51,7 @@ export const PropertyList = ({ onAddProperty }: PropertyListProps) => {
 	const typeFilter = filters.length === 1 ? filters[0] : "";
 
 	const buildUrl = () => {
-		let url = `/api/contacts/properties/list?limit=${pageSize}&page=${currentPage}`;
+		let url = `/api/contacts/v1/properties/list?limit=${pageSize}&page=${currentPage}`;
 		if (search) url += `&search=${encodeURIComponent(search)}`;
 		if (typeFilter) url += `&type=${typeFilter}`;
 		return url;
