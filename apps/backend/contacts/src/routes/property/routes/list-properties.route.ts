@@ -19,6 +19,34 @@ export const listPropertiesRoute = new Elysia().use(authMiddleware).get(
       tags: ["Contact Properties"],
       summary: "List Contact properties",
       description: "List all properties for the organization with pagination and filtering",
+      responses: {
+        200: {
+          description: "Properties listed successfully",
+          content: {
+            "application/json": {
+              example: {
+                object: "contact_property",
+                properties: [
+                  {
+                    object: "contact_property",
+                    id: "prop_123456789",
+                    name: "company_name",
+                    type: "string",
+                    fallbackValue: "Unknown",
+                    organizationId: "org_123456789",
+                    createdAt: "2026-03-24T10:00:00Z",
+                    updatedAt: "2026-03-24T10:00:00Z",
+                    deletedAt: null,
+                  },
+                ],
+                total: 1,
+                page: 1,
+                limit: 100,
+              },
+            },
+          },
+        },
+      },
     },
   },
 );

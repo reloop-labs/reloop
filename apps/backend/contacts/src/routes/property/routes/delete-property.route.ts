@@ -22,6 +22,18 @@ export const deletePropertyRoute = new Elysia().use(authMiddleware).delete(
       tags: ["Contact Properties"],
       summary: "Delete a Contact property",
       description: "Soft delete a property by ID",
+      responses: {
+        200: {
+          description: "Property deleted successfully",
+          content: {
+            "application/json": {
+              example: {
+                success: true,
+              },
+            },
+          },
+        },
+      },
     },
   },
 );

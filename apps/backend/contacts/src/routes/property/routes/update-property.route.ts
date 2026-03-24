@@ -25,6 +25,26 @@ export const updatePropertyRoute = new Elysia().use(authMiddleware).patch(
       tags: ["Contact Properties"],
       summary: "Update a Contact property",
       description: "Update the fallback value of a property",
+      responses: {
+        200: {
+          description: "Property updated successfully",
+          content: {
+            "application/json": {
+              example: {
+                object: "contact_property",
+                id: "prop_123456789",
+                name: "company_name",
+                type: "string",
+                fallbackValue: "New Company",
+                organizationId: "org_123456789",
+                createdAt: "2026-03-24T10:00:00Z",
+                updatedAt: "2026-03-24T11:00:00Z",
+                deletedAt: null,
+              },
+            },
+          },
+        },
+      },
     },
   },
 );

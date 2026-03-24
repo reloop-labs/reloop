@@ -20,6 +20,26 @@ export const createPropertyRoute = new Elysia().use(authMiddleware).post(
       tags: ["Contact Properties"],
       summary: "Create Contact property",
       description: "Create a new custom property for contacts in the organization",
+      responses: {
+        200: {
+          description: "Property created successfully",
+          content: {
+            "application/json": {
+              example: {
+                object: "contact_property",
+                id: "prop_123456789",
+                name: "company_name",
+                type: "string",
+                fallbackValue: "Unknown",
+                organizationId: "org_123456789",
+                createdAt: "2026-03-24T10:00:00Z",
+                updatedAt: "2026-03-24T10:00:00Z",
+                deletedAt: null,
+              },
+            },
+          },
+        },
+      },
     },
   },
 );
