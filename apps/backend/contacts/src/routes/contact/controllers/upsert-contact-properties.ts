@@ -11,6 +11,18 @@ export async function upsertContactProperties(
   db: DatabaseInstance = defaultDb,
 ): Promise<void> {
   const propertyNames = Object.keys(properties);
+
+  // Validate property names
+  const propertyNameRegex = /^[a-z0-9_]+$/;
+  for (const name of propertyNames) {
+    if (!propertyNameRegex.test(name)) {
+      logger.warn({ name }, "Invalid property name");
+      throw new Error(
+        `Invalid property name: '${name}'. Property names must be lowercase and contain only alphanumeric characters and underscores.`,
+      );
+    }
+  }
+
   logger.info(
     { contactId, organizationId, propertyCount: propertyNames.length },
     "Upserting properties for contact (replacement mode)",
