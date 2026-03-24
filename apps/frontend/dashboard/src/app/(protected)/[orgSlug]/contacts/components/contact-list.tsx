@@ -9,6 +9,7 @@ import { parseAsInteger, useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
+import { AddContactModal } from "./add-contact-modal";
 import {
 	ContactFilterDropdown,
 	type ContactFilters,
@@ -36,10 +37,6 @@ interface ContactListResponse {
 	totalContacts: number;
 	subscribedContacts: number;
 	unsubscribedContacts: number;
-}
-
-interface ContactListProps {
-	onAddContact?: () => void;
 }
 
 const SummaryCard = ({
@@ -70,10 +67,11 @@ const SummaryCard = ({
 	</div>
 );
 
-export const ContactList = ({ onAddContact }: ContactListProps) => {
+export const ContactList = () => {
 	const { activeOrganization } = useUserOrganization();
 	const [searchQuery, setSearchQuery] = useState<string>("");
 	const [filters, setFilters] = useState<ContactFilters>([]);
+	const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 	const [currentPage, setCurrentPage] = useQueryState(
 		"page",
 		parseAsInteger.withDefault(1),
@@ -200,7 +198,6 @@ export const ContactList = ({ onAddContact }: ContactListProps) => {
 				</div>
 
 				<ContactFilterDropdown value={filters} onChange={setFilters} />
-
 				<Button.Root
 					variant="neutral"
 					mode="stroke"
@@ -218,9 +215,11 @@ export const ContactList = ({ onAddContact }: ContactListProps) => {
 					contacts={data?.contacts || []}
 					isLoading={isLoading}
 					loadingRows={6}
-					onAddContact={onAddContact}
+					onAddContact={() => setIsAddModalOpen(true)}
 				/>
 			</div>
+
+			<AddContactModal open={isAddModalOpen} onOpenChange={setIsAddModalOpen} />
 
 			{/* Pagination */}
 			{data && data.total > 0 && (

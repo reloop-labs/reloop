@@ -20,6 +20,7 @@ interface DomainTableProps {
 	currentDomainId?: string;
 	isLoading?: boolean;
 	loadingRows?: number;
+	onAddDomain?: () => void;
 }
 
 const DomainSkeleton = () => (
@@ -46,6 +47,7 @@ export const DomainTable = ({
 	currentDomainId,
 	isLoading,
 	loadingRows = 3,
+	onAddDomain,
 }: DomainTableProps) => {
 	const router = useRouter();
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
@@ -107,7 +109,7 @@ export const DomainTable = ({
 			{/* Table Body */}
 			<div className="divide-y divide-stroke-soft-100">
 				{domains.length === 0 ? (
-					<EmptyState />
+					<EmptyState onAddDomain={onAddDomain} />
 				) : (
 					domains.map((domain) => {
 						const isRowActive = activeDropdownId === domain.id;

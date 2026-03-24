@@ -2,11 +2,13 @@
 
 import { PageSizeDropdown } from "@fe/dashboard/components/page-size-dropdown";
 import { PaginationControls } from "@fe/dashboard/components/pagination-controls";
+import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import { useQueryState } from "nuqs";
 import { useState } from "react";
 import useSWR from "swr";
+import { AddPropertyModal } from "./add-property-modal";
 import {
 	PropertyFilterDropdown,
 	type PropertyFilters,
@@ -31,11 +33,8 @@ interface PropertyListResponse {
 	limit: number;
 }
 
-interface PropertyListProps {
-	onAddProperty?: () => void;
-}
-
-export const PropertyList = ({ onAddProperty }: PropertyListProps) => {
+export const PropertyList = () => {
+	const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 	const [currentPage, setCurrentPage] = useQueryState("propertyPage", {
 		defaultValue: 1,
 		parse: Number,
@@ -85,7 +84,6 @@ export const PropertyList = ({ onAddProperty }: PropertyListProps) => {
 						</Input.Wrapper>
 					</Input.Root>
 				</div>
-
 				<PropertyFilterDropdown value={filters} onChange={setFilters} />
 			</div>
 
@@ -95,9 +93,14 @@ export const PropertyList = ({ onAddProperty }: PropertyListProps) => {
 					isLoading={isLoading}
 					loadingRows={4}
 					onDelete={handleDeleteProperty}
-					onAddProperty={onAddProperty}
+					onAddProperty={() => setIsAddModalOpen(true)}
 				/>
 			</div>
+
+			<AddPropertyModal
+				open={isAddModalOpen}
+				onOpenChange={setIsAddModalOpen}
+			/>
 
 			{/* Pagination */}
 			{data && data.total > 0 && (

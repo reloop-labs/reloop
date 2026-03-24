@@ -4,7 +4,11 @@ import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
 
-export const EmptyState = () => {
+interface EmptyStateProps {
+	onAddDomain?: () => void;
+}
+
+export const EmptyState = ({ onAddDomain }: EmptyStateProps) => {
 	const { activeOrganization } = useUserOrganization();
 
 	return (
@@ -22,16 +26,23 @@ export const EmptyState = () => {
 					Add your first domain to begin sending emails from your custom domain.
 				</p>
 
-				<Link
-					href={`/${activeOrganization.slug}/domain/add`}
-					className={Button.buttonVariants({
-						variant: "neutral",
-						size: "small",
-					}).root()}
-				>
-					<Icon name="plus" className="h-4 w-4" />
-					Add your first domain
-				</Link>
+				{onAddDomain ? (
+					<Button.Root variant="neutral" size="small" onClick={onAddDomain}>
+						<Icon name="plus" className="h-4 w-4" />
+						Add your first domain
+					</Button.Root>
+				) : (
+					<Link
+						href={`/${activeOrganization.slug}/domain/add`}
+						className={Button.buttonVariants({
+							variant: "neutral",
+							size: "small",
+						}).root()}
+					>
+						<Icon name="plus" className="h-4 w-4" />
+						Add your first domain
+					</Link>
+				)}
 
 				<a
 					href="https://reloop.sh/docs/domains"
