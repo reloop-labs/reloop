@@ -11,10 +11,10 @@ import {
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { AnimatePresence, motion } from "motion/react";
 import { useRef, useState } from "react";
 import { DeletePropertyModal } from "./delete-property-modal";
 import { EditPropertyModal } from "./edit-property-modal";
+import { PropertiesEmptyState } from "./properties-empty-state";
 
 interface Property {
 	id: string;
@@ -32,20 +32,8 @@ interface PropertyTableProps {
 	isLoading?: boolean;
 	loadingRows?: number;
 	onDelete?: (propertyId: string) => void;
+	onAddProperty?: () => void;
 }
-
-const getAnimationProps = (row: number, column: number) => {
-	return {
-		initial: { opacity: 0, y: "-100%" },
-		animate: { opacity: 1, y: 0 },
-		exit: { opacity: 0, y: "100%" },
-		transition: {
-			duration: 0.5,
-			delay: row * 0.07 + column * 0.1,
-			ease: [0.65, 0, 0.35, 1] as const,
-		},
-	};
-};
 
 const getTypeBadgeStyles = (type: string) => {
 	switch (type.toLowerCase()) {
@@ -183,6 +171,7 @@ export const PropertyTable = ({
 	isLoading,
 	loadingRows = 4,
 	onDelete,
+	onAddProperty,
 }: PropertyTableProps) => {
 	const [editingProperty, setEditingProperty] = useState<Property | null>(null);
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -244,32 +233,34 @@ export const PropertyTable = ({
 
 	return (
 		<>
-			<AnimatePresence mode="wait">
-				<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm">
-					{/* Table Header */}
-					<div className="grid grid-cols-[1fr_100px_1fr_120px_40px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600">
-						<div className="flex items-center gap-2">
-							<Icon name="tag" className="h-4 w-4" />
-							<span className="text-xs">Name</span>
-						</div>
-						<div className="flex items-center gap-2">
-							<Icon name="file-code" className="h-4 w-4" />
-							<span className="text-xs">Type</span>
-						</div>
-						<div className="flex items-center gap-2">
-							<Icon name="file-text" className="h-4 w-4" />
-							<span className="text-xs">Default</span>
-						</div>
-						<div className="flex items-center gap-2">
-							<Icon name="clock" className="h-4 w-4" />
-							<span className="text-xs">Created At</span>
-						</div>
-						<div />
+			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm">
+				{/* Table Header */}
+				<div className="grid grid-cols-[1fr_100px_1fr_120px_40px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600">
+					<div className="flex items-center gap-2">
+						<Icon name="tag" className="h-4 w-4" />
+						<span className="text-xs">Name</span>
 					</div>
+					<div className="flex items-center gap-2">
+						<Icon name="file-code" className="h-4 w-4" />
+						<span className="text-xs">Type</span>
+					</div>
+					<div className="flex items-center gap-2">
+						<Icon name="file-text" className="h-4 w-4" />
+						<span className="text-xs">Default</span>
+					</div>
+					<div className="flex items-center gap-2">
+						<Icon name="clock" className="h-4 w-4" />
+						<span className="text-xs">Created At</span>
+					</div>
+					<div />
+				</div>
 
-					{/* Rows */}
-					<div className="divide-y divide-stroke-soft-100">
-						{properties.map((property, index) => (
+				{/* Rows */}
+				<div className="divide-y divide-stroke-soft-100">
+					{properties.length === 0 && !isLoading ? (
+						<PropertiesEmptyState onAddProperty={onAddProperty} />
+					) : (
+						properties.map((property) => (
 							<div
 								key={property.id}
 								className={cn(
@@ -279,10 +270,7 @@ export const PropertyTable = ({
 								)}
 							>
 								{/* Name Column */}
-								<motion.div
-									{...getAnimationProps(index + 1, 0)}
-									className="flex items-center gap-2"
-								>
+								<div className="flex items-center gap-2">
 									<Icon
 										name="tag"
 										className="h-4 w-4 flex-shrink-0 text-text-sub-600"
@@ -290,13 +278,10 @@ export const PropertyTable = ({
 									<span className="truncate font-medium text-label-sm text-text-sub-600">
 										{property.name}
 									</span>
-								</motion.div>
+								</div>
 
 								{/* Type Column */}
-								<motion.div
-									{...getAnimationProps(index + 1, 1)}
-									className="flex items-center"
-								>
+								<div className="flex items-center">
 									<span
 										className={cn(
 											"inline-flex rounded-md border-[1px] px-[6px] py-0.5 font-medium text-[10px] text-text-sub-600",
@@ -305,33 +290,24 @@ export const PropertyTable = ({
 									>
 										{property.type}
 									</span>
-								</motion.div>
+								</div>
 
 								{/* Default Column */}
-								<motion.div
-									{...getAnimationProps(index + 1, 2)}
-									className="flex items-center"
-								>
+								<div className="flex items-center">
 									<span className="truncate font-medium text-label-sm text-text-sub-600">
 										{property.fallbackValue || "-"}
 									</span>
-								</motion.div>
+								</div>
 
 								{/* Created At Column */}
-								<motion.div
-									{...getAnimationProps(index + 1, 3)}
-									className="flex items-center"
-								>
+								<div className="flex items-center">
 									<span className="truncate whitespace-nowrap font-medium text-label-sm text-text-sub-600">
 										{formatRelativeTime(property.createdAt)}
 									</span>
-								</motion.div>
+								</div>
 
 								{/* Actions Column */}
-								<motion.div
-									{...getAnimationProps(index + 1, 4)}
-									className="flex items-center justify-end"
-								>
+								<div className="flex items-center justify-end">
 									<PropertyActionsPopover
 										property={property}
 										onEdit={handleEdit}
@@ -340,12 +316,12 @@ export const PropertyTable = ({
 											setOpenPropertyId(open ? property.id : null)
 										}
 									/>
-								</motion.div>
+								</div>
 							</div>
-						))}
-					</div>
+						))
+					)}
 				</div>
-			</AnimatePresence>
+			</div>
 
 			{/* Edit Property Modal */}
 			<EditPropertyModal

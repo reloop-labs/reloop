@@ -7,7 +7,6 @@ import * as Input from "@reloop/ui/input";
 import { useQueryState } from "nuqs";
 import { useState } from "react";
 import useSWR from "swr";
-import { PropertiesEmptyState } from "./properties-empty-state";
 import {
 	PropertyFilterDropdown,
 	type PropertyFilters,
@@ -52,7 +51,7 @@ export const PropertyList = ({ onAddProperty }: PropertyListProps) => {
 	const typeFilter = filters.length === 1 ? filters[0] : "";
 
 	const buildUrl = () => {
-		let url = `/api/contacts/v1/properties/list?limit=${pageSize}&page=${currentPage}`;
+		let url = `/api/contacts/properties/list?limit=${pageSize}&page=${currentPage}`;
 		if (search) url += `&search=${encodeURIComponent(search)}`;
 		if (typeFilter) url += `&type=${typeFilter}`;
 		return url;
@@ -67,15 +66,6 @@ export const PropertyList = ({ onAddProperty }: PropertyListProps) => {
 	const handleDeleteProperty = async (_propertyId: string) => {
 		await mutate();
 	};
-
-	if (
-		!isLoading &&
-		data?.properties.length === 0 &&
-		!search &&
-		filters.length === 0
-	) {
-		return <PropertiesEmptyState onAddProperty={onAddProperty} />;
-	}
 
 	return (
 		<div>
@@ -105,6 +95,7 @@ export const PropertyList = ({ onAddProperty }: PropertyListProps) => {
 					isLoading={isLoading}
 					loadingRows={4}
 					onDelete={handleDeleteProperty}
+					onAddProperty={onAddProperty}
 				/>
 			</div>
 
