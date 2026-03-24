@@ -22,99 +22,110 @@ export async function updateContact(
 	);
 
 	try {
-		// Check if contact exists
-		const existingContact = await db.query.contact.findFirst({
-			where: and(
-				eq(schema.contact.id, contactId),
-				eq(schema.contact.organizationId, organizationId),
-				isNull(schema.contact.deletedAt),
-			),
-		});
-
-		if (!existingContact) {
-			logger.warn({ contactId, organizationId }, "Contact not found");
-			throw status(404, { message: "Contact not found" });
-		}
-
-		// Update the contact
-		const updateData: Partial<typeof schema.contact.$inferInsert> = {
-			updatedAt: new Date(),
-		};
-
-		if (body.email !== undefined) {
-			updateData.email = body.email;
-		}
-		if (body.firstName !== undefined) {
-			updateData.firstName = body.firstName;
-		}
-		if (body.lastName !== undefined) {
-			updateData.lastName = body.lastName;
-		}
-		if (body.status !== undefined) {
-			updateData.status = body.status;
-		}
-
-		const [updatedContact] = await db
-			.update(schema.contact)
-			.set(updateData)
-			.where(
-				and(
+		return await db.transaction(async (tx) => {
+			// Check if contact exists
+			const existingContact = await tx.query.contact.findFirst({
+				where: and(
 					eq(schema.contact.id, contactId),
 					eq(schema.contact.organizationId, organizationId),
+					isNull(schema.contact.deletedAt),
 				),
-			)
-			.returning();
+			});
 
-		if (!updatedContact) {
-			logger.error(
-				{ contactId },
-				"Failed to update contact - no data returned",
+			if (!existingContact) {
+				logger.warn({ contactId, organizationId }, "Contact not found");
+				throw status(404, { message: "Contact not found" });
+			}
+
+			// Update the contact
+			const updateData: Partial<typeof schema.contact.$inferInsert> = {
+				updatedAt: new Date(),
+			};
+
+			if (body.email !== undefined) {
+				updateData.email = body.email;
+			}
+			if (body.firstName !== undefined) {
+				updateData.firstName = body.firstName;
+			}
+			if (body.lastName !== undefined) {
+				updateData.lastName = body.lastName;
+			}
+			if (body.status !== undefined) {
+				updateData.status = body.status;
+			}
+
+			const [updatedContact] = await tx
+				.update(schema.contact)
+				.set(updateData)
+				.where(
+					and(
+						eq(schema.contact.id, contactId),
+						eq(schema.contact.organizationId, organizationId),
+					),
+				)
+				.returning();
+
+			if (!updatedContact) {
+				logger.error(
+					{ contactId },
+					"Failed to update contact - no data returned",
+				);
+				throw status(500, { message: "Failed to update contact" });
+			}
+
+			// Handle property values if provided
+			if (body.properties !== undefined) {
+				await upsertContactProperties(
+					contactId,
+					organizationId,
+					existingContact.userId,
+					body.properties,
+					logger,
+					tx,
+				);
+			}
+
+			logger.info(
+				{
+					contactId,
+					organizationId,
+				},
+				"Contact updated successfully",
 			);
-			throw status(500, { message: "Failed to update contact" });
-		}
 
-		// Handle property values if provided
-		if (body.properties && Object.keys(body.properties).length > 0) {
-			await upsertContactProperties(
-				contactId,
-				organizationId,
-				existingContact.userId,
-				body.properties,
+			// Fetch current properties after update to return them in response
+			const updatedProperties = await tx
+				.select({
+					name: schema.contactProperty.propertyName,
+					value: schema.contactPropertyValue.value,
+				})
+				.from(schema.contactPropertyValue)
+				.innerJoin(
+					schema.contactProperty,
+					eq(schema.contactPropertyValue.propertyId, schema.contactProperty.id),
+				)
+				.where(
+					and(
+						eq(schema.contactPropertyValue.contactId, contactId),
+						eq(schema.contactPropertyValue.organizationId, organizationId),
+						isNull(schema.contactProperty.deletedAt),
+						isNull(schema.contactPropertyValue.deletedAt),
+					),
+				);
+
+			const propertiesRecord = updatedProperties.reduce(
+				(acc, curr) => {
+					acc[curr.name] = curr.value;
+					return acc;
+				},
+				{} as Record<string, string>,
 			);
-		}
 
-		logger.info(
-			{
-				contactId,
-				organizationId,
-			},
-			"Contact updated successfully",
-		);
-
-		// Fetch current properties after update to return them in response
-		const updatedProperties = await db
-			.select({
-				name: schema.contactProperty.propertyName,
-				value: schema.contactPropertyValue.value,
-			})
-			.from(schema.contactPropertyValue)
-			.innerJoin(
-				schema.contactProperty,
-				eq(schema.contactPropertyValue.propertyId, schema.contactProperty.id),
-			)
-			.where(eq(schema.contactPropertyValue.contactId, contactId));
-
-		const propertiesRecord = updatedProperties.reduce(
-			(acc, curr) => {
-				acc[curr.name] = curr.value;
-				return acc;
-			},
-			{} as Record<string, string>,
-		);
-
-		return formatContactResponse({
-			...updatedContact,
-			properties: propertiesRecord,
+			return formatContactResponse({
+				...updatedContact,
+				properties: propertiesRecord,
+			});
 		});
 	} catch (error) {
 		logger.error(
