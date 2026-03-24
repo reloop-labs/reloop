@@ -4,14 +4,14 @@ import { updatePropertyHandler } from "@be/contacts/routes/property/controllers/
 import { Elysia, t } from "elysia";
 
 export const updatePropertyRoute = new Elysia().use(authMiddleware).patch(
-  "/:propertyId",
-  async ({ params, body, activeOrganizationId }) => {
-    return updatePropertyHandler(activeOrganizationId as string, params.propertyId, body);
+  "/:contact_property_id",
+  async ({ params, body, activeOrganizationId, logger }) => {
+    return updatePropertyHandler(activeOrganizationId as string, params.contact_property_id, body, logger);
   },
   {
     auth: true,
     params: t.Object({
-      propertyId: t.String({ description: "Property ID to update" }),
+      contact_property_id: t.String({ description: "Property ID to update" }),
     }),
     body: t.Object({
       fallbackValue: t.Nullable(t.String({ description: "New fallback value" })),
@@ -22,8 +22,8 @@ export const updatePropertyRoute = new Elysia().use(authMiddleware).patch(
       401: PropertyModel.unauthorized,
     },
     detail: {
-      tags: ["Properties"],
-      summary: "Update a property",
+      tags: ["Contact Properties"],
+      summary: "Update a Contact property",
       description: "Update the fallback value of a property",
     },
   },

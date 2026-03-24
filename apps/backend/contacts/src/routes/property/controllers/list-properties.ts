@@ -2,12 +2,13 @@ import { formatPropertyResponse } from "@be/contacts/routes/property/controllers
 import type { PropertyTypes } from "@be/contacts/types/property.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { logger } from "@reloop/logger";
+import type { Logger } from "@reloop/logger";
 import { and, count, desc, eq, ilike, isNull, type SQL } from "drizzle-orm";
 
 export async function listProperties(
   organizationId: string,
   query: PropertyTypes.PropertyListQuery,
+  logger: Logger,
 ): Promise<PropertyTypes.PropertyListResponse> {
   logger.info(
     {
@@ -89,6 +90,7 @@ export async function listProperties(
 export async function listPropertiesHandler(
   organizationId: string,
   query: PropertyTypes.PropertyListQuery,
+  logger: Logger,
 ): Promise<PropertyTypes.PropertyListResponse> {
-  return listProperties(organizationId, query);
+  return listProperties(organizationId, query, logger);
 }

@@ -2,18 +2,19 @@ import { formatPropertyResponse } from "@be/contacts/routes/property/controllers
 import type { PropertyTypes } from "@be/contacts/types/property.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { logger } from "@reloop/logger";
+import type { Logger } from "@reloop/logger";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
 export async function updateProperty(
   organizationId: string,
-  propertyId: string,
+  contactPropertyId: string,
   body: { fallbackValue: string | null },
+  logger: Logger,
 ): Promise<PropertyTypes.PropertyResponse> {
   logger.info(
     {
-      propertyId,
+      contactPropertyId,
       organizationId,
       fallbackValue: body.fallbackValue,
     },
@@ -27,7 +28,7 @@ export async function updateProperty(
       .from(schema.contactProperty)
       .where(
         and(
-          eq(schema.contactProperty.id, propertyId),
+          eq(schema.contactProperty.id, contactPropertyId),
           eq(schema.contactProperty.organizationId, organizationId),
           isNull(schema.contactProperty.deletedAt),
         ),
@@ -36,7 +37,7 @@ export async function updateProperty(
 
     if (existingProperty.length === 0) {
       logger.warn(
-        { propertyId },
+        { contactPropertyId },
         "Property not found",
       );
       throw status(404, { message: "Property not found" });
@@ -49,12 +50,12 @@ export async function updateProperty(
         defaultValue: body.fallbackValue,
         updatedAt: new Date(),
       })
-      .where(eq(schema.contactProperty.id, propertyId))
+      .where(eq(schema.contactProperty.id, contactPropertyId))
       .returning();
 
     if (!updatedProperty) {
       logger.error(
-        { propertyId },
+        { contactPropertyId },
         "Failed to update property - no data returned",
       );
       throw status(500, { message: "Failed to update property" });
@@ -62,7 +63,7 @@ export async function updateProperty(
 
     logger.info(
       {
-        propertyId,
+        contactPropertyId,
         fallbackValue: body.fallbackValue,
       },
       "Property updated successfully",
@@ -72,7 +73,7 @@ export async function updateProperty(
   } catch (error) {
     logger.error(
       {
-        propertyId,
+        contactPropertyId,
         organizationId,
         error: error instanceof Error ? error.message : String(error),
       },
@@ -84,8 +85,9 @@ export async function updateProperty(
 
 export async function updatePropertyHandler(
   organizationId: string,
-  propertyId: string,
+  contactPropertyId: string,
   body: { fallbackValue: string | null },
+  logger: Logger,
 ): Promise<PropertyTypes.PropertyResponse> {
-  return updateProperty(organizationId, propertyId, body);
+  return updateProperty(organizationId, contactPropertyId, body, logger);
 }

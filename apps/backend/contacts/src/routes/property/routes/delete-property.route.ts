@@ -4,14 +4,14 @@ import { deletePropertyHandler } from "@be/contacts/routes/property/controllers/
 import { Elysia, t } from "elysia";
 
 export const deletePropertyRoute = new Elysia().use(authMiddleware).delete(
-  "/:propertyId",
-  async ({ params, activeOrganizationId }) => {
-    return deletePropertyHandler(activeOrganizationId as string, params.propertyId);
+  "/:contact_property_id",
+  async ({ params, activeOrganizationId, logger }) => {
+    return deletePropertyHandler(activeOrganizationId as string, params.contact_property_id, logger);
   },
   {
     auth: true,
     params: t.Object({
-      propertyId: t.String({ description: "Property ID to delete" }),
+      contact_property_id: t.String({ description: "Property ID to delete" }),
     }),
     response: {
       200: PropertyModel.deleteResponse,
@@ -19,8 +19,8 @@ export const deletePropertyRoute = new Elysia().use(authMiddleware).delete(
       401: PropertyModel.unauthorized,
     },
     detail: {
-      tags: ["Properties"],
-      summary: "Delete a property",
+      tags: ["Contact Properties"],
+      summary: "Delete a Contact property",
       description: "Soft delete a property by ID",
     },
   },

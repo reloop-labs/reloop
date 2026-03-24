@@ -5,8 +5,8 @@ import { Elysia } from "elysia";
 
 export const listPropertiesRoute = new Elysia().use(authMiddleware).get(
   "/list",
-  async ({ query, activeOrganizationId }) => {
-    return listPropertiesHandler(activeOrganizationId as string, query);
+  async ({ query, activeOrganizationId, logger }) => {
+    return listPropertiesHandler(activeOrganizationId as string, query, logger);
   },
   {
     auth: true,
@@ -16,8 +16,8 @@ export const listPropertiesRoute = new Elysia().use(authMiddleware).get(
       401: PropertyModel.unauthorized,
     },
     detail: {
-      tags: ["Properties"],
-      summary: "List properties",
+      tags: ["Contact Properties"],
+      summary: "List Contact properties",
       description: "List all properties for the organization with pagination and filtering",
     },
   },

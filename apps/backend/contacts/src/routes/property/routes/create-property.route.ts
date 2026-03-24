@@ -5,8 +5,8 @@ import { Elysia } from "elysia";
 
 export const createPropertyRoute = new Elysia().use(authMiddleware).post(
   "/create",
-  async ({ body, activeOrganizationId, userId }) => {
-    return createPropertyHandler(activeOrganizationId as string, userId, body);
+  async ({ body, activeOrganizationId, userId, logger }) => {
+    return createPropertyHandler(activeOrganizationId as string, userId, body, logger);
   },
   {
     auth: true,
@@ -17,8 +17,8 @@ export const createPropertyRoute = new Elysia().use(authMiddleware).post(
       401: PropertyModel.unauthorized,
     },
     detail: {
-      tags: ["Properties"],
-      summary: "Create a new property",
+      tags: ["Contact Properties"],
+      summary: "Create Contact property",
       description: "Create a new custom property for contacts in the organization",
     },
   },

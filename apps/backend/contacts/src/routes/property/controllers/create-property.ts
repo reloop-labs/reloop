@@ -2,7 +2,7 @@ import { formatPropertyResponse } from "@be/contacts/routes/property/controllers
 import type { PropertyTypes } from "@be/contacts/types/property.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { logger } from "@reloop/logger";
+import type { Logger } from "@reloop/logger";
 import { and, eq } from "drizzle-orm";
 import { status } from "elysia";
 
@@ -10,6 +10,7 @@ export async function createProperty(
   organizationId: string,
   userId: string,
   body: PropertyTypes.CreatePropertyRequest,
+  logger: Logger,
 ): Promise<PropertyTypes.PropertyResponse> {
   logger.info(
     {
@@ -88,6 +89,7 @@ export async function createPropertyHandler(
   organizationId: string,
   userId: string,
   body: PropertyTypes.CreatePropertyRequest,
+  logger: Logger,
 ): Promise<PropertyTypes.PropertyResponse> {
-  return createProperty(organizationId, userId, body);
+  return createProperty(organizationId, userId, body, logger);
 }

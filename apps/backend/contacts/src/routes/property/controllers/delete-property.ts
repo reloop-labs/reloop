@@ -1,17 +1,17 @@
-import type { PropertyTypes } from "@be/contacts/types/property.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { logger } from "@reloop/logger";
+import type { Logger } from "@reloop/logger";
 import { and, eq } from "drizzle-orm";
 import { status } from "elysia";
 
 export async function deleteProperty(
   organizationId: string,
-  propertyId: string,
+  contactPropertyId: string,
+  logger: Logger,
 ): Promise<{ success: boolean }> {
   logger.info(
     {
-      propertyId,
+      contactPropertyId,
       organizationId,
     },
     "Deleting property",
@@ -24,7 +24,7 @@ export async function deleteProperty(
       .from(schema.contactProperty)
       .where(
         and(
-          eq(schema.contactProperty.id, propertyId),
+          eq(schema.contactProperty.id, contactPropertyId),
           eq(schema.contactProperty.organizationId, organizationId),
         ),
       )
@@ -32,7 +32,7 @@ export async function deleteProperty(
 
     if (existingProperty.length === 0) {
       logger.warn(
-        { propertyId },
+        { contactPropertyId },
         "Property not found",
       );
       throw status(404, { message: "Property not found" });
@@ -41,10 +41,10 @@ export async function deleteProperty(
     // Hard delete - actually remove the record
     await db
       .delete(schema.contactProperty)
-      .where(eq(schema.contactProperty.id, propertyId));
+      .where(eq(schema.contactProperty.id, contactPropertyId));
 
     logger.info(
-      { propertyId },
+      { contactPropertyId },
       "Property deleted successfully",
     );
 
@@ -52,7 +52,7 @@ export async function deleteProperty(
   } catch (error) {
     logger.error(
       {
-        propertyId,
+        contactPropertyId,
         organizationId,
         error: error instanceof Error ? error.message : String(error),
       },
@@ -64,7 +64,8 @@ export async function deleteProperty(
 
 export async function deletePropertyHandler(
   organizationId: string,
-  propertyId: string,
+  contactPropertyId: string,
+  logger: Logger,
 ): Promise<{ success: boolean }> {
-  return deleteProperty(organizationId, propertyId);
+  return deleteProperty(organizationId, contactPropertyId, logger);
 }
