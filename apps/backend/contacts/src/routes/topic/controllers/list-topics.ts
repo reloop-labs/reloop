@@ -1,15 +1,17 @@
 import type { TopicTypes } from "@be/contacts/types/topic.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { logger } from "@reloop/logger";
+import type { Logger } from "@reloop/logger";
 import { and, count, desc, eq, isNull } from "drizzle-orm";
 
 export async function listTopics(
   query: TopicTypes.TopicListQuery,
   organizationId: string,
+  logger: Logger,
 ): Promise<TopicTypes.TopicListResponse> {
-  const { page = 1, limit = 10 } = query;
+  const { page = 1, limit = 100 } = query;
   const offset = (page - 1) * limit;
+  logger.info({ organizationId, page, limit }, "Listing topics");
 
   try {
     const conditions = [
@@ -32,8 +34,10 @@ export async function listTopics(
       offset: offset,
     });
 
+    logger.info({ organizationId, total, page, limit }, "Topics listed successfully");
     return {
-      topics: topics,
+      object: "contact_topic",
+      topics: topics.map((t) => ({ ...t, object: "contact_topic" as const })),
       total,
       page,
       limit,
@@ -53,6 +57,7 @@ export async function listTopics(
 export async function listTopicsHandler(
   query: TopicTypes.TopicListQuery,
   organizationId: string,
+  logger: Logger,
 ): Promise<TopicTypes.TopicListResponse> {
-  return await listTopics(query, organizationId);
+  return await listTopics(query, organizationId, logger);
 }

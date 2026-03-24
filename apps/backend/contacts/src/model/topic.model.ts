@@ -64,6 +64,7 @@ export namespace TopicModel {
 
   // Topic Response
   export const topicResponse = t.Object({
+    object: t.Literal("contact_topic", { default: "contact_topic" }),
     id: t.String({ description: "Unique topic identifier" }),
     name: t.String({ description: "Topic name" }),
     description: t.Union([t.String(), t.Null()], {
@@ -85,6 +86,7 @@ export namespace TopicModel {
 
   // Topic List Response
   export const topicListResponse = t.Object({
+    object: t.Literal("contact_topic", { default: "contact_topic" }),
     topics: t.Array(topicResponse),
     total: t.Number(),
     page: t.Number(),
@@ -96,7 +98,7 @@ export namespace TopicModel {
   // Query
   export const topicQuery = t.Object({
     page: t.Optional(t.Number({ minimum: 1, default: 1 })),
-    limit: t.Optional(t.Number({ minimum: 1, maximum: 100, default: 10 })),
+    limit: t.Optional(t.Number({ minimum: 1, maximum: 1000, default: 100 })),
     search: t.Optional(t.String({ description: "Search by name" })),
   });
 

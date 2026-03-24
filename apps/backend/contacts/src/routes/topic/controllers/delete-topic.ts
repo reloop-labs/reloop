@@ -1,24 +1,27 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { logger } from "@reloop/logger";
+import type { Logger } from "@reloop/logger";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
 export async function deleteTopic(
-  topicId: string,
+  contactTopicId: string,
   organizationId: string,
+  logger: Logger,
 ): Promise<{ success: boolean }> {
+  logger.info({ contactTopicId, organizationId }, "Deleting topic");
   try {
     // Check if topic exists
     const existingTopic = await db.query.topic.findFirst({
       where: and(
-        eq(schema.topic.id, topicId),
+        eq(schema.topic.id, contactTopicId),
         eq(schema.topic.organizationId, organizationId),
         isNull(schema.topic.deletedAt),
       ),
     });
 
     if (!existingTopic) {
+      logger.warn({ contactTopicId }, "Topic not found");
       throw status(404, { message: "Topic not found" });
     }
 
@@ -29,13 +32,14 @@ export async function deleteTopic(
         deletedAt: new Date(),
         updatedAt: new Date(),
       })
-      .where(eq(schema.topic.id, topicId));
+      .where(eq(schema.topic.id, contactTopicId));
 
+    logger.info({ contactTopicId }, "Topic deleted successfully");
     return { success: true };
   } catch (error) {
     logger.error(
       {
-        topicId,
+        contactTopicId,
         error: error instanceof Error ? error.message : String(error),
       },
       "Error deleting topic",
@@ -45,8 +49,9 @@ export async function deleteTopic(
 }
 
 export async function deleteTopicHandler(
-  topicId: string,
+  contactTopicId: string,
   organizationId: string,
+  logger: Logger,
 ): Promise<{ success: boolean }> {
-  return await deleteTopic(topicId, organizationId);
+  return await deleteTopic(contactTopicId, organizationId, logger);
 }

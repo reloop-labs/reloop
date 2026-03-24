@@ -1,33 +1,36 @@
 import type { TopicTypes } from "@be/contacts/types/topic.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { logger } from "@reloop/logger";
+import type { Logger } from "@reloop/logger";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
 export async function getTopic(
-  topicId: string,
+  contactTopicId: string,
   organizationId: string,
+  logger: Logger,
 ): Promise<TopicTypes.TopicResponse> {
+  logger.info({ contactTopicId, organizationId }, "Getting topic");
   try {
     const result = await db.query.topic.findFirst({
       where: and(
-        eq(schema.topic.id, topicId),
+        eq(schema.topic.id, contactTopicId),
         eq(schema.topic.organizationId, organizationId),
         isNull(schema.topic.deletedAt),
       ),
     });
 
     if (!result) {
-      logger.warn({ topicId }, "Topic not found");
+      logger.warn({ contactTopicId }, "Topic not found");
       throw status(404, { message: "Topic not found" });
     }
 
-    return result;
+    logger.info({ contactTopicId }, "Topic retrieved successfully");
+    return { ...result, object: "contact_topic" as const };
   } catch (error) {
     logger.error(
       {
-        topicId,
+        contactTopicId,
         error: error instanceof Error ? error.message : String(error),
       },
       "Error getting topic",
@@ -37,8 +40,9 @@ export async function getTopic(
 }
 
 export async function getTopicHandler(
-  topicId: string,
+  contactTopicId: string,
   organizationId: string,
+  logger: Logger,
 ): Promise<TopicTypes.TopicResponse> {
-  return await getTopic(topicId, organizationId);
+  return await getTopic(contactTopicId, organizationId, logger);
 }

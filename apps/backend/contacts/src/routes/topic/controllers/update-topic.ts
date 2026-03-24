@@ -1,31 +1,36 @@
 import type { TopicTypes } from "@be/contacts/types/topic.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { logger } from "@reloop/logger";
+import type { Logger } from "@reloop/logger";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
-export async function updateTopic(params: {
-  topicId: string;
-  organizationId: string;
-  name?: string;
-  description?: string;
-  autoEnroll?: "enrolled" | "unenrolled";
-  visibility?: "private" | "public";
-}): Promise<TopicTypes.TopicResponse> {
-  const { topicId, organizationId, name, description, autoEnroll, visibility } = params;
+export async function updateTopic(
+  params: {
+    contactTopicId: string;
+    organizationId: string;
+    name?: string;
+    description?: string;
+    autoEnroll?: "enrolled" | "unenrolled";
+    visibility?: "private" | "public";
+  },
+  logger: Logger,
+): Promise<TopicTypes.TopicResponse> {
+  const { contactTopicId, organizationId, name, description, autoEnroll, visibility } = params;
+  logger.info({ contactTopicId, organizationId }, "Updating topic");
 
   try {
     // Check if topic exists
     const existingTopic = await db.query.topic.findFirst({
       where: and(
-        eq(schema.topic.id, topicId),
+        eq(schema.topic.id, contactTopicId),
         eq(schema.topic.organizationId, organizationId),
         isNull(schema.topic.deletedAt),
       ),
     });
 
     if (!existingTopic) {
+      logger.warn({ contactTopicId }, "Topic not found");
       throw status(404, { message: "Topic not found" });
     }
 
@@ -40,6 +45,7 @@ export async function updateTopic(params: {
       });
 
       if (duplicateName) {
+        logger.warn({ contactTopicId, name }, "Topic with this name already exists");
         throw status(409, { message: "Topic with this name already exists" });
       }
     }
@@ -53,18 +59,20 @@ export async function updateTopic(params: {
         ...(visibility && { visibility }),
         updatedAt: new Date(),
       })
-      .where(eq(schema.topic.id, topicId))
+      .where(eq(schema.topic.id, contactTopicId))
       .returning();
 
     if (!updatedTopic) {
+      logger.error({ contactTopicId }, "Failed to update topic - no data returned");
       throw new Error("Failed to update topic");
     }
 
-    return updatedTopic;
+    logger.info({ contactTopicId }, "Topic updated successfully");
+    return { ...updatedTopic, object: "contact_topic" as const };
   } catch (error) {
     logger.error(
       {
-        topicId,
+        contactTopicId,
         error: error instanceof Error ? error.message : String(error),
       },
       "Error updating topic",
@@ -73,13 +81,16 @@ export async function updateTopic(params: {
   }
 }
 
-export async function updateTopicHandler(params: {
-  topicId: string;
-  organizationId: string;
-  name?: string;
-  description?: string;
-  autoEnroll?: "enrolled" | "unenrolled";
-  visibility?: "private" | "public";
-}): Promise<TopicTypes.TopicResponse> {
-  return await updateTopic(params);
+export async function updateTopicHandler(
+  params: {
+    contactTopicId: string;
+    organizationId: string;
+    name?: string;
+    description?: string;
+    autoEnroll?: "enrolled" | "unenrolled";
+    visibility?: "private" | "public";
+  },
+  logger: Logger,
+): Promise<TopicTypes.TopicResponse> {
+  return await updateTopic(params, logger);
 }

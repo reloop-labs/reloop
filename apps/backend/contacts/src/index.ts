@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { contactsConfig } from "@be/contacts/contacts.config";
-import { topicRoutes } from "@be/contacts/routes/audience-topic/audience-topic.routes";
+import { topicRoutes } from "@be/contacts/routes/topic/topic.routes";
 import { topicSubscriptionRoutes } from "@be/contacts/routes/audience-topic-mapper/audience-topic-mapper.routes";
 import { contactRoutes } from "@be/contacts/routes/contact/contact.routes";
 import { landing } from "@be/contacts/routes/landing/landing.index";
