@@ -39,6 +39,7 @@ export namespace ContactTypes {
     lastName?: string;
     status?: "subscribed" | "unsubscribed" | "blocked";
     properties?: Record<string, string>;
+    content: "contact";
   }
 
   export interface CreateContactsRequest {

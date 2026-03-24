@@ -20,13 +20,13 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 				const currentLogger = logger.child({ traceId });
 				const apiKeyResult = await validateApiKey(apiKey);
 				if (apiKeyResult) {
-					const tenantLogger = currentLogger.child({ traceId, ...currentLogger });
+					const tenantLogger = currentLogger.child({ traceId, service: "contacts", ...currentLogger });
 					tenantLogger.info({ ...apiKeyResult, }, "API key authentication successful");
 					return { ...apiKeyResult, traceId, logger: tenantLogger };
 				}
 				const sessionResult = await validateSession(cookie);
 				if (sessionResult) {
-					const tenantLogger = currentLogger.child({ traceId, ...currentLogger });
+					const tenantLogger = currentLogger.child({ traceId, service: "contacts", ...currentLogger });
 					tenantLogger.info({ ...sessionResult, }, "Session authentication successful");
 					return { ...sessionResult, traceId, logger: tenantLogger };
 				}

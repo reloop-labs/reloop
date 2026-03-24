@@ -98,7 +98,7 @@ export namespace ContactModel {
 
   export const contactQuery = t.Object({
     page: t.Optional(t.Number({ minimum: 1, default: 1 })),
-    limit: t.Optional(t.Number({ minimum: 1, maximum: 100, default: 10 })),
+    limit: t.Optional(t.Number({ minimum: 1, maximum: 1000, default: 100 })),
     search: t.Optional(t.String({ description: "Search by email" })),
     status: t.Optional(
       t.Union([t.Literal("subscribed"), t.Literal("unsubscribed"), t.Literal("blocked")], {
@@ -117,7 +117,7 @@ export namespace ContactModel {
       description: "Search query",
     }),
     page: t.Optional(t.Number({ minimum: 1, default: 1 })),
-    limit: t.Optional(t.Number({ minimum: 1, maximum: 100, default: 10 })),
+    limit: t.Optional(t.Number({ minimum: 1, maximum: 1000, default: 100 })),
     status: t.Optional(
       t.Union([t.Literal("subscribed"), t.Literal("unsubscribed"), t.Literal("blocked")], {
         description: "Filter by status",
