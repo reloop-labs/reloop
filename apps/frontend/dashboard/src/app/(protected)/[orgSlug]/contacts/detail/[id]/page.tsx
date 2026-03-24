@@ -51,14 +51,14 @@ const ContactDetailPage = () => {
 		data: contactData,
 		error: contactError,
 		isLoading: contactLoading,
-	} = useSWR<ContactData>(id ? `/api/contacts/v1/contacts/get/${id}` : null, {
+	} = useSWR<ContactData>(id ? `/api/contacts/retrieve/${id}` : null, {
 		revalidateOnFocus: false,
 		revalidateOnReconnect: true,
 	});
 
 	const { data: propertiesData, isLoading: propertiesLoading } = useSWR<{
 		propertyValues: PropertyValue[];
-	}>(id ? `/api/contacts/v1/contacts/${id}/properties` : null, {
+	}>(id ? `/api/contacts/${id}/properties` : null, {
 		revalidateOnFocus: false,
 	});
 

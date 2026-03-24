@@ -18,6 +18,7 @@ interface Contact {
 	lastName: string | null;
 	status: string;
 	organizationId: string;
+	properties: Record<string, string | number>;
 	createdAt: string;
 	updatedAt: string;
 	deletedAt: string | null;
@@ -88,7 +89,7 @@ export const EditContactModal = ({
 		propertyValues: PropertyValue[];
 	}>(
 		open && contact
-			? `/api/contacts/v1/contacts/${contact.id}/properties`
+			? `/api/contacts/${contact.id}/properties`
 			: null,
 		fetcher,
 	);
@@ -243,11 +244,13 @@ export const EditContactModal = ({
 
 		setIsSaving(true);
 		try {
-			// Build custom properties array (firstName/lastName are now direct fields)
-			const propsToUpdate: { propertyId: string; value: string }[] = [];
-			for (const [propertyId, value] of Object.entries(propertyValues)) {
-				if (value) {
-					propsToUpdate.push({ propertyId, value });
+			// Build custom properties record
+			const propertiesPayload: Record<string, string | number> = {};
+			for (const property of customProperties) {
+				const value = propertyValues[property.id];
+				if (value !== undefined && value !== "") {
+					propertiesPayload[property.name] =
+						property.type === "number" ? Number(value) : value;
 				}
 			}
 
@@ -255,17 +258,20 @@ export const EditContactModal = ({
 				firstName,
 				lastName,
 				status: isSubscribed ? "subscribed" : "unsubscribed",
-				properties: propsToUpdate,
+				properties: propertiesPayload,
 			});
 
-			const response = await fetch(`/api/contacts/v1/contacts/${contact.id}`, {
+			const response = await fetch(`/api/contacts/${contact.id}`, {
 				method: "PATCH",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
 					firstName: firstName || undefined,
 					lastName: lastName || undefined,
 					status: isSubscribed ? "subscribed" : "unsubscribed",
-					properties: propsToUpdate.length > 0 ? propsToUpdate : undefined,
+					properties:
+						Object.keys(propertiesPayload).length > 0
+							? propertiesPayload
+							: undefined,
 				}),
 			});
 
@@ -323,7 +329,7 @@ export const EditContactModal = ({
 			toast.success("Contact updated successfully");
 			handleOpenChange(false);
 			// Invalidate the specific contact endpoint
-			await mutate(`/api/contacts/v1/contacts/get/${contact.id}`);
+			await mutate(`/api/contacts/retrieve/${contact.id}`);
 			// Invalidate the specific enrollments cache for this contact
 			await mutate(
 				`/api/contacts/v1/enrollments/list?contactId=${contact.id}&limit=100`,

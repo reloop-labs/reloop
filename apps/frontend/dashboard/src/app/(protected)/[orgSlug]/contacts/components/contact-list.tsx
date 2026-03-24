@@ -23,6 +23,7 @@ interface Contact {
 	firstName: string | null;
 	lastName: string | null;
 	organizationId: string;
+	properties: Record<string, string | number>;
 	createdAt: string;
 	updatedAt: string;
 	deletedAt: string | null;
@@ -62,7 +63,7 @@ export const ContactList = ({ onAddContact }: ContactListProps) => {
 
 	const buildUrl = () => {
 		if (!activeOrganization?.id) return null;
-		let url = `/api/contacts/v1/contacts/list?limit=${pageSize}&page=${currentPage}`;
+		let url = `/api/contacts/list?limit=${pageSize}&page=${currentPage}`;
 		if (searchQuery) url += `&search=${encodeURIComponent(searchQuery)}`;
 		if (statusFilter) url += `&status=${statusFilter}`;
 		return url;
@@ -80,9 +81,7 @@ export const ContactList = ({ onAddContact }: ContactListProps) => {
 	const handleDownloadCSV = async () => {
 		try {
 			// Fetch all contacts for export
-			const response = await fetch(
-				"/api/contacts/v1/contacts/list?limit=10000",
-			);
+			const response = await fetch("/api/contacts/list?limit=10000");
 			const allData = (await response.json()) as ContactListResponse;
 
 			if (!allData.contacts || allData.contacts.length === 0) {

@@ -22,6 +22,7 @@ interface Contact {
 	firstName: string | null;
 	lastName: string | null;
 	organizationId: string;
+	properties: Record<string, string | number>;
 	createdAt: string;
 	updatedAt: string;
 	deletedAt: string | null;
@@ -94,7 +95,7 @@ export const ContactDropdown = ({
 		setIsTogglingStatus(true);
 		try {
 			const newStatus = isSubscribed ? "unsubscribed" : "subscribed";
-			const response = await fetch(`/api/contacts/v1/contacts/${contact.id}`, {
+			const response = await fetch(`/api/contacts/${contact.id}`, {
 				method: "PATCH",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ status: newStatus }),

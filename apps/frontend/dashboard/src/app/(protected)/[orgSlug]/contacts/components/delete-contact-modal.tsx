@@ -13,6 +13,7 @@ interface Contact {
 	email: string;
 	status: string;
 	organizationId: string;
+	properties: Record<string, string | number>;
 	createdAt: string;
 	updatedAt: string;
 	deletedAt: string | null;
@@ -53,12 +54,9 @@ export const DeleteContactModal = ({
 
 		try {
 			setIsDeleting(true);
-			const response = await fetch(
-				`/api/contacts/v1/contacts/delete/${contact.id}`,
-				{
-					method: "DELETE",
-				},
-			);
+			const response = await fetch(`/api/contacts/delete/${contact.id}`, {
+				method: "DELETE",
+			});
 
 			if (!response.ok) {
 				throw new Error("Failed to delete contact");
@@ -69,7 +67,7 @@ export const DeleteContactModal = ({
 			setConfirmationEmail("");
 			await mutate(
 				(key: string) =>
-					typeof key === "string" && key.includes("/api/contacts/v1/contacts"),
+					typeof key === "string" && key.includes("/api/contacts"),
 			);
 
 			onDeleteSuccess?.();

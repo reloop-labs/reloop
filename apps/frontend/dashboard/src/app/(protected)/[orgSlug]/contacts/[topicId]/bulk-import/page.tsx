@@ -160,7 +160,7 @@ const BulkImportPage = () => {
 
 			// Step 1: Bulk import contacts
 			const contactsResponse = await axios.post(
-				"/api/contacts/v1/contacts/bulk-import",
+				"/api/contacts/bulk-import",
 				{ contacts: csvData },
 				{ withCredentials: true },
 			);

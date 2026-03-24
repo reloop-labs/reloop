@@ -98,7 +98,9 @@ export const AddContactModal = ({
 		e.preventDefault();
 		const paste = e.clipboardData.getData("text");
 		const emails = paste.split(/[\s,;]+/).filter(Boolean);
-		emails.forEach((email) => addEmailChip(email));
+		emails.forEach((email) => {
+			addEmailChip(email);
+		});
 	};
 
 	// Reset state when modal closes
@@ -133,7 +135,7 @@ export const AddContactModal = ({
 			let skipped = 0;
 
 			for (const email of validEmails) {
-				const response = await fetch("/api/contacts/v1/contacts/add", {
+				const response = await fetch("/api/contacts/create", {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({ email }),
@@ -157,8 +159,7 @@ export const AddContactModal = ({
 			handleOpenChange(false);
 			await mutate(
 				(key: string) =>
-					typeof key === "string" &&
-					key.includes("/api/contacts/v1/contacts/list"),
+					typeof key === "string" && key.includes("/api/contacts/list"),
 			);
 		} catch (error) {
 			console.error("Failed to create contacts:", error);

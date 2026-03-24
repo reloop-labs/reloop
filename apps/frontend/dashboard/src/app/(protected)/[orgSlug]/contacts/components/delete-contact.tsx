@@ -36,7 +36,7 @@ export const DeleteContactModal = ({ contacts }: DeleteContactModalProps) => {
 
 		setIsDeleting(true);
 		try {
-			const response = await fetch(`/api/contacts/v1/contacts/${deleteId}`, {
+			const response = await fetch(`/api/contacts/${deleteId}`, {
 				method: "DELETE",
 			});
 
@@ -51,7 +51,7 @@ export const DeleteContactModal = ({ contacts }: DeleteContactModalProps) => {
 			await mutate(
 				(key: string) =>
 					typeof key === "string" &&
-					key.includes("/api/contacts/v1/contacts/list"),
+					key.includes("/api/contacts/list"),
 			);
 		} catch (error) {
 			console.error("Failed to delete contact:", error);

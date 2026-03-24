@@ -60,7 +60,7 @@ export const AddContact = ({
 		try {
 			changeStatus("loading");
 			await axios.post(
-				"/api/contacts/v1/contacts/add-to-topic",
+				"/api/contacts/add-to-topic",
 				{
 					email,
 					firstName: firstName || undefined,

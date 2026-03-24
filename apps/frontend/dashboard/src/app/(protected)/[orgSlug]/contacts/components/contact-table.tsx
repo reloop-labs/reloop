@@ -18,6 +18,7 @@ interface Contact {
 	firstName: string | null;
 	lastName: string | null;
 	organizationId: string;
+	properties: Record<string, string | number>;
 	createdAt: string;
 	updatedAt: string;
 	deletedAt: string | null;
@@ -66,12 +67,16 @@ const formatStatusLabel = (status: string) => {
 };
 
 const ContactSkeleton = () => (
-	<div className="grid grid-cols-[1fr_180px_100px_80px] items-center px-4 py-2">
+	<div className="grid grid-cols-[1fr_150px_200px_100px_80px] items-center px-4 py-2">
 		<div className="flex items-center gap-3">
 			<Skeleton className="h-4 w-4" />
 			<Skeleton className="h-4 w-40" />
 		</div>
 		<Skeleton className="h-5 w-20 rounded-md" />
+		<div className="flex gap-1">
+			<Skeleton className="h-4 w-12 rounded" />
+			<Skeleton className="h-4 w-12 rounded" />
+		</div>
 		<Skeleton className="h-4 w-20" />
 		<div className="flex items-center justify-end">
 			<Skeleton className="h-4 w-4 rounded" />
@@ -120,7 +125,7 @@ export const ContactTable = ({
 		return (
 			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm">
 				{/* Header */}
-				<div className="grid grid-cols-[1fr_180px_100px_80px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600">
+				<div className="grid grid-cols-[1fr_150px_200px_100px_80px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600">
 					<div className="flex items-center gap-2">
 						<Icon name="mail-single" className="h-4 w-4" />
 						<span className="text-xs">Email</span>
@@ -128,6 +133,10 @@ export const ContactTable = ({
 					<div className="flex items-center gap-2">
 						<Icon name="check-circle" className="h-4 w-4" />
 						<span className="text-xs">Status</span>
+					</div>
+					<div className="flex items-center gap-2">
+						<Icon name="list" className="h-4 w-4" />
+						<span className="text-xs">Properties</span>
 					</div>
 					<div className="flex items-center gap-2">
 						<Icon name="clock" className="h-4 w-4" />
@@ -149,8 +158,7 @@ export const ContactTable = ({
 		<>
 			<AnimatePresence mode="wait">
 				<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm">
-					{/* Table Header */}
-					<div className="grid grid-cols-[1fr_180px_100px_80px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600">
+					<div className="grid grid-cols-[1fr_150px_200px_100px_80px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600">
 						<div className="flex items-center gap-2">
 							<Icon name="mail-single" className="h-4 w-4" />
 							<span className="text-xs">Email</span>
@@ -158,6 +166,10 @@ export const ContactTable = ({
 						<div className="flex items-center gap-2">
 							<Icon name="check-circle" className="h-4 w-4" />
 							<span className="text-xs">Status</span>
+						</div>
+						<div className="flex items-center gap-2">
+							<Icon name="list" className="h-4 w-4" />
+							<span className="text-xs">Properties</span>
 						</div>
 						<div className="flex items-center gap-2">
 							<Icon name="clock" className="h-4 w-4" />
@@ -175,7 +187,7 @@ export const ContactTable = ({
 									key={contact.id}
 									onClick={() => handleRowClick(contact)}
 									className={cn(
-										"group/row grid w-full cursor-pointer grid-cols-[1fr_180px_100px_80px] items-center px-4 py-2 text-left transition-colors",
+										"group/row grid w-full cursor-pointer grid-cols-[1fr_150px_200px_100px_80px] items-center px-4 py-2 text-left transition-colors",
 										"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-base focus-visible:ring-offset-1",
 										isRowActive && "bg-bg-weak-50/50",
 									)}
@@ -206,6 +218,29 @@ export const ContactTable = ({
 										>
 											{formatStatusLabel(contact.status)}
 										</span>
+									</motion.div>
+
+									{/* Properties Column */}
+									<motion.div
+										{...getAnimationProps(index + 1, 2)}
+										className="flex flex-wrap items-center gap-1 overflow-hidden"
+									>
+										{Object.entries(contact.properties || {})
+											.slice(0, 3)
+											.map(([key, value]) => (
+												<span
+													key={key}
+													className="inline-flex max-w-[80px] items-center truncate rounded bg-neutral-alpha-10 px-1 py-0.5 text-[10px] text-text-sub-600"
+													title={`${key}: ${value}`}
+												>
+													{key}={value}
+												</span>
+											))}
+										{Object.keys(contact.properties || {}).length > 3 && (
+											<span className="text-[10px] text-text-sub-600">
+												+{Object.keys(contact.properties).length - 3}
+											</span>
+										)}
 									</motion.div>
 
 									{/* Created At Column */}

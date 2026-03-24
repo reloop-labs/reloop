@@ -13,6 +13,7 @@ export interface Contact {
 	firstName: string | null;
 	lastName: string | null;
 	organizationId: string;
+	properties: Record<string, string | number>;
 	createdAt: string;
 	updatedAt: string;
 	deletedAt: string | null;
