@@ -6,7 +6,7 @@ export async function upsertContactProperties(
   contactId: string,
   organizationId: string,
   userId: string,
-  properties: Record<string, string>,
+  properties: Record<string, string | number>,
   logger: Logger = globalLogger,
   db: DatabaseInstance = defaultDb,
 ): Promise<void> {
@@ -64,6 +64,7 @@ export async function upsertContactProperties(
       .select({
         id: schema.contactProperty.id,
         propertyName: schema.contactProperty.propertyName,
+        propertyType: schema.contactProperty.propertyType,
       })
       .from(schema.contactProperty)
       .where(
@@ -74,26 +75,24 @@ export async function upsertContactProperties(
         ),
       );
 
-    const propertyNameToId = new Map<string, string>(
-      existingProperties.map(
-        (p: { id: string; propertyName: string }) =>
-          [p.propertyName, p.id] as [string, string],
-      ),
-    );
-    logger.info(
-      { propertyMap: Object.fromEntries(propertyNameToId) },
-      "Property name to ID map",
+    const propertyInfo = new Map<string, { id: string; type: "string" | "number" }>(
+      existingProperties.map((p) => [
+        p.propertyName,
+        { id: p.id, type: p.propertyType as "string" | "number" },
+      ]),
     );
 
     for (const [name, value] of Object.entries(properties)) {
-      let propertyId = propertyNameToId.get(name);
-      if (!propertyId) {
-        logger.info({ name }, "Creating new property definition");
+      let info = propertyInfo.get(name);
+      const incomingType = typeof value === "number" ? "number" : "string";
+
+      if (!info) {
+        logger.info({ name, incomingType }, "Creating new property definition");
         const [newProp] = await db
           .insert(schema.contactProperty)
           .values({
             propertyName: name,
-            propertyType: "string",
+            propertyType: incomingType,
             organizationId,
             userId,
             createdAt: new Date(),
@@ -102,13 +101,26 @@ export async function upsertContactProperties(
           .returning();
 
         if (newProp) {
-          propertyId = newProp.id;
-          propertyNameToId.set(name, propertyId);
+          info = { id: newProp.id, type: newProp.propertyType as "string" | "number" };
+          propertyInfo.set(name, info);
         }
       }
 
-      if (propertyId) {
-        const pid = propertyId as string;
+      if (info) {
+        // Validate type compatibility
+        if (incomingType !== info.type) {
+          logger.warn(
+            { name, expected: info.type, received: incomingType },
+            "Property type mismatch",
+          );
+          throw new Error(
+            `Property '${name}' expected type '${info.type}' but received '${incomingType}'`,
+          );
+        }
+
+        const pid = info.id;
+        const stringValue = String(value);
+
         // Find existing value record (even if soft-deleted) to update/restore it
         const existingValue = await db.query.contactPropertyValue.findFirst({
           where: and(
@@ -119,24 +131,21 @@ export async function upsertContactProperties(
         });
 
         if (existingValue) {
-          logger.info(
-            { name, id: propertyId },
-            "Updating existing property value",
-          );
+          logger.info({ name, id: pid }, "Updating existing property value");
           await db
             .update(schema.contactPropertyValue)
             .set({
-              value: value,
+              value: stringValue,
               updatedAt: new Date(),
               deletedAt: null, // Restore if it was soft-deleted
             })
             .where(eq(schema.contactPropertyValue.id, existingValue.id));
         } else {
-          logger.info({ name, id: propertyId }, "Inserting new property value");
+          logger.info({ name, id: pid }, "Inserting new property value");
           await db.insert(schema.contactPropertyValue).values({
             contactId,
-            propertyId,
-            value,
+            propertyId: pid,
+            value: stringValue,
             organizationId,
             userId,
             createdAt: new Date(),

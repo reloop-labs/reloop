@@ -22,7 +22,7 @@ export namespace ContactModel {
       }),
     ),
     properties: t.Optional(
-      t.Record(t.String(), t.String(), {
+      t.Record(t.String(), t.Union([t.String(), t.Number()]), {
         description: "Contact properties as key-value pairs",
       }),
     ),
@@ -61,7 +61,7 @@ export namespace ContactModel {
       }),
     ),
     properties: t.Optional(
-      t.Record(t.String(), t.String(), {
+      t.Record(t.String(), t.Union([t.String(), t.Number()]), {
         description: "Contact properties as key-value pairs to update",
       }),
     ),
@@ -78,7 +78,7 @@ export namespace ContactModel {
     status: t.Union([t.Literal("subscribed"), t.Literal("unsubscribed"), t.Literal("blocked")], {
       description: "Contact subscription status",
     }),
-    properties: t.Record(t.String(), t.String(), {
+    properties: t.Record(t.String(), t.Union([t.String(), t.Number()]), {
       description: "Contact properties as key-value pairs",
       default: {},
     }),

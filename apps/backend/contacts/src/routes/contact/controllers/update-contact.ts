@@ -99,6 +99,7 @@ export async function updateContact(
 				.select({
 					name: schema.contactProperty.propertyName,
 					value: schema.contactPropertyValue.value,
+					type: schema.contactProperty.propertyType,
 				})
 				.from(schema.contactPropertyValue)
 				.innerJoin(
@@ -116,10 +117,11 @@ export async function updateContact(
 
 			const propertiesRecord = updatedProperties.reduce(
 				(acc, curr) => {
-					acc[curr.name] = curr.value;
+					acc[curr.name] =
+						curr.type === "number" ? Number(curr.value) : curr.value;
 					return acc;
 				},
-				{} as Record<string, string>,
+				{} as Record<string, string | number>,
 			);
 
 			return formatContactResponse({
