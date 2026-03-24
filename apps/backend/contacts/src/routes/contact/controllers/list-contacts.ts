@@ -85,7 +85,7 @@ export async function listContacts(
 			}),
 		);
 		logger.info({ total, page, limit }, "Contacts listed successfully");
-		return { contacts: formattedContacts, total, page, limit };
+		return { content: "contact", contacts: formattedContacts, total, page, limit };
 	} catch (error) {
 		logger.error(
 			{

@@ -70,6 +70,7 @@ export namespace ContactModel {
   export type UpdateContactBody = typeof updateContactBody.static;
 
   export const contactResponse = t.Object({
+    content: t.Literal("contact", { default: "contact" }),
     id: t.String({ description: "Unique contact identifier" }),
     email: t.String({ description: "Contact email address" }),
     firstName: t.Union([t.String(), t.Null()], { description: "Contact first name" }),
@@ -88,6 +89,7 @@ export namespace ContactModel {
   export type ContactResponse = typeof contactResponse.static;
 
   export const contactListResponse = t.Object({
+    content: t.Literal("contact", { default: "contact" }),
     contacts: t.Array(contactResponse),
     total: t.Number(),
     page: t.Number(),

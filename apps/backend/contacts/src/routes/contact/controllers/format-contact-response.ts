@@ -4,6 +4,7 @@ export function formatContactResponse(
 	contact: ContactTypes.ContactData,
 ): ContactTypes.ContactResponse {
 	return {
+		content: "contact",
 		id: contact.id,
 		email: contact.email,
 		firstName: contact.firstName,
