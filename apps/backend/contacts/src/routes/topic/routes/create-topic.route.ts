@@ -37,7 +37,7 @@ export const createTopicRoute = new Elysia().use(authMiddleware).post(
           content: {
             "application/json": {
               example: {
-                object: "contact_topic",
+                object: "topic",
                 id: "topic_123456789",
                 name: "Newsletter",
                 description: "Monthly newsletter subscribers",

@@ -64,7 +64,7 @@ export namespace TopicModel {
 
   // Topic Response
   export const topicResponse = t.Object({
-    object: t.Literal("contact_topic", { default: "contact_topic" }),
+    object: t.Literal("topic", { default: "topic" }),
     id: t.String({ description: "Unique topic identifier" }),
     name: t.String({ description: "Topic name" }),
     description: t.Union([t.String(), t.Null()], {
@@ -86,7 +86,7 @@ export namespace TopicModel {
 
   // Topic List Response
   export const topicListResponse = t.Object({
-    object: t.Literal("contact_topic", { default: "contact_topic" }),
+    object: t.Literal("topic", { default: "topic" }),
     topics: t.Array(topicResponse),
     total: t.Number(),
     page: t.Number(),

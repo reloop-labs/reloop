@@ -25,10 +25,10 @@ export const listTopicsRoute = new Elysia().use(authMiddleware).get(
           content: {
             "application/json": {
               example: {
-                object: "contact_topic",
+                object: "topic",
                 topics: [
                   {
-                    object: "contact_topic",
+                    object: "topic",
                     id: "topic_123456789",
                     name: "Newsletter",
                     description: "Monthly newsletter subscribers",

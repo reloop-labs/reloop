@@ -36,8 +36,8 @@ export async function listTopics(
 
     logger.info({ organizationId, total, page, limit }, "Topics listed successfully");
     return {
-      object: "contact_topic",
-      topics: topics.map((t) => ({ ...t, object: "contact_topic" as const })),
+      object: "topic",
+      topics: topics.map((t) => ({ ...t, object: "topic" as const })),
       total,
       page,
       limit,

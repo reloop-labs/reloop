@@ -68,7 +68,7 @@ export async function updateTopic(
     }
 
     logger.info({ contactTopicId }, "Topic updated successfully");
-    return { ...updatedTopic, object: "contact_topic" as const };
+    return { ...updatedTopic, object: "topic" as const };
   } catch (error) {
     logger.error(
       {

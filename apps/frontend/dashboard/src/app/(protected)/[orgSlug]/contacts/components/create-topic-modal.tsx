@@ -80,7 +80,7 @@ export const CreateTopicModal = ({
 			setIsCreating(true);
 			try {
 				await axios.post(
-					"/api/contacts/v1/topics/add",
+					"/api/contacts/v1/topics/create",
 					{
 						name: name.trim(),
 						description: description.trim() || undefined,

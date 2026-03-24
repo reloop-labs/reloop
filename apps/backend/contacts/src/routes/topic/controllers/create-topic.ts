@@ -51,7 +51,7 @@ export async function createTopic(
     }
 
     logger.info({ name, id: newTopic.id }, "Topic created successfully");
-    return { ...newTopic, object: "contact_topic" as const };
+    return { ...newTopic, object: "topic" as const };
   } catch (error) {
     logger.error(
       {

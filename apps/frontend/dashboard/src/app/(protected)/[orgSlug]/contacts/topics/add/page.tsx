@@ -49,7 +49,7 @@ const AddTopicPage = () => {
 		try {
 			changeStatus("loading");
 			const response = await axios.post(
-				"/api/contacts/v1/topics/add",
+				"/api/contacts/v1/topics/create",
 				{
 					name,
 					description: description || undefined,

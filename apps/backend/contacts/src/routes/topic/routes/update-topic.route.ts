@@ -41,7 +41,7 @@ export const updateTopicRoute = new Elysia().use(authMiddleware).patch(
           content: {
             "application/json": {
               example: {
-                object: "contact_topic",
+                object: "topic",
                 id: "topic_123456789",
                 name: "Updated Newsletter",
                 description: "Monthly newsletter subscribers",
