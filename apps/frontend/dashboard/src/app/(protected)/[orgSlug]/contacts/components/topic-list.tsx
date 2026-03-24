@@ -11,7 +11,6 @@ import useSWR, { useSWRConfig } from "swr";
 import { CreateTopicModal } from "./create-topic-modal";
 import { DeleteTopicModal } from "./delete-topic";
 import { EditTopicModal } from "./edit-topic-modal";
-import { EmptyState } from "./empty-state";
 import { TopicTable } from "./topic-table";
 
 interface Topic {
@@ -95,75 +94,79 @@ export const TopicList = () => {
 		}
 	};
 
+	if (error) {
+		return (
+			<div className="flex flex-col items-center justify-center gap-2 p-4">
+				<Icon name="alert-circle" className="h-8 w-8 text-red-500" />
+				<p className="text-center text-sm text-text-sub-600">
+					Failed to load topics
+				</p>
+			</div>
+		);
+	}
+
 	return (
 		<div>
-			<div>
-				{error ? (
-					<div className="flex flex-col items-center justify-center gap-2 p-4">
-						<Icon name="alert-circle" className="h-8 w-8 text-red-500" />
-						<p className="text-center text-sm text-text-sub-600">
-							Failed to load topics
-						</p>
-					</div>
-				) : data?.topics && data.topics.length === 0 ? (
-					<EmptyState onCreateClick={() => setIsCreateModalOpen(true)} />
-				) : (
-					<div>
-						<div className="mt-10 flex items-center gap-3">
-							<div className="flex-1">
-								<Input.Root size="small" className="rounded-xl">
-									<Input.Wrapper>
-										<Input.Icon
-											as={() => <Icon name="search" className="h-4 w-4" />}
-										/>
-										<Input.Input
-											type="text"
-											placeholder="Search topics..."
-											value={searchQuery}
-											onChange={(e) => setSearchQuery(e.target.value)}
-										/>
-									</Input.Wrapper>
-								</Input.Root>
-							</div>
-						</div>
-						<div className="mt-4">
-							<TopicTable
-								topics={filteredTopics}
-								activeOrganizationSlug={activeOrganization.slug}
-								isLoading={isLoading}
-								loadingRows={4}
-								onToggleVisibility={handleToggleVisibility}
-								onEdit={(topicId) => setEditTopicId(topicId)}
+			<div className="flex items-center gap-3">
+				<div className="flex-1">
+					<Input.Root size="xsmall" className="rounded-[10px]">
+						<Input.Wrapper>
+							<Input.Icon
+								as={Icon}
+								name="search"
+								size="xsmall"
+								className="h-3.5 w-3.5"
 							/>
-						</div>
-
-						{/* Pagination */}
-						{data && data.total > 0 && (
-							<div className="mt-4 flex items-center justify-between pb-8 text-paragraph-sm text-text-sub-600">
-								<div className="flex items-center gap-3">
-									<span>
-										Showing {startIndex}–{endIndex} of {data.total} topic
-										{data.total !== 1 ? "s" : ""}
-									</span>
-									<PageSizeDropdown
-										value={pageSize}
-										onValueChange={(value) => {
-											setPageSize(value);
-											setCurrentPage(1);
-										}}
-									/>
-								</div>
-								<PaginationControls
-									currentPage={currentPage}
-									totalPages={totalPages}
-									onPageChange={setCurrentPage}
-									isLoading={isLoading}
-								/>
-							</div>
-						)}
-					</div>
-				)}
+							<Input.Input
+								placeholder="Search topics..."
+								value={searchQuery}
+								onChange={(e) => {
+									setSearchQuery(e.target.value);
+									setCurrentPage(1);
+								}}
+							/>
+						</Input.Wrapper>
+					</Input.Root>
+				</div>
 			</div>
+
+			<div className="mt-4">
+				<TopicTable
+					topics={filteredTopics}
+					activeOrganizationSlug={activeOrganization.slug}
+					isLoading={isLoading}
+					loadingRows={4}
+					onToggleVisibility={handleToggleVisibility}
+					onEdit={(topicId) => setEditTopicId(topicId)}
+					onAddTopic={() => setIsCreateModalOpen(true)}
+				/>
+			</div>
+
+			{/* Pagination */}
+			{data && data.total > 0 && (
+				<div className="mt-4 flex items-center justify-between pb-8 text-paragraph-sm text-text-sub-600">
+					<div className="flex items-center gap-3">
+						<span>
+							Showing {startIndex}–{endIndex} of {data.total} topic
+							{data.total !== 1 ? "s" : ""}
+						</span>
+						<PageSizeDropdown
+							value={pageSize}
+							onValueChange={(value) => {
+								setPageSize(value);
+								setCurrentPage(1);
+							}}
+						/>
+					</div>
+					<PaginationControls
+						currentPage={currentPage}
+						totalPages={totalPages}
+						onPageChange={setCurrentPage}
+						isLoading={isLoading}
+					/>
+				</div>
+			)}
+
 			<DeleteTopicModal topics={data?.topics || []} />
 			<CreateTopicModal
 				open={isCreateModalOpen}

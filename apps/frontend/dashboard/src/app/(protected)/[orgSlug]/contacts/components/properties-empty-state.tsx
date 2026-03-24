@@ -14,19 +14,13 @@ export const PropertiesEmptyState = ({
 				<Icon name="sliders-horiz-2" className="h-8 w-8 text-natural-base" />
 			</div>
 
-			{/* Content */}
 			<div className="flex max-w-md flex-col items-center text-center">
 				<h3 className="mb-2 font-semibold text-text-strong-950 text-xl">
 					No properties yet
 				</h3>
-				<p className="mb-2 text-sm text-text-sub-600">
+				<p className="mb-5 max-w-[250px] text-sm text-text-sub-600">
 					Properties let you store custom data for each contact.
 				</p>
-				<p className="mb-6 text-text-soft-400 text-xs">
-					Add your first property to personalize your emails.
-				</p>
-
-				{/* CTA */}
 				<div>
 					<Button.Root variant="neutral" size="small" onClick={onAddProperty}>
 						<Icon name="plus" className="h-4 w-4" />

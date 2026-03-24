@@ -1,13 +1,11 @@
 "use client";
-import { getAnimationProps } from "@fe/dashboard/utils/domain";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { AnimatePresence, motion } from "motion/react";
-import Link from "next/link";
-import { useQueryState } from "nuqs";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { EmptyState } from "./empty-state";
 import { TopicDropdown } from "./topic-dropdown";
 
 interface Topic {
@@ -32,6 +30,7 @@ interface TopicTableProps {
 		currentValue: "private" | "public",
 	) => void;
 	onEdit?: (topicId: string) => void;
+	onAddTopic?: () => void;
 }
 
 // Badge styles matching the "Admin"/"Member" style from the image
@@ -49,6 +48,27 @@ const getVisibilityBadgeStyle = (visibility?: "private" | "public") => {
 	return "text-text-sub-600 border-stroke-soft-200 bg-bg-white-0";
 };
 
+const TopicSkeleton = () => (
+	<div className="grid grid-cols-[2fr_1fr_1fr_1fr_48px] items-center px-4 py-2">
+		<div className="flex items-center gap-2">
+			<Skeleton className="h-4 w-4 rounded" />
+			<Skeleton className="h-4 w-32" />
+		</div>
+		<div className="flex items-center">
+			<Skeleton className="h-5 w-16 rounded-full" />
+		</div>
+		<div className="flex items-center">
+			<Skeleton className="h-5 w-14 rounded-full" />
+		</div>
+		<div className="flex items-center">
+			<Skeleton className="h-4 w-20" />
+		</div>
+		<div className="flex items-center justify-center">
+			<Skeleton className="h-4 w-4 rounded" />
+		</div>
+	</div>
+);
+
 export const TopicTable = ({
 	topics,
 	activeOrganizationSlug,
@@ -56,23 +76,23 @@ export const TopicTable = ({
 	loadingRows = 4,
 	onToggleVisibility,
 	onEdit,
+	onAddTopic,
 }: TopicTableProps) => {
-	const [, setDeleteId] = useQueryState("delete");
+	const router = useRouter();
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 
-	const handleViewDetails = (topicId: string) => {
-		window.location.href = `/dashboard/${activeOrganizationSlug}/contacts/topics/${topicId}`;
+	const handleRowClick = (topicId: string) => {
+		router.push(`/${activeOrganizationSlug}/contacts/topics/${topicId}`);
 	};
 
 	const handleDelete = (topicId: string) => {
-		setDeleteId(topicId);
+		// Topic deletion handled through query state in TopicList if needed
 	};
 
-	return (
-		<AnimatePresence mode="wait">
+	if (isLoading) {
+		return (
 			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-200/70 text-paragraph-sm shadow-regular-md ring-stroke-soft-200 ring-inset">
-				{/* Table Header */}
-				<div className="grid grid-cols-[2fr_1fr_1fr_1fr_48px] items-center px-4 py-3.5 text-text-sub-600">
+				<div className="grid grid-cols-[2fr_1fr_1fr_1fr_48px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600">
 					<div className="flex items-center gap-2">
 						<Icon name="notification-indicator" className="h-4 w-4" />
 						<span className="text-xs">Name</span>
@@ -91,169 +111,135 @@ export const TopicTable = ({
 					</div>
 					<div />
 				</div>
-
-				{/* Table Body */}
-				<div className="grid grid-cols-[2fr_1fr_1fr_1fr_48px]">
-					{isLoading
-						? // Skeleton loading state
-							Array.from({ length: loadingRows }).map((_, index) => (
-								<div key={`skeleton-${index}`} className="contents">
-									<div className="flex items-center gap-2 border-stroke-soft-100 border-t py-2 pl-4">
-										<Skeleton className="h-4 w-4 rounded" />
-										<Skeleton className="h-4 w-32" />
-									</div>
-									<div className="flex items-center border-stroke-soft-100 border-t py-2">
-										<Skeleton className="h-5 w-16 rounded-full" />
-									</div>
-									<div className="flex items-center border-stroke-soft-100 border-t py-2">
-										<Skeleton className="h-5 w-14 rounded-full" />
-									</div>
-									<div className="flex items-center border-stroke-soft-100 border-t py-2">
-										<Skeleton className="h-4 w-20" />
-									</div>
-									<div className="flex items-center justify-center border-stroke-soft-100 border-t py-2 pr-4">
-										<Skeleton className="h-4 w-4 rounded" />
-									</div>
-								</div>
-							))
-						: topics.map((topic, index) => {
-								const isRowActive = activeDropdownId === topic.id;
-								const enrollmentValue = topic.autoEnroll || "unenrolled";
-								const visibilityValue = topic.visibility || "private";
-
-								return (
-									<div key={topic.id} className="group/row contents">
-										{/* Name Column (clickable link) */}
-										<Link
-											href={`/${activeOrganizationSlug}/contacts/topics/${topic.id}`}
-											className="group/row contents"
-										>
-											<div
-												className={cn(
-													"flex items-center gap-2 border-stroke-soft-100 border-t py-2 pl-4 transition-colors group-hover/row:bg-bg-weak-50/50",
-													isRowActive && "bg-bg-weak-50/50",
-												)}
-											>
-												<motion.div
-													{...getAnimationProps(index + 1, 0)}
-													className="flex items-center gap-2"
-												>
-													<Icon
-														name="notification-indicator"
-														className="h-4 w-4 shrink-0 text-text-sub-600"
-													/>
-													<div className="truncate text-label-sm text-text-strong-950">
-														{topic.name}
-													</div>
-												</motion.div>
-											</div>
-
-											{/* Enrollment Column */}
-											<div
-												className={cn(
-													"flex items-center border-stroke-soft-100 border-t py-2 transition-colors group-hover/row:bg-bg-weak-50/50",
-													isRowActive && "bg-bg-weak-50/50",
-												)}
-											>
-												<motion.div
-													{...getAnimationProps(index + 1, 1)}
-													className="flex items-center"
-												>
-													<span
-														className={cn(
-															"inline-flex items-center gap-1 rounded-md border px-2 py-0.5 font-medium text-[11px] capitalize",
-															getEnrollmentBadgeStyle(topic.autoEnroll),
-														)}
-													>
-														<Icon
-															name={
-																topic.autoEnroll === "enrolled"
-																	? "user-plus"
-																	: "user-minus"
-															}
-															className="h-3 w-3"
-														/>
-														{enrollmentValue}
-													</span>
-												</motion.div>
-											</div>
-
-											{/* Visibility Column */}
-											<div
-												className={cn(
-													"flex items-center border-stroke-soft-100 border-t py-2 transition-colors group-hover/row:bg-bg-weak-50/50",
-													isRowActive && "bg-bg-weak-50/50",
-												)}
-											>
-												<motion.div
-													{...getAnimationProps(index + 1, 2)}
-													className="flex items-center"
-												>
-													<span
-														className={cn(
-															"inline-flex items-center gap-1 rounded-md border px-2 py-0.5 font-medium text-[11px] capitalize",
-															getVisibilityBadgeStyle(topic.visibility),
-														)}
-													>
-														<Icon
-															name={
-																topic.visibility === "public" ? "globe" : "lock"
-															}
-															className="h-3 w-3"
-														/>
-														{visibilityValue}
-													</span>
-												</motion.div>
-											</div>
-
-											{/* Created Column */}
-											<div
-												className={cn(
-													"flex items-center border-stroke-soft-100 border-t py-2 transition-colors group-hover/row:bg-bg-weak-50/50",
-													isRowActive && "bg-bg-weak-50/50",
-												)}
-											>
-												<motion.div
-													{...getAnimationProps(index + 1, 3)}
-													className="flex items-center"
-												>
-													<span className="whitespace-nowrap text-label-sm text-text-sub-600">
-														{formatRelativeTime(topic.createdAt)}
-													</span>
-												</motion.div>
-											</div>
-										</Link>
-
-										{/* Actions Column - outside Link to prevent navigation on dropdown click */}
-										<div
-											className={cn(
-												"flex items-center justify-center border-stroke-soft-100 border-t py-2 pr-4 transition-colors group-hover/row:bg-bg-weak-50/50",
-												isRowActive && "bg-bg-weak-50/50",
-											)}
-										>
-											<motion.div
-												{...getAnimationProps(index + 1, 4)}
-												className="flex items-center justify-center"
-											>
-												<TopicDropdown
-													topicId={topic.id}
-													topicName={topic.name}
-													visibility={topic.visibility}
-													onViewDetails={handleViewDetails}
-													onEdit={onEdit}
-													onDelete={handleDelete}
-													onToggleVisibility={onToggleVisibility}
-													onOpenChange={(open: boolean) =>
-														setActiveDropdownId(open ? topic.id : null)
-													}
-												/>
-											</motion.div>
-										</div>
-									</div>
-								);
-							})}
+				<div className="divide-y divide-stroke-soft-100">
+					{Array.from({ length: loadingRows }).map((_, i) => (
+						<TopicSkeleton key={`skeleton-${i}`} />
+					))}
 				</div>
 			</div>
-		</AnimatePresence>
+		);
+	}
+
+	return (
+		<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-200/70 text-paragraph-sm shadow-regular-md ring-stroke-soft-200 ring-inset">
+			{/* Table Header */}
+			<div className="grid grid-cols-[2fr_1fr_1fr_1fr_48px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600">
+				<div className="flex items-center gap-2">
+					<Icon name="notification-indicator" className="h-4 w-4" />
+					<span className="text-xs">Name</span>
+				</div>
+				<div className="flex items-center gap-2">
+					<Icon name="users" className="h-4 w-4" />
+					<span className="text-xs">Enrollment</span>
+				</div>
+				<div className="flex items-center gap-2">
+					<Icon name="eye-outline" className="h-4 w-4" />
+					<span className="text-xs">Visibility</span>
+				</div>
+				<div className="flex items-center gap-2">
+					<Icon name="clock" className="h-4 w-4" />
+					<span className="text-xs">Created</span>
+				</div>
+				<div />
+			</div>
+
+			{/* Table Body */}
+			<div className="divide-y divide-stroke-soft-100">
+				{topics.length === 0 ? (
+					<EmptyState onCreateClick={onAddTopic} />
+				) : (
+					topics.map((topic) => {
+						const isRowActive = activeDropdownId === topic.id;
+						const enrollmentValue = topic.autoEnroll || "unenrolled";
+						const visibilityValue = topic.visibility || "private";
+
+						return (
+							<div
+								key={topic.id}
+								onClick={() => handleRowClick(topic.id)}
+								className={cn(
+									"group/row grid cursor-pointer grid-cols-[2fr_1fr_1fr_1fr_48px] items-center px-4 py-2 text-left transition-colors",
+									"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-base focus-visible:ring-offset-1",
+									isRowActive && "bg-bg-weak-50/50",
+								)}
+							>
+								{/* Name Column */}
+								<div className="flex items-center gap-2">
+									<Icon
+										name="notification-indicator"
+										className="h-4 w-4 shrink-0 text-text-sub-600"
+									/>
+									<span className="truncate text-label-sm text-text-strong-950">
+										{topic.name}
+									</span>
+								</div>
+
+								{/* Enrollment Column */}
+								<div className="flex items-center">
+									<span
+										className={cn(
+											"inline-flex items-center gap-1 rounded-md border px-2 py-0.5 font-medium text-[11px] capitalize",
+											getEnrollmentBadgeStyle(topic.autoEnroll),
+										)}
+									>
+										<Icon
+											name={
+												topic.autoEnroll === "enrolled"
+													? "user-plus"
+													: "user-minus"
+											}
+											className="h-3 w-3"
+										/>
+										{enrollmentValue}
+									</span>
+								</div>
+
+								{/* Visibility Column */}
+								<div className="flex items-center">
+									<span
+										className={cn(
+											"inline-flex items-center gap-1 rounded-md border px-2 py-0.5 font-medium text-[11px] capitalize",
+											getVisibilityBadgeStyle(topic.visibility),
+										)}
+									>
+										<Icon
+											name={topic.visibility === "public" ? "globe" : "lock"}
+											className="h-3 w-3"
+										/>
+										{visibilityValue}
+									</span>
+								</div>
+
+								{/* Created Column */}
+								<div className="flex items-center text-text-sub-600">
+									<span className="whitespace-nowrap text-label-sm">
+										{formatRelativeTime(topic.createdAt)}
+									</span>
+								</div>
+
+								{/* Actions Column */}
+								<div
+									className="flex items-center justify-center"
+									onClick={(e) => e.stopPropagation()}
+								>
+									<TopicDropdown
+										topicId={topic.id}
+										topicName={topic.name}
+										visibility={topic.visibility}
+										onViewDetails={() => handleRowClick(topic.id)}
+										onEdit={onEdit}
+										onDelete={handleDelete}
+										onToggleVisibility={onToggleVisibility}
+										onOpenChange={(open: boolean) =>
+											setActiveDropdownId(open ? topic.id : null)
+										}
+									/>
+								</div>
+							</div>
+						);
+					})
+				)}
+			</div>
+		</div>
 	);
 };
