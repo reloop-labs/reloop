@@ -14,7 +14,6 @@ export async function createContact(
   logger: Logger,
 ): Promise<ContactTypes.ContactResponse> {
   const { email } = body;
-  logger.info({ email, organizationId }, "Searching for existing contact");
   try {
     const existingContact = await getExistingContact({ email, organizationId, logger });
     if (existingContact) {
