@@ -289,4 +289,46 @@ export namespace ContactModel {
 
 	export type AddContactToTopicResponse =
 		typeof addContactToTopicResponse.static;
+
+	// Group Management
+	export const addContactToGroupBody = t.Object({
+		contactId: t.Optional(t.String({ description: "Contact ID" })),
+		email: t.Optional(
+			t.String({
+				pattern: emailPattern.source,
+				description: "Contact email address",
+			}),
+		),
+		groupId: t.String({ description: "Group ID to add the contact to" }),
+	});
+
+	export type AddContactToGroupBody = typeof addContactToGroupBody.static;
+
+	export const addContactToGroupResponse = t.Object({
+		success: t.Boolean({ default: true }),
+		contactId: t.String(),
+		groupId: t.String(),
+	});
+
+	export type AddContactToGroupResponse = typeof addContactToGroupResponse.static;
+
+	export const removeContactFromGroupBody = t.Object({
+		contactId: t.Optional(t.String({ description: "Contact ID" })),
+		email: t.Optional(
+			t.String({
+				pattern: emailPattern.source,
+				description: "Contact email address",
+			}),
+		),
+		groupId: t.String({ description: "Group ID to remove the contact from" }),
+	});
+
+	export type RemoveContactFromGroupBody = typeof removeContactFromGroupBody.static;
+
+	export const removeContactFromGroupResponse = t.Object({
+		success: t.Boolean({ default: true }),
+	});
+
+	export type RemoveContactFromGroupResponse =
+		typeof removeContactFromGroupResponse.static;
 }
