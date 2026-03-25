@@ -48,11 +48,6 @@ export namespace TopicModel {
         t.Null(),
       ]),
     ),
-    defaultSubscription: t.Optional(
-      t.Union([t.Literal("opt_in"), t.Literal("opt_out")], {
-        description: "Default subscription setting",
-      }),
-    ),
     visibility: t.Optional(
       t.Union([t.Literal("private"), t.Literal("public")], {
         description: "Visibility setting - whether the topic is visible to everyone or just the team",
