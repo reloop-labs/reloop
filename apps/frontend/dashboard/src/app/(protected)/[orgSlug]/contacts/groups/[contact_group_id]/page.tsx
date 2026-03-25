@@ -10,13 +10,15 @@ interface Group {
 
 const GroupDetailPage = () => {
 	const params = useParams();
-	const groupId = params.groupId as string;
+	const contact_group_id = params.contact_group_id as string;
 
 	const {
 		data: group,
 		error,
 		isLoading,
-	} = useSWR<Group>(groupId ? `/api/contacts/v1/groups/${groupId}` : null);
+	} = useSWR<Group>(
+		contact_group_id ? `/api/contacts/v1/groups/${contact_group_id}` : null,
+	);
 
 	if (isLoading) {
 		return (

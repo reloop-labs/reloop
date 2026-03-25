@@ -9,7 +9,7 @@ export namespace GroupTypes {
     deletedAt: Date | null;
   }
 
-  export interface GroupResponse extends Group {
+  export interface GroupResponse extends Omit<Group, "organizationId" | "userId" | "deletedAt"> {
     object: "contact_group";
   }
 

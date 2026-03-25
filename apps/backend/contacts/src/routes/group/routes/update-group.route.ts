@@ -4,14 +4,14 @@ import { updateGroupHandler } from "@be/contacts/routes/group/controllers/update
 import { Elysia, t } from "elysia";
 
 export const updateGroupRoute = new Elysia().use(authMiddleware).patch(
-  "/:groupId",
+  "/:contact_group_id",
   async ({ params, body, activeOrganizationId, logger }) => {
-    const { groupId } = params;
+    const { contact_group_id } = params;
     const { name } = body;
     return await updateGroupHandler(
       {
         organizationId: activeOrganizationId as string,
-        groupId,
+        contact_group_id,
         name,
       },
       logger,
@@ -20,7 +20,7 @@ export const updateGroupRoute = new Elysia().use(authMiddleware).patch(
   {
     auth: true,
     params: t.Object({
-      groupId: t.String(),
+      contact_group_id: t.String(),
     }),
     body: GroupModel.updateGroupBody,
     response: {
@@ -30,8 +30,8 @@ export const updateGroupRoute = new Elysia().use(authMiddleware).patch(
       403: GroupModel.unauthorized,
     },
     detail: {
-      tags: ["Groups"],
-      summary: "Update group",
+      tags: ["Contact groups"],
+      summary: "Update contact group",
       description: "Updates an existing group for the organization",
     },
   },

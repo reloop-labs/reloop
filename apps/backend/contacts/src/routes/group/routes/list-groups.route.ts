@@ -25,8 +25,8 @@ export const listGroupsRoute = new Elysia().use(authMiddleware).get(
       403: GroupModel.unauthorized,
     },
     detail: {
-      tags: ["Groups"],
-      summary: "List groups",
+      tags: ["Contact groups"],
+      summary: "List contact groups",
       description: "List all groups for the organization",
     },
   },

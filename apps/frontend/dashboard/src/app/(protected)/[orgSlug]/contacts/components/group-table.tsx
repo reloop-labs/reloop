@@ -24,9 +24,9 @@ interface GroupTableProps {
 	activeOrganizationSlug: string;
 	isLoading?: boolean;
 	loadingRows?: number;
-	onEdit?: (groupId: string) => void;
+	onEdit?: (contact_group_id: string) => void;
 	onAddGroup?: () => void;
-	onDelete?: (groupId: string) => void;
+	onDelete?: (contact_group_id: string) => void;
 }
 
 const GroupSkeleton = () => (

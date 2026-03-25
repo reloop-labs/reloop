@@ -25,8 +25,8 @@ export const createGroupRoute = new Elysia().use(authMiddleware).post(
       403: GroupModel.unauthorized,
     },
     detail: {
-      tags: ["Groups"],
-      summary: "Create group",
+      tags: ["Contact groups"],
+      summary: "Create contact group",
       description: "Creates a new group for the organization",
     },
   },

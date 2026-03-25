@@ -104,9 +104,9 @@ export const GroupList = () => {
 					groups={data?.groups || []}
 					activeOrganizationSlug={activeOrganization.slug}
 					isLoading={isLoading}
-					onEdit={(groupId) => setEditGroupId(groupId)}
+					onEdit={(contact_group_id) => setEditGroupId(contact_group_id)}
 					onAddGroup={() => setIsCreateModalOpen(true)}
-					onDelete={(groupId) => setDeleteGroupId(groupId)}
+					onDelete={(contact_group_id) => setDeleteGroupId(contact_group_id)}
 				/>
 			</div>
 

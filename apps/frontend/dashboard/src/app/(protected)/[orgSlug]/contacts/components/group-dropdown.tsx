@@ -10,8 +10,8 @@ interface Group {
 
 interface GroupDropdownProps {
 	group: Group;
-	onEdit: (groupId: string) => void;
-	onDelete: (groupId: string) => void;
+	onEdit: (contact_group_id: string) => void;
+	onDelete: (contact_group_id: string) => void;
 	onOpenChange?: (open: boolean) => void;
 }
 

@@ -4,13 +4,13 @@ import { getGroupHandler } from "@be/contacts/routes/group/controllers/get-group
 import { Elysia, t } from "elysia";
 
 export const getGroupRoute = new Elysia().use(authMiddleware).get(
-  "/:groupId",
+  "/:contact_group_id",
   async ({ params, activeOrganizationId, logger }) => {
-    const { groupId } = params;
+    const { contact_group_id } = params;
     return await getGroupHandler(
       {
         organizationId: activeOrganizationId as string,
-        groupId,
+        contact_group_id,
       },
       logger,
     );
@@ -18,7 +18,7 @@ export const getGroupRoute = new Elysia().use(authMiddleware).get(
   {
     auth: true,
     params: t.Object({
-      groupId: t.String(),
+      contact_group_id: t.String(),
     }),
     response: {
       200: GroupModel.groupResponse,
@@ -26,8 +26,8 @@ export const getGroupRoute = new Elysia().use(authMiddleware).get(
       403: GroupModel.unauthorized,
     },
     detail: {
-      tags: ["Groups"],
-      summary: "Get group",
+      tags: ["Contact groups"],
+      summary: "Get contact group",
       description: "Returns a single group for the organization",
     },
   },

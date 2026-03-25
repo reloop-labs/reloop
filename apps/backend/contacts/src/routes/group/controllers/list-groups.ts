@@ -1,7 +1,7 @@
 import type { GroupModel } from "@be/contacts/model/group.model";
 import type { GroupTypes } from "@be/contacts/types/group.type";
 import { db } from "@reloop/db/client";
-import { schema } from "@reloop/db/schema";
+import * as schema from "@reloop/db/schema";
 import type { Logger } from "@reloop/logger";
 import { and, eq, ilike, sql } from "drizzle-orm";
 
@@ -43,10 +43,13 @@ export const listGroups = async ({
 
 		const count = countResult[0]?.count ?? 0;
 
-		const groupResponses = groups.map((group) => ({
-			...group,
-			object: "contact_group" as const,
-		}));
+		const groupResponses = groups.map(
+			(group) =>
+				({
+					...group,
+					object: "contact_group" as const,
+				}) as GroupTypes.GroupResponse,
+		);
 
 		return {
 			object: "contact_group" as const,

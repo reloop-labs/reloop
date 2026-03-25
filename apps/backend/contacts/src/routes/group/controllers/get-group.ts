@@ -1,7 +1,8 @@
 import type { GroupModel } from "@be/contacts/model/group.model";
 import type { GroupTypes } from "@be/contacts/types/group.type";
 import { db } from "@reloop/db/client";
-import { schema } from "@reloop/db/schema";
+import * as schema from "@reloop/db/schema";
+import type { Logger } from "@reloop/logger";
 import { and, eq, isNull } from "drizzle-orm";
 
 export const getGroup = async ({
@@ -9,7 +10,7 @@ export const getGroup = async ({
   activeOrganizationId,
   logger,
 }: {
-  params: { groupId: string };
+  params: { contact_group_id: string };
   activeOrganizationId: string;
   logger: any;
 }): Promise<
@@ -17,35 +18,35 @@ export const getGroup = async ({
   | GroupModel.GroupNotFound
   | GroupModel.Unauthorized
 > => {
-  const { groupId } = params;
+  const { contact_group_id } = params;
 
   logger.info(
-    { organizationId: activeOrganizationId, groupId },
+    { organizationId: activeOrganizationId, contact_group_id },
     "Getting group",
   );
 
   try {
     const group = await db.query.group.findFirst({
       where: and(
-        eq(schema.group.id, groupId),
+        eq(schema.group.id, contact_group_id),
         eq(schema.group.organizationId, activeOrganizationId),
         isNull(schema.group.deletedAt),
       ),
     });
 
     if (!group) {
-      logger.warn({ groupId }, "Group not found");
+      logger.warn({ contact_group_id }, "Group not found");
       return { message: "Group not found" };
     }
 
     return {
       ...group,
       object: "contact_group" as const,
-    };
+    } as GroupTypes.GroupResponse;
   } catch (error) {
     logger.error(
       {
-        groupId,
+        contact_group_id,
         organizationId: activeOrganizationId,
         error: error instanceof Error ? error.message : String(error),
       },
@@ -58,9 +59,14 @@ export const getGroup = async ({
 export async function getGroupHandler(
   params: {
     organizationId: string;
-    groupId: string;
+    contact_group_id: string;
   },
   logger: Logger,
 ): Promise<GroupTypes.GroupResponse> {
-  return await getGroup(params, logger);
+  const result = await getGroup({
+    params: { contact_group_id: params.contact_group_id },
+    activeOrganizationId: params.organizationId,
+    logger,
+  });
+  return result as GroupTypes.GroupResponse;
 }

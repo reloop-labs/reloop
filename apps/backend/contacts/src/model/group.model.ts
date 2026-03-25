@@ -28,11 +28,8 @@ export namespace GroupModel {
     object: t.Literal("contact_group", { default: "contact_group" }),
     id: t.String({ description: "Unique group identifier" }),
     name: t.String({ description: "Group name" }),
-    organizationId: t.String({ description: "Organization ID" }),
-    userId: t.String({ description: "User ID" }),
     createdAt: t.Date(),
     updatedAt: t.Date(),
-    deletedAt: t.Union([t.Date(), t.Null()]),
   });
 
   export type GroupResponse = typeof groupResponse.static;
