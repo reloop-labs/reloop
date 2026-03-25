@@ -20,7 +20,7 @@ export const listGroupContactsRoute = new Elysia().use(authMiddleware).get(
 		}),
 		query: ContactModel.contactQuery,
 		response: {
-			200: ContactModel.contactListResponse,
+			200: ContactModel.groupContactListResponse,
 			403: ContactModel.unauthorized,
 		},
 		detail: {

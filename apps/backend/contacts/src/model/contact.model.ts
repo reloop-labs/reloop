@@ -172,6 +172,31 @@ export namespace ContactModel {
 
 	export type ContactListResponse = typeof contactListResponse.static;
 
+	export const groupContactListResponse = t.Object({
+		object: t.Literal("contact_group", { default: "contact_group" }),
+		group: t.Object({
+			id: t.String({ description: "Unique group identifier" }),
+			name: t.String({ description: "Group name" }),
+			createdAt: t.Date(),
+			updatedAt: t.Date(),
+			contacts: t.Array(contactListItem),
+		}),
+		total: t.Number(),
+		page: t.Number(),
+		limit: t.Number(),
+		totalContacts: t.Number({
+			description: "Total number of contacts in group",
+		}),
+		subscribedContacts: t.Number({
+			description: "Total number of subscribed contacts in group",
+		}),
+		unsubscribedContacts: t.Number({
+			description: "Total number of unsubscribed contacts in group",
+		}),
+	});
+
+	export type GroupContactListResponse = typeof groupContactListResponse.static;
+
 	export const contactQuery = t.Object({
 		page: t.Optional(t.Number({ minimum: 1, default: 1 })),
 		limit: t.Optional(t.Number({ minimum: 1, maximum: 100, default: 100 })),

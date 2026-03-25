@@ -5,6 +5,8 @@ export namespace ContactTypes {
 	export type ContactResponse = typeof ContactModel.contactResponse.static;
 	export type ContactListResponse =
 		typeof ContactModel.contactListResponse.static;
+	export type GroupContactListResponse =
+		typeof ContactModel.groupContactListResponse.static;
 	export type CreateContactBody = typeof ContactModel.createContactBody.static;
 	export type CreateContactsBody =
 		typeof ContactModel.createContactsBody.static;

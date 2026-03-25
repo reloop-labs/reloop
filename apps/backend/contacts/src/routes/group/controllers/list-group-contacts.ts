@@ -20,12 +20,26 @@ export async function listGroupContacts(
 	group_id: string,
 	query: ContactModel.ContactQuery,
 	logger: Logger,
-): Promise<ContactTypes.ContactListResponse> {
+): Promise<ContactTypes.GroupContactListResponse> {
 	logger.info({ ...query, group_id }, "Listing contacts for group");
 	try {
 		const page = query.page || 1;
 		const limit = Math.min(query.limit || 100, 100);
 		const offset = (page - 1) * limit;
+
+		// Fetch the group details first
+		const group = await db.query.group.findFirst({
+			where: and(
+				eq(schema.group.id, group_id),
+				eq(schema.group.organizationId, organizationId),
+				isNull(schema.group.deletedAt),
+			),
+		});
+
+		if (!group) {
+			logger.warn({ group_id }, "Group not found");
+			throw new Error("Group not found");
+		}
 
 		// Base conditions for joining on contactGroup
 		const whereConditions: Array<SQL<unknown>> = [
@@ -55,10 +69,7 @@ export async function listGroupContacts(
 
 		const total = totalResult[0]?.count || 0;
 
-		// Calculate Summaries for the Organization (like list-contacts behaviour)
-		// Or should it be scoped to the group?
-		// The requirement usually expects the totalContacts, subscribed, etc to match the query scope.
-		// Let's scope it to the group to be accurate for "contacts inside this group":
+		// Calculate Summaries for the group
 		const [
 			totalSummaryResult,
 			subscribedSummaryResult,
@@ -181,8 +192,14 @@ export async function listGroupContacts(
 		);
 
 		return {
-			object: "contact",
-			contacts: formattedContacts,
+			object: "contact_group",
+			group: {
+				id: group.id,
+				name: group.name,
+				createdAt: group.createdAt,
+				updatedAt: group.updatedAt,
+				contacts: formattedContacts,
+			},
 			total,
 			page,
 			limit,
@@ -208,6 +225,6 @@ export async function listGroupContactsHandler(
 	group_id: string,
 	query: ContactModel.ContactQuery,
 	logger: Logger,
-): Promise<ContactTypes.ContactListResponse> {
+): Promise<ContactTypes.GroupContactListResponse> {
 	return listGroupContacts(organizationId, group_id, query, logger);
 }
