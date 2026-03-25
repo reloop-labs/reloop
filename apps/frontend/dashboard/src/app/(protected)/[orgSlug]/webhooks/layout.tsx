@@ -4,7 +4,7 @@ import { Icon } from "@reloop/ui/icon";
 const WebhooksLayout = ({ children }: { children: React.ReactNode }) => {
 	return (
 		<div>
-			<div className="sticky top-0 z-10 flex h-12 items-center justify-start gap-2 border-stroke-soft-100 border-b bg-bg-white-0 px-2">
+			<div className="sticky top-0 z-10 flex h-12 items-center justify-start gap-2 border-stroke-soft-100 border-b bg-bg-white-0 pr-2 pl-3">
 				<div className="flex items-center gap-2">
 					<Icon name="webhook" className="h-4 w-4" />
 					<p className="font-medium text-sm">Webhooks</p>
