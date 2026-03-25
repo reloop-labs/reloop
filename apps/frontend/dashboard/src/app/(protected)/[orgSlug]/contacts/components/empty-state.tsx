@@ -7,36 +7,33 @@ interface EmptyStateProps {
 
 export const EmptyState = ({ onCreateClick }: EmptyStateProps) => {
 	return (
-		<div className="flex flex-col items-center justify-center py-16">
-			<div className="relative mb-4">
+		<div className="flex flex-col items-center justify-center px-4 py-12 text-center">
+			<div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-bg-weak-50">
 				<Icon
 					name="notification-indicator"
-					className="h-8 w-8 text-natural-base"
+					className="h-6 w-6 text-text-sub-600"
 				/>
 			</div>
-			<div className="flex max-w-md flex-col items-center text-center">
-				<h3 className="mb-2 font-semibold text-text-strong-950 text-xl">
-					No topics yet
-				</h3>
-				<p className="mb-4 max-w-[250px] text-sm text-text-sub-600">
-					Topics help you organize contacts by interest, preference, or
-					category.
-				</p>
-				<Button.Root variant="neutral" size="small" onClick={onCreateClick}>
-					<Icon name="plus" className="h-4 w-4" />
-					Create your first topic
-				</Button.Root>
+			<h3 className="mb-1 font-semibold text-lg text-text-strong-950">
+				No topics yet
+			</h3>
+			<p className="mb-6 max-w-[280px] font-normal text-sm text-text-sub-600">
+				Topics help you organize contacts by interest, preference, or category.
+			</p>
+			<Button.Root variant="neutral" size="xsmall" onClick={onCreateClick}>
+				<Icon name="plus" className="h-4 w-4" />
+				Create your first topic
+			</Button.Root>
 
-				<a
-					href="https://reloop.sh/docs/topics"
-					target="_blank"
-					rel="noopener noreferrer"
-					className="mt-4 flex items-center gap-1 text-text-sub-600 text-xs transition-colors hover:text-text-strong-950"
-				>
-					<Icon name="book-closed" className="h-3 w-3" />
-					Learn more about topics
-				</a>
-			</div>
+			<a
+				href="https://reloop.sh/docs/topics"
+				target="_blank"
+				rel="noopener noreferrer"
+				className="mt-4 flex items-center gap-1 text-text-sub-600 text-xs transition-colors hover:text-text-strong-950"
+			>
+				<Icon name="book-closed" className="h-3 w-3" />
+				Learn more about topics
+			</a>
 		</div>
 	);
 };

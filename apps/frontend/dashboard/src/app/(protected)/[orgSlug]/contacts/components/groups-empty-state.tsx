@@ -22,6 +22,15 @@ export const GroupsEmptyState = ({ onAddGroup }: GroupsEmptyStateProps) => {
 				<Icon name="plus" className="h-4 w-4" />
 				Add group
 			</Button.Root>
+			<a
+				href="https://reloop.sh/docs/contacts"
+				target="_blank"
+				rel="noopener noreferrer"
+				className="mt-4 flex items-center gap-1 text-text-sub-600 text-xs transition-colors hover:text-text-strong-950"
+			>
+				<Icon name="book-closed" className="h-3 w-3" />
+				Learn more about contacts
+			</a>
 		</div>
 	);
 };
