@@ -1,6 +1,5 @@
 import "dotenv/config";
 import { contactsConfig } from "@be/contacts/contacts.config";
-import { topicSubscriptionRoutes } from "@be/contacts/routes/audience-topic-mapper/audience-topic-mapper.routes";
 import { contactRoutes } from "@be/contacts/routes/contact/contact.routes";
 import { groupRoutes } from "@be/contacts/routes/group/group.routes";
 
@@ -50,8 +49,6 @@ const contactsService = new Elysia({
 	.use(propertyRoutes)
 	.use(topicRoutes)
 	.use(groupRoutes)
-	.use(topicSubscriptionRoutes)
-
 	.onStart(async () => {
 		await loader();
 	})
