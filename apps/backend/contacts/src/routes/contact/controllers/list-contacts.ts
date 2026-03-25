@@ -22,7 +22,7 @@ export async function listContacts(
 	logger.info({ ...query }, "Listing contacts");
 	try {
 		const page = query.page || 1;
-		const limit = query.limit || 100;
+		const limit = Math.min(query.limit || 100, 100);
 		const offset = (page - 1) * limit;
 
 		const whereConditions: Array<SQL<unknown>> = [

@@ -14,7 +14,9 @@ export const listGroups = async ({
 	activeOrganizationId: string;
 	logger: Logger;
 }): Promise<GroupTypes.GroupListResponse | GroupModel.Unauthorized> => {
-	const { page = 1, limit = 100, search } = query;
+	const page = query.page || 1;
+	const limit = Math.min(query.limit || 100, 100);
+	const { search } = query;
 	const offset = (page - 1) * limit;
 
 	logger.info(

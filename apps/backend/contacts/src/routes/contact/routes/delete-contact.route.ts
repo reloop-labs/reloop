@@ -4,14 +4,14 @@ import { deleteContactHandler } from "@be/contacts/routes/contact/controllers/de
 import { Elysia, t } from "elysia";
 
 export const deleteContactRoute = new Elysia().use(authMiddleware).delete(
-	"/delete/:id",
+	"/:contact_id",
 	async ({ params, activeOrganizationId }) => {
-		return await deleteContactHandler(params.id, activeOrganizationId);
+		return await deleteContactHandler(params.contact_id, activeOrganizationId);
 	},
 	{
 		auth: true,
 		params: t.Object({
-			id: t.String(),
+			contact_id: t.String(),
 		}),
 		response: {
 			200: t.Object({

@@ -4,14 +4,14 @@ import { updateContactHandler } from "@be/contacts/routes/contact/controllers/up
 import { Elysia, t } from "elysia";
 
 export const updateContactRoute = new Elysia().use(authMiddleware).patch(
-	"/:id",
+	"/:contact_id",
 	async ({ params, body, activeOrganizationId }) => {
-		return await updateContactHandler(params.id, activeOrganizationId, body);
+		return await updateContactHandler(params.contact_id, activeOrganizationId, body);
 	},
 	{
 		auth: true,
 		params: t.Object({
-			id: t.String(),
+			contact_id: t.String(),
 		}),
 		body: ContactModel.updateContactBody,
 		response: {

@@ -21,9 +21,10 @@ export interface AddContactToTopicResult {
 export async function addContactToTopic(
 	organizationId: string,
 	userId: string,
+	topicId: string,
 	body: ContactModel.AddContactToTopicBody,
 ): Promise<AddContactToTopicResult> {
-	const { email, topicId } = body;
+	const { email } = body;
 
 	logger.info(
 		{
@@ -159,7 +160,8 @@ export async function addContactToTopic(
 export async function addContactToTopicHandler(
 	organizationId: string,
 	userId: string,
+	topicId: string,
 	body: ContactModel.AddContactToTopicBody,
 ): Promise<AddContactToTopicResult> {
-	return addContactToTopic(organizationId, userId, body);
+	return addContactToTopic(organizationId, userId, topicId, body);
 }

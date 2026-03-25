@@ -4,12 +4,19 @@ import { addContactToGroup } from "@be/contacts/routes/contact/controllers/add-c
 import { Elysia, t } from "elysia";
 
 export const addContactToGroupRoute = new Elysia().use(authMiddleware).post(
-  "/groups/add",
-  async ({ body, activeOrganizationId, userId, logger }) => {
-    return await addContactToGroup(activeOrganizationId, userId, body, logger);
+  "/group/:group_id",
+  async ({ body, params, activeOrganizationId, userId, logger }) => {
+    return await addContactToGroup(
+      activeOrganizationId,
+      userId,
+      params.group_id,
+      body,
+      logger,
+    );
   },
   {
     auth: true,
+    params: t.Object({ group_id: t.String() }),
     body: ContactModel.addContactToGroupBody,
     response: {
       200: ContactModel.addContactToGroupResponse,

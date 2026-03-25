@@ -24,7 +24,7 @@ export async function listGroupContacts(
 	logger.info({ ...query, contact_group_id }, "Listing contacts for group");
 	try {
 		const page = query.page || 1;
-		const limit = query.limit || 100;
+		const limit = Math.min(query.limit || 100, 100);
 		const offset = (page - 1) * limit;
 
 		// Base conditions for joining on contactGroup

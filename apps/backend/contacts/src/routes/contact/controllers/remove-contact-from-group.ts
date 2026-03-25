@@ -8,10 +8,11 @@ import { status } from "elysia";
 export async function removeContactFromGroup(
   organizationId: string,
   _userId: string,
+  groupId: string,
   body: ContactModel.RemoveContactFromGroupBody,
   logger: Logger,
 ): Promise<ContactModel.RemoveContactFromGroupResponse> {
-  const { email, groupId } = body;
+  const { email } = body;
 
   logger.info(
     {

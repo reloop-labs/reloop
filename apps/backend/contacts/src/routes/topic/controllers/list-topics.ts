@@ -9,7 +9,8 @@ export async function listTopics(
 	organizationId: string,
 	logger: Logger,
 ): Promise<TopicTypes.TopicListResponse> {
-	const { page = 1, limit = 100 } = query;
+	const page = query.page || 1;
+	const limit = Math.min(query.limit || 100, 100);
 	const offset = (page - 1) * limit;
 	logger.info({ organizationId, page, limit }, "Listing topics");
 

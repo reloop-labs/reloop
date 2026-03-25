@@ -7,10 +7,11 @@ import { and, eq, isNull } from "drizzle-orm";
 export async function updateContactTopic(
   organizationId: string,
   userId: string,
+  topicId: string,
   body: ContactModel.UpdateContactTopicBody,
   logger: Logger,
 ): Promise<ContactModel.UpdateContactTopicResponse> {
-  const { email, topicId, subscription } = body;
+  const { email, subscription } = body;
 
   logger.info(
     {

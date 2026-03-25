@@ -2,15 +2,21 @@ import { authMiddleware } from "@be/contacts/middleware/auth";
 import { ContactModel } from "@be/contacts/model/contact.model";
 import { TopicEnrollmentModel } from "@be/contacts/model/topic-enrollment.model";
 import { addContactToTopicHandler } from "@be/contacts/routes/contact/controllers/add-contact-to-topic";
-import { Elysia } from "elysia";
+import { Elysia, t } from "elysia";
 
 export const addContactToTopicRoute = new Elysia().use(authMiddleware).post(
-	"/add-to-topic",
-	async ({ body, activeOrganizationId, userId }) => {
-		return await addContactToTopicHandler(activeOrganizationId, userId, body);
+	"/topic/:topic_id",
+	async ({ body, params, activeOrganizationId, userId }) => {
+		return await addContactToTopicHandler(
+			activeOrganizationId,
+			userId,
+			params.topic_id,
+			body,
+		);
 	},
 	{
 		auth: true,
+		params: t.Object({ topic_id: t.String() }),
 		body: ContactModel.addContactToTopicBody,
 		response: {
 			201: ContactModel.addContactToTopicResponse,

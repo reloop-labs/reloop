@@ -8,10 +8,11 @@ import { status } from "elysia";
 export async function addContactToGroup(
   organizationId: string,
   userId: string,
+  groupId: string,
   body: ContactModel.AddContactToGroupBody,
   logger: Logger,
 ): Promise<ContactModel.AddContactToGroupResponse> {
-  const { email, groupId } = body;
+  const { email } = body;
 
   logger.info(
     {

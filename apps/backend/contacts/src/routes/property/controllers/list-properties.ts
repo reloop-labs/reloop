@@ -20,7 +20,7 @@ export async function listProperties(
 
 	try {
 		const page = query.page || 1;
-		const limit = query.limit || 10;
+		const limit = Math.min(query.limit || 100, 100);
 		const offset = (page - 1) * limit;
 
 		// Build where conditions

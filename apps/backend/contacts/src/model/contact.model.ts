@@ -174,7 +174,7 @@ export namespace ContactModel {
 
 	export const contactQuery = t.Object({
 		page: t.Optional(t.Number({ minimum: 1, default: 1 })),
-		limit: t.Optional(t.Number({ minimum: 1, maximum: 1000, default: 100 })),
+		limit: t.Optional(t.Number({ minimum: 1, maximum: 100, default: 100 })),
 		search: t.Optional(t.String({ description: "Search by email" })),
 		status: t.Optional(
 			t.Union(
@@ -277,7 +277,6 @@ export namespace ContactModel {
 
 	// Add Contact to Topic (combined operation)
 	export const addContactToTopicBody = t.Object({
-		topicId: t.String({ description: "Topic identifier" }),
 		email: t.String({
 			pattern: emailPattern.source,
 			description: "Contact email address",
@@ -302,7 +301,6 @@ export namespace ContactModel {
 
 	// Group Management
 	export const addContactToGroupBody = t.Object({
-		groupId: t.String({ description: "Group ID" }),
 		email: t.String({
 			pattern: emailPattern.source,
 			description: "Contact email address",
@@ -320,7 +318,6 @@ export namespace ContactModel {
 	export type AddContactToGroupResponse = typeof addContactToGroupResponse.static;
 
 	export const removeContactFromGroupBody = t.Object({
-		groupId: t.String({ description: "Group ID" }),
 		email: t.String({
 			pattern: emailPattern.source,
 			description: "Contact email address",
@@ -338,7 +335,6 @@ export namespace ContactModel {
 
 	// Update Topic Status
 	export const updateContactTopicBody = t.Object({
-		topicId: t.String({ description: "Topic identifier" }),
 		email: t.String({
 			pattern: emailPattern.source,
 			description: "Contact email address",

@@ -4,12 +4,19 @@ import { updateContactTopic } from "@be/contacts/routes/contact/controllers/upda
 import { Elysia, t } from "elysia";
 
 export const updateContactTopicRoute = new Elysia().use(authMiddleware).patch(
-  "/topics/update",
-  async ({ body, activeOrganizationId, userId, logger }) => {
-    return await updateContactTopic(activeOrganizationId, userId, body, logger);
+  "/topic/:topic_id",
+  async ({ body, params, activeOrganizationId, userId, logger }) => {
+    return await updateContactTopic(
+      activeOrganizationId,
+      userId,
+      params.topic_id,
+      body,
+      logger,
+    );
   },
   {
     auth: true,
+    params: t.Object({ topic_id: t.String() }),
     body: ContactModel.updateContactTopicBody,
     response: {
       200: ContactModel.updateContactTopicResponse,

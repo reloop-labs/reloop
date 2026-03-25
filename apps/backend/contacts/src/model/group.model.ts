@@ -51,7 +51,7 @@ export namespace GroupModel {
 	// Query
 	export const groupQuery = t.Object({
 		page: t.Optional(t.Number({ minimum: 1, default: 1 })),
-		limit: t.Optional(t.Number({ minimum: 1, maximum: 1000, default: 100 })),
+		limit: t.Optional(t.Number({ minimum: 1, maximum: 100, default: 100 })),
 		search: t.Optional(t.String({ description: "Search by name" })),
 	});
 
