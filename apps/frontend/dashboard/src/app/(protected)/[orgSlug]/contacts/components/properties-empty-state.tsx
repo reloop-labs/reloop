@@ -19,9 +19,23 @@ export const PropertiesEmptyState = ({
 			<p className="mb-6 max-w-[280px] font-normal text-sm text-text-sub-600">
 				Properties let you store custom data for each contact.
 			</p>
-			<Button.Root variant="neutral" size="xsmall" onClick={onAddProperty}>
+			<Button.Root
+				variant="neutral"
+				size="xsmall"
+				onClick={onAddProperty}
+				className="gap-2"
+			>
 				<Icon name="plus" className="h-4 w-4" />
 				Add Your First Property
+				<span className="inline-flex items-center gap-0.5">
+					<Icon
+						name="command"
+						className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+					/>
+					<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-100/20 p-px font-medium text-[10px] uppercase">
+						A
+					</span>
+				</span>
 			</Button.Root>
 
 			{/* Help link */}

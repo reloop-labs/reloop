@@ -246,12 +246,22 @@ const getMethodColor = (
 	}
 };
 
-export const ContactsApiDetails = () => {
+type ButtonProps = React.ComponentPropsWithoutRef<typeof Button.Root>;
+
+export const ContactsApiDetails = (props: ButtonProps) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [selectedOperation, setSelectedOperation] = useState<Operation>("add");
 	const [selectedLanguage, setSelectedLanguage] =
 		useState<Language>("javascript");
 	const [copied, setCopied] = useState(false);
+
+	const {
+		variant = "neutral",
+		mode = "ghost",
+		size = "xxsmall",
+		className,
+		...rest
+	} = props;
 
 	const currentLanguageConfig = languages.find(
 		(l) => l.id === selectedLanguage,
@@ -278,13 +288,13 @@ export const ContactsApiDetails = () => {
 		<Drawer.Root open={isOpen} onOpenChange={setIsOpen}>
 			<Drawer.Trigger asChild>
 				<Button.Root
-					variant="neutral"
-					size="xxsmall"
-					mode="ghost"
-					className={cn("gap-1.5", isOpen && "bg-bg-weak-50")}
+					variant={variant}
+					size={size}
+					mode={mode}
+					className={cn("gap-1.5", isOpen && "bg-bg-weak-50", className)}
+					{...rest}
 				>
 					<Icon name="code" className="h-4 w-4" />
-					API
 					<Kbd.Root className="bg-bg-weak-50 text-[10px]">A</Kbd.Root>
 				</Button.Root>
 			</Drawer.Trigger>

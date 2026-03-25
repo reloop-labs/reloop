@@ -5,6 +5,7 @@ import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import useSWR from "swr";
 import { AddContactModal } from "./components/add-contact-modal";
 import { AddPropertyModal } from "./components/add-property-modal";
@@ -32,9 +33,26 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 	const isTopicsPage = pathname.includes("/contacts/topics");
 	const isGroupsPage = pathname.includes("/contacts/groups");
 	const isAddTopicPage = pathname.endsWith("/contacts/topics/add");
-
 	const isBulkImportPage = pathname.includes("/bulk-import");
 	const isContactDetailPage = pathname.includes("/contacts/detail/");
+
+	const handleAction = () => {
+		if (isPropertiesPage) setIsPropertyModalOpen(true);
+		else if (isTopicsPage) setIsTopicModalOpen(true);
+		else if (isGroupsPage) setIsGroupModalOpen(true);
+		else setIsContactModalOpen(true);
+	};
+
+	useHotkeys(
+		"mod+a",
+		(e) => {
+			e.preventDefault();
+			handleAction();
+		},
+		{
+			enabled: !isAddTopicPage && !isBulkImportPage && !isContactDetailPage,
+		},
+	);
 
 	// Extract topicId if on a topic subpage
 	const topicIdMatch = pathname.match(/\/contacts\/topics\/([^/]+)/);
@@ -56,13 +74,6 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 	};
 
 	const { title, showBack } = getHeaderConfig();
-
-	const handleAction = () => {
-		if (isPropertiesPage) setIsPropertyModalOpen(true);
-		else if (isTopicsPage) setIsTopicModalOpen(true);
-		else if (isGroupsPage) setIsGroupModalOpen(true);
-		else setIsContactModalOpen(true);
-	};
 
 	const actionLabel = isPropertiesPage
 		? "Add Property"
@@ -110,14 +121,26 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 						</div>
 						{!isAddTopicPage && !isBulkImportPage && (
 							<div className="flex items-center gap-2 self-end">
+								<DocsButton size="xsmall" mode="stroke" />
 								<Button.Root
 									variant="neutral"
 									size="xsmall"
 									onClick={handleAction}
+									className="gap-2"
 								>
 									<Icon name="plus" className="h-4 w-4" />
 									{actionLabel}
+									<span className="inline-flex items-center gap-0.5">
+										<Icon
+											name="command"
+											className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+										/>
+										<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-100/20 p-px font-medium text-[10px] uppercase">
+											A
+										</span>
+									</span>
 								</Button.Root>
+								<ContactsApiDetails size="xsmall" mode="ghost" />
 							</div>
 						)}
 					</div>

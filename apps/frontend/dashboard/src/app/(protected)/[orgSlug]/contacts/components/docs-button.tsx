@@ -1,22 +1,33 @@
 "use client";
 
 import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Kbd from "@reloop/ui/kbd";
 import { useHotkeys } from "react-hotkeys-hook";
 
 const openDocs = () => window.open("https://reloop.sh/docs/contacts", "_blank");
+type ButtonProps = React.ComponentPropsWithoutRef<typeof Button.Root>;
 
-export const DocsButton = () => {
+export const DocsButton = (props: ButtonProps) => {
 	useHotkeys("d", openDocs);
+
+	const {
+		variant = "neutral",
+		mode = "ghost",
+		size = "xxsmall",
+		className,
+		...rest
+	} = props;
 
 	return (
 		<Button.Root
-			variant="neutral"
-			mode="ghost"
-			size="xxsmall"
+			variant={variant}
+			mode={mode}
+			size={size}
 			onClick={openDocs}
-			className="gap-1.5"
+			className={cn("gap-1.5", className)}
+			{...rest}
 		>
 			<Icon name="book-closed" className="h-4 w-4" />
 			Docs

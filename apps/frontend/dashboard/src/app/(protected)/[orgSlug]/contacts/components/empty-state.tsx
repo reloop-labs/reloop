@@ -20,9 +20,23 @@ export const EmptyState = ({ onCreateClick }: EmptyStateProps) => {
 			<p className="mb-6 max-w-[280px] font-normal text-sm text-text-sub-600">
 				Topics help you organize contacts by interest, preference, or category.
 			</p>
-			<Button.Root variant="neutral" size="xsmall" onClick={onCreateClick}>
+			<Button.Root
+				variant="neutral"
+				size="xsmall"
+				onClick={onCreateClick}
+				className="gap-2"
+			>
 				<Icon name="plus" className="h-4 w-4" />
 				Create Your First Topic
+				<span className="inline-flex items-center gap-0.5">
+					<Icon
+						name="command"
+						className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+					/>
+					<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-100/20 p-px font-medium text-[10px] uppercase">
+						A
+					</span>
+				</span>
 			</Button.Root>
 
 			<a
