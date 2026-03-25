@@ -8,6 +8,7 @@ import * as Kbd from "@reloop/ui/kbd";
 import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { useCallback, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 
 const codeExamples = {
 	javascript: {
@@ -255,6 +256,11 @@ export const ContactsApiDetails = (props: ButtonProps) => {
 		useState<Language>("javascript");
 	const [copied, setCopied] = useState(false);
 
+	useHotkeys("a", (e) => {
+		e.preventDefault();
+		setIsOpen(true);
+	});
+
 	const {
 		variant = "neutral",
 		mode = "ghost",
@@ -286,18 +292,33 @@ export const ContactsApiDetails = (props: ButtonProps) => {
 
 	return (
 		<Drawer.Root open={isOpen} onOpenChange={setIsOpen}>
-			<Drawer.Trigger asChild>
-				<Button.Root
-					variant={variant}
-					size={size}
-					mode={mode}
-					className={cn("gap-1.5", isOpen && "bg-bg-weak-50", className)}
-					{...rest}
-				>
-					<Icon name="code" className="h-4 w-4" />
-					<Kbd.Root className="bg-bg-weak-50 text-[10px]">A</Kbd.Root>
-				</Button.Root>
-			</Drawer.Trigger>
+			<Tooltip.Provider>
+				<Tooltip.Root>
+					<Tooltip.Trigger asChild>
+						<Drawer.Trigger asChild>
+							<Button.Root
+								variant={variant}
+								size={size}
+								mode={mode}
+								className={cn(
+									"aspect-square p-0",
+									isOpen && "bg-bg-weak-50",
+									className,
+								)}
+								{...rest}
+							>
+								<Icon name="code" className="h-4 w-4" />
+							</Button.Root>
+						</Drawer.Trigger>
+					</Tooltip.Trigger>
+					<Tooltip.Content className="flex items-center gap-2 rounded-lg">
+						<p className="font-medium text-label-sm">Contacts API</p>
+						<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-100/20 p-px font-medium text-[10px] uppercase">
+							A
+						</span>
+					</Tooltip.Content>
+				</Tooltip.Root>
+			</Tooltip.Provider>
 			<Drawer.Content className="max-w-[480px]">
 				<Drawer.Header className="border-stroke-soft-200 border-b">
 					<div className="flex flex-1 flex-col gap-1">
