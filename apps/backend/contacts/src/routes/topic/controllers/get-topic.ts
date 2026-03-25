@@ -26,7 +26,8 @@ export async function getTopic(
     }
 
     logger.info({ contactTopicId }, "Topic retrieved successfully");
-    return { ...result, object: "topic" as const };
+    const { organizationId: _, deletedAt: __, ...responseTopic } = result;
+    return { ...responseTopic, object: "topic" as const };
   } catch (error) {
     logger.error(
       {

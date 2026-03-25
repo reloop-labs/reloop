@@ -8,7 +8,7 @@ export async function deleteTopic(
   contactTopicId: string,
   organizationId: string,
   logger: Logger,
-): Promise<{ success: boolean }> {
+): Promise<{ object: "topic"; success: boolean }> {
   logger.info({ contactTopicId, organizationId }, "Deleting topic");
   try {
     // Check if topic exists
@@ -35,7 +35,7 @@ export async function deleteTopic(
       .where(eq(schema.topic.id, contactTopicId));
 
     logger.info({ contactTopicId }, "Topic deleted successfully");
-    return { success: true };
+    return { object: "topic" as const, success: true };
   } catch (error) {
     logger.error(
       {
@@ -52,6 +52,6 @@ export async function deleteTopicHandler(
   contactTopicId: string,
   organizationId: string,
   logger: Logger,
-): Promise<{ success: boolean }> {
+): Promise<{ object: "topic"; success: boolean }> {
   return await deleteTopic(contactTopicId, organizationId, logger);
 }

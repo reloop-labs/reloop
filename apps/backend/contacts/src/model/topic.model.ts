@@ -76,18 +76,19 @@ export namespace TopicModel {
     visibility: t.Union([t.Literal("private"), t.Literal("public")], {
       description: "Visibility setting - whether the topic is visible to everyone or just the team",
     }),
-    organizationId: t.String({ description: "Organization ID" }),
     createdAt: t.Date(),
     updatedAt: t.Date(),
-    deletedAt: t.Union([t.Date(), t.Null()]),
   });
 
   export type TopicResponse = typeof topicResponse.static;
 
+  export const topicListItem = t.Omit(topicResponse, ["object"]);
+  export type TopicListItem = typeof topicListItem.static;
+
   // Topic List Response
   export const topicListResponse = t.Object({
     object: t.Literal("topic", { default: "topic" }),
-    topics: t.Array(topicResponse),
+    topics: t.Array(topicListItem),
     total: t.Number(),
     page: t.Number(),
     limit: t.Number(),
@@ -106,6 +107,7 @@ export namespace TopicModel {
 
   // Delete Response
   export const deleteResponse = t.Object({
+    object: t.Literal("topic", { default: "topic" }),
     success: t.Boolean(),
   });
 
