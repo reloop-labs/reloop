@@ -4,21 +4,18 @@ import { deleteGroupHandler } from "@be/contacts/routes/group/controllers/delete
 import { Elysia, t } from "elysia";
 
 export const deleteGroupRoute = new Elysia().use(authMiddleware).delete(
-	"/:contact_group_id",
+	"/:group_id",
 	async ({ params, activeOrganizationId, logger }) => {
-		const { contact_group_id } = params;
 		return await deleteGroupHandler(
-			{
-				organizationId: activeOrganizationId as string,
-				contact_group_id,
-			},
+			activeOrganizationId,
+			params.group_id,
 			logger,
 		);
 	},
 	{
 		auth: true,
 		params: t.Object({
-			contact_group_id: t.String(),
+			group_id: t.String(),
 		}),
 		response: {
 			200: GroupModel.deleteResponse,

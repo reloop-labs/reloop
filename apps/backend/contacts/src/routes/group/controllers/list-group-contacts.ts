@@ -17,11 +17,11 @@ import {
 
 export async function listGroupContacts(
 	organizationId: string,
-	contact_group_id: string,
+	group_id: string,
 	query: ContactModel.ContactQuery,
 	logger: Logger,
 ): Promise<ContactTypes.ContactListResponse> {
-	logger.info({ ...query, contact_group_id }, "Listing contacts for group");
+	logger.info({ ...query, group_id }, "Listing contacts for group");
 	try {
 		const page = query.page || 1;
 		const limit = Math.min(query.limit || 100, 100);
@@ -29,7 +29,7 @@ export async function listGroupContacts(
 
 		// Base conditions for joining on contactGroup
 		const whereConditions: Array<SQL<unknown>> = [
-			eq(schema.contactGroup.groupId, contact_group_id),
+			eq(schema.contactGroup.groupId, group_id),
 			eq(schema.contactGroup.organizationId, organizationId),
 			isNull(schema.contactGroup.deletedAt),
 			eq(schema.contact.organizationId, organizationId),
@@ -73,7 +73,7 @@ export async function listGroupContacts(
 				)
 				.where(
 					and(
-						eq(schema.contactGroup.groupId, contact_group_id),
+						eq(schema.contactGroup.groupId, group_id),
 						eq(schema.contactGroup.organizationId, organizationId),
 						isNull(schema.contactGroup.deletedAt),
 						eq(schema.contact.organizationId, organizationId),
@@ -89,7 +89,7 @@ export async function listGroupContacts(
 				)
 				.where(
 					and(
-						eq(schema.contactGroup.groupId, contact_group_id),
+						eq(schema.contactGroup.groupId, group_id),
 						eq(schema.contactGroup.organizationId, organizationId),
 						isNull(schema.contactGroup.deletedAt),
 						eq(schema.contact.status, "subscribed"),
@@ -106,7 +106,7 @@ export async function listGroupContacts(
 				)
 				.where(
 					and(
-						eq(schema.contactGroup.groupId, contact_group_id),
+						eq(schema.contactGroup.groupId, group_id),
 						eq(schema.contactGroup.organizationId, organizationId),
 						isNull(schema.contactGroup.deletedAt),
 						eq(schema.contact.status, "unsubscribed"),
@@ -176,7 +176,7 @@ export async function listGroupContacts(
 			}),
 		);
 		logger.info(
-			{ total, page, limit, contact_group_id },
+			{ total, page, limit, group_id },
 			"Group contacts listed successfully",
 		);
 
@@ -194,7 +194,7 @@ export async function listGroupContacts(
 		logger.error(
 			{
 				query,
-				contact_group_id,
+				group_id,
 				error: error instanceof Error ? error.message : String(error),
 			},
 			"Error listing group contacts",
@@ -205,9 +205,9 @@ export async function listGroupContacts(
 
 export async function listGroupContactsHandler(
 	organizationId: string,
-	contact_group_id: string,
+	group_id: string,
 	query: ContactModel.ContactQuery,
 	logger: Logger,
 ): Promise<ContactTypes.ContactListResponse> {
-	return listGroupContacts(organizationId, contact_group_id, query, logger);
+	return listGroupContacts(organizationId, group_id, query, logger);
 }

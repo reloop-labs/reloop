@@ -4,13 +4,11 @@ import { listGroupContactsHandler } from "@be/contacts/routes/group/controllers/
 import { Elysia, t } from "elysia";
 
 export const listGroupContactsRoute = new Elysia().use(authMiddleware).get(
-	"/:contact_group_id/contacts",
+	"/:group_id/contacts",
 	async ({ params, query, activeOrganizationId, logger }) => {
-		const { contact_group_id } = params;
-
 		return await listGroupContactsHandler(
 			activeOrganizationId as string,
-			contact_group_id,
+			params.group_id,
 			query,
 			logger,
 		);
@@ -18,7 +16,7 @@ export const listGroupContactsRoute = new Elysia().use(authMiddleware).get(
 	{
 		auth: true,
 		params: t.Object({
-			contact_group_id: t.String({ description: "ID of the contact group" }),
+			group_id: t.String({ description: "ID of the contact group" }),
 		}),
 		query: ContactModel.contactQuery,
 		response: {

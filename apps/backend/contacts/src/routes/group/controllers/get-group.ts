@@ -5,35 +5,29 @@ import * as schema from "@reloop/db/schema";
 import type { Logger } from "@reloop/logger";
 import { and, eq, isNull } from "drizzle-orm";
 
-export const getGroup = async ({
-	params,
-	activeOrganizationId,
-	logger,
-}: {
-	params: { contact_group_id: string };
-	activeOrganizationId: string;
-	logger: Logger;
-}): Promise<
+export const getGroup = async (
+	activeOrganizationId: string,
+	group_id: string,
+	logger: Logger,
+): Promise<
 	GroupTypes.GroupResponse | GroupModel.GroupNotFound | GroupModel.Unauthorized
 > => {
-	const { contact_group_id } = params;
-
 	logger.info(
-		{ organizationId: activeOrganizationId, contact_group_id },
+		{ organizationId: activeOrganizationId, group_id },
 		"Getting group",
 	);
 
 	try {
 		const group = await db.query.group.findFirst({
 			where: and(
-				eq(schema.group.id, contact_group_id),
+				eq(schema.group.id, group_id),
 				eq(schema.group.organizationId, activeOrganizationId),
 				isNull(schema.group.deletedAt),
 			),
 		});
 
 		if (!group) {
-			logger.warn({ contact_group_id }, "Group not found");
+			logger.warn({ group_id }, "Group not found");
 			return { message: "Group not found" };
 		}
 
@@ -44,7 +38,7 @@ export const getGroup = async ({
 	} catch (error) {
 		logger.error(
 			{
-				contact_group_id,
+				group_id,
 				organizationId: activeOrganizationId,
 				error: error instanceof Error ? error.message : String(error),
 			},
@@ -55,16 +49,10 @@ export const getGroup = async ({
 };
 
 export async function getGroupHandler(
-	params: {
-		organizationId: string;
-		contact_group_id: string;
-	},
+	organizationId: string,
+	group_id: string,
 	logger: Logger,
 ): Promise<GroupTypes.GroupResponse> {
-	const result = await getGroup({
-		params: { contact_group_id: params.contact_group_id },
-		activeOrganizationId: params.organizationId,
-		logger,
-	});
+	const result = await getGroup(organizationId, group_id, logger);
 	return result as GroupTypes.GroupResponse;
 }

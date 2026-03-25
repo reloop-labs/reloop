@@ -5,39 +5,33 @@ import * as schema from "@reloop/db/schema";
 import type { Logger } from "@reloop/logger";
 import { and, eq, isNull, ne } from "drizzle-orm";
 
-export const updateGroup = async ({
-	body,
-	params,
-	activeOrganizationId,
-	logger,
-}: {
-	body: GroupModel.UpdateGroupBody;
-	params: { contact_group_id: string };
-	activeOrganizationId: string;
-	logger: Logger;
-}): Promise<
+export const updateGroup = async (
+	activeOrganizationId: string,
+	group_id: string,
+	body: GroupModel.UpdateGroupBody,
+	logger: Logger,
+): Promise<
 	| GroupTypes.GroupResponse
 	| GroupModel.GroupNotFound
 	| GroupModel.GroupAlreadyExists
 	| GroupModel.Unauthorized
 > => {
-	const { contact_group_id } = params;
 	const { name } = body;
 	const organizationId = activeOrganizationId;
 
-	logger.info({ organizationId, contact_group_id, name }, "Updating group");
+	logger.info({ organizationId, group_id, name }, "Updating group");
 
 	try {
 		const existingGroup = await db.query.group.findFirst({
 			where: and(
-				eq(schema.group.id, contact_group_id),
+				eq(schema.group.id, group_id),
 				eq(schema.group.organizationId, organizationId),
 				isNull(schema.group.deletedAt),
 			),
 		});
 
 		if (!existingGroup) {
-			logger.warn({ contact_group_id }, "Group not found for update");
+			logger.warn({ group_id }, "Group not found for update");
 			return { message: "Group not found" };
 		}
 
@@ -47,7 +41,7 @@ export const updateGroup = async ({
 				where: and(
 					eq(schema.group.name, name),
 					eq(schema.group.organizationId, organizationId),
-					ne(schema.group.id, contact_group_id),
+					ne(schema.group.id, group_id),
 					isNull(schema.group.deletedAt),
 				),
 			});
@@ -66,12 +60,12 @@ export const updateGroup = async ({
 				name,
 				updatedAt: new Date(),
 			})
-			.where(eq(schema.group.id, contact_group_id))
+			.where(eq(schema.group.id, group_id))
 			.returning();
 
 		if (!updatedGroup) {
 			logger.error(
-				{ contact_group_id },
+				{ group_id },
 				"Failed to update group - no data returned",
 			);
 			return { message: "Group not found" };
@@ -84,7 +78,7 @@ export const updateGroup = async ({
 	} catch (error) {
 		logger.error(
 			{
-				contact_group_id,
+				group_id,
 				organizationId,
 				error: error instanceof Error ? error.message : String(error),
 			},
@@ -95,18 +89,11 @@ export const updateGroup = async ({
 };
 
 export async function updateGroupHandler(
-	params: {
-		organizationId: string;
-		contact_group_id: string;
-		name: string;
-	},
+	organizationId: string,
+	group_id: string,
+	body: GroupModel.UpdateGroupBody,
 	logger: Logger,
 ): Promise<GroupTypes.GroupResponse> {
-	const result = await updateGroup({
-		body: { name: params.name },
-		params: { contact_group_id: params.contact_group_id },
-		activeOrganizationId: params.organizationId,
-		logger,
-	});
+	const result = await updateGroup(organizationId, group_id, body, logger);
 	return result as GroupTypes.GroupResponse;
 }
