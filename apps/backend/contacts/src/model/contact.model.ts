@@ -267,11 +267,17 @@ export namespace ContactModel {
 
 	// Add Contact to Topic (combined operation)
 	export const addContactToTopicBody = t.Object({
-		email: t.String({
-			pattern: emailPattern.source,
-			description: "Contact email address",
-		}),
+		contactId: t.Optional(t.String({ description: "Contact ID" })),
+		email: t.Optional(
+			t.String({
+				pattern: emailPattern.source,
+				description: "Contact email address",
+			}),
+		),
 		topicId: t.String({ description: "Topic ID to subscribe the contact to" }),
+		subscription: t.Union([t.Literal("opt_in"), t.Literal("opt_out")], {
+			description: "Subscription status for the topic",
+		}),
 	});
 
 	export type AddContactToTopicBody = typeof addContactToTopicBody.static;

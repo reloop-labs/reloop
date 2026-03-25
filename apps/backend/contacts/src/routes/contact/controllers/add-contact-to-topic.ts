@@ -23,13 +23,17 @@ export async function addContactToTopic(
 	userId: string,
 	body: ContactModel.AddContactToTopicBody,
 ): Promise<AddContactToTopicResult> {
-	const { email, topicId } = body;
-	const emailLower = email.toLowerCase();
+	const { email, contactId, topicId } = body;
+
+	if (!email && !contactId) {
+		throw status(400, { message: "Either email or contactId must be provided" });
+	}
 
 	logger.info(
 		{
 			organizationId,
-			email: emailLower,
+			email: email?.toLowerCase(),
+			contactId,
 			topicId,
 		},
 		"Adding contact to topic",
@@ -49,34 +53,54 @@ export async function addContactToTopic(
 			throw status(404, { message: "Topic not found" });
 		}
 
-		// Check if contact already exists
-		let contact = await db.query.contact.findFirst({
-			where: and(
-				eq(schema.contact.email, emailLower),
-				eq(schema.contact.organizationId, organizationId),
-				isNull(schema.contact.deletedAt),
-			),
-		});
+		// Identify contact
+		let contact: typeof schema.contact.$inferSelect | undefined;
 
-		// Create contact if doesn't exist
-		if (!contact) {
-			const [newContact] = await db
-				.insert(schema.contact)
-				.values({
-					email: emailLower,
-					status: "subscribed",
-					organizationId,
-					userId,
-				})
-				.returning();
-
-			if (!newContact) {
-				throw new Error("Failed to create contact");
+		if (contactId) {
+			contact = await db.query.contact.findFirst({
+				where: and(
+					eq(schema.contact.id, contactId),
+					eq(schema.contact.organizationId, organizationId),
+					isNull(schema.contact.deletedAt),
+				),
+			});
+			if (!contact) {
+				throw status(404, { message: "Contact not found" });
 			}
-			contact = newContact;
-			logger.info({ contactId: contact.id }, "Created new contact");
-		} else {
-			logger.info({ contactId: contact.id }, "Contact already exists");
+		} else if (email) {
+			const emailLower = email.toLowerCase();
+			contact = await db.query.contact.findFirst({
+				where: and(
+					eq(schema.contact.email, emailLower),
+					eq(schema.contact.organizationId, organizationId),
+					isNull(schema.contact.deletedAt),
+				),
+			});
+
+			// Create contact if doesn't exist (only if identified by email)
+			if (!contact) {
+				const [newContact] = await db
+					.insert(schema.contact)
+					.values({
+						email: emailLower,
+						status: "subscribed",
+						organizationId,
+						userId,
+					})
+					.returning();
+
+				if (!newContact) {
+					throw new Error("Failed to create contact");
+				}
+				contact = newContact;
+				logger.info({ contactId: contact.id }, "Created new contact");
+			} else {
+				logger.info({ contactId: contact.id }, "Contact already exists");
+			}
+		}
+
+		if (!contact) {
+			throw new Error("Contact identification failed");
 		}
 
 		// Check if already subscribed
@@ -88,25 +112,30 @@ export async function addContactToTopic(
 			),
 		});
 
+		const targetStatus = (body.subscription === "opt_out"
+			? "unenrolled"
+			: "enrolled") as "enrolled" | "unenrolled";
+
 		if (existingSubscription) {
-			// If unsubscribed, resubscribe
-			if (existingSubscription.status === "unenrolled") {
+			// If status is different, update it
+			if (existingSubscription.status !== targetStatus) {
 				await db
 					.update(schema.topicSubscription)
-					.set({ status: "enrolled", updatedAt: new Date() })
+					.set({ status: targetStatus, updatedAt: new Date() })
 					.where(eq(schema.topicSubscription.id, existingSubscription.id));
 
 				logger.info(
-					{ subscriptionId: existingSubscription.id },
-					"Resubscribed contact",
+					{ subscriptionId: existingSubscription.id, status: targetStatus },
+					"Updated contact subscription status",
 				);
 				return {
 					contact,
 					subscriptionId: existingSubscription.id,
 				};
 			}
+
 			throw status(409, {
-				message: "Contact already subscribed to this topic",
+				message: `Contact is already ${existingSubscription.status} in this topic`,
 			});
 		}
 
@@ -117,7 +146,7 @@ export async function addContactToTopic(
 				contactId: contact.id,
 				topicId,
 				organizationId,
-				status: "enrolled",
+				status: targetStatus,
 			})
 			.returning();
 
@@ -129,6 +158,7 @@ export async function addContactToTopic(
 			{
 				contactId: contact.id,
 				subscriptionId: subscription.id,
+				status: targetStatus,
 			},
 			"Contact added to topic successfully",
 		);
@@ -140,7 +170,8 @@ export async function addContactToTopic(
 	} catch (error) {
 		logger.error(
 			{
-				email: emailLower,
+				email: email?.toLowerCase(),
+				contactId,
 				topicId,
 				error: error instanceof Error ? error.message : String(error),
 			},
