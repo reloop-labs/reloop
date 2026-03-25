@@ -18,7 +18,7 @@ export const unsubscribeContactRoute = new Elysia().use(authMiddleware).post(
     },
     detail: {
       tags: ["Topic Enrollments"],
-      summary: "Unenroll contact from topic",
+      summary: "Unenroll Contact From Topic",
       description: "Updates the enrollment status to unenrolled for a contact-topic pair",
     },
   },

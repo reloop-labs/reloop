@@ -27,7 +27,7 @@ export const updateTopicEnrollmentRoute = new Elysia().use(authMiddleware).patch
     },
     detail: {
       tags: ["Topic Enrollments"],
-      summary: "Update a topic enrollment",
+      summary: "Update A Topic Enrollment",
       description: "Updates the status of a topic enrollment",
     },
   },

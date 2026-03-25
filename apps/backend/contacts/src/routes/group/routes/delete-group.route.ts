@@ -26,8 +26,8 @@ export const deleteGroupRoute = new Elysia().use(authMiddleware).delete(
       403: GroupModel.unauthorized,
     },
     detail: {
-      tags: ["Contact groups"],
-      summary: "Delete contact group",
+      tags: ["Groups"],
+      summary: "Delete Group",
       description: "Deletes a group for the organization",
     },
   },

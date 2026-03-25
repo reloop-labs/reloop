@@ -23,7 +23,7 @@ export const updatePropertyRoute = new Elysia().use(authMiddleware).patch(
     },
     detail: {
       tags: ["Contact Properties"],
-      summary: "Update a Contact property",
+      summary: "Update A Contact Property",
       description: "Update the fallback value of a property",
       responses: {
         200: {

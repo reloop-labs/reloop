@@ -17,7 +17,7 @@ export const listContactsRoute = new Elysia().use(authMiddleware).get(
 		},
 		detail: {
 			tags: ["Contact"],
-			summary: "List contacts",
+			summary: "List Contacts",
 			description:
 				"Retrieves a paginated list of contacts with optional filtering and search",
 		},

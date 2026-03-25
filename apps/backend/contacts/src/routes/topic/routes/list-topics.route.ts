@@ -17,7 +17,7 @@ export const listTopicsRoute = new Elysia().use(authMiddleware).get(
     },
     detail: {
       tags: ["Topics"],
-      summary: "List topics",
+      summary: "List Topics",
       description: "Retrieves a paginated list of topics",
       responses: {
         200: {

@@ -25,7 +25,7 @@ export const createTopicEnrollmentRoute = new Elysia().use(authMiddleware).post(
     },
     detail: {
       tags: ["Topic Enrollments"],
-      summary: "Enroll contact in a topic",
+      summary: "Enroll Contact In A Topic",
       description: "Creates an enrollment between a contact and a topic",
     },
   },

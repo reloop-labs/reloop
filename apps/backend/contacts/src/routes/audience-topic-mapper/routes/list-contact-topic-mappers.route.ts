@@ -17,7 +17,7 @@ export const listTopicEnrollmentsRoute = new Elysia().use(authMiddleware).get(
     },
     detail: {
       tags: ["Topic Enrollments"],
-      summary: "List topic enrollments",
+      summary: "List Topic Enrollments",
       description: "Retrieves a paginated list of topic enrollments",
     },
   },

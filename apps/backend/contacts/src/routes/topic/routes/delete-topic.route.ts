@@ -20,7 +20,7 @@ export const deleteTopicRoute = new Elysia().use(authMiddleware).delete(
     },
     detail: {
       tags: ["Topics"],
-      summary: "Delete topic",
+      summary: "Delete Topic",
       description: "Soft deletes a topic",
       responses: {
         200: {

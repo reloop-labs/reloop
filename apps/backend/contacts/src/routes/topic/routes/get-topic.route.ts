@@ -20,7 +20,7 @@ export const getTopicRoute = new Elysia().use(authMiddleware).get(
     },
     detail: {
       tags: ["Topics"],
-      summary: "Retrieve topic",
+      summary: "Retrieve Topic",
       description: "Retrieves a specific topic by ID",
       responses: {
         200: {

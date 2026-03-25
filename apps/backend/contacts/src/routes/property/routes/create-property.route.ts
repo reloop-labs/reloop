@@ -18,7 +18,7 @@ export const createPropertyRoute = new Elysia().use(authMiddleware).post(
     },
     detail: {
       tags: ["Contact Properties"],
-      summary: "Create Contact property",
+      summary: "Create Contact Property",
       description: "Create a new custom property for contacts in the organization",
       responses: {
         200: {

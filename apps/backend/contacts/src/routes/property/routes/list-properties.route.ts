@@ -17,7 +17,7 @@ export const listPropertiesRoute = new Elysia().use(authMiddleware).get(
     },
     detail: {
       tags: ["Contact Properties"],
-      summary: "List Contact properties",
+      summary: "List Contact Properties",
       description: "List all properties for the organization with pagination and filtering",
       responses: {
         200: {

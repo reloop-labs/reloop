@@ -18,7 +18,7 @@ export const removeContactFromTopicRoute = new Elysia().use(authMiddleware).post
     },
     detail: {
       tags: ["Topic Enrollments"],
-      summary: "Remove contact from topic",
+      summary: "Remove Contact From Topic",
       description: "Removes a contact from a topic by soft-deleting the enrollment",
     },
   },

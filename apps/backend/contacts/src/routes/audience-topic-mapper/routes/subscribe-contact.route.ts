@@ -18,7 +18,7 @@ export const subscribeContactRoute = new Elysia().use(authMiddleware).post(
     },
     detail: {
       tags: ["Topic Enrollments"],
-      summary: "Enroll contact in topic",
+      summary: "Enroll Contact In Topic",
       description: "Updates the enrollment status to enrolled for a contact-topic pair",
     },
   },

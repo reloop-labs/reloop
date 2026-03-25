@@ -19,7 +19,7 @@ export const bulkAddContactsToTopicRoute = new Elysia().use(authMiddleware).post
     },
     detail: {
       tags: ["Topic Enrollments"],
-      summary: "Bulk add contacts to topic",
+      summary: "Bulk Add Contacts To Topic",
       description: "Enroll multiple contacts in an existing topic at once",
     },
   },

@@ -21,7 +21,7 @@ export const deleteTopicEnrollmentRoute = new Elysia().use(authMiddleware).delet
     },
     detail: {
       tags: ["Topic Enrollments"],
-      summary: "Delete a topic enrollment",
+      summary: "Delete A Topic Enrollment",
       description: "Soft deletes a topic enrollment",
     },
   },

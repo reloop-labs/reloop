@@ -33,7 +33,7 @@ export const updateTopicRoute = new Elysia().use(authMiddleware).patch(
     },
     detail: {
       tags: ["Topics"],
-      summary: "Update topic",
+      summary: "Update Topic",
       description: "Updates an existing topic",
       responses: {
         200: {

@@ -29,7 +29,7 @@ export const createTopicRoute = new Elysia().use(authMiddleware).post(
     },
     detail: {
       tags: ["Topics"],
-      summary: "Create topic",
+      summary: "Create Topic",
       description: "Creates a new topic for the organization",
       responses: {
         201: {

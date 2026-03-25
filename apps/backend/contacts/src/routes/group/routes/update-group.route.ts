@@ -30,8 +30,8 @@ export const updateGroupRoute = new Elysia().use(authMiddleware).patch(
       403: GroupModel.unauthorized,
     },
     detail: {
-      tags: ["Contact groups"],
-      summary: "Update contact group",
+      tags: ["Groups"],
+      summary: "Update Group",
       description: "Updates an existing group for the organization",
     },
   },

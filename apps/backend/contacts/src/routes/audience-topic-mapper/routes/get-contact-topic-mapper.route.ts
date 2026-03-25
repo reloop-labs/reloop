@@ -21,7 +21,7 @@ export const getTopicEnrollmentRoute = new Elysia().use(authMiddleware).get(
     },
     detail: {
       tags: ["Topic Enrollments"],
-      summary: "Get a topic enrollment",
+      summary: "Get A Topic Enrollment",
       description: "Retrieves a specific topic enrollment by ID",
     },
   },
