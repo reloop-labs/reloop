@@ -15,7 +15,6 @@ import {
 } from "./api-key-filter-dropdown";
 import { ApiKeyTable } from "./api-key-table";
 import { CreateApiKeyModal } from "./create-api-key-modal";
-import { EmptyState } from "./empty-state";
 
 interface ApiKeyData {
 	id: string;
@@ -137,8 +136,6 @@ export const ApiKeyListSidebar = () => {
 							Failed to load API keys
 						</p>
 					</div>
-				) : data?.apiKeys && data.apiKeys.length === 0 ? (
-					<EmptyState onCreateApiKey={() => setIsCreateModalOpen(true)} />
 				) : (
 					<div>
 						<div className="mt-10 flex items-center gap-3">
@@ -170,6 +167,7 @@ export const ApiKeyListSidebar = () => {
 								activeOrganizationSlug={activeOrganization?.slug || ""}
 								isLoading={isLoading}
 								loadingRows={4}
+								onAddApiKey={() => setIsCreateModalOpen(true)}
 							/>
 						</div>
 

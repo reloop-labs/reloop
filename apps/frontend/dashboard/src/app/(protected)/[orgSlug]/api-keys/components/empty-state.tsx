@@ -8,7 +8,7 @@ interface EmptyStateProps {
 
 export const EmptyState = ({ onCreateApiKey }: EmptyStateProps) => {
 	return (
-		<div className="flex min-h-[calc(100dvh-300px)] flex-col items-center justify-center px-4 py-12 text-center">
+		<div className="flex flex-col items-center justify-center px-4 py-12 text-center">
 			<div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-bg-weak-50">
 				<Icon name="key-new" className="h-6 w-6 text-text-sub-600" />
 			</div>
