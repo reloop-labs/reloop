@@ -119,7 +119,7 @@ export const DeleteContactModal = ({
 							<div className="space-y-2">
 								<p className="text-sm text-text-strong-950">
 									Type{" "}
-									<span className="inline-flex max-w-xs items-center gap-1 truncate rounded-md border border-stroke-soft-200 bg-bg-weak-50 px-2 py-1 font-mono text-text-strong-950 text-xs">
+									<span className="inline-flex max-w-xs items-center gap-1 truncate rounded-md border border-stroke-soft-100 bg-bg-weak-50/50 px-2 py-1 font-mono text-text-strong-950 text-xs">
 										{contact.email}
 										<button
 											type="button"
