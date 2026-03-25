@@ -1,6 +1,7 @@
 "use client";
 
 import * as Button from "@reloop/ui/button";
+import * as Kbd from "@reloop/ui/kbd";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 
@@ -31,7 +32,7 @@ export const RevokeInviteModal = ({
 					</p>
 				</div>
 
-				<Modal.Footer className="justify-end gap-2">
+				<Modal.Footer className="mt-4 flex items-center justify-end gap-3 border-stroke-soft-100/50">
 					<Button.Root
 						type="button"
 						variant="neutral"
@@ -41,6 +42,7 @@ export const RevokeInviteModal = ({
 						disabled={isRevoking}
 					>
 						Cancel
+						<Kbd.Root className="bg-bg-weak-50 text-xs">Esc</Kbd.Root>
 					</Button.Root>
 					<Button.Root
 						type="button"

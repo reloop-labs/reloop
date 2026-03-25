@@ -2,6 +2,7 @@
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
+import * as Kbd from "@reloop/ui/kbd";
 import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
@@ -88,9 +89,6 @@ export const CreateGroupModal = ({
 						</div>
 						<div className="flex-1">
 							<Modal.Title>Create Group</Modal.Title>
-							<p className="mt-0.5 text-paragraph-xs text-text-sub-600">
-								Create a new group to organize your contacts.
-							</p>
 						</div>
 					</Modal.Header>
 					<form onSubmit={handleSubmit} className="flex flex-col">
@@ -114,7 +112,18 @@ export const CreateGroupModal = ({
 								</Input.Root>
 							</div>
 						</Modal.Body>
-						<Modal.Footer className="mt-4 justify-end border-stroke-soft-100/50">
+						<Modal.Footer className="mt-4 flex items-center justify-end gap-3 border-stroke-soft-100/50">
+							<Button.Root
+								type="button"
+								variant="neutral"
+								mode="stroke"
+								size="xsmall"
+								onClick={() => handleClose(false)}
+								disabled={isSubmitting}
+							>
+								Cancel
+								<Kbd.Root className="bg-bg-weak-50 text-xs">Esc</Kbd.Root>
+							</Button.Root>
 							<Button.Root
 								type="submit"
 								variant="neutral"

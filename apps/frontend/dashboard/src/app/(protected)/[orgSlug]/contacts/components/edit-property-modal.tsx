@@ -2,6 +2,8 @@
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
+import * as Kbd from "@reloop/ui/kbd";
+import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import { useEffect, useState } from "react";
@@ -127,12 +129,13 @@ export const EditPropertyModal = ({
 						<Modal.Body className="space-y-5">
 							{/* Property Name (Read-only) */}
 							<div className="space-y-1.5">
-								<label className="font-medium text-sm text-text-strong-950">
+								<Label.Root htmlFor="property-name-readonly">
 									Property Name
-								</label>
+								</Label.Root>
 								<Input.Root size="small">
 									<Input.Wrapper>
 										<Input.Input
+											id="property-name-readonly"
 											type="text"
 											className="cursor-not-allowed bg-bg-weak-50 px-2 text-text-sub-600"
 											value={property.name}
@@ -145,12 +148,13 @@ export const EditPropertyModal = ({
 
 							{/* Property Type (Read-only) */}
 							<div className="space-y-1.5">
-								<label className="font-medium text-sm text-text-strong-950">
+								<Label.Root htmlFor="property-type-readonly">
 									Property Type
-								</label>
+								</Label.Root>
 								<Input.Root size="small">
 									<Input.Wrapper>
 										<Input.Input
+											id="property-type-readonly"
 											type="text"
 											className="cursor-not-allowed bg-bg-weak-50 px-2 text-text-sub-600 capitalize"
 											value={property.type}
@@ -163,12 +167,11 @@ export const EditPropertyModal = ({
 
 							{/* Fallback Value (Editable) */}
 							<div className="space-y-1.5">
-								<label className="font-medium text-sm text-text-strong-950">
-									Default Value
-								</label>
+								<Label.Root htmlFor="fallback-value">Default Value</Label.Root>
 								<Input.Root size="small">
 									<Input.Wrapper>
 										<Input.Input
+											id="fallback-value"
 											type="text"
 											className="px-2"
 											value={fallbackValue}
@@ -184,7 +187,18 @@ export const EditPropertyModal = ({
 								</p>
 							</div>
 						</Modal.Body>
-						<Modal.Footer className="mt-4 justify-end border-stroke-soft-100/50">
+						<Modal.Footer className="mt-4 flex items-center justify-end gap-3 border-stroke-soft-100/50">
+							<Button.Root
+								type="button"
+								variant="neutral"
+								mode="stroke"
+								size="xsmall"
+								onClick={() => onOpenChange(false)}
+								disabled={isSubmitting}
+							>
+								Cancel
+								<Kbd.Root className="bg-bg-weak-50 text-xs">Esc</Kbd.Root>
+							</Button.Root>
 							<Button.Root
 								type="submit"
 								variant="neutral"

@@ -160,7 +160,7 @@ export const DeleteApiKeyModal = ({
 								</Input.Root>
 							</div>
 						</Modal.Body>
-						<Modal.Footer className="mt-4 justify-end gap-2 border-stroke-soft-100/50">
+						<Modal.Footer className="mt-4 flex items-center justify-end gap-3 border-stroke-soft-100/50">
 							<Button.Root
 								type="button"
 								variant="neutral"

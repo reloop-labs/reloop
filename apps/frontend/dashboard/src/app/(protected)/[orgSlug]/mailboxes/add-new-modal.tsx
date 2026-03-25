@@ -6,6 +6,7 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
+import * as Kbd from "@reloop/ui/kbd";
 import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import * as Select from "@reloop/ui/select";
@@ -314,15 +315,17 @@ export const AddNewMailboxModal = ({
 								</div>
 							</div>
 						</Modal.Body>
-						<Modal.Footer className="flex justify-end">
+						<Modal.Footer className="mt-4 flex items-center justify-end gap-3 border-stroke-soft-100/50">
 							<Modal.Close asChild>
 								<Button.Root
 									type="button"
 									variant="neutral"
 									mode="stroke"
+									size="xsmall"
 									disabled={isSubmitting}
 								>
 									Cancel
+									<Kbd.Root className="bg-bg-weak-50 text-xs">Esc</Kbd.Root>
 								</Button.Root>
 							</Modal.Close>
 							<Button.Root
