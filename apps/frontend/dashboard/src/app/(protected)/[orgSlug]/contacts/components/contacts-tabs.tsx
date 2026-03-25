@@ -20,6 +20,11 @@ const items = [
 		iconName: "sliders-horiz-2",
 	},
 	{
+		title: "Groups",
+		value: "groups",
+		iconName: "modules",
+	},
+	{
 		title: "Topics",
 		value: "topics",
 		iconName: "notification-indicator",
@@ -34,11 +39,14 @@ export const ContactsTabs = () => {
 
 	const isPropertiesPage = pathname.includes("/contacts/properties");
 	const isTopicsPage = pathname.includes("/contacts/topics");
+	const isGroupsPage = pathname.includes("/contacts/groups");
 	const effectiveTabValue = isPropertiesPage
 		? "properties"
 		: isTopicsPage
 			? "topics"
-			: "contacts";
+			: isGroupsPage
+				? "groups"
+				: "contacts";
 
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 
@@ -74,6 +82,8 @@ export const ContactsTabs = () => {
 								router.push(`/${activeOrganization.slug}/contacts/properties`);
 							} else if (value === "topics") {
 								router.push(`/${activeOrganization.slug}/contacts/topics`);
+							} else if (value === "groups") {
+								router.push(`/${activeOrganization.slug}/contacts/groups`);
 							} else {
 								router.push(`/${activeOrganization.slug}/contacts`);
 							}

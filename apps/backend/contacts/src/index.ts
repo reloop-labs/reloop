@@ -1,10 +1,14 @@
 import "dotenv/config";
 import { contactsConfig } from "@be/contacts/contacts.config";
-import { topicRoutes } from "@be/contacts/routes/topic/topic.routes";
 import { topicSubscriptionRoutes } from "@be/contacts/routes/audience-topic-mapper/audience-topic-mapper.routes";
 import { contactRoutes } from "@be/contacts/routes/contact/contact.routes";
+import { groupRoutes } from "@be/contacts/routes/group/group.routes";
+
+
 import { landing } from "@be/contacts/routes/landing/landing.index";
 import { propertyRoutes } from "@be/contacts/routes/property/property.routes";
+import { topicRoutes } from "@be/contacts/routes/topic/topic.routes";
+
 import { loader } from "@be/contacts/utils/loader";
 import { fromTypes, openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
@@ -45,7 +49,9 @@ const contactsService = new Elysia({
 	.use(contactRoutes)
 	.use(propertyRoutes)
 	.use(topicRoutes)
+	.use(groupRoutes)
 	.use(topicSubscriptionRoutes)
+
 	.onStart(async () => {
 		await loader();
 	})

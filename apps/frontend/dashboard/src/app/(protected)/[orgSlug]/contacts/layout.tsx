@@ -9,6 +9,7 @@ import useSWR from "swr";
 import { AddContactModal } from "./components/add-contact-modal";
 import { AddPropertyModal } from "./components/add-property-modal";
 import { ContactsTabs } from "./components/contacts-tabs";
+import { CreateGroupModal } from "./components/create-group-modal";
 import { CreateTopicModal } from "./components/create-topic-modal";
 import { DocsButton } from "./components/docs-button";
 
@@ -25,10 +26,13 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 	const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 	const [isPropertyModalOpen, setIsPropertyModalOpen] = useState(false);
 	const [isTopicModalOpen, setIsTopicModalOpen] = useState(false);
+	const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
 
 	const isPropertiesPage = pathname.includes("/contacts/properties");
 	const isTopicsPage = pathname.includes("/contacts/topics");
+	const isGroupsPage = pathname.includes("/contacts/groups");
 	const isAddTopicPage = pathname.endsWith("/contacts/topics/add");
+
 	const isBulkImportPage = pathname.includes("/bulk-import");
 	const isContactDetailPage = pathname.includes("/contacts/detail/");
 
@@ -47,6 +51,7 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 			return { title: topicData?.name || "Topic Details", showBack: true };
 		if (isPropertiesPage) return { title: "Properties", showBack: false };
 		if (isTopicsPage) return { title: "Topics", showBack: false };
+		if (isGroupsPage) return { title: "Groups", showBack: false };
 		return { title: "Contacts", showBack: false };
 	};
 
@@ -55,6 +60,7 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 	const handleAction = () => {
 		if (isPropertiesPage) setIsPropertyModalOpen(true);
 		else if (isTopicsPage) setIsTopicModalOpen(true);
+		else if (isGroupsPage) setIsGroupModalOpen(true);
 		else setIsContactModalOpen(true);
 	};
 
@@ -62,7 +68,9 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 		? "Add property"
 		: isTopicsPage
 			? "Add topic"
-			: "Add contact";
+			: isGroupsPage
+				? "Add group"
+				: "Add contact";
 
 	return (
 		<div>
@@ -136,6 +144,10 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 			<CreateTopicModal
 				open={isTopicModalOpen}
 				onOpenChange={setIsTopicModalOpen}
+			/>
+			<CreateGroupModal
+				open={isGroupModalOpen}
+				onOpenChange={setIsGroupModalOpen}
 			/>
 		</div>
 	);
