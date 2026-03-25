@@ -1,15 +1,13 @@
-"use client";
+import type { Metadata } from "next";
 import { PropertyList } from "../components/property-list";
 
+export const metadata: Metadata = {
+	title: "Properties · Reloop",
+	description: "Manage your contact properties.",
+};
+
 const PropertiesPage = () => {
-	return (
-		<>
-			{/* Content */}
-			<div className="mt-4">
-				<PropertyList />
-			</div>
-		</>
-	);
+	return <PropertyList />;
 };
 
 export default PropertiesPage;

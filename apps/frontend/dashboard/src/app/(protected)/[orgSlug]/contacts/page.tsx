@@ -1,12 +1,13 @@
-"use client";
+import type { Metadata } from "next";
 import { ContactList } from "./components/contact-list";
 
+export const metadata: Metadata = {
+	title: "Contacts · Reloop",
+	description: "Manage your contacts and audience data.",
+};
+
 const ContactsPage = () => {
-	return (
-		<div className="mt-4">
-			<ContactList />
-		</div>
-	);
+	return <ContactList />;
 };
 
 export default ContactsPage;
