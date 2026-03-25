@@ -41,6 +41,27 @@ export namespace ContactModel {
 				},
 			),
 		),
+		groupIds: t.Optional(
+			t.Array(t.String(), {
+				description: "Array of group IDs to add the contact to",
+			}),
+		),
+		topics: t.Optional(
+			t.Array(
+				t.Object({
+					topicId: t.String({ description: "Topic identifier" }),
+					subscription: t.Union(
+						[t.Literal("opt_in"), t.Literal("opt_out")],
+						{
+							description: "Subscription status for the topic",
+						},
+					),
+				}),
+				{
+					description: "Array of topics to enroll the contact in",
+				},
+			),
+		),
 	});
 
 	export type CreateContactBody = typeof createContactBody.static;

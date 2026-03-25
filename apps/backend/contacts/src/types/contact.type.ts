@@ -39,6 +39,11 @@ export namespace ContactTypes {
 		lastName?: string;
 		status?: "subscribed" | "unsubscribed" | "blocked";
 		properties?: Record<string, string | number>;
+		groupIds?: string[];
+		topics?: {
+			topicId: string;
+			subscription: "opt_in" | "opt_out";
+		}[];
 		object: "contact";
 	}
 

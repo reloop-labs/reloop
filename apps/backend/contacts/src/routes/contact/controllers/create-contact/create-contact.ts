@@ -58,13 +58,37 @@ export async function createContact(
 					tx,
 				);
 			}
-			logger.info(
-				{
-					email: body.email,
-					id: newContact.id,
-				},
-				"Contact created successfully",
-			);
+			if (body.groupIds && body.groupIds.length > 0) {
+				logger.info(
+					{ contactId: newContact.id, groupIds: body.groupIds },
+					"Adding contact to groups",
+				);
+				await tx.insert(schema.contactGroup).values(
+					body.groupIds.map((groupId) => ({
+						contactId: newContact.id,
+						groupId,
+						organizationId,
+						userId,
+					})),
+				);
+			}
+			if (body.topics && body.topics.length > 0) {
+				logger.info(
+					{ contactId: newContact.id, topicCount: body.topics.length },
+					"Enrolling contact in topics",
+				);
+				await tx.insert(schema.topicEnrollment).values(
+					body.topics.map((topic) => ({
+						contactId: newContact.id,
+						topicId: topic.topicId,
+						organizationId,
+						status: (topic.subscription === "opt_in"
+							? "enrolled"
+							: "unenrolled") as "enrolled" | "unenrolled",
+					})),
+				);
+			}
+			logger.info({ email: body.email, id: newContact.id }, "Contact created successfully");
 
 			// Fetch final properties to ensure types are correct in response
 			const updatedProperties = await tx
