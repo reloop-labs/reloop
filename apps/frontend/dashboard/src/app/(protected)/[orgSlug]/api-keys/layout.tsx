@@ -29,20 +29,7 @@ const ApiKeysLayout = ({ children }: { children: React.ReactNode }) => {
 						<Icon name="key-new" className="h-4 w-4" />
 						<span className="font-medium text-sm">API Keys</span>
 					</Link>
-					<div className="flex items-center justify-end">
-						<FeedbackPopover />
-						<Button.Root
-							variant="neutral"
-							mode="ghost"
-							size="xxsmall"
-							onClick={openDocs}
-							className="gap-1.5"
-						>
-							<Icon name="book-closed" className="h-4 w-4" />
-							Docs
-							<Kbd.Root className="bg-bg-weak-50 text-[10px]">D</Kbd.Root>
-						</Button.Root>
-					</div>
+					<FeedbackPopover />
 				</div>
 			</div>
 			<div>

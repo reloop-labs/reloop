@@ -91,11 +91,7 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 						<Icon name="users" className="h-4 w-4" />
 						<p className="font-medium text-sm">Contacts</p>
 					</div>
-					<div className="flex items-center justify-end">
-						<FeedbackPopover />
-						<ContactsApiDetails />
-						<DocsButton />
-					</div>
+					<FeedbackPopover />
 				</div>
 			</div>
 			<div className="mx-auto max-w-3xl sm:px-8">
