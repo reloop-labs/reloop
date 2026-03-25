@@ -81,15 +81,12 @@ export const InviteList = () => {
 		isLoading,
 		error,
 		mutate,
-	} = useSWR<Invite[]>(
-		`invitations-${activeOrganization.id}`,
-		async () => {
-			const result = await authClient.organization.listInvitations({
-				query: { organizationId: activeOrganization.id },
-			});
-			return result.data ?? [];
-		},
-	);
+	} = useSWR<Invite[]>(`invitations-${activeOrganization.id}`, async () => {
+		const result = await authClient.organization.listInvitations({
+			query: { organizationId: activeOrganization.id },
+		});
+		return result.data ?? [];
+	});
 
 	const handleCancelInvite = async (invitationId: string) => {
 		setCancellingInvite(invitationId);
@@ -145,7 +142,9 @@ export const InviteList = () => {
 				<div className="flex h-12 w-12 items-center justify-center rounded-full bg-error-lighter">
 					<Icon name="alert-circle" className="h-6 w-6 text-error-base" />
 				</div>
-				<p className="mt-4 font-medium text-text-strong-950">Failed to load invitations</p>
+				<p className="mt-4 font-medium text-text-strong-950">
+					Failed to load invitations
+				</p>
 				<p className="mt-1 text-sm text-text-sub-600">Please try again later</p>
 			</div>
 		);
@@ -157,8 +156,12 @@ export const InviteList = () => {
 				<div className="flex h-12 w-12 items-center justify-center rounded-full bg-bg-weak-50">
 					<Icon name="mail-single" className="h-6 w-6 text-text-sub-600" />
 				</div>
-				<p className="mt-4 font-medium text-text-strong-950">No pending invitations</p>
-				<p className="mt-1 text-sm text-text-sub-600">Send an invitation to add team members</p>
+				<p className="mt-4 font-medium text-text-strong-950">
+					No pending invitations
+				</p>
+				<p className="mt-1 text-sm text-text-sub-600">
+					Send an invitation to add team members
+				</p>
 			</div>
 		);
 	}
@@ -193,7 +196,7 @@ export const InviteList = () => {
 								key={invite.id ? `invite-${invite.id}` : `invite-idx-${index}`}
 								className={cn(
 									"group/row flex items-center gap-8 rounded-lg py-4 transition-colors",
-									"hover:bg-bg-weak-50/50"
+									"hover:bg-bg-weak-50/50",
 								)}
 							>
 								{/* User Column */}
@@ -202,7 +205,7 @@ export const InviteList = () => {
 										{...getAnimationProps(index + 1, 0)}
 										className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-amber-500"
 									>
-										<span className="font-medium text-white text-sm">?</span>
+										<span className="font-medium text-sm text-white">?</span>
 									</motion.div>
 									<motion.div
 										{...getAnimationProps(index + 1, 1)}
@@ -219,8 +222,8 @@ export const InviteList = () => {
 									<motion.span
 										{...getAnimationProps(index + 1, 2)}
 										className={cn(
-											"rounded-full px-2.5 py-1 text-xs font-medium",
-											getRoleBadgeStyles(invite.role)
+											"rounded-full px-2.5 py-1 font-medium text-xs",
+											getRoleBadgeStyles(invite.role),
 										)}
 									>
 										{getRoleLabel(invite.role)}
@@ -242,7 +245,7 @@ export const InviteList = () => {
 									{isPending && (
 										<motion.span
 											{...getAnimationProps(index + 1, 4)}
-											className="rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-2.5 py-1 text-xs text-text-sub-600"
+											className="rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-2.5 py-1 text-text-sub-600 text-xs"
 										>
 											Invite pendi...
 										</motion.span>

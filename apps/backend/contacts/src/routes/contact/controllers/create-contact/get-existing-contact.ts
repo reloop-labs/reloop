@@ -4,27 +4,27 @@ import type { Logger } from "@reloop/logger";
 import { and, eq, isNull } from "drizzle-orm";
 
 export async function getExistingContact({
-  email,
-  organizationId,
-  logger,
-  db = defaultDb,
+	email,
+	organizationId,
+	logger,
+	db = defaultDb,
 }: {
-  email: string;
-  organizationId: string;
-  logger: Logger;
-  db?: DatabaseInstance;
+	email: string;
+	organizationId: string;
+	logger: Logger;
+	db?: DatabaseInstance;
 }) {
-  logger.info({}, "Checking for existing contact");
-  const results = await db
-    .select()
-    .from(schema.contact)
-    .where(
-      and(
-        eq(schema.contact.email, email),
-        eq(schema.contact.organizationId, organizationId),
-        isNull(schema.contact.deletedAt),
-      ),
-    )
-    .limit(1);
-  return results[0] || null;
+	logger.info({}, "Checking for existing contact");
+	const results = await db
+		.select()
+		.from(schema.contact)
+		.where(
+			and(
+				eq(schema.contact.email, email),
+				eq(schema.contact.organizationId, organizationId),
+				isNull(schema.contact.deletedAt),
+			),
+		)
+		.limit(1);
+	return results[0] || null;
 }

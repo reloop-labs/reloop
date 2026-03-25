@@ -151,8 +151,7 @@ const BulkImportPage = () => {
 			if (result.created > 0) {
 				await mutate(
 					(key: string) =>
-						typeof key === "string" &&
-						key.includes("/api/contacts/list"),
+						typeof key === "string" && key.includes("/api/contacts/list"),
 				);
 				toast.success(`Successfully imported ${result.created} contacts`);
 			}

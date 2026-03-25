@@ -89,12 +89,12 @@ export const StatusBanner = ({ status, isLoading }: StatusBannerProps) => {
 			variant="lighter"
 			status={getStatusVariant()}
 			size="large"
-			className={`w-full rounded-xl border ${getBorderClass()} shadow-regular-md ring-1 ring-stroke-soft-200 ring-inset rounded-2xl`}
+			className={`w-full rounded-xl border ${getBorderClass()} rounded-2xl shadow-regular-md ring-1 ring-stroke-soft-200 ring-inset`}
 		>
 			<div className="space-y-0.5">
 				<div className="font-medium text-base">{title}</div>
 				<p className="text-paragraph-sm">{description}</p>
 			</div>
-		</Alert.Root >
+		</Alert.Root>
 	);
 };

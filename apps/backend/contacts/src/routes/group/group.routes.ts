@@ -7,12 +7,12 @@ import { updateGroupRoute } from "@be/contacts/routes/group/routes/update-group.
 import { Elysia } from "elysia";
 
 export const groupRoutes = new Elysia({
-  prefix: "/v1/groups",
-  name: "GroupRoutes",
+	prefix: "/v1/groups",
+	name: "GroupRoutes",
 })
-  .use(createGroupRoute)
-  .use(getGroupRoute)
-  .use(listGroupsRoute)
-  .use(updateGroupRoute)
-  .use(deleteGroupRoute)
-  .use(listGroupContactsRoute);
+	.use(createGroupRoute)
+	.use(getGroupRoute)
+	.use(listGroupsRoute)
+	.use(updateGroupRoute)
+	.use(deleteGroupRoute)
+	.use(listGroupContactsRoute);

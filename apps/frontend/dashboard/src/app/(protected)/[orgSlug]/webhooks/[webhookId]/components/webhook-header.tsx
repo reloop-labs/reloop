@@ -146,10 +146,10 @@ export const WebhookHeader = ({
 	const successRate =
 		webhook && webhook.successCount + webhook.failureCount > 0
 			? Math.round(
-				(webhook.successCount /
-					(webhook.successCount + webhook.failureCount)) *
-				100,
-			)
+					(webhook.successCount /
+						(webhook.successCount + webhook.failureCount)) *
+						100,
+				)
 			: 0;
 
 	return (

@@ -16,10 +16,10 @@ import {
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
+import Spinner from "@reloop/ui/spinner";
 import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 import { DeleteDomainModal } from "../../components/delete-domain";
-import Spinner from "@reloop/ui/spinner";
 
 interface DomainHeaderProps {
 	domainId: string;
@@ -32,8 +32,18 @@ interface DomainHeaderProps {
 }
 
 const headerMenuItems = [
-	{ id: "docs", label: "Go to docs", icon: "file-text" as const, isDanger: false },
-	{ id: "delete", label: "Remove domain", icon: "trash" as const, isDanger: true },
+	{
+		id: "docs",
+		label: "Go to docs",
+		icon: "file-text" as const,
+		isDanger: false,
+	},
+	{
+		id: "delete",
+		label: "Remove domain",
+		icon: "trash" as const,
+		isDanger: true,
+	},
 ];
 
 export const DomainHeader = ({
@@ -136,10 +146,18 @@ export const DomainHeader = ({
 							<PopoverRoot>
 								<PopoverTrigger asChild>
 									<Button.Root variant="neutral" mode="stroke" size="xsmall">
-										<Icon name="more-vertical" className="h-3.5 w-3.5 text-text-sub-600" />
+										<Icon
+											name="more-vertical"
+											className="h-3.5 w-3.5 text-text-sub-600"
+										/>
 									</Button.Root>
 								</PopoverTrigger>
-								<PopoverContent align="end" sideOffset={8} className="w-44 p-1.5 rounded-xl" showArrow>
+								<PopoverContent
+									align="end"
+									sideOffset={8}
+									className="w-44 rounded-xl p-1.5"
+									showArrow
+								>
 									<div className="relative">
 										{headerMenuItems.map((item, idx) => (
 											<button
@@ -152,20 +170,32 @@ export const DomainHeader = ({
 												onPointerLeave={() => setHoverIdx(undefined)}
 												onClick={() => {
 													if (item.id === "docs") {
-														window.open("https://reloop.sh/docs/domain", "_blank");
+														window.open(
+															"https://reloop.sh/docs/domain",
+															"_blank",
+														);
 													} else if (item.id === "delete") {
 														setDeleteId(domainId);
 													}
 												}}
 												className={cn(
-													"flex w-full cursor-pointer items-center gap-2 rounded-lg pl-2 py-1.5 text-xs font-normal transition-colors",
-													item.isDanger ? "text-error-base" : "text-text-strong-950",
-													!currentRect && hoverIdx === idx && (item.isDanger ? "bg-red-alpha-10" : "bg-neutral-alpha-10")
+													"flex w-full cursor-pointer items-center gap-2 rounded-lg py-1.5 pl-2 font-normal text-xs transition-colors",
+													item.isDanger
+														? "text-error-base"
+														: "text-text-strong-950",
+													!currentRect &&
+														hoverIdx === idx &&
+														(item.isDanger
+															? "bg-red-alpha-10"
+															: "bg-neutral-alpha-10"),
 												)}
 											>
 												<Icon
 													name={item.icon}
-													className={cn("h-3.5 w-3.5", item.isDanger ? "" : "text-text-sub-600")}
+													className={cn(
+														"h-3.5 w-3.5",
+														item.isDanger ? "" : "text-text-sub-600",
+													)}
 												/>
 												<span>{item.label}</span>
 											</button>

@@ -92,17 +92,17 @@ ResizeHandle.displayName = TEXTAREA_RESIZE_HANDLE_NAME;
 type TextareaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement> &
 	(
 		| {
-			simple: true;
-			children?: never;
-			containerClassName?: never;
-			hasError?: boolean;
-		}
+				simple: true;
+				children?: never;
+				containerClassName?: never;
+				hasError?: boolean;
+		  }
 		| {
-			simple?: false;
-			children?: React.ReactNode;
-			containerClassName?: string;
-			hasError?: boolean;
-		}
+				simple?: false;
+				children?: React.ReactNode;
+				containerClassName?: string;
+				hasError?: boolean;
+		  }
 	);
 
 const TextareaRoot = React.forwardRef<HTMLTextAreaElement, TextareaProps>(

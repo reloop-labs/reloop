@@ -50,8 +50,7 @@ export const DeleteContactModal = ({ contacts }: DeleteContactModalProps) => {
 			// Refresh the contacts list
 			await mutate(
 				(key: string) =>
-					typeof key === "string" &&
-					key.includes("/api/contacts/list"),
+					typeof key === "string" && key.includes("/api/contacts/list"),
 			);
 		} catch (error) {
 			console.error("Failed to delete contact:", error);

@@ -6,13 +6,13 @@ import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Kbd from "@reloop/ui/kbd";
 import * as Modal from "@reloop/ui/modal";
+import Spinner from "@reloop/ui/spinner";
 import axios from "axios";
 import { usePathname, useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
-import Spinner from "@reloop/ui/spinner";
 
 interface DeleteDomainModalProps {
 	domains: Domain[];
@@ -57,7 +57,9 @@ export const DeleteDomainModal = ({ domains }: DeleteDomainModalProps) => {
 			await mutate(
 				(key) =>
 					typeof key === "string" &&
-					key.startsWith(`/api/domain/v1/list?organizationId=${activeOrganization?.id}`),
+					key.startsWith(
+						`/api/domain/v1/list?organizationId=${activeOrganization?.id}`,
+					),
 			);
 
 			toast.success(`${domainToDelete.domain} deleted successfully`);
@@ -96,16 +98,19 @@ export const DeleteDomainModal = ({ domains }: DeleteDomainModalProps) => {
 				}
 			}}
 		>
-			<Modal.Content className="sm:max-w-[480px] p-0.5 border border-stroke-soft-100/50 rounded-2xl" showClose={true}>
-				<div className="border border-stroke-soft-100/50 rounded-2xl">
-					<Modal.Header className='before:border-stroke-soft-200/50'>
+			<Modal.Content
+				className="rounded-2xl border border-stroke-soft-100/50 p-0.5 sm:max-w-[480px]"
+				showClose={true}
+			>
+				<div className="rounded-2xl border border-stroke-soft-100/50">
+					<Modal.Header className="before:border-stroke-soft-200/50">
 						<div className="flex-1">
 							<Modal.Title className="text-sm">Delete Domain</Modal.Title>
 						</div>
 					</Modal.Header>
 					<Modal.Body className="space-y-4">
 						<div className="flex flex-col gap-1">
-							<p className="text-text-sub-600 text-paragraph-sm">
+							<p className="text-paragraph-sm text-text-sub-600">
 								Are you sure you want to delete this domain?
 							</p>
 							<p className="font-medium text-error-base text-paragraph-sm">
@@ -113,9 +118,9 @@ export const DeleteDomainModal = ({ domains }: DeleteDomainModalProps) => {
 							</p>
 						</div>
 						<div className="flex flex-col gap-2">
-							<p className="text-text-strong-950 text-paragraph-sm">
+							<p className="text-paragraph-sm text-text-strong-950">
 								Type{" "}
-								<span className="inline-flex items-center gap-1 rounded-md bg-bg-weak-50 px-2 py-0.5 font-mono text-text-strong-950 text-paragraph-xs border border-stroke-soft-200">
+								<span className="inline-flex items-center gap-1 rounded-md border border-stroke-soft-200 bg-bg-weak-50 px-2 py-0.5 font-mono text-paragraph-xs text-text-strong-950">
 									{domainToDelete?.domain}
 									<button
 										type="button"
@@ -129,7 +134,7 @@ export const DeleteDomainModal = ({ domains }: DeleteDomainModalProps) => {
 												toast.error("Failed to copy domain");
 											}
 										}}
-										className="text-text-sub-600 hover:text-text-strong-950 transition-colors"
+										className="text-text-sub-600 transition-colors hover:text-text-strong-950"
 									>
 										<Icon
 											name={isCopied ? "check" : "copy"}
@@ -143,7 +148,6 @@ export const DeleteDomainModal = ({ domains }: DeleteDomainModalProps) => {
 								<Input.Wrapper>
 									<Input.Input
 										type="text"
-
 										value={confirmationText}
 										onChange={(e) => setConfirmationText(e.target.value)}
 										placeholder="Enter domain name"
@@ -152,7 +156,7 @@ export const DeleteDomainModal = ({ domains }: DeleteDomainModalProps) => {
 							</Input.Root>
 						</div>
 					</Modal.Body>
-					<Modal.Footer className="justify-end border-stroke-soft-100/50 mt-4">
+					<Modal.Footer className="mt-4 justify-end border-stroke-soft-100/50">
 						<Button.Root
 							variant="neutral"
 							mode="stroke"
@@ -167,7 +171,9 @@ export const DeleteDomainModal = ({ domains }: DeleteDomainModalProps) => {
 							variant="error"
 							size="small"
 							onClick={handleDelete}
-							disabled={isDeleting || confirmationText !== domainToDelete?.domain}
+							disabled={
+								isDeleting || confirmationText !== domainToDelete?.domain
+							}
 						>
 							{isDeleting ? (
 								<>
@@ -181,6 +187,6 @@ export const DeleteDomainModal = ({ domains }: DeleteDomainModalProps) => {
 					</Modal.Footer>
 				</div>
 			</Modal.Content>
-		</Modal.Root >
+		</Modal.Root>
 	);
 };

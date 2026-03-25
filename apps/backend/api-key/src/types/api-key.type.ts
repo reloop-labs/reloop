@@ -42,7 +42,7 @@ export namespace ApiKeyTypes {
 			id: string;
 			name: string | null;
 			image: string | null;
-			email: string
+			email: string;
 		};
 	}
 
@@ -78,7 +78,6 @@ export namespace ApiKeyTypes {
 		enabled?: boolean;
 	}
 
-	export type UsageStatsResponse =
-		typeof ApiKeyModel.usageStatsResponse.static;
+	export type UsageStatsResponse = typeof ApiKeyModel.usageStatsResponse.static;
 	export type SuccessResponse = typeof ApiKeyModel.successResponse.static;
 }

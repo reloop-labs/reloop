@@ -44,7 +44,6 @@
 				"noAriaHiddenOnFocusable": "off",
 				"noStaticElementInteractions": "off",
 				"useKeyWithClickEvents": "off"
-
 			},
 			"nursery": {
 				"useSortedClasses": {

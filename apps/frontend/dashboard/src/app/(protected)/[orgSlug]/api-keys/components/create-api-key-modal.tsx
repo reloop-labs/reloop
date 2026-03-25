@@ -9,7 +9,7 @@ import * as Modal from "@reloop/ui/modal";
 import { useLoading } from "@reloop/ui/use-loading";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -60,12 +60,14 @@ export const CreateApiKeyModal = ({
 		if (createdApiKey && !keyCopied) {
 			const handleBeforeUnload = (e: BeforeUnloadEvent) => {
 				e.preventDefault();
-				e.returnValue = "You haven't copied your API key yet. Are you sure you want to leave?";
+				e.returnValue =
+					"You haven't copied your API key yet. Are you sure you want to leave?";
 				return e.returnValue;
 			};
 
 			window.addEventListener("beforeunload", handleBeforeUnload);
-			return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+			return () =>
+				window.removeEventListener("beforeunload", handleBeforeUnload);
 		}
 	}, [createdApiKey, keyCopied]);
 
@@ -78,10 +80,14 @@ export const CreateApiKeyModal = ({
 		});
 
 	// Command/Ctrl + Enter to submit form
-	useHotkeys("mod+enter", (e) => {
-		e.preventDefault();
-		handleSubmit(onSubmit)();
-	}, { enableOnFormTags: ["INPUT"] });
+	useHotkeys(
+		"mod+enter",
+		(e) => {
+			e.preventDefault();
+			handleSubmit(onSubmit)();
+		},
+		{ enableOnFormTags: ["INPUT"] },
+	);
 
 	const onSubmit = async (data: ApiKeyFormValues) => {
 		if (!activeOrganization?.id) return;
@@ -165,7 +171,7 @@ export const CreateApiKeyModal = ({
 		return (
 			<Modal.Root open={isOpen} onOpenChange={handleOpenChange}>
 				<Modal.Content
-					className="sm:max-w-[480px] p-0.5 border border-stroke-soft-100/50 rounded-2xl"
+					className="rounded-2xl border border-stroke-soft-100/50 p-0.5 sm:max-w-[480px]"
 					showClose={keyCopied}
 					onEscapeKeyDown={(e) => {
 						if (!keyCopied) {
@@ -184,17 +190,20 @@ export const CreateApiKeyModal = ({
 						}
 					}}
 				>
-					<div className="border border-stroke-soft-100/50 rounded-2xl">
+					<div className="rounded-2xl border border-stroke-soft-100/50">
 						<Modal.Header className="before:border-stroke-soft-200/50">
 							<div className="flex items-center justify-center">
-								<Icon name="check-circle" className="h-4 w-4 text-success-base" />
+								<Icon
+									name="check-circle"
+									className="h-4 w-4 text-success-base"
+								/>
 							</div>
 							<div className="flex-1">
 								<Modal.Title>API Key Created</Modal.Title>
 							</div>
 						</Modal.Header>
 						<Modal.Body className="space-y-4">
-							<p className="text-text-sub-600 text-sm">
+							<p className="text-sm text-text-sub-600">
 								Your API key has been created. Make sure to copy the key now.
 								You won't be able to see it again!
 							</p>
@@ -202,7 +211,7 @@ export const CreateApiKeyModal = ({
 							<div className="space-y-2">
 								<Label.Root>New API Key</Label.Root>
 								<div className="flex items-center gap-2 rounded-xl border border-stroke-soft-200 bg-bg-weak-50 p-3">
-									<code className="flex-1 break-all font-mono text-xs text-text-strong-950">
+									<code className="flex-1 break-all font-mono text-text-strong-950 text-xs">
 										{createdApiKey.key}
 									</code>
 									<Button.Root
@@ -212,24 +221,27 @@ export const CreateApiKeyModal = ({
 										onClick={handleCopyKey}
 										disabled={keyCopied}
 									>
-										<Icon name={keyCopied ? "check" : "clipboard-copy"} className={`h-4 w-4 ${keyCopied ? "text-success-base" : ""}`} />
+										<Icon
+											name={keyCopied ? "check" : "clipboard-copy"}
+											className={`h-4 w-4 ${keyCopied ? "text-success-base" : ""}`}
+										/>
 									</Button.Root>
 								</div>
 								{!keyCopied && (
-									<p className="text-error-base text-xs flex items-center gap-1">
+									<p className="flex items-center gap-1 text-error-base text-xs">
 										<Icon name="alert-triangle" className="h-3 w-3" />
 										You must copy the API key before you can close this dialog.
 									</p>
 								)}
 								{keyCopied && (
-									<p className="text-success-base text-xs flex items-center gap-1">
+									<p className="flex items-center gap-1 text-success-base text-xs">
 										<Icon name="check-circle" className="h-3 w-3" />
 										API key copied! You can now close this dialog.
 									</p>
 								)}
 							</div>
 						</Modal.Body>
-						<Modal.Footer className="justify-end border-stroke-soft-100/50 mt-4">
+						<Modal.Footer className="mt-4 justify-end border-stroke-soft-100/50">
 							<Button.Root
 								type="button"
 								variant="neutral"
@@ -238,8 +250,10 @@ export const CreateApiKeyModal = ({
 								disabled={!keyCopied}
 							>
 								Continue
-
-								<Icon name="enter" className="w-4 h-4 border rounded-sm p-px border-stroke-soft-100/20" />
+								<Icon
+									name="enter"
+									className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+								/>
 							</Button.Root>
 						</Modal.Footer>
 					</div>
@@ -250,11 +264,14 @@ export const CreateApiKeyModal = ({
 
 	return (
 		<Modal.Root open={isOpen} onOpenChange={handleClose}>
-			<Modal.Content className="sm:max-w-[480px] p-0.5 border border-stroke-soft-100/50 rounded-2xl" showClose={true}>
-				<div className="border border-stroke-soft-100/50 rounded-2xl">
+			<Modal.Content
+				className="rounded-2xl border border-stroke-soft-100/50 p-0.5 sm:max-w-[480px]"
+				showClose={true}
+			>
+				<div className="rounded-2xl border border-stroke-soft-100/50">
 					<form onSubmit={handleSubmit(onSubmit)}>
 						<Modal.Header className="before:border-stroke-soft-200/50">
-							<div className="flex items-center justify-centers">
+							<div className="justify-centers flex items-center">
 								<Icon name="key-new" className="h-4 w-4" />
 							</div>
 							<div className="flex-1">
@@ -262,8 +279,9 @@ export const CreateApiKeyModal = ({
 							</div>
 						</Modal.Header>
 						<Modal.Body className="space-y-4">
-							<p className="text-text-sub-600 text-sm">
-								Create an API key to authenticate requests to Reloop from your application.
+							<p className="text-sm text-text-sub-600">
+								Create an API key to authenticate requests to Reloop from your
+								application.
 							</p>
 
 							<div className="flex flex-col gap-1">
@@ -288,7 +306,7 @@ export const CreateApiKeyModal = ({
 								)}
 							</div>
 						</Modal.Body>
-						<Modal.Footer className="justify-end border-stroke-soft-100/50 mt-4">
+						<Modal.Footer className="mt-4 justify-end border-stroke-soft-100/50">
 							<Button.Root
 								type="submit"
 								variant="neutral"
@@ -304,7 +322,10 @@ export const CreateApiKeyModal = ({
 									<>
 										Create API Key
 										<span className="inline-flex items-center gap-0.5">
-											<Icon name="enter" className="w-4 h-4 border rounded-sm p-px border-stroke-soft-100/20" />
+											<Icon
+												name="enter"
+												className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+											/>
 										</span>
 									</>
 								)}
@@ -316,4 +337,3 @@ export const CreateApiKeyModal = ({
 		</Modal.Root>
 	);
 };
-

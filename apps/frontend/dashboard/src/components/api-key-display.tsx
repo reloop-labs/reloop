@@ -35,7 +35,8 @@ export const ApiKeyDisplay = () => {
 	const start = apiKey?.start || "";
 	const suffix = start.slice(-4);
 	const asteriskCount = 24; // Fixed number of asterisks for consistent display
-	const maskedKey = prefix && start ? `${prefix}${"*".repeat(asteriskCount)}${suffix}` : "";
+	const maskedKey =
+		prefix && start ? `${prefix}${"*".repeat(asteriskCount)}${suffix}` : "";
 	const fullKey = start; // The actual key to copy/reveal
 
 	const handleCopy = async () => {
@@ -52,9 +53,7 @@ export const ApiKeyDisplay = () => {
 	return (
 		<div className="rounded-lg border border-stroke-soft-200 bg-bg-white-0 p-6">
 			<div className="mb-4">
-				<h3 className="font-semibold text-lg text-text-strong-950">
-					API Key
-				</h3>
+				<h3 className="font-semibold text-lg text-text-strong-950">API Key</h3>
 				<p className="mt-1 text-sm text-text-sub-600">
 					Use this key to authenticate your API requests
 				</p>
@@ -95,4 +94,3 @@ export const ApiKeyDisplay = () => {
 		</div>
 	);
 };
-

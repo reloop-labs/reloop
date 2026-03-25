@@ -9,7 +9,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 				<Icon name="gear" className="h-4 w-4" />
 				<p className="font-medium text-sm">Settings</p>
 			</div>
-			<div className="mx-auto max-w-3xl pt-16 px-6">
+			<div className="mx-auto max-w-3xl px-6 pt-16">
 				<div className="pb-6">
 					<p className="font-medium text-2xl">Settings</p>
 					<p className="text-paragraph-sm text-text-sub-600">

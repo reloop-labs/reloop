@@ -89,15 +89,30 @@ const ApiKeyActionsDropdown = ({
 
 	const toggleIcon = apiKey.enabled ? "pause" : "play";
 	const menuItems = [
-		{ id: "view", label: "View Details", icon: "eye-outline" as const, isDanger: false },
+		{
+			id: "view",
+			label: "View Details",
+			icon: "eye-outline" as const,
+			isDanger: false,
+		},
 		{
 			id: "toggle",
 			label: apiKey.enabled ? "Disable" : "Enable",
 			icon: toggleIcon as "pause" | "play",
 			isDanger: false,
 		},
-		{ id: "rotate", label: "Rotate Key", icon: "rotate-cw" as const, isDanger: false },
-		{ id: "delete", label: "Delete API Key", icon: "trash" as const, isDanger: true },
+		{
+			id: "rotate",
+			label: "Rotate Key",
+			icon: "rotate-cw" as const,
+			isDanger: false,
+		},
+		{
+			id: "delete",
+			label: "Delete API Key",
+			icon: "trash" as const,
+			isDanger: true,
+		},
 	];
 
 	const currentTab = buttonRefs.current[hoverIdx ?? -1];
@@ -126,10 +141,14 @@ const ApiKeyActionsDropdown = ({
 			<PopoverRoot open={popoverOpen} onOpenChange={handlePopoverOpenChange}>
 				<PopoverTrigger asChild>
 					<Button.Root variant="neutral" mode="ghost" size="xxsmall">
-						<Icon name="more-vertical" className="w-3 h-3" />
+						<Icon name="more-vertical" className="h-3 w-3" />
 					</Button.Root>
 				</PopoverTrigger>
-				<PopoverContent align="end" sideOffset={-4} className="w-40 p-1.5 rounded-xl">
+				<PopoverContent
+					align="end"
+					sideOffset={-4}
+					className="w-40 rounded-xl p-1.5"
+				>
 					<div className="relative">
 						{menuItems.map((item, idx) => (
 							<button
@@ -143,18 +162,28 @@ const ApiKeyActionsDropdown = ({
 								onClick={() => handleItemClick(item.id)}
 								disabled={item.id === "toggle" && isToggling}
 								className={cn(
-									"flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-xs font-normal transition-colors",
+									"flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 font-normal text-xs transition-colors",
 									item.isDanger ? "text-error-base" : "text-text-strong-950",
-									!currentRect && hoverIdx === idx && (item.isDanger ? "bg-red-alpha-10" : "bg-neutral-alpha-10"),
-									isToggling && item.id === "toggle" && "opacity-50 cursor-not-allowed"
+									!currentRect &&
+										hoverIdx === idx &&
+										(item.isDanger ? "bg-red-alpha-10" : "bg-neutral-alpha-10"),
+									isToggling &&
+										item.id === "toggle" &&
+										"cursor-not-allowed opacity-50",
 								)}
 							>
 								{item.id === "toggle" && isToggling ? (
-									<Icon name="loader-2" className="h-3.5 w-3.5 animate-spin text-text-sub-600" />
+									<Icon
+										name="loader-2"
+										className="h-3.5 w-3.5 animate-spin text-text-sub-600"
+									/>
 								) : (
 									<Icon
 										name={item.icon}
-										className={cn("h-3.5 w-3.5", item.isDanger ? "" : "text-text-sub-600")}
+										className={cn(
+											"h-3.5 w-3.5",
+											item.isDanger ? "" : "text-text-sub-600",
+										)}
 									/>
 								)}
 								<span>{item.label}</span>
@@ -182,7 +211,9 @@ export const ApiKeyTable = ({
 	const { mutate } = useSWRConfig();
 	const [, setDeleteId] = useQueryState("delete");
 	const [togglingId, setTogglingId] = useState<string | null>(null);
-	const [rotateModalApiKey, setRotateModalApiKey] = useState<ApiKeyData | null>(null);
+	const [rotateModalApiKey, setRotateModalApiKey] = useState<ApiKeyData | null>(
+		null,
+	);
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 
 	const handleDeleteApiKey = (apiKeyId: string) => {
@@ -206,7 +237,7 @@ export const ApiKeyTable = ({
 			await mutate(
 				(key) => typeof key === "string" && key.startsWith("/api/api-key/v1/"),
 				undefined,
-				{ revalidate: true }
+				{ revalidate: true },
 			);
 
 			toast.success(
@@ -229,7 +260,7 @@ export const ApiKeyTable = ({
 			<AnimatePresence mode="wait">
 				<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-200/70 text-paragraph-sm shadow-regular-md ring-stroke-soft-200 ring-inset">
 					{/* Table Header */}
-					<div className="grid grid-cols-[2fr_1fr_1.5fr_1fr_48px] items-center py-3.5 px-4 text-text-sub-600">
+					<div className="grid grid-cols-[2fr_1fr_1.5fr_1fr_48px] items-center px-4 py-3.5 text-text-sub-600">
 						<div className="flex items-center gap-2">
 							<Icon name="key-new" className="h-4 w-4" />
 							<span className="text-xs">Name</span>
@@ -253,144 +284,199 @@ export const ApiKeyTable = ({
 					<div className="grid grid-cols-[2fr_1fr_1.5fr_1fr_48px]">
 						{isLoading
 							? // Skeleton loading state
-							Array.from({ length: loadingRows }).map((_, index) => (
-								<div key={`skeleton-${index}-${activeOrganizationSlug}`} className="contents">
-									<div className="flex items-center gap-2 py-2 pl-4 border-t border-stroke-soft-100">
-										<Skeleton className="h-4 w-4 rounded" />
-										<Skeleton className="h-4 w-24" />
-									</div>
-									<div className="flex items-center py-2 border-t border-stroke-soft-100">
-										<Skeleton className="h-5 w-16 rounded-full" />
-									</div>
-									<div className="flex items-center gap-2 py-2 border-t border-stroke-soft-100">
-										<Skeleton className="h-5 w-5 rounded-full" />
-										<Skeleton className="h-4 w-20" />
-									</div>
-									<div className="flex items-center py-2 border-t border-stroke-soft-100">
-										<Skeleton className="h-4 w-16" />
-									</div>
-									<div className="flex items-center justify-center py-2 pr-4 border-t border-stroke-soft-100">
-										<Skeleton className="h-4 w-4 rounded" />
-									</div>
-								</div>
-							))
-							: apiKeys.map((apiKey, index) => {
-								const displayName =
-									apiKey.name || apiKey.start || apiKey.prefix || "Unnamed";
-								const isRowActive = activeDropdownId === apiKey.id;
-
-								return (
-									<div key={`api-key-${index}`} className="group/row contents">
-										<Link
-											href={`/${activeOrganizationSlug}/api-keys/${apiKey.id}`}
-											className="group/row contents"
-										>
-											{/* Name Column */}
-											<div className={cn(
-												"flex items-center gap-2 py-2 pl-4 transition-colors group-hover/row:bg-bg-weak-50/50 border-t border-stroke-soft-100",
-												isRowActive && "bg-bg-weak-50/50"
-											)}>
-												<motion.div
-													{...getAnimationProps(index + 1, 0)}
-													className="flex items-center gap-2"
-												>
-													<Icon name="key-new" className="h-4 w-4 text-text-sub-600 shrink-0" />
-													<div className="truncate font-medium text-label-sm text-text-strong-950">
-														{displayName}
-													</div>
-												</motion.div>
-											</div>
-
-											{/* Status Column */}
-											<div className={cn(
-												"flex items-center py-2 transition-colors group-hover/row:bg-bg-weak-50/50 border-t border-stroke-soft-100",
-												isRowActive && "bg-bg-weak-50/50"
-											)}>
-												<motion.div {...getAnimationProps(index + 1, 1)} className="flex items-center">
-													<span className={cn(
-														"inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-medium border-[1px]",
-														getStatusBadgeColor()
-													)}>
-														<span className={cn("mr-1.5 h-2 w-2 rounded-full", getStatusIconColor(apiKey.enabled), apiKey.enabled ? "bg-success-base" : "bg-error-base")} />
-														{apiKey.enabled ? "Enabled" : "Disabled"}
-													</span>
-												</motion.div>
-											</div>
-
-											{/* Created By Column */}
-											<div className={cn(
-												"flex items-center gap-2 py-2 transition-colors group-hover/row:bg-bg-weak-50/50 border-t border-stroke-soft-100",
-												isRowActive && "bg-bg-weak-50/50"
-											)}>
-												<motion.div {...getAnimationProps(index + 1, 2)} className="flex items-center gap-2">
-													<Avatar.Root size="20">
-														{apiKey.createdBy?.image ? (
-															<Avatar.Image src={apiKey.createdBy.image} alt={apiKey.createdBy?.name || "User"} />
-														) : null}
-													</Avatar.Root>
-													{apiKey.createdBy?.email ? (
-														<Tooltip.Root delayDuration={0}>
-															<Tooltip.Trigger asChild>
-																<span className="text-label-sm text-text-sub-600 truncate cursor-default">
-																	{apiKey.createdBy?.name || "Unknown"}
-																</span>
-															</Tooltip.Trigger>
-															<Tooltip.Content
-																sideOffset={-3}
-																variant="light" className="rounded-xl">
-																<div className="flex items-start gap-2 p-1">
-																	<Avatar.Root size="20" className="shrink-0 mt-0.5">
-																		{apiKey.createdBy?.image ? (
-																			<Avatar.Image src={apiKey.createdBy.image} alt={apiKey.createdBy?.name || "User"} />
-																		) : null}
-																	</Avatar.Root>
-																	<div className="flex flex-col items-start justify-start">
-																		<span className="font-sm">{apiKey.createdBy?.name || "Unknown"}</span>
-																		<span className="text-text-soft-400 text-xs">{apiKey.createdBy.email}</span>
-																	</div>
-																</div>
-															</Tooltip.Content>
-														</Tooltip.Root>
-													) : (
-														<span className="text-label-sm text-text-sub-600 truncate">
-															{apiKey.createdBy?.name || "Unknown"}
-														</span>
-													)}
-												</motion.div>
-											</div>
-
-											{/* Created Column */}
-											<div className={cn(
-												"flex items-center py-2 transition-colors group-hover/row:bg-bg-weak-50/50 border-t border-stroke-soft-100",
-												isRowActive && "bg-bg-weak-50/50"
-											)}>
-												<motion.div {...getAnimationProps(index + 1, 3)} className="flex items-center">
-													<span className="text-label-sm text-text-sub-600 whitespace-nowrap">
-														{formatRelativeTime(apiKey.createdAt)}
-													</span>
-												</motion.div>
-											</div>
-										</Link>
-
-										{/* Actions Column - outside Link to prevent navigation on dropdown click */}
-										<div className={cn(
-											"flex items-center justify-center py-2 pr-4 transition-colors group-hover/row:bg-bg-weak-50/50 border-t border-stroke-soft-100",
-											isRowActive && "bg-bg-weak-50/50"
-										)}>
-											<ApiKeyActionsDropdown
-												apiKey={apiKey}
-												onViewDetails={handleViewDetails}
-												onToggleEnabled={handleToggleEnabled}
-												onRotateKey={setRotateModalApiKey}
-												onDeleteKey={handleDeleteApiKey}
-												isToggling={togglingId === apiKey.id}
-												animationProps={getAnimationProps(index + 1, 4)}
-												onOpenChange={(open) => setActiveDropdownId(open ? apiKey.id : null)}
-											/>
+								Array.from({ length: loadingRows }).map((_, index) => (
+									<div
+										key={`skeleton-${index}-${activeOrganizationSlug}`}
+										className="contents"
+									>
+										<div className="flex items-center gap-2 border-stroke-soft-100 border-t py-2 pl-4">
+											<Skeleton className="h-4 w-4 rounded" />
+											<Skeleton className="h-4 w-24" />
+										</div>
+										<div className="flex items-center border-stroke-soft-100 border-t py-2">
+											<Skeleton className="h-5 w-16 rounded-full" />
+										</div>
+										<div className="flex items-center gap-2 border-stroke-soft-100 border-t py-2">
+											<Skeleton className="h-5 w-5 rounded-full" />
+											<Skeleton className="h-4 w-20" />
+										</div>
+										<div className="flex items-center border-stroke-soft-100 border-t py-2">
+											<Skeleton className="h-4 w-16" />
+										</div>
+										<div className="flex items-center justify-center border-stroke-soft-100 border-t py-2 pr-4">
+											<Skeleton className="h-4 w-4 rounded" />
 										</div>
 									</div>
-								);
-							})}
+								))
+							: apiKeys.map((apiKey, index) => {
+									const displayName =
+										apiKey.name || apiKey.start || apiKey.prefix || "Unnamed";
+									const isRowActive = activeDropdownId === apiKey.id;
+
+									return (
+										<div
+											key={`api-key-${index}`}
+											className="group/row contents"
+										>
+											<Link
+												href={`/${activeOrganizationSlug}/api-keys/${apiKey.id}`}
+												className="group/row contents"
+											>
+												{/* Name Column */}
+												<div
+													className={cn(
+														"flex items-center gap-2 border-stroke-soft-100 border-t py-2 pl-4 transition-colors group-hover/row:bg-bg-weak-50/50",
+														isRowActive && "bg-bg-weak-50/50",
+													)}
+												>
+													<motion.div
+														{...getAnimationProps(index + 1, 0)}
+														className="flex items-center gap-2"
+													>
+														<Icon
+															name="key-new"
+															className="h-4 w-4 shrink-0 text-text-sub-600"
+														/>
+														<div className="truncate font-medium text-label-sm text-text-strong-950">
+															{displayName}
+														</div>
+													</motion.div>
+												</div>
+
+												{/* Status Column */}
+												<div
+													className={cn(
+														"flex items-center border-stroke-soft-100 border-t py-2 transition-colors group-hover/row:bg-bg-weak-50/50",
+														isRowActive && "bg-bg-weak-50/50",
+													)}
+												>
+													<motion.div
+														{...getAnimationProps(index + 1, 1)}
+														className="flex items-center"
+													>
+														<span
+															className={cn(
+																"inline-flex items-center rounded-md border-[1px] px-2 py-0.5 font-medium text-[10px]",
+																getStatusBadgeColor(),
+															)}
+														>
+															<span
+																className={cn(
+																	"mr-1.5 h-2 w-2 rounded-full",
+																	getStatusIconColor(apiKey.enabled),
+																	apiKey.enabled
+																		? "bg-success-base"
+																		: "bg-error-base",
+																)}
+															/>
+															{apiKey.enabled ? "Enabled" : "Disabled"}
+														</span>
+													</motion.div>
+												</div>
+
+												{/* Created By Column */}
+												<div
+													className={cn(
+														"flex items-center gap-2 border-stroke-soft-100 border-t py-2 transition-colors group-hover/row:bg-bg-weak-50/50",
+														isRowActive && "bg-bg-weak-50/50",
+													)}
+												>
+													<motion.div
+														{...getAnimationProps(index + 1, 2)}
+														className="flex items-center gap-2"
+													>
+														<Avatar.Root size="20">
+															{apiKey.createdBy?.image ? (
+																<Avatar.Image
+																	src={apiKey.createdBy.image}
+																	alt={apiKey.createdBy?.name || "User"}
+																/>
+															) : null}
+														</Avatar.Root>
+														{apiKey.createdBy?.email ? (
+															<Tooltip.Root delayDuration={0}>
+																<Tooltip.Trigger asChild>
+																	<span className="cursor-default truncate text-label-sm text-text-sub-600">
+																		{apiKey.createdBy?.name || "Unknown"}
+																	</span>
+																</Tooltip.Trigger>
+																<Tooltip.Content
+																	sideOffset={-3}
+																	variant="light"
+																	className="rounded-xl"
+																>
+																	<div className="flex items-start gap-2 p-1">
+																		<Avatar.Root
+																			size="20"
+																			className="mt-0.5 shrink-0"
+																		>
+																			{apiKey.createdBy?.image ? (
+																				<Avatar.Image
+																					src={apiKey.createdBy.image}
+																					alt={apiKey.createdBy?.name || "User"}
+																				/>
+																			) : null}
+																		</Avatar.Root>
+																		<div className="flex flex-col items-start justify-start">
+																			<span className="font-sm">
+																				{apiKey.createdBy?.name || "Unknown"}
+																			</span>
+																			<span className="text-text-soft-400 text-xs">
+																				{apiKey.createdBy.email}
+																			</span>
+																		</div>
+																	</div>
+																</Tooltip.Content>
+															</Tooltip.Root>
+														) : (
+															<span className="truncate text-label-sm text-text-sub-600">
+																{apiKey.createdBy?.name || "Unknown"}
+															</span>
+														)}
+													</motion.div>
+												</div>
+
+												{/* Created Column */}
+												<div
+													className={cn(
+														"flex items-center border-stroke-soft-100 border-t py-2 transition-colors group-hover/row:bg-bg-weak-50/50",
+														isRowActive && "bg-bg-weak-50/50",
+													)}
+												>
+													<motion.div
+														{...getAnimationProps(index + 1, 3)}
+														className="flex items-center"
+													>
+														<span className="whitespace-nowrap text-label-sm text-text-sub-600">
+															{formatRelativeTime(apiKey.createdAt)}
+														</span>
+													</motion.div>
+												</div>
+											</Link>
+
+											{/* Actions Column - outside Link to prevent navigation on dropdown click */}
+											<div
+												className={cn(
+													"flex items-center justify-center border-stroke-soft-100 border-t py-2 pr-4 transition-colors group-hover/row:bg-bg-weak-50/50",
+													isRowActive && "bg-bg-weak-50/50",
+												)}
+											>
+												<ApiKeyActionsDropdown
+													apiKey={apiKey}
+													onViewDetails={handleViewDetails}
+													onToggleEnabled={handleToggleEnabled}
+													onRotateKey={setRotateModalApiKey}
+													onDeleteKey={handleDeleteApiKey}
+													isToggling={togglingId === apiKey.id}
+													animationProps={getAnimationProps(index + 1, 4)}
+													onOpenChange={(open) =>
+														setActiveDropdownId(open ? apiKey.id : null)
+													}
+												/>
+											</div>
+										</div>
+									);
+								})}
 					</div>
 				</div>
 			</AnimatePresence>
@@ -400,7 +486,12 @@ export const ApiKeyTable = ({
 					isOpen={!!rotateModalApiKey}
 					onClose={() => setRotateModalApiKey(null)}
 					apiKeyId={rotateModalApiKey.id}
-					apiKeyName={rotateModalApiKey.name || rotateModalApiKey.start || rotateModalApiKey.prefix || "Unnamed"}
+					apiKeyName={
+						rotateModalApiKey.name ||
+						rotateModalApiKey.start ||
+						rotateModalApiKey.prefix ||
+						"Unnamed"
+					}
 				/>
 			)}
 		</>

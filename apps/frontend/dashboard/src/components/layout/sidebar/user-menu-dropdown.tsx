@@ -38,10 +38,7 @@ export const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
 	const hoveredItem = userNavigation[hoverIdx ?? -1];
 	const isDanger = hoveredItem?.variant === "danger";
 
-	const handleAction = async (
-		path: string,
-		action: string | undefined,
-	) => {
+	const handleAction = async (path: string, action: string | undefined) => {
 		if (action === "signout") {
 			await authClient.signOut();
 			router.push("/login");
@@ -79,36 +76,43 @@ export const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
 				align="start"
 			>
 				<div className="relative">
-					{userNavigation.map(({ path, label, iconName, variant, action }, navIdx) => {
-						const isItemDanger = variant === "danger";
-						return (
-							<button
-								key={path + label}
-								ref={(el) => {
-									if (el) {
-										buttonRefs.current[navIdx] = el;
-									}
-								}}
-								type="button"
-								onPointerEnter={() => setHoverIdx(navIdx)}
-								onPointerLeave={() => setHoverIdx(undefined)}
-								className={cn(
-									"flex w-full cursor-pointer items-center justify-start gap-2.5 rounded-lg px-3 py-2 font-normal",
-									isItemDanger ? "text-red-500" : "",
-									!currentRect &&
-										hoverIdx === navIdx &&
-										(isItemDanger ? "bg-red-alpha-10" : "bg-neutral-alpha-10"),
-								)}
-								onClick={() => handleAction(path, action)}
-							>
-								<Icon
-									name={iconName}
-									className={cn("h-4 w-4", isItemDanger ? "" : "text-text-sub-600")}
-								/>
-								<p className="text-sm">{label}</p>
-							</button>
-						);
-					})}
+					{userNavigation.map(
+						({ path, label, iconName, variant, action }, navIdx) => {
+							const isItemDanger = variant === "danger";
+							return (
+								<button
+									key={path + label}
+									ref={(el) => {
+										if (el) {
+											buttonRefs.current[navIdx] = el;
+										}
+									}}
+									type="button"
+									onPointerEnter={() => setHoverIdx(navIdx)}
+									onPointerLeave={() => setHoverIdx(undefined)}
+									className={cn(
+										"flex w-full cursor-pointer items-center justify-start gap-2.5 rounded-lg px-3 py-2 font-normal",
+										isItemDanger ? "text-red-500" : "",
+										!currentRect &&
+											hoverIdx === navIdx &&
+											(isItemDanger
+												? "bg-red-alpha-10"
+												: "bg-neutral-alpha-10"),
+									)}
+									onClick={() => handleAction(path, action)}
+								>
+									<Icon
+										name={iconName}
+										className={cn(
+											"h-4 w-4",
+											isItemDanger ? "" : "text-text-sub-600",
+										)}
+									/>
+									<p className="text-sm">{label}</p>
+								</button>
+							);
+						},
+					)}
 					<AnimatedHoverBackground
 						rect={currentRect}
 						tabElement={currentTab}

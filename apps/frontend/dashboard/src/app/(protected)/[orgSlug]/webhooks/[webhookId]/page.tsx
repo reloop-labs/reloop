@@ -66,7 +66,7 @@ const WebhookDetailPage = () => {
 				webhook={webhookData}
 				isLoading={isLoading}
 				isFailed={!!error}
-				onDeleteWebhook={() => { }}
+				onDeleteWebhook={() => {}}
 			/>
 
 			<DeliveryLogs webhookId={webhookData.id} />

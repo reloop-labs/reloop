@@ -2,7 +2,6 @@ import { render } from "@react-email/render";
 import OrganizationInviteEmail from "./organization-invite";
 import PasswordResetEmail from "./password-reset";
 
-
 export interface EmailOptions {
 	to: string;
 	subject: string;
@@ -10,8 +9,12 @@ export interface EmailOptions {
 	from?: string;
 }
 
-export const sendEmail = async ({ to, subject, html, from }: EmailOptions) => {
-};
+export const sendEmail = async ({
+	to,
+	subject,
+	html,
+	from,
+}: EmailOptions) => {};
 
 export const sendPasswordResetEmail = async (
 	email: string,

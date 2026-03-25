@@ -1,9 +1,7 @@
 import { createHash, randomBytes } from "node:crypto";
 import { createId } from "@paralleldrive/cuid2";
+import { formatApiKeyWithKeyResponse } from "@reloop/api-key/routes/api-key/controllers/format-api-key-response";
 import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
-import {
-	formatApiKeyWithKeyResponse,
-} from "@reloop/api-key/routes/api-key/controllers/format-api-key-response";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
@@ -25,7 +23,7 @@ function hashApiKey(key: string): string {
 function getKeyStart(key: string): string {
 	const parts = key.split("_");
 	if (parts.length >= 2) {
-		return `${parts[0]}_${parts[1]?.substring(0, 8) ?? ''}`;
+		return `${parts[0]}_${parts[1]?.substring(0, 8) ?? ""}`;
 	}
 	return key.substring(0, 12);
 }
@@ -34,7 +32,6 @@ export async function createApiKey(
 	userId: string,
 	request: ApiKeyTypes.CreateApiKeyRequest,
 ): Promise<ApiKeyTypes.ApiKeyWithKeyResponse> {
-
 	try {
 		// Generate API key
 		const fullKey = generateApiKey();
@@ -42,7 +39,8 @@ export async function createApiKey(
 		const keyStart = getKeyStart(fullKey);
 		const keyId = createId();
 
-		logger.info("Creating API key with key values here",
+		logger.info(
+			"Creating API key with key values here",
 			organizationId,
 			userId,
 			fullKey,
@@ -99,21 +97,27 @@ export async function createApiKey(
 		});
 
 		if (!user) {
-			logger.error({ organizationId, userId }, "User not found for API key creation");
+			logger.error(
+				{ organizationId, userId },
+				"User not found for API key creation",
+			);
 			throw status(500, { message: "User not found" });
 		}
 
 		logger.info("newApiKey", newApiKey);
 
-		return formatApiKeyWithKeyResponse({
-			...newApiKey[0],
-			createdBy: {
-				id: user.id,
-				name: user.name,
-				image: user.image,
-				email: user.email,
+		return formatApiKeyWithKeyResponse(
+			{
+				...newApiKey[0],
+				createdBy: {
+					id: user.id,
+					name: user.name,
+					image: user.image,
+					email: user.email,
+				},
 			},
-		}, fullKey);
+			fullKey,
+		);
 	} catch (error) {
 		logger.error(
 			{

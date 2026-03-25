@@ -109,192 +109,192 @@ export const WebhookTable = ({
 						</div>
 						{isLoading
 							? // Skeleton loading state
-							Array.from({ length: loadingRows }).map((_, index) => (
-								<div key={`skeleton-${index}`} className="group/row contents">
-									<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
-										<div className="my-1 pl-5">
-											<Skeleton className="h-4 w-32" />
+								Array.from({ length: loadingRows }).map((_, index) => (
+									<div key={`skeleton-${index}`} className="group/row contents">
+										<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
+											<div className="my-1 pl-5">
+												<Skeleton className="h-4 w-32" />
+											</div>
+										</div>
+										<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
+											<div className="px-3">
+												<Skeleton className="h-4 w-16" />
+											</div>
+										</div>
+										<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
+											<div className="px-3">
+												<Skeleton className="h-4 w-12" />
+											</div>
+										</div>
+										<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
+											<div className="px-3">
+												<Skeleton className="h-4 w-12" />
+											</div>
+										</div>
+										<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
+											<div className="px-3">
+												<Skeleton className="h-4 w-16" />
+											</div>
+										</div>
+										<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
+											<Skeleton className="h-4 w-20" />
+										</div>
+										<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
+											<Skeleton className="h-4 w-4" />
 										</div>
 									</div>
-									<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
-										<div className="px-3">
-											<Skeleton className="h-4 w-16" />
-										</div>
-									</div>
-									<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
-										<div className="px-3">
-											<Skeleton className="h-4 w-12" />
-										</div>
-									</div>
-									<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
-										<div className="px-3">
-											<Skeleton className="h-4 w-12" />
-										</div>
-									</div>
-									<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
-										<div className="px-3">
-											<Skeleton className="h-4 w-16" />
-										</div>
-									</div>
-									<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
-										<Skeleton className="h-4 w-20" />
-									</div>
-									<div className="flex items-center border-stroke-soft-200 border-t py-2.5">
-										<Skeleton className="h-4 w-4" />
-									</div>
-								</div>
-							))
+								))
 							: webhooks.map((webhook, index) => {
-								const successRate =
-									webhook.successCount + webhook.failureCount > 0
-										? Math.round(
-											(webhook.successCount /
-												(webhook.successCount + webhook.failureCount)) *
-											100,
-										)
-										: 0;
+									const successRate =
+										webhook.successCount + webhook.failureCount > 0
+											? Math.round(
+													(webhook.successCount /
+														(webhook.successCount + webhook.failureCount)) *
+														100,
+												)
+											: 0;
 
-								return (
-									<div
-										key={`webhook-${index}`}
-										className="group/row contents"
-									>
-										<div className="flex items-center border-stroke-soft-200 border-t py-2 group-hover/row:bg-bg-weak-50">
-											<motion.div
-												{...getAnimationProps(index + 1, 0)}
-												className="flex items-center gap-2 pl-5"
-											>
-												<Link
-													href={`/${activeOrganizationSlug}/webhooks/${webhook.id}`}
-													className="flex items-center gap-2"
+									return (
+										<div
+											key={`webhook-${index}`}
+											className="group/row contents"
+										>
+											<div className="flex items-center border-stroke-soft-200 border-t py-2 group-hover/row:bg-bg-weak-50">
+												<motion.div
+													{...getAnimationProps(index + 1, 0)}
+													className="flex items-center gap-2 pl-5"
 												>
-													<Icon
-														name="webhook"
-														className="h-4 w-4 text-text-sub-600"
-													/>
+													<Link
+														href={`/${activeOrganizationSlug}/webhooks/${webhook.id}`}
+														className="flex items-center gap-2"
+													>
+														<Icon
+															name="webhook"
+															className="h-4 w-4 text-text-sub-600"
+														/>
 
+														<div
+															className={cn(
+																"truncate text-label-xs text-text-sub-400 text-xs",
+															)}
+														>
+															{webhook.url}
+														</div>
+													</Link>
+												</motion.div>
+											</div>
+											<div className="flex items-center border-stroke-soft-200 border-t py-2 group-hover/row:bg-bg-weak-50">
+												<motion.div
+													{...getAnimationProps(index + 1, 1)}
+													className="flex items-center gap-2 px-3"
+												>
 													<div
 														className={cn(
-															"truncate text-label-xs text-text-sub-400 text-xs",
+															"py flex items-center rounded-full border px-1 font-medium text-xs",
+															getStatusColor(webhook.status),
 														)}
 													>
-														{webhook.url}
+														<Icon
+															name={getStatusIcon(webhook.status)}
+															className="mr-1 h-3 w-3"
+														/>
+														{webhook.status.charAt(0).toUpperCase() +
+															webhook.status.slice(1)}
 													</div>
-												</Link>
-											</motion.div>
-										</div>
-										<div className="flex items-center border-stroke-soft-200 border-t py-2 group-hover/row:bg-bg-weak-50">
-											<motion.div
-												{...getAnimationProps(index + 1, 1)}
-												className="flex items-center gap-2 px-3"
-											>
-												<div
-													className={cn(
-														"py flex items-center rounded-full border px-1 font-medium text-xs",
-														getStatusColor(webhook.status),
-													)}
+												</motion.div>
+											</div>
+											<div className="flex items-center border-stroke-soft-200 border-t py-2 pl-1 group-hover/row:bg-bg-weak-50">
+												<motion.div
+													{...getAnimationProps(index + 1, 2)}
+													className="flex items-center gap-2 px-3 font-medium"
 												>
-													<Icon
-														name={getStatusIcon(webhook.status)}
-														className="mr-1 h-3 w-3"
-													/>
-													{webhook.status.charAt(0).toUpperCase() +
-														webhook.status.slice(1)}
-												</div>
-											</motion.div>
-										</div>
-										<div className="flex items-center border-stroke-soft-200 border-t py-2 pl-1 group-hover/row:bg-bg-weak-50">
-											<motion.div
-												{...getAnimationProps(index + 1, 2)}
-												className="flex items-center gap-2 px-3 font-medium"
-											>
-												<span className="text-label-sm text-text-strong-950">
-													{webhook.successCount}
-												</span>
-											</motion.div>
-										</div>
-										<div className="flex items-center border-stroke-soft-200 border-t py-2 group-hover/row:bg-bg-weak-50">
-											<motion.div
-												{...getAnimationProps(index + 1, 3)}
-												className="flex items-center gap-2 px-3 font-medium"
-											>
-												<span className="text-label-sm text-text-strong-950">
-													{webhook.failureCount}
-												</span>
-											</motion.div>
-										</div>
-										<div className="flex items-center border-stroke-soft-200 border-t py-2 pr-1 group-hover/row:bg-bg-weak-50">
-											<motion.div
-												{...getAnimationProps(index + 1, 4)}
-												className="flex items-center gap-2 px-3 font-medium"
-											>
-												<span className="text-label-sm text-text-strong-950">
-													{successRate}%
-												</span>
-											</motion.div>
-										</div>
-										<div className="flex items-center border-stroke-soft-200 border-t py-2 pr-1 group-hover/row:bg-bg-weak-50">
-											<motion.span
-												{...getAnimationProps(index + 1, 5)}
-												className="text-label-sm text-text-strong-950"
-											>
-												{formatRelativeTime(webhook.createdAt)}
-											</motion.span>
-										</div>
-										<div className="flex items-center border-stroke-soft-200 border-t py-2 group-hover/row:bg-bg-weak-50">
-											<motion.div
-												{...getAnimationProps(index + 1, 6)}
-												className="flex items-center justify-center"
-											>
-												<PopoverRoot>
-													<PopoverTrigger asChild>
-														<Button.Root
-															variant="neutral"
-															mode="ghost"
-															size="xxsmall"
-															className="rounded p-1"
-														>
-															<Icon
-																name="more-vertical"
-																className="h-4 w-4 text-text-sub-600 hover:text-text-strong-950"
-															/>
-														</Button.Root>
-													</PopoverTrigger>
-													<PopoverContent align="end" className="w-48 p-2">
-														<div className="flex flex-col gap-1">
+													<span className="text-label-sm text-text-strong-950">
+														{webhook.successCount}
+													</span>
+												</motion.div>
+											</div>
+											<div className="flex items-center border-stroke-soft-200 border-t py-2 group-hover/row:bg-bg-weak-50">
+												<motion.div
+													{...getAnimationProps(index + 1, 3)}
+													className="flex items-center gap-2 px-3 font-medium"
+												>
+													<span className="text-label-sm text-text-strong-950">
+														{webhook.failureCount}
+													</span>
+												</motion.div>
+											</div>
+											<div className="flex items-center border-stroke-soft-200 border-t py-2 pr-1 group-hover/row:bg-bg-weak-50">
+												<motion.div
+													{...getAnimationProps(index + 1, 4)}
+													className="flex items-center gap-2 px-3 font-medium"
+												>
+													<span className="text-label-sm text-text-strong-950">
+														{successRate}%
+													</span>
+												</motion.div>
+											</div>
+											<div className="flex items-center border-stroke-soft-200 border-t py-2 pr-1 group-hover/row:bg-bg-weak-50">
+												<motion.span
+													{...getAnimationProps(index + 1, 5)}
+													className="text-label-sm text-text-strong-950"
+												>
+													{formatRelativeTime(webhook.createdAt)}
+												</motion.span>
+											</div>
+											<div className="flex items-center border-stroke-soft-200 border-t py-2 group-hover/row:bg-bg-weak-50">
+												<motion.div
+													{...getAnimationProps(index + 1, 6)}
+													className="flex items-center justify-center"
+												>
+													<PopoverRoot>
+														<PopoverTrigger asChild>
 															<Button.Root
 																variant="neutral"
 																mode="ghost"
-																size="small"
-																onClick={() => handleViewDetails(webhook.id)}
-																className="w-full justify-start"
+																size="xxsmall"
+																className="rounded p-1"
 															>
 																<Icon
-																	name="eye-outline"
-																	className="h-4 w-4"
+																	name="more-vertical"
+																	className="h-4 w-4 text-text-sub-600 hover:text-text-strong-950"
 																/>
-																View Details
 															</Button.Root>
-															<Button.Root
-																variant="error"
-																mode="ghost"
-																size="small"
-																onClick={() =>
-																	handleDeleteWebhook(webhook.id)
-																}
-																className="w-full justify-start"
-															>
-																<Icon name="trash" className="h-4 w-4" />
-																Delete Webhook
-															</Button.Root>
-														</div>
-													</PopoverContent>
-												</PopoverRoot>
-											</motion.div>
+														</PopoverTrigger>
+														<PopoverContent align="end" className="w-48 p-2">
+															<div className="flex flex-col gap-1">
+																<Button.Root
+																	variant="neutral"
+																	mode="ghost"
+																	size="small"
+																	onClick={() => handleViewDetails(webhook.id)}
+																	className="w-full justify-start"
+																>
+																	<Icon
+																		name="eye-outline"
+																		className="h-4 w-4"
+																	/>
+																	View Details
+																</Button.Root>
+																<Button.Root
+																	variant="error"
+																	mode="ghost"
+																	size="small"
+																	onClick={() =>
+																		handleDeleteWebhook(webhook.id)
+																	}
+																	className="w-full justify-start"
+																>
+																	<Icon name="trash" className="h-4 w-4" />
+																	Delete Webhook
+																</Button.Root>
+															</div>
+														</PopoverContent>
+													</PopoverRoot>
+												</motion.div>
+											</div>
 										</div>
-									</div>
-								);
-							})}
+									);
+								})}
 					</div>
 				</div>
 			</AnimatePresence>

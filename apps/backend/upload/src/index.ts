@@ -10,28 +10,28 @@ import { Elysia } from "elysia";
 
 const port = uploadConfig.port;
 const uploadService = new Elysia({
-    prefix: "/api/upload",
-    name: "Upload Service",
+	prefix: "/api/upload",
+	name: "Upload Service",
 })
-    .use(
-        openapi({
-            references: fromTypes(
-                uploadConfig.NODE_ENV === "production"
-                    ? "dist/index.d.ts"
-                    : "src/index.ts",
-            ),
-        }),
-    )
-    .use(serverTiming())
-    .use(landing)
-    .use(uploadRoutes)
-    .onStart(async () => {
-        await loader();
-    })
-    .listen(port, () => {
-        logger.info(
-            `Upload Server is running on http://localhost:${port}/api/upload`,
-        );
-    });
+	.use(
+		openapi({
+			references: fromTypes(
+				uploadConfig.NODE_ENV === "production"
+					? "dist/index.d.ts"
+					: "src/index.ts",
+			),
+		}),
+	)
+	.use(serverTiming())
+	.use(landing)
+	.use(uploadRoutes)
+	.onStart(async () => {
+		await loader();
+	})
+	.listen(port, () => {
+		logger.info(
+			`Upload Server is running on http://localhost:${port}/api/upload`,
+		);
+	});
 
 export type UploadService = typeof uploadService;

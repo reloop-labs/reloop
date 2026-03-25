@@ -83,11 +83,15 @@ export const InviteForm = () => {
 					`${successCount} invitation${successCount > 1 ? "s" : ""} sent successfully!`,
 				);
 				form.reset({ users: [{ email: "", role: "member" }] });
-				mutate((key) => typeof key === "string" && key.startsWith("invitations-"));
+				mutate(
+					(key) => typeof key === "string" && key.startsWith("invitations-"),
+				);
 			}
 
 			if (failCount > 0) {
-				toast.error(`${failCount} invitation${failCount > 1 ? "s" : ""} failed`);
+				toast.error(
+					`${failCount} invitation${failCount > 1 ? "s" : ""} failed`,
+				);
 			}
 		} catch (error) {
 			toast.error("Failed to invite team members");
@@ -101,9 +105,9 @@ export const InviteForm = () => {
 	return (
 		<div className="overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0">
 			<form onSubmit={form.handleSubmit(onSubmit)}>
-				<div className="p-4 space-y-4">
+				<div className="space-y-4 p-4">
 					{!!fields.length && (
-						<div className="grid grid-cols-[1fr_140px_40px] gap-3 text-paragraph-xs text-text-sub-600 font-medium">
+						<div className="grid grid-cols-[1fr_140px_40px] gap-3 font-medium text-paragraph-xs text-text-sub-600">
 							<span>Email Address</span>
 							<span>Role</span>
 							<span />
@@ -113,7 +117,7 @@ export const InviteForm = () => {
 						{fields.map((field, index) => (
 							<div
 								key={field.id}
-								className="grid grid-cols-[1fr_140px_40px] gap-3 items-start"
+								className="grid grid-cols-[1fr_140px_40px] items-start gap-3"
 							>
 								<div>
 									<Input.Root size="small">
@@ -147,8 +151,11 @@ export const InviteForm = () => {
 										<Select.Content>
 											{roleOptions.map((option) => (
 												<Select.Item key={option.value} value={option.value}>
-													<div className="flex items-center gap-1.5 w-20">
-														<Icon name={option.icon} className="h-3 w-3 text-text-sub-600" />
+													<div className="flex w-20 items-center gap-1.5">
+														<Icon
+															name={option.icon}
+															className="h-3 w-3 text-text-sub-600"
+														/>
 														<span className="text-xs">{option.label}</span>
 													</div>
 												</Select.Item>
@@ -166,7 +173,10 @@ export const InviteForm = () => {
 									disabled={loading}
 									onClick={() => remove(index)}
 								>
-									<Icon name="minus-circle" className="h-4 w-4 text-text-sub-600" />
+									<Icon
+										name="minus-circle"
+										className="h-4 w-4 text-text-sub-600"
+									/>
 								</Button.Root>
 							</div>
 						))}
@@ -184,7 +194,7 @@ export const InviteForm = () => {
 					</Button.Root>
 				</div>
 
-				<div className="flex justify-end border-stroke-soft-100 border-t px-4 py-3 bg-bg-weak-50/50">
+				<div className="flex justify-end border-stroke-soft-100 border-t bg-bg-weak-50/50 px-4 py-3">
 					<Button.Root
 						type="submit"
 						variant="neutral"

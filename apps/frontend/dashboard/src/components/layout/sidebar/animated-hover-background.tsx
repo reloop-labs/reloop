@@ -10,12 +10,9 @@ interface AnimatedHoverBackgroundProps {
 	isDanger?: boolean;
 }
 
-export const AnimatedHoverBackground: React.FC<AnimatedHoverBackgroundProps> = ({
-	rect,
-	tabElement,
-	className,
-	isDanger = false,
-}) => {
+export const AnimatedHoverBackground: React.FC<
+	AnimatedHoverBackgroundProps
+> = ({ rect, tabElement, className, isDanger = false }) => {
 	if (!rect || !tabElement) return null;
 
 	// Use offsetTop/offsetLeft for position relative to parent container

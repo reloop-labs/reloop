@@ -124,7 +124,10 @@ export const MemberList = () => {
 		},
 	);
 
-	const handleRoleChange = async (memberId: string, newRole: "admin" | "member") => {
+	const handleRoleChange = async (
+		memberId: string,
+		newRole: "admin" | "member",
+	) => {
 		setUpdatingRole(memberId);
 		try {
 			const { error } = await authClient.organization.updateMemberRole({
@@ -166,7 +169,7 @@ export const MemberList = () => {
 	if (isLoading) {
 		return (
 			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 text-paragraph-sm">
-				<div className="grid grid-cols-[1fr_100px_100px_80px] border-b border-stroke-soft-200 bg-bg-weak-50">
+				<div className="grid grid-cols-[1fr_100px_100px_80px] border-stroke-soft-200 border-b bg-bg-weak-50">
 					<div className="px-4 py-3 font-medium text-text-sub-600 text-xs uppercase tracking-wide">
 						Member
 					</div>
@@ -193,7 +196,9 @@ export const MemberList = () => {
 				<div className="flex h-12 w-12 items-center justify-center rounded-full bg-error-lighter">
 					<Icon name="alert-circle" className="h-6 w-6 text-error-base" />
 				</div>
-				<p className="mt-4 font-medium text-text-strong-950">Failed to load team members</p>
+				<p className="mt-4 font-medium text-text-strong-950">
+					Failed to load team members
+				</p>
 				<p className="mt-1 text-sm text-text-sub-600">Please try again later</p>
 			</div>
 		);
@@ -205,8 +210,12 @@ export const MemberList = () => {
 				<div className="flex h-12 w-12 items-center justify-center rounded-full bg-bg-weak-50">
 					<Icon name="users" className="h-6 w-6 text-text-sub-600" />
 				</div>
-				<p className="mt-4 font-medium text-text-strong-950">No team members found</p>
-				<p className="mt-1 text-sm text-text-sub-600">Invite members to get started</p>
+				<p className="mt-4 font-medium text-text-strong-950">
+					No team members found
+				</p>
+				<p className="mt-1 text-sm text-text-sub-600">
+					Invite members to get started
+				</p>
 			</div>
 		);
 	}
@@ -215,7 +224,7 @@ export const MemberList = () => {
 		<AnimatePresence mode="wait">
 			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 text-paragraph-sm">
 				{/* Table Header */}
-				<div className="grid grid-cols-[1fr_100px_100px_80px] border-b border-stroke-soft-200 bg-bg-weak-50">
+				<div className="grid grid-cols-[1fr_100px_100px_80px] border-stroke-soft-200 border-b bg-bg-weak-50">
 					<div className="px-4 py-3 font-medium text-text-sub-600 text-xs uppercase tracking-wide">
 						Member
 					</div>
@@ -237,7 +246,7 @@ export const MemberList = () => {
 								key={member.id ? `member-${member.id}` : `member-idx-${index}`}
 								className={cn(
 									"group/row grid grid-cols-[1fr_100px_100px_80px] transition-colors",
-									"hover:bg-bg-weak-50/50"
+									"hover:bg-bg-weak-50/50",
 								)}
 							>
 								{/* Member Info Column */}
@@ -245,10 +254,13 @@ export const MemberList = () => {
 									<motion.div {...getAnimationProps(index + 1, 0)}>
 										<Avatar.Root size="40" color="gray">
 											{member.user.image ? (
-												<Avatar.Image src={member.user.image} alt={member.user.name || member.user.email} />
+												<Avatar.Image
+													src={member.user.image}
+													alt={member.user.name || member.user.email}
+												/>
 											) : (
 												<Avatar.Image asChild>
-													<div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-violet-500 to-purple-600 font-medium text-white text-sm">
+													<div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-violet-500 to-purple-600 font-medium text-sm text-white">
 														{getInitials(member.user.name, member.user.email)}
 													</div>
 												</Avatar.Image>
@@ -265,7 +277,12 @@ export const MemberList = () => {
 											</span>
 											{isOwner && (
 												<span className="text-amber-500">
-													<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+													<svg
+														width="14"
+														height="14"
+														viewBox="0 0 24 24"
+														fill="currentColor"
+													>
 														<path d="M5 16L3 8l5.5 5L12 4l3.5 9L21 8l-2 8H5z" />
 													</svg>
 												</span>
@@ -281,10 +298,12 @@ export const MemberList = () => {
 								<div className="flex items-center px-4 py-3">
 									<motion.div {...getAnimationProps(index + 1, 2)}>
 										{isOwner ? (
-											<span className={cn(
-												"rounded-full px-2.5 py-1 text-xs font-medium",
-												getRoleBadgeStyles(member.role)
-											)}>
+											<span
+												className={cn(
+													"rounded-full px-2.5 py-1 font-medium text-xs",
+													getRoleBadgeStyles(member.role),
+												)}
+											>
 												{formatRoleLabel(member.role)}
 											</span>
 										) : (

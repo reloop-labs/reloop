@@ -7,87 +7,84 @@ import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
 export async function updateProperty(
-  organizationId: string,
-  contactPropertyId: string,
-  body: { fallbackValue: string | null },
-  logger: Logger,
+	organizationId: string,
+	contactPropertyId: string,
+	body: { fallbackValue: string | null },
+	logger: Logger,
 ): Promise<PropertyTypes.PropertyResponse> {
-  logger.info(
-    {
-      contactPropertyId,
-      organizationId,
-      fallbackValue: body.fallbackValue,
-    },
-    "Updating property",
-  );
+	logger.info(
+		{
+			contactPropertyId,
+			organizationId,
+			fallbackValue: body.fallbackValue,
+		},
+		"Updating property",
+	);
 
-  try {
-    // Check if property exists and belongs to organization
-    const existingProperty = await db
-      .select()
-      .from(schema.contactProperty)
-      .where(
-        and(
-          eq(schema.contactProperty.id, contactPropertyId),
-          eq(schema.contactProperty.organizationId, organizationId),
-          isNull(schema.contactProperty.deletedAt),
-        ),
-      )
-      .limit(1);
+	try {
+		// Check if property exists and belongs to organization
+		const existingProperty = await db
+			.select()
+			.from(schema.contactProperty)
+			.where(
+				and(
+					eq(schema.contactProperty.id, contactPropertyId),
+					eq(schema.contactProperty.organizationId, organizationId),
+					isNull(schema.contactProperty.deletedAt),
+				),
+			)
+			.limit(1);
 
-    if (existingProperty.length === 0) {
-      logger.warn(
-        { contactPropertyId },
-        "Property not found",
-      );
-      throw status(404, { message: "Property not found" });
-    }
+		if (existingProperty.length === 0) {
+			logger.warn({ contactPropertyId }, "Property not found");
+			throw status(404, { message: "Property not found" });
+		}
 
-    // Update the fallback value
-    const [updatedProperty] = await db
-      .update(schema.contactProperty)
-      .set({
-        defaultValue: body.fallbackValue,
-        updatedAt: new Date(),
-      })
-      .where(eq(schema.contactProperty.id, contactPropertyId))
-      .returning();
+		// Update the fallback value
+		const [updatedProperty] = await db
+			.update(schema.contactProperty)
+			.set({
+				defaultValue: body.fallbackValue,
+				updatedAt: new Date(),
+			})
+			.where(eq(schema.contactProperty.id, contactPropertyId))
+			.returning();
 
-    if (!updatedProperty) {
-      logger.error(
-        { contactPropertyId },
-        "Failed to update property - no data returned",
-      );
-      throw status(500, { message: "Failed to update property" });
-    }
+		if (!updatedProperty) {
+			logger.error(
+				{ contactPropertyId },
+				"Failed to update property - no data returned",
+			);
+			throw status(500, { message: "Failed to update property" });
+		}
 
-    logger.info(
-      {
-        contactPropertyId,
-        fallbackValue: body.fallbackValue,
-      },
-      "Property updated successfully",
-    );
+		logger.info(
+			{
+				contactPropertyId,
+				fallbackValue: body.fallbackValue,
+			},
+			"Property updated successfully",
+		);
 
-    return formatPropertyResponse(updatedProperty);
-  } catch (error) {
-    logger.error(
-      {
-        contactPropertyId,
-        organizationId,
-        error: error instanceof Error ? error.message : String(error),
-      },
-      "Error updating property",
-    );
-    throw error;
-  }
+		return formatPropertyResponse(updatedProperty);
+	} catch (error) {
+		logger.error(
+			{
+				contactPropertyId,
+				organizationId,
+				error: error instanceof Error ? error.message : String(error),
+			},
+			"Error updating property",
+		);
+		throw error;
+	}
 }
 
 export async function updatePropertyHandler(
-  organizationId: string,
-  contactPropertyId: string,
-  body: { fallbackValue: string | null },
-  logger: Logger,
+	organizationId: string,
+	contactPropertyId: string,
+	body: { fallbackValue: string | null },
+	logger: Logger,
 ): Promise<PropertyTypes.PropertyResponse> {
-  return updateProperty(organizationId, contactPropertyId, body, logger);
+	return updateProperty(organizationId, contactPropertyId, body, logger);
 }

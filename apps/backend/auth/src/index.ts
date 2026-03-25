@@ -1,9 +1,9 @@
 import "dotenv/config";
-import { authConfig } from "./auth.config";
 import cors from "@elysiajs/cors";
 import { swagger } from "@elysiajs/swagger";
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
+import { authConfig } from "./auth.config";
 import { landing } from "./landing";
 import { auth, OpenAPI } from "./lib/auth";
 import { loader } from "./loader";

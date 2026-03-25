@@ -239,10 +239,10 @@ InputWrapper.displayName = INPUT_WRAPPER_NAME;
 const Input = React.forwardRef<
 	HTMLInputElement,
 	React.InputHTMLAttributes<HTMLInputElement> &
-	InputSharedProps & {
-		asChild?: boolean;
-		size?: "medium" | "small" | "xsmall";
-	}
+		InputSharedProps & {
+			asChild?: boolean;
+			size?: "medium" | "small" | "xsmall";
+		}
 >(
 	(
 		{ className, type = "text", size, hasError, asChild, ...rest },

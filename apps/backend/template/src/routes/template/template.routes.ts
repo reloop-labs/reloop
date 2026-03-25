@@ -7,11 +7,14 @@ import { listTemplatesRoute } from "@be/template/routes/template/routes/list-tem
 import { updateTemplateRoute } from "@be/template/routes/template/routes/update-template.route";
 import { Elysia } from "elysia";
 
-export const templateRoutes = new Elysia({ prefix: "/v1", name: "TemplateRoutes" })
-    .use(authMiddleware)
-    .use(createTemplateRoute)
-    .use(getTemplateRoute)
-    .use(listTemplatesRoute)
-    .use(updateTemplateRoute)
-    .use(deleteTemplateRoute)
-    .use(duplicateTemplateRoute);
+export const templateRoutes = new Elysia({
+	prefix: "/v1",
+	name: "TemplateRoutes",
+})
+	.use(authMiddleware)
+	.use(createTemplateRoute)
+	.use(getTemplateRoute)
+	.use(listTemplatesRoute)
+	.use(updateTemplateRoute)
+	.use(deleteTemplateRoute)
+	.use(duplicateTemplateRoute);

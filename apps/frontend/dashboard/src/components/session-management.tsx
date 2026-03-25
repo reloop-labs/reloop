@@ -1,5 +1,16 @@
 "use client";
 
+import {
+	Apple,
+	BraveBrowser,
+	Chrome,
+	Edge,
+	Firefox,
+	Opera,
+	Safari,
+	Ubuntu,
+	Windows,
+} from "@fe/dashboard/app/(protected)/[orgSlug]/settings/security/session-icons";
 import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
@@ -10,17 +21,6 @@ import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
-import {
-	Safari,
-	Chrome,
-	BraveBrowser,
-	Firefox,
-	Edge,
-	Opera,
-	Windows,
-	Apple,
-	Ubuntu,
-} from "@fe/dashboard/app/(protected)/[orgSlug]/settings/security/session-icons";
 
 interface Session {
 	id: string;
@@ -39,7 +39,8 @@ interface SessionManagementProps {
 
 // Parse user agent to extract browser, device type, and OS info
 const parseUserAgent = (userAgent: string | null | undefined) => {
-	if (!userAgent) return { browser: "Unknown", device: "Unknown", isMobile: false };
+	if (!userAgent)
+		return { browser: "Unknown", device: "Unknown", isMobile: false };
 
 	let browser = "Unknown";
 	let device = "Unknown";
@@ -108,7 +109,11 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 	const [terminatingAll, setTerminatingAll] = useState(false);
 	const { data: currentSession } = authClient.useSession();
 
-	const { data: sessions = [], isLoading: loading, mutate } = useSWR<Session[]>(
+	const {
+		data: sessions = [],
+		isLoading: loading,
+		mutate,
+	} = useSWR<Session[]>(
 		"active-sessions",
 		async () => {
 			const { data, error } = await authClient.listSessions();
@@ -122,7 +127,7 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 			onError: () => {
 				toast.error("Failed to load sessions");
 			},
-		}
+		},
 	);
 
 	const handleTerminateSession = async (token: string) => {
@@ -134,7 +139,10 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 				throw new Error(error.message || "Failed to terminate session");
 			}
 
-			mutate(sessions.filter((session) => session.token !== token), false);
+			mutate(
+				sessions.filter((session) => session.token !== token),
+				false,
+			);
 			toast.success("Session terminated successfully");
 		} catch (error) {
 			toast.error("Failed to terminate session");
@@ -154,8 +162,10 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 
 			// Keep only the current session
 			mutate(
-				sessions.filter((session) => session.token === currentSession?.session?.token),
-				false
+				sessions.filter(
+					(session) => session.token === currentSession?.session?.token,
+				),
+				false,
 			);
 			toast.success("All other sessions terminated successfully");
 		} catch (error) {
@@ -182,7 +192,9 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 			case "Brave":
 				return <BraveBrowser className={iconClass} />;
 			default:
-				return <Icon name="globe" className="h-full w-full text-text-sub-600" />;
+				return (
+					<Icon name="globe" className="h-full w-full text-text-sub-600" />
+				);
 		}
 	};
 
@@ -203,7 +215,9 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 			return <Icon name="server" className="h-full w-full text-text-sub-600" />;
 		}
 		if (deviceLower.includes("android")) {
-			return <Icon name="smartphone" className="h-full w-full text-text-sub-600" />;
+			return (
+				<Icon name="smartphone" className="h-full w-full text-text-sub-600" />
+			);
 		}
 		return <Icon name="laptop" className="h-full w-full text-text-sub-600" />;
 	};
@@ -252,9 +266,9 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 					</div>
 				</div>
 
-				<div className="w-full text-paragraph-sm rounded-xl border border-stroke-soft-100 overflow-hidden">
+				<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm">
 					{/* Table Header */}
-					<div className="grid grid-cols-[1fr_140px_140px_80px] items-center py-3.5 px-4 text-text-sub-600 border-b border-stroke-soft-100">
+					<div className="grid grid-cols-[1fr_140px_140px_80px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600">
 						<div className="flex items-center gap-2">
 							<Icon name="monitor" className="h-4 w-4" />
 							<span className="text-xs">Session</span>
@@ -275,7 +289,7 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 						{Array.from({ length: 3 }).map((_, index) => (
 							<div
 								key={`skeleton-${index}`}
-								className="grid grid-cols-[1fr_140px_140px_80px] py-2 px-4"
+								className="grid grid-cols-[1fr_140px_140px_80px] px-4 py-2"
 							>
 								{/* Session Info Column */}
 								<div className="flex items-center gap-3">
@@ -337,9 +351,9 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 			</div>
 
 			<AnimatePresence mode="wait">
-				<div className="w-full text-paragraph-sm rounded-xl border border-stroke-soft-100 overflow-hidden">
+				<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm">
 					{/* Table Header */}
-					<div className="grid grid-cols-[1fr_140px_140px_80px] items-center py-3.5 px-4 text-text-sub-600 border-b border-stroke-soft-100">
+					<div className="grid grid-cols-[1fr_140px_140px_80px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600">
 						<div className="flex items-center gap-2">
 							<Icon name="monitor" className="h-4 w-4" />
 							<span className="text-xs">Session</span>
@@ -358,15 +372,21 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 					{/* Table Body */}
 					<div className="divide-y divide-stroke-soft-100">
 						{sessions.map((session, index) => {
-							const { browser, device, isMobile } = parseUserAgent(session.userAgent);
+							const { browser, device, isMobile } = parseUserAgent(
+								session.userAgent,
+							);
 							const isCurrent = isCurrentSession(session);
 
 							return (
 								<div
-									key={session.id ? `session-${session.id}` : `session-idx-${index}`}
+									key={
+										session.id
+											? `session-${session.id}`
+											: `session-idx-${index}`
+									}
 									className={cn(
-										"group/row grid grid-cols-[1fr_140px_140px_80px] items-center py-2 px-4 transition-colors",
-										"hover:bg-bg-weak-50/50"
+										"group/row grid grid-cols-[1fr_140px_140px_80px] items-center px-4 py-2 transition-colors",
+										"hover:bg-bg-weak-50/50",
 									)}
 								>
 									{/* Session Info Column */}
@@ -395,7 +415,7 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 													</span>
 												)}
 											</div>
-											<span className="text-text-sub-600 text-[11px]">
+											<span className="text-[11px] text-text-sub-600">
 												{device} • {isMobile ? "Mobile" : "Desktop"}
 											</span>
 										</motion.div>
@@ -431,11 +451,15 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 													{terminatingSession === session.token ? (
 														<Spinner size={12} color="var(--text-sub-600)" />
 													) : (
-														<Button.Root variant="error" mode="lighter" size="xxsmall" className="text-xs">
+														<Button.Root
+															variant="error"
+															mode="lighter"
+															size="xxsmall"
+															className="text-xs"
+														>
 															Revoke
 														</Button.Root>
-													)
-													}
+													)}
 												</Button.Root>
 											</motion.div>
 										)}
@@ -454,7 +478,9 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 							transition={{ duration: 0.4, ease: [0.65, 0, 0.35, 1] }}
 						>
 							<Icon name="shield" className="mb-3 h-8 w-8 text-text-sub-600" />
-							<p className="font-medium text-text-strong-950">No active sessions</p>
+							<p className="font-medium text-text-strong-950">
+								No active sessions
+							</p>
 							<p className="text-sm text-text-sub-600">
 								Your session is the only active one.
 							</p>

@@ -22,4 +22,3 @@ const AppearancePage = () => {
 };
 
 export default AppearancePage;
-

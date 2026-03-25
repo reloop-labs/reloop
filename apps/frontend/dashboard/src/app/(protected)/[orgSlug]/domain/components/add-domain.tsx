@@ -77,8 +77,7 @@ export const AddDomainSidebar = () => {
 				</div>
 			</div>
 
-			<div className="my-6 gap-3">
-			</div>
+			<div className="my-6 gap-3"></div>
 			<div className="flex gap-6">
 				<form onSubmit={handleSubmit(onSubmit)} className="w-full space-y-3">
 					<div>
@@ -94,8 +93,7 @@ export const AddDomainSidebar = () => {
 								hasError={!!formState?.errors?.domain?.message}
 								className="w-full"
 							>
-								<Input.Affix className="bg-bg-white-0 text-text-strong-950
-">
+								<Input.Affix className="bg-bg-white-0 text-text-strong-950">
 									https://
 								</Input.Affix>
 								<Input.Wrapper>
@@ -133,7 +131,10 @@ export const AddDomainSidebar = () => {
 							) : (
 								<>
 									Add Domain
-									<Icon name="enter" className="w-4 h-4 border rounded-sm p-px border-stroke-soft-100/20" />
+									<Icon
+										name="enter"
+										className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+									/>
 								</>
 							)}
 						</Button.Root>
@@ -141,23 +142,23 @@ export const AddDomainSidebar = () => {
 				</form>
 				{/* Sticky Note Pro Tip */}
 				<div className="relative mt-10 mb-10 w-96">
-					<div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center">
+					<div className="-top-4 -translate-x-1/2 absolute left-1/2 z-10 flex flex-col items-center">
 						<div className="relative h-3 w-3 rounded-full bg-gradient-to-br from-neutral-500 via-neutral-600 to-neutral-700 shadow-lg">
 							<div className="absolute top-0.5 left-1 h-1.5 w-1.5 rounded-full bg-white/40" />
 						</div>
-						<div className="h-2 w-[2px] bg-gradient-to-b from-neutral-500 via-neutral-600 to-neutral-700 rounded-b-full" />
+						<div className="h-2 w-[2px] rounded-b-full bg-gradient-to-b from-neutral-500 via-neutral-600 to-neutral-700" />
 					</div>
 
 					<div className="relative rotate-2 rounded-lg border border-stroke-soft-200 bg-bg-weak-50/50 p-5 shadow-lg transition-transform duration-300 hover:rotate-0 hover:scale-[1.02]">
-
-						<div className="font-medium text-text-sub-600 text-xs uppercase tracking-wide flex items-center gap-1">
-							<Icon name="bulb" className="h-3 w-3" />Pro Tip
+						<div className="flex items-center gap-1 font-medium text-text-sub-600 text-xs uppercase tracking-wide">
+							<Icon name="bulb" className="h-3 w-3" />
+							Pro Tip
 						</div>
 						<p className="mt-2 font-medium text-text-strong-950 text-xs leading-relaxed">
 							Use separate domain for domain reputation
 						</p>
 						<div className="mt-3 text-text-sub-600 text-xs">
-							<p >Subdomain examples:</p>
+							<p>Subdomain examples:</p>
 							<ul className="mt-1 space-y-0.5 pl-3">
 								<li>• marketing.example.com</li>
 								<li>• send.example.com</li>

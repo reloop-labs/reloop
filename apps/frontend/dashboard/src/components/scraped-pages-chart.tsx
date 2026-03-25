@@ -1,16 +1,16 @@
 "use client";
 
 import * as Badge from "@reloop/ui/badge";
-import * as Select from "@reloop/ui/select";
 import { Icon } from "@reloop/ui/icon";
+import * as Select from "@reloop/ui/select";
 import React from "react";
 import {
 	Bar,
 	BarChart,
 	ResponsiveContainer,
 	Tooltip,
-	XAxis,
 	type TooltipProps,
+	XAxis,
 } from "recharts";
 
 interface ChartDataPoint {
@@ -69,7 +69,7 @@ const CustomTooltip = ({
 	if (active && payload && payload.length) {
 		return (
 			<div className="rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-3 py-2 shadow-regular-md">
-				<p className="text-label-xs text-text-sub-600 mb-2">{label}</p>
+				<p className="mb-2 text-label-xs text-text-sub-600">{label}</p>
 				{payload.map((entry, index) => (
 					<div key={index} className="flex items-center gap-2">
 						<div
@@ -103,9 +103,10 @@ const CustomGradientBar = (
 	const numericRadius = typeof radius === "number" ? radius : 4;
 
 	// Get fill color from chartConfig based on dataKey
-	const fillColor = dataKey && dataKey in chartConfig
-		? chartConfig[dataKey as keyof typeof chartConfig].color
-		: "var(--color-gray-400)";
+	const fillColor =
+		dataKey && dataKey in chartConfig
+			? chartConfig[dataKey as keyof typeof chartConfig].color
+			: "var(--color-gray-400)";
 
 	return (
 		<>
@@ -153,9 +154,8 @@ export const EmailStatsChart = ({
 	const totalEmails = totalSent + totalFailed + totalBounced;
 
 	// Calculate delivery rate
-	const deliveryRate = totalEmails > 0
-		? ((totalSent / totalEmails) * 100).toFixed(1)
-		: "0";
+	const deliveryRate =
+		totalEmails > 0 ? ((totalSent / totalEmails) * 100).toFixed(1) : "0";
 	const isGoodRate = Number(deliveryRate) >= 95;
 
 	return (
@@ -216,7 +216,10 @@ export const EmailStatsChart = ({
 			) : (
 				<div className="h-48">
 					<ResponsiveContainer width="100%" height="100%">
-						<BarChart data={data} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+						<BarChart
+							data={data}
+							margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
+						>
 							<XAxis
 								dataKey="date"
 								tickLine={false}

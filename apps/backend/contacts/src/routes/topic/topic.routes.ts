@@ -7,12 +7,12 @@ import { updateTopicRoute } from "@be/contacts/routes/topic/routes/update-topic.
 import { Elysia } from "elysia";
 
 export const topicRoutes = new Elysia({
-  prefix: "/v1/topics",
-  name: "TopicRoutes",
+	prefix: "/v1/topics",
+	name: "TopicRoutes",
 })
-  .use(authMiddleware)
-  .use(createTopicRoute)
-  .use(getTopicRoute)
-  .use(listTopicsRoute)
-  .use(updateTopicRoute)
-  .use(deleteTopicRoute);
+	.use(authMiddleware)
+	.use(createTopicRoute)
+	.use(getTopicRoute)
+	.use(listTopicsRoute)
+	.use(updateTopicRoute)
+	.use(deleteTopicRoute);

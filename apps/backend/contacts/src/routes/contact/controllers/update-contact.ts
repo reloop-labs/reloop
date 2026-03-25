@@ -149,4 +149,3 @@ export async function updateContactHandler(
 ): Promise<ContactTypes.ContactResponse> {
 	return updateContact(contactId, organizationId, body);
 }
-

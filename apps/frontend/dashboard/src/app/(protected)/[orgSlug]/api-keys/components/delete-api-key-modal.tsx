@@ -28,7 +28,10 @@ interface DeleteApiKeyModalProps {
 	onDeleteSuccess?: () => void;
 }
 
-export const DeleteApiKeyModal = ({ apiKeys, onDeleteSuccess }: DeleteApiKeyModalProps) => {
+export const DeleteApiKeyModal = ({
+	apiKeys,
+	onDeleteSuccess,
+}: DeleteApiKeyModalProps) => {
 	const [deleteId, setDeleteId] = useQueryState("delete");
 	const [confirmationName, setConfirmationName] = useState("");
 	const [isDeleting, setIsDeleting] = useState(false);
@@ -90,8 +93,11 @@ export const DeleteApiKeyModal = ({ apiKeys, onDeleteSuccess }: DeleteApiKeyModa
 			open={!!deleteId}
 			onOpenChange={(open) => !open && setDeleteId(null)}
 		>
-			<Modal.Content className="sm:max-w-[480px] p-0.5 border border-stroke-soft-100/50 rounded-2xl" showClose={true}>
-				<div className="border border-stroke-soft-100/50 rounded-2xl">
+			<Modal.Content
+				className="rounded-2xl border border-stroke-soft-100/50 p-0.5 sm:max-w-[480px]"
+				showClose={true}
+			>
+				<div className="rounded-2xl border border-stroke-soft-100/50">
 					<form
 						onSubmit={(e) => {
 							e.preventDefault();
@@ -107,18 +113,18 @@ export const DeleteApiKeyModal = ({ apiKeys, onDeleteSuccess }: DeleteApiKeyModa
 						</Modal.Header>
 						<Modal.Body className="space-y-4">
 							<div>
-								<p className="text-text-sub-600 text-sm">
+								<p className="text-sm text-text-sub-600">
 									Are you sure you want to delete this API key?
 								</p>
-								<p className="text-error-base text-sm font-medium">
+								<p className="font-medium text-error-base text-sm">
 									This action cannot be undone.
 								</p>
 							</div>
 
 							<div className="space-y-2">
-								<p className="text-text-strong-950 text-sm">
+								<p className="text-sm text-text-strong-950">
 									Type{" "}
-									<span className="inline-flex max-w-xs items-center gap-1 truncate rounded-md bg-bg-weak-50 border border-stroke-soft-200 px-2 py-1 font-mono text-text-strong-950 text-xs">
+									<span className="inline-flex max-w-xs items-center gap-1 truncate rounded-md border border-stroke-soft-200 bg-bg-weak-50 px-2 py-1 font-mono text-text-strong-950 text-xs">
 										{displayName}
 										<button
 											type="button"
@@ -131,7 +137,7 @@ export const DeleteApiKeyModal = ({ apiKeys, onDeleteSuccess }: DeleteApiKeyModa
 													toast.error("Failed to copy API key name");
 												}
 											}}
-											className="text-text-sub-600 hover:text-text-strong-950 transition-colors"
+											className="text-text-sub-600 transition-colors hover:text-text-strong-950"
 										>
 											<Icon
 												name={isNameCopied ? "check" : "copy"}
@@ -154,7 +160,7 @@ export const DeleteApiKeyModal = ({ apiKeys, onDeleteSuccess }: DeleteApiKeyModa
 								</Input.Root>
 							</div>
 						</Modal.Body>
-						<Modal.Footer className="justify-end gap-2 border-stroke-soft-100/50 mt-4">
+						<Modal.Footer className="mt-4 justify-end gap-2 border-stroke-soft-100/50">
 							<Button.Root
 								type="button"
 								variant="neutral"

@@ -29,7 +29,9 @@ const SettingsPage = () => {
 	const [isSaving, setIsSaving] = useState(false);
 	const [slugStatus, setSlugStatus] = useState<SlugStatus>("idle");
 	const fileInputRef = useRef<HTMLInputElement>(null);
-	const slugCheckTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const slugCheckTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+		null,
+	);
 
 	// Check if there are any changes
 	const hasChanges =
@@ -61,7 +63,9 @@ const SettingsPage = () => {
 		setSlugStatus("checking");
 		slugCheckTimeoutRef.current = setTimeout(async () => {
 			try {
-				const { data } = await authClient.organization.checkSlug({ slug: normalizedSlug });
+				const { data } = await authClient.organization.checkSlug({
+					slug: normalizedSlug,
+				});
 				setSlugStatus(data?.status ? "available" : "taken");
 			} catch {
 				setSlugStatus("error");

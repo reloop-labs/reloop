@@ -24,4 +24,3 @@ export const apiKeyRoutes = new Elysia({
 	.use(enableApiKeyRoute)
 	.use(disableApiKeyRoute)
 	.use(getUsageRoute);
-

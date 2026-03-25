@@ -139,7 +139,7 @@ const EyeDropperButton = React.forwardRef<
 	const state = React.useContext(ColorPickerStateContext)!;
 
 	// eslint-disable-next-line
-	// @ts-ignore
+	// @ts-expect-error
 	if (typeof EyeDropper === "undefined") {
 		return null;
 	}
@@ -150,7 +150,7 @@ const EyeDropperButton = React.forwardRef<
 			aria-label="Eye dropper"
 			onClick={() => {
 				// eslint-disable-next-line
-				// @ts-ignore
+				// @ts-expect-error
 				new EyeDropper()
 					.open()
 					.then((result: { sRGBHex: string }) =>

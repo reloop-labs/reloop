@@ -24,9 +24,10 @@ export const DNSRecordsSection = ({
 			<div className="mb-10">
 				<div className="mb-6 space-y-1">
 					<div className="font-medium text-sm text-text-strong-950">
-						DKIM and SPF <span className="text-text-sub-600 text-xs">(Required)</span>
+						DKIM and SPF{" "}
+						<span className="text-text-sub-600 text-xs">(Required)</span>
 					</div>
-					<div className="text-xs text-text-sub-600">
+					<div className="text-text-sub-600 text-xs">
 						Enable email signing and specify authorized senders.
 					</div>
 				</div>
@@ -44,9 +45,10 @@ export const DNSRecordsSection = ({
 			<div>
 				<div className="mb-6 space-y-1">
 					<div className="font-medium text-sm text-text-strong-950">
-						DMARC <span className="text-text-sub-600 text-xs">(Recommended)</span>
+						DMARC{" "}
+						<span className="text-text-sub-600 text-xs">(Recommended)</span>
 					</div>
-					<div className="text-xs text-text-sub-600">
+					<div className="text-text-sub-600 text-xs">
 						Set authentication policies and receive reports.
 					</div>
 				</div>
@@ -62,4 +64,3 @@ export const DNSRecordsSection = ({
 		</div>
 	);
 };
-

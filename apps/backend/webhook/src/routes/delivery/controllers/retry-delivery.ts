@@ -59,7 +59,6 @@ export async function retryDelivery(
 			})
 			.where(eq(schema.webhookDelivery.id, deliveryId));
 
-
 		logger.info(
 			{
 				deliveryId,

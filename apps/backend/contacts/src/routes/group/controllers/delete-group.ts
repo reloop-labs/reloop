@@ -5,70 +5,68 @@ import type { Logger } from "@reloop/logger";
 import { and, eq } from "drizzle-orm";
 
 export const deleteGroup = async ({
-  params,
-  activeOrganizationId,
-  logger,
+	params,
+	activeOrganizationId,
+	logger,
 }: {
-  params: { contact_group_id: string };
-  activeOrganizationId: string;
-  logger: Logger;
+	params: { contact_group_id: string };
+	activeOrganizationId: string;
+	logger: Logger;
 }): Promise<
-  | GroupModel.DeleteResponse
-  | GroupModel.GroupNotFound
-  | GroupModel.Unauthorized
+	GroupModel.DeleteResponse | GroupModel.GroupNotFound | GroupModel.Unauthorized
 > => {
-  const { contact_group_id } = params;
+	const { contact_group_id } = params;
 
-  logger.info(
-    { organizationId: activeOrganizationId, contact_group_id },
-    "Deleting group",
-  );
+	logger.info(
+		{ organizationId: activeOrganizationId, contact_group_id },
+		"Deleting group",
+	);
 
-  try {
-    const result = await db
-      .update(schema.group)
-      .set({
-        deletedAt: new Date(),
-        updatedAt: new Date(),
-      })
-      .where(
-        and(
-          eq(schema.group.id, contact_group_id),
-          eq(schema.group.organizationId, activeOrganizationId),
-        ),
-      );
+	try {
+		const result = await db
+			.update(schema.group)
+			.set({
+				deletedAt: new Date(),
+				updatedAt: new Date(),
+			})
+			.where(
+				and(
+					eq(schema.group.id, contact_group_id),
+					eq(schema.group.organizationId, activeOrganizationId),
+				),
+			);
 
-    if (result.rowCount === 0) {
-      logger.warn({ contact_group_id }, "Group not found for deletion");
-      return { message: "Group not found" };
-    }
+		if (result.rowCount === 0) {
+			logger.warn({ contact_group_id }, "Group not found for deletion");
+			return { message: "Group not found" };
+		}
 
-    logger.info({ contact_group_id }, "Group soft-deleted successfully");
-    return { object: "contact_group" as const, success: true };
-  } catch (error) {
-    logger.error(
-      {
-        contact_group_id,
-        organizationId: activeOrganizationId,
-        error: error instanceof Error ? error.message : String(error),
-      },
-      "Error deleting group",
-    );
-    throw error;
-  }
+		logger.info({ contact_group_id }, "Group soft-deleted successfully");
+		return { object: "contact_group" as const, success: true };
+	} catch (error) {
+		logger.error(
+			{
+				contact_group_id,
+				organizationId: activeOrganizationId,
+				error: error instanceof Error ? error.message : String(error),
+			},
+			"Error deleting group",
+		);
+		throw error;
+	}
 };
 
 export async function deleteGroupHandler(
-  params: {
-    organizationId: string;
-    contact_group_id: string;
-  },
-  logger: Logger,
+	params: {
+		organizationId: string;
+		contact_group_id: string;
+	},
+	logger: Logger,
 ): Promise<GroupModel.DeleteResponse> {
-  const result = await deleteGroup({
-    params: { contact_group_id: params.contact_group_id },
-    activeOrganizationId: params.organizationId,
-    logger,
-  });
-  return result as GroupModel.DeleteResponse;
+	const result = await deleteGroup({
+		params: { contact_group_id: params.contact_group_id },
+		activeOrganizationId: params.organizationId,
+		logger,
+	});
+	return result as GroupModel.DeleteResponse;
 }

@@ -3,34 +3,34 @@ import { db } from "@reloop/db/client";
 import { Elysia } from "elysia";
 
 export const rootRoute = new Elysia().get(
-  "/",
-  async () => {
-    let dbStatus = "UNKNOWN";
-    let dbError = "";
-    let redisStatus = "UNKNOWN";
-    let redisError = "";
+	"/",
+	async () => {
+		let dbStatus = "UNKNOWN";
+		let dbError = "";
+		let redisStatus = "UNKNOWN";
+		let redisError = "";
 
-    try {
-      await db.execute("SELECT 1 as test");
-      dbStatus = "CONNECTED";
-    } catch (dbErr) {
-      dbStatus = "DISCONNECTED";
-      dbError = dbErr instanceof Error ? dbErr.message : String(dbErr);
-    }
+		try {
+			await db.execute("SELECT 1 as test");
+			dbStatus = "CONNECTED";
+		} catch (dbErr) {
+			dbStatus = "DISCONNECTED";
+			dbError = dbErr instanceof Error ? dbErr.message : String(dbErr);
+		}
 
-    try {
-      await redis.healthCheck();
-      redisStatus = "CONNECTED";
-    } catch (redisErr) {
-      redisStatus = "DISCONNECTED";
-      redisError =
-        redisErr instanceof Error ? redisErr.message : String(redisErr);
-    }
+		try {
+			await redis.healthCheck();
+			redisStatus = "CONNECTED";
+		} catch (redisErr) {
+			redisStatus = "DISCONNECTED";
+			redisError =
+				redisErr instanceof Error ? redisErr.message : String(redisErr);
+		}
 
-    const dbStatusEmoji = dbStatus === "CONNECTED" ? "✅" : "❌";
-    const redisStatusEmoji = redisStatus === "CONNECTED" ? "✅" : "❌";
+		const dbStatusEmoji = dbStatus === "CONNECTED" ? "✅" : "❌";
+		const redisStatusEmoji = redisStatus === "CONNECTED" ? "✅" : "❌";
 
-    return `
+		return `
 ╔══════════════════════════════════════════════════════════════════════╗
 ║                        CONTACTS SERVICE                              ║
 ╠══════════════════════════════════════════════════════════════════════╣
@@ -74,12 +74,12 @@ export const rootRoute = new Elysia().get(
                 Made with ❤️ for developers
 
 `;
-  },
-  {
-    detail: {
-      tags: ["Health"],
-      summary: "Status",
-      description: "Checks the health of the Contacts Service",
-    },
-  },
+	},
+	{
+		detail: {
+			tags: ["Health"],
+			summary: "Status",
+			description: "Checks the health of the Contacts Service",
+		},
+	},
 );

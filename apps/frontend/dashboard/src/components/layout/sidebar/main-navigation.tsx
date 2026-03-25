@@ -74,10 +74,7 @@ export const MainNavigation: React.FC<MainNavigationProps> = ({
 				);
 			})}
 
-			<AnimatedHoverBackground
-				rect={currentRect}
-				tabElement={currentTab}
-			/>
+			<AnimatedHoverBackground rect={currentRect} tabElement={currentTab} />
 		</div>
 	);
 };

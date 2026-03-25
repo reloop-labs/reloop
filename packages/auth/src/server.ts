@@ -45,7 +45,7 @@ export const auth = betterAuth({
 				dev,
 				marketing,
 			},
-			sendInvitationEmail: async () => { },
+			sendInvitationEmail: async () => {},
 		}),
 		openAPI({ path: "/docs" }),
 	],

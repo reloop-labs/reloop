@@ -19,7 +19,7 @@ export const authMiddleware = new Elysia({ name: "better-auth" }).macro({
 					hasCookie: !!cookie,
 					cookieLength: cookie.length,
 				},
-				"Attempting authentication"
+				"Attempting authentication",
 			);
 
 			try {
@@ -36,13 +36,13 @@ export const authMiddleware = new Elysia({ name: "better-auth" }).macro({
 						status: response.status,
 						ok: response.ok,
 					},
-					"Auth service response"
+					"Auth service response",
 				);
 
 				if (!response.ok) {
 					logger.error(
 						{ status: response.status },
-						"Auth service returned error status"
+						"Auth service returned error status",
 					);
 					return status(401, { message: "Authentication failed" });
 				}
@@ -50,7 +50,6 @@ export const authMiddleware = new Elysia({ name: "better-auth" }).macro({
 				const session: Session | null = await response.json();
 
 				if (session?.user) {
-
 					return {
 						user: session.user,
 						session: session.session,
@@ -67,7 +66,7 @@ export const authMiddleware = new Elysia({ name: "better-auth" }).macro({
 						stack: error instanceof Error ? error.stack : undefined,
 						authUrl,
 					},
-					"Authentication error"
+					"Authentication error",
 				);
 				return status(401, { message: "Authentication failed" });
 			}

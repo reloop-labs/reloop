@@ -3,7 +3,7 @@
 import { TemplateList } from "./components/template-list";
 
 const TemplatesPage = () => {
-    return <TemplateList />;
+	return <TemplateList />;
 };
 
 export default TemplatesPage;

@@ -1,5 +1,5 @@
-import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
 import { formatApiKeyResponse } from "@reloop/api-key/routes/api-key/controllers/format-api-key-response";
+import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
@@ -12,7 +12,6 @@ export async function listApiKeys(
 ): Promise<ApiKeyTypes.ApiKeyListResponse> {
 	const { page = 1, limit = 10, enabled } = query;
 	const offset = (page - 1) * limit;
-
 
 	try {
 		const conditions = [eq(schema.apikey.organizationId, organizationId)];
@@ -34,7 +33,6 @@ export async function listApiKeys(
 			offset: offset,
 			with: { user: true },
 		});
-
 
 		return {
 			apiKeys: result.map((apiKey) => {

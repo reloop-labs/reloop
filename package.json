@@ -214,6 +214,5 @@
 		"docs",
 		"protobufjs"
 	],
-	"dependencies": {
-	}
+	"dependencies": {}
 }

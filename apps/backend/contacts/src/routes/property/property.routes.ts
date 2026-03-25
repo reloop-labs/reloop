@@ -6,11 +6,11 @@ import { updatePropertyRoute } from "@be/contacts/routes/property/routes/update-
 import { Elysia } from "elysia";
 
 export const propertyRoutes = new Elysia({
-  prefix: "/v1/properties",
-  name: "PropertyRoutes",
+	prefix: "/v1/properties",
+	name: "PropertyRoutes",
 })
-  .use(authMiddleware)
-  .use(createPropertyRoute)
-  .use(listPropertiesRoute)
-  .use(updatePropertyRoute)
-  .use(deletePropertyRoute);
+	.use(authMiddleware)
+	.use(createPropertyRoute)
+	.use(listPropertiesRoute)
+	.use(updatePropertyRoute)
+	.use(deletePropertyRoute);

@@ -90,4 +90,3 @@ ${redisError ? `║ REDIS ERROR: ${redisError.substring(0, 50).padEnd(50)} ║` 
 			};
 		}
 	});
-

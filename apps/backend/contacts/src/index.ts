@@ -3,7 +3,6 @@ import { contactsConfig } from "@be/contacts/contacts.config";
 import { contactRoutes } from "@be/contacts/routes/contact/contact.routes";
 import { groupRoutes } from "@be/contacts/routes/group/group.routes";
 
-
 import { landing } from "@be/contacts/routes/landing/landing.index";
 import { propertyRoutes } from "@be/contacts/routes/property/property.routes";
 import { topicRoutes } from "@be/contacts/routes/topic/topic.routes";
