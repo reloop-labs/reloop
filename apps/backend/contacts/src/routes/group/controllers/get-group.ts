@@ -12,7 +12,7 @@ export const getGroup = async ({
 }: {
   params: { contact_group_id: string };
   activeOrganizationId: string;
-  logger: any;
+  logger: Logger;
 }): Promise<
   | GroupTypes.GroupResponse
   | GroupModel.GroupNotFound

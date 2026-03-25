@@ -11,7 +11,7 @@ export const deleteGroup = async ({
 }: {
   params: { contact_group_id: string };
   activeOrganizationId: string;
-  logger: any;
+  logger: Logger;
 }): Promise<
   | GroupModel.DeleteResponse
   | GroupModel.GroupNotFound
@@ -44,7 +44,7 @@ export const deleteGroup = async ({
     }
 
     logger.info({ contact_group_id }, "Group soft-deleted successfully");
-    return { success: true };
+    return { object: "contact_group" as const, success: true };
   } catch (error) {
     logger.error(
       {
@@ -64,11 +64,11 @@ export async function deleteGroupHandler(
     contact_group_id: string;
   },
   logger: Logger,
-): Promise<{ success: boolean }> {
+): Promise<GroupModel.DeleteResponse> {
   const result = await deleteGroup({
     params: { contact_group_id: params.contact_group_id },
     activeOrganizationId: params.organizationId,
     logger,
   });
-  return result as { success: boolean };
+  return result as GroupModel.DeleteResponse;
 }

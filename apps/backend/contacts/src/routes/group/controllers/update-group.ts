@@ -16,7 +16,10 @@ export const updateGroup = async ({
   activeOrganizationId: string;
   logger: Logger;
 }): Promise<
-  GroupTypes.GroupResponse | GroupModel.GroupNotFound | GroupModel.Unauthorized
+  | GroupTypes.GroupResponse
+  | GroupModel.GroupNotFound
+  | GroupModel.GroupAlreadyExists
+  | GroupModel.Unauthorized
 > => {
   const { contact_group_id } = params;
   const { name } = body;
@@ -52,8 +55,8 @@ export const updateGroup = async ({
       if (nameConflict) {
         logger.warn({ name }, "Another group with this name already exists");
         return {
-          message: "Another group with this name already exists",
-        } as any;
+          message: "Group already exists",
+        };
       }
     }
 
@@ -67,7 +70,10 @@ export const updateGroup = async ({
       .returning();
 
     if (!updatedGroup) {
-      logger.error({ contact_group_id }, "Failed to update group - no data returned");
+      logger.error(
+        { contact_group_id },
+        "Failed to update group - no data returned",
+      );
       return { message: "Group not found" };
     }
 
@@ -86,7 +92,7 @@ export const updateGroup = async ({
     );
     throw error;
   }
-};
+}
 
 export async function updateGroupHandler(
   params: {

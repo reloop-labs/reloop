@@ -43,17 +43,9 @@ export const listGroups = async ({
 
 		const count = countResult[0]?.count ?? 0;
 
-		const groupResponses = groups.map(
-			(group) =>
-				({
-					...group,
-					object: "contact_group" as const,
-				}) as GroupTypes.GroupResponse,
-		);
-
 		return {
 			object: "contact_group" as const,
-			groups: groupResponses,
+			groups: groups as unknown as GroupTypes.GroupListItem[],
 			total: Number(count),
 			page,
 			limit,

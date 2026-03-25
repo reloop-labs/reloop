@@ -34,10 +34,13 @@ export namespace GroupModel {
 
   export type GroupResponse = typeof groupResponse.static;
 
+  export const groupListItem = t.Omit(groupResponse, ["object"]);
+  export type GroupListItem = typeof groupListItem.static;
+
   // Group List Response
   export const groupListResponse = t.Object({
     object: t.Literal("contact_group", { default: "contact_group" }),
-    groups: t.Array(groupResponse),
+    groups: t.Array(groupListItem),
     total: t.Number(),
     page: t.Number(),
     limit: t.Number(),
@@ -56,6 +59,7 @@ export namespace GroupModel {
 
   // Delete Response
   export const deleteResponse = t.Object({
+    object: t.Literal("contact_group", { default: "contact_group" }),
     success: t.Boolean(),
   });
 

@@ -13,9 +13,11 @@ export namespace GroupTypes {
     object: "contact_group";
   }
 
+  export interface GroupListItem extends Omit<GroupResponse, "object"> { }
+
   export interface GroupListResponse {
     object: "contact_group";
-    groups: GroupResponse[];
+    groups: GroupListItem[];
     total: number;
     page: number;
     limit: number;
