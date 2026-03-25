@@ -13,7 +13,7 @@ interface Topic {
 	name: string;
 	description: string | null;
 	organizationId: string;
-	autoEnroll?: "enrolled" | "unenrolled";
+	defaultSubscription?: "opt_in" | "opt_out";
 	visibility?: "private" | "public";
 	createdAt: string;
 	updatedAt: string;
@@ -34,8 +34,10 @@ interface TopicTableProps {
 }
 
 // Badge styles matching the "Admin"/"Member" style from the image
-const getEnrollmentBadgeStyle = (autoEnroll?: "enrolled" | "unenrolled") => {
-	if (autoEnroll === "enrolled") {
+const getEnrollmentBadgeStyle = (
+	defaultSubscription?: "opt_in" | "opt_out",
+) => {
+	if (defaultSubscription === "opt_in") {
 		return "text-success-base border-success-base/40 bg-success-base/5";
 	}
 	return "text-text-sub-600 border-stroke-soft-200 bg-bg-white-0";
@@ -85,7 +87,7 @@ export const TopicTable = ({
 		router.push(`/${activeOrganizationSlug}/contacts/topics/${topicId}`);
 	};
 
-	const handleDelete = (topicId: string) => {
+	const handleDelete = (_topicId: string) => {
 		// Topic deletion handled through query state in TopicList if needed
 	};
 
@@ -150,7 +152,7 @@ export const TopicTable = ({
 				) : (
 					topics.map((topic) => {
 						const isRowActive = activeDropdownId === topic.id;
-						const enrollmentValue = topic.autoEnroll || "unenrolled";
+						const enrollmentValue = topic.defaultSubscription || "opt_out";
 						const visibilityValue = topic.visibility || "private";
 
 						return (
@@ -179,12 +181,12 @@ export const TopicTable = ({
 									<span
 										className={cn(
 											"inline-flex items-center gap-1 rounded-md border px-2 py-0.5 font-medium text-[11px] capitalize",
-											getEnrollmentBadgeStyle(topic.autoEnroll),
+											getEnrollmentBadgeStyle(topic.defaultSubscription),
 										)}
 									>
 										<Icon
 											name={
-												topic.autoEnroll === "enrolled"
+												topic.defaultSubscription === "opt_in"
 													? "user-plus"
 													: "user-minus"
 											}

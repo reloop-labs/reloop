@@ -34,7 +34,7 @@ export async function unenrollContact(
 
     if (!existingEnrollment) {
       // No existing enrollment - create one with unenrolled status
-      // This handles the case where a contact is implicitly enrolled via topic's autoEnroll setting
+      // This handles the case where a contact is implicitly enrolled via topic's defaultSubscription setting
       const [newEnrollment] = await db
         .insert(schema.topicSubscription)
         .values({

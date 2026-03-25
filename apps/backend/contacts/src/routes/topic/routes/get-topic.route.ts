@@ -32,7 +32,7 @@ export const getTopicRoute = new Elysia().use(authMiddleware).get(
                 id: "topic_123456789",
                 name: "Newsletter",
                 description: "Monthly newsletter subscribers",
-                autoEnroll: "enrolled",
+                defaultSubscription: "opt_in",
                 visibility: "public",
                 organizationId: "org_123456789",
                 createdAt: "2026-03-24T10:00:00Z",

@@ -22,6 +22,11 @@ export const enrollmentStatusEnum = pgEnum("enrollment_status", [
   "unenrolled",
 ]);
 
+export const defaultSubscriptionEnum = pgEnum("default_subscription", [
+  "opt_in",
+  "opt_out",
+]);
+
 
 export const createTopicEnrollmentId = () => `enr_${createId()}`
 export const createTopicId = () => `tpc_${createId()}`;
@@ -38,7 +43,7 @@ export const topic = pgTable(
       .notNull()
       .references(() => organization.id, { onDelete: "cascade" }),
     visibility: visibilityEnum("visibility").notNull().default("private"),
-    autoEnroll: enrollmentStatusEnum("enrollment_status").notNull().default("enrolled"),
+    defaultSubscription: defaultSubscriptionEnum("default_subscription").notNull().default("opt_in"),
 
     userId: text("user_id")
       .notNull()

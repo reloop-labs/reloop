@@ -19,7 +19,7 @@ interface Topic {
 	id: string;
 	name: string;
 	description: string | null;
-	autoEnroll?: "enrolled" | "unenrolled";
+	defaultSubscription?: "opt_in" | "opt_out";
 	visibility?: "private" | "public";
 }
 
@@ -216,7 +216,7 @@ export const EditTopicModal = ({
 
 							{/* Settings Section */}
 							<div className="mt-2 space-y-3">
-								{/* Auto Enroll Toggle (Read-only) */}
+								{/* Default Subscription Toggle (Read-only) */}
 								<div className="flex items-center justify-between rounded-xl border border-stroke-soft-200 p-3 opacity-60">
 									<div className="flex items-center gap-3">
 										<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-bg-weak-50">
@@ -228,7 +228,7 @@ export const EditTopicModal = ({
 										<div>
 											<div className="flex items-center gap-1">
 												<p className="font-medium text-paragraph-sm text-text-strong-950">
-													Auto Enroll Contacts
+													Default Subscription
 												</p>
 												<Tooltip.Root>
 													<Tooltip.Trigger asChild>
@@ -247,14 +247,12 @@ export const EditTopicModal = ({
 													>
 														<div className="space-y-2">
 															<p className="text-paragraph-xs">
-																<span className="font-semibold">Enrolled:</span>{" "}
+																<span className="font-semibold">Opt In:</span>{" "}
 																All new contacts are automatically added to this
 																topic.
 															</p>
 															<p className="text-paragraph-xs">
-																<span className="font-semibold">
-																	Unenrolled:
-																</span>{" "}
+																<span className="font-semibold">Opt Out:</span>{" "}
 																Contacts must be added manually to this topic.
 															</p>
 														</div>
@@ -262,14 +260,14 @@ export const EditTopicModal = ({
 												</Tooltip.Root>
 											</div>
 											<p className="text-paragraph-xs text-text-sub-600">
-												{topic?.autoEnroll === "enrolled"
+												{topic?.defaultSubscription === "opt_in"
 													? "New contacts are automatically enrolled"
 													: "Contacts must be manually enrolled"}
 											</p>
 										</div>
 									</div>
 									<Switch.Root
-										checked={topic?.autoEnroll === "enrolled"}
+										checked={topic?.defaultSubscription === "opt_in"}
 										disabled={true}
 										checkedColor="#22c55e"
 									/>

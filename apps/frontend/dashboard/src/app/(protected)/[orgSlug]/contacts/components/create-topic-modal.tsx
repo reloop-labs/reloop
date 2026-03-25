@@ -32,9 +32,9 @@ export const CreateTopicModal = ({
 	const [name, setName] = useState("");
 	const [description, setDescription] = useState("");
 	const [nameError, setNameError] = useState<string | null>(null);
-	const [autoEnroll, setAutoEnroll] = useState<"enrolled" | "unenrolled">(
-		"enrolled",
-	);
+	const [defaultSubscription, setDefaultSubscription] = useState<
+		"opt_in" | "opt_out"
+	>("opt_in");
 	const [visibility, setVisibility] = useState<"private" | "public">("private");
 	const formRef = useRef<HTMLFormElement>(null);
 
@@ -47,7 +47,7 @@ export const CreateTopicModal = ({
 			setName("");
 			setDescription("");
 			setNameError(null);
-			setAutoEnroll("enrolled");
+			setDefaultSubscription("opt_in");
 			setVisibility("private");
 		}
 		onOpenChange(isOpen);
@@ -84,7 +84,7 @@ export const CreateTopicModal = ({
 					{
 						name: name.trim(),
 						description: description.trim() || undefined,
-						autoEnroll,
+						defaultSubscription,
 						visibility,
 					},
 					{ headers: { credentials: "include" } },
@@ -110,7 +110,7 @@ export const CreateTopicModal = ({
 		[
 			name,
 			description,
-			autoEnroll,
+			defaultSubscription,
 			visibility,
 			isDescriptionOverLimit,
 			mutate,
@@ -216,7 +216,7 @@ export const CreateTopicModal = ({
 
 							{/* Settings Section */}
 							<div className="mt-2 space-y-3">
-								{/* Auto Enroll Toggle */}
+								{/* Default Subscription Toggle */}
 								<div className="flex items-center justify-between rounded-xl border border-stroke-soft-200 p-3">
 									<div className="flex items-center gap-3">
 										<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-bg-weak-50">
@@ -228,7 +228,7 @@ export const CreateTopicModal = ({
 										<div>
 											<div className="flex items-center gap-1">
 												<p className="font-medium text-paragraph-sm text-text-strong-950">
-													Auto Enroll Contacts
+													Default Subscription
 												</p>
 												<Tooltip.Root>
 													<Tooltip.Trigger asChild>
@@ -250,14 +250,12 @@ export const CreateTopicModal = ({
 													>
 														<div className="space-y-2">
 															<p className="text-paragraph-xs">
-																<span className="font-semibold">Enrolled:</span>{" "}
+																<span className="font-semibold">Opt In:</span>{" "}
 																All new contacts are automatically added to this
 																topic.
 															</p>
 															<p className="text-paragraph-xs">
-																<span className="font-semibold">
-																	Unenrolled:
-																</span>{" "}
+																<span className="font-semibold">Opt Out:</span>{" "}
 																Contacts must be added manually to this topic.
 															</p>
 														</div>
@@ -265,16 +263,16 @@ export const CreateTopicModal = ({
 												</Tooltip.Root>
 											</div>
 											<p className="text-paragraph-xs text-text-sub-600">
-												{autoEnroll === "enrolled"
+												{defaultSubscription === "opt_in"
 													? "New contacts are automatically enrolled"
 													: "Contacts must be manually enrolled"}
 											</p>
 										</div>
 									</div>
 									<Switch.Root
-										checked={autoEnroll === "enrolled"}
+										checked={defaultSubscription === "opt_in"}
 										onCheckedChange={(checked) =>
-											setAutoEnroll(checked ? "enrolled" : "unenrolled")
+											setDefaultSubscription(checked ? "opt_in" : "opt_out")
 										}
 										disabled={isCreating}
 										checkedColor="orange"

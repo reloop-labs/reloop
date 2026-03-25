@@ -25,6 +25,7 @@ interface ContactData {
 	firstName: string | null;
 	lastName: string | null;
 	status: string;
+	properties?: Record<string, string | number>;
 	organizationId: string;
 	createdAt: string;
 	updatedAt: string;
@@ -475,7 +476,7 @@ export const ContactHeader = ({
 				<EditContactModal
 					open={isEditModalOpen}
 					onOpenChange={setIsEditModalOpen}
-					contact={contact}
+					contact={{ ...contact, properties: contact.properties ?? {} }}
 				/>
 			)}
 
@@ -484,7 +485,7 @@ export const ContactHeader = ({
 				<DeleteContactModal
 					open={isDeleteModalOpen}
 					onOpenChange={setIsDeleteModalOpen}
-					contact={contact}
+					contact={{ ...contact, properties: contact.properties ?? {} }}
 					onDeleteSuccess={handleDeleteSuccess}
 				/>
 			)}

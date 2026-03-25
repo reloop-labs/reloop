@@ -34,7 +34,7 @@ interface Property {
 interface Topic {
 	id: string;
 	name: string;
-	autoEnroll: "enrolled" | "unenrolled";
+	defaultSubscription: "opt_in" | "opt_out";
 }
 
 interface TopicEnrollment {
@@ -109,7 +109,7 @@ const ContactDetailPage = () => {
 
 	// Build enrolled topics array
 	// Logic: A contact is enrolled in a topic if:
-	// 1. Topic has autoEnroll="enrolled" AND there's no explicit "unenrolled" record for this contact
+	// 1. Topic has defaultSubscription="opt_in" AND there's no explicit "unenrolled" record for this contact
 	// 2. OR there's an explicit "enrolled" record for this contact
 	const enrolledTopics = (() => {
 		if (!allTopicsData?.topics) return [];
@@ -131,8 +131,8 @@ const ContactDetailPage = () => {
 					return explicitStatus === "enrolled";
 				}
 
-				// No explicit record - use topic's autoEnroll setting
-				return topic.autoEnroll === "enrolled";
+				// No explicit record - use topic's defaultSubscription setting
+				return topic.defaultSubscription === "opt_in";
 			})
 			.map((topic) => ({ id: topic.id, name: topic.name }));
 	})();

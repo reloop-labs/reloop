@@ -6,14 +6,14 @@ import { Elysia } from "elysia";
 export const createTopicRoute = new Elysia().use(authMiddleware).post(
   "/create",
   async ({ body, activeOrganizationId, userId, logger }) => {
-    const { name, description, autoEnroll, visibility } = body;
+    const { name, description, defaultSubscription, visibility } = body;
     return await createTopicHandler(
       {
         organizationId: activeOrganizationId as string,
         userId,
         name,
         description,
-        autoEnroll,
+        defaultSubscription,
         visibility,
       },
       logger,
@@ -41,7 +41,7 @@ export const createTopicRoute = new Elysia().use(authMiddleware).post(
                 id: "topic_123456789",
                 name: "Newsletter",
                 description: "Monthly newsletter subscribers",
-                autoEnroll: "enrolled",
+                defaultSubscription: "opt_in",
                 visibility: "public",
                 organizationId: "org_123456789",
                 createdAt: "2026-03-24T10:00:00Z",

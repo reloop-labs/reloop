@@ -40,7 +40,7 @@ interface PropertyValue {
 interface Topic {
 	id: string;
 	name: string;
-	autoEnroll: "enrolled" | "unenrolled";
+	defaultSubscription: "opt_in" | "opt_out";
 }
 
 interface TopicEnrollment {
@@ -88,9 +88,7 @@ export const EditContactModal = ({
 	const { data: contactPropsData } = useSWR<{
 		propertyValues: PropertyValue[];
 	}>(
-		open && contact
-			? `/api/contacts/${contact.id}/properties`
-			: null,
+		open && contact ? `/api/contacts/${contact.id}/properties` : null,
 		fetcher,
 	);
 
@@ -114,9 +112,9 @@ export const EditContactModal = ({
 	// All available topics
 	const allTopics = allTopicsData?.topics || [];
 
-	// Calculate enrolled topic IDs based on autoEnroll logic
+	// Calculate enrolled topic IDs based on defaultSubscription logic
 	// Logic: A contact is enrolled in a topic if:
-	// 1. Topic has autoEnroll="enrolled" AND there's no explicit "unenrolled" record
+	// 1. Topic has defaultSubscription="opt_in" AND there's no explicit "unenrolled" record
 	// 2. OR there's an explicit "enrolled" record
 	const enrolledTopicIds = (() => {
 		if (!allTopics.length) return [];
@@ -138,8 +136,8 @@ export const EditContactModal = ({
 					return explicitStatus === "enrolled";
 				}
 
-				// No explicit record - use topic's autoEnroll setting
-				return topic.autoEnroll === "enrolled";
+				// No explicit record - use topic's defaultSubscription setting
+				return topic.defaultSubscription === "opt_in";
 			})
 			.map((topic) => topic.id);
 	})();
@@ -506,7 +504,7 @@ export const EditContactModal = ({
 														className="h-3 w-3 text-text-sub-600"
 													/>
 													{topic.name}
-													{topic.autoEnroll === "unenrolled" && (
+													{topic.defaultSubscription === "opt_out" && (
 														<span className="ml-auto text-paragraph-xs text-text-soft-400">
 															Opt-out
 														</span>

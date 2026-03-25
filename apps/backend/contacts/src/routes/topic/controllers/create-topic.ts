@@ -11,12 +11,12 @@ export async function createTopic(
     userId: string;
     name: string;
     description?: string;
-    autoEnroll?: "enrolled" | "unenrolled";
+    defaultSubscription?: "opt_in" | "opt_out";
     visibility?: "private" | "public";
   },
   logger: Logger,
 ): Promise<TopicTypes.TopicResponse> {
-  const { organizationId, userId, name, description, autoEnroll, visibility } = params;
+  const { organizationId, userId, name, description, defaultSubscription, visibility } = params;
   logger.info({ organizationId, name }, "Creating topic");
   try {
     // Check if topic with same name already exists
@@ -40,7 +40,7 @@ export async function createTopic(
         description: description ?? null,
         organizationId,
         userId,
-        autoEnroll: autoEnroll ?? "enrolled",
+        defaultSubscription: defaultSubscription ?? "opt_in",
         visibility: visibility ?? "private",
       })
       .returning();
@@ -72,7 +72,7 @@ export async function createTopicHandler(
     userId: string;
     name: string;
     description?: string;
-    autoEnroll?: "enrolled" | "unenrolled";
+    defaultSubscription?: "opt_in" | "opt_out";
     visibility?: "private" | "public";
   },
   logger: Logger,

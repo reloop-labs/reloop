@@ -11,12 +11,12 @@ export async function updateTopic(
     organizationId: string;
     name?: string;
     description?: string;
-    autoEnroll?: "enrolled" | "unenrolled";
+    defaultSubscription?: "opt_in" | "opt_out";
     visibility?: "private" | "public";
   },
   logger: Logger,
 ): Promise<TopicTypes.TopicResponse> {
-  const { contactTopicId, organizationId, name, description, autoEnroll, visibility } = params;
+  const { contactTopicId, organizationId, name, description, defaultSubscription, visibility } = params;
   logger.info({ contactTopicId, organizationId }, "Updating topic");
 
   try {
@@ -55,7 +55,7 @@ export async function updateTopic(
       .set({
         ...(name && { name }),
         ...(description !== undefined && { description }),
-        ...(autoEnroll && { autoEnroll }),
+        ...(defaultSubscription && { defaultSubscription }),
         ...(visibility && { visibility }),
         updatedAt: new Date(),
       })
@@ -88,7 +88,7 @@ export async function updateTopicHandler(
     organizationId: string;
     name?: string;
     description?: string;
-    autoEnroll?: "enrolled" | "unenrolled";
+    defaultSubscription?: "opt_in" | "opt_out";
     visibility?: "private" | "public";
   },
   logger: Logger,

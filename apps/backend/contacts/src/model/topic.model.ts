@@ -14,10 +14,10 @@ export namespace TopicModel {
         description: "Topic description",
       }),
     ),
-    autoEnroll: t.Optional(
-      t.Union([t.Literal("enrolled"), t.Literal("unenrolled")], {
-        default: "enrolled",
-        description: "Auto enroll setting - enrolled means all contacts are automatically enrolled",
+    defaultSubscription: t.Optional(
+      t.Union([t.Literal("opt_in"), t.Literal("opt_out")], {
+        default: "opt_in",
+        description: "Default subscription setting",
       }),
     ),
     visibility: t.Optional(
@@ -48,9 +48,9 @@ export namespace TopicModel {
         t.Null(),
       ]),
     ),
-    autoEnroll: t.Optional(
-      t.Union([t.Literal("enrolled"), t.Literal("unenrolled")], {
-        description: "Auto enroll setting - enrolled means all contacts are automatically enrolled",
+    defaultSubscription: t.Optional(
+      t.Union([t.Literal("opt_in"), t.Literal("opt_out")], {
+        description: "Default subscription setting",
       }),
     ),
     visibility: t.Optional(
@@ -70,8 +70,8 @@ export namespace TopicModel {
     description: t.Union([t.String(), t.Null()], {
       description: "Topic description",
     }),
-    autoEnroll: t.Union([t.Literal("enrolled"), t.Literal("unenrolled")], {
-      description: "Auto enroll setting - enrolled means all contacts are automatically enrolled",
+    defaultSubscription: t.Union([t.Literal("opt_in"), t.Literal("opt_out")], {
+      description: "Default subscription setting",
     }),
     visibility: t.Union([t.Literal("private"), t.Literal("public")], {
       description: "Visibility setting - whether the topic is visible to everyone or just the team",

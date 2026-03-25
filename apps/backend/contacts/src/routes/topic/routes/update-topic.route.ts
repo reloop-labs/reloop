@@ -6,14 +6,14 @@ import { Elysia, t } from "elysia";
 export const updateTopicRoute = new Elysia().use(authMiddleware).patch(
   "/:topic_id",
   async ({ params, body, activeOrganizationId, logger }) => {
-    const { name, description, autoEnroll, visibility } = body;
+    const { name, description, defaultSubscription, visibility } = body;
     return await updateTopicHandler(
       {
         contactTopicId: params.topic_id,
         organizationId: activeOrganizationId as string,
         name,
         description: description ?? undefined,
-        autoEnroll,
+        defaultSubscription,
         visibility,
       },
       logger,
@@ -45,7 +45,7 @@ export const updateTopicRoute = new Elysia().use(authMiddleware).patch(
                 id: "topic_123456789",
                 name: "Updated Newsletter",
                 description: "Monthly newsletter subscribers",
-                autoEnroll: "enrolled",
+                defaultSubscription: "opt_in",
                 visibility: "public",
                 organizationId: "org_123456789",
                 createdAt: "2026-03-24T10:00:00Z",

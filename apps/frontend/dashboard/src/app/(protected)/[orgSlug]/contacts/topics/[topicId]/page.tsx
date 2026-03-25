@@ -3,7 +3,7 @@ import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Select from "@reloop/ui/select";
-import Spinner from "@reloop/ui/spinner";
+
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import useSWR, { useSWRConfig } from "swr";
@@ -72,7 +72,7 @@ const TopicDetailPage = () => {
 		<>
 			{subscriptionData?.subscriptions &&
 			subscriptionData.subscriptions.length === 0 ? (
-				<EmptyState />
+				<EmptyState onAddContact={() => {}} />
 			) : (
 				<div>
 					<div className="mb-6 flex items-center justify-between gap-3">
