@@ -8,7 +8,7 @@ export async function deleteProperty(
   organizationId: string,
   contactPropertyId: string,
   logger: Logger,
-): Promise<{ success: boolean }> {
+): Promise<{ object: "contact_property"; success: boolean }> {
   logger.info(
     {
       contactPropertyId,
@@ -48,7 +48,7 @@ export async function deleteProperty(
       "Property deleted successfully",
     );
 
-    return { success: true };
+    return { object: "contact_property" as const, success: true };
   } catch (error) {
     logger.error(
       {
@@ -66,6 +66,6 @@ export async function deletePropertyHandler(
   organizationId: string,
   contactPropertyId: string,
   logger: Logger,
-): Promise<{ success: boolean }> {
+): Promise<{ object: "contact_property"; success: boolean }> {
   return deleteProperty(organizationId, contactPropertyId, logger);
 }

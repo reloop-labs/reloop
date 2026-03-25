@@ -88,9 +88,12 @@ export namespace ContactModel {
 
   export type ContactResponse = typeof contactResponse.static;
 
+  export const contactListItem = t.Omit(contactResponse, ["object"]);
+  export type ContactListItem = typeof contactListItem.static;
+
   export const contactListResponse = t.Object({
     object: t.Literal("contact", { default: "contact" }),
-    contacts: t.Array(contactResponse),
+    contacts: t.Array(contactListItem),
     total: t.Number(),
     page: t.Number(),
     limit: t.Number(),

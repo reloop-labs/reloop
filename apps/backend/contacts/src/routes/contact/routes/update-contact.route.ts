@@ -22,7 +22,7 @@ export const updateContactRoute = new Elysia().use(authMiddleware).patch(
 		},
 		detail: {
 			tags: ["Contact"],
-			summary: "Update A Contact",
+			summary: "Update Contact",
 			description: "Updates an existing contact's information",
 		},
 	},

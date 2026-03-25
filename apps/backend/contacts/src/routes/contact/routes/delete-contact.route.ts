@@ -22,7 +22,7 @@ export const deleteContactRoute = new Elysia().use(authMiddleware).delete(
 		},
 		detail: {
 			tags: ["Contact"],
-			summary: "Delete A Contact",
+			summary: "Delete Contact",
 			description: "Removes a contact from the organization",
 		},
 	},

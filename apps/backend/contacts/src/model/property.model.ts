@@ -46,22 +46,25 @@ export namespace PropertyModel {
   export type UpdatePropertyBody = typeof updatePropertyBody.static;
 
   export const propertyResponse = t.Object({
+    object: t.Literal("contact_property", { default: "contact_property" }),
     id: t.String({ description: "Unique property identifier" }),
     name: t.String({ description: "Property name" }),
     type: t.String({ description: "Property type (string or number)" }),
     fallbackValue: t.Union([t.String(), t.Null()], {
       description: "Fallback value",
     }),
-    organizationId: t.String({ description: "Organization ID" }),
     createdAt: t.Date(),
     updatedAt: t.Date(),
-    deletedAt: t.Union([t.Date(), t.Null()]),
   });
 
   export type PropertyResponse = typeof propertyResponse.static;
 
+  export const propertyListItem = t.Omit(propertyResponse, ["object"]);
+  export type PropertyListItem = typeof propertyListItem.static;
+
   export const propertyListResponse = t.Object({
-    properties: t.Array(propertyResponse),
+    object: t.Literal("contact_property", { default: "contact_property" }),
+    properties: t.Array(propertyListItem),
     total: t.Number(),
     page: t.Number(),
     limit: t.Number(),
@@ -85,6 +88,7 @@ export namespace PropertyModel {
 
   // Delete Response
   export const deleteResponse = t.Object({
+    object: t.Literal("contact_property", { default: "contact_property" }),
     success: t.Boolean(),
   });
 

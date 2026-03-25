@@ -69,6 +69,7 @@ export async function listProperties(
     );
 
     return {
+      object: "contact_property" as const,
       properties: formattedProperties,
       total,
       page,
