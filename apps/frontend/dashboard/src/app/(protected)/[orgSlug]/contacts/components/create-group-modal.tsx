@@ -4,7 +4,9 @@ import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
+import Spinner from "@reloop/ui/spinner";
 import { useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
 
@@ -21,6 +23,19 @@ export const CreateGroupModal = ({
 	const [name, setName] = useState("");
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
+	// Command/Ctrl + Enter to submit
+	useHotkeys(
+		"mod+enter",
+		(e) => {
+			e.preventDefault();
+			if (open && !isSubmitting && name.trim()) {
+				handleSubmit();
+			}
+		},
+		{ enableOnFormTags: true, enabled: open },
+		[open, isSubmitting, name],
+	);
+
 	const handleClose = (isOpen: boolean) => {
 		if (!isOpen) {
 			setName("");
@@ -28,8 +43,8 @@ export const CreateGroupModal = ({
 		onOpenChange(isOpen);
 	};
 
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
+	const handleSubmit = async (e?: React.FormEvent) => {
+		e?.preventDefault();
 		if (!name.trim()) return;
 
 		setIsSubmitting(true);
@@ -68,11 +83,14 @@ export const CreateGroupModal = ({
 			>
 				<div className="rounded-2xl border border-stroke-soft-100/50">
 					<Modal.Header className="before:border-stroke-soft-200/50">
+						<div className="flex items-center justify-center">
+							<Icon name="modules" className="h-4 w-4" />
+						</div>
 						<div className="flex-1">
 							<Modal.Title>Create Group</Modal.Title>
-							<Modal.Description>
+							<p className="mt-0.5 text-paragraph-xs text-text-sub-600">
 								Create a new group to organize your contacts.
-							</Modal.Description>
+							</p>
 						</div>
 					</Modal.Header>
 					<form onSubmit={handleSubmit} className="flex flex-col">
@@ -98,24 +116,31 @@ export const CreateGroupModal = ({
 						</Modal.Body>
 						<Modal.Footer className="mt-4 justify-end border-stroke-soft-100/50">
 							<Button.Root
-								type="button"
-								variant="neutral"
-								mode="stroke"
-								onClick={() => handleClose(false)}
-								disabled={isSubmitting}
-							>
-								Cancel
-							</Button.Root>
-							<Button.Root
 								type="submit"
+								variant="neutral"
+								size="xsmall"
 								disabled={isSubmitting || !name.trim()}
 							>
 								{isSubmitting ? (
-									<Icon name="loader" className="mr-2 h-4 w-4 animate-spin" />
+									<>
+										<Spinner size={14} color="currentColor" />
+										Creating...
+									</>
 								) : (
-									<Icon name="plus" className="mr-2 h-4 w-4" />
+									<>
+										Create Group
+										<span className="inline-flex items-center gap-0.5">
+											<Icon
+												name="command"
+												className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+											/>
+											<Icon
+												name="enter"
+												className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+											/>
+										</span>
+									</>
 								)}
-								Create Group
 							</Button.Root>
 						</Modal.Footer>
 					</form>
