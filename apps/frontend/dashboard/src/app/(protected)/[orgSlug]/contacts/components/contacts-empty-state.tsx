@@ -24,7 +24,7 @@ export const ContactsEmptyState = ({
 			</p>
 			<Button.Root variant="neutral" size="xsmall" onClick={onAddContact}>
 				<Icon name="plus" className="h-4 w-4" />
-				Add your first contact
+				Add Your First Contact
 			</Button.Root>
 			<a
 				href="https://reloop.sh/docs/contacts"

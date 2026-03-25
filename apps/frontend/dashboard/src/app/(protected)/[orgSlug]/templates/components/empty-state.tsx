@@ -60,7 +60,7 @@ export const EmptyState = ({ orgSlug }: EmptyStateProps) => {
 				) : (
 					<Icon name="plus" className="h-4 w-4" />
 				)}
-				{isCreating ? "Creating..." : "Create your first template"}
+				{isCreating ? "Creating..." : "Create Your First Template"}
 			</Button.Root>
 			<a
 				href="https://reloop.sh/docs/templates"

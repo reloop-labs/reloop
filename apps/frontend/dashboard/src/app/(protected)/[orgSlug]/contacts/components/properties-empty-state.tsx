@@ -21,7 +21,7 @@ export const PropertiesEmptyState = ({
 			</p>
 			<Button.Root variant="neutral" size="xsmall" onClick={onAddProperty}>
 				<Icon name="plus" className="h-4 w-4" />
-				Add your first property
+				Add Your First Property
 			</Button.Root>
 
 			{/* Help link */}

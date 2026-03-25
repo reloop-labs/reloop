@@ -23,7 +23,7 @@ export const EmptyState = ({ onCreateApiKey }: EmptyStateProps) => {
 
 			<Button.Root variant="neutral" size="xsmall" onClick={onCreateApiKey}>
 				<Icon name="plus" className="h-4 w-4" />
-				Create your first API key
+				Create Your First API Key
 			</Button.Root>
 
 			<a

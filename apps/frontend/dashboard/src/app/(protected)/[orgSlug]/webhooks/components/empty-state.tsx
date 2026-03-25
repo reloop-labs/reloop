@@ -21,7 +21,7 @@ export const EmptyState = ({ onCreateWebhook }: EmptyStateProps) => {
 			</p>
 			<Button.Root variant="neutral" size="xsmall" onClick={onCreateWebhook}>
 				<Icon name="plus" className="h-4 w-4" />
-				Create webhook
+				Create Webhook
 			</Button.Root>
 			<a
 				href="https://reloop.sh/docs/webhooks"

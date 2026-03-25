@@ -77,8 +77,8 @@ export const GroupTable = ({
 	}
 
 	return (
-		<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 bg-white text-paragraph-sm">
-			<div className="grid grid-cols-[1fr_200px_80px] items-center border-stroke-soft-100 border-b bg-bg-weak-50/50 px-4 py-3.5 font-medium text-text-sub-600">
+		<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm">
+			<div className="grid grid-cols-[1fr_200px_80px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600">
 				<div className="flex items-center gap-2">
 					<Icon name="modules" className="h-3.5 w-3.5" />
 					<span className="text-xs uppercase tracking-wider">Name</span>

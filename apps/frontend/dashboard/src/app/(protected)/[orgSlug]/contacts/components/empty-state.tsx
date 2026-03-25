@@ -22,7 +22,7 @@ export const EmptyState = ({ onCreateClick }: EmptyStateProps) => {
 			</p>
 			<Button.Root variant="neutral" size="xsmall" onClick={onCreateClick}>
 				<Icon name="plus" className="h-4 w-4" />
-				Create your first topic
+				Create Your First Topic
 			</Button.Root>
 
 			<a

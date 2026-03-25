@@ -20,7 +20,7 @@ export const EmptyState = ({ onAddContact }: EmptyStateProps) => {
 			</p>
 			<Button.Root variant="neutral" size="xsmall" onClick={onAddContact}>
 				<Icon name="plus" className="h-4 w-4" />
-				Add first contact
+				Add First Contact
 			</Button.Root>
 			<a
 				href="https://reloop.sh/docs/contacts"

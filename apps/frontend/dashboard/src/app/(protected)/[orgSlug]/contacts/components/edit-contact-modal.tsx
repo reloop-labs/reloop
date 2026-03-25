@@ -483,7 +483,7 @@ export const EditContactModal = ({
 												}
 											}}
 											placeholder={
-												selectedTopicIds.length === 0 ? "Add topics..." : ""
+												selectedTopicIds.length === 0 ? "Add Topics..." : ""
 											}
 											className="min-w-[80px] flex-1 bg-transparent text-paragraph-sm text-text-sub-600 outline-none placeholder:text-text-soft-400"
 											disabled={isSaving}

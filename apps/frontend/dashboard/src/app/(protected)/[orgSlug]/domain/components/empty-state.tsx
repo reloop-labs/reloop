@@ -26,7 +26,7 @@ export const EmptyState = ({ onAddDomain }: EmptyStateProps) => {
 			{onAddDomain ? (
 				<Button.Root variant="neutral" size="xsmall" onClick={onAddDomain}>
 					<Icon name="plus" className="h-4 w-4" />
-					Add your first domain
+					Add Your First Domain
 				</Button.Root>
 			) : (
 				<Link
@@ -37,7 +37,7 @@ export const EmptyState = ({ onAddDomain }: EmptyStateProps) => {
 					}).root()}
 				>
 					<Icon name="plus" className="h-4 w-4" />
-					Add your first domain
+					Add Your First Domain
 				</Link>
 			)}
 

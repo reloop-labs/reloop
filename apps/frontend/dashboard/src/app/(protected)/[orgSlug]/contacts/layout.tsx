@@ -65,12 +65,12 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 	};
 
 	const actionLabel = isPropertiesPage
-		? "Add property"
+		? "Add Property"
 		: isTopicsPage
-			? "Add topic"
+			? "Create Topic"
 			: isGroupsPage
-				? "Add group"
-				: "Add contact";
+				? "Create Group"
+				: "Add Contact";
 
 	return (
 		<div>

@@ -20,7 +20,7 @@ export const GroupsEmptyState = ({ onAddGroup }: GroupsEmptyStateProps) => {
 			</p>
 			<Button.Root variant="neutral" size="xsmall" onClick={onAddGroup}>
 				<Icon name="plus" className="h-4 w-4" />
-				Add group
+				Create Your First Group
 			</Button.Root>
 			<a
 				href="https://reloop.sh/docs/contacts"
