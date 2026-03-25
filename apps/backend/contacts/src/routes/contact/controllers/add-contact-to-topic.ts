@@ -23,17 +23,12 @@ export async function addContactToTopic(
 	userId: string,
 	body: ContactModel.AddContactToTopicBody,
 ): Promise<AddContactToTopicResult> {
-	const { email, contactId, topicId } = body;
-
-	if (!email && !contactId) {
-		throw status(400, { message: "Either email or contactId must be provided" });
-	}
+	const { email, topicId } = body;
 
 	logger.info(
 		{
 			organizationId,
-			email: email?.toLowerCase(),
-			contactId,
+			email: email.toLowerCase(),
 			topicId,
 		},
 		"Adding contact to topic",
@@ -54,53 +49,34 @@ export async function addContactToTopic(
 		}
 
 		// Identify contact
-		let contact: typeof schema.contact.$inferSelect | undefined;
+		const emailLower = email.toLowerCase();
+		let contact = await db.query.contact.findFirst({
+			where: and(
+				eq(schema.contact.email, emailLower),
+				eq(schema.contact.organizationId, organizationId),
+				isNull(schema.contact.deletedAt),
+			),
+		});
 
-		if (contactId) {
-			contact = await db.query.contact.findFirst({
-				where: and(
-					eq(schema.contact.id, contactId),
-					eq(schema.contact.organizationId, organizationId),
-					isNull(schema.contact.deletedAt),
-				),
-			});
-			if (!contact) {
-				throw status(404, { message: "Contact not found" });
-			}
-		} else if (email) {
-			const emailLower = email.toLowerCase();
-			contact = await db.query.contact.findFirst({
-				where: and(
-					eq(schema.contact.email, emailLower),
-					eq(schema.contact.organizationId, organizationId),
-					isNull(schema.contact.deletedAt),
-				),
-			});
-
-			// Create contact if doesn't exist (only if identified by email)
-			if (!contact) {
-				const [newContact] = await db
-					.insert(schema.contact)
-					.values({
-						email: emailLower,
-						status: "subscribed",
-						organizationId,
-						userId,
-					})
-					.returning();
-
-				if (!newContact) {
-					throw new Error("Failed to create contact");
-				}
-				contact = newContact;
-				logger.info({ contactId: contact.id }, "Created new contact");
-			} else {
-				logger.info({ contactId: contact.id }, "Contact already exists");
-			}
-		}
-
+		// Create contact if doesn't exist
 		if (!contact) {
-			throw new Error("Contact identification failed");
+			const [newContact] = await db
+				.insert(schema.contact)
+				.values({
+					email: emailLower,
+					status: "subscribed",
+					organizationId,
+					userId,
+				})
+				.returning();
+
+			if (!newContact) {
+				throw new Error("Failed to create contact");
+			}
+			contact = newContact;
+			logger.info({ contactId: contact.id }, "Created new contact");
+		} else {
+			logger.info({ contactId: contact.id }, "Contact already exists");
 		}
 
 		// Check if already subscribed
@@ -170,8 +146,7 @@ export async function addContactToTopic(
 	} catch (error) {
 		logger.error(
 			{
-				email: email?.toLowerCase(),
-				contactId,
+				email: email.toLowerCase(),
 				topicId,
 				error: error instanceof Error ? error.message : String(error),
 			},

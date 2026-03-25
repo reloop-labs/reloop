@@ -11,19 +11,12 @@ export async function removeContactFromGroup(
   body: ContactModel.RemoveContactFromGroupBody,
   logger: Logger,
 ): Promise<ContactModel.RemoveContactFromGroupResponse> {
-  const { email, contactId, groupId } = body;
-
-  if (!email && !contactId) {
-    throw status(400, {
-      message: "Either email or contactId must be provided",
-    });
-  }
+  const { email, groupId } = body;
 
   logger.info(
     {
       organizationId,
-      email: email?.toLowerCase(),
-      contactId,
+      email: email.toLowerCase(),
       groupId,
     },
     "Removing contact from group",
@@ -31,25 +24,13 @@ export async function removeContactFromGroup(
 
   try {
     // Identify contact
-    let contact: typeof schema.contact.$inferSelect | undefined;
-
-    if (contactId) {
-      contact = await db.query.contact.findFirst({
-        where: and(
-          eq(schema.contact.id, contactId),
-          eq(schema.contact.organizationId, organizationId),
-          isNull(schema.contact.deletedAt),
-        ),
-      });
-    } else if (email) {
-      contact = await db.query.contact.findFirst({
-        where: and(
-          eq(schema.contact.email, email.toLowerCase()),
-          eq(schema.contact.organizationId, organizationId),
-          isNull(schema.contact.deletedAt),
-        ),
-      });
-    }
+    const contact = await db.query.contact.findFirst({
+      where: and(
+        eq(schema.contact.email, email.toLowerCase()),
+        eq(schema.contact.organizationId, organizationId),
+        isNull(schema.contact.deletedAt),
+      ),
+    });
 
     if (!contact) {
       throw status(404, { message: "Contact not found" });
@@ -79,8 +60,7 @@ export async function removeContactFromGroup(
   } catch (error) {
     logger.error(
       {
-        email: email?.toLowerCase(),
-        contactId,
+        email: email.toLowerCase(),
         groupId,
         error: error instanceof Error ? error.message : String(error),
       },

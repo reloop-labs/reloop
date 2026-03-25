@@ -18,7 +18,7 @@ export const addContactToGroupRoute = new Elysia().use(authMiddleware).post(
     },
     detail: {
       tags: ["Contact"],
-      summary: "Add Contact to Group",
+      summary: "Add Contact Group",
       description: "Adds a contact to a group by ID or email",
     },
   },

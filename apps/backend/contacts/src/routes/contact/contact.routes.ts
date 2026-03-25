@@ -7,6 +7,7 @@ import { getContactRoute } from "@be/contacts/routes/contact/routes/get-contact.
 import { listContactsRoute } from "@be/contacts/routes/contact/routes/list-contacts.route";
 import { removeContactFromGroupRoute } from "@be/contacts/routes/contact/routes/remove-contact-from-group.route";
 import { updateContactRoute } from "@be/contacts/routes/contact/routes/update-contact.route";
+import { updateContactTopicRoute } from "@be/contacts/routes/contact/routes/update-contact-topic.route";
 import { Elysia } from "elysia";
 
 export const contactRoutes = new Elysia({ name: "ContactRoutes" })
@@ -21,4 +22,6 @@ export const contactRoutes = new Elysia({ name: "ContactRoutes" })
 	.use(addContactToTopicRoute)
 	// Group Management
 	.use(addContactToGroupRoute)
-	.use(removeContactFromGroupRoute);
+	.use(removeContactFromGroupRoute)
+	// Topic Management
+	.use(updateContactTopicRoute);

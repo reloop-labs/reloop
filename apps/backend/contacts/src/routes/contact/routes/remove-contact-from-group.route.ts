@@ -3,7 +3,7 @@ import { ContactModel } from "@be/contacts/model/contact.model";
 import { removeContactFromGroup } from "@be/contacts/routes/contact/controllers/remove-contact-from-group";
 import { Elysia, t } from "elysia";
 
-export const removeContactFromGroupRoute = new Elysia().use(authMiddleware).post(
+export const removeContactFromGroupRoute = new Elysia().use(authMiddleware).delete(
   "/groups/remove",
   async ({ body, activeOrganizationId, userId, logger }) => {
     return await removeContactFromGroup(
@@ -23,8 +23,8 @@ export const removeContactFromGroupRoute = new Elysia().use(authMiddleware).post
     },
     detail: {
       tags: ["Contact"],
-      summary: "Remove Contact from Group",
-      description: "Removes a contact from a group by ID or email",
+      summary: "Delete Contact Group",
+      description: "Deletes a contact from a group by ID or email",
     },
   },
 );

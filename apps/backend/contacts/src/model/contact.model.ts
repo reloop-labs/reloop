@@ -265,19 +265,29 @@ export namespace ContactModel {
 
 	export type BulkImportResponse = typeof bulkImportResponse.static;
 
+	// Topic params
+	export const topicParams = t.Object({
+		topic_id: t.String({ description: "Topic ID" }),
+	});
+
+	// Group params
+	export const groupParams = t.Object({
+		group_id: t.String({ description: "Group ID" }),
+	});
+
 	// Add Contact to Topic (combined operation)
 	export const addContactToTopicBody = t.Object({
-		contactId: t.Optional(t.String({ description: "Contact ID" })),
-		email: t.Optional(
-			t.String({
-				pattern: emailPattern.source,
-				description: "Contact email address",
+		topicId: t.String({ description: "Topic identifier" }),
+		email: t.String({
+			pattern: emailPattern.source,
+			description: "Contact email address",
+		}),
+		subscription: t.Optional(
+			t.Union([t.Literal("opt_in"), t.Literal("opt_out")], {
+				description: "Subscription status for the topic",
+				default: "opt_in",
 			}),
 		),
-		topicId: t.String({ description: "Topic ID to subscribe the contact to" }),
-		subscription: t.Union([t.Literal("opt_in"), t.Literal("opt_out")], {
-			description: "Subscription status for the topic",
-		}),
 	});
 
 	export type AddContactToTopicBody = typeof addContactToTopicBody.static;
@@ -292,14 +302,11 @@ export namespace ContactModel {
 
 	// Group Management
 	export const addContactToGroupBody = t.Object({
-		contactId: t.Optional(t.String({ description: "Contact ID" })),
-		email: t.Optional(
-			t.String({
-				pattern: emailPattern.source,
-				description: "Contact email address",
-			}),
-		),
-		groupId: t.String({ description: "Group ID to add the contact to" }),
+		groupId: t.String({ description: "Group ID" }),
+		email: t.String({
+			pattern: emailPattern.source,
+			description: "Contact email address",
+		}),
 	});
 
 	export type AddContactToGroupBody = typeof addContactToGroupBody.static;
@@ -313,14 +320,11 @@ export namespace ContactModel {
 	export type AddContactToGroupResponse = typeof addContactToGroupResponse.static;
 
 	export const removeContactFromGroupBody = t.Object({
-		contactId: t.Optional(t.String({ description: "Contact ID" })),
-		email: t.Optional(
-			t.String({
-				pattern: emailPattern.source,
-				description: "Contact email address",
-			}),
-		),
-		groupId: t.String({ description: "Group ID to remove the contact from" }),
+		groupId: t.String({ description: "Group ID" }),
+		email: t.String({
+			pattern: emailPattern.source,
+			description: "Contact email address",
+		}),
 	});
 
 	export type RemoveContactFromGroupBody = typeof removeContactFromGroupBody.static;
@@ -331,4 +335,26 @@ export namespace ContactModel {
 
 	export type RemoveContactFromGroupResponse =
 		typeof removeContactFromGroupResponse.static;
+
+	// Update Topic Status
+	export const updateContactTopicBody = t.Object({
+		topicId: t.String({ description: "Topic identifier" }),
+		email: t.String({
+			pattern: emailPattern.source,
+			description: "Contact email address",
+		}),
+		subscription: t.Union([t.Literal("opt_in"), t.Literal("opt_out")], {
+			description: "Status to update to",
+		}),
+	});
+
+	export type UpdateContactTopicBody = typeof updateContactTopicBody.static;
+
+	export const updateContactTopicResponse = t.Object({
+		success: t.Boolean({ default: true }),
+		status: t.String(),
+	});
+
+	export type UpdateContactTopicResponse =
+		typeof updateContactTopicResponse.static;
 }

@@ -21,7 +21,7 @@ export const addContactToTopicRoute = new Elysia().use(authMiddleware).post(
 		},
 		detail: {
 			tags: ["Contact"],
-			summary: "Add Contact To Topic",
+			summary: "Add Contact Topic",
 			description:
 				"Creates a contact (if not exists) and enrolls them in a topic in one operation",
 		},
