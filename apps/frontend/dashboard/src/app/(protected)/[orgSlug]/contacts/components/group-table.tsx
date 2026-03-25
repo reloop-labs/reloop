@@ -5,8 +5,6 @@ import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { DeleteGroupModal } from "./delete-group";
-import { EditGroupModal } from "./edit-group-modal";
 import { GroupDropdown } from "./group-dropdown";
 import { GroupsEmptyState } from "./groups-empty-state";
 
@@ -30,13 +28,13 @@ interface GroupTableProps {
 }
 
 const GroupSkeleton = () => (
-	<div className="grid grid-cols-[1fr_200px_80px] items-center px-4 py-2">
-		<div className="flex items-center gap-3">
-			<Skeleton className="h-4 w-4" />
+	<div className="grid grid-cols-[2fr_1fr_48px] items-center px-4 py-2">
+		<div className="flex items-center gap-2">
+			<Skeleton className="h-4 w-4 rounded" />
 			<Skeleton className="h-4 w-40" />
 		</div>
 		<Skeleton className="h-4 w-32" />
-		<div className="flex items-center justify-end">
+		<div className="flex items-center justify-center">
 			<Skeleton className="h-4 w-4 rounded" />
 		</div>
 	</div>
@@ -51,18 +49,23 @@ export const GroupTable = ({
 	onAddGroup,
 	onDelete,
 }: GroupTableProps) => {
+	const router = useRouter();
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
+
+	const handleRowClick = (groupId: string) => {
+		router.push(`/${activeOrganizationSlug}/contacts/groups/${groupId}`);
+	};
 
 	if (isLoading) {
 		return (
-			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm">
-				<div className="grid grid-cols-[1fr_200px_80px] items-center border-stroke-soft-100 border-b px-4 py-3.5 font-medium text-text-sub-600">
+			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-200/70 text-paragraph-sm shadow-regular-md ring-stroke-soft-200 ring-inset">
+				<div className="grid grid-cols-[2fr_1fr_48px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600">
 					<div className="flex items-center gap-2">
-						<Icon name="modules" className="h-3.5 w-3.5" />
+						<Icon name="modules" className="h-4 w-4" />
 						<span className="text-xs">Name</span>
 					</div>
 					<div className="flex items-center gap-2">
-						<Icon name="clock" className="h-3.5 w-3.5" />
+						<Icon name="clock" className="h-4 w-4" />
 						<span className="text-xs">Created at</span>
 					</div>
 					<div />
@@ -77,15 +80,15 @@ export const GroupTable = ({
 	}
 
 	return (
-		<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm">
-			<div className="grid grid-cols-[1fr_200px_80px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600">
+		<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-200/70 text-paragraph-sm shadow-regular-md ring-stroke-soft-200 ring-inset">
+			<div className="grid grid-cols-[2fr_1fr_48px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600">
 				<div className="flex items-center gap-2">
-					<Icon name="modules" className="h-3.5 w-3.5" />
-					<span className="text-xs uppercase tracking-wider">Name</span>
+					<Icon name="modules" className="h-4 w-4" />
+					<span className="text-xs">Name</span>
 				</div>
 				<div className="flex items-center gap-2">
-					<Icon name="clock" className="h-3.5 w-3.5" />
-					<span className="text-xs uppercase tracking-wider">Created at</span>
+					<Icon name="clock" className="h-4 w-4" />
+					<span className="text-xs">Created at</span>
 				</div>
 				<div />
 			</div>
@@ -99,26 +102,33 @@ export const GroupTable = ({
 						return (
 							<div
 								key={group.id}
+								onClick={() => handleRowClick(group.id)}
 								className={cn(
-									"group/row grid w-full grid-cols-[1fr_200px_80px] items-center px-4 py-3 text-left transition-colors",
-									"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-base",
+									"group/row grid w-full cursor-pointer grid-cols-[2fr_1fr_48px] items-center px-4 py-2 text-left transition-colors",
+									"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-base focus-visible:ring-offset-1",
 									isRowActive && "bg-bg-weak-50/50",
 								)}
 							>
-								<div className="flex items-center gap-3">
-									<div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-bg-weak-100 text-text-sub-600">
-										<Icon name="modules" className="h-3.5 w-3.5" />
-									</div>
-									<span className="truncate font-medium text-text-strong-950">
+								<div className="flex items-center gap-2">
+									<Icon
+										name="modules"
+										className="h-4 w-4 shrink-0 text-text-sub-600"
+									/>
+									<span className="truncate text-label-sm text-text-strong-950">
 										{group.name}
 									</span>
 								</div>
 
 								<div className="flex items-center text-text-sub-600">
-									<span>{formatRelativeTime(group.createdAt)}</span>
+									<span className="whitespace-nowrap text-label-sm">
+										{formatRelativeTime(group.createdAt)}
+									</span>
 								</div>
 
-								<div className="flex items-center justify-end">
+								<div
+									className="flex items-center justify-center"
+									onClick={(e) => e.stopPropagation()}
+								>
 									<GroupDropdown
 										group={group}
 										onEdit={() => onEdit?.(group.id)}
