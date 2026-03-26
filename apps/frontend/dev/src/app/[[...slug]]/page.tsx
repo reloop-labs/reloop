@@ -21,7 +21,7 @@ import {
 import { source } from "@reloop/fe-dev/lib/source";
 import { getMDXComponents } from "@reloop/fe-dev/mdx-components";
 import { Icon } from "@reloop/ui/icon";
-import { DocsLayout } from "fumadocs-ui/layouts/notebook";
+import { DocsLayout } from "fumadocs-ui/layouts/docs";
 import { createRelativeLink } from "fumadocs-ui/mdx";
 import { DocsBody, DocsPage } from "fumadocs-ui/page";
 import Link from "next/link";
@@ -123,11 +123,9 @@ export default async function Page(props: {
 
 	return (
 		<DocsLayout
-			tabMode="navbar"
 			tree={source.pageTree}
 			{...baseOptions}
 			githubUrl="https://github.com/reloop-labs/reloop"
-			nav={{ ...baseOptions.nav, mode: "top" }}
 			sidebar={{
 				collapsible: false,
 				banner: <DocTabs />,
