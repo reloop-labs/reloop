@@ -18,7 +18,10 @@
 		"baseUrl": ".",
 		"paths": {
 			"@fe/docs/*": ["./src/*"],
-			"@be/domain/*": ["../../backend/domain/src/*"]
+			"@be/domain/*": ["../../backend/domain/src/*"],
+			"collections/*": [
+        "./.source/*"
+      ]
 		}
 	},
 	"include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

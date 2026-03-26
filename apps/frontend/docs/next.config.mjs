@@ -7,6 +7,7 @@ const config = {
 	reactStrictMode: true,
 	basePath: "/docs",
 	output: "standalone",
+	serverExternalPackages: ["@takumi-rs/image-response"],
 };
 
 export default withMDX(config);
