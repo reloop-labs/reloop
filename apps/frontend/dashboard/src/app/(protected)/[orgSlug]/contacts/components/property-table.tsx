@@ -11,9 +11,8 @@ import {
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
+import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";
-import { DeletePropertyModal } from "./delete-property-modal";
-import { EditPropertyModal } from "./edit-property-modal";
 import { PropertiesEmptyState } from "./properties-empty-state";
 
 interface Property {
@@ -173,29 +172,18 @@ export const PropertyTable = ({
 	onDelete,
 	onAddProperty,
 }: PropertyTableProps) => {
-	const [editingProperty, setEditingProperty] = useState<Property | null>(null);
-	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-	const [deletingProperty, setDeletingProperty] = useState<Property | null>(
-		null,
-	);
-	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+	const [, setModal] = useQueryState("modal");
+	const [id, setId] = useQueryState("id");
 	const [openPropertyId, setOpenPropertyId] = useState<string | null>(null);
 
 	const handleEdit = (property: Property) => {
-		setEditingProperty(property);
-		setIsEditModalOpen(true);
+		setModal("edit-property");
+		setId(property.id);
 	};
 
 	const handleDelete = (property: Property) => {
-		setDeletingProperty(property);
-		setIsDeleteModalOpen(true);
-	};
-
-	const handleDeleteSuccess = () => {
-		if (deletingProperty) {
-			onDelete?.(deletingProperty.id);
-		}
-		setDeletingProperty(null);
+		setModal("delete-property");
+		setId(property.id);
 	};
 
 	if (isLoading) {
@@ -322,21 +310,6 @@ export const PropertyTable = ({
 					)}
 				</div>
 			</div>
-
-			{/* Edit Property Modal */}
-			<EditPropertyModal
-				property={editingProperty}
-				open={isEditModalOpen}
-				onOpenChange={setIsEditModalOpen}
-			/>
-
-			{/* Delete Property Modal */}
-			<DeletePropertyModal
-				property={deletingProperty}
-				open={isDeleteModalOpen}
-				onOpenChange={setIsDeleteModalOpen}
-				onDeleteSuccess={handleDeleteSuccess}
-			/>
 		</>
 	);
 };

@@ -30,6 +30,7 @@ interface TopicTableProps {
 		currentValue: "private" | "public",
 	) => void;
 	onEdit?: (topicId: string) => void;
+	onDelete?: (topicId: string) => void;
 	onAddTopic?: () => void;
 }
 

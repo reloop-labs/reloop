@@ -7,8 +7,6 @@ import * as Input from "@reloop/ui/input";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useState } from "react";
 import useSWR from "swr";
-import { DeleteGroupModal } from "./delete-group";
-import { EditGroupModal } from "./edit-group-modal";
 import { GroupTable } from "./group-table";
 
 interface Group {
@@ -31,8 +29,7 @@ export const GroupList = () => {
 	const { activeOrganization } = useUserOrganization();
 	const [searchQuery, setSearchQuery] = useState<string>("");
 	const [, setModal] = useQueryState("modal");
-	const [editGroupId, setEditGroupId] = useState<string | null>(null);
-	const [deleteGroupId, setDeleteGroupId] = useState<string | null>(null);
+	const [, setId] = useQueryState("id");
 
 	const [currentPage, setCurrentPage] = useQueryState(
 		"page",
@@ -103,9 +100,15 @@ export const GroupList = () => {
 					groups={data?.groups || []}
 					activeOrganizationSlug={activeOrganization.slug}
 					isLoading={isLoading}
-					onEdit={(contact_group_id) => setEditGroupId(contact_group_id)}
+					onEdit={(contact_group_id) => {
+						setModal("edit-group");
+						setId(contact_group_id);
+					}}
 					onAddGroup={() => setModal("create-group")}
-					onDelete={(contact_group_id) => setDeleteGroupId(contact_group_id)}
+					onDelete={(contact_group_id) => {
+						setModal("delete-group");
+						setId(contact_group_id);
+					}}
 				/>
 			</div>
 
@@ -133,18 +136,6 @@ export const GroupList = () => {
 					/>
 				</div>
 			)}
-
-			<EditGroupModal
-				open={!!editGroupId}
-				onOpenChange={(open) => !open && setEditGroupId(null)}
-				group={data?.groups?.find((g) => g.id === editGroupId) || null}
-			/>
-
-			<DeleteGroupModal
-				open={!!deleteGroupId}
-				onOpenChange={(open) => !open && setDeleteGroupId(null)}
-				group={data?.groups?.find((g) => g.id === deleteGroupId) || null}
-			/>
 		</div>
 	);
 };

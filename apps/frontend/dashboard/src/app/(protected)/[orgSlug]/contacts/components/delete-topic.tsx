@@ -28,13 +28,15 @@ interface DeleteTopicModalProps {
 
 export const DeleteTopicModal = ({ topics }: DeleteTopicModalProps) => {
 	const { orgSlug } = useParams();
-	const [deleteId, setDeleteId] = useQueryState("delete");
+	const [modal, setModal] = useQueryState("modal");
+	const [id, setId] = useQueryState("id");
 	const [isDeleting, setIsDeleting] = useState(false);
 	const [confirmationText, setConfirmationText] = useState("");
 	const [isCopied, setIsCopied] = useState(false);
 	const { mutate } = useSWRConfig();
 
-	const topicToDelete = topics.find((topic) => topic.id === deleteId);
+	const isOpen = modal === "delete-topic";
+	const topicToDelete = topics.find((topic) => topic.id === id);
 
 	useEffect(() => {
 		if (isCopied) {
@@ -46,7 +48,8 @@ export const DeleteTopicModal = ({ topics }: DeleteTopicModalProps) => {
 	}, [isCopied]);
 
 	const handleClose = () => {
-		setDeleteId(null);
+		setModal(null);
+		setId(null);
 		setConfirmationText("");
 	};
 
@@ -81,7 +84,7 @@ export const DeleteTopicModal = ({ topics }: DeleteTopicModalProps) => {
 
 	return (
 		<Modal.Root
-			open={!!deleteId}
+			open={isOpen}
 			onOpenChange={(open) => {
 				if (!open) {
 					handleClose();

@@ -363,272 +363,285 @@ export const EditContactModal = ({
 							<Modal.Title>Edit Contact</Modal.Title>
 						</div>
 					</Modal.Header>
-					<form onSubmit={handleSubmit} className="flex flex-col">
-						<Modal.Body className="max-h-[60vh] space-y-4 overflow-y-auto">
-							{/* Email */}
-							<div className="flex flex-col gap-1">
-								<Label.Root htmlFor="email">Email</Label.Root>
-								<Input.Root size="small">
-									<Input.Wrapper>
-										<Input.Input
-											id="email"
-											type="email"
-											value={email || contact?.email || ""}
-											onChange={(e) => setEmail(e.target.value)}
-											disabled={isSaving}
-											readOnly
-											placeholder={contact?.email || "Email address"}
-											className="cursor-not-allowed bg-bg-weak-50"
-										/>
-									</Input.Wrapper>
-								</Input.Root>
-							</div>
+					{!contact && open ? (
+						<div className="flex h-[400px] flex-col items-center justify-center space-y-4 p-8 text-center">
+							<Spinner size={32} />
+							<p className="text-sm text-text-sub-600">
+								Loading contact details...
+							</p>
+						</div>
+					) : (
+						<form onSubmit={handleSubmit} className="flex flex-col">
+							<Modal.Body className="max-h-[60vh] space-y-4 overflow-y-auto">
+								{/* Email */}
+								<div className="flex flex-col gap-1">
+									<Label.Root htmlFor="email">Email</Label.Root>
+									<Input.Root size="small">
+										<Input.Wrapper>
+											<Input.Input
+												id="email"
+												type="email"
+												value={email || contact?.email || ""}
+												onChange={(e) => setEmail(e.target.value)}
+												disabled={isSaving}
+												readOnly
+												placeholder={contact?.email || "Email address"}
+												className="cursor-not-allowed bg-bg-weak-50"
+											/>
+										</Input.Wrapper>
+									</Input.Root>
+								</div>
 
-							{/* Subscribed Toggle */}
-							<div className="border-stroke-soft-100 border-t pt-2">
-								<button
-									type="button"
-									onClick={() => !isSaving && setIsSubscribed(!isSubscribed)}
-									disabled={isSaving}
-									className={`flex w-full cursor-pointer items-center justify-between rounded-xl border p-4 transition-all duration-200 ${
-										isSubscribed
-											? "border-success-base bg-success-light/20"
-											: "border-error-base bg-error-light/20"
-									} ${isSaving ? "cursor-not-allowed opacity-50" : ""}`}
-								>
-									<div className="flex flex-col items-start gap-0.5">
-										<span
-											className={`font-medium text-label-sm ${isSubscribed ? "text-success-base" : "text-error-base"}`}
-										>
-											{isSubscribed ? "Subscribed" : "Unsubscribed"}
-										</span>
-										<span
-											className={`font-medium text-paragraph-xs ${isSubscribed ? "text-success-base" : "text-error-base"}`}
-										>
-											{isSubscribed
-												? "Receives all emails including marketing and broadcasts"
-												: "Receives transactional emails only"}
-										</span>
-									</div>
-									<div
-										className={`flex h-4.5 w-4.5 items-center justify-center rounded transition-all duration-200 ${
+								{/* Subscribed Toggle */}
+								<div className="border-stroke-soft-100 border-t pt-2">
+									<button
+										type="button"
+										onClick={() => !isSaving && setIsSubscribed(!isSubscribed)}
+										disabled={isSaving}
+										className={`flex w-full cursor-pointer items-center justify-between rounded-xl border p-4 transition-all duration-200 ${
 											isSubscribed
-												? "bg-success-base"
-												: "border border-error-base bg-bg-white-0"
-										}`}
+												? "border-success-base bg-success-light/20"
+												: "border-error-base bg-error-light/20"
+										} ${isSaving ? "cursor-not-allowed opacity-50" : ""}`}
 									>
-										{isSubscribed && (
-											<svg
-												width="10"
-												height="10"
-												viewBox="0 0 12 10"
-												fill="none"
-												xmlns="http://www.w3.org/2000/svg"
+										<div className="flex flex-col items-start gap-0.5">
+											<span
+												className={`font-medium text-label-sm ${isSubscribed ? "text-success-base" : "text-error-base"}`}
 											>
-												<path
-													d="M1 5L4.5 8.5L11 1.5"
-													stroke="white"
-													strokeWidth="1.5"
-													strokeLinecap="round"
-													strokeLinejoin="round"
-												/>
-											</svg>
-										)}
-									</div>
-								</button>
-							</div>
-
-							{/* Topics */}
-							<div className="flex flex-col gap-1 border-stroke-soft-100 border-t pt-4">
-								<Label.Root htmlFor="topics">Topics</Label.Root>
-								<div className="relative">
-									<label className="group/chips flex min-h-[44px] cursor-text flex-wrap content-start gap-1.5 rounded-xl bg-bg-white-0 px-3 py-2.5 shadow-regular-xs ring-1 ring-stroke-soft-200 ring-inset transition duration-200 ease-out focus-within:shadow-button-important-focus focus-within:ring-stroke-strong-950 hover:[&:not(:focus-within)]:bg-bg-weak-50 hover:[&:not(:focus-within)]:ring-transparent">
-										{selectedTopicIds.map((topicId) => {
-											const topicName = getTopicName(topicId);
-											if (!topicName) return null;
-											return (
-												<span
-													key={topicId}
-													className="inline-flex items-center gap-1 rounded-md border border-stroke-soft-200 bg-bg-weak-50 px-2 py-0.5 text-paragraph-xs text-text-strong-950"
-												>
-													{topicName}
-													<button
-														type="button"
-														onClick={(e) => {
-															e.preventDefault();
-															e.stopPropagation();
-															removeTopic(topicId);
-														}}
-														className="ml-0.5 text-text-sub-600 transition-colors hover:text-text-strong-950"
-														disabled={isSaving}
-													>
-														<Icon name="cross" className="h-3 w-3" />
-													</button>
-												</span>
-											);
-										})}
-										<input
-											ref={topicInputRef}
-											type="text"
-											value={topicInput}
-											onChange={(e) => {
-												setTopicInput(e.target.value);
-												setShowTopicDropdown(true);
-											}}
-											onFocus={() => setShowTopicDropdown(true)}
-											onBlur={(e) => {
-												// Close dropdown if focus leaves to outside the dropdown
-												const relatedTarget = e.relatedTarget as HTMLElement;
-												if (!relatedTarget?.closest(".absolute")) {
-													setShowTopicDropdown(false);
-												}
-											}}
-											placeholder={
-												selectedTopicIds.length === 0 ? "Add Topics..." : ""
-											}
-											className="min-w-[80px] flex-1 bg-transparent text-paragraph-sm text-text-sub-600 outline-none placeholder:text-text-soft-400"
-											disabled={isSaving}
-										/>
-									</label>
-									{/* Dropdown */}
-									{showTopicDropdown && filteredTopics.length > 0 && (
-										<div className="absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-stroke-soft-200 bg-bg-white-0 p-1 shadow-lg">
-											{filteredTopics.map((topic) => (
-												<button
-													key={topic.id}
-													type="button"
-													onClick={() => addTopic(topic.id)}
-													className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-paragraph-sm text-text-strong-950 transition-colors hover:bg-bg-weak-50"
-												>
-													<Icon
-														name="hash"
-														className="h-3 w-3 text-text-sub-600"
-													/>
-													{topic.name}
-													{topic.defaultSubscription === "opt_out" && (
-														<span className="ml-auto text-paragraph-xs text-text-soft-400">
-															Opt-out
-														</span>
-													)}
-												</button>
-											))}
+												{isSubscribed ? "Subscribed" : "Unsubscribed"}
+											</span>
+											<span
+												className={`font-medium text-paragraph-xs ${isSubscribed ? "text-success-base" : "text-error-base"}`}
+											>
+												{isSubscribed
+													? "Receives all emails including marketing and broadcasts"
+													: "Receives transactional emails only"}
+											</span>
 										</div>
-									)}
-									{showTopicDropdown &&
-										filteredTopics.length === 0 &&
-										topicInput && (
-											<div className="absolute z-10 mt-1 w-full rounded-lg border border-stroke-soft-200 bg-bg-white-0 p-3 shadow-lg">
-												<p className="text-paragraph-sm text-text-soft-400">
-													No topics found
-												</p>
+										<div
+											className={`flex h-4.5 w-4.5 items-center justify-center rounded transition-all duration-200 ${
+												isSubscribed
+													? "bg-success-base"
+													: "border border-error-base bg-bg-white-0"
+											}`}
+										>
+											{isSubscribed && (
+												<svg
+													width="10"
+													height="10"
+													viewBox="0 0 12 10"
+													fill="none"
+													xmlns="http://www.w3.org/2000/svg"
+												>
+													<path
+														d="M1 5L4.5 8.5L11 1.5"
+														stroke="white"
+														strokeWidth="1.5"
+														strokeLinecap="round"
+														strokeLinejoin="round"
+													/>
+												</svg>
+											)}
+										</div>
+									</button>
+								</div>
+
+								{/* Topics */}
+								<div className="flex flex-col gap-1 border-stroke-soft-100 border-t pt-4">
+									<Label.Root htmlFor="topics">Topics</Label.Root>
+									<div className="relative">
+										<label className="group/chips flex min-h-[44px] cursor-text flex-wrap content-start gap-1.5 rounded-xl bg-bg-white-0 px-3 py-2.5 shadow-regular-xs ring-1 ring-stroke-soft-200 ring-inset transition duration-200 ease-out focus-within:shadow-button-important-focus focus-within:ring-stroke-strong-950 hover:[&:not(:focus-within)]:bg-bg-weak-50 hover:[&:not(:focus-within)]:ring-transparent">
+											{selectedTopicIds.map((topicId) => {
+												const topicName = getTopicName(topicId);
+												if (!topicName) return null;
+												return (
+													<span
+														key={topicId}
+														className="inline-flex items-center gap-1 rounded-md border border-stroke-soft-200 bg-bg-weak-50 px-2 py-0.5 text-paragraph-xs text-text-strong-950"
+													>
+														{topicName}
+														<button
+															type="button"
+															onClick={(e) => {
+																e.preventDefault();
+																e.stopPropagation();
+																removeTopic(topicId);
+															}}
+															className="ml-0.5 text-text-sub-600 transition-colors hover:text-text-strong-950"
+															disabled={isSaving}
+														>
+															<Icon name="cross" className="h-3 w-3" />
+														</button>
+													</span>
+												);
+											})}
+											<input
+												ref={topicInputRef}
+												type="text"
+												value={topicInput}
+												onChange={(e) => {
+													setTopicInput(e.target.value);
+													setShowTopicDropdown(true);
+												}}
+												onFocus={() => setShowTopicDropdown(true)}
+												onBlur={(e) => {
+													// Close dropdown if focus leaves to outside the dropdown
+													const relatedTarget = e.relatedTarget as HTMLElement;
+													if (!relatedTarget?.closest(".absolute")) {
+														setShowTopicDropdown(false);
+													}
+												}}
+												placeholder={
+													selectedTopicIds.length === 0 ? "Add Topics..." : ""
+												}
+												className="min-w-[80px] flex-1 bg-transparent text-paragraph-sm text-text-sub-600 outline-none placeholder:text-text-soft-400"
+												disabled={isSaving}
+											/>
+										</label>
+										{/* Dropdown */}
+										{showTopicDropdown && filteredTopics.length > 0 && (
+											<div className="absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-stroke-soft-200 bg-bg-white-0 p-1 shadow-lg">
+												{filteredTopics.map((topic) => (
+													<button
+														key={topic.id}
+														type="button"
+														onClick={() => addTopic(topic.id)}
+														className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-paragraph-sm text-text-strong-950 transition-colors hover:bg-bg-weak-50"
+													>
+														<Icon
+															name="hash"
+															className="h-3 w-3 text-text-sub-600"
+														/>
+														{topic.name}
+														{topic.defaultSubscription === "opt_out" && (
+															<span className="ml-auto text-paragraph-xs text-text-soft-400">
+																Opt-out
+															</span>
+														)}
+													</button>
+												))}
 											</div>
 										)}
+										{showTopicDropdown &&
+											filteredTopics.length === 0 &&
+											topicInput && (
+												<div className="absolute z-10 mt-1 w-full rounded-lg border border-stroke-soft-200 bg-bg-white-0 p-3 shadow-lg">
+													<p className="text-paragraph-sm text-text-soft-400">
+														No topics found
+													</p>
+												</div>
+											)}
+									</div>
 								</div>
-							</div>
 
-							{/* First Name - System property, always shown */}
-							<div className="flex flex-col gap-1 border-stroke-soft-100 border-t pt-4">
-								<Label.Root htmlFor="firstName">First name</Label.Root>
-								<Input.Root size="small">
-									<Input.Wrapper>
-										<Input.Input
-											id="firstName"
-											type="text"
-											value={firstName}
-											onChange={(e) => setFirstName(e.target.value)}
-											disabled={isSaving}
-											placeholder="Your contact name"
-										/>
-									</Input.Wrapper>
-								</Input.Root>
-							</div>
-
-							{/* Last Name - System property, always shown */}
-							<div className="flex flex-col gap-1">
-								<Label.Root htmlFor="lastName">Last name</Label.Root>
-								<Input.Root size="small">
-									<Input.Wrapper>
-										<Input.Input
-											id="lastName"
-											type="text"
-											value={lastName}
-											onChange={(e) => setLastName(e.target.value)}
-											disabled={isSaving}
-											placeholder="Your contact last name"
-										/>
-									</Input.Wrapper>
-								</Input.Root>
-							</div>
-
-							{/* Custom Properties */}
-							{customProperties.length > 0 && (
-								<div className="space-y-4 border-stroke-soft-100 border-t pt-4">
-									{customProperties.map((property) => (
-										<div key={property.id} className="flex flex-col gap-1">
-											<Label.Root htmlFor={`prop-${property.id}`}>
-												{property.name}
-											</Label.Root>
-											<Input.Root size="small">
-												<Input.Wrapper>
-													<Input.Input
-														id={`prop-${property.id}`}
-														type={
-															property.type === "number" ? "number" : "text"
-														}
-														value={propertyValues[property.id]}
-														onChange={(e) =>
-															handlePropertyChange(property.id, e.target.value)
-														}
-														disabled={isSaving}
-														placeholder={
-															property.fallbackValue || `Enter ${property.name}`
-														}
-													/>
-												</Input.Wrapper>
-											</Input.Root>
-										</div>
-									))}
-								</div>
-							)}
-						</Modal.Body>
-
-						<Modal.Footer className="mt-4 flex items-center justify-end gap-3 border-stroke-soft-100/50">
-							<Button.Root
-								type="button"
-								variant="neutral"
-								mode="stroke"
-								size="xsmall"
-								onClick={() => handleOpenChange(false)}
-								disabled={isSaving}
-							>
-								Cancel
-								<Kbd.Root className="bg-bg-weak-50 text-xs">Esc</Kbd.Root>
-							</Button.Root>
-							<Button.Root
-								type="submit"
-								variant="neutral"
-								size="xsmall"
-								disabled={isSaving}
-							>
-								{isSaving ? (
-									<>
-										<Spinner size={14} color="currentColor" />
-										Updating...
-									</>
-								) : (
-									<>
-										Update
-										<span className="inline-flex items-center gap-0.5">
-											<Icon
-												name="enter"
-												className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+								{/* First Name - System property, always shown */}
+								<div className="flex flex-col gap-1 border-stroke-soft-100 border-t pt-4">
+									<Label.Root htmlFor="firstName">First name</Label.Root>
+									<Input.Root size="small">
+										<Input.Wrapper>
+											<Input.Input
+												id="firstName"
+												type="text"
+												value={firstName}
+												onChange={(e) => setFirstName(e.target.value)}
+												disabled={isSaving}
+												placeholder="Your contact name"
 											/>
-										</span>
-									</>
+										</Input.Wrapper>
+									</Input.Root>
+								</div>
+
+								{/* Last Name - System property, always shown */}
+								<div className="flex flex-col gap-1">
+									<Label.Root htmlFor="lastName">Last name</Label.Root>
+									<Input.Root size="small">
+										<Input.Wrapper>
+											<Input.Input
+												id="lastName"
+												type="text"
+												value={lastName}
+												onChange={(e) => setLastName(e.target.value)}
+												disabled={isSaving}
+												placeholder="Your contact last name"
+											/>
+										</Input.Wrapper>
+									</Input.Root>
+								</div>
+
+								{/* Custom Properties */}
+								{customProperties.length > 0 && (
+									<div className="space-y-4 border-stroke-soft-100 border-t pt-4">
+										{customProperties.map((property) => (
+											<div key={property.id} className="flex flex-col gap-1">
+												<Label.Root htmlFor={`prop-${property.id}`}>
+													{property.name}
+												</Label.Root>
+												<Input.Root size="small">
+													<Input.Wrapper>
+														<Input.Input
+															id={`prop-${property.id}`}
+															type={
+																property.type === "number" ? "number" : "text"
+															}
+															value={propertyValues[property.id]}
+															onChange={(e) =>
+																handlePropertyChange(
+																	property.id,
+																	e.target.value,
+																)
+															}
+															disabled={isSaving}
+															placeholder={
+																property.fallbackValue ||
+																`Enter ${property.name}`
+															}
+														/>
+													</Input.Wrapper>
+												</Input.Root>
+											</div>
+										))}
+									</div>
 								)}
-							</Button.Root>
-						</Modal.Footer>
-					</form>
+							</Modal.Body>
+
+							<Modal.Footer className="mt-4 flex items-center justify-end gap-3 border-stroke-soft-100/50">
+								<Button.Root
+									type="button"
+									variant="neutral"
+									mode="stroke"
+									size="xsmall"
+									onClick={() => handleOpenChange(false)}
+									disabled={isSaving}
+								>
+									Cancel
+									<Kbd.Root className="bg-bg-weak-50 text-xs">Esc</Kbd.Root>
+								</Button.Root>
+								<Button.Root
+									type="submit"
+									variant="neutral"
+									size="xsmall"
+									disabled={isSaving}
+								>
+									{isSaving ? (
+										<>
+											<Spinner size={14} color="currentColor" />
+											Updating...
+										</>
+									) : (
+										<>
+											Update
+											<span className="inline-flex items-center gap-0.5">
+												<Icon
+													name="enter"
+													className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+												/>
+											</span>
+										</>
+									)}
+								</Button.Root>
+							</Modal.Footer>
+						</form>
+					)}
 				</div>
 			</Modal.Content>
 		</Modal.Root>

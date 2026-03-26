@@ -9,8 +9,6 @@ import { parseAsInteger, useQueryState } from "nuqs";
 import { useState } from "react";
 import { toast } from "sonner";
 import useSWR, { useSWRConfig } from "swr";
-import { DeleteTopicModal } from "./delete-topic";
-import { EditTopicModal } from "./edit-topic-modal";
 import { TopicTable } from "./topic-table";
 
 interface Topic {
@@ -37,7 +35,7 @@ export const TopicList = () => {
 	const { mutate } = useSWRConfig();
 	const [searchQuery, setSearchQuery] = useState<string>("");
 	const [, setModal] = useQueryState("modal");
-	const [editTopicId, setEditTopicId] = useState<string | null>(null);
+	const [, setId] = useQueryState("id");
 	const [currentPage, setCurrentPage] = useQueryState(
 		"page",
 		parseAsInteger.withDefault(1),
@@ -137,7 +135,14 @@ export const TopicList = () => {
 					isLoading={isLoading}
 					loadingRows={4}
 					onToggleVisibility={handleToggleVisibility}
-					onEdit={(topicId) => setEditTopicId(topicId)}
+					onEdit={(topicId) => {
+						setModal("edit-topic");
+						setId(topicId);
+					}}
+					onDelete={(topicId) => {
+						setModal("delete-topic");
+						setId(topicId);
+					}}
 					onAddTopic={() => setModal("create-topic")}
 				/>
 			</div>
@@ -166,13 +171,6 @@ export const TopicList = () => {
 					/>
 				</div>
 			)}
-
-			<DeleteTopicModal topics={data?.topics || []} />
-			<EditTopicModal
-				open={!!editTopicId}
-				onOpenChange={(open) => !open && setEditTopicId(null)}
-				topic={data?.topics?.find((t) => t.id === editTopicId) || null}
-			/>
 		</div>
 	);
 };

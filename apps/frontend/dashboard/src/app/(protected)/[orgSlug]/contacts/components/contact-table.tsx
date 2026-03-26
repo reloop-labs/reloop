@@ -5,11 +5,10 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useRouter } from "next/navigation";
+import { useQueryState } from "nuqs";
 import { useState } from "react";
 import { ContactDropdown } from "./contact-dropdown";
 import { ContactsEmptyState } from "./contacts-empty-state";
-import { DeleteContactModal } from "./delete-contact-modal";
-import { EditContactModal } from "./edit-contact-modal";
 
 interface Contact {
 	id: string;
@@ -28,7 +27,6 @@ interface ContactTableProps {
 	contacts: Contact[];
 	isLoading?: boolean;
 	loadingRows?: number;
-	onDelete?: (contactId: string) => void;
 	onAddContact?: () => void;
 }
 
@@ -72,15 +70,12 @@ export const ContactTable = ({
 	contacts,
 	isLoading,
 	loadingRows = 6,
-	onDelete,
 	onAddContact,
 }: ContactTableProps) => {
 	const router = useRouter();
 	const { activeOrganization } = useUserOrganization();
-	const [editingContact, setEditingContact] = useState<Contact | null>(null);
-	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-	const [deletingContact, setDeletingContact] = useState<Contact | null>(null);
-	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+	const [, setModal] = useQueryState("modal");
+	const [, setId] = useQueryState("id");
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 
 	const handleRowClick = (contact: Contact) => {
@@ -90,20 +85,13 @@ export const ContactTable = ({
 	};
 
 	const handleEdit = (contact: Contact) => {
-		setEditingContact(contact);
-		setIsEditModalOpen(true);
+		setModal("edit-contact");
+		setId(contact.id);
 	};
 
 	const handleDelete = (contact: Contact) => {
-		setDeletingContact(contact);
-		setIsDeleteModalOpen(true);
-	};
-
-	const handleDeleteSuccess = () => {
-		if (deletingContact) {
-			onDelete?.(deletingContact.id);
-		}
-		setDeletingContact(null);
+		setModal("delete-contact");
+		setId(contact.id);
 	};
 
 	if (isLoading) {
@@ -221,21 +209,6 @@ export const ContactTable = ({
 					)}
 				</div>
 			</div>
-
-			{/* Edit Contact Modal */}
-			<EditContactModal
-				open={isEditModalOpen}
-				onOpenChange={setIsEditModalOpen}
-				contact={editingContact}
-			/>
-
-			{/* Delete Contact Modal */}
-			<DeleteContactModal
-				contact={deletingContact}
-				open={isDeleteModalOpen}
-				onOpenChange={setIsDeleteModalOpen}
-				onDeleteSuccess={handleDeleteSuccess}
-			/>
 		</>
 	);
 };
