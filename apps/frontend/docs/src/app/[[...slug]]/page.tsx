@@ -1,4 +1,5 @@
 import { baseOptions } from "@reloop/fe-docs/app/layout.config";
+import { Footer } from "@reloop/fe-docs/components/footer";
 import {
 	BiomejsIcon,
 	BunIcon,
@@ -81,12 +82,16 @@ export default async function Page(props: {
 					path: `/${params.slug?.join("/")}.mdx?plain=1`,
 					sha: "main/apps/frontend/dev/content/docs",
 				}}
-				footer={{}}
+				slots={{
+					footer: Footer,
+				}}
 			>
 				<div className="flex items-center justify-between">
 					<div>
 						<DocsTitle>{page.data.title}</DocsTitle>
-						<DocsDescription>{page.data.description}</DocsDescription>
+						<DocsDescription className="mb-4">
+							{page.data.description}
+						</DocsDescription>
 					</div>
 					<PageActions markdownUrl={`${page.url}.mdx`} />
 				</div>

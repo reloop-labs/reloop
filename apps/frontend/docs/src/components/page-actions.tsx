@@ -1,6 +1,4 @@
 "use client";
-import * as ButtonGroup from "@reloop/ui/button-group";
-import * as DropdownMenu from "@reloop/ui/dropdown";
 import { useCopyButton } from "fumadocs-ui/utils/use-copy-button";
 import {
 	Box,
@@ -47,105 +45,127 @@ export function PageActions({
 		);
 	});
 
+	const [isOpen, setOpen] = useState(false);
+
 	return (
-		<ButtonGroup.Root size="xsmall">
-			<ButtonGroup.Item
+		<div className="relative flex items-center rounded-xl border text-sm">
+			<button
+				type="button"
 				onClick={onCopy}
 				disabled={isLoading}
-				className="min-w-9"
+				className="flex h-8 min-w-9 items-center justify-center rounded-l-xl px-2 transition-colors hover:bg-fd-accent/30"
 			>
-				<ButtonGroup.Icon as={checked ? Check : Copy} className="size-3.5" />
-			</ButtonGroup.Item>
-			<DropdownMenu.Root>
-				<DropdownMenu.Trigger asChild>
-					<ButtonGroup.Item className="px-1.5">
-						<ChevronDown className="size-3.5 text-text-sub-600" />
-					</ButtonGroup.Item>
-				</DropdownMenu.Trigger>
-				<DropdownMenu.Content align="end" className="w-[320px]">
-					<DropdownMenu.Item
-						onClick={onCopy}
-						className="flex-col items-start gap-0.5 py-3"
-					>
-						<div className="flex items-center gap-2 font-medium text-text-strong-950">
-							<DropdownMenu.ItemIcon as={Copy} className="size-4" />
-							Copy page
-						</div>
-						<div className="ml-6 text-text-sub-600 text-xs">
-							Copy page as Markdown for LLMs
-						</div>
-					</DropdownMenu.Item>
+				{checked ? (
+					<Check className="size-3.5" />
+				) : (
+					<Copy className="size-3.5" />
+				)}
+			</button>
+			<div className="h-4 w-px border-border border-l" />
+			<div className="relative">
+				<button
+					type="button"
+					onClick={() => setOpen(!isOpen)}
+					className="flex h-8 items-center justify-center rounded-r-lg px-2.5 transition-colors hover:bg-fd-accent/30"
+				>
+					<ChevronDown
+						className={`size-3.5 text-text-sub-600 transition-transform ${isOpen ? "rotate-180" : ""}`}
+					/>
+				</button>
 
-					<DropdownMenu.Item
-						asChild
-						className="flex-col items-start gap-0.5 py-3"
-					>
-						<a href="/llms-full.txt" target="_blank" rel="noreferrer noopener">
-							<div className="flex w-full items-center gap-2 font-medium text-text-strong-950">
-								<DropdownMenu.ItemIcon as={FileText} className="size-4" />
-								llms-full.txt
-								<ExternalLinkIcon className="ml-auto size-3 text-text-soft-400" />
-							</div>
-							<div className="ml-6 text-text-sub-600 text-xs">
-								View all docs as Markdown for LLMs
-							</div>
-						</a>
-					</DropdownMenu.Item>
+				{isOpen && (
+					<>
+						{/* Overlay to close on outside click */}
+						<div
+							className="fixed inset-0 z-40"
+							onClick={() => setOpen(false)}
+						/>
+						<div className="absolute top-full right-0 z-50 mt-1 w-[320px] rounded-2xl border bg-fd-popover p-1 shadow-lg">
+							<button
+								type="button"
+								onClick={(e) => {
+									onCopy(e);
+									setOpen(false);
+								}}
+								className="flex w-full flex-col items-start gap-0.5 rounded-xl px-3 py-3 text-left transition-colors hover:bg-fd-accent/30"
+							>
+								<div className="flex items-center gap-2 font-medium text-text-strong-950">
+									<Copy className="size-4" />
+									Copy page
+								</div>
+								<div className="ml-6 text-fd-muted-foreground text-text-sub-600 text-xs">
+									Copy page as Markdown for LLMs
+								</div>
+							</button>
 
-					<DropdownMenu.Item
-						onClick={onCopyMCP}
-						className="flex-col items-start gap-0.5 py-3"
-					>
-						<div className="flex w-full items-center gap-2 font-medium text-text-strong-950">
-							<DropdownMenu.ItemIcon as={Terminal} className="size-4" />
-							{mcpChecked ? "Copied!" : "Copy MCP install command"}
+							<a
+								href="/llms-full.txt"
+								target="_blank"
+								rel="noreferrer noopener"
+								className="flex w-full flex-col items-start gap-0.5 rounded-xl px-3 py-3 transition-colors hover:bg-fd-accent/30"
+							>
+								<div className="flex w-full items-center gap-2 font-medium text-text-strong-950">
+									<FileText className="size-4" />
+									llms-full.txt
+									<ExternalLinkIcon className="ml-auto size-3 text-text-soft-400" />
+								</div>
+								<div className="ml-6 text-fd-muted-foreground text-text-sub-600 text-xs">
+									View all docs as Markdown for LLMs
+								</div>
+							</a>
+
+							<button
+								type="button"
+								onClick={(e) => {
+									onCopyMCP(e);
+									setOpen(false);
+								}}
+								className="flex w-full flex-col items-start gap-0.5 rounded-md px-3 py-3 text-left transition-colors hover:bg-fd-accent/30"
+							>
+								<div className="flex w-full items-center gap-2 font-medium text-text-strong-950">
+									<Terminal className="size-4" />
+									{mcpChecked ? "Copied!" : "Copy MCP install command"}
+								</div>
+								<div className="ml-6 text-fd-muted-foreground text-text-sub-600 text-xs">
+									Copy npx command to install MCP server
+								</div>
+							</button>
+
+							<a
+								href="https://cursor.com/mcp"
+								target="_blank"
+								rel="noreferrer noopener"
+								className="flex w-full flex-col items-start gap-0.5 rounded-xl px-3 py-3 transition-colors hover:bg-fd-accent/30"
+							>
+								<div className="flex w-full items-center gap-2 font-medium text-text-strong-950">
+									<Box className="size-4" />
+									Connect to Cursor
+									<ExternalLinkIcon className="ml-auto size-3 text-text-soft-400" />
+								</div>
+								<div className="ml-6 text-fd-muted-foreground text-text-sub-600 text-xs">
+									Install MCP Server on Cursor
+								</div>
+							</a>
+
+							<a
+								href="vscode://reloop.mcp-server"
+								target="_blank"
+								rel="noreferrer noopener"
+								className="flex w-full flex-col items-start gap-0.5 rounded-xl px-3 py-3 transition-colors hover:bg-fd-accent/30"
+							>
+								<div className="flex w-full items-center gap-2 font-medium text-text-strong-950">
+									<Code className="size-4" />
+									Connect to VS Code
+									<ExternalLinkIcon className="ml-auto size-3 text-text-soft-400" />
+								</div>
+								<div className="ml-6 text-fd-muted-foreground text-text-sub-600 text-xs">
+									Install MCP Server on VS Code
+								</div>
+							</a>
 						</div>
-						<div className="ml-6 text-text-sub-600 text-xs">
-							Copy npx command to install MCP server
-						</div>
-					</DropdownMenu.Item>
-
-					<DropdownMenu.Item
-						asChild
-						className="flex-col items-start gap-0.5 py-3"
-					>
-						<a
-							href="https://cursor.com/mcp"
-							target="_blank"
-							rel="noreferrer noopener"
-						>
-							<div className="flex w-full items-center gap-2 font-medium text-text-strong-950">
-								<DropdownMenu.ItemIcon as={Box} className="size-4" />
-								Connect to Cursor
-								<ExternalLinkIcon className="ml-auto size-3 text-text-soft-400" />
-							</div>
-							<div className="ml-6 text-text-sub-600 text-xs">
-								Install MCP Server on Cursor
-							</div>
-						</a>
-					</DropdownMenu.Item>
-
-					<DropdownMenu.Item
-						asChild
-						className="flex-col items-start gap-0.5 py-3"
-					>
-						<a
-							href="vscode://reloop.mcp-server"
-							target="_blank"
-							rel="noreferrer noopener"
-						>
-							<div className="flex w-full items-center gap-2 font-medium text-text-strong-950">
-								<DropdownMenu.ItemIcon as={Code} className="size-4" />
-								Connect to VS Code
-								<ExternalLinkIcon className="ml-auto size-3 text-text-soft-400" />
-							</div>
-							<div className="ml-6 text-text-sub-600 text-xs">
-								Install MCP Server on VS Code
-							</div>
-						</a>
-					</DropdownMenu.Item>
-				</DropdownMenu.Content>
-			</DropdownMenu.Root>
-		</ButtonGroup.Root>
+					</>
+				)}
+			</div>
+		</div>
 	);
 }
