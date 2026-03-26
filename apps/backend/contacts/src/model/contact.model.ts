@@ -146,7 +146,25 @@ export namespace ContactModel {
 		),
 		createdAt: t.Date(),
 		updatedAt: t.Date(),
-	});
+	},
+		{
+			examples: [
+				{
+					object: "contact",
+					id: "con_123456789",
+					email: "john.doe@example.com",
+					firstName: "John",
+					lastName: "Doe",
+					status: "subscribed",
+					properties: {
+						company: "Reloop",
+						role: "Developer",
+					},
+					createdAt: "2026-03-23T10:00:00Z",
+					updatedAt: "2026-03-23T10:00:00Z",
+				},
+			],
+		});
 
 	export type ContactResponse = typeof contactResponse.static;
 

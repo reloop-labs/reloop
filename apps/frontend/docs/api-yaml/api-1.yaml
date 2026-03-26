@@ -1,0 +1,3239 @@
+openapi: 3.0.3
+info:
+  title: Contacts Service
+  description: Development documentation
+  version: 1.0.0
+components:
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      name: x-api-key
+      in: header
+  schemas: {}
+paths:
+  /api/contacts/:
+    get:
+      tags:
+        - Health
+      summary: Status
+      description: Checks the health of the Contacts Service
+      operationId: getApiContacts
+  /api/contacts/health/redis:
+    get:
+      tags:
+        - Health
+      summary: Redis
+      description: Checks the health of the Redis database
+      operationId: getApiContactsHealthRedis
+  /api/contacts/health/postgres:
+    get:
+      tags:
+        - Health
+      summary: Postgres
+      description: Checks the health of the Postgres database
+      operationId: getApiContactsHealthPostgres
+  /api/contacts/create:
+    post:
+      tags:
+        - Contact
+      summary: Create Contact
+      description: Creates contact
+      x-codeSamples:
+        - id: node
+          lang: JavaScript
+          label: Node.js
+          source: |-
+            import Reloop from 'reloop-email';
+
+            const reloop = new Reloop({
+              url: 'https://reloop.sh',
+              key: 're_123456789'
+            });
+
+            const contact = await reloop.audience.create({
+              email: 'john.doe@example.com',
+              firstName: 'John',
+              lastName: 'Doe',
+              status: 'subscribed'
+            });
+
+            console.log(contact);
+        - id: php
+          lang: PHP
+          label: PHP
+          source: |-
+            $reloop = new \Reloop\Client([
+              'url' => 'https://reloop.sh',
+              'key' => 're_123456789'
+            ]);
+
+            $contact = $reloop->audience->create([
+              'email' => 'john.doe@example.com',
+              'firstName' => 'John',
+              'lastName' => 'Doe',
+              'status' => 'subscribed'
+            ]);
+
+            echo $contact->id;
+        - id: ruby
+          lang: Ruby
+          label: Ruby
+          source: |-
+            require 'reloop'
+
+            client = Reloop::Client.new(
+              url: 'https://reloop.sh',
+              key: 're_123456789'
+            )
+
+            contact = client.audience.create(
+              email: 'john.doe@example.com',
+              first_name: 'John',
+              last_name: 'Doe',
+              status: 'subscribed'
+            )
+
+            puts contact.id
+        - id: python
+          lang: Python
+          label: Python
+          source: |-
+            from reloop import Reloop
+
+            client = Reloop(
+                url="https://reloop.sh",
+                key="re_123456789"
+            )
+
+            contact = client.audience.create(
+                email="john.doe@example.com",
+                first_name="John",
+                last_name="Doe",
+                status="subscribed"
+            )
+
+            print(contact.id)
+        - id: go
+          lang: Go
+          label: Go
+          source: >-
+            package main
+
+
+            import (
+              "fmt"
+              reloop "github.com/reloop-labs/reloop-go"
+            )
+
+
+            func main() {
+              client := reloop.New(&reloop.Config{
+                URL: "https://reloop.sh",
+                Key: "re_123456789",
+              })
+
+              contact, err := client.Audience.Create(&reloop.CreateAudienceRequest{
+                Email:     "john.doe@example.com",
+                FirstName: "John",
+                LastName:  "Doe",
+                Status:    "subscribed",
+              })
+
+              if err != nil {
+                panic(err)
+              }
+
+              fmt.Println(contact.ID)
+            }
+        - id: rust
+          lang: Rust
+          label: Rust
+          source: |-
+            use reloop::Client;
+
+            #[tokio::main]
+            async fn main() -> Result<(), Box<dyn std::error::Error>> {
+                let client = Client::new(
+                    "https://reloop.sh",
+                    "re_123456789"
+                );
+
+                let contact = client
+                    .audience()
+                    .create(CreateAudienceRequest {
+                        email: "john.doe@example.com".into(),
+                        first_name: Some("John".into()),
+                        last_name: Some("Doe".into()),
+                        status: Some("subscribed".into()),
+                    })
+                    .await?;
+
+                println!("{}", contact.id);
+                Ok(())
+            }
+        - id: elixir
+          lang: Elixir
+          label: Elixir
+          source: |-
+            client = Reloop.new(
+              url: "https://reloop.sh",
+              key: "re_123456789"
+            )
+
+            {:ok, contact} = Reloop.Audience.create(client, %{
+              email: "john.doe@example.com",
+              first_name: "John",
+              last_name: "Doe",
+              status: "subscribed"
+            })
+
+            IO.inspect(contact.id)
+        - id: java
+          lang: Java
+          label: Java
+          source: |-
+            import com.reloop.Reloop;
+            import com.reloop.models.Contact;
+
+            Reloop client = new Reloop.Builder()
+                .url("https://reloop.sh")
+                .key("re_123456789")
+                .build();
+
+            Contact contact = client.audience().create(
+                CreateAudienceRequest.builder()
+                    .email("john.doe@example.com")
+                    .firstName("John")
+                    .lastName("Doe")
+                    .status("subscribed")
+                    .build()
+            );
+
+            System.out.println(contact.getId());
+        - id: dotnet
+          lang: C#
+          label: .NET
+          source: >-
+            using Reloop;
+
+
+            var client = new ReloopClient(new ReloopConfig
+
+            {
+                Url = "https://reloop.sh",
+                Key = "re_123456789"
+            });
+
+
+            var contact = await client.Audience.CreateAsync(new
+            CreateAudienceRequest
+
+            {
+                Email = "john.doe@example.com",
+                FirstName = "John",
+                LastName = "Doe",
+                Status = "subscribed"
+            });
+
+
+            Console.WriteLine(contact.Id);
+        - id: curl
+          lang: Shell
+          label: cURL
+          source: |-
+            curl -X POST https://reloop.sh/api/contacts/v1/contacts/create \
+              -H "Authorization: Bearer re_123456789" \
+              -H "Content-Type: application/json" \
+              -d '{
+                "email": "john.doe@example.com",
+                "firstName": "John",
+                "lastName": "Doe",
+                "status": "subscribed"
+              }'
+      x-selectedCodeSample: node
+      responses:
+        "201":
+          description: Response for status 201
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    default: contact
+                    const: contact
+                    type: string
+                  id:
+                    description: Unique contact identifier
+                    type: string
+                  email:
+                    description: Contact email address
+                    type: string
+                  firstName:
+                    description: Contact first name
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                  lastName:
+                    description: Contact last name
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                  status:
+                    type: string
+                    enum:
+                      - subscribed
+                      - unsubscribed
+                      - blocked
+                  properties:
+                    description: Contact properties as key-value pairs
+                    default: {}
+                    type: object
+                    patternProperties:
+                      ^[a-z_]+$:
+                        anyOf:
+                          - type: string
+                          - type: number
+                  createdAt:
+                    anyOf:
+                      - type: Date
+                      - format: date-time
+                        type: string
+                      - format: date
+                        type: string
+                      - type: number
+                  updatedAt:
+                    anyOf:
+                      - type: Date
+                      - format: date-time
+                        type: string
+                      - format: date
+                        type: string
+                      - type: number
+                required:
+                  - object
+                  - id
+                  - email
+                  - firstName
+                  - lastName
+                  - status
+                  - properties
+                  - createdAt
+                  - updatedAt
+        "400":
+          description: Response for status 400
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    const: Invalid email format
+                    type: string
+                required:
+                  - message
+        "403":
+          description: Response for status 403
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    const: Unauthorized access
+                    type: string
+                required:
+                  - message
+        "409":
+          description: Response for status 409
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    const: Contact already exists
+                    type: string
+                required:
+                  - message
+      security:
+        - apiKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  pattern: ^[^\s@]+@[^\s@]+\.[^\s@]+$
+                  description: Contact email address
+                  type: string
+                firstName:
+                  description: Contact first name
+                  type: string
+                lastName:
+                  description: Contact last name
+                  type: string
+                status:
+                  type: string
+                  enum:
+                    - subscribed
+                    - unsubscribed
+                    - blocked
+                properties:
+                  description: Contact properties as key-value pairs
+                  type: object
+                  patternProperties:
+                    ^[a-z0-9_]+$:
+                      anyOf:
+                        - type: string
+                        - type: number
+                groupIds:
+                  description: Array of group IDs to add the contact to
+                  type: array
+                  items:
+                    type: string
+                topics:
+                  description: Array of topics to enroll the contact in
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      topicId:
+                        description: Topic identifier
+                        type: string
+                      subscription:
+                        type: string
+                        enum:
+                          - opt_in
+                          - opt_out
+                    required:
+                      - topicId
+                      - subscription
+              required:
+                - email
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                email:
+                  pattern: ^[^\s@]+@[^\s@]+\.[^\s@]+$
+                  description: Contact email address
+                  type: string
+                firstName:
+                  description: Contact first name
+                  type: string
+                lastName:
+                  description: Contact last name
+                  type: string
+                status:
+                  type: string
+                  enum:
+                    - subscribed
+                    - unsubscribed
+                    - blocked
+                properties:
+                  description: Contact properties as key-value pairs
+                  type: object
+                  patternProperties:
+                    ^[a-z0-9_]+$:
+                      anyOf:
+                        - type: string
+                        - type: number
+                groupIds:
+                  description: Array of group IDs to add the contact to
+                  type: array
+                  items:
+                    type: string
+                topics:
+                  description: Array of topics to enroll the contact in
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      topicId:
+                        description: Topic identifier
+                        type: string
+                      subscription:
+                        type: string
+                        enum:
+                          - opt_in
+                          - opt_out
+                    required:
+                      - topicId
+                      - subscription
+              required:
+                - email
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                email:
+                  pattern: ^[^\s@]+@[^\s@]+\.[^\s@]+$
+                  description: Contact email address
+                  type: string
+                firstName:
+                  description: Contact first name
+                  type: string
+                lastName:
+                  description: Contact last name
+                  type: string
+                status:
+                  type: string
+                  enum:
+                    - subscribed
+                    - unsubscribed
+                    - blocked
+                properties:
+                  description: Contact properties as key-value pairs
+                  type: object
+                  patternProperties:
+                    ^[a-z0-9_]+$:
+                      anyOf:
+                        - type: string
+                        - type: number
+                groupIds:
+                  description: Array of group IDs to add the contact to
+                  type: array
+                  items:
+                    type: string
+                topics:
+                  description: Array of topics to enroll the contact in
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      topicId:
+                        description: Topic identifier
+                        type: string
+                      subscription:
+                        type: string
+                        enum:
+                          - opt_in
+                          - opt_out
+                    required:
+                      - topicId
+                      - subscription
+              required:
+                - email
+      operationId: postApiContactsCreate
+  /api/contacts/retrieve/{contact_id}:
+    get:
+      tags:
+        - Contact
+      summary: Retrieve Contact
+      description: Retrieves a contact by ID
+      security:
+        - apiKey: []
+      parameters:
+        - name: contact_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    default: contact
+                    const: contact
+                    type: string
+                  id:
+                    description: Unique contact identifier
+                    type: string
+                  email:
+                    description: Contact email address
+                    type: string
+                  firstName:
+                    description: Contact first name
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                  lastName:
+                    description: Contact last name
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                  status:
+                    type: string
+                    enum:
+                      - subscribed
+                      - unsubscribed
+                      - blocked
+                  properties:
+                    description: Contact properties as key-value pairs
+                    default: {}
+                    type: object
+                    patternProperties:
+                      ^[a-z_]+$:
+                        anyOf:
+                          - type: string
+                          - type: number
+                  createdAt:
+                    anyOf:
+                      - type: Date
+                      - format: date-time
+                        type: string
+                      - format: date
+                        type: string
+                      - type: number
+                  updatedAt:
+                    anyOf:
+                      - type: Date
+                      - format: date-time
+                        type: string
+                      - format: date
+                        type: string
+                      - type: number
+                required:
+                  - object
+                  - id
+                  - email
+                  - firstName
+                  - lastName
+                  - status
+                  - properties
+                  - createdAt
+                  - updatedAt
+        "403":
+          description: Response for status 403
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    const: Unauthorized access
+                    type: string
+                required:
+                  - message
+        "404":
+          description: Response for status 404
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    const: Contact not found
+                    type: string
+                required:
+                  - message
+      operationId: getApiContactsRetrieveByContact_id
+  /api/contacts/list:
+    get:
+      tags:
+        - Contact
+      summary: List Contacts
+      description: Retrieves a paginated list of contacts with optional filtering and search
+      security:
+        - apiKey: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            minimum: 1
+            default: 1
+            type: number
+        - name: limit
+          in: query
+          required: false
+          schema:
+            minimum: 1
+            maximum: 100
+            default: 100
+            type: number
+        - name: search
+          in: query
+          required: false
+          schema:
+            description: Search by email
+            type: string
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - subscribed
+              - unsubscribed
+              - blocked
+        - name: organizationId
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    default: contact
+                    const: contact
+                    type: string
+                  contacts:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          description: Unique contact identifier
+                          type: string
+                        email:
+                          description: Contact email address
+                          type: string
+                        firstName:
+                          description: Contact first name
+                          anyOf:
+                            - type: string
+                            - type: "null"
+                        lastName:
+                          description: Contact last name
+                          anyOf:
+                            - type: string
+                            - type: "null"
+                        status:
+                          type: string
+                          enum:
+                            - subscribed
+                            - unsubscribed
+                            - blocked
+                        properties:
+                          description: Contact properties as key-value pairs
+                          default: {}
+                          type: object
+                          patternProperties:
+                            ^[a-z_]+$:
+                              anyOf:
+                                - type: string
+                                - type: number
+                        createdAt:
+                          anyOf:
+                            - type: Date
+                            - format: date-time
+                              type: string
+                            - format: date
+                              type: string
+                            - type: number
+                        updatedAt:
+                          anyOf:
+                            - type: Date
+                            - format: date-time
+                              type: string
+                            - format: date
+                              type: string
+                            - type: number
+                      required:
+                        - id
+                        - email
+                        - firstName
+                        - lastName
+                        - status
+                        - properties
+                        - createdAt
+                        - updatedAt
+                  total:
+                    type: number
+                  page:
+                    type: number
+                  limit:
+                    type: number
+                  totalContacts:
+                    description: Total number of contacts in organization
+                    type: number
+                  subscribedContacts:
+                    description: Total number of subscribed contacts
+                    type: number
+                  unsubscribedContacts:
+                    description: Total number of unsubscribed contacts
+                    type: number
+                required:
+                  - object
+                  - contacts
+                  - total
+                  - page
+                  - limit
+                  - totalContacts
+                  - subscribedContacts
+                  - unsubscribedContacts
+        "403":
+          description: Response for status 403
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    const: Unauthorized access
+                    type: string
+                required:
+                  - message
+      operationId: getApiContactsList
+  /api/contacts/{contact_id}:
+    patch:
+      tags:
+        - Contact
+      summary: Update Contact
+      description: Updates an existing contact's information
+      security:
+        - apiKey: []
+      parameters:
+        - name: contact_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  pattern: ^[^\s@]+@[^\s@]+\.[^\s@]+$
+                  description: Contact email address
+                  type: string
+                firstName:
+                  description: Contact first name
+                  type: string
+                lastName:
+                  description: Contact last name
+                  type: string
+                status:
+                  type: string
+                  enum:
+                    - subscribed
+                    - unsubscribed
+                    - blocked
+                properties:
+                  description: Contact properties as key-value pairs to update
+                  type: object
+                  patternProperties:
+                    ^[a-z_]+$:
+                      anyOf:
+                        - type: string
+                        - type: number
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                email:
+                  pattern: ^[^\s@]+@[^\s@]+\.[^\s@]+$
+                  description: Contact email address
+                  type: string
+                firstName:
+                  description: Contact first name
+                  type: string
+                lastName:
+                  description: Contact last name
+                  type: string
+                status:
+                  type: string
+                  enum:
+                    - subscribed
+                    - unsubscribed
+                    - blocked
+                properties:
+                  description: Contact properties as key-value pairs to update
+                  type: object
+                  patternProperties:
+                    ^[a-z_]+$:
+                      anyOf:
+                        - type: string
+                        - type: number
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                email:
+                  pattern: ^[^\s@]+@[^\s@]+\.[^\s@]+$
+                  description: Contact email address
+                  type: string
+                firstName:
+                  description: Contact first name
+                  type: string
+                lastName:
+                  description: Contact last name
+                  type: string
+                status:
+                  type: string
+                  enum:
+                    - subscribed
+                    - unsubscribed
+                    - blocked
+                properties:
+                  description: Contact properties as key-value pairs to update
+                  type: object
+                  patternProperties:
+                    ^[a-z_]+$:
+                      anyOf:
+                        - type: string
+                        - type: number
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    default: contact
+                    const: contact
+                    type: string
+                  id:
+                    description: Unique contact identifier
+                    type: string
+                  email:
+                    description: Contact email address
+                    type: string
+                  firstName:
+                    description: Contact first name
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                  lastName:
+                    description: Contact last name
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                  status:
+                    type: string
+                    enum:
+                      - subscribed
+                      - unsubscribed
+                      - blocked
+                  properties:
+                    description: Contact properties as key-value pairs
+                    default: {}
+                    type: object
+                    patternProperties:
+                      ^[a-z_]+$:
+                        anyOf:
+                          - type: string
+                          - type: number
+                  createdAt:
+                    anyOf:
+                      - type: Date
+                      - format: date-time
+                        type: string
+                      - format: date
+                        type: string
+                      - type: number
+                  updatedAt:
+                    anyOf:
+                      - type: Date
+                      - format: date-time
+                        type: string
+                      - format: date
+                        type: string
+                      - type: number
+                required:
+                  - object
+                  - id
+                  - email
+                  - firstName
+                  - lastName
+                  - status
+                  - properties
+                  - createdAt
+                  - updatedAt
+        "400":
+          description: Response for status 400
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                        message:
+                          type: string
+                      required:
+                        - field
+                        - message
+                required:
+                  - message
+                  - errors
+        "403":
+          description: Response for status 403
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    const: Unauthorized access
+                    type: string
+                required:
+                  - message
+        "404":
+          description: Response for status 404
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    const: Contact not found
+                    type: string
+                required:
+                  - message
+      operationId: patchApiContactsByContact_id
+    delete:
+      tags:
+        - Contact
+      summary: Delete Contact
+      description: Removes a contact from the organization
+      security:
+        - apiKey: []
+      parameters:
+        - name: contact_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                required:
+                  - message
+        "403":
+          description: Response for status 403
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    const: Unauthorized access
+                    type: string
+                required:
+                  - message
+        "404":
+          description: Response for status 404
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    const: Contact not found
+                    type: string
+                required:
+                  - message
+      operationId: deleteApiContactsByContact_id
+  /api/contacts/topic/{topic_id}:
+    post:
+      tags:
+        - Contact
+      summary: Add Contact Topic
+      description: Creates a contact (if not exists) and enrolls them in a topic in
+        one operation
+      security:
+        - apiKey: []
+      parameters:
+        - name: topic_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  pattern: ^[^\s@]+@[^\s@]+\.[^\s@]+$
+                  description: Contact email address
+                  type: string
+                subscription:
+                  type: string
+                  enum:
+                    - opt_in
+                    - opt_out
+              required:
+                - email
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                email:
+                  pattern: ^[^\s@]+@[^\s@]+\.[^\s@]+$
+                  description: Contact email address
+                  type: string
+                subscription:
+                  type: string
+                  enum:
+                    - opt_in
+                    - opt_out
+              required:
+                - email
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                email:
+                  pattern: ^[^\s@]+@[^\s@]+\.[^\s@]+$
+                  description: Contact email address
+                  type: string
+                subscription:
+                  type: string
+                  enum:
+                    - opt_in
+                    - opt_out
+              required:
+                - email
+      responses:
+        "201":
+          description: Response for status 201
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  contact:
+                    type: object
+                    properties:
+                      object:
+                        default: contact
+                        const: contact
+                        type: string
+                      id:
+                        description: Unique contact identifier
+                        type: string
+                      email:
+                        description: Contact email address
+                        type: string
+                      firstName:
+                        description: Contact first name
+                        anyOf:
+                          - type: string
+                          - type: "null"
+                      lastName:
+                        description: Contact last name
+                        anyOf:
+                          - type: string
+                          - type: "null"
+                      status:
+                        type: string
+                        enum:
+                          - subscribed
+                          - unsubscribed
+                          - blocked
+                      properties:
+                        description: Contact properties as key-value pairs
+                        default: {}
+                        type: object
+                        patternProperties:
+                          ^[a-z_]+$:
+                            anyOf:
+                              - type: string
+                              - type: number
+                      createdAt:
+                        anyOf:
+                          - type: Date
+                          - format: date-time
+                            type: string
+                          - format: date
+                            type: string
+                          - type: number
+                      updatedAt:
+                        anyOf:
+                          - type: Date
+                          - format: date-time
+                            type: string
+                          - format: date
+                            type: string
+                          - type: number
+                    required:
+                      - object
+                      - id
+                      - email
+                      - firstName
+                      - lastName
+                      - status
+                      - properties
+                      - createdAt
+                      - updatedAt
+                  subscriptionId:
+                    description: Created subscription ID
+                    type: string
+                required:
+                  - contact
+                  - subscriptionId
+        "400":
+          description: Response for status 400
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    const: Invalid email format
+                    type: string
+                required:
+                  - message
+        "403":
+          description: Response for status 403
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    const: Unauthorized access
+                    type: string
+                required:
+                  - message
+        "404":
+          description: Response for status 404
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    const: Topic enrollment not found
+                    type: string
+                required:
+                  - message
+        "409":
+          description: Response for status 409
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    const: Contact is already enrolled in this topic
+                    type: string
+                required:
+                  - message
+      operationId: postApiContactsTopicByTopic_id
+    patch:
+      tags:
+        - Contact
+      summary: Update Contact Topic
+      description: Updates a contact's enrollment status in a topic
+      security:
+        - apiKey: []
+      parameters:
+        - name: topic_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  pattern: ^[^\s@]+@[^\s@]+\.[^\s@]+$
+                  description: Contact email address
+                  type: string
+                subscription:
+                  type: string
+                  enum:
+                    - opt_in
+                    - opt_out
+              required:
+                - email
+                - subscription
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                email:
+                  pattern: ^[^\s@]+@[^\s@]+\.[^\s@]+$
+                  description: Contact email address
+                  type: string
+                subscription:
+                  type: string
+                  enum:
+                    - opt_in
+                    - opt_out
+              required:
+                - email
+                - subscription
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                email:
+                  pattern: ^[^\s@]+@[^\s@]+\.[^\s@]+$
+                  description: Contact email address
+                  type: string
+                subscription:
+                  type: string
+                  enum:
+                    - opt_in
+                    - opt_out
+              required:
+                - email
+                - subscription
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    default: true
+                    type: boolean
+                  status:
+                    type: string
+                required:
+                  - success
+                  - status
+        "400":
+          description: Response for status 400
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                required:
+                  - message
+        "404":
+          description: Response for status 404
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                required:
+                  - message
+      operationId: patchApiContactsTopicByTopic_id
+  /api/contacts/group/{group_id}:
+    post:
+      tags:
+        - Contact
+      summary: Add Contact Group
+      description: Adds a contact to a group by ID or email
+      security:
+        - apiKey: []
+      parameters:
+        - name: group_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  pattern: ^[^\s@]+@[^\s@]+\.[^\s@]+$
+                  description: Contact email address
+                  type: string
+              required:
+                - email
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                email:
+                  pattern: ^[^\s@]+@[^\s@]+\.[^\s@]+$
+                  description: Contact email address
+                  type: string
+              required:
+                - email
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                email:
+                  pattern: ^[^\s@]+@[^\s@]+\.[^\s@]+$
+                  description: Contact email address
+                  type: string
+              required:
+                - email
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    default: true
+                    type: boolean
+                  contactId:
+                    type: string
+                  groupId:
+                    type: string
+                required:
+                  - success
+                  - contactId
+                  - groupId
+        "400":
+          description: Response for status 400
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                required:
+                  - message
+        "404":
+          description: Response for status 404
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                required:
+                  - message
+      operationId: postApiContactsGroupByGroup_id
+    delete:
+      tags:
+        - Contact
+      summary: Delete Contact Group
+      description: Deletes a contact from a group by ID or email
+      security:
+        - apiKey: []
+      parameters:
+        - name: group_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  pattern: ^[^\s@]+@[^\s@]+\.[^\s@]+$
+                  description: Contact email address
+                  type: string
+              required:
+                - email
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                email:
+                  pattern: ^[^\s@]+@[^\s@]+\.[^\s@]+$
+                  description: Contact email address
+                  type: string
+              required:
+                - email
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                email:
+                  pattern: ^[^\s@]+@[^\s@]+\.[^\s@]+$
+                  description: Contact email address
+                  type: string
+              required:
+                - email
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    default: true
+                    type: boolean
+                required:
+                  - success
+        "400":
+          description: Response for status 400
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                required:
+                  - message
+        "404":
+          description: Response for status 404
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                required:
+                  - message
+      operationId: deleteApiContactsGroupByGroup_id
+  /api/contacts/v1/properties/create:
+    post:
+      tags:
+        - Contact Properties
+      summary: Create Contact Property
+      description: Create a new custom property for contacts in the organization
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    default: contact_property
+                    const: contact_property
+                    type: string
+                  id:
+                    description: Unique property identifier
+                    type: string
+                  name:
+                    description: Property name
+                    type: string
+                  type:
+                    description: Property type (string or number)
+                    type: string
+                  fallbackValue:
+                    description: Fallback value
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                  createdAt:
+                    anyOf:
+                      - type: Date
+                      - format: date-time
+                        type: string
+                      - format: date
+                        type: string
+                      - type: number
+                  updatedAt:
+                    anyOf:
+                      - type: Date
+                      - format: date-time
+                        type: string
+                      - format: date
+                        type: string
+                      - type: number
+                required:
+                  - object
+                  - id
+                  - name
+                  - type
+                  - fallbackValue
+                  - createdAt
+                  - updatedAt
+        "401":
+          description: Response for status 401
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    const: Unauthorized access
+                    type: string
+                required:
+                  - message
+        "409":
+          description: Response for status 409
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    const: Property already exists
+                    type: string
+                required:
+                  - message
+      security:
+        - apiKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  minLength: 1
+                  maxLength: 255
+                  description: Property name (e.g., company_name, first_name)
+                  type: string
+                type:
+                  type: string
+                  enum:
+                    - string
+                    - number
+                fallbackValue:
+                  description: Default value to use when property is empty
+                  type: string
+              required:
+                - name
+                - type
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                name:
+                  minLength: 1
+                  maxLength: 255
+                  description: Property name (e.g., company_name, first_name)
+                  type: string
+                type:
+                  type: string
+                  enum:
+                    - string
+                    - number
+                fallbackValue:
+                  description: Default value to use when property is empty
+                  type: string
+              required:
+                - name
+                - type
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  minLength: 1
+                  maxLength: 255
+                  description: Property name (e.g., company_name, first_name)
+                  type: string
+                type:
+                  type: string
+                  enum:
+                    - string
+                    - number
+                fallbackValue:
+                  description: Default value to use when property is empty
+                  type: string
+              required:
+                - name
+                - type
+      operationId: postApiContactsV1PropertiesCreate
+  /api/contacts/v1/properties/list:
+    get:
+      tags:
+        - Contact Properties
+      summary: List Contact Properties
+      description: List all properties for the organization with pagination and filtering
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    default: contact_property
+                    const: contact_property
+                    type: string
+                  properties:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          description: Unique property identifier
+                          type: string
+                        name:
+                          description: Property name
+                          type: string
+                        type:
+                          description: Property type (string or number)
+                          type: string
+                        fallbackValue:
+                          description: Fallback value
+                          anyOf:
+                            - type: string
+                            - type: "null"
+                        createdAt:
+                          anyOf:
+                            - type: Date
+                            - format: date-time
+                              type: string
+                            - format: date
+                              type: string
+                            - type: number
+                        updatedAt:
+                          anyOf:
+                            - type: Date
+                            - format: date-time
+                              type: string
+                            - format: date
+                              type: string
+                            - type: number
+                      required:
+                        - id
+                        - name
+                        - type
+                        - fallbackValue
+                        - createdAt
+                        - updatedAt
+                  total:
+                    type: number
+                  page:
+                    type: number
+                  limit:
+                    type: number
+                required:
+                  - object
+                  - properties
+                  - total
+                  - page
+                  - limit
+        "401":
+          description: Response for status 401
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    const: Unauthorized access
+                    type: string
+                required:
+                  - message
+      security:
+        - apiKey: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            minimum: 1
+            default: 1
+            type: number
+        - name: limit
+          in: query
+          required: false
+          schema:
+            minimum: 1
+            maximum: 100
+            default: 10
+            type: number
+        - name: search
+          in: query
+          required: false
+          schema:
+            description: Search by name
+            type: string
+        - name: type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - string
+              - number
+        - name: organizationId
+          in: query
+          required: false
+          schema:
+            type: string
+      operationId: getApiContactsV1PropertiesList
+  /api/contacts/v1/properties/{contact_property_id}:
+    patch:
+      tags:
+        - Contact Properties
+      summary: Update Contact Property
+      description: Update the fallback value of a property
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    default: contact_property
+                    const: contact_property
+                    type: string
+                  id:
+                    description: Unique property identifier
+                    type: string
+                  name:
+                    description: Property name
+                    type: string
+                  type:
+                    description: Property type (string or number)
+                    type: string
+                  fallbackValue:
+                    description: Fallback value
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                  createdAt:
+                    anyOf:
+                      - type: Date
+                      - format: date-time
+                        type: string
+                      - format: date
+                        type: string
+                      - type: number
+                  updatedAt:
+                    anyOf:
+                      - type: Date
+                      - format: date-time
+                        type: string
+                      - format: date
+                        type: string
+                      - type: number
+                required:
+                  - object
+                  - id
+                  - name
+                  - type
+                  - fallbackValue
+                  - createdAt
+                  - updatedAt
+        "401":
+          description: Response for status 401
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    const: Unauthorized access
+                    type: string
+                required:
+                  - message
+        "404":
+          description: Response for status 404
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    const: Property not found
+                    type: string
+                required:
+                  - message
+      security:
+        - apiKey: []
+      parameters:
+        - name: contact_property_id
+          in: path
+          required: true
+          schema:
+            description: Property ID to update
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fallbackValue:
+                  nullable: true
+                  anyOf:
+                    - description: New fallback value
+                      type: string
+                    - type: "null"
+              required:
+                - fallbackValue
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                fallbackValue:
+                  nullable: true
+                  anyOf:
+                    - description: New fallback value
+                      type: string
+                    - type: "null"
+              required:
+                - fallbackValue
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                fallbackValue:
+                  nullable: true
+                  anyOf:
+                    - description: New fallback value
+                      type: string
+                    - type: "null"
+              required:
+                - fallbackValue
+      operationId: patchApiContactsV1PropertiesByContact_property_id
+    delete:
+      tags:
+        - Contact Properties
+      summary: Delete Contact Property
+      description: Soft delete a property by ID
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    default: contact_property
+                    const: contact_property
+                    type: string
+                  success:
+                    type: boolean
+                required:
+                  - object
+                  - success
+        "401":
+          description: Response for status 401
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    const: Unauthorized access
+                    type: string
+                required:
+                  - message
+        "404":
+          description: Response for status 404
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    const: Property not found
+                    type: string
+                required:
+                  - message
+      security:
+        - apiKey: []
+      parameters:
+        - name: contact_property_id
+          in: path
+          required: true
+          schema:
+            description: Property ID to delete
+            type: string
+      operationId: deleteApiContactsV1PropertiesByContact_property_id
+  /api/contacts/v1/topics/create:
+    post:
+      tags:
+        - Topics
+      summary: Create Topic
+      description: Creates a new topic for the organization
+      responses:
+        "201":
+          description: Response for status 201
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    default: topic
+                    const: topic
+                    type: string
+                  id:
+                    description: Unique topic identifier
+                    type: string
+                  name:
+                    description: Topic name
+                    type: string
+                  description:
+                    description: Topic description
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                  defaultSubscription:
+                    type: string
+                    enum:
+                      - opt_in
+                      - opt_out
+                  visibility:
+                    type: string
+                    enum:
+                      - private
+                      - public
+                  createdAt:
+                    anyOf:
+                      - type: Date
+                      - format: date-time
+                        type: string
+                      - format: date
+                        type: string
+                      - type: number
+                  updatedAt:
+                    anyOf:
+                      - type: Date
+                      - format: date-time
+                        type: string
+                      - format: date
+                        type: string
+                      - type: number
+                required:
+                  - object
+                  - id
+                  - name
+                  - description
+                  - defaultSubscription
+                  - visibility
+                  - createdAt
+                  - updatedAt
+        "403":
+          description: Response for status 403
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    const: Unauthorized access
+                    type: string
+                required:
+                  - message
+        "409":
+          description: Response for status 409
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    const: Topic already exists
+                    type: string
+                required:
+                  - message
+      security:
+        - apiKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  minLength: 1
+                  maxLength: 255
+                  description: Topic name
+                  type: string
+                description:
+                  maxLength: 1000
+                  description: Topic description
+                  type: string
+                defaultSubscription:
+                  type: string
+                  enum:
+                    - opt_in
+                    - opt_out
+                visibility:
+                  type: string
+                  enum:
+                    - private
+                    - public
+              required:
+                - name
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                name:
+                  minLength: 1
+                  maxLength: 255
+                  description: Topic name
+                  type: string
+                description:
+                  maxLength: 1000
+                  description: Topic description
+                  type: string
+                defaultSubscription:
+                  type: string
+                  enum:
+                    - opt_in
+                    - opt_out
+                visibility:
+                  type: string
+                  enum:
+                    - private
+                    - public
+              required:
+                - name
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  minLength: 1
+                  maxLength: 255
+                  description: Topic name
+                  type: string
+                description:
+                  maxLength: 1000
+                  description: Topic description
+                  type: string
+                defaultSubscription:
+                  type: string
+                  enum:
+                    - opt_in
+                    - opt_out
+                visibility:
+                  type: string
+                  enum:
+                    - private
+                    - public
+              required:
+                - name
+      operationId: postApiContactsV1TopicsCreate
+  /api/contacts/v1/topics/{topic_id}:
+    get:
+      tags:
+        - Topics
+      summary: Retrieve Topic
+      description: Retrieves a specific topic by ID
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    default: topic
+                    const: topic
+                    type: string
+                  id:
+                    description: Unique topic identifier
+                    type: string
+                  name:
+                    description: Topic name
+                    type: string
+                  description:
+                    description: Topic description
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                  defaultSubscription:
+                    type: string
+                    enum:
+                      - opt_in
+                      - opt_out
+                  visibility:
+                    type: string
+                    enum:
+                      - private
+                      - public
+                  createdAt:
+                    anyOf:
+                      - type: Date
+                      - format: date-time
+                        type: string
+                      - format: date
+                        type: string
+                      - type: number
+                  updatedAt:
+                    anyOf:
+                      - type: Date
+                      - format: date-time
+                        type: string
+                      - format: date
+                        type: string
+                      - type: number
+                required:
+                  - object
+                  - id
+                  - name
+                  - description
+                  - defaultSubscription
+                  - visibility
+                  - createdAt
+                  - updatedAt
+        "403":
+          description: Response for status 403
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    const: Unauthorized access
+                    type: string
+                required:
+                  - message
+        "404":
+          description: Response for status 404
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    const: Topic not found
+                    type: string
+                required:
+                  - message
+      security:
+        - apiKey: []
+      parameters:
+        - name: topic_id
+          in: path
+          required: true
+          schema:
+            description: Topic ID
+            type: string
+      operationId: getApiContactsV1TopicsByTopic_id
+    patch:
+      tags:
+        - Topics
+      summary: Update Topic
+      description: Updates an existing topic
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    default: topic
+                    const: topic
+                    type: string
+                  id:
+                    description: Unique topic identifier
+                    type: string
+                  name:
+                    description: Topic name
+                    type: string
+                  description:
+                    description: Topic description
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                  defaultSubscription:
+                    type: string
+                    enum:
+                      - opt_in
+                      - opt_out
+                  visibility:
+                    type: string
+                    enum:
+                      - private
+                      - public
+                  createdAt:
+                    anyOf:
+                      - type: Date
+                      - format: date-time
+                        type: string
+                      - format: date
+                        type: string
+                      - type: number
+                  updatedAt:
+                    anyOf:
+                      - type: Date
+                      - format: date-time
+                        type: string
+                      - format: date
+                        type: string
+                      - type: number
+                required:
+                  - object
+                  - id
+                  - name
+                  - description
+                  - defaultSubscription
+                  - visibility
+                  - createdAt
+                  - updatedAt
+        "403":
+          description: Response for status 403
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    const: Unauthorized access
+                    type: string
+                required:
+                  - message
+        "404":
+          description: Response for status 404
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    const: Topic not found
+                    type: string
+                required:
+                  - message
+        "409":
+          description: Response for status 409
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    const: Topic already exists
+                    type: string
+                required:
+                  - message
+      security:
+        - apiKey: []
+      parameters:
+        - name: topic_id
+          in: path
+          required: true
+          schema:
+            description: Topic ID
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  minLength: 1
+                  maxLength: 255
+                  description: Topic name
+                  type: string
+                description:
+                  anyOf:
+                    - maxLength: 1000
+                      description: Topic description
+                      type: string
+                    - type: "null"
+                visibility:
+                  type: string
+                  enum:
+                    - private
+                    - public
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                name:
+                  minLength: 1
+                  maxLength: 255
+                  description: Topic name
+                  type: string
+                description:
+                  anyOf:
+                    - maxLength: 1000
+                      description: Topic description
+                      type: string
+                    - type: "null"
+                visibility:
+                  type: string
+                  enum:
+                    - private
+                    - public
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  minLength: 1
+                  maxLength: 255
+                  description: Topic name
+                  type: string
+                description:
+                  anyOf:
+                    - maxLength: 1000
+                      description: Topic description
+                      type: string
+                    - type: "null"
+                visibility:
+                  type: string
+                  enum:
+                    - private
+                    - public
+      operationId: patchApiContactsV1TopicsByTopic_id
+    delete:
+      tags:
+        - Topics
+      summary: Delete Topic
+      description: Soft deletes a topic
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    default: topic
+                    const: topic
+                    type: string
+                  success:
+                    type: boolean
+                required:
+                  - object
+                  - success
+        "403":
+          description: Response for status 403
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    const: Unauthorized access
+                    type: string
+                required:
+                  - message
+        "404":
+          description: Response for status 404
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    const: Topic not found
+                    type: string
+                required:
+                  - message
+      security:
+        - apiKey: []
+      parameters:
+        - name: topic_id
+          in: path
+          required: true
+          schema:
+            description: Topic ID
+            type: string
+      operationId: deleteApiContactsV1TopicsByTopic_id
+  /api/contacts/v1/topics/list:
+    get:
+      tags:
+        - Topics
+      summary: List Topics
+      description: Retrieves a paginated list of topics
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    default: topic
+                    const: topic
+                    type: string
+                  topics:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          description: Unique topic identifier
+                          type: string
+                        name:
+                          description: Topic name
+                          type: string
+                        description:
+                          description: Topic description
+                          anyOf:
+                            - type: string
+                            - type: "null"
+                        defaultSubscription:
+                          type: string
+                          enum:
+                            - opt_in
+                            - opt_out
+                        visibility:
+                          type: string
+                          enum:
+                            - private
+                            - public
+                        createdAt:
+                          anyOf:
+                            - type: Date
+                            - format: date-time
+                              type: string
+                            - format: date
+                              type: string
+                            - type: number
+                        updatedAt:
+                          anyOf:
+                            - type: Date
+                            - format: date-time
+                              type: string
+                            - format: date
+                              type: string
+                            - type: number
+                      required:
+                        - id
+                        - name
+                        - description
+                        - defaultSubscription
+                        - visibility
+                        - createdAt
+                        - updatedAt
+                  total:
+                    type: number
+                  page:
+                    type: number
+                  limit:
+                    type: number
+                required:
+                  - object
+                  - topics
+                  - total
+                  - page
+                  - limit
+        "403":
+          description: Response for status 403
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    const: Unauthorized access
+                    type: string
+                required:
+                  - message
+      security:
+        - apiKey: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            minimum: 1
+            default: 1
+            type: number
+        - name: limit
+          in: query
+          required: false
+          schema:
+            minimum: 1
+            maximum: 100
+            default: 100
+            type: number
+        - name: search
+          in: query
+          required: false
+          schema:
+            description: Search by name
+            type: string
+      operationId: getApiContactsV1TopicsList
+  /api/contacts/v1/groups/create:
+    post:
+      tags:
+        - Groups
+      summary: Create Group
+      description: Creates a new group for the organization
+      security:
+        - apiKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  minLength: 1
+                  maxLength: 255
+                  description: Group name
+                  type: string
+              required:
+                - name
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                name:
+                  minLength: 1
+                  maxLength: 255
+                  description: Group name
+                  type: string
+              required:
+                - name
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  minLength: 1
+                  maxLength: 255
+                  description: Group name
+                  type: string
+              required:
+                - name
+      responses:
+        "201":
+          description: Response for status 201
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    default: contact_group
+                    const: contact_group
+                    type: string
+                  id:
+                    description: Unique group identifier
+                    type: string
+                  name:
+                    description: Group name
+                    type: string
+                  createdAt:
+                    anyOf:
+                      - type: Date
+                      - format: date-time
+                        type: string
+                      - format: date
+                        type: string
+                      - type: number
+                  updatedAt:
+                    anyOf:
+                      - type: Date
+                      - format: date-time
+                        type: string
+                      - format: date
+                        type: string
+                      - type: number
+                required:
+                  - object
+                  - id
+                  - name
+                  - createdAt
+                  - updatedAt
+        "403":
+          description: Response for status 403
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    const: Unauthorized access
+                    type: string
+                required:
+                  - message
+        "409":
+          description: Response for status 409
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    const: Group already exists
+                    type: string
+                required:
+                  - message
+      operationId: postApiContactsV1GroupsCreate
+  /api/contacts/v1/groups/{group_id}:
+    get:
+      tags:
+        - Groups
+      summary: Get Group
+      description: Returns a single group for the organization
+      security:
+        - apiKey: []
+      parameters:
+        - name: group_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    default: contact_group
+                    const: contact_group
+                    type: string
+                  id:
+                    description: Unique group identifier
+                    type: string
+                  name:
+                    description: Group name
+                    type: string
+                  createdAt:
+                    anyOf:
+                      - type: Date
+                      - format: date-time
+                        type: string
+                      - format: date
+                        type: string
+                      - type: number
+                  updatedAt:
+                    anyOf:
+                      - type: Date
+                      - format: date-time
+                        type: string
+                      - format: date
+                        type: string
+                      - type: number
+                required:
+                  - object
+                  - id
+                  - name
+                  - createdAt
+                  - updatedAt
+        "403":
+          description: Response for status 403
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    const: Unauthorized access
+                    type: string
+                required:
+                  - message
+        "404":
+          description: Response for status 404
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    const: Group not found
+                    type: string
+                required:
+                  - message
+      operationId: getApiContactsV1GroupsByGroup_id
+    patch:
+      tags:
+        - Groups
+      summary: Update Group
+      description: Updates an existing group for the organization
+      security:
+        - apiKey: []
+      parameters:
+        - name: group_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  minLength: 1
+                  maxLength: 255
+                  description: Group name
+                  type: string
+              required:
+                - name
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                name:
+                  minLength: 1
+                  maxLength: 255
+                  description: Group name
+                  type: string
+              required:
+                - name
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  minLength: 1
+                  maxLength: 255
+                  description: Group name
+                  type: string
+              required:
+                - name
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    default: contact_group
+                    const: contact_group
+                    type: string
+                  id:
+                    description: Unique group identifier
+                    type: string
+                  name:
+                    description: Group name
+                    type: string
+                  createdAt:
+                    anyOf:
+                      - type: Date
+                      - format: date-time
+                        type: string
+                      - format: date
+                        type: string
+                      - type: number
+                  updatedAt:
+                    anyOf:
+                      - type: Date
+                      - format: date-time
+                        type: string
+                      - format: date
+                        type: string
+                      - type: number
+                required:
+                  - object
+                  - id
+                  - name
+                  - createdAt
+                  - updatedAt
+        "403":
+          description: Response for status 403
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    const: Unauthorized access
+                    type: string
+                required:
+                  - message
+        "404":
+          description: Response for status 404
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    const: Group not found
+                    type: string
+                required:
+                  - message
+        "409":
+          description: Response for status 409
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    const: Group already exists
+                    type: string
+                required:
+                  - message
+      operationId: patchApiContactsV1GroupsByGroup_id
+    delete:
+      tags:
+        - Groups
+      summary: Delete Group
+      description: Deletes a group for the organization
+      security:
+        - apiKey: []
+      parameters:
+        - name: group_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    default: contact_group
+                    const: contact_group
+                    type: string
+                  success:
+                    type: boolean
+                required:
+                  - object
+                  - success
+        "403":
+          description: Response for status 403
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    const: Unauthorized access
+                    type: string
+                required:
+                  - message
+        "404":
+          description: Response for status 404
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    const: Group not found
+                    type: string
+                required:
+                  - message
+      operationId: deleteApiContactsV1GroupsByGroup_id
+  /api/contacts/v1/groups/list:
+    get:
+      tags:
+        - Groups
+      summary: List Groups
+      description: List all groups for the organization
+      security:
+        - apiKey: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            minimum: 1
+            default: 1
+            type: number
+        - name: limit
+          in: query
+          required: false
+          schema:
+            minimum: 1
+            maximum: 100
+            default: 100
+            type: number
+        - name: search
+          in: query
+          required: false
+          schema:
+            description: Search by name
+            type: string
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    default: contact_group
+                    const: contact_group
+                    type: string
+                  groups:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          description: Unique group identifier
+                          type: string
+                        name:
+                          description: Group name
+                          type: string
+                        createdAt:
+                          anyOf:
+                            - type: Date
+                            - format: date-time
+                              type: string
+                            - format: date
+                              type: string
+                            - type: number
+                        updatedAt:
+                          anyOf:
+                            - type: Date
+                            - format: date-time
+                              type: string
+                            - format: date
+                              type: string
+                            - type: number
+                      required:
+                        - id
+                        - name
+                        - createdAt
+                        - updatedAt
+                  total:
+                    type: number
+                  page:
+                    type: number
+                  limit:
+                    type: number
+                required:
+                  - object
+                  - groups
+                  - total
+                  - page
+                  - limit
+        "403":
+          description: Response for status 403
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    const: Unauthorized access
+                    type: string
+                required:
+                  - message
+      operationId: getApiContactsV1GroupsList
+  /api/contacts/v1/groups/{group_id}/contacts:
+    get:
+      tags:
+        - Groups
+      summary: List Contacts Group
+      description: List all contacts belonging to a specific group
+      security:
+        - apiKey: []
+      parameters:
+        - name: group_id
+          in: path
+          required: true
+          schema:
+            description: ID of the contact group
+            type: string
+        - name: page
+          in: query
+          required: false
+          schema:
+            minimum: 1
+            default: 1
+            type: number
+        - name: limit
+          in: query
+          required: false
+          schema:
+            minimum: 1
+            maximum: 100
+            default: 100
+            type: number
+        - name: search
+          in: query
+          required: false
+          schema:
+            description: Search by email
+            type: string
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - subscribed
+              - unsubscribed
+              - blocked
+        - name: organizationId
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    default: contact_group
+                    const: contact_group
+                    type: string
+                  group:
+                    type: object
+                    properties:
+                      id:
+                        description: Unique group identifier
+                        type: string
+                      name:
+                        description: Group name
+                        type: string
+                      createdAt:
+                        anyOf:
+                          - type: Date
+                          - format: date-time
+                            type: string
+                          - format: date
+                            type: string
+                          - type: number
+                      updatedAt:
+                        anyOf:
+                          - type: Date
+                          - format: date-time
+                            type: string
+                          - format: date
+                            type: string
+                          - type: number
+                      contacts:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              description: Unique contact identifier
+                              type: string
+                            email:
+                              description: Contact email address
+                              type: string
+                            firstName:
+                              description: Contact first name
+                              anyOf:
+                                - type: string
+                                - type: "null"
+                            lastName:
+                              description: Contact last name
+                              anyOf:
+                                - type: string
+                                - type: "null"
+                            status:
+                              type: string
+                              enum:
+                                - subscribed
+                                - unsubscribed
+                                - blocked
+                            properties:
+                              description: Contact properties as key-value pairs
+                              default: {}
+                              type: object
+                              patternProperties:
+                                ^[a-z_]+$:
+                                  anyOf:
+                                    - type: string
+                                    - type: number
+                            createdAt:
+                              anyOf:
+                                - type: Date
+                                - format: date-time
+                                  type: string
+                                - format: date
+                                  type: string
+                                - type: number
+                            updatedAt:
+                              anyOf:
+                                - type: Date
+                                - format: date-time
+                                  type: string
+                                - format: date
+                                  type: string
+                                - type: number
+                          required:
+                            - id
+                            - email
+                            - firstName
+                            - lastName
+                            - status
+                            - properties
+                            - createdAt
+                            - updatedAt
+                    required:
+                      - id
+                      - name
+                      - createdAt
+                      - updatedAt
+                      - contacts
+                  total:
+                    type: number
+                  page:
+                    type: number
+                  limit:
+                    type: number
+                  totalContacts:
+                    description: Total number of contacts in group
+                    type: number
+                  subscribedContacts:
+                    description: Total number of subscribed contacts in group
+                    type: number
+                  unsubscribedContacts:
+                    description: Total number of unsubscribed contacts in group
+                    type: number
+                required:
+                  - object
+                  - group
+                  - total
+                  - page
+                  - limit
+                  - totalContacts
+                  - subscribedContacts
+                  - unsubscribedContacts
+        "403":
+          description: Response for status 403
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    const: Unauthorized access
+                    type: string
+                required:
+                  - message
+      operationId: getApiContactsV1GroupsByGroup_idContacts

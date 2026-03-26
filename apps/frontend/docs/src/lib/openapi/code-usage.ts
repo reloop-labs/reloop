@@ -1,6 +1,5 @@
 import { createCodeUsageGeneratorRegistry } from "fumadocs-openapi/requests/generators";
-import { registerDefault } from "fumadocs-openapi/requests/generators/all";
 
+// Empty registry — only x-codeSamples from the OpenAPI spec will be shown
 export const codeUsages = createCodeUsageGeneratorRegistry();
-registerDefault(codeUsages);
 

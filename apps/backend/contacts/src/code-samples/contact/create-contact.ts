@@ -1,7 +1,7 @@
 export const createContactSamples = [
   {
     id: "node",
-    lang: "JavaScript",
+    lang: "js",
     label: "Node.js",
     source: `import Reloop from 'reloop-email';
 
@@ -21,7 +21,7 @@ console.log(contact);`,
   },
   {
     id: "php",
-    lang: "PHP",
+    lang: "php",
     label: "PHP",
     source: `$reloop = new \\Reloop\\Client([
   'url' => 'https://reloop.sh',
@@ -39,7 +39,7 @@ echo $contact->id;`,
   },
   {
     id: "ruby",
-    lang: "Ruby",
+    lang: "ruby",
     label: "Ruby",
     source: `require 'reloop'
 
@@ -59,7 +59,7 @@ puts contact.id`,
   },
   {
     id: "python",
-    lang: "Python",
+    lang: "python",
     label: "Python",
     source: `from reloop import Reloop
 
@@ -79,7 +79,7 @@ print(contact.id)`,
   },
   {
     id: "go",
-    lang: "Go",
+    lang: "go",
     label: "Go",
     source: `package main
 
@@ -110,7 +110,7 @@ func main() {
   },
   {
     id: "rust",
-    lang: "Rust",
+    lang: "rust",
     label: "Rust",
     source: `use reloop::Client;
 
@@ -137,7 +137,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
   },
   {
     id: "elixir",
-    lang: "Elixir",
+    lang: "elixir",
     label: "Elixir",
     source: `client = Reloop.new(
   url: "https://reloop.sh",
@@ -155,7 +155,7 @@ IO.inspect(contact.id)`,
   },
   {
     id: "java",
-    lang: "Java",
+    lang: "java",
     label: "Java",
     source: `import com.reloop.Reloop;
 import com.reloop.models.Contact;
@@ -178,7 +178,7 @@ System.out.println(contact.getId());`,
   },
   {
     id: "dotnet",
-    lang: "C#",
+    lang: "csharp",
     label: ".NET",
     source: `using Reloop;
 
@@ -200,7 +200,7 @@ Console.WriteLine(contact.Id);`,
   },
   {
     id: "curl",
-    lang: "Shell",
+    lang: "bash",
     label: "cURL",
     source: `curl -X POST https://reloop.sh/api/contacts/v1/contacts/create \\
   -H "Authorization: Bearer re_123456789" \\
