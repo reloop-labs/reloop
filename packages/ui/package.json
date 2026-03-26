@@ -22,6 +22,7 @@
 		"./use-tab-observer": "./src/hooks/use-tab-observer.ts",
 		"./code-block": "./src/components/code-block.tsx",
 		"./button": "./src/components/button.tsx",
+		"./button-group": "./src/components/button-group.tsx",
 		"./calendar": "./src/components/calendar.tsx",
 		"./color-picker": "./src/components/color-picker.tsx",
 		"./file-upload": "./src/components/file-upload.tsx",
