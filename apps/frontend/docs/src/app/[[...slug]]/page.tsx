@@ -22,7 +22,6 @@ import { DocsLayout } from "fumadocs-ui/layouts/docs";
 import { createRelativeLink } from "fumadocs-ui/mdx";
 import { DocsBody, DocsPage } from "fumadocs-ui/page";
 import { notFound } from "next/navigation";
-import HomePage from "./home-page";
 
 export async function generateMetadata(props: {
 	params: Promise<{ slug?: string[] }>;
@@ -54,10 +53,6 @@ export default async function Page(props: {
 	params: Promise<{ slug?: string[] }>;
 }) {
 	const params = await props.params;
-	if (!params.slug || params.slug.length === 0) {
-		return <HomePage />;
-	}
-
 	const page = source.getPage(params.slug);
 	if (!page) notFound();
 	const MDXContent = page.data.body;

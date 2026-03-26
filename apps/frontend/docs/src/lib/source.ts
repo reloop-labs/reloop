@@ -1,8 +1,8 @@
-import { docs } from "@reloop/fe-docs/.source";
 import { Icon } from "@reloop/ui/icon";
 import { loader } from "fumadocs-core/source";
 import { createOpenAPI } from "fumadocs-openapi/server";
 import { createElement } from "react";
+import { docs } from "../../.source/server";
 
 export const source = loader({
 	icon(icon) {
