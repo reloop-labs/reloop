@@ -24,8 +24,64 @@ import { Icon } from "@reloop/ui/icon";
 import { DocsLayout } from "fumadocs-ui/layouts/notebook";
 import { createRelativeLink } from "fumadocs-ui/mdx";
 import { DocsBody, DocsPage } from "fumadocs-ui/page";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import HomePage from "./home-page";
+
+function DocTabs() {
+	const tabs = [
+		{
+			title: "Documentation",
+			url: "/sdk",
+			icon: "file-text",
+		},
+		{
+			title: "API Reference",
+			url: "/api",
+			icon: "code",
+		},
+		{
+			title: "Build with AI",
+			url: "/integrations",
+			icon: "bulb",
+		},
+		{
+			title: "Knowledge Base",
+			url: "/deploy",
+			icon: "swatch-book",
+		},
+		{
+			title: "Webhooks",
+			url: "/setup",
+			icon: "webhook",
+		},
+		{
+			title: "Self-Hosted",
+			url: "/setup",
+			icon: "server",
+		},
+		{
+			title: "Local Setup",
+			url: "/setup",
+			icon: "terminal",
+		},
+	];
+
+	return (
+		<div className="flex flex-col gap-1 p-2">
+			{tabs.map((tab) => (
+				<Link
+					key={tab.title}
+					href={tab.url}
+					className="flex items-center gap-2 rounded-md px-2 py-1.5 font-medium text-fd-muted-foreground text-sm transition-colors hover:bg-fd-accent hover:text-fd-accent-foreground"
+				>
+					<Icon name={tab.icon} className="h-4 w-4" />
+					{tab.title}
+				</Link>
+			))}
+		</div>
+	);
+}
 
 export async function generateMetadata(props: {
 	params: Promise<{ slug?: string[] }>;
@@ -74,29 +130,9 @@ export default async function Page(props: {
 			nav={{ ...baseOptions.nav, mode: "top" }}
 			sidebar={{
 				collapsible: false,
-				tabs: [
-					{
-						title: "SDK",
-						url: "/sdk",
-					},
-					{
-						title: "API",
-						url: "/api",
-					},
-					{
-						title: "Integrations",
-						url: "/integrations",
-					},
-					{
-						title: "Deploy",
-						url: "/deploy",
-					},
-					{
-						title: "Setup",
-						url: "/setup",
-					},
-				],
+				banner: <DocTabs />,
 			}}
+			tabs={false}
 		>
 			<DocsPage
 				tableOfContent={{ style: "clerk" }}
