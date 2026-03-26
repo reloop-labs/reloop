@@ -14,7 +14,7 @@ function DocTabs() {
 	const tabs = [
 		{
 			title: "Documentation",
-			url: "/sdk",
+			url: "/",
 			icon: "file-text",
 		},
 		{

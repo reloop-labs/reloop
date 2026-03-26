@@ -20,7 +20,12 @@ import { getMDXComponents } from "@reloop/fe-docs/mdx-components";
 import { Icon } from "@reloop/ui/icon";
 import { DocsLayout } from "fumadocs-ui/layouts/docs";
 import { createRelativeLink } from "fumadocs-ui/mdx";
-import { DocsBody, DocsPage } from "fumadocs-ui/page";
+import {
+	DocsBody,
+	DocsDescription,
+	DocsPage,
+	DocsTitle,
+} from "fumadocs-ui/page";
 import { notFound } from "next/navigation";
 
 export async function generateMetadata(props: {
@@ -69,6 +74,7 @@ export default async function Page(props: {
 				tableOfContent={{ style: "clerk" }}
 				toc={page.data.toc}
 				full={page.data.full}
+				title={page.data.title}
 				editOnGithub={{
 					owner: "reloop-labs",
 					repo: "reloop",
@@ -77,7 +83,11 @@ export default async function Page(props: {
 				}}
 				footer={{}}
 			>
-				<div className="flex flex-col items-end gap-2">
+				<div className="flex items-center justify-between">
+					<div>
+						<DocsTitle>{page.data.title}</DocsTitle>
+						<DocsDescription>{page.data.description}</DocsDescription>
+					</div>
 					<PageActions markdownUrl={`${page.url}.mdx`} />
 				</div>
 				<DocsBody>
