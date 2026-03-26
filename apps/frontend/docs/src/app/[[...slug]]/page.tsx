@@ -80,7 +80,7 @@ export default async function Page(props: {
 					owner: "reloop-labs",
 					repo: "reloop",
 					path: `/${params.slug?.join("/")}.mdx?plain=1`,
-					sha: "main/apps/frontend/dev/content/docs",
+					sha: "main/apps/frontend/docs/content/docs",
 				}}
 			>
 				<div className="flex items-center justify-between">
