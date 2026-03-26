@@ -19,6 +19,6 @@ padding-top: 20px;
   @apply border-fd-border border-t pt-7! pr-4
 }
 
-#nd-sidebar{
-  background-color: black;
+figure {
+  background-color: transparent !important;
 }
