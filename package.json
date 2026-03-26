@@ -65,7 +65,7 @@
 				"react-markdown": "10.1.0",
 				"rehype-highlight": "7.0.2",
 				"shiki": "3.14.0",
-				"fumadocs-openapi": "9.1.9",
+				"fumadocs-openapi": "^10.5.0",
 				"ajv": "8.17.1",
 				"@react-email/components": "0.5.0",
 				"@react-email/preview-server": "4.2.8",

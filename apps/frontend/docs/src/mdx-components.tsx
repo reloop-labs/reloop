@@ -1,5 +1,4 @@
-import { openapi } from "@reloop/fe-docs/lib/source";
-import { APIPage } from "fumadocs-openapi/ui";
+import { APIPage } from "@reloop/fe-docs/components/api-page";
 import * as File from "fumadocs-ui/components/files";
 import * as TabsComponents from "fumadocs-ui/components/tabs";
 import defaultMdxComponents from "fumadocs-ui/mdx";
@@ -8,7 +7,7 @@ import type { MDXComponents } from "mdx/types";
 export function getMDXComponents(components?: MDXComponents): MDXComponents {
 	return {
 		...defaultMdxComponents,
-		APIPage: (props) => <APIPage {...openapi.getAPIPageProps(props)} />,
+		APIPage,
 		...TabsComponents,
 		...components,
 		...File,

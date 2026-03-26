@@ -54,7 +54,7 @@ export const DeleteContactModal = ({
 
 		try {
 			setIsDeleting(true);
-			const response = await fetch(`/api/contacts/delete/${contact.id}`, {
+			const response = await fetch(`/api/contacts/${contact.id}`, {
 				method: "DELETE",
 			});
 
