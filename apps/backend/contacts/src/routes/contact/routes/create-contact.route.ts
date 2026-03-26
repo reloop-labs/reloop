@@ -1,3 +1,4 @@
+import { createContactSamples } from "@be/contacts/code-samples/contact/create-contact";
 import { authMiddleware } from "@be/contacts/middleware/auth";
 import { ContactModel } from "@be/contacts/model/contact.model";
 import { createContact } from "@be/contacts/routes/contact/controllers/create-contact";
@@ -26,6 +27,8 @@ export const createContactRoute = new Elysia().use(authMiddleware).post(
 			tags: ["Contact"],
 			summary: "Create Contact",
 			description: "Creates contact",
+			"x-codeSamples": createContactSamples,
+			"x-selectedCodeSample": "node",
 			responses: {
 				201: {
 					description: "Contact created successfully",

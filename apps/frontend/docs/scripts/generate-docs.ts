@@ -3,6 +3,6 @@ import { generateFiles } from "fumadocs-openapi";
 
 void generateFiles({
   input: openapi,
-  output: "./content/api",
+  output: "../content/docs/api",
   includeDescription: true,
 });
