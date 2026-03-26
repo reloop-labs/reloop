@@ -6,12 +6,51 @@
 .content-collections
 .source
 
+# Auto-generated API documentation
+# Ignore all auto-generated API docs but keep service overview pages
+/content/docs/service/auth/*.mdx
+!/content/docs/service/auth/index.mdx
+/content/docs/service/auth/api/
+/content/docs/service/mail/*.mdx
+!/content/docs/service/mail/index.mdx
+/content/docs/service/mail/api/
+/content/docs/service/webhook/*.mdx
+!/content/docs/service/webhook/index.mdx
+/content/docs/service/webhook/api/
+/content/docs/service/server/*.mdx
+!/content/docs/service/server/index.mdx
+/content/docs/service/server/api/
+/content/docs/setup/backend/auth/*.mdx
+!/content/docs/setup/backend/auth/index.mdx
+/content/docs/setup/backend/auth/api/
+
+# Specific auto-generated files to ignore
+/content/docs/service/auth/impersonateUser.mdx
+/content/docs/service/auth/banUser.mdx
+/content/docs/service/auth/unbanUser.mdx
+/content/docs/service/auth/removeUser.mdx
+/content/docs/service/auth/setRole.mdx
+/content/docs/service/auth/createUser.mdx
+/content/docs/service/auth/updateUser.mdx
+/content/docs/service/auth/listUsers.mdx
+/content/docs/service/auth/listUserSessions.mdx
+/content/docs/service/auth/revokeUserSession.mdx
+/content/docs/service/auth/revokeUserSessions.mdx
+/content/docs/service/auth/setUserPassword.mdx
+/content/docs/service/auth/getApiAuth.mdx
+/content/docs/service/auth/getApiAuthHealthRedis.mdx
+/content/docs/service/auth/socialSignIn.mdx
+
+# OpenAPI schema file
+openapi.json
+
 # test & build
 /coverage
 /.next/
 /out/
 /build
 *.tsbuildinfo
+
 
 # misc
 .DS_Store

@@ -1,45 +1,50 @@
-# docs
+# Reloop Developer Documentation
 
-This is a Next.js application generated with
-[Create Fumadocs](https://github.com/fuma-nama/fumadocs).
+Welcome to the Reloop developer documentation! This repository contains the source code for our comprehensive developer portal.
 
-Run development server:
+## 🚀 Quick Start
+
+Visit our live documentation at **[dev.reloop.sh](https://dev.reloop.sh)**
+
+## 📚 What's Inside
+
+- **SDK Documentation** - Integrate Reloop into your applications
+- **API Reference** - Complete REST API documentation
+- **Integrations** - Connect with your favorite tools and platforms
+- **Deployment Guides** - Learn how to deploy and host Reloop
+- **Setup Instructions** - Get started with Reloop configuration
+
+## 🛠️ Development
+
+This documentation site is built with:
+- **Next.js** - React framework for the web
+- **Fumadocs** - Documentation framework
+- **Tailwind CSS** - Utility-first CSS framework
+- **TypeScript** - Type-safe JavaScript
+
+## 🏃‍♂️ Running Locally
 
 ```bash
+# Install dependencies
+npm install
+
+# Start development server
 npm run dev
-# or
-pnpm dev
-# or
-yarn dev
+
+# Build for production
+npm run build
 ```
 
-Open http://localhost:3000 with your browser to see the result.
+## 📝 Contributing
 
-## Explore
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
-In the project, you can see:
+## 🔗 Links
 
-- `lib/source.ts`: Code for content source adapter, [`loader()`](https://fumadocs.dev/docs/headless/source-api) provides the interface to access your content.
-- `app/layout.config.tsx`: Shared options for layouts, optional but preferred to keep.
+- **Live Documentation**: [dev.reloop.sh](https://dev.reloop.sh)
+- **Product Website**: [reloop.com](https://reloop.sh)
+- **API Dashboard**: [app.reloop.com](https://app.reloop.com)
 
-| Route                     | Description                                            |
-| ------------------------- | ------------------------------------------------------ |
-| `app/(home)`              | The route group for your landing page and other pages. |
-| `app/docs`                | The documentation layout and pages.                    |
-| `app/api/search/route.ts` | The Route Handler for search.                          |
+---
 
-### Fumadocs MDX
-
-A `source.config.ts` config file has been included, you can customise different options like frontmatter schema.
-
-Read the [Introduction](https://fumadocs.dev/docs/mdx) for further details.
-
-## Learn More
-
-To learn more about Next.js and Fumadocs, take a look at the following
-resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js
-  features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-- [Fumadocs](https://fumadocs.vercel.app) - learn about Fumadocs
+**Making email infrastructure fun.** ✨

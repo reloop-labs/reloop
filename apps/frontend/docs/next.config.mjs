@@ -7,7 +7,7 @@ const config = {
 	reactStrictMode: true,
 	basePath: "/docs",
 	output: "standalone",
-	serverExternalPackages: ["@takumi-rs/image-response"],
+	allowedDevOrigins: ["local.reloop.sh", "*.local.reloop.sh"],
 };
 
 export default withMDX(config);

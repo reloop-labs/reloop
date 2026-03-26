@@ -17,12 +17,15 @@
 		"incremental": true,
 		"baseUrl": ".",
 		"paths": {
-			"@fe/docs/*": ["./src/*"],
-			"@be/domain/*": ["../../backend/domain/src/*"],
-			"collections/*": [
-        "./.source/*"
-      ]
-		}
+			"@reloop/fe-docs/*": ["./src/*"],
+			"@reloop/fe-docs/.source": [".source"],
+			"@be/domain/*": ["../../backend/domain/src/*"]
+		},
+		"plugins": [
+			{
+				"name": "next"
+			}
+		]
 	},
 	"include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
 	"exclude": ["node_modules"]

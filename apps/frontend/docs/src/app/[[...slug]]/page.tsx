@@ -1,4 +1,4 @@
-import { baseOptions } from "@fe/docs/app/layout.config";
+import { baseOptions } from "@reloop/fe-docs/app/layout.config";
 import {
 	BiomejsIcon,
 	BunIcon,
@@ -13,67 +13,77 @@ import {
 	TailwindCSSIcon,
 	TurborepoIcon,
 	TypeScriptIcon,
-} from "@fe/docs/components/icons/Tech";
-import { LLMCopyButton, ViewOptions } from "@fe/docs/components/page-actions";
-import { source } from "@fe/docs/lib/source";
-import { getMDXComponents } from "@fe/docs/mdx-components";
+} from "@reloop/fe-docs/components/icons/Tech";
+import { PageActions } from "@reloop/fe-docs/components/page-actions";
+import { source } from "@reloop/fe-docs/lib/source";
+import { getMDXComponents } from "@reloop/fe-docs/mdx-components";
 import { Icon } from "@reloop/ui/icon";
-import { DocsLayout } from "fumadocs-ui/layouts/notebook";
+import { DocsLayout } from "fumadocs-ui/layouts/docs";
 import { createRelativeLink } from "fumadocs-ui/mdx";
-import {
-	DocsBody,
-	DocsDescription,
-	DocsPage,
-	DocsTitle,
-} from "fumadocs-ui/page";
+import { DocsBody, DocsPage } from "fumadocs-ui/page";
 import { notFound } from "next/navigation";
+import HomePage from "./home-page";
+
+export async function generateMetadata(props: {
+	params: Promise<{ slug?: string[] }>;
+}) {
+	const params = await props.params;
+	if (!params.slug || params.slug.length === 0) {
+		return {
+			title: "Reloop - Modern Email Infrastructure",
+			description:
+				"The modern email infrastructure for developers. Build, send, and track emails with ease.",
+		};
+	}
+
+	const page = source.getPage(params.slug);
+	if (!page) notFound();
+
+	return {
+		title: page.data.title,
+		description: page.data.description,
+	};
+}
+
+export async function generateStaticParams() {
+	const params = source.generateParams();
+	return params.filter((param) => param.slug && param.slug.length > 0);
+}
 
 export default async function Page(props: {
 	params: Promise<{ slug?: string[] }>;
 }) {
 	const params = await props.params;
+	if (!params.slug || params.slug.length === 0) {
+		return <HomePage />;
+	}
+
 	const page = source.getPage(params.slug);
 	if (!page) notFound();
-
 	const MDXContent = page.data.body;
 
 	return (
 		<DocsLayout
-			tabMode="navbar"
 			tree={source.pageTree}
 			{...baseOptions}
-			nav={{ ...baseOptions.nav, mode: "top" }}
-			sidebar={{
-				collapsible: false,
-				tabs: [
-					{
-						title: "API",
-						url: "/api-reference",
-					},
-					{
-						title: "Self Host",
-						url: "/how-to-self-host",
-					},
-					{
-						title: "Contribute",
-						url: "/how-to-contribute",
-					},
-				],
-			}}
+			githubUrl="https://github.com/reloop-labs/reloop"
+			tabs={false}
+			sidebar={{ collapsible: false }}
 		>
 			<DocsPage
 				tableOfContent={{ style: "clerk" }}
 				toc={page.data.toc}
 				full={page.data.full}
+				editOnGithub={{
+					owner: "reloop-labs",
+					repo: "reloop",
+					path: `/${params.slug?.join("/")}.mdx?plain=1`,
+					sha: "main/apps/frontend/dev/content/docs",
+				}}
+				footer={{}}
 			>
-				<DocsTitle>{page.data.title}</DocsTitle>
-				<DocsDescription>{page.data.description}</DocsDescription>
-				<div className="flex flex-row items-center gap-2 border-b pt-2 pb-6">
-					<LLMCopyButton markdownUrl={`${page.url}.mdx`} />
-					<ViewOptions
-						markdownUrl={`${page.url}.mdx`}
-						githubUrl="https://github.com//reloop-labs/reloop"
-					/>
+				<div className="flex flex-col items-end gap-2">
+					<PageActions markdownUrl={`${page.url}.mdx`} />
 				</div>
 				<DocsBody>
 					<MDXContent
@@ -100,21 +110,4 @@ export default async function Page(props: {
 			</DocsPage>
 		</DocsLayout>
 	);
-}
-
-export async function generateStaticParams() {
-	return source.generateParams();
-}
-
-export async function generateMetadata(props: {
-	params: Promise<{ slug?: string[] }>;
-}) {
-	const params = await props.params;
-	const page = source.getPage(params.slug);
-	if (!page) notFound();
-
-	return {
-		title: page.data.title,
-		description: page.data.description,
-	};
 }

@@ -152,9 +152,6 @@
 		}
 	},
 	"scripts": {
-		"fe:dev:dev": "bun run --filter=dev dev",
-		"fe:dev:build": "bun run --filter=dev build",
-		"fe:dev:start": "bun run --filter=dev start",
 		"fe:docs:dev": "bun run --filter=docs dev",
 		"fe:docs:build": "bun run --filter=docs build",
 		"fe:docs:start": "bun run --filter=docs start",
@@ -195,9 +192,9 @@
 		"be:upload:build": "bun run --filter=upload build",
 		"be:upload:start": "bun run --filter=upload start",
 		"check": "biome check --write .",
-		"frontend:dev": "turbo dev --filter='dashboard' --filter='dev' --filter='docs' --filter='web'",
+		"frontend:dev": "turbo dev --filter='dashboard' --filter='docs' --filter='web'",
 		"backend:dev": "turbo dev --filter='contacts' --filter='auth' --filter='domain' --filter='mail' --filter='webhook' --filter='api-key' --filter='workflow' --filter='tracehub' --filter='upload' --filter='template'",
-		"reloop:dev": "turbo dev --filter='dashboard' --filter='dev' --filter='docs' --filter='web' --filter='contacts' --filter='auth' --filter='domain' --filter='mail' --filter='webhook' --filter='api-key' --filter='workflow' --filter='tracehub' --filter='upload' --filter='template'",
+		"dev": "turbo dev --filter='dashboard' --filter='docs' --filter='web' --filter='contacts' --filter='auth' --filter='domain' --filter='mail' --filter='webhook' --filter='api-key' --filter='workflow' --filter='tracehub' --filter='upload' --filter='template'",
 		"docker:up": "docker compose -f local/docker-compose.yml up -d",
 		"docker:down": "docker compose -f local/docker-compose.yml down",
 		"docker-prod:up": "docker compose -f prod/docker-compose.yml up -d",
