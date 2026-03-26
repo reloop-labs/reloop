@@ -82,9 +82,6 @@ export default async function Page(props: {
 					path: `/${params.slug?.join("/")}.mdx?plain=1`,
 					sha: "main/apps/frontend/dev/content/docs",
 				}}
-				slots={{
-					footer: Footer,
-				}}
 			>
 				<div className="flex items-center justify-between">
 					<div>
