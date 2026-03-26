@@ -61,21 +61,6 @@ NEXT_PUBLIC_API_URL="https://api.reloop.sh"
 # Install dependencies
 bun i
 
-# Start dev server
-bun dev
-# or from monorepo root with filter
-bun run --filter=dev dev
-
-# Build for production
-bun run build
-# or from monorepo root
-bun run --filter=dev build
-
-# Start production server locally
-bun run start
-# or from monorepo root
-bun run --filter=dev start
-
 # Generate API documentation from OpenAPI spec
 bun run prebuild
 # or manually
