@@ -1,5 +1,6 @@
 import { createOpenAPI } from "fumadocs-openapi/server";
+import path from "path";
 
 export const openapi = createOpenAPI({
-	input: ["http://localhost:8014/api/contacts/openapi/json"],
+	input: [path.resolve("../api-yaml/contact.yaml")],
 });
