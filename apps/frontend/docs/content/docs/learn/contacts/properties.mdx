@@ -1,0 +1,31 @@
+---
+title: Properties
+description: Using custom data to personalize your communications.
+---
+
+Properties allow you to store additional information about your contacts. These can be used for personalization in emails or for advanced filtering and segmentation.
+
+## Default Properties
+
+Every contact in Reloop has certain default properties:
+- `email`: The contact's email address.
+- `created_at`: When the contact was first added.
+- `updated_at`: When the contact was last modified.
+
+## Custom Properties
+
+You can define custom properties to suit your business needs. Examples include:
+- `first_name`
+- `last_name`
+- `company_name`
+- `plan_type` (e.g., Free, Pro, Enterprise)
+
+## Using Properties in Emails
+
+You can use variables to inject contact properties into your email templates:
+
+```html
+Hello {{ contact.first_name }},
+
+Thank you for joining {{ contact.company_name }}!
+```

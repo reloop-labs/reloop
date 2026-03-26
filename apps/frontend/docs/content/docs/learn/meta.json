@@ -1,0 +1,23 @@
+{
+	"title": "How to Contribute",
+	"description": "Steps to Contribute Effectively",
+	"root": true,
+	"pages": [
+		"---Learn---",
+		"index",
+		"tech-stack",
+		"project-structure",
+		"---Frontend---",
+		"frontend/web",
+		"frontend/dashboard",
+		"frontend/admin",
+		"frontend/docs",
+		"frontend/dev",
+		"---Backend---",
+		"backend/auth",
+		"backend/domain",
+		"backend/mail",
+		"backend/webhook",
+		"backend/workflow"
+	]
+}
