@@ -144,9 +144,6 @@ export const CreateTopicModal = ({
 						</div>
 						<div className="flex-1">
 							<Modal.Title>Create Topic</Modal.Title>
-							<p className="mt-0.5 text-paragraph-xs text-text-sub-600">
-								Create a new topic to organize your contacts
-							</p>
 						</div>
 					</Modal.Header>
 					<form ref={formRef} onSubmit={handleSubmit} className="flex flex-col">

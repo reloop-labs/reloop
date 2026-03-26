@@ -9,7 +9,6 @@ import { parseAsInteger, useQueryState } from "nuqs";
 import { useState } from "react";
 import { toast } from "sonner";
 import useSWR, { useSWRConfig } from "swr";
-import { CreateTopicModal } from "./create-topic-modal";
 import { DeleteTopicModal } from "./delete-topic";
 import { EditTopicModal } from "./edit-topic-modal";
 import { TopicTable } from "./topic-table";
@@ -37,7 +36,7 @@ export const TopicList = () => {
 	const { activeOrganization } = useUserOrganization();
 	const { mutate } = useSWRConfig();
 	const [searchQuery, setSearchQuery] = useState<string>("");
-	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+	const [, setModal] = useQueryState("modal");
 	const [editTopicId, setEditTopicId] = useState<string | null>(null);
 	const [currentPage, setCurrentPage] = useQueryState(
 		"page",
@@ -139,7 +138,7 @@ export const TopicList = () => {
 					loadingRows={4}
 					onToggleVisibility={handleToggleVisibility}
 					onEdit={(topicId) => setEditTopicId(topicId)}
-					onAddTopic={() => setIsCreateModalOpen(true)}
+					onAddTopic={() => setModal("create-topic")}
 				/>
 			</div>
 
@@ -169,10 +168,6 @@ export const TopicList = () => {
 			)}
 
 			<DeleteTopicModal topics={data?.topics || []} />
-			<CreateTopicModal
-				open={isCreateModalOpen}
-				onOpenChange={setIsCreateModalOpen}
-			/>
 			<EditTopicModal
 				open={!!editTopicId}
 				onOpenChange={(open) => !open && setEditTopicId(null)}

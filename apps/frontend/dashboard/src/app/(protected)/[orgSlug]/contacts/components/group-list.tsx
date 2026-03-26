@@ -7,7 +7,6 @@ import * as Input from "@reloop/ui/input";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useState } from "react";
 import useSWR from "swr";
-import { CreateGroupModal } from "./create-group-modal";
 import { DeleteGroupModal } from "./delete-group";
 import { EditGroupModal } from "./edit-group-modal";
 import { GroupTable } from "./group-table";
@@ -31,7 +30,7 @@ interface GroupListResponse {
 export const GroupList = () => {
 	const { activeOrganization } = useUserOrganization();
 	const [searchQuery, setSearchQuery] = useState<string>("");
-	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+	const [, setModal] = useQueryState("modal");
 	const [editGroupId, setEditGroupId] = useState<string | null>(null);
 	const [deleteGroupId, setDeleteGroupId] = useState<string | null>(null);
 
@@ -105,7 +104,7 @@ export const GroupList = () => {
 					activeOrganizationSlug={activeOrganization.slug}
 					isLoading={isLoading}
 					onEdit={(contact_group_id) => setEditGroupId(contact_group_id)}
-					onAddGroup={() => setIsCreateModalOpen(true)}
+					onAddGroup={() => setModal("create-group")}
 					onDelete={(contact_group_id) => setDeleteGroupId(contact_group_id)}
 				/>
 			</div>
@@ -134,11 +133,6 @@ export const GroupList = () => {
 					/>
 				</div>
 			)}
-
-			<CreateGroupModal
-				open={isCreateModalOpen}
-				onOpenChange={setIsCreateModalOpen}
-			/>
 
 			<EditGroupModal
 				open={!!editGroupId}

@@ -4,14 +4,11 @@ import { FeedbackPopover } from "@fe/dashboard/components/feedback-popover";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useQueryState } from "nuqs";
 import { useHotkeys } from "react-hotkeys-hook";
 import useSWR from "swr";
-import { AddContactModal } from "./components/add-contact-modal";
-import { AddPropertyModal } from "./components/add-property-modal";
+import { ContactsModals } from "./components/contacts-modals";
 import { ContactsTabs } from "./components/contacts-tabs";
-import { CreateGroupModal } from "./components/create-group-modal";
-import { CreateTopicModal } from "./components/create-topic-modal";
 import { DocsButton } from "./components/docs-button";
 
 interface Topic {
@@ -23,11 +20,8 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 	const pathname = usePathname();
 	const router = useRouter();
 
-	// Modal States
-	const [isContactModalOpen, setIsContactModalOpen] = useState(false);
-	const [isPropertyModalOpen, setIsPropertyModalOpen] = useState(false);
-	const [isTopicModalOpen, setIsTopicModalOpen] = useState(false);
-	const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
+	// Modal State via URL
+	const [, setModal] = useQueryState("modal");
 
 	const isPropertiesPage = pathname.includes("/contacts/properties");
 	const isTopicsPage = pathname.includes("/contacts/topics");
@@ -37,10 +31,10 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 	const isContactDetailPage = pathname.includes("/contacts/detail/");
 
 	const handleAction = () => {
-		if (isPropertiesPage) setIsPropertyModalOpen(true);
-		else if (isTopicsPage) setIsTopicModalOpen(true);
-		else if (isGroupsPage) setIsGroupModalOpen(true);
-		else setIsContactModalOpen(true);
+		if (isPropertiesPage) setModal("add-property");
+		else if (isTopicsPage) setModal("create-topic");
+		else if (isGroupsPage) setModal("create-group");
+		else setModal("add-contact");
 	};
 
 	useHotkeys(
@@ -150,24 +144,8 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 				<div className={!isContactDetailPage ? "mt-4" : ""}>{children}</div>
 			</div>
 
-			{/* Modals */}
-			<AddContactModal
-				open={isContactModalOpen}
-				onOpenChange={setIsContactModalOpen}
-				topicId={topicId || undefined}
-			/>
-			<AddPropertyModal
-				open={isPropertyModalOpen}
-				onOpenChange={setIsPropertyModalOpen}
-			/>
-			<CreateTopicModal
-				open={isTopicModalOpen}
-				onOpenChange={setIsTopicModalOpen}
-			/>
-			<CreateGroupModal
-				open={isGroupModalOpen}
-				onOpenChange={setIsGroupModalOpen}
-			/>
+			{/* Global Contacts Modals */}
+			<ContactsModals topicId={topicId || undefined} />
 		</div>
 	);
 };

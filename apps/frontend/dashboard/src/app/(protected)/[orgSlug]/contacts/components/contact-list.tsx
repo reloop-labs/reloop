@@ -9,7 +9,6 @@ import { parseAsInteger, useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
-import { AddContactModal } from "./add-contact-modal";
 import {
 	ContactFilterDropdown,
 	type ContactFilters,
@@ -71,7 +70,7 @@ export const ContactList = () => {
 	const { activeOrganization } = useUserOrganization();
 	const [searchQuery, setSearchQuery] = useState<string>("");
 	const [filters, setFilters] = useState<ContactFilters>([]);
-	const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+	const [, setModal] = useQueryState("modal");
 	const [currentPage, setCurrentPage] = useQueryState(
 		"page",
 		parseAsInteger.withDefault(1),
@@ -215,11 +214,9 @@ export const ContactList = () => {
 					contacts={data?.contacts || []}
 					isLoading={isLoading}
 					loadingRows={6}
-					onAddContact={() => setIsAddModalOpen(true)}
+					onAddContact={() => setModal("add-contact")}
 				/>
 			</div>
-
-			<AddContactModal open={isAddModalOpen} onOpenChange={setIsAddModalOpen} />
 
 			{/* Pagination */}
 			{data && data.total > 0 && (
