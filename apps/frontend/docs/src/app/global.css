@@ -20,6 +20,10 @@
   font-weight: 500;
   padding: 6px;
 }
+#nd-sidebar a > span {
+  font-weight: 600;
+}
+
 
 #nd-page {
 padding-top: 20px;
