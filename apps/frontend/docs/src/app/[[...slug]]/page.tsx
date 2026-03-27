@@ -1,5 +1,4 @@
 import { baseOptions } from "@reloop/fe-docs/app/layout.config";
-import { Footer } from "@reloop/fe-docs/components/footer";
 import {
 	BiomejsIcon,
 	BunIcon,
