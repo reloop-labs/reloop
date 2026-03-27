@@ -59,6 +59,7 @@ export namespace ContactTypes {
 		lastName?: string;
 		status?: "subscribed" | "unsubscribed" | "blocked";
 		properties?: Record<string, string | number>;
+		object: "contact";
 	}
 
 	export interface ContactListQuery {

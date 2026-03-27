@@ -19,7 +19,21 @@ export namespace PropertyModel {
 				description: "Default value to use when property is empty",
 			}),
 		),
-	});
+	},
+		{
+			examples: [
+				{
+					name: "company_name",
+					type: "string",
+					fallbackValue: "Unknown",
+				},
+				{
+					name: "years_of_experience",
+					type: "number",
+					fallbackValue: "0",
+				},
+			],
+		});
 
 	export type CreatePropertyBody = typeof createPropertyBody.static;
 
@@ -41,7 +55,16 @@ export namespace PropertyModel {
 				description: "Default value to use when property is empty",
 			}),
 		),
-	});
+	},
+		{
+			examples: [
+				{
+					name: "organization",
+					type: "string",
+					fallbackValue: "N/A",
+				},
+			],
+		});
 
 	export type UpdatePropertyBody = typeof updatePropertyBody.static;
 
@@ -55,7 +78,20 @@ export namespace PropertyModel {
 		}),
 		createdAt: t.Date(),
 		updatedAt: t.Date(),
-	});
+	},
+		{
+			examples: [
+				{
+					object: "contact_property",
+					id: "prop_123456789",
+					name: "company_name",
+					type: "string",
+					fallbackValue: "Unknown",
+					createdAt: "2026-03-27T10:00:00Z",
+					updatedAt: "2026-03-27T10:00:00Z",
+				},
+			],
+		});
 
 	export type PropertyResponse = typeof propertyResponse.static;
 

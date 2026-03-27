@@ -6,7 +6,10 @@ import { Elysia, t } from "elysia";
 export const updateContactRoute = new Elysia().use(authMiddleware).patch(
 	"/:contact_id",
 	async ({ params, body, activeOrganizationId }) => {
-		return await updateContactHandler(params.contact_id, activeOrganizationId, body);
+		return await updateContactHandler(params.contact_id, activeOrganizationId, {
+			...body,
+			object: "contact",
+		});
 	},
 	{
 		auth: true,

@@ -27,7 +27,17 @@ export namespace TopicModel {
 					"Visibility setting - whether the topic is visible to everyone or just the team",
 			}),
 		),
-	});
+	},
+		{
+			examples: [
+				{
+					name: "Product Updates",
+					description: "Get the latest news about our products",
+					defaultSubscription: "opt_in",
+					visibility: "public",
+				},
+			],
+		});
 
 	export type CreateTopicBody = typeof createTopicBody.static;
 
@@ -55,7 +65,16 @@ export namespace TopicModel {
 					"Visibility setting - whether the topic is visible to everyone or just the team",
 			}),
 		),
-	});
+	},
+		{
+			examples: [
+				{
+					name: "Marketing News",
+					description: "Internal marketing updates",
+					visibility: "private",
+				},
+			],
+		});
 
 	export type UpdateTopicBody = typeof updateTopicBody.static;
 
@@ -76,7 +95,21 @@ export namespace TopicModel {
 		}),
 		createdAt: t.Date(),
 		updatedAt: t.Date(),
-	});
+	},
+		{
+			examples: [
+				{
+					object: "topic",
+					id: "top_123456789",
+					name: "Product Updates",
+					description: "Get the latest news about our products",
+					defaultSubscription: "opt_in",
+					visibility: "public",
+					createdAt: "2026-03-27T10:00:00Z",
+					updatedAt: "2026-03-27T10:00:00Z",
+				},
+			],
+		});
 
 	export type TopicResponse = typeof topicResponse.static;
 

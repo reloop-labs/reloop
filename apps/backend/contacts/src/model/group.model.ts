@@ -8,7 +8,14 @@ export namespace GroupModel {
 			maxLength: 255,
 			description: "Group name",
 		}),
-	});
+	},
+		{
+			examples: [
+				{
+					name: "VIP Customers",
+				},
+			],
+		});
 
 	export type CreateGroupBody = typeof createGroupBody.static;
 
@@ -19,7 +26,14 @@ export namespace GroupModel {
 			maxLength: 255,
 			description: "Group name",
 		}),
-	});
+	},
+		{
+			examples: [
+				{
+					name: "Loyal Customers",
+				},
+			],
+		});
 
 	export type UpdateGroupBody = typeof updateGroupBody.static;
 
@@ -30,7 +44,18 @@ export namespace GroupModel {
 		name: t.String({ description: "Group name" }),
 		createdAt: t.Date(),
 		updatedAt: t.Date(),
-	});
+	},
+		{
+			examples: [
+				{
+					object: "contact_group",
+					id: "grp_123456789",
+					name: "VIP Customers",
+					createdAt: "2026-03-27T10:00:00Z",
+					updatedAt: "2026-03-27T10:00:00Z",
+				},
+			],
+		});
 
 	export type GroupResponse = typeof groupResponse.static;
 

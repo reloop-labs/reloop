@@ -62,7 +62,23 @@ export namespace ContactModel {
 				},
 			),
 		),
-	});
+		object: t.Literal("contact", { default: "contact" }),
+	},
+		{
+			examples: [
+				{
+					email: "john.doe@example.com",
+					firstName: "John",
+					lastName: "Doe",
+					status: "subscribed",
+					properties: {
+						company: "Reloop",
+						role: "Developer",
+					},
+					object: "contact",
+				},
+			],
+		});
 
 	export type CreateContactBody = typeof createContactBody.static;
 
@@ -112,7 +128,23 @@ export namespace ContactModel {
 				},
 			),
 		),
-	});
+		object: t.Literal("contact", { default: "contact" }),
+	},
+		{
+			examples: [
+				{
+					email: "john.doe@example.com",
+					firstName: "John",
+					lastName: "Doe",
+					status: "subscribed",
+					properties: {
+						company: "Reloop",
+						role: "Developer",
+					},
+					object: "contact",
+				},
+			],
+		});
 
 	export type UpdateContactBody = typeof updateContactBody.static;
 

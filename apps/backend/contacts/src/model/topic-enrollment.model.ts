@@ -11,7 +11,16 @@ export namespace TopicEnrollmentModel {
 				description: "Enrollment status",
 			}),
 		),
-	});
+	},
+		{
+			examples: [
+				{
+					contactId: "con_123456789",
+					topicId: "top_987654321",
+					status: "enrolled",
+				},
+			],
+		});
 
 	export type CreateTopicEnrollmentBody =
 		typeof createTopicEnrollmentBody.static;
@@ -21,7 +30,14 @@ export namespace TopicEnrollmentModel {
 		status: t.Union([t.Literal("enrolled"), t.Literal("unenrolled")], {
 			description: "Enrollment status",
 		}),
-	});
+	},
+		{
+			examples: [
+				{
+					status: "unenrolled",
+				},
+			],
+		});
 
 	export type UpdateTopicEnrollmentBody =
 		typeof updateTopicEnrollmentBody.static;
@@ -49,7 +65,21 @@ export namespace TopicEnrollmentModel {
 				deletedAt: t.Union([t.Date(), t.Null()]),
 			}),
 		),
-	});
+	},
+		{
+			examples: [
+				{
+					id: "enr_123456789",
+					contactId: "con_123456789",
+					topicId: "top_987654321",
+					organizationId: "org_123456789",
+					status: "enrolled",
+					createdAt: "2026-03-27T10:00:00Z",
+					updatedAt: "2026-03-27T10:00:00Z",
+					deletedAt: null,
+				},
+			],
+		});
 
 	export type TopicEnrollmentResponse = typeof topicEnrollmentResponse.static;
 
