@@ -1,3 +1,4 @@
+import { updateContactSamples } from "@be/contacts/code-samples/contact/update-contact";
 import { authMiddleware } from "@be/contacts/middleware/auth";
 import { ContactModel } from "@be/contacts/model/contact.model";
 import { updateContactHandler } from "@be/contacts/routes/contact/controllers/update-contact";
@@ -27,6 +28,7 @@ export const updateContactRoute = new Elysia().use(authMiddleware).patch(
 			tags: ["Contact"],
 			summary: "Update Contact",
 			description: "Updates an existing contact's information",
+			"x-codeSamples": updateContactSamples,
 		},
 	},
 );

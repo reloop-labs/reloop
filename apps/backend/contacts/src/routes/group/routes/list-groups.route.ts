@@ -1,3 +1,4 @@
+import { listGroupsSamples } from "@be/contacts/code-samples/group/list-groups";
 import { authMiddleware } from "@be/contacts/middleware/auth";
 import { GroupModel } from "@be/contacts/model/group.model";
 import { listGroupsHandler } from "@be/contacts/routes/group/controllers/list-groups";
@@ -28,6 +29,7 @@ export const listGroupsRoute = new Elysia().use(authMiddleware).get(
 			tags: ["Groups"],
 			summary: "List Groups",
 			description: "List all groups for the organization",
+			"x-codeSamples": listGroupsSamples,
 		},
 	},
 );

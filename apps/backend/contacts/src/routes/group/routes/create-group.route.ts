@@ -1,3 +1,4 @@
+import { createGroupSamples } from "@be/contacts/code-samples/group/create-group";
 import { authMiddleware } from "@be/contacts/middleware/auth";
 import { GroupModel } from "@be/contacts/model/group.model";
 import { createGroupHandler } from "@be/contacts/routes/group/controllers/create-group";
@@ -28,6 +29,7 @@ export const createGroupRoute = new Elysia().use(authMiddleware).post(
 			tags: ["Groups"],
 			summary: "Create Group",
 			description: "Creates a new group for the organization",
+			"x-codeSamples": createGroupSamples,
 		},
 	},
 );

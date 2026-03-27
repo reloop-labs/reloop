@@ -1,3 +1,4 @@
+import { listTopicsSamples } from "@be/contacts/code-samples/topic/list-topics";
 import { authMiddleware } from "@be/contacts/middleware/auth";
 import { TopicModel } from "@be/contacts/model/topic.model";
 import { listTopicsHandler } from "@be/contacts/routes/topic/controllers/list-topics";
@@ -23,6 +24,7 @@ export const listTopicsRoute = new Elysia().use(authMiddleware).get(
 			tags: ["Topics"],
 			summary: "List Topics",
 			description: "Retrieves a paginated list of topics",
+			"x-codeSamples": listTopicsSamples,
 			responses: {
 				200: {
 					description: "Topics listed successfully",

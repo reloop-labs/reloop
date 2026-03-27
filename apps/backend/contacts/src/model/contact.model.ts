@@ -62,7 +62,6 @@ export namespace ContactModel {
 				},
 			),
 		),
-		object: t.Literal("contact", { default: "contact" }),
 	},
 		{
 			examples: [
@@ -75,7 +74,6 @@ export namespace ContactModel {
 						company: "Reloop",
 						role: "Developer",
 					},
-					object: "contact",
 				},
 			],
 		});
@@ -128,7 +126,6 @@ export namespace ContactModel {
 				},
 			),
 		),
-		object: t.Literal("contact", { default: "contact" }),
 	},
 		{
 			examples: [
@@ -141,7 +138,6 @@ export namespace ContactModel {
 						company: "Reloop",
 						role: "Developer",
 					},
-					object: "contact",
 				},
 			],
 		});

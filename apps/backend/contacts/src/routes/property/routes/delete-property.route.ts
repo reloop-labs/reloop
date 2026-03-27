@@ -1,3 +1,4 @@
+import { deletePropertySamples } from "@be/contacts/code-samples/property/delete-property";
 import { authMiddleware } from "@be/contacts/middleware/auth";
 import { PropertyModel } from "@be/contacts/model/property.model";
 import { deletePropertyHandler } from "@be/contacts/routes/property/controllers/delete-property";
@@ -26,6 +27,7 @@ export const deletePropertyRoute = new Elysia().use(authMiddleware).delete(
 			tags: ["Contact Properties"],
 			summary: "Delete Contact Property",
 			description: "Soft delete a property by ID",
+			"x-codeSamples": deletePropertySamples,
 			responses: {
 				200: {
 					description: "Property deleted successfully",

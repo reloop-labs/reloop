@@ -1,3 +1,4 @@
+import { createPropertySamples } from "@be/contacts/code-samples/property/create-property";
 import { authMiddleware } from "@be/contacts/middleware/auth";
 import { PropertyModel } from "@be/contacts/model/property.model";
 import { createPropertyHandler } from "@be/contacts/routes/property/controllers/create-property";
@@ -26,6 +27,7 @@ export const createPropertyRoute = new Elysia().use(authMiddleware).post(
 			summary: "Create Contact Property",
 			description:
 				"Create a new custom property for contacts in the organization",
+			"x-codeSamples": createPropertySamples,
 			responses: {
 				200: {
 					description: "Property created successfully",

@@ -1,3 +1,4 @@
+import { getContactSamples } from "@be/contacts/code-samples/contact/get-contact";
 import { authMiddleware } from "@be/contacts/middleware/auth";
 import { ContactModel } from "@be/contacts/model/contact.model";
 import { getContactHandler } from "@be/contacts/routes/contact/controllers/get-contact";
@@ -20,6 +21,7 @@ export const getContactRoute = new Elysia().use(authMiddleware).get(
 			tags: ["Contact"],
 			summary: "Retrieve Contact",
 			description: "Retrieves a contact by ID",
+			"x-codeSamples": getContactSamples,
 		},
 	},
 );

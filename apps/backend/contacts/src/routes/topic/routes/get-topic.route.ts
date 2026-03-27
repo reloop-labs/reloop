@@ -1,3 +1,4 @@
+import { getTopicSamples } from "@be/contacts/code-samples/topic/get-topic";
 import { authMiddleware } from "@be/contacts/middleware/auth";
 import { TopicModel } from "@be/contacts/model/topic.model";
 import { getTopicHandler } from "@be/contacts/routes/topic/controllers/get-topic";
@@ -26,6 +27,7 @@ export const getTopicRoute = new Elysia().use(authMiddleware).get(
 			tags: ["Topics"],
 			summary: "Retrieve Topic",
 			description: "Retrieves a specific topic by ID",
+			"x-codeSamples": getTopicSamples,
 			responses: {
 				200: {
 					description: "Topic retrieved successfully",

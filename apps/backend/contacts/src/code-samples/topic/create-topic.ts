@@ -1,4 +1,4 @@
-export const removeContactFromGroupSamples = [
+export const createTopicSamples = [
   {
     id: "node",
     lang: "js",
@@ -10,18 +10,26 @@ const reloop = new Reloop({
   key: 're_123456789'
 });
 
-const response = await reloop.audience.groups.removeContact('grp_987654321', {
-  contactId: 'cont_123456789'
+const topic = await reloop.audience.topics.create({
+  name: 'Newsletter',
+  description: 'Monthly newsletter subscribers',
+  defaultSubscription: 'opt_in',
+  visibility: 'public'
 });`,
   },
   {
     id: "curl",
     lang: "bash",
     label: "cURL",
-    source: `curl -X DELETE https://reloop.sh/api/contacts/v1/group/grp_987654321 \\
+    source: `curl -X POST https://reloop.sh/api/topics/v1/create \\
   -H "Authorization: Bearer re_123456789" \\
   -H "Content-Type: application/json" \\
-  -d '{"contactId": "cont_123456789"}'`,
+  -d '{
+    "name": "Newsletter",
+    "description": "Monthly newsletter subscribers",
+    "defaultSubscription": "opt_in",
+    "visibility": "public"
+  }'`,
   },
   {
     id: "php",
@@ -30,15 +38,20 @@ const response = await reloop.audience.groups.removeContact('grp_987654321', {
     source: `<?php
 $client = new \\GuzzleHttp\\Client();
 
-$response = $client->delete('https://reloop.sh/api/contacts/v1/group/grp_987654321', [
+$response = $client->post('https://reloop.sh/api/topics/v1/create', [
     'headers' => [
         'Authorization' => 'Bearer re_123456789',
         'Content-Type'  => 'application/json',
     ],
-    'json' => ['contactId' => 'cont_123456789'],
+    'json' => [
+        'name'                => 'Newsletter',
+        'description'         => 'Monthly newsletter subscribers',
+        'defaultSubscription' => 'opt_in',
+        'visibility'          => 'public',
+    ],
 ]);
 
-$result = json_decode($response->getBody(), true);`,
+$topic = json_decode($response->getBody(), true);`,
   },
   {
     id: "python",
@@ -46,16 +59,21 @@ $result = json_decode($response->getBody(), true);`,
     label: "Python",
     source: `import requests
 
-response = requests.delete(
-    'https://reloop.sh/api/contacts/v1/group/grp_987654321',
+response = requests.post(
+    'https://reloop.sh/api/topics/v1/create',
     headers={
         'Authorization': 'Bearer re_123456789',
         'Content-Type': 'application/json',
     },
-    json={'contactId': 'cont_123456789'}
+    json={
+        'name': 'Newsletter',
+        'description': 'Monthly newsletter subscribers',
+        'defaultSubscription': 'opt_in',
+        'visibility': 'public',
+    }
 )
 
-result = response.json()`,
+topic = response.json()`,
   },
   {
     id: "ruby",
@@ -64,17 +82,22 @@ result = response.json()`,
     source: `require 'net/http'
 require 'json'
 
-uri = URI('https://reloop.sh/api/contacts/v1/group/grp_987654321')
+uri = URI('https://reloop.sh/api/topics/v1/create')
 http = Net::HTTP.new(uri.host, uri.port)
 http.use_ssl = true
 
-request = Net::HTTP::Delete.new(uri)
+request = Net::HTTP::Post.new(uri)
 request['Authorization'] = 'Bearer re_123456789'
 request['Content-Type'] = 'application/json'
-request.body = { contactId: 'cont_123456789' }.to_json
+request.body = {
+  name: 'Newsletter',
+  description: 'Monthly newsletter subscribers',
+  defaultSubscription: 'opt_in',
+  visibility: 'public'
+}.to_json
 
 response = http.request(request)
-result = JSON.parse(response.body)`,
+topic = JSON.parse(response.body)`,
   },
   {
     id: "go",
@@ -89,9 +112,14 @@ import (
 )
 
 func main() {
-  body, _ := json.Marshal(map[string]string{"contactId": "cont_123456789"})
+  body, _ := json.Marshal(map[string]string{
+    "name":                "Newsletter",
+    "description":         "Monthly newsletter subscribers",
+    "defaultSubscription": "opt_in",
+    "visibility":          "public",
+  })
 
-  req, _ := http.NewRequest("DELETE", "https://reloop.sh/api/contacts/v1/group/grp_987654321", bytes.NewBuffer(body))
+  req, _ := http.NewRequest("POST", "https://reloop.sh/api/topics/v1/create", bytes.NewBuffer(body))
   req.Header.Set("Authorization", "Bearer re_123456789")
   req.Header.Set("Content-Type", "application/json")
 
@@ -112,9 +140,14 @@ async fn main() -> Result<(), reqwest::Error> {
     let client = Client::new();
 
     let response = client
-        .delete("https://reloop.sh/api/contacts/v1/group/grp_987654321")
+        .post("https://reloop.sh/api/topics/v1/create")
         .header("Authorization", "Bearer re_123456789")
-        .json(&json!({ "contactId": "cont_123456789" }))
+        .json(&json!({
+            "name": "Newsletter",
+            "description": "Monthly newsletter subscribers",
+            "defaultSubscription": "opt_in",
+            "visibility": "public"
+        }))
         .send()
         .await?;
 
@@ -131,11 +164,20 @@ import java.net.http.HttpRequest.BodyPublishers;
 
 HttpClient client = HttpClient.newHttpClient();
 
+String body = """
+    {
+      "name": "Newsletter",
+      "description": "Monthly newsletter subscribers",
+      "defaultSubscription": "opt_in",
+      "visibility": "public"
+    }
+    """;
+
 HttpRequest request = HttpRequest.newBuilder()
-    .uri(URI.create("https://reloop.sh/api/contacts/v1/group/grp_987654321"))
+    .uri(URI.create("https://reloop.sh/api/topics/v1/create"))
     .header("Authorization", "Bearer re_123456789")
     .header("Content-Type", "application/json")
-    .method("DELETE", BodyPublishers.ofString("{\\"contactId\\": \\"cont_123456789\\"}"))
+    .POST(BodyPublishers.ofString(body))
     .build();
 
 HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());`,
@@ -150,11 +192,16 @@ using System.Net.Http.Json;
 var client = new HttpClient();
 client.DefaultRequestHeaders.Add("Authorization", "Bearer re_123456789");
 
-var payload = new { contactId = "cont_123456789" };
+var topic = new {
+    name = "Newsletter",
+    description = "Monthly newsletter subscribers",
+    defaultSubscription = "opt_in",
+    visibility = "public"
+};
 
-var request = new HttpRequestMessage(HttpMethod.Delete, "https://reloop.sh/api/contacts/v1/group/grp_987654321");
-request.Content = JsonContent.Create(payload);
-
-var response = await client.SendAsync(request);`,
+var response = await client.PostAsJsonAsync(
+    "https://reloop.sh/api/topics/v1/create",
+    topic
+);`,
   },
 ];

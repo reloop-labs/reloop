@@ -1,3 +1,4 @@
+import { removeContactFromGroupSamples } from "@be/contacts/code-samples/contact/remove-contact-from-group";
 import { authMiddleware } from "@be/contacts/middleware/auth";
 import { ContactModel } from "@be/contacts/model/contact.model";
 import { removeContactFromGroup } from "@be/contacts/routes/contact/controllers/remove-contact-from-group";
@@ -27,6 +28,7 @@ export const removeContactFromGroupRoute = new Elysia().use(authMiddleware).dele
       tags: ["Contact"],
       summary: "Delete Contact Group",
       description: "Deletes a contact from a group by ID or email",
+      "x-codeSamples": removeContactFromGroupSamples,
     },
   },
 );

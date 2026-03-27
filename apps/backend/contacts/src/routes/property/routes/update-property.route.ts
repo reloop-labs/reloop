@@ -1,3 +1,4 @@
+import { updatePropertySamples } from "@be/contacts/code-samples/property/update-property";
 import { authMiddleware } from "@be/contacts/middleware/auth";
 import { PropertyModel } from "@be/contacts/model/property.model";
 import { updatePropertyHandler } from "@be/contacts/routes/property/controllers/update-property";
@@ -32,6 +33,7 @@ export const updatePropertyRoute = new Elysia().use(authMiddleware).patch(
 			tags: ["Contact Properties"],
 			summary: "Update Contact Property",
 			description: "Update the fallback value of a property",
+			"x-codeSamples": updatePropertySamples,
 			responses: {
 				200: {
 					description: "Property updated successfully",

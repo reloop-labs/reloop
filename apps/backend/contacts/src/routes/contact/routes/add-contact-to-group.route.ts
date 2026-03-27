@@ -1,3 +1,4 @@
+import { addContactToGroupSamples } from "@be/contacts/code-samples/contact/add-contact-to-group";
 import { authMiddleware } from "@be/contacts/middleware/auth";
 import { ContactModel } from "@be/contacts/model/contact.model";
 import { addContactToGroup } from "@be/contacts/routes/contact/controllers/add-contact-to-group";
@@ -27,6 +28,7 @@ export const addContactToGroupRoute = new Elysia().use(authMiddleware).post(
       tags: ["Contact"],
       summary: "Add Contact Group",
       description: "Adds a contact to a group by ID or email",
+      "x-codeSamples": addContactToGroupSamples,
     },
   },
 );

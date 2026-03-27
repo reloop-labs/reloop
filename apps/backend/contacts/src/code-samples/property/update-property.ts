@@ -1,4 +1,4 @@
-export const removeContactFromGroupSamples = [
+export const updatePropertySamples = [
   {
     id: "node",
     lang: "js",
@@ -10,18 +10,18 @@ const reloop = new Reloop({
   key: 're_123456789'
 });
 
-const response = await reloop.audience.groups.removeContact('grp_987654321', {
-  contactId: 'cont_123456789'
+const property = await reloop.audience.properties.update('prop_123456789', {
+  fallbackValue: 'N/A'
 });`,
   },
   {
     id: "curl",
     lang: "bash",
     label: "cURL",
-    source: `curl -X DELETE https://reloop.sh/api/contacts/v1/group/grp_987654321 \\
+    source: `curl -X PATCH https://reloop.sh/api/properties/v1/prop_123456789 \\
   -H "Authorization: Bearer re_123456789" \\
   -H "Content-Type: application/json" \\
-  -d '{"contactId": "cont_123456789"}'`,
+  -d '{"fallbackValue": "N/A"}'`,
   },
   {
     id: "php",
@@ -30,15 +30,15 @@ const response = await reloop.audience.groups.removeContact('grp_987654321', {
     source: `<?php
 $client = new \\GuzzleHttp\\Client();
 
-$response = $client->delete('https://reloop.sh/api/contacts/v1/group/grp_987654321', [
+$response = $client->patch('https://reloop.sh/api/properties/v1/prop_123456789', [
     'headers' => [
         'Authorization' => 'Bearer re_123456789',
         'Content-Type'  => 'application/json',
     ],
-    'json' => ['contactId' => 'cont_123456789'],
+    'json' => ['fallbackValue' => 'N/A'],
 ]);
 
-$result = json_decode($response->getBody(), true);`,
+$property = json_decode($response->getBody(), true);`,
   },
   {
     id: "python",
@@ -46,16 +46,16 @@ $result = json_decode($response->getBody(), true);`,
     label: "Python",
     source: `import requests
 
-response = requests.delete(
-    'https://reloop.sh/api/contacts/v1/group/grp_987654321',
+response = requests.patch(
+    'https://reloop.sh/api/properties/v1/prop_123456789',
     headers={
         'Authorization': 'Bearer re_123456789',
         'Content-Type': 'application/json',
     },
-    json={'contactId': 'cont_123456789'}
+    json={'fallbackValue': 'N/A'}
 )
 
-result = response.json()`,
+property = response.json()`,
   },
   {
     id: "ruby",
@@ -64,17 +64,17 @@ result = response.json()`,
     source: `require 'net/http'
 require 'json'
 
-uri = URI('https://reloop.sh/api/contacts/v1/group/grp_987654321')
+uri = URI('https://reloop.sh/api/properties/v1/prop_123456789')
 http = Net::HTTP.new(uri.host, uri.port)
 http.use_ssl = true
 
-request = Net::HTTP::Delete.new(uri)
+request = Net::HTTP::Patch.new(uri)
 request['Authorization'] = 'Bearer re_123456789'
 request['Content-Type'] = 'application/json'
-request.body = { contactId: 'cont_123456789' }.to_json
+request.body = { fallbackValue: 'N/A' }.to_json
 
 response = http.request(request)
-result = JSON.parse(response.body)`,
+property = JSON.parse(response.body)`,
   },
   {
     id: "go",
@@ -89,9 +89,9 @@ import (
 )
 
 func main() {
-  body, _ := json.Marshal(map[string]string{"contactId": "cont_123456789"})
+  body, _ := json.Marshal(map[string]string{"fallbackValue": "N/A"})
 
-  req, _ := http.NewRequest("DELETE", "https://reloop.sh/api/contacts/v1/group/grp_987654321", bytes.NewBuffer(body))
+  req, _ := http.NewRequest("PATCH", "https://reloop.sh/api/properties/v1/prop_123456789", bytes.NewBuffer(body))
   req.Header.Set("Authorization", "Bearer re_123456789")
   req.Header.Set("Content-Type", "application/json")
 
@@ -112,9 +112,9 @@ async fn main() -> Result<(), reqwest::Error> {
     let client = Client::new();
 
     let response = client
-        .delete("https://reloop.sh/api/contacts/v1/group/grp_987654321")
+        .patch("https://reloop.sh/api/properties/v1/prop_123456789")
         .header("Authorization", "Bearer re_123456789")
-        .json(&json!({ "contactId": "cont_123456789" }))
+        .json(&json!({ "fallbackValue": "N/A" }))
         .send()
         .await?;
 
@@ -132,10 +132,10 @@ import java.net.http.HttpRequest.BodyPublishers;
 HttpClient client = HttpClient.newHttpClient();
 
 HttpRequest request = HttpRequest.newBuilder()
-    .uri(URI.create("https://reloop.sh/api/contacts/v1/group/grp_987654321"))
+    .uri(URI.create("https://reloop.sh/api/properties/v1/prop_123456789"))
     .header("Authorization", "Bearer re_123456789")
     .header("Content-Type", "application/json")
-    .method("DELETE", BodyPublishers.ofString("{\\"contactId\\": \\"cont_123456789\\"}"))
+    .method("PATCH", BodyPublishers.ofString("{\\"fallbackValue\\": \\"N/A\\"}"))
     .build();
 
 HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());`,
@@ -150,11 +150,11 @@ using System.Net.Http.Json;
 var client = new HttpClient();
 client.DefaultRequestHeaders.Add("Authorization", "Bearer re_123456789");
 
-var payload = new { contactId = "cont_123456789" };
+var update = new { fallbackValue = "N/A" };
 
-var request = new HttpRequestMessage(HttpMethod.Delete, "https://reloop.sh/api/contacts/v1/group/grp_987654321");
-request.Content = JsonContent.Create(payload);
-
-var response = await client.SendAsync(request);`,
+var response = await client.PatchAsJsonAsync(
+    "https://reloop.sh/api/properties/v1/prop_123456789",
+    update
+);`,
   },
 ];

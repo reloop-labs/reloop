@@ -1,3 +1,4 @@
+import { createTopicSamples } from "@be/contacts/code-samples/topic/create-topic";
 import { authMiddleware } from "@be/contacts/middleware/auth";
 import { TopicModel } from "@be/contacts/model/topic.model";
 import { createTopicHandler } from "@be/contacts/routes/topic/controllers/create-topic";
@@ -31,6 +32,7 @@ export const createTopicRoute = new Elysia().use(authMiddleware).post(
 			tags: ["Topics"],
 			summary: "Create Topic",
 			description: "Creates a new topic for the organization",
+			"x-codeSamples": createTopicSamples,
 			responses: {
 				201: {
 					description: "Topic created successfully",

@@ -1,3 +1,4 @@
+import { deleteTopicSamples } from "@be/contacts/code-samples/topic/delete-topic";
 import { authMiddleware } from "@be/contacts/middleware/auth";
 import { TopicModel } from "@be/contacts/model/topic.model";
 import { deleteTopicHandler } from "@be/contacts/routes/topic/controllers/delete-topic";
@@ -26,6 +27,7 @@ export const deleteTopicRoute = new Elysia().use(authMiddleware).delete(
 			tags: ["Topics"],
 			summary: "Delete Topic",
 			description: "Soft deletes a topic",
+			"x-codeSamples": deleteTopicSamples,
 			responses: {
 				200: {
 					description: "Topic deleted successfully",

@@ -1,3 +1,4 @@
+import { addContactToTopicSamples } from "@be/contacts/code-samples/contact/add-contact-to-topic";
 import { authMiddleware } from "@be/contacts/middleware/auth";
 import { ContactModel } from "@be/contacts/model/contact.model";
 import { TopicEnrollmentModel } from "@be/contacts/model/topic-enrollment.model";
@@ -30,6 +31,7 @@ export const addContactToTopicRoute = new Elysia().use(authMiddleware).post(
 			summary: "Add Contact Topic",
 			description:
 				"Creates a contact (if not exists) and enrolls them in a topic in one operation",
+			"x-codeSamples": addContactToTopicSamples,
 		},
 	},
 );

@@ -1,3 +1,4 @@
+import { updateContactTopicSamples } from "@be/contacts/code-samples/contact/update-contact-topic";
 import { authMiddleware } from "@be/contacts/middleware/auth";
 import { ContactModel } from "@be/contacts/model/contact.model";
 import { updateContactTopic } from "@be/contacts/routes/contact/controllers/update-contact-topic";
@@ -27,6 +28,7 @@ export const updateContactTopicRoute = new Elysia().use(authMiddleware).patch(
       tags: ["Contact"],
       summary: "Update Contact Topic",
       description: "Updates a contact's enrollment status in a topic",
+      "x-codeSamples": updateContactTopicSamples,
     },
   },
 );

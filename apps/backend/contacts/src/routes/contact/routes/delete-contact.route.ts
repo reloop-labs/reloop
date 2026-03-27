@@ -1,3 +1,4 @@
+import { deleteContactSamples } from "@be/contacts/code-samples/contact/delete-contact";
 import { authMiddleware } from "@be/contacts/middleware/auth";
 import { ContactModel } from "@be/contacts/model/contact.model";
 import { deleteContactHandler } from "@be/contacts/routes/contact/controllers/delete-contact";
@@ -24,6 +25,7 @@ export const deleteContactRoute = new Elysia().use(authMiddleware).delete(
 			tags: ["Contact"],
 			summary: "Delete Contact",
 			description: "Removes a contact from the organization",
+			"x-codeSamples": deleteContactSamples,
 		},
 	},
 );

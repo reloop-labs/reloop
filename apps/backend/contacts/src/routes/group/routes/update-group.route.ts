@@ -1,3 +1,4 @@
+import { updateGroupSamples } from "@be/contacts/code-samples/group/update-group";
 import { authMiddleware } from "@be/contacts/middleware/auth";
 import { GroupModel } from "@be/contacts/model/group.model";
 import { updateGroupHandler } from "@be/contacts/routes/group/controllers/update-group";
@@ -29,6 +30,7 @@ export const updateGroupRoute = new Elysia().use(authMiddleware).patch(
 			tags: ["Groups"],
 			summary: "Update Group",
 			description: "Updates an existing group for the organization",
+			"x-codeSamples": updateGroupSamples,
 		},
 	},
 );

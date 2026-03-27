@@ -1,3 +1,4 @@
+import { listContactsSamples } from "@be/contacts/code-samples/contact/list-contacts";
 import { authMiddleware } from "@be/contacts/middleware/auth";
 import { ContactModel } from "@be/contacts/model/contact.model";
 import { listContactsHandler } from "@be/contacts/routes/contact/controllers/list-contacts";
@@ -24,6 +25,7 @@ export const listContactsRoute = new Elysia().use(authMiddleware).get(
 			summary: "List Contacts",
 			description:
 				"Retrieves a paginated list of contacts with optional filtering and search",
+			"x-codeSamples": listContactsSamples,
 		},
 	},
 );

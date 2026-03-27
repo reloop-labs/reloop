@@ -1,4 +1,4 @@
-export const deleteGroupSamples = [
+export const getTopicSamples = [
   {
     id: "node",
     lang: "js",
@@ -10,13 +10,13 @@ const reloop = new Reloop({
   key: 're_123456789'
 });
 
-const response = await reloop.audience.deleteGroup('grp_123456789');`,
+const topic = await reloop.audience.topics.get('top_123456789');`,
   },
   {
     id: "curl",
     lang: "bash",
     label: "cURL",
-    source: `curl -X DELETE https://reloop.sh/api/groups/v1/grp_123456789 \\
+    source: `curl https://reloop.sh/api/topics/v1/top_123456789 \\
   -H "Authorization: Bearer re_123456789"`,
   },
   {
@@ -26,11 +26,11 @@ const response = await reloop.audience.deleteGroup('grp_123456789');`,
     source: `<?php
 $client = new \\GuzzleHttp\\Client();
 
-$response = $client->delete('https://reloop.sh/api/groups/v1/grp_123456789', [
+$response = $client->get('https://reloop.sh/api/topics/v1/top_123456789', [
     'headers' => ['Authorization' => 'Bearer re_123456789'],
 ]);
 
-$result = json_decode($response->getBody(), true);`,
+$topic = json_decode($response->getBody(), true);`,
   },
   {
     id: "python",
@@ -38,12 +38,12 @@ $result = json_decode($response->getBody(), true);`,
     label: "Python",
     source: `import requests
 
-response = requests.delete(
-    'https://reloop.sh/api/groups/v1/grp_123456789',
+response = requests.get(
+    'https://reloop.sh/api/topics/v1/top_123456789',
     headers={'Authorization': 'Bearer re_123456789'}
 )
 
-result = response.json()`,
+topic = response.json()`,
   },
   {
     id: "ruby",
@@ -52,15 +52,15 @@ result = response.json()`,
     source: `require 'net/http'
 require 'json'
 
-uri = URI('https://reloop.sh/api/groups/v1/grp_123456789')
+uri = URI('https://reloop.sh/api/topics/v1/top_123456789')
 http = Net::HTTP.new(uri.host, uri.port)
 http.use_ssl = true
 
-request = Net::HTTP::Delete.new(uri)
+request = Net::HTTP::Get.new(uri)
 request['Authorization'] = 'Bearer re_123456789'
 
 response = http.request(request)
-result = JSON.parse(response.body)`,
+topic = JSON.parse(response.body)`,
   },
   {
     id: "go",
@@ -71,7 +71,7 @@ result = JSON.parse(response.body)`,
 import "net/http"
 
 func main() {
-  req, _ := http.NewRequest("DELETE", "https://reloop.sh/api/groups/v1/grp_123456789", nil)
+  req, _ := http.NewRequest("GET", "https://reloop.sh/api/topics/v1/top_123456789", nil)
   req.Header.Set("Authorization", "Bearer re_123456789")
 
   client := &http.Client{}
@@ -90,7 +90,7 @@ async fn main() -> Result<(), reqwest::Error> {
     let client = Client::new();
 
     let response = client
-        .delete("https://reloop.sh/api/groups/v1/grp_123456789")
+        .get("https://reloop.sh/api/topics/v1/top_123456789")
         .header("Authorization", "Bearer re_123456789")
         .send()
         .await?;
@@ -108,9 +108,9 @@ import java.net.http.*;
 HttpClient client = HttpClient.newHttpClient();
 
 HttpRequest request = HttpRequest.newBuilder()
-    .uri(URI.create("https://reloop.sh/api/groups/v1/grp_123456789"))
+    .uri(URI.create("https://reloop.sh/api/topics/v1/top_123456789"))
     .header("Authorization", "Bearer re_123456789")
-    .DELETE()
+    .GET()
     .build();
 
 HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());`,
@@ -124,8 +124,8 @@ HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.o
 var client = new HttpClient();
 client.DefaultRequestHeaders.Add("Authorization", "Bearer re_123456789");
 
-var response = await client.DeleteAsync(
-    "https://reloop.sh/api/groups/v1/grp_123456789"
+var response = await client.GetAsync(
+    "https://reloop.sh/api/topics/v1/top_123456789"
 );`,
   },
 ];

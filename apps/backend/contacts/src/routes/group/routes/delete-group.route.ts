@@ -1,3 +1,4 @@
+import { deleteGroupSamples } from "@be/contacts/code-samples/group/delete-group";
 import { authMiddleware } from "@be/contacts/middleware/auth";
 import { GroupModel } from "@be/contacts/model/group.model";
 import { deleteGroupHandler } from "@be/contacts/routes/group/controllers/delete-group";
@@ -26,6 +27,7 @@ export const deleteGroupRoute = new Elysia().use(authMiddleware).delete(
 			tags: ["Groups"],
 			summary: "Delete Group",
 			description: "Deletes a group for the organization",
+			"x-codeSamples": deleteGroupSamples,
 		},
 	},
 );
