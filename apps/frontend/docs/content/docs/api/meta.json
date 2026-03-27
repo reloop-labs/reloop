@@ -38,10 +38,6 @@
 		"deleteApiContactsGroupByGroup_id",
 		"---Contact Topics---",
 		"postApiContactsTopicByTopic_id",
-		"patchApiContactsTopicByTopic_id",
-		"---System---",
-		"getApiContacts",
-		"getApiContactsHealthPostgres",
-		"getApiContactsHealthRedis"
+		"patchApiContactsTopicByTopic_id"
 	]
 }

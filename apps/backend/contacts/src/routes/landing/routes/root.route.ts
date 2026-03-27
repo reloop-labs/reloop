@@ -77,9 +77,7 @@ export const rootRoute = new Elysia().get(
 	},
 	{
 		detail: {
-			tags: ["Health"],
-			summary: "Status",
-			description: "Checks the health of the Contacts Service",
+			hide: true,
 		},
 	},
 );
