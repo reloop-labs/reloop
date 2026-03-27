@@ -3,6 +3,10 @@
 @import "fumadocs-ui/css/preset.css";
 @import "fumadocs-openapi/css/preset.css";
 
+@theme {
+  --font-sans: var(--font-open-runde), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
 :root {
   --fd-layout-width: 100%;
   --fd-sidebar-text-size: 14px;
@@ -13,7 +17,7 @@
 }
 
 #nd-sidebar p {
-  font-weight: 700;
+  font-weight: 600;
 }
 
 #nd-sidebar a {

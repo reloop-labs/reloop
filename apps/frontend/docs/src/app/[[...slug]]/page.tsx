@@ -73,7 +73,7 @@ export default async function Page(props: {
 			<DocsPage
 				tableOfContent={{ style: "clerk" }}
 				toc={page.data.toc}
-				full={page.data.full}
+				full={page.url.startsWith("/api") || page.data.full}
 				title={page.data.title}
 				editOnGithub={{
 					owner: "reloop-labs",
