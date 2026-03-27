@@ -30,12 +30,12 @@ export function DocTabs() {
 		},
 		{
 			title: "Webhooks",
-			url: "/setup",
+			url: "/webhook",
 			icon: "webhook",
 		},
 		{
 			title: "Self-Hosted",
-			url: "/setup",
+			url: "/self-host",
 			icon: "server",
 		},
 		{
@@ -48,20 +48,16 @@ export function DocTabs() {
 	return (
 		<div className="sticky top-0 z-20 flex flex-row items-center gap-1 border-fd-border border-b bg-fd-background px-4 py-2">
 			{tabs.map((tab) => {
-				const fullUrl = `/docs${tab.url === "/" ? "" : tab.url}`;
 				const active =
-					pathname === fullUrl ||
-					(tab.url !== "/" && pathname.startsWith(fullUrl));
+					tab.url === "/" ? pathname === "/" : pathname.includes(tab.url);
 
 				return (
 					<Link
 						key={tab.title}
 						href={tab.url}
 						className={cn(
-							"flex items-center gap-2 rounded-md px-2 py-1.5 font-medium text-sm transition-colors hover:bg-fd-accent hover:text-fd-accent-foreground",
-							active
-								? "bg-fd-accent text-fd-foreground"
-								: "text-fd-muted-foreground",
+							"flex items-center gap-2 rounded-md px-2 py-1.5 font-semibold text-sm hover:text-fd-accent-foreground",
+							active ? "text-fd-foreground" : "text-fd-muted-foreground",
 						)}
 					>
 						<Icon name={tab.icon} className="h-4 w-4" />
