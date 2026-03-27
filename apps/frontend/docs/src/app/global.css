@@ -5,17 +5,31 @@
 
 :root {
   --fd-layout-width: 100%;
+  --fd-sidebar-text-size: 14px;
+}
+
+#nd-sidebar {
+  font-size: var(--fd-sidebar-text-size);
+}
+
+#nd-sidebar p {
+  font-weight: 700;
+}
+
+#nd-sidebar a {
+  font-weight: 500;
+  padding: 6px;
 }
 
 #nd-page {
 padding-top: 20px;
 }
 
-#nd-toc{
+#nd-toc {
   @apply pr-0
 }
 
-#toc-title{
+#toc-title {
   @apply border-fd-border border-t pt-7! pr-4
 }
 
