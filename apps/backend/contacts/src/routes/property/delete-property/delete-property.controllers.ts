@@ -16,25 +16,20 @@ export const deletePropertyController = async ({
   logger.info({ property_id }, "Deleting property");
 
   try {
-    const existingProperty = await db
-      .select()
-      .from(schema.contactProperty)
+    const [deletedAction] = await db
+      .delete(schema.contactProperty)
       .where(
         and(
           eq(schema.contactProperty.id, property_id),
           eq(schema.contactProperty.organizationId, activeOrganizationId),
         ),
       )
-      .limit(1);
+      .returning({ id: schema.contactProperty.id });
 
-    if (existingProperty.length === 0) {
-      logger.warn({ property_id }, "Property not found");
+    if (!deletedAction) {
+      logger.warn({ property_id }, "Property not found or already deleted");
       throw status(404, { message: "Property not found" });
     }
-
-    await db
-      .delete(schema.contactProperty)
-      .where(eq(schema.contactProperty.id, property_id));
 
     logger.info({ property_id }, "Property deleted successfully");
     return { object: "contact_property", success: true };
