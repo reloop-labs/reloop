@@ -34,13 +34,22 @@ padding-top: 20px;
 }
 
 #nd-toc {
-  @apply pr-0
+  @apply pr-0;
 }
 
 #toc-title {
-  @apply border-fd-border border-t pt-7! pr-4
+  @apply border-fd-border border-t pt-7! pr-4;
 }
 
 figure {
   background-color: transparent !important;
+}
+
+[role="tablist"] {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+[role="tablist"]::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
 }
