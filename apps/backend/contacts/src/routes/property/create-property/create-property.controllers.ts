@@ -1,0 +1,63 @@
+import { formatPropertyResponse } from "@be/contacts/routes/property/controllers/format-property-response";
+import type { PropertyTypes } from "@be/contacts/types/property.type";
+import { db } from "@reloop/db/client";
+import * as schema from "@reloop/db/schema";
+import type { Logger } from "@reloop/logger";
+import { and, eq } from "drizzle-orm";
+import { status } from "elysia";
+
+export const createPropertyController = async ({
+  activeOrganizationId,
+  userId,
+  body,
+  logger,
+}: {
+  activeOrganizationId: string;
+  userId: string;
+  body: PropertyTypes.CreatePropertyRequest;
+  logger: Logger;
+}): Promise<PropertyTypes.PropertyResponse> => {
+  logger.info({ name: body.name, type: body.type }, "Creating property");
+
+  try {
+    const existingProperty = await db
+      .select()
+      .from(schema.contactProperty)
+      .where(
+        and(
+          eq(schema.contactProperty.propertyName, body.name),
+          eq(schema.contactProperty.organizationId, activeOrganizationId),
+        ),
+      )
+      .limit(1);
+
+    if (existingProperty.length > 0) {
+      logger.warn({ name: body.name }, "Property already exists in this organization");
+      throw status(409, { message: "Property already exists" });
+    }
+
+    const [newProperty] = await db
+      .insert(schema.contactProperty)
+      .values({
+        propertyName: body.name,
+        propertyType: body.type,
+        defaultValue: body.fallbackValue || null,
+        organizationId: activeOrganizationId,
+        userId,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .returning();
+
+    if (!newProperty) {
+      logger.error({ name: body.name }, "Failed to create property - no data returned");
+      throw status(500, { message: "Failed to create property" });
+    }
+
+    logger.info({ name: body.name, id: newProperty.id }, "Property created successfully");
+    return formatPropertyResponse(newProperty);
+  } catch (error) {
+    logger.error({ name: body.name, error }, "Debug creating property");
+    throw error;
+  }
+};
