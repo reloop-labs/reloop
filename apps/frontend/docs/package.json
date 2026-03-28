@@ -23,6 +23,7 @@
 		"fumadocs-openapi": "catalog:ui",
 		"fumadocs-ui": "catalog:ui",
 		"hast-util-to-jsx-runtime": "catalog:ui",
+		"lru-cache": "catalog:ui",
 		"lucide-react": "catalog:ui",
 		"next": "catalog:ui",
 		"next-themes": "catalog:ui",
