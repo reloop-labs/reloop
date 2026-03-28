@@ -1,4 +1,3 @@
-import { formatPropertyResponse } from "@be/contacts/routes/property/format-property-response";
 import type { PropertyTypes } from "@be/contacts/types/property.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
@@ -55,7 +54,7 @@ export const createPropertyController = async ({
     }
 
     logger.info({ name: body.name, id: newProperty.id }, "Property created successfully");
-    return formatPropertyResponse(newProperty);
+    return { ...newProperty, object: "contact_property" };
   } catch (error) {
     logger.error({ name: body.name, error }, "Debug creating property");
     throw error;

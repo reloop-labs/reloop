@@ -71,9 +71,9 @@ export namespace PropertyModel {
 	export const propertyResponse = t.Object({
 		object: t.Literal("contact_property", { default: "contact_property" }),
 		id: t.String({ description: "Unique property identifier" }),
-		name: t.String({ description: "Property name" }),
-		type: t.String({ description: "Property type (string or number)" }),
-		fallbackValue: t.Union([t.String(), t.Null()], {
+		propertyName: t.String({ description: "Property name" }),
+		propertyType: t.String({ description: "Property type (string or number)" }),
+		defaultValue: t.Union([t.String(), t.Null()], {
 			description: "Fallback value",
 		}),
 		createdAt: t.Date(),
@@ -84,9 +84,9 @@ export namespace PropertyModel {
 				{
 					object: "contact_property",
 					id: "prop_123456789",
-					name: "company_name",
-					type: "string",
-					fallbackValue: "Unknown",
+					propertyName: "company_name",
+					propertyType: "string",
+					defaultValue: "Unknown",
 					createdAt: "2026-03-27T10:00:00Z",
 					updatedAt: "2026-03-27T10:00:00Z",
 				},

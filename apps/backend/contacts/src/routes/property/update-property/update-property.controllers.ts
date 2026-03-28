@@ -1,4 +1,3 @@
-import { formatPropertyResponse } from "@be/contacts/routes/property/format-property-response";
 import type { PropertyTypes } from "@be/contacts/types/property.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
@@ -49,7 +48,7 @@ export const updatePropertyController = async ({
     }
 
     logger.info({ property_id }, "Property updated successfully");
-    return formatPropertyResponse(updatedProperty);
+    return { ...updatedProperty, object: "contact_property" };
   } catch (error) {
     logger.error({ property_id, error }, "Debug updating property");
     throw error;

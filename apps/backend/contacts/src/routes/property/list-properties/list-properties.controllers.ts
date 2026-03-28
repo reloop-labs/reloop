@@ -1,4 +1,3 @@
-import { formatPropertyResponse } from "@be/contacts/routes/property/format-property-response";
 import type { PropertyTypes } from "@be/contacts/types/property.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
@@ -52,7 +51,7 @@ export const listPropertiesController = async ({
     );
     return {
       object: "contact_property",
-      properties: rows.map((r) => formatPropertyResponse(r.property)),
+      properties: rows.map((r) => ({ ...r.property, object: "contact_property" })),
       total: Number(rows[0]?.total ?? 0),
       page,
       limit,
