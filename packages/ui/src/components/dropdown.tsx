@@ -27,7 +27,7 @@ const DropdownMenuContent = React.forwardRef<
 			ref={forwardedRef}
 			sideOffset={sideOffset}
 			className={cn(
-				"z-50 w-[300px] overflow-hidden rounded-2xl bg-bg-white-0 p-2 shadow-regular-md ring-1 ring-stroke-soft-200 ring-inset",
+				"z-50 w-[300px] overflow-hidden rounded-2xl bg-bg-white-0 p-2 shadow-regular-md ring-1 ring-stroke-soft-100 ring-inset dark:ring-stroke-soft-100/50",
 				"flex flex-col gap-1",
 				// origin
 				"data-[side=bottom]:origin-top data-[side=left]:origin-right data-[side=right]:origin-left data-[side=top]:origin-bottom",
@@ -156,7 +156,7 @@ const DropdownMenuSubContent = React.forwardRef<
 	<DropdownMenuPrimitive.SubContent
 		ref={forwardedRef}
 		className={cn(
-			"z-50 w-max overflow-hidden rounded-2xl bg-bg-white-0 p-2 shadow-regular-md ring-1 ring-stroke-soft-200 ring-inset",
+			"z-50 w-max overflow-hidden rounded-2xl bg-bg-white-0 p-2 shadow-regular-md ring-1 ring-stroke-soft-100 ring-inset dark:ring-stroke-soft-100/50",
 			"flex flex-col gap-1",
 			// animation
 			"data-[state=open]:fade-in-0 data-[state=open]:animate-in",
