@@ -78,8 +78,8 @@ export async function addContactToGroup(
     if (existing) {
       return {
         success: true,
-        contactId: contact.id,
-        groupId,
+        object: "contact" as const,
+        id: contact.id,
       };
     }
 
@@ -95,8 +95,8 @@ export async function addContactToGroup(
 
     return {
       success: true,
-      contactId: contact.id,
-      groupId,
+      object: "contact" as const,
+      id: contact.id,
     };
   } catch (error) {
     logger.error(

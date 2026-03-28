@@ -7,7 +7,7 @@ import { status } from "elysia";
 export async function deleteContact(
 	contactId: string,
 	organizationId: string,
-): Promise<{ message: string }> {
+): Promise<{ success: boolean; object: "contact"; id: string }> {
 	logger.info(
 		{
 			contactId,
@@ -48,7 +48,7 @@ export async function deleteContact(
 			"Contact deleted successfully",
 		);
 
-		return { message: "Contact deleted successfully" };
+		return { success: true, object: "contact", id: contactId };
 	} catch (error) {
 		logger.error(
 			{
@@ -65,6 +65,6 @@ export async function deleteContact(
 export async function deleteContactHandler(
 	contactId: string,
 	organizationId: string,
-): Promise<{ message: string }> {
+): Promise<{ success: boolean; object: "contact"; id: string }> {
 	return deleteContact(contactId, organizationId);
 }

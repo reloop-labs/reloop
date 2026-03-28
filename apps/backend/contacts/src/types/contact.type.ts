@@ -33,6 +33,8 @@ export namespace ContactTypes {
 		updatedAt: Date;
 		deletedAt: Date | null;
 		properties?: Record<string, string | number>;
+		groups?: { id: string; name: string }[];
+		topics?: { id: string; name: string; subscription: "opt_in" | "opt_out" }[];
 	}
 
 	export interface CreateContactRequest {

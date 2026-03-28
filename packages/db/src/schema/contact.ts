@@ -1,4 +1,5 @@
 import { createId } from "@paralleldrive/cuid2";
+import { relations } from "drizzle-orm";
 import {
 	index,
 	pgEnum,
@@ -9,6 +10,8 @@ import {
 	varchar,
 } from "drizzle-orm/pg-core";
 import { organization, user } from "./auth";
+import { contactGroup } from "./group";
+import { topicEnrollment } from "./topic";
 
 const createContactId = () => `con_${createId()}`;
 const createContactPropertyValueId = () => `cpv_${createId()}`;
@@ -124,6 +127,32 @@ export const contactPropertyValue = pgTable(
 		index("cpv_idx_organization_id").on(table.organizationId),
 		index("cpv_idx_user_id").on(table.userId),
 	],
+);
+
+// --- Relations ---
+
+export const contactRelations = relations(contact, ({ one, many }) => ({
+	organization: one(organization, {
+		fields: [contact.organizationId],
+		references: [organization.id],
+	}),
+	propertyValues: many(contactPropertyValue),
+	contactGroups: many(contactGroup),
+	contactTopics: many(topicEnrollment),
+}));
+
+export const contactPropertyValueRelations = relations(
+	contactPropertyValue,
+	({ one }) => ({
+		contact: one(contact, {
+			fields: [contactPropertyValue.contactId],
+			references: [contact.id],
+		}),
+		property: one(contactProperty, {
+			fields: [contactPropertyValue.propertyId],
+			references: [contactProperty.id],
+		}),
+	}),
 );
 
 export type ContactPropertyValue = typeof contactPropertyValue.$inferSelect;

@@ -57,6 +57,8 @@ export async function removeContactFromGroup(
 
     return {
       success: true,
+      object: "contact" as const,
+      id: contact.id,
     };
   } catch (error) {
     logger.error(

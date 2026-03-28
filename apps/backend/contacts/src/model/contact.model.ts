@@ -172,6 +172,30 @@ export namespace ContactModel {
 				default: {},
 			},
 		),
+		groups: t.Array(
+			t.Object({
+				id: t.String({ description: "Group ID" }),
+				name: t.String({ description: "Group name" }),
+			}),
+			{
+				description: "Groups this contact belongs to",
+				default: [],
+			},
+		),
+		topics: t.Array(
+			t.Object({
+				id: t.String({ description: "Topic ID" }),
+				name: t.String({ description: "Topic name" }),
+				subscription: t.Union(
+					[t.Literal("opt_in"), t.Literal("opt_out")],
+					{ description: "Contact's subscription status for this topic" },
+				),
+			}),
+			{
+				description: "Topics this contact is enrolled in",
+				default: [],
+			},
+		),
 		createdAt: t.Date(),
 		updatedAt: t.Date(),
 	},
@@ -188,6 +212,8 @@ export namespace ContactModel {
 						company: "Reloop",
 						role: "Developer",
 					},
+					groups: [{ id: "grp_123", name: "Beta Testers" }],
+					topics: [{ id: "tpc_123", name: "Newsletter", subscription: "opt_in" }],
 					createdAt: "2026-03-23T10:00:00Z",
 					updatedAt: "2026-03-23T10:00:00Z",
 				},
@@ -265,9 +291,22 @@ export namespace ContactModel {
 	export type ContactQuery = typeof contactQuery.static;
 
 	// Delete Response
-	export const deleteResponse = t.Object({
-		success: t.Boolean(),
-	});
+	export const deleteResponse = t.Object(
+		{
+			success: t.Boolean({ default: true }),
+			object: t.Literal("contact", { default: "contact" }),
+			id: t.String({ description: "ID of the deleted contact" }),
+		},
+		{
+			examples: [
+				{
+					success: true,
+					object: "contact",
+					id: "con_123456789",
+				},
+			],
+		},
+	);
 
 	export type DeleteResponse = typeof deleteResponse.static;
 
@@ -380,11 +419,22 @@ export namespace ContactModel {
 
 	export type AddContactToGroupBody = typeof addContactToGroupBody.static;
 
-	export const addContactToGroupResponse = t.Object({
-		success: t.Boolean({ default: true }),
-		contactId: t.String(),
-		groupId: t.String(),
-	});
+	export const addContactToGroupResponse = t.Object(
+		{
+			success: t.Boolean({ default: true }),
+			object: t.Literal("contact", { default: "contact" }),
+			id: t.String({ description: "ID of the contact added to the group" }),
+		},
+		{
+			examples: [
+				{
+					success: true,
+					object: "contact",
+					id: "con_123456789",
+				},
+			],
+		},
+	);
 
 	export type AddContactToGroupResponse = typeof addContactToGroupResponse.static;
 
@@ -397,9 +447,22 @@ export namespace ContactModel {
 
 	export type RemoveContactFromGroupBody = typeof removeContactFromGroupBody.static;
 
-	export const removeContactFromGroupResponse = t.Object({
-		success: t.Boolean({ default: true }),
-	});
+	export const removeContactFromGroupResponse = t.Object(
+		{
+			success: t.Boolean({ default: true }),
+			object: t.Literal("contact", { default: "contact" }),
+			id: t.String({ description: "ID of the contact removed from the group" }),
+		},
+		{
+			examples: [
+				{
+					success: true,
+					object: "contact",
+					id: "con_123456789",
+				},
+			],
+		},
+	);
 
 	export type RemoveContactFromGroupResponse =
 		typeof removeContactFromGroupResponse.static;

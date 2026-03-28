@@ -92,13 +92,7 @@ export const topicEnrollment = pgTable(
 	],
 );
 
-export const contactRelations = relations(contact, ({ one, many }) => ({
-	organization: one(organization, {
-		fields: [contact.organizationId],
-		references: [organization.id],
-	}),
-	enrollments: many(topicEnrollment),
-}));
+
 
 export const topicRelations = relations(topic, ({ one, many }) => ({
 	organization: one(organization, {

@@ -11,6 +11,8 @@ export function formatContactResponse(
 		lastName: contact.lastName,
 		status: contact.status,
 		properties: contact.properties ?? {},
+		groups: contact.groups ?? [],
+		topics: contact.topics ?? [],
 		createdAt: contact.createdAt,
 		updatedAt: contact.updatedAt,
 	};

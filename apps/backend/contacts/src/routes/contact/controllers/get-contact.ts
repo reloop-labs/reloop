@@ -10,13 +10,7 @@ export async function getContact(
 	contactId: string,
 	organizationId: string,
 ): Promise<ContactTypes.ContactResponse> {
-	logger.info(
-		{
-			contactId,
-			organizationId,
-		},
-		"Getting contact",
-	);
+	logger.info({ contactId, organizationId }, "Getting contact");
 
 	try {
 		const contact = await db.query.contact.findFirst({
@@ -25,6 +19,20 @@ export async function getContact(
 				eq(schema.contact.organizationId, organizationId),
 				isNull(schema.contact.deletedAt),
 			),
+			with: {
+				propertyValues: {
+					with: { property: true },
+					where: isNull(schema.contactPropertyValue.deletedAt),
+				},
+				contactGroups: {
+					with: { group: true },
+					where: isNull(schema.contactGroup.deletedAt),
+				},
+				contactTopics: {
+					with: { topic: true },
+					where: isNull(schema.topicEnrollment.deletedAt),
+				},
+			},
 		});
 
 		if (!contact) {
@@ -32,40 +40,47 @@ export async function getContact(
 			throw status(404, { message: "Contact not found" });
 		}
 
-		// Fetch properties for this contact
-		const properties = await db
-			.select({
-				name: schema.contactProperty.propertyName,
-				value: schema.contactPropertyValue.value,
-			})
-			.from(schema.contactPropertyValue)
-			.innerJoin(
-				schema.contactProperty,
-				eq(schema.contactPropertyValue.propertyId, schema.contactProperty.id),
-			)
-			.where(eq(schema.contactPropertyValue.contactId, contactId));
-
-		// Map properties to Record<string, string>
-		const propertiesRecord = properties.reduce(
-			(acc, curr) => {
-				acc[curr.name] = curr.value;
+		// Map property values to Record<string, string>
+		const properties = contact.propertyValues.reduce(
+			(acc, pv) => {
+				acc[pv.property.propertyName] = pv.value;
 				return acc;
 			},
 			{} as Record<string, string>,
 		);
 
+		// Map contactGroups join rows to { id, name }
+		const groups = contact.contactGroups
+			.filter((cg) => cg.group !== null)
+			.map((cg) => ({ id: cg.group.id, name: cg.group.name }));
+
+		// Map enrollments to { id, name, subscription }
+		const topics = contact.contactTopics
+			.filter((en) => en.topic !== null && en.topic.deletedAt === null)
+			.map((en) => ({
+				id: en.topic.id,
+				name: en.topic.name,
+				subscription: (en.status === "enrolled" ? "opt_in" : "opt_out") as
+					| "opt_in"
+					| "opt_out",
+			}));
+
 		logger.info(
 			{
 				contactId,
 				organizationId,
-				propertyCount: properties.length,
+				propertyCount: contact.propertyValues.length,
+				groupCount: groups.length,
+				topicCount: topics.length,
 			},
 			"Contact retrieved successfully",
 		);
 
 		return formatContactResponse({
 			...contact,
-			properties: propertiesRecord,
+			properties,
+			groups,
+			topics,
 		});
 	} catch (error) {
 		logger.error(

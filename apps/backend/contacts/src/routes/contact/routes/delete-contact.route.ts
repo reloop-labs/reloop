@@ -15,9 +15,7 @@ export const deleteContactRoute = new Elysia().use(authMiddleware).delete(
 			contact_id: t.String(),
 		}),
 		response: {
-			200: t.Object({
-				message: t.String(),
-			}),
+			200: ContactModel.deleteResponse,
 			404: ContactModel.contactNotFound,
 			403: ContactModel.unauthorized,
 		},
