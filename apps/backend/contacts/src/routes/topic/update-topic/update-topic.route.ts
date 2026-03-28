@@ -9,7 +9,7 @@ export const updateTopicRoute = new Elysia().use(authMiddleware).patch(
   async ({ params, body, activeOrganizationId, logger }) => {
     const { name, description, visibility } = body;
     return await updateTopicController({
-      activeOrganizationId: activeOrganizationId as string,
+      activeOrganizationId,
       topic_id: params.topic_id,
       name,
       description: description ?? undefined,
@@ -32,27 +32,6 @@ export const updateTopicRoute = new Elysia().use(authMiddleware).patch(
       summary: "Update Topic",
       description: "Updates an existing topic",
       "x-codeSamples": updateTopicXCodeSamples,
-      responses: {
-        200: {
-          description: "Topic updated successfully",
-          content: {
-            "application/json": {
-              example: {
-                object: "topic",
-                id: "topic_123456789",
-                name: "Updated Newsletter",
-                description: "Monthly newsletter subscribers",
-                defaultSubscription: "opt_in",
-                visibility: "public",
-                organizationId: "org_123456789",
-                createdAt: "2026-03-24T10:00:00Z",
-                updatedAt: "2026-03-24T11:00:00Z",
-                deletedAt: null,
-              },
-            },
-          },
-        },
-      },
     },
   },
 );

@@ -9,7 +9,7 @@ export const createTopicRoute = new Elysia().use(authMiddleware).post(
   async ({ body, activeOrganizationId, userId, logger }) => {
     const { name, description, defaultSubscription, visibility } = body;
     return await createTopicController({
-      activeOrganizationId: activeOrganizationId as string,
+      activeOrganizationId,
       userId,
       name,
       description,
@@ -31,27 +31,6 @@ export const createTopicRoute = new Elysia().use(authMiddleware).post(
       summary: "Create Topic",
       description: "Creates a new topic for the organization",
       "x-codeSamples": createTopicXCodeSamples,
-      responses: {
-        201: {
-          description: "Topic created successfully",
-          content: {
-            "application/json": {
-              example: {
-                object: "topic",
-                id: "topic_123456789",
-                name: "Newsletter",
-                description: "Monthly newsletter subscribers",
-                defaultSubscription: "opt_in",
-                visibility: "public",
-                organizationId: "org_123456789",
-                createdAt: "2026-03-24T10:00:00Z",
-                updatedAt: "2026-03-24T10:00:00Z",
-                deletedAt: null,
-              },
-            },
-          },
-        },
-      },
     },
   },
 );

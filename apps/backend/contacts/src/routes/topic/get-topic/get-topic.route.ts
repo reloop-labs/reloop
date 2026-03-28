@@ -8,7 +8,7 @@ export const getTopicRoute = new Elysia().use(authMiddleware).get(
   "/:topic_id",
   async ({ params, activeOrganizationId, logger }) => {
     return await getTopicController({
-      activeOrganizationId: activeOrganizationId as string,
+      activeOrganizationId,
       topic_id: params.topic_id,
       logger,
     });
@@ -26,27 +26,6 @@ export const getTopicRoute = new Elysia().use(authMiddleware).get(
       summary: "Retrieve Topic",
       description: "Retrieves a specific topic by ID",
       "x-codeSamples": getTopicXCodeSamples,
-      responses: {
-        200: {
-          description: "Topic retrieved successfully",
-          content: {
-            "application/json": {
-              example: {
-                object: "topic",
-                id: "topic_123456789",
-                name: "Newsletter",
-                description: "Monthly newsletter subscribers",
-                defaultSubscription: "opt_in",
-                visibility: "public",
-                organizationId: "org_123456789",
-                createdAt: "2026-03-24T10:00:00Z",
-                updatedAt: "2026-03-24T10:00:00Z",
-                deletedAt: null,
-              },
-            },
-          },
-        },
-      },
     },
   },
 );

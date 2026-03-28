@@ -8,7 +8,7 @@ export const deleteTopicRoute = new Elysia().use(authMiddleware).delete(
   "/:topic_id",
   async ({ params, activeOrganizationId, logger }) => {
     return await deleteTopicController({
-      activeOrganizationId: activeOrganizationId as string,
+      activeOrganizationId,
       topic_id: params.topic_id,
       logger,
     });
@@ -26,16 +26,6 @@ export const deleteTopicRoute = new Elysia().use(authMiddleware).delete(
       summary: "Delete Topic",
       description: "Soft deletes a topic",
       "x-codeSamples": deleteTopicXCodeSamples,
-      responses: {
-        200: {
-          description: "Topic deleted successfully",
-          content: {
-            "application/json": {
-              example: { success: true },
-            },
-          },
-        },
-      },
     },
   },
 );

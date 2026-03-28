@@ -8,7 +8,7 @@ export const deletePropertyRoute = new Elysia().use(authMiddleware).delete(
   "/:contact_property_id",
   async ({ params, activeOrganizationId, logger }) => {
     return deletePropertyController({
-      activeOrganizationId: activeOrganizationId as string,
+      activeOrganizationId,
       property_id: params.contact_property_id,
       logger,
     });
@@ -28,16 +28,6 @@ export const deletePropertyRoute = new Elysia().use(authMiddleware).delete(
       summary: "Delete Contact Property",
       description: "Soft delete a property by ID",
       "x-codeSamples": deletePropertyXCodeSamples,
-      responses: {
-        200: {
-          description: "Property deleted successfully",
-          content: {
-            "application/json": {
-              example: { success: true },
-            },
-          },
-        },
-      },
     },
   },
 );
