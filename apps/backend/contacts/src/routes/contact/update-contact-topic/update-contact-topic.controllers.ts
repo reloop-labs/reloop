@@ -18,34 +18,20 @@ export async function updateContactTopicController({
   logger: Logger;
 }): Promise<ContactModel.UpdateContactTopicResponse> {
   const { email, subscription } = body;
-
-  logger.info(
-    {
-      organizationId,
-      email: email.toLowerCase(),
-      topicId,
-      subscription,
-    },
-    "Updating contact topic status",
-  );
-
+  logger.info({ email, topicId, subscription }, "Updating contact topic status");
   try {
-    // Identify contact
-    const emailLower = email.toLowerCase();
     let contact = await db.query.contact.findFirst({
       where: and(
-        eq(schema.contact.email, emailLower),
+        eq(schema.contact.email, email),
         eq(schema.contact.organizationId, organizationId),
         isNull(schema.contact.deletedAt),
       ),
     });
-
-    // If identified by email and not found, create it (consistency with addContactToTopic)
     if (!contact) {
       const [newContact] = await db
         .insert(schema.contact)
         .values({
-          email: emailLower,
+          email,
           status: "subscribed",
           organizationId,
           userId,
