@@ -1,8 +1,8 @@
-import { listPropertiesSamples } from "@be/contacts/code-samples/property/list-properties";
 import { authMiddleware } from "@be/contacts/middleware/auth";
 import { PropertyModel } from "@be/contacts/model/property.model";
 import { Elysia } from "elysia";
 import { listPropertiesController } from "./list-properties.controllers";
+import { listPropertiesXCodeSamples } from "./list-properties.x-codeSamples";
 
 export const listPropertiesRoute = new Elysia().use(authMiddleware).get(
   "/list",
@@ -23,8 +23,9 @@ export const listPropertiesRoute = new Elysia().use(authMiddleware).get(
     detail: {
       tags: ["Contact Properties"],
       summary: "List Contact Properties",
-      description: "List all properties for the organization with pagination and filtering",
-      "x-codeSamples": listPropertiesSamples,
+      description:
+        "List all properties for the organization with pagination and filtering",
+      "x-codeSamples": listPropertiesXCodeSamples,
       responses: {
         200: {
           description: "Properties listed successfully",

@@ -1,8 +1,8 @@
-import { updateTopicSamples } from "@be/contacts/code-samples/topic/update-topic";
 import { authMiddleware } from "@be/contacts/middleware/auth";
 import { TopicModel } from "@be/contacts/model/topic.model";
 import { Elysia, t } from "elysia";
 import { updateTopicController } from "./update-topic.controllers";
+import { updateTopicXCodeSamples } from "./update-topic.x-codeSamples";
 
 export const updateTopicRoute = new Elysia().use(authMiddleware).patch(
   "/:topic_id",
@@ -31,7 +31,7 @@ export const updateTopicRoute = new Elysia().use(authMiddleware).patch(
       tags: ["Topics"],
       summary: "Update Topic",
       description: "Updates an existing topic",
-      "x-codeSamples": updateTopicSamples,
+      "x-codeSamples": updateTopicXCodeSamples,
       responses: {
         200: {
           description: "Topic updated successfully",

@@ -1,8 +1,8 @@
-import { updatePropertySamples } from "@be/contacts/code-samples/property/update-property";
 import { authMiddleware } from "@be/contacts/middleware/auth";
 import { PropertyModel } from "@be/contacts/model/property.model";
 import { Elysia, t } from "elysia";
 import { updatePropertyController } from "./update-property.controllers";
+import { updatePropertyXCodeSamples } from "./update-property.x-codeSamples";
 
 export const updatePropertyRoute = new Elysia().use(authMiddleware).patch(
   "/:contact_property_id",
@@ -16,9 +16,13 @@ export const updatePropertyRoute = new Elysia().use(authMiddleware).patch(
   },
   {
     auth: true,
-    params: t.Object({ contact_property_id: t.String({ description: "Property ID to update" }) }),
+    params: t.Object({
+      contact_property_id: t.String({ description: "Property ID to update" }),
+    }),
     body: t.Object({
-      fallbackValue: t.Nullable(t.String({ description: "New fallback value" })),
+      fallbackValue: t.Nullable(
+        t.String({ description: "New fallback value" }),
+      ),
     }),
     response: {
       200: PropertyModel.propertyResponse,
@@ -29,7 +33,7 @@ export const updatePropertyRoute = new Elysia().use(authMiddleware).patch(
       tags: ["Contact Properties"],
       summary: "Update Contact Property",
       description: "Update the fallback value of a property",
-      "x-codeSamples": updatePropertySamples,
+      "x-codeSamples": updatePropertyXCodeSamples,
       responses: {
         200: {
           description: "Property updated successfully",

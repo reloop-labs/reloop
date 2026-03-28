@@ -244,6 +244,47 @@ export namespace ContactModel {
 
 	export type ContactListResponse = typeof contactListResponse.static;
 
+	// Lean contact item for group contact list (no groups/topics)
+	export const groupContactItem = t.Object(
+		{
+			id: t.String({ description: "Unique contact identifier" }),
+			email: t.String({ description: "Contact email address" }),
+			firstName: t.Union([t.String(), t.Null()], { description: "Contact first name" }),
+			lastName: t.Union([t.String(), t.Null()], { description: "Contact last name" }),
+			status: t.Union(
+				[
+					t.Literal("subscribed"),
+					t.Literal("unsubscribed"),
+					t.Literal("blocked"),
+				],
+				{ description: "Contact subscription status" },
+			),
+			properties: t.Record(
+				t.String({ pattern: "^[a-z_]+$" }),
+				t.Union([t.String(), t.Number()]),
+				{ description: "Contact properties as key-value pairs", default: {} },
+			),
+			createdAt: t.Date(),
+			updatedAt: t.Date(),
+		},
+		{
+			examples: [
+				{
+					id: "con_123456789",
+					email: "john.doe@example.com",
+					firstName: "John",
+					lastName: "Doe",
+					status: "subscribed",
+					properties: { company: "Reloop", role: "Developer" },
+					createdAt: "2026-03-23T10:00:00Z",
+					updatedAt: "2026-03-23T10:00:00Z",
+				},
+			],
+		},
+	);
+
+	export type GroupContactItem = typeof groupContactItem.static;
+
 	export const groupContactListResponse = t.Object({
 		object: t.Literal("contact_group", { default: "contact_group" }),
 		group: t.Object({
@@ -251,20 +292,11 @@ export namespace ContactModel {
 			name: t.String({ description: "Group name" }),
 			createdAt: t.Date(),
 			updatedAt: t.Date(),
-			contacts: t.Array(contactListItem),
+			contacts: t.Array(groupContactItem),
 		}),
 		total: t.Number(),
 		page: t.Number(),
 		limit: t.Number(),
-		totalContacts: t.Number({
-			description: "Total number of contacts in group",
-		}),
-		subscribedContacts: t.Number({
-			description: "Total number of subscribed contacts in group",
-		}),
-		unsubscribedContacts: t.Number({
-			description: "Total number of unsubscribed contacts in group",
-		}),
 	});
 
 	export type GroupContactListResponse = typeof groupContactListResponse.static;
