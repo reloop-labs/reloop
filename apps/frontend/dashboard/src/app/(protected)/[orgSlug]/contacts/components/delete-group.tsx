@@ -1,8 +1,8 @@
 "use client";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
-import * as Modal from "@reloop/ui/modal";
 import * as Kbd from "@reloop/ui/kbd";
+import * as Modal from "@reloop/ui/modal";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";

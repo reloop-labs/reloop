@@ -26,6 +26,7 @@ interface ContactData {
 	lastName: string | null;
 	status: string;
 	properties?: Record<string, string | number>;
+	groups?: { id: string; name: string }[];
 	organizationId: string;
 	createdAt: string;
 	updatedAt: string;
@@ -401,7 +402,34 @@ export const ContactHeader = ({
 							</button>
 						)}
 					</div>
-					<div className="col-span-2 flex flex-col gap-1.5">
+					<div className="flex flex-col gap-1.5">
+						<div className="flex items-center gap-1.5">
+							<Icon name="modules" className="h-3.5 w-3.5 text-text-sub-600" />
+							<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
+								Groups
+							</span>
+						</div>
+						{isLoading ? (
+							<Skeleton className="h-5 w-32 rounded-lg" />
+						) : contact?.groups && contact.groups.length > 0 ? (
+							<div className="flex flex-wrap gap-2">
+								{contact.groups.map((group) => (
+									<Link
+										key={group.id}
+										href={`/${activeOrganization?.slug}/groups/${group.id}`}
+										className="font-medium text-paragraph-sm text-text-strong-950 underline decoration-dashed underline-offset-2 transition-colors hover:text-primary-base"
+									>
+										{group.name}
+									</Link>
+								))}
+							</div>
+						) : (
+							<span className="font-medium text-paragraph-sm text-text-soft-400 italic">
+								No groups
+							</span>
+						)}
+					</div>
+					<div className="flex flex-col gap-1.5">
 						<div className="flex items-center gap-1.5">
 							<Icon
 								name="notification-indicator"

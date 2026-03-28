@@ -82,7 +82,7 @@ export const AddPropertyModal = ({
 			}
 		},
 		{ enableOnFormTags: true, enabled: open },
-		[open, isCreating, propertyName, nameError]
+		[open, isCreating, propertyName, nameError],
 	);
 
 	const handleSubmit = async (e: React.FormEvent) => {

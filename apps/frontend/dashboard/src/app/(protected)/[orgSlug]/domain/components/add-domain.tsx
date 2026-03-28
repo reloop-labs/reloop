@@ -77,7 +77,7 @@ export const AddDomainSidebar = () => {
 				</div>
 			</div>
 
-			<div className="my-6 gap-3"></div>
+			<div className="my-6 gap-3" />
 			<div className="flex gap-6">
 				<form onSubmit={handleSubmit(onSubmit)} className="w-full space-y-3">
 					<div>

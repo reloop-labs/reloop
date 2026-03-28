@@ -11,17 +11,12 @@ interface ContactData {
 	lastName: string | null;
 	status: string;
 	organizationId: string;
+	properties?: Record<string, string | number>;
+	groups?: { id: string; name: string }[];
+	topics?: { id: string; name: string; subscription: "opt_in" | "opt_out" }[];
 	createdAt: string;
 	updatedAt: string;
 	deletedAt: string | null;
-}
-
-interface PropertyValue {
-	id: string;
-	propertyId: string;
-	value: string;
-	createdAt: string;
-	updatedAt: string;
 }
 
 interface Property {
@@ -37,13 +32,6 @@ interface Topic {
 	defaultSubscription: "opt_in" | "opt_out";
 }
 
-interface TopicEnrollment {
-	id: string;
-	contactId: string;
-	topicId: string;
-	status: "enrolled" | "unenrolled";
-}
-
 export const ContactDetailContent = () => {
 	const { id } = useParams();
 
@@ -54,12 +42,6 @@ export const ContactDetailContent = () => {
 	} = useSWR<ContactData>(id ? `/api/contacts/retrieve/${id}` : null, {
 		revalidateOnFocus: false,
 		revalidateOnReconnect: true,
-	});
-
-	const { data: propertiesData, isLoading: propertiesLoading } = useSWR<{
-		propertyValues: PropertyValue[];
-	}>(id ? `/api/contacts/${id}/properties` : null, {
-		revalidateOnFocus: false,
 	});
 
 	const { data: allPropertiesData } = useSWR<{
@@ -77,35 +59,22 @@ export const ContactDetailContent = () => {
 		revalidateOnFocus: false,
 	});
 
-	// Fetch contact's topic enrollments
-	const { data: enrollmentsData } = useSWR<{
-		enrollments: TopicEnrollment[];
-		total: number;
-	}>(
-		id ? `/api/contacts/v1/enrollments/list?contactId=${id}&limit=100` : null,
-		{
-			revalidateOnFocus: false,
-		},
-	);
-
-	// Build a map of propertyId -> property value for this contact
-	const valueMap = new Map<string, string>();
-	if (propertiesData?.propertyValues) {
-		for (const pv of propertiesData.propertyValues) {
-			valueMap.set(pv.propertyId, pv.value);
-		}
-	}
-
 	// Build all properties with their values (use fallbackValue if no explicit value, show "-" if neither)
 	const allPropertiesWithValues =
-		allPropertiesData?.properties?.map((prop) => ({
-			id: prop.id,
-			propertyId: prop.id,
-			name: prop.propertyName,
-			value: valueMap.get(prop.id) || prop.defaultValue || "-",
-			createdAt: "",
-			updatedAt: "",
-		})) || [];
+		allPropertiesData?.properties?.map((prop) => {
+			const val = contactData?.properties?.[prop.propertyName];
+			return {
+				id: prop.id,
+				propertyId: prop.id,
+				name: prop.propertyName,
+				value:
+					val !== undefined && val !== null
+						? String(val)
+						: prop.defaultValue || "-",
+				createdAt: "",
+				updatedAt: "",
+			};
+		}) || [];
 
 	// Build enrolled topics array
 	// Logic: A contact is enrolled in a topic if:
@@ -115,10 +84,10 @@ export const ContactDetailContent = () => {
 		if (!allTopicsData?.topics) return [];
 
 		// Build a map of topicId -> enrollment status from explicit enrollments
-		const enrollmentMap = new Map<string, "enrolled" | "unenrolled">();
-		if (enrollmentsData?.enrollments) {
-			for (const e of enrollmentsData.enrollments) {
-				enrollmentMap.set(e.topicId, e.status);
+		const enrollmentMap = new Map<string, "opt_in" | "opt_out">();
+		if (contactData?.topics) {
+			for (const t of contactData.topics) {
+				enrollmentMap.set(t.id, t.subscription);
 			}
 		}
 
@@ -128,7 +97,7 @@ export const ContactDetailContent = () => {
 
 				// If there's an explicit enrollment record
 				if (explicitStatus) {
-					return explicitStatus === "enrolled";
+					return explicitStatus === "opt_in";
 				}
 
 				// No explicit record - use topic's defaultSubscription setting
@@ -137,7 +106,7 @@ export const ContactDetailContent = () => {
 			.map((topic) => ({ id: topic.id, name: topic.name }));
 	})();
 
-	const isLoading = contactLoading || propertiesLoading;
+	const isLoading = contactLoading;
 
 	if (contactError) {
 		return (

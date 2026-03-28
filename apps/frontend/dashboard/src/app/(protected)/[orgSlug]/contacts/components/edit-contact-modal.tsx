@@ -20,6 +20,7 @@ interface Contact {
 	status: string;
 	organizationId: string;
 	properties: Record<string, string | number>;
+	topics?: { id: string; name: string; subscription: "opt_in" | "opt_out" }[];
 	createdAt: string;
 	updatedAt: string;
 	deletedAt: string | null;
@@ -32,23 +33,10 @@ interface Property {
 	defaultValue: string | null;
 }
 
-interface PropertyValue {
-	id: string;
-	propertyId: string;
-	value: string;
-}
-
 interface Topic {
 	id: string;
 	name: string;
 	defaultSubscription: "opt_in" | "opt_out";
-}
-
-interface TopicEnrollment {
-	id: string;
-	contactId: string;
-	topicId: string;
-	status: "enrolled" | "unenrolled";
 }
 
 interface EditContactModalProps {
@@ -85,30 +73,11 @@ export const EditContactModal = ({
 		total: number;
 	}>(open ? "/api/contacts/v1/properties/list?limit=100" : null, fetcher);
 
-	// Fetch property values for this contact
-	const { data: contactPropsData } = useSWR<{
-		propertyValues: PropertyValue[];
-	}>(
-		open && contact ? `/api/contacts/${contact.id}/properties` : null,
-		fetcher,
-	);
-
 	// Fetch all topics for the organization
 	const { data: allTopicsData } = useSWR<{
 		topics: Topic[];
 		total: number;
 	}>(open ? "/api/contacts/v1/topics/list?limit=100" : null, fetcher);
-
-	// Fetch contact's topic enrollments
-	const { data: enrollmentsData } = useSWR<{
-		enrollments: TopicEnrollment[];
-		total: number;
-	}>(
-		open && contact
-			? `/api/contacts/v1/enrollments/list?contactId=${contact.id}&limit=100`
-			: null,
-		fetcher,
-	);
 
 	// All available topics
 	const allTopics = allTopicsData?.topics || [];
@@ -121,10 +90,10 @@ export const EditContactModal = ({
 		if (!allTopics.length) return [];
 
 		// Build a map of topicId -> enrollment status from explicit enrollments
-		const enrollmentMap = new Map<string, "enrolled" | "unenrolled">();
-		if (enrollmentsData?.enrollments) {
-			for (const e of enrollmentsData.enrollments) {
-				enrollmentMap.set(e.topicId, e.status);
+		const enrollmentMap = new Map<string, "opt_in" | "opt_out">();
+		if (contact?.topics) {
+			for (const t of contact.topics) {
+				enrollmentMap.set(t.id, t.subscription);
 			}
 		}
 
@@ -134,7 +103,7 @@ export const EditContactModal = ({
 
 				// If there's an explicit enrollment record
 				if (explicitStatus) {
-					return explicitStatus === "enrolled";
+					return explicitStatus === "opt_in";
 				}
 
 				// No explicit record - use topic's defaultSubscription setting
@@ -156,16 +125,19 @@ export const EditContactModal = ({
 		}
 	}, [contact, open]);
 
-	// Set custom property values when fetched
+	// Set custom property values when contact data is loaded
 	useEffect(() => {
-		if (contactPropsData?.propertyValues) {
+		if (open && contact && contact.properties) {
 			const values: Record<string, string> = {};
-			for (const pv of contactPropsData.propertyValues) {
-				values[pv.propertyId] = pv.value;
+			for (const property of customProperties) {
+				const val = contact.properties[property.propertyName];
+				if (val !== undefined && val !== null) {
+					values[property.id] = String(val);
+				}
 			}
 			setPropertyValues(values);
 		}
-	}, [contactPropsData]);
+	}, [contact, open, customProperties]);
 
 	// Initialize selected topics from enrollments
 	useEffect(() => {
@@ -581,7 +553,9 @@ export const EditContactModal = ({
 														<Input.Input
 															id={`prop-${property.id}`}
 															type={
-																property.propertyType === "number" ? "number" : "text"
+																property.propertyType === "number"
+																	? "number"
+																	: "text"
 															}
 															value={propertyValues[property.id]}
 															onChange={(e) =>

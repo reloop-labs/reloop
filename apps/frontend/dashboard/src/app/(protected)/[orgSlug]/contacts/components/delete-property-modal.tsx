@@ -129,7 +129,9 @@ export const DeletePropertyModal = ({
 											type="button"
 											onClick={async () => {
 												try {
-													await navigator.clipboard.writeText(property.propertyName);
+													await navigator.clipboard.writeText(
+														property.propertyName,
+													);
 													setIsNameCopied(true);
 													setTimeout(() => setIsNameCopied(false), 2000);
 												} catch {
@@ -175,7 +177,9 @@ export const DeletePropertyModal = ({
 								type="submit"
 								variant="error"
 								size="xsmall"
-								disabled={confirmationName !== property.propertyName || isDeleting}
+								disabled={
+									confirmationName !== property.propertyName || isDeleting
+								}
 							>
 								{isDeleting ? (
 									<>
