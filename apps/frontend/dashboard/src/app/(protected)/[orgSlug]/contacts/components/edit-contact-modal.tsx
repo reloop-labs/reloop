@@ -129,7 +129,8 @@ export const EditContactModal = ({
 	useEffect(() => {
 		if (open && contact && contact.properties) {
 			const values: Record<string, string> = {};
-			for (const property of customProperties) {
+			const props = propertiesData?.properties || [];
+			for (const property of props) {
 				const val = contact.properties[property.propertyName];
 				if (val !== undefined && val !== null) {
 					values[property.id] = String(val);
@@ -137,7 +138,7 @@ export const EditContactModal = ({
 			}
 			setPropertyValues(values);
 		}
-	}, [contact, open, customProperties]);
+	}, [contact, open, propertiesData?.properties]);
 
 	// Initialize selected topics from enrollments
 	useEffect(() => {

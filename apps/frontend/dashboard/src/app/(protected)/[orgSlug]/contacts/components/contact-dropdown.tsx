@@ -108,7 +108,7 @@ export const ContactDropdown = ({
 			toast.success(`Contact ${newStatus}`);
 			await mutate(
 				(key: string) =>
-					typeof key === "string" && key.includes("/api/contacts/v1"),
+					typeof key === "string" && key.includes("/api/contacts"),
 			);
 		} catch (error) {
 			console.error("Failed to toggle status:", error);

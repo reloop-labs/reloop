@@ -114,7 +114,7 @@ export const GroupList = () => {
 
 			{/* Pagination */}
 			{data && data.total > 0 && (
-				<div className="mt-4 flex items-center justify-between pb-8 font-medium text-paragraph-sm text-text-sub-600">
+				<div className="mt-4 flex items-center justify-between pb-8 text-paragraph-sm text-text-sub-600">
 					<div className="flex items-center gap-3">
 						<span>
 							Showing {startIndex}–{endIndex} of {data.total} group

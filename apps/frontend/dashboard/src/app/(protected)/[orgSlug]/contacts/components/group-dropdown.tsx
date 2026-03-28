@@ -1,17 +1,28 @@
 "use client";
+
+import { AnimatedHoverBackground } from "@fe/dashboard/components/layout/sidebar/animated-hover-background";
+import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import * as Button from "@reloop/ui/button";
-import * as Dropdown from "@reloop/ui/dropdown";
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import {
+	Content as PopoverContent,
+	Root as PopoverRoot,
+	Trigger as PopoverTrigger,
+} from "@reloop/ui/popover";
+import { useRouter } from "next/navigation";
+import { useRef, useState } from "react";
 
 interface Group {
 	id: string;
 	name: string;
 }
 
-interface GroupDropdownProps {
+export interface GroupDropdownProps {
 	group: Group;
-	onEdit: (contact_group_id: string) => void;
-	onDelete: (contact_group_id: string) => void;
+	onEdit: (group: Group) => void;
+	onDelete: (group: Group) => void;
+	isDeleting?: boolean;
 	onOpenChange?: (open: boolean) => void;
 }
 
@@ -19,33 +30,118 @@ export const GroupDropdown = ({
 	group,
 	onEdit,
 	onDelete,
+	isDeleting = false,
 	onOpenChange,
 }: GroupDropdownProps) => {
+	const router = useRouter();
+	const { activeOrganization } = useUserOrganization();
+	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
+	const [popoverOpen, setPopoverOpen] = useState(false);
+	const buttonRefs = useRef<HTMLButtonElement[]>([]);
+
+	const menuItems = [
+		{
+			id: "view",
+			label: "View Details",
+			icon: "eye-outline" as const,
+			isDanger: false,
+		},
+		{
+			id: "edit",
+			label: "Edit group",
+			icon: "edit" as const,
+			isDanger: false,
+		},
+		{
+			id: "delete",
+			label: "Delete group",
+			icon: "trash" as const,
+			isDanger: true,
+		},
+	];
+
+	const handlePopoverOpenChange = (open: boolean) => {
+		setPopoverOpen(open);
+		onOpenChange?.(open);
+	};
+
+	const currentTab = buttonRefs.current[hoverIdx ?? -1];
+	const currentRect = currentTab?.getBoundingClientRect();
+	const hoveredItem = menuItems[hoverIdx ?? -1];
+	const isDanger = hoveredItem?.isDanger ?? false;
+
+	const handleItemClick = (itemId: string) => {
+		if (itemId === "view") {
+			setPopoverOpen(false);
+			if (activeOrganization?.slug) {
+				router.push(`/${activeOrganization.slug}/contacts/groups/${group.id}`);
+			}
+		} else if (itemId === "edit") {
+			setPopoverOpen(false);
+			onEdit(group);
+		} else if (itemId === "delete") {
+			setPopoverOpen(false);
+			onDelete(group);
+		}
+	};
+
 	return (
-		<Dropdown.Root onOpenChange={onOpenChange}>
-			<Dropdown.Trigger asChild>
+		<PopoverRoot open={popoverOpen} onOpenChange={handlePopoverOpenChange}>
+			<PopoverTrigger asChild>
 				<Button.Root
 					variant="neutral"
 					mode="ghost"
-					size="xsmall"
-					className="h-8 w-8 p-0"
+					size="xxsmall"
+					disabled={isDeleting}
 				>
-					<Icon name="dots-horizontal" className="h-4 w-4" />
+					<Icon name="more-vertical" className="h-3 w-3" />
 				</Button.Root>
-			</Dropdown.Trigger>
-			<Dropdown.Content align="end" className="w-40">
-				<Dropdown.Item onClick={() => onEdit(group.id)}>
-					<Icon name="edit" className="mr-2 h-4 w-4" />
-					Edit
-				</Dropdown.Item>
-				<Dropdown.Item
-					onClick={() => onDelete(group.id)}
-					className="text-error-base focus:text-error-base"
-				>
-					<Icon name="trash" className="mr-2 h-4 w-4" />
-					Delete
-				</Dropdown.Item>
-			</Dropdown.Content>
-		</Dropdown.Root>
+			</PopoverTrigger>
+			<PopoverContent
+				align="end"
+				sideOffset={-4}
+				className="w-40 rounded-xl p-1.5"
+			>
+				<div className="relative">
+					{menuItems.map((item, idx) => (
+						<button
+							key={item.id}
+							ref={(el) => {
+								if (el) buttonRefs.current[idx] = el;
+							}}
+							type="button"
+							onPointerEnter={() => setHoverIdx(idx)}
+							onPointerLeave={() => setHoverIdx(undefined)}
+							onClick={() => handleItemClick(item.id)}
+							disabled={item.id === "delete" && isDeleting}
+							className={cn(
+								"flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 font-normal text-xs transition-colors",
+								item.isDanger ? "text-error-base" : "text-text-strong-950",
+								!currentRect &&
+									hoverIdx === idx &&
+									(item.isDanger ? "bg-red-alpha-10" : "bg-neutral-alpha-10"),
+								isDeleting &&
+									item.id === "delete" &&
+									"cursor-not-allowed opacity-50",
+							)}
+						>
+							<Icon
+								name={item.icon}
+								className={cn(
+									"h-3.5 w-3.5",
+									item.isDanger ? "" : "text-text-sub-600",
+								)}
+							/>
+							<span>{item.label}</span>
+						</button>
+					))}
+					<AnimatedHoverBackground
+						rect={currentRect}
+						tabElement={currentTab}
+						isDanger={isDanger}
+					/>
+				</div>
+			</PopoverContent>
+		</PopoverRoot>
 	);
 };

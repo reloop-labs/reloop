@@ -28,13 +28,13 @@ interface GroupTableProps {
 }
 
 const GroupSkeleton = () => (
-	<div className="grid grid-cols-[2fr_1fr_48px] items-center px-4 py-2">
-		<div className="flex items-center gap-2">
-			<Skeleton className="h-4 w-4 rounded" />
+	<div className="grid grid-cols-[1fr_150px_80px] items-center px-4 py-2">
+		<div className="flex items-center gap-3">
+			<Skeleton className="h-4 w-4 rounded-md" />
 			<Skeleton className="h-4 w-40" />
 		</div>
-		<Skeleton className="h-4 w-32" />
-		<div className="flex items-center justify-center">
+		<Skeleton className="h-4 w-28" />
+		<div className="flex items-center justify-end">
 			<Skeleton className="h-4 w-4 rounded" />
 		</div>
 	</div>
@@ -44,7 +44,7 @@ export const GroupTable = ({
 	groups,
 	activeOrganizationSlug,
 	isLoading,
-	loadingRows = 4,
+	loadingRows = 6,
 	onEdit,
 	onAddGroup,
 	onDelete,
@@ -58,8 +58,8 @@ export const GroupTable = ({
 
 	if (isLoading) {
 		return (
-			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-200/70 text-paragraph-sm shadow-regular-md ring-stroke-soft-200 ring-inset">
-				<div className="grid grid-cols-[2fr_1fr_48px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600">
+			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm">
+				<div className="grid grid-cols-[1fr_150px_80px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600">
 					<div className="flex items-center gap-2">
 						<Icon name="modules" className="h-4 w-4" />
 						<span className="text-xs">Name</span>
@@ -80,15 +80,15 @@ export const GroupTable = ({
 	}
 
 	return (
-		<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-200/70 text-paragraph-sm shadow-regular-md ring-stroke-soft-200 ring-inset">
-			<div className="grid grid-cols-[2fr_1fr_48px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600">
+		<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm">
+			<div className="grid grid-cols-[1fr_150px_80px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600">
 				<div className="flex items-center gap-2">
 					<Icon name="modules" className="h-4 w-4" />
 					<span className="text-xs">Name</span>
 				</div>
 				<div className="flex items-center gap-2">
 					<Icon name="clock" className="h-4 w-4" />
-					<span className="text-xs">Created at</span>
+					<span className="text-xs">Created At</span>
 				</div>
 				<div />
 			</div>
@@ -104,29 +104,31 @@ export const GroupTable = ({
 								key={group.id}
 								onClick={() => handleRowClick(group.id)}
 								className={cn(
-									"group/row grid w-full cursor-pointer grid-cols-[2fr_1fr_48px] items-center px-4 py-2 text-left transition-colors",
+									"group/row grid w-full cursor-pointer grid-cols-[1fr_150px_80px] items-center px-4 py-2 text-left transition-colors",
 									"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-base focus-visible:ring-offset-1",
 									isRowActive && "bg-bg-weak-50/50",
 								)}
 							>
+								{/* Name Column */}
 								<div className="flex items-center gap-2">
-									<Icon
-										name="modules"
-										className="h-4 w-4 shrink-0 text-text-sub-600"
-									/>
-									<span className="truncate text-label-sm text-text-strong-950">
+									<div className="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-white shadow-sm">
+										<Icon name="modules" className="h-2.5 w-2.5" />
+									</div>
+									<span className="truncate font-medium text-label-sm text-text-strong-950">
 										{group.name}
 									</span>
 								</div>
 
-								<div className="flex items-center text-text-sub-600">
-									<span className="whitespace-nowrap text-label-sm">
+								{/* Created At Column */}
+								<div className="flex items-center">
+									<span className="whitespace-nowrap text-label-sm text-text-strong-950">
 										{formatRelativeTime(group.createdAt)}
 									</span>
 								</div>
 
+								{/* Actions Column */}
 								<div
-									className="flex items-center justify-center"
+									className="flex items-center justify-end"
 									onClick={(e) => e.stopPropagation()}
 								>
 									<GroupDropdown
