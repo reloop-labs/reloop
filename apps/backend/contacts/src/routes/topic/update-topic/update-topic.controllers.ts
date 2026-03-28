@@ -68,8 +68,7 @@ export const updateTopicController = async ({
     }
 
     logger.info({ topic_id }, "Topic updated successfully");
-    const { organizationId: _, deletedAt: __, ...responseTopic } = updatedTopic;
-    return { ...responseTopic, object: "topic" };
+    return { ...updatedTopic, object: "topic" };
   } catch (error) {
     logger.error({ topic_id, error }, "Debug updating topic");
     throw error;

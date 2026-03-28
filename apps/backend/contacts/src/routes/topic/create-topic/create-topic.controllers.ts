@@ -55,8 +55,7 @@ export const createTopicController = async ({
     }
 
     logger.info({ name, id: newTopic.id }, "Topic created successfully");
-    const { organizationId: _, deletedAt: __, ...responseTopic } = newTopic;
-    return { ...responseTopic, object: "topic" };
+    return { ...newTopic, object: "topic" };
   } catch (error) {
     logger.error({ name, error }, "Debug creating topic");
     throw error;

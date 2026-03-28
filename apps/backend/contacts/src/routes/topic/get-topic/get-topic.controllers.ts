@@ -30,8 +30,7 @@ export const getTopicController = async ({
     }
 
     logger.info({ topic_id }, "Topic retrieved successfully");
-    const { organizationId: _, deletedAt: __, ...responseTopic } = result;
-    return { ...responseTopic, object: "topic" };
+    return { ...result, object: "topic" };
   } catch (error) {
     logger.error({ topic_id, error }, "Debug getting topic");
     throw error;

@@ -41,7 +41,7 @@ export const listTopicsController = async ({
     logger.info({ total: rows[0]?.total ?? 0, page, limit }, "Topics listed successfully");
     return {
       object: "topic",
-      topics: rows.map(({ topic: { organizationId: _, deletedAt: __, ...t } }) => t),
+      topics: rows.map(({ topic }) => topic),
       total: Number(rows[0]?.total ?? 0),
       page,
       limit,
