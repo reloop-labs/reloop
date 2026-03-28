@@ -64,7 +64,7 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
 	return (
 		<motion.div
 			className={cn(
-				"sticky top-0 z-10 flex h-screen flex-col border-stroke-soft-100 border-r bg-neutral-alpha-10/30",
+				"sticky top-0 z-10 flex h-screen flex-col border-stroke-soft-100 border-r bg-neutral-alpha-10/30 dark:border-stroke-soft-100/40",
 				isSidebarCollapsed ? "w-14" : "w-60",
 				className,
 			)}
@@ -72,7 +72,7 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
 			transition={{ duration: 0.2, ease: "easeInOut" }}
 		>
 			{/* Header */}
-			<div className="flex h-12 items-center border-stroke-soft-100 border-b px-2">
+			<div className="flex h-12 items-center border-stroke-soft-100 border-b px-2 dark:border-stroke-soft-100/40">
 				{activeOrganization ? (
 					<div>
 						<Avatar.Root size="24" placeholderType="company">
@@ -133,7 +133,7 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
 			</div>
 
 			{/* User Menu */}
-			<div className="border-stroke-soft-100 border-t p-2">
+			<div className="border-stroke-soft-100 border-t p-2 dark:border-stroke-soft-100/40">
 				<UserMenuDropdown
 					user={user}
 					organizationSlug={activeOrganization.slug}

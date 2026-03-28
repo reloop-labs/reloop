@@ -83,7 +83,7 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 
 	return (
 		<div>
-			<div className="sticky top-0 z-10 flex h-12 items-center justify-start gap-2 border-stroke-soft-100 border-b bg-bg-white-0 pr-2 pl-3">
+			<div className="sticky top-0 z-10 flex h-12 items-center justify-start gap-2 border-stroke-soft-100 border-b bg-bg-white-0 pr-2 pl-3 dark:border-stroke-soft-100/40">
 				<div className="flex w-full items-center justify-between">
 					<div className="flex items-center gap-2">
 						<Icon name="users" className="h-4 w-4" />
