@@ -7,17 +7,15 @@ import { deleteGroupXCodeSamples } from "./delete-group.x-codeSamples";
 export const deleteGroupRoute = new Elysia().use(authMiddleware).delete(
   "/:group_id",
   async ({ params, activeOrganizationId, logger }) => {
-    return await deleteGroupController(
+    return await deleteGroupController({
       activeOrganizationId,
-      params.group_id,
+      group_id: params.group_id,
       logger,
-    );
+    });
   },
   {
     auth: true,
-    params: t.Object({
-      group_id: t.String(),
-    }),
+    params: t.Object({ group_id: t.String(), }),
     response: {
       200: GroupModel.deleteResponse,
       404: GroupModel.groupNotFound,

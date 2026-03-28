@@ -7,11 +7,11 @@ import { getGroupXCodeSamples } from "./get-group.x-codeSamples";
 export const getGroupRoute = new Elysia().use(authMiddleware).get(
   "/:group_id",
   async ({ params, activeOrganizationId, logger }) => {
-    return await getGroupController(
+    return await getGroupController({
       activeOrganizationId,
-      params.group_id,
+      group_id: params.group_id,
       logger,
-    );
+    });
   },
   {
     auth: true,

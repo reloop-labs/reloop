@@ -15,12 +15,17 @@ import {
   type SQL,
 } from "drizzle-orm";
 
-export async function listGroupContactsController(
-  organizationId: string,
-  group_id: string,
-  query: ContactModel.ContactQuery,
-  logger: Logger,
-): Promise<ContactTypes.GroupContactListResponse> {
+export async function listGroupContactsController({
+  activeOrganizationId,
+  group_id,
+  query,
+  logger,
+}: {
+  activeOrganizationId: string;
+  group_id: string;
+  query: ContactModel.ContactQuery;
+  logger: Logger;
+}): Promise<ContactTypes.GroupContactListResponse> {
   logger.info({ ...query, group_id }, "Listing contacts for group");
   try {
     const page = query.page || 1;
@@ -31,7 +36,7 @@ export async function listGroupContactsController(
     const group = await db.query.group.findFirst({
       where: and(
         eq(schema.group.id, group_id),
-        eq(schema.group.organizationId, organizationId),
+        eq(schema.group.organizationId, activeOrganizationId),
         isNull(schema.group.deletedAt),
       ),
     });
@@ -44,9 +49,9 @@ export async function listGroupContactsController(
     // Base conditions for joining on contactGroup
     const whereConditions: Array<SQL<unknown>> = [
       eq(schema.contactGroup.groupId, group_id),
-      eq(schema.contactGroup.organizationId, organizationId),
+      eq(schema.contactGroup.organizationId, activeOrganizationId),
       isNull(schema.contactGroup.deletedAt),
-      eq(schema.contact.organizationId, organizationId),
+      eq(schema.contact.organizationId, activeOrganizationId),
       isNull(schema.contact.deletedAt),
     ];
 
@@ -85,9 +90,9 @@ export async function listGroupContactsController(
         .where(
           and(
             eq(schema.contactGroup.groupId, group_id),
-            eq(schema.contactGroup.organizationId, organizationId),
+            eq(schema.contactGroup.organizationId, activeOrganizationId),
             isNull(schema.contactGroup.deletedAt),
-            eq(schema.contact.organizationId, organizationId),
+            eq(schema.contact.organizationId, activeOrganizationId),
             isNull(schema.contact.deletedAt),
           ),
         ),
@@ -101,10 +106,10 @@ export async function listGroupContactsController(
         .where(
           and(
             eq(schema.contactGroup.groupId, group_id),
-            eq(schema.contactGroup.organizationId, organizationId),
+            eq(schema.contactGroup.organizationId, activeOrganizationId),
             isNull(schema.contactGroup.deletedAt),
             eq(schema.contact.status, "subscribed"),
-            eq(schema.contact.organizationId, organizationId),
+            eq(schema.contact.organizationId, activeOrganizationId),
             isNull(schema.contact.deletedAt),
           ),
         ),
@@ -118,10 +123,10 @@ export async function listGroupContactsController(
         .where(
           and(
             eq(schema.contactGroup.groupId, group_id),
-            eq(schema.contactGroup.organizationId, organizationId),
+            eq(schema.contactGroup.organizationId, activeOrganizationId),
             isNull(schema.contactGroup.deletedAt),
             eq(schema.contact.status, "unsubscribed"),
-            eq(schema.contact.organizationId, organizationId),
+            eq(schema.contact.organizationId, activeOrganizationId),
             isNull(schema.contact.deletedAt),
           ),
         ),
@@ -207,14 +212,7 @@ export async function listGroupContactsController(
       unsubscribedContacts,
     };
   } catch (error) {
-    logger.error(
-      {
-        query,
-        group_id,
-        error: error instanceof Error ? error.message : String(error),
-      },
-      "Error listing group contacts",
-    );
+    logger.error({ query, group_id, error }, "Error listing group contacts");
     throw error;
   }
 }

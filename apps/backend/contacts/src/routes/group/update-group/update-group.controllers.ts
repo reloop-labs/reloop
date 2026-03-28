@@ -1,31 +1,35 @@
 import type { GroupModel } from "@be/contacts/model/group.model";
-import type { GroupTypes } from "@be/contacts/types/group.type";
+import type { GroupResponse } from "@be/contacts/types/group.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import type { Logger } from "@reloop/logger";
 import { and, eq, isNull, ne } from "drizzle-orm";
 
-export const updateGroupController = async (
-  activeOrganizationId: string,
-  group_id: string,
-  body: GroupModel.UpdateGroupBody,
-  logger: Logger,
-): Promise<
-  | GroupTypes.GroupResponse
+export const updateGroupController = async ({
+  activeOrganizationId,
+  group_id,
+  body,
+  logger,
+}: {
+  activeOrganizationId: string;
+  group_id: string;
+  body: GroupModel.UpdateGroupBody;
+  logger: Logger;
+}): Promise<
+  | GroupResponse
   | GroupModel.GroupNotFound
   | GroupModel.GroupAlreadyExists
   | GroupModel.Unauthorized
 > => {
   const { name } = body;
-  const organizationId = activeOrganizationId;
 
-  logger.info({ organizationId, group_id, name }, "Updating group");
+  logger.info({ group_id, name }, "Updating group");
 
   try {
     const existingGroup = await db.query.group.findFirst({
       where: and(
         eq(schema.group.id, group_id),
-        eq(schema.group.organizationId, organizationId),
+        eq(schema.group.organizationId, activeOrganizationId),
         isNull(schema.group.deletedAt),
       ),
     });
@@ -40,7 +44,7 @@ export const updateGroupController = async (
       const nameConflict = await db.query.group.findFirst({
         where: and(
           eq(schema.group.name, name),
-          eq(schema.group.organizationId, organizationId),
+          eq(schema.group.organizationId, activeOrganizationId),
           ne(schema.group.id, group_id),
           isNull(schema.group.deletedAt),
         ),
@@ -63,19 +67,13 @@ export const updateGroupController = async (
       return { message: "Group not found" };
     }
 
+    logger.info({ group_id }, "Group updated successfully");
     return {
       ...updatedGroup,
       object: "contact_group" as const,
-    } as GroupTypes.GroupResponse;
+    } as GroupResponse;
   } catch (error) {
-    logger.error(
-      {
-        group_id,
-        organizationId,
-        error: error instanceof Error ? error.message : String(error),
-      },
-      "Error updating group",
-    );
+    logger.error({ group_id, error }, "Debug updating group");
     throw error;
   }
 };

@@ -16,10 +16,3 @@ export interface GroupListResponse {
 	page: number;
 	limit: number;
 }
-
-// Namespace re-export for controllers that import via `GroupTypes.X`
-export namespace GroupTypes {
-	export type GroupResponse = import("./group.type").GroupResponse;
-	export type GroupListItem = import("./group.type").GroupListItem;
-	export type GroupListResponse = import("./group.type").GroupListResponse;
-}

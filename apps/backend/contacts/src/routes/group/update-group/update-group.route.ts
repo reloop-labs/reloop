@@ -7,12 +7,12 @@ import { updateGroupXCodeSamples } from "./update-group.x-codeSamples";
 export const updateGroupRoute = new Elysia().use(authMiddleware).patch(
   "/:group_id",
   async ({ params, body, activeOrganizationId, logger }) => {
-    return await updateGroupController(
+    return await updateGroupController({
       activeOrganizationId,
-      params.group_id,
+      group_id: params.group_id,
       body,
       logger,
-    );
+    });
   },
   {
     auth: true,

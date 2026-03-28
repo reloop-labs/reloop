@@ -4,17 +4,18 @@ import * as schema from "@reloop/db/schema";
 import type { Logger } from "@reloop/logger";
 import { and, eq } from "drizzle-orm";
 
-export const deleteGroup = async (
-  activeOrganizationId: string,
-  group_id: string,
-  logger: Logger,
-): Promise<
+export const deleteGroupController = async ({
+  activeOrganizationId,
+  group_id,
+  logger,
+}: {
+  activeOrganizationId: string;
+  group_id: string;
+  logger: Logger;
+}): Promise<
   GroupModel.DeleteResponse | GroupModel.GroupNotFound | GroupModel.Unauthorized
 > => {
-  logger.info(
-    { organizationId: activeOrganizationId, group_id },
-    "Deleting group",
-  );
+  logger.info({ group_id }, "Deleting group");
 
   try {
     const result = await db
@@ -38,23 +39,7 @@ export const deleteGroup = async (
     logger.info({ group_id }, "Group soft-deleted successfully");
     return { object: "contact_group" as const, success: true };
   } catch (error) {
-    logger.error(
-      {
-        group_id,
-        organizationId: activeOrganizationId,
-        error: error instanceof Error ? error.message : String(error),
-      },
-      "Error deleting group",
-    );
+    logger.error({ group_id, error }, "Debug deleting group");
     throw error;
   }
 };
-
-export async function deleteGroupController(
-  organizationId: string,
-  group_id: string,
-  logger: Logger,
-): Promise<GroupModel.DeleteResponse> {
-  const result = await deleteGroup(organizationId, group_id, logger);
-  return result as GroupModel.DeleteResponse;
-}

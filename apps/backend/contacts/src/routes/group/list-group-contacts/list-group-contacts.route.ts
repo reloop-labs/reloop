@@ -7,17 +7,17 @@ import { listGroupContactsXCodeSamples } from "./list-group-contacts.x-codeSampl
 export const listGroupContactsRoute = new Elysia().use(authMiddleware).get(
   "/:group_id/contacts",
   async ({ params, query, activeOrganizationId, logger }) => {
-    return await listGroupContactsController(
-      activeOrganizationId as string,
-      params.group_id,
+    return await listGroupContactsController({
+      activeOrganizationId,
+      group_id: params.group_id,
       query,
       logger,
-    );
+    });
   },
   {
     auth: true,
     params: t.Object({
-      group_id: t.String({ description: "ID of the contact group" }),
+      group_id: t.String({ description: "ID of the group" }),
     }),
     query: ContactModel.contactQuery,
     response: {

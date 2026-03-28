@@ -1,22 +1,20 @@
 import type { GroupModel } from "@be/contacts/model/group.model";
-import type { GroupTypes } from "@be/contacts/types/group.type";
+import type { GroupResponse } from "@be/contacts/types/group.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import type { Logger } from "@reloop/logger";
 import { and, eq, isNull } from "drizzle-orm";
 
-export const getGroup = async (
-  activeOrganizationId: string,
-  group_id: string,
-  logger: Logger,
-): Promise<
-  GroupTypes.GroupResponse | GroupModel.GroupNotFound | GroupModel.Unauthorized
-> => {
-  logger.info(
-    { organizationId: activeOrganizationId, group_id },
-    "Getting group",
-  );
-
+export const getGroupController = async ({
+  activeOrganizationId,
+  group_id,
+  logger,
+}: {
+  activeOrganizationId: string;
+  group_id: string;
+  logger: Logger;
+}): Promise<GroupResponse | GroupModel.GroupNotFound | GroupModel.Unauthorized> => {
+  logger.info({ group_id }, "Getting group");
   try {
     const group = await db.query.group.findFirst({
       where: and(
@@ -25,34 +23,14 @@ export const getGroup = async (
         isNull(schema.group.deletedAt),
       ),
     });
-
     if (!group) {
       logger.warn({ group_id }, "Group not found");
       return { message: "Group not found" };
     }
-
-    return {
-      ...group,
-      object: "contact_group" as const,
-    } as GroupTypes.GroupResponse;
+    logger.info({ group_id }, "Group retrieved successfully");
+    return { ...group, object: "contact_group", } as GroupResponse;
   } catch (error) {
-    logger.error(
-      {
-        group_id,
-        organizationId: activeOrganizationId,
-        error: error instanceof Error ? error.message : String(error),
-      },
-      "Error getting group",
-    );
+    logger.error({ group_id, error }, "Debug getting group");
     throw error;
   }
 };
-
-export async function getGroupController(
-  organizationId: string,
-  group_id: string,
-  logger: Logger,
-): Promise<GroupTypes.GroupResponse> {
-  const result = await getGroup(organizationId, group_id, logger);
-  return result as GroupTypes.GroupResponse;
-}
