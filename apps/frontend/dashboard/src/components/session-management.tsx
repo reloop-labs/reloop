@@ -266,7 +266,7 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 					</div>
 				</div>
 
-				<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm">
+				<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/50">
 					{/* Table Header */}
 					<div className="grid grid-cols-[1fr_140px_140px_80px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600">
 						<div className="flex items-center gap-2">
@@ -285,7 +285,7 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 					</div>
 
 					{/* Skeleton Rows */}
-					<div className="divide-y divide-stroke-soft-100">
+					<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
 						{Array.from({ length: 3 }).map((_, index) => (
 							<div
 								key={`skeleton-${index}`}
@@ -351,7 +351,7 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 			</div>
 
 			<AnimatePresence mode="wait">
-				<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm">
+				<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/50">
 					{/* Table Header */}
 					<div className="grid grid-cols-[1fr_140px_140px_80px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600">
 						<div className="flex items-center gap-2">
@@ -370,7 +370,7 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 					</div>
 
 					{/* Table Body */}
-					<div className="divide-y divide-stroke-soft-100">
+					<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
 						{sessions.map((session, index) => {
 							const { browser, device, isMobile } = parseUserAgent(
 								session.userAgent,

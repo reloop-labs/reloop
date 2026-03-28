@@ -88,7 +88,7 @@ export const DNSRecordTable = ({
 
 	return (
 		<AnimatePresence mode="wait">
-			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm">
+			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/50">
 				{/* Table Header */}
 				<div
 					className={cn(
@@ -127,7 +127,7 @@ export const DNSRecordTable = ({
 				</div>
 
 				{/* Table Body */}
-				<div className="divide-y divide-stroke-soft-100">
+				<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
 					{isLoading
 						? Array.from({ length: loadingRows }).map((_, index) => (
 								<RecordSkeleton

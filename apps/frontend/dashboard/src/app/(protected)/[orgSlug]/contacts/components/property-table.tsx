@@ -190,7 +190,7 @@ export const PropertyTable = ({
 
 	if (isLoading) {
 		return (
-			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm">
+			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/50">
 				{/* Header */}
 				<div className="grid grid-cols-[1fr_100px_1fr_120px_40px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600">
 					<div className="flex items-center gap-2">
@@ -212,7 +212,7 @@ export const PropertyTable = ({
 					<div />
 				</div>
 				{/* Skeleton rows */}
-				<div className="divide-y divide-stroke-soft-100">
+				<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
 					{Array.from({ length: loadingRows }).map((_, index) => (
 						<PropertySkeleton key={`skeleton-${index}`} />
 					))}
@@ -223,7 +223,7 @@ export const PropertyTable = ({
 
 	return (
 		<>
-			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm">
+			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/50">
 				{/* Table Header */}
 				<div className="grid grid-cols-[1fr_100px_1fr_120px_40px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600">
 					<div className="flex items-center gap-2">
@@ -246,7 +246,7 @@ export const PropertyTable = ({
 				</div>
 
 				{/* Rows */}
-				<div className="divide-y divide-stroke-soft-100">
+				<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
 					{properties.length === 0 && !isLoading ? (
 						<PropertiesEmptyState onAddProperty={onAddProperty} />
 					) : (

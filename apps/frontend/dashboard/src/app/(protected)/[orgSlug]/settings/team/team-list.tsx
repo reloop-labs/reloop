@@ -382,7 +382,7 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
 
 	return (
 		<AnimatePresence mode="wait">
-			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm">
+			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/50">
 				{/* Table Header */}
 				<div className="grid grid-cols-[1fr_180px_165px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600">
 					<div className="flex items-center gap-2">
@@ -397,7 +397,7 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
 				</div>
 
 				{/* Combined List */}
-				<div className="divide-y divide-stroke-soft-100">
+				<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
 					{/* Pending Invites */}
 					{filteredData.invites.map((invite, index) => (
 						<div

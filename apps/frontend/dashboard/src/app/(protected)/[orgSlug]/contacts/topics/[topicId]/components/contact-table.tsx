@@ -69,8 +69,8 @@ export const ContactTable = ({
 }: ContactTableProps) => {
 	if (isLoading) {
 		return (
-			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm">
-				<div className="grid grid-cols-[1fr_150px_100px_80px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600">
+			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/50">
+				<div className="grid grid-cols-[1fr_150px_100px_80px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600 dark:border-stroke-soft-100/50">
 					<div className="flex items-center gap-2">
 						<Icon name="mail-single" className="h-4 w-4" />
 						<span className="text-xs">Contact</span>
@@ -86,7 +86,7 @@ export const ContactTable = ({
 					<div />
 				</div>
 
-				<div className="divide-y divide-stroke-soft-100">
+				<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
 					{Array.from({ length: loadingRows }).map((_, index) => (
 						<ContactSkeleton
 							key={`skeleton-${index}-${activeOrganizationSlug}`}
@@ -98,8 +98,8 @@ export const ContactTable = ({
 	}
 
 	return (
-		<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm">
-			<div className="grid grid-cols-[1fr_150px_100px_80px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600">
+		<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/50">
+			<div className="grid grid-cols-[1fr_150px_100px_80px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600 dark:border-stroke-soft-100/50">
 				<div className="flex items-center gap-2">
 					<Icon name="mail-single" className="h-4 w-4" />
 					<span className="text-xs">Contact</span>
@@ -115,7 +115,7 @@ export const ContactTable = ({
 				<div />
 			</div>
 
-			<div className="divide-y divide-stroke-soft-100">
+			<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
 				{subscriptions.map((subscription) => (
 					<div
 						key={subscription.id}

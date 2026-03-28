@@ -49,7 +49,7 @@ const SummaryCard = ({
 	icon: string;
 	isLoading: boolean;
 }) => (
-	<div className="flex items-center gap-3 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 py-3">
+	<div className="flex items-center gap-3 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 py-3 dark:border-stroke-soft-100/50">
 		<div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-bg-weak-50">
 			<Icon name={icon} className="h-4 w-4 text-text-sub-600" />
 		</div>

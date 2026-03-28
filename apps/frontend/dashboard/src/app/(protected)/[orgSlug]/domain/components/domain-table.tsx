@@ -78,7 +78,7 @@ export const DomainTable = ({
 					</div>
 					<div />
 				</div>
-				<div className="divide-y divide-stroke-soft-100">
+				<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
 					{Array.from({ length: loadingRows }).map((_, i) => (
 						<DomainSkeleton key={`skeleton-${i}`} />
 					))}
@@ -107,7 +107,7 @@ export const DomainTable = ({
 			</div>
 
 			{/* Table Body */}
-			<div className="divide-y divide-stroke-soft-100">
+			<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
 				{domains.length === 0 ? (
 					<EmptyState onAddDomain={onAddDomain} />
 				) : (

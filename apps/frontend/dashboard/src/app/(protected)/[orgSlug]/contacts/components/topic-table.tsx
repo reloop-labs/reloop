@@ -114,7 +114,7 @@ export const TopicTable = ({
 					</div>
 					<div />
 				</div>
-				<div className="divide-y divide-stroke-soft-100">
+				<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
 					{Array.from({ length: loadingRows }).map((_, i) => (
 						<TopicSkeleton key={`skeleton-${i}`} />
 					))}
@@ -147,7 +147,7 @@ export const TopicTable = ({
 			</div>
 
 			{/* Table Body */}
-			<div className="divide-y divide-stroke-soft-100">
+			<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
 				{topics.length === 0 ? (
 					<EmptyState onCreateClick={onAddTopic} />
 				) : (
