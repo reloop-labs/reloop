@@ -26,7 +26,7 @@ export const deleteGroupRoute = new Elysia().use(authMiddleware).delete(
 		detail: {
 			tags: ["Groups"],
 			summary: "Delete Group",
-			description: "Deletes a group for the organization",
+			description: "Delete group based on group id",
 			"x-codeSamples": deleteGroupSamples,
 		},
 	},

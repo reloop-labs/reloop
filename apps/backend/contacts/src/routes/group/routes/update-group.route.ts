@@ -29,7 +29,7 @@ export const updateGroupRoute = new Elysia().use(authMiddleware).patch(
 		detail: {
 			tags: ["Groups"],
 			summary: "Update Group",
-			description: "Updates an existing group for the organization",
+			description: "Updates group name and discription based on group id",
 			"x-codeSamples": updateGroupSamples,
 		},
 	},

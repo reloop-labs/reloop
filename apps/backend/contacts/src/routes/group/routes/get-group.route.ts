@@ -18,8 +18,8 @@ export const getGroupRoute = new Elysia().use(authMiddleware).get(
 		},
 		detail: {
 			tags: ["Groups"],
-			summary: "Get Group",
-			description: "Returns a single group for the organization",
+			summary: "Retrieve Group",
+			description: "Returns group details based on group id",
 		},
 	},
 );
