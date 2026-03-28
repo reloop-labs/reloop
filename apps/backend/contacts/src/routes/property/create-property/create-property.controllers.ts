@@ -1,4 +1,4 @@
-import { formatPropertyResponse } from "@be/contacts/routes/property/controllers/format-property-response";
+import { formatPropertyResponse } from "@be/contacts/routes/property/format-property-response";
 import type { PropertyTypes } from "@be/contacts/types/property.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
