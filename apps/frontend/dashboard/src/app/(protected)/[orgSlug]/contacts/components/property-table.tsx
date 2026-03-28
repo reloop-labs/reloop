@@ -192,7 +192,7 @@ export const PropertyTable = ({
 		return (
 			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/50">
 				{/* Header */}
-				<div className="grid grid-cols-[1fr_100px_1fr_120px_40px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600">
+				<div className="grid grid-cols-[1fr_100px_1fr_120px_40px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600 dark:border-stroke-soft-100/50">
 					<div className="flex items-center gap-2">
 						<Icon name="tag" className="h-4 w-4" />
 						<span className="text-xs">Name</span>
@@ -222,95 +222,93 @@ export const PropertyTable = ({
 	}
 
 	return (
-		<>
-			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/50">
-				{/* Table Header */}
-				<div className="grid grid-cols-[1fr_100px_1fr_120px_40px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600">
-					<div className="flex items-center gap-2">
-						<Icon name="tag" className="h-4 w-4" />
-						<span className="text-xs">Name</span>
-					</div>
-					<div className="flex items-center gap-2">
-						<Icon name="file-code" className="h-4 w-4" />
-						<span className="text-xs">Type</span>
-					</div>
-					<div className="flex items-center gap-2">
-						<Icon name="file-text" className="h-4 w-4" />
-						<span className="text-xs">Default</span>
-					</div>
-					<div className="flex items-center gap-2">
-						<Icon name="clock" className="h-4 w-4" />
-						<span className="text-xs">Created At</span>
-					</div>
-					<div />
+		<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/50">
+			{/* Table Header */}
+			<div className="grid grid-cols-[1fr_100px_1fr_120px_40px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600 dark:border-stroke-soft-100/50">
+				<div className="flex items-center gap-2">
+					<Icon name="tag" className="h-4 w-4" />
+					<span className="text-xs">Name</span>
 				</div>
-
-				{/* Rows */}
-				<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
-					{properties.length === 0 && !isLoading ? (
-						<PropertiesEmptyState onAddProperty={onAddProperty} />
-					) : (
-						properties.map((property) => (
-							<div
-								key={property.id}
-								className={cn(
-									"group/row grid grid-cols-[1fr_100px_1fr_120px_40px] items-center px-4 py-2 transition-colors",
-									"hover:bg-bg-weak-50/50",
-									openPropertyId === property.id && "bg-bg-weak-50/50",
-								)}
-							>
-								{/* Name Column */}
-								<div className="flex items-center gap-2">
-									<div className="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-white shadow-sm">
-										<Icon name="tag" className="h-2.5 w-2.5" />
-									</div>
-									<span className="truncate font-medium text-label-sm text-text-strong-950">
-										{property.propertyName}
-									</span>
-								</div>
-
-								{/* Type Column */}
-								<div className="flex items-center">
-									<span
-										className={cn(
-											"inline-flex rounded-md border-[1px] px-[6px] py-0.5 font-medium text-[10px] text-text-sub-600",
-											getTypeBadgeStyles(property.propertyType),
-										)}
-									>
-										{property.propertyType}
-									</span>
-								</div>
-
-								{/* Default Column */}
-								<div className="flex items-center">
-									<span className="truncate font-medium text-label-sm text-text-sub-600">
-										{property.defaultValue || "-"}
-									</span>
-								</div>
-
-								{/* Created At Column */}
-								<div className="flex items-center">
-									<span className="truncate whitespace-nowrap font-medium text-label-sm text-text-sub-600">
-										{formatRelativeTime(property.createdAt)}
-									</span>
-								</div>
-
-								{/* Actions Column */}
-								<div className="flex items-center justify-end">
-									<PropertyActionsPopover
-										property={property}
-										onEdit={handleEdit}
-										onDelete={handleDelete}
-										onOpenChange={(open) =>
-											setOpenPropertyId(open ? property.id : null)
-										}
-									/>
-								</div>
-							</div>
-						))
-					)}
+				<div className="flex items-center gap-2">
+					<Icon name="file-code" className="h-4 w-4" />
+					<span className="text-xs">Type</span>
 				</div>
+				<div className="flex items-center gap-2">
+					<Icon name="file-text" className="h-4 w-4" />
+					<span className="text-xs">Default</span>
+				</div>
+				<div className="flex items-center gap-2">
+					<Icon name="clock" className="h-4 w-4" />
+					<span className="text-xs">Created At</span>
+				</div>
+				<div />
 			</div>
-		</>
+
+			{/* Rows */}
+			<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
+				{properties.length === 0 && !isLoading ? (
+					<PropertiesEmptyState onAddProperty={onAddProperty} />
+				) : (
+					properties.map((property) => (
+						<div
+							key={property.id}
+							className={cn(
+								"group/row grid grid-cols-[1fr_100px_1fr_120px_40px] items-center px-4 py-2 transition-colors",
+								"hover:bg-bg-weak-50/50",
+								openPropertyId === property.id && "bg-bg-weak-50/50",
+							)}
+						>
+							{/* Name Column */}
+							<div className="flex items-center gap-2">
+								<div className="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-white shadow-sm">
+									<Icon name="tag" className="h-2.5 w-2.5" />
+								</div>
+								<span className="truncate font-medium text-label-sm text-text-strong-950">
+									{property.propertyName}
+								</span>
+							</div>
+
+							{/* Type Column */}
+							<div className="flex items-center">
+								<span
+									className={cn(
+										"inline-flex rounded-md border-[1px] px-[6px] py-0.5 font-medium text-[10px] text-text-sub-600",
+										getTypeBadgeStyles(property.propertyType),
+									)}
+								>
+									{property.propertyType}
+								</span>
+							</div>
+
+							{/* Default Column */}
+							<div className="flex items-center">
+								<span className="truncate font-medium text-label-sm text-text-sub-600">
+									{property.defaultValue || "-"}
+								</span>
+							</div>
+
+							{/* Created At Column */}
+							<div className="flex items-center">
+								<span className="truncate whitespace-nowrap font-medium text-label-sm text-text-sub-600">
+									{formatRelativeTime(property.createdAt)}
+								</span>
+							</div>
+
+							{/* Actions Column */}
+							<div className="flex items-center justify-end">
+								<PropertyActionsPopover
+									property={property}
+									onEdit={handleEdit}
+									onDelete={handleDelete}
+									onOpenChange={(open) =>
+										setOpenPropertyId(open ? property.id : null)
+									}
+								/>
+							</div>
+						</div>
+					))
+				)}
+			</div>
+		</div>
 	);
 };

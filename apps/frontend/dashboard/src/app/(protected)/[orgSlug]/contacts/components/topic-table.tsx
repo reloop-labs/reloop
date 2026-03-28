@@ -94,8 +94,8 @@ export const TopicTable = ({
 
 	if (isLoading) {
 		return (
-			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-200/70 text-paragraph-sm shadow-regular-md ring-stroke-soft-200 ring-inset">
-				<div className="grid grid-cols-[2fr_1fr_1fr_1fr_48px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600">
+			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm shadow-regular-md ring-stroke-soft-200 ring-inset dark:border-stroke-soft-100/50">
+				<div className="grid grid-cols-[2fr_1fr_1fr_1fr_48px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600 dark:border-stroke-soft-100/50">
 					<div className="flex items-center gap-2">
 						<Icon name="notification-indicator" className="h-4 w-4" />
 						<span className="text-xs">Name</span>
@@ -124,9 +124,9 @@ export const TopicTable = ({
 	}
 
 	return (
-		<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-200/70 text-paragraph-sm shadow-regular-md ring-stroke-soft-200 ring-inset">
+		<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/50">
 			{/* Table Header */}
-			<div className="grid grid-cols-[2fr_1fr_1fr_1fr_48px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600">
+			<div className="grid grid-cols-[2fr_1fr_1fr_1fr_48px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600 dark:border-stroke-soft-100/50">
 				<div className="flex items-center gap-2">
 					<Icon name="notification-indicator" className="h-4 w-4" />
 					<span className="text-xs">Name</span>

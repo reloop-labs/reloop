@@ -74,7 +74,7 @@ export const GroupTable = ({
 	if (isLoading) {
 		return (
 			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/50">
-				<div className="grid grid-cols-[1fr_100px_150px_80px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600">
+				<div className="grid grid-cols-[1fr_100px_150px_80px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600 dark:border-stroke-soft-100/50">
 					<div className="flex items-center gap-2">
 						<Icon name="modules" className="h-4 w-4" />
 						<span className="text-xs">Name</span>
@@ -100,7 +100,7 @@ export const GroupTable = ({
 
 	return (
 		<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/50">
-			<div className="grid grid-cols-[1fr_100px_150px_80px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600">
+			<div className="grid grid-cols-[1fr_100px_150px_80px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600 dark:border-stroke-soft-100/50">
 				<div className="flex items-center gap-2">
 					<Icon name="modules" className="h-4 w-4" />
 					<span className="text-xs">Name</span>
