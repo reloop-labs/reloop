@@ -261,11 +261,10 @@ export const PropertyTable = ({
 							>
 								{/* Name Column */}
 								<div className="flex items-center gap-2">
-									<Icon
-										name="tag"
-										className="h-4 w-4 flex-shrink-0 text-text-sub-600"
-									/>
-									<span className="truncate font-medium text-label-sm text-text-sub-600">
+									<div className="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-white shadow-sm">
+										<Icon name="tag" className="h-2.5 w-2.5" />
+									</div>
+									<span className="truncate font-medium text-label-sm text-text-strong-950">
 										{property.propertyName}
 									</span>
 								</div>

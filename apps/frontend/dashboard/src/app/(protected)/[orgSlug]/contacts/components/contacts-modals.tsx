@@ -2,6 +2,7 @@
 import { useQueryState } from "nuqs";
 import useSWR from "swr";
 import { AddContactModal } from "./add-contact-modal";
+import { AddContactToGroupModal } from "./add-contact-to-group-modal";
 import { AddPropertyModal } from "./add-property-modal";
 import { CreateGroupModal } from "./create-group-modal";
 import { CreateTopicModal } from "./create-topic-modal";
@@ -90,6 +91,10 @@ export const ContactsModals = ({ topicId }: ContactsModalsProps) => {
 				open={modal === "add-contact"}
 				onOpenChange={handleOpenChange}
 				topicId={topicId}
+			/>
+			<AddContactToGroupModal
+				open={modal === "add-contact-to-group"}
+				onOpenChange={handleOpenChange}
 			/>
 			<AddPropertyModal
 				open={modal === "add-property"}

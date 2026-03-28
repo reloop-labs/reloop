@@ -65,7 +65,7 @@ export const DeleteTopicModal = ({ topics }: DeleteTopicModalProps) => {
 			toast.success(`${topicToDelete.name} deleted successfully`);
 
 			if (orgSlug) {
-				window.location.href = `/dashboard/${orgSlug}/topics`;
+				window.location.href = `/${orgSlug}/contacts/topics`;
 				return;
 			}
 			handleClose();

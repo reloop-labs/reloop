@@ -29,6 +29,10 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 	const isAddTopicPage = pathname.endsWith("/contacts/topics/add");
 	const isBulkImportPage = pathname.includes("/bulk-import");
 	const isContactDetailPage = pathname.includes("/contacts/detail/");
+	const isGroupDetailPage = pathname.match(/\/contacts\/groups\/([^/]+)/) !== null;
+	const isTopicDetailPage = pathname.match(/\/contacts\/topics\/([^/]+)$/) !== null;
+	const isDetailPage =
+		isContactDetailPage || isGroupDetailPage || isTopicDetailPage;
 
 	const handleAction = () => {
 		if (isPropertiesPage) setModal("add-property");
@@ -44,7 +48,7 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 			handleAction();
 		},
 		{
-			enabled: !isAddTopicPage && !isBulkImportPage && !isContactDetailPage,
+			enabled: !isAddTopicPage && !isBulkImportPage && !isDetailPage,
 		},
 	);
 
@@ -90,7 +94,7 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 			</div>
 			<div className="mx-auto max-w-3xl sm:px-8">
 				{/* Unified Header */}
-				{!isContactDetailPage && (
+				{!isDetailPage && (
 					<div className="flex items-center justify-between pt-10 pb-6">
 						<div className="flex flex-col gap-1">
 							{showBack && (
@@ -136,12 +140,12 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 					</div>
 				)}
 
-				{!isContactDetailPage && (
+				{!isDetailPage && (
 					<div className="mt-2">
 						<ContactsTabs />
 					</div>
 				)}
-				<div className={!isContactDetailPage ? "mt-4" : ""}>{children}</div>
+				<div className={!isDetailPage ? "mt-4" : ""}>{children}</div>
 			</div>
 
 			{/* Global Contacts Modals */}

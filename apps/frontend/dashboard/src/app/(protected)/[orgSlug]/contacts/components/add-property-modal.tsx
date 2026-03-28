@@ -132,7 +132,7 @@ export const AddPropertyModal = ({
 				<div className="rounded-2xl border border-stroke-soft-100/50">
 					<Modal.Header className="before:border-stroke-soft-200/50">
 						<div className="justify-centers flex items-center">
-							<Icon name="sliders-horiz-2" className="h-4 w-4" />
+							<Icon name="tag" className="h-4 w-4" />
 						</div>
 						<div className="flex-1">
 							<Modal.Title>Add Property</Modal.Title>

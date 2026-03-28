@@ -11,7 +11,7 @@ export const PropertiesEmptyState = ({
 	return (
 		<div className="flex flex-col items-center justify-center px-4 py-12 text-center">
 			<div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-bg-weak-50">
-				<Icon name="sliders-horiz-2" className="h-6 w-6 text-text-sub-600" />
+				<Icon name="tag" className="h-6 w-6 text-text-sub-600" />
 			</div>
 			<h3 className="mb-1 font-semibold text-lg text-text-strong-950">
 				No properties yet

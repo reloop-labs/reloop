@@ -17,7 +17,7 @@ const items = [
 	{
 		title: "Properties",
 		value: "properties",
-		iconName: "sliders-horiz-2",
+		iconName: "tag",
 	},
 	{
 		title: "Groups",

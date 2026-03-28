@@ -1,11 +1,17 @@
 "use client";
-import { Icon } from "@reloop/ui/icon";
+import { SomethingWentWrong } from "@fe/dashboard/components/something-went-wrong";
 import { useParams } from "next/navigation";
 import useSWR from "swr";
+import { GroupContactList } from "./components/group-contact-list";
+import { GroupHeader } from "./components/group-header";
 
-interface Group {
+interface GroupData {
 	id: string;
 	name: string;
+	organizationId: string;
+	createdAt: string;
+	updatedAt: string;
+	deletedAt: string | null;
 }
 
 export const GroupDetailContent = () => {
@@ -13,45 +19,46 @@ export const GroupDetailContent = () => {
 	const contact_group_id = params.contact_group_id as string;
 
 	const {
-		data: group,
-		error,
-		isLoading,
-	} = useSWR<Group>(
+		data: groupData,
+		error: groupError,
+		isLoading: groupLoading,
+	} = useSWR<GroupData>(
 		contact_group_id ? `/api/contacts/v1/groups/${contact_group_id}` : null,
+		{
+			revalidateOnFocus: false,
+			revalidateOnReconnect: true,
+		},
 	);
 
-	if (isLoading) {
+	const isLoading = groupLoading;
+
+	if (groupError) {
 		return (
-			<div className="p-8 text-center text-text-sub-600">
-				Loading group details...
+			<div className="mx-auto max-w-3xl sm:px-8">
+				<SomethingWentWrong />
 			</div>
 		);
 	}
 
-	if (error || !group) {
+	if (!groupData && !isLoading) {
 		return (
-			<div className="flex flex-col items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-12 text-center">
-				<Icon name="alert-circle" className="mb-2 h-8 w-8 text-error-base" />
-				<h3 className="font-semibold text-text-strong-950">Group not found</h3>
-				<p className="text-sm text-text-sub-600">
-					The group you are looking for does not exist or has been deleted.
-				</p>
+			<div className="mx-auto max-w-3xl sm:px-8">
+				<div className="py-12 text-center">
+					<h2 className="mb-2 font-semibold text-2xl text-gray-900">
+						Group not found
+					</h2>
+					<p className="text-gray-500">
+						The group you're looking for doesn't exist or has been deleted.
+					</p>
+				</div>
 			</div>
 		);
 	}
 
 	return (
-		<div className="space-y-6">
-			<div className="rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-6">
-				<h2 className="mb-2 font-semibold text-text-strong-950 text-xl">
-					{group.name}
-				</h2>
-				<p className="text-sm text-text-sub-600">
-					This is the detail page for the group{" "}
-					<span className="font-medium">"{group.name}"</span>. In the future,
-					you'll be able to see contacts belonging to this group here.
-				</p>
-			</div>
+		<div className="mx-auto max-w-3xl sm:px-8">
+			<GroupHeader group={groupData} isLoading={isLoading} />
+			{groupData && <GroupContactList groupId={groupData.id} />}
 		</div>
 	);
 };
