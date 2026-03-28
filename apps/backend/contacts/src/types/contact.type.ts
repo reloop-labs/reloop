@@ -48,7 +48,6 @@ export namespace ContactTypes {
 			topicId: string;
 			subscription: "opt_in" | "opt_out";
 		}[];
-		object: "contact";
 	}
 
 	export interface CreateContactsRequest {
@@ -61,7 +60,6 @@ export namespace ContactTypes {
 		lastName?: string;
 		status?: "subscribed" | "unsubscribed" | "blocked";
 		properties?: Record<string, string | number>;
-		object: "contact";
 	}
 
 	export interface ContactListQuery {

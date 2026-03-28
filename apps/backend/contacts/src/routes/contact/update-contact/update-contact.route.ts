@@ -10,10 +10,7 @@ export const updateContactRoute = new Elysia().use(authMiddleware).patch(
     return await updateContactController({
       contactId: params.contact_id,
       organizationId: activeOrganizationId,
-      body: {
-        ...body,
-        object: "contact",
-      },
+      body,
     });
   },
   {

@@ -10,7 +10,7 @@ export const createContactRoute = new Elysia().use(authMiddleware).post(
     return await createContactController({
       organizationId: activeOrganizationId,
       userId,
-      body: { ...body, object: "contact" },
+      body,
       logger,
     });
   },
