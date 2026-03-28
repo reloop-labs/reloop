@@ -419,10 +419,13 @@ export namespace ContactModel {
 
 	// Add Contact to Topic (combined operation)
 	export const addContactToTopicBody = t.Object({
-		email: t.String({
-			pattern: emailPattern.source,
-			description: "Contact email address",
-		}),
+		contact_id: t.Optional(t.String({ description: "Contact ID" })),
+		email: t.Optional(
+			t.String({
+				pattern: emailPattern.source,
+				description: "Contact email address",
+			}),
+		),
 		subscription: t.Optional(
 			t.Union([t.Literal("opt_in"), t.Literal("opt_out")], {
 				description: "Subscription status for the topic",
@@ -443,10 +446,13 @@ export namespace ContactModel {
 
 	// Group Management
 	export const addContactToGroupBody = t.Object({
-		email: t.String({
-			pattern: emailPattern.source,
-			description: "Contact email address",
-		}),
+		contact_id: t.Optional(t.String({ description: "Contact ID" })),
+		email: t.Optional(
+			t.String({
+				pattern: emailPattern.source,
+				description: "Contact email address",
+			}),
+		),
 	});
 
 	export type AddContactToGroupBody = typeof addContactToGroupBody.static;
@@ -471,10 +477,13 @@ export namespace ContactModel {
 	export type AddContactToGroupResponse = typeof addContactToGroupResponse.static;
 
 	export const removeContactFromGroupBody = t.Object({
-		email: t.String({
-			pattern: emailPattern.source,
-			description: "Contact email address",
-		}),
+		contact_id: t.Optional(t.String({ description: "Contact ID" })),
+		email: t.Optional(
+			t.String({
+				pattern: emailPattern.source,
+				description: "Contact email address",
+			}),
+		),
 	});
 
 	export type RemoveContactFromGroupBody = typeof removeContactFromGroupBody.static;

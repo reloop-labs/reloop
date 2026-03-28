@@ -11,7 +11,7 @@ const reloop = new Reloop({
 });
 
 const response = await reloop.audience.groups.addContact('grp_987654321', {
-  contactId: 'cont_123456789'
+  contact_id: 'cont_123456789'
 });`,
   },
   {
