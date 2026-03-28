@@ -10,8 +10,9 @@ const reloop = new Reloop({
   key: 're_123456789'
 });
 
-const response = await reloop.audience.subscribe('cont_123456789', {
-  topicId: 'top_987654321'
+const response = await reloop.audience.topics.updateStatus('top_987654321', {
+  contact_id: 'cont_123456789',
+  subscription: 'opt_in'
 });`,
   },
   {

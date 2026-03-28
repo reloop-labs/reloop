@@ -21,20 +21,12 @@ export async function addContactToGroupController({
   const { contact_id, email } = body;
 
   if (!contact_id && !email) {
-    throw status(400, { message: "Either 'contact_id' or 'email' must be provided" });
-  }
-
-  logger.info(
-    {
-      organizationId,
-      contactId: contact_id,
-      email: email?.toLowerCase(),
-      groupId,
-    },
-    "Adding contact to group",
-  );
+    logger.info({}, "Either 'contact_id' or 'email' must be provided");
+    throw status(400, { message: "Either 'contact_id' or 'email' must be provided" })
+  };
 
   try {
+    logger.info({ contactId: contact_id, email, groupId }, "Verify group exists");
     // Verify group exists
     const group = await db.query.group.findFirst({
       where: and(
@@ -45,13 +37,14 @@ export async function addContactToGroupController({
     });
 
     if (!group) {
+      logger.info({ groupId }, "Group not found");
       throw status(404, { message: "Group not found" });
     }
 
-    // Identify contact
     let contact: typeof schema.contact.$inferSelect | undefined;
 
     if (contact_id) {
+      logger.info({ contactId: contact_id }, "Find contact by id");
       contact = await db.query.contact.findFirst({
         where: and(
           eq(schema.contact.id, contact_id),
@@ -60,40 +53,21 @@ export async function addContactToGroupController({
         ),
       });
     } else if (email) {
-      const emailLower = email.toLowerCase();
+      logger.info({ email }, "Find contact by email");
       contact = await db.query.contact.findFirst({
         where: and(
-          eq(schema.contact.email, emailLower),
+          eq(schema.contact.email, email),
           eq(schema.contact.organizationId, organizationId),
           isNull(schema.contact.deletedAt),
         ),
       });
-
-      // Create contact if doesn't exist
-      if (!contact) {
-        const [newContact] = await db
-          .insert(schema.contact)
-          .values({
-            email: emailLower,
-            status: "subscribed",
-            organizationId,
-            userId,
-          })
-          .returning();
-
-        if (!newContact) {
-          throw new Error("Failed to create contact");
-        }
-        contact = newContact;
-        logger.info({ contactId: contact.id }, "Created new contact from email");
-      }
     }
 
     if (!contact) {
       throw status(404, { message: "Contact not found" });
     }
 
-    // Check if already in group
+    logger.info({ contactId: contact.id, groupId }, "Checking if contact is already in group");
     const existing = await db.query.contactGroup.findFirst({
       where: and(
         eq(schema.contactGroup.contactId, contact.id),
@@ -110,7 +84,7 @@ export async function addContactToGroupController({
       };
     }
 
-    // Add to group
+    logger.info({ contactId: contact.id, groupId }, "Adding contact to group");
     await db.insert(schema.contactGroup).values({
       contactId: contact.id,
       groupId,

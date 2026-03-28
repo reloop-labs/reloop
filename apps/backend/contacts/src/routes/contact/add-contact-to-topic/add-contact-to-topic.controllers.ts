@@ -80,31 +80,14 @@ export async function addContactToTopicController({
         ),
       });
 
-      // Create contact if doesn't exist
-      if (!contact) {
-        const [newContact] = await db
-          .insert(schema.contact)
-          .values({
-            email: emailLower,
-            status: "subscribed",
-            organizationId,
-            userId,
-          })
-          .returning();
-
-        if (!newContact) {
-          throw new Error("Failed to create contact");
-        }
-        contact = newContact;
-        logger.info({ contactId: contact.id }, "Created new contact from email");
-      }
     }
 
     if (!contact) {
+      logger.info({ contact_id, email }, "Contact not found");
       throw status(404, { message: "Contact not found" });
     }
 
-    // Check if already subscribed
+    logger.info({ contactId: contact.id, topicId }, "Checking if contact is already subscribed to topic");
     const existingSubscription = await db.query.topicEnrollment.findFirst({
       where: and(
         eq(schema.topicEnrollment.contactId, contact.id),

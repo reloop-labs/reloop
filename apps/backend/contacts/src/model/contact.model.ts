@@ -510,10 +510,13 @@ export namespace ContactModel {
 
 	// Update Topic Status
 	export const updateContactTopicBody = t.Object({
-		email: t.String({
-			pattern: emailPattern.source,
-			description: "Contact email address",
-		}),
+		contact_id: t.Optional(t.String({ description: "Contact ID" })),
+		email: t.Optional(
+			t.String({
+				pattern: emailPattern.source,
+				description: "Contact email address",
+			}),
+		),
 		subscription: t.Union([t.Literal("opt_in"), t.Literal("opt_out")], {
 			description: "Status to update to",
 		}),

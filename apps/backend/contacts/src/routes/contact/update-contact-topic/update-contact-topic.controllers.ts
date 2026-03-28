@@ -4,52 +4,68 @@ import * as schema from "@reloop/db/schema";
 import type { Logger } from "@reloop/logger";
 import { and, eq, isNull } from "drizzle-orm";
 
+import { status } from "elysia";
+
 export async function updateContactTopicController({
   organizationId,
-  userId,
   topicId,
   body,
   logger,
 }: {
   organizationId: string;
-  userId: string;
   topicId: string;
   body: ContactModel.UpdateContactTopicBody;
   logger: Logger;
 }): Promise<ContactModel.UpdateContactTopicResponse> {
-  const { email, subscription } = body;
-  logger.info({ email, topicId, subscription }, "Updating contact topic status");
-  try {
-    let contact = await db.query.contact.findFirst({
-      where: and(
-        eq(schema.contact.email, email),
-        eq(schema.contact.organizationId, organizationId),
-        isNull(schema.contact.deletedAt),
-      ),
-    });
-    if (!contact) {
-      const [newContact] = await db
-        .insert(schema.contact)
-        .values({
-          email,
-          status: "subscribed",
-          organizationId,
-          userId,
-        })
-        .returning();
+  const { contact_id, email, subscription } = body;
 
-      if (!newContact) {
-        throw new Error("Failed to create contact");
-      }
-      contact = newContact;
-      logger.info({ contactId: contact.id }, "Created new contact");
+  if (!contact_id && !email) {
+    throw status(400, { message: "Either 'contact_id' or 'email' must be provided" });
+  }
+
+  logger.info(
+    {
+      organizationId,
+      contactId: contact_id,
+      email: email?.toLowerCase(),
+      topicId,
+      subscription,
+    },
+    "Updating contact topic status",
+  );
+
+  try {
+    // Identify contact
+    let contact: typeof schema.contact.$inferSelect | undefined;
+
+    if (contact_id) {
+      contact = await db.query.contact.findFirst({
+        where: and(
+          eq(schema.contact.id, contact_id),
+          eq(schema.contact.organizationId, organizationId),
+          isNull(schema.contact.deletedAt),
+        ),
+      });
+    } else if (email) {
+      contact = await db.query.contact.findFirst({
+        where: and(
+          eq(schema.contact.email, email.toLowerCase()),
+          eq(schema.contact.organizationId, organizationId),
+          isNull(schema.contact.deletedAt),
+        ),
+      });
+    }
+
+    if (!contact) {
+      logger.info({ contact_id, email }, "Contact not found");
+      throw status(404, { message: "Contact not found" });
     }
 
     const targetStatus = (
       subscription === "opt_out" ? "unenrolled" : "enrolled"
     ) as "enrolled" | "unenrolled";
 
-    // Upsert topic enrollment
+    logger.info({ contactId: contact.id, topicId }, "Checking existing topic enrollment");
     const existing = await db.query.topicEnrollment.findFirst({
       where: and(
         eq(schema.topicEnrollment.contactId, contact.id),
@@ -92,7 +108,8 @@ export async function updateContactTopicController({
   } catch (error) {
     logger.error(
       {
-        email: email.toLowerCase(),
+        contactId: contact_id,
+        email: email?.toLowerCase(),
         topicId,
         error: error instanceof Error ? error.message : String(error),
       },
