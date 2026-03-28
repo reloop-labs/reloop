@@ -5,16 +5,12 @@ export namespace GroupModel {
 	export const createGroupBody = t.Object({
 		name: t.String({
 			minLength: 1,
-			maxLength: 255,
+			maxLength: 50,
 			description: "Group name",
 		}),
 	},
 		{
-			examples: [
-				{
-					name: "VIP Customers",
-				},
-			],
+			examples: [{ name: "Beta Testers" }],
 		});
 
 	export type CreateGroupBody = typeof createGroupBody.static;
@@ -50,7 +46,7 @@ export namespace GroupModel {
 				{
 					object: "contact_group",
 					id: "grp_123456789",
-					name: "VIP Customers",
+					name: "Beta Testers",
 					createdAt: "2026-03-27T10:00:00Z",
 					updatedAt: "2026-03-27T10:00:00Z",
 				},

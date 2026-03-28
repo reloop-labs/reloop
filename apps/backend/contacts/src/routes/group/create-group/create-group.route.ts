@@ -1,21 +1,14 @@
-import { createGroupSamples } from "@be/contacts/code-samples/group/create-group";
 import { authMiddleware } from "@be/contacts/middleware/auth";
 import { GroupModel } from "@be/contacts/model/group.model";
-import { createGroupHandler } from "@be/contacts/routes/group/controllers/create-group";
+import { createGroupController } from "@be/contacts/routes/group/create-group/create-group.controllers";
 import { Elysia } from "elysia";
+import { createGroupXCodeSamples } from "./create-group.x-codeSamples";
 
 export const createGroupRoute = new Elysia().use(authMiddleware).post(
 	"/create",
 	async ({ body, activeOrganizationId, userId, logger }) => {
 		const { name } = body;
-		return await createGroupHandler(
-			{
-				organizationId: activeOrganizationId as string,
-				userId,
-				name,
-			},
-			logger,
-		);
+		return await createGroupController({ activeOrganizationId, userId, name, logger, });
 	},
 	{
 		auth: true,
@@ -29,7 +22,7 @@ export const createGroupRoute = new Elysia().use(authMiddleware).post(
 			tags: ["Groups"],
 			summary: "Create Group",
 			description: "Creates a new group for the organization",
-			"x-codeSamples": createGroupSamples,
+			"x-codeSamples": createGroupXCodeSamples,
 		},
 	},
 );

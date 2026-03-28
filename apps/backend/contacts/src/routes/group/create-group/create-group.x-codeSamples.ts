@@ -1,4 +1,4 @@
-export const createGroupSamples = [
+export const createGroupXCodeSamples = [
   {
     id: "node",
     lang: "js",

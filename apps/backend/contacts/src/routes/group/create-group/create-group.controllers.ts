@@ -1,0 +1,56 @@
+import type { GroupModel } from "@be/contacts/model/group.model";
+import type { GroupResponse } from "@be/contacts/types/group.type";
+import { db } from "@reloop/db/client";
+import * as schema from "@reloop/db/schema";
+import { createGroupId } from "@reloop/db/schema";
+import type { Logger } from "@reloop/logger";
+import { and, eq, isNull } from "drizzle-orm";
+
+export const createGroupController = async ({
+  name,
+  activeOrganizationId,
+  userId,
+  logger,
+}: {
+  name: string;
+  activeOrganizationId: string;
+  userId: string;
+  logger: Logger;
+}): Promise<GroupResponse | GroupModel.Unauthorized> => {
+  logger.info({ name }, "Creating group");
+  try {
+    logger.info({ name }, "Checking if group already exists");
+    const existingGroup = await db.query.group.findFirst({
+      where: and(
+        eq(schema.group.name, name),
+        eq(schema.group.organizationId, activeOrganizationId),
+        isNull(schema.group.deletedAt),
+      ),
+    });
+    if (existingGroup) {
+      logger.warn({ name }, "Group already exists");
+      throw new Error("Group already exists");
+    }
+    const [newGroup] = await db
+      .insert(schema.group)
+      .values({
+        id: createGroupId(),
+        name,
+        organizationId: activeOrganizationId,
+        userId,
+      })
+      .returning();
+    if (!newGroup) {
+      logger.error({ name }, "Failed to create group - no data returned");
+      throw new Error("Failed to create group");
+    }
+    logger.info({ name, id: newGroup.id }, "Group created successfully");
+    return {
+      ...newGroup,
+      object: "contact_group",
+    } as GroupResponse;
+  } catch (error) {
+    logger.error({ name, error }, "Debug creating group");
+    throw error;
+  }
+};
