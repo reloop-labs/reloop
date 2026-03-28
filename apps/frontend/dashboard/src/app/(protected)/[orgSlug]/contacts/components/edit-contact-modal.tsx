@@ -27,9 +27,9 @@ interface Contact {
 
 interface Property {
 	id: string;
-	name: string;
-	type: string;
-	fallbackValue: string | null;
+	propertyName: string;
+	propertyType: string;
+	defaultValue: string | null;
 }
 
 interface PropertyValue {
@@ -248,8 +248,8 @@ export const EditContactModal = ({
 			for (const property of customProperties) {
 				const value = propertyValues[property.id];
 				if (value !== undefined && value !== "") {
-					propertiesPayload[property.name] =
-						property.type === "number" ? Number(value) : value;
+					propertiesPayload[property.propertyName] =
+						property.propertyType === "number" ? Number(value) : value;
 				}
 			}
 
@@ -574,14 +574,14 @@ export const EditContactModal = ({
 										{customProperties.map((property) => (
 											<div key={property.id} className="flex flex-col gap-1">
 												<Label.Root htmlFor={`prop-${property.id}`}>
-													{property.name}
+													{property.propertyName}
 												</Label.Root>
 												<Input.Root size="small">
 													<Input.Wrapper>
 														<Input.Input
 															id={`prop-${property.id}`}
 															type={
-																property.type === "number" ? "number" : "text"
+																property.propertyType === "number" ? "number" : "text"
 															}
 															value={propertyValues[property.id]}
 															onChange={(e) =>
@@ -592,8 +592,8 @@ export const EditContactModal = ({
 															}
 															disabled={isSaving}
 															placeholder={
-																property.fallbackValue ||
-																`Enter ${property.name}`
+																property.defaultValue ||
+																`Enter ${property.propertyName}`
 															}
 														/>
 													</Input.Wrapper>

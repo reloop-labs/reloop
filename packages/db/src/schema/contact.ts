@@ -138,7 +138,7 @@ export const contactRelations = relations(contact, ({ one, many }) => ({
 	}),
 	propertyValues: many(contactPropertyValue),
 	contactGroups: many(contactGroup),
-	contactTopics: many(topicEnrollment),
+	contactTopics: many(topicEnrollment, { relationName: "contactTopics" }),
 }));
 
 export const contactPropertyValueRelations = relations(

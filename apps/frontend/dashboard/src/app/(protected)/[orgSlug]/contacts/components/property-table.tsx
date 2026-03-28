@@ -17,9 +17,9 @@ import { PropertiesEmptyState } from "./properties-empty-state";
 
 interface Property {
 	id: string;
-	name: string;
-	type: string;
-	fallbackValue: string | null;
+	propertyName: string;
+	propertyType: string;
+	defaultValue: string | null;
 	organizationId: string;
 	createdAt: string;
 	updatedAt: string;
@@ -35,6 +35,7 @@ interface PropertyTableProps {
 }
 
 const getTypeBadgeStyles = (type: string) => {
+	if (!type) return "border border-stroke-soft-200 text-text-sub-600 bg-neutral-alpha-10";
 	switch (type.toLowerCase()) {
 		case "string":
 			return "border border-primary-base text-primary-base bg-primary-light/20";
@@ -264,7 +265,7 @@ export const PropertyTable = ({
 										className="h-4 w-4 flex-shrink-0 text-text-sub-600"
 									/>
 									<span className="truncate font-medium text-label-sm text-text-sub-600">
-										{property.name}
+										{property.propertyName}
 									</span>
 								</div>
 
@@ -273,17 +274,17 @@ export const PropertyTable = ({
 									<span
 										className={cn(
 											"inline-flex rounded-md border-[1px] px-[6px] py-0.5 font-medium text-[10px] text-text-sub-600",
-											getTypeBadgeStyles(property.type),
+											getTypeBadgeStyles(property.propertyType),
 										)}
 									>
-										{property.type}
+										{property.propertyType}
 									</span>
 								</div>
 
 								{/* Default Column */}
 								<div className="flex items-center">
 									<span className="truncate font-medium text-label-sm text-text-sub-600">
-										{property.fallbackValue || "-"}
+										{property.defaultValue || "-"}
 									</span>
 								</div>
 

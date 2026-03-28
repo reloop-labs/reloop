@@ -15,9 +15,9 @@ import { PropertyTable } from "./property-table";
 
 interface Property {
 	id: string;
-	name: string;
-	type: string;
-	fallbackValue: string | null;
+	propertyName: string;
+	propertyType: string;
+	defaultValue: string | null;
 	organizationId: string;
 	createdAt: string;
 	updatedAt: string;

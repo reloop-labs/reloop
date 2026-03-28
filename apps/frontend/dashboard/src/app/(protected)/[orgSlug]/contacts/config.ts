@@ -21,9 +21,9 @@ export interface Contact {
 
 export interface Property {
 	id: string;
-	name: string;
-	type: string;
-	fallbackValue: string | null;
+	propertyName: string;
+	propertyType: string;
+	defaultValue: string | null;
 	organizationId: string;
 	createdAt: string;
 	updatedAt: string;
@@ -101,6 +101,7 @@ export const getAnimationProps = (row: number, column: number) => {
 // ============================================================================
 
 export const getTypeBadgeStyles = (type: string): string => {
+	if (!type) return "border border-stroke-soft-200 text-text-sub-600 bg-neutral-alpha-10";
 	switch (type.toLowerCase()) {
 		case "string":
 			return "border border-primary-base text-primary-base bg-primary-light/20";

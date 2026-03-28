@@ -81,11 +81,11 @@ export async function addContactToTopic(
 		}
 
 		// Check if already subscribed
-		const existingSubscription = await db.query.topicSubscription.findFirst({
+		const existingSubscription = await db.query.topicEnrollment.findFirst({
 			where: and(
-				eq(schema.topicSubscription.contactId, contact.id),
-				eq(schema.topicSubscription.topicId, topicId),
-				isNull(schema.topicSubscription.deletedAt),
+				eq(schema.topicEnrollment.contactId, contact.id),
+				eq(schema.topicEnrollment.topicId, topicId),
+				isNull(schema.topicEnrollment.deletedAt),
 			),
 		});
 
@@ -97,9 +97,9 @@ export async function addContactToTopic(
 			// If status is different, update it
 			if (existingSubscription.status !== targetStatus) {
 				await db
-					.update(schema.topicSubscription)
+					.update(schema.topicEnrollment)
 					.set({ status: targetStatus, updatedAt: new Date() })
-					.where(eq(schema.topicSubscription.id, existingSubscription.id));
+					.where(eq(schema.topicEnrollment.id, existingSubscription.id));
 
 				logger.info(
 					{ subscriptionId: existingSubscription.id, status: targetStatus },
@@ -118,7 +118,7 @@ export async function addContactToTopic(
 
 		// Create subscription
 		const [subscription] = await db
-			.insert(schema.topicSubscription)
+			.insert(schema.topicEnrollment)
 			.values({
 				contactId: contact.id,
 				topicId,

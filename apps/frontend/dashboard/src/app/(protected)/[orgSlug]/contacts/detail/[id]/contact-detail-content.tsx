@@ -26,9 +26,9 @@ interface PropertyValue {
 
 interface Property {
 	id: string;
-	name: string;
-	type: string;
-	fallbackValue: string | null;
+	propertyName: string;
+	propertyType: string;
+	defaultValue: string | null;
 }
 
 interface Topic {
@@ -101,8 +101,8 @@ export const ContactDetailContent = () => {
 		allPropertiesData?.properties?.map((prop) => ({
 			id: prop.id,
 			propertyId: prop.id,
-			name: prop.name,
-			value: valueMap.get(prop.id) || prop.fallbackValue || "-",
+			name: prop.propertyName,
+			value: valueMap.get(prop.id) || prop.defaultValue || "-",
 			createdAt: "",
 			updatedAt: "",
 		})) || [];

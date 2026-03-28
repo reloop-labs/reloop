@@ -10,9 +10,9 @@ import { useSWRConfig } from "swr";
 
 interface Property {
 	id: string;
-	name: string;
-	type: string;
-	fallbackValue: string | null;
+	propertyName: string;
+	propertyType: string;
+	defaultValue: string | null;
 	organizationId: string;
 	createdAt: string;
 	updatedAt: string;
@@ -47,7 +47,7 @@ export const DeletePropertyModal = ({
 	const handleDelete = async () => {
 		if (!property) return;
 
-		if (confirmationName !== property.name) {
+		if (confirmationName !== property.propertyName) {
 			toast.error("Please enter the correct property name to confirm deletion");
 			return;
 		}
@@ -100,7 +100,7 @@ export const DeletePropertyModal = ({
 					<form
 						onSubmit={(e) => {
 							e.preventDefault();
-							if (confirmationName === property.name && !isDeleting) {
+							if (confirmationName === property.propertyName && !isDeleting) {
 								handleDelete();
 							}
 						}}
@@ -124,12 +124,12 @@ export const DeletePropertyModal = ({
 								<p className="text-sm text-text-strong-950">
 									Type{" "}
 									<span className="inline-flex max-w-xs items-center gap-1 truncate rounded-md border border-stroke-soft-200 bg-bg-weak-50 px-2 py-1 font-mono text-text-strong-950 text-xs">
-										{property.name}
+										{property.propertyName}
 										<button
 											type="button"
 											onClick={async () => {
 												try {
-													await navigator.clipboard.writeText(property.name);
+													await navigator.clipboard.writeText(property.propertyName);
 													setIsNameCopied(true);
 													setTimeout(() => setIsNameCopied(false), 2000);
 												} catch {
@@ -175,7 +175,7 @@ export const DeletePropertyModal = ({
 								type="submit"
 								variant="error"
 								size="xsmall"
-								disabled={confirmationName !== property.name || isDeleting}
+								disabled={confirmationName !== property.propertyName || isDeleting}
 							>
 								{isDeleting ? (
 									<>

@@ -77,11 +77,12 @@ export const AddPropertyModal = ({
 		"mod+enter",
 		(e) => {
 			e.preventDefault();
-			if (propertyName) {
+			if (open && !isCreating && propertyName && !nameError) {
 				handleSubmit(new Event("submit") as unknown as React.FormEvent);
 			}
 		},
-		{ enableOnFormTags: ["INPUT"] },
+		{ enableOnFormTags: true, enabled: open },
+		[open, isCreating, propertyName, nameError]
 	);
 
 	const handleSubmit = async (e: React.FormEvent) => {
@@ -255,6 +256,10 @@ export const AddPropertyModal = ({
 									<>
 										Add Property
 										<span className="inline-flex items-center gap-0.5">
+											<Icon
+												name="command"
+												className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+											/>
 											<Icon
 												name="enter"
 												className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"

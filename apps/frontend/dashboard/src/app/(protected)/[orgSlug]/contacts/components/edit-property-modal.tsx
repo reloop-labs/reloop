@@ -13,9 +13,9 @@ import { useSWRConfig } from "swr";
 
 interface Property {
 	id: string;
-	name: string;
-	type: string;
-	fallbackValue: string | null;
+	propertyName: string;
+	propertyType: string;
+	defaultValue: string | null;
 	organizationId: string;
 	createdAt: string;
 	updatedAt: string;
@@ -42,7 +42,7 @@ export const EditPropertyModal = ({
 	// Initialize fallback value when modal opens or property changes
 	useEffect(() => {
 		if (open && property) {
-			setFallbackValue(property.fallbackValue || "");
+			setFallbackValue(property.defaultValue || "");
 		}
 	}, [open, property]);
 
@@ -138,7 +138,7 @@ export const EditPropertyModal = ({
 											id="property-name-readonly"
 											type="text"
 											className="cursor-not-allowed bg-bg-weak-50 px-2 text-text-sub-600"
-											value={property.name}
+											value={property.propertyName}
 											disabled
 											readOnly
 										/>
@@ -157,7 +157,7 @@ export const EditPropertyModal = ({
 											id="property-type-readonly"
 											type="text"
 											className="cursor-not-allowed bg-bg-weak-50 px-2 text-text-sub-600 capitalize"
-											value={property.type}
+											value={property.propertyType}
 											disabled
 											readOnly
 										/>

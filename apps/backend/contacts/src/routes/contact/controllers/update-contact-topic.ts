@@ -58,21 +58,21 @@ export async function updateContactTopic(
     ) as "enrolled" | "unenrolled";
 
     // Upsert topic enrollment
-    const existing = await db.query.topicSubscription.findFirst({
+    const existing = await db.query.topicEnrollment.findFirst({
       where: and(
-        eq(schema.topicSubscription.contactId, contact.id),
-        eq(schema.topicSubscription.topicId, topicId),
-        eq(schema.topicSubscription.organizationId, organizationId),
-        isNull(schema.topicSubscription.deletedAt),
+        eq(schema.topicEnrollment.contactId, contact.id),
+        eq(schema.topicEnrollment.topicId, topicId),
+        eq(schema.topicEnrollment.organizationId, organizationId),
+        isNull(schema.topicEnrollment.deletedAt),
       ),
     });
 
     if (existing) {
       if (existing.status !== targetStatus) {
         await db
-          .update(schema.topicSubscription)
+          .update(schema.topicEnrollment)
           .set({ status: targetStatus, updatedAt: new Date() })
-          .where(eq(schema.topicSubscription.id, existing.id));
+          .where(eq(schema.topicEnrollment.id, existing.id));
 
         logger.info(
           { subscriptionId: existing.id, status: targetStatus },
@@ -80,7 +80,7 @@ export async function updateContactTopic(
         );
       }
     } else {
-      await db.insert(schema.topicSubscription).values({
+      await db.insert(schema.topicEnrollment).values({
         contactId: contact.id,
         topicId,
         organizationId,

@@ -108,6 +108,7 @@ export const topicEnrollmentRelations = relations(
 		contact: one(contact, {
 			fields: [topicEnrollment.contactId],
 			references: [contact.id],
+			relationName: "contactTopics",
 		}),
 		topic: one(topic, {
 			fields: [topicEnrollment.topicId],
@@ -126,8 +127,4 @@ export type NewTopicEnrollment = typeof topicEnrollment.$inferInsert;
 export type Topic = typeof topic.$inferSelect;
 export type NewTopic = typeof topic.$inferInsert;
 
-// Backward compatibility aliases - TODO: Remove after migration
-export const topicSubscription = topicEnrollment;
-export const subscriptionStatusEnum = enrollmentStatusEnum;
-export type TopicSubscription = TopicEnrollment;
-export type NewTopicSubscription = NewTopicEnrollment;
+// Cleaned up backward compatibility aliases as they break Drizzle ORM relation inference.
