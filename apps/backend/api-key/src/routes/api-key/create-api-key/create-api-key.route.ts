@@ -7,7 +7,7 @@ import { createApiKeyXCodeSamples } from "./create-api-key.x-codeSamples";
 export const createApiKeyRoute = new Elysia().use(authMiddleware).post(
 	"/",
 	async ({ body, activeOrganizationId, userId }) => {
-		return await createApiKeyHandler(activeOrganizationId!, userId!, body);
+		return await createApiKeyHandler(activeOrganizationId, userId!, body);
 	},
 	{
 		auth: true,
@@ -18,8 +18,8 @@ export const createApiKeyRoute = new Elysia().use(authMiddleware).post(
 		},
 		detail: {
 			tags: ["API Keys"],
-			summary: "Create a new API key",
-			description: "Creates a new API key for the user's organization",
+			summary: "Create API Key",
+			description: "Creates a new API key",
 			"x-codeSamples": createApiKeyXCodeSamples,
 		},
 	},

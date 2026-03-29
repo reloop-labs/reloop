@@ -1,4 +1,3 @@
-import { authMiddleware } from "@reloop/api-key/middleware/auth";
 import { Elysia } from "elysia";
 import { createApiKeyRoute } from "./create-api-key/create-api-key.route";
 import { deleteApiKeyRoute } from "./delete-api-key/delete-api-key.route";
@@ -14,7 +13,6 @@ export const apiKeyRoutes = new Elysia({
 	prefix: "/v1",
 	name: "ApiKeyRoutes",
 })
-	.use(authMiddleware)
 	.use(createApiKeyRoute)
 	.use(getApiKeyRoute)
 	.use(listApiKeysRoute)
