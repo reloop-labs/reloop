@@ -17,8 +17,7 @@ export const EmptyState = ({ onCreateApiKey }: EmptyStateProps) => {
 				No API keys yet
 			</h3>
 			<p className="mb-6 max-w-[280px] font-normal text-sm text-text-sub-600">
-				API keys allow you to authenticate requests to your application
-				programmatically.
+				Use API keys to connect your apps and automate your tasks securely.
 			</p>
 
 			<Button.Root variant="neutral" size="xsmall" onClick={onCreateApiKey}>
