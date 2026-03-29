@@ -115,56 +115,63 @@ export const ContactTable = ({
 				<div />
 			</div>
 
-			<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
-				{subscriptions.map((subscription) => (
-					<div
-						key={subscription.id}
-						className={cn(
-							"group/row grid grid-cols-[1fr_150px_100px_80px] items-center px-4 py-2 transition-colors",
-							"hover:bg-bg-weak-50/50",
-						)}
-					>
-						<div className="flex items-center gap-2">
-							<div className="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-white text-xs uppercase tracking-wide shadow-sm">
-								<Icon name="user" className="h-2.5 w-2.5" />
-							</div>
-							<span className="truncate font-medium text-label-sm text-text-strong-950">
-								{subscription.contactId}
-							</span>
-						</div>
-
-						<div className="flex items-center">
-							<span
-								className={cn(
-									"inline-flex rounded-md border-[1px] px-[6px] py-0.5 font-medium text-[10px]",
-									getStatusBadgeStyles(subscription.status),
-								)}
-							>
-								{formatStatusLabel(subscription.status)}
-							</span>
-						</div>
-
-						<div className="flex items-center">
-							<span className="whitespace-nowrap text-label-sm text-text-strong-950">
-								{formatRelativeTime(subscription.createdAt)}
-							</span>
-						</div>
-
-						<div className="flex items-center justify-end">
-							{subscription.status === "subscribed" && (
-								<Button.Root
-									variant="neutral"
-									mode="ghost"
-									size="xxsmall"
-									onClick={() => onUnsubscribe(subscription.contactId)}
-									title="Unsubscribe"
-								>
-									<Icon name="bell-minus" className="h-4 w-4" />
-								</Button.Root>
-							)}
-						</div>
+			<div className="divide-y divide-stroke-soft-100">
+				{subscriptions.length === 0 && !isLoading ? (
+					<div className="flex flex-col items-center justify-center px-4 py-8 text-center text-text-sub-600">
+						<Icon name="search" className="mb-2 h-6 w-6" />
+						<p className="text-sm">No matching contacts found.</p>
 					</div>
-				))}
+				) : (
+					subscriptions.map((subscription) => (
+						<div
+							key={subscription.id}
+							className={cn(
+								"group/row grid grid-cols-[1fr_150px_100px_80px] items-center px-4 py-2 transition-colors",
+								"hover:bg-bg-weak-50/50",
+							)}
+						>
+							<div className="flex items-center gap-2">
+								<div className="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-white text-xs uppercase tracking-wide shadow-sm">
+									<Icon name="user" className="h-2.5 w-2.5" />
+								</div>
+								<span className="truncate font-medium text-label-sm text-text-strong-950">
+									{subscription.contactId}
+								</span>
+							</div>
+
+							<div className="flex items-center">
+								<span
+									className={cn(
+										"inline-flex rounded-md border-[1px] px-[6px] py-0.5 font-medium text-[10px]",
+										getStatusBadgeStyles(subscription.status),
+									)}
+								>
+									{formatStatusLabel(subscription.status)}
+								</span>
+							</div>
+
+							<div className="flex items-center">
+								<span className="whitespace-nowrap text-label-sm text-text-strong-950">
+									{formatRelativeTime(subscription.createdAt)}
+								</span>
+							</div>
+
+							<div className="flex items-center justify-end">
+								{subscription.status === "subscribed" && (
+									<Button.Root
+										variant="neutral"
+										mode="ghost"
+										size="xxsmall"
+										onClick={() => onUnsubscribe(subscription.contactId)}
+										title="Unsubscribe"
+									>
+										<Icon name="bell-minus" className="h-4 w-4" />
+									</Button.Root>
+								)}
+							</div>
+						</div>
+					))
+				)}
 			</div>
 		</div>
 	);

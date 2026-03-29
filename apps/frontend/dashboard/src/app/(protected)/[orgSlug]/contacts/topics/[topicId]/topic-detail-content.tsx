@@ -1,25 +1,21 @@
 "use client";
 import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
 import { AnimatedHoverBackground } from "@fe/dashboard/components/layout/sidebar/animated-hover-background";
-import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import * as Input from "@reloop/ui/input";
 import {
 	Content as PopoverContent,
 	Root as PopoverRoot,
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
-import * as Select from "@reloop/ui/select";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useParams } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
-import useSWR, { useSWRConfig } from "swr";
-import { ContactTable } from "./components/contact-table";
+import useSWR from "swr";
 import { EmptyState } from "./components/empty-state";
 
 interface TopicData {
@@ -91,12 +87,8 @@ const topicMenuItems = [
 
 export const TopicDetailContent = () => {
 	const { topicId } = useParams();
-	const { mutate } = useSWRConfig();
-	const { activeOrganization } = useUserOrganization();
 	const [, setModal] = useQueryState("modal");
 	const [, setId] = useQueryState("id");
-	const [statusFilter, setStatusFilter] = useState<string>("all");
-	const [searchQuery, setSearchQuery] = useState<string>("");
 	const [copied, setCopied] = useState(false);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
@@ -124,24 +116,6 @@ export const TopicDetailContent = () => {
 	const hoveredItem = topicMenuItems[hoverIdx ?? -1];
 	const isDanger = hoveredItem?.isDanger ?? false;
 
-	const handleUnsubscribe = async (contactId: string) => {
-		try {
-			await fetch("/api/contacts/v1/subscriptions/unsubscribe", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-					credentials: "include",
-				},
-				body: JSON.stringify({ contactId, topicId }),
-			});
-			await mutate(
-				`/api/contacts/v1/subscriptions/list?topicId=${topicId}&limit=100`,
-			);
-		} catch (error) {
-			console.error("Failed to unsubscribe contact:", error);
-		}
-	};
-
 	const handleCopyId = async () => {
 		if (!topicData?.id) return;
 
@@ -161,16 +135,6 @@ export const TopicDetailContent = () => {
 		setId(topicData.id);
 		setModal(itemId === "edit" ? "edit-topic" : "delete-topic");
 	};
-
-	const filteredSubscriptions =
-		subscriptionData?.subscriptions?.filter((sub) => {
-			const matchesStatus =
-				statusFilter === "all" || sub.status === statusFilter;
-			const matchesSearch =
-				searchQuery === "" ||
-				sub.contactId.toLowerCase().includes(searchQuery.toLowerCase());
-			return matchesStatus && matchesSearch;
-		}) || [];
 
 	const isLoading = topicLoading || subscriptionLoading;
 
@@ -277,7 +241,7 @@ export const TopicDetailContent = () => {
 							<Button.Root
 								variant="neutral"
 								size="xsmall"
-								onClick={() => setModal("add-contact")}
+								onClick={() => setModal("add-contact-to-topic")}
 								className="gap-2"
 							>
 								<Icon name="plus" className="h-4 w-4" />
@@ -481,85 +445,12 @@ export const TopicDetailContent = () => {
 				</div>
 			</div>
 
-			<div className="mt-12">
-				<h3 className="font-medium text-paragraph-sm text-text-strong-950">
-					Contacts
-				</h3>
-
-				{subscriptionData?.subscriptions &&
-				subscriptionData.subscriptions.length === 0 &&
-				!subscriptionLoading ? (
-					<EmptyState onAddContact={() => setModal("add-contact")} />
-				) : (
-					<>
-						<div className="mb-6 flex items-center justify-between gap-3">
-							<div className="flex w-full items-center gap-3">
-								<div className="flex-1">
-									<Input.Root size="small" className="rounded-xl">
-										<Input.Wrapper>
-											<Input.Icon
-												as={() => <Icon name="search" className="h-4 w-4" />}
-											/>
-											<Input.Input
-												type="text"
-												placeholder="Search contacts..."
-												value={searchQuery}
-												onChange={(e) => setSearchQuery(e.target.value)}
-											/>
-										</Input.Wrapper>
-									</Input.Root>
-								</div>
-								<div className="w-48">
-									<Select.Root
-										size="small"
-										value={statusFilter}
-										onValueChange={setStatusFilter}
-										disabled={subscriptionLoading}
-									>
-										<Select.Trigger className="rounded-xl">
-											<Select.Value placeholder="Status" />
-										</Select.Trigger>
-										<Select.Content className="w-48">
-											<Select.Item value="all">
-												<div className="flex items-center gap-2 text-sm">
-													<Icon name="users" className="h-4 w-4" />
-													All Status
-												</div>
-											</Select.Item>
-											<Select.Item value="subscribed">
-												<div className="flex items-center gap-2 text-sm">
-													<Icon
-														name="bell-plus"
-														className="h-4 w-4 text-success-base"
-													/>
-													Subscribed
-												</div>
-											</Select.Item>
-											<Select.Item value="unsubscribed">
-												<div className="flex items-center gap-2 text-sm">
-													<Icon
-														name="bell-minus"
-														className="h-4 w-4 text-text-sub-600"
-													/>
-													Unsubscribed
-												</div>
-											</Select.Item>
-										</Select.Content>
-									</Select.Root>
-								</div>
-							</div>
-						</div>
-
-						<ContactTable
-							subscriptions={filteredSubscriptions}
-							isLoading={subscriptionLoading}
-							loadingRows={4}
-							onUnsubscribe={handleUnsubscribe}
-							activeOrganizationSlug={activeOrganization.slug}
-						/>
-					</>
+			{!subscriptionLoading &&
+				(!subscriptionData || (subscriptionData.total || 0) === 0) && (
+					<div className="mt-12 pt-8">
+						<EmptyState onAddContact={() => setModal("add-contact-to-topic")} />
+					</div>
 				)}
-			</div>
 		</div>
 	);
 };

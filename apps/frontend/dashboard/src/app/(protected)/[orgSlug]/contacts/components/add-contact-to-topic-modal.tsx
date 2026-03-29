@@ -16,17 +16,35 @@ interface Contact {
 	email: string;
 }
 
-interface AddContactToGroupModalProps {
+interface Subscription {
+	id: string;
+	contactId: string;
+	topicId: string;
+	organizationId: string;
+	status: "subscribed" | "unsubscribed";
+	createdAt: string;
+	updatedAt: string;
+	deletedAt: string | null;
+}
+
+interface SubscriptionListResponse {
+	subscriptions: Subscription[];
+	total: number;
+	page: number;
+	limit: number;
+}
+
+interface AddContactToTopicModalProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 }
 
-export const AddContactToGroupModal = ({
+export const AddContactToTopicModal = ({
 	open,
 	onOpenChange,
-}: AddContactToGroupModalProps) => {
+}: AddContactToTopicModalProps) => {
 	const params = useParams();
-	const groupId = params.contact_group_id as string;
+	const topicId = params.topicId as string;
 	const { mutate } = useSWRConfig();
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -49,16 +67,16 @@ export const AddContactToGroupModal = ({
 			: null,
 	);
 
-	// Also fetch the current group's contacts so we don't show already-added contacts
-	const { data: groupData } = useSWR<{ group: { contacts: Contact[] } }>(
-		open && groupId
-			? `/api/contacts/v1/groups/${groupId}/contacts?limit=100`
+	// Also fetch the current topic's contacts so we don't show already-added contacts
+	const { data: topicData } = useSWR<SubscriptionListResponse>(
+		open && topicId
+			? `/api/contacts/v1/subscriptions/list?topicId=${topicId}&limit=100`
 			: null,
 	);
 
 	const allContacts = data?.contacts || [];
-	const currentGroupContactIds =
-		groupData?.group?.contacts?.map((c) => c.id) || [];
+	const currentTopicContactIds =
+		topicData?.subscriptions?.map((s) => s.contactId) || [];
 
 	const addContact = (contactId: string) => {
 		if (!selectedContactIds.includes(contactId)) {
@@ -77,11 +95,11 @@ export const AddContactToGroupModal = ({
 		return allContacts.find((c) => c.id === contactId)?.email || "";
 	};
 
-	// Only show contacts that are NOT already in the group AND NOT already selected
+	// Only show contacts that are NOT already in the topic AND NOT already selected
 	const availableContacts = allContacts.filter(
 		(contact) =>
 			!selectedContactIds.includes(contact.id) &&
-			!currentGroupContactIds.includes(contact.id),
+			!currentTopicContactIds.includes(contact.id),
 	);
 
 	const filteredContacts = searchInput
@@ -100,8 +118,8 @@ export const AddContactToGroupModal = ({
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		if (!groupId) {
-			toast.error("Group ID not found");
+		if (!topicId) {
+			toast.error("Topic ID not found");
 			return;
 		}
 
@@ -117,10 +135,10 @@ export const AddContactToGroupModal = ({
 				const emailPayload = getContactEmail(contactId);
 				if (!emailPayload) continue;
 
-				const response = await fetch(`/api/contacts/group/${groupId}`, {
+				const response = await fetch(`/api/contacts/topic/${topicId}`, {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ email: emailPayload }),
+					body: JSON.stringify({ email: emailPayload, subscription: "opt_in" }),
 				});
 
 				if (response.ok) {
@@ -129,22 +147,20 @@ export const AddContactToGroupModal = ({
 			}
 
 			if (added > 0) {
-				toast.success(`${added} contact(s) added to group`);
+				toast.success(`${added} contact(s) added to topic`);
 			} else {
-				toast.error("Failed to add contacts to group");
+				toast.error("Failed to add contacts to topic");
 			}
 
 			handleOpenChange(false);
 
-			// Re-fetch the groups contact list
+			// Re-fetch the topic contact list
 			await mutate(
-				(key: string) =>
-					typeof key === "string" &&
-					key.includes(`/api/contacts/v1/groups/${groupId}/contacts`),
+				`/api/contacts/v1/subscriptions/list?topicId=${topicId}&limit=100`,
 			);
 		} catch (error) {
 			console.error("Failed to add contacts:", error);
-			toast.error("Failed to add contacts to group");
+			toast.error("Failed to add contacts to topic");
 		} finally {
 			setIsSubmitting(false);
 		}
@@ -162,7 +178,7 @@ export const AddContactToGroupModal = ({
 							<Icon name="user-plus" className="h-4 w-4" />
 						</div>
 						<div className="flex-1">
-							<Modal.Title>Add Contacts to Group</Modal.Title>
+							<Modal.Title>Add Contacts to Topic</Modal.Title>
 						</div>
 					</Modal.Header>
 					<form onSubmit={handleSubmit} className="flex flex-col">

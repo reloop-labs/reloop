@@ -16,7 +16,7 @@ export const EmptyState = ({ onAddContact }: EmptyStateProps) => {
 				No contacts yet
 			</h3>
 			<p className="mb-6 max-w-[280px] font-normal text-sm text-text-sub-600">
-				Add contacts to this topic to start managing their subscriptions.
+				Add contacts to this topic to organize and start managing them.
 			</p>
 			<Button.Root variant="neutral" size="xsmall" onClick={onAddContact}>
 				<Icon name="plus" className="h-4 w-4" />
