@@ -6,7 +6,7 @@ import type {
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import type { Logger } from "@reloop/logger";
-import { and, desc, eq, ilike, sql } from "drizzle-orm";
+import { and, desc, eq, ilike, isNull, sql } from "drizzle-orm";
 
 export const listGroupsController = async ({
   organizationId,
@@ -30,6 +30,7 @@ export const listGroupsController = async ({
   try {
     const whereClause = and(
       eq(schema.group.organizationId, organizationId),
+      isNull(schema.group.deletedAt),
       search ? ilike(schema.group.name, `%${search}%`) : undefined,
     );
 

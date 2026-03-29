@@ -45,7 +45,7 @@ export const GroupContactList = ({ groupId }: { groupId: string }) => {
 		"limit",
 		parseAsInteger.withDefault(10),
 	);
-	const [, setModal] = useQueryState("modal");
+	const [, setModal] = useQueryState("modal", { history: "replace" });
 	const [filters, setFilters] = useState<ContactFilters>([]);
 	const [searchQuery, setSearchQuery] = useState<string>("");
 

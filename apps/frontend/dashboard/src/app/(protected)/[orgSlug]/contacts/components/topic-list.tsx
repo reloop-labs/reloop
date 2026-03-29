@@ -34,8 +34,8 @@ export const TopicList = () => {
 	const { activeOrganization } = useUserOrganization();
 	const { mutate } = useSWRConfig();
 	const [searchQuery, setSearchQuery] = useState<string>("");
-	const [, setModal] = useQueryState("modal");
-	const [, setId] = useQueryState("id");
+	const [, setModal] = useQueryState("modal", { history: "replace" });
+	const [, setId] = useQueryState("id", { history: "replace" });
 	const [currentPage, setCurrentPage] = useQueryState(
 		"page",
 		parseAsInteger.withDefault(1),

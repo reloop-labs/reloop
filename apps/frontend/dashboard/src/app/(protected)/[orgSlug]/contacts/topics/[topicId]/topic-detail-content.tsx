@@ -91,8 +91,8 @@ const topicMenuItems = [
 export const TopicDetailContent = () => {
 	const { activeOrganization } = useUserOrganization();
 	const { topicId } = useParams();
-	const [, setModal] = useQueryState("modal");
-	const [, setId] = useQueryState("id");
+	const [, setModal] = useQueryState("modal", { history: "replace" });
+	const [, setId] = useQueryState("id", { history: "replace" });
 	const [copied, setCopied] = useState(false);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);

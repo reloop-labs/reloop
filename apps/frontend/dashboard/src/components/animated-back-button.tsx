@@ -20,12 +20,25 @@ export const AnimatedBackButton = ({
 
 		const handleKeyDown = (e: KeyboardEvent) => {
 			if (e.key === "Escape") {
-				back();
+				// Prevent back navigation if a Radix dialog, alertdialog, or popover is open
+				if (
+					document.querySelector(
+						'[role="dialog"], [role="alertdialog"], [data-radix-popper-content-wrapper]',
+					)
+				) {
+					return;
+				}
+
+				if (onClick) {
+					onClick();
+				} else {
+					back();
+				}
 			}
 		};
 		window.addEventListener("keydown", handleKeyDown);
 		return () => window.removeEventListener("keydown", handleKeyDown);
-	}, [back, showEscKey]);
+	}, [back, showEscKey, onClick]);
 
 	return (
 		<button

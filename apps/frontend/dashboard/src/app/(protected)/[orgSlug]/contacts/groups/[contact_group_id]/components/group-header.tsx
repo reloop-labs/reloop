@@ -46,7 +46,7 @@ const headerMenuItems = [
 export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 	const { push, activeOrganization } = useUserOrganization();
 	const router = useRouter();
-	const [, setModal] = useQueryState("modal");
+	const [, setModal] = useQueryState("modal", { history: "replace" });
 	const [copied, setCopied] = useState(false);
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);

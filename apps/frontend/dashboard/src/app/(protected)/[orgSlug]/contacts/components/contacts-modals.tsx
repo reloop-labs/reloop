@@ -62,8 +62,8 @@ interface ContactsModalsProps {
 }
 
 export const ContactsModals = ({ topicId }: ContactsModalsProps) => {
-	const [modal, setModal] = useQueryState("modal");
-	const [id, setId] = useQueryState("id");
+	const [modal, setModal] = useQueryState("modal", { history: "replace" });
+	const [id, setId] = useQueryState("id", { history: "replace" });
 
 	const { data: topicsData } = useSWR<{ topics: Topic[] }>(
 		modal?.includes("topic") ? "/api/contacts/v1/topics/list" : null,
