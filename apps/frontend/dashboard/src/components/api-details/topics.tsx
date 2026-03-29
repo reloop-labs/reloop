@@ -5,7 +5,6 @@ import { CodeBlock } from "@reloop/ui/code-block";
 import * as Drawer from "@reloop/ui/drawer";
 import { Icon } from "@reloop/ui/icon";
 import * as Kbd from "@reloop/ui/kbd";
-import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { useCallback, useState } from "react";
 
@@ -229,6 +228,7 @@ export const TopicsApiDetails = () => {
 	const [selectedLanguage, setSelectedLanguage] =
 		useState<Language>("javascript");
 	const [copied, setCopied] = useState(false);
+	const [baseCopied, setBaseCopied] = useState(false);
 
 	const currentLanguageConfig = languages.find(
 		(l) => l.id === selectedLanguage,
@@ -248,6 +248,8 @@ export const TopicsApiDetails = () => {
 	const copyBaseUrl = useCallback(async () => {
 		try {
 			await navigator.clipboard.writeText("https://api.reloop.sh");
+			setBaseCopied(true);
+			setTimeout(() => setBaseCopied(false), 2000);
 		} catch {}
 	}, []);
 
@@ -265,7 +267,7 @@ export const TopicsApiDetails = () => {
 					<Kbd.Root className="bg-bg-weak-50 text-[10px]">A</Kbd.Root>
 				</Button.Root>
 			</Drawer.Trigger>
-			<Drawer.Content className="max-w-[480px]">
+			<Drawer.Content className="max-w-[520px]">
 				<Drawer.Header className="border-stroke-soft-200 border-b">
 					<div className="flex flex-1 flex-col gap-1">
 						<Drawer.Title>Topics API</Drawer.Title>
@@ -274,8 +276,8 @@ export const TopicsApiDetails = () => {
 						</p>
 					</div>
 				</Drawer.Header>
-				<Drawer.Body className="flex flex-col gap-6 p-5">
-					{/* Base URL Section */}
+				<Drawer.Body className="flex flex-col gap-5 p-5">
+					{/* Base URL Card */}
 					<div className="flex items-center justify-between rounded-lg bg-bg-weak-50 px-3 py-2.5">
 						<div className="flex items-center gap-2">
 							<Icon name="link-02" className="h-4 w-4 text-text-sub-600" />
@@ -292,15 +294,20 @@ export const TopicsApiDetails = () => {
 										mode="ghost"
 										onClick={copyBaseUrl}
 									>
-										<Icon name="clipboard-copy" className="h-3.5 w-3.5" />
+										<Icon
+											name={baseCopied ? "check" : "clipboard-copy"}
+											className={cn("h-3.5 w-3.5", baseCopied && "text-success-base")}
+										/>
 									</Button.Root>
 								</Tooltip.Trigger>
-								<Tooltip.Content size="xsmall">Copy base URL</Tooltip.Content>
+								<Tooltip.Content size="xsmall">
+									{baseCopied ? "Copied!" : "Copy base URL"}
+								</Tooltip.Content>
 							</Tooltip.Root>
 						</Tooltip.Provider>
 					</div>
 
-					{/* Language Selector - Custom Segmented Control */}
+					{/* Language Selector */}
 					<div className="space-y-2.5">
 						<h3 className="text-label-sm text-text-sub-600">Language</h3>
 						<div className="grid grid-cols-3 gap-1 rounded-lg bg-bg-weak-50 p-1">
@@ -322,100 +329,78 @@ export const TopicsApiDetails = () => {
 						</div>
 					</div>
 
-					{/* Operations Tabs */}
+					{/* Endpoints */}
 					<div className="space-y-2.5">
-						<h3 className="text-label-sm text-text-sub-600">Operation</h3>
-						<TabMenuHorizontal.Root
-							value={selectedOperation}
-							onValueChange={(value) =>
-								setSelectedOperation(value as Operation)
-							}
-						>
-							<TabMenuHorizontal.List className="border-stroke-soft-200 border-b">
-								{operations.map((op) => (
-									<TabMenuHorizontal.Trigger key={op.id} value={op.id}>
-										{op.label}
-									</TabMenuHorizontal.Trigger>
-								))}
-							</TabMenuHorizontal.List>
-						</TabMenuHorizontal.Root>
+						<h3 className="text-label-sm text-text-sub-600">Endpoints</h3>
+						<div className="divide-y divide-stroke-soft-200 rounded-xl border border-stroke-soft-200 bg-bg-white-0 overflow-hidden">
+							{operations.map((op) => {
+								const isSelected = selectedOperation === op.id;
+								return (
+									<button
+										type="button"
+										key={op.id}
+										onClick={() => setSelectedOperation(op.id as Operation)}
+										className={cn(
+											"group flex w-full items-center gap-3 px-3.5 py-2.5 text-left transition-all duration-150",
+											"border-l-2",
+											isSelected
+												? "bg-bg-weak-50 border-l-text-strong-950"
+												: "border-l-transparent hover:bg-bg-weak-50/60",
+										)}
+									>
+										<Badge.Root
+											variant="light"
+											size="small"
+											color={getMethodColor(op.method)}
+											className="w-[52px] justify-center font-mono text-[10px]"
+										>
+											{op.method}
+										</Badge.Root>
+										<code className={cn(
+											"flex-1 font-mono text-[11px] transition-colors",
+											isSelected ? "text-text-strong-950" : "text-text-sub-500 group-hover:text-text-strong-950"
+										)}>
+											{op.endpoint}
+										</code>
+										<span className={cn(
+											"text-label-xs transition-colors flex-shrink-0",
+											isSelected ? "text-text-sub-600" : "text-text-sub-400 group-hover:text-text-sub-600"
+										)}>
+											{op.label}
+										</span>
+									</button>
+								);
+							})}
+						</div>
 					</div>
 
-					{/* Current Endpoint Display */}
+					{/* Code Example */}
 					{currentOperation && (
-						<div className="flex items-center gap-3">
-							<Badge.Root
-								variant="light"
-								size="medium"
-								color={getMethodColor(currentOperation.method)}
-							>
-								{currentOperation.method}
-							</Badge.Root>
-							<code className="font-mono text-label-sm text-text-strong-950">
-								{currentOperation.endpoint}
-							</code>
+						<div className="space-y-2.5">
+							<div className="flex items-center justify-between">
+								<h3 className="text-label-sm text-text-sub-600">Example</h3>
+								<Button.Root
+									variant="neutral"
+									size="xxsmall"
+									mode="ghost"
+									onClick={copyToClipboard}
+									className="gap-1.5"
+								>
+									<Icon
+										name={copied ? "check" : "clipboard-copy"}
+										className={cn("h-3.5 w-3.5", copied && "text-success-base")}
+									/>
+									{copied ? "Copied!" : "Copy"}
+								</Button.Root>
+							</div>
+							<div className="overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-weak-50">
+								<CodeBlock
+									code={codeExamples[selectedLanguage][selectedOperation]}
+									lang={currentLanguageConfig?.shikiLang || "javascript"}
+								/>
+							</div>
 						</div>
 					)}
-
-					{/* Code Block */}
-					<div className="space-y-2.5">
-						<div className="flex items-center justify-between">
-							<h3 className="text-label-sm text-text-sub-600">Example</h3>
-							<Button.Root
-								variant="neutral"
-								size="xxsmall"
-								mode="ghost"
-								onClick={copyToClipboard}
-								className="gap-1.5"
-							>
-								<Icon
-									name={copied ? "check" : "clipboard-copy"}
-									className="h-3.5 w-3.5"
-								/>
-								{copied ? "Copied!" : "Copy"}
-							</Button.Root>
-						</div>
-						<div className="overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-weak-50">
-							<CodeBlock
-								code={codeExamples[selectedLanguage][selectedOperation]}
-								lang={currentLanguageConfig?.shikiLang || "javascript"}
-							/>
-						</div>
-					</div>
-
-					{/* All Endpoints Reference */}
-					<div className="space-y-2.5">
-						<h3 className="text-label-sm text-text-sub-600">All Endpoints</h3>
-						<div className="divide-y divide-stroke-soft-200 rounded-xl border border-stroke-soft-200 bg-bg-white-0">
-							{operations.map((op) => (
-								<button
-									type="button"
-									key={op.id}
-									onClick={() => setSelectedOperation(op.id as Operation)}
-									className={cn(
-										"flex w-full items-center gap-3 px-3.5 py-3 text-left transition-colors duration-150",
-										"hover:bg-bg-weak-50",
-										selectedOperation === op.id && "bg-bg-weak-50",
-									)}
-								>
-									<Badge.Root
-										variant="light"
-										size="small"
-										color={getMethodColor(op.method)}
-										className="w-16 justify-center font-mono"
-									>
-										{op.method}
-									</Badge.Root>
-									<code className="flex-1 font-mono text-label-xs text-text-strong-950">
-										{op.endpoint}
-									</code>
-									<span className="text-label-xs text-text-sub-600">
-										{op.label}
-									</span>
-								</button>
-							))}
-						</div>
-					</div>
 				</Drawer.Body>
 			</Drawer.Content>
 		</Drawer.Root>

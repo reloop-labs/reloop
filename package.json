@@ -103,7 +103,8 @@
 				"@types/three": "0.182.0",
 				"three": "0.182.0",
 				"recharts": "2.15.0",
-				"react-use-measure": "2.1.7"
+				"react-use-measure": "2.1.7",
+				"simple-icons": "16.14.0"
 			},
 			"db": {
 				"@types/pg": "8.15.4",
