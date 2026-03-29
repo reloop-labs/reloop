@@ -33,12 +33,12 @@ export const landing = new Elysia()
 ║                  API KEY SERVICE                       ║
 ╠════════════════════════════════════════════════════════╣
 ║                                                        ║
-║   █████╗ ██████╗ ██╗    ██╗  ██╗███████╗██╗   ██╗     ║
-║  ██╔══██╗██╔══██╗██║    ██║ ██╔╝██╔════╝╚██╗ ██╔╝     ║
-║  ███████║██████╔╝██║ █╗ █████╔╝ █████╗   ╚████╔╝      ║
-║  ██╔══██║██╔═══╝ ██║███╗██╔═██╗ ██╔══╝    ╚██╔╝       ║
-║  ██║  ██║██║     ╚███╔███╔╝██║  ███████╗   ██║        ║
-║  ╚═╝  ╚═╝╚═╝      ╚══╝╚══╝ ╚═╝  ╚══════╝   ╚═╝        ║
+║    █████╗ ██████╗ ██╗    ██╗  ██╗███████╗██╗   ██╗    ║
+║   ██╔══██╗██╔══██╗██║    ██║ ██╔╝██╔════╝╚██╗ ██╔╝    ║
+║   ███████║██████╔╝██║    █████╔╝ █████╗   ╚████╔╝     ║
+║   ██╔══██║██╔═══╝ ██║    ██╔═██╗ ██╔══╝    ╚██╔╝      ║
+║   ██║  ██║██║     ██║    ██║  ██╗███████╗   ██║       ║
+║   ╚═╝  ╚═╝╚═╝     ╚═╝    ╚═╝  ╚═╝╚══════╝   ╚═╝       ║
 ║                                                        ║
 ║                  ONLINE & READY                        ║
 ║                 Version: v1.0.0                        ║
@@ -51,7 +51,7 @@ ${dbError ? `║ DB ERROR: ${dbError.substring(0, 50).padEnd(50)} ║` : "║   
 ${redisError ? `║ REDIS ERROR: ${redisError.substring(0, 50).padEnd(50)} ║` : "║                                                        ║"}
 ╠════════════════════════════════════════════════════════╣
 ║ QUICK START:                                           ║
-║ curl -X GET /api/api-key/v1/keys \\                     ║
+║ curl -X GET /api/api-key/v1/ \\                         ║
 ║   -H "Content-Type: application/json" \\                ║
 ╠════════════════════════════════════════════════════════╣
 ║ - SUPPORT                                              ║
@@ -69,13 +69,7 @@ ${redisError ? `║ REDIS ERROR: ${redisError.substring(0, 50).padEnd(50)} ║` 
 
 `;
 		},
-		{
-			detail: {
-				tags: ["Service"],
-				summary: "API Key Service",
-				description: "Checks the health of the API Key Service",
-			},
-		},
+		{ detail: { hide: true } },
 	)
 	.get(
 		"/health",
@@ -101,11 +95,5 @@ ${redisError ? `║ REDIS ERROR: ${redisError.substring(0, 50).padEnd(50)} ║` 
 				};
 			}
 		},
-		{
-			detail: {
-				tags: ["Service"],
-				summary: "Health",
-				description: "Checks the health of the API Key Service",
-			},
-		},
+		{ detail: { hide: true } },
 	)
