@@ -1,31 +1,16 @@
-import { createHash, randomBytes } from "node:crypto";
 import { createId } from "@paralleldrive/cuid2";
 import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
+import {
+	API_KEY_PREFIX,
+	generateApiKey,
+	getKeyStart,
+	hashApiKey,
+} from "@reloop/apikey";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import type { Logger } from "@reloop/logger";
 import { eq } from "drizzle-orm";
 import { status } from "elysia";
-
-const API_KEY_PREFIX = "rl_live";
-const API_KEY_LENGTH = 64;
-
-function generateApiKey(): string {
-	const randomPart = randomBytes(API_KEY_LENGTH).toString("base64url");
-	return `${API_KEY_PREFIX}_${randomPart}`;
-}
-
-function hashApiKey(key: string): string {
-	return createHash("sha256").update(key).digest("hex");
-}
-
-function getKeyStart(key: string): string {
-	const parts = key.split("_");
-	if (parts.length >= 2) {
-		return `${parts[0]}_${parts[1]?.substring(0, 8) ?? ""}`;
-	}
-	return key.substring(0, 12);
-}
 
 export async function createApiKeyController({
 	organizationId,
