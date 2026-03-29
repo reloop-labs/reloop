@@ -4,7 +4,6 @@ import { deleteApiKeyRoute } from "./delete-api-key/delete-api-key.route";
 import { disableApiKeyRoute } from "./disable-api-key/disable-api-key.route";
 import { enableApiKeyRoute } from "./enable-api-key/enable-api-key.route";
 import { getApiKeyRoute } from "./get-api-key/get-api-key.route";
-import { getUsageRoute } from "./get-usage/get-usage.route";
 import { listApiKeysRoute } from "./list-api-keys/list-api-keys.route";
 import { rotateApiKeyRoute } from "./rotate-api-key/rotate-api-key.route";
 import { updateApiKeyRoute } from "./update-api-key/update-api-key.route";
@@ -20,5 +19,4 @@ export const apiKeyRoutes = new Elysia({
 	.use(deleteApiKeyRoute)
 	.use(rotateApiKeyRoute)
 	.use(enableApiKeyRoute)
-	.use(disableApiKeyRoute)
-	.use(getUsageRoute);
+	.use(disableApiKeyRoute);
