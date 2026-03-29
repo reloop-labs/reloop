@@ -79,6 +79,7 @@ export const TopicTable = ({
 	loadingRows = 4,
 	onToggleVisibility,
 	onEdit,
+	onDelete,
 	onAddTopic,
 }: TopicTableProps) => {
 	const router = useRouter();
@@ -88,8 +89,8 @@ export const TopicTable = ({
 		router.push(`/${activeOrganizationSlug}/contacts/topics/${topicId}`);
 	};
 
-	const handleDelete = (_topicId: string) => {
-		// Topic deletion handled through query state in TopicList if needed
+	const handleDelete = (topicId: string) => {
+		onDelete?.(topicId);
 	};
 
 	if (isLoading) {

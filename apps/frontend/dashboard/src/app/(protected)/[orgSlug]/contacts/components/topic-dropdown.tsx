@@ -88,7 +88,7 @@ export const TopicDropdown = ({
 		},
 		{
 			icon: "trash" as const,
-			label: "Delete",
+			label: "Delete Topic",
 			onClick: handleDelete,
 			className: "text-error-base",
 		},

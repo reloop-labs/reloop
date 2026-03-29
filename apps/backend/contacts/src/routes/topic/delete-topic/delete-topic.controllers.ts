@@ -32,6 +32,18 @@ export const deleteTopicController = async ({
       throw status(404, { message: "Topic not found" });
     }
 
+    // Unsubscribe all contacts gracefully by soft deleting their enrollments
+    await db
+      .update(schema.topicEnrollment)
+      .set({ deletedAt: new Date(), updatedAt: new Date() })
+      .where(
+        and(
+          eq(schema.topicEnrollment.topicId, topic_id),
+          eq(schema.topicEnrollment.organizationId, activeOrganizationId),
+          isNull(schema.topicEnrollment.deletedAt),
+        ),
+      );
+
     logger.info({ topic_id }, "Topic deleted successfully");
     return { object: "topic", success: true };
   } catch (error) {
