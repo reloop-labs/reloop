@@ -48,28 +48,10 @@ export namespace ApiKeyTypes {
 
 	export interface CreateApiKeyRequest {
 		name?: string;
-		expiresAt?: string | null;
-		refillInterval?: number;
-		refillAmount?: number;
-		enabled?: boolean;
-		rateLimitEnabled?: boolean;
-		rateLimitTimeWindow?: number;
-		rateLimitMax?: number;
-		permissions?: string | null;
-		metadata?: string | null;
 	}
 
 	export interface UpdateApiKeyRequest {
 		name?: string;
-		expiresAt?: string | null;
-		refillInterval?: number;
-		refillAmount?: number;
-		enabled?: boolean;
-		rateLimitEnabled?: boolean;
-		rateLimitTimeWindow?: number;
-		rateLimitMax?: number;
-		permissions?: string | null;
-		metadata?: string | null;
 	}
 
 	export interface ApiKeyListQuery {

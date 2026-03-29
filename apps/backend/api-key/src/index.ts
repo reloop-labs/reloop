@@ -14,6 +14,21 @@ const apiKeyService = new Elysia({
 })
 	.use(
 		openapi({
+			documentation: {
+				info: {
+					title: "API Key Service",
+					version: "1.0.0",
+				},
+				components: {
+					securitySchemes: {
+						apiKey: {
+							type: "apiKey",
+							name: "x-api-key",
+							in: "header",
+						},
+					},
+				},
+			},
 			references: fromTypes(
 				process.env.NODE_ENV === "production"
 					? "dist/index.d.ts"

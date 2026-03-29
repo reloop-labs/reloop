@@ -1,15 +1,21 @@
 import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { logger } from "@reloop/logger";
+import type { Logger } from "@reloop/logger";
 import { and, eq } from "drizzle-orm";
 import { status } from "elysia";
 
-export async function enableApiKey(
-	id: string,
-	organizationId: string,
-	userId: string,
-): Promise<ApiKeyTypes.ApiKeyResponse> {
+export async function enableApiKeyController({
+	id,
+	organizationId,
+	userId,
+	logger,
+}: {
+	id: string;
+	organizationId: string;
+	userId: string;
+	logger: Logger;
+}): Promise<ApiKeyTypes.ApiKeyResponse> {
 	try {
 		const existingKey = await db.query.apikey.findFirst({
 			where: and(
@@ -118,13 +124,4 @@ export async function enableApiKey(
 		);
 		throw error;
 	}
-}
-
-export async function enableApiKeyHandler(
-	id: string,
-	organizationId: string,
-	userId: string,
-): Promise<ApiKeyTypes.ApiKeyResponse> {
-	logger.info({ id, organizationId, userId }, "Enabling API key");
-	return enableApiKey(id, organizationId, userId);
 }

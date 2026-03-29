@@ -1,15 +1,21 @@
 import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { logger } from "@reloop/logger";
+import type { Logger } from "@reloop/logger";
 import { and, eq } from "drizzle-orm";
 import { status } from "elysia";
 
-export async function getUsageStats(
-	id: string,
-	organizationId: string,
-	userId: string,
-): Promise<ApiKeyTypes.UsageStatsResponse> {
+export async function getUsageStatsController({
+	id,
+	organizationId,
+	userId,
+	logger,
+}: {
+	id: string;
+	organizationId: string;
+	userId: string;
+	logger: Logger;
+}): Promise<ApiKeyTypes.UsageStatsResponse> {
 	try {
 		const apiKey = await db.query.apikey.findFirst({
 			where: and(
@@ -51,13 +57,4 @@ export async function getUsageStats(
 		);
 		throw error;
 	}
-}
-
-export async function getUsageStatsHandler(
-	id: string,
-	organizationId: string,
-	userId: string,
-): Promise<ApiKeyTypes.UsageStatsResponse> {
-	logger.info({ id, organizationId, userId }, "Getting usage stats");
-	return getUsageStats(id, organizationId, userId);
 }

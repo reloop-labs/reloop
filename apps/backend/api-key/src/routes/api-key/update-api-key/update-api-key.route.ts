@@ -1,23 +1,19 @@
 import { authMiddleware } from "@reloop/api-key/middleware/auth";
 import { ApiKeyModel } from "@reloop/api-key/model/api-key.model";
-import { Elysia, status, t } from "elysia";
-import { updateApiKeyHandler } from "./update-api-key.controllers";
+import { Elysia, t } from "elysia";
+import { updateApiKeyController } from "./update-api-key.controllers";
 import { updateApiKeyXCodeSamples } from "./update-api-key.x-codeSamples";
 
 export const updateApiKeyRoute = new Elysia().use(authMiddleware).patch(
 	"/:id",
-	async ({ params: { id }, body, activeOrganizationId, userId }) => {
-		if (!activeOrganizationId) {
-			throw status(403, {
-				message: "User is not a member of an organization",
-			});
-		}
-		return await updateApiKeyHandler(
-			id,
-			activeOrganizationId!,
-			userId!,
+	async ({ params: { id }, body, activeOrganizationId, userId, logger }) => {
+		return await updateApiKeyController({
+			apiKeyId: id,
+			organizationId: activeOrganizationId,
+			userId,
 			body,
-		);
+			logger,
+		});
 	},
 	{
 		auth: true,

@@ -1,14 +1,21 @@
 import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { logger } from "@reloop/logger";
+import type { Logger } from "@reloop/logger";
 import { and, eq } from "drizzle-orm";
 import { status } from "elysia";
 
-export async function getApiKey(
-	apiKeyId: string,
-	organizationId: string,
-): Promise<ApiKeyTypes.ApiKeyResponse> {
+export async function getApiKeyController({
+	apiKeyId,
+	organizationId,
+	userId,
+	logger,
+}: {
+	apiKeyId: string;
+	organizationId: string;
+	userId: string;
+	logger: Logger;
+}): Promise<ApiKeyTypes.ApiKeyResponse> {
 	logger.info({ apiKeyId, organizationId }, "Getting API key");
 
 	try {
@@ -60,34 +67,6 @@ export async function getApiKey(
 		logger.error(
 			{
 				apiKeyId,
-				error: error instanceof Error ? error.message : String(error),
-			},
-			"Error getting API key",
-		);
-		throw error;
-	}
-}
-
-export async function getApiKeyHandler(
-	apiKeyId: string,
-	organizationId: string,
-	userId: string,
-): Promise<ApiKeyTypes.ApiKeyResponse> {
-	logger.info({ apiKeyId, organizationId, userId }, "Getting API key");
-
-	try {
-		const apiKey = await getApiKey(apiKeyId, organizationId);
-		logger.info(
-			{ apiKeyId, organizationId, userId },
-			"API key retrieved successfully",
-		);
-		return apiKey;
-	} catch (error) {
-		logger.error(
-			{
-				apiKeyId,
-				organizationId,
-				userId,
 				error: error instanceof Error ? error.message : String(error),
 			},
 			"Error getting API key",

@@ -1,15 +1,21 @@
 import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { logger } from "@reloop/logger";
+import type { Logger } from "@reloop/logger";
 import { and, eq } from "drizzle-orm";
 import { status } from "elysia";
 
-export async function disableApiKey(
-	id: string,
-	organizationId: string,
-	userId: string,
-): Promise<ApiKeyTypes.ApiKeyResponse> {
+export async function disableApiKeyController({
+	id,
+	organizationId,
+	userId,
+	logger,
+}: {
+	id: string;
+	organizationId: string;
+	userId: string;
+	logger: Logger;
+}): Promise<ApiKeyTypes.ApiKeyResponse> {
 	try {
 		const existingKey = await db.query.apikey.findFirst({
 			where: and(
@@ -121,13 +127,4 @@ export async function disableApiKey(
 		);
 		throw error;
 	}
-}
-
-export async function disableApiKeyHandler(
-	id: string,
-	organizationId: string,
-	userId: string,
-): Promise<ApiKeyTypes.ApiKeyResponse> {
-	logger.info({ id, organizationId, userId }, "Disabling API key");
-	return disableApiKey(id, organizationId, userId);
 }

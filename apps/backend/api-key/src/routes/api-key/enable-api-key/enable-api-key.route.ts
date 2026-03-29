@@ -1,17 +1,17 @@
 import { authMiddleware } from "@reloop/api-key/middleware/auth";
 import { ApiKeyModel } from "@reloop/api-key/model/api-key.model";
-import { Elysia, status, t } from "elysia";
-import { enableApiKeyHandler } from "./enable-api-key.controllers";
+import { Elysia, t } from "elysia";
+import { enableApiKeyController } from "./enable-api-key.controllers";
 
 export const enableApiKeyRoute = new Elysia().use(authMiddleware).post(
 	"/:id/enable",
-	async ({ params: { id }, activeOrganizationId, userId }) => {
-		if (!activeOrganizationId) {
-			throw status(403, {
-				message: "User is not a member of an organization",
-			});
-		}
-		return await enableApiKeyHandler(id, activeOrganizationId!, userId!);
+	async ({ params: { id }, activeOrganizationId, userId, logger }) => {
+		return await enableApiKeyController({
+			id,
+			organizationId: activeOrganizationId,
+			userId,
+			logger,
+		});
 	},
 	{
 		auth: true,

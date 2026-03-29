@@ -1,16 +1,23 @@
 import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { logger } from "@reloop/logger";
+import type { Logger } from "@reloop/logger";
 import { and, eq } from "drizzle-orm";
 import { status } from "elysia";
 
-export async function updateApiKey(
-	apiKeyId: string,
-	organizationId: string,
-	userId: string,
-	request: ApiKeyTypes.UpdateApiKeyRequest,
-): Promise<ApiKeyTypes.ApiKeyResponse> {
+export async function updateApiKeyController({
+	apiKeyId,
+	organizationId,
+	userId,
+	body,
+	logger,
+}: {
+	apiKeyId: string;
+	organizationId: string;
+	userId: string;
+	body: ApiKeyTypes.UpdateApiKeyRequest;
+	logger: Logger;
+}): Promise<ApiKeyTypes.ApiKeyResponse> {
 	logger.info(
 		{
 			apiKeyId,
@@ -41,37 +48,8 @@ export async function updateApiKey(
 			updatedAt: new Date(),
 		};
 
-		if (request.name !== undefined) {
-			updateData.name = request.name || null;
-		}
-		if (request.expiresAt !== undefined) {
-			updateData.expiresAt = request.expiresAt
-				? new Date(request.expiresAt)
-				: null;
-		}
-		if (request.refillInterval !== undefined) {
-			updateData.refillInterval = request.refillInterval ?? null;
-		}
-		if (request.refillAmount !== undefined) {
-			updateData.refillAmount = request.refillAmount ?? null;
-		}
-		if (request.enabled !== undefined) {
-			updateData.enabled = request.enabled;
-		}
-		if (request.rateLimitEnabled !== undefined) {
-			updateData.rateLimitEnabled = request.rateLimitEnabled;
-		}
-		if (request.rateLimitTimeWindow !== undefined) {
-			updateData.rateLimitTimeWindow = request.rateLimitTimeWindow;
-		}
-		if (request.rateLimitMax !== undefined) {
-			updateData.rateLimitMax = request.rateLimitMax;
-		}
-		if (request.permissions !== undefined) {
-			updateData.permissions = request.permissions ?? null;
-		}
-		if (request.metadata !== undefined) {
-			updateData.metadata = request.metadata ?? null;
+		if (body.name !== undefined) {
+			updateData.name = body.name || null;
 		}
 
 		const updated = await db
@@ -125,35 +103,6 @@ export async function updateApiKey(
 		logger.error(
 			{
 				apiKeyId,
-				error: error instanceof Error ? error.message : String(error),
-			},
-			"Error updating API key",
-		);
-		throw error;
-	}
-}
-
-export async function updateApiKeyHandler(
-	apiKeyId: string,
-	organizationId: string,
-	userId: string,
-	body: ApiKeyTypes.UpdateApiKeyRequest,
-): Promise<ApiKeyTypes.ApiKeyResponse> {
-	logger.info({ apiKeyId, organizationId, userId }, "Updating API key");
-
-	try {
-		const apiKey = await updateApiKey(apiKeyId, organizationId, userId, body);
-		logger.info(
-			{ apiKeyId, organizationId, userId },
-			"API key updated successfully",
-		);
-		return apiKey;
-	} catch (error) {
-		logger.error(
-			{
-				apiKeyId,
-				organizationId,
-				userId,
 				error: error instanceof Error ? error.message : String(error),
 			},
 			"Error updating API key",

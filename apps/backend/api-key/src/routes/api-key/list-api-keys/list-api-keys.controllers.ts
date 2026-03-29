@@ -1,14 +1,18 @@
 import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { logger } from "@reloop/logger";
+import type { Logger } from "@reloop/logger";
 import { and, count, desc, eq } from "drizzle-orm";
 
-export async function listApiKeys(
-	query: ApiKeyTypes.ApiKeyListQuery,
-	organizationId: string,
-	userId: string,
-): Promise<ApiKeyTypes.ApiKeyListResponse> {
+export async function listApiKeysController({
+	query,
+	organizationId,
+	logger,
+}: {
+	query: ApiKeyTypes.ApiKeyListQuery;
+	organizationId: string;
+	logger: Logger;
+}): Promise<ApiKeyTypes.ApiKeyListResponse> {
 	const { page = 1, limit = 10, enabled } = query;
 	const offset = (page - 1) * limit;
 
@@ -74,34 +78,6 @@ export async function listApiKeys(
 		logger.error(
 			{
 				query,
-				error: error instanceof Error ? error.message : String(error),
-			},
-			"Error listing API keys",
-		);
-		throw error;
-	}
-}
-
-export async function listApiKeysHandler(
-	query: ApiKeyTypes.ApiKeyListQuery,
-	organizationId: string,
-	userId: string,
-): Promise<ApiKeyTypes.ApiKeyListResponse> {
-	logger.info({ query, organizationId, userId }, "Listing API keys");
-
-	try {
-		const result = await listApiKeys(query, organizationId, userId);
-		logger.info(
-			{ query, organizationId, userId },
-			"API keys listed successfully",
-		);
-		return result;
-	} catch (error) {
-		logger.error(
-			{
-				query,
-				organizationId,
-				userId,
 				error: error instanceof Error ? error.message : String(error),
 			},
 			"Error listing API keys",

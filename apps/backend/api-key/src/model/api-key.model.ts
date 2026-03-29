@@ -5,246 +5,162 @@ export namespace ApiKeyModel {
 		description: "API Key identifier",
 	});
 
-	export const createApiKeyBody = t.Object({
-		name: t.Optional(
-			t.String({
-				minLength: 1,
-				maxLength: 255,
-				description: "Name for the API key",
-			}),
-		),
-		expiresAt: t.Optional(
-			t.Union([t.String(), t.Null()], {
-				description: "Expiration date (ISO 8601)",
-			}),
-		),
-		refillInterval: t.Optional(
-			t.Number({
-				minimum: 0,
-				description: "Refill interval in milliseconds",
-			}),
-		),
-		refillAmount: t.Optional(
-			t.Number({
-				minimum: 0,
-				description: "Amount to refill per interval",
-			}),
-		),
-		enabled: t.Optional(
-			t.Boolean({
-				description: "Whether the API key is enabled",
-			}),
-		),
-		rateLimitEnabled: t.Optional(
-			t.Boolean({
-				description: "Whether rate limiting is enabled",
-			}),
-		),
-		rateLimitTimeWindow: t.Optional(
-			t.Number({
-				minimum: 0,
-				description: "Rate limit time window in milliseconds",
-			}),
-		),
-		rateLimitMax: t.Optional(
-			t.Number({
-				minimum: 0,
-				description: "Maximum requests per time window",
-			}),
-		),
-		permissions: t.Optional(
-			t.Union([t.String(), t.Null()], {
-				description: "Comma-separated permissions",
-			}),
-		),
-		metadata: t.Optional(
-			t.Union([t.String(), t.Null()], {
-				description: "JSON metadata string",
-			}),
-		),
-	});
+	export const createApiKeyBody = t.Object(
+		{
+			name: t.Optional(
+				t.String({
+					minLength: 1,
+					maxLength: 255,
+					description: "Name for the API key",
+				}),
+			),
+		},
+		{
+			examples: [
+				{
+					name: "Production API Key",
+				},
+			],
+		},
+	);
 
 	export type CreateApiKeyBody = typeof createApiKeyBody.static;
 
-	export const updateApiKeyBody = t.Object({
-		name: t.Optional(
-			t.String({
-				minLength: 1,
-				maxLength: 255,
-				description: "Name for the API key",
-			}),
-		),
-		expiresAt: t.Optional(
-			t.Union([t.String(), t.Null()], {
-				description: "Expiration date (ISO 8601)",
-			}),
-		),
-		refillInterval: t.Optional(
-			t.Number({
-				minimum: 0,
-				description: "Refill interval in milliseconds",
-			}),
-		),
-		refillAmount: t.Optional(
-			t.Number({
-				minimum: 0,
-				description: "Amount to refill per interval",
-			}),
-		),
-		enabled: t.Optional(
-			t.Boolean({
-				description: "Whether the API key is enabled",
-			}),
-		),
-		rateLimitEnabled: t.Optional(
-			t.Boolean({
-				description: "Whether rate limiting is enabled",
-			}),
-		),
-		rateLimitTimeWindow: t.Optional(
-			t.Number({
-				minimum: 0,
-				description: "Rate limit time window in milliseconds",
-			}),
-		),
-		rateLimitMax: t.Optional(
-			t.Number({
-				minimum: 0,
-				description: "Maximum requests per time window",
-			}),
-		),
-		permissions: t.Optional(
-			t.Union([t.String(), t.Null()], {
-				description: "Comma-separated permissions",
-			}),
-		),
-		metadata: t.Optional(
-			t.Union([t.String(), t.Null()], {
-				description: "JSON metadata string",
-			}),
-		),
-	});
+	export const updateApiKeyBody = t.Object(
+		{
+			name: t.Optional(
+				t.String({
+					minLength: 1,
+					maxLength: 255,
+					description: "Name for the API key",
+				}),
+			),
+		},
+		{
+			examples: [
+				{
+					name: "Updated API Key Name",
+				},
+			],
+		},
+	);
 
 	export type UpdateApiKeyBody = typeof updateApiKeyBody.static;
 
-	export const apiKeyResponse = t.Object({
-		id: t.String({ description: "Unique API key identifier" }),
-		name: t.Union([t.String(), t.Null()], {
-			description: "Name for the API key",
-		}),
-		start: t.Union([t.String(), t.Null()], {
-			description: "Start of the API key (for display)",
-		}),
-		prefix: t.Union([t.String(), t.Null()], {
-			description: "API key prefix",
-		}),
-		organizationId: t.String({ description: "Organization identifier" }),
-		userId: t.String({ description: "User identifier" }),
-		refillInterval: t.Union([t.Number(), t.Null()], {
-			description: "Refill interval in milliseconds",
-		}),
-		refillAmount: t.Union([t.Number(), t.Null()], {
-			description: "Amount to refill per interval",
-		}),
-		lastRefillAt: t.Union([t.String(), t.Null()], {
-			description: "Last refill timestamp",
-		}),
-		enabled: t.Boolean({ description: "Whether the API key is enabled" }),
-		rateLimitEnabled: t.Boolean({
-			description: "Whether rate limiting is enabled",
-		}),
-		rateLimitTimeWindow: t.Number({
-			description: "Rate limit time window in milliseconds",
-		}),
-		rateLimitMax: t.Number({
-			description: "Maximum requests per time window",
-		}),
-		requestCount: t.Number({
-			description: "Total request count",
-		}),
-		remaining: t.Union([t.Number(), t.Null()], {
-			description: "Remaining requests",
-		}),
-		lastRequest: t.Union([t.String(), t.Null()], {
-			description: "Last request timestamp",
-		}),
-		expiresAt: t.Union([t.String(), t.Null()], {
-			description: "Expiration date",
-		}),
-		createdAt: t.String({ description: "Creation timestamp" }),
-		updatedAt: t.String({ description: "Last update timestamp" }),
-		permissions: t.Union([t.String(), t.Null()], {
-			description: "Comma-separated permissions",
-		}),
-		metadata: t.Union([t.String(), t.Null()], {
-			description: "JSON metadata string",
-		}),
-		createdBy: t.Optional(
-			t.Object({
-				id: t.String({ description: "User ID" }),
-				name: t.Union([t.String(), t.Null()], { description: "User name" }),
-				image: t.Union([t.String(), t.Null()], { description: "User avatar" }),
-				email: t.String({ description: "User email" }),
+	export const apiKeyResponse = t.Object(
+		{
+			id: t.String({ description: "Unique API key identifier" }),
+			name: t.Union([t.String(), t.Null()], {
+				description: "Name for the API key",
 			}),
-		),
-	});
+			start: t.Union([t.String(), t.Null()], {
+				description: "Start of the API key (for display)",
+			}),
+			prefix: t.Union([t.String(), t.Null()], {
+				description: "API key prefix",
+			}),
+			organizationId: t.String({ description: "Organization identifier" }),
+			userId: t.String({ description: "User identifier" }),
+			refillInterval: t.Union([t.Number(), t.Null()], {
+				description: "Refill interval in milliseconds",
+			}),
+			refillAmount: t.Union([t.Number(), t.Null()], {
+				description: "Amount to refill per interval",
+			}),
+			lastRefillAt: t.Union([t.String(), t.Null()], {
+				description: "Last refill timestamp",
+			}),
+			enabled: t.Boolean({ description: "Whether the API key is enabled" }),
+			rateLimitEnabled: t.Boolean({
+				description: "Whether rate limiting is enabled",
+			}),
+			rateLimitTimeWindow: t.Number({
+				description: "Rate limit time window in milliseconds",
+			}),
+			rateLimitMax: t.Number({
+				description: "Maximum requests per time window",
+			}),
+			requestCount: t.Number({
+				description: "Total request count",
+			}),
+			remaining: t.Union([t.Number(), t.Null()], {
+				description: "Remaining requests",
+			}),
+			lastRequest: t.Union([t.String(), t.Null()], {
+				description: "Last request timestamp",
+			}),
+			expiresAt: t.Union([t.String(), t.Null()], {
+				description: "Expiration date",
+			}),
+			createdAt: t.String({ description: "Creation timestamp" }),
+			updatedAt: t.String({ description: "Last update timestamp" }),
+			permissions: t.Union([t.String(), t.Null()], {
+				description: "Comma-separated permissions",
+			}),
+			metadata: t.Union([t.String(), t.Null()], {
+				description: "JSON metadata string",
+			}),
+			createdBy: t.Optional(
+				t.Object({
+					id: t.String({ description: "User ID" }),
+					name: t.Union([t.String(), t.Null()], { description: "User name" }),
+					image: t.Union([t.String(), t.Null()], { description: "User avatar" }),
+					email: t.String({ description: "User email" }),
+				}),
+			),
+		},
+		{
+			examples: [
+				{
+					id: "key_123456789",
+					name: "Production API Key",
+					start: "rl_live",
+					prefix: "rl",
+					enabled: true,
+					requestCount: 150,
+					createdAt: "2026-03-29T10:00:00Z",
+					updatedAt: "2026-03-29T10:00:00Z",
+					permissions: "read,write",
+					createdBy: {
+						id: "user_123",
+						name: "John Doe",
+						email: "john@example.com",
+					},
+				},
+			],
+		},
+	);
 
 	export type ApiKeyResponse = typeof apiKeyResponse.static;
 
-	export const apiKeyWithKeyResponse = t.Object({
-		id: t.String({ description: "Unique API key identifier" }),
-		name: t.Union([t.String(), t.Null()], {
-			description: "Name for the API key",
-		}),
-		key: t.String({ description: "Full API key (only shown once)" }),
-		start: t.Union([t.String(), t.Null()], {
-			description: "Start of the API key (for display)",
-		}),
-		prefix: t.Union([t.String(), t.Null()], {
-			description: "API key prefix",
-		}),
-		organizationId: t.String({ description: "Organization identifier" }),
-		userId: t.String({ description: "User identifier" }),
-		refillInterval: t.Union([t.Number(), t.Null()], {
-			description: "Refill interval in milliseconds",
-		}),
-		refillAmount: t.Union([t.Number(), t.Null()], {
-			description: "Amount to refill per interval",
-		}),
-		lastRefillAt: t.Union([t.String(), t.Null()], {
-			description: "Last refill timestamp",
-		}),
-		enabled: t.Boolean({ description: "Whether the API key is enabled" }),
-		rateLimitEnabled: t.Boolean({
-			description: "Whether rate limiting is enabled",
-		}),
-		rateLimitTimeWindow: t.Number({
-			description: "Rate limit time window in milliseconds",
-		}),
-		rateLimitMax: t.Number({
-			description: "Maximum requests per time window",
-		}),
-		requestCount: t.Number({
-			description: "Total request count",
-		}),
-		remaining: t.Union([t.Number(), t.Null()], {
-			description: "Remaining requests",
-		}),
-		lastRequest: t.Union([t.String(), t.Null()], {
-			description: "Last request timestamp",
-		}),
-		expiresAt: t.Union([t.String(), t.Null()], {
-			description: "Expiration date",
-		}),
-		createdAt: t.String({ description: "Creation timestamp" }),
-		updatedAt: t.String({ description: "Last update timestamp" }),
-		permissions: t.Union([t.String(), t.Null()], {
-			description: "Comma-separated permissions",
-		}),
-		metadata: t.Union([t.String(), t.Null()], {
-			description: "JSON metadata string",
-		}),
-	});
+	export const apiKeyWithKeyResponse = t.Object(
+		{
+			id: t.String({ description: "Unique API key identifier" }),
+			name: t.Union([t.String(), t.Null()], {
+				description: "Name for the API key",
+			}),
+			key: t.String({ description: "Full API key (only shown once)" }),
+			enabled: t.Boolean({ description: "Whether the API key is enabled" }),
+			createdAt: t.String({ description: "Creation timestamp" }),
+			updatedAt: t.String({ description: "Last update timestamp" }),
+			permissions: t.Union([t.String(), t.Null()], {
+				description: "Comma-separated permissions",
+			}),
+		},
+		{
+			examples: [
+				{
+					id: "key_123456789",
+					name: "Production API Key",
+					key: "rl_live_abc123def456ghi789",
+					enabled: true,
+					createdAt: "2026-03-29T10:00:00Z",
+					updatedAt: "2026-03-29T10:00:00Z",
+					permissions: "read,write",
+				},
+			],
+		},
+	);
 
 	export type ApiKeyWithKeyResponse = typeof apiKeyWithKeyResponse.static;
 

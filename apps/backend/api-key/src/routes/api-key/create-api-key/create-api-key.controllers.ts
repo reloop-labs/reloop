@@ -3,11 +3,11 @@ import { createId } from "@paralleldrive/cuid2";
 import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { logger } from "@reloop/logger";
+import type { Logger } from "@reloop/logger";
 import { eq } from "drizzle-orm";
 import { status } from "elysia";
 
-const API_KEY_PREFIX = "rl";
+const API_KEY_PREFIX = "rl_live";
 const API_KEY_LENGTH = 64;
 
 function generateApiKey(): string {
@@ -26,47 +26,45 @@ function getKeyStart(key: string): string {
 	}
 	return key.substring(0, 12);
 }
-export async function createApiKey(
-	organizationId: string,
-	userId: string,
-	request: ApiKeyTypes.CreateApiKeyRequest,
-): Promise<ApiKeyTypes.ApiKeyWithKeyResponse> {
+
+export async function createApiKeyController({
+	organizationId,
+	userId,
+	body,
+	logger,
+}: {
+	organizationId: string;
+	userId: string;
+	body: ApiKeyTypes.CreateApiKeyRequest;
+	logger: Logger;
+}): Promise<ApiKeyTypes.ApiKeyWithKeyResponse> {
 	try {
 		const fullKey = generateApiKey();
 		const hashedKey = hashApiKey(fullKey);
 		const keyStart = getKeyStart(fullKey);
 		const keyId = createId();
 
-		logger.info(
-			"Creating API key with key values here",
-			organizationId,
-			userId,
-			fullKey,
-			hashedKey,
-			keyStart,
-			keyId,
-		);
+		logger.info("Creating API key with key values here", hashedKey, keyStart, keyId);
 		const now = new Date();
-		const expiresAt = request.expiresAt ? new Date(request.expiresAt) : null;
-
-		const enabled = request.enabled ?? true;
-		const rateLimitEnabled = request.rateLimitEnabled ?? true;
-		const rateLimitTimeWindow = request.rateLimitTimeWindow ?? 86400000;
-		const rateLimitMax = request.rateLimitMax ?? 10;
-		const remaining = request.refillAmount ?? rateLimitMax;
+		const expiresAt = null;
+		const enabled = true;
+		const rateLimitEnabled = true;
+		const rateLimitTimeWindow = 86400000;
+		const rateLimitMax = 10;
+		const remaining = rateLimitMax;
 
 		const newApiKey = await db
 			.insert(schema.apikey)
 			.values({
 				id: keyId,
-				name: request.name || null,
+				name: body.name || null,
 				start: keyStart,
 				prefix: API_KEY_PREFIX,
 				key: hashedKey,
 				organizationId,
 				userId,
-				refillInterval: request.refillInterval ?? null,
-				refillAmount: request.refillAmount ?? null,
+				refillInterval: null,
+				refillAmount: null,
 				lastRefillAt: null,
 				enabled,
 				rateLimitEnabled,
@@ -78,8 +76,8 @@ export async function createApiKey(
 				expiresAt,
 				createdAt: now,
 				updatedAt: now,
-				permissions: request.permissions ?? null,
-				metadata: request.metadata ?? null,
+				permissions: null,
+				metadata: null,
 			})
 			.returning();
 
@@ -106,47 +104,11 @@ export async function createApiKey(
 			id: newApiKey[0].id,
 			name: newApiKey[0].name,
 			key: fullKey,
-			start: newApiKey[0].start,
-			prefix: newApiKey[0].prefix,
-			organizationId: newApiKey[0].organizationId,
-			userId: newApiKey[0].userId,
-			refillInterval: newApiKey[0].refillInterval,
-			refillAmount: newApiKey[0].refillAmount,
-			lastRefillAt: newApiKey[0].lastRefillAt?.toISOString() ?? null,
 			enabled: newApiKey[0].enabled,
-			rateLimitEnabled: newApiKey[0].rateLimitEnabled,
-			rateLimitTimeWindow: newApiKey[0].rateLimitTimeWindow,
-			rateLimitMax: newApiKey[0].rateLimitMax,
-			requestCount: newApiKey[0].requestCount,
-			remaining: newApiKey[0].remaining,
-			lastRequest: newApiKey[0].lastRequest?.toISOString() ?? null,
-			expiresAt: newApiKey[0].expiresAt?.toISOString() ?? null,
 			createdAt: newApiKey[0].createdAt.toISOString(),
 			updatedAt: newApiKey[0].updatedAt.toISOString(),
 			permissions: newApiKey[0].permissions,
-			metadata: newApiKey[0].metadata,
 		};
-	} catch (error) {
-		logger.error(
-			{
-				organizationId,
-				userId,
-				error: error instanceof Error ? error.message : String(error),
-			},
-			"Error creating API key",
-		);
-		throw error;
-	}
-}
-
-export async function createApiKeyHandler(
-	organizationId: string,
-	userId: string,
-	body: ApiKeyTypes.CreateApiKeyRequest,
-): Promise<ApiKeyTypes.ApiKeyWithKeyResponse> {
-	try {
-		const apiKey = await createApiKey(organizationId, userId, body);
-		return apiKey;
 	} catch (error) {
 		logger.error(
 			{

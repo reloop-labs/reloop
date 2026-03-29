@@ -1,18 +1,18 @@
 import { authMiddleware } from "@reloop/api-key/middleware/auth";
 import { ApiKeyModel } from "@reloop/api-key/model/api-key.model";
-import { Elysia, status, t } from "elysia";
-import { deleteApiKeyHandler } from "./delete-api-key.controllers";
+import { Elysia, t } from "elysia";
+import { deleteApiKeyController } from "./delete-api-key.controllers";
 import { deleteApiKeyXCodeSamples } from "./delete-api-key.x-codeSamples";
 
 export const deleteApiKeyRoute = new Elysia().use(authMiddleware).delete(
 	"/:id",
-	async ({ params: { id }, activeOrganizationId, userId }) => {
-		if (!activeOrganizationId) {
-			throw status(403, {
-				message: "User is not a member of an organization",
-			});
-		}
-		return await deleteApiKeyHandler(id, activeOrganizationId!, userId!);
+	async ({ params: { id }, activeOrganizationId, userId, logger }) => {
+		return await deleteApiKeyController({
+			apiKeyId: id,
+			organizationId: activeOrganizationId,
+			userId,
+			logger,
+		});
 	},
 	{
 		auth: true,
