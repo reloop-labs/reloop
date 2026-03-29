@@ -745,7 +745,7 @@ export const ContactsApiDetails = (props: ButtonProps) => {
 							className="self-start rounded-lg border border-stroke-soft-200 p-1.5 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950"
 							aria-label="Close"
 						>
-							<Icon name="close" className="h-4 w-4" />
+							<Icon name="cross" className="h-4 w-4" />
 						</button>
 					</Drawer.Close>
 				</Drawer.Header>
