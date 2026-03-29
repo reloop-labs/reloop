@@ -1,6 +1,6 @@
 import { createHash, randomBytes } from "node:crypto";
 import { createId } from "@paralleldrive/cuid2";
-import { formatApiKeyWithKeyResponse } from "@reloop/api-key/routes/api-key/controllers/format-api-key-response";
+import { formatApiKeyWithKeyResponse } from "../utils/format-api-key-response";
 import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
@@ -33,7 +33,6 @@ export async function createApiKey(
 	request: ApiKeyTypes.CreateApiKeyRequest,
 ): Promise<ApiKeyTypes.ApiKeyWithKeyResponse> {
 	try {
-		// Generate API key
 		const fullKey = generateApiKey();
 		const hashedKey = hashApiKey(fullKey);
 		const keyStart = getKeyStart(fullKey);
@@ -51,10 +50,9 @@ export async function createApiKey(
 		const now = new Date();
 		const expiresAt = request.expiresAt ? new Date(request.expiresAt) : null;
 
-		// Set defaults
 		const enabled = request.enabled ?? true;
 		const rateLimitEnabled = request.rateLimitEnabled ?? true;
-		const rateLimitTimeWindow = request.rateLimitTimeWindow ?? 86400000; // 24 hours
+		const rateLimitTimeWindow = request.rateLimitTimeWindow ?? 86400000;
 		const rateLimitMax = request.rateLimitMax ?? 10;
 		const remaining = request.refillAmount ?? rateLimitMax;
 
@@ -91,7 +89,6 @@ export async function createApiKey(
 			throw status(500, { message: "Failed to create API key" });
 		}
 
-		// Fetch the user info to include in the response
 		const user = await db.query.user.findFirst({
 			where: eq(schema.user.id, userId),
 		});

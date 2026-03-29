@@ -1,17 +1,17 @@
 import { authMiddleware } from "@reloop/api-key/middleware/auth";
 import { ApiKeyModel } from "@reloop/api-key/model/api-key.model";
-import { getUsageStatsHandler } from "@reloop/api-key/routes/api-key/controllers/get-usage";
 import { Elysia, status, t } from "elysia";
+import { getUsageStatsHandler } from "./get-usage.controllers";
 
 export const getUsageRoute = new Elysia().use(authMiddleware).get(
 	"/:id/usage",
-	async ({ params: { id }, user }) => {
-		if (!user.activeOrganizationId) {
+	async ({ params: { id }, activeOrganizationId, userId }) => {
+		if (!activeOrganizationId) {
 			throw status(403, {
 				message: "User is not a member of an organization",
 			});
 		}
-		return await getUsageStatsHandler(id, user.activeOrganizationId, user.id);
+		return await getUsageStatsHandler(id, activeOrganizationId!, userId!);
 	},
 	{
 		auth: true,

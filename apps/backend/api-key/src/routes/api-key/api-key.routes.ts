@@ -1,14 +1,14 @@
 import { authMiddleware } from "@reloop/api-key/middleware/auth";
-import { createApiKeyRoute } from "@reloop/api-key/routes/api-key/routes/create-api-key.route";
-import { deleteApiKeyRoute } from "@reloop/api-key/routes/api-key/routes/delete-api-key.route";
-import { disableApiKeyRoute } from "@reloop/api-key/routes/api-key/routes/disable-api-key.route";
-import { enableApiKeyRoute } from "@reloop/api-key/routes/api-key/routes/enable-api-key.route";
-import { getApiKeyRoute } from "@reloop/api-key/routes/api-key/routes/get-api-key.route";
-import { getUsageRoute } from "@reloop/api-key/routes/api-key/routes/get-usage.route";
-import { listApiKeysRoute } from "@reloop/api-key/routes/api-key/routes/list-api-keys.route";
-import { rotateApiKeyRoute } from "@reloop/api-key/routes/api-key/routes/rotate-api-key.route";
-import { updateApiKeyRoute } from "@reloop/api-key/routes/api-key/routes/update-api-key.route";
 import { Elysia } from "elysia";
+import { createApiKeyRoute } from "./create-api-key/create-api-key.route";
+import { deleteApiKeyRoute } from "./delete-api-key/delete-api-key.route";
+import { disableApiKeyRoute } from "./disable-api-key/disable-api-key.route";
+import { enableApiKeyRoute } from "./enable-api-key/enable-api-key.route";
+import { getApiKeyRoute } from "./get-api-key/get-api-key.route";
+import { getUsageRoute } from "./get-usage/get-usage.route";
+import { listApiKeysRoute } from "./list-api-keys/list-api-keys.route";
+import { rotateApiKeyRoute } from "./rotate-api-key/rotate-api-key.route";
+import { updateApiKeyRoute } from "./update-api-key/update-api-key.route";
 
 export const apiKeyRoutes = new Elysia({
 	prefix: "/v1",

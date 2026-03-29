@@ -1,5 +1,5 @@
 import { createHash, randomBytes } from "node:crypto";
-import { formatApiKeyWithKeyResponse } from "@reloop/api-key/routes/api-key/controllers/format-api-key-response";
+import { formatApiKeyWithKeyResponse } from "../utils/format-api-key-response";
 import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
@@ -33,7 +33,6 @@ export async function rotateApiKey(
 	userId: string,
 ): Promise<ApiKeyTypes.ApiKeyWithKeyResponse> {
 	try {
-		// Verify the API key exists and belongs to the organization
 		const existingKey = await db.query.apikey.findFirst({
 			where: and(
 				eq(schema.apikey.id, id),
@@ -49,13 +48,11 @@ export async function rotateApiKey(
 			throw status(404, { message: "API key not found" });
 		}
 
-		// Generate new key
 		const fullKey = generateApiKey();
 		const hashedKey = hashApiKey(fullKey);
 		const keyStart = getKeyStart(fullKey);
 		const now = new Date();
 
-		// Update with new key
 		const [updatedKey] = await db
 			.update(schema.apikey)
 			.set({

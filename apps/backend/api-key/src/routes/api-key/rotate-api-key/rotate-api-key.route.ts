@@ -1,17 +1,17 @@
 import { authMiddleware } from "@reloop/api-key/middleware/auth";
 import { ApiKeyModel } from "@reloop/api-key/model/api-key.model";
-import { rotateApiKeyHandler } from "@reloop/api-key/routes/api-key/controllers/rotate-api-key";
 import { Elysia, status, t } from "elysia";
+import { rotateApiKeyHandler } from "./rotate-api-key.controllers";
 
 export const rotateApiKeyRoute = new Elysia().use(authMiddleware).post(
 	"/:id/rotate",
-	async ({ params: { id }, user }) => {
-		if (!user.activeOrganizationId) {
+	async ({ params: { id }, activeOrganizationId, userId }) => {
+		if (!activeOrganizationId) {
 			throw status(403, {
 				message: "User is not a member of an organization",
 			});
 		}
-		return await rotateApiKeyHandler(id, user.activeOrganizationId, user.id);
+		return await rotateApiKeyHandler(id, activeOrganizationId!, userId!);
 	},
 	{
 		auth: true,

@@ -1,4 +1,4 @@
-import { formatApiKeyResponse } from "@reloop/api-key/routes/api-key/controllers/format-api-key-response";
+import { formatApiKeyResponse } from "../utils/format-api-key-response";
 import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
@@ -6,13 +6,12 @@ import { logger } from "@reloop/logger";
 import { and, eq } from "drizzle-orm";
 import { status } from "elysia";
 
-export async function enableApiKey(
+export async function disableApiKey(
 	id: string,
 	organizationId: string,
 	userId: string,
 ): Promise<ApiKeyTypes.ApiKeyResponse> {
 	try {
-		// Verify the API key exists and belongs to the user/org
 		const existingKey = await db.query.apikey.findFirst({
 			where: and(
 				eq(schema.apikey.id, id),
@@ -28,8 +27,8 @@ export async function enableApiKey(
 			throw status(404, { message: "API key not found" });
 		}
 
-		if (existingKey.enabled) {
-			logger.info({ id }, "API key is already enabled");
+		if (!existingKey.enabled) {
+			logger.info({ id }, "API key is already disabled");
 			return formatApiKeyResponse({
 				...existingKey,
 				createdBy: {
@@ -46,18 +45,21 @@ export async function enableApiKey(
 		const [updatedKey] = await db
 			.update(schema.apikey)
 			.set({
-				enabled: true,
+				enabled: false,
 				updatedAt: now,
 			})
 			.where(eq(schema.apikey.id, id))
 			.returning();
 
 		if (!updatedKey) {
-			logger.error({ id }, "Failed to enable API key");
-			throw status(500, { message: "Failed to enable API key" });
+			logger.error({ id }, "Failed to disable API key");
+			throw status(500, { message: "Failed to disable API key" });
 		}
 
-		logger.info({ id, organizationId, userId }, "API key enabled successfully");
+		logger.info(
+			{ id, organizationId, userId },
+			"API key disabled successfully",
+		);
 
 		return formatApiKeyResponse({
 			...updatedKey,
@@ -76,17 +78,17 @@ export async function enableApiKey(
 				userId,
 				error: error instanceof Error ? error.message : String(error),
 			},
-			"Error enabling API key",
+			"Error disabling API key",
 		);
 		throw error;
 	}
 }
 
-export async function enableApiKeyHandler(
+export async function disableApiKeyHandler(
 	id: string,
 	organizationId: string,
 	userId: string,
 ): Promise<ApiKeyTypes.ApiKeyResponse> {
-	logger.info({ id, organizationId, userId }, "Enabling API key");
-	return enableApiKey(id, organizationId, userId);
+	logger.info({ id, organizationId, userId }, "Disabling API key");
+	return disableApiKey(id, organizationId, userId);
 }

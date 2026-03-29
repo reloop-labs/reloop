@@ -1,3 +1,4 @@
+import { formatApiKeyResponse } from "../utils/format-api-key-response";
 import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
@@ -5,66 +6,63 @@ import { logger } from "@reloop/logger";
 import { and, eq } from "drizzle-orm";
 import { status } from "elysia";
 
-export async function deleteApiKey(
+export async function getApiKey(
 	apiKeyId: string,
 	organizationId: string,
-	userId: string,
-): Promise<void> {
-	logger.info({ apiKeyId, organizationId, userId }, "Deleting API key");
+): Promise<ApiKeyTypes.ApiKeyResponse> {
+	logger.info({ apiKeyId, organizationId }, "Getting API key");
 
 	try {
-		// Check if API key exists and belongs to user/organization
-		const existing = await db.query.apikey.findFirst({
+		const result = await db.query.apikey.findFirst({
 			where: and(
 				eq(schema.apikey.id, apiKeyId),
 				eq(schema.apikey.organizationId, organizationId),
-				eq(schema.apikey.userId, userId),
 			),
+			with: { user: true },
 		});
 
-		if (!existing) {
+		if (!result) {
 			logger.warn({ apiKeyId }, "API key not found");
 			throw status(404, { message: "API key not found" });
 		}
 
-		// Hard delete the API key
-		await db
-			.delete(schema.apikey)
-			.where(
-				and(
-					eq(schema.apikey.id, apiKeyId),
-					eq(schema.apikey.organizationId, organizationId),
-					eq(schema.apikey.userId, userId),
-				),
-			);
-
-		logger.info({ apiKeyId }, "API key deleted successfully");
+		const { user, ...apiKeyData } = result;
+		logger.info({ apiKeyId }, "API key retrieved successfully");
+		return formatApiKeyResponse({
+			...apiKeyData,
+			createdBy: {
+				id: user.id,
+				name: user.name,
+				image: user.image,
+				email: user.email,
+			},
+		});
 	} catch (error) {
 		logger.error(
 			{
 				apiKeyId,
 				error: error instanceof Error ? error.message : String(error),
 			},
-			"Error deleting API key",
+			"Error getting API key",
 		);
 		throw error;
 	}
 }
 
-export async function deleteApiKeyHandler(
+export async function getApiKeyHandler(
 	apiKeyId: string,
 	organizationId: string,
 	userId: string,
-): Promise<{ message: string }> {
-	logger.info({ apiKeyId, organizationId, userId }, "Deleting API key");
+): Promise<ApiKeyTypes.ApiKeyResponse> {
+	logger.info({ apiKeyId, organizationId, userId }, "Getting API key");
 
 	try {
-		await deleteApiKey(apiKeyId, organizationId, userId);
+		const apiKey = await getApiKey(apiKeyId, organizationId);
 		logger.info(
 			{ apiKeyId, organizationId, userId },
-			"API key deleted successfully",
+			"API key retrieved successfully",
 		);
-		return { message: "API key deleted successfully" };
+		return apiKey;
 	} catch (error) {
 		logger.error(
 			{
@@ -73,7 +71,7 @@ export async function deleteApiKeyHandler(
 				userId,
 				error: error instanceof Error ? error.message : String(error),
 			},
-			"Error deleting API key",
+			"Error getting API key",
 		);
 		throw error;
 	}

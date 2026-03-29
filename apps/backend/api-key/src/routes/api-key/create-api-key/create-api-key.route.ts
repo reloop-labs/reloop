@@ -1,12 +1,12 @@
 import { authMiddleware } from "@reloop/api-key/middleware/auth";
 import { ApiKeyModel } from "@reloop/api-key/model/api-key.model";
-import { createApiKeyHandler } from "@reloop/api-key/routes/api-key/controllers/create-api-key";
-import { Elysia, status } from "elysia";
+import { Elysia } from "elysia";
+import { createApiKeyHandler } from "./create-api-key.controllers";
 
 export const createApiKeyRoute = new Elysia().use(authMiddleware).post(
 	"/",
-	async ({ body, user }) => {
-		return await createApiKeyHandler(user.activeOrganizationId, user.id, body);
+	async ({ body, activeOrganizationId, userId }) => {
+		return await createApiKeyHandler(activeOrganizationId!, userId!, body);
 	},
 	{
 		auth: true,

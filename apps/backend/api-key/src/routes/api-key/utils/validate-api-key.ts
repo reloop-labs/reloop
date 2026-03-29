@@ -1,11 +1,10 @@
 import { createHash } from "node:crypto";
-import { formatApiKeyResponse } from "@reloop/api-key/routes/api-key/controllers/format-api-key-response";
+import { formatApiKeyResponse } from "./format-api-key-response";
 import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
 import { and, eq } from "drizzle-orm";
-import { status } from "elysia";
 
 function hashApiKey(key: string): string {
 	return createHash("sha256").update(key).digest("hex");
@@ -20,10 +19,8 @@ export async function validateApiKey(
 	);
 
 	try {
-		// Hash the provided key
 		const hashedKey = hashApiKey(apiKey);
 
-		// Find API key by hash
 		const result = await db.query.apikey.findFirst({
 			where: and(
 				eq(schema.apikey.key, hashedKey),
@@ -42,13 +39,11 @@ export async function validateApiKey(
 			return null;
 		}
 
-		// Check expiration
 		if (result.expiresAt && new Date(result.expiresAt) < new Date()) {
 			logger.warn({ id: result.id }, "API key has expired");
 			return null;
 		}
 
-		// Update last request
 		const now = new Date();
 		await db
 			.update(schema.apikey)

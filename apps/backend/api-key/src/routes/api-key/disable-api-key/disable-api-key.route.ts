@@ -1,29 +1,23 @@
 import { authMiddleware } from "@reloop/api-key/middleware/auth";
 import { ApiKeyModel } from "@reloop/api-key/model/api-key.model";
-import { updateApiKeyHandler } from "@reloop/api-key/routes/api-key/controllers/update-api-key";
 import { Elysia, status, t } from "elysia";
+import { disableApiKeyHandler } from "./disable-api-key.controllers";
 
-export const updateApiKeyRoute = new Elysia().use(authMiddleware).patch(
-	"/:id",
-	async ({ params: { id }, body, user }) => {
-		if (!user.activeOrganizationId) {
+export const disableApiKeyRoute = new Elysia().use(authMiddleware).post(
+	"/:id/disable",
+	async ({ params: { id }, activeOrganizationId, userId }) => {
+		if (!activeOrganizationId) {
 			throw status(403, {
 				message: "User is not a member of an organization",
 			});
 		}
-		return await updateApiKeyHandler(
-			id,
-			user.activeOrganizationId,
-			user.id,
-			body,
-		);
+		return await disableApiKeyHandler(id, activeOrganizationId!, userId!);
 	},
 	{
 		auth: true,
 		params: t.Object({
 			id: ApiKeyModel.apiKeyIdParam,
 		}),
-		body: ApiKeyModel.updateApiKeyBody,
 		response: {
 			200: ApiKeyModel.apiKeyResponse,
 			404: ApiKeyModel.apiKeyNotFound,
@@ -31,8 +25,8 @@ export const updateApiKeyRoute = new Elysia().use(authMiddleware).patch(
 		},
 		detail: {
 			tags: ["API Keys"],
-			summary: "Update API key",
-			description: "Updates an existing API key",
+			summary: "Disable API key",
+			description: "Disables an API key without deleting it (soft revoke)",
 		},
 	},
 );
