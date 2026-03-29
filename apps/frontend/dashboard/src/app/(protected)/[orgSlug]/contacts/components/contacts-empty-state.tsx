@@ -4,10 +4,16 @@ import { Icon } from "@reloop/ui/icon";
 
 interface ContactsEmptyStateProps {
 	onAddContact?: () => void;
+	title?: string;
+	description?: string;
+	buttonText?: string;
 }
 
 export const ContactsEmptyState = ({
 	onAddContact,
+	title = "No contacts yet",
+	description = "Contacts are the people you send emails to through Reloop.",
+	buttonText = "Add Contact",
 }: ContactsEmptyStateProps) => {
 	useUserOrganization();
 
@@ -17,10 +23,10 @@ export const ContactsEmptyState = ({
 				<Icon name="users" className="h-6 w-6 text-text-sub-600" />
 			</div>
 			<h3 className="mb-1 font-semibold text-lg text-text-strong-950">
-				No contacts yet
+				{title}
 			</h3>
 			<p className="mb-6 max-w-[280px] font-normal text-sm text-text-sub-600">
-				Contacts are the people you send emails to through Reloop.
+				{description}
 			</p>
 			<Button.Root
 				variant="neutral"
@@ -29,7 +35,7 @@ export const ContactsEmptyState = ({
 				className="gap-2"
 			>
 				<Icon name="plus" className="h-4 w-4" />
-				Add Contact
+				{buttonText}
 				<span className="inline-flex items-center gap-0.5">
 					<Icon
 						name="command"

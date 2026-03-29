@@ -1,14 +1,18 @@
 "use client";
 import { PageSizeDropdown } from "@fe/dashboard/components/page-size-dropdown";
 import { PaginationControls } from "@fe/dashboard/components/pagination-controls";
+import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import * as Select from "@reloop/ui/select";
 import { parseAsInteger, useQueryState } from "nuqs";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { toast } from "sonner";
 import useSWR from "swr";
+import {
+	ContactFilterDropdown,
+	type ContactFilters,
+} from "../../../components/contact-filter-dropdown";
 import { ContactTable } from "../../../components/contact-table";
-import { EmptyState } from "./empty-state";
 
 interface Contact {
 	id: string;
@@ -42,8 +46,16 @@ export const GroupContactList = ({ groupId }: { groupId: string }) => {
 		parseAsInteger.withDefault(10),
 	);
 	const [, setModal] = useQueryState("modal");
-	const [statusFilter, setStatusFilter] = useState<string>("all");
+	const [filters, setFilters] = useState<ContactFilters>([]);
 	const [searchQuery, setSearchQuery] = useState<string>("");
+
+	// Convert filters array to status filter string for client-side filtering logic
+	const statusFilter = useMemo(() => {
+		if (filters.length === 0 || filters.length === 2) return "all";
+		if (filters.includes("subscribed")) return "subscribed";
+		if (filters.includes("unsubscribed")) return "unsubscribed";
+		return "all";
+	}, [filters]);
 
 	const buildUrl = () => {
 		if (!groupId) return null;
@@ -70,6 +82,47 @@ export const GroupContactList = ({ groupId }: { groupId: string }) => {
 	const startIndex = (currentPage - 1) * pageSize + 1;
 	const endIndex = Math.min(currentPage * pageSize, data?.total || 0);
 
+	const handleDownloadCSV = async () => {
+		try {
+			// Fetch all contacts for export
+			const response = await fetch(
+				`/api/contacts/v1/groups/${groupId}/contacts?limit=10000`,
+			);
+			const allData = (await response.json()) as GroupContactsResponse;
+
+			if (!allData.group?.contacts || allData.group.contacts.length === 0) {
+				toast.error("No contacts to export");
+				return;
+			}
+
+			// Create CSV content
+			const headers = ["Email", "Status", "Created At"];
+			const csvRows = allData.group.contacts.map((contact) => [
+				contact.email,
+				contact.status,
+				new Date(contact.createdAt).toISOString(),
+			]);
+
+			const csvContent = [
+				headers.join(","),
+				...csvRows.map((row) => row.map((cell) => `"${cell}"`).join(",")),
+			].join("\n");
+
+			// Download file
+			const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+			const link = document.createElement("a");
+			link.href = URL.createObjectURL(blob);
+			link.download = `group_contacts_${new Date().toISOString().split("T")[0]}.csv`;
+			link.click();
+			URL.revokeObjectURL(link.href);
+
+			toast.success("Contacts exported successfully");
+		} catch (error) {
+			console.error("Failed to download CSV:", error);
+			toast.error("Failed to export contacts");
+		}
+	};
+
 	if (error) {
 		return (
 			<div className="flex flex-col items-center justify-center gap-2 p-4">
@@ -82,83 +135,46 @@ export const GroupContactList = ({ groupId }: { groupId: string }) => {
 	}
 
 	return (
-		<div className="mt-12">
-		
-
-			{data?.group?.contacts &&
-			data.group.contacts.length === 0 &&
-			!isLoading ? (
-				<div className="pt-8">
-					<EmptyState onAddContact={() => setModal("add-contact-to-group")} />
+		<div >
+			<div className="mb-4 flex items-center gap-3">
+				<div className="flex-1">
+					<Input.Root size="xsmall">
+						<Input.Wrapper>
+							<Input.Icon as={Icon} name="search" size="xsmall" />
+							<Input.Input
+								placeholder="Search by email"
+								value={searchQuery}
+								onChange={(e) => {
+									setSearchQuery(e.target.value);
+									setCurrentPage(1);
+								}}
+							/>
+						</Input.Wrapper>
+					</Input.Root>
 				</div>
-			) : (
-				<>
-					<div className="mb-6 flex items-center justify-between gap-3">
-						<div className="flex w-full items-center gap-3">
-							<div className="flex-1">
-								<Input.Root size="small" className="rounded-xl">
-									<Input.Wrapper>
-										<Input.Icon
-											as={() => <Icon name="search" className="h-4 w-4" />}
-										/>
-										<Input.Input
-											type="text"
-											placeholder="Search contacts..."
-											value={searchQuery}
-											onChange={(e) => setSearchQuery(e.target.value)}
-										/>
-									</Input.Wrapper>
-								</Input.Root>
-							</div>
-							<div className="w-48">
-								<Select.Root
-									size="small"
-									value={statusFilter}
-									onValueChange={setStatusFilter}
-									disabled={isLoading}
-								>
-									<Select.Trigger className="rounded-xl">
-										<Select.Value placeholder="Status" />
-									</Select.Trigger>
-									<Select.Content className="w-48">
-										<Select.Item value="all">
-											<div className="flex items-center gap-2 text-sm">
-												<Icon name="users" className="h-4 w-4" />
-												All Status
-											</div>
-										</Select.Item>
-										<Select.Item value="subscribed">
-											<div className="flex items-center gap-2 text-sm">
-												<Icon
-													name="bell-plus"
-													className="h-4 w-4 text-success-base"
-												/>
-												Subscribed
-											</div>
-										</Select.Item>
-										<Select.Item value="unsubscribed">
-											<div className="flex items-center gap-2 text-sm">
-												<Icon
-													name="bell-minus"
-													className="h-4 w-4 text-text-sub-600"
-												/>
-												Unsubscribed
-											</div>
-										</Select.Item>
-									</Select.Content>
-								</Select.Root>
-							</div>
-						</div>
-					</div>
 
-					<ContactTable
-						contacts={filteredContacts}
-						isLoading={isLoading}
-						loadingRows={5}
-						onAddContact={() => setModal("add-contact-to-group")}
-					/>
-				</>
-			)}
+				<ContactFilterDropdown value={filters} onChange={setFilters} />
+				<Button.Root
+					variant="neutral"
+					mode="stroke"
+					size="xsmall"
+					onClick={handleDownloadCSV}
+					disabled={!data?.group?.contacts || data.group.contacts.length === 0}
+					title="Export CSV"
+				>
+					<Icon name="file-download" className="h-4 w-4" />
+				</Button.Root>
+			</div>
+
+			<ContactTable
+				contacts={filteredContacts}
+				isLoading={isLoading}
+				loadingRows={5}
+				onAddContact={() => setModal("add-contact-to-group")}
+				emptyStateTitle="No contacts yet"
+				emptyStateDescription="Add contacts to this group to organize and start managing them."
+				emptyStateButtonText="Add First Contact"
+			/>
 
 			{/* Pagination */}
 			{data && data.total > 0 && (

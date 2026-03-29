@@ -4,6 +4,7 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
+import { ContactsEmptyState } from "../../../components/contacts-empty-state";
 
 interface Subscription {
 	id: string;
@@ -21,7 +22,11 @@ interface ContactTableProps {
 	isLoading: boolean;
 	loadingRows: number;
 	onUnsubscribe: (contactId: string) => void;
+	onAddContact?: () => void;
 	activeOrganizationSlug: string;
+	emptyStateTitle?: string;
+	emptyStateDescription?: string;
+	emptyStateButtonText?: string;
 }
 
 const getStatusBadgeStyles = (status: string) => {
@@ -65,7 +70,11 @@ export const ContactTable = ({
 	isLoading,
 	loadingRows,
 	onUnsubscribe,
+	onAddContact,
 	activeOrganizationSlug,
+	emptyStateTitle,
+	emptyStateDescription,
+	emptyStateButtonText,
 }: ContactTableProps) => {
 	if (isLoading) {
 		return (
@@ -117,10 +126,12 @@ export const ContactTable = ({
 
 			<div className="divide-y divide-stroke-soft-100">
 				{subscriptions.length === 0 && !isLoading ? (
-					<div className="flex flex-col items-center justify-center px-4 py-8 text-center text-text-sub-600">
-						<Icon name="search" className="mb-2 h-6 w-6" />
-						<p className="text-sm">No matching contacts found.</p>
-					</div>
+					<ContactsEmptyState
+						onAddContact={onAddContact}
+						title={emptyStateTitle}
+						description={emptyStateDescription}
+						buttonText={emptyStateButtonText}
+					/>
 				) : (
 					subscriptions.map((subscription) => (
 						<div

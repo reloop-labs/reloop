@@ -5,6 +5,7 @@ import * as Input from "@reloop/ui/input";
 import * as Kbd from "@reloop/ui/kbd";
 import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
+import Spinner from "@reloop/ui/spinner";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
@@ -70,25 +71,22 @@ export const EditGroupModal = ({
 	return (
 		<Modal.Root open={open} onOpenChange={onOpenChange}>
 			<Modal.Content
-				className="rounded-2xl border border-stroke-soft-100/50 p-0.5 sm:max-w-[425px]"
+				className="rounded-2xl border border-stroke-soft-100/50 p-0.5 sm:max-w-[480px]"
 				showClose={true}
 			>
 				<div className="rounded-2xl border border-stroke-soft-100/50">
 					<Modal.Header className="before:border-stroke-soft-200/50">
+						<div className="flex items-center justify-center">
+							<Icon name="edit-2" className="h-4 w-4" />
+						</div>
 						<div className="flex-1">
 							<Modal.Title>Edit Group</Modal.Title>
-							<Modal.Description>
-								Update the name of your group.
-							</Modal.Description>
 						</div>
 					</Modal.Header>
 					<form onSubmit={handleSubmit} className="flex flex-col">
 						<Modal.Body className="relative space-y-4">
-							<div className="relative flex flex-col gap-1.5">
-								<Label.Root htmlFor="edit-name">
-									Group Name
-									<span className="text-primary-base">*</span>
-								</Label.Root>
+							<div className="flex flex-col gap-1">
+								<Label.Root htmlFor="edit-name">Group Name</Label.Root>
 								<Input.Root size="small">
 									<Input.Wrapper>
 										<Input.Input
@@ -116,14 +114,26 @@ export const EditGroupModal = ({
 							</Button.Root>
 							<Button.Root
 								type="submit"
+								variant="neutral"
+								size="xsmall"
 								disabled={isSubmitting || !name.trim() || name === group?.name}
 							>
 								{isSubmitting ? (
-									<Icon name="loader" className="mr-2 h-4 w-4 animate-spin" />
+									<>
+										<Spinner size={14} color="currentColor" />
+										Updating...
+									</>
 								) : (
-									<Icon name="check" className="mr-2 h-4 w-4" />
+									<>
+										Update
+										<span className="inline-flex items-center gap-0.5">
+											<Icon
+												name="enter"
+												className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+											/>
+										</span>
+									</>
 								)}
-								Save Changes
 							</Button.Root>
 						</Modal.Footer>
 					</form>

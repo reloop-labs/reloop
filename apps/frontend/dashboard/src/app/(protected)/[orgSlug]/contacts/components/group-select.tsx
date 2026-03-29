@@ -139,6 +139,9 @@ export const GroupSelect = ({
 					</div>
 				)}
 			</div>
+			<p className="text-paragraph-xs text-text-soft-400">
+				You can create new groups from the Groups tab.
+			</p>
 		</div>
 	);
 };

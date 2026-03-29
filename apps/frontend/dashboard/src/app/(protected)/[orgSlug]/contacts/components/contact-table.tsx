@@ -28,6 +28,9 @@ interface ContactTableProps {
 	isLoading?: boolean;
 	loadingRows?: number;
 	onAddContact?: () => void;
+	emptyStateTitle?: string;
+	emptyStateDescription?: string;
+	emptyStateButtonText?: string;
 }
 
 const getStatusBadgeStyles = (status: string) => {
@@ -71,6 +74,9 @@ export const ContactTable = ({
 	isLoading,
 	loadingRows = 6,
 	onAddContact,
+	emptyStateTitle,
+	emptyStateDescription,
+	emptyStateButtonText,
 }: ContactTableProps) => {
 	const router = useRouter();
 	const { activeOrganization } = useUserOrganization();
@@ -145,7 +151,12 @@ export const ContactTable = ({
 				{/* Rows */}
 				<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
 					{contacts.length === 0 && !isLoading ? (
-						<ContactsEmptyState onAddContact={onAddContact} />
+						<ContactsEmptyState
+							onAddContact={onAddContact}
+							title={emptyStateTitle}
+							description={emptyStateDescription}
+							buttonText={emptyStateButtonText}
+						/>
 					) : (
 						contacts.map((contact) => {
 							const isRowActive = activeDropdownId === contact.id;

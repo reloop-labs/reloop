@@ -13,10 +13,13 @@ import {
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useParams } from "next/navigation";
 import { useQueryState } from "nuqs";
-import { useRef, useState } from "react";
+import { useRef, useState, useMemo } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
-import { EmptyState } from "./components/empty-state";
+import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
+import * as Input from "@reloop/ui/input";
+import { ContactFilterDropdown, type ContactFilters } from "../../components/contact-filter-dropdown";
+import { ContactTable } from "./components/contact-table";
 
 interface TopicData {
 	id: string;
@@ -86,12 +89,22 @@ const topicMenuItems = [
 ];
 
 export const TopicDetailContent = () => {
+	const { activeOrganization } = useUserOrganization();
 	const { topicId } = useParams();
 	const [, setModal] = useQueryState("modal");
 	const [, setId] = useQueryState("id");
 	const [copied, setCopied] = useState(false);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
+	const [filters, setFilters] = useState<ContactFilters>([]);
+	const [searchQuery, setSearchQuery] = useState<string>("");
+
+	const statusFilter = useMemo(() => {
+		if (filters.length === 0 || filters.length === 2) return "all";
+		if (filters.includes("subscribed")) return "subscribed";
+		if (filters.includes("unsubscribed")) return "unsubscribed";
+		return "all";
+	}, [filters]);
 
 	const {
 		data: topicData,
@@ -137,6 +150,56 @@ export const TopicDetailContent = () => {
 	};
 
 	const isLoading = topicLoading || subscriptionLoading;
+
+	const handleUnsubscribe = async (contactId: string) => {
+		toast.error("Not implemented");
+	};
+
+	const handleDownloadCSV = async () => {
+		try {
+			if (
+				!subscriptionData?.subscriptions ||
+				subscriptionData.subscriptions.length === 0
+			) {
+				toast.error("No contacts to export");
+				return;
+			}
+
+			const headers = ["Contact ID", "Status", "Subscribed At"];
+			const csvRows = subscriptionData.subscriptions.map((sub) => [
+				sub.contactId,
+				sub.status,
+				new Date(sub.createdAt).toISOString(),
+			]);
+
+			const csvContent = [
+				headers.join(","),
+				...csvRows.map((row) => row.map((cell) => `"${cell}"`).join(",")),
+			].join("\n");
+
+			const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+			const link = document.createElement("a");
+			link.href = URL.createObjectURL(blob);
+			link.download = `topic_contacts_${new Date().toISOString().split("T")[0]}.csv`;
+			link.click();
+			URL.revokeObjectURL(link.href);
+
+			toast.success("Contacts exported successfully");
+		} catch (error) {
+			console.error("Failed to download CSV:", error);
+			toast.error("Failed to export contacts");
+		}
+	};
+
+	const filteredSubscriptions =
+		subscriptionData?.subscriptions?.filter((sub) => {
+			const matchesStatus =
+				statusFilter === "all" || sub.status === statusFilter;
+			const matchesSearch =
+				searchQuery === "" ||
+				sub.contactId.toLowerCase().includes(searchQuery.toLowerCase());
+			return matchesStatus && matchesSearch;
+		}) || [];
 
 	if (topicError) {
 		return (
@@ -445,12 +508,46 @@ export const TopicDetailContent = () => {
 				</div>
 			</div>
 
-			{!subscriptionLoading &&
-				(!subscriptionData || (subscriptionData.total || 0) === 0) && (
-					<div className="mt-12 pt-8">
-						<EmptyState onAddContact={() => setModal("add-contact-to-topic")} />
+			<div className="mt-12">
+				<div className="mb-4 flex items-center gap-3">
+					<div className="flex-1">
+						<Input.Root size="xsmall">
+							<Input.Wrapper>
+								<Input.Icon as={Icon} name="search" size="xsmall" />
+								<Input.Input
+									placeholder="Search by contact ID"
+									value={searchQuery}
+									onChange={(e) => setSearchQuery(e.target.value)}
+								/>
+							</Input.Wrapper>
+						</Input.Root>
 					</div>
-				)}
+
+					<ContactFilterDropdown value={filters} onChange={setFilters} />
+					<Button.Root
+						variant="neutral"
+						mode="stroke"
+						size="xsmall"
+						onClick={handleDownloadCSV}
+						disabled={!subscriptionData?.subscriptions || subscriptionData.subscriptions.length === 0}
+						title="Export CSV"
+					>
+						<Icon name="file-download" className="h-4 w-4" />
+					</Button.Root>
+				</div>
+
+				<ContactTable
+					subscriptions={filteredSubscriptions}
+					isLoading={subscriptionLoading}
+					loadingRows={5}
+					onUnsubscribe={handleUnsubscribe}
+					onAddContact={() => setModal("add-contact-to-topic")}
+					activeOrganizationSlug={activeOrganization?.slug || ""}
+					emptyStateTitle="No contacts yet"
+					emptyStateDescription="Add contacts to this topic to organize and start managing them."
+					emptyStateButtonText="Add First Contact"
+				/>
+			</div>
 		</div>
 	);
 };
