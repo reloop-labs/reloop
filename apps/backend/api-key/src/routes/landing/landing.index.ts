@@ -72,13 +72,13 @@ ${redisError ? `║ REDIS ERROR: ${redisError.substring(0, 50).padEnd(50)} ║` 
 		{
 			detail: {
 				tags: ["Service"],
-				summary: "Health check for API Key Service",
+				summary: "API Key Service",
 				description: "Checks the health of the API Key Service",
 			},
 		},
 	)
 	.get(
-		"/status",
+		"/health",
 		async () => {
 			try {
 				const startTime = Date.now();
@@ -104,8 +104,8 @@ ${redisError ? `║ REDIS ERROR: ${redisError.substring(0, 50).padEnd(50)} ║` 
 		{
 			detail: {
 				tags: ["Service"],
-				summary: "Status",
-				description: "Checks the status of the API Key Service",
+				summary: "Health",
+				description: "Checks the health of the API Key Service",
 			},
 		},
 	)

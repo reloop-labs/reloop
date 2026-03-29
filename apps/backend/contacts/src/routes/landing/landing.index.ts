@@ -76,16 +76,10 @@ export const landing = new Elysia()
 
 `;
 		},
-		{
-			detail: {
-				tags: ["Service"],
-				summary: "Health check for API Key Service",
-				description: "Checks the health of the API Key Service",
-			},
-		},
+		{ detail: { hide: true } },
 	)
 	.get(
-		"/status",
+		"/health",
 		async () => {
 			try {
 				const startTime = Date.now();
@@ -108,11 +102,5 @@ export const landing = new Elysia()
 				};
 			}
 		},
-		{
-			detail: {
-				tags: ["Service"],
-				summary: "Status",
-				description: "Checks the status of Contact Service",
-			},
-		},
+		{ detail: { hide: true } },
 	);
