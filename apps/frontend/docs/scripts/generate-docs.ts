@@ -36,6 +36,5 @@ for (const [name, openapi] of Object.entries(services)) {
     input: openapi,
     output: outputDir,
     includeDescription: true,
-    groupBy: "tag",
   });
 }
