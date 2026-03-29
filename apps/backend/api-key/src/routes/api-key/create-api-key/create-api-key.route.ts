@@ -2,6 +2,7 @@ import { authMiddleware } from "@reloop/api-key/middleware/auth";
 import { ApiKeyModel } from "@reloop/api-key/model/api-key.model";
 import { Elysia } from "elysia";
 import { createApiKeyHandler } from "./create-api-key.controllers";
+import { createApiKeyXCodeSamples } from "./create-api-key.x-codeSamples";
 
 export const createApiKeyRoute = new Elysia().use(authMiddleware).post(
 	"/",
@@ -19,6 +20,7 @@ export const createApiKeyRoute = new Elysia().use(authMiddleware).post(
 			tags: ["API Keys"],
 			summary: "Create a new API key",
 			description: "Creates a new API key for the user's organization",
+			"x-codeSamples": createApiKeyXCodeSamples,
 		},
 	},
 );

@@ -1,0 +1,124 @@
+export const createApiKeyXCodeSamples = [
+	{
+		id: "node",
+		lang: "js",
+		label: "Node.js",
+		source: `const response = await fetch("https://api.reloop.sh/api-key/v1/", {
+  method: "POST",
+  headers: {
+    "Authorization": "Bearer rl_123456789",
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    name: "Production key",
+    enabled: true,
+    rateLimitEnabled: true
+  })
+});
+
+const apiKey = await response.json();`,
+	},
+	{
+		id: "curl",
+		lang: "bash",
+		label: "cURL",
+		source: `curl -X POST https://api.reloop.sh/api-key/v1/ \\
+  -H "Authorization: Bearer rl_123456789" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "name": "Production key",
+    "enabled": true,
+    "rateLimitEnabled": true
+  }'`,
+	},
+	{
+		id: "python",
+		lang: "python",
+		label: "Python",
+		source: `import requests
+
+response = requests.post(
+    "https://api.reloop.sh/api-key/v1/",
+    headers={
+        "Authorization": "Bearer rl_123456789",
+        "Content-Type": "application/json",
+    },
+    json={
+        "name": "Production key",
+        "enabled": True,
+        "rateLimitEnabled": True,
+    },
+)
+
+api_key = response.json()`,
+	},
+	{
+		id: "php",
+		lang: "php",
+		label: "PHP",
+		source: `<?php
+$client = new \\GuzzleHttp\\Client();
+
+$response = $client->post('https://api.reloop.sh/api-key/v1/', [
+    'headers' => [
+        'Authorization' => 'Bearer rl_123456789',
+        'Content-Type'  => 'application/json',
+    ],
+    'json' => [
+        'name' => 'Production key',
+        'enabled' => true,
+        'rateLimitEnabled' => true,
+    ],
+]);
+
+$apiKey = json_decode($response->getBody(), true);`,
+	},
+	{
+		id: "java",
+		lang: "java",
+		label: "Java",
+		source: `import java.net.URI;
+import java.net.http.*;
+import java.net.http.HttpRequest.BodyPublishers;
+
+HttpClient client = HttpClient.newHttpClient();
+
+String body = """
+    {
+      "name": "Production key",
+      "enabled": true,
+      "rateLimitEnabled": true
+    }
+    """;
+
+HttpRequest request = HttpRequest.newBuilder()
+    .uri(URI.create("https://api.reloop.sh/api-key/v1/"))
+    .header("Authorization", "Bearer rl_123456789")
+    .header("Content-Type", "application/json")
+    .POST(BodyPublishers.ofString(body))
+    .build();
+
+HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());`,
+	},
+	{
+		id: "dotnet",
+		lang: "csharp",
+		label: ".NET",
+		source: `using System.Net.Http;
+using System.Net.Http.Json;
+
+var client = new HttpClient();
+client.DefaultRequestHeaders.Add("Authorization", "Bearer rl_123456789");
+
+var payload = new {
+    name = "Production key",
+    enabled = true,
+    rateLimitEnabled = true
+};
+
+var response = await client.PostAsJsonAsync(
+    "https://api.reloop.sh/api-key/v1/",
+    payload
+);`,
+	},
+];

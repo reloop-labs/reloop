@@ -1,5 +1,4 @@
 import { createHash, randomBytes } from "node:crypto";
-import { formatApiKeyWithKeyResponse } from "../utils/format-api-key-response";
 import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
@@ -70,18 +69,30 @@ export async function rotateApiKey(
 
 		logger.info({ id, organizationId, userId }, "API key rotated successfully");
 
-		return formatApiKeyWithKeyResponse(
-			{
-				...updatedKey,
-				createdBy: {
-					id: existingKey.user.id,
-					name: existingKey.user.name,
-					image: existingKey.user.image,
-					email: existingKey.user.email,
-				},
-			},
-			fullKey,
-		);
+		return {
+			id: updatedKey.id,
+			name: updatedKey.name,
+			key: fullKey,
+			start: updatedKey.start,
+			prefix: updatedKey.prefix,
+			organizationId: updatedKey.organizationId,
+			userId: updatedKey.userId,
+			refillInterval: updatedKey.refillInterval,
+			refillAmount: updatedKey.refillAmount,
+			lastRefillAt: updatedKey.lastRefillAt?.toISOString() ?? null,
+			enabled: updatedKey.enabled,
+			rateLimitEnabled: updatedKey.rateLimitEnabled,
+			rateLimitTimeWindow: updatedKey.rateLimitTimeWindow,
+			rateLimitMax: updatedKey.rateLimitMax,
+			requestCount: updatedKey.requestCount,
+			remaining: updatedKey.remaining,
+			lastRequest: updatedKey.lastRequest?.toISOString() ?? null,
+			expiresAt: updatedKey.expiresAt?.toISOString() ?? null,
+			createdAt: updatedKey.createdAt.toISOString(),
+			updatedAt: updatedKey.updatedAt.toISOString(),
+			permissions: updatedKey.permissions,
+			metadata: updatedKey.metadata,
+		};
 	} catch (error) {
 		logger.error(
 			{

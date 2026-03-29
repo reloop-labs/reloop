@@ -2,6 +2,7 @@ import { authMiddleware } from "@reloop/api-key/middleware/auth";
 import { ApiKeyModel } from "@reloop/api-key/model/api-key.model";
 import { Elysia, status, t } from "elysia";
 import { getApiKeyHandler } from "./get-api-key.controllers";
+import { getApiKeyXCodeSamples } from "./get-api-key.x-codeSamples";
 
 export const getApiKeyRoute = new Elysia().use(authMiddleware).get(
 	"/:id",
@@ -27,6 +28,7 @@ export const getApiKeyRoute = new Elysia().use(authMiddleware).get(
 			tags: ["API Keys"],
 			summary: "Get API key by ID",
 			description: "Retrieves an API key by its ID",
+			"x-codeSamples": getApiKeyXCodeSamples,
 		},
 	},
 );

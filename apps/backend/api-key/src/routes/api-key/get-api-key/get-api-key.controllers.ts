@@ -1,4 +1,3 @@
-import { formatApiKeyResponse } from "../utils/format-api-key-response";
 import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
@@ -28,15 +27,35 @@ export async function getApiKey(
 
 		const { user, ...apiKeyData } = result;
 		logger.info({ apiKeyId }, "API key retrieved successfully");
-		return formatApiKeyResponse({
-			...apiKeyData,
+		return {
+			id: apiKeyData.id,
+			name: apiKeyData.name,
+			start: apiKeyData.start,
+			prefix: apiKeyData.prefix,
+			organizationId: apiKeyData.organizationId,
+			userId: apiKeyData.userId,
+			refillInterval: apiKeyData.refillInterval,
+			refillAmount: apiKeyData.refillAmount,
+			lastRefillAt: apiKeyData.lastRefillAt?.toISOString() ?? null,
+			enabled: apiKeyData.enabled,
+			rateLimitEnabled: apiKeyData.rateLimitEnabled,
+			rateLimitTimeWindow: apiKeyData.rateLimitTimeWindow,
+			rateLimitMax: apiKeyData.rateLimitMax,
+			requestCount: apiKeyData.requestCount,
+			remaining: apiKeyData.remaining,
+			lastRequest: apiKeyData.lastRequest?.toISOString() ?? null,
+			expiresAt: apiKeyData.expiresAt?.toISOString() ?? null,
+			createdAt: apiKeyData.createdAt.toISOString(),
+			updatedAt: apiKeyData.updatedAt.toISOString(),
+			permissions: apiKeyData.permissions,
+			metadata: apiKeyData.metadata,
 			createdBy: {
 				id: user.id,
 				name: user.name,
 				image: user.image,
 				email: user.email,
 			},
-		});
+		};
 	} catch (error) {
 		logger.error(
 			{

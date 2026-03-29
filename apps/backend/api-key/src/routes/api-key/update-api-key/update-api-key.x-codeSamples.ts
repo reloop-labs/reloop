@@ -1,0 +1,118 @@
+export const updateApiKeyXCodeSamples = [
+	{
+		id: "node",
+		lang: "js",
+		label: "Node.js",
+		source: `const response = await fetch("https://api.reloop.sh/api-key/v1/key_123456789", {
+  method: "PATCH",
+  headers: {
+    "Authorization": "Bearer rl_123456789",
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    name: "Updated production key",
+    enabled: true
+  })
+});
+
+const apiKey = await response.json();`,
+	},
+	{
+		id: "curl",
+		lang: "bash",
+		label: "cURL",
+		source: `curl -X PATCH https://api.reloop.sh/api-key/v1/key_123456789 \\
+  -H "Authorization: Bearer rl_123456789" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "name": "Updated production key",
+    "enabled": true
+  }'`,
+	},
+	{
+		id: "python",
+		lang: "python",
+		label: "Python",
+		source: `import requests
+
+response = requests.patch(
+    "https://api.reloop.sh/api-key/v1/key_123456789",
+    headers={
+        "Authorization": "Bearer rl_123456789",
+        "Content-Type": "application/json",
+    },
+    json={
+        "name": "Updated production key",
+        "enabled": True,
+    },
+)
+
+api_key = response.json()`,
+	},
+	{
+		id: "php",
+		lang: "php",
+		label: "PHP",
+		source: `<?php
+$client = new \\GuzzleHttp\\Client();
+
+$response = $client->patch('https://api.reloop.sh/api-key/v1/key_123456789', [
+    'headers' => [
+        'Authorization' => 'Bearer rl_123456789',
+        'Content-Type'  => 'application/json',
+    ],
+    'json' => [
+        'name' => 'Updated production key',
+        'enabled' => true,
+    ],
+]);
+
+$apiKey = json_decode($response->getBody(), true);`,
+	},
+	{
+		id: "java",
+		lang: "java",
+		label: "Java",
+		source: `import java.net.URI;
+import java.net.http.*;
+import java.net.http.HttpRequest.BodyPublishers;
+
+HttpClient client = HttpClient.newHttpClient();
+
+String body = """
+    {
+      "name": "Updated production key",
+      "enabled": true
+    }
+    """;
+
+HttpRequest request = HttpRequest.newBuilder()
+    .uri(URI.create("https://api.reloop.sh/api-key/v1/key_123456789"))
+    .header("Authorization", "Bearer rl_123456789")
+    .header("Content-Type", "application/json")
+    .method("PATCH", BodyPublishers.ofString(body))
+    .build();
+
+HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());`,
+	},
+	{
+		id: "dotnet",
+		lang: "csharp",
+		label: ".NET",
+		source: `using System.Net.Http;
+using System.Net.Http.Json;
+
+var client = new HttpClient();
+client.DefaultRequestHeaders.Add("Authorization", "Bearer rl_123456789");
+
+var payload = new {
+    name = "Updated production key",
+    enabled = true
+};
+
+var response = await client.PatchAsJsonAsync(
+    "https://api.reloop.sh/api-key/v1/key_123456789",
+    payload
+);`,
+	},
+];

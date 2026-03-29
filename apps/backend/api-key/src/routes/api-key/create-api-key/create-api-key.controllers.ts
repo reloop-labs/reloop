@@ -1,6 +1,5 @@
 import { createHash, randomBytes } from "node:crypto";
 import { createId } from "@paralleldrive/cuid2";
-import { formatApiKeyWithKeyResponse } from "../utils/format-api-key-response";
 import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
@@ -103,18 +102,30 @@ export async function createApiKey(
 
 		logger.info("newApiKey", newApiKey);
 
-		return formatApiKeyWithKeyResponse(
-			{
-				...newApiKey[0],
-				createdBy: {
-					id: user.id,
-					name: user.name,
-					image: user.image,
-					email: user.email,
-				},
-			},
-			fullKey,
-		);
+		return {
+			id: newApiKey[0].id,
+			name: newApiKey[0].name,
+			key: fullKey,
+			start: newApiKey[0].start,
+			prefix: newApiKey[0].prefix,
+			organizationId: newApiKey[0].organizationId,
+			userId: newApiKey[0].userId,
+			refillInterval: newApiKey[0].refillInterval,
+			refillAmount: newApiKey[0].refillAmount,
+			lastRefillAt: newApiKey[0].lastRefillAt?.toISOString() ?? null,
+			enabled: newApiKey[0].enabled,
+			rateLimitEnabled: newApiKey[0].rateLimitEnabled,
+			rateLimitTimeWindow: newApiKey[0].rateLimitTimeWindow,
+			rateLimitMax: newApiKey[0].rateLimitMax,
+			requestCount: newApiKey[0].requestCount,
+			remaining: newApiKey[0].remaining,
+			lastRequest: newApiKey[0].lastRequest?.toISOString() ?? null,
+			expiresAt: newApiKey[0].expiresAt?.toISOString() ?? null,
+			createdAt: newApiKey[0].createdAt.toISOString(),
+			updatedAt: newApiKey[0].updatedAt.toISOString(),
+			permissions: newApiKey[0].permissions,
+			metadata: newApiKey[0].metadata,
+		};
 	} catch (error) {
 		logger.error(
 			{

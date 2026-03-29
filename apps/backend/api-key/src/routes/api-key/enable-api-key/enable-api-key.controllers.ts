@@ -1,4 +1,3 @@
-import { formatApiKeyResponse } from "../utils/format-api-key-response";
 import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
@@ -29,15 +28,35 @@ export async function enableApiKey(
 
 		if (existingKey.enabled) {
 			logger.info({ id }, "API key is already enabled");
-			return formatApiKeyResponse({
-				...existingKey,
+			return {
+				id: existingKey.id,
+				name: existingKey.name,
+				start: existingKey.start,
+				prefix: existingKey.prefix,
+				organizationId: existingKey.organizationId,
+				userId: existingKey.userId,
+				refillInterval: existingKey.refillInterval,
+				refillAmount: existingKey.refillAmount,
+				lastRefillAt: existingKey.lastRefillAt?.toISOString() ?? null,
+				enabled: existingKey.enabled,
+				rateLimitEnabled: existingKey.rateLimitEnabled,
+				rateLimitTimeWindow: existingKey.rateLimitTimeWindow,
+				rateLimitMax: existingKey.rateLimitMax,
+				requestCount: existingKey.requestCount,
+				remaining: existingKey.remaining,
+				lastRequest: existingKey.lastRequest?.toISOString() ?? null,
+				expiresAt: existingKey.expiresAt?.toISOString() ?? null,
+				createdAt: existingKey.createdAt.toISOString(),
+				updatedAt: existingKey.updatedAt.toISOString(),
+				permissions: existingKey.permissions,
+				metadata: existingKey.metadata,
 				createdBy: {
 					id: existingKey.user.id,
 					name: existingKey.user.name,
 					image: existingKey.user.image,
 					email: existingKey.user.email,
 				},
-			});
+			};
 		}
 
 		const now = new Date();
@@ -58,15 +77,35 @@ export async function enableApiKey(
 
 		logger.info({ id, organizationId, userId }, "API key enabled successfully");
 
-		return formatApiKeyResponse({
-			...updatedKey,
+		return {
+			id: updatedKey.id,
+			name: updatedKey.name,
+			start: updatedKey.start,
+			prefix: updatedKey.prefix,
+			organizationId: updatedKey.organizationId,
+			userId: updatedKey.userId,
+			refillInterval: updatedKey.refillInterval,
+			refillAmount: updatedKey.refillAmount,
+			lastRefillAt: updatedKey.lastRefillAt?.toISOString() ?? null,
+			enabled: updatedKey.enabled,
+			rateLimitEnabled: updatedKey.rateLimitEnabled,
+			rateLimitTimeWindow: updatedKey.rateLimitTimeWindow,
+			rateLimitMax: updatedKey.rateLimitMax,
+			requestCount: updatedKey.requestCount,
+			remaining: updatedKey.remaining,
+			lastRequest: updatedKey.lastRequest?.toISOString() ?? null,
+			expiresAt: updatedKey.expiresAt?.toISOString() ?? null,
+			createdAt: updatedKey.createdAt.toISOString(),
+			updatedAt: updatedKey.updatedAt.toISOString(),
+			permissions: updatedKey.permissions,
+			metadata: updatedKey.metadata,
 			createdBy: {
 				id: existingKey.user.id,
 				name: existingKey.user.name,
 				image: existingKey.user.image,
 				email: existingKey.user.email,
 			},
-		});
+		};
 	} catch (error) {
 		logger.error(
 			{

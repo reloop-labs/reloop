@@ -2,6 +2,7 @@ import { authMiddleware } from "@reloop/api-key/middleware/auth";
 import { ApiKeyModel } from "@reloop/api-key/model/api-key.model";
 import { Elysia, status, t } from "elysia";
 import { updateApiKeyHandler } from "./update-api-key.controllers";
+import { updateApiKeyXCodeSamples } from "./update-api-key.x-codeSamples";
 
 export const updateApiKeyRoute = new Elysia().use(authMiddleware).patch(
 	"/:id",
@@ -33,6 +34,7 @@ export const updateApiKeyRoute = new Elysia().use(authMiddleware).patch(
 			tags: ["API Keys"],
 			summary: "Update API key",
 			description: "Updates an existing API key",
+			"x-codeSamples": updateApiKeyXCodeSamples,
 		},
 	},
 );
