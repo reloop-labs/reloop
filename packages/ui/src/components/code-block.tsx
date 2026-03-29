@@ -4,17 +4,20 @@
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { codeToHtml } from "shiki";
+import { cn } from "@reloop/ui/cn";
 
 interface Props {
 	code: string;
 	lang?: string;
 	theme?: string;
+	className?: string;
 }
 
 export const CodeBlock = ({
 	code,
 	lang = "javascript",
 	theme: themeOverride,
+	className,
 }: Props) => {
 	const { theme: currentTheme, systemTheme, resolvedTheme } = useTheme();
 	const [html, setHtml] = useState<string>("");
@@ -84,7 +87,7 @@ export const CodeBlock = ({
 			`}</style>
 			<div
 				dangerouslySetInnerHTML={{ __html: html }}
-				className="[&>pre]:!bg-transparent text-sm leading-6 [&>pre]:p-4"
+				className={cn("[&>pre]:!bg-transparent text-sm leading-6 [&>pre]:p-4", className)}
 			/>
 		</>
 	);

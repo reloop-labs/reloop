@@ -4,11 +4,13 @@ import { cn } from "@reloop/ui/cn";
 import { CodeBlock } from "@reloop/ui/code-block";
 import * as Drawer from "@reloop/ui/drawer";
 import { Icon } from "@reloop/ui/icon";
-import * as Kbd from "@reloop/ui/kbd";
 import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
+import * as Table from "@reloop/ui/table";
+import * as Kbd from "@reloop/ui/kbd";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { useCallback, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
+import { toast } from "sonner";
 
 const codeExamples = {
 	javascript: {
@@ -255,6 +257,8 @@ export const ContactsApiDetails = (props: ButtonProps) => {
 	const [selectedLanguage, setSelectedLanguage] =
 		useState<Language>("javascript");
 	const [copied, setCopied] = useState(false);
+	const [copiedEndpoint, setCopiedEndpoint] = useState<string | null>(null);
+	const [baseCopied, setBaseCopied] = useState(false);
 
 	useHotkeys("a", (e) => {
 		e.preventDefault();
@@ -281,13 +285,19 @@ export const ContactsApiDetails = (props: ButtonProps) => {
 			);
 			setCopied(true);
 			setTimeout(() => setCopied(false), 2000);
-		} catch {}
+		} catch {
+			toast.error("Failed to copy code snippet");
+		}
 	}, [selectedLanguage, selectedOperation]);
 
 	const copyBaseUrl = useCallback(async () => {
 		try {
 			await navigator.clipboard.writeText("https://api.reloop.sh");
-		} catch {}
+			setBaseCopied(true);
+			setTimeout(() => setBaseCopied(false), 2000);
+		} catch {
+			toast.error("Failed to copy Base URL");
+		}
 	}, []);
 
 	return (
@@ -319,157 +329,180 @@ export const ContactsApiDetails = (props: ButtonProps) => {
 					</Tooltip.Content>
 				</Tooltip.Root>
 			</Tooltip.Provider>
-			<Drawer.Content className="max-w-[480px]">
+			<Drawer.Content className="max-w-[560px]">
 				<Drawer.Header className="border-stroke-soft-200 border-b">
 					<div className="flex flex-1 flex-col gap-1">
 						<Drawer.Title>Contacts API</Drawer.Title>
-						<p className="text-paragraph-xs text-text-sub-600">
-							Manage contacts programmatically with our REST API
+						<p className="text-sm text-text-sub-600">
+							Manage contacts programmatically with our REST API.
 						</p>
 					</div>
 				</Drawer.Header>
-				<Drawer.Body className="flex flex-col gap-6 p-5">
-					{/* Base URL Section */}
-					<div className="flex items-center justify-between rounded-lg bg-bg-weak-50 px-3 py-2.5">
-						<div className="flex items-center gap-2">
-							<Icon name="link-02" className="h-4 w-4 text-text-sub-600" />
-							<code className="font-mono text-label-sm text-text-strong-950">
-								https://api.reloop.sh
-							</code>
-						</div>
-						<Tooltip.Provider>
-							<Tooltip.Root>
-								<Tooltip.Trigger asChild>
-									<Button.Root
-										variant="neutral"
-										size="xxsmall"
-										mode="ghost"
-										onClick={copyBaseUrl}
+				
+				<Drawer.Body className="flex flex-col gap-6 p-6">
+					{/* Base URL */}
+					<div className="flex items-center gap-2 group cursor-pointer w-fit" onClick={copyBaseUrl} role="button" tabIndex={0}>
+						<span className="text-xs text-text-sub-500 font-medium">
+							Base URL:
+						</span>
+						<code className="text-xs font-medium text-text-strong-950 group-hover:text-text-sub-600 transition-colors ml-1">
+							https://api.reloop.sh
+						</code>
+						<Icon 
+							name={baseCopied ? "check" : "copy"} 
+							className={cn(
+								"h-3.5 w-3.5 ml-1 transition-colors", 
+								baseCopied ? "text-success-base" : "text-text-sub-400 group-hover:text-text-strong-950"
+							)} 
+						/>
+					</div>
+
+					{/* Operations List */}
+					<div className="flex flex-col gap-2">
+						<h3 className="text-[11px] font-medium uppercase tracking-widest text-text-sub-500 mb-0.5">Endpoints</h3>
+						<div className="flex flex-col gap-0.5">
+							{operations.map((op) => {
+								const isSelected = selectedOperation === op.id;
+								return (
+									<div
+										role="button"
+										tabIndex={0}
+										key={op.id}
+										onClick={() => setSelectedOperation(op.id as Operation)}
+										onKeyDown={(e) => {
+											if (e.key === "Enter" || e.key === " ") {
+												e.preventDefault();
+												setSelectedOperation(op.id as Operation);
+											}
+										}}
+										className={cn(
+											"group flex items-center gap-4 rounded-md px-2.5 py-1.5 transition-all outline-none border border-transparent cursor-pointer",
+											isSelected
+												? "bg-bg-white-0 shadow-[0_1px_3px_0_rgba(0,0,0,0.02)]"
+												: "hover:bg-bg-white-0/40"
+										)}
 									>
-										<Icon name="clipboard-copy" className="h-3.5 w-3.5" />
-									</Button.Root>
-								</Tooltip.Trigger>
-								<Tooltip.Content size="xsmall">Copy base URL</Tooltip.Content>
-							</Tooltip.Root>
-						</Tooltip.Provider>
-					</div>
-
-					{/* Language Selector - Custom Segmented Control */}
-					<div className="space-y-2.5">
-						<h3 className="text-label-sm text-text-sub-600">Language</h3>
-						<div className="grid grid-cols-3 gap-1 rounded-lg bg-bg-weak-50 p-1">
-							{languages.map((lang) => (
-								<button
-									type="button"
-									key={lang.id}
-									onClick={() => setSelectedLanguage(lang.id)}
-									className={cn(
-										"rounded-md px-3 py-1.5 font-medium text-label-sm transition-all duration-200",
-										"text-text-sub-600 hover:text-text-strong-950",
-										selectedLanguage === lang.id &&
-											"bg-bg-white-0 text-text-strong-950 shadow-sm",
-									)}
-								>
-									{lang.label}
-								</button>
-							))}
+										<Badge.Root
+											variant="lighter"
+											size="small"
+											color={getMethodColor(op.method)}
+											className="text-[10px] p-2"
+										>
+											{op.method.charAt(0).toUpperCase() + op.method.slice(1).toLowerCase()}
+										</Badge.Root>
+										<div className="flex flex-1 items-center justify-between gap-4 min-w-0">
+											<div className="flex items-center gap-1.5 min-w-0 flex-shrink-0">
+												<span className={cn(
+													"text-xs font-medium transition-colors truncate",
+													isSelected ? "text-text-strong-950" : "text-text-sub-600 group-hover:text-text-strong-950"
+												)}>
+													{op.label}
+												</span>
+												<button
+													type="button"
+													aria-label="View documentation"
+													onClick={(e) => {
+														e.stopPropagation();
+														window.open(`https://docs.reloop.sh/api-reference/contacts#${op.id}`, "_blank");
+													}}
+													className="p-1 text-text-sub-400 hover:text-text-strong-950 focus:text-text-strong-950 outline-none rounded transition-colors"
+												>
+													<Icon name="external-link" className="w-[12px] h-[12px]" />
+												</button>
+											</div>
+											<div className="flex items-center justify-end gap-1.5 min-w-0 flex-1">
+												<code className={cn(
+													"font-mono text-[11px] transition-colors truncate",
+													isSelected ? "text-text-sub-500" : "text-text-sub-400 group-hover:text-text-sub-500"
+												)}>
+													{op.endpoint}
+												</code>
+												<button
+													type="button"
+													aria-label="Copy endpoint"
+													onClick={async (e) => {
+														e.stopPropagation();
+														try {
+															await navigator.clipboard.writeText(op.endpoint);
+															setCopiedEndpoint(op.id);
+															setTimeout(() => setCopiedEndpoint(null), 2000);
+														} catch {
+															toast.error("Failed to copy endpoint");
+														}
+													}}
+													className="p-1 text-text-sub-400 hover:text-text-strong-950 focus:text-text-strong-950 outline-none rounded transition-colors"
+												>
+													<Icon 
+														name={copiedEndpoint === op.id ? "check" : "copy"} 
+														className={cn("h-3.5 w-3.5", copiedEndpoint === op.id ? "text-success-base" : "")} 
+													/>
+												</button>
+											</div>
+										</div>
+									</div>
+								);
+							})}
 						</div>
 					</div>
 
-					{/* Operations Tabs */}
-					<div className="space-y-2.5">
-						<h3 className="text-label-sm text-text-sub-600">Operation</h3>
-						<TabMenuHorizontal.Root
-							value={selectedOperation}
-							onValueChange={(value) =>
-								setSelectedOperation(value as Operation)
-							}
-						>
-							<TabMenuHorizontal.List className="border-stroke-soft-200 border-b">
-								{operations.map((op) => (
-									<TabMenuHorizontal.Trigger key={op.id} value={op.id}>
-										{op.label}
-									</TabMenuHorizontal.Trigger>
-								))}
-							</TabMenuHorizontal.List>
-						</TabMenuHorizontal.Root>
-					</div>
-
-					{/* Current Endpoint Display */}
+					{/* Snippet Block */}
 					{currentOperation && (
-						<div className="flex items-center gap-3">
-							<Badge.Root
-								variant="light"
-								size="medium"
-								color={getMethodColor(currentOperation.method)}
+						<div className="flex flex-col gap-3 pb-6">
+							<TabMenuHorizontal.Root
+								value={selectedLanguage}
+								onValueChange={(val) => setSelectedLanguage(val as Language)}
 							>
-								{currentOperation.method}
-							</Badge.Root>
-							<code className="font-mono text-label-sm text-text-strong-950">
-								{currentOperation.endpoint}
-							</code>
+								<TabMenuHorizontal.List className="border-stroke-soft-200 border-b h-9 gap-4">
+									{languages.map((lang) => (
+										<TabMenuHorizontal.Trigger
+											key={lang.id}
+											value={lang.id}
+											className="h-9 py-0 text-xs font-medium text-text-sub-500 data-[state=active]:text-text-strong-950"
+										>
+											{lang.label}
+										</TabMenuHorizontal.Trigger>
+									))}
+								</TabMenuHorizontal.List>
+							</TabMenuHorizontal.Root>
+							
+							<div className="relative overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-weak-50 shadow-sm mt-1">
+							<div className="absolute right-2 top-2 z-10 flex items-center gap-1.5">
+								<Button.Root
+									type="button"
+									variant="neutral"
+									size="xsmall"
+									mode="ghost"
+									onClick={() => toast("Test request feature unavailable", { description: `Cannot currently execute ${currentOperation.method} ${currentOperation.endpoint}` })}
+									className="h-8 w-8 aspect-square p-0 bg-bg-white-0/50 backdrop-blur-sm shadow-sm transition-all hover:bg-bg-white-0"
+									aria-label="Send test request"
+								>
+									<Icon name="send" className="h-4 w-4 text-text-sub-600" />
+								</Button.Root>
+								<Button.Root
+									type="button"
+									variant="neutral"
+									size="xsmall"
+									mode="ghost"
+									onClick={copyToClipboard}
+									className="h-8 w-8 aspect-square p-0 bg-bg-white-0/50 backdrop-blur-sm shadow-sm transition-all hover:bg-bg-white-0"
+									aria-label="Copy snippet"
+								>
+									<Icon
+										name={copied ? "check" : "copy"}
+										className={cn("h-4 w-4", copied ? "text-success-base" : "text-text-sub-600")}
+									/>
+								</Button.Root>
+							</div>
+								<div className="group">
+									<CodeBlock
+										code={codeExamples[selectedLanguage][selectedOperation]}
+										lang={currentLanguageConfig?.shikiLang || "javascript"}
+										className="text-[10px] leading-snug sm:text-[11px] sm:leading-relaxed [&>pre]:!m-0 [&>pre]:!p-3"
+									/>
+								</div>
+							</div>
 						</div>
 					)}
-
-					{/* Code Block */}
-					<div className="space-y-2.5">
-						<div className="flex items-center justify-between">
-							<h3 className="text-label-sm text-text-sub-600">Example</h3>
-							<Button.Root
-								variant="neutral"
-								size="xxsmall"
-								mode="ghost"
-								onClick={copyToClipboard}
-								className="gap-1.5"
-							>
-								<Icon
-									name={copied ? "check" : "clipboard-copy"}
-									className="h-3.5 w-3.5"
-								/>
-								{copied ? "Copied!" : "Copy"}
-							</Button.Root>
-						</div>
-						<div className="overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-weak-50">
-							<CodeBlock
-								code={codeExamples[selectedLanguage][selectedOperation]}
-								lang={currentLanguageConfig?.shikiLang || "javascript"}
-							/>
-						</div>
-					</div>
-
-					{/* All Endpoints Reference */}
-					<div className="space-y-2.5">
-						<h3 className="text-label-sm text-text-sub-600">All Endpoints</h3>
-						<div className="divide-y divide-stroke-soft-200 rounded-xl border border-stroke-soft-200 bg-bg-white-0">
-							{operations.map((op) => (
-								<button
-									type="button"
-									key={op.id}
-									onClick={() => setSelectedOperation(op.id as Operation)}
-									className={cn(
-										"flex w-full items-center gap-3 px-3.5 py-3 text-left transition-colors duration-150",
-										"hover:bg-bg-weak-50",
-										selectedOperation === op.id && "bg-bg-weak-50",
-									)}
-								>
-									<Badge.Root
-										variant="light"
-										size="small"
-										color={getMethodColor(op.method)}
-										className="w-16 justify-center font-mono"
-									>
-										{op.method}
-									</Badge.Root>
-									<code className="flex-1 font-mono text-label-xs text-text-strong-950">
-										{op.endpoint}
-									</code>
-									<span className="text-label-xs text-text-sub-600">
-										{op.label}
-									</span>
-								</button>
-							))}
-						</div>
-					</div>
 				</Drawer.Body>
 			</Drawer.Content>
 		</Drawer.Root>
