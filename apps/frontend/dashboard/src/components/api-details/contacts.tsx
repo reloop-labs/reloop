@@ -720,23 +720,11 @@ export const ContactsApiDetails = (props: ButtonProps) => {
 			</Tooltip.Provider>
 
 			<Drawer.Content className="max-w-[560px]">
-				{/* ── Header ─────────────────────────────────────────── */}
 				<Drawer.Header className="border-stroke-soft-200 border-b" showCloseButton={false}>
-					<div className="flex flex-1 flex-col gap-1.5">
-						<div className="flex items-center gap-2">
-							<span className="text-[11px] font-medium uppercase tracking-widest text-text-sub-400">
-								REST API
-							</span>
-							<span className="text-[11px] text-text-sub-400">·</span>
-							<span className="text-[11px] font-medium uppercase tracking-widest text-text-sub-400">
-								V1
-							</span>
-						</div>
-						<Drawer.Title className="text-2xl font-semibold tracking-tight">
-							Contacts <span className="font-light italic text-text-sub-600">API</span>
-						</Drawer.Title>
+					<div className="flex flex-1 flex-col gap-1">
+						<Drawer.Title>Contacts API</Drawer.Title>
 						<p className="text-paragraph-xs text-text-sub-600">
-							Manage contacts programmatically. Authenticated, structured, predictable.
+							Manage contacts programmatically with our REST API.
 						</p>
 					</div>
 					<Drawer.Close asChild>
@@ -833,21 +821,21 @@ export const ContactsApiDetails = (props: ButtonProps) => {
 									</button>
 								</div>
 
-								{/* Dark code card */}
-								<div className="relative rounded-xl bg-[#1a1a2e] overflow-hidden ring-1 ring-white/[0.06]">
-									{/* Filename label */}
-									<div className="flex items-center justify-between px-4 pt-3 pb-0">
-										<span className="font-mono text-[11px] text-white/40">
+								{/* Code card */}
+								<div className="overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-weak-50">
+									{/* Filename + copy */}
+									<div className="flex items-center justify-between border-b border-stroke-soft-200 px-4 py-2">
+										<span className="font-mono text-[11px] text-text-sub-600">
 											{example.filename}
 										</span>
 										<button
 											type="button"
 											onClick={() => copySnippet(op.id)}
 											className={cn(
-												"rounded-md p-1.5 transition-colors",
+												"rounded-md p-1 transition-colors",
 												isCopied
-													? "text-green-400"
-													: "text-white/40 hover:text-white/70 hover:bg-white/[0.06]",
+													? "text-success-base"
+													: "text-text-sub-400 hover:text-text-strong-950",
 											)}
 											aria-label="Copy snippet"
 										>
@@ -862,8 +850,7 @@ export const ContactsApiDetails = (props: ButtonProps) => {
 									<CodeBlock
 										code={example.code}
 										lang={currentLanguageConfig?.shikiLang || "javascript"}
-										theme="one-dark-pro"
-										className="text-[12px] leading-relaxed [&>pre]:!bg-transparent [&>pre]:!py-3 [&>pre]:!px-4 [&_.line]:!pl-0 [&_.line::before]:!hidden"
+										className="text-[11px] leading-relaxed [&>pre]:!bg-transparent [&>pre]:!m-0 [&>pre]:!p-3 [&_.line]:!pl-0 [&_.line::before]:!hidden"
 									/>
 								</div>
 							</section>
