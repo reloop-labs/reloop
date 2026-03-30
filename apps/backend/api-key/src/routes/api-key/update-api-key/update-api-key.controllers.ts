@@ -16,7 +16,7 @@ export async function updateApiKeyController({
 	body: ApiKeyTypes.UpdateApiKeyRequest;
 	logger: Logger;
 }): Promise<ApiKeyTypes.ApiKeyResponse> {
-	logger.info({ apiKeyId }, "Updating API key",);
+	logger.info({ apiKeyId }, "Searching api key");
 	try {
 		const existing = await db.query.apikey.findFirst({
 			where: and(
@@ -29,12 +29,12 @@ export async function updateApiKeyController({
 			logger.warn({ apiKeyId }, "API key not found");
 			throw status(404, { message: "API key not found" });
 		}
+
+		logger.info({ apiKeyId }, "Updating api key");
 		const updateData: Partial<typeof schema.apikey.$inferInsert> = {
 			updatedAt: new Date(),
+			name: body.name,
 		};
-		if (body.name !== undefined) {
-			updateData.name = body.name || null;
-		}
 		const updated = await db
 			.update(schema.apikey)
 			.set(updateData)
@@ -45,7 +45,6 @@ export async function updateApiKeyController({
 				),
 			)
 			.returning();
-
 		if (!updated[0]) {
 			logger.error({ apiKeyId }, "Failed to update API key");
 			throw status(500, { message: "Failed to update API key" });
