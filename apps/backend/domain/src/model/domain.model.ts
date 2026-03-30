@@ -227,6 +227,11 @@ export namespace DomainModel {
 			],
 			{ description: "Domain verification status" },
 		),
+	}, {
+		examples: [{
+			id: "domain_123456789",
+			status: "verifying"
+		}]
 	});
 
 	export const domainListResponse = t.Object({

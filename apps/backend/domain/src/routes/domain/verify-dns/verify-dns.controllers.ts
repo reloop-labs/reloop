@@ -13,7 +13,6 @@ export async function verifyDNSRecordController({
   organizationId: string;
   logger: Logger;
 }) {
-  logger.info({ domainId }, "Verify DNS records controller called");
   try {
     logger.info({ domainId }, "Fetching domain with DNS records");
     const domainWithRecords = await db.query.domain.findFirst({
@@ -35,6 +34,18 @@ export async function verifyDNSRecordController({
     }
 
     const domainName = domainWithRecords.domain;
+
+    // Control the verifying based on the current status
+    if (domainWithRecords.status === "verifying") {
+      logger.info(
+        { domainId },
+        "Domain is already in verifying status, skipping update and trigger",
+      );
+      return {
+        id: domainId,
+        status: "verifying" as const,
+      };
+    }
 
     // Set status to "verifying"
     logger.info({ domainId }, "Updating domain status to verifying");
@@ -60,17 +71,12 @@ export async function verifyDNSRecordController({
       // 	},
       // });
       logger.info(
-        { domain: domainName, organizationId },
+        { domain: domainName },
         "Triggered background domain verification workflow",
       );
     } catch (error) {
       logger.error(
-        {
-          domain: domainName,
-          organizationId,
-          error: error instanceof Error ? error.message : String(error),
-        },
-        "Failed to trigger domain verification workflow",
+        { domain: domainName, error }, "Failed to trigger domain verification workflow",
       );
       // Revert status if Inngest fails
       await db
@@ -81,8 +87,6 @@ export async function verifyDNSRecordController({
         message: "Failed to start verification process",
       });
     }
-
-    // Return just the updated status
     logger.info({ domainId }, "Domain verification started successfully");
     return {
       id: domainId,
