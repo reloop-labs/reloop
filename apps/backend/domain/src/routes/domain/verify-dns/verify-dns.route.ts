@@ -1,24 +1,25 @@
 import { authMiddleware } from "@be/domain/middleware/auth";
 import { DomainModel } from "@be/domain/model/domain.model";
-import { Elysia } from "elysia";
+import { Elysia, t } from "elysia";
 import { verifyDNSRecordController } from "./verify-dns.controllers";
 import { verifyDNSXCodeSamples } from "./verify-dns.x-codeSamples";
 
 export const verifyDNSRecordRoute = new Elysia().use(authMiddleware).post(
-  "/verify",
-  async ({ body, activeOrganizationId, logger }) => {
-    const { domain } = body;
+  "/verify/:domain_id",
+  async ({ params: { domain_id }, activeOrganizationId, logger }) => {
     return await verifyDNSRecordController({
-      domain,
+      domainId: domain_id,
       organizationId: activeOrganizationId,
       logger,
     });
   },
   {
     auth: true,
-    body: DomainModel.createDomainBody,
+    params: t.Object({
+      domain_id: t.String(),
+    }),
     response: {
-      200: DomainModel.domainResponse,
+      200: DomainModel.domainStatusResponse,
       400: DomainModel.invalidDomain,
       404: DomainModel.domainNotFound,
       500: DomainModel.invalidDomain,

@@ -215,6 +215,20 @@ export namespace DomainModel {
 		}]
 	});
 
+	export const domainStatusResponse = t.Object({
+		id: t.String({ description: "Unique domain identifier" }),
+		status: t.Union(
+			[
+				t.Literal("start-verify"),
+				t.Literal("verifying"),
+				t.Literal("active"),
+				t.Literal("suspended"),
+				t.Literal("failed"),
+			],
+			{ description: "Domain verification status" },
+		),
+	});
+
 	export const domainListResponse = t.Object({
 		domains: t.Array(domainResponse),
 		total: t.Number(),

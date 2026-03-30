@@ -5,18 +5,20 @@ import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
 export async function verifyDNSRecordController({
-  domain,
+  domainId,
   organizationId,
   logger,
 }: {
-  domain: string;
+  domainId: string;
   organizationId: string;
   logger: Logger;
 }) {
+  logger.info({ domainId }, "Verify DNS records controller called");
   try {
+    logger.info({ domainId }, "Fetching domain with DNS records");
     const domainWithRecords = await db.query.domain.findFirst({
       where: and(
-        eq(schema.domain.domain, domain),
+        eq(schema.domain.id, domainId),
         eq(schema.domain.organizationId, organizationId),
         isNull(schema.domain.deletedAt),
       ),
@@ -28,19 +30,24 @@ export async function verifyDNSRecordController({
     });
 
     if (!domainWithRecords) {
-      logger.warn({ domain }, "Domain not found");
+      logger.warn({ domainId }, "Domain not found");
       throw status(404, { message: "Domain not found" });
     }
 
+    const domainName = domainWithRecords.domain;
+
     // Set status to "verifying"
+    logger.info({ domainId }, "Updating domain status to verifying");
     await db
       .update(schema.domain)
       .set({ status: "verifying" })
-      .where(eq(schema.domain.id, domainWithRecords.id));
+      .where(eq(schema.domain.id, domainId));
+
+    logger.info({ domainId }, "Updating DNS records status to verifying");
     await db
       .update(schema.domainDnsRecord)
       .set({ status: "verifying" })
-      .where(eq(schema.domainDnsRecord.domainId, domainWithRecords.id));
+      .where(eq(schema.domainDnsRecord.domainId, domainId));
 
     // Trigger Inngest workflow for background verification with exponential backoff
     try {
@@ -53,13 +60,13 @@ export async function verifyDNSRecordController({
       // 	},
       // });
       logger.info(
-        { domain, organizationId },
+        { domain: domainName, organizationId },
         "Triggered background domain verification workflow",
       );
     } catch (error) {
       logger.error(
         {
-          domain,
+          domain: domainName,
           organizationId,
           error: error instanceof Error ? error.message : String(error),
         },
@@ -75,18 +82,14 @@ export async function verifyDNSRecordController({
       });
     }
 
-    // Return domain with "verifying" status
-    // The Inngest function will update the status asynchronously
+    // Return just the updated status
+    logger.info({ domainId }, "Domain verification started successfully");
     return {
-      ...domainWithRecords,
+      id: domainId,
       status: "verifying" as const,
-      dnsRecords: domainWithRecords.dnsRecords.map((record) => ({
-        ...record,
-        status: "verifying" as const,
-      })),
     };
   } catch (error) {
-    logger.error({ domain, error }, "Error verifying DNS records");
-    throw status(500, { message: "Internal server error" });
+    logger.error({ domainId, error }, "Error verifying DNS records");
+    throw error;
   }
 }
