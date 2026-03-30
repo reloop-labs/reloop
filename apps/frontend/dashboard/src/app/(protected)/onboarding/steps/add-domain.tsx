@@ -1,5 +1,6 @@
 "use client";
 
+import type { DomainResponse } from "@reloop/api";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
@@ -17,6 +18,10 @@ export const AddDomainStep = () => {
 		"domain",
 		parseAsString.withDefault(""),
 	);
+	const [, setDomainId] = useQueryState(
+		"domainId",
+		parseAsString.withDefault(""),
+	);
 	const [step, setStep] = useQueryState("step", parseAsInteger.withDefault(1));
 	const [verifying, setVerifying] = useState(false);
 	const [customReturnPath, setCustomReturnPath] = useState("send");
@@ -30,7 +35,7 @@ export const AddDomainStep = () => {
 		if (!domain) return;
 		setVerifying(true);
 		try {
-			await axios.post(
+			const { data } = await axios.post<DomainResponse>(
 				"/api/domain/v1/create",
 				{
 					domain,
@@ -41,6 +46,7 @@ export const AddDomainStep = () => {
 				},
 				{ headers: { credentials: "include" } },
 			);
+			setDomainId(data.id);
 			setStep(step + 1);
 		} catch (error) {
 			const errorMessage = axios.isAxiosError(error)

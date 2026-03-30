@@ -13,12 +13,13 @@ import { DNSRecordTable } from "../../[orgSlug]/domain/[domainId]/components/DNS
 
 export const ConfigureDnsStep = () => {
 	const [domain] = useQueryState("domain", parseAsString.withDefault(""));
+	const [domainId] = useQueryState("domainId", parseAsString.withDefault(""));
 	const [, setStep] = useQueryState("step", parseAsInteger.withDefault(1));
 	const [copiedItems, setCopiedItems] = React.useState<Set<string>>(new Set());
 	const [isVerifying, setIsVerifying] = React.useState(false);
 
 	const { data: domainData, isLoading } = useSWR<DomainResponse>(
-		domain ? `/api/domain/v1/${domain}` : null,
+		domainId ? `/api/domain/v1/${domainId}` : null,
 	);
 
 	const copyToClipboard = async (text: string, itemId: string) => {
@@ -38,18 +39,16 @@ export const ConfigureDnsStep = () => {
 	};
 
 	const handleVerifyDNS = async () => {
-		if (!domain) {
+		if (!domainId) {
 			toast.error("Domain information not available");
 			return;
 		}
 
 		setIsVerifying(true);
 		try {
-			await axios.post(
-				"/api/domain/v1/verify",
-				{ domain },
-				{ headers: { credentials: "include" } },
-			);
+			await axios.post(`/api/domain/v1/verify/${domainId}`, undefined, {
+				headers: { credentials: "include" },
+			});
 
 			toast.success(
 				"DNS verification started! Verification will continue in the background.",
@@ -172,7 +171,7 @@ export const ConfigureDnsStep = () => {
 							? () => setStep(4)
 							: handleVerifyDNS
 					}
-					disabled={isVerifying || !domain}
+					disabled={isVerifying || !domainId}
 				>
 					{isVerifying ? (
 						<>

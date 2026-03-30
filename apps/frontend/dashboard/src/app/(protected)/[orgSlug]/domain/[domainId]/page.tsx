@@ -38,7 +38,7 @@ const DomainPage = () => {
 	};
 
 	const handleVerifyDNS = async () => {
-		if (!domainData?.domain) {
+		if (!domainId) {
 			toast.error("Domain information not available");
 			return;
 		}
@@ -46,11 +46,9 @@ const DomainPage = () => {
 		setIsVerifying(true);
 		try {
 			// Trigger Inngest workflow for background verification
-			await axios.post(
-				"/api/domain/v1/verify",
-				{ domain: domainData.domain },
-				{ headers: { credentials: "include" } },
-			);
+			await axios.post(`/api/domain/v1/verify/${domainId}`, undefined, {
+				headers: { credentials: "include" },
+			});
 
 			// Refresh domain data to get "verifying" status
 			await mutate(`/api/domain/v1/${domainId}`);

@@ -2,6 +2,7 @@
 import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { valibotResolver } from "@hookform/resolvers/valibot";
+import type { DomainResponse } from "@reloop/api";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
@@ -56,8 +57,8 @@ export const AddDomainSidebar = () => {
 		});
 	const tlsValue = watch("tls");
 
-	const handleAddDomain = (domain: string) => {
-		push(`/domain/add/${domain}`);
+	const handleAddDomain = (domainId: string) => {
+		push(`/domain/add/${domainId}`);
 	};
 
 	const onSubmit = async ({
@@ -67,7 +68,7 @@ export const AddDomainSidebar = () => {
 	}: DomainFormValues) => {
 		try {
 			changeStatus("loading");
-			await axios.post(
+			const { data } = await axios.post<DomainResponse>(
 				"/api/domain/v1/create",
 				{
 					domain,
@@ -78,8 +79,11 @@ export const AddDomainSidebar = () => {
 				},
 				{ headers: { credentials: "include" } },
 			);
-			await mutate(`/api/domain/v1/dns/${domain}`);
-			handleAddDomain(domain);
+			await mutate(
+				(key) => typeof key === "string" && key.startsWith("/api/domain/v1/list"),
+			);
+			await mutate(`/api/domain/v1/${data.id}`, data, false);
+			handleAddDomain(data.id);
 		} catch (error) {
 			changeStatus("idle");
 			const errorMessage = axios.isAxiosError(error)

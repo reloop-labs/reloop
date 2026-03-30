@@ -32,6 +32,7 @@ export const OnBoardingContent = () => {
 	const [logoUrl] = useQueryState("logoUrl", parseAsString.withDefault(""));
 	const [apiKey] = useQueryState("apiKey", parseAsString.withDefault(""));
 	const [domain] = useQueryState("domain", parseAsString.withDefault(""));
+	const [domainId] = useQueryState("domainId", parseAsString.withDefault(""));
 
 	useEffect(() => {
 		if (!isPending && !session) {
@@ -74,7 +75,7 @@ export const OnBoardingContent = () => {
 			stepIndicator: "3/4",
 			title: "Configure DNS",
 			component: <ConfigureDnsStep />,
-			preview: <DnsConfigPreview domain={domain} />,
+			preview: <DnsConfigPreview domain={domainId || domain} />,
 			fullWidth: true,
 		},
 		4: {
