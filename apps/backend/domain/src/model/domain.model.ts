@@ -4,13 +4,6 @@ export namespace DomainModel {
 	// Domain validation pattern - supports domains and subdomains
 	const domainPattern =
 		/^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/;
-
-	export const domainParam = t.String({
-		pattern: domainPattern.source,
-		description:
-			"Valid domain or subdomain (e.g., example.com, subdomain.example.com)",
-	});
-
 	export const createDomainBody = t.Object({
 		domain: t.String({
 			minLength: 4,
@@ -18,6 +11,57 @@ export namespace DomainModel {
 			pattern: domainPattern.source,
 			description: "Domain name (e.g., send.reloop.com)",
 		}),
+		customReturnPath: t.Optional(
+			t.String({
+				minLength: 1,
+				maxLength: 255,
+				pattern: "^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$",
+				default: "send",
+				description: "Custom return-path subdomain (e.g., send)",
+			}),
+		),
+		clickTracking: t.Optional(
+			t.Boolean({
+				default: false,
+				description: "Whether click tracking is enabled",
+			}),
+		),
+		openTracking: t.Optional(
+			t.Boolean({
+				default: false,
+				description: "Whether open tracking is enabled",
+			}),
+		),
+		tls: t.Optional(
+			t.Union([t.Literal("opportunistic"), t.Literal("enforced")], {
+				default: "opportunistic",
+				description: "TLS mode for the domain",
+			}),
+		),
+		sendingEmail: t.Optional(
+			t.Boolean({
+				default: true,
+				description: "Whether sending email is enabled",
+			}),
+		),
+		receivingEmail: t.Optional(
+			t.Boolean({
+				default: true,
+				description: "Whether receiving email is enabled",
+			}),
+		),
+	}, {
+		examples: [
+			{
+				domain: "send.example.com",
+				customReturnPath: "send",
+				clickTracking: true,
+				openTracking: true,
+				tls: "opportunistic",
+				sendingEmail: true,
+				receivingEmail: true,
+			},
+		],
 	});
 
 	export const dnsRecordResponse = t.Object({
@@ -63,13 +107,25 @@ export namespace DomainModel {
 			{ description: "Domain verification status" },
 		),
 		updatedAt: t.Date(),
+	}, {
+		examples: [{
+			id: "dns_123456789",
+			recordType: "MX",
+			recordTypeName: "MX",
+			domain: "example.com",
+			name: "@",
+			value: "feedback-smtp.us-east-1.amazonses.com",
+			ttl: "Auto",
+			priority: 10,
+			status: "active",
+			createdAt: new Date("2026-03-30T10:00:00Z"),
+			updatedAt: new Date("2026-03-30T10:00:00Z")
+		}]
 	});
 
 	export const domainResponse = t.Object({
 		id: t.String({ description: "Unique domain identifier" }),
 		domain: t.String({ description: "Domain name (e.g., send.reloop.com)" }),
-		organizationId: t.String(),
-		userId: t.String(),
 		domainType: t.Union(
 			[t.Literal("custom"), t.Literal("subdomain"), t.Literal("system")],
 			{ description: "Type of domain" },
@@ -90,8 +146,27 @@ export namespace DomainModel {
 		systemVerified: t.Boolean({
 			description: "Whether system has verified the domain",
 		}),
+		customReturnPath: t.String({
+			description: "Custom return path subdomain for SPF and bounce handling",
+			default: 'inbound'
+		}),
+		clickTracking: t.Boolean({
+			description: "Whether click tracking is enabled for the domain",
+		}),
+		openTracking: t.Boolean({
+			description: "Whether open tracking is enabled for the domain",
+		}),
+		tls: t.Union([t.Literal("opportunistic"), t.Literal("enforced")], {
+			description: "TLS mode for the domain",
+		}),
 		trackingDomain: t.Boolean({
 			description: "Whether domain is used for tracking",
+		}),
+		sendingEmail: t.Boolean({
+			description: "Whether sending email is enabled for the domain",
+		}),
+		receivingEmail: t.Boolean({
+			description: "Whether receiving email is enabled for the domain",
 		}),
 		verificationFailedReason: t.Union([t.String(), t.Null()], {
 			description: "Reason for verification failure",
@@ -107,7 +182,92 @@ export namespace DomainModel {
 		}),
 		createdAt: t.Date(),
 		updatedAt: t.Date(),
+	}, {
+		examples: [{
+			id: "domain_123456789",
+			domain: "send.example.com",
+			domainType: "custom",
+			status: "active",
+			userVerified: true,
+			systemVerified: true,
+			customReturnPath: "inbound",
+			clickTracking: true,
+			openTracking: true,
+			tls: "opportunistic",
+			trackingDomain: false,
+			sendingEmail: true,
+			receivingEmail: true,
+			dnsRecords: [{
+				id: "dns_123456789",
+				recordType: "MX",
+				recordTypeName: "MX",
+				domain: "example.com",
+				name: "@",
+				value: "email.reloop.sh",
+				ttl: "Auto",
+				priority: 10,
+				status: "active",
+				createdAt: new Date("2026-03-30T10:00:00Z"),
+				updatedAt: new Date("2026-03-30T10:00:00Z")
+			}],
+			createdAt: new Date("2026-03-30T10:00:00Z"),
+			updatedAt: new Date("2026-03-30T10:00:00Z")
+		}]
 	});
+
+	export const domainStatusResponse = t.Object({
+		id: t.String({ description: "Unique domain identifier" }),
+		status: t.Union(
+			[
+				t.Literal("start-verify"),
+				t.Literal("verifying"),
+				t.Literal("active"),
+				t.Literal("suspended"),
+				t.Literal("failed"),
+			],
+			{ description: "Domain verification status" },
+		),
+	}, {
+		examples: [{
+			id: "domain_123456789",
+			status: "verifying"
+		}]
+	});
+
+	export const updateDomainBody = t.Object(
+		{
+			clickTracking: t.Optional(
+				t.Boolean({
+					description: "Whether click tracking is enabled",
+				}),
+			),
+			openTracking: t.Optional(
+				t.Boolean({
+					description: "Whether open tracking is enabled",
+				}),
+			),
+			sendingEmail: t.Optional(
+				t.Boolean({
+					description: "Whether sending email is enabled",
+				}),
+			),
+			receivingEmail: t.Optional(
+				t.Boolean({
+					description: "Whether receiving email is enabled",
+				}),
+			),
+		},
+		{
+			examples: [
+				{
+					clickTracking: true,
+					openTracking: true,
+					sendingEmail: true,
+					receivingEmail: true,
+				},
+			],
+		},
+	);
 
 	export const domainListResponse = t.Object({
 		domains: t.Array(domainResponse),

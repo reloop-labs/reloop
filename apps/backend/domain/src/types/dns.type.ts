@@ -1,5 +1,7 @@
 import type { DNSModel } from "@be/domain/model/dns.model";
 export namespace DNSTypes {
+	export type DomainNameserversResponse =
+		typeof DNSModel.domainNameserversResponse.static;
 	export type DNSRecordResponse = typeof DNSModel.dnsRecordResponse.static;
 	export type DKIMKeysResponse = typeof DNSModel.dkimKeysResponse.static;
 	export type GenerateDNSBody = typeof DNSModel.generateDNSBody.static;

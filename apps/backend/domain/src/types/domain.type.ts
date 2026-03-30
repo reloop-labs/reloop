@@ -6,6 +6,7 @@ export namespace DomainTypes {
 	export type DnsRecordResponse = typeof DomainModel.dnsRecordResponse.static;
 	export type DomainListResponse = typeof DomainModel.domainListResponse.static;
 	export type CreateDomainBody = typeof DomainModel.createDomainBody.static;
+	export type UpdateDomainBody = typeof DomainModel.updateDomainBody.static;
 	export type DomainQuery = typeof DomainModel.domainQuery.static;
 	export type DomainNotFound = typeof DomainModel.domainNotFound.static;
 	export type DomainAlreadyExists =
@@ -27,6 +28,12 @@ export namespace DomainTypes {
 
 	export interface CreateDomainRequest {
 		domain: string;
+		customReturnPath?: string;
+		clickTracking?: boolean;
+		openTracking?: boolean;
+		tls?: "opportunistic" | "enforced";
+		sendingEmail?: boolean;
+		receivingEmail?: boolean;
 	}
 
 	export interface DomainListQuery {
@@ -41,5 +48,12 @@ export namespace DomainTypes {
 		page?: number;
 		limit?: number;
 		status?: DomainStatus;
+	}
+
+	export interface UpdateDomainRequest {
+		clickTracking?: boolean;
+		openTracking?: boolean;
+		sendingEmail?: boolean;
+		receivingEmail?: boolean;
 	}
 }

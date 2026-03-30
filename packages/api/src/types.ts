@@ -15,6 +15,10 @@ export interface Domain {
 	status: DomainStatus;
 	userVerified: boolean;
 	systemVerified: boolean;
+	customReturnPath: string;
+	clickTracking: boolean;
+	openTracking: boolean;
+	tls: "opportunistic" | "enforced";
 	dnsConfigured: boolean;
 	nameservers: string[] | null;
 	spfRecord: string | null;
@@ -23,6 +27,8 @@ export interface Domain {
 	dmarcRecord: string | null;
 	dmarcPolicy: string;
 	trackingDomain: boolean;
+	sendingEmail: boolean;
+	receivingEmail: boolean;
 	verificationFailedReason: string | null;
 	deletedAt: string | null;
 	lastVerifiedAt: string | null;
@@ -57,6 +63,12 @@ export interface DNSRecord {
 
 export interface DomainResponse extends Domain {
 	dnsRecords: DNSRecord[];
+}
+
+export interface DomainNameserversResponse {
+	domainId: string;
+	domain: string;
+	nameservers: string[] | null;
 }
 
 export interface DomainListResponse {

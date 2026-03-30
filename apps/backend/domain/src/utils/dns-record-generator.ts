@@ -1,7 +1,10 @@
 import { domainConfig } from "@be/domain/domain.config";
 import { DNSTypes } from "@be/domain/types/dns.type";
 import { generateDKIMKeyPair } from "@be/domain/utils/dkim-key-generator";
-import { getDomainSubString } from "@be/domain/utils/domain-formatter";
+import {
+	getCustomReturnPathSubString,
+	getDomainSubString,
+} from "@be/domain/utils/domain-formatter";
 
 export async function generateDKIMRecord(
 	domain: string,
@@ -45,17 +48,26 @@ export function generateDMARCRecord(domain: string): DNSTypes.DNSRecord {
 	};
 }
 
-export function generateMXRecord(domain: string): DNSTypes.DNSRecord {
+export function generateMXRecord(domain: string, host?: string): DNSTypes.DNSRecord {
 	return {
 		type: DNSTypes.DNSRecordType.MX,
 		name: domain,
-		value: domainConfig.HOST_DOMAIN,
+		value: host || domainConfig.HOST_DOMAIN,
 		priority: domainConfig.constants.mxPriority,
 		ttl: "Auto",
 	};
 }
 
-export async function generateAllDNSRecords(domain: string): Promise<{
+export function generateReceivingMXRecord(
+	hostDomain: string,
+	customReturnPath = "inbound",
+): DNSTypes.DNSRecord {
+	return generateMXRecord(customReturnPath, hostDomain);
+}
+
+export async function generateAllDNSRecords(
+	domain: string,
+): Promise<{
 	mxRecord: DNSTypes.DNSRecord;
 	spfRecord: DNSTypes.DNSRecord;
 	dmarcRecord: DNSTypes.DNSRecord;

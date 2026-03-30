@@ -23,6 +23,7 @@ import { DeleteDomainModal } from "../../components/delete-domain";
 
 interface DomainHeaderProps {
 	domainId: string;
+	domainRecordId?: string;
 	lastUpdated?: string;
 	status?: DomainStatus;
 	isLoading?: boolean;
@@ -48,6 +49,7 @@ const headerMenuItems = [
 
 export const DomainHeader = ({
 	domainId,
+	domainRecordId,
 	lastUpdated,
 	status = "start-verify",
 	isLoading,
@@ -175,7 +177,7 @@ export const DomainHeader = ({
 															"_blank",
 														);
 													} else if (item.id === "delete") {
-														setDeleteId(domainId);
+														setDeleteId(domainRecordId || domainId);
 													}
 												}}
 												className={cn(
@@ -215,7 +217,7 @@ export const DomainHeader = ({
 			<DeleteDomainModal
 				domains={[
 					{
-						id: domainId,
+						id: domainRecordId || domainId,
 						domain: domainId,
 						organizationId: "",
 						userId: "",
@@ -223,6 +225,10 @@ export const DomainHeader = ({
 						status: "active" as const,
 						userVerified: false,
 						systemVerified: false,
+						customReturnPath: "send",
+						clickTracking: false,
+						openTracking: false,
+						tls: "opportunistic" as const,
 						dnsConfigured: false,
 						nameservers: null,
 						spfRecord: null,
@@ -231,6 +237,8 @@ export const DomainHeader = ({
 						dmarcRecord: null,
 						dmarcPolicy: "none",
 						trackingDomain: false,
+						sendingEmail: true,
+						receivingEmail: true,
 						verificationFailedReason: null,
 						deletedAt: null,
 						lastVerifiedAt: null,

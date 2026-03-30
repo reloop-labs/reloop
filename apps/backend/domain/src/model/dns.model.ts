@@ -1,6 +1,20 @@
 import { t } from "elysia";
 
 export namespace DNSModel {
+	export const dnsRecordItemResponse = t.Object({
+		id: t.String(),
+		recordType: t.String(),
+		recordTypeName: t.String(),
+		name: t.String(),
+		value: t.String(),
+		ttl: t.String(),
+		priority: t.Union([t.Number(), t.Null()]),
+		verificationError: t.Union([t.String(), t.Null()]),
+		status: t.String(),
+		createdAt: t.Date(),
+		updatedAt: t.Date(),
+	});
+
 	// Parameter validation schemas
 	export const domainParams = t.Object({
 		domain: t.String({
@@ -13,18 +27,13 @@ export namespace DNSModel {
 		}),
 	});
 
-	export const dnsRecordResponse = t.Array(
-		t.Object({
-			recordType: t.String(),
-			name: t.String(),
-			value: t.String(),
-			ttl: t.Number(),
-			priority: t.Optional(t.Number()),
-			description: t.Optional(t.String()),
-			isVerified: t.Boolean(),
-			status: t.String(),
-		}),
-	);
+	export const dnsRecordResponse = t.Array(dnsRecordItemResponse);
+
+	export const domainNameserversResponse = t.Object({
+		domainId: t.String(),
+		domain: t.String(),
+		nameservers: t.Union([t.Array(t.String()), t.Null()]),
+	});
 
 	export const dkimKeysResponse = t.Object({
 		selector: t.String(),

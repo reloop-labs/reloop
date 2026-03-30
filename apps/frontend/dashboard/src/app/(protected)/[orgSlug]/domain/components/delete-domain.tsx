@@ -51,7 +51,7 @@ export const DeleteDomainModal = ({ domains }: DeleteDomainModalProps) => {
 
 		setIsDeleting(true);
 		try {
-			await axios.delete(`/api/domain/v1/${domainToDelete.domain}`, {
+			await axios.delete(`/api/domain/v1/${domainToDelete.id}`, {
 				headers: { credentials: "include" },
 			});
 			await mutate(

@@ -4,21 +4,26 @@ import type { DomainResponse } from "@reloop/api";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
+import * as Switch from "@reloop/ui/switch";
 import axios from "axios";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import * as React from "react";
 import { toast } from "sonner";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 import { DNSRecordTable } from "../../[orgSlug]/domain/[domainId]/components/DNSRecordTable";
+import { groupDomainDnsRecords } from "../../[orgSlug]/domain/[domainId]/components/dns-record-groups";
 
 export const ConfigureDnsStep = () => {
 	const [domain] = useQueryState("domain", parseAsString.withDefault(""));
+	const [domainId] = useQueryState("domainId", parseAsString.withDefault(""));
 	const [, setStep] = useQueryState("step", parseAsInteger.withDefault(1));
 	const [copiedItems, setCopiedItems] = React.useState<Set<string>>(new Set());
 	const [isVerifying, setIsVerifying] = React.useState(false);
+	const [isUpdatingSending, setIsUpdatingSending] = React.useState(false);
+	const [isUpdatingReceiving, setIsUpdatingReceiving] = React.useState(false);
 
 	const { data: domainData, isLoading } = useSWR<DomainResponse>(
-		domain ? `/api/domain/v1/${domain}` : null,
+		domainId ? `/api/domain/v1/${domainId}` : null,
 	);
 
 	const copyToClipboard = async (text: string, itemId: string) => {
@@ -38,18 +43,16 @@ export const ConfigureDnsStep = () => {
 	};
 
 	const handleVerifyDNS = async () => {
-		if (!domain) {
+		if (!domainId) {
 			toast.error("Domain information not available");
 			return;
 		}
 
 		setIsVerifying(true);
 		try {
-			await axios.post(
-				"/api/domain/v1/verify",
-				{ domain },
-				{ headers: { credentials: "include" } },
-			);
+			await axios.post(`/api/domain/v1/verify/${domainId}`, undefined, {
+				headers: { credentials: "include" },
+			});
 
 			toast.success(
 				"DNS verification started! Verification will continue in the background.",
@@ -74,17 +77,39 @@ export const ConfigureDnsStep = () => {
 		}
 	};
 
-	// Separate DMARC records from DKIM/SPF records
-	const dmarcRecords = domainData?.dnsRecords.filter(
-		(record) =>
-			record.name.includes("_dmarc") ||
-			(record.recordType === "TXT" && record.value.includes("v=DMARC")),
-	);
-	const otherRecords = domainData?.dnsRecords.filter(
-		(record) =>
-			!record.name.includes("_dmarc") &&
-			!(record.recordType === "TXT" && record.value.includes("v=DMARC")),
-	);
+	const handleUpdateDomain = async (
+		payload: Partial<Pick<DomainResponse, "sendingEmail" | "receivingEmail">>,
+		setUpdating: React.Dispatch<React.SetStateAction<boolean>>,
+	) => {
+		if (!domainId || !domainData) {
+			toast.error("Domain information not available");
+			return;
+		}
+
+		const cacheKey = `/api/domain/v1/${domainId}`;
+		setUpdating(true);
+		await mutate(cacheKey, { ...domainData, ...payload }, false);
+
+		try {
+			const { data } = await axios.patch<DomainResponse>(
+				`/api/domain/v1/${domainId}`,
+				payload,
+				{ headers: { credentials: "include" } },
+			);
+			await mutate(cacheKey, data, false);
+		} catch (error) {
+			await mutate(cacheKey);
+			const errorMessage = axios.isAxiosError(error)
+				? error.response?.data?.message || "Failed to update domain"
+				: "Failed to update domain";
+			toast.error(errorMessage);
+		} finally {
+			setUpdating(false);
+		}
+	};
+
+	const { sendingRecords, receivingRecords, dmarcRecords } =
+		groupDomainDnsRecords(domainData?.dnsRecords);
 
 	if (!domain) {
 		return (
@@ -113,19 +138,30 @@ export const ConfigureDnsStep = () => {
 
 	return (
 		<div className="fade-in animate-in duration-500">
-			{/* DKIM and SPF Records */}
+			{/* Sending Email Records */}
 			<div className="relative mb-10">
-				<div className="mb-6 space-y-1">
-					<div className="font-medium text-base text-text-strong-950">
-						DKIM and SPF <span className="text-text-sub-600">(Required)</span>
+				<div className="mb-6 flex items-start justify-between gap-4">
+					<div className="space-y-1">
+						<div className="font-medium text-base text-text-strong-950">
+							Sending Email{" "}
+							<span className="text-text-sub-600">(Required)</span>
+						</div>
+						<div className="text-sm text-text-sub-600">
+							Enable email signing and specify authorized senders.
+						</div>
 					</div>
-					<div className="text-sm text-text-sub-600">
-						Enable email signing and specify authorized senders.
-					</div>
+					<Switch.Root
+						checked={domainData?.sendingEmail ?? true}
+						onCheckedChange={(value) =>
+							handleUpdateDomain({ sendingEmail: value }, setIsUpdatingSending)
+						}
+						disabled={isLoading || isUpdatingSending}
+						checkedColor="orange"
+					/>
 				</div>
 				<div className="w-full">
 					<DNSRecordTable
-						records={otherRecords}
+						records={sendingRecords}
 						onCopyToClipboard={copyToClipboard}
 						copiedItems={copiedItems}
 						isLoading={isLoading}
@@ -136,6 +172,45 @@ export const ConfigureDnsStep = () => {
 					/>
 				</div>
 			</div>
+
+			{receivingRecords.length > 0 && (
+				<div className="relative mb-10">
+					<div className="mb-6 flex items-start justify-between gap-4">
+						<div className="space-y-1">
+							<div className="font-medium text-base text-text-strong-950">
+								Receiving Email{" "}
+								<span className="text-text-sub-600">(Optional)</span>
+							</div>
+							<div className="text-sm text-text-sub-600">
+								Route inbound mail to your receiving mail host.
+							</div>
+						</div>
+						<Switch.Root
+							checked={domainData?.receivingEmail ?? true}
+							onCheckedChange={(value) =>
+								handleUpdateDomain(
+									{ receivingEmail: value },
+									setIsUpdatingReceiving,
+								)
+							}
+							disabled={isLoading || isUpdatingReceiving}
+							checkedColor="orange"
+						/>
+					</div>
+					<div className="w-full">
+						<DNSRecordTable
+							records={receivingRecords}
+							onCopyToClipboard={copyToClipboard}
+							copiedItems={copiedItems}
+							isLoading={isLoading}
+							loadingRows={1}
+							tableId="receiving-"
+							hideStatus={true}
+							showPriorityColumn={true}
+						/>
+					</div>
+				</div>
+			)}
 
 			{/* DMARC Records */}
 			<div className="relative">
@@ -172,7 +247,7 @@ export const ConfigureDnsStep = () => {
 							? () => setStep(4)
 							: handleVerifyDNS
 					}
-					disabled={isVerifying || !domain}
+					disabled={isVerifying || !domainId}
 				>
 					{isVerifying ? (
 						<>

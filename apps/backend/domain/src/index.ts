@@ -15,6 +15,21 @@ const emailService = new Elysia({
 })
 	.use(
 		openapi({
+			documentation: {
+				info: {
+					title: "Domain Service",
+					version: "1.0.0",
+				},
+				components: {
+					securitySchemes: {
+						apiKey: {
+							type: "apiKey",
+							name: "x-api-key",
+							in: "header",
+						},
+					},
+				},
+			},
 			references: fromTypes(
 				domainConfig.NODE_ENV === "production"
 					? "dist/index.d.ts"
