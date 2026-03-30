@@ -17,7 +17,6 @@ import {
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
 import Spinner from "@reloop/ui/spinner";
-import * as Switch from "@reloop/ui/switch";
 import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 import { DeleteDomainModal } from "../../components/delete-domain";
@@ -31,11 +30,6 @@ interface DomainHeaderProps {
 	isFailed?: boolean;
 	onVerify?: () => void | Promise<void>;
 	isVerifying?: boolean;
-	sendingEmail?: boolean;
-	receivingEmail?: boolean;
-	onToggleSending?: (value: boolean) => void | Promise<void>;
-	onToggleReceiving?: (value: boolean) => void | Promise<void>;
-	isUpdatingSettings?: boolean;
 }
 
 const headerMenuItems = [
@@ -62,11 +56,6 @@ export const DomainHeader = ({
 	isFailed,
 	onVerify,
 	isVerifying,
-	sendingEmail = true,
-	receivingEmail = true,
-	onToggleSending,
-	onToggleReceiving,
-	isUpdatingSettings,
 }: DomainHeaderProps) => {
 	const { push } = useUserOrganization();
 	const [, setDeleteId] = useQueryState("delete");
@@ -127,40 +116,6 @@ export const DomainHeader = ({
 						</div>
 					)}
 					<h1 className="font-medium text-title-h6 leading-8">{domainId}</h1>
-					<div className="mt-4 flex flex-wrap gap-5">
-						<div className="flex items-center gap-3">
-							<div>
-								<p className="font-medium text-label-sm text-text-strong-950">
-									Sending
-								</p>
-								<p className="text-paragraph-xs text-text-sub-600">
-									Allow outbound email for this domain.
-								</p>
-							</div>
-							<Switch.Root
-								checked={sendingEmail}
-								onCheckedChange={onToggleSending}
-								disabled={isLoading || isUpdatingSettings}
-								checkedColor="orange"
-							/>
-						</div>
-						<div className="flex items-center gap-3">
-							<div>
-								<p className="font-medium text-label-sm text-text-strong-950">
-									Receiving
-								</p>
-								<p className="text-paragraph-xs text-text-sub-600">
-									Allow inbound email for this domain.
-								</p>
-							</div>
-							<Switch.Root
-								checked={receivingEmail}
-								onCheckedChange={onToggleReceiving}
-								disabled={isLoading || isUpdatingSettings}
-								checkedColor="orange"
-							/>
-						</div>
-					</div>
 				</div>
 
 				<div className="flex items-center gap-2">
@@ -282,8 +237,8 @@ export const DomainHeader = ({
 						dmarcRecord: null,
 						dmarcPolicy: "none",
 						trackingDomain: false,
-						sendingEmail: sendingEmail,
-						receivingEmail: receivingEmail,
+						sendingEmail: true,
+						receivingEmail: true,
 						verificationFailedReason: null,
 						deletedAt: null,
 						lastVerifiedAt: null,

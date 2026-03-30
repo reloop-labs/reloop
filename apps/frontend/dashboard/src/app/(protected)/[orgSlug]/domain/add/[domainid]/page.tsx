@@ -17,7 +17,8 @@ import { groupDomainDnsRecords } from "../../[domainId]/components/dns-record-gr
 const NewDomainPage = () => {
 	const [copiedItems, setCopiedItems] = React.useState<Set<string>>(new Set());
 	const [isVerifying, setIsVerifying] = React.useState(false);
-	const [isUpdatingSettings, setIsUpdatingSettings] = React.useState(false);
+	const [isUpdatingSending, setIsUpdatingSending] = React.useState(false);
+	const [isUpdatingReceiving, setIsUpdatingReceiving] = React.useState(false);
 	const { push } = useUserOrganization();
 	const { domainId } = useParams();
 	const { back } = useRouter();
@@ -75,6 +76,7 @@ const NewDomainPage = () => {
 
 	const handleUpdateDomain = async (
 		payload: Partial<Pick<DomainResponse, "sendingEmail" | "receivingEmail">>,
+		setUpdating: React.Dispatch<React.SetStateAction<boolean>>,
 	) => {
 		if (!domainId || !domainData) {
 			toast.error("Domain information not available");
@@ -82,7 +84,7 @@ const NewDomainPage = () => {
 		}
 
 		const cacheKey = `/api/domain/v1/${domainId}`;
-		setIsUpdatingSettings(true);
+		setUpdating(true);
 		await mutate(cacheKey, { ...domainData, ...payload }, false);
 
 		try {
@@ -99,7 +101,7 @@ const NewDomainPage = () => {
 				: "Failed to update domain";
 			toast.error(errorMessage);
 		} finally {
-			setIsUpdatingSettings(false);
+			setUpdating(false);
 		}
 	};
 
@@ -216,9 +218,9 @@ const NewDomainPage = () => {
 						<Switch.Root
 							checked={domainData?.sendingEmail ?? true}
 							onCheckedChange={(value) =>
-								handleUpdateDomain({ sendingEmail: value })
+								handleUpdateDomain({ sendingEmail: value }, setIsUpdatingSending)
 							}
-							disabled={isLoading || isUpdatingSettings}
+							disabled={isLoading || isUpdatingSending}
 							checkedColor="orange"
 						/>
 					</div>
@@ -249,9 +251,12 @@ const NewDomainPage = () => {
 							<Switch.Root
 								checked={domainData?.receivingEmail ?? true}
 								onCheckedChange={(value) =>
-									handleUpdateDomain({ receivingEmail: value })
+									handleUpdateDomain(
+										{ receivingEmail: value },
+										setIsUpdatingReceiving,
+									)
 								}
-								disabled={isLoading || isUpdatingSettings}
+								disabled={isLoading || isUpdatingReceiving}
 								checkedColor="orange"
 							/>
 						</div>

@@ -15,7 +15,8 @@ const DomainPage = () => {
 	const { domainId } = useParams();
 	const [copiedItems, setCopiedItems] = React.useState<Set<string>>(new Set());
 	const [isVerifying, setIsVerifying] = React.useState(false);
-	const [isUpdatingSettings, setIsUpdatingSettings] = React.useState(false);
+	const [isUpdatingSending, setIsUpdatingSending] = React.useState(false);
+	const [isUpdatingReceiving, setIsUpdatingReceiving] = React.useState(false);
 
 	const {
 		data: domainData,
@@ -70,6 +71,7 @@ const DomainPage = () => {
 
 	const handleUpdateDomain = async (
 		payload: Partial<Pick<DomainResponse, "sendingEmail" | "receivingEmail">>,
+		setUpdating: React.Dispatch<React.SetStateAction<boolean>>,
 		successMessage: string,
 	) => {
 		if (!domainId || !domainData) {
@@ -80,8 +82,8 @@ const DomainPage = () => {
 		const cacheKey = `/api/domain/v1/${domainId}`;
 		const optimisticData = { ...domainData, ...payload };
 
-		setIsUpdatingSettings(true);
-			await mutate(cacheKey, optimisticData, false);
+		setUpdating(true);
+		await mutate(cacheKey, optimisticData, false);
 
 		try {
 			const { data } = await axios.patch<DomainResponse>(
@@ -99,7 +101,7 @@ const DomainPage = () => {
 				: "Failed to update domain settings";
 			toast.error(errorMessage);
 		} finally {
-			setIsUpdatingSettings(false);
+			setUpdating(false);
 		}
 	};
 
@@ -134,21 +136,6 @@ const DomainPage = () => {
 				lastUpdated={domainData?.createdAt || undefined}
 				onVerify={handleVerifyDNS}
 				isVerifying={isVerifying}
-				sendingEmail={domainData?.sendingEmail}
-				receivingEmail={domainData?.receivingEmail}
-				onToggleSending={(value) =>
-					handleUpdateDomain(
-						{ sendingEmail: value },
-						`Sending email ${value ? "enabled" : "disabled"}`,
-					)
-				}
-				onToggleReceiving={(value) =>
-					handleUpdateDomain(
-						{ receivingEmail: value },
-						`Receiving email ${value ? "enabled" : "disabled"}`,
-					)
-				}
-				isUpdatingSettings={isUpdatingSettings}
 			/>
 			<StatusBanner
 				status={domainData?.status || "start-verify"}
@@ -166,16 +153,19 @@ const DomainPage = () => {
 				onToggleSending={(value) =>
 					handleUpdateDomain(
 						{ sendingEmail: value },
+						setIsUpdatingSending,
 						`Sending email ${value ? "enabled" : "disabled"}`,
 					)
 				}
 				onToggleReceiving={(value) =>
 					handleUpdateDomain(
 						{ receivingEmail: value },
+						setIsUpdatingReceiving,
 						`Receiving email ${value ? "enabled" : "disabled"}`,
 					)
 				}
-				isUpdatingSettings={isUpdatingSettings}
+				isUpdatingSending={isUpdatingSending}
+				isUpdatingReceiving={isUpdatingReceiving}
 				onCopyToClipboard={copyToClipboard}
 				copiedItems={copiedItems}
 				isLoading={isLoading}

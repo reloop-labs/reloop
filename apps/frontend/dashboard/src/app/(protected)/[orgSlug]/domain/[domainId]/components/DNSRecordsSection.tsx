@@ -12,7 +12,8 @@ interface DNSRecordsSectionProps {
 	receivingEmail?: boolean;
 	onToggleSending?: (value: boolean) => void | Promise<void>;
 	onToggleReceiving?: (value: boolean) => void | Promise<void>;
-	isUpdatingSettings?: boolean;
+	isUpdatingSending?: boolean;
+	isUpdatingReceiving?: boolean;
 	onCopyToClipboard?: (text: string, itemId: string) => void;
 	copiedItems?: Set<string>;
 	isLoading?: boolean;
@@ -26,7 +27,8 @@ export const DNSRecordsSection = ({
 	receivingEmail = true,
 	onToggleSending,
 	onToggleReceiving,
-	isUpdatingSettings,
+	isUpdatingSending,
+	isUpdatingReceiving,
 	onCopyToClipboard,
 	copiedItems = new Set(),
 	isLoading,
@@ -48,7 +50,7 @@ export const DNSRecordsSection = ({
 					<Switch.Root
 						checked={sendingEmail}
 						onCheckedChange={onToggleSending}
-						disabled={isLoading || isUpdatingSettings}
+						disabled={isLoading || isUpdatingSending}
 						checkedColor="orange"
 					/>
 				</div>
@@ -78,7 +80,7 @@ export const DNSRecordsSection = ({
 						<Switch.Root
 							checked={receivingEmail}
 							onCheckedChange={onToggleReceiving}
-							disabled={isLoading || isUpdatingSettings}
+							disabled={isLoading || isUpdatingReceiving}
 							checkedColor="orange"
 						/>
 					</div>
