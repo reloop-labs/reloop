@@ -1,5 +1,6 @@
+import { domainConfig } from "@be/domain/domain.config";
 import type { DomainTypes } from "@be/domain/types/domain.type";
-import { generateAllDNSRecords } from "@be/domain/utils";
+import { generateAllDNSRecords, generateReceivingMXRecord } from "@be/domain/utils";
 import { createId } from "@paralleldrive/cuid2";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
@@ -96,6 +97,10 @@ export async function createDomainController({
     logger.info({ domain }, "Generating DNS records");
     const dnsRecords = await generateAllDNSRecords(domain);
     const { dkimRecord, spfRecord, dmarcRecord, mxRecord } = dnsRecords;
+    const receivingMxRecord = generateReceivingMXRecord(
+      `inbound.${domainConfig.HOST_DOMAIN}`,
+      customReturnPath,
+    );
     const domainId = `domain_${createId()}`;
     logger.info({ domainId }, "Creating domain");
     await db.insert(schema.domain).values({
@@ -123,7 +128,7 @@ export async function createDomainController({
       domain,
     };
     logger.info({ dnsRecordIds }, "Creating DNS records");
-    await db.insert(schema.domainDnsRecord).values([
+    const recordsToInsert = [
       {
         ...dnsRecordIds,
         recordType: dkimRecord.type,
@@ -131,31 +136,48 @@ export async function createDomainController({
         value: dkimRecord.value,
         priority: dkimRecord.priority,
         privateKey: dkimRecord.privateKey,
-        recordTypeName: "DKIM",
+        recordTypeName: "DKIM" as const,
       },
       {
         ...dnsRecordIds,
         recordType: spfRecord.type,
         name: spfRecord.name,
         value: spfRecord.value,
-        recordTypeName: "SPF",
+        recordTypeName: "SPF" as const,
       },
       {
         ...dnsRecordIds,
         recordType: dmarcRecord.type,
         name: dmarcRecord.name,
         value: dmarcRecord.value,
-        recordTypeName: "DMARC",
+        recordTypeName: "DMARC" as const,
       },
       {
         ...dnsRecordIds,
         recordType: mxRecord.type,
         name: mxRecord.name,
         value: mxRecord.value,
-        recordTypeName: "MX",
+        recordTypeName: "MX" as const,
         priority: mxRecord.priority,
       },
-    ]);
+    ];
+
+    const hasDistinctReceivingMxRecord =
+      receivingMxRecord.name !== mxRecord.name ||
+      receivingMxRecord.value !== mxRecord.value ||
+      receivingMxRecord.priority !== mxRecord.priority;
+
+    if (hasDistinctReceivingMxRecord) {
+      recordsToInsert.push({
+        ...dnsRecordIds,
+        recordType: receivingMxRecord.type,
+        name: receivingMxRecord.name,
+        value: receivingMxRecord.value,
+        recordTypeName: "MX" as const,
+        priority: receivingMxRecord.priority,
+      });
+    }
+    await db.insert(schema.domainDnsRecord).values(recordsToInsert);
     logger.info({ domainId }, "Fetching domain with DNS records");
     const domainWithDnsRecords = await db.query.domain.findFirst({
       where: and(

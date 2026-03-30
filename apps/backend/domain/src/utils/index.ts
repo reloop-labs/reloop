@@ -10,5 +10,6 @@ export {
 	generateDKIMRecord,
 	generateDMARCRecord,
 	generateMXRecord,
+	generateReceivingMXRecord,
 	generateSPFRecord,
 } from "@be/domain/utils/dns-record-generator";

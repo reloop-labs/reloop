@@ -155,6 +155,7 @@ export namespace DomainModel {
 		}),
 		customReturnPath: t.String({
 			description: "Custom return path subdomain for SPF and bounce handling",
+			default: 'inbound'
 		}),
 		clickTracking: t.Boolean({
 			description: "Whether click tracking is enabled for the domain",
@@ -196,7 +197,7 @@ export namespace DomainModel {
 			status: "active",
 			userVerified: true,
 			systemVerified: true,
-			customReturnPath: "send",
+			customReturnPath: "inbound",
 			clickTracking: true,
 			openTracking: true,
 			tls: "opportunistic",
