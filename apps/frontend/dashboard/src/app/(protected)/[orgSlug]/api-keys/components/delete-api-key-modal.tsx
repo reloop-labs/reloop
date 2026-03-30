@@ -63,7 +63,9 @@ export const DeleteApiKeyModal = ({
 			toast.success("API key deleted successfully");
 			await setDeleteId(null);
 			setConfirmationName("");
-			await mutate("/api/api-key/v1/?limit=100");
+			await mutate(
+				(key) => typeof key === "string" && key.startsWith("/api/api-key/v1/")
+			);
 
 			// Call the success callback if provided (e.g., to navigate back to list)
 			onDeleteSuccess?.();

@@ -127,13 +127,15 @@ export const ApiKeyHeader = ({
 		try {
 			setIsToggling(true);
 			const endpoint = apiKey.enabled
-				? `/api/api-key/v1/${apiKey.id}/disable`
-				: `/api/api-key/v1/${apiKey.id}/enable`;
+				? `/api/api-key/v1/disable/${apiKey.id}`
+				: `/api/api-key/v1/enable/${apiKey.id}`;
 
 			await axios.post(endpoint, {}, { headers: { credentials: "include" } });
 
 			await mutate(`/api/api-key/v1/${apiKey.id}`);
-			await mutate("/api/api-key/v1/?limit=100");
+			await mutate(
+				(key) => typeof key === "string" && key.startsWith("/api/api-key/v1/")
+			);
 
 			toast.success(
 				apiKey.enabled

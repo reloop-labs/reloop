@@ -59,14 +59,15 @@ export const RotateApiKeyModal = ({
 		try {
 			setIsRotating(true);
 			const response = await axios.post<ApiKeyWithKeyResponse>(
-				`/api/api-key/v1/${apiKeyId}/rotate`,
+				`/api/api-key/v1/rotate/${apiKeyId}`,
 				{},
 				{ headers: { credentials: "include" } },
 			);
 
 			setRotatedApiKey(response.data);
-			await mutate(`/api/api-key/v1/${apiKeyId}`);
-			await mutate("/api/api-key/v1/?limit=100");
+			await mutate(
+				(key) => typeof key === "string" && key.startsWith("/api/api-key/v1/")
+			);
 			toast.success("API key rotated successfully");
 		} catch (error) {
 			const errorMessage = axios.isAxiosError(error)

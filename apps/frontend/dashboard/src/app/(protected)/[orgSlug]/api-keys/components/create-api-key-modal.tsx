@@ -103,7 +103,9 @@ export const CreateApiKeyModal = ({
 				{ headers: { credentials: "include" } },
 			);
 
-			await mutate("/api/api-key/v1/?limit=100");
+			await mutate(
+				(key) => typeof key === "string" && key.startsWith("/api/api-key/v1/")
+			);
 
 			setCreatedApiKey(response.data);
 			changeStatus("idle");
