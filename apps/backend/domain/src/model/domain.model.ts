@@ -45,6 +45,16 @@ export namespace DomainModel {
 				description: "TLS mode for the domain",
 			}),
 		),
+	}, {
+		examples: [
+			{
+				domain: "send.example.com",
+				customReturnPath: "send",
+				clickTracking: true,
+				openTracking: true,
+				tls: "opportunistic",
+			},
+		],
 	});
 
 	export const dnsRecordResponse = t.Object({
@@ -90,6 +100,20 @@ export namespace DomainModel {
 			{ description: "Domain verification status" },
 		),
 		updatedAt: t.Date(),
+	}, {
+		examples: [{
+			id: "dns_123456789",
+			recordType: "MX",
+			recordTypeName: "MX",
+			domain: "example.com",
+			name: "@",
+			value: "feedback-smtp.us-east-1.amazonses.com",
+			ttl: "Auto",
+			priority: 10,
+			status: "active",
+			createdAt: new Date("2026-03-30T10:00:00Z"),
+			updatedAt: new Date("2026-03-30T10:00:00Z")
+		}]
 	});
 
 	export const domainResponse = t.Object({
@@ -146,6 +170,25 @@ export namespace DomainModel {
 		}),
 		createdAt: t.Date(),
 		updatedAt: t.Date(),
+	}, {
+		examples: [{
+			id: "domain_123456789",
+			domain: "send.example.com",
+			organizationId: "org_123",
+			userId: "user_123",
+			domainType: "custom",
+			status: "active",
+			userVerified: true,
+			systemVerified: true,
+			customReturnPath: "send",
+			clickTracking: true,
+			openTracking: true,
+			tls: "opportunistic",
+			trackingDomain: false,
+			dnsRecords: [],
+			createdAt: new Date("2026-03-30T10:00:00Z"),
+			updatedAt: new Date("2026-03-30T10:00:00Z")
+		}]
 	});
 
 	export const domainListResponse = t.Object({
