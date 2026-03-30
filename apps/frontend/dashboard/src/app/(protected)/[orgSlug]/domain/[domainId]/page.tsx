@@ -162,10 +162,17 @@ const DomainPage = () => {
 				receivingRecords={receivingRecords}
 				dmarcRecords={dmarcRecords}
 				sendingEmail={domainData?.sendingEmail}
+				receivingEmail={domainData?.receivingEmail}
 				onToggleSending={(value) =>
 					handleUpdateDomain(
 						{ sendingEmail: value },
 						`Sending email ${value ? "enabled" : "disabled"}`,
+					)
+				}
+				onToggleReceiving={(value) =>
+					handleUpdateDomain(
+						{ receivingEmail: value },
+						`Receiving email ${value ? "enabled" : "disabled"}`,
 					)
 				}
 				isUpdatingSettings={isUpdatingSettings}

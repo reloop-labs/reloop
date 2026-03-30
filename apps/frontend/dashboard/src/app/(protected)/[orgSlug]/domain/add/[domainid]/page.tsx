@@ -236,14 +236,24 @@ const NewDomainPage = () => {
 
 				{receivingRecords.length > 0 && (
 					<div className="relative mt-10">
-						<div className="mb-6 space-y-1">
-							<div className="font-medium text-sm text-text-strong-950">
-								Receiving Email{" "}
-								<span className="text-text-sub-600 text-xs">(Optional)</span>
+						<div className="mb-6 flex items-start justify-between gap-4">
+							<div className="space-y-1">
+								<div className="font-medium text-sm text-text-strong-950">
+									Receiving Email{" "}
+									<span className="text-text-sub-600 text-xs">(Optional)</span>
+								</div>
+								<div className="text-text-sub-600 text-xs">
+									Route inbound mail to your receiving mail host.
+								</div>
 							</div>
-							<div className="text-text-sub-600 text-xs">
-								Route inbound mail to your receiving mail host.
-							</div>
+							<Switch.Root
+								checked={domainData?.receivingEmail ?? true}
+								onCheckedChange={(value) =>
+									handleUpdateDomain({ receivingEmail: value })
+								}
+								disabled={isLoading || isUpdatingSettings}
+								checkedColor="orange"
+							/>
 						</div>
 						<div className="w-full">
 							<DNSRecordTable

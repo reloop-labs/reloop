@@ -9,7 +9,9 @@ interface DNSRecordsSectionProps {
 	receivingRecords: DNSRecord[];
 	dmarcRecords: DNSRecord[];
 	sendingEmail?: boolean;
+	receivingEmail?: boolean;
 	onToggleSending?: (value: boolean) => void | Promise<void>;
+	onToggleReceiving?: (value: boolean) => void | Promise<void>;
 	isUpdatingSettings?: boolean;
 	onCopyToClipboard?: (text: string, itemId: string) => void;
 	copiedItems?: Set<string>;
@@ -21,7 +23,9 @@ export const DNSRecordsSection = ({
 	receivingRecords,
 	dmarcRecords,
 	sendingEmail = true,
+	receivingEmail = true,
 	onToggleSending,
+	onToggleReceiving,
 	isUpdatingSettings,
 	onCopyToClipboard,
 	copiedItems = new Set(),
@@ -61,14 +65,22 @@ export const DNSRecordsSection = ({
 			{/* Receiving Email Section */}
 			{receivingRecords.length > 0 && (
 				<div className="mb-10">
-					<div className="mb-6 space-y-1">
-						<div className="font-medium text-sm text-text-strong-950">
-							Receiving Email{" "}
-							<span className="text-text-sub-600 text-xs">(Optional)</span>
+					<div className="mb-6 flex items-start justify-between gap-4">
+						<div className="space-y-1">
+							<div className="font-medium text-sm text-text-strong-950">
+								Receiving Email{" "}
+								<span className="text-text-sub-600 text-xs">(Optional)</span>
+							</div>
+							<div className="text-text-sub-600 text-xs">
+								Route inbound mail to your receiving mail host.
+							</div>
 						</div>
-						<div className="text-text-sub-600 text-xs">
-							Route inbound mail to your receiving mail host.
-						</div>
+						<Switch.Root
+							checked={receivingEmail}
+							onCheckedChange={onToggleReceiving}
+							disabled={isLoading || isUpdatingSettings}
+							checkedColor="orange"
+						/>
 					</div>
 					<DNSRecordTable
 						records={receivingRecords}

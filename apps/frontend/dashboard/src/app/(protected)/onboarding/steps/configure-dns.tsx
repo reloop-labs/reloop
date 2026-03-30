@@ -173,14 +173,24 @@ export const ConfigureDnsStep = () => {
 
 			{receivingRecords.length > 0 && (
 				<div className="relative mb-10">
-					<div className="mb-6 space-y-1">
-						<div className="font-medium text-base text-text-strong-950">
-							Receiving Email{" "}
-							<span className="text-text-sub-600">(Optional)</span>
+					<div className="mb-6 flex items-start justify-between gap-4">
+						<div className="space-y-1">
+							<div className="font-medium text-base text-text-strong-950">
+								Receiving Email{" "}
+								<span className="text-text-sub-600">(Optional)</span>
+							</div>
+							<div className="text-sm text-text-sub-600">
+								Route inbound mail to your receiving mail host.
+							</div>
 						</div>
-						<div className="text-sm text-text-sub-600">
-							Route inbound mail to your receiving mail host.
-						</div>
+						<Switch.Root
+							checked={domainData?.receivingEmail ?? true}
+							onCheckedChange={(value) =>
+								handleUpdateDomain({ receivingEmail: value })
+							}
+							disabled={isLoading || isUpdatingSettings}
+							checkedColor="orange"
+						/>
 					</div>
 					<div className="w-full">
 						<DNSRecordTable
