@@ -123,10 +123,12 @@ export const ApiKeyListSidebar = () => {
 					<div>
 						<div className="flex items-center gap-3">
 							<div className="flex-1">
-								<Input.Root size="small" className="rounded-xl">
+								<Input.Root size="xsmall">
 									<Input.Wrapper>
 										<Input.Icon
-											as={() => <Icon name="search" className="h-4 w-4" />}
+											as={Icon}
+											name="search"
+											size="xsmall"
 										/>
 										<Input.Input
 											type="text"
