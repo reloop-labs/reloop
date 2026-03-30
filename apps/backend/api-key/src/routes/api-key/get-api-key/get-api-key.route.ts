@@ -25,7 +25,7 @@ export const getApiKeyRoute = new Elysia().use(authMiddleware).get(
 		},
 		detail: {
 			tags: ["API Keys"],
-			summary: "Get API key by ID",
+			summary: "Retrieve API key",
 			description: "Retrieves an API key by its ID",
 			"x-codeSamples": getApiKeyXCodeSamples,
 		},

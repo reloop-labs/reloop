@@ -11,6 +11,7 @@
 		"errors",
 		"---API Key---",
 		"api-key/postApiApi-keyV1",
+		"api-key/getApiApi-keyV1ByApi_key_id",
 		"api-key/getApiApi-keyV1",
 		"api-key/patchApiApi-keyV1ById",
 		"api-key/deleteApiApi-keyV1ByApi_key_id",
