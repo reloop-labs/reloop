@@ -9,6 +9,7 @@ import useSWR, { mutate } from "swr";
 import { DNSRecordsSection } from "./components/DNSRecordsSection";
 import { DomainHeader } from "./components/DomainHeader";
 import { StatusBanner } from "./components/StatusBanner";
+import { groupDomainDnsRecords } from "./components/dns-record-groups";
 
 const DomainPage = () => {
 	const { domainId } = useParams();
@@ -66,17 +67,8 @@ const DomainPage = () => {
 		}
 	};
 
-	const dkimSpfRecords =
-		domainData?.dnsRecords?.filter(
-			(record) =>
-				(record.recordType === "MX" || record.recordType === "TXT") &&
-				!record.name.includes("_dmarc"),
-		) || [];
-
-	const dmarcRecords =
-		domainData?.dnsRecords?.filter((record) =>
-			record.name.includes("_dmarc"),
-		) || [];
+	const { sendingRecords, receivingRecords, dmarcRecords } =
+		groupDomainDnsRecords(domainData?.dnsRecords, domainData?.customReturnPath);
 
 	if (error) {
 		return (
@@ -114,7 +106,8 @@ const DomainPage = () => {
 				<div className="w-full border-stroke-soft-200 border-t border-dashed" />
 			</div>
 			<DNSRecordsSection
-				dkimSpfRecords={dkimSpfRecords}
+				sendingRecords={sendingRecords}
+				receivingRecords={receivingRecords}
 				dmarcRecords={dmarcRecords}
 				onCopyToClipboard={copyToClipboard}
 				copiedItems={copiedItems}

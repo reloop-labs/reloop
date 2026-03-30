@@ -11,6 +11,7 @@ import * as React from "react";
 import { toast } from "sonner";
 import useSWR, { mutate } from "swr";
 import { DNSRecordTable } from "../../[domainId]/components/DNSRecordTable";
+import { groupDomainDnsRecords } from "../../[domainId]/components/dns-record-groups";
 
 const NewDomainPage = () => {
 	const [copiedItems, setCopiedItems] = React.useState<Set<string>>(new Set());
@@ -118,17 +119,8 @@ const NewDomainPage = () => {
 		);
 	}
 
-	// Separate DMARC records from DKIM/SPF records
-	const dmarcRecords = domainData?.dnsRecords.filter(
-		(record) =>
-			record.name.includes("_dmarc") ||
-			(record.recordType === "TXT" && record.value.includes("v=DMARC")),
-	);
-	const otherRecords = domainData?.dnsRecords.filter(
-		(record) =>
-			!record.name.includes("_dmarc") &&
-			!(record.recordType === "TXT" && record.value.includes("v=DMARC")),
-	);
+	const { sendingRecords, receivingRecords, dmarcRecords } =
+		groupDomainDnsRecords(domainData?.dnsRecords, domainData?.customReturnPath);
 
 	return (
 		<div className="mx-auto max-w-3xl pt-10 pb-8 sm:px-8">
@@ -190,7 +182,7 @@ const NewDomainPage = () => {
 					</div>
 					<div className="w-full">
 						<DNSRecordTable
-							records={otherRecords}
+							records={sendingRecords}
 							onCopyToClipboard={copyToClipboard}
 							copiedItems={copiedItems}
 							isLoading={isLoading}
@@ -199,6 +191,30 @@ const NewDomainPage = () => {
 						/>
 					</div>
 				</div>
+
+				{receivingRecords.length > 0 && (
+					<div className="relative mt-10">
+						<div className="mb-6 space-y-1">
+							<div className="font-medium text-sm text-text-strong-950">
+								Receiving Email{" "}
+								<span className="text-text-sub-600 text-xs">(Optional)</span>
+							</div>
+							<div className="text-text-sub-600 text-xs">
+								Route inbound mail to your receiving mail host.
+							</div>
+						</div>
+						<div className="w-full">
+							<DNSRecordTable
+								records={receivingRecords}
+								onCopyToClipboard={copyToClipboard}
+								copiedItems={copiedItems}
+								isLoading={isLoading}
+								loadingRows={1}
+								tableId="receiving-"
+							/>
+						</div>
+					</div>
+				)}
 
 				<div className="relative mt-10">
 					<div className="mb-6 space-y-1">

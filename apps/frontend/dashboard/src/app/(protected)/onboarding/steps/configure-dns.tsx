@@ -10,6 +10,7 @@ import * as React from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 import { DNSRecordTable } from "../../[orgSlug]/domain/[domainId]/components/DNSRecordTable";
+import { groupDomainDnsRecords } from "../../[orgSlug]/domain/[domainId]/components/dns-record-groups";
 
 export const ConfigureDnsStep = () => {
 	const [domain] = useQueryState("domain", parseAsString.withDefault(""));
@@ -73,17 +74,8 @@ export const ConfigureDnsStep = () => {
 		}
 	};
 
-	// Separate DMARC records from DKIM/SPF records
-	const dmarcRecords = domainData?.dnsRecords.filter(
-		(record) =>
-			record.name.includes("_dmarc") ||
-			(record.recordType === "TXT" && record.value.includes("v=DMARC")),
-	);
-	const otherRecords = domainData?.dnsRecords.filter(
-		(record) =>
-			!record.name.includes("_dmarc") &&
-			!(record.recordType === "TXT" && record.value.includes("v=DMARC")),
-	);
+	const { sendingRecords, receivingRecords, dmarcRecords } =
+		groupDomainDnsRecords(domainData?.dnsRecords, domainData?.customReturnPath);
 
 	if (!domain) {
 		return (
@@ -124,7 +116,7 @@ export const ConfigureDnsStep = () => {
 				</div>
 				<div className="w-full">
 					<DNSRecordTable
-						records={otherRecords}
+						records={sendingRecords}
 						onCopyToClipboard={copyToClipboard}
 						copiedItems={copiedItems}
 						isLoading={isLoading}
@@ -135,6 +127,32 @@ export const ConfigureDnsStep = () => {
 					/>
 				</div>
 			</div>
+
+			{receivingRecords.length > 0 && (
+				<div className="relative mb-10">
+					<div className="mb-6 space-y-1">
+						<div className="font-medium text-base text-text-strong-950">
+							Receiving Email{" "}
+							<span className="text-text-sub-600">(Optional)</span>
+						</div>
+						<div className="text-sm text-text-sub-600">
+							Route inbound mail to your receiving mail host.
+						</div>
+					</div>
+					<div className="w-full">
+						<DNSRecordTable
+							records={receivingRecords}
+							onCopyToClipboard={copyToClipboard}
+							copiedItems={copiedItems}
+							isLoading={isLoading}
+							loadingRows={1}
+							tableId="receiving-"
+							hideStatus={true}
+							showPriorityColumn={true}
+						/>
+					</div>
+				</div>
+			)}
 
 			{/* DMARC Records */}
 			<div className="relative">
