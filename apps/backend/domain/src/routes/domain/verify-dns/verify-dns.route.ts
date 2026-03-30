@@ -2,6 +2,7 @@ import { authMiddleware } from "@be/domain/middleware/auth";
 import { DomainModel } from "@be/domain/model/domain.model";
 import { Elysia } from "elysia";
 import { verifyDNSRecordController } from "./verify-dns.controllers";
+import { verifyDNSXCodeSamples } from "./verify-dns.x-codeSamples";
 
 export const verifyDNSRecordRoute = new Elysia().use(authMiddleware).post(
   "/verify",
@@ -28,6 +29,7 @@ export const verifyDNSRecordRoute = new Elysia().use(authMiddleware).post(
       summary: "Verify DNS records",
       description:
         "Verifies DNS records for a domain to check if they are properly configured",
+      "x-codeSamples": verifyDNSXCodeSamples,
     },
   },
 );

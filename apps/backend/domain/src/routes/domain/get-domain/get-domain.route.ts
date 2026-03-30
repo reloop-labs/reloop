@@ -2,6 +2,7 @@ import { authMiddleware } from "@be/domain/middleware/auth";
 import { DomainModel } from "@be/domain/model/domain.model";
 import { Elysia, t } from "elysia";
 import { getDomainController } from "./get-domain.controllers";
+import { getDomainXCodeSamples } from "./get-domain.x-codeSamples";
 
 export const getDomainRoute = new Elysia().use(authMiddleware).get(
   "/:domain",
@@ -27,6 +28,7 @@ export const getDomainRoute = new Elysia().use(authMiddleware).get(
       tags: ["Domains"],
       summary: "Get domain by name",
       description: "Retrieves a domain by its domain name",
+      "x-codeSamples": getDomainXCodeSamples,
     },
   },
 );

@@ -2,6 +2,7 @@ import { authMiddleware } from "@be/domain/middleware/auth";
 import { DomainModel } from "@be/domain/model/domain.model";
 import { Elysia, t } from "elysia";
 import { deleteDomainController } from "./delete-domain.controllers";
+import { deleteDomainXCodeSamples } from "./delete-domain.x-codeSamples";
 
 export const deleteDomainRoute = new Elysia().use(authMiddleware).delete(
   "/:domain",
@@ -27,6 +28,7 @@ export const deleteDomainRoute = new Elysia().use(authMiddleware).delete(
       tags: ["Domains"],
       summary: "Delete domain",
       description: "Deletes a domain and all its associated data",
+      "x-codeSamples": deleteDomainXCodeSamples,
     },
   },
 );

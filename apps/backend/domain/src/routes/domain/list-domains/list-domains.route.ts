@@ -2,6 +2,7 @@ import { authMiddleware } from "@be/domain/middleware/auth";
 import { DomainModel } from "@be/domain/model/domain.model";
 import { Elysia } from "elysia";
 import { listDomainsController } from "./list-domains.controllers";
+import { listDomainsXCodeSamples } from "./list-domains.x-codeSamples";
 
 export const listDomainsRoute = new Elysia().use(authMiddleware).get(
   "/list",
@@ -24,6 +25,7 @@ export const listDomainsRoute = new Elysia().use(authMiddleware).get(
       summary: "List domains",
       description:
         "Retrieves a paginated list of domains with optional filters",
+      "x-codeSamples": listDomainsXCodeSamples,
     },
   },
 );

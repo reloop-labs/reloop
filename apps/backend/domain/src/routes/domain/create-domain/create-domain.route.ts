@@ -3,6 +3,7 @@ import { authMiddleware } from "@be/domain/middleware/auth";
 import { DomainModel } from "@be/domain/model/domain.model";
 import { Elysia } from "elysia";
 import { createDomainController } from "./create-domain.controllers";
+import { createDomainXCodeSamples } from "./create-domain.x-codeSamples";
 
 export const createDomainRoute = new Elysia().use(authMiddleware).post(
   "/create",
@@ -37,6 +38,7 @@ export const createDomainRoute = new Elysia().use(authMiddleware).post(
       tags: ["Domains"],
       summary: "Add a new domain",
       description: "Adds a new domain to the user's organization",
+      "x-codeSamples": createDomainXCodeSamples,
     },
   },
 );
