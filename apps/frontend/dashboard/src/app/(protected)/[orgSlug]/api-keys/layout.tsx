@@ -8,13 +8,24 @@ import { useQueryState } from "nuqs";
 import { useHotkeys } from "react-hotkeys-hook";
 import { DocsButton } from "./components/docs-button";
 
+import { usePathname } from "next/navigation";
+
 const ApiKeysLayout = ({ children }: { children: React.ReactNode }) => {
 	const [, setModal] = useQueryState("modal");
+	const pathname = usePathname();
 
-	useHotkeys("mod+a", (event) => {
-		event.preventDefault();
-		setModal("create-api-key");
-	});
+	const isDetailPage = pathname.match(/\/api-keys\/([^/]+)$/) !== null;
+
+	useHotkeys(
+		"mod+a",
+		(event) => {
+			event.preventDefault();
+			setModal("create-api-key");
+		},
+		{
+			enabled: !isDetailPage,
+		},
+	);
 
 	return (
 		<div>
@@ -28,31 +39,33 @@ const ApiKeysLayout = ({ children }: { children: React.ReactNode }) => {
 				</div>
 			</div>
 			<div className="mx-auto max-w-3xl sm:px-8">
-				<div className="flex items-center justify-between pt-10 pb-6">
-					<h1 className="font-medium text-2xl">API Keys</h1>
-					<div className="flex items-center gap-2 self-end">
-						<DocsButton size="xsmall" mode="stroke" />
-						<Button.Root
-							variant="neutral"
-							size="xsmall"
-							onClick={() => setModal("create-api-key")}
-							className="gap-2"
-						>
-							<Icon name="plus" className="h-4 w-4" />
-							Create API key
-							<span className="inline-flex items-center gap-0.5">
-								<Icon
-									name="command"
-									className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
-								/>
-								<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-100/20 p-px font-medium text-[10px] uppercase">
-									A
+				{!isDetailPage && (
+					<div className="flex items-center justify-between pt-10 pb-6">
+						<h1 className="font-medium text-2xl">API Keys</h1>
+						<div className="flex items-center gap-2 self-end">
+							<DocsButton size="xsmall" mode="stroke" />
+							<Button.Root
+								variant="neutral"
+								size="xsmall"
+								onClick={() => setModal("create-api-key")}
+								className="gap-2"
+							>
+								<Icon name="plus" className="h-4 w-4" />
+								Create API key
+								<span className="inline-flex items-center gap-0.5">
+									<Icon
+										name="command"
+										className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+									/>
+									<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-100/20 p-px font-medium text-[10px] uppercase">
+										A
+									</span>
 								</span>
-							</span>
-						</Button.Root>
-						<ApiKeysApiDetails size="xsmall" mode="ghost" />
+							</Button.Root>
+							<ApiKeysApiDetails size="xsmall" mode="ghost" />
+						</div>
 					</div>
-				</div>
+				)}
 				<div>{children}</div>
 			</div>
 		</div>

@@ -250,9 +250,14 @@ export const ApiKeyHeader = ({
 						{isLoading ? (
 							<Skeleton className="mt-2 h-7 w-48 rounded-lg" />
 						) : (
-							<h1 className="font-medium text-title-h6 leading-8">
-								{displayName}
-							</h1>
+							<div className="flex items-center gap-1">
+								<div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-white text-xs uppercase tracking-wide shadow-sm">
+									{displayName.charAt(0).toUpperCase()}
+								</div>
+								<h1 className="font-medium text-title-h6 leading-8">
+									{displayName}
+								</h1>
+							</div>
 						)}
 					</div>
 
@@ -326,7 +331,7 @@ export const ApiKeyHeader = ({
 													<Icon
 														name={item.icon}
 														className={cn(
-															"h-3.5 w-3.5",
+															"h-4 w-4",
 															item.isDanger ? "" : "text-text-sub-600",
 														)}
 													/>
@@ -345,7 +350,7 @@ export const ApiKeyHeader = ({
 						) : null}
 					</div>
 				</div>
-				<div className="mt-10 grid grid-cols-[1fr_1fr_1fr] gap-y-12">
+				<div className="mt-10 grid grid-cols-3 gap-x-12 gap-y-6">
 					{/* Token/Key */}
 					<div className="flex flex-col gap-1.5">
 						<div className="flex items-center gap-1.5">
@@ -363,16 +368,14 @@ export const ApiKeyHeader = ({
 								className="group/copy flex w-fit cursor-pointer items-center gap-1.5"
 								onClick={handleCopyPrefix}
 							>
-								<code className="rounded bg-neutral-alpha-10 px-2 py-1 font-medium font-mono text-text-strong-950 text-xs">
+								<code className="max-w-[120px] truncate rounded bg-neutral-alpha-10 px-2 py-1 font-medium font-mono text-text-strong-950 text-xs">
 									{displayPrefix}...
 								</code>
 								<Icon
 									name={copied ? "check" : "copy"}
 									className={cn(
-										"h-3 w-3 transition-all",
-										copied
-											? "text-success-base"
-											: "text-text-sub-600 opacity-0 group-hover/copy:opacity-100",
+										"h-3 w-3 flex-shrink-0 transition-all",
+										copied ? "text-success-base" : "text-text-sub-600 opacity-0 group-hover/copy:opacity-100",
 									)}
 								/>
 							</button>
@@ -399,21 +402,27 @@ export const ApiKeyHeader = ({
 						)}
 					</div>
 
-					{/* Last Used */}
+					{/* Status */}
 					<div className="flex flex-col gap-1.5">
 						<div className="flex items-center gap-1.5">
-							<Icon name="clock" className="h-3.5 w-3.5 text-text-sub-600" />
+							<Icon
+								name="check-circle"
+								className="h-3.5 w-3.5 text-text-sub-600"
+							/>
 							<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
-								Last Used
+								Status
 							</span>
 						</div>
 						{isLoading ? (
-							<Skeleton className="h-5 w-24 rounded-lg" />
+							<Skeleton className="h-5 w-20 rounded-lg" />
 						) : (
-							<span className="font-medium text-paragraph-sm text-text-strong-950">
-								{apiKey?.lastRequest
-									? formatRelativeTime(apiKey.lastRequest)
-									: "No activity"}
+							<span
+								className={cn(
+									"inline-flex w-fit rounded-md border-[1px] px-[6px] py-0.5 font-medium text-[10px]",
+									apiKey?.enabled ? "border border-success-base text-success-base bg-success-light/20" : "border border-error-base text-error-base bg-error-light/20"
+								)}
+							>
+								{apiKey?.enabled ? "Enabled" : "Disabled"}
 							</span>
 						)}
 					</div>
@@ -433,6 +442,25 @@ export const ApiKeyHeader = ({
 								{apiKey?.createdAt
 									? formatRelativeTime(apiKey.createdAt)
 									: "---"}
+							</span>
+						)}
+					</div>
+
+					{/* Last Used */}
+					<div className="flex flex-col gap-1.5">
+						<div className="flex items-center gap-1.5">
+							<Icon name="clock" className="h-3.5 w-3.5 text-text-sub-600" />
+							<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
+								Last Used
+							</span>
+						</div>
+						{isLoading ? (
+							<Skeleton className="h-5 w-24 rounded-lg" />
+						) : (
+							<span className="font-medium text-paragraph-sm text-text-strong-950">
+								{apiKey?.lastRequest
+									? formatRelativeTime(apiKey.lastRequest)
+									: "No activity"}
 							</span>
 						)}
 					</div>
