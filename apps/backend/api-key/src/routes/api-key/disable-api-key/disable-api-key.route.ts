@@ -4,19 +4,18 @@ import { Elysia, t } from "elysia";
 import { disableApiKeyController } from "./disable-api-key.controllers";
 
 export const disableApiKeyRoute = new Elysia().use(authMiddleware).post(
-	"/:id/disable",
-	async ({ params: { id }, activeOrganizationId, userId, logger }) => {
+	"/disable/:api_key_id",
+	async ({ params: { api_key_id }, activeOrganizationId, logger }) => {
 		return await disableApiKeyController({
-			id,
+			id: api_key_id,
 			organizationId: activeOrganizationId,
-			userId,
 			logger,
 		});
 	},
 	{
 		auth: true,
 		params: t.Object({
-			id: ApiKeyModel.apiKeyIdParam,
+			api_key_id: ApiKeyModel.apiKeyIdParam,
 		}),
 		response: {
 			200: ApiKeyModel.apiKeyResponse,

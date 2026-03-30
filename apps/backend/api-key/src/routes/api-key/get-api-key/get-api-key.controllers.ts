@@ -8,16 +8,13 @@ import { status } from "elysia";
 export async function getApiKeyController({
 	apiKeyId,
 	organizationId,
-	userId,
 	logger,
 }: {
 	apiKeyId: string;
 	organizationId: string;
-	userId: string;
 	logger: Logger;
 }): Promise<ApiKeyTypes.ApiKeyResponse> {
-	logger.info({ apiKeyId, organizationId }, "Getting API key");
-
+	logger.info({ apiKeyId }, "Getting API key");
 	try {
 		const result = await db.query.apikey.findFirst({
 			where: and(
@@ -64,13 +61,7 @@ export async function getApiKeyController({
 			},
 		};
 	} catch (error) {
-		logger.error(
-			{
-				apiKeyId,
-				error: error instanceof Error ? error.message : String(error),
-			},
-			"Error getting API key",
-		);
+		logger.error({ apiKeyId, error }, "Error getting API key");
 		throw error;
 	}
 }

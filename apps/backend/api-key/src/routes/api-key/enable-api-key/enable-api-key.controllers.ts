@@ -8,15 +8,14 @@ import { status } from "elysia";
 export async function enableApiKeyController({
 	id,
 	organizationId,
-	userId,
 	logger,
 }: {
 	id: string;
 	organizationId: string;
-	userId: string;
 	logger: Logger;
 }): Promise<ApiKeyTypes.ApiKeyResponse> {
 	try {
+		logger.info({ id, organizationId }, "Search for api key");
 		const existingKey = await db.query.apikey.findFirst({
 			where: and(
 				eq(schema.apikey.id, id),
@@ -26,12 +25,10 @@ export async function enableApiKeyController({
 				user: true,
 			},
 		});
-
 		if (!existingKey) {
-			logger.warn({ id, organizationId, userId }, "API key not found");
+			logger.warn({ id }, "API key not found");
 			throw status(404, { message: "API key not found" });
 		}
-
 		if (existingKey.enabled) {
 			logger.info({ id }, "API key is already enabled");
 			return {
@@ -64,9 +61,8 @@ export async function enableApiKeyController({
 				},
 			};
 		}
-
 		const now = new Date();
-
+		logger.info({ id, now }, "Updating API key");
 		const [updatedKey] = await db
 			.update(schema.apikey)
 			.set({
@@ -75,14 +71,11 @@ export async function enableApiKeyController({
 			})
 			.where(eq(schema.apikey.id, id))
 			.returning();
-
 		if (!updatedKey) {
 			logger.error({ id }, "Failed to enable API key");
 			throw status(500, { message: "Failed to enable API key" });
 		}
-
-		logger.info({ id, organizationId, userId }, "API key enabled successfully");
-
+		logger.info({ id }, "API key enabled successfully");
 		return {
 			id: updatedKey.id,
 			name: updatedKey.name,
@@ -113,15 +106,7 @@ export async function enableApiKeyController({
 			},
 		};
 	} catch (error) {
-		logger.error(
-			{
-				id,
-				organizationId,
-				userId,
-				error: error instanceof Error ? error.message : String(error),
-			},
-			"Error enabling API key",
-		);
+		logger.error({ id, error }, "Error enabling API key");
 		throw error;
 	}
 }

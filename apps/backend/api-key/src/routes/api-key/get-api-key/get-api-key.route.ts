@@ -5,19 +5,18 @@ import { getApiKeyController } from "./get-api-key.controllers";
 import { getApiKeyXCodeSamples } from "./get-api-key.x-codeSamples";
 
 export const getApiKeyRoute = new Elysia().use(authMiddleware).get(
-	"/:id",
-	async ({ params: { id }, activeOrganizationId, userId, logger }) => {
+	"/:api_key_id",
+	async ({ params: { api_key_id }, activeOrganizationId, logger }) => {
 		return await getApiKeyController({
-			apiKeyId: id,
+			apiKeyId: api_key_id,
 			organizationId: activeOrganizationId,
-			userId,
 			logger,
 		});
 	},
 	{
 		auth: true,
 		params: t.Object({
-			id: ApiKeyModel.apiKeyIdParam,
+			api_key_id: ApiKeyModel.apiKeyIdParam,
 		}),
 		response: {
 			200: ApiKeyModel.apiKeyResponse,

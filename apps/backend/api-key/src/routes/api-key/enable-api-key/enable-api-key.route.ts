@@ -4,19 +4,18 @@ import { Elysia, t } from "elysia";
 import { enableApiKeyController } from "./enable-api-key.controllers";
 
 export const enableApiKeyRoute = new Elysia().use(authMiddleware).post(
-	"/:id/enable",
-	async ({ params: { id }, activeOrganizationId, userId, logger }) => {
+	"/enable/:api_key_id",
+	async ({ params: { api_key_id }, activeOrganizationId, logger }) => {
 		return await enableApiKeyController({
-			id,
+			id: api_key_id,
 			organizationId: activeOrganizationId,
-			userId,
 			logger,
 		});
 	},
 	{
 		auth: true,
 		params: t.Object({
-			id: ApiKeyModel.apiKeyIdParam,
+			api_key_id: ApiKeyModel.apiKeyIdParam,
 		}),
 		response: {
 			200: ApiKeyModel.apiKeyResponse,
