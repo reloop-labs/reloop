@@ -5,12 +5,11 @@ import { updateApiKeyController } from "./update-api-key.controllers";
 import { updateApiKeyXCodeSamples } from "./update-api-key.x-codeSamples";
 
 export const updateApiKeyRoute = new Elysia().use(authMiddleware).patch(
-	"/:id",
-	async ({ params: { id }, body, activeOrganizationId, userId, logger }) => {
+	"/:api_key_id",
+	async ({ params: { api_key_id }, body, activeOrganizationId, logger }) => {
 		return await updateApiKeyController({
-			apiKeyId: id,
+			apiKeyId: api_key_id,
 			organizationId: activeOrganizationId,
-			userId,
 			body,
 			logger,
 		});
@@ -18,7 +17,7 @@ export const updateApiKeyRoute = new Elysia().use(authMiddleware).patch(
 	{
 		auth: true,
 		params: t.Object({
-			id: ApiKeyModel.apiKeyIdParam,
+			api_key_id: ApiKeyModel.apiKeyIdParam,
 		}),
 		body: ApiKeyModel.updateApiKeyBody,
 		response: {

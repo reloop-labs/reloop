@@ -8,50 +8,33 @@ import { status } from "elysia";
 export async function updateApiKeyController({
 	apiKeyId,
 	organizationId,
-	userId,
 	body,
 	logger,
 }: {
 	apiKeyId: string;
 	organizationId: string;
-	userId: string;
 	body: ApiKeyTypes.UpdateApiKeyRequest;
 	logger: Logger;
 }): Promise<ApiKeyTypes.ApiKeyResponse> {
-	logger.info(
-		{
-			apiKeyId,
-			organizationId,
-			userId,
-		},
-		"Updating API key",
-	);
-
+	logger.info({ apiKeyId }, "Updating API key",);
 	try {
 		const existing = await db.query.apikey.findFirst({
 			where: and(
 				eq(schema.apikey.id, apiKeyId),
 				eq(schema.apikey.organizationId, organizationId),
-				eq(schema.apikey.userId, userId),
 			),
-			with: {
-				user: true,
-			},
+			with: { user: true },
 		});
-
 		if (!existing) {
 			logger.warn({ apiKeyId }, "API key not found");
 			throw status(404, { message: "API key not found" });
 		}
-
 		const updateData: Partial<typeof schema.apikey.$inferInsert> = {
 			updatedAt: new Date(),
 		};
-
 		if (body.name !== undefined) {
 			updateData.name = body.name || null;
 		}
-
 		const updated = await db
 			.update(schema.apikey)
 			.set(updateData)
@@ -59,7 +42,6 @@ export async function updateApiKeyController({
 				and(
 					eq(schema.apikey.id, apiKeyId),
 					eq(schema.apikey.organizationId, organizationId),
-					eq(schema.apikey.userId, userId),
 				),
 			)
 			.returning();
@@ -68,7 +50,6 @@ export async function updateApiKeyController({
 			logger.error({ apiKeyId }, "Failed to update API key");
 			throw status(500, { message: "Failed to update API key" });
 		}
-
 		logger.info({ apiKeyId }, "API key updated successfully");
 		return {
 			id: updated[0].id,
@@ -100,13 +81,7 @@ export async function updateApiKeyController({
 			},
 		};
 	} catch (error) {
-		logger.error(
-			{
-				apiKeyId,
-				error: error instanceof Error ? error.message : String(error),
-			},
-			"Error updating API key",
-		);
+		logger.error({ apiKeyId, error }, "Error updating API key");
 		throw error;
 	}
 }

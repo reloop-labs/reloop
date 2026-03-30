@@ -5,7 +5,7 @@ import { rotateApiKeyController } from "./rotate-api-key.controllers";
 
 export const rotateApiKeyRoute = new Elysia().use(authMiddleware).post(
 	"/rotate/:api_key_id",
-	async ({ params: { api_key_id }, activeOrganizationId, userId, logger }) => {
+	async ({ params: { api_key_id }, activeOrganizationId, logger }) => {
 		return await rotateApiKeyController({
 			id: api_key_id,
 			organizationId: activeOrganizationId,
