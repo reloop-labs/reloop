@@ -154,7 +154,7 @@ const NewDomainPage = () => {
 	}
 
 	const { sendingRecords, receivingRecords, dmarcRecords } =
-		groupDomainDnsRecords(domainData?.dnsRecords, domainData?.customReturnPath);
+		groupDomainDnsRecords(domainData?.dnsRecords);
 
 	return (
 		<div className="mx-auto max-w-3xl pt-10 pb-8 sm:px-8">

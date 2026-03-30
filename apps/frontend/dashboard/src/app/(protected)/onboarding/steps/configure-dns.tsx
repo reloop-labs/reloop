@@ -109,7 +109,7 @@ export const ConfigureDnsStep = () => {
 	};
 
 	const { sendingRecords, receivingRecords, dmarcRecords } =
-		groupDomainDnsRecords(domainData?.dnsRecords, domainData?.customReturnPath);
+		groupDomainDnsRecords(domainData?.dnsRecords);
 
 	if (!domain) {
 		return (

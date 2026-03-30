@@ -65,6 +65,12 @@ export interface DomainResponse extends Domain {
 	dnsRecords: DNSRecord[];
 }
 
+export interface DomainNameserversResponse {
+	domainId: string;
+	domain: string;
+	nameservers: string[] | null;
+}
+
 export interface DomainListResponse {
 	domains: Domain[];
 	total: number;
