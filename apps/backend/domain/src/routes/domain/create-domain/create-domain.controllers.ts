@@ -22,6 +22,7 @@ export async function createDomainController({
   logger: Logger;
 } & DomainTypes.CreateDomainRequest): Promise<DomainTypes.DomainResponse> {
   try {
+    logger.info({ domain }, "Finding exsiting domain");
     const activeDomain = await db.query.domain.findFirst({
       where: and(
         eq(schema.domain.domain, domain),
@@ -29,8 +30,12 @@ export async function createDomainController({
         isNull(schema.domain.deletedAt),
       ),
     });
-    if (activeDomain) throw new Error("Domain already exists");
+    if (activeDomain) {
+      logger.info({ domain }, "Domain already exists");
+      throw new Error("Domain already exists");
+    }
 
+    logger.info({ domain }, "Finding deleted domain");
     const deletedDomain = await db.query.domain.findFirst({
       where: and(
         eq(schema.domain.domain, domain),
@@ -38,10 +43,10 @@ export async function createDomainController({
       ),
     });
 
-    // If domain exists and is soft-deleted, undelete it
     if (deletedDomain?.deletedAt) {
       const now = new Date();
       const domainId = deletedDomain.id;
+      logger.info({ domainId }, "Undeleting domain");
 
       await db
         .update(schema.domain)
@@ -56,7 +61,7 @@ export async function createDomainController({
           tls,
         })
         .where(eq(schema.domain.id, domainId));
-
+      logger.info({ domainId }, "Undeleting domain DNS records");
       await db
         .update(schema.domainDnsRecord)
         .set({
@@ -64,8 +69,6 @@ export async function createDomainController({
           updatedAt: now,
         })
         .where(eq(schema.domainDnsRecord.domainId, domainId));
-
-      // 3. Refetch the undeleted domain with DNS records (Option 2: refetch approach)
       const undeletedDomain = await db.query.domain.findFirst({
         where: and(
           eq(schema.domain.domain, domain),
@@ -82,13 +85,15 @@ export async function createDomainController({
       if (!undeletedDomain) {
         throw new Error("Failed to undelete domain");
       }
-
+      logger.info({ domainId }, "Undeleted domain");
       return undeletedDomain;
     }
 
+    logger.info({ domain }, "Generating DNS records");
     const dnsRecords = await generateAllDNSRecords(domain);
     const { dkimRecord, spfRecord, dmarcRecord, mxRecord } = dnsRecords;
     const domainId = `domain_${createId()}`;
+    logger.info({ domainId }, "Creating domain");
     await db.insert(schema.domain).values({
       id: domainId,
       userId: userId,
@@ -111,6 +116,7 @@ export async function createDomainController({
       userId,
       domain,
     };
+    logger.info({ dnsRecordIds }, "Creating DNS records");
     await db.insert(schema.domainDnsRecord).values([
       {
         ...dnsRecordIds,
@@ -144,6 +150,7 @@ export async function createDomainController({
         priority: mxRecord.priority,
       },
     ]);
+    logger.info({ domainId }, "Fetching domain with DNS records");
     const domainWithDnsRecords = await db.query.domain.findFirst({
       where: and(
         eq(schema.domain.domain, domain),
@@ -159,15 +166,10 @@ export async function createDomainController({
     if (!domainWithDnsRecords) {
       throw new Error("Failed to fetch domain with DNS records after creation");
     }
+    logger.info({ domainWithDnsRecords }, "Domain created successfully");
     return domainWithDnsRecords;
   } catch (error) {
-    logger.error(
-      {
-        domain,
-        error: error instanceof Error ? error.message : String(error),
-      },
-      "Error creating domain",
-    );
+    logger.error({ domain, error }, "Error creating domain");
     if (error instanceof Error && error.message.includes("already exists")) {
       throw status(409, { message: "Domain already exists" });
     }

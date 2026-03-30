@@ -69,6 +69,8 @@ export const domain = pgTable(
 		openTracking: boolean("open_tracking").notNull().default(false),
 		tls: tlsModeEnum("tls").notNull().default("opportunistic"),
 		trackingDomain: boolean("tracking_domain").notNull().default(false),
+		sendingEmail: boolean("sending_email").notNull().default(true),
+		receivingEmail: boolean("receiving_email").notNull().default(true),
 		verificationFailedReason: text("verification_failed_reason"),
 		deletedAt: timestamp("deleted_at"),
 		lastVerifiedAt: timestamp("last_verified_at"),

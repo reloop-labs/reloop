@@ -119,8 +119,6 @@ export namespace DomainModel {
 	export const domainResponse = t.Object({
 		id: t.String({ description: "Unique domain identifier" }),
 		domain: t.String({ description: "Domain name (e.g., send.reloop.com)" }),
-		organizationId: t.String(),
-		userId: t.String(),
 		domainType: t.Union(
 			[t.Literal("custom"), t.Literal("subdomain"), t.Literal("system")],
 			{ description: "Type of domain" },
@@ -174,8 +172,6 @@ export namespace DomainModel {
 		examples: [{
 			id: "domain_123456789",
 			domain: "send.example.com",
-			organizationId: "org_123",
-			userId: "user_123",
 			domainType: "custom",
 			status: "active",
 			userVerified: true,
@@ -185,7 +181,19 @@ export namespace DomainModel {
 			openTracking: true,
 			tls: "opportunistic",
 			trackingDomain: false,
-			dnsRecords: [],
+			dnsRecords: [{
+				id: "dns_123456789",
+				recordType: "MX",
+				recordTypeName: "MX",
+				domain: "example.com",
+				name: "@",
+				value: "email.reloop.sh",
+				ttl: "Auto",
+				priority: 10,
+				status: "active",
+				createdAt: new Date("2026-03-30T10:00:00Z"),
+				updatedAt: new Date("2026-03-30T10:00:00Z")
+			}],
 			createdAt: new Date("2026-03-30T10:00:00Z"),
 			updatedAt: new Date("2026-03-30T10:00:00Z")
 		}]
