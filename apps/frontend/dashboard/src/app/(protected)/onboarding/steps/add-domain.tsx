@@ -31,7 +31,7 @@ export const AddDomainStep = () => {
 		setVerifying(true);
 		try {
 			await axios.post(
-				"/api/domain/v1/add",
+				"/api/domain/v1/create",
 				{
 					domain,
 					customReturnPath,

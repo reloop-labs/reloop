@@ -68,7 +68,7 @@ export const AddDomainSidebar = () => {
 		try {
 			changeStatus("loading");
 			await axios.post(
-				"/api/domain/v1/add",
+				"/api/domain/v1/create",
 				{
 					domain,
 					customReturnPath,
