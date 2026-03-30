@@ -17,9 +17,9 @@ export function generateApiKey(): string {
 export function getKeyStart(key: string): string {
 	const parts = key.split("_");
 	if (parts.length >= 2) {
-		return `${parts[0]}_${parts[1]?.substring(0, 8) ?? ""}`;
+		return `${parts[0]}_${parts[1]?.substring(0, 17) ?? ""}`;
 	}
-	return key.substring(0, 12);
+	return key.substring(0, 17);
 }
 
 export function getApiKeyCacheKey(apiKey: string): string {
