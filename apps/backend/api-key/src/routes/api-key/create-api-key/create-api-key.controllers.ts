@@ -9,7 +9,6 @@ import {
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import type { Logger } from "@reloop/logger";
-import { eq } from "drizzle-orm";
 import { status } from "elysia";
 
 export async function createApiKeyController({
@@ -24,20 +23,23 @@ export async function createApiKeyController({
 	logger: Logger;
 }): Promise<ApiKeyTypes.ApiKeyWithKeyResponse> {
 	try {
+		logger.info({}, "Generating new api key");
 		const fullKey = generateApiKey();
 		const hashedKey = hashApiKey(fullKey);
 		const keyStart = getKeyStart(fullKey);
 		const keyId = createId();
+		logger.info({ hashedKey, keyStart, keyId }, "APi key Generated");
 
-		logger.info("Creating API key with key values here", hashedKey, keyStart, keyId);
 		const now = new Date();
 		const expiresAt = null;
 		const enabled = true;
 		const rateLimitEnabled = true;
-		const rateLimitTimeWindow = 86400000;
-		const rateLimitMax = 10;
+		const rateLimitTimeWindow = 1000;
+		const rateLimitMax = 100;
 		const remaining = rateLimitMax;
 
+
+		logger.info({ hashedKey, keyStart, keyId }, "Inserting API key in database");
 		const newApiKey = await db
 			.insert(schema.apikey)
 			.values({
@@ -67,24 +69,10 @@ export async function createApiKeyController({
 			.returning();
 
 		if (!newApiKey[0]) {
-			logger.error({ organizationId, userId }, "Failed to create API key");
+			logger.error({}, "Failed to create API key");
 			throw status(500, { message: "Failed to create API key" });
 		}
-
-		const user = await db.query.user.findFirst({
-			where: eq(schema.user.id, userId),
-		});
-
-		if (!user) {
-			logger.error(
-				{ organizationId, userId },
-				"User not found for API key creation",
-			);
-			throw status(500, { message: "User not found" });
-		}
-
-		logger.info("newApiKey", newApiKey);
-
+		logger.info("New Api key generated", { newApiKey });
 		return {
 			id: newApiKey[0].id,
 			name: newApiKey[0].name,
@@ -95,14 +83,7 @@ export async function createApiKeyController({
 			permissions: newApiKey[0].permissions,
 		};
 	} catch (error) {
-		logger.error(
-			{
-				organizationId,
-				userId,
-				error: error instanceof Error ? error.message : String(error),
-			},
-			"Error creating API key",
-		);
+		logger.error({ error }, "Error creating API key");
 		throw error;
 	}
 }

@@ -13,7 +13,7 @@
 		"api-key/postApiApi-keyV1",
 		"api-key/getApiApi-keyV1",
 		"api-key/patchApiApi-keyV1ById",
-		"api-key/deleteApiApi-keyV1ById",
+		"api-key/deleteApiApi-keyV1ByApi_key_id",
 		"---Contacts---",
 		"contacts/postApiContactsCreate",
 		"contacts/getApiContactsRetrieveByContact_id",

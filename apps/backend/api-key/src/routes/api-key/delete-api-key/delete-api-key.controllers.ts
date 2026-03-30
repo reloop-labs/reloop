@@ -7,22 +7,18 @@ import { status } from "elysia";
 export async function deleteApiKeyController({
 	apiKeyId,
 	organizationId,
-	userId,
 	logger,
 }: {
 	apiKeyId: string;
 	organizationId: string;
-	userId: string;
 	logger: Logger;
-}): Promise<{ message: string }> {
-	logger.info({ apiKeyId, organizationId, userId }, "Deleting API key");
-
+}): Promise<{ id: string; message: string }> {
+	logger.info({ apiKeyId }, "Checking if api key exists");
 	try {
 		const existing = await db.query.apikey.findFirst({
 			where: and(
 				eq(schema.apikey.id, apiKeyId),
 				eq(schema.apikey.organizationId, organizationId),
-				eq(schema.apikey.userId, userId),
 			),
 		});
 
@@ -31,18 +27,18 @@ export async function deleteApiKeyController({
 			throw status(404, { message: "API key not found" });
 		}
 
+		logger.info({ apiKeyId }, "Deleting API key");
 		await db
 			.delete(schema.apikey)
 			.where(
 				and(
 					eq(schema.apikey.id, apiKeyId),
 					eq(schema.apikey.organizationId, organizationId),
-					eq(schema.apikey.userId, userId),
 				),
 			);
 
 		logger.info({ apiKeyId }, "API key deleted successfully");
-		return { message: "API key deleted successfully" };
+		return { id: apiKeyId, message: "API key deleted successfully" };
 	} catch (error) {
 		logger.error(
 			{

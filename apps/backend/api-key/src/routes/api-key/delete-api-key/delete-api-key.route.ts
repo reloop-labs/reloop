@@ -5,24 +5,21 @@ import { deleteApiKeyController } from "./delete-api-key.controllers";
 import { deleteApiKeyXCodeSamples } from "./delete-api-key.x-codeSamples";
 
 export const deleteApiKeyRoute = new Elysia().use(authMiddleware).delete(
-	"/:id",
-	async ({ params: { id }, activeOrganizationId, userId, logger }) => {
+	"/:api_key_id",
+	async ({ params: { api_key_id }, activeOrganizationId, userId, logger }) => {
 		return await deleteApiKeyController({
-			apiKeyId: id,
+			apiKeyId: api_key_id,
 			organizationId: activeOrganizationId,
-			userId,
 			logger,
 		});
 	},
 	{
 		auth: true,
 		params: t.Object({
-			id: ApiKeyModel.apiKeyIdParam,
+			api_key_id: ApiKeyModel.apiKeyIdParam,
 		}),
 		response: {
-			200: t.Object({
-				message: t.String(),
-			}),
+			200: ApiKeyModel.deleteApiKeyResponse,
 			404: ApiKeyModel.apiKeyNotFound,
 			403: ApiKeyModel.unauthorized,
 		},

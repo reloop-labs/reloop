@@ -235,4 +235,20 @@ export namespace ApiKeyModel {
 		message: t.String({ description: "Success message" }),
 	});
 	export type SuccessResponse = typeof successResponse.static;
+
+	export const deleteApiKeyResponse = t.Object(
+		{
+			id: t.String({ description: "Deleted API key identifier" }),
+			message: t.String({ description: "Success message" }),
+		},
+		{
+			examples: [
+				{
+					id: "key_123456789",
+					message: "API key deleted successfully",
+				},
+			],
+		},
+	);
+	export type DeleteApiKeyResponse = typeof deleteApiKeyResponse.static;
 }
