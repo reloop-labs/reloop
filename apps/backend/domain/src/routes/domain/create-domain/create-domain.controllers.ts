@@ -18,7 +18,13 @@ export async function createDomainController({
   body: DomainTypes.CreateDomainRequest;
   logger: Logger;
 }): Promise<DomainTypes.DomainResponse> {
-  const { domain } = body;
+  const {
+    domain,
+    customReturnPath = "send",
+    clickTracking = false,
+    openTracking = false,
+    tls = "opportunistic",
+  } = body;
   try {
     const activeDomain = await db.query.domain.findFirst({
       where: and(
@@ -48,6 +54,10 @@ export async function createDomainController({
           updatedAt: now,
           createdAt: now,
           status: "start-verify",
+          customReturnPath,
+          clickTracking,
+          openTracking,
+          tls,
         })
         .where(eq(schema.domain.id, domainId));
 
@@ -92,6 +102,10 @@ export async function createDomainController({
       status: "start-verify",
       userVerified: false,
       systemVerified: false,
+      customReturnPath,
+      clickTracking,
+      openTracking,
+      tls,
       createdAt: new Date(),
       updatedAt: new Date(),
     });

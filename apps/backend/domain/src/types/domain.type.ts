@@ -27,6 +27,10 @@ export namespace DomainTypes {
 
 	export interface CreateDomainRequest {
 		domain: string;
+		customReturnPath?: string;
+		clickTracking?: boolean;
+		openTracking?: boolean;
+		tls?: "opportunistic" | "enforced";
 	}
 
 	export interface DomainListQuery {

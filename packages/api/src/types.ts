@@ -15,6 +15,10 @@ export interface Domain {
 	status: DomainStatus;
 	userVerified: boolean;
 	systemVerified: boolean;
+	customReturnPath: string;
+	clickTracking: boolean;
+	openTracking: boolean;
+	tls: "opportunistic" | "enforced";
 	dnsConfigured: boolean;
 	nameservers: string[] | null;
 	spfRecord: string | null;

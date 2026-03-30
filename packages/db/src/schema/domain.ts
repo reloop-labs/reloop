@@ -43,6 +43,7 @@ export const dnsRecordTypeNameEnum = pgEnum("dns_record_type_name", [
 	"DKIM",
 	"DMARC",
 ]);
+export const tlsModeEnum = pgEnum("tls_mode", ["opportunistic", "enforced"]);
 
 export const domain = pgTable(
 	"domain",
@@ -61,6 +62,12 @@ export const domain = pgTable(
 		status: domainStatusEnum("status").notNull().default("start-verify"),
 		userVerified: boolean("user_verified").notNull().default(false),
 		systemVerified: boolean("system_verified").notNull().default(false),
+		customReturnPath: varchar("custom_return_path", { length: 255 })
+			.notNull()
+			.default("send"),
+		clickTracking: boolean("click_tracking").notNull().default(false),
+		openTracking: boolean("open_tracking").notNull().default(false),
+		tls: tlsModeEnum("tls").notNull().default("opportunistic"),
 		trackingDomain: boolean("tracking_domain").notNull().default(false),
 		verificationFailedReason: text("verification_failed_reason"),
 		deletedAt: timestamp("deleted_at"),

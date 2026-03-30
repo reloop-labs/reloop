@@ -18,6 +18,33 @@ export namespace DomainModel {
 			pattern: domainPattern.source,
 			description: "Domain name (e.g., send.reloop.com)",
 		}),
+		customReturnPath: t.Optional(
+			t.String({
+				minLength: 1,
+				maxLength: 255,
+				pattern: "^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$",
+				default: "send",
+				description: "Custom return-path subdomain (e.g., send)",
+			}),
+		),
+		clickTracking: t.Optional(
+			t.Boolean({
+				default: false,
+				description: "Whether click tracking is enabled",
+			}),
+		),
+		openTracking: t.Optional(
+			t.Boolean({
+				default: false,
+				description: "Whether open tracking is enabled",
+			}),
+		),
+		tls: t.Optional(
+			t.Union([t.Literal("opportunistic"), t.Literal("enforced")], {
+				default: "opportunistic",
+				description: "TLS mode for the domain",
+			}),
+		),
 	});
 
 	export const dnsRecordResponse = t.Object({
@@ -89,6 +116,18 @@ export namespace DomainModel {
 		}),
 		systemVerified: t.Boolean({
 			description: "Whether system has verified the domain",
+		}),
+		customReturnPath: t.String({
+			description: "Custom return path subdomain for SPF and bounce handling",
+		}),
+		clickTracking: t.Boolean({
+			description: "Whether click tracking is enabled for the domain",
+		}),
+		openTracking: t.Boolean({
+			description: "Whether open tracking is enabled for the domain",
+		}),
+		tls: t.Union([t.Literal("opportunistic"), t.Literal("enforced")], {
+			description: "TLS mode for the domain",
 		}),
 		trackingDomain: t.Boolean({
 			description: "Whether domain is used for tracking",

@@ -24,7 +24,7 @@ export const verifyDNSRecordRoute = new Elysia().use(authMiddleware).post(
       403: DomainModel.unauthorized,
     },
     detail: {
-      tags: ["Verify-DNS-Record"],
+      tags: ["Domains"],
       summary: "Verify DNS records",
       description:
         "Verifies DNS records for a domain to check if they are properly configured",

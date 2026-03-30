@@ -6,9 +6,12 @@ import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
+import * as Select from "@reloop/ui/select";
 import Spinner from "@reloop/ui/spinner";
+import * as Switch from "@reloop/ui/switch";
 import { useLoading } from "@reloop/ui/use-loading";
 import axios from "axios";
+import { useState } from "react";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { useSWRConfig } from "swr";
@@ -23,6 +26,15 @@ const domainSchema = v.object({
 			"Please enter a valid domain name",
 		),
 	),
+	customReturnPath: v.pipe(
+		v.string("Custom return path is required"),
+		v.minLength(1, "Custom return path is required"),
+		v.regex(
+			/^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/,
+			"Use only letters, numbers, and hyphens",
+		),
+	),
+	tls: v.picklist(["opportunistic", "enforced"]),
 });
 
 type DomainFormValues = v.InferInput<typeof domainSchema>;
@@ -31,24 +43,39 @@ export const AddDomainSidebar = () => {
 	const { push } = useUserOrganization();
 	const { changeStatus, status } = useLoading();
 	const { mutate } = useSWRConfig();
-	const { register, handleSubmit, formState, setError } =
+	const [clickTracking, setClickTracking] = useState(false);
+	const [openTracking, setOpenTracking] = useState(false);
+	const { register, handleSubmit, formState, setError, setValue, watch } =
 		useForm<DomainFormValues>({
 			resolver: valibotResolver(domainSchema) as Resolver<DomainFormValues>,
 			defaultValues: {
 				domain: "",
+				customReturnPath: "send",
+				tls: "opportunistic",
 			},
 		});
+	const tlsValue = watch("tls");
 
 	const handleAddDomain = (domain: string) => {
 		push(`/domain/add/${domain}`);
 	};
 
-	const onSubmit = async ({ domain }: DomainFormValues) => {
+	const onSubmit = async ({
+		domain,
+		customReturnPath,
+		tls,
+	}: DomainFormValues) => {
 		try {
 			changeStatus("loading");
 			await axios.post(
 				"/api/domain/v1/add",
-				{ domain },
+				{
+					domain,
+					customReturnPath,
+					clickTracking,
+					openTracking,
+					tls,
+				},
 				{ headers: { credentials: "include" } },
 			);
 			await mutate(`/api/domain/v1/dns/${domain}`);
@@ -113,6 +140,112 @@ export const AddDomainSidebar = () => {
 									</p>
 								</div>
 							)}
+						</div>
+					</div>
+					<div className="grid gap-3 rounded-2xl border border-stroke-soft-200 bg-bg-weak-50/50 p-4">
+						<div>
+							<p className="font-medium text-sm text-text-strong-950">
+								Advanced settings
+							</p>
+							<p className="text-paragraph-sm text-text-sub-600">
+								Configure tracking, return path, and TLS for this domain.
+							</p>
+						</div>
+						<div>
+							<Label.Root
+								htmlFor="customReturnPath"
+								className="mb-2 block font-medium text-sm"
+							>
+								Custom Return Path
+								<Label.Asterisk />
+							</Label.Root>
+							<Input.Root
+								hasError={!!formState.errors.customReturnPath?.message}
+								className="w-full"
+							>
+								<Input.Wrapper>
+									<Input.Input
+										id="customReturnPath"
+										placeholder="send"
+										{...register("customReturnPath")}
+										disabled={status === "loading"}
+									/>
+								</Input.Wrapper>
+							</Input.Root>
+							<p className="mt-2 text-paragraph-xs text-text-sub-600">
+								This becomes the return-path subdomain used for SPF and bounces.
+							</p>
+							{formState.errors.customReturnPath && (
+								<div className="mt-2 flex items-center gap-2">
+									<Icon name="alert-circle" className="h-4 w-4 text-red-500" />
+									<p className="text-red-600 text-sm">
+										{formState.errors.customReturnPath.message}
+									</p>
+								</div>
+							)}
+						</div>
+						<div>
+							<Label.Root className="mb-2 block font-medium text-sm">
+								TLS Mode
+							</Label.Root>
+							<Select.Root
+								value={tlsValue}
+								onValueChange={(value) =>
+									setValue(
+										"tls",
+										value as DomainFormValues["tls"],
+										{ shouldValidate: true, shouldDirty: true },
+									)
+								}
+							>
+								<Select.Trigger className="w-full">
+									<Select.Value placeholder="Select TLS mode" />
+								</Select.Trigger>
+								<Select.Content>
+									<Select.Item value="opportunistic">
+										Opportunistic TLS
+									</Select.Item>
+									<Select.Item value="enforced">Enforced TLS</Select.Item>
+								</Select.Content>
+							</Select.Root>
+							<p className="mt-2 text-paragraph-xs text-text-sub-600">
+								Enforced TLS requires a secure connection to the receiving mail
+								server.
+							</p>
+						</div>
+						<div className="grid gap-3 sm:grid-cols-2">
+							<div className="flex items-center justify-between rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-3">
+								<div>
+									<p className="font-medium text-paragraph-sm text-text-strong-950">
+										Click Tracking
+									</p>
+									<p className="text-paragraph-xs text-text-sub-600">
+										Rewrite links to measure clicks.
+									</p>
+								</div>
+								<Switch.Root
+									checked={clickTracking}
+									onCheckedChange={setClickTracking}
+									disabled={status === "loading"}
+									checkedColor="orange"
+								/>
+							</div>
+							<div className="flex items-center justify-between rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-3">
+								<div>
+									<p className="font-medium text-paragraph-sm text-text-strong-950">
+										Open Tracking
+									</p>
+									<p className="text-paragraph-xs text-text-sub-600">
+										Measure opens using a tracking pixel.
+									</p>
+								</div>
+								<Switch.Root
+									checked={openTracking}
+									onCheckedChange={setOpenTracking}
+									disabled={status === "loading"}
+									checkedColor="orange"
+								/>
+							</div>
 						</div>
 					</div>
 					<div className="flex justify-end">

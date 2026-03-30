@@ -24,6 +24,10 @@ export interface SendEmailResponse {
 // Domain Service Types
 export interface CreateDomainRequest {
 	domain: string;
+	customReturnPath?: string;
+	clickTracking?: boolean;
+	openTracking?: boolean;
+	tls?: "opportunistic" | "enforced";
 }
 
 export type DomainStatus =
@@ -75,6 +79,10 @@ export interface DomainResponse {
 	status: DomainStatus;
 	userVerified: boolean;
 	systemVerified: boolean;
+	customReturnPath: string;
+	clickTracking: boolean;
+	openTracking: boolean;
+	tls: "opportunistic" | "enforced";
 	dnsConfigured: boolean;
 	nameservers: string[] | null;
 	spfRecord: string | null;
