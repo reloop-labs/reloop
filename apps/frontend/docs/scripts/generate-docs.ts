@@ -13,6 +13,7 @@ if (fs.existsSync(targetDir)) {
     "pagination.mdx",
     "usage-limits.mdx",
     "errors.mdx",
+    "meta.json"
   ];
   for (const entry of entries) {
     if (manualFiles.includes(entry.name)) continue;
