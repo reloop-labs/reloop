@@ -4,13 +4,6 @@ export namespace DomainModel {
 	// Domain validation pattern - supports domains and subdomains
 	const domainPattern =
 		/^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/;
-
-	export const domainParam = t.String({
-		pattern: domainPattern.source,
-		description:
-			"Valid domain or subdomain (e.g., example.com, subdomain.example.com)",
-	});
-
 	export const createDomainBody = t.Object({
 		domain: t.String({
 			minLength: 4,

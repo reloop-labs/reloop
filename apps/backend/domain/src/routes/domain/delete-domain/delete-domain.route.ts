@@ -5,10 +5,10 @@ import { deleteDomainController } from "./delete-domain.controllers";
 import { deleteDomainXCodeSamples } from "./delete-domain.x-codeSamples";
 
 export const deleteDomainRoute = new Elysia().use(authMiddleware).delete(
-  "/:domain",
-  async ({ params: { domain }, activeOrganizationId, logger }) => {
+  "/:domain_id",
+  async ({ params: { domain_id }, activeOrganizationId, logger }) => {
     return await deleteDomainController({
-      domain,
+      domainId: domain_id,
       organizationId: activeOrganizationId,
       logger,
     });
@@ -16,7 +16,7 @@ export const deleteDomainRoute = new Elysia().use(authMiddleware).delete(
   {
     auth: true,
     params: t.Object({
-      domain: DomainModel.domainParam,
+      domain_id: t.String(),
     }),
     response: {
       200: DomainModel.domainResponse,

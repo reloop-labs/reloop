@@ -6,21 +6,21 @@ import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
 export async function deleteDomainController({
-  domain: domainName,
+  domainId,
   organizationId,
   logger,
 }: {
-  domain: string;
+  domainId: string;
   organizationId: string;
   logger: Logger;
 }): Promise<DomainTypes.DomainResponse> {
-  logger.info({ domain: domainName }, "Soft deleting domain");
+  logger.info({ domainId }, "Soft deleting domain");
 
   try {
     // Fetch the domain with DNS records before deletion
     const domainWithDnsRecords = await db.query.domain.findFirst({
       where: and(
-        eq(schema.domain.domain, domainName),
+        eq(schema.domain.id, domainId),
         isNull(schema.domain.deletedAt),
         eq(schema.domain.organizationId, organizationId),
       ),
@@ -32,11 +32,10 @@ export async function deleteDomainController({
     });
 
     if (!domainWithDnsRecords) {
-      logger.warn({ domain: domainName }, "Domain not found for deletion");
+      logger.warn({ domainId }, "Domain not found for deletion");
       throw status(404, { message: "Domain not found" });
     }
 
-    const domainId = domainWithDnsRecords.id;
     const now = new Date();
 
     // Soft delete the domain
@@ -47,7 +46,7 @@ export async function deleteDomainController({
       .returning();
 
     if (domainUpdateResult.length === 0) {
-      logger.warn({ domain: domainName }, "Failed to delete domain");
+      logger.warn({ domainId }, "Failed to delete domain");
       throw status(500, { message: "Failed to delete domain" });
     }
 
@@ -70,7 +69,7 @@ export async function deleteDomainController({
     };
 
     logger.info(
-      { domain: domainName },
+      { domainId },
       "Domain and DNS records deleted successfully",
     );
 
@@ -78,7 +77,7 @@ export async function deleteDomainController({
   } catch (error) {
     logger.error(
       {
-        domain: domainName,
+        domainId,
         error: error instanceof Error ? error.message : String(error),
       },
       "Error deleting domain",
