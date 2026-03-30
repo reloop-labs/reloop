@@ -234,6 +234,41 @@ export namespace DomainModel {
 		}]
 	});
 
+	export const updateDomainBody = t.Object(
+		{
+			clickTracking: t.Optional(
+				t.Boolean({
+					description: "Whether click tracking is enabled",
+				}),
+			),
+			openTracking: t.Optional(
+				t.Boolean({
+					description: "Whether open tracking is enabled",
+				}),
+			),
+			sendingEmail: t.Optional(
+				t.Boolean({
+					description: "Whether sending email is enabled",
+				}),
+			),
+			receivingEmail: t.Optional(
+				t.Boolean({
+					description: "Whether receiving email is enabled",
+				}),
+			),
+		},
+		{
+			examples: [
+				{
+					clickTracking: true,
+					openTracking: true,
+					sendingEmail: true,
+					receivingEmail: true,
+				},
+			],
+		},
+	);
+
 	export const domainListResponse = t.Object({
 		domains: t.Array(domainResponse),
 		total: t.Number(),

@@ -15,6 +15,7 @@ const DomainPage = () => {
 	const { domainId } = useParams();
 	const [copiedItems, setCopiedItems] = React.useState<Set<string>>(new Set());
 	const [isVerifying, setIsVerifying] = React.useState(false);
+	const [isUpdatingSettings, setIsUpdatingSettings] = React.useState(false);
 
 	const {
 		data: domainData,
@@ -67,6 +68,41 @@ const DomainPage = () => {
 		}
 	};
 
+	const handleUpdateDomain = async (
+		payload: Partial<Pick<DomainResponse, "sendingEmail" | "receivingEmail">>,
+		successMessage: string,
+	) => {
+		if (!domainId || !domainData) {
+			toast.error("Domain information not available");
+			return;
+		}
+
+		const cacheKey = `/api/domain/v1/${domainId}`;
+		const optimisticData = { ...domainData, ...payload };
+
+		setIsUpdatingSettings(true);
+			await mutate(cacheKey, optimisticData, false);
+
+		try {
+			const { data } = await axios.patch<DomainResponse>(
+				`/api/domain/v1/${domainId}`,
+				payload,
+				{ headers: { credentials: "include" } },
+			);
+
+			await mutate(cacheKey, data, false);
+			toast.success(successMessage);
+		} catch (error) {
+			await mutate(cacheKey);
+			const errorMessage = axios.isAxiosError(error)
+				? error.response?.data?.message || "Failed to update domain settings"
+				: "Failed to update domain settings";
+			toast.error(errorMessage);
+		} finally {
+			setIsUpdatingSettings(false);
+		}
+	};
+
 	const { sendingRecords, receivingRecords, dmarcRecords } =
 		groupDomainDnsRecords(domainData?.dnsRecords, domainData?.customReturnPath);
 
@@ -91,12 +127,28 @@ const DomainPage = () => {
 	return (
 		<div className="mx-auto max-w-3xl sm:px-8">
 			<DomainHeader
+				domainRecordId={domainData?.id || (domainId as string)}
 				domainId={domainData?.domain || (domainId as string)}
 				status={domainData?.status || "start-verify"}
 				isLoading={isLoading}
 				lastUpdated={domainData?.createdAt || undefined}
 				onVerify={handleVerifyDNS}
 				isVerifying={isVerifying}
+				sendingEmail={domainData?.sendingEmail}
+				receivingEmail={domainData?.receivingEmail}
+				onToggleSending={(value) =>
+					handleUpdateDomain(
+						{ sendingEmail: value },
+						`Sending email ${value ? "enabled" : "disabled"}`,
+					)
+				}
+				onToggleReceiving={(value) =>
+					handleUpdateDomain(
+						{ receivingEmail: value },
+						`Receiving email ${value ? "enabled" : "disabled"}`,
+					)
+				}
+				isUpdatingSettings={isUpdatingSettings}
 			/>
 			<StatusBanner
 				status={domainData?.status || "start-verify"}

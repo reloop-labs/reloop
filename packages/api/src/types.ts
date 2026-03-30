@@ -27,6 +27,8 @@ export interface Domain {
 	dmarcRecord: string | null;
 	dmarcPolicy: string;
 	trackingDomain: boolean;
+	sendingEmail: boolean;
+	receivingEmail: boolean;
 	verificationFailedReason: string | null;
 	deletedAt: string | null;
 	lastVerifiedAt: string | null;
