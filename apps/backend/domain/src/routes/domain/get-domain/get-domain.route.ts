@@ -5,10 +5,10 @@ import { getDomainController } from "./get-domain.controllers";
 import { getDomainXCodeSamples } from "./get-domain.x-codeSamples";
 
 export const getDomainRoute = new Elysia().use(authMiddleware).get(
-  "/:domain",
-  async ({ params: { domain }, activeOrganizationId, logger }) => {
+  "/:domain_id",
+  async ({ params: { domain_id }, activeOrganizationId, logger }) => {
     return await getDomainController({
-      domain,
+      domainId: domain_id,
       organizationId: activeOrganizationId,
       logger,
     });
@@ -16,7 +16,7 @@ export const getDomainRoute = new Elysia().use(authMiddleware).get(
   {
     auth: true,
     params: t.Object({
-      domain: DomainModel.domainParam,
+      domain_id: t.String(),
     }),
     response: {
       200: DomainModel.domainResponse,
@@ -26,8 +26,8 @@ export const getDomainRoute = new Elysia().use(authMiddleware).get(
     },
     detail: {
       tags: ["Domains"],
-      summary: "Get domain by name",
-      description: "Retrieves a domain by its domain name",
+      summary: "Get domain by ID",
+      description: "Retrieves a domain by its ID",
       "x-codeSamples": getDomainXCodeSamples,
     },
   },

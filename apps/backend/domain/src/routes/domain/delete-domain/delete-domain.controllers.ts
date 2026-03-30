@@ -14,10 +14,8 @@ export async function deleteDomainController({
   organizationId: string;
   logger: Logger;
 }): Promise<DomainTypes.DomainResponse> {
-  logger.info({ domainId }, "Soft deleting domain");
-
   try {
-    // Fetch the domain with DNS records before deletion
+    logger.info({ domainId }, "Fetching domain with DNS records");
     const domainWithDnsRecords = await db.query.domain.findFirst({
       where: and(
         eq(schema.domain.id, domainId),
@@ -38,7 +36,7 @@ export async function deleteDomainController({
 
     const now = new Date();
 
-    // Soft delete the domain
+    logger.info({ domainId }, "Soft deleting domain");
     const domainUpdateResult = await db
       .update(schema.domain)
       .set({ deletedAt: now, updatedAt: now })
@@ -50,13 +48,12 @@ export async function deleteDomainController({
       throw status(500, { message: "Failed to delete domain" });
     }
 
-    // Soft delete DNS records
+    logger.info({ domainId }, "Soft deleting domain DNS records");
     await db
       .update(schema.domainDnsRecord)
       .set({ deletedAt: now, updatedAt: now })
       .where(eq(schema.domainDnsRecord.domainId, domainId));
 
-    // Update the domain object with deletedAt timestamp
     const deletedDomain = {
       ...domainWithDnsRecords,
       deletedAt: now,
@@ -75,13 +72,7 @@ export async function deleteDomainController({
 
     return deletedDomain;
   } catch (error) {
-    logger.error(
-      {
-        domainId,
-        error: error instanceof Error ? error.message : String(error),
-      },
-      "Error deleting domain",
-    );
+    logger.error({ domainId, error, }, "Error deleting domain",);
     throw error;
   }
 }

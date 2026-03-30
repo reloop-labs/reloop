@@ -6,18 +6,19 @@ import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
 export async function getDomainController({
-  domain: domainName,
   organizationId,
   logger,
+  domainId,
 }: {
-  domain: string;
   organizationId: string;
   logger: Logger;
+  domainId: string;
 }): Promise<DomainTypes.DomainResponse> {
   try {
+    logger.info({ domainId }, "Fetching domain with DNS records");
     const result = await db.query.domain.findFirst({
       where: and(
-        eq(schema.domain.domain, domainName),
+        eq(schema.domain.id, domainId),
         isNull(schema.domain.deletedAt),
         eq(schema.domain.organizationId, organizationId),
       ),
@@ -29,19 +30,14 @@ export async function getDomainController({
     });
 
     if (!result) {
-      logger.warn({ domain: domainName }, "Domain not found");
+      logger.warn({ domainId }, "Domain not found");
       throw status(404, { message: "Domain not found" });
     }
 
+    logger.info({ domainId }, "Domain fetched successfully");
     return result;
   } catch (error) {
-    logger.error(
-      {
-        domain: domainName,
-        error: error instanceof Error ? error.message : String(error),
-      },
-      "Error getting domain",
-    );
+    logger.error({ domainId, error }, "Error getting domain");
     throw error;
   }
 }
