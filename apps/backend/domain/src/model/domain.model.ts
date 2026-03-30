@@ -45,6 +45,18 @@ export namespace DomainModel {
 				description: "TLS mode for the domain",
 			}),
 		),
+		sendingEmail: t.Optional(
+			t.Boolean({
+				default: true,
+				description: "Whether sending email is enabled",
+			}),
+		),
+		receivingEmail: t.Optional(
+			t.Boolean({
+				default: true,
+				description: "Whether receiving email is enabled",
+			}),
+		),
 	}, {
 		examples: [
 			{
@@ -53,6 +65,8 @@ export namespace DomainModel {
 				clickTracking: true,
 				openTracking: true,
 				tls: "opportunistic",
+				sendingEmail: true,
+				receivingEmail: true,
 			},
 		],
 	});
@@ -154,6 +168,12 @@ export namespace DomainModel {
 		trackingDomain: t.Boolean({
 			description: "Whether domain is used for tracking",
 		}),
+		sendingEmail: t.Boolean({
+			description: "Whether sending email is enabled for the domain",
+		}),
+		receivingEmail: t.Boolean({
+			description: "Whether receiving email is enabled for the domain",
+		}),
 		verificationFailedReason: t.Union([t.String(), t.Null()], {
 			description: "Reason for verification failure",
 		}),
@@ -181,6 +201,8 @@ export namespace DomainModel {
 			openTracking: true,
 			tls: "opportunistic",
 			trackingDomain: false,
+			sendingEmail: true,
+			receivingEmail: true,
 			dnsRecords: [{
 				id: "dns_123456789",
 				recordType: "MX",

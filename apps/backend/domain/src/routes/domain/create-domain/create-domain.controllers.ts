@@ -15,6 +15,8 @@ export async function createDomainController({
   clickTracking,
   openTracking,
   tls,
+  sendingEmail,
+  receivingEmail,
   logger,
 }: {
   organizationId: string;
@@ -59,6 +61,8 @@ export async function createDomainController({
           clickTracking,
           openTracking,
           tls,
+          sendingEmail,
+          receivingEmail,
         })
         .where(eq(schema.domain.id, domainId));
       logger.info({ domainId }, "Undeleting domain DNS records");
@@ -107,6 +111,8 @@ export async function createDomainController({
       clickTracking,
       openTracking,
       tls,
+      sendingEmail,
+      receivingEmail,
       createdAt: new Date(),
       updatedAt: new Date(),
     });

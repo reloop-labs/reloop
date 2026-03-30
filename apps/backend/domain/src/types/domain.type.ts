@@ -31,6 +31,8 @@ export namespace DomainTypes {
 		clickTracking?: boolean;
 		openTracking?: boolean;
 		tls?: "opportunistic" | "enforced";
+		sendingEmail?: boolean;
+		receivingEmail?: boolean;
 	}
 
 	export interface DomainListQuery {

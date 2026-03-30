@@ -14,7 +14,9 @@ export const createDomainXCodeSamples = [
     customReturnPath: "send",
     clickTracking: true,
     openTracking: true,
-    tls: "opportunistic"
+    tls: "opportunistic",
+    sendingEmail: true,
+    receivingEmail: true
   })
 });
 
@@ -32,7 +34,9 @@ const domain = await response.json();`,
     "customReturnPath": "send",
     "clickTracking": true,
     "openTracking": true,
-    "tls": "opportunistic"
+    "tls": "opportunistic",
+    "sendingEmail": true,
+    "receivingEmail": true
   }'`,
   },
   {
@@ -53,6 +57,8 @@ response = requests.post(
         "clickTracking": True,
         "openTracking": True,
         "tls": "opportunistic",
+        "sendingEmail": True,
+        "receivingEmail": True,
     },
 )
 
@@ -76,6 +82,8 @@ $response = $client->post('https://api.reloop.sh/api/domain/v1/create', [
         'clickTracking' => true,
         'openTracking' => true,
         'tls' => 'opportunistic',
+        'sendingEmail' => true,
+        'receivingEmail' => true,
     ],
 ]);
 
@@ -97,7 +105,9 @@ String body = """
       "customReturnPath": "send",
       "clickTracking": true,
       "openTracking": true,
-      "tls": "opportunistic"
+      "tls": "opportunistic",
+      "sendingEmail": true,
+      "receivingEmail": true
     }
     """;
 
@@ -125,7 +135,9 @@ var payload = new {
     customReturnPath = "send",
     clickTracking = true,
     openTracking = true,
-    tls = "opportunistic"
+    tls = "opportunistic",
+    sendingEmail = true,
+    receivingEmail = true
 };
 
 var response = await client.PostAsJsonAsync(
