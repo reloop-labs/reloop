@@ -52,8 +52,8 @@ export const DomainTable = ({
 	const router = useRouter();
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 
-	const handleRowClick = (domainName: string) => {
-		router.push(`/${activeOrganizationSlug}/domain/${domainName}`);
+	const handleRowClick = (domainId: string) => {
+		router.push(`/${activeOrganizationSlug}/domain/${domainId}`);
 	};
 
 	const handleDeleteDomain = (domainId: string) => {
@@ -113,12 +113,12 @@ export const DomainTable = ({
 				) : (
 					domains.map((domain) => {
 						const isRowActive = activeDropdownId === domain.id;
-						const isSelected = currentDomainId === domain.domain;
+						const isSelected = currentDomainId === domain.id;
 
 						return (
 							<div
 								key={domain.id}
-								onClick={() => handleRowClick(domain.domain)}
+								onClick={() => handleRowClick(domain.id)}
 								className={cn(
 									"group/row grid cursor-pointer grid-cols-[1fr_minmax(200px,auto)_minmax(100px,auto)_minmax(40px,auto)] items-center px-5 py-2 text-left transition-colors",
 									"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-base",
@@ -170,7 +170,7 @@ export const DomainTable = ({
 									<DomainDropdown
 										domainId={domain.id}
 										domainName={domain.domain}
-										onViewDetails={() => handleRowClick(domain.domain)}
+										onViewDetails={() => handleRowClick(domain.id)}
 										onDelete={handleDeleteDomain}
 										onOpenChange={(open) =>
 											setActiveDropdownId(open ? domain.id : null)
