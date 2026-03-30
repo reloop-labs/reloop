@@ -152,6 +152,7 @@
         "@opentelemetry/sdk-trace-node": "catalog:backend",
         "@opentelemetry/semantic-conventions": "catalog:backend",
         "@paralleldrive/cuid2": "catalog:backend",
+        "@reloop/apikey": "workspace:*",
         "@reloop/auth": "workspace:*",
         "@reloop/cache": "workspace:*",
         "@reloop/db": "workspace:*",
