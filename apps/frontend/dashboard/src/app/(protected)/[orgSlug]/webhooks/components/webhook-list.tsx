@@ -59,7 +59,7 @@ export const WebhookListSidebar = () => {
 
 	return (
 		<div className="mx-auto max-w-3xl sm:px-8">
-			<div className="flex items-center justify-between pt-10">
+			<div className="flex items-center justify-between pt-10 pb-6">
 				<p className="font-medium text-2xl">
 					Webhook{data?.webhooks.length !== 1 ? "s" : ""}
 				</p>
@@ -99,7 +99,7 @@ export const WebhookListSidebar = () => {
 					<EmptyState onCreateWebhook={() => setIsCreateModalOpen(true)} />
 				) : (
 					<div>
-						<div className="mt-10 flex items-center gap-3">
+						<div className="flex items-center gap-3">
 							<div className="flex-1">
 								<Input.Root size="small" className="rounded-xl">
 									<Input.Wrapper>

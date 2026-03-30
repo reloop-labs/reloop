@@ -111,7 +111,7 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 									Back
 								</Button.Root>
 							)}
-							<h1 className="mt-2 font-medium text-2xl">{title}</h1>
+							<h1 className=" font-medium text-2xl">{title}</h1>
 						</div>
 						{!isAddTopicPage && !isBulkImportPage && (
 							<div className="flex items-center gap-2 self-end">

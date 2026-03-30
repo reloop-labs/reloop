@@ -109,6 +109,11 @@ export const ApiKeyListSidebar = () => {
 			return matchesStatus && matchesCreator && matchesSearch;
 		}) || [];
 
+	const derivedEnabledCount =
+		data?.apiKeys?.filter((k) => k.enabled).length || 0;
+	const derivedDisabledCount =
+		data?.apiKeys?.filter((k) => !k.enabled).length || 0;
+
 	return (
 		<div className="pb-8">
 			<div>
