@@ -10,21 +10,17 @@ import { status } from "elysia";
 export async function createDomainController({
   organizationId,
   userId,
-  body,
+  domain,
+  customReturnPath,
+  clickTracking,
+  openTracking,
+  tls,
   logger,
 }: {
   organizationId: string;
   userId: string;
-  body: DomainTypes.CreateDomainRequest;
   logger: Logger;
-}): Promise<DomainTypes.DomainResponse> {
-  const {
-    domain,
-    customReturnPath = "send",
-    clickTracking = false,
-    openTracking = false,
-    tls = "opportunistic",
-  } = body;
+} & DomainTypes.CreateDomainRequest): Promise<DomainTypes.DomainResponse> {
   try {
     const activeDomain = await db.query.domain.findFirst({
       where: and(

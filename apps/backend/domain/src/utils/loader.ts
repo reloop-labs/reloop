@@ -2,7 +2,7 @@ import { RedisCache } from "@reloop/cache/redis-client";
 import { db } from "@reloop/db/client";
 import { logger } from "@reloop/logger";
 
-const redis = new RedisCache("domain");
+export const redis = new RedisCache("domain");
 export const loader = async () => {
 	try {
 		await redis.healthCheck();

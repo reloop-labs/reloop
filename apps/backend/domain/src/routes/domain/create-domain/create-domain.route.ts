@@ -5,12 +5,16 @@ import { Elysia } from "elysia";
 import { createDomainController } from "./create-domain.controllers";
 
 export const createDomainRoute = new Elysia().use(authMiddleware).post(
-  "/add",
+  "/create",
   async ({ body, activeOrganizationId, userId, logger }) => {
     try {
       return await createDomainController({
         organizationId: activeOrganizationId,
-        body,
+        domain: body.domain,
+        customReturnPath: body.customReturnPath,
+        clickTracking: body.clickTracking,
+        openTracking: body.openTracking,
+        tls: body.tls,
         userId,
         logger,
       });
