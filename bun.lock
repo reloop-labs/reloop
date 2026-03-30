@@ -716,6 +716,7 @@
       "@types/bun": "1.2.6",
       "@types/nodemailer": "6.4.14",
       "bun-types": "latest",
+      "cloudflare": "5.2.0",
       "date-fns": "^4.1.0",
       "dotenv": "16.4.7",
       "elysia": "1.4.15",

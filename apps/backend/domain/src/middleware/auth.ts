@@ -23,6 +23,9 @@ export const authMiddleware = new Elysia({ name: "better-auth" }).macro({
 					},
 				);
 				const session: Session | null = await response.json();
+				const traceId = crypto.randomUUID();
+				const currentLogger = logger.child({ traceId, service: "domain" });
+
 				if (session) {
 					if (!session?.user?.activeOrganizationId) {
 						return status(401, {
@@ -30,10 +33,18 @@ export const authMiddleware = new Elysia({ name: "better-auth" }).macro({
 							code: errorCodes.NOT_MEMBER_OF_ORGANIZATION,
 						});
 					}
+					currentLogger.info(
+						{ userId: session.user.id, organizationId: session.user.activeOrganizationId },
+						"Session authentication successful",
+					);
 					return {
+						userId: session.user.id,
+						activeOrganizationId: session.user.activeOrganizationId,
 						user: session.user,
 						session: session.session,
 						authMethod: "cookie" as const,
+						traceId,
+						logger: currentLogger,
 					};
 				}
 				return status(401, {
