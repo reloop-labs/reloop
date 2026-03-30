@@ -26,7 +26,7 @@ export const deleteDomainRoute = new Elysia().use(authMiddleware).delete(
     },
     detail: {
       tags: ["Domains"],
-      summary: "Delete domain",
+      summary: "Delete Domain",
       description: "Deletes a domain and all its associated data",
       "x-codeSamples": deleteDomainXCodeSamples,
     },

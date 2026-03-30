@@ -26,7 +26,7 @@ export const getDomainRoute = new Elysia().use(authMiddleware).get(
     },
     detail: {
       tags: ["Domains"],
-      summary: "Get domain by ID",
+      summary: "Retrieve Domain",
       description: "Retrieves a domain by its ID",
       "x-codeSamples": getDomainXCodeSamples,
     },

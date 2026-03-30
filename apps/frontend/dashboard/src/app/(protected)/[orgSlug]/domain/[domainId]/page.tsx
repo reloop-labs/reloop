@@ -161,6 +161,14 @@ const DomainPage = () => {
 				sendingRecords={sendingRecords}
 				receivingRecords={receivingRecords}
 				dmarcRecords={dmarcRecords}
+				sendingEmail={domainData?.sendingEmail}
+				onToggleSending={(value) =>
+					handleUpdateDomain(
+						{ sendingEmail: value },
+						`Sending email ${value ? "enabled" : "disabled"}`,
+					)
+				}
+				isUpdatingSettings={isUpdatingSettings}
 				onCopyToClipboard={copyToClipboard}
 				copiedItems={copiedItems}
 				isLoading={isLoading}

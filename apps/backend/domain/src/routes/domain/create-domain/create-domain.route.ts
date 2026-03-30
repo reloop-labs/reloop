@@ -38,8 +38,8 @@ export const createDomainRoute = new Elysia().use(authMiddleware).post(
     },
     detail: {
       tags: ["Domains"],
-      summary: "Add a new domain",
-      description: "Adds a new domain to the user's organization",
+      summary: "Create Domain",
+      description: "Creates a new domain",
       "x-codeSamples": createDomainXCodeSamples,
     },
   },

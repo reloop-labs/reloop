@@ -9,6 +9,10 @@ export const services = {
 		input: ["http://localhost:8012/api/api-key/openapi/json"],
 		disableCache: true,
 	}),
+	domain: createOpenAPI({
+		input: ["http://localhost:8011/api/domain/openapi/json"],
+		disableCache: true,
+	}),
 };
 
-export const openapi = services.contacts;
+export const openapi = services.domain;

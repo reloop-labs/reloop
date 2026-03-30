@@ -27,7 +27,7 @@ export const verifyDNSRecordRoute = new Elysia().use(authMiddleware).post(
     },
     detail: {
       tags: ["Domains"],
-      summary: "Verify DNS records",
+      summary: "Verify Domain",
       description:
         "Verifies DNS records for a domain to check if they are properly configured",
       "x-codeSamples": verifyDNSXCodeSamples,

@@ -5,6 +5,7 @@ import * as Alert from "@reloop/ui/alert";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
+import * as Switch from "@reloop/ui/switch";
 import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
 import * as React from "react";
@@ -16,6 +17,7 @@ import { groupDomainDnsRecords } from "../../[domainId]/components/dns-record-gr
 const NewDomainPage = () => {
 	const [copiedItems, setCopiedItems] = React.useState<Set<string>>(new Set());
 	const [isVerifying, setIsVerifying] = React.useState(false);
+	const [isUpdatingSettings, setIsUpdatingSettings] = React.useState(false);
 	const { push } = useUserOrganization();
 	const { domainId } = useParams();
 	const { back } = useRouter();
@@ -68,6 +70,36 @@ const NewDomainPage = () => {
 			toast.error(errorMessage);
 		} finally {
 			setIsVerifying(false);
+		}
+	};
+
+	const handleUpdateDomain = async (
+		payload: Partial<Pick<DomainResponse, "sendingEmail" | "receivingEmail">>,
+	) => {
+		if (!domainId || !domainData) {
+			toast.error("Domain information not available");
+			return;
+		}
+
+		const cacheKey = `/api/domain/v1/${domainId}`;
+		setIsUpdatingSettings(true);
+		await mutate(cacheKey, { ...domainData, ...payload }, false);
+
+		try {
+			const { data } = await axios.patch<DomainResponse>(
+				`/api/domain/v1/${domainId}`,
+				payload,
+				{ headers: { credentials: "include" } },
+			);
+			await mutate(cacheKey, data, false);
+		} catch (error) {
+			await mutate(cacheKey);
+			const errorMessage = axios.isAxiosError(error)
+				? error.response?.data?.message || "Failed to update domain"
+				: "Failed to update domain";
+			toast.error(errorMessage);
+		} finally {
+			setIsUpdatingSettings(false);
 		}
 	};
 
@@ -169,16 +201,26 @@ const NewDomainPage = () => {
 					</div>
 				</Alert.Root>
 
-				{/* DKIM and SPF Records */}
+				{/* Sending Email Records */}
 				<div className="relative mt-10">
-					<div className="mb-6 space-y-1">
-						<div className="font-medium text-sm text-text-strong-950">
-							DKIM and SPF{" "}
-							<span className="text-text-sub-600 text-xs">(Required)</span>
+					<div className="mb-6 flex items-start justify-between gap-4">
+						<div className="space-y-1">
+							<div className="font-medium text-sm text-text-strong-950">
+								Sending Email{" "}
+								<span className="text-text-sub-600 text-xs">(Required)</span>
+							</div>
+							<div className="text-text-sub-600 text-xs">
+								Enable email signing and specify authorized senders.
+							</div>
 						</div>
-						<div className="text-text-sub-600 text-xs">
-							Enable email signing and specify authorized senders.
-						</div>
+						<Switch.Root
+							checked={domainData?.sendingEmail ?? true}
+							onCheckedChange={(value) =>
+								handleUpdateDomain({ sendingEmail: value })
+							}
+							disabled={isLoading || isUpdatingSettings}
+							checkedColor="orange"
+						/>
 					</div>
 					<div className="w-full">
 						<DNSRecordTable
