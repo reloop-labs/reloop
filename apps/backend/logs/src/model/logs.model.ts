@@ -19,83 +19,20 @@ export namespace LogsModel {
 	});
 
 	export const baseLogBody = t.Object({
-		service: t.Optional(
-			t.String({
-				minLength: 1,
-				description: "Service name emitting the log entry",
-			}),
-		),
 		event: t.String({
 			minLength: 1,
 			description: "Event or log name (e.g., 'user_signed_up', 'email_sent')",
 		}),
-		level: t.Optional(logLevel),
-		source: t.Optional(
-			t.String({
-				description: "Source component or subsystem inside the service",
-			}),
-		),
-		message: t.Optional(
-			t.String({
-				description: "Human-readable log message",
-			}),
-		),
-		properties: t.Optional(
-			t.Record(t.String(), structuredValue, {
-				description: "Structured event or log properties",
-			}),
-		),
-		metadata: t.Optional(
+		level: t.String(logLevel),
+		trace_id: t.String({ description: "Distributed trace identifier", }),
+		metadata:
 			t.Record(t.String(), structuredValue, {
 				description: "Additional structured metadata for debugging and querying",
 			}),
-		),
-		distinct_id: t.Optional(
-			t.String({
-				description: "Distinct identifier for the user/entity",
+		requestDetails:
+			t.Record(t.String(), structuredValue, {
+				description: "Additional structured metadata for debugging and querying",
 			}),
-		),
-		user_id: t.Optional(
-			t.String({
-				description: "User identifier",
-			}),
-		),
-		organization_id: t.Optional(
-			t.String({
-				description: "Organization identifier",
-			}),
-		),
-		request_id: t.Optional(
-			t.String({
-				description: "Request identifier for correlating application flows",
-			}),
-		),
-		trace_id: t.Optional(
-			t.String({
-				description: "Distributed trace identifier",
-			}),
-		),
-		span_id: t.Optional(
-			t.String({
-				description: "Distributed trace span identifier",
-			}),
-		),
-		environment: t.Optional(
-			t.String({
-				description: "Runtime environment, such as local, staging, or production",
-			}),
-		),
-		tags: t.Optional(
-			t.Array(t.String(), {
-				description: "Tags for filtering and grouping related logs",
-			}),
-		),
-		occurred_at: t.Optional(
-			t.String({
-				format: "date-time",
-				description: "RFC 3339 timestamp representing when the event occurred",
-			}),
-		),
 	});
 
 	export type BaseLogBody = typeof baseLogBody.static;
@@ -105,33 +42,24 @@ export namespace LogsModel {
 
 	export const logEntryResponse = t.Object({
 		uuid: t.String({ description: "Unique log identifier" }),
-		service: t.String({ description: "Service name emitting the log entry" }),
 		event: t.String({ description: "Event or log name" }),
 		level: t.String({ description: "Stored log level" }),
-		source: t.Union([t.String(), t.Null()]),
-		message: t.Union([t.String(), t.Null()]),
-		request_id: t.Union([t.String(), t.Null()]),
 		trace_id: t.Union([t.String(), t.Null()]),
-		span_id: t.Union([t.String(), t.Null()]),
-		user_id: t.Union([t.String(), t.Null()]),
-		distinct_id: t.Union([t.String(), t.Null()]),
-		organization_id: t.Union([t.String(), t.Null()]),
-		environment: t.Union([t.String(), t.Null()]),
-		tags: t.Array(t.String()),
-		properties: t.Any(),
 		metadata: t.Any(),
-		occurred_at: t.String({ format: "date-time" }),
-		ingested_at: t.String({ format: "date-time" }),
+		created_at: t.String({ format: "date-time" }),
+		request_details: t.Any()
 	});
 
 	export type LogEntryResponse = typeof logEntryResponse.static;
 
 	export const logResponse = t.Object({
 		uuid: t.String({ description: "Unique event identifier" }),
-		service: t.String({ description: "Service name emitting the log entry" }),
 		event: t.String({ description: "Event name" }),
 		level: t.String({ description: "Stored log level" }),
-		message: t.String({ description: "Success message" }),
+		trace_id: t.String({ description: "Distributed trace identifier" }),
+		metadata: t.Any({ description: "Additional structured metadata" }),
+		created_at: t.String({ format: "date-time" }),
+		request_details: t.Any(),
 	});
 
 	export type LogResponse = typeof logResponse.static;
@@ -140,7 +68,6 @@ export namespace LogsModel {
 	export type CreateLogResponse = typeof createLogResponse.static;
 
 	export const listLogsQuery = t.Object({
-		service: t.Optional(t.String()),
 		level: t.Optional(logLevel),
 		event: t.Optional(t.String()),
 		organization_id: t.Optional(t.String()),

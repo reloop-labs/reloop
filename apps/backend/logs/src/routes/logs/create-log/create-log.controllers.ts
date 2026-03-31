@@ -1,36 +1,50 @@
-import { logger } from "@reloop/logger";
-import { insertLog } from "@reloop/logs/utils/clickhouse";
+import type { LogsTypes } from "@reloop/logs/types/logs.type";
+import { getClickHouseClient } from "@reloop/logs/utils/clickhouse";
 import { status } from "elysia";
-import type { LogsTypes } from "../../../types/logs.type";
 
-export async function createLogController(
-	body: LogsTypes.CreateLogBody,
-): Promise<LogsTypes.CreateLogResponse> {
+export async function createLogController({
+	event,
+	level,
+	trace_id,
+	metadata,
+	userId,
+	activeOrganizationId,
+	requestDetails,
+}: LogsTypes.CreateLogBody & {
+	userId: string;
+	activeOrganizationId: string;
+}): Promise<LogsTypes.CreateLogResponse> {
 	try {
-		const response = await insertLog(body);
+		const client = getClickHouseClient();
 
-		logger.info(
-			{
-				service: response.service,
-				event: response.event,
-				level: response.level,
-				uuid: response.uuid,
-			},
-			"Log created successfully",
-		);
-
-		return response;
+		const id = crypto.randomUUID();
+		const occurredAt = new Date().toISOString();
+		const entry = {
+			id,
+			event,
+			level,
+			trace_id,
+			user_id: userId,
+			organization_id: activeOrganizationId,
+			metadata: JSON.stringify(metadata || {}),
+			created_at: occurredAt,
+			request_details: JSON.stringify(requestDetails || {}),
+		};
+		await client.insert({
+			table: "logs",
+			values: [entry],
+			format: "JSONEachRow",
+		});
+		return {
+			uuid: entry.id,
+			event: entry.event,
+			level: entry.level,
+			trace_id: entry.trace_id,
+			metadata: metadata || {},
+			created_at: entry.created_at,
+			request_details: requestDetails,
+		};
 	} catch (error) {
-		logger.error(
-			{
-				service: body.service || "unknown",
-				event: body.event,
-				level: body.level || "info",
-				error: error instanceof Error ? error.message : String(error),
-			},
-			"Error creating log",
-		);
-
 		throw status(500, {
 			message: error instanceof Error ? error.message : "Failed to create log",
 		});

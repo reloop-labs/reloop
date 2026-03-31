@@ -1,4 +1,3 @@
-import { logger } from "@reloop/logger";
 import { logsConfig } from "@reloop/logs/logs.config";
 import { Elysia } from "elysia";
 import { validateApiKey } from "./api-key-auth";
@@ -23,34 +22,14 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 
 				const cookie = headers.get("cookie");
 				const traceId = crypto.randomUUID();
-				const currentLogger = logger.child({ traceId });
 				const sessionResult = await validateSession(cookie);
 
 				if (sessionResult) {
-					const tenantLogger = currentLogger.child({
-						traceId,
-						service: "logs",
-						...currentLogger,
-					});
-
-					tenantLogger.info(
-						{ ...sessionResult },
-						"Session authentication successful",
-					);
-
-					return { ...sessionResult, traceId, logger: tenantLogger };
+					return { ...sessionResult, traceId };
 				}
 
 				return status(401, { message: "Authentication required" });
-			} catch (e) {
-				logger.error(
-					{
-						error: e instanceof Error ? e.message : "Unknown error",
-						stack: e instanceof Error ? e.stack : undefined,
-					},
-					"Authentication error",
-				);
-
+			} catch {
 				return status(401, { message: "Authentication failed" });
 			}
 		},
@@ -63,50 +42,19 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 					headers.get("authorization")?.replace("Bearer ", "");
 				const cookie = headers.get("cookie");
 				const traceId = crypto.randomUUID();
-				const currentLogger = logger.child({ traceId });
 				const apiKeyResult = await validateApiKey(apiKey);
 
 				if (apiKeyResult) {
-					const tenantLogger = currentLogger.child({
-						traceId,
-						service: "logs",
-						...currentLogger,
-					});
-
-					tenantLogger.info(
-						{ ...apiKeyResult },
-						"API key authentication successful",
-					);
-
-					return { ...apiKeyResult, traceId, logger: tenantLogger };
+					return { ...apiKeyResult, traceId };
 				}
 
 				const sessionResult = await validateSession(cookie);
 				if (sessionResult) {
-					const tenantLogger = currentLogger.child({
-						traceId,
-						service: "logs",
-						...currentLogger,
-					});
-
-					tenantLogger.info(
-						{ ...sessionResult },
-						"Session authentication successful",
-					);
-
-					return { ...sessionResult, traceId, logger: tenantLogger };
+					return { ...sessionResult, traceId };
 				}
 
 				return status(401, { message: "Authentication required" });
-			} catch (e) {
-				logger.error(
-					{
-						error: e instanceof Error ? e.message : "Unknown error",
-						stack: e instanceof Error ? e.stack : undefined,
-					},
-					"Authentication error",
-				);
-
+			} catch {
 				return status(401, { message: "Authentication failed" });
 			}
 		},

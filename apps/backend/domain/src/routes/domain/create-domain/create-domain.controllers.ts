@@ -1,10 +1,13 @@
 import { domainConfig } from "@be/domain/domain.config";
 import type { DomainTypes } from "@be/domain/types/domain.type";
-import { generateAllDNSRecords, generateReceivingMXRecord } from "@be/domain/utils";
+import {
+  generateAllDNSRecords,
+  generateReceivingMXRecord,
+} from "@be/domain/utils";
 import { createId } from "@paralleldrive/cuid2";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import type { Logger } from "@reloop/logger";
+import { createLog, type Logger } from "@reloop/logger";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
@@ -91,6 +94,15 @@ export async function createDomainController({
         throw new Error("Failed to undelete domain");
       }
       logger.info({ domainId }, "Undeleted domain");
+
+      await createLog({
+        event: "domain_undeleted",
+        message: `Domain ${domain} was undeleted`,
+        organization_id: organizationId,
+        user_id: userId,
+        properties: { domain, domainId },
+      });
+
       return undeletedDomain;
     }
 
@@ -195,9 +207,31 @@ export async function createDomainController({
       throw new Error("Failed to fetch domain with DNS records after creation");
     }
     logger.info({ domainWithDnsRecords }, "Domain created successfully");
+
+    await createLog({
+      event: "domain_created",
+      message: `Domain ${domain} was created successfully`,
+      organization_id: organizationId,
+      user_id: userId,
+      properties: { domain, domainId },
+    });
+
     return domainWithDnsRecords;
   } catch (error) {
     logger.error({ domain, error }, "Error creating domain");
+
+    await createLog({
+      event: "domain_creation_failed",
+      level: "error",
+      message: `Failed to create domain ${domain}`,
+      organization_id: organizationId,
+      user_id: userId,
+      properties: {
+        domain,
+        error: error instanceof Error ? error.message : String(error),
+      },
+    });
+
     if (error instanceof Error && error.message.includes("already exists")) {
       throw status(409, { message: "Domain already exists" });
     }

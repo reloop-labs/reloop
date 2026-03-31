@@ -1,7 +1,6 @@
 import "dotenv/config";
 import { fromTypes, openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
-import { logger } from "@reloop/logger";
 import { logsConfig } from "@reloop/logs/logs.config";
 import { loader } from "@reloop/logs/utils/loader";
 import { Elysia } from "elysia";
@@ -35,7 +34,7 @@ const logsService = new Elysia({
 		await loader();
 	})
 	.listen(port, () => {
-		logger.info(`Logs Server is running on http://localhost:${port}/api/logs`);
+		// Server started
 	});
 
 export type LogsService = typeof logsService;

@@ -69,4 +69,41 @@ export const logger = Object.assign(baseLogger, {
 	},
 });
 
+/**
+ * Create a structured log in the remote log service
+ * @param body - The log entry details
+ */
+export async function createLog(body: {
+	event: string;
+	level?: "debug" | "info" | "warn" | "error" | "fatal";
+	message?: string;
+	organization_id?: string;
+	user_id?: string;
+	properties?: Record<string, unknown>;
+	metadata?: Record<string, unknown>;
+	service?: string;
+	source?: string;
+}) {
+	const baseUrl =
+		process.env.BASE_URL?.replace("local.reloop.sh", "localhost") ||
+		"http://localhost:8016";
+	const url = `${baseUrl}/api/logs/v1/create`;
+
+	try {
+		await fetch(url, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				"x-api-key": process.env.LOGS_API_KEY || "reloop-log-api-key",
+			},
+			body: JSON.stringify({
+				level: "info",
+				...body,
+			}),
+		});
+	} catch (error) {
+		baseLogger.error({ error, url }, "Error calling logs service");
+	}
+}
+
 export default logger;
