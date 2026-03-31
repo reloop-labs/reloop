@@ -14,7 +14,7 @@ function validateLogApiKeyHeader(headers: Headers) {
 }
 
 export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
-	cookieAuth: {
+	insertAuth: {
 		async resolve({ status, request: { headers } }) {
 			try {
 				if (!validateLogApiKeyHeader(headers)) {
@@ -55,59 +55,9 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 			}
 		},
 	},
-	apiKeyAuth: {
-		async resolve({ status, request: { headers } }) {
-			try {
-				if (!validateLogApiKeyHeader(headers)) {
-					return status(403, { message: "Invalid log service key" });
-				}
-
-				const apiKey =
-					headers.get("x-api-key") ||
-					headers.get("authorization")?.replace("Bearer ", "");
-				const traceId = crypto.randomUUID();
-				const currentLogger = logger.child({ traceId });
-				const apiKeyResult = await validateApiKey(apiKey);
-
-				if (apiKeyResult) {
-					const tenantLogger = currentLogger.child({
-						traceId,
-						service: "logs",
-						...currentLogger,
-					});
-
-					tenantLogger.info(
-						{ ...apiKeyResult },
-						"API key authentication successful",
-					);
-
-					return { ...apiKeyResult, traceId, logger: tenantLogger };
-				}
-
-				return status(401, { message: "Authentication required" });
-			} catch (e) {
-				logger.error(
-					{
-						error: e instanceof Error ? e.message : "Unknown error",
-						stack: e instanceof Error ? e.stack : undefined,
-					},
-					"Authentication error",
-				);
-
-				return status(401, { message: "Authentication failed" });
-			}
-		},
-		detail: {
-			security: [{ apiKey: [] }],
-		},
-	},
 	auth: {
 		async resolve({ status, request: { headers } }) {
 			try {
-				if (!validateLogApiKeyHeader(headers)) {
-					return status(403, { message: "Invalid log service key" });
-				}
-
 				const apiKey =
 					headers.get("x-api-key") ||
 					headers.get("authorization")?.replace("Bearer ", "");

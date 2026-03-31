@@ -100,8 +100,8 @@ export namespace LogsModel {
 
 	export type BaseLogBody = typeof baseLogBody.static;
 
-	export const ingestLogBody = baseLogBody;
-	export type IngestLogBody = typeof ingestLogBody.static;
+	export const createLogBody = baseLogBody;
+	export type CreateLogBody = typeof createLogBody.static;
 
 	export const logEntryResponse = t.Object({
 		uuid: t.String({ description: "Unique log identifier" }),
@@ -136,8 +136,8 @@ export namespace LogsModel {
 
 	export type LogResponse = typeof logResponse.static;
 
-	export const ingestLogResponse = logResponse;
-	export type IngestLogResponse = typeof ingestLogResponse.static;
+	export const createLogResponse = logResponse;
+	export type CreateLogResponse = typeof createLogResponse.static;
 
 	export const listLogsQuery = t.Object({
 		service: t.Optional(t.String()),
