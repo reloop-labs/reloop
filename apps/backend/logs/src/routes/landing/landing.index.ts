@@ -22,7 +22,8 @@ export const landing = new Elysia()
 ║                                                        ║
 ╠════════════════════════════════════════════════════════╣
 ║ QUICK START:                                           ║
-║ curl -X GET /api/logs/health/db                        ║
+║ POST /api/logs/v1       - ingest one structured log    ║
+║ POST /api/logs/v1/bulk  - ingest a batch of logs       ║
 ║                                                        ║
 ╠════════════════════════════════════════════════════════╣
 ║ - SUPPORT                                              ║
