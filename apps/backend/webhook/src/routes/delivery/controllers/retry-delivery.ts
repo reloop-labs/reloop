@@ -26,7 +26,6 @@ export async function retryDelivery(
 			),
 			with: {
 				webhook: true,
-				event: true,
 			},
 		});
 

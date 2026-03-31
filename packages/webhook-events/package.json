@@ -1,0 +1,24 @@
+{
+	"name": "@reloop/webhook-events",
+	"version": "0.1.0",
+	"private": true,
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts",
+		"./domain": "./src/domain.ts",
+		"./contact": "./src/contact.ts",
+		"./api-key": "./src/api-key.ts",
+		"./types": "./src/types.ts"
+	},
+	"scripts": {
+		"build": "tsc --build",
+		"clean": "git clean -xdf .cache .turbo dist node_modules",
+		"dev": "tsc --build tsconfig.package.json",
+		"typecheck": "tsc --build --noEmit --emitDeclarationOnly false"
+	},
+	"devDependencies": {
+		"@reloop/tsconfig": "workspace:*",
+		"@types/node": "catalog:",
+		"typescript": "catalog:"
+	}
+}

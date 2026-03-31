@@ -13,7 +13,6 @@ import {
 } from "drizzle-orm/pg-core";
 import { organization, user } from "./auth";
 
-const createWebhookEventId = () => `whevt_${createId()}`;
 const createWebhookId = () => `wh_${createId()}`;
 const createWebhookSubscriptionId = () => `whsub_${createId()}`;
 const createWebhookDeliveryId = () => `whde_${createId()}`;
@@ -31,29 +30,6 @@ export const webhookDeliveryStatusEnum = pgEnum("webhook_delivery_status", [
 	"failed",
 	"retrying",
 ]);
-
-export const webhookEvent = pgTable(
-	"webhook_event",
-	{
-		id: text("id")
-			.$defaultFn(() => createWebhookEventId())
-			.primaryKey(),
-		name: varchar("name", { length: 255 }).notNull().unique(),
-		description: text("description"),
-		category: varchar("category", { length: 255 }).notNull(),
-		isActive: boolean("is_active").notNull().default(true),
-		createdAt: timestamp("created_at").notNull().defaultNow(),
-		updatedAt: timestamp("updated_at")
-			.notNull()
-			.defaultNow()
-			.$onUpdate(() => new Date()),
-	},
-	(table) => [
-		index("webhook_event_idx_name").on(table.name),
-		index("webhook_event_idx_category").on(table.category),
-		index("webhook_event_idx_is_active").on(table.isActive),
-	],
-);
 
 export const webhook = pgTable(
 	"webhook",
@@ -113,9 +89,7 @@ export const webhookEventSubscription = pgTable(
 		webhookId: text("webhook_id")
 			.notNull()
 			.references(() => webhook.id, { onDelete: "cascade" }),
-		eventId: text("event_id")
-			.notNull()
-			.references(() => webhookEvent.id, { onDelete: "cascade" }),
+		eventId: text("event_id").notNull(),
 		isEnabled: boolean("is_enabled").notNull().default(true),
 		createdAt: timestamp("created_at").notNull().defaultNow(),
 		updatedAt: timestamp("updated_at")
@@ -143,9 +117,7 @@ export const webhookDelivery = pgTable(
 		webhookId: text("webhook_id")
 			.notNull()
 			.references(() => webhook.id, { onDelete: "cascade" }),
-		eventId: text("event_id")
-			.notNull()
-			.references(() => webhookEvent.id, { onDelete: "cascade" }),
+		eventId: text("event_id").notNull(),
 		eventData: jsonb("event_data").$type<Record<string, unknown>>().notNull(),
 		status: webhookDeliveryStatusEnum("status").notNull().default("pending"),
 		requestUrl: text("request_url").notNull(),
@@ -184,11 +156,6 @@ export const webhookDelivery = pgTable(
 	],
 );
 
-export const webhookEventRelations = relations(webhookEvent, ({ many }) => ({
-	subscriptions: many(webhookEventSubscription),
-	deliveries: many(webhookDelivery),
-}));
-
 export const webhookRelations = relations(webhook, ({ one, many }) => ({
 	organization: one(organization, {
 		fields: [webhook.organizationId],
@@ -209,10 +176,6 @@ export const webhookEventSubscriptionRelations = relations(
 			fields: [webhookEventSubscription.webhookId],
 			references: [webhook.id],
 		}),
-		event: one(webhookEvent, {
-			fields: [webhookEventSubscription.eventId],
-			references: [webhookEvent.id],
-		}),
 	}),
 );
 
@@ -223,15 +186,10 @@ export const webhookDeliveryRelations = relations(
 			fields: [webhookDelivery.webhookId],
 			references: [webhook.id],
 		}),
-		event: one(webhookEvent, {
-			fields: [webhookDelivery.eventId],
-			references: [webhookEvent.id],
-		}),
 	}),
 );
 
 export const webhookTables = {
-	webhookEvent,
 	webhook,
 	webhookEventSubscription,
 	webhookDelivery,

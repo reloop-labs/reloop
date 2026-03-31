@@ -7,15 +7,13 @@ import * as Input from "@reloop/ui/input";
 import * as Kbd from "@reloop/ui/kbd";
 import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
-import * as Select from "@reloop/ui/select";
 import { useLoading } from "@reloop/ui/use-loading";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import useSWR, { useSWRConfig } from "swr";
+import { useSWRConfig } from "swr";
 import * as v from "valibot";
 
 const webhookSchema = v.object({
@@ -31,23 +29,6 @@ const webhookSchema = v.object({
 
 type WebhookFormValues = v.InferInput<typeof webhookSchema>;
 
-interface Event {
-	id: string;
-	name: string;
-	description: string | null;
-	category: string;
-	isActive: boolean;
-	createdAt: string;
-	updatedAt: string;
-}
-
-interface EventListResponse {
-	events: Event[];
-	total: number;
-	page: number;
-	limit: number;
-}
-
 interface CreateWebhookModalProps {
 	isOpen: boolean;
 	onClose: () => void;
@@ -61,13 +42,6 @@ export const CreateWebhookModal = ({
 	const { changeStatus, status } = useLoading();
 	const { mutate } = useSWRConfig();
 	const router = useRouter();
-	const [selectedEventId, setSelectedEventId] = useState<string>("");
-
-	const { data: eventsData, isLoading: eventsLoading } =
-		useSWR<EventListResponse>("/api/webhook/events/list", {
-			revalidateOnFocus: false,
-			revalidateOnReconnect: true,
-		});
 
 	const { register, handleSubmit, formState, reset, setError } =
 		useForm<WebhookFormValues>({
@@ -79,11 +53,6 @@ export const CreateWebhookModal = ({
 
 	const onSubmit = async (data: WebhookFormValues) => {
 		if (!activeOrganization?.id) return;
-
-		if (!selectedEventId) {
-			toast.error("Please select an event");
-			return;
-		}
 
 		try {
 			changeStatus("loading");
@@ -98,7 +67,6 @@ export const CreateWebhookModal = ({
 			);
 			await mutate(`/api/webhook/v1/?organizationId=${activeOrganization.id}&limit=100`);
 			reset();
-			setSelectedEventId("");
 			changeStatus("idle");
 			onClose();
 			const webhookId = response.data?.webhook?.id || response.data?.id;
@@ -122,20 +90,6 @@ export const CreateWebhookModal = ({
 			}
 		}
 	};
-
-	const filteredEvents =
-		eventsData?.events?.filter((event) => event.isActive) || [];
-
-	const eventsByCategory = filteredEvents.reduce(
-		(acc, event) => {
-			if (!acc[event.category]) {
-				acc[event.category] = [];
-			}
-			acc[event.category]?.push(event);
-			return acc;
-		},
-		{} as Record<string, Event[]>,
-	);
 
 	return (
 		<Modal.Root open={isOpen} onOpenChange={onClose}>
@@ -166,59 +120,6 @@ export const CreateWebhookModal = ({
 										{formState.errors.url.message}
 									</p>
 								)}
-							</div>
-
-							<div>
-								<Label.Root className="mb-2 font-medium text-sm">
-									Event
-									<Label.Asterisk />
-								</Label.Root>
-								<Select.Root
-									value={selectedEventId}
-									onValueChange={setSelectedEventId}
-								>
-									<Select.Trigger className="w-full">
-										<Select.Value placeholder="Select an event" />
-									</Select.Trigger>
-									<Select.Content className="w-[510px] overflow-y-auto p-0">
-										{eventsLoading ? (
-											<div className="flex items-center justify-center py-8">
-												<Icon
-													name="loader-2"
-													className="h-5 w-5 animate-spin text-gray-400"
-												/>
-												<span className="ml-2 text-gray-600 text-sm">
-													Loading events...
-												</span>
-											</div>
-										) : Object.keys(eventsByCategory).length === 0 ? (
-											<div className="py-8 text-center text-gray-500 text-sm">
-												No events found
-											</div>
-										) : (
-											Object.entries(eventsByCategory).map(
-												([category, events]) => (
-													<Select.Group key={category}>
-														<Select.GroupLabel className="px-2 py-1.5 font-semibold text-gray-700 text-sm uppercase tracking-wider">
-															{category}
-														</Select.GroupLabel>
-														{events.map((event) => (
-															<Select.Item key={event.id} value={event.id}>
-																<Icon
-																	name={getEventIcon(event)}
-																	className={`h-4 w-4 ${getEventIconColor(event)}`}
-																/>
-																<span className="font-medium text-gray-900 text-sm leading-tight">
-																	{event.name}
-																</span>
-															</Select.Item>
-														))}
-													</Select.Group>
-												),
-											)
-										)}
-									</Select.Content>
-								</Select.Root>
 							</div>
 						</div>
 					</Modal.Body>
@@ -255,39 +156,4 @@ export const CreateWebhookModal = ({
 			</Modal.Content>
 		</Modal.Root>
 	);
-};
-
-const getEventIcon = (event: Event) => {
-	if (event.category === "email") {
-		return "mail";
-	}
-	if (event.category === "domain") {
-		return "globe";
-	}
-	if (event.category === "audience") {
-		return "users";
-	}
-	return "circle-dots";
-};
-
-const getEventIconColor = (event: Event): string => {
-	const operation = event.name.split(".").pop()?.toLowerCase();
-
-	switch (operation) {
-		case "create":
-			return "text-green-600";
-		case "update":
-			return "text-amber-600";
-		case "delete":
-			return "text-red-600";
-		case "sent":
-		case "opened":
-		case "clicked":
-			return "text-blue-600";
-		case "failed":
-		case "bounced":
-			return "text-red-600";
-		default:
-			return "text-gray-600";
-	}
 };

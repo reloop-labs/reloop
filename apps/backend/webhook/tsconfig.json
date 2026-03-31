@@ -15,7 +15,9 @@
 		"declarationMap": false,
 		"baseUrl": ".",
 		"paths": {
-			"@reloop/webhook/*": ["./src/*"]
+			"@reloop/webhook/*": ["./src/*"],
+			"@reloop/webhook-events": ["../../../packages/webhook-events/src/index.ts"],
+			"@reloop/webhook-events/*": ["../../../packages/webhook-events/src/*"]
 		}
 	}
 }

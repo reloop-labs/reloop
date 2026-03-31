@@ -5,6 +5,7 @@
 		"./client": "./src/client.ts",
 		"./schema": "./src/schema/index.ts",
 		"./index": "./src/index.ts",
+		"./webhook-events": "./src/webhook-events.ts",
 		"./utils": "./src/utils/*"
 	},
 	"scripts": {
@@ -25,6 +26,7 @@
 		"migrate": "bun run src/migrate.ts"
 	},
 	"dependencies": {
+		"@reloop/webhook-events": "workspace:*",
 		"drizzle-orm": "catalog:db",
 		"drizzle-typebox": "catalog:db",
 		"pg": "catalog:db",

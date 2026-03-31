@@ -3,7 +3,6 @@ import { fromTypes, openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 import { logger } from "@reloop/logger";
 import { deliveryRoutes } from "@reloop/webhook/routes/delivery/delivery.routes";
-import { eventRoutes } from "@reloop/webhook/routes/event/event.routes";
 import { landing } from "@reloop/webhook/routes/landing/landing.index";
 import { subscriptionRoutes } from "@reloop/webhook/routes/subscription/subscription.routes";
 import { webhookRoutes } from "@reloop/webhook/routes/webhook/webhook.routes";
@@ -27,7 +26,6 @@ const webhookService = new Elysia({
 	.use(serverTiming())
 	.use(landing)
 	.use(webhookRoutes)
-	.use(eventRoutes)
 	.use(subscriptionRoutes)
 	.use(deliveryRoutes)
 	.listen(port, () => {

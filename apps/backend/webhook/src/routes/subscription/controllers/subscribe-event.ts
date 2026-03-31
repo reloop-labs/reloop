@@ -1,8 +1,9 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
+import { WEBHOOK_EVENTS_BY_ID } from "@reloop/webhook-events";
 import type { SubscriptionTypes } from "@reloop/webhook/routes/subscription/subscription.type";
-import { and, eq, inArray, isNull } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
 export async function subscribeEvent(
@@ -34,12 +35,11 @@ export async function subscribeEvent(
 			throw status(404, { message: "Webhook not found" });
 		}
 
-		// Verify all events exist
-		const events = await db.query.webhookEvent.findMany({
-			where: inArray(schema.webhookEvent.id, eventIds),
-		});
+		const allEventsExist = eventIds.every((eventId) =>
+			WEBHOOK_EVENTS_BY_ID.has(eventId),
+		);
 
-		if (events.length !== eventIds.length) {
+		if (!allEventsExist) {
 			logger.warn({ eventIds }, "Some events not found");
 			throw status(404, { message: "Some events not found" });
 		}
