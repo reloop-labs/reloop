@@ -194,9 +194,12 @@
         "@opentelemetry/resources": "catalog:backend",
         "@opentelemetry/sdk-trace-node": "catalog:backend",
         "@opentelemetry/semantic-conventions": "catalog:backend",
+        "@reloop/apikey": "workspace:*",
+        "@reloop/cache": "workspace:*",
         "@reloop/logger": "workspace:*",
         "dotenv": "catalog:backend",
         "elysia": "catalog:backend",
+        "redis": "catalog:db",
         "zod": "catalog:ui",
       },
       "devDependencies": {
