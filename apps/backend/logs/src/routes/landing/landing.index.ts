@@ -23,7 +23,8 @@ export const landing = new Elysia()
 ╠════════════════════════════════════════════════════════╣
 ║ QUICK START:                                           ║
 ║ POST /api/logs/v1       - ingest one structured log    ║
-║ POST /api/logs/v1/bulk  - ingest a batch of logs       ║
+║ GET  /api/logs/v1       - list logs                    ║
+║ GET  /api/logs/v1/:id   - retrieve a single log        ║
 ║                                                        ║
 ╠════════════════════════════════════════════════════════╣
 ║ - SUPPORT                                              ║

@@ -27,6 +27,15 @@ type StoredLogEntry = {
 	ingested_at: string;
 };
 
+type ParsedLogEntry = Omit<
+	StoredLogEntry,
+	"tags" | "properties" | "metadata"
+> & {
+	tags: string[];
+	properties: unknown;
+	metadata: unknown;
+};
+
 export function getClickHouseClient(): ClickHouseClient {
 	if (!clickhouseClient) {
 		clickhouseClient = createClient({
@@ -173,6 +182,52 @@ function toLogResponse(entry: StoredLogEntry): LogsTypes.LogResponse {
 	};
 }
 
+function safeJsonParse(value: string, fallback: unknown): unknown {
+	try {
+		return JSON.parse(value);
+	} catch {
+		return fallback;
+	}
+}
+
+function toLogEntryResponse(entry: StoredLogEntry): LogsTypes.LogEntryResponse {
+	const parsed = entry as ParsedLogEntry;
+
+	return {
+		uuid: parsed.id,
+		service: parsed.service,
+		event: parsed.event,
+		level: parsed.level,
+		source: parsed.source,
+		message: parsed.message,
+		request_id: parsed.request_id,
+		trace_id: parsed.trace_id,
+		span_id: parsed.span_id,
+		user_id: parsed.user_id,
+		distinct_id: parsed.distinct_id,
+		organization_id: parsed.organization_id,
+		environment: parsed.environment,
+		tags: Array.isArray(parsed.tags) ? parsed.tags : [],
+		properties: parsed.properties,
+		metadata: parsed.metadata,
+		occurred_at: parsed.occurred_at,
+		ingested_at: parsed.ingested_at,
+	};
+}
+
+function parseStoredLogEntry(entry: StoredLogEntry): LogsTypes.LogEntryResponse {
+	return toLogEntryResponse({
+		...entry,
+		tags: safeJsonParse(entry.tags, []) as string[],
+		properties: safeJsonParse(entry.properties, {}),
+		metadata: safeJsonParse(entry.metadata, {}),
+	} as ParsedLogEntry as StoredLogEntry);
+}
+
+function escapeString(value: string): string {
+	return value.replaceAll("\\", "\\\\").replaceAll("'", "\\'");
+}
+
 export async function insertLog(
 	body: LogsTypes.BaseLogBody,
 ): Promise<LogsTypes.LogResponse> {
@@ -211,35 +266,131 @@ export async function insertLog(
 	}
 }
 
-export async function insertLogs(
-	bodies: LogsTypes.BaseLogBody[],
-): Promise<LogsTypes.LogResponse[]> {
+export async function listLogs(
+	query: LogsTypes.ListLogsQuery,
+): Promise<LogsTypes.LogEntryResponse[]> {
 	const client = getClickHouseClient();
-	const entries = bodies.map(normalizeLogEntry);
+	const conditions: string[] = [];
+
+	if (query.service) {
+		conditions.push(`service = '${escapeString(query.service)}'`);
+	}
+
+	if (query.level) {
+		conditions.push(`level = '${escapeString(query.level)}'`);
+	}
+
+	if (query.event) {
+		conditions.push(`event = '${escapeString(query.event)}'`);
+	}
+
+	if (query.organization_id) {
+		conditions.push(
+			`organization_id = '${escapeString(query.organization_id)}'`,
+		);
+	}
+
+	const whereClause =
+		conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+	const limit = Math.min(Math.max(Number(query.limit || 25), 1), 100);
 
 	try {
-		await client.insert({
-			table: "logs",
-			values: entries,
+		const resultSet = await client.query({
+			query: `
+				SELECT
+					id,
+					service,
+					event,
+					level,
+					source,
+					message,
+					request_id,
+					trace_id,
+					span_id,
+					user_id,
+					distinct_id,
+					organization_id,
+					environment,
+					tags,
+					properties,
+					metadata,
+					toString(occurred_at) AS occurred_at,
+					toString(ingested_at) AS ingested_at
+				FROM logs
+				${whereClause}
+				ORDER BY occurred_at DESC, ingested_at DESC
+				LIMIT ${limit}
+			`,
 			format: "JSONEachRow",
 		});
+		const rows = await resultSet.json<StoredLogEntry[]>();
 
 		logger.debug(
 			{
-				count: entries.length,
-				services: [...new Set(entries.map((entry) => entry.service))],
+				count: rows.length,
 			},
-			"Logs inserted into ClickHouse",
+			"Logs fetched from ClickHouse",
 		);
 
-		return entries.map(toLogResponse);
+		return rows.map(parseStoredLogEntry);
 	} catch (error) {
 		logger.error(
 			{
 				error: error instanceof Error ? error.message : String(error),
-				count: entries.length,
+				service: query.service || null,
+				level: query.level || null,
+				event: query.event || null,
 			},
-			"Failed to insert logs into ClickHouse",
+			"Failed to fetch logs from ClickHouse",
+		);
+		throw error;
+	}
+}
+
+export async function getLogById(
+	logId: string,
+): Promise<LogsTypes.LogEntryResponse | null> {
+	const client = getClickHouseClient();
+
+	try {
+		const resultSet = await client.query({
+			query: `
+				SELECT
+					id,
+					service,
+					event,
+					level,
+					source,
+					message,
+					request_id,
+					trace_id,
+					span_id,
+					user_id,
+					distinct_id,
+					organization_id,
+					environment,
+					tags,
+					properties,
+					metadata,
+					toString(occurred_at) AS occurred_at,
+					toString(ingested_at) AS ingested_at
+				FROM logs
+				WHERE id = '${escapeString(logId)}'
+				LIMIT 1
+			`,
+			format: "JSONEachRow",
+		});
+		const rows = await resultSet.json<StoredLogEntry[]>();
+		const entry = rows[0];
+
+		return entry ? parseStoredLogEntry(entry) : null;
+	} catch (error) {
+		logger.error(
+			{
+				logId,
+				error: error instanceof Error ? error.message : String(error),
+			},
+			"Failed to fetch log from ClickHouse",
 		);
 		throw error;
 	}

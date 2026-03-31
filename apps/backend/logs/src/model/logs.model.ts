@@ -103,14 +103,28 @@ export namespace LogsModel {
 	export const ingestLogBody = baseLogBody;
 	export type IngestLogBody = typeof ingestLogBody.static;
 
-	export const ingestLogsBody = t.Object({
-		logs: t.Array(baseLogBody, {
-			minItems: 1,
-			description: "A batch of log entries to ingest",
-		}),
+	export const logEntryResponse = t.Object({
+		uuid: t.String({ description: "Unique log identifier" }),
+		service: t.String({ description: "Service name emitting the log entry" }),
+		event: t.String({ description: "Event or log name" }),
+		level: t.String({ description: "Stored log level" }),
+		source: t.Union([t.String(), t.Null()]),
+		message: t.Union([t.String(), t.Null()]),
+		request_id: t.Union([t.String(), t.Null()]),
+		trace_id: t.Union([t.String(), t.Null()]),
+		span_id: t.Union([t.String(), t.Null()]),
+		user_id: t.Union([t.String(), t.Null()]),
+		distinct_id: t.Union([t.String(), t.Null()]),
+		organization_id: t.Union([t.String(), t.Null()]),
+		environment: t.Union([t.String(), t.Null()]),
+		tags: t.Array(t.String()),
+		properties: t.Any(),
+		metadata: t.Any(),
+		occurred_at: t.String({ format: "date-time" }),
+		ingested_at: t.String({ format: "date-time" }),
 	});
 
-	export type IngestLogsBody = typeof ingestLogsBody.static;
+	export type LogEntryResponse = typeof logEntryResponse.static;
 
 	export const logResponse = t.Object({
 		uuid: t.String({ description: "Unique event identifier" }),
@@ -125,14 +139,37 @@ export namespace LogsModel {
 	export const ingestLogResponse = logResponse;
 	export type IngestLogResponse = typeof ingestLogResponse.static;
 
-	export const ingestLogsResponse = t.Object({
-		logs: t.Array(logResponse, {
-			description: "Stored log entry results",
-		}),
-		message: t.String({ description: "Batch ingest result" }),
+	export const listLogsQuery = t.Object({
+		service: t.Optional(t.String()),
+		level: t.Optional(logLevel),
+		event: t.Optional(t.String()),
+		organization_id: t.Optional(t.String()),
+		limit: t.Optional(
+			t.Numeric({
+				minimum: 1,
+				maximum: 100,
+				description: "Maximum number of log entries to return",
+			}),
+		),
 	});
 
-	export type IngestLogsResponse = typeof ingestLogsResponse.static;
+	export type ListLogsQuery = typeof listLogsQuery.static;
+
+	export const getLogParams = t.Object({
+		logId: t.String({
+			minLength: 1,
+			description: "Unique log identifier",
+		}),
+	});
+
+	export type GetLogParams = typeof getLogParams.static;
+
+	export const listLogsResponse = t.Object({
+		logs: t.Array(logEntryResponse),
+		count: t.Number(),
+	});
+
+	export type ListLogsResponse = typeof listLogsResponse.static;
 
 	export const errorResponse = t.Object({
 		message: t.String({ description: "Error message" }),
