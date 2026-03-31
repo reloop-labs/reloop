@@ -238,6 +238,7 @@ export const ApiPreview = ({ apiKey: _apiKey }: ApiPreviewProps) => {
 interface DomainPreviewProps {
 	domain?: string;
 	logoUrl?: string;
+	variant?: "onboarding" | "domain";
 }
 
 // --- MOCK DATA: PROVIDER GUIDES ---
@@ -454,17 +455,28 @@ export const DnsConfigPreview = ({ domain }: DnsConfigPreviewProps) => {
 	);
 };
 
-export const DomainPreview = ({ domain, logoUrl }: DomainPreviewProps) => {
+export const DomainPreview = ({
+	domain,
+	logoUrl,
+	variant = "onboarding",
+}: DomainPreviewProps) => {
 	const domainName = domain ? domain.split(".")[0] || "Sender" : "Sender";
 	const domainHost = domain ? domain.split(".").slice(-2).join(".") || "" : "";
 	const displayDomain = domain || "";
 	const senderEmail = domain ? `hello@${domainHost}` : "";
 	const toEmail = "sundar@google.com";
 	const avatarInitial = domainName[0]?.toUpperCase() || "S";
+	const isDomainVariant = variant === "domain";
 
 	return (
-		<div className="absolute top-10 left-10">
-			<div className="w-[1000px] transform overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-2xl transition-all">
+		<div className={isDomainVariant ? "absolute top-8 left-8" : "absolute top-10 left-10"}>
+			<div
+				className={
+					isDomainVariant
+						? "w-[920px] transform overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-2xl transition-all"
+						: "w-[1000px] transform overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-2xl transition-all"
+				}
+			>
 				{/* Browser Window Header */}
 				<div className="flex items-center gap-2 border-stroke-soft-100 border-b bg-bg-weak-50 px-4 py-3">
 					<div className="flex gap-1.5">
@@ -476,9 +488,21 @@ export const DomainPreview = ({ domain, logoUrl }: DomainPreviewProps) => {
 				</div>
 
 				{/* Email Client Content */}
-				<div className="relative bg-bg-white-0 p-6">
+				<div
+					className={
+						isDomainVariant
+							? "relative bg-bg-white-0 px-6 pt-5 pb-4"
+							: "relative bg-bg-white-0 p-6"
+					}
+				>
 					{/* Subject Line */}
-					<div className="mb-3 ml-14 flex w-auto justify-start gap-3">
+					<div
+						className={
+							isDomainVariant
+								? "mb-2 ml-14 flex w-auto justify-start gap-3"
+								: "mb-3 ml-14 flex w-auto justify-start gap-3"
+						}
+					>
 						<span className="font-medium text-text-strong-800">
 							Black Friday is here. 55% off on all products.
 						</span>
@@ -528,11 +552,23 @@ export const DomainPreview = ({ domain, logoUrl }: DomainPreviewProps) => {
 
 							{/* Email Details Dropdown */}
 							<div className="fade-in slide-in-from-top-2 relative mt-2 animate-in duration-500">
-								<div className="relative rounded-lg border border-stroke-soft-200 bg-bg-white-0 p-4 text-text-sub-600 text-xs leading-relaxed shadow-lg shadow-stroke-soft-200/50">
+								<div
+									className={
+										isDomainVariant
+											? "relative rounded-lg border border-stroke-soft-200 bg-bg-white-0 p-3 text-text-sub-600 text-xs leading-relaxed shadow-lg shadow-stroke-soft-200/50"
+											: "relative rounded-lg border border-stroke-soft-200 bg-bg-white-0 p-4 text-text-sub-600 text-xs leading-relaxed shadow-lg shadow-stroke-soft-200/50"
+									}
+								>
 									{/* Triangle Pointer */}
 									<div className="-top-1.5 absolute left-3 h-3 w-3 rotate-45 transform border-stroke-soft-200 border-t border-l bg-bg-white-0" />
 
-									<div className="grid grid-cols-[100px_1fr] gap-y-2.5">
+									<div
+										className={
+											isDomainVariant
+												? "grid grid-cols-[100px_1fr] gap-y-2"
+												: "grid grid-cols-[100px_1fr] gap-y-2.5"
+										}
+									>
 										<div className="pr-3 text-right text-text-soft-400">
 											from:
 										</div>
@@ -545,7 +581,13 @@ export const DomainPreview = ({ domain, logoUrl }: DomainPreviewProps) => {
 													</span>
 												</>
 											) : (
-												<div className="h-4 w-48 rounded bg-bg-soft-200" />
+												<div
+													className={
+														isDomainVariant
+															? "h-4 w-48 rounded bg-bg-weak-50"
+															: "h-4 w-48 rounded bg-bg-soft-200"
+													}
+												/>
 											)}
 										</div>
 
@@ -588,7 +630,13 @@ export const DomainPreview = ({ domain, logoUrl }: DomainPreviewProps) => {
 													{displayDomain}
 												</span>
 											) : (
-												<div className="h-4 w-32 rounded bg-bg-soft-200" />
+												<div
+													className={
+														isDomainVariant
+															? "h-4 w-32 rounded bg-bg-weak-50"
+															: "h-4 w-32 rounded bg-bg-soft-200"
+													}
+												/>
 											)}
 										</div>
 
@@ -601,7 +649,13 @@ export const DomainPreview = ({ domain, logoUrl }: DomainPreviewProps) => {
 													{displayDomain}
 												</span>
 											) : (
-												<div className="h-4 w-32 rounded bg-bg-soft-200" />
+												<div
+													className={
+														isDomainVariant
+															? "h-4 w-32 rounded bg-bg-weak-50"
+															: "h-4 w-32 rounded bg-bg-soft-200"
+													}
+												/>
 											)}
 										</div>
 
@@ -623,17 +677,49 @@ export const DomainPreview = ({ domain, logoUrl }: DomainPreviewProps) => {
 					</div>
 
 					{/* Email Body Skeleton */}
-					<div className="mt-8 space-y-4 opacity-40 blur-[0.5px]">
-						<div className="h-4 w-full rounded bg-bg-soft-200" />
-						<div className="h-4 w-11/12 rounded bg-bg-soft-200" />
-						<div className="h-4 w-4/5 rounded bg-bg-soft-200" />
+					<div
+						className={
+							isDomainVariant
+								? "mt-5 space-y-4"
+								: "mt-8 space-y-4 opacity-40 blur-[0.5px]"
+						}
+					>
+						<div
+							className={
+								isDomainVariant
+									? "h-4 w-full rounded bg-bg-weak-50"
+									: "h-4 w-full rounded bg-bg-soft-200"
+							}
+						/>
+						{!isDomainVariant && (
+							<>
+								<div className="h-4 w-11/12 rounded bg-bg-soft-200" />
+								<div className="h-4 w-4/5 rounded bg-bg-soft-200" />
+							</>
+						)}
 
-						<div className="mt-8 flex h-40 w-full items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-weak-50 text-text-soft-400">
-							<Icon name="info" />
+						<div
+							className={
+								isDomainVariant
+									? "flex h-36 w-full items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-weak-50 text-text-soft-400"
+									: "mt-8 flex h-40 w-full items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-weak-50 text-text-soft-400"
+							}
+						>
+							{isDomainVariant ? (
+								<Icon name="info" />
+							) : (
+								<Icon name="info" />
+							)}
 						</div>
 
-						<div className="mt-6 flex justify-center">
-							<div className="h-10 w-32 rounded-lg bg-primary-lighter" />
+						<div className={isDomainVariant ? "hidden" : "mt-6 flex justify-center"}>
+							<div
+								className={
+									isDomainVariant
+										? "h-8 w-28 rounded-lg bg-bg-soft-200/90"
+										: "h-10 w-32 rounded-lg bg-primary-lighter"
+								}
+							/>
 						</div>
 					</div>
 				</div>
