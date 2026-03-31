@@ -1,5 +1,5 @@
 {
-	"name": "tracehub",
+	"name": "logs",
 	"main": "src/index.ts",
 	"type": "module",
 	"scripts": {

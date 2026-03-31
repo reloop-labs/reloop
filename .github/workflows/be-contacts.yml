@@ -1,23 +1,23 @@
-name: BE Audience Docker
+name: BE Contacts Docker
 
 on:
   push:
     branches: [ main ]
     paths:
-      - 'apps/backend/audience/**'
+      - 'apps/backend/contacts/**'
       - 'docker-compose.setup.yml'
-      - '.github/workflows/be-audience.yml'
+      - '.github/workflows/be-contacts.yml'
   pull_request:
     branches: [ main ]
     paths:
-      - 'apps/backend/audience/**'
+      - 'apps/backend/contacts/**'
       - 'docker-compose.setup.yml'
-      - '.github/workflows/be-audience.yml'
+      - '.github/workflows/be-contacts.yml'
   workflow_dispatch:
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/be-audience
+  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/be-contacts
 
 jobs:
   build-and-push:
@@ -54,7 +54,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./apps/backend/audience/Dockerfile
+          file: ./apps/backend/contacts/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

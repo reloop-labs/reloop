@@ -15,35 +15,30 @@ export const landingRoute = new Elysia()
 		async () => {
 			return `
 ╔════════════════════════════════════════════════════════╗
-║                  tracehub service                      ║
+║                    LOGS SERVICE                        ║
 ╠════════════════════════════════════════════════════════╣
 ║                                                        ║
-║   ████████╗██████╗  █████╗  ██████╗███████╗██╗  ██╗   ║
-║   ╚══██╔══╝██╔══██╗██╔══██╗██╔════╝██╔════╝██║  ██║   ║
-║      ██║   ██████╔╝███████║██║     █████╗  ███████║   ║
-║      ██║   ██╔══██╗██╔══██║██║     ██╔══╝  ██╔══██║   ║
-║      ██║   ██║  ██║██║  ██║╚██████╗███████╗██║  ██║   ║
-║      ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚══════╝╚═╝  ╚═╝   ║
-║                                                        ║
-║   ██╗  ██╗██╗   ██╗██████╗                            ║
-║   ██║  ██║██║   ██║██╔══██╗                           ║
-║   ███████║██║   ██║██████╔╝                           ║
-║   ██╔══██║██║   ██║██╔══██╗                           ║
-║   ██║  ██║╚██████╔╝██████╔╝                           ║
-║   ╚═╝  ╚═╝ ╚═════╝ ╚═════╝                            ║
+║   ██╗      ██████╗  ██████╗ ███████╗                   ║
+║   ██║     ██╔═══██╗██╔════╝ ██╔════╝                   ║
+║   ██║     ██║   ██║██║  ███╗███████╗                  ║
+║   ██║     ██║   ██║██║   ██║╚════██║                  ║
+║   ███████╗╚██████╔╝╚██████╔╝███████║                  ║
+║   ╚══════╝ ╚═════╝  ╚═════╝ ╚══════╝                  ║
 ║                                                        ║
 ║                  ONLINE & READY                        ║
 ║                 Version: v1.0.0                        ║
 ║                                                        ║
 ╠════════════════════════════════════════════════════════╣
 ║ QUICK START:                                           ║
-║ curl -X POST /api/tracehub/v1/track \\                  ║
-║   -H "Content-Type: application/json" \\                ║
-║   -d '{"event":"page_viewed","properties":{"page":"/home"}}' ║
+║ curl -X GET /api/logs/health/db                        ║
+║                                                        ║
 ╠════════════════════════════════════════════════════════╣
 ║ - SUPPORT                                              ║
-║ - https://reloop.sh/dev/setup/backend/tracehub        ║
-║ - https://github.com/reloop-labs/reloop               ║
+║ - https://reloop.sh/dev/setup/backend/logs             ║
+║ - https://github.com/reloop-labs/reloop                ║
+╠════════════════════════════════════════════════════════╣
+║  "Every event tells a story."                          ║
+║                    - Your Reloop Team                  ║
 ╚════════════════════════════════════════════════════════╝
 
 
@@ -56,8 +51,8 @@ export const landingRoute = new Elysia()
 		{
 			detail: {
 				tags: ["Service"],
-				summary: "Landing page for tracehub service",
-				description: "Displays the landing page for the tracehub service",
+				summary: "Landing page for logs service",
+				description: "Displays the landing page for the logs service",
 			},
 		},
 	)

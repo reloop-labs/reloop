@@ -26,7 +26,8 @@
 			"@reloop/webhook": ["../../apps/backend/webhook/src/*"],
 			"@reloop/audience": ["../../apps/backend/audience/src/*"],
 			"@reloop/web": ["../../apps/frontend/web/src/*"],
-			"@reloop/be-mail": ["../../apps/backend/mail/src/*"]
+			"@reloop/be-mail": ["../../apps/backend/mail/src/*"],
+			"@reloop/logs": ["../../apps/backend/logs/src/*"]
 		}
 	}
 }

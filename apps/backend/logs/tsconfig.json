@@ -15,7 +15,7 @@
 		"declarationMap": false,
 		"baseUrl": ".",
 		"paths": {
-			"@reloop/tracehub/*": ["./src/*"]
+			"@reloop/logs/*": ["./src/*"]
 		}
 	}
 }

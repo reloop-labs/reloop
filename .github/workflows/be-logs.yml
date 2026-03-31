@@ -1,23 +1,23 @@
-name: BE Tracehub Docker
+name: BE Logs Docker
 
 on:
   push:
     branches: [ main ]
     paths:
-      - 'apps/backend/tracehub/**'
+      - 'apps/backend/logs/**'
       - 'docker-compose.setup.yml'
-      - '.github/workflows/be-tracehub.yml'
+      - '.github/workflows/be-logs.yml'
   pull_request:
     branches: [ main ]
     paths:
-      - 'apps/backend/tracehub/**'
+      - 'apps/backend/logs/**'
       - 'docker-compose.setup.yml'
-      - '.github/workflows/be-tracehub.yml'
+      - '.github/workflows/be-logs.yml'
   workflow_dispatch:
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/be-tracehub
+  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/be-logs
 
 jobs:
   build-and-push:
@@ -54,7 +54,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./apps/backend/tracehub/Dockerfile
+          file: ./apps/backend/logs/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
