@@ -1,7 +1,7 @@
-import { listLogs } from "@reloop/logs/utils/clickhouse";
 import { logger } from "@reloop/logger";
+import type { LogsTypes } from "@reloop/logs/types/logs.type";
+import { listLogs } from "@reloop/logs/utils/clickhouse";
 import { status } from "elysia";
-import type { LogsTypes } from "../../../types/logs.type";
 
 export async function listLogsController(
 	query: LogsTypes.ListLogsQuery,

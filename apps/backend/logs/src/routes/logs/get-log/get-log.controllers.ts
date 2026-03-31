@@ -1,13 +1,13 @@
-import { getLogById } from "@reloop/logs/utils/clickhouse";
 import { logger } from "@reloop/logger";
+import { getLogById } from "@reloop/logs/utils/clickhouse";
 import { status } from "elysia";
 import type { LogsTypes } from "../../../types/logs.type";
 
 export async function getLogController(
-	params: LogsTypes.GetLogParams,
+	logId: string,
 ): Promise<LogsTypes.LogEntryResponse> {
 	try {
-		const log = await getLogById(params.logId);
+		const log = await getLogById(logId);
 
 		if (!log) {
 			throw status(404, {
@@ -17,7 +17,7 @@ export async function getLogController(
 
 		logger.info(
 			{
-				logId: params.logId,
+				logId,
 				service: log.service,
 				event: log.event,
 			},
@@ -32,14 +32,15 @@ export async function getLogController(
 
 		logger.error(
 			{
-				logId: params.logId,
+				logId,
 				error: error instanceof Error ? error.message : String(error),
 			},
 			"Error retrieving log",
 		);
 
 		throw status(500, {
-			message: error instanceof Error ? error.message : "Failed to retrieve log",
+			message:
+				error instanceof Error ? error.message : "Failed to retrieve log",
 		});
 	}
 }

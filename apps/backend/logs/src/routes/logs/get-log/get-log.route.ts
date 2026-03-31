@@ -5,9 +5,9 @@ import { getLogController } from "./get-log.controllers";
 import { getLogXCodeSamples } from "./get-log.x-codeSamples";
 
 export const getLogRoute = new Elysia().use(authMiddleware).get(
-	"/:logId",
+	"/:log_id",
 	async ({ params }) => {
-		return await getLogController(params);
+		return await getLogController(params.log_id);
 	},
 	{
 		auth: true,

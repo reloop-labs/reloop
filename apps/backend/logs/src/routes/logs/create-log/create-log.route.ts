@@ -4,7 +4,7 @@ import { Elysia } from "elysia";
 import { createLogController } from "./create-log.controllers";
 
 export const createLogRoute = new Elysia().use(authMiddleware).post(
-	"/",
+	"/create",
 	async ({ body, set }) => {
 		set.status = 201;
 		return await createLogController(body);

@@ -5,7 +5,7 @@ import { listLogsController } from "./list-logs.controllers";
 import { listLogsXCodeSamples } from "./list-logs.x-codeSamples";
 
 export const listLogsRoute = new Elysia().use(authMiddleware).get(
-	"/",
+	"/list",
 	async ({ query }) => {
 		return await listLogsController(query);
 	},

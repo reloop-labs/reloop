@@ -156,7 +156,7 @@ export namespace LogsModel {
 	export type ListLogsQuery = typeof listLogsQuery.static;
 
 	export const getLogParams = t.Object({
-		logId: t.String({
+		log_id: t.String({
 			minLength: 1,
 			description: "Unique log identifier",
 		}),
