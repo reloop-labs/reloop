@@ -70,22 +70,16 @@ ${redisError ? `║ REDIS ERROR: ${redisError.substring(0, 50).padEnd(50)} ║` 
 
 `;
 		},
-		{
-			detail: {
-				tags: ["Service"],
-				summary: "Health check for Webhook Service",
-				description: "Checks the health of the Webhook Service",
-			},
-		},
+		{ detail: { hide: true } },
 	)
 	.get(
-		"/health/redis",
+		"/health",
 		async () => {
 			try {
 				const startTime = Date.now();
 				await redis.healthCheck();
+				await db.execute("SELECT 1 as test");
 				const responseTime = Date.now() - startTime;
-
 				return {
 					status: "CONNECTED",
 					responseTime: `${responseTime}ms`,
@@ -99,36 +93,5 @@ ${redisError ? `║ REDIS ERROR: ${redisError.substring(0, 50).padEnd(50)} ║` 
 				};
 			}
 		},
-		{
-			detail: {
-				tags: ["Service"],
-				summary: "Health check for Redis",
-				description: "Checks the health of the Redis database",
-			},
-		},
+		{ detail: { hide: true } },
 	)
-	.get(
-		"/health/postgres",
-		async () => {
-			try {
-				await db.execute("SELECT 1 as test");
-				return {
-					status: "CONNECTED",
-					timestamp: new Date().toISOString(),
-				};
-			} catch (error) {
-				return {
-					status: "DISCONNECTED",
-					error: error instanceof Error ? error.message : String(error),
-					timestamp: new Date().toISOString(),
-				};
-			}
-		},
-		{
-			detail: {
-				tags: ["Service"],
-				summary: "Health check for Postgres",
-				description: "Checks the health of the Postgres database",
-			},
-		},
-	);
