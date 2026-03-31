@@ -53,9 +53,7 @@ export const DeleteWebhookModal = ({ webhooks }: DeleteWebhookModalProps) => {
 			toast.success("Webhook deleted successfully");
 			setDeleteId(null);
 			setConfirmationUrl("");
-			mutate(
-				`/api/webhook/v1/list?organizationId=${activeOrganization.id}&limit=100`,
-			);
+			mutate(`/api/webhook/v1/?organizationId=${activeOrganization.id}&limit=100`);
 		} catch (error) {
 			const errorMessage = axios.isAxiosError(error)
 				? error.response?.data?.message || "Failed to delete webhook"

@@ -5,17 +5,14 @@ import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 import type { WebhookTypes } from "../webhook.type";
 
-export async function getWebhook(
-	webhookId: string,
-	organizationId: string,
-): Promise<WebhookTypes.WebhookResponse> {
-	logger.info(
-		{
-			webhookId,
-			organizationId,
-		},
-		"Getting webhook",
-	);
+export async function getWebhookController({
+	webhookId,
+	organizationId,
+}: {
+	webhookId: string;
+	organizationId: string;
+}): Promise<WebhookTypes.WebhookResponse> {
+	logger.info({ webhookId, organizationId }, "Getting webhook");
 
 	try {
 		const webhook = await db.query.webhook.findFirst({
@@ -27,19 +24,9 @@ export async function getWebhook(
 		});
 
 		if (!webhook) {
-			logger.warn({ webhookId, organizationId }, "Webhook not found");
 			throw status(404, { message: "Webhook not found" });
 		}
 
-		logger.info(
-			{
-				webhookId,
-				organizationId,
-			},
-			"Webhook retrieved successfully",
-		);
-
-		// Format response (return actual secret)
 		return {
 			id: webhook.id,
 			name: webhook.name,
@@ -62,51 +49,7 @@ export async function getWebhook(
 			updatedAt: webhook.updatedAt.toISOString(),
 		};
 	} catch (error) {
-		logger.error(
-			{
-				webhookId,
-				organizationId,
-				error: error instanceof Error ? error.message : String(error),
-			},
-			"Error getting webhook",
-		);
-		throw error;
-	}
-}
-
-export async function getWebhookHandler(
-	webhookId: string,
-	organizationId: string,
-): Promise<WebhookTypes.WebhookResponse> {
-	logger.info(
-		{
-			webhookId,
-			organizationId,
-		},
-		"Getting webhook",
-	);
-
-	try {
-		const webhook = await getWebhook(webhookId, organizationId);
-
-		logger.info(
-			{
-				webhookId,
-				organizationId,
-			},
-			"Webhook retrieved successfully",
-		);
-
-		return webhook;
-	} catch (error) {
-		logger.error(
-			{
-				webhookId,
-				organizationId,
-				error: error instanceof Error ? error.message : String(error),
-			},
-			"Error getting webhook",
-		);
+		logger.error({ webhookId, organizationId, error }, "Error getting webhook");
 		throw error;
 	}
 }

@@ -37,7 +37,7 @@ export const WebhookListSidebar = () => {
 
 	const { data, error, isLoading } = useSWR<WebhookListResponse>(
 		activeOrganization?.id
-			? `/api/webhook/v1/list?organizationId=${activeOrganization.id}&limit=100`
+			? `/api/webhook/v1/?organizationId=${activeOrganization.id}&limit=100`
 			: null,
 		{
 			revalidateOnFocus: true,

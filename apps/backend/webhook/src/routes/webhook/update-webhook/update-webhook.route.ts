@@ -1,9 +1,10 @@
 import { authMiddleware } from "@reloop/webhook/middleware/auth";
-import { updateWebhookHandler } from "@reloop/webhook/routes/webhook/controllers/update-webhook";
 import { WebhookModel } from "@reloop/webhook/routes/webhook/webhook.model";
 import { Elysia, status, t } from "elysia";
+import { updateWebhookController } from "./update-webhook.controllers";
+import { updateWebhookXCodeSamples } from "./update-webhook.x-codeSamples";
 
-export const updateWebhookRoute = new Elysia().use(authMiddleware).put(
+export const updateWebhookRoute = new Elysia().use(authMiddleware).patch(
 	"/:id",
 	async ({ params: { id }, body, user }) => {
 		if (!user.activeOrganizationId) {
@@ -11,7 +12,12 @@ export const updateWebhookRoute = new Elysia().use(authMiddleware).put(
 				message: "User is not a member of an organization",
 			});
 		}
-		return await updateWebhookHandler(id, user.activeOrganizationId, body);
+
+		return await updateWebhookController({
+			webhookId: id,
+			organizationId: user.activeOrganizationId,
+			body,
+		});
 	},
 	{
 		auth: true,
@@ -30,6 +36,7 @@ export const updateWebhookRoute = new Elysia().use(authMiddleware).put(
 			tags: ["Webhooks"],
 			summary: "Update webhook",
 			description: "Updates a webhook by its ID",
+			"x-codeSamples": updateWebhookXCodeSamples,
 		},
 	},
 );

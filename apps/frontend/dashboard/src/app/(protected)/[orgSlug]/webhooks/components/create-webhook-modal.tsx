@@ -89,16 +89,14 @@ export const CreateWebhookModal = ({
 			changeStatus("loading");
 			const webhookName = new URL(data.url).hostname;
 			const response = await axios.post(
-				"/api/webhook/v1/add",
+				"/api/webhook/v1/",
 				{
 					name: webhookName,
 					url: data.url,
 				},
 				{ headers: { credentials: "include" } },
 			);
-			await mutate(
-				`/api/webhook/v1/list?organizationId=${activeOrganization.id}&limit=100`,
-			);
+			await mutate(`/api/webhook/v1/?organizationId=${activeOrganization.id}&limit=100`);
 			reset();
 			setSelectedEventId("");
 			changeStatus("idle");

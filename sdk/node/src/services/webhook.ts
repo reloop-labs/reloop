@@ -16,7 +16,7 @@ export class WebhookService {
 	 * @returns Promise resolving to the created webhook
 	 */
 	async create(data: CreateWebhookRequest): Promise<WebhookResponse> {
-		return this.client.post<WebhookResponse>("/api/webhook/v1/add", data);
+		return this.client.post<WebhookResponse>("/api/webhook/v1/", data);
 	}
 
 	/**
@@ -36,7 +36,7 @@ export class WebhookService {
 	 * @returns Promise resolving to the list of webhooks
 	 */
 	async list(query?: WebhookQuery): Promise<WebhookListResponse> {
-		return this.client.get<WebhookListResponse>("/api/webhook/v1/list", query);
+		return this.client.get<WebhookListResponse>("/api/webhook/v1/", query);
 	}
 
 	/**
@@ -49,7 +49,7 @@ export class WebhookService {
 		id: string,
 		data: UpdateWebhookRequest,
 	): Promise<WebhookResponse> {
-		return this.client.put<WebhookResponse>(
+		return this.client.patch<WebhookResponse>(
 			`/api/webhook/v1/${encodeURIComponent(id)}`,
 			data,
 		);

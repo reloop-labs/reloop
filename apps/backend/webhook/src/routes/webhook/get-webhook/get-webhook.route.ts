@@ -1,7 +1,8 @@
 import { authMiddleware } from "@reloop/webhook/middleware/auth";
-import { getWebhookHandler } from "@reloop/webhook/routes/webhook/controllers/get-webhook";
 import { WebhookModel } from "@reloop/webhook/routes/webhook/webhook.model";
 import { Elysia, status, t } from "elysia";
+import { getWebhookController } from "./get-webhook.controllers";
+import { getWebhookXCodeSamples } from "./get-webhook.x-codeSamples";
 
 export const getWebhookRoute = new Elysia().use(authMiddleware).get(
 	"/:id",
@@ -11,7 +12,11 @@ export const getWebhookRoute = new Elysia().use(authMiddleware).get(
 				message: "User is not a member of an organization",
 			});
 		}
-		return await getWebhookHandler(id, user.activeOrganizationId);
+
+		return await getWebhookController({
+			webhookId: id,
+			organizationId: user.activeOrganizationId,
+		});
 	},
 	{
 		auth: true,
@@ -25,8 +30,9 @@ export const getWebhookRoute = new Elysia().use(authMiddleware).get(
 		},
 		detail: {
 			tags: ["Webhooks"],
-			summary: "Get webhook by ID",
+			summary: "Get webhook",
 			description: "Retrieves a webhook by its ID",
+			"x-codeSamples": getWebhookXCodeSamples,
 		},
 	},
 );

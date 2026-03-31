@@ -13,6 +13,8 @@ export namespace WebhookTypes {
 	export type InvalidWebhookUrl = typeof WebhookModel.invalidWebhookUrl.static;
 	export type Unauthorized = typeof WebhookModel.unauthorized.static;
 	export type ValidationError = typeof WebhookModel.validationError.static;
+	export type DeleteWebhookResponse =
+		typeof WebhookModel.deleteWebhookResponse.static;
 
 	// Backend types with Date objects
 	export interface WebhookData {

@@ -1,7 +1,8 @@
 import { authMiddleware } from "@reloop/webhook/middleware/auth";
-import { deleteWebhookHandler } from "@reloop/webhook/routes/webhook/controllers/delete-webhook";
 import { WebhookModel } from "@reloop/webhook/routes/webhook/webhook.model";
 import { Elysia, status, t } from "elysia";
+import { deleteWebhookController } from "./delete-webhook.controllers";
+import { deleteWebhookXCodeSamples } from "./delete-webhook.x-codeSamples";
 
 export const deleteWebhookRoute = new Elysia().use(authMiddleware).delete(
 	"/:id",
@@ -11,7 +12,11 @@ export const deleteWebhookRoute = new Elysia().use(authMiddleware).delete(
 				message: "User is not a member of an organization",
 			});
 		}
-		return await deleteWebhookHandler(id, user.activeOrganizationId);
+
+		return await deleteWebhookController({
+			webhookId: id,
+			organizationId: user.activeOrganizationId,
+		});
 	},
 	{
 		auth: true,
@@ -19,9 +24,7 @@ export const deleteWebhookRoute = new Elysia().use(authMiddleware).delete(
 			id: WebhookModel.webhookIdParam,
 		}),
 		response: {
-			200: t.Object({
-				message: t.String(),
-			}),
+			200: WebhookModel.deleteWebhookResponse,
 			404: WebhookModel.webhookNotFound,
 			403: WebhookModel.unauthorized,
 		},
@@ -29,6 +32,7 @@ export const deleteWebhookRoute = new Elysia().use(authMiddleware).delete(
 			tags: ["Webhooks"],
 			summary: "Delete webhook",
 			description: "Soft deletes a webhook by its ID",
+			"x-codeSamples": deleteWebhookXCodeSamples,
 		},
 	},
 );

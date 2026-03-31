@@ -1,17 +1,23 @@
 import { authMiddleware } from "@reloop/webhook/middleware/auth";
-import { createWebhookHandler } from "@reloop/webhook/routes/webhook/controllers/create-webhook";
 import { WebhookModel } from "@reloop/webhook/routes/webhook/webhook.model";
 import { Elysia, status } from "elysia";
+import { createWebhookController } from "./create-webhook.controllers";
+import { createWebhookXCodeSamples } from "./create-webhook.x-codeSamples";
 
 export const createWebhookRoute = new Elysia().use(authMiddleware).post(
-	"/add",
+	"/",
 	async ({ body, user }) => {
 		if (!user.activeOrganizationId) {
 			throw status(403, {
 				message: "User is not a member of an organization",
 			});
 		}
-		return await createWebhookHandler(user.activeOrganizationId, user.id, body);
+
+		return await createWebhookController({
+			organizationId: user.activeOrganizationId,
+			userId: user.id,
+			body,
+		});
 	},
 	{
 		auth: true,
@@ -24,8 +30,9 @@ export const createWebhookRoute = new Elysia().use(authMiddleware).post(
 		},
 		detail: {
 			tags: ["Webhooks"],
-			summary: "Create a new webhook",
-			description: "Creates a new webhook for the user's organization",
+			summary: "Create webhook",
+			description: "Creates a new webhook for the active organization",
+			"x-codeSamples": createWebhookXCodeSamples,
 		},
 	},
 );
