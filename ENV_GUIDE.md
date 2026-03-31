@@ -163,6 +163,5 @@ Use these for:
 ## Additional Resources
 
 - See individual service READMEs for service-specific requirements
-- Check `scripts/03-configure-env.sh` for automated setup
+- Configure environment values directly in the workspace `.env` files when needed
 - Review `local/docker-compose.yml` for local development setup
-

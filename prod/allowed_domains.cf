@@ -1,5 +1,0 @@
-hosts = reloopsh-postgres
-user = reloop
-password = reloop123
-dbname = reloop
-query = SELECT 'OK' FROM domain WHERE domain='%s'
