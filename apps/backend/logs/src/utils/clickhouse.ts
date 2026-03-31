@@ -1,5 +1,6 @@
 import { type ClickHouseClient, createClient } from "@clickhouse/client";
 import { logger } from "@reloop/logger";
+import { logsConfig } from "@reloop/logs/logs.config";
 import type { LogsTypes } from "@reloop/logs/types/logs.type";
 
 let clickhouseClient: ClickHouseClient | null = null;
@@ -28,10 +29,10 @@ type StoredLogEntry = {
 export function getClickHouseClient(): ClickHouseClient {
 	if (!clickhouseClient) {
 		clickhouseClient = createClient({
-			host: process.env.CLICKHOUSE_HOST || "http://localhost:8123",
-			username: process.env.CLICKHOUSE_USER || "reloop",
-			password: process.env.CLICKHOUSE_PASSWORD || "reloop123",
-			database: process.env.CLICKHOUSE_DATABASE || "reloop_tracehub",
+			host: logsConfig.clickhouse.host,
+			username: logsConfig.clickhouse.username,
+			password: logsConfig.clickhouse.password,
+			database: logsConfig.clickhouse.database,
 		});
 	}
 	return clickhouseClient;
