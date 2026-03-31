@@ -16,7 +16,6 @@ export async function createLogController({
 }): Promise<LogsTypes.CreateLogResponse> {
 	try {
 		const client = getClickHouseClient();
-
 		const id = crypto.randomUUID();
 		const occurredAt = new Date().toISOString();
 		const entry = {

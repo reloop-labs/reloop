@@ -1,11 +1,10 @@
 import { type ClickHouseClient, createClient } from "@clickhouse/client";
 import { logsConfig } from "@reloop/logs/logs.config";
-import type { LogsTypes } from "@reloop/logs/types/logs.type";
 
 let clickhouseClient: ClickHouseClient | null = null;
 let clickhouseAdminClient: ClickHouseClient | null = null;
 
-type StoredLogEntry = {
+export type StoredLogEntry = {
 	id: string;
 	event: string;
 	level: string;
@@ -85,115 +84,5 @@ export async function ensureTableExists(): Promise<void> {
 
 
 
-function safeJsonParse(value: string, fallback: unknown): unknown {
-	try {
-		return JSON.parse(value);
-	} catch {
-		return fallback;
-	}
-}
 
 
-function parseStoredLogEntry(entry: StoredLogEntry): LogsTypes.LogEntryResponse {
-	return {
-		uuid: entry.id,
-		event: entry.event,
-		level: entry.level,
-		trace_id: entry.trace_id,
-		metadata: safeJsonParse(entry.metadata, {}),
-		created_at: entry.created_at,
-		request_details: safeJsonParse(entry.request_details, {}),
-	};
-}
-
-function escapeString(value: string): string {
-	return value.replaceAll("\\", "\\\\").replaceAll("'", "\\'");
-}
-
-
-export async function listLogs(
-	query: LogsTypes.ListLogsQuery,
-): Promise<LogsTypes.LogEntryResponse[]> {
-	const client = getClickHouseClient();
-	const conditions: string[] = [];
-
-
-	if (query.level) {
-		conditions.push(`level = '${escapeString(query.level)}'`);
-	}
-
-	if (query.event) {
-		conditions.push(`event = '${escapeString(query.event)}'`);
-	}
-
-	if (query.organization_id) {
-		conditions.push(
-			`organization_id = '${escapeString(query.organization_id)}'`,
-		);
-	}
-
-	const whereClause =
-		conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
-	const limit = Math.min(Math.max(Number(query.limit || 25), 1), 100);
-
-	try {
-		const resultSet = await client.query({
-			query: `
-				SELECT
-					id,
-					event,
-					level,
-					trace_id,
-					user_id,
-					organization_id,
-					metadata,
-					request_details,
-					toString(created_at) AS created_at
-				FROM logs
-				${whereClause}
-				ORDER BY created_at DESC
-				LIMIT ${limit}
-			`,
-			format: "JSONEachRow",
-		});
-		const rows = (await resultSet.json()) as StoredLogEntry[];
-
-
-		return rows.map(parseStoredLogEntry);
-	} catch (error) {
-		throw error;
-	}
-}
-
-export async function getLogById(
-	logId: string,
-): Promise<LogsTypes.LogEntryResponse | null> {
-	const client = getClickHouseClient();
-
-	try {
-		const resultSet = await client.query({
-			query: `
-				SELECT
-					id,
-					event,
-					level,
-					trace_id,
-					user_id,
-					organization_id,
-					metadata,
-					request_details,
-					toString(created_at) AS created_at
-				FROM logs
-				WHERE id = '${escapeString(logId)}'
-				LIMIT 1
-			`,
-			format: "JSONEachRow",
-		});
-		const rows = (await resultSet.json()) as StoredLogEntry[];
-		const entry = rows[0];
-
-		return entry ? parseStoredLogEntry(entry) : null;
-	} catch (error) {
-		throw error;
-	}
-}
