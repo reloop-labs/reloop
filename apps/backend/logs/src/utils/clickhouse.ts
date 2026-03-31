@@ -4,6 +4,7 @@ import { logsConfig } from "@reloop/logs/logs.config";
 import type { LogsTypes } from "@reloop/logs/types/logs.type";
 
 let clickhouseClient: ClickHouseClient | null = null;
+let clickhouseAdminClient: ClickHouseClient | null = null;
 
 type StoredLogEntry = {
 	id: string;
@@ -29,7 +30,7 @@ type StoredLogEntry = {
 export function getClickHouseClient(): ClickHouseClient {
 	if (!clickhouseClient) {
 		clickhouseClient = createClient({
-			host: logsConfig.clickhouse.host,
+			url: logsConfig.clickhouse.url,
 			username: logsConfig.clickhouse.username,
 			password: logsConfig.clickhouse.password,
 			database: logsConfig.clickhouse.database,
@@ -38,7 +39,43 @@ export function getClickHouseClient(): ClickHouseClient {
 	return clickhouseClient;
 }
 
+function getClickHouseAdminClient(): ClickHouseClient {
+	if (!clickhouseAdminClient) {
+		clickhouseAdminClient = createClient({
+			url: logsConfig.clickhouse.url,
+			username: logsConfig.clickhouse.username,
+			password: logsConfig.clickhouse.password,
+		});
+	}
+	return clickhouseAdminClient;
+}
+
+export async function ensureDatabaseExists(): Promise<void> {
+	const client = getClickHouseAdminClient();
+
+	try {
+		await client.exec({
+			query: `CREATE DATABASE IF NOT EXISTS ${logsConfig.clickhouse.database}`,
+		});
+
+		logger.info(
+			{ database: logsConfig.clickhouse.database },
+			"ClickHouse database ensured",
+		);
+	} catch (error) {
+		logger.error(
+			{
+				database: logsConfig.clickhouse.database,
+				error: error instanceof Error ? error.message : String(error),
+			},
+			"Failed to ensure ClickHouse database",
+		);
+		throw error;
+	}
+}
+
 export async function ensureTableExists(): Promise<void> {
+	await ensureDatabaseExists();
 	const client = getClickHouseClient();
 
 	try {
