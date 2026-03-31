@@ -1,5 +1,5 @@
-import { logsConfig } from "@reloop/logs/logs.config";
 import { logger } from "@reloop/logger";
+import { logsConfig } from "@reloop/logs/logs.config";
 import { Elysia } from "elysia";
 import { validateApiKey } from "./api-key-auth";
 import { validateSession } from "./cookie-auth";
@@ -10,7 +10,7 @@ if (logsConfig.NODE_ENV !== "production") {
 
 function validateLogApiKeyHeader(headers: Headers) {
 	const logApiKey = headers.get("x-log-api-key");
-	return logApiKey === logsConfig.logApiKey;
+	return logApiKey === logsConfig.LOGS_API_KEY;
 }
 
 export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({

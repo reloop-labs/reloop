@@ -19,4 +19,5 @@ export const contactsConfig = {
 	NODE_ENV: process.env.NODE_ENV || "development",
 	NODE_TLS_REJECT_UNAUTHORIZED: process.env.NODE_TLS_REJECT_UNAUTHORIZED,
 	BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
+	LOGS_API_KEY: process.env.LOGS_API_KEY || "reloop-log-api-key",
 };

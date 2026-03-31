@@ -16,6 +16,7 @@ export const templateConfig = {
 	BASE_URL: process.env.BASE_URL,
 	NODE_ENV: process.env.NODE_ENV || "development",
 	NODE_TLS_REJECT_UNAUTHORIZED: process.env.NODE_TLS_REJECT_UNAUTHORIZED,
+	LOGS_API_KEY: process.env.LOGS_API_KEY || "reloop-log-api-key",
 
 	constants: {
 		maxTemplateNameLength: 255,

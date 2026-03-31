@@ -21,6 +21,7 @@ export const uploadConfig = {
 	NODE_TLS_REJECT_UNAUTHORIZED: process.env.NODE_TLS_REJECT_UNAUTHORIZED,
 	UPLOAD_STORAGE_PATH: process.env.UPLOAD_STORAGE_PATH,
 	MAX_FILE_SIZE: Number(process.env.MAX_FILE_SIZE),
+	LOGS_API_KEY: process.env.LOGS_API_KEY || "reloop-log-api-key",
 
 	constants: {
 		maxFileSize: 10 * 1024 * 1024, // 10MB

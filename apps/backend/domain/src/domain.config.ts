@@ -20,6 +20,7 @@ export const domainConfig = {
 	NODE_TLS_REJECT_UNAUTHORIZED: process.env.NODE_TLS_REJECT_UNAUTHORIZED,
 	HOST_DOMAIN: process.env.HOST_DOMAIN,
 	DKIM_SELECTOR: process.env.DKIM_SELECTOR,
+	LOGS_API_KEY: process.env.LOGS_API_KEY || "reloop-log-api-key",
 
 	constants: {
 		keyLength: 2048,

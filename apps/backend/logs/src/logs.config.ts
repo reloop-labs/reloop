@@ -11,7 +11,7 @@ export const logsConfig = {
 	NODE_ENV: process.env.NODE_ENV || "development",
 	REDIS_URL: process.env.REDIS_URL,
 	BASE_URL: process.env.BASE_URL,
-	logApiKey: process.env.LOGS_API_KEY || "reloop-log-api-key",
+	LOGS_API_KEY: process.env.LOGS_API_KEY || "reloop-log-api-key",
 	clickhouse: {
 		url:
 			process.env.CLICKHOUSE_URL ||
