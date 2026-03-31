@@ -2,35 +2,40 @@ import "dotenv/config";
 import { fromTypes, openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 import { logger } from "@reloop/logger";
+import { logsConfig } from "@reloop/logs/logs.config";
 import { loader } from "@reloop/logs/utils/loader";
 import { Elysia } from "elysia";
-import { landingRoute } from "./routes/landing/landing.route";
+import { landing } from "./routes/landing/landing.index";
 import { logsRoutes } from "./routes/logs/logs.routes";
 
-const port = 8016;
+const port = logsConfig.port;
 const logsService = new Elysia({
 	prefix: "/api/logs",
-	name: "logs service",
+	name: "Logs Service",
 })
 	.use(
 		openapi({
+			documentation: {
+				info: {
+					title: "Logs Service",
+					version: "1.0.0",
+				},
+			},
 			references: fromTypes(
-				process.env.NODE_ENV === "production"
+				logsConfig.NODE_ENV === "production"
 					? "dist/index.d.ts"
 					: "src/index.ts",
 			),
 		}),
 	)
 	.use(serverTiming())
-	.use(landingRoute)
+	.use(landing)
 	.use(logsRoutes)
 	.onStart(async () => {
 		await loader();
 	})
 	.listen(port, () => {
-		logger.info(
-			`logs server is running on http://localhost:${port}/api/logs`,
-		);
+		logger.info(`Logs Server is running on http://localhost:${port}/api/logs`);
 	});
 
 export type LogsService = typeof logsService;
