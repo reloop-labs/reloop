@@ -1,4 +1,5 @@
 import { getClickHouseClient } from "@reloop/logs/utils/clickhouse";
+import { redis } from "@reloop/logs/utils/loader";
 import { Elysia } from "elysia";
 
 export const landing = new Elysia()
@@ -51,6 +52,7 @@ export const landing = new Elysia()
 				const startTime = Date.now();
 				const client = getClickHouseClient();
 				await client.query({ query: "SELECT 1 as test", format: "JSON" });
+				await redis.healthCheck();
 				const responseTime = Date.now() - startTime;
 
 				return {
