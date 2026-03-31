@@ -112,12 +112,13 @@ export const AddDomainSidebar = () => {
 	};
 
 	return (
-		<div className="flex h-[calc(100vh-64px)] w-full overflow-hidden">
-			<div
-				className="scrollbar-hide flex w-full flex-col overflow-y-auto lg:w-1/2"
-				style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-			>
-				<div className="mx-auto w-full max-w-2xl px-6 pt-8 pb-10 sm:px-12">
+		<div className="h-[calc(100vh-64px)] w-full overflow-hidden">
+			<div className="mx-auto flex h-full w-full max-w-5xl overflow-hidden">
+				<div
+					className="scrollbar-hide flex w-full flex-col overflow-y-auto lg:w-1/2 lg:shrink-0"
+					style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+				>
+					<div className="mx-auto w-full max-w-[620px] px-6 pt-8 pb-10 sm:px-8">
 					<AnimatedBackButton />
 					<div className="mb-4 border-stroke-soft-200 border-b border-dashed pt-4 pb-4">
 						<div>
@@ -373,14 +374,15 @@ export const AddDomainSidebar = () => {
 							</Button.Root>
 						</div>
 					</form>
+					</div>
 				</div>
-			</div>
-			
-			{/* Right side preview */}
-			<div className="relative hidden h-full w-1/2 shrink-0 overflow-hidden bg-bg-weak-50/10 lg:flex">
-				<div className="fade-in slide-in-from-bottom-8 relative z-10 h-full w-full animate-in duration-700">
-					<div className="flex h-full items-start justify-center px-8 pt-6 pb-10">
-						<DomainPreview domain={watch("domain")} variant="domain" />
+
+				{/* Right side preview */}
+				<div className="relative hidden h-full min-w-0 flex-1 overflow-hidden bg-bg-weak-50/10 lg:flex">
+					<div className="fade-in slide-in-from-bottom-8 relative z-10 h-full w-full animate-in duration-700">
+						<div className="flex h-full items-start justify-center px-8 pt-6 pb-10">
+							<DomainPreview domain={watch("domain")} variant="domain" />
+						</div>
 					</div>
 				</div>
 			</div>
