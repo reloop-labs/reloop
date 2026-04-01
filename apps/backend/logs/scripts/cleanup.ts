@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { cleanupOldLogs, truncateLogs } from "../src/utils/cleanup";
 
 async function main() {
