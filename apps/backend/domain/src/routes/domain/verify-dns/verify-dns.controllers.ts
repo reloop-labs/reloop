@@ -1,6 +1,7 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import type { Logger } from "@reloop/logger";
+import { DOMAIN_VERIFY_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
@@ -44,6 +45,7 @@ export async function verifyDNSRecordController({
       return {
         id: domainId,
         status: "verifying" as const,
+        event: DOMAIN_VERIFY_WEBHOOK_EVENT.id,
       };
     }
 
@@ -91,6 +93,7 @@ export async function verifyDNSRecordController({
     return {
       id: domainId,
       status: "verifying" as const,
+      event: DOMAIN_VERIFY_WEBHOOK_EVENT.id,
     };
   } catch (error) {
     logger.error({ domainId, error }, "Error verifying DNS records");

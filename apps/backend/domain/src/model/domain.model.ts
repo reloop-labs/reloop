@@ -237,6 +237,7 @@ export namespace DomainModel {
 			],
 			{ description: "Domain verification status" },
 		),
+		event: t.Optional(t.String({ description: "Event ID" })),
 	}, {
 		examples: [{
 			id: "domain_123456789",

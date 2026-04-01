@@ -56,6 +56,14 @@ export const DOMAIN_GET_DNS_WEBHOOK_EVENT = {
 	isActive: true,
 } as const satisfies WebhookEventDefinition;
 
+export const DOMAIN_VERIFY_WEBHOOK_EVENT = {
+	id: "domain.verify",
+	name: "domain.verify",
+	category: "domain",
+	description: "Triggered when a domain's DNS records are verified",
+	isActive: true,
+} as const satisfies WebhookEventDefinition;
+
 export const DOMAIN_WEBHOOK_EVENTS = [
 	DOMAIN_CREATE_WEBHOOK_EVENT,
 	DOMAIN_UPDATE_WEBHOOK_EVENT,
@@ -64,4 +72,5 @@ export const DOMAIN_WEBHOOK_EVENTS = [
 	DOMAIN_LIST_WEBHOOK_EVENT,
 	DOMAIN_GET_WEBHOOK_EVENT,
 	DOMAIN_GET_DNS_WEBHOOK_EVENT,
+	DOMAIN_VERIFY_WEBHOOK_EVENT,
 ] as const satisfies readonly WebhookEventDefinition[];
