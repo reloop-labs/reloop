@@ -182,7 +182,7 @@ export const AddDomainSidebar = () => {
 									Add Domain
 								</h1>
 								<p className="text-paragraph-sm text-text-sub-600">
-									You need a domain to send emails from your own domain
+									Send emails from a domain you control
 								</p>
 							</div>
 						</div>
@@ -240,10 +240,10 @@ export const AddDomainSidebar = () => {
 												Pro Tip
 											</p>
 											<p className="max-w-[560px] text-[13px] leading-5 text-text-sub-600">
-												Use a sending domain or dedicated subdomain you control.
+											Use a dedicated sending domain or subdomain you control.
 											</p>
 											<p className="max-w-[560px] text-[13px] leading-5 text-text-sub-600">
-												Examples: marketing.example.com or send.example.com.
+												e.g. marketing.example.com or send.example.com.
 											</p>
 										</div>
 									</div>
@@ -492,6 +492,7 @@ export const AddDomainSidebar = () => {
 							</motion.section>
 
 							<motion.div
+								initial={false}
 								layout="position"
 								animate={{
 									y: hasDomainValue ? 0 : 6,
