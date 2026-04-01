@@ -1,7 +1,9 @@
 import type { TopicTypes } from "@be/contacts/types/topic.type";
+import { createLog } from "@be/contacts/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import type { Logger } from "@reloop/logger";
+import { TOPIC_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
@@ -12,6 +14,8 @@ export const updateTopicController = async ({
   description,
   visibility,
   logger,
+  cookie,
+  requestDetails,
 }: {
   activeOrganizationId: string;
   topic_id: string;
@@ -19,6 +23,13 @@ export const updateTopicController = async ({
   description?: string;
   visibility?: "private" | "public";
   logger: Logger;
+  cookie?: string;
+  requestDetails?: {
+    endpoint?: string;
+    method?: string;
+    userAgent?: string;
+    ipAddress?: string;
+  };
 }): Promise<TopicTypes.TopicResponse> => {
   logger.info({ topic_id, name }, "Updating topic");
 
@@ -68,7 +79,21 @@ export const updateTopicController = async ({
     }
 
     logger.info({ topic_id }, "Topic updated successfully");
-    return { ...updatedTopic, object: "topic" };
+
+    const result = {
+      ...updatedTopic,
+      object: "topic" as const,
+      event: TOPIC_UPDATE_WEBHOOK_EVENT.id,
+    };
+
+    await createLog({
+      event: TOPIC_UPDATE_WEBHOOK_EVENT.id,
+      cookie,
+      metadata: result,
+      requestDetails,
+    });
+
+    return result;
   } catch (error) {
     logger.error({ topic_id, error }, "Debug updating topic");
     throw error;

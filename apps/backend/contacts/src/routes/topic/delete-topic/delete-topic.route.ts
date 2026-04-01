@@ -6,11 +6,19 @@ import { deleteTopicXCodeSamples } from "./delete-topic.x-codeSamples";
 
 export const deleteTopicRoute = new Elysia().use(authMiddleware).delete(
   "/:topic_id",
-  async ({ params, activeOrganizationId, logger }) => {
+  async ({ params, activeOrganizationId, logger, path, request, headers }) => {
+    const cookieString = headers["cookie"] || "";
     return await deleteTopicController({
       activeOrganizationId,
       topic_id: params.topic_id,
       logger,
+      cookie: cookieString,
+      requestDetails: {
+        endpoint: path,
+        method: request.method,
+        userAgent: headers["user-agent"],
+        ipAddress: (headers["x-forwarded-for"] as string) || (headers["x-real-ip"] as string),
+      },
     });
   },
   {

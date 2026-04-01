@@ -75,14 +75,20 @@ export const createPropertyController = async ({
       "Property created successfully",
     );
 
+    const result = {
+      ...newProperty,
+      object: "contact_property" as const,
+      event: PROPERTY_CREATE_WEBHOOK_EVENT.id,
+    };
+
     await createLog({
       event: PROPERTY_CREATE_WEBHOOK_EVENT.id,
       cookie,
-      metadata: { name: body.name, id: newProperty.id },
+      metadata: result,
       requestDetails,
     });
 
-    return { ...newProperty, object: "contact_property" };
+    return result;
   } catch (error) {
     logger.error({ name: body.name, error }, "Debug creating property");
     throw error;

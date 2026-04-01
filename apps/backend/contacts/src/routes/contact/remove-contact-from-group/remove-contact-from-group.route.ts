@@ -8,12 +8,20 @@ export const removeContactFromGroupRoute = new Elysia()
   .use(authMiddleware)
   .delete(
     "/group/:group_id",
-    async ({ body, params, activeOrganizationId, logger }) => {
+    async ({ body, params, activeOrganizationId, logger, path, request, headers }) => {
+      const cookieString = headers["cookie"] || "";
       return await removeContactFromGroupController({
         organizationId: activeOrganizationId,
         groupId: params.group_id,
         body,
         logger,
+        cookie: cookieString,
+        requestDetails: {
+          endpoint: path,
+          method: request.method,
+          userAgent: headers["user-agent"],
+          ipAddress: (headers["x-forwarded-for"] as string) || (headers["x-real-ip"] as string),
+        },
       });
     },
     {

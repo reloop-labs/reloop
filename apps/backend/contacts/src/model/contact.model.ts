@@ -198,6 +198,7 @@ export namespace ContactModel {
 		),
 		createdAt: t.Date(),
 		updatedAt: t.Date(),
+		event: t.String({ description: "Event ID for the mutation" }),
 	},
 		{
 			examples: [
@@ -328,6 +329,7 @@ export namespace ContactModel {
 			success: t.Boolean({ default: true }),
 			object: t.Literal("contact", { default: "contact" }),
 			id: t.String({ description: "ID of the deleted contact" }),
+			event: t.String({ description: "Event ID for the mutation" }),
 		},
 		{
 			examples: [
@@ -439,6 +441,7 @@ export namespace ContactModel {
 	export const addContactToTopicResponse = t.Object({
 		contact: contactResponse,
 		subscriptionId: t.String({ description: "Created subscription ID" }),
+		event: t.String({ description: "Event ID for the mutation" }),
 	});
 
 	export type AddContactToTopicResponse =
@@ -462,6 +465,7 @@ export namespace ContactModel {
 			success: t.Boolean({ default: true }),
 			object: t.Literal("contact", { default: "contact" }),
 			id: t.String({ description: "ID of the contact added to the group" }),
+			event: t.String({ description: "Event ID for the mutation" }),
 		},
 		{
 			examples: [
@@ -493,6 +497,7 @@ export namespace ContactModel {
 			success: t.Boolean({ default: true }),
 			object: t.Literal("contact", { default: "contact" }),
 			id: t.String({ description: "ID of the contact removed from the group" }),
+			event: t.String({ description: "Event ID for the mutation" }),
 		},
 		{
 			examples: [
@@ -527,6 +532,7 @@ export namespace ContactModel {
 	export const updateContactTopicResponse = t.Object({
 		success: t.Boolean({ default: true }),
 		status: t.String(),
+		event: t.String({ description: "Event ID for the mutation" }),
 	});
 
 	export type UpdateContactTopicResponse =

@@ -7,12 +7,20 @@ import { addContactToTopicXCodeSamples } from "./add-contact-to-topic.x-codeSamp
 
 export const addContactToTopicRoute = new Elysia().use(authMiddleware).post(
   "/topic/:topic_id",
-  async ({ body, params, activeOrganizationId, userId }) => {
+  async ({ body, params, activeOrganizationId, logger, path, request, headers }) => {
+    const cookieString = headers["cookie"] || "";
     return await addContactToTopicController({
       organizationId: activeOrganizationId,
-      userId,
       topicId: params.topic_id,
       body,
+      logger,
+      cookie: cookieString,
+      requestDetails: {
+        endpoint: path,
+        method: request.method,
+        userAgent: headers["user-agent"],
+        ipAddress: (headers["x-forwarded-for"] as string) || (headers["x-real-ip"] as string),
+      },
     });
   },
   {

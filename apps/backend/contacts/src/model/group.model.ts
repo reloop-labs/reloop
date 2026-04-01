@@ -40,6 +40,7 @@ export namespace GroupModel {
 		name: t.String({ description: "Group name" }),
 		createdAt: t.Date(),
 		updatedAt: t.Date(),
+		event: t.String({ description: "Event ID for the mutation" }),
 	},
 		{
 			examples: [
@@ -82,6 +83,9 @@ export namespace GroupModel {
 	export const deleteResponse = t.Object({
 		object: t.Literal("contact_group", { default: "contact_group" }),
 		success: t.Boolean(),
+		id: t.String({ description: "ID of the deleted group" }),
+		name: t.String({ description: "Name of the deleted group" }),
+		event: t.String({ description: "Event ID for the mutation" }),
 	});
 
 	export type DeleteResponse = typeof deleteResponse.static;

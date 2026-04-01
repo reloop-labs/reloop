@@ -67,14 +67,20 @@ export const createTopicController = async ({
 
     logger.info({ name, id: newTopic.id }, "Topic created successfully");
 
+    const result = {
+      ...newTopic,
+      object: "topic" as const,
+      event: TOPIC_CREATE_WEBHOOK_EVENT.id,
+    };
+
     await createLog({
       event: TOPIC_CREATE_WEBHOOK_EVENT.id,
       cookie,
-      metadata: { name, id: newTopic.id },
+      metadata: result,
       requestDetails,
     });
 
-    return { ...newTopic, object: "topic" };
+    return result;
   } catch (error) {
     logger.error({ name, error }, "Debug creating topic");
     throw error;

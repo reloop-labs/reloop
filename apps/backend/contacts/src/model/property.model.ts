@@ -78,6 +78,7 @@ export namespace PropertyModel {
 		}),
 		createdAt: t.Date(),
 		updatedAt: t.Date(),
+		event: t.String({ description: "Event ID for the mutation" }),
 	},
 		{
 			examples: [
@@ -126,6 +127,9 @@ export namespace PropertyModel {
 	export const deleteResponse = t.Object({
 		object: t.Literal("contact_property", { default: "contact_property" }),
 		success: t.Boolean(),
+		id: t.String({ description: "ID of the deleted property" }),
+		name: t.String({ description: "Name of the deleted property" }),
+		event: t.String({ description: "Event ID for the mutation" }),
 	});
 
 	export type DeleteResponse = typeof deleteResponse.static;

@@ -6,26 +6,26 @@ import { createTopicXCodeSamples } from "./create-topic.x-codeSamples";
 
 export const createTopicRoute = new Elysia().use(authMiddleware).post(
   "/create",
-  async ({ body, activeOrganizationId, userId, logger, path, request, headers }) => {
-    const { name, description, defaultSubscription, visibility } = body;
-    const cookieString = headers["cookie"] || "";
-    return await createTopicController({
-      activeOrganizationId,
-      userId,
-      name,
-      description,
-      defaultSubscription,
-      visibility,
-      logger,
-      cookie: cookieString,
-      requestDetails: {
-        endpoint: path,
-        method: request.method,
-        userAgent: headers["user-agent"],
-        ipAddress: (headers["x-forwarded-for"] as string) || (headers["x-real-ip"] as string),
-      },
-    });
-  },
+    async ({ body, activeOrganizationId, userId, logger, path, request, headers }) => {
+      const { name, description, defaultSubscription, visibility } = body;
+      const cookieString = headers["cookie"] || "";
+      return await createTopicController({
+        activeOrganizationId,
+        userId,
+        name,
+        description,
+        defaultSubscription,
+        visibility,
+        logger,
+        cookie: cookieString,
+        requestDetails: {
+          endpoint: path,
+          method: request.method,
+          userAgent: headers["user-agent"],
+          ipAddress: (headers["x-forwarded-for"] as string) || (headers["x-real-ip"] as string),
+        },
+      });
+    },
   {
     auth: true,
     body: TopicModel.createTopicBody,

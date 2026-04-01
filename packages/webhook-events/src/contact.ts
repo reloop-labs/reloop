@@ -49,50 +49,74 @@ export const CONTACT_BLOCKED_WEBHOOK_EVENT = {
 } as const satisfies WebhookEventDefinition;
 
 export const GROUP_CREATE_WEBHOOK_EVENT = {
-	id: "group.create",
-	name: "group.create",
+	id: "contact.group.create",
+	name: "contact.group.create",
 	category: "contact",
 	description: "Triggered when a new group is created",
 	isActive: true,
 } as const satisfies WebhookEventDefinition;
 
 export const GROUP_DELETE_WEBHOOK_EVENT = {
-	id: "group.delete",
-	name: "group.delete",
+	id: "contact.group.delete",
+	name: "contact.group.delete",
 	category: "contact",
 	description: "Triggered when a group is deleted",
 	isActive: true,
 } as const satisfies WebhookEventDefinition;
 
+export const GROUP_UPDATE_WEBHOOK_EVENT = {
+	id: "contact.group.update",
+	name: "contact.group.update",
+	category: "contact",
+	description: "Triggered when a group is updated",
+	isActive: true,
+} as const satisfies WebhookEventDefinition;
+
 export const TOPIC_CREATE_WEBHOOK_EVENT = {
-	id: "topic.create",
-	name: "topic.create",
+	id: "contact.topic.create",
+	name: "contact.topic.create",
 	category: "contact",
 	description: "Triggered when a new topic is created",
 	isActive: true,
 } as const satisfies WebhookEventDefinition;
 
 export const TOPIC_DELETE_WEBHOOK_EVENT = {
-	id: "topic.delete",
-	name: "topic.delete",
+	id: "contact.topic.delete",
+	name: "contact.topic.delete",
 	category: "contact",
 	description: "Triggered when a topic is deleted",
 	isActive: true,
 } as const satisfies WebhookEventDefinition;
 
+export const TOPIC_UPDATE_WEBHOOK_EVENT = {
+	id: "contact.topic.update",
+	name: "contact.topic.update",
+	category: "contact",
+	description: "Triggered when a topic is updated",
+	isActive: true,
+} as const satisfies WebhookEventDefinition;
+
 export const PROPERTY_CREATE_WEBHOOK_EVENT = {
-	id: "property.create",
-	name: "property.create",
+	id: "contact.property.create",
+	name: "contact.property.create",
 	category: "contact",
 	description: "Triggered when a new property is created",
 	isActive: true,
 } as const satisfies WebhookEventDefinition;
 
 export const PROPERTY_DELETE_WEBHOOK_EVENT = {
-	id: "property.delete",
-	name: "property.delete",
+	id: "contact.property.delete",
+	name: "contact.property.delete",
 	category: "contact",
 	description: "Triggered when a property is deleted",
+	isActive: true,
+} as const satisfies WebhookEventDefinition;
+
+export const PROPERTY_UPDATE_WEBHOOK_EVENT = {
+	id: "contact.property.update",
+	name: "contact.property.update",
+	category: "contact",
+	description: "Triggered when a property is updated",
 	isActive: true,
 } as const satisfies WebhookEventDefinition;
 
@@ -104,9 +128,12 @@ export const CONTACT_WEBHOOK_EVENTS = [
 	CONTACT_UNSUBSCRIBED_WEBHOOK_EVENT,
 	CONTACT_BLOCKED_WEBHOOK_EVENT,
 	GROUP_CREATE_WEBHOOK_EVENT,
+	GROUP_UPDATE_WEBHOOK_EVENT,
 	GROUP_DELETE_WEBHOOK_EVENT,
 	TOPIC_CREATE_WEBHOOK_EVENT,
+	TOPIC_UPDATE_WEBHOOK_EVENT,
 	TOPIC_DELETE_WEBHOOK_EVENT,
 	PROPERTY_CREATE_WEBHOOK_EVENT,
+	PROPERTY_UPDATE_WEBHOOK_EVENT,
 	PROPERTY_DELETE_WEBHOOK_EVENT,
 ] as const satisfies readonly WebhookEventDefinition[];

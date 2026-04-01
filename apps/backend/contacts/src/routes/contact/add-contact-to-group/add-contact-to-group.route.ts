@@ -6,13 +6,20 @@ import { addContactToGroupXCodeSamples } from "./add-contact-to-group.x-codeSamp
 
 export const addContactToGroupRoute = new Elysia().use(authMiddleware).post(
   "/group/:group_id",
-  async ({ body, params, activeOrganizationId, userId, logger }) => {
+  async ({ body, params, activeOrganizationId, logger, path, request, headers }) => {
+    const cookieString = headers["cookie"] || "";
     return await addContactToGroupController({
       organizationId: activeOrganizationId,
-      userId,
       groupId: params.group_id,
       body,
       logger,
+      cookie: cookieString,
+      requestDetails: {
+        endpoint: path,
+        method: request.method,
+        userAgent: headers["user-agent"],
+        ipAddress: (headers["x-forwarded-for"] as string) || (headers["x-real-ip"] as string),
+      },
     });
   },
   {

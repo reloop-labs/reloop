@@ -138,27 +138,8 @@ export async function createContactController({
         {} as Record<string, string | number>,
       );
 
-      await createLog({
-        event: CONTACT_CREATE_WEBHOOK_EVENT.id,
-        cookie,
-        metadata: {
-          object: "contact",
-          id: newContact.id,
-          email: newContact.email,
-          firstName: newContact.firstName,
-          lastName: newContact.lastName,
-          status: newContact.status,
-          properties: propertiesRecord ?? {},
-          groups: (newContact as ContactTypes.ContactData).groups ?? [],
-          topics: (newContact as ContactTypes.ContactData).topics ?? [],
-          createdAt: newContact.createdAt,
-          updatedAt: newContact.updatedAt,
-        },
-        requestDetails,
-      });
-
-      return {
-        object: "contact",
+      const result = {
+        object: "contact" as const,
         id: newContact.id,
         email: newContact.email,
         firstName: newContact.firstName,
@@ -169,7 +150,17 @@ export async function createContactController({
         topics: (newContact as ContactTypes.ContactData).topics ?? [],
         createdAt: newContact.createdAt,
         updatedAt: newContact.updatedAt,
+        event: CONTACT_CREATE_WEBHOOK_EVENT.id,
       };
+
+      await createLog({
+        event: CONTACT_CREATE_WEBHOOK_EVENT.id,
+        cookie,
+        metadata: result,
+        requestDetails,
+      });
+
+      return result;
     });
   } catch (error) {
     logger.error({ email: body.email, error }, "Debug creating contact");

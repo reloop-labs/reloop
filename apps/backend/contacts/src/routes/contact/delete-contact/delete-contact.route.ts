@@ -6,10 +6,19 @@ import { deleteContactXCodeSamples } from "./delete-contact.x-codeSamples";
 
 export const deleteContactRoute = new Elysia().use(authMiddleware).delete(
   "/:contact_id",
-  async ({ params, activeOrganizationId }) => {
+  async ({ params, activeOrganizationId, logger, path, request, headers }) => {
+    const cookieString = headers["cookie"] || "";
     return await deleteContactController({
       contactId: params.contact_id,
       organizationId: activeOrganizationId,
+      logger,
+      cookie: cookieString,
+      requestDetails: {
+        endpoint: path,
+        method: request.method,
+        userAgent: headers["user-agent"],
+        ipAddress: (headers["x-forwarded-for"] as string) || (headers["x-real-ip"] as string),
+      },
     });
   },
   {

@@ -5,6 +5,7 @@ export type { Group };
 export interface GroupResponse
 	extends Omit<Group, "organizationId" | "userId" | "deletedAt"> {
 	object: "contact_group";
+	event: string;
 }
 
 export interface GroupListItem extends Omit<GroupResponse, "object"> { }

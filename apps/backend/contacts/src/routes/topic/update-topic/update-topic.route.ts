@@ -6,8 +6,9 @@ import { updateTopicXCodeSamples } from "./update-topic.x-codeSamples";
 
 export const updateTopicRoute = new Elysia().use(authMiddleware).patch(
   "/:topic_id",
-  async ({ params, body, activeOrganizationId, logger }) => {
+  async ({ params, body, activeOrganizationId, logger, path, request, headers }) => {
     const { name, description, visibility } = body;
+    const cookieString = headers["cookie"] || "";
     return await updateTopicController({
       activeOrganizationId,
       topic_id: params.topic_id,
@@ -15,6 +16,13 @@ export const updateTopicRoute = new Elysia().use(authMiddleware).patch(
       description: description ?? undefined,
       visibility,
       logger,
+      cookie: cookieString,
+      requestDetails: {
+        endpoint: path,
+        method: request.method,
+        userAgent: headers["user-agent"],
+        ipAddress: (headers["x-forwarded-for"] as string) || (headers["x-real-ip"] as string),
+      },
     });
   },
   {

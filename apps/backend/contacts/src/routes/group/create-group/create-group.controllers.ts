@@ -57,17 +57,23 @@ export const createGroupController = async ({
     }
     logger.info({ name, id: newGroup.id }, "Group created successfully");
 
+    const result = {
+      id: newGroup.id,
+      name: newGroup.name,
+      createdAt: newGroup.createdAt,
+      updatedAt: newGroup.updatedAt,
+      object: "contact_group" as const,
+      event: GROUP_CREATE_WEBHOOK_EVENT.id,
+    };
+
     await createLog({
       event: GROUP_CREATE_WEBHOOK_EVENT.id,
       cookie,
-      metadata: { name, id: newGroup.id },
+      metadata: result,
       requestDetails,
     });
 
-    return {
-      ...newGroup,
-      object: "contact_group",
-    } as GroupResponse;
+    return result;
   } catch (error) {
     logger.error({ name, error }, "Debug creating group");
     throw error;

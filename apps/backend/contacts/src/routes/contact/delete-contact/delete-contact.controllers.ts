@@ -1,23 +1,33 @@
+import type { ContactModel } from "@be/contacts/model/contact.model";
+import { createLog } from "@be/contacts/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { logger } from "@reloop/logger";
+import type { Logger } from "@reloop/logger";
+import { CONTACT_DELETE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq } from "drizzle-orm";
-import { status } from "elysia";
 
 export async function deleteContactController({
   contactId,
   organizationId,
+  logger,
+  cookie,
+  requestDetails,
 }: {
   contactId: string;
   organizationId: string;
-}): Promise<{ success: boolean; object: "contact"; id: string }> {
-  logger.info(
-    {
-      contactId,
-      organizationId,
-    },
-    "Deleting contact",
-  );
+  logger: Logger;
+  cookie?: string;
+  requestDetails?: {
+    endpoint?: string;
+    method?: string;
+    userAgent?: string;
+    ipAddress?: string;
+  };
+}): Promise<
+  | ContactModel.DeleteResponse
+  | ContactModel.ContactNotFound
+> {
+  logger.info({ contactId }, "Deleting contact");
 
   try {
     // Check if contact exists
@@ -30,7 +40,7 @@ export async function deleteContactController({
 
     if (!existingContact) {
       logger.warn({ contactId, organizationId }, "Contact not found");
-      throw status(404, { message: "Contact not found" });
+      return { message: "Contact not found" };
     }
 
     // Delete the contact (hard delete)
@@ -43,22 +53,26 @@ export async function deleteContactController({
         ),
       );
 
-    logger.info(
-      {
-        contactId,
-        organizationId,
-      },
-      "Contact deleted successfully",
-    );
+    logger.info({ contactId }, "Contact deleted successfully");
 
-    return { success: true, object: "contact", id: contactId };
+    const result = {
+      success: true,
+      object: "contact" as const,
+      id: existingContact.id,
+      event: CONTACT_DELETE_WEBHOOK_EVENT.id,
+    };
+
+    await createLog({
+      event: CONTACT_DELETE_WEBHOOK_EVENT.id,
+      cookie,
+      metadata: result,
+      requestDetails,
+    });
+
+    return result;
   } catch (error) {
     logger.error(
-      {
-        contactId,
-        organizationId,
-        error: error instanceof Error ? error.message : String(error),
-      },
+      { contactId, error: error instanceof Error ? error.message : String(error) },
       "Error deleting contact",
     );
     throw error;

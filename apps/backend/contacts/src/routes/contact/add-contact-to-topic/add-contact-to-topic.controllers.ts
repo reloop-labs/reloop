@@ -1,7 +1,9 @@
 import type { ContactModel } from "@be/contacts/model/contact.model";
+import { createLog } from "@be/contacts/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { logger } from "@reloop/logger";
+import type { Logger } from "@reloop/logger";
+import { CONTACT_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
@@ -16,18 +18,28 @@ export interface AddContactToTopicResult {
     deletedAt: Date | null;
   };
   subscriptionId: string;
+  event: string;
 }
 
 export async function addContactToTopicController({
   organizationId,
-  userId,
   topicId,
   body,
+  logger,
+  cookie,
+  requestDetails,
 }: {
   organizationId: string;
-  userId: string;
   topicId: string;
   body: ContactModel.AddContactToTopicBody;
+  logger: Logger;
+  cookie?: string;
+  requestDetails?: {
+    endpoint?: string;
+    method?: string;
+    userAgent?: string;
+    ipAddress?: string;
+  };
 }): Promise<AddContactToTopicResult> {
   const { contact_id, email } = body;
 
@@ -35,15 +47,6 @@ export async function addContactToTopicController({
     throw status(400, { message: "Either 'contact_id' or 'email' must be provided" });
   }
 
-  logger.info(
-    {
-      organizationId,
-      contactId: contact_id,
-      email: email?.toLowerCase(),
-      topicId,
-    },
-    "Adding contact to topic",
-  );
 
   try {
     // Verify topic exists
@@ -112,17 +115,27 @@ export async function addContactToTopicController({
           { subscriptionId: existingSubscription.id, status: targetStatus },
           "Updated contact subscription status",
         );
-        return {
+
+        const result = {
           contact,
           subscriptionId: existingSubscription.id,
+          event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
         };
+
+        await createLog({
+          event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
+          cookie,
+          metadata: result,
+          requestDetails,
+        });
+
+        return result;
       }
 
       throw status(409, {
         message: `Contact is already ${existingSubscription.status} in this topic`,
       });
     }
-
     // Create subscription
     const [subscription] = await db
       .insert(schema.topicEnrollment)
@@ -147,10 +160,20 @@ export async function addContactToTopicController({
       "Contact added to topic successfully",
     );
 
-    return {
+    const result = {
       contact,
       subscriptionId: subscription.id,
+      event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
     };
+
+    await createLog({
+      event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
+      cookie,
+      metadata: result,
+      requestDetails,
+    });
+
+    return result;
   } catch (error) {
     logger.error(
       {

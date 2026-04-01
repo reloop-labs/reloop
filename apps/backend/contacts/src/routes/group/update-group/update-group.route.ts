@@ -6,12 +6,20 @@ import { updateGroupXCodeSamples } from "./update-group.x-codeSamples";
 
 export const updateGroupRoute = new Elysia().use(authMiddleware).patch(
   "/:group_id",
-  async ({ params, body, activeOrganizationId, logger }) => {
+  async ({ params, body, activeOrganizationId, logger, path, request, headers }) => {
+    const cookieString = headers["cookie"] || "";
     return await updateGroupController({
       activeOrganizationId,
       group_id: params.group_id,
       body,
       logger,
+      cookie: cookieString,
+      requestDetails: {
+        endpoint: path,
+        method: request.method,
+        userAgent: headers["user-agent"],
+        ipAddress: (headers["x-forwarded-for"] as string) || (headers["x-real-ip"] as string),
+      },
     });
   },
   {

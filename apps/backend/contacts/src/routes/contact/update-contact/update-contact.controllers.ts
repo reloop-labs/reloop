@@ -1,8 +1,10 @@
 import { upsertContactProperties } from "@be/contacts/routes/contact/utils/upsert-contact-properties";
 import type { ContactTypes } from "@be/contacts/types/contact.type";
+import { createLog } from "@be/contacts/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { logger } from "@reloop/logger";
+import type { Logger } from "@reloop/logger";
+import { CONTACT_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
@@ -10,10 +12,21 @@ export async function updateContactController({
   contactId,
   organizationId,
   body,
+  logger,
+  cookie,
+  requestDetails,
 }: {
   contactId: string;
   organizationId: string;
   body: ContactTypes.UpdateContactRequest;
+  logger: Logger;
+  cookie?: string;
+  requestDetails?: {
+    endpoint?: string;
+    method?: string;
+    userAgent?: string;
+    ipAddress?: string;
+  };
 }): Promise<ContactTypes.ContactResponse> {
   logger.info(
     {
@@ -127,8 +140,8 @@ export async function updateContactController({
         {} as Record<string, string | number>,
       );
 
-      return {
-        object: "contact",
+      const finalContact = {
+        object: "contact" as const,
         id: updatedContact.id,
         email: updatedContact.email,
         firstName: updatedContact.firstName,
@@ -139,7 +152,17 @@ export async function updateContactController({
         topics: (updatedContact as ContactTypes.ContactData).topics ?? [],
         createdAt: updatedContact.createdAt,
         updatedAt: updatedContact.updatedAt,
+        event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
       };
+
+      await createLog({
+        event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
+        cookie,
+        metadata: finalContact,
+        requestDetails,
+      });
+
+      return finalContact;
     });
   } catch (error) {
     logger.error(

@@ -16,4 +16,3 @@ export const groupRoutes = new Elysia({
 	.use(updateGroupRoute)
 	.use(deleteGroupRoute)
 	.use(listGroupContactsRoute);
-

@@ -1,7 +1,9 @@
 import type { PropertyTypes } from "@be/contacts/types/property.type";
+import { createLog } from "@be/contacts/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import type { Logger } from "@reloop/logger";
+import { PROPERTY_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
@@ -10,11 +12,20 @@ export const updatePropertyController = async ({
   property_id,
   body,
   logger,
+  cookie,
+  requestDetails,
 }: {
   activeOrganizationId: string;
   property_id: string;
   body: { fallbackValue: string | null };
   logger: Logger;
+  cookie?: string;
+  requestDetails?: {
+    endpoint?: string;
+    method?: string;
+    userAgent?: string;
+    ipAddress?: string;
+  };
 }): Promise<PropertyTypes.PropertyResponse> => {
   logger.info({ property_id, fallbackValue: body.fallbackValue }, "Updating property");
 
@@ -48,7 +59,21 @@ export const updatePropertyController = async ({
     }
 
     logger.info({ property_id }, "Property updated successfully");
-    return { ...updatedProperty, object: "contact_property" };
+
+    const result = {
+      ...updatedProperty,
+      object: "contact_property" as const,
+      event: PROPERTY_UPDATE_WEBHOOK_EVENT.id,
+    };
+
+    await createLog({
+      event: PROPERTY_UPDATE_WEBHOOK_EVENT.id,
+      cookie,
+      metadata: result,
+      requestDetails,
+    });
+
+    return result;
   } catch (error) {
     logger.error({ property_id, error }, "Debug updating property");
     throw error;

@@ -1,7 +1,9 @@
 import type { ContactModel } from "@be/contacts/model/contact.model";
+import { createLog } from "@be/contacts/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import type { Logger } from "@reloop/logger";
+import { CONTACT_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 
 import { status } from "elysia";
@@ -11,11 +13,20 @@ export async function updateContactTopicController({
   topicId,
   body,
   logger,
+  cookie,
+  requestDetails,
 }: {
   organizationId: string;
   topicId: string;
   body: ContactModel.UpdateContactTopicBody;
   logger: Logger;
+  cookie?: string;
+  requestDetails?: {
+    endpoint?: string;
+    method?: string;
+    userAgent?: string;
+    ipAddress?: string;
+  };
 }): Promise<ContactModel.UpdateContactTopicResponse> {
   const { contact_id, email, subscription } = body;
 
@@ -25,7 +36,6 @@ export async function updateContactTopicController({
 
   logger.info(
     {
-      organizationId,
       contactId: contact_id,
       email: email?.toLowerCase(),
       topicId,
@@ -101,10 +111,20 @@ export async function updateContactTopicController({
       );
     }
 
-    return {
+    const result = {
       success: true,
       status: targetStatus,
+      event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
     };
+
+    await createLog({
+      event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
+      cookie,
+      metadata: result,
+      requestDetails,
+    });
+
+    return result;
   } catch (error) {
     logger.error(
       {

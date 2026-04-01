@@ -95,6 +95,7 @@ export namespace TopicModel {
 		}),
 		createdAt: t.Date(),
 		updatedAt: t.Date(),
+		event: t.String({ description: "Event ID for the mutation" }),
 	},
 		{
 			examples: [
@@ -140,6 +141,9 @@ export namespace TopicModel {
 	export const deleteResponse = t.Object({
 		object: t.Literal("topic", { default: "topic" }),
 		success: t.Boolean(),
+		id: t.String({ description: "ID of the deleted topic" }),
+		name: t.String({ description: "Name of the deleted topic" }),
+		event: t.String({ description: "Event ID for the mutation" }),
 	});
 
 	export type DeleteResponse = typeof deleteResponse.static;
