@@ -38,7 +38,7 @@ export async function createLogController({
 		return {
 			uuid: entry.id,
 			event: entry.event,
-			level: entry.level as any,
+			level: entry.level as string,
 			trace_id: entry.trace_id,
 			metadata: metadata || {},
 			created_at: occurredAt,

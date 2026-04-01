@@ -4,6 +4,7 @@ import { serverTiming } from "@elysiajs/server-timing";
 import { logsConfig } from "@reloop/logs/logs.config";
 import { loader } from "@reloop/logs/utils/loader";
 import { Elysia } from "elysia";
+import { logCleanupCron } from "./cron/cleanup-logs.cron";
 import { landing } from "./routes/landing/landing.index";
 import { logsRoutes } from "./routes/logs/logs.routes";
 
@@ -30,6 +31,7 @@ const logsService = new Elysia({
 	.use(serverTiming())
 	.use(landing)
 	.use(logsRoutes)
+	.use(logCleanupCron)
 	.onStart(async () => {
 		await loader();
 	})

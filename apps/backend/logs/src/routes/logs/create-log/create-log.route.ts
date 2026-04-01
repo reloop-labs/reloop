@@ -5,8 +5,7 @@ import { createLogController } from "./create-log.controllers";
 
 export const createLogRoute = new Elysia().use(authMiddleware).post(
 	"/create",
-	async (ctx: any) => {
-		const { body, userId, activeOrganizationId } = ctx;
+	async ({ body, userId, activeOrganizationId }) => {
 		const {
 			event,
 			level,
@@ -20,8 +19,8 @@ export const createLogRoute = new Elysia().use(authMiddleware).post(
 			trace_id,
 			metadata,
 			requestDetails,
-			userId: userId || "",
-			activeOrganizationId: activeOrganizationId || "",
+			userId: userId,
+			activeOrganizationId: activeOrganizationId,
 		});
 	},
 	{
