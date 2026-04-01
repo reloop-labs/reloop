@@ -68,7 +68,13 @@ export const createTopicController = async ({
     logger.info({ name, id: newTopic.id }, "Topic created successfully");
 
     const result = {
-      ...newTopic,
+      id: newTopic.id,
+      name: newTopic.name,
+      description: newTopic.description,
+      defaultSubscription: newTopic.defaultSubscription,
+      visibility: newTopic.visibility,
+      createdAt: newTopic.createdAt,
+      updatedAt: newTopic.updatedAt,
       object: "topic" as const,
       event: TOPIC_CREATE_WEBHOOK_EVENT.id,
     };
