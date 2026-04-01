@@ -1,8 +1,8 @@
 "use client";
+import { DomainPreview } from "@fe/dashboard/app/(protected)/onboarding/components/previews";
 import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
 import { AnimatedHoverBackground } from "@fe/dashboard/components/layout/sidebar/animated-hover-background";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
-import { DomainPreview } from "@fe/dashboard/app/(protected)/onboarding/components/previews";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import type { DomainResponse } from "@reloop/api";
 import * as Button from "@reloop/ui/button";
@@ -11,11 +11,11 @@ import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
-import { motion } from "motion/react";
 import Spinner from "@reloop/ui/spinner";
 import * as Switch from "@reloop/ui/switch";
 import { useLoading } from "@reloop/ui/use-loading";
 import axios from "axios";
+import { motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
@@ -42,8 +42,6 @@ const domainSchema = v.object({
 });
 
 type DomainFormValues = v.InferInput<typeof domainSchema>;
-
-
 
 export const AddDomainSidebar = () => {
 	const { push } = useUserOrganization();
@@ -86,12 +84,15 @@ export const AddDomainSidebar = () => {
 
 			const startTop = scrollContainer.scrollTop;
 			const getTargetTop = () =>
-				Math.max(scrollContainer.scrollHeight - scrollContainer.clientHeight, 0);
+				Math.max(
+					scrollContainer.scrollHeight - scrollContainer.clientHeight,
+					0,
+				);
 			const durationMs = matchedRevealTransition.duration * 1000;
 			const startTime = performance.now();
 
 			const easeInOut = (t: number) =>
-				t < 0.5 ? 2 * t * t : 1 - ((-2 * t + 2) ** 2) / 2;
+				t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
 
 			const animateScroll = (now: number) => {
 				const elapsed = now - startTime;
@@ -117,10 +118,7 @@ export const AddDomainSidebar = () => {
 		push(`/domain/add/${domainId}`);
 	};
 
-	const onSubmit = async ({
-		domain,
-		customReturnPath,
-	}: DomainFormValues) => {
+	const onSubmit = async ({ domain, customReturnPath }: DomainFormValues) => {
 		try {
 			changeStatus("loading");
 			const { data } = await axios.post<DomainResponse>(
@@ -135,7 +133,8 @@ export const AddDomainSidebar = () => {
 				{ headers: { credentials: "include" } },
 			);
 			await mutate(
-				(key) => typeof key === "string" && key.startsWith("/api/domain/v1/list"),
+				(key) =>
+					typeof key === "string" && key.startsWith("/api/domain/v1/list"),
 			);
 			await mutate(`/api/domain/v1/${data.id}`, data, false);
 			handleAddDomain(data.id);
@@ -154,20 +153,20 @@ export const AddDomainSidebar = () => {
 	return (
 		<div className="h-[calc(100vh-64px)] w-full overflow-hidden">
 			<div className="relative mx-auto flex h-full w-full max-w-3xl overflow-hidden">
-				<div className="pointer-events-none absolute top-[140px] left-7 z-20 w-full border-stroke-soft-200 border-b border-dashed" />
+				<div className="pointer-events-none absolute top-[143px] left-1 z-20 w-full border-stroke-soft-200 border-b border-dashed" />
 				<div
 					ref={scrollContainerRef}
 					className="scrollbar-hide flex w-full flex-col overflow-y-auto lg:w-1/2 lg:shrink-0"
 					style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
 				>
-					<div className="mx-auto w-full px-6 pt-8 pb-10 sm:px-8">
+					<div className="mx-auto w-full px-2 pt-8 pb-10">
 						<AnimatedBackButton />
 						<div className="pt-4 pb-4">
 							<div>
 								<h1 className="font-semibold text-title-h6 leading-8">
 									Add Domain
 								</h1>
-								<p className="text-xs text-text-sub-600">
+								<p className="text-text-sub-600 text-xs">
 									Send emails from a domain you control
 								</p>
 							</div>
@@ -210,7 +209,10 @@ export const AddDomainSidebar = () => {
 									</Input.Root>
 									{formState.errors.domain && (
 										<div className="mt-2 flex items-center gap-2">
-											<Icon name="alert-circle" className="h-4 w-4 text-red-500" />
+											<Icon
+												name="alert-circle"
+												className="h-4 w-4 text-red-500"
+											/>
 											<p className="text-red-600 text-xs">
 												{formState.errors.domain.message}
 											</p>
@@ -218,25 +220,24 @@ export const AddDomainSidebar = () => {
 									)}
 								</div>
 								<div className="max-w-[720px] rounded-xl bg-bg-weak-50/60 px-4 py-2">
-									<div className="flex items-start gap-3">
+									<div className="flex items-center gap-3">
 										<div className="mt-0.5 flex h-7 w-7 items-center justify-center rounded-full bg-bg-white-0 text-text-soft-400 shadow-regular-xs">
 											<Icon name="bulb" className="h-3.5 w-3.5" />
 										</div>
-										<div className="flex-1 space-y-1.5 pt-1">
-											<p className="font-medium text-[11px] text-text-soft-400 uppercase tracking-[0.18em]">
-												Pro Tip
-											</p>
-											<ul className="space-y-1">
-												<li className="flex items-start gap-2 max-w-[560px] text-xs leading-5 text-text-sub-600">
-													<span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-text-soft-400" />
-													Use a dedicated sending domain or subdomain you control.
-												</li>
-												<li className="flex items-start gap-2 max-w-[560px] text-xs leading-5 text-text-sub-600">
-													<span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-text-soft-400" />
-													e.g. marketing.example.com or send.example.com.
-												</li>
-											</ul>
-										</div>
+										<p className="font-medium text-[11px] text-text-soft-400 uppercase tracking-[0.18em]">
+											Pro Tip
+										</p>
+									</div>
+									<p className="pt-2 text-sm text-text-sub-600">
+										Use separate domain for domain reputation
+									</p>
+									<div className="pt-3 text-sm text-text-sub-600">
+										<p>Subdomain example:</p>
+										<ul className="list-disc pl-5">
+											<li>marketing.example.com</li>
+											<li>send.example.com</li>
+											<li>transection.example.com</li>
+										</ul>
 									</div>
 								</div>
 							</motion.section>
@@ -345,7 +346,7 @@ export const AddDomainSidebar = () => {
 
 				<div className="relative hidden h-full min-w-0 flex-1 overflow-hidden bg-bg-weak-50/10 lg:flex">
 					<div className="relative z-10 h-full w-full">
-						<div className="flex h-full items-start justify-center px-8 pt-10 pb-12">
+						<div className="flex h-full items-start justify-center px-2 pt-10 pb-12">
 							<DomainPreview domain={watch("domain")} variant="domain" />
 						</div>
 					</div>

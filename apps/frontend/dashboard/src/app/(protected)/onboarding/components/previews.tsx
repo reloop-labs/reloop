@@ -469,7 +469,7 @@ export const DomainPreview = ({
 	const isDomainVariant = variant === "domain";
 
 	return (
-		<div className={isDomainVariant ? "absolute top-44 left-8" : "absolute top-10 left-10"}>
+		<div className={isDomainVariant ? "absolute top-[196px] left-4" : "absolute top-10 left-10"}>
 			<div
 				className={
 					isDomainVariant
