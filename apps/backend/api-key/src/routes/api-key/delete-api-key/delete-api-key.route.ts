@@ -6,11 +6,19 @@ import { deleteApiKeyXCodeSamples } from "./delete-api-key.x-codeSamples";
 
 export const deleteApiKeyRoute = new Elysia().use(authMiddleware).delete(
 	"/:api_key_id",
-	async ({ params: { api_key_id }, activeOrganizationId, userId, logger }) => {
+	async ({ params: { api_key_id }, activeOrganizationId, userId, logger, path, request, headers }) => {
+		const cookieString = headers["cookie"] || "";
 		return await deleteApiKeyController({
 			apiKeyId: api_key_id,
 			organizationId: activeOrganizationId,
 			logger,
+			cookie: cookieString,
+			requestDetails: {
+				endpoint: path,
+				method: request.method,
+				userAgent: headers["user-agent"],
+				ipAddress: (headers["x-forwarded-for"] as string) || (headers["x-real-ip"] as string),
+			},
 		});
 	},
 	{

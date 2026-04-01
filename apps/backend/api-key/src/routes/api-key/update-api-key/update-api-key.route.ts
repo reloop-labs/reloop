@@ -6,12 +6,20 @@ import { updateApiKeyXCodeSamples } from "./update-api-key.x-codeSamples";
 
 export const updateApiKeyRoute = new Elysia().use(authMiddleware).patch(
 	"/:api_key_id",
-	async ({ params: { api_key_id }, body, activeOrganizationId, logger }) => {
+	async ({ params: { api_key_id }, body, activeOrganizationId, logger, path, request, headers }) => {
+		const cookieString = headers["cookie"] || "";
 		return await updateApiKeyController({
 			apiKeyId: api_key_id,
 			organizationId: activeOrganizationId,
 			body,
 			logger,
+			cookie: cookieString,
+			requestDetails: {
+				endpoint: path,
+				method: request.method,
+				userAgent: headers["user-agent"],
+				ipAddress: (headers["x-forwarded-for"] as string) || (headers["x-real-ip"] as string),
+			},
 		});
 	},
 	{

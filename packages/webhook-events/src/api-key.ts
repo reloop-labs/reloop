@@ -40,10 +40,28 @@ export const API_KEY_RATE_LIMITED_WEBHOOK_EVENT = {
 	isActive: true,
 } as const satisfies WebhookEventDefinition;
 
+export const API_KEY_LIST_WEBHOOK_EVENT = {
+	id: "api-key.list",
+	name: "api-key.list",
+	category: "api-key",
+	description: "Triggered when API keys are listed",
+	isActive: true,
+} as const satisfies WebhookEventDefinition;
+
+export const API_KEY_GET_WEBHOOK_EVENT = {
+	id: "api-key.get",
+	name: "api-key.get",
+	category: "api-key",
+	description: "Triggered when an API key is retrieved",
+	isActive: true,
+} as const satisfies WebhookEventDefinition;
+
 export const API_KEY_WEBHOOK_EVENTS = [
 	API_KEY_CREATE_WEBHOOK_EVENT,
 	API_KEY_UPDATE_WEBHOOK_EVENT,
 	API_KEY_DELETE_WEBHOOK_EVENT,
 	API_KEY_REVOKE_WEBHOOK_EVENT,
 	API_KEY_RATE_LIMITED_WEBHOOK_EVENT,
+	API_KEY_LIST_WEBHOOK_EVENT,
+	API_KEY_GET_WEBHOOK_EVENT,
 ] as const satisfies readonly WebhookEventDefinition[];

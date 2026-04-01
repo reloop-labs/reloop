@@ -1,5 +1,6 @@
 import { createId } from "@paralleldrive/cuid2";
 import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
+import { createLog } from "@reloop/api-key/utils/logger";
 import {
 	API_KEY_PREFIX,
 	generateApiKey,
@@ -9,6 +10,7 @@ import {
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import type { Logger } from "@reloop/logger";
+import { API_KEY_CREATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { status } from "elysia";
 
 export async function createApiKeyController({
@@ -16,11 +18,20 @@ export async function createApiKeyController({
 	userId,
 	body,
 	logger,
+	cookie,
+	requestDetails,
 }: {
 	organizationId: string;
 	userId: string;
 	body: ApiKeyTypes.CreateApiKeyRequest;
 	logger: Logger;
+	cookie?: string;
+	requestDetails?: {
+		endpoint?: string;
+		method?: string;
+		userAgent?: string;
+		ipAddress?: string;
+	};
 }): Promise<ApiKeyTypes.ApiKeyWithKeyResponse> {
 	try {
 		logger.info({}, "Generating new api key");
@@ -38,8 +49,10 @@ export async function createApiKeyController({
 		const rateLimitMax = 100;
 		const remaining = rateLimitMax;
 
-
-		logger.info({ hashedKey, keyStart, keyId }, "Inserting API key in database");
+		logger.info(
+			{ hashedKey, keyStart, keyId },
+			"Inserting API key in database",
+		);
 		const newApiKey = await db
 			.insert(schema.apikey)
 			.values({
@@ -73,7 +86,8 @@ export async function createApiKeyController({
 			throw status(500, { message: "Failed to create API key" });
 		}
 		logger.info("New Api key generated", { newApiKey });
-		return {
+
+		const result = {
 			id: newApiKey[0].id,
 			name: newApiKey[0].name,
 			key: fullKey,
@@ -81,7 +95,18 @@ export async function createApiKeyController({
 			createdAt: newApiKey[0].createdAt.toISOString(),
 			updatedAt: newApiKey[0].updatedAt.toISOString(),
 			permissions: newApiKey[0].permissions,
+			object: "api_key" as const,
+			event: API_KEY_CREATE_WEBHOOK_EVENT.id,
 		};
+
+		await createLog({
+			event: API_KEY_CREATE_WEBHOOK_EVENT.id,
+			cookie,
+			metadata: result,
+			requestDetails,
+		});
+
+		return result;
 	} catch (error) {
 		logger.error({ error }, "Error creating API key");
 		throw error;

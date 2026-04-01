@@ -1,6 +1,8 @@
+import { createLog } from "@reloop/api-key/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import type { Logger } from "@reloop/logger";
+import { API_KEY_DELETE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq } from "drizzle-orm";
 import { status } from "elysia";
 
@@ -8,11 +10,20 @@ export async function deleteApiKeyController({
 	apiKeyId,
 	organizationId,
 	logger,
+	cookie,
+	requestDetails,
 }: {
 	apiKeyId: string;
 	organizationId: string;
 	logger: Logger;
-}): Promise<{ id: string; message: string }> {
+	cookie?: string;
+	requestDetails?: {
+		endpoint?: string;
+		method?: string;
+		userAgent?: string;
+		ipAddress?: string;
+	};
+}): Promise<{ id: string; message: string; object: "api_key"; event: string }> {
 	logger.info({ apiKeyId }, "Checking if api key exists");
 	try {
 		const existing = await db.query.apikey.findFirst({
@@ -38,7 +49,21 @@ export async function deleteApiKeyController({
 			);
 
 		logger.info({ apiKeyId }, "API key deleted successfully");
-		return { id: apiKeyId, message: "API key deleted successfully" };
+		const result = {
+			id: apiKeyId,
+			message: "API key deleted successfully",
+			object: "api_key" as const,
+			event: API_KEY_DELETE_WEBHOOK_EVENT.id,
+		};
+
+		await createLog({
+			event: API_KEY_DELETE_WEBHOOK_EVENT.id,
+			cookie,
+			metadata: result,
+			requestDetails,
+		});
+
+		return result;
 	} catch (error) {
 		logger.error(
 			{

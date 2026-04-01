@@ -1,7 +1,9 @@
 import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
+import { createLog } from "@reloop/api-key/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import type { Logger } from "@reloop/logger";
+import { API_KEY_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq } from "drizzle-orm";
 import { status } from "elysia";
 
@@ -10,11 +12,20 @@ export async function updateApiKeyController({
 	organizationId,
 	body,
 	logger,
+	cookie,
+	requestDetails,
 }: {
 	apiKeyId: string;
 	organizationId: string;
 	body: ApiKeyTypes.UpdateApiKeyRequest;
 	logger: Logger;
+	cookie?: string;
+	requestDetails?: {
+		endpoint?: string;
+		method?: string;
+		userAgent?: string;
+		ipAddress?: string;
+	};
 }): Promise<ApiKeyTypes.ApiKeyResponse> {
 	logger.info({ apiKeyId }, "Searching api key");
 	try {
@@ -50,7 +61,7 @@ export async function updateApiKeyController({
 			throw status(500, { message: "Failed to update API key" });
 		}
 		logger.info({ apiKeyId }, "API key updated successfully");
-		return {
+		const result = {
 			id: updated[0].id,
 			name: updated[0].name,
 			start: updated[0].start,
@@ -78,7 +89,18 @@ export async function updateApiKeyController({
 				image: existing.user.image,
 				email: existing.user.email,
 			},
+			object: "api_key" as const,
+			event: API_KEY_UPDATE_WEBHOOK_EVENT.id,
 		};
+
+		await createLog({
+			event: API_KEY_UPDATE_WEBHOOK_EVENT.id,
+			cookie,
+			metadata: result as Record<string, unknown>,
+			requestDetails,
+		});
+
+		return result;
 	} catch (error) {
 		logger.error({ apiKeyId, error }, "Error updating API key");
 		throw error;

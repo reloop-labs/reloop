@@ -108,6 +108,8 @@ export namespace ApiKeyModel {
 					email: t.String({ description: "User email" }),
 				}),
 			),
+			object: t.Literal("api_key"),
+			event: t.String({ description: "Event ID for the operation" }),
 		},
 		{
 			examples: [
@@ -146,6 +148,8 @@ export namespace ApiKeyModel {
 			permissions: t.Union([t.String(), t.Null()], {
 				description: "Comma-separated permissions",
 			}),
+			object: t.Literal("api_key"),
+			event: t.String({ description: "Event ID for the operation" }),
 		},
 		{
 			examples: [
@@ -165,10 +169,12 @@ export namespace ApiKeyModel {
 	export type ApiKeyWithKeyResponse = typeof apiKeyWithKeyResponse.static;
 
 	export const apiKeyListResponse = t.Object({
+		object: t.Literal("api_key"),
 		apiKeys: t.Array(apiKeyResponse),
 		total: t.Number(),
 		page: t.Number(),
 		limit: t.Number(),
+		event: t.String({ description: "Event ID for the list operation" }),
 	});
 
 	export type ApiKeyListResponse = typeof apiKeyListResponse.static;
@@ -240,6 +246,8 @@ export namespace ApiKeyModel {
 		{
 			id: t.String({ description: "Deleted API key identifier" }),
 			message: t.String({ description: "Success message" }),
+			object: t.Literal("api_key"),
+			event: t.String({ description: "Event ID for the operation" }),
 		},
 		{
 			examples: [

@@ -2,6 +2,7 @@ import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import type { Logger } from "@reloop/logger";
+import { API_KEY_GET_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq } from "drizzle-orm";
 import { status } from "elysia";
 
@@ -59,6 +60,8 @@ export async function getApiKeyController({
 				image: user.image,
 				email: user.email,
 			},
+			object: "api_key" as const,
+			event: API_KEY_GET_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
 		logger.error({ apiKeyId, error }, "Error getting API key");

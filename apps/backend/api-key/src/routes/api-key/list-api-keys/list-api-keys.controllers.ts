@@ -2,6 +2,7 @@ import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import type { Logger } from "@reloop/logger";
+import { API_KEY_LIST_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, count, desc, eq } from "drizzle-orm";
 
 export async function listApiKeysController({
@@ -18,7 +19,8 @@ export async function listApiKeysController({
 	logger.info({ query }, "Getting API keys");
 	try {
 		const conditions = [eq(schema.apikey.organizationId, organizationId)];
-		if (enabled !== undefined) conditions.push(eq(schema.apikey.enabled, enabled));
+		if (enabled !== undefined)
+			conditions.push(eq(schema.apikey.enabled, enabled));
 		const whereClause = and(...conditions);
 		logger.info({ whereClause }, "Getting Total Count");
 		const totalResult = await db
@@ -66,11 +68,15 @@ export async function listApiKeysController({
 						image: user.image,
 						email: user.email,
 					},
+					object: "api_key" as const,
+					event: API_KEY_LIST_WEBHOOK_EVENT.id,
 				};
 			}),
 			total,
 			page,
 			limit,
+			object: "api_key" as const,
+			event: API_KEY_LIST_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
 		logger.error({ query, error }, "Error listing API keys");
