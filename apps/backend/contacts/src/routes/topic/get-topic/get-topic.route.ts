@@ -17,7 +17,7 @@ export const getTopicRoute = new Elysia().use(authMiddleware).get(
     auth: true,
     params: t.Object({ topic_id: t.String({ description: "Topic ID" }) }),
     response: {
-      200: TopicModel.topicResponse,
+      200: TopicModel.topicBaseResponse,
       404: TopicModel.topicNotFound,
       403: TopicModel.unauthorized,
     },

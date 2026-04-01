@@ -17,7 +17,7 @@ export const getGroupRoute = new Elysia().use(authMiddleware).get(
     auth: true,
     params: t.Object({ group_id: t.String() }),
     response: {
-      200: GroupModel.groupResponse,
+      200: GroupModel.groupBaseResponse,
       404: GroupModel.groupNotFound,
       403: GroupModel.unauthorized,
     },

@@ -34,13 +34,12 @@ export namespace GroupModel {
 	export type UpdateGroupBody = typeof updateGroupBody.static;
 
 	// Group Response
-	export const groupResponse = t.Object({
+	export const groupBaseResponse = t.Object({
 		object: t.Literal("contact_group", { default: "contact_group" }),
 		id: t.String({ description: "Unique group identifier" }),
 		name: t.String({ description: "Group name" }),
 		createdAt: t.Date(),
 		updatedAt: t.Date(),
-		event: t.String({ description: "Event ID for the mutation" }),
 	},
 		{
 			examples: [
@@ -54,9 +53,16 @@ export namespace GroupModel {
 			],
 		});
 
+	export const groupResponse = t.Composite([
+		groupBaseResponse,
+		t.Object({
+			event: t.String({ description: "Event ID for the mutation" }),
+		}),
+	]);
+
 	export type GroupResponse = typeof groupResponse.static;
 
-	export const groupListItem = t.Omit(groupResponse, ["object", "event"]);
+	export const groupListItem = t.Omit(groupBaseResponse, ["object"]);
 	export type GroupListItem = typeof groupListItem.static;
 
 	// Group List Response

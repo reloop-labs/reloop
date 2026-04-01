@@ -17,7 +17,7 @@ export const getContactRoute = new Elysia().use(authMiddleware).get(
     auth: true,
     params: t.Object({ contact_id: t.String() }),
     response: {
-      200: ContactModel.contactResponse,
+      200: ContactModel.contactBaseResponse,
       404: ContactModel.contactNotFound,
       403: ContactModel.unauthorized,
     },

@@ -144,7 +144,7 @@ export namespace ContactModel {
 
 	export type UpdateContactBody = typeof updateContactBody.static;
 
-	export const contactResponse = t.Object({
+	export const contactBaseResponse = t.Object({
 		object: t.Literal("contact", { default: "contact" }),
 		id: t.String({ description: "Unique contact identifier" }),
 		email: t.String({ description: "Contact email address" }),
@@ -198,7 +198,6 @@ export namespace ContactModel {
 		),
 		createdAt: t.Date(),
 		updatedAt: t.Date(),
-		event: t.String({ description: "Event ID for the mutation" }),
 	},
 		{
 			examples: [
@@ -221,9 +220,16 @@ export namespace ContactModel {
 			],
 		});
 
+	export const contactResponse = t.Composite([
+		contactBaseResponse,
+		t.Object({
+			event: t.String({ description: "Event ID for the mutation" }),
+		}),
+	]);
+
 	export type ContactResponse = typeof contactResponse.static;
 
-	export const contactListItem = t.Omit(contactResponse, ["object", "event"]);
+	export const contactListItem = contactBaseResponse;
 	export type ContactListItem = typeof contactListItem.static;
 
 	export const contactListResponse = t.Object({

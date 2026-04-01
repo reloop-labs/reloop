@@ -79,7 +79,7 @@ export namespace TopicModel {
 	export type UpdateTopicBody = typeof updateTopicBody.static;
 
 	// Topic Response
-	export const topicResponse = t.Object({
+	export const topicBaseResponse = t.Object({
 		object: t.Literal("topic", { default: "topic" }),
 		id: t.String({ description: "Unique topic identifier" }),
 		name: t.String({ description: "Topic name" }),
@@ -95,7 +95,6 @@ export namespace TopicModel {
 		}),
 		createdAt: t.Date(),
 		updatedAt: t.Date(),
-		event: t.String({ description: "Event ID for the mutation" }),
 	},
 		{
 			examples: [
@@ -112,9 +111,16 @@ export namespace TopicModel {
 			],
 		});
 
+	export const topicResponse = t.Composite([
+		topicBaseResponse,
+		t.Object({
+			event: t.String({ description: "Event ID for the mutation" }),
+		}),
+	]);
+
 	export type TopicResponse = typeof topicResponse.static;
 
-	export const topicListItem = t.Omit(topicResponse, ["object", "event"]);
+	export const topicListItem = t.Omit(topicBaseResponse, ["object"]);
 	export type TopicListItem = typeof topicListItem.static;
 
 	// Topic List Response

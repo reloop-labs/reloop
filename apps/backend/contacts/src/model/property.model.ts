@@ -68,7 +68,7 @@ export namespace PropertyModel {
 
 	export type UpdatePropertyBody = typeof updatePropertyBody.static;
 
-	export const propertyResponse = t.Object({
+	export const propertyBaseResponse = t.Object({
 		object: t.Literal("contact_property", { default: "contact_property" }),
 		id: t.String({ description: "Unique property identifier" }),
 		propertyName: t.String({ description: "Property name" }),
@@ -78,7 +78,6 @@ export namespace PropertyModel {
 		}),
 		createdAt: t.Date(),
 		updatedAt: t.Date(),
-		event: t.String({ description: "Event ID for the mutation" }),
 	},
 		{
 			examples: [
@@ -94,9 +93,16 @@ export namespace PropertyModel {
 			],
 		});
 
+	export const propertyResponse = t.Composite([
+		propertyBaseResponse,
+		t.Object({
+			event: t.String({ description: "Event ID for the mutation" }),
+		}),
+	]);
+
 	export type PropertyResponse = typeof propertyResponse.static;
 
-	export const propertyListItem = t.Omit(propertyResponse, ["object", "event"]);
+	export const propertyListItem = t.Omit(propertyBaseResponse, ["object"]);
 	export type PropertyListItem = typeof propertyListItem.static;
 
 	export const propertyListResponse = t.Object({
