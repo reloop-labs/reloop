@@ -14,12 +14,19 @@ export const createGroupController = async ({
   userId,
   logger,
   cookie,
+  requestDetails,
 }: {
   name: string;
   activeOrganizationId: string;
   userId: string;
   logger: Logger;
   cookie?: string;
+  requestDetails?: {
+    endpoint?: string;
+    method?: string;
+    userAgent?: string;
+    ipAddress?: string;
+  };
 }): Promise<GroupResponse | GroupModel.Unauthorized> => {
   logger.info({ name }, "Creating group");
   try {
@@ -53,7 +60,8 @@ export const createGroupController = async ({
     await createLog({
       event: GROUP_CREATE_WEBHOOK_EVENT.id,
       cookie,
-      requestDetails: { name, id: newGroup.id },
+      metadata: { name, id: newGroup.id },
+      requestDetails,
     });
 
     return {

@@ -7,7 +7,7 @@ import { createDomainXCodeSamples } from "./create-domain.x-codeSamples";
 
 export const createDomainRoute = new Elysia().use(authMiddleware).post(
   "/create",
-  async ({ body, activeOrganizationId, userId, logger, request: { headers } }) => {
+  async ({ body, activeOrganizationId, userId, logger, request: { headers }, path, request }) => {
     try {
       const cookie = headers.get("cookie") || undefined;
       return await createDomainController({
@@ -22,6 +22,12 @@ export const createDomainRoute = new Elysia().use(authMiddleware).post(
         userId,
         logger,
         cookie,
+        requestDetails: {
+          endpoint: path,
+          method: request.method,
+          userAgent: headers.get("user-agent") || undefined,
+          ipAddress: (headers.get("x-forwarded-for") as string) || (headers.get("x-real-ip") as string),
+        },
       });
     } catch (error) {
       const errorMessage =

@@ -16,6 +16,7 @@ export const createTopicController = async ({
   visibility,
   logger,
   cookie,
+  requestDetails,
 }: {
   activeOrganizationId: string;
   userId: string;
@@ -25,6 +26,12 @@ export const createTopicController = async ({
   visibility?: "private" | "public";
   logger: Logger;
   cookie?: string;
+  requestDetails?: {
+    endpoint?: string;
+    method?: string;
+    userAgent?: string;
+    ipAddress?: string;
+  };
 }): Promise<TopicTypes.TopicResponse> => {
   logger.info({ name }, "Creating topic");
   try {
@@ -63,7 +70,8 @@ export const createTopicController = async ({
     await createLog({
       event: TOPIC_CREATE_WEBHOOK_EVENT.id,
       cookie,
-      requestDetails: { name, id: newTopic.id },
+      metadata: { name, id: newTopic.id },
+      requestDetails,
     });
 
     return { ...newTopic, object: "topic" };

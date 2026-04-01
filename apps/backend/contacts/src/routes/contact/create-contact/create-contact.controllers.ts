@@ -15,12 +15,19 @@ export async function createContactController({
   body,
   logger,
   cookie,
+  requestDetails,
 }: {
   organizationId: string;
   userId: string;
   body: ContactTypes.CreateContactRequest;
   logger: Logger;
   cookie?: string;
+  requestDetails?: {
+    endpoint?: string;
+    method?: string;
+    userAgent?: string;
+    ipAddress?: string;
+  };
 }): Promise<ContactTypes.ContactResponse> {
   const { email } = body;
   try {
@@ -134,7 +141,8 @@ export async function createContactController({
       await createLog({
         event: CONTACT_CREATE_WEBHOOK_EVENT.id,
         cookie,
-        requestDetails: { contactId: newContact.id, email: newContact.email },
+        metadata: { contactId: newContact.id, email: newContact.email },
+        requestDetails,
       });
 
       return {

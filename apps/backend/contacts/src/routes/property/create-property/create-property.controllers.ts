@@ -13,12 +13,19 @@ export const createPropertyController = async ({
   body,
   logger,
   cookie,
+  requestDetails,
 }: {
   activeOrganizationId: string;
   userId: string;
   body: PropertyTypes.CreatePropertyRequest;
   logger: Logger;
   cookie?: string;
+  requestDetails?: {
+    endpoint?: string;
+    method?: string;
+    userAgent?: string;
+    ipAddress?: string;
+  };
 }): Promise<PropertyTypes.PropertyResponse> => {
   logger.info({ name: body.name, type: body.type }, "Creating property");
 
@@ -71,7 +78,8 @@ export const createPropertyController = async ({
     await createLog({
       event: PROPERTY_CREATE_WEBHOOK_EVENT.id,
       cookie,
-      requestDetails: { name: body.name, id: newProperty.id },
+      metadata: { name: body.name, id: newProperty.id },
+      requestDetails,
     });
 
     return { ...newProperty, object: "contact_property" };

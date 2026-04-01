@@ -28,11 +28,18 @@ export async function createDomainController({
   receivingEmail,
   logger,
   cookie,
+  requestDetails,
 }: {
   organizationId: string;
   userId: string;
   logger: Logger;
   cookie?: string;
+  requestDetails?: {
+    endpoint?: string;
+    method?: string;
+    userAgent?: string;
+    ipAddress?: string;
+  };
 } & DomainTypes.CreateDomainRequest): Promise<DomainTypes.DomainResponse> {
   try {
     logger.info({ domain }, "Finding exsiting domain");
@@ -105,7 +112,8 @@ export async function createDomainController({
       await createLog({
         event: DOMAIN_UNDELETE_WEBHOOK_EVENT.id,
         cookie,
-        requestDetails: { domain, domainId },
+        metadata: { domain, domainId },
+        requestDetails,
       });
 
       return undeletedDomain;
@@ -216,7 +224,8 @@ export async function createDomainController({
     await createLog({
       event: DOMAIN_CREATE_WEBHOOK_EVENT.id,
       cookie,
-      requestDetails: { domain, domainId },
+      metadata: { domain, domainId },
+      requestDetails,
     });
 
     return domainWithDnsRecords;

@@ -9,7 +9,12 @@ export async function createLog(body: {
   level?: "debug" | "info" | "warn" | "error" | "fatal";
   trace_id?: string;
   metadata?: Record<string, unknown>;
-  requestDetails?: Record<string, unknown>;
+  requestDetails?: {
+    endpoint?: string;
+    method?: string;
+    userAgent?: string;
+    ipAddress?: string;
+  };
   cookie?: string;
 }) {
   const url = `${contactsConfig.BASE_URL}/api/logs/v1/create`;
