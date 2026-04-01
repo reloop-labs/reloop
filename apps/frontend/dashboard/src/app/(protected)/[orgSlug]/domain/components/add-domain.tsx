@@ -63,7 +63,7 @@ export const AddDomainSidebar = () => {
 	const domainValue = watch("domain");
 	const hasDomainValue = domainValue.trim().length > 0;
 	const matchedRevealTransition = {
-		duration: 0.82,
+		duration: 0.55,
 		ease: "easeInOut" as const,
 	};
 
@@ -153,7 +153,8 @@ export const AddDomainSidebar = () => {
 
 	return (
 		<div className="h-[calc(100vh-64px)] w-full overflow-hidden">
-			<div className="mx-auto flex h-full w-full max-w-3xl overflow-hidden">
+			<div className="relative mx-auto flex h-full w-full max-w-3xl overflow-hidden">
+				<div className="pointer-events-none absolute top-[140px] left-7 z-20 w-full border-stroke-soft-200 border-b border-dashed" />
 				<div
 					ref={scrollContainerRef}
 					className="scrollbar-hide flex w-full flex-col overflow-y-auto lg:w-1/2 lg:shrink-0"
@@ -161,7 +162,7 @@ export const AddDomainSidebar = () => {
 				>
 					<div className="mx-auto w-full px-6 pt-8 pb-10 sm:px-8">
 						<AnimatedBackButton />
-						<div className="mb-4 border-stroke-soft-200 border-b border-dashed pt-4 pb-4">
+						<div className="pt-4 pb-4">
 							<div>
 								<h1 className="font-semibold text-title-h6 leading-8">
 									Add Domain
@@ -171,6 +172,7 @@ export const AddDomainSidebar = () => {
 								</p>
 							</div>
 						</div>
+						<div className="mb-6 h-[1px]" />
 
 						<motion.form
 							layout
@@ -245,13 +247,13 @@ export const AddDomainSidebar = () => {
 									onClick={() => setIsAdvancedOpen(!isAdvancedOpen)}
 									className="flex items-center gap-2 rounded-md py-2 text-text-sub-600 transition-colors hover:text-text-strong-950"
 								>
-									<Icon
-										name="chevron-right"
-										className={cn(
-											"h-3 w-3 transition-transform duration-200",
-											isAdvancedOpen && "rotate-90",
-										)}
-									/>
+									<motion.div
+										animate={{ rotate: isAdvancedOpen ? 90 : 0 }}
+										transition={matchedRevealTransition}
+										className="flex h-3 w-3 items-center justify-center"
+									>
+										<Icon name="chevron-right" className="h-full w-full" />
+									</motion.div>
 									<span className="font-medium text-xs">Advanced options</span>
 								</button>
 

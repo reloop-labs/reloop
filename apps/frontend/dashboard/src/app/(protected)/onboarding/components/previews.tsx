@@ -469,11 +469,11 @@ export const DomainPreview = ({
 	const isDomainVariant = variant === "domain";
 
 	return (
-		<div className={isDomainVariant ? "absolute top-8 left-8" : "absolute top-10 left-10"}>
+		<div className={isDomainVariant ? "absolute top-44 left-8" : "absolute top-10 left-10"}>
 			<div
 				className={
 					isDomainVariant
-						? "w-[920px] transform overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-2xl transition-all"
+						? "w-[920px] transform overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 transition-all"
 						: "w-[1000px] transform overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-2xl transition-all"
 				}
 				style={isDomainVariant ? { maxHeight: "calc(100% + 16px)" } : undefined}
