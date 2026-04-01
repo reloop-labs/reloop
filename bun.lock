@@ -114,6 +114,7 @@
         "@reloop/cache": "workspace:*",
         "@reloop/db": "workspace:*",
         "@reloop/logger": "workspace:*",
+        "@reloop/webhook-events": "workspace:*",
         "better-auth": "catalog:",
         "dotenv": "catalog:backend",
         "drizzle-orm": "catalog:db",
@@ -157,6 +158,7 @@
         "@reloop/cache": "workspace:*",
         "@reloop/db": "workspace:*",
         "@reloop/logger": "workspace:*",
+        "@reloop/webhook-events": "workspace:*",
         "better-auth": "catalog:",
         "dotenv": "catalog:backend",
         "drizzle-orm": "catalog:db",
@@ -359,6 +361,7 @@
         "@reloop/cache": "workspace:*",
         "@reloop/db": "workspace:*",
         "@reloop/logger": "workspace:*",
+        "@reloop/webhook-events": "workspace:*",
         "better-auth": "catalog:",
         "dotenv": "catalog:backend",
         "drizzle-orm": "catalog:db",
@@ -580,6 +583,7 @@
       "name": "@reloop/db",
       "dependencies": {
         "@paralleldrive/cuid2": "catalog:backend",
+        "@reloop/webhook-events": "workspace:*",
         "drizzle-orm": "catalog:db",
         "drizzle-typebox": "catalog:db",
         "pg": "catalog:db",
@@ -682,6 +686,15 @@
         "@types/react-dom": "catalog:ui",
         "react": "catalog:ui",
         "react-dom": "catalog:ui",
+      },
+    },
+    "packages/webhook-events": {
+      "name": "@reloop/webhook-events",
+      "version": "0.1.0",
+      "devDependencies": {
+        "@reloop/tsconfig": "workspace:*",
+        "@types/node": "catalog:",
+        "typescript": "catalog:",
       },
     },
   },
@@ -1840,6 +1853,8 @@
     "@reloop/tsconfig": ["@reloop/tsconfig@workspace:packages/tsconfig"],
 
     "@reloop/ui": ["@reloop/ui@workspace:packages/ui"],
+
+    "@reloop/webhook-events": ["@reloop/webhook-events@workspace:packages/webhook-events"],
 
     "@rolldown/binding-darwin-arm64": ["@rolldown/binding-darwin-arm64@1.0.0-beta.9-commit.d91dfb5", "", { "os": "darwin", "cpu": "arm64" }, "sha512-Mp0/gqiPdepHjjVm7e0yL1acWvI0rJVVFQEADSezvAjon9sjQ7CEg9JnXICD4B1YrPmN9qV/e7cQZCp87tTV4w=="],
 

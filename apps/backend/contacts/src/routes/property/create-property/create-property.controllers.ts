@@ -1,7 +1,9 @@
 import type { PropertyTypes } from "@be/contacts/types/property.type";
+import { createLog } from "@be/contacts/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import type { Logger } from "@reloop/logger";
+import { PROPERTY_CREATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq } from "drizzle-orm";
 import { status } from "elysia";
 
@@ -10,11 +12,13 @@ export const createPropertyController = async ({
   userId,
   body,
   logger,
+  cookie,
 }: {
   activeOrganizationId: string;
   userId: string;
   body: PropertyTypes.CreatePropertyRequest;
   logger: Logger;
+  cookie?: string;
 }): Promise<PropertyTypes.PropertyResponse> => {
   logger.info({ name: body.name, type: body.type }, "Creating property");
 
@@ -31,7 +35,10 @@ export const createPropertyController = async ({
       .limit(1);
 
     if (existingProperty.length > 0) {
-      logger.warn({ name: body.name }, "Property already exists in this organization");
+      logger.warn(
+        { name: body.name },
+        "Property already exists in this organization",
+      );
       throw status(409, { message: "Property already exists" });
     }
 
@@ -49,11 +56,24 @@ export const createPropertyController = async ({
       .returning();
 
     if (!newProperty) {
-      logger.error({ name: body.name }, "Failed to create property - no data returned");
+      logger.error(
+        { name: body.name },
+        "Failed to create property - no data returned",
+      );
       throw status(500, { message: "Failed to create property" });
     }
 
-    logger.info({ name: body.name, id: newProperty.id }, "Property created successfully");
+    logger.info(
+      { name: body.name, id: newProperty.id },
+      "Property created successfully",
+    );
+
+    await createLog({
+      event: PROPERTY_CREATE_WEBHOOK_EVENT.id,
+      cookie,
+      requestDetails: { name: body.name, id: newProperty.id },
+    });
+
     return { ...newProperty, object: "contact_property" };
   } catch (error) {
     logger.error({ name: body.name, error }, "Debug creating property");

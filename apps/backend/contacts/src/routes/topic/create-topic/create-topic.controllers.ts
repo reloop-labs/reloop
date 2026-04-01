@@ -1,7 +1,9 @@
 import type { TopicTypes } from "@be/contacts/types/topic.type";
+import { createLog } from "@be/contacts/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import type { Logger } from "@reloop/logger";
+import { TOPIC_CREATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
@@ -13,6 +15,7 @@ export const createTopicController = async ({
   defaultSubscription,
   visibility,
   logger,
+  cookie,
 }: {
   activeOrganizationId: string;
   userId: string;
@@ -21,6 +24,7 @@ export const createTopicController = async ({
   defaultSubscription?: "opt_in" | "opt_out";
   visibility?: "private" | "public";
   logger: Logger;
+  cookie?: string;
 }): Promise<TopicTypes.TopicResponse> => {
   logger.info({ name }, "Creating topic");
   try {
@@ -55,6 +59,13 @@ export const createTopicController = async ({
     }
 
     logger.info({ name, id: newTopic.id }, "Topic created successfully");
+
+    await createLog({
+      event: TOPIC_CREATE_WEBHOOK_EVENT.id,
+      cookie,
+      requestDetails: { name, id: newTopic.id },
+    });
+
     return { ...newTopic, object: "topic" };
   } catch (error) {
     logger.error({ name, error }, "Debug creating topic");

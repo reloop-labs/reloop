@@ -1,8 +1,10 @@
 import { upsertContactProperties } from "@be/contacts/routes/contact/utils/upsert-contact-properties";
 import type { ContactTypes } from "@be/contacts/types/contact.type";
+import { createLog } from "@be/contacts/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import type { Logger } from "@reloop/logger";
+import { CONTACT_CREATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 import { getExistingContact } from "./get-existing-contact";
@@ -12,11 +14,13 @@ export async function createContactController({
   userId,
   body,
   logger,
+  cookie,
 }: {
   organizationId: string;
   userId: string;
   body: ContactTypes.CreateContactRequest;
   logger: Logger;
+  cookie?: string;
 }): Promise<ContactTypes.ContactResponse> {
   const { email } = body;
   try {
@@ -92,7 +96,10 @@ export async function createContactController({
           })),
         );
       }
-      logger.info({ email: body.email, id: newContact.id }, "Contact created successfully");
+      logger.info(
+        { email: body.email, id: newContact.id },
+        "Contact created successfully",
+      );
 
       // Fetch final properties to ensure types are correct in response
       const updatedProperties = await tx
@@ -124,6 +131,12 @@ export async function createContactController({
         {} as Record<string, string | number>,
       );
 
+      await createLog({
+        event: CONTACT_CREATE_WEBHOOK_EVENT.id,
+        cookie,
+        requestDetails: { contactId: newContact.id, email: newContact.email },
+      });
+
       return {
         object: "contact",
         id: newContact.id,
@@ -139,14 +152,7 @@ export async function createContactController({
       };
     });
   } catch (error) {
-    logger.error(
-      {
-        email: body.email,
-        organizationId,
-        error: error instanceof Error ? error.message : String(error),
-      },
-      "Error creating contact",
-    );
+    logger.error({ email: body.email, error }, "Debug creating contact");
     throw error;
   }
 }

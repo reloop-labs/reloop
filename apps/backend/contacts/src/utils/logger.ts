@@ -1,8 +1,8 @@
-import { domainConfig } from "@be/domain/domain.config";
+import { contactsConfig } from "@be/contacts/contacts.config";
 
 /**
  * Creates a structured log entry in the centralized logs service.
- * This is a service-specific implementation that uses domain-specific configuration.
+ * This is a service-specific implementation that uses contacts-specific configuration.
  */
 export async function createLog(body: {
   event: string;
@@ -10,10 +10,9 @@ export async function createLog(body: {
   trace_id?: string;
   metadata?: Record<string, unknown>;
   requestDetails?: Record<string, unknown>;
-  // Context fields
   cookie?: string;
 }) {
-  const url = `${domainConfig.BASE_URL}/api/logs/v1/create`;
+  const url = `${contactsConfig.BASE_URL}/api/logs/v1/create`;
   const {
     event,
     level = "info",
@@ -28,7 +27,7 @@ export async function createLog(body: {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-log-api-key": domainConfig.LOGS_API_KEY,
+        "x-log-api-key": contactsConfig.LOGS_API_KEY,
         ...(cookie && { cookie }),
       },
       body: JSON.stringify({
@@ -43,6 +42,6 @@ export async function createLog(body: {
     });
   } catch (error) {
     // Log locally if remote logging fails
-    console.error("[Domain Service] Error calling logs service:", error);
+    console.error("[Contacts Service] Error calling logs service:", error);
   }
 }

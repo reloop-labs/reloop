@@ -6,8 +6,9 @@ import { createTopicXCodeSamples } from "./create-topic.x-codeSamples";
 
 export const createTopicRoute = new Elysia().use(authMiddleware).post(
   "/create",
-  async ({ body, activeOrganizationId, userId, logger }) => {
+  async ({ body, activeOrganizationId, userId, logger, cookie }) => {
     const { name, description, defaultSubscription, visibility } = body;
+    const cookieString = cookie?.toString() || "";
     return await createTopicController({
       activeOrganizationId,
       userId,
@@ -16,6 +17,7 @@ export const createTopicRoute = new Elysia().use(authMiddleware).post(
       defaultSubscription,
       visibility,
       logger,
+      cookie: cookieString,
     });
   },
   {

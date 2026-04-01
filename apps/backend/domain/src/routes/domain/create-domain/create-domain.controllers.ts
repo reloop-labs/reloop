@@ -9,6 +9,10 @@ import { createId } from "@paralleldrive/cuid2";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import type { Logger } from "@reloop/logger";
+import {
+  DOMAIN_CREATE_WEBHOOK_EVENT,
+  DOMAIN_UNDELETE_WEBHOOK_EVENT,
+} from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
@@ -99,9 +103,9 @@ export async function createDomainController({
       logger.info({ domainId }, "Undeleted domain");
 
       await createLog({
-        event: "domain_undeleted",
+        event: DOMAIN_UNDELETE_WEBHOOK_EVENT.id,
         cookie,
-        properties: { domain, domainId },
+        requestDetails: { domain, domainId },
       });
 
       return undeletedDomain;
@@ -210,23 +214,14 @@ export async function createDomainController({
     logger.info({ domainWithDnsRecords }, "Domain created successfully");
 
     await createLog({
-      event: "domain_created",
+      event: DOMAIN_CREATE_WEBHOOK_EVENT.id,
       cookie,
-      properties: { domain, domainId },
+      requestDetails: { domain, domainId },
     });
 
     return domainWithDnsRecords;
   } catch (error) {
     logger.error({ domain, error }, "Error creating domain");
-    await createLog({
-      event: "domain_creation_failed",
-      level: "error",
-      cookie,
-      properties: {
-        domain,
-        error: error instanceof Error ? error.message : String(error),
-      },
-    });
 
     if (error instanceof Error && error.message.includes("already exists")) {
       throw status(409, { message: "Domain already exists" });

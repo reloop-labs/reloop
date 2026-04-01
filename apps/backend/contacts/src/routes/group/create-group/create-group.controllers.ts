@@ -1,9 +1,11 @@
 import type { GroupModel } from "@be/contacts/model/group.model";
 import type { GroupResponse } from "@be/contacts/types/group.type";
+import { createLog } from "@be/contacts/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { createGroupId } from "@reloop/db/schema";
 import type { Logger } from "@reloop/logger";
+import { GROUP_CREATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 
 export const createGroupController = async ({
@@ -11,11 +13,13 @@ export const createGroupController = async ({
   activeOrganizationId,
   userId,
   logger,
+  cookie,
 }: {
   name: string;
   activeOrganizationId: string;
   userId: string;
   logger: Logger;
+  cookie?: string;
 }): Promise<GroupResponse | GroupModel.Unauthorized> => {
   logger.info({ name }, "Creating group");
   try {
@@ -45,6 +49,13 @@ export const createGroupController = async ({
       throw new Error("Failed to create group");
     }
     logger.info({ name, id: newGroup.id }, "Group created successfully");
+
+    await createLog({
+      event: GROUP_CREATE_WEBHOOK_EVENT.id,
+      cookie,
+      requestDetails: { name, id: newGroup.id },
+    });
+
     return {
       ...newGroup,
       object: "contact_group",
