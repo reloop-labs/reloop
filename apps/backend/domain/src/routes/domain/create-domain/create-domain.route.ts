@@ -7,8 +7,9 @@ import { createDomainXCodeSamples } from "./create-domain.x-codeSamples";
 
 export const createDomainRoute = new Elysia().use(authMiddleware).post(
   "/create",
-  async ({ body, activeOrganizationId, userId, logger }) => {
+  async ({ body, activeOrganizationId, userId, logger, request: { headers } }) => {
     try {
+      const cookie = headers.get("cookie") || undefined;
       return await createDomainController({
         organizationId: activeOrganizationId,
         domain: body.domain,
@@ -20,6 +21,7 @@ export const createDomainRoute = new Elysia().use(authMiddleware).post(
         receivingEmail: body.receivingEmail,
         userId,
         logger,
+        cookie,
       });
     } catch (error) {
       const errorMessage =

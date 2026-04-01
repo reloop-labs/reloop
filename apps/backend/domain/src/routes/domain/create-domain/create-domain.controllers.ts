@@ -4,10 +4,11 @@ import {
   generateAllDNSRecords,
   generateReceivingMXRecord,
 } from "@be/domain/utils";
+import { createLog } from "@be/domain/utils/logger";
 import { createId } from "@paralleldrive/cuid2";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { createLog, type Logger } from "@reloop/logger";
+import type { Logger } from "@reloop/logger";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
@@ -22,10 +23,12 @@ export async function createDomainController({
   sendingEmail,
   receivingEmail,
   logger,
+  cookie,
 }: {
   organizationId: string;
   userId: string;
   logger: Logger;
+  cookie?: string;
 } & DomainTypes.CreateDomainRequest): Promise<DomainTypes.DomainResponse> {
   try {
     logger.info({ domain }, "Finding exsiting domain");
@@ -97,9 +100,7 @@ export async function createDomainController({
 
       await createLog({
         event: "domain_undeleted",
-        message: `Domain ${domain} was undeleted`,
-        organization_id: organizationId,
-        user_id: userId,
+        cookie,
         properties: { domain, domainId },
       });
 
@@ -210,22 +211,17 @@ export async function createDomainController({
 
     await createLog({
       event: "domain_created",
-      message: `Domain ${domain} was created successfully`,
-      organization_id: organizationId,
-      user_id: userId,
+      cookie,
       properties: { domain, domainId },
     });
 
     return domainWithDnsRecords;
   } catch (error) {
     logger.error({ domain, error }, "Error creating domain");
-
     await createLog({
       event: "domain_creation_failed",
       level: "error",
-      message: `Failed to create domain ${domain}`,
-      organization_id: organizationId,
-      user_id: userId,
+      cookie,
       properties: {
         domain,
         error: error instanceof Error ? error.message : String(error),

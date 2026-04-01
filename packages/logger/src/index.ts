@@ -76,29 +76,32 @@ export const logger = Object.assign(baseLogger, {
 export async function createLog(body: {
 	event: string;
 	level?: "debug" | "info" | "warn" | "error" | "fatal";
-	message?: string;
-	organization_id?: string;
-	user_id?: string;
-	properties?: Record<string, unknown>;
+	trace_id?: string;
 	metadata?: Record<string, unknown>;
-	service?: string;
-	source?: string;
+	requestDetails?: Record<string, unknown>;
 }) {
-	const baseUrl =
-		process.env.BASE_URL?.replace("local.reloop.sh", "localhost") ||
-		"http://localhost:8016";
-	const url = `${baseUrl}/api/logs/v1/create`;
+	const url = `${process.env.BASE_URL}/api/logs/v1/create`;
+	const {
+		event,
+		level = "info",
+		trace_id,
+		metadata = {},
+		requestDetails = {},
+	} = body;
 
 	try {
 		await fetch(url, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
-				"x-api-key": process.env.LOGS_API_KEY || "reloop-log-api-key",
+				"x-log-api-key": process.env.LOGS_API_KEY || "reloop-log-api-key",
 			},
 			body: JSON.stringify({
-				level: "info",
-				...body,
+				event,
+				level,
+				trace_id: trace_id || (typeof crypto !== "undefined" ? crypto.randomUUID() : undefined),
+				metadata,
+				requestDetails,
 			}),
 		});
 	} catch (error) {
