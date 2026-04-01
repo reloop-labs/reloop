@@ -30,9 +30,11 @@ export namespace DNSModel {
 	export const dnsRecordResponse = t.Array(dnsRecordItemResponse);
 
 	export const domainNameserversResponse = t.Object({
+		object: t.Literal("domain_nameservers", { default: "domain_nameservers" }),
 		domainId: t.String(),
 		domain: t.String(),
 		nameservers: t.Union([t.Array(t.String()), t.Null()]),
+		event: t.String({ description: "Event ID for the query" }),
 	});
 
 	export const dkimKeysResponse = t.Object({

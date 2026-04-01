@@ -40,10 +40,28 @@ export const DOMAIN_LIST_WEBHOOK_EVENT = {
 	isActive: true,
 } as const satisfies WebhookEventDefinition;
 
+export const DOMAIN_GET_WEBHOOK_EVENT = {
+	id: "domain.get",
+	name: "domain.get",
+	category: "domain",
+	description: "Triggered when a domain is retrieved",
+	isActive: true,
+} as const satisfies WebhookEventDefinition;
+
+export const DOMAIN_GET_DNS_WEBHOOK_EVENT = {
+	id: "domain.dns.get",
+	name: "domain.dns.get",
+	category: "domain",
+	description: "Triggered when a domain's DNS is retrieved",
+	isActive: true,
+} as const satisfies WebhookEventDefinition;
+
 export const DOMAIN_WEBHOOK_EVENTS = [
 	DOMAIN_CREATE_WEBHOOK_EVENT,
 	DOMAIN_UPDATE_WEBHOOK_EVENT,
 	DOMAIN_DELETE_WEBHOOK_EVENT,
 	DOMAIN_UNDELETE_WEBHOOK_EVENT,
 	DOMAIN_LIST_WEBHOOK_EVENT,
+	DOMAIN_GET_WEBHOOK_EVENT,
+	DOMAIN_GET_DNS_WEBHOOK_EVENT,
 ] as const satisfies readonly WebhookEventDefinition[];

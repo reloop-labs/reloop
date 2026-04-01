@@ -6,19 +6,11 @@ import { listDomainsXCodeSamples } from "./list-domains.x-codeSamples";
 
 export const listDomainsRoute = new Elysia().use(authMiddleware).get(
   "/list",
-  async ({ query, activeOrganizationId, logger, request: { headers }, path, request }) => {
-    const cookie = headers.get("cookie") || undefined;
+  async ({ query, activeOrganizationId, logger }) => {
     return await listDomainsController({
       query,
       organizationId: activeOrganizationId,
       logger,
-      cookie,
-      requestDetails: {
-        endpoint: path,
-        method: request.method,
-        userAgent: headers.get("user-agent") || undefined,
-        ipAddress: (headers.get("x-forwarded-for") || headers.get("x-real-ip")) ?? undefined,
-      },
     });
   },
   {

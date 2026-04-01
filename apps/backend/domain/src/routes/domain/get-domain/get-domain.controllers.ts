@@ -2,6 +2,7 @@ import type { DomainTypes } from "@be/domain/types/domain.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import type { Logger } from "@reloop/logger";
+import { DOMAIN_GET_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
@@ -38,6 +39,7 @@ export async function getDomainController({
     return {
       object: "domain" as const,
       ...result,
+      event: DOMAIN_GET_WEBHOOK_EVENT.id,
     };
   } catch (error) {
     logger.error({ domainId, error }, "Error getting domain");

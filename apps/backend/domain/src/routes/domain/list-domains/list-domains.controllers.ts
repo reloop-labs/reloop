@@ -1,5 +1,4 @@
 import type { DomainTypes } from "@be/domain/types/domain.type";
-import { createLog } from "@be/domain/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import type { Logger } from "@reloop/logger";
@@ -10,19 +9,10 @@ export async function listDomainsController({
   query,
   organizationId,
   logger,
-  cookie,
-  requestDetails,
 }: {
   query: DomainTypes.DomainQuery;
   organizationId: string;
   logger: Logger;
-  cookie?: string;
-  requestDetails?: {
-    endpoint?: string;
-    method?: string;
-    userAgent?: string;
-    ipAddress?: string;
-  };
 }): Promise<DomainTypes.DomainListResponse> {
   const { page = 1, limit = 10, status } = query;
   const offset = (page - 1) * limit;
@@ -57,13 +47,6 @@ export async function listDomainsController({
       limit,
       event: DOMAIN_LIST_WEBHOOK_EVENT.id,
     };
-
-    await createLog({
-      event: DOMAIN_LIST_WEBHOOK_EVENT.id,
-      cookie,
-      metadata: { organizationId, query },
-      requestDetails,
-    });
 
     return finalResponse;
   } catch (error) {

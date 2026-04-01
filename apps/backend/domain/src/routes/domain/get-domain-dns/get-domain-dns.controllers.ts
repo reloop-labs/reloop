@@ -1,8 +1,9 @@
+import { resolveNs } from "node:dns/promises";
 import type { DNSTypes } from "@be/domain/types/dns.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import type { Logger } from "@reloop/logger";
-import { resolveNs } from "node:dns/promises";
+import { DOMAIN_GET_DNS_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
@@ -44,9 +45,11 @@ export async function getDomainDNSController({
 		}
 
 		return {
+			object: "domain_nameservers" as const,
 			domainId: foundDomain.id,
 			domain: foundDomain.domain,
 			nameservers,
+			event: DOMAIN_GET_DNS_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
 		logger.error({ domainId, error }, "Error getting domain nameservers");
