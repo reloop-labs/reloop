@@ -141,7 +141,19 @@ export async function createContactController({
       await createLog({
         event: CONTACT_CREATE_WEBHOOK_EVENT.id,
         cookie,
-        metadata: { contactId: newContact.id, email: newContact.email },
+        metadata: {
+          object: "contact",
+          id: newContact.id,
+          email: newContact.email,
+          firstName: newContact.firstName,
+          lastName: newContact.lastName,
+          status: newContact.status,
+          properties: propertiesRecord ?? {},
+          groups: (newContact as ContactTypes.ContactData).groups ?? [],
+          topics: (newContact as ContactTypes.ContactData).topics ?? [],
+          createdAt: newContact.createdAt,
+          updatedAt: newContact.updatedAt,
+        },
         requestDetails,
       });
 

@@ -17,6 +17,8 @@ export async function createLog(body: {
     userAgent?: string;
     ipAddress?: string;
   };
+  organization_id?: string;
+  user_id?: string;
 }) {
   const url = `${domainConfig.BASE_URL}/api/logs/v1/create`;
   const {

@@ -51,7 +51,7 @@ export async function getLogController(
 			trace_id: row.trace_id,
 			metadata: safeJsonParse(row.metadata, {}),
 			created_at: formatClickHouseDate(row.created_at),
-			request_details: safeJsonParse(row.request_details, {}),
+			requestDetails: safeJsonParse(row.request_details, {}),
 		};
 	} catch (error) {
 		if (error && typeof error === "object" && "status" in error) {

@@ -19,15 +19,15 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 				if (!validateLogApiKeyHeader(headers)) {
 					return status(403, { message: "Invalid log service key" });
 				}
-
+				const apiKey =
+					headers.get("x-api-key") ||
+					headers.get("authorization")?.replace("Bearer ", "");
 				const cookie = headers.get("cookie");
 				const traceId = crypto.randomUUID();
+				const apiKeyResult = await validateApiKey(apiKey);
+				if (apiKeyResult) return { ...apiKeyResult, traceId };
 				const sessionResult = await validateSession(cookie);
-
-				if (sessionResult) {
-					return { ...sessionResult, traceId };
-				}
-
+				if (sessionResult) return { ...sessionResult, traceId };
 				return status(401, { message: "Authentication required" });
 			} catch {
 				return status(401, { message: "Authentication failed" });
@@ -43,16 +43,9 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 				const cookie = headers.get("cookie");
 				const traceId = crypto.randomUUID();
 				const apiKeyResult = await validateApiKey(apiKey);
-
-				if (apiKeyResult) {
-					return { ...apiKeyResult, traceId };
-				}
-
+				if (apiKeyResult) return { ...apiKeyResult, traceId };
 				const sessionResult = await validateSession(cookie);
-				if (sessionResult) {
-					return { ...sessionResult, traceId };
-				}
-
+				if (sessionResult) return { ...sessionResult, traceId };
 				return status(401, { message: "Authentication required" });
 			} catch {
 				return status(401, { message: "Authentication failed" });

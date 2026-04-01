@@ -6,8 +6,8 @@ import { createContactXCodeSamples } from "./create-contact.x-codeSamples";
 
 export const createContactRoute = new Elysia().use(authMiddleware).post(
   "/create",
-  async ({ body, activeOrganizationId, userId, logger, cookie, path, request, headers }) => {
-    const cookieString = cookie.toString() || "";
+  async ({ body, activeOrganizationId, userId, logger, path, request, headers }) => {
+    const cookieString = headers["cookie"] || "";
     return await createContactController({
       organizationId: activeOrganizationId,
       userId,

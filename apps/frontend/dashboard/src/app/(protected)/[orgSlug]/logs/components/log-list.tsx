@@ -14,7 +14,8 @@ interface LogData {
 	service: string;
 	event: string;
 	level: string;
-	occurred_at: string;
+	created_at: string;
+	requestDetails?: Record<string, unknown>;
 }
 
 interface LogListResponse {
@@ -59,7 +60,7 @@ export const LogList = () => {
 		try {
 			const headers = ["Timestamp", "Service", "Event", "Level"];
 			const csvRows = data.logs.map((log) => [
-				new Date(log.occurred_at).toISOString(),
+				new Date(log.created_at).toISOString(),
 				log.service,
 				log.event,
 				log.level,

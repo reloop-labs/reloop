@@ -33,7 +33,17 @@ export async function listLogsController(
 
 		const whereClause =
 			conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
-		const limit = Math.min(Math.max(Number(query.limit || 25), 1), 100);
+		const limit = Math.min(Math.max(Number(query.limit || 10), 1), 100);
+		const page = Math.max(Number(query.page || 1), 1);
+		const offset = (page - 1) * limit;
+
+		// Get total count for pagination
+		const countResultSet = await client.query({
+			query: `SELECT count() as total FROM logs ${whereClause}`,
+			format: "JSONEachRow",
+		});
+		const countRows = (await countResultSet.json()) as { total: string }[];
+		const totalCount = Number(countRows[0]?.total || 0);
 
 		const resultSet = await client.query({
 			query: `
@@ -50,7 +60,7 @@ export async function listLogsController(
 				FROM logs
 				${whereClause}
 				ORDER BY created_at DESC
-				LIMIT ${limit}
+				LIMIT ${limit} OFFSET ${offset}
 			`,
 			format: "JSONEachRow",
 		});
@@ -64,12 +74,12 @@ export async function listLogsController(
 			trace_id: row.trace_id,
 			metadata: safeJsonParse(row.metadata, {}),
 			created_at: formatClickHouseDate(row.created_at),
-			request_details: safeJsonParse(row.request_details, {}),
+			requestDetails: safeJsonParse(row.request_details, {}),
 		}));
 
 		return {
 			logs,
-			count: logs.length,
+			count: totalCount,
 		};
 	} catch (error) {
 		throw status(500, {

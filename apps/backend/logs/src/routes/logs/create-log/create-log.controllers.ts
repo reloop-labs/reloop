@@ -22,7 +22,7 @@ export async function createLogController({
 		const entry = {
 			id,
 			event,
-			level,
+			level: level || "info",
 			trace_id,
 			user_id: userId,
 			organization_id: activeOrganizationId,
@@ -38,11 +38,11 @@ export async function createLogController({
 		return {
 			uuid: entry.id,
 			event: entry.event,
-			level: entry.level,
+			level: entry.level as any,
 			trace_id: entry.trace_id,
 			metadata: metadata || {},
 			created_at: occurredAt,
-			request_details: requestDetails,
+			requestDetails: requestDetails || {},
 		};
 	} catch (error) {
 		throw status(500, {

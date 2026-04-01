@@ -6,8 +6,8 @@ import { createPropertyXCodeSamples } from "./create-property.x-codeSamples";
 
 export const createPropertyRoute = new Elysia().use(authMiddleware).post(
   "/create",
-  async ({ body, activeOrganizationId, userId, logger, cookie, path, request, headers }) => {
-    const cookieString = cookie?.toString() || "";
+  async ({ body, activeOrganizationId, userId, logger, path, request, headers }) => {
+    const cookieString = headers["cookie"] || "";
     return createPropertyController({
       activeOrganizationId,
       userId,

@@ -6,9 +6,9 @@ import { createGroupXCodeSamples } from "./create-group.x-codeSamples";
 
 export const createGroupRoute = new Elysia().use(authMiddleware).post(
 	"/create",
-	async ({ body, activeOrganizationId, userId, logger, cookie, path, request, headers }) => {
+	async ({ body, activeOrganizationId, userId, logger, path, request, headers }) => {
 		const { name } = body;
-		const cookieString = cookie?.toString() || "";
+		const cookieString = headers["cookie"] || "";
 		return await createGroupController({
 			activeOrganizationId,
 			userId,

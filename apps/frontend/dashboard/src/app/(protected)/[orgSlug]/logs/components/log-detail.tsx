@@ -4,14 +4,17 @@ import { Skeleton } from "@reloop/ui/skeleton";
 interface LogDetailProps {
 	log?: {
 		uuid: string;
-		service: string;
 		event: string;
 		level: string;
 		message: string | null;
-		occurred_at: string;
-		properties: Record<string, unknown>;
+		created_at: string;
 		metadata: Record<string, unknown>;
-		request_id: string | null;
+		requestDetails: {
+			endpoint?: string;
+			method?: string;
+			userAgent?: string;
+			ipAddress?: string;
+		};
 		trace_id: string | null;
 	};
 	isLoading: boolean;
@@ -72,12 +75,6 @@ export const LogDetail = ({ log, isLoading }: LogDetailProps) => {
 					</h3>
 					<div className="space-y-3">
 						<div className="flex justify-between text-sm">
-							<span className="text-text-sub-600">Service</span>
-							<span className="font-medium text-text-strong-950">
-								{log.service}
-							</span>
-						</div>
-						<div className="flex justify-between text-sm">
 							<span className="text-text-sub-600">Event</span>
 							<span className="font-medium text-text-strong-950">
 								{log.event}
@@ -86,7 +83,7 @@ export const LogDetail = ({ log, isLoading }: LogDetailProps) => {
 						<div className="flex justify-between text-sm">
 							<span className="text-text-sub-600">Timestamp</span>
 							<span className="text-text-strong-950">
-								{new Date(log.occurred_at).toLocaleString()}
+								{new Date(log.created_at).toLocaleString()}
 							</span>
 						</div>
 					</div>
@@ -94,25 +91,25 @@ export const LogDetail = ({ log, isLoading }: LogDetailProps) => {
 
 				<div className="rounded-xl border border-stroke-soft-100 p-4 dark:border-stroke-soft-100/50">
 					<h3 className="mb-3 font-medium text-text-sub-600 text-xs uppercase">
-						Context
+						Request Details
 					</h3>
 					<div className="space-y-3">
 						<div className="flex justify-between text-sm">
-							<span className="text-text-sub-600">Log UUID</span>
-							<span className="max-w-[150px] truncate font-mono text-text-strong-950 text-xs">
-								{log.uuid}
+							<span className="text-text-sub-600">Endpoint</span>
+							<span className="font-medium text-text-strong-950">
+								{log.requestDetails?.endpoint || "N/A"}
 							</span>
 						</div>
 						<div className="flex justify-between text-sm">
-							<span className="text-text-sub-600">Request ID</span>
-							<span className="max-w-[150px] truncate font-mono text-text-strong-950 text-xs">
-								{log.request_id || "N/A"}
+							<span className="text-text-sub-600">Method</span>
+							<span className="font-medium text-text-strong-950">
+								{log.requestDetails?.method || "N/A"}
 							</span>
 						</div>
 						<div className="flex justify-between text-sm">
-							<span className="text-text-sub-600">Trace ID</span>
-							<span className="max-w-[150px] truncate font-mono text-text-strong-950 text-xs">
-								{log.trace_id || "N/A"}
+							<span className="text-text-sub-600">IP Address</span>
+							<span className="text-text-strong-950">
+								{log.requestDetails?.ipAddress || "N/A"}
 							</span>
 						</div>
 					</div>
@@ -131,15 +128,32 @@ export const LogDetail = ({ log, isLoading }: LogDetailProps) => {
 				</div>
 			)}
 
-			{/* Properties & Metadata */}
+			{/* Metadata & Secondary Details */}
 			<div className="space-y-6">
-				<div className="rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4 dark:border-stroke-soft-100/50">
+				<div className="rounded-xl border border-stroke-soft-100 p-4 dark:border-stroke-soft-100/50">
 					<h3 className="mb-3 font-medium text-text-sub-600 text-xs uppercase">
-						Properties
+						Client Info
 					</h3>
-					<pre className="overflow-x-auto rounded-lg border border-stroke-soft-100 bg-bg-white-0 p-4 font-mono text-text-strong-950 text-xs">
-						{JSON.stringify(log.properties, null, 2)}
-					</pre>
+					<div className="space-y-3">
+						<div className="flex justify-between text-sm">
+							<span className="text-text-sub-600">User Agent</span>
+							<span className="max-w-[400px] truncate text-right text-text-strong-950 text-xs">
+								{log.requestDetails?.userAgent || "N/A"}
+							</span>
+						</div>
+						<div className="flex justify-between text-sm">
+							<span className="text-text-sub-600">Trace ID</span>
+							<span className="font-mono text-text-strong-950 text-xs">
+								{log.trace_id || "N/A"}
+							</span>
+						</div>
+						<div className="flex justify-between text-sm">
+							<span className="text-text-sub-600">Log UUID</span>
+							<span className="font-mono text-text-strong-950 text-xs">
+								{log.uuid}
+							</span>
+						</div>
+					</div>
 				</div>
 
 				<div className="rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4 dark:border-stroke-soft-100/50">

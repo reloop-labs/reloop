@@ -47,7 +47,7 @@ export namespace LogsModel {
 		trace_id: t.Union([t.String(), t.Null()]),
 		metadata: t.Any(),
 		created_at: t.String({ format: "date-time" }),
-		request_details: t.Any()
+		requestDetails: t.Any()
 	});
 
 	export type LogEntryResponse = typeof logEntryResponse.static;
@@ -59,7 +59,7 @@ export namespace LogsModel {
 		trace_id: t.String({ description: "Distributed trace identifier" }),
 		metadata: t.Any({ description: "Additional structured metadata" }),
 		created_at: t.String({ format: "date-time" }),
-		request_details: t.Any(),
+		requestDetails: t.Any(),
 	});
 
 	export type LogResponse = typeof logResponse.static;
@@ -76,6 +76,12 @@ export namespace LogsModel {
 				minimum: 1,
 				maximum: 100,
 				description: "Maximum number of log entries to return",
+			}),
+		),
+		page: t.Optional(
+			t.Numeric({
+				minimum: 1,
+				description: "Page number for pagination",
 			}),
 		),
 	});

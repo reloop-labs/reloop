@@ -1,5 +1,4 @@
 "use client";
-import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -8,10 +7,9 @@ import Link from "next/link";
 
 interface LogData {
 	uuid: string;
-	service: string;
 	event: string;
 	level: string;
-	occurred_at: string;
+	created_at: string;
 }
 
 interface LogTableProps {
@@ -42,7 +40,7 @@ export const LogTable = ({
 	isLoading,
 	loadingRows = 5,
 }: LogTableProps) => {
-	const gridClass = "grid grid-cols-[150px_120px_1fr_100px] items-center px-4";
+	const gridClass = "grid grid-cols-[150px_1fr_100px] items-center px-4";
 
 	if (isLoading) {
 		return (
@@ -59,8 +57,8 @@ export const LogTable = ({
 						<span className="text-xs">Timestamp</span>
 					</div>
 					<div className="flex items-center gap-2">
-						<Icon name="box" className="h-4 w-4" />
-						<span className="text-xs">Service</span>
+						<Icon name="clock" className="h-4 w-4" />
+						<span className="text-xs">Timestamp</span>
 					</div>
 					<div className="flex items-center gap-2">
 						<Icon name="activity" className="h-4 w-4" />
@@ -76,7 +74,6 @@ export const LogTable = ({
 					{Array.from({ length: loadingRows }).map((_, index) => (
 						<div key={`skeleton-${index}`} className={cn(gridClass, "py-2")}>
 							<Skeleton className="h-4 w-24" />
-							<Skeleton className="h-4 w-20" />
 							<Skeleton className="h-4 w-40" />
 							<Skeleton className="h-5 w-16 rounded-md" />
 						</div>
@@ -100,8 +97,8 @@ export const LogTable = ({
 					<span className="text-xs">Timestamp</span>
 				</div>
 				<div className="flex items-center gap-2">
-					<Icon name="box" className="h-4 w-4" />
-					<span className="text-xs">Service</span>
+					<Icon name="clock" className="h-4 w-4" />
+					<span className="text-xs">Timestamp</span>
 				</div>
 				<div className="flex items-center gap-2">
 					<Icon name="activity" className="h-4 w-4" />
@@ -132,17 +129,7 @@ export const LogTable = ({
 						>
 							{/* Timestamp Column */}
 							<div className="truncate text-label-sm text-text-sub-600">
-								{formatRelativeTime(log.occurred_at)}
-							</div>
-
-							{/* Service Column */}
-							<div className="flex items-center gap-2">
-								<div className="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded bg-bg-weak-100 font-bold text-[10px] text-text-sub-600 uppercase tracking-tighter shadow-sm">
-									{log.service.charAt(0)}
-								</div>
-								<span className="truncate font-medium text-label-sm text-text-strong-950">
-									{log.service}
-								</span>
+								{formatRelativeTime(log.created_at)}
 							</div>
 
 							{/* Event Column */}

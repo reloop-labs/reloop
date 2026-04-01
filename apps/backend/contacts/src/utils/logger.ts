@@ -1,5 +1,5 @@
 import { contactsConfig } from "@be/contacts/contacts.config";
-
+import logger from "@reloop/logger";
 /**
  * Creates a structured log entry in the centralized logs service.
  * This is a service-specific implementation that uses contacts-specific configuration.
@@ -26,7 +26,6 @@ export async function createLog(body: {
     requestDetails = {},
     cookie,
   } = body;
-
   try {
     await fetch(url, {
       method: "POST",
@@ -46,7 +45,6 @@ export async function createLog(body: {
       }),
     });
   } catch (error) {
-    // Log locally if remote logging fails
-    console.error("[Contacts Service] Error calling logs service:", error);
+    logger.error({ error }, "Error calling logs service");
   }
 }

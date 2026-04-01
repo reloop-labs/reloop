@@ -1,4 +1,3 @@
-import { authMiddleware } from "@be/contacts/middleware/auth";
 import { Elysia } from "elysia";
 import { addContactToGroupRoute } from "./add-contact-to-group/add-contact-to-group.route";
 import { addContactToTopicRoute } from "./add-contact-to-topic/add-contact-to-topic.route";
@@ -11,7 +10,6 @@ import { updateContactRoute } from "./update-contact/update-contact.route";
 import { updateContactTopicRoute } from "./update-contact-topic/update-contact-topic.route";
 
 export const contactRoutes = new Elysia({ name: "ContactRoutes" })
-	.use(authMiddleware)
 	// Contact Routes
 	.use(createContactRoute)
 	.use(getContactRoute)
