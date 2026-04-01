@@ -1,7 +1,9 @@
 import type { DomainTypes } from "@be/domain/types/domain.type";
+import { createLog } from "@be/domain/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import type { Logger } from "@reloop/logger";
+import { DOMAIN_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
@@ -10,11 +12,20 @@ export async function updateDomainController({
 	organizationId,
 	body,
 	logger,
+	cookie,
+	requestDetails,
 }: {
 	domainId: string;
 	organizationId: string;
 	body: DomainTypes.UpdateDomainRequest;
 	logger: Logger;
+	cookie?: string;
+	requestDetails?: {
+		endpoint?: string;
+		method?: string;
+		userAgent?: string;
+		ipAddress?: string;
+	};
 }): Promise<DomainTypes.DomainResponse> {
 	try {
 		logger.info({ domainId, body }, "Updating domain");
@@ -80,7 +91,20 @@ export async function updateDomainController({
 			throw status(500, { message: "Failed to update domain" });
 		}
 
-		return updatedDomain;
+		const finalDomain = {
+			object: "domain" as const,
+			...updatedDomain,
+			event: DOMAIN_UPDATE_WEBHOOK_EVENT.id,
+		};
+
+		await createLog({
+			event: DOMAIN_UPDATE_WEBHOOK_EVENT.id,
+			cookie,
+			metadata: { domainId, domain: updatedDomain.domain },
+			requestDetails,
+		});
+
+		return finalDomain;
 	} catch (error) {
 		logger.error({ domainId, error }, "Error updating domain settings");
 		throw error;

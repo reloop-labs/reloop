@@ -123,7 +123,8 @@ export namespace DomainModel {
 		}]
 	});
 
-	export const domainResponse = t.Object({
+	export const domainBaseResponse = t.Object({
+		object: t.Literal("domain", { default: "domain" }),
 		id: t.String({ description: "Unique domain identifier" }),
 		domain: t.String({ description: "Domain name (e.g., send.reloop.com)" }),
 		domainType: t.Union(
@@ -184,6 +185,7 @@ export namespace DomainModel {
 		updatedAt: t.Date(),
 	}, {
 		examples: [{
+			object: "domain",
 			id: "domain_123456789",
 			domain: "send.example.com",
 			domainType: "custom",
@@ -214,6 +216,14 @@ export namespace DomainModel {
 			updatedAt: new Date("2026-03-30T10:00:00Z")
 		}]
 	});
+
+	export const domainResponse = t.Composite([
+		domainBaseResponse,
+		t.Object({
+			event: t.Optional(t.String({ description: "Event ID for the mutation" })),
+		}),
+	]);
+
 
 	export const domainStatusResponse = t.Object({
 		id: t.String({ description: "Unique domain identifier" }),
@@ -270,10 +280,12 @@ export namespace DomainModel {
 	);
 
 	export const domainListResponse = t.Object({
-		domains: t.Array(domainResponse),
+		object: t.Literal("domain", { default: "domain" }),
+		domains: t.Array(domainBaseResponse),
 		total: t.Number(),
 		page: t.Number(),
 		limit: t.Number(),
+		event: t.String({ description: "Event ID for the list request" }),
 	});
 
 	export const domainQuery = t.Object({

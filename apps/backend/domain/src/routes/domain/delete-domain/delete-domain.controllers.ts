@@ -1,7 +1,9 @@
 import type { DomainTypes } from "@be/domain/types/domain.type";
+import { createLog } from "@be/domain/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import type { Logger } from "@reloop/logger";
+import { DOMAIN_DELETE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
@@ -9,10 +11,19 @@ export async function deleteDomainController({
   domainId,
   organizationId,
   logger,
+  cookie,
+  requestDetails,
 }: {
   domainId: string;
   organizationId: string;
   logger: Logger;
+  cookie?: string;
+  requestDetails?: {
+    endpoint?: string;
+    method?: string;
+    userAgent?: string;
+    ipAddress?: string;
+  };
 }): Promise<DomainTypes.DomainResponse> {
   try {
     logger.info({ domainId }, "Fetching domain with DNS records");
@@ -65,14 +76,24 @@ export async function deleteDomainController({
       })),
     };
 
-    logger.info(
-      { domainId },
-      "Domain and DNS records deleted successfully",
-    );
+    logger.info({ domainId }, "Domain and DNS records deleted successfully");
 
-    return deletedDomain;
+    const finalDomain = {
+      object: "domain" as const,
+      ...deletedDomain,
+      event: DOMAIN_DELETE_WEBHOOK_EVENT.id,
+    };
+
+    await createLog({
+      event: DOMAIN_DELETE_WEBHOOK_EVENT.id,
+      cookie,
+      metadata: { domainId, domain: domainWithDnsRecords.domain },
+      requestDetails,
+    });
+
+    return finalDomain;
   } catch (error) {
-    logger.error({ domainId, error, }, "Error deleting domain",);
+    logger.error({ domainId, error }, "Error deleting domain");
     throw error;
   }
 }

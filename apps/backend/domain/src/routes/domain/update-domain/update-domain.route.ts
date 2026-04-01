@@ -8,12 +8,20 @@ export const updateDomainRoute = new Elysia()
 	.use(authMiddleware)
 	.patch(
 		"/:domain_id",
-		async ({ params: { domain_id }, body, activeOrganizationId, logger }) => {
+		async ({ params: { domain_id }, body, activeOrganizationId, logger, request: { headers }, path, request }) => {
+			const cookie = headers.get("cookie") || undefined;
 			return await updateDomainController({
 				domainId: domain_id,
 				organizationId: activeOrganizationId,
 				body,
 				logger,
+				cookie,
+				requestDetails: {
+					endpoint: path,
+					method: request.method,
+					userAgent: headers.get("user-agent") || undefined,
+					ipAddress: (headers.get("x-forwarded-for") || headers.get("x-real-ip")) ?? undefined,
+				},
 			});
 		},
 		{

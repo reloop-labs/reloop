@@ -116,7 +116,11 @@ export async function createDomainController({
         requestDetails,
       });
 
-      return undeletedDomain;
+      return {
+        ...undeletedDomain,
+        object: "domain" as const,
+        event: DOMAIN_UNDELETE_WEBHOOK_EVENT.id,
+      };
     }
 
     logger.info({ domain }, "Generating DNS records");
@@ -228,7 +232,11 @@ export async function createDomainController({
       requestDetails,
     });
 
-    return domainWithDnsRecords;
+    return {
+      ...domainWithDnsRecords,
+      object: "domain" as const,
+      event: DOMAIN_CREATE_WEBHOOK_EVENT.id,
+    };
   } catch (error) {
     logger.error({ domain, error }, "Error creating domain");
 

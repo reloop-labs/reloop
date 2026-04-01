@@ -35,7 +35,10 @@ export async function getDomainController({
     }
 
     logger.info({ domainId }, "Domain fetched successfully");
-    return result;
+    return {
+      object: "domain" as const,
+      ...result,
+    };
   } catch (error) {
     logger.error({ domainId, error }, "Error getting domain");
     throw error;

@@ -32,9 +32,18 @@ export const DOMAIN_UNDELETE_WEBHOOK_EVENT = {
 	isActive: true,
 } as const satisfies WebhookEventDefinition;
 
+export const DOMAIN_LIST_WEBHOOK_EVENT = {
+	id: "domain.list",
+	name: "domain.list",
+	category: "domain",
+	description: "Triggered when domains are listed",
+	isActive: true,
+} as const satisfies WebhookEventDefinition;
+
 export const DOMAIN_WEBHOOK_EVENTS = [
 	DOMAIN_CREATE_WEBHOOK_EVENT,
 	DOMAIN_UPDATE_WEBHOOK_EVENT,
 	DOMAIN_DELETE_WEBHOOK_EVENT,
 	DOMAIN_UNDELETE_WEBHOOK_EVENT,
+	DOMAIN_LIST_WEBHOOK_EVENT,
 ] as const satisfies readonly WebhookEventDefinition[];
