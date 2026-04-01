@@ -1,8 +1,21 @@
-import "dotenv/config";
-import { cleanupOldLogs } from "../src/utils/cleanup";
+import { cleanupOldLogs, truncateLogs } from "../src/utils/cleanup";
 
 async function main() {
-  const days = Number(process.argv[2]) || 100;
+  const arg = process.argv[2];
+
+  if (arg === "all") {
+    console.log("Starting full cleanup of all logs (TRUNCATE)...");
+    try {
+      await truncateLogs();
+      console.log("All logs have been successfully deleted.");
+      process.exit(0);
+    } catch (error) {
+      console.error("Full cleanup failed:", error);
+      process.exit(1);
+    }
+  }
+
+  const days = Number(arg) || 100;
   console.log(`Starting manual cleanup of logs older than ${days} days...`);
 
   try {

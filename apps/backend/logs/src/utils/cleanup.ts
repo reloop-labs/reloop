@@ -25,3 +25,19 @@ export async function cleanupOldLogs(days = 100): Promise<number> {
     throw error;
   }
 }
+
+/**
+ * Deletes all logs from the database.
+ */
+export async function truncateLogs(): Promise<void> {
+  const client = getClickHouseClient();
+
+  try {
+    await client.exec({
+      query: "TRUNCATE TABLE logs",
+    });
+  } catch (error) {
+    console.error("Failed to truncate logs table:", error);
+    throw error;
+  }
+}
