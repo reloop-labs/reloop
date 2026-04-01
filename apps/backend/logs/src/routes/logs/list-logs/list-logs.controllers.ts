@@ -3,19 +3,12 @@ import {
 	getClickHouseClient,
 	type StoredLogEntry,
 } from "@reloop/logs/utils/clickhouse";
+import {
+	escapeString,
+	formatClickHouseDate,
+	safeJsonParse,
+} from "@reloop/logs/utils/format";
 import { status } from "elysia";
-
-function escapeString(value: string): string {
-	return value.replaceAll("\\", "\\\\").replaceAll("'", "\\'");
-}
-
-function safeJsonParse(value: string, fallback: unknown): unknown {
-	try {
-		return JSON.parse(value);
-	} catch {
-		return fallback;
-	}
-}
 
 export async function listLogsController(
 	query: LogsTypes.ListLogsQuery,
@@ -70,7 +63,7 @@ export async function listLogsController(
 			level: row.level,
 			trace_id: row.trace_id,
 			metadata: safeJsonParse(row.metadata, {}),
-			created_at: row.created_at,
+			created_at: formatClickHouseDate(row.created_at),
 			request_details: safeJsonParse(row.request_details, {}),
 		}));
 

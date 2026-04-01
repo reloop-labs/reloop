@@ -1,5 +1,6 @@
 import type { LogsTypes } from "@reloop/logs/types/logs.type";
 import { getClickHouseClient } from "@reloop/logs/utils/clickhouse";
+import { toClickHouseDate } from "@reloop/logs/utils/format";
 import { status } from "elysia";
 
 export async function createLogController({
@@ -26,7 +27,7 @@ export async function createLogController({
 			user_id: userId,
 			organization_id: activeOrganizationId,
 			metadata: JSON.stringify(metadata || {}),
-			created_at: occurredAt,
+			created_at: toClickHouseDate(occurredAt),
 			request_details: JSON.stringify(requestDetails || {}),
 		};
 		await client.insert({
@@ -40,7 +41,7 @@ export async function createLogController({
 			level: entry.level,
 			trace_id: entry.trace_id,
 			metadata: metadata || {},
-			created_at: entry.created_at,
+			created_at: occurredAt,
 			request_details: requestDetails,
 		};
 	} catch (error) {

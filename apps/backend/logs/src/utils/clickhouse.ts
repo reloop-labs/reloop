@@ -16,7 +16,6 @@ export type StoredLogEntry = {
 	created_at: string;
 };
 
-
 export function getClickHouseClient(): ClickHouseClient {
 	if (!clickhouseClient) {
 		clickhouseClient = createClient({
@@ -47,7 +46,6 @@ export async function ensureDatabaseExists(): Promise<void> {
 		await client.exec({
 			query: `CREATE DATABASE IF NOT EXISTS ${logsConfig.clickhouse.database}`,
 		});
-
 	} catch (error) {
 		throw error;
 	}
@@ -56,6 +54,60 @@ export async function ensureDatabaseExists(): Promise<void> {
 export async function ensureTableExists(): Promise<void> {
 	await ensureDatabaseExists();
 	const client = getClickHouseClient();
+
+	const tableSchema = [
+		{ name: "id", type: "String" },
+		{ name: "event", type: "String" },
+		{ name: "level", type: "LowCardinality(String)" },
+		{ name: "trace_id", type: "Nullable(String)" },
+		{ name: "user_id", type: "Nullable(String)" },
+		{ name: "organization_id", type: "Nullable(String)" },
+		{ name: "metadata", type: "String" },
+		{ name: "request_details", type: "String" },
+		{ name: "created_at", type: "DateTime64(3)" },
+	];
+
+	try {
+		// Check if table exists and get its schema
+		const resultSet = await client.query({
+			query: "DESCRIBE TABLE logs",
+			format: "JSONEachRow",
+		});
+
+		const currentSchema = await resultSet.json<{
+			name: string;
+			type: string;
+		}>();
+
+		// Map current schema to a comparable format
+		const currentColumns = currentSchema.map((col) => ({
+			name: col.name,
+			type: col.type,
+		}));
+
+		// Compare schema
+		const isSchemaMatch =
+			tableSchema.every((expected) =>
+				currentColumns.some(
+					(current) =>
+						current.name === expected.name && current.type === expected.type,
+				),
+			) && tableSchema.length === currentColumns.length;
+
+		if (!isSchemaMatch) {
+			console.log(
+				"ClickHouse logs table schema mismatch. Dropping and recreating table...",
+			);
+			await client.exec({
+				query: "DROP TABLE logs",
+			});
+		}
+	} catch (error: unknown) {
+		// If table doesn't exist, DESCRIBE will throw. We can ignore this and proceed to CREATE.
+		if (error instanceof Error && !error.message?.includes("Table default.logs doesn't exist") && !error.message?.includes("Table logs does not exist")) {
+			// console.error("Error checking ClickHouse table schema:", error);
+		}
+	}
 
 	try {
 		await client.exec({
@@ -76,13 +128,7 @@ export async function ensureTableExists(): Promise<void> {
 				PARTITION BY toYYYYMM(created_at)
 			`,
 		});
-
 	} catch (error) {
 		throw error;
 	}
 }
-
-
-
-
-
