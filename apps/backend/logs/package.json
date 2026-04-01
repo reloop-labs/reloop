@@ -7,7 +7,8 @@
 		"check-types": "tsc --noEmit",
 		"compile": "bun build --compile --minify --sourcemap --bytecode ./src/index.ts --outfile server",
 		"dev": "bun run --hot src/index.ts",
-		"start": "bun run dist/index.js"
+		"start": "bun run dist/index.js",
+		"cleanup": "bun run scripts/cleanup.ts"
 	},
 	"dependencies": {
 		"@clickhouse/client": "catalog:backend",
