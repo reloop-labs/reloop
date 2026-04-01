@@ -39,43 +39,29 @@ const domainSchema = v.object({
 			"Use only letters, numbers, and hyphens",
 		),
 	),
-	tls: v.picklist(["opportunistic", "enforced"]),
 });
 
 type DomainFormValues = v.InferInput<typeof domainSchema>;
 
-const tlsOptions = [
-	{ value: "opportunistic", label: "Opportunistic TLS" },
-	{ value: "enforced", label: "Enforced TLS" },
-] as const;
+
 
 export const AddDomainSidebar = () => {
 	const { push } = useUserOrganization();
 	const { changeStatus, status } = useLoading();
 	const { mutate } = useSWRConfig();
-	const [clickTracking, setClickTracking] = useState(false);
-	const [openTracking, setOpenTracking] = useState(false);
-	const [tlsOpen, setTlsOpen] = useState(false);
-	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
-	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
 	const didAutoScrollRef = useRef(false);
+	const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
 	const { register, handleSubmit, formState, setError, setValue, watch } =
 		useForm<DomainFormValues>({
 			resolver: valibotResolver(domainSchema) as Resolver<DomainFormValues>,
 			defaultValues: {
 				domain: "",
 				customReturnPath: "send",
-				tls: "opportunistic",
 			},
 		});
-	const tlsValue = watch("tls");
 	const domainValue = watch("domain");
 	const hasDomainValue = domainValue.trim().length > 0;
-	const currentTlsOption =
-		tlsOptions.find((option) => option.value === tlsValue) ?? tlsOptions[0];
-	const currentTab = buttonRefs.current[hoverIdx ?? -1];
-	const currentRect = currentTab?.getBoundingClientRect();
 	const matchedRevealTransition = {
 		duration: 0.82,
 		ease: "easeInOut" as const,
@@ -134,7 +120,6 @@ export const AddDomainSidebar = () => {
 	const onSubmit = async ({
 		domain,
 		customReturnPath,
-		tls,
 	}: DomainFormValues) => {
 		try {
 			changeStatus("loading");
@@ -143,9 +128,9 @@ export const AddDomainSidebar = () => {
 				{
 					domain,
 					customReturnPath,
-					clickTracking,
-					openTracking,
-					tls,
+					clickTracking: false,
+					openTracking: false,
+					tls: "opportunistic",
 				},
 				{ headers: { credentials: "include" } },
 			);
@@ -168,20 +153,20 @@ export const AddDomainSidebar = () => {
 
 	return (
 		<div className="h-[calc(100vh-64px)] w-full overflow-hidden">
-			<div className="mx-auto flex h-full w-full max-w-5xl overflow-hidden">
+			<div className="mx-auto flex h-full w-full max-w-3xl overflow-hidden">
 				<div
 					ref={scrollContainerRef}
 					className="scrollbar-hide flex w-full flex-col overflow-y-auto lg:w-1/2 lg:shrink-0"
 					style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
 				>
-					<div className="mx-auto w-full max-w-[620px] px-6 pt-8 pb-10 sm:px-8">
+					<div className="mx-auto w-full px-6 pt-8 pb-10 sm:px-8">
 						<AnimatedBackButton />
 						<div className="mb-4 border-stroke-soft-200 border-b border-dashed pt-4 pb-4">
 							<div>
-								<h1 className="font-medium text-title-h5 leading-8">
+								<h1 className="font-semibold text-title-h6 leading-8">
 									Add Domain
 								</h1>
-								<p className="text-paragraph-sm text-text-sub-600">
+								<p className="text-xs text-text-sub-600">
 									Send emails from a domain you control
 								</p>
 							</div>
@@ -224,7 +209,7 @@ export const AddDomainSidebar = () => {
 									{formState.errors.domain && (
 										<div className="mt-2 flex items-center gap-2">
 											<Icon name="alert-circle" className="h-4 w-4 text-red-500" />
-											<p className="text-red-600 text-sm">
+											<p className="text-red-600 text-xs">
 												{formState.errors.domain.message}
 											</p>
 										</div>
@@ -235,276 +220,98 @@ export const AddDomainSidebar = () => {
 										<div className="mt-0.5 flex h-7 w-7 items-center justify-center rounded-full bg-bg-white-0 text-text-soft-400 shadow-regular-xs">
 											<Icon name="bulb" className="h-3.5 w-3.5" />
 										</div>
-										<div className="space-y-0.5">
+										<div className="flex-1 space-y-1.5 pt-1">
 											<p className="font-medium text-[11px] text-text-soft-400 uppercase tracking-[0.18em]">
 												Pro Tip
 											</p>
-											<p className="max-w-[560px] text-[13px] leading-5 text-text-sub-600">
-											Use a dedicated sending domain or subdomain you control.
-											</p>
-											<p className="max-w-[560px] text-[13px] leading-5 text-text-sub-600">
-												e.g. marketing.example.com or send.example.com.
-											</p>
+											<ul className="space-y-1">
+												<li className="flex items-start gap-2 max-w-[560px] text-xs leading-5 text-text-sub-600">
+													<span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-text-soft-400" />
+													Use a dedicated sending domain or subdomain you control.
+												</li>
+												<li className="flex items-start gap-2 max-w-[560px] text-xs leading-5 text-text-sub-600">
+													<span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-text-soft-400" />
+													e.g. marketing.example.com or send.example.com.
+												</li>
+											</ul>
 										</div>
 									</div>
 								</div>
 							</motion.section>
 
-							<motion.section
-								initial={false}
-								layout
-								animate={{
-									maxHeight: hasDomainValue ? 560 : 0,
-									opacity: hasDomainValue ? 1 : 0,
-									marginTop: hasDomainValue ? 0 : -8,
-								}}
-								transition={{
-									maxHeight: matchedRevealTransition,
-									opacity: matchedRevealTransition,
-									marginTop: matchedRevealTransition,
-									layout: matchedRevealTransition,
-								}}
-								className="overflow-hidden"
-							>
-								<motion.div
+							<div className="pt-2">
+								<button
+									type="button"
+									onClick={() => setIsAdvancedOpen(!isAdvancedOpen)}
+									className="flex items-center gap-2 rounded-md py-2 text-text-sub-600 transition-colors hover:text-text-strong-950"
+								>
+									<Icon
+										name="chevron-right"
+										className={cn(
+											"h-3 w-3 transition-transform duration-200",
+											isAdvancedOpen && "rotate-90",
+										)}
+									/>
+									<span className="font-medium text-xs">Advanced options</span>
+								</button>
+
+								<motion.section
 									initial={false}
-									layout="position"
 									animate={{
-										y: hasDomainValue ? 0 : -6,
+										maxHeight: isAdvancedOpen ? 500 : 0,
+										opacity: isAdvancedOpen ? 1 : 0,
+										marginTop: isAdvancedOpen ? 0 : 0,
 									}}
 									transition={{
-										duration: matchedRevealTransition.duration,
-										ease: matchedRevealTransition.ease,
+										maxHeight: matchedRevealTransition,
+										opacity: matchedRevealTransition,
 									}}
 									className="overflow-hidden"
-									aria-hidden={!hasDomainValue}
 								>
-									<section className="border-stroke-soft-200 border-t pt-4">
-											<div className="space-y-0.5">
-												<h2 className="font-medium text-lg text-text-strong-950">
-													Advanced settings
-												</h2>
-												<p className="max-w-xl text-[13px] leading-5 text-text-sub-600">
-													Configure return path, TLS, and tracking before you add the
-													domain.
-												</p>
-											</div>
-
-											<div className="grid gap-4 pt-4">
-												<motion.div
-													initial={{ opacity: 0, y: 10 }}
-													animate={{ opacity: 1, y: 0 }}
-													transition={{ duration: 0.35, delay: 0.05 }}
-													className="grid gap-2"
-												>
-													<Label.Root
-														htmlFor="customReturnPath"
-														className="block font-medium text-sm"
-													>
-														Custom Return Path
-														<Label.Asterisk />
-													</Label.Root>
-													<Input.Root
-														hasError={!!formState.errors.customReturnPath?.message}
-														className="w-full"
-														size="small"
-													>
-														<Input.Wrapper>
-															<Input.Input
-																id="customReturnPath"
-																placeholder="send"
-																{...register("customReturnPath")}
-																disabled={status === "loading"}
-															/>
-														</Input.Wrapper>
-													</Input.Root>
-													<p className="text-paragraph-xs text-text-sub-600">
-														This becomes the return-path subdomain used for SPF and
-														bounces.
+									<div className="grid gap-4 pt-4 pb-2">
+										<div className="grid gap-2">
+											<Label.Root
+												htmlFor="customReturnPath"
+												className="block font-medium text-xs"
+											>
+												Custom Return-Path
+												<Label.Asterisk />
+											</Label.Root>
+											<Input.Root
+												hasError={!!formState.errors.customReturnPath?.message}
+												className="w-full"
+												size="small"
+											>
+												<Input.Wrapper>
+													<Input.Input
+														id="customReturnPath"
+														placeholder="send"
+														{...register("customReturnPath")}
+														disabled={status === "loading"}
+													/>
+												</Input.Wrapper>
+											</Input.Root>
+											<p className="text-paragraph-xs text-text-sub-600">
+												This becomes the return-path subdomain used for SPF and
+												bounces.
+											</p>
+											{formState.errors.customReturnPath && (
+												<div className="flex items-center gap-2">
+													<Icon
+														name="alert-circle"
+														className="h-4 w-4 text-red-500"
+													/>
+													<p className="text-red-600 text-xs">
+														{formState.errors.customReturnPath.message}
 													</p>
-													{formState.errors.customReturnPath && (
-														<div className="flex items-center gap-2">
-															<Icon name="alert-circle" className="h-4 w-4 text-red-500" />
-															<p className="text-red-600 text-sm">
-																{formState.errors.customReturnPath.message}
-															</p>
-														</div>
-													)}
-												</motion.div>
+												</div>
+											)}
+										</div>
+									</div>
+								</motion.section>
+							</div>
 
-												<motion.div
-													initial={{ opacity: 0, y: 10 }}
-													animate={{ opacity: 1, y: 0 }}
-													transition={{ duration: 0.35, delay: 0.1 }}
-													className="grid gap-2"
-												>
-													<Label.Root className="block font-medium text-sm">
-														TLS Mode
-													</Label.Root>
-													<Dropdown.Root open={tlsOpen} onOpenChange={setTlsOpen}>
-														<Dropdown.Trigger asChild>
-															<button
-																type="button"
-																className="group/trigger flex h-9 min-h-9 w-full items-center gap-2 rounded-lg bg-bg-white-0 pl-2.5 pr-2 text-left text-paragraph-sm text-text-strong-950 outline-none ring-1 ring-inset ring-stroke-soft-100 transition duration-200 ease-out hover:bg-bg-weak-50 hover:ring-transparent focus:shadow-button-important-focus focus:outline-none focus:ring-stroke-strong-950"
-															>
-																<span>{currentTlsOption.label}</span>
-																<Icon
-																	name="chevron-down"
-																	className={cn(
-																		"ml-auto size-5 shrink-0 text-text-sub-600 transition duration-200 ease-out",
-																		tlsOpen && "rotate-180",
-																	)}
-																/>
-															</button>
-														</Dropdown.Trigger>
-														<Dropdown.Content align="start" className="w-[var(--radix-dropdown-menu-trigger-width)] p-2">
-															<div className="relative">
-																{tlsOptions.map((option, idx) => {
-																	const isSelected = tlsValue === option.value;
-																	return (
-																		<button
-																			key={option.value}
-																			ref={(el) => {
-																				if (el) buttonRefs.current[idx] = el;
-																			}}
-																			type="button"
-																			onPointerEnter={() => setHoverIdx(idx)}
-																			onPointerLeave={() => setHoverIdx(undefined)}
-																			onClick={() => {
-																				setValue(
-																					"tls",
-																					option.value as DomainFormValues["tls"],
-																					{
-																						shouldValidate: true,
-																						shouldDirty: true,
-																					},
-																				);
-																				setTlsOpen(false);
-																			}}
-																			className={cn(
-																				"flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-sm text-text-strong-950 transition-colors",
-																				!currentRect &&
-																					hoverIdx === idx &&
-																					"bg-neutral-alpha-10",
-																			)}
-																		>
-																			<span>{option.label}</span>
-																			{isSelected && (
-																				<Icon
-																					name="check"
-																					className="ml-auto h-4 w-4 text-text-sub-600"
-																				/>
-																			)}
-																		</button>
-																	);
-																})}
-																<AnimatedHoverBackground
-																	rect={currentRect}
-																	tabElement={currentTab}
-																/>
-															</div>
-														</Dropdown.Content>
-													</Dropdown.Root>
-													<p className="text-paragraph-xs text-text-sub-600">
-														Enforced TLS requires a secure connection to the receiving
-														mail server.
-													</p>
-												</motion.div>
-
-												<motion.div
-													initial={{ opacity: 0, y: 10 }}
-													animate={{ opacity: 1, y: 0 }}
-													transition={{ duration: 0.35, delay: 0.15 }}
-													className="grid gap-2.5 sm:grid-cols-2"
-												>
-													<motion.button
-														type="button"
-														whileHover={{ y: -2 }}
-														whileTap={{ scale: 0.995 }}
-														onClick={() => setClickTracking((value) => !value)}
-														className={cn(
-															"rounded-2xl border p-3 text-left transition-all duration-300",
-															clickTracking
-																? "border-stroke-soft-300 bg-bg-weak-50 shadow-regular-xs"
-																: "border-stroke-soft-200 bg-bg-white-0",
-														)}
-													>
-														<div className="flex items-start justify-between gap-4">
-															<div className="space-y-1">
-																<p className="font-medium text-paragraph-sm text-text-strong-950">
-																	Click Tracking
-																</p>
-																<p className="max-w-[220px] text-paragraph-xs text-text-sub-600">
-																	Rewrite links to measure clicks.
-																</p>
-															</div>
-															<motion.div
-																animate={{ scale: clickTracking ? 1.04 : 1 }}
-																transition={{ duration: 0.22 }}
-															>
-																<Switch.Root
-																	checked={clickTracking}
-																	onCheckedChange={setClickTracking}
-																	onClick={(event) => event.stopPropagation()}
-																	disabled={status === "loading"}
-																/>
-															</motion.div>
-														</div>
-													</motion.button>
-													<motion.button
-														type="button"
-														whileHover={{ y: -2 }}
-														whileTap={{ scale: 0.995 }}
-														onClick={() => setOpenTracking((value) => !value)}
-														className={cn(
-															"rounded-2xl border p-3 text-left transition-all duration-300",
-															openTracking
-																? "border-stroke-soft-300 bg-bg-weak-50 shadow-regular-xs"
-																: "border-stroke-soft-200 bg-bg-white-0",
-														)}
-													>
-														<div className="flex items-start justify-between gap-4">
-															<div className="space-y-1">
-																<p className="font-medium text-paragraph-sm text-text-strong-950">
-																	Open Tracking
-																</p>
-																<p className="max-w-[220px] text-paragraph-xs text-text-sub-600">
-																	Measure opens using a tracking pixel.
-																</p>
-															</div>
-															<motion.div
-																animate={{ scale: openTracking ? 1.04 : 1 }}
-																transition={{ duration: 0.22 }}
-															>
-																<Switch.Root
-																	checked={openTracking}
-																	onCheckedChange={setOpenTracking}
-																	onClick={(event) => event.stopPropagation()}
-																	disabled={status === "loading"}
-																/>
-															</motion.div>
-														</div>
-													</motion.button>
-												</motion.div>
-											</div>
-										</section>
-								</motion.div>
-							</motion.section>
-
-							<motion.div
-								initial={false}
-								layout="position"
-								animate={{
-									y: hasDomainValue ? 0 : 6,
-									opacity: hasDomainValue ? 1 : 0.92,
-								}}
-								transition={{
-									duration: matchedRevealTransition.duration,
-									ease: matchedRevealTransition.ease,
-									layout: matchedRevealTransition,
-								}}
-								className="sticky bottom-0 z-10"
-							>
+							<div className="sticky bottom-0 z-10">
 								<div className="w-full rounded-2xl bg-bg-white-0/92 shadow-[0_16px_40px_-28px_rgba(18,18,23,0.28)] backdrop-blur">
 									<Button.Root
 										type="submit"
@@ -529,27 +336,17 @@ export const AddDomainSidebar = () => {
 										)}
 									</Button.Root>
 								</div>
-							</motion.div>
+							</div>
 						</motion.form>
 					</div>
 				</div>
 
-				{/* Right side preview */}
 				<div className="relative hidden h-full min-w-0 flex-1 overflow-hidden bg-bg-weak-50/10 lg:flex">
-					<motion.div
-						initial={{ opacity: 0, x: 24 }}
-						animate={{ opacity: 1, x: 0 }}
-						transition={{ duration: 0.55, delay: 0.12, ease: "easeOut" }}
-						className="fade-in slide-in-from-bottom-8 relative z-10 h-full w-full animate-in duration-700"
-					>
-						<motion.div
-							animate={{ y: [0, -6, 0] }}
-							transition={{ duration: 6, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-							className="flex h-full items-start justify-center px-8 pt-10 pb-12"
-						>
+					<div className="relative z-10 h-full w-full">
+						<div className="flex h-full items-start justify-center px-8 pt-10 pb-12">
 							<DomainPreview domain={watch("domain")} variant="domain" />
-						</motion.div>
-					</motion.div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>

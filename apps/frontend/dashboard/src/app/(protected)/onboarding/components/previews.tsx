@@ -476,6 +476,7 @@ export const DomainPreview = ({
 						? "w-[920px] transform overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-2xl transition-all"
 						: "w-[1000px] transform overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-2xl transition-all"
 				}
+				style={isDomainVariant ? { maxHeight: "calc(100% + 16px)" } : undefined}
 			>
 				{/* Browser Window Header */}
 				<div className="flex items-center gap-2 border-stroke-soft-100 border-b bg-bg-weak-50 px-4 py-3">
@@ -491,7 +492,7 @@ export const DomainPreview = ({
 				<div
 					className={
 						isDomainVariant
-							? "relative bg-bg-white-0 px-6 pt-5 pb-4"
+							? "relative bg-bg-white-0 px-6 pt-5 pb-0"
 							: "relative bg-bg-white-0 p-6"
 					}
 				>
@@ -545,13 +546,15 @@ export const DomainPreview = ({
 								</span>
 							</div>
 
+							{!isDomainVariant && (
 							<div className="mb-2 flex cursor-pointer items-center gap-1 text-text-soft-400 text-xs">
 								to me{" "}
 								<div className="mt-0.5 h-0 w-0 border-t-[4px] border-t-text-soft-400 border-r-[3px] border-r-transparent border-l-[3px] border-l-transparent" />
 							</div>
+							)}
 
 							{/* Email Details Dropdown */}
-							<div className="fade-in slide-in-from-top-2 relative mt-2 animate-in duration-500">
+							<div className="relative mt-2">
 								<div
 									className={
 										isDomainVariant
@@ -677,51 +680,21 @@ export const DomainPreview = ({
 					</div>
 
 					{/* Email Body Skeleton */}
-					<div
-						className={
-							isDomainVariant
-								? "mt-5 space-y-4"
-								: "mt-8 space-y-4 opacity-40 blur-[0.5px]"
-						}
-					>
-						<div
-							className={
-								isDomainVariant
-									? "h-4 w-full rounded bg-bg-weak-50"
-									: "h-4 w-full rounded bg-bg-soft-200"
-							}
-						/>
-						{!isDomainVariant && (
-							<>
-								<div className="h-4 w-11/12 rounded bg-bg-soft-200" />
-								<div className="h-4 w-4/5 rounded bg-bg-soft-200" />
-							</>
-						)}
+					{!isDomainVariant && (
+					<div className="mt-8 space-y-4 opacity-40 blur-[0.5px]">
+						<div className="h-4 w-full rounded bg-bg-soft-200" />
+						<div className="h-4 w-11/12 rounded bg-bg-soft-200" />
+						<div className="h-4 w-4/5 rounded bg-bg-soft-200" />
 
-						<div
-							className={
-								isDomainVariant
-									? "flex h-36 w-full items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-weak-50 text-text-soft-400"
-									: "mt-8 flex h-40 w-full items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-weak-50 text-text-soft-400"
-							}
-						>
-							{isDomainVariant ? (
-								<Icon name="info" />
-							) : (
-								<Icon name="info" />
-							)}
+						<div className="mt-8 flex h-40 w-full items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-weak-50 text-text-soft-400">
+							<Icon name="info" />
 						</div>
 
-						<div className={isDomainVariant ? "hidden" : "mt-6 flex justify-center"}>
-							<div
-								className={
-									isDomainVariant
-										? "h-8 w-28 rounded-lg bg-bg-soft-200/90"
-										: "h-10 w-32 rounded-lg bg-primary-lighter"
-								}
-							/>
+						<div className="mt-6 flex justify-center">
+							<div className="h-10 w-32 rounded-lg bg-primary-lighter" />
 						</div>
 					</div>
+					)}
 				</div>
 			</div>
 		</div>
