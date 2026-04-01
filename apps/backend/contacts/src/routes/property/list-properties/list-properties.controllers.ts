@@ -2,6 +2,7 @@ import type { PropertyTypes } from "@be/contacts/types/property.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import type { Logger } from "@reloop/logger";
+import { PROPERTY_LIST_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, desc, eq, ilike, isNull, type SQL, sql } from "drizzle-orm";
 
 export const listPropertiesController = async ({
@@ -51,10 +52,18 @@ export const listPropertiesController = async ({
     );
     return {
       object: "contact_property",
-      properties: rows.map((r) => ({ ...r.property, object: "contact_property" })),
+      properties: rows.map((r) => ({
+        id: r.property.id,
+        propertyName: r.property.propertyName,
+        propertyType: r.property.propertyType,
+        defaultValue: r.property.defaultValue,
+        createdAt: r.property.createdAt,
+        updatedAt: r.property.updatedAt,
+      })),
       total: Number(rows[0]?.total ?? 0),
       page,
       limit,
+      event: PROPERTY_LIST_WEBHOOK_EVENT.id,
     };
   } catch (error) {
     logger.error({ error }, "Debug listing properties");

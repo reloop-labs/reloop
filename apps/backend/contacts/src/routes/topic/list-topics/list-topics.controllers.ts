@@ -2,6 +2,7 @@ import type { TopicTypes } from "@be/contacts/types/topic.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import type { Logger } from "@reloop/logger";
+import { TOPIC_LIST_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, desc, eq, isNull, sql } from "drizzle-orm";
 
 export const listTopicsController = async ({
@@ -38,13 +39,25 @@ export const listTopicsController = async ({
       .limit(limit)
       .offset(offset);
 
-    logger.info({ total: rows[0]?.total ?? 0, page, limit }, "Topics listed successfully");
+    logger.info(
+      { total: rows[0]?.total ?? 0, page, limit },
+      "Topics listed successfully",
+    );
     return {
       object: "topic",
-      topics: rows.map(({ topic }) => topic),
+      topics: rows.map(({ topic }) => ({
+        id: topic.id,
+        name: topic.name,
+        description: topic.description,
+        defaultSubscription: topic.defaultSubscription,
+        visibility: topic.visibility,
+        createdAt: topic.createdAt,
+        updatedAt: topic.updatedAt,
+      })),
       total: Number(rows[0]?.total ?? 0),
       page,
       limit,
+      event: TOPIC_LIST_WEBHOOK_EVENT.id,
     };
   } catch (error) {
     logger.error({ error }, "Debug listing topics");

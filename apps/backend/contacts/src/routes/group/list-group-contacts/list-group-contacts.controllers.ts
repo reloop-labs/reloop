@@ -3,6 +3,7 @@ import type { GroupModel } from "@be/contacts/model/group.model";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import type { Logger } from "@reloop/logger";
+import { GROUP_LIST_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, asc, eq, isNull, sql } from "drizzle-orm";
 
 export const listGroupContactsController = async ({
@@ -111,6 +112,7 @@ export const listGroupContactsController = async ({
       total,
       page,
       limit,
+      event: GROUP_LIST_WEBHOOK_EVENT.id,
     };
   } catch (error) {
     logger.error({ group_id, error }, "Error listing group contacts");

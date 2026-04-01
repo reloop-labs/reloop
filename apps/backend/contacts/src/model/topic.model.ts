@@ -114,7 +114,7 @@ export namespace TopicModel {
 
 	export type TopicResponse = typeof topicResponse.static;
 
-	export const topicListItem = t.Omit(topicResponse, ["object"]);
+	export const topicListItem = t.Omit(topicResponse, ["object", "event"]);
 	export type TopicListItem = typeof topicListItem.static;
 
 	// Topic List Response
@@ -124,6 +124,7 @@ export namespace TopicModel {
 		total: t.Number(),
 		page: t.Number(),
 		limit: t.Number(),
+		event: t.String({ description: "Event ID for the list request" }),
 	});
 
 	export type TopicListResponse = typeof topicListResponse.static;

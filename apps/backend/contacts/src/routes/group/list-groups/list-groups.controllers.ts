@@ -6,6 +6,7 @@ import type {
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import type { Logger } from "@reloop/logger";
+import { GROUP_LIST_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, desc, eq, ilike, isNull, sql } from "drizzle-orm";
 
 export const listGroupsController = async ({
@@ -47,10 +48,16 @@ export const listGroupsController = async ({
 
     return {
       object: "contact_group",
-      groups: rows.map((r) => r.group) as GroupListItem[],
+      groups: rows.map((r) => ({
+        id: r.group.id,
+        name: r.group.name,
+        createdAt: r.group.createdAt,
+        updatedAt: r.group.updatedAt,
+      })),
       total: Number(rows[0]?.total ?? 0),
       page,
       limit,
+      event: GROUP_LIST_WEBHOOK_EVENT.id,
     };
   } catch (error) {
     logger.error({ error }, "Debug listing groups");

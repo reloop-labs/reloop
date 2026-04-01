@@ -2,6 +2,7 @@ import type { ContactTypes } from "@be/contacts/types/contact.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import type { Logger } from "@reloop/logger";
+import { CONTACT_LIST_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import {
   and,
   count,
@@ -144,6 +145,7 @@ export async function listContactsController({
       totalContacts,
       subscribedContacts,
       unsubscribedContacts,
+      event: CONTACT_LIST_WEBHOOK_EVENT.id,
     };
   } catch (error) {
     logger.error(

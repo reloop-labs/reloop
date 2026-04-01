@@ -120,6 +120,38 @@ export const PROPERTY_UPDATE_WEBHOOK_EVENT = {
 	isActive: true,
 } as const satisfies WebhookEventDefinition;
 
+export const CONTACT_LIST_WEBHOOK_EVENT = {
+	id: "contact.list",
+	name: "contact.list",
+	category: "contact",
+	description: "Triggered when contacts are listed",
+	isActive: true,
+} as const satisfies WebhookEventDefinition;
+
+export const GROUP_LIST_WEBHOOK_EVENT = {
+	id: "contact.group.list",
+	name: "contact.group.list",
+	category: "contact",
+	description: "Triggered when groups are listed",
+	isActive: true,
+} as const satisfies WebhookEventDefinition;
+
+export const TOPIC_LIST_WEBHOOK_EVENT = {
+	id: "contact.topic.list",
+	name: "contact.topic.list",
+	category: "contact",
+	description: "Triggered when topics are listed",
+	isActive: true,
+} as const satisfies WebhookEventDefinition;
+
+export const PROPERTY_LIST_WEBHOOK_EVENT = {
+	id: "contact.property.list",
+	name: "contact.property.list",
+	category: "contact",
+	description: "Triggered when properties are listed",
+	isActive: true,
+} as const satisfies WebhookEventDefinition;
+
 export const CONTACT_WEBHOOK_EVENTS = [
 	CONTACT_CREATE_WEBHOOK_EVENT,
 	CONTACT_UPDATE_WEBHOOK_EVENT,
@@ -136,4 +168,8 @@ export const CONTACT_WEBHOOK_EVENTS = [
 	PROPERTY_CREATE_WEBHOOK_EVENT,
 	PROPERTY_UPDATE_WEBHOOK_EVENT,
 	PROPERTY_DELETE_WEBHOOK_EVENT,
+	CONTACT_LIST_WEBHOOK_EVENT,
+	GROUP_LIST_WEBHOOK_EVENT,
+	TOPIC_LIST_WEBHOOK_EVENT,
+	PROPERTY_LIST_WEBHOOK_EVENT,
 ] as const satisfies readonly WebhookEventDefinition[];

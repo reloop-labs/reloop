@@ -56,7 +56,7 @@ export namespace GroupModel {
 
 	export type GroupResponse = typeof groupResponse.static;
 
-	export const groupListItem = t.Omit(groupResponse, ["object"]);
+	export const groupListItem = t.Omit(groupResponse, ["object", "event"]);
 	export type GroupListItem = typeof groupListItem.static;
 
 	// Group List Response
@@ -66,6 +66,7 @@ export namespace GroupModel {
 		total: t.Number(),
 		page: t.Number(),
 		limit: t.Number(),
+		event: t.String({ description: "Event ID for the list request" }),
 	});
 
 	export type GroupListResponse = typeof groupListResponse.static;

@@ -96,7 +96,7 @@ export namespace PropertyModel {
 
 	export type PropertyResponse = typeof propertyResponse.static;
 
-	export const propertyListItem = t.Omit(propertyResponse, ["object"]);
+	export const propertyListItem = t.Omit(propertyResponse, ["object", "event"]);
 	export type PropertyListItem = typeof propertyListItem.static;
 
 	export const propertyListResponse = t.Object({
@@ -105,6 +105,7 @@ export namespace PropertyModel {
 		total: t.Number(),
 		page: t.Number(),
 		limit: t.Number(),
+		event: t.String({ description: "Event ID for the list request" }),
 	});
 
 	export type PropertyListResponse = typeof propertyListResponse.static;

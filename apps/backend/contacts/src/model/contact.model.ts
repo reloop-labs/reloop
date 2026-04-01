@@ -223,7 +223,7 @@ export namespace ContactModel {
 
 	export type ContactResponse = typeof contactResponse.static;
 
-	export const contactListItem = t.Omit(contactResponse, ["object"]);
+	export const contactListItem = t.Omit(contactResponse, ["object", "event"]);
 	export type ContactListItem = typeof contactListItem.static;
 
 	export const contactListResponse = t.Object({
@@ -241,6 +241,7 @@ export namespace ContactModel {
 		unsubscribedContacts: t.Number({
 			description: "Total number of unsubscribed contacts",
 		}),
+		event: t.String({ description: "Event ID for the list request" }),
 	});
 
 	export type ContactListResponse = typeof contactListResponse.static;
@@ -289,7 +290,7 @@ export namespace ContactModel {
 	export const groupContactListResponse = t.Object({
 		object: t.Literal("contact_group", { default: "contact_group" }),
 		group: t.Object({
-			id: t.String({ description: "Unique group identifier" }),
+			id: t.String({ description: "Group ID" }),
 			name: t.String({ description: "Group name" }),
 			createdAt: t.Date(),
 			updatedAt: t.Date(),
@@ -298,6 +299,7 @@ export namespace ContactModel {
 		total: t.Number(),
 		page: t.Number(),
 		limit: t.Number(),
+		event: t.String({ description: "Event ID for the list request" }),
 	});
 
 	export type GroupContactListResponse = typeof groupContactListResponse.static;
