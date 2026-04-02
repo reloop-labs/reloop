@@ -21,7 +21,7 @@ export namespace WebhookTypes {
 		id: string;
 		name: string;
 		url: string;
-		secret: string | null;
+		secret: string;
 		organizationId: string;
 		userId: string;
 		status: "active" | "paused" | "disabled" | "failed";

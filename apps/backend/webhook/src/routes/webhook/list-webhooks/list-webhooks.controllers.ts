@@ -44,7 +44,7 @@ export async function listWebhooksController({
 				id: webhook.id,
 				name: webhook.name,
 				url: webhook.url,
-				secret: webhook.secret ? "***masked***" : null,
+				secret: webhook.secret,
 				organizationId: webhook.organizationId,
 				userId: webhook.userId,
 				status: webhook.status,

@@ -172,8 +172,8 @@ export namespace WebhookModel {
 			id: t.String({ description: "Unique webhook identifier" }),
 			name: t.String({ description: "Webhook name" }),
 			url: t.String({ description: "Webhook URL" }),
-			secret: t.Union([t.String(), t.Null()], {
-				description: "Webhook secret",
+			secret: t.String({
+				description: "Masked webhook secret",
 			}),
 			organizationId: t.String({ description: "Organization ID" }),
 			userId: t.String({ description: "User ID" }),

@@ -68,7 +68,7 @@ export async function createWebhookController({
 			id: newWebhook.id,
 			name: newWebhook.name,
 			url: newWebhook.url,
-			secret: newWebhook.secret ? "***masked***" : null,
+			secret: newWebhook.secret,
 			organizationId: newWebhook.organizationId,
 			userId: newWebhook.userId,
 			status: newWebhook.status,

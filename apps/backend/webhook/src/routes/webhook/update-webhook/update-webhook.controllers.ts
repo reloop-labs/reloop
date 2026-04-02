@@ -95,7 +95,7 @@ export async function updateWebhookController({
 			id: updatedWebhook.id,
 			name: updatedWebhook.name,
 			url: updatedWebhook.url,
-			secret: updatedWebhook.secret ? "***masked***" : null,
+			secret: updatedWebhook.secret,
 			organizationId: updatedWebhook.organizationId,
 			userId: updatedWebhook.userId,
 			status: updatedWebhook.status,
