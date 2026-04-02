@@ -1,6 +1,10 @@
 "use client";
 import { SomethingWentWrong } from "@fe/dashboard/components/something-went-wrong";
+import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import type { DomainNameserversResponse, DomainResponse } from "@reloop/api";
+import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
+import { Skeleton } from "@reloop/ui/skeleton";
 import axios from "axios";
 import { useParams } from "next/navigation";
 import * as React from "react";
@@ -9,8 +13,31 @@ import { toast } from "sonner";
 import useSWR, { mutate } from "swr";
 import { DNSRecordsSection } from "./components/DNSRecordsSection";
 import { DomainHeader } from "./components/DomainHeader";
-import { StatusBanner } from "./components/StatusBanner";
 import { groupDomainDnsRecords } from "./components/dns-record-groups";
+import { DomainEvents } from "./components/domain-events";
+
+const getStatusBadgeStyles = (status: string) => {
+	switch (status.toLowerCase()) {
+		case "active":
+			return "border border-success-base text-success-base bg-success-light/20";
+		case "suspended":
+		case "failed":
+			return "border border-error-base text-error-base bg-error-light/20";
+		case "verifying":
+			return "border border-warning-base text-warning-base bg-warning-light/20";
+		default:
+			return "border border-stroke-soft-200 text-text-sub-600 bg-neutral-alpha-10";
+	}
+};
+
+const formatStatusLabel = (status: string) => {
+	switch (status.toLowerCase()) {
+		case "start-verify":
+			return "Pending";
+		default:
+			return status.charAt(0).toUpperCase() + status.slice(1);
+	}
+};
 
 const inferDnsProvider = (nameservers: string[] | null | undefined) => {
 	if (!nameservers?.length) return null;
@@ -36,7 +63,25 @@ const inferDnsProvider = (nameservers: string[] | null | undefined) => {
 		return { label: "Namecheap", iconKey: "siNamecheap" };
 	}
 
-	return null;
+	// Fallback: extract domain name from the first nameserver (e.g., ns.udag.org -> Udag)
+	let fallbackLabel = normalized[0] || "Unknown";
+	try {
+		const parts = fallbackLabel.split(".");
+		if (parts.length >= 2) {
+			let name = parts[parts.length - 2];
+			// basic attempt to skip tlds like co.uk
+			if (name === "co" || name === "com" || name === "org" || name === "net") {
+				name = parts[parts.length - 3] || parts[parts.length - 2];
+			}
+			if (name) {
+				fallbackLabel = name.charAt(0).toUpperCase() + name.slice(1);
+			}
+		}
+	} catch {
+		// Ignore any parsing errors
+	}
+
+	return { label: fallbackLabel, iconKey: null as string | null };
 };
 
 const DomainPage = () => {
@@ -140,7 +185,8 @@ const DomainPage = () => {
 	const { sendingRecords, receivingRecords, dmarcRecords } =
 		groupDomainDnsRecords(domainData?.dnsRecords);
 	const dnsProvider = inferDnsProvider(nameserverData?.nameservers);
-	const dnsIcon = dnsProvider
+
+	const dnsIcon = dnsProvider?.iconKey
 		? ((simpleIcons as Record<string, { svg: string; hex: string }>)[
 				dnsProvider.iconKey
 			] ?? null)
@@ -166,99 +212,131 @@ const DomainPage = () => {
 
 	return (
 		<div className="mx-auto max-w-3xl sm:px-8">
-			<DomainHeader
-				domainRecordId={domainData?.id || (domainId as string)}
-				domainId={domainData?.domain || (domainId as string)}
-				status={domainData?.status || "start-verify"}
-				isLoading={isLoading}
-				lastUpdated={domainData?.createdAt || undefined}
-				onVerify={handleVerifyDNS}
-				isVerifying={isVerifying}
-			/>
-			<StatusBanner
-				status={domainData?.status || "start-verify"}
-				isLoading={isLoading}
-			/>
-			<div className="mt-4 rounded-2xl border border-stroke-soft-200 p-5 shadow-regular-md ring-1 ring-stroke-soft-200 ring-inset">
-				<div className="mb-3">
-					<div className="flex items-center gap-2">
-						<div className="font-medium text-sm text-text-strong-950">
-							Nameservers
+			<div className="mx-auto max-w-3xl sm:px-8">
+				<DomainHeader
+					domainRecordId={domainData?.id || (domainId as string)}
+					domainId={domainData?.domain || (domainId as string)}
+					status={domainData?.status || "start-verify"}
+					isLoading={isLoading}
+					lastUpdated={domainData?.createdAt || undefined}
+					onVerify={handleVerifyDNS}
+					isVerifying={isVerifying}
+				/>
+				<div className="mt-10 grid grid-cols-3 gap-x-12 gap-y-6">
+					{/* Created */}
+					<div className="flex flex-col gap-1.5">
+						<div className="flex items-center gap-1.5">
+							<Icon name="calendar" className="h-3.5 w-3.5 text-text-sub-600" />
+							<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
+								Created
+							</span>
 						</div>
-						{dnsProvider && dnsIcon && (
-							<div className="inline-flex items-center gap-1 rounded-full border border-stroke-soft-200 bg-bg-weak-50 px-2 py-1 text-xs text-text-sub-600">
-								<span
-									className="h-3.5 w-3.5"
-									style={{ color: `#${dnsIcon.hex}` }}
-									dangerouslySetInnerHTML={{ __html: dnsIcon.svg }}
-								/>
-								<span>{dnsProvider.label}</span>
+						{isLoading ? (
+							<Skeleton className="h-5 w-24 rounded-lg" />
+						) : (
+							<span className="font-medium text-paragraph-sm text-text-strong-950">
+								{domainData?.createdAt
+									? formatRelativeTime(domainData.createdAt)
+									: "---"}
+							</span>
+						)}
+					</div>
+
+					{/* Status */}
+					<div className="flex flex-col gap-1.5">
+						<div className="flex items-center gap-1.5">
+							<Icon name="activity" className="h-3.5 w-3.5 text-text-sub-600" />
+							<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
+								Status
+							</span>
+						</div>
+						{isLoading ? (
+							<Skeleton className="h-5 w-20 rounded-lg" />
+						) : (
+							<span
+								className={cn(
+									"inline-flex w-fit rounded-md border-[1px] px-[6px] py-0.5 font-medium text-[10px]",
+									getStatusBadgeStyles(domainData?.status || "start-verify"),
+								)}
+							>
+								{formatStatusLabel(domainData?.status || "start-verify")}
+							</span>
+						)}
+					</div>
+
+					{/* Provider */}
+					<div className="flex flex-col gap-1.5">
+						<div className="flex items-center gap-1.5">
+							<Icon name="server" className="h-3.5 w-3.5 text-text-sub-600" />
+							<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
+								Provider
+							</span>
+						</div>
+						{isLoading || isLoadingNameservers ? (
+							<Skeleton className="h-5 w-24 rounded-lg" />
+						) : (
+							<div className="mt-0.5 flex items-center gap-1.5">
+								{dnsProvider ? (
+									<div className="flex items-center gap-1.5 text-sm text-text-strong-950">
+										{dnsIcon && (
+											<span
+												className="h-4 w-4"
+												style={{ color: `#${dnsIcon.hex}` }}
+												// biome-ignore lint/security/noDangerouslySetInnerHtml: Trusted SVG from simple-icons
+												dangerouslySetInnerHTML={{ __html: dnsIcon.svg }}
+											/>
+										)}
+										<span className="font-medium text-paragraph-sm underline decoration-stroke-soft-200 decoration-dashed underline-offset-4">
+											{dnsProvider.label}
+										</span>
+									</div>
+								) : (
+									<span className="font-medium text-paragraph-sm text-text-soft-400 italic">
+										Unknown
+									</span>
+								)}
 							</div>
 						)}
 					</div>
-					<div className="text-paragraph-sm text-text-sub-600">
-						Current nameservers detected for this domain.
-					</div>
 				</div>
-				{isLoadingNameservers ? (
-					<div className="text-paragraph-sm text-text-sub-600">
-						Loading nameservers...
-					</div>
-				) : nameserverData?.nameservers?.length ? (
-					<div className="space-y-2">
-						{nameserverData.nameservers.map((nameserver, index) => (
-							<button
-								key={`${nameserver}-${index}`}
-								type="button"
-								onClick={() =>
-									copyToClipboard(nameserver, `nameserver-${index}`)
-								}
-								className="flex w-full items-center justify-between rounded-xl border border-stroke-soft-200 px-3 py-2 text-left transition-colors hover:bg-bg-weak-50/50"
-							>
-								<span className="font-mono text-label-sm text-text-strong-950">
-									{nameserver}
-								</span>
-								<span className="text-text-sub-600 text-xs">
-									{copiedItems.has(`nameserver-${index}`) ? "Copied" : "Copy"}
-								</span>
-							</button>
-						))}
-					</div>
-				) : (
-					<div className="text-paragraph-sm text-text-sub-600">
-						No nameservers found for this domain yet.
-					</div>
+
+				{domainData && (
+					<DomainEvents
+						domain={domainData}
+						providerLabel={dnsProvider?.label}
+					/>
 				)}
+
+				<div className="my-9">
+					<div className="w-full border-stroke-soft-200 border-t border-dashed" />
+				</div>
+				<DNSRecordsSection
+					sendingRecords={sendingRecords}
+					receivingRecords={receivingRecords}
+					dmarcRecords={dmarcRecords}
+					sendingEmail={domainData?.sendingEmail}
+					receivingEmail={domainData?.receivingEmail}
+					onToggleSending={(value) =>
+						handleUpdateDomain(
+							{ sendingEmail: value },
+							setIsUpdatingSending,
+							`Sending email ${value ? "enabled" : "disabled"}`,
+						)
+					}
+					onToggleReceiving={(value) =>
+						handleUpdateDomain(
+							{ receivingEmail: value },
+							setIsUpdatingReceiving,
+							`Receiving email ${value ? "enabled" : "disabled"}`,
+						)
+					}
+					isUpdatingSending={isUpdatingSending}
+					isUpdatingReceiving={isUpdatingReceiving}
+					onCopyToClipboard={copyToClipboard}
+					copiedItems={copiedItems}
+					isLoading={isLoading}
+				/>
 			</div>
-			<div className="my-9">
-				<div className="w-full border-stroke-soft-200 border-t border-dashed" />
-			</div>
-			<DNSRecordsSection
-				sendingRecords={sendingRecords}
-				receivingRecords={receivingRecords}
-				dmarcRecords={dmarcRecords}
-				sendingEmail={domainData?.sendingEmail}
-				receivingEmail={domainData?.receivingEmail}
-				onToggleSending={(value) =>
-					handleUpdateDomain(
-						{ sendingEmail: value },
-						setIsUpdatingSending,
-						`Sending email ${value ? "enabled" : "disabled"}`,
-					)
-				}
-				onToggleReceiving={(value) =>
-					handleUpdateDomain(
-						{ receivingEmail: value },
-						setIsUpdatingReceiving,
-						`Receiving email ${value ? "enabled" : "disabled"}`,
-					)
-				}
-				isUpdatingSending={isUpdatingSending}
-				isUpdatingReceiving={isUpdatingReceiving}
-				onCopyToClipboard={copyToClipboard}
-				copiedItems={copiedItems}
-				isLoading={isLoading}
-			/>
 		</div>
 	);
 };

@@ -68,7 +68,7 @@ export const DomainHeader = ({
 	const isDanger = hoveredItem?.isDanger ?? false;
 
 	return (
-		<div className="pt-10 pb-8">
+		<div className="pt-10">
 			<AnimatedBackButton onClick={() => push("/domain")} />
 			<div className="flex items-center justify-between pt-6">
 				<div>
