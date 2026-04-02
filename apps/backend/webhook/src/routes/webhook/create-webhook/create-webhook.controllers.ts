@@ -16,13 +16,7 @@ export async function createWebhookController({
 	url: string;
 	events: string[];
 }): Promise<WebhookTypes.WebhookResponse> {
-	logger.info(
-		{
-			url,
-			events,
-		},
-		"Creating webhook",
-	);
+	logger.info({ url, events }, "Creating webhook");
 
 	try {
 		const [newWebhook] = await db
@@ -81,15 +75,7 @@ export async function createWebhookController({
 			updatedAt: newWebhook.updatedAt.toISOString(),
 		};
 	} catch (error) {
-		logger.error(
-			{
-				url,
-				organizationId,
-				userId,
-				error,
-			},
-			"Error creating webhook",
-		);
+		logger.error({ url, error, }, "Error creating webhook",);
 		throw error;
 	}
 }
