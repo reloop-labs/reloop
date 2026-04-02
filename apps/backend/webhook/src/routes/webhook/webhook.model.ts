@@ -11,75 +11,20 @@ export namespace WebhookModel {
 
 	export const createWebhookBody = t.Object(
 		{
-			name: t.String({
-				minLength: 1,
-				maxLength: 255,
-				description: "Webhook name",
-			}),
 			url: t.String({
 				pattern: urlPattern.source,
 				description: "Webhook URL",
 			}),
-			secret: t.Optional(
-				t.String({
-					minLength: 8,
-					maxLength: 255,
-					description: "Webhook secret for HMAC signature verification",
-				}),
-			),
-			customHeaders: t.Optional(
-				t.Record(t.String(), t.String(), {
-					description: "Custom headers to include in webhook requests",
-				}),
-			),
-			rateLimitEnabled: t.Optional(
-				t.Boolean({
-					default: true,
-					description: "Enable rate limiting",
-				}),
-			),
-			maxRequestsPerMinute: t.Optional(
-				t.Number({
-					minimum: 1,
-					maximum: 1000,
-					default: 60,
-					description: "Maximum requests per minute",
-				}),
-			),
-			maxRetries: t.Optional(
-				t.Number({
-					minimum: 0,
-					maximum: 10,
-					default: 3,
-					description: "Maximum retry attempts",
-				}),
-			),
-			retryBackoffMultiplier: t.Optional(
-				t.Number({
-					minimum: 1,
-					maximum: 10,
-					default: 2,
-					description: "Retry backoff multiplier",
-				}),
-			),
-			filteringOptions: t.Optional(
-				t.Record(t.String(), t.Any(), {
-					description: "Event filtering options",
-				}),
-			),
+			events: t.Array(t.String(), {
+				minItems: 1,
+				description: "Array of event IDs to subscribe to",
+			}),
 		},
 		{
 			examples: [
 				{
-					name: "Payments Webhook",
 					url: "https://example.com/webhooks/reloop",
-					customHeaders: {
-						"x-source": "reloop",
-					},
-					rateLimitEnabled: true,
-					maxRequestsPerMinute: 60,
-					maxRetries: 3,
-					retryBackoffMultiplier: 2,
+					events: ["payment.created", "payment.failed"],
 				},
 			],
 		},

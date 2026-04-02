@@ -2,59 +2,44 @@ import { createId } from "@paralleldrive/cuid2";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
-import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 import type { WebhookTypes } from "../webhook.type";
 
 export async function createWebhookController({
 	organizationId,
 	userId,
-	body,
+	url,
+	events,
 }: {
 	organizationId: string;
 	userId: string;
-	body: WebhookTypes.CreateWebhookRequest;
+	url: string;
+	events: string[];
 }): Promise<WebhookTypes.WebhookResponse> {
 	logger.info(
 		{
-			name: body.name,
-			url: body.url,
+			url,
+			events,
 		},
 		"Creating webhook",
 	);
 
 	try {
-		const existingWebhook = await db
-			.select({ id: schema.webhook.id })
-			.from(schema.webhook)
-			.where(
-				and(
-					eq(schema.webhook.name, body.name),
-					eq(schema.webhook.organizationId, organizationId),
-					isNull(schema.webhook.deletedAt),
-				),
-			)
-			.limit(1);
-
-		if (existingWebhook[0]) {
-			throw status(409, { message: "Webhook name already exists" });
-		}
-
 		const [newWebhook] = await db
 			.insert(schema.webhook)
 			.values({
-				name: body.name,
-				url: body.url,
-				secret: body.secret || `whsec_${createId()}`,
+				name: `webhook_${createId()}`,
+				url,
+				secret: `whsec_${createId()}`,
 				organizationId,
 				userId,
 				status: "active",
-				customHeaders: body.customHeaders || null,
-				rateLimitEnabled: body.rateLimitEnabled ?? true,
-				maxRequestsPerMinute: body.maxRequestsPerMinute ?? 60,
-				maxRetries: body.maxRetries ?? 3,
-				retryBackoffMultiplier: body.retryBackoffMultiplier ?? 2,
-				filteringOptions: body.filteringOptions || null,
+				customHeaders: null,
+				rateLimitEnabled: true,
+				maxRequestsPerMinute: 60,
+				maxRetries: 3,
+				retryBackoffMultiplier: 2,
+				filteringOptions: null,
 				createdAt: new Date(),
 				updatedAt: new Date(),
 			})
@@ -62,6 +47,16 @@ export async function createWebhookController({
 
 		if (!newWebhook) {
 			throw status(500, { message: "Failed to create webhook" });
+		}
+
+		if (events.length > 0) {
+			await db.insert(schema.webhookEventSubscription).values(
+				events.map((eventId) => ({
+					webhookId: newWebhook.id,
+					eventId,
+					isEnabled: true,
+				})),
+			);
 		}
 
 		return {
@@ -88,7 +83,7 @@ export async function createWebhookController({
 	} catch (error) {
 		logger.error(
 			{
-				name: body.name,
+				url,
 				organizationId,
 				userId,
 				error,

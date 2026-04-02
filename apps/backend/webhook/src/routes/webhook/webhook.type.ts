@@ -41,15 +41,8 @@ export namespace WebhookTypes {
 	}
 
 	export interface CreateWebhookRequest {
-		name: string;
 		url: string;
-		secret?: string;
-		customHeaders?: Record<string, string>;
-		rateLimitEnabled?: boolean;
-		maxRequestsPerMinute?: number;
-		maxRetries?: number;
-		retryBackoffMultiplier?: number;
-		filteringOptions?: Record<string, unknown>;
+		events: string[];
 	}
 
 	export interface UpdateWebhookRequest {
