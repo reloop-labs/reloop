@@ -71,6 +71,7 @@ export async function createWebhookController({
 			successCount: newWebhook.successCount,
 			failureCount: newWebhook.failureCount,
 			consecutiveFailures: newWebhook.consecutiveFailures,
+			events,
 			createdAt: newWebhook.createdAt.toISOString(),
 			updatedAt: newWebhook.updatedAt.toISOString(),
 		};

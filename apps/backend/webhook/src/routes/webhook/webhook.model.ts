@@ -153,6 +153,9 @@ export namespace WebhookModel {
 			consecutiveFailures: t.Number({
 				description: "Consecutive failure count",
 			}),
+			events: t.Array(t.String(), {
+				description: "Array of subscribed event IDs",
+			}),
 			createdAt: t.String({ description: "Creation timestamp" }),
 			updatedAt: t.String({ description: "Last update timestamp" }),
 		},

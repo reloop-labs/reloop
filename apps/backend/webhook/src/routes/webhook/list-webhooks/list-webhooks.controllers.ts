@@ -37,6 +37,11 @@ export async function listWebhooksController({
 			orderBy: desc(schema.webhook.createdAt),
 			limit,
 			offset,
+			with: {
+				subscriptions: {
+					where: eq(schema.webhookEventSubscription.isEnabled, true),
+				},
+			},
 		});
 
 		return {
@@ -58,6 +63,7 @@ export async function listWebhooksController({
 				successCount: webhook.successCount,
 				failureCount: webhook.failureCount,
 				consecutiveFailures: webhook.consecutiveFailures,
+				events: webhook.subscriptions.map((s) => s.eventId),
 				createdAt: webhook.createdAt.toISOString(),
 				updatedAt: webhook.updatedAt.toISOString(),
 			})),

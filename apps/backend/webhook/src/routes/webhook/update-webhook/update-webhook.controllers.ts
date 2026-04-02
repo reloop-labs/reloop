@@ -91,26 +91,43 @@ export async function updateWebhookController({
 			throw status(500, { message: "Failed to update webhook" });
 		}
 
+		const updatedWebhookWithSubs = await db.query.webhook.findFirst({
+			where: and(
+				eq(schema.webhook.id, updatedWebhook.id),
+				eq(schema.webhook.organizationId, organizationId),
+			),
+			with: {
+				subscriptions: {
+					where: eq(schema.webhookEventSubscription.isEnabled, true),
+				},
+			},
+		});
+
+		if (!updatedWebhookWithSubs) {
+			throw status(500, { message: "Failed to fetch updated webhook" });
+		}
+
 		return {
-			id: updatedWebhook.id,
-			name: updatedWebhook.name,
-			url: updatedWebhook.url,
-			secret: updatedWebhook.secret,
-			organizationId: updatedWebhook.organizationId,
-			userId: updatedWebhook.userId,
-			status: updatedWebhook.status,
-			customHeaders: updatedWebhook.customHeaders,
-			rateLimitEnabled: updatedWebhook.rateLimitEnabled,
-			maxRequestsPerMinute: updatedWebhook.maxRequestsPerMinute,
-			maxRetries: updatedWebhook.maxRetries,
-			retryBackoffMultiplier: updatedWebhook.retryBackoffMultiplier,
-			filteringOptions: updatedWebhook.filteringOptions,
-			lastTriggeredAt: updatedWebhook.lastTriggeredAt?.toISOString() || null,
-			successCount: updatedWebhook.successCount,
-			failureCount: updatedWebhook.failureCount,
-			consecutiveFailures: updatedWebhook.consecutiveFailures,
-			createdAt: updatedWebhook.createdAt.toISOString(),
-			updatedAt: updatedWebhook.updatedAt.toISOString(),
+			id: updatedWebhookWithSubs.id,
+			name: updatedWebhookWithSubs.name,
+			url: updatedWebhookWithSubs.url,
+			secret: updatedWebhookWithSubs.secret,
+			organizationId: updatedWebhookWithSubs.organizationId,
+			userId: updatedWebhookWithSubs.userId,
+			status: updatedWebhookWithSubs.status,
+			customHeaders: updatedWebhookWithSubs.customHeaders,
+			rateLimitEnabled: updatedWebhookWithSubs.rateLimitEnabled,
+			maxRequestsPerMinute: updatedWebhookWithSubs.maxRequestsPerMinute,
+			maxRetries: updatedWebhookWithSubs.maxRetries,
+			retryBackoffMultiplier: updatedWebhookWithSubs.retryBackoffMultiplier,
+			filteringOptions: updatedWebhookWithSubs.filteringOptions,
+			lastTriggeredAt: updatedWebhookWithSubs.lastTriggeredAt?.toISOString() || null,
+			successCount: updatedWebhookWithSubs.successCount,
+			failureCount: updatedWebhookWithSubs.failureCount,
+			consecutiveFailures: updatedWebhookWithSubs.consecutiveFailures,
+			events: updatedWebhookWithSubs.subscriptions.map((s) => s.eventId),
+			createdAt: updatedWebhookWithSubs.createdAt.toISOString(),
+			updatedAt: updatedWebhookWithSubs.updatedAt.toISOString(),
 		};
 	} catch (error) {
 		logger.error({ webhookId, organizationId, body, error }, "Error updating webhook");

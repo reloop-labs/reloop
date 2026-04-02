@@ -21,6 +21,11 @@ export async function getWebhookController({
 				eq(schema.webhook.organizationId, organizationId),
 				isNull(schema.webhook.deletedAt),
 			),
+			with: {
+				subscriptions: {
+					where: eq(schema.webhookEventSubscription.isEnabled, true),
+				},
+			},
 		});
 
 		if (!webhook) {
@@ -45,6 +50,7 @@ export async function getWebhookController({
 			successCount: webhook.successCount,
 			failureCount: webhook.failureCount,
 			consecutiveFailures: webhook.consecutiveFailures,
+			events: webhook.subscriptions.map((s) => s.eventId),
 			createdAt: webhook.createdAt.toISOString(),
 			updatedAt: webhook.updatedAt.toISOString(),
 		};
