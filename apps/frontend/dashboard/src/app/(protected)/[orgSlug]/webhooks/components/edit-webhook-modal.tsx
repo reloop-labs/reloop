@@ -9,89 +9,90 @@ import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import { useLoading } from "@reloop/ui/use-loading";
 import axios from "axios";
-import { useRouter } from "next/navigation";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
 import * as v from "valibot";
 
-const webhookSchema = v.object({
-	url: v.pipe(
-		v.string("URL is required"),
-		v.minLength(1, "URL is required"),
-		v.regex(
-			/^https?:\/\/.+/,
-			"Please enter a valid URL starting with http:// or https://",
+const updateWebhookSchema = v.object({
+	name: v.optional(v.string("Name is required")),
+	url: v.optional(
+		v.pipe(
+			v.string("URL is required"),
+			v.minLength(1, "URL is required"),
+			v.regex(
+				/^https?:\/\/.+/,
+				"Please enter a valid URL starting with http:// or https://",
+			),
 		),
 	),
-	events: v.pipe(
-		v.string("Events are required"),
-		v.minLength(1, "At least one event is required"),
+	status: v.optional(
+		v.union([v.literal("active"), v.literal("paused"), v.literal("disabled")]),
 	),
 });
 
-type WebhookFormValues = v.InferInput<typeof webhookSchema>;
+type UpdateWebhookFormValues = v.InferInput<typeof updateWebhookSchema>;
 
-interface CreateWebhookModalProps {
-	isOpen: boolean;
-	onClose: () => void;
+interface WebhookData {
+	id: string;
+	name: string;
+	url: string;
+	status: "active" | "paused" | "disabled" | "failed";
 }
 
-export const CreateWebhookModal = ({
+interface EditWebhookModalProps {
+	isOpen: boolean;
+	onClose: () => void;
+	webhook: WebhookData;
+}
+
+export const EditWebhookModal = ({
 	isOpen,
 	onClose,
-}: CreateWebhookModalProps) => {
+	webhook,
+}: EditWebhookModalProps) => {
 	const { activeOrganization } = useUserOrganization();
 	const { changeStatus, status } = useLoading();
 	const { mutate } = useSWRConfig();
-	const router = useRouter();
 
-	const { register, handleSubmit, formState, reset, setError } =
-		useForm<WebhookFormValues>({
-			resolver: valibotResolver(webhookSchema) as Resolver<WebhookFormValues>,
+	const { register, handleSubmit, formState, reset } =
+		useForm<UpdateWebhookFormValues>({
+			resolver: valibotResolver(
+				updateWebhookSchema,
+			) as Resolver<UpdateWebhookFormValues>,
 			defaultValues: {
-				url: "",
-				events: "",
+				name: webhook.name || "",
+				url: webhook.url || "",
+				status: webhook.status as "active" | "paused" | "disabled",
 			},
 		});
 
-	const onSubmit = async (data: WebhookFormValues) => {
+	const onSubmit = async (data: UpdateWebhookFormValues) => {
 		if (!activeOrganization?.id) return;
 
 		try {
 			changeStatus("loading");
-			const response = await axios.post(
-				"/api/webhook/v1/",
+			await axios.patch(
+				`/api/webhook/v1/${webhook.id}`,
 				{
-					url: data.url,
-					events: data.events
-						.split(",")
-						.map((e) => e.trim())
-						.filter(Boolean),
+					...data,
 				},
 				{ headers: { credentials: "include" } },
 			);
+			await mutate(`/api/webhook/v1/${webhook.id}`);
 			await mutate(
 				`/api/webhook/v1/?organizationId=${activeOrganization.id}&limit=100`,
 			);
-			reset();
+			reset(data);
 			changeStatus("idle");
+			toast.success("Webhook updated successfully");
 			onClose();
-			const webhookId = response.data?.webhook?.id || response.data?.id;
-			if (webhookId) {
-				router.push(`/${activeOrganization.slug}/webhooks/${webhookId}`);
-			}
 		} catch (error) {
 			changeStatus("idle");
 			if (axios.isAxiosError(error)) {
 				const responseData = error.response?.data?.message;
 				if (responseData) {
-					setError("url", {
-						type: "server",
-						message: responseData,
-					});
-				} else {
 					toast.error(responseData);
 				}
 			} else {
@@ -106,14 +107,29 @@ export const CreateWebhookModal = ({
 				<form onSubmit={handleSubmit(onSubmit)}>
 					<Modal.Body>
 						<h2 className="mb-6 font-semibold text-gray-900 text-xl">
-							Create Webhook
+							Edit Webhook
 						</h2>
-						<div className="space-y-3">
+						<div className="space-y-4">
 							<div>
-								<Label.Root htmlFor="url">
-									Endpoint URL
-									<Label.Asterisk />
-								</Label.Root>
+								<Label.Root htmlFor="name">Name</Label.Root>
+								<Input.Root className="mt-1" size="small">
+									<Input.Wrapper>
+										<Input.Input
+											className="px-2"
+											id="name"
+											placeholder="My Webhook"
+											{...register("name")}
+										/>
+									</Input.Wrapper>
+								</Input.Root>
+								{formState.errors.name && (
+									<p className="mt-1 text-red-600 text-sm">
+										{formState.errors.name.message}
+									</p>
+								)}
+							</div>
+							<div>
+								<Label.Root htmlFor="url">Endpoint URL</Label.Root>
 								<Input.Root className="mt-1" size="small">
 									<Input.Wrapper>
 										<Input.Input
@@ -131,27 +147,21 @@ export const CreateWebhookModal = ({
 								)}
 							</div>
 							<div>
-								<Label.Root htmlFor="events">
-									Events
-									<Label.Asterisk />
-								</Label.Root>
-								<p className="mb-1 text-text-sub-600 text-xs">
-									Comma separated event names to listen to (e.g.
-									payment.created)
-								</p>
-								<Input.Root className="mt-1" size="small">
-									<Input.Wrapper>
-										<Input.Input
-											className="px-2"
-											id="events"
-											placeholder="payment.created, user.created"
-											{...register("events")}
-										/>
-									</Input.Wrapper>
-								</Input.Root>
-								{formState.errors.events && (
+								<Label.Root htmlFor="status">Status</Label.Root>
+								<div className="mt-1 flex items-center gap-3">
+									<select
+										id="status"
+										className="flex h-9 w-full rounded-md border border-stroke-soft-200 bg-bg-white-0 px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary-base disabled:cursor-not-allowed disabled:opacity-50"
+										{...register("status")}
+									>
+										<option value="active">Active</option>
+										<option value="paused">Paused</option>
+										<option value="disabled">Disabled</option>
+									</select>
+								</div>
+								{formState.errors.status && (
 									<p className="mt-1 text-red-600 text-sm">
-										{formState.errors.events.message}
+										{formState.errors.status.message}
 									</p>
 								)}
 							</div>
@@ -176,11 +186,11 @@ export const CreateWebhookModal = ({
 							{status === "loading" ? (
 								<>
 									<Icon name="loader-2" className="mr-2 h-4 w-4 animate-spin" />
-									Creating...
+									Saving...
 								</>
 							) : (
 								<>
-									Create Webhook
+									Save Changes
 									<Icon name="undo" className="h-3 w-3 scale-y-[-1]" />
 								</>
 							)}

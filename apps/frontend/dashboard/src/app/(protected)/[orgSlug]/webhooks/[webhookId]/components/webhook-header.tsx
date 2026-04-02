@@ -9,7 +9,9 @@ import {
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { toast } from "sonner";
+import { EditWebhookModal } from "../../components/edit-webhook-modal";
 
 interface WebhookData {
 	id: string;
@@ -35,7 +37,6 @@ interface WebhookHeaderProps {
 	webhook: WebhookData | null;
 	isLoading: boolean;
 	isFailed?: boolean;
-	onOpenSettings?: () => void;
 	onDeleteWebhook?: () => void;
 }
 
@@ -73,10 +74,10 @@ export const WebhookHeader = ({
 	webhook,
 	isLoading,
 	isFailed,
-	onOpenSettings,
 	onDeleteWebhook,
 }: WebhookHeaderProps) => {
 	const { back } = useRouter();
+	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
 	const handleCopySecret = async () => {
 		if (webhook?.secret) {
@@ -245,10 +246,10 @@ export const WebhookHeader = ({
 							<Button.Root
 								variant="neutral"
 								size="xsmall"
-								onClick={() => onOpenSettings?.()}
+								onClick={() => setIsEditModalOpen(true)}
 							>
-								<Icon name="pause" className="h-4 w-4" />
-								Disable webhook
+								<Icon name="edit" className="h-4 w-4" />
+								Edit Webhook
 							</Button.Root>
 							<PopoverRoot>
 								<PopoverTrigger asChild>
@@ -278,6 +279,16 @@ export const WebhookHeader = ({
 										>
 											<Icon name="rotate-cw" className="h-4 w-4" />
 											Rotate secret
+										</Button.Root>
+										<Button.Root
+											variant="neutral"
+											mode="ghost"
+											size="small"
+											onClick={() => setIsEditModalOpen(true)}
+											className="w-full justify-start"
+										>
+											<Icon name="edit" className="h-4 w-4" />
+											Edit Webhook
 										</Button.Root>
 										<Button.Root
 											variant="neutral"
@@ -436,6 +447,13 @@ export const WebhookHeader = ({
 						</div>
 					</div>
 				</div>
+			)}
+			{webhook && (
+				<EditWebhookModal
+					isOpen={isEditModalOpen}
+					onClose={() => setIsEditModalOpen(false)}
+					webhook={webhook}
+				/>
 			)}
 		</div>
 	);
