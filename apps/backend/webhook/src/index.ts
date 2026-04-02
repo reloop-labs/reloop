@@ -7,6 +7,7 @@ import { landing } from "@reloop/webhook/routes/landing/landing.index";
 import { subscriptionRoutes } from "@reloop/webhook/routes/subscription/subscription.routes";
 import { webhookRoutes } from "@reloop/webhook/routes/webhook/webhook.routes";
 import { Elysia } from "elysia";
+import { webhookConfig } from "./webhook.config";
 
 const port = 8013;
 
@@ -17,7 +18,7 @@ const webhookService = new Elysia({
 	.use(
 		openapi({
 			references: fromTypes(
-				process.env.NODE_ENV === "production"
+				webhookConfig.NODE_ENV === "production"
 					? "dist/index.d.ts"
 					: "src/index.ts",
 			),
