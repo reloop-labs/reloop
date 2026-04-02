@@ -3,6 +3,9 @@
   "workspaces": {
     "": {
       "name": "reloop",
+      "dependencies": {
+        "evlog": "^2.10.0",
+      },
       "devDependencies": {
         "@biomejs/biome": "2.2.6",
         "husky": "9.1.7",
@@ -2509,6 +2512,8 @@
     "eventemitter3": ["eventemitter3@4.0.7", "", {}, "sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw=="],
 
     "events": ["events@3.3.0", "", {}, "sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q=="],
+
+    "evlog": ["evlog@2.10.0", "", { "peerDependencies": { "@nestjs/common": ">=11.1.17", "@nuxt/kit": "^4.4.2", "ai": ">=6.0.137", "elysia": ">=1.4.28", "express": ">=5.2.1", "fastify": ">=5.8.4", "h3": "^1.15.10", "hono": "", "next": ">=16.2.1", "nitro": "^3.0.260311-beta", "nitropack": "^2.13.2", "ofetch": "^1.5.1", "react": ">=19.2.4", "react-router": ">=7.13.2", "vite": "^7.0.0 || ^8.0.0" }, "optionalPeers": ["@nestjs/common", "@nuxt/kit", "ai", "elysia", "express", "fastify", "h3", "hono", "next", "nitro", "nitropack", "ofetch", "react", "react-router", "vite"] }, "sha512-jvCXGeoH6p8oVljfXYq0FI7OeO572bPeKV4KM8utSrC1q8z5FAK+4kLbOOECnl09Yy9JGCAJyif9B3LNrUmPfA=="],
 
     "exact-mirror": ["exact-mirror@0.2.2", "", { "peerDependencies": { "@sinclair/typebox": "^0.34.15" }, "optionalPeers": ["@sinclair/typebox"] }, "sha512-CrGe+4QzHZlnrXZVlo/WbUZ4qQZq8C0uATQVGVgXIrNXgHDBBNFD1VRfssRA2C9t3RYvh3MadZSdg2Wy7HBoQA=="],
 

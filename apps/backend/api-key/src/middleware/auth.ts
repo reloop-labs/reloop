@@ -1,5 +1,6 @@
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
+import { useLogger } from "evlog/elysia";
 import { validateApiKey } from "./api-key-auth";
 import { validateSession } from "./cookie-auth";
 
@@ -11,21 +12,14 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 	cookieAuth: {
 		async resolve({ status, request: { headers } }) {
 			try {
+				const log = useLogger();
 				const cookie = headers.get("cookie");
 				const traceId = crypto.randomUUID();
-				const currentLogger = logger.child({ traceId });
 				const sessionResult = await validateSession(cookie);
+
 				if (sessionResult) {
-					const tenantLogger = currentLogger.child({
-						traceId,
-						service: "api-key",
-						...currentLogger,
-					});
-					tenantLogger.info(
-						{ ...sessionResult },
-						"Session authentication successful",
-					);
-					return { ...sessionResult, traceId, logger: tenantLogger };
+					log.set({ traceId, user: sessionResult });
+					return { ...sessionResult, traceId };
 				}
 				return status(401, { message: "Authentication required" });
 			} catch (e) {
@@ -43,21 +37,13 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 	apiKeyAuth: {
 		async resolve({ status, request: { headers } }) {
 			try {
-				const apiKey = headers.get("x-api-key")
+				const log = useLogger();
+				const apiKey = headers.get("x-api-key");
 				const traceId = crypto.randomUUID();
-				const currentLogger = logger.child({ traceId });
 				const apiKeyResult = await validateApiKey(apiKey);
 				if (apiKeyResult) {
-					const tenantLogger = currentLogger.child({
-						traceId,
-						service: "api-key",
-						...currentLogger,
-					});
-					tenantLogger.info(
-						{ ...apiKeyResult },
-						"API key authentication successful",
-					);
-					return { ...apiKeyResult, traceId, logger: tenantLogger };
+					log.set({ traceId, user: apiKeyResult });
+					return { ...apiKeyResult, traceId };
 				}
 				return status(401, { message: "Authentication required" });
 			} catch (e) {

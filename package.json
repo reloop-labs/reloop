@@ -149,7 +149,8 @@
 				"pino": "10.0.0",
 				"pino-pretty": "13.1.2",
 				"@elysiajs/openapi": "1.4.11",
-				"inngest": "3.44.4"
+				"inngest": "3.44.4",
+				"evlog": "2.10.0"
 			}
 		}
 	},
@@ -218,5 +219,7 @@
 		"docs",
 		"protobufjs"
 	],
-	"dependencies": {}
+	"dependencies": {
+		"evlog": "^2.10.0"
+	}
 }

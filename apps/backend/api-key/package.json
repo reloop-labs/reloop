@@ -26,6 +26,7 @@
 		"better-auth": "catalog:",
 		"dotenv": "catalog:backend",
 		"drizzle-orm": "catalog:db",
+		"evlog": "catalog:backend",
 		"drizzle-typebox": "catalog:db",
 		"elysia": "catalog:backend",
 		"pg": "catalog:db",

@@ -6,12 +6,18 @@ import { landing } from "@reloop/api-key/routes/landing/landing.index";
 import { loader } from "@reloop/api-key/utils/loader";
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
+import { initLogger } from "evlog";
+import { evlog } from "evlog/elysia";
+import { apiKeyConfig } from "./api-key.config";
 
-const port = 8012;
+initLogger({ env: { service: "api-key" } });
+
+const port = apiKeyConfig.port;
 const apiKeyService = new Elysia({
 	prefix: "/api/api-key",
 	name: "API Key Service",
 })
+	.use(evlog())
 	.use(
 		openapi({
 			documentation: {
@@ -30,7 +36,7 @@ const apiKeyService = new Elysia({
 				},
 			},
 			references: fromTypes(
-				process.env.NODE_ENV === "production"
+				apiKeyConfig.NODE_ENV === "production"
 					? "dist/index.d.ts"
 					: "src/index.ts",
 			),
