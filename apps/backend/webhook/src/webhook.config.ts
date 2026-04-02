@@ -4,7 +4,7 @@ if (!process.env.PG_URL)
   process.env.PG_URL = "postgresql://reloop:reloop123@localhost:5432/reloop";
 if (!process.env.REDIS_URL)
   process.env.REDIS_URL = "redis://:reloop123@localhost:6379";
-if (!process.env.BASE_URL) process.env.BASE_URL = "http://localhost:3000";
+if (!process.env.BASE_URL) process.env.BASE_URL = "https://local.reloop.sh";
 
 if (!process.env.NODE_TLS_REJECT_UNAUTHORIZED)
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";

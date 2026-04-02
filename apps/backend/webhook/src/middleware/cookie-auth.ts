@@ -1,6 +1,8 @@
 import { webhookConfig } from "../webhook.config";
 
 export async function validateSession(cookie: string | null) {
+  console.log(`${webhookConfig.BASE_URL}/api/auth/v1/get-session`,
+  )
   const response = await fetch(
     `${webhookConfig.BASE_URL}/api/auth/v1/get-session`,
     {
@@ -18,7 +20,6 @@ export async function validateSession(cookie: string | null) {
       activeOrganizationId?: string;
     };
   };
-
   if (session?.user?.activeOrganizationId) {
     return {
       userId: session.user.id,
