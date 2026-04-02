@@ -25,6 +25,7 @@ export const updatePropertyController = async ({
     method?: string;
     userAgent?: string;
     ipAddress?: string;
+    statusCode?: number;
   };
 }): Promise<PropertyTypes.PropertyResponse> => {
   logger.info({ property_id, fallbackValue: body.fallbackValue }, "Updating property");
@@ -70,7 +71,7 @@ export const updatePropertyController = async ({
       event: PROPERTY_UPDATE_WEBHOOK_EVENT.id,
       cookie,
       metadata: result,
-      requestDetails,
+      requestDetails: { ...(requestDetails || {}), statusCode: 200 },
     });
 
     return result;

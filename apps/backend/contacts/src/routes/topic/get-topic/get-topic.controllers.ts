@@ -2,6 +2,7 @@ import type { TopicTypes } from "@be/contacts/types/topic.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import type { Logger } from "@reloop/logger";
+import { TOPIC_GET_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
@@ -30,7 +31,7 @@ export const getTopicController = async ({
     }
 
     logger.info({ topic_id }, "Topic retrieved successfully");
-    return { ...result, object: "topic" };
+    return { ...result, object: "topic", event: TOPIC_GET_WEBHOOK_EVENT.id };
   } catch (error) {
     logger.error({ topic_id, error }, "Debug getting topic");
     throw error;

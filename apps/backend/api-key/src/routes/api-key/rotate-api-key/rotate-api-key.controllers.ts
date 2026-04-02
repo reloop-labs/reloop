@@ -24,6 +24,7 @@ export async function rotateApiKeyController({
 		method?: string;
 		userAgent?: string;
 		ipAddress?: string;
+    statusCode?: number;
 	};
 }): Promise<ApiKeyTypes.ApiKeyWithKeyResponse> {
 	try {
@@ -78,7 +79,7 @@ export async function rotateApiKeyController({
 			event: API_KEY_UPDATE_WEBHOOK_EVENT.id,
 			cookie,
 			metadata: result,
-			requestDetails,
+			requestDetails: { ...(requestDetails || {}), statusCode: 200 },
 		});
 
 		return result;

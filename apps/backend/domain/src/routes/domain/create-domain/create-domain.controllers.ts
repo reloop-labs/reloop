@@ -39,6 +39,7 @@ export async function createDomainController({
     method?: string;
     userAgent?: string;
     ipAddress?: string;
+    statusCode?: number;
   };
 } & DomainTypes.CreateDomainRequest): Promise<DomainTypes.DomainResponse> {
   try {
@@ -113,7 +114,7 @@ export async function createDomainController({
         event: DOMAIN_UNDELETE_WEBHOOK_EVENT.id,
         cookie,
         metadata: { domain, domainId },
-        requestDetails,
+        requestDetails: { ...(requestDetails || {}), statusCode: 201 },
       });
 
       return {
@@ -229,7 +230,7 @@ export async function createDomainController({
       event: DOMAIN_CREATE_WEBHOOK_EVENT.id,
       cookie,
       metadata: { domain, domainId },
-      requestDetails,
+      requestDetails: { ...(requestDetails || {}), statusCode: 201 },
     });
 
     return {

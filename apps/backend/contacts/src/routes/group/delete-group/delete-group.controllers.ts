@@ -22,6 +22,7 @@ export const deleteGroupController = async ({
     method?: string;
     userAgent?: string;
     ipAddress?: string;
+    statusCode?: number;
   };
 }): Promise<
   | { object: "contact_group"; success: boolean; id: string; name: string; event: string }
@@ -71,7 +72,7 @@ export const deleteGroupController = async ({
       event: GROUP_DELETE_WEBHOOK_EVENT.id,
       cookie,
       metadata: result,
-      requestDetails,
+      requestDetails: { ...(requestDetails || {}), statusCode: 200 },
     });
 
     return result;

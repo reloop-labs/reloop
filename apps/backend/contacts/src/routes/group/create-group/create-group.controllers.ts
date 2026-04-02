@@ -26,6 +26,7 @@ export const createGroupController = async ({
     method?: string;
     userAgent?: string;
     ipAddress?: string;
+    statusCode?: number;
   };
 }): Promise<GroupResponse | GroupModel.Unauthorized> => {
   logger.info({ name }, "Creating group");
@@ -70,7 +71,7 @@ export const createGroupController = async ({
       event: GROUP_CREATE_WEBHOOK_EVENT.id,
       cookie,
       metadata: result,
-      requestDetails,
+      requestDetails: { ...(requestDetails || {}), statusCode: 201 },
     });
 
     return result;

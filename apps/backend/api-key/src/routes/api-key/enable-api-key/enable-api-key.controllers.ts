@@ -23,6 +23,7 @@ export async function enableApiKeyController({
 		method?: string;
 		userAgent?: string;
 		ipAddress?: string;
+    statusCode?: number;
 	};
 }): Promise<ApiKeyTypes.ApiKeyResponse> {
 	try {
@@ -104,7 +105,7 @@ export async function enableApiKeyController({
 			event: API_KEY_UPDATE_WEBHOOK_EVENT.id,
 			cookie,
 			metadata: result as Record<string, unknown>,
-			requestDetails,
+			requestDetails: { ...(requestDetails || {}), statusCode: 200 },
 		});
 
 		return result;

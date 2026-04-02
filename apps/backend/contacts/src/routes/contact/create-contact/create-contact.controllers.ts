@@ -27,6 +27,7 @@ export async function createContactController({
     method?: string;
     userAgent?: string;
     ipAddress?: string;
+    statusCode?: number;
   };
 }): Promise<ContactTypes.ContactResponse> {
   const { email } = body;
@@ -157,7 +158,7 @@ export async function createContactController({
         event: CONTACT_CREATE_WEBHOOK_EVENT.id,
         cookie,
         metadata: result,
-        requestDetails,
+        requestDetails: { ...(requestDetails || {}), statusCode: 201 },
       });
 
       return result;

@@ -26,6 +26,7 @@ export async function updateContactTopicController({
     method?: string;
     userAgent?: string;
     ipAddress?: string;
+    statusCode?: number;
   };
 }): Promise<ContactModel.UpdateContactTopicResponse> {
   const { contact_id, email, subscription } = body;
@@ -121,7 +122,7 @@ export async function updateContactTopicController({
       event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
       cookie,
       metadata: result,
-      requestDetails,
+      requestDetails: { ...(requestDetails || {}), statusCode: 200 },
     });
 
     return result;

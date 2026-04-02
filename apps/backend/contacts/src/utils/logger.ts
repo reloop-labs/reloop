@@ -14,6 +14,7 @@ export async function createLog(body: {
     method?: string;
     userAgent?: string;
     ipAddress?: string;
+    statusCode?: number;
   };
   cookie?: string;
 }) {

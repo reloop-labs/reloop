@@ -22,6 +22,7 @@ export async function deleteApiKeyController({
 		method?: string;
 		userAgent?: string;
 		ipAddress?: string;
+    statusCode?: number;
 	};
 }): Promise<{ id: string; message: string; object: "api_key"; event: string }> {
 	logger.info({ apiKeyId }, "Checking if api key exists");
@@ -60,7 +61,7 @@ export async function deleteApiKeyController({
 			event: API_KEY_DELETE_WEBHOOK_EVENT.id,
 			cookie,
 			metadata: result,
-			requestDetails,
+			requestDetails: { ...(requestDetails || {}), statusCode: 200 },
 		});
 
 		return result;

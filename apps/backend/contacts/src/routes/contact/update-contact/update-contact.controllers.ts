@@ -26,6 +26,7 @@ export async function updateContactController({
     method?: string;
     userAgent?: string;
     ipAddress?: string;
+    statusCode?: number;
   };
 }): Promise<ContactTypes.ContactResponse> {
   logger.info(
@@ -159,7 +160,7 @@ export async function updateContactController({
         event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
         cookie,
         metadata: finalContact,
-        requestDetails,
+        requestDetails: { ...(requestDetails || {}), statusCode: 200 },
       });
 
       return finalContact;

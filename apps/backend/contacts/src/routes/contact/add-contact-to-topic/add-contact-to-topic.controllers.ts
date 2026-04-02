@@ -39,6 +39,7 @@ export async function addContactToTopicController({
     method?: string;
     userAgent?: string;
     ipAddress?: string;
+    statusCode?: number;
   };
 }): Promise<AddContactToTopicResult> {
   const { contact_id, email } = body;
@@ -126,7 +127,7 @@ export async function addContactToTopicController({
           event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
           cookie,
           metadata: result,
-          requestDetails,
+          requestDetails: { ...(requestDetails || {}), statusCode: 200 },
         });
 
         return result;
@@ -170,7 +171,7 @@ export async function addContactToTopicController({
       event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
       cookie,
       metadata: result,
-      requestDetails,
+      requestDetails: { ...(requestDetails || {}), statusCode: 200 },
     });
 
     return result;

@@ -152,6 +152,30 @@ export const PROPERTY_LIST_WEBHOOK_EVENT = {
 	isActive: true,
 } as const satisfies WebhookEventDefinition;
 
+export const CONTACT_GET_WEBHOOK_EVENT = {
+	id: "contact.get",
+	name: "contact.get",
+	category: "contact",
+	description: "Triggered when a contact is retrieved",
+	isActive: true,
+} as const satisfies WebhookEventDefinition;
+
+export const GROUP_GET_WEBHOOK_EVENT = {
+	id: "contact.group.get",
+	name: "contact.group.get",
+	category: "contact",
+	description: "Triggered when a group is retrieved",
+	isActive: true,
+} as const satisfies WebhookEventDefinition;
+
+export const TOPIC_GET_WEBHOOK_EVENT = {
+	id: "contact.topic.get",
+	name: "contact.topic.get",
+	category: "contact",
+	description: "Triggered when a topic is retrieved",
+	isActive: true,
+} as const satisfies WebhookEventDefinition;
+
 export const CONTACT_WEBHOOK_EVENTS = [
 	CONTACT_CREATE_WEBHOOK_EVENT,
 	CONTACT_UPDATE_WEBHOOK_EVENT,
@@ -172,4 +196,7 @@ export const CONTACT_WEBHOOK_EVENTS = [
 	GROUP_LIST_WEBHOOK_EVENT,
 	TOPIC_LIST_WEBHOOK_EVENT,
 	PROPERTY_LIST_WEBHOOK_EVENT,
+	CONTACT_GET_WEBHOOK_EVENT,
+	GROUP_GET_WEBHOOK_EVENT,
+	TOPIC_GET_WEBHOOK_EVENT,
 ] as const satisfies readonly WebhookEventDefinition[];

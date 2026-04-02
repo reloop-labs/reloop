@@ -25,6 +25,7 @@ export async function removeContactFromGroupController({
     method?: string;
     userAgent?: string;
     ipAddress?: string;
+    statusCode?: number;
   };
 }): Promise<ContactModel.RemoveContactFromGroupResponse> {
   const { contact_id, email } = body;
@@ -92,7 +93,7 @@ export async function removeContactFromGroupController({
       event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
       cookie,
       metadata: result,
-      requestDetails,
+      requestDetails: { ...(requestDetails || {}), statusCode: 200 },
     });
 
     return result;

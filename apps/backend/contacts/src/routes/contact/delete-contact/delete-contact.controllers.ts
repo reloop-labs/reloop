@@ -22,6 +22,7 @@ export async function deleteContactController({
     method?: string;
     userAgent?: string;
     ipAddress?: string;
+    statusCode?: number;
   };
 }): Promise<
   | ContactModel.DeleteResponse
@@ -66,7 +67,7 @@ export async function deleteContactController({
       event: CONTACT_DELETE_WEBHOOK_EVENT.id,
       cookie,
       metadata: result,
-      requestDetails,
+      requestDetails: { ...(requestDetails || {}), statusCode: 200 },
     });
 
     return result;

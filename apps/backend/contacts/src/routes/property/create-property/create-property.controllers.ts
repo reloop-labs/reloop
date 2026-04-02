@@ -25,6 +25,7 @@ export const createPropertyController = async ({
     method?: string;
     userAgent?: string;
     ipAddress?: string;
+    statusCode?: number;
   };
 }): Promise<PropertyTypes.PropertyResponse> => {
   logger.info({ name: body.name, type: body.type }, "Creating property");
@@ -85,7 +86,7 @@ export const createPropertyController = async ({
       event: PROPERTY_CREATE_WEBHOOK_EVENT.id,
       cookie,
       metadata: result,
-      requestDetails,
+      requestDetails: { ...(requestDetails || {}), statusCode: 201 },
     });
 
     return result;

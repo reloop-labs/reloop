@@ -22,6 +22,7 @@ export const deletePropertyController = async ({
     method?: string;
     userAgent?: string;
     ipAddress?: string;
+    statusCode?: number;
   };
 }): Promise<{ object: "contact_property"; success: boolean; id: string; name: string; event: string }> => {
   logger.info({ property_id }, "Deleting property");
@@ -64,7 +65,7 @@ export const deletePropertyController = async ({
       event: PROPERTY_DELETE_WEBHOOK_EVENT.id,
       cookie,
       metadata: result,
-      requestDetails,
+      requestDetails: { ...(requestDetails || {}), statusCode: 200 },
     });
 
     return result;

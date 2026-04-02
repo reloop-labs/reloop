@@ -16,6 +16,7 @@ export async function createLog(body: {
     method?: string;
     userAgent?: string;
     ipAddress?: string;
+    statusCode?: number;
   };
   organization_id?: string;
   user_id?: string;

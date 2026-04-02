@@ -23,6 +23,7 @@ export async function deleteDomainController({
     method?: string;
     userAgent?: string;
     ipAddress?: string;
+    statusCode?: number;
   };
 }): Promise<DomainTypes.DomainResponse> {
   try {
@@ -88,7 +89,7 @@ export async function deleteDomainController({
       event: DOMAIN_DELETE_WEBHOOK_EVENT.id,
       cookie,
       metadata: { domainId, domain: domainWithDnsRecords.domain },
-      requestDetails,
+      requestDetails: { ...(requestDetails || {}), statusCode: 200 },
     });
 
     return finalDomain;

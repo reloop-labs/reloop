@@ -29,6 +29,7 @@ export const updateTopicController = async ({
     method?: string;
     userAgent?: string;
     ipAddress?: string;
+    statusCode?: number;
   };
 }): Promise<TopicTypes.TopicResponse> => {
   logger.info({ topic_id, name }, "Updating topic");
@@ -90,7 +91,7 @@ export const updateTopicController = async ({
       event: TOPIC_UPDATE_WEBHOOK_EVENT.id,
       cookie,
       metadata: result,
-      requestDetails,
+      requestDetails: { ...(requestDetails || {}), statusCode: 200 },
     });
 
     return result;

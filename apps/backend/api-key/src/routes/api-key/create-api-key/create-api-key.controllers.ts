@@ -31,6 +31,7 @@ export async function createApiKeyController({
 		method?: string;
 		userAgent?: string;
 		ipAddress?: string;
+    statusCode?: number;
 	};
 }): Promise<ApiKeyTypes.ApiKeyWithKeyResponse> {
 	try {
@@ -103,7 +104,7 @@ export async function createApiKeyController({
 			event: API_KEY_CREATE_WEBHOOK_EVENT.id,
 			cookie,
 			metadata: result,
-			requestDetails,
+			requestDetails: { ...(requestDetails || {}), statusCode: 201 },
 		});
 
 		return result;

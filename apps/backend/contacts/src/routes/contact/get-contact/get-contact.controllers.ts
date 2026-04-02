@@ -2,6 +2,7 @@ import type { ContactTypes } from "@be/contacts/types/contact.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import type { Logger } from "@reloop/logger";
+import { CONTACT_GET_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
@@ -92,6 +93,7 @@ export async function getContactController({
       topics: topics ?? [],
       createdAt: contact.createdAt,
       updatedAt: contact.updatedAt,
+      event: CONTACT_GET_WEBHOOK_EVENT.id,
     };
   } catch (error) {
     logger.error(

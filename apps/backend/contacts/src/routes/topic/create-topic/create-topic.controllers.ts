@@ -31,6 +31,7 @@ export const createTopicController = async ({
     method?: string;
     userAgent?: string;
     ipAddress?: string;
+    statusCode?: number;
   };
 }): Promise<TopicTypes.TopicResponse> => {
   logger.info({ name }, "Creating topic");
@@ -83,7 +84,7 @@ export const createTopicController = async ({
       event: TOPIC_CREATE_WEBHOOK_EVENT.id,
       cookie,
       metadata: result,
-      requestDetails,
+      requestDetails: { ...(requestDetails || {}), statusCode: 201 },
     });
 
     return result;

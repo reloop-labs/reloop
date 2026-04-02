@@ -23,6 +23,7 @@ export async function disableApiKeyController({
 		method?: string;
 		userAgent?: string;
 		ipAddress?: string;
+    statusCode?: number;
 	};
 }): Promise<ApiKeyTypes.ApiKeyResponse> {
 	logger.info({ id }, "Checking if API key exists");
@@ -104,7 +105,7 @@ export async function disableApiKeyController({
 			event: API_KEY_UPDATE_WEBHOOK_EVENT.id,
 			cookie,
 			metadata: result as Record<string, unknown>,
-			requestDetails,
+			requestDetails: { ...(requestDetails || {}), statusCode: 200 },
 		});
 
 		return result;

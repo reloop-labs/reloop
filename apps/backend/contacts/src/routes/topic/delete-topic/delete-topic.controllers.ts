@@ -22,6 +22,7 @@ export const deleteTopicController = async ({
     method?: string;
     userAgent?: string;
     ipAddress?: string;
+    statusCode?: number;
   };
 }): Promise<{ object: "topic"; success: boolean; id: string; name: string; event: string }> => {
   logger.info({ topic_id }, "Deleting topic");
@@ -76,7 +77,7 @@ export const deleteTopicController = async ({
       event: TOPIC_DELETE_WEBHOOK_EVENT.id,
       cookie,
       metadata: result,
-      requestDetails,
+      requestDetails: { ...(requestDetails || {}), statusCode: 200 },
     });
 
     return result;

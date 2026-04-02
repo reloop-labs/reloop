@@ -25,6 +25,7 @@ export const updateGroupController = async ({
     method?: string;
     userAgent?: string;
     ipAddress?: string;
+    statusCode?: number;
   };
 }): Promise<
   | GroupResponse
@@ -93,7 +94,7 @@ export const updateGroupController = async ({
       event: GROUP_UPDATE_WEBHOOK_EVENT.id,
       cookie,
       metadata: result,
-      requestDetails,
+      requestDetails: { ...(requestDetails || {}), statusCode: 200 },
     });
 
     return result;

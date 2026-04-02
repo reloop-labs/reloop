@@ -25,6 +25,7 @@ export async function updateDomainController({
 		method?: string;
 		userAgent?: string;
 		ipAddress?: string;
+		statusCode?: number;
 	};
 }): Promise<DomainTypes.DomainResponse> {
 	try {
@@ -101,7 +102,7 @@ export async function updateDomainController({
 			event: DOMAIN_UPDATE_WEBHOOK_EVENT.id,
 			cookie,
 			metadata: { domainId, domain: updatedDomain.domain },
-			requestDetails,
+			requestDetails: { ...(requestDetails || {}), statusCode: 200 },
 		});
 
 		return finalDomain;
