@@ -16,6 +16,7 @@ import { organization, user } from "./auth";
 const createWebhookId = () => `wh_${createId()}`;
 const createWebhookSubscriptionId = () => `whsub_${createId()}`;
 const createWebhookDeliveryId = () => `whde_${createId()}`;
+const createWebhookEventId = () => `evt_${createId()}`;
 
 export const webhookStatusEnum = pgEnum("webhook_status", [
 	"active",
@@ -39,7 +40,7 @@ export const webhook = pgTable(
 			.primaryKey(),
 		name: varchar("name", { length: 255 }).notNull(),
 		url: text("url").notNull(),
-		secret: text("secret"),
+		secret: text("secret").notNull(),
 		organizationId: text("organization_id")
 			.notNull()
 			.references(() => organization.id, { onDelete: "cascade" }),
@@ -56,8 +57,10 @@ export const webhook = pgTable(
 		retryBackoffMultiplier: integer("retry_backoff_multiplier")
 			.notNull()
 			.default(2),
-		filteringOptions:
-			jsonb("filtering_options").$type<Record<string, unknown>>(),
+		filteringOptions: jsonb("filtering_options").$type<{
+			excludeFields?: string[];
+			matchConditions?: Record<string, unknown>;
+		}>(),
 		lastTriggeredAt: timestamp("last_triggered_at"),
 		successCount: integer("success_count").notNull().default(0),
 		failureCount: integer("failure_count").notNull().default(0),
@@ -108,6 +111,31 @@ export const webhookEventSubscription = pgTable(
 	],
 );
 
+export const webhookEvent = pgTable(
+	"webhook_event",
+	{
+		id: text("id")
+			.$defaultFn(() => createWebhookEventId())
+			.primaryKey(),
+		event: text("event").notNull(),
+		payload: jsonb("payload").$type<Record<string, unknown>>().notNull(),
+		source: varchar("source", { length: 100 }).notNull(),
+		organizationId: text("organization_id")
+			.notNull()
+			.references(() => organization.id, { onDelete: "cascade" }),
+		userId: text("user_id").references(() => user.id, { onDelete: "set null" }),
+		createdAt: timestamp("created_at").notNull().defaultNow(),
+	},
+	(table) => [
+		index("webhook_event_idx_organization_id").on(table.organizationId),
+		index("webhook_event_idx_event").on(table.event),
+		index("webhook_event_idx_source").on(table.source),
+		index("webhook_event_idx_user_id").on(table.userId),
+		index("webhook_event_idx_created_at").on(table.createdAt),
+		index("webhook_event_idx_org_event").on(table.organizationId, table.event),
+	],
+);
+
 export const webhookDelivery = pgTable(
 	"webhook_delivery",
 	{
@@ -117,7 +145,10 @@ export const webhookDelivery = pgTable(
 		webhookId: text("webhook_id")
 			.notNull()
 			.references(() => webhook.id, { onDelete: "cascade" }),
-		eventId: text("event_id").notNull(),
+		webhookEventId: text("webhook_event_id").references(() => webhookEvent.id, {
+			onDelete: "set null",
+		}),
+		eventType: text("event_type").notNull(),
 		eventData: jsonb("event_data").$type<Record<string, unknown>>().notNull(),
 		status: webhookDeliveryStatusEnum("status").notNull().default("pending"),
 		requestUrl: text("request_url").notNull(),
@@ -133,12 +164,13 @@ export const webhookDelivery = pgTable(
 		errorMessage: text("error_message"),
 		errorDetails: jsonb("error_details").$type<Record<string, unknown>>(),
 		completedAt: timestamp("completed_at"),
+		durationMs: integer("duration_ms"),
 		createdAt: timestamp("created_at").notNull().defaultNow(),
 	},
 	(table) => [
 		index("webhook_delivery_idx_webhook_id").on(table.webhookId),
 		index("webhook_delivery_idx_status").on(table.status),
-		index("webhook_delivery_idx_event_id").on(table.eventId),
+		index("webhook_delivery_idx_event_type").on(table.eventType),
 		index("webhook_delivery_idx_created_at").on(table.createdAt),
 		index("webhook_delivery_idx_next_retry_at").on(table.nextRetryAt),
 		index("webhook_delivery_idx_webhook_status").on(
@@ -153,6 +185,7 @@ export const webhookDelivery = pgTable(
 			table.status,
 			table.nextRetryAt,
 		),
+		index("webhook_delivery_idx_event_instance").on(table.webhookEventId),
 	],
 );
 
@@ -169,12 +202,31 @@ export const webhookRelations = relations(webhook, ({ one, many }) => ({
 	deliveries: many(webhookDelivery),
 }));
 
+export const webhookEventRelations = relations(
+	webhookEvent,
+	({ one, many }) => ({
+		organization: one(organization, {
+			fields: [webhookEvent.organizationId],
+			references: [organization.id],
+		}),
+		user: one(user, {
+			fields: [webhookEvent.userId],
+			references: [user.id],
+		}),
+		deliveries: many(webhookDelivery),
+	}),
+);
+
 export const webhookEventSubscriptionRelations = relations(
 	webhookEventSubscription,
 	({ one }) => ({
 		webhook: one(webhook, {
 			fields: [webhookEventSubscription.webhookId],
 			references: [webhook.id],
+		}),
+		organization: one(organization, {
+			fields: [webhookEventSubscription.webhookId],
+			references: [organization.id],
 		}),
 	}),
 );
@@ -186,12 +238,17 @@ export const webhookDeliveryRelations = relations(
 			fields: [webhookDelivery.webhookId],
 			references: [webhook.id],
 		}),
+		event: one(webhookEvent, {
+			fields: [webhookDelivery.webhookEventId],
+			references: [webhookEvent.id],
+		}),
 	}),
 );
 
 export const webhookTables = {
 	webhook,
 	webhookEventSubscription,
+	webhookEvent,
 	webhookDelivery,
 } as const;
 
