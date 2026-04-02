@@ -1,6 +1,8 @@
+import { webhookConfig } from "../webhook.config";
+
 export async function validateSession(cookie: string | null) {
   const response = await fetch(
-    `${process.env.BASE_URL}/api/auth/v1/get-session`,
+    `${webhookConfig.BASE_URL}/api/auth/v1/get-session`,
     {
       method: "GET",
       headers: new Headers({

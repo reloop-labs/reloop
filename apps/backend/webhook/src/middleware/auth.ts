@@ -1,9 +1,10 @@
 import { logger } from "@reloop/logger";
+import { webhookConfig } from "@reloop/webhook/webhook.config";
 import { Elysia } from "elysia";
 import { validateApiKey } from "./api-key-auth";
 import { validateSession } from "./cookie-auth";
 
-if (process.env.NODE_ENV !== "production") {
+if (webhookConfig.NODE_ENV !== "production") {
 	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 }
 
