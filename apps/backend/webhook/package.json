@@ -35,6 +35,7 @@
 		"@reloop/cache": "workspace:*",
 		"@reloop/logger": "workspace:*",
 		"@reloop/auth": "workspace:*",
+		"@reloop/apikey": "workspace:*",
 		"@reloop/webhook-events": "workspace:*",
 		"@elysiajs/eden": "catalog:backend",
 		"@elysiajs/openapi": "catalog:backend",

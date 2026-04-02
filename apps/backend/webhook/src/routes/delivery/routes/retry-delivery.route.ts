@@ -5,13 +5,13 @@ import { Elysia, status, t } from "elysia";
 
 export const retryDeliveryRoute = new Elysia().use(authMiddleware).post(
 	"/:id/retry",
-	async ({ params: { id }, body, user }) => {
-		if (!user.activeOrganizationId) {
+	async ({ params: { id }, body, activeOrganizationId }) => {
+		if (!activeOrganizationId) {
 			throw status(403, {
-				message: "User is not a member of an organization",
+				message: "Authentication required",
 			});
 		}
-		return await retryDeliveryHandler(id, user.activeOrganizationId, body);
+		return await retryDeliveryHandler(id, activeOrganizationId, body);
 	},
 	{
 		auth: true,

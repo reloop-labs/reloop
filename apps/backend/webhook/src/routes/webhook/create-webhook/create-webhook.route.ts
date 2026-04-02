@@ -6,16 +6,16 @@ import { createWebhookXCodeSamples } from "./create-webhook.x-codeSamples";
 
 export const createWebhookRoute = new Elysia().use(authMiddleware).post(
 	"/",
-	async ({ body, user }) => {
-		if (!user.activeOrganizationId) {
+	async ({ body, activeOrganizationId, userId }) => {
+		if (!activeOrganizationId) {
 			throw status(403, {
-				message: "User is not a member of an organization",
+				message: "Authentication required",
 			});
 		}
 
 		return await createWebhookController({
-			organizationId: user.activeOrganizationId,
-			userId: user.id,
+			organizationId: activeOrganizationId,
+			userId,
 			body,
 		});
 	},

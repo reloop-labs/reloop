@@ -19,8 +19,6 @@ export async function createWebhookController({
 		{
 			name: body.name,
 			url: body.url,
-			organizationId,
-			userId,
 		},
 		"Creating webhook",
 	);

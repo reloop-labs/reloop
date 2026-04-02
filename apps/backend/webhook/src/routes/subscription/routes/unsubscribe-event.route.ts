@@ -5,16 +5,16 @@ import { Elysia, status, t } from "elysia";
 
 export const unsubscribeEventRoute = new Elysia().use(authMiddleware).delete(
 	"/:webhookId/unsubscribe/:eventId",
-	async ({ params: { webhookId, eventId }, user }) => {
-		if (!user.activeOrganizationId) {
+	async ({ params: { webhookId, eventId }, activeOrganizationId }) => {
+		if (!activeOrganizationId) {
 			throw status(403, {
-				message: "User is not a member of an organization",
+				message: "Authentication required",
 			});
 		}
 		return await unsubscribeEventHandler(
 			webhookId,
 			eventId,
-			user.activeOrganizationId,
+			activeOrganizationId,
 		);
 	},
 	{

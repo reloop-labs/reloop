@@ -5,13 +5,13 @@ import { Elysia, status } from "elysia";
 
 export const listDeliveriesRoute = new Elysia().use(authMiddleware).get(
 	"/list",
-	async ({ query, user }) => {
-		if (!user.activeOrganizationId) {
+	async ({ query, activeOrganizationId }) => {
+		if (!activeOrganizationId) {
 			throw status(403, {
-				message: "User is not a member of an organization",
+				message: "Authentication required",
 			});
 		}
-		return await listDeliveriesHandler(query, user.activeOrganizationId);
+		return await listDeliveriesHandler(query, activeOrganizationId);
 	},
 	{
 		query: DeliveryModel.deliveryQuery,

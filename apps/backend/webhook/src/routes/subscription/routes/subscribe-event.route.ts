@@ -5,16 +5,16 @@ import { Elysia, status, t } from "elysia";
 
 export const subscribeEventRoute = new Elysia().use(authMiddleware).post(
 	"/:webhookId/subscribe",
-	async ({ params: { webhookId }, body, user }) => {
-		if (!user.activeOrganizationId) {
+	async ({ params: { webhookId }, body, activeOrganizationId }) => {
+		if (!activeOrganizationId) {
 			throw status(403, {
-				message: "User is not a member of an organization",
+				message: "Authentication required",
 			});
 		}
 		return await subscribeEventHandler(
 			webhookId,
 			body,
-			user.activeOrganizationId,
+			activeOrganizationId,
 		);
 	},
 	{

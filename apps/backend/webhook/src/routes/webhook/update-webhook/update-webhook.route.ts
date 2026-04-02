@@ -6,16 +6,16 @@ import { updateWebhookXCodeSamples } from "./update-webhook.x-codeSamples";
 
 export const updateWebhookRoute = new Elysia().use(authMiddleware).patch(
 	"/:id",
-	async ({ params: { id }, body, user }) => {
-		if (!user.activeOrganizationId) {
+	async ({ params: { id }, body, activeOrganizationId }) => {
+		if (!activeOrganizationId) {
 			throw status(403, {
-				message: "User is not a member of an organization",
+				message: "Authentication required",
 			});
 		}
 
 		return await updateWebhookController({
 			webhookId: id,
-			organizationId: user.activeOrganizationId,
+			organizationId: activeOrganizationId,
 			body,
 		});
 	},

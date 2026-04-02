@@ -6,16 +6,16 @@ import { listWebhooksXCodeSamples } from "./list-webhooks.x-codeSamples";
 
 export const listWebhooksRoute = new Elysia().use(authMiddleware).get(
 	"/",
-	async ({ query, user }) => {
-		if (!user.activeOrganizationId) {
+	async ({ query, activeOrganizationId }) => {
+		if (!activeOrganizationId) {
 			throw status(403, {
-				message: "User is not a member of an organization",
+				message: "Authentication required",
 			});
 		}
 
 		return await listWebhooksController({
 			query,
-			organizationId: user.activeOrganizationId,
+			organizationId: activeOrganizationId,
 		});
 	},
 	{

@@ -6,16 +6,16 @@ import { deleteWebhookXCodeSamples } from "./delete-webhook.x-codeSamples";
 
 export const deleteWebhookRoute = new Elysia().use(authMiddleware).delete(
 	"/:id",
-	async ({ params: { id }, user }) => {
-		if (!user.activeOrganizationId) {
+	async ({ params: { id }, activeOrganizationId }) => {
+		if (!activeOrganizationId) {
 			throw status(403, {
-				message: "User is not a member of an organization",
+				message: "Authentication required",
 			});
 		}
 
 		return await deleteWebhookController({
 			webhookId: id,
-			organizationId: user.activeOrganizationId,
+			organizationId: activeOrganizationId,
 		});
 	},
 	{
