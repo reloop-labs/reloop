@@ -30,7 +30,7 @@ export const getWebhookRoute = new Elysia().use(authMiddleware).get(
 		},
 		detail: {
 			tags: ["Webhooks"],
-			summary: "Get webhook",
+			summary: "Retrieves webhook",
 			description: "Retrieves a webhook by its ID",
 			"x-codeSamples": getWebhookXCodeSamples,
 		},

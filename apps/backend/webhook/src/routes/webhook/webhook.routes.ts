@@ -9,8 +9,8 @@ export const webhookRoutes = new Elysia({
 	prefix: "/v1",
 	name: "WebhookRoutes",
 })
-	.use(listWebhooksRoute)
 	.use(createWebhookRoute)
 	.use(getWebhookRoute)
 	.use(updateWebhookRoute)
+	.use(listWebhooksRoute)
 	.use(deleteWebhookRoute);
