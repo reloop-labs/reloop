@@ -2,6 +2,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
+import type { WebhookEventName } from "@reloop/webhook-events";
 import { status } from "elysia";
 import type { WebhookTypes } from "../webhook.type";
 
@@ -14,10 +15,9 @@ export async function createWebhookController({
 	organizationId: string;
 	userId: string;
 	url: string;
-	events: string[];
+	events: WebhookEventName[];
 }): Promise<WebhookTypes.WebhookResponse> {
 	logger.info({ url, events }, "Creating webhook");
-
 	try {
 		const [newWebhook] = await db
 			.insert(schema.webhook)
@@ -40,9 +40,11 @@ export async function createWebhookController({
 			.returning();
 
 		if (!newWebhook) {
+			logger.error({ url, events }, "Failed to create webhook");
 			throw status(500, { message: "Failed to create webhook" });
 		}
 
+		logger.info({ webhookId: newWebhook.id }, "Creating webhook subscriptions");
 		if (events.length > 0) {
 			await db.insert(schema.webhookEventSubscription).values(
 				events.map((eventId) => ({
@@ -58,8 +60,6 @@ export async function createWebhookController({
 			name: newWebhook.name,
 			url: newWebhook.url,
 			secret: newWebhook.secret,
-			organizationId: newWebhook.organizationId,
-			userId: newWebhook.userId,
 			status: newWebhook.status,
 			customHeaders: newWebhook.customHeaders,
 			rateLimitEnabled: newWebhook.rateLimitEnabled,
@@ -76,7 +76,7 @@ export async function createWebhookController({
 			updatedAt: newWebhook.updatedAt.toISOString(),
 		};
 	} catch (error) {
-		logger.error({ url, error, }, "Error creating webhook",);
+		logger.error({ url, error }, "Error creating webhook");
 		throw error;
 	}
 }

@@ -1,5 +1,6 @@
 import { authMiddleware } from "@reloop/webhook/middleware/auth";
 import { WebhookModel } from "@reloop/webhook/routes/webhook/webhook.model";
+import type { WebhookEventName } from "@reloop/webhook-events";
 import { Elysia } from "elysia";
 import { createWebhookController } from "./create-webhook.controllers";
 import { createWebhookXCodeSamples } from "./create-webhook.x-codeSamples";
@@ -11,7 +12,7 @@ export const createWebhookRoute = new Elysia().use(authMiddleware).post(
 			organizationId: activeOrganizationId,
 			userId,
 			url: body.url,
-			events: body.events,
+			events: body.events as WebhookEventName[],
 		});
 	},
 	{

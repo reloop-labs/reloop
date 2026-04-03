@@ -1,8 +1,11 @@
+import { WEBHOOK_EVENTS, type WebhookEventName } from "@reloop/webhook-events";
 import { t } from "elysia";
 
 export namespace WebhookModel {
 	const urlPattern = /^https?:\/\/.+/;
 	const maskedSecretExample = "***masked***";
+	const eventIds = WEBHOOK_EVENTS.map((event) => event.id);
+	const eventRegex = new RegExp(`^(${eventIds.join("|").replace(/\./g, "\\.")})$`);
 
 	export const webhookIdParam = t.String({
 		minLength: 1,
@@ -15,7 +18,7 @@ export namespace WebhookModel {
 				pattern: urlPattern.source,
 				description: "Webhook URL",
 			}),
-			events: t.Array(t.String(), {
+			events: t.Array(t.String({ pattern: eventRegex.source }), {
 				minItems: 1,
 				description: "Array of event IDs to subscribe to",
 			}),
@@ -24,13 +27,15 @@ export namespace WebhookModel {
 			examples: [
 				{
 					url: "https://example.com/webhooks/reloop",
-					events: ["payment.created", "payment.failed"],
+					events: ["domain.created", "domain.deleted"],
 				},
 			],
 		},
 	);
 
-	export type CreateWebhookBody = typeof createWebhookBody.static;
+	export type CreateWebhookBody = Omit<typeof createWebhookBody.static, "events"> & {
+		events: WebhookEventName[];
+	};
 
 	export const updateWebhookBody = t.Object(
 		{
@@ -120,8 +125,6 @@ export namespace WebhookModel {
 			secret: t.String({
 				description: "Masked webhook secret",
 			}),
-			organizationId: t.String({ description: "Organization ID" }),
-			userId: t.String({ description: "User ID" }),
 			status: t.Union(
 				[
 					t.Literal("active"),
@@ -153,7 +156,7 @@ export namespace WebhookModel {
 			consecutiveFailures: t.Number({
 				description: "Consecutive failure count",
 			}),
-			events: t.Array(t.String(), {
+			events: t.Array(t.String({ pattern: eventRegex.source }), {
 				description: "Array of subscribed event IDs",
 			}),
 			createdAt: t.String({ description: "Creation timestamp" }),
@@ -166,8 +169,6 @@ export namespace WebhookModel {
 					name: "Payments Webhook",
 					url: "https://example.com/webhooks/reloop",
 					secret: maskedSecretExample,
-					organizationId: "org_123",
-					userId: "user_123",
 					status: "active",
 					customHeaders: {
 						"x-source": "reloop",
@@ -188,7 +189,9 @@ export namespace WebhookModel {
 		},
 	);
 
-	export type WebhookResponse = typeof webhookResponse.static;
+	export type WebhookResponse = Omit<typeof webhookResponse.static, "events"> & {
+		events: WebhookEventName[];
+	};
 
 	export const webhookListResponse = t.Object({
 		webhooks: t.Array(webhookResponse),

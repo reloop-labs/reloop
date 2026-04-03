@@ -1,6 +1,7 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
+import type { WebhookEventName } from "@reloop/webhook-events";
 import { and, eq, isNull, ne } from "drizzle-orm";
 import { status } from "elysia";
 import type { WebhookTypes } from "../webhook.type";
@@ -112,8 +113,6 @@ export async function updateWebhookController({
 			name: updatedWebhookWithSubs.name,
 			url: updatedWebhookWithSubs.url,
 			secret: updatedWebhookWithSubs.secret,
-			organizationId: updatedWebhookWithSubs.organizationId,
-			userId: updatedWebhookWithSubs.userId,
 			status: updatedWebhookWithSubs.status,
 			customHeaders: updatedWebhookWithSubs.customHeaders,
 			rateLimitEnabled: updatedWebhookWithSubs.rateLimitEnabled,
@@ -121,16 +120,22 @@ export async function updateWebhookController({
 			maxRetries: updatedWebhookWithSubs.maxRetries,
 			retryBackoffMultiplier: updatedWebhookWithSubs.retryBackoffMultiplier,
 			filteringOptions: updatedWebhookWithSubs.filteringOptions,
-			lastTriggeredAt: updatedWebhookWithSubs.lastTriggeredAt?.toISOString() || null,
+			lastTriggeredAt:
+				updatedWebhookWithSubs.lastTriggeredAt?.toISOString() || null,
 			successCount: updatedWebhookWithSubs.successCount,
 			failureCount: updatedWebhookWithSubs.failureCount,
 			consecutiveFailures: updatedWebhookWithSubs.consecutiveFailures,
-			events: updatedWebhookWithSubs.subscriptions.map((s) => s.eventId),
+			events: updatedWebhookWithSubs.subscriptions.map(
+				(s) => s.eventId as WebhookEventName,
+			),
 			createdAt: updatedWebhookWithSubs.createdAt.toISOString(),
 			updatedAt: updatedWebhookWithSubs.updatedAt.toISOString(),
 		};
 	} catch (error) {
-		logger.error({ webhookId, organizationId, body, error }, "Error updating webhook");
+		logger.error(
+			{ webhookId, organizationId, body, error },
+			"Error updating webhook",
+		);
 		throw error;
 	}
 }

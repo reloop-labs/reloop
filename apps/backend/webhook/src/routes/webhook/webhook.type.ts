@@ -1,3 +1,4 @@
+import type { WebhookEventName } from "@reloop/webhook-events";
 import type { WebhookModel } from "./webhook.model";
 
 export namespace WebhookTypes {
@@ -42,7 +43,7 @@ export namespace WebhookTypes {
 
 	export interface CreateWebhookRequest {
 		url: string;
-		events: string[];
+		events: WebhookEventName[];
 	}
 
 	export interface UpdateWebhookRequest {

@@ -1,6 +1,7 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
+import type { WebhookEventName } from "@reloop/webhook-events";
 import { and, count, desc, eq, isNull } from "drizzle-orm";
 import type { WebhookTypes } from "../webhook.type";
 
@@ -50,8 +51,6 @@ export async function listWebhooksController({
 				name: webhook.name,
 				url: webhook.url,
 				secret: webhook.secret,
-				organizationId: webhook.organizationId,
-				userId: webhook.userId,
 				status: webhook.status,
 				customHeaders: webhook.customHeaders,
 				rateLimitEnabled: webhook.rateLimitEnabled,
@@ -63,7 +62,7 @@ export async function listWebhooksController({
 				successCount: webhook.successCount,
 				failureCount: webhook.failureCount,
 				consecutiveFailures: webhook.consecutiveFailures,
-				events: webhook.subscriptions.map((s) => s.eventId),
+				events: webhook.subscriptions.map((s) => s.eventId as WebhookEventName),
 				createdAt: webhook.createdAt.toISOString(),
 				updatedAt: webhook.updatedAt.toISOString(),
 			})),
