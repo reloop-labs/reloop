@@ -73,6 +73,10 @@ export namespace WebhookTypes {
 		userId?: string;
 	}
 
-	export type TriggerWebhookResponse =
-		typeof WebhookModel.triggerWebhookResponse.static;
+	export type WebhookDeliveryResponse =
+		typeof WebhookModel.webhookDeliveryResponse.static;
+	export type WebhookDeliveryListResponse =
+		typeof WebhookModel.webhookDeliveryListResponse.static;
+	export type WebhookDeliveryQuery =
+		typeof WebhookModel.webhookDeliveryQuery.static;
 }

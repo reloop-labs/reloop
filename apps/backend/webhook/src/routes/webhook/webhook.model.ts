@@ -305,4 +305,56 @@ export namespace WebhookModel {
 	});
 
 	export type TriggerWebhookResponse = typeof triggerWebhookResponse.static;
+	export const webhookDeliveryResponse = t.Object({
+		id: t.String({ description: "Unique delivery identifier" }),
+		webhookId: t.String({ description: "Webhook identifier" }),
+		webhookEventId: t.Union([t.String(), t.Null()], { description: "Event identifier" }),
+		eventType: t.String({ description: "Event type" }),
+		eventData: t.Record(t.String(), t.Any(), { description: "Event payload" }),
+		status: t.Union([
+			t.Literal("pending"),
+			t.Literal("success"),
+			t.Literal("failed"),
+			t.Literal("retrying"),
+		], { description: "Delivery status" }),
+		requestUrl: t.String({ description: "Request URL" }),
+		requestHeaders: t.Union([t.Record(t.String(), t.String()), t.Null()]),
+		requestBody: t.Union([t.Record(t.String(), t.Any()), t.Null()]),
+		responseStatus: t.Union([t.Number(), t.Null()]),
+		responseBody: t.Union([t.String(), t.Null()]),
+		responseHeaders: t.Union([t.Record(t.String(), t.String()), t.Null()]),
+		attemptNumber: t.Number(),
+		maxAttempts: t.Number(),
+		nextRetryAt: t.Union([t.String(), t.Null()]),
+		lastAttemptAt: t.Union([t.String(), t.Null()]),
+		errorMessage: t.Union([t.String(), t.Null()]),
+		errorDetails: t.Union([t.Record(t.String(), t.Any()), t.Null()]),
+		completedAt: t.Union([t.String(), t.Null()]),
+		durationMs: t.Union([t.Number(), t.Null()]),
+		createdAt: t.String(),
+	});
+
+	export type WebhookDeliveryResponse = typeof webhookDeliveryResponse.static;
+
+	export const webhookDeliveryListResponse = t.Object({
+		deliveries: t.Array(webhookDeliveryResponse),
+		total: t.Number(),
+		page: t.Number(),
+		limit: t.Number(),
+	});
+
+	export type WebhookDeliveryListResponse = typeof webhookDeliveryListResponse.static;
+
+	export const webhookDeliveryQuery = t.Object({
+		page: t.Optional(t.Number({ minimum: 1, default: 1 })),
+		limit: t.Optional(t.Number({ minimum: 1, maximum: 100, default: 10 })),
+		status: t.Optional(t.Union([
+			t.Literal("pending"),
+			t.Literal("success"),
+			t.Literal("failed"),
+			t.Literal("retrying"),
+		])),
+	});
+
+	export type WebhookDeliveryQuery = typeof webhookDeliveryQuery.static;
 }
