@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { EditWebhookModal } from "../../components/edit-webhook-modal";
+import { TriggerWebhookModal } from "../../components/trigger-webhook-modal";
 
 interface WebhookData {
 	id: string;
@@ -78,6 +79,7 @@ export const WebhookHeader = ({
 }: WebhookHeaderProps) => {
 	const { back } = useRouter();
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+	const [isTriggerModalOpen, setIsTriggerModalOpen] = useState(false);
 
 	const handleCopySecret = async () => {
 		if (webhook?.secret) {
@@ -243,6 +245,14 @@ export const WebhookHeader = ({
 						</Button.Root>
 					) : webhook ? (
 						<>
+							<Button.Root
+								variant="neutral"
+								size="xsmall"
+								onClick={() => setIsTriggerModalOpen(true)}
+							>
+								<Icon name="webhook" className="h-4 w-4" />
+								Trigger Test Event
+							</Button.Root>
 							<Button.Root
 								variant="neutral"
 								size="xsmall"
@@ -449,11 +459,18 @@ export const WebhookHeader = ({
 				</div>
 			)}
 			{webhook && (
-				<EditWebhookModal
-					isOpen={isEditModalOpen}
-					onClose={() => setIsEditModalOpen(false)}
-					webhook={webhook}
-				/>
+				<>
+					<EditWebhookModal
+						isOpen={isEditModalOpen}
+						onClose={() => setIsEditModalOpen(false)}
+						webhook={webhook}
+					/>
+					<TriggerWebhookModal
+						isOpen={isTriggerModalOpen}
+						onClose={() => setIsTriggerModalOpen(false)}
+						webhookId={webhook.id}
+					/>
+				</>
 			)}
 		</div>
 	);

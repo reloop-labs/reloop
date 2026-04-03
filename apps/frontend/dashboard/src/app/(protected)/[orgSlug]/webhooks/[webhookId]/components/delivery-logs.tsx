@@ -32,8 +32,10 @@ interface DeliveryLogsProps {
 
 interface Delivery {
 	id: string;
-	eventId: string;
-	eventName: string;
+	webhookId: string;
+	webhookEventId: string | null;
+	eventType: string;
+	eventData: Record<string, unknown>;
 	status: "pending" | "success" | "failed" | "retrying";
 	requestUrl: string;
 	requestHeaders: Record<string, string> | null;
@@ -44,7 +46,7 @@ interface Delivery {
 	attemptNumber: number;
 	maxAttempts: number;
 	nextRetryAt: string | null;
-	lastAttemptAt: string;
+	lastAttemptAt: string | null;
 	errorMessage: string | null;
 	errorDetails: Record<string, unknown> | null;
 	completedAt: string | null;
@@ -73,7 +75,7 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 	const [dateRange, setDateRange] = useState("7d");
 
 	const { data, error, isLoading } = useSWR<DeliveryListResponse>(
-		`/api/webhook/deliveries/list?webhookId=${webhookId}&page=${currentPage}&limit=${pageSize}&status=${statusFilter === "all" ? "" : statusFilter}`,
+		`/api/webhook/v1/${webhookId}/deliveries?page=${currentPage}&limit=${pageSize}&status=${statusFilter === "all" ? "" : statusFilter}`,
 		{
 			revalidateOnFocus: false,
 			revalidateOnReconnect: true,
@@ -130,7 +132,7 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 		data?.deliveries?.filter((delivery) => {
 			const matchesSearch =
 				searchQuery === "" ||
-				delivery.eventName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+				delivery.eventType.toLowerCase().includes(searchQuery.toLowerCase()) ||
 				delivery.requestUrl.toLowerCase().includes(searchQuery.toLowerCase());
 			return matchesSearch;
 		}) || [];
@@ -272,7 +274,7 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 											/>
 											<div className="flex flex-col">
 												<span className="font-medium text-label-sm text-text-strong-950">
-													{delivery.eventName}
+													{delivery.eventType}
 												</span>
 												<span className="text-label-xs text-text-sub-600">
 													{delivery.requestUrl}
@@ -322,7 +324,9 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 											{...getAnimationProps(index + 1, 3)}
 											className="text-label-sm text-text-strong-950"
 										>
-											{dayjs(delivery.lastAttemptAt).fromNow()}
+											{delivery.lastAttemptAt
+												? dayjs(delivery.lastAttemptAt).fromNow()
+												: "Pending"}
 										</motion.span>
 									</div>
 
