@@ -2,6 +2,7 @@
 import { SomethingWentWrong } from "@fe/dashboard/components/something-went-wrong";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import type { DomainNameserversResponse, DomainResponse } from "@reloop/api";
+import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
@@ -307,10 +308,14 @@ const DomainPage = () => {
 					/>
 				)}
 
-				<div className="mt-10 mb-4">
+				<div className="mt-10 mb-4 flex items-center justify-between">
 					<p className="font-semibold text-paragraph-lg text-text-strong-950">
 						DNS Records
 					</p>
+					<Button.Root variant="neutral" mode="stroke" size="xsmall">
+						<Icon name="refresh-cw" className="h-3.5 w-3.5" />
+						Auto Configure
+					</Button.Root>
 				</div>
 				<DNSRecordsSection
 					sendingRecords={sendingRecords}
