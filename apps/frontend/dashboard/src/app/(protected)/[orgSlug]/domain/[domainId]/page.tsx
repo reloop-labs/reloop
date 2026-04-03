@@ -307,8 +307,10 @@ const DomainPage = () => {
 					/>
 				)}
 
-				<div className="my-9">
-					<div className="w-full border-stroke-soft-200 border-t border-dashed" />
+				<div className="mt-10 mb-4">
+					<p className="font-semibold text-paragraph-lg text-text-strong-950">
+						DNS Records
+					</p>
 				</div>
 				<DNSRecordsSection
 					sendingRecords={sendingRecords}

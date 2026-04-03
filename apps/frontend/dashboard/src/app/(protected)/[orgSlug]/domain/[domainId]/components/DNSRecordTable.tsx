@@ -10,6 +10,7 @@ import type { DNSRecord } from "@reloop/api/types";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
+import * as Tooltip from "@reloop/ui/tooltip";
 import { AnimatePresence, motion } from "motion/react";
 
 interface DNSRecordTableProps {
@@ -200,48 +201,61 @@ export const DNSRecordTable = ({
 									</motion.button>
 
 									{/* Value Column */}
-									<motion.button
-										{...getAnimationProps(index + 1, 2)}
-										type="button"
-										onClick={() =>
-											onCopyToClipboard?.(
-												record.value,
-												`${tableId}value-${index}`,
-											)
-										}
-										className="group/copy flex min-w-0 max-w-full cursor-pointer items-center gap-1.5 overflow-hidden pr-2"
-									>
-										<span className="truncate font-mono text-label-sm text-text-sub-600">
-											{record.value}
-										</span>
-										<motion.div
-											animate={
-												copiedItems.has(`${tableId}value-${index}`)
-													? "copied"
-													: "default"
-											}
-											variants={{
-												default: { scale: 1 },
-												copied: { scale: 1.1 },
-											}}
-											transition={{ duration: 0.2, ease: "easeInOut" }}
-											className="flex-shrink-0"
-										>
-											<Icon
-												name={
-													copiedItems.has(`${tableId}value-${index}`)
-														? "check"
-														: "copy"
-												}
-												className={cn(
-													"h-3 w-3 transition-colors",
-													copiedItems.has(`${tableId}value-${index}`)
-														? "text-success-base"
-														: "text-text-sub-600 opacity-0 group-hover/copy:opacity-100",
-												)}
-											/>
-										</motion.div>
-									</motion.button>
+									<Tooltip.Provider delayDuration={300}>
+										<Tooltip.Root>
+											<Tooltip.Trigger asChild>
+												<motion.button
+													{...getAnimationProps(index + 1, 2)}
+													type="button"
+													onClick={() =>
+														onCopyToClipboard?.(
+															record.value,
+															`${tableId}value-${index}`,
+														)
+													}
+													className="group/copy flex min-w-0 max-w-full cursor-pointer items-center gap-1.5 overflow-hidden pr-2"
+												>
+													<span className="truncate font-mono text-label-sm text-text-sub-600">
+														{record.value}
+													</span>
+													<motion.div
+														animate={
+															copiedItems.has(`${tableId}value-${index}`)
+																? "copied"
+																: "default"
+														}
+														variants={{
+															default: { scale: 1 },
+															copied: { scale: 1.1 },
+														}}
+														transition={{ duration: 0.2, ease: "easeInOut" }}
+														className="flex-shrink-0"
+													>
+														<Icon
+															name={
+																copiedItems.has(`${tableId}value-${index}`)
+																	? "check"
+																	: "copy"
+															}
+															className={cn(
+																"h-3 w-3 transition-colors",
+																copiedItems.has(`${tableId}value-${index}`)
+																	? "text-success-base"
+																	: "text-text-sub-600 opacity-0 group-hover/copy:opacity-100",
+															)}
+														/>
+													</motion.div>
+												</motion.button>
+											</Tooltip.Trigger>
+											<Tooltip.Content
+												side="top"
+												variant="light"
+												className="max-w-sm break-all font-mono text-xs"
+											>
+												{record.value}
+											</Tooltip.Content>
+										</Tooltip.Root>
+									</Tooltip.Provider>
 
 									{/* Priority Column */}
 									{showPriorityColumn && (

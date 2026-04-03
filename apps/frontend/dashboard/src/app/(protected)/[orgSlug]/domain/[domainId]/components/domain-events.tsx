@@ -231,7 +231,7 @@ export const DomainEvents = ({
 									{/* Circle */}
 									<div
 										className={cn(
-											"relative flex h-8 w-8 shrink-0 items-center justify-center rounded-md transition-all duration-500",
+											"relative flex h-9 w-9 shrink-0 items-center justify-center rounded-md transition-all duration-500",
 											state === "completed" &&
 												"bg-neutral-alpha-10 text-text-strong-950",
 											state === "active" &&
