@@ -211,8 +211,8 @@ export namespace WebhookModel {
 	export type WebhookListResponse = typeof webhookListResponse.static;
 
 	export const webhookQuery = t.Object({
-		page: t.Optional(t.Number({ minimum: 1, default: 1 })),
-		limit: t.Optional(t.Number({ minimum: 1, maximum: 100, default: 10 })),
+		page: t.Optional(t.Numeric({ minimum: 1, default: 1 })),
+		limit: t.Optional(t.Numeric({ minimum: 1, maximum: 100, default: 10 })),
 		status: t.Optional(
 			t.Union([
 				t.Literal("active"),
@@ -346,14 +346,17 @@ export namespace WebhookModel {
 	export type WebhookDeliveryListResponse = typeof webhookDeliveryListResponse.static;
 
 	export const webhookDeliveryQuery = t.Object({
-		page: t.Optional(t.Number({ minimum: 1, default: 1 })),
-		limit: t.Optional(t.Number({ minimum: 1, maximum: 100, default: 10 })),
-		status: t.Optional(t.Union([
-			t.Literal("pending"),
-			t.Literal("success"),
-			t.Literal("failed"),
-			t.Literal("retrying"),
-		])),
+		page: t.Optional(t.Numeric({ minimum: 1, default: 1 })),
+		limit: t.Optional(t.Numeric({ minimum: 1, maximum: 100, default: 10 })),
+		status: t.Optional(
+			t.Union([
+				t.Literal("pending"),
+				t.Literal("success"),
+				t.Literal("failed"),
+				t.Literal("retrying"),
+				t.Literal(""),
+			]),
+		),
 	});
 
 	export type WebhookDeliveryQuery = typeof webhookDeliveryQuery.static;
