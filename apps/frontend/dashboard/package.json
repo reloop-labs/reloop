@@ -15,6 +15,7 @@
 		"@reloop/auth": "workspace:*",
 		"@reloop/tailwind": "workspace:*",
 		"@reloop/ui": "workspace:*",
+		"@reloop/webhook-events": "workspace:*",
 		"@tanstack/react-table": "catalog:ui",
 		"@types/three": "catalog:ui",
 		"axios": "catalog:",

@@ -16,6 +16,8 @@ import { toast } from "sonner";
 import { useSWRConfig } from "swr";
 import * as v from "valibot";
 
+import { WebhookEventSelector } from "./webhook-event-selector";
+
 const webhookSchema = v.object({
 	url: v.pipe(
 		v.string("URL is required"),
@@ -26,7 +28,7 @@ const webhookSchema = v.object({
 		),
 	),
 	events: v.pipe(
-		v.string("Events are required"),
+		v.array(v.string("Events are required")),
 		v.minLength(1, "At least one event is required"),
 	),
 });
@@ -47,14 +49,23 @@ export const CreateWebhookModal = ({
 	const { mutate } = useSWRConfig();
 	const router = useRouter();
 
-	const { register, handleSubmit, formState, reset, setError } =
-		useForm<WebhookFormValues>({
-			resolver: valibotResolver(webhookSchema) as Resolver<WebhookFormValues>,
-			defaultValues: {
-				url: "",
-				events: "",
-			},
-		});
+	const {
+		register,
+		handleSubmit,
+		formState,
+		reset,
+		setError,
+		setValue,
+		watch,
+	} = useForm<WebhookFormValues>({
+		resolver: valibotResolver(webhookSchema) as Resolver<WebhookFormValues>,
+		defaultValues: {
+			url: "",
+			events: [],
+		},
+	});
+
+	const events = watch("events");
 
 	const onSubmit = async (data: WebhookFormValues) => {
 		if (!activeOrganization?.id) return;
@@ -65,10 +76,7 @@ export const CreateWebhookModal = ({
 				"/api/webhook/v1/",
 				{
 					url: data.url,
-					events: data.events
-						.split(",")
-						.map((e) => e.trim())
-						.filter(Boolean),
+					events: data.events,
 				},
 				{ headers: { credentials: "include" } },
 			);
@@ -136,19 +144,15 @@ export const CreateWebhookModal = ({
 									<Label.Asterisk />
 								</Label.Root>
 								<p className="mb-1 text-text-sub-600 text-xs">
-									Comma separated event names to listen to (e.g.
-									payment.created)
+									Select the events you want to listen to.
 								</p>
-								<Input.Root className="mt-1" size="small">
-									<Input.Wrapper>
-										<Input.Input
-											className="px-2"
-											id="events"
-											placeholder="payment.created, user.created"
-											{...register("events")}
-										/>
-									</Input.Wrapper>
-								</Input.Root>
+								<WebhookEventSelector
+									value={events}
+									onChange={(val: string[]) =>
+										setValue("events", val, { shouldValidate: true })
+									}
+									error={formState.errors.events?.message}
+								/>
 								{formState.errors.events && (
 									<p className="mt-1 text-red-600 text-sm">
 										{formState.errors.events.message}

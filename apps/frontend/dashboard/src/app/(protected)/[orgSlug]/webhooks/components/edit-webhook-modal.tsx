@@ -14,6 +14,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
 import * as v from "valibot";
+import { WebhookEventSelector } from "./webhook-event-selector";
 
 const updateWebhookSchema = v.object({
 	name: v.optional(v.string("Name is required")),
@@ -30,6 +31,7 @@ const updateWebhookSchema = v.object({
 	status: v.optional(
 		v.union([v.literal("active"), v.literal("paused"), v.literal("disabled")]),
 	),
+	events: v.optional(v.array(v.string("Events are required"))),
 });
 
 type UpdateWebhookFormValues = v.InferInput<typeof updateWebhookSchema>;
@@ -39,6 +41,7 @@ interface WebhookData {
 	name: string;
 	url: string;
 	status: "active" | "paused" | "disabled" | "failed";
+	events: string[];
 }
 
 interface EditWebhookModalProps {
@@ -56,7 +59,7 @@ export const EditWebhookModal = ({
 	const { changeStatus, status } = useLoading();
 	const { mutate } = useSWRConfig();
 
-	const { register, handleSubmit, formState, reset } =
+	const { register, handleSubmit, formState, reset, setValue, watch } =
 		useForm<UpdateWebhookFormValues>({
 			resolver: valibotResolver(
 				updateWebhookSchema,
@@ -65,8 +68,11 @@ export const EditWebhookModal = ({
 				name: webhook.name || "",
 				url: webhook.url || "",
 				status: webhook.status as "active" | "paused" | "disabled",
+				events: webhook.events || [],
 			},
 		});
+
+	const events = watch("events") || [];
 
 	const onSubmit = async (data: UpdateWebhookFormValues) => {
 		if (!activeOrganization?.id) return;
@@ -143,6 +149,23 @@ export const EditWebhookModal = ({
 								{formState.errors.url && (
 									<p className="mt-1 text-red-600 text-sm">
 										{formState.errors.url.message}
+									</p>
+								)}
+							</div>
+							<div>
+								<Label.Root htmlFor="events">Events</Label.Root>
+								<div className="mt-1">
+									<WebhookEventSelector
+										value={events}
+										onChange={(val: string[]) =>
+											setValue("events", val, { shouldValidate: true })
+										}
+										error={formState.errors.events?.message}
+									/>
+								</div>
+								{formState.errors.events && (
+									<p className="mt-1 text-red-600 text-sm">
+										{formState.errors.events.message}
 									</p>
 								)}
 							</div>
