@@ -269,4 +269,40 @@ export namespace WebhookModel {
 		},
 	);
 	export type DeleteWebhookResponse = typeof deleteWebhookResponse.static;
+	export const triggerWebhookBody = t.Object({
+		event: t.String({
+			pattern: eventRegex.source,
+			error: "Invalid event ID provided",
+		}),
+		payload: t.Record(t.String(), t.Any(), {
+			description: "Event payload",
+		}),
+		organizationId: t.Optional(t.String({
+			description: "Organization ID to trigger webhooks for",
+		})),
+		userId: t.Optional(t.String({
+			description: "User ID to trigger webhooks for",
+		})),
+	}, {
+		examples: [
+			{
+				event: "domain.created",
+				payload: {
+					id: "dom_123456789",
+					name: "example.com",
+				},
+				organizationId: "org_123456789",
+			},
+		],
+	});
+
+	export type TriggerWebhookBody = typeof triggerWebhookBody.static;
+
+	export const triggerWebhookResponse = t.Object({
+		success: t.Boolean(),
+		message: t.String(),
+		jobId: t.Optional(t.String()),
+	});
+
+	export type TriggerWebhookResponse = typeof triggerWebhookResponse.static;
 }

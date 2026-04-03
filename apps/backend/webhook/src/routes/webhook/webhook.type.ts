@@ -66,4 +66,13 @@ export namespace WebhookTypes {
 		organizationId?: string;
 		userId?: string;
 	}
+	export interface TriggerWebhookRequest {
+		event: string;
+		payload: Record<string, unknown>;
+		organizationId?: string;
+		userId?: string;
+	}
+
+	export type TriggerWebhookResponse =
+		typeof WebhookModel.triggerWebhookResponse.static;
 }
