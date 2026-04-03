@@ -158,10 +158,10 @@ export const DomainEvents = ({
 			>
 				<div
 					className={cn(
-						"relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full",
+						"relative flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-stroke-soft-200",
 						domain.status === "active"
 							? "bg-bg-weak-50 text-text-strong-950"
-							: "bg-bg-weak-50 text-text-sub-600 ring-1 ring-stroke-soft-200 ring-inset",
+							: "bg-bg-weak-50 text-text-sub-600 ring-stroke-soft-200 ring-inset",
 					)}
 				>
 					{domain.status === "verifying" ? (
@@ -231,12 +231,12 @@ export const DomainEvents = ({
 									{/* Circle */}
 									<div
 										className={cn(
-											"relative flex h-9 w-9 shrink-0 items-center justify-center rounded-md transition-all duration-500",
+											"relative flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-stroke-soft-200 transition-all duration-500",
 											state === "completed" &&
 												"bg-neutral-alpha-10 text-text-strong-950",
 											state === "active" &&
 												!isFailed &&
-												"bg-neutral-alpha-10 text-text-sub-600",
+												"bg-bg-weak-50 text-text-sub-600",
 											state === "failed" &&
 												"bg-neutral-alpha-10 text-text-sub-600",
 											state === "upcoming" &&
