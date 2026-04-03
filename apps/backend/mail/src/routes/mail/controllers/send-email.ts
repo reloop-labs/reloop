@@ -1,4 +1,4 @@
-import { postfixClient } from "@reloop/be-mail/lib/postfix-client";
+import { kumomtaClient } from "@reloop/be-mail/lib/kumomta-client";
 import type { MailTypes } from "@reloop/be-mail/routes/mail/mail.type.js";
 import { db } from "@reloop/db/client";
 import {
@@ -54,37 +54,37 @@ export async function sendEmail(
 		if (!dnsHealthCheck.isHealthy) {
 			const errorMessage = `Domain ${domainName} has invalid or missing DNS records: ${dnsHealthCheck.missingRecords.join(", ")}. Please verify your DNS records are configured correctly.`;
 
-			// Trigger async re-verification in background
-			try {
-				await inngest.send({
-					name: "verify/domain",
-					data: {
-						domainId: currentDomain.id,
-						domain: currentDomain.domain,
-						organizationId,
-					},
-				});
-				logger.info(
-					{ domainId: currentDomain.id, domain: domainName },
-					"Triggered async DNS re-verification due to health check failure",
-				);
-			} catch (error) {
-				logger.warn(
-					{
-						domainId: currentDomain.id,
-						error: error instanceof Error ? error.message : String(error),
-					},
-					"Failed to trigger DNS re-verification",
-				);
-			}
+			// Trigger async re-verification in background (commented out until inngest is properly integrated)
+			// try {
+			// 	await inngest.send({
+			// 		name: "verify/domain",
+			// 		data: {
+			// 			domainId: currentDomain.id,
+			// 			domain: currentDomain.domain,
+			// 			organizationId,
+			// 		},
+			// 	});
+			// 	logger.info(
+			// 		{ domainId: currentDomain.id, domain: domainName },
+			// 		"Triggered async DNS re-verification due to health check failure",
+			// 	);
+			// } catch (error) {
+			// 	logger.warn(
+			// 		{
+			// 			domainId: currentDomain.id,
+			// 			error: error instanceof Error ? error.message : String(error),
+			// 		},
+			// 		"Failed to trigger DNS re-verification",
+			// 	);
+			// }
 
 			throw new Error(errorMessage);
 		}
 
 		// Check if user has a mailbox for this domain
 
-		// Send email via Postfix
-		const result = await postfixClient.sendEmail({
+		// Send email via KumoMTA
+		const result = await kumomtaClient.sendEmail({
 			from: emailData.from,
 			to: emailData.to,
 			subject: emailData.subject,
@@ -118,7 +118,7 @@ export async function sendEmail(
 			textBody: emailData.text,
 			htmlBody: emailData.html,
 			status: "sent",
-			provider: "postfix",
+			provider: "kumomta",
 			providerMessageId: result.messageId,
 			size: (emailData.text?.length || 0) + (emailData.html?.length || 0),
 			sentAt: new Date(),
@@ -216,7 +216,6 @@ async function checkDomainDnsHealth(
 		columns: {
 			id: true,
 			domain: true,
-			dnsConfigured: true,
 			systemVerified: true,
 			status: true,
 			lastVerifiedAt: true,
@@ -235,15 +234,10 @@ async function checkDomainDnsHealth(
 	const lastVerified = domainData.lastVerifiedAt;
 	const isRecent = lastVerified
 		? new Date().getTime() - new Date(lastVerified).getTime() <
-			STALE_THRESHOLD_HOURS * 60 * 60 * 1000
+		STALE_THRESHOLD_HOURS * 60 * 60 * 1000
 		: false;
 
-	if (
-		domainData.dnsConfigured &&
-		domainData.systemVerified &&
-		domainData.status === "active" &&
-		isRecent
-	) {
+	if (domainData.systemVerified && domainData.status === "active" && isRecent) {
 		return {
 			isHealthy: true,
 			missingRecords: [],
@@ -255,8 +249,7 @@ async function checkDomainDnsHealth(
 	const dnsRecords = await db
 		.select({
 			recordType: domainDnsRecord.recordType,
-			isVerified: domainDnsRecord.isVerified,
-			isActive: domainDnsRecord.isActive,
+			status: domainDnsRecord.status,
 		})
 		.from(domainDnsRecord)
 		.where(
@@ -272,9 +265,7 @@ async function checkDomainDnsHealth(
 		.limit(10);
 
 	const foundRecordTypes = new Set(
-		dnsRecords
-			.filter((r) => r.isVerified && r.isActive)
-			.map((r) => r.recordType),
+		dnsRecords.filter((r) => r.status === "active").map((r) => r.recordType),
 	);
 
 	const missingRecords = requiredRecordTypes.filter(

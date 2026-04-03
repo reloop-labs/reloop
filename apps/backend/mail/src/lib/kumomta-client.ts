@@ -11,7 +11,7 @@ export interface SMTPConfig {
 	};
 }
 
-export class PostfixClient {
+export class KumomtaClient {
 	private transporter: nodemailer.Transporter;
 	private config: SMTPConfig;
 
@@ -115,7 +115,7 @@ const smtpPort = Number.parseInt(process.env.SMTP_PORT || "25");
 const smtpUser = process.env.SMTP_USER;
 const smtpPass = process.env.SMTP_PASS;
 
-export const postfixClient = new PostfixClient({
+export const kumomtaClient = new KumomtaClient({
 	host: smtpHost,
 	port: smtpPort,
 	secure: false,

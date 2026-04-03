@@ -1,10 +1,10 @@
-import { testPostfixSend } from "@reloop/be-mail/routes/mail/controllers/postfix-send.js";
+import { testKumomtaSend } from "@reloop/be-mail/routes/mail/controllers/kumomta-send.js";
 import { Elysia, t } from "elysia";
 
 export const testSendRoute = new Elysia().get(
 	"/hard-send",
 	async () => {
-		return await testPostfixSend();
+		return await testKumomtaSend();
 	},
 	{
 		response: {
@@ -23,9 +23,9 @@ export const testSendRoute = new Elysia().get(
 		},
 		detail: {
 			tags: ["Mail", "Health Check"],
-			summary: "Test Postfix mail server",
+			summary: "Test Kumomta mail server",
 			description:
-				"Sends a test email with hardcoded values to verify Postfix functionality. No authentication required.",
+				"Sends a test email with hardcoded values to verify Kumomta functionality. No authentication required.",
 		},
 	},
 );

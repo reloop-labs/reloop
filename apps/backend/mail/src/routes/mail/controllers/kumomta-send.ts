@@ -1,7 +1,7 @@
 import { logger } from "@reloop/logger";
 import nodemailer from "nodemailer";
 
-interface TestPostfixSendResponse {
+interface TestKumomtaSendResponse {
 	success: boolean;
 	messageId?: string;
 	response?: string;
@@ -14,14 +14,14 @@ interface TestPostfixSendResponse {
 	error?: string;
 }
 
-export async function testPostfixSend(): Promise<TestPostfixSendResponse> {
+export async function testKumomtaSend(): Promise<TestKumomtaSendResponse> {
 	const timestamp = new Date().toISOString();
 
 	const TEST_CONFIG = {
 		from: "test@deployx.dev",
 		to: "jxgyc.test@inbox.testmail.app",
-		subject: "Postfix Health Check",
-		text: `Postfix test email sent at ${timestamp}.\n\nIf you receive this, the mail server is operational.`,
+		subject: "Kumomta Health Check",
+		text: `Kumomta test email sent at ${timestamp}.\n\nIf you receive this, the mail server is operational.`,
 	};
 
 	const transporter = nodemailer.createTransport({
@@ -41,7 +41,7 @@ export async function testPostfixSend(): Promise<TestPostfixSendResponse> {
 				host: process.env.SMTP_HOST || "localhost",
 				port: process.env.SMTP_PORT || "587",
 			},
-			"Starting Postfix test email send",
+			"Starting Kumomta test email send",
 		);
 
 		const info = await transporter.sendMail({
@@ -56,7 +56,7 @@ export async function testPostfixSend(): Promise<TestPostfixSendResponse> {
 				messageId: info.messageId,
 				response: info.response,
 			},
-			"Postfix test email sent successfully",
+			"Kumomta test email sent successfully",
 		);
 
 		return {
@@ -80,7 +80,7 @@ export async function testPostfixSend(): Promise<TestPostfixSendResponse> {
 				from: TEST_CONFIG.from,
 				to: TEST_CONFIG.to,
 			},
-			"Postfix test email failed",
+			"Kumomta test email failed",
 		);
 
 		return {
