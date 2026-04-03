@@ -17,11 +17,19 @@ export namespace WebhookModel {
 			url: t.String({
 				pattern: urlPattern.source,
 				description: "Webhook URL",
+				error: "Please provide a valid webhook URL",
 			}),
-			events: t.Array(t.String({ pattern: eventRegex.source }), {
-				minItems: 1,
-				description: "Array of event IDs to subscribe to",
-			}),
+			events: t.Array(
+				t.String({
+					pattern: eventRegex.source,
+					error: "Invalid event ID provided",
+				}),
+				{
+					minItems: 1,
+					description: "Array of event IDs to subscribe to",
+					error: "Please provide at least one valid event ID to subscribe to",
+				},
+			),
 		},
 		{
 			examples: [
