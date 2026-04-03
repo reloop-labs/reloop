@@ -41,7 +41,7 @@ const headerMenuItems = [
 	},
 	{
 		id: "delete",
-		label: "Remove domain",
+		label: "Delete Domain",
 		icon: "trash" as const,
 		isDanger: true,
 	},

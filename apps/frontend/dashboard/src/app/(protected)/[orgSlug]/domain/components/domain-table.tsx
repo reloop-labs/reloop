@@ -10,6 +10,7 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useRouter } from "next/navigation";
+import { useQueryState } from "nuqs";
 import { useState } from "react";
 import { DomainDropdown } from "./domain-dropdown";
 import { EmptyState } from "./empty-state";
@@ -51,13 +52,14 @@ export const DomainTable = ({
 }: DomainTableProps) => {
 	const router = useRouter();
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
+	const [, setDeleteId] = useQueryState("delete");
 
 	const handleRowClick = (domainId: string) => {
 		router.push(`/${activeOrganizationSlug}/domain/${domainId}`);
 	};
 
 	const handleDeleteDomain = (domainId: string) => {
-		// Handled via query state in list if needed
+		setDeleteId(domainId);
 	};
 
 	if (isLoading) {

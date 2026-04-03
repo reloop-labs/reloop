@@ -22,7 +22,7 @@ const domainMenuItems = [
 		icon: "eye-outline" as const,
 		isDanger: false,
 	},
-	{ id: "delete", label: "Delete", icon: "trash" as const, isDanger: true },
+	{ id: "delete", label: "Delete Domain", icon: "trash" as const, isDanger: true },
 ];
 
 export const DomainDropdown = ({
