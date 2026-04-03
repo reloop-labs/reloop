@@ -3,6 +3,7 @@
 import type { DomainResponse } from "@reloop/api";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import Spinner from "@reloop/ui/spinner";
 import { format } from "date-fns";
 
 const WifiAnimatedIcon = ({ className }: { className?: string }) => (
@@ -73,6 +74,7 @@ export const DomainEvents = ({
 	const isFailed = domain.status === "failed";
 
 	const getStepState = (stepNumber: number) => {
+		if (domain.status === "active") return "completed";
 		if (isFailed && stepNumber === 2) return "failed";
 		if (stepNumber < currentStep) return "completed";
 		if (stepNumber === currentStep) return "active";
@@ -144,10 +146,16 @@ export const DomainEvents = ({
 	return (
 		<div>
 			{/* Status Banner */}
-			<h3 className="mt-8 mb-2 font-medium text-paragraph-xs text-text-sub-600">
-				DNS Status
-			</h3>
-			<div className="mb-5 flex items-center gap-3 rounded-xl border border-stroke-soft-200 p-4">
+			<div
+				className={cn(
+					"mt-8 mb-5 flex items-center gap-3 rounded-xl border p-4",
+					domain.status === "active" && "border-success-base",
+					domain.status === "verifying" && "border-warning-base",
+					domain.status === "failed" && "border-error-base",
+					!["active", "verifying", "failed"].includes(domain.status) &&
+						"border-stroke-soft-200",
+				)}
+			>
 				<div
 					className={cn(
 						"relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full",
@@ -156,14 +164,14 @@ export const DomainEvents = ({
 							: "bg-bg-weak-50 text-text-sub-600 ring-1 ring-stroke-soft-200 ring-inset",
 					)}
 				>
-					{domain.status === "verifying" || domain.status === "start-verify" ? (
+					{domain.status === "verifying" ? (
 						<WifiAnimatedIcon className="relative h-4 w-4" />
 					) : domain.status === "active" ? (
 						<Icon name="check-circle" className="relative h-4 w-4" />
 					) : domain.status === "failed" ? (
 						<Icon name="cross-circle" className="relative h-4 w-4" />
 					) : (
-						<WifiAnimatedIcon className="relative h-4 w-4" />
+						<Icon name="wifi" className="relative h-4 w-4" />
 					)}
 				</div>
 
@@ -178,104 +186,133 @@ export const DomainEvents = ({
 			</div>
 
 			{/* Horizontal Timeline */}
-			<div className="flex items-start">
-				{steps.map((step, index) => {
-					const state = getStepState(step.number);
-					const isLast = index === steps.length - 1;
+			<div className="relative overflow-hidden rounded-2xl border-stroke-soft-200 border-t-[0.5px] border-r border-b border-l p-7">
+				{/* Circuit board pattern - Light mode */}
+				<div
+					className="pointer-events-none absolute inset-0 dark:hidden"
+					style={{
+						backgroundImage: `
+							repeating-linear-gradient(0deg, transparent, transparent 19px, rgba(0, 0, 0, 0.04) 19px, rgba(0, 0, 0, 0.04) 20px, transparent 20px, transparent 39px, rgba(0, 0, 0, 0.04) 39px, rgba(0, 0, 0, 0.04) 40px),
+							repeating-linear-gradient(90deg, transparent, transparent 19px, rgba(0, 0, 0, 0.04) 19px, rgba(0, 0, 0, 0.04) 20px, transparent 20px, transparent 39px, rgba(0, 0, 0, 0.04) 39px, rgba(0, 0, 0, 0.04) 40px),
+							radial-gradient(circle at 20px 20px, rgba(0, 0, 0, 0.05) 1.5px, transparent 1.5px),
+							radial-gradient(circle at 40px 40px, rgba(0, 0, 0, 0.05) 1.5px, transparent 1.5px)
+						`,
+						backgroundSize: "40px 40px, 40px 40px, 40px 40px, 40px 40px",
+					}}
+				/>
+				{/* Circuit board pattern - Dark mode */}
+				<div
+					className="pointer-events-none absolute inset-0 hidden dark:block"
+					style={{
+						backgroundImage: `
+							repeating-linear-gradient(0deg, transparent, transparent 19px, rgba(255, 255, 255, 0.06) 19px, rgba(255, 255, 255, 0.06) 20px, transparent 20px, transparent 39px, rgba(255, 255, 255, 0.06) 39px, rgba(255, 255, 255, 0.06) 40px),
+							repeating-linear-gradient(90deg, transparent, transparent 19px, rgba(255, 255, 255, 0.06) 19px, rgba(255, 255, 255, 0.06) 20px, transparent 20px, transparent 39px, rgba(255, 255, 255, 0.06) 39px, rgba(255, 255, 255, 0.06) 40px),
+							radial-gradient(circle at 20px 20px, rgba(255, 255, 255, 0.08) 1.5px, transparent 1.5px),
+							radial-gradient(circle at 40px 40px, rgba(255, 255, 255, 0.08) 1.5px, transparent 1.5px)
+						`,
+						backgroundSize: "40px 40px, 40px 40px, 40px 40px, 40px 40px",
+					}}
+				/>
+				<div className="relative flex items-start">
+					{steps.map((step, index) => {
+						const state = getStepState(step.number);
+						const isLast = index === steps.length - 1;
 
-					return (
-						<div
-							key={step.number}
-							className={cn(
-								"flex items-start",
-								isLast ? "flex-shrink-0" : "flex-1",
-							)}
-						>
-							{/* Step */}
-							<div className="flex flex-col items-center gap-2.5">
-								{/* Circle */}
-								<div
-									className={cn(
-										"relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-all duration-500",
-										state === "completed" &&
-											"bg-neutral-alpha-10 text-text-strong-950",
-										state === "active" &&
-											!isFailed &&
-											"bg-neutral-alpha-10 text-text-sub-600",
-										state === "failed" &&
-											"bg-neutral-alpha-10 text-text-sub-600",
-										state === "upcoming" && "bg-bg-weak-50 text-text-soft-400",
-									)}
-								>
-									{state === "failed" && (
-										<span className="absolute inset-0 animate-ping rounded-full bg-neutral-alpha-10 [animation-duration:2.5s]" />
-									)}
-
-									{state === "completed" ? (
-										<Icon name="check" className="relative h-3.5 w-3.5" />
-									) : state === "failed" ? (
-										<Icon name="cross" className="relative h-3.5 w-3.5" />
-									) : state === "active" && domain.status === "verifying" ? (
-										<WifiAnimatedIcon className="relative h-3.5 w-3.5" />
-									) : (
-										<Icon
-											name={step.icon}
-											className={cn(
-												"relative h-3.5 w-3.5",
-												state === "upcoming" && "opacity-40",
-											)}
-										/>
-									)}
-								</div>
-
-								{/* Label + Timestamp */}
-								<div className="flex flex-col items-center gap-1 text-center">
-									<span
+						return (
+							<div
+								key={step.number}
+								className={cn(
+									"flex items-start",
+									isLast ? "flex-shrink-0" : "flex-1",
+								)}
+							>
+								{/* Step */}
+								<div className="flex flex-col items-center gap-2.5">
+									{/* Circle */}
+									<div
 										className={cn(
-											"font-medium text-xs transition-colors duration-300",
-											state === "completed"
-												? "text-text-strong-950"
-												: state === "active" || state === "failed"
-													? "text-text-strong-950"
-													: "text-text-soft-400",
+											"relative flex h-8 w-8 shrink-0 items-center justify-center rounded-md transition-all duration-500",
+											state === "completed" &&
+												"bg-neutral-alpha-10 text-text-strong-950",
+											state === "active" &&
+												!isFailed &&
+												"bg-neutral-alpha-10 text-text-sub-600",
+											state === "failed" &&
+												"bg-neutral-alpha-10 text-text-sub-600",
+											state === "upcoming" &&
+												"bg-bg-weak-50 text-text-soft-400",
 										)}
 									>
-										{step.label}
-									</span>
+										{state === "failed" && (
+											<span className="absolute inset-0 animate-ping rounded-full bg-neutral-alpha-10 [animation-duration:2.5s]" />
+										)}
 
-									{step.timestamp && (
-										<span className="text-[10px] text-text-soft-400">
-											{step.timestamp}
-										</span>
-									)}
-								</div>
-							</div>
+										{state === "completed" ? (
+											<Icon name="check" className="relative h-3.5 w-3.5" />
+										) : state === "failed" ? (
+											<Icon name="cross" className="relative h-3.5 w-3.5" />
+										) : state === "active" && domain.status === "verifying" ? (
+											<Spinner size={14} color="currentColor" />
+										) : (
+											<Icon
+												name={step.icon}
+												className={cn(
+													"relative h-3.5 w-3.5",
+													state === "upcoming" && "opacity-40",
+												)}
+											/>
+										)}
+									</div>
 
-							{/* Connector Line */}
-							{!isLast && (
-								<div className="mt-[14px] flex flex-1 items-center px-2">
-									<div className="relative h-[1px] w-full overflow-hidden rounded-full bg-stroke-soft-200">
-										<div
+									{/* Label + Timestamp */}
+									<div className="flex flex-col items-center gap-1 text-center">
+										<span
 											className={cn(
-												"absolute inset-y-0 left-0 rounded-full transition-all duration-700 ease-out",
+												"font-medium text-xs transition-colors duration-300",
 												state === "completed"
-													? "w-full bg-text-sub-600"
-													: state === "active" && !isFailed
-														? "w-1/2 bg-text-sub-600"
-														: state === "failed"
-															? "w-1/2 bg-text-sub-600"
-															: "w-0",
+													? "text-text-strong-950"
+													: state === "active" || state === "failed"
+														? "text-text-strong-950"
+														: "text-text-soft-400",
 											)}
-										/>
-										{state === "active" && !isFailed && (
-											<div className="absolute inset-y-0 left-0 w-1/2 animate-pulse rounded-full bg-text-sub-600/20" />
+										>
+											{step.label}
+										</span>
+
+										{step.timestamp && (
+											<span className="text-[10px] text-text-soft-400">
+												{step.timestamp}
+											</span>
 										)}
 									</div>
 								</div>
-							)}
-						</div>
-					);
-				})}
+
+								{/* Connector Line */}
+								{!isLast && (
+									<div className="mt-[14px] flex flex-1 items-center px-2">
+										<div className="relative h-[1px] w-full overflow-hidden rounded-full bg-stroke-soft-200">
+											<div
+												className={cn(
+													"absolute inset-y-0 left-0 rounded-full transition-all duration-700 ease-out",
+													state === "completed"
+														? "w-full bg-text-sub-600"
+														: state === "active" && !isFailed
+															? "w-1/2 bg-text-sub-600"
+															: state === "failed"
+																? "w-1/2 bg-text-sub-600"
+																: "w-0",
+												)}
+											/>
+											{state === "active" && !isFailed && (
+												<div className="absolute inset-y-0 left-0 w-1/2 animate-pulse rounded-full bg-text-sub-600/20" />
+											)}
+										</div>
+									</div>
+								)}
+							</div>
+						);
+					})}
+				</div>
 			</div>
 		</div>
 	);
