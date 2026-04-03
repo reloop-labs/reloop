@@ -1,20 +1,14 @@
 import { authMiddleware } from "@reloop/webhook/middleware/auth";
 import { WebhookModel } from "@reloop/webhook/routes/webhook/webhook.model";
-import { Elysia, status, t } from "elysia";
+import { Elysia, t } from "elysia";
 import { updateWebhookController } from "./update-webhook.controllers";
 import { updateWebhookXCodeSamples } from "./update-webhook.x-codeSamples";
 
 export const updateWebhookRoute = new Elysia().use(authMiddleware).patch(
-	"/:id",
-	async ({ params: { id }, body, activeOrganizationId }) => {
-		if (!activeOrganizationId) {
-			throw status(403, {
-				message: "Authentication required",
-			});
-		}
-
+	"/:webhook_id",
+	async ({ params: { webhook_id }, body, activeOrganizationId }) => {
 		return await updateWebhookController({
-			webhookId: id,
+			webhookId: webhook_id,
 			organizationId: activeOrganizationId,
 			body,
 		});
@@ -22,7 +16,7 @@ export const updateWebhookRoute = new Elysia().use(authMiddleware).patch(
 	{
 		auth: true,
 		params: t.Object({
-			id: WebhookModel.webhookIdParam,
+			webhook_id: WebhookModel.webhookIdParam,
 		}),
 		body: WebhookModel.updateWebhookBody,
 		response: {

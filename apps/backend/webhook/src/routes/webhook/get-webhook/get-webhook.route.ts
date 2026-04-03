@@ -5,8 +5,8 @@ import { getWebhookController } from "./get-webhook.controllers";
 import { getWebhookXCodeSamples } from "./get-webhook.x-codeSamples";
 
 export const getWebhookRoute = new Elysia().use(authMiddleware).get(
-	"/:id",
-	async ({ params: { id }, activeOrganizationId }) => {
+	"/:webhook_id",
+	async ({ params: { webhook_id }, activeOrganizationId }) => {
 		if (!activeOrganizationId) {
 			throw status(403, {
 				message: "Authentication required",
@@ -14,14 +14,14 @@ export const getWebhookRoute = new Elysia().use(authMiddleware).get(
 		}
 
 		return await getWebhookController({
-			webhookId: id,
+			webhookId: webhook_id,
 			organizationId: activeOrganizationId,
 		});
 	},
 	{
 		auth: true,
 		params: t.Object({
-			id: WebhookModel.webhookIdParam,
+			webhook_id: WebhookModel.webhookIdParam,
 		}),
 		response: {
 			200: WebhookModel.webhookResponse,
