@@ -1,14 +1,10 @@
-import { logger } from "@reloop/logger";
 import { Elysia, t } from "elysia";
 import { testKumomtaSendController } from "./test-send.controllers";
 
 export const testSendRoute = new Elysia().get(
   "/hard-send",
-  async (context) => {
-    const contextLogger = (context as any).logger;
-    return await testKumomtaSendController({
-      logger: contextLogger || logger,
-    });
+  async () => {
+    return await testKumomtaSendController();
   },
   {
     response: {

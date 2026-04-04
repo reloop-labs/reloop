@@ -1,5 +1,4 @@
 import { kumomtaClient } from "@reloop/be-mail/lib/kumomta-client";
-import type { Logger } from "@reloop/logger";
 
 export interface TestKumomtaSendResponse {
   success: boolean;
@@ -14,11 +13,7 @@ export interface TestKumomtaSendResponse {
   error?: string;
 }
 
-export async function testKumomtaSendController({
-  logger,
-}: {
-  logger: Logger;
-}): Promise<TestKumomtaSendResponse> {
+export async function testKumomtaSendController(): Promise<TestKumomtaSendResponse> {
   const timestamp = new Date().toISOString();
 
   const TEST_CONFIG = {
@@ -29,14 +24,7 @@ export async function testKumomtaSendController({
   };
 
   try {
-    logger.info(
-      {
-        from: TEST_CONFIG.from,
-        to: TEST_CONFIG.to,
-        baseUrl: kumomtaClient.getConfig().baseUrl,
-      },
-      "Starting Kumomta test email send via HTTP API",
-    );
+
 
     const result = await kumomtaClient.sendEmail({
       from: TEST_CONFIG.from,
@@ -44,13 +32,6 @@ export async function testKumomtaSendController({
       subject: TEST_CONFIG.subject,
       text: TEST_CONFIG.text,
     });
-
-    logger.info(
-      {
-        messageId: result.messageId,
-      },
-      "Kumomta test email sent successfully",
-    );
 
     return {
       success: true,
@@ -66,15 +47,6 @@ export async function testKumomtaSendController({
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
-
-    logger.error(
-      {
-        error: errorMessage,
-        from: TEST_CONFIG.from,
-        to: TEST_CONFIG.to,
-      },
-      "Kumomta test email failed",
-    );
 
     return {
       success: false,

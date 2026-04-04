@@ -6,7 +6,7 @@ if (!process.env.REDIS_URL)
   process.env.REDIS_URL = "redis://:reloop123@localhost:6379";
 if (!process.env.BASE_URL) process.env.BASE_URL = "https://reloop.local";
 if (!process.env.KUMOMTA_HTTP_URL)
-  process.env.KUMOMTA_HTTP_URL = "http://localhost:8000";
+  process.env.KUMOMTA_HTTP_URL = "http://localhost:8020";
 if (!process.env.SMTP_USER) process.env.SMTP_USER = "reloop";
 if (!process.env.SMTP_PASS) process.env.SMTP_PASS = "reloop123";
 
