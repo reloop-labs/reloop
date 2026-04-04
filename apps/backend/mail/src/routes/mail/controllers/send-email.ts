@@ -53,37 +53,48 @@ export async function sendEmail(
 
 		if (!dnsHealthCheck.isHealthy) {
 			const errorMessage = `Domain ${domainName} has invalid or missing DNS records: ${dnsHealthCheck.missingRecords.join(", ")}. Please verify your DNS records are configured correctly.`;
-
-			// Trigger async re-verification in background (commented out until inngest is properly integrated)
-			// try {
-			// 	await inngest.send({
-			// 		name: "verify/domain",
-			// 		data: {
-			// 			domainId: currentDomain.id,
-			// 			domain: currentDomain.domain,
-			// 			organizationId,
-			// 		},
-			// 	});
-			// 	logger.info(
-			// 		{ domainId: currentDomain.id, domain: domainName },
-			// 		"Triggered async DNS re-verification due to health check failure",
-			// 	);
-			// } catch (error) {
-			// 	logger.warn(
-			// 		{
-			// 			domainId: currentDomain.id,
-			// 			error: error instanceof Error ? error.message : String(error),
-			// 		},
-			// 		"Failed to trigger DNS re-verification",
-			// 	);
-			// }
-
 			throw new Error(errorMessage);
 		}
 
-		// Check if user has a mailbox for this domain
+		// Create emailLog record BEFORE sending (status: pending)
+		// so we have the ID to inject as X-Email-Log-ID tracking header
+		const [logRecord] = await db
+			.insert(emailLog)
+			.values({
+				messageId: `pending_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+				organizationId,
+				domainId: currentDomain.id,
+				fromEmail: emailData.from,
+				fromName: emailData.from.split("@")[0],
+				toEmails: Array.isArray(emailData.to)
+					? emailData.to
+					: [emailData.to],
+				ccEmails: emailData.cc
+					? Array.isArray(emailData.cc)
+						? emailData.cc
+						: [emailData.cc]
+					: undefined,
+				bccEmails: emailData.bcc
+					? Array.isArray(emailData.bcc)
+						? emailData.bcc
+						: [emailData.bcc]
+					: undefined,
+				replyTo: emailData.replyTo,
+				subject: emailData.subject,
+				textBody: emailData.text,
+				htmlBody: emailData.html,
+				status: "pending",
+				provider: "kumomta",
+				size: (emailData.text?.length || 0) + (emailData.html?.length || 0),
+			})
+			.returning({ id: emailLog.id });
 
-		// Send email via KumoMTA
+		const emailLogId = logRecord?.id;
+		if (!emailLogId) {
+			throw new Error("Failed to create email log record");
+		}
+
+		// Send email via KumoMTA HTTP injection API with tracking headers
 		const result = await kumomtaClient.sendEmail({
 			from: emailData.from,
 			to: emailData.to,
@@ -93,39 +104,27 @@ export async function sendEmail(
 			replyTo: emailData.replyTo,
 			cc: emailData.cc,
 			bcc: emailData.bcc,
+			customHeaders: {
+				"X-Org-ID": organizationId,
+				"X-Domain-ID": currentDomain.id,
+				"X-Email-Log-ID": emailLogId,
+			},
 		});
 
-		// Log email in database
-		await db.insert(emailLog).values({
-			messageId: result.messageId,
-			organizationId,
-			domainId: domainRecord[0]?.id || "",
-			fromEmail: emailData.from,
-			fromName: emailData.from.split("@")[0],
-			toEmails: Array.isArray(emailData.to) ? emailData.to : [emailData.to],
-			ccEmails: emailData.cc
-				? Array.isArray(emailData.cc)
-					? emailData.cc
-					: [emailData.cc]
-				: undefined,
-			bccEmails: emailData.bcc
-				? Array.isArray(emailData.bcc)
-					? emailData.bcc
-					: [emailData.bcc]
-				: undefined,
-			replyTo: emailData.replyTo,
-			subject: emailData.subject,
-			textBody: emailData.text,
-			htmlBody: emailData.html,
-			status: "sent",
-			provider: "kumomta",
-			providerMessageId: result.messageId,
-			size: (emailData.text?.length || 0) + (emailData.html?.length || 0),
-			sentAt: new Date(),
-		});
+		// Update emailLog to "sent" with the real message ID from KumoMTA
+		await db
+			.update(emailLog)
+			.set({
+				messageId: result.messageId || emailLogId,
+				status: "sent",
+				providerMessageId: result.id,
+				sentAt: new Date(),
+			})
+			.where(eq(emailLog.id, emailLogId));
 
 		logger.info(
 			{
+				emailLogId,
 				messageId: result.messageId,
 				from: emailData.from,
 				to: emailData.to,
@@ -233,7 +232,7 @@ async function checkDomainDnsHealth(
 	const STALE_THRESHOLD_HOURS = 6;
 	const lastVerified = domainData.lastVerifiedAt;
 	const isRecent = lastVerified
-		? new Date().getTime() - new Date(lastVerified).getTime() <
+		? Date.now() - new Date(lastVerified).getTime() <
 		STALE_THRESHOLD_HOURS * 60 * 60 * 1000
 		: false;
 

@@ -26,7 +26,7 @@ export const sendEmailRoute = new Elysia().use(authMiddleware).post(
 		detail: {
 			tags: ["Mail"],
 			summary: "Send email",
-			description: "Send an email through the Postfix mail server",
+			description: "Send an email through the KumoMTA mail server",
 		},
 	},
 );

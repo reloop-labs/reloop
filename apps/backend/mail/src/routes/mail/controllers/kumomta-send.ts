@@ -1,5 +1,5 @@
+import { kumomtaClient } from "@reloop/be-mail/lib/kumomta-client";
 import { logger } from "@reloop/logger";
-import nodemailer from "nodemailer";
 
 interface TestKumomtaSendResponse {
 	success: boolean;
@@ -24,27 +24,17 @@ export async function testKumomtaSend(): Promise<TestKumomtaSendResponse> {
 		text: `Kumomta test email sent at ${timestamp}.\n\nIf you receive this, the mail server is operational.`,
 	};
 
-	const transporter = nodemailer.createTransport({
-		host: process.env.SMTP_HOST || "localhost",
-		port: Number.parseInt(process.env.SMTP_PORT || "587"),
-		secure: false,
-		tls: {
-			rejectUnauthorized: false,
-		},
-	});
-
 	try {
 		logger.info(
 			{
 				from: TEST_CONFIG.from,
 				to: TEST_CONFIG.to,
-				host: process.env.SMTP_HOST || "localhost",
-				port: process.env.SMTP_PORT || "587",
+				baseUrl: kumomtaClient.getConfig().baseUrl,
 			},
-			"Starting Kumomta test email send",
+			"Starting Kumomta test email send via HTTP API",
 		);
 
-		const info = await transporter.sendMail({
+		const result = await kumomtaClient.sendEmail({
 			from: TEST_CONFIG.from,
 			to: TEST_CONFIG.to,
 			subject: TEST_CONFIG.subject,
@@ -53,16 +43,15 @@ export async function testKumomtaSend(): Promise<TestKumomtaSendResponse> {
 
 		logger.info(
 			{
-				messageId: info.messageId,
-				response: info.response,
+				messageId: result.messageId,
 			},
 			"Kumomta test email sent successfully",
 		);
 
 		return {
 			success: true,
-			messageId: info.messageId,
-			response: info.response || "Email sent successfully",
+			messageId: result.messageId,
+			response: "Email injected via KumoMTA HTTP API",
 			timestamp,
 			config: {
 				from: TEST_CONFIG.from,
