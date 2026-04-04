@@ -28,7 +28,7 @@
 		"react-dom": "catalog:ui"
 	},
 	"devDependencies": {
-		"@react-email/preview-server": "4.2.8",
+		"@react-email/preview-server": "catalog:ui",
 		"@types/bun": "catalog:backend",
 		"typescript": "workspace:"
 	}

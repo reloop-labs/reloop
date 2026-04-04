@@ -80,6 +80,19 @@ services:
       - "8025:8025"  # Web UI port for viewing captured emails
     restart: unless-stopped
 
+  reloop-kumomta:
+    image: ghcr.io/kumocorp/kumomta:latest
+    container_name: reloop-kumomta
+    ports:
+      - "25:25"      # ESMTP injection
+      - "8020:8000"  # HTTP API
+    volumes:
+      - ./kumomta-config.lua:/opt/kumomta/etc/policy/init.lua
+    depends_on:
+      reloop-mailpit:
+        condition: service_started
+    restart: unless-stopped
+
   reloop-inngest:
     image: inngest/inngest:latest
     container_name: reloop-inngest
