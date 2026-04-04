@@ -203,7 +203,7 @@ function buildRfcMessage(options: SendEmailOptions): string {
 
 // Create singleton instance
 const kumomtaUrl = mailConfig.KUMOMTA_HTTP_URL;
-
+console.log({ kumomtaUrl })
 export const kumomtaClient = new KumomtaClient({
 	baseUrl: kumomtaUrl,
 });
