@@ -11,6 +11,8 @@ import { useParams } from "next/navigation";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useState } from "react";
 import useSWR from "swr";
+import { DomainApiDetails } from "@fe/dashboard/components/api-details/domain";
+import * as Kbd from "@reloop/ui/kbd";
 import { DeleteDomainModal } from "./delete-domain";
 import {
 	DomainFilterDropdown,
@@ -77,6 +79,17 @@ export const DomainListSidebar = () => {
 					Domain{data?.total !== 1 ? "s" : ""}
 				</h1>
 				<div className="flex items-center gap-2">
+					<Button.Root
+						variant="neutral"
+						mode="stroke"
+						size="xsmall"
+						onClick={() => window.open("https://reloop.sh/docs/domain", "_blank")}
+						className="gap-1.5"
+					>
+						<Icon name="book-closed" className="h-4 w-4" />
+						Docs
+						<Kbd.Root className="bg-bg-weak-50 text-[10px]">D</Kbd.Root>
+					</Button.Root>
 					<Link
 						className={Button.buttonVariants({
 							variant: "neutral",
@@ -87,6 +100,7 @@ export const DomainListSidebar = () => {
 						<Icon name="plus" className="h-4 w-4" />
 						Add domain
 					</Link>
+					<DomainApiDetails />
 				</div>
 			</div>
 
