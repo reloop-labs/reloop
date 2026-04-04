@@ -1,4 +1,6 @@
 import { kumomtaClient } from "@reloop/be-mail/lib/kumomta-client";
+import { ConfirmEmail } from "@reloop/react-email";
+import { render } from "@reloop/react-email/render";
 
 export interface TestKumomtaSendResponse {
   success: boolean;
@@ -19,18 +21,20 @@ export async function testKumomtaSendController(): Promise<TestKumomtaSendRespon
   const TEST_CONFIG = {
     from: "test@deployx.dev",
     to: "jxgyc.test@inbox.testmail.app",
-    subject: "Kumomta Health Check",
-    text: `Kumomta test email sent at ${timestamp}.\n\nIf you receive this, the mail server is operational.`,
+    subject: "Confirm your email - Reloop Health Check",
+    confirmLink: "https://reloop.app/confirm-test",
   };
 
   try {
-
+    const html = await render(
+      ConfirmEmail({ confirmLink: TEST_CONFIG.confirmLink }),
+    );
 
     const result = await kumomtaClient.sendEmail({
       from: TEST_CONFIG.from,
       to: TEST_CONFIG.to,
       subject: TEST_CONFIG.subject,
-      text: TEST_CONFIG.text,
+      html,
     });
 
     return {
