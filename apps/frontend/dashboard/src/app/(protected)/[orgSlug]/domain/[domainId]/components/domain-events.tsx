@@ -233,7 +233,7 @@ export const DomainEvents = ({
 										className={cn(
 											"relative flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-stroke-soft-200 transition-all duration-500",
 											state === "completed" &&
-												"bg-neutral-alpha-10 text-text-strong-950",
+												"bg-bg-weak-50 text-text-strong-950",
 											state === "active" &&
 												!isFailed &&
 												"bg-bg-weak-50 text-text-sub-600",
