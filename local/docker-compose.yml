@@ -85,7 +85,7 @@ services:
     container_name: reloop-kumomta
     ports:
       - "25:25"      # ESMTP injection
-      - "8000:8000"  # HTTP API
+      - "8020:8000"  # HTTP API
     volumes:
       - ./kumomta-config.lua:/opt/kumomta/etc/policy/init.lua
     depends_on:
