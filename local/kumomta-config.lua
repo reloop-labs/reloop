@@ -1,13 +1,6 @@
 local kumo = require 'kumo'
 
---[[
-  KumoMTA Local Development Policy
-  Routes ALL email to Mailpit for local testing.
-]]
-
--- Called once on startup to set up listeners and spool
 kumo.on('init', function()
-  -- Define the spool (required by KumoMTA)
   kumo.define_spool {
     name = 'data',
     path = '/var/spool/kumomta/data',
@@ -18,21 +11,38 @@ kumo.on('init', function()
     path = '/var/spool/kumomta/meta',
   }
 
-  -- ESMTP listener for injecting mail
   kumo.start_esmtp_listener {
     listen = '0.0.0.0:25',
-    -- Allow relay from any source (local dev only!)
-    relay_hosts = { '0.0.0.0/0' },
+
+    -- allow connection (NOT relay)
   }
 
-  -- HTTP API listener
   kumo.start_http_listener {
     listen = '0.0.0.0:8000',
     trusted_hosts = { '0.0.0.0/0' },
   }
 end)
 
--- Route ALL mail to Mailpit's SMTP on port 1025
+-- AUTH
+kumo.on('smtp_server_auth_plain', function(authz, authc, password, conn_meta)
+  if authc == 'reloop' and password == 'reloop123' then
+    -- THIS is what docs expect
+    conn_meta:set_meta('authz_id', authc)
+    return true
+  end
+  return false
+end)
+
+-- 🔥 THIS is the REAL relay control (docs way)
+kumo.on('get_listener_domain', function(domain, listener, conn_meta)
+  if conn_meta:get_meta('authz_id') then
+    return kumo.make_listener_domain {
+      relay_to = true,
+    }
+  end
+end)
+
+-- Route to Mailpit
 kumo.on('get_queue_config', function(domain, tenant, campaign, routing_domain)
   return kumo.make_queue_config {
     protocol = {

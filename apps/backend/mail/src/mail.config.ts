@@ -7,6 +7,8 @@ if (!process.env.REDIS_URL)
 if (!process.env.BASE_URL) process.env.BASE_URL = "https://reloop.local";
 if (!process.env.KUMOMTA_HTTP_URL)
   process.env.KUMOMTA_HTTP_URL = "http://localhost:8000";
+if (!process.env.SMTP_USER) process.env.SMTP_USER = "reloop";
+if (!process.env.SMTP_PASS) process.env.SMTP_PASS = "reloop123";
 
 export const mailConfig = {
   port: Number(process.env.PORT),
@@ -14,5 +16,7 @@ export const mailConfig = {
   REDIS_URL: process.env.REDIS_URL,
   BASE_URL: process.env.BASE_URL,
   KUMOMTA_HTTP_URL: process.env.KUMOMTA_HTTP_URL,
+  SMTP_USER: process.env.SMTP_USER,
+  SMTP_PASS: process.env.SMTP_PASS,
   NODE_ENV: process.env.NODE_ENV || "development",
 };
