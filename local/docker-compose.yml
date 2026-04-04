@@ -87,7 +87,7 @@ services:
       - "25:25"      # ESMTP injection
       - "8000:8000"  # HTTP API
     volumes:
-      - ./init.lua:/opt/kumomta/etc/policy/init.lua
+      - ./kumomta-config.lua:/opt/kumomta/etc/policy/init.lua
     depends_on:
       reloop-mailpit:
         condition: service_started
