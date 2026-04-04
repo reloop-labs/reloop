@@ -6,12 +6,18 @@ import { mailRoutes } from "@reloop/be-mail/routes/mail/mail.routes.js";
 import { loader } from "@reloop/be-mail/utils/loader.js";
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
+import { initLogger } from "evlog";
+import { evlog } from "evlog/elysia";
+import { mailConfig } from "./mail.config";
 
-const port = 8015;
+initLogger({ env: { service: "mail" } });
+
+const port = mailConfig.port;
 const mailService = new Elysia({
 	prefix: "/api/mail",
 	name: "Mail Service",
 })
+	.use(evlog())
 	.use(
 		openapi({
 			references: fromTypes(

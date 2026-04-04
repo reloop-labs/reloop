@@ -1,13 +1,13 @@
 import { db } from "@reloop/db/client";
 import { emailLog } from "@reloop/db/schema";
-import { logger } from "@reloop/logger";
+import type { Logger } from "@reloop/logger";
 import { eq } from "drizzle-orm";
 
 /**
  * KumoMTA log event types
  * @see https://docs.kumomta.com/reference/log_record/
  */
-type KumomtaEventType =
+export type KumomtaEventType =
   | "Reception"
   | "Delivery"
   | "Bounce"
@@ -17,7 +17,7 @@ type KumomtaEventType =
   | "Feedback"
   | "AdminBounce";
 
-interface KumomtaLogRecord {
+export interface KumomtaLogRecord {
   type: KumomtaEventType;
   id: string;
   sender: string;
@@ -61,11 +61,14 @@ const EVENT_STATUS_MAP: Partial<
 
 /**
  * Process a batch of KumoMTA log events and update emailLog records.
- * Called by the kumomta-webhook route (unauthenticated, internal-only).
  */
-export async function handleKumomtaWebhook(
-  events: KumomtaLogRecord[],
-): Promise<{ processed: number; errors: number }> {
+export async function handleKumomtaWebhookController({
+  events,
+  logger,
+}: {
+  events: KumomtaLogRecord[];
+  logger: Logger;
+}): Promise<{ processed: number; errors: number }> {
   let processed = 0;
   let errors = 0;
 

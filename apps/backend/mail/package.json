@@ -25,6 +25,7 @@
 		"@paralleldrive/cuid2": "catalog:backend",
 		"better-auth": "catalog:",
 		"dotenv": "catalog:backend",
+		"evlog": "catalog:backend",
 		"drizzle-orm": "catalog:db",
 		"drizzle-typebox": "catalog:db",
 		"elysia": "catalog:backend",

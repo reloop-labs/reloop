@@ -1,9 +1,9 @@
 import { db } from "@reloop/db/client";
 import { domain, domainDnsRecord } from "@reloop/db/schema";
-import { logger } from "@reloop/logger";
+import type { Logger } from "@reloop/logger";
 import { and, eq, isNull } from "drizzle-orm";
 
-interface DkimConfigResponse {
+export interface DkimConfigResponse {
   domain: string;
   selector: string;
   privateKey: string;
@@ -13,9 +13,13 @@ interface DkimConfigResponse {
  * Fetch DKIM signing config for a domain from the database.
  * Called by KumoMTA's init.lua at message-signing time.
  */
-export async function getDkimConfig(
-  domainName: string,
-): Promise<DkimConfigResponse | null> {
+export async function getDkimConfigController({
+  domainName,
+  logger,
+}: {
+  domainName: string;
+  logger: Logger;
+}): Promise<DkimConfigResponse | null> {
   try {
     // Find the domain record
     const domainRecord = await db.query.domain.findFirst({

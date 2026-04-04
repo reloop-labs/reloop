@@ -1,4 +1,5 @@
 import { logger } from "@reloop/logger";
+import { mailConfig } from "../mail.config";
 
 export interface KumomtaHttpConfig {
 	baseUrl: string;
@@ -201,7 +202,7 @@ function buildRfcMessage(options: SendEmailOptions): string {
 }
 
 // Create singleton instance
-const kumomtaUrl = process.env.KUMOMTA_HTTP_URL || "http://localhost:8000";
+const kumomtaUrl = mailConfig.KUMOMTA_HTTP_URL;
 
 export const kumomtaClient = new KumomtaClient({
 	baseUrl: kumomtaUrl,
