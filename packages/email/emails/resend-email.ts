@@ -1,4 +1,5 @@
 import { render } from "@react-email/render";
+import ConfirmEmail from "./confirm-email";
 import OrganizationInviteEmail from "./organization-invite";
 import PasswordResetEmail from "./password-reset";
 
@@ -14,7 +15,17 @@ export const sendEmail = async ({
 	subject,
 	html,
 	from,
-}: EmailOptions) => {};
+}: EmailOptions) => { };
+
+export const sendConfirmEmail = async (email: string, confirmLink: string) => {
+	const html = await render(ConfirmEmail({ confirmLink }));
+
+	return sendEmail({
+		to: email,
+		subject: "Confirm your email address for Reloop",
+		html,
+	});
+};
 
 export const sendPasswordResetEmail = async (
 	email: string,
