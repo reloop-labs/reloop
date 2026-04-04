@@ -6,59 +6,6 @@ import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
 import { format } from "date-fns";
 
-const WifiAnimatedIcon = ({ className }: { className?: string }) => (
-	<svg viewBox="0 0 48 48" fill="none" className={className}>
-		<style>{`
-			@keyframes wifi-pendulum {
-				0%, 100% { transform: rotate(-15deg); }
-				50% { transform: rotate(15deg); }
-			}
-		`}</style>
-		{/* WiFi arcs (static) */}
-		<path
-			d="M5.5 19.148C11.868 13.45 16.933 11.42 26.987 11.621"
-			stroke="currentColor"
-			strokeWidth={2}
-			strokeLinecap="round"
-			strokeLinejoin="round"
-		/>
-		<path
-			d="M33.972 13.324C38.53 15 40.025 16.174 42.5 19.081"
-			stroke="currentColor"
-			strokeWidth={2}
-			strokeLinecap="round"
-			strokeLinejoin="round"
-		/>
-		<path
-			d="M12.806 26.588C16.56 23.371 18.436 22.535 22.457 22.2"
-			stroke="currentColor"
-			strokeWidth={2}
-			strokeLinecap="round"
-			strokeLinejoin="round"
-		/>
-		<path
-			d="M32.057 23.785C34.121 24.225 35.931 25.975 36.347 26.801"
-			stroke="currentColor"
-			strokeWidth={2}
-			strokeLinecap="round"
-			strokeLinejoin="round"
-		/>
-		{/* Hand (pendulum) */}
-		<path
-			d="M20.179 33.358C18.269 37.782 26.212 40.195 27.418 35.101L31.976 10.701C32.012 10.121 30.731 9.766 30.434 10.3Z"
-			stroke="currentColor"
-			strokeWidth={2}
-			strokeLinecap="round"
-			strokeLinejoin="round"
-			fill="none"
-			style={{
-				transformOrigin: "24px 37px",
-				animation: "wifi-pendulum 1.5s ease-in-out infinite",
-			}}
-		/>
-	</svg>
-);
-
 export const DomainEvents = ({
 	domain,
 	providerLabel,
@@ -148,24 +95,30 @@ export const DomainEvents = ({
 			{/* Status Banner */}
 			<div
 				className={cn(
-					"mt-8 mb-5 flex items-center gap-3 rounded-xl border p-4",
-					domain.status === "active" && "border-success-base",
-					domain.status === "verifying" && "border-warning-base",
-					domain.status === "failed" && "border-error-base",
+					"mt-8 mb-5 flex w-full items-center gap-3 rounded-xl border p-4 shadow-sm",
+					domain.status === "active" && "border-success-base bg-success-base/5",
+					domain.status === "verifying" &&
+						"border-warning-base bg-warning-base/5",
+					domain.status === "failed" && "border-error-base bg-error-base/5",
 					!["active", "verifying", "failed"].includes(domain.status) &&
-						"border-stroke-soft-200",
+						"border-stroke-soft-200 bg-bg-weak-50",
 				)}
 			>
 				<div
 					className={cn(
-						"relative flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-stroke-soft-200",
-						domain.status === "active"
-							? "bg-bg-weak-50 text-text-strong-950"
-							: "bg-bg-weak-50 text-text-sub-600 ring-stroke-soft-200 ring-inset",
+						"relative flex h-9 w-9 shrink-0 items-center justify-center rounded-md border transition-colors",
+						domain.status === "active" &&
+							"border-success-base bg-success-base/10 text-success-base",
+						domain.status === "verifying" &&
+							"border-warning-base bg-warning-base/10 text-warning-base",
+						domain.status === "failed" &&
+							"border-error-base bg-error-base/10 text-error-base",
+						!["active", "verifying", "failed"].includes(domain.status) &&
+							"border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600",
 					)}
 				>
 					{domain.status === "verifying" ? (
-						<WifiAnimatedIcon className="relative h-4 w-4" />
+						<Spinner size={16} color="currentColor" />
 					) : domain.status === "active" ? (
 						<Icon name="check-circle" className="relative h-4 w-4" />
 					) : domain.status === "failed" ? (
@@ -186,31 +139,23 @@ export const DomainEvents = ({
 			</div>
 
 			{/* Horizontal Timeline */}
-			<div className="relative overflow-hidden rounded-2xl border-stroke-soft-200 border-t-[0.5px] border-r border-b border-l p-7">
-				{/* Circuit board pattern - Light mode */}
+			<div className="relative overflow-hidden rounded-2xl border-stroke-soft-200 border-t-[0.5px] border-r border-b border-l p-10">
+				{/* Dot grid pattern - Light mode */}
 				<div
 					className="pointer-events-none absolute inset-0 dark:hidden"
 					style={{
-						backgroundImage: `
-							repeating-linear-gradient(0deg, transparent, transparent 19px, rgba(0, 0, 0, 0.04) 19px, rgba(0, 0, 0, 0.04) 20px, transparent 20px, transparent 39px, rgba(0, 0, 0, 0.04) 39px, rgba(0, 0, 0, 0.04) 40px),
-							repeating-linear-gradient(90deg, transparent, transparent 19px, rgba(0, 0, 0, 0.04) 19px, rgba(0, 0, 0, 0.04) 20px, transparent 20px, transparent 39px, rgba(0, 0, 0, 0.04) 39px, rgba(0, 0, 0, 0.04) 40px),
-							radial-gradient(circle at 20px 20px, rgba(0, 0, 0, 0.05) 1.5px, transparent 1.5px),
-							radial-gradient(circle at 40px 40px, rgba(0, 0, 0, 0.05) 1.5px, transparent 1.5px)
-						`,
-						backgroundSize: "40px 40px, 40px 40px, 40px 40px, 40px 40px",
+						backgroundImage:
+							"radial-gradient(circle at 1px 1px, rgba(0, 0, 0, 0.25) 0.8px, transparent 0)",
+						backgroundSize: "20px 20px",
 					}}
 				/>
-				{/* Circuit board pattern - Dark mode */}
+				{/* Dot grid pattern - Dark mode */}
 				<div
 					className="pointer-events-none absolute inset-0 hidden dark:block"
 					style={{
-						backgroundImage: `
-							repeating-linear-gradient(0deg, transparent, transparent 19px, rgba(255, 255, 255, 0.06) 19px, rgba(255, 255, 255, 0.06) 20px, transparent 20px, transparent 39px, rgba(255, 255, 255, 0.06) 39px, rgba(255, 255, 255, 0.06) 40px),
-							repeating-linear-gradient(90deg, transparent, transparent 19px, rgba(255, 255, 255, 0.06) 19px, rgba(255, 255, 255, 0.06) 20px, transparent 20px, transparent 39px, rgba(255, 255, 255, 0.06) 39px, rgba(255, 255, 255, 0.06) 40px),
-							radial-gradient(circle at 20px 20px, rgba(255, 255, 255, 0.08) 1.5px, transparent 1.5px),
-							radial-gradient(circle at 40px 40px, rgba(255, 255, 255, 0.08) 1.5px, transparent 1.5px)
-						`,
-						backgroundSize: "40px 40px, 40px 40px, 40px 40px, 40px 40px",
+						backgroundImage:
+							"radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.3) 0.8px, transparent 0)",
+						backgroundSize: "20px 20px",
 					}}
 				/>
 				<div className="relative flex items-start">
@@ -231,20 +176,20 @@ export const DomainEvents = ({
 									{/* Circle */}
 									<div
 										className={cn(
-											"relative flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-stroke-soft-200 transition-all duration-500",
+											"relative flex h-9 w-9 shrink-0 items-center justify-center rounded-md border transition-all duration-500",
 											state === "completed" &&
-												"bg-bg-weak-50 text-text-strong-950",
+												"border-success-base bg-success-base/10 text-success-base",
 											state === "active" &&
 												!isFailed &&
-												"bg-bg-weak-50 text-text-sub-600",
+												"border-warning-base bg-warning-base/10 text-warning-base",
 											state === "failed" &&
-												"bg-neutral-alpha-10 text-text-sub-600",
+												"border-error-base bg-error-base/10 text-error-base",
 											state === "upcoming" &&
-												"bg-bg-weak-50 text-text-soft-400",
+												"border-stroke-soft-200 bg-bg-weak-50 text-text-soft-400",
 										)}
 									>
 										{state === "failed" && (
-											<span className="absolute inset-0 animate-ping rounded-full bg-neutral-alpha-10 [animation-duration:2.5s]" />
+											<span className="absolute inset-0 animate-ping rounded-full bg-error-base/20 [animation-duration:2.5s]" />
 										)}
 
 										{state === "completed" ? (
@@ -295,16 +240,16 @@ export const DomainEvents = ({
 												className={cn(
 													"absolute inset-y-0 left-0 rounded-full transition-all duration-700 ease-out",
 													state === "completed"
-														? "w-full bg-text-sub-600"
+														? "w-full bg-success-base"
 														: state === "active" && !isFailed
-															? "w-1/2 bg-text-sub-600"
+															? "w-1/2 bg-warning-base"
 															: state === "failed"
-																? "w-1/2 bg-text-sub-600"
+																? "w-1/2 bg-error-base"
 																: "w-0",
 												)}
 											/>
 											{state === "active" && !isFailed && (
-												<div className="absolute inset-y-0 left-0 w-1/2 animate-pulse rounded-full bg-text-sub-600/20" />
+												<div className="absolute inset-y-0 left-0 w-1/2 animate-pulse rounded-full bg-warning-base/20" />
 											)}
 										</div>
 									</div>

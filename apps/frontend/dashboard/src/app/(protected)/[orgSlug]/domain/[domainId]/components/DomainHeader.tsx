@@ -10,13 +10,13 @@ import type { Domain, DomainStatus } from "@reloop/api/types";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import * as Kbd from "@reloop/ui/kbd";
 import {
 	Content as PopoverContent,
 	Root as PopoverRoot,
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
-import Spinner from "@reloop/ui/spinner";
 import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 import { DeleteDomainModal } from "../../components/delete-domain";
@@ -34,12 +34,6 @@ interface DomainHeaderProps {
 
 const headerMenuItems = [
 	{
-		id: "docs",
-		label: "Go to docs",
-		icon: "file-text" as const,
-		isDanger: false,
-	},
-	{
 		id: "delete",
 		label: "Delete Domain",
 		icon: "trash" as const,
@@ -54,8 +48,6 @@ export const DomainHeader = ({
 	status = "start-verify",
 	isLoading,
 	isFailed,
-	onVerify,
-	isVerifying,
 }: DomainHeaderProps) => {
 	const { push } = useUserOrganization();
 	const [, setDeleteId] = useQueryState("delete");
@@ -132,18 +124,16 @@ export const DomainHeader = ({
 						<>
 							<Button.Root
 								variant="neutral"
+								mode="stroke"
 								size="xsmall"
-								onClick={onVerify}
-								disabled={isVerifying || status === "verifying"}
+								onClick={() =>
+									window.open("https://reloop.sh/docs/domain", "_blank")
+								}
+								className="gap-1.5"
 							>
-								{isVerifying || status === "verifying" ? (
-									<>
-										<Spinner size={16} color="currentColor" />
-										Verifying
-									</>
-								) : (
-									"Verify DNS Records"
-								)}
+								<Icon name="book-closed" className="h-4 w-4" />
+								Docs
+								<Kbd.Root className="bg-bg-weak-50 text-[10px]">D</Kbd.Root>
 							</Button.Root>
 							<PopoverRoot>
 								<PopoverTrigger asChild>
@@ -171,12 +161,7 @@ export const DomainHeader = ({
 												onPointerEnter={() => setHoverIdx(idx)}
 												onPointerLeave={() => setHoverIdx(undefined)}
 												onClick={() => {
-													if (item.id === "docs") {
-														window.open(
-															"https://reloop.sh/docs/domain",
-															"_blank",
-														);
-													} else if (item.id === "delete") {
+													if (item.id === "delete") {
 														setDeleteId(domainRecordId || domainId);
 													}
 												}}

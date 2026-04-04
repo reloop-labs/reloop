@@ -25,7 +25,7 @@ interface DomainTableProps {
 }
 
 const DomainSkeleton = () => (
-	<div className="grid grid-cols-[1fr_minmax(200px,auto)_minmax(100px,auto)_minmax(40px,auto)] items-center px-5 py-2">
+	<div className="grid grid-cols-[1fr_minmax(200px,auto)_140px_minmax(40px,auto)] items-center px-5 py-2">
 		<div className="flex items-center gap-2">
 			<Skeleton className="h-4 w-32" />
 		</div>
@@ -65,7 +65,7 @@ export const DomainTable = ({
 	if (isLoading) {
 		return (
 			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-200/70 text-paragraph-sm shadow-regular-md ring-stroke-soft-200 ring-inset">
-				<div className="grid grid-cols-[1fr_minmax(200px,auto)_minmax(100px,auto)_minmax(40px,auto)] border-stroke-soft-100 border-b px-5 py-3 text-text-sub-600">
+				<div className="grid grid-cols-[1fr_minmax(200px,auto)_140px_minmax(40px,auto)] border-stroke-soft-100 border-b px-5 py-3 text-text-sub-600">
 					<div className="flex items-center gap-2">
 						<Icon name="globe" className="h-4 w-4" />
 						<span className="text-[13px]">Domain</span>
@@ -92,7 +92,7 @@ export const DomainTable = ({
 	return (
 		<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-200/70 text-paragraph-sm shadow-regular-md ring-stroke-soft-200 ring-inset">
 			{/* Table Header */}
-			<div className="grid grid-cols-[1fr_minmax(200px,auto)_minmax(100px,auto)_minmax(40px,auto)] border-stroke-soft-100 border-b px-5 py-3 text-text-sub-600">
+			<div className="grid grid-cols-[1fr_minmax(200px,auto)_140px_minmax(40px,auto)] border-stroke-soft-100 border-b px-5 py-3 text-text-sub-600">
 				<div className="flex items-center gap-2">
 					<Icon name="globe" className="h-4 w-4" />
 					<span className="text-[13px]">Domain</span>
@@ -122,7 +122,7 @@ export const DomainTable = ({
 								key={domain.id}
 								onClick={() => handleRowClick(domain.id)}
 								className={cn(
-									"group/row grid cursor-pointer grid-cols-[1fr_minmax(200px,auto)_minmax(100px,auto)_minmax(40px,auto)] items-center px-5 py-2 text-left transition-colors",
+									"group/row grid cursor-pointer grid-cols-[1fr_minmax(200px,auto)_140px_minmax(40px,auto)] items-center px-5 py-2 text-left transition-colors",
 									"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-base",
 									(isRowActive || isSelected) && "bg-bg-weak-50/50",
 								)}
@@ -159,7 +159,7 @@ export const DomainTable = ({
 
 								{/* Created Column */}
 								<div className="flex items-center text-text-soft-400">
-									<span className="text-label-sm">
+									<span className="whitespace-nowrap text-label-sm">
 										{formatRelativeTime(domain.createdAt)}
 									</span>
 								</div>

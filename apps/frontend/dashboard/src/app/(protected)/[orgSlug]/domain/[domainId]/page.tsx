@@ -6,6 +6,7 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
+import Spinner from "@reloop/ui/spinner";
 import axios from "axios";
 import { useParams } from "next/navigation";
 import * as React from "react";
@@ -46,90 +47,219 @@ const inferDnsProvider = (nameservers: string[] | null | undefined) => {
 	const normalized = nameservers.map((server) => server.toLowerCase());
 
 	if (normalized.some((server) => server.includes("cloudflare.com"))) {
-		return { label: "Cloudflare", iconKey: "siCloudflare", url: "https://dash.cloudflare.com" };
+		return {
+			label: "Cloudflare",
+			iconKey: "siCloudflare",
+			url: "https://dash.cloudflare.com",
+		};
 	}
 	if (normalized.some((server) => server.includes("awsdns-"))) {
-		return { label: "AWS Route 53", iconKey: "siAmazonwebservices", url: "https://console.aws.amazon.com/route53" };
+		return {
+			label: "AWS Route 53",
+			iconKey: "siAmazonwebservices",
+			url: "https://console.aws.amazon.com/route53",
+		};
 	}
 	if (normalized.some((server) => server.includes("vercel-dns.com"))) {
-		return { label: "Vercel", iconKey: "siVercel", url: "https://vercel.com/dashboard/domains" };
+		return {
+			label: "Vercel",
+			iconKey: "siVercel",
+			url: "https://vercel.com/dashboard/domains",
+		};
 	}
 	if (normalized.some((server) => server.includes("digitalocean.com"))) {
-		return { label: "DigitalOcean", iconKey: "siDigitalocean", url: "https://cloud.digitalocean.com/networking/domains" };
+		return {
+			label: "DigitalOcean",
+			iconKey: "siDigitalocean",
+			url: "https://cloud.digitalocean.com/networking/domains",
+		};
 	}
 	if (normalized.some((server) => server.includes("domaincontrol.com"))) {
-		return { label: "GoDaddy", iconKey: "siGodaddy", url: "https://dcc.godaddy.com/dns" };
+		return {
+			label: "GoDaddy",
+			iconKey: "siGodaddy",
+			url: "https://dcc.godaddy.com/dns",
+		};
 	}
 	if (normalized.some((server) => server.includes("registrar-servers.com"))) {
-		return { label: "Namecheap", iconKey: "siNamecheap", url: "https://ap.www.namecheap.com/domains/list" };
+		return {
+			label: "Namecheap",
+			iconKey: "siNamecheap",
+			url: "https://ap.www.namecheap.com/domains/list",
+		};
 	}
 	// Google
-	if (normalized.some((server) => server.includes("googledomains.com") || server.includes("google.com"))) {
-		return { label: "Google Domains", iconKey: "siGoogle", url: "https://domains.google.com" };
+	if (
+		normalized.some(
+			(server) =>
+				server.includes("googledomains.com") || server.includes("google.com"),
+		)
+	) {
+		return {
+			label: "Google Domains",
+			iconKey: "siGoogle",
+			url: "https://domains.google.com",
+		};
 	}
 	// Google Cloud DNS
-	if (normalized.some((server) => server.includes("googledomains.com") || server.endsWith(".dns.goog"))) {
-		return { label: "Google Cloud DNS", iconKey: "siGooglecloud", url: "https://console.cloud.google.com/net-services/dns" };
+	if (
+		normalized.some(
+			(server) =>
+				server.includes("googledomains.com") || server.endsWith(".dns.goog"),
+		)
+	) {
+		return {
+			label: "Google Cloud DNS",
+			iconKey: "siGooglecloud",
+			url: "https://console.cloud.google.com/net-services/dns",
+		};
 	}
 	// Azure
-	if (normalized.some((server) => server.includes("azure-dns.com") || server.includes("azure-dns.net") || server.includes("azure-dns.org") || server.includes("azure-dns.info"))) {
-		return { label: "Azure DNS", iconKey: "siMicrosoftazure", url: "https://portal.azure.com/#view/HubsExtension/BrowseResource/resourceType/Microsoft.Network%2FdnsZones" };
+	if (
+		normalized.some(
+			(server) =>
+				server.includes("azure-dns.com") ||
+				server.includes("azure-dns.net") ||
+				server.includes("azure-dns.org") ||
+				server.includes("azure-dns.info"),
+		)
+	) {
+		return {
+			label: "Azure DNS",
+			iconKey: "siMicrosoftazure",
+			url: "https://portal.azure.com/#view/HubsExtension/BrowseResource/resourceType/Microsoft.Network%2FdnsZones",
+		};
 	}
 	// Netlify
 	if (normalized.some((server) => server.includes("netlify.com"))) {
-		return { label: "Netlify", iconKey: "siNetlify", url: "https://app.netlify.com/domains" };
+		return {
+			label: "Netlify",
+			iconKey: "siNetlify",
+			url: "https://app.netlify.com/domains",
+		};
 	}
 	// Hetzner
-	if (normalized.some((server) => server.includes("hetzner.com") || server.includes("hetzner.de"))) {
-		return { label: "Hetzner", iconKey: "siHetzner", url: "https://dns.hetzner.com" };
+	if (
+		normalized.some(
+			(server) =>
+				server.includes("hetzner.com") || server.includes("hetzner.de"),
+		)
+	) {
+		return {
+			label: "Hetzner",
+			iconKey: "siHetzner",
+			url: "https://dns.hetzner.com",
+		};
 	}
 	// OVH
-	if (normalized.some((server) => server.includes("ovh.net") || server.includes("ovh.com"))) {
-		return { label: "OVH", iconKey: "siOvh", url: "https://www.ovh.com/manager" };
+	if (
+		normalized.some(
+			(server) => server.includes("ovh.net") || server.includes("ovh.com"),
+		)
+	) {
+		return {
+			label: "OVH",
+			iconKey: "siOvh",
+			url: "https://www.ovh.com/manager",
+		};
 	}
 	// Linode / Akamai
 	if (normalized.some((server) => server.includes("linode.com"))) {
-		return { label: "Linode", iconKey: "siLinode", url: "https://cloud.linode.com/domains" };
+		return {
+			label: "Linode",
+			iconKey: "siLinode",
+			url: "https://cloud.linode.com/domains",
+		};
 	}
 	// Hostinger
-	if (normalized.some((server) => server.includes("hostinger.") || server.includes("dns-parking.com"))) {
-		return { label: "Hostinger", iconKey: null, url: "https://hpanel.hostinger.com/domains" };
+	if (
+		normalized.some(
+			(server) =>
+				server.includes("hostinger.") || server.includes("dns-parking.com"),
+		)
+	) {
+		return {
+			label: "Hostinger",
+			iconKey: null,
+			url: "https://hpanel.hostinger.com/domains",
+		};
 	}
 	// Bluehost
 	if (normalized.some((server) => server.includes("bluehost.com"))) {
-		return { label: "Bluehost", iconKey: null, url: "https://my.bluehost.com/cgi/dm" };
+		return {
+			label: "Bluehost",
+			iconKey: null,
+			url: "https://my.bluehost.com/cgi/dm",
+		};
 	}
 	// Squarespace (formerly Google Domains)
-	if (normalized.some((server) => server.includes("squarespace.com") || server.includes("sqsp.net"))) {
-		return { label: "Squarespace", iconKey: "siSquarespace", url: "https://account.squarespace.com/domains" };
+	if (
+		normalized.some(
+			(server) =>
+				server.includes("squarespace.com") || server.includes("sqsp.net"),
+		)
+	) {
+		return {
+			label: "Squarespace",
+			iconKey: "siSquarespace",
+			url: "https://account.squarespace.com/domains",
+		};
 	}
 	// Hover
 	if (normalized.some((server) => server.includes("hover.com"))) {
-		return { label: "Hover", iconKey: null, url: "https://www.hover.com/control_panel" };
+		return {
+			label: "Hover",
+			iconKey: null,
+			url: "https://www.hover.com/control_panel",
+		};
 	}
 	// Gandi
 	if (normalized.some((server) => server.includes("gandi.net"))) {
-		return { label: "Gandi", iconKey: null, url: "https://admin.gandi.net/domain" };
+		return {
+			label: "Gandi",
+			iconKey: null,
+			url: "https://admin.gandi.net/domain",
+		};
 	}
 	// Name.com
 	if (normalized.some((server) => server.includes("name.com"))) {
-		return { label: "Name.com", iconKey: null, url: "https://www.name.com/account/domain" };
+		return {
+			label: "Name.com",
+			iconKey: null,
+			url: "https://www.name.com/account/domain",
+		};
 	}
 	// Porkbun
 	if (normalized.some((server) => server.includes("porkbun.com"))) {
-		return { label: "Porkbun", iconKey: null, url: "https://porkbun.com/account/domainsSpe498702" };
+		return {
+			label: "Porkbun",
+			iconKey: null,
+			url: "https://porkbun.com/account/domainsSpe498702",
+		};
 	}
 	// DynaDot
 	if (normalized.some((server) => server.includes("dynadot.com"))) {
-		return { label: "Dynadot", iconKey: null, url: "https://www.dynadot.com/account/domain/name/server.html" };
+		return {
+			label: "Dynadot",
+			iconKey: null,
+			url: "https://www.dynadot.com/account/domain/name/server.html",
+		};
 	}
 	// Vultr
 	if (normalized.some((server) => server.includes("vultr.com"))) {
-		return { label: "Vultr", iconKey: "siVultr", url: "https://my.vultr.com/dns" };
+		return {
+			label: "Vultr",
+			iconKey: "siVultr",
+			url: "https://my.vultr.com/dns",
+		};
 	}
 	// DNSimple
 	if (normalized.some((server) => server.includes("dnsimple.com"))) {
-		return { label: "DNSimple", iconKey: null, url: "https://dnsimple.com/dashboard" };
+		return {
+			label: "DNSimple",
+			iconKey: null,
+			url: "https://dnsimple.com/dashboard",
+		};
 	}
 	// NS1 / IBM
 	if (normalized.some((server) => server.includes("nsone.net"))) {
@@ -137,47 +267,120 @@ const inferDnsProvider = (nameservers: string[] | null | undefined) => {
 	}
 	// Dyn / Oracle
 	if (normalized.some((server) => server.includes("dynect.net"))) {
-		return { label: "Dyn (Oracle)", iconKey: "siOracle", url: "https://portal.dynect.net" };
+		return {
+			label: "Dyn (Oracle)",
+			iconKey: "siOracle",
+			url: "https://portal.dynect.net",
+		};
 	}
 	// Ionos (1&1)
-	if (normalized.some((server) => server.includes("ui-dns.com") || server.includes("ui-dns.de") || server.includes("ui-dns.org") || server.includes("ui-dns.biz"))) {
-		return { label: "IONOS", iconKey: null, url: "https://my.ionos.com/domains" };
+	if (
+		normalized.some(
+			(server) =>
+				server.includes("ui-dns.com") ||
+				server.includes("ui-dns.de") ||
+				server.includes("ui-dns.org") ||
+				server.includes("ui-dns.biz"),
+		)
+	) {
+		return {
+			label: "IONOS",
+			iconKey: null,
+			url: "https://my.ionos.com/domains",
+		};
 	}
 	// Alibaba Cloud
-	if (normalized.some((server) => server.includes("alidns.com") || server.includes("hichina.com"))) {
-		return { label: "Alibaba Cloud", iconKey: "siAlibabacloud", url: "https://dns.console.aliyun.com" };
+	if (
+		normalized.some(
+			(server) =>
+				server.includes("alidns.com") || server.includes("hichina.com"),
+		)
+	) {
+		return {
+			label: "Alibaba Cloud",
+			iconKey: "siAlibabacloud",
+			url: "https://dns.console.aliyun.com",
+		};
 	}
 	// Tencent Cloud / DNSPod
-	if (normalized.some((server) => server.includes("dnspod.net") || server.includes("tencentdns.com"))) {
-		return { label: "Tencent Cloud", iconKey: "siTencentqq", url: "https://console.dnspod.cn" };
+	if (
+		normalized.some(
+			(server) =>
+				server.includes("dnspod.net") || server.includes("tencentdns.com"),
+		)
+	) {
+		return {
+			label: "Tencent Cloud",
+			iconKey: "siTencentqq",
+			url: "https://console.dnspod.cn",
+		};
 	}
 	// Huawei Cloud
-	if (normalized.some((server) => server.includes("huaweicloud-dns.com") || server.includes("huaweicloud-dns.cn"))) {
-		return { label: "Huawei Cloud", iconKey: "siHuawei", url: "https://console.huaweicloud.com/dns" };
+	if (
+		normalized.some(
+			(server) =>
+				server.includes("huaweicloud-dns.com") ||
+				server.includes("huaweicloud-dns.cn"),
+		)
+	) {
+		return {
+			label: "Huawei Cloud",
+			iconKey: "siHuawei",
+			url: "https://console.huaweicloud.com/dns",
+		};
 	}
 	// Strato
-	if (normalized.some((server) => server.includes("strato.de") || server.includes("strato-hosting.eu"))) {
-		return { label: "Strato", iconKey: null, url: "https://www.strato.de/apps/CustomerService" };
+	if (
+		normalized.some(
+			(server) =>
+				server.includes("strato.de") || server.includes("strato-hosting.eu"),
+		)
+	) {
+		return {
+			label: "Strato",
+			iconKey: null,
+			url: "https://www.strato.de/apps/CustomerService",
+		};
 	}
 	// Fasthosts
 	if (normalized.some((server) => server.includes("fasthosts.co.uk"))) {
-		return { label: "Fasthosts", iconKey: null, url: "https://www.fasthosts.co.uk/panel" };
+		return {
+			label: "Fasthosts",
+			iconKey: null,
+			url: "https://www.fasthosts.co.uk/panel",
+		};
 	}
 	// Wix
 	if (normalized.some((server) => server.includes("wixdns.net"))) {
-		return { label: "Wix", iconKey: "siWix", url: "https://www.wix.com/my-account/domains" };
+		return {
+			label: "Wix",
+			iconKey: "siWix",
+			url: "https://www.wix.com/my-account/domains",
+		};
 	}
 	// Shopify
 	if (normalized.some((server) => server.includes("shopify.com"))) {
-		return { label: "Shopify", iconKey: "siShopify", url: "https://admin.shopify.com/settings/domains" };
+		return {
+			label: "Shopify",
+			iconKey: "siShopify",
+			url: "https://admin.shopify.com/settings/domains",
+		};
 	}
 	// Render
 	if (normalized.some((server) => server.includes("render.com"))) {
-		return { label: "Render", iconKey: "siRender", url: "https://dashboard.render.com" };
+		return {
+			label: "Render",
+			iconKey: "siRender",
+			url: "https://dashboard.render.com",
+		};
 	}
 	// Railway
 	if (normalized.some((server) => server.includes("railway.app"))) {
-		return { label: "Railway", iconKey: "siRailway", url: "https://railway.app/dashboard" };
+		return {
+			label: "Railway",
+			iconKey: "siRailway",
+			url: "https://railway.app/dashboard",
+		};
 	}
 	// Fly.io
 	if (normalized.some((server) => server.includes("fly.io"))) {
@@ -202,7 +405,11 @@ const inferDnsProvider = (nameservers: string[] | null | undefined) => {
 		// Ignore any parsing errors
 	}
 
-	return { label: fallbackLabel, iconKey: null as string | null, url: null as string | null };
+	return {
+		label: fallbackLabel,
+		iconKey: null as string | null,
+		url: null as string | null,
+	};
 };
 
 const DomainPage = () => {
@@ -415,7 +622,10 @@ const DomainPage = () => {
 										<span className="font-medium text-paragraph-sm underline decoration-stroke-soft-200 decoration-dashed underline-offset-4">
 											{dnsProvider.label}
 										</span>
-										<Icon name="link-external" className="h-3 w-3 text-text-soft-400" />
+										<Icon
+											name="link-external"
+											className="h-3 w-3 text-text-soft-400"
+										/>
 									</a>
 								</div>
 							)}
@@ -434,9 +644,25 @@ const DomainPage = () => {
 					<p className="font-semibold text-paragraph-lg text-text-strong-950">
 						DNS Records
 					</p>
-					<Button.Root variant="neutral" mode="stroke" size="xsmall">
-						<Icon name="refresh-cw" className="h-3.5 w-3.5" />
-						Auto Configure
+					<Button.Root
+						variant="neutral"
+						mode="stroke"
+						size="xsmall"
+						onClick={handleVerifyDNS}
+						disabled={isVerifying || domainData?.status === "verifying"}
+						className={cn(
+							(isVerifying || domainData?.status === "verifying") &&
+								"pointer-events-none opacity-70",
+						)}
+					>
+						{isVerifying || domainData?.status === "verifying" ? (
+							<Spinner size={14} color="currentColor" />
+						) : (
+							<Icon name="refresh-cw" className="h-3.5 w-3.5" />
+						)}
+						{isVerifying || domainData?.status === "verifying"
+							? "Verifying"
+							: "Verify"}
 					</Button.Root>
 				</div>
 				<DNSRecordsSection
@@ -447,7 +673,9 @@ const DomainPage = () => {
 					receivingEmail={domainData?.receivingEmail}
 					onToggleSending={(value) => {
 						if (!value && !domainData?.receivingEmail) {
-							toast.error("At least one of Sending or Receiving must be enabled");
+							toast.error(
+								"At least one of Sending or Receiving must be enabled",
+							);
 							return;
 						}
 						handleUpdateDomain(
@@ -458,7 +686,9 @@ const DomainPage = () => {
 					}}
 					onToggleReceiving={(value) => {
 						if (!value && !domainData?.sendingEmail) {
-							toast.error("At least one of Sending or Receiving must be enabled");
+							toast.error(
+								"At least one of Sending or Receiving must be enabled",
+							);
 							return;
 						}
 						handleUpdateDomain(
