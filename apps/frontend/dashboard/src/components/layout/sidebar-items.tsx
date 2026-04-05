@@ -9,12 +9,12 @@ import { usePathname } from "next/navigation";
 import { useRef, useState } from "react";
 import { AnimatedHoverBackground } from "../animated-hover-background";
 
-interface MainNavigationProps {
+interface SidebarItemsProps {
 	organizationSlug: string;
 	isCollapsed?: boolean;
 }
 
-export const MainNavigation: React.FC<MainNavigationProps> = ({
+export const SidebarItems: React.FC<SidebarItemsProps> = ({
 	organizationSlug,
 	isCollapsed = false,
 }) => {

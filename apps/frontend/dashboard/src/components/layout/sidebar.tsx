@@ -10,8 +10,8 @@ import { Logo } from "@reloop/ui/logo";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
-import { MainNavigation } from "./main-navigation";
 import { OrganizationSwitcher } from "./organization-switcher";
+import { SidebarItems } from "./sidebar-items";
 import { UserMenuDropdown } from "./user-menu-dropdown";
 
 interface MainSidebarProps {
@@ -124,7 +124,7 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
 
 			{/* Main Navigation */}
 			<div className="flex-1 overflow-y-auto p-2">
-				<MainNavigation
+				<SidebarItems
 					organizationSlug={activeOrganization.slug}
 					isCollapsed={isSidebarCollapsed}
 				/>
