@@ -10,7 +10,6 @@ import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import Spinner from "@reloop/ui/spinner";
-import { AnimatePresence, motion } from "motion/react";
 import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
@@ -89,19 +88,6 @@ const formatRoleLabel = (role: string) => {
 		default:
 			return role;
 	}
-};
-
-const getAnimationProps = (row: number, column: number) => {
-	return {
-		initial: { opacity: 0, y: "-100%" },
-		animate: { opacity: 1, y: 0 },
-		exit: { opacity: 0, y: "100%" },
-		transition: {
-			duration: 0.5,
-			delay: row * 0.07 + column * 0.1,
-			ease: [0.65, 0, 0.35, 1] as const,
-		},
-	};
 };
 
 const TeamSkeleton = () => (
@@ -381,7 +367,7 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
 	}
 
 	return (
-		<AnimatePresence mode="wait">
+		<div>
 			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/50">
 				{/* Table Header */}
 				<div className="grid grid-cols-[1fr_180px_165px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600">
@@ -412,10 +398,7 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
 							)}
 						>
 							{/* User Column - Avatar + Email */}
-							<motion.div
-								{...getAnimationProps(index + 1, 0)}
-								className="flex items-center gap-3"
-							>
+							<div className="flex items-center gap-3">
 								<div className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-white text-xs uppercase tracking-wide shadow-sm">
 									{invite.email.charAt(0).toUpperCase()}
 								</div>
@@ -423,13 +406,10 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
 								<span className="truncate font-medium text-label-sm text-text-sub-600">
 									{invite.email}
 								</span>
-							</motion.div>
+							</div>
 
 							{/* Role Column */}
-							<motion.div
-								{...getAnimationProps(index + 1, 1)}
-								className="flex items-center"
-							>
+							<div className="flex items-center">
 								<span
 									className={cn(
 										"inline-flex rounded-md border-[1px] border-stroke-soft-200 px-[6px] py-0.5 font-medium text-[10px]",
@@ -438,13 +418,10 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
 								>
 									{formatRoleLabel(invite.role)}
 								</span>
-							</motion.div>
+							</div>
 
 							{/* Actions Column */}
-							<motion.div
-								{...getAnimationProps(index + 1, 2)}
-								className="flex items-center justify-end gap-8"
-							>
+							<div className="flex items-center justify-end gap-8">
 								<span className="whitespace-nowrap rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-2.5 py-0.5 text-[11px] text-text-sub-600">
 									Invite pending...
 								</span>
@@ -455,7 +432,7 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
 									onRevokeInvite={handleRevokeInviteClick}
 									isResending={resendingInvite === invite.id}
 								/>
-							</motion.div>
+							</div>
 						</div>
 					))}
 
@@ -478,10 +455,7 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
 								)}
 							>
 								{/* User Column - Avatar + Name + Email */}
-								<motion.div
-									{...getAnimationProps(displayIndex + 1, 0)}
-									className="flex items-center gap-3 py-[3px]"
-								>
+								<div className="flex items-center gap-3 py-[3px]">
 									<Avatar.Root size="20" color="gray">
 										{member.user.image ? (
 											<Avatar.Image
@@ -511,13 +485,10 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
 											</span>
 										</div>
 									</div>
-								</motion.div>
+								</div>
 
 								{/* Role Column */}
-								<motion.div
-									{...getAnimationProps(displayIndex + 1, 1)}
-									className="flex items-center"
-								>
+								<div className="flex items-center">
 									<span
 										className={cn(
 											"inline-flex rounded-md border-[1px] border-stroke-soft-200 px-[6px] py-0.5 font-medium text-[10px]",
@@ -526,13 +497,10 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
 									>
 										{formatRoleLabel(member.role)}
 									</span>
-								</motion.div>
+								</div>
 
 								{/* Actions Column */}
-								<motion.div
-									{...getAnimationProps(displayIndex + 1, 2)}
-									className="flex items-center justify-end"
-								>
+								<div className="flex items-center justify-end">
 									{!isOwner && !isCurrentUser && (
 										<Dropdown.Root>
 											<Dropdown.Trigger asChild>
@@ -555,7 +523,7 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
 											</Dropdown.Content>
 										</Dropdown.Root>
 									)}
-								</motion.div>
+								</div>
 							</div>
 						);
 					})}
@@ -576,6 +544,6 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
 				memberName={memberToRemove?.name ?? ""}
 				memberEmail={memberToRemove?.email ?? ""}
 			/>
-		</AnimatePresence>
+		</div>
 	);
 };
