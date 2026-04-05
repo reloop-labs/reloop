@@ -1,7 +1,6 @@
 "use client";
 
 import { authClient } from "@reloop/auth/client";
-import * as Alert from "@reloop/ui/alert";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FileUpload from "@reloop/ui/file-upload";
@@ -9,7 +8,6 @@ import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
 import Spinner from "@reloop/ui/spinner";
-import * as StatusBadge from "@reloop/ui/status-badge";
 import axios from "axios";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
@@ -199,7 +197,7 @@ const AccountPage = () => {
 								) : imageUrl || imagePreview ? (
 									<img
 										src={imageUrl || imagePreview}
-										alt="Profile picture preview"
+										alt="Profile  preview"
 										className="h-full w-full rounded-full object-cover"
 									/>
 								) : (
@@ -249,6 +247,7 @@ const AccountPage = () => {
 										onChange={(e) => setFirstName(e.target.value)}
 										onFocus={() => setIsFirstNameFocused(true)}
 										onBlur={() => setIsFirstNameFocused(false)}
+										disabled={isSaving}
 										onKeyDown={(e) => {
 											if (e.key === "Enter") {
 												e.preventDefault();
@@ -257,11 +256,17 @@ const AccountPage = () => {
 										}}
 									/>
 
-									{isFirstNameFocused && (
-										<div className="flex items-center gap-1 rounded-md border border-stroke-sub-300 bg-bg-white-0 px-1 py-[1px] text-[10px] text-text-sub-600 ring-stroke-soft-200 ring-inset">
-											<span>⏎</span>
-											<span>Enter</span>
+									{isSaving ? (
+										<div className="mr-1 flex items-center">
+											<Spinner size={16} color="var(--text-sub-600)" />
 										</div>
+									) : (
+										isFirstNameFocused && (
+											<div className="flex items-center gap-1 rounded-md border border-stroke-sub-300 bg-bg-white-0 px-1 py-[1px] text-[10px] text-text-sub-600 ring-stroke-soft-200 ring-inset">
+												<span>⏎</span>
+												<span>Enter</span>
+											</div>
+										)
 									)}
 								</Input.Wrapper>
 							</Input.Root>
@@ -278,6 +283,7 @@ const AccountPage = () => {
 										onChange={(e) => setLastName(e.target.value)}
 										onFocus={() => setIsLastNameFocused(true)}
 										onBlur={() => setIsLastNameFocused(false)}
+										disabled={isSaving}
 										onKeyDown={(e) => {
 											if (e.key === "Enter") {
 												e.preventDefault();
@@ -285,11 +291,17 @@ const AccountPage = () => {
 											}
 										}}
 									/>
-									{isLastNameFocused && (
-										<div className="flex items-center gap-1 rounded-md border border-stroke-sub-300 bg-bg-white-0 px-1 py-[1px] text-[10px] text-text-sub-600 ring-stroke-soft-200 ring-inset">
-											<span>⏎</span>
-											<span>Enter</span>
+									{isSaving ? (
+										<div className="mr-1 flex items-center">
+											<Spinner size={16} color="var(--text-sub-600)" />
 										</div>
+									) : (
+										isLastNameFocused && (
+											<div className="flex items-center gap-1 rounded-md border border-stroke-sub-300 bg-bg-white-0 px-1 py-[1px] text-[10px] text-text-sub-600 ring-stroke-soft-200 ring-inset">
+												<span>⏎</span>
+												<span>Enter</span>
+											</div>
+										)
 									)}
 								</Input.Wrapper>
 							</Input.Root>

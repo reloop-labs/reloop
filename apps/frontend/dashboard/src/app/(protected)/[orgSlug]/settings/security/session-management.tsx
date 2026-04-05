@@ -244,6 +244,13 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 									</div>
 								);
 							})}
+					{!loading && sessions.length > 0 && (
+						<div className={"flex items-center justify-between px-4 py-2.5"}>
+							<p className="text-label-xs text-text-sub-600">
+								{sessions.length} active session{sessions.length > 1 ? "s" : ""}
+							</p>
+						</div>
+					)}
 				</div>
 
 				{!loading && sessions.length === 0 && (
