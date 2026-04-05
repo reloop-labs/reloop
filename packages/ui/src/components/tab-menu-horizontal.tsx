@@ -66,7 +66,7 @@ const TabMenuHorizontalList = React.forwardRef<
 			<TabsPrimitive.List
 				ref={mergeRefs(forwardedRef, listRef)}
 				className={cn(
-					"group/tab-list relative flex h-12 items-center gap-6 whitespace-nowrap border-stroke-soft-100/50 border-b",
+					"group/tab-list relative flex h-12 items-center gap-6 whitespace-nowrap border-stroke-soft-100 border-b dark:border-stroke-soft-100/50",
 					className,
 				)}
 				{...rest}
