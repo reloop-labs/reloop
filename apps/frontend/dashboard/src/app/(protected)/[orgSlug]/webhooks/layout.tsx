@@ -1,23 +1,68 @@
 "use client";
+
+import { FeedbackPopover } from "@fe/dashboard/components/feedback-popover";
+import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
+import { usePathname } from "next/navigation";
+import { useQueryState } from "nuqs";
+import { useHotkeys } from "react-hotkeys-hook";
+import { DocsButton } from "./components/docs-button";
 
 const WebhooksLayout = ({ children }: { children: React.ReactNode }) => {
+	const [, setModal] = useQueryState("modal");
+	const pathname = usePathname();
+
+	const isDetailPage = pathname.match(/\/webhooks\/([^/]+)$/) !== null;
+
+	useHotkeys(
+		"mod+a",
+		(event) => {
+			event.preventDefault();
+			setModal("create-webhook");
+		},
+		{
+			enabled: !isDetailPage,
+		}
+	);
+
 	return (
 		<div>
-			<div className="sticky top-0 z-10 flex h-12 items-center justify-start gap-2 border-stroke-soft-100 border-b bg-bg-white-0 pr-2 pl-3">
-				<div className="flex items-center gap-2">
-					<Icon name="webhook" className="h-4 w-4" />
-					<p className="font-medium text-sm">Webhooks</p>
-					<a
-						href="https://reloop.sh/docs/webhooks"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						<Icon name="info-outline" className="h-3.5 w-3.5" />
-					</a>
+			<div className="sticky top-0 z-10 flex h-12 items-center justify-start gap-2 border-stroke-soft-100 border-b bg-bg-white-0 pr-2 pl-3 dark:border-stroke-soft-dark-100/40">
+				<div className="flex w-full items-center justify-between">
+					<div className="flex items-center gap-2">
+						<Icon name="webhook" className="h-4 w-4" />
+						<span className="font-medium text-sm">Webhooks</span>
+					</div>
+					<FeedbackPopover />
 				</div>
 			</div>
-			<div>
+			<div className="mx-auto max-w-3xl sm:px-8">
+				{!isDetailPage && (
+					<div className="flex items-center justify-between pt-10 pb-6">
+						<h1 className="font-medium text-2xl">Webhooks</h1>
+						<div className="flex items-center gap-2 self-end">
+							<DocsButton size="xsmall" mode="stroke" />
+							<Button.Root
+								variant="neutral"
+								size="xsmall"
+								onClick={() => setModal("create-webhook")}
+								className="gap-2"
+							>
+								<Icon name="plus" className="h-4 w-4" />
+								Create webhook
+								<span className="inline-flex items-center gap-0.5">
+									<Icon
+										name="command"
+										className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+									/>
+									<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-100/20 p-px font-medium text-[10px] uppercase">
+										A
+									</span>
+								</span>
+							</Button.Root>
+						</div>
+					</div>
+				)}
 				<div>{children}</div>
 			</div>
 		</div>

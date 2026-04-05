@@ -1,14 +1,13 @@
 "use client";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
-import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Select from "@reloop/ui/select";
-import Link from "next/link";
+import { useQueryState } from "nuqs";
 import { useState } from "react";
 import useSWR from "swr";
 import { CreateWebhookModal } from "./create-webhook-modal";
-import { EmptyState } from "./empty-state";
+
 import { WebhookTable } from "./webhook-table";
 
 interface WebhookData {
@@ -33,7 +32,7 @@ export const WebhookListSidebar = () => {
 	const { activeOrganization } = useUserOrganization();
 	const [statusFilter, setStatusFilter] = useState<string>("all");
 	const [searchQuery, setSearchQuery] = useState<string>("");
-	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+	const [modal, setModal] = useQueryState("modal");
 
 	const { data, error, isLoading } = useSWR<WebhookListResponse>(
 		activeOrganization?.id
@@ -58,35 +57,7 @@ export const WebhookListSidebar = () => {
 		}) || [];
 
 	return (
-		<div className="mx-auto max-w-3xl sm:px-8">
-			<div className="flex items-center justify-between pt-10 pb-6">
-				<p className="font-medium text-2xl">
-					Webhook{data?.webhooks.length !== 1 ? "s" : ""}
-				</p>
-				<div className="flex items-center gap-2">
-					<Button.Root
-						variant="neutral"
-						size="xsmall"
-						onClick={() => setIsCreateModalOpen(true)}
-					>
-						<Icon name="plus" className="h-4 w-4" />
-						Create webhook
-					</Button.Root>
-					<Link
-						href="https://reloop.sh/docs/learn/webhook"
-						target="_blank"
-						rel="noopener noreferrer"
-						className={Button.buttonVariants({
-							variant: "neutral",
-							size: "xsmall",
-							mode: "stroke",
-						}).root()}
-					>
-						<Icon name="book-closed" className="h-4 w-4" />
-					</Link>
-				</div>
-			</div>
-
+		<div className="pb-8">
 			<div>
 				{error ? (
 					<div className="flex flex-col items-center justify-center gap-2 p-4">
@@ -95,8 +66,6 @@ export const WebhookListSidebar = () => {
 							Failed to load webhooks
 						</p>
 					</div>
-				) : data?.webhooks && data.webhooks.length === 0 ? (
-					<EmptyState onCreateWebhook={() => setIsCreateModalOpen(true)} />
 				) : (
 					<div>
 						<div className="flex items-center gap-3">
@@ -147,8 +116,8 @@ export const WebhookListSidebar = () => {
 				)}
 			</div>
 			<CreateWebhookModal
-				isOpen={isCreateModalOpen}
-				onClose={() => setIsCreateModalOpen(false)}
+				isOpen={modal === "create-webhook"}
+				onClose={() => setModal(null)}
 			/>
 		</div>
 	);
