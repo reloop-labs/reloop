@@ -110,6 +110,7 @@ export const WebhookListSidebar = () => {
 								activeOrganizationSlug={activeOrganization?.slug || ""}
 								isLoading={isLoading}
 								loadingRows={4}
+								onAddWebhook={() => setModal("create-webhook")}
 							/>
 						</div>
 					</div>

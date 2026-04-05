@@ -1,5 +1,6 @@
 "use client";
 
+import { WebhooksApiDetails } from "@fe/dashboard/components/api-details/webhooks";
 import { FeedbackPopover } from "@fe/dashboard/components/feedback-popover";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
@@ -22,7 +23,7 @@ const WebhooksLayout = ({ children }: { children: React.ReactNode }) => {
 		},
 		{
 			enabled: !isDetailPage,
-		}
+		},
 	);
 
 	return (
@@ -60,6 +61,7 @@ const WebhooksLayout = ({ children }: { children: React.ReactNode }) => {
 									</span>
 								</span>
 							</Button.Root>
+							<WebhooksApiDetails size="xsmall" mode="ghost" />
 						</div>
 					</div>
 				)}
