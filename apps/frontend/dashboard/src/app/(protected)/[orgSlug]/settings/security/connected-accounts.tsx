@@ -85,9 +85,9 @@ const getProviderInfo = (providerId: string) => {
 };
 
 const AccountSkeleton = () => (
-	<div className="rounded-xl border border-stroke-soft-100 py-2 pr-2.5 pl-3">
+	<div className="rounded-xl border border-stroke-soft-100 py-2 pr-2.5 pl-3 dark:border-stroke-soft-100/40">
 		<div className="flex items-center justify-between">
-			<div className="flex items-center gap-3">
+			<div className="flex items-center gap-3 p-0.5">
 				<Skeleton className="h-8 w-8 rounded-lg" />
 				<div className="space-y-1.5">
 					<Skeleton className="h-4 w-24" />
@@ -163,6 +163,7 @@ export const ConnectedAccounts = ({ className }: ConnectedAccountsProps) => {
 			<div className="space-y-3">
 				{isLoading ? (
 					<>
+						<AccountSkeleton />
 						<AccountSkeleton />
 						<AccountSkeleton />
 					</>
