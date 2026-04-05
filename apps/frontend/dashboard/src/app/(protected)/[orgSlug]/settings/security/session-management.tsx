@@ -236,85 +236,6 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 		return session.token === currentSession?.session?.token;
 	};
 
-	if (loading) {
-		return (
-			<div className={cn("space-y-4", className)}>
-				<div className="flex items-center justify-between">
-					<div>
-						<p className="font-medium text-label-md text-text-strong-950">
-							Active Sessions
-						</p>
-						<p className="text-paragraph-sm text-text-sub-600">
-							Monitor and manage all your active sessions.
-						</p>
-					</div>
-				</div>
-
-				<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/40">
-					{/* Table Header */}
-					<div className="grid grid-cols-[1fr_140px_140px_120px_80px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600 dark:border-stroke-soft-100/40">
-						<div className="flex items-center gap-2">
-							<Icon name="monitor" className="h-4 w-4" />
-							<span className="text-xs">Session</span>
-						</div>
-						<div className="flex items-center gap-2">
-							<Icon name="globe" className="h-4 w-4" />
-							<span className="text-xs">IP Address</span>
-						</div>
-						<div className="flex items-center gap-2">
-							<Icon name="clock" className="h-4 w-4" />
-							<span className="text-xs">Last Active</span>
-						</div>
-						<div className="flex items-center gap-2">
-							<Icon name="map-pin" className="h-4 w-4" />
-							<span className="text-xs">Location</span>
-						</div>
-						<div />
-					</div>
-
-					{/* Skeleton Rows */}
-					<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/40">
-						{Array.from({ length: 3 }).map((_, index) => (
-							<div
-								key={`skeleton-${index}`}
-								className="grid grid-cols-[1fr_140px_140px_120px_80px] px-4 py-2"
-							>
-								{/* Session Info Column */}
-								<div className="flex items-center gap-3">
-									<Skeleton className="h-5 w-5 rounded-full" />
-									<div className="flex-1 space-y-1">
-										<Skeleton className="h-4 w-24" />
-										<Skeleton className="h-3 w-32" />
-									</div>
-								</div>
-
-								{/* IP Address Column */}
-								<div className="flex items-center">
-									<Skeleton className="h-4 w-20" />
-								</div>
-
-								{/* Last Active Column */}
-								<div className="flex items-center">
-									<Skeleton className="h-4 w-16" />
-								</div>
-
-								{/* Location Column */}
-								<div className="flex items-center">
-									<Skeleton className="h-4 w-24" />
-								</div>
-
-								{/* Action Column */}
-								<div className="flex items-center justify-end">
-									<Skeleton className="h-6 w-6 rounded" />
-								</div>
-							</div>
-						))}
-					</div>
-				</div>
-			</div>
-		);
-	}
-
 	return (
 		<div className={cn("space-y-4", className)}>
 			<div className="flex items-center justify-between">
@@ -332,7 +253,7 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 						className="h-7 text-sm"
 						size="xxsmall"
 						onClick={handleTerminateAllSessions}
-						disabled={terminatingAll}
+						disabled={terminatingAll || loading}
 					>
 						{terminatingAll && <Spinner size={12} color="var(--error-base)" />}
 						Revoke All Other
@@ -365,94 +286,147 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 
 					{/* Table Body */}
 					<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/40">
-						{sessions.map((session, index) => {
-							const { browser, device, isMobile } = parseUserAgent(
-								session.userAgent,
-							);
-							const isCurrent = isCurrentSession(session);
-
-							return (
-								<div
-									key={
-										session.id
-											? `session-${session.id}`
-											: `session-idx-${index}`
-									}
-									className={cn(
-										"group/row grid grid-cols-[1fr_140px_140px_120px_80px] items-center px-4 py-2 transition-colors",
-										"hover:bg-bg-weak-50/50",
-									)}
-								>
-									{/* Session Info Column */}
-									<div className="flex items-center gap-3">
-										{/* Browser Icon */}
-										<div className="flex h-5 w-5 flex-shrink-0 items-center justify-center">
-											{getBrowserIcon(browser)}
+						{loading
+							? Array.from({ length: 3 }).map((_, index) => (
+									<div
+										key={`skeleton-${index}`}
+										className="grid grid-cols-[1fr_140px_140px_120px_80px] px-4 py-2"
+									>
+										{/* Session Info Column */}
+										<div className="flex items-center gap-3">
+											<Skeleton className="h-5 w-5 rounded-full" />
+											<div className="flex-1 space-y-1">
+												<Skeleton className="h-4 w-24" />
+												<Skeleton className="h-3 w-32" />
+											</div>
 										</div>
 
-										{/* Session Details */}
-										<div className="min-w-0 flex-1">
-											<div className="flex items-center gap-2">
-												<span className="truncate font-medium text-label-xs text-text-strong-950">
-													{browser}
-												</span>
-												{isCurrent && (
-													<span className="rounded-full bg-success-base px-1.5 font-semibold text-[10px] text-white">
-														Current
-													</span>
-												)}
-											</div>
-											<span className="text-[11px] text-text-sub-600">
-												{device} • {isMobile ? "Mobile" : "Desktop"}
-											</span>
+										{/* IP Address Column */}
+										<div className="flex items-center">
+											<Skeleton className="h-4 w-20" />
+										</div>
+
+										{/* Last Active Column */}
+										<div className="flex items-center">
+											<Skeleton className="h-4 w-16" />
+										</div>
+
+										{/* Location Column */}
+										<div className="flex items-center">
+											<Skeleton className="h-4 w-24" />
+										</div>
+
+										{/* Action Column */}
+										<div className="flex items-center justify-end">
+											<Skeleton className="h-6 w-6 rounded" />
 										</div>
 									</div>
+								))
+							: sessions.length > 0
+								? sessions.map((session, index) => {
+										const { browser, device, isMobile } = parseUserAgent(
+											session.userAgent,
+										);
+										const isCurrent = isCurrentSession(session);
 
-									{/* IP Address Column */}
-									<span className="text-label-xs text-text-sub-600">
-										{session.ipAddress || "—"}
-									</span>
-
-									{/* Last Active Column */}
-									<span className="text-label-xs text-text-sub-600">
-										{formatTimeAgo(session.updatedAt)}
-									</span>
-
-									{/* Location Column */}
-									<span className="text-label-xs text-text-sub-600">
-										{session.location || "Unknown"}
-									</span>
-
-									{/* Action Column */}
-									<div className="flex items-center justify-end">
-										{isCurrent ? (
-											<div className="flex h-7 w-16 items-center justify-center rounded-lg border border-stroke-soft-100 font-medium text-text-sub-600/70 text-xs dark:border-stroke-soft-100/40">
-												Current
-											</div>
-										) : (
-											<Button.Root
-												variant="error"
-												mode="lighter"
-												size="xxsmall"
-												className="text-xs"
-												onClick={() => handleTerminateSession(session.token)}
-												disabled={terminatingSession === session.token}
+										return (
+											<div
+												key={
+													session.id
+														? `session-${session.id}`
+														: `session-idx-${index}`
+												}
+												className={cn(
+													"group/row grid grid-cols-[1fr_140px_140px_120px_80px] items-center px-4 py-2 transition-colors",
+													"hover:bg-bg-weak-50/50",
+												)}
 											>
-												{terminatingSession === session.token ? (
-													<Spinner size={12} color="var(--text-sub-600)" />
-												) : (
-													"Revoke"
-												)}
-											</Button.Root>
-										)}
-									</div>
-								</div>
-							);
-						})}
+												{/* Session Info Column */}
+												<div className="flex items-center gap-3">
+													{/* Browser Icon */}
+													<div className="flex h-5 w-5 flex-shrink-0 items-center justify-center">
+														{getBrowserIcon(browser)}
+													</div>
+
+													{/* Session Details */}
+													<div className="min-w-0 flex-1">
+														<div className="flex items-center gap-2">
+															<span className="truncate font-medium text-label-xs text-text-strong-950">
+																{browser}
+															</span>
+															{isCurrent && (
+																<span className="rounded-full bg-success-base px-1.5 font-semibold text-[10px] text-white">
+																	Current
+																</span>
+															)}
+														</div>
+														<span className="flex items-center gap-1.5 text-[11px] text-text-sub-600">
+															<span className="flex items-center gap-1">
+																<span className="h-3 w-3">
+																	{getOsIcon(device)}
+																</span>
+																<span>{device}</span>
+															</span>
+															<span>•</span>
+															<span className="flex items-center gap-1">
+																{getDeviceTypeIcon(isMobile)}
+																<span>{isMobile ? "Mobile" : "Desktop"}</span>
+															</span>
+														</span>
+													</div>
+												</div>
+
+												{/* IP Address Column */}
+												<span className="text-label-xs text-text-sub-600">
+													{session.ipAddress || "—"}
+												</span>
+
+												{/* Last Active Column */}
+												<span className="text-label-xs text-text-sub-600">
+													{formatTimeAgo(session.updatedAt)}
+												</span>
+
+												{/* Location Column */}
+												<span className="text-label-xs text-text-sub-600">
+													{session.location || "Unknown"}
+												</span>
+
+												{/* Action Column */}
+												<div className="flex items-center justify-end">
+													{isCurrent ? (
+														<div className="flex h-7 w-16 items-center justify-center rounded-lg border border-stroke-soft-100 font-medium text-text-sub-600/70 text-xs dark:border-stroke-soft-100/40">
+															Current
+														</div>
+													) : (
+														<Button.Root
+															variant="error"
+															mode="lighter"
+															size="xxsmall"
+															className="text-xs"
+															onClick={() =>
+																handleTerminateSession(session.token)
+															}
+															disabled={terminatingSession === session.token}
+														>
+															{terminatingSession === session.token ? (
+																<Spinner
+																	size={12}
+																	color="var(--text-sub-600)"
+																/>
+															) : (
+																"Revoke"
+															)}
+														</Button.Root>
+													)}
+												</div>
+											</div>
+										);
+									})
+								: null}
 					</div>
 
 					{/* Empty State */}
-					{sessions.length === 0 && (
+					{!loading && sessions.length === 0 && (
 						<div className="flex flex-col items-center justify-center py-12 text-center">
 							<Icon name="shield" className="mb-3 h-8 w-8 text-text-sub-600" />
 							<p className="font-medium text-text-strong-950">
