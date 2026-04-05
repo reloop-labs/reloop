@@ -22,7 +22,7 @@ interface SessionManagementProps {
 }
 
 const GRID_COLS = "grid-cols-[1fr_140px_140px_120px_80px]";
-const DIVIDER = "divide-stroke-soft-100 dark:divide-stroke-soft-100/40";
+const DIVIDER = "divide-stroke-soft-100 dark:divide-[#101010]";
 const BORDER = "border-stroke-soft-100 dark:border-stroke-soft-100/40";
 
 export const SessionManagement = ({ className }: SessionManagementProps) => {
@@ -114,7 +114,7 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 
 			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/40">
 				<div
-					className={`grid ${GRID_COLS} items-center border-b px-4 py-2.5 font-medium text-text-sub-600 ${BORDER}`}
+					className={`grid ${GRID_COLS} items-center border-stroke-soft-100 border-b bg-bg-weak-50/50 px-4 py-2.5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-bg-weak-50/40`}
 				>
 					<div className="flex items-center gap-1">
 						<Icon name="monitor" className="h-3 w-3" />

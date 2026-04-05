@@ -1,6 +1,10 @@
 "use client";
 
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
+import {
+	getAvatarGradient,
+	getAvatarInitial,
+} from "@fe/dashboard/utils/avatar";
 import { authClient } from "@reloop/auth/client";
 import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
@@ -8,8 +12,7 @@ import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
-import Spinner from "@reloop/ui/spinner";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 
@@ -39,40 +42,14 @@ interface TeamListProps {
 	filters?: ("invited" | "suspended" | "active")[];
 }
 
-const getInitials = (name: string | null, email: string) => {
-	if (name) {
-		return name
-			.split(" ")
-			.map((part) => part.charAt(0).toUpperCase())
-			.join("")
-			.slice(0, 2);
-	}
-	const emailPart = email.split("@")[0];
-	if (!emailPart) return "??";
-	return emailPart
-		.split(".")
-		.map((part) => part.charAt(0).toUpperCase())
-		.join("")
-		.slice(0, 2);
-};
-
-const getFirstChar = (name: string | null, email: string) => {
-	if (name && name.length > 0) {
-		return name.charAt(0).toUpperCase();
-	}
-	const emailPart = email.split("@")[0];
-	if (!emailPart) return "?";
-	return emailPart.charAt(0).toUpperCase();
-};
-
 const getRoleBadgeStyles = (role: string) => {
 	switch (role.toLowerCase()) {
 		case "owner":
-			return "border border-warning-base text-warning-base bg-warning-light/20";
+			return "border border-warning-light bg-warning-lighter text-warning-base";
 		case "admin":
-			return "border border-feature-base text-feature-base bg-feature-light/20";
+			return "border border-feature-light bg-feature-lighter text-feature-base";
 		default:
-			return "border border-stroke-soft-200 text-text-sub-600 bg-neutral-alpha-10";
+			return "border border-neutral-alpha-10 bg-neutral-alpha-10 text-text-sub-600";
 	}
 };
 
@@ -89,19 +66,25 @@ const formatRoleLabel = (role: string) => {
 	}
 };
 
+const GRID = "grid-cols-[1fr_160px_200px_48px]";
+const BORDER = "border-stroke-soft-100 dark:border-stroke-soft-100/50";
+const DIVIDER = "divide-stroke-soft-100 dark:divide-stroke-soft-100/50";
+
 const TeamSkeleton = () => (
-	<div className="grid grid-cols-[1fr_180px_165px] items-center px-4 py-2">
+	<div className={`grid ${GRID} items-center px-4 py-2`}>
 		<div className="flex items-center gap-3">
-			<Skeleton className="h-6 w-6 rounded-full" />
-			<div className="flex items-center gap-2">
-				<Skeleton className="h-4 w-24" />
+			<Skeleton className="h-6 w-6 flex-shrink-0 rounded-full" />
+			<div className="space-y-1.5">
+				<Skeleton className="h-3.5 w-24" />
 				<Skeleton className="h-3 w-32" />
 			</div>
 		</div>
 		<Skeleton className="h-5 w-16 rounded-full" />
-		<div className="flex items-center justify-end">
-			<Skeleton className="h-4 w-4 rounded" />
+		<div className="flex items-center gap-2">
+			<Skeleton className="h-2 w-2 rounded-full" />
+			<Skeleton className="h-3 w-24" />
 		</div>
+		<Skeleton className="h-4 w-4 rounded" />
 	</div>
 );
 
@@ -307,21 +290,32 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
 
 	if (isLoading) {
 		return (
-			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-200 text-paragraph-sm">
-				{/* Header */}
-				<div className="grid grid-cols-[1fr_180px_165px] items-center border-stroke-soft-200 border-b bg-bg-weak-50 px-4 py-2 text-text-sub-600">
-					<div className="flex items-center gap-2">
-						<Icon name="user" className="h-4 w-4" />
-						<span className="text-xs">User</span>
+			<div
+				className={`w-full overflow-hidden rounded-xl border text-paragraph-sm ${BORDER}`}
+			>
+				<div
+					className={`grid ${GRID} items-center border-b bg-bg-weak-50 px-4 py-2.5 text-text-sub-600 ${BORDER}`}
+				>
+					<div className="flex items-center gap-1.5">
+						<Icon name="user" className="h-3 w-3" />
+						<span className="font-medium text-xs uppercase tracking-wide">
+							User
+						</span>
 					</div>
-					<div className="flex items-center gap-2">
-						<Icon name="user-role" className="h-4 w-4" />
-						<span className="text-xs">Role</span>
+					<div className="flex items-center gap-1.5">
+						<Icon name="user-role" className="h-3 w-3" />
+						<span className="font-medium text-xs uppercase tracking-wide">
+							Role
+						</span>
+					</div>
+					<div className="flex items-center gap-1.5">
+						<span className="font-medium text-xs uppercase tracking-wide">
+							Status
+						</span>
 					</div>
 					<div />
 				</div>
-				{/* Skeleton rows */}
-				<div className="divide-y divide-stroke-soft-200">
+				<div className={`divide-y ${DIVIDER}`}>
 					{Array.from({ length: 3 }).map((_, index) => (
 						<TeamSkeleton key={`skeleton-${index}`} />
 					))}
@@ -367,22 +361,29 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
 
 	return (
 		<div>
-			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/50">
-				{/* Table Header */}
-				<div className="grid grid-cols-[1fr_180px_165px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600">
-					<div className="flex items-center gap-2">
-						<Icon name="user" className="h-4 w-4" />
-						<span className="text-xs">User</span>
+			<div
+				className={`w-full overflow-hidden rounded-xl border text-paragraph-sm ${BORDER}`}
+			>
+				<div
+					className={`grid ${GRID} items-center border-b bg-bg-weak-50/50 px-4 py-2.5 text-text-sub-600 dark:bg-bg-weak-50/40 ${BORDER}`}
+				>
+					<div className="flex items-center gap-1">
+						<Icon name="user" className="h-3 w-3" />
+						<span className="font-medium text-xs tracking-wide">User</span>
 					</div>
-					<div className="flex items-center gap-2">
-						<Icon name="user-role" className="h-4 w-4" />
-						<span className="text-xs">Role</span>
+					<div className="flex items-center gap-1">
+						<Icon name="user-role" className="h-3 w-3" />
+						<span className="font-medium text-xs tracking-wide">Role</span>
+					</div>
+					<div className="flex items-center gap-1">
+						<Icon name="activity" className="h-3 w-3" />
+						<span className="font-medium text-xs tracking-wide">Status</span>
 					</div>
 					<div />
 				</div>
 
 				{/* Combined List */}
-				<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
+				<div className={`divide-y ${DIVIDER}`}>
 					{/* Pending Invites */}
 					{filteredData.invites.map((invite, index) => (
 						<div
@@ -392,26 +393,35 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
 									: `invite-idx-${index}`
 							}
 							className={cn(
-								"group/row grid grid-cols-[1fr_180px_165px] items-center px-4 py-2 transition-colors",
+								`group/row grid ${GRID} items-center px-4 py-2 transition-colors`,
 								"hover:bg-bg-weak-50/50",
 							)}
 						>
-							{/* User Column - Avatar + Email */}
+							{/* User Column */}
 							<div className="flex items-center gap-3">
-								<div className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-white text-xs uppercase tracking-wide shadow-sm">
-									{invite.email.charAt(0).toUpperCase()}
+								<div
+									className={cn(
+										"flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full font-semibold text-white text-xs uppercase tracking-wide shadow-sm",
+										getAvatarGradient(invite.email),
+									)}
+								>
+									{getAvatarInitial(null, invite.email)}
 								</div>
-
-								<span className="truncate font-medium text-label-sm text-text-sub-600">
-									{invite.email}
-								</span>
+								<div className="min-w-0">
+									<span className="block truncate font-medium text-label-sm text-text-strong-950">
+										{invite.email.split("@")[0]}
+									</span>
+									<span className="block truncate text-[11px] text-text-sub-600">
+										{invite.email}
+									</span>
+								</div>
 							</div>
 
 							{/* Role Column */}
 							<div className="flex items-center">
 								<span
 									className={cn(
-										"inline-flex rounded-md border-[1px] border-stroke-soft-200 px-[6px] py-0.5 font-medium text-[10px]",
+										"inline-flex rounded-full px-2.5 py-0.5 font-medium text-[11px]",
 										getRoleBadgeStyles(invite.role),
 									)}
 								>
@@ -419,11 +429,16 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
 								</span>
 							</div>
 
-							{/* Actions Column */}
-							<div className="flex items-center justify-end gap-8">
-								<span className="whitespace-nowrap rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-2.5 py-0.5 text-[11px] text-text-sub-600">
-									Invite pending...
+							{/* Status Column */}
+							<div className="flex items-center gap-2">
+								<span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-amber-400" />
+								<span className="font-medium text-[12px] text-text-sub-600">
+									Invite Pending
 								</span>
+							</div>
+
+							{/* Actions Column */}
+							<div className="flex items-center justify-end">
 								<InviteDropdown
 									inviteId={invite.id}
 									onResendInvite={handleResendInvite}
@@ -439,7 +454,6 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
 					{filteredData.members.map((member, index) => {
 						const isOwner = member.role.toLowerCase() === "owner";
 						const isCurrentUser = member.user.id === currentUserId;
-						const displayIndex = index + filteredData.invites.length;
 
 						return (
 							<div
@@ -449,13 +463,13 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
 										: `member-idx-${index}`
 								}
 								className={cn(
-									"group/row grid grid-cols-[1fr_180px_165px] items-center px-4 py-2 transition-colors",
+									`group/row grid ${GRID} items-center px-4 py-2 transition-colors`,
 									"hover:bg-bg-weak-50/50",
 								)}
 							>
-								{/* User Column - Avatar + Name + Email */}
-								<div className="flex items-center gap-3 py-[3px]">
-									<Avatar.Root size="20" color="gray">
+								{/* User Column */}
+								<div className="flex items-center gap-3">
+									<Avatar.Root size="24" color="gray" className="flex-shrink-0">
 										{member.user.image ? (
 											<Avatar.Image
 												src={member.user.image}
@@ -463,26 +477,34 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
 											/>
 										) : (
 											<Avatar.Image asChild>
-												<div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-white text-xs uppercase tracking-wide shadow-sm">
-													{getFirstChar(member.user.name, member.user.email)}
+												<div
+													className={cn(
+														"flex h-full w-full items-center justify-center rounded-full font-semibold text-white text-xs uppercase tracking-wide shadow-sm",
+														getAvatarGradient(member.user.email),
+													)}
+												>
+													{getAvatarInitial(
+														member.user.name,
+														member.user.email,
+													)}
 												</div>
 											</Avatar.Image>
 										)}
 									</Avatar.Root>
 									<div className="min-w-0 flex-1">
-										<div className="flex items-center gap-1.5">
+										<div className="flex flex-wrap items-center gap-1.5">
 											<span className="truncate font-medium text-label-sm text-text-strong-950">
 												{member.user.name || member.user.email.split("@")[0]}
 											</span>
 											{isCurrentUser && (
-												<span className="inline-flex rounded-md border border-stroke-soft-200 bg-neutral-alpha-10 px-[6px] py-0.5 font-medium text-[10px] text-text-sub-600">
+												<span className="inline-flex flex-shrink-0 rounded-full border border-stroke-soft-200 bg-neutral-alpha-10 px-[6px] font-medium text-[10px] text-text-sub-600">
 													You
 												</span>
 											)}
-											<span className="truncate text-text-sub-600">
-												{member.user.email}
-											</span>
 										</div>
+										<span className="block truncate text-[11px] text-text-sub-600">
+											{member.user.email}
+										</span>
 									</div>
 								</div>
 
@@ -490,11 +512,19 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
 								<div className="flex items-center">
 									<span
 										className={cn(
-											"inline-flex rounded-md border-[1px] border-stroke-soft-200 px-[6px] py-0.5 font-medium text-[10px]",
+											"inline-flex rounded-full px-2.5 py-0.5 font-medium text-[11px]",
 											getRoleBadgeStyles(member.role),
 										)}
 									>
 										{formatRoleLabel(member.role)}
+									</span>
+								</div>
+
+								{/* Status Column */}
+								<div className="flex items-center gap-2">
+									<span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-success-base" />
+									<span className="font-medium text-[12px] text-text-sub-600">
+										Active
 									</span>
 								</div>
 
