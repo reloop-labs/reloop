@@ -1,8 +1,29 @@
-"use client";
 import { Icon } from "@reloop/ui/icon";
+import type { Metadata } from "next";
 import { SettingsTabs } from "./tabs";
 
-const Layout = ({ children }: { children: React.ReactNode }) => {
+export function generateMetadata(): Metadata {
+	return {
+		title: "Workspace · Reloop",
+		description: "Manage your workspace settings, name, handle, and logo.",
+		openGraph: {
+			title: "Workspace · Reloop",
+			description: "Manage your workspace settings, name, handle, and logo.",
+			type: "website",
+		},
+		twitter: {
+			card: "summary_large_image",
+			title: "Workspace · Reloop",
+			description: "Manage your workspace settings, name, handle, and logo.",
+		},
+	};
+}
+
+export default function WorkspaceLayout({
+	children,
+}: {
+	children: React.ReactNode;
+}) {
 	return (
 		<div>
 			<div className="sticky top-0 z-10 flex h-12 items-center justify-start gap-2 border-stroke-soft-100 border-b bg-bg-white-0 pr-2 pl-3">
@@ -21,6 +42,4 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 			</div>
 		</div>
 	);
-};
-
-export default Layout;
+}
