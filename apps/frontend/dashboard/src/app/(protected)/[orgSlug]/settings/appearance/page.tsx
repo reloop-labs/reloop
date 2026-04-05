@@ -12,7 +12,7 @@ const AppearancePage = () => {
 						Theme
 					</p>
 					<p className="text-paragraph-sm text-text-sub-600">
-						Select a theme to personalize your platform's appearance
+						Select a base theme for your interface
 					</p>
 				</div>
 				<ThemeToggleAppearance />

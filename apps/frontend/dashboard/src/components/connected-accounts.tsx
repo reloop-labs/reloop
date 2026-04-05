@@ -1,9 +1,12 @@
 "use client";
 
 import { authClient } from "@reloop/auth/client";
+import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
+import Spinner from "@reloop/ui/spinner";
+import { useState } from "react";
 import useSWR from "swr";
 
 interface Account {
@@ -16,6 +19,11 @@ interface Account {
 interface ConnectedAccountsProps {
 	className?: string;
 }
+
+const AVAILABLE_PROVIDERS = [
+	{ id: "google", name: "Google", icon: "google", useCustomIcon: true },
+	{ id: "github", name: "GitHub", icon: "github", useCustomIcon: false },
+] as const;
 
 const GoogleIcon = ({ className }: { className?: string }) => (
 	<svg
@@ -47,32 +55,31 @@ const getProviderInfo = (providerId: string) => {
 	switch (providerId.toLowerCase()) {
 		case "google":
 			return {
-				name: "Signed in with Google",
+				name: "Google",
 				icon: "google",
 				useCustomIcon: true,
-				borderColor: "border-stroke-soft-100",
+				description: "Connected via Google",
 			};
 		case "github":
 			return {
-				name: "Signed in with GitHub",
+				name: "GitHub",
 				icon: "github",
 				useCustomIcon: false,
-				borderColor: "border-stroke-soft-100",
+				description: "Connected via GitHub",
 			};
 		case "credential":
 			return {
-				name: "Signed in with email and password",
+				name: "Email and password",
 				icon: "mail-single",
 				useCustomIcon: false,
-				borderColor: "border-stroke-soft-100",
+				description: "Connected via email and password",
 			};
 		default:
 			return {
 				name: providerId,
 				icon: "user",
 				useCustomIcon: false,
-				description: `Signed in with ${providerId}`,
-				borderColor: "border-stroke-soft-100",
+				description: `Connected via ${providerId}`,
 			};
 	}
 };
@@ -93,7 +100,14 @@ const AccountSkeleton = () => (
 );
 
 export const ConnectedAccounts = ({ className }: ConnectedAccountsProps) => {
-	const { data: accounts, isLoading } = useSWR<Account[]>(
+	const [connecting, setConnecting] = useState<string | null>(null);
+	const [disconnecting, setDisconnecting] = useState<string | null>(null);
+
+	const {
+		data: accounts,
+		isLoading,
+		mutate,
+	} = useSWR<Account[]>(
 		"connected-accounts",
 		async () => {
 			const { data, error } = await authClient.listAccounts();
@@ -108,6 +122,33 @@ export const ConnectedAccounts = ({ className }: ConnectedAccountsProps) => {
 		},
 	);
 
+	const handleConnect = async (provider: string) => {
+		try {
+			setConnecting(provider);
+			await authClient.linkSocial({
+				provider: provider as "github" | "google",
+				callbackURL: window.location.href,
+			});
+		} catch (error) {
+			console.error(`Failed to connect ${provider}:`, error);
+		} finally {
+			setConnecting(null);
+		}
+	};
+
+	const handleDisconnect = async (providerId: string) => {
+		try {
+			setDisconnecting(providerId);
+			const res = await authClient.unlinkAccount({ providerId });
+			if (res.error) throw res.error;
+			mutate();
+		} catch (error) {
+			console.error(`Failed to disconnect ${providerId}:`, error);
+		} finally {
+			setDisconnecting(null);
+		}
+	};
+
 	return (
 		<div className={cn("space-y-4", className)}>
 			<div>
@@ -115,7 +156,7 @@ export const ConnectedAccounts = ({ className }: ConnectedAccountsProps) => {
 					Connected Accounts
 				</p>
 				<p className="text-paragraph-sm text-text-sub-600">
-					See how you're signed in to your account
+					Manage how you sign in to your workspace
 				</p>
 			</div>
 
@@ -125,22 +166,79 @@ export const ConnectedAccounts = ({ className }: ConnectedAccountsProps) => {
 						<AccountSkeleton />
 						<AccountSkeleton />
 					</>
-				) : accounts && accounts.length > 0 ? (
-					accounts.map((account) => {
-						const provider = getProviderInfo(account.providerId);
-						return (
+				) : (
+					<>
+						{accounts?.map((account) => {
+							const provider = getProviderInfo(account.providerId);
+							return (
+								<div
+									key={account.id}
+									className={cn(
+										"rounded-[15px] border border-stroke-soft-100 py-2 pr-2.5 pl-3 dark:border-stroke-soft-100/40",
+									)}
+								>
+									<div className="flex items-center justify-between">
+										<div className="flex items-center gap-3">
+											<div className="flex h-8 w-8 items-center justify-center rounded-lg border border-stroke-soft-100 bg-bg-weak-50/60 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/50">
+												{provider.useCustomIcon &&
+												account.providerId.toLowerCase() === "google" ? (
+													<GoogleIcon className="h-4 w-4" />
+												) : (
+													<Icon
+														name={provider.icon}
+														className="h-4 w-4 text-text-sub-600"
+													/>
+												)}
+											</div>
+											<div>
+												<p className="font-medium text-label-sm text-text-strong-950">
+													{provider.name}
+												</p>
+												<p className="text-paragraph-xs text-text-sub-600">
+													{provider.description}
+												</p>
+											</div>
+										</div>
+										{account.providerId !== "credential" ? (
+											<Button.Root
+												mode="stroke"
+												variant="neutral"
+												disabled={disconnecting === account.providerId}
+												onClick={() => handleDisconnect(account.providerId)}
+												className="h-8 px-3"
+											>
+												{disconnecting === account.providerId ? (
+													<Spinner size={14} color="var(--text-strong-950)" />
+												) : (
+													<div className="flex items-center gap-1.5 text-text-sub-600">
+														<Icon name="check" className="h-3.5 w-3.5" />
+														<span className="font-medium text-xs">
+															Disconnect
+														</span>
+													</div>
+												)}
+											</Button.Root>
+										) : (
+											<span className="rounded-full bg-success-base px-1.5 py-0.5 font-semibold text-[10px] text-white">
+												Connected
+											</span>
+										)}
+									</div>
+								</div>
+							);
+						})}
+
+						{AVAILABLE_PROVIDERS.filter(
+							(p) => !accounts?.some((a) => a.providerId === p.id),
+						).map((provider) => (
 							<div
-								key={account.id}
-								className={cn(
-									"rounded-xl border py-2 pr-2.5 pl-3",
-									provider.borderColor,
-								)}
+								key={provider.id}
+								className="rounded-xl border border-stroke-soft-100 py-2 pr-2.5 pl-3 dark:border-stroke-soft-100/40"
 							>
 								<div className="flex items-center justify-between">
 									<div className="flex items-center gap-3">
-										<div className="flex h-8 w-8 items-center justify-center rounded-lg border border-stroke-soft-200/40 bg-bg-weak-50">
-											{provider.useCustomIcon &&
-											account.providerId.toLowerCase() === "google" ? (
+										<div className="flex h-8 w-8 items-center justify-center rounded-lg border border-stroke-soft-100 bg-bg-weak-50/60 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/50">
+											{provider.useCustomIcon && provider.id === "google" ? (
 												<GoogleIcon className="h-4 w-4" />
 											) : (
 												<Icon
@@ -154,23 +252,30 @@ export const ConnectedAccounts = ({ className }: ConnectedAccountsProps) => {
 												{provider.name}
 											</p>
 											<p className="text-paragraph-xs text-text-sub-600">
-												{provider.description}
+												Connect your {provider.name} account
 											</p>
 										</div>
 									</div>
-									<span className="rounded-md border border-success-base bg-success-lighter/50 px-2 py-0.5 font-medium text-success-base text-xs">
-										Connected
-									</span>
+									<Button.Root
+										mode="stroke"
+										variant="neutral"
+										disabled={connecting === provider.id}
+										onClick={() => handleConnect(provider.id)}
+										className="h-8"
+									>
+										{connecting === provider.id ? (
+											<Spinner size={14} color="var(--text-strong-950)" />
+										) : (
+											<div className="flex items-center gap-1">
+												<Icon name="plus" className="-ml-[3px] h-3.5 w-3.5" />
+												<span className="font-medium text-xs">Connect</span>
+											</div>
+										)}
+									</Button.Root>
 								</div>
 							</div>
-						);
-					})
-				) : (
-					<div className="rounded-xl border border-stroke-soft-100 py-2 pr-2.5 pl-3">
-						<p className="text-paragraph-sm text-text-sub-600">
-							No connected accounts found
-						</p>
-					</div>
+						))}
+					</>
 				)}
 			</div>
 		</div>

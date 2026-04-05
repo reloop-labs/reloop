@@ -1,6 +1,5 @@
 "use client";
 
-import { motion, type Transition } from "framer-motion";
 import { useTheme } from "next-themes";
 
 export type SidebarLayoutIconVariant = "light" | "dark" | "auto";
@@ -46,279 +45,169 @@ export const SidebarLayoutIcon = ({
 
 	const currentColors = getThemeColors();
 
-	// Animation variants for staggered children
-	const containerVariants = {
-		hidden: { opacity: 0 },
-		visible: {
-			opacity: 1,
-			transition: {
-				staggerChildren: 0.05,
-				delayChildren: 0.1,
-			},
-		},
-	};
-
-	const sidebarItemVariants = {
-		hidden: { opacity: 0, x: -8, scaleX: 0 },
-		visible: {
-			opacity: 1,
-			x: 0,
-			scaleX: 1,
-			transition: {
-				type: "spring" as const,
-				stiffness: 300,
-				damping: 20,
-			},
-		},
-	};
-
-	const contentRowVariants = {
-		hidden: { opacity: 0, x: 8, scaleX: 0 },
-		visible: {
-			opacity: 1,
-			x: 0,
-			scaleX: 1,
-			transition: {
-				type: "spring" as const,
-				stiffness: 300,
-				damping: 20,
-			},
-		},
-	};
-
-	const colorTransition = { duration: 0.3, ease: "easeInOut" as const };
-
 	return (
-		<motion.svg
+		<svg
 			width="120"
 			height="80"
 			viewBox="0 0 120 80"
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
-			variants={containerVariants}
-			initial="hidden"
-			animate="visible"
 		>
-			{/* Main container */}
-			<motion.rect
-				x="4"
-				y="4"
-				width="112"
-				height="72"
-				rx="4"
-				animate={{
-					fill: currentColors.container,
-					stroke: currentColors.containerStroke,
-				}}
-				transition={colorTransition}
-				strokeWidth="1"
-			/>
-
 			{/* Sidebar */}
-			<motion.rect
+			<rect
 				x="8"
 				y="8"
 				width="32"
 				height="64"
 				rx="2"
-				animate={{ fill: currentColors.sidebarBg }}
-				transition={colorTransition}
+				fill={currentColors.sidebarBg}
 			/>
 
 			{/* Sidebar items */}
-			<motion.rect
+			<rect
 				x="12"
 				y="12"
 				width="20"
 				height="3"
 				rx="1.5"
-				variants={sidebarItemVariants}
-				animate={{ fill: currentColors.sidebarItem }}
-				transition={colorTransition}
-				style={{ originX: 0 }}
+				fill={currentColors.sidebarItem}
 			/>
-			<motion.rect
+			<rect
 				x="12"
 				y="18"
 				width="16"
 				height="2"
 				rx="1"
-				variants={sidebarItemVariants}
-				animate={{ fill: currentColors.sidebarItem }}
-				transition={colorTransition}
-				style={{ originX: 0 }}
+				fill={currentColors.sidebarItem}
 			/>
-			<motion.rect
+			<rect
 				x="12"
 				y="22"
 				width="18"
 				height="2"
 				rx="1"
-				variants={sidebarItemVariants}
-				animate={{ fill: currentColors.sidebarItem }}
-				transition={colorTransition}
-				style={{ originX: 0 }}
+				fill={currentColors.sidebarItem}
 			/>
-			<motion.rect
+			<rect
 				x="12"
 				y="26"
 				width="14"
 				height="2"
 				rx="1"
-				variants={sidebarItemVariants}
-				animate={{ fill: currentColors.sidebarItem }}
-				transition={colorTransition}
-				style={{ originX: 0 }}
+				fill={currentColors.sidebarItem}
 			/>
-			<motion.rect
+			<rect
 				x="12"
 				y="30"
 				width="17"
 				height="2"
 				rx="1"
-				variants={sidebarItemVariants}
-				animate={{ fill: currentColors.sidebarItem }}
-				transition={colorTransition}
-				style={{ originX: 0 }}
+				fill={currentColors.sidebarItem}
 			/>
-			<motion.rect
+			<rect
 				x="12"
 				y="34"
 				width="12"
 				height="2"
 				rx="1"
-				variants={sidebarItemVariants}
-				animate={{ fill: currentColors.sidebarItem }}
-				transition={colorTransition}
-				style={{ originX: 0 }}
+				fill={currentColors.sidebarItem}
 			/>
 
 			{/* Content area */}
-			<motion.rect
+			<rect
 				x="44"
 				y="8"
 				width="68"
 				height="64"
 				rx="2"
-				animate={{ fill: currentColors.contentBg }}
-				transition={colorTransition}
+				fill={currentColors.contentBg}
 			/>
 
 			{/* Content header */}
-			<motion.rect
+			<rect
 				x="48"
 				y="12"
 				width="60"
 				height="4"
 				rx="2"
-				variants={contentRowVariants}
-				animate={{ fill: currentColors.contentHeader }}
-				transition={colorTransition}
-				style={{ originX: 0 }}
+				fill={currentColors.contentHeader}
 			/>
-			<motion.rect
+			<rect
 				x="50"
 				y="13"
 				width="12"
 				height="2"
 				rx="1"
-				variants={contentRowVariants}
-				animate={{ fill: currentColors.contentAccent }}
-				transition={colorTransition}
-				style={{ originX: 0 }}
+				fill={currentColors.contentAccent}
 			/>
 
 			{/* Content rows */}
-			<motion.rect
+			<rect
 				x="48"
 				y="20"
 				width="60"
 				height="3"
 				rx="1.5"
-				variants={contentRowVariants}
-				animate={{ fill: currentColors.contentRow }}
-				transition={colorTransition}
-				style={{ originX: 0 }}
+				fill={currentColors.contentRow}
 			/>
-			<motion.rect
+			<rect
 				x="48"
 				y="26"
 				width="60"
 				height="3"
 				rx="1.5"
-				variants={contentRowVariants}
-				animate={{ fill: currentColors.contentRow }}
-				transition={colorTransition}
-				style={{ originX: 0 }}
+				fill={currentColors.contentRow}
 			/>
-			<motion.rect
+			<rect
 				x="48"
 				y="32"
 				width="60"
 				height="3"
 				rx="1.5"
-				variants={contentRowVariants}
-				animate={{ fill: currentColors.contentRow }}
-				transition={colorTransition}
-				style={{ originX: 0 }}
+				fill={currentColors.contentRow}
 			/>
-			<motion.rect
+			<rect
 				x="48"
 				y="38"
 				width="60"
 				height="3"
 				rx="1.5"
-				variants={contentRowVariants}
-				animate={{ fill: currentColors.contentRow }}
-				transition={colorTransition}
-				style={{ originX: 0 }}
+				fill={currentColors.contentRow}
 			/>
 
 			{/* Row content indicators */}
-			<motion.rect
+			<rect
 				x="50"
 				y="21"
 				width="16"
 				height="1.5"
 				rx="0.75"
-				variants={contentRowVariants}
-				animate={{ fill: currentColors.contentAccent }}
-				transition={colorTransition}
-				style={{ originX: 0 }}
+				fill={currentColors.contentAccent}
 			/>
-			<motion.rect
+			<rect
 				x="50"
 				y="27"
 				width="20"
 				height="1.5"
 				rx="0.75"
-				variants={contentRowVariants}
-				animate={{ fill: currentColors.contentAccent }}
-				transition={colorTransition}
-				style={{ originX: 0 }}
+				fill={currentColors.contentAccent}
 			/>
-			<motion.rect
+			<rect
 				x="50"
 				y="33"
 				width="18"
 				height="1.5"
 				rx="0.75"
-				variants={contentRowVariants}
-				animate={{ fill: currentColors.contentAccent }}
-				transition={colorTransition}
-				style={{ originX: 0 }}
+				fill={currentColors.contentAccent}
 			/>
-			<motion.rect
+			<rect
 				x="50"
 				y="39"
 				width="14"
 				height="1.5"
 				rx="0.75"
-				variants={contentRowVariants}
-				animate={{ fill: currentColors.contentAccent }}
-				transition={colorTransition}
-				style={{ originX: 0 }}
+				fill={currentColors.contentAccent}
 			/>
-		</motion.svg>
+		</svg>
 	);
 };
