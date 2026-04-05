@@ -2,7 +2,7 @@
 
 import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
 import { AnimatedClock } from "@fe/dashboard/components/animated-clock";
-import { AnimatedHoverBackground } from "@fe/dashboard/components/layout/sidebar/animated-hover-background";
+import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { getStatusColorClass, getStatusIcon } from "@fe/dashboard/utils/domain";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";

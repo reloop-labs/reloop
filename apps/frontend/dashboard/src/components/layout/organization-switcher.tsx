@@ -8,7 +8,7 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Popover from "@reloop/ui/popover";
 import { useRef, useState } from "react";
-import { AnimatedHoverBackground } from "./animated-hover-background";
+import { AnimatedHoverBackground } from "../animated-hover-background";
 
 interface Organization {
 	id: string;

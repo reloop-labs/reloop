@@ -1,6 +1,6 @@
 "use client";
 import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
-import { AnimatedHoverBackground } from "@fe/dashboard/components/layout/sidebar/animated-hover-background";
+import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import * as Avatar from "@reloop/ui/avatar";
@@ -134,7 +134,7 @@ export const ApiKeyHeader = ({
 
 			await mutate(`/api/api-key/v1/${apiKey.id}`);
 			await mutate(
-				(key) => typeof key === "string" && key.startsWith("/api/api-key/v1/")
+				(key) => typeof key === "string" && key.startsWith("/api/api-key/v1/"),
 			);
 
 			toast.success(
@@ -377,7 +377,9 @@ export const ApiKeyHeader = ({
 									name={copied ? "check" : "copy"}
 									className={cn(
 										"h-3 w-3 flex-shrink-0 transition-all",
-										copied ? "text-success-base" : "text-text-sub-600 opacity-0 group-hover/copy:opacity-100",
+										copied
+											? "text-success-base"
+											: "text-text-sub-600 opacity-0 group-hover/copy:opacity-100",
 									)}
 								/>
 							</button>
@@ -421,7 +423,9 @@ export const ApiKeyHeader = ({
 							<span
 								className={cn(
 									"inline-flex w-fit rounded-md border-[1px] px-[6px] py-0.5 font-medium text-[10px]",
-									apiKey?.enabled ? "border border-success-base text-success-base bg-success-light/20" : "border border-error-base text-error-base bg-error-light/20"
+									apiKey?.enabled
+										? "border border-success-base bg-success-light/20 text-success-base"
+										: "border border-error-base bg-error-light/20 text-error-base",
 								)}
 							>
 								{apiKey?.enabled ? "Enabled" : "Disabled"}

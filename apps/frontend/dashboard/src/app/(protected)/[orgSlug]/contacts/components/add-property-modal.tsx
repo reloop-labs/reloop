@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatedHoverBackground } from "@fe/dashboard/components/layout/sidebar/animated-hover-background";
+import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";

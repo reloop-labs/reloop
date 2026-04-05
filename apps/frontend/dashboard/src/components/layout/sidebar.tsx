@@ -10,11 +10,9 @@ import { Logo } from "@reloop/ui/logo";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
-import {
-	MainNavigation,
-	OrganizationSwitcher,
-	UserMenuDropdown,
-} from "./sidebar";
+import { MainNavigation } from "./main-navigation";
+import { OrganizationSwitcher } from "./organization-switcher";
+import { UserMenuDropdown } from "./user-menu-dropdown";
 
 interface MainSidebarProps {
 	className?: string;

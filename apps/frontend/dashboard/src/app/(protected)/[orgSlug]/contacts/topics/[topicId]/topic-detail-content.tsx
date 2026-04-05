@@ -1,10 +1,12 @@
 "use client";
 import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
-import { AnimatedHoverBackground } from "@fe/dashboard/components/layout/sidebar/animated-hover-background";
+import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
+import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import * as Input from "@reloop/ui/input";
 import {
 	Content as PopoverContent,
 	Root as PopoverRoot,
@@ -13,12 +15,13 @@ import {
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useParams } from "next/navigation";
 import { useQueryState } from "nuqs";
-import { useRef, useState, useMemo } from "react";
+import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
-import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
-import * as Input from "@reloop/ui/input";
-import { ContactFilterDropdown, type ContactFilters } from "../../components/contact-filter-dropdown";
+import {
+	ContactFilterDropdown,
+	type ContactFilters,
+} from "../../components/contact-filter-dropdown";
 import { ContactTable } from "./components/contact-table";
 
 interface TopicData {
@@ -529,7 +532,10 @@ export const TopicDetailContent = () => {
 						mode="stroke"
 						size="xsmall"
 						onClick={handleDownloadCSV}
-						disabled={!subscriptionData?.subscriptions || subscriptionData.subscriptions.length === 0}
+						disabled={
+							!subscriptionData?.subscriptions ||
+							subscriptionData.subscriptions.length === 0
+						}
 						title="Export CSV"
 					>
 						<Icon name="file-download" className="h-4 w-4" />

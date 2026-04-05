@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatedHoverBackground } from "@fe/dashboard/components/layout/sidebar/animated-hover-background";
+import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -22,7 +22,12 @@ const domainMenuItems = [
 		icon: "eye-outline" as const,
 		isDanger: false,
 	},
-	{ id: "delete", label: "Delete Domain", icon: "trash" as const, isDanger: true },
+	{
+		id: "delete",
+		label: "Delete Domain",
+		icon: "trash" as const,
+		isDanger: true,
+	},
 ];
 
 export const DomainDropdown = ({

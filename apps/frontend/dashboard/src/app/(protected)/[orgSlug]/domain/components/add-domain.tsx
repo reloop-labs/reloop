@@ -1,7 +1,7 @@
 "use client";
 import { DomainPreview } from "@fe/dashboard/app/(protected)/onboarding/components/previews";
 import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
-import { AnimatedHoverBackground } from "@fe/dashboard/components/layout/sidebar/animated-hover-background";
+import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import type { DomainResponse } from "@reloop/api";

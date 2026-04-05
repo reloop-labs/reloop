@@ -9,7 +9,7 @@ import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
-import { AnimatedHoverBackground } from "./animated-hover-background";
+import { AnimatedHoverBackground } from "../animated-hover-background";
 
 interface User {
 	name: string;

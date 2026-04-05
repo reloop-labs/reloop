@@ -1,6 +1,6 @@
 "use client";
 import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
-import { AnimatedHoverBackground } from "@fe/dashboard/components/layout/sidebar/animated-hover-background";
+import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import * as Button from "@reloop/ui/button";
@@ -179,60 +179,60 @@ export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 								</Button.Root>
 								<PopoverRoot>
 									<PopoverTrigger asChild>
-									<Button.Root variant="neutral" mode="stroke" size="xsmall">
-										<Icon
-											name="more-vertical"
-											className="h-3.5 w-3.5 text-text-sub-600"
-										/>
-									</Button.Root>
-								</PopoverTrigger>
-								<PopoverContent
-									align="end"
-									sideOffset={8}
-									className="w-44 rounded-xl p-1.5"
-									showArrow
-								>
-									<div className="relative">
-										{headerMenuItems.map((item, idx) => (
-											<button
-												key={item.id}
-												ref={(el) => {
-													if (el) buttonRefs.current[idx] = el;
-												}}
-												type="button"
-												onPointerEnter={() => setHoverIdx(idx)}
-												onPointerLeave={() => setHoverIdx(undefined)}
-												onClick={() => handleMenuItemClick(item.id)}
-												className={cn(
-													"flex w-full cursor-pointer items-center gap-2 rounded-lg py-1.5 pl-2 font-normal text-xs transition-colors",
-													item.isDanger
-														? "text-error-base"
-														: "text-text-strong-950",
-													!currentRect &&
-														hoverIdx === idx &&
-														(item.isDanger
-															? "bg-red-alpha-10"
-															: "bg-neutral-alpha-10"),
-												)}
-											>
-												<Icon
-													name={item.icon}
+										<Button.Root variant="neutral" mode="stroke" size="xsmall">
+											<Icon
+												name="more-vertical"
+												className="h-3.5 w-3.5 text-text-sub-600"
+											/>
+										</Button.Root>
+									</PopoverTrigger>
+									<PopoverContent
+										align="end"
+										sideOffset={8}
+										className="w-44 rounded-xl p-1.5"
+										showArrow
+									>
+										<div className="relative">
+											{headerMenuItems.map((item, idx) => (
+												<button
+													key={item.id}
+													ref={(el) => {
+														if (el) buttonRefs.current[idx] = el;
+													}}
+													type="button"
+													onPointerEnter={() => setHoverIdx(idx)}
+													onPointerLeave={() => setHoverIdx(undefined)}
+													onClick={() => handleMenuItemClick(item.id)}
 													className={cn(
-														"h-4 w-4",
-														item.isDanger ? "" : "text-text-sub-600",
+														"flex w-full cursor-pointer items-center gap-2 rounded-lg py-1.5 pl-2 font-normal text-xs transition-colors",
+														item.isDanger
+															? "text-error-base"
+															: "text-text-strong-950",
+														!currentRect &&
+															hoverIdx === idx &&
+															(item.isDanger
+																? "bg-red-alpha-10"
+																: "bg-neutral-alpha-10"),
 													)}
-												/>
-												<span>{item.label}</span>
-											</button>
-										))}
-										<AnimatedHoverBackground
-											rect={currentRect}
-											tabElement={currentTab}
-											isDanger={isDanger}
-										/>
-									</div>
-								</PopoverContent>
-							</PopoverRoot>
+												>
+													<Icon
+														name={item.icon}
+														className={cn(
+															"h-4 w-4",
+															item.isDanger ? "" : "text-text-sub-600",
+														)}
+													/>
+													<span>{item.label}</span>
+												</button>
+											))}
+											<AnimatedHoverBackground
+												rect={currentRect}
+												tabElement={currentTab}
+												isDanger={isDanger}
+											/>
+										</div>
+									</PopoverContent>
+								</PopoverRoot>
 							</>
 						) : null}
 					</div>
@@ -243,10 +243,7 @@ export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 					{/* Group Name */}
 					<div className="flex flex-col gap-1.5">
 						<div className="flex items-center gap-1.5">
-							<Icon
-								name="modules"
-								className="h-3.5 w-3.5 text-text-sub-600"
-							/>
+							<Icon name="modules" className="h-3.5 w-3.5 text-text-sub-600" />
 							<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
 								Group Name
 							</span>
@@ -272,9 +269,7 @@ export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 							<Skeleton className="h-5 w-24 rounded-lg" />
 						) : (
 							<span className="font-medium text-paragraph-sm text-text-strong-950">
-								{group?.createdAt
-									? formatRelativeTime(group.createdAt)
-									: "---"}
+								{group?.createdAt ? formatRelativeTime(group.createdAt) : "---"}
 							</span>
 						)}
 					</div>
