@@ -1,6 +1,6 @@
 "use client";
-import { ConnectedAccounts } from "@fe/dashboard/components/connected-accounts";
-import { SessionManagement } from "@fe/dashboard/components/session-management";
+import { ConnectedAccounts } from "./connected-accounts";
+import { SessionManagement } from "./session-management";
 
 const SecurityPage = () => {
 	return (
