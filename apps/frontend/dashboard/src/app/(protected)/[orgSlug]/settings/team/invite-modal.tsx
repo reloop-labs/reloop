@@ -1,60 +1,95 @@
 "use client";
 
-import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
-import { valibotResolver } from "@hookform/resolvers/valibot";
+import {
+	getAvatarGradient,
+	getAvatarInitial,
+} from "@fe/dashboard/utils/avatar";
 import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import * as Kbd from "@reloop/ui/kbd";
-import * as Label from "@reloop/ui/label";
+import * as Input from "@reloop/ui/input";
 import * as Modal from "@reloop/ui/modal";
-import * as Select from "@reloop/ui/select";
 import Spinner from "@reloop/ui/spinner";
 import { useRef, useState } from "react";
-import type { Resolver } from "react-hook-form";
-import { useForm } from "react-hook-form";
-import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import useSWR, { useSWRConfig } from "swr";
-import * as v from "valibot";
 
-const formSchema = v.object({
-	emails: v.pipe(
-		v.string("Email is required"),
-		v.minLength(1, "Please enter at least one email"),
-	),
-	role: v.picklist(["admin", "member"], "Please select a valid role"),
-	team: v.optional(v.string()),
-});
+type Role = "member" | "admin";
 
-type InviteValues = v.InferInput<typeof formSchema>;
+interface PendingEmail {
+	email: string;
+	role: Role;
+}
 
 interface InviteModalProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 }
 
-const roleOptions = [
-	{ value: "member" as const, label: "Member" },
-	{ value: "admin" as const, label: "Admin" },
+const ROLE_CONFIG: {
+	value: Role;
+	label: string;
+	description: string;
+	dotColor: string;
+}[] = [
+	{
+		value: "member",
+		label: "Member",
+		description: "Can create, view & delete own content",
+		dotColor: "bg-neutral-600",
+	},
+	{
+		value: "admin",
+		label: "Admin",
+		description: "Can manage members and settings and everything",
+		dotColor: "bg-feature-base",
+	},
 ];
+
+const getRoleBadgeStyles = (role: Role) => {
+	switch (role) {
+		case "admin":
+			return "border border-feature-light bg-feature-lighter text-feature-base";
+		default:
+			return "border border-neutral-alpha-10 bg-neutral-alpha-10 text-text-sub-600";
+	}
+};
+
+const getRoleCardStyles = (role: Role) => {
+	switch (role) {
+		case "admin":
+			return {
+				card: "border-feature-base bg-feature-lighter/40 ring-1 ring-feature-base",
+				label: "text-feature-base",
+				desc: "text-feature-base/70",
+				check: "bg-feature-base",
+			};
+		default:
+			return {
+				card: "border-stroke-base bg-bg-weak-50 ring-1 ring-stroke-base",
+				label: "text-text-strong-950",
+				desc: "text-text-sub-600",
+				check: "bg-neutral-600",
+			};
+	}
+};
+
+const isValidEmail = (email: string) =>
+	/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
 export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
 	const [loading, setLoading] = useState(false);
-	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
-	const [emailChips, setEmailChips] = useState<string[]>([]);
 	const [inputValue, setInputValue] = useState("");
+	const [inputFocused, setInputFocused] = useState(false);
 	const [emailError, setEmailError] = useState<string | null>(null);
-	const itemRefs = useRef<HTMLButtonElement[]>([]);
+	const [pendingEmails, setPendingEmails] = useState<PendingEmail[]>([]);
+	const [selectedRole, setSelectedRole] = useState<Role>("member");
 	const inputRef = useRef<HTMLInputElement>(null);
 	const { mutate } = useSWRConfig();
 	const { data: session } = authClient.useSession();
 
-	const currentTab = itemRefs.current[hoverIdx ?? -1];
-	const currentRect = currentTab?.getBoundingClientRect();
-
-	// Fetch existing members
+	// Fetch existing members & invites to prevent duplicates
 	const { data: membersData } = useSWR(
 		session?.user.activeOrganizationId
 			? `organization-member-${session.user.activeOrganizationId}`
@@ -67,7 +102,6 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
 		},
 	);
 
-	// Fetch pending invites
 	const { data: invitesData } = useSWR(
 		session?.user.activeOrganizationId
 			? `invitations-${session.user.activeOrganizationId}`
@@ -89,148 +123,72 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
 			.map((i: { email: string }) => i.email.toLowerCase()) ?? []),
 	]);
 
-	const form = useForm<InviteValues>({
-		resolver: valibotResolver(formSchema) as Resolver<InviteValues>,
-		defaultValues: {
-			emails: "",
-			role: "member",
-			team: "",
-		},
-	});
-
-	// Validate email format
-	const isValidEmail = (email: string) => {
-		return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-	};
-
-	// Add email chip
-	const addEmailChip = (email: string) => {
-		const trimmedEmail = email.trim().toLowerCase();
+	const handleAddEmail = () => {
+		const trimmed = inputValue.trim().toLowerCase();
 		setEmailError(null);
 
-		if (!trimmedEmail) return;
+		if (!trimmed) return;
 
-		if (!isValidEmail(trimmedEmail)) {
+		if (!isValidEmail(trimmed)) {
 			setEmailError("Please enter a valid email address");
 			return;
 		}
-
-		if (emailChips.includes(trimmedEmail)) {
+		if (pendingEmails.some((e) => e.email === trimmed)) {
 			setEmailError("This email is already in the list");
 			return;
 		}
-
-		if (existingEmails.has(trimmedEmail)) {
+		if (existingEmails.has(trimmed)) {
 			setEmailError("This user is already a member or has a pending invite");
 			return;
 		}
 
-		const newChips = [...emailChips, trimmedEmail];
-		setEmailChips(newChips);
-		form.setValue("emails", newChips.join(","));
+		setPendingEmails((prev) => [...prev, { email: trimmed, role: "member" }]);
 		setInputValue("");
+		inputRef.current?.focus();
 	};
 
-	// Remove email chip
-	const removeEmailChip = (emailToRemove: string) => {
-		const newChips = emailChips.filter((email) => email !== emailToRemove);
-		setEmailChips(newChips);
-		form.setValue("emails", newChips.join(","));
-	};
-
-	// Command/Ctrl + Enter to submit form
-	useHotkeys(
-		"mod+enter",
-		(e) => {
+	const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (e.key === "Enter" || e.key === ",") {
 			e.preventDefault();
-			// Add any pending email first
-			if (inputValue.trim()) {
-				addEmailChip(inputValue);
-			}
-			// Submit the form
-			form.handleSubmit(onSubmit)();
-		},
-		{ enableOnFormTags: ["INPUT"] },
-	);
-
-	// Handle input keydown
-	const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-		if (
-			e.key === "Enter" ||
-			e.key === "," ||
-			e.key === " " ||
-			e.key === "Tab"
-		) {
-			e.preventDefault();
-			addEmailChip(inputValue);
-		} else if (e.key === "Backspace" && !inputValue && emailChips.length > 0) {
-			// Remove last chip on backspace if input is empty
-			removeEmailChip(emailChips[emailChips.length - 1]!);
+			handleAddEmail();
 		}
 	};
 
-	// Handle paste
-	const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
-		e.preventDefault();
-		setEmailError(null);
-		const pastedText = e.clipboardData.getData("text");
-		const emails = pastedText.split(/[,\n\s]+/).filter((email) => email.trim());
-		let skippedCount = 0;
-
-		for (const email of emails) {
-			const trimmedEmail = email.trim().toLowerCase();
-			if (
-				isValidEmail(trimmedEmail) &&
-				!emailChips.includes(trimmedEmail) &&
-				!existingEmails.has(trimmedEmail)
-			) {
-				setEmailChips((prev) => {
-					const newChips = [...prev, trimmedEmail];
-					form.setValue("emails", newChips.join(","));
-					return newChips;
-				});
-			} else if (existingEmails.has(trimmedEmail)) {
-				skippedCount++;
-			}
-		}
-
-		if (skippedCount > 0) {
-			setEmailError(
-				`${skippedCount} email${skippedCount > 1 ? "s" : ""} already ${skippedCount > 1 ? "have" : "has"} a member or pending invite`,
-			);
-		}
-		setInputValue("");
+	const handleRemovePending = (email: string) => {
+		setPendingEmails((prev) => prev.filter((e) => e.email !== email));
 	};
 
-	// Reset chips when modal closes
+	const handleRoleChange = (email: string, role: Role) => {
+		setPendingEmails((prev) =>
+			prev.map((e) => (e.email === email ? { ...e, role } : e)),
+		);
+	};
+
 	const handleOpenChange = (isOpen: boolean) => {
 		if (!isOpen) {
-			setEmailChips([]);
+			setPendingEmails([]);
 			setInputValue("");
 			setEmailError(null);
-			form.reset();
+			setSelectedRole("member");
 		}
 		onOpenChange(isOpen);
 	};
 
-	const onSubmit = async (data: InviteValues) => {
-		if (!session?.user.activeOrganizationId) return;
-		setLoading(true);
-
-		// Use emailChips directly instead of parsing
-		if (emailChips.length === 0) {
-			toast.error("Please enter at least one valid email address");
-			setLoading(false);
+	const handleSubmit = async () => {
+		if (pendingEmails.length === 0) {
+			toast.error("Please add at least one email address");
 			return;
 		}
+		if (!session?.user.activeOrganizationId) return;
 
+		setLoading(true);
 		try {
 			const results = await Promise.allSettled(
-				emailChips.map((email) =>
+				pendingEmails.map(({ email, role }) =>
 					authClient.organization.inviteMember({
 						email,
-						role: data.role,
-						organizationId: session?.user.activeOrganizationId ?? undefined,
+						role,
+						organizationId: session.user.activeOrganizationId ?? undefined,
 					}),
 				),
 			);
@@ -244,21 +202,17 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
 				toast.success(
 					`${successCount} invitation${successCount > 1 ? "s" : ""} sent successfully!`,
 				);
-				form.reset({ emails: "", role: "member", team: "" });
-				setEmailChips([]);
-				setInputValue("");
 				mutate(
 					(key) => typeof key === "string" && key.startsWith("invitations-"),
 				);
 				handleOpenChange(false);
 			}
-
 			if (failCount > 0) {
 				toast.error(
 					`${failCount} invitation${failCount > 1 ? "s" : ""} failed`,
 				);
 			}
-		} catch (error) {
+		} catch {
 			toast.error("Failed to invite team members");
 		} finally {
 			setLoading(false);
@@ -268,182 +222,259 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
 	return (
 		<Modal.Root open={open} onOpenChange={handleOpenChange}>
 			<Modal.Content
-				className="rounded-2xl border border-stroke-soft-100/50 p-0.5 sm:max-w-[480px]"
-				showClose={true}
+				className="rounded-2xl border border-stroke-soft-100 p-0 sm:max-w-[480px] dark:border-stroke-soft-100/40"
+				showClose={false}
 			>
-				<div className="rounded-2xl border border-stroke-soft-100/50">
-					<Modal.Header className="before:border-stroke-soft-200/50">
-						<div className="justify-centers flex items-center">
-							<Icon name="user-plus" className="h-4 w-4" />
-						</div>
-						<div className="flex-1">
-							<Modal.Title>Invite team members</Modal.Title>
-						</div>
-					</Modal.Header>
-					<form
-						onSubmit={form.handleSubmit(onSubmit)}
-						className="flex flex-col"
+				{/* Header */}
+				<div className="flex items-start justify-between border-stroke-soft-100 border-b px-5 pt-5 pb-4 dark:border-stroke-soft-100/40">
+					<div>
+						<h2 className="font-semibold text-label-md text-text-strong-950">
+							Invite team members
+						</h2>
+						<p className="-mt-0.5 text-paragraph-sm text-text-sub-600">
+							Invitations will be sent via email
+						</p>
+					</div>
+					<button
+						type="button"
+						onClick={() => handleOpenChange(false)}
+						className="flex h-7 w-7 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50"
 					>
-						<Modal.Body className="space-y-2">
-							{/* Email Chips Input */}
-							<div className="flex flex-col gap-1">
-								<Label.Root htmlFor="email">Send Invite to ...</Label.Root>
-								{/* biome-ignore lint/a11y/noStaticElementInteractions: Container click delegates focus to the input inside */}
-								<div
-									className={cn(
-										"group/chips flex min-h-[82px] flex-wrap content-start gap-1.5 rounded-xl bg-bg-white-0 px-3 py-2.5 shadow-regular-xs",
-										"ring-1 ring-inset",
-										"cursor-text transition duration-200 ease-out",
-										emailError
-											? [
-													// error state
-													"ring-error-base",
-													"focus-within:shadow-button-error-focus focus-within:ring-error-base",
-												]
-											: [
-													// normal state
-													"ring-stroke-soft-200",
-													// hover
-													"hover:[&:not(:focus-within)]:bg-bg-weak-50 hover:[&:not(:focus-within)]:ring-transparent",
-													// focus
-													"focus-within:shadow-button-important-focus focus-within:ring-stroke-strong-950",
-												],
-									)}
-									onMouseDown={() => inputRef.current?.focus()}
-								>
-									{emailChips.map((email) => (
-										<span
-											key={email}
-											className="inline-flex items-center gap-1 rounded-md border border-stroke-soft-200 bg-bg-weak-50 px-2 py-0.5 text-paragraph-xs text-text-strong-950"
-										>
-											<Icon
-												name="mail-single"
-												className="h-3 w-3 text-text-sub-600"
-											/>
-											{email}
-											<button
-												type="button"
-												onClick={(e) => {
-													e.stopPropagation();
-													removeEmailChip(email);
-												}}
-												className="ml-0.5 text-text-sub-600 transition-colors hover:text-text-strong-950"
-												disabled={loading}
-											>
-												<Icon name="cross" className="h-3 w-3" />
-											</button>
-										</span>
-									))}
-									<input
+						<Icon name="cross" className="h-3.5 w-3.5" />
+					</button>
+				</div>
+
+				<div className="space-y-2 px-5 pt-3 pb-3">
+					{/* Email Input */}
+					<div className="space-y-1.5">
+						<div className="flex items-center gap-2">
+							<span className="font-medium text-label-sm text-text-strong-950">
+								Email addresses
+							</span>
+						</div>
+						<div className="flex gap-2">
+							<Input.Root
+								size="xsmall"
+								className="flex-1"
+								hasError={!!emailError}
+							>
+								<Input.Wrapper>
+									<Input.Input
 										ref={inputRef}
-										type="text"
+										type="email"
+										placeholder="name@company.com"
 										value={inputValue}
-										onChange={(e) => setInputValue(e.target.value)}
-										onKeyDown={handleInputKeyDown}
-										onPaste={handlePaste}
-										onBlur={() => {
-											if (inputValue.trim()) {
-												addEmailChip(inputValue);
-											}
+										onChange={(e) => {
+											setInputValue(e.target.value);
+											setEmailError(null);
 										}}
-										placeholder={
-											emailChips.length === 0 ? "example@email.com" : ""
-										}
+										onKeyDown={handleKeyDown}
+										onFocus={() => setInputFocused(true)}
 										disabled={loading}
-										className="min-w-[120px] flex-1 bg-transparent text-paragraph-sm text-text-sub-600 outline-none placeholder:text-text-soft-400"
 									/>
-								</div>
-								{(emailError || form.formState.errors.emails) && (
-									<p className="text-error-base text-paragraph-xs">
-										{emailError || form.formState.errors.emails?.message}
-									</p>
-								)}
-							</div>
-
-							{/* Role Select */}
-							<div className="flex flex-col gap-1">
-								<Label.Root htmlFor="role">Invite as</Label.Root>
-								<Select.Root
-									size="small"
-									defaultValue="member"
-									disabled={loading}
-									onValueChange={(value: "admin" | "member") => {
-										form.setValue("role", value);
-									}}
-								>
-									<Select.Trigger className="w-full text-paragraph-sm">
-										<Select.Value placeholder="Select role" />
-									</Select.Trigger>
-									<Select.Content className="min-w-[var(--radix-select-trigger-width)] text-paragraph-sm">
-										<div className="relative">
-											{roleOptions.map((option, idx) => (
-												<Select.Item
-													key={option.value}
-													value={option.value}
-													className="h-8 data-[highlighted]:bg-transparent"
-													ref={(el) => {
-														if (el)
-															itemRefs.current[idx] =
-																el as unknown as HTMLButtonElement;
-													}}
-													onPointerEnter={() => setHoverIdx(idx)}
-													onPointerLeave={() => setHoverIdx(undefined)}
-												>
-													{option.label}
-												</Select.Item>
-											))}
-											<AnimatedHoverBackground
-												rect={currentRect}
-												tabElement={currentTab}
-											/>
+									{inputFocused && inputValue.trim() && (
+										<div className="flex items-center gap-1 rounded-md border border-stroke-sub-300 bg-bg-white-0 px-1 py-[1px] text-[10px] text-text-sub-600">
+											<span>⏎</span>
+											<span>Enter</span>
 										</div>
-									</Select.Content>
-								</Select.Root>
-							</div>
-						</Modal.Body>
-
-						{/* Footer */}
-						<Modal.Footer className="mt-4 flex items-center justify-end gap-3 border-stroke-soft-100/50">
+									)}
+								</Input.Wrapper>
+							</Input.Root>
 							<Button.Root
 								type="button"
 								variant="neutral"
 								mode="stroke"
 								size="xsmall"
-								onClick={() => handleOpenChange(false)}
-								disabled={loading}
+								className="rounded-[10px]"
+								onClick={handleAddEmail}
+								disabled={loading || !inputValue.trim()}
 							>
-								Cancel
-								<Kbd.Root className="bg-bg-weak-50 text-xs">Esc</Kbd.Root>
+								<Icon name="plus" className="-mr-1 h-3.5 w-3.5" />
+								Add
 							</Button.Root>
-							<Button.Root
-								type="submit"
-								variant="neutral"
-								size="xsmall"
-								disabled={loading}
-							>
-								{loading ? (
-									<>
-										<Spinner size={14} color="currentColor" />
-										Sending...
-									</>
-								) : (
-									<>
-										Send Invites
-										<span className="inline-flex items-center gap-0.5">
-											<Icon
-												name="command"
-												className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
-											/>
-											<Icon
-												name="enter"
-												className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
-											/>
+						</div>
+						{emailError && (
+							<p className="text-error-base text-paragraph-xs">{emailError}</p>
+						)}
+					</div>
+					{pendingEmails.length > 0 && (
+						<div className="space-y-2">
+							<div className="flex items-center gap-2">
+								<span className="font-medium text-label-sm text-text-strong-950">
+									Pending invites
+								</span>
+								<span className="flex h-4 min-w-[20px] items-center justify-center rounded-full border border-stroke-soft-100 bg-neutral-alpha-10 px-1.5 font-medium text-[11px] text-text-sub-600 dark:border-stroke-soft-100/40">
+									{pendingEmails.length}
+								</span>
+							</div>
+							<div className="divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/50">
+								{pendingEmails.map(({ email, role }) => (
+									<div
+										key={email}
+										className="flex items-center gap-3 px-3 py-2.5"
+									>
+										{/* Avatar */}
+										<div
+											className={cn(
+												"flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full font-semibold text-white text-xs uppercase tracking-wide shadow-sm",
+												getAvatarGradient(email),
+											)}
+										>
+											{getAvatarInitial(null, email)}
+										</div>
+
+										{/* Email */}
+										<span className="flex-1 truncate font-medium text-paragraph-sm text-text-strong-950">
+											{email}
 										</span>
-									</>
-								)}
-							</Button.Root>
-						</Modal.Footer>
-					</form>
+
+										{/* Role badge toggle */}
+										<div className="flex items-center gap-1.5">
+											{(["member", "admin"] as Role[]).map((r) => (
+												<button
+													key={r}
+													type="button"
+													onClick={() => handleRoleChange(email, r)}
+													className={cn(
+														"inline-flex rounded-full border px-2.5 py-0.5 font-medium text-[11px] capitalize transition-colors",
+														role === r
+															? getRoleBadgeStyles(r)
+															: "border-transparent text-text-soft-400 hover:text-text-sub-600",
+													)}
+												>
+													{r.charAt(0).toUpperCase() + r.slice(1)}
+												</button>
+											))}
+										</div>
+
+										{/* Remove */}
+										<button
+											type="button"
+											onClick={() => handleRemovePending(email)}
+											disabled={loading}
+											className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md text-text-soft-400 transition-colors hover:bg-bg-weak-50 hover:text-text-sub-600"
+										>
+											<Icon name="cross" className="h-3 w-3" />
+										</button>
+									</div>
+								))}
+							</div>
+						</div>
+					)}
+					<div className="space-y-2">
+						<span className="font-medium text-label-sm text-text-strong-950">
+							Assign role
+						</span>
+						<div className="grid grid-cols-2 gap-2 pt-2">
+							{ROLE_CONFIG.map(({ value, label, description, dotColor }) => {
+								const isSelected = selectedRole === value;
+								const styles = getRoleCardStyles(value);
+								return (
+									<button
+										key={value}
+										type="button"
+										onClick={() => {
+											setSelectedRole(value);
+											// Apply selected role to all pending emails
+											setPendingEmails((prev) =>
+												prev.map((e) => ({ ...e, role: value })),
+											);
+										}}
+										className={cn(
+											"relative flex flex-col items-start gap-1 rounded-xl border px-3.5 pt-2 pb-3.5 text-left transition-all",
+											isSelected
+												? styles.card
+												: "border-stroke-soft-100 bg-bg-white-0 hover:border-stroke-soft-200 hover:bg-bg-weak-50/50 dark:border-stroke-soft-100/50",
+										)}
+									>
+										<div className="flex w-full items-center justify-between">
+											<div className="flex items-center gap-1.5">
+												<span
+													className={cn(
+														"h-2 w-2 flex-shrink-0 rounded-full",
+														dotColor,
+													)}
+												/>
+												<span
+													className={cn(
+														"font-medium text-label-xs",
+														isSelected ? styles.label : "text-text-strong-950",
+													)}
+												>
+													{label}
+												</span>
+											</div>
+											{isSelected && (
+												<span
+													className={cn(
+														"flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full",
+														styles.check,
+													)}
+												>
+													<Icon
+														name="check"
+														className="h-2.5 w-2.5 text-white"
+													/>
+												</span>
+											)}
+										</div>
+										<p
+											className={cn(
+												"text-balance font-medium text-[11px]",
+												isSelected ? styles.desc : "text-text-sub-600",
+											)}
+										>
+											{description}
+										</p>
+									</button>
+								);
+							})}
+						</div>
+						<p className="ml-1 flex items-center gap-1.5 pt-2 text-[11px] text-text-sub-600">
+							<Icon name="info-outline" className="h-3.5 w-3.5 flex-shrink-0" />
+							Roles can be changed anytime after the member joins
+						</p>
+					</div>
+				</div>
+
+				{/* Footer */}
+				<div className="flex items-center justify-between border-stroke-soft-100 border-t px-5 py-3.5 dark:border-stroke-soft-100/50">
+					<p className="text-paragraph-xs text-text-sub-600">
+						{pendingEmails.length > 0
+							? `${pendingEmails.length} invitation${pendingEmails.length > 1 ? "s" : ""} will be sent`
+							: "No invitations queued"}
+					</p>
+					<div className="flex items-center gap-2">
+						<Button.Root
+							type="button"
+							variant="neutral"
+							mode="stroke"
+							size="xsmall"
+							onClick={() => handleOpenChange(false)}
+							disabled={loading}
+						>
+							Cancel
+						</Button.Root>
+						<Button.Root
+							type="button"
+							variant="neutral"
+							size="xsmall"
+							onClick={handleSubmit}
+							disabled={loading || pendingEmails.length === 0}
+						>
+							{loading ? (
+								<>
+									<Spinner size={12} color="currentColor" />
+									Sending...
+								</>
+							) : (
+								<>
+									<Icon name="send" className="h-3.5 w-3.5" />
+									Send invites
+								</>
+							)}
+						</Button.Root>
+					</div>
 				</div>
 			</Modal.Content>
 		</Modal.Root>
