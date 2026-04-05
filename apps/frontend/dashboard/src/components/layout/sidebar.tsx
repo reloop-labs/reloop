@@ -10,7 +10,7 @@ import { Logo } from "@reloop/ui/logo";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
-import { OrganizationSwitcher } from "./organization-switcher";
+import { OrganizationSwitcher } from "../organization/organization-switcher";
 import { SidebarItems } from "./sidebar-items";
 import { UserMenuDropdown } from "./user-menu-dropdown";
 
