@@ -4,7 +4,6 @@ import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover
 import {
 	getStatusColorClass,
 	getStatusIcon,
-	getStatusLabel,
 } from "@fe/dashboard/utils/domain";
 import type { DomainStatus } from "@reloop/api/types";
 import * as Button from "@reloop/ui/button";
@@ -43,6 +42,13 @@ export const DomainFilterDropdown = ({
 	const activeFilterCount = value.length;
 	const hasActiveFilter = activeFilterCount > 0;
 
+	const displayLabel =
+		activeFilterCount === 0
+			? "Filter"
+			: activeFilterCount === 1
+				? filterOptions.find((o) => o.id === value[0])?.label || "Filter"
+				: `${activeFilterCount} Filters`;
+
 	const handleReset = () => {
 		onChange([]);
 	};
@@ -58,14 +64,23 @@ export const DomainFilterDropdown = ({
 	return (
 		<Dropdown.Root open={isOpen} onOpenChange={setIsOpen}>
 			<Dropdown.Trigger asChild>
-				<Button.Root variant="neutral" mode="stroke" size="xsmall">
-					<Icon name="filter" className="h-4 w-4" />
-					<span>Filter</span>
-					{hasActiveFilter && (
-						<span className="-top-1.5 -right-1 absolute flex h-4 w-4 items-center justify-center rounded-full bg-neutral-900 text-[10px] text-white">
-							{activeFilterCount}
-						</span>
+				<Button.Root
+					variant="neutral"
+					mode="stroke"
+					size="xsmall"
+					className={cn(
+						"gap-1.5 whitespace-nowrap",
+						hasActiveFilter &&
+							"border-stroke-soft-900 bg-neutral-alpha-10 text-text-strong-950",
 					)}
+				>
+					<Button.Icon>
+						<Icon name="filter" className="h-3.5 w-3.5" />
+					</Button.Icon>
+					{displayLabel}
+					<Button.Icon>
+						<Icon name="chevron-down" className="h-3.5 w-3.5" />
+					</Button.Icon>
 				</Button.Root>
 			</Dropdown.Trigger>
 			<Dropdown.Content align="start" className="w-48 p-2">
@@ -98,30 +113,23 @@ export const DomainFilterDropdown = ({
 								onPointerLeave={() => setHoverIdx(undefined)}
 								onClick={() => handleToggle(option.id)}
 								className={cn(
-									"flex w-full cursor-pointer items-center gap-2 rounded-lg px-1 py-1.5 font-normal text-xs transition-colors",
+									"flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg px-2 py-1.5 font-normal text-xs transition-colors",
 									"text-text-strong-950",
 									!currentRect && hoverIdx === idx && "bg-neutral-alpha-10",
 								)}
 							>
-								{/* Checkbox */}
-								<div
-									className={cn(
-										"flex h-3.5 w-3.5 items-center justify-center rounded border p-[1px] transition-colors",
-										isChecked
-											? "border-stroke-soft-900 bg-neutral-900"
-											: "border-stroke-soft-200",
-									)}
-								>
-									{isChecked && (
-										<Icon name="check" className="h-3 w-3 text-white" />
-									)}
+								<div className="flex items-center gap-2">
+									<Icon
+										name={getStatusIcon(option.id)}
+										className={cn("h-3.5 w-3.5", getStatusColorClass(option.id))}
+									/>
+									<span className={cn(isChecked && "font-medium text-text-strong-950")}>
+										{option.label}
+									</span>
 								</div>
-								{/* Status Icon */}
-								<Icon
-									name={getStatusIcon(option.id)}
-									className={cn("h-3.5 w-3.5", getStatusColorClass(option.id))}
-								/>
-								<span>{option.label}</span>
+								{isChecked && (
+									<Icon name="check" className="h-3.5 w-3.5 text-text-strong-950" />
+								)}
 							</button>
 						);
 					})}
