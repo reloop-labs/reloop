@@ -9,6 +9,7 @@ import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import useSWR from "swr";
 import { OrganizationSwitcher } from "../organization/organization-switcher";
 import { SidebarItems } from "./sidebar-items";
@@ -42,6 +43,11 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
 		});
 	};
 
+	useHotkeys("meta+b", (e) => {
+		e.preventDefault();
+		toggleSidebarCollapse();
+	});
+
 	const { data: organizations } = useSWR(
 		"organizations",
 		async () => (await authClient.organization.list()).data ?? undefined,
@@ -70,22 +76,7 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
 			transition={{ duration: 0.2, ease: "easeInOut" }}
 		>
 			{/* Header */}
-			<div className="flex h-12 items-center border-stroke-soft-100 border-b px-2 dark:border-stroke-soft-100/40">
-				{activeOrganization ? (
-					<div>
-						<Avatar.Root size="24" placeholderType="company">
-							{activeOrganization.logo && (
-								<Avatar.Image
-									src={activeOrganization.logo}
-									alt={activeOrganization.name}
-								/>
-							)}
-						</Avatar.Root>
-					</div>
-				) : (
-					<Logo className="h-8 w-8 rounded-full" />
-				)}
-
+			<div className="flex h-12 items-center justify-between border-stroke-soft-100 border-b dark:border-stroke-soft-100/40">
 				<AnimatePresence mode="wait">
 					{!isSidebarCollapsed && (
 						<motion.div
@@ -95,7 +86,6 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
 							exit={{ opacity: 0, x: -10 }}
 							transition={{ duration: 0.15 }}
 						>
-							<p className="ml-1 text-text-disabled-300">/</p>
 							<OrganizationSwitcher
 								organizations={organizations}
 								activeOrganization={activeOrganization}
@@ -106,17 +96,23 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
 						</motion.div>
 					)}
 				</AnimatePresence>
-
 				<Button.Root
 					variant="neutral"
-					mode="ghost"
+					mode="stroke"
 					size="xxsmall"
 					onClick={toggleSidebarCollapse}
-					className={cn(isSidebarCollapsed && "-right-4.5 absolute", "ml-auto")}
+					title="Toggle Sidebar (Cmd+B)"
+					className={cn(
+						isSidebarCollapsed && "ml-[18px]",
+						"mr-3",
+						"h-5 w-5 p-0",
+						"bg-white",
+					)}
 				>
 					<Button.Icon>
 						<Icon
-							name={isSidebarCollapsed ? "arrow-right-rec" : "arrow-left-rec"}
+							name={isSidebarCollapsed ? "chevron-right" : "chevron-left"}
+							className="h-3.5 w-3.5"
 						/>
 					</Button.Icon>
 				</Button.Root>

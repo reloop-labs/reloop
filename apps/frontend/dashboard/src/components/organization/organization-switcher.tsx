@@ -1,11 +1,15 @@
 "use client";
 
 import { useOrgStore } from "@fe/dashboard/store/use-org-store";
+import {
+	getAvatarGradient,
+	getAvatarInitial,
+} from "@fe/dashboard/utils/avatar";
 import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
-import * as Popover from "@reloop/ui/popover";
 import { useRef, useState } from "react";
 import { AnimatedHoverBackground } from "../animated-hover-background";
 
@@ -55,21 +59,36 @@ export const OrganizationSwitcher: React.FC<OrganizationSwitcherProps> = ({
 
 	if (isCollapsed) {
 		return (
-			<Popover.Root open={isOpen} onOpenChange={setIsOpen}>
-				<Popover.Trigger asChild>
+			<Dropdown.Root open={isOpen} onOpenChange={setIsOpen}>
+				<Dropdown.Trigger asChild>
 					<Button.Root
 						variant="neutral"
-						mode="ghost"
-						size="xxsmall"
-						className="absolute left-2"
+						mode="lighter"
 						title={activeOrganization.name}
 					>
-						<Button.Icon>
-							<Icon name="building" className="h-4 w-4" />
-						</Button.Icon>
+						{activeOrganization.logo ? (
+							<Avatar.Root size="24" placeholderType="company">
+								<Avatar.Image
+									src={activeOrganization.logo}
+									alt={activeOrganization.name}
+								/>
+							</Avatar.Root>
+						) : (
+							<div
+								className={cn(
+									"flex h-[22px] w-[22px] items-center justify-center rounded-[6px] font-semibold text-[10px] text-white shadow-sm",
+									getAvatarGradient(activeOrganization.name),
+								)}
+							>
+								{getAvatarInitial(
+									activeOrganization.name,
+									activeOrganization.name,
+								)}
+							</div>
+						)}
 					</Button.Root>
-				</Popover.Trigger>
-				<Popover.Content
+				</Dropdown.Trigger>
+				<Dropdown.Content
 					sideOffset={2}
 					className="w-60 p-0"
 					side="right"
@@ -87,29 +106,51 @@ export const OrganizationSwitcher: React.FC<OrganizationSwitcherProps> = ({
 						onSelect={handleSelectOrganization}
 						onCreateNew={handleCreateOrganization}
 					/>
-				</Popover.Content>
-			</Popover.Root>
+				</Dropdown.Content>
+			</Dropdown.Root>
 		);
 	}
 
 	return (
-		<Popover.Root open={isOpen} onOpenChange={setIsOpen}>
-			<Popover.Trigger asChild>
-				<Button.Root
-					variant="neutral"
-					mode="ghost"
-					size="xxsmall"
-					className="flex h-auto items-center gap-2 px-2 py-1"
-				>
-					<div className="flex items-center gap-2">
-						<span className="font-medium text-sm text-text-strong-950">
+		<Dropdown.Root open={isOpen} onOpenChange={setIsOpen}>
+			<Dropdown.Trigger asChild>
+				<Button.Root variant="neutral" mode="ghost">
+					<div className="flex items-center gap-2.5">
+						{activeOrganization.logo ? (
+							<Avatar.Root
+								size="24"
+								placeholderType="company"
+								className="rounded-[6px]"
+							>
+								<Avatar.Image
+									src={activeOrganization.logo}
+									alt={activeOrganization.name}
+								/>
+							</Avatar.Root>
+						) : (
+							<div
+								className={cn(
+									"flex h-6 w-6 items-center justify-center rounded-[6px] font-semibold text-[11px] text-white shadow-sm",
+									getAvatarGradient(activeOrganization.name),
+								)}
+							>
+								{getAvatarInitial(
+									activeOrganization.name,
+									activeOrganization.name,
+								)}
+							</div>
+						)}
+						<span className="font-semibold text-sm text-text-strong-950">
 							{activeOrganization.name}
 						</span>
 					</div>
-					<Icon name="chevron-down" className="h-3 w-3" />
+					<Icon
+						name="chevron-down"
+						className="h-[14px] w-[14px] text-text-sub-600"
+					/>
 				</Button.Root>
-			</Popover.Trigger>
-			<Popover.Content
+			</Dropdown.Trigger>
+			<Dropdown.Content
 				sideOffset={2}
 				className="w-60 p-0"
 				side={side}
@@ -127,8 +168,8 @@ export const OrganizationSwitcher: React.FC<OrganizationSwitcherProps> = ({
 					onSelect={handleSelectOrganization}
 					onCreateNew={handleCreateOrganization}
 				/>
-			</Popover.Content>
-		</Popover.Root>
+			</Dropdown.Content>
+		</Dropdown.Root>
 	);
 };
 
