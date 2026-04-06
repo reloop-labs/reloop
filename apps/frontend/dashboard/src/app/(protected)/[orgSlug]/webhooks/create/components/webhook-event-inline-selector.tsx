@@ -1,6 +1,6 @@
 "use client";
 
-import * as Badge from "@reloop/ui/badge";
+import * as Checkbox from "@reloop/ui/checkbox";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { WEBHOOK_EVENTS } from "@reloop/webhook-events";
@@ -11,16 +11,19 @@ interface WebhookEventInlineSelectorProps {
 	error?: string;
 }
 
-const categoryIcons: Record<string, string> = {
-	domain: "globe",
-	"api-key": "key",
-	contact: "users",
+const categoryBadgeColors: Record<string, { light: string; dark: string }> = {
+	domain: { light: "bg-[#0A438A]", dark: "dark:bg-[#1E57A8]" },
+	"api-key": { light: "bg-[#8A5A0A]", dark: "dark:bg-[#A87A1E]" },
+	contact: { light: "bg-[#0A6B3A]", dark: "dark:bg-[#1E8A4E]" },
 };
 
-const categoryColors: Record<string, "blue" | "orange" | "green" | "gray"> = {
-	domain: "blue",
-	"api-key": "orange",
-	contact: "green",
+const categoryCheckboxColors: Record<string, string> = {
+	domain:
+		"[&>[data-state=checked]]:![&>[data-state=checked]>svg>rect:first-of-type]:fill-[#0A438A] dark:[&>[data-state=checked]>svg>rect:first-of-type]:fill-[#1E57A8]",
+	"api-key":
+		"[&>[data-state=checked]>svg>rect:first-of-type]:fill-[#8A5A0A] dark:[&>[data-state=checked]>svg>rect:first-of-type]:fill-[#A87A1E]",
+	contact:
+		"[&>[data-state=checked]>svg>rect:first-of-type]:fill-[#0A6B3A] dark:[&>[data-state=checked]>svg>rect:first-of-type]:fill-[#1E8A4E]",
 };
 
 export const WebhookEventInlineSelector = ({
@@ -42,45 +45,38 @@ export const WebhookEventInlineSelector = ({
 				{WEBHOOK_EVENTS.map((event, i) => {
 					const isChecked = value.includes(event.id);
 					return (
-						<button
+						<div
 							key={event.id}
-							type="button"
-							onClick={() => handleToggle(event.id)}
 							className={cn(
-								"flex w-full items-center justify-between px-4 py-2.5 text-left transition-colors hover:bg-bg-weak-50/50",
+								"flex w-full cursor-pointer items-center justify-between px-4 py-2.5 text-left transition-colors hover:bg-bg-weak-50/50",
 								isChecked && "bg-bg-weak-50/60",
 								i !== WEBHOOK_EVENTS.length - 1 &&
 									"border-stroke-soft-100 border-b dark:border-stroke-soft-100/40",
 							)}
 						>
 							<div className="flex items-center gap-3">
-								<div
-									className={cn(
-										"flex h-5 w-5 items-center justify-center rounded border transition-colors",
-										isChecked
-											? "border-neutral-base bg-neutral-base text-white"
-											: "border-stroke-soft-200 bg-bg-white-0",
-									)}
-								>
-									{isChecked && <Icon name="check" className="h-3.5 w-3.5" />}
+								<div className={cn(categoryCheckboxColors[event.category])}>
+									<Checkbox.Root
+										checked={isChecked}
+										onCheckedChange={() => handleToggle(event.id)}
+									/>
 								</div>
 								<span className="font-medium text-label-sm text-text-strong-950">
 									{event.name}
 								</span>
 							</div>
-							<Badge.Root
-								size="small"
-								variant="lighter"
-								color={categoryColors[event.category] ?? "gray"}
-								className="capitalize"
+							<div
+								className={cn(
+									"rounded-full px-1.5 py-0.5 font-medium text-[10px] text-white",
+									categoryBadgeColors[event.category]?.light,
+									categoryBadgeColors[event.category]?.dark,
+								)}
 							>
-								<Badge.Icon
-									as={Icon}
-									name={categoryIcons[event.category] ?? "webhook"}
-								/>
-								{event.category.replace("-", " ")}
-							</Badge.Root>
-						</button>
+								{event.category
+									.replace("-", " ")
+									.replace(/\b\w/g, (c) => c.toUpperCase())}
+							</div>
+						</div>
 					);
 				})}
 			</div>

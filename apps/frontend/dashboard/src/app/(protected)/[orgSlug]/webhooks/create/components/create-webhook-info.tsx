@@ -18,8 +18,8 @@ const EXAMPLE_PAYLOAD = `{
 export function CreateWebhookInfo() {
 	return (
 		<div className="space-y-5 lg:col-span-5">
-			<div className="rounded-xl border border-stroke-soft-100 bg-bg-weak-50/60 p-5 dark:border-stroke-soft-100/40">
-				<h3 className="mb-4 font-medium text-label-md text-text-strong-950">
+			<div className="rounded-xl border border-stroke-soft-100 bg-bg-weak-50/60 px-4 py-5 dark:border-stroke-soft-100/40">
+				<h3 className="mb-4 font-semibold text-label-md text-text-strong-950">
 					How it works
 				</h3>
 				<ul className="space-y-4">
