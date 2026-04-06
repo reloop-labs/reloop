@@ -1,14 +1,13 @@
 "use client";
 
 import { ApiKeysApiDetails } from "@fe/dashboard/components/api-details/api-keys";
-import { FeedbackPopover } from "@fe/dashboard/components/feedback-popover";
+
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
+import { usePathname } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useHotkeys } from "react-hotkeys-hook";
 import { DocsButton } from "./components/docs-button";
-
-import { usePathname } from "next/navigation";
 
 const ApiKeysLayout = ({ children }: { children: React.ReactNode }) => {
 	const [, setModal] = useQueryState("modal");
@@ -29,15 +28,6 @@ const ApiKeysLayout = ({ children }: { children: React.ReactNode }) => {
 
 	return (
 		<div>
-			<div className="sticky top-0 z-10 flex h-12 items-center justify-start gap-2 border-stroke-soft-100 border-b bg-bg-white-0 pr-2 pl-3 dark:border-stroke-soft-dark-100/40">
-				<div className="flex w-full items-center justify-between">
-					<div className="flex items-center gap-2">
-						<Icon name="key-new" className="h-4 w-4" />
-						<span className="font-medium text-sm">API Keys</span>
-					</div>
-					<FeedbackPopover />
-				</div>
-			</div>
 			<div className="mx-auto max-w-3xl sm:px-8">
 				{!isDetailPage && (
 					<div className="flex items-center justify-between pt-10 pb-6">
