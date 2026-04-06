@@ -349,14 +349,16 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
 										</div>
 
 										{/* Remove */}
-										<button
-											type="button"
+										<Button.Root
 											onClick={() => handleRemovePending(email)}
 											disabled={loading}
-											className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md text-text-soft-400 transition-colors hover:bg-bg-weak-50 hover:text-text-sub-600"
+											size="xxsmall"
+											variant="neutral"
+											mode="lighter"
+											className="h-5 w-5 rounded-md p-0"
 										>
 											<Icon name="cross" className="h-3 w-3" />
-										</button>
+										</Button.Root>
 									</div>
 								))}
 							</div>
