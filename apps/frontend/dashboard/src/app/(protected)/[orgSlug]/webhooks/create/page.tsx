@@ -10,7 +10,7 @@ export default function CreateWebhookPage() {
 	const { form, isLoading, onSubmit } = useCreateWebhookForm();
 
 	return (
-		<div className="mx-auto w-full max-w-4xl space-y-6">
+		<div className="mx-auto mb-10 w-full max-w-4xl space-y-6">
 			<CreateWebhookHeader />
 			<form
 				onSubmit={onSubmit}
