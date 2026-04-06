@@ -11,7 +11,6 @@ import { memo, useCallback } from "react";
 interface WebhookEventInlineSelectorProps {
 	value: string[];
 	onChange: (value: string[]) => void;
-	error?: string;
 }
 
 const categoryBadgeColors: Record<string, { light: string; dark: string }> = {
@@ -90,7 +89,6 @@ WebhookEventRow.displayName = "WebhookEventRow";
 export const WebhookEventInlineSelector = ({
 	value,
 	onChange,
-	error,
 }: WebhookEventInlineSelectorProps) => {
 	const handleToggle = useCallback(
 		(eventId: string) => {
@@ -175,29 +173,6 @@ export const WebhookEventInlineSelector = ({
 									})}
 								</AnimatePresence>
 							</motion.div>
-						</motion.div>
-					)}
-				</AnimatePresence>
-
-				<AnimatePresence initial={false}>
-					{error && (
-						<motion.div
-							key="error"
-							initial={{ opacity: 0, height: 0 }}
-							animate={{ opacity: 1, height: "auto" }}
-							exit={{ opacity: 0, height: 0 }}
-							transition={{
-								type: "spring",
-								stiffness: 500,
-								damping: 30,
-								mass: 0.5,
-							}}
-							className="overflow-hidden"
-						>
-							<div className="flex items-center gap-2">
-								<Icon name="alert-circle" className="h-4 w-4 text-red-500" />
-								<p className="text-red-600 text-xs">{error}</p>
-							</div>
 						</motion.div>
 					)}
 				</AnimatePresence>

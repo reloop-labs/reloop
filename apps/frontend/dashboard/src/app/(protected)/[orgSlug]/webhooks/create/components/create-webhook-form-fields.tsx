@@ -1,3 +1,4 @@
+import { AnimatePresence, motion } from "motion/react";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
@@ -71,14 +72,20 @@ export function CreateWebhookFormFields({
 			</div>
 
 			<div>
-				<Label.Root className="mb-2 block font-medium text-label-sm text-text-strong-950 text-xs uppercase">
-					Events to subscribe
-					<Label.Asterisk />
-				</Label.Root>
+				<div className="mb-2 flex items-center justify-between">
+					<Label.Root className="block font-medium text-label-sm text-text-strong-950 text-xs uppercase">
+						Events to subscribe
+						<Label.Asterisk />
+					</Label.Root>
+					{formState.errors.events?.message && (
+						<p className="text-red-600 text-xs">
+							{formState.errors.events.message}
+						</p>
+					)}
+				</div>
 				<WebhookEventInlineSelector
 					value={events}
 					onChange={(val) => setValue("events", val, { shouldValidate: true })}
-					error={formState.errors.events?.message}
 				/>
 			</div>
 		</div>
