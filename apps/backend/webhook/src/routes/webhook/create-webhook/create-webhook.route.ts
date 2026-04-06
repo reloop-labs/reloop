@@ -11,6 +11,7 @@ export const createWebhookRoute = new Elysia().use(authMiddleware).post(
 		return await createWebhookController({
 			organizationId: activeOrganizationId,
 			userId,
+			description: body.description,
 			url: body.url,
 			events: body.events as WebhookEventName[],
 		});

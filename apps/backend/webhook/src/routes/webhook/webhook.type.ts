@@ -42,11 +42,13 @@ export namespace WebhookTypes {
 	}
 
 	export interface CreateWebhookRequest {
+		description: string;
 		url: string;
 		events: WebhookEventName[];
 	}
 
 	export interface UpdateWebhookRequest {
+		description?: string;
 		name?: string;
 		url?: string;
 		secret?: string;

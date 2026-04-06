@@ -30,13 +30,14 @@ export async function updateWebhookController({
 			throw status(404, { message: "Webhook not found" });
 		}
 
-		if (body.name && body.name !== existingWebhook.name) {
+		const nameToUpdate = body.description ?? body.name;
+		if (nameToUpdate && nameToUpdate !== existingWebhook.name) {
 			const nameConflict = await db
 				.select({ id: schema.webhook.id })
 				.from(schema.webhook)
 				.where(
 					and(
-						eq(schema.webhook.name, body.name),
+						eq(schema.webhook.name, nameToUpdate),
 						eq(schema.webhook.organizationId, organizationId),
 						ne(schema.webhook.id, webhookId),
 						isNull(schema.webhook.deletedAt),
@@ -53,7 +54,7 @@ export async function updateWebhookController({
 			updatedAt: new Date(),
 		};
 
-		if (body.name !== undefined) updateValues.name = body.name;
+		if (nameToUpdate !== undefined) updateValues.name = nameToUpdate;
 		if (body.url !== undefined) updateValues.url = body.url;
 		if (body.secret !== undefined) updateValues.secret = body.secret;
 		if (body.status !== undefined) updateValues.status = body.status;

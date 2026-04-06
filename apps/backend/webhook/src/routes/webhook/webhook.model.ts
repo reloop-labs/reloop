@@ -14,6 +14,12 @@ export namespace WebhookModel {
 
 	export const createWebhookBody = t.Object(
 		{
+			description: t.String({
+				minLength: 1,
+				maxLength: 255,
+				description: "Webhook description",
+				error: "Please provide a valid webhook description",
+			}),
 			url: t.String({
 				pattern: urlPattern.source,
 				description: "Webhook URL",
@@ -34,6 +40,7 @@ export namespace WebhookModel {
 		{
 			examples: [
 				{
+					description: "My Webhook",
 					url: "https://example.com/webhooks/reloop",
 					events: ["domain.created", "domain.deleted"],
 				},
@@ -47,6 +54,13 @@ export namespace WebhookModel {
 
 	export const updateWebhookBody = t.Object(
 		{
+			description: t.Optional(
+				t.String({
+					minLength: 1,
+					maxLength: 255,
+					description: "Webhook description",
+				}),
+			),
 			name: t.Optional(
 				t.String({
 					minLength: 1,

@@ -9,20 +9,22 @@ import type { WebhookTypes } from "../webhook.type";
 export async function createWebhookController({
 	organizationId,
 	userId,
+	description,
 	url,
 	events,
 }: {
 	organizationId: string;
 	userId: string;
+	description: string;
 	url: string;
 	events: WebhookEventName[];
 }): Promise<WebhookTypes.WebhookResponse> {
-	logger.info({ url, events }, "Creating webhook");
+	logger.info({ url, events, description }, "Creating webhook");
 	try {
 		const [newWebhook] = await db
 			.insert(schema.webhook)
 			.values({
-				name: `webhook_${createId()}`,
+				name: description,
 				url,
 				secret: `whsec_${createId()}`,
 				organizationId,
