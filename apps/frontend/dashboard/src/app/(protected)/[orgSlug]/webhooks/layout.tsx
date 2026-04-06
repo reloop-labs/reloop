@@ -1,13 +1,10 @@
 "use client";
 
-import { WebhooksApiDetails } from "@fe/dashboard/components/api-details/webhooks";
-
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import { usePathname } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useHotkeys } from "react-hotkeys-hook";
-import { DocsButton } from "./components/docs-button";
 
 const WebhooksLayout = ({ children }: { children: React.ReactNode }) => {
 	const [, setModal] = useQueryState("modal");
@@ -27,12 +24,16 @@ const WebhooksLayout = ({ children }: { children: React.ReactNode }) => {
 	);
 
 	return (
-		<div className="mx-auto sm:px-8">
+		<div className="mx-auto max-w-4xl sm:px-8">
 			{!isDetailPage && (
 				<div className="flex items-center justify-between pt-10 pb-6">
-					<h1 className="font-medium text-2xl">Webhooks</h1>
+					<div>
+						<h1 className="font-medium text-2xl">Webhooks</h1>
+						<p className="mt-1 text-sm text-text-sub-600">
+							Send real-time event notifications to your endpoints
+						</p>
+					</div>
 					<div className="flex items-center gap-2 self-end">
-						<DocsButton size="xsmall" mode="stroke" />
 						<Button.Root
 							variant="neutral"
 							size="xsmall"
@@ -40,18 +41,8 @@ const WebhooksLayout = ({ children }: { children: React.ReactNode }) => {
 							className="gap-2"
 						>
 							<Icon name="plus" className="h-4 w-4" />
-							Create webhook
-							<span className="inline-flex items-center gap-0.5">
-								<Icon
-									name="command"
-									className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
-								/>
-								<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-100/20 p-px font-medium text-[10px] uppercase">
-									A
-								</span>
-							</span>
+							Add webhook
 						</Button.Root>
-						<WebhooksApiDetails size="xsmall" mode="ghost" />
 					</div>
 				</div>
 			)}

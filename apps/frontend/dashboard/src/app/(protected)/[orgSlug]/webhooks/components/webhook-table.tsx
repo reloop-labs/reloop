@@ -14,7 +14,6 @@ import { Skeleton } from "@reloop/ui/skeleton";
 import Link from "next/link";
 import { useQueryState } from "nuqs";
 import { DeleteWebhookModal } from "./delete-webhook-modal";
-import { EmptyState } from "./empty-state";
 
 interface WebhookData {
 	id: string;
@@ -32,7 +31,6 @@ interface WebhookTableProps {
 	activeOrganizationSlug: string;
 	isLoading?: boolean;
 	loadingRows?: number;
-	onAddWebhook?: () => void;
 }
 
 const getStatusColor = (status: string) => {
@@ -70,7 +68,6 @@ export const WebhookTable = ({
 	activeOrganizationSlug,
 	isLoading,
 	loadingRows = 3,
-	onAddWebhook,
 }: WebhookTableProps) => {
 	const { push } = useUserOrganization();
 	const [, setDeleteId] = useQueryState("delete");
@@ -127,8 +124,8 @@ export const WebhookTable = ({
 							</div>
 						))
 					) : webhooks.length === 0 ? (
-						<div className="w-full">
-							<EmptyState onCreateWebhook={onAddWebhook || (() => {})} />
+						<div className="flex w-full items-center justify-center p-8 text-sm text-text-sub-600">
+							No webhooks matching your search.
 						</div>
 					) : (
 						webhooks.map((webhook, index) => (

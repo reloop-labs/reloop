@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import useSWR from "swr";
 
+import { EmptyState } from "./empty-state";
 import { WebhookTable } from "./webhook-table";
 
 interface WebhookData {
@@ -43,6 +44,8 @@ export const WebhookListSidebar = () => {
 		},
 	);
 
+	const isTotalEmpty = !isLoading && data?.webhooks?.length === 0;
+
 	// Filter webhooks based on status and search query
 	const filteredWebhooks =
 		data?.webhooks?.filter((webhook) => {
@@ -64,6 +67,14 @@ export const WebhookListSidebar = () => {
 						<p className="text-center text-sm text-text-sub-600">
 							Failed to load webhooks
 						</p>
+					</div>
+				) : isTotalEmpty ? (
+					<div className="mt-4 w-full">
+						<EmptyState
+							onCreateWebhook={() =>
+								router.push(`/${activeOrganization?.slug}/webhooks/create`)
+							}
+						/>
 					</div>
 				) : (
 					<div>
@@ -109,9 +120,6 @@ export const WebhookListSidebar = () => {
 								activeOrganizationSlug={activeOrganization?.slug || ""}
 								isLoading={isLoading}
 								loadingRows={4}
-								onAddWebhook={() =>
-									router.push(`/${activeOrganization?.slug}/webhooks/create`)
-								}
 							/>
 						</div>
 					</div>
