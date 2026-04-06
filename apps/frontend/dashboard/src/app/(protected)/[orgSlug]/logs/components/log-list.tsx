@@ -233,9 +233,9 @@ export const LogList = () => {
 				/>
 
 				<StatusFilterDropdown
-					value={statusCode || null}
-					onChange={(val: string | null) => {
-						setStatusCode(val || "");
+					value={statusCode ? statusCode.split(",") : []}
+					onChange={(val: string[]) => {
+						setStatusCode(val.length > 0 ? val.join(",") : "");
 						setCurrentPage(1);
 					}}
 				/>

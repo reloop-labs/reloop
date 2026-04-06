@@ -10,8 +10,8 @@ import { useRef, useState } from "react";
 export type StatusFilterOption = string;
 
 interface StatusFilterDropdownProps {
-	value: StatusFilterOption | null;
-	onChange: (value: StatusFilterOption | null) => void;
+	value: StatusFilterOption[];
+	onChange: (value: StatusFilterOption[]) => void;
 }
 
 const statusOptions: {
@@ -51,22 +51,33 @@ export const StatusFilterDropdown = ({
 	const currentTab = buttonRefs.current[hoverIdx ?? -1];
 	const currentRect = currentTab?.getBoundingClientRect();
 
-	const hasActiveFilter = !!value;
+	const hasActiveFilter = value.length > 0;
 
 	const handleReset = () => {
-		onChange(null);
+		onChange([]);
 		setIsOpen(false);
 	};
 
 	const handleToggle = (optionId: StatusFilterOption | null) => {
-		onChange(optionId);
-		setIsOpen(false);
+		if (optionId === null) {
+			onChange([]);
+			setIsOpen(false);
+			return;
+		}
+
+		if (value.includes(optionId)) {
+			onChange(value.filter((v) => v !== optionId));
+		} else {
+			onChange([...value, optionId]);
+		}
 	};
 
 	const displayLabel =
-		value === null
+		value.length === 0
 			? "Status"
-			: statusOptions.find((o) => o.id === value)?.label || "Status";
+			: value.length === 1
+				? statusOptions.find((o) => o.id === value[0])?.label || "Status"
+				: `${value.length} Statuses`;
 
 	return (
 		<Dropdown.Root open={isOpen} onOpenChange={setIsOpen}>
@@ -78,7 +89,7 @@ export const StatusFilterDropdown = ({
 					className={cn(
 						"gap-1.5 whitespace-nowrap",
 						hasActiveFilter &&
-							"border-primary-base/30 bg-primary-alpha-10 text-primary-base",
+							"border-stroke-soft-900 bg-neutral-alpha-10 text-text-strong-950",
 					)}
 				>
 					<Button.Icon>
@@ -127,9 +138,9 @@ export const StatusFilterDropdown = ({
 							<div className="flex h-3.5 w-3.5 items-center justify-center">
 								<div className="h-2 w-2 rounded-full border-2 border-text-strong-950" />
 							</div>
-							<span className={cn(!value && "font-medium")}>All Statuses</span>
+							<span className={cn(value.length === 0 && "font-medium")}>All Statuses</span>
 						</div>
-						{!value && (
+						{value.length === 0 && (
 							<Icon name="check" className="h-4 w-4 text-text-strong-950" />
 						)}
 					</button>
@@ -138,7 +149,7 @@ export const StatusFilterDropdown = ({
 					<div className="my-1 border-stroke-soft-200 border-t" />
 
 					{statusOptions.slice(0, 2).map((option, idx) => {
-						const isChecked = value === option.id;
+						const isChecked = value.includes(option.id);
 						const index = idx + 1; // offset by 1 because of "All Statuses"
 						return (
 							<button
@@ -163,13 +174,13 @@ export const StatusFilterDropdown = ({
 										/>
 									</div>
 									<span
-										className={cn(isChecked && "font-medium text-primary-base")}
+										className={cn(isChecked && "font-medium text-text-strong-950")}
 									>
 										{option.label}
 									</span>
 								</div>
 								{isChecked && (
-									<Icon name="check" className="h-4 w-4 text-primary-base" />
+									<Icon name="check" className="h-4 w-4 text-text-strong-950" />
 								)}
 							</button>
 						);
@@ -181,7 +192,7 @@ export const StatusFilterDropdown = ({
 					{/* Specific Statuses */}
 					<div className="max-h-[240px] overflow-y-auto pr-1">
 						{statusOptions.slice(2).map((option, idx) => {
-							const isChecked = value === option.id;
+							const isChecked = value.includes(option.id);
 							const index = idx + 3; // offset by 3 ("All Statuses" + 2 groups)
 							return (
 								<button
@@ -210,14 +221,14 @@ export const StatusFilterDropdown = ({
 										</div>
 										<span
 											className={cn(
-												isChecked && "font-medium text-primary-base",
+												isChecked && "font-medium text-text-strong-950",
 											)}
 										>
 											{option.label}
 										</span>
 									</div>
 									{isChecked && (
-										<Icon name="check" className="h-4 w-4 text-primary-base" />
+										<Icon name="check" className="h-4 w-4 text-text-strong-950" />
 									)}
 								</button>
 							);

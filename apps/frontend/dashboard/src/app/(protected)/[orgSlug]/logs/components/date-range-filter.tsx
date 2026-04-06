@@ -149,7 +149,7 @@ export const DateRangeFilter = ({
 					className={cn(
 						"gap-1.5 whitespace-nowrap",
 						hasActiveFilter &&
-							"border-primary-base/30 bg-primary-alpha-10 text-primary-base",
+							"border-stroke-soft-900 bg-neutral-alpha-10 text-text-strong-950",
 					)}
 				>
 					<Button.Icon>
@@ -231,7 +231,7 @@ export const DateRangeFilter = ({
 										className={cn(
 											"flex w-full cursor-pointer items-center justify-between rounded-lg px-1 py-1.5 font-normal text-xs transition-colors",
 											isActive
-												? "font-medium text-primary-base"
+												? "font-medium text-text-strong-950"
 												: "text-text-strong-950",
 											!currentRect &&
 												hoverIdx === idx &&
@@ -242,7 +242,7 @@ export const DateRangeFilter = ({
 										{isActive && (
 											<Icon
 												name="check"
-												className="h-3.5 w-3.5 text-primary-base"
+												className="h-3.5 w-3.5 text-text-strong-950"
 											/>
 										)}
 									</button>

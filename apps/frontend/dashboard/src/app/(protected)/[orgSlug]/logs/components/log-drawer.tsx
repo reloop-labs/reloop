@@ -5,6 +5,7 @@ import { cn } from "@reloop/ui/cn";
 import * as Drawer from "@reloop/ui/drawer";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
+import * as Tooltip from "@reloop/ui/tooltip";
 import Link from "next/link";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
@@ -158,16 +159,33 @@ function FieldValue({
 }) {
 	if (!value) return <span className="text-text-soft-400 text-xs">—</span>;
 
-	const display =
-		maxLength && value.length > maxLength
-			? `${value.slice(0, maxLength)}…`
-			: value;
+	const isTruncated = maxLength && value.length > maxLength;
+	const display = isTruncated ? `${value.slice(0, maxLength)}…` : value;
+
+	const content = (
+		<span className={cn("text-text-strong-950 text-xs", mono && "font-mono")}>
+			{display}
+		</span>
+	);
 
 	return (
 		<>
-			<span className={cn("text-text-strong-950 text-xs", mono && "font-mono")}>
-				{display}
-			</span>
+			{isTruncated ? (
+				<Tooltip.Provider delayDuration={300}>
+					<Tooltip.Root>
+						<Tooltip.Trigger asChild>{content}</Tooltip.Trigger>
+						<Tooltip.Content
+							side="top"
+							variant="light"
+							className="max-w-sm break-all font-mono text-xs"
+						>
+							{value}
+						</Tooltip.Content>
+					</Tooltip.Root>
+				</Tooltip.Provider>
+			) : (
+				content
+			)}
 			{copyable && <CopyButton value={value} label={mono ? "ID" : undefined} />}
 		</>
 	);

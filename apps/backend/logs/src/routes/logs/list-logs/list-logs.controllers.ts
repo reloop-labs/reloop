@@ -23,15 +23,22 @@ export async function listLogsController(
 		}
 
 		if (query.status_code) {
-			if (query.status_code === "successes") {
-				conditions.push("status_code >= 200 AND status_code < 400");
-			} else if (query.status_code === "errors") {
-				conditions.push("status_code >= 400");
-			} else {
-				const numericStatus = Number.parseInt(query.status_code, 10);
-				if (!Number.isNaN(numericStatus)) {
-					conditions.push(`status_code = ${numericStatus}`);
+			const statuses = query.status_code.split(",");
+			const statusConditions: string[] = [];
+			for (const status of statuses) {
+				if (status === "successes") {
+					statusConditions.push("(status_code >= 200 AND status_code < 400)");
+				} else if (status === "errors") {
+					statusConditions.push("(status_code >= 400)");
+				} else {
+					const numericStatus = Number.parseInt(status, 10);
+					if (!Number.isNaN(numericStatus)) {
+						statusConditions.push(`status_code = ${numericStatus}`);
+					}
 				}
+			}
+			if (statusConditions.length > 0) {
+				conditions.push(`(${statusConditions.join(" OR ")})`);
 			}
 		}
 

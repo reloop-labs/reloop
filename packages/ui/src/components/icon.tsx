@@ -832,6 +832,29 @@ export const IconsSprite = () => (
 					strokeLinejoin="round"
 				/>
 			</symbol>
+			<symbol
+				id="fingerprint"
+				viewBox="0 0 24 24"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<rect
+					opacity="0.12"
+					x={4}
+					y={2}
+					width={16}
+					height={20}
+					rx={8}
+					fill="#2F384C"
+				/>
+				<path
+					d="M20 10C20 5.58172 16.4183 2 12 2C10.9391 2 9.92643 2.20651 9 2.58152M14.5 21.6016C17.6939 20.5518 20 17.5452 20 14M9.5 21.6016C6.30607 20.5518 4 17.5452 4 14V10C4 8.10811 4.65672 6.3696 5.75463 5M12 10V14M8 14V10C8 7.79086 9.79086 6 12 6M15.4649 8C15.8052 8.58835 16 9.27143 16 10V14C16 16.2091 14.2091 18 12 18C11.2714 18 10.5883 17.8052 10 17.4649"
+					stroke="#2F384C"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
 
 			<symbol id="info-outline" viewBox="0 0 24 24" fill="none">
 				<circle opacity="0.12" cx={12} cy={12} r={10} fill="currentColor" />
