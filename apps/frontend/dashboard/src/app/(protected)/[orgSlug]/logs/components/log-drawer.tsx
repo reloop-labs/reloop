@@ -21,6 +21,7 @@ interface LogDetail {
 	uuid: string;
 	event: string;
 	level: string;
+	status_code?: number | null;
 	trace_id: string | null;
 	metadata: Record<string, unknown>;
 	requestDetails: {
@@ -41,34 +42,63 @@ const getLevelConfig = (level: string) => {
 				color: "text-error-base",
 				bg: "bg-error-alpha-10",
 				border: "border-error-soft-200",
-				dot: "bg-error-base",
-				label: level === "fatal" ? "Fatal" : "Error",
+				icon: "alert-triangle",
 			};
 		case "warn":
 			return {
 				color: "text-warning-base",
 				bg: "bg-warning-alpha-10",
 				border: "border-warning-soft-200",
-				dot: "bg-warning-base",
-				label: "Warning",
+				icon: "alert-triangle",
 			};
 		case "info":
 			return {
 				color: "text-primary-base",
 				bg: "bg-primary-alpha-10",
 				border: "border-primary-soft-200",
-				dot: "bg-primary-base",
-				label: "Info",
+				icon: "info-outline",
 			};
 		default:
 			return {
 				color: "text-text-sub-600",
 				bg: "bg-neutral-alpha-10",
 				border: "border-stroke-soft-200",
-				dot: "bg-text-sub-600",
-				label: "Debug",
+				icon: "terminal",
 			};
 	}
+};
+
+const getStatusColor = (statusCode: number | null | undefined) => {
+	if (!statusCode) return null;
+	if (statusCode >= 200 && statusCode < 400)
+		return {
+			color: "text-success-base",
+			bg: "bg-success-alpha-10",
+			border: "border-success-soft-200",
+		};
+	return {
+		color: "text-error-base",
+		bg: "bg-error-alpha-10",
+		border: "border-error-soft-200",
+	};
+};
+
+const EVENT_SOURCE_ICONS: Record<string, string> = {
+	email: "mail",
+	auth: "lock",
+	domain: "globe",
+	"api-key": "key-new",
+	webhook: "link",
+	contact: "users",
+	template: "file-text",
+	settings: "settings",
+	manual: "edit",
+};
+
+const getEventIcon = (event: string) => {
+	const source = event.split(".")[0];
+	if (!source) return "terminal";
+	return EVENT_SOURCE_ICONS[source] || "terminal";
 };
 
 function CopyButton({ value, label }: { value: string; label?: string }) {
@@ -100,63 +130,77 @@ function CopyButton({ value, label }: { value: string; label?: string }) {
 	);
 }
 
-function InfoRow({
+function FieldRow({
 	label,
-	value,
-	mono,
-	copyable,
+	children,
 }: {
 	label: string;
-	value: string | null | undefined;
-	mono?: boolean;
-	copyable?: boolean;
+	children: React.ReactNode;
 }) {
-	if (!value) return null;
 	return (
-		<div className="flex items-start justify-between gap-4 py-1.5">
+		<div className="flex items-start justify-between gap-3 py-2">
 			<span className="shrink-0 text-text-sub-600 text-xs">{label}</span>
-			<div className="flex items-center gap-1">
-				<span
-					className={cn(
-						"text-right text-text-strong-950 text-xs",
-						mono && "font-mono",
-					)}
-				>
-					{value}
-				</span>
-				{copyable && <CopyButton value={value} label={label} />}
-			</div>
+			<div className="flex items-center gap-1 text-right">{children}</div>
 		</div>
 	);
 }
 
-function MetadataTable({ metadata }: { metadata: Record<string, unknown> }) {
-	const entries = Object.entries(metadata);
-	if (entries.length === 0) {
-		return (
-			<p className="py-2 text-center text-text-soft-400 text-xs">
-				No metadata
-			</p>
-		);
-	}
+function FieldValue({
+	value,
+	mono,
+	copyable,
+	maxLength,
+}: {
+	value: string | null | undefined;
+	mono?: boolean;
+	copyable?: boolean;
+	maxLength?: number;
+}) {
+	if (!value) return <span className="text-text-soft-400 text-xs">—</span>;
+
+	const display =
+		maxLength && value.length > maxLength
+			? `${value.slice(0, maxLength)}…`
+			: value;
 
 	return (
-		<div className="divide-y divide-stroke-soft-100/50">
-			{entries.map(([key, value]) => (
-				<div
-					key={key}
-					className="flex items-start justify-between gap-3 py-1.5"
-				>
-					<span className="shrink-0 font-mono text-text-sub-600 text-xs">
-						{key}
-					</span>
-					<span className="break-all text-right font-mono text-xs text-text-strong-950">
-						{typeof value === "object"
-							? JSON.stringify(value)
-							: String(value ?? "—")}
+		<>
+			<span className={cn("text-text-strong-950 text-xs", mono && "font-mono")}>
+				{display}
+			</span>
+			{copyable && <CopyButton value={value} label={mono ? "ID" : undefined} />}
+		</>
+	);
+}
+
+function Section({
+	title,
+	icon,
+	children,
+	actions,
+}: {
+	title: string;
+	icon?: string;
+	children: React.ReactNode;
+	actions?: React.ReactNode;
+}) {
+	return (
+		<div className="rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/50">
+			<div className="flex items-center justify-between px-4 py-2.5">
+				<div className="flex items-center gap-2">
+					{icon && (
+						<Icon
+							name={icon as any}
+							className="h-3.5 w-3.5 text-text-sub-600"
+						/>
+					)}
+					<span className="font-medium text-[11px] text-text-sub-600 uppercase tracking-wider">
+						{title}
 					</span>
 				</div>
-			))}
+				{actions}
+			</div>
+			<div className="border-stroke-soft-100 border-t px-4">{children}</div>
 		</div>
 	);
 }
@@ -175,6 +219,10 @@ export const LogDrawer = ({
 	);
 
 	const levelConfig = log ? getLevelConfig(log.level) : null;
+	const statusConfig = log ? getStatusColor(log.status_code) : null;
+	const hasRequestDetails =
+		log?.requestDetails && Object.keys(log.requestDetails).length > 0;
+	const metadataEntries = log ? Object.entries(log.metadata || {}) : [];
 
 	return (
 		<Drawer.Root open={isOpen} onOpenChange={onOpenChange}>
@@ -188,25 +236,25 @@ export const LogDrawer = ({
 							</>
 						) : log ? (
 							<>
-								<div className="flex items-center gap-2">
-									<span
+								<div className="flex items-center gap-2.5">
+									<Icon
+										name={getEventIcon(log.event) as any}
 										className={cn(
-											"inline-flex items-center rounded-md border px-1.5 py-0.5 font-medium text-[10px] capitalize",
-											levelConfig?.color,
-											levelConfig?.bg,
-											levelConfig?.border,
+											"h-4.5 w-4.5 shrink-0",
+											log.status_code
+												? log.status_code >= 200 && log.status_code < 400
+													? "text-success-base"
+													: "text-error-base"
+												: "text-text-sub-600",
 										)}
-									>
-										{log.level}
-									</span>
-									<Drawer.Title className="truncate">
-										{log.event}
-									</Drawer.Title>
+									/>
+									<Drawer.Title className="truncate">{log.event}</Drawer.Title>
 								</div>
-								<p className="text-paragraph-xs text-text-sub-600">
-									{new Date(log.created_at).toLocaleString()} ·{" "}
-									{formatRelativeTime(log.created_at)}
-								</p>
+								<div className="flex items-center gap-2 text-paragraph-xs text-text-sub-600">
+									<span>{new Date(log.created_at).toLocaleString()}</span>
+									<span className="text-text-disabled-300">·</span>
+									<span>{formatRelativeTime(log.created_at)}</span>
+								</div>
 							</>
 						) : (
 							<Drawer.Title>Log Details</Drawer.Title>
@@ -214,84 +262,119 @@ export const LogDrawer = ({
 					</div>
 				</Drawer.Header>
 
-				<Drawer.Body className="flex flex-col gap-5 overflow-y-auto p-5">
+				<Drawer.Body className="flex flex-col gap-4 overflow-y-auto p-4">
 					{isLoading ? (
 						<div className="space-y-4">
-							<Skeleton className="h-24 rounded-xl" />
-							<Skeleton className="h-24 rounded-xl" />
-							<Skeleton className="h-32 rounded-xl" />
+							<Skeleton className="h-20 rounded-xl" />
+							<Skeleton className="h-20 rounded-xl" />
+							<Skeleton className="h-28 rounded-xl" />
 						</div>
 					) : log ? (
 						<>
-							{/* Event Section */}
-							<section className="rounded-xl border border-stroke-soft-100 p-4 dark:border-stroke-soft-100/50">
-								<h3 className="mb-2.5 font-medium text-text-sub-600 text-[11px] uppercase tracking-wider">
-									Event
-								</h3>
-								<div className="space-y-0.5">
-									<InfoRow label="Event" value={log.event} />
-									<InfoRow label="Level" value={log.level} />
-									<InfoRow
-										label="Trace ID"
-										value={log.trace_id}
-										mono
-										copyable
-									/>
-									<InfoRow label="Log ID" value={log.uuid} mono copyable />
-								</div>
-							</section>
-
-							{/* Request Section */}
-							{log.requestDetails &&
-								Object.keys(log.requestDetails || {}).length > 0 && (
-									<section className="rounded-xl border border-stroke-soft-100 p-4 dark:border-stroke-soft-100/50">
-										<h3 className="mb-2.5 text-[11px] font-medium uppercase tracking-wider text-text-sub-600">
-											Request
-										</h3>
-										<div className="space-y-0.5">
-											{log.requestDetails.method &&
-												log.requestDetails.endpoint && (
-													<InfoRow
-														label="Endpoint"
-														value={`${log.requestDetails.method} ${log.requestDetails.endpoint}`}
-														mono
-													/>
-												)}
-											<InfoRow
-												label="IP Address"
-												value={log.requestDetails.ipAddress as string}
-												mono
-												copyable
-											/>
-											<InfoRow
-												label="User Agent"
-												value={
-													log.requestDetails.userAgent
-														? String(log.requestDetails.userAgent).length > 60
-															? `${String(log.requestDetails.userAgent).slice(0, 60)}…`
-															: String(log.requestDetails.userAgent)
-														: null
-												}
-											/>
-										</div>
-									</section>
+							{/* Badges Row */}
+							<div className="flex items-center gap-2">
+								{levelConfig && (
+									<span
+										className={cn(
+											"inline-flex items-center gap-1.5 rounded-md border px-2 py-1 font-medium text-[10px] capitalize",
+											levelConfig.color,
+											levelConfig.bg,
+											levelConfig.border,
+										)}
+									>
+										<Icon name={levelConfig.icon as any} className="h-3 w-3" />
+										{log.level}
+									</span>
 								)}
+								{statusConfig && log.status_code && (
+									<span
+										className={cn(
+											"inline-flex items-center rounded-md border px-2 py-1 font-medium text-[10px]",
+											statusConfig.color,
+											statusConfig.bg,
+											statusConfig.border,
+										)}
+									>
+										{log.status_code}
+									</span>
+								)}
+							</div>
 
-							{/* Metadata Section */}
-							<section className="rounded-xl border border-stroke-soft-100 p-4 dark:border-stroke-soft-100/50">
-								<div className="mb-2.5 flex items-center justify-between">
-									<h3 className="text-[11px] font-medium uppercase tracking-wider text-text-sub-600">
-										Metadata
-									</h3>
-									{Object.keys(log.metadata || {}).length > 0 && (
+							{/* Event Info */}
+							<Section title="Event" icon="activity">
+								<FieldRow label="Event">
+									<FieldValue value={log.event} />
+								</FieldRow>
+								<FieldRow label="Level">
+									<FieldValue value={log.level} />
+								</FieldRow>
+								<FieldRow label="Log ID">
+									<FieldValue value={log.uuid} mono copyable />
+								</FieldRow>
+								<FieldRow label="Trace ID">
+									<FieldValue value={log.trace_id} mono copyable />
+								</FieldRow>
+							</Section>
+
+							{/* Request Details */}
+							{hasRequestDetails && (
+								<Section title="Request" icon="globe">
+									{log.requestDetails.method && log.requestDetails.endpoint && (
+										<FieldRow label="Endpoint">
+											<FieldValue
+												value={`${log.requestDetails.method} ${log.requestDetails.endpoint}`}
+												mono
+											/>
+										</FieldRow>
+									)}
+									<FieldRow label="IP Address">
+										<FieldValue
+											value={log.requestDetails.ipAddress as string}
+											mono
+											copyable
+										/>
+									</FieldRow>
+									<FieldRow label="User Agent">
+										<FieldValue
+											value={log.requestDetails.userAgent as string}
+											maxLength={60}
+										/>
+									</FieldRow>
+								</Section>
+							)}
+
+							{/* Metadata */}
+							<Section
+								title="Metadata"
+								icon="code"
+								actions={
+									metadataEntries.length > 0 ? (
 										<CopyButton
 											value={JSON.stringify(log.metadata, null, 2)}
-											label="Metadata JSON"
+											label="Metadata"
 										/>
-									)}
-								</div>
-								<MetadataTable metadata={log.metadata || {}} />
-							</section>
+									) : undefined
+								}
+							>
+								{metadataEntries.length > 0 ? (
+									metadataEntries.map(([key, value]) => (
+										<FieldRow key={key} label={key}>
+											<FieldValue
+												value={
+													typeof value === "object"
+														? JSON.stringify(value)
+														: String(value ?? "—")
+												}
+												mono
+											/>
+										</FieldRow>
+									))
+								) : (
+									<div className="py-3 text-center text-text-soft-400 text-xs">
+										No metadata
+									</div>
+								)}
+							</Section>
 						</>
 					) : null}
 				</Drawer.Body>
@@ -300,7 +383,7 @@ export const LogDrawer = ({
 					<Drawer.Footer className="border-stroke-soft-200 border-t">
 						<Link
 							href={`/${activeOrganizationSlug}/logs/${log.uuid}`}
-							className="flex w-full items-center justify-center gap-2 rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-4 py-2 text-sm font-medium text-text-strong-950 transition-colors hover:bg-bg-weak-50"
+							className="flex w-full items-center justify-center gap-2 rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-4 py-2 font-medium text-sm text-text-strong-950 transition-colors hover:bg-bg-weak-50"
 						>
 							View Full Details
 							<Icon name="arrow-right" className="h-4 w-4" />
