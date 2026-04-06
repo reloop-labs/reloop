@@ -8,7 +8,7 @@ import { motion } from "motion/react";
 import { useEffect } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import useSWR from "swr";
-import { OrganizationSwitcher } from "../organization/organization-switcher";
+import { OrganizationSwitcher } from "./organization-switcher";
 import { SidebarItems } from "./sidebar-items";
 import { UserMenuDropdown } from "./user-menu-dropdown";
 

@@ -1,6 +1,5 @@
 "use client";
 
-import { useOrgStore } from "@fe/dashboard/store/use-org-store";
 import {
 	getAvatarGradient,
 	getAvatarInitial,
@@ -10,6 +9,7 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
+import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { AnimatedHoverBackground } from "../animated-hover-background";
 
@@ -38,7 +38,7 @@ export const OrganizationSwitcher: React.FC<OrganizationSwitcherProps> = ({
 	const [isOpen, setIsOpen] = useState(false);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
-	const { setState } = useOrgStore();
+	const router = useRouter();
 
 	const activeIndex = organizations?.findIndex(
 		(org) => org.id === activeOrganization.id,
@@ -48,7 +48,7 @@ export const OrganizationSwitcher: React.FC<OrganizationSwitcherProps> = ({
 	const currentRect = currentTab?.getBoundingClientRect();
 
 	const handleCreateOrganization = () => {
-		setState(true);
+		router.push("/onboarding");
 		setIsOpen(false);
 	};
 
