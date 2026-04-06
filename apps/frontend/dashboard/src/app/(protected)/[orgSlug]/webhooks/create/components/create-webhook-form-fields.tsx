@@ -17,7 +17,7 @@ export function CreateWebhookFormFields({
 			<div>
 				<Label.Root
 					htmlFor="url"
-					className="mb-2 block font-medium text-label-sm text-text-strong-950 uppercase"
+					className="mb-2 block font-medium text-label-sm text-text-strong-950 text-xs uppercase"
 				>
 					Endpoint URL
 					<Label.Asterisk />
@@ -51,7 +51,7 @@ export function CreateWebhookFormFields({
 			<div>
 				<Label.Root
 					htmlFor="description"
-					className="mb-2 block font-medium text-label-sm text-text-strong-950 uppercase"
+					className="mb-2 block font-medium text-label-sm text-text-strong-950 text-xs uppercase"
 				>
 					Description
 					<span className="text-text-sub-600 text-xs capitalize">
@@ -71,7 +71,7 @@ export function CreateWebhookFormFields({
 			</div>
 
 			<div>
-				<Label.Root className="mb-2 block font-medium text-label-sm text-text-strong-950">
+				<Label.Root className="mb-2 block font-medium text-label-sm text-text-strong-950 text-xs uppercase">
 					Events to subscribe
 					<Label.Asterisk />
 				</Label.Root>
