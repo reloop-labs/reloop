@@ -311,7 +311,9 @@ const AccountPage = () => {
 					<div>
 						<Label.Root htmlFor="email" className="flex items-center gap-1">
 							Email Address
-							<span className="text-text-sub-600 text-xs"> (Read only)</span>
+							<span className="flex h-4 min-w-[20px] items-center justify-center rounded-full border border-stroke-soft-100 bg-neutral-alpha-10 px-1.5 font-medium text-[11px] text-text-sub-600 dark:border-stroke-soft-100/40">
+								Read only
+							</span>
 						</Label.Root>
 						<Input.Root className="mt-1 w-full" size="small">
 							<Input.Wrapper className="w-full">
@@ -323,6 +325,60 @@ const AccountPage = () => {
 								/>
 							</Input.Wrapper>
 						</Input.Root>
+						<p className="mt-1 font-medium text-paragraph-xs text-text-sub-600">
+							To change your email, contact support.
+						</p>
+					</div>
+					<div className="flex justify-end">
+						<Button.Root
+							variant="neutral"
+							size="xsmall"
+							onClick={handleSaveChanges}
+							disabled={!hasChanges || isUploading || isSaving}
+						>
+							{isSaving ? (
+								<>
+									<Spinner size={14} color="var(--text-strong-950)" />
+									Saving...
+								</>
+							) : (
+								<>
+									Save Changes
+									<span className="inline-flex items-center gap-0.5">
+										<Icon
+											name="command"
+											className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+										/>
+										<Icon
+											name="enter"
+											className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+										/>
+									</span>
+								</>
+							)}
+						</Button.Root>
+					</div>
+				</div>
+				<div className="mt-6">
+					<p className="mb-3 font-medium text-label-md text-text-strong-950">
+						Danger zone
+					</p>
+					<div className="rounded-xl border border-error-light py-2 pr-2.5 pl-3">
+						<div className="flex items-center justify-between">
+							<div>
+								<p className="font-medium text-label-sm text-text-strong-950">
+									Delete workspace
+								</p>
+								<p className="text-paragraph-xs text-text-sub-600">
+									Delete your workspace and all of its data. This action is
+									irreversible.
+								</p>
+							</div>
+							<Button.Root variant="error" size="xsmall">
+								<Icon name="trash-2" className="-mr-1 size-3 text-white" />
+								Delete Account
+							</Button.Root>
+						</div>
 					</div>
 				</div>
 			</div>

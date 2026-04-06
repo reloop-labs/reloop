@@ -12,6 +12,7 @@ import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
+import { useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
@@ -97,13 +98,10 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
 	const [removingMember, setRemovingMember] = useState<string | null>(null);
 	const [cancellingInvite, setCancellingInvite] = useState<string | null>(null);
 	const [resendingInvite, setResendingInvite] = useState<string | null>(null);
-	const [revokeModalOpen, setRevokeModalOpen] = useState(false);
-	const [inviteToRevoke, setInviteToRevoke] = useState<{
-		id: string;
-		email: string;
-		role: string;
-		createdAt?: Date;
-	} | null>(null);
+	const [modal, setModal] = useQueryState("modal", { history: "replace" });
+	const [inviteId, setInviteId] = useQueryState("inviteId", {
+		history: "replace",
+	});
 	const [removeMemberModalOpen, setRemoveMemberModalOpen] = useState(false);
 	const [memberToRemove, setMemberToRemove] = useState<{
 		id: string;
@@ -274,23 +272,17 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
 	};
 
 	const handleRevokeInviteClick = (inviteId: string) => {
-		const invite = invites?.find((i) => i.id === inviteId);
-		if (invite) {
-			setInviteToRevoke({
-				id: invite.id,
-				email: invite.email,
-				role: invite.role,
-				createdAt: (invite as unknown as { createdAt?: Date }).createdAt,
-			});
-			setRevokeModalOpen(true);
-		}
+		setModal("revoke-invite");
+		setInviteId(inviteId);
 	};
+
+	const inviteToRevoke = invites?.find((i) => i.id === inviteId) ?? null;
 
 	const handleConfirmRevoke = async () => {
 		if (!inviteToRevoke) return;
 		await handleCancelInvite(inviteToRevoke.id);
-		setRevokeModalOpen(false);
-		setInviteToRevoke(null);
+		setModal(null);
+		setInviteId(null);
 	};
 
 	const isLoading = membersLoading || invitesLoading;
@@ -566,13 +558,20 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
 				</div>
 			</div>
 			<RevokeInviteModal
-				open={revokeModalOpen}
-				onOpenChange={setRevokeModalOpen}
+				open={modal === "revoke-invite"}
+				onOpenChange={(open) => {
+					if (!open) {
+						setModal(null);
+						setInviteId(null);
+					}
+				}}
 				onConfirm={handleConfirmRevoke}
 				isRevoking={cancellingInvite === inviteToRevoke?.id}
 				inviteEmail={inviteToRevoke?.email ?? ""}
 				inviteRole={inviteToRevoke?.role ?? "member"}
-				invitedAt={inviteToRevoke?.createdAt}
+				invitedAt={
+					(inviteToRevoke as unknown as { createdAt?: Date })?.createdAt
+				}
 			/>
 			<RemoveMemberModal
 				open={removeMemberModalOpen}

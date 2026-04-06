@@ -276,7 +276,7 @@ const SettingsPage = () => {
 					</div>
 					<div className="grid grid-cols-1 gap-3">
 						<div>
-							<Label.Root htmlFor="name">Name</Label.Root>
+							<Label.Root htmlFor="name">Workspace Name</Label.Root>
 							<Input.Root className="mt-1 w-full" size="small">
 								<Input.Wrapper className="w-full">
 									<Input.Input
@@ -291,9 +291,12 @@ const SettingsPage = () => {
 									/>
 								</Input.Wrapper>
 							</Input.Root>
+							<p className="mt-1 font-medium text-paragraph-xs text-text-sub-600">
+								This is the display name show accross you workspace
+							</p>
 						</div>
 						<div>
-							<Label.Root htmlFor="slug">Slug</Label.Root>
+							<Label.Root htmlFor="slug">Workspace Slug</Label.Root>
 							<Input.Root
 								size="small"
 								className="mt-1 w-full"
@@ -329,9 +332,14 @@ const SettingsPage = () => {
 									)}
 								</Input.Wrapper>
 							</Input.Root>
-							{slugStatus === "taken" && (
+							{slugStatus === "taken" ? (
 								<p className="mt-1 text-paragraph-xs text-red-500">
 									This workspace handle is already taken
+								</p>
+							) : (
+								<p className="mt-1 font-medium text-paragraph-xs text-text-sub-600">
+									Used in your workspace URL. Only lowercase letters, numbers
+									and hyphens.
 								</p>
 							)}
 						</div>
@@ -355,7 +363,19 @@ const SettingsPage = () => {
 									Saving...
 								</>
 							) : (
-								"Save Changes"
+								<>
+									Save Changes
+									<span className="inline-flex items-center gap-0.5">
+										<Icon
+											name="command"
+											className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+										/>
+										<Icon
+											name="enter"
+											className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+										/>
+									</span>
+								</>
 							)}
 						</Button.Root>
 					</div>
@@ -374,7 +394,7 @@ const SettingsPage = () => {
 								</p>
 							</div>
 							<Button.Root variant="error" size="xsmall">
-								<Icon name="trash" className="size-3 text-white" />
+								<Icon name="trash-2" className="-mr-1 size-3 text-white" />
 								Delete workspace
 							</Button.Root>
 						</div>
