@@ -101,6 +101,8 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
 	const [inviteToRevoke, setInviteToRevoke] = useState<{
 		id: string;
 		email: string;
+		role: string;
+		createdAt?: Date;
 	} | null>(null);
 	const [removeMemberModalOpen, setRemoveMemberModalOpen] = useState(false);
 	const [memberToRemove, setMemberToRemove] = useState<{
@@ -274,7 +276,12 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
 	const handleRevokeInviteClick = (inviteId: string) => {
 		const invite = invites?.find((i) => i.id === inviteId);
 		if (invite) {
-			setInviteToRevoke({ id: invite.id, email: invite.email });
+			setInviteToRevoke({
+				id: invite.id,
+				email: invite.email,
+				role: invite.role,
+				createdAt: (invite as unknown as { createdAt?: Date }).createdAt,
+			});
 			setRevokeModalOpen(true);
 		}
 	};
@@ -564,6 +571,8 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
 				onConfirm={handleConfirmRevoke}
 				isRevoking={cancellingInvite === inviteToRevoke?.id}
 				inviteEmail={inviteToRevoke?.email ?? ""}
+				inviteRole={inviteToRevoke?.role ?? "member"}
+				invitedAt={inviteToRevoke?.createdAt}
 			/>
 			<RemoveMemberModal
 				open={removeMemberModalOpen}

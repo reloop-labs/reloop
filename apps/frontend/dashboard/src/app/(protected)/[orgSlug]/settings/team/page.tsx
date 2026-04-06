@@ -3,7 +3,9 @@
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
+import { useQueryState } from "nuqs";
 import { useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import { InviteModal } from "./invite-modal";
 import { TeamFilterDropdown, type TeamFilters } from "./team-filter-dropdown";
 import { TeamList } from "./team-list";
@@ -11,7 +13,12 @@ import { TeamList } from "./team-list";
 const Team = () => {
 	const [searchQuery, setSearchQuery] = useState("");
 	const [filters, setFilters] = useState<TeamFilters>([]);
-	const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+	const [modal, setModal] = useQueryState("modal", { history: "replace" });
+
+	useHotkeys("mod+a", (e) => {
+		e.preventDefault();
+		setModal("invite");
+	});
 
 	return (
 		<div className="w-full space-y-6 pt-5">
@@ -43,10 +50,19 @@ const Team = () => {
 				<Button.Root
 					variant="neutral"
 					size="xsmall"
-					onClick={() => setIsInviteModalOpen(true)}
+					onClick={() => setModal("invite")}
 				>
 					<Icon name="user-plus" className="h-4 w-4" />
 					<span>Invite members</span>
+					<span className="inline-flex items-center gap-0.5">
+						<Icon
+							name="command"
+							className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+						/>
+						<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-100/20 p-px font-medium text-[10px] uppercase">
+							a
+						</span>
+					</span>
 				</Button.Root>
 			</div>
 
@@ -55,8 +71,8 @@ const Team = () => {
 
 			{/* Invite Modal */}
 			<InviteModal
-				open={isInviteModalOpen}
-				onOpenChange={setIsInviteModalOpen}
+				open={modal === "invite"}
+				onOpenChange={(open) => setModal(open ? "invite" : null)}
 			/>
 		</div>
 	);

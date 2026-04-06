@@ -7,7 +7,6 @@ import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
 import { useRef, useState } from "react";
-import { toast } from "sonner";
 
 export interface InviteDropdownProps {
 	inviteId: string;
