@@ -226,7 +226,7 @@ const OrganizationList: React.FC<OrganizationListProps> = ({
 						onPointerEnter={() => setHoverIdx(idx)}
 						onPointerLeave={() => setHoverIdx(undefined)}
 						className={cn(
-							"flex w-full cursor-pointer items-center justify-between gap-2.5 rounded-lg px-2 py-2 font-normal",
+							"flex w-full cursor-pointer items-center justify-between gap-2.5 rounded-3xl px-2 py-2 font-normal",
 							!currentRect && currentIdx === idx && "bg-neutral-alpha-10",
 						)}
 						onClick={() => onSelect(organization)}
@@ -286,7 +286,7 @@ const OrganizationList: React.FC<OrganizationListProps> = ({
 					key="create-organization"
 					type="button"
 					className={cn(
-						"flex w-full cursor-pointer items-center justify-start gap-2.5 rounded-lg px-2 py-2 font-normal",
+						"flex w-full cursor-pointer items-center justify-start gap-2.5 rounded-2xl px-2 py-2 font-normal",
 						!currentRect &&
 							currentIdx === organizations.length &&
 							"bg-neutral-alpha-10",
