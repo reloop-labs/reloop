@@ -19,7 +19,6 @@ interface LogData {
 	uuid: string;
 	event: string;
 	level: string;
-	source: string | null;
 	created_at: string;
 	trace_id?: string | null;
 	metadata?: Record<string, unknown>;
@@ -150,12 +149,11 @@ export const LogList = () => {
 		if (!data?.logs || data.logs.length === 0) return;
 
 		try {
-			const headers = ["Timestamp", "Event", "Level", "Source"];
+			const headers = ["Timestamp", "Event", "Level"];
 			const csvRows = data.logs.map((log) => [
 				new Date(log.created_at).toISOString(),
 				log.event,
 				log.level,
-				log.source || "",
 			]);
 
 			const csvContent = [

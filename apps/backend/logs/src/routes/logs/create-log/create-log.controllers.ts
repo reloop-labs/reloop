@@ -6,7 +6,6 @@ import { status } from "elysia";
 export async function createLogController({
 	event,
 	level,
-	source,
 	trace_id,
 	metadata,
 	status_code,
@@ -25,7 +24,6 @@ export async function createLogController({
 			id,
 			event,
 			level: level || "info",
-			source: source || null,
 			trace_id,
 			user_id: userId,
 			organization_id: activeOrganizationId,
@@ -43,7 +41,6 @@ export async function createLogController({
 			uuid: entry.id,
 			event: entry.event,
 			level: entry.level as string,
-			source: entry.source,
 			trace_id: entry.trace_id,
 			metadata: metadata || {},
 			status_code: entry.status_code,

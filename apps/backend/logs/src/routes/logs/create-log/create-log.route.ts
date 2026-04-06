@@ -9,7 +9,6 @@ export const createLogRoute = new Elysia().use(authMiddleware).post(
 		const {
 			event,
 			level,
-			source,
 			trace_id,
 			metadata,
 			status_code,
@@ -18,7 +17,6 @@ export const createLogRoute = new Elysia().use(authMiddleware).post(
 		return await createLogController({
 			event,
 			level,
-			source,
 			trace_id,
 			metadata,
 			status_code,

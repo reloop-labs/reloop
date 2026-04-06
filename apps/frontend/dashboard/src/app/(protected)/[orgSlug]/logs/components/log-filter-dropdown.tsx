@@ -53,8 +53,13 @@ export const LogFilterDropdown = ({
 		<Dropdown.Root open={isOpen} onOpenChange={setIsOpen}>
 			<Dropdown.Trigger asChild>
 				<Button.Root variant="neutral" mode="stroke" size="xsmall">
-					<Icon name="filter" className="h-4 w-4" />
+					<Button.Icon>
+						<Icon name="barchart" className="h-3.5 w-3.5" />
+					</Button.Icon>
 					<span>Level</span>
+					<Button.Icon>
+						<Icon name="chevron-down" className="h-3.5 w-3.5" />
+					</Button.Icon>
 					{hasActiveFilter && (
 						<span className="-top-1.5 -right-1 absolute flex h-4 w-4 items-center justify-center rounded-full bg-neutral-900 text-[10px] text-white">
 							{activeFilterCount}

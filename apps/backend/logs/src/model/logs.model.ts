@@ -14,23 +14,6 @@ export namespace LogsModel {
 		},
 	);
 
-	export const logSource = t.Union(
-		[
-			t.Literal("email"),
-			t.Literal("auth"),
-			t.Literal("domain"),
-			t.Literal("api_key"),
-			t.Literal("webhook"),
-			t.Literal("contact"),
-			t.Literal("template"),
-			t.Literal("settings"),
-			t.Literal("manual"),
-		],
-		{
-			description: "Source service or category that generated this log",
-		},
-	);
-
 	export const structuredValue = t.Any({
 		description: "Any valid JSON-compatible structured value",
 	});
@@ -41,7 +24,6 @@ export namespace LogsModel {
 			description: "Event or log name (e.g., 'user_signed_up', 'email_sent')",
 		}),
 		level: t.String(logLevel),
-		source: t.Optional(logSource),
 		trace_id: t.String({ description: "Distributed trace identifier" }),
 		metadata:
 			t.Record(t.String(), structuredValue, {
@@ -63,7 +45,6 @@ export namespace LogsModel {
 		uuid: t.String({ description: "Unique log identifier" }),
 		event: t.String({ description: "Event or log name" }),
 		level: t.String({ description: "Stored log level" }),
-		source: t.Union([t.String(), t.Null()], { description: "Source service or category" }),
 		trace_id: t.Union([t.String(), t.Null()]),
 		metadata: t.Any(),
 		status_code: t.Union([t.Number(), t.Null()], { description: "HTTP status code" }),
@@ -77,7 +58,6 @@ export namespace LogsModel {
 		uuid: t.String({ description: "Unique event identifier" }),
 		event: t.String({ description: "Event name" }),
 		level: t.String({ description: "Stored log level" }),
-		source: t.Union([t.String(), t.Null()], { description: "Source service or category" }),
 		trace_id: t.String({ description: "Distributed trace identifier" }),
 		metadata: t.Any({ description: "Additional structured metadata" }),
 		status_code: t.Union([t.Number(), t.Null()], { description: "HTTP status code" }),
@@ -92,7 +72,6 @@ export namespace LogsModel {
 
 	export const listLogsQuery = t.Object({
 		level: t.Optional(logLevel),
-		source: t.Optional(logSource),
 		event: t.Optional(t.String({ description: "Filter by event name (partial match)" })),
 		status_code: t.Optional(t.String({ description: "Filter by status code (number or 'success', 'error')" })),
 		search: t.Optional(t.String({ description: "Search across event name and metadata" })),

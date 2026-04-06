@@ -5,49 +5,49 @@ import logger from "@reloop/logger";
  * This is a service-specific implementation that uses contacts-specific configuration.
  */
 export async function createLog(body: {
-  event: string;
-  level?: "debug" | "info" | "warn" | "error" | "fatal";
-  trace_id?: string;
-  metadata?: Record<string, unknown>;
-  requestDetails?: {
-    endpoint?: string;
-    method?: string;
-    userAgent?: string;
-    ipAddress?: string;
-    statusCode?: number;
-  };
-  cookie?: string;
+	event: string;
+	level?: "debug" | "info" | "warn" | "error" | "fatal";
+	trace_id?: string;
+	metadata?: Record<string, unknown>;
+	requestDetails?: {
+		endpoint?: string;
+		method?: string;
+		userAgent?: string;
+		ipAddress?: string;
+		statusCode?: number;
+	};
+	cookie?: string;
 }) {
-  const url = `${contactsConfig.BASE_URL}/api/logs/v1/create`;
-  const {
-    event,
-    level = "info",
-    trace_id,
-    metadata = {},
-    requestDetails = {},
-    cookie,
-  } = body;
-  try {
-    await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-log-api-key": contactsConfig.LOGS_API_KEY,
-        ...(cookie && { cookie }),
-      },
-      body: JSON.stringify({
-        event,
-        level,
-        source: "contact",
-        trace_id:
-          trace_id ||
-          (typeof crypto !== "undefined" ? crypto.randomUUID() : undefined),
-        metadata,
-        status_code: requestDetails.statusCode,
-        requestDetails,
-      }),
-    });
-  } catch (error) {
-    logger.error({ error }, "Error calling logs service");
-  }
+	const url = `${contactsConfig.BASE_URL}/api/logs/v1/create`;
+	const {
+		event,
+		level = "info",
+		trace_id,
+		metadata = {},
+		requestDetails = {},
+		cookie,
+	} = body;
+
+	try {
+		await fetch(url, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				"x-log-api-key": contactsConfig.LOGS_API_KEY,
+				...(cookie && { cookie }),
+			},
+			body: JSON.stringify({
+				event,
+				level,
+				trace_id:
+					trace_id ||
+					(typeof crypto !== "undefined" ? crypto.randomUUID() : undefined),
+				metadata,
+				status_code: requestDetails.statusCode,
+				requestDetails,
+			}),
+		});
+	} catch (error) {
+		logger.error({ error }, "Error calling logs service");
+	}
 }

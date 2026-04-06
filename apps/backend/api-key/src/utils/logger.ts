@@ -29,9 +29,6 @@ export async function createLog(body: {
 		cookie,
 	} = body;
 
-	// Extract source from the first word of the event (e.g., "domain.create" -> "domain")
-	const source = event.split(".")[0];
-
 	try {
 		await fetch(url, {
 			method: "POST",
@@ -43,7 +40,6 @@ export async function createLog(body: {
 			body: JSON.stringify({
 				event,
 				level,
-				source,
 				trace_id:
 					trace_id ||
 					(typeof crypto !== "undefined" ? crypto.randomUUID() : undefined),

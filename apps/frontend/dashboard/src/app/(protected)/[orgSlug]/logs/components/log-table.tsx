@@ -9,7 +9,6 @@ interface LogData {
 	uuid: string;
 	event: string;
 	level: string;
-	source?: string | null;
 	status_code?: number | null;
 	created_at: string;
 }
@@ -56,26 +55,22 @@ const getRowTintColor = (level: string) => {
 	}
 };
 
-const SOURCE_ICONS: Record<string, string> = {
+const EVENT_SOURCE_ICONS: Record<string, string> = {
 	email: "mail",
 	auth: "lock",
 	domain: "globe",
-	api_key: "key",
+	"api-key": "key-new",
 	webhook: "link",
-	contact: "user",
+	contact: "users",
 	template: "file-text",
 	settings: "settings",
 	manual: "edit",
 };
 
-const getSourceIcon = (source: string | null | undefined) => {
+const getEventIcon = (event: string) => {
+	const source = event.split(".")[0];
 	if (!source) return "terminal";
-	return SOURCE_ICONS[source] || "terminal";
-};
-
-const formatSourceLabel = (source: string | null | undefined) => {
-	if (!source) return "—";
-	return source.replace(/_/g, " ");
+	return EVENT_SOURCE_ICONS[source] || "terminal";
 };
 
 export const LogTable = ({
@@ -85,8 +80,9 @@ export const LogTable = ({
 	loadingRows = 5,
 	onRowClick,
 }: LogTableProps) => {
+	console.log("logs", logs);
 	const gridClass =
-		"grid grid-cols-[130px_minmax(0,1fr)_70px_80px_70px] items-center px-6 gap-8";
+		"grid grid-cols-[minmax(0,1fr)_80px_80px_130px] items-center px-6 gap-6";
 
 	if (isLoading) {
 		return (
@@ -99,35 +95,32 @@ export const LogTable = ({
 					)}
 				>
 					<div className="flex items-center gap-2">
-						<Icon name="clock" className="h-3.5 w-3.5" />
-						<span className="text-xs">Time</span>
-					</div>
-					<div className="flex items-center gap-2">
 						<Icon name="activity" className="h-3.5 w-3.5" />
 						<span className="text-xs">Event</span>
-					</div>
-					<div className="flex items-center gap-2">
-						<Icon name="layers" className="h-3.5 w-3.5" />
-						<span className="text-xs">Source</span>
 					</div>
 					<div className="flex items-center gap-2">
 						<Icon name="check-circle" className="h-3.5 w-3.5" />
 						<span className="text-xs">Status</span>
 					</div>
 					<div className="flex items-center gap-2">
-						<Icon name="alert-triangle" className="h-3.5 w-3.5" />
+						<Icon name="barchart" className="h-3.5 w-3.5" />
 						<span className="text-xs">Level</span>
+					</div>
+					<div className="flex items-center justify-end gap-2">
+						<Icon name="clock" className="h-3.5 w-3.5" />
+						<span className="text-xs">Time</span>
 					</div>
 				</div>
 				{/* Skeleton rows */}
 				<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
 					{Array.from({ length: loadingRows }).map((_, index) => (
 						<div key={`skeleton-${index}`} className={cn(gridClass, "py-2")}>
-							<Skeleton className="h-4 w-16" />
 							<Skeleton className="h-4 w-40" />
-							<Skeleton className="h-4 w-14" />
 							<Skeleton className="h-4 w-10" />
 							<Skeleton className="h-5 w-12 rounded-md" />
+							<div className="flex justify-end">
+								<Skeleton className="h-4 w-16" />
+							</div>
 						</div>
 					))}
 				</div>
@@ -145,24 +138,20 @@ export const LogTable = ({
 				)}
 			>
 				<div className="flex items-center gap-2">
-					<Icon name="clock" className="h-3.5 w-3.5" />
-					<span className="text-xs">Time</span>
-				</div>
-				<div className="flex items-center gap-2">
 					<Icon name="activity" className="h-3.5 w-3.5" />
 					<span className="text-xs">Event</span>
-				</div>
-				<div className="flex items-center gap-2">
-					<Icon name="layers" className="h-3.5 w-3.5" />
-					<span className="text-xs">Source</span>
 				</div>
 				<div className="flex items-center gap-2">
 					<Icon name="check-circle" className="h-3.5 w-3.5" />
 					<span className="text-xs">Status</span>
 				</div>
 				<div className="flex items-center gap-2">
-					<Icon name="alert-triangle" className="h-3.5 w-3.5" />
+					<Icon name="barchart" className="h-3.5 w-3.5" />
 					<span className="text-xs">Level</span>
+				</div>
+				<div className="flex items-center justify-end gap-2">
+					<Icon name="clock" className="h-3.5 w-3.5" />
+					<span className="text-xs">Time</span>
 				</div>
 			</div>
 
@@ -180,31 +169,26 @@ export const LogTable = ({
 					logs.map((log) => {
 						const rowContent = (
 							<>
-								{/* Timestamp Column */}
-								<div className="truncate text-label-sm text-text-sub-600">
-									{formatRelativeTime(log.created_at)}
-								</div>
-
-								{/* Event Column */}
-								<div className="flex items-center gap-2 truncate">
+								{/* Event Column - icon derived from event prefix + event name */}
+								<div className="flex items-center gap-2.5 truncate">
+									<Icon
+										name={getEventIcon(log.event) as any}
+										className={cn(
+											"h-4 w-4 shrink-0",
+											log.status_code
+												? log.status_code >= 200 && log.status_code < 400
+													? "text-success-base"
+													: "text-error-base"
+												: "text-text-sub-600",
+										)}
+									/>
 									<span className="truncate text-label-sm text-text-strong-950">
 										{log.event}
 									</span>
 								</div>
 
-								{/* Source Column */}
-								<div className="flex items-center gap-1.5 text-text-sub-600">
-									<Icon
-										name={getSourceIcon(log.source) as any}
-										className="h-3.5 w-3.5 shrink-0"
-									/>
-									<span className="truncate text-xs capitalize">
-										{formatSourceLabel(log.source)}
-									</span>
-								</div>
-
 								{/* Status Column */}
-								<div className="flex items-center gap-1.5">
+								<div className="flex items-center">
 									{log.status_code ? (
 										<span
 											className={cn(
@@ -229,6 +213,11 @@ export const LogTable = ({
 									>
 										{log.level}
 									</span>
+								</div>
+
+								{/* Time Column - right aligned */}
+								<div className="truncate text-right text-label-sm text-text-sub-600">
+									{formatRelativeTime(log.created_at)}
 								</div>
 							</>
 						);

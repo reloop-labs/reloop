@@ -21,7 +21,6 @@ interface LogDetail {
 	uuid: string;
 	event: string;
 	level: string;
-	source: string | null;
 	trace_id: string | null;
 	metadata: Record<string, unknown>;
 	requestDetails: {
@@ -232,10 +231,6 @@ export const LogDrawer = ({
 								<div className="space-y-0.5">
 									<InfoRow label="Event" value={log.event} />
 									<InfoRow label="Level" value={log.level} />
-									<InfoRow
-										label="Source"
-										value={log.source?.replace(/_/g, " ") || null}
-									/>
 									<InfoRow
 										label="Trace ID"
 										value={log.trace_id}

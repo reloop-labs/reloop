@@ -22,10 +22,6 @@ export async function listLogsController(
 			conditions.push(`level = '${escapeString(query.level)}'`);
 		}
 
-		if (query.source) {
-			conditions.push(`source = '${escapeString(query.source)}'`);
-		}
-
 		if (query.status_code) {
 			if (query.status_code === "successes") {
 				conditions.push("status_code >= 200 AND status_code < 400");
@@ -86,7 +82,6 @@ export async function listLogsController(
 						id,
 						event,
 						level,
-						source,
 						trace_id,
 						user_id,
 						organization_id,
@@ -142,7 +137,6 @@ export async function listLogsController(
 			uuid: row.id,
 			event: row.event,
 			level: row.level,
-			source: row.source,
 			trace_id: row.trace_id,
 			metadata: safeJsonParse(row.metadata, {}),
 			status_code: row.status_code,

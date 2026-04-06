@@ -81,6 +81,9 @@ export const StatusFilterDropdown = ({
 							"border-primary-base/30 bg-primary-alpha-10 text-primary-base",
 					)}
 				>
+					<Button.Icon>
+						<Icon name="check-circle" className="h-3.5 w-3.5" />
+					</Button.Icon>
 					{displayLabel}
 					<Button.Icon>
 						<Icon name="chevron-down" className="h-3.5 w-3.5" />
@@ -89,15 +92,15 @@ export const StatusFilterDropdown = ({
 			</Dropdown.Trigger>
 			<Dropdown.Content align="start" className="w-[280px] p-2">
 				{/* Header */}
-				<div className="flex items-center justify-between border-b border-stroke-soft-200 px-1 pb-2">
-					<span className="text-xs font-medium text-text-sub-600">
+				<div className="flex items-center justify-between border-stroke-soft-200 border-b px-1 pb-2">
+					<span className="font-medium text-text-sub-600 text-xs">
 						Filter by status
 					</span>
 					{hasActiveFilter && (
 						<button
 							type="button"
 							onClick={handleReset}
-							className="rounded-lg border border-stroke-soft-200 px-2 py-1 text-xs text-text-sub-600 transition-colors hover:bg-bg-weak-50"
+							className="rounded-lg border border-stroke-soft-200 px-2 py-1 text-text-sub-600 text-xs transition-colors hover:bg-bg-weak-50"
 						>
 							Reset filter
 						</button>
@@ -132,7 +135,7 @@ export const StatusFilterDropdown = ({
 					</button>
 
 					{/* Divider between All and Groups */}
-					<div className="my-1 border-t border-stroke-soft-200" />
+					<div className="my-1 border-stroke-soft-200 border-t" />
 
 					{statusOptions.slice(0, 2).map((option, idx) => {
 						const isChecked = value === option.id;
@@ -173,7 +176,7 @@ export const StatusFilterDropdown = ({
 					})}
 
 					{/* Divider between Groups and Specific Statuses */}
-					<div className="my-1 border-t border-stroke-soft-200" />
+					<div className="my-1 border-stroke-soft-200 border-t" />
 
 					{/* Specific Statuses */}
 					<div className="max-h-[240px] overflow-y-auto pr-1">

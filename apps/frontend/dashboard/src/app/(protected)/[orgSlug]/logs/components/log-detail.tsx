@@ -12,7 +12,6 @@ interface LogDetailProps {
 		uuid: string;
 		event: string;
 		level: string;
-		source?: string | null;
 		created_at: string;
 		metadata: Record<string, unknown>;
 		requestDetails: {
@@ -224,14 +223,6 @@ export const LogDetail = ({ log, isLoading }: LogDetailProps) => {
 						<span>{new Date(log.created_at).toLocaleString()}</span>
 						<span className="text-text-disabled-300">·</span>
 						<span>{formatRelativeTime(log.created_at)}</span>
-						{log.source && (
-							<>
-								<span className="text-text-disabled-300">·</span>
-								<span className="capitalize">
-									{log.source.replace(/_/g, " ")}
-								</span>
-							</>
-						)}
 					</div>
 				</div>
 			</div>
@@ -243,10 +234,6 @@ export const LogDetail = ({ log, isLoading }: LogDetailProps) => {
 					<div className="divide-y divide-stroke-soft-100/50">
 						<DetailRow label="Event" value={log.event} />
 						<DetailRow label="Level" value={log.level} />
-						<DetailRow
-							label="Source"
-							value={log.source?.replace(/_/g, " ") || null}
-						/>
 						<DetailRow
 							label="Timestamp"
 							value={new Date(log.created_at).toLocaleString()}
