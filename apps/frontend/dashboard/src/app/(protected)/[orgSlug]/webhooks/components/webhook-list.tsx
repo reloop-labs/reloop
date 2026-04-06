@@ -3,10 +3,9 @@ import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Select from "@reloop/ui/select";
-import { useQueryState } from "nuqs";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import useSWR from "swr";
-import { CreateWebhookModal } from "./create-webhook-modal";
 
 import { WebhookTable } from "./webhook-table";
 
@@ -32,7 +31,7 @@ export const WebhookListSidebar = () => {
 	const { activeOrganization } = useUserOrganization();
 	const [statusFilter, setStatusFilter] = useState<string>("all");
 	const [searchQuery, setSearchQuery] = useState<string>("");
-	const [modal, setModal] = useQueryState("modal");
+	const router = useRouter();
 
 	const { data, error, isLoading } = useSWR<WebhookListResponse>(
 		activeOrganization?.id
@@ -110,16 +109,14 @@ export const WebhookListSidebar = () => {
 								activeOrganizationSlug={activeOrganization?.slug || ""}
 								isLoading={isLoading}
 								loadingRows={4}
-								onAddWebhook={() => setModal("create-webhook")}
+								onAddWebhook={() =>
+									router.push(`/${activeOrganization?.slug}/webhooks/create`)
+								}
 							/>
 						</div>
 					</div>
 				)}
 			</div>
-			<CreateWebhookModal
-				isOpen={modal === "create-webhook"}
-				onClose={() => setModal(null)}
-			/>
 		</div>
 	);
 };
