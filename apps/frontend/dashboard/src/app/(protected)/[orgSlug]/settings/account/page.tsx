@@ -370,8 +370,8 @@ const AccountPage = () => {
 									Delete workspace
 								</p>
 								<p className="text-paragraph-xs text-text-sub-600">
-									Delete your workspace and all of its data. This action is
-									irreversible.
+									Perminently delete your account and all it's associated data.
+									This cannot be undone.
 								</p>
 							</div>
 							<Button.Root variant="error" size="xsmall">
