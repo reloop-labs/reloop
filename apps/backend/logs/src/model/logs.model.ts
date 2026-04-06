@@ -14,6 +14,23 @@ export namespace LogsModel {
 		},
 	);
 
+	export const logSource = t.Union(
+		[
+			t.Literal("email"),
+			t.Literal("auth"),
+			t.Literal("domain"),
+			t.Literal("api_key"),
+			t.Literal("webhook"),
+			t.Literal("contact"),
+			t.Literal("template"),
+			t.Literal("settings"),
+			t.Literal("manual"),
+		],
+		{
+			description: "Source service or category that generated this log",
+		},
+	);
+
 	export const structuredValue = t.Any({
 		description: "Any valid JSON-compatible structured value",
 	});
@@ -24,11 +41,13 @@ export namespace LogsModel {
 			description: "Event or log name (e.g., 'user_signed_up', 'email_sent')",
 		}),
 		level: t.String(logLevel),
-		trace_id: t.String({ description: "Distributed trace identifier", }),
+		source: t.Optional(logSource),
+		trace_id: t.String({ description: "Distributed trace identifier" }),
 		metadata:
 			t.Record(t.String(), structuredValue, {
 				description: "Additional structured metadata for debugging and querying",
 			}),
+		status_code: t.Optional(t.Union([t.Number(), t.String()], { description: "HTTP status code if applicable" })),
 		requestDetails:
 			t.Record(t.String(), structuredValue, {
 				description: "Additional structured metadata for debugging and querying",
@@ -44,10 +63,12 @@ export namespace LogsModel {
 		uuid: t.String({ description: "Unique log identifier" }),
 		event: t.String({ description: "Event or log name" }),
 		level: t.String({ description: "Stored log level" }),
+		source: t.Union([t.String(), t.Null()], { description: "Source service or category" }),
 		trace_id: t.Union([t.String(), t.Null()]),
 		metadata: t.Any(),
+		status_code: t.Union([t.Number(), t.Null()], { description: "HTTP status code" }),
 		created_at: t.String({ format: "date-time" }),
-		requestDetails: t.Any()
+		requestDetails: t.Any(),
 	});
 
 	export type LogEntryResponse = typeof logEntryResponse.static;
@@ -56,8 +77,10 @@ export namespace LogsModel {
 		uuid: t.String({ description: "Unique event identifier" }),
 		event: t.String({ description: "Event name" }),
 		level: t.String({ description: "Stored log level" }),
+		source: t.Union([t.String(), t.Null()], { description: "Source service or category" }),
 		trace_id: t.String({ description: "Distributed trace identifier" }),
 		metadata: t.Any({ description: "Additional structured metadata" }),
+		status_code: t.Union([t.Number(), t.Null()], { description: "HTTP status code" }),
 		created_at: t.String({ format: "date-time" }),
 		requestDetails: t.Any(),
 	});
@@ -69,8 +92,13 @@ export namespace LogsModel {
 
 	export const listLogsQuery = t.Object({
 		level: t.Optional(logLevel),
-		event: t.Optional(t.String()),
+		source: t.Optional(logSource),
+		event: t.Optional(t.String({ description: "Filter by event name (partial match)" })),
+		status_code: t.Optional(t.String({ description: "Filter by status code (number or 'success', 'error')" })),
+		search: t.Optional(t.String({ description: "Search across event name and metadata" })),
 		organization_id: t.Optional(t.String()),
+		start_date: t.Optional(t.String({ format: "date-time", description: "Filter logs from this date (ISO 8601)" })),
+		end_date: t.Optional(t.String({ format: "date-time", description: "Filter logs until this date (ISO 8601)" })),
 		limit: t.Optional(
 			t.Numeric({
 				minimum: 1,
@@ -97,9 +125,20 @@ export namespace LogsModel {
 
 	export type GetLogParams = typeof getLogParams.static;
 
+	export const levelStats = t.Object({
+		debug: t.Number(),
+		info: t.Number(),
+		warn: t.Number(),
+		error: t.Number(),
+		fatal: t.Number(),
+	});
+
+	export type LevelStats = typeof levelStats.static;
+
 	export const listLogsResponse = t.Object({
 		logs: t.Array(logEntryResponse),
 		count: t.Number(),
+		stats: t.Optional(levelStats),
 	});
 
 	export type ListLogsResponse = typeof listLogsResponse.static;

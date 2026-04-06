@@ -42,10 +42,12 @@ export async function createLog(body: {
       body: JSON.stringify({
         event,
         level,
+        source: "domain",
         trace_id:
           trace_id ||
           (typeof crypto !== "undefined" ? crypto.randomUUID() : undefined),
         metadata,
+        status_code: requestDetails.statusCode,
         requestDetails,
       }),
     });

@@ -22,11 +22,13 @@ export async function getLogController(
 					id,
 					event,
 					level,
+					source,
 					trace_id,
 					user_id,
 					organization_id,
 					metadata,
 					request_details,
+					status_code,
 					toString(created_at) AS created_at
 				FROM logs
 				WHERE id = '${escapeString(logId)}'
@@ -48,10 +50,12 @@ export async function getLogController(
 			uuid: row.id,
 			event: row.event,
 			level: row.level,
+			source: row.source,
 			trace_id: row.trace_id,
 			metadata: safeJsonParse(row.metadata, {}),
 			created_at: formatClickHouseDate(row.created_at),
 			requestDetails: safeJsonParse(row.request_details, {}),
+			status_code: row.status_code || null,
 		};
 	} catch (error) {
 		if (error && typeof error === "object" && "status" in error) {

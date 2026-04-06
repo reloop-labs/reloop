@@ -6,8 +6,10 @@ import { status } from "elysia";
 export async function createLogController({
 	event,
 	level,
+	source,
 	trace_id,
 	metadata,
+	status_code,
 	userId,
 	activeOrganizationId,
 	requestDetails,
@@ -23,10 +25,12 @@ export async function createLogController({
 			id,
 			event,
 			level: level || "info",
+			source: source || null,
 			trace_id,
 			user_id: userId,
 			organization_id: activeOrganizationId,
 			metadata: JSON.stringify(metadata || {}),
+			status_code: status_code ?? null,
 			created_at: toClickHouseDate(occurredAt),
 			request_details: JSON.stringify(requestDetails || {}),
 		};
@@ -39,8 +43,10 @@ export async function createLogController({
 			uuid: entry.id,
 			event: entry.event,
 			level: entry.level as string,
+			source: entry.source,
 			trace_id: entry.trace_id,
 			metadata: metadata || {},
+			status_code: entry.status_code,
 			created_at: occurredAt,
 			requestDetails: requestDetails || {},
 		};
@@ -50,3 +56,4 @@ export async function createLogController({
 		});
 	}
 }
+

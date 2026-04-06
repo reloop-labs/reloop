@@ -8,11 +8,13 @@ export type StoredLogEntry = {
 	id: string;
 	event: string;
 	level: string;
+	source: string | null;
 	trace_id: string | null;
 	user_id: string | null;
 	organization_id: string | null;
 	metadata: string;
 	request_details: string;
+	status_code: number | null;
 	created_at: string;
 };
 
@@ -59,11 +61,13 @@ export async function ensureTableExists(): Promise<void> {
 		{ name: "id", type: "String" },
 		{ name: "event", type: "String" },
 		{ name: "level", type: "LowCardinality(String)" },
+		{ name: "source", type: "LowCardinality(Nullable(String))" },
 		{ name: "trace_id", type: "Nullable(String)" },
 		{ name: "user_id", type: "Nullable(String)" },
 		{ name: "organization_id", type: "Nullable(String)" },
 		{ name: "metadata", type: "String" },
 		{ name: "request_details", type: "String" },
+		{ name: "status_code", type: "Nullable(Int32)" },
 		{ name: "created_at", type: "DateTime64(3)" },
 	];
 
@@ -116,11 +120,13 @@ export async function ensureTableExists(): Promise<void> {
 					id String,
 					event String,
 					level LowCardinality(String),
+					source LowCardinality(Nullable(String)),
 					trace_id Nullable(String),
 					user_id Nullable(String),
 					organization_id Nullable(String),
 					metadata String,
 					request_details String,
+					status_code Nullable(Int32),
 					created_at DateTime64(3)
 				)
 				ENGINE = MergeTree()

@@ -7,14 +7,18 @@ import { LogDetail } from "../components/log-detail";
 
 interface LogData {
 	uuid: string;
-	service: string;
 	event: string;
 	level: string;
-	message: string | null;
-	occurred_at: string;
-	properties: Record<string, unknown>;
+	source: string | null;
+	created_at: string;
 	metadata: Record<string, unknown>;
-	request_id: string | null;
+	requestDetails: {
+		endpoint?: string;
+		method?: string;
+		userAgent?: string;
+		ipAddress?: string;
+		[key: string]: unknown;
+	};
 	trace_id: string | null;
 }
 
