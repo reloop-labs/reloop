@@ -90,8 +90,12 @@ function DrawerHeader({
 
 			{showCloseButton && (
 				<DrawerClose asChild>
-					<CompactButton.Root variant="ghost" size="large">
-						<CompactButton.Icon as={() => <Icon name="close" />} />
+					<CompactButton.Root variant="stroke" size="large">
+						<CompactButton.Icon
+							as={() => (
+								<Icon name="cross" className="h-4 w-4 cursor-pointer" />
+							)}
+						/>
 					</CompactButton.Root>
 				</DrawerClose>
 			)}
