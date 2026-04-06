@@ -53,6 +53,17 @@ export const SidebarLayoutIcon = ({
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
 		>
+			{/* Container wrapper */}
+			<rect
+				x="0.5"
+				y="0.5"
+				width="119"
+				height="79"
+				rx="7.5"
+				fill={currentColors.container}
+				stroke={currentColors.containerStroke}
+			/>
+
 			{/* Sidebar */}
 			<rect
 				x="8"

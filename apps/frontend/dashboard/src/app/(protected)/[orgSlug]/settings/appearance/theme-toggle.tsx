@@ -44,7 +44,7 @@ export function ThemeToggleAppearance() {
 							: "border-stroke-soft-100 hover:border-stroke-soft-200 dark:border-stroke-soft-100/50 dark:hover:border-stroke-soft-100",
 					)}
 				>
-					<div className="flex w-full flex-1 items-end justify-center bg-bg-soft-200/30 px-4 pt-5 pb-1.5">
+					<div className="flex w-full flex-1 items-end justify-center bg-bg-soft-200/30 px-4 pt-5 pb-5">
 						<div className="flex w-full justify-center opacity-90 transition-opacity group-hover:opacity-100 [&>svg]:h-auto [&>svg]:w-full [&>svg]:max-w-[90px]">
 							{option.layoutIcon}
 						</div>
