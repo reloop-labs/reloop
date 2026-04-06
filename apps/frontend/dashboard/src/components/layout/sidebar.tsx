@@ -1,10 +1,11 @@
 "use client";
 
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
+import { useUIStore } from "@fe/dashboard/store/use-ui-store";
 import { authClient } from "@reloop/auth/client";
 import { cn } from "@reloop/ui/cn";
-import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useState } from "react";
+import { motion } from "motion/react";
+import { useEffect } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import useSWR from "swr";
 import { OrganizationSwitcher } from "../organization/organization-switcher";
@@ -17,7 +18,8 @@ interface MainSidebarProps {
 
 export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
 	const { user, activeOrganization, push } = useUserOrganization();
-	const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
+	const { isSidebarCollapsed, setIsSidebarCollapsed, toggleSidebarCollapse } =
+		useUIStore();
 	const { refetch } = authClient.useSession();
 
 	useEffect(() => {
@@ -27,17 +29,7 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
 				setIsSidebarCollapsed(saved === "true");
 			}
 		} catch {}
-	}, []);
-
-	const toggleSidebarCollapse = () => {
-		setIsSidebarCollapsed((prev) => {
-			const next = !prev;
-			try {
-				localStorage.setItem("isSidebarCollapsed", String(next));
-			} catch {}
-			return next;
-		});
-	};
+	}, [setIsSidebarCollapsed]);
 
 	useHotkeys("meta+b", (e) => {
 		e.preventDefault();

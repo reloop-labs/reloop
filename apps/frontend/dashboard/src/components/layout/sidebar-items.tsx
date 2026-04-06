@@ -49,18 +49,27 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 						onPointerEnter={() => setHoverIdx(index)}
 						onPointerLeave={() => setHoverIdx(undefined)}
 						className={cn(
-							"flex h-9 items-center gap-2 rounded-lg px-2 text-left transition-colors",
+							"flex h-8 items-center gap-2 rounded-lg px-2 text-left transition-colors",
 							isCollapsed ? "justify-center" : "justify-start",
 							!currentRect && currentIdx === index && "bg-neutral-alpha-10",
 							"hover:bg-neutral-alpha-5",
 						)}
 						title={isCollapsed ? label : undefined}
 					>
-						<Icon name={iconName} className="h-[17px] w-[17px] shrink-0" />
+						<Icon
+							name={iconName}
+							className={cn(
+								"h-3.5 w-3.5 shrink-0",
+								activeIndex !== index ? "text-text-sub-600 opacity-90" : "",
+							)}
+						/>
 						<AnimatePresence mode="wait">
 							{!isCollapsed && (
 								<motion.span
-									className="text-sm"
+									className={cn(
+										"font-medium text-sm",
+										activeIndex !== index && "text-text-sub-600",
+									)}
 									initial={{ opacity: 0, x: -10 }}
 									animate={{ opacity: 1, x: 0 }}
 									exit={{ opacity: 0, x: -10 }}
