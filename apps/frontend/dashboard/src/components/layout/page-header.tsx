@@ -1,13 +1,13 @@
 "use client";
 
+import { FeedbackPopover } from "@fe/dashboard/components/feedback-popover";
 import { mainNavigation, userNavigation } from "@fe/dashboard/constants";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
-import type { ReactNode } from "react";
 
-export const PageHeader = ({ children }: { children?: ReactNode }) => {
+export const PageHeader = () => {
 	const { orgSlug } = useParams();
 	const pathname = usePathname();
 
@@ -40,7 +40,9 @@ export const PageHeader = ({ children }: { children?: ReactNode }) => {
 					/>
 					<span className="font-medium text-sm">{activeItem.label}</span>
 				</Link>
-				<div className="flex items-center justify-end">{children}</div>
+				<div className="flex items-center justify-end">
+					<FeedbackPopover />
+				</div>
 			</div>
 		</div>
 	);

@@ -84,7 +84,7 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 				: "Add Contact";
 
 	return (
-		<div>
+		<>
 			<div className="mx-auto max-w-3xl sm:px-8">
 				{/* Unified Header */}
 				{!isDetailPage && (
@@ -143,7 +143,7 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 
 			{/* Global Contacts Modals */}
 			<ContactsModals topicId={topicId || undefined} />
-		</div>
+		</>
 	);
 };
 

@@ -21,7 +21,7 @@ const LogsLayout = ({ children }: { children: React.ReactNode }) => {
 	const { title, showBack } = getHeaderConfig();
 
 	return (
-		<div>
+		<>
 			<div className="mx-auto max-w-3xl sm:px-8">
 				<div className="flex items-center justify-between pt-10 pb-6">
 					<div className="flex flex-col gap-1">
@@ -53,7 +53,7 @@ const LogsLayout = ({ children }: { children: React.ReactNode }) => {
 			</div>
 
 			<LogsModals />
-		</div>
+		</>
 	);
 };
 
