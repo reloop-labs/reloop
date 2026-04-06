@@ -5,8 +5,8 @@ import * as Checkbox from "@reloop/ui/checkbox";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { WEBHOOK_EVENTS } from "@reloop/webhook-events";
-import { memo, useCallback } from "react";
 import { AnimatePresence, LayoutGroup, motion } from "motion/react";
+import { memo, useCallback } from "react";
 
 interface WebhookEventInlineSelectorProps {
 	value: string[];
@@ -179,12 +179,28 @@ export const WebhookEventInlineSelector = ({
 					)}
 				</AnimatePresence>
 
-				{error && (
-					<div className="flex items-center gap-2">
-						<Icon name="alert-circle" className="h-4 w-4 text-red-500" />
-						<p className="text-red-600 text-xs">{error}</p>
-					</div>
-				)}
+				<AnimatePresence initial={false}>
+					{error && (
+						<motion.div
+							key="error"
+							initial={{ opacity: 0, height: 0 }}
+							animate={{ opacity: 1, height: "auto" }}
+							exit={{ opacity: 0, height: 0 }}
+							transition={{
+								type: "spring",
+								stiffness: 500,
+								damping: 30,
+								mass: 0.5,
+							}}
+							className="overflow-hidden"
+						>
+							<div className="flex items-center gap-2">
+								<Icon name="alert-circle" className="h-4 w-4 text-red-500" />
+								<p className="text-red-600 text-xs">{error}</p>
+							</div>
+						</motion.div>
+					)}
+				</AnimatePresence>
 			</div>
 		</LayoutGroup>
 	);

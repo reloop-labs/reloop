@@ -1,6 +1,7 @@
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
+import { motion } from "motion/react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
@@ -15,7 +16,16 @@ export function CreateWebhookActions({ isLoading }: CreateWebhookActionsProps) {
 	const { orgSlug } = useParams();
 
 	return (
-		<div className="flex items-center gap-3 lg:col-span-12">
+		<motion.div
+			className="flex items-center gap-3 lg:col-span-12"
+			layout
+			transition={{
+				type: "spring",
+				stiffness: 500,
+				damping: 30,
+				mass: 0.5,
+			}}
+		>
 			<Button.Root
 				type="submit"
 				variant="neutral"
@@ -52,6 +62,6 @@ export function CreateWebhookActions({ isLoading }: CreateWebhookActionsProps) {
 			>
 				<Link href={`/${orgSlug}/webhooks`}>Cancel</Link>
 			</Button.Root>
-		</div>
+		</motion.div>
 	);
 }
