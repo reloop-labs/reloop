@@ -14,7 +14,11 @@ interface StatusFilterDropdownProps {
 	onChange: (value: StatusFilterOption | null) => void;
 }
 
-const statusOptions: { id: StatusFilterOption; label: string; colorClass?: string }[] = [
+const statusOptions: {
+	id: StatusFilterOption;
+	label: string;
+	colorClass?: string;
+}[] = [
 	{ id: "successes", label: "Successes", colorClass: "bg-success-base" },
 	{ id: "errors", label: "Errors", colorClass: "bg-error-base" },
 	{ id: "200", label: "200 - Ok", colorClass: "bg-success-base" },
@@ -23,9 +27,17 @@ const statusOptions: { id: StatusFilterOption; label: string; colorClass?: strin
 	{ id: "401", label: "401 - Unauthorized", colorClass: "bg-error-base" },
 	{ id: "403", label: "403 - Forbidden", colorClass: "bg-error-base" },
 	{ id: "404", label: "404 - Not Found", colorClass: "bg-error-base" },
-	{ id: "422", label: "422 - Unprocessable Content", colorClass: "bg-error-base" },
+	{
+		id: "422",
+		label: "422 - Unprocessable Content",
+		colorClass: "bg-error-base",
+	},
 	{ id: "429", label: "429 - Too Many Requests", colorClass: "bg-error-base" },
-	{ id: "500", label: "500 - Internal Server Error", colorClass: "bg-error-base" },
+	{
+		id: "500",
+		label: "500 - Internal Server Error",
+		colorClass: "bg-error-base",
+	},
 ];
 
 export const StatusFilterDropdown = ({
@@ -51,7 +63,10 @@ export const StatusFilterDropdown = ({
 		setIsOpen(false);
 	};
 
-	const displayLabel = value === null ? "All Statuses" : statusOptions.find(o => o.id === value)?.label || "Status";
+	const displayLabel =
+		value === null
+			? "Status"
+			: statusOptions.find((o) => o.id === value)?.label || "Status";
 
 	return (
 		<Dropdown.Root open={isOpen} onOpenChange={setIsOpen}>
@@ -79,14 +94,14 @@ export const StatusFilterDropdown = ({
 						Filter by status
 					</span>
 					{hasActiveFilter && (
-					    <button
-						    type="button"
-						    onClick={handleReset}
-						    className="rounded-lg border border-stroke-soft-200 px-2 py-1 text-xs text-text-sub-600 transition-colors hover:bg-bg-weak-50"
-					    >
-						    Reset filter
-					    </button>
-                    )}
+						<button
+							type="button"
+							onClick={handleReset}
+							className="rounded-lg border border-stroke-soft-200 px-2 py-1 text-xs text-text-sub-600 transition-colors hover:bg-bg-weak-50"
+						>
+							Reset filter
+						</button>
+					)}
 				</div>
 
 				<div className="relative mt-2">
@@ -105,15 +120,15 @@ export const StatusFilterDropdown = ({
 							!currentRect && hoverIdx === 0 && "bg-neutral-alpha-10",
 						)}
 					>
-                        <div className="flex items-center gap-3">
-                            <div className="flex h-3.5 w-3.5 items-center justify-center">
-                                <div className="h-2 w-2 rounded-full border-2 border-text-strong-950" />
-                            </div>
-                            <span className={cn(!value && "font-medium")}>All Statuses</span>
-                        </div>
-                        {!value && (
-                            <Icon name="check" className="h-4 w-4 text-text-strong-950" />
-                        )}
+						<div className="flex items-center gap-3">
+							<div className="flex h-3.5 w-3.5 items-center justify-center">
+								<div className="h-2 w-2 rounded-full border-2 border-text-strong-950" />
+							</div>
+							<span className={cn(!value && "font-medium")}>All Statuses</span>
+						</div>
+						{!value && (
+							<Icon name="check" className="h-4 w-4 text-text-strong-950" />
+						)}
 					</button>
 
 					{/* Divider between All and Groups */}
@@ -139,11 +154,17 @@ export const StatusFilterDropdown = ({
 								)}
 							>
 								<div className="flex items-center gap-3">
-                                    <div className="flex h-3.5 w-3.5 items-center justify-center">
-                                        <div className={cn("h-2 w-2 rounded-full", option.colorClass)} />
-                                    </div>
-                                    <span className={cn(isChecked && "font-medium text-primary-base")}>{option.label}</span>
-                                </div>
+									<div className="flex h-3.5 w-3.5 items-center justify-center">
+										<div
+											className={cn("h-2 w-2 rounded-full", option.colorClass)}
+										/>
+									</div>
+									<span
+										className={cn(isChecked && "font-medium text-primary-base")}
+									>
+										{option.label}
+									</span>
+								</div>
 								{isChecked && (
 									<Icon name="check" className="h-4 w-4 text-primary-base" />
 								)}
@@ -155,39 +176,50 @@ export const StatusFilterDropdown = ({
 					<div className="my-1 border-t border-stroke-soft-200" />
 
 					{/* Specific Statuses */}
-                    <div className="max-h-[240px] overflow-y-auto pr-1">
-                        {statusOptions.slice(2).map((option, idx) => {
-                            const isChecked = value === option.id;
-                            const index = idx + 3; // offset by 3 ("All Statuses" + 2 groups)
-                            return (
-                                <button
-                                    key={option.id}
-                                    ref={(el) => {
-                                        if (el) buttonRefs.current[index] = el;
-                                    }}
-                                    type="button"
-                                    onPointerEnter={() => setHoverIdx(index)}
-                                    onPointerLeave={() => setHoverIdx(undefined)}
-                                    onClick={() => handleToggle(option.id)}
-                                    className={cn(
-                                        "flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg px-2 py-2 text-sm transition-colors",
-                                        "text-text-strong-950",
-                                        !currentRect && hoverIdx === index && "bg-neutral-alpha-10",
-                                    )}
-                                >
-                                    <div className="flex items-center gap-3">
-                                        <div className="flex h-3.5 w-3.5 items-center justify-center">
-                                            <div className={cn("h-2 w-2 rounded-full", option.colorClass)} />
-                                        </div>
-                                        <span className={cn(isChecked && "font-medium text-primary-base")}>{option.label}</span>
-                                    </div>
-                                    {isChecked && (
-                                        <Icon name="check" className="h-4 w-4 text-primary-base" />
-                                    )}
-                                </button>
-                            );
-                        })}
-                    </div>
+					<div className="max-h-[240px] overflow-y-auto pr-1">
+						{statusOptions.slice(2).map((option, idx) => {
+							const isChecked = value === option.id;
+							const index = idx + 3; // offset by 3 ("All Statuses" + 2 groups)
+							return (
+								<button
+									key={option.id}
+									ref={(el) => {
+										if (el) buttonRefs.current[index] = el;
+									}}
+									type="button"
+									onPointerEnter={() => setHoverIdx(index)}
+									onPointerLeave={() => setHoverIdx(undefined)}
+									onClick={() => handleToggle(option.id)}
+									className={cn(
+										"flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg px-2 py-2 text-sm transition-colors",
+										"text-text-strong-950",
+										!currentRect && hoverIdx === index && "bg-neutral-alpha-10",
+									)}
+								>
+									<div className="flex items-center gap-3">
+										<div className="flex h-3.5 w-3.5 items-center justify-center">
+											<div
+												className={cn(
+													"h-2 w-2 rounded-full",
+													option.colorClass,
+												)}
+											/>
+										</div>
+										<span
+											className={cn(
+												isChecked && "font-medium text-primary-base",
+											)}
+										>
+											{option.label}
+										</span>
+									</div>
+									{isChecked && (
+										<Icon name="check" className="h-4 w-4 text-primary-base" />
+									)}
+								</button>
+							);
+						})}
+					</div>
 
 					<AnimatedHoverBackground rect={currentRect} tabElement={currentTab} />
 				</div>

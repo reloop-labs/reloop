@@ -54,7 +54,7 @@ export const LogFilterDropdown = ({
 			<Dropdown.Trigger asChild>
 				<Button.Root variant="neutral" mode="stroke" size="xsmall">
 					<Icon name="filter" className="h-4 w-4" />
-					<span>Filter</span>
+					<span>Level</span>
 					{hasActiveFilter && (
 						<span className="-top-1.5 -right-1 absolute flex h-4 w-4 items-center justify-center rounded-full bg-neutral-900 text-[10px] text-white">
 							{activeFilterCount}
@@ -66,7 +66,7 @@ export const LogFilterDropdown = ({
 				{/* Header */}
 				<div className="flex items-center justify-between border-stroke-soft-200 border-b px-1 pb-2">
 					<span className="font-medium text-text-sub-600 text-xs">
-						Filter by
+						Filter by level
 					</span>
 					<button
 						type="button"

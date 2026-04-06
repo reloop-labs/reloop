@@ -6,15 +6,14 @@ import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import { parseAsInteger, useQueryState } from "nuqs";
+import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
 import useSWR from "swr";
+import { DateRangeFilter } from "./date-range-filter";
 import { LogDrawer } from "./log-drawer";
+import { LogFilterDropdown, type LogFilters } from "./log-filter-dropdown";
+import { StatusFilterDropdown } from "./status-filter-dropdown";
 import { LogTable } from "./log-table";
-import {
-	UnifiedLogFilterDropdown,
-	type UnifiedLogFilters,
-} from "./unified-log-filter";
 
 interface LogData {
 	uuid: string;
@@ -72,6 +71,7 @@ const SummaryCard = ({
 export const LogList = () => {
 	const { activeOrganization } = useUserOrganization();
 	const [searchQuery, setSearchQuery] = useState<string>("");
+	const [filters, setFilters] = useState<LogFilters>([]);
 	const [currentPage, setCurrentPage] = useQueryState(
 		"page",
 		parseAsInteger.withDefault(1),
@@ -80,24 +80,33 @@ export const LogList = () => {
 		"limit",
 		parseAsInteger.withDefault(10),
 	);
-	const [filters, setFilters] = useState<UnifiedLogFilters>({
-		levels: [],
-		status: null,
-		startDate: null,
-		endDate: null,
-		datePreset: null,
-	});
+	const [startDate, setStartDate] = useQueryState(
+		"start_date",
+		parseAsString.withDefault(""),
+	);
+	const [endDate, setEndDate] = useQueryState(
+		"end_date",
+		parseAsString.withDefault(""),
+	);
+	const [datePreset, setDatePreset] = useQueryState(
+		"preset",
+		parseAsString.withDefault(""),
+	);
+	const [statusCode, setStatusCode] = useQueryState(
+		"status_code",
+		parseAsString.withDefault(""),
+	);
 
 	// Drawer state
 	const [drawerLogId, setDrawerLogId] = useState<string | null>(null);
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-	// Convert filters to API params
+	// Convert filters array to level filter string for API
 	const levelFilter = useMemo(() => {
-		if (filters.levels.length === 0 || filters.levels.length === 5) return "";
-		if (filters.levels.length === 1) return filters.levels[0];
+		if (filters.length === 0 || filters.length === 5) return "";
+		if (filters.length === 1) return filters[0];
 		return "";
-	}, [filters.levels]);
+	}, [filters]);
 
 	// Build API URL with all filters
 	const buildApiUrl = () => {
@@ -109,9 +118,9 @@ export const LogList = () => {
 
 		if (searchQuery) params.set("event", searchQuery);
 		if (levelFilter) params.set("level", levelFilter);
-		if (filters.startDate) params.set("start_date", filters.startDate);
-		if (filters.endDate) params.set("end_date", filters.endDate);
-		if (filters.status) params.set("status_code", filters.status);
+		if (startDate) params.set("start_date", startDate);
+		if (endDate) params.set("end_date", endDate);
+		if (statusCode) params.set("status_code", statusCode);
 
 		return `/api/logs/v1/list?${params.toString()}`;
 	};
@@ -126,8 +135,14 @@ export const LogList = () => {
 	const startIndex = (currentPage - 1) * pageSize + 1;
 	const endIndex = Math.min(currentPage * pageSize, totalLogs);
 
-	const handleFilterChange = (newFilters: UnifiedLogFilters) => {
-		setFilters(newFilters);
+	const handleDateChange = (
+		newStartDate: string | null,
+		newEndDate: string | null,
+		preset: string | null,
+	) => {
+		setStartDate(newStartDate || "");
+		setEndDate(newEndDate || "");
+		setDatePreset(preset || "");
 		setCurrentPage(1);
 	};
 
@@ -212,10 +227,22 @@ export const LogList = () => {
 					</Input.Root>
 				</div>
 
-				<UnifiedLogFilterDropdown
-					value={filters}
-					onChange={handleFilterChange}
+				<DateRangeFilter
+					startDate={startDate || null}
+					endDate={endDate || null}
+					activePreset={datePreset || null}
+					onDateChange={handleDateChange}
 				/>
+
+				<StatusFilterDropdown
+					value={statusCode || null}
+					onChange={(val: string | null) => {
+						setStatusCode(val || "");
+						setCurrentPage(1);
+					}}
+				/>
+
+				<LogFilterDropdown value={filters} onChange={setFilters} />
 
 				<Button.Root
 					variant="neutral"
