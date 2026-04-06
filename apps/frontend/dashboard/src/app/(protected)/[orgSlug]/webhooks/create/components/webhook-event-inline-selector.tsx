@@ -101,6 +101,10 @@ export const WebhookEventInlineSelector = ({
 		[value, onChange],
 	);
 
+	const eventsMap = new Map<string, (typeof WEBHOOK_EVENTS)[number]>(
+		WEBHOOK_EVENTS.map((e) => [e.id, e]),
+	);
+
 	return (
 		<LayoutGroup>
 			<div className="space-y-3">
@@ -120,59 +124,58 @@ export const WebhookEventInlineSelector = ({
 					{value.length > 0 && (
 						<motion.div
 							key="selected-events"
-							initial={{ opacity: 0, y: -8 }}
-							animate={{ opacity: 1, y: 0 }}
-							exit={{ opacity: 0, y: -8 }}
+							initial={{ height: 0, opacity: 0 }}
+							animate={{ height: "auto", opacity: 1 }}
+							exit={{ height: 0, opacity: 0 }}
 							transition={{
 								type: "spring",
-								stiffness: 500,
-								damping: 30,
-								mass: 0.5,
+								stiffness: 400,
+								damping: 40,
 							}}
-							className="rounded-xl border border-stroke-soft-100 bg-bg-soft-50 p-3 dark:border-stroke-soft-100/40 dark:bg-bg-soft-50/50"
+							className="overflow-hidden"
 						>
-							<div className="mb-2 flex items-center gap-1.5">
-								<Icon
-									name="check-circle"
-									className="h-3.5 w-3.5 text-green-600"
-								/>
-								<span className="font-medium text-label-xs text-text-strong-950">
-									{value.length} event{value.length > 1 ? "s" : ""} selected
-								</span>
+							<div className="rounded-xl border border-stroke-soft-100 bg-bg-soft-50 p-3 dark:border-stroke-soft-100/40 dark:bg-bg-soft-50/50">
+								<div className="mb-2 flex items-center gap-1.5">
+									<Icon
+										name="check-circle"
+										className="h-3.5 w-3.5 text-green-600"
+									/>
+									<span className="font-medium text-label-xs text-text-strong-950">
+										{value.length} event{value.length > 1 ? "s" : ""} selected
+									</span>
+								</div>
+								<div className="flex flex-wrap gap-1.5">
+									<AnimatePresence initial={false}>
+										{value.map((eventId) => {
+											const event = eventsMap.get(eventId);
+											if (!event) return null;
+											return (
+												<motion.button
+													key={event.id}
+													type="button"
+													onClick={() => handleToggle(event.id)}
+													initial={{ opacity: 0, scale: 0.8 }}
+													animate={{ opacity: 1, scale: 1 }}
+													exit={{ opacity: 0, scale: 0.8 }}
+													transition={{
+														type: "spring",
+														stiffness: 400,
+														damping: 40,
+													}}
+													className={cn(
+														"flex items-center gap-1 rounded-full px-2 py-0.5 font-medium text-[11px] text-white transition-opacity hover:opacity-80",
+														categoryBadgeColors[event.category]?.light,
+														categoryBadgeColors[event.category]?.dark,
+													)}
+												>
+													{event.name}
+													<Icon name="plus" className="h-3 w-3 rotate-45" />
+												</motion.button>
+											);
+										})}
+									</AnimatePresence>
+								</div>
 							</div>
-							<motion.div className="flex flex-wrap gap-1.5" layout>
-								<AnimatePresence mode="popLayout" initial={false}>
-									{value.map((eventId) => {
-										const event = WEBHOOK_EVENTS.find((e) => e.id === eventId);
-										if (!event) return null;
-										return (
-											<motion.button
-												key={event.id}
-												type="button"
-												onClick={() => handleToggle(event.id)}
-												layout
-												initial={{ opacity: 0, scale: 0.8, y: 4 }}
-												animate={{ opacity: 1, scale: 1, y: 0 }}
-												exit={{ opacity: 0, scale: 0.8, y: 4 }}
-												transition={{
-													type: "spring",
-													stiffness: 500,
-													damping: 35,
-													mass: 0.4,
-												}}
-												className={cn(
-													"flex items-center gap-1 rounded-full px-2 py-0.5 font-medium text-[11px] text-white transition-opacity hover:opacity-80",
-													categoryBadgeColors[event.category]?.light,
-													categoryBadgeColors[event.category]?.dark,
-												)}
-											>
-												{event.name}
-												<Icon name="plus" className="h-3 w-3 rotate-45" />
-											</motion.button>
-										);
-									})}
-								</AnimatePresence>
-							</motion.div>
 						</motion.div>
 					)}
 				</AnimatePresence>
