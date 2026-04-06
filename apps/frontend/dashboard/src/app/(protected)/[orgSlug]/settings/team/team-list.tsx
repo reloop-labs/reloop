@@ -293,24 +293,19 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
 				className={`w-full overflow-hidden rounded-xl border text-paragraph-sm ${BORDER}`}
 			>
 				<div
-					className={`grid ${GRID} items-center border-b bg-bg-weak-50 px-4 py-2.5 text-text-sub-600 ${BORDER}`}
+					className={`grid ${GRID} items-center border-b bg-bg-weak-50/50 px-4 py-2.5 text-text-sub-600 dark:bg-bg-weak-50/40 ${BORDER}`}
 				>
-					<div className="flex items-center gap-1.5">
+					<div className="flex items-center gap-1">
 						<Icon name="user" className="h-3 w-3" />
-						<span className="font-medium text-xs uppercase tracking-wide">
-							User
-						</span>
+						<span className="font-medium text-xs tracking-wide">User</span>
 					</div>
-					<div className="flex items-center gap-1.5">
+					<div className="flex items-center gap-1">
 						<Icon name="user-role" className="h-3 w-3" />
-						<span className="font-medium text-xs uppercase tracking-wide">
-							Role
-						</span>
+						<span className="font-medium text-xs tracking-wide">Role</span>
 					</div>
-					<div className="flex items-center gap-1.5">
-						<span className="font-medium text-xs uppercase tracking-wide">
-							Status
-						</span>
+					<div className="flex items-center gap-1">
+						<Icon name="activity" className="h-3 w-3" />
+						<span className="font-medium text-xs tracking-wide">Status</span>
 					</div>
 					<div />
 				</div>

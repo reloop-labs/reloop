@@ -311,7 +311,7 @@ const AccountPage = () => {
 					<div>
 						<Label.Root htmlFor="email" className="flex items-center gap-1">
 							Email Address
-							<span className="flex h-4 min-w-[20px] items-center justify-center rounded-full border border-stroke-soft-100 bg-neutral-alpha-10 px-1.5 font-medium text-[11px] text-text-sub-600 dark:border-stroke-soft-100/40">
+							<span className="flex h-4 min-w-[20px] items-center justify-center rounded-[5px] border border-stroke-soft-100 bg-neutral-alpha-10 px-1.5 font-medium text-[11px] text-text-sub-600 dark:border-stroke-soft-100/40">
 								Read only
 							</span>
 						</Label.Root>
