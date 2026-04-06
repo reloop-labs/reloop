@@ -6,7 +6,7 @@ import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { AnimatedHoverBackground } from "../animated-hover-background";
 
 interface SidebarItemsProps {
@@ -19,6 +19,7 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 	isCollapsed = false,
 }) => {
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
+	const [rect, setRect] = useState<DOMRect | undefined>(undefined);
 	const buttonRefs = useRef<HTMLAnchorElement[]>([]);
 	const pathname = usePathname();
 
@@ -30,7 +31,23 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 
 	const currentIdx = hoverIdx !== undefined ? hoverIdx : activeIndex;
 	const currentTab = buttonRefs.current[currentIdx];
-	const currentRect = currentTab?.getBoundingClientRect();
+
+	useLayoutEffect(() => {
+		const measure = () => {
+			if (currentTab) {
+				setRect(currentTab.getBoundingClientRect());
+			} else {
+				setRect(undefined);
+			}
+		};
+
+		// Delay measurement to wait for sidebar width animation (200ms)
+		const timer = setTimeout(measure, 220);
+		// Also measure immediately for hover changes
+		measure();
+
+		return () => clearTimeout(timer);
+	}, [currentTab, isCollapsed]);
 
 	return (
 		<div className="relative">
@@ -51,7 +68,7 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 						className={cn(
 							"flex h-8 items-center gap-2 rounded-lg px-2 text-left transition-colors",
 							isCollapsed ? "justify-center" : "justify-start",
-							!currentRect && currentIdx === index && "bg-neutral-alpha-10",
+							!rect && currentIdx === index && "bg-neutral-alpha-10",
 							"hover:bg-neutral-alpha-5",
 						)}
 						title={isCollapsed ? label : undefined}
@@ -83,7 +100,7 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 				);
 			})}
 
-			<AnimatedHoverBackground rect={currentRect} tabElement={currentTab} />
+			<AnimatedHoverBackground rect={rect} tabElement={currentTab} />
 		</div>
 	);
 };

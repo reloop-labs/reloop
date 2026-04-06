@@ -11,7 +11,7 @@ export const SidebarToggle = () => {
 	return (
 		<motion.div
 			className="absolute z-50 shrink-0"
-			style={{ top: "14px" }}
+			style={{ top: "12px" }}
 			animate={{ left: isSidebarCollapsed ? 67 : 250 }}
 			transition={{ duration: 0.2, ease: "easeInOut" }}
 		>
