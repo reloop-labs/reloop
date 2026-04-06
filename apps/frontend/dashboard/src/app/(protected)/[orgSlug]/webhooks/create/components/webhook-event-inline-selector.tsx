@@ -41,7 +41,7 @@ export const WebhookEventInlineSelector = ({
 
 	return (
 		<div className="space-y-3">
-			<div className="max-h-[320px] overflow-y-auto rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/40">
+			<div className="h-96 overflow-y-auto rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/40">
 				{WEBHOOK_EVENTS.map((event, i) => {
 					const isChecked = value.includes(event.id);
 					return (
@@ -54,20 +54,25 @@ export const WebhookEventInlineSelector = ({
 									"border-stroke-soft-100 border-b dark:border-stroke-soft-100/40",
 							)}
 						>
-							<div className="flex items-center gap-3">
-								<div className={cn(categoryCheckboxColors[event.category])}>
+							<div className="flex min-w-0 flex-1 items-center gap-3">
+								<div
+									className={cn(
+										"shrink-0",
+										categoryCheckboxColors[event.category],
+									)}
+								>
 									<Checkbox.Root
 										checked={isChecked}
 										onCheckedChange={() => handleToggle(event.id)}
 									/>
 								</div>
-								<span className="font-medium text-label-sm text-text-strong-950">
+								<span className="truncate font-medium text-label-sm text-text-strong-950">
 									{event.name}
 								</span>
 							</div>
 							<div
 								className={cn(
-									"rounded-full px-1.5 py-0.5 font-medium text-[10px] text-white",
+									"ml-3 shrink-0 rounded-full px-1.5 py-0.5 font-medium text-[10px] text-white",
 									categoryBadgeColors[event.category]?.light,
 									categoryBadgeColors[event.category]?.dark,
 								)}
