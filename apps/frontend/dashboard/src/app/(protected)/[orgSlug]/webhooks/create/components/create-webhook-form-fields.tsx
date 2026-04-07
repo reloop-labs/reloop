@@ -1,7 +1,7 @@
-import { AnimatePresence, motion } from "motion/react";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
+import { AnimatePresence, motion } from "motion/react";
 import type { useCreateWebhookForm } from "./use-create-webhook-form";
 import { WebhookEventInlineSelector } from "./webhook-event-inline-selector";
 
@@ -36,16 +36,18 @@ export function CreateWebhookFormFields({
 						/>
 					</Input.Wrapper>
 				</Input.Root>
-				<p className="mt-1.5 font-medium text-paragraph-xs text-text-sub-600">
-					Must be a publicly accessible HTTPS URL.
-				</p>
-				{formState.errors.url && (
-					<div className="mt-2 flex items-center gap-2">
-						<Icon name="alert-circle" className="h-4 w-4 text-red-500" />
-						<p className="text-red-600 text-xs">
+
+				{formState.errors.url ? (
+					<div className="mt-1.5 flex items-center gap-1">
+						<Icon name="alert-circle" className="h-3 w-3 text-error-base" />
+						<p className="text-error-base text-xs">
 							{formState.errors.url.message}
 						</p>
 					</div>
+				) : (
+					<p className="mt-1.5 font-medium text-paragraph-xs text-text-sub-600">
+						Must be a publicly accessible HTTPS URL.
+					</p>
 				)}
 			</div>
 
@@ -78,9 +80,12 @@ export function CreateWebhookFormFields({
 						<Label.Asterisk />
 					</Label.Root>
 					{formState.errors.events?.message && (
-						<p className="text-red-600 text-xs">
-							{formState.errors.events.message}
-						</p>
+						<div className="flex items-center gap-1">
+							<Icon name="alert-circle" className="h-3 w-3 text-error-base" />
+							<p className="text-error-base text-xs">
+								{formState.errors.events.message}
+							</p>
+						</div>
 					)}
 				</div>
 				<WebhookEventInlineSelector

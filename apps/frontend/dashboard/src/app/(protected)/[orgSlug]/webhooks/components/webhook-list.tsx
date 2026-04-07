@@ -70,11 +70,7 @@ export const WebhookListSidebar = () => {
 					</div>
 				) : isTotalEmpty ? (
 					<div className="mt-4 w-full">
-						<EmptyState
-							onCreateWebhook={() =>
-								router.push(`/${activeOrganization?.slug}/webhooks/create`)
-							}
-						/>
+						<EmptyState />
 					</div>
 				) : (
 					<div>
