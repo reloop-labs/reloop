@@ -24,7 +24,7 @@ const WebhooksLayout = ({ children }: { children: React.ReactNode }) => {
 	);
 
 	return (
-		<div className="mx-auto max-w-4xl sm:px-8">
+		<div className="mx-auto max-w-3xl sm:px-8">
 			{!isDetailPage && (
 				<div className="flex items-center justify-between pt-10 pb-6">
 					<div>
