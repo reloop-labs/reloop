@@ -47,15 +47,15 @@ export const EmptyState = () => {
 	const { activeOrganization } = useUserOrganization();
 
 	return (
-		<div className="w-full overflow-hidden rounded-2xl border border-stroke-soft-100 dark:border-stroke-soft-100/50">
-			<div className="flex flex-col items-center border-stroke-soft-100 border-b bg-bg-soft-200/25 px-6 py-12 text-center dark:border-stroke-soft-100/50 dark:bg-bg-soft-200/15">
+		<div className="w-full">
+			<div className="flex flex-col items-center border-stroke-soft-100 border-b bg-bg-soft-200/10 px-6 py-12 text-center dark:border-stroke-soft-100/50 dark:bg-bg-soft-200/15">
 				<div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
 					<Icon name="webhook" className="h-5 w-5 text-text-sub-600" />
 				</div>
 				<h3 className="mb-2 font-semibold text-text-strong-950 text-xl">
 					No webhooks yet
 				</h3>
-				<p className="mx-auto mb-6 max-w-[520px] text-balance text-sm text-text-sub-600">
+				<p className="mx-auto mb-6 max-w-[520px] text-balance font-medium text-[12px] text-text-sub-600">
 					Connect your app to real-time events. When something happens in your
 					account, we'll instantly POST a signed payload to your URL.
 				</p>
@@ -118,7 +118,7 @@ export const EmptyState = () => {
 									<h5 className="font-medium text-sm text-text-strong-950">
 										{step.title}
 									</h5>
-									<p className="mt-0.5 text-balance text-sm text-text-sub-600">
+									<p className="mt-0.5 text-balance font-medium text-[12px] text-text-sub-600">
 										{step.description}
 									</p>
 								</div>
@@ -138,7 +138,7 @@ export const EmptyState = () => {
 								className={cn(
 									"flex gap-4",
 									i < features.length - 1 &&
-										"mb-5 border-stroke-soft-100 border-b pb-5 dark:border-stroke-soft-100/50",
+										"mb-3 border-stroke-soft-100 border-b pb-3 dark:border-stroke-soft-100/50",
 								)}
 							>
 								<div className="mt-0.5 shrink-0">
@@ -151,7 +151,7 @@ export const EmptyState = () => {
 									<h5 className="font-medium text-sm text-text-strong-950">
 										{feature.title}
 									</h5>
-									<p className="mt-0.5 text-balance text-sm text-text-sub-600">
+									<p className="mt-0.5 text-balance font-medium text-[12px] text-text-sub-600">
 										{feature.description}
 									</p>
 								</div>

@@ -29,20 +29,27 @@ interface WebhookTableProps {
 	isTotalEmpty?: boolean;
 }
 
-const getStatusColor = (status: string) => {
+const getStatusBadgeColor = () => {
+	return "text-text-sub-600 border-stroke-soft-200 bg-neutral-alpha-10";
+};
+
+const getStatusIconColor = (status: string) => {
 	switch (status) {
 		case "active":
-			return "text-success-base";
+			return "bg-success-base";
 		case "paused":
-			return "text-warning-base";
+			return "bg-warning-base";
 		case "disabled":
-			return "text-warning-base";
+			return "bg-warning-base";
 		case "failed":
-			return "text-error-base";
+			return "bg-error-base";
 		default:
-			return "text-faded-base";
+			return "bg-faded-base";
 	}
 };
+
+const GRID = "grid-cols-[2fr_1.5fr_1fr_1fr_96px]";
+const BORDER = "border-stroke-soft-100 dark:border-stroke-soft-100/50";
 
 export const WebhookTable = ({
 	webhooks,
@@ -57,23 +64,27 @@ export const WebhookTable = ({
 		push(`/webhooks/${webhookId}`);
 	};
 
-	if (isTotalEmpty) {
-		return <EmptyState />;
-	}
-
 	return (
 		<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/50">
-			<div className="grid grid-cols-[2fr_1.5fr_1fr_1fr_96px] items-center border-stroke-soft-100 border-b px-6 py-3.5 font-semibold text-[11px] text-text-sub-600 uppercase tracking-wider dark:border-stroke-soft-100/50">
-				<div>Endpoint</div>
-				<div>Events</div>
-				<div>Status</div>
-				<div>Last Triggered</div>
+			<div
+				className={`grid ${GRID} items-center border-b bg-bg-weak-50/50 px-4 py-2.5 text-text-sub-600 dark:bg-bg-weak-50/40 ${BORDER}`}
+			>
+				<div className="font-medium text-xs">Endpoint</div>
+				<div className="font-medium text-xs">Events</div>
+				<div className="font-medium text-xs">Status</div>
+				<div className="whitespace-nowrap font-medium text-xs">
+					Last Triggered
+				</div>
 				<div />
 			</div>
 
 			<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
 				{isLoading ? (
 					<WebhookTableSkeleton rows={loadingRows} />
+				) : isTotalEmpty ? (
+					<div className="w-full">
+						<EmptyState />
+					</div>
 				) : webhooks.length === 0 ? (
 					<div className="flex w-full items-center justify-center p-8 text-sm text-text-sub-600">
 						No endpoints matching your search.
@@ -83,25 +94,31 @@ export const WebhookTable = ({
 						<div
 							key={`webhook-${index}`}
 							className={cn(
-								"group/row grid w-full grid-cols-[2fr_1.5fr_1fr_1fr_96px] items-center px-6 py-4 text-left transition-colors",
-								"hover:bg-bg-weak-50/50",
+								`group/row grid w-full cursor-pointer ${GRID} items-center px-4 py-2 text-left transition-colors`,
+								"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-base focus-visible:ring-offset-1",
 							)}
 						>
 							<Link
 								href={`/${activeOrganizationSlug}/webhooks/${webhook.id}`}
 								className="contents"
 							>
-								<div className="flex flex-col pr-4">
-									<div className="truncate font-medium text-text-strong-950">
-										{webhook.name || webhook.url}
-									</div>
-									<div className="mt-0.5 truncate font-mono text-text-sub-600 text-xs">
-										{webhook.url}
+								<div className="flex items-center gap-2">
+									<Icon
+										name="link"
+										className="h-4 w-4 shrink-0 text-text-sub-600"
+									/>
+									<div className="flex min-w-0 flex-col pr-4">
+										<div className="truncate font-medium text-label-sm text-text-strong-950">
+											{webhook.name || webhook.url}
+										</div>
+										<div className="mt-0.5 truncate font-mono text-[11px] text-text-sub-600">
+											{webhook.url}
+										</div>
 									</div>
 								</div>
 
-								<div className="pr-4">
-									<div className="truncate text-sm text-text-sub-600">
+								<div className="flex items-center pr-4">
+									<div className="truncate text-label-sm text-text-sub-600">
 										{webhook.events && webhook.events.length > 0
 											? webhook.events.join(", ")
 											: "All events"}
@@ -109,19 +126,24 @@ export const WebhookTable = ({
 								</div>
 
 								<div className="flex items-center">
-									<div className="flex items-center gap-2 font-medium text-sm text-text-strong-950">
-										<div
+									<span
+										className={cn(
+											"inline-flex items-center rounded-md border-[1px] px-[6px] py-0.5 font-medium text-[10px]",
+											getStatusBadgeColor(),
+										)}
+									>
+										<span
 											className={cn(
-												"h-2 w-2 rounded-full",
-												getStatusColor(webhook.status).replace("text-", "bg-"),
+												"mr-1.5 h-2 w-2 rounded-full",
+												getStatusIconColor(webhook.status),
 											)}
 										/>
 										<span className="capitalize">{webhook.status}</span>
-									</div>
+									</span>
 								</div>
 
 								<div className="flex items-center">
-									<span className="whitespace-nowrap text-sm text-text-sub-600">
+									<span className="whitespace-nowrap text-label-sm text-text-sub-600">
 										{webhook.lastTriggeredAt
 											? formatRelativeTime(webhook.lastTriggeredAt)
 											: "Never"}
@@ -129,23 +151,20 @@ export const WebhookTable = ({
 								</div>
 							</Link>
 
-							<div className="flex items-center justify-end gap-2">
+							<div
+								className="flex items-center justify-end gap-1.5"
+								onClick={(e) => e.stopPropagation()}
+							>
 								<Button.Root
 									variant="neutral"
-									mode="stroke"
-									size="xsmall"
+									mode="ghost"
+									size="xxsmall"
 									onClick={() => handleViewDetails(webhook.id)}
-									className="flex h-8 w-10 items-center justify-center rounded-lg border-stroke-soft-100 p-0 text-text-sub-600 hover:text-text-strong-950"
 								>
-									<Icon name="eye-outline" className="h-4 w-4" />
+									<Icon name="eye-outline" className="h-3 w-3" />
 								</Button.Root>
-								<Button.Root
-									variant="neutral"
-									mode="stroke"
-									size="xsmall"
-									className="flex h-8 w-10 items-center justify-center rounded-lg border-stroke-soft-100 p-0 text-text-sub-600 hover:text-text-strong-950"
-								>
-									<Icon name="send" className="h-4 w-4" />
+								<Button.Root variant="neutral" mode="ghost" size="xxsmall">
+									<Icon name="send" className="h-3 w-3" />
 								</Button.Root>
 							</div>
 						</div>

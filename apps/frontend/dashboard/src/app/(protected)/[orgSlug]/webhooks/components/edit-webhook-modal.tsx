@@ -41,7 +41,7 @@ interface WebhookData {
 	name: string;
 	url: string;
 	status: "active" | "paused" | "disabled" | "failed";
-	events: string[];
+	events?: string[];
 }
 
 interface EditWebhookModalProps {

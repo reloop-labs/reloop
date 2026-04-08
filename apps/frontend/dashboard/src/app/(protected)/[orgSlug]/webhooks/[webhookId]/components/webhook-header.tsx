@@ -32,6 +32,7 @@ interface WebhookData {
 	consecutiveFailures: number;
 	createdAt: string;
 	updatedAt: string;
+	events?: string[];
 }
 
 interface WebhookHeaderProps {
