@@ -23,24 +23,28 @@ interface WebhookData {
 }
 
 interface DeleteWebhookModalProps {
-	webhooks: WebhookData[];
+	webhook?: WebhookData | null;
+	onSuccess?: () => void;
 }
 
-export const DeleteWebhookModal = ({ webhooks }: DeleteWebhookModalProps) => {
+export const DeleteWebhookModal = ({
+	webhook,
+	onSuccess,
+}: DeleteWebhookModalProps) => {
 	const [deleteId, setDeleteId] = useQueryState("delete");
-	const [confirmationUrl, setConfirmationUrl] = useState("");
+	const [confirmationName, setConfirmationName] = useState("");
 	const [isDeleting, setIsDeleting] = useState(false);
-	const [isUrlCopied, setIsUrlCopied] = useState(false);
 	const { activeOrganization } = useUserOrganization();
 	const { mutate } = useSWRConfig();
 
-	const webhookToDelete = webhooks.find((webhook) => webhook.id === deleteId);
+	const webhookToDelete = webhook?.id === deleteId ? webhook : null;
+	const validationPhrase = webhookToDelete?.name || webhookToDelete?.url || "";
 
 	const handleDelete = async () => {
 		if (!webhookToDelete || !activeOrganization) return;
 
-		if (confirmationUrl !== webhookToDelete.url) {
-			toast.error("Please enter the correct webhook URL to confirm deletion");
+		if (confirmationName !== validationPhrase) {
+			toast.error("Please enter the correct webhook name to confirm deletion");
 			return;
 		}
 
@@ -52,8 +56,13 @@ export const DeleteWebhookModal = ({ webhooks }: DeleteWebhookModalProps) => {
 
 			toast.success("Webhook deleted successfully");
 			setDeleteId(null);
-			setConfirmationUrl("");
-			mutate(`/api/webhook/v1/?organizationId=${activeOrganization.id}&limit=100`);
+			setConfirmationName("");
+			mutate(
+				`/api/webhook/v1/?organizationId=${activeOrganization.id}&limit=100`,
+			);
+			if (onSuccess) {
+				onSuccess();
+			}
 		} catch (error) {
 			const errorMessage = axios.isAxiosError(error)
 				? error.response?.data?.message || "Failed to delete webhook"
@@ -66,75 +75,76 @@ export const DeleteWebhookModal = ({ webhooks }: DeleteWebhookModalProps) => {
 
 	const handleCancel = () => {
 		setDeleteId(null);
-		setConfirmationUrl("");
+		setConfirmationName("");
 	};
 
 	return (
 		<Modal.Root
 			open={!!deleteId}
-			onOpenChange={(open) => !open && setDeleteId(null)}
+			onOpenChange={(open) => !open && handleCancel()}
 		>
-			<Modal.Content className="data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom-4 data-[state=open]:zoom-in-95 data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-bottom-4 data-[state=closed]:zoom-out-95 max-w-md duration-200 data-[state=closed]:animate-out data-[state=open]:animate-in">
+			<Modal.Content className="data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom-4 data-[state=open]:zoom-in-95 data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-bottom-4 data-[state=closed]:zoom-out-95 max-w-md overflow-hidden p-0 duration-200 data-[state=closed]:animate-out data-[state=open]:animate-in sm:max-w-md">
 				<form
 					onSubmit={(e) => {
 						e.preventDefault();
-						if (confirmationUrl === webhookToDelete?.url && !isDeleting) {
+						if (confirmationName === validationPhrase && !isDeleting) {
 							handleDelete();
 						}
 					}}
 				>
-					<Modal.Body>
-						<h2 className="mb-2 font-semibold text-gray-900 text-xl">
-							Delete Webhook
+					<div className="p-6">
+						{/* Header Icon */}
+						<div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-error-base/10">
+							<Icon name="trash" className="h-6 w-6 text-error-base" />
+						</div>
+
+						<h2 className="mb-2 font-medium text-text-strong-950 text-title-h5">
+							Delete webhook?
 						</h2>
-						<p className="text-gray-600 text-sm">
-							Are you sure you want to delete this webhook?
-						</p>
-						<p className="mb-4 font-medium text-red-600 text-sm">
-							This can not be undone.
+						<p className="mb-6 text-sm text-text-sub-600 leading-relaxed">
+							This will permanently delete the endpoint and all its delivery
+							history. This action cannot be undone.
 						</p>
 
-						<div className="mb-4">
-							<p className="mb-2 text-gray-700 text-sm">
-								Type URL{" "}
-								<span className="inline-flex max-w-xs items-center gap-1 truncate rounded-md bg-gray-100 px-2 py-1 font-mono text-gray-800 text-xs">
+						{/* Webhook Card */}
+						<div className="mb-6 flex items-center gap-3 rounded-lg border border-stroke-soft-200 bg-bg-weak-50/50 p-4">
+							<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-error-base/10 text-error-base">
+								<Icon name="database" className="h-5 w-5" />
+							</div>
+							<div className="min-w-0 flex-1">
+								<p className="truncate font-medium text-sm text-text-strong-950">
+									{webhookToDelete?.name || webhookToDelete?.url}
+								</p>
+								<p className="mt-0.5 truncate font-mono text-text-sub-600 text-xs">
 									{webhookToDelete?.url}
-									<button
-										type="button"
-										onClick={async () => {
-											try {
-												await navigator.clipboard.writeText(
-													webhookToDelete?.url || "",
-												);
-												setIsUrlCopied(true);
-												setTimeout(() => setIsUrlCopied(false), 2000);
-											} catch {
-												toast.error("Failed to copy webhook URL");
-											}
-										}}
-										className="ml-1 text-gray-500 hover:text-gray-700"
-									>
-										<Icon
-											name={isUrlCopied ? "check" : "copy"}
-											className={`h-3 w-3 ${isUrlCopied ? "text-green-600" : ""}`}
-										/>
-									</button>
+								</p>
+							</div>
+						</div>
+
+						{/* Confirmation Input */}
+						<div className="mb-2">
+							<p className="mb-2 text-sm text-text-sub-600">
+								Type{" "}
+								<span className="rounded bg-bg-strong-200/50 px-1.5 py-0.5 font-mono font-semibold text-text-strong-950 text-xs dark:bg-bg-strong-200">
+									{validationPhrase}
 								</span>{" "}
-								to confirm.
+								to confirm
 							</p>
 							<Input.Root size="small">
-								<Input.Wrapper size="xsmall">
+								<Input.Wrapper>
 									<Input.Input
 										type="text"
-										value={confirmationUrl}
-										onChange={(e) => setConfirmationUrl(e.target.value)}
-										placeholder="Enter webhook URL"
+										value={confirmationName}
+										onChange={(e) => setConfirmationName(e.target.value)}
+										placeholder="Type the webhook name..."
+										className="font-mono text-sm"
 									/>
 								</Input.Wrapper>
 							</Input.Root>
 						</div>
-					</Modal.Body>
-					<Modal.Footer className="flex items-center justify-end gap-3">
+					</div>
+
+					<div className="flex flex-col-reverse gap-3 px-6 pb-6 sm:flex-row sm:justify-between">
 						<Button.Root
 							type="button"
 							variant="neutral"
@@ -142,29 +152,38 @@ export const DeleteWebhookModal = ({ webhooks }: DeleteWebhookModalProps) => {
 							size="small"
 							onClick={handleCancel}
 							disabled={isDeleting}
+							className="w-full sm:w-auto"
 						>
 							Cancel
-							<Kbd.Root className="bg-bg-weak-50 text-xs">Esc</Kbd.Root>
+							<Kbd.Root className="ml-2 bg-bg-weak-50 text-xs">Esc</Kbd.Root>
 						</Button.Root>
 						<Button.Root
 							type="submit"
-							variant="error"
+							variant="neutral"
+							mode="stroke"
 							size="small"
-							disabled={confirmationUrl !== webhookToDelete?.url || isDeleting}
+							disabled={confirmationName !== validationPhrase || isDeleting}
+							className="w-full focus:ring-error-base sm:w-auto"
 						>
 							{isDeleting ? (
 								<>
-									<Icon name="loader-2" className="mr-2 h-4 w-4 animate-spin" />
+									<Icon
+										name="loader-2"
+										className="mr-2 h-4 w-4 animate-spin text-text-sub-600"
+									/>
 									Deleting...
 								</>
 							) : (
 								<>
-									Delete Webhook
-									<Icon name="undo" className="h-3 w-3 scale-y-[-1]" />
+									<Icon
+										name="trash"
+										className="mr-1.5 h-4 w-4 text-text-sub-600"
+									/>
+									Delete webhook
 								</>
 							)}
 						</Button.Root>
-					</Modal.Footer>
+					</div>
 				</form>
 			</Modal.Content>
 		</Modal.Root>

@@ -1,10 +1,9 @@
 "use client";
 
+import { useWebhooks } from "./components/use-webhooks";
 import { WebhookError } from "./components/webhook-error";
-import { WebhookMetrics } from "./components/webhook-metrics";
 import { WebhookTable } from "./components/webhook-table";
 import { WebhookToolbar } from "./components/webhook-toolbar";
-import { useWebhooks } from "./components/use-webhooks";
 
 const WebhooksPage = () => {
 	const {
@@ -14,7 +13,6 @@ const WebhooksPage = () => {
 		searchQuery,
 		setSearchQuery,
 		webhooks,
-		metrics,
 		isLoading,
 		error,
 		isTotalEmpty,
@@ -26,23 +24,13 @@ const WebhooksPage = () => {
 
 	return (
 		<div>
-			{!isTotalEmpty && (
-				<WebhookMetrics
-					totalEndpoints={metrics.totalEndpoints}
-					totalDeliveries={metrics.totalDeliveries}
-					failureRate={metrics.failureRate}
+			<div>
+				<WebhookToolbar
+					searchQuery={searchQuery}
+					onSearchChange={setSearchQuery}
+					statusFilter={statusFilter}
+					onStatusFilterChange={setStatusFilter}
 				/>
-			)}
-
-			<div className="rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/50">
-				{!isTotalEmpty && (
-					<WebhookToolbar
-						searchQuery={searchQuery}
-						onSearchChange={setSearchQuery}
-						statusFilter={statusFilter}
-						onStatusFilterChange={setStatusFilter}
-					/>
-				)}
 
 				<WebhookTable
 					webhooks={webhooks}

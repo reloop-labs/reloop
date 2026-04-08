@@ -1,7 +1,10 @@
 "use client";
 import { SomethingWentWrong } from "@fe/dashboard/components/something-went-wrong";
+import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { useParams } from "next/navigation";
+import { useQueryState } from "nuqs";
 import useSWR from "swr";
+import { DeleteWebhookModal } from "../components/delete-webhook-modal";
 import { DeliveryLogs } from "./components/delivery-logs";
 import { WebhookHeader } from "./components/webhook-header";
 
@@ -27,6 +30,8 @@ interface WebhookData {
 
 const WebhookDetailPage = () => {
 	const { webhookId } = useParams();
+	const [, setDeleteId] = useQueryState("delete");
+	const { activeOrganization, push } = useUserOrganization();
 
 	const {
 		data: webhookData,
@@ -66,10 +71,21 @@ const WebhookDetailPage = () => {
 				webhook={webhookData}
 				isLoading={isLoading}
 				isFailed={!!error}
-				onDeleteWebhook={() => {}}
+				onDeleteWebhook={() => {
+					setDeleteId(webhookData.id);
+				}}
 			/>
 
 			<DeliveryLogs webhookId={webhookData.id} />
+
+			<DeleteWebhookModal
+				webhook={webhookData}
+				onSuccess={() => {
+					if (activeOrganization?.slug) {
+						push(`/${activeOrganization.slug}/webhooks`);
+					}
+				}}
+			/>
 		</div>
 	);
 };
