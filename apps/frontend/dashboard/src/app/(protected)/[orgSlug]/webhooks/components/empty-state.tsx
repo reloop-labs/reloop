@@ -69,8 +69,17 @@ export const EmptyState = () => {
 						}
 						className="gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
 					>
-						<Icon name="plus" className="h-3.5 w-3.5" />
-						Create your first webhook
+						<Icon name="plus" className="h-4 w-4" />
+						Create Webhook
+						<span className="inline-flex items-center gap-0.5">
+							<Icon
+								name="command"
+								className="h-4 w-4 rounded-sm border border-stroke-soft-100 p-px"
+							/>
+							<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-100 p-px font-medium text-[10px] uppercase">
+								A
+							</span>
+						</span>
 					</Button.Root>
 					<Button.Root
 						variant="neutral"
