@@ -1,22 +1,29 @@
 "use client";
 
+import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
-import { usePathname } from "next/navigation";
-import { useQueryState } from "nuqs";
+import { usePathname, useRouter } from "next/navigation";
 import { useHotkeys } from "react-hotkeys-hook";
 
 const WebhooksLayout = ({ children }: { children: React.ReactNode }) => {
-	const [, setModal] = useQueryState("modal");
 	const pathname = usePathname();
+	const router = useRouter();
+	const { activeOrganization } = useUserOrganization();
 
 	const isDetailPage = pathname.match(/\/webhooks\/([^/]+)$/) !== null;
+
+	const handleCreateWebhook = () => {
+		if (activeOrganization?.slug) {
+			router.push(`/${activeOrganization.slug}/webhooks/create`);
+		}
+	};
 
 	useHotkeys(
 		"mod+a",
 		(event) => {
 			event.preventDefault();
-			setModal("create-webhook");
+			handleCreateWebhook();
 		},
 		{
 			enabled: !isDetailPage,
@@ -37,7 +44,7 @@ const WebhooksLayout = ({ children }: { children: React.ReactNode }) => {
 						<Button.Root
 							variant="neutral"
 							size="xsmall"
-							onClick={() => setModal("create-webhook")}
+							onClick={handleCreateWebhook}
 							className="gap-2"
 						>
 							<Icon name="plus" className="h-4 w-4" />
