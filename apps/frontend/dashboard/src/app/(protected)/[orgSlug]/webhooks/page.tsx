@@ -32,13 +32,15 @@ const WebhooksPage = () => {
 					onStatusFilterChange={setStatusFilter}
 				/>
 
-				<WebhookTable
-					webhooks={webhooks}
-					activeOrganizationSlug={activeOrganization?.slug || ""}
-					isLoading={isLoading}
-					loadingRows={4}
-					isTotalEmpty={isTotalEmpty}
-				/>
+				<div className="mt-4">
+					<WebhookTable
+						webhooks={webhooks}
+						activeOrganizationSlug={activeOrganization?.slug || ""}
+						isLoading={isLoading}
+						loadingRows={4}
+						isTotalEmpty={isTotalEmpty}
+					/>
+				</div>
 			</div>
 		</div>
 	);

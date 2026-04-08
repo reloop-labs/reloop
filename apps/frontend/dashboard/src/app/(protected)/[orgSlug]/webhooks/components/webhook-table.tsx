@@ -62,7 +62,7 @@ export const WebhookTable = ({
 	}
 
 	return (
-		<div className="w-full overflow-hidden text-paragraph-sm">
+		<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/50">
 			<div className="grid grid-cols-[2fr_1.5fr_1fr_1fr_96px] items-center border-stroke-soft-100 border-b px-6 py-3.5 font-semibold text-[11px] text-text-sub-600 uppercase tracking-wider dark:border-stroke-soft-100/50">
 				<div>Endpoint</div>
 				<div>Events</div>
