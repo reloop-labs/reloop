@@ -4,10 +4,18 @@ import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import * as Tooltip from "@reloop/ui/tooltip";
+import { WEBHOOK_EVENTS } from "@reloop/webhook-events";
 import Link from "next/link";
 
 import { EmptyState } from "./empty-state";
 import { WebhookTableSkeleton } from "./webhook-table-skeleton";
+
+const categoryBadgeColors: Record<string, { light: string; dark: string }> = {
+	domain: { light: "bg-[#0A438A]", dark: "dark:bg-[#1E57A8]" },
+	"api-key": { light: "bg-[#8A5A0A]", dark: "dark:bg-[#A87A1E]" },
+	contact: { light: "bg-[#0A6B3A]", dark: "dark:bg-[#1E8A4E]" },
+};
 
 interface WebhookData {
 	id: string;
@@ -118,11 +126,92 @@ export const WebhookTable = ({
 								</div>
 
 								<div className="flex items-center pr-4">
-									<div className="truncate text-label-sm text-text-sub-600">
-										{webhook.events && webhook.events.length > 0
-											? webhook.events.join(", ")
-											: "All events"}
-									</div>
+									{!webhook.events || webhook.events.length === 0 ? (
+										<span className="truncate text-label-sm text-text-sub-600">
+											All events
+										</span>
+									) : (
+										<Tooltip.Root delayDuration={0}>
+											<Tooltip.Trigger asChild>
+												<div className="flex flex-col items-start gap-1">
+													{webhook.events[0] &&
+														(() => {
+															const firstId = webhook.events![0];
+															const event = WEBHOOK_EVENTS.find(
+																(e) => e.id === firstId,
+															);
+															if (!event) return null;
+															return (
+																<div
+																	key={event.id}
+																	className={cn(
+																		"shrink-0 rounded-full px-1.5 py-0.5 font-medium text-[10px] text-white",
+																		categoryBadgeColors[event.category]?.light,
+																		categoryBadgeColors[event.category]?.dark,
+																	)}
+																>
+																	{event.name}
+																</div>
+															);
+														})()}
+													{webhook.events.length > 1 && (
+														<div className="flex items-center gap-1">
+															{(() => {
+																const secondId = webhook.events![1];
+																const event = WEBHOOK_EVENTS.find(
+																	(e) => e.id === secondId,
+																);
+																if (!event) return null;
+																return (
+																	<div
+																		key={event.id}
+																		className={cn(
+																			"shrink-0 rounded-full px-1.5 py-0.5 font-medium text-[10px] text-white",
+																			categoryBadgeColors[event.category]
+																				?.light,
+																			categoryBadgeColors[event.category]?.dark,
+																		)}
+																	>
+																		{event.name}
+																	</div>
+																);
+															})()}
+															{webhook.events.length > 2 && (
+																<span className="shrink-0 font-medium text-text-sub-600 text-xs">
+																	+{webhook.events.length - 2}
+																</span>
+															)}
+														</div>
+													)}
+												</div>
+											</Tooltip.Trigger>
+											<Tooltip.Content
+												sideOffset={4}
+												className="max-w-[280px] rounded-xl p-2"
+											>
+												<div className="flex flex-wrap gap-1">
+													{webhook.events.map((eventId) => {
+														const event = WEBHOOK_EVENTS.find(
+															(e) => e.id === eventId,
+														);
+														if (!event) return null;
+														return (
+															<div
+																key={event.id}
+																className={cn(
+																	"shrink-0 rounded-full px-1.5 py-0.5 font-medium text-[10px] text-white",
+																	categoryBadgeColors[event.category]?.light,
+																	categoryBadgeColors[event.category]?.dark,
+																)}
+															>
+																{event.name}
+															</div>
+														);
+													})}
+												</div>
+											</Tooltip.Content>
+										</Tooltip.Root>
+									)}
 								</div>
 
 								<div className="flex items-center">
