@@ -1,0 +1,140 @@
+"use client";
+import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
+import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
+import { formatRelativeTime } from "@fe/dashboard/utils/time";
+import { Icon } from "@reloop/ui/icon";
+import { Skeleton } from "@reloop/ui/skeleton";
+import { useParams } from "next/navigation";
+import useSWR from "swr";
+import { TriggerWebhookTester } from "../../components/trigger-webhook-tester";
+
+interface WebhookData {
+	id: string;
+	name: string;
+	url: string;
+	status: "active" | "paused" | "disabled" | "failed";
+	createdAt: string;
+}
+
+const getStatusIconColor = (status: string) => {
+	switch (status) {
+		case "active":
+			return "text-success-base";
+		case "paused":
+			return "text-warning-base";
+		case "failed":
+			return "text-error-base";
+		default:
+			return "text-text-sub-600";
+	}
+};
+
+const getStatusIcon = (status: string) => {
+	switch (status) {
+		case "active":
+			return "check-circle";
+		case "paused":
+			return "pause-circle";
+		case "disabled":
+			return "x-circle";
+		case "failed":
+			return "alert-circle";
+		default:
+			return "circle";
+	}
+};
+
+const WebhookTestPage = () => {
+	const { webhookId } = useParams();
+	const { push } = useUserOrganization();
+
+	const { data: webhookData, isLoading } = useSWR<WebhookData>(
+		webhookId ? `/api/webhook/v1/${webhookId}` : null,
+		{ revalidateOnFocus: false },
+	);
+
+	const displayName =
+		webhookData?.name || webhookData?.url || "Unnamed Webhook";
+
+	return (
+		<div className="mx-auto max-w-3xl sm:px-8">
+			{/* Header — matches webhook-header.tsx pattern */}
+			<div className="pt-10 pb-8">
+				<AnimatedBackButton
+					onClick={() => push(`/webhooks/${webhookId as string}`)}
+				/>
+
+				<div className="flex items-center justify-between pt-6">
+					<div>
+						{/* Breadcrumb */}
+						{isLoading ? (
+							<div className="flex items-center gap-1.5">
+								<Skeleton className="h-4 w-12 rounded-full" />
+								<Skeleton className="h-1 w-1 rounded-full" />
+								<Skeleton className="h-4 w-20 rounded-full" />
+								<Skeleton className="h-1 w-1 rounded-full" />
+								<Skeleton className="h-4 w-16 rounded-full" />
+							</div>
+						) : (
+							<div className="flex items-center gap-1.5">
+								<p className="font-medium text-paragraph-xs text-text-sub-600">
+									Webhook
+								</p>
+								<p className="font-semibold text-paragraph-xs text-text-sub-600">
+									•
+								</p>
+								<p className="font-medium text-paragraph-xs text-text-sub-600">
+									{webhookData?.createdAt
+										? formatRelativeTime(webhookData.createdAt)
+										: "---"}
+								</p>
+								<p className="font-semibold text-paragraph-xs text-text-sub-600">
+									•
+								</p>
+								<div
+									className={`flex items-center gap-1 ${getStatusIconColor(webhookData?.status ?? "")}`}
+								>
+									<Icon
+										name={getStatusIcon(webhookData?.status ?? "")}
+										className="h-3.5 w-3.5"
+									/>
+									<p className="font-medium text-paragraph-xs capitalize">
+										{webhookData?.status ?? "Unknown"}
+									</p>
+								</div>
+							</div>
+						)}
+
+						{/* Title */}
+						{isLoading ? (
+							<div className="mt-2 flex flex-col gap-1.5">
+								<Skeleton className="h-7 w-48 rounded-lg" />
+								<Skeleton className="h-4 w-64 rounded-lg" />
+							</div>
+						) : (
+							<div className="mt-1 flex flex-col">
+								<h1 className="font-medium text-title-h6 leading-8">
+									{displayName}
+								</h1>
+								<div className="flex items-center gap-1.5 truncate font-medium font-mono text-[11px] text-text-sub-600 leading-tight">
+									{webhookData?.url}
+								</div>
+							</div>
+						)}
+					</div>
+				</div>
+			</div>
+
+			{/* Tester body */}
+			<div className="pt-8">
+				<TriggerWebhookTester
+					webhookId={webhookData?.id ?? (webhookId as string)}
+					webhookName={webhookData?.name}
+					webhookUrl={webhookData?.url}
+				/>
+			</div>
+		</div>
+	);
+};
+
+export default WebhookTestPage;

@@ -50,7 +50,7 @@ const WebhookDetailPage = () => {
 		);
 	}
 
-	if (!webhookData) {
+	if (!webhookData && !isLoading) {
 		return (
 			<div className="mx-auto max-w-3xl sm:px-8">
 				<div className="py-12 text-center">
@@ -68,24 +68,27 @@ const WebhookDetailPage = () => {
 	return (
 		<div className="mx-auto max-w-3xl sm:px-8">
 			<WebhookHeader
-				webhook={webhookData}
+				webhook={webhookData ?? null}
 				isLoading={isLoading}
 				isFailed={!!error}
 				onDeleteWebhook={() => {
-					setDeleteId(webhookData.id);
+					if (webhookData) setDeleteId(webhookData.id);
 				}}
+				onTriggerTest={() => push(`/webhooks/${webhookId as string}/test`)}
 			/>
 
-			<DeliveryLogs webhookId={webhookData.id} />
+			<DeliveryLogs webhookId={webhookData?.id ?? (webhookId as string)} />
 
-			<DeleteWebhookModal
-				webhook={webhookData}
-				onSuccess={() => {
-					if (activeOrganization?.slug) {
-						push(`/${activeOrganization.slug}/webhooks`);
-					}
-				}}
-			/>
+			{webhookData && (
+				<DeleteWebhookModal
+					webhook={webhookData}
+					onSuccess={() => {
+						if (activeOrganization?.slug) {
+							push(`/${activeOrganization.slug}/webhooks`);
+						}
+					}}
+				/>
+			)}
 		</div>
 	);
 };

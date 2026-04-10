@@ -1,10 +1,12 @@
 "use client";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import * as Drawer from "@reloop/ui/drawer";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Select from "@reloop/ui/select";
 import { Skeleton } from "@reloop/ui/skeleton";
+import * as Table from "@reloop/ui/table";
 import axios from "axios";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -18,15 +20,16 @@ dayjs.extend(relativeTime);
 const getStatusColorClass = (status: string) => {
 	switch (status) {
 		case "success":
-			return "text-green-600 bg-green-50 border-green-200";
+			return "text-success-base bg-success-lighter";
 		case "failed":
-			return "text-red-600 bg-red-50 border-red-200";
+			return "text-error-base bg-error-lighter";
 		case "pending":
-			return "text-yellow-600 bg-yellow-50 border-yellow-200";
+			return "text-warning-base bg-warning-lighter";
 		case "retrying":
-			return "text-blue-600 bg-blue-50 border-blue-200";
+		case "retried":
+			return "text-warning-base bg-warning-lighter";
 		default:
-			return "text-gray-600 bg-gray-50 border-gray-200";
+			return "text-text-sub-600 bg-bg-weak-50";
 	}
 };
 
@@ -77,9 +80,8 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 		"limit",
 		parseAsInteger.withDefault(10),
 	);
-	const [dateRange, setDateRange] = useState("7d");
 
-	const { data, error, isLoading } = useSWR<DeliveryListResponse>(
+	const { data, isLoading } = useSWR<DeliveryListResponse>(
 		`/api/webhook/v1/${webhookId}/deliveries?page=${currentPage}&limit=${pageSize}&status=${statusFilter === "all" ? "" : statusFilter}`,
 		{
 			revalidateOnFocus: false,
@@ -123,207 +125,226 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 	return (
 		<div className="flex flex-col space-y-6">
 			{/* Filters */}
-			<div className="flex items-center gap-4">
-				<div className="flex-1">
+			<div className="flex items-center justify-between gap-4">
+				<div className="max-w-sm flex-1">
 					<Input.Root size="small">
-						<Input.Wrapper>
+						<Input.Wrapper className="border-0 bg-transparent px-0 shadow-none focus-within:ring-0">
 							<Input.Icon
-								as={() => <Icon name="search" className="h-4 w-4" />}
+								as={() => (
+									<Icon name="search" className="h-4 w-4 text-text-sub-600" />
+								)}
 							/>
 							<Input.Input
 								type="text"
-								placeholder="Search deliveries..."
+								placeholder="Filter by event, status, ID..."
 								value={searchQuery}
 								onChange={(e) => setSearchQuery(e.target.value)}
+								className="border-0 bg-transparent px-0 shadow-none focus-visible:ring-0"
 							/>
 						</Input.Wrapper>
 					</Input.Root>
 				</div>
-				<div className="w-40">
-					<Select.Root
-						size="small"
-						value={statusFilter}
-						onValueChange={setStatusFilter}
-					>
-						<Select.Trigger>
-							<Select.Value placeholder="All statuses" />
-						</Select.Trigger>
-						<Select.Content>
-							<Select.Item value="all">All statuses</Select.Item>
-							<Select.Item value="success">Success</Select.Item>
-							<Select.Item value="failed">Failed</Select.Item>
-							<Select.Item value="pending">Pending</Select.Item>
-							<Select.Item value="retrying">Retrying</Select.Item>
-						</Select.Content>
-					</Select.Root>
-				</div>
-				<div className="w-32">
-					<select
-						value={dateRange}
-						onChange={(e) => setDateRange(e.target.value)}
-						className="w-full rounded-md border border-stroke-soft-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-					>
-						<option value="1d">Last 24 hours</option>
-						<option value="7d">Last 7 days</option>
-						<option value="30d">Last 30 days</option>
-						<option value="90d">Last 90 days</option>
-					</select>
+				<div className="flex w-fit items-center gap-2">
+					{["all", "success", "failed", "retrying"].map((status) => (
+						<Button.Root
+							key={status}
+							size="xsmall"
+							mode="stroke"
+							variant="neutral"
+							className={cn(
+								"rounded-full px-4 font-medium capitalize transition-colors duration-200",
+								statusFilter === status
+									? "border-stroke-soft-200 bg-bg-weak-50 text-text-strong-950"
+									: "border-transparent text-text-sub-600 hover:border-stroke-soft-200 hover:text-text-strong-950",
+							)}
+							onClick={() => setStatusFilter(status)}
+						>
+							{status === "all"
+								? "All"
+								: status === "success"
+									? "Succeeded"
+									: status === "failed"
+										? "Failed"
+										: "Retried"}
+						</Button.Root>
+					))}
 				</div>
 			</div>
 
-			<div className="grid h-[700px] grid-cols-1 overflow-hidden rounded-xl border border-stroke-soft-200 shadow-regular-md md:grid-cols-[400px_1fr]">
-				{/* Left Pane: List */}
-				<div className="flex flex-col border-stroke-soft-200 border-r bg-bg-weak-25">
-					<div className="flex-1 overflow-y-auto">
+			<div className="overflow-hidden rounded-xl border border-stroke-soft-200">
+				<Table.Root>
+					<Table.Header>
+						<Table.Row>
+							<Table.Head className="font-medium text-[10px] uppercase tracking-wider">
+								Time
+							</Table.Head>
+							<Table.Head className="font-medium text-[10px] uppercase tracking-wider">
+								Status
+							</Table.Head>
+							<Table.Head className="font-medium text-[10px] uppercase tracking-wider">
+								Event
+							</Table.Head>
+							<Table.Head className="font-medium text-[10px] uppercase tracking-wider">
+								Delivery ID
+							</Table.Head>
+							<Table.Head className="font-medium text-[10px] uppercase tracking-wider">
+								Duration
+							</Table.Head>
+							<Table.Head className="font-medium text-[10px] uppercase tracking-wider">
+								Code
+							</Table.Head>
+						</Table.Row>
+					</Table.Header>
+					<Table.Body className="divide-y divide-stroke-soft-200">
 						{isLoading ? (
-							<div className="space-y-2 p-4">
-								{Array.from({ length: 8 }).map((_, i) => (
-									<Skeleton key={i} className="h-16 w-full rounded-lg" />
-								))}
-							</div>
-						) : error ? (
-							<div className="flex flex-col items-center justify-center p-12 text-center">
-								<Icon
-									name="info-outline"
-									className="mb-2 h-8 w-8 text-red-500"
-								/>
-								<p className="text-sm text-text-sub-600">
-									Failed to load delivery logs
-								</p>
-							</div>
+							Array.from({ length: 5 }).map((_, i) => (
+								<Table.Row key={i}>
+									<Table.Cell colSpan={6} className="p-4">
+										<Skeleton className="h-6 w-full rounded" />
+									</Table.Cell>
+								</Table.Row>
+							))
 						) : filteredDeliveries.length === 0 ? (
-							<div className="flex flex-col items-center justify-center p-12 text-center">
-								<Icon
-									name="activity"
-									className="mb-2 h-8 w-8 text-text-sub-400"
-								/>
-								<p className="text-sm text-text-sub-600">No deliveries found</p>
-							</div>
-						) : (
-							<div className="divide-y divide-stroke-soft-200">
-								{filteredDeliveries.map((delivery) => (
-									<button
-										key={delivery.id}
-										type="button"
-										onClick={() => setSelectedDeliveryId(delivery.id)}
-										className={cn(
-											"flex w-full flex-col gap-1 p-4 text-left transition-colors hover:bg-bg-weak-50",
-											(selectedDeliveryId === delivery.id ||
-												(!selectedDeliveryId &&
-													selectedDelivery?.id === delivery.id)) &&
-												"bg-white shadow-inner sm:border-brand-base-600 sm:border-l-2",
-										)}
-									>
-										<div className="flex items-center justify-between gap-2">
-											<div className="flex items-center gap-2">
-												{delivery.responseStatus && (
-													<span className="font-mono text-text-sub-600 text-xs">
-														{delivery.responseStatus}
-													</span>
-												)}
-												<div
-													className={cn(
-														"h-1.5 w-1.5 rounded-full",
-														delivery.status === "success"
-															? "bg-green-500"
-															: delivery.status === "failed"
-																? "bg-red-500"
-																: "bg-yellow-500",
-													)}
-												/>
-												<span className="truncate font-medium text-text-strong-950 text-xs">
-													{delivery.eventType}
-												</span>
-											</div>
-											<span className="shrink-0 text-text-sub-600 text-xs">
-												{dayjs(delivery.createdAt).format("h:mm:ss A")}
-											</span>
-										</div>
-										<div className="flex items-center justify-between gap-2">
-											<span className="truncate text-text-sub-600 text-xs">
-												{delivery.requestUrl}
-											</span>
-										</div>
-									</button>
-								))}
-							</div>
-						)}
-					</div>
-
-					{/* Pagination footer */}
-					{data && data.total > 0 && (
-						<div className="border-stroke-soft-200 border-t bg-white p-4">
-							<div className="flex items-center justify-between gap-4 text-text-sub-600 text-xs">
-								<div className="flex items-center gap-1.5">
-									<Button.Root
-										size="xxsmall"
-										variant="neutral"
-										mode="stroke"
-										onClick={() =>
-											setCurrentPage((prev) => Math.max(1, prev - 1))
-										}
-										disabled={currentPage === 1}
-									>
-										<Icon name="chevron-left" className="h-3 w-3" />
-									</Button.Root>
-									<span className="whitespace-nowrap">
-										{currentPage} / {totalPages}
-									</span>
-									<Button.Root
-										size="xxsmall"
-										variant="neutral"
-										mode="stroke"
-										onClick={() =>
-											setCurrentPage((prev) => Math.min(totalPages, prev + 1))
-										}
-										disabled={currentPage === totalPages}
-									>
-										<Icon name="chevron-right" className="h-3 w-3" />
-									</Button.Root>
-								</div>
-								<Select.Root
-									value={String(pageSize)}
-									onValueChange={(value) => {
-										setPageSize(Number(value));
-										setCurrentPage(1);
-									}}
-									size="xsmall"
+							<Table.Row>
+								<Table.Cell
+									colSpan={6}
+									className="h-32 text-center text-text-sub-600"
 								>
-									<Select.Trigger className="h-7 w-14 text-[10px]">
-										<Select.Value />
-									</Select.Trigger>
-									<Select.Content className="min-w-16">
-										{["10", "20", "50"].map((v) => (
-											<Select.Item key={v} value={v} className="text-xs">
-												{v}
-											</Select.Item>
-										))}
-									</Select.Content>
-								</Select.Root>
-							</div>
-						</div>
-					)}
-				</div>
+									No deliveries found
+								</Table.Cell>
+							</Table.Row>
+						) : (
+							filteredDeliveries.map((delivery) => {
+								const duration = delivery.completedAt
+									? dayjs(delivery.completedAt).diff(
+											dayjs(delivery.createdAt),
+											"ms",
+										)
+									: null;
 
-				{/* Right Pane: Details */}
-				<div className="flex flex-col overflow-hidden bg-white">
+								return (
+									<Table.Row
+										key={delivery.id}
+										className="cursor-pointer transition-colors hover:bg-bg-weak-50"
+										onClick={() => setSelectedDeliveryId(delivery.id)}
+									>
+										<Table.Cell className="font-medium font-mono text-[13px] text-text-strong-950">
+											{dayjs(delivery.createdAt).format("HH:mm:ss")}
+										</Table.Cell>
+										<Table.Cell>
+											<span
+												className={cn(
+													"inline-flex rounded-full px-2 py-0.5 font-medium text-xs capitalize",
+													getStatusColorClass(delivery.status),
+												)}
+											>
+												{delivery.status}
+											</span>
+										</Table.Cell>
+										<Table.Cell className="font-medium font-mono text-[13px] text-text-strong-950">
+											{delivery.eventType}
+										</Table.Cell>
+										<Table.Cell className="font-mono text-text-sub-600 text-xs">
+											{delivery.id.replace("dlv_", "").substring(0, 8)}
+										</Table.Cell>
+										<Table.Cell className="font-medium text-[13px] text-text-sub-600">
+											{duration ? `${duration.toLocaleString()}ms` : "---"}
+										</Table.Cell>
+										<Table.Cell
+											className={cn(
+												"font-medium font-mono text-[13px]",
+												delivery.responseStatus &&
+													delivery.responseStatus >= 200 &&
+													delivery.responseStatus < 300
+													? "text-success-base"
+													: "text-error-base",
+											)}
+										>
+											{delivery.responseStatus || "---"}
+										</Table.Cell>
+									</Table.Row>
+								);
+							})
+						)}
+					</Table.Body>
+				</Table.Root>
+
+				{/* Pagination footer */}
+				{data && data.total > 0 && (
+					<div className="border-stroke-soft-200 border-t bg-white p-4">
+						<div className="flex items-center justify-between gap-4 text-text-sub-600 text-xs">
+							<div className="flex items-center gap-1.5">
+								<Button.Root
+									size="xxsmall"
+									variant="neutral"
+									mode="stroke"
+									onClick={() =>
+										setCurrentPage((prev) => Math.max(1, prev - 1))
+									}
+									disabled={currentPage === 1}
+								>
+									<Icon name="chevron-left" className="h-3 w-3" />
+								</Button.Root>
+								<span className="truncate whitespace-nowrap font-medium">
+									{currentPage} / {totalPages}
+								</span>
+								<Button.Root
+									size="xxsmall"
+									variant="neutral"
+									mode="stroke"
+									onClick={() =>
+										setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+									}
+									disabled={currentPage === totalPages}
+								>
+									<Icon name="chevron-right" className="h-3 w-3" />
+								</Button.Root>
+							</div>
+							<Select.Root
+								value={String(pageSize)}
+								onValueChange={(value) => {
+									setPageSize(Number(value));
+									setCurrentPage(1);
+								}}
+								size="xsmall"
+							>
+								<Select.Trigger className="h-7 w-14 text-[10px]">
+									<Select.Value />
+								</Select.Trigger>
+								<Select.Content className="min-w-16">
+									{["10", "20", "50"].map((v) => (
+										<Select.Item key={v} value={v} className="text-xs">
+											{v}
+										</Select.Item>
+									))}
+								</Select.Content>
+							</Select.Root>
+						</div>
+					</div>
+				)}
+			</div>
+
+			<Drawer.Root
+				open={!!selectedDeliveryId}
+				onOpenChange={(open) => !open && setSelectedDeliveryId(null)}
+			>
+				<Drawer.Content className="w-[600px] max-w-[90vw]">
 					{selectedDelivery ? (
 						<div className="flex h-full flex-col">
-							{/* Header */}
 							<div className="flex items-center justify-between border-stroke-soft-200 border-b p-6">
 								<div className="flex flex-col gap-1">
 									<div className="flex items-center gap-2">
 										<h3 className="font-semibold text-lg text-text-strong-950">
 											{selectedDelivery.eventType}
 										</h3>
-										<div
+										<span
 											className={cn(
-												"rounded-full border px-2 py-0.5 font-medium text-xs capitalize",
+												"inline-flex rounded-full px-2 py-0.5 font-medium text-xs capitalize",
 												getStatusColorClass(selectedDelivery.status),
 											)}
 										>
 											{selectedDelivery.status}
-										</div>
+										</span>
 									</div>
 									<p className="text-sm text-text-sub-600">
 										{dayjs(selectedDelivery.createdAt).format(
@@ -341,13 +362,21 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 										<Icon name="refresh-cw" className="mr-2 h-4 w-4" />
 										Resend
 									</Button.Root>
+									<Drawer.Close asChild>
+										<Button.Root
+											size="small"
+											variant="neutral"
+											mode="stroke"
+											className="px-2"
+										>
+											<Icon name="cross" className="h-4 w-4" />
+										</Button.Root>
+									</Drawer.Close>
 								</div>
 							</div>
 
-							{/* Content */}
 							<div className="flex-1 overflow-y-auto p-6">
 								<div className="grid grid-cols-1 gap-8">
-									{/* Info Section */}
 									<div className="grid grid-cols-2 gap-4 rounded-lg bg-bg-weak-25 p-4 md:grid-cols-4">
 										<div>
 											<p className="text-text-sub-600 text-xs uppercase tracking-wider">
@@ -382,7 +411,6 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 										</div>
 									</div>
 
-									{/* Response Section */}
 									<section className="space-y-3">
 										<h4 className="font-semibold text-text-strong-950 text-xs uppercase tracking-wider">
 											Response
@@ -413,7 +441,6 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 										</div>
 									</section>
 
-									{/* Request Section */}
 									<section className="space-y-3">
 										<h4 className="font-semibold text-text-strong-950 text-xs uppercase tracking-wider">
 											Request
@@ -463,16 +490,10 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 							</div>
 						</div>
 					) : (
-						<div className="flex h-full flex-col items-center justify-center p-12 text-center text-text-sub-600">
-							<Icon
-								name="activity"
-								className="mb-4 h-12 w-12 text-bg-weak-100"
-							/>
-							<p>Select a delivery attempt to view its details</p>
-						</div>
+						<div />
 					)}
-				</div>
-			</div>
+				</Drawer.Content>
+			</Drawer.Root>
 		</div>
 	);
 };
