@@ -2,6 +2,7 @@ import { cors } from "@elysiajs/cors";
 import { swagger } from "@elysiajs/swagger";
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
+import { kumomtaConfig } from "./kumomta.config";
 import { kumomtaRoutes } from "./routes/kumomta.routes";
 
 const app = new Elysia({
@@ -21,7 +22,7 @@ const app = new Elysia({
     }),
   )
   .use(kumomtaRoutes)
-  .listen(3008, (server) => {
+  .listen(kumomtaConfig.port, (server) => {
     logger.info(
       `🦊 KumoMTA Server is running at http://${server?.hostname}:${server?.port}`,
     );

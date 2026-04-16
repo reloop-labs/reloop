@@ -74,6 +74,13 @@ local.reloop.sh {
             header_up X-Forwarded-For {remote}
         }
     }
+    handle /api/kumomta* {
+        reverse_proxy host.docker.internal:8020 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
     handle /api/logs* {
         reverse_proxy host.docker.internal:8016 {
             header_up Host {host}
