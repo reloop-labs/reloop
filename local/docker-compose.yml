@@ -96,28 +96,3 @@ services:
         condition: service_started
     restart: unless-stopped
 
-  reloop-inngest:
-    image: inngest/inngest:latest
-    container_name: reloop-inngest
-    command: "inngest start"
-    ports:
-      - "8288:8288"  # Inngest Dev Server UI
-    environment:
-      - INNGEST_EVENT_KEY=local_dev_event_key_0123456789abcdef
-      - INNGEST_SIGNING_KEY=signkey-local-0123456789abcdef
-      - INNGEST_POSTGRES_URI=postgres://reloop:reloop123@reloop-postgres:5432/inngest
-      - INNGEST_REDIS_URI=redis://:reloop123@reloop-redis:6379
-    depends_on:
-      reloop-postgres:
-        condition: service_healthy
-      reloop-redis:
-        condition: service_started
-    volumes:
-      - ../docker-data/inngest:/var/lib/inngest
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8288/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-    restart: unless-stopped
