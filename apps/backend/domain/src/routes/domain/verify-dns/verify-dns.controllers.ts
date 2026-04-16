@@ -1,3 +1,4 @@
+import { domainVerificationQueue } from "@be/domain/queues/domain-verification.queue";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import type { Logger } from "@reloop/logger";
@@ -36,11 +37,11 @@ export async function verifyDNSRecordController({
 
     const domainName = domainWithRecords.domain;
 
-    // Control the verifying based on the current status
+    // Already in-flight — don't queue again
     if (domainWithRecords.status === "verifying") {
       logger.info(
         { domainId },
-        "Domain is already in verifying status, skipping update and trigger",
+        "Domain is already in verifying status, skipping re-queue",
       );
       return {
         id: domainId,
@@ -62,25 +63,23 @@ export async function verifyDNSRecordController({
       .set({ status: "verifying" })
       .where(eq(schema.domainDnsRecord.domainId, domainId));
 
-    // Trigger Inngest workflow for background verification with exponential backoff
+    // Enqueue BullMQ job — jobId deduplicates concurrent requests for the same domain
     try {
-      // await inngest.send({
-      // 	name: "domain.verification",
-      // 	data: {
-      // 		domain,
-      // 		organizationId,
-      // 		// attempt and startedAt will be set automatically by the function
-      // 	},
-      // });
+      await domainVerificationQueue.add(
+        "verify",
+        { domainId, organizationId },
+        { jobId: domainId },
+      );
       logger.info(
         { domain: domainName },
-        "Triggered background domain verification workflow",
+        "Enqueued background domain verification job",
       );
     } catch (error) {
       logger.error(
-        { domain: domainName, error }, "Failed to trigger domain verification workflow",
+        { domain: domainName, error },
+        "Failed to enqueue domain verification job",
       );
-      // Revert status if Inngest fails
+      // Revert status if enqueue fails
       await db
         .update(schema.domain)
         .set({ status: domainWithRecords.status })
@@ -89,6 +88,7 @@ export async function verifyDNSRecordController({
         message: "Failed to start verification process",
       });
     }
+
     logger.info({ domainId }, "Domain verification started successfully");
     return {
       id: domainId,
