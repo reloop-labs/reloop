@@ -20,9 +20,9 @@ export const ContactsEmptyState = ({
 			<h3 className="mb-2 font-semibold text-text-strong-950 text-xl">
 				No contacts yet
 			</h3>
-			<p className="mx-auto mb-6 max-w-[520px] text-balance font-medium text-[12px] text-text-sub-600">
-				Contacts are the people you reach with Reloop. Add them manually, import
-				a list, or let your app sync them automatically.
+			<p className="mx-auto mb-6 max-w-[300px] text-balance font-medium text-[12px] text-text-sub-600">
+				Add contacts manually, import a CSV, or let your app sync them
+				automatically.
 			</p>
 			<div className="flex items-center gap-3">
 				<Button.Root

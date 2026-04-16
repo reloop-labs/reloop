@@ -55,9 +55,9 @@ export const EmptyState = () => {
 				<h3 className="mb-2 font-semibold text-text-strong-950 text-xl">
 					No webhooks yet
 				</h3>
-				<p className="mx-auto mb-6 max-w-[520px] text-balance font-medium text-[12px] text-text-sub-600">
-					Connect your app to real-time events. When something happens in your
-					account, we'll instantly POST a signed payload to your URL.
+				<p className="mx-auto mb-6 max-w-[300px] text-balance font-medium text-[12px] text-text-sub-600">
+					Connect to real-time events and get a signed payload POSTed to your
+					URL whenever something happens.
 				</p>
 				<div className="flex items-center gap-3">
 					<Button.Root
