@@ -1,31 +1,50 @@
 import { cors } from "@elysiajs/cors";
-import { swagger } from "@elysiajs/swagger";
+import { fromTypes, openapi } from "@elysiajs/openapi";
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
 import { kumomtaConfig } from "./kumomta.config";
 import { kumomtaRoutes } from "./routes/kumomta.routes";
+import { landing } from "./routes/landing/landing.index";
+import { loader } from "./utils/loader";
 
 const app = new Elysia({
+  prefix: "/api/kumomta",
   name: "Server",
 })
   .use(cors())
   .use(
-    swagger({
+    openapi({
       documentation: {
         info: {
-          title: "Reloop KumoMTA API",
+          title: "KumoMTA Service",
           version: "1.0.0",
         },
-        tags: [{ name: "KumoMTA", description: "KumoMTA Callbacks & Configs" }],
+        components: {
+          securitySchemes: {
+            apiKey: {
+              type: "apiKey",
+              name: "x-kumomta-key",
+              in: "header",
+            },
+          },
+        },
       },
-      exclude: ["/swagger"],
+      references: fromTypes(
+        kumomtaConfig.NODE_ENV === "production"
+          ? "dist/index.d.ts"
+          : "src/index.ts",
+      ),
     }),
   )
-  .use(kumomtaRoutes)
-  .listen(kumomtaConfig.port, (server) => {
-    logger.info(
-      `🦊 KumoMTA Server is running at http://${server?.hostname}:${server?.port}`,
-    );
-  });
+  .use(landing)
+  .use(kumomtaRoutes);
+
+await loader();
+
+app.listen(kumomtaConfig.port, (server) => {
+  logger.info(
+    `🦊 KumoMTA Server is running at http://${server?.hostname}:${server?.port}`,
+  );
+});
 
 export type App = typeof app;

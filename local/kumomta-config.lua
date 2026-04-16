@@ -25,11 +25,20 @@ end)
 
 -- AUTH
 kumo.on('smtp_server_auth_plain', function(authz, authc, password, conn_meta)
-  if authc == 'reloop' and password == 'reloop123' then
-    -- THIS is what docs expect
+  local client = kumo.http.build_client({})
+  local status, response = pcall(function()
+    return client:get("http://host.docker.internal:8020/v1/auth/verify", {
+      headers = {
+        ["x-api-key"] = password
+      }
+    })
+  end)
+
+  if status and response and response:status_code() == 200 then
     conn_meta:set_meta('authz_id', authc)
     return true
   end
+
   return false
 end)
 

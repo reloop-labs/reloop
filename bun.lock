@@ -184,6 +184,30 @@
         "typescript": "catalog:",
       },
     },
+    "apps/backend/kumomta": {
+      "name": "kumomta",
+      "dependencies": {
+        "@elysiajs/cors": "catalog:backend",
+        "@elysiajs/openapi": "^1.4.14",
+        "@elysiajs/opentelemetry": "catalog:backend",
+        "@elysiajs/server-timing": "catalog:backend",
+        "@reloop/auth": "workspace:*",
+        "@reloop/cache": "workspace:*",
+        "@reloop/db": "workspace:*",
+        "@reloop/logger": "workspace:*",
+        "dotenv": "catalog:backend",
+        "drizzle-orm": "catalog:db",
+        "elysia": "catalog:backend",
+        "evlog": "catalog:backend",
+        "zod": "catalog:ui",
+      },
+      "devDependencies": {
+        "@reloop/tsconfig": "workspace:*",
+        "@types/bun": "catalog:backend",
+        "tsdown": "catalog:backend",
+        "typescript": "catalog:",
+      },
+    },
     "apps/backend/logs": {
       "name": "logs",
       "dependencies": {
@@ -2686,6 +2710,8 @@
 
     "kleur": ["kleur@3.0.3", "", {}, "sha512-eTIzlVOSUR+JxdDFepEYcBMtZ9Qqdef+rnzWdRZuMbOywu5tO2w2N7rqjoANZ5k9vywhL6Br1VRjUIgTQx4E8w=="],
 
+    "kumomta": ["kumomta@workspace:apps/backend/kumomta"],
+
     "kysely": ["kysely@0.28.8", "", {}, "sha512-QUOgl5ZrS9IRuhq5FvOKFSsD/3+IA6MLE81/bOOTRA/YQpKDza2sFdN5g6JCB9BOpqMJDGefLCQ9F12hRS13TA=="],
 
     "leac": ["leac@0.6.0", "", {}, "sha512-y+SqErxb8h7nE/fiEX07jsbuhrpO9lL8eca7/Y1nuWV2moNlXhyd59iDGcRf6moVyDMbmTNzL40SUyrFU/yDpg=="],
@@ -3979,6 +4005,8 @@
     "intl-messageformat/@formatjs/fast-memoize": ["@formatjs/fast-memoize@2.2.7", "", { "dependencies": { "tslib": "^2.8.0" } }, "sha512-Yabmi9nSvyOMrlSeGGWDiH7rf3a7sIwplbvo/dlz9WCIjzIQAfy1RMf4S0X3yG724n5Ghu2GmEl5NJIV6O9sZQ=="],
 
     "its-fine/@types/react-reconciler": ["@types/react-reconciler@0.28.9", "", { "peerDependencies": { "@types/react": "*" } }, "sha512-HHM3nxyUZ3zAylX8ZEyrDNd2XZOnQ0D5XfunJF5FLQnZbHHYq4UWvW1QfelQNXv1ICNkwYhfxjwfnqivYB6bFg=="],
+
+    "kumomta/@elysiajs/openapi": ["@elysiajs/openapi@1.4.14", "", { "peerDependencies": { "elysia": ">= 1.4.0" } }, "sha512-kWmJWdvP8/LwHwAJXSpz6xFfYUoyUyEPRimEYABuDU1rOnS27Da1u9T2jyU7frOopxKWV/wDfDxMP8z2xdCPJw=="],
 
     "listr2/eventemitter3": ["eventemitter3@5.0.1", "", {}, "sha512-GWkBvjiSZK87ELrYOSESUYeVIc9mvLLf/nXalMOS5dYrgZq9o5OVkbZAVM06CVxYsCwH9BDZFPlQTlPA1j4ahA=="],
 

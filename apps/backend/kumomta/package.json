@@ -11,19 +11,18 @@
 	},
 	"dependencies": {
 		"@elysiajs/cors": "catalog:backend",
+		"@elysiajs/openapi": "^1.4.14",
 		"@elysiajs/opentelemetry": "catalog:backend",
 		"@elysiajs/server-timing": "catalog:backend",
-		"@elysiajs/swagger": "catalog:backend",
-		"@elysiajs/openapi": "catalog:backend",
+		"@reloop/auth": "workspace:*",
+		"@reloop/cache": "workspace:*",
+		"@reloop/db": "workspace:*",
+		"@reloop/logger": "workspace:*",
 		"dotenv": "catalog:backend",
-		"evlog": "catalog:backend",
 		"drizzle-orm": "catalog:db",
 		"elysia": "catalog:backend",
-		"zod": "catalog:ui",
-		"@reloop/db": "workspace:*",
-		"@reloop/cache": "workspace:*",
-		"@reloop/logger": "workspace:*",
-		"@reloop/auth": "workspace:*"
+		"evlog": "catalog:backend",
+		"zod": "catalog:ui"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",
