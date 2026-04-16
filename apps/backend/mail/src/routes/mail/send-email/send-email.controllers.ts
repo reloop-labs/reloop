@@ -1,5 +1,5 @@
 import { kumomtaClient } from "@reloop/be-mail/lib/kumomta-client";
-import type { MailTypes } from "@reloop/be-mail/routes/mail/mail.type.js";
+import type { MailTypes } from "@reloop/be-mail/types/mail.type.js";
 import { db } from "@reloop/db/client";
 import {
   type dnsRecordTypeEnum,
@@ -92,7 +92,7 @@ export async function sendEmailController({
             ? body.bcc
             : [body.bcc]
           : undefined,
-        replyTo: body.replyTo,
+        replyTo: Array.isArray(body.replyTo) ? body.replyTo.join(", ") : body.replyTo,
         subject: body.subject,
         textBody: body.text,
         htmlBody: body.html,
@@ -117,10 +117,16 @@ export async function sendEmailController({
       replyTo: body.replyTo,
       cc: body.cc,
       bcc: body.bcc,
+      scheduledAt: body.scheduledAt,
+      topicId: body.topicId,
+      attachments: body.attachments,
+      tags: body.tags,
+      template: body.template,
       customHeaders: {
         "X-Org-ID": organizationId,
         "X-Domain-ID": currentDomain.id,
         "X-Email-Log-ID": emailLogId,
+        ...(body.headers || {}),
       },
     });
 

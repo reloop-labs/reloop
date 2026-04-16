@@ -36,8 +36,7 @@ export namespace MailModel {
 			}),
 		),
 		replyTo: t.Optional(
-			t.String({
-				pattern: emailPattern.source,
+			t.Union([t.String(), t.Array(t.String())], {
 				description: "Reply-to email address",
 				examples: ["noreply@example.com"],
 			}),
@@ -53,6 +52,49 @@ export namespace MailModel {
 				description: "BCC email address(es)",
 				examples: ["bcc@example.com"],
 			}),
+		),
+		scheduledAt: t.Optional(
+			t.String({
+				description: "Schedule email to be sent later",
+				examples: ["in 1 min", "2026-08-05T11:52:01.858Z"],
+			}),
+		),
+		headers: t.Optional(
+			t.Record(t.String(), t.String(), {
+				description: "Custom headers to add to the email",
+			}),
+		),
+		topicId: t.Optional(
+			t.String({
+				description: "The topic ID to receive the email",
+			}),
+		),
+		attachments: t.Optional(
+			t.Array(
+				t.Object({
+					content: t.Optional(t.Union([t.String(), t.Unknown()])),
+					filename: t.Optional(t.String()),
+					path: t.Optional(t.String()),
+					contentType: t.Optional(t.String()),
+					contentId: t.Optional(t.String()),
+				}),
+				{ description: "Email attachments" },
+			),
+		),
+		tags: t.Optional(
+			t.Array(
+				t.Object({
+					name: t.String(),
+					value: t.String(),
+				}),
+				{ description: "Custom tags passed in key/value pairs" },
+			),
+		),
+		template: t.Optional(
+			t.Object({
+				id: t.String({ description: "Template alias or ID" }),
+				variables: t.Optional(t.Record(t.String(), t.Union([t.String(), t.Number()]))),
+			}, { description: "Email template to use" }),
 		),
 	});
 
@@ -74,6 +116,29 @@ export namespace MailModel {
 	});
 
 	export type SendEmailResponse = typeof sendEmailResponse.static;
+
+	export const getAttachmentParams = t.Object({
+		emailId: t.String({
+			description: "The Email ID",
+		}),
+		id: t.String({
+			description: "The Attachment ID",
+		}),
+	});
+	export type GetAttachmentParams = typeof getAttachmentParams.static;
+
+	export const getAttachmentResponse = t.Object({
+		object: t.Literal("attachment"),
+		id: t.String(),
+		filename: t.String(),
+		size: t.Number(),
+		content_type: t.String(),
+		content_disposition: t.String(),
+		content_id: t.Optional(t.String()),
+		download_url: t.String(),
+		expires_at: t.Optional(t.String()),
+	});
+	export type GetAttachmentResponse = typeof getAttachmentResponse.static;
 
 	export const unauthorized = t.Object({
 		message: t.Literal("Authentication required"),

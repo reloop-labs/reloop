@@ -1,4 +1,4 @@
-import { logger } from "@reloop/logger";
+import { type Logger, logger } from "@reloop/logger";
 import { Elysia, t } from "elysia";
 import {
   handleKumomtaWebhookController,
@@ -9,7 +9,7 @@ export const kumomtaWebhookRoute = new Elysia().post(
   "/webhook/kumomta",
   async (context) => {
     const { body } = context;
-    const contextLogger = (context as any).logger;
+    const contextLogger = (context as { logger?: Logger }).logger;
     return await handleKumomtaWebhookController({
       events: body as KumomtaLogRecord[],
       logger: contextLogger || logger,

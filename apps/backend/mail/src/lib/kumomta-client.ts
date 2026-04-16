@@ -12,10 +12,21 @@ export interface SendEmailOptions {
 	subject: string;
 	text?: string;
 	html?: string;
-	replyTo?: string;
+	replyTo?: string | string[];
 	cc?: string | string[];
 	bcc?: string | string[];
 	customHeaders?: Record<string, string>;
+	scheduledAt?: string;
+	topicId?: string;
+	attachments?: Array<{
+		content?: string | unknown;
+		filename?: string;
+		path?: string;
+		contentType?: string;
+		contentId?: string;
+	}>;
+	tags?: Array<{ name: string; value: string }>;
+	template?: { id: string; variables?: Record<string, string | number> };
 }
 
 interface InjectRecipient {
@@ -158,7 +169,8 @@ function buildRfcMessage(options: SendEmailOptions): string {
 
 	// Optional headers
 	if (options.replyTo) {
-		lines.push(`Reply-To: ${options.replyTo}`);
+		const replyToList = Array.isArray(options.replyTo) ? options.replyTo : [options.replyTo];
+		lines.push(`Reply-To: ${replyToList.join(", ")}`);
 	}
 	if (options.cc) {
 		const ccList = Array.isArray(options.cc) ? options.cc : [options.cc];

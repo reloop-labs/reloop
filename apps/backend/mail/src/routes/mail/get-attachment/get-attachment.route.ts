@@ -2,36 +2,37 @@ import { authMiddleware } from "@reloop/be-mail/middleware/auth";
 import { MailModel } from "@reloop/be-mail/model/mail.model.js";
 import { type Logger, logger } from "@reloop/logger";
 import { Elysia, status } from "elysia";
-import { sendEmailController } from "./send-email.controllers";
+import { getAttachmentController } from "./get-attachment.controllers";
 
-export const sendEmailRoute = new Elysia().use(authMiddleware).post(
-  "/send",
-  async ({ body, activeOrganizationId, logger: contextLogger }) => {
+export const getAttachmentRoute = new Elysia().use(authMiddleware).get(
+  "/:emailId/attachments/:id",
+  async ({ params, activeOrganizationId, logger: contextLogger }) => {
     if (!activeOrganizationId) {
       throw status(403, {
         message: "User is not a member of an organization",
       });
     }
-    return await sendEmailController({
+    return await getAttachmentController({
       organizationId: activeOrganizationId,
-      body,
+      emailId: params.emailId,
+      attachmentId: params.id,
       logger: (contextLogger as Logger) || logger,
     });
   },
   {
     auth: true,
-    body: MailModel.sendEmailBody,
+    params: MailModel.getAttachmentParams,
     response: {
-      200: MailModel.sendEmailResponse,
+      200: MailModel.getAttachmentResponse,
       401: MailModel.unauthorized,
       403: MailModel.forbidden,
-      400: MailModel.badRequest,
+      404: MailModel.badRequest,
       500: MailModel.internalServerError,
     },
     detail: {
       tags: ["Mail"],
-      summary: "Send email",
-      description: "Send an email through the KumoMTA mail server",
+      summary: "Retrieve Attachment",
+      description: "Retrieve a single attachment from a sent email",
     },
   },
 );

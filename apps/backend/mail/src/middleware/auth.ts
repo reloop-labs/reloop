@@ -1,53 +1,128 @@
-import type { Session } from "@reloop/auth/server";
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
 import { mailConfig } from "../mail.config";
+import { validateApiKey } from "./api-key-auth";
+import { validateSession } from "./cookie-auth";
 
-if (process.env.NODE_ENV !== "production") {
+if (mailConfig.NODE_ENV !== "production") {
 	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 }
 
-export const authMiddleware = new Elysia({ name: "better-auth" }).macro({
-	auth: {
+export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
+	cookieAuth: {
 		async resolve({ status, request: { headers } }) {
 			try {
-				const response = await fetch(
-					`${mailConfig.BASE_URL}/api/auth/v1/get-session`,
-					{
-						method: "GET",
-						headers: new Headers({
-							"Content-Type": "application/json",
-							Cookie: headers.get("cookie") || "",
-						}),
-					},
-				);
-				const session: Session | null = await response.json();
+				const cookie = headers.get("cookie");
 				const traceId = crypto.randomUUID();
-				const tenantLogger = logger.child({ traceId, service: "mail" });
-
-				if (session) {
-					tenantLogger.info(
-						{ userId: session.user },
-						"User authenticated via cookie",
-					);
-					return {
-						user: session.user,
-						session: session.session,
-						authMethod: "cookie" as const,
+				const currentLogger = logger.child({ traceId });
+				const sessionResult = await validateSession(cookie);
+				if (sessionResult) {
+					const tenantLogger = currentLogger.child({
 						traceId,
-						logger: tenantLogger,
-					};
+						service: "mail",
+						...currentLogger,
+					});
+					tenantLogger.info(
+						{ ...sessionResult },
+						"Session authentication successful",
+					);
+					return { ...sessionResult, traceId, logger: tenantLogger };
 				}
 				return status(401, { message: "Authentication required" });
-			} catch (error) {
+			} catch (e) {
 				logger.error(
 					{
-						error: error instanceof Error ? error.message : "Unknown error",
+						error: e instanceof Error ? e.message : "Unknown error",
+						stack: e instanceof Error ? e.stack : undefined,
 					},
 					"Authentication error",
 				);
 				return status(401, { message: "Authentication failed" });
 			}
+		},
+	},
+	apiKeyAuth: {
+		async resolve({ status, request: { headers } }) {
+			try {
+				const apiKey = headers.get("x-api-key");
+				const traceId = crypto.randomUUID();
+				const currentLogger = logger.child({ traceId });
+				const apiKeyResult = await validateApiKey(apiKey);
+				if (apiKeyResult) {
+					const tenantLogger = currentLogger.child({
+						traceId,
+						service: "mail",
+						...currentLogger,
+					});
+					tenantLogger.info(
+						{ ...apiKeyResult },
+						"API key authentication successful",
+					);
+					return { ...apiKeyResult, traceId, logger: tenantLogger };
+				}
+				return status(401, { message: "Authentication required" });
+			} catch (e) {
+				logger.error(
+					{
+						error: e instanceof Error ? e.message : "Unknown error",
+						stack: e instanceof Error ? e.stack : undefined,
+					},
+					"Authentication error",
+				);
+				return status(401, { message: "Authentication failed" });
+			}
+		},
+		detail: {
+			security: [{ apiKey: [] }],
+		},
+	},
+	auth: {
+		async resolve({ status, request: { headers } }) {
+			try {
+				const apiKey = headers.get("x-api-key");
+				const cookie = headers.get("cookie");
+				const traceId = crypto.randomUUID();
+				const currentLogger = logger.child({ traceId });
+				const apiKeyResult = await validateApiKey(apiKey);
+				if (apiKeyResult) {
+					const tenantLogger = currentLogger.child({
+						traceId,
+						service: "mail",
+						...currentLogger,
+					});
+					tenantLogger.info(
+						{ ...apiKeyResult },
+						"API key authentication successful",
+					);
+					return { ...apiKeyResult, traceId, logger: tenantLogger };
+				}
+				const sessionResult = await validateSession(cookie);
+				if (sessionResult) {
+					const tenantLogger = currentLogger.child({
+						traceId,
+						service: "mail",
+						...currentLogger,
+					});
+					tenantLogger.info(
+						{ ...sessionResult },
+						"Session authentication successful",
+					);
+					return { ...sessionResult, traceId, logger: tenantLogger };
+				}
+				return status(401, { message: "Authentication required" });
+			} catch (e) {
+				logger.error(
+					{
+						error: e instanceof Error ? e.message : "Unknown error",
+						stack: e instanceof Error ? e.stack : undefined,
+					},
+					"Authentication error",
+				);
+				return status(401, { message: "Authentication failed" });
+			}
+		},
+		detail: {
+			security: [{ apiKey: [] }],
 		},
 	},
 });
