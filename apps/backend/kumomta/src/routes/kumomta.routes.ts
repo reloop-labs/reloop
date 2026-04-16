@@ -1,7 +1,7 @@
 import { Elysia } from "elysia";
 import { authMiddleware } from "../middleware/auth";
-import { verifyApiKeyRoute } from "./auth/verify-api-key/verify-api-key.route";
 import { kumomtaConfigRoute } from "./config/config.route";
+import { verifyApiKeyRoute } from "./verify-api-key/verify-api-key.route";
 import { kumomtaWebhookRoute } from "./webhook/webhook.route";
 
 export const kumomtaRoutes = new Elysia({
@@ -10,8 +10,5 @@ export const kumomtaRoutes = new Elysia({
 })
   .use(authMiddleware)
   .guard({ kumomtaAuth: true }, (app) =>
-    app
-      .use(verifyApiKeyRoute)
-      .use(kumomtaConfigRoute)
-      .use(kumomtaWebhookRoute),
+    app.use(verifyApiKeyRoute).use(kumomtaConfigRoute).use(kumomtaWebhookRoute),
   );

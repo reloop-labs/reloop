@@ -28,8 +28,7 @@ export const kumomtaConfigRoute = new Elysia().get(
       ),
     },
     detail: {
-      tags: ["Kumomta", "Internal"],
-      summary: "Get DKIM config",
+      summary: "Retrieve DKIM config",
       description:
         "Internal endpoint for KumoMTA to fetch DKIM signing configuration for a domain.",
     },

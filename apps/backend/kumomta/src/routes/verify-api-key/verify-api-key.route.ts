@@ -37,8 +37,7 @@ export const verifyApiKeyRoute = new Elysia().post(
       key: t.String(),
     }),
     detail: {
-      tags: ["Kumomta", "Internal", "Auth"],
-      summary: "Verify API Key via POST JSON",
+      summary: "API Key Verification",
       description:
         "Internal verification endpoint mapping POST API keys to their owner.",
     },

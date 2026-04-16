@@ -63,7 +63,6 @@ export const kumomtaWebhookRoute = new Elysia().post(
       }),
     },
     detail: {
-      tags: ["Kumomta", "Internal"],
       summary: "KumoMTA webhooks",
       description:
         "Internal endpoint for KumoMTA to push event delivery/bounce logs.",
