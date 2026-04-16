@@ -35,13 +35,21 @@ kumo.on('smtp_server_auth_plain', function(authz, authc, password, conn_meta)
     }
   })
   local status, response = pcall(function()
-    return client:post(
-      kumomta_endpoint .. "/api/kumomta/v1/auth/verify",
-      kumo.serde.json_encode({
+    local req = client:post(kumomta_endpoint .. "/api/kumomta/v1/auth/verify")
+    return req
+      :header("x-kumomta-key", kumomta_key)
+      :header("Content-Type", "application/json")
+      :body(kumo.serde.json_encode({
         key = password
-      })
-    )
+      }))
+      :send()
   end)
+
+  if not status then
+    print("HTTP CALL FAILED: " .. tostring(response))
+  elseif response then
+    print("HTTP STATUS: " .. tostring(response:status_code()))
+  end
 
   if status and response and response:status_code() == 200 then
     conn_meta:set_meta('authz_id', authc)
