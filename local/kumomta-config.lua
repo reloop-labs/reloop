@@ -27,9 +27,9 @@ end)
 kumo.on('smtp_server_auth_plain', function(authz, authc, password, conn_meta)
   local client = kumo.http.build_client({})
   local status, response = pcall(function()
-    return client:get("http://host.docker.internal:8020/v1/auth/verify", {
+    return client:get("http://host.docker.internal:8020/api/kumomta/v1/auth/verify", {
       headers = {
-        ["x-api-key"] = password
+        ["x-kumomta-key"] = password
       }
     })
   end)

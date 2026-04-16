@@ -5,9 +5,9 @@ import { verifyApiKeyController } from "./verify-api-key.controllers";
 export const verifyApiKeyRoute = new Elysia().get(
   "/auth/verify",
   async (context) => {
-    // Check Authorization header or x-api-key directly
+    // Check Authorization header or x-kumomta-key directly
     const authHeader = context.request.headers.get("authorization");
-    let apiKey = context.request.headers.get("x-api-key");
+    let apiKey = context.request.headers.get("x-kumomta-key");
     if (authHeader?.startsWith("Bearer ")) {
       apiKey = authHeader.substring(7);
     }
