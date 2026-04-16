@@ -43,7 +43,10 @@
 		"three": "catalog:ui",
 		"usehooks-ts": "catalog:ui",
 		"valibot": "catalog:db",
-		"zustand": "catalog:ui"
+		"zustand": "catalog:ui",
+		"@dnd-kit/core": "catalog:ui",
+		"@dnd-kit/sortable": "catalog:ui",
+		"@dnd-kit/utilities": "catalog:ui"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",

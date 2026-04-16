@@ -9,6 +9,7 @@ import { motion } from "framer-motion";
 import { parseAsBoolean, useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 import useMeasure from "react-use-measure";
+import { useEditorStore } from "../editor/use-editor-store";
 
 interface FieldRowProps {
 	label: string;
@@ -145,11 +146,16 @@ const DomainDropdown = ({ value, onChange }: DomainDropdownProps) => {
 };
 
 export const CenterHeader = () => {
-	const [sender, setSender] = useState("Test");
-	const [from, setFrom] = useState("pranavkp.me");
+	const senderName = useEditorStore((s) => s.senderName);
+	const setSenderName = useEditorStore((s) => s.setSenderName);
+	const fromEmail = useEditorStore((s) => s.fromEmail);
+	const setFromEmail = useEditorStore((s) => s.setFromEmail);
+	const replyTo = useEditorStore((s) => s.replyTo);
+	const setReplyTo = useEditorStore((s) => s.setReplyTo);
+	const subject = useEditorStore((s) => s.subject);
+	const setSubject = useEditorStore((s) => s.setSubject);
+
 	const [selectedDomain, setSelectedDomain] = useState("prolab.sh");
-	const [reply, setReply] = useState("pranavkp.me@outlook.com");
-	const [subject, setSubject] = useState("");
 	const [showDetails, setShowDetails] = useQueryState(
 		"showDetails",
 		parseAsBoolean,
@@ -177,8 +183,9 @@ export const CenterHeader = () => {
 			</Button.Root>
 			<FieldRow
 				label="Sender"
-				value={sender}
-				onChange={setSender}
+				value={senderName}
+				onChange={setSenderName}
+				placeholder="Sender name"
 				hideBorder={!showDetails}
 			/>
 			<motion.div
@@ -196,8 +203,9 @@ export const CenterHeader = () => {
 				<div ref={ref}>
 					<FieldRow
 						label="From"
-						value={from}
-						onChange={setFrom}
+						value={fromEmail}
+						onChange={setFromEmail}
+						placeholder="your-email"
 						suffixDropdown={
 							<DomainDropdown
 								value={selectedDomain}
@@ -205,7 +213,7 @@ export const CenterHeader = () => {
 							/>
 						}
 					/>
-					<FieldRow label="Reply" value={reply} onChange={setReply} />
+					<FieldRow label="Reply" value={replyTo} onChange={setReplyTo} placeholder="Reply-to email" />
 					<FieldRow
 						label="Subject"
 						value={subject}

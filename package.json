@@ -104,7 +104,10 @@
 				"three": "0.182.0",
 				"recharts": "2.15.0",
 				"react-use-measure": "2.1.7",
-				"simple-icons": "16.14.0"
+				"simple-icons": "16.14.0",
+				"@dnd-kit/core": "^6.3.1",
+				"@dnd-kit/sortable": "^10.0.0",
+				"@dnd-kit/utilities": "^3.2.2"
 			},
 			"db": {
 				"@types/pg": "8.15.4",

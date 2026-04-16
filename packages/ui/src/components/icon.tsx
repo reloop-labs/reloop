@@ -2003,6 +2003,36 @@ export const IconsSprite = () => (
 				/>
 			</symbol>
 			<symbol
+				id="arrow-down"
+				viewBox="0 0 24 24"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<path
+					d="M12 3L12 21M12 21L19 14M12 21L5 14"
+					stroke="#2F384C"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
+
+			<symbol
+				id="arrow-top"
+				viewBox="0 0 24 24"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<path
+					d="M12 21L12 3M12 3L19 10M12 3L5 10"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
+
+			<symbol
 				id="arrow-left"
 				viewBox="0 0 24 24"
 				fill="none"
