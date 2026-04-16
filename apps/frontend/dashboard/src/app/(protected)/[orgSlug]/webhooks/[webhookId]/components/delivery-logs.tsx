@@ -1,12 +1,11 @@
-"use client";
+import { PageSizeDropdown } from "@fe/dashboard/components/page-size-dropdown";
+import { PaginationControls } from "@fe/dashboard/components/pagination-controls";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Drawer from "@reloop/ui/drawer";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import * as Select from "@reloop/ui/select";
 import { Skeleton } from "@reloop/ui/skeleton";
-import * as Table from "@reloop/ui/table";
 import axios from "axios";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -16,6 +15,19 @@ import { toast } from "sonner";
 import useSWR, { mutate } from "swr";
 
 dayjs.extend(relativeTime);
+
+const GRID = "grid-cols-[100px_100px_1fr_120px_100px_80px]";
+
+const DeliverySkeleton = () => (
+	<div className={cn("grid w-full items-center gap-4 px-4 py-3", GRID)}>
+		<Skeleton className="h-4 w-16" />
+		<Skeleton className="h-5 w-16 rounded-[4px]" />
+		<Skeleton className="h-4 w-full" />
+		<Skeleton className="h-4 w-16" />
+		<Skeleton className="h-4 w-12" />
+		<Skeleton className="h-4 w-8" />
+	</div>
+);
 
 const getStatusColorClass = (status: string) => {
 	switch (status) {
@@ -121,6 +133,8 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 		filteredDeliveries[0];
 
 	const totalPages = data ? Math.ceil(data.total / pageSize) : 0;
+	const startIndex = (currentPage - 1) * pageSize + 1;
+	const endIndex = Math.min(currentPage * pageSize, data?.total || 0);
 
 	return (
 		<div className="flex flex-col space-y-6">
@@ -171,86 +185,92 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 				</div>
 			</div>
 
-			<div className="overflow-hidden rounded-xl border border-stroke-soft-200">
-				<Table.Root>
-					<Table.Header>
-						<Table.Row>
-							<Table.Head className="font-medium text-[10px] uppercase tracking-wider">
-								Time
-							</Table.Head>
-							<Table.Head className="font-medium text-[10px] uppercase tracking-wider">
-								Status
-							</Table.Head>
-							<Table.Head className="font-medium text-[10px] uppercase tracking-wider">
-								Event
-							</Table.Head>
-							<Table.Head className="font-medium text-[10px] uppercase tracking-wider">
-								Delivery ID
-							</Table.Head>
-							<Table.Head className="font-medium text-[10px] uppercase tracking-wider">
-								Duration
-							</Table.Head>
-							<Table.Head className="font-medium text-[10px] uppercase tracking-wider">
-								Code
-							</Table.Head>
-						</Table.Row>
-					</Table.Header>
-					<Table.Body className="divide-y divide-stroke-soft-200">
-						{isLoading ? (
-							Array.from({ length: 5 }).map((_, i) => (
-								<Table.Row key={i}>
-									<Table.Cell colSpan={6} className="p-4">
-										<Skeleton className="h-6 w-full rounded" />
-									</Table.Cell>
-								</Table.Row>
-							))
-						) : filteredDeliveries.length === 0 ? (
-							<Table.Row>
-								<Table.Cell
-									colSpan={6}
-									className="h-32 text-center text-text-sub-600"
-								>
-									No deliveries found
-								</Table.Cell>
-							</Table.Row>
-						) : (
-							filteredDeliveries.map((delivery) => {
-								const duration = delivery.completedAt
-									? dayjs(delivery.completedAt).diff(
-											dayjs(delivery.createdAt),
-											"ms",
-										)
-									: null;
+			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/50">
+				<div
+					className={cn(
+						"grid items-center gap-4 border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600 dark:border-stroke-soft-100/50",
+						GRID,
+					)}
+				>
+					<div className="flex items-center gap-2 text-xs">
+						<Icon name="clock" className="h-3.5 w-3.5" />
+						<span className="font-medium">Time</span>
+					</div>
+					<div className="flex items-center gap-2 text-xs">
+						<Icon name="check-circle" className="h-3.5 w-3.5" />
+						<span className="font-medium">Status</span>
+					</div>
+					<div className="flex items-center gap-2 text-xs">
+						<Icon name="activity-2" className="h-3.5 w-3.5" />
+						<span className="font-medium">Event</span>
+					</div>
+					<div className="flex items-center gap-2 whitespace-nowrap text-xs">
+						<Icon name="hash" className="h-3.5 w-3.5" />
+						<span className="font-medium">Delivery ID</span>
+					</div>
+					<div className="flex items-center gap-2 text-xs">
+						<Icon name="clock" className="h-3.5 w-3.5" />
+						<span className="font-medium">Duration</span>
+					</div>
+					<div className="flex items-center gap-2 text-xs">
+						<Icon name="code" className="h-3.5 w-3.5" />
+						<span className="font-medium">Code</span>
+					</div>
+				</div>
+				<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
+					{isLoading ? (
+						Array.from({ length: 5 }).map((_, i) => (
+							<DeliverySkeleton key={i} />
+						))
+					) : filteredDeliveries.length === 0 ? (
+						<div className="flex h-32 w-full items-center justify-center text-center text-text-sub-600">
+							No deliveries found
+						</div>
+					) : (
+						filteredDeliveries.map((delivery) => {
+							const duration = delivery.completedAt
+								? dayjs(delivery.completedAt).diff(
+										dayjs(delivery.createdAt),
+										"ms",
+									)
+								: null;
+							const isRowActive = selectedDeliveryId === delivery.id;
 
-								return (
-									<Table.Row
-										key={delivery.id}
-										className="cursor-pointer transition-colors hover:bg-bg-weak-50"
-										onClick={() => setSelectedDeliveryId(delivery.id)}
-									>
-										<Table.Cell className="font-medium font-mono text-[13px] text-text-strong-950">
-											{dayjs(delivery.createdAt).format("HH:mm:ss")}
-										</Table.Cell>
-										<Table.Cell>
-											<span
-												className={cn(
-													"inline-flex rounded-full px-2 py-0.5 font-medium text-xs capitalize",
-													getStatusColorClass(delivery.status),
-												)}
-											>
-												{delivery.status}
-											</span>
-										</Table.Cell>
-										<Table.Cell className="font-medium font-mono text-[13px] text-text-strong-950">
-											{delivery.eventType}
-										</Table.Cell>
-										<Table.Cell className="font-mono text-text-sub-600 text-xs">
-											{delivery.id.replace("dlv_", "").substring(0, 8)}
-										</Table.Cell>
-										<Table.Cell className="font-medium text-[13px] text-text-sub-600">
-											{duration ? `${duration.toLocaleString()}ms` : "---"}
-										</Table.Cell>
-										<Table.Cell
+							return (
+								<div
+									key={delivery.id}
+									onClick={() => setSelectedDeliveryId(delivery.id)}
+									className={cn(
+										"group/row grid w-full cursor-pointer items-center gap-4 px-4 py-3 text-left transition-colors",
+										GRID,
+										"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-base focus-visible:ring-offset-1",
+										isRowActive && "bg-bg-weak-50/50",
+									)}
+								>
+									<div className="font-medium font-mono text-[13px] text-text-strong-950">
+										{dayjs(delivery.createdAt).format("HH:mm:ss")}
+									</div>
+									<div className="flex items-center">
+										<span
+											className={cn(
+												"inline-flex rounded-md border-[1px] border-transparent px-[6px] py-0.5 font-medium text-[10px]",
+												getStatusColorClass(delivery.status),
+											)}
+										>
+											{delivery.status}
+										</span>
+									</div>
+									<div className="truncate font-medium font-mono text-[13px] text-text-strong-950">
+										{delivery.eventType}
+									</div>
+									<div className="truncate font-mono text-text-sub-600 text-xs">
+										{delivery.id.replace("dlv_", "").substring(0, 8)}
+									</div>
+									<div className="font-medium text-[13px] text-text-sub-600">
+										{duration ? `${duration.toLocaleString()}ms` : "---"}
+									</div>
+									<div className="flex items-center">
+										<span
 											className={cn(
 												"font-medium font-mono text-[13px]",
 												delivery.responseStatus &&
@@ -261,65 +281,35 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 											)}
 										>
 											{delivery.responseStatus || "---"}
-										</Table.Cell>
-									</Table.Row>
-								);
-							})
-						)}
-					</Table.Body>
-				</Table.Root>
-
+										</span>
+									</div>
+								</div>
+							);
+						})
+					)}
+				</div>
 				{/* Pagination footer */}
 				{data && data.total > 0 && (
-					<div className="border-stroke-soft-200 border-t bg-white p-4">
-						<div className="flex items-center justify-between gap-4 text-text-sub-600 text-xs">
-							<div className="flex items-center gap-1.5">
-								<Button.Root
-									size="xxsmall"
-									variant="neutral"
-									mode="stroke"
-									onClick={() =>
-										setCurrentPage((prev) => Math.max(1, prev - 1))
-									}
-									disabled={currentPage === 1}
-								>
-									<Icon name="chevron-left" className="h-3 w-3" />
-								</Button.Root>
-								<span className="truncate whitespace-nowrap font-medium">
-									{currentPage} / {totalPages}
-								</span>
-								<Button.Root
-									size="xxsmall"
-									variant="neutral"
-									mode="stroke"
-									onClick={() =>
-										setCurrentPage((prev) => Math.min(totalPages, prev + 1))
-									}
-									disabled={currentPage === totalPages}
-								>
-									<Icon name="chevron-right" className="h-3 w-3" />
-								</Button.Root>
-							</div>
-							<Select.Root
-								value={String(pageSize)}
+					<div className="flex items-center justify-between border-stroke-soft-100 border-t bg-bg-white-0 px-4 py-3 text-paragraph-sm text-text-sub-600 dark:border-stroke-soft-100/50">
+						<div className="flex items-center gap-3">
+							<span>
+								Showing {startIndex}–{endIndex} of {data.total} deliver
+								{data.total !== 1 ? "ies" : "y"}
+							</span>
+							<PageSizeDropdown
+								value={pageSize}
 								onValueChange={(value) => {
-									setPageSize(Number(value));
+									setPageSize(value);
 									setCurrentPage(1);
 								}}
-								size="xsmall"
-							>
-								<Select.Trigger className="h-7 w-14 text-[10px]">
-									<Select.Value />
-								</Select.Trigger>
-								<Select.Content className="min-w-16">
-									{["10", "20", "50"].map((v) => (
-										<Select.Item key={v} value={v} className="text-xs">
-											{v}
-										</Select.Item>
-									))}
-								</Select.Content>
-							</Select.Root>
+							/>
 						</div>
+						<PaginationControls
+							currentPage={currentPage}
+							totalPages={totalPages}
+							onPageChange={setCurrentPage}
+							isLoading={isLoading}
+						/>
 					</div>
 				)}
 			</div>
