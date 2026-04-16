@@ -3,7 +3,7 @@ import { Elysia, t } from "elysia";
 import {
   handleKumomtaWebhookController,
   type KumomtaLogRecord,
-} from "./kumomta-webhook.controllers";
+} from "./webhook.controllers";
 
 export const kumomtaWebhookRoute = new Elysia().post(
   "/webhook/kumomta",

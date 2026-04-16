@@ -1,6 +1,6 @@
 import { type Logger, logger } from "@reloop/logger";
 import { Elysia, t } from "elysia";
-import { getDkimConfigController } from "./kumomta-config.controllers";
+import { getDkimConfigController } from "./config.controllers";
 
 export const kumomtaConfigRoute = new Elysia().get(
   "/config/dkim/:domain",
