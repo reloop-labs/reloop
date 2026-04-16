@@ -4,6 +4,7 @@ import { serverTiming } from "@elysiajs/server-timing";
 import { logger } from "@reloop/logger";
 import { landing } from "@reloop/webhook/routes/landing/landing.index";
 import { webhookRoutes } from "@reloop/webhook/routes/webhook/webhook.routes";
+import { loader } from "@reloop/webhook/utils/loader";
 import { Elysia } from "elysia";
 import { webhookConfig } from "./webhook.config";
 
@@ -25,6 +26,9 @@ const webhookService = new Elysia({
 	.use(serverTiming())
 	.use(landing)
 	.use(webhookRoutes)
+	.onStart(async () => {
+		await loader();
+	})
 	.listen(port, () => {
 		logger.info(
 			`Webhook Server is running on http://localhost:${port}/api/webhook`,
@@ -32,3 +36,4 @@ const webhookService = new Elysia({
 	});
 
 export type WebhookService = typeof webhookService;
+

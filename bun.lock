@@ -371,6 +371,7 @@
         "@reloop/logger": "workspace:*",
         "@reloop/webhook-events": "workspace:*",
         "better-auth": "catalog:",
+        "bullmq": "catalog:backend",
         "dotenv": "catalog:backend",
         "drizzle-orm": "catalog:db",
         "drizzle-typebox": "catalog:db",
