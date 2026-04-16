@@ -1,18 +1,19 @@
 "use client";
-import * as Badge from "@reloop/ui/badge";
+
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
 import { WEBHOOK_EVENTS } from "@reloop/webhook-events";
 import axios from "axios";
-import { useMemo, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { mutate } from "swr";
 
 interface TriggerWebhookTesterProps {
 	webhookId: string;
-	webhookName?: string;
-	webhookUrl?: string;
+	webhookEvents?: string[];
 }
 
 type Tab = "timeline" | "response" | "headers";
@@ -26,10 +27,10 @@ interface TriggerResult {
 	error: string | null;
 }
 
-const categoryColors: Record<string, "blue" | "orange" | "green" | "gray"> = {
-	domain: "blue",
-	"api-key": "orange",
-	contact: "green",
+const categoryBadgeColors: Record<string, { light: string; dark: string }> = {
+	domain: { light: "bg-[#0A438A]", dark: "dark:bg-[#1E57A8]" },
+	"api-key": { light: "bg-[#8A5A0A]", dark: "dark:bg-[#A87A1E]" },
+	contact: { light: "bg-[#0A6B3A]", dark: "dark:bg-[#1E8A4E]" },
 };
 
 const getPayloadForEvent = (
@@ -76,20 +77,41 @@ const getPayloadForEvent = (
 
 export const TriggerWebhookTester = ({
 	webhookId,
-	webhookName,
-	webhookUrl,
+	webhookEvents,
 }: TriggerWebhookTesterProps) => {
+	const filteredEvents = useMemo(() => {
+		if (webhookEvents) {
+			return WEBHOOK_EVENTS.filter((e) => webhookEvents.includes(e.id));
+		}
+		return WEBHOOK_EVENTS;
+	}, [webhookEvents]);
+
 	const [selectedEventId, setSelectedEventId] = useState<string>(
-		WEBHOOK_EVENTS[0].id,
+		filteredEvents[0]?.id || "",
 	);
 	const [activeTab, setActiveTab] = useState<Tab>("timeline");
+
+	useEffect(() => {
+		if (!selectedEventId && filteredEvents.length > 0) {
+			setSelectedEventId(filteredEvents[0].id);
+		} else if (
+			selectedEventId &&
+			webhookEvents &&
+			!webhookEvents.includes(selectedEventId)
+		) {
+			if (filteredEvents.length > 0) setSelectedEventId(filteredEvents[0].id);
+		}
+	}, [selectedEventId, filteredEvents, webhookEvents]);
+
+	const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
+	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 	const [isTriggering, setIsTriggering] = useState(false);
 	const [result, setResult] = useState<TriggerResult | null>(null);
 	const [isCopyingPayload, setIsCopyingPayload] = useState(false);
 
 	const selectedEvent = useMemo(
-		() => WEBHOOK_EVENTS.find((e) => e.id === selectedEventId),
-		[selectedEventId],
+		() => filteredEvents.find((e) => e.id === selectedEventId),
+		[filteredEvents, selectedEventId],
 	);
 
 	const payload = useMemo(() => {
@@ -181,21 +203,16 @@ export const TriggerWebhookTester = ({
 		}
 	};
 
-	const groupedEvents = useMemo(() => {
-		const groups: Record<string, (typeof WEBHOOK_EVENTS)[number][]> = {};
-		for (const event of WEBHOOK_EVENTS) {
-			const group = groups[event.category] ?? [];
-			group.push(event);
-			groups[event.category] = group;
-		}
-		return groups;
-	}, []);
-
-	const tabs: { id: Tab; label: string }[] = [
-		{ id: "timeline", label: "Timeline" },
-		{ id: "response", label: "Response" },
-		{ id: "headers", label: "Headers" },
+	const tabs: { id: Tab; label: string; iconName: string }[] = [
+		{ id: "timeline", label: "Timeline", iconName: "activity" },
+		{ id: "response", label: "Response", iconName: "code" },
+		{ id: "headers", label: "Headers", iconName: "list" },
 	];
+
+	const activeIndex = tabs.findIndex((t) => t.id === activeTab);
+	const currentIdx = hoveredIdx !== undefined ? hoveredIdx : activeIndex;
+	const currentTabEl = buttonRefs.current[currentIdx];
+	const rect = currentTabEl?.getBoundingClientRect();
 
 	const isSuccess =
 		result?.status != null && result.status >= 200 && result.status < 300;
@@ -205,95 +222,59 @@ export const TriggerWebhookTester = ({
 			<div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
 				{/* ── Left: Event selector + Payload ── */}
 				<div className="flex min-h-0 flex-col gap-4">
-					{/* Send test event card */}
-					<div className="overflow-hidden rounded-xl border border-stroke-soft-200">
-						{/* Card header */}
-						<div className="border-stroke-soft-200 border-b bg-bg-weak-50 px-4 py-3">
-							<p className="font-semibold text-paragraph-xs text-text-strong-950">
-								Send test event
-							</p>
-							{(webhookName || webhookUrl) && (
-								<p className="mt-0.5 truncate font-medium text-paragraph-xs text-text-sub-600">
-									{webhookName && <span>{webhookName}</span>}
-									{webhookName && webhookUrl && (
-										<span className="mx-1 text-text-soft-400">·</span>
-									)}
-									{webhookUrl && (
-										<span className="font-mono text-[11px]">{webhookUrl}</span>
-									)}
-								</p>
-							)}
-						</div>
-
-						{/* Event list */}
-						<div className="p-3">
-							<p className="mb-2 px-1 font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
-								Choose event type
-							</p>
-							<div className="flex max-h-72 flex-col gap-0.5 overflow-y-auto">
-								{Object.entries(groupedEvents).map(([category, events]) => (
-									<div key={category}>
-										<p className="mt-2 mb-1 px-2 font-medium text-[9px] text-text-soft-400 uppercase tracking-widest first:mt-0">
-											{category}
-										</p>
-										{events.map((event) => {
-											const isSelected = selectedEventId === event.id;
-											return (
-												<button
-													key={event.id}
-													type="button"
-													onClick={() => handleSelectEvent(event.id)}
-													className={cn(
-														"flex w-full cursor-pointer items-center gap-3 rounded-lg border px-3 py-2 text-left transition-colors",
-														isSelected
-															? "border-primary-base bg-primary-lighter"
-															: "border-transparent hover:bg-bg-weak-50",
-													)}
-												>
-													{/* Radio */}
-													<div
-														className={cn(
-															"flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
-															isSelected
-																? "border-primary-base bg-primary-base"
-																: "border-stroke-soft-200 bg-bg-white-0",
-														)}
-													>
-														{isSelected && (
-															<div className="h-1.5 w-1.5 rounded-full bg-white" />
-														)}
-													</div>
-													{/* Text */}
-													<div className="min-w-0 flex-1">
-														<p
-															className={cn(
-																"truncate font-medium text-paragraph-xs",
-																isSelected
-																	? "text-primary-base"
-																	: "text-text-strong-950",
-															)}
-														>
-															{event.name}
-														</p>
-														<p className="truncate text-[11px] text-text-sub-600">
-															{event.description}
-														</p>
-													</div>
-													{/* Badge */}
-													<Badge.Root
-														size="small"
-														variant="lighter"
-														color={categoryColors[event.category] ?? "gray"}
-														className="shrink-0 capitalize"
-													>
-														{event.category}
-													</Badge.Root>
-												</button>
-											);
-										})}
-									</div>
-								))}
-							</div>
+					{/* Event list */}
+					<div className="flex flex-col gap-2">
+						<p className="px-1 font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
+							Choose event type
+						</p>
+						<div className="flex max-h-72 flex-col overflow-y-auto rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/40">
+							{filteredEvents.map((event, i) => {
+								const isSelected = selectedEventId === event.id;
+								const isLast = i === filteredEvents.length - 1;
+								return (
+									<button
+										key={event.id}
+										type="button"
+										aria-pressed={isSelected}
+										onClick={() => handleSelectEvent(event.id)}
+										className={cn(
+											"flex w-full cursor-pointer items-center justify-between px-4 py-2.5 text-left transition-colors hover:bg-bg-weak-50/50",
+											isSelected && "bg-bg-weak-50/60",
+											!isLast &&
+												"border-stroke-soft-100 border-b dark:border-stroke-soft-100/40",
+										)}
+									>
+										<div className="flex min-w-0 flex-1 items-center gap-3">
+											<div
+												className={cn(
+													"flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
+													isSelected
+														? "border-primary-base bg-primary-base"
+														: "border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40",
+												)}
+											>
+												{isSelected && (
+													<div className="h-1.5 w-1.5 rounded-full bg-white" />
+												)}
+											</div>
+											<span className="truncate font-medium text-label-sm text-text-strong-950">
+												{event.name}
+											</span>
+										</div>
+										<div
+											className={cn(
+												"ml-3 shrink-0 rounded-full px-1.5 py-0.5 font-medium text-[10px] text-white",
+												categoryBadgeColors[event.category]?.light,
+												categoryBadgeColors[event.category]?.dark,
+											)}
+										>
+											{event.category
+												.replace("-", " ")
+												.replace(/\b\w/g, (c) => c.toUpperCase())}
+										</div>
+									</button>
+								);
+							})}
 						</div>
 					</div>
 
@@ -347,25 +328,89 @@ export const TriggerWebhookTester = ({
 				{/* ── Right: Response panel ── */}
 				<div className="flex flex-col overflow-hidden rounded-xl border border-stroke-soft-200">
 					{/* Tabs bar */}
-					<div className="flex items-center border-stroke-soft-200 border-b bg-bg-weak-50 px-2">
-						{tabs.map((tab) => (
-							<button
-								key={tab.id}
-								type="button"
-								onClick={() => setActiveTab(tab.id)}
-								className={cn(
-									"relative px-3 py-3 font-medium text-paragraph-xs transition-colors",
-									activeTab === tab.id
-										? "text-text-strong-950"
-										: "text-text-sub-600 hover:text-text-strong-950",
-								)}
-							>
-								{tab.label}
-								{activeTab === tab.id && (
-									<span className="absolute right-0 bottom-0 left-0 h-0.5 rounded-t-full bg-text-strong-950" />
-								)}
-							</button>
-						))}
+					<div className="border-stroke-soft-200 border-b bg-bg-weak-50 px-2">
+						<TabMenuHorizontal.Root
+							value={activeTab}
+							onValueChange={(val) => setActiveTab(val as Tab)}
+						>
+							<TabMenuHorizontal.List className="relative h-10 gap-0 border-b! border-transparent! py-0">
+								{tabs.map((tab, index) => (
+									<TabMenuHorizontal.Trigger
+										key={tab.id}
+										value={tab.id}
+										ref={(el) => {
+											if (el) {
+												buttonRefs.current[index] = el;
+											}
+										}}
+										onPointerEnter={() => setHoveredIdx(index)}
+										onPointerLeave={() => setHoveredIdx(undefined)}
+										className={cn(
+											"flex cursor-pointer items-center gap-2 px-2.5 py-0! text-sm transition-colors",
+											hoveredIdx === undefined && activeIndex === index
+												? "text-text-strong-950"
+												: "text-text-sub-600",
+										)}
+									>
+										<Icon name={tab.iconName} className="h-4 w-4" />
+										{tab.label}
+									</TabMenuHorizontal.Trigger>
+								))}
+								<AnimatePresence>
+									{rect && activeIndex !== -1 ? (
+										<motion.div
+											className="absolute top-0 left-0 rounded-lg bg-neutral-alpha-10"
+											initial={{
+												pointerEvents: "none",
+												width: rect.width,
+												height: rect.height - 20,
+												left:
+													rect.left -
+													(currentTabEl?.offsetParent?.getBoundingClientRect()
+														.left || 0),
+												top:
+													rect.top -
+													(currentTabEl?.offsetParent?.getBoundingClientRect()
+														.top || 0) +
+													10,
+												opacity: 0,
+											}}
+											animate={{
+												pointerEvents: "none",
+												width: rect.width,
+												height: rect.height - 20,
+												left:
+													rect.left -
+													(currentTabEl?.offsetParent?.getBoundingClientRect()
+														.left || 0),
+												top:
+													rect.top -
+													(currentTabEl?.offsetParent?.getBoundingClientRect()
+														.top || 0) +
+													10,
+												opacity: 1,
+											}}
+											exit={{
+												pointerEvents: "none",
+												opacity: 0,
+												width: rect.width,
+												height: rect.height - 20,
+												left:
+													rect.left -
+													(currentTabEl?.offsetParent?.getBoundingClientRect()
+														.left || 0),
+												top:
+													rect.top -
+													(currentTabEl?.offsetParent?.getBoundingClientRect()
+														.top || 0) +
+													10,
+											}}
+											transition={{ duration: 0.14 }}
+										/>
+									) : null}
+								</AnimatePresence>
+							</TabMenuHorizontal.List>
+						</TabMenuHorizontal.Root>
 					</div>
 
 					{/* Panel body */}

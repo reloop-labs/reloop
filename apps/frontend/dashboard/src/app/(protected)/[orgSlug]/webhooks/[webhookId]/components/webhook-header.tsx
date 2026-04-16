@@ -13,6 +13,7 @@ import {
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
+import { WEBHOOK_EVENTS } from "@reloop/webhook-events";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { EditWebhookModal } from "../../components/edit-webhook-modal";
@@ -37,6 +38,12 @@ interface WebhookData {
 	updatedAt: string;
 	events?: string[];
 }
+
+const categoryBadgeColors: Record<string, { light: string; dark: string }> = {
+	domain: { light: "bg-[#0A438A]", dark: "dark:bg-[#1E57A8]" },
+	"api-key": { light: "bg-[#8A5A0A]", dark: "dark:bg-[#A87A1E]" },
+	contact: { light: "bg-[#0A6B3A]", dark: "dark:bg-[#1E8A4E]" },
+};
 
 interface WebhookHeaderProps {
 	webhook: WebhookData | null;
@@ -212,7 +219,7 @@ export const WebhookHeader = ({
 
 	return (
 		<>
-			<div className="border-stroke-soft-200 border-b border-dashed pt-10 pb-8">
+			<div className="pt-10 pb-8">
 				<AnimatedBackButton onClick={() => push("/webhooks")} />
 				<div className="flex items-center justify-between pt-6">
 					<div>
@@ -524,6 +531,51 @@ export const WebhookHeader = ({
 									)}
 								</Input.Wrapper>
 							</Input.Root>
+						)}
+					</div>
+
+					{/* Webhook Events */}
+					<div className="col-span-3 flex min-w-0 flex-col gap-2">
+						<div className="flex items-center gap-1.5">
+							<Icon name="list" className="h-3.5 w-3.5 text-text-sub-600" />
+							<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
+								Subscribed Events
+							</span>
+						</div>
+						{isLoading ? (
+							<div className="flex flex-wrap gap-2">
+								<Skeleton className="h-6 w-24 rounded-md" />
+								<Skeleton className="h-6 w-32 rounded-md" />
+							</div>
+						) : (
+							<div className="flex flex-wrap gap-2">
+								{webhook?.events?.length ? (
+									webhook.events.map((eventId) => {
+										const eventDefinition = WEBHOOK_EVENTS.find(
+											(e) => e.id === eventId,
+										);
+										return (
+											<span
+												key={eventId}
+												className={cn(
+													"inline-flex shrink-0 items-center rounded-full px-1.5 py-0.5 font-medium text-[10px] text-white",
+													eventDefinition?.category &&
+														categoryBadgeColors[eventDefinition.category]
+															?.light,
+													eventDefinition?.category &&
+														categoryBadgeColors[eventDefinition.category]?.dark,
+												)}
+											>
+												{eventDefinition?.name || eventId}
+											</span>
+										);
+									})
+								) : (
+									<span className="text-paragraph-sm text-text-sub-600 italic">
+										No events subscribed
+									</span>
+								)}
+							</div>
 						)}
 					</div>
 				</div>

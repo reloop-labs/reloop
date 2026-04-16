@@ -14,6 +14,7 @@ interface WebhookData {
 	url: string;
 	status: "active" | "paused" | "disabled" | "failed";
 	createdAt: string;
+	events: string[];
 }
 
 const getStatusIconColor = (status: string) => {
@@ -57,14 +58,14 @@ const WebhookTestPage = () => {
 		webhookData?.name || webhookData?.url || "Unnamed Webhook";
 
 	return (
-		<div className="mx-auto max-w-3xl sm:px-8">
+		<div className="mx-auto mb-10 w-full max-w-4xl space-y-6">
 			{/* Header — matches webhook-header.tsx pattern */}
-			<div className="pt-10 pb-8">
+			<div className="pt-6">
 				<AnimatedBackButton
 					onClick={() => push(`/webhooks/${webhookId as string}`)}
 				/>
 
-				<div className="flex items-center justify-between pt-6">
+				<div className="flex items-center justify-between pt-4">
 					<div>
 						{/* Breadcrumb */}
 						{isLoading ? (
@@ -112,11 +113,11 @@ const WebhookTestPage = () => {
 								<Skeleton className="h-4 w-64 rounded-lg" />
 							</div>
 						) : (
-							<div className="mt-1 flex flex-col">
-								<h1 className="font-medium text-title-h6 leading-8">
+							<div className="mt-1 flex flex-col gap-1">
+								<h1 className="font-semibold text-text-strong-950 text-title-h6 leading-8">
 									{displayName}
 								</h1>
-								<div className="flex items-center gap-1.5 truncate font-medium font-mono text-[11px] text-text-sub-600 leading-tight">
+								<div className="flex items-center gap-1.5 truncate font-medium font-mono text-paragraph-sm text-text-sub-600">
 									{webhookData?.url}
 								</div>
 							</div>
@@ -126,11 +127,10 @@ const WebhookTestPage = () => {
 			</div>
 
 			{/* Tester body */}
-			<div className="pt-8">
+			<div>
 				<TriggerWebhookTester
 					webhookId={webhookData?.id ?? (webhookId as string)}
-					webhookName={webhookData?.name}
-					webhookUrl={webhookData?.url}
+					webhookEvents={webhookData?.events}
 				/>
 			</div>
 		</div>
