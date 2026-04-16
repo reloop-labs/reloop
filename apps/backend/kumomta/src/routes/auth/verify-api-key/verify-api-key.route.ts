@@ -2,15 +2,10 @@ import { type Logger, logger } from "@reloop/logger";
 import { Elysia, t } from "elysia";
 import { verifyApiKeyController } from "./verify-api-key.controllers";
 
-export const verifyApiKeyRoute = new Elysia().get(
+export const verifyApiKeyRoute = new Elysia().post(
   "/auth/verify",
   async (context) => {
-    // Check Authorization header or x-kumomta-key directly
-    const authHeader = context.request.headers.get("authorization");
-    let apiKey = context.request.headers.get("x-kumomta-key");
-    if (authHeader?.startsWith("Bearer ")) {
-      apiKey = authHeader.substring(7);
-    }
+    const apiKey = context.body.key;
 
     if (!apiKey) {
       return context.status(401, { message: "API key missing" });
@@ -38,11 +33,14 @@ export const verifyApiKeyRoute = new Elysia().get(
         message: t.String(),
       }),
     },
+    body: t.Object({
+      key: t.String(),
+    }),
     detail: {
       tags: ["Kumomta", "Internal", "Auth"],
-      summary: "Verify API Key",
+      summary: "Verify API Key via POST JSON",
       description:
-        "Internal verification endpoint mapping HTTP API keys to their owner.",
+        "Internal verification endpoint mapping POST API keys to their owner.",
     },
   },
 );

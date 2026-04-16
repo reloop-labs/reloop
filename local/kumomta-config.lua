@@ -25,13 +25,22 @@ end)
 
 -- AUTH
 kumo.on('smtp_server_auth_plain', function(authz, authc, password, conn_meta)
-  local client = kumo.http.build_client({})
+  local kumomta_key = os.getenv("X_KUMOMTA_KEY") or "reloop"
+  local kumomta_endpoint = os.getenv("KUMOMTA_ENDPOINT") or "http://local.reloop.sh"
+
+  local client = kumo.http.build_client({
+    headers = {
+      ["x-kumomta-key"] = kumomta_key,
+      ["Content-Type"] = "application/json"
+    }
+  })
   local status, response = pcall(function()
-    return client:get("http://host.docker.internal:8020/api/kumomta/v1/auth/verify", {
-      headers = {
-        ["x-kumomta-key"] = password
-      }
-    })
+    return client:post(
+      kumomta_endpoint .. "/api/kumomta/v1/auth/verify",
+      kumo.serde.json_encode({
+        key = password
+      })
+    )
   end)
 
   if status and response and response:status_code() == 200 then

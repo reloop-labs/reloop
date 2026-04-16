@@ -31,6 +31,6 @@ ENV HOSTNAME=0.0.0.0
 COPY --from=builder /app/apps/backend/kumomta/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 
-EXPOSE 8020
+EXPOSE 8021
 
 CMD ["bun", "run", "dist/index.js"]

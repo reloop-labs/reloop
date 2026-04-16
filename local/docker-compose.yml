@@ -86,6 +86,9 @@ services:
     ports:
       - "25:25"      # ESMTP injection
       - "8020:8000"  # HTTP API
+    environment:
+      - X_KUMOMTA_KEY=${X_KUMOMTA_KEY:-reloop}
+      - KUMOMTA_ENDPOINT=${KUMOMTA_ENDPOINT:-http://local.reloop.sh}
     volumes:
       - ./kumomta-config.lua:/opt/kumomta/etc/policy/init.lua
     depends_on:
