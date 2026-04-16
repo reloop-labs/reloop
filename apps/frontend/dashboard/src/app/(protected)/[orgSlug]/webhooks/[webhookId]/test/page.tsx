@@ -128,10 +128,12 @@ const WebhookTestPage = () => {
 
 			{/* Tester body */}
 			<div>
-				<TriggerWebhookTester
-					webhookId={webhookData?.id ?? (webhookId as string)}
-					webhookEvents={webhookData?.events}
-				/>
+				{!isLoading && webhookData && (
+					<TriggerWebhookTester
+						webhookId={webhookData.id}
+						webhookEvents={webhookData.events}
+					/>
+				)}
 			</div>
 		</div>
 	);

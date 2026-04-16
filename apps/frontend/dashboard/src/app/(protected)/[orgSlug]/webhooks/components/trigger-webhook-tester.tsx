@@ -7,7 +7,8 @@ import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
 import { WEBHOOK_EVENTS } from "@reloop/webhook-events";
 import axios from "axios";
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { mutate } from "swr";
 
@@ -91,17 +92,14 @@ export const TriggerWebhookTester = ({
 	);
 	const [activeTab, setActiveTab] = useState<Tab>("timeline");
 
-	useEffect(() => {
-		if (!selectedEventId && filteredEvents.length > 0) {
-			setSelectedEventId(filteredEvents[0].id);
-		} else if (
-			selectedEventId &&
-			webhookEvents &&
-			!webhookEvents.includes(selectedEventId)
-		) {
-			if (filteredEvents.length > 0) setSelectedEventId(filteredEvents[0].id);
-		}
-	}, [selectedEventId, filteredEvents, webhookEvents]);
+	useHotkeys(
+		"mod+enter",
+		(e) => {
+			e.preventDefault();
+			document.getElementById("trigger-webhook-send-btn")?.click();
+		},
+		{ enableOnFormTags: true },
+	);
 
 	const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
@@ -310,18 +308,33 @@ export const TriggerWebhookTester = ({
 
 					{/* Send button */}
 					<Button.Root
+						id="trigger-webhook-send-btn"
 						variant="primary"
 						size="small"
-						className="w-full font-semibold"
+						className="relative w-full font-semibold"
 						onClick={handleTrigger}
 						disabled={isTriggering || !selectedEventId}
 					>
-						{isTriggering ? (
-							<Icon name="refresh-cw" className="mr-2 h-4 w-4 animate-spin" />
-						) : (
-							<Icon name="send" className="mr-2 h-4 w-4" />
+						<span className="flex items-center">
+							{isTriggering ? (
+								<Icon name="refresh-cw" className="mr-2 h-4 w-4 animate-spin" />
+							) : (
+								<Icon name="send" className="mr-2 h-4 w-4" />
+							)}
+							{isTriggering ? "Sending..." : "Send test"}
+						</span>
+						{!isTriggering && (
+							<span className="-translate-y-1/2 absolute top-1/2 right-2 inline-flex items-center gap-0.5">
+								<Icon
+									name="command"
+									className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+								/>
+								<Icon
+									name="enter"
+									className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+								/>
+							</span>
 						)}
-						{isTriggering ? "Sending..." : "Send test"}
 					</Button.Root>
 				</div>
 
