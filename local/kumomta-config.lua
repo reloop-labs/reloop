@@ -78,3 +78,44 @@ kumo.on('get_queue_config', function(domain, tenant, campaign, routing_domain)
     },
   }
 end)
+
+-- Enforce Domain Verification on Receipt
+kumo.on('smtp_server_message_received', function(msg)
+  local sender = msg:sender()
+  local domain = ""
+  if sender then
+    domain = string.match(tostring(sender), "@([^>]+)>?") or ""
+  end
+
+  if domain ~= "" then
+    local kumomta_key = os.getenv("X_KUMOMTA_KEY") or "reloop"
+    local kumomta_endpoint = os.getenv("KUMOMTA_ENDPOINT") or "http://local.reloop.sh"
+
+    local client = kumo.http.build_client({
+      headers = {
+        ["x-kumomta-key"] = kumomta_key,
+        ["Content-Type"] = "application/json"
+      }
+    })
+
+    local status, response = pcall(function()
+      local req = client:post(kumomta_endpoint .. "/api/kumomta/v1/domain/verify")
+      return req
+        :header("x-kumomta-key", kumomta_key)
+        :header("Content-Type", "application/json")
+        :body(kumo.serde.json_encode({
+          domain = domain
+        }))
+        :send()
+    end)
+
+    if status and response and response:status_code() == 200 then
+      local body = kumo.serde.json_parse(response:text())
+      if not body.isVerified then
+        kumo.reject(550, "5.7.1 Domain " .. domain .. " is not verified or active.")
+      end
+    else
+      kumo.reject(451, "4.3.0 Temporary failure verifying domain status")
+    end
+  end
+end)
