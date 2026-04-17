@@ -5,6 +5,8 @@ export const verifyRoute = new Elysia().post(
   "/verify",
   async ({ body, status }) => {
     const { key, domain } = body;
+    console.log("key", key);
+    console.log("domain", domain);
     const apiKeyResult = await verifyApiKeyController(key);
     if (!apiKeyResult) return status(401, { message: "Invalid API key" });
     const domainResult = await verifyDomainController({ domainName: domain, orgId: apiKeyResult.organizationId, });
