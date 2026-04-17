@@ -6,8 +6,6 @@ import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
 import * as Popover from "@reloop/ui/popover";
 import * as SegmentedControl from "@reloop/ui/segmented-control";
-import * as Select from "@reloop/ui/select";
-import { Slider } from "@reloop/ui/slider";
 import { useState } from "react";
 import { parseColor } from "react-aria-components";
 import { useEditorStore } from "../../editor/use-editor-store";
@@ -50,11 +48,11 @@ interface ColorFieldProps {
 const ColorField = ({ label, value, onChange }: ColorFieldProps) => {
 	const [isOpen, setIsOpen] = useState(false);
 
-	let colorObj;
+	let colorObj = parseColor("#FFFFFF");
 	try {
 		colorObj = parseColor(value || "#FFFFFF");
 	} catch {
-		colorObj = parseColor("#FFFFFF");
+		// Fallback already set
 	}
 
 	return (
@@ -211,13 +209,13 @@ export const GlobalSettings = () => {
 					>
 						<SegmentedControl.List>
 							<SegmentedControl.Trigger value="left">
-								LEFT
+								<Icon name="align-left" className="h-3.5 w-3.5" />
 							</SegmentedControl.Trigger>
 							<SegmentedControl.Trigger value="center">
-								CENTER
+								<Icon name="align-center" className="h-3.5 w-3.5" />
 							</SegmentedControl.Trigger>
 							<SegmentedControl.Trigger value="right">
-								RIGHT
+								<Icon name="align-right" className="h-3.5 w-3.5" />
 							</SegmentedControl.Trigger>
 						</SegmentedControl.List>
 					</SegmentedControl.Root>

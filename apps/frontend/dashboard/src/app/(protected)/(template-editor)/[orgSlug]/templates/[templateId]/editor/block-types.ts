@@ -1,5 +1,5 @@
-import type { TemplateBlock } from "@reloop/db/schema";
 import { createId } from "@paralleldrive/cuid2";
+import type { TemplateBlock } from "@reloop/db/schema";
 
 // ============ Block Type Constants ============
 export type BlockType =
@@ -181,7 +181,7 @@ export const BLOCK_DEFINITIONS: BlockDefinition[] = [
 	{
 		type: "heading",
 		label: "Heading",
-		icon: "heading",
+		icon: "Text",
 		category: "text",
 		description: "Large title text",
 		hasChildren: false,
@@ -198,7 +198,7 @@ export const BLOCK_DEFINITIONS: BlockDefinition[] = [
 	{
 		type: "image",
 		label: "Image",
-		icon: "image-1",
+		icon: "camera",
 		category: "media",
 		description: "Upload or link an image",
 		hasChildren: false,
@@ -207,7 +207,7 @@ export const BLOCK_DEFINITIONS: BlockDefinition[] = [
 	{
 		type: "button",
 		label: "Button",
-		icon: "cursor-click-1",
+		icon: "target",
 		category: "actions",
 		description: "Call-to-action button",
 		hasChildren: false,
@@ -232,7 +232,7 @@ export const BLOCK_DEFINITIONS: BlockDefinition[] = [
 	{
 		type: "section",
 		label: "Section",
-		icon: "square",
+		icon: "plus-rec",
 		category: "layout",
 		description: "Container with background",
 		hasChildren: true,
@@ -248,7 +248,7 @@ export const BLOCK_DEFINITIONS: BlockDefinition[] = [
 	{
 		type: "html",
 		label: "HTML",
-		icon: "source-code",
+		icon: "file-code",
 		category: "layout",
 		description: "Custom HTML code",
 		hasChildren: false,
