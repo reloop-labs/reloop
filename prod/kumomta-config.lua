@@ -42,14 +42,15 @@ end)
 
 -- Enforce API Key + Domain Verification on Receipt
 kumo.on('smtp_server_message_received', function(msg)
-  local conn_meta = msg:connection_meta()
-  local api_key = conn_meta:get_meta('api_key') or ""
+  local api_key = msg:get_meta('api_key') or ""
 
   local sender = msg:sender()
   local domain = ""
   if sender then
     domain = string.match(tostring(sender), "@([^>]+)?") or ""
   end
+
+  print("[VERIFY] api_key=" .. api_key .. " domain=" .. domain)
 
   if api_key == "" or domain == "" then
     kumo.reject(550, "5.7.1 Missing credentials or sender domain.")
@@ -78,11 +79,25 @@ kumo.on('smtp_server_message_received', function(msg)
       :send()
   end)
 
-  if status and response and response:status_code() == 200 then
-    local body = kumo.serde.json_parse(response:text())
+  if not status then
+    print("[VERIFY] pcall failed: " .. tostring(response))
+    kumo.reject(451, "4.3.0 Temporary failure contacting verify endpoint")
+    return
+  end
+
+  local code = response:status_code()
+  local body_text = response:text()
+  print("[VERIFY] status=" .. tostring(code) .. " body=" .. tostring(body_text))
+
+  if code == 200 then
+    local body = kumo.serde.json_parse(body_text)
     if not body.isVerified then
       kumo.reject(550, "5.7.1 Domain " .. domain .. " is not verified or active.")
     end
+  elseif code == 401 then
+    kumo.reject(535, "5.7.8 Invalid API key")
+  elseif code == 404 then
+    kumo.reject(550, "5.7.1 Domain " .. domain .. " not found")
   else
     kumo.reject(451, "4.3.0 Temporary failure verifying API key or domain status")
   end

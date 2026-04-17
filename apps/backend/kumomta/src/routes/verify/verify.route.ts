@@ -32,7 +32,7 @@ export const verifyRoute = new Elysia().post(
       domain: t.String(),
     }),
     detail: {
-      summary: "Combined Verification Check",
+      summary: "Verify",
       description: "Internal verification endpoint mapping POST API keys to their owner and checking domain verification status.",
     },
   },

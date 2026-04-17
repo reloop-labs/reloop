@@ -88,9 +88,11 @@ services:
       - "8020:8000"  # HTTP API
     environment:
       - X_KUMOMTA_KEY=${X_KUMOMTA_KEY:-reloop}
-      - KUMOMTA_ENDPOINT=${KUMOMTA_ENDPOINT:-http://local.reloop.sh}
+      - KUMOMTA_ENDPOINT=${KUMOMTA_ENDPOINT:-http://host.docker.internal:8021}
     volumes:
       - ./kumomta-config.lua:/opt/kumomta/etc/policy/init.lua
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       reloop-mailpit:
         condition: service_started
