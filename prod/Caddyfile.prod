@@ -1,0 +1,115 @@
+{$DOMAIN} {
+    # Frontend routes (most specific first)
+    handle /dashboard* {
+        reverse_proxy dashboard:3000 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+    handle /docs* {
+        reverse_proxy docs:3000 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+
+    # API routes
+    handle /api/auth* {
+        reverse_proxy auth:8000 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+    handle /api/api-key* {
+        reverse_proxy api-key:8012 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+    handle /api/domain* {
+        reverse_proxy domain:8011 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+    handle /api/webhook* {
+        reverse_proxy webhook:8013 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+    handle /api/contacts* {
+        reverse_proxy contacts:8014 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+    handle /api/mail* {
+        reverse_proxy mail:8015 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+    handle /api/kumomta* {
+        reverse_proxy kumomta-api:8021 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+    handle /api/logs* {
+        reverse_proxy logs:8016 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+    handle /api/workflow* {
+        reverse_proxy workflow:8017 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+    handle /api/upload* {
+        reverse_proxy upload:8018 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+    handle /api/template* {
+        reverse_proxy template:8019 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+
+    # Mailpit Web UI (for viewing captured test emails behind a secure path or generally accessible)
+    handle /mail* {
+        uri strip_prefix /mail
+        reverse_proxy reloop-mailpit:8025 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+
+    # Main app (catch-all - everything else)
+    handle {
+        reverse_proxy web:3000 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+}
