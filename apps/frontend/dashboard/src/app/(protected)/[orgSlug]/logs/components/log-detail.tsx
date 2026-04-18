@@ -22,9 +22,13 @@ interface LogDetailProps {
 			[key: string]: unknown;
 		};
 		trace_id: string | null;
+		email?: any;
 	};
 	isLoading: boolean;
 }
+
+import Link from "next/link";
+import { useParams } from "next/navigation";
 
 function CopyButton({ value, label }: { value: string; label?: string }) {
 	const [copied, setCopied] = useState(false);
@@ -56,6 +60,7 @@ function CopyButton({ value, label }: { value: string; label?: string }) {
 }
 
 export const LogDetail = ({ log, isLoading }: LogDetailProps) => {
+	const { orgSlug } = useParams();
 	const metadataEntries = log ? Object.entries(log.metadata || {}) : [];
 
 	if (isLoading) {
@@ -80,9 +85,9 @@ export const LogDetail = ({ log, isLoading }: LogDetailProps) => {
 	if (!log) return null;
 
 	return (
-		<div className="space-y-6">
+		<div className="space-y-12">
 			{/* Metadata Section */}
-			<div>
+			<section>
 				<div className="mb-4 flex items-center justify-between">
 					<h3 className="font-medium text-paragraph-sm text-text-strong-950">
 						Metadata
@@ -114,7 +119,51 @@ export const LogDetail = ({ log, isLoading }: LogDetailProps) => {
 						No metadata
 					</p>
 				)}
-			</div>
+			</section>
+
+			{/* Email Details Section (if enriched) */}
+			{log.email && (
+				<section>
+					<div className="mb-4 flex items-center justify-between">
+						<h3 className="font-medium text-paragraph-sm text-text-strong-950">
+							Email Details
+						</h3>
+						<Link
+							href={`/${orgSlug}/emails/${log.email.id}`}
+							className="flex items-center gap-1 text-primary-base text-xs hover:underline"
+						>
+							View Full Details
+							<Icon name="arrow-right" className="h-3 w-3" />
+						</Link>
+					</div>
+					<div className="grid grid-cols-3 gap-x-8 gap-y-8 rounded-xl border border-stroke-soft-100 p-6 dark:border-stroke-soft-100/50">
+						<div className="flex flex-col gap-1">
+							<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
+								Subject
+							</span>
+							<span className="truncate font-medium text-paragraph-sm text-text-strong-950">
+								{log.email.subject}
+							</span>
+						</div>
+						<div className="flex flex-col gap-1">
+							<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
+								To
+							</span>
+							<span className="truncate font-medium text-paragraph-sm text-text-strong-950">
+								{log.email.toEmails.join(", ")}
+							</span>
+						</div>
+						<div className="flex flex-col gap-1">
+							<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
+								Status
+							</span>
+							<span className="font-medium text-paragraph-sm text-text-strong-950 capitalize">
+								{log.email.status}
+							</span>
+						</div>
+					</div>
+				</section>
+			)}
 		</div>
 	);
 };

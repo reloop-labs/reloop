@@ -50,6 +50,7 @@ export namespace LogsModel {
 		status_code: t.Union([t.Number(), t.Null()], { description: "HTTP status code" }),
 		created_at: t.String({ format: "date-time" }),
 		requestDetails: t.Any(),
+		email: t.Optional(t.Any()),
 	});
 
 	export type LogEntryResponse = typeof logEntryResponse.static;
@@ -63,6 +64,7 @@ export namespace LogsModel {
 		status_code: t.Union([t.Number(), t.Null()], { description: "HTTP status code" }),
 		created_at: t.String({ format: "date-time" }),
 		requestDetails: t.Any(),
+		email: t.Optional(t.Any()),
 	});
 
 	export type LogResponse = typeof logResponse.static;

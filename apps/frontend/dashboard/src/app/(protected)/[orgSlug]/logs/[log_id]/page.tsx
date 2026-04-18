@@ -20,6 +20,7 @@ interface LogData {
 		[key: string]: unknown;
 	};
 	trace_id: string | null;
+	email?: any;
 }
 
 const LogDetailPage = () => {

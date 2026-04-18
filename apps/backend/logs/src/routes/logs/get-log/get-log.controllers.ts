@@ -1,4 +1,4 @@
-import type { LogsTypes } from "@reloop/logs/types/logs.type";
+import type { LogsModel } from "@reloop/logs/model/logs.model";
 import {
 	getClickHouseClient,
 	type StoredLogEntry,
@@ -9,10 +9,11 @@ import {
 	safeJsonParse,
 } from "@reloop/logs/utils/format";
 import { status } from "elysia";
+import { getEmailLogController } from "../get-email-log/get-email-log.controllers";
 
 export async function getLogController(
 	logId: string,
-): Promise<LogsTypes.LogEntryResponse> {
+): Promise<LogsModel.LogEntryResponse> {
 	try {
 		const client = getClickHouseClient();
 
@@ -45,15 +46,31 @@ export async function getLogController(
 			});
 		}
 
+		const metadata = safeJsonParse(row.metadata, {}) as any;
+		const emailId = metadata.emailId || metadata.email_id || metadata.email_log_id;
+		let emailDetails = null;
+
+		if (emailId && typeof emailId === "string" && row.organization_id) {
+			try {
+				emailDetails = await getEmailLogController({
+					id: emailId,
+					organizationId: row.organization_id,
+				});
+			} catch {
+				// Silently fail email enrichment
+			}
+		}
+
 		return {
 			uuid: row.id,
 			event: row.event,
 			level: row.level,
 			trace_id: row.trace_id,
-			metadata: safeJsonParse(row.metadata, {}),
+			metadata,
 			created_at: formatClickHouseDate(row.created_at),
 			requestDetails: safeJsonParse(row.request_details, {}),
 			status_code: row.status_code || null,
+			email: emailDetails || undefined,
 		};
 	} catch (error) {
 		if (error && typeof error === "object" && "status" in error) {
