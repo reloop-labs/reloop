@@ -18,6 +18,11 @@ export const mainNavigation: MainNavigationItem[] = [
 		iconName: "mail-single",
 	},
 	{
+		label: "Metrics",
+		path: "/metrics",
+		iconName: "fat-row",
+	},
+	{
 		label: "Contacts",
 		path: "/contacts",
 		iconName: "users",
