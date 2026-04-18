@@ -243,7 +243,7 @@ export const EmailTable = ({
 											<div className="flex h-4 w-4 shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-white shadow-sm">
 												<Icon name="mail-single" className="h-2.5 w-2.5" />
 											</div>
-											<div className="truncate text-label-sm text-text-sub-600">
+											<div className="truncate font-medium text-label-sm">
 												{log.toEmails.join(", ")}
 											</div>
 										</div>
