@@ -25,8 +25,89 @@ interface EmailDetailProps {
 		size: number;
 		headers: Record<string, string> | null;
 		createdAt: string;
+		events?: {
+			id: string;
+			type: string;
+			metadata: Record<string, string>;
+			createdAt: string;
+		}[];
 	};
 	isLoading: boolean;
+}
+
+function EmailTimeline({
+	events,
+}: {
+	events: NonNullable<EmailDetailProps["email"]>["events"];
+}) {
+	if (!events || events.length === 0) return null;
+
+	const steps = [
+		{ type: "sent", label: "Sent", icon: "send" as const },
+		{ type: "delivered", label: "Delivered", icon: "check-circle" as const },
+		{ type: "opened", label: "Opened", icon: "eye" as const },
+		{ type: "clicked", label: "Clicked", icon: "cursor-click" as const },
+	];
+
+	return (
+		<div className="flex w-full items-start justify-between gap-4 px-2">
+			{steps.map((step, index) => {
+				const event = events.find((e) => e.type === step.type);
+				const isCompleted = !!event;
+
+				return (
+					<div
+						key={step.type}
+						className="flex flex-1 flex-col items-center gap-3"
+					>
+						<div className="relative flex w-full items-center justify-center">
+							{/* Connection Line */}
+							{index < steps.length - 1 && (
+								<div
+									className={cn(
+										"-translate-y-1/2 absolute top-1/2 right-[-50%] left-[calc(50%+1.5rem)] h-[2px]",
+										isCompleted &&
+											events.some((e) => e.type === steps[index + 1].type)
+											? "bg-success-base"
+											: "bg-stroke-soft-100",
+									)}
+								/>
+							)}
+							{/* Icon Circle */}
+							<div
+								className={cn(
+									"relative z-10 flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all duration-300",
+									isCompleted
+										? "border-success-base bg-success-alpha-10 text-success-base"
+										: "border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600",
+								)}
+							>
+								<Icon name={step.icon} className="h-5 w-5" />
+							</div>
+						</div>
+						<div className="flex flex-col items-center text-center">
+							<span
+								className={cn(
+									"font-semibold text-paragraph-xs transition-colors",
+									isCompleted ? "text-text-strong-950" : "text-text-sub-600",
+								)}
+							>
+								{step.label}
+							</span>
+							{event && (
+								<span className="mt-1 font-medium text-[10px] text-text-soft-400">
+									{new Date(event.createdAt).toLocaleTimeString([], {
+										hour: "2-digit",
+										minute: "2-digit",
+									})}
+								</span>
+							)}
+						</div>
+					</div>
+				);
+			})}
+		</div>
+	);
 }
 
 function IframePreview({ html }: { html: string }) {
@@ -210,6 +291,11 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 						</span>
 					</div>
 				</div>
+			</section>
+
+			{/* Event Tracking Timeline */}
+			<section className="py-4">
+				<EmailTimeline events={email.events || []} />
 			</section>
 
 			{/* Error Message if failed */}

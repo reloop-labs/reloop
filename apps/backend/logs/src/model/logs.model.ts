@@ -157,6 +157,14 @@ export namespace LogsModel {
 	});
 	export type ListEmailLogsResponse = typeof listEmailLogsResponse.static;
 
+	export const emailEventLine = t.Object({
+		id: t.String(),
+		type: t.String(),
+		metadata: t.Union([t.Any(), t.Null()]),
+		createdAt: t.String(),
+	});
+	export type EmailEventLine = typeof emailEventLine.static;
+
 	export const emailLogFullEntry = t.Object({
 		id: t.String(),
 		messageId: t.String(),
@@ -181,6 +189,7 @@ export namespace LogsModel {
 		failedAt: t.Union([t.String(), t.Null()]),
 		createdAt: t.String(),
 		updatedAt: t.String(),
+		events: t.Optional(t.Array(emailEventLine)),
 	});
 	export type EmailLogFullEntry = typeof emailLogFullEntry.static;
 

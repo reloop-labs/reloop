@@ -17,6 +17,11 @@ export async function getEmailLogController({
         eq(schema.emailLog.id, id),
         eq(schema.emailLog.organizationId, organizationId),
       ),
+      with: {
+        events: {
+          orderBy: (events, { asc }) => [asc(events.createdAt)],
+        },
+      },
     });
 
     if (!log) return null;
@@ -28,6 +33,12 @@ export async function getEmailLogController({
       failedAt: log.failedAt?.toISOString() || null,
       createdAt: log.createdAt.toISOString(),
       updatedAt: log.updatedAt.toISOString(),
+      events: (log.events || []).map((event) => ({
+        id: event.id,
+        type: event.type as string,
+        metadata: event.metadata ?? null,
+        createdAt: event.createdAt.toISOString(),
+      })),
     } as LogsModel.EmailLogFullEntry;
   } catch (error) {
     logger.error(

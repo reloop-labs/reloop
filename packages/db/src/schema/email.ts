@@ -35,6 +35,16 @@ export const emailPriorityEnum = pgEnum("email_priority", [
 	"urgent",
 ]);
 
+// Email event type enum
+export const emailEventTypeEnum = pgEnum("email_event_type", [
+	"sent",
+	"delivered",
+	"opened",
+	"clicked",
+	"bounced",
+	"complaint",
+]);
+
 // Email sending log table
 export const emailLog = pgTable(
 	"email_log",
@@ -88,7 +98,28 @@ export const emailLog = pgTable(
 	],
 );
 
-export const emailLogRelations = relations(emailLog, ({ one }) => ({
+// Email event table
+export const emailEvent = pgTable(
+	"email_event",
+	{
+		id: text("id")
+			.$defaultFn(() => `ev_${createId()}`)
+			.primaryKey(),
+		emailLogId: text("email_log_id")
+			.notNull()
+			.references(() => emailLog.id, { onDelete: "cascade" }),
+		type: emailEventTypeEnum("type").notNull(),
+		metadata: jsonb("metadata").$type<Record<string, any>>(),
+		createdAt: timestamp("created_at").notNull().defaultNow(),
+	},
+	(table) => [
+		index("email_event_idx_email_log_id").on(table.emailLogId),
+		index("email_event_idx_type").on(table.type),
+		index("email_event_idx_created_at").on(table.createdAt),
+	],
+);
+
+export const emailLogRelations = relations(emailLog, ({ one, many }) => ({
 	organization: one(organization, {
 		fields: [emailLog.organizationId],
 		references: [organization.id],
@@ -97,10 +128,19 @@ export const emailLogRelations = relations(emailLog, ({ one }) => ({
 		fields: [emailLog.domainId],
 		references: [domain.id],
 	}),
+	events: many(emailEvent),
+}));
+
+export const emailEventRelations = relations(emailEvent, ({ one }) => ({
+	emailLog: one(emailLog, {
+		fields: [emailEvent.emailLogId],
+		references: [emailLog.id],
+	}),
 }));
 
 export const emailLogTables = {
 	emailLog,
+	emailEvent,
 } as const;
 
 export type EmailLogTable = typeof emailLogTables;
