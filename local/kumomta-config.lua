@@ -15,8 +15,10 @@ local function url_encode(str)
   return str
 end
 
+local tracking_url = os.getenv("TRACKING_BASE_URL") or kumomta_endpoint
+
 local function inject_tracking(data, email_log_id)
-  local tracking_base_url = kumomta_endpoint:gsub("/+$", "")
+  local tracking_base_url = tracking_url:gsub("/+$", "")
 
   -- Only proceed if it looks like HTML
   if not data:find("text/html") then

@@ -29,7 +29,7 @@ async function main() {
     const info = await transporter.sendMail({
       from: "pranav@marketing.reloop.sh",
       to: "test@example.com",
-      subject: "Welcome to Reloop",
+      subject: "ssss",
       html: emailHtml,
       text: emailText,
     });
