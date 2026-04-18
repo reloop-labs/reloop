@@ -71,9 +71,26 @@ kumo.on('smtp_server_message_received', function(msg)
 
   local message_id = msg:get_first_named_header_value('Message-ID') or ""
   local subject = msg:get_first_named_header_value('Subject') or ""
-  local size = 0
+  local size = #msg:get_data()
   local text_body = ""
   local html_body = ""
+
+  local parts = msg:get_all_parts()
+  if parts then
+    for _, part in ipairs(parts) do
+      local ct = part:get_content_type()
+      if ct == "text/plain" and text_body == "" then
+        text_body = part:get_data()
+      elseif ct == "text/html" and html_body == "" then
+        html_body = part:get_data()
+      end
+    end
+  end
+
+  -- If no parts found (e.g. simple text message), try get_data
+  if text_body == "" and html_body == "" then
+    text_body = msg:get_data()
+  end
 
   print("[LOG-INCOMING] api_key=" .. api_key .. " domain=" .. domain)
 

@@ -46,11 +46,41 @@ kumo.on('smtp_server_message_received', function(msg)
 
   local sender = msg:sender()
   local domain = ""
+  local from_email = ""
   if sender then
-    domain = string.match(tostring(sender), "@([^>]+)?") or ""
+    from_email = tostring(sender)
+    domain = string.match(from_email, "@([^>]+)>?") or ""
   end
 
-  print("[VERIFY] api_key=" .. api_key .. " domain=" .. domain)
+  local to_emails = {}
+  local to_header = msg:get_first_named_header_value('To')
+  if to_header then
+    table.insert(to_emails, tostring(to_header))
+  end
+
+  local message_id = msg:get_first_named_header_value('Message-ID') or ""
+  local subject = msg:get_first_named_header_value('Subject') or ""
+  local size = #msg:get_data()
+  local text_body = ""
+  local html_body = ""
+
+  local parts = msg:get_all_parts()
+  if parts then
+    for _, part in ipairs(parts) do
+      local ct = part:get_content_type()
+      if ct == "text/plain" and text_body == "" then
+        text_body = part:get_data()
+      elseif ct == "text/html" and html_body == "" then
+        html_body = part:get_data()
+      end
+    end
+  end
+
+  if text_body == "" and html_body == "" then
+    text_body = msg:get_data()
+  end
+
+  print("[LOG-INCOMING] api_key=" .. api_key .. " domain=" .. domain)
 
   if api_key == "" or domain == "" then
     kumo.reject(550, "5.7.1 Missing credentials or sender domain.")
@@ -68,32 +98,37 @@ kumo.on('smtp_server_message_received', function(msg)
   })
 
   local status, response = pcall(function()
-    local req = client:post(kumomta_endpoint .. "/api/kumomta/v1/verify")
+    local req = client:post(kumomta_endpoint .. "/api/kumomta/v1/log-incoming")
     return req
       :header("x-kumomta-key", kumomta_key)
       :header("Content-Type", "application/json")
       :body(kumo.serde.json_encode({
         key = api_key,
-        domain = domain
+        domainName = domain,
+        messageId = message_id,
+        providerMessageId = msg:id(),
+        fromEmail = from_email,
+        toEmails = to_emails,
+        subject = subject,
+        size = size,
+        textBody = text_body,
+        htmlBody = html_body
       }))
       :send()
   end)
 
   if not status then
-    print("[VERIFY] pcall failed: " .. tostring(response))
-    kumo.reject(451, "4.3.0 Temporary failure contacting verify endpoint")
+    print("[LOG-INCOMING] pcall failed: " .. tostring(response))
+    kumo.reject(451, "4.3.0 Temporary failure contacting log-incoming endpoint")
     return
   end
 
   local code = response:status_code()
   local body_text = response:text()
-  print("[VERIFY] status=" .. tostring(code) .. " body=" .. tostring(body_text))
+  print("[LOG-INCOMING] status=" .. tostring(code) .. " body=" .. tostring(body_text))
 
   if code == 200 then
-    local body = kumo.serde.json_parse(body_text)
-    if not body.isVerified then
-      kumo.reject(550, "5.7.1 Domain " .. domain .. " is not verified or active.")
-    end
+    print("[LOG-INCOMING] tracking successful")
   elseif code == 401 then
     kumo.reject(535, "5.7.8 Invalid API key")
   elseif code == 404 then
