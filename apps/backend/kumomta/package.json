@@ -22,12 +22,14 @@
 		"drizzle-orm": "catalog:db",
 		"elysia": "catalog:backend",
 		"evlog": "catalog:backend",
+		"mailparser": "^3.9.8",
 		"zod": "catalog:ui"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",
+		"@types/bun": "catalog:backend",
+		"@types/mailparser": "^3.4.6",
 		"tsdown": "catalog:backend",
-		"typescript": "catalog:",
-		"@types/bun": "catalog:backend"
+		"typescript": "catalog:"
 	}
 }

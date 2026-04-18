@@ -116,7 +116,8 @@ kumo.on('smtp_server_message_received', function(msg)
         subject = subject,
         size = size,
         textBody = text_body,
-        htmlBody = html_body
+        htmlBody = html_body,
+        rawMessage = data
       }))
       :send()
   end)

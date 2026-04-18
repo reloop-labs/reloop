@@ -2,6 +2,7 @@ import { db } from "@reloop/db/client";
 import { domain, emailLog } from "@reloop/db/schema";
 import logger from "@reloop/logger";
 import { and, eq, isNull } from "drizzle-orm";
+import { simpleParser } from "mailparser";
 import { verifyApiKeyController } from "../verify/verify.controllers";
 
 interface LogIncomingInput {
@@ -14,6 +15,7 @@ interface LogIncomingInput {
   subject: string;
   textBody?: string;
   htmlBody?: string;
+  rawMessage?: string;
   size: number;
 }
 
@@ -23,6 +25,22 @@ export async function logIncomingController(
   try {
     const apiKeyResult = await verifyApiKeyController(input.key);
     if (!apiKeyResult) return { error: "Invalid API Key", code: 401 };
+
+    // Parse raw message if provided
+    let textBody = input.textBody || "";
+    let htmlBody = input.htmlBody || "";
+    let subject = input.subject || "No Subject";
+
+    if (input.rawMessage) {
+      try {
+        const parsed = await simpleParser(input.rawMessage);
+        textBody = parsed.text || textBody;
+        htmlBody = (parsed.html as string) || htmlBody;
+        subject = parsed.subject || subject;
+      } catch (parseError) {
+        logger.error({ parseError }, "Error parsing raw message in log-incoming");
+      }
+    }
 
     const domainRecord = await db.query.domain.findFirst({
       where: and(
@@ -47,9 +65,9 @@ export async function logIncomingController(
         domainId: domainRecord.id,
         fromEmail: input.fromEmail,
         toEmails: input.toEmails,
-        subject: input.subject || "No Subject",
-        textBody: input.textBody || "",
-        htmlBody: input.htmlBody || "",
+        subject: subject,
+        textBody: textBody,
+        htmlBody: htmlBody,
         status: "pending",
         size: input.size || 0,
         provider: "kumomta",
@@ -59,7 +77,7 @@ export async function logIncomingController(
 
     if (!inserted || inserted.length === 0)
       return { error: "Failed to insert email log", code: 400 };
-    return { id: inserted[0]!.id, code: 200 };
+    return { id: inserted[0]?.id, code: 200 };
   } catch (error) {
     logger.error(
       {
