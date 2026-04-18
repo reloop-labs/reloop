@@ -154,25 +154,22 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 	const rect = currentTab?.getBoundingClientRect();
 
 	return (
-		<div className="space-y-12">
-			{/* Delivery Info */}
+		<div className="space-y-6">
+			{/* Delivery Info - Email Header Style */}
 			<section>
-				<h3 className="mb-4 font-medium text-paragraph-sm text-text-strong-950">
-					Delivery Details
-				</h3>
-				<div className="grid grid-cols-2 gap-x-12 gap-y-6 rounded-xl border border-stroke-soft-100 p-6 dark:border-stroke-soft-100/50">
-					<div className="flex flex-col gap-1">
-						<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
+				<div className="flex flex-col gap-3.5">
+					<div className="flex items-start gap-4">
+						<span className="w-16 flex-shrink-0 font-medium text-paragraph-sm text-text-sub-600">
 							From
 						</span>
-						<span className="truncate font-medium text-paragraph-sm text-text-strong-950">
+						<span className="font-medium text-paragraph-sm text-text-strong-950">
 							{email.fromName
 								? `${email.fromName} <${email.fromEmail}>`
 								: email.fromEmail}
 						</span>
 					</div>
-					<div className="flex flex-col gap-1">
-						<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
+					<div className="flex items-start gap-4">
+						<span className="w-16 flex-shrink-0 font-medium text-paragraph-sm text-text-sub-600">
 							To
 						</span>
 						<span className="font-medium text-paragraph-sm text-text-strong-950">
@@ -180,29 +177,36 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 						</span>
 					</div>
 					{email.ccEmails && email.ccEmails.length > 0 && (
-						<div className="flex flex-col gap-1">
-							<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
-								CC
+						<div className="flex items-start gap-4">
+							<span className="w-16 flex-shrink-0 font-medium text-paragraph-sm text-text-sub-600">
+								Cc
 							</span>
 							<span className="font-medium text-paragraph-sm text-text-strong-950">
 								{email.ccEmails.join(", ")}
 							</span>
 						</div>
 					)}
-					<div className="flex flex-col gap-1">
-						<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
-							Provider
-						</span>
-						<span className="font-medium text-paragraph-sm text-text-strong-950 capitalize">
-							{email.provider}
-						</span>
-					</div>
-					<div className="flex flex-col gap-1">
-						<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
-							Size
+					<div className="flex items-start gap-4">
+						<span className="w-16 flex-shrink-0 font-medium text-paragraph-sm text-text-sub-600">
+							Date
 						</span>
 						<span className="font-medium text-paragraph-sm text-text-strong-950">
-							{(email.size / 1024).toFixed(2)} KB
+							{new Date(email.createdAt).toLocaleString(undefined, {
+								weekday: "long",
+								year: "numeric",
+								month: "long",
+								day: "numeric",
+								hour: "2-digit",
+								minute: "2-digit",
+							})}
+						</span>
+					</div>
+					<div className="flex items-start gap-4">
+						<span className="w-16 flex-shrink-0 font-medium text-paragraph-sm text-text-sub-600">
+							Subject
+						</span>
+						<span className="font-medium text-paragraph-sm text-text-strong-950">
+							{email.subject}
 						</span>
 					</div>
 				</div>
