@@ -14,7 +14,7 @@ export const logIncomingRoute = new Elysia().post(
       }
       return status(400, { message: result.error });
     }
-    return { id: result.id! };
+    return { id: result.id ?? "" };
   },
   {
     response: {
@@ -41,6 +41,7 @@ export const logIncomingRoute = new Elysia().post(
       subject: t.String(),
       textBody: t.Optional(t.String()),
       htmlBody: t.Optional(t.String()),
+      rawMessage: t.Optional(t.String()),
       size: t.Number(),
     }),
     detail: {

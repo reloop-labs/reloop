@@ -1,4 +1,7 @@
+import { render } from "@react-email/render";
+import { WelcomeEmail } from "@reloop/react-email/emails/welcome.js";
 import nodemailer from "nodemailer";
+import React from "react";
 
 const transporter = nodemailer.createTransport({
   host: "localhost",
@@ -6,21 +9,29 @@ const transporter = nodemailer.createTransport({
   secure: false, // TLS on 25 is starttls, secure: false means no implicit TLS
   auth: {
     user: "reloop",
-    //pass: "rl_live_4KgvE7rCH343ntCEv-n-DaiOKLfcyv1a3-igTSDGRam7lscSX0zo_ZZMn7K1PdlMLHHdvbqRYrvF02n9krTypQ"
-    pass: "rl_live_bChwFljrqG0R7saD3aDLC9M-1m2rhYjc58ImHNRlSAFTrNXbrJ2c2PjVcKxF0OsG4tenHxexjmepqUTOsjEQWQ"
+    pass: "rl_live_bChwFljrqG0R7saD3aDLC9M-1m2rhYjc58ImHNRlSAFTrNXbrJ2c2PjVcKxF0OsG4tenHxexjmepqUTOsjEQWQ",
   },
   tls: {
-    rejectUnauthorized: false
-  }
+    rejectUnauthorized: false,
+  },
 });
 
 async function main() {
   try {
+    const emailHtml = await render(
+      React.createElement(WelcomeEmail, { fullName: "Pranav Patel" }),
+    );
+    const emailText = await render(
+      React.createElement(WelcomeEmail, { fullName: "Pranav Patel" }),
+      { plainText: true },
+    );
+
     const info = await transporter.sendMail({
       from: "pranav@marketing.reloop.sh",
       to: "test@example.com",
-      subject: "Test email from Node",
-      text: "This is a test email sent through the local KumoMTA server!"
+      subject: "Welcome to Reloop",
+      html: emailHtml,
+      text: emailText,
     });
     console.log("Email sent successfully: ", info.messageId);
   } catch (error) {

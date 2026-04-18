@@ -32,12 +32,16 @@ export async function logIncomingController(
     let subject = input.subject || "No Subject";
 
     if (input.rawMessage) {
+      console.log(`[LOG-INCOMING] Parsing rawMessage (length: ${input.rawMessage.length})`);
       try {
         const parsed = await simpleParser(input.rawMessage);
-        textBody = parsed.text || textBody;
-        htmlBody = (parsed.html as string) || htmlBody;
+        console.log(`[LOG-INCOMING] Parsed: text=${!!parsed.text}, html=${!!parsed.html}`);
+        // Reset bodies to ensure we only use the high-fidelity parsed content
+        textBody = parsed.text || "";
+        htmlBody = (parsed.html as string) || "";
         subject = parsed.subject || subject;
       } catch (parseError) {
+        console.error("[LOG-INCOMING] mailparser error:", parseError);
         logger.error({ parseError }, "Error parsing raw message in log-incoming");
       }
     }
