@@ -42,6 +42,10 @@ export interface KumomtaLogRecord {
     "X-Domain-ID"?: string;
     "X-Email-Log-ID"?: string;
   };
+  meta?: {
+    "X-Email-Log-ID"?: string;
+    [key: string]: unknown;
+  };
   timestamp?: string;
 }
 
@@ -74,7 +78,7 @@ export async function handleKumomtaWebhookController({
 
   for (const event of events) {
     try {
-      let emailLogId = event.headers?.["X-Email-Log-ID"];
+      let emailLogId = event.headers?.["X-Email-Log-ID"] || event.meta?.["X-Email-Log-ID"];
 
       if (!emailLogId) {
         // Fallback: look up by providerMessageId which corresponds to event.id (msg:id())

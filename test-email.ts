@@ -1,7 +1,7 @@
 import { render } from "@react-email/render";
-import { WelcomeEmail } from "@reloop/react-email/emails/welcome.js";
 import nodemailer from "nodemailer";
 import React from "react";
+import { WelcomeEmail } from "./packages/email/emails/welcome";
 
 const transporter = nodemailer.createTransport({
   host: "localhost",

@@ -38,14 +38,16 @@ export const kumomtaWebhookRoute = new Elysia().post(
         response: t.Object({
           code: t.Number(),
           enhanced_code: t.Optional(
-            t.Object({
-              class: t.Number(),
-              subject: t.Number(),
-              detail: t.Number(),
-            }),
+            t.Nullable(
+              t.Object({
+                class: t.Number(),
+                subject: t.Number(),
+                detail: t.Number(),
+              }),
+            ),
           ),
           content: t.String(),
-          command: t.Optional(t.String()),
+          command: t.Optional(t.Nullable(t.String())),
         }),
         headers: t.Object({
           Subject: t.Optional(t.String()),
@@ -53,7 +55,8 @@ export const kumomtaWebhookRoute = new Elysia().post(
           "X-Domain-ID": t.Optional(t.String()),
           "X-Email-Log-ID": t.Optional(t.String()),
         }),
-        timestamp: t.Optional(t.String()),
+        meta: t.Optional(t.Record(t.String(), t.Any())),
+        timestamp: t.Optional(t.Union([t.String(), t.Number()])),
       }),
     ),
     response: {
