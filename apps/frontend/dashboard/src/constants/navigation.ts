@@ -13,6 +13,11 @@ export const mainNavigation: MainNavigationItem[] = [
 		iconName: "house",
 	},
 	{
+		label: "Emails",
+		path: "/emails",
+		iconName: "mail-single",
+	},
+	{
 		label: "Contacts",
 		path: "/contacts",
 		iconName: "users",
