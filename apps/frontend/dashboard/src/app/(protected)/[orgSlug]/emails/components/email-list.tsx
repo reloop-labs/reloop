@@ -1,6 +1,4 @@
 "use client";
-import { PageSizeDropdown } from "@fe/dashboard/components/page-size-dropdown";
-import { PaginationControls } from "@fe/dashboard/components/pagination-controls";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
@@ -50,9 +48,6 @@ export const EmailList = () => {
 	});
 
 	const totalLogs = data?.total || 0;
-	const totalPages = Math.ceil(totalLogs / pageSize) || 1;
-	const startIndex = (currentPage - 1) * pageSize + 1;
-	const endIndex = Math.min(currentPage * pageSize, totalLogs);
 
 	if (error) {
 		return (
@@ -90,33 +85,16 @@ export const EmailList = () => {
 					logs={data?.data || []}
 					isLoading={isLoading}
 					loadingRows={pageSize}
+					currentPage={currentPage}
+					pageSize={pageSize}
+					totalLogs={totalLogs}
+					onPageChange={setCurrentPage}
+					onPageSizeChange={(value) => {
+						setPageSize(value);
+						setCurrentPage(1);
+					}}
 				/>
 			</div>
-
-			{/* Pagination */}
-			{data && totalLogs > 0 && (
-				<div className="mt-4 flex items-center justify-between pb-8 text-paragraph-sm text-text-sub-600">
-					<div className="flex items-center gap-3">
-						<span>
-							Showing {startIndex}–{endIndex} of {totalLogs} log
-							{totalLogs !== 1 ? "s" : ""}
-						</span>
-						<PageSizeDropdown
-							value={pageSize}
-							onValueChange={(value) => {
-								setPageSize(value);
-								setCurrentPage(1);
-							}}
-						/>
-					</div>
-					<PaginationControls
-						currentPage={currentPage}
-						totalPages={totalPages}
-						onPageChange={setCurrentPage}
-						isLoading={isLoading}
-					/>
-				</div>
-			)}
 		</div>
 	);
 };
