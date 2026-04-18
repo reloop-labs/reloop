@@ -5,7 +5,7 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Popover from "@reloop/ui/popover";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { DateRange } from "react-day-picker";
 import { LogsCalendar } from "../../logs/components/logs-calendar";
 
@@ -86,11 +86,21 @@ export const DateRangeFilter = ({
 	const [isOpen, setIsOpen] = useState(false);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
+	// Sync internal range with props when they change
 	const [calendarRange, setCalendarRange] = useState<DateRange | undefined>(
 		startDate && endDate
 			? { from: new Date(startDate), to: new Date(endDate) }
 			: undefined,
 	);
+
+	// Update internal state when props change (e.g. from presets)
+	useEffect(() => {
+		if (startDate && endDate) {
+			setCalendarRange({ from: new Date(startDate), to: new Date(endDate) });
+		} else {
+			setCalendarRange(undefined);
+		}
+	}, [startDate, endDate]);
 
 	const currentTab = buttonRefs.current[hoverIdx ?? -1];
 	const currentRect = currentTab?.getBoundingClientRect();
@@ -122,10 +132,17 @@ export const DateRangeFilter = ({
 
 	const handleCalendarSelect = (range: DateRange | undefined) => {
 		setCalendarRange(range);
-		if (range?.from && range?.to) {
-			const endOfDay = new Date(range.to);
+	};
+
+	const handleApply = () => {
+		if (calendarRange?.from && calendarRange?.to) {
+			const endOfDay = new Date(calendarRange.to);
 			endOfDay.setHours(23, 59, 59, 999);
-			onDateChange(range.from.toISOString(), endOfDay.toISOString(), null);
+			onDateChange(
+				calendarRange.from.toISOString(),
+				endOfDay.toISOString(),
+				null,
+			);
 			setIsOpen(false);
 		}
 	};
@@ -244,6 +261,16 @@ export const DateRangeFilter = ({
 							numberOfMonths={2}
 							disabled={{ after: new Date() }}
 						/>
+						<div className="mt-4 flex justify-end border-stroke-soft-200 border-t pt-3">
+							<Button.Root
+								size="xsmall"
+								variant="neutral"
+								onClick={handleApply}
+								disabled={!calendarRange?.from || !calendarRange?.to}
+							>
+								Apply
+							</Button.Root>
+						</div>
 					</div>
 				</div>
 			</Popover.Content>
