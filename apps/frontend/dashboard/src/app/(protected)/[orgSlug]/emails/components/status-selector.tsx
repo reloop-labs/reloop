@@ -18,8 +18,8 @@ export type EmailStatus =
 	| "clicked";
 
 interface StatusSelectorProps {
-	value: string[];
-	onChange: (value: string[]) => void;
+	value: string;
+	onChange: (value: string) => void;
 }
 
 const statusOptions: {
@@ -45,33 +45,23 @@ export const StatusSelector = ({ value, onChange }: StatusSelectorProps) => {
 	const currentTab = buttonRefs.current[hoverIdx ?? -1];
 	const currentRect = currentTab?.getBoundingClientRect();
 
-	const hasActiveFilter = value.length > 0;
-
-	const handleReset = () => {
-		onChange([]);
-		setIsOpen(false);
-	};
+	const hasActiveFilter = !!value;
 
 	const handleToggle = (optionId: string | null) => {
 		if (optionId === null) {
-			onChange([]);
+			onChange("");
 			setIsOpen(false);
 			return;
 		}
 
-		if (value.includes(optionId)) {
-			onChange(value.filter((v) => v !== optionId));
-		} else {
-			onChange([...value, optionId]);
-		}
+		onChange(optionId === value ? "" : optionId);
+		setIsOpen(false);
 	};
 
 	const displayLabel =
-		value.length === 0
+		value === ""
 			? "Status"
-			: value.length === 1
-				? statusOptions.find((o) => o.id === value[0])?.label || "Status"
-				: `${value.length} Statuses`;
+			: statusOptions.find((o) => o.id === value)?.label || "Status";
 
 	return (
 		<Dropdown.Root open={isOpen} onOpenChange={setIsOpen}>
@@ -96,7 +86,7 @@ export const StatusSelector = ({ value, onChange }: StatusSelectorProps) => {
 				</Button.Root>
 			</Dropdown.Trigger>
 			<Dropdown.Content align="start" className="w-56 p-2">
-				<div className="relative mt-2">
+				<div>
 					{/* All Statuses option */}
 					<button
 						ref={(el) => {
@@ -109,6 +99,7 @@ export const StatusSelector = ({ value, onChange }: StatusSelectorProps) => {
 						className={cn(
 							"flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-xs transition-colors",
 							"text-text-strong-950",
+							value === "" && "bg-neutral-alpha-10",
 							!currentRect && hoverIdx === 0 && "bg-neutral-alpha-10",
 						)}
 					>
@@ -116,16 +107,16 @@ export const StatusSelector = ({ value, onChange }: StatusSelectorProps) => {
 							<div className="flex h-3 w-3 items-center justify-center">
 								<div className="h-1.5 w-1.5 rounded-full border border-text-strong-950" />
 							</div>
-							<span className={cn(value.length === 0 && "font-medium")}>
+							<span className={cn(value === "" && "font-medium")}>
 								All Statuses
 							</span>
 						</div>
-						{value.length === 0 && (
+						{value === "" && (
 							<Icon name="check" className="h-3.5 w-3.5 text-text-strong-950" />
 						)}
 					</button>
 					{statusOptions.map((option, idx) => {
-						const isChecked = value.includes(option.id);
+						const isChecked = value === option.id;
 						const index = idx + 1;
 						return (
 							<button
@@ -140,6 +131,7 @@ export const StatusSelector = ({ value, onChange }: StatusSelectorProps) => {
 								className={cn(
 									"flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-xs transition-colors",
 									"text-text-strong-950",
+									isChecked && "bg-neutral-alpha-10",
 									!currentRect && hoverIdx === index && "bg-neutral-alpha-10",
 								)}
 							>
@@ -165,7 +157,6 @@ export const StatusSelector = ({ value, onChange }: StatusSelectorProps) => {
 							</button>
 						);
 					})}
-
 					<AnimatedHoverBackground rect={currentRect} tabElement={currentTab} />
 				</div>
 			</Dropdown.Content>

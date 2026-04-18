@@ -211,7 +211,7 @@ export const DateRangeFilter = ({
 										className={cn(
 											"flex w-full cursor-pointer items-center justify-between rounded-lg px-2 py-1.5 font-normal text-xs transition-colors",
 											isActive
-												? "font-medium text-text-strong-950"
+												? "bg-neutral-alpha-10 font-medium text-text-strong-950"
 												: "text-text-strong-950",
 											!currentRect && hoverIdx === idx && "bg-neutral-alpha-10",
 										)}

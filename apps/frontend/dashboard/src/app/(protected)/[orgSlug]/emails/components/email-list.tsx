@@ -129,9 +129,9 @@ export const EmailList = () => {
 					onDateChange={handleDateChange}
 				/>
 				<StatusSelector
-					value={selectedStatus ? selectedStatus.split(",") : []}
+					value={selectedStatus}
 					onChange={(val) => {
-						setSelectedStatus(val.length > 0 ? val.join(",") : "");
+						setSelectedStatus(val);
 						setCurrentPage(1);
 					}}
 				/>
