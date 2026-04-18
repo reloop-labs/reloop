@@ -54,6 +54,50 @@ const getStatusBadgeColor = (status: string) => {
 	}
 };
 
+const getStatusInfo = (status: string) => {
+	switch (status.toLowerCase()) {
+		case "delivered":
+		case "sent":
+			return {
+				icon: "check-circle" as const,
+				color: "text-success-base",
+				bgColor: "bg-success-base/10",
+			};
+		case "failed":
+		case "bounced":
+		case "spam":
+			return {
+				icon: "x-circle-outline" as const,
+				color: "text-error-base",
+				bgColor: "bg-error-base/10",
+			};
+		case "pending":
+			return {
+				icon: "clock" as const,
+				color: "text-warning-base",
+				bgColor: "bg-warning-base/10",
+			};
+		case "opened":
+			return {
+				icon: "eye-outline" as const,
+				color: "text-information-base",
+				bgColor: "bg-information-base/10",
+			};
+		case "clicked":
+			return {
+				icon: "mouse-pointer-outline" as const,
+				color: "text-information-base",
+				bgColor: "bg-information-base/40",
+			};
+		default:
+			return {
+				icon: "mail-single" as const,
+				color: "text-text-sub-600",
+				bgColor: "bg-neutral-alpha-10",
+			};
+	}
+};
+
 interface EmailActionsDropdownProps {
 	log: EmailLogData;
 	onViewDetails: (id: string) => void;
@@ -208,10 +252,13 @@ export const EmailTable = ({
 				{isLoading ? (
 					Array.from({ length: loadingRows }).map((_, index) => (
 						<div key={`skeleton-${index}`} className={cn(gridClass, "py-3")}>
-							<Skeleton className="h-5 w-16 rounded-md" />
-							<Skeleton className="h-4 w-40" />
-							<Skeleton className="h-4 w-24" />
-							<Skeleton className="h-4 w-32" />
+							<div className="flex items-center gap-2">
+								<Skeleton className="h-6 w-6 rounded-lg" />
+								<Skeleton className="h-4 w-40" />
+							</div>
+							<Skeleton className="h-4 w-60" />
+							<Skeleton className="h-5 w-16 rounded-full" />
+							<Skeleton className="h-4 w-20" />
 							<div className="flex justify-end">
 								<Skeleton className="h-4 w-16" />
 							</div>
@@ -240,10 +287,29 @@ export const EmailTable = ({
 									<div className={cn(gridClass, "w-full py-2.5 text-left")}>
 										{/* To */}
 										<div className="flex items-center gap-2">
-											<div className="flex h-4 w-4 shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-white shadow-sm">
-												<Icon name="mail-single" className="h-2.5 w-2.5" />
+											<div
+												className={cn(
+													"relative flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-100",
+													getStatusInfo(log.status).bgColor,
+												)}
+											>
+												<Icon
+													name="mail-single"
+													className={`h-3 w-3 ${getStatusInfo(log.status).color}`}
+												/>
+												<div
+													className={cn(
+														"-bottom-0.5 -right-0.5 absolute flex h-3 w-3 items-center justify-center rounded-full border border-stroke-soft-100 bg-white shadow-xs",
+														getStatusInfo(log.status).color,
+													)}
+												>
+													<Icon
+														name={getStatusInfo(log.status).icon}
+														className="h-2 w-2"
+													/>
+												</div>
 											</div>
-											<div className="truncate font-medium text-label-sm">
+											<div className="truncate font-medium text-label-sm text-text-strong-950">
 												{log.toEmails.join(", ")}
 											</div>
 										</div>
