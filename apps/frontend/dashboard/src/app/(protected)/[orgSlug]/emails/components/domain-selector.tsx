@@ -66,7 +66,7 @@ export const DomainSelector = ({ value, onChange }: DomainSelectorProps) => {
 				</Button.Root>
 			</Dropdown.Trigger>
 			<Dropdown.Content align="start" className="w-64 p-2">
-				<div className="relative">
+				<div className="relative max-h-80 overflow-y-auto">
 					{/* All Domains option */}
 					<button
 						ref={(el) => {
@@ -89,56 +89,54 @@ export const DomainSelector = ({ value, onChange }: DomainSelectorProps) => {
 						)}
 					</button>
 
-					<div className="max-h-60 overflow-y-auto">
-						{isLoading ? (
-							<div className="space-y-1 p-1">
-								<Skeleton className="h-8 w-full rounded-lg" />
-								<Skeleton className="h-8 w-full rounded-lg" />
-								<Skeleton className="h-8 w-full rounded-lg" />
-							</div>
-						) : domains.length === 0 ? (
-							<div className="p-4 text-center text-text-sub-600 text-xs">
-								No domains found
-							</div>
-						) : (
-							<div className="space-y-0.5">
-								{domains.map((domain, idx) => {
-									const isSelected = domain.domain === value;
-									const index = idx + 1;
-									return (
-										<button
-											key={domain.id}
-											ref={(el) => {
-												if (el) buttonRefs.current[index] = el;
-											}}
-											type="button"
-											onPointerEnter={() => setHoverIdx(index)}
-											onPointerLeave={() => setHoverIdx(undefined)}
-											onClick={() => handleSelect(domain.domain)}
-											className={cn(
-												"flex w-full cursor-pointer items-center justify-between rounded-lg px-2 py-1.5 text-xs transition-colors",
-												"text-text-strong-950",
-												isSelected && "bg-neutral-alpha-10",
-												!currentRect &&
-													hoverIdx === index &&
-													"bg-neutral-alpha-10",
-											)}
-										>
-											<div className="flex items-center gap-2 truncate">
-												<span className="truncate">{domain.domain}</span>
-											</div>
-											{isSelected && (
-												<Icon
-													name="check"
-													className="h-3.5 w-3.5 text-text-strong-950"
-												/>
-											)}
-										</button>
-									);
-								})}
-							</div>
-						)}
-					</div>
+					{isLoading ? (
+						<div className="space-y-1 p-1">
+							<Skeleton className="h-8 w-full rounded-lg" />
+							<Skeleton className="h-8 w-full rounded-lg" />
+							<Skeleton className="h-8 w-full rounded-lg" />
+						</div>
+					) : domains.length === 0 ? (
+						<div className="p-4 text-center text-text-sub-600 text-xs">
+							No domains found
+						</div>
+					) : (
+						<div>
+							{domains.map((domain, idx) => {
+								const isSelected = domain.domain === value;
+								const index = idx + 1;
+								return (
+									<button
+										key={domain.id}
+										ref={(el) => {
+											if (el) buttonRefs.current[index] = el;
+										}}
+										type="button"
+										onPointerEnter={() => setHoverIdx(index)}
+										onPointerLeave={() => setHoverIdx(undefined)}
+										onClick={() => handleSelect(domain.domain)}
+										className={cn(
+											"flex w-full cursor-pointer items-center justify-between rounded-lg px-2 py-1.5 text-xs transition-colors",
+											"text-text-strong-950",
+											isSelected && "bg-neutral-alpha-10",
+											!currentRect &&
+												hoverIdx === index &&
+												"bg-neutral-alpha-10",
+										)}
+									>
+										<div className="flex items-center gap-2 truncate">
+											<span className="truncate">{domain.domain}</span>
+										</div>
+										{isSelected && (
+											<Icon
+												name="check"
+												className="h-3.5 w-3.5 text-text-strong-950"
+											/>
+										)}
+									</button>
+								);
+							})}
+						</div>
+					)}
 					<AnimatedHoverBackground rect={currentRect} tabElement={currentTab} />
 				</div>
 			</Dropdown.Content>

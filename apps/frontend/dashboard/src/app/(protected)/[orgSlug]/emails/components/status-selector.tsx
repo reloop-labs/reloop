@@ -86,7 +86,7 @@ export const StatusSelector = ({ value, onChange }: StatusSelectorProps) => {
 				</Button.Root>
 			</Dropdown.Trigger>
 			<Dropdown.Content align="start" className="w-56 p-2">
-				<div>
+				<div className="relative max-h-80 overflow-y-auto">
 					{/* All Statuses option */}
 					<button
 						ref={(el) => {
