@@ -1,9 +1,12 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
+import { CodeBlock } from "@reloop/ui/code-block";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { useCallback, useState } from "react";
+import * as TabMenu from "@reloop/ui/tab-menu-horizontal";
+import { AnimatePresence, motion } from "motion/react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 interface EmailDetailProps {
@@ -24,6 +27,49 @@ interface EmailDetailProps {
 		createdAt: string;
 	};
 	isLoading: boolean;
+}
+
+function IframePreview({ html }: { html: string }) {
+	const iframeRef = useRef<HTMLIFrameElement>(null);
+
+	const updateHeight = useCallback(() => {
+		const iframe = iframeRef.current;
+		if (iframe?.contentWindow) {
+			try {
+				const body = iframe.contentWindow.document.body;
+				const htmlDoc = iframe.contentWindow.document.documentElement;
+				const height = Math.max(
+					body.scrollHeight,
+					body.offsetHeight,
+					htmlDoc.clientHeight,
+					htmlDoc.scrollHeight,
+					htmlDoc.offsetHeight,
+				);
+				iframe.style.height = `${height}px`;
+			} catch (_e) {
+				// Ignore cross-origin issues if any
+			}
+		}
+	}, []);
+
+	useEffect(() => {
+		const iframe = iframeRef.current;
+		if (iframe) {
+			const interval = setInterval(updateHeight, 500);
+			return () => clearInterval(interval);
+		}
+	}, [updateHeight]);
+
+	return (
+		<iframe
+			ref={iframeRef}
+			srcDoc={html}
+			className="w-full overflow-hidden border-none"
+			onLoad={updateHeight}
+			title="Email Preview"
+			sandbox="allow-popups allow-popups-to-escape-sandbox"
+		/>
+	);
 }
 
 function CopyButton({ value, label }: { value: string; label?: string }) {
@@ -56,6 +102,16 @@ function CopyButton({ value, label }: { value: string; label?: string }) {
 }
 
 export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
+	const [activeTab, setActiveTab] = useState<string>("preview");
+	const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
+	const buttonRefs = useRef<HTMLButtonElement[]>([]);
+
+	useEffect(() => {
+		if (email) {
+			setActiveTab(email.htmlBody ? "preview" : "plain");
+		}
+	}, [email]);
+
 	if (isLoading) {
 		return (
 			<div className="space-y-8">
@@ -75,6 +131,27 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 	}
 
 	if (!email) return null;
+
+	const tabItems = [
+		...(email.htmlBody
+			? [
+					{ title: "Preview", value: "preview", icon: "mail-single" as const },
+					{ title: "Plain Text", value: "plain", icon: "file-text" as const },
+					{ title: "HTML Source", value: "html", icon: "code" as const },
+				]
+			: [
+					{
+						title: "Plain Text",
+						value: "plain",
+						icon: "file-text" as const,
+					},
+				]),
+	];
+
+	const activeIndex = tabItems.findIndex((item) => item.value === activeTab);
+	const currentIdx = hoveredIdx !== undefined ? hoveredIdx : activeIndex;
+	const currentTab = buttonRefs.current[currentIdx];
+	const rect = currentTab?.getBoundingClientRect();
 
 	return (
 		<div className="space-y-12">
@@ -145,36 +222,122 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 				</section>
 			)}
 
-			{/* Content Preview */}
+			{/* Content Preview Tabs */}
 			<section>
-				<div className="mb-4 flex items-center justify-between">
-					<h3 className="font-medium text-paragraph-sm text-text-strong-950">
-						Message Content
-					</h3>
-				</div>
-				<div className="overflow-hidden rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/50">
-					<div className="flex items-center justify-between border-stroke-soft-100 border-b bg-bg-weak-50/50 px-4 py-2 dark:border-stroke-soft-100/50">
-						<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
-							{email.htmlBody ? "HTML Body" : "Text Body"}
-						</span>
-						<CopyButton
-							value={email.htmlBody || email.textBody || ""}
-							label="Content"
-						/>
+				<TabMenu.Root value={activeTab} onValueChange={setActiveTab}>
+					<TabMenu.List className="relative mb-6 h-10 gap-0 border-b! py-0">
+						{tabItems.map((item, index) => (
+							<TabMenu.Trigger
+								key={item.value}
+								value={item.value}
+								ref={(el) => {
+									if (el) buttonRefs.current[index] = el;
+								}}
+								onPointerEnter={() => setHoveredIdx(index)}
+								onPointerLeave={() => setHoveredIdx(undefined)}
+								className={cn(
+									"flex cursor-pointer items-center gap-2 px-2.5 py-0! text-sm transition-colors",
+									activeTab === item.value
+										? "text-text-strong-950"
+										: "text-text-sub-600 hover:text-text-strong-950",
+								)}
+							>
+								<Icon name={item.icon} className="h-4 w-4" />
+								{item.title}
+							</TabMenu.Trigger>
+						))}
+
+						<AnimatePresence>
+							{rect && activeIndex !== -1 && (
+								<motion.div
+									className="absolute top-0 left-0 rounded-lg bg-neutral-alpha-10"
+									initial={{
+										pointerEvents: "none",
+										width: rect.width,
+										height: rect.height - 20,
+										left:
+											rect.left -
+											(currentTab?.offsetParent?.getBoundingClientRect().left ||
+												0),
+										top:
+											rect.top -
+											(currentTab?.offsetParent?.getBoundingClientRect().top ||
+												0) +
+											10,
+										opacity: 0,
+									}}
+									animate={{
+										pointerEvents: "none",
+										width: rect.width,
+										height: rect.height - 20,
+										left:
+											rect.left -
+											(currentTab?.offsetParent?.getBoundingClientRect().left ||
+												0),
+										top:
+											rect.top -
+											(currentTab?.offsetParent?.getBoundingClientRect().top ||
+												0) +
+											10,
+										opacity: 1,
+									}}
+									exit={{
+										pointerEvents: "none",
+										opacity: 0,
+										width: rect.width,
+										height: rect.height - 20,
+										left:
+											rect.left -
+											(currentTab?.offsetParent?.getBoundingClientRect().left ||
+												0),
+										top:
+											rect.top -
+											(currentTab?.offsetParent?.getBoundingClientRect().top ||
+												0) +
+											10,
+									}}
+									transition={{ duration: 0.14 }}
+								/>
+							)}
+						</AnimatePresence>
+					</TabMenu.List>
+
+					<div className="overflow-hidden rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/50">
+						<TabMenu.Content value="preview">
+							<div className="bg-white p-6">
+								{email.htmlBody && <IframePreview html={email.htmlBody} />}
+							</div>
+						</TabMenu.Content>
+
+						<TabMenu.Content value="plain">
+							<div className="relative">
+								<div className="absolute top-4 right-4 z-10">
+									{email.textBody && (
+										<CopyButton value={email.textBody} label="Plain Text" />
+									)}
+								</div>
+								<pre className="whitespace-pre-wrap bg-bg-weak-50/50 p-6 font-mono text-sm text-text-strong-950">
+									{email.textBody || "No text content"}
+								</pre>
+							</div>
+						</TabMenu.Content>
+
+						<TabMenu.Content value="html">
+							<div className="relative">
+								<div className="absolute top-4 right-4 z-10">
+									{email.htmlBody && (
+										<CopyButton value={email.htmlBody} label="HTML Source" />
+									)}
+								</div>
+								<div className="bg-bg-weak-50/50">
+									{email.htmlBody && (
+										<CodeBlock code={email.htmlBody} lang="html" />
+									)}
+								</div>
+							</div>
+						</TabMenu.Content>
 					</div>
-					<div className="p-6">
-						{email.htmlBody ? (
-							<div
-								className="message-content prose prose-sm max-w-none"
-								dangerouslySetInnerHTML={{ __html: email.htmlBody }}
-							/>
-						) : (
-							<pre className="whitespace-pre-wrap font-mono text-sm text-text-strong-950">
-								{email.textBody || "No content"}
-							</pre>
-						)}
-					</div>
-				</div>
+				</TabMenu.Root>
 			</section>
 
 			{/* Headers */}
