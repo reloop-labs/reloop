@@ -54,21 +54,6 @@ const getStatusIcon = (status: string) => {
 export const EmailHeader = ({ email, isLoading }: EmailHeaderProps) => {
 	const { orgSlug } = useParams();
 	const router = useRouter();
-	const [copiedId, setCopiedId] = useState(false);
-
-	const handleCopy = useCallback(
-		async (value: string, setCopied: (v: boolean) => void, label: string) => {
-			try {
-				await navigator.clipboard.writeText(value);
-				setCopied(true);
-				toast.success(`${label} copied`);
-				setTimeout(() => setCopied(false), 2000);
-			} catch {
-				toast.error("Failed to copy");
-			}
-		},
-		[],
-	);
 
 	if (!email && !isLoading) {
 		return (
@@ -144,92 +129,6 @@ export const EmailHeader = ({ email, isLoading }: EmailHeaderProps) => {
 								{email?.subject || "No Subject"}
 							</h1>
 						</div>
-					)}
-				</div>
-			</div>
-
-			{/* Stats Grid */}
-			<div className="mt-10 grid grid-cols-3 gap-x-12 gap-y-6">
-				{/* Timestamp */}
-				<div className="flex flex-col gap-1.5">
-					<div className="flex items-center gap-1.5 text-text-sub-600">
-						<Icon name="clock" className="h-3.5 w-3.5" />
-						<span className="font-medium text-[10px] uppercase tracking-wider">
-							Sent At
-						</span>
-					</div>
-					{isLoading ? (
-						<Skeleton className="h-5 w-32 rounded-lg" />
-					) : (
-						<span className="font-medium text-paragraph-sm text-text-strong-950">
-							{email?.createdAt
-								? new Date(email.createdAt).toLocaleString()
-								: "---"}
-						</span>
-					)}
-				</div>
-
-				{/* ID */}
-				<div className="flex flex-col gap-1.5">
-					<div className="flex items-center gap-1.5 text-text-sub-600">
-						<Icon name="fingerprint" className="h-3.5 w-3.5" />
-						<span className="font-medium text-[10px] uppercase tracking-wider">
-							Email ID
-						</span>
-					</div>
-					{isLoading ? (
-						<Skeleton className="h-6 w-28 rounded-lg" />
-					) : (
-						<button
-							className="group/copy flex w-fit cursor-pointer items-center gap-1.5"
-							type="button"
-							onClick={() =>
-								email?.id && handleCopy(email.id, setCopiedId, "Email ID")
-							}
-						>
-							<code className="max-w-[120px] truncate rounded bg-neutral-alpha-10 px-2 py-1 font-medium font-mono text-text-strong-950 text-xs">
-								{email?.id}
-							</code>
-							<Icon
-								name={copiedId ? "check" : "copy"}
-								className={cn(
-									"h-3 w-3 flex-shrink-0 transition-all",
-									copiedId
-										? "text-success-base"
-										: "text-text-sub-600 opacity-0 group-hover/copy:opacity-100",
-								)}
-							/>
-						</button>
-					)}
-				</div>
-
-				{/* Status */}
-				<div className="flex flex-col gap-1.5">
-					<div className="flex items-center gap-1.5 text-text-sub-600">
-						<Icon name="check-circle" className="h-3.5 w-3.5" />
-						<span className="font-medium text-[10px] uppercase tracking-wider">
-							Final Status
-						</span>
-					</div>
-					{isLoading ? (
-						<Skeleton className="h-5 w-20 rounded-lg" />
-					) : (
-						<span
-							className={cn(
-								"inline-flex w-fit rounded-md border-[1px] px-[6px] py-0.5 font-medium text-[10px] capitalize",
-								getStatusColor(email?.status || "")
-									.replace("text-", "border-")
-									.replace("-base", "-soft-200") +
-									" " +
-									getStatusColor(email?.status || "")
-										.replace("text-", "bg-")
-										.replace("-base", "-alpha-10") +
-									" " +
-									getStatusColor(email?.status || ""),
-							)}
-						>
-							{email?.status || "---"}
-						</span>
 					)}
 				</div>
 			</div>

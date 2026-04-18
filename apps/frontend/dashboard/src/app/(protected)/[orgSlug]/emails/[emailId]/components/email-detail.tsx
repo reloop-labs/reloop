@@ -43,23 +43,20 @@ function EmailTimeline({
 	if (!events || events.length === 0) return null;
 
 	const steps = [
-		{ type: "sent", label: "Sent", icon: "send" as const },
+		{ type: "sent", label: "Sent", icon: "send-2" as const },
 		{ type: "delivered", label: "Delivered", icon: "check-circle" as const },
-		{ type: "opened", label: "Opened", icon: "eye" as const },
+		{ type: "opened", label: "Opened", icon: "eye-outline" as const },
 		{ type: "clicked", label: "Clicked", icon: "cursor-click" as const },
 	];
 
 	return (
-		<div className="flex w-full items-start justify-between gap-4 px-2">
+		<div className="flex w-full items-start justify-between gap-4 rounded-xl border border-stroke-soft-100 pt-10 pb-4">
 			{steps.map((step, index) => {
 				const event = events.find((e) => e.type === step.type);
 				const isCompleted = !!event;
 
 				return (
-					<div
-						key={step.type}
-						className="flex flex-1 flex-col items-center gap-3"
-					>
+					<div key={step.type} className="flex flex-1 flex-col gap-3">
 						<div className="relative flex w-full items-center justify-center">
 							{/* Connection Line */}
 							{index < steps.length - 1 && (

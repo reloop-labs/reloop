@@ -898,6 +898,20 @@ export const IconsSprite = () => (
 					strokeLinejoin="round"
 				/>
 			</symbol>
+			<symbol
+				id="cursor-click"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				strokeWidth="1.8"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			>
+				<path d="M4 3l7 17 2-6 6-2z" />
+				<path d="M12 2v3" />
+				<path d="M19 5l-2 2" />
+				<path d="M22 12h-3" />
+			</symbol>
 			<symbol id="undo" viewBox="0 0 24 24" fill="none">
 				<path
 					d="M2 6H15C18.866 6 22 9.13401 22 13C22 16.866 18.866 20 15 20H10M2 6L6 2M2 6L6 10"
