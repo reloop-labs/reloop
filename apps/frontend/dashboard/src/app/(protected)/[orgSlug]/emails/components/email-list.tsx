@@ -39,7 +39,7 @@ export const EmailList = () => {
 	);
 
 	const fetchUrl = activeOrganization?.id
-		? `/api/mail/v1/logs?limit=${pageSize}&page=${currentPage}${
+		? `/api/logs/v1/emails?limit=${pageSize}&page=${currentPage}${
 				searchQuery ? `&search=${encodeURIComponent(searchQuery)}` : ""
 			}`
 		: null;

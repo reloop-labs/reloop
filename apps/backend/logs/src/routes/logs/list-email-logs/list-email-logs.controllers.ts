@@ -1,7 +1,7 @@
-import type { MailModel } from "@reloop/be-mail/model/mail.model.js";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import type { Logger } from "@reloop/logger";
+import { logger } from "@reloop/logger";
+import type { LogsModel } from "@reloop/logs/model/logs.model";
 import { and, count, desc, eq, ilike, or, type SQL } from "drizzle-orm";
 
 type EmailStatus = (typeof schema.emailStatusEnum.enumValues)[number];
@@ -9,12 +9,10 @@ type EmailStatus = (typeof schema.emailStatusEnum.enumValues)[number];
 export async function listEmailLogsController({
   query,
   organizationId,
-  logger,
 }: {
-  query: MailModel.ListEmailLogsQuery;
+  query: LogsModel.ListEmailLogsQuery;
   organizationId: string;
-  logger: Logger;
-}): Promise<MailModel.ListEmailLogsResponse> {
+}): Promise<LogsModel.ListEmailLogsResponse> {
   const { page = 1, limit = 10, search, status } = query;
   const offset = (page - 1) * limit;
 
@@ -53,14 +51,14 @@ export async function listEmailLogsController({
       orderBy: desc(schema.emailLog.createdAt),
       limit: limit,
       offset: offset,
-      with: {
-        domain: true,
-      },
     });
 
     return {
       object: "list",
-      data: logs,
+      data: logs.map((log) => ({
+        ...log,
+        createdAt: log.createdAt.toISOString(),
+      })),
       total,
       page,
       limit,

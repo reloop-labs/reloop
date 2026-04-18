@@ -127,4 +127,31 @@ export namespace LogsModel {
 	});
 
 	export type ErrorResponse = typeof errorResponse.static;
+
+	// Email Logs
+	export const listEmailLogsQuery = t.Object({
+		page: t.Optional(t.Numeric({ default: 1 })),
+		limit: t.Optional(t.Numeric({ default: 10 })),
+		search: t.Optional(t.String()),
+		status: t.Optional(t.String()),
+	});
+	export type ListEmailLogsQuery = typeof listEmailLogsQuery.static;
+
+	export const emailLogEntry = t.Object({
+		id: t.String(),
+		subject: t.String(),
+		fromEmail: t.String(),
+		toEmails: t.Array(t.String()),
+		status: t.String(),
+		createdAt: t.String(),
+	});
+
+	export const listEmailLogsResponse = t.Object({
+		object: t.Literal("list"),
+		data: t.Array(emailLogEntry),
+		total: t.Number(),
+		page: t.Number(),
+		limit: t.Number(),
+	});
+	export type ListEmailLogsResponse = typeof listEmailLogsResponse.static;
 }

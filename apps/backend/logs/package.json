@@ -29,6 +29,10 @@
 		"elysia": "catalog:backend",
 		"zod": "catalog:ui",
 		"redis": "catalog:db",
+		"drizzle-orm": "catalog:db",
+		"drizzle-typebox": "catalog:db",
+		"pg": "catalog:db",
+		"@reloop/db": "workspace:*",
 		"@reloop/cache": "workspace:*",
 		"@reloop/apikey": "workspace:*",
 		"@reloop/logger": "workspace:*"
