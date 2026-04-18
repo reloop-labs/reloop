@@ -25,6 +25,8 @@ interface EmailDetailProps {
 		provider: string;
 		size: number;
 		headers: Record<string, string> | null;
+		sentAt: string | null;
+		deliveredAt: string | null;
 		createdAt: string;
 		events?: {
 			id: string;
@@ -221,7 +223,11 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 
 			{/* Event Tracking Timeline */}
 			<section className="py-4">
-				<EmailTimeline events={email.events || []} />
+				<EmailTimeline
+					events={email.events || []}
+					sentAt={email.sentAt}
+					deliveredAt={email.deliveredAt}
+				/>
 			</section>
 
 			{/* Error Message if failed */}

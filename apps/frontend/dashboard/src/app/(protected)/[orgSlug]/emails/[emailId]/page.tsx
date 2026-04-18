@@ -25,6 +25,8 @@ interface EmailLogData {
 	provider: string;
 	size: number;
 	headers: Record<string, string> | null;
+	sentAt: string | null;
+	deliveredAt: string | null;
 	createdAt: string;
 	updatedAt: string;
 }
