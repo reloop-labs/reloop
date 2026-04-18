@@ -21,7 +21,7 @@ export const SectionRenderer = ({ block }: SectionRendererProps) => {
 		>
 			{block.children && block.children.length > 0 ? (
 				block.children.map((child, index) => (
-					<BlockRenderer key={child.id} block={child} index={index} />
+					<BlockRenderer key={child.id} block={child} index={index} totalSiblings={block.children!.length} />
 				))
 			) : (
 				<div className="flex items-center justify-center rounded-lg border-2 border-dashed border-stroke-soft-200/50 py-8">

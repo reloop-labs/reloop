@@ -18,7 +18,12 @@ const SortableBlock = ({
 	block,
 	index,
 }: {
-	block: { id: string; type: string; props: Record<string, unknown>; children?: unknown[] };
+	block: {
+		id: string;
+		type: string;
+		props: Record<string, unknown>;
+		children?: unknown[];
+	};
 	index: number;
 }) => {
 	const {
@@ -45,16 +50,13 @@ const SortableBlock = ({
 		<div
 			ref={setNodeRef}
 			style={style}
-			className={cn(
-				"relative",
-				isDragging && "z-50 opacity-60",
-			)}
+			className={cn("relative", isDragging && "z-50 opacity-60")}
 			{...attributes}
 		>
 			{/* Drag handle — appears on hover */}
 			<div
 				className={cn(
-					"absolute top-1/2 -left-6 z-30 flex -translate-y-1/2 cursor-grab items-center justify-center opacity-0 transition-opacity active:cursor-grabbing",
+					"-left-6 -translate-y-1/2 absolute top-1/2 z-30 flex cursor-grab items-center justify-center opacity-0 transition-opacity active:cursor-grabbing",
 					"group-hover/block:opacity-100",
 				)}
 				{...listeners}
@@ -164,7 +166,7 @@ export const EmailCanvas = () => {
 								: "text-text-sub-600 hover:text-text-strong-950",
 						)}
 					>
-						<Icon name="smartphone-2" className="h-3.5 w-3.5" />
+						<Icon name="smartphone" className="h-3.5 w-3.5" />
 					</button>
 				</div>
 			</div>
@@ -184,7 +186,7 @@ export const EmailCanvas = () => {
 						globalSettings.contentAlign === "center" && "mx-auto",
 						globalSettings.contentAlign === "left" && "mr-auto",
 						globalSettings.contentAlign === "right" && "ml-auto",
-						isOver && "ring-2 ring-primary-base/40 ring-dashed shadow-lg",
+						isOver && "shadow-lg ring-2 ring-dashed ring-primary-base/40",
 					)}
 					style={{
 						backgroundColor: globalSettings.contentBackgroundColor,
@@ -207,11 +209,7 @@ export const EmailCanvas = () => {
 						>
 							<div className="flex flex-col py-2">
 								{blocks.map((block, index) => (
-									<SortableBlock
-										key={block.id}
-										block={block}
-										index={index}
-									/>
+									<SortableBlock key={block.id} block={block} index={index} />
 								))}
 							</div>
 						</SortableContext>
@@ -248,9 +246,7 @@ const EmptyCanvasState = ({ isOver }: { isOver: boolean }) => {
 							name={isOver ? "plus" : "mail-1"}
 							className={cn(
 								"h-7 w-7",
-								isOver
-									? "text-primary-base"
-									: "text-text-soft-400",
+								isOver ? "text-primary-base" : "text-text-soft-400",
 							)}
 						/>
 					</div>
@@ -264,23 +260,18 @@ const EmptyCanvasState = ({ isOver }: { isOver: boolean }) => {
 								repeat: Number.POSITIVE_INFINITY,
 								ease: "easeInOut",
 							}}
-							className="absolute -top-1 -right-1 flex h-6 w-6 items-center justify-center rounded-lg bg-primary-base/10"
+							className="-top-1 -right-1 absolute flex h-6 w-6 items-center justify-center rounded-lg bg-primary-base/10"
 						>
-							<Icon
-								name="plus"
-								className="h-3 w-3 text-primary-base"
-							/>
+							<Icon name="plus" className="h-3 w-3 text-primary-base" />
 						</motion.div>
 					)}
 				</div>
 
 				<div className="text-center">
 					<p className="font-medium text-sm text-text-strong-950">
-						{isOver
-							? "Drop to add block"
-							: "Start building your email"}
+						{isOver ? "Drop to add block" : "Start building your email"}
 					</p>
-					<p className="mt-1 max-w-[240px] text-xs text-text-soft-400">
+					<p className="mt-1 max-w-[240px] text-text-soft-400 text-xs">
 						{isOver
 							? "Release to add this block to your template"
 							: "Click or drag a block from the left panel to get started"}

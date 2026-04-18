@@ -17,6 +17,7 @@ import { TextRenderer } from "./block-renderers/text-renderer";
 interface BlockRendererProps {
 	block: TemplateBlock;
 	index: number;
+	totalSiblings?: number;
 }
 
 const BLOCK_TYPE_LABELS: Record<string, string> = {
@@ -61,18 +62,19 @@ function renderBlockContent(block: TemplateBlock) {
 	}
 }
 
-export const BlockRenderer = ({ block, index }: BlockRendererProps) => {
+export const BlockRenderer = ({ block, index, totalSiblings }: BlockRendererProps) => {
 	const selectedBlockId = useEditorStore((s) => s.selectedBlockId);
 	const selectBlock = useEditorStore((s) => s.selectBlock);
 	const removeBlock = useEditorStore((s) => s.removeBlock);
 	const duplicateBlock = useEditorStore((s) => s.duplicateBlock);
-	const moveBlock = useEditorStore((s) => s.moveBlock);
+	const moveBlockUp = useEditorStore((s) => s.moveBlockUp);
+	const moveBlockDown = useEditorStore((s) => s.moveBlockDown);
 	const totalBlocks = useEditorStore((s) => s.blocks.length);
 
 	const isSelected = selectedBlockId === block.id;
 	const typeLabel = BLOCK_TYPE_LABELS[block.type] || block.type;
 	const isFirst = index === 0;
-	const isLast = index === totalBlocks - 1;
+	const isLast = index === (totalSiblings ?? totalBlocks) - 1;
 
 	return (
 		<div
@@ -121,7 +123,7 @@ export const BlockRenderer = ({ block, index }: BlockRendererProps) => {
 					disabled={isFirst}
 					onClick={(e) => {
 						e.stopPropagation();
-						if (!isFirst) moveBlock(index, index - 1);
+						if (!isFirst) moveBlockUp(block.id);
 					}}
 					className={cn(
 						"flex h-5 w-5 items-center justify-center rounded transition-colors",
@@ -138,7 +140,7 @@ export const BlockRenderer = ({ block, index }: BlockRendererProps) => {
 					disabled={isLast}
 					onClick={(e) => {
 						e.stopPropagation();
-						if (!isLast) moveBlock(index, index + 1);
+						if (!isLast) moveBlockDown(block.id);
 					}}
 					className={cn(
 						"flex h-5 w-5 items-center justify-center rounded transition-colors",

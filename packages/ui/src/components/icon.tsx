@@ -1096,6 +1096,20 @@ export const IconsSprite = () => (
 					strokeLinejoin="round"
 				/>
 			</symbol>
+			<symbol
+				id="redo"
+				viewBox="0 0 24 24"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<path
+					d="M22 6H9C5.13401 6 2 9.13401 2 13C2 16.866 5.13401 20 9 20H14M22 6L18 2M22 6L18 10"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
 
 			<symbol id="table" viewBox="0 0 24 24">
 				<rect opacity="0.12" x="5" y="5" width="14" height="14" />

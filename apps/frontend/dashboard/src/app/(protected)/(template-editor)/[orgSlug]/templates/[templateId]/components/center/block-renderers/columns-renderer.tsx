@@ -33,6 +33,7 @@ export const ColumnsRenderer = ({ block }: ColumnsRendererProps) => {
 								key={grandchild.id}
 								block={grandchild}
 								index={j}
+								totalSiblings={child.children!.length}
 							/>
 						))
 					) : (
