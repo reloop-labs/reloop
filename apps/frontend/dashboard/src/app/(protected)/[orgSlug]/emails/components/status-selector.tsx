@@ -96,22 +96,6 @@ export const StatusSelector = ({ value, onChange }: StatusSelectorProps) => {
 				</Button.Root>
 			</Dropdown.Trigger>
 			<Dropdown.Content align="start" className="w-56 p-2">
-				{/* Header */}
-				<div className="flex items-center justify-between border-stroke-soft-200 border-b px-1 pb-2">
-					<span className="font-medium text-text-sub-600 text-xs">
-						Filter by status
-					</span>
-					{hasActiveFilter && (
-						<button
-							type="button"
-							onClick={handleReset}
-							className="rounded-lg border border-stroke-soft-200 px-2 py-1 text-text-sub-600 text-xs transition-colors hover:bg-bg-weak-50"
-						>
-							Reset
-						</button>
-					)}
-				</div>
-
 				<div className="relative mt-2">
 					{/* All Statuses option */}
 					<button
@@ -140,9 +124,6 @@ export const StatusSelector = ({ value, onChange }: StatusSelectorProps) => {
 							<Icon name="check" className="h-3.5 w-3.5 text-text-strong-950" />
 						)}
 					</button>
-
-					<div className="my-1 border-stroke-soft-200 border-t" />
-
 					{statusOptions.map((option, idx) => {
 						const isChecked = value.includes(option.id);
 						const index = idx + 1;
