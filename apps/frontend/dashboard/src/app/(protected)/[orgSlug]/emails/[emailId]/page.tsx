@@ -1,10 +1,10 @@
 "use client";
 
+import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
 import { SomethingWentWrong } from "@fe/dashboard/components/something-went-wrong";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import useSWR from "swr";
 import { EmailDetail } from "./components/email-detail";
-import { EmailHeader } from "./components/email-header";
 
 interface EmailLogData {
 	id: string;
@@ -29,10 +29,17 @@ interface EmailLogData {
 	deliveredAt: string | null;
 	createdAt: string;
 	updatedAt: string;
+	events?: {
+		id: string;
+		type: string;
+		metadata: Record<string, string>;
+		createdAt: string;
+	}[];
 }
 
 const EmailDetailPage = () => {
-	const { emailId } = useParams();
+	const { orgSlug, emailId } = useParams();
+	const router = useRouter();
 
 	const {
 		data: emailData,
@@ -46,7 +53,11 @@ const EmailDetailPage = () => {
 	if (error) {
 		return (
 			<div className="mx-auto max-w-3xl sm:px-8">
-				<EmailHeader isLoading={false} />
+				<div className="pt-10 pb-8">
+					<AnimatedBackButton
+						onClick={() => router.push(`/${orgSlug}/emails`)}
+					/>
+				</div>
 				<div className="pt-20">
 					<SomethingWentWrong />
 				</div>
@@ -56,7 +67,9 @@ const EmailDetailPage = () => {
 
 	return (
 		<div className="mx-auto max-w-3xl sm:px-8">
-			<EmailHeader email={emailData} isLoading={isLoading} />
+			<div className="pt-10 pb-8">
+				<AnimatedBackButton onClick={() => router.push(`/${orgSlug}/emails`)} />
+			</div>
 			{!emailData && !isLoading ? null : (
 				<EmailDetail email={emailData} isLoading={isLoading} />
 			)}

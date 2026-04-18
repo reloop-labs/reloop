@@ -42,22 +42,13 @@ export function EmailTimeline({
 				const eventType = eventTypes[index];
 				const event = allEvents.find((e) => e.type === eventType);
 
-				const nextEventType = eventTypes[index + 1];
-				const isCompleted = !!event;
-				const isNextCompleted = !!allEvents.find(
-					(e) => e.type === nextEventType,
-				);
-
 				return (
 					<Fragment key={index}>
 						<StepComponent event={event} />
 						{index < TIMELINE_COMPONENTS.length - 1 && (
 							<div
 								className={cn(
-									"mt-5 h-0 flex-1 border-t-[1.5px] border-dashed",
-									isCompleted && isNextCompleted
-										? "border-success-base"
-										: "border-stroke-soft-100",
+									"mt-5 h-0 flex-1 border-stroke-soft-100 border-t-[1.5px] border-dashed",
 								)}
 							/>
 						)}

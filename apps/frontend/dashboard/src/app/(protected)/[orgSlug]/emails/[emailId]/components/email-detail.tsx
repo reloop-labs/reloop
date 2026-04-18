@@ -225,7 +225,7 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 			<section className="py-4">
 				<EmailTimeline
 					events={email.events || []}
-					sentAt={email.sentAt}
+					sentAt={email.sentAt || email.createdAt}
 					deliveredAt={email.deliveredAt}
 				/>
 			</section>

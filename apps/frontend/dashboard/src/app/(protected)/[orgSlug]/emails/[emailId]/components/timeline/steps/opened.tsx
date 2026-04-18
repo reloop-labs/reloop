@@ -33,7 +33,7 @@ export const OpenedStep = ({ event }: { event: EmailEvent | undefined }) => {
 						Opened
 					</span>
 					{isCompleted && timestamp && (
-						<span className="mt-1 font-medium text-[10px] text-text-soft-400">
+						<span className="mt-1 font-medium text-text-soft-400 text-xs">
 							{new Date(timestamp).toLocaleString([], {
 								month: "short",
 								day: "numeric",
