@@ -2,13 +2,17 @@
 
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
+import { useParams, useRouter } from "next/navigation";
 import { useHotkeys } from "react-hotkeys-hook";
 import { DocsButton } from "./components/docs-button";
 import { EmailList } from "./components/email-list";
 
 const EmailsPage = () => {
+	const router = useRouter();
+	const { orgSlug } = useParams();
+
 	const handleSendEmail = () => {
-		// handle compose logic
+		router.push(`/${orgSlug}/emails/send`);
 	};
 
 	useHotkeys("mod+a", (e) => {
