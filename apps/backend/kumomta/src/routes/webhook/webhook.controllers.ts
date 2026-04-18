@@ -74,7 +74,16 @@ export async function handleKumomtaWebhookController({
 
   for (const event of events) {
     try {
-      const emailLogId = event.headers?.["X-Email-Log-ID"];
+      let emailLogId = event.headers?.["X-Email-Log-ID"];
+
+      if (!emailLogId) {
+        // Fallback: look up by providerMessageId which corresponds to event.id (msg:id())
+        const logEntry = await db.query.emailLog.findFirst({
+          where: eq(emailLog.providerMessageId, event.id),
+          columns: { id: true },
+        });
+        if (logEntry) emailLogId = logEntry.id;
+      }
 
       if (!emailLogId) {
         logger.warn(
@@ -83,7 +92,7 @@ export async function handleKumomtaWebhookController({
             type: event.type,
             recipient: event.recipient,
           },
-          "KumoMTA event missing X-Email-Log-ID header, skipping",
+          "KumoMTA event missing X-Email-Log-ID header and provider tracking ID, skipping",
         );
         continue;
       }
