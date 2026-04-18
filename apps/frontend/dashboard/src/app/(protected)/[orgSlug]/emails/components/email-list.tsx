@@ -2,10 +2,14 @@
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import { parseAsInteger, useQueryState } from "nuqs";
+import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useState } from "react";
 import useSWR from "swr";
+import { ApiKeySelector } from "./api-key-selector";
+import { DateRangeFilter } from "./date-range-filter";
+import { DomainSelector } from "./domain-selector";
 import { EmailTable } from "./email-table";
+import { StatusSelector } from "./status-selector";
 
 interface EmailLogData {
 	id: string;
@@ -35,11 +39,39 @@ export const EmailList = () => {
 		"limit",
 		parseAsInteger.withDefault(10),
 	);
+	const [selectedDomain, setSelectedDomain] = useQueryState(
+		"domain",
+		parseAsString.withDefault(""),
+	);
+	const [selectedApiKey, setSelectedApiKey] = useQueryState(
+		"api_key",
+		parseAsString.withDefault(""),
+	);
+	const [selectedStatus, setSelectedStatus] = useQueryState(
+		"status",
+		parseAsString.withDefault(""),
+	);
+	const [startDate, setStartDate] = useQueryState(
+		"start_date",
+		parseAsString.withDefault(""),
+	);
+	const [endDate, setEndDate] = useQueryState(
+		"end_date",
+		parseAsString.withDefault(""),
+	);
+	const [datePreset, setDatePreset] = useQueryState(
+		"preset",
+		parseAsString.withDefault(""),
+	);
 
 	const fetchUrl = activeOrganization?.id
 		? `/api/logs/v1/emails?limit=${pageSize}&page=${currentPage}${
 				searchQuery ? `&search=${encodeURIComponent(searchQuery)}` : ""
-			}`
+			}${selectedDomain ? `&domain=${selectedDomain}` : ""}${
+				selectedApiKey ? `&api_key=${selectedApiKey}` : ""
+			}${selectedStatus ? `&status=${selectedStatus}` : ""}${
+				startDate ? `&start_date=${startDate}` : ""
+			}${endDate ? `&end_date=${endDate}` : ""}`
 		: null;
 
 	const { data, error, isLoading } = useSWR<EmailListResponse>(fetchUrl, {
@@ -48,6 +80,17 @@ export const EmailList = () => {
 	});
 
 	const totalLogs = data?.total || 0;
+
+	const handleDateChange = (
+		newStartDate: string | null,
+		newEndDate: string | null,
+		preset: string | null,
+	) => {
+		setStartDate(newStartDate || "");
+		setEndDate(newEndDate || "");
+		setDatePreset(preset || "");
+		setCurrentPage(1);
+	};
 
 	if (error) {
 		return (
@@ -62,7 +105,7 @@ export const EmailList = () => {
 
 	return (
 		<div>
-			<div className="flex items-center gap-3">
+			<div className="flex items-center gap-1">
 				<div className="flex-1">
 					<Input.Root size="xsmall">
 						<Input.Wrapper>
@@ -78,6 +121,34 @@ export const EmailList = () => {
 						</Input.Wrapper>
 					</Input.Root>
 				</div>
+
+				<DateRangeFilter
+					startDate={startDate || null}
+					endDate={endDate || null}
+					activePreset={datePreset || null}
+					onDateChange={handleDateChange}
+				/>
+				<StatusSelector
+					value={selectedStatus ? selectedStatus.split(",") : []}
+					onChange={(val) => {
+						setSelectedStatus(val.length > 0 ? val.join(",") : "");
+						setCurrentPage(1);
+					}}
+				/>
+				<DomainSelector
+					value={selectedDomain}
+					onChange={(val) => {
+						setSelectedDomain(val);
+						setCurrentPage(1);
+					}}
+				/>
+				<ApiKeySelector
+					value={selectedApiKey}
+					onChange={(val) => {
+						setSelectedApiKey(val);
+						setCurrentPage(1);
+					}}
+				/>
 			</div>
 
 			<div className="mt-4">
