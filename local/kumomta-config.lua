@@ -4,6 +4,48 @@ local log_hooks = require 'policy-extras.log_hooks'
 local kumomta_key = os.getenv("X_KUMOMTA_KEY") or "reloop"
 local kumomta_endpoint = os.getenv("KUMOMTA_ENDPOINT") or "http://local.reloop.sh"
 
+local function url_encode(str)
+  if str then
+    str = str:gsub("\n", "\r\n")
+    str = str:gsub("([^%w %-%_%.%~])", function(c)
+      return string.format("%%%02X", string.byte(c))
+    end)
+    str = str:gsub(" ", "+")
+  end
+  return str
+end
+
+local function inject_tracking(data, email_log_id)
+  local tracking_base_url = kumomta_endpoint:gsub("/+$", "")
+
+  -- Only proceed if it looks like HTML
+  if not data:find("text/html") then
+    return data
+  end
+
+  -- 1. Inject pixel before </body>
+  local pixel = string.format('<img src="%s/api/mail/v1/track/open/%s" width="1" height="1" style="display:none" alt="" />', tracking_base_url, email_log_id)
+  if data:find("</body>") then
+    data = data:gsub("</body>", pixel .. "</body>")
+  else
+    -- If no </body>, just append at end (naive but better than nothing)
+    data = data .. pixel
+  end
+
+  -- 2. Rewrite links
+  -- Aggressive approach for raw MIME/Quoted-Printable: href=3D"URL" or href="URL"
+  data = data:gsub('(href=3D?["\']?)(https?://[^"%s >]+)(["\']?)', function(prefix, url, suffix)
+    -- Skip if already tracked
+    if url:find("/api/mail/v1/track/click") then
+      return nil
+    end
+    local tracked_url = string.format("%s/api/mail/v1/track/click/%s?url=%s", tracking_base_url, email_log_id, url_encode(url))
+    return prefix .. tracked_url .. suffix
+  end)
+
+  return data
+end
+
 -- Send a JSON webhook to the backend for log updates.
 log_hooks:new {
   name = 'webhook',
@@ -184,6 +226,13 @@ kumo.on('smtp_server_message_received', function(msg)
     local body = kumo.serde.json_parse(body_text)
     if body and body.id then
       msg:set_meta('X-Email-Log-ID', body.id)
+
+      -- Apply tracking injection
+      local new_data = inject_tracking(msg:get_data(), body.id)
+      if new_data ~= msg:get_data() then
+        msg:set_data(new_data)
+        print("[TRACKING] injected tracking into message " .. msg:id())
+      end
     end
   elseif code == 401 then
     kumo.reject(535, "5.7.8 Invalid API key")

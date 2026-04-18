@@ -153,6 +153,31 @@ export class KumomtaClient {
  * Build an RFC 5322 formatted message string with headers and body.
  */
 function buildRfcMessage(options: SendEmailOptions): string {
+	const emailLogId = options.customHeaders?.["X-Email-Log-ID"];
+	const trackingBaseUrl = mailConfig.TRACKING_BASE_URL.replace(/\/+$/, "");
+	let html = options.html;
+
+	if (emailLogId && html) {
+		// 1. Inject open tracking pixel
+		const pixel = `<img src="${trackingBaseUrl}/api/mail/v1/track/open/${emailLogId}" width="1" height="1" style="display:none" alt="" />`;
+		if (html.includes("</body>")) {
+			html = html.replace("</body>", `${pixel}</body>`);
+		} else {
+			html += pixel;
+		}
+
+		// 2. Rewrite links for click tracking
+		// Search for <a ... href="URL" ...> and replace URL
+		html = html.replace(/<a\s+(?:[^>]*?\s+)?href=(["'])(.*?)\1/gi, (match, quote, url) => {
+			// Avoid rewriting existing tracking links or anchored links
+			if (url.startsWith("#") || url.includes("/api/mail/v1/track/click")) {
+				return match;
+			}
+			const trackedUrl = `${trackingBaseUrl}/api/mail/v1/track/click/${emailLogId}?url=${encodeURIComponent(url)}`;
+			return match.replace(url, trackedUrl);
+		});
+	}
+
 	const lines: string[] = [];
 	const boundary = `----=_Part_${Date.now()}_${Math.random().toString(36).slice(2)}`;
 
@@ -198,12 +223,12 @@ function buildRfcMessage(options: SendEmailOptions): string {
 		lines.push("Content-Type: text/html; charset=UTF-8");
 		lines.push("Content-Transfer-Encoding: quoted-printable");
 		lines.push("");
-		lines.push(options.html);
+		lines.push(html as string);
 		lines.push(`--${boundary}--`);
-	} else if (options.html) {
+	} else if (html) {
 		lines.push("Content-Type: text/html; charset=UTF-8");
 		lines.push("");
-		lines.push(options.html);
+		lines.push(html);
 	} else {
 		lines.push("Content-Type: text/plain; charset=UTF-8");
 		lines.push("");
