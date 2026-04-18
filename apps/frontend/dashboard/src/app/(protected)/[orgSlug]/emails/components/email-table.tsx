@@ -220,12 +220,12 @@ export const EmailTable = ({
 		"grid grid-cols-[1.5fr_2fr_80px_80px_32px] items-center px-4 gap-4";
 
 	return (
-		<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/50">
+		<div className="w-full rounded-xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/50">
 			{/* Table Header */}
 			<div
 				className={cn(
 					gridClass,
-					"border-stroke-soft-100 border-b bg-bg-weak-50/50 px-4 py-2.5 text-text-sub-600 dark:border-stroke-soft-100/50 dark:bg-bg-weak-50/40",
+					"sticky top-[1px] z-20 rounded-t-xl border-stroke-soft-100 border-b bg-bg-weak-50/50 px-4 py-2.5 text-text-sub-600 backdrop-blur-sm dark:border-stroke-soft-100/50 dark:bg-bg-weak-50/40",
 				)}
 			>
 				<div className="flex items-center gap-1">
@@ -359,7 +359,7 @@ export const EmailTable = ({
 
 			{/* Table Footer / Pagination */}
 			{!isLoading && totalLogs > 0 && (
-				<div className="flex items-center justify-between border-stroke-soft-100 border-t px-4 py-2.5 text-text-sub-600 dark:border-stroke-soft-100/50">
+				<div className="sticky bottom-0 z-20 flex items-center justify-between border-stroke-soft-100 border-t bg-white px-4 py-2.5 text-text-sub-600 dark:border-stroke-soft-100/50 dark:bg-bg-white-0">
 					<div className="flex items-center gap-3">
 						<span className="text-xs">
 							Showing {startIndex}–{endIndex} of {totalLogs} log

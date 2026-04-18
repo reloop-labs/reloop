@@ -14,11 +14,9 @@ const ContactPage = () => {
 
 	return (
 		<div className="flex flex-col">
-			{/* Main Content Section - Two Column Layout */}
 			<section className="bg-bg-soft-200">
 				<div className="mx-auto max-w-7xl border-stroke-soft-100 border-r border-l">
 					<div className="grid grid-cols-1 gap-12 px-6 py-20 md:grid-cols-2 md:px-12 md:py-28">
-						{/* Left Column - Information & Value Proposition */}
 						<div className="flex flex-col gap-6">
 							{/* Contact Header */}
 							<div className="flex items-center gap-2">
