@@ -154,4 +154,36 @@ export namespace LogsModel {
 		limit: t.Number(),
 	});
 	export type ListEmailLogsResponse = typeof listEmailLogsResponse.static;
+
+	export const emailLogFullEntry = t.Object({
+		id: t.String(),
+		messageId: t.String(),
+		organizationId: t.String(),
+		domainId: t.String(),
+		fromEmail: t.String(),
+		fromName: t.Union([t.String(), t.Null()]),
+		toEmails: t.Array(t.String()),
+		ccEmails: t.Union([t.Array(t.String()), t.Null()]),
+		bccEmails: t.Union([t.Array(t.String()), t.Null()]),
+		replyTo: t.Union([t.String(), t.Null()]),
+		subject: t.String(),
+		textBody: t.Union([t.String(), t.Null()]),
+		htmlBody: t.Union([t.String(), t.Null()]),
+		status: t.String(),
+		errorMessage: t.Union([t.String(), t.Null()]),
+		provider: t.String(),
+		size: t.Number(),
+		headers: t.Union([t.Record(t.String(), t.String()), t.Null()]),
+		sentAt: t.Union([t.String(), t.Null()]),
+		deliveredAt: t.Union([t.String(), t.Null()]),
+		failedAt: t.Union([t.String(), t.Null()]),
+		createdAt: t.String(),
+		updatedAt: t.String(),
+	});
+	export type EmailLogFullEntry = typeof emailLogFullEntry.static;
+
+	export const getEmailLogParams = t.Object({
+		id: t.String(),
+	});
+	export type GetEmailLogParams = typeof getEmailLogParams.static;
 }

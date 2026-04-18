@@ -3,6 +3,8 @@ import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
+import Link from "next/link";
+import { useParams } from "next/navigation";
 
 interface EmailLogData {
 	id: string;
@@ -40,6 +42,7 @@ export const EmailTable = ({
 	isLoading,
 	loadingRows = 5,
 }: EmailTableProps) => {
+	const { orgSlug } = useParams();
 	const gridClass =
 		"grid grid-cols-[1fr_2fr_1.5fr_1.5fr_120px] items-center px-6 gap-4";
 
@@ -136,7 +139,7 @@ export const EmailTable = ({
 							key={log.id}
 							className={cn(
 								gridClass,
-								"w-full py-3 text-left transition-colors hover:bg-bg-weak-50/50",
+								"w-full py-3.5 text-left transition-colors hover:bg-bg-weak-50/50",
 							)}
 						>
 							{/* Status */}
@@ -153,7 +156,12 @@ export const EmailTable = ({
 
 							{/* Subject */}
 							<div className="truncate font-medium text-label-sm text-text-strong-950">
-								{log.subject}
+								<Link
+									href={`/${orgSlug}/emails/${log.id}`}
+									className="hover:text-primary-base hover:underline"
+								>
+									{log.subject}
+								</Link>
 							</div>
 
 							{/* To */}
