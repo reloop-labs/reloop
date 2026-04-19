@@ -164,7 +164,7 @@ function LogsDayButton({
 			data-range-middle={modifiers.range_middle}
 			className={cn(
 				// base
-				"relative isolate z-10 flex aspect-square size-auto w-full min-w-7 items-center justify-center rounded-md font-normal text-sm leading-none outline-none",
+				"relative isolate z-10 flex aspect-square size-auto w-full min-w-7 items-center justify-center rounded-md font-normal text-xs leading-none outline-none",
 				"transition duration-150 ease-out",
 				// hover
 				"hover:bg-bg-weak-50 hover:text-text-strong-950",

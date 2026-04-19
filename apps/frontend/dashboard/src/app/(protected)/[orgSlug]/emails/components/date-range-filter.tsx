@@ -242,11 +242,11 @@ export const DateRangeFilter = ({
 							numberOfMonths={numberOfMonths}
 							disabled={{ after: new Date() }}
 						/>
-						<div className="mt-4 flex justify-end border-stroke-soft-200 border-t pt-3">
+						<div className="flex justify-end border-stroke-soft-100 border-t pt-2">
 							<Button.Root
 								size="xsmall"
 								variant="neutral"
-								mode="ghost"
+								className="rounded-xl"
 								onClick={handleApply}
 								disabled={!calendarRange?.from || !calendarRange?.to}
 							>
