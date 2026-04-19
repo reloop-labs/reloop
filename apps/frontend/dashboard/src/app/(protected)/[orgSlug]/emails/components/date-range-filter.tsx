@@ -75,6 +75,7 @@ interface DateRangeFilterProps {
 		endDate: string | null,
 		preset: string | null,
 	) => void;
+	numberOfMonths?: number;
 }
 
 export const DateRangeFilter = ({
@@ -82,6 +83,7 @@ export const DateRangeFilter = ({
 	endDate,
 	activePreset,
 	onDateChange,
+	numberOfMonths = 2,
 }: DateRangeFilterProps) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
@@ -179,12 +181,9 @@ export const DateRangeFilter = ({
 			<Popover.Content align="start" showArrow={false} className="w-auto p-0">
 				<div className="flex divide-x divide-stroke-soft-200">
 					{/* Left: Presets */}
-					<div className="w-44 p-3">
-						<div className="flex items-center justify-between border-stroke-soft-200 border-b px-1 pb-2">
-							<span className="font-medium text-text-sub-600 text-xs">
-								Time range
-							</span>
-							{hasActiveFilter && (
+					<div className="w-44 px-2">
+						{hasActiveFilter && (
+							<div className="mb-2 flex items-center justify-end border-stroke-soft-200 border-b px-1 pb-2">
 								<button
 									type="button"
 									onClick={handleClear}
@@ -192,8 +191,8 @@ export const DateRangeFilter = ({
 								>
 									Reset
 								</button>
-							)}
-						</div>
+							</div>
+						)}
 
 						<div className="relative mt-2">
 							{DATE_PRESETS.map((preset, idx) => {
@@ -209,7 +208,7 @@ export const DateRangeFilter = ({
 										onPointerLeave={() => setHoverIdx(undefined)}
 										onClick={() => handlePresetSelect(preset)}
 										className={cn(
-											"flex w-full cursor-pointer items-center justify-between rounded-lg px-2 py-1.5 font-normal text-xs transition-colors",
+											"flex w-full cursor-pointer items-center justify-between rounded-lg px-2 py-1.5 font-medium text-xs transition-colors",
 											isActive
 												? "bg-neutral-alpha-10 font-medium text-text-strong-950"
 												: "text-text-strong-950",
@@ -235,36 +234,19 @@ export const DateRangeFilter = ({
 					</div>
 
 					{/* Right: Calendar */}
-					<div className="p-4">
-						<div className="mb-3 flex h-6 items-center justify-between">
-							<span className="font-medium text-text-sub-600 text-xs">
-								Custom range
-							</span>
-							{calendarRange?.from && calendarRange?.to && (
-								<span className="text-text-sub-600 text-xs">
-									{calendarRange.from.toLocaleDateString("en-US", {
-										month: "short",
-										day: "numeric",
-									})}{" "}
-									–{" "}
-									{calendarRange.to.toLocaleDateString("en-US", {
-										month: "short",
-										day: "numeric",
-									})}
-								</span>
-							)}
-						</div>
+					<div className="p-2">
 						<LogsCalendar
 							mode="range"
 							selected={calendarRange}
 							onSelect={handleCalendarSelect}
-							numberOfMonths={2}
+							numberOfMonths={numberOfMonths}
 							disabled={{ after: new Date() }}
 						/>
 						<div className="mt-4 flex justify-end border-stroke-soft-200 border-t pt-3">
 							<Button.Root
 								size="xsmall"
 								variant="neutral"
+								mode="ghost"
 								onClick={handleApply}
 								disabled={!calendarRange?.from || !calendarRange?.to}
 							>

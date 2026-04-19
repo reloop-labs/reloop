@@ -4,9 +4,9 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as React from "react";
 import {
+	type DayButtonProps,
 	DayPicker,
 	getDefaultClassNames,
-	type DayButtonProps,
 } from "react-day-picker";
 
 /**
@@ -22,7 +22,7 @@ function LogsCalendar({
 	className,
 	classNames,
 	showOutsideDays = true,
-	captionLayout = "dropdown",
+	captionLayout = "label",
 	startMonth,
 	endMonth,
 	...props
@@ -41,10 +41,7 @@ function LogsCalendar({
 			endMonth={defaultEndMonth}
 			className={cn("p-2", className)}
 			classNames={{
-				months: cn(
-					"relative flex flex-col gap-4 md:flex-row",
-					defaults.months,
-				),
+				months: cn("relative flex flex-col gap-4 md:flex-row", defaults.months),
 				month: cn("flex w-full flex-col gap-4", defaults.month),
 				nav: cn(
 					"absolute inset-x-0 top-0 flex w-full items-center justify-between gap-1",
@@ -64,30 +61,27 @@ function LogsCalendar({
 				),
 				// Dropdown containers
 				dropdowns: cn(
-					"flex h-7 w-full items-center justify-center gap-1.5 text-sm font-medium",
+					"flex h-7 w-full items-center justify-center gap-1.5 font-medium text-sm",
 					defaults.dropdowns,
 				),
-				dropdown_root: cn(
-					"relative rounded-md",
-					defaults.dropdown_root,
-				),
+				dropdown_root: cn("relative rounded-md", defaults.dropdown_root),
 				dropdown: cn(
 					"absolute inset-0 cursor-pointer opacity-0",
 					defaults.dropdown,
 				),
 				caption_label: cn(
-					"flex items-center gap-1 rounded-md text-sm font-medium text-text-strong-950 select-none",
+					"flex select-none items-center gap-1 rounded-md font-medium text-sm text-text-strong-950",
 					"[&>svg]:size-3.5 [&>svg]:text-text-soft-400",
 					defaults.caption_label,
 				),
 				weekdays: cn("flex", defaults.weekdays),
 				weekday: cn(
-					"flex-1 rounded-md text-[0.8rem] font-normal text-text-soft-400 select-none",
+					"flex-1 select-none rounded-md font-normal text-[0.8rem] text-text-soft-400",
 					defaults.weekday,
 				),
 				week: cn("mt-2 flex w-full", defaults.week),
 				day: cn(
-					"group/day relative aspect-square h-full w-full rounded-md p-0 text-center select-none",
+					"group/day relative aspect-square h-full w-full select-none rounded-md p-0 text-center",
 					defaults.day,
 				),
 				range_start: cn(
@@ -107,10 +101,7 @@ function LogsCalendar({
 					"text-text-disabled-300 aria-selected:text-text-disabled-300",
 					defaults.outside,
 				),
-				disabled: cn(
-					"text-text-disabled-300 opacity-50",
-					defaults.disabled,
-				),
+				disabled: cn("text-text-disabled-300 opacity-50", defaults.disabled),
 				hidden: cn("invisible", defaults.hidden),
 				...classNames,
 			}}
@@ -118,11 +109,7 @@ function LogsCalendar({
 				Chevron: ({ orientation, ...chevronProps }) => {
 					if (orientation === "left") {
 						return (
-							<Icon
-								name="chevron-left"
-								className="h-4 w-4"
-								{...chevronProps}
-							/>
+							<Icon name="chevron-left" className="h-4 w-4" {...chevronProps} />
 						);
 					}
 					if (orientation === "right") {

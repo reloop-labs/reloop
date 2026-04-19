@@ -75,6 +75,7 @@ interface DateRangeFilterProps {
 		endDate: string | null,
 		preset: string | null,
 	) => void;
+	numberOfMonths?: number;
 }
 
 export const DateRangeFilter = ({
@@ -82,6 +83,7 @@ export const DateRangeFilter = ({
 	endDate,
 	activePreset,
 	onDateChange,
+	numberOfMonths = 1,
 }: DateRangeFilterProps) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [showCalendar, setShowCalendar] = useState(false);
@@ -147,7 +149,7 @@ export const DateRangeFilter = ({
 					mode="stroke"
 					size="xsmall"
 					className={cn(
-						"gap-1.5 whitespace-nowrap",
+						"gap-1.5 whitespace-nowrap rounded-xl",
 						hasActiveFilter &&
 							"border-stroke-soft-900 bg-neutral-alpha-10 text-text-strong-950",
 					)}
@@ -192,7 +194,7 @@ export const DateRangeFilter = ({
 							mode="range"
 							selected={calendarRange}
 							onSelect={handleCalendarSelect}
-							numberOfMonths={2}
+							numberOfMonths={numberOfMonths}
 							disabled={{ after: new Date() }}
 						/>
 					</div>
@@ -233,9 +235,7 @@ export const DateRangeFilter = ({
 											isActive
 												? "font-medium text-text-strong-950"
 												: "text-text-strong-950",
-											!currentRect &&
-												hoverIdx === idx &&
-												"bg-neutral-alpha-10",
+											!currentRect && hoverIdx === idx && "bg-neutral-alpha-10",
 										)}
 									>
 										<span>{preset.label}</span>
@@ -253,13 +253,10 @@ export const DateRangeFilter = ({
 							<div className="my-1 border-stroke-soft-200 border-t" />
 							<button
 								ref={(el) => {
-									if (el)
-										buttonRefs.current[DATE_PRESETS.length] = el;
+									if (el) buttonRefs.current[DATE_PRESETS.length] = el;
 								}}
 								type="button"
-								onPointerEnter={() =>
-									setHoverIdx(DATE_PRESETS.length)
-								}
+								onPointerEnter={() => setHoverIdx(DATE_PRESETS.length)}
 								onPointerLeave={() => setHoverIdx(undefined)}
 								onClick={() => setShowCalendar(true)}
 								className={cn(

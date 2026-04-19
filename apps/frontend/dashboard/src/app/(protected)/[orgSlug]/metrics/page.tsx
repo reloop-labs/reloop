@@ -43,6 +43,7 @@ const MetricsPage = () => {
 						endDate={endDate || null}
 						activePreset={datePreset || null}
 						onDateChange={handleDateChange}
+						numberOfMonths={1}
 					/>
 					<DomainSelector
 						value={selectedDomain}
