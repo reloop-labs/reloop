@@ -5,12 +5,7 @@ import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
 import { useParams, useRouter } from "next/navigation";
 
-interface ComposeHeaderProps {
-	onSend: () => void;
-	isLoading?: boolean;
-}
-
-export const ComposeHeader = ({ onSend, isLoading }: ComposeHeaderProps) => {
+export const ComposeHeader = () => {
 	const router = useRouter();
 	const { orgSlug } = useParams();
 
@@ -32,29 +27,6 @@ export const ComposeHeader = ({ onSend, isLoading }: ComposeHeaderProps) => {
 				<h1 className="font-medium text-2xl text-text-strong-950">
 					Send Email
 				</h1>
-			</div>
-			<div className="flex items-center gap-3">
-				<Button.Root
-					variant="neutral"
-					mode="stroke"
-					size="xsmall"
-					onClick={() => router.push(`/${orgSlug}/emails`)}
-				>
-					Cancel
-				</Button.Root>
-				<Button.Root
-					variant="primary"
-					mode="filled"
-					size="xsmall"
-					onClick={onSend}
-					disabled={isLoading}
-					className="bg-text-strong-950 text-static-white hover:bg-black"
-				>
-					<span className="flex items-center gap-2">
-						{isLoading && <Spinner size={14} color="#fff" />}
-						Send message
-					</span>
-				</Button.Root>
 			</div>
 		</div>
 	);
