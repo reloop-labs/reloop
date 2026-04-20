@@ -2,7 +2,7 @@ import { kumomtaClient } from "@reloop/be-mail/lib/kumomta-client";
 import type { MailTypes } from "@reloop/be-mail/types/mail.type.js";
 import { db } from "@reloop/db/client";
 import {
-  type dnsRecordTypeEnum,
+  type dnsRecordTypeNameEnum,
   domain,
   domainDnsRecord,
   emailLog,
@@ -277,7 +277,7 @@ async function checkDomainDnsHealth(
   const requiredRecordTypes = ["SPF", "DKIM", "DMARC"];
   const dnsRecords = await db
     .select({
-      recordType: domainDnsRecord.recordType,
+      recordTypeName: domainDnsRecord.recordTypeName,
       status: domainDnsRecord.status,
     })
     .from(domainDnsRecord)
@@ -286,21 +286,23 @@ async function checkDomainDnsHealth(
         eq(domainDnsRecord.domainId, domainId),
         eq(domainDnsRecord.organizationId, organizationId),
         inArray(
-          domainDnsRecord.recordType,
-          requiredRecordTypes as (typeof dnsRecordTypeEnum.enumValues)[number][],
+          domainDnsRecord.recordTypeName,
+          requiredRecordTypes as (typeof dnsRecordTypeNameEnum.enumValues)[number][],
         ),
       ),
     )
     .limit(10);
 
   const foundRecordTypes = new Set(
-    dnsRecords.filter((r) => r.status === "active").map((r) => r.recordType),
+    dnsRecords
+      .filter((r) => r.status === "active")
+      .map((r) => r.recordTypeName),
   );
 
   const missingRecords = requiredRecordTypes.filter(
     (type) =>
       !foundRecordTypes.has(
-        type as (typeof dnsRecordTypeEnum.enumValues)[number],
+        type as (typeof dnsRecordTypeNameEnum.enumValues)[number],
       ),
   );
 

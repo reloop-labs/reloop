@@ -3,7 +3,7 @@ if (!process.env.PG_URL)
   process.env.PG_URL = "postgresql://reloop:reloop123@localhost:5432/reloop";
 if (!process.env.REDIS_URL)
   process.env.REDIS_URL = "redis://:reloop123@localhost:6379";
-if (!process.env.BASE_URL) process.env.BASE_URL = "https://reloop.local";
+if (!process.env.BASE_URL) process.env.BASE_URL = "https://local.reloop.sh";
 if (!process.env.SMTP_USER) process.env.SMTP_USER = "reloop";
 if (!process.env.SMTP_PASS) process.env.SMTP_PASS = "reloop123";
 
