@@ -1,10 +1,4 @@
-import {
-	Body,
-	Container,
-	Heading,
-	Preview,
-	Text,
-} from "@react-email/components";
+import { Body, Container, Heading, Preview, Text } from "react-email";
 
 import { GetStarted } from "../components/get-started";
 import {
