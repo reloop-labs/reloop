@@ -193,6 +193,30 @@ export namespace LogsModel {
 	});
 	export type EmailLogFullEntry = typeof emailLogFullEntry.static;
 
+	export const emailStatsQuery = t.Object({
+		organization_id: t.Optional(t.String()),
+		domain_id: t.Optional(t.String()),
+		start_date: t.Optional(t.String({ format: "date-time" })),
+		end_date: t.Optional(t.String({ format: "date-time" })),
+		interval: t.Optional(t.Union([t.Literal("day"), t.Literal("hour")], { default: "day" })),
+	});
+	export type EmailStatsQuery = typeof emailStatsQuery.static;
+
+	export const emailStatsResponse = t.Object({
+		dates: t.Array(t.String()),
+		sent: t.Array(t.Number()),
+		delivered: t.Array(t.Number()),
+		bounced: t.Array(t.Number()),
+		complaint: t.Array(t.Number()),
+		rate: t.Array(t.Number()),
+		bounceBreakdown: t.Object({
+			transient: t.Array(t.Number()),
+			permanent: t.Array(t.Number()),
+			undetermined: t.Array(t.Number()),
+		}),
+	});
+	export type EmailStatsResponse = typeof emailStatsResponse.static;
+
 	export const getEmailLogParams = t.Object({
 		id: t.String(),
 	});
