@@ -203,7 +203,7 @@ export async function sendEmailController({
 
     return {
       success: true,
-      messageId: result.messageId,
+      messageId: result.messageId || emailLogId,
       status: "sent",
       timestamp,
     };
