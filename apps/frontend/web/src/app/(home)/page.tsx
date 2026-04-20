@@ -2,6 +2,7 @@ import Company from "./components/company";
 import CTA from "./components/cta";
 import Faq from "./components/faq";
 import Hero from "./components/hero";
+import OpenSource from "./components/open-source";
 import { Scale } from "./components/scale";
 import Sdk from "./components/sdk";
 import Security from "./components/security";
@@ -16,6 +17,7 @@ export default function Home() {
 			<Security />
 			<Company />
 			<CTA />
+			<OpenSource />
 			<Faq />
 		</div>
 	);
