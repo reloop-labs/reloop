@@ -19,7 +19,7 @@ export interface SendEmailOptions {
 	scheduledAt?: string;
 	topicId?: string;
 	attachments?: Array<{
-		content?: string | unknown;
+		content?: string | Buffer | import("stream").Readable;
 		filename?: string;
 		path?: string;
 		contentType?: string;
@@ -76,7 +76,7 @@ export class KumomtaClient {
 		options: SendEmailOptions,
 	): Promise<{ id: string; messageId: string }> {
 		const toList = Array.isArray(options.to) ? options.to : [options.to];
-		const content = buildRfcMessage(options);
+		const content = await buildRfcMessage(options);
 
 		const payload: InjectRequest = {
 			envelope_sender: options.from,
@@ -149,10 +149,12 @@ export class KumomtaClient {
 	}
 }
 
+import MailComposer from "nodemailer/lib/mail-composer";
+
 /**
  * Build an RFC 5322 formatted message string with headers and body.
  */
-function buildRfcMessage(options: SendEmailOptions): string {
+async function buildRfcMessage(options: SendEmailOptions): Promise<string> {
 	const emailLogId = options.customHeaders?.["X-Email-Log-ID"];
 	const trackingBaseUrl = mailConfig.TRACKING_BASE_URL.replace(/\/+$/, "");
 	let html = options.html;
@@ -168,74 +170,44 @@ function buildRfcMessage(options: SendEmailOptions): string {
 
 		// 2. Rewrite links for click tracking
 		// Search for <a ... href="URL" ...> and replace URL
-		html = html.replace(/<a\s+(?:[^>]*?\s+)?href=(["'])(.*?)\1/gi, (match, quote, url) => {
-			// Avoid rewriting existing tracking links or anchored links
-			if (url.startsWith("#") || url.includes("/api/mail/v1/track/click")) {
-				return match;
-			}
-			const trackedUrl = `${trackingBaseUrl}/api/mail/v1/track/click/${emailLogId}?url=${encodeURIComponent(url)}`;
-			return match.replace(url, trackedUrl);
-		});
+		html = html.replace(
+			/<a\s+(?:[^>]*?\s+)?href=(["'])(.*?)\1/gi,
+			(match, _quote, url) => {
+				// Avoid rewriting existing tracking links or anchored links
+				if (url.startsWith("#") || url.includes("/api/mail/v1/track/click")) {
+					return match;
+				}
+				const trackedUrl = `${trackingBaseUrl}/api/mail/v1/track/click/${emailLogId}?url=${encodeURIComponent(url)}`;
+				return match.replace(url, trackedUrl);
+			},
+		);
 	}
 
-	const lines: string[] = [];
-	const boundary = `----=_Part_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+	const mailOptions: import("nodemailer/lib/mailer").Options = {
+		from: options.fromName
+			? `${options.fromName} <${options.from}>`
+			: options.from,
+		to: options.to,
+		subject: options.subject,
+		text: options.text,
+		html: html,
+		replyTo: options.replyTo,
+		cc: options.cc,
+		bcc: options.bcc,
+		headers: options.customHeaders,
+		attachments: options.attachments?.map((att) => ({
+			filename: att.filename,
+			content: att.content,
+			path: att.path,
+			contentType: att.contentType,
+			cid: att.contentId,
+		})),
+	};
 
-	// Required headers
-	lines.push(
-		`From: ${options.fromName ? `${options.fromName} <${options.from}>` : options.from}`,
-	);
+	const composer = new MailComposer(mailOptions);
+	const message = await composer.compile().build();
 
-	const toList = Array.isArray(options.to) ? options.to : [options.to];
-	lines.push(`To: ${toList.join(", ")}`);
-	lines.push(`Subject: ${options.subject}`);
-	lines.push(`Date: ${new Date().toUTCString()}`);
-	lines.push("MIME-Version: 1.0");
-
-	// Optional headers
-	if (options.replyTo) {
-		const replyToList = Array.isArray(options.replyTo) ? options.replyTo : [options.replyTo];
-		lines.push(`Reply-To: ${replyToList.join(", ")}`);
-	}
-	if (options.cc) {
-		const ccList = Array.isArray(options.cc) ? options.cc : [options.cc];
-		lines.push(`Cc: ${ccList.join(", ")}`);
-	}
-
-	// Custom headers (X-Org-ID, X-Domain-ID, X-Email-Log-ID, etc.)
-	if (options.customHeaders) {
-		for (const [key, value] of Object.entries(options.customHeaders)) {
-			lines.push(`${key}: ${value}`);
-		}
-	}
-
-	// Body
-	if (options.html && options.text) {
-		// Multipart alternative
-		lines.push(`Content-Type: multipart/alternative; boundary="${boundary}"`);
-		lines.push("");
-		lines.push(`--${boundary}`);
-		lines.push("Content-Type: text/plain; charset=UTF-8");
-		lines.push("Content-Transfer-Encoding: quoted-printable");
-		lines.push("");
-		lines.push(options.text);
-		lines.push(`--${boundary}`);
-		lines.push("Content-Type: text/html; charset=UTF-8");
-		lines.push("Content-Transfer-Encoding: quoted-printable");
-		lines.push("");
-		lines.push(html as string);
-		lines.push(`--${boundary}--`);
-	} else if (html) {
-		lines.push("Content-Type: text/html; charset=UTF-8");
-		lines.push("");
-		lines.push(html);
-	} else {
-		lines.push("Content-Type: text/plain; charset=UTF-8");
-		lines.push("");
-		lines.push(options.text || "");
-	}
-
-	return lines.join("\r\n");
+	return message.toString();
 }
 
 // Create singleton instance

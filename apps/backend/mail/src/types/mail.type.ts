@@ -26,7 +26,7 @@ export namespace MailTypes {
 		headers?: Record<string, string>;
 		topicId?: string;
 		attachments?: Array<{
-			content?: string | unknown;
+			content?: string | Buffer | import("stream").Readable;
 			filename?: string;
 			path?: string;
 			contentType?: string;

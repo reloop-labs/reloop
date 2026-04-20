@@ -1,5 +1,6 @@
 import { authMiddleware } from "@reloop/be-mail/middleware/auth";
 import { MailModel } from "@reloop/be-mail/model/mail.model.js";
+import type { MailTypes } from "@reloop/be-mail/types/mail.type.js";
 import { type Logger, logger } from "@reloop/logger";
 import { Elysia, status } from "elysia";
 import { sendEmailController } from "./send-email.controllers";
@@ -12,9 +13,10 @@ export const sendEmailRoute = new Elysia().use(authMiddleware).post(
         message: "User is not a member of an organization",
       });
     }
+
     return await sendEmailController({
       organizationId: activeOrganizationId,
-      body,
+      body: body as MailTypes.SendEmailRequest,
       logger: (contextLogger as Logger) || logger,
     });
   },

@@ -32,10 +32,15 @@ export async function sendEmailController({
     );
 
     // Validate sender email belongs to user's organization
-    const domainName = body.from.split("@")[1];
-    if (!domainName) {
-      throw new Error("Invalid 'from' email address");
+    const fromParts = body.from.split("@");
+    if (fromParts.length < 2) {
+      throw new Error("Invalid 'from' email address format");
     }
+    const domainName = fromParts[1];
+    if (!domainName) {
+      throw new Error("Invalid 'from' email address format");
+    }
+
     const domainRecord = await db
       .select()
       .from(domain)
@@ -71,8 +76,6 @@ export async function sendEmailController({
       throw new Error(errorMessage);
     }
 
-    // Create emailLog record BEFORE sending (status: pending)
-    // so we have the ID to inject as X-Email-Log-ID tracking header
     const [logRecord] = await db
       .insert(emailLog)
       .values({
@@ -107,13 +110,59 @@ export async function sendEmailController({
       throw new Error("Failed to create email log record");
     }
 
+    // Template Resolution: If template is provided, fetch and substitute variables
+    let finalSubject = body.subject;
+    let finalHtml = body.html;
+    let finalText = body.text;
+
+    if (body.template?.id) {
+      const templateId = body.template.id;
+      const templateRecord = await db.query.template.findFirst({
+        where: (t, { and: dbAnd, eq: dbEq, isNull: dbIsNull }) =>
+          dbAnd(
+            dbEq(t.id, templateId),
+            dbEq(t.organizationId, organizationId),
+            dbIsNull(t.deletedAt),
+          ),
+      });
+
+      if (!templateRecord) {
+        throw new Error(`Template ${body.template.id} not found`);
+      }
+
+      // Latest version for rendered HTML
+      const latestVersion = await db.query.templateVersion.findFirst({
+        where: (tv, { eq: dbEq }) => dbEq(tv.templateId, templateRecord.id),
+        orderBy: (tv, { desc: dbDesc }) => [dbDesc(tv.version)],
+      });
+
+      finalSubject = templateRecord.subject || finalSubject;
+      finalHtml = latestVersion?.renderedHtml || finalHtml;
+
+      const variables = body.template.variables;
+      if (variables) {
+        const substitute = (str: string) => {
+          let substituted = str;
+          for (const [key, value] of Object.entries(variables)) {
+            const regex = new RegExp(`{{\\s*${key}\\s*}}`, "g");
+            substituted = substituted.replace(regex, String(value));
+          }
+          return substituted;
+        };
+
+        if (finalSubject) finalSubject = substitute(finalSubject);
+        if (finalHtml) finalHtml = substitute(finalHtml);
+        if (finalText) finalText = substitute(finalText);
+      }
+    }
+
     // Send email via KumoMTA HTTP injection API with tracking headers
     const result = await kumomtaClient.sendEmail({
       from: body.from,
       to: body.to,
-      subject: body.subject,
-      text: body.text,
-      html: body.html,
+      subject: finalSubject,
+      text: finalText,
+      html: finalHtml,
       replyTo: body.replyTo,
       cc: body.cc,
       bcc: body.bcc,
