@@ -2,6 +2,7 @@
 
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 /* ------------------------------------------------------------------ */
@@ -523,7 +524,7 @@ export default function Features() {
 									<div className="mt-14 sm:mt-18">
 										<div className="relative overflow-hidden rounded-xl bg-zinc-900 shadow-2xl">
 											<div className="absolute inset-0 opacity-40 grayscale">
-												<img
+												<Image
 													src={feature.bgImage}
 													alt=""
 													fill
