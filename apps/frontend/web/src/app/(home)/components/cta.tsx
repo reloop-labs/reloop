@@ -4,7 +4,7 @@ import Link from "next/link";
 
 const CTA = () => {
 	return (
-		<section id="cta" className="bg-[#05070b] text-white">
+		<section id="cta" className="">
 			<div className="mx-auto max-w-[1320px] px-4 py-24 sm:px-6 sm:py-32 lg:px-8 lg:py-40">
 				<div className="mx-auto max-w-[920px] text-center">
 					<p className="font-semibold text-[11px] text-white/40 uppercase tracking-[0.16em]">
