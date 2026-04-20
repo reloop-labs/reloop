@@ -32,7 +32,14 @@ interface HistoryEntry {
 }
 
 interface EditorState {
-	// Block data
+	// Editor Instance Reference (TipTap / React Email Editor)
+	editor: any | null;
+	setEditor: (editor: any) => void;
+	
+	tiptapSelection: { nodeName: string | null; attrs: any } | null;
+	setTiptapSelection: (nodeName: string | null, attrs: any) => void;
+
+	// Legacy Block data (may be deprecated by Tiptap JSON state)
 	blocks: TemplateBlock[];
 	selectedBlockId: string | null;
 
@@ -155,6 +162,16 @@ function updateBlockInList(
 
 // ============ Store ============
 export const useEditorStore = create<EditorState>((set, get) => ({
+	// Editor Reference
+	editor: null,
+	setEditor: (editor) => set({ editor }),
+	
+	tiptapSelection: null,
+	setTiptapSelection: (nodeName, attrs) => set({ 
+		tiptapSelection: { nodeName, attrs },
+		selectedBlockId: nodeName ? 'tiptap-selection' : null
+	}),
+
 	// Initial state
 	blocks: [],
 	selectedBlockId: null,
@@ -175,10 +192,36 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
 	addBlock: (type, index) => {
 		const state = get();
+		
+		// If TipTap editor is available, insert into the document directly
+		if (state.editor) {
+			const editor = state.editor;
+			
+			// Simple mapping from BlockType to TipTap HTML/Nodes
+			// This will be expanded based on the exact extensions used 
+			// from @react-email/editor
+			const nodeMap: Record<BlockType, string> = {
+				heading: "<h1>New Heading</h1>",
+				text: "<p>Start writing your content here...</p>",
+				button: '<a href="#" style="background-color: #000; color: #fff; padding: 12px 24px; border-radius: 6px; display: inline-block; cursor: pointer; text-align: center; font-weight: 500; text-decoration: none;">Click me</a>',
+				image: '<img src="https://placehold.co/200x200?text=Upload+Image" alt="Placeholder Image" style="display: block; max-width: 100%; border-radius: 8px;" />',
+				divider: "<hr>",
+				spacer: '<div style="height: 32px"></div>',
+				section: '<section><p>New Section</p></section>',
+				columns: '<div style="display: flex; gap: 16px;"><div style="flex:1;"><p>Col 1</p></div><div style="flex:1;"><p>Col 2</p></div></div>',
+				html: '<div><p>Custom HTML</p></div>'
+			};
+			
+			editor.chain().focus().insertContent(nodeMap[type] || "<p></p>").run();
+			
+			// We skip local legacy state block arrays since Tiptap maintains the state tree
+			return;
+		}
+		
+		// Fallback for legacy blocks tree (will eventually be removed)
 		const newBlock = createBlock(type);
 		const newBlocks = cloneBlocks(state.blocks);
 
-		// Save to undo stack
 		const historyEntry: HistoryEntry = {
 			blocks: cloneBlocks(state.blocks),
 			selectedBlockId: state.selectedBlockId,
@@ -222,6 +265,27 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
 	updateBlockProps: (blockId, props) => {
 		const state = get();
+
+		if (state.editor && blockId === 'tiptap-selection' && state.tiptapSelection?.nodeName) {
+			const { nodeName } = state.tiptapSelection;
+			
+			// Map legacy props to TipTap HTML attributes
+			const newAttrs: Record<string, any> = { ...props };
+			if (nodeName === 'image' && props.url) {
+				newAttrs.src = props.url; // Convert 'url' back to 'src'
+			}
+			if (nodeName === 'link' && props.url) {
+			    newAttrs.href = props.url;
+			}
+			
+			state.editor.chain().focus().updateAttributes(nodeName, newAttrs).run();
+			
+			// Refresh our store selection state visually
+			const updatedAttrs = state.editor.getAttributes(nodeName);
+			state.setTiptapSelection(nodeName, updatedAttrs);
+			return;
+		}
+
 		const historyEntry: HistoryEntry = {
 			blocks: cloneBlocks(state.blocks),
 			selectedBlockId: state.selectedBlockId,
@@ -370,6 +434,28 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
 	getSelectedBlock: () => {
 		const state = get();
+		
+		// Priority: Read from TipTap selection explicitly
+		if (state.editor && state.tiptapSelection?.nodeName) {
+			const { nodeName, attrs } = state.tiptapSelection;
+			
+			// Bridge TipTap names to Legacy BlockTypes
+			let legacyType = nodeName;
+			
+			const mappedProps: Record<string, any> = { ...attrs };
+			
+			// Provide backward compatible Image properties
+			if (nodeName === 'image') {
+				mappedProps.url = attrs.src; // some sidebars expect url
+			}
+
+			return {
+				id: 'tiptap-selection',
+				type: legacyType as BlockType,
+				props: mappedProps,
+			} as TemplateBlock;
+		}
+
 		if (!state.selectedBlockId) return null;
 		return findBlock(state.blocks, state.selectedBlockId);
 	},
