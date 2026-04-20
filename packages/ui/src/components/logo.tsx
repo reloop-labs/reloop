@@ -1,10 +1,17 @@
 "use client";
 import { useTheme } from "next-themes";
 
-export const Logo = ({ className }: { className?: string }) => {
+export const Logo = ({
+	className,
+	theme: forcedTheme,
+}: {
+	className?: string;
+	theme?: "light" | "dark";
+}) => {
 	const { theme, resolvedTheme } = useTheme();
 	const currentTheme =
-		theme === "light" || theme === "dark" ? theme : resolvedTheme;
+		forcedTheme ||
+		(theme === "light" || theme === "dark" ? theme : resolvedTheme);
 
 	const fillColor = currentTheme === "dark" ? "#D2D2D2" : "#2C2C2C";
 	const strokeColor = currentTheme === "dark" ? "#878787" : "#4D4D4D";

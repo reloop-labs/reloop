@@ -1,5 +1,9 @@
 @import "@reloop/tailwind/style.css";
 
+:root {
+	--font-sans: var(--font-open-runde) !important;
+}
+
 @custom-variant dark (&:where(.dark, .dark *));
 @custom-variant light (&:where(.light, .light *));
 
