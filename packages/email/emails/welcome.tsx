@@ -2,13 +2,13 @@ import {
 	Body,
 	Container,
 	Heading,
-	Hr,
 	Img,
 	Link,
 	Preview,
 	Section,
 	Text,
 } from "react-email";
+import { Footer } from "../components/footer";
 import {
 	EmailThemeProvider,
 	getEmailInlineStyles,
@@ -87,31 +87,7 @@ export const WelcomeEmail = ({ fullName = "" }: Props) => {
 						<br />
 						The Reloop Team
 					</Text>
-					<Hr className="mx-0 my-[26px] w-full border border-[#eaeaea] border-solid" />
-					<Text className="text-[#666666] text-[12px] leading-[24px]">
-						If you'd like to report an issue, reach out to{" "}
-						<Link
-							href={`${baseUrl}/help`}
-							className="text-blue-600 no-underline"
-						>
-							Reloop Help
-						</Link>
-						.
-					</Text>
-					<Text className="text-[#666666] text-[12px] leading-[24px]">
-						<Link
-							href={`${baseUrl}/notifications`}
-							className="text-[#666666] no-underline"
-						>
-							Manage your notification settings
-						</Link>
-					</Text>
-					<Text className="text-[#666666] text-[12px] leading-[24px]">
-						Copyright © {new Date().getFullYear()} Reloop Inc. All rights
-						reserved.
-						<br />
-						123 Reloop St, San Francisco, CA 94103
-					</Text>
+					<Footer />
 				</Container>
 			</Body>
 		</EmailThemeProvider>

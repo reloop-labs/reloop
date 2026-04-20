@@ -1,5 +1,5 @@
-import { Font, Head, Html, Tailwind } from "@react-email/components";
 import type React from "react";
+import { Font, Head, Html, Tailwind } from "react-email";
 
 // Email-optimized theme colors (avoiding pure white/black for better email client compatibility)
 export const emailTheme = {
@@ -192,6 +192,65 @@ export function EmailThemeProvider({
 }: EmailThemeProviderProps) {
 	return (
 		<Html>
+			<Head>
+				{/* Essential meta tags for email dark mode support */}
+				<meta name="color-scheme" content="light dark" />
+				<meta name="supported-color-schemes" content="light dark" />
+
+				{/* Additional Gmail dark mode hints */}
+				<meta
+					name="theme-color"
+					content="#0C0C0C"
+					media="(prefers-color-scheme: dark)"
+				/>
+				<meta
+					name="theme-color"
+					content="#ffffff"
+					media="(prefers-color-scheme: light)"
+				/>
+				<meta name="msapplication-navbutton-color" content="#0C0C0C" />
+
+				{/* Dark mode styles */}
+				{/* biome-ignore lint/security/noDangerouslySetInnerHtml: Needed for raw email CSS */}
+				<style dangerouslySetInnerHTML={{ __html: getEmailDarkModeCSS() }} />
+
+				{/* Default fonts for all emails */}
+				<Font
+					fontFamily="Open Runde"
+					fallbackFontFamily="Helvetica"
+					webFont={{
+						url: "https://reloop.sh/font/openRunde/OpenRunde-Regular.woff2",
+						format: "woff2",
+					}}
+					fontWeight={400}
+					fontStyle="normal"
+				/>
+
+				<Font
+					fontFamily="Open Runde"
+					fallbackFontFamily="Helvetica"
+					webFont={{
+						url: "https://reloop.sh/font/openRunde/OpenRunde-Medium.woff2",
+						format: "woff2",
+					}}
+					fontWeight={500}
+					fontStyle="normal"
+				/>
+
+				<Font
+					fontFamily="Open Runde"
+					fallbackFontFamily="Helvetica"
+					webFont={{
+						url: "https://reloop.sh/font/openRunde/OpenRunde-Semibold.woff2",
+						format: "woff2",
+					}}
+					fontWeight={600}
+					fontStyle="normal"
+				/>
+
+				{/* Additional head content */}
+				{additionalHeadContent}
+			</Head>
 			<Tailwind
 				config={{
 					theme: {
@@ -208,64 +267,6 @@ export function EmailThemeProvider({
 					},
 				}}
 			>
-				<Head>
-					{/* Essential meta tags for email dark mode support */}
-					<meta name="color-scheme" content="light dark" />
-					<meta name="supported-color-schemes" content="light dark" />
-
-					{/* Additional Gmail dark mode hints */}
-					<meta
-						name="theme-color"
-						content="#0C0C0C"
-						media="(prefers-color-scheme: dark)"
-					/>
-					<meta
-						name="theme-color"
-						content="#ffffff"
-						media="(prefers-color-scheme: light)"
-					/>
-					<meta name="msapplication-navbutton-color" content="#0C0C0C" />
-
-					{/* Dark mode styles */}
-					<style>{getEmailDarkModeCSS()}</style>
-
-					{/* Default fonts for all emails */}
-					<Font
-						fontFamily="Open Runde"
-						fallbackFontFamily="Helvetica"
-						webFont={{
-							url: "https://reloop.sh/font/openRunde/OpenRunde-Regular.woff2",
-							format: "woff2",
-						}}
-						fontWeight={400}
-						fontStyle="normal"
-					/>
-
-					<Font
-						fontFamily="Open Runde"
-						fallbackFontFamily="Helvetica"
-						webFont={{
-							url: "https://reloop.sh/font/openRunde/OpenRunde-Medium.woff2",
-							format: "woff2",
-						}}
-						fontWeight={500}
-						fontStyle="normal"
-					/>
-
-					<Font
-						fontFamily="Open Runde"
-						fallbackFontFamily="Helvetica"
-						webFont={{
-							url: "https://reloop.sh/font/openRunde/OpenRunde-Semibold.woff2",
-							format: "woff2",
-						}}
-						fontWeight={600}
-						fontStyle="normal"
-					/>
-
-					{/* Additional head content */}
-					{additionalHeadContent}
-				</Head>
 				{preview}
 				{children}
 			</Tailwind>
@@ -296,27 +297,26 @@ export function getEmailThemeClasses() {
 
 // Utility to get inline styles with system theme support
 export function getEmailInlineStyles() {
-	// Use CSS custom properties that automatically adapt to system theme
 	return {
 		body: {
-			backgroundColor: "var(--email-bg)",
-			color: "var(--email-fg)",
+			backgroundColor: emailTheme.light.background,
+			color: emailTheme.light.foreground,
 		},
 		container: {
-			borderColor: "var(--email-border)",
+			borderColor: emailTheme.light.border,
 		},
 		text: {
-			color: "var(--email-fg)",
+			color: emailTheme.light.foreground,
 		},
 		mutedText: {
-			color: "var(--email-muted)",
+			color: emailTheme.light.muted,
 		},
 		secondaryText: {
-			color: "var(--email-secondary)",
+			color: emailTheme.light.secondary,
 		},
 		button: {
-			color: "var(--email-accent)",
-			borderColor: "var(--email-accent)",
+			color: emailTheme.light.accent,
+			borderColor: emailTheme.light.accent,
 		},
 	};
 }

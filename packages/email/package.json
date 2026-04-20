@@ -27,6 +27,7 @@
 		"react-dom": "catalog:ui"
 	},
 	"devDependencies": {
+		"@react-email/ui": "catalog:ui",
 		"@types/bun": "catalog:backend",
 		"typescript": "catalog:"
 	}
