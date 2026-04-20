@@ -10,9 +10,9 @@ export default function Home() {
 		<div>
 			<Hero />
 			<HowItWorks />
-			<CTA />
-			<OpenSource />
 			<UseCaseGrid />
+			<OpenSource />
+			<CTA />
 			<Faq />
 		</div>
 	);

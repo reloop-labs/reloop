@@ -1,7 +1,5 @@
 "use client";
 
-import { Icon } from "@reloop/ui/icon";
-import Link from "next/link";
 import { AnimatedAlternative } from "./animated-alternative";
 export default function Hero() {
 	return (
@@ -15,9 +13,14 @@ export default function Hero() {
 						<div className="mb-10 flex items-center justify-center">
 							<AnimatedAlternative />
 						</div>
-						<h1 className="font-semibold text-[2.8rem] text-white leading-[1.05] tracking-tighter drop-shadow-[0_10px_34px_rgba(0,0,0,0.32)] sm:text-[4.2rem]">
-							Email for AI Agents, Developers &{" "}
-							<span className="text-white/40">Marketing teams.</span>
+						<h1 className="font-semibold text-[2.8rem] leading-[1.05] tracking-tighter drop-shadow-[0_10px_34px_rgba(0,0,0,0.32)] sm:text-[4.2rem]">
+							<span className="bg-gradient-to-b from-white via-white to-white/40 bg-clip-text text-transparent">
+								Email for AI Agents,
+							</span>
+							<br />
+							<span className="bg-gradient-to-b from-white via-white to-white/40 bg-clip-text text-transparent">
+								Developers & Marketing teams.
+							</span>
 						</h1>
 						<p className="mx-auto mt-8 max-w-[620px] text-[15px] text-white/50 leading-relaxed sm:text-[17px]">
 							High-performance, open-source email infrastructure for AI agents
