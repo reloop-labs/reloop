@@ -78,27 +78,32 @@ export class KumomtaClient {
 		const toList = Array.isArray(options.to) ? options.to : [options.to];
 		const content = await buildRfcMessage(options);
 
-		const payload: InjectRequest = {
-			envelope_sender: options.from,
-			recipients: toList.map((email) => ({ email })),
-			content,
-		};
+		// Deduplicate recipients across To, CC, and BCC to avoid multiple deliveries to the same address
+		const recipientSet = new Set<string>();
 
-		// Add CC recipients
+		toList.forEach((email) => {
+			recipientSet.add(email.toLowerCase().trim());
+		});
+
 		if (options.cc) {
 			const ccList = Array.isArray(options.cc) ? options.cc : [options.cc];
-			for (const email of ccList) {
-				payload.recipients.push({ email });
-			}
+			ccList.forEach((email) => {
+				recipientSet.add(email.toLowerCase().trim());
+			});
 		}
 
-		// Add BCC recipients
 		if (options.bcc) {
 			const bccList = Array.isArray(options.bcc) ? options.bcc : [options.bcc];
-			for (const email of bccList) {
-				payload.recipients.push({ email });
-			}
+			bccList.forEach((email) => {
+				recipientSet.add(email.toLowerCase().trim());
+			});
 		}
+
+		const payload: InjectRequest = {
+			envelope_sender: options.from,
+			recipients: Array.from(recipientSet).map((email) => ({ email })),
+			content,
+		};
 
 		try {
 			const response = await fetch(`${this.baseUrl}/api/inject/v1`, {
