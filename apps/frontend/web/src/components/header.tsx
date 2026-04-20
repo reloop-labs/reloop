@@ -10,13 +10,10 @@ export const Header = () => {
 	const { data: session } = useSession();
 
 	return (
-		<header className="absolute inset-x-0 top-0 z-30 bg-transparent">
-			<div className="mx-auto flex h-[76px] max-w-[1320px] items-center justify-between px-4 sm:px-6 lg:px-8">
-				<Link href="/" className="flex items-center gap-3">
-					<Logo theme="dark" className="size-6" />
-					<span className="font-semibold text-[18px] text-white/92 lowercase tracking-[0.04em] sm:text-[20px]">
-						reloop
-					</span>
+		<header className="sticky top-0 z-30 border-white/5 border-b bg-[#05070b]">
+			<div className="mx-auto flex h-16 max-w-[1320px] items-center justify-between px-4 sm:px-6 lg:px-8">
+				<Link href="/" className="flex items-center">
+					<Logo theme="dark" className="w-10" />
 				</Link>
 
 				<div className="flex items-center gap-2.5 sm:gap-3">

@@ -25,6 +25,7 @@
 		"postcss": "catalog:ui",
 		"react": "catalog:ui",
 		"react-dom": "catalog:ui",
+		"calligraph": "catalog:ui",
 		"react-hook-form": "catalog:ui",
 		"sonner": "catalog:ui",
 		"tailwindcss": "catalog:ui",
