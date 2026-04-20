@@ -13,8 +13,8 @@ export default function Home() {
 			<Features />
 			<CodeSnippet />
 			<UseCase />
-			<CTA />
 			<OpenSource />
+			<CTA />
 			<Faq />
 		</div>
 	);
