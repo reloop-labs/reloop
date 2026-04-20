@@ -19,7 +19,6 @@ export async function handleOpenTracking({
     const logEntry = await db.query.emailLog.findFirst({
       where: eq(emailLog.id, emailLogId),
     });
-
     if (logEntry) {
       await db.insert(emailEvent).values({
         emailLogId,
@@ -33,13 +32,7 @@ export async function handleOpenTracking({
   } catch (error) {
     logger.error({ error, emailLogId }, "Failed to track email open");
   }
-
-  return new Response(TRANSPARENT_PIXEL, {
-    headers: {
-      "Content-Type": "image/png",
-      "Cache-Control": "no-cache, no-store, must-revalidate",
-    },
-  });
+  return new Response(TRANSPARENT_PIXEL, { headers: { "Content-Type": "image/png", "Cache-Control": "no-cache, no-store, must-revalidate", }, });
 }
 
 export async function handleClickTracking({
