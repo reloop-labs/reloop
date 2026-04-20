@@ -29,7 +29,6 @@ ENV HOSTNAME=0.0.0.0
 
 # Copy standalone build
 COPY --from=builder /app/apps/frontend/web/public ./public
-COPY --from=builder /app/scripts ./public/scripts
 COPY --from=builder /app/apps/frontend/web/.next/standalone ./
 COPY --from=builder /app/apps/frontend/web/.next/standalone/apps/frontend/web ./
 COPY --from=builder /app/apps/frontend/web/.next/static ./.next/static
