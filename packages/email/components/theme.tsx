@@ -37,7 +37,7 @@ export const getEmailDarkModeCSS = () => {
     :root {
       color-scheme: light dark;
       supported-color-schemes: light dark;
-      
+
       /* CSS custom properties for system theme adaptation */
       --email-bg: ${emailTheme.light.background};
       --email-fg: ${emailTheme.light.foreground};
@@ -58,7 +58,7 @@ export const getEmailDarkModeCSS = () => {
         --email-accent: ${emailTheme.dark.accent};
         --email-secondary: ${emailTheme.dark.secondary};
       }
-      
+
       .email-body {
         background-color: ${emailTheme.dark.background} !important;
         color: ${emailTheme.dark.foreground} !important;
@@ -82,7 +82,7 @@ export const getEmailDarkModeCSS = () => {
       .email-border {
         border-color: ${emailTheme.dark.border} !important;
       }
-      
+
       /* Image swapping for dark mode */
       .dark-mode-hide {
         display: none !important;
@@ -192,7 +192,22 @@ export function EmailThemeProvider({
 }: EmailThemeProviderProps) {
 	return (
 		<Html>
-			<Tailwind>
+			<Tailwind
+				config={{
+					theme: {
+						extend: {
+							fontFamily: {
+								sans: [
+									"Open Runde",
+									"ui-sans-serif",
+									"system-ui",
+									"sans-serif",
+								],
+							},
+						},
+					},
+				}}
+			>
 				<Head>
 					{/* Essential meta tags for email dark mode support */}
 					<meta name="color-scheme" content="light dark" />
@@ -216,10 +231,10 @@ export function EmailThemeProvider({
 
 					{/* Default fonts for all emails */}
 					<Font
-						fontFamily="Geist"
+						fontFamily="Open Runde"
 						fallbackFontFamily="Helvetica"
 						webFont={{
-							url: "https://cdn.jsdelivr.net/npm/@fontsource/geist-sans@5.0.1/files/geist-sans-latin-400-normal.woff2",
+							url: "https://reloop.sh/font/openRunde/OpenRunde-Regular.woff2",
 							format: "woff2",
 						}}
 						fontWeight={400}
@@ -227,13 +242,24 @@ export function EmailThemeProvider({
 					/>
 
 					<Font
-						fontFamily="Geist"
+						fontFamily="Open Runde"
 						fallbackFontFamily="Helvetica"
 						webFont={{
-							url: "https://cdn.jsdelivr.net/npm/@fontsource/geist-sans@5.0.1/files/geist-sans-latin-500-normal.woff2",
+							url: "https://reloop.sh/font/openRunde/OpenRunde-Medium.woff2",
 							format: "woff2",
 						}}
 						fontWeight={500}
+						fontStyle="normal"
+					/>
+
+					<Font
+						fontFamily="Open Runde"
+						fallbackFontFamily="Helvetica"
+						webFont={{
+							url: "https://reloop.sh/font/openRunde/OpenRunde-Semibold.woff2",
+							format: "woff2",
+						}}
+						fontWeight={600}
 						fontStyle="normal"
 					/>
 

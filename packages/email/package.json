@@ -14,12 +14,11 @@
 		"lint": "biome check .",
 		"format": "biome format --write .",
 		"typecheck": "tsc --noEmit",
-		"dev": "email dev -p 3003",
+		"dev": "email dev -p 3005",
 		"build": "email build",
 		"start": "email start"
 	},
 	"dependencies": {
-		"@react-email/components": "catalog:ui",
 		"@react-email/render": "catalog:ui",
 		"@react-email/tailwind": "catalog:ui",
 		"date-fns": "catalog:backend",
@@ -28,8 +27,7 @@
 		"react-dom": "catalog:ui"
 	},
 	"devDependencies": {
-		"@react-email/preview-server": "catalog:ui",
 		"@types/bun": "catalog:backend",
-		"typescript": "workspace:"
+		"typescript": "catalog:"
 	}
 }
