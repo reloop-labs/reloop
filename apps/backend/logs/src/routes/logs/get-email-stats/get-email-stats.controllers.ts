@@ -67,18 +67,27 @@ export async function getEmailStatsController({
     };
 
     for (const row of stats) {
+      if (!row.date) continue;
       const dateStr = new Date(row.date as string | Date).toISOString();
       result.dates.push(dateStr);
-      result.sent.push(Number(row.sent));
-      result.delivered.push(Number(row.delivered));
-      result.bounced.push(Number(row.bounced));
-      result.complaint.push(Number(row.spam));
-      result.bounceBreakdown.permanent.push(Number(row.permanent));
-      result.bounceBreakdown.transient.push(Number(row.transient));
-      result.bounceBreakdown.undetermined.push(Number(row.undetermined));
 
-      const rate =
-        row.sent > 0 ? (Number(row.delivered) / Number(row.sent)) * 100 : 0;
+      const sentCount = Number(row.sent);
+      const deliveredCount = Number(row.delivered);
+      const bouncedCount = Number(row.bounced);
+      const spamCount = Number(row.spam);
+      const permanentCount = Number(row.permanent);
+      const transientCount = Number(row.transient);
+      const undeterminedCount = Number(row.undetermined);
+
+      result.sent.push(sentCount);
+      result.delivered.push(deliveredCount);
+      result.bounced.push(bouncedCount);
+      result.complaint.push(spamCount);
+      result.bounceBreakdown.permanent.push(permanentCount);
+      result.bounceBreakdown.transient.push(transientCount);
+      result.bounceBreakdown.undetermined.push(undeterminedCount);
+
+      const rate = sentCount > 0 ? (deliveredCount / sentCount) * 100 : 0;
       result.rate.push(Math.round(rate * 100) / 100);
     }
 
