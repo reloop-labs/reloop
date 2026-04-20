@@ -160,14 +160,6 @@ export const Footer = () => {
 								<Icon className="size-4.5" name="social-github" />
 							</Link>
 						</div>
-						<div className="mt-6">
-							<a
-								href="/dashboard/login"
-								className="inline-flex items-center justify-center rounded-[11px] bg-white px-5 py-2.5 font-semibold text-[#0a0d12] text-[13px] transition-colors hover:bg-white/88"
-							>
-								Get Started
-							</a>
-						</div>
 					</div>
 					<div className="grid flex-1 grid-cols-2 gap-8 sm:grid-cols-4">
 						{links.map((group) => (

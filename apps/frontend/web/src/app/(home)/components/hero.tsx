@@ -3,7 +3,7 @@
 import { AnimatedAlternative } from "./animated-alternative";
 export default function Hero() {
 	return (
-		<div className="relative flex h-[calc(100dvh-100px)] items-center justify-center overflow-hidden bg-[#05070b] text-white">
+		<div className="relative flex h-[calc(100dvh-63px)] items-center justify-center overflow-hidden bg-[#05070b] text-white">
 			<main className="relative z-10">
 				<section
 					id="product"

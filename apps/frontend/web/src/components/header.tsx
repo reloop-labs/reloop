@@ -10,7 +10,7 @@ export const Header = () => {
 	const { data: session } = useSession();
 
 	return (
-		<header className="sticky top-0 z-30 border-white/5 border-b bg-[#05070b]">
+		<header className="bg-[#05070b]">
 			<div className="mx-auto flex h-16 max-w-[1320px] items-center justify-between px-4 sm:px-6 lg:px-8">
 				<Link href="/" className="flex items-center">
 					<Logo theme="dark" className="w-16" />
