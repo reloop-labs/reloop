@@ -2,6 +2,7 @@ import Company from "./components/company";
 import CTA from "./components/cta";
 import Faq from "./components/faq";
 import Hero from "./components/hero";
+import HowItWorks from "./components/how-it-works";
 import OpenSource from "./components/open-source";
 import { Scale } from "./components/scale";
 import Sdk from "./components/sdk";
@@ -13,6 +14,7 @@ export default function Home() {
 			<Hero />
 			<Sdk />
 			<UseCase />
+			<HowItWorks />
 			<Scale />
 			<Security />
 			<Company />
