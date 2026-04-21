@@ -10,7 +10,7 @@ export const source = {
 			data: {
 				title: "Docs",
 				description: "Documentation",
-				body: () => <div>Content for {path}</div>,
+				body: (props: { components?: any }) => <div>Content for {path}</div>,
 				toc: [],
 			},
 			url: `/docs/${path}`,

@@ -1,4 +1,15 @@
 "use client";
+
+import {
+	Box,
+	Check,
+	ChevronDown,
+	Code,
+	Copy,
+	ExternalLinkIcon,
+	FileText,
+	Terminal,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 
 const cache = new Map<string, string>();
@@ -28,7 +39,7 @@ export function PageActions({
 				cache.set(markdownUrl, content);
 				await navigator.clipboard.writeText(content);
 			} finally {
-				setLoading(true);
+				setLoading(false);
 			}
 		}
 		setChecked(true);
@@ -49,7 +60,7 @@ export function PageActions({
 		<div className="relative flex items-center rounded-xl border text-sm">
 			<button
 				type="button"
-				onClick={onCopy}
+				onClick={() => onCopy()}
 				disabled={isLoading}
 				className="flex h-8 min-w-9 items-center justify-center rounded-l-xl px-2 transition-colors hover:bg-fd-accent/30"
 			>
@@ -81,8 +92,8 @@ export function PageActions({
 						<div className="absolute top-full right-0 z-50 mt-1 w-[320px] rounded-2xl border bg-fd-popover p-1 shadow-lg">
 							<button
 								type="button"
-								onClick={(e) => {
-									onCopy(e);
+								onClick={() => {
+									onCopy();
 									setOpen(false);
 								}}
 								className="flex w-full flex-col items-start gap-0.5 rounded-xl px-3 py-3 text-left transition-colors hover:bg-fd-accent/30"
@@ -114,8 +125,8 @@ export function PageActions({
 
 							<button
 								type="button"
-								onClick={(e) => {
-									onCopyMCP(e);
+								onClick={() => {
+									onCopyMCP();
 									setOpen(false);
 								}}
 								className="flex w-full flex-col items-start gap-0.5 rounded-md px-3 py-3 text-left transition-colors hover:bg-fd-accent/30"

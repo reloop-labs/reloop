@@ -45,7 +45,7 @@ export async function generateMetadata(props: {
 }
 
 export async function generateStaticParams() {
-	const params = source.generateParams();
+	const params = source.generateParams() as { slug: string[] }[];
 	return params.filter((param) => param.slug && param.slug.length > 0);
 }
 
