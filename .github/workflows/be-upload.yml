@@ -1,23 +1,23 @@
-name: BE Postfix Docker
+name: BE Upload Docker
 
 on:
   push:
     branches: [ main ]
     paths:
-      - 'apps/backend/postfix/**'
+      - 'apps/backend/upload/**'
       - 'docker-compose.setup.yml'
-      - '.github/workflows/be-postfix.yml'
+      - '.github/workflows/be-upload.yml'
   pull_request:
     branches: [ main ]
     paths:
-      - 'apps/backend/postfix/**'
+      - 'apps/backend/upload/**'
       - 'docker-compose.setup.yml'
-      - '.github/workflows/be-postfix.yml'
+      - '.github/workflows/be-upload.yml'
   workflow_dispatch:
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: reloopsh/be-postfix
+  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/be-upload
 
 jobs:
   build-and-push:
@@ -53,8 +53,8 @@ jobs:
         id: build
         uses: docker/build-push-action@v5
         with:
-          context: ./apps/backend/postfix
-          file: ./apps/backend/postfix/Dockerfile
+          context: .
+          file: ./apps/backend/upload/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -64,4 +64,3 @@ jobs:
 
       - name: Image digest
         run: echo ${{ steps.build.outputs.digest }}
-
