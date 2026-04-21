@@ -2,16 +2,13 @@ import { createOpenAPI } from "fumadocs-openapi/server";
 
 export const services = {
 	contacts: createOpenAPI({
-		input: ["http://localhost:8014/api/contacts/openapi/json"],
-		disableCache: true,
+		input: ["https://reloop.sh/api/contacts/openapi/json"],
 	}),
 	"api-key": createOpenAPI({
-		input: ["http://localhost:8012/api/api-key/openapi/json"],
-		disableCache: true,
+		input: ["https://reloop.sh/api/api-key/openapi/json"],
 	}),
 	domain: createOpenAPI({
-		input: ["http://localhost:8011/api/domain/openapi/json"],
-		disableCache: true,
+		input: ["https://reloop.sh/api/domain/openapi/json"],
 	}),
 };
 
