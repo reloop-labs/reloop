@@ -34,7 +34,7 @@ export const landing = new Elysia()
 ║                                                                ║
 ╠════════════════════════════════════════════════════════════════╣
 ║                                                                ║
-║  "Store your images locally, serve them globally."             ║
+║  "Store your images on S3, serve them globally."              ║
 		- Your Reloop Team                          ║
 ║                                                                ║
 ╚════════════════════════════════════════════════════════════════╝
@@ -77,16 +77,16 @@ export const landing = new Elysia()
 	.get("/agent-card.json", () => ({
 		name: "Upload Service",
 		version: "1.0.0",
-		description: "Service for uploading and managing files, images, and attachments.",
+		description: "Service for uploading and managing files via S3-compatible storage.",
 		url: "https://reloop.sh",
 		defaultInputModes: ["multipart/form-data"],
 		defaultOutputModes: ["application/json"],
-		supportsStreaming: false,
+		supportsStreaming: true,
 		skills: [
 			{
 				id: "upload_file",
 				name: "Upload File",
-				description: "Upload a file to storage. Returns a public URL or identifier.",
+				description: "Upload a file to S3 storage. Returns file metadata and ID.",
 				method: "POST",
 				path: "/api/upload/v1/upload",
 				tags: ["upload"],
@@ -101,29 +101,27 @@ export const landing = new Elysia()
 				examples: []
 			},
 			{
-				id: "get_file",
-				name: "Get File Info",
-				description: "Retrieve metadata for a previously uploaded file.",
-				method: "GET",
-				path: "/api/upload/v1/:id",
+				id: "delete_file",
+				name: "Delete File",
+				description: "Permanently delete a file from S3 storage and database.",
+				method: "DELETE",
+				path: "/api/upload/v1/files/:fileId",
 				tags: ["upload"],
 				inputSchema: {
-					id: { type: "string", required: true, description: "File ID" }
+					fileId: { type: "string", required: true, description: "File ID" }
 				},
 				outputSchema: {
-					id: { type: "string" },
-					name: { type: "string" },
-					size: { type: "number" }
+					message: { type: "string" }
 				},
 				errorCodes: [{ status: 404, meaning: "File not found" }],
 				examples: []
 			}
 		],
-		usage_guidelines: "1. Max file size limits apply (default 10MB).\n2. Files are scanned for malware upon upload.\n3. Supported formats: images, documents, and common email attachments.",
+		usage_guidelines: "1. Max file size limits apply (default 10MB).\n2. Files are stored on S3-compatible storage.\n3. Supported formats: images (jpg, png, webp, svg, gif).",
 		authentication: {
-			schemes: ["bearer", "apiKey"],
-			headerName: "Authorization",
-			notes: "Bearer token or session cookie required."
+			schemes: ["apiKey", "cookie"],
+			headerName: "x-api-key",
+			notes: "x-api-key header or session cookie required."
 		},
 		provider: {
 			organization: "Reloop labs",
