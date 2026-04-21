@@ -30,6 +30,8 @@ ENV HOSTNAME=0.0.0.0
 # Copy standalone build
 COPY --from=builder /app/apps/backend/mail/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/packages ./packages
+COPY --from=builder /app/package.json ./package.json
 
 EXPOSE 8015
 

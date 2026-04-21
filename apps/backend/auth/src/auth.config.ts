@@ -12,7 +12,6 @@ const defaults = {
 	NODE_ENV: "development",
 	NODE_TLS_REJECT_UNAUTHORIZED: "0",
 	BETTER_AUTH_SECRET: "tENkVU4GrhckuRw4Bcfh93EWgXOFcszn",
-	EMAIL_DOMAIN: "reloop.sh",
 	GOOGLE_CLIENT_ID:
 		"612069473337-9tlq9iqsrq6rc80ue3lebqscilu0ki01.apps.googleusercontent.com",
 	GOOGLE_CLIENT_SECRET: "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",
@@ -29,7 +28,6 @@ export const authConfig = {
 	NODE_TLS_REJECT_UNAUTHORIZED:
 		process.env.NODE_TLS_REJECT_UNAUTHORIZED ||
 		defaults.NODE_TLS_REJECT_UNAUTHORIZED,
-	EMAIL_DOMAIN: process.env.EMAIL_DOMAIN || defaults.EMAIL_DOMAIN,
 	BETTER_AUTH_SECRET:
 		process.env.BETTER_AUTH_SECRET || defaults.BETTER_AUTH_SECRET,
 	GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || defaults.GOOGLE_CLIENT_ID,
