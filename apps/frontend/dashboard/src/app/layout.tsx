@@ -5,7 +5,7 @@ import { IconsSprite } from "@reloop/ui/icon";
 import * as Tooltip from "@reloop/ui/tooltip";
 
 import localFont from "next/font/local";
-import { ThemeProvider } from "next-themes";
+import { ThemeProvider } from "@fe/dashboard/providers/theme-provider";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 const openRunde = localFont({

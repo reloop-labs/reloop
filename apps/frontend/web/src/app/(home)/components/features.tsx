@@ -4,9 +4,11 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import CodeSnippet from "./code-snippet";
 
 /* ------------------------------------------------------------------ */
-/*  Visual 1: Deliverability Insights                                  */
+/* ------------------------------------------------------------------ */
+/*  Visual 2: Deliverability Insights                                  */
 /* ------------------------------------------------------------------ */
 
 function DeliverabilityVisual() {
@@ -329,13 +331,23 @@ function TeamVisual() {
 
 const features = [
 	{
-		label: "Insights",
+		label: "SDK",
+		title: "",
+		description: "",
+		visual: CodeSnippet,
+		containerClassName: "bg-transparent shadow-none px-0 py-0 pb-12",
+		hideBackground: true,
+		bgImage: "",
+		cards: [],
+	},
+	{
+		label: "insights",
 		title: "Full Deliverability Visibility",
 		description:
 			"Monitor your reputation across every major ISP in real-time. Reach humans, not spam folders with automated compliance checks and relay optimization.",
 		visual: DeliverabilityVisual,
 		bgImage:
-			"https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=2070",
+			"https://images.unsplash.com/photo-1558494949-ef010cbdcc51?auto=format&fit=crop&q=80&w=2070",
 		cards: [
 			{
 				title: "Real-time Dashboard",
@@ -355,59 +367,7 @@ const features = [
 		],
 	},
 	{
-		label: "Pipelines",
-		title: "Programmable Email Pipelines",
-		description:
-			"Chain together security, compliance, and custom logic. Authenticate with SPF, DKIM, and DMARC automatically while sanitizing content for max deliverability.",
-		visual: PipelinesVisual,
-		bgImage:
-			"https://images.unsplash.com/photo-1558494949-ef010cbdcc51?auto=format&fit=crop&q=80&w=2070",
-		cards: [
-			{
-				title: "Auth-as-a-Service",
-				description:
-					"Never worry about DNS validation again. We provide full managed authentication.",
-			},
-			{
-				title: "Content Sanitizer",
-				description:
-					"Our AI checks for spam triggers and phishing signals before your mail leaves the node.",
-			},
-			{
-				title: "Custom Logic",
-				description:
-					"Use YAML to define complex retry loops, a/b tests, and payload transformations.",
-			},
-		],
-	},
-	{
-		label: "Global",
-		title: "Zero-Latency Global Relay",
-		description:
-			"With SMTP nodes in every major continent, Reloop ensures your transactional emails hit the inbox in milliseconds, no matter where your users are.",
-		visual: GlobalVisual,
-		bgImage:
-			"https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=2072",
-		cards: [
-			{
-				title: "Edge Networks",
-				description:
-					"Proprietary relay network that bypasses public internet congestion for SMTP.",
-			},
-			{
-				title: "Regional Sovereignty",
-				description:
-					"Store and process data exactly where your users are to maintain GDPR compliance.",
-			},
-			{
-				title: "High Throughput",
-				description:
-					"Burstable infrastructure that scales from one email to one billion without breaking a sweat.",
-			},
-		],
-	},
-	{
-		label: "Sync",
+		label: "Editor",
 		title: "Real-time Template Collaboration",
 		description:
 			"Build beautiful emails together. Reloop's collaborative engine lets your team design, test, and ship templates in one unified, real-time environment.",
@@ -429,6 +389,32 @@ const features = [
 				title: "Version Control",
 				description:
 					"Full history of every template change with one-click rollbacks and diffs.",
+			},
+		],
+	},
+	{
+		label: "Webhook",
+		title: "Programmable Email Pipelines",
+		description:
+			"Chain together security, compliance, and custom logic. Authenticate with SPF, DKIM, and DMARC automatically while sanitizing content for max deliverability.",
+		visual: PipelinesVisual,
+		bgImage:
+			"https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=2072",
+		cards: [
+			{
+				title: "Auth-as-a-Service",
+				description:
+					"Never worry about DNS validation again. We provide full managed authentication.",
+			},
+			{
+				title: "Content Sanitizer",
+				description:
+					"Our AI checks for spam triggers and phishing signals before your mail leaves the node.",
+			},
+			{
+				title: "Custom Logic",
+				description:
+					"Use YAML to define complex retry loops, a/b tests, and payload transformations.",
 			},
 		],
 	},
@@ -513,27 +499,47 @@ export default function Features() {
 									)}
 								>
 									{/* Title + description */}
-									<h2 className="font-semibold text-[#0a0d12] text-[2.6rem] leading-[1.05] tracking-[-0.03em] sm:text-[3.4rem] lg:text-[4.2rem]">
-										{feature.title}
-									</h2>
-									<p className="mt-5 max-w-[640px] text-[#0a0d12]/60 text-[15px] leading-7 sm:text-[18px]">
-										{feature.description}
-									</p>
+									{feature.title && (
+										<h2 className="font-semibold text-[#0a0d12] text-[2.6rem] leading-[1.05] tracking-[-0.03em] sm:text-[3.4rem] lg:text-[4.2rem]">
+											{feature.title}
+										</h2>
+									)}
+									{feature.description && (
+										<p className="mt-5 max-w-[640px] text-[#0a0d12]/60 text-[15px] leading-7 sm:text-[18px]">
+											{feature.description}
+										</p>
+									)}
 
 									{/* Visual */}
-									<div className="mt-14 sm:mt-18">
-										<div className="relative overflow-hidden rounded-xl bg-zinc-900 shadow-2xl">
-											<div className="absolute inset-0 opacity-40 grayscale">
-												<Image
-													src={feature.bgImage}
-													alt=""
-													fill
-													className="object-cover object-center"
-													sizes="(max-width: 1320px) 100vw, 1320px"
-													quality={80}
-												/>
-											</div>
-											<div className="relative px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-16">
+									<div
+										className={cn("sm:mt-18", feature.title ? "mt-14" : "mt-0")}
+									>
+										<div
+											className={cn(
+												"relative overflow-hidden rounded-xl",
+												feature.containerClassName || "bg-zinc-900 shadow-2xl",
+											)}
+										>
+											{!feature.hideBackground && feature.bgImage && (
+												<div className="absolute inset-0 opacity-40 grayscale">
+													<Image
+														src={feature.bgImage}
+														alt=""
+														fill
+														className="object-cover object-center"
+														sizes="(max-width: 1320px) 100vw, 1320px"
+														quality={80}
+													/>
+												</div>
+											)}
+											<div
+												className={cn(
+													"relative",
+													feature.containerClassName
+														? "p-0"
+														: "px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-16",
+												)}
+											>
 												<Visual />
 											</div>
 										</div>

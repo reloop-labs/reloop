@@ -4,7 +4,7 @@ import { IconsSprite } from "@reloop/ui/icon";
 import { Footer } from "@reloop/web/components/footer";
 import { Header } from "@reloop/web/components/header";
 import localFont from "next/font/local";
-import { ThemeProvider } from "next-themes";
+import { ThemeProvider } from "@reloop/web/providers/theme-provider";
 
 const openRunde = localFont({
 	src: [

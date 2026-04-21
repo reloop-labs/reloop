@@ -2,11 +2,21 @@
 
 import { Icon } from "@reloop/ui/icon";
 import { useState } from "react";
+import {
+	siNodedotjs,
+	siServerless,
+	siGo,
+	siPython,
+	siRuby,
+	siPhp,
+	siRust,
+} from "simple-icons";
 
 type SdkOption = {
 	id: string;
 	name: string;
-	icon: string;
+	icon: any; // Using simple-icons object type
+	color: string;
 	install?: string;
 	code: string;
 	subTabs?: { id: string; name: string; code: string }[];
@@ -16,7 +26,8 @@ const sdks: SdkOption[] = [
 	{
 		id: "node",
 		name: "Node.js",
-		icon: "⚡",
+		icon: siNodedotjs,
+		color: "#F5CE4D",
 		install: "npm install @reloop/sdk",
 		subTabs: [
 			{
@@ -71,7 +82,8 @@ export async function POST() {
 	{
 		id: "serverless",
 		name: "Serverless",
-		icon: "🌩️",
+		icon: siServerless,
+		color: "#000000",
 		code: `// Cloudflare Workers example
 import { Resend } from 'resend';
 
@@ -90,7 +102,8 @@ export default {
 	{
 		id: "go",
 		name: "Go",
-		icon: "🐹",
+		icon: siGo,
+		color: "#00ADD8",
 		code: `package main
 
 import (
@@ -119,7 +132,8 @@ func main() {
 	{
 		id: "python",
 		name: "Python",
-		icon: "🐍",
+		icon: siPython,
+		color: "#3776AB",
 		code: `import resend
 
 resend.api_key = "re_xxxxxxxx"
@@ -137,7 +151,8 @@ print(email)`,
 	{
 		id: "ruby",
 		name: "Ruby",
-		icon: "💎",
+		icon: siRuby,
+		color: "#CC342D",
 		code: `require 'resend'
 
 Resend.api_key = 're_xxxxxxxx'
@@ -154,7 +169,8 @@ Resend::Emails.send(params)`,
 	{
 		id: "php",
 		name: "PHP",
-		icon: "🐘",
+		icon: siPhp,
+		color: "#777BB4",
 		code: `<?php
 
 $resend = Resend::client('re_xxxxxxxx');
@@ -169,7 +185,8 @@ $resend->emails->send([
 	{
 		id: "rust",
 		name: "Rust",
-		icon: "🦀",
+		icon: siRust,
+		color: "#000000",
 		code: `use resend_rs::Resend;
 
 #[tokio::main]
@@ -281,8 +298,8 @@ export default function CodeSnippet() {
 		: activeSdk.code;
 
 	return (
-		<section className="bg-white py-24 sm:py-32">
-			<div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+		<div className="w-full">
+			<div className="mx-auto max-w-5xl">
 				<div className="mb-16 text-center">
 					<h2 className="mx-auto mb-6 max-w-3xl font-medium text-[1.4rem] text-zinc-900 leading-[1.3] tracking-tight sm:text-[1.6rem]">
 						A simple, elegant interface so you can start sending emails in
@@ -306,15 +323,22 @@ export default function CodeSnippet() {
 							className="group flex flex-col items-center gap-3"
 						>
 							<div
-								className={`flex h-16 w-16 items-center justify-center rounded-2xl border transition-all duration-200 ${
+								className={`flex size-[68px] items-center justify-center rounded-2xl border transition-all duration-300 shadow-[0_2px_8px_rgba(0,0,0,0.04)] ${
 									activeSdk.id === sdk.id
-										? "border-zinc-300 bg-white shadow-sm ring-1 ring-zinc-200"
-										: "border-zinc-100 bg-zinc-50/50 hover:border-zinc-200 hover:bg-zinc-100/50"
+										? "border-neutral-200 bg-white"
+										: "border-transparent bg-transparent hover:border-neutral-200 hover:bg-white"
 								}`}
 							>
-								<span className="text-2xl grayscale transition-all group-hover:grayscale-0">
-									{sdk.icon}
-								</span>
+								<svg
+									viewBox="0 0 24 24"
+									fill={activeSdk.id === sdk.id ? sdk.color : "currentColor"}
+									className={`size-7 transition-all duration-300 group-hover:scale-110 ${
+										activeSdk.id !== sdk.id &&
+										"text-neutral-400 group-hover:text-neutral-600"
+									}`}
+								>
+									<path d={sdk.icon.path} />
+								</svg>
 							</div>
 							<span
 								className={`font-medium text-[12.5px] transition-colors ${
@@ -403,6 +427,6 @@ export default function CodeSnippet() {
 					</div>
 				</div>
 			</div>
-		</section>
+		</div>
 	);
 }
