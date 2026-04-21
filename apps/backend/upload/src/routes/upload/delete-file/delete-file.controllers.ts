@@ -1,3 +1,4 @@
+import { storage } from "@be/upload/lib/storage";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import logger from "@reloop/logger";
@@ -24,7 +25,6 @@ export async function deleteFile(params: {
 		const upload = fileRecord[0];
 
 		// Delete from S3 storage
-		const { storage } = await import("@be/upload/lib/storage");
 		await storage.delete(upload.path);
 
 		// Soft delete in database

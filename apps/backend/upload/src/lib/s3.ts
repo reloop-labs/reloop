@@ -8,5 +8,5 @@ export const s3Client = new S3Client({
     accessKeyId: uploadConfig.S3.ACCESS_KEY || "",
     secretAccessKey: uploadConfig.S3.SECRET_KEY || "",
   },
-  forcePathStyle: uploadConfig.S3.FORCE_PATH_STYLE,
+  forcePathStyle: uploadConfig.S3.FORCE_PATH_STYLE === "true",
 });

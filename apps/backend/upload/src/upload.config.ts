@@ -16,12 +16,12 @@ export const uploadConfig = {
 	NODE_TLS_REJECT_UNAUTHORIZED: process.env.NODE_TLS_REJECT_UNAUTHORIZED,
 
 	S3: {
-		ENDPOINT: process.env.S3_ENDPOINT,
-		ACCESS_KEY: process.env.S3_ACCESS_KEY,
-		SECRET_KEY: process.env.S3_SECRET_KEY,
-		BUCKET: process.env.S3_BUCKET,
+		ENDPOINT: process.env.S3_ENDPOINT || "http://localhost:9000",
+		ACCESS_KEY: process.env.S3_ACCESS_KEY || "reloop",
+		SECRET_KEY: process.env.S3_SECRET_KEY || "reloop",
+		BUCKET: process.env.S3_BUCKET || "reloop-uploads",
 		REGION: process.env.S3_REGION || "us-east-1",
-		FORCE_PATH_STYLE: process.env.S3_FORCE_PATH_STYLE === "true",
+		FORCE_PATH_STYLE: process.env.S3_FORCE_PATH_STYLE || "true",
 	},
 
 	constants: {

@@ -1,3 +1,4 @@
+import { storage } from "@be/upload/lib/storage";
 import type { UploadTypes } from "@be/upload/types/upload.type";
 import { uploadConfig } from "@be/upload/upload.config";
 import { createId } from "@paralleldrive/cuid2";
@@ -61,7 +62,6 @@ export async function uploadFile(params: {
 		const filePath = `${uploadDir}/${filename}`;
 
 		// Use storage abstraction
-		const { storage } = await import("@be/upload/lib/storage");
 		await storage.upload(filePath, file);
 
 		// Save metadata to database
