@@ -29,6 +29,7 @@ export const landing = new Elysia()
 ╠══════════════════════════════════════════════════════════════════════╣
 ║                                                                      ║
 ║ 📚 Docs: https://reloop.sh/docs/workflow                             ║
+║ 🤖 Discovery: https://reloop.sh/api/workflow/agent-card.json         ║
 ║ 🐙 GitHub: https://github.com/reloop-labs/reloop                     ║
 ║ 🆘 Support: https://reloop.sh/support                                ║
 ║ 💬 Discord: https://discord.gg/reloop                                ║
@@ -38,7 +39,7 @@ export const landing = new Elysia()
 ╠══════════════════════════════════════════════════════════════════════╣
 ║                                                                      ║
 ║  "Automate workflows, deliver results"                                ║
-║                    - Your Reloop Team                                ║
+		- Your Reloop Team                                ║
 ║                                                                      ║
 ╚══════════════════════════════════════════════════════════════════════╝
 
@@ -81,4 +82,42 @@ export const landing = new Elysia()
 				description: "Checks the health of the Postgres database",
 			},
 		},
-	);
+	)
+	.get("/agent-card.json", () => ({
+		name: "Workflow Service",
+		version: "1.0.0",
+		description: "Service for orchestrating long-running workflows and background tasks using Inngest.",
+		url: "https://reloop.sh",
+		defaultInputModes: ["application/json"],
+		defaultOutputModes: ["application/json"],
+		supportsStreaming: false,
+		skills: [
+			{
+				id: "inngest_endpoint",
+				name: "Inngest Endpoint",
+				description: "The main endpoint for Inngest communication and event ingestion.",
+				method: "POST",
+				path: "/api/workflow/inngest",
+				tags: ["workflow"],
+				inputSchema: {
+					name: { type: "string", required: true, description: "Event name" },
+					data: { type: "object", description: "Event payload" }
+				},
+				outputSchema: {
+					ids: { type: "array", description: "Event IDs" }
+				},
+				errorCodes: [],
+				examples: []
+			}
+		],
+		usage_guidelines: "1. Events are handled asynchronously by background workers.\n2. Workflows are defined as code and orchestrated by Inngest.\n3. Idempotency is recommended for all event handlers.",
+		authentication: {
+			schemes: ["bearer", "apiKey"],
+			headerName: "Authorization",
+			notes: "Inngest signing key or bearer token required."
+		},
+		provider: {
+			organization: "Reloop labs",
+			contact: "https://reloop.sh/support"
+		}
+	}));

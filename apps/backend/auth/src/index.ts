@@ -14,7 +14,6 @@ const app = new Elysia({ prefix: "/api/auth", name: "Auth Service" })
 	.use(cors({ origin: "*" }))
 	.use(
 		swagger({
-			path: "/docs",
 			documentation: {
 				components: await OpenAPI.components(),
 				paths: await OpenAPI.getPaths(),

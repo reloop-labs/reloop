@@ -24,6 +24,8 @@ export const landing = new Elysia()
 ╠════════════════════════════════════════════════════════════════╣
 ║                                                                ║
 ║ 📚 Docs: https://reloop.sh/docs/upload                         ║
+║ 🤖 Discovery: https://reloop.sh/api/upload/agent-card.json           ║
+║ 📖 Swagger: https://reloop.sh/api/upload/swagger                    ║
 ║ 🐙 GitHub: https://github.com/reloop-labs/reloop               ║
 ║ 🆘 Support: https://reloop.sh/support                          ║
 ║ 💬 Discord: https://discord.gg/reloop                          ║
@@ -33,7 +35,7 @@ export const landing = new Elysia()
 ╠════════════════════════════════════════════════════════════════╣
 ║                                                                ║
 ║  "Store your images locally, serve them globally."             ║
-║                    - Your Reloop Team                          ║
+		- Your Reloop Team                          ║
 ║                                                                ║
 ╚════════════════════════════════════════════════════════════════╝
 
@@ -105,4 +107,60 @@ export const landing = new Elysia()
 				description: "Checks the health of the Postgres database",
 			},
 		},
-	);
+	)
+	.get("/agent-card.json", () => ({
+		name: "Upload Service",
+		version: "1.0.0",
+		description: "Service for uploading and managing files, images, and attachments.",
+		url: "https://reloop.sh",
+		defaultInputModes: ["multipart/form-data"],
+		defaultOutputModes: ["application/json"],
+		supportsStreaming: false,
+		skills: [
+			{
+				id: "upload_file",
+				name: "Upload File",
+				description: "Upload a file to storage. Returns a public URL or identifier.",
+				method: "POST",
+				path: "/api/upload/v1/upload",
+				tags: ["upload"],
+				inputSchema: {
+					file: { type: "file", required: true, description: "The file to upload" }
+				},
+				outputSchema: {
+					id: { type: "string" },
+					url: { type: "string" }
+				},
+				errorCodes: [],
+				examples: []
+			},
+			{
+				id: "get_file",
+				name: "Get File Info",
+				description: "Retrieve metadata for a previously uploaded file.",
+				method: "GET",
+				path: "/api/upload/v1/:id",
+				tags: ["upload"],
+				inputSchema: {
+					id: { type: "string", required: true, description: "File ID" }
+				},
+				outputSchema: {
+					id: { type: "string" },
+					name: { type: "string" },
+					size: { type: "number" }
+				},
+				errorCodes: [{ status: 404, meaning: "File not found" }],
+				examples: []
+			}
+		],
+		usage_guidelines: "1. Max file size limits apply (default 10MB).\n2. Files are scanned for malware upon upload.\n3. Supported formats: images, documents, and common email attachments.",
+		authentication: {
+			schemes: ["bearer", "apiKey"],
+			headerName: "Authorization",
+			notes: "Bearer token or session cookie required."
+		},
+		provider: {
+			organization: "Reloop labs",
+			contact: "https://reloop.sh/support"
+		}
+	}));
