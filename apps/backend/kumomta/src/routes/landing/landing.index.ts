@@ -6,26 +6,6 @@ export const landing = new Elysia()
   .get(
     "/",
     async () => {
-      let dbStatus = "UNKNOWN";
-      let redisStatus = "UNKNOWN";
-
-      try {
-        await db.execute("SELECT 1 as test");
-        dbStatus = "CONNECTED";
-      } catch {
-        dbStatus = "DISCONNECTED";
-      }
-
-      try {
-        await redis.healthCheck();
-        redisStatus = "CONNECTED";
-      } catch {
-        redisStatus = "DISCONNECTED";
-      }
-
-      const dbStatusEmoji = dbStatus === "CONNECTED" ? "✅" : "❌";
-      const redisStatusEmoji = redisStatus === "CONNECTED" ? "✅" : "❌";
-
       return `
 ╔══════════════════════════════════════════════════════════════════════╗
 ║                        KUMOMTA SERVICE                               ║
@@ -43,17 +23,12 @@ export const landing = new Elysia()
 ║                                                                      ║
 ╠══════════════════════════════════════════════════════════════════════╣
 ║                                                                      ║
-║ 🗄️ DATABASE STATUS: ${dbStatusEmoji}                                               ║
-║ 🛢️ REDIS STATUS: ${redisStatusEmoji}                                                  ║
-║                                                                      ║
-╠══════════════════════════════════════════════════════════════════════╣
-║                                                                      ║
 ║ 📚 Docs: https://reloop.sh/docs/kumomta                              ║
 ║ 🐙 GitHub: https://github.com/reloop-labs/reloop                     ║
 ║ 🆘 Support: https://reloop.sh/support                                ║
 ║ 💬 Discord: https://discord.gg/reloop                                ║
-║ 🐦 Twitter: https://twitter.com/reloop                               ║
-║ 🛠️ Setup: https://reloop.sh/dev/setup/kumomta                        ║
+║ 🐦 Twitter: https://x.com/reloophq                               ║
+║ 🛠️ Setup: https://reloop.sh/docs/setup/kumomta                       ║
 ║                                                                      ║
 ╠══════════════════════════════════════════════════════════════════════╣
 ║                                                                      ║
