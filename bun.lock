@@ -404,7 +404,6 @@
         "drizzle-orm": "catalog:db",
         "drizzle-typebox": "catalog:db",
         "elysia": "catalog:backend",
-        "inngest": "catalog:backend",
         "pg": "catalog:db",
         "redis": "catalog:db",
         "zod": "catalog:ui",
