@@ -1,5 +1,4 @@
 // Set environment variables if not already set
-if (!process.env.PORT) process.env.PORT = "8011";
 if (!process.env.PG_URL)
 	process.env.PG_URL = "postgresql://reloop:reloop123@localhost:5432/reloop";
 if (!process.env.REDIS_URL)
@@ -12,7 +11,7 @@ if (!process.env.HOST_DOMAIN) process.env.HOST_DOMAIN = "reloop.sh";
 if (!process.env.DKIM_SELECTOR) process.env.DKIM_SELECTOR = "reloop";
 
 export const domainConfig = {
-	port: Number(process.env.PORT),
+	port: Number(process.env.PORT) || 8011,
 	PG_URL: process.env.PG_URL,
 	REDIS_URL: process.env.REDIS_URL,
 	BASE_URL: process.env.BASE_URL,
