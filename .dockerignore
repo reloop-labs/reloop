@@ -1,7 +1,10 @@
-node_modules
-.next
-dist
+**/node_modules
+**/.next
+**/dist
 .git
 .vscode
 *.log
 .husky
+docker-data
+.turbo
+**/tsconfig.tsbuildinfo
