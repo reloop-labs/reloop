@@ -10,5 +10,6 @@ export const apiKeyConfig = {
   PG_URL: process.env.PG_URL,
   REDIS_URL: process.env.REDIS_URL,
   BASE_URL: process.env.BASE_URL,
+  LOGS_API_KEY: process.env.LOGS_API_KEY || 'reloop-log-api-key',
   NODE_ENV: process.env.NODE_ENV || "development",
 };

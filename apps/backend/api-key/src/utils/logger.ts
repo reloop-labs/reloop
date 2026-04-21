@@ -1,4 +1,5 @@
 import logger from "@reloop/logger";
+import { apiKeyConfig } from "../api-key.config";
 
 /**
  * Creates a structured log entry in the centralized logs service.
@@ -18,8 +19,7 @@ export async function createLog(body: {
 	};
 	cookie?: string;
 }) {
-	const baseUrl = process.env.BASE_URL || "https://local.reloop.sh";
-	const url = `${baseUrl}/api/logs/v1/create`;
+	const url = `${apiKeyConfig.BASE_URL}/api/logs/v1/create`;
 	const {
 		event,
 		level = "info",
@@ -34,7 +34,7 @@ export async function createLog(body: {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
-				"x-log-api-key": process.env.LOGS_API_KEY || "reloop-log-api-key",
+				"x-log-api-key": apiKeyConfig.LOGS_API_KEY || "reloop-log-api-key",
 				...(cookie && { cookie }),
 			},
 			body: JSON.stringify({
