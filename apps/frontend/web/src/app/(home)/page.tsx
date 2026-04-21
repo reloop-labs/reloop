@@ -1,4 +1,3 @@
-
 import CTA from "./components/cta";
 import Faq from "./components/faq";
 import Features from "./components/features";
@@ -11,7 +10,6 @@ export default function Home() {
 		<div>
 			<Hero />
 			<Features />
-
 			<UseCase />
 			<OpenSource />
 			<CTA />
