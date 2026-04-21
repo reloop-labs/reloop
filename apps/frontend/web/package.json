@@ -10,16 +10,15 @@
 	},
 	"dependencies": {
 		"@hookform/resolvers": "catalog:ui",
-		"@react-three/drei": "^10.7.6",
-		"@react-three/fiber": "^9.4.0",
 		"@reloop/auth": "workspace:*",
 		"@reloop/tailwind": "workspace:*",
 		"@reloop/ui": "workspace:*",
 		"@tailwindcss/postcss": "catalog:ui",
 		"babel-plugin-react-compiler": "catalog:ui",
 		"better-auth": "catalog:",
-		"framer-motion": "^12.23.24",
+		"framer-motion": "catalog:ui",
 		"motion": "catalog:ui",
+		"simple-icons": "catalog:ui",
 		"next": "catalog:ui",
 		"next-themes": "catalog:ui",
 		"postcss": "catalog:ui",
@@ -28,8 +27,7 @@
 		"calligraph": "catalog:ui",
 		"react-hook-form": "catalog:ui",
 		"sonner": "catalog:ui",
-		"tailwindcss": "catalog:ui",
-		"three": "^0.181.0"
+		"tailwindcss": "catalog:ui"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",
