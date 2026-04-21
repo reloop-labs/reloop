@@ -87,7 +87,7 @@ export async function uploadFile(params: {
 			throw new Error("Failed to save upload metadata");
 		}
 
-		const fileUrl = `${uploadConfig.BASE_URL}/api/upload/v1/files/${newUpload[0].id}`;
+		const fileUrl = `${uploadConfig.S3.ENDPOINT}/${uploadConfig.S3.BUCKET}/${filePath}`;
 
 		logger.info(
 			{
