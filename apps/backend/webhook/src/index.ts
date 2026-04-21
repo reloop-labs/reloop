@@ -8,7 +8,7 @@ import { loader } from "@reloop/webhook/utils/loader";
 import { Elysia } from "elysia";
 import { webhookConfig } from "./webhook.config";
 
-const port = 8013;
+const port = webhookConfig.port;
 
 const webhookService = new Elysia({
 	prefix: "/api/webhook",
