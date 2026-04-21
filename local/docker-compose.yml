@@ -80,9 +80,11 @@ services:
       - "8025:8025"  # Web UI port for viewing captured emails
     restart: unless-stopped
 
-  reloop-kumomta:
-    image: ghcr.io/kumocorp/kumomta:latest
-    container_name: reloop-kumomta
+  kumomta-smtp:
+    build:
+      context: ../apps/backend/kumomta-smtp
+      dockerfile: Dockerfile
+    container_name: kumomta-smtp
     ports:
       - "25:25"      # ESMTP injection
       - "8020:8000"  # HTTP API
@@ -90,8 +92,6 @@ services:
       - X_KUMOMTA_KEY=${X_KUMOMTA_KEY:-reloop}
       - KUMOMTA_ENDPOINT=${KUMOMTA_ENDPOINT:-http://host.docker.internal:8021}
       - TRACKING_BASE_URL=${TRACKING_BASE_URL:-http://localhost:8015}
-    volumes:
-      - ./kumomta-config.lua:/opt/kumomta/etc/policy/init.lua
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
