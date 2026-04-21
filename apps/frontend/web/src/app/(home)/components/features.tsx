@@ -332,89 +332,90 @@ function TeamVisual() {
 const features = [
 	{
 		label: "SDK",
-		title: "",
-		description: "",
+		title: "The email API for developers",
+		description:
+			"A simple, elegant interface so you can start sending emails in minutes. It fits right into your code with SDKs for your favorite programming languages.",
 		visual: CodeSnippet,
-		containerClassName: "bg-transparent shadow-none px-0 py-0 pb-12",
+		containerClassName: "bg-transparent shadow-none px-0 py-0",
 		hideBackground: true,
 		bgImage: "",
 		cards: [],
 	},
 	{
 		label: "insights",
-		title: "Full Deliverability Visibility",
+		title: "Stop guessing about your deliverability",
 		description:
-			"Monitor your reputation across every major ISP in real-time. Reach humans, not spam folders with automated compliance checks and relay optimization.",
+			"Get the peace of mind that your emails are actually reaching your customers. Reloop tracks every bounce, click, and spam complaint in real-time, helping you maintain a perfect sender score effortlessly.",
 		visual: DeliverabilityVisual,
 		bgImage:
 			"https://images.unsplash.com/photo-1558494949-ef010cbdcc51?auto=format&fit=crop&q=80&w=2070",
 		cards: [
 			{
-				title: "Real-time Dashboard",
+				title: "Know your score",
 				description:
-					"Instantly see how your emails are performing across different regions and providers.",
+					"Deep insights into your sender reputation across every major ISP so you always know where you stand.",
 			},
 			{
-				title: "Reputation Guard",
+				title: "Bypass the spam folder",
 				description:
-					"We monitor blacklists and bounces to keep your sender score in the excellent range.",
+					"Our automated checks ensure your content meets the highest standards before it ever reaches an inbox.",
 			},
 			{
-				title: "MTA Optimization",
+				title: "Instant Alerts",
 				description:
-					"Automated throughput adjustments based on ISP-specific rate limiting rules.",
+					"Get notified the moment something goes wrong, allowing you to fix issues before they impact your users.",
 			},
 		],
 	},
 	{
 		label: "Editor",
-		title: "Real-time Template Collaboration",
+		title: "Design and ship templates in record time",
 		description:
-			"Build beautiful emails together. Reloop's collaborative engine lets your team design, test, and ship templates in one unified, real-time environment.",
+			"Stop wrestling with HTML and CSS in isolation. Reloop’s real-time editor allows your entire team to design, preview, and deploy beautiful emails without the usual friction.",
 		visual: TeamVisual,
 		bgImage:
 			"https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=2070",
 		cards: [
 			{
-				title: "Hot Reloading",
+				title: "Live visual previews",
 				description:
-					"See changes instantly across desktop and mobile previews as you type.",
+					"See your changes instantly across dozens of desktop and mobile devices while you build.",
 			},
 			{
-				title: "Role-based Access",
+				title: "Collaborate without friction",
 				description:
-					"Granular permissions for designers, copywriters, and developers.",
+					"Bring designers and developers together in one workspace with shared styles and built-in feedback.",
 			},
 			{
-				title: "Version Control",
+				title: "Zero-risk deployments",
 				description:
-					"Full history of every template change with one-click rollbacks and diffs.",
+					"Every change is versioned, so you can roll back instantly or review full diffs before going live.",
 			},
 		],
 	},
 	{
 		label: "Webhook",
-		title: "Programmable Email Pipelines",
+		title: "Build complex workflows with simple logic",
 		description:
-			"Chain together security, compliance, and custom logic. Authenticate with SPF, DKIM, and DMARC automatically while sanitizing content for max deliverability.",
+			"Scale your email infrastructure without managing servers. Use simple, programmable pipelines to handle security, compliance, and custom delivery logic automatically.",
 		visual: PipelinesVisual,
 		bgImage:
 			"https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=2072",
 		cards: [
 			{
-				title: "Auth-as-a-Service",
+				title: "Managed Authentication",
 				description:
-					"Never worry about DNS validation again. We provide full managed authentication.",
+					"We handle the technical complexity of SPF, DKIM, and DMARC so your emails always reach the inbox.",
 			},
 			{
-				title: "Content Sanitizer",
+				title: "AI-powered Content Guard",
 				description:
-					"Our AI checks for spam triggers and phishing signals before your mail leaves the node.",
+					"Automatically catch spam triggers, broken images, and phishing signals before your mail ever leaves the node.",
 			},
 			{
-				title: "Custom Logic",
+				title: "Programmable Flow",
 				description:
-					"Use YAML to define complex retry loops, a/b tests, and payload transformations.",
+					"Define complex retry logic, A/B tests, and delivery rules with a simple, YAML-based configuration.",
 			},
 		],
 	},
@@ -500,7 +501,7 @@ export default function Features() {
 								>
 									{/* Title + description */}
 									{feature.title && (
-										<h2 className="font-semibold text-[#0a0d12] text-[2.6rem] leading-[1.05] tracking-[-0.03em] sm:text-[3.4rem] lg:text-[4.2rem]">
+										<h2 className="font-semibold text-[#0a0d12] text-[2rem] leading-[1.05] tracking-[-0.03em] sm:text-[3.4rem] lg:text-[3rem]">
 											{feature.title}
 										</h2>
 									)}

@@ -300,13 +300,7 @@ export default function CodeSnippet() {
 	return (
 		<div className="w-full">
 			<div className="mx-auto max-w-5xl">
-				<div className="mb-16 text-center">
-					<h2 className="mx-auto mb-6 max-w-3xl font-medium text-[1.4rem] text-zinc-900 leading-[1.3] tracking-tight sm:text-[1.6rem]">
-						A simple, elegant interface so you can start sending emails in
-						minutes. It fits right into your code with SDKs for your favorite
-						programming languages.
-					</h2>
-				</div>
+
 
 				{/* Language Grid */}
 				<div className="mb-12 grid grid-cols-4 gap-4 sm:grid-cols-6 lg:grid-cols-8">
