@@ -126,7 +126,7 @@ services:
         condition: service_healthy
     entrypoint: >
       /bin/sh -c "
-      /usr/bin/mc alias set local-minio http://localhost:9000 reloop reloop;
+      /usr/bin/mc alias set local-minio http://reloop-minio:9000 reloop reloop;
       /usr/bin/mc mb --ignore-existing local-minio/reloop-uploads;
       /usr/bin/mc anonymous set public local-minio/reloop-uploads;
       exit 0;
