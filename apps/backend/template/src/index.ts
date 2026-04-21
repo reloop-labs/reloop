@@ -31,7 +31,7 @@ const templateService = new Elysia({
 	})
 	.listen(port, () => {
 		logger.info(
-			`Template Server is running on http://localhost:${port}/api/template`,
+			`Template Server is running on ${templateConfig.BASE_URL}/api/template`,
 		);
 	});
 
