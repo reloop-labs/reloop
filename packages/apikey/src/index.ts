@@ -2,7 +2,7 @@ import { createHash, randomBytes } from "node:crypto";
 import type { RedisCache } from "@reloop/cache/redis-client";
 import { db as defaultDb } from "@reloop/db/client";
 
-export const API_KEY_PREFIX = "rl_live";
+export const API_KEY_PREFIX = "rl_prod";
 export const API_KEY_LENGTH = 64;
 
 export function hashApiKey(key: string): string {
@@ -15,10 +15,6 @@ export function generateApiKey(): string {
 }
 
 export function getKeyStart(key: string): string {
-	const parts = key.split("_");
-	if (parts.length >= 2) {
-		return `${parts[0]}_${parts[1]?.substring(0, 17) ?? ""}`;
-	}
 	return key.substring(0, 17);
 }
 
