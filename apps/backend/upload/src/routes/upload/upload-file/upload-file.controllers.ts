@@ -60,19 +60,9 @@ export async function uploadFile(params: {
 		const uploadDir = `uploads/${year}/${month}`;
 		const filePath = `${uploadDir}/${filename}`;
 
-		// Ensure directory exists
-		const fullPath = `${uploadConfig.UPLOAD_STORAGE_PATH}/${filePath}`;
-		const dirPath = fullPath.substring(0, fullPath.lastIndexOf("/"));
-
-		// Create directory if it doesn't exist
-		try {
-			await Bun.write(fullPath, file);
-		} catch {
-			// If directory doesn't exist, create it using fs
-			const fs = await import("fs/promises");
-			await fs.mkdir(dirPath, { recursive: true });
-			await Bun.write(fullPath, file);
-		}
+		// Use storage abstraction
+		const { storage } = await import("@be/upload/lib/storage");
+		await storage.upload(filePath, file);
 
 		// Save metadata to database
 		const newUpload = await db

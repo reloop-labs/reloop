@@ -1,7 +1,7 @@
 import { uploadErrorResponse } from "@be/upload/error/upload.error-code";
 import { authMiddleware } from "@be/upload/middleware/auth";
 import { UploadModel } from "@be/upload/model/upload.model";
-import { uploadFileHandler } from "@be/upload/routes/upload/controllers/upload-file";
+import { uploadFileHandler } from "@be/upload/routes/upload/upload-file/upload-file.controllers";
 import { Elysia } from "elysia";
 
 export const uploadFileRoute = new Elysia().use(authMiddleware).post(

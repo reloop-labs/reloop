@@ -1,13 +1,12 @@
-import { uploadConfig } from "@be/upload/upload.config";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import logger from "@reloop/logger";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 
-export async function getFile(params: {
+export async function deleteFile(params: {
 	fileId: string;
-}): Promise<{ file: ReturnType<typeof Bun.file>; mimeType: string }> {
+}): Promise<{ message: string }> {
 	const { fileId } = params;
 	try {
 		// Get file metadata from database
@@ -23,34 +22,36 @@ export async function getFile(params: {
 		}
 
 		const upload = fileRecord[0];
-		const fullPath = `${uploadConfig.UPLOAD_STORAGE_PATH}/${upload.path}`;
 
-		// Check if file exists
-		const file = Bun.file(fullPath);
-		if (!(await file.exists())) {
-			logger.warn({ fileId, path: fullPath }, "File not found on disk");
-			throw new Error("File not found");
-		}
+		// Delete from S3 storage
+		const { storage } = await import("@be/upload/lib/storage");
+		await storage.delete(upload.path);
+
+		// Soft delete in database
+		await db
+			.update(schema.upload)
+			.set({
+				deletedAt: new Date(),
+				updatedAt: new Date(),
+			})
+			.where(eq(schema.upload.id, fileId));
 
 		logger.info(
 			{
 				fileId,
 				path: upload.path,
 			},
-			"File retrieved successfully",
+			"File deleted successfully",
 		);
 
-		return {
-			file: file,
-			mimeType: upload.mimeType,
-		};
+		return { message: "File deleted successfully" };
 	} catch (error) {
 		logger.error(
 			{
 				fileId,
 				error: error instanceof Error ? error.message : String(error),
 			},
-			"Error getting file",
+			"Error deleting file",
 		);
 		if (error instanceof Error && error.message.includes("File not found")) {
 			throw status(404, { message: "File not found" });
@@ -59,12 +60,12 @@ export async function getFile(params: {
 	}
 }
 
-export async function getFileHandler(params: {
+export async function deleteFileHandler(params: {
 	fileId: string;
-}): Promise<{ file: ReturnType<typeof Bun.file>; mimeType: string }> {
+}): Promise<{ message: string }> {
 	const { fileId } = params;
-	const fileDetails = await getFile({
+	const result = await deleteFile({
 		fileId,
 	});
-	return fileDetails;
+	return result;
 }

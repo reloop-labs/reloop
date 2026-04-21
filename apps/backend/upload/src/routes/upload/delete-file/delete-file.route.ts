@@ -1,27 +1,22 @@
 import { uploadErrorResponse } from "@be/upload/error/upload.error-code";
 import { authMiddleware } from "@be/upload/middleware/auth";
 import { UploadModel } from "@be/upload/model/upload.model";
-import { getFileHandler } from "@be/upload/routes/upload/controllers/get-file";
+import { deleteFileHandler } from "@be/upload/routes/upload/delete-file/delete-file.controllers";
 import { Elysia, t } from "elysia";
 
-export const getFileRoute = new Elysia().use(authMiddleware).get(
+export const deleteFileRoute = new Elysia().use(authMiddleware).delete(
 	"/files/:fileId",
-	async ({ params, set }) => {
+	async ({ params }) => {
 		const { fileId } = params;
 		try {
-			const { file, mimeType } = await getFileHandler({
+			return await deleteFileHandler({
 				fileId,
 			});
-
-			// Set proper headers for file serving
-			set.headers["Content-Type"] = mimeType;
-			set.headers["Cache-Control"] = "public, max-age=31536000, immutable";
-
-			return file;
 		} catch (error) {
 			const errorMessage =
 				error instanceof Error ? error.message : String(error);
 			uploadErrorResponse(errorMessage);
+			throw error; // This will never execute but satisfies TypeScript
 		}
 	},
 	{
@@ -30,14 +25,14 @@ export const getFileRoute = new Elysia().use(authMiddleware).get(
 			fileId: UploadModel.fileIdParam,
 		}),
 		response: {
-			200: t.Any(),
+			200: t.Object({ message: t.String() }),
 			404: UploadModel.fileNotFound,
 			403: UploadModel.unauthorized,
 		},
 		detail: {
 			tags: ["Upload"],
-			summary: "Get an uploaded file",
-			description: "Retrieves and serves an uploaded image file",
+			summary: "Delete an uploaded file",
+			description: "Deletes an uploaded file (soft delete)",
 		},
 	},
 );

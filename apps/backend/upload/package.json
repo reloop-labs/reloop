@@ -10,8 +10,12 @@
 		"start": "bun run dist/index.js"
 	},
 	"dependencies": {
+		"@aws-sdk/client-s3": "^3.1033.0",
+		"@aws-sdk/lib-storage": "^3.1033.0",
 		"@elysiajs/cors": "catalog:backend",
 		"@elysiajs/cron": "catalog:backend",
+		"@elysiajs/eden": "catalog:backend",
+		"@elysiajs/openapi": "catalog:backend",
 		"@elysiajs/opentelemetry": "catalog:backend",
 		"@elysiajs/server-timing": "catalog:backend",
 		"@elysiajs/static": "catalog:backend",
@@ -24,6 +28,11 @@
 		"@opentelemetry/sdk-trace-node": "catalog:backend",
 		"@opentelemetry/semantic-conventions": "catalog:backend",
 		"@paralleldrive/cuid2": "catalog:backend",
+		"@reloop/apikey": "workspace:*",
+		"@reloop/auth": "workspace:*",
+		"@reloop/cache": "workspace:*",
+		"@reloop/db": "workspace:*",
+		"@reloop/logger": "workspace:*",
 		"better-auth": "catalog:",
 		"dotenv": "catalog:backend",
 		"drizzle-orm": "catalog:db",
@@ -31,13 +40,7 @@
 		"elysia": "catalog:backend",
 		"pg": "catalog:db",
 		"redis": "catalog:db",
-		"zod": "catalog:ui",
-		"@reloop/db": "workspace:*",
-		"@reloop/cache": "workspace:*",
-		"@reloop/logger": "workspace:*",
-		"@reloop/auth": "workspace:*",
-		"@elysiajs/eden": "catalog:backend",
-		"@elysiajs/openapi": "catalog:backend"
+		"zod": "catalog:ui"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",
