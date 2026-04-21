@@ -20,6 +20,7 @@ const contactsService = new Elysia({
 })
 	.use(
 		openapi({
+			path: "/openapi",
 			documentation: {
 				info: {
 					title: "Contacts Service",

@@ -15,6 +15,7 @@ const emailService = new Elysia({
 })
 	.use(
 		openapi({
+			path: "/openapi",
 			documentation: {
 				info: {
 					title: "Domain Service",

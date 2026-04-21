@@ -20,6 +20,7 @@ const mailService = new Elysia({
 	.use(evlog())
 	.use(
 		openapi({
+			path: "/openapi",
 			references: fromTypes(
 				process.env.NODE_ENV === "production"
 					? "dist/index.d.ts"

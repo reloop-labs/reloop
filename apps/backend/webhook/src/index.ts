@@ -16,6 +16,7 @@ const webhookService = new Elysia({
 })
 	.use(
 		openapi({
+			path: "/openapi",
 			references: fromTypes(
 				webhookConfig.NODE_ENV === "production"
 					? "dist/index.d.ts"

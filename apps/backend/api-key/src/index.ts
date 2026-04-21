@@ -20,6 +20,7 @@ const apiKeyService = new Elysia({
 	.use(evlog())
 	.use(
 		openapi({
+			path: "/openapi",
 			documentation: {
 				info: {
 					title: "API KEY Service",

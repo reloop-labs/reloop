@@ -25,7 +25,7 @@ export const landing = new Elysia()
 ║                                                                      ║
 ║ 📚 Docs: https://reloop.sh/docs/domain                               ║
 ║ 🤖 Discovery: https://reloop.sh/api/domain/agent-card.json           ║
-║ 📖 Swagger: https://reloop.sh/api/domain/swagger                    ║
+║ 📖 OpenAPI: https://reloop.sh/api/domain/openapi                     ║
 ║ 🐙 GitHub: https://github.com/reloop-labs/reloop                     ║
 ║ 🆘 Support: https://reloop.sh/support                                ║
 ║ 💬 Discord: https://discord.gg/reloop                                ║

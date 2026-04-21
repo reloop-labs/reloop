@@ -14,6 +14,7 @@ const app = new Elysia({
   .use(cors())
   .use(
     openapi({
+      path: "/openapi",
       documentation: {
         info: {
           title: "KumoMTA Service",

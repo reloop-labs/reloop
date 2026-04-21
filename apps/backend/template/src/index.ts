@@ -15,6 +15,7 @@ const templateService = new Elysia({
 })
 	.use(
 		openapi({
+			path: "/openapi",
 			references: fromTypes(
 				templateConfig.NODE_ENV === "production"
 					? "dist/index.d.ts"

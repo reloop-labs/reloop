@@ -15,6 +15,7 @@ const uploadService = new Elysia({
 })
 	.use(
 		openapi({
+			path: "/openapi",
 			references: fromTypes(
 				uploadConfig.NODE_ENV === "production"
 					? "dist/index.d.ts"
