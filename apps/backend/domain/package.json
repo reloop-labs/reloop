@@ -39,8 +39,7 @@
 		"@reloop/webhook-events": "workspace:*",
 		"@elysiajs/eden": "catalog:backend",
 		"@elysiajs/openapi": "catalog:backend",
-		"bullmq": "catalog:backend",
-		"inngest": "catalog:backend"
+		"bullmq": "catalog:backend"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",

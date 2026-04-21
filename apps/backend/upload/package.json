@@ -37,8 +37,7 @@
 		"@reloop/logger": "workspace:*",
 		"@reloop/auth": "workspace:*",
 		"@elysiajs/eden": "catalog:backend",
-		"@elysiajs/openapi": "catalog:backend",
-		"inngest": "catalog:backend"
+		"@elysiajs/openapi": "catalog:backend"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",

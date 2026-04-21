@@ -158,7 +158,6 @@
 				"pino": "10.0.0",
 				"pino-pretty": "13.1.2",
 				"@elysiajs/openapi": "1.4.11",
-				"inngest": "3.44.4",
 				"bullmq": "5.74.1",
 				"evlog": "2.10.0"
 			}
@@ -195,9 +194,6 @@
 		"be:api-key:dev": "bun run --filter=api-key dev",
 		"be:api-key:build": "bun run --filter=api-key build",
 		"be:api-key:start": "bun run --filter=api-key start",
-		"be:workflow:dev": "bun run --filter=workflow dev",
-		"be:workflow:build": "bun run --filter=workflow build",
-		"be:workflow:start": "bun run --filter=workflow start",
 		"be:logs:dev": "bun run --filter=logs dev",
 		"be:logs:build": "bun run --filter=logs build",
 		"be:logs:start": "bun run --filter=logs start",
@@ -209,8 +205,8 @@
 		"be:upload:start": "bun run --filter=upload start",
 		"check": "biome check --write .",
 		"frontend:dev": "turbo dev --filter='dashboard' --filter='docs' --filter='web'",
-		"backend:dev": "turbo dev --filter='contacts' --filter='auth' --filter='domain' --filter='mail' --filter='kumomta' --filter='webhook' --filter='api-key' --filter='workflow' --filter='logs' --filter='upload' --filter='template' --filter='mail'",
-		"dev": "turbo dev --filter='dashboard' --filter='docs' --filter='web' --filter='contacts' --filter='auth' --filter='domain' --filter='mail' --filter='kumomta' --filter='webhook' --filter='api-key' --filter='workflow' --filter='logs' --filter='upload' --filter='template' --filter='mail'",
+		"backend:dev": "turbo dev --filter='contacts' --filter='auth' --filter='domain' --filter='mail' --filter='kumomta' --filter='webhook' --filter='api-key' --filter='logs' --filter='upload' --filter='template' --filter='mail'",
+		"dev": "turbo dev --filter='dashboard' --filter='docs' --filter='web' --filter='contacts' --filter='auth' --filter='domain' --filter='mail' --filter='kumomta' --filter='webhook' --filter='api-key' --filter='logs' --filter='upload' --filter='template' --filter='mail'",
 		"docker:up": "docker compose -f local/docker-compose.yml up -d",
 		"docker:down": "docker compose -f local/docker-compose.yml down",
 		"db:push": "bun run --filter=@reloop/db push",
