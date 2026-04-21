@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { fromTypes, openapi } from "@elysiajs/openapi";
+import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 import { apiKeyRoutes } from "@reloop/api-key/routes/api-key/api-key.routes";
 import { landing } from "@reloop/api-key/routes/landing/landing.index";
@@ -20,7 +20,6 @@ const apiKeyService = new Elysia({
 	.use(evlog())
 	.use(
 		openapi({
-			path: "/openapi",
 			documentation: {
 				info: {
 					title: "API KEY Service",
@@ -36,11 +35,6 @@ const apiKeyService = new Elysia({
 					},
 				},
 			},
-			references: fromTypes(
-				apiKeyConfig.NODE_ENV === "production"
-					? "dist/index.d.ts"
-					: "src/index.ts",
-			),
 		}),
 	)
 	.use(serverTiming())

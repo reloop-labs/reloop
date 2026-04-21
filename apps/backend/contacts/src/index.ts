@@ -8,7 +8,7 @@ import { propertyRoutes } from "@be/contacts/routes/property/property.routes";
 import { topicRoutes } from "@be/contacts/routes/topic/topic.routes";
 
 import { loader } from "@be/contacts/utils/loader";
-import { fromTypes, openapi } from "@elysiajs/openapi";
+import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
@@ -20,7 +20,6 @@ const contactsService = new Elysia({
 })
 	.use(
 		openapi({
-			path: "/openapi",
 			documentation: {
 				info: {
 					title: "Contacts Service",
@@ -36,11 +35,6 @@ const contactsService = new Elysia({
 					},
 				},
 			},
-			references: fromTypes(
-				contactsConfig.NODE_ENV === "production"
-					? "dist/index.d.ts"
-					: "src/index.ts",
-			),
 		}),
 	)
 	.use(serverTiming())

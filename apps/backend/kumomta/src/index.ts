@@ -1,5 +1,5 @@
 import { cors } from "@elysiajs/cors";
-import { fromTypes, openapi } from "@elysiajs/openapi";
+import { openapi } from "@elysiajs/openapi";
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
 import { kumomtaConfig } from "./kumomta.config";
@@ -14,7 +14,6 @@ const app = new Elysia({
   .use(cors())
   .use(
     openapi({
-      path: "/openapi",
       documentation: {
         info: {
           title: "KumoMTA Service",
@@ -30,11 +29,6 @@ const app = new Elysia({
           },
         },
       },
-      references: fromTypes(
-        kumomtaConfig.NODE_ENV === "production"
-          ? "dist/index.d.ts"
-          : "src/index.ts",
-      ),
     }),
   )
   .use(landing)

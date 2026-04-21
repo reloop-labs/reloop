@@ -3,7 +3,7 @@ import { domainConfig } from "@be/domain/domain.config";
 import { domainRoutes } from "@be/domain/routes/domain/domain.routes";
 import { landing } from "@be/domain/routes/landing/landing.index";
 import { loader } from "@be/domain/utils/loader";
-import { fromTypes, openapi } from "@elysiajs/openapi";
+import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
@@ -15,7 +15,6 @@ const emailService = new Elysia({
 })
 	.use(
 		openapi({
-			path: "/openapi",
 			documentation: {
 				info: {
 					title: "Domain Service",
@@ -31,11 +30,6 @@ const emailService = new Elysia({
 					},
 				},
 			},
-			references: fromTypes(
-				domainConfig.NODE_ENV === "production"
-					? "dist/index.d.ts"
-					: "src/index.ts",
-			),
 		}),
 	)
 	.use(serverTiming())

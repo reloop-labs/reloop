@@ -3,7 +3,7 @@ import { landing } from "@be/template/routes/landing/landing.index";
 import { templateRoutes } from "@be/template/routes/template/template.routes";
 import { templateConfig } from "@be/template/template.config";
 import { loader } from "@be/template/utils/loader";
-import { fromTypes, openapi } from "@elysiajs/openapi";
+import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
@@ -13,16 +13,7 @@ const templateService = new Elysia({
 	prefix: "/api/template",
 	name: "Template Service",
 })
-	.use(
-		openapi({
-			path: "/openapi",
-			references: fromTypes(
-				templateConfig.NODE_ENV === "production"
-					? "dist/index.d.ts"
-					: "src/index.ts",
-			),
-		}),
-	)
+	.use(openapi())
 	.use(serverTiming())
 	.use(landing)
 	.use(templateRoutes)

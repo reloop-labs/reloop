@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { fromTypes, openapi } from "@elysiajs/openapi";
+import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 import { landing } from "@reloop/be-mail/routes/landing/landing.index.js";
 import { mailRoutes } from "@reloop/be-mail/routes/mail/mail.routes.js";
@@ -18,16 +18,7 @@ const mailService = new Elysia({
 	name: "Mail Service",
 })
 	.use(evlog())
-	.use(
-		openapi({
-			path: "/openapi",
-			references: fromTypes(
-				process.env.NODE_ENV === "production"
-					? "dist/index.d.ts"
-					: "src/index.ts",
-			),
-		}),
-	)
+	.use(openapi())
 	.use(serverTiming())
 	.use(landing)
 	.use(mailRoutes)
