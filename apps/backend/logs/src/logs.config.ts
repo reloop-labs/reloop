@@ -7,7 +7,7 @@ if (!process.env.BASE_URL) {
 }
 
 export const logsConfig = {
-	port: 8016,
+	port: Number(process.env.PORT) || 8016,
 	NODE_ENV: process.env.NODE_ENV || "development",
 	REDIS_URL: process.env.REDIS_URL,
 	BASE_URL: process.env.BASE_URL,
