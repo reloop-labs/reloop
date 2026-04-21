@@ -42,12 +42,14 @@ function getClickHouseAdminClient(): ClickHouseClient {
 
 export async function ensureDatabaseExists(): Promise<void> {
 	const client = getClickHouseAdminClient();
+	const database = logsConfig.clickhouse.database;
 
 	try {
 		await client.exec({
-			query: `CREATE DATABASE IF NOT EXISTS ${logsConfig.clickhouse.database}`,
+			query: `CREATE DATABASE IF NOT EXISTS \`${database}\``,
 		});
 	} catch (error) {
+		console.error(`Error creating database ${database}:`, error);
 		throw error;
 	}
 }
@@ -106,15 +108,18 @@ export async function ensureTableExists(): Promise<void> {
 		}
 	} catch (error: unknown) {
 		// If table doesn't exist, DESCRIBE will throw. We can ignore this and proceed to CREATE.
-		if (error instanceof Error && !error.message?.includes("Table default.logs doesn't exist") && !error.message?.includes("Table logs does not exist")) {
-			// console.error("Error checking ClickHouse table schema:", error);
+		if (error instanceof Error &&
+			!error.message?.includes("Table default.logs doesn't exist") &&
+			!error.message?.includes("Table logs does not exist") &&
+			!error.message?.includes("not found")) {
+			console.error("Error checking ClickHouse table schema:", error);
 		}
 	}
 
 	try {
 		await client.exec({
 			query: `
-				CREATE TABLE IF NOT EXISTS logs (
+				CREATE TABLE IF NOT EXISTS \`${logsConfig.clickhouse.database}\`.logs (
 					id String,
 					event String,
 					level LowCardinality(String),
@@ -131,7 +136,9 @@ export async function ensureTableExists(): Promise<void> {
 				PARTITION BY toYYYYMM(created_at)
 			`,
 		});
+		console.log(`Successfully ensured table \`${logsConfig.clickhouse.database}\`.logs exists`);
 	} catch (error) {
+		console.error(`Error creating table \`${logsConfig.clickhouse.database}\`.logs:`, error);
 		throw error;
 	}
 }

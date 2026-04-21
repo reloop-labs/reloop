@@ -13,6 +13,15 @@ export const loader = async () => {
 		await client.query({ query: "SELECT 1 as test", format: "JSON", });
 		logger.info("ClickHouse connection health check passed");
 	} catch (error) {
-		logger.error({ error }, "Error during initialization");
+		logger.error(
+			{
+				error: error instanceof Error ? {
+					message: error.message,
+					stack: error.stack,
+					name: error.name
+				} : error
+			},
+			"Error during initialization"
+		);
 	}
 };
