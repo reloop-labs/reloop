@@ -152,7 +152,9 @@
 				"pino-pretty": "13.1.2",
 				"@elysiajs/openapi": "1.4.11",
 				"bullmq": "5.74.1",
-				"evlog": "2.10.0"
+				"evlog": "2.10.0",
+				"@aws-sdk/client-s3": "3.1033.0",
+				"@aws-sdk/lib-storage": "3.1033.0"
 			}
 		}
 	},

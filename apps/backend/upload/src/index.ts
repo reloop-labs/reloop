@@ -3,7 +3,7 @@ import { landing } from "@be/upload/routes/landing/landing.index";
 import { uploadRoutes } from "@be/upload/routes/upload/upload.routes";
 import { uploadConfig } from "@be/upload/upload.config";
 import { loader } from "@be/upload/utils/loader";
-import { fromTypes, openapi } from "@elysiajs/openapi";
+import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
@@ -13,16 +13,7 @@ const uploadService = new Elysia({
 	prefix: "/api/upload",
 	name: "Upload Service",
 })
-	.use(
-		openapi({
-			path: "/openapi",
-			references: fromTypes(
-				uploadConfig.NODE_ENV === "production"
-					? "dist/index.d.ts"
-					: "src/index.ts",
-			),
-		}),
-	)
+	.use(openapi())
 	.use(serverTiming())
 	.use(landing)
 	.use(uploadRoutes)
