@@ -1,6 +1,6 @@
 import "../app/global.css";
 import { IconsSprite } from "@reloop/ui/icon";
-import { RootProvider } from "fumadocs-ui/provider/next";
+
 import localFont from "next/font/local";
 import type { ReactNode } from "react";
 import { cn } from "../lib/cn";
@@ -44,7 +44,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 			suppressHydrationWarning
 		>
 			<body className="flex min-h-screen flex-col">
-				<RootProvider>{children}</RootProvider>
+				{children}
 				<IconsSprite />
 			</body>
 		</html>

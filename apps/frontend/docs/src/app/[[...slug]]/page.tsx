@@ -1,4 +1,6 @@
-import { baseOptions } from "@reloop/fe-docs/app/layout.config";
+import { DocsBody } from "@reloop/fe-docs/components/docs/body";
+import { DocsLayout } from "@reloop/fe-docs/components/docs/layout";
+import { TableOfContents } from "@reloop/fe-docs/components/docs/toc";
 import {
 	BiomejsIcon,
 	BunIcon,
@@ -16,16 +18,9 @@ import {
 } from "@reloop/fe-docs/components/icons/Tech";
 import { PageActions } from "@reloop/fe-docs/components/page-actions";
 import { source } from "@reloop/fe-docs/lib/source";
+import type { PageTreeItem, TOCItem } from "@reloop/fe-docs/lib/types";
 import { getMDXComponents } from "@reloop/fe-docs/mdx-components";
 import { Icon } from "@reloop/ui/icon";
-import { DocsLayout } from "fumadocs-ui/layouts/docs";
-import { createRelativeLink } from "fumadocs-ui/mdx";
-import {
-	DocsBody,
-	DocsDescription,
-	DocsPage,
-	DocsTitle,
-} from "fumadocs-ui/page";
 import { notFound } from "next/navigation";
 
 export async function generateMetadata(props: {
@@ -63,39 +58,22 @@ export default async function Page(props: {
 	const MDXContent = page.data.body;
 
 	return (
-		<DocsLayout
-			tree={source.pageTree}
-			{...baseOptions}
-			githubUrl="https://github.com/reloop-labs/reloop"
-			tabs={false}
-			sidebar={{ collapsible: false }}
-		>
-			<DocsPage
-				tableOfContent={{ style: "clerk" }}
-				toc={page.data.toc}
-				full={page.url.startsWith("/api") || page.data.full}
-				title={page.data.title}
-				editOnGithub={{
-					owner: "reloop-labs",
-					repo: "reloop",
-					path: `/${params.slug?.join("/")}.mdx?plain=1`,
-					sha: "main/apps/frontend/docs/content/docs",
-				}}
-			>
-				<div className="flex items-center justify-between">
-					<div>
-						<DocsTitle>{page.data.title}</DocsTitle>
-						<DocsDescription className="mb-4">
-							{page.data.description}
-						</DocsDescription>
-					</div>
-					<PageActions markdownUrl={`${page.url}.mdx`} />
+		<DocsLayout tree={source.pageTree.children as PageTreeItem[]}>
+			<div className="flex items-center justify-between">
+				<div>
+					<h1 className="font-bold text-3xl text-foreground tracking-tight sm:text-4xl">
+						{page.data.title}
+					</h1>
+					<p className="mt-2 text-lg text-muted-foreground">
+						{page.data.description}
+					</p>
 				</div>
+				<PageActions markdownUrl={`${page.url}.mdx`} />
+			</div>
+			<div className="mt-8 flex flex-col gap-10 xl:grid xl:grid-cols-[1fr_300px]">
 				<DocsBody>
 					<MDXContent
 						components={getMDXComponents({
-							// this allows you to link to other pages with relative file paths
-							a: createRelativeLink(source, page),
 							Icon: Icon,
 							NextjsIcon: NextjsIcon,
 							RadixUIIcon: RadixUIIcon,
@@ -113,7 +91,8 @@ export default async function Page(props: {
 						})}
 					/>
 				</DocsBody>
-			</DocsPage>
+				<TableOfContents items={page.data.toc as TOCItem[]} />
+			</div>
 		</DocsLayout>
 	);
 }

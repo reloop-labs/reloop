@@ -1,16 +1,5 @@
 "use client";
-import { useCopyButton } from "fumadocs-ui/utils/use-copy-button";
-import {
-	Box,
-	Check,
-	ChevronDown,
-	Code,
-	Copy,
-	ExternalLinkIcon,
-	FileText,
-	Terminal,
-} from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const cache = new Map<string, string>();
 
@@ -24,26 +13,35 @@ export function PageActions({
 }) {
 	const [isLoading, setLoading] = useState(false);
 
-	const [checked, onCopy] = useCopyButton(async () => {
+	const [checked, setChecked] = useState(false);
+	const [mcpChecked, setMcpChecked] = useState(false);
+
+	const onCopy = async () => {
 		const cached = cache.get(markdownUrl);
-		if (cached) return navigator.clipboard.writeText(cached);
-
-		setLoading(true);
-		try {
-			const res = await fetch(markdownUrl);
-			const content = await res.text();
-			cache.set(markdownUrl, content);
-			await navigator.clipboard.writeText(content);
-		} finally {
-			setLoading(false);
+		if (cached) {
+			await navigator.clipboard.writeText(cached);
+		} else {
+			setLoading(true);
+			try {
+				const res = await fetch(markdownUrl);
+				const content = await res.text();
+				cache.set(markdownUrl, content);
+				await navigator.clipboard.writeText(content);
+			} finally {
+				setLoading(true);
+			}
 		}
-	});
+		setChecked(true);
+		setTimeout(() => setChecked(false), 2000);
+	};
 
-	const [mcpChecked, onCopyMCP] = useCopyButton(async () => {
+	const onCopyMCP = async () => {
 		await navigator.clipboard.writeText(
 			"npx @reloop/mcp-server@latest install",
 		);
-	});
+		setMcpChecked(true);
+		setTimeout(() => setMcpChecked(false), 2000);
+	};
 
 	const [isOpen, setOpen] = useState(false);
 

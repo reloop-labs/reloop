@@ -1,11 +1,6 @@
 "use client";
 import { Icon } from "@reloop/ui/icon";
-import type { FooterProps } from "fumadocs-ui/layouts/docs/page/slots/footer";
-
-export function Footer(props: FooterProps) {
-	const { items } = props;
-	const previous = items?.previous;
-	const next = items?.next;
+export function Footer() {
 	return (
 		<footer className="mt-20 flex flex-col gap-8 border-fd-border border-t pt-12 pb-8">
 			<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

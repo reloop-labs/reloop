@@ -1,7 +1,4 @@
 @import "tailwindcss";
-@import "fumadocs-ui/css/black.css";
-@import "fumadocs-ui/css/preset.css";
-@import "fumadocs-openapi/css/preset.css";
 
 @theme {
   --font-sans: var(--font-open-runde), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
