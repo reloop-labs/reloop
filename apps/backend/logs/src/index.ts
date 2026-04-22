@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { fromTypes, openapi } from "@elysiajs/openapi";
+import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 import { logger } from "@reloop/logger";
 import { logsConfig } from "@reloop/logs/logs.config";
@@ -16,18 +16,12 @@ const logsService = new Elysia({
 })
 	.use(
 		openapi({
-			path: "/openapi",
 			documentation: {
 				info: {
 					title: "Logs Service",
 					version: "1.0.0",
 				},
 			},
-			references: fromTypes(
-				logsConfig.NODE_ENV === "production"
-					? "dist/index.d.ts"
-					: "src/index.ts",
-			),
 		}),
 	)
 	.use(serverTiming())

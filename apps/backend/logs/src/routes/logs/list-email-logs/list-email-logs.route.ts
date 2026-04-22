@@ -8,7 +8,7 @@ export const listEmailLogsRoute = new Elysia().use(authMiddleware).get(
   async ({ query, activeOrganizationId }) => {
     const result = await listEmailLogsController({
       query,
-      organizationId: activeOrganizationId as string,
+      organizationId: activeOrganizationId,
     });
     return result;
   },
