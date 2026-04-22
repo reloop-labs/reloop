@@ -50,7 +50,6 @@ export const UserOrganizationProvider = ({
 	children: ReactNode;
 }) => {
 	const { data: session, isPending: sessionLoading } = authClient.useSession();
-	const { orgSlug } = useParams();
 	const {
 		data: organizations,
 		isLoading: organizationsLoading,
@@ -65,9 +64,10 @@ export const UserOrganizationProvider = ({
 	const [isSettingDefaultOrg, setIsSettingDefaultOrg] = useState(false);
 	const [hasInitialized, setHasInitialized] = useState(false);
 
-	const activeOrganization = organizations?.find(
-		(organization) => organization.slug === orgSlug,
-	);
+	const activeOrganization =
+		organizations?.find(
+			(organization) => organization.id === session?.user?.activeOrganizationId,
+		) || organizations?.[0];
 
 	const isLoading =
 		sessionLoading || organizationsLoading || isSettingDefaultOrg;
@@ -91,35 +91,12 @@ export const UserOrganizationProvider = ({
 					}
 				}
 
-				if (session?.user?.activeOrganizationId && orgSlug) {
-					const sessionActiveOrg = organizations.find(
-						(org) => org.id === session.user.activeOrganizationId,
-					);
-					if (sessionActiveOrg && sessionActiveOrg.slug !== orgSlug) {
-						setIsSettingDefaultOrg(true);
-						push(`/${sessionActiveOrg.slug}`);
-						setIsSettingDefaultOrg(false);
-						setHasInitialized(true);
-						return;
-					}
-				}
 				if (!activeOrganization) {
 					if (organizations.length > 0) {
 						setIsSettingDefaultOrg(true);
-						if (session?.user?.activeOrganizationId) {
-							const targetOrg = organizations.find(
-								(org) => org.id === session.user.activeOrganizationId,
-							);
-							if (targetOrg?.slug) {
-								push(`/${targetOrg.slug}`);
-								setIsSettingDefaultOrg(false);
-								setHasInitialized(true);
-								return;
-							}
-						}
 
 						const firstOrg = organizations[0];
-						if (firstOrg?.id && firstOrg?.slug) {
+						if (firstOrg?.id) {
 							try {
 								await authClient.organization.setActive({
 									organizationId: firstOrg.id,
@@ -127,7 +104,6 @@ export const UserOrganizationProvider = ({
 								await authClient.updateUser({
 									activeOrganizationId: firstOrg.id,
 								});
-								push(`/${firstOrg.slug}`);
 							} catch (error) {
 								console.log("Error setting active organization", { error });
 							} finally {
@@ -155,7 +131,6 @@ export const UserOrganizationProvider = ({
 		hasInitialized,
 		push,
 		session?.user?.activeOrganizationId,
-		orgSlug,
 	]);
 
 	if (isLoading) {
@@ -178,15 +153,8 @@ export const UserOrganizationProvider = ({
 		);
 	}
 
-	const onPush = (path: string, changeSlug?: boolean) => {
-		if (changeSlug) {
-			const pathWithoutOrg = pathname.replace(/^\/[^/]+/, "");
-			const newPath = `/${path}${pathWithoutOrg}`;
-			const queryString = searchParams.toString();
-			push(queryString ? `${newPath}?${queryString}` : newPath);
-			return;
-		}
-		push(`/${activeOrganization.slug}${path}`);
+	const onPush = (path: string, _changeSlug?: boolean) => {
+		push(path);
 	};
 
 	const contextValue: UserOrganizationContextType = {
