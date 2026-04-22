@@ -16,6 +16,7 @@
 		"@elysiajs/server-timing": "catalog:backend",
 		"@reloop/auth": "workspace:*",
 		"@reloop/cache": "workspace:*",
+		"@reloop/apikey": "workspace:*",
 		"@reloop/db": "workspace:*",
 		"@reloop/logger": "workspace:*",
 		"dotenv": "catalog:backend",

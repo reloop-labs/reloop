@@ -188,6 +188,7 @@
         "@elysiajs/openapi": "catalog:backend",
         "@elysiajs/opentelemetry": "catalog:backend",
         "@elysiajs/server-timing": "catalog:backend",
+        "@reloop/apikey": "workspace:*",
         "@reloop/auth": "workspace:*",
         "@reloop/cache": "workspace:*",
         "@reloop/db": "workspace:*",
