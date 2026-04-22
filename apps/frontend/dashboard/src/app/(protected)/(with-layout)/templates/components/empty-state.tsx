@@ -5,11 +5,7 @@ import Spinner from "@reloop/ui/spinner";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-interface EmptyStateProps {
-	orgSlug: string;
-}
-
-export const EmptyState = ({ orgSlug }: EmptyStateProps) => {
+export const EmptyState = () => {
 	const router = useRouter();
 	const [isCreating, setIsCreating] = useState(false);
 

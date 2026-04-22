@@ -21,7 +21,6 @@ interface Template {
 
 interface TemplateTableProps {
 	templates: Template[];
-	activeOrganizationSlug: string;
 	isLoading: boolean;
 	loadingRows?: number;
 	onMutate: () => void;
@@ -35,7 +34,6 @@ const statusColors = {
 
 export const TemplateTable = ({
 	templates,
-	activeOrganizationSlug,
 	isLoading,
 	loadingRows = 4,
 	onMutate,
@@ -91,7 +89,7 @@ export const TemplateTable = ({
 						transition={{ delay: index * 0.05 }}
 					>
 						<Link
-							href={`/${activeOrganizationSlug}/templates/${template.id}`}
+							href={`/templates/${template.id}`}
 							className="group flex items-center justify-between rounded-xl border border-stroke-soft-200 p-4 transition-all duration-200 hover:border-primary-base hover:bg-bg-weak-50/50"
 						>
 							<div className="min-w-0 flex-1">

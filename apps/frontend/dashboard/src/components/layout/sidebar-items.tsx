@@ -10,12 +10,10 @@ import { useLayoutEffect, useRef, useState } from "react";
 import { AnimatedHoverBackground } from "../animated-hover-background";
 
 interface SidebarItemsProps {
-	organizationSlug: string;
 	isCollapsed?: boolean;
 }
 
 export const SidebarItems: React.FC<SidebarItemsProps> = ({
-	organizationSlug,
 	isCollapsed = false,
 }) => {
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
@@ -23,7 +21,7 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 	const buttonRefs = useRef<HTMLAnchorElement[]>([]);
 	const pathname = usePathname();
 
-	const pathWithoutSlug = pathname.replace(/^\/[^/]+/, "") || "/";
+	const pathWithoutSlug = pathname;
 	const activeIndex = mainNavigation.findIndex((item) => {
 		if (item.path === "/") return pathWithoutSlug === "/";
 		return pathWithoutSlug.startsWith(item.path);
@@ -52,7 +50,7 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 	return (
 		<div className="relative">
 			{mainNavigation.map(({ path, label, iconName }, index) => {
-				const href = `/${organizationSlug}${path}`;
+				const href = path;
 
 				return (
 					<Link

@@ -5,7 +5,7 @@ import * as Input from "@reloop/ui/input";
 import * as Kbd from "@reloop/ui/kbd";
 import * as Modal from "@reloop/ui/modal";
 import axios from "axios";
-import { useParams, usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";

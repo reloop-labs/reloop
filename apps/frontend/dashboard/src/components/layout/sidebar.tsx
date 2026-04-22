@@ -73,17 +73,10 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
 				/>
 			</div>
 			<div className="flex-1 overflow-y-auto p-2">
-				<SidebarItems
-					organizationSlug={activeOrganization.slug}
-					isCollapsed={isSidebarCollapsed}
-				/>
+				<SidebarItems isCollapsed={isSidebarCollapsed} />
 			</div>
 			<div className="border-stroke-soft-100 border-t p-2 dark:border-stroke-soft-100/40">
-				<UserMenuDropdown
-					user={user}
-					organizationSlug={activeOrganization.slug}
-					isCollapsed={isSidebarCollapsed}
-				/>
+				<UserMenuDropdown user={user} isCollapsed={isSidebarCollapsed} />
 			</div>
 		</motion.div>
 	);

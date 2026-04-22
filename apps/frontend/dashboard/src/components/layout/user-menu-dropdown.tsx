@@ -23,13 +23,11 @@ interface User {
 
 interface UserMenuDropdownProps {
 	user: User;
-	organizationSlug: string;
 	isCollapsed?: boolean;
 }
 
 export const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
 	user,
-	organizationSlug,
 	isCollapsed = false,
 }) => {
 	const [isOpen, setIsOpen] = useState(false);
@@ -47,7 +45,7 @@ export const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
 			await authClient.signOut();
 			router.push("/login");
 		} else {
-			router.push(`/${organizationSlug}${path}`);
+			router.push(path);
 		}
 	};
 

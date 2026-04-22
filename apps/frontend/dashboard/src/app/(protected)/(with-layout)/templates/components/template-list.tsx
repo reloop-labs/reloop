@@ -5,7 +5,6 @@ import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import Spinner from "@reloop/ui/spinner";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useState } from "react";
@@ -123,7 +122,7 @@ export const TemplateList = () => {
 						</p>
 					</div>
 				) : data?.templates && data.templates.length === 0 ? (
-					<EmptyState orgSlug={activeOrganization.slug} />
+					<EmptyState />
 				) : (
 					<div>
 						<div className="mt-10 flex items-center gap-3">
@@ -146,7 +145,6 @@ export const TemplateList = () => {
 						<div className="mt-4">
 							<TemplateTable
 								templates={filteredTemplates}
-								activeOrganizationSlug={activeOrganization.slug}
 								isLoading={isLoading}
 								loadingRows={4}
 								onMutate={mutate}
