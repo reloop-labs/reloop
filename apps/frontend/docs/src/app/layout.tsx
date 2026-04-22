@@ -1,6 +1,6 @@
-import "../app/global.css";
+import "./global.css";
 import { IconsSprite } from "@reloop/ui/icon";
-
+import { ThemeProvider } from "next-themes";
 import localFont from "next/font/local";
 import type { ReactNode } from "react";
 import { cn } from "../lib/cn";
@@ -43,10 +43,18 @@ export default function Layout({ children }: { children: ReactNode }) {
 			)}
 			suppressHydrationWarning
 		>
-			<body className="flex min-h-screen flex-col">
-				{children}
-				<IconsSprite />
+			<body className="flex min-h-screen flex-col overflow-x-hidden bg-fd-background text-fd-foreground">
+				<ThemeProvider
+					attribute="class"
+					defaultTheme="light"
+					enableSystem
+					disableTransitionOnChange
+				>
+					{children}
+					<IconsSprite />
+				</ThemeProvider>
 			</body>
 		</html>
 	);
 }
+

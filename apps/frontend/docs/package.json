@@ -25,7 +25,8 @@
 		"react-dom": "catalog:ui",
 		"shiki": "catalog:ui",
 		"tailwind-merge": "catalog:ui",
-		"zod": "catalog:ui"
+		"zod": "catalog:ui",
+		"@mintlify/components": "catalog:ui"
 	},
 	"devDependencies": {
 		"@types/node": "catalog:",
