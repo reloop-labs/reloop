@@ -40,7 +40,6 @@ interface WebhookData {
 
 interface WebhookTableProps {
 	webhooks: WebhookData[];
-	activeOrganizationSlug: string;
 	isLoading?: boolean;
 	loadingRows?: number;
 	isTotalEmpty?: boolean;
@@ -176,7 +175,6 @@ const BORDER = "border-stroke-soft-100 dark:border-stroke-soft-100/50";
 
 export const WebhookTable = ({
 	webhooks,
-	activeOrganizationSlug,
 	isLoading,
 	loadingRows = 3,
 	isTotalEmpty,
@@ -231,10 +229,7 @@ export const WebhookTable = ({
 										isRowActive && "bg-bg-weak-50/50",
 									)}
 								>
-									<Link
-										href={`/${activeOrganizationSlug}/webhooks/${webhook.id}`}
-										className="contents"
-									>
+									<Link href={`/webhooks/${webhook.id}`} className="contents">
 										<div className="flex items-center gap-2">
 											<Icon
 												name="link"

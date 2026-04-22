@@ -22,7 +22,6 @@ interface Topic {
 
 interface TopicTableProps {
 	topics: Topic[];
-	activeOrganizationSlug: string;
 	isLoading?: boolean;
 	loadingRows?: number;
 	onToggleVisibility?: (
@@ -74,7 +73,6 @@ const TopicSkeleton = () => (
 
 export const TopicTable = ({
 	topics,
-	activeOrganizationSlug,
 	isLoading,
 	loadingRows = 4,
 	onToggleVisibility,
@@ -86,7 +84,7 @@ export const TopicTable = ({
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 
 	const handleRowClick = (topicId: string) => {
-		router.push(`/${activeOrganizationSlug}/contacts/topics/${topicId}`);
+		router.push(`/contacts/topics/${topicId}`);
 	};
 
 	const handleDelete = (topicId: string) => {

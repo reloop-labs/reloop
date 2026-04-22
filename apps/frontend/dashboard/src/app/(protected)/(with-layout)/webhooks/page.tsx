@@ -27,7 +27,7 @@ const WebhooksPage = () => {
 
 	const handleCreateWebhook = () => {
 		if (activeOrganization?.slug) {
-			router.push(`/webhooks/create`);
+			router.push("/webhooks/create");
 		}
 	};
 
@@ -85,7 +85,6 @@ const WebhooksPage = () => {
 				<div className="mt-4">
 					<WebhookTable
 						webhooks={webhooks}
-						activeOrganizationSlug={activeOrganization?.slug || ""}
 						isLoading={isLoading}
 						loadingRows={4}
 						isTotalEmpty={isTotalEmpty}

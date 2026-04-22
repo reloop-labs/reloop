@@ -42,7 +42,6 @@ export const SettingsTabs = () => {
 	const router = useRouter();
 	const pathWithoutSlug = pathname.replace(/^\/[^/]+/, "") || "/";
 	const activeIndex = list.findIndex((item) => item.path === pathWithoutSlug);
-	const { activeOrganization } = useUserOrganization();
 	const currentIdx = hoveredIdx !== undefined ? hoveredIdx : activeIndex;
 	const tab = buttonRefs.current[currentIdx];
 	const rect = tab?.getBoundingClientRect();
@@ -76,7 +75,7 @@ export const SettingsTabs = () => {
 						key={path}
 						value={path}
 						onClick={() => {
-							router.push(`/${activeOrganization.slug}${path}`);
+							router.push(path);
 						}}
 					>
 						<Icon name={iconName} className="h-4 w-4" />

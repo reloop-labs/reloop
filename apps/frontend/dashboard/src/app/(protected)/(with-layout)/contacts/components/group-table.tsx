@@ -20,7 +20,6 @@ interface Group {
 
 interface GroupTableProps {
 	groups: Group[];
-	activeOrganizationSlug: string;
 	isLoading?: boolean;
 	loadingRows?: number;
 	onEdit?: (contact_group_id: string) => void;
@@ -57,7 +56,6 @@ const GroupContactsCount = ({ groupId }: { groupId: string }) => {
 
 export const GroupTable = ({
 	groups,
-	activeOrganizationSlug,
 	isLoading,
 	loadingRows = 6,
 	onEdit,
@@ -68,7 +66,7 @@ export const GroupTable = ({
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 
 	const handleRowClick = (groupId: string) => {
-		router.push(`/${activeOrganizationSlug}/contacts/groups/${groupId}`);
+		router.push(`/contacts/groups/${groupId}`);
 	};
 
 	if (isLoading) {

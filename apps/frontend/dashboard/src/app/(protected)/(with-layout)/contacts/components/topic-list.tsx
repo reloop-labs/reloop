@@ -131,7 +131,6 @@ export const TopicList = () => {
 			<div className="mt-4">
 				<TopicTable
 					topics={filteredTopics}
-					activeOrganizationSlug={activeOrganization.slug}
 					isLoading={isLoading}
 					loadingRows={4}
 					onToggleVisibility={handleToggleVisibility}

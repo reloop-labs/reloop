@@ -1,6 +1,5 @@
 "use client";
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
-import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
@@ -15,6 +14,7 @@ import { Skeleton } from "@reloop/ui/skeleton";
 import * as Tooltip from "@reloop/ui/tooltip";
 import axios from "axios";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
@@ -43,7 +43,6 @@ interface ApiKeyData {
 
 interface ApiKeyTableProps {
 	apiKeys: ApiKeyData[];
-	activeOrganizationSlug: string;
 	isLoading?: boolean;
 	loadingRows?: number;
 	onAddApiKey?: () => void;
@@ -201,12 +200,11 @@ const ApiKeyActionsDropdown = ({
 
 export const ApiKeyTable = ({
 	apiKeys,
-	activeOrganizationSlug,
 	isLoading,
 	loadingRows = 3,
 	onAddApiKey,
 }: ApiKeyTableProps) => {
-	const { push } = useUserOrganization();
+	const router = useRouter();
 	const { mutate } = useSWRConfig();
 	const [, setDeleteId] = useQueryState("delete");
 	const [togglingId, setTogglingId] = useState<string | null>(null);
@@ -220,7 +218,7 @@ export const ApiKeyTable = ({
 	};
 
 	const handleViewDetails = (apiKeyId: string) => {
-		push(`/api-keys/${apiKeyId}`);
+		router.push(`/api-keys/${apiKeyId}`);
 	};
 
 	const handleToggleEnabled = async (apiKey: ApiKeyData) => {
@@ -284,7 +282,7 @@ export const ApiKeyTable = ({
 						// Skeleton loading state
 						Array.from({ length: loadingRows }).map((_, index) => (
 							<div
-								key={`skeleton-${index}-${activeOrganizationSlug}`}
+								key={`skeleton-${index}`}
 								className="grid grid-cols-[2fr_1fr_1.5fr_1fr_48px] items-center px-4 py-2"
 							>
 								<div className="flex items-center gap-2">
@@ -325,10 +323,7 @@ export const ApiKeyTable = ({
 										isRowActive && "bg-bg-weak-50/50",
 									)}
 								>
-									<Link
-										href={`/${activeOrganizationSlug}/api-keys/${apiKey.id}`}
-										className="contents"
-									>
+									<Link href={`/api-keys/${apiKey.id}`} className="contents">
 										{/* Name Column */}
 										<div className="flex items-center gap-2">
 											<Icon

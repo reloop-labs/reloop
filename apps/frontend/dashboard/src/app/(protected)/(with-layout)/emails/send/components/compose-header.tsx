@@ -3,17 +3,16 @@
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export const ComposeHeader = () => {
 	const router = useRouter();
-	
 
 	return (
 		<div className="flex items-center justify-between pt-10 pb-6">
 			<div className="flex flex-col gap-1">
 				<Button.Root
-					onClick={() => router.push(`/emails`)}
+					onClick={() => router.push("/emails")}
 					variant="neutral"
 					mode="stroke"
 					size="xxsmall"

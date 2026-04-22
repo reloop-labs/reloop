@@ -1,4 +1,5 @@
 "use client";
+import { DomainApiDetails } from "@fe/dashboard/components/api-details/domain";
 import { PageSizeDropdown } from "@fe/dashboard/components/page-size-dropdown";
 import { PaginationControls } from "@fe/dashboard/components/pagination-controls";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
@@ -6,13 +7,12 @@ import type { DomainListResponse } from "@reloop/api";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
+import * as Kbd from "@reloop/ui/kbd";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useState } from "react";
 import useSWR from "swr";
-import { DomainApiDetails } from "@fe/dashboard/components/api-details/domain";
-import * as Kbd from "@reloop/ui/kbd";
 import { DeleteDomainModal } from "./delete-domain";
 import {
 	DomainFilterDropdown,
@@ -83,7 +83,9 @@ export const DomainListSidebar = () => {
 						variant="neutral"
 						mode="stroke"
 						size="xsmall"
-						onClick={() => window.open("https://reloop.sh/docs/domain", "_blank")}
+						onClick={() =>
+							window.open("https://reloop.sh/docs/domain", "_blank")
+						}
 						className="gap-1.5"
 					>
 						<Icon name="book-closed" className="h-4 w-4" />
@@ -95,7 +97,7 @@ export const DomainListSidebar = () => {
 							variant: "neutral",
 							size: "xsmall",
 						}).root()}
-						href={`/domain/add`}
+						href={"/domain/add"}
 					>
 						<Icon name="plus" className="h-4 w-4" />
 						Add domain
@@ -129,7 +131,6 @@ export const DomainListSidebar = () => {
 			<div className="mt-4">
 				<DomainTable
 					domains={filteredDomains}
-					activeOrganizationSlug={activeOrganization.slug}
 					currentDomainId={domainId as string}
 					isLoading={isLoading}
 					loadingRows={4}

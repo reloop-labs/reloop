@@ -15,7 +15,6 @@ interface LogDrawerProps {
 	logId: string | null;
 	isOpen: boolean;
 	onOpenChange: (open: boolean) => void;
-	activeOrganizationSlug: string;
 }
 
 interface LogDetail {
@@ -133,14 +132,24 @@ function CopyButton({ value, label }: { value: string; label?: string }) {
 
 function FieldRow({
 	label,
+	icon,
 	children,
 }: {
 	label: string;
+	icon?: string;
 	children: React.ReactNode;
 }) {
 	return (
 		<div className="flex items-start justify-between gap-3 py-2">
-			<span className="shrink-0 text-text-sub-600 text-xs">{label}</span>
+			<div className="flex items-center gap-2">
+				{icon && (
+					<Icon
+						name={icon as "mail-single"}
+						className="h-4 w-4 text-text-sub-600"
+					/>
+				)}
+				<span className="shrink-0 text-text-sub-600 text-xs">{label}</span>
+			</div>
 			<div className="flex items-center gap-1 text-right">{children}</div>
 		</div>
 	);
@@ -208,7 +217,7 @@ function Section({
 				<div className="flex items-center gap-2">
 					{icon && (
 						<Icon
-							name={icon as any}
+							name={icon as "activity"}
 							className="h-3.5 w-3.5 text-text-sub-600"
 						/>
 					)}
@@ -223,12 +232,7 @@ function Section({
 	);
 }
 
-export const LogDrawer = ({
-	logId,
-	isOpen,
-	onOpenChange,
-	activeOrganizationSlug,
-}: LogDrawerProps) => {
+export const LogDrawer = ({ logId, isOpen, onOpenChange }: LogDrawerProps) => {
 	const { data: log, isLoading } = useSWR<LogDetail>(
 		logId && isOpen ? `/api/logs/v1/${logId}` : null,
 		{
@@ -256,7 +260,7 @@ export const LogDrawer = ({
 							<>
 								<div className="flex items-center gap-2.5">
 									<Icon
-										name={getEventIcon(log.event) as any}
+										name={getEventIcon(log.event) as "terminal"}
 										className={cn(
 											"h-4.5 w-4.5 shrink-0",
 											log.status_code
@@ -300,7 +304,10 @@ export const LogDrawer = ({
 											levelConfig.border,
 										)}
 									>
-										<Icon name={levelConfig.icon as any} className="h-3 w-3" />
+										<Icon
+											name={levelConfig.icon as "terminal"}
+											className="h-3 w-3"
+										/>
 										{log.level}
 									</span>
 								)}
@@ -400,7 +407,7 @@ export const LogDrawer = ({
 				{log && (
 					<Drawer.Footer className="border-stroke-soft-200 border-t">
 						<Link
-							href={`/${activeOrganizationSlug}/logs/${log.uuid}`}
+							href={`/logs/${log.uuid}`}
 							className="flex w-full items-center justify-center gap-2 rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-4 py-2 font-medium text-sm text-text-strong-950 transition-colors hover:bg-bg-weak-50"
 						>
 							View Full Details

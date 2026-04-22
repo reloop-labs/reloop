@@ -8,7 +8,6 @@ import useSWR from "swr";
 const Home = () => {
 	const router = useRouter();
 	const { data: session, isPending } = authClient.useSession();
-	const activeOrganizationId = session?.user.activeOrganizationId;
 	const { data: organizations, isLoading: organizationsLoading } = useSWR(
 		"organizations",
 		async () => (await authClient.organization.list()).data,
@@ -21,22 +20,6 @@ const Home = () => {
 					router.push("/onboarding");
 					return;
 				}
-				if (!activeOrganizationId) {
-					const firstOrg = organizations[0];
-					if (firstOrg?.slug) {
-						await authClient.organization.setActive({
-							organizationId: firstOrg.id,
-						});
-						router.push(`/${firstOrg.slug}`);
-					}
-					return;
-				}
-				const activeOrg = organizations.find(
-					(org) => org.id === activeOrganizationId,
-				);
-				if (activeOrg?.slug) {
-					router.push(`/${activeOrg.slug}`);
-				}
 			} else {
 				if (!isPending) {
 					router.push("/login");
@@ -45,13 +28,7 @@ const Home = () => {
 		};
 
 		handleRedirect();
-	}, [
-		isPending,
-		organizationsLoading,
-		organizations,
-		activeOrganizationId,
-		router,
-	]);
+	}, [isPending, organizationsLoading, organizations]);
 
 	return (
 		<div className="flex h-screen items-center justify-center">

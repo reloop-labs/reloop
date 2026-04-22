@@ -23,7 +23,6 @@ interface ContactTableProps {
 	loadingRows: number;
 	onUnsubscribe: (contactId: string) => void;
 	onAddContact?: () => void;
-	activeOrganizationSlug: string;
 	emptyStateTitle?: string;
 	emptyStateDescription?: string;
 	emptyStateButtonText?: string;
@@ -71,7 +70,6 @@ export const ContactTable = ({
 	loadingRows,
 	onUnsubscribe,
 	onAddContact,
-	activeOrganizationSlug,
 	emptyStateTitle,
 	emptyStateDescription,
 	emptyStateButtonText,
@@ -97,9 +95,7 @@ export const ContactTable = ({
 
 				<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
 					{Array.from({ length: loadingRows }).map((_, index) => (
-						<ContactSkeleton
-							key={`skeleton-${index}-${activeOrganizationSlug}`}
-						/>
+						<ContactSkeleton key={`skeleton-${index}`} />
 					))}
 				</div>
 			</div>

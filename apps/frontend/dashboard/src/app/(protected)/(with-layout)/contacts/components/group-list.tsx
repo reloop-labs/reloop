@@ -98,7 +98,6 @@ export const GroupList = () => {
 			<div className="mt-4">
 				<GroupTable
 					groups={data?.groups || []}
-					activeOrganizationSlug={activeOrganization.slug}
 					isLoading={isLoading}
 					onEdit={(contact_group_id) => {
 						setModal("edit-group");

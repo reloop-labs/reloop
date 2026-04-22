@@ -109,11 +109,6 @@ export const ApiKeyListSidebar = () => {
 			return matchesStatus && matchesCreator && matchesSearch;
 		}) || [];
 
-	const derivedEnabledCount =
-		data?.apiKeys?.filter((k) => k.enabled).length || 0;
-	const derivedDisabledCount =
-		data?.apiKeys?.filter((k) => !k.enabled).length || 0;
-
 	return (
 		<div className="pb-8">
 			<div>
@@ -130,11 +125,7 @@ export const ApiKeyListSidebar = () => {
 							<div className="flex-1">
 								<Input.Root size="xsmall">
 									<Input.Wrapper>
-										<Input.Icon
-											as={Icon}
-											name="search"
-											size="xsmall"
-										/>
+										<Input.Icon as={Icon} name="search" size="xsmall" />
 										<Input.Input
 											type="text"
 											placeholder="Search API keys..."
@@ -154,7 +145,6 @@ export const ApiKeyListSidebar = () => {
 						<div className="mt-4">
 							<ApiKeyTable
 								apiKeys={filteredApiKeys}
-								activeOrganizationSlug={activeOrganization?.slug || ""}
 								isLoading={isLoading}
 								loadingRows={4}
 								onAddApiKey={() => setModal("create-api-key")}

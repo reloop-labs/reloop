@@ -17,7 +17,6 @@ import { EmptyState } from "./empty-state";
 
 interface DomainTableProps {
 	domains: Domain[];
-	activeOrganizationSlug: string;
 	currentDomainId?: string;
 	isLoading?: boolean;
 	loadingRows?: number;
@@ -44,7 +43,6 @@ const DomainSkeleton = () => (
 
 export const DomainTable = ({
 	domains,
-	activeOrganizationSlug,
 	currentDomainId,
 	isLoading,
 	loadingRows = 3,
@@ -55,7 +53,7 @@ export const DomainTable = ({
 	const [, setDeleteId] = useQueryState("delete");
 
 	const handleRowClick = (domainId: string) => {
-		router.push(`/${activeOrganizationSlug}/domain/${domainId}`);
+		router.push(`/domain/${domainId}`);
 	};
 
 	const handleDeleteDomain = (domainId: string) => {

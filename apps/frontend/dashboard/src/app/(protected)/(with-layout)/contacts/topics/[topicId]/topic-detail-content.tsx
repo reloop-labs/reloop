@@ -1,7 +1,6 @@
 "use client";
 import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
-import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
@@ -92,7 +91,6 @@ const topicMenuItems = [
 ];
 
 export const TopicDetailContent = () => {
-	const { activeOrganization } = useUserOrganization();
 	const { topicId } = useParams();
 	const [, setModal] = useQueryState("modal", { history: "replace" });
 	const [, setId] = useQueryState("id", { history: "replace" });
@@ -548,7 +546,6 @@ export const TopicDetailContent = () => {
 					loadingRows={5}
 					onUnsubscribe={handleUnsubscribe}
 					onAddContact={() => setModal("add-contact-to-topic")}
-					activeOrganizationSlug={activeOrganization?.slug || ""}
 					emptyStateTitle="No contacts yet"
 					emptyStateDescription="Add contacts to this topic to organize and start managing them."
 					emptyStateButtonText="Add First Contact"

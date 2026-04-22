@@ -86,7 +86,7 @@ const AcceptInvitationContent = () => {
 					inviterEmail: invitation.inviterEmail,
 				});
 				setStatus("valid");
-			} catch (err) {
+			} catch {
 				setStatus("error");
 				setError("Failed to load invitation details");
 			}
@@ -123,8 +123,8 @@ const AcceptInvitationContent = () => {
 			}
 
 			// Redirect to the organization dashboard
-			router.push(`/${inviteDetails?.organizationSlug || "dashboard"}`);
-		} catch (err) {
+			router.push("/");
+		} catch {
 			setError("Failed to accept invitation");
 			setAccepting(false);
 		}
@@ -147,7 +147,7 @@ const AcceptInvitationContent = () => {
 
 			// Redirect to home or login
 			router.push("/login");
-		} catch (err) {
+		} catch {
 			setError("Failed to decline invitation");
 			setDeclining(false);
 		}

@@ -15,7 +15,6 @@ interface LogData {
 
 interface LogTableProps {
 	logs: LogData[];
-	activeOrganizationSlug: string;
 	isLoading?: boolean;
 	loadingRows?: number;
 	onRowClick?: (logId: string) => void;
@@ -75,7 +74,6 @@ const getEventIcon = (event: string) => {
 
 export const LogTable = ({
 	logs,
-	activeOrganizationSlug,
 	isLoading,
 	loadingRows = 5,
 	onRowClick,
@@ -245,7 +243,7 @@ export const LogTable = ({
 						return (
 							<Link
 								key={log.uuid}
-								href={`/${activeOrganizationSlug}/logs/${log.uuid}`}
+								href={`/logs/${log.uuid}`}
 								className={rowClasses}
 							>
 								{rowContent}

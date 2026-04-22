@@ -12,8 +12,8 @@ import useSWR from "swr";
 import { DateRangeFilter } from "./date-range-filter";
 import { LogDrawer } from "./log-drawer";
 import { LogFilterDropdown, type LogFilters } from "./log-filter-dropdown";
-import { StatusFilterDropdown } from "./status-filter-dropdown";
 import { LogTable } from "./log-table";
+import { StatusFilterDropdown } from "./status-filter-dropdown";
 
 interface LogData {
 	uuid: string;
@@ -258,7 +258,6 @@ export const LogList = () => {
 			<div className="mt-4">
 				<LogTable
 					logs={data?.logs || []}
-					activeOrganizationSlug={activeOrganization?.slug || ""}
 					isLoading={isLoading}
 					loadingRows={pageSize}
 					onRowClick={(logId) => {
@@ -276,7 +275,6 @@ export const LogList = () => {
 					setIsDrawerOpen(open);
 					if (!open) setDrawerLogId(null);
 				}}
-				activeOrganizationSlug={activeOrganization?.slug || ""}
 			/>
 
 			{/* Pagination */}

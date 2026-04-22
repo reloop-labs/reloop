@@ -3,7 +3,6 @@
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
 import { PageSizeDropdown } from "@fe/dashboard/components/page-size-dropdown";
 import { PaginationControls } from "@fe/dashboard/components/pagination-controls";
-import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
@@ -15,7 +14,7 @@ import {
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 
 interface EmailLogData {
@@ -208,8 +207,7 @@ export const EmailTable = ({
 	onPageChange,
 	onPageSizeChange,
 }: EmailTableProps) => {
-	
-	const { push } = useUserOrganization();
+	const router = useRouter();
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 
 	const totalPages = Math.ceil(totalLogs / pageSize) || 1;
@@ -280,10 +278,7 @@ export const EmailTable = ({
 									isRowActive ? "bg-bg-weak-50/50" : "hover:bg-bg-weak-50/50",
 								)}
 							>
-								<Link
-									href={`/emails/${log.id}`}
-									className="contents"
-								>
+								<Link href={`/emails/${log.id}`} className="contents">
 									<div className={cn(gridClass, "w-full py-2.5 text-left")}>
 										{/* To */}
 										<div className="flex items-center gap-2">
@@ -339,11 +334,14 @@ export const EmailTable = ({
 										{/* Actions */}
 										<div
 											className="flex justify-end"
-											onClick={(e) => e.stopPropagation()}
+											onClick={(e) => {
+												e.preventDefault();
+												e.stopPropagation();
+											}}
 										>
 											<EmailActionsDropdown
 												log={log}
-												onViewDetails={(id) => push(`/emails/${id}`)}
+												onViewDetails={(id) => router.push(`/emails/${id}`)}
 												onOpenChange={(open) =>
 													setActiveDropdownId(open ? log.id : null)
 												}
