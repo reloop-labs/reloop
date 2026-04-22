@@ -1,21 +1,17 @@
 "use client";
-import { DomainPreview } from "@fe/dashboard/app/(protected)/onboarding/components/previews";
+import { DomainPreview } from "@fe/dashboard/app/(protected)/(with-layout)/onboarding/components/previews";
 import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
-import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
-import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import type { DomainResponse } from "@reloop/api";
 import * as Button from "@reloop/ui/button";
-import { cn } from "@reloop/ui/cn";
-import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
 import Spinner from "@reloop/ui/spinner";
-import * as Switch from "@reloop/ui/switch";
 import { useLoading } from "@reloop/ui/use-loading";
 import axios from "axios";
 import { motion } from "motion/react";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
@@ -44,13 +40,13 @@ const domainSchema = v.object({
 type DomainFormValues = v.InferInput<typeof domainSchema>;
 
 export const AddDomainSidebar = () => {
-	const { push } = useUserOrganization();
+	const router = useRouter();
 	const { changeStatus, status } = useLoading();
 	const { mutate } = useSWRConfig();
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
 	const didAutoScrollRef = useRef(false);
 	const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
-	const { register, handleSubmit, formState, setError, setValue, watch } =
+	const { register, handleSubmit, formState, setError, watch } =
 		useForm<DomainFormValues>({
 			resolver: valibotResolver(domainSchema) as Resolver<DomainFormValues>,
 			defaultValues: {
@@ -115,7 +111,7 @@ export const AddDomainSidebar = () => {
 	}, [hasDomainValue]);
 
 	const handleAddDomain = (domainId: string) => {
-		push(`/domain/add/${domainId}`);
+		router.push(`/domain/add/${domainId}`);
 	};
 
 	const onSubmit = async ({ domain, customReturnPath }: DomainFormValues) => {

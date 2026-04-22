@@ -1,6 +1,5 @@
 "use client";
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
-import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
@@ -13,6 +12,7 @@ import {
 import * as Tooltip from "@reloop/ui/tooltip";
 import { WEBHOOK_EVENTS } from "@reloop/webhook-events";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 
@@ -181,12 +181,12 @@ export const WebhookTable = ({
 	loadingRows = 3,
 	isTotalEmpty,
 }: WebhookTableProps) => {
-	const { push } = useUserOrganization();
+	const router = useRouter();
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 	const [deleteId, setDeleteId] = useQueryState("delete");
 
 	const handleViewDetails = (webhookId: string) => {
-		push(`/webhooks/${webhookId}`);
+		router.push(`/webhooks/${webhookId}`);
 	};
 
 	const handleDeleteWebhook = (webhookId: string) => {

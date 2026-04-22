@@ -5,6 +5,7 @@ import { useUIStore } from "@fe/dashboard/store/use-ui-store";
 import { authClient } from "@reloop/auth/client";
 import { cn } from "@reloop/ui/cn";
 import { motion } from "motion/react";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import useSWR from "swr";
@@ -17,7 +18,8 @@ interface MainSidebarProps {
 }
 
 export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
-	const { user, activeOrganization, push } = useUserOrganization();
+	const { user, activeOrganization } = useUserOrganization();
+	const router = useRouter();
 	const { isSidebarCollapsed, setIsSidebarCollapsed, toggleSidebarCollapse } =
 		useUIStore();
 	const { refetch } = authClient.useSession();
@@ -50,7 +52,7 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
 			activeOrganizationId: organization.id,
 		});
 		refetch();
-		push(organization.slug, true);
+		router.push("/");
 	};
 
 	return (

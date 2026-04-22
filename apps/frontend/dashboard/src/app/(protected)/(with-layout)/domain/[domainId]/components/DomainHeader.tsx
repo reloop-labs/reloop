@@ -3,7 +3,6 @@
 import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
 import { AnimatedClock } from "@fe/dashboard/components/animated-clock";
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
-import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { getStatusColorClass, getStatusIcon } from "@fe/dashboard/utils/domain";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import type { Domain, DomainStatus } from "@reloop/api/types";
@@ -17,6 +16,7 @@ import {
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
+import { useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 import { DeleteDomainModal } from "../../components/delete-domain";
@@ -49,7 +49,7 @@ export const DomainHeader = ({
 	isLoading,
 	isFailed,
 }: DomainHeaderProps) => {
-	const { push } = useUserOrganization();
+	const router = useRouter();
 	const [, setDeleteId] = useQueryState("delete");
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
@@ -61,7 +61,7 @@ export const DomainHeader = ({
 
 	return (
 		<div className="pt-10">
-			<AnimatedBackButton onClick={() => push("/domain")} />
+			<AnimatedBackButton onClick={() => router.push("/domain")} />
 			<div className="flex items-center justify-between pt-6">
 				<div>
 					{isLoading ? (

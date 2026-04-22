@@ -1,10 +1,9 @@
 "use client";
 import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
-import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import useSWR from "swr";
 import { TriggerWebhookTester } from "../../components/trigger-webhook-tester";
 
@@ -47,7 +46,7 @@ const getStatusIcon = (status: string) => {
 
 const WebhookTestPage = () => {
 	const { webhookId } = useParams();
-	const { push } = useUserOrganization();
+	const router = useRouter();
 
 	const { data: webhookData, isLoading } = useSWR<WebhookData>(
 		webhookId ? `/api/webhook/v1/${webhookId}` : null,
@@ -62,7 +61,7 @@ const WebhookTestPage = () => {
 			{/* Header — matches webhook-header.tsx pattern */}
 			<div className="pt-6">
 				<AnimatedBackButton
-					onClick={() => push(`/webhooks/${webhookId as string}`)}
+					onClick={() => router.push(`/webhooks/${webhookId as string}`)}
 				/>
 
 				<div className="flex items-center justify-between pt-4">

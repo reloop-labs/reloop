@@ -1,7 +1,6 @@
 "use client";
 import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
-import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
@@ -14,6 +13,7 @@ import {
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { WEBHOOK_EVENTS } from "@reloop/webhook-events";
+import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { EditWebhookModal } from "../../components/edit-webhook-modal";
@@ -103,7 +103,7 @@ export const WebhookHeader = ({
 	onDeleteWebhook,
 	onTriggerTest,
 }: WebhookHeaderProps) => {
-	const { push } = useUserOrganization();
+	const router = useRouter();
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 	const [copiedSecret, setCopiedSecret] = useState(false);
 	const [isSecretVisible, setIsSecretVisible] = useState(false);
@@ -177,7 +177,7 @@ export const WebhookHeader = ({
 	if (!webhook && !isLoading) {
 		return (
 			<div className="pt-10 pb-8">
-				<AnimatedBackButton onClick={() => push("/webhooks")} />
+				<AnimatedBackButton onClick={() => router.push("/webhooks")} />
 				<div className="flex items-center justify-between pt-6">
 					<div>
 						<div className="flex items-center gap-1.5">
@@ -220,7 +220,7 @@ export const WebhookHeader = ({
 	return (
 		<>
 			<div className="pt-10 pb-8">
-				<AnimatedBackButton onClick={() => push("/webhooks")} />
+				<AnimatedBackButton onClick={() => router.push("/webhooks")} />
 				<div className="flex items-center justify-between pt-6">
 					<div>
 						{isLoading ? (

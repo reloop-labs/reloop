@@ -1,5 +1,4 @@
 "use client";
-import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import type { DomainResponse } from "@reloop/api";
 import * as Alert from "@reloop/ui/alert";
 import * as Button from "@reloop/ui/button";
@@ -19,9 +18,9 @@ const NewDomainPage = () => {
 	const [isVerifying, setIsVerifying] = React.useState(false);
 	const [isUpdatingSending, setIsUpdatingSending] = React.useState(false);
 	const [isUpdatingReceiving, setIsUpdatingReceiving] = React.useState(false);
-	const { push } = useUserOrganization();
 	const { domainId } = useParams();
-	const { back } = useRouter();
+	const router = useRouter();
+	const { back } = router;
 
 	const { data: domainData, isLoading } = useSWR<DomainResponse>(
 		domainId ? `/api/domain/v1/${domainId}` : null,
@@ -63,7 +62,7 @@ const NewDomainPage = () => {
 			);
 
 			// Navigate to domain detail page to see verification progress
-			push("/domain");
+			router.push("/domain");
 		} catch (error) {
 			const errorMessage = axios.isAxiosError(error)
 				? error.response?.data?.message || "Failed to start DNS verification"
@@ -218,7 +217,10 @@ const NewDomainPage = () => {
 						<Switch.Root
 							checked={domainData?.sendingEmail ?? true}
 							onCheckedChange={(value) =>
-								handleUpdateDomain({ sendingEmail: value }, setIsUpdatingSending)
+								handleUpdateDomain(
+									{ sendingEmail: value },
+									setIsUpdatingSending,
+								)
 							}
 							disabled={isLoading || isUpdatingSending}
 							checkedColor="orange"
