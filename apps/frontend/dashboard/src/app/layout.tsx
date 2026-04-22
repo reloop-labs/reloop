@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import SWRProvider from "@fe/dashboard/providers/swr.config";
-import { IconsSprite } from "@reloop/ui/icon";
-import * as Tooltip from "@reloop/ui/tooltip";
-
-import localFont from "next/font/local";
 import { ThemeProvider } from "@fe/dashboard/providers/theme-provider";
+import { IconsSprite } from "@reloop/ui/icon";
+import { Toaster } from "@reloop/ui/toast";
+import * as Tooltip from "@reloop/ui/tooltip";
+import localFont from "next/font/local";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 const openRunde = localFont({
@@ -58,6 +58,7 @@ export default function RootLayout({
 						<SWRProvider>
 							<Tooltip.Provider>{children}</Tooltip.Provider>
 							<IconsSprite />
+							<Toaster />
 						</SWRProvider>
 					</ThemeProvider>
 				</NuqsAdapter>
