@@ -68,7 +68,7 @@ kumo.on('smtp_server_message_received', function(msg)
   })
 
   local status, response = pcall(function()
-    local req = client:post(constants.base_url .. "/api/kumomta/v1/log-incoming")
+    local req = client:post(constants.kumomta_url .. "/api/kumomta/v1/log-incoming")
     return req
       :header("x-kumomta-key", constants.kumomta_key)
       :header("Content-Type", "application/json")
@@ -89,11 +89,11 @@ kumo.on('smtp_server_message_received', function(msg)
   end)
 
   if not status then
-    kumo.log_error("FAILED: " .. tostring(response))
+    print("FAILED: " .. tostring(response))
     kumo.reject(451, "4.3.0 Temporary failure contacting log-incoming endpoint: " .. tostring(response))
     return
   else
-    kumo.log_info("RESULT: SUCCESS")
+    print("RESULT: SUCCESS")
   end
 
   local code = response:status_code()

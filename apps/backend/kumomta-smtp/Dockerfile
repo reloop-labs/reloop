@@ -1,5 +1,7 @@
 FROM ghcr.io/kumocorp/kumomta:latest
 
+RUN apt-get update && apt-get install -y curl iputils-ping && rm -rf /var/lib/apt/lists/*
+
 # Copy the configuration files to the expected location
 COPY init.lua /opt/kumomta/etc/policy/init.lua
 COPY policy /opt/kumomta/etc/policy/policy
