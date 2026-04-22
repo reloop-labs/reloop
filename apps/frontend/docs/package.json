@@ -8,6 +8,7 @@
 		"start": "next start"
 	},
 	"dependencies": {
+		"@mintlify/components": "catalog:ui",
 		"@radix-ui/react-collapsible": "catalog:ui",
 		"@radix-ui/react-dialog": "catalog:ui",
 		"@radix-ui/react-popover": "catalog:ui",
@@ -16,17 +17,19 @@
 		"@reloop/ui": "workspace:*",
 		"ajv": "catalog:ui",
 		"class-variance-authority": "catalog:ui",
+		"framer-motion": "^12.38.0",
+		"gray-matter": "^4.0.3",
 		"hast-util-to-jsx-runtime": "catalog:ui",
 		"lru-cache": "catalog:ui",
 		"lucide-react": "catalog:ui",
 		"next": "catalog:ui",
+		"next-mdx-remote": "^6.0.0",
 		"next-themes": "catalog:ui",
 		"react": "catalog:ui",
 		"react-dom": "catalog:ui",
 		"shiki": "catalog:ui",
 		"tailwind-merge": "catalog:ui",
-		"zod": "catalog:ui",
-		"@mintlify/components": "catalog:ui"
+		"zod": "catalog:ui"
 	},
 	"devDependencies": {
 		"@types/node": "catalog:",

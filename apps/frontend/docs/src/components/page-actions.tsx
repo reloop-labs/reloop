@@ -10,7 +10,7 @@ import {
 	FileText,
 	Terminal,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const cache = new Map<string, string>();
 

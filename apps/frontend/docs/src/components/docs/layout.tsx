@@ -1,9 +1,9 @@
 "use client";
 
-import type { PageTreeItem } from "../../lib/types";
 import type { ReactNode } from "react";
-import { Sidebar } from "./sidebar";
+import type { PageTreeItem } from "../../lib/types";
 import { Navbar } from "./navbar";
+import { Sidebar } from "./sidebar";
 
 interface DocsLayoutProps {
 	children: ReactNode;
@@ -12,11 +12,14 @@ interface DocsLayoutProps {
 
 export function DocsLayout({ children, tree }: DocsLayoutProps) {
 	return (
-		<div className="flex h-screen w-full flex-col overflow-hidden bg-white">
+		<div className="flex h-[100dvh] w-full flex-col overflow-hidden bg-fd-background">
 			<Navbar />
-			<div className="mx-auto flex w-full max-w-[1440px] flex-1 overflow-hidden md:grid md:grid-cols-[240px_minmax(0,1fr)]">
+			<div className="mx-auto flex h-full min-h-0 w-full max-w-[1440px] flex-1 flex-row overflow-hidden">
 				<Sidebar tree={tree} />
-				<main id="nd-page" className="relative flex-1 overflow-y-auto overflow-x-hidden">
+				<main
+					id="nd-page"
+					className="relative h-full min-w-0 flex-1 overflow-y-auto overflow-x-hidden"
+				>
 					{children}
 				</main>
 			</div>

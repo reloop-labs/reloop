@@ -1,7 +1,7 @@
 import "./global.css";
 import { IconsSprite } from "@reloop/ui/icon";
-import { ThemeProvider } from "next-themes";
 import localFont from "next/font/local";
+import { ThemeProvider } from "next-themes";
 import type { ReactNode } from "react";
 import { cn } from "../lib/cn";
 
@@ -57,4 +57,3 @@ export default function Layout({ children }: { children: ReactNode }) {
 		</html>
 	);
 }
-

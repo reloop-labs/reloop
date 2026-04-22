@@ -21,7 +21,7 @@ export function Navbar() {
 	];
 
 	return (
-		<header className="z-50 w-full shrink-0 border-[#f5f5f5] border-b bg-white">
+		<header className="z-50 w-full shrink-0 border-fd-border border-b bg-fd-background">
 			<div className="mx-auto flex h-12 max-w-[1440px] items-center justify-between pr-3">
 				{/* Left side: Logo + Nav tabs */}
 				<div className="flex flex-1 items-center">
@@ -46,8 +46,8 @@ export function Navbar() {
 									className={cn(
 										"flex h-8 items-center gap-1.5 rounded-lg px-2.5 font-medium text-sm transition-colors",
 										active
-											? "text-[#171717]"
-											: "text-[#5c5c5c] hover:bg-[#a3a3a30d] hover:text-[#171717]",
+											? "text-fd-foreground"
+											: "text-fd-muted-foreground hover:bg-fd-foreground/5 hover:text-fd-foreground",
 									)}
 								>
 									<Icon
@@ -68,13 +68,13 @@ export function Navbar() {
 					<div className="ml-2 hidden items-center gap-3 sm:flex">
 						<Link
 							href="https://dashboard.reloop.sh/login"
-							className="font-medium text-[#5c5c5c] text-sm transition-colors hover:text-[#171717]"
+							className="font-medium text-fd-muted-foreground text-sm transition-colors hover:text-fd-foreground"
 						>
 							Sign In
 						</Link>
 						<Link
 							href="https://dashboard.reloop.sh/signup"
-							className="inline-flex h-8 items-center justify-center rounded-full bg-[#171717] px-4 font-semibold text-sm text-white transition-all hover:bg-[#333] active:scale-[0.98]"
+							className="inline-flex h-8 items-center justify-center rounded-full bg-fd-foreground px-4 font-semibold text-sm text-fd-background transition-all hover:opacity-90 active:scale-[0.98]"
 						>
 							Get Started
 						</Link>

@@ -16,27 +16,52 @@ import {
 	TurborepoIcon,
 	TypeScriptIcon,
 } from "@reloop/fe-docs/components/icons/Tech";
+import { Card, Cards } from "@reloop/fe-docs/components/mdx/cards";
 import { PageActions } from "@reloop/fe-docs/components/page-actions";
 import { source } from "@reloop/fe-docs/lib/source";
 import type { PageTreeItem, TOCItem } from "@reloop/fe-docs/lib/types";
 import { getMDXComponents } from "@reloop/fe-docs/mdx-components";
 import { Icon } from "@reloop/ui/icon";
-import { notFound } from "next/navigation";
+import { ChevronRight } from "lucide-react";
+import { notFound, redirect } from "next/navigation";
+
+function getBreadcrumbs(
+	tree: PageTreeItem[],
+	slugPath: string,
+	parentPath: string[] = [],
+): string[] {
+	const targetUrl = `/${slugPath === "index" ? "introduction" : slugPath}`;
+	for (const item of tree) {
+		if (item.type === "page" && item.url === targetUrl) {
+			return [...parentPath, item.name as string];
+		}
+
+		if (item.type === "folder") {
+			const found = getBreadcrumbs(item.children, slugPath, [
+				...parentPath,
+				item.name as string,
+			]);
+			if (found.length) return found;
+		}
+	}
+	return [];
+}
 
 export async function generateMetadata(props: {
 	params: Promise<{ slug?: string[] }>;
 }) {
 	const params = await props.params;
-	if (!params.slug || params.slug.length === 0) {
-		return {
-			title: "Reloop - Modern Email Infrastructure",
-			description:
-				"The modern email infrastructure for developers. Build, send, and track emails with ease.",
-		};
-	}
 
 	const page = source.getPage(params.slug);
-	if (!page) notFound();
+	if (!page) {
+		if (!params.slug || params.slug.length === 0) {
+			return {
+				title: "Reloop - Modern Email Infrastructure",
+				description: "The modern email infrastructure for developers.",
+			};
+		}
+		notFound();
+	}
 
 	return {
 		title: page.data.title,
@@ -53,9 +78,20 @@ export default async function Page(props: {
 	params: Promise<{ slug?: string[] }>;
 }) {
 	const params = await props.params;
+
+	if (!params.slug || params.slug.length === 0) {
+		redirect("/introduction");
+	}
+
 	const page = source.getPage(params.slug);
 	if (!page) notFound();
 	const MDXContent = page.data.body;
+
+	const slugPath = params.slug?.join("/") || "index";
+	const breadcrumbs = getBreadcrumbs(
+		source.pageTree.children as PageTreeItem[],
+		slugPath,
+	);
 
 	return (
 		<DocsLayout tree={source.pageTree.children as PageTreeItem[]}>
@@ -63,23 +99,40 @@ export default async function Page(props: {
 				{/* Main content area */}
 				<div className="min-w-0 px-6 py-8 md:px-10 lg:px-16">
 					{/* Breadcrumb */}
-					<div className="mb-2 text-[13px] font-medium text-fd-muted-foreground">
-						Documentation
-					</div>
+					{breadcrumbs.length > 0 ? (
+						<div className="mb-2 flex items-center gap-1.5 font-medium text-[13px] text-fd-muted-foreground">
+							{breadcrumbs.map((crumb, i) => (
+								<div key={i} className="flex items-center gap-1.5">
+									{i > 0 && <ChevronRight className="h-3.5 w-3.5" />}
+									<span
+										className={
+											i === breadcrumbs.length - 1 ? "text-fd-foreground" : ""
+										}
+									>
+										{crumb}
+									</span>
+								</div>
+							))}
+						</div>
+					) : (
+						<div className="mb-2 font-medium text-[13px] text-fd-muted-foreground">
+							Documentation
+						</div>
+					)}
 
 					{/* Title row */}
-					<div className="flex items-start justify-between gap-4 mb-6">
+					<div className="mb-6 flex items-start justify-between gap-4">
 						<div>
 							<h1 className="font-bold text-3xl text-fd-foreground tracking-tight sm:text-[32px]">
 								{page.data.title}
 							</h1>
 							{page.data.description && (
-								<p className="mt-2 text-[16px] leading-relaxed text-fd-muted-foreground">
+								<p className="mt-2 text-[16px] text-fd-muted-foreground leading-relaxed">
 									{page.data.description}
 								</p>
 							)}
 						</div>
-						<div className="shrink-0 mt-1">
+						<div className="mt-1 shrink-0">
 							<PageActions markdownUrl={`${page.url}.mdx`} />
 						</div>
 					</div>
@@ -102,6 +155,8 @@ export default async function Page(props: {
 								KubernetesIcon: KubernetesIcon,
 								DockerIcon: DockerIcon,
 								TypeScriptIcon: TypeScriptIcon,
+								Cards: Cards,
+								Card: Card,
 							})}
 						/>
 					</DocsBody>
@@ -109,7 +164,7 @@ export default async function Page(props: {
 
 				{/* Right sidebar - Table of Contents */}
 				<aside className="hidden xl:block">
-					<div className="sticky top-20 pr-6 pt-8">
+					<div className="sticky top-20 pt-8 pr-6">
 						<TableOfContents items={page.data.toc as TOCItem[]} />
 					</div>
 				</aside>
