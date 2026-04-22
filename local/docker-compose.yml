@@ -88,6 +88,9 @@ services:
     ports:
       - "25:25"      # ESMTP injection
       - "8020:8000"  # HTTP API
+    volumes:
+      - ../docker-data/kumomta/data:/var/spool/kumomta/data
+      - ../docker-data/kumomta/meta:/var/spool/kumomta/meta
     environment:
       - X_KUMOMTA_KEY=${X_KUMOMTA_KEY:-reloop}
       - BASE_URL=${BASE_URL:-http://local.reloop.sh}
