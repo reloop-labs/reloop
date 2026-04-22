@@ -8,7 +8,7 @@ if (!process.env.NODE_TLS_REJECT_UNAUTHORIZED)
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 export const webhookConfig = {
-  port: Number(process.env.PORT) || 8013,
+  port: Number(process.env.PORT || 8013),
   PG_URL: process.env.PG_URL,
   REDIS_URL: process.env.REDIS_URL,
   BASE_URL: process.env.BASE_URL,
