@@ -161,7 +161,7 @@ import MailComposer from "nodemailer/lib/mail-composer";
  */
 async function buildRfcMessage(options: SendEmailOptions): Promise<string> {
 	const emailLogId = options.customHeaders?.["X-Email-Log-ID"];
-	const trackingBaseUrl = mailConfig.TRACKING_BASE_URL.replace(/\/+$/, "");
+	const trackingBaseUrl = mailConfig.BASE_URL.replace(/\/+$/, "");
 	let html = options.html;
 
 	if (emailLogId && html) {

@@ -13,7 +13,6 @@ export const mailConfig = {
   REDIS_URL: process.env.REDIS_URL,
   BASE_URL: process.env.BASE_URL,
   KUMOMTA_HTTP_URL: process.env.KUMOMTA_HTTP_URL || "http://localhost:8020",
-  TRACKING_BASE_URL: process.env.TRACKING_BASE_URL || "http://localhost:8015",
   SMTP_USER: process.env.SMTP_USER,
   SMTP_PASS: process.env.SMTP_PASS,
   NODE_ENV: process.env.NODE_ENV || "development",
