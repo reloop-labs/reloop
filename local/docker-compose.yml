@@ -70,7 +70,7 @@ services:
       - ../docker-data/caddy:/config
     restart: unless-stopped
     extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - "local.reloop.sh:host-gateway"
 
   reloop-mailpit:
     image: axllent/mailpit:latest
