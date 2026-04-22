@@ -1,7 +1,8 @@
 FROM ghcr.io/kumocorp/kumomta:latest
 
-# Copy the configuration file to the expected location
+# Copy the configuration files to the expected location
 COPY init.lua /opt/kumomta/etc/policy/init.lua
+COPY policy /opt/kumomta/etc/policy/policy
 
 # Create spool directories and set permissions
 RUN mkdir -p /var/spool/kumomta/data /var/spool/kumomta/meta \
