@@ -15,12 +15,22 @@ log_hooks:new {
     }
 
     function connection:send(message)
-      local response = client
-        :post(constants.base_url .. '/api/kumomta/v1/webhook/kumomta')
-        :header('Content-Type', 'application/json')
-        :header('x-kumomta-key', constants.kumomta_key)
-        :body('[' .. message:get_data() .. ']')
-        :send()
+      local ok, response = pcall(function()
+        return client
+          :post(constants.base_url .. '/api/kumomta/v1/webhook/kumomta')
+          :header('Content-Type', 'application/json')
+          :header('x-kumomta-key', constants.kumomta_key)
+          :body('[' .. message:get_data() .. ']')
+          :send()
+      end)
+
+      if not ok then
+        kumo.log_error("FAILED: " .. tostring(response))
+        kumo.reject(500, "Temporary failure contacting webhook endpoint: " .. tostring(response))
+        return
+      else
+        kumo.log_info("RESULT: SUCCESS")
+      end
 
       local disposition = string.format(
         '%d %s: %s',

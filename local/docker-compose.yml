@@ -91,11 +91,14 @@ services:
     volumes:
       - ../docker-data/kumomta/data:/var/spool/kumomta/data
       - ../docker-data/kumomta/meta:/var/spool/kumomta/meta
+      - ../apps/backend/kumomta-smtp/init.lua:/opt/kumomta/etc/policy/init.lua
+      - ../apps/backend/kumomta-smtp/policy:/opt/kumomta/etc/policy/policy
     environment:
       - X_KUMOMTA_KEY=${X_KUMOMTA_KEY:-reloop}
       - BASE_URL=${BASE_URL:-https://local.reloop.sh}
     extra_hosts:
       - "host.docker.internal:host-gateway"
+      - "local.reloop.sh:host-gateway"
     depends_on:
       reloop-mailpit:
         condition: service_started

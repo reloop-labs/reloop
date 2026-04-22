@@ -89,9 +89,11 @@ kumo.on('smtp_server_message_received', function(msg)
   end)
 
   if not status then
-    print("[LOG-INCOMING] pcall failed: " .. tostring(response))
-    kumo.reject(451, "4.3.0 Temporary failure contacting log-incoming endpoint")
+    kumo.log_error("FAILED: " .. tostring(response))
+    kumo.reject(451, "4.3.0 Temporary failure contacting log-incoming endpoint: " .. tostring(response))
     return
+  else
+    kumo.log_info("RESULT: SUCCESS")
   end
 
   local code = response:status_code()
