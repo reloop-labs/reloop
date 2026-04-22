@@ -2,7 +2,8 @@ local kumo = require 'kumo'
 local log_hooks = require 'policy-extras.log_hooks'
 
 local kumomta_key = os.getenv("X_KUMOMTA_KEY") or "reloop"
-local kumomta_endpoint = os.getenv("KUMOMTA_ENDPOINT") or "http://local.reloop.sh"
+local base_url = os.getenv("BASE_URL") or "http://local.reloop.sh"
+local kumomta_endpoint = os.getenv("KUMOMTA_ENDPOINT") or base_url
 
 local function url_encode(str)
   if str then
@@ -15,7 +16,7 @@ local function url_encode(str)
   return str
 end
 
-local tracking_url = os.getenv("TRACKING_BASE_URL") or kumomta_endpoint
+local tracking_url = os.getenv("TRACKING_BASE_URL") or base_url
 
 local function inject_tracking(data, email_log_id)
   local tracking_base_url = tracking_url:gsub("/+$", "")

@@ -81,7 +81,8 @@ kumo.on('smtp_server_message_received', function(msg)
   end
 
   local kumomta_key = os.getenv("X_KUMOMTA_KEY") or "reloop"
-  local kumomta_endpoint = os.getenv("KUMOMTA_ENDPOINT") or "http://local.reloop.sh"
+  local base_url = os.getenv("BASE_URL") or "http://local.reloop.sh"
+  local kumomta_endpoint = os.getenv("KUMOMTA_ENDPOINT") or base_url
 
   local client = kumo.http.build_client({
     headers = {

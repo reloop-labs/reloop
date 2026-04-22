@@ -90,8 +90,7 @@ services:
       - "8020:8000"  # HTTP API
     environment:
       - X_KUMOMTA_KEY=${X_KUMOMTA_KEY:-reloop}
-      - KUMOMTA_ENDPOINT=${KUMOMTA_ENDPOINT:-http://host.docker.internal:8021}
-      - TRACKING_BASE_URL=${TRACKING_BASE_URL:-http://localhost:8015}
+      - BASE_URL=${BASE_URL:-http://local.reloop.sh}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
