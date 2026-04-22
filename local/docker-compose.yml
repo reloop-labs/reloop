@@ -93,7 +93,7 @@ services:
       - ../docker-data/kumomta/meta:/var/spool/kumomta/meta
     environment:
       - X_KUMOMTA_KEY=${X_KUMOMTA_KEY:-reloop}
-      - BASE_URL=${BASE_URL:-http://local.reloop.sh}
+      - BASE_URL=${BASE_URL:-https://local.reloop.sh}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:

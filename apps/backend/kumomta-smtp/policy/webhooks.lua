@@ -10,11 +10,13 @@ log_hooks:new {
   },
   constructor = function(domain, tenant, campaign)
     local connection = {}
-    local client = kumo.http.build_client {}
+    local client = kumo.http.build_client {
+      danger_accept_invalid_certs = true,
+    }
 
     function connection:send(message)
       local response = client
-        :post(constants.kumomta_endpoint .. '/api/kumomta/v1/webhook/kumomta')
+        :post(constants.base_url .. '/api/kumomta/v1/webhook/kumomta')
         :header('Content-Type', 'application/json')
         :header('x-kumomta-key', constants.kumomta_key)
         :body('[' .. message:get_data() .. ']')

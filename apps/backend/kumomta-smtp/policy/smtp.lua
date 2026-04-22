@@ -60,6 +60,7 @@ kumo.on('smtp_server_message_received', function(msg)
   end
 
   local client = kumo.http.build_client({
+    danger_accept_invalid_certs = true,
     headers = {
       ["x-kumomta-key"] = constants.kumomta_key,
       ["Content-Type"] = "application/json"
