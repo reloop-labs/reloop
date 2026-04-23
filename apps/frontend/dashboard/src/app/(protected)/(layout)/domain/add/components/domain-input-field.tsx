@@ -1,11 +1,9 @@
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
-import * as Tooltip from "@reloop/ui/tooltip";
 import * as React from "react";
 import type { FieldErrors, UseFormRegister } from "react-hook-form";
 import type { DomainFormValues } from "../schema";
-import { ProTip } from "./pro-tip";
 
 interface DomainInputFieldProps {
 	register: UseFormRegister<DomainFormValues>;
@@ -20,11 +18,18 @@ export const DomainInputField = ({
 	isLoading,
 	domain,
 }: DomainInputFieldProps) => {
-	const isRootDomain = React.useMemo(() => {
-		if (!domain) return false;
-		const parts = domain.split(".").filter(Boolean);
-		return parts.length > 0 && parts.length <= 2;
+	const domainParts = React.useMemo(() => {
+		if (!domain) return [];
+		return domain.split(".").filter(Boolean);
 	}, [domain]);
+
+	const criteria = React.useMemo(() => {
+		return {
+			isSubdomain: domainParts.length > 2,
+			isNotRoot: domainParts.length > 2,
+			isValid: domainParts.length >= 2 && !!domain?.includes("."),
+		};
+	}, [domain, domainParts]);
 
 	return (
 		<section className="space-y-1">
@@ -51,25 +56,75 @@ export const DomainInputField = ({
 							disabled={isLoading}
 						/>
 
-						{isRootDomain && (
-							<Tooltip.Root>
-								<Tooltip.Trigger asChild>
-									<Input.Icon className="cursor-help">
-										<Icon name="bulb" className="h-4 w-4 text-yellow-500" />
-									</Input.Icon>
-								</Tooltip.Trigger>
-								<Tooltip.Content
-									side="top"
-									align="end"
-									variant="light"
-									className="border-none p-0 shadow-none"
-								>
-									<ProTip />
-								</Tooltip.Content>
-							</Tooltip.Root>
+						{criteria.isSubdomain && (
+							<Input.Icon>
+								<Icon name="check-circle" className="h-4 w-4 text-green-500" />
+							</Input.Icon>
+						)}
+
+						{!criteria.isSubdomain && domainParts.length > 0 && (
+							<Input.Icon>
+								<Icon
+									name="alert-triangle"
+									className="h-4 w-4 text-orange-500"
+								/>
+							</Input.Icon>
 						)}
 					</Input.Wrapper>
 				</Input.Root>
+
+				{domainParts.length === 2 && (
+					<div className="mt-2 space-y-2">
+						<div className="font-medium text-text-sub-600 text-xs">
+							Domain Recommendations:
+						</div>
+						<div className="space-y-1.5">
+							<div className="flex items-center gap-2 text-text-sub-600 text-xs">
+								{criteria.isSubdomain ? (
+									<Icon
+										name="check-circle"
+										className="h-4 w-4 text-green-500"
+									/>
+								) : (
+									<Icon
+										name="cross-circle"
+										className="h-4 w-4 text-text-soft-400"
+									/>
+								)}
+								Use a subdomain (e.g., mail.{domain}, send.{domain}, m.{domain})
+							</div>
+							<div className="flex items-center gap-2 text-text-sub-600 text-xs">
+								{criteria.isNotRoot ? (
+									<Icon
+										name="check-circle"
+										className="h-4 w-4 text-green-500"
+									/>
+								) : (
+									<Icon
+										name="cross-circle"
+										className="h-4 w-4 text-text-soft-400"
+									/>
+								)}
+								Avoid using your root domain
+							</div>
+							<div className="flex items-center gap-2 text-text-sub-600 text-xs">
+								{criteria.isValid ? (
+									<Icon
+										name="check-circle"
+										className="h-4 w-4 text-green-500"
+									/>
+								) : (
+									<Icon
+										name="cross-circle"
+										className="h-4 w-4 text-text-soft-400"
+									/>
+								)}
+								Valid domain format
+							</div>
+						</div>
+					</div>
+				)}
+
 				{errors.domain && (
 					<div className="mt-2 flex items-center gap-2">
 						<Icon name="alert-circle" className="h-4 w-4 text-red-500" />
