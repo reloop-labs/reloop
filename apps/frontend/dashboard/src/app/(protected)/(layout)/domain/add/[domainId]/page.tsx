@@ -46,19 +46,13 @@ const NewDomainPage = () => {
 
 		setIsVerifying(true);
 		try {
-			// Trigger Inngest workflow for background verification
 			await axios.post(`/api/domain/v1/verify/${domainId}`, undefined, {
 				headers: { credentials: "include" },
 			});
-
-			// Refresh domain data to get "verifying" status
 			await mutate(`/api/domain/v1/${domainId}`);
-
 			toast.success(
 				"DNS verification started! Verification will continue in the background.",
 			);
-
-			// Navigate to domain list page
 			router.push("/domain");
 		} catch (error) {
 			const errorMessage = axios.isAxiosError(error)
@@ -109,7 +103,7 @@ const NewDomainPage = () => {
 	) {
 		return (
 			<div className="mx-auto max-w-3xl pt-10 pb-8 sm:px-8">
-				<NewDomainEmptyState onBack={() => router.back()} />
+				<NewDomainEmptyState />
 			</div>
 		);
 	}

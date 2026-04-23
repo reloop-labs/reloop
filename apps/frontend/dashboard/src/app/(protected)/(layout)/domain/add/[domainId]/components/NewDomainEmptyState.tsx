@@ -2,44 +2,74 @@
 
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type * as React from "react";
-import { NewDomainHeader } from "./NewDomainHeader";
+import { useHotkeys } from "react-hotkeys-hook";
 
-interface NewDomainEmptyStateProps {
-	onBack: () => void;
-}
+export const NewDomainEmptyState: React.FC = () => {
+	const router = useRouter();
 
-export const NewDomainEmptyState: React.FC<NewDomainEmptyStateProps> = ({
-	onBack,
-}) => {
+	useHotkeys("mod+b", () => router.push("/domain"));
+	useHotkeys("mod+a", (e) => {
+		e.preventDefault();
+		router.push("/domain/add");
+	});
+
 	return (
-		<>
-			<Button.Root
-				onClick={onBack}
-				variant="neutral"
-				mode="stroke"
-				size="xxsmall"
-			>
-				<Button.Icon>
-					<Icon name="chevron-left" className="h-4 w-4" />
-				</Button.Icon>
-				Back
-			</Button.Root>
-			<NewDomainHeader
-				title="Add Domain"
-				description="You need a domain to send emails from your own domain"
-				action={{
-					label: "Go to docs",
-					onClick: () => window.open("https://reloop.sh/docs/domain", "_blank"),
-					icon: "file-text",
-				}}
-			/>
-			<div className="mt-6 rounded-lg border border-yellow-200 bg-yellow-50 p-4">
-				<p className="text-yellow-800">
-					No DNS records found for this domain. Please generate DNS records
-					first.
+		<div className="flex flex-col items-center justify-center">
+			<div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
+				<Icon name="search" className="h-8 w-8 text-text-sub-600" />
+			</div>
+			<div className="text-center">
+				<h3 className="mb-2 font-semibold text-2xl text-text-strong-950">
+					No DNS records found
+				</h3>
+				<p className="mx-auto mb-8 max-w-[440px] text-balance font-medium text-paragraph-md text-text-sub-600">
+					We couldn't find any DNS records for this domain. This might be
+					because the domain is brand new or there was a typo during the setup.
 				</p>
 			</div>
-		</>
+			<div className="flex items-center gap-3">
+				<Button.Root
+					onClick={() => router.push("/domain")}
+					variant="neutral"
+					size="xsmall"
+					className="gap-2 rounded-lg"
+				>
+					<Icon name="arrow-left" className="h-4 w-4" />
+					Back to domains
+					<span className="inline-flex items-center gap-0.5 opacity-60">
+						<Icon
+							name="command"
+							className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+						/>
+						<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-100/20 p-px font-medium text-[10px] uppercase">
+							d
+						</span>
+					</span>
+				</Button.Root>
+				<Link
+					className={`${Button.buttonVariants({
+						variant: "neutral",
+						mode: "stroke",
+						size: "xsmall",
+					}).root()}`}
+					href={"/domain/add"}
+				>
+					<Icon name="plus" className="h-4 w-4" />
+					Add domain
+					<span className="inline-flex items-center gap-0.5">
+						<Icon
+							name="command"
+							className="h-4 w-4 rounded-sm border border-stroke-soft-200 p-px"
+						/>
+						<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-200 p-px font-medium text-[10px] uppercase">
+							a
+						</span>
+					</span>
+				</Link>
+			</div>
+		</div>
 	);
 };
