@@ -1,5 +1,4 @@
 "use client";
-import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
@@ -40,15 +39,13 @@ export const SettingsTabs = () => {
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 	const pathname = usePathname();
 	const router = useRouter();
-	const pathWithoutSlug = pathname.replace(/^\/[^/]+/, "") || "/";
-	const activeIndex = list.findIndex((item) => item.path === pathWithoutSlug);
+	const activeIndex = list.findIndex((item) => item.path === pathname);
 	const currentIdx = hoveredIdx !== undefined ? hoveredIdx : activeIndex;
 	const tab = buttonRefs.current[currentIdx];
 	const rect = tab?.getBoundingClientRect();
 
 	const getTabValue = (pathname: string) => {
-		const pathWithoutSlug = pathname.replace(/^\/[^/]+/, "") || "/";
-		return pathWithoutSlug;
+		return pathname;
 	};
 
 	return (

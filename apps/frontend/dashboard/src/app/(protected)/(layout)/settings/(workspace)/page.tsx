@@ -12,6 +12,7 @@ import Spinner from "@reloop/ui/spinner";
 import axios from "axios";
 import type React from "react";
 import { useRef, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { mutate } from "swr";
 
@@ -151,18 +152,14 @@ const SettingsPage = () => {
 
 	const handleSaveChanges = async () => {
 		if (!hasChanges) return;
-
-		// Validate slug
 		if (slugStatus === "taken") {
 			toast.error("Please choose a different slug");
 			return;
 		}
-
 		if (slugStatus === "checking") {
 			toast.error("Please wait for slug validation to complete");
 			return;
 		}
-
 		setIsSaving(true);
 		try {
 			const normalizedSlug = slug.toLowerCase().replace(/\s+/g, "-");
@@ -179,16 +176,9 @@ const SettingsPage = () => {
 				toast.error(error.message || "Failed to update workspace");
 				return;
 			}
-
-			// Refresh organization data - use global mutate to update all SWR consumers
 			await mutate("organizations");
 			mutateOrganizations();
 			toast.success("Workspace updated successfully");
-
-			// If slug changed, redirect to new URL
-			if (normalizedSlug !== activeOrganization.slug) {
-				window.location.href = `/dashboard/${normalizedSlug}/settings`;
-			}
 		} catch (error) {
 			console.error("Update error:", error);
 			toast.error("Failed to update workspace");
@@ -196,6 +186,24 @@ const SettingsPage = () => {
 			setIsSaving(false);
 		}
 	};
+
+	useHotkeys(
+		"mod+enter",
+		() => {
+			if (
+				hasChanges &&
+				slugStatus !== "taken" &&
+				slugStatus !== "checking" &&
+				!isUploading &&
+				!isSaving
+			) {
+				handleSaveChanges();
+			}
+		},
+		{
+			enableOnFormTags: true,
+		},
+	);
 
 	return (
 		<div className="w-full space-y-8 pt-5">
@@ -253,7 +261,6 @@ const SettingsPage = () => {
 								</p>
 								<Button.Root
 									variant="neutral"
-									mode="stroke"
 									size="xxsmall"
 									type="button"
 									onClick={handleFileUploadClick}

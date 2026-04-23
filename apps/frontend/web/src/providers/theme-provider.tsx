@@ -1,11 +1,8 @@
 "use client";
 
-import * as React from "react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
+import type * as React from "react";
 
-// React 19 introduced stricter warnings for rendering inline script tags.
-// next-themes uses a script tag to prevent FOUC, which triggers this warning during development.
-// This intercepts and suppresses that specific development warning so the Next.js overlay doesn't block the screen.
 if (typeof window !== "undefined" && process.env.NODE_ENV === "development") {
 	const origError = console.error;
 	console.error = (...args: unknown[]) => {
