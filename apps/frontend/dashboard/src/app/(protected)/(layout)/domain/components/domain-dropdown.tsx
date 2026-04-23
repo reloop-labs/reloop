@@ -71,7 +71,7 @@ export const DomainDropdown = ({
 					className="rounded p-1"
 				>
 					<Icon
-						name="more-vertical"
+						name="more-horizontal"
 						className="h-3 w-3 text-text-sub-600 hover:text-text-strong-950"
 					/>
 				</Button.Root>
