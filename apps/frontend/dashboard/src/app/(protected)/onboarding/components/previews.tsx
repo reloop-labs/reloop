@@ -24,7 +24,7 @@ interface SidebarPreviewProps {
 export const SidebarPreview = ({ name, logo, slug }: SidebarPreviewProps) => {
 	return (
 		<div className="absolute top-32 left-28">
-			<div className="relative flex h-[520px] w-[480px] flex-col overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-2xl">
+			<div className="relative flex h-[520px] w-[480px] flex-col overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 shadow-2xl dark:border-stroke-soft-100/40">
 				<div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-bg-white-0 to-transparent" />
 				<div className="flex items-center gap-2 border-stroke-soft-100 border-b bg-bg-white-0 p-3">
 					<div className="flex gap-1.5">
@@ -46,7 +46,7 @@ export const SidebarPreview = ({ name, logo, slug }: SidebarPreviewProps) => {
 									className="h-5 w-5 rounded-sm object-cover"
 								/>
 							) : (
-								<span className="flex h-6 w-6 items-center justify-center rounded-lg border border-stroke-soft-200 p-1 font-bold text-xs">
+								<span className="flex h-6 w-6 items-center justify-center rounded-lg border border-stroke-soft-100 p-1 font-bold text-xs dark:border-stroke-soft-100/40">
 									{name && name.length > 0 ? name[0]?.toUpperCase() : "W"}
 								</span>
 							)}
@@ -76,7 +76,7 @@ export const SidebarPreview = ({ name, logo, slug }: SidebarPreviewProps) => {
 							</div>
 						</div>
 
-						<div className="mt-auto border-stroke-soft-200 border-t pt-4">
+						<div className="mt-auto border-stroke-soft-100 border-t pt-4 dark:border-stroke-soft-100/40">
 							<div className="flex items-center gap-2 opacity-50">
 								<div className="h-8 w-8 rounded-full bg-bg-soft-200" />
 								<div className="flex-1 space-y-1">
@@ -272,7 +272,7 @@ const PROVIDERS: Record<ProviderKey, ProviderConfig> = {
 	vercel: {
 		name: "Vercel",
 		color: "from-zinc-100 to-zinc-50",
-		borderColor: "border-stroke-soft-200",
+		borderColor: "border-stroke-soft-100 dark:border-stroke-soft-100/40",
 		textColor: "text-text-strong-950",
 		icon: (
 			<svg
@@ -305,7 +305,7 @@ const PROVIDERS: Record<ProviderKey, ProviderConfig> = {
 	unknown: {
 		name: "DNS Provider",
 		color: "from-blue-50 to-indigo-50",
-		borderColor: "border-stroke-soft-200",
+		borderColor: "border-stroke-soft-100 dark:border-stroke-soft-100/40",
 		textColor: "text-primary-base",
 		icon: <Globe className="h-6 w-6 text-primary-base" />,
 		url: null,
@@ -370,7 +370,7 @@ export const DnsConfigPreview = ({ domain }: DnsConfigPreviewProps) => {
 							<div className="mb-6 flex items-center justify-between">
 								<div className="flex items-center gap-3">
 									<div
-										className={`rounded-lg border border-stroke-soft-200 bg-bg-weak-50 p-2 ${provider.textColor}`}
+										className={`rounded-lg border border-stroke-soft-100 bg-bg-weak-50 p-2 dark:border-stroke-soft-100/40 ${provider.textColor}`}
 									>
 										{isDetecting ? (
 											<Search className="h-6 w-6 animate-pulse" />
@@ -402,7 +402,7 @@ export const DnsConfigPreview = ({ domain }: DnsConfigPreviewProps) => {
 										key={step}
 										className="flex items-start gap-3"
 									>
-										<div className="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-weak-50 font-mono text-text-sub-600 text-xs">
+										<div className="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border border-stroke-soft-100 bg-bg-weak-50 font-mono text-text-sub-600 text-xs dark:border-stroke-soft-100/40">
 											{index + 1}
 										</div>
 										<p className="text-sm text-text-sub-600 leading-relaxed">
@@ -420,10 +420,10 @@ export const DnsConfigPreview = ({ domain }: DnsConfigPreviewProps) => {
 									href={provider.url}
 									target="_blank"
 									rel="noopener noreferrer"
-									className="group flex w-full cursor-pointer items-center justify-between rounded-lg border border-stroke-soft-200 bg-bg-weak-50 p-4 transition-all hover:border-primary-base hover:bg-bg-white-0"
+									className="group flex w-full cursor-pointer items-center justify-between rounded-lg border border-stroke-soft-100 bg-bg-weak-50 p-4 transition-all hover:border-primary-base hover:bg-bg-white-0 dark:border-stroke-soft-100/40"
 								>
 									<div className="flex items-center gap-3">
-										<div className="flex h-8 w-8 items-center justify-center rounded border border-stroke-soft-200 bg-bg-white-0">
+										<div className="flex h-8 w-8 items-center justify-center rounded border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40">
 											{/* Generic Favicon Fetcher for visual polish */}
 											<img
 												src={`https://www.google.com/s2/favicons?domain=${provider.url}&sz=32`}
@@ -479,19 +479,18 @@ export const DomainPreview = ({
 			<div
 				className={
 					isDomainVariant
-						? "w-[920px] transform overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 transition-all"
-						: "w-[1000px] transform overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-2xl transition-all"
+						? "w-[920px] transform overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 transition-all dark:border-stroke-soft-100/40"
+						: "w-[1000px] transform overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 shadow-2xl transition-all dark:border-stroke-soft-100/40"
 				}
 				style={isDomainVariant ? { maxHeight: "calc(100% + 16px)" } : undefined}
 			>
 				{/* Browser Window Header */}
-				<div className="flex items-center gap-2 border-stroke-soft-100 border-b bg-bg-weak-50 px-4 py-3">
+				<div className="flex items-center gap-2 border-stroke-soft-100 border-b px-4 py-3 dark:border-stroke-soft-100/40">
 					<div className="flex gap-1.5">
 						<div className="h-3 w-3 rounded-full bg-error-base/80" />
 						<div className="h-3 w-3 rounded-full bg-warning-base/80" />
 						<div className="h-3 w-3 rounded-full bg-success-base/80" />
 					</div>
-					<div className="ml-3 h-2.5 max-w-[140px] flex-1 rounded-full bg-bg-soft-200" />
 				</div>
 
 				{/* Email Client Content */}
@@ -513,7 +512,7 @@ export const DomainPreview = ({
 						<span className="font-medium text-text-strong-800">
 							Black Friday is here. 55% off on all products.
 						</span>
-						<div className="flex items-center gap-1 rounded-md border border-stroke-soft-200 bg-bg-weak-50 px-1.5 py-0">
+						<div className="flex items-center gap-1 rounded-md border border-stroke-soft-100 bg-bg-weak-50 px-1.5 py-0 dark:border-stroke-soft-100/40">
 							<span className="text-[11px] text-text-soft-400">Inbox</span>
 							<span className="text-[10px] text-text-soft-400">×</span>
 						</div>
@@ -564,12 +563,12 @@ export const DomainPreview = ({
 								<div
 									className={
 										isDomainVariant
-											? "relative rounded-lg border border-stroke-soft-200 bg-bg-white-0 p-3 text-text-sub-600 text-xs leading-relaxed shadow-lg shadow-stroke-soft-200/50"
-											: "relative rounded-lg border border-stroke-soft-200 bg-bg-white-0 p-4 text-text-sub-600 text-xs leading-relaxed shadow-lg shadow-stroke-soft-200/50"
+											? "relative rounded-lg border border-stroke-soft-100 bg-bg-white-0 p-3 text-text-sub-600 text-xs leading-relaxed shadow-stroke-soft-200/50 dark:border-stroke-soft-100/40"
+											: "relative rounded-lg border border-stroke-soft-100 bg-bg-white-0 p-4 text-text-sub-600 text-xs leading-relaxed shadow-stroke-soft-200/50 dark:border-stroke-soft-100/40"
 									}
 								>
 									{/* Triangle Pointer */}
-									<div className="-top-1.5 absolute left-3 h-3 w-3 rotate-45 transform border-stroke-soft-200 border-t border-l bg-bg-white-0" />
+									<div className="-top-1.5 absolute left-3 h-3 w-3 rotate-45 transform border-stroke-soft-100 border-t border-l bg-bg-white-0 dark:border-stroke-soft-100/40" />
 
 									<div
 										className={
