@@ -158,7 +158,7 @@ export const DomainTable = ({
 
 			{/* Pagination */}
 			{total > 0 && (
-				<div className="flex items-center justify-between border-stroke-soft-100 border-t px-4 py-2 text-label-xs text-text-sub-600">
+				<div className="flex items-center justify-between border-stroke-soft-100 border-t px-4 py-2 text-label-xs text-text-sub-600 dark:border-stroke-soft-100/40">
 					<div className="flex items-center">
 						<span>
 							Showing {startIndex}–{endIndex} of {total} domain
