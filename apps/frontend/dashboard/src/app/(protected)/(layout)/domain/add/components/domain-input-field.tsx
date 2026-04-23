@@ -49,7 +49,6 @@ export const DomainInputField = ({
 					</div>
 				)}
 			</div>
-			<ProTip />
 		</section>
 	);
 };

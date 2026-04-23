@@ -2,7 +2,6 @@ import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
 import Link from "next/link";
-import { useParams } from "next/navigation";
 
 import type { useCreateWebhookForm } from "./use-create-webhook-form";
 
@@ -12,8 +11,6 @@ type CreateWebhookActionsProps = Pick<
 >;
 
 export function CreateWebhookActions({ isLoading }: CreateWebhookActionsProps) {
-	
-
 	return (
 		<div className="flex items-center gap-3 lg:col-span-12">
 			<Button.Root
@@ -50,7 +47,7 @@ export function CreateWebhookActions({ isLoading }: CreateWebhookActionsProps) {
 				asChild
 				disabled={isLoading}
 			>
-				<Link href={`/webhooks`}>Cancel</Link>
+				<Link href={"/webhooks"}>Cancel</Link>
 			</Button.Root>
 		</div>
 	);

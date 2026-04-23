@@ -1,8 +1,8 @@
 "use client";
-import { AddDomainSidebar } from "./add-domain";
+import { AddDomainView } from "./add-domain";
 
 const NewDomainPage = () => {
-	return <AddDomainSidebar />;
+	return <AddDomainView />;
 };
 
 export default NewDomainPage;

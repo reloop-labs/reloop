@@ -469,7 +469,13 @@ export const DomainPreview = ({
 	const isDomainVariant = variant === "domain";
 
 	return (
-		<div className={isDomainVariant ? "absolute top-[196px] left-4" : "absolute top-10 left-10"}>
+		<div
+			className={
+				isDomainVariant
+					? "absolute top-[176px] left-4"
+					: "absolute top-10 left-10"
+			}
+		>
 			<div
 				className={
 					isDomainVariant
@@ -547,10 +553,10 @@ export const DomainPreview = ({
 							</div>
 
 							{!isDomainVariant && (
-							<div className="mb-2 flex cursor-pointer items-center gap-1 text-text-soft-400 text-xs">
-								to me{" "}
-								<div className="mt-0.5 h-0 w-0 border-t-[4px] border-t-text-soft-400 border-r-[3px] border-r-transparent border-l-[3px] border-l-transparent" />
-							</div>
+								<div className="mb-2 flex cursor-pointer items-center gap-1 text-text-soft-400 text-xs">
+									to me{" "}
+									<div className="mt-0.5 h-0 w-0 border-t-[4px] border-t-text-soft-400 border-r-[3px] border-r-transparent border-l-[3px] border-l-transparent" />
+								</div>
 							)}
 
 							{/* Email Details Dropdown */}
@@ -681,19 +687,19 @@ export const DomainPreview = ({
 
 					{/* Email Body Skeleton */}
 					{!isDomainVariant && (
-					<div className="mt-8 space-y-4 opacity-40 blur-[0.5px]">
-						<div className="h-4 w-full rounded bg-bg-soft-200" />
-						<div className="h-4 w-11/12 rounded bg-bg-soft-200" />
-						<div className="h-4 w-4/5 rounded bg-bg-soft-200" />
+						<div className="mt-8 space-y-4 opacity-40 blur-[0.5px]">
+							<div className="h-4 w-full rounded bg-bg-soft-200" />
+							<div className="h-4 w-11/12 rounded bg-bg-soft-200" />
+							<div className="h-4 w-4/5 rounded bg-bg-soft-200" />
 
-						<div className="mt-8 flex h-40 w-full items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-weak-50 text-text-soft-400">
-							<Icon name="info" />
-						</div>
+							<div className="mt-8 flex h-40 w-full items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-weak-50 text-text-soft-400">
+								<Icon name="info" />
+							</div>
 
-						<div className="mt-6 flex justify-center">
-							<div className="h-10 w-32 rounded-lg bg-primary-lighter" />
+							<div className="mt-6 flex justify-center">
+								<div className="h-10 w-32 rounded-lg bg-primary-lighter" />
+							</div>
 						</div>
-					</div>
 					)}
 				</div>
 			</div>

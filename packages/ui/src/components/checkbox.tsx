@@ -38,10 +38,15 @@ function IconIndeterminate({ ...rest }: React.SVGProps<SVGSVGElement>) {
 	);
 }
 
+interface CheckboxProps
+	extends React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root> {
+	variant?: "primary" | "black";
+}
+
 const Checkbox = React.forwardRef<
 	React.ComponentRef<typeof CheckboxPrimitive.Root>,
-	React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root>
->(({ className, checked, ...rest }, forwardedRef) => {
+	CheckboxProps
+>(({ className, checked, variant = "primary", ...rest }, forwardedRef) => {
 	const filterId = React.useId();
 
 	// precalculated by .getTotalLength()
@@ -87,8 +92,14 @@ const Checkbox = React.forwardRef<
 						"group-focus/checkbox:group-data-[state=checked]/checkbox:fill-primary-dark",
 						"group-focus/checkbox:group-data-[state=indeterminate]/checkbox:fill-primary-dark",
 						// checked
-						"group-data-[state=checked]/checkbox:fill-primary-base",
-						"group-data-[state=indeterminate]/checkbox:fill-primary-base",
+						variant === "primary" && [
+							"group-data-[state=checked]/checkbox:fill-primary-base",
+							"group-data-[state=indeterminate]/checkbox:fill-primary-base",
+						],
+						variant === "black" && [
+							"group-data-[state=checked]/checkbox:fill-static-black",
+							"group-data-[state=indeterminate]/checkbox:fill-static-black",
+						],
 						// disabled checked
 						"group-disabled/checkbox:group-data-[state=checked]/checkbox:fill-bg-soft-200",
 						"group-disabled/checkbox:group-data-[state=indeterminate]/checkbox:fill-bg-soft-200",

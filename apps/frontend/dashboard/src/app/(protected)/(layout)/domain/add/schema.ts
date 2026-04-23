@@ -9,14 +9,8 @@ export const domainSchema = v.object({
       "Please enter a valid domain name",
     ),
   ),
-  customReturnPath: v.pipe(
-    v.string("Custom return path is required"),
-    v.minLength(1, "Custom return path is required"),
-    v.regex(
-      /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/,
-      "Use only letters, numbers, and hyphens",
-    ),
-  ),
+  clickTracking: v.boolean(),
+  openTracking: v.boolean(),
 });
 
 export type DomainFormValues = v.InferInput<typeof domainSchema>;

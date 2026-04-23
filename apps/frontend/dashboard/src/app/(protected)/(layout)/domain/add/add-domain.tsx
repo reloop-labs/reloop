@@ -7,6 +7,7 @@ import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
 import { useLoading } from "@reloop/ui/use-loading";
 import axios from "axios";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
@@ -17,17 +18,18 @@ import { DomainInputField } from "./components/domain-input-field";
 import type { DomainFormValues } from "./schema";
 import { domainSchema } from "./schema";
 
-export const AddDomainSidebar = () => {
+export const AddDomainView = () => {
 	const router = useRouter();
 	const { changeStatus, status } = useLoading();
 	const { mutate } = useSWRConfig();
 
-	const { register, handleSubmit, formState, setError, watch } =
+	const { register, handleSubmit, formState, setError, watch, control } =
 		useForm<DomainFormValues>({
 			resolver: valibotResolver(domainSchema) as Resolver<DomainFormValues>,
 			defaultValues: {
 				domain: "",
-				customReturnPath: "send",
+				clickTracking: false,
+				openTracking: false,
 			},
 		});
 
@@ -35,16 +37,19 @@ export const AddDomainSidebar = () => {
 		router.push(`/domain/add/${domainId}`);
 	};
 
-	const onSubmit = async ({ domain, customReturnPath }: DomainFormValues) => {
+	const onSubmit = async ({
+		domain,
+		clickTracking,
+		openTracking,
+	}: DomainFormValues) => {
 		try {
 			changeStatus("loading");
 			const { data } = await axios.post<DomainResponse>(
 				"/api/domain/v1/create",
 				{
 					domain,
-					customReturnPath,
-					clickTracking: false,
-					openTracking: false,
+					clickTracking,
+					openTracking,
 					tls: "opportunistic",
 				},
 				{ headers: { credentials: "include" } },
@@ -68,67 +73,70 @@ export const AddDomainSidebar = () => {
 	};
 
 	return (
-		<div className="h-[calc(100vh-64px)] w-full overflow-hidden">
-			<div className="relative mx-auto flex h-full w-full max-w-3xl overflow-hidden">
-				<div className="pointer-events-none absolute top-[143px] left-1 z-20 w-full border-stroke-soft-200 border-b border-dashed" />
-				<div
-					className="scrollbar-hide flex w-full flex-col overflow-y-auto lg:w-1/2 lg:shrink-0"
-					style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+		<div className="mx-auto grid min-h-[calc(100vh-64px)] w-full max-w-5xl lg:grid-cols-2">
+			<div className="mx-auto w-full max-w-md px-6 py-12 lg:px-8">
+				<AddDomainHeader />
+				<form
+					onSubmit={handleSubmit(onSubmit)}
+					className="mt-6 flex w-full flex-col"
 				>
-					<div className="mx-auto w-full px-2 pt-8 pb-10">
-						<AddDomainHeader />
-						<form
-							onSubmit={handleSubmit(onSubmit)}
-							className="flex w-full flex-col gap-3"
+					<DomainInputField
+						register={register}
+						errors={formState.errors}
+						isLoading={status === "loading"}
+					/>
+
+					<AdvancedOptions control={control} isLoading={status === "loading"} />
+					<div className="mt-6 flex items-center gap-3">
+						<Button.Root
+							type="submit"
+							variant="neutral"
+							mode="filled"
+							size="xsmall"
+							disabled={status === "loading" || !formState.isValid}
 						>
-							<DomainInputField
-								register={register}
-								errors={formState.errors}
-								isLoading={status === "loading"}
-							/>
-
-							<AdvancedOptions
-								register={register}
-								errors={formState.errors}
-								isLoading={status === "loading"}
-							/>
-
-							<div className="sticky bottom-0 z-10">
-								<div className="w-full rounded-2xl bg-bg-white-0/92 shadow-[0_16px_40px_-28px_rgba(18,18,23,0.28)] backdrop-blur">
-									<Button.Root
-										type="submit"
-										variant="neutral"
-										mode="filled"
-										disabled={status === "loading" || !formState.isValid}
-										className="w-full"
-									>
-										{status === "loading" ? (
-											<>
-												<Spinner color="currentColor" />
-												Adding Domain...
-											</>
-										) : (
-											<>
-												Add Domain
-												<Icon
-													name="enter"
-													className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
-												/>
-											</>
-										)}
-									</Button.Root>
-								</div>
-							</div>
-						</form>
+							{status === "loading" ? (
+								<>
+									<Spinner color="currentColor" />
+									Adding Domain...
+								</>
+							) : (
+								<>
+									Add Domain
+									<span className="inline-flex items-center gap-0.5">
+										<Icon
+											name="command"
+											className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+										/>
+										<Icon
+											name="enter"
+											className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+										/>
+									</span>
+								</>
+							)}
+						</Button.Root>
+						<Button.Root
+							variant="neutral"
+							mode="stroke"
+							size="xsmall"
+							asChild
+							disabled={status === "loading"}
+						>
+							<Link href={"/domain"}>
+								Cancel
+								<span className="flex h-[19px] w-7 items-center justify-center rounded-[5px] border border-stroke-soft-100 bg-bg-weak-50/50 p-px font-medium text-[10px]">
+									Esc
+								</span>
+							</Link>
+						</Button.Root>
 					</div>
-				</div>
+				</form>
+			</div>
 
-				<div className="relative hidden h-full min-w-0 flex-1 overflow-hidden bg-bg-weak-50/10 lg:flex">
-					<div className="relative z-10 h-full w-full">
-						<div className="flex h-full items-start justify-center px-2 pt-10 pb-12">
-							<DomainPreview domain={watch("domain")} variant="domain" />
-						</div>
-					</div>
+			<div className="sticky top-0 hidden h-[calc(100vh-64px)] items-start justify-center overflow-hidden bg-bg-weak-50/10 pt-12 lg:flex">
+				<div className="relative h-full w-full">
+					<DomainPreview domain={watch("domain")} variant="domain" />
 				</div>
 			</div>
 		</div>
