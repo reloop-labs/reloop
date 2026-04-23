@@ -30,6 +30,7 @@ interface DomainHeaderProps {
 	isFailed?: boolean;
 	onVerify?: () => void | Promise<void>;
 	isVerifying?: boolean;
+	mutate: () => void;
 }
 
 const headerMenuItems = [
@@ -48,6 +49,7 @@ export const DomainHeader = ({
 	status = "start-verify",
 	isLoading,
 	isFailed,
+	mutate,
 }: DomainHeaderProps) => {
 	const router = useRouter();
 	const [, setDeleteId] = useQueryState("delete");
@@ -231,6 +233,7 @@ export const DomainHeader = ({
 						updatedAt: "",
 					} satisfies Domain,
 				]}
+				mutate={mutate}
 			/>
 		</div>
 	);

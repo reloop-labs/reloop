@@ -1,34 +1,31 @@
 "use client";
-import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import type { Domain } from "@reloop/api/types";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import * as Kbd from "@reloop/ui/kbd";
 import * as Modal from "@reloop/ui/modal";
-import Spinner from "@reloop/ui/spinner";
 import axios from "axios";
 import { usePathname, useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
-import { useSWRConfig } from "swr";
 
 interface DeleteDomainModalProps {
 	domains: Domain[];
+	mutate: () => void;
 }
 
-export const DeleteDomainModal = ({ domains }: DeleteDomainModalProps) => {
+export const DeleteDomainModal = ({
+	domains,
+	mutate,
+}: DeleteDomainModalProps) => {
 	const [deleteId, setDeleteId] = useQueryState("delete");
 	const [isDeleting, setIsDeleting] = useState(false);
 	const [isValidationPhraseCopied, setIsValidationPhraseCopied] =
 		useState(false);
 
-	// Check if we're on a domain detail page (not the list page)
 	const [confirmationText, setConfirmationText] = useState("");
-	const { mutate } = useSWRConfig();
-	const { activeOrganization } = useUserOrganization();
 	const pathname = usePathname();
 	const router = useRouter();
 	const domainToDelete = domains.find((domain) => domain.id === deleteId);
@@ -37,7 +34,6 @@ export const DeleteDomainModal = ({ domains }: DeleteDomainModalProps) => {
 		!pathname?.includes("/domain/add") &&
 		pathname !== "/domain";
 
-	// Command/Ctrl + Enter to delete
 	useHotkeys(
 		"mod+enter",
 		(e) => {
@@ -57,18 +53,11 @@ export const DeleteDomainModal = ({ domains }: DeleteDomainModalProps) => {
 			await axios.delete(`/api/domain/v1/${domainToDelete.id}`, {
 				headers: { credentials: "include" },
 			});
-			await mutate(
-				(key) =>
-					typeof key === "string" && key.startsWith("/api/domain/v1/lis"),
-			);
-
+			mutate();
 			toast.success(`${domainToDelete.domain} deleted successfully`);
 			setDeleteId(null);
 			setConfirmationText("");
-
-			// Navigate to domain list if we're on a detail page
-			if (isOnDetailPage && activeOrganization) {
-				// Use setTimeout to ensure modal closes first, then navigate
+			if (isOnDetailPage) {
 				setTimeout(() => {
 					router.push("/domain");
 				}, 100);

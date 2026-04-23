@@ -35,7 +35,7 @@ const DomainPage = () => {
 	const [currentPage] = useQueryState("page", parseAsInteger.withDefault(1));
 	const [pageSize] = useQueryState("limit", parseAsInteger.withDefault(10));
 
-	const { data, error, isLoading } = useSWR<DomainListResponse>(
+	const { data, error, isLoading, mutate } = useSWR<DomainListResponse>(
 		`/api/domain/v1/list?limit=${pageSize}&page=${currentPage}${statusFilters ? `&status=${statusFilters}` : ""}${searchQuery ? `&q=${searchQuery}` : ""}`,
 		{
 			revalidateOnFocus: true,
@@ -64,7 +64,7 @@ const DomainPage = () => {
 					/>
 				)}
 			</div>
-			<DeleteDomainModal domains={data?.domains || []} />
+			<DeleteDomainModal domains={data?.domains || []} mutate={mutate} />
 		</div>
 	);
 };
