@@ -1,5 +1,5 @@
 "use client";
-import { AddDomainSidebar } from "../components/add-domain";
+import { AddDomainSidebar } from "./add-domain";
 
 const NewDomainPage = () => {
 	return <AddDomainSidebar />;

@@ -175,7 +175,7 @@ export const AddDomainSidebar = () => {
 							className="flex w-full flex-col gap-3"
 							transition={{ layout: matchedRevealTransition }}
 						>
-							<motion.section layout="position" className="space-y-3">
+							<motion.section layout="position" className="space-y-1">
 								<div className="space-y-1">
 									<Label.Root
 										htmlFor="domain"
@@ -191,9 +191,6 @@ export const AddDomainSidebar = () => {
 										className="w-full"
 										size="small"
 									>
-										<Input.Affix className="bg-bg-white-0 text-text-strong-950">
-											https://
-										</Input.Affix>
 										<Input.Wrapper>
 											<Input.Input
 												id="domain"
