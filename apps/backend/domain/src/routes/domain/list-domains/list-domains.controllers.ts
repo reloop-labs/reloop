@@ -3,7 +3,7 @@ import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import type { Logger } from "@reloop/logger";
 import { DOMAIN_LIST_WEBHOOK_EVENT } from "@reloop/webhook-events";
-import { and, count, desc, eq, isNull } from "drizzle-orm";
+import { and, count, desc, eq, ilike, isNull } from "drizzle-orm";
 
 export async function listDomainsController({
   query,
@@ -14,7 +14,7 @@ export async function listDomainsController({
   organizationId: string;
   logger: Logger;
 }): Promise<DomainTypes.DomainListResponse> {
-  const { page = 1, limit = 10, status } = query;
+  const { page = 1, limit = 10, status, q } = query;
   const offset = (page - 1) * limit;
 
   try {
@@ -22,7 +22,12 @@ export async function listDomainsController({
       isNull(schema.domain.deletedAt),
       eq(schema.domain.organizationId, organizationId),
     ];
-    if (status !== undefined) conditions.push(eq(schema.domain.status, status));
+    if (status) {
+      conditions.push(eq(schema.domain.status, status));
+    }
+    if (q) {
+      conditions.push(ilike(schema.domain.domain, `%${q}%`));
+    }
     const whereClause = and(...conditions);
     const totalResult = await db
       .select({ count: count() })

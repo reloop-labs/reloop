@@ -292,6 +292,7 @@ export namespace DomainModel {
 	export const domainQuery = t.Object({
 		page: t.Optional(t.Number({ minimum: 1, default: 1 })),
 		limit: t.Optional(t.Number({ minimum: 1, maximum: 100, default: 10 })),
+		q: t.Optional(t.String({ description: "Search query for domain name" })),
 		status: t.Optional(
 			t.Union([
 				t.Literal("start-verify"),

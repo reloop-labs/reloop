@@ -1,6 +1,5 @@
 "use client";
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
-import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
@@ -38,19 +37,24 @@ export const PageSizeDropdown = ({
 	return (
 		<Dropdown.Root open={dropdownOpen} onOpenChange={setDropdownOpen}>
 			<Dropdown.Trigger asChild>
-				<Button.Root
-					variant="neutral"
-					mode="stroke"
+				<button
 					type="button"
-					size="xxsmall"
 					className={cn(
-						dropdownOpen &&
-							"bg-bg-weak-50 ring-transparent hover:border-transparent",
+						"flex items-center gap-1 rounded-md px-1.5 py-0.5 text-label-xs text-text-sub-600 uppercase outline-none transition-colors focus-visible:ring-2 focus-visible:ring-primary-base",
+						hoverIdx !== undefined || dropdownOpen
+							? "bg-bg-weak-50 text-text-strong-950"
+							: "hover:bg-bg-weak-50 hover:text-text-strong-950",
 					)}
 				>
 					{value}
-					<Icon name="chevron-down" className="h-3 w-3 text-text-sub-600" />
-				</Button.Root>
+					<Icon
+						name="chevron-down"
+						className={cn(
+							"h-3 w-3 transition-transform duration-200",
+							dropdownOpen && "rotate-180",
+						)}
+					/>
+				</button>
 			</Dropdown.Trigger>
 			<Dropdown.Content align="start" className="w-20 rounded-xl p-1.5">
 				<div className="relative">

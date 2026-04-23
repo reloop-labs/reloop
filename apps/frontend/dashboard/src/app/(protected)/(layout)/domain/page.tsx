@@ -4,10 +4,10 @@ import relativeTime from "dayjs/plugin/relativeTime";
 
 dayjs.extend(relativeTime);
 
-import { DomainListSidebar } from "./components/domain-list";
+import { Domain } from "./components/domain";
 
 const DomainPage = () => {
-	return <DomainListSidebar />;
+	return <Domain />;
 };
 
 export default DomainPage;
