@@ -3,28 +3,36 @@ import { PageSizeDropdown } from "@fe/dashboard/components/page-size-dropdown";
 import { PaginationControls } from "@fe/dashboard/components/pagination-controls";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import type { DomainListResponse } from "@reloop/api";
-import { Icon } from "@reloop/ui/icon";
-import * as Input from "@reloop/ui/input";
 import { useParams, useRouter } from "next/navigation";
-import { parseAsInteger, useQueryState } from "nuqs";
-import { useState } from "react";
+import {
+	parseAsInteger,
+	parseAsString,
+	parseAsStringLiteral,
+	useQueryState,
+} from "nuqs";
 import { useHotkeys } from "react-hotkeys-hook";
 import useSWR from "swr";
 import { DeleteDomainModal } from "./delete-domain";
 import { DomainErrorState } from "./domain-error-state";
-import {
-	DomainFilterDropdown,
-	type DomainStatusFilters,
-} from "./domain-filter-dropdown";
 import { DomainListHeader } from "./domain-list-header";
+import { DomainListToolbar } from "./domain-list-toolbar";
 import { DomainTable } from "./domain-table";
 
 export const DomainListSidebar = () => {
 	const { activeOrganization } = useUserOrganization();
 	const { domainId } = useParams();
 	const router = useRouter();
-	const [statusFilters, setStatusFilters] = useState<DomainStatusFilters>([]);
-	const [searchQuery, setSearchQuery] = useState<string>("");
+	const [statusFilters] = useQueryState(
+		"status",
+		parseAsStringLiteral([
+			"start-verify",
+			"verifying",
+			"active",
+			"suspended",
+			"failed",
+		] as const),
+	);
+	const [searchQuery] = useQueryState("q", parseAsString.withDefault(""));
 	const [currentPage, setCurrentPage] = useQueryState(
 		"page",
 		parseAsInteger.withDefault(1),
@@ -55,8 +63,7 @@ export const DomainListSidebar = () => {
 	// Filter domains based on status and search query
 	const filteredDomains =
 		data?.domains?.filter((domain) => {
-			const matchesStatus =
-				statusFilters.length === 0 || statusFilters.includes(domain.status);
+			const matchesStatus = !statusFilters || domain.status === statusFilters;
 			const matchesSearch =
 				searchQuery === "" ||
 				domain.domain.toLowerCase().includes(searchQuery.toLowerCase());
@@ -70,29 +77,7 @@ export const DomainListSidebar = () => {
 	return (
 		<div className="mx-auto max-w-4xl sm:px-8">
 			<DomainListHeader />
-
-			<div className="flex items-center gap-3">
-				<div className="flex-1">
-					<Input.Root size="xsmall">
-						<Input.Wrapper>
-							<Input.Icon as={Icon} name="search" size="xsmall" />
-							<Input.Input
-								placeholder="Search domains..."
-								value={searchQuery}
-								onChange={(e) => {
-									setSearchQuery(e.target.value);
-									setCurrentPage(1);
-								}}
-							/>
-						</Input.Wrapper>
-					</Input.Root>
-				</div>
-				<DomainFilterDropdown
-					value={statusFilters}
-					onChange={setStatusFilters}
-				/>
-			</div>
-
+			<DomainListToolbar />
 			<div className="mt-4">
 				<DomainTable
 					domains={filteredDomains}

@@ -1,10 +1,7 @@
 "use client";
 
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
-import {
-	getStatusColorClass,
-	getStatusIcon,
-} from "@fe/dashboard/utils/domain";
+import { getStatusColorClass, getStatusIcon } from "@fe/dashboard/utils/domain";
 import type { DomainStatus } from "@reloop/api/types";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
@@ -12,8 +9,8 @@ import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import { useRef, useState } from "react";
 
-export type DomainStatusFilterOption = DomainStatus;
-export type DomainStatusFilters = DomainStatusFilterOption[];
+export type DomainStatusFilterOption = DomainStatus | null;
+export type DomainStatusFilters = DomainStatus | null;
 
 interface DomainFilterDropdownProps {
 	value: DomainStatusFilters;
@@ -21,6 +18,7 @@ interface DomainFilterDropdownProps {
 }
 
 const filterOptions: { id: DomainStatusFilterOption; label: string }[] = [
+	{ id: null, label: "All Status" },
 	{ id: "start-verify", label: "Not Started" },
 	{ id: "verifying", label: "Verifying" },
 	{ id: "active", label: "Active" },
@@ -36,28 +34,32 @@ export const DomainFilterDropdown = ({
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 
-	const currentTab = buttonRefs.current[hoverIdx ?? -1];
+	const activeIdx =
+		hoverIdx !== undefined
+			? hoverIdx
+			: filterOptions.findIndex((o) => o.id === value);
+
+	const currentTab = buttonRefs.current[activeIdx];
 	const currentRect = currentTab?.getBoundingClientRect();
 
-	const activeFilterCount = value.length;
-	const hasActiveFilter = activeFilterCount > 0;
+	const selectedOption = value
+		? filterOptions.find((o) => o.id === value)
+		: null;
 
-	const displayLabel =
-		activeFilterCount === 0
-			? "Filter"
-			: activeFilterCount === 1
-				? filterOptions.find((o) => o.id === value[0])?.label || "Filter"
-				: `${activeFilterCount} Filters`;
+	const displayLabel = selectedOption ? selectedOption.label : "All Status";
 
-	const handleReset = () => {
-		onChange([]);
-	};
+	const displayIcon = selectedOption?.id
+		? getStatusIcon(selectedOption.id)
+		: "activity";
+	const displayIconColor = selectedOption?.id
+		? getStatusColorClass(selectedOption.id)
+		: "";
 
 	const handleToggle = (optionId: DomainStatusFilterOption) => {
-		if (value.includes(optionId)) {
-			onChange(value.filter((v) => v !== optionId));
+		if (value === optionId) {
+			onChange(null);
 		} else {
-			onChange([...value, optionId]);
+			onChange(optionId);
 		}
 	};
 
@@ -68,40 +70,25 @@ export const DomainFilterDropdown = ({
 					variant="neutral"
 					mode="stroke"
 					size="xsmall"
-					className={cn(
-						"gap-1.5 whitespace-nowrap",
-						hasActiveFilter &&
-							"border-stroke-soft-900 bg-neutral-alpha-10 text-text-strong-950",
-					)}
+					className="w-42 justify-between gap-1.5 whitespace-nowrap rounded-[10px]"
 				>
-					<Button.Icon>
-						<Icon name="filter" className="h-3.5 w-3.5" />
-					</Button.Icon>
-					{displayLabel}
-					<Button.Icon>
-						<Icon name="chevron-down" className="h-3.5 w-3.5" />
-					</Button.Icon>
+					<div className="flex items-center gap-1.5 overflow-hidden">
+						<Icon
+							name={displayIcon}
+							className={cn("h-3.5 w-3.5 shrink-0", displayIconColor)}
+						/>
+						<span className="truncate">{displayLabel}</span>
+					</div>
+					<Icon name="chevron-down" className="h-3.5 w-3.5 shrink-0" />
 				</Button.Root>
 			</Dropdown.Trigger>
-			<Dropdown.Content align="start" className="w-48 p-2">
+			<Dropdown.Content align="start" className="w-42 p-2">
 				{/* Header */}
-				<div className="flex items-center justify-between border-stroke-soft-200 border-b px-1 pb-2">
-					<span className="font-medium text-text-sub-600 text-xs">
-						Filter by
-					</span>
-					<button
-						type="button"
-						onClick={handleReset}
-						className="rounded-lg border border-stroke-soft-200 px-2 py-1 text-text-sub-600 text-xs transition-colors hover:bg-bg-weak-50"
-					>
-						Reset filters
-					</button>
-				</div>
 
 				{/* Filter Options */}
 				<div className="relative">
 					{filterOptions.map((option, idx) => {
-						const isChecked = value.includes(option.id);
+						const isChecked = value === option.id;
 						return (
 							<button
 								key={option.id}
@@ -119,16 +106,30 @@ export const DomainFilterDropdown = ({
 								)}
 							>
 								<div className="flex items-center gap-2">
-									<Icon
-										name={getStatusIcon(option.id)}
-										className={cn("h-3.5 w-3.5", getStatusColorClass(option.id))}
-									/>
-									<span className={cn(isChecked && "font-medium text-text-strong-950")}>
+									{option.id ? (
+										<Icon
+											name={getStatusIcon(option.id)}
+											className={cn(
+												"h-3.5 w-3.5",
+												getStatusColorClass(option.id),
+											)}
+										/>
+									) : (
+										<Icon name="activity" className="h-3.5 w-3.5" />
+									)}
+									<span
+										className={` ${cn(
+											isChecked ? "font-medium text-text-strong-950" : "",
+										)}`}
+									>
 										{option.label}
 									</span>
 								</div>
 								{isChecked && (
-									<Icon name="check" className="h-3.5 w-3.5 text-text-strong-950" />
+									<Icon
+										name="check"
+										className="h-3.5 w-3.5 text-text-strong-950"
+									/>
 								)}
 							</button>
 						);
