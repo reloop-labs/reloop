@@ -10,7 +10,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 export const NewDomainEmptyState: React.FC = () => {
 	const router = useRouter();
 
-	useHotkeys("mod+b", () => router.push("/domain"));
+	useHotkeys("mod+d", () => router.push("/domain"));
 	useHotkeys("mod+a", (e) => {
 		e.preventDefault();
 		router.push("/domain/add");

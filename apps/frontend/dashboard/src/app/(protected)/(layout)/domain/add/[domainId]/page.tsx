@@ -10,7 +10,6 @@ import { groupDomainDnsRecords } from "../../[domainId]/components/dns-record-gr
 import { DNSRecordSection } from "./components/DNSRecordSection";
 import { DomainAddedAlert } from "./components/DomainAddedAlert";
 import { NewDomainEmptyState } from "./components/NewDomainEmptyState";
-import { NewDomainHeader } from "./components/NewDomainHeader";
 
 const NewDomainPage = () => {
 	const [copiedItems, setCopiedItems] = React.useState<Set<string>>(new Set());
@@ -113,20 +112,17 @@ const NewDomainPage = () => {
 
 	return (
 		<div className="mx-auto max-w-3xl pt-10 pb-8 sm:px-8">
-			<NewDomainHeader
-				title="Domain Added"
-				description="You have successfully added the domain"
-				action={{
-					label: "I have added the DNS records",
-					onClick: handleVerifyAndNavigate,
-					isLoading: isVerifying,
-				}}
-			/>
+			<div className="flex w-full items-center justify-between pt-6 pb-6">
+				<div>
+					<h1 className="font-medium text-title-h5 leading-8">Domain Added</h1>
+					<p className="text-paragraph-sm text-text-sub-600">
+						You have successfully added the domain
+					</p>
+				</div>
+			</div>
 
-			<div className="relative my-10">
-				<DomainAddedAlert
-					domainName={domainData?.domain || (domainId as string)}
-				/>
+			<div className="relative mb-10">
+				<DomainAddedAlert domainName={domainData?.domain} />
 
 				<DNSRecordSection
 					title="Sending Email"
