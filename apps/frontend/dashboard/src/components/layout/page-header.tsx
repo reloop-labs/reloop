@@ -5,21 +5,19 @@ import { mainNavigation, userNavigation } from "@fe/dashboard/constants";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
-import { useParams, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 export const PageHeader = () => {
-	const { orgSlug } = useParams();
 	const pathname = usePathname();
 
-	const pathWithoutSlug = pathname.replace(/^\/[^/]+/, "") || "/";
 	const activeItem = [...mainNavigation, ...userNavigation].find((item) => {
-		if (item.path === "/") return pathWithoutSlug === "/";
-		return pathWithoutSlug.startsWith(item.path);
+		if (item.path === "/") return pathname === "/";
+		return pathname.startsWith(item.path);
 	});
 
 	if (!activeItem) return null;
 
-	const href = `/${orgSlug}${activeItem.path}`;
+	const href = activeItem.path;
 
 	return (
 		<div className="sticky top-0 z-10 flex h-12 items-center justify-start gap-2 border-stroke-soft-100 border-b bg-bg-white-0 pr-2 pl-3 dark:border-stroke-soft-100/40">
