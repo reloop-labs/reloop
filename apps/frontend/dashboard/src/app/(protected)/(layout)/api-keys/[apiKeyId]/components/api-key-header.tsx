@@ -1,4 +1,5 @@
 "use client";
+
 import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
@@ -14,6 +15,7 @@ import {
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
@@ -93,7 +95,9 @@ export const ApiKeyHeader = ({
 	isFailed,
 	onDeleteApiKey,
 }: ApiKeyHeaderProps) => {
-	const { push } = useUserOrganization();
+	const { push } = useRouter();
+	useUserOrganization();
+
 	const { mutate } = useSWRConfig();
 	const [copied, setCopied] = useState(false);
 	const [isToggling, setIsToggling] = useState(false);

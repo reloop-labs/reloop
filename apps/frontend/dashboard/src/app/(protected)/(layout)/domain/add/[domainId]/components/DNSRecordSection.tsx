@@ -31,7 +31,7 @@ export const DNSRecordSection: React.FC<DNSRecordSectionProps> = ({
 	loadingRows = 1,
 }) => {
 	return (
-		<div className="relative mt-10">
+		<div className="relative mt-7">
 			<div className="mb-3 flex items-start justify-between gap-4">
 				<Link
 					href={docsUrl || "#"}

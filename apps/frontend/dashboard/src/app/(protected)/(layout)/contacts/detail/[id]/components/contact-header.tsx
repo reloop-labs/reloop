@@ -108,7 +108,7 @@ export const ContactHeader = ({
 	propertyValues,
 	enrolledTopics = [],
 }: ContactHeaderProps) => {
-	const { push, activeOrganization } = useUserOrganization();
+	const { activeOrganization } = useUserOrganization();
 	const router = useRouter();
 	const [copied, setCopied] = useState(false);
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -138,7 +138,7 @@ export const ContactHeader = ({
 		toast.success("Contact deleted");
 		// Navigate back to contacts list
 		if (activeOrganization?.slug) {
-			router.push(`/contacts`);
+			router.push("/contacts");
 		}
 	};
 
@@ -153,7 +153,7 @@ export const ContactHeader = ({
 	if (!contact && !isLoading) {
 		return (
 			<div className="pt-10 pb-8">
-				<AnimatedBackButton onClick={() => push("/contacts")} />
+				<AnimatedBackButton onClick={() => router.push("/contacts")} />
 				<div className="flex items-center justify-between pt-6">
 					<div>
 						<div className="flex items-center gap-1.5">
@@ -186,7 +186,7 @@ export const ContactHeader = ({
 	return (
 		<>
 			<div className="pt-10 pb-8">
-				<AnimatedBackButton onClick={() => push("/contacts")} />
+				<AnimatedBackButton onClick={() => router.push("/contacts")} />
 				<div className="flex items-center justify-between pt-6">
 					<div>
 						{isLoading ? (

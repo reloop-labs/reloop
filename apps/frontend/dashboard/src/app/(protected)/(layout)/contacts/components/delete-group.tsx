@@ -17,12 +17,14 @@ interface DeleteGroupModalProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	group: Group | null;
+	onDeleteSuccess?: () => void;
 }
 
 export const DeleteGroupModal = ({
 	open,
 	onOpenChange,
 	group,
+	onDeleteSuccess,
 }: DeleteGroupModalProps) => {
 	const [confirmationName, setConfirmationName] = useState("");
 	const [isSubmitting, setIsSubmitting] = useState(false);
@@ -61,6 +63,7 @@ export const DeleteGroupModal = ({
 			);
 			onOpenChange(false);
 			setConfirmationName("");
+			onDeleteSuccess?.();
 		} catch (error) {
 			toast.error(
 				error instanceof Error ? error.message : "Failed to delete group",
