@@ -34,12 +34,10 @@ export const DomainFilterDropdown = ({
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 
-	const activeIdx =
-		hoverIdx !== undefined
-			? hoverIdx
-			: filterOptions.findIndex((o) => o.id === value);
+	const activeIdx = hoverIdx;
 
-	const currentTab = buttonRefs.current[activeIdx];
+	const currentTab =
+		activeIdx !== undefined ? buttonRefs.current[activeIdx] : undefined;
 	const currentRect = currentTab?.getBoundingClientRect();
 
 	const selectedOption = value
@@ -61,6 +59,7 @@ export const DomainFilterDropdown = ({
 		} else {
 			onChange(optionId);
 		}
+		setIsOpen(false);
 	};
 
 	return (
@@ -70,7 +69,7 @@ export const DomainFilterDropdown = ({
 					variant="neutral"
 					mode="stroke"
 					size="xsmall"
-					className="w-42 justify-between gap-1.5 whitespace-nowrap rounded-[10px]"
+					className="w-48 justify-between gap-1.5 whitespace-nowrap rounded-[10px]"
 				>
 					<div className="flex items-center gap-1.5 overflow-hidden">
 						<Icon
@@ -82,7 +81,7 @@ export const DomainFilterDropdown = ({
 					<Icon name="chevron-down" className="h-3.5 w-3.5 shrink-0" />
 				</Button.Root>
 			</Dropdown.Trigger>
-			<Dropdown.Content align="start" className="w-42 p-2">
+			<Dropdown.Content align="start" className="w-48 p-2">
 				{/* Header */}
 
 				{/* Filter Options */}
@@ -102,7 +101,7 @@ export const DomainFilterDropdown = ({
 								className={cn(
 									"flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg px-2 py-1.5 font-normal text-xs transition-colors",
 									"text-text-strong-950",
-									!currentRect && hoverIdx === idx && "bg-neutral-alpha-10",
+									isChecked && "bg-neutral-alpha-10",
 								)}
 							>
 								<div className="flex items-center gap-2">
