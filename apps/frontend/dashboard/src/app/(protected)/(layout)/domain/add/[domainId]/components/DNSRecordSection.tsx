@@ -3,15 +3,14 @@
 import type { DNSRecord } from "@reloop/api/types";
 import * as Switch from "@reloop/ui/switch";
 import type * as React from "react";
-import { DNSRecordTable } from "./DNSRecordTable";
+import { DNSRecordTableMinimal } from "./DNSRecordTableMinimal";
 
 interface DNSRecordSectionProps {
 	title: string;
-	statusText: string;
-	description: string;
+	statusText?: string;
+	description?: string;
 	records: DNSRecord[];
-	onCopyToClipboard: (text: string, itemId: string) => void;
-	copiedItems: Set<string>;
+	onCopyToClipboard: (text: string) => void;
 	isLoading: boolean;
 	tableId: string;
 	switchProps?: {
@@ -27,10 +26,8 @@ export const DNSRecordSection: React.FC<DNSRecordSectionProps> = ({
 	description,
 	records,
 	onCopyToClipboard,
-	copiedItems,
 	isLoading,
 	tableId,
-	switchProps,
 }) => {
 	return (
 		<div className="relative mt-10">
@@ -38,24 +35,19 @@ export const DNSRecordSection: React.FC<DNSRecordSectionProps> = ({
 				<div className="space-y-1">
 					<div className="font-medium text-sm text-text-strong-950">
 						{title}{" "}
-						<span className="text-text-sub-600 text-xs">({statusText})</span>
+						{statusText && (
+							<span className="text-text-sub-600 text-xs">({statusText})</span>
+						)}
 					</div>
-					<div className="text-text-sub-600 text-xs">{description}</div>
+					{description && (
+						<div className="text-text-sub-600 text-xs">{description}</div>
+					)}
 				</div>
-				{switchProps && (
-					<Switch.Root
-						checked={switchProps.checked}
-						onCheckedChange={switchProps.onCheckedChange}
-						disabled={switchProps.disabled}
-						checkedColor="orange"
-					/>
-				)}
 			</div>
 			<div className="w-full">
-				<DNSRecordTable
+				<DNSRecordTableMinimal
 					records={records}
 					onCopyToClipboard={onCopyToClipboard}
-					copiedItems={copiedItems}
 					isLoading={isLoading}
 					loadingRows={1}
 					tableId={tableId}

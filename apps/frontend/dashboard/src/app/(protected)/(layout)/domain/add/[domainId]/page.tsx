@@ -12,10 +12,7 @@ import { DomainAddedAlert } from "./components/DomainAddedAlert";
 import { NewDomainEmptyState } from "./components/NewDomainEmptyState";
 
 const NewDomainPage = () => {
-	const [copiedItems, setCopiedItems] = React.useState<Set<string>>(new Set());
 	const [isVerifying, setIsVerifying] = React.useState(false);
-	const [isUpdatingSending, setIsUpdatingSending] = React.useState(false);
-	const [isUpdatingReceiving, setIsUpdatingReceiving] = React.useState(false);
 	const { domainId } = useParams();
 	const router = useRouter();
 
@@ -23,17 +20,9 @@ const NewDomainPage = () => {
 		`/api/domain/v1/${domainId}`,
 	);
 
-	const copyToClipboard = async (text: string, itemId: string) => {
+	const copyToClipboard = async (text: string) => {
 		try {
 			await navigator.clipboard.writeText(text);
-			setCopiedItems((prev) => new Set(prev).add(itemId));
-			setTimeout(() => {
-				setCopiedItems((prev) => {
-					const newSet = new Set(prev);
-					newSet.delete(itemId);
-					return newSet;
-				});
-			}, 2000);
 		} catch {}
 	};
 
@@ -63,37 +52,6 @@ const NewDomainPage = () => {
 		}
 	};
 
-	const handleUpdateDomain = async (
-		payload: Partial<Pick<DomainResponse, "sendingEmail" | "receivingEmail">>,
-		setUpdating: React.Dispatch<React.SetStateAction<boolean>>,
-	) => {
-		if (!domainId || !domainData) {
-			toast.error("Domain information not available");
-			return;
-		}
-
-		const cacheKey = `/api/domain/v1/${domainId}`;
-		setUpdating(true);
-		await mutate(cacheKey, { ...domainData, ...payload }, false);
-
-		try {
-			const { data } = await axios.patch<DomainResponse>(
-				`/api/domain/v1/${domainId}`,
-				payload,
-				{ headers: { credentials: "include" } },
-			);
-			await mutate(cacheKey, data, false);
-		} catch (error) {
-			await mutate(cacheKey);
-			const errorMessage = axios.isAxiosError(error)
-				? error.response?.data?.message || "Failed to update domain"
-				: "Failed to update domain";
-			toast.error(errorMessage);
-		} finally {
-			setUpdating(false);
-		}
-	};
-
 	if (
 		(!domainData ||
 			!domainData.dnsRecords ||
@@ -107,8 +65,9 @@ const NewDomainPage = () => {
 		);
 	}
 
-	const { sendingRecords, receivingRecords, dmarcRecords } =
-		groupDomainDnsRecords(domainData?.dnsRecords);
+	const { sendingRecords, dmarcRecords } = groupDomainDnsRecords(
+		domainData?.dnsRecords,
+	);
 
 	return (
 		<div className="mx-auto max-w-3xl pt-10 pb-8 sm:px-8">
@@ -123,53 +82,18 @@ const NewDomainPage = () => {
 
 			<div className="relative mb-10">
 				<DomainAddedAlert domainName={domainData?.domain} />
-
 				<DNSRecordSection
 					title="Sending Email"
-					statusText="Required"
-					description="Enable email signing and specify authorized senders."
 					records={sendingRecords}
 					onCopyToClipboard={copyToClipboard}
-					copiedItems={copiedItems}
 					isLoading={isLoading}
 					tableId="dkim-"
-					switchProps={{
-						checked: domainData?.sendingEmail ?? true,
-						onCheckedChange: (value) =>
-							handleUpdateDomain({ sendingEmail: value }, setIsUpdatingSending),
-						disabled: isLoading || isUpdatingSending,
-					}}
 				/>
-
-				{receivingRecords.length > 0 && (
-					<DNSRecordSection
-						title="Receiving Email"
-						statusText="Optional"
-						description="Route inbound mail to your receiving mail host."
-						records={receivingRecords}
-						onCopyToClipboard={copyToClipboard}
-						copiedItems={copiedItems}
-						isLoading={isLoading}
-						tableId="receiving-"
-						switchProps={{
-							checked: domainData?.receivingEmail ?? true,
-							onCheckedChange: (value) =>
-								handleUpdateDomain(
-									{ receivingEmail: value },
-									setIsUpdatingReceiving,
-								),
-							disabled: isLoading || isUpdatingReceiving,
-						}}
-					/>
-				)}
 
 				<DNSRecordSection
 					title="DMARC"
-					statusText="Recommended"
-					description="Set authentication policies and receive reports."
 					records={dmarcRecords}
 					onCopyToClipboard={copyToClipboard}
-					copiedItems={copiedItems}
 					isLoading={isLoading}
 					tableId="dmarc-"
 				/>
