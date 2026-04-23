@@ -26,12 +26,12 @@ export const Header = () => {
 						<Icon name="social-github" className="size-3.5" />
 						GitHub
 					</a>
-					<Link
+					<a
 						href={session ? "/dashboard" : "/dashboard/login"}
 						className="inline-flex items-center justify-center gap-2 rounded-[12px] bg-white px-4 py-2 font-semibold text-[#0a0d12] text-[13px] transition-colors hover:bg-white/92"
 					>
 						{session ? "Dashboard" : "Login"}
-					</Link>
+					</a>
 				</div>
 			</div>
 		</header>
