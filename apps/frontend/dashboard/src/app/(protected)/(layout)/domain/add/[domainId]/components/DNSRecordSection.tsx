@@ -18,6 +18,7 @@ interface DNSRecordSectionProps {
 		onCheckedChange: (value: boolean) => void;
 		disabled: boolean;
 	};
+	loadingRows?: number;
 }
 
 export const DNSRecordSection: React.FC<DNSRecordSectionProps> = ({
@@ -27,6 +28,7 @@ export const DNSRecordSection: React.FC<DNSRecordSectionProps> = ({
 	onCopyToClipboard,
 	isLoading,
 	docsUrl,
+	loadingRows = 1,
 }) => {
 	return (
 		<div className="relative mt-10">
@@ -55,7 +57,7 @@ export const DNSRecordSection: React.FC<DNSRecordSectionProps> = ({
 					records={records}
 					onCopyToClipboard={onCopyToClipboard}
 					isLoading={isLoading}
-					loadingRows={1}
+					loadingRows={loadingRows}
 				/>
 			</div>
 		</div>

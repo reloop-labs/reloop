@@ -103,6 +103,7 @@ const NewDomainPage = () => {
 
 				{dmarcRecords.length > 0 && (
 					<DNSRecordSection
+						loadingRows={2}
 						title="Reject spoofed emails (DMARC)"
 						records={dmarcRecords}
 						onCopyToClipboard={copyToClipboard}
