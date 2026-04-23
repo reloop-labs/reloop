@@ -32,7 +32,7 @@ const NewDomainPage = () => {
 		{ enableOnFormTags: true },
 	);
 
-	useHotkeys("v l", () => {
+	useHotkeys("v+l", () => {
 		router.push("/domain");
 	});
 
@@ -154,7 +154,7 @@ const NewDomainPage = () => {
 						onClick={() => router.push("/domain")}
 						className="gap-1.5"
 					>
-						Verify later
+						Save & Verify later
 						<span className="inline-flex items-center gap-0.5">
 							<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-200 p-px font-medium text-[10px] uppercase">
 								V
