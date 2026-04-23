@@ -10,7 +10,8 @@ import Spinner from "@reloop/ui/spinner";
 import axios from "axios";
 import { usePathname, useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
 
@@ -21,30 +22,32 @@ interface DeleteDomainModalProps {
 export const DeleteDomainModal = ({ domains }: DeleteDomainModalProps) => {
 	const [deleteId, setDeleteId] = useQueryState("delete");
 	const [isDeleting, setIsDeleting] = useState(false);
+	const [isValidationPhraseCopied, setIsValidationPhraseCopied] =
+		useState(false);
+
+	// Check if we're on a domain detail page (not the list page)
 	const [confirmationText, setConfirmationText] = useState("");
-	const [isCopied, setIsCopied] = useState(false);
 	const { mutate } = useSWRConfig();
 	const { activeOrganization } = useUserOrganization();
 	const pathname = usePathname();
 	const router = useRouter();
 	const domainToDelete = domains.find((domain) => domain.id === deleteId);
-
-	// Check if we're on a domain detail page (not the list page)
-	// Detail page: /domain/{domainId}
-	// List page: /domain
 	const isOnDetailPage =
 		pathname?.includes("/domain/") &&
 		!pathname?.includes("/domain/add") &&
 		pathname !== "/domain";
 
-	useEffect(() => {
-		if (isCopied) {
-			const timer = setTimeout(() => {
-				setIsCopied(false);
-			}, 1000);
-			return () => clearTimeout(timer);
-		}
-	}, [isCopied]);
+	// Command/Ctrl + Enter to delete
+	useHotkeys(
+		"mod+enter",
+		(e) => {
+			e.preventDefault();
+			if (confirmationText === domainToDelete?.domain && !isDeleting) {
+				handleDelete();
+			}
+		},
+		{ enableOnFormTags: ["INPUT"], enabled: !!deleteId },
+	);
 
 	const handleDelete = async () => {
 		if (!domainToDelete) return;
@@ -56,10 +59,7 @@ export const DeleteDomainModal = ({ domains }: DeleteDomainModalProps) => {
 			});
 			await mutate(
 				(key) =>
-					typeof key === "string" &&
-					key.startsWith(
-						`/api/domain/v1/list?organizationId=${activeOrganization?.id}`,
-					),
+					typeof key === "string" && key.startsWith("/api/domain/v1/lis"),
 			);
 
 			toast.success(`${domainToDelete.domain} deleted successfully`);
@@ -99,92 +99,137 @@ export const DeleteDomainModal = ({ domains }: DeleteDomainModalProps) => {
 			}}
 		>
 			<Modal.Content
-				className="rounded-2xl border border-stroke-soft-100/50 p-0.5 sm:max-w-[480px]"
+				className="rounded-20 border-none p-0 sm:max-w-[480px]"
 				showClose={true}
 			>
-				<div className="rounded-2xl border border-stroke-soft-100/50">
-					<Modal.Header className="before:border-stroke-soft-200/50">
-						<div className="flex-1">
-							<Modal.Title className="text-sm">Delete Domain</Modal.Title>
-						</div>
-					</Modal.Header>
-					<Modal.Body className="space-y-4">
-						<div className="flex flex-col gap-1">
-							<p className="text-paragraph-sm text-text-sub-600">
-								Are you sure you want to delete this domain?
-							</p>
-							<p className="font-medium text-error-base text-paragraph-sm">
-								This action cannot be undone.
-							</p>
-						</div>
-						<div className="flex flex-col gap-2">
-							<p className="text-paragraph-sm text-text-strong-950">
-								Type{" "}
-								<span className="inline-flex items-center gap-1 rounded-md border border-stroke-soft-200 bg-bg-weak-50 px-2 py-0.5 font-mono text-paragraph-xs text-text-strong-950">
-									{domainToDelete?.domain}
-									<button
-										type="button"
-										onClick={async () => {
-											try {
-												await navigator.clipboard.writeText(
-													domainToDelete?.domain || "",
-												);
-												setIsCopied(true);
-											} catch {
-												toast.error("Failed to copy domain");
-											}
-										}}
-										className="text-text-sub-600 transition-colors hover:text-text-strong-950"
-									>
-										<Icon
-											name={isCopied ? "check" : "copy"}
-											className={`h-3 w-3 ${isCopied ? "text-success-base" : ""}`}
-										/>
-									</button>
-								</span>{" "}
-								to confirm.
-							</p>
-							<Input.Root size="small">
-								<Input.Wrapper>
-									<Input.Input
-										type="text"
-										value={confirmationText}
-										onChange={(e) => setConfirmationText(e.target.value)}
-										placeholder="Enter domain name"
-									/>
-								</Input.Wrapper>
-							</Input.Root>
-						</div>
-					</Modal.Body>
-					<Modal.Footer className="mt-4 flex items-center justify-end gap-3 border-stroke-soft-100/50">
-						<Button.Root
-							variant="neutral"
-							mode="stroke"
-							size="small"
-							onClick={handleCancel}
-							disabled={isDeleting}
-						>
-							Cancel
-							<Kbd.Root className="bg-bg-weak-50 text-[10px]">Esc</Kbd.Root>
-						</Button.Root>
-						<Button.Root
-							variant="error"
-							size="small"
-							onClick={handleDelete}
-							disabled={
-								isDeleting || confirmationText !== domainToDelete?.domain
+				<div className="rounded-20 border border-stroke-soft-100/50 bg-bg-white-0">
+					<form
+						onSubmit={(e) => {
+							e.preventDefault();
+							if (confirmationText === domainToDelete?.domain && !isDeleting) {
+								handleDelete();
 							}
-						>
-							{isDeleting ? (
-								<>
-									<Spinner size={16} />
-									Deleting...
-								</>
-							) : (
-								"Delete Domain"
-							)}
-						</Button.Root>
-					</Modal.Footer>
+						}}
+					>
+						<div className="p-6">
+							<div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-error-base/10">
+								<Icon name="trash" className="h-4 w-4 text-error-base" />
+							</div>
+
+							<h2 className="font-medium text-text-strong-950 text-title-h5">
+								Delete domain?
+							</h2>
+							<p className="mb-6 text-pretty text-sm text-text-sub-600 leading-relaxed">
+								This will stop all email delivery through this domain. Any
+								campaigns or automations using this sender will fail. Update
+								your sender address before removing.
+							</p>
+
+							{/* Domain Card */}
+							<div className="mb-6 flex items-center gap-3 rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/30">
+								<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-error-base/10 text-error-base">
+									<Icon name="globe" className="h-5 w-5" />
+								</div>
+								<div className="min-w-0 flex-1">
+									<p className="truncate font-medium text-sm text-text-strong-950">
+										{domainToDelete?.domain}
+									</p>
+									<p className="mt-0.5 truncate font-mono text-text-sub-600 text-xs">
+										{domainToDelete?.id}
+									</p>
+								</div>
+							</div>
+
+							{/* Confirmation Input */}
+							<div className="mb-2">
+								<p className="mb-2 text-sm text-text-sub-600">
+									Type{" "}
+									<span className="inline-flex max-w-xs items-center gap-1 truncate rounded-lg border border-stroke-soft-100 bg-bg-weak-50/50 px-2 py-0.5 font-medium text-text-strong-950 text-xs dark:bg-bg-strong-200">
+										{domainToDelete?.domain}
+										<button
+											type="button"
+											onClick={async () => {
+												try {
+													if (domainToDelete?.domain) {
+														await navigator.clipboard.writeText(
+															domainToDelete.domain,
+														);
+														setIsValidationPhraseCopied(true);
+														setTimeout(
+															() => setIsValidationPhraseCopied(false),
+															2000,
+														);
+													}
+												} catch {
+													toast.error("Failed to copy domain name");
+												}
+											}}
+											className="text-text-sub-600 transition-colors hover:text-text-strong-950"
+										>
+											<Icon
+												name={isValidationPhraseCopied ? "check" : "copy"}
+												className={`h-3 w-3 ${isValidationPhraseCopied ? "text-success-base" : ""}`}
+											/>
+										</button>
+									</span>{" "}
+									to confirm
+								</p>
+								<Input.Root size="small">
+									<Input.Wrapper>
+										<Input.Input
+											type="text"
+											value={confirmationText}
+											onChange={(e) => setConfirmationText(e.target.value)}
+											placeholder={domainToDelete?.domain}
+											className="font-mono text-sm"
+										/>
+									</Input.Wrapper>
+								</Input.Root>
+							</div>
+						</div>
+
+						<div className="flex flex-col-reverse justify-end gap-4 px-6 pb-6 sm:flex-row sm:items-center">
+							<Button.Root
+								variant="neutral"
+								mode="stroke"
+								size="xsmall"
+								onClick={handleCancel}
+								disabled={isDeleting}
+								className="gap-1.5"
+							>
+								Cancel
+								<span className="flex h-[19px] w-7 items-center justify-center rounded-[5px] border border-stroke-soft-100 bg-bg-weak-50/50 p-px font-medium text-[10px]">
+									Esc
+								</span>
+							</Button.Root>
+							<Button.Root
+								type="submit"
+								variant="error"
+								size="xsmall"
+								disabled={
+									isDeleting || confirmationText !== domainToDelete?.domain
+								}
+							>
+								{isDeleting ? (
+									"Deleting..."
+								) : (
+									<>
+										Delete domain
+										<span className="inline-flex items-center gap-0.5">
+											<Icon
+												name="command"
+												className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+											/>
+											<Icon
+												name="enter"
+												className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+											/>
+										</span>
+									</>
+								)}
+							</Button.Root>
+						</div>
+					</form>
 				</div>
 			</Modal.Content>
 		</Modal.Root>
