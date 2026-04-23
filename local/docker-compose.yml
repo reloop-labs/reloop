@@ -70,7 +70,7 @@ services:
       - ../docker-data/caddy:/config
     restart: unless-stopped
     extra_hosts:
-      - "local.reloop.sh:host-gateway"
+      - "host.docker.internal:host-gateway"
 
   reloop-mailpit:
     image: axllent/mailpit:latest
@@ -98,7 +98,6 @@ services:
       - BASE_URL=${BASE_URL:-https://local.reloop.sh}
     extra_hosts:
       - "host.docker.internal:host-gateway"
-      - "local.reloop.sh:host-gateway"
     depends_on:
       reloop-mailpit:
         condition: service_started
