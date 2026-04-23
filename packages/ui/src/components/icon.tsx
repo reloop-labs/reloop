@@ -1172,7 +1172,6 @@ export const IconsSprite = () => (
 				<path
 					d="M8 6L2 12L8 18M16 6L22 12L16 18"
 					stroke="currentColor"
-					strokeWidth="1.5"
 					strokeLinecap="round"
 					strokeLinejoin="round"
 				/>
@@ -2201,6 +2200,19 @@ export const IconsSprite = () => (
 					d="M12 21L12 3M12 3L19 10M12 3L5 10"
 					stroke="currentColor"
 					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
+			<symbol
+				id="arrow-top-right"
+				viewBox="0 0 24 24"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<path
+					d="M4 20L20 4M20 4V15M20 4H9"
+					stroke="currentColor"
 					strokeLinecap="round"
 					strokeLinejoin="round"
 				/>

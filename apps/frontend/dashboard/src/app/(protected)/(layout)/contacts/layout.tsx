@@ -1,6 +1,6 @@
 "use client";
 import { ContactsApiDetails } from "@fe/dashboard/components/api-details/contacts";
-
+import { DocsButton } from "@fe/dashboard/components/docs-button";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import { usePathname, useRouter } from "next/navigation";
@@ -9,7 +9,6 @@ import { useHotkeys } from "react-hotkeys-hook";
 import useSWR from "swr";
 import { ContactsModals } from "./components/contacts-modals";
 import { ContactsTabs } from "./components/contacts-tabs";
-import { DocsButton } from "./components/docs-button";
 
 interface Topic {
 	id: string;
@@ -108,7 +107,7 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 						</div>
 						{!isAddTopicPage && !isBulkImportPage && (
 							<div className="flex items-center gap-2 self-end">
-								<DocsButton size="xsmall" mode="stroke" />
+								<DocsButton slug="contacts" size="xsmall" mode="stroke" />
 								<Button.Root
 									variant="neutral"
 									size="xsmall"

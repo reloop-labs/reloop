@@ -1,18 +1,11 @@
 "use client";
-import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
 
-interface EmptyStateProps {
-	onAddDomain?: () => void;
-}
-
-export const EmptyState = ({ onAddDomain }: EmptyStateProps) => {
-	const { activeOrganization } = useUserOrganization();
-
+export const EmptyState = () => {
 	return (
-		<div className="flex flex-col items-center border-stroke-soft-100 bg-bg-soft-200/10 px-6 py-12 text-center dark:border-stroke-soft-100/50 dark:bg-bg-soft-200/15">
+		<div className="flex flex-col items-center bg-bg-soft-200/10 px-6 py-12 text-center dark:bg-bg-soft-200/15">
 			<div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
 				<Icon name="globe" className="h-5 w-5 text-text-sub-600" />
 			</div>
@@ -23,31 +16,27 @@ export const EmptyState = ({ onAddDomain }: EmptyStateProps) => {
 				Add a custom domain to send emails and improve your deliverability.
 			</p>
 			<div className="flex items-center gap-3">
-				{onAddDomain ? (
-					<Button.Root
-						variant="neutral"
-						mode="stroke"
-						size="xsmall"
-						onClick={onAddDomain}
-						className="gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
-					>
+				<Button.Root
+					variant="neutral"
+					mode="stroke"
+					size="xsmall"
+					asChild
+					className="gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
+				>
+					<Link href={"/domain/add"}>
 						<Icon name="plus" className="h-4 w-4" />
 						Add Domain
-					</Button.Root>
-				) : (
-					<Button.Root
-						variant="neutral"
-						mode="stroke"
-						size="xsmall"
-						asChild
-						className="gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
-					>
-						<Link href={`/domain/add`}>
-							<Icon name="plus" className="h-4 w-4" />
-							Add Domain
-						</Link>
-					</Button.Root>
-				)}
+						<span className="inline-flex items-center gap-0.5">
+							<Icon
+								name="command"
+								className="h-4 w-4 rounded-sm border border-stroke-soft-100 p-px"
+							/>
+							<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-100 p-px font-medium text-[10px] uppercase">
+								A
+							</span>
+						</span>
+					</Link>
+				</Button.Root>
 				<Button.Root
 					variant="neutral"
 					mode="stroke"
@@ -61,7 +50,7 @@ export const EmptyState = ({ onAddDomain }: EmptyStateProps) => {
 						rel="noopener noreferrer"
 					>
 						<Icon name="book-open" className="h-3.5 w-3.5" />
-						Read the docs
+						Learn about domains
 					</a>
 				</Button.Root>
 			</div>

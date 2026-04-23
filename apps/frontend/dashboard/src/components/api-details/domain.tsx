@@ -268,11 +268,11 @@ export const DomainApiDetails = () => {
 			<Drawer.Trigger asChild>
 				<Button.Root
 					variant="neutral"
-					size="xxsmall"
-					mode="ghost"
+					size="xsmall"
+					mode="lighter"
 					className={cn("gap-1.5", isOpen && "bg-bg-weak-50")}
 				>
-					<Icon name="code" className="h-4 w-4" />
+					<Icon name="code" className="h-4 w-4 stroke-2" />
 				</Button.Root>
 			</Drawer.Trigger>
 			<Drawer.Content className="max-w-[520px]">
