@@ -8,7 +8,6 @@
 		"start": "next start"
 	},
 	"dependencies": {
-		"@icons-pack/react-simple-icons": "^13.13.0",
 		"@mintlify/components": "catalog:ui",
 		"@radix-ui/react-collapsible": "catalog:ui",
 		"@radix-ui/react-dialog": "catalog:ui",
@@ -29,6 +28,7 @@
 		"react": "catalog:ui",
 		"react-dom": "catalog:ui",
 		"shiki": "catalog:ui",
+		"simple-icons": "catalog:ui",
 		"tailwind-merge": "catalog:ui",
 		"zod": "catalog:ui"
 	},

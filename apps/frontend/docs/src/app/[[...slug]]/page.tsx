@@ -1,21 +1,6 @@
 import { DocsBody } from "@reloop/fe-docs/components/docs/body";
 import { DocsLayout } from "@reloop/fe-docs/components/docs/layout";
 import { TableOfContents } from "@reloop/fe-docs/components/docs/toc";
-import {
-	BiomejsIcon,
-	BunIcon,
-	DockerIcon,
-	ElysiaJSIcon,
-	KubernetesIcon,
-	NextjsIcon,
-	PostgreSQLIcon,
-	RadixUIIcon,
-	RedisIcon,
-	SWRIcon,
-	TailwindCSSIcon,
-	TurborepoIcon,
-	TypeScriptIcon,
-} from "@reloop/fe-docs/components/icons/Tech";
 
 import { PageActions } from "@reloop/fe-docs/components/page-actions";
 import { source } from "@reloop/fe-docs/lib/source";
@@ -139,24 +124,7 @@ export default async function Page(props: {
 
 					{/* Content */}
 					<DocsBody>
-						<MDXContent
-							components={getMDXComponents({
-								Icon: Icon,
-								NextjsIcon: NextjsIcon,
-								RadixUIIcon: RadixUIIcon,
-								TailwindCSSIcon: TailwindCSSIcon,
-								SWRIcon: SWRIcon,
-								ElysiaJSIcon: ElysiaJSIcon,
-								PostgreSQLIcon: PostgreSQLIcon,
-								RedisIcon: RedisIcon,
-								BunIcon: BunIcon,
-								TurborepoIcon: TurborepoIcon,
-								BiomejsIcon: BiomejsIcon,
-								KubernetesIcon: KubernetesIcon,
-								DockerIcon: DockerIcon,
-								TypeScriptIcon: TypeScriptIcon,
-							})}
-						/>
+						<MDXContent components={getMDXComponents({ Icon: Icon })} />
 					</DocsBody>
 				</div>
 

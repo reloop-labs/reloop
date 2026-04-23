@@ -62,7 +62,7 @@ function SidebarSection({
 }) {
 	if (node.type === "separator") {
 		return (
-			<div className="space-y-0.5">
+			<div className="mt-4 pt-4 border-t border-fd-border first:mt-0 first:pt-0 first:border-none">
 				<h4 className="px-2 py-1 font-semibold text-fd-muted-foreground text-[11px] uppercase tracking-wider">
 					{node.name}
 				</h4>

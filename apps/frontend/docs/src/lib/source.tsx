@@ -1,38 +1,107 @@
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
-import { MDXRemote } from "next-mdx-remote/rsc";
 import type { MDXComponents } from "mdx/types";
-import type { PageTreeItem } from "./types";
+import { MDXRemote } from "next-mdx-remote/rsc";
+import type { PageTreeItem, TOCItem } from "./types";
 
-// This is a simplified source loader that replaces fumadocs-core.
+const docsDir = path.join(process.cwd(), "content/docs");
+
+function getTitle(filePath: string): string {
+	try {
+		const content = fs.readFileSync(filePath, "utf8");
+		return matter(content).data.title || path.basename(filePath, ".mdx");
+	} catch (e) {
+		return path.basename(filePath, ".mdx");
+	}
+}
+
+function buildTree(dir: string, base = ""): PageTreeItem[] {
+	const metaPath = path.join(dir, "meta.json");
+	let pages: string[] = [];
+
+	if (fs.existsSync(metaPath)) {
+		const meta = JSON.parse(fs.readFileSync(metaPath, "utf8"));
+		pages = meta.pages || [];
+	} else {
+		// Fallback: read all .mdx files and directories
+		pages = fs.readdirSync(dir).map(f => {
+			if (fs.statSync(path.join(dir, f)).isDirectory()) return f;
+			if (f.endsWith(".mdx") && f !== "introduction.mdx" && f !== "index.mdx") return f.replace(".mdx", "");
+			return null;
+		}).filter(Boolean) as string[];
+	}
+
+	return pages
+		.map((item: string): PageTreeItem | null => {
+			if (item.startsWith("---") && item.endsWith("---")) {
+				return { type: "separator", name: item.replace(/-/g, "") } as PageTreeItem;
+			}
+
+			// 1. Resolve item path and handle "index" mapping
+			const resolvedItem = item === "index" ? "introduction" : item;
+			const absolutePath = path.resolve(dir, item);
+			const url = `/${path.join(base, resolvedItem).replace(/\\/g, "/")}`;
+
+			// 2. Check if it's a direct .mdx file (at the actual path or mapped from index)
+			const mdxPath = item === "index" ? path.join(dir, "introduction.mdx") : `${absolutePath}.mdx`;
+			if (fs.existsSync(mdxPath)) {
+				return { type: "page", name: getTitle(mdxPath), url } as PageTreeItem;
+			}
+
+			// 3. Check if it's a directory
+			if (fs.existsSync(absolutePath) && fs.statSync(absolutePath).isDirectory()) {
+				const children = buildTree(absolutePath, path.join(base, item));
+				const indexPath = path.join(absolutePath, "index.mdx");
+
+				// Try to get folder title from its own meta.json
+				const childMetaPath = path.join(absolutePath, "meta.json");
+				let folderName = item.split("/").filter(Boolean).pop() || item;
+				if (fs.existsSync(childMetaPath)) {
+					try {
+						const childMeta = JSON.parse(fs.readFileSync(childMetaPath, "utf8"));
+						if (childMeta.title) folderName = childMeta.title;
+					} catch (e) {}
+				} else {
+					// Prettify folder name (e.g., nodejs -> Node.js)
+					if (folderName.toLowerCase() === "nodejs") folderName = "Node.js";
+					else folderName = folderName.charAt(0).toUpperCase() + folderName.slice(1);
+				}
+
+				if (children.length > 0) {
+					return { type: "folder", name: folderName, children } as PageTreeItem;
+				}
+
+				if (fs.existsSync(indexPath)) {
+					return { type: "page", name: folderName, url } as PageTreeItem;
+				}
+			}
+
+			return { type: "page", name: item, url } as PageTreeItem;
+		})
+		.filter((item): item is PageTreeItem => item !== null);
+}
+
 export const source = {
 	getPage: (slug?: string[]) => {
 		const slugPath = slug?.join("/") || "index";
-		const filePath = path.join(
-			process.cwd(),
-			"content/docs",
-			`${slugPath}.mdx`,
+		const filePath = path.join(docsDir, `${slugPath}.mdx`);
+
+		if (!fs.existsSync(filePath)) return null;
+
+		const { data: frontmatter, content } = matter(
+			fs.readFileSync(filePath, "utf8"),
 		);
-
-		if (!fs.existsSync(filePath)) {
-			return null;
-		}
-
-		const fileContent = fs.readFileSync(filePath, "utf8");
-		const { data: frontmatter, content } = matter(fileContent);
-
-		const toc: { title: string; url: string; depth: number }[] = [];
+		const toc: TOCItem[] = [];
 		const headingRegex = /^(##|###)\s+(.*)$/gm;
 		for (const match of content.matchAll(headingRegex)) {
 			if (!match[1] || !match[2]) continue;
-			const depth = match[1].length;
 			const title = match[2].trim();
-			const slugId = title
+			const url = `#${title
 				.toLowerCase()
-				.replace(/[^\w\- ]+/g, "")
-				.replace(/\s+/g, "-");
-			toc.push({ title, url: `#${slugId}`, depth });
+				.replace(/[^\w ]+/g, "")
+				.replace(/\s+/g, "-")}`;
+			toc.push({ title, url, depth: match[1].length });
 		}
 
 		return {
@@ -47,78 +116,28 @@ export const source = {
 			url: `/${slugPath === "index" ? "introduction" : slugPath}`,
 		};
 	},
-	pageTree: {
-		children: [
-			{
-				type: "separator",
-				name: "Documentation",
-			},
-			{
-				type: "page",
-				name: "Introduction",
-				url: "/introduction",
-			},
-			{
-				type: "separator",
-				name: "Quickstart",
-			},
-			{
-				type: "folder",
-				name: "Node.js",
-				children: [
-					{ type: "page", name: "Introduction", url: "/sdk/nodejs/index" },
-					{ type: "page", name: "Next.js", url: "/sdk/nodejs/nextjs" },
-					{ type: "page", name: "Remix", url: "/sdk/nodejs/remix" },
-					{ type: "page", name: "Nuxt", url: "/sdk/nodejs/nuxt" },
-					{ type: "page", name: "SvelteKit", url: "/sdk/nodejs/sveltekit" },
-					{ type: "page", name: "Express", url: "/sdk/nodejs/express" },
-					{ type: "page", name: "RedwoodJS", url: "/sdk/nodejs/redwoodjs" },
-					{ type: "page", name: "Hono", url: "/sdk/nodejs/hono" },
-					{ type: "page", name: "Bun", url: "/sdk/nodejs/bun" },
-					{ type: "page", name: "Astro", url: "/sdk/nodejs/astro" },
-					{ type: "page", name: "Railway", url: "/sdk/nodejs/railway" },
-					{ type: "page", name: "Encore", url: "/sdk/nodejs/encore" },
-				],
-			},
-			{
-				type: "folder",
-				name: "Serverless",
-				children: [
-					{
-						type: "page",
-						name: "Vercel Functions",
-						url: "/sdk/serverless/vercel-functions",
-					},
-					{
-						type: "page",
-						name: "Supabase Edge Functions",
-						url: "/sdk/serverless/supabase-edge-functions",
-					},
-					{
-						type: "page",
-						name: "Cloudflare Workers",
-						url: "/sdk/serverless/cloudflare-workers",
-					},
-					{
-						type: "page",
-						name: "Deno Deploy",
-						url: "/sdk/serverless/deno-deploy",
-					},
-				],
-			},
-			{ type: "page", name: "PHP", url: "/sdk/php/index" },
-			{ type: "page", name: "Ruby", url: "/sdk/ruby/introduction" },
-			{ type: "page", name: "Python", url: "/sdk/python/index" },
-			{ type: "page", name: "Go", url: "/sdk/go/index" },
-			{ type: "page", name: "Rust", url: "/sdk/rust/index" },
-			{ type: "page", name: "Elixir", url: "/sdk/elixir/index" },
-			{ type: "page", name: "Java", url: "/sdk/java/index" },
-			{ type: "page", name: ".NET", url: "/sdk/dotnet/index" },
-			{ type: "page", name: "SMTP", url: "/sdk/smtp/index" },
-			{ type: "page", name: "CLI", url: "/sdk/cli/index" },
-		] as PageTreeItem[],
+	get pageTree() {
+		return { children: buildTree(docsDir) };
 	},
 	generateParams: () => {
-		return [];
+		const getSlugs = (
+			dir: string,
+			base: string[] = [],
+		): { slug: string[] }[] => {
+			const results: { slug: string[] }[] = [];
+			const items = fs.readdirSync(dir);
+			for (const item of items) {
+				const full = path.join(dir, item);
+				if (fs.statSync(full).isDirectory()) {
+					results.push(...getSlugs(full, [...base, item]));
+				} else if (item.endsWith(".mdx")) {
+					const slug = [...base, path.basename(item, ".mdx")];
+					if (!(slug.length === 1 && slug[0] === "index"))
+						results.push({ slug });
+				}
+			}
+			return results;
+		};
+		return getSlugs(docsDir);
 	},
 };

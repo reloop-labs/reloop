@@ -1,4 +1,5 @@
 import { CardGroup } from "@reloop/fe-docs/components/mdx/CardGroup";
+import { SimpleIcon } from "@reloop/fe-docs/components/mdx/SimpleIcon";
 import {
 	Accordion,
 	Callout,
@@ -39,7 +40,15 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
 			</h3>
 		),
 		...components,
-		Card: (props: any) => <Card {...props} className="no-underline" />,
+		Card: ({ icon, ...props }: any) => {
+			const processedIcon =
+				typeof icon === "string" && (icon.startsWith("si") || icon.startsWith("Si")) ? (
+					<SimpleIcon name={icon} />
+				) : (
+					icon
+				);
+			return <Card {...props} icon={processedIcon} className="no-underline" />;
+		},
 		Accordion,
 		Callout,
 		CodeBlock,
@@ -50,5 +59,6 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
 		Tip,
 		Info,
 		CardGroup,
+		SimpleIcon,
 	};
 }

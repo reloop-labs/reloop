@@ -9,6 +9,7 @@ export {
 	Callout,
 	Card,
 	CodeGroup as CodeBlock,
+	Icon,
 	Info,
 	Note,
 	Steps,
