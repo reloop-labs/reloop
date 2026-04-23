@@ -9,11 +9,13 @@ import * as Kbd from "@reloop/ui/kbd";
 import * as LinkButton from "@reloop/ui/link-button";
 import { ArrowDown, ArrowUp, CornerDownLeft, Search, X } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
 import * as React from "react";
 
 export function CommandMenuGlobal() {
 	const [open, setOpen] = React.useState(false);
 	const router = useRouter();
+	const { setTheme } = useTheme();
 
 	// Toggle with CMD+K shortcut
 	React.useEffect(() => {
@@ -34,7 +36,18 @@ export function CommandMenuGlobal() {
 		setOpen(false);
 	};
 
+	const onThemeSelect = (theme: string) => {
+		setTheme(theme);
+		setOpen(false);
+	};
+
 	const allNavigation = [...mainNavigation, ...userNavigation];
+
+	const appearanceOptions = [
+		{ label: "Light theme", value: "light", icon: "sun" },
+		{ label: "Dark theme", value: "dark", icon: "moon" },
+		{ label: "System theme", value: "system", icon: "monitor" },
+	];
 
 	return (
 		<CommandMenu.Dialog
@@ -91,6 +104,18 @@ export function CommandMenuGlobal() {
 							onSelect={() => onSelect(item.path)}
 						>
 							<CommandMenu.ItemIcon as={Icon} name={item.iconName} />
+							{item.label}
+						</CommandMenu.Item>
+					))}
+				</CommandMenu.Group>
+
+				<CommandMenu.Group>
+					{appearanceOptions.map((item) => (
+						<CommandMenu.Item
+							key={`${item.label} ${item.value}`}
+							onSelect={() => onThemeSelect(item.value)}
+						>
+							<CommandMenu.ItemIcon as={Icon} name={item.icon} />
 							{item.label}
 						</CommandMenu.Item>
 					))}
