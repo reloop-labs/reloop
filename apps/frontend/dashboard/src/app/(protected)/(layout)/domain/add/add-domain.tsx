@@ -84,6 +84,7 @@ export const AddDomainView = () => {
 						register={register}
 						errors={formState.errors}
 						isLoading={status === "loading"}
+						domain={watch("domain")}
 					/>
 
 					<AdvancedOptions control={control} isLoading={status === "loading"} />
