@@ -9,26 +9,30 @@ const isDmarcRecord = (record: DNSRecord) =>
 	record.name.includes("_dmarc") ||
 	(record.recordType === "TXT" && record.value.includes("v=DMARC"));
 
+const isDkimRecord = (record: DNSRecord) =>
+	record.name.includes("_domainkey") || record.value.includes("v=DKIM");
+
 const isReceivingMxRecord = (record: DNSRecord) =>
 	record.recordType === "MX" &&
 	normalizeLabel(record.value) === RECEIVING_MX_VALUE;
 
-export const groupDomainDnsRecords = (
-	records: DNSRecord[] | undefined,
-) => {
+export const groupDomainDnsRecords = (records: DNSRecord[] | undefined) => {
 	const allRecords = records ?? [];
 
 	const dmarcRecords = allRecords.filter(isDmarcRecord);
 	const receivingRecords = allRecords.filter(isReceivingMxRecord);
+	const dkimRecords = allRecords.filter(isDkimRecord);
 	const sendingRecords = allRecords.filter((record) => {
 		if (isDmarcRecord(record)) return false;
 		if (isReceivingMxRecord(record)) return false;
+		if (isDkimRecord(record)) return false;
 		return true;
 	});
 
 	return {
 		sendingRecords,
 		receivingRecords,
+		dkimRecords,
 		dmarcRecords,
 	};
 };

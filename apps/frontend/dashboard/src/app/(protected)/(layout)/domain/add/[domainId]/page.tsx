@@ -65,7 +65,7 @@ const NewDomainPage = () => {
 		);
 	}
 
-	const { sendingRecords, dmarcRecords } = groupDomainDnsRecords(
+	const { sendingRecords, dkimRecords, dmarcRecords } = groupDomainDnsRecords(
 		domainData?.dnsRecords,
 	);
 
@@ -82,21 +82,34 @@ const NewDomainPage = () => {
 
 			<div className="relative mb-10">
 				<DomainAddedAlert domainName={domainData?.domain} />
+
+				{dkimRecords.length > 0 && (
+					<DNSRecordSection
+						title="Domain verification (DKIM)"
+						records={dkimRecords}
+						onCopyToClipboard={copyToClipboard}
+						isLoading={isLoading}
+						docsUrl="https://reloop.sh/docs/dns/dkim"
+					/>
+				)}
+
 				<DNSRecordSection
-					title="Sending Email"
+					title="Sending Email (SPF)"
 					records={sendingRecords}
 					onCopyToClipboard={copyToClipboard}
 					isLoading={isLoading}
-					tableId="dkim-"
+					docsUrl="https://reloop.sh/docs/dns/spf"
 				/>
 
-				<DNSRecordSection
-					title="DMARC"
-					records={dmarcRecords}
-					onCopyToClipboard={copyToClipboard}
-					isLoading={isLoading}
-					tableId="dmarc-"
-				/>
+				{dmarcRecords.length > 0 && (
+					<DNSRecordSection
+						title="Reject spoofed emails (DMARC)"
+						records={dmarcRecords}
+						onCopyToClipboard={copyToClipboard}
+						isLoading={isLoading}
+						docsUrl="https://reloop.sh/docs/dns/dmarc"
+					/>
+				)}
 
 				<Button.Root
 					onClick={handleVerifyAndNavigate}

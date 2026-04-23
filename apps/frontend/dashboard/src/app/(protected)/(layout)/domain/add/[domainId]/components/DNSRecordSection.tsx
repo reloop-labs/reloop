@@ -1,18 +1,18 @@
 "use client";
 
 import type { DNSRecord } from "@reloop/api/types";
-import * as Switch from "@reloop/ui/switch";
+import { Icon } from "@reloop/ui/icon";
+import Link from "next/link";
 import type * as React from "react";
 import { DNSRecordTableMinimal } from "./DNSRecordTableMinimal";
 
 interface DNSRecordSectionProps {
 	title: string;
 	statusText?: string;
-	description?: string;
 	records: DNSRecord[];
 	onCopyToClipboard: (text: string) => void;
 	isLoading: boolean;
-	tableId: string;
+	docsUrl?: string;
 	switchProps?: {
 		checked: boolean;
 		onCheckedChange: (value: boolean) => void;
@@ -23,26 +23,32 @@ interface DNSRecordSectionProps {
 export const DNSRecordSection: React.FC<DNSRecordSectionProps> = ({
 	title,
 	statusText,
-	description,
 	records,
 	onCopyToClipboard,
 	isLoading,
-	tableId,
+	docsUrl,
 }) => {
 	return (
 		<div className="relative mt-10">
-			<div className="mb-6 flex items-start justify-between gap-4">
-				<div className="space-y-1">
-					<div className="font-medium text-sm text-text-strong-950">
+			<div className="mb-3 flex items-start justify-between gap-4">
+				<Link
+					href={docsUrl || "#"}
+					target={docsUrl?.startsWith("http") ? "_blank" : undefined}
+					className="block space-y-1 hover:underline"
+				>
+					<div className="flex items-center gap-0.5 font-medium text-sm text-text-strong-950">
 						{title}{" "}
 						{statusText && (
 							<span className="text-text-sub-600 text-xs">({statusText})</span>
 						)}
+						{docsUrl && (
+							<Icon
+								name="arrow-top-right"
+								className="h-2.5 w-2.5 stroke-[2.5] text-text-sub-600"
+							/>
+						)}
 					</div>
-					{description && (
-						<div className="text-text-sub-600 text-xs">{description}</div>
-					)}
-				</div>
+				</Link>
 			</div>
 			<div className="w-full">
 				<DNSRecordTableMinimal
@@ -50,7 +56,6 @@ export const DNSRecordSection: React.FC<DNSRecordSectionProps> = ({
 					onCopyToClipboard={onCopyToClipboard}
 					isLoading={isLoading}
 					loadingRows={1}
-					tableId={tableId}
 				/>
 			</div>
 		</div>

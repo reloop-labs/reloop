@@ -9,13 +9,12 @@ interface DNSRecordTableMinimalProps {
 	onCopyToClipboard?: (text: string) => void;
 	isLoading?: boolean;
 	loadingRows?: number;
-	tableId?: string;
 	showPriorityColumn?: boolean;
 }
 
 const getGridCols = (showPriority: boolean) => {
 	if (showPriority) {
-		return "grid-cols-[70px_1.5fr_2fr_60px_80px]";
+		return "grid-cols-[70px_1.5fr_2fr_80px_60px]";
 	}
 	return "grid-cols-[70px_1.5fr_2fr_80px]";
 };
@@ -66,7 +65,7 @@ export const DNSRecordTableMinimal = ({
 			{/* Table Header */}
 			<div
 				className={cn(
-					"grid items-center border-stroke-soft-100 border-b px-4 py-3 text-text-sub-600",
+					"grid items-center border-stroke-soft-100 border-b bg-bg-weak-50/50 px-4 py-2.5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-bg-weak-50/40",
 					gridCols,
 				)}
 			>
@@ -79,14 +78,14 @@ export const DNSRecordTableMinimal = ({
 				<div className="flex items-center">
 					<span className="text-xs">Value</span>
 				</div>
-				{showPriorityColumn && (
-					<div className="flex items-center">
-						<span className="text-xs">Priority</span>
-					</div>
-				)}
 				<div className="flex items-center">
 					<span className="text-xs">TTL</span>
 				</div>
+				{showPriorityColumn && (
+					<div className="flex items-center justify-center">
+						<span className="text-center text-xs">Priority</span>
+					</div>
+				)}
 			</div>
 
 			{/* Table Body */}
@@ -102,14 +101,14 @@ export const DNSRecordTableMinimal = ({
 							<div
 								key={`record-${index}`}
 								className={cn(
-									"group/row grid items-center px-4 py-3 transition-colors",
+									"group/row grid items-center px-4 py-2 transition-colors",
 									"hover:bg-bg-weak-50/50",
 									gridCols,
 								)}
 							>
 								{/* Type Column */}
 								<div className="flex items-center">
-									<span className="ml-2 inline-flex items-center rounded-md bg-neutral-alpha-10 px-2 py-0.5 font-semibold text-text-strong-950 text-xs dark:bg-neutral-alpha-16">
+									<span className="inline-flex items-center rounded-md bg-neutral-alpha-10 px-2 py-0.5 font-semibold text-text-strong-950 text-xs dark:bg-neutral-alpha-16">
 										{record.recordType}
 									</span>
 								</div>
@@ -149,21 +148,25 @@ export const DNSRecordTableMinimal = ({
 									</Tooltip.Root>
 								</Tooltip.Provider>
 
-								{/* Priority Column */}
-								{showPriorityColumn && (
-									<div className="flex items-center">
-										<span className="text-label-sm text-text-sub-600">
-											{record.priority || "-"}
-										</span>
-									</div>
-								)}
-
 								{/* TTL Column */}
 								<div className="flex items-center">
 									<span className="text-label-sm text-text-sub-600">
 										{record.ttl}
 									</span>
 								</div>
+
+								{/* Priority Column */}
+								{showPriorityColumn && (
+									<div className="flex items-center justify-center">
+										{record.priority ? (
+											<span className="inline-flex items-center rounded-md bg-neutral-alpha-10 px-2 py-0.5 font-semibold text-text-strong-950 text-xs dark:bg-neutral-alpha-16">
+												{record.priority}
+											</span>
+										) : (
+											<span className="text-label-sm text-text-sub-600">-</span>
+										)}
+									</div>
+								)}
 							</div>
 						))}
 			</div>
