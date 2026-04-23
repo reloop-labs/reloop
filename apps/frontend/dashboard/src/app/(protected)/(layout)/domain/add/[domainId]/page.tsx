@@ -1,9 +1,11 @@
 "use client";
 import type { DomainResponse } from "@reloop/api";
 import * as Button from "@reloop/ui/button";
+import { Icon } from "@reloop/ui/icon";
 import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
 import * as React from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import useSWR, { mutate } from "swr";
 import { groupDomainDnsRecords } from "../../[domainId]/components/dns-record-groups";
@@ -19,6 +21,20 @@ const NewDomainPage = () => {
 	const { data: domainData, isLoading } = useSWR<DomainResponse>(
 		`/api/domain/v1/${domainId}`,
 	);
+
+	useHotkeys(
+		"mod+enter",
+		() => {
+			if (!isVerifying) {
+				handleVerifyAndNavigate();
+			}
+		},
+		{ enableOnFormTags: true },
+	);
+
+	useHotkeys("v l", () => {
+		router.push("/domain");
+	});
 
 	const copyToClipboard = async (text: string) => {
 		try {
@@ -112,15 +128,43 @@ const NewDomainPage = () => {
 					/>
 				)}
 
-				<Button.Root
-					onClick={handleVerifyAndNavigate}
-					size="xsmall"
-					variant="neutral"
-					className="mt-5"
-					disabled={isVerifying}
-				>
-					{isVerifying ? "Verifying..." : "I have added the DNS records"}
-				</Button.Root>
+				<div className="mt-5 flex items-center gap-3">
+					<Button.Root
+						onClick={handleVerifyAndNavigate}
+						size="xsmall"
+						variant="neutral"
+						disabled={isVerifying}
+					>
+						{isVerifying ? "Verifying..." : "Verify DNS Records"}
+						<span className="inline-flex items-center gap-0.5">
+							<Icon
+								name="command"
+								className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+							/>
+							<Icon
+								name="enter"
+								className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+							/>
+						</span>
+					</Button.Root>
+					<Button.Root
+						variant="neutral"
+						mode="stroke"
+						size="xsmall"
+						onClick={() => router.push("/domain")}
+						className="gap-1.5"
+					>
+						Verify later
+						<span className="inline-flex items-center gap-0.5">
+							<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-200 p-px font-medium text-[10px] uppercase">
+								V
+							</span>
+							<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-200 p-px font-medium text-[10px] uppercase">
+								L
+							</span>
+						</span>
+					</Button.Root>
+				</div>
 			</div>
 		</div>
 	);
