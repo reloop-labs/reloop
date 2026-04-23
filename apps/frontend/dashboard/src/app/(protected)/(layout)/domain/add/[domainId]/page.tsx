@@ -1,17 +1,16 @@
 "use client";
 import type { DomainResponse } from "@reloop/api";
-import * as Alert from "@reloop/ui/alert";
 import * as Button from "@reloop/ui/button";
-import { Icon } from "@reloop/ui/icon";
-import Spinner from "@reloop/ui/spinner";
-import * as Switch from "@reloop/ui/switch";
 import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
 import * as React from "react";
 import { toast } from "sonner";
 import useSWR, { mutate } from "swr";
-import { DNSRecordTable } from "../../[domainId]/components/DNSRecordTable";
 import { groupDomainDnsRecords } from "../../[domainId]/components/dns-record-groups";
+import { DNSRecordSection } from "./components/DNSRecordSection";
+import { DomainAddedAlert } from "./components/DomainAddedAlert";
+import { NewDomainEmptyState } from "./components/NewDomainEmptyState";
+import { NewDomainHeader } from "./components/NewDomainHeader";
 
 const NewDomainPage = () => {
 	const [copiedItems, setCopiedItems] = React.useState<Set<string>>(new Set());
@@ -20,11 +19,11 @@ const NewDomainPage = () => {
 	const [isUpdatingReceiving, setIsUpdatingReceiving] = React.useState(false);
 	const { domainId } = useParams();
 	const router = useRouter();
-	const { back } = router;
 
 	const { data: domainData, isLoading } = useSWR<DomainResponse>(
-		domainId ? `/api/domain/v1/${domainId}` : null,
+		`/api/domain/v1/${domainId}`,
 	);
+
 	const copyToClipboard = async (text: string, itemId: string) => {
 		try {
 			await navigator.clipboard.writeText(text);
@@ -36,9 +35,7 @@ const NewDomainPage = () => {
 					return newSet;
 				});
 			}, 2000);
-		} catch {
-			// Handle copy error silently
-		}
+		} catch {}
 	};
 
 	const handleVerifyAndNavigate = async () => {
@@ -61,7 +58,7 @@ const NewDomainPage = () => {
 				"DNS verification started! Verification will continue in the background.",
 			);
 
-			// Navigate to domain detail page to see verification progress
+			// Navigate to domain list page
 			router.push("/domain");
 		} catch (error) {
 			const errorMessage = axios.isAxiosError(error)
@@ -112,42 +109,7 @@ const NewDomainPage = () => {
 	) {
 		return (
 			<div className="mx-auto max-w-3xl pt-10 pb-8 sm:px-8">
-				<Button.Root
-					onClick={() => back()}
-					variant="neutral"
-					mode="stroke"
-					size="xxsmall"
-				>
-					<Button.Icon>
-						<Icon name="chevron-left" className="h-4 w-4" />
-					</Button.Icon>
-					Back
-				</Button.Root>
-				<div className="flex w-full items-center justify-between border-stroke-soft-200 border-b border-dashed pt-6 pb-6">
-					<div>
-						<h1 className="font-medium text-title-h5 leading-8">Add Domain</h1>
-						<p className="text-paragraph-sm text-text-sub-600">
-							You need a domain to send emails from your own domain
-						</p>
-					</div>
-					<Button.Root
-						variant="neutral"
-						mode="stroke"
-						size="xsmall"
-						onClick={() =>
-							window.open("https://reloop.sh/docs/domain", "_blank")
-						}
-					>
-						<Icon name="file-text" className="h-4 w-4" />
-						Go to docs
-					</Button.Root>
-				</div>
-				<div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4">
-					<p className="text-yellow-800">
-						No DNS records found for this domain. Please generate DNS records
-						first.
-					</p>
-				</div>
+				<NewDomainEmptyState onBack={() => router.back()} />
 			</div>
 		);
 	}
@@ -157,145 +119,70 @@ const NewDomainPage = () => {
 
 	return (
 		<div className="mx-auto max-w-3xl pt-10 pb-8 sm:px-8">
-			<div className="flex w-full items-center justify-between border-stroke-soft-200 border-b border-dashed pt-6 pb-6">
-				<div>
-					<h1 className="font-medium text-title-h5 leading-8">Domain Added</h1>
-					<p className="text-paragraph-sm text-text-sub-600">
-						You have successfully added the domain
-					</p>
-				</div>
-				<Button.Root
-					onClick={handleVerifyAndNavigate}
-					size="xsmall"
-					variant="neutral"
-					disabled={isVerifying}
-				>
-					{isVerifying ? (
-						<>
-							<Button.Icon>
-								<Spinner size={16} color="currentColor" />
-							</Button.Icon>
-							Verifying
-						</>
-					) : (
-						"I have added the DNS records"
-					)}
-				</Button.Root>
-			</div>
+			<NewDomainHeader
+				title="Domain Added"
+				description="You have successfully added the domain"
+				action={{
+					label: "I have added the DNS records",
+					onClick: handleVerifyAndNavigate,
+					isLoading: isVerifying,
+				}}
+			/>
 
 			<div className="relative my-10">
-				<Alert.Root
-					variant="stroke"
-					status="success"
-					size="small"
-					className="w-full rounded-xl border-[1px] border-success-base bg-success-base/5"
-				>
-					<div className="flex gap-2">
-						<Icon
-							name="checkbox-circle"
-							className="mt-2 size-4 text-success-base"
-						/>
-						<div>
-							<div className="font-medium text-label-md">{domainId}</div>
-							<div className="text-text-sub-600 text-xs">New added domain</div>
-						</div>
-					</div>
-				</Alert.Root>
+				<DomainAddedAlert
+					domainName={domainData?.domain || (domainId as string)}
+				/>
 
-				{/* Sending Email Records */}
-				<div className="relative mt-10">
-					<div className="mb-6 flex items-start justify-between gap-4">
-						<div className="space-y-1">
-							<div className="font-medium text-sm text-text-strong-950">
-								Sending Email{" "}
-								<span className="text-text-sub-600 text-xs">(Required)</span>
-							</div>
-							<div className="text-text-sub-600 text-xs">
-								Enable email signing and specify authorized senders.
-							</div>
-						</div>
-						<Switch.Root
-							checked={domainData?.sendingEmail ?? true}
-							onCheckedChange={(value) =>
-								handleUpdateDomain(
-									{ sendingEmail: value },
-									setIsUpdatingSending,
-								)
-							}
-							disabled={isLoading || isUpdatingSending}
-							checkedColor="orange"
-						/>
-					</div>
-					<div className="w-full">
-						<DNSRecordTable
-							records={sendingRecords}
-							onCopyToClipboard={copyToClipboard}
-							copiedItems={copiedItems}
-							isLoading={isLoading}
-							loadingRows={1}
-							tableId="dkim-"
-						/>
-					</div>
-				</div>
+				<DNSRecordSection
+					title="Sending Email"
+					statusText="Required"
+					description="Enable email signing and specify authorized senders."
+					records={sendingRecords}
+					onCopyToClipboard={copyToClipboard}
+					copiedItems={copiedItems}
+					isLoading={isLoading}
+					tableId="dkim-"
+					switchProps={{
+						checked: domainData?.sendingEmail ?? true,
+						onCheckedChange: (value) =>
+							handleUpdateDomain({ sendingEmail: value }, setIsUpdatingSending),
+						disabled: isLoading || isUpdatingSending,
+					}}
+				/>
 
 				{receivingRecords.length > 0 && (
-					<div className="relative mt-10">
-						<div className="mb-6 flex items-start justify-between gap-4">
-							<div className="space-y-1">
-								<div className="font-medium text-sm text-text-strong-950">
-									Receiving Email{" "}
-									<span className="text-text-sub-600 text-xs">(Optional)</span>
-								</div>
-								<div className="text-text-sub-600 text-xs">
-									Route inbound mail to your receiving mail host.
-								</div>
-							</div>
-							<Switch.Root
-								checked={domainData?.receivingEmail ?? true}
-								onCheckedChange={(value) =>
-									handleUpdateDomain(
-										{ receivingEmail: value },
-										setIsUpdatingReceiving,
-									)
-								}
-								disabled={isLoading || isUpdatingReceiving}
-								checkedColor="orange"
-							/>
-						</div>
-						<div className="w-full">
-							<DNSRecordTable
-								records={receivingRecords}
-								onCopyToClipboard={copyToClipboard}
-								copiedItems={copiedItems}
-								isLoading={isLoading}
-								loadingRows={1}
-								tableId="receiving-"
-							/>
-						</div>
-					</div>
+					<DNSRecordSection
+						title="Receiving Email"
+						statusText="Optional"
+						description="Route inbound mail to your receiving mail host."
+						records={receivingRecords}
+						onCopyToClipboard={copyToClipboard}
+						copiedItems={copiedItems}
+						isLoading={isLoading}
+						tableId="receiving-"
+						switchProps={{
+							checked: domainData?.receivingEmail ?? true,
+							onCheckedChange: (value) =>
+								handleUpdateDomain(
+									{ receivingEmail: value },
+									setIsUpdatingReceiving,
+								),
+							disabled: isLoading || isUpdatingReceiving,
+						}}
+					/>
 				)}
 
-				<div className="relative mt-10">
-					<div className="mb-6 space-y-1">
-						<div className="font-medium text-sm text-text-strong-950">
-							DMARC{" "}
-							<span className="text-text-sub-600 text-xs">(Recommended)</span>
-						</div>
-						<div className="text-text-sub-600 text-xs">
-							Set authentication policies and receive reports.
-						</div>
-					</div>
-					<div className="w-full">
-						<DNSRecordTable
-							records={dmarcRecords}
-							onCopyToClipboard={copyToClipboard}
-							copiedItems={copiedItems}
-							isLoading={isLoading}
-							loadingRows={1}
-							tableId="dmarc-"
-						/>
-					</div>
-				</div>
+				<DNSRecordSection
+					title="DMARC"
+					statusText="Recommended"
+					description="Set authentication policies and receive reports."
+					records={dmarcRecords}
+					onCopyToClipboard={copyToClipboard}
+					copiedItems={copiedItems}
+					isLoading={isLoading}
+					tableId="dmarc-"
+				/>
 
 				<Button.Root
 					onClick={handleVerifyAndNavigate}
@@ -304,16 +191,7 @@ const NewDomainPage = () => {
 					className="mt-5"
 					disabled={isVerifying}
 				>
-					{isVerifying ? (
-						<>
-							<Button.Icon>
-								<Spinner size={16} color="currentColor" />
-							</Button.Icon>
-							Verifying
-						</>
-					) : (
-						"I have added the DNS records"
-					)}
+					{isVerifying ? "Verifying..." : "I have added the DNS records"}
 				</Button.Root>
 			</div>
 		</div>
