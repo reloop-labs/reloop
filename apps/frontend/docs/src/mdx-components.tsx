@@ -1,3 +1,16 @@
+import { CardGroup } from "@reloop/fe-docs/components/mdx/CardGroup";
+import {
+	Accordion,
+	Callout,
+	Card,
+	CodeBlock,
+	Info,
+	Note,
+	Steps,
+	Tabs,
+	Tip,
+	Warning,
+} from "@reloop/fe-docs/components/mdx/mintlify-client";
 import type { MDXComponents } from "mdx/types";
 import React from "react";
 
@@ -26,5 +39,16 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
 			</h3>
 		),
 		...components,
+		Card: (props: any) => <Card {...props} className="no-underline" />,
+		Accordion,
+		Callout,
+		CodeBlock,
+		Steps,
+		Tabs,
+		Note,
+		Warning,
+		Tip,
+		Info,
+		CardGroup,
 	};
 }

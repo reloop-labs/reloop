@@ -16,7 +16,7 @@ import {
 	TurborepoIcon,
 	TypeScriptIcon,
 } from "@reloop/fe-docs/components/icons/Tech";
-import { Card, Cards } from "@reloop/fe-docs/components/mdx/cards";
+
 import { PageActions } from "@reloop/fe-docs/components/page-actions";
 import { source } from "@reloop/fe-docs/lib/source";
 import type { PageTreeItem, TOCItem } from "@reloop/fe-docs/lib/types";
@@ -155,8 +155,6 @@ export default async function Page(props: {
 								KubernetesIcon: KubernetesIcon,
 								DockerIcon: DockerIcon,
 								TypeScriptIcon: TypeScriptIcon,
-								Cards: Cards,
-								Card: Card,
 							})}
 						/>
 					</DocsBody>
