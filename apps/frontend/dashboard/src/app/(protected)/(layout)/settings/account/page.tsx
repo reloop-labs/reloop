@@ -9,6 +9,7 @@ import * as Label from "@reloop/ui/label";
 import Spinner from "@reloop/ui/spinner";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import * as v from "valibot";
 import { AccountDangerZone } from "./components/account-danger-zone";
@@ -77,6 +78,18 @@ const AccountPage = () => {
 			setIsSaving(false);
 		}
 	};
+
+	useHotkeys(
+		"mod+enter",
+		() => {
+			if (hasChanges && !isSaving) {
+				handleSubmit(handleSaveChanges)();
+			}
+		},
+		{
+			enableOnFormTags: true,
+		},
+	);
 
 	const getInitials = () => {
 		if (firstName || lastName) {
