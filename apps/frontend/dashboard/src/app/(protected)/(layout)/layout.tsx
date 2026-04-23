@@ -1,3 +1,4 @@
+import { CommandMenuGlobal } from "@fe/dashboard/components/command-menu";
 import { PageHeader } from "@fe/dashboard/components/layout/page-header";
 import { MainSidebar } from "@fe/dashboard/components/layout/sidebar";
 import { SidebarToggle } from "@fe/dashboard/components/layout/sidebar-toggel";
@@ -13,6 +14,7 @@ const OrgLayout = ({ children }: { children: React.ReactNode }) => {
 					<PageHeader />
 					<div className="flex-1 overflow-y-auto">{children}</div>
 				</main>
+				<CommandMenuGlobal />
 			</div>
 		</UserOrganizationProvider>
 	);
