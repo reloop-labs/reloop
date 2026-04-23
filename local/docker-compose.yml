@@ -66,6 +66,7 @@ services:
       - "443:443"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./certs:/etc/caddy/certs
       - ../docker-data/caddy:/data
       - ../docker-data/caddy:/config
     restart: unless-stopped
