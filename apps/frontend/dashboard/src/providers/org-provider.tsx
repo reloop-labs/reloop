@@ -2,6 +2,7 @@
 
 import { authClient } from "@reloop/auth/client";
 import Spinner from "@reloop/ui/spinner";
+import { useRouter } from "next/navigation";
 import {
 	createContext,
 	type ReactNode,
@@ -42,6 +43,7 @@ export const UserOrganizationProvider = ({
 }: {
 	children: ReactNode;
 }) => {
+	const router = useRouter();
 	const { data: session, isPending: sessionLoading } = authClient.useSession();
 	const {
 		data: organizations,
@@ -61,6 +63,20 @@ export const UserOrganizationProvider = ({
 
 	const isLoading =
 		sessionLoading || organizationsLoading || isSettingDefaultOrg;
+
+	useEffect(() => {
+		if (sessionLoading) return;
+
+		if (!session) {
+			router.push("/login");
+			return;
+		}
+
+		if (!organizationsLoading && organizations && organizations.length === 0) {
+			router.push("/onboarding");
+			return;
+		}
+	}, [session, sessionLoading, organizations, organizationsLoading, router]);
 
 	useEffect(() => {
 		const handleOrganizationRedirect = async () => {
@@ -130,11 +146,7 @@ export const UserOrganizationProvider = ({
 		);
 	}
 
-	if (!session?.user) {
-		return <div>User not found</div>;
-	}
-
-	if (!activeOrganization) {
+	if (!session?.user || !activeOrganization) {
 		return (
 			<div className="flex h-screen items-center justify-center">
 				<Spinner />

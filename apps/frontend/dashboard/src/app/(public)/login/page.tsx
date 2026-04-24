@@ -7,19 +7,36 @@ import { Logo } from "@reloop/ui/logo";
 import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence } from "motion/react";
 import Link from "next/link";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { LoginForm } from "./login-form";
 
 const Page = () => {
+	const router = useRouter();
+	const { data: session, isPending } = authClient.useSession();
 	const [showEmail, setShowEmail] = useState(false);
 	const [loading, setLoading] = useState<{
 		name: "google" | "github" | "email";
 		loading: boolean;
 	}>({ name: "email", loading: false });
-	const [error, setError] = useState<{
+	const [, setError] = useState<{
 		name: "google" | "github" | "email";
 		error: string | null;
 	}>({ name: "email", error: null });
+
+	useEffect(() => {
+		if (session && !isPending) {
+			router.push("/");
+		}
+	}, [session, isPending, router]);
+
+	if (isPending) {
+		return (
+			<div className="flex h-dvh flex-col items-center justify-center">
+				<Spinner size={32} />
+			</div>
+		);
+	}
 
 	return (
 		<div className="flex h-dvh flex-col items-center justify-center">
@@ -49,7 +66,7 @@ const Page = () => {
 									provider: "google",
 									callbackURL: "/dashboard",
 								});
-							} catch (error) {
+							} catch {
 								setLoading({ name: "google", loading: false });
 								setError({
 									name: "google",
@@ -101,7 +118,7 @@ const Page = () => {
 									provider: "github",
 									callbackURL: "/dashboard",
 								});
-							} catch (error) {
+							} catch {
 								setLoading({ name: "github", loading: false });
 								setError({
 									name: "github",
