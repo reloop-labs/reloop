@@ -1,0 +1,65 @@
+import { Icon } from "@reloop/ui/icon";
+import { Skeleton } from "@reloop/ui/skeleton";
+import * as React from "react";
+import * as simpleIcons from "simple-icons";
+
+import { inferDnsProvider } from "../utils";
+
+interface DNSProviderInfoProps {
+	nameservers: string[] | null | undefined;
+	isLoading: boolean;
+}
+
+export const DNSProviderInfo: React.FC<DNSProviderInfoProps> = ({
+	nameservers,
+	isLoading,
+}) => {
+	const provider = React.useMemo(
+		() => inferDnsProvider(nameservers),
+		[nameservers],
+	);
+
+	if (!provider?.url) return null;
+
+	const dnsIcon = provider.iconKey
+		? ((simpleIcons as Record<string, { svg: string; hex: string }>)[
+				provider.iconKey
+			] ?? null)
+		: null;
+
+	return (
+		<div className="flex flex-col gap-1.5">
+			<div className="flex items-center gap-1.5">
+				<Icon name="server" className="h-3.5 w-3.5 text-text-sub-600" />
+				<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
+					Provider
+				</span>
+			</div>
+			{isLoading ? (
+				<Skeleton className="h-5 w-24 rounded-lg" />
+			) : (
+				<div className="mt-0.5 flex items-center gap-1.5">
+					<a
+						href={provider.url}
+						target="_blank"
+						rel="noopener noreferrer"
+						className="flex cursor-pointer items-center gap-1.5 text-sm text-text-strong-950 transition-opacity hover:opacity-80"
+					>
+						{dnsIcon && (
+							<span
+								className="h-4 w-4"
+								style={{ color: `#${dnsIcon.hex}` }}
+								// biome-ignore lint/security/noDangerouslySetInnerHtml: Trusted SVG from simple-icons
+								dangerouslySetInnerHTML={{ __html: dnsIcon.svg }}
+							/>
+						)}
+						<span className="font-medium text-paragraph-sm underline decoration-stroke-soft-200 decoration-dashed underline-offset-4">
+							{provider.label}
+						</span>
+						<Icon name="link-external" className="h-3 w-3 text-text-soft-400" />
+					</a>
+				</div>
+			)}
+		</div>
+	);
+};

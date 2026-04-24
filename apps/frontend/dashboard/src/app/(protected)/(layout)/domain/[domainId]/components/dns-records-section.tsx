@@ -1,38 +1,60 @@
 "use client";
 
-import type { DNSRecord } from "@reloop/api/types";
+import type { DomainResponse } from "@reloop/api";
 import * as Switch from "@reloop/ui/switch";
+import { toast } from "sonner";
+import { groupDomainDnsRecords } from "./dns-record-groups";
 import { DNSRecordTable } from "./dns-record-table";
 
 interface DNSRecordsSectionProps {
-	sendingRecords: DNSRecord[];
-	receivingRecords: DNSRecord[];
-	dmarcRecords: DNSRecord[];
-	sendingEmail?: boolean;
-	receivingEmail?: boolean;
-	onToggleSending?: (value: boolean) => void | Promise<void>;
-	onToggleReceiving?: (value: boolean) => void | Promise<void>;
-	isUpdatingSending?: boolean;
-	isUpdatingReceiving?: boolean;
+	domain?: DomainResponse;
+	isLoading?: boolean;
+	handleUpdateDomain?: (
+		payload: Partial<Pick<DomainResponse, "sendingEmail" | "receivingEmail">>,
+		successMessage: string,
+	) => Promise<void>;
 	onCopyToClipboard?: (text: string, itemId: string) => void;
 	copiedItems?: Set<string>;
-	isLoading?: boolean;
 }
 
 export const DNSRecordsSection = ({
-	sendingRecords,
-	receivingRecords,
-	dmarcRecords,
-	sendingEmail = true,
-	receivingEmail = true,
-	onToggleSending,
-	onToggleReceiving,
-	isUpdatingSending,
-	isUpdatingReceiving,
+	domain,
+	isLoading,
+	handleUpdateDomain,
 	onCopyToClipboard,
 	copiedItems = new Set(),
-	isLoading,
 }: DNSRecordsSectionProps) => {
+	const { sendingRecords, receivingRecords, dmarcRecords } =
+		groupDomainDnsRecords(domain?.dnsRecords);
+
+	const onToggleSending = (value: boolean) => {
+		if (!handleUpdateDomain) return;
+
+		if (!value && !domain?.receivingEmail) {
+			toast.error("At least one of Sending or Receiving must be enabled");
+			return;
+		}
+
+		handleUpdateDomain(
+			{ sendingEmail: value },
+			`Sending email ${value ? "enabled" : "disabled"}`,
+		);
+	};
+
+	const onToggleReceiving = (value: boolean) => {
+		if (!handleUpdateDomain) return;
+
+		if (!value && !domain?.sendingEmail) {
+			toast.error("At least one of Sending or Receiving must be enabled");
+			return;
+		}
+
+		handleUpdateDomain(
+			{ receivingEmail: value },
+			`Receiving email ${value ? "enabled" : "disabled"}`,
+		);
+	};
+
 	return (
 		<div className="mb-24">
 			{/* Sending Email Section */}
@@ -48,9 +70,9 @@ export const DNSRecordsSection = ({
 						</div>
 					</div>
 					<Switch.Root
-						checked={sendingEmail}
+						checked={domain?.sendingEmail ?? true}
 						onCheckedChange={onToggleSending}
-						disabled={isLoading || isUpdatingSending}
+						disabled={isLoading}
 						checkedColor="orange"
 					/>
 				</div>
@@ -78,9 +100,9 @@ export const DNSRecordsSection = ({
 							</div>
 						</div>
 						<Switch.Root
-							checked={receivingEmail}
+							checked={domain?.receivingEmail ?? true}
 							onCheckedChange={onToggleReceiving}
-							disabled={isLoading || isUpdatingReceiving}
+							disabled={isLoading}
 							checkedColor="orange"
 						/>
 					</div>

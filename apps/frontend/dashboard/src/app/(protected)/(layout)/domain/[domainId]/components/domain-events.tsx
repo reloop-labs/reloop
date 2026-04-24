@@ -5,14 +5,21 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
 import { format } from "date-fns";
+import * as React from "react";
+import { inferDnsProvider } from "../utils";
 
 export const DomainEvents = ({
 	domain,
-	providerLabel,
+	nameservers,
 }: {
 	domain: DomainResponse;
-	providerLabel?: string | null;
+	nameservers?: string[] | null;
 }) => {
+	const providerLabel = React.useMemo(
+		() => inferDnsProvider(nameservers || domain.nameservers)?.label,
+		[nameservers, domain.nameservers],
+	);
+
 	let currentStep = 1;
 	if (domain.status === "verifying") currentStep = 2;
 	if (domain.status === "active") currentStep = 3;
