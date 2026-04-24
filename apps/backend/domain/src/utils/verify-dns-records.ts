@@ -1,6 +1,5 @@
 import { resolveMx, resolveTxt } from "node:dns";
 import { promisify } from "node:util";
-import logger from "@reloop/logger";
 
 export async function verifyMxRecord(
 	name: string,

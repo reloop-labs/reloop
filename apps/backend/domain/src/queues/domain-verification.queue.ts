@@ -16,10 +16,10 @@ export const domainVerificationQueue =
   new Queue<DomainVerificationJobData>(DOMAIN_VERIFICATION_QUEUE, {
     connection,
     defaultJobOptions: {
-      attempts: 3,
+      attempts: 6,
       backoff: {
-        type: "exponential",
-        delay: 30_000,
+        type: "fixed",
+        delay: 180_000,
       },
       removeOnComplete: { count: 100 },
       removeOnFail: { count: 200 },

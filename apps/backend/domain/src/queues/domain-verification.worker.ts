@@ -22,6 +22,7 @@ const connection = {
 async function processDomainVerification(
   domainId: string,
   organizationId: string,
+  isLastAttempt: boolean,
 ): Promise<void> {
   logger.info({ domainId }, "Processing domain verification job");
 
@@ -92,21 +93,28 @@ async function processDomainVerification(
 
   // Update individual record statuses
   await Promise.all(
-    results.map(({ record, ok }) =>
-      db
+    results.map(({ record, ok }) => {
+      // Only update to failed if it's the last attempt
+      if (!ok && !isLastAttempt) return Promise.resolve();
+
+      return db
         .update(schema.domainDnsRecord)
         .set({ status: ok ? "active" : "failed" })
-        .where(eq(schema.domainDnsRecord.id, record.id)),
-    ),
+        .where(eq(schema.domainDnsRecord.id, record.id));
+    }),
   );
 
   const allPassed = mxOk && spfOk && dkimOk && dmarcOk;
-  const newDomainStatus = allPassed ? "active" : "failed";
 
-  await db
-    .update(schema.domain)
-    .set({ status: newDomainStatus })
-    .where(eq(schema.domain.id, domainId));
+  // Only update domain status to failed if it's the last attempt
+  if (allPassed || isLastAttempt) {
+    const newDomainStatus = allPassed ? "active" : "failed";
+
+    await db
+      .update(schema.domain)
+      .set({ status: newDomainStatus })
+      .where(eq(schema.domain.id, domainId));
+  }
 
   if (allPassed) {
     logger.info({ domainId, domainName }, "Domain verified successfully");
@@ -127,7 +135,8 @@ export function startDomainVerificationWorker(): Worker {
     DOMAIN_VERIFICATION_QUEUE,
     async (job) => {
       const { domainId, organizationId } = job.data;
-      await processDomainVerification(domainId, organizationId);
+      const isLastAttempt = (job.attemptsMade + 1) >= (job.opts.attempts ?? 1);
+      await processDomainVerification(domainId, organizationId, isLastAttempt);
     },
     {
       connection,
