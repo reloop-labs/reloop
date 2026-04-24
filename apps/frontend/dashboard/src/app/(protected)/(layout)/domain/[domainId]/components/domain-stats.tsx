@@ -4,7 +4,7 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import type * as React from "react";
-import { formatStatusLabel, getStatusBadgeStyles } from "../utils";
+import { getStatusBadgeStyles } from "../utils";
 import { DNSProviderInfo } from "./dns-provider-info";
 
 interface DomainStatsProps {
@@ -52,7 +52,7 @@ export const DomainStats: React.FC<DomainStatsProps> = ({
 							getStatusBadgeStyles(domain?.status || "start-verify"),
 						)}
 					>
-						{formatStatusLabel(domain?.status || "start-verify")}
+						{domain?.status || "start-verify"}
 					</span>
 				)}
 			</div>

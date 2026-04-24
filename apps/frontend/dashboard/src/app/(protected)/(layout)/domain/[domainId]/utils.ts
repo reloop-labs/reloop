@@ -13,14 +13,6 @@ export const getStatusBadgeStyles = (status: string) => {
   }
 };
 
-export const formatStatusLabel = (status: string) => {
-  switch (status.toLowerCase()) {
-    case "start-verify":
-      return "Pending";
-    default:
-      return status.charAt(0).toUpperCase() + status.slice(1);
-  }
-};
 
 export const inferDnsProvider = (nameservers: string[] | null | undefined) => {
   if (!nameservers?.length) return null;
