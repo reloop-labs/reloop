@@ -57,7 +57,7 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 	];
 
 	return (
-		<div className="relative flex items-start gap-0">
+		<div className="relative ml-10 flex max-w-md items-start gap-0">
 			{steps.map((step, index) => {
 				const state = getStepState(step.number);
 				const isLast = index === steps.length - 1;
@@ -105,7 +105,7 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 
 								{/* Connector Line */}
 								{!isLast && (
-									<div className="absolute top-3 right-0 left-6 h-[1px] bg-stroke-soft-200">
+									<div className="-right-5 absolute top-5 left-5 h-[1px] bg-stroke-soft-200">
 										<div
 											className={cn(
 												"h-full transition-all duration-700 ease-out",
@@ -119,10 +119,10 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 							</div>
 
 							{/* Label + Meta */}
-							<div className="flex flex-col gap-0.5 pr-4">
+							<div className="flex w-10 flex-col items-center gap-0.5">
 								<p
 									className={cn(
-										"font-medium text-[10px] uppercase tracking-wider transition-colors duration-300",
+										"whitespace-nowrap text-center font-medium text-[10px] uppercase tracking-wider transition-colors duration-300",
 										state === "upcoming"
 											? "text-text-soft-400"
 											: "text-text-strong-950",
@@ -131,7 +131,7 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 									{step.label}
 								</p>
 								{step.timestamp && (
-									<span className="text-[10px] text-text-soft-400 tabular-nums">
+									<span className="whitespace-nowrap text-center text-[10px] text-text-soft-400 tabular-nums">
 										{step.timestamp}
 									</span>
 								)}
