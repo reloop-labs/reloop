@@ -1,5 +1,5 @@
 {
-  "id": "a881bfcc-06b8-418b-8c57-f223d18031fb",
+  "id": "7ffa9b76-4a19-4089-82b2-56119feb3847",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -1399,7 +1399,7 @@
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true,
-          "default": "'send'"
+          "default": "'inbound.email'"
         },
         "click_tracking": {
           "name": "click_tracking",
@@ -1818,6 +1818,12 @@
         },
         "domain": {
           "name": "domain",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fqdn": {
+          "name": "fqdn",
           "type": "text",
           "primaryKey": false,
           "notNull": true

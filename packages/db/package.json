@@ -23,6 +23,7 @@
 		"db:push": "bun env:run drizzle-kit push",
 		"db:studio": "bun env:run drizzle-kit studio",
 		"db:seed": "bun env:run bun run src/utils/seed.ts",
+		"db:reset": "bun env:run bun src/reset.ts",
 		"migrate": "bun run src/migrate.ts"
 	},
 	"dependencies": {
