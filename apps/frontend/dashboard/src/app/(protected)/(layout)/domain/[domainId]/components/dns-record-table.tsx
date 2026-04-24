@@ -23,16 +23,17 @@ interface DNSRecordTableProps {
 }
 
 const getGridCols = (hideStatus: boolean, showPriority: boolean) => {
-	if (hideStatus && showPriority) {
-		return "grid-cols-[70px_1.5fr_2fr_80px_60px]";
+	// For tables with status (dashboard view), we use a consistent 6-column grid to ensure alignment
+	// across multiple tables (DKIM, SPF, DMARC), even if some don't have priority.
+	if (!hideStatus) {
+		return "grid-cols-[80px_1fr_1.5fr_70px_70px_110px]";
 	}
-	if (hideStatus && !showPriority) {
-		return "grid-cols-[70px_1.5fr_2fr_80px]";
+
+	// For tables without status (e.g. Add Domain flow)
+	if (showPriority) {
+		return "grid-cols-[80px_1fr_1.5fr_70px_70px]";
 	}
-	if (!hideStatus && showPriority) {
-		return "grid-cols-[70px_1.5fr_2fr_80px_60px_120px]";
-	}
-	return "grid-cols-[70px_1.5fr_2fr_80px_120px]";
+	return "grid-cols-[80px_1fr_1.5fr_70px]";
 };
 
 const RecordSkeleton = ({
@@ -57,9 +58,10 @@ const RecordSkeleton = ({
 		<div className="flex items-center gap-2">
 			<Skeleton className="h-4 w-32" />
 		</div>
-		{showPriority && (
+		{/* Priority Column - always render slot if status is shown for alignment */}
+		{(!hideStatus || showPriority) && (
 			<div className="flex items-center">
-				<Skeleton className="h-4 w-6" />
+				{showPriority && <Skeleton className="h-4 w-6" />}
 			</div>
 		)}
 		<div className="flex items-center">
@@ -110,9 +112,10 @@ export const DNSRecordTable = ({
 				<div className="flex items-center">
 					<span className="text-xs">TTL</span>
 				</div>
-				{showPriorityColumn && (
-					<div className="flex items-center justify-center">
-						<span className="text-xs">Priority</span>
+				{/* Priority Column - always render slot if status is shown for alignment */}
+				{(!hideStatus || showPriorityColumn) && (
+					<div className="flex items-center">
+						{showPriorityColumn && <span className="text-xs">Priority</span>}
 					</div>
 				)}
 				{!hideStatus && (
@@ -242,17 +245,17 @@ export const DNSRecordTable = ({
 									</span>
 								</div>
 
-								{/* Priority Column */}
-								{showPriorityColumn && (
-									<div className="flex items-center justify-center">
+								{/* Priority Column - always render slot if status is shown for alignment */}
+								{(!hideStatus || showPriorityColumn) && (
+									<div className="flex items-center">
 										{record.priority !== undefined &&
 										record.priority !== null ? (
 											<span className="inline-flex items-center rounded-md bg-neutral-alpha-10 px-2 py-0.5 font-semibold text-text-strong-950 text-xs dark:bg-neutral-alpha-16">
 												{record.priority}
 											</span>
-										) : (
+										) : showPriorityColumn ? (
 											<span className="text-label-sm text-text-sub-600">-</span>
-										)}
+										) : null}
 									</div>
 								)}
 

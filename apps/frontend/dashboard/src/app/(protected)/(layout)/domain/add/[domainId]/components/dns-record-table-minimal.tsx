@@ -13,20 +13,14 @@ interface DNSRecordTableMinimalProps {
 	showPriorityColumn?: boolean;
 }
 
-const getGridCols = (showPriority: boolean) => {
-	if (showPriority) {
-		return "grid-cols-[70px_1.5fr_2fr_80px_60px]";
-	}
-	return "grid-cols-[70px_1.5fr_2fr_80px]";
+const getGridCols = () => {
+	// For minimal tables, we use a consistent grid definition to ensure alignment
+	// across multiple tables even if some don't have priority.
+	return "grid-cols-[80px_1fr_1.5fr_70px_70px]";
 };
 
 const RecordSkeleton = ({ showPriority }: { showPriority?: boolean }) => (
-	<div
-		className={cn(
-			"grid items-center px-4 py-3",
-			getGridCols(showPriority ?? false),
-		)}
-	>
+	<div className={cn("grid items-center px-4 py-3", getGridCols())}>
 		<div className="flex items-center">
 			<Skeleton className="h-4 w-8" />
 		</div>
@@ -36,11 +30,9 @@ const RecordSkeleton = ({ showPriority }: { showPriority?: boolean }) => (
 		<div className="flex items-center gap-2">
 			<Skeleton className="h-4 w-32" />
 		</div>
-		{showPriority && (
-			<div className="flex items-center">
-				<Skeleton className="h-4 w-6" />
-			</div>
-		)}
+		<div className="flex items-center">
+			{showPriority && <Skeleton className="h-4 w-6" />}
+		</div>
 		<div className="flex items-center">
 			<Skeleton className="h-4 w-8" />
 		</div>
@@ -60,7 +52,7 @@ export const DNSRecordTableMinimal = ({
 		[records],
 	);
 	const showPriorityColumn = !!(showPriorityColumnProp ?? hasPriority);
-	const gridCols = getGridCols(showPriorityColumn);
+	const gridCols = getGridCols();
 
 	const handleCopy = (text: string, id: string) => {
 		onCopyToClipboard?.(text);
@@ -89,11 +81,9 @@ export const DNSRecordTableMinimal = ({
 				<div className="flex items-center">
 					<span className="text-xs">TTL</span>
 				</div>
-				{showPriorityColumn && (
-					<div className="flex items-center justify-center">
-						<span className="text-center text-xs">Priority</span>
-					</div>
-				)}
+				<div className="flex items-center">
+					{showPriorityColumn && <span className="text-xs">Priority</span>}
+				</div>
 			</div>
 
 			{/* Table Body */}
@@ -202,18 +192,16 @@ export const DNSRecordTableMinimal = ({
 									</span>
 								</div>
 
-								{/* Priority Column */}
-								{showPriorityColumn && (
-									<div className="flex items-center justify-center">
-										{record.priority ? (
-											<span className="inline-flex items-center rounded-md bg-neutral-alpha-10 px-2 py-0.5 font-semibold text-text-strong-950 text-xs dark:bg-neutral-alpha-16">
-												{record.priority}
-											</span>
-										) : (
-											<span className="text-label-sm text-text-sub-600">-</span>
-										)}
-									</div>
-								)}
+								{/* Priority Column - always render slot for alignment */}
+								<div className="flex items-center">
+									{record.priority ? (
+										<span className="inline-flex items-center rounded-md bg-neutral-alpha-10 px-2 py-0.5 font-semibold text-text-strong-950 text-xs dark:bg-neutral-alpha-16">
+											{record.priority}
+										</span>
+									) : showPriorityColumn ? (
+										<span className="text-label-sm text-text-sub-600">-</span>
+									) : null}
+								</div>
 							</div>
 						))}
 			</div>
