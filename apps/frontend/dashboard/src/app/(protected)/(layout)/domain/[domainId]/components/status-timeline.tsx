@@ -63,6 +63,10 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 				const state = getStepState(step.number);
 				const isLast = index === steps.length - 1;
 
+				const canShowSuccess = step.number !== 1 || domain.status === "active";
+				const shouldForceNeutral =
+					step.number === 1 && domain.status !== "active" && state !== "failed";
+
 				return (
 					<div
 						key={step.number}
@@ -75,15 +79,14 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 									className={cn(
 										"relative z-10 flex size-10 shrink-0 items-center justify-center rounded-[14px] border bg-bg-white-0 transition-all duration-300",
 										state === "completed" &&
-											step.number !== 1 &&
+											canShowSuccess &&
 											"border-success-base text-success-base",
 										state === "active" &&
 											step.number !== 1 &&
 											!isFailed &&
 											"border-warning-base text-warning-base",
 										state === "failed" && "border-error-base text-error-base",
-										(state === "upcoming" ||
-											(state !== "failed" && step.number === 1)) &&
+										(state === "upcoming" || shouldForceNeutral) &&
 											"border-stroke-soft-200 text-text-soft-400",
 									)}
 								>
@@ -92,7 +95,7 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 										className={cn(
 											"absolute inset-0 rounded-[14px]",
 											state === "completed" &&
-												step.number !== 1 &&
+												canShowSuccess &&
 												"bg-success-base/10",
 											state === "active" &&
 												step.number !== 1 &&
@@ -115,7 +118,7 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 												"relative z-10 h-5 w-5 transition-colors duration-300",
 												state === "active" && step.number !== 1
 													? "text-warning-base"
-													: state === "completed" && step.number !== 1
+													: state === "completed" && canShowSuccess
 														? "text-success-base"
 														: "text-text-soft-400",
 											)}
@@ -129,7 +132,7 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 										<div
 											className={cn(
 												"h-full transition-all duration-700 ease-out",
-												state === "completed" && step.number !== 1
+												state === "completed" && canShowSuccess
 													? "w-full bg-success-base"
 													: "w-0",
 											)}
