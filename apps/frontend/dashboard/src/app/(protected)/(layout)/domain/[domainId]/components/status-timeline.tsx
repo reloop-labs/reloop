@@ -76,27 +76,43 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 										"relative z-10 flex size-10 shrink-0 items-center justify-center rounded-[14px] border bg-bg-white-0 transition-all duration-300",
 										state === "completed" &&
 											step.number !== 1 &&
-											"border-success-base bg-success-base/10 text-success-base",
+											"border-success-base text-success-base",
 										state === "active" &&
 											step.number !== 1 &&
 											!isFailed &&
-											"border-warning-base bg-warning-base/10 text-warning-base",
-										state === "failed" &&
-											"border-error-base bg-error-base/10 text-error-base",
+											"border-warning-base text-warning-base",
+										state === "failed" && "border-error-base text-error-base",
 										(state === "upcoming" ||
 											(state !== "failed" && step.number === 1)) &&
-											"border-stroke-soft-200 bg-bg-white-0 text-text-soft-400",
+											"border-stroke-soft-200 text-text-soft-400",
 									)}
 								>
+									{/* Colored Shade Overlay */}
+									<div
+										className={cn(
+											"absolute inset-0 rounded-[14px]",
+											state === "completed" &&
+												step.number !== 1 &&
+												"bg-success-base/10",
+											state === "active" &&
+												step.number !== 1 &&
+												!isFailed &&
+												"bg-warning-base/10",
+											state === "failed" && "bg-error-base/10",
+										)}
+									/>
+
 									{state === "failed" ? (
-										<Icon name="cross" className="h-5 w-5" />
+										<Icon name="cross" className="relative z-10 h-5 w-5" />
 									) : state === "active" && domain.status === "verifying" ? (
-										<Spinner size={12} color="currentColor" />
+										<div className="relative z-10">
+											<Spinner size={12} color="currentColor" />
+										</div>
 									) : (
 										<Icon
 											name={step.icon}
 											className={cn(
-												"h-5 w-5 transition-colors duration-300",
+												"relative z-10 h-5 w-5 transition-colors duration-300",
 												state === "active" && step.number !== 1
 													? "text-warning-base"
 													: state === "completed" && step.number !== 1

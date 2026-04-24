@@ -2,36 +2,29 @@
 
 import type { DomainResponse } from "@reloop/api";
 import { Icon } from "@reloop/ui/icon";
-import * as React from "react";
-import { inferDnsProvider } from "../utils";
 import { StatusTimeline } from "./status-timeline";
 
 export const DomainEvents = ({
 	domain,
-	nameservers,
 }: {
 	domain: DomainResponse;
 	nameservers?: string[] | null;
 }) => {
-	const providerLabel = React.useMemo(
-		() => inferDnsProvider(nameservers || domain.nameservers)?.label,
-		[nameservers, domain.nameservers],
-	);
-
 	const bannerMessage = () => {
 		switch (domain.status) {
 			case "verifying":
 				return "Your domain is being verified — this can take a few hours depending on your DNS provider.";
 			case "active":
-				return "You're all set! Your domain is connected and working correctly.";
+				return "You're all set! Your domain is ready to send emails.";
 			case "failed":
-				return "Something doesn't look right with your DNS setup. Double-check your records and try again.";
+				return "We couldn't verify your domain. Double-check your DNS records and try again.";
 			case "start-verify":
-				return "Almost there! Add the DNS records shown below, then click Verify when you're done.";
+				return "Almost there! Add the DNS records shown below, then click Verify — and you'll be ready to send.";
 			default:
-				return "Checking your domain status — this will just take a moment…";
+				return "Checking your domain authentication — this will just take a moment…";
 		}
 	};
+
 	return (
 		<div className="mt-7 flex flex-col gap-6 rounded-2xl border border-stroke-soft-200 bg-bg-weak-50/50 p-6">
 			{/* Header Status */}
