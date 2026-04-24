@@ -21,18 +21,17 @@ export const DomainEvents = ({
 	const bannerMessage = () => {
 		switch (domain.status) {
 			case "verifying":
-				return `Propagation via ${providerLabel || "your DNS provider"} may take a few hours`;
+				return "Your domain is being verified — this can take a few hours depending on your DNS provider.";
 			case "active":
-				return "DNS records are configured correctly";
+				return "You're all set! Your domain is connected and working correctly.";
 			case "failed":
-				return "Please review your DNS configuration";
+				return "Something doesn't look right with your DNS setup. Double-check your records and try again.";
 			case "start-verify":
-				return "Add the DNS records and click Verify";
+				return "Almost there! Add the DNS records shown below, then click Verify when you're done.";
 			default:
-				return "Checking status...";
+				return "Checking your domain status — this will just take a moment…";
 		}
 	};
-
 	return (
 		<div className="mt-7 flex flex-col gap-6 rounded-2xl border border-stroke-soft-200 bg-bg-weak-50/50 p-6">
 			{/* Header Status */}
@@ -47,6 +46,8 @@ export const DomainEvents = ({
 					{bannerMessage()}
 				</p>
 			</div>
+
+			<div className="h-[1px] w-full bg-stroke-soft-200" />
 
 			<StatusTimeline domain={domain} />
 		</div>

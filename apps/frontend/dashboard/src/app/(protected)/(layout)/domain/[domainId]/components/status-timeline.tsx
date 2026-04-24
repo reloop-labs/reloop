@@ -57,7 +57,7 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 	];
 
 	return (
-		<div className="relative ml-10 flex max-w-md items-start gap-0">
+		<div className="relative mx-auto flex w-full max-w-md items-start gap-0">
 			{steps.map((step, index) => {
 				const state = getStepState(step.number);
 				const isLast = index === steps.length - 1;
@@ -74,13 +74,16 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 									className={cn(
 										"relative z-10 flex size-10 shrink-0 items-center justify-center rounded-[14px] border bg-bg-white-0 transition-all duration-300",
 										state === "completed" &&
+											step.number !== 1 &&
 											"border-success-base bg-success-base text-static-white",
 										state === "active" &&
+											step.number !== 1 &&
 											!isFailed &&
 											"border-warning-base bg-warning-base/10 text-warning-base",
 										state === "failed" &&
 											"border-error-base bg-error-base/10 text-error-base",
-										state === "upcoming" &&
+										(state === "upcoming" ||
+											(state !== "failed" && step.number === 1)) &&
 											"border-stroke-soft-200 bg-bg-white-0 text-text-soft-400",
 									)}
 								>
@@ -95,7 +98,7 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 											name={step.icon}
 											className={cn(
 												"h-5 w-5 transition-colors duration-300",
-												state === "active"
+												state === "active" && step.number !== 1
 													? "text-warning-base"
 													: "text-text-soft-400",
 											)}
@@ -109,7 +112,7 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 										<div
 											className={cn(
 												"h-full transition-all duration-700 ease-out",
-												state === "completed"
+												state === "completed" && step.number !== 1
 													? "w-full bg-success-base"
 													: "w-0",
 											)}
