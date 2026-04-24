@@ -4,7 +4,7 @@ import type { DNSRecord } from "@reloop/api/types";
 import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
 import type * as React from "react";
-import { DNSRecordTableMinimal } from "./DNSRecordTableMinimal";
+import { DNSRecordTableMinimal } from "./dns-record-table-minimal";
 
 interface DNSRecordSectionProps {
 	title: string;

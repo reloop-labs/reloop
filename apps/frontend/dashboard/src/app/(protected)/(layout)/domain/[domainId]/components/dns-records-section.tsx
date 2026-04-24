@@ -2,7 +2,7 @@
 
 import type { DNSRecord } from "@reloop/api/types";
 import * as Switch from "@reloop/ui/switch";
-import { DNSRecordTable } from "./DNSRecordTable";
+import { DNSRecordTable } from "./dns-record-table";
 
 interface DNSRecordsSectionProps {
 	sendingRecords: DNSRecord[];

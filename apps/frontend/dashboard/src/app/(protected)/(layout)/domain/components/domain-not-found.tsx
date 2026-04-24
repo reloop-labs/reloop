@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import type * as React from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 
-export const NewDomainEmptyState: React.FC = () => {
+export const DomainNotFound: React.FC = () => {
 	const router = useRouter();
 
 	useHotkeys("mod+d", () => router.push("/domain"));

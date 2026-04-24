@@ -13,10 +13,11 @@ import * as React from "react";
 import * as simpleIcons from "simple-icons";
 import { toast } from "sonner";
 import useSWR, { mutate } from "swr";
-import { DNSRecordsSection } from "./components/DNSRecordsSection";
-import { DomainHeader } from "./components/DomainHeader";
+import { DomainNotFound } from "../components/domain-not-found";
 import { groupDomainDnsRecords } from "./components/dns-record-groups";
+import { DNSRecordsSection } from "./components/dns-records-section";
 import { DomainEvents } from "./components/domain-events";
+import { DomainHeader } from "./components/domain-header";
 import {
 	formatStatusLabel,
 	getStatusBadgeStyles,
@@ -134,23 +135,8 @@ const DomainPage = () => {
 
 	if (error) {
 		return (
-			<div className="mx-auto max-w-3xl sm:px-8">
-				<DomainHeader
-					domainId={domainId as string}
-					status="failed"
-					isFailed
-					mutate={mutateDomain}
-				/>
-				<div className="pt-20">
-					<SomethingWentWrong
-						errorType="server"
-						title="Failed to Load Domain Information"
-						description="We couldn't load the domain information. This might be due to a temporary server issue or network problem."
-						onRetry={() => mutateDomain()}
-						refreshText="Reload Page"
-						onRefresh={() => window.location.reload()}
-					/>
-				</div>
+			<div className="mx-auto max-w-3xl pt-10 pb-8 sm:px-8">
+				<DomainNotFound />
 			</div>
 		);
 	}

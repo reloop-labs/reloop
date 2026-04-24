@@ -10,8 +10,8 @@ import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import * as React from "react";
 import { toast } from "sonner";
 import useSWR, { mutate } from "swr";
-import { DNSRecordTable } from "../../(layout)/domain/[domainId]/components/DNSRecordTable";
 import { groupDomainDnsRecords } from "../../(layout)/domain/[domainId]/components/dns-record-groups";
+import { DNSRecordTable } from "../../(layout)/domain/[domainId]/components/dns-record-table";
 
 export const ConfigureDnsStep = () => {
 	const [domain] = useQueryState("domain", parseAsString.withDefault(""));

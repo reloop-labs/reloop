@@ -9,9 +9,9 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import useSWR, { mutate } from "swr";
 import { groupDomainDnsRecords } from "../../[domainId]/components/dns-record-groups";
-import { DNSRecordSection } from "./components/DNSRecordSection";
-import { DomainAddedAlert } from "./components/DomainAddedAlert";
-import { NewDomainEmptyState } from "./components/NewDomainEmptyState";
+import { DomainNotFound } from "../../components/domain-not-found";
+import { DNSRecordSection } from "./components/dns-record-section";
+import { DomainAddedAlert } from "./components/domain-added-alert";
 
 const NewDomainPage = () => {
 	const [isVerifying, setIsVerifying] = React.useState(false);
@@ -76,7 +76,7 @@ const NewDomainPage = () => {
 	) {
 		return (
 			<div className="mx-auto max-w-3xl pt-10 pb-8 sm:px-8">
-				<NewDomainEmptyState />
+				<DomainNotFound />
 			</div>
 		);
 	}
