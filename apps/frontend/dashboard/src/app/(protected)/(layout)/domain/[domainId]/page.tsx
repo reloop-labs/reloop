@@ -84,7 +84,7 @@ const DomainPage = () => {
 			<TabMenu.Root
 				value={activeTab}
 				onValueChange={setActiveTab}
-				className="mt-10"
+				className="mt-7"
 			>
 				<TabMenu.List className="relative h-10 gap-0 border-b! py-0">
 					{tabs.map((t, index) => (

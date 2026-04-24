@@ -78,7 +78,7 @@ export const DomainEvents = ({
 	];
 
 	return (
-		<div className="mt-10 flex flex-col gap-6 rounded-2xl border border-stroke-soft-200 bg-bg-weak-50/50 p-6">
+		<div className="mt-7 flex flex-col gap-6 rounded-2xl border border-stroke-soft-200 bg-bg-weak-50/50 p-6">
 			{/* Header Status */}
 			<div className="flex flex-col gap-1">
 				<div className="flex items-center gap-1.5">
