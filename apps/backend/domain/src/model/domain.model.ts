@@ -15,7 +15,8 @@ export namespace DomainModel {
 			t.String({
 				minLength: 1,
 				maxLength: 255,
-				pattern: "^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$",
+				pattern:
+					"^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$",
 				default: "inbound.email",
 				description: "Custom return-path subdomain (e.g., inbound.email)",
 			}),
