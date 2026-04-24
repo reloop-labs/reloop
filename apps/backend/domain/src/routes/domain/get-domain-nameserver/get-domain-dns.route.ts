@@ -1,8 +1,8 @@
 import { authMiddleware } from "@be/domain/middleware/auth";
 import { DNSModel } from "@be/domain/model/dns.model";
 import { Elysia, t } from "elysia";
-import { getDomainDNSController } from "./get-domain-dns.controllers";
-import { getDomainNameserversXCodeSamples } from "./get-domain-dns.x-codeSamples";
+import { getDomainDNSController } from "./get-domain-nameserver.controllers";
+import { getDomainNameserversXCodeSamples } from "./get-domain-nameserver.x-codeSamples";
 
 export const getDomainNameserversRoute = new Elysia().use(authMiddleware).get(
 	"/nameservers/:domain_id",
