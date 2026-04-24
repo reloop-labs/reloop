@@ -55,11 +55,8 @@ const DomainPage = () => {
 	return (
 		<div className="mx-auto max-w-3xl sm:px-8">
 			<DomainHeader domain={domainData} isLoading={isLoading} />
-
 			<DomainStats domain={domainData} isLoading={isLoading} />
-
 			{domainData && <DomainEvents domain={domainData} />}
-
 			<TabMenu.Root
 				value={activeTab}
 				onValueChange={setActiveTab}
@@ -86,7 +83,6 @@ const DomainPage = () => {
 							{t.label}
 						</TabMenu.Trigger>
 					))}
-
 					<AnimatePresence>
 						{rect && activeIndex !== -1 ? (
 							<motion.div
@@ -135,11 +131,9 @@ const DomainPage = () => {
 						) : null}
 					</AnimatePresence>
 				</TabMenu.List>
-
 				<TabMenu.Content value="dns" className="outline-none">
 					<DNSRecordsSection domain={domainData} isLoading={isLoading} />
 				</TabMenu.Content>
-
 				<TabMenu.Content value="tracking">
 					<DomainTrackingSection domain={domainData} isLoading={isLoading} />
 				</TabMenu.Content>
