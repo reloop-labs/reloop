@@ -64,7 +64,7 @@ export const domain = pgTable(
 		systemVerified: boolean("system_verified").notNull().default(false),
 		customReturnPath: varchar("custom_return_path", { length: 255 })
 			.notNull()
-			.default("inbound.email"),
+			.default("inbound"),
 		clickTracking: boolean("click_tracking").notNull().default(false),
 		openTracking: boolean("open_tracking").notNull().default(false),
 		tls: tlsModeEnum("tls").notNull().default("opportunistic"),

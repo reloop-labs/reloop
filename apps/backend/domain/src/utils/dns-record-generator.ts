@@ -77,7 +77,7 @@ export function generateMXRecord(
 export function generateReceivingMXRecord(
 	hostDomain: string,
 	rootDomain: string,
-	customReturnPath = "inbound.email",
+	customReturnPath: string,
 ): DNSTypes.DNSRecord {
 	return generateMXRecord(customReturnPath, rootDomain, hostDomain);
 }

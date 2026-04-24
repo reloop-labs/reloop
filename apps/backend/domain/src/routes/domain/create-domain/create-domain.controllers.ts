@@ -128,9 +128,9 @@ export async function createDomainController({
     const dnsRecords = await generateAllDNSRecords(domain);
     const { dkimRecord, spfRecord, dmarcRecord, mxRecord } = dnsRecords;
     const receivingMxRecord = generateReceivingMXRecord(
-      `inbound.${domainConfig.HOST_DOMAIN}`,
+      domainConfig.HOST_DOMAIN,
       domain,
-      customReturnPath,
+      customReturnPath || "inbound",
     );
     const domainId = `domain_${createId()}`;
     logger.info({ domainId }, "Creating domain");

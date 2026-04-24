@@ -168,7 +168,7 @@ CREATE TABLE "domain" (
 	"status" "domain_status" DEFAULT 'start-verify' NOT NULL,
 	"user_verified" boolean DEFAULT false NOT NULL,
 	"system_verified" boolean DEFAULT false NOT NULL,
-	"custom_return_path" varchar(255) DEFAULT 'inbound.email' NOT NULL,
+	"custom_return_path" varchar(255) DEFAULT 'inbound' NOT NULL,
 	"click_tracking" boolean DEFAULT false NOT NULL,
 	"open_tracking" boolean DEFAULT false NOT NULL,
 	"tls" "tls_mode" DEFAULT 'opportunistic' NOT NULL,

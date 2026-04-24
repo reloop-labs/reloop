@@ -17,8 +17,8 @@ export namespace DomainModel {
 				maxLength: 255,
 				pattern:
 					"^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$",
-				default: "inbound.email",
-				description: "Custom return-path subdomain (e.g., inbound.email)",
+				default: "inbound",
+				description: "Custom return-path subdomain (e.g., inbound)",
 			}),
 		),
 		clickTracking: t.Optional(
@@ -55,7 +55,7 @@ export namespace DomainModel {
 		examples: [
 			{
 				domain: "send.example.com",
-				customReturnPath: "inbound.email",
+				customReturnPath: "inbound",
 				clickTracking: true,
 				openTracking: true,
 				tls: "opportunistic",
@@ -150,7 +150,7 @@ export namespace DomainModel {
 		}),
 		customReturnPath: t.String({
 			description: "Custom return path subdomain for SPF and bounce handling",
-			default: "inbound.email"
+			default: "inbound"
 		}),
 		clickTracking: t.Boolean({
 			description: "Whether click tracking is enabled for the domain",
@@ -193,7 +193,7 @@ export namespace DomainModel {
 			status: "active",
 			userVerified: true,
 			systemVerified: true,
-			customReturnPath: "inbound.email",
+			customReturnPath: "inbound",
 			clickTracking: true,
 			openTracking: true,
 			tls: "opportunistic",
