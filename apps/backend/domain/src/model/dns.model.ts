@@ -6,6 +6,7 @@ export namespace DNSModel {
 		recordType: t.String(),
 		recordTypeName: t.String(),
 		name: t.String(),
+		fqdn: t.String(),
 		value: t.String(),
 		ttl: t.String(),
 		priority: t.Union([t.Number(), t.Null()]),

@@ -29,6 +29,7 @@ export namespace DNSTypes {
 	export interface DNSRecord {
 		type: DNSRecordType;
 		name: string;
+		fqdn: string;
 		value: string;
 		ttl: string;
 		priority?: number;
@@ -45,6 +46,7 @@ export namespace DNSTypes {
 	export interface DNSRecordData {
 		recordType: string;
 		name: string;
+		fqdn: string;
 		value: string;
 		ttl: string;
 		priority?: number;

@@ -1,4 +1,5 @@
 import { domainConfig } from "@be/domain/domain.config";
+
 import {
   verifyDkimRecord,
   verifyDmarcRecord,
@@ -46,6 +47,7 @@ async function processDomainVerification(
 
   const domainName = domainWithRecords.domain;
   const records = domainWithRecords.dnsRecords;
+  logger.info({ domainId, records }, "Fetched DNS records from database");
 
   // Find each record type
   const mxRecord = records.find((r) => r.recordType === "MX");
@@ -71,12 +73,12 @@ async function processDomainVerification(
     return;
   }
 
-  // Run all verifications in parallel
+  // Run all verifications in parallel using FQDNs from database
   const [mxOk, spfOk, dkimOk, dmarcOk] = await Promise.all([
-    verifyMxRecord(domainName, mxRecord.value, mxRecord.priority ?? 10),
-    verifySpfRecord(domainName, spfRecord.value),
-    verifyDkimRecord(dkimRecord.name, dkimRecord.value),
-    verifyDmarcRecord(dmarcRecord.name, dmarcRecord.value),
+    verifyMxRecord(mxRecord.fqdn, mxRecord.value, mxRecord.priority ?? 10),
+    verifySpfRecord(spfRecord.fqdn, spfRecord.value),
+    verifyDkimRecord(dkimRecord.fqdn, dkimRecord.value),
+    verifyDmarcRecord(dmarcRecord.fqdn, dmarcRecord.value),
   ]);
 
   const results = [
@@ -135,7 +137,7 @@ export function startDomainVerificationWorker(): Worker {
     DOMAIN_VERIFICATION_QUEUE,
     async (job) => {
       const { domainId, organizationId } = job.data;
-      const isLastAttempt = (job.attemptsMade + 1) >= (job.opts.attempts ?? 1);
+      const isLastAttempt = job.attemptsMade + 1 >= (job.opts.attempts ?? 1);
       await processDomainVerification(domainId, organizationId, isLastAttempt);
     },
     {

@@ -16,13 +16,16 @@ export async function verifyMxRecord(
 			),
 		]);
 
-		return records.some(
-			(mx) =>
-				(mx.exchange.toLowerCase() === value.toLowerCase() ||
-					mx.exchange.toLowerCase().endsWith(`.${value.toLowerCase()}`)) &&
-				mx.priority === priority,
-		);
-	} catch {
+		return records.some((mx) => {
+			const exchange = mx.exchange.toLowerCase().replace(/\.$/, "");
+			const expected = value.toLowerCase().replace(/\.$/, "");
+			return (
+				(exchange === expected || exchange.endsWith(`.${expected}`)) &&
+				mx.priority === priority
+			);
+		});
+	} catch (e) {
+		console.error(`Error verifying MX record for ${name}:`, e);
 		return false;
 	}
 }
@@ -42,14 +45,15 @@ export async function verifySpfRecord(
 		]);
 		const flattenedRecords = records.flat();
 		return flattenedRecords.some((record) => {
-			const normalizedRecord = record.trim();
-			const normalizedValue = value.trim();
+			const normalizedRecord = record.trim().replace(/\s+/g, " ");
+			const normalizedValue = value.trim().replace(/\s+/g, " ");
 			return (
 				normalizedRecord === normalizedValue ||
 				normalizedRecord.includes(normalizedValue)
 			);
 		});
-	} catch {
+	} catch (e) {
+		console.error(`Error verifying SPF record for ${name}:`, e);
 		return false;
 	}
 }
@@ -84,7 +88,8 @@ export async function verifyDkimRecord(
 		const actualPublicKey = actualPublicKeyMatch[1].trim();
 
 		return actualPublicKey === expectedPublicKey;
-	} catch {
+	} catch (e) {
+		console.error(`Error verifying DKIM record for ${name}:`, e);
 		return false;
 	}
 }
@@ -122,7 +127,8 @@ export async function verifyDmarcRecord(
 						.startsWith(expectedTag.toLowerCase().split("=")[0] + "="),
 			);
 		});
-	} catch {
+	} catch (e) {
+		console.error(`Error verifying DMARC record for ${name}:`, e);
 		return false;
 	}
 }

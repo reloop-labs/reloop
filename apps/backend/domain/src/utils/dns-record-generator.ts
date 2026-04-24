@@ -2,12 +2,12 @@ import { domainConfig } from "@be/domain/domain.config";
 import { DNSTypes } from "@be/domain/types/dns.type";
 import { generateDKIMKeyPair } from "@be/domain/utils/dkim-key-generator";
 import {
-	getCustomReturnPathSubString,
 	getDomainSubString,
 } from "@be/domain/utils/domain-formatter";
 
 export async function generateDKIMRecord(
 	domain: string,
+	rootDomain: string,
 ): Promise<DNSTypes.DNSRecord> {
 	const dkimKeyPair = await generateDKIMKeyPair();
 	const cleanPublicKey = dkimKeyPair.publicKey
@@ -16,42 +16,58 @@ export async function generateDKIMRecord(
 		.replace(/\s/g, "");
 
 	const dkimValue = `v=DKIM1; k=rsa; p=${cleanPublicKey}`;
+	const name = `${domainConfig.DKIM_SELECTOR}._domainkey.${domain}`;
 
 	return {
 		type: DNSTypes.DNSRecordType.TXT,
-		name: `${domainConfig.DKIM_SELECTOR}._domainkey.${domain}`,
+		name,
+		fqdn: `${name}.${rootDomain}`,
 		value: dkimValue,
 		ttl: "Auto",
 		privateKey: dkimKeyPair.privateKey,
 	};
 }
 
-export function generateSPFRecord(domain: string): DNSTypes.DNSRecord {
+export function generateSPFRecord(
+	domain: string,
+	rootDomain: string,
+): DNSTypes.DNSRecord {
 	const spfValue = `v=spf1 include:${domainConfig.HOST_DOMAIN} ~all`;
 
 	return {
 		type: DNSTypes.DNSRecordType.TXT,
 		name: domain,
+		fqdn: `${domain}.${rootDomain}`,
 		value: spfValue,
 		ttl: "Auto",
 	};
 }
 
-export function generateDMARCRecord(domain: string): DNSTypes.DNSRecord {
+export function generateDMARCRecord(
+	domain: string,
+	rootDomain: string,
+): DNSTypes.DNSRecord {
 	const dmarcValue = "v=DMARC1; p=none;";
+	const name = `_dmarc.${domain}`;
 
 	return {
 		type: DNSTypes.DNSRecordType.TXT,
-		name: `_dmarc.${domain}`,
+		name,
+		fqdn: `${name}.${rootDomain}`,
 		value: dmarcValue,
 		ttl: "Auto",
 	};
 }
 
-export function generateMXRecord(domain: string, host?: string): DNSTypes.DNSRecord {
+export function generateMXRecord(
+	domain: string,
+	rootDomain: string,
+	host?: string,
+): DNSTypes.DNSRecord {
 	return {
 		type: DNSTypes.DNSRecordType.MX,
 		name: domain,
+		fqdn: `${domain}.${rootDomain}`,
 		value: host || domainConfig.HOST_DOMAIN,
 		priority: domainConfig.constants.mxPriority,
 		ttl: "Auto",
@@ -60,9 +76,10 @@ export function generateMXRecord(domain: string, host?: string): DNSTypes.DNSRec
 
 export function generateReceivingMXRecord(
 	hostDomain: string,
+	rootDomain: string,
 	customReturnPath = "inbound",
 ): DNSTypes.DNSRecord {
-	return generateMXRecord(customReturnPath, hostDomain);
+	return generateMXRecord(customReturnPath, rootDomain, hostDomain);
 }
 
 export async function generateAllDNSRecords(
@@ -74,10 +91,10 @@ export async function generateAllDNSRecords(
 	dkimRecord: DNSTypes.DNSRecord;
 }> {
 	const domainSubString = getDomainSubString(domain);
-	const dkimRecord = await generateDKIMRecord(domainSubString);
-	const spfRecord = generateSPFRecord(domainSubString);
-	const dmarcRecord = generateDMARCRecord(domainSubString);
-	const mxRecord = generateMXRecord(domainSubString);
+	const dkimRecord = await generateDKIMRecord(domainSubString, domain);
+	const spfRecord = generateSPFRecord(domainSubString, domain);
+	const dmarcRecord = generateDMARCRecord(domainSubString, domain);
+	const mxRecord = generateMXRecord(domainSubString, domain);
 	return {
 		mxRecord,
 		spfRecord,

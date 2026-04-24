@@ -129,6 +129,7 @@ export async function createDomainController({
     const { dkimRecord, spfRecord, dmarcRecord, mxRecord } = dnsRecords;
     const receivingMxRecord = generateReceivingMXRecord(
       `inbound.${domainConfig.HOST_DOMAIN}`,
+      domain,
       customReturnPath,
     );
     const domainId = `domain_${createId()}`;
@@ -163,6 +164,7 @@ export async function createDomainController({
         ...dnsRecordIds,
         recordType: dkimRecord.type,
         name: dkimRecord.name,
+        fqdn: dkimRecord.fqdn,
         value: dkimRecord.value,
         priority: dkimRecord.priority,
         privateKey: dkimRecord.privateKey,
@@ -172,6 +174,7 @@ export async function createDomainController({
         ...dnsRecordIds,
         recordType: spfRecord.type,
         name: spfRecord.name,
+        fqdn: spfRecord.fqdn,
         value: spfRecord.value,
         recordTypeName: "SPF" as const,
       },
@@ -179,6 +182,7 @@ export async function createDomainController({
         ...dnsRecordIds,
         recordType: dmarcRecord.type,
         name: dmarcRecord.name,
+        fqdn: dmarcRecord.fqdn,
         value: dmarcRecord.value,
         recordTypeName: "DMARC" as const,
       },
@@ -186,6 +190,7 @@ export async function createDomainController({
         ...dnsRecordIds,
         recordType: mxRecord.type,
         name: mxRecord.name,
+        fqdn: mxRecord.fqdn,
         value: mxRecord.value,
         recordTypeName: "MX" as const,
         priority: mxRecord.priority,
@@ -202,6 +207,7 @@ export async function createDomainController({
         ...dnsRecordIds,
         recordType: receivingMxRecord.type,
         name: receivingMxRecord.name,
+        fqdn: receivingMxRecord.fqdn,
         value: receivingMxRecord.value,
         recordTypeName: "MX" as const,
         priority: receivingMxRecord.priority,

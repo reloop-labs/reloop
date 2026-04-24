@@ -64,7 +64,7 @@ export const domain = pgTable(
 		systemVerified: boolean("system_verified").notNull().default(false),
 		customReturnPath: varchar("custom_return_path", { length: 255 })
 			.notNull()
-			.default("send"),
+			.default("inbound.email"),
 		clickTracking: boolean("click_tracking").notNull().default(false),
 		openTracking: boolean("open_tracking").notNull().default(false),
 		tls: tlsModeEnum("tls").notNull().default("opportunistic"),
@@ -121,6 +121,7 @@ export const domainDnsRecord = pgTable(
 		priority: integer("priority"),
 		recordTypeName: dnsRecordTypeNameEnum("record_type_name").notNull(),
 		domain: text("domain").notNull(),
+		fqdn: text("fqdn").notNull(),
 		privateKey: text("private_key"),
 		verificationError: text("verification_error"),
 		deletedAt: timestamp("deleted_at"),

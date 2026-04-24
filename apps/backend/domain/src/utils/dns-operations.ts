@@ -21,6 +21,7 @@ export type DNSRecordStatus =
 export interface DNSRecordData {
 	recordType: string;
 	name: string;
+	fqdn: string;
 	value: string;
 	ttl: string;
 	priority?: number;
@@ -81,6 +82,7 @@ export async function insertDNSRecords(
 			userId,
 			recordType: record.recordType as "A" | "AAAA" | "CNAME" | "MX" | "TXT",
 			name: record.name,
+			fqdn: record.fqdn,
 			value: record.value,
 			ttl: record.ttl,
 			priority: record.priority,

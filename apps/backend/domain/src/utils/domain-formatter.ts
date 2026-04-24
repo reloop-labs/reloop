@@ -1,14 +1,14 @@
 export const getDomainSubString = (domain: string) => {
 	if (domain.split(".").length >= 3) {
 		const subDomain = domain.split(".").slice(0, -2).join(".");
-		return `send.${subDomain}`;
+		return `inbound.email.${subDomain}`;
 	}
-	return "send";
+	return "inbound.email";
 };
 
 export const getCustomReturnPathSubString = (
 	domain: string,
-	customReturnPath = "send",
+	customReturnPath = "inbound.email",
 ) => {
 	if (domain.split(".").length >= 3) {
 		const subDomain = domain.split(".").slice(0, -2).join(".");
