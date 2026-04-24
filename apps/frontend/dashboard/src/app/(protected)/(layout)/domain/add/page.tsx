@@ -1,5 +1,5 @@
 "use client";
-import { DomainPreview } from "@fe/dashboard/app/(protected)/onboarding/components/previews";
+import { DomainPreview } from "@fe/dashboard/app/(protected)/onboarding/components/domain-preview";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import type { DomainResponse } from "@reloop/api";
 import * as Button from "@reloop/ui/button";

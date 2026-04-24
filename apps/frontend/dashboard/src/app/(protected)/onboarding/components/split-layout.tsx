@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@reloop/ui/cn";
 import { Logo } from "@reloop/ui/logo";
 import { ChevronLeft } from "lucide-react";
 import { parseAsInteger, useQueryState } from "nuqs";
@@ -11,6 +12,7 @@ interface SplitLayoutProps {
 	children: React.ReactNode;
 	previewContent?: React.ReactNode;
 	fullWidth?: boolean;
+	previewSize?: "small" | "medium";
 }
 
 export const SplitLayout = ({
@@ -19,6 +21,7 @@ export const SplitLayout = ({
 	children,
 	previewContent,
 	fullWidth = false,
+	previewSize = "medium",
 }: SplitLayoutProps) => {
 	const [step, setStep] = useQueryState("step", parseAsInteger.withDefault(1));
 	const onBack = step > 1 ? () => setStep(step - 1) : undefined;
@@ -36,7 +39,14 @@ export const SplitLayout = ({
 			<div className="flex w-full max-w-5xl flex-1 flex-col items-center justify-center border-stroke-soft-100 border-r border-l">
 				<div className="w-full border-stroke-soft-100 border-t" />
 				<div
-					className={`mx-auto grid h-full w-full ${fullWidth ? "lg:grid-cols-1" : "lg:grid-cols-2"}`}
+					className={cn(
+						"mx-auto grid h-full w-full",
+						fullWidth
+							? "lg:grid-cols-1"
+							: previewSize === "small"
+								? "lg:grid-cols-[1.2fr_0.8fr]"
+								: "lg:grid-cols-2",
+					)}
 				>
 					<div
 						className={`flex flex-col gap-4 ${fullWidth ? "px-12 lg:px-24" : "px-12"} pt-9 pb-9`}

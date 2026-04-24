@@ -7,12 +7,11 @@ import { CheckCircle2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useEffect } from "react";
-import {
-	ApiPreview,
-	DnsConfigPreview,
-	DomainPreview,
-	SidebarPreview,
-} from "./components/previews";
+import { ApiPreview } from "./components/api-preview";
+import { DnsConfigPreview } from "./components/dns-config-preview";
+import { DomainPreview } from "./components/domain-preview";
+import { SidebarPreview } from "./components/sidebar-preview";
+
 import { SplitLayout } from "./components/split-layout";
 import { AddDomainStep } from "./steps/add-domain";
 import { ConfigureDnsStep } from "./steps/configure-dns";
@@ -76,7 +75,7 @@ export const OnBoardingContent = () => {
 			title: "Configure DNS",
 			component: <ConfigureDnsStep />,
 			preview: <DnsConfigPreview domain={domainId || domain} />,
-			fullWidth: true,
+			fullWidth: false,
 		},
 		4: {
 			stepIndicator: "4/4",
@@ -122,6 +121,7 @@ export const OnBoardingContent = () => {
 			title={currentConfig.title}
 			previewContent={currentConfig.preview}
 			fullWidth={currentConfig.fullWidth}
+			previewSize={step === 3 ? "small" : "medium"}
 		>
 			{currentConfig.component}
 		</SplitLayout>

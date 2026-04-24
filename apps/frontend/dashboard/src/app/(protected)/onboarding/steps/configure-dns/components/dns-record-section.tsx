@@ -3,7 +3,6 @@
 import type { DNSRecord } from "@reloop/api/types";
 import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
-import * as React from "react";
 import { DNSRecordTableMinimal } from "./dns-table-minimal";
 
 interface DNSRecordSectionProps {
