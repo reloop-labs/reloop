@@ -1,7 +1,6 @@
 "use client";
 
 import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
-import { SomethingWentWrong } from "@fe/dashboard/components/something-went-wrong";
 import { useParams, useRouter } from "next/navigation";
 import useSWR from "swr";
 import { EmailDetail } from "./components/email-detail";
@@ -38,7 +37,7 @@ interface EmailLogData {
 }
 
 const EmailDetailPage = () => {
-	const {  emailId } = useParams();
+	const { emailId } = useParams();
 	const router = useRouter();
 
 	const {
@@ -54,12 +53,10 @@ const EmailDetailPage = () => {
 		return (
 			<div className="mx-auto max-w-3xl sm:px-8">
 				<div className="pt-10 pb-8">
-					<AnimatedBackButton
-						onClick={() => router.push(`/emails`)}
-					/>
+					<AnimatedBackButton onClick={() => router.push("/emails")} />
 				</div>
 				<div className="pt-20">
-					<SomethingWentWrong />
+					<p>sdd</p>
 				</div>
 			</div>
 		);
@@ -68,7 +65,7 @@ const EmailDetailPage = () => {
 	return (
 		<div className="mx-auto max-w-3xl sm:px-8">
 			<div className="pt-10 pb-8">
-				<AnimatedBackButton onClick={() => router.push(`/emails`)} />
+				<AnimatedBackButton onClick={() => router.push("/emails")} />
 			</div>
 			{!emailData && !isLoading ? null : (
 				<EmailDetail email={emailData} isLoading={isLoading} />

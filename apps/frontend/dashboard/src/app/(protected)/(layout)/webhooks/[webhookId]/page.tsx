@@ -1,5 +1,4 @@
 "use client";
-import { SomethingWentWrong } from "@fe/dashboard/components/something-went-wrong";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { useParams, useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
@@ -46,7 +45,7 @@ const WebhookDetailPage = () => {
 	if (error) {
 		return (
 			<div className="mx-auto max-w-3xl sm:px-8">
-				<SomethingWentWrong />
+				<p>dd</p>
 			</div>
 		);
 	}

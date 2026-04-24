@@ -1,5 +1,4 @@
 "use client";
-import { SomethingWentWrong } from "@fe/dashboard/components/something-went-wrong";
 import { useParams } from "next/navigation";
 import useSWR from "swr";
 import { GroupContactList } from "./components/group-contact-list";
@@ -33,11 +32,7 @@ export const GroupDetailContent = () => {
 	const isLoading = groupLoading;
 
 	if (groupError) {
-		return (
-			<div className="mx-auto max-w-3xl sm:px-8">
-				<SomethingWentWrong />
-			</div>
-		);
+		return <div className="mx-auto max-w-3xl sm:px-8">ep</div>;
 	}
 
 	if (!groupData && !isLoading) {

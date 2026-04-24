@@ -1,5 +1,4 @@
 "use client";
-import { SomethingWentWrong } from "@fe/dashboard/components/something-went-wrong";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import type { DomainNameserversResponse, DomainResponse } from "@reloop/api";
 import * as Button from "@reloop/ui/button";

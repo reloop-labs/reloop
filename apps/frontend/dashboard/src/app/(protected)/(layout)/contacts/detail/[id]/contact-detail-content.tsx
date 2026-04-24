@@ -1,5 +1,4 @@
 "use client";
-import { SomethingWentWrong } from "@fe/dashboard/components/something-went-wrong";
 import { useParams } from "next/navigation";
 import useSWR from "swr";
 import { ContactHeader } from "./components/contact-header";
@@ -111,7 +110,7 @@ export const ContactDetailContent = () => {
 	if (contactError) {
 		return (
 			<div className="mx-auto max-w-3xl sm:px-8">
-				<SomethingWentWrong />
+				<p>sd</p>
 			</div>
 		);
 	}

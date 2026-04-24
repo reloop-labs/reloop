@@ -1,5 +1,4 @@
 "use client";
-import { SomethingWentWrong } from "@fe/dashboard/components/something-went-wrong";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { useParams, useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
@@ -55,14 +54,14 @@ const ApiKeyDetailPage = () => {
 	const handleDeleteSuccess = () => {
 		// Navigate back to API keys list after successful deletion
 		if (activeOrganization?.slug) {
-			router.push(`/api-keys`);
+			router.push("/api-keys");
 		}
 	};
 
 	if (error) {
 		return (
 			<div className="mx-auto max-w-3xl sm:px-8">
-				<SomethingWentWrong />
+				<p>ds</p>
 			</div>
 		);
 	}
