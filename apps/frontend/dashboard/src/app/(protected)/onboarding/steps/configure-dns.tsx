@@ -17,7 +17,6 @@ export const ConfigureDnsStep = () => {
 	const [domain] = useQueryState("domain", parseAsString.withDefault(""));
 	const [domainId] = useQueryState("domainId", parseAsString.withDefault(""));
 	const [, setStep] = useQueryState("step", parseAsInteger.withDefault(1));
-	const [copiedItems, setCopiedItems] = React.useState<Set<string>>(new Set());
 	const [isVerifying, setIsVerifying] = React.useState(false);
 	const [isUpdatingSending, setIsUpdatingSending] = React.useState(false);
 	const [isUpdatingReceiving, setIsUpdatingReceiving] = React.useState(false);
@@ -25,22 +24,6 @@ export const ConfigureDnsStep = () => {
 	const { data: domainData, isLoading } = useSWR<DomainResponse>(
 		domainId ? `/api/domain/v1/${domainId}` : null,
 	);
-
-	const copyToClipboard = async (text: string, itemId: string) => {
-		try {
-			await navigator.clipboard.writeText(text);
-			setCopiedItems((prev) => new Set(prev).add(itemId));
-			setTimeout(() => {
-				setCopiedItems((prev) => {
-					const newSet = new Set(prev);
-					newSet.delete(itemId);
-					return newSet;
-				});
-			}, 2000);
-		} catch {
-			// Handle copy error silently
-		}
-	};
 
 	const handleVerifyDNS = async () => {
 		if (!domainId) {
@@ -162,8 +145,6 @@ export const ConfigureDnsStep = () => {
 				<div className="w-full">
 					<DNSRecordTable
 						records={sendingRecords}
-						onCopyToClipboard={copyToClipboard}
-						copiedItems={copiedItems}
 						isLoading={isLoading}
 						loadingRows={1}
 						tableId="dkim-"
@@ -200,8 +181,6 @@ export const ConfigureDnsStep = () => {
 					<div className="w-full">
 						<DNSRecordTable
 							records={receivingRecords}
-							onCopyToClipboard={copyToClipboard}
-							copiedItems={copiedItems}
 							isLoading={isLoading}
 							loadingRows={1}
 							tableId="receiving-"
@@ -225,8 +204,6 @@ export const ConfigureDnsStep = () => {
 				<div className="w-full">
 					<DNSRecordTable
 						records={dmarcRecords}
-						onCopyToClipboard={copyToClipboard}
-						copiedItems={copiedItems}
 						isLoading={isLoading}
 						loadingRows={1}
 						tableId="dmarc-"
