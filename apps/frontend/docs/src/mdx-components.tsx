@@ -8,7 +8,9 @@ import {
 	Info,
 	Note,
 	Steps,
+	Step,
 	Tabs,
+	Tab,
 	Tip,
 	Warning,
 } from "@reloop/fe-docs/components/mdx/mintlify-client";
@@ -53,7 +55,9 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
 		Callout,
 		CodeBlock,
 		Steps,
+		Step,
 		Tabs,
+		Tab,
 		Note,
 		Warning,
 		Tip,
@@ -62,3 +66,4 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
 		SimpleIcon,
 	};
 }
+

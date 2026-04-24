@@ -14,6 +14,8 @@ import {
 	siRuby,
 	siRubyonrails,
 	siRust,
+	siCursor,
+	siReadthedocs,
 } from "simple-icons";
 import type { SimpleIcon as SimpleIconType } from "simple-icons";
 import type { SVGProps } from "react";
@@ -32,6 +34,8 @@ const Icons: Record<string, SimpleIconType> = {
 	siElixir,
 	siOpenjdk,
 	siDotnet,
+	siCursor,
+	siReadthedocs,
 };
 
 interface SimpleIconProps extends Omit<SVGProps<SVGSVGElement>, "ref"> {

@@ -10,7 +10,8 @@ const docsDir = path.join(process.cwd(), "content/docs");
 function getTitle(filePath: string): string {
 	try {
 		const content = fs.readFileSync(filePath, "utf8");
-		return matter(content).data.title || path.basename(filePath, ".mdx");
+		const { data } = matter(content);
+		return data.sidebarTitle || data.title || path.basename(filePath, ".mdx");
 	} catch (e) {
 		return path.basename(filePath, ".mdx");
 	}
@@ -39,14 +40,17 @@ function buildTree(dir: string, base = ""): PageTreeItem[] {
 			}
 
 			// 1. Resolve item path and handle "index" mapping
-			const resolvedItem = item === "index" ? "introduction" : item;
 			const absolutePath = path.resolve(dir, item);
-			const url = `/${path.join(base, resolvedItem).replace(/\\/g, "/")}`;
+			const url = `/${path.join(base, item === "index" ? "" : item).replace(/\\/g, "/").replace(/\/$/, "")}`;
 
-			// 2. Check if it's a direct .mdx file (at the actual path or mapped from index)
-			const mdxPath = item === "index" ? path.join(dir, "introduction.mdx") : `${absolutePath}.mdx`;
+			// 2. Check if it's a direct .mdx file
+			let mdxPath = item.endsWith(".mdx") ? absolutePath : `${absolutePath}.mdx`;
+			if (!fs.existsSync(mdxPath) && item === "index") {
+				mdxPath = path.join(dir, "introduction.mdx");
+			}
+
 			if (fs.existsSync(mdxPath)) {
-				return { type: "page", name: getTitle(mdxPath), url } as PageTreeItem;
+				return { type: "page", name: getTitle(mdxPath), url: url || "/introduction" } as PageTreeItem;
 			}
 
 			// 3. Check if it's a directory
@@ -85,9 +89,17 @@ function buildTree(dir: string, base = ""): PageTreeItem[] {
 export const source = {
 	getPage: (slug?: string[]) => {
 		const slugPath = slug?.join("/") || "index";
-		const filePath = path.join(docsDir, `${slugPath}.mdx`);
+		let filePath = path.join(docsDir, `${slugPath}.mdx`);
 
-		if (!fs.existsSync(filePath)) return null;
+		if (!fs.existsSync(filePath)) {
+			// Try index.mdx if it's a directory
+			const indexPath = path.join(docsDir, slugPath, "index.mdx");
+			if (fs.existsSync(indexPath)) {
+				filePath = indexPath;
+			} else {
+				return null;
+			}
+		}
 
 		const { data: frontmatter, content } = matter(
 			fs.readFileSync(filePath, "utf8"),
@@ -116,6 +128,7 @@ export const source = {
 			url: `/${slugPath === "index" ? "introduction" : slugPath}`,
 		};
 	},
+
 	get pageTree() {
 		return { children: buildTree(docsDir) };
 	},

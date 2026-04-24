@@ -15,10 +15,17 @@ function getBreadcrumbs(
 	slugPath: string,
 	parentPath: string[] = [],
 ): string[] {
-	const targetUrl = `/${slugPath === "index" ? "introduction" : slugPath}`;
+	let currentSection = "";
+	const targetUrl = slugPath === "index" ? "/" : `/${slugPath.replace(/\/index$/, "")}`;
+
 	for (const item of tree) {
-		if (item.type === "page" && item.url === targetUrl) {
-			return [...parentPath, item.name as string];
+		if (item.type === "separator") {
+			currentSection = item.name;
+			continue;
+		}
+
+		if (item.type === "page" && (item.url === targetUrl || (item.url === "/introduction" && targetUrl === "/"))) {
+			return currentSection ? [currentSection, ...parentPath, item.name as string] : [...parentPath, item.name as string];
 		}
 
 		if (item.type === "folder") {
@@ -26,7 +33,9 @@ function getBreadcrumbs(
 				...parentPath,
 				item.name as string,
 			]);
-			if (found.length) return found;
+			if (found.length) {
+				return currentSection ? [currentSection, ...found] : found;
+			}
 		}
 	}
 	return [];
@@ -108,16 +117,16 @@ export default async function Page(props: {
 					{/* Title row */}
 					<div className="mb-6 flex items-start justify-between gap-4">
 						<div>
-							<h1 className="font-bold text-3xl text-fd-foreground tracking-tight sm:text-[32px]">
+							<h1 className="font-bold text-4xl text-fd-foreground tracking-[-0.02em] sm:text-[40px]">
 								{page.data.title}
 							</h1>
 							{page.data.description && (
-								<p className="mt-2 text-[16px] text-fd-muted-foreground leading-relaxed">
+								<p className="mt-3 text-[18px] text-fd-muted-foreground leading-relaxed">
 									{page.data.description}
 								</p>
 							)}
 						</div>
-						<div className="mt-1 shrink-0">
+						<div className="mt-2 shrink-0">
 							<PageActions markdownUrl={`${page.url}.mdx`} />
 						</div>
 					</div>

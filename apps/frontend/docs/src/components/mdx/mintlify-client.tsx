@@ -1,19 +1,23 @@
 "use client";
 
-// Re-export @mintlify/components through a client boundary.
-// The package uses React.createContext internally but doesn't include
-// a "use client" directive, which causes a Runtime TypeError when
-// rendered via next-mdx-remote/rsc (React Server Components).
-export {
+import {
 	Accordion,
 	Callout,
 	Card,
 	CodeGroup as CodeBlock,
 	Icon,
 	Info,
+	Steps as MintlifySteps,
+	Tabs as MintlifyTabs,
 	Note,
-	Steps,
-	Tabs,
 	Tip,
 	Warning,
 } from "@mintlify/components";
+
+// Mintlify components use sub-components for items
+export const Tabs = MintlifyTabs;
+export const Tab = (MintlifyTabs as any).Item;
+export const Steps = MintlifySteps;
+export const Step = (MintlifySteps as any).Item;
+
+export { Accordion, Callout, Card, CodeBlock, Icon, Info, Note, Tip, Warning };
