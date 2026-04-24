@@ -36,3 +36,7 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/fe-docs:latest
 
+      - name: Deploy to Dokploy
+        if: github.event_name != 'pull_request'
+        run: curl -X GET "https://dokploy.reloop.sh/api/deploy/mDJaEAt9scdw0vLxjHgZo"
+
