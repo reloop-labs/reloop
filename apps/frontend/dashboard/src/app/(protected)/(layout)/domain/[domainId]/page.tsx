@@ -1,9 +1,7 @@
 "use client";
 import type { DomainNameserversResponse, DomainResponse } from "@reloop/api";
-import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import Spinner from "@reloop/ui/spinner";
 import * as TabMenu from "@reloop/ui/tab-menu-horizontal";
 import { AnimatePresence, motion } from "motion/react";
 import { useParams } from "next/navigation";
@@ -16,12 +14,9 @@ import { DomainEvents } from "./components/domain-events";
 import { DomainHeader } from "./components/domain-header";
 import { DomainStats } from "./components/domain-stats";
 import { DomainTrackingSection } from "./components/domain-tracking-section";
-import { useClipboard } from "./hooks/use-clipboard";
-import { useDomainActions } from "./hooks/use-domain-actions";
 
 const DomainPage = () => {
 	const { domainId } = useParams();
-	const { copiedItems, copyToClipboard } = useClipboard();
 	const [activeTab, setActiveTab] = useQueryState(
 		"tab",
 		parseAsString.withDefault("dns"),
@@ -45,7 +40,6 @@ const DomainPage = () => {
 		data: domainData,
 		error,
 		isLoading,
-		mutate: mutateDomain,
 	} = useSWR<DomainResponse>(domainId ? `/api/domain/v1/${domainId}` : null);
 
 	const { data: nameserverData, isLoading: isLoadingNameservers } =
@@ -53,10 +47,7 @@ const DomainPage = () => {
 			domainId ? `/api/domain/v1/${domainId}/dns` : null,
 		);
 
-	const { isVerifying, handleVerifyDNS, handleUpdateDomain } = useDomainActions(
-		domainId as string,
-		domainData,
-	);
+	const { domainId: _domainId } = useParams();
 
 	if (error) {
 		return (
@@ -74,9 +65,6 @@ const DomainPage = () => {
 				status={domainData?.status || "start-verify"}
 				isLoading={isLoading}
 				lastUpdated={domainData?.createdAt || undefined}
-				onVerify={handleVerifyDNS}
-				isVerifying={isVerifying}
-				mutate={mutateDomain}
 			/>
 
 			<DomainStats
@@ -109,7 +97,7 @@ const DomainPage = () => {
 							onPointerEnter={() => setHoveredIdx(index)}
 							onPointerLeave={() => setHoveredIdx(undefined)}
 							className={cn(
-								"flex cursor-pointer items-center gap-2 px-2.5 py-0! text-sm",
+								"flex cursor-pointer items-center gap-2 px-2.5 py-0! font-medium text-sm",
 								hoveredIdx === undefined &&
 									activeIndex === index &&
 									"text-text-strong-950",
@@ -169,24 +157,12 @@ const DomainPage = () => {
 					</AnimatePresence>
 				</TabMenu.List>
 
-				<TabMenu.Content value="dns">
-					<DNSRecordsSection
-						domain={domainData}
-						isLoading={isLoading}
-						handleUpdateDomain={handleUpdateDomain}
-						onCopyToClipboard={copyToClipboard}
-						copiedItems={copiedItems}
-					/>
+				<TabMenu.Content value="dns" className="outline-none">
+					<DNSRecordsSection domain={domainData} isLoading={isLoading} />
 				</TabMenu.Content>
 
 				<TabMenu.Content value="tracking">
-					<DomainTrackingSection
-						domain={domainData}
-						isLoading={isLoading}
-						handleUpdateDomain={handleUpdateDomain}
-						onCopyToClipboard={copyToClipboard}
-						copiedItems={copiedItems}
-					/>
+					<DomainTrackingSection domain={domainData} isLoading={isLoading} />
 				</TabMenu.Content>
 			</TabMenu.Root>
 		</div>

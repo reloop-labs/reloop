@@ -16,21 +16,20 @@ import {
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";
+import { mutate } from "swr";
 import { DeleteDomainModal } from "../../components/delete-domain";
+import { useDomainActions } from "../hooks/use-domain-actions";
 
 interface DomainHeaderProps {
-	domainId: string;
 	domainRecordId?: string;
+	domainId: string;
 	lastUpdated?: string;
 	status?: DomainStatus;
 	isLoading?: boolean;
 	isFailed?: boolean;
-	onVerify?: () => void | Promise<void>;
-	isVerifying?: boolean;
-	mutate: () => void;
 }
 
 const headerMenuItems = [
@@ -43,14 +42,19 @@ const headerMenuItems = [
 ];
 
 export const DomainHeader = ({
-	domainId,
+	domainId: domainName,
 	domainRecordId,
 	lastUpdated,
 	status = "start-verify",
 	isLoading,
 	isFailed,
-	mutate,
 }: DomainHeaderProps) => {
+	const { domainId } = useParams();
+	const { handleVerifyDNS, isVerifying } = useDomainActions(
+		domainId as string,
+		undefined,
+	);
+	const mutateDomain = () => mutate(`/api/domain/v1/${domainId}`);
 	const router = useRouter();
 	const [, setDeleteId] = useQueryState("delete");
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
@@ -109,7 +113,7 @@ export const DomainHeader = ({
 							</div>
 						</div>
 					)}
-					<h1 className="font-medium text-title-h6 leading-8">{domainId}</h1>
+					<h1 className="font-medium text-title-h6 leading-8">{domainName}</h1>
 				</div>
 
 				<div className="flex items-center gap-2">
@@ -118,9 +122,15 @@ export const DomainHeader = ({
 							<Skeleton className="h-9 w-32 rounded-lg" />
 							<Skeleton className="h-9 w-9 rounded-lg" />
 						</>
-					) : isFailed ? (
-						<Button.Root variant="error" size="small" mode="lighter">
-							Try Again
+					) : status === "start-verify" || status === "failed" ? (
+						<Button.Root
+							variant={status === "failed" ? "error" : "primary"}
+							size="small"
+							mode={status === "failed" ? "lighter" : "filled"}
+							onClick={handleVerifyDNS}
+							disabled={isVerifying}
+						>
+							{status === "failed" ? "Try Again" : "Verify Domain"}
 						</Button.Root>
 					) : (
 						<>
@@ -164,7 +174,7 @@ export const DomainHeader = ({
 												onPointerLeave={() => setHoverIdx(undefined)}
 												onClick={() => {
 													if (item.id === "delete") {
-														setDeleteId(domainRecordId || domainId);
+														setDeleteId((domainRecordId || domainId) as string);
 													}
 												}}
 												className={cn(
@@ -204,8 +214,8 @@ export const DomainHeader = ({
 			<DeleteDomainModal
 				domains={[
 					{
-						id: domainRecordId || domainId,
-						domain: domainId,
+						id: domainRecordId || (domainId as string),
+						domain: domainName,
 						organizationId: "",
 						userId: "",
 						domainType: "custom" as const,
@@ -233,7 +243,7 @@ export const DomainHeader = ({
 						updatedAt: "",
 					} satisfies Domain,
 				]}
-				mutate={mutate}
+				mutate={mutateDomain}
 			/>
 		</div>
 	);

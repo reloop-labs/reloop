@@ -34,7 +34,6 @@ const items = [
 export const ContactsTabs = () => {
 	const router = useRouter();
 	const pathname = usePathname();
-	const { activeOrganization } = useUserOrganization();
 	const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
 
 	const isPropertiesPage = pathname.includes("/contacts/properties");
@@ -70,7 +69,7 @@ export const ContactsTabs = () => {
 						onPointerEnter={() => setHoveredIdx(index)}
 						onPointerLeave={() => setHoveredIdx(undefined)}
 						className={cn(
-							"flex cursor-pointer items-center gap-2 px-2.5 py-0! text-sm",
+							"flex cursor-pointer items-center gap-2 px-2.5 py-0! font-medium text-sm",
 							hoveredIdx === undefined &&
 								activeIndex === index &&
 								"text-text-strong-950",
@@ -79,13 +78,13 @@ export const ContactsTabs = () => {
 						value={value}
 						onClick={() => {
 							if (value === "properties") {
-								router.push(`/contacts/properties`);
+								router.push("/contacts/properties");
 							} else if (value === "topics") {
-								router.push(`/contacts/topics`);
+								router.push("/contacts/topics");
 							} else if (value === "groups") {
-								router.push(`/contacts/groups`);
+								router.push("/contacts/groups");
 							} else {
-								router.push(`/contacts`);
+								router.push("/contacts");
 							}
 						}}
 					>

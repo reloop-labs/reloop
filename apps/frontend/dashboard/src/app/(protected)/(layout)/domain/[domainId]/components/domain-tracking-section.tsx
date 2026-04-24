@@ -1,35 +1,21 @@
 "use client";
 
 import type { DomainResponse } from "@reloop/api";
-import * as Switch from "@reloop/ui/switch";
-import { groupDomainDnsRecords } from "./dns-record-groups";
-import { DNSRecordTable } from "./dns-record-table";
+import * as Checkbox from "@reloop/ui/checkbox";
+import { useParams } from "next/navigation";
+import { useDomainActions } from "../hooks/use-domain-actions";
 
 interface DomainTrackingSectionProps {
 	domain?: DomainResponse;
 	isLoading?: boolean;
-	handleUpdateDomain?: (
-		payload: Partial<
-			Pick<
-				DomainResponse,
-				"sendingEmail" | "receivingEmail" | "clickTracking" | "openTracking"
-			>
-		>,
-		successMessage: string,
-	) => Promise<void>;
-	onCopyToClipboard?: (text: string, itemId: string) => void;
-	copiedItems?: Set<string>;
 }
 
 export const DomainTrackingSection = ({
 	domain,
 	isLoading,
-	handleUpdateDomain,
-	onCopyToClipboard,
-	copiedItems = new Set(),
 }: DomainTrackingSectionProps) => {
-	const { trackingRecords } = groupDomainDnsRecords(domain?.dnsRecords);
-
+	const { domainId } = useParams();
+	const { handleUpdateDomain } = useDomainActions(domainId as string, domain);
 	const onToggleClickTracking = (value: boolean) => {
 		if (!handleUpdateDomain) return;
 
@@ -49,11 +35,16 @@ export const DomainTrackingSection = ({
 	};
 
 	return (
-		<div className="mb-24">
+		<div className="mt-7 mb-24">
 			{/* Tracking Settings */}
 			<div className="mb-10 space-y-6">
 				{/* Click Tracking */}
-				<div className="flex items-start justify-between gap-4">
+				<div className="flex items-start gap-4">
+					<Checkbox.Root
+						checked={domain?.clickTracking ?? false}
+						onCheckedChange={onToggleClickTracking}
+						disabled={isLoading}
+					/>
 					<div className="space-y-1">
 						<div className="font-medium text-sm text-text-strong-950">
 							Click Tracking
@@ -62,16 +53,15 @@ export const DomainTrackingSection = ({
 							Track when recipients click links in your emails.
 						</div>
 					</div>
-					<Switch.Root
-						checked={domain?.clickTracking ?? false}
-						onCheckedChange={onToggleClickTracking}
-						disabled={isLoading}
-						checkedColor="orange"
-					/>
 				</div>
 
 				{/* Open Tracking */}
-				<div className="flex items-start justify-between gap-4">
+				<div className="flex items-start gap-4">
+					<Checkbox.Root
+						checked={domain?.openTracking ?? false}
+						onCheckedChange={onToggleOpenTracking}
+						disabled={isLoading}
+					/>
 					<div className="space-y-1">
 						<div className="font-medium text-sm text-text-strong-950">
 							Open Tracking
@@ -81,36 +71,8 @@ export const DomainTrackingSection = ({
 							inaccurate.
 						</div>
 					</div>
-					<Switch.Root
-						checked={domain?.openTracking ?? false}
-						onCheckedChange={onToggleOpenTracking}
-						disabled={isLoading}
-						checkedColor="orange"
-					/>
 				</div>
 			</div>
-
-			{/* DNS Records for Tracking */}
-			{trackingRecords.length > 0 && (
-				<div>
-					<div className="mb-6 space-y-1">
-						<div className="font-medium text-sm text-text-strong-950">
-							DNS Records
-						</div>
-						<div className="text-text-sub-600 text-xs">
-							Required DNS records for tracking to work correctly.
-						</div>
-					</div>
-					<DNSRecordTable
-						records={trackingRecords}
-						onCopyToClipboard={onCopyToClipboard}
-						copiedItems={copiedItems}
-						isLoading={isLoading}
-						loadingRows={1}
-						tableId="tracking-"
-					/>
-				</div>
-			)}
 		</div>
 	);
 };
