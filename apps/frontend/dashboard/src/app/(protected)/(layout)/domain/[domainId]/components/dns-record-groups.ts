@@ -14,7 +14,8 @@ const isDkimRecord = (record: DNSRecord) =>
 
 const isReceivingMxRecord = (record: DNSRecord) =>
 	record.recordType === "MX" &&
-	normalizeLabel(record.value) === RECEIVING_MX_VALUE;
+	(normalizeLabel(record.value) === RECEIVING_MX_VALUE ||
+		record.name.includes("inbound"));
 
 const isTrackingRecord = (record: DNSRecord) =>
 	record.recordType === "CNAME" &&
@@ -33,6 +34,7 @@ export const groupDomainDnsRecords = (records: DNSRecord[] | undefined) => {
 		if (isDmarcRecord(record)) return false;
 		if (isDkimRecord(record)) return false;
 		if (isTrackingRecord(record)) return false;
+		if (isReceivingMxRecord(record)) return false;
 		return true;
 	});
 
