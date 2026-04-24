@@ -1563,6 +1563,24 @@ export const IconsSprite = () => (
 					fill="currentColor"
 				/>
 			</symbol>
+			<symbol id="list-unordered-4-rec" viewBox="0 0 24 24" fill="none">
+				<rect
+					opacity="0.12"
+					x={2}
+					y={2}
+					width={20}
+					height={20}
+					rx={5}
+					fill="currentColor"
+				/>
+				<path
+					d="M12 17L18 17M12 12L18 12M12 7H18M6 7L7 8L9 6M6 12L7 13L9 11M6 17L7 18L9 16M10 22H14C16.8003 22 18.2004 22 19.27 21.455C20.2108 20.9757 20.9757 20.2108 21.455 19.27C22 18.2004 22 16.8003 22 14V10C22 7.19974 22 5.79961 21.455 4.73005C20.9757 3.78924 20.2108 3.02433 19.27 2.54497C18.2004 2 16.8003 2 14 2H10C7.19974 2 5.79961 2 4.73005 2.54497C3.78924 3.02433 3.02434 3.78924 2.54497 4.73005C2 5.79961 2 7.19974 2 10V14C2 16.8003 2 18.2004 2.54497 19.27C3.02434 20.2108 3.78924 20.9757 4.73005 21.455C5.79961 22 7.19974 22 10 22Z"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
 			<symbol id="shield" viewBox="0 0 24 24">
 				<path
 					opacity="0.12"
