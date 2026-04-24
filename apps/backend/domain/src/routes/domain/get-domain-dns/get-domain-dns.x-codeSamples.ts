@@ -1,4 +1,4 @@
-export const getDomainDNSXCodeSamples = [
+export const getDomainNameserversXCodeSamples = [
 	{
 		id: "node",
 		lang: "js",

@@ -2,10 +2,10 @@ import { authMiddleware } from "@be/domain/middleware/auth";
 import { DNSModel } from "@be/domain/model/dns.model";
 import { Elysia, t } from "elysia";
 import { getDomainDNSController } from "./get-domain-dns.controllers";
-import { getDomainDNSXCodeSamples } from "./get-domain-dns.x-codeSamples";
+import { getDomainNameserversXCodeSamples } from "./get-domain-dns.x-codeSamples";
 
-export const getDomainDNSRoute = new Elysia().use(authMiddleware).get(
-	"/:domain_id/dns",
+export const getDomainNameserversRoute = new Elysia().use(authMiddleware).get(
+	"/nameservers/:domain_id",
 	async ({ params: { domain_id }, activeOrganizationId, logger }) => {
 		return await getDomainDNSController({
 			domainId: domain_id,
@@ -27,7 +27,7 @@ export const getDomainDNSRoute = new Elysia().use(authMiddleware).get(
 			tags: ["Domains"],
 			summary: "Domain Nameservers",
 			description: "Returns nameservers for a domain",
-			"x-codeSamples": getDomainDNSXCodeSamples,
+			"x-codeSamples": getDomainNameserversXCodeSamples,
 		},
 	},
 );
