@@ -29,7 +29,7 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 	const steps = [
 		{
 			number: 1,
-			label: "Domain added",
+			label: "Domain Added",
 			icon: "globe",
 			timestamp: domain.createdAt
 				? format(new Date(domain.createdAt), "MMM dd, h:mm a")
@@ -37,17 +37,19 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 		},
 		{
 			number: 2,
-			label: "Verification",
+			label: isFailed ? "DNS Failed" : "Verifying DNS",
 			icon: "shield",
-			timestamp: domain.lastVerifiedAt
-				? format(new Date(domain.lastVerifiedAt), "MMM dd, h:mm a")
-				: currentStep >= 2
-					? "Pending"
+			timestamp:
+				domain.lastVerifiedAt || domain.updatedAt
+					? format(
+							new Date(domain.lastVerifiedAt || domain.updatedAt),
+							"MMM dd, h:mm a",
+						)
 					: null,
 		},
 		{
 			number: 3,
-			label: "Active",
+			label: "Ready to Send",
 			icon: "list-unordered-4-rec",
 			timestamp:
 				domain.status === "active" && domain.lastVerifiedAt
@@ -55,7 +57,6 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 					: null,
 		},
 	];
-
 	return (
 		<div className="relative mx-auto flex w-full max-w-md items-start gap-0">
 			{steps.map((step, index) => {
@@ -75,7 +76,7 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 										"relative z-10 flex size-10 shrink-0 items-center justify-center rounded-[14px] border bg-bg-white-0 transition-all duration-300",
 										state === "completed" &&
 											step.number !== 1 &&
-											"border-success-base bg-success-base text-static-white",
+											"border-success-base bg-success-base/10 text-success-base",
 										state === "active" &&
 											step.number !== 1 &&
 											!isFailed &&
@@ -87,9 +88,7 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 											"border-stroke-soft-200 bg-bg-white-0 text-text-soft-400",
 									)}
 								>
-									{state === "completed" ? (
-										<Icon name="check" className="h-5 w-5" />
-									) : state === "failed" ? (
+									{state === "failed" ? (
 										<Icon name="cross" className="h-5 w-5" />
 									) : state === "active" && domain.status === "verifying" ? (
 										<Spinner size={12} color="currentColor" />
@@ -100,7 +99,9 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 												"h-5 w-5 transition-colors duration-300",
 												state === "active" && step.number !== 1
 													? "text-warning-base"
-													: "text-text-soft-400",
+													: state === "completed" && step.number !== 1
+														? "text-success-base"
+														: "text-text-soft-400",
 											)}
 										/>
 									)}
