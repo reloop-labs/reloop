@@ -13,3 +13,8 @@ export {
 	generateReceivingMXRecord,
 	generateSPFRecord,
 } from "@be/domain/utils/dns-record-generator";
+export {
+	getCustomReturnPathSubString,
+	getDomainHost,
+	getDomainSubString,
+} from "@be/domain/utils/domain-formatter";

@@ -3,6 +3,8 @@ import type { DomainTypes } from "@be/domain/types/domain.type";
 import {
   generateAllDNSRecords,
   generateReceivingMXRecord,
+  getCustomReturnPathSubString,
+  getDomainHost,
 } from "@be/domain/utils";
 import { createLog } from "@be/domain/utils/logger";
 import { createId } from "@paralleldrive/cuid2";
@@ -129,8 +131,8 @@ export async function createDomainController({
     const { dkimRecord, spfRecord, dmarcRecord, mxRecord } = dnsRecords;
     const receivingMxRecord = generateReceivingMXRecord(
       domainConfig.HOST_DOMAIN,
-      domain,
-      customReturnPath || "inbound",
+      getDomainHost(domain),
+      getCustomReturnPathSubString(domain, customReturnPath || "inbound"),
     );
     const domainId = `domain_${createId()}`;
     logger.info({ domainId }, "Creating domain");

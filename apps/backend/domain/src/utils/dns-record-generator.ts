@@ -2,6 +2,7 @@ import { domainConfig } from "@be/domain/domain.config";
 import { DNSTypes } from "@be/domain/types/dns.type";
 import { generateDKIMKeyPair } from "@be/domain/utils/dkim-key-generator";
 import {
+	getDomainHost,
 	getDomainSubString,
 } from "@be/domain/utils/domain-formatter";
 
@@ -91,10 +92,11 @@ export async function generateAllDNSRecords(
 	dkimRecord: DNSTypes.DNSRecord;
 }> {
 	const domainSubString = getDomainSubString(domain);
-	const dkimRecord = await generateDKIMRecord(domainSubString, domain);
-	const spfRecord = generateSPFRecord(domainSubString, domain);
-	const dmarcRecord = generateDMARCRecord(domainSubString, domain);
-	const mxRecord = generateMXRecord(domainSubString, domain);
+	const domainHost = getDomainHost(domain);
+	const dkimRecord = await generateDKIMRecord(domainSubString, domainHost);
+	const spfRecord = generateSPFRecord(domainSubString, domainHost);
+	const dmarcRecord = generateDMARCRecord(domainSubString, domainHost);
+	const mxRecord = generateMXRecord(domainSubString, domainHost);
 	return {
 		mxRecord,
 		spfRecord,
