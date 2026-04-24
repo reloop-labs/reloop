@@ -94,7 +94,7 @@ const AddDomain = () => {
 							variant="neutral"
 							mode="filled"
 							size="xsmall"
-							disabled={status === "loading" || !formState.isValid}
+							disabled={status === "loading"}
 						>
 							{status === "loading" ? (
 								<>
