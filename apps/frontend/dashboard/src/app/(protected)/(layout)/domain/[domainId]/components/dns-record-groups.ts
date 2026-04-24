@@ -16,16 +16,23 @@ const isReceivingMxRecord = (record: DNSRecord) =>
 	record.recordType === "MX" &&
 	normalizeLabel(record.value) === RECEIVING_MX_VALUE;
 
+const isTrackingRecord = (record: DNSRecord) =>
+	record.recordType === "CNAME" &&
+	(record.name.includes("reloop") ||
+		record.name.includes("email") ||
+		record.name.includes("click"));
+
 export const groupDomainDnsRecords = (records: DNSRecord[] | undefined) => {
 	const allRecords = records ?? [];
 
 	const dmarcRecords = allRecords.filter(isDmarcRecord);
 	const receivingRecords = allRecords.filter(isReceivingMxRecord);
 	const dkimRecords = allRecords.filter(isDkimRecord);
+	const trackingRecords = allRecords.filter(isTrackingRecord);
 	const sendingRecords = allRecords.filter((record) => {
 		if (isDmarcRecord(record)) return false;
-		if (isReceivingMxRecord(record)) return false;
 		if (isDkimRecord(record)) return false;
+		if (isTrackingRecord(record)) return false;
 		return true;
 	});
 
@@ -34,5 +41,6 @@ export const groupDomainDnsRecords = (records: DNSRecord[] | undefined) => {
 		receivingRecords,
 		dkimRecords,
 		dmarcRecords,
+		trackingRecords,
 	};
 };

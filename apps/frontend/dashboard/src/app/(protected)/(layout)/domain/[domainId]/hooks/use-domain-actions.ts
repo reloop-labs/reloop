@@ -37,7 +37,7 @@ export const useDomainActions = (domainId: string | undefined, domainData: Domai
   }, [domainId]);
 
   const handleUpdateDomain = React.useCallback(async (
-    payload: Partial<Pick<DomainResponse, "sendingEmail" | "receivingEmail">>,
+    payload: Partial<Pick<DomainResponse, "sendingEmail" | "receivingEmail" | "clickTracking" | "openTracking">>,
     successMessage: string,
   ) => {
     if (!domainId || !domainData) {

@@ -1,18 +1,15 @@
 "use client";
 
 import type { DomainResponse } from "@reloop/api";
-import * as Switch from "@reloop/ui/switch";
-import { toast } from "sonner";
+import type { DNSRecord } from "@reloop/api/types";
+import { Icon } from "@reloop/ui/icon";
+import Link from "next/link";
 import { groupDomainDnsRecords } from "./dns-record-groups";
 import { DNSRecordTable } from "./dns-record-table";
 
 interface DNSRecordsSectionProps {
 	domain?: DomainResponse;
 	isLoading?: boolean;
-	handleUpdateDomain?: (
-		payload: Partial<Pick<DomainResponse, "sendingEmail" | "receivingEmail">>,
-		successMessage: string,
-	) => Promise<void>;
 	onCopyToClipboard?: (text: string, itemId: string) => void;
 	copiedItems?: Set<string>;
 }
@@ -20,123 +17,94 @@ interface DNSRecordsSectionProps {
 export const DNSRecordsSection = ({
 	domain,
 	isLoading,
-	handleUpdateDomain,
 	onCopyToClipboard,
 	copiedItems = new Set(),
 }: DNSRecordsSectionProps) => {
-	const { sendingRecords, receivingRecords, dmarcRecords } =
-		groupDomainDnsRecords(domain?.dnsRecords);
-
-	const onToggleSending = (value: boolean) => {
-		if (!handleUpdateDomain) return;
-
-		if (!value && !domain?.receivingEmail) {
-			toast.error("At least one of Sending or Receiving must be enabled");
-			return;
-		}
-
-		handleUpdateDomain(
-			{ sendingEmail: value },
-			`Sending email ${value ? "enabled" : "disabled"}`,
-		);
-	};
-
-	const onToggleReceiving = (value: boolean) => {
-		if (!handleUpdateDomain) return;
-
-		if (!value && !domain?.sendingEmail) {
-			toast.error("At least one of Sending or Receiving must be enabled");
-			return;
-		}
-
-		handleUpdateDomain(
-			{ receivingEmail: value },
-			`Receiving email ${value ? "enabled" : "disabled"}`,
-		);
-	};
+	const { dkimRecords, sendingRecords, dmarcRecords } = groupDomainDnsRecords(
+		domain?.dnsRecords,
+	);
 
 	return (
 		<div className="mb-24">
-			{/* Sending Email Section */}
-			<div className="mb-10">
-				<div className="mb-6 flex items-start justify-between gap-4">
-					<div className="space-y-1">
-						<div className="font-medium text-sm text-text-strong-950">
-							Sending Email{" "}
-							<span className="text-text-sub-600 text-xs">(Required)</span>
-						</div>
-						<div className="text-text-sub-600 text-xs">
-							Enable email signing and specify authorized senders.
-						</div>
-					</div>
-					<Switch.Root
-						checked={domain?.sendingEmail ?? true}
-						onCheckedChange={onToggleSending}
-						disabled={isLoading}
-						checkedColor="orange"
-					/>
-				</div>
-				<DNSRecordTable
-					records={sendingRecords}
-					onCopyToClipboard={onCopyToClipboard}
-					copiedItems={copiedItems}
-					isLoading={isLoading}
-					loadingRows={4}
-					tableId="dkim-"
-				/>
-			</div>
+			<DNSRecordSectionGroup
+				title="Domain verification (DKIM)"
+				docsUrl="https://reloop.sh/docs/dns/dkim"
+				records={dkimRecords}
+				isLoading={!!isLoading}
+				onCopyToClipboard={onCopyToClipboard}
+				copiedItems={copiedItems}
+				tableId="dkim-"
+			/>
 
-			{/* Receiving Email Section */}
-			{receivingRecords.length > 0 && (
-				<div className="mb-10">
-					<div className="mb-6 flex items-start justify-between gap-4">
-						<div className="space-y-1">
-							<div className="font-medium text-sm text-text-strong-950">
-								Receiving Email{" "}
-								<span className="text-text-sub-600 text-xs">(Optional)</span>
-							</div>
-							<div className="text-text-sub-600 text-xs">
-								Route inbound mail to your receiving mail host.
-							</div>
-						</div>
-						<Switch.Root
-							checked={domain?.receivingEmail ?? true}
-							onCheckedChange={onToggleReceiving}
-							disabled={isLoading}
-							checkedColor="orange"
+			<DNSRecordSectionGroup
+				title="Sending Email (SPF)"
+				docsUrl="https://reloop.sh/docs/dns/spf"
+				records={sendingRecords}
+				isLoading={!!isLoading}
+				onCopyToClipboard={onCopyToClipboard}
+				copiedItems={copiedItems}
+				tableId="spf-"
+			/>
+
+			<DNSRecordSectionGroup
+				title="Reject spoofed emails (DMARC)"
+				docsUrl="https://reloop.sh/docs/dns/dmarc"
+				records={dmarcRecords}
+				isLoading={!!isLoading}
+				onCopyToClipboard={onCopyToClipboard}
+				copiedItems={copiedItems}
+				tableId="dmarc-"
+			/>
+		</div>
+	);
+};
+
+interface DNSRecordSectionGroupProps {
+	title: string;
+	docsUrl: string;
+	records: DNSRecord[];
+	isLoading: boolean;
+	onCopyToClipboard?: (text: string, itemId: string) => void;
+	copiedItems?: Set<string>;
+	tableId: string;
+}
+
+const DNSRecordSectionGroup = ({
+	title,
+	docsUrl,
+	records,
+	isLoading,
+	onCopyToClipboard,
+	copiedItems,
+	tableId,
+}: DNSRecordSectionGroupProps) => {
+	return (
+		<div className="mb-10 last:mb-0">
+			<div className="mb-4 flex items-start justify-between gap-4">
+				<div className="space-y-1">
+					<Link
+						href={docsUrl}
+						target="_blank"
+						className="group flex items-center gap-1 hover:underline"
+					>
+						<span className="font-medium text-sm text-text-strong-950">
+							{title}
+						</span>
+						<Icon
+							name="arrow-top-right"
+							className="h-2.5 w-2.5 text-text-sub-600 opacity-0 group-hover:opacity-100"
 						/>
-					</div>
-					<DNSRecordTable
-						records={receivingRecords}
-						onCopyToClipboard={onCopyToClipboard}
-						copiedItems={copiedItems}
-						isLoading={isLoading}
-						loadingRows={1}
-						tableId="receiving-"
-					/>
+					</Link>
 				</div>
-			)}
-
-			{/* DMARC Section */}
-			<div>
-				<div className="mb-6 space-y-1">
-					<div className="font-medium text-sm text-text-strong-950">
-						DMARC{" "}
-						<span className="text-text-sub-600 text-xs">(Recommended)</span>
-					</div>
-					<div className="text-text-sub-600 text-xs">
-						Set authentication policies and receive reports.
-					</div>
-				</div>
-				<DNSRecordTable
-					records={dmarcRecords}
-					onCopyToClipboard={onCopyToClipboard}
-					copiedItems={copiedItems}
-					isLoading={isLoading}
-					loadingRows={1}
-					tableId="dmarc-"
-				/>
 			</div>
+			<DNSRecordTable
+				records={records}
+				onCopyToClipboard={onCopyToClipboard}
+				copiedItems={copiedItems}
+				isLoading={isLoading}
+				loadingRows={records.length || 1}
+				tableId={tableId}
+			/>
 		</div>
 	);
 };

@@ -12,6 +12,7 @@ import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { AnimatePresence, motion } from "motion/react";
+import * as React from "react";
 
 interface DNSRecordTableProps {
 	records?: DNSRecord[];
@@ -26,13 +27,13 @@ interface DNSRecordTableProps {
 
 const getGridCols = (hideStatus: boolean, showPriority: boolean) => {
 	if (hideStatus && showPriority) {
-		return "grid-cols-[70px_1.5fr_2fr_60px_80px]";
+		return "grid-cols-[70px_1.5fr_2fr_80px_60px]";
 	}
 	if (hideStatus && !showPriority) {
 		return "grid-cols-[70px_1.5fr_2fr_80px]";
 	}
 	if (!hideStatus && showPriority) {
-		return "grid-cols-[70px_1.5fr_2fr_60px_80px_120px]";
+		return "grid-cols-[70px_1.5fr_2fr_80px_60px_120px]";
 	}
 	return "grid-cols-[70px_1.5fr_2fr_80px_120px]";
 };
@@ -83,8 +84,13 @@ export const DNSRecordTable = ({
 	loadingRows = 3,
 	tableId = "",
 	hideStatus = false,
-	showPriorityColumn = false,
+	showPriorityColumn: showPriorityColumnProp,
 }: DNSRecordTableProps) => {
+	const hasPriority = React.useMemo(
+		() => records?.some((r) => r.priority !== undefined && r.priority !== null),
+		[records],
+	);
+	const showPriorityColumn = !!(showPriorityColumnProp ?? hasPriority);
 	const gridCols = getGridCols(hideStatus, showPriorityColumn);
 
 	return (
@@ -93,35 +99,29 @@ export const DNSRecordTable = ({
 				{/* Table Header */}
 				<div
 					className={cn(
-						"grid items-center border-stroke-soft-100 border-b px-4 py-3 text-text-sub-600",
+						"grid items-center border-stroke-soft-100 border-b bg-bg-weak-50/50 px-4 py-2.5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-bg-weak-50/40",
 						gridCols,
 					)}
 				>
-					<div className="flex items-center gap-2">
-						<Icon name="file-text" className="h-3.5 w-3.5" />
+					<div className="flex items-center">
 						<span className="text-xs">Type</span>
 					</div>
-					<div className="flex items-center gap-2">
-						<Icon name="link" className="h-3.5 w-3.5" />
+					<div className="flex items-center">
 						<span className="text-xs">Name</span>
 					</div>
-					<div className="flex items-center gap-2">
-						<Icon name="code" className="h-3.5 w-3.5" />
+					<div className="flex items-center">
 						<span className="text-xs">Value</span>
 					</div>
-					{showPriorityColumn && (
-						<div className="flex items-center gap-2">
-							<Icon name="star" className="h-3.5 w-3.5" />
-							<span className="text-xs">Pri</span>
-						</div>
-					)}
-					<div className="flex items-center gap-2">
-						<Icon name="time" className="h-3.5 w-3.5" />
+					<div className="flex items-center">
 						<span className="text-xs">TTL</span>
 					</div>
+					{showPriorityColumn && (
+						<div className="flex items-center justify-center">
+							<span className="text-xs">Priority</span>
+						</div>
+					)}
 					{!hideStatus && (
-						<div className="flex items-center gap-2">
-							<Icon name="check-circle" className="h-3.5 w-3.5" />
+						<div className="flex items-center">
 							<span className="text-xs">Status</span>
 						</div>
 					)}
@@ -257,30 +257,34 @@ export const DNSRecordTable = ({
 										</Tooltip.Root>
 									</Tooltip.Provider>
 
-									{/* Priority Column */}
-									{showPriorityColumn && (
-										<motion.div
-											{...getAnimationProps(index + 1, 3)}
-											className="flex items-center"
-										>
-											<span className="text-label-sm text-text-sub-600">
-												{record.priority || "-"}
-											</span>
-										</motion.div>
-									)}
-
 									{/* TTL Column */}
 									<motion.div
-										{...getAnimationProps(
-											index + 1,
-											showPriorityColumn ? 4 : 3,
-										)}
+										{...getAnimationProps(index + 1, 3)}
 										className="flex items-center"
 									>
 										<span className="text-label-sm text-text-sub-600">
 											{record.ttl}
 										</span>
 									</motion.div>
+
+									{/* Priority Column */}
+									{showPriorityColumn && (
+										<motion.div
+											{...getAnimationProps(index + 1, 4)}
+											className="flex items-center justify-center"
+										>
+											{record.priority !== undefined &&
+											record.priority !== null ? (
+												<span className="inline-flex items-center rounded-md bg-neutral-alpha-10 px-2 py-0.5 font-semibold text-text-strong-950 text-xs dark:bg-neutral-alpha-16">
+													{record.priority}
+												</span>
+											) : (
+												<span className="text-label-sm text-text-sub-600">
+													-
+												</span>
+											)}
+										</motion.div>
+									)}
 
 									{/* Status Column */}
 									{!hideStatus && (
