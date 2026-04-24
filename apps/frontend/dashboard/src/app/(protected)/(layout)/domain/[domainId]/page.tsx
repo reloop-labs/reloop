@@ -1,5 +1,5 @@
 "use client";
-import type { DomainNameserversResponse, DomainResponse } from "@reloop/api";
+import type { DomainResponse } from "@reloop/api";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as TabMenu from "@reloop/ui/tab-menu-horizontal";
@@ -42,11 +42,6 @@ const DomainPage = () => {
 		isLoading,
 	} = useSWR<DomainResponse>(domainId ? `/api/domain/v1/${domainId}` : null);
 
-	const { data: nameserverData, isLoading: isLoadingNameservers } =
-		useSWR<DomainNameserversResponse>(
-			domainId ? `/api/domain/v1/${domainId}/dns` : null,
-		);
-
 	const { domainId: _domainId } = useParams();
 
 	if (error) {
@@ -59,27 +54,11 @@ const DomainPage = () => {
 
 	return (
 		<div className="mx-auto max-w-3xl sm:px-8">
-			<DomainHeader
-				domainRecordId={domainData?.id || (domainId as string)}
-				domainId={domainData?.domain || (domainId as string)}
-				status={domainData?.status || "start-verify"}
-				isLoading={isLoading}
-				lastUpdated={domainData?.createdAt || undefined}
-			/>
+			<DomainHeader domain={domainData} isLoading={isLoading} />
 
-			<DomainStats
-				domain={domainData}
-				nameservers={nameserverData?.nameservers}
-				isLoading={isLoading}
-				isLoadingNameservers={isLoadingNameservers}
-			/>
+			<DomainStats domain={domainData} isLoading={isLoading} />
 
-			{domainData && (
-				<DomainEvents
-					domain={domainData}
-					nameservers={nameserverData?.nameservers}
-				/>
-			)}
+			{domainData && <DomainEvents domain={domainData} />}
 
 			<TabMenu.Root
 				value={activeTab}

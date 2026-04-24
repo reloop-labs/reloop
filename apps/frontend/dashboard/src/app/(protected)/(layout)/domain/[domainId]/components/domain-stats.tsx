@@ -9,16 +9,12 @@ import { DNSProviderInfo } from "./dns-provider-info";
 
 interface DomainStatsProps {
 	domain?: DomainResponse;
-	nameservers?: string[] | null;
 	isLoading: boolean;
-	isLoadingNameservers: boolean;
 }
 
 export const DomainStats: React.FC<DomainStatsProps> = ({
 	domain,
-	nameservers,
 	isLoading,
-	isLoadingNameservers,
 }) => {
 	return (
 		<div className="mt-7 grid grid-cols-3 gap-x-12 gap-y-6">
@@ -61,11 +57,7 @@ export const DomainStats: React.FC<DomainStatsProps> = ({
 				)}
 			</div>
 
-			{/* Provider */}
-			<DNSProviderInfo
-				nameservers={nameservers || domain?.nameservers}
-				isLoading={isLoading || isLoadingNameservers}
-			/>
+			<DNSProviderInfo domain={domain} isLoading={isLoading} />
 		</div>
 	);
 };

@@ -4,12 +4,7 @@ import type { DomainResponse } from "@reloop/api";
 import { Icon } from "@reloop/ui/icon";
 import { StatusTimeline } from "./status-timeline";
 
-export const DomainEvents = ({
-	domain,
-}: {
-	domain: DomainResponse;
-	nameservers?: string[] | null;
-}) => {
+export const DomainEvents = ({ domain }: { domain: DomainResponse }) => {
 	const bannerMessage = () => {
 		switch (domain.status) {
 			case "verifying":

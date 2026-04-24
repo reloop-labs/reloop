@@ -1,19 +1,31 @@
+import type { DomainNameserversResponse, DomainResponse } from "@reloop/api";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
+import { useParams } from "next/navigation";
 import * as React from "react";
 import * as simpleIcons from "simple-icons";
+import useSWR from "swr";
 
 import { inferDnsProvider } from "../utils";
 
 interface DNSProviderInfoProps {
-	nameservers: string[] | null | undefined;
+	domain?: DomainResponse;
 	isLoading: boolean;
 }
 
 export const DNSProviderInfo: React.FC<DNSProviderInfoProps> = ({
-	nameservers,
-	isLoading,
+	domain,
+	isLoading: isLoadingDomain,
 }) => {
+	const { domainId } = useParams();
+	const { data: nameserverData, isLoading: isLoadingNameservers } =
+		useSWR<DomainNameserversResponse>(
+			domainId ? `/api/domain/v1/${domainId}/dns` : null,
+		);
+
+	const nameservers = nameserverData?.nameservers || domain?.nameservers;
+	const isLoading = isLoadingDomain || isLoadingNameservers;
+
 	const provider = React.useMemo(
 		() => inferDnsProvider(nameservers),
 		[nameservers],

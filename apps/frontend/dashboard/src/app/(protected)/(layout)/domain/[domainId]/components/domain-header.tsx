@@ -5,7 +5,7 @@ import { AnimatedClock } from "@fe/dashboard/components/animated-clock";
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
 import { getStatusColorClass, getStatusIcon } from "@fe/dashboard/utils/domain";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
-import type { Domain, DomainStatus } from "@reloop/api/types";
+import type { Domain } from "@reloop/api/types";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -24,12 +24,8 @@ import { DeleteDomainModal } from "../../components/delete-domain";
 import { useDomainActions } from "../hooks/use-domain-actions";
 
 interface DomainHeaderProps {
-	domainRecordId?: string;
-	domainId: string;
-	lastUpdated?: string;
-	status?: DomainStatus;
+	domain?: Domain;
 	isLoading?: boolean;
-	isFailed?: boolean;
 }
 
 const headerMenuItems = [
@@ -41,20 +37,18 @@ const headerMenuItems = [
 	},
 ];
 
-export const DomainHeader = ({
-	domainId: domainName,
-	domainRecordId,
-	lastUpdated,
-	status = "start-verify",
-	isLoading,
-	isFailed,
-}: DomainHeaderProps) => {
-	const { domainId } = useParams();
+export const DomainHeader = ({ domain, isLoading }: DomainHeaderProps) => {
+	const { domainId: _domainId } = useParams();
+	const domainName = domain?.domain || (_domainId as string);
+	const domainRecordId = domain?.id || (_domainId as string);
+	const status = domain?.status || "start-verify";
+	const lastUpdated = domain?.createdAt;
+
 	const { handleVerifyDNS, isVerifying } = useDomainActions(
-		domainId as string,
+		_domainId as string,
 		undefined,
 	);
-	const mutateDomain = () => mutate(`/api/domain/v1/${domainId}`);
+	const mutateDomain = () => mutate(`/api/domain/v1/${_domainId}`);
 	const router = useRouter();
 	const [, setDeleteId] = useQueryState("delete");
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
@@ -90,11 +84,7 @@ export const DomainHeader = ({
 								•
 							</p>
 							<p className="font-medium text-paragraph-xs text-text-sub-600">
-								{isFailed
-									? "---"
-									: lastUpdated
-										? formatRelativeTime(lastUpdated)
-										: "---"}
+								{lastUpdated ? formatRelativeTime(lastUpdated) : "---"}
 							</p>
 							<p className="font-semibold text-paragraph-xs text-text-sub-600">
 								•
@@ -174,7 +164,9 @@ export const DomainHeader = ({
 												onPointerLeave={() => setHoverIdx(undefined)}
 												onClick={() => {
 													if (item.id === "delete") {
-														setDeleteId((domainRecordId || domainId) as string);
+														setDeleteId(
+															(domainRecordId || _domainId) as string,
+														);
 													}
 												}}
 												className={cn(
@@ -214,7 +206,7 @@ export const DomainHeader = ({
 			<DeleteDomainModal
 				domains={[
 					{
-						id: domainRecordId || (domainId as string),
+						id: domainRecordId || (_domainId as string),
 						domain: domainName,
 						organizationId: "",
 						userId: "",
