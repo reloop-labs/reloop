@@ -7,9 +7,9 @@ import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import type { Domain } from "@reloop/api/types";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
-import * as Kbd from "@reloop/ui/kbd";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useParams, useRouter } from "next/navigation";
+import { useHotkeys } from "react-hotkeys-hook";
 import { mutate } from "swr";
 import { DeleteDomainModal } from "../../components/delete-domain";
 import { useDomainActions } from "../hooks/use-domain-actions";
@@ -33,6 +33,27 @@ export const DomainHeader = ({ domain, isLoading }: DomainHeaderProps) => {
 	);
 	const mutateDomain = () => mutate(`/api/domain/v1/${_domainId}`);
 	const router = useRouter();
+
+	useHotkeys(
+		"mod+v",
+		(e) => {
+			e.preventDefault();
+			if (status === "start-verify" || status === "failed") {
+				handleVerifyDNS();
+			}
+		},
+		{ enableOnFormTags: true },
+		[status, handleVerifyDNS],
+	);
+
+	useHotkeys(
+		"d",
+		(e) => {
+			e.preventDefault();
+			window.open("https://reloop.sh/docs/domain", "_blank");
+		},
+		{ enableOnFormTags: true },
+	);
 
 	return (
 		<div className="pt-10">
@@ -95,6 +116,15 @@ export const DomainHeader = ({ domain, isLoading }: DomainHeaderProps) => {
 									className="font-medium"
 								>
 									{status === "failed" ? "Try Again" : "Verify Domain"}
+									<span className="inline-flex items-center gap-0.5">
+										<Icon
+											name="command"
+											className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+										/>
+										<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-100/20 p-px font-medium text-[10px] uppercase">
+											V
+										</span>
+									</span>
 								</Button.Root>
 							)}
 							<Button.Root
