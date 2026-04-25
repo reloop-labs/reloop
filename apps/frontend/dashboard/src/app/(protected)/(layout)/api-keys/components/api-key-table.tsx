@@ -55,14 +55,6 @@ interface ApiKeyTableProps {
 	onPageSizeChange: (size: number) => void;
 }
 
-const getStatusBadgeColor = () => {
-	return "text-text-sub-600 border-stroke-soft-200 bg-neutral-alpha-10";
-};
-
-const getStatusIconColor = (enabled: boolean) => {
-	return enabled ? "text-success-base" : "text-error-base";
-};
-
 interface ApiKeyActionsDropdownProps {
 	apiKey: ApiKeyData;
 	onViewDetails: (id: string) => void;
@@ -348,39 +340,42 @@ export const ApiKeyTable = ({
 
 										{/* Status Column */}
 										<div className="flex items-center">
-											<span
+											<div
 												className={cn(
-													"inline-flex items-center rounded-md border-[1px] px-[6px] py-0.5 font-medium text-[10px]",
-													getStatusBadgeColor(),
+													"flex items-center gap-2 rounded-lg py-0.5 font-medium text-[13px] capitalize",
+													apiKey.enabled
+														? "text-success-base"
+														: "text-error-base",
 												)}
 											>
-												<span
-													className={cn(
-														"mr-1.5 h-2 w-2 rounded-full",
-														getStatusIconColor(apiKey.enabled),
-														apiKey.enabled
-															? "bg-success-base"
-															: "bg-error-base",
-													)}
+												<Icon
+													name={
+														apiKey.enabled ? "check-circle" : "cross-circle"
+													}
+													className="h-3.5 w-3.5"
 												/>
 												{apiKey.enabled ? "Active" : "Disabled"}
-											</span>
+											</div>
 										</div>
 
 										{/* Created By Column */}
-										<div className="flex items-center gap-2">
-											<Avatar.Root size="20">
+										<div className="flex items-center gap-1">
+											<Avatar.Root
+												size="20"
+												className="rounded-full bg-transparent"
+											>
 												{apiKey.createdBy?.image ? (
 													<Avatar.Image
 														src={apiKey.createdBy.image}
 														alt={apiKey.createdBy?.name || "User"}
+														className="rounded-full"
 													/>
 												) : null}
 											</Avatar.Root>
 											{apiKey.createdBy?.email ? (
 												<Tooltip.Root delayDuration={0}>
 													<Tooltip.Trigger asChild>
-														<span className="cursor-default truncate text-label-sm text-text-sub-600">
+														<span className="cursor-default truncate font-medium text-label-sm text-text-sub-600">
 															{apiKey.createdBy?.name || "Unknown"}
 														</span>
 													</Tooltip.Trigger>
@@ -392,12 +387,13 @@ export const ApiKeyTable = ({
 														<div className="flex items-start gap-2 p-1">
 															<Avatar.Root
 																size="20"
-																className="mt-0.5 shrink-0"
+																className="mt-0.5 shrink-0 rounded-full bg-transparent"
 															>
 																{apiKey.createdBy?.image ? (
 																	<Avatar.Image
 																		src={apiKey.createdBy.image}
 																		alt={apiKey.createdBy?.name || "User"}
+																		className="rounded-full"
 																	/>
 																) : null}
 															</Avatar.Root>
@@ -421,7 +417,7 @@ export const ApiKeyTable = ({
 
 										{/* Created Column */}
 										<div className="flex items-center">
-											<span className="whitespace-nowrap font-medium text-[13px] text-text-sub-600">
+											<span className="whitespace-nowrap font-medium text-sm text-text-sub-600">
 												{formatRelativeTime(apiKey.createdAt)}
 											</span>
 										</div>
