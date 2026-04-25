@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useEffect } from "react";
 import { ApiPreview } from "./components/api-preview";
-import { DnsConfigPreview } from "./components/dns-config-preview";
+import { DnsConfigPreview } from "./components/dns-provider/dns-config-preview";
 import { DomainPreview } from "./components/domain-preview";
 import { SidebarPreview } from "./components/sidebar-preview";
 
@@ -74,7 +74,7 @@ export const OnBoardingContent = () => {
 			stepIndicator: "3/4",
 			title: "Configure DNS",
 			component: <ConfigureDnsStep />,
-			preview: <DnsConfigPreview domain={domainId || domain} />,
+			preview: <DnsConfigPreview domainId={domainId} domainName={domain} />,
 			fullWidth: false,
 		},
 		4: {
