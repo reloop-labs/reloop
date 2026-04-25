@@ -55,7 +55,7 @@ export const OnBoardingContent = () => {
 	// Configuration for each step
 	const stepsConfig = {
 		1: {
-			stepIndicator: "1/4",
+			stepIndicator: "Step 1 of 4",
 			title: "Create your workspace",
 			component: <CreateOrgStep />,
 			preview: (
@@ -64,21 +64,21 @@ export const OnBoardingContent = () => {
 			fullWidth: false,
 		},
 		2: {
-			stepIndicator: "2/4",
+			stepIndicator: "Step 2 of 4",
 			title: "Add Domain",
 			component: <AddDomainStep />,
 			preview: <DomainPreview domain={domain} logoUrl={logoUrl} />,
 			fullWidth: false,
 		},
 		3: {
-			stepIndicator: "3/4",
+			stepIndicator: "Step 3 of 4",
 			title: "Configure DNS",
 			component: <ConfigureDnsStep />,
 			preview: <DnsConfigPreview domainId={domainId} domainName={domain} />,
 			fullWidth: false,
 		},
 		4: {
-			stepIndicator: "4/4",
+			stepIndicator: "Step 4 of 4",
 			title: "Generate API Credentials",
 			component: <GenerateApiKeyStep />,
 			preview: <ApiPreview apiKey={apiKey} />,

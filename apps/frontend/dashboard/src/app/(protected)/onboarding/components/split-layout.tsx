@@ -53,7 +53,7 @@ export const SplitLayout = ({
 					>
 						<div className="relative flex gap-2">
 							{onBack && (
-								<div className="-left-7 -top-[2.1px] absolute">
+								<div className="-left-6 -top-[2.1px] absolute">
 									<button
 										type="button"
 										onClick={onBack}
