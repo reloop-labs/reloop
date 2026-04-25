@@ -21,6 +21,7 @@ export const DNSRecordsSection = ({
 
 	return (
 		<div className="mt-6 mb-24">
+			{/* banner */}
 			<DNSRecordSectionGroup
 				title="Domain verification (DKIM)"
 				docsUrl="https://reloop.sh/docs/dns/dkim"

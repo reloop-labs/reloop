@@ -1,6 +1,7 @@
 "use client";
 import type { DomainResponse } from "@reloop/api";
 import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
@@ -15,6 +16,7 @@ import { DomainAddedAlert } from "./components/domain-added-alert";
 
 const NewDomainPage = () => {
 	const [isVerifying, setIsVerifying] = React.useState(false);
+	const [viewMode, setViewMode] = React.useState<"table" | "list">("table");
 	const { domainId } = useParams();
 	const router = useRouter();
 
@@ -94,6 +96,35 @@ const NewDomainPage = () => {
 						You have successfully added the domain
 					</p>
 				</div>
+
+				<div className="flex items-center gap-1 rounded-lg border border-stroke-soft-100 bg-bg-weak-50/50 p-1 dark:border-stroke-soft-100/50 dark:bg-bg-weak-50/20">
+					<button
+						type="button"
+						onClick={() => setViewMode("table")}
+						className={cn(
+							"flex h-8 items-center gap-2 rounded-md px-3 font-medium text-paragraph-xs transition-all",
+							viewMode === "table"
+								? "bg-white text-text-strong-950 shadow-sm dark:bg-[#101010]"
+								: "text-text-sub-600 hover:text-text-strong-950",
+						)}
+					>
+						<Icon name="table" className="h-4 w-4" />
+						Table
+					</button>
+					<button
+						type="button"
+						onClick={() => setViewMode("list")}
+						className={cn(
+							"flex h-8 items-center gap-2 rounded-md px-3 font-medium text-paragraph-xs transition-all",
+							viewMode === "list"
+								? "bg-white text-text-strong-950 shadow-sm dark:bg-[#101010]"
+								: "text-text-sub-600 hover:text-text-strong-950",
+						)}
+					>
+						<Icon name="list" className="h-4 w-4" />
+						List
+					</button>
+				</div>
 			</div>
 
 			<div className="relative mb-10">
@@ -106,6 +137,7 @@ const NewDomainPage = () => {
 						onCopyToClipboard={copyToClipboard}
 						isLoading={isLoading}
 						docsUrl="https://reloop.sh/docs/dns/dkim"
+						viewMode={viewMode}
 					/>
 				)}
 
@@ -115,6 +147,7 @@ const NewDomainPage = () => {
 					onCopyToClipboard={copyToClipboard}
 					isLoading={isLoading}
 					docsUrl="https://reloop.sh/docs/dns/spf"
+					viewMode={viewMode}
 				/>
 
 				{dmarcRecords.length > 0 && (
@@ -125,6 +158,7 @@ const NewDomainPage = () => {
 						onCopyToClipboard={copyToClipboard}
 						isLoading={isLoading}
 						docsUrl="https://reloop.sh/docs/dns/dmarc"
+						viewMode={viewMode}
 					/>
 				)}
 

@@ -20,16 +20,17 @@ export const DNSProviderInfo: React.FC<DNSProviderInfoProps> = ({
 	const { domainId } = useParams();
 	const { data: nameserverData, isLoading: isLoadingNameservers } =
 		useSWR<DomainNameserversResponse>(
-			domainId ? `/api/domain/v1/${domainId}/dns` : null,
+			domainId ? `/api/domain/v1/nameservers/${domainId}` : null,
 		);
 
 	const nameservers = nameserverData?.nameservers || domain?.nameservers;
 	const isLoading = isLoadingDomain || isLoadingNameservers;
 
-	const provider = React.useMemo(
-		() => inferDnsProvider(nameservers),
-		[nameservers],
-	);
+	const provider = React.useMemo(() => {
+		// If we have a dnsProvider from the API, we can use it or fallback to inference
+		// For now, nameservers inference is quite robust and matches the labels we want
+		return inferDnsProvider(nameservers);
+	}, [nameservers]);
 
 	if (!provider?.url) return null;
 
@@ -58,12 +59,14 @@ export const DNSProviderInfo: React.FC<DNSProviderInfoProps> = ({
 						className="flex cursor-pointer items-center gap-1.5 text-sm text-text-strong-950 transition-opacity hover:opacity-80"
 					>
 						{dnsIcon && (
-							<span
-								className="h-4 w-4"
-								style={{ color: `#${dnsIcon.hex}` }}
-								// biome-ignore lint/security/noDangerouslySetInnerHtml: Trusted SVG from simple-icons
-								dangerouslySetInnerHTML={{ __html: dnsIcon.svg }}
-							/>
+							<div>
+								<span
+									className="flex h-6 w-6 items-center justify-center [&>svg]:h-full [&>svg]:w-full"
+									style={{ fill: `#${dnsIcon.hex}` }}
+									// biome-ignore lint/security/noDangerouslySetInnerHtml: Trusted SVG from simple-icons
+									dangerouslySetInnerHTML={{ __html: dnsIcon.svg }}
+								/>
+							</div>
 						)}
 						<span className="font-medium text-paragraph-sm underline decoration-stroke-soft-200 decoration-dashed underline-offset-4">
 							{provider.label}
