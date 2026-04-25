@@ -13,7 +13,7 @@ import {
 	type CreatedByUser,
 } from "./api-key-filter-dropdown";
 import { ApiKeyTable } from "./api-key-table";
-import { CreateApiKeyModal } from "./create-api-key-modal";
+import { CreateApiKeyModal } from "./create-api-key-modal/index";
 
 interface ApiKeyData {
 	id: string;

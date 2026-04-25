@@ -3,7 +3,6 @@ import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import * as Kbd from "@reloop/ui/kbd";
 import * as Modal from "@reloop/ui/modal";
 import axios from "axios";
 import { useQueryState } from "nuqs";
@@ -64,7 +63,7 @@ export const DeleteApiKeyModal = ({
 			await setDeleteId(null);
 			setConfirmationName("");
 			await mutate(
-				(key) => typeof key === "string" && key.startsWith("/api/api-key/v1/")
+				(key) => typeof key === "string" && key.startsWith("/api/api-key/v1/"),
 			);
 
 			// Call the success callback if provided (e.g., to navigate back to list)
@@ -172,7 +171,9 @@ export const DeleteApiKeyModal = ({
 								disabled={isDeleting}
 							>
 								Cancel
-								<Kbd.Root className="bg-bg-weak-50 text-xs">Esc</Kbd.Root>
+								<span className="flex h-[19px] w-7 items-center justify-center rounded-[5px] border border-stroke-soft-100 bg-bg-weak-50/50 p-px font-medium text-[10px]">
+									Esc
+								</span>
 							</Button.Root>
 							<Button.Root
 								type="submit"

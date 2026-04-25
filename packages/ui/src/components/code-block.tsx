@@ -1,16 +1,18 @@
-/** biome-ignore-all lint/security/noDangerouslySetInnerHtml: <explanation> */
+/** biome-ignore-all lint/security/noDangerouslySetInnerHtml: Shiki generates safe HTML for code highlighting */
 "use client";
 
+import { cn } from "@reloop/ui/cn";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { codeToHtml } from "shiki";
-import { cn } from "@reloop/ui/cn";
 
 interface Props {
 	code: string;
 	lang?: string;
 	theme?: string;
 	className?: string;
+	hideLineNumbers?: boolean;
+	noScroll?: boolean;
 }
 
 export const CodeBlock = ({
@@ -18,6 +20,8 @@ export const CodeBlock = ({
 	lang = "javascript",
 	theme: themeOverride,
 	className,
+	hideLineNumbers = false,
+	noScroll = false,
 }: Props) => {
 	const { theme: currentTheme, systemTheme, resolvedTheme } = useTheme();
 	const [html, setHtml] = useState<string>("");
@@ -47,7 +51,15 @@ export const CodeBlock = ({
 			transformers: [
 				{
 					pre(node) {
-						this.addClassToHast(node, "overflow-x-auto py-4 line-numbers");
+						this.addClassToHast(
+							node,
+							cn(
+								"py-4",
+								!noScroll && "overflow-x-auto",
+								noScroll && "whitespace-pre-wrap break-all",
+								!hideLineNumbers && "line-numbers",
+							),
+						);
 					},
 					line(node) {
 						this.addClassToHast(node, "line");
@@ -55,7 +67,7 @@ export const CodeBlock = ({
 				},
 			],
 		}).then(setHtml);
-	}, [code, lang, shikiTheme]);
+	}, [code, lang, shikiTheme, hideLineNumbers, noScroll]);
 
 	if (!html || !mounted) {
 		return null;
@@ -87,7 +99,10 @@ export const CodeBlock = ({
 			`}</style>
 			<div
 				dangerouslySetInnerHTML={{ __html: html }}
-				className={cn("[&>pre]:!bg-transparent text-sm leading-6 [&>pre]:p-4", className)}
+				className={cn(
+					"[&>pre]:!bg-transparent text-sm leading-6 [&>pre]:p-4",
+					className,
+				)}
 			/>
 		</>
 	);

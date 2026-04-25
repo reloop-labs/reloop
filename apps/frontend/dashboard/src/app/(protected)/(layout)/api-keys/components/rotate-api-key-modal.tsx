@@ -1,7 +1,6 @@
 "use client";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
-import * as Kbd from "@reloop/ui/kbd";
 import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
@@ -66,7 +65,7 @@ export const RotateApiKeyModal = ({
 
 			setRotatedApiKey(response.data);
 			await mutate(
-				(key) => typeof key === "string" && key.startsWith("/api/api-key/v1/")
+				(key) => typeof key === "string" && key.startsWith("/api/api-key/v1/"),
 			);
 			toast.success("API key rotated successfully");
 		} catch (error) {
@@ -252,7 +251,9 @@ export const RotateApiKeyModal = ({
 							disabled={isRotating}
 						>
 							Cancel
-							<Kbd.Root className="bg-bg-weak-50 text-xs">Esc</Kbd.Root>
+							<span className="flex h-[19px] w-7 items-center justify-center rounded-[5px] border border-stroke-soft-100 bg-bg-weak-50/50 p-px font-medium text-[10px]">
+								Esc
+							</span>
 						</Button.Root>
 						<Button.Root
 							type="button"
