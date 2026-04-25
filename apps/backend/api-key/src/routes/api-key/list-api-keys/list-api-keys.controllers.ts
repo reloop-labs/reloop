@@ -3,7 +3,7 @@ import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import type { Logger } from "@reloop/logger";
 import { API_KEY_LIST_WEBHOOK_EVENT } from "@reloop/webhook-events";
-import { and, count, desc, eq } from "drizzle-orm";
+import { and, count, desc, eq, ilike, or } from "drizzle-orm";
 
 export async function listApiKeysController({
 	query,
@@ -14,13 +14,24 @@ export async function listApiKeysController({
 	organizationId: string;
 	logger: Logger;
 }): Promise<ApiKeyTypes.ApiKeyListResponse> {
-	const { page = 1, limit = 10, enabled } = query;
+	const { page = 1, limit = 10, enabled, userId, q } = query;
 	const offset = (page - 1) * limit;
 	logger.info({ query }, "Getting API keys");
 	try {
 		const conditions = [eq(schema.apikey.organizationId, organizationId)];
 		if (enabled !== undefined)
 			conditions.push(eq(schema.apikey.enabled, enabled));
+		if (userId !== undefined) conditions.push(eq(schema.apikey.userId, userId));
+		if (q !== undefined && q !== "") {
+			const searchCondition = or(
+				ilike(schema.apikey.name, `%${q}%`),
+				ilike(schema.apikey.start, `%${q}%`),
+				ilike(schema.apikey.prefix, `%${q}%`),
+			);
+			if (searchCondition) {
+				conditions.push(searchCondition);
+			}
+		}
 		const whereClause = and(...conditions);
 		logger.info({ whereClause }, "Getting Total Count");
 		const totalResult = await db

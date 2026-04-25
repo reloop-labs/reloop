@@ -1,5 +1,7 @@
 "use client";
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
+import { PageSizeDropdown } from "@fe/dashboard/components/page-size-dropdown";
+import { PaginationControls } from "@fe/dashboard/components/pagination-controls";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
@@ -43,9 +45,14 @@ interface ApiKeyData {
 
 interface ApiKeyTableProps {
 	apiKeys: ApiKeyData[];
+	total: number;
 	isLoading?: boolean;
 	loadingRows?: number;
 	onAddApiKey?: () => void;
+	currentPage: number;
+	onPageChange: (page: number) => void;
+	pageSize: number;
+	onPageSizeChange: (size: number) => void;
 }
 
 const getStatusBadgeColor = () => {
@@ -200,9 +207,14 @@ const ApiKeyActionsDropdown = ({
 
 export const ApiKeyTable = ({
 	apiKeys,
+	total,
 	isLoading,
 	loadingRows = 3,
 	onAddApiKey,
+	currentPage,
+	onPageChange,
+	pageSize,
+	onPageSizeChange,
 }: ApiKeyTableProps) => {
 	const router = useRouter();
 	const { mutate } = useSWRConfig();
@@ -212,6 +224,10 @@ export const ApiKeyTable = ({
 		null,
 	);
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
+
+	const totalPages = Math.ceil(total / pageSize);
+	const startIndex = (currentPage - 1) * pageSize + 1;
+	const endIndex = Math.min(currentPage * pageSize, total);
 
 	const handleDeleteApiKey = (apiKeyId: string) => {
 		setDeleteId(apiKeyId);
@@ -232,7 +248,8 @@ export const ApiKeyTable = ({
 
 			// Revalidate all API key caches using a matcher function
 			await mutate(
-				(key) => typeof key === "string" && key.startsWith("/api/api-key/v1/"),
+				(key: unknown) =>
+					typeof key === "string" && key.startsWith("/api/api-key/v1/"),
 				undefined,
 				{ revalidate: true },
 			);
@@ -254,23 +271,22 @@ export const ApiKeyTable = ({
 
 	return (
 		<>
-			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/50">
+			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/40">
 				{/* Table Header */}
-				<div className="grid grid-cols-[2fr_1fr_1.5fr_1fr_48px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600 dark:border-stroke-soft-100/50">
-					<div className="flex items-center gap-2">
-						<Icon name="key-new" className="h-4 w-4" />
+				<div className="grid grid-cols-[2fr_1fr_1.5fr_1fr_48px] items-center border-stroke-soft-100 border-b bg-bg-weak-50/50 px-4 py-2.5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-bg-weak-50/40">
+					<div className="flex items-center gap-1">
 						<span className="text-xs">Name</span>
 					</div>
-					<div className="flex items-center gap-2">
-						<Icon name="check-circle" className="h-4 w-4" />
+					<div className="flex items-center gap-1">
+						<Icon name="activity" className="h-3 w-3" />
 						<span className="text-xs">Status</span>
 					</div>
-					<div className="flex items-center gap-2">
-						<Icon name="user" className="h-4 w-4" />
+					<div className="flex items-center gap-1">
+						<Icon name="user" className="h-3 w-3" />
 						<span className="text-xs">Created By</span>
 					</div>
-					<div className="flex items-center gap-2">
-						<Icon name="clock" className="h-4 w-4" />
+					<div className="flex items-center gap-1">
+						<Icon name="clock" className="h-3 w-3" />
 						<span className="text-xs">Created</span>
 					</div>
 					<div />
@@ -286,7 +302,6 @@ export const ApiKeyTable = ({
 								className="grid grid-cols-[2fr_1fr_1.5fr_1fr_48px] items-center px-4 py-2"
 							>
 								<div className="flex items-center gap-2">
-									<Skeleton className="h-4 w-4 rounded" />
 									<Skeleton className="h-4 w-24" />
 								</div>
 								<div className="flex items-center">
@@ -326,10 +341,6 @@ export const ApiKeyTable = ({
 									<Link href={`/api-keys/${apiKey.id}`} className="contents">
 										{/* Name Column */}
 										<div className="flex items-center gap-2">
-											<Icon
-												name="key-new"
-												className="h-4 w-4 shrink-0 text-text-sub-600"
-											/>
 											<div className="truncate font-medium text-label-sm text-text-strong-950">
 												{displayName}
 											</div>
@@ -352,7 +363,7 @@ export const ApiKeyTable = ({
 															: "bg-error-base",
 													)}
 												/>
-												{apiKey.enabled ? "Enabled" : "Disabled"}
+												{apiKey.enabled ? "Active" : "Disabled"}
 											</span>
 										</div>
 
@@ -410,7 +421,7 @@ export const ApiKeyTable = ({
 
 										{/* Created Column */}
 										<div className="flex items-center">
-											<span className="whitespace-nowrap text-label-sm text-text-sub-600">
+											<span className="whitespace-nowrap font-medium text-[13px] text-text-sub-600">
 												{formatRelativeTime(apiKey.createdAt)}
 											</span>
 										</div>
@@ -438,6 +449,30 @@ export const ApiKeyTable = ({
 						})
 					)}
 				</div>
+
+				{/* Pagination Footer */}
+				{total > 0 && (
+					<div className="flex items-center justify-between border-stroke-soft-100 border-t px-4 py-2 text-label-xs text-text-sub-600 dark:border-stroke-soft-100/40">
+						<div className="flex items-center">
+							<span>
+								Showing {startIndex}–{endIndex} of {total} API key
+								{total !== 1 ? "s" : ""}
+							</span>
+							<PageSizeDropdown
+								value={pageSize}
+								onValueChange={(value) => {
+									onPageSizeChange(value);
+								}}
+							/>
+						</div>
+						<PaginationControls
+							currentPage={currentPage}
+							totalPages={totalPages}
+							onPageChange={onPageChange}
+							isLoading={isLoading}
+						/>
+					</div>
+				)}
 			</div>
 			<DeleteApiKeyModal apiKeys={apiKeys} />
 			{rotateModalApiKey && (

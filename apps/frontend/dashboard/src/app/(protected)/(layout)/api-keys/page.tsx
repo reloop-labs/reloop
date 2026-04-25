@@ -1,9 +1,15 @@
 "use client";
 
-import { ApiKeyListSidebar } from "./components/api-key-list";
+import { ApiKeyList } from "./components/api-key-list";
+import { ApiKeyListHeader } from "./components/api-key-list-header";
 
 const ApiKeysPage = () => {
-	return <ApiKeyListSidebar />;
+	return (
+		<div className="mx-auto max-w-3xl sm:px-8">
+			<ApiKeyListHeader />
+			<ApiKeyList />
+		</div>
+	);
 };
 
 export default ApiKeysPage;

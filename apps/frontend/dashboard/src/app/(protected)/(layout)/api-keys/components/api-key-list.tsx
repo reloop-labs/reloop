@@ -1,18 +1,12 @@
 "use client";
-import { PageSizeDropdown } from "@fe/dashboard/components/page-size-dropdown";
-import { PaginationControls } from "@fe/dashboard/components/pagination-controls";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { Icon } from "@reloop/ui/icon";
-import * as Input from "@reloop/ui/input";
-import { parseAsInteger, useQueryState } from "nuqs";
-import { useMemo, useState } from "react";
+import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
+import { useMemo } from "react";
 import useSWR from "swr";
-import {
-	ApiKeyFilterDropdown,
-	type ApiKeyFilters,
-	type CreatedByUser,
-} from "./api-key-filter-dropdown";
+import { ApiKeyListToolbar } from "./api-key-list-toolbar";
 import { ApiKeyTable } from "./api-key-table";
+import type { CreatedByUser } from "./api-key-user-filter-dropdown";
 import { CreateApiKeyModal } from "./create-api-key-modal/index";
 
 interface ApiKeyData {
@@ -40,13 +34,14 @@ interface ApiKeyListResponse {
 	limit: number;
 }
 
-export const ApiKeyListSidebar = () => {
+export const ApiKeyList = () => {
 	const { activeOrganization } = useUserOrganization();
-	const [filters, setFilters] = useState<ApiKeyFilters>({
-		status: [],
-		createdBy: [],
-	});
-	const [searchQuery, setSearchQuery] = useState<string>("");
+	const [statusFilter] = useQueryState("status", parseAsString.withDefault(""));
+	const [creatorFilter] = useQueryState(
+		"creator",
+		parseAsString.withDefault(""),
+	);
+	const [searchQuery] = useQueryState("q", parseAsString.withDefault(""));
 	const [modal, setModal] = useQueryState("modal");
 	const [currentPage, setCurrentPage] = useQueryState(
 		"page",
@@ -59,17 +54,21 @@ export const ApiKeyListSidebar = () => {
 
 	const { data, error, isLoading } = useSWR<ApiKeyListResponse>(
 		activeOrganization?.id
-			? `/api/api-key/v1/?limit=${pageSize}&page=${currentPage}`
+			? `/api/api-key/v1/?limit=${pageSize}&page=${currentPage}${
+					statusFilter === "enabled"
+						? "&enabled=true"
+						: statusFilter === "disabled"
+							? "&enabled=false"
+							: ""
+				}${creatorFilter ? `&userId=${creatorFilter}` : ""}${
+					searchQuery ? `&q=${searchQuery}` : ""
+				}`
 			: null,
 		{
 			revalidateOnFocus: true,
 			revalidateOnReconnect: true,
 		},
 	);
-
-	const totalPages = data ? Math.ceil(data.total / pageSize) : 1;
-	const startIndex = (currentPage - 1) * pageSize + 1;
-	const endIndex = Math.min(currentPage * pageSize, data?.total || 0);
 
 	// Extract unique creators from API keys
 	const availableCreators = useMemo<CreatedByUser[]>(() => {
@@ -87,28 +86,6 @@ export const ApiKeyListSidebar = () => {
 		return Array.from(creatorsMap.values());
 	}, [data?.apiKeys]);
 
-	// Filter API keys based on status, creator, and search query
-	const filteredApiKeys =
-		data?.apiKeys?.filter((apiKey) => {
-			const matchesStatus =
-				filters.status.length === 0 ||
-				(filters.status.includes("enabled") && apiKey.enabled) ||
-				(filters.status.includes("disabled") && !apiKey.enabled);
-
-			const matchesCreator =
-				filters.createdBy.length === 0 ||
-				(apiKey.createdBy?.id &&
-					filters.createdBy.includes(apiKey.createdBy.id));
-
-			const displayName = apiKey.name || apiKey.start || apiKey.prefix || "";
-			const matchesSearch =
-				searchQuery === "" ||
-				displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-				apiKey.prefix?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-				apiKey.start?.toLowerCase().includes(searchQuery.toLowerCase());
-			return matchesStatus && matchesCreator && matchesSearch;
-		}) || [];
-
 	return (
 		<div className="pb-8">
 			<div>
@@ -121,60 +98,24 @@ export const ApiKeyListSidebar = () => {
 					</div>
 				) : (
 					<div>
-						<div className="flex items-center gap-3">
-							<div className="flex-1">
-								<Input.Root size="xsmall">
-									<Input.Wrapper>
-										<Input.Icon as={Icon} name="search" size="xsmall" />
-										<Input.Input
-											type="text"
-											placeholder="Search API keys..."
-											value={searchQuery}
-											onChange={(e) => setSearchQuery(e.target.value)}
-										/>
-									</Input.Wrapper>
-								</Input.Root>
-							</div>
-							<ApiKeyFilterDropdown
-								value={filters}
-								onChange={setFilters}
-								availableCreators={availableCreators}
-							/>
-						</div>
+						<ApiKeyListToolbar availableCreators={availableCreators} />
 
 						<div className="mt-4">
 							<ApiKeyTable
-								apiKeys={filteredApiKeys}
+								apiKeys={data?.apiKeys || []}
+								total={data?.total || 0}
 								isLoading={isLoading}
 								loadingRows={4}
 								onAddApiKey={() => setModal("create-api-key")}
+								currentPage={currentPage}
+								onPageChange={setCurrentPage}
+								pageSize={pageSize}
+								onPageSizeChange={(size) => {
+									setPageSize(size);
+									setCurrentPage(1);
+								}}
 							/>
 						</div>
-
-						{/* Pagination */}
-						{data && data.total > 0 && (
-							<div className="mt-4 flex items-center justify-between pb-8 text-paragraph-sm text-text-sub-600">
-								<div className="flex items-center gap-3">
-									<span>
-										Showing {startIndex}–{endIndex} of {data.total} API key
-										{data.total !== 1 ? "s" : ""}
-									</span>
-									<PageSizeDropdown
-										value={pageSize}
-										onValueChange={(value) => {
-											setPageSize(value);
-											setCurrentPage(1);
-										}}
-									/>
-								</div>
-								<PaginationControls
-									currentPage={currentPage}
-									totalPages={totalPages}
-									onPageChange={setCurrentPage}
-									isLoading={isLoading}
-								/>
-							</div>
-						)}
 					</div>
 				)}
 			</div>

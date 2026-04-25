@@ -3,7 +3,6 @@
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import * as Kbd from "@reloop/ui/kbd";
 import { useHotkeys } from "react-hotkeys-hook";
 
 const openDocs = () =>
@@ -33,7 +32,9 @@ export const DocsButton = (props: ButtonProps) => {
 		>
 			<Icon name="book-closed" className="h-4 w-4" />
 			Docs
-			<Kbd.Root className="bg-bg-weak-50 text-[10px]">D</Kbd.Root>
+			<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-200 p-px font-medium text-[10px] uppercase">
+				D
+			</span>
 		</Button.Root>
 	);
 };
