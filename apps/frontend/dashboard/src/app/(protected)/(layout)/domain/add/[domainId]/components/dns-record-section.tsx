@@ -4,7 +4,6 @@ import type { DNSRecord } from "@reloop/api/types";
 import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
 import type * as React from "react";
-import { DNSRecordList } from "./dns-record-list";
 import { DNSRecordTableMinimal } from "./dns-record-table-minimal";
 
 interface DNSRecordSectionProps {
@@ -20,7 +19,6 @@ interface DNSRecordSectionProps {
 		disabled: boolean;
 	};
 	loadingRows?: number;
-	viewMode?: "table" | "list";
 }
 
 export const DNSRecordSection: React.FC<DNSRecordSectionProps> = ({
@@ -31,7 +29,6 @@ export const DNSRecordSection: React.FC<DNSRecordSectionProps> = ({
 	isLoading,
 	docsUrl,
 	loadingRows = 1,
-	viewMode = "table",
 }) => {
 	return (
 		<div className="relative mt-7">
@@ -56,21 +53,12 @@ export const DNSRecordSection: React.FC<DNSRecordSectionProps> = ({
 				</Link>
 			</div>
 			<div className="w-full">
-				{viewMode === "table" ? (
-					<DNSRecordTableMinimal
-						records={records}
-						onCopyToClipboard={onCopyToClipboard}
-						isLoading={isLoading}
-						loadingRows={loadingRows}
-					/>
-				) : (
-					<DNSRecordList
-						records={records}
-						onCopyToClipboard={onCopyToClipboard}
-						isLoading={isLoading}
-						loadingRows={loadingRows}
-					/>
-				)}
+				<DNSRecordTableMinimal
+					records={records}
+					onCopyToClipboard={onCopyToClipboard}
+					isLoading={isLoading}
+					loadingRows={loadingRows}
+				/>
 			</div>
 		</div>
 	);

@@ -3,6 +3,7 @@
 import type { DomainResponse } from "@reloop/api";
 import type { DNSRecord } from "@reloop/api/types";
 import { Icon } from "@reloop/ui/icon";
+import { DNSAutoConnectBanner } from "./dns-auto-connect-banner";
 import { groupDomainDnsRecords } from "./dns-record-groups";
 import { DNSRecordTable } from "./dns-record-table";
 
@@ -21,7 +22,7 @@ export const DNSRecordsSection = ({
 
 	return (
 		<div className="mt-6 mb-24">
-			{/* banner */}
+			<DNSAutoConnectBanner domain={domain} />
 			<DNSRecordSectionGroup
 				title="Domain verification (DKIM)"
 				docsUrl="https://reloop.sh/docs/dns/dkim"
