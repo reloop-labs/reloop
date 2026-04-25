@@ -9,7 +9,7 @@ const transporter = nodemailer.createTransport({
   secure: false, // TLS on 25 is starttls, secure: false means no implicit TLS
   auth: {
     user: "reloop",
-    pass: "rl_live_bChwFljrqG0R7saD3aDLC9M-1m2rhYjc58ImHNRlSAFTrNXbrJ2c2PjVcKxF0OsG4tenHxexjmepqUTOsjEQWQ",
+    pass: "rl_prod_aQu-7wmZCSQUDzg2bqkyD2MyJ9GjnUziuupidfDHo9TOnknqxk7h689fTqRSz0I--RtsPgKSMswYw4x7G_Ra-Q",
   },
   tls: {
     rejectUnauthorized: false,
@@ -27,7 +27,7 @@ async function main() {
     );
 
     const info = await transporter.sendMail({
-      from: "pranav@marketing.reloop.sh",
+      from: "pranav@mail.qubit.email",
       to: "test@example.com",
       subject: "tttt",
       html: emailHtml,

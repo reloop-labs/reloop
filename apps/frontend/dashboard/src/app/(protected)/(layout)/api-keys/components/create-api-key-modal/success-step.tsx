@@ -23,7 +23,7 @@ export const SuccessStep = ({
 	const [copy, setCopy] = useState(false);
 
 	const handleCopy = () => {
-		if (isCopied) {
+		if (!isCopied) {
 			onCopy();
 		}
 		setCopy(true);
