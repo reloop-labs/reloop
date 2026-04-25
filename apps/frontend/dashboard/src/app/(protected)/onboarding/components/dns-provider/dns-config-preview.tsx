@@ -34,7 +34,7 @@ export const DnsConfigPreview = ({
 				{/* Provider Status Card */}
 				<div className="rounded-2xl border border-stroke-soft-100 p-4 dark:border-stroke-soft-100/40">
 					{/* Content Section */}
-					{detectedProvider === "unknown" && !isLoading ? (
+					{!(detectedProvider === "unknown" && !isLoading) ? (
 						<DnsProviderNotDetected domain={domainName} />
 					) : (
 						<DnsProviderDetected

@@ -60,6 +60,7 @@ export const getStatusIcon = (status: DomainStatus): string => {
 	}
 };
 
+
 /**
  * Get animation properties for staggered animations
  */
@@ -74,4 +75,14 @@ export const getAnimationProps = (row: number, column: number) => {
 			ease: [0.65, 0, 0.35, 1] as const,
 		},
 	};
+};
+
+/**
+ * Extract root domain from a domain name (simple version)
+ */
+export const getRootDomain = (domain: string): string => {
+	if (!domain) return "";
+	const parts = domain.split(".");
+	if (parts.length <= 2) return domain;
+	return parts.slice(-2).join(".");
 };
