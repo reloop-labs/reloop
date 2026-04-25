@@ -1,0 +1,62 @@
+import { Icon } from "@reloop/ui/icon";
+import type React from "react";
+import * as simpleIcons from "simple-icons";
+import providersData from "./dns-providers.json";
+
+export type ProviderKey = keyof typeof providersData;
+
+export interface ProviderConfig {
+	name: string;
+	color: string;
+	borderColor: string;
+	textColor: string;
+	icon: React.ReactNode;
+	url: string | null;
+	supportsAutoConnect?: boolean;
+}
+
+interface RawProviderData {
+	name: string;
+	color: string;
+	borderColor: string;
+	textColor: string;
+	iconSlug?: string;
+	iconName?: string;
+	url: string | null;
+	supportsAutoConnect?: boolean;
+}
+
+export const PROVIDERS = Object.fromEntries(
+	Object.entries(providersData as Record<string, RawProviderData>).map(
+		([key, value]) => {
+			const iconSlug = value.iconSlug;
+			const siIcon = iconSlug
+				? (simpleIcons as unknown as Record<string, simpleIcons.SimpleIcon>)[
+						iconSlug
+					] || null
+				: null;
+
+			const icon = siIcon ? (
+				<span
+					className="h-5 w-5"
+					style={{ color: `#${siIcon.hex}` }}
+					// biome-ignore lint/security/noDangerouslySetInnerHtml: Trusted SVG from simple-icons
+					dangerouslySetInnerHTML={{ __html: siIcon.svg }}
+				/>
+			) : (
+				<Icon
+					name={value.iconName || "globe"}
+					className={`h-5 w-5 ${value.textColor || ""}`}
+				/>
+			);
+
+			return [
+				key,
+				{
+					...value,
+					icon,
+				},
+			];
+		},
+	),
+) as unknown as Record<ProviderKey, ProviderConfig>;

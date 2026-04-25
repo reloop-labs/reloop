@@ -69,6 +69,7 @@ export interface DomainNameserversResponse {
 	domainId: string;
 	domain: string;
 	nameservers: string[] | null;
+	dnsProvider: string | null;
 }
 
 export interface DomainListResponse {
@@ -111,7 +112,7 @@ export interface AudienceGroup {
 	updatedAt: string;
 }
 
-export interface AudienceResponse extends Audience {}
+export interface AudienceResponse extends Audience { }
 
 export interface AudienceListResponse {
 	audiences: Audience[];
@@ -120,7 +121,7 @@ export interface AudienceListResponse {
 	limit: number;
 }
 
-export interface AudienceGroupResponse extends AudienceGroup {}
+export interface AudienceGroupResponse extends AudienceGroup { }
 
 export interface AudienceGroupListResponse {
 	audienceGroups: AudienceGroup[];

@@ -35,6 +35,7 @@ export namespace DNSModel {
 		domainId: t.String(),
 		domain: t.String(),
 		nameservers: t.Union([t.Array(t.String()), t.Null()]),
+		dnsProvider: t.Union([t.String(), t.Null()]),
 		event: t.String({ description: "Event ID for the query" }),
 	});
 

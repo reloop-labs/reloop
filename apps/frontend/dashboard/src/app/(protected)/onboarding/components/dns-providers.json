@@ -1,0 +1,38 @@
+{
+	"cloudflare": {
+		"name": "Cloudflare",
+		"color": "from-orange-100 to-orange-50",
+		"borderColor": "border-orange-200",
+		"textColor": "text-orange-600",
+		"iconSlug": "siCloudflare",
+		"iconName": "cloudflare",
+		"url": "https://dash.cloudflare.com",
+		"supportsAutoConnect": true
+	},
+	"vercel": {
+		"name": "Vercel",
+		"color": "from-zinc-100 to-zinc-50",
+		"borderColor": "border-stroke-soft-200",
+		"textColor": "text-text-strong-950",
+		"iconSlug": "siVercel",
+		"iconName": "vercel",
+		"url": "https://vercel.com/dashboard",
+		"supportsAutoConnect": true
+	},
+	"godaddy": {
+		"name": "GoDaddy",
+		"color": "from-teal-100 to-teal-50",
+		"borderColor": "border-teal-200",
+		"textColor": "text-teal-600",
+		"iconName": "server",
+		"url": "https://dcc.godaddy.com/manage"
+	},
+	"unknown": {
+		"name": "DNS Provider",
+		"color": "from-blue-50 to-indigo-50",
+		"borderColor": "border-stroke-soft-200",
+		"textColor": "text-primary-base",
+		"iconName": "globe",
+		"url": null
+	}
+}

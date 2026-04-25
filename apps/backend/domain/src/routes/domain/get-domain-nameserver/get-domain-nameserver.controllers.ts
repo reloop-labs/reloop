@@ -30,9 +30,30 @@ export async function getDomainDNSController({
 		}
 
 		let nameservers: string[] | null = null;
+		let dnsProvider: string | null = "unknown";
+
+		const domainParts = foundDomain.domain.split(".");
+		const baseDomain =
+			domainParts.length > 2
+				? domainParts.slice(-2).join(".")
+				: foundDomain.domain;
 
 		try {
-			nameservers = await resolveNs(foundDomain.domain);
+			nameservers = await resolveNs(baseDomain);
+
+			if (nameservers && nameservers.length > 0) {
+				const firstNs = nameservers[0];
+				if (firstNs) {
+					const ns = firstNs.toLowerCase();
+					if (ns.includes("cloudflare.com")) {
+						dnsProvider = "cloudflare";
+					} else if (ns.includes("vercel-dns.com")) {
+						dnsProvider = "vercel";
+					} else if (ns.includes("godaddy.com") || ns.includes("domaincontrol.com")) {
+						dnsProvider = "godaddy";
+					}
+				}
+			}
 		} catch (error) {
 			logger.warn(
 				{
@@ -49,6 +70,7 @@ export async function getDomainDNSController({
 			domainId: foundDomain.id,
 			domain: foundDomain.domain,
 			nameservers,
+			dnsProvider,
 			event: DOMAIN_GET_DNS_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
