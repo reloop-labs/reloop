@@ -1,10 +1,12 @@
 import { CardGroup } from "@reloop/fe-docs/components/mdx/CardGroup";
+import { PromptActions } from "@reloop/fe-docs/components/mdx/PromptActions";
 import { SimpleIcon } from "@reloop/fe-docs/components/mdx/SimpleIcon";
 import {
 	Accordion,
 	Callout,
 	Card,
 	CodeBlock,
+	CodeGroup,
 	Info,
 	Note,
 	Steps,
@@ -54,6 +56,7 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
 		Accordion,
 		Callout,
 		CodeBlock,
+		CodeGroup,
 		Steps,
 		Step,
 		Tabs,
@@ -64,6 +67,7 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
 		Info,
 		CardGroup,
 		SimpleIcon,
+		PromptActions,
 	};
 }
 

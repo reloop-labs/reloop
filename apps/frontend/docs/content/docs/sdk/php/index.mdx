@@ -1,4 +1,59 @@
 ---
-title: Introduction
-description: Learn how to send your first email using the Reloop PHP SDK.
+title: Send emails with PHP
+sidebarTitle: Introduction
+description: Learn how to send emails using the Reloop PHP SDK.
 ---
+
+<Callout icon="sparkles">
+  Use this pre-built prompt to get started faster.
+  <PromptActions prompt="I'm using PHP. Can you show me how to install the Reloop PHP SDK using Composer and send a simple HTML email?" />
+</Callout>
+
+## Prerequisites
+
+To get the most out of this guide, you'll need to:
+
+* [Create an API key](/learn/api-keys)
+* [Verify your domain](/learn/domain)
+* Have PHP 7.4 or later installed
+
+## 1. Install
+
+Install the Reloop PHP SDK via Composer:
+
+<CodeGroup>
+```bash composer
+composer require reloop/reloop-php
+```
+</CodeGroup>
+
+## 2. Usage
+
+Create an `index.php` file and add the following code:
+
+<CodeGroup>
+```php index.php
+<?php
+
+require 'vendor/autoload.php';
+
+$reloop = new \Reloop\Client('re_123456789');
+
+try {
+    $result = $reloop->emails->send([
+        'from' => 'Acme <onboarding@reloop.dev>',
+        'to' => ['delivered@reloop.dev'],
+        'subject' => 'Hello from PHP',
+        'html' => '<strong>It works!</strong>',
+    ]);
+
+    echo "Email sent successfully: " . $result->id;
+} catch (Exception $e) {
+    echo "Error sending email: " . $e->getMessage();
+}
+```
+</CodeGroup>
+
+<Card title="API Reference" icon="siReadthedocs" href="/api-reference">
+  Check out the full API reference to learn more about all available methods.
+</Card>

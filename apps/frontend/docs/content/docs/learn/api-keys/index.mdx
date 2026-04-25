@@ -1,8 +1,31 @@
 ---
 title: API Keys
-description: Reloop is open-source email API for developers.
+description: Learn how to manage your Reloop API keys.
 ---
 
-## Quick Start
+Reloop uses API keys to authenticate requests from your application. You can manage your API keys in the [Reloop Dashboard](https://reloop.sh/settings/api-keys).
 
-Learn how to get Reloop set up in your project.
+## Creating an API Key
+
+1. Go to the **Settings > API Keys** section in your dashboard.
+2. Click on **Create API Key**.
+3. Give your key a descriptive name (e.g., "Production", "Staging").
+4. Copy the key and store it securely. For security reasons, we only show the full key once.
+
+## Security Best Practices
+
+* **Keep keys secret**: Never commit your API keys to version control. Use environment variables.
+* **Use environment variables**: Store your keys in `.env` files or your platform's secret manager.
+* **Rotate keys regularly**: If you suspect a key has been compromised, revoke it immediately and create a new one.
+
+## Revoking a Key
+
+If you no longer need a key or if it has been exposed, you can revoke it:
+
+1. Locate the key in your **API Keys** list.
+2. Click the **Revoke** button.
+3. Confirm the action. Requests using this key will immediately start failing with a `401 Unauthorized` error.
+
+<Warning>
+  Revoking a key is permanent and cannot be undone. Ensure no production services are still using the key before revoking it.
+</Warning>

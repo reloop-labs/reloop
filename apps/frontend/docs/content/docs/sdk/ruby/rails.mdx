@@ -1,4 +1,72 @@
 ---
-title: rails
-description: SDK
+title: Rails Quickstart
+sidebarTitle: Rails
+description: Learn how to send emails in your Rails application using Reloop.
 ---
+
+<Callout icon="sparkles">
+  Use this pre-built prompt to get started faster.
+  <PromptActions prompt="I'm using Ruby on Rails. Can you show me how to configure Reloop as an Action Mailer delivery method?" />
+</Callout>
+
+## Prerequisites
+
+To get the most out of this guide, you'll need to:
+
+* [Create an API key](/learn/api-keys)
+* [Verify your domain](/learn/domain)
+* Have an existing Rails project
+
+## 1. Install
+
+Add the Reloop gem to your Gemfile:
+
+<CodeGroup>
+```ruby Gemfile
+gem 'reloop'
+```
+</CodeGroup>
+
+And then run:
+
+<CodeGroup>
+```bash
+bundle install
+```
+</CodeGroup>
+
+## 2. Configuration
+
+Configure Reloop as your delivery method in `config/environments/production.rb`:
+
+<CodeGroup>
+```ruby config/environments/production.rb
+config.action_mailer.delivery_method = :reloop
+config.action_mailer.reloop_settings = {
+  api_key: ENV['RELOOP_API_KEY']
+}
+```
+</CodeGroup>
+
+## 3. Usage
+
+Now you can use standard Action Mailer to send emails:
+
+<CodeGroup>
+```ruby app/mailers/user_mailer.rb
+class UserMailer < ApplicationMailer
+  def welcome_email(user)
+    @user = user
+    mail(
+      from: 'Acme <onboarding@reloop.dev>',
+      to: @user.email,
+      subject: 'Welcome to Rails + Reloop'
+    )
+  end
+end
+```
+</CodeGroup>
+
+<Card title="API Reference" icon="siReadthedocs" href="/api-reference">
+  Check out the full API reference to learn more about all available methods.
+</Card>

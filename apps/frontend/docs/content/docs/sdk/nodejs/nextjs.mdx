@@ -1,4 +1,116 @@
 ---
-title: Next.js 
-description: next.js
+title: Next.js Quickstart
+sidebarTitle: Next.js
+description: Learn how to send emails in your Next.js application using Reloop.
 ---
+
+<Callout icon="sparkles">
+  Use this pre-built prompt to get started faster.
+  <PromptActions prompt="I'm building a Next.js App Router application. Can you show me how to integrate the Reloop Node.js SDK to send emails from a Route Handler and a Server Action?" />
+</Callout>
+
+## Prerequisites
+
+To get the most out of this guide, you'll need to:
+
+* [Create an API key](/learn/api-keys)
+* [Verify your domain](/learn/domain)
+* Have an existing Next.js project (App Router recommended)
+
+## 1. Install
+
+Install the Reloop Node.js SDK in your Next.js project:
+
+<CodeGroup>
+  ```bash npm
+  npm install @reloop/node
+  ```
+  ```bash yarn
+  yarn add @reloop/node
+  ```
+  ```bash pnpm
+  pnpm add @reloop/node
+  ```
+  ```bash bun
+  bun add @reloop/node
+  ```
+</CodeGroup>
+
+## 2. Set up Environment Variables
+
+Add your Reloop API key to your `.env.local` file. This ensures your API key is kept secure and not exposed to the client.
+
+```bash
+RELOOP_API_KEY=re_123456789
+```
+
+<Note>
+  You can find your API keys in the [Reloop Dashboard](https://reloop.sh/settings/api-keys).
+</Note>
+
+## 3. Usage Examples
+
+### Route Handler
+
+Create a new API route in `app/api/send/route.ts` to handle email sending requests:
+
+<CodeGroup>
+```typescript app/api/send/route.ts
+import { Reloop } from '@reloop/node';
+import { NextResponse } from 'next/server';
+
+const reloop = new Reloop(process.env.RELOOP_API_KEY);
+
+export async function POST() {
+  try {
+    const { data, error } = await reloop.emails.send({
+      from: 'Acme <onboarding@reloop.dev>',
+      to: ['delivered@reloop.dev'],
+      subject: 'Hello World',
+      html: '<strong>It works from Next.js Route Handlers!</strong>',
+    });
+
+    if (error) {
+      return NextResponse.json({ error }, { status: 500 });
+    }
+
+    return NextResponse.json(data);
+  } catch (error) {
+    return NextResponse.json({ error }, { status: 500 });
+  }
+}
+```
+</CodeGroup>
+
+### Server Action
+
+For a more seamless integration with your UI, you can use Server Actions:
+
+<CodeGroup>
+```typescript app/actions.ts
+'use server';
+
+import { Reloop } from '@reloop/node';
+
+const reloop = new Reloop(process.env.RELOOP_API_KEY);
+
+export async function sendEmail(email: string) {
+  const { data, error } = await reloop.emails.send({
+    from: 'Acme <onboarding@reloop.dev>',
+    to: [email],
+    subject: 'Welcome to Reloop',
+    html: '<p>Thanks for joining us!</p>',
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+}
+```
+</CodeGroup>
+
+<Card title="API Reference" icon="siReadthedocs" href="/api-reference">
+  Check out the full API reference to learn more about all available methods and configurations.
+</Card>

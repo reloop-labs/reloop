@@ -1,4 +1,39 @@
 ---
-title: Rails
-description: SMTP
+title: Send emails with Rails SMTP
+sidebarTitle: Rails
+description: Learn how to configure Ruby on Rails to use Reloop's SMTP relay.
 ---
+
+<Callout icon="sparkles">
+  Use this pre-built prompt to get started faster.
+  <PromptActions prompt="Can you show me the Action Mailer settings for Reloop SMTP?" />
+</Callout>
+
+## Configuration
+
+Update your `config/environments/production.rb`:
+
+```ruby
+config.action_mailer.delivery_method = :smtp
+config.action_mailer.smtp_settings = {
+  address:              'smtp.reloop.sh',
+  port:                 587,
+  domain:               'reloop.sh',
+  user_name:            'reloop',
+  password:             ENV['RELOOP_API_KEY'],
+  authentication:       'plain',
+  enable_starttls_auto: true
+}
+```
+
+## Usage
+
+Use standard Action Mailer:
+
+```ruby
+class UserMailer < ApplicationMailer
+  def welcome_email(user)
+    mail(to: user.email, subject: 'Hello from Rails SMTP')
+  end
+end
+```

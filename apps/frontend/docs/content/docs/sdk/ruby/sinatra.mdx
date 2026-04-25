@@ -1,4 +1,55 @@
 ---
-title: sinatra
-description: SDK
+title: Sinatra Quickstart
+sidebarTitle: Sinatra
+description: Learn how to send emails in your Sinatra application using Reloop.
 ---
+
+<Callout icon="sparkles">
+  Use this pre-built prompt to get started faster.
+  <PromptActions prompt="I'm using Sinatra. Can you show me how to integrate the Reloop Ruby SDK?" />
+</Callout>
+
+## Prerequisites
+
+To get the most out of this guide, you'll need to:
+
+* [Create an API key](/learn/api-keys)
+* [Verify your domain](/learn/domain)
+* Have an existing Sinatra project
+
+## 1. Install
+
+Install the Reloop gem:
+
+<CodeGroup>
+```bash
+gem install reloop
+```
+</CodeGroup>
+
+## 2. Usage
+
+Set up a simple Sinatra route to send an email:
+
+<CodeGroup>
+```ruby app.rb
+require 'sinatra'
+require 'reloop'
+
+reloop = Reloop::Client.new(api_key: ENV['RELOOP_API_KEY'])
+
+post '/send-email' do
+  reloop.emails.send(
+    from: 'Acme <onboarding@reloop.dev>',
+    to: ['delivered@reloop.dev'],
+    subject: 'Hello from Sinatra',
+    html: '<strong>It works with Sinatra!</strong>'
+  )
+  'Email sent!'
+end
+```
+</CodeGroup>
+
+<Card title="API Reference" icon="siReadthedocs" href="/api-reference">
+  Check out the full API reference to learn more about all available methods.
+</Card>

@@ -1,4 +1,90 @@
 ---
-title: AWS Lambda
-description: AWS Lambda with serverless
+title: Send emails with AWS Lambda
+sidebarTitle: AWS Lambda
+description: Learn how to send emails in your AWS Lambda functions using Reloop.
 ---
+
+<Callout icon="sparkles">
+  Use this pre-built prompt to get started faster.
+  <PromptActions prompt="Can you show me how to integrate the Reloop Node.js SDK into an AWS Lambda function using TypeScript?" />
+</Callout>
+
+## Prerequisites
+
+To get the most out of this guide, you'll need to:
+
+* [Create an API key](/learn/api-keys)
+* [Verify your domain](/learn/domain)
+* Have an AWS account
+
+## 1. Install
+
+Install the Reloop Node.js SDK in your Lambda project:
+
+<CodeGroup>
+  ```bash npm
+  npm install @reloop/node
+  ```
+  ```bash yarn
+  yarn add @reloop/node
+  ```
+  ```bash pnpm
+  pnpm add @reloop/node
+  ```
+  ```bash bun
+  bun add @reloop/node
+  ```
+</CodeGroup>
+
+## 2. Set up Environment Variables
+
+Configure your Lambda function with the following environment variable:
+
+<CodeGroup>
+```bash
+RELOOP_API_KEY=re_123456789
+```
+</CodeGroup>
+
+## 3. Usage
+
+<CodeGroup>
+```typescript index.ts
+import { Reloop } from '@reloop/node';
+import { Handler } from 'aws-lambda';
+
+const reloop = new Reloop(process.env.RELOOP_API_KEY);
+
+export const handler: Handler = async (event) => {
+  try {
+    const { data, error } = await reloop.emails.send({
+      from: 'Acme <onboarding@reloop.dev>',
+      to: ['delivered@reloop.dev'],
+      subject: 'Hello from AWS Lambda',
+      html: '<strong>It works!</strong>',
+    });
+
+    if (error) {
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error }),
+      };
+    }
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify(data),
+    };
+  } catch (error) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: 'Internal Server Error' }),
+    };
+  }
+};
+```
+</CodeGroup>
+
+<Card title="API Reference" icon="siReadthedocs" href="/api-reference">
+  Check out the full API reference to learn more about all available methods.
+</Card>

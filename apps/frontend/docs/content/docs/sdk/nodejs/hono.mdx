@@ -1,4 +1,72 @@
 ---
-title: Hono
-description: Hono
+title: Hono Quickstart
+sidebarTitle: Hono
+description: Learn how to send emails in your Hono application using Reloop.
 ---
+
+<Callout icon="sparkles">
+  Use this pre-built prompt to get started faster.
+  <PromptActions prompt="Can you show me how to integrate the Reloop Node.js SDK into a Hono application?" />
+</Callout>
+
+## Prerequisites
+
+To get the most out of this guide, you'll need to:
+
+* [Create an API key](/learn/api-keys)
+* [Verify your domain](/learn/domain)
+* Have an existing Hono project
+
+## 1. Install
+
+Install the Reloop Node.js SDK:
+
+<CodeGroup>
+  ```bash npm
+  npm install @reloop/node
+  ```
+  ```bash yarn
+  yarn add @reloop/node
+  ```
+  ```bash pnpm
+  pnpm add @reloop/node
+  ```
+  ```bash bun
+  bun add @reloop/node
+  ```
+</CodeGroup>
+
+## 2. Usage
+
+Set up a Hono route to send an email:
+
+<CodeGroup>
+```typescript index.ts
+import { Hono } from 'hono'
+import { Reloop } from '@reloop/node'
+
+const app = new Hono()
+const reloop = new Reloop('re_123456789')
+
+app.post('/send', async (c) => {
+  const { data, error } = await reloop.emails.send({
+    from: 'Acme <onboarding@reloop.dev>',
+    to: ['delivered@reloop.dev'],
+    subject: 'Hello from Hono',
+    html: '<strong>It works!</strong>',
+  })
+
+  if (error) {
+    return c.json({ error }, 500)
+  }
+
+  return c.json(data)
+})
+
+export default app
+```
+</CodeGroup>
+
+<Card title="API Reference" icon="siReadthedocs" href="/api-reference">
+  Check out the full API reference to learn more about all available methods.
+</Card>

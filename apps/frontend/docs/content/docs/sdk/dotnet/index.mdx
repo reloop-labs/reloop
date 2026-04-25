@@ -1,4 +1,62 @@
 ---
-title: Introduction
-description: .Net
+title: Send emails with .NET
+sidebarTitle: Introduction
+description: Learn how to send emails using the Reloop .NET SDK.
 ---
+
+<Callout icon="sparkles">
+  Use this pre-built prompt to get started faster.
+  <PromptActions prompt="I'm using C# with .NET. Can you show me how to install the Reloop NuGet package and send a simple HTML email?" />
+</Callout>
+
+## Prerequisites
+
+To get the most out of this guide, you'll need to:
+
+* [Create an API key](/learn/api-keys)
+* [Verify your domain](/learn/domain)
+* Have .NET 6.0 or later installed
+
+## 1. Install
+
+Install the Reloop NuGet package:
+
+<CodeGroup>
+```bash
+dotnet add package Reloop
+```
+</CodeGroup>
+
+## 2. Usage
+
+Create a `Program.cs` file and add the following code:
+
+<CodeGroup>
+```csharp Program.cs
+using Reloop;
+
+var client = new ReloopClient("re_123456789");
+
+var email = new SendEmailRequest
+{
+    From = "Acme <onboarding@reloop.dev>",
+    To = new List<string> { "delivered@reloop.dev" },
+    Subject = "Hello from .NET",
+    Html = "<strong>It works!</strong>"
+};
+
+try
+{
+    var response = await client.Emails.SendAsync(email);
+    Console.WriteLine($"Email sent successfully: {response.Id}");
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Error sending email: {ex.Message}");
+}
+```
+</CodeGroup>
+
+<Card title="API Reference" icon="siReadthedocs" href="/api-reference">
+  Check out the full API reference to learn more about all available methods.
+</Card>

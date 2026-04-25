@@ -1,4 +1,41 @@
 ---
-title: Introduction
-description: SMTP
+title: Send emails with SMTP
+sidebarTitle: Introduction
+description: Learn how to use Reloop as an SMTP relay for your application.
 ---
+
+<Callout icon="sparkles">
+  Use this pre-built prompt to get started faster.
+  <PromptActions prompt="Can you show me how to configure a standard SMTP client to work with Reloop?" />
+</Callout>
+
+## Prerequisites
+
+To get the most out of this guide, you'll need to:
+
+* [Create an API key](/learn/api-keys)
+* [Verify your domain](/learn/domain)
+
+## SMTP Configuration
+
+You can use these settings in any application that supports SMTP:
+
+| Setting | Value |
+| :--- | :--- |
+| **Server** | `smtp.reloop.sh` |
+| **Port** | `587` (TLS) or `465` (SSL) |
+| **Username** | `reloop` |
+| **Password** | Your Reloop API Key (`re_123...`) |
+| **Encryption** | STARTTLS or SSL/TLS |
+
+## Authentication
+
+Reloop uses your API key as the password for SMTP authentication. Ensure you keep your API key secure.
+
+<Note>
+  We recommend using Port 587 with STARTTLS for most applications.
+</Note>
+
+<Card title="Integrations" icon="siReadthedocs" href="/sdk/smtp/nodemailer">
+  Explore specific guides for popular frameworks and platforms.
+</Card>

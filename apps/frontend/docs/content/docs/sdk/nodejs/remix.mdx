@@ -1,4 +1,82 @@
 ---
-title: Remix 
-description: Remix
+title: Remix Quickstart
+sidebarTitle: Remix
+description: Learn how to send emails in your Remix application using Reloop.
 ---
+
+<Callout icon="sparkles">
+  Use this pre-built prompt to get started faster.
+  <PromptActions prompt="I'm using Remix with Vite. Can you show me how to set up the Reloop Node.js SDK and send an email from a Remix Action?" />
+</Callout>
+
+## Prerequisites
+
+To get the most out of this guide, you'll need to:
+
+* [Create an API key](/learn/api-keys)
+* [Verify your domain](/learn/domain)
+* Have an existing Remix project
+
+## 1. Install
+
+Install the Reloop Node.js SDK:
+
+<CodeGroup>
+  ```bash npm
+  npm install @reloop/node
+  ```
+  ```bash yarn
+  yarn add @reloop/node
+  ```
+  ```bash pnpm
+  pnpm add @reloop/node
+  ```
+  ```bash bun
+  bun add @reloop/node
+  ```
+</CodeGroup>
+
+## 2. Set up Environment Variables
+
+Add your Reloop API key to your `.env` file:
+
+<CodeGroup>
+```bash .env
+RELOOP_API_KEY=re_123456789
+```
+</CodeGroup>
+
+## 3. Usage
+
+In Remix, you should handle email sending within an `action` or `loader` to ensure it runs on the server.
+
+<CodeGroup>
+```typescript app/routes/_index.tsx
+import { json, type ActionFunctionArgs } from "@remix-run/node";
+import { Reloop } from "@reloop/node";
+
+const reloop = new Reloop(process.env.RELOOP_API_KEY);
+
+export const action = async ({ request }: ActionFunctionArgs) => {
+  const formData = await request.formData();
+  const email = formData.get("email") as string;
+
+  const { data, error } = await reloop.emails.send({
+    from: 'Acme <onboarding@reloop.dev>',
+    to: [email],
+    subject: 'Welcome to Remix + Reloop',
+    html: '<strong>It works!</strong>',
+  });
+
+  if (error) {
+    return json({ error }, { status: 500 });
+  }
+
+  return json({ data });
+};
+```
+</CodeGroup>
+
+<Card title="API Reference" icon="siReadthedocs" href="/api-reference">
+  Check out the full API reference to learn more about all available methods.
+</Card>

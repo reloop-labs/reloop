@@ -1,4 +1,63 @@
 ---
-title: Laravel
-description: Laravel
+title: Laravel Quickstart
+sidebarTitle: Laravel
+description: Learn how to send emails in your Laravel application using Reloop.
 ---
+
+<Callout icon="sparkles">
+  Use this pre-built prompt to get started faster.
+  <PromptActions prompt="I'm using Laravel. Can you show me how to configure the Reloop PHP SDK as a mail transport?" />
+</Callout>
+
+## Prerequisites
+
+To get the most out of this guide, you'll need to:
+
+* [Create an API key](/learn/api-keys)
+* [Verify your domain](/learn/domain)
+* Have an existing Laravel project
+
+## 1. Install
+
+Install the Reloop Laravel provider:
+
+```bash
+composer require reloop/reloop-laravel
+```
+
+## 2. Configuration
+
+Add your Reloop API key to your `.env` file and set the mail mailer:
+
+```bash
+MAIL_MAILER=reloop
+RELOOP_API_KEY=re_123456789
+```
+
+## 3. Usage
+
+Now you can use Laravel's standard `Mail` facade to send emails:
+
+```php
+use Illuminate\Support\Facades\Mail;
+use App\Mail\WelcomeEmail;
+
+Mail::to('delivered@reloop.dev')->send(new WelcomeEmail());
+```
+
+Or using the `Reloop` facade directly:
+
+```php
+use Reloop\Laravel\Facades\Reloop;
+
+Reloop::emails()->send([
+    'from' => 'Acme <onboarding@reloop.dev>',
+    'to' => ['delivered@reloop.dev'],
+    'subject' => 'Hello from Laravel',
+    'html' => '<strong>It works with Laravel!</strong>',
+]);
+```
+
+<Card title="API Reference" icon="siReadthedocs" href="/api-reference">
+  Check out the full API reference to learn more about all available methods.
+</Card>

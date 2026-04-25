@@ -1,4 +1,79 @@
 ---
-title: Vercel Functions
-description: Vercel Functions with serverless
+title: Send emails with Vercel Functions
+sidebarTitle: Vercel Functions
+description: Learn how to send emails in your Vercel Functions using Reloop.
 ---
+
+<Callout icon="sparkles">
+  Use this pre-built prompt to get started faster.
+  <PromptActions prompt="I'm using Vercel Functions. Can you show me how to integrate the Reloop Node.js SDK in a serverless function?" />
+</Callout>
+
+## Prerequisites
+
+To get the most out of this guide, you'll need to:
+
+* [Create an API key](/learn/api-keys)
+* [Verify your domain](/learn/domain)
+* Have a Vercel account and a project
+
+## 1. Install
+
+Install the Reloop Node.js SDK:
+
+<CodeGroup>
+  ```bash npm
+  npm install @reloop/node
+  ```
+  ```bash yarn
+  yarn add @reloop/node
+  ```
+  ```bash pnpm
+  pnpm add @reloop/node
+  ```
+  ```bash bun
+  bun add @reloop/node
+  ```
+</CodeGroup>
+
+## 2. Set up Environment Variables
+
+Add your Reloop API key to your Vercel project's environment variables:
+
+<CodeGroup>
+```bash .env
+RELOOP_API_KEY=re_123456789
+```
+</CodeGroup>
+
+## 3. Usage
+
+Create a new function in `api/send.ts`:
+
+<CodeGroup>
+```typescript api/send.ts
+import { Reloop } from '@reloop/node';
+import type { VercelRequest, VercelResponse } from '@vercel/node';
+
+const reloop = new Reloop(process.env.RELOOP_API_KEY);
+
+export default async (request: VercelRequest, response: VercelResponse) => {
+  const { data, error } = await reloop.emails.send({
+    from: 'Acme <onboarding@reloop.dev>',
+    to: ['delivered@reloop.dev'],
+    subject: 'Hello from Vercel Functions',
+    html: '<strong>It works!</strong>',
+  });
+
+  if (error) {
+    return response.status(500).json({ error });
+  }
+
+  return response.status(200).json(data);
+};
+```
+</CodeGroup>
+
+<Card title="API Reference" icon="siReadthedocs" href="/api-reference">
+  Check out the full API reference to learn more about all available methods.
+</Card>

@@ -1,4 +1,101 @@
 ---
-title: Nuxt 
-description: Nuxt
+title: Nuxt Quickstart
+sidebarTitle: Nuxt
+description: Learn how to send emails in your Nuxt 3 application using Reloop.
 ---
+
+<Callout icon="sparkles">
+  Use this pre-built prompt to get started faster.
+  <PromptActions prompt="I'm using Nuxt 3. Can you show me how to integrate the Reloop Node.js SDK using a Server Route?" />
+</Callout>
+
+## Prerequisites
+
+To get the most out of this guide, you'll need to:
+
+* [Create an API key](/learn/api-keys)
+* [Verify your domain](/learn/domain)
+* Have an existing Nuxt 3 project
+
+## 1. Install
+
+Install the Reloop Node.js SDK:
+
+<CodeGroup>
+  ```bash npm
+  npm install @reloop/node
+  ```
+  ```bash yarn
+  yarn add @reloop/node
+  ```
+  ```bash pnpm
+  pnpm add @reloop/node
+  ```
+  ```bash bun
+  bun add @reloop/node
+  ```
+</CodeGroup>
+
+## 2. Set up Environment Variables
+
+Add your Reloop API key to your `.env` file:
+
+<CodeGroup>
+```bash .env
+RELOOP_API_KEY=re_123456789
+```
+</CodeGroup>
+
+And update your `nuxt.config.ts` to include the runtime config:
+
+<CodeGroup>
+```typescript nuxt.config.ts
+export default defineNuxtConfig({
+  runtimeConfig: {
+    reloopApiKey: process.env.RELOOP_API_KEY
+  }
+})
+```
+</CodeGroup>
+
+## 3. Usage
+
+Create a server route in `server/api/send.ts`:
+
+<CodeGroup>
+```typescript server/api/send.ts
+import { Reloop } from '@reloop/node';
+
+export default defineEventHandler(async (event) => {
+  const config = useRuntimeConfig();
+  const reloop = new Reloop(config.reloopApiKey);
+
+  try {
+    const { data, error } = await reloop.emails.send({
+      from: 'Acme <onboarding@reloop.dev>',
+      to: ['delivered@reloop.dev'],
+      subject: 'Hello from Nuxt',
+      html: '<strong>It works with Nuxt Server Routes!</strong>',
+    });
+
+    if (error) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: error.message,
+      });
+    }
+
+    return data;
+  } catch (error) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Internal Server Error',
+    });
+  }
+});
+```
+</CodeGroup>
+
+<Card title="API Reference" icon="siReadthedocs" href="/api-reference">
+  Check out the full API reference to learn more about all available methods.
+</Card>

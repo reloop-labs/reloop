@@ -1,4 +1,40 @@
 ---
-title: Django
-description: SMTP
+title: Send emails with Django SMTP
+sidebarTitle: Django
+description: Learn how to configure Django to use Reloop's SMTP relay.
 ---
+
+<Callout icon="sparkles">
+  Use this pre-built prompt to get started faster.
+  <PromptActions prompt="Can you show me the settings to configure Django's email backend with Reloop SMTP?" />
+</Callout>
+
+## Configuration
+
+Update your `settings.py` with the following configuration:
+
+```python
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.reloop.sh'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'reloop'
+EMAIL_HOST_PASSWORD = 're_123456789' # Your Reloop API Key
+DEFAULT_FROM_EMAIL = 'Acme <onboarding@reloop.dev>'
+```
+
+## Usage
+
+Use Django's `send_mail` function:
+
+```python
+from django.core.mail import send_mail
+
+send_mail(
+    'Hello from Django SMTP',
+    'It works!',
+    'onboarding@reloop.dev',
+    ['delivered@reloop.dev'],
+    fail_silently=False,
+)
+```

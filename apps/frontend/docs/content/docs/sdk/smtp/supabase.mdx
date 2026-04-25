@@ -1,4 +1,31 @@
 ---
-title: PHPmailer
-description: SMTP
+title: Send auth emails with Supabase
+sidebarTitle: Supabase
+description: Learn how to configure Supabase Auth to use Reloop's SMTP relay.
 ---
+
+<Callout icon="sparkles">
+  Use this pre-built prompt to get started faster.
+  <PromptActions prompt="Can you show me the settings to use Reloop as a custom SMTP provider in Supabase?" />
+</Callout>
+
+## Configuration
+
+1. Go to your **Supabase Dashboard**.
+2. Navigate to **Authentication > Settings > Auth Service Settings**.
+3. Enable **SMTP Provider**.
+4. Fill in the following details:
+
+| Field | Value |
+| :--- | :--- |
+| **Sender email** | `onboarding@yourdomain.com` |
+| **Sender name** | `Your App Name` |
+| **SMTP Host** | `smtp.reloop.sh` |
+| **SMTP Port** | `587` |
+| **SMTP User** | `reloop` |
+| **SMTP Admin Password** | Your Reloop API Key (`re_123...`) |
+| **Minimum time between emails** | `1 second` |
+
+## Verification
+
+Once configured, Supabase will send all authentication emails (signup, password reset, magic links) through Reloop.

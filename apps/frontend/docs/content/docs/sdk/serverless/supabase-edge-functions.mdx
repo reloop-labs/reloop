@@ -1,4 +1,59 @@
 ---
-title: Supabase Edge Functions
-description: Supabase Edge Functions with serverless
+title: Send emails with Supabase Edge Functions
+sidebarTitle: Supabase Edge Functions
+description: Learn how to send emails in your Supabase Edge Functions using Reloop.
 ---
+
+<Callout icon="sparkles">
+  Use this pre-built prompt to get started faster.
+  <PromptActions prompt="Can you show me how to integrate the Reloop Node.js SDK into a Supabase Edge Function?" />
+</Callout>
+
+## Prerequisites
+
+To get the most out of this guide, you'll need to:
+
+* [Create an API key](/learn/api-keys)
+* [Verify your domain](/learn/domain)
+* Have a Supabase project
+
+## 1. Set up Environment Variables
+
+Add your Reloop API key to your Supabase project:
+
+<CodeGroup>
+```bash
+supabase secrets set RELOOP_API_KEY=re_123456789
+```
+</CodeGroup>
+
+## 2. Usage
+
+Create a new function and use the Reloop SDK via an import from an npm specifier:
+
+<CodeGroup>
+```typescript supabase/functions/send/index.ts
+import { Reloop } from 'npm:@reloop/node';
+
+Deno.serve(async (req) => {
+  const reloop = new Reloop(Deno.env.get('RELOOP_API_KEY'));
+
+  const { data, error } = await reloop.emails.send({
+    from: 'Acme <onboarding@reloop.dev>',
+    to: ['delivered@reloop.dev'],
+    subject: 'Hello from Supabase Edge Functions',
+    html: '<strong>It works!</strong>',
+  });
+
+  if (error) {
+    return new Response(JSON.stringify({ error }), { status: 500 });
+  }
+
+  return new Response(JSON.stringify(data), { status: 200 });
+});
+```
+</CodeGroup>
+
+<Card title="API Reference" icon="siReadthedocs" href="/api-reference">
+  Check out the full API reference to learn more about all available methods.
+</Card>

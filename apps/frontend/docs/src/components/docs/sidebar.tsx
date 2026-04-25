@@ -2,9 +2,9 @@
 
 import { Search } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "../../lib/cn";
-import type { PageTreeItem } from "../../lib/types";
+import type { PageTreeItem, FolderNode } from "../../lib/types";
 
 interface SidebarProps {
 	tree: PageTreeItem[];
@@ -91,7 +91,18 @@ function SidebarSection({
 
 import { motion } from "framer-motion";
 import { ChevronRight } from "lucide-react";
-import type { FolderNode } from "../../lib/types";
+
+function findFirstPage(node: PageTreeItem): string | null {
+	if (node.type === "page") return node.url;
+	if (node.type === "folder") {
+		if (node.index) return node.index.url;
+		for (const child of node.children) {
+			const url = findFirstPage(child);
+			if (url) return url;
+		}
+	}
+	return null;
+}
 
 function SidebarFolder({
 	node,
@@ -112,6 +123,19 @@ function SidebarFolder({
 
 	const isActive = node.children.some(isChildActive);
 	const [isOpen, setIsOpen] = useState(isActive);
+	const router = useRouter();
+
+	const handleToggle = () => {
+		const nextIsOpen = !isOpen;
+		setIsOpen(nextIsOpen);
+
+		if (nextIsOpen) {
+			const firstPage = findFirstPage(node);
+			if (firstPage && firstPage !== pathname) {
+				router.push(firstPage);
+			}
+		}
+	};
 
 	const isHovered = hoveredNodeName === node.name;
 
@@ -119,7 +143,7 @@ function SidebarFolder({
 		<div className="space-y-px">
 			<button
 				type="button"
-				onClick={() => setIsOpen(!isOpen)}
+				onClick={handleToggle}
 				onPointerEnter={() => setHoveredNodeName(node.name as string)}
 				className={cn(
 					"group relative flex h-8 w-full items-center justify-between rounded-lg px-2 font-medium text-[13px] transition-colors",

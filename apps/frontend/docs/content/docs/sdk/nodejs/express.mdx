@@ -1,4 +1,72 @@
 ---
-title: Express
-description: Express.js
+title: Express Quickstart
+sidebarTitle: Express
+description: Learn how to send emails in your Express application using Reloop.
 ---
+
+<Callout icon="sparkles">
+  Use this pre-built prompt to get started faster.
+  <PromptActions prompt="Can you show me how to integrate the Reloop Node.js SDK into an Express.js app?" />
+</Callout>
+
+## Prerequisites
+
+To get the most out of this guide, you'll need to:
+
+* [Create an API key](/learn/api-keys)
+* [Verify your domain](/learn/domain)
+* Have an existing Express project
+
+## 1. Install
+
+Install the Reloop Node.js SDK:
+
+<CodeGroup>
+  ```bash npm
+  npm install @reloop/node
+  ```
+  ```bash yarn
+  yarn add @reloop/node
+  ```
+  ```bash pnpm
+  pnpm add @reloop/node
+  ```
+  ```bash bun
+  bun add @reloop/node
+  ```
+</CodeGroup>
+
+## 2. Usage
+
+Set up a simple Express route to send an email:
+
+<CodeGroup>
+```javascript app.js
+import express from 'express';
+import { Reloop } from '@reloop/node';
+
+const app = express();
+const reloop = new Reloop('re_123456789');
+
+app.post('/send-email', async (req, res) => {
+  const { data, error } = await reloop.emails.send({
+    from: 'Acme <onboarding@reloop.dev>',
+    to: ['delivered@reloop.dev'],
+    subject: 'Hello from Express',
+    html: '<strong>It works!</strong>',
+  });
+
+  if (error) {
+    return res.status(500).json({ error });
+  }
+
+  res.json({ data });
+});
+
+app.listen(3000);
+```
+</CodeGroup>
+
+<Card title="API Reference" icon="siReadthedocs" href="/api-reference">
+  Check out the full API reference to learn more about all available methods.
+</Card>

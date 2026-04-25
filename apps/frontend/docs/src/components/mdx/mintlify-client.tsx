@@ -4,7 +4,7 @@ import {
 	Accordion,
 	Callout,
 	Card,
-	CodeGroup as CodeBlock,
+	CodeGroup,
 	Icon,
 	Info,
 	Steps as MintlifySteps,
@@ -14,10 +14,12 @@ import {
 	Warning,
 } from "@mintlify/components";
 
+const CodeBlock = CodeGroup;
+
 // Mintlify components use sub-components for items
 export const Tabs = MintlifyTabs;
 export const Tab = (MintlifyTabs as any).Item;
 export const Steps = MintlifySteps;
 export const Step = (MintlifySteps as any).Item;
 
-export { Accordion, Callout, Card, CodeBlock, Icon, Info, Note, Tip, Warning };
+export { Accordion, Callout, Card, CodeBlock, CodeGroup, Icon, Info, Note, Tip, Warning };

@@ -1,4 +1,62 @@
 ---
-title: fastapi
-description: python
+title: FastAPI Quickstart
+sidebarTitle: FastAPI
+description: Learn how to send emails in your FastAPI application using Reloop.
 ---
+
+<Callout icon="sparkles">
+  Use this pre-built prompt to get started faster.
+  <PromptActions prompt="I'm using FastAPI. Can you show me how to integrate the Reloop Python SDK to send emails asynchronously?" />
+</Callout>
+
+## Prerequisites
+
+To get the most out of this guide, you'll need to:
+
+* [Create an API key](/learn/api-keys)
+* [Verify your domain](/learn/domain)
+* Have an existing FastAPI project
+
+## 1. Install
+
+Install the Reloop Python SDK:
+
+<CodeGroup>
+```bash pip
+pip install reloop
+```
+</CodeGroup>
+
+## 2. Usage
+
+Set up an asynchronous FastAPI endpoint:
+
+<CodeGroup>
+```python main.py
+from fastapi import FastAPI, HTTPException
+import reloop
+import os
+
+app = FastAPI()
+client = reloop.Client(api_key=os.environ.get("RELOOP_API_KEY"))
+
+@app.post("/send-email")
+async def send_email():
+    try:
+        # Note: In a production app, you might want to use an async-compatible 
+        # library or run this in a threadpool if the SDK is strictly synchronous.
+        response = client.emails.send({
+            "from": "Acme <onboarding@reloop.dev>",
+            "to": ["delivered@reloop.dev"],
+            "subject": "Hello from FastAPI",
+            "html": "<strong>It works with FastAPI!</strong>",
+        })
+        return response
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+```
+</CodeGroup>
+
+<Card title="API Reference" icon="siReadthedocs" href="/api-reference">
+  Check out the full API reference to learn more about all available methods.
+</Card>
