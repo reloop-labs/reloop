@@ -66,17 +66,33 @@ export const DnsProviderDetected = ({
 					mode="filled"
 					disabled={isLoading}
 					onClick={onAutoConnect}
-					className="w-full justify-between px-4"
+					className="w-full items-center gap-2"
 				>
-					<div className="flex items-center gap-2">
-						<Button.Icon
-							as={Icon}
-							name="refresh-cw"
-							className={isLoading ? "animate-spin" : ""}
-						/>
-						<span>Auto-populate DNS records</span>
-					</div>
-					<span className="rounded-full bg-bg-white-0/10 px-2 py-0.5 text-[10px] text-text-white-0">
+					<Button.Icon
+						as={() => (
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								strokeWidth={2}
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								className="h-3.5 w-3.5"
+							>
+								<path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72" />
+								<path d="m14 7 3 3" />
+								<path d="M5 6v4" />
+								<path d="M19 14v4" />
+								<path d="M10 2v2" />
+								<path d="M7 8H3" />
+								<path d="M21 16h-4" />
+								<path d="M11 3H9" />
+							</svg>
+						)}
+					/>
+					<span>Auto-populate DNS records</span>
+					<span className="rounded-full bg-bg-white-0/10 px-2 text-[10px] text-text-white-0">
 						1-click
 					</span>
 				</Button.Root>
