@@ -97,6 +97,7 @@ services:
     environment:
       - X_KUMOMTA_KEY=${X_KUMOMTA_KEY:-reloop}
       - BASE_URL=${BASE_URL:-https://local.reloop.sh}
+      - KUMOMTA_WEBHOOK_URL=${KUMOMTA_WEBHOOK_URL:-http://host.docker.internal:8021}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
