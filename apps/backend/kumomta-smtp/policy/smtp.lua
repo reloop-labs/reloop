@@ -10,6 +10,10 @@ kumo.on('smtp_server_auth_plain', function(authz, authc, password, conn_meta)
   return true
 end)
 
+kumo.on('http_server_auth_basic', function(user, password)
+  return password == constants.kumomta_key
+end)
+
 -- 🔥 THIS is the REAL relay control (docs way)
 kumo.on('get_listener_domain', function(domain, listener, conn_meta)
   if conn_meta:get_meta('authz_id') then

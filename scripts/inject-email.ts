@@ -5,26 +5,30 @@
  * bun run scripts/inject-email.ts
  */
 
-const INJECT_URL = "https://send.reloop.sh/api/inject/v1";
+const INJECT_URL_LOCAL = "http://localhost:8020/api/inject/v1";
+const API_KEY = process.env.X_KUMOMTA_KEY || "reloop";
 
 async function sendEmail() {
   const payload = {
     envelope_sender: "noreply@reloop.sh",
-    content: "Subject: Hello from Reloop\n\nThis is a test email sent via the Reloop Inject API.",
+    content: "",
     recipients: [
       {
-        email: "recipient@example.com",
+        email: "pranavkp.me@outlook.com",
       },
     ],
   };
 
-  console.log(`Sending email to ${payload.recipients[0].email} via ${INJECT_URL}...`);
+  payload.content = `From: Reloop <${payload.envelope_sender}>\nTo: ${payload.recipients[0].email}\nSubject: Hello from Reloop\n\nThis is a test email sent via the Reloop Inject API.`;
+
+  console.log(`Sending email to ${payload.recipients[0].email} via ${INJECT_URL_LOCAL}...`);
 
   try {
-    const response = await fetch(INJECT_URL, {
+    const response = await fetch(INJECT_URL_LOCAL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "X_KUMOMTA_KEY": API_KEY,
       },
       body: JSON.stringify(payload),
     });

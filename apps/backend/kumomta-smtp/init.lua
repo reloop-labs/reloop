@@ -23,6 +23,5 @@ kumo.on('init', function()
 
   kumo.start_http_listener {
     listen = '0.0.0.0:8000',
-    trusted_hosts = { '0.0.0.0/0' },
   }
 end)
