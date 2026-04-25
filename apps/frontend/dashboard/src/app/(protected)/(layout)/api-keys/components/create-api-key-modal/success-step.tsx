@@ -20,17 +20,17 @@ export const SuccessStep = ({
 	onCopy,
 	onContinue,
 }: SuccessStepProps) => {
-	const [copiedOnce, setCopiedOnce] = useState(false);
+	const [copy, setCopy] = useState(false);
 
 	const handleCopy = () => {
 		if (isCopied) {
 			onCopy();
 		}
-		setCopiedOnce(true);
-		setTimeout(() => setCopiedOnce(false), 2000);
+		setCopy(true);
+		setTimeout(() => setCopy(false), 2000);
 	};
 
-	const showCopiedState = isCopied && copiedOnce;
+	const showCopiedState = isCopied && copy;
 
 	return (
 		<div className="flex flex-col">
@@ -91,7 +91,7 @@ export const SuccessStep = ({
 					variant="neutral"
 					size="xsmall"
 					onClick={onContinue}
-					disabled={!showCopiedState}
+					disabled={!isCopied}
 				>
 					Continue
 					<span className="inline-flex items-center gap-0.5">
