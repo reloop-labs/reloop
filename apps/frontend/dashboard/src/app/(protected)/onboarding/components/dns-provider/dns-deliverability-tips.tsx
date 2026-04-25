@@ -60,12 +60,12 @@ export const DnsDeliverabilityTips = () => {
 					<Accordion.Item
 						key={item.id}
 						value={item.id}
-						className="rounded-none border-stroke-soft-100/20 border-b bg-transparent p-0 ring-0 last:border-0 hover:bg-bg-weak-50/30 hover:ring-0 data-[state=open]:bg-bg-weak-50/30 data-[state=open]:ring-0"
+						className="group rounded-none border-stroke-soft-100/20 border-b bg-transparent p-0 ring-0 last:border-0"
 					>
-						<Accordion.Trigger className="w-full grid-cols-[auto,1fr,auto] items-start gap-2 px-4 py-2.5">
+						<Accordion.Trigger className="flex w-full cursor-pointer items-start gap-3 px-4 py-2.5 outline-none transition-colors hover:bg-bg-weak-50/50">
 							<div
 								className={cn(
-									"flex h-7 w-7 items-center justify-center rounded-lg",
+									"flex h-7 w-7 shrink-0 items-center justify-center rounded-lg",
 									item.iconBg,
 								)}
 							>
@@ -74,21 +74,21 @@ export const DnsDeliverabilityTips = () => {
 									className={cn("h-3.5 w-3.5", item.iconColor)}
 								/>
 							</div>
-							<div className="flex flex-col gap-0.5 text-left">
+							<div className="flex flex-1 flex-col gap-0.5 text-left">
 								<span className="font-semibold text-sm text-text-strong-950 leading-tight">
 									{item.title}
 								</span>
-								<span className="text-text-sub-600 text-xs leading-snug">
+								<span className="text-[11px] text-text-sub-600 leading-snug">
 									{item.description}
 								</span>
 							</div>
 							<Accordion.Arrow
 								openIcon="chevron-down"
 								closeIcon="chevron-down"
-								className="size-4 rotate-0 transition-transform duration-200 group-data-[state=open]/accordion:rotate-180"
+								className="size-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180"
 							/>
 						</Accordion.Trigger>
-						<Accordion.Content className="px-4 pt-0 pb-2.5 pl-[52px] text-text-sub-600 text-xs leading-relaxed">
+						<Accordion.Content className="px-4 pt-0 pb-2.5 pl-[57px] text-[11px] text-text-sub-600 leading-relaxed">
 							{item.details}
 						</Accordion.Content>
 					</Accordion.Item>
