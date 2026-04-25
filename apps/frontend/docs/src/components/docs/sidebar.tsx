@@ -10,18 +10,19 @@ interface SidebarProps {
 	tree: PageTreeItem[];
 }
 
+import { Logo } from "@reloop/ui/logo";
 import { useState } from "react";
 
 export function Sidebar({ tree }: SidebarProps) {
 	const [hoveredNodeName, setHoveredNodeName] = useState<string | null>(null);
 
 	return (
-		<aside className="z-30 hidden h-full w-60 shrink-0 flex-col border-fd-border border-r bg-fd-background/50 md:flex">
-			{/* Search button area - matches dashboard top section padding */}
-			<div className="flex h-12 items-center border-fd-border border-b px-3">
+		<aside className="z-30 hidden h-full w-64 shrink-0 flex-col border-fd-border border-r bg-fd-background/50 md:flex">
+			{/* Search button area */}
+			<div className="px-3 py-2">
 				<button
 					type="button"
-					className="flex h-8 w-full items-center gap-2 rounded-lg border border-fd-border bg-fd-background px-2.5 text-fd-muted-foreground text-xs transition-all hover:border-fd-foreground/20 hover:shadow-sm"
+					className="flex h-8.5 w-full items-center gap-2 rounded-lg border border-fd-border bg-fd-background px-2.5 text-fd-muted-foreground text-xs transition-all hover:border-fd-foreground/20 hover:shadow-sm"
 				>
 					<Search className="h-3.5 w-3.5" />
 					<span className="flex-1 text-left">Search...</span>

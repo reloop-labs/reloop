@@ -53,6 +53,18 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
 				);
 			return <Card {...props} icon={processedIcon} className="no-underline" />;
 		},
+		table: (props) => (
+			<div className="my-6 w-full overflow-y-auto">
+				<table className="w-full border-collapse text-sm" {...props} />
+			</div>
+		),
+		thead: (props) => <thead className="border-fd-border border-b text-left" {...props} />,
+		tbody: (props) => <tbody className="divide-fd-border divide-y" {...props} />,
+		tr: (props) => <tr className="transition-colors hover:bg-fd-muted/50" {...props} />,
+		th: (props) => (
+			<th className="px-4 py-3 font-semibold text-fd-muted-foreground" {...props} />
+		),
+		td: (props) => <td className="px-4 py-3 text-fd-foreground" {...props} />,
 		Accordion,
 		Callout,
 		CodeBlock,
