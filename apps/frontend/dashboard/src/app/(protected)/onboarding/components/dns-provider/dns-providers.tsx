@@ -38,7 +38,7 @@ export const PROVIDERS = Object.fromEntries(
 
 			const icon = siIcon ? (
 				<span
-					className="flex h-5 w-5 items-center justify-center [&>svg]:h-full [&>svg]:w-full"
+					className="flex h-9 w-9 items-center justify-center [&>svg]:h-full [&>svg]:w-full"
 					style={{ fill: `#${siIcon.hex}` }}
 					// biome-ignore lint/security/noDangerouslySetInnerHtml: Trusted SVG from simple-icons
 					dangerouslySetInnerHTML={{ __html: siIcon.svg }}
@@ -46,7 +46,7 @@ export const PROVIDERS = Object.fromEntries(
 			) : (
 				<Icon
 					name={value.iconName || "globe"}
-					className={`size-5 ${value.textColor || "text-text-soft-400"}`}
+					className={`size-7 ${value.textColor || "text-text-soft-400"}`}
 				/>
 			);
 

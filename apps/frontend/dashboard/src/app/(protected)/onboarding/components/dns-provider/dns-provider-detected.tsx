@@ -2,6 +2,7 @@
 
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
+import { Skeleton } from "@reloop/ui/skeleton";
 import type { PROVIDERS } from "./dns-providers";
 
 interface DnsProviderDetectedProps {
@@ -19,42 +20,45 @@ export const DnsProviderDetected = ({
 }: DnsProviderDetectedProps) => {
 	return (
 		<div>
-			{/* Header */}
-			<div className="mb-6 flex items-center gap-3">
-				<div className="flex size-10 items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-weak-50 dark:border-stroke-soft-100/40">
-					{isLoading ? (
-						<div className="animate-pulse">
-							<Icon name="globe" className="h-5 w-5 text-text-soft-400" />
-						</div>
-					) : (
-						provider.icon
-					)}
-				</div>
-				<div>
-					<span className="font-semibold text-[10px] text-text-soft-400 uppercase leading-none tracking-wider">
-						DNS Provider Detected
-					</span>
+			<div className="mb-4 flex items-center justify-between">
+				<div className="flex items-center gap-2">
+					<div className="flex size-10 items-center justify-center">
+						{isLoading ? (
+							<div className="animate-pulse">
+								<Icon name="globe" className="h-6 w-6 text-text-soft-400" />
+							</div>
+						) : (
+							provider.icon
+						)}
+					</div>
 					<h3 className="font-bold text-lg text-text-strong-950 leading-tight">
-						{isLoading ? "Scanning..." : provider.name}
+						{isLoading ? <Skeleton className="h-6 w-32" /> : provider.name}
 					</h3>
 				</div>
+				<p className="rounded-full bg-bg-weak-50 px-2 py-0.5 font-semibold text-[10px] text-text-sub-600 uppercase tracking-wider">
+					DNS Provider
+				</p>
 			</div>
-
-			{/* Divider */}
 			<div className="mb-6 h-px w-full bg-stroke-soft-200 dark:bg-stroke-soft-100/40" />
-
 			<div className="space-y-6">
 				<div className="flex items-center gap-2">
 					<Icon name="globe" className="h-4 w-4 text-text-soft-400" />
-					<div className="rounded-lg bg-bg-strong-950 px-3 py-1.5 font-mono text-sm text-text-white-0">
-						{domain || "myapp.com"}
-					</div>
+					{isLoading ? (
+						<Skeleton className="h-8 w-32" />
+					) : (
+						<div className="rounded-lg border border-stroke-soft-200 bg-bg-weak-50 px-2 py-0.5 font-medium text-sm text-text-strong-950">
+							{domain}
+						</div>
+					)}
 				</div>
-
 				<p className="text-paragraph-sm text-text-sub-600 leading-relaxed">
 					Your domain is managed by{" "}
 					<span className="font-bold text-text-strong-950">
-						{isLoading ? "Scanning..." : provider.name}
+						{isLoading ? (
+							<Skeleton className="inline-block h-4 w-24 translate-y-0.5" />
+						) : (
+							provider.name
+						)}
 					</span>
 					. We can automatically add all the required DNS records for you
 					&mdash; no need to copy and paste anything manually.

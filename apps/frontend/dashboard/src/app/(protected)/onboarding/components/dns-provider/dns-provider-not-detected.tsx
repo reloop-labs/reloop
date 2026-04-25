@@ -14,9 +14,9 @@ export const DnsProviderNotDetected = ({
 		<div>
 			{/* Header */}
 			<div className="mb-6 flex items-center gap-3">
-				<div className="flex size-10 items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-weak-50 dark:border-stroke-soft-100/40">
+				<div className="flex size-12 items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-weak-50 dark:border-stroke-soft-100/40">
 					<div className="relative">
-						<Icon name="globe" className="h-5 w-5 text-text-soft-400" />
+						<Icon name="globe" className="h-6 w-6 text-text-soft-400" />
 						<div className="-top-0.5 -right-0.5 absolute size-2 rounded-full border border-bg-white-0 bg-error-base dark:border-stroke-soft-100/40" />
 					</div>
 				</div>
