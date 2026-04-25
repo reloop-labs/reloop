@@ -39,7 +39,7 @@ export const DnsProviderDetected = ({
 					DNS Provider
 				</p>
 			</div>
-			<div className="mb-7 h-px w-full bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
+			<div className="mb-4 h-px w-full bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
 			<div className="space-y-6">
 				<div className="flex items-center gap-2">
 					<Icon name="globe" className="h-4 w-4 text-text-soft-400" />
