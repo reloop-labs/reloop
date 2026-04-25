@@ -20,7 +20,7 @@ export const DnsProviderDetected = ({
 }: DnsProviderDetectedProps) => {
 	return (
 		<div>
-			<div className="mb-4 flex items-center justify-between">
+			<div className="mb-3 flex items-center justify-between">
 				<div className="flex items-center gap-2">
 					<div className="flex size-10 items-center justify-center">
 						{isLoading ? (
@@ -39,7 +39,7 @@ export const DnsProviderDetected = ({
 					DNS Provider
 				</p>
 			</div>
-			<div className="mb-6 h-px w-full bg-stroke-soft-200 dark:bg-stroke-soft-100/40" />
+			<div className="mb-7 h-px w-full bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
 			<div className="space-y-6">
 				<div className="flex items-center gap-2">
 					<Icon name="globe" className="h-4 w-4 text-text-soft-400" />
@@ -51,18 +51,21 @@ export const DnsProviderDetected = ({
 						</div>
 					)}
 				</div>
-				<p className="text-paragraph-sm text-text-sub-600 leading-relaxed">
+				<div className="text-paragraph-sm text-text-sub-600 leading-relaxed">
 					Your domain is managed by{" "}
-					<span className="font-bold text-text-strong-950">
+					<span className="inline-flex items-center gap-1.5 align-middle font-bold text-text-strong-950">
 						{isLoading ? (
-							<Skeleton className="inline-block h-4 w-24 translate-y-0.5" />
+							<Skeleton className="h-4 w-24 translate-y-0.5" />
 						) : (
-							provider.name
+							<>
+								{provider.renderIcon({ className: "size-6" })}
+								{provider.name}
+							</>
 						)}
 					</span>
 					. We can automatically add all the required DNS records for you
 					&mdash; no need to copy and paste anything manually.
-				</p>
+				</div>
 
 				<Button.Root
 					type="button"
