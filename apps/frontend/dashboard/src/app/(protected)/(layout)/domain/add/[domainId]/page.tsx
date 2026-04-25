@@ -80,7 +80,7 @@ const NewDomainPage = () => {
 		<div className="mx-auto max-w-3xl pt-10 pb-8 sm:px-8">
 			<div className="flex w-full items-center justify-between pt-6 pb-6">
 				<div>
-					<h1 className="flex items-center gap-2 font-medium text-title-h5 leading-8">
+					<h1 className="flex items-center gap-2 font-semibold text-title-h5 leading-8">
 						{domainData?.domain || <Skeleton className="h-6 w-48" />}
 						<Icon name="check-circle" className="size-5 text-warning-base" />
 					</h1>
