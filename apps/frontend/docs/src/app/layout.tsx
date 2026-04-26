@@ -43,7 +43,10 @@ export default function Layout({ children }: { children: ReactNode }) {
 			)}
 			suppressHydrationWarning
 		>
-			<body className="flex min-h-screen flex-col overflow-x-hidden bg-fd-background text-fd-foreground">
+			<body 
+				className="flex min-h-screen flex-col overflow-x-hidden bg-fd-background text-fd-foreground"
+				suppressHydrationWarning
+			>
 				<ThemeProvider
 					attribute="class"
 					defaultTheme="system"
@@ -51,8 +54,8 @@ export default function Layout({ children }: { children: ReactNode }) {
 					disableTransitionOnChange
 				>
 					{children}
-					<IconsSprite />
 				</ThemeProvider>
+				<IconsSprite />
 			</body>
 		</html>
 	);

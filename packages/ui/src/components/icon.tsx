@@ -1411,6 +1411,20 @@ export const IconsSprite = () => (
 					strokeLinejoin="round"
 				/>
 			</symbol>
+			<symbol
+				id="menu-2"
+				viewBox="0 0 24 24"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<path
+					d="M3 6H21M3 12H11M3 18H16"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+				/>
+			</symbol>
+
 			<symbol viewBox="0 0 24 24" fill="none" id="align-top-2">
 				<rect
 					opacity="0.12"

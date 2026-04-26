@@ -16,16 +16,23 @@ function getBreadcrumbs(
 	parentPath: string[] = [],
 ): string[] {
 	let currentSection = "";
-	const targetUrl = slugPath === "index" ? "/" : `/${slugPath.replace(/\/index$/, "")}`;
+	const targetUrl =
+		slugPath === "index" ? "/" : `/${slugPath.replace(/\/index$/, "")}`;
 
 	for (const item of tree) {
 		if (item.type === "separator") {
-			currentSection = item.name;
+			currentSection = (item.name as string) || "";
 			continue;
 		}
 
-		if (item.type === "page" && (item.url === targetUrl || (item.url === "/introduction" && targetUrl === "/"))) {
-			return currentSection ? [currentSection, ...parentPath, item.name as string] : [...parentPath, item.name as string];
+		if (
+			item.type === "page" &&
+			(item.url === targetUrl ||
+				(item.url === "/introduction" && targetUrl === "/"))
+		) {
+			return currentSection
+				? [currentSection, ...parentPath, item.name as string]
+				: [...parentPath, item.name as string];
 		}
 
 		if (item.type === "folder") {
@@ -89,57 +96,61 @@ export default async function Page(props: {
 
 	return (
 		<DocsLayout tree={source.pageTree.children as PageTreeItem[]}>
-			<div className="flex flex-col xl:grid xl:grid-cols-[minmax(0,1fr)_220px] xl:gap-10">
+			<div className="mx-auto flex w-full max-w-[1250px] flex-col xl:grid xl:grid-cols-[1fr_240px] xl:gap-8s">
 				{/* Main content area */}
-				<div className="min-w-0 px-6 py-8 md:px-10 lg:px-16">
-					{/* Breadcrumb */}
-					{breadcrumbs.length > 0 ? (
-						<div className="mb-2 flex items-center gap-1.5 font-medium text-[13px] text-fd-muted-foreground">
-							{breadcrumbs.map((crumb, i) => (
-								<div key={i} className="flex items-center gap-1.5">
-									{i > 0 && <ChevronRight className="h-3.5 w-3.5" />}
-									<span
-										className={
-											i === breadcrumbs.length - 1 ? "text-fd-foreground" : ""
-										}
-									>
-										{crumb}
-									</span>
-								</div>
-							))}
-						</div>
-					) : (
-						<div className="mb-2 font-medium text-[13px] text-fd-muted-foreground">
-							Documentation
-						</div>
-					)}
+				<div className="min-w-0 px-6 py-8 md:px-10 lg:pr-0 lg:pl-16">
+					<div className="mx-auto max-w-[720px] xl:mx-0">
+						{/* Breadcrumb */}
+						{breadcrumbs.length > 0 ? (
+							<div className="mb-3 flex items-center gap-1.5 font-medium text-[12px] text-fd-muted-foreground/60 uppercase tracking-wider">
+								{breadcrumbs.map((crumb, i) => (
+									<div key={i} className="flex items-center gap-1.5">
+										{i > 0 && <ChevronRight className="h-3 w-3 opacity-50" />}
+										<span
+											className={
+												i === breadcrumbs.length - 1
+													? "text-fd-foreground/80"
+													: ""
+											}
+										>
+											{crumb}
+										</span>
+									</div>
+								))}
+							</div>
+						) : (
+							<div className="mb-3 font-medium text-[12px] text-fd-muted-foreground/60 uppercase tracking-wider">
+								Documentation
+							</div>
+						)}
 
-					{/* Title row */}
-					<div className="mb-6 flex items-start justify-between gap-4">
-						<div>
-							<h1 className="font-bold text-4xl text-fd-foreground tracking-[-0.02em] sm:text-[40px]">
-								{page.data.title}
-							</h1>
-							{page.data.description && (
-								<p className="mt-3 text-[18px] text-fd-muted-foreground leading-relaxed">
-									{page.data.description}
-								</p>
-							)}
+						{/* Title row */}
+						<div className="mb-8 flex items-start justify-between gap-4">
+							<div className="flex-1">
+								<h1 className="font-bold text-4xl text-fd-foreground tracking-[-0.03em] sm:text-[40px]">
+									{page.data.title}
+								</h1>
+								{page.data.description && (
+									<p className="mt-3.5 text-[18px] text-fd-muted-foreground/90 leading-relaxed tracking-[-0.01em]">
+										{page.data.description}
+									</p>
+								)}
+							</div>
+							<div className="mt-2 shrink-0">
+								<PageActions markdownUrl={`${page.url}.mdx`} />
+							</div>
 						</div>
-						<div className="mt-2 shrink-0">
-							<PageActions markdownUrl={`${page.url}.mdx`} />
-						</div>
+
+						{/* Content */}
+						<DocsBody>
+							<MDXContent components={getMDXComponents({ Icon: Icon })} />
+						</DocsBody>
 					</div>
-
-					{/* Content */}
-					<DocsBody>
-						<MDXContent components={getMDXComponents({ Icon: Icon })} />
-					</DocsBody>
 				</div>
 
 				{/* Right sidebar - Table of Contents */}
 				<aside className="hidden xl:block">
-					<div className="sticky top-20 pt-8 pr-6">
+					<div className="sticky top-0 h-[calc(100vh-3rem)] overflow-y-auto pt-8 pr-6">
 						<TableOfContents items={page.data.toc as TOCItem[]} />
 					</div>
 				</aside>

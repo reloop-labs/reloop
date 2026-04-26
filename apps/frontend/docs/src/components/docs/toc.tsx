@@ -2,7 +2,7 @@
 
 import { cn } from "@reloop/fe-docs/lib/cn";
 import type { TOCItem } from "@reloop/fe-docs/lib/types";
-import { List } from "lucide-react";
+import { Icon } from "@reloop/ui/icon";
 import { useEffect, useState } from "react";
 
 interface TOCProps {
@@ -61,12 +61,12 @@ export function TableOfContents({ items }: TOCProps) {
 
 	return (
 		<div id="nd-toc" className="hidden text-sm xl:block">
-			<div className="sticky top-20 pt-4">
+			<div className="sticky top-0">
 				<div
 					id="toc-title"
-					className="mb-3 flex items-center gap-1.5 font-medium text-[13px] text-fd-foreground/60"
+					className="mb-3 flex items-center gap-1.5 font-medium text-[12px] text-fd-muted-foreground/60 uppercase tracking-wider"
 				>
-					<List className="h-3.5 w-3.5" />
+					<Icon name="menu-2" className="h-4 w-4 opacity-70" />
 					On this page
 				</div>
 

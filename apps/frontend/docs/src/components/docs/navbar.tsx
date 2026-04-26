@@ -1,30 +1,39 @@
 "use client";
 
+import { navigationTabs } from "@reloop/fe-docs/lib/navigation";
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { cn } from "../../lib/cn";
 
-export function Navbar() {
+export function Navbar({
+	onMobileMenuClick,
+}: {
+	onMobileMenuClick: () => void;
+}) {
 	const pathname = usePathname();
-	const tabs = [
-		{ title: "Documentation", url: "/", iconName: "file-text" as const },
-		{ title: "API Reference", url: "/api", iconName: "code" as const },
-		{ title: "Build with AI", url: "/integrations", iconName: "bulb" as const },
-		{
-			title: "Knowledge Base",
-			url: "/deploy",
-			iconName: "swatch-book" as const,
-		},
-		{ title: "Webhooks", url: "/webhook", iconName: "webhook" as const },
-	];
+	const tabs = navigationTabs;
 
 	return (
-		<div className="flex h-full w-full items-center justify-between pr-3">
+		<div className="flex h-full w-full items-center justify-between px-4 pr-3">
+			{/* Mobile Menu Placeholder / Logo on Mobile */}
+			<div className="flex items-center gap-4 lg:hidden">
+				<button
+					type="button"
+					onClick={onMobileMenuClick}
+					className="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-fd-foreground/5"
+				>
+					<Icon name="menu-2" className="h-5 w-5" />
+				</button>
+				<Link href="/" className="flex items-center lg:hidden">
+					<Logo theme="light" className="w-10" />
+				</Link>
+			</div>
+
 			{/* Nav tabs */}
 			<div className="flex flex-1 items-center">
-				<nav className="hidden h-full items-center gap-0.5 md:flex md:pl-6">
+				<nav className="hidden h-full items-center gap-0.5 lg:flex lg:pl-6">
 					{tabs.map((tab) => {
 						const active =
 							tab.url === "/" ? pathname === "/" : pathname.startsWith(tab.url);
@@ -55,18 +64,20 @@ export function Navbar() {
 			</div>
 
 			<div className="flex shrink-0 items-center gap-2">
-				<div className="ml-2 hidden items-center gap-3 sm:flex">
+				<div className="flex items-center gap-3">
 					<Link
 						href="https://dashboard.reloop.sh/login"
-						className="font-medium text-fd-muted-foreground text-sm transition-colors hover:text-fd-foreground"
+						className="hidden font-medium text-fd-muted-foreground text-sm transition-colors hover:text-fd-foreground sm:block"
 					>
 						Sign In
 					</Link>
 					<Link
 						href="https://dashboard.reloop.sh/signup"
-						className="inline-flex h-8 items-center justify-center rounded-full bg-fd-foreground px-4 font-semibold text-sm text-fd-background transition-all hover:opacity-90 active:scale-[0.98]"
+						className="inline-flex h-8 items-center justify-center rounded-full bg-fd-foreground px-4 font-semibold text-fd-background text-sm transition-all hover:opacity-90 active:scale-[0.98]"
 					>
-						Get Started
+						{/* Shorten text on very small screens */}
+						<span className="xs:inline hidden">Get Started</span>
+						<span className="xs:hidden">Start</span>
 					</Link>
 				</div>
 			</div>
