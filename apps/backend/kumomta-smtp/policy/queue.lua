@@ -7,11 +7,16 @@ kumo.on('get_queue_config', function(domain, tenant, campaign, routing_domain)
     }
   end
 
-  return kumo.make_queue_config {
-    protocol = {
-      smtp = {
-        mx_list = { 'reloop-mailpit:1025' },
+  local env = os.getenv('NODE_ENV') or os.getenv('KUMOMTA_ENV') or 'production'
+  if env == 'development' then
+    return kumo.make_queue_config {
+      protocol = {
+        smtp = {
+          mx_list = { 'reloop-mailpit:1025' },
+        },
       },
-    },
-  }
+    }
+  end
+
+  return kumo.make_queue_config {}
 end)
