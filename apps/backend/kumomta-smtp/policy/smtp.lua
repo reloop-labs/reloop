@@ -106,7 +106,7 @@ kumo.on('smtp_server_message_received', function(msg)
   print("[LOG-INCOMING] status=" .. tostring(code) .. " body=" .. tostring(body_text))
 
   if code == 200 then
-    -- success, store the log ID in metadata for webhook tracking
+    -- store the log ID in metadata for webhook tracking
     local body = kumo.serde.json_parse(body_text)
     if body and body.id then
       msg:set_meta('X-Email-Log-ID', body.id)
@@ -117,6 +117,43 @@ kumo.on('smtp_server_message_received', function(msg)
         msg:set_data(new_data)
         print("[TRACKING] injected tracking into message " .. msg:id())
       end
+    end
+
+    -- DKIM sign the message
+    local dkim_ok, dkim_resp = pcall(function()
+      local req = client:post(constants.kumomta_url .. "/api/kumomta/v1/dkim-key")
+      return req
+        :header("x-kumomta-key", constants.kumomta_key)
+        :header("Content-Type", "application/json")
+        :body(kumo.serde.json_encode({ key = api_key, domainName = domain }))
+        :send()
+    end)
+
+    if dkim_ok then
+      local dkim_code = dkim_resp:status_code()
+      if dkim_code == 200 then
+        local dkim_data = kumo.serde.json_parse(dkim_resp:text())
+        if dkim_data and dkim_data.privateKey and dkim_data.selector then
+          local sign_ok, sign_err = pcall(function()
+            msg:dkim_sign {
+              domain   = domain,
+              selector = dkim_data.selector,
+              key      = kumo.pki.rsa_key_from_pem(dkim_data.privateKey),
+            }
+          end)
+          if sign_ok then
+            print("[DKIM] signed for domain=" .. domain .. " selector=" .. dkim_data.selector)
+          else
+            print("[DKIM] signing failed: " .. tostring(sign_err))
+          end
+        else
+          print("[DKIM] key data missing in response")
+        end
+      else
+        print("[DKIM] key fetch failed code=" .. tostring(dkim_code))
+      end
+    else
+      print("[DKIM] key fetch error: " .. tostring(dkim_resp))
     end
   elseif code == 401 then
     kumo.reject(535, "5.7.8 Invalid API key")
