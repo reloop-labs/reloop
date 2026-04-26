@@ -3,7 +3,6 @@ import path from "node:path";
 import matter from "gray-matter";
 import type { MDXComponents } from "mdx/types";
 import { MDXRemote } from "next-mdx-remote/rsc";
-import remarkGfm from "remark-gfm";
 import type { PageTreeItem, TOCItem } from "./types";
 
 const docsDir = path.join(process.cwd(), "content/docs");
@@ -160,15 +159,7 @@ export const source = {
 				title: frontmatter.title || "Docs",
 				description: frontmatter.description || "",
 				body: (props: { components?: MDXComponents }) => (
-					<MDXRemote
-						source={content}
-						components={props.components}
-						options={{
-							mdxOptions: {
-								remarkPlugins: [remarkGfm],
-							},
-						}}
-					/>
+					<MDXRemote source={content} components={props.components} />
 				),
 				toc,
 			},

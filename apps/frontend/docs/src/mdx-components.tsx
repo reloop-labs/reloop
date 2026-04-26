@@ -19,6 +19,23 @@ import {
 import type { MDXComponents } from "mdx/types";
 import React from "react";
 
+const APIPage = (props: any) => {
+	return (
+		<div className="my-8 rounded-xl border border-fd-border bg-fd-muted/10 p-6">
+			<div className="flex items-center gap-2 text-fd-muted-foreground">
+				<div className="h-2 w-2 rounded-full bg-blue-500" />
+				<span className="font-medium text-sm tracking-wide uppercase">API Endpoint</span>
+			</div>
+			<div className="mt-4 font-mono text-sm">
+				{props.operations?.[0]?.method?.toUpperCase()} {props.operations?.[0]?.path}
+			</div>
+			<div className="mt-6 text-fd-muted-foreground text-sm italic">
+				API Reference rendering is currently being optimized. 
+			</div>
+		</div>
+	);
+};
+
 const getSlug = (children: React.ReactNode): string => {
 	if (typeof children === "string")
 		return children
@@ -78,8 +95,10 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
 		Tip,
 		Info,
 		CardGroup,
+		Cards: CardGroup,
 		SimpleIcon,
 		PromptActions,
+		APIPage,
 	};
 }
 

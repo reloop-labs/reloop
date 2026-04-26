@@ -873,7 +873,6 @@
       "recharts": "2.15.0",
       "rehype-highlight": "7.0.2",
       "remark": "15.0.1",
-      "remark-gfm": "4.0.1",
       "remark-rehype": "11.1.2",
       "shiki": "3.14.0",
       "simple-icons": "16.14.0",

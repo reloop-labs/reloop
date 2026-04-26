@@ -90,7 +90,6 @@
 				"@openrouter/ai-sdk-provider": "2.3.3",
 				"flexsearch": "0.8.212",
 				"remark": "15.0.1",
-				"remark-gfm": "4.0.1",
 				"remark-rehype": "11.1.2",
 				"unist-util-visit": "5.1.0",
 				"boring-avatars": "2.0.4",
