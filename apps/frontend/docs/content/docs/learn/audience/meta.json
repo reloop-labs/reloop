@@ -1,0 +1,13 @@
+{
+	"title": "Audience",
+	"icon": "Users",
+	"pages": [
+		"index",
+		"contacts",
+		"properties",
+		"segments",
+		"topics",
+		"migration-guide",
+		"subscriptions"
+	]
+}

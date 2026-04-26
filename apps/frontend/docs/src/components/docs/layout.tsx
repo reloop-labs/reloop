@@ -17,7 +17,7 @@ export function DocsLayout({ children, tree }: DocsLayoutProps) {
 		<div className="flex h-[100dvh] w-full flex-col overflow-hidden bg-fd-background">
 			{/* Unified Header */}
 			<header className="z-50 flex h-12 w-full shrink-0 border-fd-border border-b bg-fd-background">
-				<div className="flex w-64 shrink-0 items-center border-fd-border border-r px-4 pt-1">
+				<div className="flex w-60 shrink-0 items-center border-fd-border border-r px-4 pt-1">
 					<Link href="/" className="flex items-center">
 						<Logo theme="light" className="w-12" />
 					</Link>

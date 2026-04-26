@@ -18,12 +18,15 @@ function getTitle(filePath: string): string {
 	}
 }
 
+import * as LucideIcons from "lucide-react";
+
 function buildTree(dir: string, base = ""): PageTreeItem[] {
 	const metaPath = path.join(dir, "meta.json");
 	let pages: string[] = [];
+	let meta: any = {};
 
 	if (fs.existsSync(metaPath)) {
-		const meta = JSON.parse(fs.readFileSync(metaPath, "utf8"));
+		meta = JSON.parse(fs.readFileSync(metaPath, "utf8"));
 		pages = meta.pages || [];
 	} else {
 		// Fallback: read all .mdx files and directories
@@ -51,7 +54,16 @@ function buildTree(dir: string, base = ""): PageTreeItem[] {
 			}
 
 			if (fs.existsSync(mdxPath)) {
-				return { type: "page", name: getTitle(mdxPath), url: url || "/introduction" } as PageTreeItem;
+				const { data } = matter(fs.readFileSync(mdxPath, "utf8"));
+				const iconName = data.icon || (item === "index" && meta.icon);
+				const Icon = iconName ? (LucideIcons as any)[iconName] : null;
+
+				return {
+					type: "page",
+					name: data.sidebarTitle || data.title || path.basename(mdxPath, ".mdx"),
+					url: url || "/introduction",
+					icon: Icon ? <Icon className="h-4 w-4" /> : undefined
+				} as PageTreeItem;
 			}
 
 			// 3. Check if it's a directory
@@ -62,23 +74,29 @@ function buildTree(dir: string, base = ""): PageTreeItem[] {
 				// Try to get folder title from its own meta.json
 				const childMetaPath = path.join(absolutePath, "meta.json");
 				let folderName = item.split("/").filter(Boolean).pop() || item;
+				let folderIcon = undefined;
+
 				if (fs.existsSync(childMetaPath)) {
 					try {
 						const childMeta = JSON.parse(fs.readFileSync(childMetaPath, "utf8"));
 						if (childMeta.title) folderName = childMeta.title;
+						if (childMeta.icon) {
+							const Icon = (LucideIcons as any)[childMeta.icon];
+							if (Icon) folderIcon = <Icon className="h-4 w-4" />;
+						}
 					} catch (e) {}
 				} else {
-					// Prettify folder name (e.g., nodejs -> Node.js)
+					// Prettify folder name
 					if (folderName.toLowerCase() === "nodejs") folderName = "Node.js";
 					else folderName = folderName.charAt(0).toUpperCase() + folderName.slice(1);
 				}
 
 				if (children.length > 0) {
-					return { type: "folder", name: folderName, children } as PageTreeItem;
+					return { type: "folder", name: folderName, children, icon: folderIcon } as PageTreeItem;
 				}
 
 				if (fs.existsSync(indexPath)) {
-					return { type: "page", name: folderName, url } as PageTreeItem;
+					return { type: "page", name: folderName, url, icon: folderIcon } as PageTreeItem;
 				}
 			}
 

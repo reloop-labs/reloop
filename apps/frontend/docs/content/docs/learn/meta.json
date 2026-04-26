@@ -1,23 +1,17 @@
 {
-	"title": "How to Contribute",
-	"description": "Steps to Contribute Effectively",
-	"root": true,
+	"title": "Learn",
+	"description": "Learn about Reloop and how it works",
 	"pages": [
-		"---Learn---",
-		"index",
-		"tech-stack",
-		"project-structure",
-		"---Frontend---",
-		"frontend/web",
-		"frontend/dashboard",
-		"frontend/admin",
-		"frontend/docs",
-		"frontend/dev",
-		"---Backend---",
-		"backend/auth",
-		"backend/domain",
-		"backend/mail",
-		"backend/webhook",
-		"backend/workflow"
+		"sending/index",
+		"receiving/index",
+		"broadcasts/index",
+		"automations/index",
+		"templates/index",
+		"audience/index",
+		"domains/index",
+		"logs/index",
+		"api-keys/index",
+		"webhooks/index",
+		"settings/index"
 	]
 }

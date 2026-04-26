@@ -1,0 +1,11 @@
+{
+	"title": "Domains",
+	"icon": "Globe",
+	"pages": [
+		"index",
+		"tracking",
+		"regions",
+		"dmarc",
+		"bimi"
+	]
+}

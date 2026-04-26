@@ -1,28 +1,55 @@
 "use client";
 
-import { Search } from "lucide-react";
+import { Search, Sparkles, Sun, Moon } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "../../lib/cn";
 import type { PageTreeItem, FolderNode } from "../../lib/types";
+import { useState, useEffect } from "react";
+import { useTheme } from "next-themes";
 
 interface SidebarProps {
 	tree: PageTreeItem[];
 }
 
-import { Logo } from "@reloop/ui/logo";
-import { useState } from "react";
-
 export function Sidebar({ tree }: SidebarProps) {
-	const [hoveredNodeName, setHoveredNodeName] = useState<string | null>(null);
+	const pathname = usePathname();
+	const [hoveredRect, setHoveredRect] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
+	const [activeRect, setActiveRect] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
+	const navRef = useRef<HTMLElement>(null);
+
+	// Sync active rectangle on path change or tree changes
+	useEffect(() => {
+		const updateActiveRect = () => {
+			if (navRef.current) {
+				const activeEl = navRef.current.querySelector('[data-active="true"]') as HTMLElement;
+				if (activeEl) {
+					const navBox = navRef.current.getBoundingClientRect();
+					const activeBox = activeEl.getBoundingClientRect();
+					setActiveRect({
+						top: activeBox.top - navBox.top + navRef.current.scrollTop,
+						left: activeBox.left - navBox.left + navRef.current.scrollLeft,
+						width: activeBox.width,
+						height: activeBox.height,
+					});
+				} else {
+					setActiveRect(null);
+				}
+			}
+		};
+
+		// Small delay to ensure the DOM has updated
+		const timer = setTimeout(updateActiveRect, 0);
+		return () => clearTimeout(timer);
+	}, [pathname, tree]);
 
 	return (
-		<aside className="z-30 hidden h-full w-64 shrink-0 flex-col border-fd-border border-r bg-fd-background/50 md:flex">
+		<aside className="z-30 hidden h-full w-60 shrink-0 flex-col border-fd-border border-r bg-fd-muted/[0.15] md:flex">
 			{/* Search button area */}
-			<div className="px-3 py-2">
+			<div className="flex items-center gap-2 px-3 py-2">
 				<button
 					type="button"
-					className="flex h-8.5 w-full items-center gap-2 rounded-lg border border-fd-border bg-fd-background px-2.5 text-fd-muted-foreground text-xs transition-all hover:border-fd-foreground/20 hover:shadow-sm"
+					className="flex h-8.5 flex-1 items-center gap-2 rounded-lg border border-fd-border bg-fd-background px-2.5 text-fd-muted-foreground text-xs transition-all hover:border-fd-foreground/10 hover:shadow-sm"
 				>
 					<Search className="h-3.5 w-3.5" />
 					<span className="flex-1 text-left">Search...</span>
@@ -30,42 +57,110 @@ export function Sidebar({ tree }: SidebarProps) {
 						<span className="text-xs">⌘</span>K
 					</kbd>
 				</button>
+				<button
+					type="button"
+					className="flex h-8.5 w-8.5 items-center justify-center rounded-lg border border-fd-border bg-fd-background text-fd-muted-foreground transition-all hover:border-fd-foreground/10 hover:text-fd-foreground hover:shadow-sm"
+				>
+					<Sparkles className="h-3.5 w-3.5" />
+				</button>
 			</div>
 
-			{/* Navigation tree - matches dashboard sidebar-items area */}
+			{/* Navigation tree */}
 			<nav
-				className="flex-1 overflow-y-auto p-2"
-				onPointerLeave={() => setHoveredNodeName(null)}
+				ref={navRef}
+				className="relative flex-1 overflow-y-auto p-2"
+				onPointerLeave={() => setHoveredRect(null)}
 			>
-				<div className="flex flex-col gap-4">
+				<AnimatePresence>
+					{(hoveredRect || activeRect) && (
+						<motion.div
+							className={cn(
+								"absolute rounded-lg z-0 pointer-events-none",
+								hoveredRect ? "bg-fd-foreground/[0.04]" : "bg-fd-foreground/5 shadow-sm"
+							)}
+							initial={false}
+							animate={{
+								top: (hoveredRect || activeRect)?.top || 0,
+								left: (hoveredRect || activeRect)?.left || 0,
+								width: (hoveredRect || activeRect)?.width || 0,
+								height: (hoveredRect || activeRect)?.height || 0,
+								opacity: 1,
+							}}
+							exit={{ opacity: 0 }}
+							transition={{ duration: 0.14, ease: "easeOut" }}
+						/>
+					)}
+				</AnimatePresence>
+
+				<div className="relative z-10 flex flex-col gap-px">
 					{tree.map((node, index) => (
 						<SidebarSection
 							key={index}
 							node={node}
-							hoveredNodeName={hoveredNodeName}
-							setHoveredNodeName={setHoveredNodeName}
+							onHover={(rect) => setHoveredRect(rect)}
 						/>
 					))}
 				</div>
 			</nav>
+
+			{/* Footer area with Theme Toggle */}
+			<div className="p-3">
+				<ThemeToggle />
+			</div>
 		</aside>
+	);
+}
+
+function ThemeToggle() {
+	const { theme, setTheme } = useTheme();
+	const [mounted, setMounted] = useState(false);
+
+	useEffect(() => setMounted(true), []);
+
+	if (!mounted) return <div className="h-7 w-14 rounded-full bg-fd-background/50 animate-pulse" />;
+
+	return (
+		<div className="flex w-fit items-center gap-0.5 rounded-full border border-fd-border bg-fd-background p-0.5">
+			<button
+				type="button"
+				onClick={() => setTheme("light")}
+				className={cn(
+					"flex h-6 w-6 items-center justify-center rounded-full transition-colors",
+					theme === "light"
+						? "bg-fd-muted text-fd-foreground shadow-sm"
+						: "text-fd-muted-foreground hover:text-fd-foreground",
+				)}
+			>
+				<Sun className="h-3.5 w-3.5" />
+			</button>
+			<button
+				type="button"
+				onClick={() => setTheme("dark")}
+				className={cn(
+					"flex h-6 w-6 items-center justify-center rounded-full transition-colors",
+					theme === "dark"
+						? "bg-fd-muted text-fd-foreground shadow-sm"
+						: "text-fd-muted-foreground hover:text-fd-foreground",
+				)}
+			>
+				<Moon className="h-3.5 w-3.5" />
+			</button>
+		</div>
 	);
 }
 
 function SidebarSection({
 	node,
-	hoveredNodeName,
-	setHoveredNodeName,
+	onHover,
 }: {
 	node: PageTreeItem;
-	hoveredNodeName: string | null;
-	setHoveredNodeName: (name: string | null) => void;
+	onHover: (rect: { top: number; left: number; width: number; height: number } | null) => void;
 }) {
 	if (node.type === "separator") {
 		return (
-			<div className="mt-4 pt-4 border-t border-fd-border first:mt-0 first:pt-0 first:border-none">
-				<h4 className="px-2 py-1 font-semibold text-fd-muted-foreground text-[11px] uppercase tracking-wider">
-					{node.name}
+			<div className="mt-4 mb-1.5 px-2">
+				<h4 className="font-semibold text-fd-muted-foreground/60 text-[10px] uppercase tracking-[0.05em]">
+					{node.name as string}
 				</h4>
 			</div>
 		);
@@ -75,8 +170,7 @@ function SidebarSection({
 		return (
 			<SidebarFolder
 				node={node}
-				hoveredNodeName={hoveredNodeName}
-				setHoveredNodeName={setHoveredNodeName}
+				onHover={onHover}
 			/>
 		);
 	}
@@ -84,13 +178,14 @@ function SidebarSection({
 	return (
 		<SidebarLink
 			node={node}
-			hoveredNodeName={hoveredNodeName}
-			setHoveredNodeName={setHoveredNodeName}
+			onHover={onHover}
 		/>
 	);
 }
 
-import { motion } from "framer-motion";
+import { useRef } from "react";
+
+import { motion, AnimatePresence } from "framer-motion";
 import { ChevronRight } from "lucide-react";
 
 function findFirstPage(node: PageTreeItem): string | null {
@@ -107,14 +202,13 @@ function findFirstPage(node: PageTreeItem): string | null {
 
 function SidebarFolder({
 	node,
-	hoveredNodeName,
-	setHoveredNodeName,
+	onHover,
 }: {
 	node: FolderNode;
-	hoveredNodeName: string | null;
-	setHoveredNodeName: (name: string | null) => void;
+	onHover: (rect: { top: number; left: number; width: number; height: number } | null) => void;
 }) {
 	const pathname = usePathname();
+	const ref = useRef<HTMLButtonElement>(null);
 
 	const isChildActive = (item: PageTreeItem): boolean => {
 		if (item.type === "page") return item.url === pathname;
@@ -138,59 +232,67 @@ function SidebarFolder({
 		}
 	};
 
-	const isHovered = hoveredNodeName === node.name;
-
 	return (
 		<div className="space-y-px">
 			<button
+				ref={ref}
 				type="button"
 				onClick={handleToggle}
-				onPointerEnter={() => setHoveredNodeName(node.name as string)}
+				data-active={isActive}
+				onPointerEnter={() => {
+					if (ref.current && ref.current.parentElement?.parentElement) {
+						const navEl = ref.current.closest('nav');
+						if (navEl) {
+							const navBox = navEl.getBoundingClientRect();
+							const activeBox = ref.current.getBoundingClientRect();
+							onHover({
+								top: activeBox.top - navBox.top + navEl.scrollTop,
+								left: activeBox.left - navBox.left + navEl.scrollLeft,
+								width: activeBox.width,
+								height: activeBox.height,
+							});
+						}
+					}
+				}}
 				className={cn(
-					"group relative flex h-8 w-full items-center justify-between rounded-lg px-2 font-medium text-[13px] transition-colors",
+					"group flex h-9 w-full items-center justify-between rounded-lg px-2 font-medium text-sm transition-all",
+					isActive
+						? "border-1.5 border-fd-foreground text-fd-foreground shadow-sm"
+						: "text-fd-muted-foreground hover:text-fd-foreground",
 				)}
 			>
-				{isHovered && (
-					<motion.div
-						layoutId="sidebar-hover-bg"
-						className="absolute inset-0 z-0 rounded-lg bg-fd-foreground/5"
-						initial={{ opacity: 0 }}
-						animate={{ opacity: 1 }}
-						exit={{ opacity: 0 }}
-						transition={{ duration: 0.15, ease: "easeOut" }}
-					/>
-				)}
 				<div className="relative z-10 flex w-full items-center gap-2 text-left">
 					{node.icon && (
-						<span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center text-fd-muted-foreground opacity-90 transition-colors group-hover:text-fd-foreground">
+						<span
+							className={cn(
+								"flex h-4 w-4 shrink-0 items-center justify-center transition-colors",
+								isActive ? "text-fd-foreground" : "text-fd-muted-foreground",
+							)}
+						>
 							{node.icon}
 						</span>
 					)}
-					<span
-						className={cn(
-							"truncate",
-							isHovered ? "text-fd-foreground" : "text-fd-muted-foreground",
-						)}
-					>
-						{node.name}
-					</span>
+					<span className="truncate">{node.name as string}</span>
 				</div>
 				<ChevronRight
 					className={cn(
-						"relative z-10 h-3.5 w-3.5 text-fd-muted-foreground transition-transform duration-200",
+						"relative z-10 h-3.5 w-3.5 transition-transform duration-200",
+						isActive ? "text-fd-foreground" : "text-fd-muted-foreground/40 group-hover:text-fd-foreground",
 						isOpen && "rotate-90",
 					)}
 				/>
 			</button>
 
 			{isOpen && (
-				<div className="mt-[2px] flex flex-col space-y-[2px] pl-3">
+				<div className={cn(
+					"mt-px flex flex-col space-y-px",
+					isActive ? "pl-0" : "pl-3 border-l border-fd-border/50 ml-3.5"
+				)}>
 					{node.children.map((child: PageTreeItem, index: number) => (
 						<SidebarLink
 							key={index}
 							node={child}
-							hoveredNodeName={hoveredNodeName}
-							setHoveredNodeName={setHoveredNodeName}
+							onHover={onHover}
 						/>
 					))}
 				</div>
@@ -201,69 +303,64 @@ function SidebarFolder({
 
 function SidebarLink({
 	node,
-	hoveredNodeName,
-	setHoveredNodeName,
+	onHover,
 }: {
 	node: PageTreeItem;
-	hoveredNodeName: string | null;
-	setHoveredNodeName: (name: string | null) => void;
+	onHover: (rect: { top: number; left: number; width: number; height: number } | null) => void;
 }) {
 	const pathname = usePathname();
+	const ref = useRef<HTMLAnchorElement>(null);
 
 	if (node.type === "separator") return null;
 	if (node.type === "folder") {
 		return (
 			<SidebarFolder
 				node={node}
-				hoveredNodeName={hoveredNodeName}
-				setHoveredNodeName={setHoveredNodeName}
+				onHover={onHover}
 			/>
 		);
 	}
 
-	const isActive = pathname === node.url;
-	const isHovered = hoveredNodeName === node.name;
+	const linkId = node.url;
+	const isActive = pathname === linkId || (linkId === "/" && pathname === "");
 
 	return (
 		<Link
-			href={node.url}
-			onPointerEnter={() => setHoveredNodeName(node.name as string)}
+			ref={ref}
+			href={linkId}
+			data-active={isActive}
+			onPointerEnter={() => {
+				if (ref.current) {
+					const navEl = ref.current.closest('nav');
+					if (navEl) {
+						const navBox = navEl.getBoundingClientRect();
+						const activeBox = ref.current.getBoundingClientRect();
+						onHover({
+							top: activeBox.top - navBox.top + navEl.scrollTop,
+							left: activeBox.left - navBox.left + navEl.scrollLeft,
+							width: activeBox.width,
+							height: activeBox.height,
+						});
+					}
+				}
+			}}
 			className={cn(
-				"group relative flex h-8 items-center gap-2 rounded-lg px-2 font-medium text-[13px] transition-colors",
-				isActive ? "bg-fd-foreground/10 text-fd-foreground" : "",
+				"group flex h-8 items-center gap-2 rounded-lg px-2 font-medium text-sm transition-colors",
+				isActive ? "text-fd-foreground" : "text-fd-muted-foreground hover:text-fd-foreground",
 			)}
 		>
-			{isHovered && !isActive && (
-				<motion.div
-					layoutId="sidebar-hover-bg"
-					className="absolute inset-0 z-0 rounded-lg bg-fd-foreground/5"
-					initial={{ opacity: 0 }}
-					animate={{ opacity: 1 }}
-					exit={{ opacity: 0 }}
-					transition={{ duration: 0.15, ease: "easeOut" }}
-				/>
-			)}
 			<div className="relative z-10 flex w-full items-center gap-2 text-left">
 				{node.icon && (
 					<span
 						className={cn(
 							"flex h-3.5 w-3.5 shrink-0 items-center justify-center transition-colors",
-							isActive || isHovered
-								? "text-fd-foreground"
-								: "text-fd-muted-foreground opacity-90",
+							isActive ? "text-fd-foreground" : "text-fd-muted-foreground",
 						)}
 					>
 						{node.icon}
 					</span>
 				)}
-				<span
-					className={cn(
-						"truncate",
-						isActive || isHovered ? "text-fd-foreground" : "text-fd-muted-foreground",
-					)}
-				>
-					{node.name}
-				</span>
+				<span className="truncate">{node.name as string}</span>
 			</div>
 		</Link>
 	);
