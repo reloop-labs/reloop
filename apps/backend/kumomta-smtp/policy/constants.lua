@@ -5,10 +5,20 @@ constants.base_url = os.getenv("BASE_URL") or "https://local.reloop.sh"
 
 -- Extract hostname from environment or base_url
 local hostname = os.getenv("KUMOMTA_HOSTNAME")
-if not hostname then
-  hostname = constants.base_url:match("https?://([^/:]+)")
+if not hostname or hostname == "" or hostname:match("^%x+$") then
+  -- If KUMOMTA_HOSTNAME is unset or looks like a random hex string (container ID)
+  -- Try to extract from BASE_URL
+  local from_base = constants.base_url:match("https?://([^/:]+)")
+  if from_base and from_base ~= "" then
+    hostname = from_base
+  end
 end
-constants.hostname = hostname or "localhost"
+
+-- Final fallback
+if not hostname or hostname == "" or hostname:match("^%x+$") then
+  hostname = "local.reloop.sh"
+end
+constants.hostname = hostname
 
 local raw_url = os.getenv("KUMOMTA_WEBHOOK_URL") or "http://host.docker.internal:8021"
 -- Ensure it ends with /api/kumomta if it doesn't already

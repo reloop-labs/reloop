@@ -1,4 +1,5 @@
 local kumo = require 'kumo'
+local constants = require 'policy.constants'
 
 kumo.on('get_queue_config', function(domain, tenant, campaign, routing_domain)
   if domain:find('%.log_hook$') then
@@ -13,10 +14,17 @@ kumo.on('get_queue_config', function(domain, tenant, campaign, routing_domain)
       protocol = {
         smtp = {
           mx_list = { 'reloop-mailpit:1025' },
+          ehlo_hostname = constants.hostname,
         },
       },
     }
   end
 
-  return kumo.make_queue_config {}
+  return kumo.make_queue_config {
+    protocol = {
+      smtp = {
+        ehlo_hostname = constants.hostname,
+      },
+    },
+  }
 end)
