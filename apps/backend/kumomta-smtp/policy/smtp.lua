@@ -133,19 +133,19 @@ local function apply_reloop_logic(msg, api_key)
   -- Ensure mandatory headers for deliverability
   if not msg:get_first_named_header_value('Date') then
     local date_str = os.date("!%a, %d %b %Y %H:%M:%S +0000")
-    msg:set_header('Date', date_str)
+    msg:append_header('Date', date_str)
     print("[HEADERS] [" .. msg_id .. "] Injected missing Date: " .. date_str)
   end
 
   if not msg:get_first_named_header_value('MIME-Version') then
-    msg:set_header('MIME-Version', '1.0')
+    msg:append_header('MIME-Version', '1.0')
     print("[HEADERS] [" .. msg_id .. "] Injected missing MIME-Version: 1.0")
   end
 
   local current_mid = msg:get_first_named_header_value('Message-ID')
   if not current_mid or not current_mid:find("^<.+@.+>$") then
     local new_mid = string.format("<%s@%s>", msg_id, domain)
-    msg:set_header('Message-ID', new_mid)
+    msg:append_header('Message-ID', new_mid)
     print("[HEADERS] [" .. msg_id .. "] Injected/Fixed Message-ID: " .. new_mid)
   end
 
