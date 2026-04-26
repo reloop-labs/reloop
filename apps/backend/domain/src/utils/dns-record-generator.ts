@@ -48,7 +48,7 @@ export function generateDMARCRecord(
 	domain: string,
 	rootDomain: string,
 ): DNSTypes.DNSRecord {
-	const dmarcValue = "v=DMARC1; p=none;";
+	const dmarcValue = "v=DMARC1; p=reject;";
 	const name = `_dmarc.${domain}`;
 
 	return {
