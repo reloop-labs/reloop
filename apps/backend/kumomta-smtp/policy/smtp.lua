@@ -53,23 +53,26 @@ local function apply_reloop_logic(msg, api_key)
 
   if not existing_log_id then
     local status, response = pcall(function()
+      local payload_str = kumo.serde.json_encode({
+        key = api_key,
+        domainName = domain,
+        messageId = message_id,
+        providerMessageId = msg:id(),
+        fromEmail = from_email,
+        toEmails = to_emails,
+        subject = subject,
+        size = size,
+        textBody = text_body,
+        htmlBody = html_body,
+        rawMessage = data
+      })
+      print("[LOG-INCOMING PAYLOAD] " .. payload_str)
+
       local req = client:post(constants.kumomta_url .. "/api/kumomta/v1/log-incoming")
       return req
         :header("x-kumomta-key", constants.kumomta_key)
         :header("Content-Type", "application/json")
-        :body(kumo.serde.json_encode({
-          key = api_key,
-          domainName = domain,
-          messageId = message_id,
-          providerMessageId = msg:id(),
-          fromEmail = from_email,
-          toEmails = to_emails,
-          subject = subject,
-          size = size,
-          textBody = text_body,
-          htmlBody = html_body,
-          rawMessage = data
-        }))
+        :body(payload_str)
         :send()
     end)
 
