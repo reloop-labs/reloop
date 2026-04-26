@@ -30,7 +30,8 @@ kumo.on('get_queue_config', function(domain, tenant, campaign, routing_domain)
 end)
 
 kumo.on('get_egress_path_config', function(routing_domain, egress_source, site_name)
-  return kumo.make_egress_path_config {
+  return {
     ehlo_hostname = constants.hostname,
+    enable_tls = "Opportunistic",
   }
 end)
