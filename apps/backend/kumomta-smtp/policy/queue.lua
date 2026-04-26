@@ -35,6 +35,6 @@ kumo.on('get_egress_path_config', function(routing_domain, egress_source, site_n
   local make = kumo.make_egress_path or function(t) return t end
   return make {
     ehlo_hostname = constants.hostname,
-    enable_tls = "OpportunisticInsecure", \
+    enable_tls = "OpportunisticInsecure",
   }
 end)
