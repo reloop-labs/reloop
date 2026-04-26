@@ -30,7 +30,7 @@ const TIPS_DATA: TipItem[] = [
 		title: "Only one SPF TXT record per domain",
 		description: "Multiple SPF records will break email delivery.",
 		details:
-			"Merge all SPF entries into one: v=spf1 include:provider1.com include:provider2.com ~all. Two separate SPF records cause validation to fail.",
+			"Merge all SPF entries into one: v=spf1 include:provider1.com include:provider2.com -all. Two separate SPF records cause validation to fail.",
 		icon: "arrow-swap",
 		iconBg: "bg-[#ECFDF3]",
 		iconColor: "text-[#12B76A]",

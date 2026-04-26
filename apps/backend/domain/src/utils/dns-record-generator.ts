@@ -33,7 +33,7 @@ export function generateSPFRecord(
 	domain: string,
 	rootDomain: string,
 ): DNSTypes.DNSRecord {
-	const spfValue = `v=spf1 include:${domainConfig.HOST_DOMAIN} ~all`;
+	const spfValue = `v=spf1 include:${domainConfig.HOST_DOMAIN} -all`;
 
 	return {
 		type: DNSTypes.DNSRecordType.TXT,
