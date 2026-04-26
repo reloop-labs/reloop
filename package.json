@@ -107,9 +107,9 @@
 				"@tiptap/extension-link": "^2.2.4",
 				"@tiptap/extension-image": "^2.2.4",
 				"@mintlify/components": "^1.0.16",
-				"gray-matter": "^5.0.3",
+				"gray-matter": "^4.0.3",
 				"framer-motion": "^12.38.0",
-		"next-mdx-remote": "^6.0.0"
+				"next-mdx-remote": "^6.0.0"
 			},
 			"db": {
 				"@types/pg": "8.15.4",
