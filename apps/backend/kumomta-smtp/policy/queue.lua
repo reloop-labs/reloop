@@ -30,8 +30,11 @@ kumo.on('get_queue_config', function(domain, tenant, campaign, routing_domain)
 end)
 
 kumo.on('get_egress_path_config', function(routing_domain, egress_source, site_name)
-  return {
+  -- Try to use the constructor if available, otherwise return the table
+  -- Note: make_egress_path is the common name in newer versions
+  local make = kumo.make_egress_path or function(t) return t end
+  return make {
     ehlo_hostname = constants.hostname,
-    enable_tls = "Opportunistic",
+    enable_tls = "OpportunisticInsecure", \
   }
 end)
