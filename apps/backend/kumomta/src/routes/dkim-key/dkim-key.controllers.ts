@@ -42,14 +42,25 @@ export async function dkimKeyController(
         isNull(domain.deletedAt),
       );
 
+    logger.info({ domain: input.domainName, organizationId }, "[DKIM-KEY] Querying domain");
+
     // Find the active domain for this org
     const domainRecord = await db.query.domain.findFirst({
       where: domainQuery,
       columns: { id: true, status: true },
     });
 
-    if (!domainRecord || domainRecord.status !== "active") {
-      return { error: "Domain not found or not active", code: 404 };
+    if (!domainRecord) {
+      logger.warn({ domain: input.domainName }, "[DKIM-KEY] Domain NOT FOUND");
+      return { error: "Domain not found", code: 404 };
+    }
+
+    if (domainRecord.status !== "active") {
+      logger.warn(
+        { domain: input.domainName, status: domainRecord.status },
+        "[DKIM-KEY] Domain found but NOT ACTIVE",
+      );
+      return { error: "Domain not active", code: 404 };
     }
 
     // Fetch the DKIM DNS record (recordTypeName = 'DKIM')

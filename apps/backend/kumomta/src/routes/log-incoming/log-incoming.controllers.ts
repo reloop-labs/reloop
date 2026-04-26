@@ -40,17 +40,16 @@ export async function logIncomingController(
     let subject = input.subject || "No Subject";
 
     if (input.rawMessage) {
-      console.log(`[LOG-INCOMING] Parsing rawMessage (length: ${input.rawMessage.length})`);
+      logger.info({ rawLength: input.rawMessage.length }, "[LOG-INCOMING] Parsing rawMessage");
       try {
         const parsed = await simpleParser(input.rawMessage);
-        console.log(`[LOG-INCOMING] Parsed: text=${!!parsed.text}, html=${!!parsed.html}`);
+        logger.info({ hasText: !!parsed.text, hasHtml: !!parsed.html }, "[LOG-INCOMING] Parsed rawMessage");
         // Reset bodies to ensure we only use the high-fidelity parsed content
         textBody = parsed.text || "";
         htmlBody = (parsed.html as string) || "";
         subject = parsed.subject || subject;
       } catch (parseError) {
-        console.error("[LOG-INCOMING] mailparser error:", parseError);
-        logger.error({ parseError }, "Error parsing raw message in log-incoming");
+        logger.error({ parseError }, "[LOG-INCOMING] mailparser error");
       }
     }
 
@@ -65,12 +64,23 @@ export async function logIncomingController(
         isNull(domain.deletedAt),
       );
 
+    logger.info({ domain: input.domainName, organizationId }, "[LOG-INCOMING] Querying domain");
+
     const domainRecord = await db.query.domain.findFirst({
       where: domainQuery,
       columns: { id: true, status: true, organizationId: true },
     });
 
-    if (!domainRecord || domainRecord.status !== "active") {
+    if (!domainRecord) {
+      logger.warn({ domain: input.domainName }, "[LOG-INCOMING] Domain NOT FOUND");
+      return { error: "Domain not found", code: 404 };
+    }
+
+    if (domainRecord.status !== "active") {
+      logger.warn(
+        { domain: input.domainName, status: domainRecord.status },
+        "[LOG-INCOMING] Domain found but NOT ACTIVE",
+      );
       return { error: "Domain not verified", code: 404 };
     }
 
