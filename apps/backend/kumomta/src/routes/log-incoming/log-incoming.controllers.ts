@@ -87,6 +87,17 @@ export async function logIncomingController(
     // Use the domain's organizationId if we bypassed standard auth (master key)
     const finalOrgId = organizationId || domainRecord.organizationId;
 
+    // Check for duplicate messageId
+    const existingLog = await db.query.emailLog.findFirst({
+      where: eq(emailLog.messageId, input.messageId),
+      columns: { id: true },
+    });
+
+    if (existingLog) {
+      logger.info({ messageId: input.messageId }, "[LOG-INCOMING] Message ID already exists");
+      return { error: "Message ID already exists", code: 409 };
+    }
+
     const inserted = await db
       .insert(emailLog)
       .values({

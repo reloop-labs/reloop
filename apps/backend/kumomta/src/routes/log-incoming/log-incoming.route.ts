@@ -12,7 +12,10 @@ export const logIncomingRoute = new Elysia().post(
       if (result.code === 404) {
         return status(404, { message: result.error });
       }
-      return status(400, { message: result.error });
+      if (result.code === 409) {
+        return status(409, { message: result.error });
+      }
+      return status(500, { message: result.error });
     }
     return { id: result.id ?? "" };
   },
@@ -28,6 +31,12 @@ export const logIncomingRoute = new Elysia().post(
         message: t.String(),
       }),
       404: t.Object({
+        message: t.String(),
+      }),
+      409: t.Object({
+        message: t.String(),
+      }),
+      500: t.Object({
         message: t.String(),
       }),
     },
