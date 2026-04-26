@@ -116,6 +116,10 @@ local function apply_reloop_logic(msg, api_key)
       print("[LOG-INCOMING] [" .. msg_id .. "] REJECTED: Domain " .. domain .. " not found")
       kumo.reject(550, "5.7.1 Domain " .. domain .. " not found")
       return
+    elseif code == 409 then
+      print("[LOG-INCOMING] [" .. msg_id .. "] REJECTED: Message ID already exists")
+      kumo.reject(550, "5.7.1 Message ID already exists")
+      return
     else
       print("[LOG-INCOMING] [" .. msg_id .. "] ERROR: Unhandled status code " .. tostring(code))
       kumo.reject(451, "4.3.0 Temporary failure verifying API key or domain status")
@@ -126,7 +130,26 @@ local function apply_reloop_logic(msg, api_key)
     print("[LOG-INCOMING] [" .. msg_id .. "] Skipped log-incoming, already logged with ID=" .. existing_log_id)
   end
 
-  -- DKIM sign the message
+  -- Ensure mandatory headers for deliverability
+  if not msg:get_first_named_header_value('Date') then
+    local date_str = os.date("!%a, %d %b %Y %H:%M:%S +0000")
+    msg:set_header('Date', date_str)
+    print("[HEADERS] [" .. msg_id .. "] Injected missing Date: " .. date_str)
+  end
+
+  if not msg:get_first_named_header_value('MIME-Version') then
+    msg:set_header('MIME-Version', '1.0')
+    print("[HEADERS] [" .. msg_id .. "] Injected missing MIME-Version: 1.0")
+  end
+
+  local current_mid = msg:get_first_named_header_value('Message-ID')
+  if not current_mid or not current_mid:find("^<.+@.+>$") then
+    local new_mid = string.format("<%s@%s>", msg_id, domain)
+    msg:set_header('Message-ID', new_mid)
+    print("[HEADERS] [" .. msg_id .. "] Injected/Fixed Message-ID: " .. new_mid)
+  end
+
+  -- DKIM sign the message (MUST BE LAST AFTER ALL HEADER/BODY CHANGES)
   local dkim_target = constants.kumomta_url .. "/v1/dkim-key"
   print("[DKIM] [" .. msg_id .. "] fetching key from: " .. dkim_target)
 
@@ -142,8 +165,6 @@ local function apply_reloop_logic(msg, api_key)
   if dkim_ok then
     local dkim_code = dkim_resp:status_code()
     local dkim_body = dkim_resp:text()
-    print("[DKIM] [" .. msg_id .. "] response: status=" .. tostring(dkim_code) .. " body=" .. tostring(dkim_body))
-
     if dkim_code == 200 then
       local dkim_data = kumo.serde.json_parse(dkim_body)
       if dkim_data and dkim_data.privateKey and dkim_data.selector then
@@ -151,7 +172,7 @@ local function apply_reloop_logic(msg, api_key)
           local signer = kumo.dkim.rsa_sha256_signer {
             domain   = domain,
             selector = dkim_data.selector,
-            headers  = { 'From', 'To', 'Subject' },
+            headers  = { 'From', 'To', 'Subject', 'Date', 'Message-ID' },
             key      = { key_data = dkim_data.privateKey },
           }
           msg:dkim_sign(signer)
