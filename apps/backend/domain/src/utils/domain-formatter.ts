@@ -1,7 +1,7 @@
 export const getDomainSubString = (domain: string) => {
 	if (domain.split(".").length >= 3) {
 		const subDomain = domain.split(".").slice(0, -2).join(".");
-		return `send.${subDomain}`;
+		return `${subDomain}`;
 	}
 	return "send";
 };
