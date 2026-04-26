@@ -4,6 +4,7 @@ local utils = require 'policy.utils'
 
 -- Helper function to apply business logic to both SMTP and HTTP generated messages
 local function apply_reloop_logic(msg, api_key)
+  local msg_id = msg:id()
   local sender = msg:sender()
   local domain = ""
   local from_email = ""
@@ -33,9 +34,10 @@ local function apply_reloop_logic(msg, api_key)
     text_body = data
   end
 
-  print("[LOG-INCOMING] api_key=" .. api_key .. " domain=" .. domain)
+  print("[LOG-INCOMING] [" .. msg_id .. "] processing message: api_key=" .. api_key .. " domain=" .. domain .. " recipients=" .. #to_emails)
 
   if api_key == "" or domain == "" then
+    print("[LOG-INCOMING] [" .. msg_id .. "] REJECTED: Missing credentials or sender domain")
     kumo.reject(550, "5.7.1 Missing credentials or sender domain.")
     return
   end
@@ -52,12 +54,15 @@ local function apply_reloop_logic(msg, api_key)
   local existing_log_id = msg:get_first_named_header_value('X-Email-Log-ID')
 
   if not existing_log_id then
+    local target_url = constants.kumomta_url .. "/api/kumomta/v1/log-incoming"
+    print("[LOG-INCOMING] [" .. msg_id .. "] calling webhook: " .. target_url)
+
     local status, response = pcall(function()
-      local payload_str = kumo.serde.json_encode({
+      local payload = {
         key = api_key,
         domainName = domain,
         messageId = message_id,
-        providerMessageId = msg:id(),
+        providerMessageId = msg_id,
         fromEmail = from_email,
         toEmails = to_emails,
         subject = subject,
@@ -65,10 +70,11 @@ local function apply_reloop_logic(msg, api_key)
         textBody = text_body,
         htmlBody = html_body,
         rawMessage = data
-      })
-      print("[LOG-INCOMING PAYLOAD] " .. payload_str)
+      }
+      local payload_str = kumo.serde.json_encode(payload)
+      print("[LOG-INCOMING PAYLOAD] [" .. msg_id .. "] " .. payload_str)
 
-      local req = client:post(constants.kumomta_url .. "/api/kumomta/v1/log-incoming")
+      local req = client:post(target_url)
       return req
         :header("x-kumomta-key", constants.kumomta_key)
         :header("Content-Type", "application/json")
@@ -77,45 +83,55 @@ local function apply_reloop_logic(msg, api_key)
     end)
 
     if not status then
-      print("FAILED: " .. tostring(response))
+      print("[LOG-INCOMING] [" .. msg_id .. "] FAILED to send request: " .. tostring(response))
       kumo.reject(451, "4.3.0 Temporary failure contacting log-incoming endpoint: " .. tostring(response))
       return
-    else
-      print("RESULT: SUCCESS")
     end
 
     local code = response:status_code()
     local body_text = response:text()
-    print("[LOG-INCOMING] status=" .. tostring(code) .. " body=" .. tostring(body_text))
+    print("[LOG-INCOMING] [" .. msg_id .. "] response: status=" .. tostring(code) .. " body=" .. tostring(body_text))
 
     if code == 200 then
       -- success, store the log ID in metadata for webhook tracking
       local body = kumo.serde.json_parse(body_text)
       if body and body.id then
         msg:set_meta('X-Email-Log-ID', body.id)
+        print("[LOG-INCOMING] [" .. msg_id .. "] stored log ID: " .. body.id)
 
         -- Apply tracking injection
         local new_data = utils.inject_tracking(msg:get_data(), body.id)
         if new_data ~= msg:get_data() then
           msg:set_data(new_data)
-          print("[TRACKING] injected tracking into message " .. msg:id())
+          print("[TRACKING] [" .. msg_id .. "] injected tracking into message")
         end
+      else
+        print("[LOG-INCOMING] [" .. msg_id .. "] ERROR: backend returned 200 but no ID found")
       end
     elseif code == 401 then
+      print("[LOG-INCOMING] [" .. msg_id .. "] REJECTED: Invalid API key")
       kumo.reject(535, "5.7.8 Invalid API key")
+      return
     elseif code == 404 then
+      print("[LOG-INCOMING] [" .. msg_id .. "] REJECTED: Domain " .. domain .. " not found")
       kumo.reject(550, "5.7.1 Domain " .. domain .. " not found")
+      return
     else
+      print("[LOG-INCOMING] [" .. msg_id .. "] ERROR: Unhandled status code " .. tostring(code))
       kumo.reject(451, "4.3.0 Temporary failure verifying API key or domain status")
+      return
     end
   else
     msg:set_meta('X-Email-Log-ID', existing_log_id)
-    print("[LOG-INCOMING] Skipped log-incoming, already logged with ID=" .. existing_log_id)
+    print("[LOG-INCOMING] [" .. msg_id .. "] Skipped log-incoming, already logged with ID=" .. existing_log_id)
   end
 
   -- DKIM sign the message
+  local dkim_target = constants.kumomta_url .. "/api/kumomta/v1/dkim-key"
+  print("[DKIM] [" .. msg_id .. "] fetching key from: " .. dkim_target)
+
   local dkim_ok, dkim_resp = pcall(function()
-    local req = client:post(constants.kumomta_url .. "/api/kumomta/v1/dkim-key")
+    local req = client:post(dkim_target)
     return req
       :header("x-kumomta-key", constants.kumomta_key)
       :header("Content-Type", "application/json")
@@ -125,8 +141,11 @@ local function apply_reloop_logic(msg, api_key)
 
   if dkim_ok then
     local dkim_code = dkim_resp:status_code()
+    local dkim_body = dkim_resp:text()
+    print("[DKIM] [" .. msg_id .. "] response: status=" .. tostring(dkim_code) .. " body=" .. tostring(dkim_body))
+
     if dkim_code == 200 then
-      local dkim_data = kumo.serde.json_parse(dkim_resp:text())
+      local dkim_data = kumo.serde.json_parse(dkim_body)
       if dkim_data and dkim_data.privateKey and dkim_data.selector then
         local sign_ok, sign_err = pcall(function()
           local signer = kumo.dkim.rsa_sha256_signer {
@@ -138,18 +157,18 @@ local function apply_reloop_logic(msg, api_key)
           msg:dkim_sign(signer)
         end)
         if sign_ok then
-          print("[DKIM] signed for domain=" .. domain .. " selector=" .. dkim_data.selector)
+          print("[DKIM] [" .. msg_id .. "] signed successfully: selector=" .. dkim_data.selector)
         else
-          print("[DKIM] signing failed: " .. tostring(sign_err))
+          print("[DKIM] [" .. msg_id .. "] signing failed: " .. tostring(sign_err))
         end
       else
-        print("[DKIM] key data missing in response")
+        print("[DKIM] [" .. msg_id .. "] ERROR: key data missing in response")
       end
     else
-      print("[DKIM] key fetch failed code=" .. tostring(dkim_code))
+      print("[DKIM] [" .. msg_id .. "] fetch failed: status=" .. tostring(dkim_code))
     end
   else
-    print("[DKIM] key fetch error: " .. tostring(dkim_resp))
+    print("[DKIM] [" .. msg_id .. "] fetch error (pcall failed): " .. tostring(dkim_resp))
   end
 end
 
