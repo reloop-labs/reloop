@@ -10,8 +10,8 @@ kumo.on('smtp_server_auth_plain', function(authz, authc, password, conn_meta)
   return true
 end)
 
-kumo.on('http_server_auth_basic', function(user, password)
-    kumo.log_info("AUTH attempt user=", user, " password=", password)
+kumo.on('http_server_validate_auth_basic', function(user, password)
+    kumo.log_info("AUTH attempt user=" .. tostring(user) .. " password=" .. tostring(password))
   return password == constants.kumomta_key
 end)
 
