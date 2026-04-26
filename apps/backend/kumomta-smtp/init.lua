@@ -5,6 +5,8 @@ require 'policy.webhooks'
 require 'policy.smtp'
 require 'policy.queue'
 
+local constants = require 'policy.constants'
+
 kumo.on('init', function()
   kumo.define_spool {
     name = 'data',
@@ -18,7 +20,7 @@ kumo.on('init', function()
 
   kumo.start_esmtp_listener {
     listen = '0.0.0.0:25',
-    -- allow connection (NOT relay)
+    hostname = constants.hostname,
   }
 
   kumo.start_http_listener {
