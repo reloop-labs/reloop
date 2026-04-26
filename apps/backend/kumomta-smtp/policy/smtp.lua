@@ -54,7 +54,7 @@ local function apply_reloop_logic(msg, api_key)
   local existing_log_id = msg:get_first_named_header_value('X-Email-Log-ID')
 
   if not existing_log_id then
-    local target_url = constants.kumomta_url .. "/api/kumomta/v1/log-incoming"
+    local target_url = constants.kumomta_url .. "/v1/log-incoming"
     print("[LOG-INCOMING] [" .. msg_id .. "] calling webhook: " .. target_url)
 
     local status, response = pcall(function()
@@ -127,7 +127,7 @@ local function apply_reloop_logic(msg, api_key)
   end
 
   -- DKIM sign the message
-  local dkim_target = constants.kumomta_url .. "/api/kumomta/v1/dkim-key"
+  local dkim_target = constants.kumomta_url .. "/v1/dkim-key"
   print("[DKIM] [" .. msg_id .. "] fetching key from: " .. dkim_target)
 
   local dkim_ok, dkim_resp = pcall(function()
