@@ -6,15 +6,15 @@
  */
 
 const INJECT_URL_LOCAL = "http://localhost:8020/api/inject/v1";
-const API_KEY = process.env.X_KUMOMTA_KEY || "reloop";
+const API_KEY = process.env.X_KUMOMTA_KEY || "rl_prod_aQu-7wmZCSQUDzg2bqkyD2MyJ9GjnUziuupidfDHo9TOnknqxk7h689fTqRSz0I--RtsPgKSMswYw4x7G_Ra-Q";
 
 async function sendEmail() {
   const payload = {
-    envelope_sender: "noreply@reloop.sh",
+    envelope_sender: "noreply@mail.qubit.email",
     content: "",
     recipients: [
       {
-        email: "pranavkp.me@outlook.com",
+        email: "play@reloop.sh",
       },
     ],
   };
@@ -28,7 +28,7 @@ async function sendEmail() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X_KUMOMTA_KEY": API_KEY,
+        "Authorization": "Basic " + Buffer.from("reloop:" + API_KEY).toString("base64"),
       },
       body: JSON.stringify(payload),
     });

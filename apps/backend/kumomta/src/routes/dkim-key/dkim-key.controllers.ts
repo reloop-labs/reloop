@@ -2,6 +2,7 @@ import { db } from "@reloop/db/client";
 import { domain, domainDnsRecord } from "@reloop/db/schema";
 import logger from "@reloop/logger";
 import { and, eq, isNull } from "drizzle-orm";
+import { kumomtaConfig } from "../../kumomta.config";
 import { verifyApiKeyController } from "../verify/verify.controllers";
 
 interface DkimKeyInput {
@@ -20,16 +21,30 @@ export async function dkimKeyController(
   input: DkimKeyInput,
 ): Promise<DkimKeyResult> {
   try {
-    const apiKeyResult = await verifyApiKeyController(input.key);
-    if (!apiKeyResult) return { error: "Invalid API Key", code: 401 };
+    let organizationId: string | undefined;
+
+    if (input.key === kumomtaConfig.X_KUMOMTA_KEY) {
+      organizationId = undefined;
+    } else {
+      const apiKeyResult = await verifyApiKeyController(input.key);
+      if (!apiKeyResult) return { error: "Invalid API Key", code: 401 };
+      organizationId = apiKeyResult.organizationId;
+    }
+
+    const domainQuery = organizationId
+      ? and(
+        eq(domain.domain, input.domainName),
+        eq(domain.organizationId, organizationId),
+        isNull(domain.deletedAt),
+      )
+      : and(
+        eq(domain.domain, input.domainName),
+        isNull(domain.deletedAt),
+      );
 
     // Find the active domain for this org
     const domainRecord = await db.query.domain.findFirst({
-      where: and(
-        eq(domain.domain, input.domainName),
-        eq(domain.organizationId, apiKeyResult.organizationId),
-        isNull(domain.deletedAt),
-      ),
+      where: domainQuery,
       columns: { id: true, status: true },
     });
 

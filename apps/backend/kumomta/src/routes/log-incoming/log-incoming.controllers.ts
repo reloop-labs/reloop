@@ -3,6 +3,7 @@ import { domain, emailLog } from "@reloop/db/schema";
 import logger from "@reloop/logger";
 import { and, eq, isNull } from "drizzle-orm";
 import { simpleParser } from "mailparser";
+import { kumomtaConfig } from "../../kumomta.config";
 import { verifyApiKeyController } from "../verify/verify.controllers";
 
 interface LogIncomingInput {
@@ -23,8 +24,15 @@ export async function logIncomingController(
   input: LogIncomingInput,
 ): Promise<{ id?: string; error?: string; code?: number }> {
   try {
-    const apiKeyResult = await verifyApiKeyController(input.key);
-    if (!apiKeyResult) return { error: "Invalid API Key", code: 401 };
+    let organizationId: string | undefined;
+
+    if (input.key === kumomtaConfig.X_KUMOMTA_KEY) {
+      organizationId = undefined;
+    } else {
+      const apiKeyResult = await verifyApiKeyController(input.key);
+      if (!apiKeyResult) return { error: "Invalid API Key", code: 401 };
+      organizationId = apiKeyResult.organizationId;
+    }
 
     // Parse raw message if provided
     let textBody = input.textBody || "";
@@ -46,18 +54,28 @@ export async function logIncomingController(
       }
     }
 
-    const domainRecord = await db.query.domain.findFirst({
-      where: and(
+    const domainQuery = organizationId
+      ? and(
         eq(domain.domain, input.domainName),
-        eq(domain.organizationId, apiKeyResult.organizationId),
+        eq(domain.organizationId, organizationId),
         isNull(domain.deletedAt),
-      ),
-      columns: { id: true, status: true },
+      )
+      : and(
+        eq(domain.domain, input.domainName),
+        isNull(domain.deletedAt),
+      );
+
+    const domainRecord = await db.query.domain.findFirst({
+      where: domainQuery,
+      columns: { id: true, status: true, organizationId: true },
     });
 
     if (!domainRecord || domainRecord.status !== "active") {
       return { error: "Domain not verified", code: 404 };
     }
+
+    // Use the domain's organizationId if we bypassed standard auth (master key)
+    const finalOrgId = organizationId || domainRecord.organizationId;
 
     const inserted = await db
       .insert(emailLog)
@@ -65,7 +83,7 @@ export async function logIncomingController(
         messageId:
           input.messageId ||
           `msg_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
-        organizationId: apiKeyResult.organizationId,
+        organizationId: finalOrgId,
         domainId: domainRecord.id,
         fromEmail: input.fromEmail,
         toEmails: input.toEmails,
