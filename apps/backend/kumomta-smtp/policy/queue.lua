@@ -14,7 +14,7 @@ kumo.on('get_queue_config', function(domain, tenant, campaign, routing_domain)
       protocol = {
         smtp = {
           mx_list = { 'reloop-mailpit:1025' },
-          ehlo_hostname = constants.hostname,
+          ehlo_domain = constants.hostname,
         },
       },
     }
@@ -23,18 +23,23 @@ kumo.on('get_queue_config', function(domain, tenant, campaign, routing_domain)
   return kumo.make_queue_config {
     protocol = {
       smtp = {
-        ehlo_hostname = constants.hostname,
+        ehlo_domain = constants.hostname,
       },
     },
   }
 end)
 
 kumo.on('get_egress_path_config', function(routing_domain, egress_source, site_name)
-  -- Try to use the constructor if available, otherwise return the table
-  -- Note: make_egress_path is the common name in newer versions
   local make = kumo.make_egress_path or function(t) return t end
   return make {
-    ehlo_hostname = constants.hostname,
     enable_tls = "OpportunisticInsecure",
+    ehlo_domain = constants.hostname,
+  }
+end)
+
+kumo.on('get_egress_source', function(source_name)
+  local make = kumo.make_egress_source or function(t) return t end
+  return make {
+    ehlo_domain = constants.hostname,
   }
 end)
