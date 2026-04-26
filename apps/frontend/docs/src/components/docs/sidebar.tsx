@@ -7,6 +7,7 @@ import { cn } from "../../lib/cn";
 import type { PageTreeItem, FolderNode } from "../../lib/types";
 import { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
+import { SearchDialog } from "./search-dialog";
 
 interface SidebarProps {
 	tree: PageTreeItem[];
@@ -16,7 +17,20 @@ export function Sidebar({ tree }: SidebarProps) {
 	const pathname = usePathname();
 	const [hoveredRect, setHoveredRect] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
 	const [activeRect, setActiveRect] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
+	const [isSearchOpen, setIsSearchOpen] = useState(false);
 	const navRef = useRef<HTMLElement>(null);
+
+	// Keyboard shortcuts
+	useEffect(() => {
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+				e.preventDefault();
+				setIsSearchOpen(true);
+			}
+		};
+		window.addEventListener("keydown", handleKeyDown);
+		return () => window.removeEventListener("keydown", handleKeyDown);
+	}, []);
 
 	// Sync active rectangle on path change or tree changes
 	useEffect(() => {
@@ -49,6 +63,7 @@ export function Sidebar({ tree }: SidebarProps) {
 			<div className="flex items-center gap-2 px-3 py-2">
 				<button
 					type="button"
+					onClick={() => setIsSearchOpen(true)}
 					className="flex h-8.5 flex-1 items-center gap-2 rounded-lg border border-fd-border bg-fd-background px-2.5 text-fd-muted-foreground text-xs transition-all hover:border-fd-foreground/10 hover:shadow-sm"
 				>
 					<Search className="h-3.5 w-3.5" />
@@ -107,6 +122,12 @@ export function Sidebar({ tree }: SidebarProps) {
 			<div className="p-3">
 				<ThemeToggle />
 			</div>
+
+			<SearchDialog
+				open={isSearchOpen}
+				onOpenChange={setIsSearchOpen}
+				tree={tree}
+			/>
 		</aside>
 	);
 }

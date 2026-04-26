@@ -8,16 +8,6 @@ import type { PageTreeItem, TOCItem } from "./types";
 
 const docsDir = path.join(process.cwd(), "content/docs");
 
-function getTitle(filePath: string): string {
-	try {
-		const content = fs.readFileSync(filePath, "utf8");
-		const { data } = matter(content);
-		return data.sidebarTitle || data.title || path.basename(filePath, ".mdx");
-	} catch (e) {
-		return path.basename(filePath, ".mdx");
-	}
-}
-
 import * as LucideIcons from "lucide-react";
 
 function buildTree(dir: string, base = ""): PageTreeItem[] {
@@ -30,25 +20,37 @@ function buildTree(dir: string, base = ""): PageTreeItem[] {
 		pages = meta.pages || [];
 	} else {
 		// Fallback: read all .mdx files and directories
-		pages = fs.readdirSync(dir).map(f => {
-			if (fs.statSync(path.join(dir, f)).isDirectory()) return f;
-			if (f.endsWith(".mdx") && f !== "introduction.mdx" && f !== "index.mdx") return f.replace(".mdx", "");
-			return null;
-		}).filter(Boolean) as string[];
+		pages = fs
+			.readdirSync(dir)
+			.map((f) => {
+				if (fs.statSync(path.join(dir, f)).isDirectory()) return f;
+				if (f.endsWith(".mdx") && f !== "introduction.mdx" && f !== "index.mdx")
+					return f.replace(".mdx", "");
+				return null;
+			})
+			.filter(Boolean) as string[];
 	}
 
 	return pages
 		.map((item: string): PageTreeItem | null => {
 			if (item.startsWith("---") && item.endsWith("---")) {
-				return { type: "separator", name: item.replace(/-/g, "") } as PageTreeItem;
+				return {
+					type: "separator",
+					name: item.replace(/-/g, ""),
+				} as PageTreeItem;
 			}
 
 			// 1. Resolve item path and handle "index" mapping
 			const absolutePath = path.resolve(dir, item);
-			const url = `/${path.join(base, item === "index" ? "" : item).replace(/\\/g, "/").replace(/\/$/, "")}`;
+			const url = `/${path
+				.join(base, item === "index" ? "" : item)
+				.replace(/\\/g, "/")
+				.replace(/\/$/, "")}`;
 
 			// 2. Check if it's a direct .mdx file
-			let mdxPath = item.endsWith(".mdx") ? absolutePath : `${absolutePath}.mdx`;
+			let mdxPath = item.endsWith(".mdx")
+				? absolutePath
+				: `${absolutePath}.mdx`;
 			if (!fs.existsSync(mdxPath) && item === "index") {
 				mdxPath = path.join(dir, "introduction.mdx");
 			}
@@ -60,25 +62,31 @@ function buildTree(dir: string, base = ""): PageTreeItem[] {
 
 				return {
 					type: "page",
-					name: data.sidebarTitle || data.title || path.basename(mdxPath, ".mdx"),
+					name:
+						data.sidebarTitle || data.title || path.basename(mdxPath, ".mdx"),
 					url: url || "/introduction",
-					icon: Icon ? <Icon className="h-4 w-4" /> : undefined
+					icon: Icon ? <Icon className="h-4 w-4" /> : undefined,
 				} as PageTreeItem;
 			}
 
 			// 3. Check if it's a directory
-			if (fs.existsSync(absolutePath) && fs.statSync(absolutePath).isDirectory()) {
+			if (
+				fs.existsSync(absolutePath) &&
+				fs.statSync(absolutePath).isDirectory()
+			) {
 				const children = buildTree(absolutePath, path.join(base, item));
 				const indexPath = path.join(absolutePath, "index.mdx");
 
 				// Try to get folder title from its own meta.json
 				const childMetaPath = path.join(absolutePath, "meta.json");
 				let folderName = item.split("/").filter(Boolean).pop() || item;
-				let folderIcon = undefined;
+				let folderIcon: React.ReactNode;
 
 				if (fs.existsSync(childMetaPath)) {
 					try {
-						const childMeta = JSON.parse(fs.readFileSync(childMetaPath, "utf8"));
+						const childMeta = JSON.parse(
+							fs.readFileSync(childMetaPath, "utf8"),
+						);
 						if (childMeta.title) folderName = childMeta.title;
 						if (childMeta.icon) {
 							const Icon = (LucideIcons as any)[childMeta.icon];
@@ -88,15 +96,27 @@ function buildTree(dir: string, base = ""): PageTreeItem[] {
 				} else {
 					// Prettify folder name
 					if (folderName.toLowerCase() === "nodejs") folderName = "Node.js";
-					else folderName = folderName.charAt(0).toUpperCase() + folderName.slice(1);
+					else
+						folderName =
+							folderName.charAt(0).toUpperCase() + folderName.slice(1);
 				}
 
 				if (children.length > 0) {
-					return { type: "folder", name: folderName, children, icon: folderIcon } as PageTreeItem;
+					return {
+						type: "folder",
+						name: folderName,
+						children,
+						icon: folderIcon,
+					} as PageTreeItem;
 				}
 
 				if (fs.existsSync(indexPath)) {
-					return { type: "page", name: folderName, url, icon: folderIcon } as PageTreeItem;
+					return {
+						type: "page",
+						name: folderName,
+						url,
+						icon: folderIcon,
+					} as PageTreeItem;
 				}
 			}
 
