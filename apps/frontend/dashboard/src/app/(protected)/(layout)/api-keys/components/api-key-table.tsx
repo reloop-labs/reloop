@@ -17,7 +17,7 @@ import * as Tooltip from "@reloop/ui/tooltip";
 import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useQueryState } from "nuqs";
+import { parseAsInteger, useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
@@ -49,11 +49,6 @@ interface ApiKeyTableProps {
 	total: number;
 	isLoading?: boolean;
 	loadingRows?: number;
-	onAddApiKey?: () => void;
-	currentPage: number;
-	onPageChange: (page: number) => void;
-	pageSize: number;
-	onPageSizeChange: (size: number) => void;
 }
 
 interface ApiKeyActionsDropdownProps {
@@ -203,24 +198,28 @@ export const ApiKeyTable = ({
 	total,
 	isLoading,
 	loadingRows = 3,
-	onAddApiKey,
-	currentPage,
-	onPageChange,
-	pageSize,
-	onPageSizeChange,
 }: ApiKeyTableProps) => {
 	const router = useRouter();
 	const { mutate } = useSWRConfig();
 	const [, setDeleteId] = useQueryState("delete");
+	const [, setModal] = useQueryState("modal");
+	const [currentPage, setCurrentPage] = useQueryState(
+		"page",
+		parseAsInteger.withDefault(1),
+	);
+	const [pageSize, setPageSize] = useQueryState(
+		"limit",
+		parseAsInteger.withDefault(10),
+	);
 	const [togglingId, setTogglingId] = useState<string | null>(null);
 	const [rotateModalApiKey, setRotateModalApiKey] = useState<ApiKeyData | null>(
 		null,
 	);
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 
-	const totalPages = Math.ceil(total / pageSize);
-	const startIndex = (currentPage - 1) * pageSize + 1;
-	const endIndex = Math.min(currentPage * pageSize, total);
+	const totalPages = Math.ceil(total / (pageSize ?? 10));
+	const startIndex = ((currentPage ?? 1) - 1) * (pageSize ?? 10) + 1;
+	const endIndex = Math.min((currentPage ?? 1) * (pageSize ?? 10), total);
 
 	const handleDeleteApiKey = (apiKeyId: string) => {
 		setDeleteId(apiKeyId);
@@ -228,6 +227,10 @@ export const ApiKeyTable = ({
 
 	const handleViewDetails = (apiKeyId: string) => {
 		router.push(`/api-keys/${apiKeyId}`);
+	};
+
+	const handleAddApiKey = () => {
+		setModal("create-api-key");
 	};
 
 	const handleToggleEnabled = async (apiKey: ApiKeyData) => {
@@ -266,7 +269,7 @@ export const ApiKeyTable = ({
 		<>
 			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/40">
 				{/* Table Header */}
-				<div className="grid grid-cols-[1.5fr_0.8fr_1.5fr_1fr_0.8fr_0.8fr_48px] items-center border-stroke-soft-100 border-b bg-bg-weak-50/50 px-4 py-2.5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-bg-weak-50/40">
+				<div className="grid grid-cols-[1fr_1.3fr_1.5fr_1fr_0.8fr_0.8fr_34px] items-center border-stroke-soft-100 border-b bg-bg-weak-50/50 px-4 py-2.5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-bg-weak-50/40">
 					<div className="flex items-center gap-1">
 						<span className="text-xs">Name</span>
 					</div>
@@ -300,7 +303,7 @@ export const ApiKeyTable = ({
 						Array.from({ length: loadingRows }).map((_, index) => (
 							<div
 								key={`skeleton-${index}`}
-								className="grid grid-cols-[1.5fr_0.8fr_1.5fr_1fr_0.8fr_0.8fr_48px] items-center px-4 py-2"
+								className="grid grid-cols-[1fr_1.3fr_1.5fr_1fr_0.8fr_0.8fr_34px] items-center px-4 py-2"
 							>
 								<div className="flex items-center gap-2">
 									<Skeleton className="h-4 w-24" />
@@ -328,7 +331,7 @@ export const ApiKeyTable = ({
 						))
 					) : apiKeys.length === 0 ? (
 						<div className="w-full">
-							<EmptyState onCreateApiKey={onAddApiKey || (() => {})} />
+							<EmptyState onCreateApiKey={handleAddApiKey} />
 						</div>
 					) : (
 						apiKeys.map((apiKey, index) => {
@@ -340,7 +343,7 @@ export const ApiKeyTable = ({
 								<div
 									key={`api-key-${index}`}
 									className={cn(
-										"group/row grid w-full cursor-pointer grid-cols-[1.5fr_0.8fr_1.5fr_1fr_0.8fr_0.8fr_48px] items-center px-4 py-2 text-left transition-colors",
+										"group/row grid w-full cursor-pointer grid-cols-[1fr_1.3fr_1.5fr_1fr_0.8fr_0.8fr_34px] items-center px-4 py-2 text-left transition-colors",
 										"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-base focus-visible:ring-offset-1",
 										isRowActive && "bg-bg-weak-50/50",
 									)}
@@ -355,9 +358,9 @@ export const ApiKeyTable = ({
 
 										{/* Prefix Column */}
 										<div className="flex items-center">
-											<code className="rounded bg-bg-weak-50 px-1.5 py-0.5 font-mono text-[11px] text-text-sub-600 dark:bg-bg-weak-50/20">
-												{apiKey.prefix || "rl_..."}
-											</code>
+											<span className="rounded-md bg-bg-weak-50 px-1.5 py-0.5 font-semibold text-[11px] text-text-sub-600 dark:bg-bg-weak-50/20">
+												{apiKey.start || "rl_..."}
+											</span>
 										</div>
 
 										{/* Created By Column */}
@@ -488,14 +491,15 @@ export const ApiKeyTable = ({
 							<PageSizeDropdown
 								value={pageSize}
 								onValueChange={(value) => {
-									onPageSizeChange(value);
+									setPageSize(value);
+									setCurrentPage(1);
 								}}
 							/>
 						</div>
 						<PaginationControls
 							currentPage={currentPage}
 							totalPages={totalPages}
-							onPageChange={onPageChange}
+							onPageChange={setCurrentPage}
 							isLoading={isLoading}
 						/>
 					</div>

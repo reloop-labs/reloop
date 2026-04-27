@@ -44,14 +44,8 @@ export const ApiKeyList = () => {
 	);
 	const [searchQuery] = useQueryState("q", parseAsString.withDefault(""));
 	const [modal, setModal] = useQueryState("modal");
-	const [currentPage, setCurrentPage] = useQueryState(
-		"page",
-		parseAsInteger.withDefault(1),
-	);
-	const [pageSize, setPageSize] = useQueryState(
-		"limit",
-		parseAsInteger.withDefault(10),
-	);
+	const [currentPage] = useQueryState("page", parseAsInteger.withDefault(1));
+	const [pageSize] = useQueryState("limit", parseAsInteger.withDefault(10));
 
 	const { data, error, isLoading } = useSWR<ApiKeyListResponse>(
 		activeOrganization?.id
@@ -107,14 +101,6 @@ export const ApiKeyList = () => {
 								total={data?.total || 0}
 								isLoading={isLoading}
 								loadingRows={4}
-								onAddApiKey={() => setModal("create-api-key")}
-								currentPage={currentPage}
-								onPageChange={setCurrentPage}
-								pageSize={pageSize}
-								onPageSizeChange={(size) => {
-									setPageSize(size);
-									setCurrentPage(1);
-								}}
 							/>
 						</div>
 					</div>
