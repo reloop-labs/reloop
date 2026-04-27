@@ -4,7 +4,7 @@ import { cn } from "@reloop/ui/cn";
 import { CodeBlock } from "@reloop/ui/code-block";
 import * as Drawer from "@reloop/ui/drawer";
 import { Icon } from "@reloop/ui/icon";
-import * as Kbd from "@reloop/ui/kbd";
+import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { useCallback, useState } from "react";
 
@@ -264,7 +264,7 @@ export const TopicsApiDetails = () => {
 				>
 					<Icon name="code" className="h-4 w-4" />
 					API
-					<Kbd.Root className="bg-bg-weak-50 text-[10px]">A</Kbd.Root>
+					<KbdKeyOutline>A</KbdKeyOutline>
 				</Button.Root>
 			</Drawer.Trigger>
 			<Drawer.Content className="max-w-[520px]">
@@ -296,7 +296,10 @@ export const TopicsApiDetails = () => {
 									>
 										<Icon
 											name={baseCopied ? "check" : "clipboard-copy"}
-											className={cn("h-3.5 w-3.5", baseCopied && "text-success-base")}
+											className={cn(
+												"h-3.5 w-3.5",
+												baseCopied && "text-success-base",
+											)}
 										/>
 									</Button.Root>
 								</Tooltip.Trigger>
@@ -332,7 +335,7 @@ export const TopicsApiDetails = () => {
 					{/* Endpoints */}
 					<div className="space-y-2.5">
 						<h3 className="text-label-sm text-text-sub-600">Endpoints</h3>
-						<div className="divide-y divide-stroke-soft-200 rounded-xl border border-stroke-soft-200 bg-bg-white-0 overflow-hidden">
+						<div className="divide-y divide-stroke-soft-200 overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0">
 							{operations.map((op) => {
 								const isSelected = selectedOperation === op.id;
 								return (
@@ -344,7 +347,7 @@ export const TopicsApiDetails = () => {
 											"group flex w-full items-center gap-3 px-3.5 py-2.5 text-left transition-all duration-150",
 											"border-l-2",
 											isSelected
-												? "bg-bg-weak-50 border-l-text-strong-950"
+												? "border-l-text-strong-950 bg-bg-weak-50"
 												: "border-l-transparent hover:bg-bg-weak-50/60",
 										)}
 									>
@@ -356,16 +359,24 @@ export const TopicsApiDetails = () => {
 										>
 											{op.method}
 										</Badge.Root>
-										<code className={cn(
-											"flex-1 font-mono text-[11px] transition-colors",
-											isSelected ? "text-text-strong-950" : "text-text-sub-500 group-hover:text-text-strong-950"
-										)}>
+										<code
+											className={cn(
+												"flex-1 font-mono text-[11px] transition-colors",
+												isSelected
+													? "text-text-strong-950"
+													: "text-text-sub-500 group-hover:text-text-strong-950",
+											)}
+										>
 											{op.endpoint}
 										</code>
-										<span className={cn(
-											"text-label-xs transition-colors flex-shrink-0",
-											isSelected ? "text-text-sub-600" : "text-text-sub-400 group-hover:text-text-sub-600"
-										)}>
+										<span
+											className={cn(
+												"flex-shrink-0 text-label-xs transition-colors",
+												isSelected
+													? "text-text-sub-600"
+													: "text-text-sub-400 group-hover:text-text-sub-600",
+											)}
+										>
 											{op.label}
 										</span>
 									</button>

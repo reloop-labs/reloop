@@ -1,7 +1,7 @@
 "use client";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
-import * as Kbd from "@reloop/ui/kbd";
+import { KbdEsc } from "@reloop/ui/kbd-esc";
 import * as Modal from "@reloop/ui/modal";
 import { useQueryState } from "nuqs";
 import { useState } from "react";
@@ -91,7 +91,7 @@ export const DeleteContactModal = ({ contacts }: DeleteContactModalProps) => {
 						disabled={isDeleting}
 					>
 						Cancel
-						<Kbd.Root className="bg-bg-weak-50 text-xs">Esc</Kbd.Root>
+						<KbdEsc />
 					</Button.Root>
 					<Button.Root
 						type="button"

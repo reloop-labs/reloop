@@ -4,7 +4,6 @@ import { cn } from "@reloop/ui/cn";
 import { CodeBlock } from "@reloop/ui/code-block";
 import * as Drawer from "@reloop/ui/drawer";
 import { Icon } from "@reloop/ui/icon";
-import * as Kbd from "@reloop/ui/kbd";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { useCallback, useState } from "react";
 
@@ -269,7 +268,7 @@ export const DomainApiDetails = () => {
 				<Button.Root
 					variant="neutral"
 					size="xsmall"
-					mode="lighter"
+					mode="ghost"
 					className={cn("gap-1.5", isOpen && "bg-bg-weak-50")}
 				>
 					<Icon name="code" className="h-4 w-4 stroke-2" />

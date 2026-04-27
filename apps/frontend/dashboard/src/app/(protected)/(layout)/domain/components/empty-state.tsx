@@ -49,8 +49,11 @@ export const EmptyState = () => {
 						target="_blank"
 						rel="noopener noreferrer"
 					>
-						<Icon name="book-open" className="h-3.5 w-3.5" />
-						Learn about domains
+						<Icon name="book-closed" className="h-3.5 w-3.5" />
+						Learn about domains{" "}
+						<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-200 p-px font-medium text-[10px] uppercase">
+							D
+						</span>
 					</a>
 				</Button.Root>
 			</div>

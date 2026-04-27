@@ -4,7 +4,7 @@ import { valibotResolver } from "@hookform/resolvers/valibot";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import * as Kbd from "@reloop/ui/kbd";
+import { KbdEsc } from "@reloop/ui/kbd-esc";
 import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import { useLoading } from "@reloop/ui/use-loading";
@@ -199,7 +199,7 @@ export const EditWebhookModal = ({
 							disabled={status === "loading"}
 						>
 							Cancel
-							<Kbd.Root className="bg-bg-weak-50 text-xs">Esc</Kbd.Root>
+							<KbdEsc />
 						</Button.Root>
 						<Button.Root
 							type="submit"

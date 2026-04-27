@@ -9,7 +9,9 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import * as Kbd from "@reloop/ui/kbd";
+import { KbdCommand } from "@reloop/ui/kbd-command";
+import { KbdEnter } from "@reloop/ui/kbd-enter";
+import { KbdEsc } from "@reloop/ui/kbd-esc";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import { useRef, useState } from "react";
@@ -457,7 +459,7 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
 							disabled={loading}
 						>
 							Cancel
-							<Kbd.Root className="bg-bg-weak-50 text-xs">Esc</Kbd.Root>
+							<KbdEsc />
 						</Button.Root>
 						<Button.Root
 							type="button"
@@ -476,14 +478,8 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
 									<Icon name="send-2" className="-mr-1 h-3.5 w-3.5" />
 									Send invites
 									<span className="inline-flex items-center gap-0.5">
-										<Icon
-											name="command"
-											className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
-										/>
-										<Icon
-											name="enter"
-											className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
-										/>
+										<KbdCommand />
+										<KbdEnter />
 									</span>
 								</>
 							)}

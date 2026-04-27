@@ -3,7 +3,7 @@
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import * as Kbd from "@reloop/ui/kbd";
+import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
 import { useHotkeys } from "react-hotkeys-hook";
 
 const openDocs = () => window.open("https://reloop.sh/docs/emails", "_blank");
@@ -31,7 +31,7 @@ export const DocsButton = (props: ButtonProps) => {
 		>
 			<Icon name="book-closed" className="h-4 w-4" />
 			Docs
-			<Kbd.Root className="bg-bg-weak-50 text-[10px]">D</Kbd.Root>
+			<KbdKeyOutline>D</KbdKeyOutline>
 		</Button.Root>
 	);
 };

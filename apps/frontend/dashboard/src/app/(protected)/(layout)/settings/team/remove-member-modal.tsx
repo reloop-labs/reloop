@@ -1,7 +1,7 @@
 "use client";
 
 import * as Button from "@reloop/ui/button";
-import * as Kbd from "@reloop/ui/kbd";
+import { KbdEsc } from "@reloop/ui/kbd-esc";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 
@@ -48,7 +48,7 @@ export const RemoveMemberModal = ({
 						disabled={isRemoving}
 					>
 						Cancel
-						<Kbd.Root className="bg-bg-weak-50 text-xs">Esc</Kbd.Root>
+						<KbdEsc />
 					</Button.Root>
 					<Button.Root
 						type="button"

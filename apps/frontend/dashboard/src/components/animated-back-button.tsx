@@ -1,6 +1,6 @@
 "use client";
 
-import * as Kbd from "@reloop/ui/kbd";
+import { KbdEsc } from "@reloop/ui/kbd-esc";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -69,11 +69,7 @@ export const AnimatedBackButton = ({
 			<span className="text-xs transition-all duration-300 group-hover:tracking-wide">
 				Back
 			</span>
-			{showEscKey && (
-				<Kbd.Root className="bg-bg-weak-50 px-1.5 py-0.5 text-[10px]">
-					Esc
-				</Kbd.Root>
-			)}
+			{showEscKey && <KbdEsc />}
 		</button>
 	);
 };

@@ -2,7 +2,7 @@
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import * as Kbd from "@reloop/ui/kbd";
+import { KbdEsc } from "@reloop/ui/kbd-esc";
 import * as Modal from "@reloop/ui/modal";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -171,7 +171,7 @@ export const DeletePropertyModal = ({
 								disabled={isDeleting}
 							>
 								Cancel
-								<Kbd.Root className="bg-bg-weak-50 text-xs">Esc</Kbd.Root>
+								<KbdEsc />
 							</Button.Root>
 							<Button.Root
 								type="submit"

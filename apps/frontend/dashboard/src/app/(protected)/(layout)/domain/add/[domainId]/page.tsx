@@ -2,6 +2,9 @@
 import type { DomainResponse } from "@reloop/api";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
+import { KbdCommand } from "@reloop/ui/kbd-command";
+import { KbdEnter } from "@reloop/ui/kbd-enter";
+import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
 import { Skeleton } from "@reloop/ui/skeleton";
 import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
@@ -118,7 +121,7 @@ const NewDomainPage = () => {
 						docsUrl="https://reloop.sh/docs/dns/dmarc"
 					/>
 				)}
-				<div className="mt-5 flex items-center gap-3">
+				<div className="flex items-center gap-3 pt-10">
 					<Button.Root
 						onClick={handleVerifyAndNavigate}
 						size="xsmall"
@@ -126,15 +129,9 @@ const NewDomainPage = () => {
 						disabled={isVerifying}
 					>
 						{isVerifying ? "Verifying..." : "Verify DNS Records"}
-						<span className="inline-flex items-center gap-0.5">
-							<Icon
-								name="command"
-								className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
-							/>
-							<Icon
-								name="enter"
-								className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
-							/>
+						<span className="flex items-center gap-0.5">
+							<KbdCommand />
+							<KbdEnter />
 						</span>
 					</Button.Root>
 					<Button.Root
@@ -145,13 +142,9 @@ const NewDomainPage = () => {
 						className="gap-1.5"
 					>
 						Save & Verify later
-						<span className="inline-flex items-center gap-0.5">
-							<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-200 p-px font-medium text-[10px] uppercase">
-								V
-							</span>
-							<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-200 p-px font-medium text-[10px] uppercase">
-								L
-							</span>
+						<span className="flex items-center gap-0.5">
+							<KbdKeyOutline>V</KbdKeyOutline>
+							<KbdKeyOutline>L</KbdKeyOutline>
 						</span>
 					</Button.Root>
 				</div>

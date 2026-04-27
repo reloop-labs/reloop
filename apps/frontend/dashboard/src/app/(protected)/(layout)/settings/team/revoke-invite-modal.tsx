@@ -8,7 +8,7 @@ import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import * as Kbd from "@reloop/ui/kbd";
+import { KbdEsc } from "@reloop/ui/kbd-esc";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 
@@ -113,9 +113,7 @@ export const RevokeInviteModal = ({
 						className="justify-center"
 					>
 						Cancel
-						<Kbd.Root className="ml-1.5 border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600 text-xs">
-							Esc
-						</Kbd.Root>
+						<KbdEsc />
 					</Button.Root>
 					<Button.Root
 						type="button"

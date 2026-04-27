@@ -49,10 +49,10 @@ export const DNSAutoConnectBanner: React.FC<DNSAutoConnectBannerProps> = ({
 	};
 
 	return (
-		<div className="mb-8 overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/30 p-4 dark:border-stroke-soft-100/50">
+		<div className="mb-8 overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/30 p-4 dark:border-stroke-soft-100/40">
 			<div className="flex items-center justify-between gap-6">
 				<div className="flex items-center gap-4">
-					<div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-bg-white-0 shadow-sm ring-1 ring-stroke-soft-100 dark:bg-bg-weak-50/50">
+					<div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-bg-white-0 shadow-sm ring-1 ring-stroke-soft-100 dark:bg-bg-weak-50/50 dark:ring-stroke-soft-100/40">
 						{dnsIcon ? (
 							<div
 								className="flex h-10 w-10 items-center justify-center rounded-lg"

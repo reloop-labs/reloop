@@ -3,6 +3,9 @@
 import { DomainApiDetails } from "@fe/dashboard/components/api-details/domain";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
+import { KbdCommand } from "@reloop/ui/kbd-command";
+import { KbdKey } from "@reloop/ui/kbd-key";
+import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
 import Link from "next/link";
 import { useHotkeys } from "react-hotkeys-hook";
 
@@ -27,9 +30,7 @@ export const DomainListHeader = () => {
 				>
 					<Icon name="book-closed" className="h-4 w-4" />
 					Docs
-					<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-200 p-px font-medium text-[10px] uppercase">
-						D
-					</span>
+					<KbdKeyOutline>D</KbdKeyOutline>
 				</Button.Root>
 				<Link
 					className={`${Button.buttonVariants({
@@ -41,13 +42,8 @@ export const DomainListHeader = () => {
 					<Icon name="plus" className="h-4 w-4" />
 					Add domain
 					<span className="inline-flex items-center gap-0.5">
-						<Icon
-							name="command"
-							className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
-						/>
-						<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-100/20 p-px font-medium text-[10px] uppercase">
-							a
-						</span>
+						<KbdCommand />
+						<KbdKey>a</KbdKey>
 					</span>
 				</Link>
 				<DomainApiDetails />

@@ -133,7 +133,7 @@ export const DeleteDomainModal = ({
 							<div className="mb-2">
 								<p className="mb-2 text-sm text-text-sub-600">
 									Type{" "}
-									<span className="inline-flex max-w-xs items-center gap-1 truncate rounded-lg border border-stroke-soft-100 bg-bg-weak-50/50 px-2 py-0.5 font-medium text-text-strong-950 text-xs dark:bg-bg-strong-200">
+									<span className="inline-flex max-w-xs items-center gap-1 truncate rounded-[6px] border border-stroke-soft-100 bg-bg-weak-50/50 px-1.5 py-0.5 font-medium text-text-strong-950 text-xs dark:border-stroke-soft-100/40 dark:bg-bg-strong-200">
 										{domainToDelete?.domain}
 										<button
 											type="button"
@@ -163,25 +163,23 @@ export const DeleteDomainModal = ({
 									</span>{" "}
 									to confirm
 								</p>
-								<Input.Root size="small">
+								<Input.Root size="small" className="rounded-[10px]">
 									<Input.Wrapper>
 										<Input.Input
 											type="text"
 											value={confirmationText}
 											onChange={(e) => setConfirmationText(e.target.value)}
 											placeholder={domainToDelete?.domain}
-											className="font-mono text-sm"
 										/>
 									</Input.Wrapper>
 								</Input.Root>
 							</div>
 						</div>
 
-						<div className="flex flex-col-reverse justify-end gap-4 px-6 pb-6 sm:flex-row sm:items-center">
+						<div className="flex flex-col-reverse justify-end gap-2 px-6 pb-6 sm:flex-row sm:items-center">
 							<Button.Root
 								variant="neutral"
 								mode="stroke"
-								size="xsmall"
 								onClick={handleCancel}
 								disabled={isDeleting}
 								className="gap-1.5"
@@ -194,7 +192,6 @@ export const DeleteDomainModal = ({
 							<Button.Root
 								type="submit"
 								variant="error"
-								size="xsmall"
 								disabled={
 									isDeleting || confirmationText !== domainToDelete?.domain
 								}

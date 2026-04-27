@@ -2,7 +2,7 @@
 
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
-import * as Kbd from "@reloop/ui/kbd";
+import { KbdEsc } from "@reloop/ui/kbd-esc";
 import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
@@ -284,7 +284,7 @@ export const AddContactToTopicModal = ({
 								disabled={isSubmitting}
 							>
 								Cancel
-								<Kbd.Root className="bg-bg-weak-50 text-xs">Esc</Kbd.Root>
+								<KbdEsc />
 							</Button.Root>
 							<Button.Root
 								type="submit"
