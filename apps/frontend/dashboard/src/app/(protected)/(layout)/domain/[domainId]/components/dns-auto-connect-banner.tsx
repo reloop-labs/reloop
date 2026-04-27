@@ -3,6 +3,7 @@
 import type { DomainNameserversResponse, DomainResponse } from "@reloop/api";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
+import { Skeleton } from "@reloop/ui/skeleton";
 import { useParams } from "next/navigation";
 import * as React from "react";
 import * as simpleIcons from "simple-icons";
@@ -12,6 +13,21 @@ import { inferDnsProvider } from "../utils";
 interface DNSAutoConnectBannerProps {
 	domain?: DomainResponse;
 }
+
+const DNSAutoConnectBannerSkeleton = () => (
+	<div className="mb-8 overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/30 p-4 dark:border-stroke-soft-100/40">
+		<div className="flex items-center justify-between gap-6">
+			<div className="flex items-center gap-4">
+				<Skeleton className="h-12 w-12 rounded-xl" />
+				<div className="space-y-2">
+					<Skeleton className="h-5 w-48" />
+					<Skeleton className="h-4 w-72" />
+				</div>
+			</div>
+			<Skeleton className="h-10 w-40 rounded-lg" />
+		</div>
+	</div>
+);
 
 export const DNSAutoConnectBanner: React.FC<DNSAutoConnectBannerProps> = ({
 	domain,
@@ -28,8 +44,13 @@ export const DNSAutoConnectBanner: React.FC<DNSAutoConnectBannerProps> = ({
 		[nameservers],
 	);
 
-	if (isLoading || domain?.status === "active" || domain?.dnsConfigured) {
+	// Show only if domain status is "start-verify" and DNS is not yet configured
+	if (domain?.status !== "start-verify" || domain?.dnsConfigured) {
 		return null;
+	}
+
+	if (isLoading) {
+		return <DNSAutoConnectBannerSkeleton />;
 	}
 
 	const handleAutoConnect = async () => {
@@ -46,7 +67,7 @@ export const DNSAutoConnectBanner: React.FC<DNSAutoConnectBannerProps> = ({
 			: null;
 
 		return (
-			<div className="mb-8 overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/30 p-4 dark:border-stroke-soft-100/40">
+			<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/30 p-4 dark:border-stroke-soft-100/40">
 				<div className="flex items-center justify-between gap-6">
 					<div className="flex items-center gap-4">
 						<div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-bg-white-0 shadow-sm ring-1 ring-stroke-soft-100 dark:bg-bg-weak-50/50 dark:ring-stroke-soft-100/40">
@@ -117,10 +138,10 @@ export const DNSAutoConnectBanner: React.FC<DNSAutoConnectBannerProps> = ({
 
 	// State: DNS Provider NOT Found (Manual Setup Required)
 	return (
-		<div className="mb-8 overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/30 p-4 dark:border-stroke-soft-100/40">
+		<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/30 p-4 dark:border-stroke-soft-100/40">
 			<div className="flex flex-col gap-6">
 				<div className="flex items-center gap-4">
-					<div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-bg-white-0 shadow-sm ring-1 ring-stroke-soft-100 dark:bg-bg-weak-50/50 dark:ring-stroke-soft-100/40">
+					<div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-bg-white-0 ring-1 ring-stroke-soft-100 dark:bg-bg-weak-50/50 dark:ring-stroke-soft-100/40">
 						<Icon name="server" className="h-6 w-6 text-text-soft-400" />
 						<div className="absolute top-2 right-2 size-2 rounded-full border border-bg-white-0 bg-error-base dark:border-stroke-soft-100/40" />
 					</div>

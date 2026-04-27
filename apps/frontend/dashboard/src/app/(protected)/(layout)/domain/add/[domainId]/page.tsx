@@ -26,7 +26,7 @@ const NewDomainPage = () => {
 		`/api/domain/v1/${domainId}`,
 	);
 
-	useHotkeys("v+l", () => {
+	useHotkeys("esc", () => {
 		router.push("/domain");
 	});
 

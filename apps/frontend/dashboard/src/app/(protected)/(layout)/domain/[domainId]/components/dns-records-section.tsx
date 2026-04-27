@@ -22,7 +22,9 @@ export const DNSRecordsSection = ({
 
 	return (
 		<div className="mt-6 mb-24">
-			<DNSAutoConnectBanner domain={domain} />
+			<div className="pb-5">
+				<DNSAutoConnectBanner domain={domain} />
+			</div>
 			<DNSRecordSectionGroup
 				title="Domain verification (DKIM)"
 				docsUrl="https://reloop.sh/docs/dns/dkim"
