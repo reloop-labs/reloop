@@ -259,9 +259,9 @@ export const ApiKeyHeader = ({
 						{isLoading ? (
 							<Skeleton className="mt-2 h-7 w-48 rounded-lg" />
 						) : (
-							<div className="flex items-center gap-1">
-								<div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-white text-xs uppercase tracking-wide shadow-sm">
-									{displayName.charAt(0).toUpperCase()}
+							<div className="flex items-center gap-1.5">
+								<div className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-[6px] bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-white text-xs uppercase tracking-wide shadow-sm">
+									<Icon name="key-new" className="h-3 w-3" />
 								</div>
 								<h1 className="font-medium text-title-h6 leading-8">
 									{displayName}
