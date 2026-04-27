@@ -1,6 +1,4 @@
 import { CardGroup } from "@reloop/fe-docs/components/mdx/CardGroup";
-import { PromptActions } from "@reloop/fe-docs/components/mdx/PromptActions";
-import { SimpleIcon } from "@reloop/fe-docs/components/mdx/SimpleIcon";
 import {
 	Accordion,
 	Callout,
@@ -9,32 +7,18 @@ import {
 	CodeGroup,
 	Info,
 	Note,
-	Steps,
 	Step,
-	Tabs,
+	Steps,
 	Tab,
+	Tabs,
 	Tip,
 	Warning,
 } from "@reloop/fe-docs/components/mdx/mintlify-client";
+import { PromptActions } from "@reloop/fe-docs/components/mdx/PromptActions";
+import { SimpleIcon } from "@reloop/fe-docs/components/mdx/SimpleIcon";
 import type { MDXComponents } from "mdx/types";
 import React from "react";
-
-const APIPage = (props: any) => {
-	return (
-		<div className="my-8 rounded-xl border border-fd-border bg-fd-muted/10 p-6">
-			<div className="flex items-center gap-2 text-fd-muted-foreground">
-				<div className="h-2 w-2 rounded-full bg-blue-500" />
-				<span className="font-medium text-sm tracking-wide uppercase">API Endpoint</span>
-			</div>
-			<div className="mt-4 font-mono text-sm">
-				{props.operations?.[0]?.method?.toUpperCase()} {props.operations?.[0]?.path}
-			</div>
-			<div className="mt-6 text-fd-muted-foreground text-sm italic">
-				API Reference rendering is currently being optimized. 
-			</div>
-		</div>
-	);
-};
+import { APIPage } from "./components/mdx/APIPage";
 
 const getSlug = (children: React.ReactNode): string => {
 	if (typeof children === "string")
@@ -63,7 +47,8 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
 		...components,
 		Card: ({ icon, ...props }: any) => {
 			const processedIcon =
-				typeof icon === "string" && (icon.startsWith("si") || icon.startsWith("Si")) ? (
+				typeof icon === "string" &&
+				(icon.startsWith("si") || icon.startsWith("Si")) ? (
 					<SimpleIcon name={icon} />
 				) : (
 					icon
@@ -75,11 +60,20 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
 				<table className="w-full border-collapse text-sm" {...props} />
 			</div>
 		),
-		thead: (props) => <thead className="border-fd-border border-b text-left" {...props} />,
-		tbody: (props) => <tbody className="divide-fd-border divide-y" {...props} />,
-		tr: (props) => <tr className="transition-colors hover:bg-fd-muted/50" {...props} />,
+		thead: (props) => (
+			<thead className="border-fd-border border-b text-left" {...props} />
+		),
+		tbody: (props) => (
+			<tbody className="divide-y divide-fd-border" {...props} />
+		),
+		tr: (props) => (
+			<tr className="transition-colors hover:bg-fd-muted/50" {...props} />
+		),
 		th: (props) => (
-			<th className="px-4 py-3 font-semibold text-fd-muted-foreground" {...props} />
+			<th
+				className="px-4 py-3 font-semibold text-fd-muted-foreground"
+				{...props}
+			/>
 		),
 		td: (props) => <td className="px-4 py-3 text-fd-foreground" {...props} />,
 		Accordion,
@@ -101,4 +95,3 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
 		APIPage,
 	};
 }
-

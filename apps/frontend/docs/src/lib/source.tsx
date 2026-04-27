@@ -65,6 +65,7 @@ function buildTree(dir: string, base = ""): PageTreeItem[] {
 						data.sidebarTitle || data.title || path.basename(mdxPath, ".mdx"),
 					url: url || "/introduction",
 					icon: Icon ? <Icon className="h-4 w-4" /> : undefined,
+					method: (data._openapi as any)?.method,
 				} as PageTreeItem;
 			}
 

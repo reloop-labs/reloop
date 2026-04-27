@@ -18,7 +18,7 @@ import {
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { SearchDialog } from "./search-dialog";
 
 interface SidebarProps {
@@ -29,6 +29,52 @@ interface SidebarProps {
 
 export function Sidebar({ tree, isMobile, onLinkClick }: SidebarProps) {
 	const pathname = usePathname();
+	const activeTab =
+		navigationTabs.find((tab) =>
+			tab.url === "/" ? pathname === "/" : pathname.startsWith(tab.url),
+		) ?? navigationTabs[0];
+
+	// Filter tree based on active section
+	const filteredTree = useMemo(() => {
+		if (!tree || !Array.isArray(tree)) return [];
+
+		// 1. Get all specialized section URLs (excluding root)
+		const sectionPaths = navigationTabs
+			.filter((tab) => tab.url !== "/")
+			.map((tab) => tab.url.replace("/", ""));
+
+		const currentPath = activeTab?.url?.replace("/", "") || "";
+
+		// 2. If we are in a specialized section (API, Webhooks, etc.)
+		if (currentPath) {
+			const sectionFolder = tree.find((node) => {
+				if (node.type !== "folder") return false;
+				// Safely get folder name as string
+				const folderName = String(node.name || "").toLowerCase();
+				// Match if folder name is same as path or starts with it (e.g., webhook vs webhooks)
+				return (
+					folderName === currentPath.toLowerCase() ||
+					folderName.startsWith(currentPath.toLowerCase())
+				);
+			});
+
+			return sectionFolder && sectionFolder.type === "folder"
+				? sectionFolder.children
+				: [];
+		}
+
+		// 3. For the main Documentation ('/'), hide all specialized folders
+		return tree.filter((node) => {
+			if (node.type !== "folder") return true;
+			const folderName = String(node.name || "").toLowerCase();
+			return !sectionPaths.some(
+				(p) =>
+					folderName === p.toLowerCase() ||
+					folderName.startsWith(p.toLowerCase()),
+			);
+		});
+	}, [tree, activeTab]);
+
 	const [hoveredRect, setHoveredRect] = useState<{
 		top: number;
 		left: number;
@@ -150,7 +196,7 @@ export function Sidebar({ tree, isMobile, onLinkClick }: SidebarProps) {
 				</AnimatePresence>
 
 				<div className="relative z-10 flex flex-col gap-px">
-					{tree.map((node, index) => (
+					{filteredTree.map((node, index) => (
 						<SidebarSection
 							key={index}
 							node={node}
@@ -169,7 +215,7 @@ export function Sidebar({ tree, isMobile, onLinkClick }: SidebarProps) {
 			<SearchDialog
 				open={isSearchOpen}
 				onOpenChange={setIsSearchOpen}
-				tree={tree}
+				tree={filteredTree}
 			/>
 		</aside>
 	);
@@ -511,6 +557,20 @@ function SidebarLink({
 				)}
 				<span className="truncate">{node.name as string}</span>
 			</div>
+			{node.method && (
+				<span
+					className={cn(
+						"ml-auto rounded px-1.5 py-0.5 font-bold text-[9px] uppercase tracking-wider",
+						node.method === "GET" && "bg-green-500/10 text-green-600 dark:text-green-400",
+						node.method === "POST" && "bg-blue-500/10 text-blue-600 dark:text-blue-400",
+						node.method === "DELETE" && "bg-red-500/10 text-red-600 dark:text-red-400",
+						node.method === "PATCH" && "bg-orange-500/10 text-orange-600 dark:text-orange-400",
+						node.method === "PUT" && "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400",
+					)}
+				>
+					{node.method}
+				</span>
+			)}
 		</Link>
 	);
 }

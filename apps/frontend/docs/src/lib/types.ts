@@ -13,6 +13,7 @@ export interface PageNode {
 	name: ReactNode;
 	url: string;
 	icon?: ReactNode;
+	method?: string;
 }
 
 export interface FolderNode {
