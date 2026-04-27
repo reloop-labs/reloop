@@ -33,11 +33,7 @@ export const FormStep = ({
 
 	return (
 		<form onSubmit={handleSubmit(onSubmit)}>
-			<ModalHeader
-				title="Create API Key"
-				subtitle="Create an API key to authenticate requests to Reloop"
-				onClose={onClose}
-			/>
+			<ModalHeader title="Create API Key" icon="key-new" onClose={onClose} />
 
 			<Modal.Body className="space-y-4 px-5 py-4 pb-5">
 				<div className="flex flex-col gap-1.5">

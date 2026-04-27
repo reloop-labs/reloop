@@ -5,38 +5,33 @@ import { CodeBlock } from "@reloop/ui/code-block";
 import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
 import { useState } from "react";
+import { toast } from "sonner";
 import { ModalHeader } from "./header";
 
 interface SuccessStepProps {
 	apiKey: string;
-	isCopied: boolean;
-	onCopy: () => void;
 	onContinue: () => void;
 }
 
-export const SuccessStep = ({
-	apiKey,
-	isCopied,
-	onCopy,
-	onContinue,
-}: SuccessStepProps) => {
-	const [copy, setCopy] = useState(false);
+export const SuccessStep = ({ apiKey, onContinue }: SuccessStepProps) => {
+	const [copied, setCopied] = useState(false);
 
-	const handleCopy = () => {
-		if (!isCopied) {
-			onCopy();
+	const handleCopy = async () => {
+		try {
+			await navigator.clipboard.writeText(`RELOOP_API_KEY=${apiKey}`);
+			setCopied(true);
+			setTimeout(() => setCopied(false), 2000);
+		} catch {
+			toast.error("Failed to copy API key");
 		}
-		setCopy(true);
-		setTimeout(() => setCopy(false), 2000);
 	};
-
-	const showCopiedState = isCopied && copy;
 
 	return (
 		<div className="flex flex-col">
 			<ModalHeader
 				title="API Key Created"
-				subtitle="Make sure to copy your API key now. You won't be able to see it again!"
+				icon="check-circle"
+				iconClassName="text-success-base"
 				onClose={() => {}} // Disabled in success state unless copied
 				showCloseIcon={false}
 			/>
@@ -53,7 +48,7 @@ export const SuccessStep = ({
 								className="cursor-pointer"
 							>
 								<Icon
-									name={showCopiedState ? "check" : "copy"}
+									name={copied ? "check" : "copy"}
 									className={"h-3.5 w-3.5 stroke-3"}
 								/>
 							</button>
@@ -71,17 +66,11 @@ export const SuccessStep = ({
 				</div>
 
 				<div className="mt-3">
-					{isCopied ? (
-						<p className="flex items-center gap-1.5 text-success-base text-xs">
-							<Icon name="check-circle" className="h-3.5 w-3.5" />
-							Key copied! You can now safely close this dialog.
-						</p>
-					) : (
-						<p className="flex items-center gap-1.5 text-error-base text-xs">
-							<Icon name="alert-triangle" className="h-3.5 w-3.5" />
-							Please copy your API key before continuing.
-						</p>
-					)}
+					<p className="flex items-center gap-1.5 text-error-base text-xs">
+						<Icon name="alert-triangle" className="h-3.5 w-3.5" />
+						Make sure to copy your API key now. You won't be able to see it
+						again!
+					</p>
 				</div>
 			</Modal.Body>
 
@@ -91,7 +80,7 @@ export const SuccessStep = ({
 					variant="neutral"
 					size="xsmall"
 					onClick={onContinue}
-					disabled={!isCopied}
+					className="gap-2"
 				>
 					Continue
 					<span className="inline-flex items-center gap-0.5">

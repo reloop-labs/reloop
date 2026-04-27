@@ -1,14 +1,17 @@
 "use client";
 import * as Button from "@reloop/ui/button";
-import { cn } from "@reloop/ui/cn";
+import { CodeBlock } from "@reloop/ui/code-block";
 import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import axios from "axios";
 import { useQueryState } from "nuqs";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
+
+import { ModalHeader } from "./create-api-key-modal/header";
 
 interface ApiKeyData {
 	id: string;
@@ -46,21 +49,19 @@ export const RotateApiKeyModal = ({ apiKeys }: RotateApiKeyModalProps) => {
 		apiKeyToRotate?.prefix ||
 		"Unnamed";
 
-	// Block browser refresh/close when key is rotated but not copied
-	useEffect(() => {
-		if (rotatedApiKey && !keyCopied) {
-			const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-				e.preventDefault();
-				e.returnValue =
-					"You haven't copied your new API key yet. Are you sure you want to leave?";
-				return e.returnValue;
-			};
-
-			window.addEventListener("beforeunload", handleBeforeUnload);
-			return () =>
-				window.removeEventListener("beforeunload", handleBeforeUnload);
-		}
-	}, [rotatedApiKey, keyCopied]);
+	// Command/Ctrl + Enter to handle actions
+	useHotkeys(
+		"mod+enter",
+		(e) => {
+			e.preventDefault();
+			if (!rotatedApiKey) {
+				handleRotate();
+			} else {
+				handleClose();
+			}
+		},
+		{ enabled: !!rotateId },
+	);
 
 	const handleRotate = async () => {
 		if (!apiKeyToRotate) return;
@@ -91,9 +92,11 @@ export const RotateApiKeyModal = ({ apiKeys }: RotateApiKeyModalProps) => {
 	const handleCopyKey = async () => {
 		if (rotatedApiKey?.key) {
 			try {
-				await navigator.clipboard.writeText(rotatedApiKey.key);
+				await navigator.clipboard.writeText(
+					`RELOOP_API_KEY=${rotatedApiKey.key}`,
+				);
 				setKeyCopied(true);
-				toast.success("API key copied to clipboard");
+				setTimeout(() => setKeyCopied(false), 2000);
 			} catch {
 				toast.error("Failed to copy API key");
 			}
@@ -101,18 +104,12 @@ export const RotateApiKeyModal = ({ apiKeys }: RotateApiKeyModalProps) => {
 	};
 
 	const handleClose = () => {
-		if (!rotatedApiKey || keyCopied) {
-			setRotateId(null);
-			setRotatedApiKey(null);
-			setKeyCopied(false);
-		}
+		setRotateId(null);
+		setRotatedApiKey(null);
+		setKeyCopied(false);
 	};
 
 	const handleOpenChange = (open: boolean) => {
-		if (!open && rotatedApiKey && !keyCopied) {
-			toast.warning("Please copy your API key before closing");
-			return;
-		}
 		if (!open) {
 			handleClose();
 		}
@@ -121,91 +118,97 @@ export const RotateApiKeyModal = ({ apiKeys }: RotateApiKeyModalProps) => {
 	return (
 		<Modal.Root open={!!rotateId} onOpenChange={handleOpenChange}>
 			<Modal.Content
-				className="rounded-20 border-none p-0 sm:max-w-[480px]"
-				showClose={!rotatedApiKey || keyCopied}
+				className="overflow-hidden rounded-2xl border border-stroke-soft-100 p-0 sm:max-w-[480px] dark:border-stroke-soft-100/40"
+				showClose={false}
 			>
-				<div className="rounded-20 border border-stroke-soft-100/50 bg-bg-white-0">
-					{rotatedApiKey ? (
-						/* --- Result Stage --- */
-						<div className="p-6">
-							<div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-success-base/10 text-success-base">
-								<Icon name="check-circle" className="h-5 w-5" />
-							</div>
+				{rotatedApiKey ? (
+					/* --- Result Stage --- */
+					<div className="flex flex-col">
+						<ModalHeader
+							title="API Key Rotated"
+							icon="check-circle"
+							iconClassName="text-success-base"
+							onClose={() => {}}
+							showCloseIcon={false}
+						/>
 
-							<h2 className="font-medium text-text-strong-950 text-title-h5">
-								API key rotated successfully
-							</h2>
-							<p className="mb-6 text-pretty text-sm text-text-sub-600 leading-relaxed">
-								Make sure to copy the new secret key now. You won't be able to
-								see it again after closing this dialog. Update your applications
-								with the new key.
-							</p>
-
-							<div className="mb-6 space-y-2">
-								<div className="flex items-center justify-between">
-									<span className="font-medium text-text-sub-600 text-xs uppercase tracking-wider">
-										New Secret Key
-									</span>
-									{keyCopied && (
-										<span className="flex items-center gap-1 font-medium text-success-base text-xs">
-											<Icon name="check" className="h-3 w-3" />
-											Copied
-										</span>
-									)}
+						<Modal.Body className="space-y-4 px-5 py-3.5">
+							<div className="group relative overflow-hidden rounded-2xl border border-stroke-soft-100 dark:border-stroke-soft-100/40">
+								{/* Code Block Header */}
+								<div className="flex items-center justify-between px-4 py-2">
+									<p className="font-medium text-sm text-text-sub-600">.env</p>
+									<div className="flex items-center gap-2">
+										<button
+											type="button"
+											onClick={handleCopyKey}
+											className="cursor-pointer"
+										>
+											<Icon
+												name={keyCopied ? "check" : "copy"}
+												className={"h-3.5 w-3.5 stroke-3"}
+											/>
+										</button>
+									</div>
 								</div>
-								<div className="group relative overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4 transition-all hover:bg-bg-weak-50 dark:border-stroke-soft-100/40">
-									<code className="block text-wrap break-all pr-10 font-mono text-sm text-text-strong-950">
-										{rotatedApiKey.key}
-									</code>
-									<button
-										type="button"
-										onClick={handleCopyKey}
-										className={cn(
-											"-translate-y-1/2 absolute top-1/2 right-2 rounded-lg p-2 transition-all",
-											keyCopied
-												? "bg-success-base/10 text-success-base"
-												: "bg-bg-white-0 text-text-sub-600 shadow-sm hover:text-text-strong-950",
-										)}
-									>
-										<Icon
-											name={keyCopied ? "check" : "clipboard-copy"}
-											className="h-4 w-4"
-										/>
-									</button>
+								<div className="rounded-t-[10px] rounded-b-2xl bg-bg-weak-50/70 dark:bg-bg-weak-50/45">
+									<CodeBlock
+										code={`RELOOP_API_KEY=${rotatedApiKey.key}`}
+										lang="bash"
+										className="text-[10px]"
+										hideLineNumbers={true}
+										noScroll={true}
+									/>
 								</div>
 							</div>
 
-							<div className="flex justify-end px-6 pb-6">
-								<Button.Root
-									variant="neutral"
-									size="xsmall"
-									onClick={handleClose}
-									disabled={!keyCopied}
-									className="gap-2"
-								>
-									Done
-									<Icon name="check" className="h-4 w-4" />
-								</Button.Root>
+							<div className="mt-3">
+								<p className="flex items-center gap-1.5 text-error-base text-xs">
+									<Icon name="alert-triangle" className="h-3.5 w-3.5" />
+									Make sure to copy your API key now. You won't be able to see
+									it again!
+								</p>
 							</div>
+						</Modal.Body>
+
+						<div className="flex items-center justify-end border-stroke-soft-100 border-t px-5 py-3.5 dark:border-stroke-soft-100/50">
+							<Button.Root
+								variant="neutral"
+								size="xsmall"
+								onClick={handleClose}
+								className="gap-2"
+							>
+								Done
+								<span className="inline-flex items-center gap-0.5">
+									<Icon
+										name="command"
+										className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+									/>
+									<Icon
+										name="enter"
+										className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+									/>
+								</span>
+							</Button.Root>
 						</div>
-					) : (
-						/* --- Confirmation Stage --- */
-						<div className="p-6">
-							<div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-orange-500/10 text-orange-500">
-								<Icon name="rotate-cw" className="h-5 w-5" />
-							</div>
+					</div>
+				) : (
+					/* --- Confirmation Stage --- */
+					<div className="flex flex-col">
+						<ModalHeader
+							title="Rotate API Key"
+							icon="rotate-cw"
+							iconClassName="text-orange-500"
+							onClose={handleClose}
+						/>
 
-							<h2 className="font-medium text-text-strong-950 text-title-h5">
-								Rotate API key?
-							</h2>
-							<p className="mb-6 text-pretty text-sm text-text-sub-600 leading-relaxed">
-								This will generate a new secret for this API key. The old key
-								will stop working immediately. Any applications using this key
-								will need to be updated.
+						<Modal.Body className="space-y-4 px-5 py-4 pb-5">
+							<p className="text-sm text-text-sub-600 leading-relaxed">
+								This will invalidate the current key and generate a new one.
+								Applications using the old key will need to be updated.
 							</p>
 
 							{/* API Key Identity Card */}
-							<div className="mb-6 flex items-center gap-3 rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/30">
+							<div className="flex items-center gap-3 rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/30">
 								<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-500/10 text-orange-500">
 									<Icon name="key-new" className="h-5 w-5" />
 								</div>
@@ -213,16 +216,19 @@ export const RotateApiKeyModal = ({ apiKeys }: RotateApiKeyModalProps) => {
 									<p className="truncate font-medium text-sm text-text-strong-950">
 										{displayName}
 									</p>
-									<p className="mt-0.5 truncate font-semibold text-[11px] text-text-sub-600 text-xs">
+									<p className="mt-0.5 truncate font-semibold text-text-sub-600 text-xs">
 										{apiKeyToRotate?.start || "rl_"}...
 									</p>
 								</div>
 							</div>
+						</Modal.Body>
 
-							<div className="flex flex-col-reverse justify-end gap-2 sm:flex-row sm:items-center">
+						<div className="flex items-center justify-end border-stroke-soft-100 border-t px-5 py-3.5 dark:border-stroke-soft-100/50">
+							<div className="flex items-center gap-2">
 								<Button.Root
 									variant="neutral"
 									mode="stroke"
+									size="xsmall"
 									onClick={handleClose}
 									disabled={isRotating}
 									className="gap-1.5"
@@ -234,13 +240,14 @@ export const RotateApiKeyModal = ({ apiKeys }: RotateApiKeyModalProps) => {
 								</Button.Root>
 								<Button.Root
 									variant="neutral"
+									size="xsmall"
 									onClick={handleRotate}
 									disabled={isRotating}
 									className="gap-2"
 								>
 									{isRotating ? (
 										<>
-											<Spinner size={14} color="currentColor" />
+											<Spinner size={12} color="currentColor" />
 											Rotating...
 										</>
 									) : (
@@ -252,8 +259,8 @@ export const RotateApiKeyModal = ({ apiKeys }: RotateApiKeyModalProps) => {
 								</Button.Root>
 							</div>
 						</div>
-					)}
-				</div>
+					</div>
+				)}
 			</Modal.Content>
 		</Modal.Root>
 	);
