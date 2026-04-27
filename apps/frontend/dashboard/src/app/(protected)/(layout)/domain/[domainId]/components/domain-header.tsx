@@ -127,22 +127,10 @@ export const DomainHeader = ({ domain, isLoading }: DomainHeaderProps) => {
 									</span>
 								</Button.Root>
 							)}
-							<Button.Root
-								variant="neutral"
-								mode="stroke"
-								size="xsmall"
-								onClick={() =>
-									window.open("https://reloop.sh/docs/domain", "_blank")
-								}
-								className="gap-1.5 font-medium"
-							>
-								<Icon name="book-closed" className="h-4 w-4" />
-								Docs
-								<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-200 p-px font-medium text-[10px] uppercase">
-									D
-								</span>
-							</Button.Root>
-							<DomainHeaderActions domainRecordId={domainRecordId} />
+							<DomainHeaderActions
+								domain={domain}
+								domainRecordId={domainRecordId}
+							/>
 						</>
 					)}
 				</div>

@@ -3,7 +3,6 @@
 import type { DomainResponse } from "@reloop/api";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import Spinner from "@reloop/ui/spinner";
 import { format } from "date-fns";
 
 interface StatusTimelineProps {
@@ -37,10 +36,27 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 		},
 		{
 			number: 2,
-			label: isFailed ? "DNS Failed" : "Verifying DNS",
-			icon: "shield",
+			label:
+				domain.status === "active"
+					? "Verified"
+					: domain.status === "verifying"
+						? "Verifying DNS"
+						: domain.status === "failed"
+							? "DNS Verification Failed"
+							: "Start verification",
+			icon:
+				domain.status === "active"
+					? "shield-check"
+					: domain.status === "verifying"
+						? "scan"
+						: domain.status === "failed"
+							? "cross-circle"
+							: "question",
 			timestamp:
-				domain.lastVerifiedAt || domain.updatedAt
+				(domain.status === "active" ||
+					domain.status === "verifying" ||
+					domain.status === "failed") &&
+				(domain.lastVerifiedAt || domain.updatedAt)
 					? format(
 							new Date(domain.lastVerifiedAt || domain.updatedAt),
 							"MMM dd, h:mm a",
@@ -50,7 +66,7 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 		{
 			number: 3,
 			label: "Ready to Send",
-			icon: "list-unordered-4-rec",
+			icon: "mail-single",
 			timestamp:
 				domain.status === "active" && domain.lastVerifiedAt
 					? format(new Date(domain.lastVerifiedAt), "MMM dd, h:mm a")
@@ -105,25 +121,22 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 										)}
 									/>
 
-									{state === "failed" ? (
-										<Icon name="cross" className="relative z-10 h-5 w-5" />
-									) : state === "active" && domain.status === "verifying" ? (
-										<div className="relative z-10">
-											<Spinner size={12} color="currentColor" />
-										</div>
-									) : (
-										<Icon
-											name={step.icon}
-											className={cn(
-												"relative z-10 h-5 w-5 transition-colors duration-300",
-												state === "active" && step.number !== 1
-													? "text-warning-base"
-													: state === "completed" && canShowSuccess
-														? "text-success-base"
+									<Icon
+										name={step.icon}
+										className={cn(
+											"relative z-10 h-5 w-5 transition-colors duration-300",
+											state === "active" && step.number !== 1
+												? "text-warning-base"
+												: state === "completed" && canShowSuccess
+													? "text-success-base"
+													: state === "failed"
+														? "text-error-base"
 														: "text-text-soft-400",
-											)}
-										/>
-									)}
+											domain.status === "verifying" &&
+												step.number === 2 &&
+												"animate-spin",
+										)}
+									/>
 								</div>
 
 								{/* Connector Line */}

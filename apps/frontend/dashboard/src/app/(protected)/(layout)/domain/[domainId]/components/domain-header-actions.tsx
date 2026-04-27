@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
+import type { Domain } from "@reloop/api/types";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -11,28 +12,40 @@ import {
 } from "@reloop/ui/popover";
 import { useParams } from "next/navigation";
 import { useQueryState } from "nuqs";
-import { useRef, useState } from "react";
-
-const headerMenuItems = [
-	{
-		id: "delete",
-		label: "Delete Domain",
-		icon: "trash" as const,
-		isDanger: true,
-	},
-];
+import { useMemo, useRef, useState } from "react";
 
 interface DomainHeaderActionsProps {
+	domain?: Domain;
 	domainRecordId: string;
 }
 
 export const DomainHeaderActions = ({
+	domain,
 	domainRecordId,
 }: DomainHeaderActionsProps) => {
 	const { domainId: _domainId } = useParams();
 	const [, setDeleteId] = useQueryState("delete");
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
+
+	const headerMenuItems = useMemo(() => {
+		const items = [];
+
+		items.push({
+			id: "docs",
+			label: "Documentation",
+			icon: "book-closed" as const,
+		});
+
+		items.push({
+			id: "delete",
+			label: "Delete Domain",
+			icon: "trash" as const,
+			isDanger: true,
+		});
+
+		return items;
+	}, [domain?.nameservers, domain?.status]);
 
 	const currentTab = buttonRefs.current[hoverIdx ?? -1];
 	const currentRect = currentTab?.getBoundingClientRect();
@@ -68,6 +81,9 @@ export const DomainHeaderActions = ({
 							onClick={() => {
 								if (item.id === "delete") {
 									setDeleteId((domainRecordId || _domainId) as string);
+								}
+								if (item.id === "docs") {
+									window.open("https://reloop.sh/docs/domain", "_blank");
 								}
 							}}
 							className={cn(
