@@ -21,6 +21,15 @@ const logsService = new Elysia({
 					title: "Logs Service",
 					version: "1.0.0",
 				},
+				components: {
+					securitySchemes: {
+						apiKey: {
+							type: "apiKey",
+							name: "x-api-key",
+							in: "header",
+						},
+					},
+				},
 			},
 		}),
 	)

@@ -19,6 +19,7 @@ export interface PageNode {
 export interface FolderNode {
 	type: "folder";
 	name: ReactNode;
+	url: string;
 	children: PageTreeItem[];
 	icon?: ReactNode;
 	index?: PageNode;

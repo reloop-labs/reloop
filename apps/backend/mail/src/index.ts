@@ -18,7 +18,25 @@ const mailService = new Elysia({
 	name: "Mail Service",
 })
 	.use(evlog())
-	.use(openapi())
+	.use(
+		openapi({
+			documentation: {
+				info: {
+					title: "Mail Service",
+					version: "1.0.0",
+				},
+				components: {
+					securitySchemes: {
+						apiKey: {
+							type: "apiKey",
+							name: "x-api-key",
+							in: "header",
+						},
+					},
+				},
+			},
+		}),
+	)
 	.use(serverTiming())
 	.use(landing)
 	.use(mailRoutes)

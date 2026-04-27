@@ -1,6 +1,64 @@
 ---
 title: Introduction
-description: Overview of the Reloop API
+description: Understand general concepts, response codes, and authentication strategies.
 ---
 
-Welcome to the Reloop API Reference. Here you'll find everything you need to integrate Reloop into your application.
+Welcome to the Reloop API Reference. The Reloop API is built on **REST** principles. We enforce HTTPS in every request to improve data security, integrity, and privacy.
+
+## Base URL
+
+All requests contain the following base URL:
+
+```
+https://api.reloop.sh
+```
+
+## Authentication
+
+To authenticate, you need to add an `x-api-key` header with your API key:
+
+```bash
+curl -X GET "https://api.reloop.sh/api/domain/v1/list" \
+  -H "x-api-key: rl_YOUR_API_KEY"
+```
+
+You can generate API keys from the [Reloop Dashboard](https://reloop.sh/dashboard/api-keys). Each API key is scoped to an organization and can be rotated or revoked at any time.
+
+| Header | Value | Required |
+|--------|-------|----------|
+| `x-api-key` | Your Reloop API key (starts with `rl_`) | Yes |
+| `Content-Type` | `application/json` | For POST/PUT/PATCH requests |
+
+## Response Codes
+
+The API uses standard HTTP status codes to indicate success or failure:
+
+| Code | Description |
+|------|-------------|
+| `200` | OK — Request succeeded |
+| `201` | Created — Resource was created |
+| `400` | Bad Request — Invalid parameters |
+| `401` | Unauthorized — Missing or invalid API key |
+| `403` | Forbidden — Not allowed to access this resource |
+| `404` | Not Found — Resource doesn't exist |
+| `409` | Conflict — Resource already exists |
+| `429` | Too Many Requests — Rate limit exceeded |
+| `500` | Internal Server Error |
+
+## Rate Limits
+
+The API enforces rate limits to ensure fair usage. If you exceed the limit, you'll receive a `429` response. Rate limits are applied per API key.
+
+## Content Type
+
+All request and response bodies are encoded as JSON. Make sure to set the `Content-Type: application/json` header for requests with a body.
+
+## Errors
+
+All error responses follow a consistent format:
+
+```json
+{
+  "message": "A human-readable description of the error"
+}
+```

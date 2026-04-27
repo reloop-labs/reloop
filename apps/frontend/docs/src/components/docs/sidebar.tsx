@@ -49,13 +49,12 @@ export function Sidebar({ tree, isMobile, onLinkClick }: SidebarProps) {
 		if (currentPath) {
 			const sectionFolder = tree.find((node) => {
 				if (node.type !== "folder") return false;
-				// Safely get folder name as string
-				const folderName = String(node.name || "").toLowerCase();
-				// Match if folder name is same as path or starts with it (e.g., webhook vs webhooks)
-				return (
-					folderName === currentPath.toLowerCase() ||
-					folderName.startsWith(currentPath.toLowerCase())
-				);
+
+				// Match by URL instead of name for precision
+				const nodeUrl = (node.url || "").toLowerCase();
+				const tabUrl = activeTab.url.toLowerCase();
+
+				return nodeUrl === tabUrl || nodeUrl === `${tabUrl}/`;
 			});
 
 			return sectionFolder && sectionFolder.type === "folder"
@@ -64,13 +63,15 @@ export function Sidebar({ tree, isMobile, onLinkClick }: SidebarProps) {
 		}
 
 		// 3. For the main Documentation ('/'), hide all specialized folders
+		const allSectionUrls = navigationTabs
+			.filter((tab) => tab.url !== "/")
+			.map((tab) => tab.url.toLowerCase());
+
 		return tree.filter((node) => {
 			if (node.type !== "folder") return true;
-			const folderName = String(node.name || "").toLowerCase();
-			return !sectionPaths.some(
-				(p) =>
-					folderName === p.toLowerCase() ||
-					folderName.startsWith(p.toLowerCase()),
+			const nodeUrl = (node.url || "").toLowerCase();
+			return !allSectionUrls.some(
+				(url) => nodeUrl === url || nodeUrl.startsWith(`${url}/`),
 			);
 		});
 	}, [tree, activeTab]);

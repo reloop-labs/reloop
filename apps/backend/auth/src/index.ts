@@ -1,6 +1,6 @@
 import "dotenv/config";
 import cors from "@elysiajs/cors";
-import { swagger } from "@elysiajs/swagger";
+import { openapi } from "@elysiajs/openapi";
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
 import { authConfig } from "./auth.config";
@@ -13,8 +13,12 @@ const port = authConfig.port;
 const app = new Elysia({ prefix: "/api/auth", name: "Auth Service" })
 	.use(cors({ origin: "*" }))
 	.use(
-		swagger({
+		openapi({
 			documentation: {
+				info: {
+					title: "Auth Service",
+					version: "1.0.0",
+				},
 				components: await OpenAPI.components(),
 				paths: await OpenAPI.getPaths(),
 			},
@@ -30,3 +34,4 @@ const app = new Elysia({ prefix: "/api/auth", name: "Auth Service" })
 	});
 
 export type App = typeof app;
+

@@ -14,7 +14,25 @@ const webhookService = new Elysia({
 	prefix: "/api/webhook",
 	name: "Webhook Service",
 })
-	.use(openapi())
+	.use(
+		openapi({
+			documentation: {
+				info: {
+					title: "Webhook Service",
+					version: "1.0.0",
+				},
+				components: {
+					securitySchemes: {
+						apiKey: {
+							type: "apiKey",
+							name: "x-api-key",
+							in: "header",
+						},
+					},
+				},
+			},
+		}),
+	)
 	.use(serverTiming())
 	.use(landing)
 	.use(webhookRoutes)

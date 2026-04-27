@@ -13,7 +13,25 @@ const uploadService = new Elysia({
 	prefix: "/api/upload",
 	name: "Upload Service",
 })
-	.use(openapi())
+	.use(
+		openapi({
+			documentation: {
+				info: {
+					title: "Upload Service",
+					version: "1.0.0",
+				},
+				components: {
+					securitySchemes: {
+						apiKey: {
+							type: "apiKey",
+							name: "x-api-key",
+							in: "header",
+						},
+					},
+				},
+			},
+		}),
+	)
 	.use(serverTiming())
 	.use(landing)
 	.use(uploadRoutes)

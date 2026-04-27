@@ -105,6 +105,7 @@ function buildTree(dir: string, base = ""): PageTreeItem[] {
 					return {
 						type: "folder",
 						name: folderName,
+						url,
 						children,
 						icon: folderIcon,
 					} as PageTreeItem;

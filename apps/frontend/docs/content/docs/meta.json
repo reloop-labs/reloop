@@ -36,6 +36,9 @@
 		"resources/mcp-server",
 		"resources/security",
 		"integrations",
-		"resources/storing-webhooks-data"
+		"resources/storing-webhooks-data",
+		"api-keys",
+		"api",
+		"webhooks"
 	]
 }

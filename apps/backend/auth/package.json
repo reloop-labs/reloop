@@ -15,7 +15,7 @@
 		"@elysiajs/cron": "catalog:backend",
 		"@elysiajs/opentelemetry": "catalog:backend",
 		"@elysiajs/server-timing": "catalog:backend",
-		"@elysiajs/swagger": "catalog:backend",
+		"@elysiajs/openapi": "catalog:backend",
 		"@opentelemetry/exporter-trace-otlp-http": "catalog:backend",
 		"@opentelemetry/exporter-trace-otlp-proto": "catalog:backend",
 		"@opentelemetry/instrumentation-express": "catalog:backend",
