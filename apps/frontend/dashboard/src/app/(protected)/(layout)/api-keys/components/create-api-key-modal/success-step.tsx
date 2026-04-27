@@ -11,9 +11,14 @@ import { ModalHeader } from "./header";
 interface SuccessStepProps {
 	apiKey: string;
 	onContinue: () => void;
+	defaultHtml?: string;
 }
 
-export const SuccessStep = ({ apiKey, onContinue }: SuccessStepProps) => {
+export const SuccessStep = ({
+	apiKey,
+	onContinue,
+	defaultHtml,
+}: SuccessStepProps) => {
 	const [copied, setCopied] = useState(false);
 
 	const handleCopy = async () => {
@@ -61,6 +66,7 @@ export const SuccessStep = ({ apiKey, onContinue }: SuccessStepProps) => {
 							className="text-[10px]"
 							hideLineNumbers={true}
 							noScroll={true}
+							defaultHtml={defaultHtml}
 						/>
 					</div>
 				</div>

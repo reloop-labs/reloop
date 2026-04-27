@@ -2,6 +2,7 @@
 
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { valibotResolver } from "@hookform/resolvers/valibot";
+import { cn } from "@reloop/ui/cn";
 import * as Modal from "@reloop/ui/modal";
 import { useLoading } from "@reloop/ui/use-loading";
 import axios from "axios";
@@ -10,6 +11,7 @@ import { useState } from "react";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { useHotkeys } from "react-hotkeys-hook";
+import { codeToHtml } from "shiki";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
 import * as v from "valibot";
@@ -43,6 +45,7 @@ export const CreateApiKeyModal = ({
 	const router = useRouter();
 	const [createdApiKey, setCreatedApiKey] =
 		useState<ApiKeyWithKeyResponse | null>(null);
+	const [html, setHtml] = useState("");
 
 	const form = useForm<ApiKeyFormValues>({
 		resolver: valibotResolver(apiKeySchema) as Resolver<ApiKeyFormValues>,
@@ -80,6 +83,31 @@ export const CreateApiKeyModal = ({
 				(key) => typeof key === "string" && key.startsWith("/api/api-key/v1/"),
 			);
 
+			const generatedHtml = await codeToHtml(
+				`RELOOP_API_KEY=${response.data.key}`,
+				{
+					lang: "bash",
+					theme: "github-light",
+					transformers: [
+						{
+							pre(node) {
+								this.addClassToHast(
+									node,
+									cn(
+										"py-4",
+										"overflow-x-auto",
+										"whitespace-pre-wrap break-all",
+									),
+								);
+							},
+							line(node) {
+								this.addClassToHast(node, "line");
+							},
+						},
+					],
+				},
+			);
+			setHtml(generatedHtml);
 			setCreatedApiKey(response.data);
 			changeStatus("idle");
 			form.reset();
@@ -128,7 +156,11 @@ export const CreateApiKeyModal = ({
 						isLoading={status === "loading"}
 					/>
 				) : (
-					<SuccessStep apiKey={createdApiKey.key} onContinue={handleContinue} />
+					<SuccessStep
+						apiKey={createdApiKey.key}
+						onContinue={handleContinue}
+						defaultHtml={html}
+					/>
 				)}
 			</Modal.Content>
 		</Modal.Root>
