@@ -21,7 +21,7 @@ export const DomainEvents = ({ domain }: { domain: DomainResponse }) => {
 	};
 
 	return (
-		<div className="mt-7 flex flex-col gap-6 rounded-2xl border border-stroke-soft-200 bg-bg-weak-50/50 p-6">
+		<div className="mt-7 flex flex-col gap-6 rounded-2xl border border-stroke-soft-200 bg-bg-weak-50/50 p-6 dark:border-stroke-soft-100/40">
 			{/* Header Status */}
 			<div className="flex flex-col gap-1">
 				<div className="flex items-center gap-1.5">
@@ -35,7 +35,7 @@ export const DomainEvents = ({ domain }: { domain: DomainResponse }) => {
 				</p>
 			</div>
 
-			<div className="h-[1px] w-full bg-stroke-soft-200" />
+			<div className="h-[1px] w-full bg-stroke-soft-200 dark:bg-stroke-soft-100/40" />
 
 			<StatusTimeline domain={domain} />
 		</div>

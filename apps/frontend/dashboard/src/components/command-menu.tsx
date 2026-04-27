@@ -11,24 +11,18 @@ import { ArrowDown, ArrowUp, CornerDownLeft, Search, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import * as React from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 
 export function CommandMenuGlobal() {
 	const [open, setOpen] = React.useState(false);
 	const router = useRouter();
-	const { setTheme } = useTheme();
+	const { setTheme, resolvedTheme } = useTheme();
 
 	// Toggle with CMD+K shortcut
-	React.useEffect(() => {
-		const down = (e: KeyboardEvent) => {
-			if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
-				e.preventDefault();
-				setOpen((open) => !open);
-			}
-		};
-
-		document.addEventListener("keydown", down);
-		return () => document.removeEventListener("keydown", down);
-	}, []);
+	useHotkeys("mod+k", (e) => {
+		e.preventDefault();
+		setOpen((open) => !open);
+	});
 
 	const onSelect = (path: string) => {
 		if (!path) return;
@@ -36,14 +30,23 @@ export function CommandMenuGlobal() {
 		setOpen(false);
 	};
 
-	const onThemeSelect = (theme: string) => {
-		setTheme(theme);
+	const onThemeSelect = (themeValue: string) => {
+		if (themeValue === "toggle") {
+			setTheme(resolvedTheme === "light" ? "dark" : "light");
+		} else {
+			setTheme(themeValue);
+		}
 		setOpen(false);
 	};
 
 	const allNavigation = [...mainNavigation, ...userNavigation];
 
 	const appearanceOptions = [
+		{
+			label: "Toggle theme",
+			value: "toggle",
+			icon: resolvedTheme === "dark" ? "sun" : "moon",
+		},
 		{ label: "Light theme", value: "light", icon: "sun" },
 		{ label: "Dark theme", value: "dark", icon: "moon" },
 		{ label: "System theme", value: "system", icon: "monitor" },
