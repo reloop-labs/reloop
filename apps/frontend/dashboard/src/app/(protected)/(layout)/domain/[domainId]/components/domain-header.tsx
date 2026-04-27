@@ -109,13 +109,13 @@ export const DomainHeader = ({ domain, isLoading }: DomainHeaderProps) => {
 						<>
 							{(status === "start-verify" || status === "failed") && (
 								<Button.Root
-									variant={status === "failed" ? "error" : "neutral"}
+									variant="neutral"
 									size="xsmall"
 									onClick={handleVerifyDNS}
 									disabled={isVerifying}
 									className="font-medium"
 								>
-									{status === "failed" ? "Try Again" : "Verify Domain"}
+									{status === "failed" ? "Verify DNS Again" : "Verify Domain"}
 									<span className="inline-flex items-center gap-0.5">
 										<Icon
 											name="command"

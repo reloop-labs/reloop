@@ -21,33 +21,33 @@ export const DNSRecordsSection = ({
 	);
 
 	return (
-		<div className="mt-6 mb-24">
-			<div className="pb-5">
-				<DNSAutoConnectBanner domain={domain} />
+		<div className="mt-6 mb-24 space-y-5">
+			<DNSAutoConnectBanner domain={domain} />
+			<div>
+				<DNSRecordSectionGroup
+					title="Domain verification (DKIM)"
+					docsUrl="https://reloop.sh/docs/dns/dkim"
+					records={dkimRecords}
+					isLoading={!!isLoading}
+					tableId="dkim-"
+				/>
+
+				<DNSRecordSectionGroup
+					title="Sending Email (SPF)"
+					docsUrl="https://reloop.sh/docs/dns/spf"
+					records={sendingRecords}
+					isLoading={!!isLoading}
+					tableId="spf-"
+				/>
+
+				<DNSRecordSectionGroup
+					title="Reject spoofed emails (DMARC)"
+					docsUrl="https://reloop.sh/docs/dns/dmarc"
+					records={dmarcRecords}
+					isLoading={!!isLoading}
+					tableId="dmarc-"
+				/>
 			</div>
-			<DNSRecordSectionGroup
-				title="Domain verification (DKIM)"
-				docsUrl="https://reloop.sh/docs/dns/dkim"
-				records={dkimRecords}
-				isLoading={!!isLoading}
-				tableId="dkim-"
-			/>
-
-			<DNSRecordSectionGroup
-				title="Sending Email (SPF)"
-				docsUrl="https://reloop.sh/docs/dns/spf"
-				records={sendingRecords}
-				isLoading={!!isLoading}
-				tableId="spf-"
-			/>
-
-			<DNSRecordSectionGroup
-				title="Reject spoofed emails (DMARC)"
-				docsUrl="https://reloop.sh/docs/dns/dmarc"
-				records={dmarcRecords}
-				isLoading={!!isLoading}
-				tableId="dmarc-"
-			/>
 		</div>
 	);
 };

@@ -44,8 +44,13 @@ export const DNSAutoConnectBanner: React.FC<DNSAutoConnectBannerProps> = ({
 		[nameservers],
 	);
 
-	// Show only if domain status is "start-verify" and DNS is not yet configured
-	if (domain?.status !== "start-verify" || domain?.dnsConfigured) {
+	const status = domain?.status || "start-verify";
+
+	// Show only if domain status is "start-verify" or "failed" and DNS is not yet configured
+	if (
+		(status !== "start-verify" && status !== "failed") ||
+		domain?.dnsConfigured
+	) {
 		return null;
 	}
 
