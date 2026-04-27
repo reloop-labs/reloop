@@ -21,7 +21,6 @@ import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
 import { EditApiKeyModal } from "../../components/edit-api-key-modal";
-import { RotateApiKeyModal } from "../../components/rotate-api-key-modal";
 
 interface ApiKeyData {
 	id: string;
@@ -425,18 +424,20 @@ export const ApiKeyHeader = ({
 							</span>
 						</div>
 						{isLoading ? (
-							<Skeleton className="h-5 w-20 rounded-lg" />
+							<Skeleton className="h-5 w-24 rounded-lg" />
 						) : (
-							<span
+							<div
 								className={cn(
-									"inline-flex w-fit rounded-md border-[1px] px-[6px] py-0.5 font-medium text-[10px]",
-									apiKey?.enabled
-										? "border border-success-base bg-success-light/20 text-success-base"
-										: "border border-error-base bg-error-light/20 text-error-base",
+									"flex w-fit items-center gap-1.5 font-medium text-sm capitalize",
+									apiKey?.enabled ? "text-success-base" : "text-error-base",
 								)}
 							>
-								{apiKey?.enabled ? "Enabled" : "Disabled"}
-							</span>
+								<Icon
+									name={apiKey?.enabled ? "check-circle" : "cross-circle"}
+									className="h-3.5 w-3.5"
+								/>
+								{apiKey?.enabled ? "Active" : "Disabled"}
+							</div>
 						)}
 					</div>
 
@@ -511,23 +512,11 @@ export const ApiKeyHeader = ({
 
 			{/* Modals */}
 			{apiKey && (
-				<>
-					<RotateApiKeyModal
-						apiKeys={[
-							{
-								id: apiKey.id,
-								name: apiKey.name,
-								start: apiKey.start,
-								prefix: apiKey.prefix,
-							},
-						]}
-					/>
-					<EditApiKeyModal
-						isOpen={isEditModalOpen}
-						onClose={() => setIsEditModalOpen(false)}
-						apiKey={apiKey}
-					/>
-				</>
+				<EditApiKeyModal
+					isOpen={isEditModalOpen}
+					onClose={() => setIsEditModalOpen(false)}
+					apiKey={apiKey}
+				/>
 			)}
 		</>
 	);

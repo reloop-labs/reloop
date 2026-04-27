@@ -4,6 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import useSWR from "swr";
 import { DeleteApiKeyModal } from "../components/delete-api-key-modal";
+import { RotateApiKeyModal } from "../components/rotate-api-key-modal";
 import { ApiKeyHeader } from "./components/api-key-header";
 
 interface ApiKeyData {
@@ -112,6 +113,7 @@ const ApiKeyDetailPage = () => {
 				apiKeys={apiKeysForModal}
 				onDeleteSuccess={handleDeleteSuccess}
 			/>
+			<RotateApiKeyModal apiKeys={apiKeysForModal} />
 		</>
 	);
 };
