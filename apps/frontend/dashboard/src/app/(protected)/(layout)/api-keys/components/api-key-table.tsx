@@ -217,6 +217,7 @@ export const ApiKeyTable = ({
 }: ApiKeyTableProps) => {
 	const router = useRouter();
 	const [, setDeleteId] = useQueryState("delete");
+	const [, setRotateId] = useQueryState("rotate");
 	const [, setModal] = useQueryState("modal");
 	const [currentPage, setCurrentPage] = useQueryState(
 		"page",
@@ -227,9 +228,6 @@ export const ApiKeyTable = ({
 		parseAsInteger.withDefault(10),
 	);
 	const [togglingId, setTogglingId] = useState<string | null>(null);
-	const [rotateModalApiKey, setRotateModalApiKey] = useState<ApiKeyData | null>(
-		null,
-	);
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 
 	const totalPages = Math.ceil(total / (pageSize ?? 10));
@@ -503,7 +501,7 @@ export const ApiKeyTable = ({
 											apiKey={apiKey}
 											onViewDetails={handleViewDetails}
 											onToggleEnabled={handleToggleEnabled}
-											onRotateKey={setRotateModalApiKey}
+											onRotateKey={(key) => setRotateId(key.id)}
 											onDeleteKey={handleDeleteApiKey}
 											isToggling={togglingId === apiKey.id}
 											onOpenChange={(open) =>
@@ -543,20 +541,7 @@ export const ApiKeyTable = ({
 				)}
 			</div>
 			<DeleteApiKeyModal apiKeys={apiKeys} />
-			{rotateModalApiKey && (
-				<RotateApiKeyModal
-					isOpen={!!rotateModalApiKey}
-					onClose={() => setRotateModalApiKey(null)}
-					apiKeyId={rotateModalApiKey.id}
-					apiKeyName={
-						rotateModalApiKey.name ||
-						rotateModalApiKey.start ||
-						rotateModalApiKey.prefix ||
-						"Unnamed"
-					}
-					apiKeyStart={rotateModalApiKey.start}
-				/>
-			)}
+			<RotateApiKeyModal apiKeys={apiKeys} />
 		</>
 	);
 };

@@ -16,6 +16,7 @@ import {
 import { Skeleton } from "@reloop/ui/skeleton";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
@@ -99,9 +100,9 @@ export const ApiKeyHeader = ({
 	useUserOrganization();
 
 	const { mutate } = useSWRConfig();
+	const [, setRotateId] = useQueryState("rotate");
 	const [copied, setCopied] = useState(false);
 	const [isToggling, setIsToggling] = useState(false);
-	const [isRotateModalOpen, setIsRotateModalOpen] = useState(false);
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
@@ -160,7 +161,9 @@ export const ApiKeyHeader = ({
 		if (itemId === "docs") {
 			window.open("https://reloop.sh/docs/api-keys", "_blank");
 		} else if (itemId === "rotate") {
-			setIsRotateModalOpen(true);
+			if (apiKey?.id) {
+				setRotateId(apiKey.id);
+			}
 		} else if (itemId === "edit") {
 			setIsEditModalOpen(true);
 		} else if (itemId === "delete") {
@@ -510,11 +513,14 @@ export const ApiKeyHeader = ({
 			{apiKey && (
 				<>
 					<RotateApiKeyModal
-						isOpen={isRotateModalOpen}
-						onClose={() => setIsRotateModalOpen(false)}
-						apiKeyId={apiKey.id}
-						apiKeyName={displayName}
-						apiKeyStart={apiKey.start}
+						apiKeys={[
+							{
+								id: apiKey.id,
+								name: apiKey.name,
+								start: apiKey.start,
+								prefix: apiKey.prefix,
+							},
+						]}
 					/>
 					<EditApiKeyModal
 						isOpen={isEditModalOpen}

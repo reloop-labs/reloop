@@ -5,9 +5,17 @@ import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import axios from "axios";
+import { useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
+
+interface ApiKeyData {
+	id: string;
+	name: string | null;
+	start: string | null;
+	prefix: string | null;
+}
 
 interface ApiKeyWithKeyResponse {
 	id: string;
@@ -20,25 +28,23 @@ interface ApiKeyWithKeyResponse {
 }
 
 interface RotateApiKeyModalProps {
-	isOpen: boolean;
-	onClose: () => void;
-	apiKeyId: string;
-	apiKeyName: string;
-	apiKeyStart?: string | null;
+	apiKeys: ApiKeyData[];
 }
 
-export const RotateApiKeyModal = ({
-	isOpen,
-	onClose,
-	apiKeyId,
-	apiKeyName,
-	apiKeyStart,
-}: RotateApiKeyModalProps) => {
+export const RotateApiKeyModal = ({ apiKeys }: RotateApiKeyModalProps) => {
+	const [rotateId, setRotateId] = useQueryState("rotate");
 	const [isRotating, setIsRotating] = useState(false);
 	const [rotatedApiKey, setRotatedApiKey] =
 		useState<ApiKeyWithKeyResponse | null>(null);
 	const [keyCopied, setKeyCopied] = useState(false);
 	const { mutate } = useSWRConfig();
+
+	const apiKeyToRotate = apiKeys.find((apiKey) => apiKey.id === rotateId);
+	const displayName =
+		apiKeyToRotate?.name ||
+		apiKeyToRotate?.start ||
+		apiKeyToRotate?.prefix ||
+		"Unnamed";
 
 	// Block browser refresh/close when key is rotated but not copied
 	useEffect(() => {
@@ -57,10 +63,12 @@ export const RotateApiKeyModal = ({
 	}, [rotatedApiKey, keyCopied]);
 
 	const handleRotate = async () => {
+		if (!apiKeyToRotate) return;
+
 		try {
 			setIsRotating(true);
 			const response = await axios.post<ApiKeyWithKeyResponse>(
-				`/api/api-key/v1/rotate/${apiKeyId}`,
+				`/api/api-key/v1/rotate/${apiKeyToRotate.id}`,
 				{},
 				{ withCredentials: true },
 			);
@@ -94,9 +102,9 @@ export const RotateApiKeyModal = ({
 
 	const handleClose = () => {
 		if (!rotatedApiKey || keyCopied) {
+			setRotateId(null);
 			setRotatedApiKey(null);
 			setKeyCopied(false);
-			onClose();
 		}
 	};
 
@@ -111,7 +119,7 @@ export const RotateApiKeyModal = ({
 	};
 
 	return (
-		<Modal.Root open={isOpen} onOpenChange={handleOpenChange}>
+		<Modal.Root open={!!rotateId} onOpenChange={handleOpenChange}>
 			<Modal.Content
 				className="rounded-20 border-none p-0 sm:max-w-[480px]"
 				showClose={!rotatedApiKey || keyCopied}
@@ -146,7 +154,7 @@ export const RotateApiKeyModal = ({
 									)}
 								</div>
 								<div className="group relative overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4 transition-all hover:bg-bg-weak-50 dark:border-stroke-soft-100/40">
-									<code className="block break-all pr-10 font-mono text-sm text-text-strong-950">
+									<code className="block text-wrap break-all pr-10 font-mono text-sm text-text-strong-950">
 										{rotatedApiKey.key}
 									</code>
 									<button
@@ -167,7 +175,7 @@ export const RotateApiKeyModal = ({
 								</div>
 							</div>
 
-							<div className="flex justify-end">
+							<div className="flex justify-end px-6 pb-6">
 								<Button.Root
 									variant="neutral"
 									size="xsmall"
@@ -203,10 +211,10 @@ export const RotateApiKeyModal = ({
 								</div>
 								<div className="min-w-0 flex-1">
 									<p className="truncate font-medium text-sm text-text-strong-950">
-										{apiKeyName}
+										{displayName}
 									</p>
 									<p className="mt-0.5 truncate font-semibold text-[11px] text-text-sub-600 text-xs">
-										{apiKeyStart || "rl_"}...
+										{apiKeyToRotate?.start || "rl_"}...
 									</p>
 								</div>
 							</div>
