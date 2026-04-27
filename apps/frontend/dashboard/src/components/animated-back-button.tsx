@@ -45,28 +45,28 @@ export const AnimatedBackButton = ({
 			className="flex cursor-pointer items-center gap-1 py-1.5 pr-2 font-medium text-text-sub-600 text-xs transition-colors duration-200 hover:text-text-strong-950"
 		>
 			{/* Icon track */}
-			<div className="relative flex h-3.5 w-4 items-center">
+			<div className="relative flex h-3.5 w-3.5 items-center">
 				{/* Tail — grows from left, anchored to chevron tip */}
 				<motion.div
-					className="-translate-y-1/2 absolute top-1/2 left-[2px] h-[1.5px] rounded-full bg-current"
+					className="-translate-y-1/2 absolute top-1/2 left-[1.5px] h-[1.5px] rounded-full bg-current"
 					initial={{ width: 0, opacity: 0 }}
 					animate={{
-						width: hovered ? 12 : 0,
+						width: hovered ? 10 : 0,
 						opacity: hovered ? 1 : 0,
 					}}
 					transition={transition}
 				/>
 				{/* Chevron — stationary */}
 				<motion.svg
-					width={8}
-					height={11}
-					viewBox="0 0 8 11"
+					width={6}
+					height={10}
+					viewBox="0 0 6 10"
 					fill="none"
 					className="absolute left-0"
 					transition={transition}
 				>
 					<path
-						d="M6.5 1.5L2 5.5L6.5 9.5"
+						d="M5 1L1.5 5L5 9"
 						stroke="currentColor"
 						strokeWidth={1.5}
 						strokeLinecap="round"
