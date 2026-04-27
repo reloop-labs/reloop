@@ -98,8 +98,17 @@ export const EditApiKeyModal = ({ apiKeys }: EditApiKeyModalProps) => {
 
 	const handleClose = () => {
 		setEditId(null);
-		reset();
 	};
+
+	// Reset state when modal is closed
+	useEffect(() => {
+		if (!editId) {
+			const timer = setTimeout(() => {
+				reset();
+			}, 300); // Wait for transition
+			return () => clearTimeout(timer);
+		}
+	}, [editId, reset]);
 
 	return (
 		<Modal.Root

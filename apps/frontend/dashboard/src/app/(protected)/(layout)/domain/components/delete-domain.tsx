@@ -7,7 +7,7 @@ import * as Modal from "@reloop/ui/modal";
 import axios from "axios";
 import { usePathname, useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 
@@ -74,8 +74,17 @@ export const DeleteDomainModal = ({
 
 	const handleCancel = () => {
 		setDeleteId(null);
-		setConfirmationText("");
 	};
+
+	// Reset state when modal is closed
+	useEffect(() => {
+		if (!deleteId) {
+			const timer = setTimeout(() => {
+				setConfirmationText("");
+			}, 300); // Wait for transition
+			return () => clearTimeout(timer);
+		}
+	}, [deleteId]);
 
 	return (
 		<Modal.Root
@@ -83,7 +92,6 @@ export const DeleteDomainModal = ({
 			onOpenChange={(open) => {
 				if (!open) {
 					setDeleteId(null);
-					setConfirmationText("");
 				}
 			}}
 		>

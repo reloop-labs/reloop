@@ -7,7 +7,7 @@ import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import axios from "axios";
 import { useQueryState } from "nuqs";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { codeToHtml } from "shiki";
 import { toast } from "sonner";
@@ -130,10 +130,7 @@ export const RotateApiKeyModal = ({ apiKeys }: RotateApiKeyModalProps) => {
 	};
 
 	const handleClose = () => {
-		handleCopyKey();
 		setRotateId(null);
-		setRotatedApiKey(null);
-		setKeyCopied(false);
 	};
 
 	const handleOpenChange = (open: boolean) => {
@@ -141,6 +138,18 @@ export const RotateApiKeyModal = ({ apiKeys }: RotateApiKeyModalProps) => {
 			handleClose();
 		}
 	};
+
+	// Reset state when modal is closed
+	useEffect(() => {
+		if (!rotateId) {
+			const timer = setTimeout(() => {
+				setRotatedApiKey(null);
+				setKeyCopied(false);
+				setHtml("");
+			}, 300); // Wait for transition
+			return () => clearTimeout(timer);
+		}
+	}, [rotateId]);
 
 	return (
 		<Modal.Root open={!!rotateId} onOpenChange={handleOpenChange}>

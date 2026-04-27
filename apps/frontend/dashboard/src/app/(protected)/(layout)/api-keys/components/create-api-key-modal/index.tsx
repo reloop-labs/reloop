@@ -7,7 +7,7 @@ import * as Modal from "@reloop/ui/modal";
 import { useLoading } from "@reloop/ui/use-loading";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -131,10 +131,20 @@ export const CreateApiKeyModal = ({
 	};
 
 	const handleClose = () => {
-		setCreatedApiKey(null);
-		form.reset();
 		onClose();
 	};
+
+	// Reset state when modal is closed
+	useEffect(() => {
+		if (!isOpen) {
+			const timer = setTimeout(() => {
+				setCreatedApiKey(null);
+				setHtml("");
+				form.reset();
+			}, 300); // Wait for transition
+			return () => clearTimeout(timer);
+		}
+	}, [isOpen, form]);
 
 	return (
 		<Modal.Root open={isOpen} onOpenChange={handleClose}>
