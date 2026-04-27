@@ -5,18 +5,19 @@ import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
-import { useLoading } from "@reloop/ui/use-loading";
+import Spinner from "@reloop/ui/spinner";
 import axios from "axios";
+import { useQueryState } from "nuqs";
+import { useEffect } from "react";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
+import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
 import * as v from "valibot";
 
 const editApiKeySchema = v.object({
-	name: v.optional(
-		v.pipe(v.string(), v.minLength(1, "Name must be at least 1 character")),
-	),
+	name: v.pipe(v.string(), v.minLength(1, "Name must be at least 1 character")),
 });
 
 type EditApiKeyFormValues = v.InferInput<typeof editApiKeySchema>;
@@ -26,59 +27,68 @@ interface ApiKeyData {
 	name: string | null;
 	start: string | null;
 	prefix: string | null;
-	enabled: boolean;
-	rateLimitEnabled: boolean;
-	rateLimitTimeWindow: number;
-	rateLimitMax: number;
-	expiresAt: string | null;
-	permissions: string | null;
 }
 
 interface EditApiKeyModalProps {
-	isOpen: boolean;
-	onClose: () => void;
-	apiKey: ApiKeyData;
+	apiKeys: ApiKeyData[];
 }
 
-export const EditApiKeyModal = ({
-	isOpen,
-	onClose,
-	apiKey,
-}: EditApiKeyModalProps) => {
-	const { changeStatus, status } = useLoading();
+export const EditApiKeyModal = ({ apiKeys }: EditApiKeyModalProps) => {
+	const [editId, setEditId] = useQueryState("edit");
 	const { mutate } = useSWRConfig();
 
-	const { register, handleSubmit, formState, reset } =
-		useForm<EditApiKeyFormValues>({
-			resolver: valibotResolver(
-				editApiKeySchema,
-			) as Resolver<EditApiKeyFormValues>,
-			defaultValues: {
-				name: apiKey.name || "",
-			},
-		});
+	const apiKeyToEdit = apiKeys.find((apiKey) => apiKey.id === editId);
+
+	const {
+		register,
+		handleSubmit,
+		formState: { errors, isSubmitting },
+		reset,
+	} = useForm<EditApiKeyFormValues>({
+		resolver: valibotResolver(
+			editApiKeySchema,
+		) as Resolver<EditApiKeyFormValues>,
+		defaultValues: {
+			name: apiKeyToEdit?.name || "",
+		},
+	});
+
+	// Reset form when modal opens with a new key
+	useEffect(() => {
+		if (editId && apiKeyToEdit) {
+			reset({
+				name: apiKeyToEdit.name || "",
+			});
+		}
+	}, [editId, apiKeyToEdit, reset]);
+
+	useHotkeys(
+		"mod+enter",
+		(e) => {
+			e.preventDefault();
+			handleSubmit(onSubmit)();
+		},
+		{ enableOnFormTags: ["INPUT"], enabled: !!editId },
+	);
 
 	const onSubmit = async (data: EditApiKeyFormValues) => {
+		if (!apiKeyToEdit) return;
+
 		try {
-			changeStatus("loading");
-			const payload: Record<string, unknown> = {};
+			await axios.patch(
+				`/api/api-key/v1/${apiKeyToEdit.id}`,
+				{ name: data.name },
+				{ withCredentials: true },
+			);
 
-			if (data.name !== undefined && data.name !== apiKey.name) {
-				payload.name = data.name;
-			}
-
-			await axios.patch(`/api/api-key/v1/${apiKey.id}`, payload, {
-				withCredentials: true,
-			});
-
-			await mutate(`/api/api-key/v1/${apiKey.id}`);
-			await mutate("/api/api-key/v1/?limit=100");
+			await mutate(`/api/api-key/v1/${apiKeyToEdit.id}`);
+			await mutate(
+				(key) => typeof key === "string" && key.startsWith("/api/api-key/v1/"),
+			);
 
 			toast.success("API key updated successfully");
-			changeStatus("idle");
-			onClose();
+			handleClose();
 		} catch (error) {
-			changeStatus("idle");
 			const errorMessage = axios.isAxiosError(error)
 				? error.response?.data?.message || "Failed to update API key"
 				: "Failed to update API key";
@@ -87,61 +97,59 @@ export const EditApiKeyModal = ({
 	};
 
 	const handleClose = () => {
+		setEditId(null);
 		reset();
-		onClose();
 	};
 
 	return (
-		<Modal.Root open={isOpen} onOpenChange={handleClose}>
+		<Modal.Root
+			open={!!editId}
+			onOpenChange={(open) => {
+				if (!open) handleClose();
+			}}
+		>
 			<Modal.Content
-				className="rounded-2xl border border-stroke-soft-100/50 p-0.5 sm:max-w-[480px]"
+				className="rounded-20 border-none p-0 sm:max-w-[480px]"
 				showClose={true}
 			>
-				<div className="rounded-2xl border border-stroke-soft-100/50">
+				<div className="rounded-20 border border-stroke-soft-100/50 bg-bg-white-0">
 					<form onSubmit={handleSubmit(onSubmit)}>
-						<Modal.Header className="before:border-stroke-soft-200/50">
-							<div className="flex items-center justify-center">
-								<Icon name="edit-2" className="h-4 w-4" />
+						<div className="p-6">
+							<div className="mb-4 flex items-center gap-2">
+								<Icon name="edit" className="h-4 w-4 text-text-strong-950" />
+								<h2 className="font-medium text-text-strong-950">
+									Edit API key
+								</h2>
 							</div>
-							<div className="flex-1">
-								<Modal.Title>Edit API Key</Modal.Title>
-							</div>
-						</Modal.Header>
-						<Modal.Body className="space-y-4">
-							<p className="text-sm text-text-sub-600">
-								Update the name for this API key.
-							</p>
-
-							<div className="flex flex-col gap-1">
-								<Label.Root htmlFor="name">
-									Name
+							<div className="flex flex-col gap-1.5">
+								<Label.Root htmlFor="name" className="text-text-strong-950">
+									Key Name
 									<Label.Asterisk />
 								</Label.Root>
-								<Input.Root size="small">
+								<Input.Root size="small" className="rounded-[10px]">
 									<Input.Wrapper>
 										<Input.Input
-											className="px-2"
 											id="name"
-											placeholder="e.g., Production Server, My App"
+											placeholder="e.g. Production Server, Web App"
 											{...register("name")}
 										/>
 									</Input.Wrapper>
 								</Input.Root>
-								{formState.errors.name && (
-									<p className="text-error-base text-paragraph-xs">
-										{formState.errors.name.message}
+								{errors.name && (
+									<p className="font-medium text-error-base text-paragraph-xs">
+										{errors.name.message}
 									</p>
 								)}
 							</div>
-						</Modal.Body>
-						<Modal.Footer className="mt-4 flex items-center justify-end gap-3 border-stroke-soft-100/50">
+						</div>
+
+						<div className="flex flex-col-reverse justify-end gap-2 px-6 pb-6 sm:flex-row sm:items-center">
 							<Button.Root
-								type="button"
 								variant="neutral"
 								mode="stroke"
-								size="xsmall"
 								onClick={handleClose}
-								disabled={status === "loading"}
+								disabled={isSubmitting}
+								className="gap-1.5"
 							>
 								Cancel
 								<span className="flex h-[19px] w-7 items-center justify-center rounded-[5px] border border-stroke-soft-100 bg-bg-weak-50/50 p-px font-medium text-[10px]">
@@ -151,17 +159,21 @@ export const EditApiKeyModal = ({
 							<Button.Root
 								type="submit"
 								variant="neutral"
-								size="xsmall"
-								disabled={status === "loading"}
+								disabled={isSubmitting}
+								className="gap-2"
 							>
-								{status === "loading" ? (
+								{isSubmitting ? (
 									<>
-										<Icon name="loader-2" className="h-4 w-4 animate-spin" />
+										<Spinner size={14} color="currentColor" />
 										Saving...
 									</>
 								) : (
 									<>
-										Save Changes
+										Save changes
+										<Icon
+											name="command"
+											className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+										/>
 										<Icon
 											name="enter"
 											className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
@@ -169,7 +181,7 @@ export const EditApiKeyModal = ({
 									</>
 								)}
 							</Button.Root>
-						</Modal.Footer>
+						</div>
 					</form>
 				</div>
 			</Modal.Content>

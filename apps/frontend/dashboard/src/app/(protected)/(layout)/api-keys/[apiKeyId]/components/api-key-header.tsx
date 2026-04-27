@@ -20,7 +20,6 @@ import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
-import { EditApiKeyModal } from "../../components/edit-api-key-modal";
 
 interface ApiKeyData {
 	id: string;
@@ -100,9 +99,9 @@ export const ApiKeyHeader = ({
 
 	const { mutate } = useSWRConfig();
 	const [, setRotateId] = useQueryState("rotate");
+	const [, setEditId] = useQueryState("edit");
 	const [copied, setCopied] = useState(false);
 	const [isToggling, setIsToggling] = useState(false);
-	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 
@@ -164,7 +163,9 @@ export const ApiKeyHeader = ({
 				setRotateId(apiKey.id);
 			}
 		} else if (itemId === "edit") {
-			setIsEditModalOpen(true);
+			if (apiKey?.id) {
+				setEditId(apiKey.id);
+			}
 		} else if (itemId === "delete") {
 			onDeleteApiKey?.();
 		}
@@ -509,15 +510,6 @@ export const ApiKeyHeader = ({
 					</div>
 				</div>
 			</div>
-
-			{/* Modals */}
-			{apiKey && (
-				<EditApiKeyModal
-					isOpen={isEditModalOpen}
-					onClose={() => setIsEditModalOpen(false)}
-					apiKey={apiKey}
-				/>
-			)}
 		</>
 	);
 };

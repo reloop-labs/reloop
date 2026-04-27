@@ -21,6 +21,7 @@ import { parseAsInteger, useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { DeleteApiKeyModal } from "./delete-api-key-modal";
+import { EditApiKeyModal } from "./edit-api-key-modal";
 import { EmptyState } from "./empty-state";
 import { RotateApiKeyModal } from "./rotate-api-key-modal";
 
@@ -70,6 +71,7 @@ interface ApiKeyActionsDropdownProps {
 	apiKey: ApiKeyData;
 	onViewDetails: (id: string) => void;
 	onToggleEnabled: (apiKey: ApiKeyData) => void;
+	onEditKey: (apiKey: ApiKeyData) => void;
 	onRotateKey: (apiKey: ApiKeyData) => void;
 	onDeleteKey: (id: string) => void;
 	isToggling: boolean;
@@ -80,6 +82,7 @@ const ApiKeyActionsDropdown = ({
 	apiKey,
 	onViewDetails,
 	onToggleEnabled,
+	onEditKey,
 	onRotateKey,
 	onDeleteKey,
 	isToggling,
@@ -106,6 +109,12 @@ const ApiKeyActionsDropdown = ({
 			id: "toggle",
 			label: apiKey.enabled ? "Disable" : "Enable",
 			icon: toggleIcon as "pause" | "play",
+			isDanger: false,
+		},
+		{
+			id: "edit",
+			label: "Edit",
+			icon: "edit" as const,
 			isDanger: false,
 		},
 		{
@@ -218,6 +227,7 @@ export const ApiKeyTable = ({
 	const router = useRouter();
 	const [, setDeleteId] = useQueryState("delete");
 	const [, setRotateId] = useQueryState("rotate");
+	const [, setEditId] = useQueryState("edit");
 	const [, setModal] = useQueryState("modal");
 	const [currentPage, setCurrentPage] = useQueryState(
 		"page",
@@ -240,6 +250,10 @@ export const ApiKeyTable = ({
 
 	const handleViewDetails = (apiKeyId: string) => {
 		router.push(`/api-keys/${apiKeyId}`);
+	};
+
+	const handleEditApiKey = (apiKey: ApiKeyData) => {
+		setEditId(apiKey.id);
 	};
 
 	const handleAddApiKey = () => {
@@ -501,6 +515,7 @@ export const ApiKeyTable = ({
 											apiKey={apiKey}
 											onViewDetails={handleViewDetails}
 											onToggleEnabled={handleToggleEnabled}
+											onEditKey={handleEditApiKey}
 											onRotateKey={(key) => setRotateId(key.id)}
 											onDeleteKey={handleDeleteApiKey}
 											isToggling={togglingId === apiKey.id}
@@ -542,6 +557,7 @@ export const ApiKeyTable = ({
 			</div>
 			<DeleteApiKeyModal apiKeys={apiKeys} />
 			<RotateApiKeyModal apiKeys={apiKeys} />
+			<EditApiKeyModal apiKeys={apiKeys} />
 		</>
 	);
 };
