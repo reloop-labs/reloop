@@ -30,6 +30,11 @@ const NewDomainPage = () => {
 		router.push("/domain");
 	});
 
+	useHotkeys("mod+enter", (e) => {
+		e.preventDefault();
+		handleVerifyAndNavigate();
+	});
+
 	const copyToClipboard = async (text: string) => {
 		try {
 			await navigator.clipboard.writeText(text);

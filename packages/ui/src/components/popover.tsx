@@ -41,7 +41,7 @@ const PopoverContent = React.forwardRef<
 					// base
 					[
 						!unstyled &&
-							"w-max rounded-2xl bg-bg-white-0 p-5 shadow-regular-md ring-1 ring-stroke-soft-200 ring-inset",
+							"w-max rounded-2xl bg-bg-white-0 p-5 shadow-regular-md ring-1 ring-stroke-soft-100 ring-inset dark:ring-stroke-soft-100/40",
 					],
 					"z-50",
 					// animation
@@ -55,7 +55,7 @@ const PopoverContent = React.forwardRef<
 				<Slottable>{children}</Slottable>
 				{showArrow && (
 					<PopoverPrimitive.Arrow asChild>
-						<div className="-translate-y-[calc(50%+1px)] -rotate-45 size-[11px] rounded-bl-[3px] border border-stroke-soft-200 bg-bg-white-0 [clip-path:polygon(0_100%,0_0,100%_100%)]" />
+						<div className="-translate-y-[calc(50%+1px)] -rotate-45 size-[11px] rounded-bl-[3px] border border-stroke-soft-100 bg-bg-white-0 [clip-path:polygon(0_100%,0_0,100%_100%)] dark:border-stroke-soft-100/40" />
 					</PopoverPrimitive.Arrow>
 				)}
 			</PopoverPrimitive.Content>

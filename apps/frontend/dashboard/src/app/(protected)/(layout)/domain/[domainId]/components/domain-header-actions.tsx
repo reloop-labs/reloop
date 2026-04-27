@@ -51,7 +51,7 @@ export const DomainHeaderActions = ({
 			</PopoverTrigger>
 			<PopoverContent
 				align="end"
-				sideOffset={8}
+				sideOffset={0}
 				className="w-44 rounded-xl p-1.5"
 				showArrow
 			>
@@ -71,7 +71,7 @@ export const DomainHeaderActions = ({
 								}
 							}}
 							className={cn(
-								"flex w-full cursor-pointer items-center gap-2 rounded-lg py-1.5 pl-2 font-normal text-xs transition-colors",
+								"flex w-full cursor-pointer items-center gap-2 rounded-lg py-1.5 pl-2 font-medium text-[13px] transition-colors",
 								item.isDanger ? "text-error-base" : "text-text-strong-950",
 								!currentRect &&
 									hoverIdx === idx &&
