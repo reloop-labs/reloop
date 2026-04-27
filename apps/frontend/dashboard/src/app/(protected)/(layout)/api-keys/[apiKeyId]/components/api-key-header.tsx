@@ -134,7 +134,7 @@ export const ApiKeyHeader = ({
 				? `/api/api-key/v1/disable/${apiKey.id}`
 				: `/api/api-key/v1/enable/${apiKey.id}`;
 
-			await axios.post(endpoint, {}, { headers: { credentials: "include" } });
+			await axios.post(endpoint, {}, { withCredentials: true });
 
 			await mutate(`/api/api-key/v1/${apiKey.id}`);
 			await mutate(

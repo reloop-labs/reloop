@@ -237,10 +237,10 @@ export const ApiKeyTable = ({
 		try {
 			setTogglingId(apiKey.id);
 			const endpoint = apiKey.enabled
-				? `/api/api-key/v1/${apiKey.id}/disable`
-				: `/api/api-key/v1/${apiKey.id}/enable`;
+				? `/api/api-key/v1/disable/${apiKey.id}`
+				: `/api/api-key/v1/enable/${apiKey.id}`;
 
-			await axios.post(endpoint, {}, { headers: { credentials: "include" } });
+			await axios.post(endpoint, {}, { withCredentials: true });
 
 			// Revalidate all API key caches using a matcher function
 			await mutate(

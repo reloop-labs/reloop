@@ -60,7 +60,7 @@ export const RotateApiKeyModal = ({
 			const response = await axios.post<ApiKeyWithKeyResponse>(
 				`/api/api-key/v1/rotate/${apiKeyId}`,
 				{},
-				{ headers: { credentials: "include" } },
+				{ withCredentials: true },
 			);
 
 			setRotatedApiKey(response.data);

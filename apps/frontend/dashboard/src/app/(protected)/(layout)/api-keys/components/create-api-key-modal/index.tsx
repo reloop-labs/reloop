@@ -88,7 +88,7 @@ export const CreateApiKeyModal = ({
 			const response = await axios.post<ApiKeyWithKeyResponse>(
 				"/api/api-key/v1/",
 				{ name: data.name },
-				{ headers: { credentials: "include" } },
+				{ withCredentials: true },
 			);
 
 			await mutate(

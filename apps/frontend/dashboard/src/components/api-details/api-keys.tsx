@@ -318,7 +318,10 @@ export const ApiKeysApiDetails = (props: ButtonProps) => {
 									>
 										<Icon
 											name={baseCopied ? "check" : "clipboard-copy"}
-											className={cn("h-3.5 w-3.5", baseCopied && "text-success-base")}
+											className={cn(
+												"h-3.5 w-3.5",
+												baseCopied && "text-success-base",
+											)}
 										/>
 									</Button.Root>
 								</Tooltip.Trigger>
@@ -354,7 +357,7 @@ export const ApiKeysApiDetails = (props: ButtonProps) => {
 					{/* Endpoints */}
 					<div className="space-y-2.5">
 						<h3 className="text-label-sm text-text-sub-600">Endpoints</h3>
-						<div className="divide-y divide-stroke-soft-200 rounded-xl border border-stroke-soft-200 bg-bg-white-0 overflow-hidden">
+						<div className="divide-y divide-stroke-soft-200 overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0">
 							{operations.map((operation) => {
 								const isSelected = selectedOperation === operation.id;
 								return (
@@ -366,7 +369,7 @@ export const ApiKeysApiDetails = (props: ButtonProps) => {
 											"group flex w-full items-center gap-3 px-3.5 py-2.5 text-left transition-all duration-150",
 											"border-l-2",
 											isSelected
-												? "bg-bg-weak-50 border-l-text-strong-950"
+												? "border-l-text-strong-950 bg-bg-weak-50"
 												: "border-l-transparent hover:bg-bg-weak-50/60",
 										)}
 									>
@@ -378,16 +381,24 @@ export const ApiKeysApiDetails = (props: ButtonProps) => {
 										>
 											{operation.method}
 										</Badge.Root>
-										<code className={cn(
-											"flex-1 font-mono text-[11px] transition-colors",
-											isSelected ? "text-text-strong-950" : "text-text-sub-500 group-hover:text-text-strong-950"
-										)}>
+										<code
+											className={cn(
+												"flex-1 font-mono text-[11px] transition-colors",
+												isSelected
+													? "text-text-strong-950"
+													: "text-text-sub-500 group-hover:text-text-strong-950",
+											)}
+										>
 											{operation.endpoint}
 										</code>
-										<span className={cn(
-											"text-label-xs transition-colors flex-shrink-0",
-											isSelected ? "text-text-sub-600" : "text-text-sub-400 group-hover:text-text-sub-600"
-										)}>
+										<span
+											className={cn(
+												"flex-shrink-0 text-label-xs transition-colors",
+												isSelected
+													? "text-text-sub-600"
+													: "text-text-sub-400 group-hover:text-text-sub-600",
+											)}
+										>
 											{operation.label}
 										</span>
 									</button>

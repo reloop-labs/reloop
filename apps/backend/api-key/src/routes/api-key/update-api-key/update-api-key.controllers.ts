@@ -25,7 +25,7 @@ export async function updateApiKeyController({
 		method?: string;
 		userAgent?: string;
 		ipAddress?: string;
-    statusCode?: number;
+		statusCode?: number;
 	};
 }): Promise<ApiKeyTypes.ApiKeyResponse> {
 	logger.info({ apiKeyId }, "Searching api key");

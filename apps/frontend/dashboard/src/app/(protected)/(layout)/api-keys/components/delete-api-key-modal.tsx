@@ -56,7 +56,7 @@ export const DeleteApiKeyModal = ({
 		try {
 			setIsDeleting(true);
 			await axios.delete(`/api/api-key/v1/${apiKeyToDelete.id}`, {
-				headers: { credentials: "include" },
+				withCredentials: true,
 			});
 
 			toast.success("API key deleted successfully");

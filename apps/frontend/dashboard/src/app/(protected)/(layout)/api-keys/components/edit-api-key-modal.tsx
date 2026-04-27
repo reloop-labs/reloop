@@ -68,7 +68,7 @@ export const EditApiKeyModal = ({
 			}
 
 			await axios.patch(`/api/api-key/v1/${apiKey.id}`, payload, {
-				headers: { credentials: "include" },
+				withCredentials: true,
 			});
 
 			await mutate(`/api/api-key/v1/${apiKey.id}`);
