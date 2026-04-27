@@ -8,7 +8,7 @@ export function KbdEsc({
 	return (
 		<span
 			className={cn(
-				"flex h-[19px] w-7 items-center justify-center rounded-[5px] border border-stroke-soft-100 bg-bg-weak-50/50 p-px font-medium text-[10px]",
+				"flex h-[19px] w-7 items-center justify-center rounded-[5px] border border-stroke-soft-200 bg-bg-weak-50/50 p-px font-medium text-[10px] dark:bg-bg-weak-50/50",
 				className,
 			)}
 			{...rest}

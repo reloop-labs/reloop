@@ -4,7 +4,7 @@ import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import { KbdCommand } from "@reloop/ui/kbd-command";
 import { KbdEnter } from "@reloop/ui/kbd-enter";
-import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
+import { KbdEsc } from "@reloop/ui/kbd-esc";
 import { Skeleton } from "@reloop/ui/skeleton";
 import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
@@ -141,11 +141,8 @@ const NewDomainPage = () => {
 						onClick={() => router.push("/domain")}
 						className="gap-1.5"
 					>
-						Save & Verify later
-						<span className="flex items-center gap-0.5">
-							<KbdKeyOutline>V</KbdKeyOutline>
-							<KbdKeyOutline>L</KbdKeyOutline>
-						</span>
+						Verify later
+						<KbdEsc />
 					</Button.Root>
 				</div>
 			</div>

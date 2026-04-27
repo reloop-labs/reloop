@@ -3,6 +3,7 @@
 import type { DomainResponse } from "@reloop/api";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
+import { KbdEsc } from "@reloop/ui/kbd-esc";
 import Spinner from "@reloop/ui/spinner";
 import axios from "axios";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
@@ -152,15 +153,8 @@ export const ConfigureDnsStep = () => {
 						onClick={() => setStep(4)}
 						className="gap-1.5"
 					>
-						Save & Verify later
-						<span className="inline-flex items-center gap-0.5">
-							<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-200 p-px font-medium text-[10px] uppercase">
-								V
-							</span>
-							<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-200 p-px font-medium text-[10px] uppercase">
-								L
-							</span>
-						</span>
+						Verify later
+						<KbdEsc />
 					</Button.Root>
 				</div>
 			</div>
