@@ -37,9 +37,9 @@ export const ApiKeyListToolbar = ({
 	);
 
 	return (
-		<div className="flex items-center gap-3">
+		<div className="flex items-center gap-2">
 			<div className="flex-1">
-				<Input.Root size="xsmall">
+				<Input.Root size="xsmall" className="rounded-[10px]">
 					<Input.Wrapper>
 						<Input.Icon as={Icon} name="search" size="xsmall" />
 						<Input.Input
@@ -53,7 +53,7 @@ export const ApiKeyListToolbar = ({
 					</Input.Wrapper>
 				</Input.Root>
 			</div>
-			<div className="flex items-center gap-3">
+			<div className="flex items-center gap-2">
 				<ApiKeyUserFilterDropdown
 					value={creatorFilter || null}
 					onChange={(userId) => {

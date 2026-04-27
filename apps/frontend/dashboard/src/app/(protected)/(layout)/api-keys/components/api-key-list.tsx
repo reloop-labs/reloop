@@ -19,6 +19,7 @@ interface ApiKeyData {
 	remaining: number | null;
 	expiresAt: string | null;
 	createdAt: string;
+	lastRequest: string | null;
 	createdBy?: {
 		id: string;
 		name: string | null;

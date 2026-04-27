@@ -1393,6 +1393,24 @@ export const IconsSprite = () => (
 					strokeLinejoin="round"
 				/>
 			</symbol>
+			<symbol viewBox="0 0 24 24" fill="none" id="history">
+				<rect
+					opacity="0.12"
+					x={2}
+					y={2}
+					width={20}
+					height={20}
+					rx={10}
+					fill="currentColor"
+				/>
+				<path
+					d="M2 12C2 16.9706 6 22 12 22C18 22 22 18 22 12C22 6 18 2 12 2C6 2 2 7 2 7M2 7V3M2 7H5.5M12 8V12L15 14"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
 			<symbol viewBox="0 0 24 24" fill="none" id="maximize">
 				<path
 					d="M22 8V7.5C22 6.10444 22 5.40666 21.8278 4.83886C21.44 3.56046 20.4395 2.56004 19.1611 2.17224C18.5933 2 17.8956 2 16.5 2H16M22 16V16.5C22 17.8956 22 18.5933 21.8278 19.1611C21.44 20.4395 20.4395 21.44 19.1611 21.8278C18.5933 22 17.8956 22 16.5 22H16M2 16V16.5C2 17.8956 2 18.5933 2.17224 19.1611C2.56004 20.4395 3.56046 21.44 4.83886 21.8278C5.40666 22 6.10444 22 7.5 22H8M2 8V7.5C2 6.10444 2 5.40666 2.17224 4.83886C2.56004 3.56046 3.56046 2.56004 4.83886 2.17224C5.40666 2 6.10444 2 7.5 2H8"

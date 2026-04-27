@@ -35,6 +35,7 @@ interface ApiKeyData {
 	remaining: number | null;
 	expiresAt: string | null;
 	createdAt: string;
+	lastRequest: string | null;
 	createdBy?: {
 		id: string;
 		name: string | null;
@@ -137,7 +138,7 @@ const ApiKeyActionsDropdown = ({
 			<PopoverRoot open={popoverOpen} onOpenChange={handlePopoverOpenChange}>
 				<PopoverTrigger asChild>
 					<Button.Root variant="neutral" mode="ghost" size="xxsmall">
-						<Icon name="more-vertical" className="h-3 w-3" />
+						<Icon name="more-horizontal" className="h-3 w-3" />
 					</Button.Root>
 				</PopoverTrigger>
 				<PopoverContent
@@ -158,7 +159,7 @@ const ApiKeyActionsDropdown = ({
 								onClick={() => handleItemClick(item.id)}
 								disabled={item.id === "toggle" && isToggling}
 								className={cn(
-									"flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 font-normal text-xs transition-colors",
+									"flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 font-medium text-xs transition-colors",
 									item.isDanger ? "text-error-base" : "text-text-strong-950",
 									!currentRect &&
 										hoverIdx === idx &&
@@ -265,21 +266,29 @@ export const ApiKeyTable = ({
 		<>
 			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/40">
 				{/* Table Header */}
-				<div className="grid grid-cols-[2fr_1fr_1.5fr_1fr_48px] items-center border-stroke-soft-100 border-b bg-bg-weak-50/50 px-4 py-2.5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-bg-weak-50/40">
+				<div className="grid grid-cols-[1.5fr_0.8fr_1.5fr_1fr_0.8fr_0.8fr_48px] items-center border-stroke-soft-100 border-b bg-bg-weak-50/50 px-4 py-2.5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-bg-weak-50/40">
 					<div className="flex items-center gap-1">
 						<span className="text-xs">Name</span>
 					</div>
 					<div className="flex items-center gap-1">
-						<Icon name="activity" className="h-3 w-3" />
-						<span className="text-xs">Status</span>
+						<Icon name="key-new" className="h-3 w-3" />
+						<span className="text-xs">Prefix</span>
 					</div>
 					<div className="flex items-center gap-1">
 						<Icon name="user" className="h-3 w-3" />
 						<span className="text-xs">Created By</span>
 					</div>
 					<div className="flex items-center gap-1">
+						<Icon name="history" className="h-3 w-3" />
+						<span className="text-xs">Last Used</span>
+					</div>
+					<div className="flex items-center gap-1">
 						<Icon name="clock" className="h-3 w-3" />
 						<span className="text-xs">Created</span>
+					</div>
+					<div className="flex items-center gap-1">
+						<Icon name="activity" className="h-3 w-3" />
+						<span className="text-xs">Status</span>
 					</div>
 					<div />
 				</div>
@@ -291,20 +300,26 @@ export const ApiKeyTable = ({
 						Array.from({ length: loadingRows }).map((_, index) => (
 							<div
 								key={`skeleton-${index}`}
-								className="grid grid-cols-[2fr_1fr_1.5fr_1fr_48px] items-center px-4 py-2"
+								className="grid grid-cols-[1.5fr_0.8fr_1.5fr_1fr_0.8fr_0.8fr_48px] items-center px-4 py-2"
 							>
 								<div className="flex items-center gap-2">
 									<Skeleton className="h-4 w-24" />
 								</div>
 								<div className="flex items-center">
-									<Skeleton className="h-5 w-16 rounded-full" />
+									<Skeleton className="h-4 w-12" />
 								</div>
 								<div className="flex items-center gap-2">
 									<Skeleton className="h-5 w-5 rounded-full" />
 									<Skeleton className="h-4 w-20" />
 								</div>
 								<div className="flex items-center">
+									<Skeleton className="h-4 w-20" />
+								</div>
+								<div className="flex items-center">
 									<Skeleton className="h-4 w-16" />
+								</div>
+								<div className="flex items-center">
+									<Skeleton className="h-5 w-16 rounded-full" />
 								</div>
 								<div className="flex items-center justify-end">
 									<Skeleton className="h-4 w-4 rounded" />
@@ -325,7 +340,7 @@ export const ApiKeyTable = ({
 								<div
 									key={`api-key-${index}`}
 									className={cn(
-										"group/row grid w-full cursor-pointer grid-cols-[2fr_1fr_1.5fr_1fr_48px] items-center px-4 py-2 text-left transition-colors",
+										"group/row grid w-full cursor-pointer grid-cols-[1.5fr_0.8fr_1.5fr_1fr_0.8fr_0.8fr_48px] items-center px-4 py-2 text-left transition-colors",
 										"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-base focus-visible:ring-offset-1",
 										isRowActive && "bg-bg-weak-50/50",
 									)}
@@ -338,24 +353,11 @@ export const ApiKeyTable = ({
 											</div>
 										</div>
 
-										{/* Status Column */}
+										{/* Prefix Column */}
 										<div className="flex items-center">
-											<div
-												className={cn(
-													"flex items-center gap-2 rounded-lg py-0.5 font-medium text-[13px] capitalize",
-													apiKey.enabled
-														? "text-success-base"
-														: "text-error-base",
-												)}
-											>
-												<Icon
-													name={
-														apiKey.enabled ? "check-circle" : "cross-circle"
-													}
-													className="h-3.5 w-3.5"
-												/>
-												{apiKey.enabled ? "Active" : "Disabled"}
-											</div>
+											<code className="rounded bg-bg-weak-50 px-1.5 py-0.5 font-mono text-[11px] text-text-sub-600 dark:bg-bg-weak-50/20">
+												{apiKey.prefix || "rl_..."}
+											</code>
 										</div>
 
 										{/* Created By Column */}
@@ -415,11 +417,40 @@ export const ApiKeyTable = ({
 											)}
 										</div>
 
+										{/* Last Used Column */}
+										<div className="flex items-center">
+											<span className="whitespace-nowrap font-medium text-sm text-text-sub-600">
+												{apiKey.lastRequest
+													? formatRelativeTime(apiKey.lastRequest)
+													: "Never"}
+											</span>
+										</div>
+
 										{/* Created Column */}
 										<div className="flex items-center">
 											<span className="whitespace-nowrap font-medium text-sm text-text-sub-600">
 												{formatRelativeTime(apiKey.createdAt)}
 											</span>
+										</div>
+
+										{/* Status Column */}
+										<div className="flex items-center">
+											<div
+												className={cn(
+													"flex items-center gap-2 rounded-lg py-0.5 font-medium text-[13px] capitalize",
+													apiKey.enabled
+														? "text-success-base"
+														: "text-error-base",
+												)}
+											>
+												<Icon
+													name={
+														apiKey.enabled ? "check-circle" : "cross-circle"
+													}
+													className="h-3.5 w-3.5"
+												/>
+												{apiKey.enabled ? "Active" : "Disabled"}
+											</div>
 										</div>
 									</Link>
 
