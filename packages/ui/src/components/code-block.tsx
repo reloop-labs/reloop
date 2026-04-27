@@ -13,6 +13,7 @@ interface Props {
 	className?: string;
 	hideLineNumbers?: boolean;
 	noScroll?: boolean;
+	defaultHtml?: string;
 }
 
 export const CodeBlock = ({
@@ -22,10 +23,11 @@ export const CodeBlock = ({
 	className,
 	hideLineNumbers = false,
 	noScroll = false,
+	defaultHtml,
 }: Props) => {
 	const { theme: currentTheme, systemTheme, resolvedTheme } = useTheme();
-	const [html, setHtml] = useState<string>("");
-	const [mounted, setMounted] = useState(false);
+	const [html, setHtml] = useState<string>(defaultHtml || "");
+	const [mounted, setMounted] = useState(!!defaultHtml);
 
 	// Handle mounting to avoid hydration mismatch
 	useEffect(() => {
@@ -45,6 +47,7 @@ export const CodeBlock = ({
 		(effectiveTheme === "dark" ? "one-dark-pro" : "github-light");
 
 	useEffect(() => {
+		if (defaultHtml) return;
 		codeToHtml(code, {
 			lang,
 			theme: shikiTheme,

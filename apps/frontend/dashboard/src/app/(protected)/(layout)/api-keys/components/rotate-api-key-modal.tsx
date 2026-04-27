@@ -1,5 +1,6 @@
 "use client";
 import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
 import { CodeBlock } from "@reloop/ui/code-block";
 import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
@@ -8,9 +9,9 @@ import axios from "axios";
 import { useQueryState } from "nuqs";
 import { useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
+import { codeToHtml } from "shiki";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
-
 import { ModalHeader } from "./create-api-key-modal/header";
 
 interface ApiKeyData {
@@ -41,6 +42,7 @@ export const RotateApiKeyModal = ({ apiKeys }: RotateApiKeyModalProps) => {
 		useState<ApiKeyWithKeyResponse | null>(null);
 	const [keyCopied, setKeyCopied] = useState(false);
 	const { mutate } = useSWRConfig();
+	const [html, setHtml] = useState("");
 
 	const apiKeyToRotate = apiKeys.find((apiKey) => apiKey.id === rotateId);
 	const displayName =
@@ -73,7 +75,31 @@ export const RotateApiKeyModal = ({ apiKeys }: RotateApiKeyModalProps) => {
 				{},
 				{ withCredentials: true },
 			);
-
+			const generatedHtml = await codeToHtml(
+				`RELOOP_API_KEY=${response.data.key}`,
+				{
+					lang: "bash",
+					theme: "github-light",
+					transformers: [
+						{
+							pre(node) {
+								this.addClassToHast(
+									node,
+									cn(
+										"py-4",
+										"overflow-x-auto",
+										"whitespace-pre-wrap break-all",
+									),
+								);
+							},
+							line(node) {
+								this.addClassToHast(node, "line");
+							},
+						},
+					],
+				},
+			);
+			setHtml(generatedHtml);
 			setRotatedApiKey(response.data);
 			await mutate(
 				(key) => typeof key === "string" && key.startsWith("/api/api-key/v1/"),
@@ -104,6 +130,7 @@ export const RotateApiKeyModal = ({ apiKeys }: RotateApiKeyModalProps) => {
 	};
 
 	const handleClose = () => {
+		handleCopyKey();
 		setRotateId(null);
 		setRotatedApiKey(null);
 		setKeyCopied(false);
@@ -157,11 +184,12 @@ export const RotateApiKeyModal = ({ apiKeys }: RotateApiKeyModalProps) => {
 										className="text-[10px]"
 										hideLineNumbers={true}
 										noScroll={true}
+										defaultHtml={html}
 									/>
 								</div>
 							</div>
 
-							<div className="mt-3">
+							<div className="mt-3 mb-1 ml-1.5">
 								<p className="flex items-center gap-1.5 text-error-base text-xs">
 									<Icon
 										name="alert-triangle"
@@ -179,7 +207,7 @@ export const RotateApiKeyModal = ({ apiKeys }: RotateApiKeyModalProps) => {
 								onClick={handleClose}
 								className="gap-2"
 							>
-								Done
+								Continue
 								<span className="inline-flex items-center gap-0.5">
 									<Icon
 										name="command"
