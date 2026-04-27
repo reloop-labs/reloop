@@ -60,7 +60,7 @@ interface ApiKeyHeaderProps {
 }
 
 const getStatusColor = (enabled: boolean) => {
-	return enabled ? "text-success-base" : "text-text-sub-600";
+	return enabled ? "text-success-base" : "text-error-base";
 };
 
 const getStatusIcon = (enabled: boolean) => {
@@ -300,7 +300,7 @@ export const ApiKeyHeader = ({
 									<PopoverTrigger asChild>
 										<Button.Root variant="neutral" mode="stroke" size="xsmall">
 											<Icon
-												name="more-vertical"
+												name="more-horizontal"
 												className="h-3.5 w-3.5 text-text-sub-600"
 											/>
 										</Button.Root>
@@ -323,7 +323,7 @@ export const ApiKeyHeader = ({
 													onPointerLeave={() => setHoverIdx(undefined)}
 													onClick={() => handleMenuItemClick(item.id)}
 													className={cn(
-														"flex w-full cursor-pointer items-center gap-2 rounded-lg py-1.5 pl-2 font-normal text-xs transition-colors",
+														"flex w-full cursor-pointer items-center gap-2 rounded-lg py-1.5 pl-2 font-medium text-xs transition-colors",
 														item.isDanger
 															? "text-error-base"
 															: "text-text-strong-950",
@@ -394,7 +394,7 @@ export const ApiKeyHeader = ({
 					<div className="flex flex-col gap-1.5">
 						<div className="flex items-center gap-1.5">
 							<Icon
-								name="activity-2"
+								name="arrow-swap"
 								className="h-3.5 w-3.5 text-text-sub-600"
 							/>
 							<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
@@ -414,7 +414,7 @@ export const ApiKeyHeader = ({
 					<div className="flex flex-col gap-1.5">
 						<div className="flex items-center gap-1.5">
 							<Icon
-								name="check-circle"
+								name="activity-2"
 								className="h-3.5 w-3.5 text-text-sub-600"
 							/>
 							<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
@@ -459,7 +459,7 @@ export const ApiKeyHeader = ({
 					{/* Last Used */}
 					<div className="flex flex-col gap-1.5">
 						<div className="flex items-center gap-1.5">
-							<Icon name="clock" className="h-3.5 w-3.5 text-text-sub-600" />
+							<Icon name="history" className="h-3.5 w-3.5 text-text-sub-600" />
 							<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
 								Last Used
 							</span>
@@ -514,6 +514,7 @@ export const ApiKeyHeader = ({
 						onClose={() => setIsRotateModalOpen(false)}
 						apiKeyId={apiKey.id}
 						apiKeyName={displayName}
+						apiKeyStart={apiKey.start}
 					/>
 					<EditApiKeyModal
 						isOpen={isEditModalOpen}

@@ -28,7 +28,7 @@ export const DomainListHeader = () => {
 					onClick={openDocs}
 					className="gap-1.5"
 				>
-					<Icon name="book-closed" className="h-4 w-4" />
+					<Icon name="file-text" className="h-4 w-4" />
 					Docs
 					<KbdKeyOutline>D</KbdKeyOutline>
 				</Button.Root>

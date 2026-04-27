@@ -30,7 +30,7 @@ export const DocsButton = (props: ButtonProps) => {
 			className={cn("gap-1.5", className)}
 			{...rest}
 		>
-			<Icon name="book-closed" className="h-4 w-4" />
+			<Icon name="file-text" className="h-4 w-4" />
 			Docs
 			<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-200 p-px font-medium text-[10px] uppercase">
 				D

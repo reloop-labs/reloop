@@ -554,6 +554,7 @@ export const ApiKeyTable = ({
 						rotateModalApiKey.prefix ||
 						"Unnamed"
 					}
+					apiKeyStart={rotateModalApiKey.start}
 				/>
 			)}
 		</>

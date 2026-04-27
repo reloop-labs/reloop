@@ -277,7 +277,7 @@ export const ApiKeysApiDetails = (props: ButtonProps) => {
 								)}
 								{...rest}
 							>
-								<Icon name="code" className="h-4 w-4" />
+								<Icon name="code" className="h-4 w-4 stroke-2" />
 							</Button.Root>
 						</Drawer.Trigger>
 					</Tooltip.Trigger>
