@@ -98,7 +98,7 @@ export default async function Page(props: {
 		<DocsLayout tree={source.pageTree.children as PageTreeItem[]}>
 			<div className="mx-auto flex w-full max-w-[1250px] flex-col xl:grid xl:grid-cols-[1fr_240px] xl:gap-8s">
 				{/* Main content area */}
-				<div className="min-w-0 px-6 py-8 md:px-10 lg:pr-0 lg:pl-16">
+				<div className="min-w-0 px-6 py-8 md:px-10">
 					<div className="mx-auto max-w-[720px] xl:mx-0">
 						{/* Breadcrumb */}
 						{breadcrumbs.length > 0 ? (

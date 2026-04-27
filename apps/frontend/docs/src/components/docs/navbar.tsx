@@ -33,7 +33,7 @@ export function Navbar({
 
 			{/* Nav tabs */}
 			<div className="flex flex-1 items-center">
-				<nav className="hidden h-full items-center gap-0.5 lg:flex lg:pl-6">
+				<nav className="hidden h-full items-center gap-1 lg:flex">
 					{tabs.map((tab) => {
 						const active =
 							tab.url === "/" ? pathname === "/" : pathname.startsWith(tab.url);
@@ -43,17 +43,17 @@ export function Navbar({
 								key={tab.title}
 								href={tab.url}
 								className={cn(
-									"flex h-8 items-center gap-1.5 rounded-lg px-2.5 font-medium text-sm transition-colors",
+									"flex h-9 items-center gap-1 whitespace-nowrap rounded-lg px-2 font-medium text-[13px] transition-all md:px-4",
 									active
-										? "text-fd-foreground"
-										: "text-fd-muted-foreground hover:bg-fd-foreground/5 hover:text-fd-foreground",
+										? "bg-fd-foreground/[0.03] text-fd-foreground"
+										: "text-fd-muted-foreground/70 hover:bg-fd-foreground/[0.03] hover:text-fd-foreground",
 								)}
 							>
 								<Icon
 									name={tab.iconName}
 									className={cn(
 										"h-4 w-4 shrink-0 transition-opacity",
-										active ? "opacity-100" : "opacity-70",
+										active ? "opacity-100" : "opacity-60",
 									)}
 								/>
 								{tab.title}
@@ -67,13 +67,13 @@ export function Navbar({
 				<div className="flex items-center gap-3">
 					<Link
 						href="https://dashboard.reloop.sh/login"
-						className="hidden font-medium text-fd-muted-foreground text-sm transition-colors hover:text-fd-foreground sm:block"
+						className="hidden font-medium text-fd-muted-foreground/70 text-sm transition-colors hover:text-fd-foreground sm:block"
 					>
 						Sign In
 					</Link>
 					<Link
 						href="https://dashboard.reloop.sh/signup"
-						className="inline-flex h-8 items-center justify-center rounded-full bg-fd-foreground px-4 font-semibold text-fd-background text-sm transition-all hover:opacity-90 active:scale-[0.98]"
+						className="inline-flex h-9 items-center justify-center rounded-full bg-fd-foreground px-5 font-semibold text-fd-background text-sm transition-all hover:opacity-90 active:scale-[0.98]"
 					>
 						{/* Shorten text on very small screens */}
 						<span className="xs:inline hidden">Get Started</span>

@@ -1,10 +1,10 @@
 "use client";
- 
+
 import * as Dialog from "@radix-ui/react-dialog";
 import { Logo } from "@reloop/ui/logo";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
-import { useState, type ReactNode } from "react";
+import { type ReactNode, useState } from "react";
 import type { PageTreeItem } from "../../lib/types";
 import { Navbar } from "./navbar";
 import { Sidebar } from "./sidebar";
@@ -33,7 +33,7 @@ export function DocsLayout({ children, tree }: DocsLayoutProps) {
 				</div>
 			</header>
 
-			<div className="flex flex-1 flex-row overflow-hidden bg-[#fafafa] dark:bg-[#0a0a0a]">
+			<div className="flex flex-1 flex-row overflow-hidden bg-fd-background">
 				{/* Mobile Drawer */}
 				<Dialog.Root open={open} onOpenChange={setOpen}>
 					<Dialog.Portal>
@@ -54,12 +54,20 @@ export function DocsLayout({ children, tree }: DocsLayoutProps) {
 								className="fixed inset-y-0 left-0 z-50 w-72 border-fd-border border-r bg-fd-background p-0 shadow-2xl focus:outline-none"
 							>
 								<div className="flex h-12 items-center border-fd-border border-b px-4">
-									<Link href="/" className="flex items-center" onClick={() => setOpen(false)}>
+									<Link
+										href="/"
+										className="flex items-center"
+										onClick={() => setOpen(false)}
+									>
 										<Logo theme="light" className="w-10" />
 									</Link>
 								</div>
 								<div className="h-[calc(100vh-3rem)] overflow-y-auto">
-									<Sidebar tree={tree} isMobile onLinkClick={() => setOpen(false)} />
+									<Sidebar
+										tree={tree}
+										isMobile
+										onLinkClick={() => setOpen(false)}
+									/>
 								</div>
 							</motion.div>
 						</Dialog.Content>
@@ -71,12 +79,12 @@ export function DocsLayout({ children, tree }: DocsLayoutProps) {
 					<Sidebar tree={tree} />
 				</aside>
 
-				{/* Main Content Area - Fluid */}
+				{/* Main Content Area - Seamless */}
 				<main
 					id="nd-page"
-					className="relative min-h-0 flex-1 overflow-y-auto overflow-x-hidden p-0 md:p-6 lg:p-8"
+					className="relative min-h-0 flex-1 overflow-y-auto overflow-x-hidden bg-fd-background"
 				>
-					<div className="mx-auto min-h-full w-full rounded-none border-fd-border bg-fd-background shadow-none transition-all duration-300 md:rounded-xl md:border md:shadow-[0_1px_3px_rgba(0,0,0,0.02)] lg:max-w-[1250px]">
+					<div className="mx-auto min-h-full w-full transition-all duration-300 lg:max-w-[1250px]">
 						{children}
 					</div>
 				</main>
