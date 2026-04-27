@@ -2,10 +2,18 @@
 
 import type { DomainResponse } from "@reloop/api";
 import { Icon } from "@reloop/ui/icon";
-import { StatusTimeline } from "./status-timeline";
+import { Skeleton } from "@reloop/ui/skeleton";
+import { StatusTimeline, StatusTimelineSkeleton } from "./status-timeline";
 
-export const DomainEvents = ({ domain }: { domain: DomainResponse }) => {
+export const DomainEvents = ({
+	domain,
+	isLoading,
+}: {
+	domain?: DomainResponse;
+	isLoading?: boolean;
+}) => {
 	const bannerMessage = () => {
+		if (!domain) return "";
 		switch (domain.status) {
 			case "verifying":
 				return "Your domain is being verified — this can take a few hours depending on your DNS provider.";
@@ -19,6 +27,10 @@ export const DomainEvents = ({ domain }: { domain: DomainResponse }) => {
 				return "Checking your domain authentication — this will just take a moment…";
 		}
 	};
+
+	if (isLoading || !domain) {
+		return <DomainEventsSkeleton />;
+	}
 
 	return (
 		<div className="mt-7 flex flex-col gap-6 rounded-2xl border border-stroke-soft-200 bg-bg-weak-50/50 p-6 dark:border-stroke-soft-100/40">
@@ -41,3 +53,19 @@ export const DomainEvents = ({ domain }: { domain: DomainResponse }) => {
 		</div>
 	);
 };
+
+export const DomainEventsSkeleton = () => (
+	<div className="mt-7 flex flex-col gap-6 rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/20 p-6 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/50">
+		<div className="flex flex-col gap-2.5">
+			<div className="flex items-center gap-1.5">
+				<Skeleton className="h-3.5 w-3.5 rounded-full" />
+				<Skeleton className="h-2.5 w-24 rounded-full" />
+			</div>
+			<Skeleton className="h-4 w-3/4 rounded-full" />
+		</div>
+
+		<div className="h-[1px] w-full bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
+
+		<StatusTimelineSkeleton />
+	</div>
+);

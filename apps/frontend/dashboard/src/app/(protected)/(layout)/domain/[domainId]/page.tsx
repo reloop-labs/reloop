@@ -56,7 +56,7 @@ const DomainPage = () => {
 		<div className="mx-auto max-w-3xl sm:px-8">
 			<DomainHeader domain={domainData} isLoading={isLoading} />
 			<DomainStats domain={domainData} isLoading={isLoading} />
-			{domainData && <DomainEvents domain={domainData} />}
+			<DomainEvents domain={domainData} isLoading={isLoading} />
 			<TabMenu.Root
 				value={activeTab}
 				onValueChange={setActiveTab}

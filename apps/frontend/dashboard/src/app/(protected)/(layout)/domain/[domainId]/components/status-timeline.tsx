@@ -3,6 +3,7 @@
 import type { DomainResponse } from "@reloop/api";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import { Skeleton } from "@reloop/ui/skeleton";
 import { format } from "date-fns";
 
 interface StatusTimelineProps {
@@ -179,3 +180,37 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 		</div>
 	);
 };
+
+export const StatusTimelineSkeleton = () => (
+	<div className="relative mx-auto flex w-full max-w-md items-start gap-0">
+		{[1, 2, 3].map((step, index) => {
+			const isLast = index === 2;
+			return (
+				<div
+					key={step}
+					className={cn("relative flex items-start", !isLast && "flex-1")}
+				>
+					<div className="flex flex-col gap-3">
+						<div className="flex items-center">
+							{/* Circle Indicator */}
+							<div className="relative z-10 flex size-10 shrink-0 items-center justify-center rounded-[14px] border border-stroke-soft-100 bg-bg-white-0 transition-all duration-300 dark:border-stroke-soft-100/40">
+								<Skeleton className="h-5 w-5 rounded-md" />
+							</div>
+
+							{/* Connector Line */}
+							{!isLast && (
+								<div className="-right-5 absolute top-5 left-5 h-[1px] w-full bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
+							)}
+						</div>
+
+						{/* Label + Meta */}
+						<div className="flex w-10 flex-col items-center gap-1.5">
+							<Skeleton className="h-2 w-12 rounded-sm" />
+							<Skeleton className="h-2 w-16 rounded-sm" />
+						</div>
+					</div>
+				</div>
+			);
+		})}
+	</div>
+);
