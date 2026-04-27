@@ -20,7 +20,6 @@ import { useRouter } from "next/navigation";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
-import { useSWRConfig } from "swr";
 import { DeleteApiKeyModal } from "./delete-api-key-modal";
 import { EmptyState } from "./empty-state";
 import { RotateApiKeyModal } from "./rotate-api-key-modal";
@@ -44,9 +43,25 @@ interface ApiKeyData {
 	};
 }
 
+interface ApiKeyListResponse {
+	apiKeys: ApiKeyData[];
+	total: number;
+	page: number;
+	limit: number;
+}
+
 interface ApiKeyTableProps {
 	apiKeys: ApiKeyData[];
 	total: number;
+	mutate: (
+		key?: string | ((key: unknown) => boolean),
+		data?:
+			| ApiKeyListResponse
+			| ((
+					current: ApiKeyListResponse | undefined,
+			  ) => ApiKeyListResponse | undefined),
+		options?: boolean | { revalidate?: boolean },
+	) => Promise<ApiKeyListResponse | undefined> | unknown;
 	isLoading?: boolean;
 	loadingRows?: number;
 }
@@ -196,11 +211,11 @@ const ApiKeyActionsDropdown = ({
 export const ApiKeyTable = ({
 	apiKeys,
 	total,
+	mutate,
 	isLoading,
 	loadingRows = 3,
 }: ApiKeyTableProps) => {
 	const router = useRouter();
-	const { mutate } = useSWRConfig();
 	const [, setDeleteId] = useQueryState("delete");
 	const [, setModal] = useQueryState("modal");
 	const [currentPage, setCurrentPage] = useQueryState(
@@ -234,26 +249,40 @@ export const ApiKeyTable = ({
 	};
 
 	const handleToggleEnabled = async (apiKey: ApiKeyData) => {
+		const newEnabled = !apiKey.enabled;
+		const optimisticDataTransformation = (
+			currentData: ApiKeyListResponse | undefined,
+		) => {
+			if (!currentData || !currentData.apiKeys) return currentData;
+			return {
+				...currentData,
+				apiKeys: currentData.apiKeys.map((k: ApiKeyData) =>
+					k.id === apiKey.id ? { ...k, enabled: newEnabled } : k,
+				),
+			};
+		};
+
 		try {
 			setTogglingId(apiKey.id);
+
+			// Optimistically update the UI
+			mutate(
+				(key: unknown) =>
+					typeof key === "string" && key.startsWith("/api/api-key/v1/"),
+				optimisticDataTransformation,
+				{ revalidate: false },
+			);
+
 			const endpoint = apiKey.enabled
 				? `/api/api-key/v1/disable/${apiKey.id}`
 				: `/api/api-key/v1/enable/${apiKey.id}`;
 
 			await axios.post(endpoint, {}, { withCredentials: true });
 
-			// Revalidate all API key caches using a matcher function
-			await mutate(
-				(key: unknown) =>
-					typeof key === "string" && key.startsWith("/api/api-key/v1/"),
-				undefined,
-				{ revalidate: true },
-			);
-
 			toast.success(
-				apiKey.enabled
-					? "API key disabled successfully"
-					: "API key enabled successfully",
+				newEnabled
+					? "API key enabled successfully"
+					: "API key disabled successfully",
 			);
 		} catch (error) {
 			const errorMessage = axios.isAxiosError(error)
@@ -262,6 +291,13 @@ export const ApiKeyTable = ({
 			toast.error(errorMessage);
 		} finally {
 			setTogglingId(null);
+			// Revalidate in the background to ensure consistency
+			mutate(
+				(key: unknown) =>
+					typeof key === "string" && key.startsWith("/api/api-key/v1/"),
+				undefined,
+				{ revalidate: true },
+			);
 		}
 	};
 
@@ -298,7 +334,7 @@ export const ApiKeyTable = ({
 
 				{/* Table Body */}
 				<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
-					{isLoading ? (
+					{isLoading && apiKeys.length === 0 ? (
 						// Skeleton loading state
 						Array.from({ length: loadingRows }).map((_, index) => (
 							<div

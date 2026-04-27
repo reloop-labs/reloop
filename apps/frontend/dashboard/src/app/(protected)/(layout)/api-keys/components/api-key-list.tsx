@@ -3,7 +3,7 @@ import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { Icon } from "@reloop/ui/icon";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useMemo } from "react";
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr";
 import { ApiKeyListToolbar } from "./api-key-list-toolbar";
 import { ApiKeyTable } from "./api-key-table";
 import type { CreatedByUser } from "./api-key-user-filter-dropdown";
@@ -36,6 +36,7 @@ interface ApiKeyListResponse {
 }
 
 export const ApiKeyList = () => {
+	const { mutate } = useSWRConfig();
 	const { activeOrganization } = useUserOrganization();
 	const [statusFilter] = useQueryState("status", parseAsString.withDefault(""));
 	const [creatorFilter] = useQueryState(
@@ -62,6 +63,7 @@ export const ApiKeyList = () => {
 		{
 			revalidateOnFocus: true,
 			revalidateOnReconnect: true,
+			keepPreviousData: true,
 		},
 	);
 
@@ -99,6 +101,7 @@ export const ApiKeyList = () => {
 							<ApiKeyTable
 								apiKeys={data?.apiKeys || []}
 								total={data?.total || 0}
+								mutate={mutate}
 								isLoading={isLoading}
 								loadingRows={4}
 							/>
