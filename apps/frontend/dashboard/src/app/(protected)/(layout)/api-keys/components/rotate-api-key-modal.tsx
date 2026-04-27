@@ -163,9 +163,11 @@ export const RotateApiKeyModal = ({ apiKeys }: RotateApiKeyModalProps) => {
 
 							<div className="mt-3">
 								<p className="flex items-center gap-1.5 text-error-base text-xs">
-									<Icon name="alert-triangle" className="h-3.5 w-3.5" />
-									Make sure to copy your API key now. You won't be able to see
-									it again!
+									<Icon
+										name="alert-triangle"
+										className="h-3.5 w-3.5 flex-shrink-0"
+									/>
+									Old API key invalid. Make sure to copy your new key now!
 								</p>
 							</div>
 						</Modal.Body>
