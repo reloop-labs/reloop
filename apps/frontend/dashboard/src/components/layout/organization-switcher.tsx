@@ -5,7 +5,6 @@ import {
 	getAvatarInitial,
 } from "@fe/dashboard/utils/avatar";
 import * as Avatar from "@reloop/ui/avatar";
-import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
