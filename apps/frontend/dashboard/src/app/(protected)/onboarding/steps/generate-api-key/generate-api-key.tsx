@@ -27,7 +27,7 @@ export const GenerateApiKeyStep = () => {
 		setLoading(true);
 		try {
 			const response = await axios.post("/api/api-key/v1/", {
-				name: "Default API Key",
+				name: "Onboarding Key",
 			});
 			setApiKey(response.data.key);
 		} catch (error) {

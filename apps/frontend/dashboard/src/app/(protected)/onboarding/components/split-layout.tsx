@@ -8,11 +8,12 @@ import type React from "react";
 
 interface SplitLayoutProps {
 	stepIndicator: string;
-	title: string;
+	title?: string;
 	children: React.ReactNode;
 	previewContent?: React.ReactNode;
 	fullWidth?: boolean;
 	previewSize?: "small" | "medium";
+	maxWidth?: "3xl" | "4xl" | "5xl";
 }
 
 export const SplitLayout = ({
@@ -22,6 +23,7 @@ export const SplitLayout = ({
 	previewContent,
 	fullWidth = false,
 	previewSize = "medium",
+	maxWidth = "5xl",
 }: SplitLayoutProps) => {
 	const [step, setStep] = useQueryState("step", parseAsInteger.withDefault(1));
 	const onBack = step > 1 ? () => setStep(step - 1) : undefined;
@@ -36,7 +38,16 @@ export const SplitLayout = ({
 					reloop
 				</span>
 			</div>
-			<div className="flex w-full max-w-5xl flex-1 flex-col items-center justify-center border-stroke-soft-100 border-r border-l">
+			<div
+				className={cn(
+					"flex w-full flex-1 flex-col items-center justify-center border-stroke-soft-100 border-r border-l",
+					maxWidth === "3xl"
+						? "max-w-3xl"
+						: maxWidth === "4xl"
+							? "max-w-4xl"
+							: "max-w-5xl",
+				)}
+			>
 				<div className="w-full border-stroke-soft-100 border-t" />
 				<div
 					className={cn(
@@ -48,9 +59,7 @@ export const SplitLayout = ({
 								: "lg:grid-cols-2",
 					)}
 				>
-					<div
-						className={`flex flex-col gap-4 ${fullWidth ? "px-12 lg:px-24" : "px-12"} pt-9 pb-9`}
-					>
+					<div className="flex flex-col gap-4 px-12 pt-9 pb-9">
 						<div className="relative flex gap-2">
 							{onBack && (
 								<div className="-left-6 -top-[2.1px] absolute">
@@ -67,7 +76,9 @@ export const SplitLayout = ({
 								<div className="mb-1 font-medium text-text-soft-400 text-xs">
 									{stepIndicator}
 								</div>
-								<h1 className="font-semibold text-title-h5">{title}</h1>
+								{title && (
+									<h1 className="font-semibold text-title-h5">{title}</h1>
+								)}
 							</div>
 						</div>
 						{children}

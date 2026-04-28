@@ -7,6 +7,7 @@ import { CheckCircle2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useEffect } from "react";
+import type React from "react";
 import { DnsConfigPreview } from "./components/dns-provider/dns-config-preview";
 import { DomainPreview } from "./components/domain-preview";
 import { SidebarPreview } from "./components/sidebar-preview";
@@ -52,7 +53,17 @@ export const OnBoardingContent = () => {
 	}
 
 	// Configuration for each step
-	const stepsConfig = {
+	const stepsConfig: Record<
+		number,
+		{
+			stepIndicator: string;
+			title?: string;
+			component: React.ReactNode;
+			preview: React.ReactNode;
+			fullWidth: boolean;
+			maxWidth?: "3xl" | "4xl" | "5xl";
+		}
+	> = {
 		1: {
 			stepIndicator: "Step 1 of 4",
 			title: "Create your workspace",
@@ -78,10 +89,10 @@ export const OnBoardingContent = () => {
 		},
 		4: {
 			stepIndicator: "Step 4 of 4",
-			title: "Generate API Credentials",
 			component: <GenerateApiKeyStep />,
 			preview: null,
 			fullWidth: true,
+			maxWidth: "3xl",
 		},
 	};
 
@@ -121,6 +132,7 @@ export const OnBoardingContent = () => {
 			previewContent={currentConfig.preview}
 			fullWidth={currentConfig.fullWidth}
 			previewSize={step === 3 ? "small" : "medium"}
+			maxWidth={currentConfig.maxWidth}
 		>
 			{currentConfig.component}
 		</SplitLayout>
