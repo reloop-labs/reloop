@@ -7,8 +7,36 @@ import { Logo } from "@reloop/ui/logo";
 import { AnimatePresence, motion } from "motion/react";
 import { parseAsInteger, useQueryState } from "nuqs";
 import type React from "react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
+
+// Smoothly animates height changes using a ResizeObserver + CSS transition.
+// Deliberately avoids Framer Motion layout so it can't conflict with slide animations.
+const AnimatedHeight = ({ children }: { children: React.ReactNode }) => {
+	const innerRef = useRef<HTMLDivElement>(null);
+	const [height, setHeight] = useState<number | undefined>(undefined);
+
+	useEffect(() => {
+		if (!innerRef.current) return;
+		const ro = new ResizeObserver(([entry]) => {
+			setHeight(entry.contentRect.height);
+		});
+		ro.observe(innerRef.current);
+		return () => ro.disconnect();
+	}, []);
+
+	return (
+		<div
+			style={{
+				height: height === undefined ? "auto" : height,
+				transition: "height 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
+				overflow: "hidden",
+			}}
+		>
+			<div ref={innerRef}>{children}</div>
+		</div>
+	);
+};
 
 interface SplitLayoutProps {
 	stepIndicator: string;
@@ -60,42 +88,40 @@ export const SplitLayout = ({
 	const currentStep = stepMatch ? Number(stepMatch[1]) : null;
 	const totalSteps = stepMatch ? Number(stepMatch[2]) : null;
 
-	const slideDistance = 40;
-	// Left panel: enters from right (forward) / left (back); exits LEFT (forward) / RIGHT (back)
+	const slideDistance = 14;
+	// Left panel: enters from right (forward) / left (back); exits left/right
 	const contentVariants = {
 		initial: (dir: number) => ({
 			opacity: 0,
 			x: dir * slideDistance,
-			filter: "blur(3px)",
 		}),
 		animate: {
 			opacity: 1,
 			x: 0,
-			filter: "blur(0px)",
+			transition: { duration: 0.28, ease: [0.0, 0.0, 0.2, 1] },
 		},
 		exit: (dir: number) => ({
 			opacity: 0,
 			x: dir * -slideDistance,
-			filter: "blur(3px)",
+			transition: { duration: 0.12, ease: [0.4, 0, 1, 1] },
 		}),
 	};
 
-	// Right panel: enters from bottom (forward) / top (back); exits UP (forward) / DOWN (back)
+	// Right panel: enters from bottom/top; exits up/down
 	const previewVariants = {
 		initial: (dir: number) => ({
 			opacity: 0,
-			y: dir * 28,
-			filter: "blur(3px)",
+			y: dir * 12,
 		}),
 		animate: {
 			opacity: 1,
 			y: 0,
-			filter: "blur(0px)",
+			transition: { duration: 0.3, ease: [0.0, 0.0, 0.2, 1], delay: 0.05 },
 		},
 		exit: (dir: number) => ({
 			opacity: 0,
-			y: dir * -28,
-			filter: "blur(3px)",
+			y: dir * -12,
+			transition: { duration: 0.12, ease: [0.4, 0, 1, 1] },
 		}),
 	};
 
@@ -206,24 +232,22 @@ export const SplitLayout = ({
 						</motion.button>
 
 						{/* Animated step content — slides left/right based on nav direction */}
-						<AnimatePresence mode="wait" initial={false} custom={direction}>
-							<motion.div
-								key={step}
-								custom={direction}
-								variants={contentVariants}
-								initial="initial"
-								animate="animate"
-								exit="exit"
-								transition={{
-									duration: 0.3,
-									ease: [0.4, 0, 0.2, 1],
-								}}
-								className="flex flex-col gap-4"
-							>
-								{title && <h1 className="font-semibold text-title-h5">{title}</h1>}
-								{children}
-							</motion.div>
-						</AnimatePresence>
+						<AnimatedHeight>
+							<AnimatePresence mode="wait" initial={false} custom={direction}>
+								<motion.div
+									key={step}
+									custom={direction}
+									variants={contentVariants}
+									initial="initial"
+									animate="animate"
+									exit="exit"
+									className="flex flex-col gap-4"
+								>
+									{title && <h1 className="font-semibold text-title-h5">{title}</h1>}
+									{children}
+								</motion.div>
+							</AnimatePresence>
+						</AnimatedHeight>
 					</div>
 					{!fullWidth && previewContent && (
 						<div className="relative hidden w-full overflow-hidden border-stroke-soft-100 border-l lg:flex dark:border-stroke-soft-100/40">
@@ -235,11 +259,6 @@ export const SplitLayout = ({
 									initial="initial"
 									animate="animate"
 									exit="exit"
-									transition={{
-										duration: 0.35,
-										ease: [0.4, 0, 0.2, 1],
-										delay: 0.05,
-									}}
 									className="relative z-10 w-full"
 								>
 									{previewContent}
