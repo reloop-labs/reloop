@@ -96,11 +96,7 @@ export function PostGenerate({
 
 			{/* 3-step integration guide */}
 			<div className="flex flex-col gap-5">
-				<StepCard
-					number={1}
-					title="Install the SDK"
-					subtitle="Add the Reloop package to your project"
-				>
+				<StepCard number={1} title="Install the Reloop SDK">
 					<CopyCodeBlock
 						code={installCode}
 						lang="bash"
@@ -112,11 +108,7 @@ export function PostGenerate({
 					/>
 				</StepCard>
 
-				<StepCard
-					number={2}
-					title="Set your environment variable"
-					subtitle="Add your secret key to your .env file"
-				>
+				<StepCard number={2} title="Add your API key to .env">
 					<CopyCodeBlock
 						code={`RELOOP_API_KEY=${apiKey}`}
 						lang="bash"
@@ -126,11 +118,7 @@ export function PostGenerate({
 					/>
 				</StepCard>
 
-				<StepCard
-					number={3}
-					title="Send your first email"
-					subtitle="Use the SDK to send a transactional email"
-				>
+				<StepCard number={3} title="Send your first email">
 					<CopyCodeBlock
 						code={sendEmailCode[lang].code}
 						lang={sendEmailCode[lang].lang}

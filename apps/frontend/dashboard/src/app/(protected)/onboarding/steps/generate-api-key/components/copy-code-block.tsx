@@ -56,6 +56,7 @@ export function CopyCodeBlock({
 					<div className="flex items-center">
 						{tabs.map((tab) => {
 							const isActive = tab.id === activeTab;
+							const brandColor = `#${tab.si.hex}`;
 							return (
 								<button
 									key={tab.id}
@@ -74,13 +75,17 @@ export function CopyCodeBlock({
 										className="h-3 w-3 shrink-0"
 										fill="currentColor"
 										xmlns="http://www.w3.org/2000/svg"
+										style={isActive ? { color: brandColor } : undefined}
 									>
 										<path d={tab.si.path} />
 									</svg>
 									{tab.label}
-									{/* Active underline */}
+									{/* Active underline — brand color */}
 									{isActive && (
-										<span className="absolute right-4 bottom-0 left-0 h-[1.5px] rounded-full bg-text-strong-950" />
+										<span
+											className="absolute right-4 bottom-0 left-0 h-[1.5px] rounded-full"
+											style={{ backgroundColor: brandColor }}
+										/>
 									)}
 								</button>
 							);
@@ -96,6 +101,7 @@ export function CopyCodeBlock({
 								className="h-3.5 w-3.5 shrink-0"
 								fill="currentColor"
 								xmlns="http://www.w3.org/2000/svg"
+								style={{ color: `#${si.hex}` }}
 							>
 								<path d={si.path} />
 							</svg>
