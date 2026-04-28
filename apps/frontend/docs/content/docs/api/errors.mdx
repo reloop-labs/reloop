@@ -1,10 +1,28 @@
 ---
 title: Errors
-description: API Error Responses
+description: A guide to error codes and troubleshooting API requests.
 ---
 
-The Reloop API uses standard HTTP response codes to indicate the success or failure of an API request. In general:
+Reloop uses standard HTTP response codes to indicate the success or failure of an API request.
 
-- Codes in the `2xx` range indicate success.
-- Codes in the `4xx` range indicate an error that failed given the proper information provided.
-- Codes in the `5xx` range indicate an error with our servers.
+## Error Format
+
+All error responses return a JSON object with a `message` field describing the error.
+
+```json
+{
+  "message": "The provided API key is invalid."
+}
+```
+
+## Common Error Codes
+
+| Code | Type | Description |
+|------|------|-------------|
+| `400` | Bad Request | The request was unacceptable, often due to missing a required parameter. |
+| `401` | Unauthorized | No valid API key provided. |
+| `403` | Forbidden | The API key does not have permissions to perform the request. |
+| `404` | Not Found | The requested resource doesn't exist. |
+| `409` | Conflict | The request conflicts with another resource (e.g., duplicate domain). |
+| `429` | Too Many Requests | Too many requests hit the API too quickly. |
+| `500` | Server Error | Something went wrong on Reloop's end. |

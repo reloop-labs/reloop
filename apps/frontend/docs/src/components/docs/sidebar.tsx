@@ -52,7 +52,7 @@ export function Sidebar({ tree, isMobile, onLinkClick }: SidebarProps) {
 
 				// Match by URL instead of name for precision
 				const nodeUrl = (node.url || "").toLowerCase();
-				const tabUrl = activeTab.url.toLowerCase();
+				const tabUrl = (activeTab?.url || "").toLowerCase();
 
 				return nodeUrl === tabUrl || nodeUrl === `${tabUrl}/`;
 			});

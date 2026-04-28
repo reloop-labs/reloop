@@ -1,6 +1,29 @@
 ---
 title: Pagination
-description: API Pagination Guide
+description: Learn how to handle paginated responses from the Reloop API.
 ---
 
-Reloop API endpoints that return a list of items support cursor-based pagination. Support for pagination will be specified in the endpoint documentation alongside its respective query parameters.
+Reloop uses offset-based pagination for list endpoints. You can control the number of results returned using the `limit` and `page` query parameters.
+
+## Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `limit` | `number` | `20` | The number of records to return (max 100). |
+| `page` | `number` | `1` | The page number to retrieve. |
+
+## Response
+
+Paginated responses include a `meta` object with the following fields:
+
+```json
+{
+  "data": [...],
+  "meta": {
+    "total": 150,
+    "page": 1,
+    "limit": 20,
+    "totalPages": 8
+  }
+}
+```

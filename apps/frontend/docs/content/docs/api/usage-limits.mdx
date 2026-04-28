@@ -1,6 +1,30 @@
 ---
 title: Usage Limits
-description: API Rate Limits and Quotas
+description: Understand the rate limits and usage quotas for your Reloop account.
 ---
 
-To ensure high availability and fair use, the Reloop API restricts the number of requests you can make within a certain time period. Exceeding these limits will result in a `429 Too Many Requests` response.
+To ensure high availability and performance for all users, Reloop enforces rate limits on API requests.
+
+## Rate Limits
+
+Rate limits are applied per API key. The default limits are:
+
+| Plan | Rate Limit |
+|------|------------|
+| Free | 10 requests per second |
+| Pro | 100 requests per second |
+| Enterprise | Custom |
+
+## Limit Headers
+
+Every API response includes headers that indicate your current rate limit status:
+
+| Header | Description |
+|--------|-------------|
+| `X-RateLimit-Limit` | The maximum number of requests allowed per window. |
+| `X-RateLimit-Remaining` | The number of requests remaining in the current window. |
+| `X-RateLimit-Reset` | The time at which the current rate limit window resets (in UTC seconds). |
+
+## Handling Rate Limits
+
+When a rate limit is exceeded, the API returns a `429 Too Many Requests` status code. We recommend implementing an exponential backoff strategy for retrying failed requests.

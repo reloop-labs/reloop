@@ -7,9 +7,6 @@
  *
  * Usage:
  *   bun run generate:api-docs
- *   bun run generate:api-docs --service=domain
- *
- * Prerequisites: Backend services must be running locally.
  */
 
 import fs from "node:fs";
@@ -46,25 +43,19 @@ const SERVICES: ServiceConfig[] = [
 	{ name: "auth", prefix: "/api/auth", port: 8000, specUrl: "http://localhost:8000/api/auth/openapi/json", prodUrl: "https://reloop.sh/api/auth/openapi/json" },
 ];
 
-function sanitizeOperationId(method: string, routePath: string, prefix: string): string {
-	// Remove the service prefix to get cleaner names
+function sanitizeOperationId(method: string, routePath: string, prefix: string, operation: any): string {
+	if (operation.operationId) {
+		return operation.operationId.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
+	}
+
+	// Fallback to path-based slug
 	const cleanPath = routePath.startsWith(prefix) ? routePath.slice(prefix.length) : routePath;
-	const parts = cleanPath
+	return cleanPath
+		.replace(/[{}]/g, "")
 		.split("/")
 		.filter(Boolean)
-		.map((p) => {
-			if (p.startsWith("{") && p.endsWith("}")) {
-				return `By${p.slice(1, -1).split("_").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join("_")}`;
-			}
-			return p.charAt(0).toUpperCase() + p.slice(1);
-		});
-
-	const prefix2 = routePath
-		.replace(/[{}]/g, "")
-		.replace(/\//g, "_")
-		.replace(/^_/, "")
-		.replace(/_$/, "");
-	return `${method}${prefix2.charAt(0).toUpperCase()}${prefix2.slice(1)}`;
+		.join("-")
+		.toLowerCase();
 }
 
 function resolveSchemaRef(ref: string, spec: any): any {
@@ -98,32 +89,33 @@ function resolveSchema(schema: any, spec: any, depth = 0): any {
 
 function getTypeString(schema: any): string {
 	if (!schema) return "any";
-	if (schema.type === "array") {
+	
+	let typeStr = schema.type || "any";
+
+	if (schema.enum) {
+		return schema.enum.map((v: any) => (typeof v === "string" ? `"${v}"` : v)).join(" | ");
+	}
+
+	if (schema.type === "array" && schema.items) {
 		return `${getTypeString(schema.items)}[]`;
 	}
-	if (schema.type === "object" && schema.properties) {
-		return "object";
-	}
-	if (schema.enum) {
-		return schema.enum.map((v: string) => `"${v}"`).join(" | ");
-	}
+
 	if (schema.anyOf || schema.oneOf) {
 		const variants = schema.anyOf || schema.oneOf;
 		return variants.map((v: any) => getTypeString(v)).join(" | ");
 	}
-	if (schema.allOf) {
-		return "object";
+
+	if (schema.pattern) {
+		typeStr += ` (pattern: ${schema.pattern})`;
 	}
-	return schema.type || "any";
+
+	return typeStr;
 }
 
-function extractParameters(
-	operation: any,
-	spec: any,
-): ParameterInfo[] {
+function extractParameters(operation: any, spec: any): ParameterInfo[] {
 	const params: ParameterInfo[] = [];
 
-	// Path/Query/Header parameters
+	// 1. Header, Query, Path Parameters
 	if (operation.parameters) {
 		for (const param of operation.parameters) {
 			const resolved = param.$ref ? resolveSchemaRef(param.$ref, spec) : param;
@@ -138,12 +130,13 @@ function extractParameters(
 		}
 	}
 
-	// Request body
+	// 2. Request Body Parameters (JSON)
 	if (operation.requestBody) {
 		const content = operation.requestBody.content;
 		const jsonContent = content?.["application/json"];
 		if (jsonContent?.schema) {
 			const schema = resolveSchema(jsonContent.schema, spec);
+			
 			if (schema.properties) {
 				const required = schema.required || [];
 				for (const [name, propSchema] of Object.entries(schema.properties)) {
@@ -152,10 +145,19 @@ function extractParameters(
 						name,
 						type: getTypeString(prop),
 						required: required.includes(name),
-						description: (prop as any).description || "",
+						description: (prop as any).description || (prop as any).title || "",
 						location: "body",
 					});
 				}
+			} else if (schema.type === "array" && schema.items) {
+				// Handle array of objects in body
+				params.push({
+					name: "body",
+					type: `${getTypeString(schema.items)}[]`,
+					required: true,
+					description: schema.description || "Array of items",
+					location: "body",
+				});
 			}
 		}
 	}
@@ -163,22 +165,16 @@ function extractParameters(
 	return params;
 }
 
-function extractResponses(
-	operation: any,
-	spec: any,
-): Record<string, any> {
+function extractResponses(operation: any, spec: any): Record<string, any> {
 	const responses: Record<string, any> = {};
 
 	if (operation.responses) {
 		for (const [status, responseObj] of Object.entries(operation.responses as Record<string, any>)) {
-			const resolved = responseObj.$ref
-				? resolveSchemaRef(responseObj.$ref, spec)
-				: responseObj;
+			const resolved = responseObj.$ref ? resolveSchemaRef(responseObj.$ref, spec) : responseObj;
 			const content = resolved.content?.["application/json"];
 			let schema = null;
 			if (content?.schema) {
 				schema = resolveSchema(content.schema, spec);
-				// Simplify schema for display - just keep type and properties names
 				schema = simplifySchema(schema);
 			}
 			responses[status] = {
@@ -194,16 +190,16 @@ function extractResponses(
 function simplifySchema(schema: any, depth = 0): any {
 	if (!schema || depth > 2) return null;
 	if (schema.type === "object" && schema.properties) {
-		const simplified: Record<string, string> = {};
+		const simplified: Record<string, any> = {};
 		for (const [key, value] of Object.entries(schema.properties)) {
 			simplified[key] = getTypeString(value as any);
 		}
 		return simplified;
 	}
 	if (schema.type === "array" && schema.items) {
-		return { _type: "array", items: simplifySchema(schema.items, depth + 1) };
+		return [simplifySchema(schema.items, depth + 1)];
 	}
-	return { _type: schema.type || "any" };
+	return schema.type || "any";
 }
 
 function escapeForMDX(str: string): string {
@@ -221,9 +217,6 @@ function generateMDX(
 	const title = operation.summary || `${method.toUpperCase()} ${routePath}`;
 	const description = operation.description || title;
 
-	const paramsJSON = JSON.stringify(params);
-	const responsesJSON = JSON.stringify(responses);
-
 	return `---
 title: "${escapeForMDX(title)}"
 full: true
@@ -234,13 +227,18 @@ _openapi:
     headings: []
     contents:
       - content: "${escapeForMDX(description)}"
+_apiData:
+  document: "${service.prodUrl}"
+  operationData: ${JSON.stringify([{path: routePath, method}])}
+  parameterList: ${JSON.stringify(params)}
+  responseMap: ${JSON.stringify(responses)}
 ---
 
 {/* This file was generated by the OpenAPI doc generator. Do not edit this file directly. Run \`bun run generate:api-docs\` to regenerate. */}
 
 ${description}
 
-<APIPage document={"${service.prodUrl}"} operations={[{"path":"${routePath}","method":"${method}"}]} parameters={${paramsJSON}} responses={${responsesJSON}} />
+<APIPage />
 `;
 }
 
@@ -249,19 +247,14 @@ async function generateForService(service: ServiceConfig): Promise<string[]> {
 
 	try {
 		const response = await fetch(service.specUrl);
-		if (!response.ok) {
-			console.error(`  ❌ Failed: HTTP ${response.status}`);
-			return [];
-		}
+		if (!response.ok) return [];
 
 		const spec = await response.json();
 		const paths = spec.paths || {};
 		const generated: string[] = [];
 
 		const serviceDir = path.join(DOCS_DIR, service.name);
-		if (!fs.existsSync(serviceDir)) {
-			fs.mkdirSync(serviceDir, { recursive: true });
-		}
+		if (!fs.existsSync(serviceDir)) fs.mkdirSync(serviceDir, { recursive: true });
 
 		for (const [routePath, methods] of Object.entries(paths)) {
 			for (const [method, operation] of Object.entries(methods as Record<string, any>)) {
@@ -271,20 +264,15 @@ async function generateForService(service: ServiceConfig): Promise<string[]> {
 				const params = extractParameters(operation, spec);
 				const responses = extractResponses(operation, spec);
 
-				const operationId = sanitizeOperationId(method, routePath, service.prefix);
+				const operationId = sanitizeOperationId(method, routePath, service.prefix, operation);
 				const filename = `${operationId}.mdx`;
 				const filePath = path.join(serviceDir, filename);
 
 				const content = generateMDX(service, routePath, method, operation, params, responses);
 				fs.writeFileSync(filePath, content);
 				generated.push(`${service.name}/${operationId}`);
-				console.log(`  ✅ ${method.toUpperCase().padEnd(6)} ${routePath} → ${filename} (${params.length} params, ${Object.keys(responses).length} responses)`);
+				console.log(`  ✅ ${method.toUpperCase().padEnd(6)} ${routePath} → ${filename}`);
 			}
-		}
-
-		// Generate meta entries for this service
-		if (generated.length > 0) {
-			console.log(`  📄 Generated ${generated.length} pages for ${service.name}`);
 		}
 
 		return generated;
@@ -297,7 +285,6 @@ async function generateForService(service: ServiceConfig): Promise<string[]> {
 function generateMetaJson(allGenerated: Record<string, string[]>) {
 	const metaPath = path.join(DOCS_DIR, "meta.json");
 
-	// Build the pages array
 	const pages: string[] = [
 		"---API Reference---",
 		"index",
@@ -322,7 +309,7 @@ function generateMetaJson(allGenerated: Record<string, string[]>) {
 	for (const [service, entries] of Object.entries(allGenerated)) {
 		const sectionName = sectionNames[service] || service;
 		pages.push(`---${sectionName}---`);
-		pages.push(...entries);
+		pages.push(...entries.sort());
 	}
 
 	const meta = {
@@ -334,48 +321,21 @@ function generateMetaJson(allGenerated: Record<string, string[]>) {
 	};
 
 	fs.writeFileSync(metaPath, JSON.stringify(meta, null, "\t") + "\n");
-	console.log(`\n📝 Updated meta.json with ${pages.length} entries`);
+	console.log(`\n📝 Updated meta.json`);
 }
 
 async function main() {
-	const args = process.argv.slice(2);
-	const serviceFilter = args.find((a) => a.startsWith("--service="))?.split("=")[1];
-	const autoMeta = !args.includes("--no-meta");
-
-	const services = serviceFilter
-		? SERVICES.filter((s) => s.name === serviceFilter)
-		: SERVICES;
-
-	if (services.length === 0) {
-		console.error(`Unknown service: ${serviceFilter}`);
-		process.exit(1);
-	}
-
 	console.log("🔧 OpenAPI → MDX Doc Generator");
-	console.log(`   Generating docs for: ${services.map((s) => s.name).join(", ")}`);
 
 	const allGenerated: Record<string, string[]> = {};
 
-	for (const service of services) {
+	for (const service of SERVICES) {
 		const generated = await generateForService(service);
-		if (generated.length > 0) {
-			allGenerated[service.name] = generated;
-		}
+		if (generated.length > 0) allGenerated[service.name] = generated;
 	}
 
-	// Auto-update meta.json
-	if (autoMeta && Object.keys(allGenerated).length > 0) {
-		generateMetaJson(allGenerated);
-	}
-
-	// Print summary
-	console.log("\n📊 Summary:");
-	let total = 0;
-	for (const [name, pages] of Object.entries(allGenerated)) {
-		console.log(`   ${name}: ${pages.length} pages`);
-		total += pages.length;
-	}
-	console.log(`   Total: ${total} pages generated`);
+	generateMetaJson(allGenerated);
+	console.log("\n📊 Done!");
 }
 
 main();

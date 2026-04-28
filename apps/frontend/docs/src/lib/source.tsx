@@ -164,6 +164,7 @@ export const source = {
 					<MDXRemote source={content} components={props.components} />
 				),
 				toc,
+				_apiData: frontmatter._apiData || null,
 			},
 			url: `/${slugPath === "index" ? "introduction" : slugPath}`,
 		};

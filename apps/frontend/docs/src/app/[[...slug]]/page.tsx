@@ -143,7 +143,7 @@ export default async function Page(props: {
 
 						{/* Content */}
 						<DocsBody>
-							<MDXContent components={getMDXComponents({ Icon: Icon })} />
+							<MDXContent components={getMDXComponents({ Icon: Icon, _apiData: page.data._apiData } as any)} />
 						</DocsBody>
 					</div>
 				</div>

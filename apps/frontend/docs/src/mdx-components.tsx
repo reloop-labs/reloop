@@ -32,7 +32,9 @@ const getSlug = (children: React.ReactNode): string => {
 	return "";
 };
 
-export function getMDXComponents(components?: MDXComponents): MDXComponents {
+export function getMDXComponents(components?: MDXComponents & { _apiData?: any }): MDXComponents {
+	const apiData = components?._apiData;
+	const { _apiData: _, ...restComponents } = components || {};
 	return {
 		h2: ({ children, ...props }) => (
 			<h2 id={getSlug(children)} {...props}>
@@ -44,7 +46,7 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
 				{children}
 			</h3>
 		),
-		...components,
+		...restComponents,
 		Card: ({ icon, ...props }: any) => {
 			const processedIcon =
 				typeof icon === "string" &&
@@ -92,6 +94,20 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
 		Cards: CardGroup,
 		SimpleIcon,
 		PromptActions,
-		APIPage,
+		APIPage: (props: any) => {
+			// Inject frontmatter _apiData into APIPage when no operationData is provided inline
+			if (apiData && (!props.operationData || props.operationData.length === 0)) {
+				return (
+					<APIPage
+						document={apiData.document}
+						operationData={apiData.operationData}
+						parameterList={apiData.parameterList}
+						responseMap={apiData.responseMap}
+						{...props}
+					/>
+				);
+			}
+			return <APIPage {...props} />;
+		},
 	};
 }
