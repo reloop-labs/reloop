@@ -39,7 +39,7 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 
 	const handleAction = () => {
 		if (isPropertiesPage) setModal("add-property");
-		else if (isTopicsPage) setModal("create-topic");
+		else if (isTopicsPage) router.push("/contacts/topics/add");
 		else if (isGroupsPage) setModal("create-group");
 		else setModal("add-contact");
 	};
@@ -86,7 +86,7 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 
 	return (
 		<>
-			<div className="mx-auto max-w-3xl sm:px-8">
+			<div className={`mx-auto sm:px-8 ${isAddTopicPage ? "max-w-5xl" : "max-w-3xl"}`}>
 				{/* Unified Header */}
 				{!isDetailPage && (
 					<div className="flex items-center justify-between pt-10 pb-6">
@@ -129,7 +129,7 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 					</div>
 				)}
 
-				{!isDetailPage && (
+				{!isDetailPage && !isAddTopicPage && !isBulkImportPage && (
 					<div className="mt-2">
 						<ContactsTabs />
 					</div>

@@ -25,7 +25,7 @@ export const SidebarToggle = () => {
 			>
 				<Button.Icon>
 					<Icon
-						name="chevron-left"
+						name="sidebar-left"
 						className="h-3.5 w-3.5 transition-transform duration-200"
 						style={{
 							transform: isSidebarCollapsed ? "rotate(180deg)" : "rotate(0deg)",

@@ -7,6 +7,7 @@ import { parseAsInteger, useQueryState } from "nuqs";
 import { useState } from "react";
 import { toast } from "sonner";
 import useSWR, { useSWRConfig } from "swr";
+import { useRouter } from "next/navigation";
 import { TopicTable } from "./topic-table";
 
 interface Topic {
@@ -31,6 +32,7 @@ interface TopicListResponse {
 export const TopicList = () => {
 	const { activeOrganization } = useUserOrganization();
 	const { mutate } = useSWRConfig();
+	const router = useRouter();
 	const [searchQuery, setSearchQuery] = useState<string>("");
 	const [, setModal] = useQueryState("modal", { history: "replace" });
 	const [, setId] = useQueryState("id", { history: "replace" });
@@ -148,7 +150,7 @@ export const TopicList = () => {
 						setModal("delete-topic");
 						setId(topicId);
 					}}
-					onAddTopic={() => setModal("create-topic")}
+					onAddTopic={() => router.push("/contacts/topics/add")}
 				/>
 			</div>
 		</div>
