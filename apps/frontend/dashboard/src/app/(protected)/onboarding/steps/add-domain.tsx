@@ -82,7 +82,7 @@ export const AddDomainStep = () => {
 	);
 
 	useHotkeys(
-		"v+l",
+		"a+l",
 		() => {
 			if (status !== "loading") {
 				setStep(step + 1);
@@ -139,10 +139,10 @@ export const AddDomainStep = () => {
 						onClick={() => setStep(step + 1)}
 						disabled={status === "loading"}
 					>
-						Skip
+						Add Later
 						<span className="inline-flex items-center gap-0.5">
 							<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-200 p-px font-medium text-[10px] uppercase">
-								V
+								A
 							</span>
 							<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-200 p-px font-medium text-[10px] uppercase">
 								L

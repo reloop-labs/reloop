@@ -7,7 +7,7 @@ import { Logo } from "@reloop/ui/logo";
 import { AnimatePresence, motion } from "motion/react";
 import { parseAsInteger, useQueryState } from "nuqs";
 import type React from "react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 
 interface SplitLayoutProps {
@@ -30,8 +30,24 @@ export const SplitLayout = ({
 	maxWidth = "5xl",
 }: SplitLayoutProps) => {
 	const [step, setStep] = useQueryState("step", parseAsInteger.withDefault(1));
-	const onBack = step > 1 ? () => setStep(step - 1) : undefined;
 	const [hovered, setHovered] = useState(false);
+
+	// Compute direction synchronously during render.
+	// prevStepRef starts at 0 (sentinel) so the first render just initialises it.
+	// Works correctly with React Strict Mode double-renders because:
+	//   - both renders share the same ref object
+	//   - first render updates ref; second render sees step===prev → no-op
+	const prevStepRef = useRef(0);
+	const directionRef = useRef<1 | -1>(1);
+	if (prevStepRef.current === 0) {
+		prevStepRef.current = step; // initialise on mount
+	} else if (step !== prevStepRef.current) {
+		directionRef.current = step > prevStepRef.current ? 1 : -1;
+		prevStepRef.current = step;
+	}
+	const direction = directionRef.current;
+
+	const onBack = step > 1 ? () => setStep(step - 1) : undefined;
 
 	const easing = [0.4, 0, 0.2, 1] as const;
 	const transition = { duration: 0.22, ease: easing };
@@ -43,6 +59,45 @@ export const SplitLayout = ({
 	const stepMatch = stepIndicator.match(/Step (\d+) of (\d+)/);
 	const currentStep = stepMatch ? Number(stepMatch[1]) : null;
 	const totalSteps = stepMatch ? Number(stepMatch[2]) : null;
+
+	const slideDistance = 40;
+	// Left panel: enters from right (forward) / left (back); exits LEFT (forward) / RIGHT (back)
+	const contentVariants = {
+		initial: (dir: number) => ({
+			opacity: 0,
+			x: dir * slideDistance,
+			filter: "blur(3px)",
+		}),
+		animate: {
+			opacity: 1,
+			x: 0,
+			filter: "blur(0px)",
+		},
+		exit: (dir: number) => ({
+			opacity: 0,
+			x: dir * -slideDistance,
+			filter: "blur(3px)",
+		}),
+	};
+
+	// Right panel: enters from bottom (forward) / top (back); exits UP (forward) / DOWN (back)
+	const previewVariants = {
+		initial: (dir: number) => ({
+			opacity: 0,
+			y: dir * 28,
+			filter: "blur(3px)",
+		}),
+		animate: {
+			opacity: 1,
+			y: 0,
+			filter: "blur(0px)",
+		},
+		exit: (dir: number) => ({
+			opacity: 0,
+			y: dir * -28,
+			filter: "blur(3px)",
+		}),
+	};
 
 	return (
 		<div className="flex min-h-screen flex-col items-center justify-center">
@@ -76,7 +131,7 @@ export const SplitLayout = ({
 								: "lg:grid-cols-2",
 					)}
 				>
-					<div className="flex flex-col gap-4 px-12 pt-9 pb-9">
+					<div className="flex flex-col gap-4 px-12 pt-9 pb-9 overflow-hidden">
 						<motion.button
 							type="button"
 							onClick={onBack}
@@ -150,14 +205,46 @@ export const SplitLayout = ({
 							</div>
 						</motion.button>
 
-						{title && <h1 className="font-semibold text-title-h5">{title}</h1>}
-						{children}
+						{/* Animated step content — slides left/right based on nav direction */}
+						<AnimatePresence mode="wait" initial={false} custom={direction}>
+							<motion.div
+								key={step}
+								custom={direction}
+								variants={contentVariants}
+								initial="initial"
+								animate="animate"
+								exit="exit"
+								transition={{
+									duration: 0.3,
+									ease: [0.4, 0, 0.2, 1],
+								}}
+								className="flex flex-col gap-4"
+							>
+								{title && <h1 className="font-semibold text-title-h5">{title}</h1>}
+								{children}
+							</motion.div>
+						</AnimatePresence>
 					</div>
 					{!fullWidth && previewContent && (
 						<div className="relative hidden w-full overflow-hidden border-stroke-soft-100 border-l lg:flex dark:border-stroke-soft-100/40">
-							<div className="fade-in slide-in-from-bottom-8 relative z-10 w-full animate-in duration-700">
-								{previewContent}
-							</div>
+							<AnimatePresence mode="wait" initial={false} custom={direction}>
+								<motion.div
+									key={step}
+									custom={direction}
+									variants={previewVariants}
+									initial="initial"
+									animate="animate"
+									exit="exit"
+									transition={{
+										duration: 0.35,
+										ease: [0.4, 0, 0.2, 1],
+										delay: 0.05,
+									}}
+									className="relative z-10 w-full"
+								>
+									{previewContent}
+								</motion.div>
+							</AnimatePresence>
 						</div>
 					)}
 				</div>
