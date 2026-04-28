@@ -15,7 +15,7 @@ import { SplitLayout } from "./components/split-layout";
 import { AddDomainStep } from "./steps/add-domain";
 import { ConfigureDnsStep } from "./steps/configure-dns";
 import { CreateOrgStep } from "./steps/create-org";
-import { GenerateApiKeyStep } from "./steps/generate-api-key";
+import { GenerateApiKeyStep } from "./steps/generate-api-key/generate-api-key";
 
 export const OnBoardingContent = () => {
 	const { data: session, isPending } = authClient.useSession();
