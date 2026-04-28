@@ -9,7 +9,11 @@
 		"lint": "next lint"
 	},
 	"dependencies": {
+		"@dnd-kit/core": "catalog:ui",
+		"@dnd-kit/sortable": "catalog:ui",
+		"@dnd-kit/utilities": "catalog:ui",
 		"@hookform/resolvers": "catalog:ui",
+		"@number-flow/react": "catalog:ui",
 		"@reloop/api": "workspace:*",
 		"@reloop/auth": "workspace:*",
 		"@reloop/tailwind": "workspace:*",
@@ -34,17 +38,13 @@
 		"react-hotkeys-hook": "catalog:ui",
 		"react-use-measure": "catalog:ui",
 		"recharts": "catalog:ui",
-		"@number-flow/react": "catalog:ui",
 		"shiki": "catalog:ui",
 		"simple-icons": "catalog:ui",
 		"sonner": "catalog:ui",
 		"swr": "catalog:ui",
 		"usehooks-ts": "catalog:ui",
 		"valibot": "catalog:db",
-		"zustand": "catalog:ui",
-		"@dnd-kit/core": "catalog:ui",
-		"@dnd-kit/sortable": "catalog:ui",
-		"@dnd-kit/utilities": "catalog:ui"
+		"zustand": "catalog:ui"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",

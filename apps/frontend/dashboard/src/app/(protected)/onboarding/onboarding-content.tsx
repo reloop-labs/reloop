@@ -32,6 +32,7 @@ export const OnBoardingContent = () => {
 	const [domainId, setDomainId] = useQueryState("domainId", parseAsString.withDefault(""));
 	const [, setApiKey] = useQueryState("apiKey", parseAsString.withDefault(""));
 	const [, setLang] = useQueryState("lang", parseAsString.withDefault(""));
+	const [skippedDns, setSkippedDns] = useQueryState("skippedDns", parseAsString.withDefault(""));
 
 	useEffect(() => {
 		if (!isPending && !session) {
@@ -64,8 +65,12 @@ export const OnBoardingContent = () => {
 		4: () => {
 			setApiKey(null);
 			setLang(null);
+			setSkippedDns(null);
 		},
 	};
+
+	// When user skipped DNS (Add Later), back from step 4 goes to step 2
+	const backStep = step === 4 && skippedDns === "true" ? 2 : undefined;
 
 	const stepsConfig: Record<
 		number,
@@ -147,6 +152,7 @@ export const OnBoardingContent = () => {
 			previewSize="medium"
 			maxWidth={currentConfig.maxWidth}
 			onBack={stepCleanup[step]}
+			backStep={backStep}
 		>
 			{currentConfig.component}
 		</SplitLayout>

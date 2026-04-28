@@ -10,6 +10,7 @@ import { parseAsInteger, useQueryState } from "nuqs";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
+import { Calligraph } from "calligraph";
 
 // Smoothly animates height changes using a ResizeObserver + CSS transition.
 // Deliberately avoids Framer Motion layout so it can't conflict with slide animations.
@@ -41,6 +42,21 @@ const AnimatedHeight = ({ children }: { children: React.ReactNode }) => {
 	);
 };
 
+// Title that fluidly transitions its characters when the text changes between steps.
+// Calligraph uses LCS diffing: shared chars slide to new positions, new chars fade in.
+const ScrambleTitle = ({ text }: { text: string }) => (
+	<Calligraph
+		as="h1"
+		className="font-semibold text-title-h5"
+		animation="snappy"
+		trend={-1}
+		drift={{ x: 4, y: 0 }}
+		stagger={0.015}
+	>
+		{text}
+	</Calligraph>
+);
+
 interface SplitLayoutProps {
 	stepIndicator: string;
 	title?: string;
@@ -51,6 +67,8 @@ interface SplitLayoutProps {
 	maxWidth?: "3xl" | "4xl" | "5xl";
 	/** Called before stepping back — use to clear URL params set in the current step */
 	onBack?: () => void;
+	/** Override the target step when going back (defaults to step - 1) */
+	backStep?: number;
 }
 
 export const SplitLayout = ({
@@ -62,6 +80,7 @@ export const SplitLayout = ({
 	previewSize = "medium",
 	maxWidth = "5xl",
 	onBack: onBackCleanup,
+	backStep,
 }: SplitLayoutProps) => {
 	const [step, setStep] = useQueryState("step", parseAsInteger.withDefault(1));
 	const [hovered, setHovered] = useState(false);
@@ -85,7 +104,7 @@ export const SplitLayout = ({
 	const onBack = canGoBack
 		? () => {
 				onBackCleanup?.();
-				setStep(step - 1);
+				setStep(backStep ?? step - 1);
 			}
 		: undefined;
 
@@ -230,6 +249,9 @@ export const SplitLayout = ({
 							</div>
 						</motion.button>
 
+						{/* Title stays fixed; only the text scrambles when step changes */}
+						{title && <ScrambleTitle text={title} />}
+
 						{/* Animated step content */}
 						<AnimatedHeight>
 							<AnimatePresence mode="wait" initial={false} custom={direction}>
@@ -242,9 +264,6 @@ export const SplitLayout = ({
 									exit="exit"
 									className="flex flex-col gap-4"
 								>
-									{title && (
-										<h1 className="font-semibold text-title-h5">{title}</h1>
-									)}
 									{children}
 								</motion.div>
 							</AnimatePresence>

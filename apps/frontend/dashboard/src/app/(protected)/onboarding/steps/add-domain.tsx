@@ -25,6 +25,10 @@ export const AddDomainStep = () => {
 		parseAsString.withDefault(""),
 	);
 	const [step, setStep] = useQueryState("step", parseAsInteger.withDefault(1));
+	const [, setSkippedDns] = useQueryState(
+		"skippedDns",
+		parseAsString.withDefault(""),
+	);
 	const [status, setStatus] = React.useState<"idle" | "loading">("idle");
 
 	const { register, handleSubmit, formState, setError, watch, control } =
@@ -85,7 +89,8 @@ export const AddDomainStep = () => {
 		"a+l",
 		() => {
 			if (status !== "loading") {
-				setStep(step + 1);
+				setSkippedDns("true");
+				setStep(4);
 			}
 		},
 		{ enableOnFormTags: true },
@@ -133,10 +138,14 @@ export const AddDomainStep = () => {
 						)}
 					</Button.Root>
 					<Button.Root
+						type="button"
 						variant="neutral"
 						mode="stroke"
 						size="xsmall"
-						onClick={() => setStep(step + 1)}
+						onClick={() => {
+							setSkippedDns("true");
+							setStep(4);
+						}}
 						disabled={status === "loading"}
 					>
 						Add Later
