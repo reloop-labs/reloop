@@ -2,12 +2,13 @@
 
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
+import { useState } from "react";
 import {
 	siBun,
 	siComposer,
 	siDotenv,
-	siGo,
 	siGnubash,
+	siGo,
 	siNodedotjs,
 	siNpm,
 	siPhp,
@@ -15,13 +16,12 @@ import {
 	siPython,
 	siYarn,
 } from "simple-icons";
-import { useState } from "react";
 import {
 	installCommands,
-	nodeInstallCommands,
-	sendEmailCode,
 	type LanguageCode,
+	nodeInstallCommands,
 	type PackageManager,
+	sendEmailCode,
 } from "../data";
 import { CopyCodeBlock } from "./copy-code-block";
 import { LanguageBadges } from "./language-badges";
@@ -75,7 +75,9 @@ export function PostGenerate({
 	const [pkgManager, setPkgManager] = useState<PackageManager>("npm");
 
 	const isNode = lang === "nodejs";
-	const installCode = isNode ? nodeInstallCommands[pkgManager] : installCommands[lang];
+	const installCode = isNode
+		? nodeInstallCommands[pkgManager]
+		: installCommands[lang];
 	const installIcon = isNode
 		? undefined
 		: nonNodeInstallIcons[lang as keyof typeof nonNodeInstallIcons];
@@ -88,7 +90,12 @@ export function PostGenerate({
 				<p className="text-paragraph-xs text-text-sub-600">
 					Your API key — copy it now, you won't see it again.
 				</p>
-				<CopyCodeBlock code={apiKey} lang="bash" copyValue={apiKey} label="secret key" />
+				<CopyCodeBlock
+					code={apiKey}
+					lang="bash"
+					copyValue={apiKey}
+					label="secret key"
+				/>
 			</div>
 
 			{/* Language selector */}
@@ -104,7 +111,9 @@ export function PostGenerate({
 						si={installIcon}
 						tabs={isNode ? pkgManagerTabs : undefined}
 						activeTab={isNode ? pkgManager : undefined}
-						onTabChange={isNode ? (id) => setPkgManager(id as PackageManager) : undefined}
+						onTabChange={
+							isNode ? (id) => setPkgManager(id as PackageManager) : undefined
+						}
 					/>
 				</StepCard>
 
@@ -118,7 +127,7 @@ export function PostGenerate({
 					/>
 				</StepCard>
 
-				<StepCard number={3} title="Send your first email">
+				<StepCard number={3} title="Send your first email" isLast>
 					<CopyCodeBlock
 						code={sendEmailCode[lang].code}
 						lang={sendEmailCode[lang].lang}
