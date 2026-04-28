@@ -34,6 +34,7 @@
 		"react-hotkeys-hook": "catalog:ui",
 		"react-use-measure": "catalog:ui",
 		"recharts": "catalog:ui",
+		"@number-flow/react": "catalog:ui",
 		"shiki": "catalog:ui",
 		"simple-icons": "catalog:ui",
 		"sonner": "catalog:ui",

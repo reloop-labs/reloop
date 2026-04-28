@@ -1,8 +1,10 @@
 "use client";
 
+import NumberFlow from "@number-flow/react";
 import { cn } from "@reloop/ui/cn";
 import { Logo } from "@reloop/ui/logo";
 import { ChevronLeft } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import { parseAsInteger, useQueryState } from "nuqs";
 import type React from "react";
 
@@ -27,6 +29,12 @@ export const SplitLayout = ({
 }: SplitLayoutProps) => {
 	const [step, setStep] = useQueryState("step", parseAsInteger.withDefault(1));
 	const onBack = step > 1 ? () => setStep(step - 1) : undefined;
+
+	// Extract the current step number for NumberFlow
+	const stepMatch = stepIndicator.match(/Step (\d+) of (\d+)/);
+	const currentStep = stepMatch ? Number(stepMatch[1]) : null;
+	const totalSteps = stepMatch ? Number(stepMatch[2]) : null;
+
 	return (
 		<div className="flex min-h-screen flex-col items-center justify-center">
 			<div className="-translate-x-1/2 absolute top-5 left-1/2 flex items-center space-x-2">
@@ -61,20 +69,48 @@ export const SplitLayout = ({
 				>
 					<div className="flex flex-col gap-4 px-12 pt-9 pb-9">
 						<div className="relative flex gap-2">
-							{onBack && (
-								<div className="-left-6 -top-[2.1px] absolute">
-									<button
-										type="button"
-										onClick={onBack}
-										className="cursor-pointer text-text-soft-400 hover:text-text-strong-950"
+							{/* Back button — slides in from the left */}
+							<AnimatePresence>
+								{onBack && (
+									<motion.div
+										className="-left-6 -top-[2.1px] absolute"
+										initial={{ opacity: 0, x: -6 }}
+										animate={{ opacity: 1, x: 0 }}
+										exit={{ opacity: 0, x: -6 }}
+										transition={{ duration: 0.2, ease: "easeOut" }}
 									>
-										<ChevronLeft size={16} />
-									</button>
-								</div>
-							)}
+										<button
+											type="button"
+											onClick={onBack}
+											className="cursor-pointer text-text-soft-400 transition-colors hover:text-text-strong-950"
+										>
+											<ChevronLeft size={16} />
+										</button>
+									</motion.div>
+								)}
+							</AnimatePresence>
+
 							<div>
+								{/* Step indicator with NumberFlow for the number */}
 								<div className="mb-1 font-medium text-text-soft-400 text-xs">
-									{stepIndicator}
+									{currentStep !== null && totalSteps !== null ? (
+										<span className="inline-flex items-center gap-1">
+											Step
+											<NumberFlow
+												value={currentStep}
+												className="tabular-nums"
+												transformTiming={{ duration: 400, easing: "ease-out" }}
+											/>
+											of
+											<NumberFlow
+												value={totalSteps}
+												className="tabular-nums"
+												transformTiming={{ duration: 400, easing: "ease-out" }}
+											/>
+										</span>
+									) : (
+										stepIndicator
+									)}
 								</div>
 								{title && (
 									<h1 className="font-semibold text-title-h5">{title}</h1>
