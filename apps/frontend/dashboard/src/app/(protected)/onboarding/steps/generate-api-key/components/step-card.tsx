@@ -17,7 +17,7 @@ export function StepCard({
 		<div className="flex gap-3">
 			{/* Left: badge + connector line */}
 			<div className="flex flex-col items-center">
-				<div className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-bg-weak-50 font-semibold text-[11px] text-text-sub-600 ring-1 ring-stroke-soft-200">
+				<div className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-bg-weak-50 font-semibold text-[11px] text-text-sub-600 ring-1 ring-stroke-soft-200 dark:bg-bg-weak-50/70 dark:ring-stroke-soft-100/40">
 					{number}
 				</div>
 				{!isLast && (
