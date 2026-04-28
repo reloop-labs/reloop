@@ -9,6 +9,8 @@ import { useHotkeys } from "react-hotkeys-hook";
 import useSWR from "swr";
 import { ContactsModals } from "./components/contacts-modals";
 import { ContactsTabs } from "./components/contacts-tabs";
+import { KbdCommand } from "@reloop/ui/kbd-command";
+import { KbdKey } from "@reloop/ui/kbd-key";
 
 interface Topic {
 	id: string;
@@ -107,7 +109,7 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 						</div>
 						{!isAddTopicPage && !isBulkImportPage && (
 							<div className="flex items-center gap-2 self-end">
-								<DocsButton slug="contacts" size="xsmall" mode="stroke" />
+								<DocsButton slug="contacts" size="xsmall" />
 								<Button.Root
 									variant="neutral"
 									size="xsmall"
@@ -117,13 +119,8 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 									<Icon name="plus" className="h-4 w-4" />
 									{actionLabel}
 									<span className="inline-flex items-center gap-0.5">
-										<Icon
-											name="command"
-											className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
-										/>
-										<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-100/20 p-px font-medium text-[10px] uppercase">
-											A
-										</span>
+										<KbdCommand />
+										<KbdKey>a</KbdKey>
 									</span>
 								</Button.Root>
 								<ContactsApiDetails size="xsmall" mode="ghost" />

@@ -73,10 +73,7 @@ export const ContactList = () => {
 		"page",
 		parseAsInteger.withDefault(1),
 	);
-	const [pageSize] = useQueryState(
-		"limit",
-		parseAsInteger.withDefault(10),
-	);
+	const [pageSize] = useQueryState("limit", parseAsInteger.withDefault(10));
 
 	const buildUrl = () => {
 		if (!activeOrganization?.id) return null;
@@ -182,12 +179,12 @@ export const ContactList = () => {
 					</Input.Root>
 				</div>
 
-				<ContactFilterDropdown 
-					value={filter} 
+				<ContactFilterDropdown
+					value={filter}
 					onChange={(newFilter) => {
 						setFilter(newFilter);
 						setCurrentPage(1);
-					}} 
+					}}
 				/>
 				<Button.Root
 					variant="neutral"

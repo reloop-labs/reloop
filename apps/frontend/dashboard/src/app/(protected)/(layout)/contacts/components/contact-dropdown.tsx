@@ -65,6 +65,7 @@ export const ContactDropdown = ({
 			id: "toggle-status",
 			label: isSubscribed ? "Unsubscribe" : "Subscribe",
 			icon: isSubscribed ? "cross-circle" : ("check-circle" as const),
+			color: isSubscribed ? "text-red-base" : "text-success-base",
 			isDanger: false,
 		},
 		{
@@ -122,9 +123,7 @@ export const ContactDropdown = ({
 		if (itemId === "view") {
 			setPopoverOpen(false);
 			if (activeOrganization?.slug) {
-				router.push(
-					`/contacts/detail/${contact.id}`,
-				);
+				router.push(`/contacts/detail/${contact.id}`);
 			}
 		} else if (itemId === "toggle-status") {
 			setPopoverOpen(false);
@@ -171,7 +170,7 @@ export const ContactDropdown = ({
 								(item.id === "toggle-status" && isTogglingStatus)
 							}
 							className={cn(
-								"flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 font-normal text-xs transition-colors",
+								"flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 font-medium text-xs transition-colors",
 								item.isDanger ? "text-error-base" : "text-text-strong-950",
 								!currentRect &&
 									hoverIdx === idx &&

@@ -3,6 +3,7 @@
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
 import { useHotkeys } from "react-hotkeys-hook";
 
 interface DocsButtonProps
@@ -36,11 +37,9 @@ export const DocsButton = ({
 			className={cn("gap-1.5", className)}
 			{...rest}
 		>
-			<Icon name="book-closed" className="h-4 w-4" />
-			docs
-			<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-100 p-px font-medium text-[10px] uppercase">
-				D
-			</span>
+			<Icon name="file-text" className="h-4 w-4" />
+			Docs
+			<KbdKeyOutline>D</KbdKeyOutline>
 		</Button.Root>
 	);
 };
