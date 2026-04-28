@@ -1,7 +1,15 @@
 export type LanguageCode = "nodejs" | "go" | "php" | "python";
+export type PackageManager = "npm" | "pnpm" | "yarn" | "bun";
+
+export const nodeInstallCommands: Record<PackageManager, string> = {
+	npm: "npm install reloop-email",
+	pnpm: "pnpm add reloop-email",
+	yarn: "yarn add reloop-email",
+	bun: "bun add reloop-email",
+};
 
 export const installCommands: Record<LanguageCode, string> = {
-	nodejs: "npm install reloop-email",
+	nodejs: nodeInstallCommands.npm,
 	python: "pip install reloop",
 	go: "go get github.com/reloop/reloop-go",
 	php: "composer require reloop/reloop-php",

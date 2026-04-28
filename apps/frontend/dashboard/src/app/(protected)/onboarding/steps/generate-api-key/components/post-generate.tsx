@@ -2,10 +2,64 @@
 
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
-import { installCommands, sendEmailCode, type LanguageCode } from "../data";
+import {
+	siBun,
+	siComposer,
+	siDotenv,
+	siGo,
+	siGnubash,
+	siNodedotjs,
+	siNpm,
+	siPhp,
+	siPnpm,
+	siPython,
+	siYarn,
+} from "simple-icons";
+import { useState } from "react";
+import {
+	installCommands,
+	nodeInstallCommands,
+	sendEmailCode,
+	type LanguageCode,
+	type PackageManager,
+} from "../data";
 import { CopyCodeBlock } from "./copy-code-block";
 import { LanguageBadges } from "./language-badges";
 import { StepCard } from "./step-card";
+
+const langIcons = {
+	nodejs: siNodedotjs,
+	python: siPython,
+	go: siGo,
+	php: siPhp,
+} satisfies Record<LanguageCode, unknown>;
+
+const langLabels: Record<LanguageCode, string> = {
+	nodejs: "Node.js",
+	python: "Python",
+	go: "Go",
+	php: "PHP",
+};
+
+const langFileLabels: Record<LanguageCode, string> = {
+	nodejs: "send-email.ts",
+	python: "send_email.py",
+	go: "send_email.go",
+	php: "send-email.php",
+};
+
+const nonNodeInstallIcons = {
+	python: siPython,
+	go: siGnubash,
+	php: siComposer,
+} satisfies Partial<Record<LanguageCode, unknown>>;
+
+const pkgManagerTabs = [
+	{ id: "npm" as PackageManager, label: "npm", si: siNpm },
+	{ id: "pnpm" as PackageManager, label: "pnpm", si: siPnpm },
+	{ id: "yarn" as PackageManager, label: "yarn", si: siYarn },
+	{ id: "bun" as PackageManager, label: "bun", si: siBun },
+];
 
 export function PostGenerate({
 	apiKey,
@@ -18,6 +72,15 @@ export function PostGenerate({
 	onLanguageChange: (lang: LanguageCode) => void;
 	onDone: () => void;
 }) {
+	const [pkgManager, setPkgManager] = useState<PackageManager>("npm");
+
+	const isNode = lang === "nodejs";
+	const installCode = isNode ? nodeInstallCommands[pkgManager] : installCommands[lang];
+	const installIcon = isNode
+		? undefined
+		: nonNodeInstallIcons[lang as keyof typeof nonNodeInstallIcons];
+	const installLabel = isNode ? undefined : langLabels[lang];
+
 	return (
 		<div className="flex flex-col gap-6">
 			{/* API Key display */}
@@ -38,7 +101,15 @@ export function PostGenerate({
 					title="Install the SDK"
 					subtitle="Add the Reloop package to your project"
 				>
-					<CopyCodeBlock code={installCommands[lang]} lang="bash" label="terminal" />
+					<CopyCodeBlock
+						code={installCode}
+						lang="bash"
+						label={installLabel}
+						si={installIcon}
+						tabs={isNode ? pkgManagerTabs : undefined}
+						activeTab={isNode ? pkgManager : undefined}
+						onTabChange={isNode ? (id) => setPkgManager(id as PackageManager) : undefined}
+					/>
 				</StepCard>
 
 				<StepCard
@@ -51,6 +122,7 @@ export function PostGenerate({
 						lang="bash"
 						copyValue={`RELOOP_API_KEY=${apiKey}`}
 						label=".env"
+						si={siDotenv}
 					/>
 				</StepCard>
 
@@ -62,7 +134,8 @@ export function PostGenerate({
 					<CopyCodeBlock
 						code={sendEmailCode[lang].code}
 						lang={sendEmailCode[lang].lang}
-						label={lang}
+						label={langFileLabels[lang]}
+						si={langIcons[lang]}
 					/>
 				</StepCard>
 			</div>
