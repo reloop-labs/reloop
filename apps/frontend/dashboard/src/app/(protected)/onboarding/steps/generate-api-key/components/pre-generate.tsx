@@ -2,7 +2,7 @@
 
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
-import { Loader2 } from "lucide-react";
+import Spinner from "@reloop/ui/spinner";
 import { useHotkeys } from "react-hotkeys-hook";
 
 export function PreGenerate({
@@ -35,18 +35,13 @@ export function PreGenerate({
 				it safe — you'll only see it once.
 			</p>
 			<div className="flex items-center gap-3">
-				<Button.Root
-					variant="neutral"
-					size="xsmall"
-					onClick={onGenerate}
-					disabled={loading}
-				>
+				<Button.Root variant="neutral" onClick={onGenerate} disabled={loading}>
 					{loading ? (
-						<Loader2 className="h-4 w-4 animate-spin" />
+						<Spinner size={16} />
 					) : (
 						<Icon name="key-new" className="h-4 w-4" />
 					)}
-					{loading ? "Generating…" : "Generate Secret Key"}
+					{loading ? "Creating key…" : "Create your API key"}
 					{!loading && (
 						<span className="inline-flex items-center gap-0.5">
 							<Icon
