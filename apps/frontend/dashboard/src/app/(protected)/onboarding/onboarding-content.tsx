@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import type React from "react";
 import { useEffect } from "react";
-import { DnsConfigPreview } from "./components/dns-provider/dns-config-preview";
+
 import { DomainPreview } from "./components/domain-preview";
 import { SidebarPreview } from "./components/sidebar-preview";
 
@@ -23,7 +23,6 @@ export const OnBoardingContent = () => {
 	const router = useRouter();
 	const [step] = useQueryState("step", parseAsInteger.withDefault(1));
 	const [name] = useQueryState("name", parseAsString.withDefault(""));
-	const [slug] = useQueryState("slug", parseAsString.withDefault(""));
 	const [logoPreview] = useQueryState(
 		"logoPreview",
 		parseAsString.withDefault(""),
@@ -81,8 +80,9 @@ export const OnBoardingContent = () => {
 			stepIndicator: "Step 3 of 4",
 			title: "Configure DNS",
 			component: <ConfigureDnsStep />,
-			preview: <DnsConfigPreview domainId={domainId} domainName={domain} />,
-			fullWidth: false,
+			preview: null,
+			fullWidth: true,
+			maxWidth: "3xl",
 		},
 		4: {
 			stepIndicator: "Step 4 of 4",
@@ -128,7 +128,7 @@ export const OnBoardingContent = () => {
 			title={currentConfig.title}
 			previewContent={currentConfig.preview}
 			fullWidth={currentConfig.fullWidth}
-			previewSize={step === 3 ? "small" : "medium"}
+			previewSize="medium"
 			maxWidth={currentConfig.maxWidth}
 		>
 			{currentConfig.component}

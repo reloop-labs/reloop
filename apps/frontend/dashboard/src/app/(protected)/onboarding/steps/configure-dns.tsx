@@ -11,6 +11,7 @@ import * as React from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import useSWR, { mutate } from "swr";
+import { DNSAutoConnectBanner } from "@fe/dashboard/app/(protected)/(layout)/domain/[domainId]/components/dns-auto-connect-banner";
 import { DNSRecordSection } from "./configure-dns/components/dns-record-section";
 import { DomainAddedAlert } from "./configure-dns/components/domain-added-alert";
 import { groupDomainDnsRecords } from "./configure-dns/utils/dns-record-groups";
@@ -88,6 +89,8 @@ export const ConfigureDnsStep = () => {
 		<div className="fade-in animate-in pb-10 duration-500">
 			<div className="relative mx-auto mb-8">
 				<DomainAddedAlert domainName={domainData?.domain} />
+
+				<DNSAutoConnectBanner domain={domainData} domainId={domainId} />
 
 				{dkimRecords.length > 0 && (
 					<DNSRecordSection

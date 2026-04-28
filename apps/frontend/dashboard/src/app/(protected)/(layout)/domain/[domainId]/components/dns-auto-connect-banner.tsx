@@ -12,6 +12,7 @@ import { inferDnsProvider } from "../utils";
 
 interface DNSAutoConnectBannerProps {
 	domain?: DomainResponse;
+	domainId?: string;
 }
 
 const DNSAutoConnectBannerSkeleton = () => (
@@ -31,8 +32,10 @@ const DNSAutoConnectBannerSkeleton = () => (
 
 export const DNSAutoConnectBanner: React.FC<DNSAutoConnectBannerProps> = ({
 	domain,
+	domainId: domainIdProp,
 }) => {
-	const { domainId } = useParams();
+	const params = useParams();
+	const domainId = domainIdProp || params?.domainId;
 	const { data: nameserverData, isLoading } = useSWR<DomainNameserversResponse>(
 		domainId ? `/api/domain/v1/nameservers/${domainId}` : null,
 	);
