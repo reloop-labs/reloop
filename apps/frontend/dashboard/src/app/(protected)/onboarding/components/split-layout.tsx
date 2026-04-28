@@ -4,6 +4,7 @@ import NumberFlow from "@number-flow/react";
 import { cn } from "@reloop/ui/cn";
 import { KbdEsc } from "@reloop/ui/kbd-esc";
 import { Logo } from "@reloop/ui/logo";
+import type { Variants } from "motion/react";
 import { AnimatePresence, motion } from "motion/react";
 import { parseAsInteger, useQueryState } from "nuqs";
 import type React from "react";
@@ -18,7 +19,9 @@ const AnimatedHeight = ({ children }: { children: React.ReactNode }) => {
 
 	useEffect(() => {
 		if (!innerRef.current) return;
-		const ro = new ResizeObserver(([entry]) => {
+		const ro = new ResizeObserver((entries: ResizeObserverEntry[]) => {
+			const entry = entries[0];
+			if (!entry) return;
 			setHeight(entry.contentRect.height);
 		});
 		ro.observe(innerRef.current);
@@ -90,7 +93,7 @@ export const SplitLayout = ({
 
 	const slideDistance = 14;
 	// Left panel: enters from right (forward) / left (back); exits left/right
-	const contentVariants = {
+	const contentVariants: Variants = {
 		initial: (dir: number) => ({
 			opacity: 0,
 			x: dir * slideDistance,
@@ -98,17 +101,17 @@ export const SplitLayout = ({
 		animate: {
 			opacity: 1,
 			x: 0,
-			transition: { duration: 0.28, ease: [0.0, 0.0, 0.2, 1] },
+			transition: { duration: 0.28, ease: [0.0, 0.0, 0.2, 1] as const },
 		},
 		exit: (dir: number) => ({
 			opacity: 0,
 			x: dir * -slideDistance,
-			transition: { duration: 0.12, ease: [0.4, 0, 1, 1] },
+			transition: { duration: 0.12, ease: [0.4, 0, 1, 1] as const },
 		}),
 	};
 
 	// Right panel: enters from bottom/top; exits up/down
-	const previewVariants = {
+	const previewVariants: Variants = {
 		initial: (dir: number) => ({
 			opacity: 0,
 			y: dir * 12,
@@ -116,12 +119,16 @@ export const SplitLayout = ({
 		animate: {
 			opacity: 1,
 			y: 0,
-			transition: { duration: 0.3, ease: [0.0, 0.0, 0.2, 1], delay: 0.05 },
+			transition: {
+				duration: 0.3,
+				ease: [0.0, 0.0, 0.2, 1] as const,
+				delay: 0.05,
+			},
 		},
 		exit: (dir: number) => ({
 			opacity: 0,
 			y: dir * -12,
-			transition: { duration: 0.12, ease: [0.4, 0, 1, 1] },
+			transition: { duration: 0.12, ease: [0.4, 0, 1, 1] as const },
 		}),
 	};
 
@@ -157,7 +164,7 @@ export const SplitLayout = ({
 								: "lg:grid-cols-2",
 					)}
 				>
-					<div className="flex flex-col gap-4 px-12 pt-9 pb-9 overflow-hidden">
+					<div className="flex flex-col gap-4 overflow-hidden px-12 pt-9 pb-9">
 						<motion.button
 							type="button"
 							onClick={onBack}
@@ -243,7 +250,9 @@ export const SplitLayout = ({
 									exit="exit"
 									className="flex flex-col gap-4"
 								>
-									{title && <h1 className="font-semibold text-title-h5">{title}</h1>}
+									{title && (
+										<h1 className="font-semibold text-title-h5">{title}</h1>
+									)}
 									{children}
 								</motion.div>
 							</AnimatePresence>
