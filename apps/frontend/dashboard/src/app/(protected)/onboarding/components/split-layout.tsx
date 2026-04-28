@@ -153,25 +153,28 @@ export const SplitLayout = ({
 				</span>
 			</div>
 			<div
-				className={cn(
-					"flex w-full flex-1 flex-col items-center justify-center border-stroke-soft-100 border-r border-l dark:border-stroke-soft-100/40",
-					maxWidth === "3xl"
-						? "max-w-3xl"
-						: maxWidth === "4xl"
-							? "max-w-4xl"
-							: "max-w-5xl",
-				)}
+				className="flex w-full flex-1 flex-col items-center justify-center border-stroke-soft-100 border-r border-l dark:border-stroke-soft-100/40"
+				style={{
+					maxWidth:
+						maxWidth === "3xl"
+							? "48rem"
+							: maxWidth === "4xl"
+								? "56rem"
+								: "64rem",
+					transition: "max-width 0.45s cubic-bezier(0.4, 0, 0.2, 1)",
+				}}
 			>
 				<div className="w-full border-stroke-soft-100 border-t dark:border-stroke-soft-100/40" />
 				<div
-					className={cn(
-						"mx-auto grid h-full w-full",
-						fullWidth
-							? "lg:grid-cols-1"
+					className="mx-auto grid h-full w-full"
+					style={{
+						gridTemplateColumns: fullWidth
+							? "1fr 0px"
 							: previewSize === "small"
-								? "lg:grid-cols-[1.2fr_0.8fr]"
-								: "lg:grid-cols-2",
-					)}
+								? "1.2fr 0.8fr"
+								: "1fr 1fr",
+						transition: "grid-template-columns 0.45s cubic-bezier(0.4, 0, 0.2, 1)",
+					}}
 				>
 					<div className="flex flex-col gap-4 overflow-hidden px-12 pt-9 pb-9">
 						<motion.button
@@ -195,7 +198,7 @@ export const SplitLayout = ({
 										>
 											{/* Icon track */}
 											<div className="relative flex h-3.5 w-3.5 items-center">
-												{/* Tail — grows from left, anchored to chevron tip */}
+												{/* Tail */}
 												<motion.div
 													className="-translate-y-1/2 absolute top-1/2 left-[1.5px] h-[1.5px] rounded-full bg-current"
 													initial={{ width: 0, opacity: 0 }}
@@ -205,21 +208,9 @@ export const SplitLayout = ({
 													}}
 													transition={transition}
 												/>
-												{/* Chevron — stationary */}
-												<svg
-													width={6}
-													height={10}
-													viewBox="0 0 6 10"
-													fill="none"
-													className="absolute left-0"
-												>
-													<path
-														d="M5 1L1.5 5L5 9"
-														stroke="currentColor"
-														strokeWidth={1.5}
-														strokeLinecap="round"
-														strokeLinejoin="round"
-													/>
+												{/* Chevron */}
+												<svg width={6} height={10} viewBox="0 0 6 10" fill="none" className="absolute left-0">
+													<path d="M5 1L1.5 5L5 9" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
 												</svg>
 											</div>
 										</motion.span>
@@ -228,17 +219,9 @@ export const SplitLayout = ({
 								{currentStep !== null && totalSteps !== null ? (
 									<span className="mr-2 ml-px inline-flex items-center gap-1">
 										Step
-										<NumberFlow
-											value={currentStep}
-											className="tabular-nums"
-											transformTiming={{ duration: 400, easing: "ease-out" }}
-										/>
+										<NumberFlow value={currentStep} className="tabular-nums" transformTiming={{ duration: 400, easing: "ease-out" }} />
 										of
-										<NumberFlow
-											value={totalSteps}
-											className="tabular-nums"
-											transformTiming={{ duration: 400, easing: "ease-out" }}
-										/>
+										<NumberFlow value={totalSteps} className="tabular-nums" transformTiming={{ duration: 400, easing: "ease-out" }} />
 									</span>
 								) : (
 									stepIndicator
@@ -247,7 +230,7 @@ export const SplitLayout = ({
 							</div>
 						</motion.button>
 
-						{/* Animated step content — slides left/right based on nav direction */}
+						{/* Animated step content */}
 						<AnimatedHeight>
 							<AnimatePresence mode="wait" initial={false} custom={direction}>
 								<motion.div
@@ -267,23 +250,30 @@ export const SplitLayout = ({
 							</AnimatePresence>
 						</AnimatedHeight>
 					</div>
-					{!fullWidth && previewContent && (
-						<div className="relative hidden w-full overflow-hidden border-stroke-soft-100 border-l lg:flex dark:border-stroke-soft-100/40">
-							<AnimatePresence mode="wait" initial={false} custom={direction}>
-								<motion.div
-									key={step}
-									custom={direction}
-									variants={previewVariants}
-									initial="initial"
-									animate="animate"
-									exit="exit"
-									className="relative z-10 w-full"
-								>
-									{previewContent}
-								</motion.div>
-							</AnimatePresence>
-						</div>
-					)}
+
+					{/* Right panel — always in DOM, collapses via grid-template-columns */}
+					<div
+						className="relative hidden overflow-hidden border-stroke-soft-100 border-l lg:flex dark:border-stroke-soft-100/40"
+						style={{
+							opacity: fullWidth || !previewContent ? 0 : 1,
+							pointerEvents: fullWidth || !previewContent ? "none" : "auto",
+							transition: "opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+						}}
+					>
+						<AnimatePresence mode="wait" initial={false} custom={direction}>
+							<motion.div
+								key={step}
+								custom={direction}
+								variants={previewVariants}
+								initial="initial"
+								animate="animate"
+								exit="exit"
+								className="relative z-10 w-full"
+							>
+								{previewContent}
+							</motion.div>
+						</AnimatePresence>
+					</div>
 				</div>
 				<div className="w-full border-stroke-soft-100 border-b dark:border-stroke-soft-100/40" />
 			</div>
