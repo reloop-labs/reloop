@@ -25,7 +25,7 @@ export const getStatusColorClass = (status: AudienceStatus): string => {
 		case "subscribed":
 			return "text-success-base";
 		case "unsubscribed":
-			return "text-text-sub-600";
+			return "text-error-base";
 		default:
 			return "text-text-sub-600";
 	}

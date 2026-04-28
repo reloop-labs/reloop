@@ -1,17 +1,15 @@
 "use client";
-import { PageSizeDropdown } from "@fe/dashboard/components/page-size-dropdown";
-import { PaginationControls } from "@fe/dashboard/components/pagination-controls";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import { parseAsInteger, useQueryState } from "nuqs";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 import {
 	ContactFilterDropdown,
-	type ContactFilters,
+	type ContactFilterOption,
 } from "./contact-filter-dropdown";
 import { ContactTable } from "./contact-table";
 
@@ -69,30 +67,22 @@ const SummaryCard = ({
 export const ContactList = () => {
 	const { activeOrganization } = useUserOrganization();
 	const [searchQuery, setSearchQuery] = useState<string>("");
-	const [filters, setFilters] = useState<ContactFilters>([]);
+	const [filter, setFilter] = useState<ContactFilterOption>(null);
 	const [, setModal] = useQueryState("modal");
 	const [currentPage, setCurrentPage] = useQueryState(
 		"page",
 		parseAsInteger.withDefault(1),
 	);
-	const [pageSize, setPageSize] = useQueryState(
+	const [pageSize] = useQueryState(
 		"limit",
 		parseAsInteger.withDefault(10),
 	);
-
-	// Convert filters array to status filter string for API
-	const statusFilter = useMemo(() => {
-		if (filters.length === 0 || filters.length === 2) return "";
-		if (filters.includes("subscribed")) return "subscribed";
-		if (filters.includes("unsubscribed")) return "unsubscribed";
-		return "";
-	}, [filters]);
 
 	const buildUrl = () => {
 		if (!activeOrganization?.id) return null;
 		let url = `/api/contacts/list?limit=${pageSize}&page=${currentPage}`;
 		if (searchQuery) url += `&search=${encodeURIComponent(searchQuery)}`;
-		if (statusFilter) url += `&status=${statusFilter}`;
+		if (filter) url += `&status=${filter}`;
 		return url;
 	};
 
@@ -100,10 +90,6 @@ export const ContactList = () => {
 		revalidateOnFocus: true,
 		revalidateOnReconnect: true,
 	});
-
-	const totalPages = data ? Math.ceil(data.total / pageSize) : 1;
-	const startIndex = (currentPage - 1) * pageSize + 1;
-	const endIndex = Math.min(currentPage * pageSize, data?.total || 0);
 
 	const handleDownloadCSV = async () => {
 		try {
@@ -179,9 +165,9 @@ export const ContactList = () => {
 				/>
 			</div>
 
-			<div className="flex items-center gap-3">
+			<div className="flex items-center gap-2">
 				<div className="flex-1">
-					<Input.Root size="xsmall">
+					<Input.Root size="xsmall" className="rounded-[10px]">
 						<Input.Wrapper>
 							<Input.Icon as={Icon} name="search" size="xsmall" />
 							<Input.Input
@@ -196,7 +182,13 @@ export const ContactList = () => {
 					</Input.Root>
 				</div>
 
-				<ContactFilterDropdown value={filters} onChange={setFilters} />
+				<ContactFilterDropdown 
+					value={filter} 
+					onChange={(newFilter) => {
+						setFilter(newFilter);
+						setCurrentPage(1);
+					}} 
+				/>
 				<Button.Root
 					variant="neutral"
 					mode="stroke"
@@ -212,36 +204,12 @@ export const ContactList = () => {
 			<div className="mt-4">
 				<ContactTable
 					contacts={data?.contacts || []}
+					total={data?.total || 0}
 					isLoading={isLoading}
 					loadingRows={6}
 					onAddContact={() => setModal("add-contact")}
 				/>
 			</div>
-
-			{/* Pagination */}
-			{data && data.total > 0 && (
-				<div className="mt-4 flex items-center justify-between pb-8 text-paragraph-sm text-text-sub-600">
-					<div className="flex items-center gap-3">
-						<span>
-							Showing {startIndex}–{endIndex} of {data.total} contact
-							{data.total !== 1 ? "s" : ""}
-						</span>
-						<PageSizeDropdown
-							value={pageSize}
-							onValueChange={(value) => {
-								setPageSize(value);
-								setCurrentPage(1);
-							}}
-						/>
-					</div>
-					<PaginationControls
-						currentPage={currentPage}
-						totalPages={totalPages}
-						onPageChange={setCurrentPage}
-						isLoading={isLoading}
-					/>
-				</div>
-			)}
 		</div>
 	);
 };

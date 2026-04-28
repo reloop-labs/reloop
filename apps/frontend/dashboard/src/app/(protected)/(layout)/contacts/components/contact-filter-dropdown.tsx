@@ -1,21 +1,25 @@
 "use client";
 
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
+import {
+	getStatusColorClass,
+	getStatusIcon,
+} from "@fe/dashboard/utils/audience";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import { useRef, useState } from "react";
 
-export type ContactFilterOption = "subscribed" | "unsubscribed";
-export type ContactFilters = ContactFilterOption[];
+export type ContactFilterOption = "subscribed" | "unsubscribed" | null;
 
 interface ContactFilterDropdownProps {
-	value: ContactFilters;
-	onChange: (value: ContactFilters) => void;
+	value: ContactFilterOption;
+	onChange: (value: ContactFilterOption) => void;
 }
 
 const filterOptions: { id: ContactFilterOption; label: string }[] = [
+	{ id: null, label: "All Status" },
 	{ id: "subscribed", label: "Subscribed" },
 	{ id: "unsubscribed", label: "Unsubscribed" },
 ];
@@ -31,26 +35,15 @@ export const ContactFilterDropdown = ({
 	const currentTab = buttonRefs.current[hoverIdx ?? -1];
 	const currentRect = currentTab?.getBoundingClientRect();
 
-	const activeFilterCount = value.length;
-	const hasActiveFilter = activeFilterCount > 0;
-
 	const displayLabel =
-		activeFilterCount === 0
-			? "Status"
-			: activeFilterCount === 1
-				? filterOptions.find((o) => o.id === value[0])?.label || "Status"
-				: `${activeFilterCount} Statuses`;
+		filterOptions.find((o) => o.id === value)?.label || "Status";
 
-	const handleReset = () => {
-		onChange([]);
-	};
+	const displayIcon = value ? getStatusIcon(value) : "activity";
+	const displayIconColor = value ? getStatusColorClass(value) : "";
 
 	const handleToggle = (optionId: ContactFilterOption) => {
-		if (value.includes(optionId)) {
-			onChange(value.filter((v) => v !== optionId));
-		} else {
-			onChange([...value, optionId]);
-		}
+		onChange(optionId);
+		setIsOpen(false);
 	};
 
 	return (
@@ -60,43 +53,30 @@ export const ContactFilterDropdown = ({
 					variant="neutral"
 					mode="stroke"
 					size="xsmall"
-					className={cn(
-						"gap-1.5 whitespace-nowrap",
-						hasActiveFilter &&
-							"border-stroke-soft-900 bg-neutral-alpha-10 text-text-strong-950",
-					)}
+					className="w-48 justify-between gap-1.5 whitespace-nowrap rounded-[10px]"
 				>
-					<Button.Icon>
-						<Icon name="filter" className="h-3.5 w-3.5" />
-					</Button.Icon>
-					{displayLabel}
-					<Button.Icon>
-						<Icon name="chevron-down" className="h-3.5 w-3.5" />
-					</Button.Icon>
+					<div className="flex items-center gap-1.5 overflow-hidden">
+						<Icon
+							name={displayIcon}
+							className={cn("h-3.5 w-3.5 shrink-0", displayIconColor)}
+						/>
+						<span className={cn("truncate", displayIconColor)}>
+							{displayLabel}
+						</span>
+					</div>
+					<Icon name="chevron-down" className="h-3.5 w-3.5 shrink-0" />
 				</Button.Root>
 			</Dropdown.Trigger>
-			<Dropdown.Content align="start" className="w-44 p-3">
-				{/* Header */}
-				<div className="flex items-center justify-between border-stroke-soft-200 border-b px-1 pb-2">
-					<span className="font-medium text-text-sub-600 text-xs">
-						Filter by
-					</span>
-					<button
-						type="button"
-						onClick={handleReset}
-						className="rounded-lg border border-stroke-soft-200 px-2 py-1 text-text-sub-600 text-xs transition-colors hover:bg-bg-weak-50"
-					>
-						Reset filters
-					</button>
-				</div>
-
+			<Dropdown.Content align="start" className="w-48 p-2">
 				{/* Filter Options */}
 				<div className="relative">
 					{filterOptions.map((option, idx) => {
-						const isChecked = value.includes(option.id);
+						const isChecked =
+							option.id === null ? value === null : value === option.id;
+						const optionColor = option.id ? getStatusColorClass(option.id) : "";
 						return (
 							<button
-								key={option.id}
+								key={option.id ?? "all"}
 								ref={(el) => {
 									if (el) buttonRefs.current[idx] = el;
 								}}
@@ -105,16 +85,29 @@ export const ContactFilterDropdown = ({
 								onPointerLeave={() => setHoverIdx(undefined)}
 								onClick={() => handleToggle(option.id)}
 								className={cn(
-									"flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg px-2 py-1.5 font-normal text-xs transition-colors",
+									"flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg px-2 py-1.5 font-medium text-xs transition-colors",
 									"text-text-strong-950",
-									!currentRect && hoverIdx === idx && "bg-neutral-alpha-10",
+									isChecked && "bg-neutral-alpha-10",
 								)}
 							>
-								<span className={cn(isChecked && "font-medium text-text-strong-950")}>
-									{option.label}
-								</span>
+								<div className="flex items-center gap-2">
+									{option.id ? (
+										<Icon
+											name={getStatusIcon(option.id)}
+											className={cn("h-3.5 w-3.5", optionColor)}
+										/>
+									) : (
+										<Icon name="activity" className="h-3.5 w-3.5" />
+									)}
+									<span className={cn(isChecked && "font-medium", optionColor)}>
+										{option.label}
+									</span>
+								</div>
 								{isChecked && (
-									<Icon name="check" className="h-3.5 w-3.5 text-text-strong-950" />
+									<Icon
+										name="check"
+										className="h-3.5 w-3.5 text-text-strong-950"
+									/>
 								)}
 							</button>
 						);

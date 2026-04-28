@@ -147,7 +147,7 @@ export const ContactDropdown = ({
 					size="xxsmall"
 					disabled={isDeleting || isTogglingStatus}
 				>
-					<Icon name="more-vertical" className="h-3 w-3" />
+					<Icon name="more-horizontal" className="h-3 w-3" />
 				</Button.Root>
 			</PopoverTrigger>
 			<PopoverContent
