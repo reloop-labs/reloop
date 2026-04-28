@@ -2,11 +2,13 @@
 
 import NumberFlow from "@number-flow/react";
 import { cn } from "@reloop/ui/cn";
+import { KbdEsc } from "@reloop/ui/kbd-esc";
 import { Logo } from "@reloop/ui/logo";
-import { ChevronLeft } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { parseAsInteger, useQueryState } from "nuqs";
 import type React from "react";
+import { useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 
 interface SplitLayoutProps {
 	stepIndicator: string;
@@ -29,6 +31,13 @@ export const SplitLayout = ({
 }: SplitLayoutProps) => {
 	const [step, setStep] = useQueryState("step", parseAsInteger.withDefault(1));
 	const onBack = step > 1 ? () => setStep(step - 1) : undefined;
+	const [hovered, setHovered] = useState(false);
+
+	const easing = [0.4, 0, 0.2, 1] as const;
+	const transition = { duration: 0.22, ease: easing };
+
+	// Esc to go back
+	useHotkeys("escape", () => onBack?.(), { enabled: !!onBack });
 
 	// Extract the current step number for NumberFlow
 	const stepMatch = stepIndicator.match(/Step (\d+) of (\d+)/);
@@ -68,55 +77,80 @@ export const SplitLayout = ({
 					)}
 				>
 					<div className="flex flex-col gap-4 px-12 pt-9 pb-9">
-						<div className="relative flex gap-2">
-							{/* Back button — slides in from the left */}
-							<AnimatePresence>
-								{onBack && (
-									<motion.div
-										className="-left-6 -top-[2.1px] absolute"
-										initial={{ opacity: 0, x: -6 }}
-										animate={{ opacity: 1, x: 0 }}
-										exit={{ opacity: 0, x: -6 }}
-										transition={{ duration: 0.2, ease: "easeOut" }}
-									>
-										<button
-											type="button"
-											onClick={onBack}
-											className="cursor-pointer text-text-soft-400 transition-colors hover:text-text-strong-950"
+						<motion.button
+							type="button"
+							onClick={onBack}
+							disabled={!onBack}
+							onHoverStart={() => onBack && setHovered(true)}
+							onHoverEnd={() => setHovered(false)}
+							className={cn("group text-left", onBack && "cursor-pointer")}
+						>
+							{/* Step indicator row — icon + text */}
+							<div className="flex items-center font-medium text-text-soft-400 text-xs transition-colors group-hover:text-text-strong-950">
+								<AnimatePresence>
+									{onBack && (
+										<motion.span
+											initial={{ opacity: 0, width: 0 }}
+											animate={{ opacity: 1, width: "auto" }}
+											exit={{ opacity: 0, width: 0 }}
+											transition={transition}
+											className="mb-px flex items-center overflow-hidden"
 										>
-											<ChevronLeft size={16} />
-										</button>
-									</motion.div>
-								)}
-							</AnimatePresence>
-
-							<div>
-								{/* Step indicator with NumberFlow for the number */}
-								<div className="mb-1 font-medium text-text-soft-400 text-xs">
-									{currentStep !== null && totalSteps !== null ? (
-										<span className="inline-flex items-center gap-1">
-											Step
-											<NumberFlow
-												value={currentStep}
-												className="tabular-nums"
-												transformTiming={{ duration: 400, easing: "ease-out" }}
-											/>
-											of
-											<NumberFlow
-												value={totalSteps}
-												className="tabular-nums"
-												transformTiming={{ duration: 400, easing: "ease-out" }}
-											/>
-										</span>
-									) : (
-										stepIndicator
+											{/* Icon track */}
+											<div className="relative flex h-3.5 w-3.5 items-center">
+												{/* Tail — grows from left, anchored to chevron tip */}
+												<motion.div
+													className="-translate-y-1/2 absolute top-1/2 left-[1.5px] h-[1.5px] rounded-full bg-current"
+													initial={{ width: 0, opacity: 0 }}
+													animate={{
+														width: hovered ? 10 : 0,
+														opacity: hovered ? 1 : 0,
+													}}
+													transition={transition}
+												/>
+												{/* Chevron — stationary */}
+												<svg
+													width={6}
+													height={10}
+													viewBox="0 0 6 10"
+													fill="none"
+													className="absolute left-0"
+												>
+													<path
+														d="M5 1L1.5 5L5 9"
+														stroke="currentColor"
+														strokeWidth={1.5}
+														strokeLinecap="round"
+														strokeLinejoin="round"
+													/>
+												</svg>
+											</div>
+										</motion.span>
 									)}
-								</div>
-								{title && (
-									<h1 className="font-semibold text-title-h5">{title}</h1>
+								</AnimatePresence>
+								{currentStep !== null && totalSteps !== null ? (
+									<span className="mr-2 ml-px inline-flex items-center gap-1">
+										Step
+										<NumberFlow
+											value={currentStep}
+											className="tabular-nums"
+											transformTiming={{ duration: 400, easing: "ease-out" }}
+										/>
+										of
+										<NumberFlow
+											value={totalSteps}
+											className="tabular-nums"
+											transformTiming={{ duration: 400, easing: "ease-out" }}
+										/>
+									</span>
+								) : (
+									stepIndicator
 								)}
+								{onBack && <KbdEsc />}
 							</div>
-						</div>
+						</motion.button>
+
+						{title && <h1 className="font-semibold text-title-h5">{title}</h1>}
 						{children}
 					</div>
 					{!fullWidth && previewContent && (
