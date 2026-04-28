@@ -28,11 +28,11 @@ export function PreGenerate({
 				<Icon name="key-new" className="h-5 w-5 text-text-sub-600" />
 			</div>
 			<h3 className="mb-2 font-semibold text-text-strong-950 text-xl">
-				Generate API Credentials
+				Create your API key
 			</h3>
 			<p className="mx-auto mb-6 max-w-lg text-balance font-medium text-[12px] text-text-sub-600">
-				Your secret key authenticates your application with the Reloop API. Keep
-				it safe — you'll only see it once.
+				This key lets your app send emails through Reloop. Copy it now — for
+				security, we won’t show it again.
 			</p>
 			<div className="flex items-center gap-3">
 				<Button.Root variant="neutral" onClick={onGenerate} disabled={loading}>

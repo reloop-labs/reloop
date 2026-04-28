@@ -25,7 +25,7 @@ export function PostGenerate({
 				<p className="text-paragraph-xs text-text-sub-600">
 					Your API key — copy it now, you won't see it again.
 				</p>
-				<CopyCodeBlock code={apiKey} lang="bash" copyValue={apiKey} />
+				<CopyCodeBlock code={apiKey} lang="bash" copyValue={apiKey} label="secret key" />
 			</div>
 
 			{/* Language selector */}
@@ -38,7 +38,7 @@ export function PostGenerate({
 					title="Install the SDK"
 					subtitle="Add the Reloop package to your project"
 				>
-					<CopyCodeBlock code={installCommands[lang]} lang="bash" />
+					<CopyCodeBlock code={installCommands[lang]} lang="bash" label="terminal" />
 				</StepCard>
 
 				<StepCard
@@ -50,6 +50,7 @@ export function PostGenerate({
 						code={`RELOOP_API_KEY=${apiKey}`}
 						lang="bash"
 						copyValue={`RELOOP_API_KEY=${apiKey}`}
+						label=".env"
 					/>
 				</StepCard>
 
@@ -61,6 +62,7 @@ export function PostGenerate({
 					<CopyCodeBlock
 						code={sendEmailCode[lang].code}
 						lang={sendEmailCode[lang].lang}
+						label={lang}
 					/>
 				</StepCard>
 			</div>
