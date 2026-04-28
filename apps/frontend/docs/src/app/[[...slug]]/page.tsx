@@ -87,6 +87,7 @@ export default async function Page(props: {
 	const page = source.getPage(params.slug);
 	if (!page) notFound();
 	const MDXContent = page.data.body;
+	const isFullWidth = page.data.full === true;
 
 	const slugPath = params.slug?.join("/") || "index";
 	const breadcrumbs = getBreadcrumbs(
@@ -96,10 +97,10 @@ export default async function Page(props: {
 
 	return (
 		<DocsLayout tree={source.pageTree.children as PageTreeItem[]}>
-			<div className="mx-auto flex w-full max-w-[1250px] flex-col xl:grid xl:grid-cols-[1fr_240px] xl:gap-8s">
+			<div className={`mx-auto flex w-full flex-col ${isFullWidth ? 'max-w-none' : 'max-w-[1250px] xl:grid xl:grid-cols-[1fr_240px] xl:gap-8'}`}>
 				{/* Main content area */}
 				<div className="min-w-0 px-6 py-8 md:px-10">
-					<div className="mx-auto max-w-[720px] xl:mx-0">
+					<div className={isFullWidth ? '' : 'mx-auto max-w-[720px] xl:mx-0'}>
 						{/* Breadcrumb */}
 						{breadcrumbs.length > 0 ? (
 							<div className="mb-3 flex items-center gap-1.5 font-medium text-[12px] text-fd-muted-foreground/60 uppercase tracking-wider">
@@ -148,12 +149,14 @@ export default async function Page(props: {
 					</div>
 				</div>
 
-				{/* Right sidebar - Table of Contents */}
-				<aside className="hidden xl:block">
-					<div className="sticky top-0 h-[calc(100vh-3rem)] overflow-y-auto pt-8 pr-6">
-						<TableOfContents items={page.data.toc as TOCItem[]} />
-					</div>
-				</aside>
+				{/* Right sidebar - Table of Contents (hidden on full-width API pages) */}
+				{!isFullWidth && (
+					<aside className="hidden xl:block">
+						<div className="sticky top-0 h-[calc(100vh-3rem)] overflow-y-auto pt-8 pr-6">
+							<TableOfContents items={page.data.toc as TOCItem[]} />
+						</div>
+					</aside>
+				)}
 			</div>
 		</DocsLayout>
 	);

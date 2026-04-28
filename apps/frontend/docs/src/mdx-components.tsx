@@ -103,6 +103,7 @@ export function getMDXComponents(components?: MDXComponents & { _apiData?: any }
 						operationData={apiData.operationData}
 						parameterList={apiData.parameterList}
 						responseMap={apiData.responseMap}
+						codeSamples={apiData.codeSamples}
 						{...props}
 					/>
 				);

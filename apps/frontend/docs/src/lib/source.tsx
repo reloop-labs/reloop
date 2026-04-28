@@ -160,6 +160,7 @@ export const source = {
 			data: {
 				title: frontmatter.title || "Docs",
 				description: frontmatter.description || "",
+				full: frontmatter.full === true,
 				body: (props: { components?: MDXComponents }) => (
 					<MDXRemote source={content} components={props.components} />
 				),
