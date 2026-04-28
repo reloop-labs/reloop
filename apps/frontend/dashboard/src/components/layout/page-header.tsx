@@ -20,7 +20,7 @@ export const PageHeader = () => {
 	const href = activeItem.path;
 
 	return (
-		<div className="sticky top-0 z-10 flex h-12 items-center justify-start gap-2 border-stroke-soft-100 border-b bg-bg-white-0 pr-2 pl-3 dark:border-stroke-soft-100/40">
+		<div className="sticky top-0 z-10 flex h-11 items-center justify-start gap-2 border-stroke-soft-100 border-b pr-2 pl-3 dark:border-stroke-soft-100/40">
 			<div className="flex w-full items-center justify-between">
 				<Link
 					href={href}

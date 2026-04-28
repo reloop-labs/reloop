@@ -12,12 +12,12 @@ export const SidebarToggle = () => {
 		<motion.div
 			className="absolute z-50 shrink-0"
 			style={{ top: "12px" }}
-			animate={{ left: isSidebarCollapsed ? 67 : 250 }}
+			animate={{ left: isSidebarCollapsed ? 67 : 235 }}
 			transition={{ duration: 0.2, ease: "easeInOut" }}
 		>
 			<Button.Root
 				variant="neutral"
-				mode="stroke"
+				mode="ghost"
 				size="xxsmall"
 				onClick={toggleSidebarCollapse}
 				title="Toggle Sidebar (Cmd+B)"

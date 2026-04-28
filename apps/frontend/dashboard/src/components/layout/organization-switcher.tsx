@@ -92,55 +92,49 @@ export const OrganizationSwitcher: React.FC<OrganizationSwitcherProps> = ({
 						)}
 					</button>
 				) : (
-					<Button.Root
-						variant="neutral"
-						mode="ghost"
+					<button
+						type="button"
 						className={cn(
-							"flex h-auto w-full cursor-pointer items-center justify-between gap-2.5 pl-2",
+							"flex w-fit max-w-full cursor-pointer items-center gap-2 rounded-md p-1.5 outline-none transition-colors hover:bg-bg-weak-50",
 							isOpen && "bg-bg-weak-50",
 						)}
 					>
-						<div className="flex min-w-0 flex-1 items-center gap-2">
-							<div className="relative flex-shrink-0">
-								{activeOrganization.logo ? (
-									<Avatar.Root
-										size="24"
-										placeholderType="company"
-										className="rounded-[6px]"
-									>
-										<Avatar.Image
-											src={activeOrganization.logo}
-											alt={activeOrganization.name}
-										/>
-									</Avatar.Root>
-								) : (
-									<div
-										className={cn(
-											"flex h-[30px] w-[30px] flex-shrink-0 items-center justify-center rounded-[10px] font-semibold text-[11px] text-white shadow-sm",
-											getAvatarGradient(activeOrganization.name),
-										)}
-									>
-										{getAvatarInitial(
-											activeOrganization.name,
-											activeOrganization.name,
-										)}
-									</div>
-								)}
-							</div>
-							<div className="flex min-w-0 flex-1 flex-col items-start gap-px">
-								<p className="w-full truncate text-left font-medium text-sm text-text-strong-950">
-									{activeOrganization.name}
-								</p>
-								<p className="-mt-[3px] w-full truncate text-left text-text-sub-600 text-xs">
-									Free plan
-								</p>
-							</div>
+						<div className="relative flex-shrink-0">
+							{activeOrganization.logo ? (
+								<Avatar.Root
+									size="24"
+									placeholderType="company"
+									className="rounded-[6px]"
+								>
+									<Avatar.Image
+										src={activeOrganization.logo}
+										alt={activeOrganization.name}
+									/>
+								</Avatar.Root>
+							) : (
+								<div
+									className={cn(
+										"flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-[6px] font-semibold text-[11px] text-white shadow-sm",
+										getAvatarGradient(activeOrganization.name),
+									)}
+								>
+									{getAvatarInitial(
+										activeOrganization.name,
+										activeOrganization.name,
+									)}
+								</div>
+							)}
 						</div>
-						<Icon
-							name="chevron-down"
-							className="h-[14px] w-[14px] flex-shrink-0 text-text-sub-600"
-						/>
-					</Button.Root>
+						<div className="flex min-w-0 flex-shrink items-center gap-1.5">
+							<span className="truncate font-medium text-sm text-text-strong-950">
+								{activeOrganization.name}
+							</span>
+							<Icon
+								name="chevron-down"
+								className="h-3.5 w-3.5 flex-shrink-0 text-text-sub-600"
+							/>
+						</div>
+					</button>
 				)}
 			</Dropdown.Trigger>
 			<Dropdown.Content

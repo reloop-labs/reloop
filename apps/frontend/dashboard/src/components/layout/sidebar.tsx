@@ -13,11 +13,7 @@ import { OrganizationSwitcher } from "./organization-switcher";
 import { SidebarItems } from "./sidebar-items";
 import { UserMenuDropdown } from "./user-menu-dropdown";
 
-interface MainSidebarProps {
-	className?: string;
-}
-
-export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
+export const MainSidebar: React.FC = () => {
 	const { mutate } = useSWRConfig();
 	const { user, activeOrganization } = useUserOrganization();
 	const router = useRouter();
@@ -60,14 +56,13 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
 	return (
 		<motion.div
 			className={cn(
-				"sticky top-0 z-10 flex h-screen flex-col border-stroke-soft-100 border-r bg-neutral-alpha-10/30 dark:border-stroke-soft-100/40",
+				"sticky top-0 z-10 flex h-screen flex-col",
 				isSidebarCollapsed ? "w-14" : "w-60",
-				className,
 			)}
 			animate={{ width: isSidebarCollapsed ? 56 : 240 }}
 			transition={{ duration: 0.2, ease: "easeInOut" }}
 		>
-			<div className="flex h-12 items-center justify-between border-stroke-soft-100 border-b pr-3 pl-1 dark:border-stroke-soft-100/40">
+			<div className="flex h-12 items-center justify-between pr-3 pl-1">
 				<OrganizationSwitcher
 					organizations={organizations}
 					activeOrganization={activeOrganization}
@@ -79,9 +74,7 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
 			<div className="flex-1 overflow-y-auto p-2">
 				<SidebarItems isCollapsed={isSidebarCollapsed} />
 			</div>
-			<div className="border-stroke-soft-100 border-t p-2 dark:border-stroke-soft-100/40">
-				<UserMenuDropdown user={user} isCollapsed={isSidebarCollapsed} />
-			</div>
+			<UserMenuDropdown user={user} isCollapsed={isSidebarCollapsed} />
 		</motion.div>
 	);
 };
