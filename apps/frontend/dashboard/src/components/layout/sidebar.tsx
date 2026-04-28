@@ -8,7 +8,7 @@ import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr";
 import { OrganizationSwitcher } from "./organization-switcher";
 import { SidebarItems } from "./sidebar-items";
 import { UserMenuDropdown } from "./user-menu-dropdown";
@@ -18,6 +18,7 @@ interface MainSidebarProps {
 }
 
 export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
+	const { mutate } = useSWRConfig();
 	const { user, activeOrganization } = useUserOrganization();
 	const router = useRouter();
 	const { isSidebarCollapsed, setIsSidebarCollapsed, toggleSidebarCollapse } =
@@ -51,8 +52,9 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ className }) => {
 		await authClient.updateUser({
 			activeOrganizationId: organization.id,
 		});
-		refetch();
-		router.push("/");
+		await refetch();
+		await mutate(() => true, undefined, { revalidate: true });
+		router.refresh();
 	};
 
 	return (

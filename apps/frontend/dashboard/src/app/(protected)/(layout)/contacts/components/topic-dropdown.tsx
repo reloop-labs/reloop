@@ -98,7 +98,7 @@ export const TopicDropdown = ({
 		<PopoverRoot open={popoverOpen} onOpenChange={handleOpenChange}>
 			<PopoverTrigger asChild>
 				<Button.Root variant="neutral" mode="ghost" size="xxsmall">
-					<Icon name="more-vertical" className="h-3 w-3" />
+					<Icon name="more-horizontal" className="h-3 w-3" />
 				</Button.Root>
 			</PopoverTrigger>
 			<PopoverContent
@@ -118,7 +118,7 @@ export const TopicDropdown = ({
 							onPointerLeave={() => setHoverIdx(undefined)}
 							onClick={item.onClick}
 							className={cn(
-								"flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 font-normal text-text-strong-950 text-xs transition-colors",
+								"flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 font-medium text-text-strong-950 text-xs transition-colors",
 								!currentRect && hoverIdx === idx && "bg-neutral-alpha-10",
 								item.className,
 							)}

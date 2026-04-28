@@ -1,6 +1,4 @@
 "use client";
-import { PageSizeDropdown } from "@fe/dashboard/components/page-size-dropdown";
-import { PaginationControls } from "@fe/dashboard/components/pagination-controls";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
@@ -98,6 +96,14 @@ export const GroupList = () => {
 			<div className="mt-4">
 				<GroupTable
 					groups={data?.groups || []}
+					total={data?.total || 0}
+					currentPage={currentPage}
+					pageSize={pageSize}
+					onPageChange={setCurrentPage}
+					onPageSizeChange={(size) => {
+						setPageSize(size);
+						setCurrentPage(1);
+					}}
 					isLoading={isLoading}
 					onEdit={(contact_group_id) => {
 						setModal("edit-group");
@@ -110,31 +116,6 @@ export const GroupList = () => {
 					}}
 				/>
 			</div>
-
-			{/* Pagination */}
-			{data && data.total > 0 && (
-				<div className="mt-4 flex items-center justify-between pb-8 text-paragraph-sm text-text-sub-600">
-					<div className="flex items-center gap-3">
-						<span>
-							Showing {startIndex}–{endIndex} of {data.total} group
-							{data.total !== 1 ? "s" : ""}
-						</span>
-						<PageSizeDropdown
-							value={pageSize}
-							onValueChange={(value) => {
-								setPageSize(value);
-								setCurrentPage(1);
-							}}
-						/>
-					</div>
-					<PaginationControls
-						currentPage={currentPage}
-						totalPages={totalPages}
-						onPageChange={setCurrentPage}
-						isLoading={isLoading}
-					/>
-				</div>
-			)}
 		</div>
 	);
 };

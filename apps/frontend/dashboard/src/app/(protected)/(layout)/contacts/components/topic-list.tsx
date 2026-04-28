@@ -1,6 +1,4 @@
 "use client";
-import { PageSizeDropdown } from "@fe/dashboard/components/page-size-dropdown";
-import { PaginationControls } from "@fe/dashboard/components/pagination-controls";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 
 import { Icon } from "@reloop/ui/icon";
@@ -131,6 +129,14 @@ export const TopicList = () => {
 			<div className="mt-4">
 				<TopicTable
 					topics={filteredTopics}
+					total={data?.total || 0}
+					currentPage={currentPage}
+					pageSize={pageSize}
+					onPageChange={setCurrentPage}
+					onPageSizeChange={(size) => {
+						setPageSize(size);
+						setCurrentPage(1);
+					}}
 					isLoading={isLoading}
 					loadingRows={4}
 					onToggleVisibility={handleToggleVisibility}
@@ -145,31 +151,6 @@ export const TopicList = () => {
 					onAddTopic={() => setModal("create-topic")}
 				/>
 			</div>
-
-			{/* Pagination */}
-			{data && data.total > 0 && (
-				<div className="mt-4 flex items-center justify-between pb-8 text-paragraph-sm text-text-sub-600">
-					<div className="flex items-center gap-3">
-						<span>
-							Showing {startIndex}–{endIndex} of {data.total} topic
-							{data.total !== 1 ? "s" : ""}
-						</span>
-						<PageSizeDropdown
-							value={pageSize}
-							onValueChange={(value) => {
-								setPageSize(value);
-								setCurrentPage(1);
-							}}
-						/>
-					</div>
-					<PaginationControls
-						currentPage={currentPage}
-						totalPages={totalPages}
-						onPageChange={setCurrentPage}
-						isLoading={isLoading}
-					/>
-				</div>
-			)}
 		</div>
 	);
 };

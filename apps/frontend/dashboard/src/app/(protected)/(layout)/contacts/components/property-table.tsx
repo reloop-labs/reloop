@@ -14,6 +14,8 @@ import { Skeleton } from "@reloop/ui/skeleton";
 import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 import { PropertiesEmptyState } from "./properties-empty-state";
+import { PageSizeDropdown } from "@fe/dashboard/components/page-size-dropdown";
+import { PaginationControls } from "@fe/dashboard/components/pagination-controls";
 
 interface Property {
 	id: string;
@@ -28,6 +30,11 @@ interface Property {
 
 interface PropertyTableProps {
 	properties: Property[];
+	total?: number;
+	currentPage?: number;
+	pageSize?: number;
+	onPageChange?: (page: number) => void;
+	onPageSizeChange?: (size: number) => void;
 	isLoading?: boolean;
 	loadingRows?: number;
 	onDelete?: (propertyId: string) => void;
@@ -119,7 +126,7 @@ const PropertyActionsPopover = ({
 		>
 			<PopoverTrigger asChild>
 				<Button.Root variant="neutral" mode="ghost" size="xxsmall">
-					<Icon name="more-vertical" className="h-3 w-3" />
+					<Icon name="more-horizontal" className="h-3 w-3" />
 				</Button.Root>
 			</PopoverTrigger>
 			<PopoverContent
@@ -139,7 +146,7 @@ const PropertyActionsPopover = ({
 							onPointerLeave={() => setHoverIdx(undefined)}
 							onClick={() => handleItemClick(item.id)}
 							className={cn(
-								"flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 font-normal text-xs transition-colors",
+								"flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 font-medium text-xs transition-colors",
 								item.isDanger ? "text-error-base" : "text-text-strong-950",
 								!currentRect &&
 									hoverIdx === idx &&
@@ -169,6 +176,11 @@ const PropertyActionsPopover = ({
 
 export const PropertyTable = ({
 	properties,
+	total = 0,
+	currentPage = 1,
+	pageSize = 10,
+	onPageChange,
+	onPageSizeChange,
 	isLoading,
 	loadingRows = 4,
 	onDelete,
@@ -188,57 +200,28 @@ export const PropertyTable = ({
 		setId(property.id);
 	};
 
-	if (isLoading) {
-		return (
-			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/50">
-				{/* Header */}
-				<div className="grid grid-cols-[1fr_100px_1fr_120px_40px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600 dark:border-stroke-soft-100/50">
-					<div className="flex items-center gap-2">
-						<Icon name="tag" className="h-4 w-4" />
-						<span className="text-xs">Name</span>
-					</div>
-					<div className="flex items-center gap-2">
-						<Icon name="file-code" className="h-4 w-4" />
-						<span className="text-xs">Type</span>
-					</div>
-					<div className="flex items-center gap-2">
-						<Icon name="file-text" className="h-4 w-4" />
-						<span className="text-xs">Default</span>
-					</div>
-					<div className="flex items-center gap-2">
-						<Icon name="clock" className="h-4 w-4" />
-						<span className="text-xs">Created At</span>
-					</div>
-					<div />
-				</div>
-				{/* Skeleton rows */}
-				<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
-					{Array.from({ length: loadingRows }).map((_, index) => (
-						<PropertySkeleton key={`skeleton-${index}`} />
-					))}
-				</div>
-			</div>
-		);
-	}
+	const totalPages = Math.ceil(total / pageSize);
+	const startIndex = (currentPage - 1) * pageSize + 1;
+	const endIndex = Math.min(currentPage * pageSize, total);
 
 	return (
-		<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/50">
+		<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/40">
 			{/* Table Header */}
-			<div className="grid grid-cols-[1fr_100px_1fr_120px_40px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600 dark:border-stroke-soft-100/50">
-				<div className="flex items-center gap-2">
-					<Icon name="tag" className="h-4 w-4" />
+			<div className="grid grid-cols-[1fr_100px_1fr_120px_40px] items-center border-stroke-soft-100 border-b bg-bg-weak-50/50 px-4 py-2.5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-bg-weak-50/40">
+				<div className="flex items-center gap-1">
+					<Icon name="tag" className="h-3 w-3" />
 					<span className="text-xs">Name</span>
 				</div>
-				<div className="flex items-center gap-2">
-					<Icon name="file-code" className="h-4 w-4" />
+				<div className="flex items-center gap-1">
+					<Icon name="file-code" className="h-3 w-3" />
 					<span className="text-xs">Type</span>
 				</div>
-				<div className="flex items-center gap-2">
-					<Icon name="file-text" className="h-4 w-4" />
+				<div className="flex items-center gap-1">
+					<Icon name="file-text" className="h-3 w-3" />
 					<span className="text-xs">Default</span>
 				</div>
-				<div className="flex items-center gap-2">
-					<Icon name="clock" className="h-4 w-4" />
+				<div className="flex items-center gap-1">
+					<Icon name="clock" className="h-3 w-3" />
 					<span className="text-xs">Created At</span>
 				</div>
 				<div />
@@ -246,15 +229,19 @@ export const PropertyTable = ({
 
 			{/* Rows */}
 			<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
-				{properties.length === 0 && !isLoading ? (
+				{isLoading ? (
+					Array.from({ length: loadingRows }).map((_, i) => (
+						<PropertySkeleton key={`skeleton-${i}`} />
+					))
+				) : properties.length === 0 ? (
 					<PropertiesEmptyState onAddProperty={onAddProperty} />
 				) : (
 					properties.map((property) => (
 						<div
 							key={property.id}
 							className={cn(
-								"group/row grid grid-cols-[1fr_100px_1fr_120px_40px] items-center px-4 py-2 transition-colors",
-								"hover:bg-bg-weak-50/50",
+								"group/row grid grid-cols-[1fr_100px_1fr_120px_40px] items-center px-4 py-2 transition-colors text-left",
+								"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-base",
 								openPropertyId === property.id && "bg-bg-weak-50/50",
 							)}
 						>
@@ -282,14 +269,14 @@ export const PropertyTable = ({
 
 							{/* Default Column */}
 							<div className="flex items-center">
-								<span className="truncate font-medium text-label-sm text-text-sub-600">
+								<span className="truncate font-medium text-label-sm text-text-strong-950">
 									{property.defaultValue || "-"}
 								</span>
 							</div>
 
 							{/* Created At Column */}
 							<div className="flex items-center">
-								<span className="truncate whitespace-nowrap font-medium text-label-sm text-text-sub-600">
+								<span className="truncate whitespace-nowrap font-medium text-[13px]">
 									{formatRelativeTime(property.createdAt)}
 								</span>
 							</div>
@@ -309,6 +296,28 @@ export const PropertyTable = ({
 					))
 				)}
 			</div>
+
+			{/* Pagination Footer */}
+			{!isLoading && total > 0 && (
+				<div className="flex items-center justify-between border-stroke-soft-100 border-t px-4 py-2 text-label-xs text-text-sub-600 dark:border-stroke-soft-100/40">
+					<div className="flex items-center gap-3">
+						<span>
+							Showing {startIndex}–{endIndex} of {total} propert
+							{total !== 1 ? "ies" : "y"}
+						</span>
+						<PageSizeDropdown
+							value={pageSize}
+							onValueChange={(value) => onPageSizeChange?.(value)}
+						/>
+					</div>
+					<PaginationControls
+						currentPage={currentPage}
+						totalPages={totalPages}
+						onPageChange={(page) => onPageChange?.(page)}
+						isLoading={isLoading}
+					/>
+				</div>
+			)}
 		</div>
 	);
 };

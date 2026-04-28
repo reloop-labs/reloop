@@ -94,7 +94,7 @@ export const GroupDropdown = ({
 					size="xxsmall"
 					disabled={isDeleting}
 				>
-					<Icon name="more-vertical" className="h-3 w-3" />
+					<Icon name="more-horizontal" className="h-3 w-3" />
 				</Button.Root>
 			</PopoverTrigger>
 			<PopoverContent
@@ -115,7 +115,7 @@ export const GroupDropdown = ({
 							onClick={() => handleItemClick(item.id)}
 							disabled={item.id === "delete" && isDeleting}
 							className={cn(
-								"flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 font-normal text-xs transition-colors",
+								"flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 font-medium text-xs transition-colors",
 								item.isDanger ? "text-error-base" : "text-text-strong-950",
 								!currentRect &&
 									hoverIdx === idx &&

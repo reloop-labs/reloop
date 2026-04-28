@@ -8,6 +8,8 @@ import { useState } from "react";
 import useSWR from "swr";
 import { GroupDropdown } from "./group-dropdown";
 import { GroupsEmptyState } from "./groups-empty-state";
+import { PageSizeDropdown } from "@fe/dashboard/components/page-size-dropdown";
+import { PaginationControls } from "@fe/dashboard/components/pagination-controls";
 
 interface Group {
 	id: string;
@@ -20,6 +22,11 @@ interface Group {
 
 interface GroupTableProps {
 	groups: Group[];
+	total?: number;
+	currentPage?: number;
+	pageSize?: number;
+	onPageChange?: (page: number) => void;
+	onPageSizeChange?: (size: number) => void;
 	isLoading?: boolean;
 	loadingRows?: number;
 	onEdit?: (contact_group_id: string) => void;
@@ -48,7 +55,7 @@ const GroupContactsCount = ({ groupId }: { groupId: string }) => {
 
 	if (isLoading) return <Skeleton className="h-4 w-8" />;
 	return (
-		<span className="text-label-sm text-text-strong-950">
+		<span className="font-medium text-label-sm text-text-strong-950">
 			{data?.total ?? "---"}
 		</span>
 	);
@@ -56,6 +63,11 @@ const GroupContactsCount = ({ groupId }: { groupId: string }) => {
 
 export const GroupTable = ({
 	groups,
+	total = 0,
+	currentPage = 1,
+	pageSize = 10,
+	onPageChange,
+	onPageSizeChange,
 	isLoading,
 	loadingRows = 6,
 	onEdit,
@@ -69,53 +81,35 @@ export const GroupTable = ({
 		router.push(`/contacts/groups/${groupId}`);
 	};
 
-	if (isLoading) {
-		return (
-			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/50">
-				<div className="grid grid-cols-[1fr_100px_150px_80px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600 dark:border-stroke-soft-100/50">
-					<div className="flex items-center gap-2">
-						<Icon name="modules" className="h-4 w-4" />
-						<span className="text-xs">Name</span>
-					</div>
-					<div className="flex items-center gap-2">
-						<Icon name="users" className="h-4 w-4" />
-						<span className="text-xs">Contacts</span>
-					</div>
-					<div className="flex items-center gap-2">
-						<Icon name="clock" className="h-4 w-4" />
-						<span className="text-xs">Created at</span>
-					</div>
-					<div />
-				</div>
-				<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
-					{Array.from({ length: loadingRows }).map((_, index) => (
-						<GroupSkeleton key={`skeleton-${index}`} />
-					))}
-				</div>
-			</div>
-		);
-	}
+	const totalPages = Math.ceil(total / pageSize);
+	const startIndex = (currentPage - 1) * pageSize + 1;
+	const endIndex = Math.min(currentPage * pageSize, total);
 
 	return (
-		<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/50">
-			<div className="grid grid-cols-[1fr_100px_150px_80px] items-center border-stroke-soft-100 border-b px-4 py-3.5 text-text-sub-600 dark:border-stroke-soft-100/50">
-				<div className="flex items-center gap-2">
-					<Icon name="modules" className="h-4 w-4" />
+		<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/40">
+			{/* Table Header */}
+			<div className="grid grid-cols-[1fr_100px_150px_80px] items-center border-stroke-soft-100 border-b bg-bg-weak-50/50 px-4 py-2.5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-bg-weak-50/40">
+				<div className="flex items-center gap-1">
+					<Icon name="modules" className="h-3 w-3" />
 					<span className="text-xs">Name</span>
 				</div>
-				<div className="flex items-center gap-2">
-					<Icon name="users" className="h-4 w-4" />
+				<div className="flex items-center gap-1">
+					<Icon name="users" className="h-3 w-3" />
 					<span className="text-xs">Contacts</span>
 				</div>
-				<div className="flex items-center gap-2">
-					<Icon name="clock" className="h-4 w-4" />
+				<div className="flex items-center gap-1">
+					<Icon name="clock" className="h-3 w-3" />
 					<span className="text-xs">Created At</span>
 				</div>
 				<div />
 			</div>
 
 			<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
-				{groups.length === 0 ? (
+				{isLoading ? (
+					Array.from({ length: loadingRows }).map((_, i) => (
+						<GroupSkeleton key={`skeleton-${i}`} />
+					))
+				) : groups.length === 0 ? (
 					<GroupsEmptyState onAddGroup={onAddGroup} />
 				) : (
 					groups.map((group) => {
@@ -147,7 +141,7 @@ export const GroupTable = ({
 
 								{/* Created At Column */}
 								<div className="flex items-center">
-									<span className="whitespace-nowrap text-label-sm text-text-strong-950">
+									<span className="whitespace-nowrap font-medium text-[13px]">
 										{formatRelativeTime(group.createdAt)}
 									</span>
 								</div>
@@ -171,6 +165,28 @@ export const GroupTable = ({
 					})
 				)}
 			</div>
+
+			{/* Pagination Footer */}
+			{!isLoading && total > 0 && (
+				<div className="flex items-center justify-between border-stroke-soft-100 border-t px-4 py-2 text-label-xs text-text-sub-600 dark:border-stroke-soft-100/40">
+					<div className="flex items-center gap-3">
+						<span>
+							Showing {startIndex}–{endIndex} of {total} group
+							{total !== 1 ? "s" : ""}
+						</span>
+						<PageSizeDropdown
+							value={pageSize}
+							onValueChange={(value) => onPageSizeChange?.(value)}
+						/>
+					</div>
+					<PaginationControls
+						currentPage={currentPage}
+						totalPages={totalPages}
+						onPageChange={(page) => onPageChange?.(page)}
+						isLoading={isLoading}
+					/>
+				</div>
+			)}
 		</div>
 	);
 };
