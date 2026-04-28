@@ -28,8 +28,10 @@ export const OnBoardingContent = () => {
 		parseAsString.withDefault(""),
 	);
 	const [logoUrl] = useQueryState("logoUrl", parseAsString.withDefault(""));
-	const [domain] = useQueryState("domain", parseAsString.withDefault(""));
-	const [domainId] = useQueryState("domainId", parseAsString.withDefault(""));
+	const [domain, setDomain] = useQueryState("domain", parseAsString.withDefault(""));
+	const [domainId, setDomainId] = useQueryState("domainId", parseAsString.withDefault(""));
+	const [, setApiKey] = useQueryState("apiKey", parseAsString.withDefault(""));
+	const [, setLang] = useQueryState("lang", parseAsString.withDefault(""));
 
 	useEffect(() => {
 		if (!isPending && !session) {
@@ -50,7 +52,21 @@ export const OnBoardingContent = () => {
 		return null;
 	}
 
-	// Configuration for each step
+	// Params to clear when navigating back from each step
+	const stepCleanup: Record<number, () => void> = {
+		2: () => {
+			setDomain(null);
+			setDomainId(null);
+		},
+		3: () => {
+			setDomainId(null);
+		},
+		4: () => {
+			setApiKey(null);
+			setLang(null);
+		},
+	};
+
 	const stepsConfig: Record<
 		number,
 		{
@@ -130,6 +146,7 @@ export const OnBoardingContent = () => {
 			fullWidth={currentConfig.fullWidth}
 			previewSize="medium"
 			maxWidth={currentConfig.maxWidth}
+			onBack={stepCleanup[step]}
 		>
 			{currentConfig.component}
 		</SplitLayout>

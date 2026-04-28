@@ -49,6 +49,8 @@ interface SplitLayoutProps {
 	fullWidth?: boolean;
 	previewSize?: "small" | "medium";
 	maxWidth?: "3xl" | "4xl" | "5xl";
+	/** Called before stepping back — use to clear URL params set in the current step */
+	onBack?: () => void;
 }
 
 export const SplitLayout = ({
@@ -59,6 +61,7 @@ export const SplitLayout = ({
 	fullWidth = false,
 	previewSize = "medium",
 	maxWidth = "5xl",
+	onBack: onBackCleanup,
 }: SplitLayoutProps) => {
 	const [step, setStep] = useQueryState("step", parseAsInteger.withDefault(1));
 	const [hovered, setHovered] = useState(false);
@@ -78,7 +81,13 @@ export const SplitLayout = ({
 	}
 	const direction = directionRef.current;
 
-	const onBack = step > 1 ? () => setStep(step - 1) : undefined;
+	const canGoBack = step > 1;
+	const onBack = canGoBack
+		? () => {
+				onBackCleanup?.();
+				setStep(step - 1);
+			}
+		: undefined;
 
 	const easing = [0.4, 0, 0.2, 1] as const;
 	const transition = { duration: 0.22, ease: easing };
