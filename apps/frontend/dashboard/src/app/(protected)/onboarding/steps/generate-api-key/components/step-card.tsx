@@ -21,13 +21,17 @@ export function StepCard({
 					{number}
 				</div>
 				{!isLast && (
-					<div className="mt-1.5 w-px flex-1 bg-stroke-soft-200" />
+					<div className="mt-1.5 w-px flex-1 bg-stroke-soft-200 dark:bg-stroke-soft-100/40" />
 				)}
 			</div>
 
 			{/* Right: title + content */}
-			<div className={`flex flex-1 min-w-0 flex-col gap-3 ${isLast ? "" : "pb-2"}`}>
-				<p className="mt-[1px] font-medium text-label-sm text-text-strong-950 leading-5">{title}</p>
+			<div
+				className={`flex min-w-0 flex-1 flex-col gap-3 ${isLast ? "" : "pb-2"}`}
+			>
+				<p className="mt-[1px] font-medium text-label-sm text-text-strong-950 leading-5">
+					{title}
+				</p>
 				<div>{children}</div>
 			</div>
 		</div>
