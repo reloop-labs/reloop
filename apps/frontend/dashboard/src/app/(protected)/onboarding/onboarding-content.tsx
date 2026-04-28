@@ -6,8 +6,8 @@ import Spinner from "@reloop/ui/spinner";
 import { CheckCircle2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
-import { useEffect } from "react";
 import type React from "react";
+import { useEffect } from "react";
 import { DnsConfigPreview } from "./components/dns-provider/dns-config-preview";
 import { DomainPreview } from "./components/domain-preview";
 import { SidebarPreview } from "./components/sidebar-preview";
@@ -29,7 +29,6 @@ export const OnBoardingContent = () => {
 		parseAsString.withDefault(""),
 	);
 	const [logoUrl] = useQueryState("logoUrl", parseAsString.withDefault(""));
-	const [apiKey] = useQueryState("apiKey", parseAsString.withDefault(""));
 	const [domain] = useQueryState("domain", parseAsString.withDefault(""));
 	const [domainId] = useQueryState("domainId", parseAsString.withDefault(""));
 
@@ -68,9 +67,7 @@ export const OnBoardingContent = () => {
 			stepIndicator: "Step 1 of 4",
 			title: "Create your workspace",
 			component: <CreateOrgStep />,
-			preview: (
-				<SidebarPreview name={name} slug={slug} logo={logoPreview || null} />
-			),
+			preview: <SidebarPreview name={name} logo={logoPreview || null} />,
 			fullWidth: false,
 		},
 		2: {

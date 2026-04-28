@@ -2,7 +2,10 @@
 
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
+import { KbdCommand } from "@reloop/ui/kbd-command";
+import { KbdEnter } from "@reloop/ui/kbd-enter";
 import { useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import {
 	siBun,
 	siComposer,
@@ -74,6 +77,16 @@ export function PostGenerate({
 }) {
 	const [pkgManager, setPkgManager] = useState<PackageManager>("npm");
 
+	useHotkeys(
+		"mod+enter",
+		(e) => {
+			e.preventDefault();
+			onDone();
+		},
+		{ enableOnFormTags: true },
+		[onDone],
+	);
+
 	const isNode = lang === "nodejs";
 	const installCode = isNode
 		? nodeInstallCommands[pkgManager]
@@ -138,7 +151,7 @@ export function PostGenerate({
 			</div>
 
 			{/* CTA */}
-			<div className="flex items-center gap-3 pb-4">
+			<div className="ml-8 flex items-center gap-3 pb-4">
 				<Button.Root
 					variant="neutral"
 					mode="filled"
@@ -147,6 +160,10 @@ export function PostGenerate({
 				>
 					<Icon name="check-circle" className="h-3.5 w-3.5" />
 					Go to Dashboard
+					<span className="inline-flex items-center gap-0.5">
+						<KbdCommand />
+						<KbdEnter />
+					</span>
 				</Button.Root>
 			</div>
 		</div>

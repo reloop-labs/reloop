@@ -57,7 +57,7 @@ export const SplitLayout = ({
 			</div>
 			<div
 				className={cn(
-					"flex w-full flex-1 flex-col items-center justify-center border-stroke-soft-100 border-r border-l",
+					"flex w-full flex-1 flex-col items-center justify-center border-stroke-soft-100 border-r border-l dark:border-stroke-soft-100/40",
 					maxWidth === "3xl"
 						? "max-w-3xl"
 						: maxWidth === "4xl"
@@ -65,7 +65,7 @@ export const SplitLayout = ({
 							: "max-w-5xl",
 				)}
 			>
-				<div className="w-full border-stroke-soft-100 border-t" />
+				<div className="w-full border-stroke-soft-100 border-t dark:border-stroke-soft-100/40" />
 				<div
 					className={cn(
 						"mx-auto grid h-full w-full",
@@ -154,14 +154,14 @@ export const SplitLayout = ({
 						{children}
 					</div>
 					{!fullWidth && previewContent && (
-						<div className="relative hidden w-full overflow-hidden border-stroke-soft-100 border-l lg:flex">
+						<div className="relative hidden w-full overflow-hidden border-stroke-soft-100 border-l lg:flex dark:border-stroke-soft-100/40">
 							<div className="fade-in slide-in-from-bottom-8 relative z-10 w-full animate-in duration-700">
 								{previewContent}
 							</div>
 						</div>
 					)}
 				</div>
-				<div className="w-full border-stroke-soft-100 border-b" />
+				<div className="w-full border-stroke-soft-100 border-b dark:border-stroke-soft-100/40" />
 			</div>
 		</div>
 	);
