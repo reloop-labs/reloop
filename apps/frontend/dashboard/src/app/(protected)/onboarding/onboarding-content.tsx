@@ -7,7 +7,6 @@ import { CheckCircle2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useEffect } from "react";
-import { ApiPreview } from "./components/api-preview";
 import { DnsConfigPreview } from "./components/dns-provider/dns-config-preview";
 import { DomainPreview } from "./components/domain-preview";
 import { SidebarPreview } from "./components/sidebar-preview";
@@ -81,8 +80,8 @@ export const OnBoardingContent = () => {
 			stepIndicator: "Step 4 of 4",
 			title: "Generate API Credentials",
 			component: <GenerateApiKeyStep />,
-			preview: <ApiPreview apiKey={apiKey} />,
-			fullWidth: false,
+			preview: null,
+			fullWidth: true,
 		},
 	};
 

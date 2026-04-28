@@ -27,16 +27,24 @@ const languages = [
 
 interface LanguageTabsProps {
 	defaultValue?: string;
+	/** Controlled value — when provided, internal state mirrors this. */
+	value?: string;
 	onValueChange?: (value: string) => void;
 }
 
 export const LanguageTabs = ({
 	defaultValue = "nodejs",
+	value,
 	onValueChange,
 }: LanguageTabsProps) => {
 	const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
-	const [selectedLang, setSelectedLang] = useState<string>(defaultValue);
+	const [selectedLang, setSelectedLang] = useState<string>(value ?? defaultValue);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
+
+	// Keep internal state in sync with controlled value
+	if (value !== undefined && value !== selectedLang) {
+		setSelectedLang(value);
+	}
 
 	const activeIndex = languages.findIndex((lang) => lang.id === selectedLang);
 	const currentIdx = hoveredIdx !== undefined ? hoveredIdx : activeIndex;
@@ -49,7 +57,7 @@ export const LanguageTabs = ({
 	};
 
 	return (
-		<TabMenuHorizontal.Root defaultValue={defaultValue} value={selectedLang}>
+		<TabMenuHorizontal.Root defaultValue={defaultValue} value={value ?? selectedLang}>
 			<TabMenuHorizontal.List className="relative h-10 gap-0 border-b! px-3 py-0">
 				{languages.map((lang, index) => (
 					<TabMenuHorizontal.Trigger

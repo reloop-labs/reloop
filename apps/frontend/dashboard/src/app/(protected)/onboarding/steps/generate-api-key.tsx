@@ -1,34 +1,206 @@
 "use client";
 
 import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
+import { CodeBlock } from "@reloop/ui/code-block";
 import { Icon } from "@reloop/ui/icon";
-import * as Input from "@reloop/ui/input";
-import * as Label from "@reloop/ui/label";
 import axios from "axios";
 import {
 	CheckCircle2,
-	Code,
 	Copy,
-	Key,
 	Loader2,
-	Lock,
-	Plus,
-	Zap,
 } from "lucide-react";
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
+import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 import { parseAsString, useQueryState } from "nuqs";
 import { useState } from "react";
 import { toast } from "sonner";
+import { LanguageTabs } from "../components/language-tabs";
+
+type LanguageCode = "nodejs" | "go" | "php" | "python";
+
+const installCommands: Record<LanguageCode, string> = {
+	nodejs: "npm install reloop-email",
+	python: "pip install reloop",
+	go: "go get github.com/reloop/reloop-go",
+	php: "composer require reloop/reloop-php",
+};
+
+const sendEmailCode: Record<LanguageCode, { code: string; lang: string }> = {
+	nodejs: {
+		code: `import Reloop from 'reloop-email';
+
+const reloop = new Reloop(process.env.RELOOP_API_KEY);
+
+const result = await reloop.mail.send({
+  from: 'sender@example.com',
+  to: 'recipient@example.com',
+  subject: 'Hello from Reloop!',
+  text: 'Hello World!',
+});
+
+console.log(result);`,
+		lang: "typescript",
+	},
+	python: {
+		code: `import os
+from reloop import Reloop
+
+client = Reloop(os.environ["RELOOP_API_KEY"])
+
+result = client.mail.send(
+    from_email="sender@example.com",
+    to="recipient@example.com",
+    subject="Hello from Reloop!",
+    text="Hello World!",
+)
+
+print(result)`,
+		lang: "python",
+	},
+	go: {
+		code: `package main
+
+import (
+  "fmt"
+  "os"
+  "github.com/reloop/reloop-go"
+)
+
+func main() {
+  client := reloop.NewClient(os.Getenv("RELOOP_API_KEY"))
+
+  result, err := client.Mail.Send(&reloop.MailRequest{
+    From:    "sender@example.com",
+    To:      "recipient@example.com",
+    Subject: "Hello from Reloop!",
+    Text:    "Hello World!",
+  })
+  if err != nil {
+    fmt.Println("Error:", err)
+    return
+  }
+  fmt.Println("Success:", result)
+}`,
+		lang: "go",
+	},
+	php: {
+		code: `<?php
+
+require_once 'vendor/autoload.php';
+
+use Reloop\ReloopClient;
+
+$client = new ReloopClient(getenv('RELOOP_API_KEY'));
+
+$result = $client->mail->send([
+  'from'    => 'sender@example.com',
+  'to'      => 'recipient@example.com',
+  'subject' => 'Hello from Reloop!',
+  'text'    => 'Hello World!',
+]);
+
+echo json_encode($result, JSON_PRETTY_PRINT);`,
+		lang: "php",
+	},
+};
+
+// ─── Sub-components ────────────────────────────────────────────────────────
+
+function StepCard({
+	number,
+	title,
+	subtitle,
+	children,
+}: {
+	number: number;
+	title: string;
+	subtitle?: string;
+	children: React.ReactNode;
+}) {
+	return (
+		<div className="flex flex-col gap-3">
+			<div className="flex items-center gap-2.5">
+				<div className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-bg-weak-50 text-[11px] font-semibold text-text-sub-600 ring-1 ring-stroke-soft-200">
+					{number}
+				</div>
+				<div>
+					<p className="font-medium text-label-sm text-text-strong-950">
+						{title}
+					</p>
+					{subtitle && (
+						<p className="text-paragraph-xs text-text-soft-400">{subtitle}</p>
+					)}
+				</div>
+			</div>
+			<div className="pl-[30px]">{children}</div>
+		</div>
+	);
+}
+
+function CopyCodeBlock({
+	code,
+	lang,
+	copyValue,
+}: {
+	code: string;
+	lang: string;
+	copyValue?: string;
+}) {
+	const [copied, setCopied] = useState(false);
+	const { resolvedTheme } = useTheme();
+
+	const handleCopy = () => {
+		navigator.clipboard.writeText(copyValue ?? code);
+		setCopied(true);
+		setTimeout(() => setCopied(false), 2000);
+	};
+
+	return (
+		<div className="group relative overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-weak-50">
+			<div className="max-h-52 overflow-auto">
+				<CodeBlock
+					code={code}
+					lang={lang}
+					theme={resolvedTheme === "light" ? "rose-pine-dawn" : "vesper"}
+				/>
+			</div>
+			<button
+				type="button"
+				onClick={handleCopy}
+				className={cn(
+					"absolute top-2 right-2 flex items-center gap-1.5 rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-1",
+					"text-label-xs text-text-sub-600 shadow-xs transition-all duration-150",
+					"opacity-0 group-hover:opacity-100 hover:border-stroke-soft-300 hover:text-text-strong-950",
+				)}
+			>
+				{copied ? (
+					<CheckCircle2 className="h-3 w-3 text-success-base" />
+				) : (
+					<Copy className="h-3 w-3" />
+				)}
+				{copied ? "Copied!" : "Copy"}
+			</button>
+		</div>
+	);
+}
+
+// ─── Main Component ─────────────────────────────────────────────────────────
 
 export const GenerateApiKeyStep = () => {
 	const [apiKey, setApiKey] = useQueryState(
 		"apiKey",
 		parseAsString.withDefault(""),
 	);
+	const [selectedLang, setSelectedLang] = useQueryState(
+		"lang",
+		parseAsString.withDefault("nodejs"),
+	);
 	const router = useRouter();
 	const [loading, setLoading] = useState(false);
-	const [copied, setCopied] = useState(false);
+
+	const lang = (selectedLang as LanguageCode) || "nodejs";
 
 	const generateKey = async () => {
 		setLoading(true);
@@ -47,290 +219,141 @@ export const GenerateApiKeyStep = () => {
 		}
 	};
 
-	const copyToClipboard = () => {
-		navigator.clipboard.writeText(apiKey);
-		setCopied(true);
-		setTimeout(() => setCopied(false), 2000);
+	const handleLanguageChange = (value: string) => {
+		setSelectedLang(value);
 	};
 
 	return (
-		<div className="fade-in h-full animate-in space-y-6 duration-500">
-			{!apiKey ? (
-				<div className="flex w-full flex-col items-center justify-center p-4">
-					{/* Illustration Area */}
-					<div className="relative mb-8 flex h-64 w-64 items-center justify-center">
-						{/* The Dashed Orbit Ring - Rotating */}
-						<motion.div
-							className="absolute inset-0 rounded-full border border-stroke-soft-200 border-dashed opacity-75"
-							animate={{ rotate: 360 }}
-							transition={{
-								duration: 20,
-								repeat: Number.POSITIVE_INFINITY,
-								ease: "linear",
-							}}
-						/>
-
-						{/* Inner Glow/Background - Pulsing */}
-						<motion.div
-							className="absolute h-32 w-32 rounded-full bg-bg-weak-50 opacity-60 blur-2xl"
-							animate={{
-								scale: [1, 1.1, 1],
-								opacity: [0.4, 0.6, 0.4],
-							}}
-							transition={{
-								duration: 3,
-								repeat: Number.POSITIVE_INFINITY,
-								ease: "easeInOut",
-							}}
-						/>
-
-						{/* Center Element: The Main Key Icon - Floating */}
-						<motion.div
-							className="relative z-10 flex h-20 w-24 flex-col items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 shadow-sm"
-							animate={{
-								y: [0, -8, 0],
-							}}
-							transition={{
-								duration: 2.5,
-								repeat: Number.POSITIVE_INFINITY,
-								ease: "easeInOut",
-							}}
-						>
-							<div className="mb-2 h-2 w-full rounded-t-xl bg-bg-weak-50 opacity-50" />
-							<motion.div
-								style={{
-									color: "rgb(156 163 175)",
-								}}
-								animate={{
-									color: [
-										"rgb(156 163 175)", // text-text-soft-400
-										"rgb(59 130 246)", // primary-blue
-										"rgb(34 197 94)", // success-green
-										"rgb(156 163 175)", // back to soft
-									],
-								}}
-								transition={{
-									duration: 4,
-									repeat: Number.POSITIVE_INFINITY,
-									ease: "easeInOut",
-								}}
-							>
-								<Key className="h-8 w-8" strokeWidth={1.5} />
-							</motion.div>
-							<div className="mt-2 h-1.5 w-12 rounded-full bg-bg-weak-50" />
-						</motion.div>
-
-						{/* Satellite Icon 1 (Top Left) - Lock - Floating */}
-						<motion.div
-							className="absolute top-8 left-8 flex h-10 w-10 items-center justify-center rounded-full border border-stroke-soft-100 bg-bg-white-0 shadow-sm"
-							animate={{
-								y: [0, -12, 0],
-								rotate: [0, 5, -5, 0],
-							}}
-							transition={{
-								duration: 3,
-								repeat: Number.POSITIVE_INFINITY,
-								ease: "easeInOut",
-								delay: 0.2,
-							}}
-						>
-							<motion.div
-								style={{
-									color: "rgb(156 163 175)",
-								}}
-								animate={{
-									color: [
-										"rgb(156 163 175)", // text-text-soft-400
-										"rgb(239 68 68)", // error-red
-										"rgb(34 197 94)", // success-green
-										"rgb(156 163 175)", // back to soft
-									],
-								}}
-								transition={{
-									duration: 3.5,
-									repeat: Number.POSITIVE_INFINITY,
-									ease: "easeInOut",
-									delay: 0.5,
-								}}
-							>
-								<Lock className="h-4 w-4" />
-							</motion.div>
-						</motion.div>
-
-						{/* Satellite Icon 2 (Top Right) - Code - Floating */}
-						<motion.div
-							className="absolute top-8 right-8 flex h-10 w-10 items-center justify-center rounded-full border border-stroke-soft-100 bg-bg-white-0 shadow-sm"
-							animate={{
-								y: [0, -10, 0],
-								rotate: [0, -5, 5, 0],
-							}}
-							transition={{
-								duration: 2.8,
-								repeat: Number.POSITIVE_INFINITY,
-								ease: "easeInOut",
-								delay: 0.4,
-							}}
-						>
-							<motion.div
-								style={{
-									color: "rgb(156 163 175)",
-								}}
-								animate={{
-									color: [
-										"rgb(156 163 175)", // text-text-soft-400
-										"rgb(59 130 246)", // information-blue
-										"rgb(168 85 247)", // feature-purple
-										"rgb(156 163 175)", // back to soft
-									],
-								}}
-								transition={{
-									duration: 3.8,
-									repeat: Number.POSITIVE_INFINITY,
-									ease: "easeInOut",
-									delay: 1,
-								}}
-							>
-								<Code className="h-4 w-4" />
-							</motion.div>
-						</motion.div>
-
-						{/* Satellite Icon 3 (Bottom Left) - Zap - Floating */}
-						<motion.div
-							className="absolute bottom-8 left-8 flex h-10 w-10 items-center justify-center rounded-full border border-stroke-soft-100 bg-bg-white-0 shadow-sm"
-							animate={{
-								y: [0, -8, 0],
-								rotate: [0, 8, -8, 0],
-							}}
-							transition={{
-								duration: 3.2,
-								repeat: Number.POSITIVE_INFINITY,
-								ease: "easeInOut",
-								delay: 0.6,
-							}}
-						>
-							<motion.div
-								style={{
-									color: "rgb(156 163 175)",
-								}}
-								animate={{
-									color: [
-										"rgb(156 163 175)", // text-text-soft-400
-										"rgb(249 115 22)", // warning-orange
-										"rgb(234 179 8)", // away-yellow
-										"rgb(156 163 175)", // back to soft
-									],
-								}}
-								transition={{
-									duration: 3.2,
-									repeat: Number.POSITIVE_INFINITY,
-									ease: "easeInOut",
-									delay: 1.5,
-								}}
-							>
-								<Zap className="h-4 w-4" />
-							</motion.div>
-						</motion.div>
-
-						{/* Satellite Icon 4 (Bottom Right) - Lock - Floating */}
-						<motion.div
-							className="absolute right-8 bottom-8 flex h-12 w-12 items-center justify-center rounded-full border border-stroke-soft-100 bg-bg-white-0 shadow-sm"
-							animate={{
-								y: [0, -14, 0],
-								rotate: [0, -6, 6, 0],
-							}}
-							transition={{
-								duration: 2.6,
-								repeat: Number.POSITIVE_INFINITY,
-								ease: "easeInOut",
-								delay: 0.8,
-							}}
-						>
-							<motion.div
-								style={{
-									color: "rgb(156 163 175)",
-								}}
-								animate={{
-									color: [
-										"rgb(156 163 175)", // text-text-soft-400
-										"rgb(34 197 94)", // success-green
-										"rgb(59 130 246)", // information-blue
-										"rgb(156 163 175)", // back to soft
-									],
-								}}
-								transition={{
-									duration: 4.2,
-									repeat: Number.POSITIVE_INFINITY,
-									ease: "easeInOut",
-									delay: 2,
-								}}
-							>
-								<Lock className="h-5 w-5" />
-							</motion.div>
-						</motion.div>
-					</div>
-					<Button.Root
-						variant="neutral"
-						mode="filled"
-						onClick={generateKey}
-						disabled={loading}
-						className="w-full"
+		<div className="fade-in h-full animate-in duration-500">
+			<AnimatePresence mode="wait">
+				{!apiKey ? (
+					/* ── Pre-generation state ── */
+					<motion.div
+						key="pre-generate"
+						initial={{ opacity: 0, y: 8 }}
+						animate={{ opacity: 1, y: 0 }}
+						exit={{ opacity: 0, y: -8 }}
+						transition={{ duration: 0.25 }}
+						className="flex flex-col items-center justify-center gap-6 py-8 text-center"
 					>
-						{loading ? (
-							<Loader2 className="h-4 w-4 animate-spin" />
-						) : (
-							<Plus className="h-4 w-4" />
-						)}
-						{loading ? "Generating..." : "Generate Secret Key"}
-					</Button.Root>
-				</div>
-			) : (
-				<div className="flex h-full flex-1 flex-col justify-between space-y-6">
-					<div className="flex flex-col gap-1">
-						<Label.Root htmlFor="api-key">Your API Key</Label.Root>
-						<div className="group relative">
-							<Input.Root size="small">
-								<Input.Wrapper>
-									<Input.Input
-										id="api-key"
-										type="text"
-										readOnly
-										value={apiKey}
-										className="pr-14 font-mono"
-									/>
-								</Input.Wrapper>
-							</Input.Root>
-							<Button.Root
-								variant="neutral"
-								mode="ghost"
-								size="xsmall"
-								onClick={copyToClipboard}
-								className="-translate-y-1/2 absolute top-1/2 right-2"
-								title="Copy to clipboard"
-							>
-								{copied ? (
-									<CheckCircle2 size={18} className="text-success-base" />
-								) : (
-									<Copy size={18} />
-								)}
-							</Button.Root>
+						<div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-stroke-soft-200 bg-bg-weak-50 shadow-xs">
+							<Icon name="key" className="h-6 w-6 text-text-sub-600" />
 						</div>
-					</div>
-
-					<div className="pt-4">
+						<div className="space-y-1.5">
+							<h2 className="font-semibold text-label-lg text-text-strong-950">
+								Generate your API key
+							</h2>
+							<p className="max-w-xs text-paragraph-sm text-text-soft-400">
+								Your secret key authenticates your application with the Reloop
+								API. Keep it safe — you'll only see it once.
+							</p>
+						</div>
 						<Button.Root
 							variant="neutral"
 							mode="filled"
-							className="w-full"
-							onClick={() => router.push("/")}
+							onClick={generateKey}
+							disabled={loading}
+							className="w-full max-w-xs"
 						>
-							<Button.Icon>
-								<Icon name="check-circle" className="h-4 w-4" />
-							</Button.Icon>
-							Go to Dashboard
+							{loading ? (
+								<Loader2 className="h-4 w-4 animate-spin" />
+							) : (
+								<Icon name="key" className="h-4 w-4" />
+							)}
+							{loading ? "Generating…" : "Generate Secret Key"}
 						</Button.Root>
-					</div>
-				</div>
-			)}
+					</motion.div>
+				) : (
+					/* ── Post-generation: 3-step guide ── */
+					<motion.div
+						key="post-generate"
+						initial={{ opacity: 0, y: 8 }}
+						animate={{ opacity: 1, y: 0 }}
+						exit={{ opacity: 0, y: -8 }}
+						transition={{ duration: 0.25 }}
+						className="flex h-full flex-1 flex-col gap-6"
+					>
+						{/* API Key display — always visible */}
+						<div className="flex flex-col gap-1.5">
+							<p className="text-label-xs text-text-soft-400 uppercase tracking-wide">
+								Your API Key
+							</p>
+							<CopyCodeBlock
+								code={apiKey}
+								lang="bash"
+								copyValue={apiKey}
+							/>
+						</div>
+
+						{/* Language selector */}
+						<div className="flex flex-col gap-2">
+							<p className="text-label-xs text-text-soft-400 uppercase tracking-wide">
+								Select your language
+							</p>
+							<LanguageTabs
+								defaultValue={lang}
+								value={lang}
+								onValueChange={handleLanguageChange}
+							/>
+						</div>
+
+						{/* 3-step cards */}
+						<div className="flex flex-col gap-5">
+							{/* Step 1 — Install */}
+							<StepCard
+								number={1}
+								title="Install the SDK"
+								subtitle="Add the Reloop package to your project"
+							>
+								<CopyCodeBlock
+									code={installCommands[lang]}
+									lang="bash"
+								/>
+							</StepCard>
+
+							{/* Step 2 — ENV */}
+							<StepCard
+								number={2}
+								title="Set your environment variable"
+								subtitle="Add your secret key to your .env file"
+							>
+								<CopyCodeBlock
+									code={`RELOOP_API_KEY=${apiKey}`}
+									lang="bash"
+									copyValue={`RELOOP_API_KEY=${apiKey}`}
+								/>
+							</StepCard>
+
+							{/* Step 3 — Send email */}
+							<StepCard
+								number={3}
+								title="Send your first email"
+								subtitle="Use the SDK to send a transactional email"
+							>
+								<CopyCodeBlock
+									code={sendEmailCode[lang].code}
+									lang={sendEmailCode[lang].lang}
+								/>
+							</StepCard>
+						</div>
+
+						{/* CTA */}
+						<div className="pt-2">
+							<Button.Root
+								variant="neutral"
+								mode="filled"
+								className="w-full"
+								onClick={() => router.push("/")}
+							>
+								<Button.Icon>
+									<Icon name="check-circle" className="h-4 w-4" />
+								</Button.Icon>
+								Go to Dashboard
+							</Button.Root>
+						</div>
+					</motion.div>
+				)}
+			</AnimatePresence>
 		</div>
 	);
 };
