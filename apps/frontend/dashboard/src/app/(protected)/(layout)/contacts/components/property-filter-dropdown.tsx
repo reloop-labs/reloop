@@ -7,17 +7,18 @@ import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import { useRef, useState } from "react";
 
-export type PropertyFilterOption = "string" | "number";
-export type PropertyFilters = PropertyFilterOption[];
+export type PropertyFilterOption = "string" | "number" | null;
+export type PropertyFilters = PropertyFilterOption;
 
 interface PropertyFilterDropdownProps {
 	value: PropertyFilters;
 	onChange: (value: PropertyFilters) => void;
 }
 
-const filterOptions: { id: PropertyFilterOption; label: string }[] = [
-	{ id: "string", label: "String" },
-	{ id: "number", label: "Number" },
+const filterOptions: { id: PropertyFilterOption; label: string; icon: any }[] = [
+	{ id: null, label: "All types", icon: "activity" },
+	{ id: "string", label: "String", icon: "file-text" },
+	{ id: "number", label: "Number", icon: "hash" },
 ];
 
 export const PropertyFilterDropdown = ({
@@ -31,26 +32,16 @@ export const PropertyFilterDropdown = ({
 	const currentTab = buttonRefs.current[hoverIdx ?? -1];
 	const currentRect = currentTab?.getBoundingClientRect();
 
-	const activeFilterCount = value.length;
-	const hasActiveFilter = activeFilterCount > 0;
-
 	const displayLabel =
-		activeFilterCount === 0
-			? "Type"
-			: activeFilterCount === 1
-				? filterOptions.find((o) => o.id === value[0])?.label || "Type"
-				: `${activeFilterCount} Types`;
+		filterOptions.find((o) => o.id === value)?.label || "Type";
 
-	const handleReset = () => {
-		onChange([]);
-	};
+	const displayIcon = value
+		? filterOptions.find((o) => o.id === value)?.icon || "activity"
+		: "activity";
 
 	const handleToggle = (optionId: PropertyFilterOption) => {
-		if (value.includes(optionId)) {
-			onChange(value.filter((v) => v !== optionId));
-		} else {
-			onChange([...value, optionId]);
-		}
+		onChange(optionId);
+		setIsOpen(false);
 	};
 
 	return (
@@ -61,42 +52,24 @@ export const PropertyFilterDropdown = ({
 					mode="stroke"
 					size="xsmall"
 					className={cn(
-						"gap-1.5 whitespace-nowrap",
-						hasActiveFilter &&
-							"border-stroke-soft-900 bg-neutral-alpha-10 text-text-strong-950",
+						"w-44 justify-between gap-1.5 whitespace-nowrap rounded-[10px]",
 					)}
 				>
-					<Button.Icon>
-						<Icon name="filter" className="h-3.5 w-3.5" />
-					</Button.Icon>
-					{displayLabel}
-					<Button.Icon>
-						<Icon name="chevron-down" className="h-3.5 w-3.5" />
-					</Button.Icon>
+					<div className="flex items-center gap-1.5 overflow-hidden">
+						<Icon name={displayIcon} className="h-3.5 w-3.5 shrink-0" />
+						<span className="truncate">{displayLabel}</span>
+					</div>
+					<Icon name="chevron-down" className="h-3.5 w-3.5 shrink-0" />
 				</Button.Root>
 			</Dropdown.Trigger>
-			<Dropdown.Content align="start" className="w-44 p-3">
-				{/* Header */}
-				<div className="flex items-center justify-between border-stroke-soft-200 border-b px-1 pb-2">
-					<span className="whitespace-nowrap font-medium text-text-sub-600 text-xs">
-						Filter by
-					</span>
-					<button
-						type="button"
-						onClick={handleReset}
-						className="rounded-lg border border-stroke-soft-200 px-2 py-1 text-text-sub-600 text-xs transition-colors hover:bg-bg-weak-50"
-					>
-						Reset filters
-					</button>
-				</div>
-
+			<Dropdown.Content align="start" className="w-44 p-1.5">
 				{/* Filter Options */}
 				<div className="relative">
 					{filterOptions.map((option, idx) => {
-						const isChecked = value.includes(option.id);
+						const isChecked = option.id === null ? value === null : value === option.id;
 						return (
 							<button
-								key={option.id}
+								key={option.id ?? "all"}
 								ref={(el) => {
 									if (el) buttonRefs.current[idx] = el;
 								}}
@@ -105,16 +78,20 @@ export const PropertyFilterDropdown = ({
 								onPointerLeave={() => setHoverIdx(undefined)}
 								onClick={() => handleToggle(option.id)}
 								className={cn(
-									"flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg px-2 py-1.5 font-normal text-xs transition-colors",
+									"flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg px-2 py-1.5 font-medium text-xs transition-colors",
 									"text-text-strong-950",
-									!currentRect && hoverIdx === idx && "bg-neutral-alpha-10",
+									isChecked && "bg-neutral-alpha-10",
 								)}
 							>
-								<span className={cn(isChecked && "font-medium text-text-strong-950")}>
-									{option.label}
-								</span>
+								<div className="flex items-center gap-1.5 overflow-hidden">
+									<Icon name={option.icon} className="h-3.5 w-3.5 shrink-0" />
+									<span className="truncate">{option.label}</span>
+								</div>
 								{isChecked && (
-									<Icon name="check" className="h-3.5 w-3.5 text-text-strong-950" />
+									<Icon
+										name="check"
+										className="h-3.5 w-3.5 text-text-strong-950"
+									/>
 								)}
 							</button>
 						);
