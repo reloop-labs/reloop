@@ -79,7 +79,7 @@ export const OrganizationSwitcher: React.FC<OrganizationSwitcherProps> = ({
 						) : (
 							<div
 								className={cn(
-									"flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-[6px] font-semibold text-[11px] text-white shadow-sm",
+									"flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-[6px] font-semibold text-[11px] text-white",
 									getAvatarGradient(activeOrganization.name),
 								)}
 							>
@@ -94,14 +94,14 @@ export const OrganizationSwitcher: React.FC<OrganizationSwitcherProps> = ({
 					<button
 						type="button"
 						className={cn(
-							"flex w-fit max-w-full cursor-pointer items-center gap-2 rounded-md p-1.5 outline-none transition-colors hover:bg-bg-weak-50",
+							"flex w-fit max-w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 outline-none transition-colors hover:bg-bg-weak-50",
 							isOpen && "bg-bg-weak-50",
 						)}
 					>
 						<div className="relative flex-shrink-0">
 							{activeOrganization.logo ? (
 								<Avatar.Root
-									size="24"
+									size="20"
 									placeholderType="company"
 									className="rounded-[6px]"
 								>
@@ -113,7 +113,7 @@ export const OrganizationSwitcher: React.FC<OrganizationSwitcherProps> = ({
 							) : (
 								<div
 									className={cn(
-										"flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-[6px] font-semibold text-[11px] text-white shadow-sm",
+										"flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-[6px] font-semibold text-[11px] text-white",
 										getAvatarGradient(activeOrganization.name),
 									)}
 								>
@@ -175,7 +175,6 @@ interface OrganizationListProps {
 const OrganizationList: React.FC<OrganizationListProps> = ({
 	organizations,
 	activeOrganization,
-	hoverIdx,
 	setHoverIdx,
 	buttonRefs,
 	currentRect,
@@ -188,24 +187,11 @@ const OrganizationList: React.FC<OrganizationListProps> = ({
 
 	return (
 		<div className="relative flex flex-col p-1.5">
-			<div className="relative mt-1 mb-2 px-1">
-				<Icon
-					name="search"
-					className="-translate-y-1/2 absolute top-1/2 left-3.5 h-[14px] w-[14px] text-text-sub-600"
-				/>
-				<input
-					type="text"
-					placeholder="Search workspaces..."
-					className="h-9 w-full rounded-lg border border-stroke-soft-200 bg-bg-weak-50 pr-3 pl-8 text-sm text-text-strong-950 placeholder:text-text-sub-600 focus:border-stroke-strong-950 focus:outline-none dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/50"
-				/>
-			</div>
-
 			<div className="px-2 pt-1 pb-1.5">
 				<span className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-wider">
 					Workspaces
 				</span>
 			</div>
-
 			<div className="relative">
 				{organizations.map((organization, idx) => (
 					<button
@@ -240,7 +226,7 @@ const OrganizationList: React.FC<OrganizationListProps> = ({
 								) : (
 									<div
 										className={cn(
-											"flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-[8px] font-semibold text-[13px] text-white shadow-sm",
+											"flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-[6px] font-semibold text-[11px] text-white",
 											getAvatarGradient(organization.name),
 										)}
 									>
@@ -248,14 +234,9 @@ const OrganizationList: React.FC<OrganizationListProps> = ({
 									</div>
 								)}
 							</div>
-							<div className="flex min-w-0 flex-1 flex-col items-start gap-px text-left">
-								<span className="w-full truncate font-medium text-sm text-text-strong-950">
-									{organization.name}
-								</span>
-								<span className="w-full truncate text-text-sub-600 text-xs">
-									Free plan · 1 member
-								</span>
-							</div>
+							<p className="w-full truncate text-left font-medium text-sm text-text-strong-950">
+								{organization.name}
+							</p>
 						</div>
 						{organization.id === activeOrganization.id && (
 							<Icon
@@ -266,7 +247,7 @@ const OrganizationList: React.FC<OrganizationListProps> = ({
 					</button>
 				))}
 
-				<div className="mx-2 my-1.5 border-stroke-soft-100 border-t dark:border-stroke-soft-100/40" />
+				<div className="mx-2 mt-1.5 border-stroke-soft-100 border-t dark:border-stroke-soft-100/40" />
 
 				<button
 					onPointerEnter={() => setHoverIdx(organizations.length)}
@@ -286,8 +267,8 @@ const OrganizationList: React.FC<OrganizationListProps> = ({
 					)}
 					onClick={onCreateNew}
 				>
-					<div className="flex h-8 w-8 items-center justify-center rounded-[8px] border border-stroke-soft-200 border-dashed bg-bg-weak-50 dark:border-stroke-soft-100/50 dark:bg-bg-weak-50/50">
-						<Icon name="plus" className="h-4 w-4 text-text-sub-600" />
+					<div className="flex h-6 w-6 items-center justify-center rounded-[6px] border border-stroke-soft-200 border-dashed bg-bg-weak-50 dark:border-stroke-soft-100/50 dark:bg-bg-weak-50/50">
+						<Icon name="plus" className="h-3.5 w-3.5 text-text-sub-600" />
 					</div>
 					<span className="font-medium text-sm text-text-strong-950">
 						Create workspace
@@ -296,7 +277,7 @@ const OrganizationList: React.FC<OrganizationListProps> = ({
 				<AnimatedHoverBackground
 					rect={currentRect}
 					tabElement={currentTab}
-					className="rounded-xl"
+					className="rounded-lg"
 				/>
 			</div>
 		</div>

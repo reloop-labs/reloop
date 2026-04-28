@@ -67,7 +67,7 @@ export const MainSidebar: React.FC = () => {
 					organizations={organizations}
 					activeOrganization={activeOrganization}
 					onOrganizationChange={handleOrganizationChange}
-					isCollapsed={false}
+					isCollapsed={isSidebarCollapsed}
 					side="bottom"
 				/>
 			</div>
