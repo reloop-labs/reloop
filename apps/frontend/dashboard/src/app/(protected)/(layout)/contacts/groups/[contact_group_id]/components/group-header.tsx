@@ -8,6 +8,9 @@ import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import { KbdCommand } from "@reloop/ui/kbd-command";
+import { KbdEnter } from "@reloop/ui/kbd-enter";
+import { KbdEsc } from "@reloop/ui/kbd-esc";
 import { KbdKey } from "@reloop/ui/kbd-key";
 import {
 	Content as PopoverContent,
@@ -159,6 +162,35 @@ export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 		},
 	);
 
+	useHotkeys(
+		"mod+enter",
+		(e) => {
+			e.preventDefault();
+			if (
+				isEditing &&
+				!isSubmitting &&
+				editName.trim() &&
+				editName !== group?.name
+			) {
+				handleEditSubmit();
+			}
+		},
+		{ enableOnFormTags: true, enabled: isEditing },
+		[isEditing, isSubmitting, editName, group],
+	);
+
+	useHotkeys(
+		"esc",
+		(e) => {
+			e.preventDefault();
+			if (isEditing) {
+				handleEditCancel();
+			}
+		},
+		{ enableOnFormTags: true, enabled: isEditing },
+		[isEditing],
+	);
+
 	if (!group && !isLoading) {
 		return (
 			<div className="pt-10 pb-8">
@@ -217,20 +249,15 @@ export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 							<Skeleton className="mt-2 h-7 w-48 rounded-lg" />
 						) : isEditing ? (
 							<form onSubmit={handleEditSubmit} className="flex items-center">
-								<div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-white shadow-sm">
+								<div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-white">
 									<Icon name="modules" className="h-3 w-3" />
 								</div>
 								<input
 									value={editName}
 									onChange={(e) => setEditName(e.target.value)}
-									onKeyDown={(e) => {
-										if (e.key === "Escape") {
-											handleEditCancel();
-										}
-									}}
 									autoFocus
 									disabled={isSubmitting}
-									className="ml-2 min-w-[200px] border-0 bg-transparent px-0 py-0 font-medium text-text-strong-950 text-title-h6 leading-8 focus:border-text-strong-950 focus:outline-none focus:ring-0"
+									className="ml-2 w-[160px] border-0 bg-transparent px-0 py-0 font-medium text-text-strong-950 text-title-h6 leading-8 focus:border-text-strong-950 focus:outline-none focus:ring-0"
 								/>
 								<Button.Root
 									type="submit"
@@ -239,12 +266,18 @@ export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 									disabled={
 										isSubmitting || !editName.trim() || editName === group?.name
 									}
-									className="ml-3"
+									className="ml-3 gap-2"
 								>
 									{isSubmitting ? (
 										<Spinner size={14} color="currentColor" />
 									) : (
-										"Save"
+										<>
+											Save
+											<span className="inline-flex items-center gap-0.5">
+												<KbdCommand />
+												<KbdEnter />
+											</span>
+										</>
 									)}
 								</Button.Root>
 								<Button.Root
@@ -254,9 +287,10 @@ export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 									size="xxsmall"
 									onClick={handleEditCancel}
 									disabled={isSubmitting}
-									className="ml-2"
+									className="ml-2 gap-2"
 								>
 									Cancel
+									<KbdEsc />
 								</Button.Root>
 							</form>
 						) : (
