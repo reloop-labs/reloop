@@ -44,8 +44,8 @@ const TYPE_OPTIONS: {
 		label: "Number",
 		icon: "hash",
 		description: "Integer or decimal",
-		color: "text-violet-600",
-		badgeClass: "border border-violet-500 text-violet-600 bg-violet-100/20",
+		color: "text-primary-base",
+		badgeClass: "border border-primary-base text-primary-base bg-primary-light/20",
 	},
 ];
 
@@ -195,7 +195,9 @@ export const AddPropertyModal = ({
 						<Modal.Body
 							className={cn(
 								"gap-6 sm:gap-8",
-								showPreview ? "grid grid-cols-1 sm:grid-cols-2" : "flex flex-col",
+								showPreview
+									? "grid grid-cols-1 sm:grid-cols-2"
+									: "flex flex-col",
 							)}
 						>
 							{/* ── Left: Form fields ───────────────────────────── */}
@@ -254,11 +256,11 @@ export const AddPropertyModal = ({
 													className={cn(
 														"flex flex-col items-start gap-2 rounded-xl border p-3 text-left transition-all duration-150",
 														isSelected
-															? "border-primary-base bg-primary-light/10 ring-1 ring-primary-base/30"
+															? "border-primary-base bg-primary-light/10"
 															: "border-stroke-soft-100 bg-bg-soft-200/20 hover:border-stroke-soft-200 hover:bg-bg-soft-200/40 dark:border-stroke-soft-100/40 dark:bg-bg-soft-200/10",
 													)}
 												>
-													<div className="flex w-full items-center justify-between">
+													<div className="flex w-full justify-between">
 														<div
 															className={cn(
 																"flex h-6 w-6 items-center justify-center rounded-lg border",
@@ -329,97 +331,97 @@ export const AddPropertyModal = ({
 
 							{showPreview && (
 								<div className="flex flex-col gap-3">
-								<p className="font-medium text-[10px] text-text-sub-600 uppercase tracking-widest">
-									Live preview
-								</p>
-
-								{/* Property card */}
-								<div className="rounded-xl border border-stroke-soft-100 bg-bg-soft-200/20 p-4 dark:border-stroke-soft-100/30 dark:bg-bg-soft-200/10">
-									<div className="mb-3 flex items-center gap-2.5">
-										<div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-neutral-600 to-neutral-500 shadow-sm">
-											<Icon name="tag" className="h-3.5 w-3.5 text-white" />
-										</div>
-										<div>
-											<p className="font-semibold text-text-strong-950 text-xs">
-												{previewName}
-											</p>
-											<span
-												className={cn(
-													"mt-0.5 inline-flex items-center rounded-md border-[1px] px-[5px] py-px font-medium text-[9px]",
-													selectedType.badgeClass,
-												)}
-											>
-												{selectedType.label}
-											</span>
-										</div>
-									</div>
-
-									<div className="divide-y divide-stroke-soft-100 rounded-lg border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/30 dark:border-stroke-soft-100/30 dark:bg-bg-weak-50/30">
-										<div className="flex items-center justify-between px-3 py-2">
-											<span className="font-medium text-[11px] text-text-sub-600">
-												Name
-											</span>
-											<span className="font-mono font-semibold text-[11px] text-text-strong-950">
-												{previewName}
-											</span>
-										</div>
-										<div className="flex items-center justify-between px-3 py-2">
-											<span className="font-medium text-[11px] text-text-sub-600">
-												Type
-											</span>
-											<span
-												className={cn(
-													"inline-flex items-center rounded-md border-[1px] px-[5px] py-px font-medium text-[9px]",
-													selectedType.badgeClass,
-												)}
-											>
-												{selectedType.label}
-											</span>
-										</div>
-										<div className="flex items-center justify-between px-3 py-2">
-											<span className="font-medium text-[11px] text-text-sub-600">
-												Default
-											</span>
-											<span className="font-medium font-mono text-[11px] text-text-strong-950">
-												{previewDefault ?? (
-													<span className="text-text-soft-400">—</span>
-												)}
-											</span>
-										</div>
-									</div>
-								</div>
-
-								{/* JSON snippet */}
-								<div className="rounded-xl border border-stroke-soft-100 bg-bg-soft-200/20 p-4 dark:border-stroke-soft-100/30 dark:bg-bg-soft-200/10">
-									<p className="mb-2 font-medium text-[10px] text-text-sub-600">
-										Contact record snippet
+									<p className="font-medium text-[10px] text-text-sub-600 uppercase tracking-widest">
+										Live preview
 									</p>
-									<pre className="overflow-x-auto rounded-lg bg-bg-weak-50 p-2.5 font-mono text-[10px] text-text-strong-950 leading-relaxed dark:bg-bg-weak-50/50">
-										<span className="text-text-sub-600">{"{"}</span>
-										{"\n"}
-										{"  "}
-										<span className="text-primary-base">
-											&quot;{previewName}&quot;
-										</span>
-										<span className="text-text-sub-600">: </span>
-										{previewDefault ? (
-											propertyType === "number" ? (
-												<span className="text-violet-500">
-													{previewDefault}
+
+									{/* Property card */}
+									<div className="rounded-xl border border-stroke-soft-100 bg-bg-soft-200/20 p-4 dark:border-stroke-soft-100/30 dark:bg-bg-soft-200/10">
+										<div className="mb-3 flex items-center gap-2.5">
+											<div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-neutral-600 to-neutral-500 shadow-sm">
+												<Icon name="tag" className="h-3.5 w-3.5 text-white" />
+											</div>
+											<div>
+												<p className="font-semibold text-text-strong-950 text-xs">
+													{previewName}
+												</p>
+												<span
+													className={cn(
+														"mt-0.5 inline-flex items-center rounded-md border-[1px] px-[5px] py-px font-medium text-[9px]",
+														selectedType.badgeClass,
+													)}
+												>
+													{selectedType.label}
 												</span>
+											</div>
+										</div>
+
+										<div className="divide-y divide-stroke-soft-100 rounded-lg border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/30 dark:border-stroke-soft-100/30 dark:bg-bg-weak-50/30">
+											<div className="flex items-center justify-between px-3 py-2">
+												<span className="font-medium text-[11px] text-text-sub-600">
+													Name
+												</span>
+												<span className="font-mono font-semibold text-[11px] text-text-strong-950">
+													{previewName}
+												</span>
+											</div>
+											<div className="flex items-center justify-between px-3 py-2">
+												<span className="font-medium text-[11px] text-text-sub-600">
+													Type
+												</span>
+												<span
+													className={cn(
+														"inline-flex items-center rounded-md border-[1px] px-[5px] py-px font-medium text-[9px]",
+														selectedType.badgeClass,
+													)}
+												>
+													{selectedType.label}
+												</span>
+											</div>
+											<div className="flex items-center justify-between px-3 py-2">
+												<span className="font-medium text-[11px] text-text-sub-600">
+													Default
+												</span>
+												<span className="font-medium font-mono text-[11px] text-text-strong-950">
+													{previewDefault ?? (
+														<span className="text-text-soft-400">—</span>
+													)}
+												</span>
+											</div>
+										</div>
+									</div>
+
+									{/* JSON snippet */}
+									<div className="rounded-xl border border-stroke-soft-100 bg-bg-soft-200/20 p-4 dark:border-stroke-soft-100/30 dark:bg-bg-soft-200/10">
+										<p className="mb-2 font-medium text-[10px] text-text-sub-600">
+											Contact record snippet
+										</p>
+										<pre className="overflow-x-auto rounded-lg bg-bg-weak-50 p-2.5 font-mono text-[10px] text-text-strong-950 leading-relaxed dark:bg-bg-weak-50/50">
+											<span className="text-text-sub-600">{"{"}</span>
+											{"\n"}
+											{"  "}
+											<span className="text-primary-base">
+												&quot;{previewName}&quot;
+											</span>
+											<span className="text-text-sub-600">: </span>
+											{previewDefault ? (
+												propertyType === "number" ? (
+													<span className="text-violet-500">
+														{previewDefault}
+													</span>
+												) : (
+													<span className="text-success-base">
+														&quot;{previewDefault}&quot;
+													</span>
+												)
 											) : (
-												<span className="text-success-base">
-													&quot;{previewDefault}&quot;
-												</span>
-											)
-										) : (
-											<span className="text-text-soft-400">null</span>
-										)}
-										{"\n"}
-										<span className="text-text-sub-600">{"}"}</span>
-									</pre>
+												<span className="text-text-soft-400">null</span>
+											)}
+											{"\n"}
+											<span className="text-text-sub-600">{"}"}</span>
+										</pre>
+									</div>
 								</div>
-							</div>
 							)}
 						</Modal.Body>
 

@@ -20,6 +20,7 @@ import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
+import useSWR from "swr";
 
 interface GroupData {
 	id: string;
@@ -44,6 +45,19 @@ const headerMenuItems = [
 		isDanger: true,
 	},
 ];
+
+const GroupContactsCount = ({ groupId }: { groupId: string }) => {
+	const { data, isLoading } = useSWR<{ total: number }>(
+		groupId ? `/api/contacts/v1/groups/${groupId}/contacts?limit=1` : null,
+	);
+
+	if (isLoading) return <Skeleton className="h-5 w-8 rounded-lg" />;
+	return (
+		<span className="font-medium text-paragraph-sm text-text-strong-950">
+			{data?.total?.toLocaleString() ?? "0"}
+		</span>
+	);
+};
 
 export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 	const { activeOrganization } = useUserOrganization();
@@ -250,20 +264,18 @@ export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 
 				{/* Stats Grid - Row 1 */}
 				<div className="mt-10 grid grid-cols-3 gap-x-12 gap-y-6">
-					{/* Group Name */}
+					{/* Total Contacts */}
 					<div className="flex flex-col gap-1.5">
 						<div className="flex items-center gap-1.5">
-							<Icon name="modules" className="h-3.5 w-3.5 text-text-sub-600" />
+							<Icon name="users" className="h-3.5 w-3.5 text-text-sub-600" />
 							<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
-								Group Name
+								Total Contacts
 							</span>
 						</div>
 						{isLoading ? (
 							<Skeleton className="h-5 w-32 rounded-lg" />
 						) : (
-							<span className="font-medium text-paragraph-sm text-text-strong-950">
-								{group?.name || "---"}
-							</span>
+							<GroupContactsCount groupId={group?.id || ""} />
 						)}
 					</div>
 

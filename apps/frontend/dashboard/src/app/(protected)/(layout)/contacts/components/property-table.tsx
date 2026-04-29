@@ -241,7 +241,7 @@ export const PropertyTable = ({
 							key={property.id}
 							className={cn(
 								"group/row grid grid-cols-[1fr_100px_1fr_120px_40px] items-center px-4 py-2 transition-colors text-left",
-								"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-base",
+								"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-base",
 								openPropertyId === property.id && "bg-bg-weak-50/50",
 							)}
 						>

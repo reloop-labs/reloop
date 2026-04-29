@@ -120,7 +120,7 @@ export const GroupTable = ({
 								onClick={() => handleRowClick(group.id)}
 								className={cn(
 									"group/row grid w-full cursor-pointer grid-cols-[1fr_100px_150px_80px] items-center px-4 py-2 text-left transition-colors",
-									"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-base focus-visible:ring-offset-1",
+									"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-base focus-visible:outline-offset-[-1px]",
 									isRowActive && "bg-bg-weak-50/50",
 								)}
 							>

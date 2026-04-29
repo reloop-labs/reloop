@@ -150,7 +150,7 @@ export const TopicTable = ({
 								onClick={() => handleRowClick(topic.id)}
 								className={cn(
 									"group/row grid cursor-pointer grid-cols-[2fr_1fr_1fr_1fr_48px] items-center px-4 py-2 text-left transition-colors",
-									"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-base focus-visible:ring-offset-1",
+									"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-base focus-visible:outline-offset-[-1px]",
 									isRowActive && "bg-bg-weak-50/50",
 								)}
 							>

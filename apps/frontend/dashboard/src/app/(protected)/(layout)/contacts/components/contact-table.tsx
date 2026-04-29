@@ -157,7 +157,7 @@ export const ContactTable = ({
 								onClick={() => handleRowClick(contact)}
 								className={cn(
 									"group/row grid cursor-pointer grid-cols-[1fr_minmax(200px,auto)_140px_minmax(40px,auto)] items-center px-4 py-2 text-left transition-colors",
-									"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-base",
+									"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-base",
 									isRowActive && "bg-bg-weak-50/50",
 								)}
 							>

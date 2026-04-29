@@ -1,5 +1,6 @@
 "use client";
 
+import type { AudienceStatus } from "@fe/dashboard/utils/audience";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
@@ -11,7 +12,6 @@ import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import useSWR, { useSWRConfig } from "swr";
-import type { AudienceStatus } from "@fe/dashboard/utils/audience";
 
 interface Contact {
 	id: string;
@@ -424,7 +424,7 @@ export const EditContactModal = ({
 								<div className="flex flex-col gap-1 border-stroke-soft-100 border-t pt-4">
 									<Label.Root htmlFor="topics">Topics</Label.Root>
 									<div className="relative">
-										<label className="group/chips flex min-h-[44px] cursor-text flex-wrap content-start gap-1.5 rounded-xl bg-bg-white-0 px-3 py-2.5 shadow-regular-xs ring-1 ring-stroke-soft-200 ring-inset transition duration-200 ease-out focus-within:shadow-button-important-focus focus-within:ring-stroke-strong-950 hover:[&:not(:focus-within)]:bg-bg-weak-50 hover:[&:not(:focus-within)]:ring-transparent">
+										<label className="group/chips flex min-h-[44px] cursor-text flex-wrap content-start gap-1.5 rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-3 py-2.5 shadow-regular-xs transition duration-200 ease-out focus-within:border-stroke-strong-950 focus-within:shadow-button-important-focus hover:[&:not(:focus-within)]:bg-bg-weak-50">
 											{selectedTopicIds.map((topicId) => {
 												const topicName = getTopicName(topicId);
 												if (!topicName) return null;
