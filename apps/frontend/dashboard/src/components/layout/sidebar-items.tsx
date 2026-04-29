@@ -26,60 +26,74 @@ const contactsSubNav = [
 export const SidebarItems: React.FC<SidebarItemsProps> = ({
 	isCollapsed = false,
 }) => {
-	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
+	// Single unified hover element — drives the one shared animated background
+	const [hoveredEl, setHoveredEl] = useState<HTMLAnchorElement | undefined>(
+		undefined,
+	);
 	const [rect, setRect] = useState<DOMRect | undefined>(undefined);
-	const buttonRefs = useRef<HTMLAnchorElement[]>([]);
+
+	const mainNavRefs = useRef<HTMLAnchorElement[]>([]);
+	const subNavRefs = useRef<HTMLAnchorElement[]>([]);
+
 	const pathname = usePathname();
-
 	const pathWithoutSlug = pathname;
-	const activeIndex = mainNavigation.findIndex((item) => {
-		if (item.path === "/") return pathWithoutSlug === "/";
-		return pathWithoutSlug.startsWith(item.path);
-	});
 
-	const currentIdx = hoverIdx !== undefined ? hoverIdx : activeIndex;
-	const currentTab = buttonRefs.current[currentIdx];
+	const isOnContactsSubPage = contactsSubNav.some((item) =>
+		pathWithoutSlug.startsWith(item.path),
+	);
+	const isOnContacts = pathWithoutSlug.startsWith("/contacts");
 
+	const activeIndex = isOnContactsSubPage
+		? -1
+		: mainNavigation.findIndex((item) => {
+				if (item.path === "/") return pathWithoutSlug === "/";
+				return pathWithoutSlug.startsWith(item.path);
+			});
+
+	const subActiveIndex = contactsSubNav.findIndex((item) =>
+		pathWithoutSlug.startsWith(item.path),
+	);
+
+	// The single "current" element: hovered takes priority, otherwise the active one
+	const activeEl = isOnContactsSubPage
+		? subNavRefs.current[subActiveIndex]
+		: mainNavRefs.current[activeIndex];
+	const currentEl = hoveredEl ?? activeEl;
+
+	// Single useLayoutEffect that feeds rect for the ONE shared animated background
 	useLayoutEffect(() => {
-		if (currentTab) {
-			setRect(currentTab.getBoundingClientRect());
+		if (currentEl) {
+			setRect(currentEl.getBoundingClientRect());
 		} else {
 			setRect(undefined);
 		}
-	}, [currentTab, isCollapsed]);
-
-	const isOnContacts = pathname.startsWith("/contacts");
+	}, [currentEl, isCollapsed, pathname]);
 
 	return (
+		// Single relative container — the animated pill lives here and nowhere else
 		<div className="relative">
 			{mainNavigation.map(({ path, label, iconName }, index) => {
-				const href = path;
 				const isContactsItem = path === "/contacts";
 
 				return (
 					<div key={path + index}>
 						<Link
-							href={href}
+							href={path}
 							ref={(el) => {
-								if (el) {
-									buttonRefs.current[index] = el;
-								}
+								if (el) mainNavRefs.current[index] = el;
 							}}
-							onPointerEnter={() => setHoverIdx(index)}
-							onPointerLeave={() => setHoverIdx(undefined)}
+							onPointerEnter={() => setHoveredEl(mainNavRefs.current[index])}
+							onPointerLeave={() => setHoveredEl(undefined)}
 							className={cn(
-								"flex h-8 items-center gap-2 rounded-lg px-2 text-left transition-colors",
+								"relative z-10 flex h-8 items-center gap-2 rounded-lg px-2 text-left",
 								isContactsItem && !isCollapsed
 									? "justify-between"
 									: isCollapsed
 										? "justify-center"
 										: "justify-start",
-								!rect && currentIdx === index && "bg-neutral-alpha-10",
-								"hover:bg-neutral-alpha-5",
 							)}
 							title={isCollapsed ? label : undefined}
 						>
-							{/* Left side: icon + label */}
 							<span className="flex min-w-0 items-center gap-2">
 								<Icon
 									name={iconName}
@@ -100,7 +114,6 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 								)}
 							</span>
 
-							{/* Chevron for contacts item */}
 							{isContactsItem && !isCollapsed && (
 								<Icon
 									name="chevron-right"
@@ -112,7 +125,6 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 							)}
 						</Link>
 
-						{/* Contacts sub-navigation — smooth Framer Motion height animation */}
 						{isContactsItem && !isCollapsed && (
 							<AnimatePresence initial={false}>
 								{isOnContacts && (
@@ -124,23 +136,31 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 										transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
 										style={{ overflow: "hidden" }}
 									>
-										<div className="my-0.5 ml-[18px] flex flex-col gap-0.5 border-neutral-alpha-10 border-l pb-0.5 pl-2">
+										{/* No position:relative here — sub-items share the root offsetParent */}
+										<div className="my-0.5 ml-[14px] flex flex-col gap-0.5 border-neutral-alpha-10 border-l pb-0.5 pl-2">
 											{contactsSubNav.map(
-												({
-													label: subLabel,
-													path: subPath,
-													iconName: subIcon,
-												}) => {
-													const isSubActive = pathname.startsWith(subPath);
+												(
+													{ label: subLabel, path: subPath, iconName: subIcon },
+													subIndex,
+												) => {
+													const isSubActive =
+														pathWithoutSlug.startsWith(subPath);
 													return (
 														<Link
 															key={subPath}
 															href={subPath}
+															ref={(el) => {
+																if (el) subNavRefs.current[subIndex] = el;
+															}}
+															onPointerEnter={() =>
+																setHoveredEl(subNavRefs.current[subIndex])
+															}
+															onPointerLeave={() => setHoveredEl(undefined)}
 															className={cn(
-																"flex h-7 items-center gap-1.5 rounded-md px-2 text-xs transition-colors",
+																"relative z-10 flex h-7 items-center gap-1.5 rounded-md px-2 text-xs",
 																isSubActive
-																	? "bg-neutral-alpha-10 font-medium text-foreground"
-																	: "text-text-sub-600 hover:bg-neutral-alpha-5 hover:text-foreground",
+																	? "font-medium text-foreground"
+																	: "text-text-sub-600",
 															)}
 														>
 															<Icon
@@ -164,7 +184,8 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 				);
 			})}
 
-			<AnimatedHoverBackground rect={rect} tabElement={currentTab} />
+			{/* The ONE shared animated hover/active background for everything */}
+			<AnimatedHoverBackground rect={rect} tabElement={currentEl} />
 		</div>
 	);
 };
