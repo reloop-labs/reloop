@@ -4,7 +4,7 @@ import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import { useQueryState } from "nuqs";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { InviteModal } from "./invite-modal";
 import { TeamFilterDropdown, type TeamFilters } from "./team-filter-dropdown";
@@ -77,5 +77,10 @@ const Team = () => {
 		</div>
 	);
 };
+const TeamPage = () => (
+	<Suspense>
+		<Team />
+	</Suspense>
+);
 
-export default Team;
+export default TeamPage;
