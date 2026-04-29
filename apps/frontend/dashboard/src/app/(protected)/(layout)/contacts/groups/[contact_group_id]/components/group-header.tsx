@@ -169,7 +169,10 @@ export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 
 					<div className="flex items-center gap-2">
 						{isLoading ? (
-							<Skeleton className="h-9 w-9 rounded-lg" />
+							<>
+								<Skeleton className="h-9 w-48 rounded-lg" />
+								<Skeleton className="h-9 w-9 rounded-lg" />
+							</>
 						) : group ? (
 							<>
 								<Button.Root
