@@ -209,7 +209,11 @@ export const AddPropertyModal = ({
 										Name
 										<Label.Asterisk />
 									</Label.Root>
-									<Input.Root size="small" hasError={!!nameError}>
+									<Input.Root
+										size="small"
+										hasError={!!nameError}
+										className="rounded-xl"
+									>
 										<Input.Wrapper>
 											<Input.Icon
 												as={Icon}
@@ -256,7 +260,7 @@ export const AddPropertyModal = ({
 													onClick={() => setPropertyType(opt.value)}
 													disabled={isCreating}
 													className={cn(
-														"flex flex-col items-start gap-2 rounded-xl border p-3 text-left transition-all duration-150",
+														"flex flex-col items-start gap-2 rounded-xl border-2 p-3 text-left transition-all duration-150",
 														isSelected
 															? "border-primary-base bg-primary-light/10"
 															: "border-stroke-soft-100 bg-bg-soft-200/20 hover:border-stroke-soft-200 hover:bg-bg-soft-200/40 dark:border-stroke-soft-100/40 dark:bg-bg-soft-200/10",
@@ -319,7 +323,7 @@ export const AddPropertyModal = ({
 								{/* Default Value */}
 								<div className="flex flex-col gap-1.5">
 									<Label.Root htmlFor="defaultValue">Default Value</Label.Root>
-									<Input.Root size="small">
+									<Input.Root size="small" className="rounded-xl">
 										<Input.Wrapper>
 											<Input.Input
 												id="defaultValue"
