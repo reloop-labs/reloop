@@ -1,6 +1,7 @@
 "use client";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
+import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
 
 interface GroupsEmptyStateProps {
 	onAddGroup?: () => void;
@@ -30,13 +31,8 @@ export const GroupsEmptyState = ({ onAddGroup }: GroupsEmptyStateProps) => {
 					<Icon name="plus" className="h-4 w-4" />
 					Create Group
 					<span className="inline-flex items-center gap-0.5">
-						<Icon
-							name="command"
-							className="h-4 w-4 rounded-sm border border-stroke-soft-200 p-px"
-						/>
-						<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-200 p-px font-medium text-[10px] uppercase">
-							A
-						</span>
+						<KbdKeyOutline>c</KbdKeyOutline>
+						<KbdKeyOutline>g</KbdKeyOutline>
 					</span>
 				</Button.Root>
 				<Button.Root

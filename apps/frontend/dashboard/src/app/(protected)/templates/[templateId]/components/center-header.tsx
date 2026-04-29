@@ -43,6 +43,7 @@ const FieldRow = ({
 			</label>
 			<div className="flex flex-1 items-center">
 				<input
+					id={label}
 					type="text"
 					value={value}
 					onChange={(e) => onChange(e.target.value)}
@@ -213,7 +214,12 @@ export const CenterHeader = () => {
 							/>
 						}
 					/>
-					<FieldRow label="Reply" value={replyTo} onChange={setReplyTo} placeholder="Reply-to email" />
+					<FieldRow
+						label="Reply"
+						value={replyTo}
+						onChange={setReplyTo}
+						placeholder="Reply-to email"
+					/>
 					<FieldRow
 						label="Subject"
 						value={subject}

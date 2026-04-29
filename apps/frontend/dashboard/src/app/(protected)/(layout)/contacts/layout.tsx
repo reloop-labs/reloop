@@ -3,14 +3,14 @@ import { ContactsApiDetails } from "@fe/dashboard/components/api-details/contact
 import { DocsButton } from "@fe/dashboard/components/docs-button";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
+import { KbdCommand } from "@reloop/ui/kbd-command";
+import { KbdKey } from "@reloop/ui/kbd-key";
 import { usePathname, useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useHotkeys } from "react-hotkeys-hook";
 import useSWR from "swr";
 import { ContactsModals } from "./components/contacts-modals";
 import { ContactsTabs } from "./components/contacts-tabs";
-import { KbdCommand } from "@reloop/ui/kbd-command";
-import { KbdKey } from "@reloop/ui/kbd-key";
 
 interface Topic {
 	id: string;
@@ -48,7 +48,20 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 		"mod+a",
 		(e) => {
 			e.preventDefault();
-			handleAction();
+			if (!isGroupsPage) {
+				handleAction();
+			}
+		},
+		{
+			enabled: !isAddTopicPage && !isBulkImportPage && !isDetailPage,
+		},
+	);
+
+	useHotkeys(
+		"c+g",
+		(e) => {
+			e.preventDefault();
+			setModal("create-group");
 		},
 		{
 			enabled: !isAddTopicPage && !isBulkImportPage && !isDetailPage,
@@ -86,7 +99,9 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 
 	return (
 		<>
-			<div className={`mx-auto sm:px-8 ${isAddTopicPage ? "max-w-5xl" : "max-w-3xl"}`}>
+			<div
+				className={`mx-auto sm:px-8 ${isAddTopicPage ? "max-w-5xl" : "max-w-3xl"}`}
+			>
 				{/* Unified Header */}
 				{!isDetailPage && (
 					<div className="flex items-center justify-between pt-10 pb-6">
@@ -118,10 +133,17 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 								>
 									<Icon name="plus" className="h-4 w-4" />
 									{actionLabel}
-									<span className="inline-flex items-center gap-0.5">
-										<KbdCommand />
-										<KbdKey>a</KbdKey>
-									</span>
+									{isGroupsPage ? (
+										<span className="inline-flex items-center gap-0.5">
+											<KbdKey>c</KbdKey>
+											<KbdKey>g</KbdKey>
+										</span>
+									) : (
+										<span className="inline-flex items-center gap-0.5">
+											<KbdCommand />
+											<KbdKey>a</KbdKey>
+										</span>
+									)}
 								</Button.Root>
 								<ContactsApiDetails size="xsmall" mode="ghost" />
 							</div>

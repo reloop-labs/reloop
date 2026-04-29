@@ -89,7 +89,7 @@ export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 	if (!group && !isLoading) {
 		return (
 			<div className="pt-10 pb-8">
-				<AnimatedBackButton onClick={() => router.push("/contacts")} />
+				<AnimatedBackButton onClick={() => router.push("/contacts/groups")} />
 				<div className="flex items-center justify-between pt-6">
 					<div>
 						<div className="flex items-center gap-1.5">
@@ -116,7 +116,7 @@ export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 	return (
 		<>
 			<div className="pt-10 pb-8">
-				<AnimatedBackButton onClick={() => router.push("/contacts")} />
+				<AnimatedBackButton onClick={() => router.push("/contacts/groups")} />
 				<div className="flex items-center justify-between pt-6">
 					<div>
 						{isLoading ? (

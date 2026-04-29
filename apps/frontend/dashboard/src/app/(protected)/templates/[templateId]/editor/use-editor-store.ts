@@ -12,8 +12,16 @@ interface EditorState {
 	fromEmail: string;
 	replyTo: string;
 	subject: string;
+	status: "draft" | "published" | "archived";
 
 	// Actions — Metadata
+	initializeTemplate: (template: {
+		name?: string | null;
+		subject?: string | null;
+		status?: "draft" | "published" | "archived";
+	}) => void;
+	markDirty: () => void;
+	markSaved: (status?: "draft" | "published" | "archived") => void;
 	setTemplateName: (name: string) => void;
 	setSenderName: (name: string) => void;
 	setFromEmail: (email: string) => void;
@@ -32,8 +40,22 @@ export const useEditorStore = create<EditorState>((set) => ({
 	fromEmail: "",
 	replyTo: "",
 	subject: "",
+	status: "draft",
 
 	// ----- Metadata Actions -----
+	initializeTemplate: (template) =>
+		set({
+			templateName: template.name || "Untitled Template",
+			subject: template.subject || "",
+			status: template.status || "draft",
+			isDirty: false,
+		}),
+	markDirty: () => set({ isDirty: true }),
+	markSaved: (status) =>
+		set((state) => ({
+			isDirty: false,
+			status: status || state.status,
+		})),
 	setTemplateName: (name) => set({ templateName: name, isDirty: true }),
 	setSenderName: (name) => set({ senderName: name, isDirty: true }),
 	setFromEmail: (email) => set({ fromEmail: email, isDirty: true }),
