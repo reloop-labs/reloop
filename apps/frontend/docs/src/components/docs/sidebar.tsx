@@ -248,7 +248,7 @@ function ProductSwitcher() {
 			</Popover.Trigger>
 			<Popover.Portal>
 				<Popover.Content
-					sideOffset={8}
+					sideOffset={0}
 					align="start"
 					className="fade-in zoom-in-95 z-50 w-[240px] animate-in overflow-hidden rounded-xl border border-fd-border bg-fd-background p-1 shadow-xl outline-none"
 				>
@@ -562,11 +562,16 @@ function SidebarLink({
 				<span
 					className={cn(
 						"ml-auto rounded px-1.5 py-0.5 font-bold text-[9px] uppercase tracking-wider",
-						node.method === "GET" && "bg-green-500/10 text-green-600 dark:text-green-400",
-						node.method === "POST" && "bg-blue-500/10 text-blue-600 dark:text-blue-400",
-						node.method === "DELETE" && "bg-red-500/10 text-red-600 dark:text-red-400",
-						node.method === "PATCH" && "bg-orange-500/10 text-orange-600 dark:text-orange-400",
-						node.method === "PUT" && "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400",
+						node.method === "GET" &&
+							"bg-green-500/10 text-green-600 dark:text-green-400",
+						node.method === "POST" &&
+							"bg-blue-500/10 text-blue-600 dark:text-blue-400",
+						node.method === "DELETE" &&
+							"bg-red-500/10 text-red-600 dark:text-red-400",
+						node.method === "PATCH" &&
+							"bg-orange-500/10 text-orange-600 dark:text-orange-400",
+						node.method === "PUT" &&
+							"bg-yellow-500/10 text-yellow-600 dark:text-yellow-400",
 					)}
 				>
 					{node.method}

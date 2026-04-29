@@ -1,4 +1,9 @@
 "use client";
+import {
+	ContactFilterDropdown,
+	type ContactFilterOption,
+} from "@fe/dashboard/app/(protected)/(layout)/contacts/components/contact-filter-dropdown";
+import { ContactTable } from "@fe/dashboard/app/(protected)/(layout)/contacts/topics/[topicId]/components/contact-table";
 import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
@@ -17,11 +22,6 @@ import { useQueryState } from "nuqs";
 import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
-import {
-	ContactFilterDropdown,
-	type ContactFilterOption,
-} from "@fe/dashboard/app/(protected)/(layout)/contacts/components/contact-filter-dropdown";
-import { ContactTable } from "@fe/dashboard/app/(protected)/(layout)/contacts/topics/[topicId]/components/contact-table";
 
 interface TopicData {
 	id: string;
@@ -324,7 +324,7 @@ export const TopicDetailContent = () => {
 								</PopoverTrigger>
 								<PopoverContent
 									align="end"
-									sideOffset={8}
+									sideOffset={0}
 									className="w-44 rounded-xl p-1.5"
 									showArrow
 								>
@@ -517,7 +517,10 @@ export const TopicDetailContent = () => {
 						</Input.Root>
 					</div>
 
-					<ContactFilterDropdown value={statusFilter} onChange={setStatusFilter} />
+					<ContactFilterDropdown
+						value={statusFilter}
+						onChange={setStatusFilter}
+					/>
 					<Button.Root
 						variant="neutral"
 						mode="stroke"

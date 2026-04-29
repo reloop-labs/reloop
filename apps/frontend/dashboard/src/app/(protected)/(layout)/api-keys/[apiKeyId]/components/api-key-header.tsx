@@ -310,7 +310,7 @@ export const ApiKeyHeader = ({
 									</PopoverTrigger>
 									<PopoverContent
 										align="end"
-										sideOffset={8}
+										sideOffset={0}
 										className="w-44 rounded-xl p-1.5"
 										showArrow
 									>

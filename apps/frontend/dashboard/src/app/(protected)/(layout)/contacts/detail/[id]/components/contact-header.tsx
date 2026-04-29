@@ -1,7 +1,10 @@
 "use client";
+import { DeleteContactModal } from "@fe/dashboard/app/(protected)/(layout)/contacts/components/delete-contact-modal";
+import { EditContactModal } from "@fe/dashboard/app/(protected)/(layout)/contacts/components/edit-contact-modal";
 import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
+import type { AudienceStatus } from "@fe/dashboard/utils/audience";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
@@ -16,9 +19,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
-import { DeleteContactModal } from "@fe/dashboard/app/(protected)/(layout)/contacts/components/delete-contact-modal";
-import { EditContactModal } from "@fe/dashboard/app/(protected)/(layout)/contacts/components/edit-contact-modal";
-import type { AudienceStatus } from "@fe/dashboard/utils/audience";
 
 interface ContactData {
 	id: string;
@@ -259,7 +259,7 @@ export const ContactHeader = ({
 								</PopoverTrigger>
 								<PopoverContent
 									align="end"
-									sideOffset={8}
+									sideOffset={0}
 									className="w-44 rounded-xl p-1.5"
 									showArrow
 								>

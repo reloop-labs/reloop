@@ -66,7 +66,7 @@ export const FeedbackPopover = () => {
 			</Popover.Trigger>
 			<Popover.Content
 				align="end"
-				sideOffset={8}
+				sideOffset={0}
 				showArrow={false}
 				className="w-80 p-4"
 			>

@@ -48,10 +48,6 @@ export const GroupList = () => {
 		},
 	);
 
-	const totalPages = data ? Math.ceil(data.total / pageSize) : 1;
-	const startIndex = (currentPage - 1) * pageSize + 1;
-	const endIndex = Math.min(currentPage * pageSize, data?.total || 0);
-
 	if (error) {
 		return (
 			<div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-12 text-center">

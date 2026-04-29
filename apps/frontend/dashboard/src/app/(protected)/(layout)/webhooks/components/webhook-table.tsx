@@ -126,7 +126,7 @@ const WebhookActionsDropdown = ({
 				</PopoverTrigger>
 				<PopoverContent
 					align="end"
-					sideOffset={-4}
+					sideOffset={-10}
 					className="w-40 rounded-xl p-1.5"
 				>
 					<div className="relative">
