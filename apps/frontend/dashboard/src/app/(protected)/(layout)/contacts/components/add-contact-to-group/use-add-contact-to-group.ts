@@ -9,7 +9,10 @@ import type { Contact } from "./types";
 
 const PAGE_SIZE = 50;
 
-export const useAddContactToGroup = (open: boolean, onOpenChange: (open: boolean) => void) => {
+export const useAddContactToGroup = (
+	open: boolean,
+	onOpenChange: (open: boolean) => void,
+) => {
 	const params = useParams();
 	const groupId = params.contact_group_id as string;
 	const { mutate } = useSWRConfig();
@@ -64,9 +67,13 @@ export const useAddContactToGroup = (open: boolean, onOpenChange: (open: boolean
 			: null,
 	);
 
-	const existingContactIds = useMemo(() => {
-		return new Set(groupData?.group?.contacts?.map((c) => c.id) || []);
+	const existingContacts = useMemo(() => {
+		return groupData?.group?.contacts || [];
 	}, [groupData]);
+
+	const existingContactIds = useMemo(() => {
+		return new Set(existingContacts.map((c) => c.id));
+	}, [existingContacts]);
 
 	const availableContacts = useMemo(() => {
 		return fetchedContacts.filter((c) => !existingContactIds.has(c.id));
@@ -179,6 +186,7 @@ export const useAddContactToGroup = (open: boolean, onOpenChange: (open: boolean
 		selectedContacts,
 		setSelectedContacts,
 		availableContacts,
+		existingContacts,
 		totalMatching,
 		totalInOrg,
 		hasMore,
