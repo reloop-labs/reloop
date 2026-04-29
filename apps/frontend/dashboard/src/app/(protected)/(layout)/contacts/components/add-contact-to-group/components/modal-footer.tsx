@@ -55,6 +55,7 @@ export const ModalFooter = ({
 			<Button.Root
 				type="button"
 				onClick={onSubmit}
+				variant="neutral"
 				disabled={isSubmitting || selectedCount === 0}
 				className="h-9 gap-1.5 px-4 text-sm"
 			>
