@@ -41,6 +41,7 @@
 		"shiki": "catalog:ui",
 		"simple-icons": "catalog:ui",
 		"sonner": "catalog:ui",
+		"calligraph": "catalog:ui",
 		"swr": "catalog:ui",
 		"usehooks-ts": "catalog:ui",
 		"valibot": "catalog:db",
