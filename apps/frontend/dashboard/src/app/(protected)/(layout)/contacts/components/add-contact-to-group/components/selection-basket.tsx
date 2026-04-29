@@ -26,7 +26,7 @@ export const SelectionBasket = ({
 		<div className="flex w-full flex-col bg-bg-weak-50/20 sm:w-[380px] dark:bg-bg-strong-200/10">
 			{/* New Selections Section */}
 			<div className="flex flex-1 flex-col overflow-hidden">
-				<div className="flex items-center justify-between border-stroke-soft-100 border-b px-5 py-3 dark:border-stroke-soft-100/20">
+				<div className="flex items-center justify-between border-stroke-soft-100 border-b px-5 py-3 dark:border-stroke-soft-100/40">
 					<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-text-soft-400/80">
 						To be added ({selectedContacts.length})
 					</p>
@@ -52,7 +52,7 @@ export const SelectionBasket = ({
 							</p>
 						</div>
 					) : (
-						<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/10">
+						<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/40">
 							{selectedContacts.map((contact) => (
 								<SelectedItem
 									key={contact.id}

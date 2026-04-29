@@ -27,7 +27,7 @@ export const ContactRow = ({
 			disabled={disabled}
 		>
 			{/* Unchecked checkbox — contacts disappear from this list once selected */}
-			<div className="flex h-4 w-4 shrink-0 items-center justify-center rounded border border-stroke-soft-200 bg-bg-white-0 transition-all dark:border-stroke-soft-100/40 dark:bg-bg-strong-200" />
+			<div className="flex h-4 w-4 shrink-0 items-center justify-center rounded border border-stroke-soft-100 bg-bg-white-0 transition-all dark:border-stroke-soft-100/40 dark:bg-bg-strong-200" />
 
 			<div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-bg-weak-50 font-semibold text-[11px] text-text-sub-600 dark:bg-bg-strong-200 dark:text-text-soft-400">
 				{initial}

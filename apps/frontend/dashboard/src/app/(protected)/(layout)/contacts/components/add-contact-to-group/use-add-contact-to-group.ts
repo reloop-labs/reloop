@@ -3,7 +3,7 @@
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import useSWR, { useSWRConfig } from "swr";
+import { useSWRConfig } from "swr";
 import useSWRInfinite from "swr/infinite";
 import type { Contact } from "./types";
 

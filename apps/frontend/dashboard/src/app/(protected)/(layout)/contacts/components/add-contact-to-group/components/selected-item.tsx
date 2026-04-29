@@ -34,7 +34,7 @@ export const SelectedItem = ({
 			<button
 				type="button"
 				onClick={onRemove}
-				className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-stroke-soft-100 bg-bg-white-0 text-text-soft-400 transition-all hover:border-error-base/30 hover:bg-error-base/5 hover:text-error-base dark:border-stroke-soft-100/10 dark:bg-bg-strong-300 dark:hover:bg-error-base/10"
+				className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-stroke-soft-100 bg-bg-white-0 text-text-soft-400 transition-all hover:border-error-base/30 hover:bg-error-base/5 hover:text-error-base dark:border-stroke-soft-100/40 dark:bg-bg-strong-300 dark:hover:bg-error-base/10"
 				disabled={disabled}
 			>
 				<Icon name="cross" className="h-3.5 w-3.5" />

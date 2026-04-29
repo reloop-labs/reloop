@@ -68,7 +68,7 @@ export const DiscoveryPane = ({
 			</div>
 
 			{/* Select All Bar */}
-			<div className="border-stroke-soft-100 border-t border-b px-5 py-2.5 dark:border-stroke-soft-100/10">
+			<div className="border-stroke-soft-100 border-t border-b px-5 py-2.5 dark:border-stroke-soft-100/40">
 				<button
 					type="button"
 					onClick={onToggleSelectAll}
@@ -79,7 +79,7 @@ export const DiscoveryPane = ({
 							"flex h-4 w-4 items-center justify-center rounded border transition-all",
 							isAllSelected
 								? "border-primary-base bg-primary-base text-white"
-								: "border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-strong-200",
+								: "border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-strong-200",
 						)}
 					>
 						{isAllSelected && <Icon name="check" className="h-3 w-3" />}
@@ -119,7 +119,7 @@ export const DiscoveryPane = ({
 						</p>
 					</div>
 				) : (
-					<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/10">
+					<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/40">
 						{availableContacts.map((contact) => (
 							<ContactRow
 								key={contact.id}

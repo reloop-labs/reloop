@@ -74,10 +74,10 @@ export const AddContactToGroupModal = ({
 				className="rounded-20 border-none p-0 sm:max-w-[860px]"
 				showClose={true}
 			>
-				<div className="flex flex-col rounded-20 border border-stroke-soft-100/50 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-[#101010]">
+				<div className="flex flex-col rounded-20 border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40">
 					<ModalHeader groupName={groupName} />
 
-					<div className="flex flex-col divide-x divide-stroke-soft-100 sm:flex-row dark:divide-stroke-soft-100/20">
+					<div className="flex flex-col divide-x divide-stroke-soft-100 sm:flex-row dark:divide-stroke-soft-100/40">
 						{/* ── Left Column: Discovery ────────────────────────── */}
 						<DiscoveryPane
 							searchInput={searchInput}

@@ -24,7 +24,7 @@ export const ModalFooter = ({
 	onSubmit,
 }: ModalFooterProps) => {
 	return (
-		<div className="flex flex-col-reverse justify-end gap-2 border-stroke-soft-100/50 border-t px-6 py-4 sm:flex-row sm:items-center dark:border-stroke-soft-100/20">
+		<div className="flex flex-col-reverse justify-end gap-2 border-stroke-soft-100 border-t px-6 py-4 sm:flex-row sm:items-center dark:border-stroke-soft-100/40">
 			<div className="mr-auto hidden items-center gap-2 text-text-soft-400 text-xs sm:flex">
 				{totalMatching > 0 && (
 					<>

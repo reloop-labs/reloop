@@ -18,11 +18,14 @@ export const ExistingMembers = ({
 	if (contacts.length === 0) return null;
 
 	return (
-		<div className="flex flex-col border-stroke-soft-100 border-t dark:border-stroke-soft-100/10">
+		<div className="flex flex-col border-stroke-soft-100 border-t dark:border-stroke-soft-100/40">
 			<button
 				type="button"
 				onClick={() => setIsExpanded(!isExpanded)}
-				className="flex items-center justify-between px-5 py-3 transition-colors hover:bg-bg-weak-50/50 dark:hover:bg-bg-strong-200/30"
+				className={cn(
+					"flex items-center justify-between px-5 py-3 transition-colors hover:bg-bg-weak-50/50 dark:hover:bg-bg-strong-200/30",
+					isExpanded && "border-stroke-soft-100 border-b dark:border-stroke-soft-100/40",
+				)}
 			>
 				<div className="flex items-center gap-2">
 					<Icon name="users" className="h-3.5 w-3.5 text-text-soft-400" />
@@ -41,7 +44,7 @@ export const ExistingMembers = ({
 
 			{isExpanded && (
 				<div className="max-h-[300px] overflow-y-auto bg-bg-weak-50/5 dark:bg-bg-strong-300/5">
-					<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/10">
+					<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/40">
 						{contacts.map((contact) => (
 							<div
 								key={contact.id}
@@ -63,7 +66,7 @@ export const ExistingMembers = ({
 								<button
 									type="button"
 									onClick={() => onRemove(contact)}
-									className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-stroke-soft-100 bg-bg-white-0 text-text-soft-400 transition-all hover:border-error-base/30 hover:bg-error-base/5 hover:text-error-base dark:border-stroke-soft-100/10 dark:bg-bg-strong-300 dark:hover:bg-error-base/10"
+									className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-stroke-soft-100 bg-bg-white-0 text-text-soft-400 transition-all hover:border-error-base/30 hover:bg-error-base/5 hover:text-error-base dark:border-stroke-soft-100/40 dark:bg-bg-strong-300 dark:hover:bg-error-base/10"
 									title="Remove from group"
 								>
 									<Icon name="minus" className="h-3.5 w-3.5" />
