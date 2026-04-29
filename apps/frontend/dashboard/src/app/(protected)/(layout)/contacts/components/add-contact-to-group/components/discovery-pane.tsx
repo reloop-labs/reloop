@@ -18,7 +18,6 @@ interface DiscoveryPaneProps {
 	onToggleSelectAll: () => void;
 	totalMatching: number;
 	debouncedSearch: string;
-	fetchedCount: number;
 	availableContacts: Contact[];
 	selectedContacts: Contact[];
 	onToggleContact: (contact: Contact) => void;
@@ -37,7 +36,6 @@ export const DiscoveryPane = ({
 	onToggleSelectAll,
 	totalMatching,
 	debouncedSearch,
-	fetchedCount,
 	availableContacts,
 	selectedContacts,
 	onToggleContact,
@@ -95,14 +93,31 @@ export const DiscoveryPane = ({
 			</div>
 
 			<div className="max-h-[380px] min-h-[300px] overflow-y-auto">
-				{!debouncedSearch && !isSearching && fetchedCount === 0 ? (
+				{isSearching ? (
+					// Initial loading skeleton
+					<div className="flex h-64 flex-col items-center justify-center">
+						<Spinner size={20} />
+					</div>
+				) : availableContacts.length === 0 && debouncedSearch ? (
+					// Search returned no results
 					<div className="flex h-64 flex-col items-center justify-center text-center">
 						<Icon name="search" className="mb-3 h-8 w-8 text-text-soft-400" />
 						<p className="font-medium text-sm text-text-strong-950 dark:text-white">
-							Start searching
+							No results found
 						</p>
 						<p className="mt-1 text-text-sub-600 text-xs dark:text-text-soft-400">
-							Type an email address to find records.
+							No contacts match &ldquo;{debouncedSearch}&rdquo;.
+						</p>
+					</div>
+				) : availableContacts.length === 0 && !debouncedSearch ? (
+					// Org has no contacts at all
+					<div className="flex h-64 flex-col items-center justify-center text-center">
+						<Icon name="users" className="mb-3 h-8 w-8 text-text-soft-400" />
+						<p className="font-medium text-sm text-text-strong-950 dark:text-white">
+							No contacts available
+						</p>
+						<p className="mt-1 text-text-sub-600 text-xs dark:text-text-soft-400">
+							All contacts in your organization are already in this group.
 						</p>
 					</div>
 				) : (

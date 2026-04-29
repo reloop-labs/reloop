@@ -3,6 +3,7 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import type { Contact } from "../types";
+import { getDisplayName, getInitial } from "./utils";
 
 export const ContactRow = ({
 	contact,
@@ -15,11 +16,8 @@ export const ContactRow = ({
 	onToggle: () => void;
 	disabled?: boolean;
 }) => {
-	const initials = (
-		contact?.firstName?.[0] ||
-		contact?.email?.[0] ||
-		"?"
-	).toUpperCase();
+	const initial = getInitial(contact);
+	const displayName = getDisplayName(contact);
 	return (
 		<button
 			type="button"
@@ -44,14 +42,12 @@ export const ContactRow = ({
 			</div>
 
 			<div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-bg-weak-50 font-semibold text-[11px] text-text-sub-600 dark:bg-bg-strong-200 dark:text-text-soft-400">
-				{initials}
+				{initial}
 			</div>
 
 			<div className="min-w-0 flex-1">
 				<p className="truncate font-medium text-[13px] text-text-strong-950 dark:text-white">
-					{contact.firstName || contact.lastName
-						? `${contact.firstName || ""} ${contact.lastName || ""}`.trim()
-						: contact.email.split("@")[0]}
+					{displayName}
 				</p>
 				<p className="truncate text-[11px] text-text-sub-600 dark:text-text-soft-400">
 					{contact.email}

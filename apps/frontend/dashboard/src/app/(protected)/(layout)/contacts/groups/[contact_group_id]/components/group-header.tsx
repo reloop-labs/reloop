@@ -89,7 +89,7 @@ export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 	};
 
 	useHotkeys(
-		"a+c",
+		"m+c",
 		(e) => {
 			e.preventDefault();
 			setModal("add-contact-to-group");
@@ -182,10 +182,10 @@ export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 									className="gap-2"
 								>
 									<Icon name="plus" className="h-4 w-4" />
-									Add Contacts to Group
+									Manage Contacts
 									<span className="inline-flex items-center gap-0.5">
-										<KbdKey>a</KbdKey>
-										<KbdKey>c</KbdKey>
+										<KbdKey>M</KbdKey>
+										<KbdKey>C</KbdKey>
 									</span>
 								</Button.Root>
 								<PopoverRoot>

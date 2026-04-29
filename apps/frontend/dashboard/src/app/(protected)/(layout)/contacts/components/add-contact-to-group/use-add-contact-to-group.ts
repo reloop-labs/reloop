@@ -15,7 +15,7 @@ export const useAddContactToGroup = (
 ) => {
 	const params = useParams();
 	const groupId = params.contact_group_id as string;
-	const { mutate } = useSWRConfig();
+	const { mutate: mutateGlobal } = useSWRConfig();
 
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [searchInput, setSearchInput] = useState("");
@@ -37,6 +37,7 @@ export const useAddContactToGroup = (
 		setSize,
 		isValidating,
 		isLoading: isSearching,
+		mutate: mutateInfinite,
 	} = useSWRInfinite<{
 		contacts: Contact[];
 		total: number;
@@ -59,7 +60,7 @@ export const useAddContactToGroup = (
 	const hasMore = fetchedContacts.length < totalMatching;
 
 	// Fetch current group's contacts
-	const { data: groupData } = useSWR<{
+	const { data: groupData, mutate: mutateGroup } = useSWR<{
 		group: { name: string; contacts: Contact[] };
 	}>(
 		open && groupId
@@ -157,16 +158,22 @@ export const useAddContactToGroup = (
 				toast.success(
 					`${added} contact${added !== 1 ? "s" : ""} added to group`,
 				);
-				handleOpenChange(false);
+				setSelectedContacts([]);
+				await Promise.all([
+					mutateGroup(),
+					mutateInfinite(),
+					// Invalidate the group list so the parent table refreshes
+					mutateGlobal(
+						(key: string) =>
+							typeof key === "string" &&
+							key.includes(`/api/contacts/v1/groups/${groupId}`),
+						undefined,
+						{ revalidate: true },
+					),
+				]);
 			} else {
 				toast.error("No new contacts were added (they might already be in the group)");
 			}
-
-			await mutate(
-				(key: string) =>
-					typeof key === "string" &&
-					key.includes(`/api/contacts/v1/groups/${groupId}/contacts`),
-			);
 		} catch (error) {
 			console.error("Failed to add contacts:", error);
 			toast.error("Failed to add contacts to group");
@@ -187,11 +194,7 @@ export const useAddContactToGroup = (
 
 			if (response.ok) {
 				toast.success("Contact removed from group");
-				await mutate(
-					(key: string) =>
-						typeof key === "string" &&
-						key.includes(`/api/contacts/v1/groups/${groupId}/contacts`),
-				);
+				await Promise.all([mutateGroup(), mutateInfinite()]);
 			} else {
 				toast.error("Failed to remove contact");
 			}
@@ -202,7 +205,6 @@ export const useAddContactToGroup = (
 	};
 
 	return {
-		groupId,
 		groupName: groupData?.group?.name || "",
 		isSubmitting,
 		searchInput,
@@ -215,7 +217,6 @@ export const useAddContactToGroup = (
 		totalMatching,
 		totalInOrg,
 		hasMore,
-		size,
 		setSize,
 		isValidating,
 		isSearching,

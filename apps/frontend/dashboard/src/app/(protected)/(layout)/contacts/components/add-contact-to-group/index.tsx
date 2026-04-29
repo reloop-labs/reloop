@@ -1,7 +1,7 @@
 "use client";
 
 import * as Modal from "@reloop/ui/modal";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useIntersectionObserver } from "usehooks-ts";
 
@@ -30,7 +30,6 @@ export const AddContactToGroupModal = ({
 		totalInOrg,
 		hasMore,
 		setSize,
-		size,
 		isValidating,
 		isSearching,
 		isAllSelected,
@@ -48,10 +47,13 @@ export const AddContactToGroupModal = ({
 		threshold: 0.1,
 	});
 
-	// Load more when intersecting
-	if (isIntersecting && hasMore && !isValidating) {
-		setSize(size + 1);
-	}
+	// Load more when the sentinel comes into view — must be in an effect,
+	// not in the render body, to avoid setState-during-render warnings.
+	useEffect(() => {
+		if (isIntersecting && hasMore && !isValidating) {
+			setSize((s) => s + 1);
+		}
+	}, [isIntersecting, hasMore, isValidating, setSize]);
 
 	useHotkeys(
 		"mod+enter",
@@ -86,7 +88,6 @@ export const AddContactToGroupModal = ({
 							onToggleSelectAll={toggleSelectAll}
 							totalMatching={totalMatching}
 							debouncedSearch={debouncedSearch}
-							fetchedCount={fetchedCount}
 							availableContacts={availableContacts}
 							selectedContacts={selectedContacts}
 							onToggleContact={toggleContact}
