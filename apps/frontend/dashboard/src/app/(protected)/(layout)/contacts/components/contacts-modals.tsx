@@ -1,8 +1,9 @@
 "use client";
+import type { AudienceStatus } from "@fe/dashboard/utils/audience";
 import { useQueryState } from "nuqs";
 import useSWR from "swr";
 import { AddContactModal } from "./add-contact-modal";
-import { AddContactToGroupModal } from "./add-contact-to-group-modal";
+import { AddContactToGroupModal } from "./add-contact-to-group";
 import { AddContactToTopicModal } from "./add-contact-to-topic-modal";
 import { AddPropertyModal } from "./add-property-modal";
 import { CreateGroupModal } from "./create-group-modal";
@@ -15,7 +16,6 @@ import { EditContactModal } from "./edit-contact-modal";
 import { EditGroupModal } from "./edit-group-modal";
 import { EditPropertyModal } from "./edit-property-modal";
 import { EditTopicModal } from "./edit-topic-modal";
-import type { AudienceStatus } from "@fe/dashboard/utils/audience";
 
 interface Contact {
 	id: string;
