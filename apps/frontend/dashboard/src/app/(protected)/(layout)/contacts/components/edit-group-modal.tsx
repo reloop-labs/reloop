@@ -7,6 +7,7 @@ import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import { useEffect, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
 
@@ -36,8 +37,21 @@ export const EditGroupModal = ({
 		}
 	}, [group]);
 
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
+	// Command/Ctrl + Enter to submit
+	useHotkeys(
+		"mod+enter",
+		(e) => {
+			e.preventDefault();
+			if (open && !isSubmitting && name.trim() && name !== group?.name) {
+				handleSubmit();
+			}
+		},
+		{ enableOnFormTags: true, enabled: open },
+		[open, isSubmitting, name, group],
+	);
+
+	const handleSubmit = async (e?: React.FormEvent) => {
+		e?.preventDefault();
 		if (!group || !name.trim() || name === group.name) return;
 
 		setIsSubmitting(true);
@@ -71,7 +85,7 @@ export const EditGroupModal = ({
 	return (
 		<Modal.Root open={open} onOpenChange={onOpenChange}>
 			<Modal.Content
-				className="rounded-2xl border border-stroke-soft-100/50 p-0.5 sm:max-w-[480px]"
+				className="rounded-2xl border border-stroke-soft-100/50 p-0.5 sm:max-w-[425px]"
 				showClose={true}
 			>
 				<div className="rounded-2xl border border-stroke-soft-100/50">
@@ -80,14 +94,14 @@ export const EditGroupModal = ({
 							<Icon name="edit-2" className="h-4 w-4" />
 						</div>
 						<div className="flex-1">
-							<Modal.Title>Edit Group</Modal.Title>
+							<Modal.Title className="font-semibold">Edit Group</Modal.Title>
 						</div>
 					</Modal.Header>
 					<form onSubmit={handleSubmit} className="flex flex-col">
 						<Modal.Body className="relative space-y-4">
 							<div className="flex flex-col gap-1">
-								<Label.Root htmlFor="edit-name">Group Name</Label.Root>
-								<Input.Root size="small">
+								<Label.Root htmlFor="edit-name">Updated Group Name</Label.Root>
+								<Input.Root size="small" className="rounded-xl">
 									<Input.Wrapper>
 										<Input.Input
 											id="edit-name"
@@ -105,7 +119,6 @@ export const EditGroupModal = ({
 								type="button"
 								variant="neutral"
 								mode="stroke"
-								size="xsmall"
 								onClick={() => onOpenChange(false)}
 								disabled={isSubmitting}
 							>
@@ -115,7 +128,6 @@ export const EditGroupModal = ({
 							<Button.Root
 								type="submit"
 								variant="neutral"
-								size="xsmall"
 								disabled={isSubmitting || !name.trim() || name === group?.name}
 							>
 								{isSubmitting ? (
@@ -127,6 +139,10 @@ export const EditGroupModal = ({
 									<>
 										Update
 										<span className="inline-flex items-center gap-0.5">
+											<Icon
+												name="command"
+												className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+											/>
 											<Icon
 												name="enter"
 												className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
