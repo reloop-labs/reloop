@@ -12,6 +12,7 @@ import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import { useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
+import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
 
@@ -249,7 +250,8 @@ export const AddPropertyModal = ({
 										{TYPE_OPTIONS.map((opt) => {
 											const isSelected = propertyType === opt.value;
 											return (
-												<button
+												<motion.button
+													whileTap={{ scale: 0.98 }}
 													key={opt.value}
 													type="button"
 													onClick={() => setPropertyType(opt.value)}
@@ -280,14 +282,26 @@ export const AddPropertyModal = ({
 																)}
 															/>
 														</div>
-														{isSelected && (
-															<div className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-primary-base">
-																<Icon
-																	name="check"
-																	className="h-2 w-2 text-white"
-																/>
-															</div>
-														)}
+														<AnimatePresence>
+															{isSelected && (
+																<motion.div
+																	initial={{ scale: 0, opacity: 0 }}
+																	animate={{ scale: 1, opacity: 1 }}
+																	exit={{ scale: 0, opacity: 0 }}
+																	transition={{
+																		type: "spring",
+																		stiffness: 500,
+																		damping: 30,
+																	}}
+																	className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-primary-base"
+																>
+																	<Icon
+																		name="check"
+																		className="h-2 w-2 text-white"
+																	/>
+																</motion.div>
+															)}
+														</AnimatePresence>
 													</div>
 													<div>
 														<p className="font-semibold text-text-strong-950 text-xs">
@@ -297,7 +311,7 @@ export const AddPropertyModal = ({
 															{opt.description}
 														</p>
 													</div>
-												</button>
+												</motion.button>
 											);
 										})}
 									</div>
