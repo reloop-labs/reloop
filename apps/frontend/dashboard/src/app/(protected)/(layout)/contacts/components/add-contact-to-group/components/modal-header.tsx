@@ -14,7 +14,7 @@ export const ModalHeader = ({ groupName }: { groupName: string }) => (
 					Add contacts to{" "}
 					<span className="text-primary-base">{groupName || "group"}</span>
 				</Modal.Title>
-				<Modal.Description className="text-sm text-text-sub-600 dark:text-text-soft-400">
+				<Modal.Description className="hidden">
 					Select contacts from your database to add them to this group.
 				</Modal.Description>
 			</div>

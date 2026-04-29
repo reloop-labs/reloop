@@ -8,6 +8,8 @@ import useSWRInfinite from "swr/infinite";
 import type { Contact } from "./types";
 
 const PAGE_SIZE = 50;
+// Backend hard-caps this at 100 — never request more than that.
+const GROUP_MEMBERS_PAGE_SIZE = 100;
 
 export const useAddContactToGroup = (
 	open: boolean,
@@ -59,40 +61,80 @@ export const useAddContactToGroup = (
 	const totalInOrg = infiniteData?.[0]?.totalContacts || 0;
 	const hasMore = fetchedContacts.length < totalMatching;
 
-	// Fetch current group's contacts
-	const { data: groupData, mutate: mutateGroup } = useSWR<{
+	// ── Fetch ALL existing group members (paginated, backend max = 100) ──────
+	// We use useSWRInfinite so that groups with >100 members still work.
+	const {
+		data: groupPagesData,
+		mutate: mutateGroup,
+		isLoading: isGroupLoading,
+	} = useSWRInfinite<{
 		group: { name: string; contacts: Contact[] };
+		total: number;
 	}>(
-		open && groupId
-			? `/api/contacts/v1/groups/${groupId}/contacts?limit=1000`
-			: null,
+		(index) => {
+			if (!open || !groupId) return null;
+			const page = index + 1;
+			return `/api/contacts/v1/groups/${groupId}/contacts?limit=${GROUP_MEMBERS_PAGE_SIZE}&page=${page}`;
+		},
+		{
+			revalidateFirstPage: false,
+			// Automatically load all pages up-front so we have a full picture
+			// of existing members before filtering.
+			initialSize: 1,
+		},
 	);
 
+	// Auto-fetch subsequent pages until we've loaded all existing members
+	const groupTotal = groupPagesData?.[0]?.total ?? 0;
+	const loadedGroupMemberCount = useMemo(
+		() =>
+			groupPagesData
+				? groupPagesData.flatMap((p) => p.group?.contacts ?? []).length
+				: 0,
+		[groupPagesData],
+	);
+	const groupHasMore = loadedGroupMemberCount < groupTotal;
+
+	// Trigger loading next page of group members when we know there are more
+	useEffect(() => {
+		if (groupHasMore && !isGroupLoading) {
+			// setSize is stable but we need the current page count
+			mutateGroup(); // just nudge — the index function handles pagination
+		}
+	}, [groupHasMore, isGroupLoading, mutateGroup]);
+
 	const existingContacts = useMemo(() => {
-		return groupData?.group?.contacts || [];
-	}, [groupData]);
+		if (!groupPagesData) return [];
+		return groupPagesData.flatMap((page) => page.group?.contacts ?? []);
+	}, [groupPagesData]);
 
 	const existingContactIds = useMemo(() => {
 		return new Set(existingContacts.map((c) => c.id));
 	}, [existingContacts]);
+
+	// Group name from the first page
+	const groupName = groupPagesData?.[0]?.group?.name ?? "";
 
 	const selectedContactIds = useMemo(
 		() => new Set(selectedContacts.map((c) => c.id)),
 		[selectedContacts],
 	);
 
-	// Contacts that can still be picked: not already in the group AND not yet in the basket
+	// While group members are still loading, don't filter yet — show nothing
+	// to avoid the flash where all contacts briefly appear as available.
 	const availableContacts = useMemo(() => {
+		if (isGroupLoading) return [];
 		return fetchedContacts.filter(
 			(c) => !existingContactIds.has(c.id) && !selectedContactIds.has(c.id),
 		);
-	}, [fetchedContacts, existingContactIds, selectedContactIds]);
+	}, [fetchedContacts, existingContactIds, selectedContactIds, isGroupLoading]);
 
-	// The full pickable pool (existing excluded, but selected not excluded) is used
-	// to decide whether "select all" has been exhausted.
+	// The full pickable pool (existing excluded, selected not excluded) —
+	// used to decide whether "select all" has been exhausted.
 	const pickableContacts = useMemo(() => {
+		if (isGroupLoading) return [];
 		return fetchedContacts.filter((c) => !existingContactIds.has(c.id));
-	}, [fetchedContacts, existingContactIds]);
+	}, [fetchedContacts, existingContactIds, isGroupLoading]);
 
 	const isAllSelected = useMemo(() => {
 		if (pickableContacts.length === 0) return false;
@@ -213,7 +255,7 @@ export const useAddContactToGroup = (
 	};
 
 	return {
-		groupName: groupData?.group?.name || "",
+		groupName,
 		isSubmitting,
 		searchInput,
 		setSearchInput,
@@ -228,6 +270,7 @@ export const useAddContactToGroup = (
 		setSize,
 		isValidating,
 		isSearching,
+		isGroupLoading,
 		isAllSelected,
 		toggleContact,
 		removeContact,

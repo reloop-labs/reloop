@@ -32,6 +32,7 @@ export const AddContactToGroupModal = ({
 		setSize,
 		isValidating,
 		isSearching,
+		isGroupLoading,
 		isAllSelected,
 		toggleContact,
 		removeContact,
@@ -81,7 +82,7 @@ export const AddContactToGroupModal = ({
 						<DiscoveryPane
 							searchInput={searchInput}
 							onSearchChange={setSearchInput}
-							isSearching={isSearching}
+							isSearching={isSearching || isGroupLoading}
 							isValidating={isValidating}
 							isSubmitting={isSubmitting}
 							isAllSelected={isAllSelected}
