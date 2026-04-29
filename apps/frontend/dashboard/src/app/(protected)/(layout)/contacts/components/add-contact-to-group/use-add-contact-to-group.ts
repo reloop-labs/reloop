@@ -76,16 +76,28 @@ export const useAddContactToGroup = (
 		return new Set(existingContacts.map((c) => c.id));
 	}, [existingContacts]);
 
+	const selectedContactIds = useMemo(
+		() => new Set(selectedContacts.map((c) => c.id)),
+		[selectedContacts],
+	);
+
+	// Contacts that can still be picked: not already in the group AND not yet in the basket
 	const availableContacts = useMemo(() => {
+		return fetchedContacts.filter(
+			(c) => !existingContactIds.has(c.id) && !selectedContactIds.has(c.id),
+		);
+	}, [fetchedContacts, existingContactIds, selectedContactIds]);
+
+	// The full pickable pool (existing excluded, but selected not excluded) is used
+	// to decide whether "select all" has been exhausted.
+	const pickableContacts = useMemo(() => {
 		return fetchedContacts.filter((c) => !existingContactIds.has(c.id));
 	}, [fetchedContacts, existingContactIds]);
 
 	const isAllSelected = useMemo(() => {
-		if (availableContacts.length === 0) return false;
-		return availableContacts.every((contact) =>
-			selectedContacts.some((c) => c.id === contact.id),
-		);
-	}, [availableContacts, selectedContacts]);
+		if (pickableContacts.length === 0) return false;
+		return pickableContacts.every((contact) => selectedContactIds.has(contact.id));
+	}, [pickableContacts, selectedContactIds]);
 
 	const toggleContact = (contact: Contact) => {
 		setSelectedContacts((prev) => {
@@ -103,18 +115,14 @@ export const useAddContactToGroup = (
 
 	const toggleSelectAll = () => {
 		if (isAllSelected) {
-			const availableIds = new Set(availableContacts.map((c) => c.id));
+			// Deselect all: remove everything from the full pickable pool
+			const pickableIds = new Set(pickableContacts.map((c) => c.id));
 			setSelectedContacts((prev) =>
-				prev.filter((c) => !availableIds.has(c.id)),
+				prev.filter((c) => !pickableIds.has(c.id)),
 			);
 		} else {
-			const newSelections = [...selectedContacts];
-			availableContacts.forEach((contact) => {
-				if (!newSelections.some((c) => c.id === contact.id)) {
-					newSelections.push(contact);
-				}
-			});
-			setSelectedContacts(newSelections);
+			// Select all remaining (availableContacts = pickable minus already-selected)
+			setSelectedContacts((prev) => [...prev, ...availableContacts]);
 		}
 	};
 

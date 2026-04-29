@@ -19,7 +19,6 @@ interface DiscoveryPaneProps {
 	totalMatching: number;
 	debouncedSearch: string;
 	availableContacts: Contact[];
-	selectedContacts: Contact[];
 	onToggleContact: (contact: Contact) => void;
 	hasMore: boolean;
 	loadMoreRef: Ref<HTMLDivElement>;
@@ -37,7 +36,6 @@ export const DiscoveryPane = ({
 	totalMatching,
 	debouncedSearch,
 	availableContacts,
-	selectedContacts,
 	onToggleContact,
 	hasMore,
 	loadMoreRef,
@@ -126,7 +124,6 @@ export const DiscoveryPane = ({
 							<ContactRow
 								key={contact.id}
 								contact={contact}
-								isSelected={selectedContacts.some((c) => c.id === contact.id)}
 								onToggle={() => onToggleContact(contact)}
 								disabled={isSubmitting}
 							/>

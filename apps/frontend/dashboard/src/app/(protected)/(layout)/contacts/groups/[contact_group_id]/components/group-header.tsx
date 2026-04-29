@@ -181,7 +181,6 @@ export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 									onClick={() => setModal("add-contact-to-group")}
 									className="gap-2"
 								>
-									<Icon name="plus" className="h-4 w-4" />
 									Manage Contacts
 									<span className="inline-flex items-center gap-0.5">
 										<KbdKey>M</KbdKey>

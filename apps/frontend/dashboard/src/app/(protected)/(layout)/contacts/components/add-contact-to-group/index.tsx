@@ -89,7 +89,6 @@ export const AddContactToGroupModal = ({
 							totalMatching={totalMatching}
 							debouncedSearch={debouncedSearch}
 							availableContacts={availableContacts}
-							selectedContacts={selectedContacts}
 							onToggleContact={toggleContact}
 							hasMore={hasMore}
 							loadMoreRef={loadMoreRef}
