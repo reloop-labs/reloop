@@ -28,7 +28,7 @@ const CommandDialog = ({
 				overlayClassName={cn("justify-start pt-20", overlayClassName)}
 				showClose={false}
 				className={cn(
-					"flex max-h-full max-w-[600px] flex-col overflow-hidden rounded-2xl",
+					"flex max-h-full max-w-[640px] flex-col overflow-hidden rounded-2xl",
 					className,
 				)}
 			>
@@ -113,9 +113,9 @@ CommandGroup.displayName = "CommandGroup";
 
 const commandItemVariants = tv({
 	base: [
-		"flex items-center gap-3 rounded-10 bg-bg-white-0",
+		"flex items-center gap-3 rounded-10 bg-transparent",
 		"cursor-pointer text-paragraph-sm text-text-strong-950",
-		"transition duration-200 ease-out",
+		"transition-all duration-150 ease-out",
 		// hover/selected
 		"data-[selected=true]:bg-bg-weak-50",
 	],
@@ -192,6 +192,33 @@ function CommandFooterKeyBox({
 	);
 }
 
+function CommandEmpty({
+	className,
+	...rest
+}: React.ComponentPropsWithoutRef<typeof Command.Empty>) {
+	return (
+		<Command.Empty
+			className={cn(
+				"flex flex-col items-center justify-center py-12 text-center",
+				className,
+			)}
+			{...rest}
+		/>
+	);
+}
+
+function CommandSeparator({
+	className,
+	...rest
+}: React.ComponentPropsWithoutRef<typeof Command.Separator>) {
+	return (
+		<Command.Separator
+			className={cn("h-px bg-stroke-soft-200", className)}
+			{...rest}
+		/>
+	);
+}
+
 export {
 	CommandDialog as Dialog,
 	CommandDialogTitle as DialogTitle,
@@ -203,4 +230,6 @@ export {
 	CommandItemIcon as ItemIcon,
 	CommandFooter as Footer,
 	CommandFooterKeyBox as FooterKeyBox,
+	CommandEmpty as Empty,
+	CommandSeparator as Separator,
 };
