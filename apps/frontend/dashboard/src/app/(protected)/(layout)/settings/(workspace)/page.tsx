@@ -7,6 +7,7 @@ import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
+import { Skeleton } from "@reloop/ui/skeleton";
 import Spinner from "@reloop/ui/spinner";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -32,12 +33,84 @@ type WorkspaceFormValues = v.InferOutput<typeof workspaceSchema>;
 
 type SlugStatus = "idle" | "checking" | "available" | "taken" | "error";
 
-const SettingsPage = () => {
-	const { activeOrganization, mutateOrganizations } = useUserOrganization();
+// ---------- Skeleton ----------
+
+const SettingsSkeleton = () => (
+	<div className="w-full space-y-8 pt-5">
+		<div>
+			{/* WorkspaceHeader */}
+			<div className="mb-6">
+				<Skeleton className="mb-1 h-5 w-24" />
+				<Skeleton className="h-4 w-52" />
+			</div>
+
+			<div className="w-full space-y-5">
+				{/* WorkspaceLogoUpload — 72px square + stacked label/description/button */}
+				<div className="flex items-center gap-4">
+					<Skeleton className="h-[72px] w-[72px] flex-shrink-0 rounded-xl" />
+					<div className="flex flex-col gap-2">
+						<Skeleton className="h-4 w-28" />
+						<Skeleton className="h-3.5 w-44" />
+						<Skeleton className="h-7 w-24 rounded-lg" />
+					</div>
+				</div>
+
+				<div className="grid grid-cols-1 gap-3">
+					{/* Workspace Name field */}
+					<div>
+						<Skeleton className="mb-1 h-4 w-28" />
+						<Skeleton className="h-9 w-full rounded-lg" />
+						<Skeleton className="mt-1 h-3.5 w-64" />
+					</div>
+
+					{/* Workspace Slug field */}
+					<div>
+						<Skeleton className="mb-1 h-4 w-28" />
+						<Skeleton className="h-9 w-full rounded-lg" />
+						<Skeleton className="mt-1 h-3.5 w-72" />
+					</div>
+				</div>
+
+				{/* Save button — right aligned */}
+				<div className="flex justify-end">
+					<Skeleton className="h-8 w-40 rounded-lg" />
+				</div>
+
+				{/* WorkspaceDangerZone */}
+				<div>
+					<Skeleton className="mb-3 h-5 w-24" />
+					<div className="rounded-xl border border-error-light py-2 pr-2.5 pl-3">
+						<div className="flex items-center justify-between">
+							<div className="space-y-1">
+								<Skeleton className="h-4 w-32" />
+								<Skeleton className="h-3 w-72" />
+							</div>
+							<Skeleton className="h-8 w-36 rounded-lg" />
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+);
+
+// ---------- Form (only rendered once org is guaranteed non-null) ----------
+
+type Organization = NonNullable<
+	ReturnType<typeof useUserOrganization>["activeOrganization"]
+>;
+
+interface WorkspaceFormProps {
+	activeOrganization: Organization;
+	mutateOrganizations: () => void;
+}
+
+const WorkspaceForm = ({
+	activeOrganization,
+	mutateOrganizations,
+}: WorkspaceFormProps) => {
 	const [isSaving, setIsSaving] = useState(false);
 	const [slugStatus, setSlugStatus] = useState<SlugStatus>("idle");
-
-	if (!activeOrganization) return null;
 
 	const {
 		register,
@@ -58,7 +131,6 @@ const SettingsPage = () => {
 	const slugValue = watch("slug");
 	const logoValue = watch("logo");
 
-	// Check if there are any changes (isDirty from RHF is usually enough, but we want to be explicit relative to activeOrganization if needed)
 	const hasChanges =
 		nameValue !== activeOrganization.name ||
 		slugValue !== activeOrganization.slug ||
@@ -201,6 +273,24 @@ const SettingsPage = () => {
 				</form>
 			</div>
 		</div>
+	);
+};
+
+// ---------- Page ----------
+
+const SettingsPage = () => {
+	const { activeOrganization, isLoading, mutateOrganizations } =
+		useUserOrganization();
+
+	if (isLoading || !activeOrganization) {
+		return <SettingsSkeleton />;
+	}
+
+	return (
+		<WorkspaceForm
+			activeOrganization={activeOrganization}
+			mutateOrganizations={mutateOrganizations}
+		/>
 	);
 };
 

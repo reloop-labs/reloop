@@ -3,17 +3,17 @@ import { useUIStore } from "@fe/dashboard/store/use-ui-store";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { motion } from "motion/react";
 
 export const SidebarToggle = () => {
 	const { isSidebarCollapsed, toggleSidebarCollapse } = useUIStore();
 
 	return (
-		<motion.div
-			className="absolute z-50 shrink-0"
-			style={{ top: "12px" }}
-			animate={{ left: isSidebarCollapsed ? 67 : 235 }}
-			transition={{ duration: 0.2, ease: "easeInOut" }}
+		<div
+			className="absolute z-50 shrink-0 transition-[left] duration-200 ease-in-out"
+			style={{
+				top: "12px",
+				left: isSidebarCollapsed ? 67 : 235,
+			}}
 		>
 			<Button.Root
 				variant="neutral"
@@ -33,6 +33,6 @@ export const SidebarToggle = () => {
 					/>
 				</Button.Icon>
 			</Button.Root>
-		</motion.div>
+		</div>
 	);
 };
