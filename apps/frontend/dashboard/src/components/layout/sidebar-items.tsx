@@ -3,7 +3,6 @@
 import { mainNavigation } from "@fe/dashboard/constants";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useLayoutEffect, useRef, useState } from "react";
@@ -31,20 +30,11 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 	const currentTab = buttonRefs.current[currentIdx];
 
 	useLayoutEffect(() => {
-		const measure = () => {
-			if (currentTab) {
-				setRect(currentTab.getBoundingClientRect());
-			} else {
-				setRect(undefined);
-			}
-		};
-
-		// Delay measurement to wait for sidebar width animation (200ms)
-		const timer = setTimeout(measure, 220);
-		// Also measure immediately for hover changes
-		measure();
-
-		return () => clearTimeout(timer);
+		if (currentTab) {
+			setRect(currentTab.getBoundingClientRect());
+		} else {
+			setRect(undefined);
+		}
 	}, [currentTab, isCollapsed]);
 
 	return (
@@ -78,22 +68,16 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 								activeIndex !== index ? "text-text-sub-600 opacity-90" : "",
 							)}
 						/>
-						<AnimatePresence mode="wait">
-							{!isCollapsed && (
-								<motion.span
-									className={cn(
-										"font-medium text-sm",
-										activeIndex !== index && "text-text-sub-600",
-									)}
-									initial={{ opacity: 0, x: -10 }}
-									animate={{ opacity: 1, x: 0 }}
-									exit={{ opacity: 0, x: -10 }}
-									transition={{ duration: 0.15 }}
-								>
-									{label}
-								</motion.span>
-							)}
-						</AnimatePresence>
+						{!isCollapsed && (
+							<span
+								className={cn(
+									"font-medium text-sm",
+									activeIndex !== index && "text-text-sub-600",
+								)}
+							>
+								{label}
+							</span>
+						)}
 					</Link>
 				);
 			})}

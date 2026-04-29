@@ -1,7 +1,6 @@
 "use client";
 
 import { authClient } from "@reloop/auth/client";
-import Spinner from "@reloop/ui/spinner";
 import { useRouter } from "next/navigation";
 import {
 	createContext,
@@ -20,8 +19,9 @@ type Organization = NonNullable<
 >[0];
 
 type UserOrganizationContextType = {
-	user: User;
-	activeOrganization: Organization;
+	user: User | null;
+	activeOrganization: Organization | null;
+	isLoading: boolean;
 	mutateOrganizations: () => void;
 };
 
@@ -59,7 +59,9 @@ export const UserOrganizationProvider = ({
 	const activeOrganization =
 		organizations?.find(
 			(organization) => organization.id === session?.user?.activeOrganizationId,
-		) || organizations?.[0];
+		) ||
+		organizations?.[0] ||
+		null;
 
 	const isLoading =
 		sessionLoading || organizationsLoading || isSettingDefaultOrg;
@@ -138,25 +140,10 @@ export const UserOrganizationProvider = ({
 		session?.user?.activeOrganizationId,
 	]);
 
-	if (isLoading) {
-		return (
-			<div className="flex h-screen items-center justify-center">
-				<Spinner />
-			</div>
-		);
-	}
-
-	if (!session?.user || !activeOrganization) {
-		return (
-			<div className="flex h-screen items-center justify-center">
-				<Spinner />
-			</div>
-		);
-	}
-
 	const contextValue: UserOrganizationContextType = {
-		user: session.user,
+		user: session?.user ?? null,
 		activeOrganization,
+		isLoading,
 		mutateOrganizations,
 	};
 

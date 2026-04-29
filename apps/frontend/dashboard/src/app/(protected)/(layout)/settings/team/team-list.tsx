@@ -115,8 +115,11 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
 		isLoading: membersLoading,
 		mutate: mutateMembers,
 	} = useSWR<{ members: Member[] }>(
-		`organization-member-${activeOrganization.id}`,
+		activeOrganization?.id
+			? `organization-member-${activeOrganization.id}`
+			: null,
 		async () => {
+			if (!activeOrganization?.id) return { members: [] };
 			const result = await authClient.organization.listMembers({
 				query: { organizationId: activeOrganization.id },
 			});
@@ -129,12 +132,16 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
 		data: invites,
 		isLoading: invitesLoading,
 		mutate: mutateInvites,
-	} = useSWR<Invite[]>(`invitations-${activeOrganization.id}`, async () => {
-		const result = await authClient.organization.listInvitations({
-			query: { organizationId: activeOrganization.id },
-		});
-		return result.data ?? [];
-	});
+	} = useSWR<Invite[]>(
+		activeOrganization?.id ? `invitations-${activeOrganization.id}` : null,
+		async () => {
+			if (!activeOrganization?.id) return [];
+			const result = await authClient.organization.listInvitations({
+				query: { organizationId: activeOrganization.id },
+			});
+			return result.data ?? [];
+		},
+	);
 
 	const { data: session } = authClient.useSession();
 	const currentUserId = session?.user?.id;
@@ -249,7 +256,7 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
 			const { error } = await authClient.organization.inviteMember({
 				email: invite.email,
 				role: invite.role as "admin" | "member",
-				organizationId: activeOrganization.id,
+				organizationId: activeOrganization?.id ?? "",
 				resend: true,
 			});
 			if (error) {

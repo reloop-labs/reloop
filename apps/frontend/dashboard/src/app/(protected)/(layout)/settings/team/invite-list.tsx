@@ -81,12 +81,16 @@ export const InviteList = () => {
 		isLoading,
 		error,
 		mutate,
-	} = useSWR<Invite[]>(`invitations-${activeOrganization.id}`, async () => {
-		const result = await authClient.organization.listInvitations({
-			query: { organizationId: activeOrganization.id },
-		});
-		return result.data ?? [];
-	});
+	} = useSWR<Invite[]>(
+		activeOrganization?.id ? `invitations-${activeOrganization.id}` : null,
+		async () => {
+			if (!activeOrganization?.id) return [];
+			const result = await authClient.organization.listInvitations({
+				query: { organizationId: activeOrganization.id },
+			});
+			return result.data ?? [];
+		},
+	);
 
 	const handleCancelInvite = async (invitationId: string) => {
 		setCancellingInvite(invitationId);

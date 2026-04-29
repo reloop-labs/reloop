@@ -67,7 +67,7 @@ export const WorkspaceLogoUpload = ({
 
 			// Immediately save to database
 			const { error } = await authClient.organization.update({
-				organizationId: activeOrganization.id,
+				organizationId: activeOrganization?.id ?? "",
 				data: {
 					logo: uploadedUrl,
 				},

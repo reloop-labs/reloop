@@ -22,7 +22,7 @@ interface User {
 }
 
 interface UserMenuDropdownProps {
-	user: User;
+	user: User | null | undefined;
 	isCollapsed?: boolean;
 }
 
@@ -48,6 +48,26 @@ export const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
 			router.push(path);
 		}
 	};
+
+	if (!user) {
+		// Skeleton while user data loads — layout renders immediately
+		return (
+			<div
+				className={cn(
+					"flex h-auto w-full items-center gap-2.5 px-2 py-2",
+					isCollapsed ? "justify-center" : "justify-start",
+				)}
+			>
+				<div className="h-8 w-8 flex-shrink-0 animate-pulse rounded-full bg-bg-weak-50" />
+				{!isCollapsed && (
+					<div className="flex flex-1 flex-col gap-1.5">
+						<div className="h-3 w-28 animate-pulse rounded bg-bg-weak-50" />
+						<div className="h-2.5 w-16 animate-pulse rounded bg-bg-weak-50" />
+					</div>
+				)}
+			</div>
+		);
+	}
 
 	return (
 		<Dropdown.Root open={isOpen} onOpenChange={setIsOpen}>

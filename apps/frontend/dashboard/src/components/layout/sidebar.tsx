@@ -4,7 +4,7 @@ import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { useUIStore } from "@fe/dashboard/store/use-ui-store";
 import { authClient } from "@reloop/auth/client";
 import { cn } from "@reloop/ui/cn";
-import { motion } from "motion/react";
+
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -54,13 +54,11 @@ export const MainSidebar: React.FC = () => {
 	};
 
 	return (
-		<motion.div
+		<div
 			className={cn(
-				"sticky top-0 z-10 flex h-screen flex-col",
+				"sticky top-0 z-10 flex h-screen flex-col transition-[width] duration-200 ease-in-out",
 				isSidebarCollapsed ? "w-14" : "w-60",
 			)}
-			animate={{ width: isSidebarCollapsed ? 56 : 240 }}
-			transition={{ duration: 0.2, ease: "easeInOut" }}
 		>
 			<div className="flex h-12 items-center justify-between pr-3 pl-1">
 				<OrganizationSwitcher
@@ -75,6 +73,6 @@ export const MainSidebar: React.FC = () => {
 				<SidebarItems isCollapsed={isSidebarCollapsed} />
 			</div>
 			<UserMenuDropdown user={user} isCollapsed={isSidebarCollapsed} />
-		</motion.div>
+		</div>
 	);
 };

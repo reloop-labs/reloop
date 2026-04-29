@@ -37,6 +37,8 @@ const SettingsPage = () => {
 	const [isSaving, setIsSaving] = useState(false);
 	const [slugStatus, setSlugStatus] = useState<SlugStatus>("idle");
 
+	if (!activeOrganization) return null;
+
 	const {
 		register,
 		handleSubmit,

@@ -21,7 +21,7 @@ interface Organization {
 
 interface OrganizationSwitcherProps {
 	organizations: Organization[] | undefined;
-	activeOrganization: Organization;
+	activeOrganization: Organization | null;
 	onOrganizationChange: (organization: Organization) => void;
 	isCollapsed?: boolean;
 	side?: "bottom" | "right";
@@ -39,9 +39,9 @@ export const OrganizationSwitcher: React.FC<OrganizationSwitcherProps> = ({
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 	const router = useRouter();
 
-	const activeIndex = organizations?.findIndex(
-		(org) => org.id === activeOrganization.id,
-	);
+	const activeIndex = activeOrganization
+		? organizations?.findIndex((org) => org.id === activeOrganization.id)
+		: undefined;
 	const currentIdx = hoverIdx !== undefined ? hoverIdx : activeIndex;
 	const currentTab = buttonRefs.current[currentIdx ?? -1];
 	const currentRect = currentTab?.getBoundingClientRect();
@@ -55,6 +55,23 @@ export const OrganizationSwitcher: React.FC<OrganizationSwitcherProps> = ({
 		onOrganizationChange(organization);
 		setIsOpen(false);
 	};
+
+	if (!activeOrganization) {
+		// Skeleton while org data loads — layout renders immediately
+		if (isCollapsed) {
+			return (
+				<div className="flex w-full items-center justify-center">
+					<div className="h-6 w-6 animate-pulse rounded-[6px] bg-bg-weak-50" />
+				</div>
+			);
+		}
+		return (
+			<div className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5">
+				<div className="h-5 w-5 flex-shrink-0 animate-pulse rounded-[6px] bg-bg-weak-50" />
+				<div className="h-3.5 w-24 animate-pulse rounded bg-bg-weak-50" />
+			</div>
+		);
+	}
 
 	return (
 		<Dropdown.Root open={isOpen} onOpenChange={setIsOpen}>
@@ -161,7 +178,7 @@ export const OrganizationSwitcher: React.FC<OrganizationSwitcherProps> = ({
 
 interface OrganizationListProps {
 	organizations: Organization[] | undefined;
-	activeOrganization: Organization;
+	activeOrganization: Organization | null;
 	hoverIdx: number | undefined;
 	setHoverIdx: (idx: number | undefined) => void;
 	buttonRefs: React.MutableRefObject<HTMLButtonElement[]>;
@@ -238,7 +255,7 @@ const OrganizationList: React.FC<OrganizationListProps> = ({
 								{organization.name}
 							</p>
 						</div>
-						{organization.id === activeOrganization.id && (
+						{activeOrganization && organization.id === activeOrganization.id && (
 							<Icon
 								name="check"
 								className="h-4 w-4 flex-shrink-0 text-text-strong-950"
