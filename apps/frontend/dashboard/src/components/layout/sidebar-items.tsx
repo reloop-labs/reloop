@@ -6,7 +6,7 @@ import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AnimatedHoverBackground } from "../animated-hover-background";
 
 interface SidebarItemsProps {
@@ -43,6 +43,14 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 	);
 	const isOnContacts = pathWithoutSlug.startsWith("/contacts");
 
+	const [isContactsExpanded, setIsContactsExpanded] = useState(isOnContacts);
+
+	useEffect(() => {
+		if (isOnContacts) {
+			setIsContactsExpanded(true);
+		}
+	}, [isOnContacts]);
+
 	const activeIndex = isOnContactsSubPage
 		? -1
 		: mainNavigation.findIndex((item) => {
@@ -67,7 +75,7 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 		} else {
 			setRect(undefined);
 		}
-	}, [currentEl, isCollapsed, pathname]);
+	}, [currentEl, isCollapsed, pathname, isContactsExpanded]);
 
 	return (
 		// Single relative container — the animated pill lives here and nowhere else
@@ -85,7 +93,7 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 							onPointerEnter={() => setHoveredEl(mainNavRefs.current[index])}
 							onPointerLeave={() => setHoveredEl(undefined)}
 							className={cn(
-								"relative z-10 flex h-8 items-center gap-2 rounded-lg px-2 text-left",
+								"relative z-10 flex h-7 items-center gap-2 rounded-lg px-2 text-left",
 								isContactsItem && !isCollapsed
 									? "justify-between"
 									: isCollapsed
@@ -99,7 +107,7 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 									name={iconName}
 									className={cn(
 										"h-3.5 w-3.5 shrink-0",
-										activeIndex !== index ? "text-text-sub-600 opacity-90" : "",
+										activeIndex !== index ? "text-text-sub-600 opacity-70" : "",
 									)}
 								/>
 								{!isCollapsed && (
@@ -115,19 +123,30 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 							</span>
 
 							{isContactsItem && !isCollapsed && (
-								<Icon
-									name="chevron-right"
-									className={cn(
-										"h-3 w-3 shrink-0 text-text-sub-600 opacity-60 transition-transform duration-200",
-										isOnContacts && "rotate-90",
-									)}
-								/>
+								<button
+									type="button"
+									tabIndex={0}
+									onClick={(e) => {
+										e.preventDefault();
+										e.stopPropagation();
+										setIsContactsExpanded((prev) => !prev);
+									}}
+									className="flex h-5 w-5 items-center justify-center rounded-md transition-colors hover:bg-neutral-alpha-10"
+								>
+									<Icon
+										name="chevron-right"
+										className={cn(
+											"h-3 w-3 shrink-0 text-text-sub-600 opacity-60 transition-transform duration-200",
+											isContactsExpanded && "rotate-90",
+										)}
+									/>
+								</button>
 							)}
 						</Link>
 
 						{isContactsItem && !isCollapsed && (
 							<AnimatePresence initial={false}>
-								{isOnContacts && (
+								{isContactsExpanded && (
 									<motion.div
 										key="contacts-subnav"
 										initial={{ height: 0, opacity: 0 }}
@@ -157,9 +176,9 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 															}
 															onPointerLeave={() => setHoveredEl(undefined)}
 															className={cn(
-																"relative z-10 flex h-7 items-center gap-1.5 rounded-md px-2 text-xs",
+																"relative z-10 flex h-7 items-center gap-1.5 rounded-md px-2 font-medium text-xs",
 																isSubActive
-																	? "font-medium text-foreground"
+																	? "text-foreground"
 																	: "text-text-sub-600",
 															)}
 														>
