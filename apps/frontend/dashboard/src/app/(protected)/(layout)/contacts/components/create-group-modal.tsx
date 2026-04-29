@@ -125,7 +125,6 @@ export const CreateGroupModal = ({
 							</Button.Root>
 							<Button.Root
 								type="submit"
-								variant="neutral"
 								disabled={isSubmitting || !name.trim()}
 							>
 								{isSubmitting ? (

@@ -875,12 +875,12 @@
 	--social-amazon: #353e47;
 	--social-zendesk: #16140d;
 
-	--primary-dark: var(--blue-800);
-	--primary-darker: var(--blue-700);
-	--primary-base: var(--blue-500);
-	--primary-alpha-24: var(--blue-alpha-24);
-	--primary-alpha-16: var(--blue-alpha-16);
-	--primary-alpha-10: var(--blue-alpha-10);
+	--primary-dark: #D97757;
+	--primary-darker: #D97757;
+	--primary-base: #D97757;
+	--primary-alpha-24: #D977573d;
+	--primary-alpha-16: #D9775729;
+	--primary-alpha-10: #D977571a;
 
 	--static-black: var(--neutral-950);
 	--static-white: var(--neutral-0);
