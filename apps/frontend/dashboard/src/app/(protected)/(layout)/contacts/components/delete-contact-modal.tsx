@@ -2,9 +2,9 @@
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import { KbdEsc } from "@reloop/ui/kbd-esc";
 import * as Modal from "@reloop/ui/modal";
 import { useEffect, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
 import type { AudienceStatus } from "@fe/dashboard/utils/audience";
@@ -41,9 +41,24 @@ export const DeleteContactModal = ({
 	// Reset confirmation when modal closes or contact changes
 	useEffect(() => {
 		if (!open) {
-			setConfirmationEmail("");
+			const timer = setTimeout(() => {
+				setConfirmationEmail("");
+			}, 300);
+			return () => clearTimeout(timer);
 		}
 	}, [open]);
+
+	useHotkeys(
+		"mod+enter",
+		(e) => {
+			e.preventDefault();
+			if (open && confirmationEmail === contact?.email && !isDeleting) {
+				handleDelete();
+			}
+		},
+		{ enableOnFormTags: ["INPUT"], enabled: open && !!contact },
+		[open, confirmationEmail, contact, isDeleting],
+	);
 
 	const handleDelete = async () => {
 		if (!contact) return;
@@ -82,26 +97,20 @@ export const DeleteContactModal = ({
 
 	const handleCancel = () => {
 		onOpenChange(false);
-		setConfirmationEmail("");
 	};
 
 	return (
 		<Modal.Root open={open} onOpenChange={onOpenChange}>
 			<Modal.Content
-				className="rounded-2xl border border-stroke-soft-100/50 p-0.5 sm:max-w-[480px]"
+				className="rounded-20 border-none p-0 sm:max-w-[480px]"
 				showClose={true}
 			>
-				<div className="rounded-2xl border border-stroke-soft-100/50">
-					<Modal.Header className="before:border-stroke-soft-200/50">
-						<div className="flex-1">
-							<Modal.Title>Delete Contact</Modal.Title>
-						</div>
-					</Modal.Header>
+				<div className="rounded-20 border border-stroke-soft-100/50 bg-bg-white-0">
 					{!contact && open ? (
 						<div className="flex h-[200px] flex-col items-center justify-center space-y-4 p-8 text-center">
 							<Icon
 								name="loader-2"
-								className="h-8 w-8 animate-spin text-text-sub-600"
+								className="h-8 w-8 animate-spin text-text-soft-400"
 							/>
 							<p className="text-sm text-text-sub-600">
 								Loading contact details...
@@ -116,20 +125,39 @@ export const DeleteContactModal = ({
 								}
 							}}
 						>
-							<Modal.Body className="space-y-4">
-								<div>
-									<p className="text-sm text-text-sub-600">
-										Are you sure you want to delete this contact?
-									</p>
-									<p className="font-medium text-error-base text-sm">
-										This action cannot be undone.
-									</p>
+							<div className="p-6">
+								<div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-error-base/10">
+									<Icon name="trash" className="h-4 w-4 text-error-base" />
 								</div>
 
-								<div className="space-y-2">
-									<p className="text-sm text-text-strong-950">
+								<h2 className="font-medium text-text-strong-950 text-title-h5">
+									Delete contact?
+								</h2>
+								<p className="mb-6 text-pretty text-sm text-text-sub-600 leading-relaxed">
+									This will permanently delete the contact and all associated
+									data. This action cannot be undone.
+								</p>
+
+								{/* Contact Card */}
+								<div className="mb-6 flex items-center gap-3 rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/30">
+									<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-error-base/10 text-error-base">
+										<Icon name="user" className="h-5 w-5" />
+									</div>
+									<div className="min-w-0 flex-1">
+										<p className="truncate font-medium text-sm text-text-strong-950">
+											{contact.email}
+										</p>
+										<p className="mt-0.5 truncate font-medium text-text-sub-600 text-xs capitalize">
+											{contact.status.replace("_", " ")}
+										</p>
+									</div>
+								</div>
+
+								{/* Confirmation Input */}
+								<div className="mb-2">
+									<p className="mb-2 text-sm text-text-sub-600">
 										Type{" "}
-										<span className="inline-flex max-w-xs items-center gap-1 truncate rounded-md border border-stroke-soft-100 bg-bg-weak-50/50 px-2 py-1 font-mono text-text-strong-950 text-xs">
+										<span className="inline-flex max-w-xs items-center gap-1 truncate rounded-[6px] border border-stroke-soft-100 bg-bg-weak-50/50 px-1.5 py-0.5 font-medium text-text-strong-950 text-xs dark:border-stroke-soft-100/40 dark:bg-bg-strong-200">
 											{contact.email}
 											<button
 												type="button"
@@ -150,49 +178,59 @@ export const DeleteContactModal = ({
 												/>
 											</button>
 										</span>{" "}
-										to confirm.
+										to confirm
 									</p>
-									<Input.Root size="small">
+									<Input.Root size="small" className="rounded-[10px]">
 										<Input.Wrapper>
 											<Input.Input
 												type="text"
-												className="px-2"
 												value={confirmationEmail}
 												onChange={(e) => setConfirmationEmail(e.target.value)}
-												placeholder="Enter contact email"
+												placeholder={contact.email}
 											/>
 										</Input.Wrapper>
 									</Input.Root>
 								</div>
-							</Modal.Body>
-							<Modal.Footer className="mt-4 flex items-center justify-end gap-3 border-stroke-soft-100/50">
+							</div>
+
+							<div className="flex flex-col-reverse justify-end gap-2 px-6 pb-6 sm:flex-row sm:items-center">
 								<Button.Root
 									type="button"
 									variant="neutral"
 									mode="stroke"
-									size="xsmall"
 									onClick={handleCancel}
 									disabled={isDeleting}
+									className="gap-1.5"
 								>
 									Cancel
-									<KbdEsc />
+									<span className="flex h-[19px] w-7 items-center justify-center rounded-[5px] border border-stroke-soft-100 bg-bg-weak-50/50 p-px font-medium text-[10px]">
+										Esc
+									</span>
 								</Button.Root>
 								<Button.Root
 									type="submit"
 									variant="error"
-									size="xsmall"
-									disabled={confirmationEmail !== contact.email || isDeleting}
+									disabled={isDeleting || confirmationEmail !== contact.email}
 								>
 									{isDeleting ? (
-										<>
-											<Icon name="loader-2" className="h-4 w-4 animate-spin" />
-											Deleting...
-										</>
+										"Deleting..."
 									) : (
-										"Delete Contact"
+										<>
+											Delete contact
+											<span className="inline-flex items-center gap-0.5">
+												<Icon
+													name="command"
+													className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+												/>
+												<Icon
+													name="enter"
+													className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+												/>
+											</span>
+										</>
 									)}
 								</Button.Root>
-							</Modal.Footer>
+							</div>
 						</form>
 					) : null}
 				</div>
