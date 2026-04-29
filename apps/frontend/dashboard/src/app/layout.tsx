@@ -6,6 +6,7 @@ import { IconsSprite } from "@reloop/ui/icon";
 import { Toaster } from "@reloop/ui/toast";
 import * as Tooltip from "@reloop/ui/tooltip";
 import localFont from "next/font/local";
+import { Suspense } from "react";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 const openRunde = localFont({
@@ -56,7 +57,9 @@ export default function RootLayout({
 						disableTransitionOnChange
 					>
 						<SWRProvider>
-							<Tooltip.Provider>{children}</Tooltip.Provider>
+							<Tooltip.Provider>
+								<Suspense>{children}</Suspense>
+							</Tooltip.Provider>
 							<IconsSprite />
 							<Toaster />
 						</SWRProvider>
