@@ -89,7 +89,7 @@ export const DiscoveryPane = ({
 						{isAllSelected && <Icon name="check" className="h-3 w-3" />}
 					</div>
 					<span className="font-medium text-[13px] text-text-strong-950 dark:text-white">
-						Select all visible ({totalMatching.toLocaleString()})
+						Select all visible ({availableContacts.length.toLocaleString()})
 					</span>
 				</button>
 			</div>

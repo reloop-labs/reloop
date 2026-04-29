@@ -63,7 +63,7 @@ export const useAddContactToGroup = (
 		group: { name: string; contacts: Contact[] };
 	}>(
 		open && groupId
-			? `/api/contacts/v1/groups/${groupId}/contacts?limit=100`
+			? `/api/contacts/v1/groups/${groupId}/contacts?limit=1000`
 			: null,
 	);
 
@@ -157,11 +157,10 @@ export const useAddContactToGroup = (
 				toast.success(
 					`${added} contact${added !== 1 ? "s" : ""} added to group`,
 				);
+				handleOpenChange(false);
 			} else {
-				toast.error("Failed to add contacts to group");
+				toast.error("No new contacts were added (they might already be in the group)");
 			}
-
-			handleOpenChange(false);
 
 			await mutate(
 				(key: string) =>
@@ -173,6 +172,32 @@ export const useAddContactToGroup = (
 			toast.error("Failed to add contacts to group");
 		} finally {
 			setIsSubmitting(false);
+		}
+	};
+
+	const removeFromGroup = async (contact: Contact) => {
+		if (!groupId) return;
+
+		try {
+			const response = await fetch(`/api/contacts/group/${groupId}`, {
+				method: "DELETE",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ email: contact.email }),
+			});
+
+			if (response.ok) {
+				toast.success("Contact removed from group");
+				await mutate(
+					(key: string) =>
+						typeof key === "string" &&
+						key.includes(`/api/contacts/v1/groups/${groupId}/contacts`),
+				);
+			} else {
+				toast.error("Failed to remove contact");
+			}
+		} catch (error) {
+			console.error("Failed to remove contact:", error);
+			toast.error("Failed to remove contact");
 		}
 	};
 
@@ -200,6 +225,7 @@ export const useAddContactToGroup = (
 		toggleSelectAll,
 		handleOpenChange,
 		handleSubmit,
+		removeFromGroup,
 		fetchedCount: fetchedContacts.length,
 	};
 };

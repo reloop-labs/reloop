@@ -23,6 +23,7 @@ export const AddContactToGroupModal = ({
 		setSearchInput,
 		debouncedSearch,
 		selectedContacts,
+		setSelectedContacts,
 		availableContacts,
 		existingContacts,
 		totalMatching,
@@ -38,6 +39,7 @@ export const AddContactToGroupModal = ({
 		toggleSelectAll,
 		handleOpenChange,
 		handleSubmit,
+		removeFromGroup,
 		fetchedCount,
 	} = useAddContactToGroup(open, onOpenChange);
 
@@ -98,6 +100,7 @@ export const AddContactToGroupModal = ({
 							selectedContacts={selectedContacts}
 							existingContacts={existingContacts}
 							onRemove={removeContact}
+							onRemoveFromGroup={removeFromGroup}
 							onClearAll={() => setSelectedContacts([])}
 							isSubmitting={isSubmitting}
 						/>

@@ -96,12 +96,21 @@ export async function addContactToGroupController({
     }
 
     logger.info({ contactId: contact.id, groupId }, "Adding contact to group");
-    await db.insert(schema.contactGroup).values({
-      contactId: contact.id,
-      groupId,
-      organizationId,
-      userId: contact.userId,
-    });
+    await db
+      .insert(schema.contactGroup)
+      .values({
+        contactId: contact.id,
+        groupId,
+        organizationId,
+        userId: contact.userId,
+      })
+      .onConflictDoUpdate({
+        target: [schema.contactGroup.contactId, schema.contactGroup.groupId],
+        set: {
+          deletedAt: null,
+          updatedAt: new Date(),
+        },
+      });
 
     logger.info({ contactId: contact.id, groupId }, "Contact added to group");
 
