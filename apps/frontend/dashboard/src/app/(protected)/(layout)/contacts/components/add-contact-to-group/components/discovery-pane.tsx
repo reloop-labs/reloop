@@ -4,7 +4,7 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import Spinner from "@reloop/ui/spinner";
-import type { RefObject } from "react";
+import type { Ref } from "react";
 import type { Contact } from "../types";
 import { ContactRow } from "./contact-row";
 
@@ -23,8 +23,8 @@ interface DiscoveryPaneProps {
 	selectedContacts: Contact[];
 	onToggleContact: (contact: Contact) => void;
 	hasMore: boolean;
-	loadMoreRef: RefObject<HTMLDivElement>;
-	inputRef: RefObject<HTMLInputElement>;
+	loadMoreRef: Ref<HTMLDivElement>;
+	inputRef: Ref<HTMLInputElement>;
 }
 
 export const DiscoveryPane = ({
@@ -47,7 +47,7 @@ export const DiscoveryPane = ({
 }: DiscoveryPaneProps) => {
 	return (
 		<div className="flex flex-1 flex-col overflow-hidden">
-			<div className="p-5 pb-3">
+			<div className="p-3">
 				<Input.Root size="small" className="rounded-lg">
 					<Input.Wrapper className="pl-9 dark:bg-bg-strong-300/50">
 						<div className="-translate-y-1/2 absolute top-1/2 left-3">
@@ -72,7 +72,7 @@ export const DiscoveryPane = ({
 			</div>
 
 			{/* Select All Bar */}
-			<div className="border-stroke-soft-100 border-b px-5 py-2.5 dark:border-stroke-soft-100/10">
+			<div className="border-stroke-soft-100 border-t border-b px-5 py-2.5 dark:border-stroke-soft-100/10">
 				<button
 					type="button"
 					onClick={onToggleSelectAll}
