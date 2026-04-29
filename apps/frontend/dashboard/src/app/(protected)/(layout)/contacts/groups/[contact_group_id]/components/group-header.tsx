@@ -225,28 +225,7 @@ export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 				<div className="flex items-center justify-between pt-6">
 					<div>
 						{isLoading ? (
-							<div className="flex items-center gap-1.5">
-								<Skeleton className="h-4 w-12 rounded-full" />
-								<Skeleton className="h-1 w-1 rounded-full" />
-								<Skeleton className="h-4 w-20 rounded-full" />
-							</div>
-						) : (
-							<div className="flex items-center gap-1.5">
-								<p className="font-medium text-paragraph-xs text-text-sub-600">
-									Group{" "}
-								</p>
-								<p className="font-semibold text-paragraph-xs text-text-sub-600">
-									•
-								</p>
-								<p className="font-medium text-paragraph-xs text-text-sub-600">
-									{group?.createdAt
-										? formatRelativeTime(group.createdAt)
-										: "---"}
-								</p>
-							</div>
-						)}
-						{isLoading ? (
-							<Skeleton className="mt-2 h-7 w-48 rounded-lg" />
+							<Skeleton className="h-7 w-48 rounded-lg" />
 						) : isEditing ? (
 							<form onSubmit={handleEditSubmit} className="flex items-center">
 								<div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-white">
