@@ -16,11 +16,12 @@ import { parseAsInteger, useQueryState } from "nuqs";
 import { useState } from "react";
 import { ContactDropdown } from "./contact-dropdown";
 import { ContactsEmptyState } from "./contacts-empty-state";
+import type { AudienceStatus } from "@fe/dashboard/utils/audience";
 
 interface Contact {
 	id: string;
 	email: string;
-	status: string;
+	status: AudienceStatus;
 	firstName: string | null;
 	lastName: string | null;
 	organizationId: string;
@@ -39,6 +40,9 @@ interface ContactTableProps {
 	emptyStateTitle?: string;
 	emptyStateDescription?: string;
 	emptyStateButtonText?: string;
+	emptyStateShortcut?: React.ReactNode;
+	emptyStateDocsText?: string;
+	emptyStateDocsLink?: string;
 }
 
 const ContactSkeleton = () => (
@@ -69,6 +73,9 @@ export const ContactTable = ({
 	emptyStateTitle,
 	emptyStateDescription,
 	emptyStateButtonText,
+	emptyStateShortcut,
+	emptyStateDocsText,
+	emptyStateDocsLink,
 }: ContactTableProps) => {
 	const router = useRouter();
 	const { activeOrganization } = useUserOrganization();
@@ -136,6 +143,9 @@ export const ContactTable = ({
 						title={emptyStateTitle}
 						description={emptyStateDescription}
 						buttonText={emptyStateButtonText}
+						shortcut={emptyStateShortcut}
+						docsText={emptyStateDocsText}
+						docsLink={emptyStateDocsLink}
 					/>
 				) : (
 					contacts.map((contact) => {
@@ -153,7 +163,7 @@ export const ContactTable = ({
 							>
 								{/* Email Column */}
 								<div className="flex items-center gap-2">
-									<div className="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-white text-[10px] uppercase tracking-wide shadow-sm">
+									<div className="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-[10px] text-white uppercase tracking-wide shadow-sm">
 										{contact.email.charAt(0).toUpperCase()}
 									</div>
 									<span className="font-medium text-label-sm text-text-strong-950">
@@ -166,14 +176,14 @@ export const ContactTable = ({
 									<div
 										className={cn(
 											"flex items-center gap-2 rounded-lg py-0.5 font-medium text-[13px] capitalize",
-											getStatusColorClass(contact.status as any),
+											getStatusColorClass(contact.status),
 										)}
 									>
 										<Icon
-											name={getStatusIcon(contact.status as any)}
+											name={getStatusIcon(contact.status)}
 											className="h-3.5 w-3.5"
 										/>
-										{getStatusLabel(contact.status as any)}
+										{getStatusLabel(contact.status)}
 									</div>
 								</div>
 

@@ -2,13 +2,14 @@
 import { useParams } from "next/navigation";
 import useSWR from "swr";
 import { ContactHeader } from "./components/contact-header";
+import type { AudienceStatus } from "@fe/dashboard/utils/audience";
 
 interface ContactData {
 	id: string;
 	email: string;
 	firstName: string | null;
 	lastName: string | null;
-	status: string;
+	status: AudienceStatus;
 	organizationId: string;
 	properties?: Record<string, string | number>;
 	groups?: { id: string; name: string }[];

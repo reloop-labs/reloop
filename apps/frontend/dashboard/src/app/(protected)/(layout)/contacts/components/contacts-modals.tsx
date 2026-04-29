@@ -15,13 +15,14 @@ import { EditContactModal } from "./edit-contact-modal";
 import { EditGroupModal } from "./edit-group-modal";
 import { EditPropertyModal } from "./edit-property-modal";
 import { EditTopicModal } from "./edit-topic-modal";
+import type { AudienceStatus } from "@fe/dashboard/utils/audience";
 
 interface Contact {
 	id: string;
 	email: string;
 	firstName: string | null;
 	lastName: string | null;
-	status: string;
+	status: AudienceStatus;
 	organizationId: string;
 	properties: Record<string, string | number>;
 	createdAt: string;

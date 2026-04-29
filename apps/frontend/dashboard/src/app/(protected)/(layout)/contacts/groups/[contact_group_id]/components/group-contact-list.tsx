@@ -4,20 +4,23 @@ import { PaginationControls } from "@fe/dashboard/components/pagination-controls
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
+import { KbdKey } from "@reloop/ui/kbd-key";
+import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 import {
 	ContactFilterDropdown,
-	type ContactFilters,
-} from "../../../components/contact-filter-dropdown";
-import { ContactTable } from "../../../components/contact-table";
+	type ContactFilterOption,
+} from "@fe/dashboard/app/(protected)/(layout)/contacts/components/contact-filter-dropdown";
+import { ContactTable } from "@fe/dashboard/app/(protected)/(layout)/contacts/components/contact-table";
+import type { AudienceStatus } from "@fe/dashboard/utils/audience";
 
 interface Contact {
 	id: string;
 	email: string;
-	status: string;
+	status: AudienceStatus;
 	firstName: string | null;
 	lastName: string | null;
 	organizationId: string;
@@ -46,20 +49,12 @@ export const GroupContactList = ({ groupId }: { groupId: string }) => {
 		parseAsInteger.withDefault(10),
 	);
 	const [, setModal] = useQueryState("modal", { history: "replace" });
-	const [filters, setFilters] = useState<ContactFilters>([]);
+	const [statusFilter, setStatusFilter] = useState<ContactFilterOption>(null);
 	const [searchQuery, setSearchQuery] = useState<string>("");
-
-	// Convert filters array to status filter string for client-side filtering logic
-	const statusFilter = useMemo(() => {
-		if (filters.length === 0 || filters.length === 2) return "all";
-		if (filters.includes("subscribed")) return "subscribed";
-		if (filters.includes("unsubscribed")) return "unsubscribed";
-		return "all";
-	}, [filters]);
 
 	const buildUrl = () => {
 		if (!groupId) return null;
-		let url = `/api/contacts/v1/groups/${groupId}/contacts?limit=${pageSize}&page=${currentPage}`;
+		const url = `/api/contacts/v1/groups/${groupId}/contacts?limit=${pageSize}&page=${currentPage}`;
 		return url;
 	};
 
@@ -71,7 +66,7 @@ export const GroupContactList = ({ groupId }: { groupId: string }) => {
 	const filteredContacts =
 		data?.group?.contacts?.filter((contact) => {
 			const matchesStatus =
-				statusFilter === "all" || contact.status === statusFilter;
+				statusFilter === null || contact.status === statusFilter;
 			const matchesSearch =
 				searchQuery === "" ||
 				contact.email.toLowerCase().includes(searchQuery.toLowerCase());
@@ -135,7 +130,7 @@ export const GroupContactList = ({ groupId }: { groupId: string }) => {
 	}
 
 	return (
-		<div >
+		<div>
 			<div className="mb-4 flex items-center gap-3">
 				<div className="flex-1">
 					<Input.Root size="xsmall">
@@ -153,7 +148,7 @@ export const GroupContactList = ({ groupId }: { groupId: string }) => {
 					</Input.Root>
 				</div>
 
-				<ContactFilterDropdown value={filters} onChange={setFilters} />
+				<ContactFilterDropdown value={statusFilter} onChange={setStatusFilter} />
 				<Button.Root
 					variant="neutral"
 					mode="stroke"
@@ -168,12 +163,20 @@ export const GroupContactList = ({ groupId }: { groupId: string }) => {
 
 			<ContactTable
 				contacts={filteredContacts}
+				total={data?.total || 0}
 				isLoading={isLoading}
 				loadingRows={5}
 				onAddContact={() => setModal("add-contact-to-group")}
 				emptyStateTitle="No contacts in this group"
 				emptyStateDescription="This group doesn't have any contacts yet. Add contacts to start segmenting your audience."
 				emptyStateButtonText="Add Contact to Group"
+				emptyStateShortcut={
+					<span className="inline-flex items-center gap-0.5">
+						<KbdKeyOutline>a</KbdKeyOutline>
+						<KbdKeyOutline>c</KbdKeyOutline>
+					</span>
+				}
+				emptyStateDocsText="Learn about groups"
 			/>
 
 			{/* Pagination */}

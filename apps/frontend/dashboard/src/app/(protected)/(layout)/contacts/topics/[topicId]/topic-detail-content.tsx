@@ -19,9 +19,9 @@ import { toast } from "sonner";
 import useSWR from "swr";
 import {
 	ContactFilterDropdown,
-	type ContactFilters,
-} from "../../components/contact-filter-dropdown";
-import { ContactTable } from "./components/contact-table";
+	type ContactFilterOption,
+} from "@fe/dashboard/app/(protected)/(layout)/contacts/components/contact-filter-dropdown";
+import { ContactTable } from "@fe/dashboard/app/(protected)/(layout)/contacts/topics/[topicId]/components/contact-table";
 
 interface TopicData {
 	id: string;
@@ -97,15 +97,8 @@ export const TopicDetailContent = () => {
 	const [copied, setCopied] = useState(false);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
-	const [filters, setFilters] = useState<ContactFilters>([]);
+	const [statusFilter, setStatusFilter] = useState<ContactFilterOption>(null);
 	const [searchQuery, setSearchQuery] = useState<string>("");
-
-	const statusFilter = useMemo(() => {
-		if (filters.length === 0 || filters.length === 2) return "all";
-		if (filters.includes("subscribed")) return "subscribed";
-		if (filters.includes("unsubscribed")) return "unsubscribed";
-		return "all";
-	}, [filters]);
 
 	const {
 		data: topicData,
@@ -195,7 +188,7 @@ export const TopicDetailContent = () => {
 	const filteredSubscriptions =
 		subscriptionData?.subscriptions?.filter((sub) => {
 			const matchesStatus =
-				statusFilter === "all" || sub.status === statusFilter;
+				statusFilter === null || sub.status === statusFilter;
 			const matchesSearch =
 				searchQuery === "" ||
 				sub.contactId.toLowerCase().includes(searchQuery.toLowerCase());
@@ -524,7 +517,7 @@ export const TopicDetailContent = () => {
 						</Input.Root>
 					</div>
 
-					<ContactFilterDropdown value={filters} onChange={setFilters} />
+					<ContactFilterDropdown value={statusFilter} onChange={setStatusFilter} />
 					<Button.Root
 						variant="neutral"
 						mode="stroke"

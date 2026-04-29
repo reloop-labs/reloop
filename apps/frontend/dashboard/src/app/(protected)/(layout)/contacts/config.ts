@@ -5,11 +5,12 @@
 // ============================================================================
 // Types
 // ============================================================================
+import type { AudienceStatus } from "@fe/dashboard/utils/audience";
 
 export interface Contact {
 	id: string;
 	email: string;
-	status: string;
+	status: AudienceStatus;
 	firstName: string | null;
 	lastName: string | null;
 	organizationId: string;

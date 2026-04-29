@@ -11,13 +11,14 @@ import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import useSWR, { useSWRConfig } from "swr";
+import type { AudienceStatus } from "@fe/dashboard/utils/audience";
 
 interface Contact {
 	id: string;
 	email: string;
 	firstName: string | null;
 	lastName: string | null;
-	status: string;
+	status: AudienceStatus;
 	organizationId: string;
 	properties: Record<string, string | number>;
 	topics?: { id: string; name: string; subscription: "opt_in" | "opt_out" }[];

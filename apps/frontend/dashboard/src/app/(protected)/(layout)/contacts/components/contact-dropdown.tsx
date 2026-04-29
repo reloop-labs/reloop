@@ -14,11 +14,12 @@ import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
+import type { AudienceStatus } from "@fe/dashboard/utils/audience";
 
 interface Contact {
 	id: string;
 	email: string;
-	status: string;
+	status: AudienceStatus;
 	firstName: string | null;
 	lastName: string | null;
 	organizationId: string;

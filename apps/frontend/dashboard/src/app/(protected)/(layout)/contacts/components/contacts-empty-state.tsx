@@ -8,6 +8,9 @@ interface ContactsEmptyStateProps {
 	title?: string;
 	description?: string;
 	buttonText?: string;
+	shortcut?: React.ReactNode;
+	docsText?: string;
+	docsLink?: string;
 }
 
 export const ContactsEmptyState = ({
@@ -15,6 +18,19 @@ export const ContactsEmptyState = ({
 	title = "No contacts yet",
 	description = "Add contacts manually, import a CSV, or let your app sync them automatically.",
 	buttonText = "Add Contact",
+	shortcut = (
+		<span className="inline-flex items-center gap-0.5">
+			<Icon
+				name="command"
+				className="h-4 w-4 rounded-sm border border-stroke-soft-200 p-px"
+			/>
+			<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-200 p-px font-medium text-[10px] uppercase">
+				A
+			</span>
+		</span>
+	),
+	docsText = "Learn about contacts",
+	docsLink = "https://reloop.sh/docs/contacts",
 }: ContactsEmptyStateProps) => {
 	useUserOrganization();
 
@@ -39,15 +55,7 @@ export const ContactsEmptyState = ({
 				>
 					<Icon name="plus" className="h-4 w-4" />
 					{buttonText}
-					<span className="inline-flex items-center gap-0.5">
-						<Icon
-							name="command"
-							className="h-4 w-4 rounded-sm border border-stroke-soft-200 p-px"
-						/>
-						<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-200 p-px font-medium text-[10px] uppercase">
-							A
-						</span>
-					</span>
+					{shortcut}
 				</Button.Root>
 				<Button.Root
 					variant="neutral"
@@ -57,12 +65,12 @@ export const ContactsEmptyState = ({
 					className="gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
 				>
 					<a
-						href="https://reloop.sh/docs/contacts"
+						href={docsLink}
 						target="_blank"
 						rel="noopener noreferrer"
 					>
 						<Icon name="file-text" className="h-3.5 w-3.5" />
-						Learn about contacts
+						{docsText}
 						<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-200 p-px font-medium text-[10px] uppercase">
 							D
 						</span>

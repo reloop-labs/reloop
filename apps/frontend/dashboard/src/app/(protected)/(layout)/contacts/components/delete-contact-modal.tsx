@@ -7,11 +7,12 @@ import * as Modal from "@reloop/ui/modal";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
+import type { AudienceStatus } from "@fe/dashboard/utils/audience";
 
 interface Contact {
 	id: string;
 	email: string;
-	status: string;
+	status: AudienceStatus;
 	organizationId: string;
 	properties: Record<string, string | number>;
 	createdAt: string;

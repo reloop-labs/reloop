@@ -18,13 +18,14 @@ import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { DeleteContactModal } from "../../../components/delete-contact-modal";
 import { EditContactModal } from "../../../components/edit-contact-modal";
+import type { AudienceStatus } from "@fe/dashboard/utils/audience";
 
 interface ContactData {
 	id: string;
 	email: string;
 	firstName: string | null;
 	lastName: string | null;
-	status: string;
+	status: AudienceStatus;
 	properties?: Record<string, string | number>;
 	groups?: { id: string; name: string }[];
 	organizationId: string;
