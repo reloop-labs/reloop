@@ -1,4 +1,6 @@
 "use client";
+import { DeleteGroupModal } from "@fe/dashboard/app/(protected)/(layout)/contacts/components/delete-group";
+import { EditGroupModal } from "@fe/dashboard/app/(protected)/(layout)/contacts/components/edit-group-modal";
 import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
@@ -18,8 +20,6 @@ import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
-import { DeleteGroupModal } from "../../../components/delete-group";
-import { EditGroupModal } from "../../../components/edit-group-modal";
 
 interface GroupData {
 	id: string;

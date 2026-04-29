@@ -1,5 +1,5 @@
+import { TopicList } from "@fe/dashboard/app/(protected)/(layout)/contacts/components/topic-list";
 import type { Metadata } from "next";
-import { TopicList } from "../components/topic-list";
 
 export const metadata: Metadata = {
 	title: "Topics · Reloop",

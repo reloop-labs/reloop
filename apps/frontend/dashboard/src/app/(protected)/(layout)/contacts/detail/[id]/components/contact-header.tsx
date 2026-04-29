@@ -16,8 +16,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
-import { DeleteContactModal } from "../../../components/delete-contact-modal";
-import { EditContactModal } from "../../../components/edit-contact-modal";
+import { DeleteContactModal } from "@fe/dashboard/app/(protected)/(layout)/contacts/components/delete-contact-modal";
+import { EditContactModal } from "@fe/dashboard/app/(protected)/(layout)/contacts/components/edit-contact-modal";
 import type { AudienceStatus } from "@fe/dashboard/utils/audience";
 
 interface ContactData {

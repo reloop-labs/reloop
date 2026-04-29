@@ -53,7 +53,7 @@ export const GroupDetailContent = () => {
 	return (
 		<div className="mx-auto max-w-3xl sm:px-8">
 			<GroupHeader group={groupData} isLoading={isLoading} />
-			{groupData && <GroupContactList groupId={groupData.id} />}
+			<GroupContactList groupId={contact_group_id} />
 		</div>
 	);
 };

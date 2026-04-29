@@ -1,5 +1,5 @@
+import { GroupList } from "@fe/dashboard/app/(protected)/(layout)/contacts/components/group-list";
 import type { Metadata } from "next";
-import { GroupList } from "../components/group-list";
 
 export const metadata: Metadata = {
 	title: "Groups · Reloop",

@@ -4,7 +4,7 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { ContactsEmptyState } from "../../../components/contacts-empty-state";
+import { ContactsEmptyState } from "@fe/dashboard/app/(protected)/(layout)/contacts/components/contacts-empty-state";
 
 interface Subscription {
 	id: string;

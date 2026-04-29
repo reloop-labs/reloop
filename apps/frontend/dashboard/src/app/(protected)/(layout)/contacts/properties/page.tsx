@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { PropertyList } from "../components/property-list";
+import { PropertyList } from "@fe/dashboard/app/(protected)/(layout)/contacts/components/property-list";
 
 export const metadata: Metadata = {
 	title: "Properties · Reloop",
