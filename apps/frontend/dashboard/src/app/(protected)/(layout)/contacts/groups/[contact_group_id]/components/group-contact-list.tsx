@@ -171,9 +171,9 @@ export const GroupContactList = ({ groupId }: { groupId: string }) => {
 				isLoading={isLoading}
 				loadingRows={5}
 				onAddContact={() => setModal("add-contact-to-group")}
-				emptyStateTitle="No contacts yet"
-				emptyStateDescription="Add contacts to this group to organize and start managing them."
-				emptyStateButtonText="Add First Contact"
+				emptyStateTitle="No contacts in this group"
+				emptyStateDescription="This group doesn't have any contacts yet. Add contacts to start segmenting your audience."
+				emptyStateButtonText="Add Contact to Group"
 			/>
 
 			{/* Pagination */}

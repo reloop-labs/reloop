@@ -274,7 +274,7 @@ export const ContactHeader = ({
 												onPointerLeave={() => setHoverIdx(undefined)}
 												onClick={() => handleMenuItemClick(item.id)}
 												className={cn(
-													"flex w-full cursor-pointer items-center gap-2 rounded-lg py-1.5 pl-2 font-normal text-xs transition-colors",
+													"flex w-full cursor-pointer items-center gap-2 rounded-lg py-1.5 pl-2 font-medium text-xs transition-colors",
 													item.isDanger
 														? "text-error-base"
 														: "text-text-strong-950",

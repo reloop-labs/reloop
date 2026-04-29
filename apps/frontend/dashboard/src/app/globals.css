@@ -60,3 +60,45 @@ body {
 .template-editor-surface .ProseMirror p.is-editor-empty:first-child::before {
 	color: var(--color-text-soft-400);
 }
+
+.template-editor-canvas .tiptap {
+	min-height: 100%;
+}
+
+.template-editor-inspector [data-re-inspector-breadcrumb-list] {
+	gap: 0.375rem;
+	color: var(--color-text-sub-600);
+}
+
+.template-editor-inspector [data-re-inspector-breadcrumb-button] {
+	border-radius: 0.375rem;
+	padding: 0.125rem 0.25rem;
+	font-size: 0.75rem;
+	color: var(--color-text-sub-600);
+}
+
+.template-editor-inspector
+	[data-re-inspector-breadcrumb-button][data-clickable]:hover {
+	background: var(--color-bg-weak-50);
+	color: var(--color-text-strong-950);
+}
+
+.template-editor-inspector [data-re-inspector-section] {
+	padding: 1rem 0;
+}
+
+.template-editor-inspector [data-re-inspector-section-toggle] {
+	font-weight: 500;
+	color: var(--color-text-strong-950);
+}
+
+.template-editor-inspector [data-re-inspector-label] {
+	color: var(--color-text-sub-600);
+}
+
+.template-editor-inspector [data-re-inspector-input],
+.template-editor-inspector [data-re-inspector-color-hex],
+.template-editor-inspector select,
+.template-editor-inspector textarea {
+	color: var(--color-text-strong-950);
+}

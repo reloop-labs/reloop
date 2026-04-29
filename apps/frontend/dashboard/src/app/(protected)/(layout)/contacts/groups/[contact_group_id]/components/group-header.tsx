@@ -6,6 +6,7 @@ import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import { KbdKey } from "@reloop/ui/kbd-key";
 import {
 	Content as PopoverContent,
 	Root as PopoverRoot,
@@ -15,6 +16,7 @@ import { Skeleton } from "@reloop/ui/skeleton";
 import { useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { DeleteGroupModal } from "../../../components/delete-group";
 import { EditGroupModal } from "../../../components/edit-group-modal";
@@ -85,6 +87,17 @@ export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 			setIsDeleteModalOpen(true);
 		}
 	};
+
+	useHotkeys(
+		"a+c",
+		(e) => {
+			e.preventDefault();
+			setModal("add-contact-to-group");
+		},
+		{
+			enabled: !!group,
+		},
+	);
 
 	if (!group && !isLoading) {
 		return (
@@ -166,29 +179,24 @@ export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 									className="gap-2"
 								>
 									<Icon name="plus" className="h-4 w-4" />
-									Add Contact
+									Add Contacts to Group
 									<span className="inline-flex items-center gap-0.5">
-										<Icon
-											name="command"
-											className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
-										/>
-										<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-100/20 p-px font-medium text-[10px] uppercase">
-											a
-										</span>
+										<KbdKey>a</KbdKey>
+										<KbdKey>c</KbdKey>
 									</span>
 								</Button.Root>
 								<PopoverRoot>
 									<PopoverTrigger asChild>
 										<Button.Root variant="neutral" mode="stroke" size="xsmall">
 											<Icon
-												name="more-vertical"
+												name="more-horizontal"
 												className="h-3.5 w-3.5 text-text-sub-600"
 											/>
 										</Button.Root>
 									</PopoverTrigger>
 									<PopoverContent
 										align="end"
-										sideOffset={8}
+										sideOffset={0}
 										className="w-44 rounded-xl p-1.5"
 										showArrow
 									>
@@ -204,7 +212,7 @@ export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 													onPointerLeave={() => setHoverIdx(undefined)}
 													onClick={() => handleMenuItemClick(item.id)}
 													className={cn(
-														"flex w-full cursor-pointer items-center gap-2 rounded-lg py-1.5 pl-2 font-normal text-xs transition-colors",
+														"flex w-full cursor-pointer items-center gap-2 rounded-lg py-1.5 pl-2 font-medium text-xs transition-colors",
 														item.isDanger
 															? "text-error-base"
 															: "text-text-strong-950",

@@ -2,6 +2,7 @@
 
 import type { EmailEditorProps, EmailEditorRef } from "@react-email/editor";
 import { EmailEditor } from "@react-email/editor";
+import { Inspector } from "@react-email/editor/ui";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
@@ -43,6 +44,27 @@ const getInitialEditorContent = (content: TemplateRecord["content"]) => {
 	}
 
 	return emptyEditorContent;
+};
+
+const TemplateInspector = () => {
+	return (
+		<Inspector.Root className="template-editor-inspector flex h-full w-[320px] shrink-0 flex-col overflow-hidden border-stroke-soft-200 border-l bg-bg-white-0 text-text-strong-950">
+			<div className="flex h-12 shrink-0 items-center justify-between border-stroke-soft-200 border-b px-4">
+				<div className="min-w-0">
+					<p className="font-medium text-sm text-text-strong-950">Design</p>
+					<p className="text-text-soft-400 text-xs">Selection properties</p>
+				</div>
+			</div>
+			<div className="shrink-0 border-stroke-soft-200 border-b px-4 py-3">
+				<Inspector.Breadcrumb />
+			</div>
+			<div className="min-h-0 flex-1 overflow-y-auto px-4">
+				<Inspector.Text />
+				<Inspector.Node />
+				<Inspector.Document />
+			</div>
+		</Inspector.Root>
+	);
 };
 
 const Page = () => {
@@ -130,7 +152,7 @@ const Page = () => {
 					credentials: "include",
 					body: JSON.stringify({
 						name: trimmedName,
-						subject: subject.trim() || undefined,
+						subject: subject.trim(),
 						content: json ? [json] : template?.content || [],
 						status: nextStatus,
 					}),
@@ -211,7 +233,7 @@ const Page = () => {
 			<main className="flex flex-1 flex-col overflow-hidden">
 				<CenterHeader />
 				<div className="flex-1 overflow-auto p-4 sm:p-8">
-					<div className="template-editor-surface mx-auto flex h-full min-h-[600px] max-w-4xl flex-col overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 shadow-sm">
+					<div className="template-editor-surface mx-auto flex h-full min-h-[600px] max-w-6xl overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 shadow-sm">
 						{isLoading ? (
 							<div className="flex flex-1 items-center justify-center text-text-sub-600">
 								<Spinner size={18} />
@@ -228,7 +250,7 @@ const Page = () => {
 							</div>
 						) : (
 							<EmailEditor
-								key={`${templateId}-${template?.updatedAt || "new"}`}
+								key={templateId}
 								ref={editorRef}
 								placeholder="Press '/' for commands..."
 								content={editorContent}
@@ -239,8 +261,10 @@ const Page = () => {
 									editorRef.current = ref;
 									markDirty();
 								}}
-								className="h-full w-full flex-1 p-8 text-text-strong-950 outline-none focus:outline-none"
-							/>
+								className="template-editor-canvas h-full min-w-0 flex-1 overflow-auto p-8 text-text-strong-950 outline-none focus:outline-none"
+							>
+								<TemplateInspector />
+							</EmailEditor>
 						)}
 					</div>
 				</div>
