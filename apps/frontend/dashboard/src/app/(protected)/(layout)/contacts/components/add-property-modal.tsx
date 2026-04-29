@@ -45,7 +45,8 @@ const TYPE_OPTIONS: {
 		icon: "hash",
 		description: "Integer or decimal",
 		color: "text-primary-base",
-		badgeClass: "border border-primary-base text-primary-base bg-primary-light/20",
+		badgeClass:
+			"border border-primary-base text-primary-base bg-primary-light/20",
 	},
 ];
 
@@ -184,7 +185,7 @@ export const AddPropertyModal = ({
 							)}
 						>
 							<Icon
-								name={showPreview ? "eye-off" : "eye"}
+								name={showPreview ? "eye-slash-outline" : "eye-outline"}
 								className="h-3 w-3"
 							/>
 							{showPreview ? "Hide preview" : "Preview"}
