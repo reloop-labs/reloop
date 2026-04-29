@@ -159,17 +159,17 @@ export const DeleteTopicModal = ({ topics }: DeleteTopicModalProps) => {
 									<Icon name="trash" className="h-4 w-4 text-error-base" />
 								</div>
 
-								<h2 className="font-medium text-text-strong-950 text-title-h5">
+								<Modal.Title className="font-medium text-text-strong-950 text-title-h5">
 									Delete topic?
-								</h2>
-								<p className="mb-6 text-pretty text-sm text-text-sub-600 leading-relaxed">
+								</Modal.Title>
+								<Modal.Description className="mb-6 text-pretty text-sm text-text-sub-600 leading-relaxed">
 									This will permanently delete the topic. Any contacts enrolled
 									in this topic will be unlinked but{" "}
 									<span className="font-semibold text-text-strong-950">
 										they will not be deleted
 									</span>
 									. This action cannot be undone.
-								</p>
+								</Modal.Description>
 
 								{/* Topic Stats Card */}
 								<div className="mb-6 flex items-center gap-3 rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/30">

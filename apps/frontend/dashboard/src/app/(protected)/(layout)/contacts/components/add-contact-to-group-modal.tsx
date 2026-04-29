@@ -162,7 +162,9 @@ export const AddContactToGroupModal = ({
 							<Icon name="user-plus" className="h-4 w-4" />
 						</div>
 						<div className="flex-1">
-							<Modal.Title>Add Contacts to Group</Modal.Title>
+							<Modal.Title className="font-medium">
+								Add Contacts to Group
+							</Modal.Title>
 						</div>
 					</Modal.Header>
 					<form onSubmit={handleSubmit} className="flex flex-col">
