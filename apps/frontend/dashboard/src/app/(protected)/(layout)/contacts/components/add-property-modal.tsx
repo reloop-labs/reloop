@@ -1,5 +1,6 @@
 "use client";
 
+import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -10,9 +11,9 @@ import { KbdEsc } from "@reloop/ui/kbd-esc";
 import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
+import { AnimatePresence, motion } from "framer-motion";
 import { useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
 
@@ -29,7 +30,7 @@ const TYPE_OPTIONS: {
 	icon: string;
 	description: string;
 	color: string;
-	badgeClass: string;
+	badgeColor: "blue" | "purple";
 }[] = [
 	{
 		value: "string",
@@ -37,8 +38,7 @@ const TYPE_OPTIONS: {
 		icon: "type",
 		description: "Free-form text",
 		color: "text-primary-base",
-		badgeClass:
-			"border border-primary-base text-primary-base bg-primary-light/20",
+		badgeColor: "blue",
 	},
 	{
 		value: "number",
@@ -46,8 +46,7 @@ const TYPE_OPTIONS: {
 		icon: "hash",
 		description: "Integer or decimal",
 		color: "text-primary-base",
-		badgeClass:
-			"border border-primary-base text-primary-base bg-primary-light/20",
+		badgeColor: "purple",
 	},
 ];
 
@@ -173,13 +172,13 @@ export const AddPropertyModal = ({
 							<Icon name="tag" className="h-4 w-4" />
 						</div>
 						<div className="flex-1">
-							<Modal.Title>Add Property</Modal.Title>
+							<Modal.Title className="font-medium">Add Property</Modal.Title>
 						</div>
 						<button
 							type="button"
 							onClick={() => setShowPreview((v) => !v)}
 							className={cn(
-								"mr-7 inline-flex items-center gap-1.5 rounded-lg border px-2 py-1 font-medium text-[11px] transition-colors",
+								"inline-flex items-center gap-1.5 rounded-lg border px-2 py-1 font-medium text-[11px] transition-colors",
 								showPreview
 									? "border-primary-base/30 bg-primary-light/10 text-primary-base"
 									: "border-stroke-soft-100 bg-bg-soft-200/30 text-text-sub-600 hover:border-stroke-soft-200 hover:text-text-strong-950 dark:border-stroke-soft-100/40",
@@ -360,14 +359,14 @@ export const AddPropertyModal = ({
 												<p className="font-semibold text-text-strong-950 text-xs">
 													{previewName}
 												</p>
-												<span
-													className={cn(
-														"mt-0.5 inline-flex items-center rounded-md border-[1px] px-[5px] py-px font-medium text-[9px]",
-														selectedType.badgeClass,
-													)}
+												<Badge.Root
+													size="small"
+													variant="light"
+													color={selectedType.badgeColor}
+													className="mt-0.5 capitalize"
 												>
 													{selectedType.label}
-												</span>
+												</Badge.Root>
 											</div>
 										</div>
 
@@ -384,14 +383,14 @@ export const AddPropertyModal = ({
 												<span className="font-medium text-[11px] text-text-sub-600">
 													Type
 												</span>
-												<span
-													className={cn(
-														"inline-flex items-center rounded-md border-[1px] px-[5px] py-px font-medium text-[9px]",
-														selectedType.badgeClass,
-													)}
+												<Badge.Root
+													size="small"
+													variant="light"
+													color={selectedType.badgeColor}
+													className="capitalize"
 												>
 													{selectedType.label}
-												</span>
+												</Badge.Root>
 											</div>
 											<div className="flex items-center justify-between px-3 py-2">
 												<span className="font-medium text-[11px] text-text-sub-600">

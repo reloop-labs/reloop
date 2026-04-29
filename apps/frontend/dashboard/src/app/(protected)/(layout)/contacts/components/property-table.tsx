@@ -1,7 +1,10 @@
 "use client";
 
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
+import { PageSizeDropdown } from "@fe/dashboard/components/page-size-dropdown";
+import { PaginationControls } from "@fe/dashboard/components/pagination-controls";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
+import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -14,8 +17,6 @@ import { Skeleton } from "@reloop/ui/skeleton";
 import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 import { PropertiesEmptyState } from "./properties-empty-state";
-import { PageSizeDropdown } from "@fe/dashboard/components/page-size-dropdown";
-import { PaginationControls } from "@fe/dashboard/components/pagination-controls";
 
 interface Property {
 	id: string;
@@ -41,16 +42,14 @@ interface PropertyTableProps {
 	onAddProperty?: () => void;
 }
 
-const getTypeBadgeStyles = (type: string) => {
-	if (!type)
-		return "border border-stroke-soft-200 text-text-sub-600 bg-neutral-alpha-10";
-	switch (type.toLowerCase()) {
+const getBadgeColor = (type: string) => {
+	switch (type?.toLowerCase()) {
 		case "string":
-			return "border border-primary-base text-primary-base bg-primary-light/20";
+			return "blue";
 		case "number":
-			return "border border-violet-500 text-violet-600 bg-violet-100/20";
+			return "purple";
 		default:
-			return "border border-stroke-soft-200 text-text-sub-600 bg-neutral-alpha-10";
+			return "gray";
 	}
 };
 
@@ -240,7 +239,7 @@ export const PropertyTable = ({
 						<div
 							key={property.id}
 							className={cn(
-								"group/row grid grid-cols-[1fr_100px_1fr_120px_40px] items-center px-4 py-2 transition-colors text-left",
+								"group/row grid grid-cols-[1fr_100px_1fr_120px_40px] items-center px-4 py-2 text-left transition-colors",
 								"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-base",
 								openPropertyId === property.id && "bg-bg-weak-50/50",
 							)}
@@ -257,14 +256,14 @@ export const PropertyTable = ({
 
 							{/* Type Column */}
 							<div className="flex items-center">
-								<span
-									className={cn(
-										"inline-flex rounded-md border-[1px] px-[6px] py-0.5 font-medium text-[10px] text-text-sub-600",
-										getTypeBadgeStyles(property.propertyType),
-									)}
+								<Badge.Root
+									size="small"
+									variant="lighter"
+									color={getBadgeColor(property.propertyType)}
+									className="h-5 rounded-md px-1.5 font-medium text-xs capitalize"
 								>
 									{property.propertyType}
-								</span>
+								</Badge.Root>
 							</div>
 
 							{/* Default Column */}
