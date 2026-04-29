@@ -13,7 +13,6 @@ import { DeleteGroupModal } from "./delete-group";
 import { DeletePropertyModal } from "./delete-property-modal";
 import { DeleteTopicModal } from "./delete-topic";
 import { EditContactModal } from "./edit-contact-modal";
-import { EditGroupModal } from "./edit-group-modal";
 import { EditPropertyModal } from "./edit-property-modal";
 import { EditTopicModal } from "./edit-topic-modal";
 
@@ -120,11 +119,6 @@ export const ContactsModals = ({ topicId }: ContactsModalsProps) => {
 				open={modal === "edit-topic"}
 				onOpenChange={handleOpenChange}
 				topic={topicsData?.topics?.find((t) => t.id === id) || null}
-			/>
-			<EditGroupModal
-				open={modal === "edit-group"}
-				onOpenChange={handleOpenChange}
-				group={groupsData?.groups?.find((g) => g.id === id) || null}
 			/>
 			<EditPropertyModal
 				open={modal === "edit-property"}

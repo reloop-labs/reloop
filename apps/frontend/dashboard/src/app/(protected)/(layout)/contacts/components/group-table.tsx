@@ -29,7 +29,6 @@ interface GroupTableProps {
 	onPageSizeChange?: (size: number) => void;
 	isLoading?: boolean;
 	loadingRows?: number;
-	onEdit?: (contact_group_id: string) => void;
 	onAddGroup?: () => void;
 	onDelete?: (contact_group_id: string) => void;
 }
@@ -70,7 +69,6 @@ export const GroupTable = ({
 	onPageSizeChange,
 	isLoading,
 	loadingRows = 6,
-	onEdit,
 	onAddGroup,
 	onDelete,
 }: GroupTableProps) => {
@@ -153,7 +151,6 @@ export const GroupTable = ({
 								>
 									<GroupDropdown
 										group={group}
-										onEdit={() => onEdit?.(group.id)}
 										onDelete={() => onDelete?.(group.id)}
 										onOpenChange={(open) =>
 											setActiveDropdownId(open ? group.id : null)

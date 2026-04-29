@@ -105,10 +105,6 @@ export const GroupList = () => {
 						setCurrentPage(1);
 					}}
 					isLoading={isLoading}
-					onEdit={(contact_group_id) => {
-						setModal("edit-group");
-						setId(contact_group_id);
-					}}
 					onAddGroup={() => setModal("create-group")}
 					onDelete={(contact_group_id) => {
 						setModal("delete-group");

@@ -20,7 +20,6 @@ interface Group {
 
 export interface GroupDropdownProps {
 	group: Group;
-	onEdit: (group: Group) => void;
 	onDelete: (group: Group) => void;
 	isDeleting?: boolean;
 	onOpenChange?: (open: boolean) => void;
@@ -28,7 +27,6 @@ export interface GroupDropdownProps {
 
 export const GroupDropdown = ({
 	group,
-	onEdit,
 	onDelete,
 	isDeleting = false,
 	onOpenChange,
@@ -44,12 +42,6 @@ export const GroupDropdown = ({
 			id: "view",
 			label: "View Details",
 			icon: "eye-outline" as const,
-			isDanger: false,
-		},
-		{
-			id: "edit",
-			label: "Edit group",
-			icon: "edit" as const,
 			isDanger: false,
 		},
 		{
@@ -76,9 +68,6 @@ export const GroupDropdown = ({
 			if (activeOrganization?.slug) {
 				router.push(`/contacts/groups/${group.id}`);
 			}
-		} else if (itemId === "edit") {
-			setPopoverOpen(false);
-			onEdit(group);
 		} else if (itemId === "delete") {
 			setPopoverOpen(false);
 			onDelete(group);

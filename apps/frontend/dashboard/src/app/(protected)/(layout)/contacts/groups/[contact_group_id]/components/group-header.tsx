@@ -1,6 +1,6 @@
+/** biome-ignore-all lint/a11y/noAutofocus: <explanation> */
 "use client";
 import { DeleteGroupModal } from "@fe/dashboard/app/(protected)/(layout)/contacts/components/delete-group";
-import { EditGroupModal } from "@fe/dashboard/app/(protected)/(layout)/contacts/components/edit-group-modal";
 import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
@@ -15,12 +15,13 @@ import {
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
+import Spinner from "@reloop/ui/spinner";
 import { useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr";
 
 interface GroupData {
 	id: string;
@@ -37,7 +38,6 @@ interface GroupHeaderProps {
 }
 
 const headerMenuItems = [
-	{ id: "edit", label: "Edit group", icon: "edit" as const, isDanger: false },
 	{
 		id: "delete",
 		label: "Delete group",
@@ -60,11 +60,14 @@ const GroupContactsCount = ({ groupId }: { groupId: string }) => {
 };
 
 export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
+	const { mutate } = useSWRConfig();
 	const { activeOrganization } = useUserOrganization();
 	const router = useRouter();
 	const [, setModal] = useQueryState("modal", { history: "replace" });
 	const [copied, setCopied] = useState(false);
-	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+	const [isEditing, setIsEditing] = useState(false);
+	const [editName, setEditName] = useState("");
+	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
@@ -94,10 +97,53 @@ export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 		}
 	};
 
+	const handleEditStart = () => {
+		setEditName(group?.name || "");
+		setIsEditing(true);
+	};
+
+	const handleEditCancel = () => {
+		setIsEditing(false);
+		setEditName(group?.name || "");
+	};
+
+	const handleEditSubmit = async (e?: React.FormEvent) => {
+		e?.preventDefault();
+		if (!group || !editName.trim() || editName === group.name) {
+			setIsEditing(false);
+			return;
+		}
+
+		setIsSubmitting(true);
+		try {
+			const response = await fetch(`/api/contacts/v1/groups/${group.id}`, {
+				method: "PATCH",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ name: editName }),
+			});
+
+			if (!response.ok) {
+				const errorData = await response.json();
+				throw new Error(errorData.message || "Failed to update group");
+			}
+
+			toast.success("Group updated successfully");
+			mutate(
+				(key: string) =>
+					typeof key === "string" && key.startsWith("/api/contacts/v1/groups"),
+			);
+			setIsEditing(false);
+		} catch (error) {
+			toast.error(
+				error instanceof Error ? error.message : "Failed to update group",
+			);
+		} finally {
+			setIsSubmitting(false);
+		}
+	};
+
 	const handleMenuItemClick = (itemId: string) => {
-		if (itemId === "edit") {
-			setIsEditModalOpen(true);
-		} else if (itemId === "delete") {
+		if (itemId === "delete") {
 			setIsDeleteModalOpen(true);
 		}
 	};
@@ -169,14 +215,68 @@ export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 						)}
 						{isLoading ? (
 							<Skeleton className="mt-2 h-7 w-48 rounded-lg" />
-						) : (
-							<div className="flex items-center gap-2">
+						) : isEditing ? (
+							<form onSubmit={handleEditSubmit} className="flex items-center">
 								<div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-white shadow-sm">
 									<Icon name="modules" className="h-3 w-3" />
 								</div>
-								<h1 className="font-medium text-title-h6 leading-8">
+								<input
+									value={editName}
+									onChange={(e) => setEditName(e.target.value)}
+									onKeyDown={(e) => {
+										if (e.key === "Escape") {
+											handleEditCancel();
+										}
+									}}
+									autoFocus
+									disabled={isSubmitting}
+									className="ml-2 min-w-[200px] border-0 bg-transparent px-0 py-0 font-medium text-text-strong-950 text-title-h6 leading-8 focus:border-text-strong-950 focus:outline-none focus:ring-0"
+								/>
+								<Button.Root
+									type="submit"
+									variant="neutral"
+									size="xxsmall"
+									disabled={
+										isSubmitting || !editName.trim() || editName === group?.name
+									}
+									className="ml-3"
+								>
+									{isSubmitting ? (
+										<Spinner size={14} color="currentColor" />
+									) : (
+										"Save"
+									)}
+								</Button.Root>
+								<Button.Root
+									type="button"
+									variant="neutral"
+									mode="stroke"
+									size="xxsmall"
+									onClick={handleEditCancel}
+									disabled={isSubmitting}
+									className="ml-2"
+								>
+									Cancel
+								</Button.Root>
+							</form>
+						) : (
+							<div className="flex items-center">
+								<div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-white shadow-sm">
+									<Icon name="modules" className="h-3 w-3" />
+								</div>
+								<h1
+									className="ml-2 cursor-pointer font-medium text-title-h6 leading-8 transition-colors hover:text-text-sub-600"
+									onClick={handleEditStart}
+								>
 									{group?.name}
 								</h1>
+								<button
+									type="button"
+									onClick={handleEditStart}
+									className="mt-0.5 flex h-6 w-6 items-center justify-center rounded-md text-text-sub-600 transition-colors hover:bg-neutral-alpha-10"
+								>
+									<Icon name="edit" className="h-3.5 w-3.5" />
+								</button>
 							</div>
 						)}
 					</div>
@@ -327,15 +427,6 @@ export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 					</div>
 				</div>
 			</div>
-
-			{/* Edit Group Modal */}
-			{group && (
-				<EditGroupModal
-					open={isEditModalOpen}
-					onOpenChange={setIsEditModalOpen}
-					group={group}
-				/>
-			)}
 
 			{/* Delete Group Modal */}
 			{group && isDeleteModalOpen && (
