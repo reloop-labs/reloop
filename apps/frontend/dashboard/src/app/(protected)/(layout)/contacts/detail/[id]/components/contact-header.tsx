@@ -5,6 +5,11 @@ import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-butto
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import type { AudienceStatus } from "@fe/dashboard/utils/audience";
+import {
+	getStatusIcon as getSharedStatusIcon,
+	getStatusColorClass,
+	getStatusLabel,
+} from "@fe/dashboard/utils/audience";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
@@ -49,40 +54,6 @@ interface ContactHeaderProps {
 	propertyValues: PropertyValueWithName[];
 	enrolledTopics?: { id: string; name: string }[];
 }
-
-const getStatusColor = (status: string) => {
-	return status.toLowerCase() === "subscribed"
-		? "text-success-base"
-		: "text-error-base";
-};
-
-const getStatusIcon = (status: string) => {
-	return status.toLowerCase() === "subscribed"
-		? "check-circle"
-		: "cross-circle";
-};
-
-const getStatusBadgeStyles = (status: string) => {
-	switch (status.toLowerCase()) {
-		case "subscribed":
-			return "border border-success-base text-success-base bg-success-light/20";
-		case "unsubscribed":
-			return "border border-error-base text-error-base bg-error-light/20";
-		default:
-			return "border border-stroke-soft-200 text-text-sub-600 bg-neutral-alpha-10";
-	}
-};
-
-const formatStatusLabel = (status: string) => {
-	switch (status.toLowerCase()) {
-		case "subscribed":
-			return "Subscribed";
-		case "unsubscribed":
-			return "Unsubscribed";
-		default:
-			return status;
-	}
-};
 
 // Convert camelCase to Title Case (e.g., "firstName" -> "FIRST NAME")
 const formatPropertyName = (name: string) => {
@@ -191,46 +162,6 @@ export const ContactHeader = ({
 				<div className="flex items-center justify-between pt-6">
 					<div>
 						{isLoading ? (
-							<div className="flex items-center gap-1.5">
-								<Skeleton className="h-4 w-12 rounded-full" />
-								<Skeleton className="h-1 w-1 rounded-full" />
-								<Skeleton className="h-4 w-20 rounded-full" />
-								<Skeleton className="h-1 w-1 rounded-full" />
-								<div className="flex items-center gap-1">
-									<Skeleton className="h-3.5 w-3.5 rounded-full" />
-									<Skeleton className="h-4 w-16 rounded-full" />
-								</div>
-							</div>
-						) : (
-							<div className="flex items-center gap-1.5">
-								<p className="font-medium text-paragraph-xs text-text-sub-600">
-									Contact{" "}
-								</p>
-								<p className="font-semibold text-paragraph-xs text-text-sub-600">
-									•
-								</p>
-								<p className="font-medium text-paragraph-xs text-text-sub-600">
-									{contact?.createdAt
-										? formatRelativeTime(contact.createdAt)
-										: "---"}
-								</p>
-								<p className="font-semibold text-paragraph-xs text-text-sub-600">
-									•
-								</p>
-								<div
-									className={`flex items-center gap-1 ${getStatusColor(contact?.status || "")}`}
-								>
-									<Icon
-										name={getStatusIcon(contact?.status || "")}
-										className="h-3.5 w-3.5"
-									/>
-									<p className="font-medium text-paragraph-xs">
-										{formatStatusLabel(contact?.status || "")}
-									</p>
-								</div>
-							</div>
-						)}
-						{isLoading ? (
 							<Skeleton className="mt-2 h-7 w-48 rounded-lg" />
 						) : (
 							<div className="flex items-center gap-1">
@@ -252,7 +183,7 @@ export const ContactHeader = ({
 								<PopoverTrigger asChild>
 									<Button.Root variant="neutral" mode="stroke" size="xsmall">
 										<Icon
-											name="more-vertical"
+											name="more-horizontal"
 											className="h-3.5 w-3.5 text-text-sub-600"
 										/>
 									</Button.Root>
@@ -310,26 +241,6 @@ export const ContactHeader = ({
 
 				{/* Stats Grid - Row 1 */}
 				<div className="mt-10 grid grid-cols-3 gap-x-12 gap-y-6">
-					{/* Email Address */}
-					<div className="flex flex-col gap-1.5">
-						<div className="flex items-center gap-1.5">
-							<Icon
-								name="mail-single"
-								className="h-3.5 w-3.5 text-text-sub-600"
-							/>
-							<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
-								Email Address
-							</span>
-						</div>
-						{isLoading ? (
-							<Skeleton className="h-5 w-32 rounded-lg" />
-						) : (
-							<span className="font-medium text-paragraph-sm text-text-strong-950">
-								{contact?.email || "---"}
-							</span>
-						)}
-					</div>
-
 					{/* Created */}
 					<div className="flex flex-col gap-1.5">
 						<div className="flex items-center gap-1.5">
@@ -352,10 +263,7 @@ export const ContactHeader = ({
 					{/* Status */}
 					<div className="flex flex-col gap-1.5">
 						<div className="flex items-center gap-1.5">
-							<Icon
-								name="check-circle"
-								className="h-3.5 w-3.5 text-text-sub-600"
-							/>
+							<Icon name="activity" className="h-3.5 w-3.5 text-text-sub-600" />
 							<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
 								Status
 							</span>
@@ -363,14 +271,18 @@ export const ContactHeader = ({
 						{isLoading ? (
 							<Skeleton className="h-5 w-20 rounded-lg" />
 						) : (
-							<span
+							<div
 								className={cn(
-									"inline-flex w-fit rounded-md border-[1px] px-[6px] py-0.5 font-medium text-[10px]",
-									getStatusBadgeStyles(contact?.status || ""),
+									"flex items-center gap-1.5 font-medium text-[13px]",
+									getStatusColorClass(contact?.status as AudienceStatus),
 								)}
 							>
-								{formatStatusLabel(contact?.status || "")}
-							</span>
+								<Icon
+									name={getSharedStatusIcon(contact?.status as AudienceStatus)}
+									className="h-3.5 w-3.5"
+								/>
+								{getStatusLabel(contact?.status as AudienceStatus)}
+							</div>
 						)}
 					</div>
 
