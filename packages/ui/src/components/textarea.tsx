@@ -26,7 +26,7 @@ const Textarea = React.forwardRef<
 					],
 					simple && [
 						"min-h-28 rounded-xl bg-bg-white-0 px-3 py-2.5 shadow-regular-xs",
-						"ring-1 ring-stroke-soft-200 ring-inset",
+						"ring-1 ring-stroke-soft-100 ring-inset dark:ring-stroke-soft-100/40",
 						"transition duration-200 ease-out",
 						// hover
 						"hover:[&:not(:focus)]:bg-bg-weak-50",
@@ -122,7 +122,7 @@ const TextareaRoot = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
 					[
 						// base
 						"group/textarea relative flex w-full flex-col rounded-xl bg-bg-white-0 pb-2.5 shadow-regular-xs",
-						"ring-1 ring-stroke-soft-200 ring-inset",
+						"ring-1 ring-stroke-soft-100 ring-inset dark:ring-stroke-soft-100/40",
 						"transition duration-200 ease-out",
 						// hover
 						"hover:[&:not(:focus-within)]:bg-bg-weak-50",
