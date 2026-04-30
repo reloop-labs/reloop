@@ -120,7 +120,12 @@ export namespace ChannelModel {
 
 	export type ChannelResponse = typeof channelResponse.static;
 
-	export const channelListItem = t.Omit(channelBaseResponse, ["object"]);
+	export const channelListItem = t.Composite([
+		t.Omit(channelBaseResponse, ["object"]),
+		t.Object({
+			subscriberCount: t.Optional(t.Number({ description: "Number of subscribers" })),
+		}),
+	]);
 	export type ChannelListItem = typeof channelListItem.static;
 
 	// Channel List Response
@@ -139,7 +144,6 @@ export namespace ChannelModel {
 	export const channelQuery = t.Object({
 		page: t.Optional(t.Number({ minimum: 1, default: 1 })),
 		limit: t.Optional(t.Number({ minimum: 1, maximum: 100, default: 100 })),
-		search: t.Optional(t.String({ description: "Search by name" })),
 	});
 
 	export type ChannelQuery = typeof channelQuery.static;

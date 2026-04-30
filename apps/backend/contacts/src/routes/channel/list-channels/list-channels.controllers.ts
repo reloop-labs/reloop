@@ -31,6 +31,13 @@ export const listChannelsController = async ({
     const rows = await db
       .select({
         channel: schema.channel,
+        subscriberCount: sql<number>`(
+          SELECT count(*)::int 
+          FROM ${schema.channelSubscription} 
+          WHERE ${schema.channelSubscription.channelId} = ${schema.channel.id} 
+          AND ${schema.channelSubscription.status} = 'enrolled'
+          AND ${schema.channelSubscription.deletedAt} IS NULL
+        )`,
         total: sql<number>`COUNT(*) OVER()`,
       })
       .from(schema.channel)
@@ -45,7 +52,7 @@ export const listChannelsController = async ({
     );
     return {
       object: "channel",
-      channels: rows.map(({ channel }) => ({
+      channels: rows.map(({ channel, subscriberCount }) => ({
         id: channel.id,
         name: channel.name,
         description: channel.description,
@@ -53,6 +60,7 @@ export const listChannelsController = async ({
         visibility: channel.visibility,
         createdAt: channel.createdAt,
         updatedAt: channel.updatedAt,
+        subscriberCount,
       })),
       total: Number(rows[0]?.total ?? 0),
       page,

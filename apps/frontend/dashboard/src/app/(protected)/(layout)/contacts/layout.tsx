@@ -70,7 +70,8 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 
 	// Extract channelId if on a channel subpage
 	const channelIdMatch = pathname.match(/\/contacts\/channels\/([^/]+)/);
-	const channelId = channelIdMatch && !isAddChannelPage ? channelIdMatch[1] : null;
+	const channelId =
+		channelIdMatch && !isAddChannelPage ? channelIdMatch[1] : null;
 
 	const { data: channelData } = useSWR<Channel>(
 		channelId ? `/api/contacts/v1/channels/${channelId}` : null,
@@ -99,10 +100,7 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 
 	return (
 		<>
-			<div
-				className={`mx-auto sm:px-8 ${isAddChannelPage ? "max-w-5xl" : "max-w-3xl"}`}
-			>
-				{/* Unified Header */}
+			<div className={"mx-auto max-w-3xl sm:px-8"}>
 				{!isDetailPage && (
 					<div className="flex items-center justify-between pt-10 pb-6">
 						<div className="flex flex-col gap-1">

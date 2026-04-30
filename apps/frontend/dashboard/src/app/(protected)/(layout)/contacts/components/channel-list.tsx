@@ -2,14 +2,11 @@
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { SubscriberPreview } from "./subscriber-preview";
 
-import { Icon } from "@reloop/ui/icon";
-import * as Input from "@reloop/ui/input";
-import { parseAsInteger, useQueryState } from "nuqs";
-import { useState } from "react";
+import { useQueryState } from "nuqs";
 import { toast } from "sonner";
 import useSWR, { useSWRConfig } from "swr";
 import { useRouter } from "next/navigation";
-import { ChannelTable } from "./channel-table";
+import { ChannelCards } from "./channel-cards";
 
 interface Channel {
 	id: string;
@@ -18,6 +15,7 @@ interface Channel {
 	organizationId: string;
 	defaultSubscription?: "opt_in" | "opt_out";
 	visibility?: "private" | "public";
+	subscriberCount?: number;
 	createdAt: string;
 	updatedAt: string;
 	deletedAt: string | null;
@@ -34,37 +32,18 @@ export const ChannelList = () => {
 	const { activeOrganization } = useUserOrganization();
 	const { mutate } = useSWRConfig();
 	const router = useRouter();
-	const [searchQuery, setSearchQuery] = useState<string>("");
 	const [, setModal] = useQueryState("modal", { history: "replace" });
 	const [, setId] = useQueryState("id", { history: "replace" });
-	const [currentPage, setCurrentPage] = useQueryState(
-		"page",
-		parseAsInteger.withDefault(1),
-	);
-	const [pageSize, setPageSize] = useQueryState(
-		"limit",
-		parseAsInteger.withDefault(10),
-	);
 
 	const { data, error, isLoading } = useSWR<ChannelListResponse>(
 		activeOrganization?.id
-			? `/api/contacts/v1/channels/list?limit=${pageSize}&page=${currentPage}`
+			? "/api/contacts/v1/channels/list?limit=100"
 			: null,
 		{
 			revalidateOnFocus: true,
 			revalidateOnReconnect: true,
 		},
 	);
-
-	// Filter channels based on search query
-	const filteredChannels =
-		data?.channels?.filter((channel) => {
-			return (
-				searchQuery === "" ||
-				channel.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-				channel.description?.toLowerCase().includes(searchQuery.toLowerCase())
-			);
-		}) || [];
 
 	const handleToggleVisibility = async (
 		channelId: string,
@@ -105,44 +84,12 @@ export const ChannelList = () => {
 
 	return (
 		<div className="flex gap-6">
-			{/* Left: Channel table */}
+			{/* Left: Channel list */}
 			<div className="min-w-0 flex-1">
-				<div className="flex items-center gap-3">
-					<div className="flex-1">
-						<Input.Root size="xsmall" className="rounded-[10px]">
-							<Input.Wrapper>
-								<Input.Icon
-									as={Icon}
-									name="search"
-									size="xsmall"
-									className="h-3.5 w-3.5"
-								/>
-								<Input.Input
-									placeholder="Search channels..."
-									value={searchQuery}
-									onChange={(e) => {
-										setSearchQuery(e.target.value);
-										setCurrentPage(1);
-									}}
-								/>
-							</Input.Wrapper>
-						</Input.Root>
-					</div>
-				</div>
-
-				<div className="mt-4">
-					<ChannelTable
-						channels={filteredChannels}
-						total={data?.total || 0}
-						currentPage={currentPage}
-						pageSize={pageSize}
-						onPageChange={setCurrentPage}
-						onPageSizeChange={(size) => {
-							setPageSize(size);
-							setCurrentPage(1);
-						}}
+				<div className="mt-0">
+					<ChannelCards
+						channels={allChannels}
 						isLoading={isLoading}
-						loadingRows={4}
 						onToggleVisibility={handleToggleVisibility}
 						onEdit={(channelId) => {
 							setModal("edit-channel");

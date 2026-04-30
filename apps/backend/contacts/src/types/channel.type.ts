@@ -25,6 +25,7 @@ export namespace ChannelTypes {
 		createdAt: Date;
 		updatedAt: Date;
 		deletedAt: Date | null;
+		subscriberCount?: number;
 	}
 
 	export interface CreateChannelRequest {
@@ -40,6 +41,5 @@ export namespace ChannelTypes {
 	export interface ChannelListQuery {
 		page?: number;
 		limit?: number;
-		search?: string;
 	}
 }
