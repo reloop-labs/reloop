@@ -1,0 +1,39 @@
+---
+title: Set Up Your Logo on Apple Mail
+sidebarTitle: Apple Branded Mail
+description: How to display your brand logo in Apple Mail using BIMI.
+---
+
+Apple Mail supports Brand Indicators for Message Identification (BIMI), which lets you display your brand logo next to your emails in the recipient's inbox.
+
+## Prerequisites
+
+- A verified domain with DMARC set to `quarantine` or `reject`
+- A square SVG logo in Tiny PS format
+- A VMC (Verified Mark Certificate) from a trusted authority
+
+## Setup
+
+<Steps>
+  <Step title="Configure DMARC">
+    Your DMARC policy must be set to at least `p=quarantine`:
+
+    ```
+    v=DMARC1; p=quarantine; rua=mailto:dmarc@example.com
+    ```
+  </Step>
+  <Step title="Prepare your logo">
+    Create a square SVG logo that meets BIMI requirements. The logo must be in Tiny PS format.
+  </Step>
+  <Step title="Add the BIMI record">
+    Add a TXT record at `default._bimi.yourdomain.com`:
+
+    ```
+    v=BIMI1; l=https://example.com/logo.svg; a=https://example.com/vmc.pem
+    ```
+  </Step>
+</Steps>
+
+<Note>
+BIMI adoption is growing but not yet universal. Apple Mail, Gmail, and Yahoo support it. Outlook does not yet.
+</Note>

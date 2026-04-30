@@ -1,0 +1,35 @@
+---
+title: n8n Reloop Integration
+sidebarTitle: n8n Integration
+description: How to use Reloop with n8n for email automation workflows.
+---
+
+[n8n](https://n8n.io) is an open-source workflow automation tool. Use the Reloop integration to send emails as part of your automated workflows.
+
+## Setup
+
+<Steps>
+  <Step title="Install the Reloop node">
+    In your n8n instance, search for "Reloop" in the nodes panel and install the Reloop integration.
+  </Step>
+  <Step title="Configure credentials">
+    Add your Reloop API key in n8n's credentials settings:
+    1. Go to **Credentials** → **New Credential**
+    2. Search for "Reloop"
+    3. Enter your API key from [app.reloop.dev/api-keys](https://app.reloop.dev/api-keys)
+  </Step>
+  <Step title="Add to your workflow">
+    Drag the Reloop node into your workflow and configure the email parameters (from, to, subject, body).
+  </Step>
+</Steps>
+
+## Example Workflows
+
+- **Form submission → Email notification**: Send an email when a form is submitted
+- **CRM trigger → Welcome email**: Send a welcome email when a new contact is created
+- **Scheduled reports**: Send daily/weekly reports via email
+
+## Learn More
+
+- [Reloop API Reference](/docs/api)
+- [n8n Documentation](https://docs.n8n.io)

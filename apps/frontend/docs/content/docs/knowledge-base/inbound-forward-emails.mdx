@@ -1,0 +1,51 @@
+---
+title: Forward Emails with Reloop Inbound
+sidebarTitle: Inbound Forward Emails
+description: How to forward received emails to another address using Reloop webhooks.
+---
+
+Reloop's inbound email feature can be used to forward received emails to another email address automatically.
+
+## How It Works
+
+1. Reloop receives an email on your verified domain
+2. A webhook is triggered with the email data
+3. Your webhook handler forwards the email via the Reloop API
+
+## Setup
+
+<Steps>
+  <Step title="Enable receiving on your domain">
+    Go to your [domain settings](https://app.reloop.dev/domains) and enable receiving.
+  </Step>
+  <Step title="Create a webhook endpoint">
+    Set up a webhook endpoint that listens for `email.received` events.
+  </Step>
+  <Step title="Forward the email">
+    In your webhook handler, use the Reloop API to send the email to the forwarding address:
+
+    ```typescript
+    import { Reloop } from 'reloop';
+
+    const reloop = new Reloop(process.env.RELOOP_API_KEY);
+
+    async function handleWebhook(event) {
+      if (event.type === 'email.received') {
+        const email = await reloop.emails.receiving.get(event.data.email_id);
+
+        await reloop.emails.send({
+          from: 'forwarding@yourdomain.com',
+          to: 'destination@example.com',
+          subject: `Fwd: ${email.data.subject}`,
+          html: email.data.html,
+        });
+      }
+    }
+    ```
+  </Step>
+</Steps>
+
+## Learn More
+
+- [Receiving Emails](/docs/knowledge-base/receiving-emails)
+- [Webhooks](/docs/learn/webhooks)

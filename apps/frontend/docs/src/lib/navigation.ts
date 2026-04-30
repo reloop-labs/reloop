@@ -4,7 +4,7 @@ export const navigationTabs = [
 	{ title: "Build with AI", url: "/integrations", iconName: "bulb" as const },
 	{
 		title: "Knowledge Base",
-		url: "/deploy",
+		url: "/knowledge-base",
 		iconName: "swatch-book" as const,
 	},
 	{ title: "Webhooks", url: "/webhook", iconName: "webhook" as const },

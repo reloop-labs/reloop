@@ -39,6 +39,7 @@
 		"resources/storing-webhooks-data",
 		"api-keys",
 		"api",
-		"webhooks"
+		"webhooks",
+		"knowledge-base"
 	]
 }

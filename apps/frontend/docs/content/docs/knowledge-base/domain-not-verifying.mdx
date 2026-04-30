@@ -1,0 +1,55 @@
+---
+title: Domain Not Verifying
+description: What to do when your domain verification is stuck or failing.
+---
+
+If your domain verification is not completing, follow these steps to diagnose and resolve the issue.
+
+## Common Causes
+
+### DNS Records Not Added Correctly
+
+The most common reason for verification failure is incorrect DNS records. Double-check that:
+
+- All required DNS records (SPF, DKIM, DMARC) are added to the correct domain/subdomain
+- There are no typos in the record values
+- The record type (TXT, CNAME) matches what Reloop expects
+
+### DNS Propagation Delay
+
+DNS changes can take up to **72 hours** to propagate globally, though most providers update within minutes. If you just added the records, wait a few hours and try again.
+
+### Conflicting Records
+
+Existing DNS records can sometimes conflict with Reloop's records:
+
+- **Duplicate SPF records**: You can only have one SPF record per domain. If you already have one, merge Reloop's `include:_spf.reloop.dev` into your existing record.
+- **CNAME at root domain**: Some providers don't allow CNAME records at the root domain. Use a subdomain instead.
+
+## Troubleshooting Steps
+
+<Steps>
+  <Step title="Verify DNS records">
+    Use a DNS lookup tool to confirm your records are visible:
+
+    ```bash
+    dig TXT yourdomain.com
+    dig CNAME reloop._domainkey.yourdomain.com
+    ```
+  </Step>
+  <Step title="Check for propagation">
+    Use [DNS Checker](https://dnschecker.org) to verify that your records have propagated globally.
+  </Step>
+  <Step title="Re-verify in dashboard">
+    Go to [Reloop Domains](https://app.reloop.dev/domains) and click the **Verify** button again.
+  </Step>
+  <Step title="Contact support">
+    If verification still fails after 72 hours, contact [Reloop support](https://reloop.dev/help) with your domain name and a screenshot of your DNS records.
+  </Step>
+</Steps>
+
+## Learn More
+
+- [Avoid MX Conflicts](/docs/knowledge-base/avoid-mx-conflicts)
+- [DNS Setup Guides](/docs/knowledge-base/dns-cloudflare) — Provider-specific guides
+- [Domains Guide](/docs/learn/domains)

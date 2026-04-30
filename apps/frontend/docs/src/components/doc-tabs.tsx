@@ -25,7 +25,7 @@ export function DocTabs() {
 		},
 		{
 			title: "Knowledge Base",
-			url: "/deploy",
+			url: "/knowledge-base",
 			icon: "swatch-book",
 		},
 		{

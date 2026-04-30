@@ -1,0 +1,32 @@
+---
+title: Email Addresses for Testing
+sidebarTitle: Testing Addresses
+description: Which email addresses to use when testing with Reloop.
+---
+
+When testing your Reloop integration, use these special email addresses to simulate different scenarios without sending real emails.
+
+## Test Addresses
+
+| Address | Behavior |
+|---------|----------|
+| `delivered@reloop.dev` | Simulates a successful delivery |
+| `bounced@reloop.dev` | Simulates a hard bounce |
+| `complained@reloop.dev` | Simulates a spam complaint |
+
+## Development Mode
+
+When using Reloop in development:
+
+- Emails sent from unverified domains are automatically sandboxed
+- Use the `reloop.dev` test addresses above to verify your integration
+- Check the [Reloop dashboard](https://app.reloop.dev/emails) to see sent emails and their status
+
+<Warning>
+Never use real customer email addresses for testing. Always use the test addresses above or your own addresses.
+</Warning>
+
+## Learn More
+
+- [E2E Testing with Playwright](/docs/knowledge-base/e2e-testing-playwright)
+- [Account Quotas and Limits](/docs/knowledge-base/account-quotas-limits)

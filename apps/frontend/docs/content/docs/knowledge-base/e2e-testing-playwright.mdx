@@ -1,0 +1,49 @@
+---
+title: E2E Testing with Playwright
+sidebarTitle: E2E Testing
+description: How to test email sending end-to-end with Playwright and Reloop.
+---
+
+Test your email flows end-to-end using Playwright and Reloop's API.
+
+## Approach
+
+Use Reloop's API to verify that emails were sent correctly during your E2E tests. Instead of checking actual inboxes, query the Reloop API to confirm emails were delivered.
+
+## Setup
+
+```bash
+npm install @playwright/test reloop
+```
+
+## Example Test
+
+```typescript
+import { test, expect } from '@playwright/test';
+import { Reloop } from 'reloop';
+
+const reloop = new Reloop(process.env.RELOOP_API_KEY);
+
+test('signup sends welcome email', async ({ page }) => {
+  // Trigger the signup flow
+  await page.goto('/signup');
+  await page.fill('[name="email"]', 'test@example.com');
+  await page.click('button[type="submit"]');
+
+  // Wait for the email to be sent
+  await page.waitForTimeout(3000);
+
+  // Verify via Reloop API
+  const { data } = await reloop.emails.list();
+  const welcomeEmail = data?.data?.find(
+    (e) => e.to?.includes('test@example.com') && e.subject?.includes('Welcome')
+  );
+
+  expect(welcomeEmail).toBeDefined();
+  expect(welcomeEmail?.last_event).toBe('delivered');
+});
+```
+
+<Tip>
+Use [testing email addresses](/docs/knowledge-base/testing-email-addresses) to avoid sending real emails during tests.
+</Tip>
