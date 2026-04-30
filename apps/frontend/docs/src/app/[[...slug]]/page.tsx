@@ -72,7 +72,7 @@ export async function generateMetadata(props: {
 
 export async function generateStaticParams() {
 	const params = source.generateParams() as { slug: string[] }[];
-	return params.filter((param) => param.slug && param.slug.length > 0);
+	return [{ slug: [] }, ...params.filter((param) => param.slug && param.slug.length > 0)];
 }
 
 export default async function Page(props: {
@@ -80,11 +80,7 @@ export default async function Page(props: {
 }) {
 	const params = await props.params;
 
-	if (!params.slug || params.slug.length === 0) {
-		redirect("/introduction");
-	}
-
-	const page = source.getPage(params.slug);
+	const page = source.getPage(params.slug?.length ? params.slug : ["introduction"]);
 	if (!page) notFound();
 	const MDXContent = page.data.body;
 	const isFullWidth = page.data.full === true;

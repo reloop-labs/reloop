@@ -50,7 +50,7 @@ const Steps = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof Mintl
 		const validChildren = React.Children.toArray(children).filter(React.isValidElement);
 		return (
 			<div ref={ref} suppressHydrationWarning>
-				<MintlifySteps {...props}>{validChildren}</MintlifySteps>
+				<MintlifySteps {...props}>{validChildren as any}</MintlifySteps>
 			</div>
 		);
 	},
