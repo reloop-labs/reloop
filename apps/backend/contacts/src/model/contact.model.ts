@@ -196,6 +196,21 @@ export namespace ContactModel {
 				default: [],
 			},
 		),
+		suppressionReason: t.Union(
+			[
+				t.Literal("hard_bounce"),
+				t.Literal("spam_complaint"),
+				t.Null(),
+			],
+			{
+				description: "Suppression reason, or null if not suppressed",
+				default: null,
+			},
+		),
+		suppressedAt: t.Union([t.Date(), t.Null()], {
+			description: "When the contact was suppressed, or null",
+			default: null,
+		}),
 		createdAt: t.Date(),
 		updatedAt: t.Date(),
 	},
@@ -214,11 +229,13 @@ export namespace ContactModel {
 					},
 					groups: [{ id: "grp_123", name: "Beta Testers" }],
 					topics: [{ id: "tpc_123", name: "Newsletter", subscription: "opt_in" }],
+					suppression: null,
 					createdAt: "2026-03-23T10:00:00Z",
 					updatedAt: "2026-03-23T10:00:00Z",
 				},
 			],
 		});
+
 
 	export const contactResponse = t.Composite([
 		contactBaseResponse,

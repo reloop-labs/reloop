@@ -34,6 +34,8 @@ interface ContactData {
 	properties?: Record<string, string | number>;
 	groups?: { id: string; name: string }[];
 	organizationId: string;
+	suppressionReason: "hard_bounce" | "spam_complaint" | null;
+	suppressedAt: string | null;
 	createdAt: string;
 	updatedAt: string;
 	deletedAt: string | null;
@@ -271,17 +273,29 @@ export const ContactHeader = ({
 						{isLoading ? (
 							<Skeleton className="h-5 w-20 rounded-lg" />
 						) : (
-							<div
-								className={cn(
-									"flex items-center gap-1.5 font-medium text-[13px]",
-									getStatusColorClass(contact?.status as AudienceStatus),
+							<div className="flex flex-col gap-1.5">
+								<div
+									className={cn(
+										"flex items-center gap-1.5 font-medium text-[13px]",
+										getStatusColorClass(contact?.status as AudienceStatus),
+									)}
+								>
+									<Icon
+										name={getSharedStatusIcon(contact?.status as AudienceStatus)}
+										className="h-3.5 w-3.5"
+									/>
+									{getStatusLabel(contact?.status as AudienceStatus)}
+								</div>
+								{contact?.suppressionReason && (
+									<div className="flex items-center gap-1 rounded-md bg-error-alpha-10 px-2 py-0.5 w-fit">
+										<Icon name="alert-circle" className="h-3 w-3 text-error-base flex-shrink-0" />
+										<span className="font-medium text-[11px] text-error-base">
+											Suppressed
+											{" · "}
+											{contact.suppressionReason === "hard_bounce" ? "Hard Bounce" : "Spam Complaint"}
+										</span>
+									</div>
 								)}
-							>
-								<Icon
-									name={getSharedStatusIcon(contact?.status as AudienceStatus)}
-									className="h-3.5 w-3.5"
-								/>
-								{getStatusLabel(contact?.status as AudienceStatus)}
 							</div>
 						)}
 					</div>

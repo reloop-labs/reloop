@@ -23,6 +23,11 @@ export const contactStatusEnum = pgEnum("contact_status", [
 	"blocked",
 ]);
 
+export const suppressionReasonEnum = pgEnum("suppression_reason", [
+	"hard_bounce",
+	"spam_complaint",
+]);
+
 export const propertyTypeEnum = pgEnum("property_type", ["string", "number"]);
 
 export const contact = pgTable(
@@ -41,6 +46,8 @@ export const contact = pgTable(
 			.references(() => user.id, { onDelete: "cascade" }),
 		firstName: varchar("first_name", { length: 255 }),
 		lastName: varchar("last_name", { length: 255 }),
+		suppressionReason: suppressionReasonEnum("suppression_reason"),
+		suppressedAt: timestamp("suppressed_at"),
 		createdAt: timestamp("created_at").notNull().defaultNow(),
 		updatedAt: timestamp("updated_at")
 			.notNull()
@@ -54,6 +61,7 @@ export const contact = pgTable(
 		index("contact_idx_org_email").on(table.organizationId, table.email),
 		index("contact_idx_status").on(table.status),
 		index("contact_idx_user_id").on(table.userId),
+		index("contact_idx_suppression_reason").on(table.suppressionReason),
 		unique("contact_unique_org_email").on(table.organizationId, table.email),
 	],
 );

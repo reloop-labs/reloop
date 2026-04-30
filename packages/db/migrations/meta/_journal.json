@@ -8,6 +8,13 @@
       "when": 1777034797256,
       "tag": "0000_cloudy_stellaris",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1777523948830,
+      "tag": "0001_suppression_on_contact_table",
+      "breakpoints": true
     }
   ]
 }

@@ -35,6 +35,8 @@ export namespace ContactTypes {
 		properties?: Record<string, string | number>;
 		groups?: { id: string; name: string }[];
 		topics?: { id: string; name: string; subscription: "opt_in" | "opt_out" }[];
+		suppressionReason: "hard_bounce" | "spam_complaint" | null;
+		suppressedAt: Date | null;
 	}
 
 	export interface CreateContactRequest {

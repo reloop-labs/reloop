@@ -92,6 +92,8 @@ export async function listContactsController({
       offset,
     });
     const contactIds = contacts.map((c) => c.id);
+
+    // Batch load properties
     let propertyMap: Record<string, Record<string, string>> = {};
     if (contactIds.length > 0) {
       const allProperties = await db
@@ -132,6 +134,9 @@ export async function listContactsController({
       properties: propertyMap[contact.id] || {},
       groups: (contact as ContactTypes.ContactData).groups ?? [],
       topics: (contact as ContactTypes.ContactData).topics ?? [],
+      // Suppression is on the contact row itself — no extra query
+      suppressionReason: contact.suppressionReason ?? null,
+      suppressedAt: contact.suppressedAt ?? null,
       createdAt: contact.createdAt,
       updatedAt: contact.updatedAt,
     }));

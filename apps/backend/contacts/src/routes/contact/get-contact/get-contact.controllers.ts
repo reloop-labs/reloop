@@ -70,6 +70,10 @@ export async function getContactController({
           | "opt_out",
       }));
 
+    // Suppression is flat on the contact row
+    const suppressionReason = contact.suppressionReason ?? null;
+    const suppressedAt = contact.suppressedAt ?? null;
+
     logger.info(
       {
         contactId,
@@ -77,6 +81,7 @@ export async function getContactController({
         propertyCount: contact.propertyValues.length,
         groupCount: groups.length,
         topicCount: topics.length,
+        suppressed: suppressionReason !== null,
       },
       "Contact retrieved successfully",
     );
@@ -91,6 +96,8 @@ export async function getContactController({
       properties: properties ?? {},
       groups: groups ?? [],
       topics: topics ?? [],
+      suppressionReason,
+      suppressedAt,
       createdAt: contact.createdAt,
       updatedAt: contact.updatedAt,
       event: CONTACT_GET_WEBHOOK_EVENT.id,
