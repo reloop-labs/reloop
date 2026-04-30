@@ -21,17 +21,13 @@ interface SubscriberPreviewProps {
 
 function Checkbox({
 	checked,
-	onChange,
 	isDarkMode,
 }: {
 	checked: boolean;
-	onChange: (v: boolean) => void;
 	isDarkMode: boolean;
 }) {
 	return (
-		<button
-			type="button"
-			onClick={() => onChange(!checked)}
+		<div
 			className={cn(
 				"flex h-4 w-4 flex-shrink-0 items-center justify-center rounded transition-all duration-150",
 				checked
@@ -39,23 +35,30 @@ function Checkbox({
 						? "bg-white"
 						: "bg-primary-base"
 					: cn(
-							"border bg-transparent hover:border-white/50",
+							"border bg-transparent",
 							isDarkMode ? "border-white/25" : "border-black/15",
 						),
 			)}
 		>
 			{checked && (
 				<svg
-					className={cn("h-2.5 w-2.5", isDarkMode ? "text-black" : "text-white")}
+					className={cn(
+						"h-2.5 w-2.5",
+						isDarkMode ? "text-black" : "text-white",
+					)}
 					fill="none"
 					viewBox="0 0 24 24"
 					stroke="currentColor"
 					strokeWidth={3}
 				>
-					<path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+					<path
+						strokeLinecap="round"
+						strokeLinejoin="round"
+						d="M5 13l4 4L19 7"
+					/>
 				</svg>
 			)}
-		</button>
+		</div>
 	);
 }
 
@@ -97,7 +100,7 @@ export function SubscriberPreview({
 		<div className={cn("w-full space-y-4", isDarkMode ? "dark" : "light")}>
 			<div
 				className={cn(
-					"relative overflow-hidden rounded-2xl p-6 transition-all duration-300 lg:p-8",
+					"relative overflow-hidden rounded-2xl px-4 pt-6 pb-4 transition-all duration-300",
 					"bg-white text-text-strong-950 shadow-lg ring-1 ring-black/5",
 					"dark:bg-[#111113] dark:text-white dark:shadow-xl dark:ring-1 dark:ring-white/5",
 				)}
@@ -132,12 +135,10 @@ export function SubscriberPreview({
 					<h2
 						className={cn(
 							"font-bold text-xl leading-tight",
-							"text-text-strong-950 dark:text-white",
+							"px-4 text-text-strong-950 dark:text-white",
 						)}
 					>
-						Do you want to
-						<br />
-						unsubscribe?
+						Do you want to unsubscribe?
 					</h2>
 					<p
 						className={cn(
@@ -162,9 +163,7 @@ export function SubscriberPreview({
 						)}
 					>
 						<p className="text-[11px] text-text-soft-400 dark:text-white/30">
-							No public channels yet.
-							<br />
-							Set a channel to Public to show it here.
+							No public channels yet. Set a channel to Public to show it here.
 						</p>
 					</div>
 				) : (
@@ -180,15 +179,12 @@ export function SubscriberPreview({
 									}))
 								}
 								className={cn(
-									"flex w-full gap-2 px-4 pt-3.5 pb-2 text-left transition-colors",
+									"flex w-full gap-2 rounded-2xl px-4 pt-3.5 pb-2 text-left transition-colors",
 									"hover:bg-bg-weak-50 dark:hover:bg-white/5",
 								)}
 							>
 								<Checkbox
 									checked={checked[channel.id] ?? false}
-									onChange={(val) =>
-										setChecked((prev) => ({ ...prev, [channel.id]: val }))
-									}
 									isDarkMode={isDarkMode}
 								/>
 								<div className="-mt-px min-w-0 flex-1">

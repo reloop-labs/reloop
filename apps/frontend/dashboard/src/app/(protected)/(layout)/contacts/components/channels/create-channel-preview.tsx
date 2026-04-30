@@ -26,17 +26,13 @@ interface CreateChannelPreviewProps {
 
 function Checkbox({
 	checked,
-	onChange,
 	isDarkMode,
 }: {
 	checked: boolean;
-	onChange: (v: boolean) => void;
 	isDarkMode: boolean;
 }) {
 	return (
-		<button
-			type="button"
-			onClick={() => onChange(!checked)}
+		<div
 			className={cn(
 				"flex h-4 w-4 flex-shrink-0 items-center justify-center rounded transition-all duration-150",
 				checked
@@ -44,7 +40,7 @@ function Checkbox({
 						? "bg-white"
 						: "bg-primary-base"
 					: cn(
-							"border bg-transparent hover:border-white/50",
+							"border bg-transparent",
 							isDarkMode ? "border-white/25" : "border-black/15",
 						),
 			)}
@@ -67,7 +63,7 @@ function Checkbox({
 					/>
 				</svg>
 			)}
-		</button>
+		</div>
 	);
 }
 
@@ -204,9 +200,6 @@ export function CreateChannelPreview({
 								>
 									<Checkbox
 										checked={checked[t.id] ?? false}
-										onChange={(val) =>
-											setChecked((prev) => ({ ...prev, [t.id]: val }))
-										}
 										isDarkMode={isDarkMode}
 									/>
 									<div className="-mt-px min-w-0 flex-1">

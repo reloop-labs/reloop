@@ -38,20 +38,16 @@ function isSubscribed(
 
 function Checkbox({
 	checked,
-	onChange,
 }: {
 	checked: boolean;
-	onChange: (v: boolean) => void;
 }) {
 	return (
-		<button
-			type="button"
-			onClick={() => onChange(!checked)}
+		<div
 			className={cn(
 				"flex h-4 w-4 flex-shrink-0 items-center justify-center rounded transition-all duration-150",
 				checked
 					? "bg-white"
-					: "border border-white/25 bg-transparent hover:border-white/50",
+					: "border border-white/25 bg-transparent",
 			)}
 		>
 			{checked && (
@@ -62,14 +58,10 @@ function Checkbox({
 					stroke="currentColor"
 					strokeWidth={3}
 				>
-					<path
-						strokeLinecap="round"
-						strokeLinejoin="round"
-						d="M5 13l4 4L19 7"
-					/>
+					<path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
 				</svg>
 			)}
-		</button>
+		</div>
 	);
 }
 
@@ -230,12 +222,7 @@ export function PreferencesContent({
 										"hover:bg-white/5 active:bg-white/10",
 									)}
 								>
-									<Checkbox
-										checked={checked[channel.id] ?? false}
-										onChange={(val) =>
-											setChecked((prev) => ({ ...prev, [channel.id]: val }))
-										}
-									/>
+									<Checkbox checked={checked[channel.id] ?? false} />
 									<div className="-mt-0.5 min-w-0 flex-1">
 										<p className="font-semibold text-[15px] text-white leading-5">
 											{channel.name}

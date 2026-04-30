@@ -20,20 +20,16 @@ interface SubscriberBrowserPreviewProps {
 
 function Checkbox({
 	checked,
-	onChange,
 }: {
 	checked: boolean;
-	onChange: (v: boolean) => void;
 }) {
 	return (
-		<button
-			type="button"
-			onClick={() => onChange(!checked)}
+		<div
 			className={cn(
 				"flex h-4 w-4 flex-shrink-0 items-center justify-center rounded transition-all duration-150",
 				checked
 					? "bg-white"
-					: "border border-white/25 bg-transparent hover:border-white/50",
+					: "border border-white/25 bg-transparent",
 			)}
 		>
 			{checked && (
@@ -44,14 +40,10 @@ function Checkbox({
 					stroke="currentColor"
 					strokeWidth={3}
 				>
-					<path
-						strokeLinecap="round"
-						strokeLinejoin="round"
-						d="M5 13l4 4L19 7"
-					/>
+					<path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
 				</svg>
 			)}
-		</button>
+		</div>
 	);
 }
 
@@ -178,12 +170,7 @@ export function SubscriberBrowserPreview({
 											: "hover:bg-white/5",
 									)}
 								>
-									<Checkbox
-										checked={checked[t.id] ?? false}
-										onChange={(val) =>
-											setChecked((prev) => ({ ...prev, [t.id]: val }))
-										}
-									/>
+									<Checkbox checked={checked[t.id] ?? false} />
 									<div className="min-w-0">
 										<div className="flex items-center gap-2">
 											<p className="font-medium text-sm text-white leading-4">
