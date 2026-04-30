@@ -45,8 +45,16 @@ CodeBlock.displayName = "CodeBlock";
 // Mintlify components use sub-components for items
 export const Tabs = MintlifyTabs;
 export const Tab = (MintlifyTabs as any).Item;
-export const Steps = MintlifySteps;
-export const Step = (MintlifySteps as any).Item;
+const Steps = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof MintlifySteps>>(
+	(props, ref) => (
+		<div ref={ref} suppressHydrationWarning>
+			<MintlifySteps {...props} />
+		</div>
+	),
+);
+Steps.displayName = "Steps";
 
-export { Accordion, Callout, Card, CodeBlock, CodeGroup, Icon, Info, Note, Tip, Warning };
+const Step = (MintlifySteps as any).Item;
+
+export { Accordion, Callout, Card, CodeBlock, CodeGroup, Icon, Info, Note, Steps, Step, Tip, Warning };
 

@@ -18,7 +18,6 @@ Replit is a collaborative development environment that lets you code, build, and
   </Step>
   <Step title="Add Reloop to your Replit project">
     Install the Reloop SDK in your Replit shell:
-
     ```bash
     npm install reloop
     ```
@@ -30,12 +29,9 @@ Replit is a collaborative development environment that lets you code, build, and
   </Step>
   <Step title="Send emails">
     Use the Reloop SDK in your application:
-
     ```javascript
     import { Reloop } from 'reloop';
-
     const reloop = new Reloop(process.env.RELOOP_API_KEY);
-
     await reloop.emails.send({
       from: 'you@yourdomain.com',
       to: 'user@example.com',
