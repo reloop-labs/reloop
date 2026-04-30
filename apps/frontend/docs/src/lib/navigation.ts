@@ -7,5 +7,5 @@ export const navigationTabs = [
 		url: "/knowledge-base",
 		iconName: "swatch-book" as const,
 	},
-	{ title: "Webhooks", url: "/webhook", iconName: "webhook" as const },
+	{ title: "Webhooks", url: "/webhooks", iconName: "webhook" as const },
 ];

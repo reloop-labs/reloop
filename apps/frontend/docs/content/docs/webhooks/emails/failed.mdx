@@ -1,0 +1,38 @@
+---
+title: "email.failed"
+sidebarTitle: "email.failed"
+description: "Webhook event triggered when an email is failed."
+---
+
+The `email.failed` event is triggered when an email's status changes to **failed**.
+
+## Payload
+
+```json
+{
+  "type": "email.failed",
+  "created_at": "2023-01-01T12:00:00Z",
+  "data": {
+    "email_id": "em_123456789",
+    "from": "sender@example.com",
+    "to": ["recipient@example.com"],
+    "subject": "Hello World",
+    "status": "failed",
+    "timestamp": "2023-01-01T12:00:00Z"
+  }
+}
+```
+
+## Handling this event
+
+When your endpoint receives an `email.failed` event, you might want to:
+
+- Update the status in your internal database.
+- Trigger an automated follow-up workflow.
+- Log the event for analytics purposes.
+- Notify relevant team members if the event indicates an issue (e.g., bounce or failure).
+
+## Learn More
+
+- [Webhooks Introduction](/docs/webhooks)
+- [All Event Types](/docs/webhooks/event-types)

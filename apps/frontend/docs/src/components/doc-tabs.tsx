@@ -30,7 +30,7 @@ export function DocTabs() {
 		},
 		{
 			title: "Webhooks",
-			url: "/webhook",
+			url: "/webhooks",
 			icon: "webhook",
 		},
 		{

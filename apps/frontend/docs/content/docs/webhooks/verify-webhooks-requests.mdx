@@ -1,0 +1,54 @@
+---
+title: Verify Webhooks Requests
+description: Secure your webhook endpoint by verifying that requests are coming from Reloop.
+---
+
+To ensure that webhook requests are authentic and coming from Reloop, you should verify the signature included in the request headers.
+
+## Signature Header
+
+Every webhook request from Reloop includes a `reloop-signature` header. This header contains a timestamp and one or more signatures.
+
+```
+reloop-signature: t=1672531200,v1=sha256_signature_here
+```
+
+## Verification Steps
+
+<Steps>
+  <Step title="Extract Timestamp and Signature">
+    Parse the `reloop-signature` header to get the timestamp (`t`) and the signature (`v1`).
+  </Step>
+  <Step title="Construct the Signed Payload">
+    Concatenate the timestamp, a dot `.`, and the raw JSON request body.
+  </Step>
+  <Step title="Compute HMAC">
+    Use your webhook's secret key to compute an HMAC with SHA256 hashing.
+  </Step>
+  <Step title="Compare Signatures">
+    Verify that the computed HMAC matches the signature from the header.
+  </Step>
+</Steps>
+
+## Example Implementation (Node.js)
+
+```javascript
+const crypto = require('crypto');
+
+function verifyWebhook(payload, header, secret) {
+  const parts = header.split(',');
+  const timestamp = parts.find(p => p.startsWith('t=')).split('=')[1];
+  const signature = parts.find(p => p.startsWith('v1=')).split('=')[1];
+
+  const signedPayload = `${timestamp}.${payload}`;
+  const expectedSignature = crypto
+    .createHmac('sha256', secret)
+    .update(signedPayload)
+    .digest('hex');
+
+  return crypto.timingSafeEqual(
+    Buffer.from(signature),
+    Buffer.from(expectedSignature)
+  );
+}
+```

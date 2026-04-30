@@ -1,0 +1,30 @@
+---
+title: Retries and Replays
+description: How Reloop handles webhook delivery failures and how to replay events.
+---
+
+Reloop ensures that your webhooks are delivered reliably. If your server is down or returns an error, we will retry the delivery.
+
+## Delivery Retries
+
+If your webhook endpoint returns anything other than a `2xx` status code, Reloop will attempt to retry the delivery using an exponential backoff strategy.
+
+- **Initial Retry**: 1 minute after the first failure.
+- **Maximum Retries**: Up to 15 attempts over 48 hours.
+- **Deactivation**: If a webhook fails consistently for a long period, it may be automatically disabled.
+
+## Manual Replays
+
+You can manually replay any webhook event from the Reloop Dashboard. This is useful if your server was down for an extended period or if you need to re-process an event after fixing a bug.
+
+<Steps>
+  <Step title="Go to Webhooks">
+    Navigate to the [Webhooks](https://app.reloop.dev/webhooks) section in your dashboard.
+  </Step>
+  <Step title="View Logs">
+    Select the webhook and view the delivery logs.
+  </Step>
+  <Step title="Click Replay">
+    Click the "Replay" button next to any failed delivery attempt.
+  </Step>
+</Steps>

@@ -1,0 +1,42 @@
+---
+title: Event Types
+description: List of all events you can subscribe to via webhooks.
+---
+
+Reloop supports several event types that you can subscribe to. Each event has a specific payload structure.
+
+## Email Events
+
+| Event | Description |
+|-------|-------------|
+| `email.sent` | Triggered when an email is successfully sent to the upstream provider. |
+| `email.delivered` | Triggered when an email is successfully delivered to the recipient. |
+| `email.bounced` | Triggered when an email bounces. |
+| `email.opened` | Triggered when a recipient opens an email. |
+| `email.clicked` | Triggered when a recipient clicks a link in an email. |
+| `email.complained` | Triggered when a recipient marks an email as spam. |
+| `email.failed` | Triggered when an email fails to send. |
+| `email.received` | Triggered when an inbound email is received. |
+
+## Payload Structure
+
+All webhook payloads follow a consistent structure:
+
+```json
+{
+  "type": "email.delivered",
+  "created_at": "2023-01-01T12:00:00Z",
+  "data": {
+    "email_id": "em_123456789",
+    "from": "sender@example.com",
+    "to": ["recipient@example.com"],
+    "subject": "Hello World",
+    "status": "delivered"
+  }
+}
+```
+
+## Learn More
+
+- [Introduction](/docs/webhooks)
+- [Email Delivered Event](/docs/webhooks/emails/delivered)

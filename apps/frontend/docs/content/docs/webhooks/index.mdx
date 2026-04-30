@@ -1,0 +1,40 @@
+---
+title: Introduction
+description: Real-time event notifications for your application.
+---
+
+Webhooks allow you to build or set up integrations which subscribe to certain events on Reloop. When one of those events is triggered, we'll send a HTTP POST payload to the webhook's configured URL.
+
+## What are Webhooks?
+
+Webhooks are "user-defined HTTP callbacks". They are usually triggered by some event, such as an email being delivered or opened. When that event occurs, the source site makes an HTTP request to the URL configured for the webhook. Users can configure them to cause events on one site to invoke behavior on another.
+
+## Use Cases
+
+- **Deliverability Monitoring**: Track bounces and complaints in real-time.
+- **Engagement Tracking**: Update your CRM when an email is opened or clicked.
+- **Syncing Data**: Keep your database in sync with email status updates.
+- **Custom Notifications**: Trigger internal alerts based on specific email events.
+
+## Getting Started
+
+<Steps>
+  <Step title="Create a Webhook Endpoint">
+    Set up a URL on your server that can receive HTTP POST requests.
+  </Step>
+  <Step title="Register in Reloop">
+    Go to the [Reloop Dashboard](https://app.reloop.dev/webhooks) and add your endpoint URL.
+  </Step>
+  <Step title="Select Events">
+    Choose the events you want to subscribe to (e.g., `email.delivered`, `email.bounced`).
+  </Step>
+  <Step title="Handle Payloads">
+    Implement logic on your server to process the JSON payloads sent by Reloop.
+  </Step>
+</Steps>
+
+## Learn More
+
+- [Event Types](/docs/webhooks/event-types)
+- [Verifying Requests](/docs/webhooks/verify-webhooks-requests)
+- [Retries and Replays](/docs/webhooks/retries-and-replays)

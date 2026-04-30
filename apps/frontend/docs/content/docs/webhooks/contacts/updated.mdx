@@ -1,0 +1,36 @@
+---
+title: "contact.updated"
+sidebarTitle: "contact.updated"
+description: "Webhook event triggered when a contact is updated."
+---
+
+The `contact.updated` event is triggered when a contact is **updated** in your audience.
+
+## Payload
+
+```json
+{
+  "type": "contact.updated",
+  "created_at": "2023-01-01T12:00:00Z",
+  "data": {
+    "contact_id": "con_123456789",
+    "email": "user@example.com",
+    "first_name": "John",
+    "last_name": "Doe",
+    "unsubscribed": false
+  }
+}
+```
+
+## Handling this event
+
+When your endpoint receives a `contact.updated` event, you might want to:
+
+- Synchronize contact details with your CRM or external database.
+- Trigger onboarding emails for new contacts.
+- Update subscription preferences in real-time.
+
+## Learn More
+
+- [Webhooks Introduction](/docs/webhooks)
+- [All Event Types](/docs/webhooks/event-types)
