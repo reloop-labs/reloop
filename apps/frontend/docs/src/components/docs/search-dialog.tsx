@@ -116,6 +116,11 @@ export function SearchDialog({ open, onOpenChange, tree }: SearchDialogProps) {
 									transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
 									className="relative w-full max-w-2xl overflow-hidden rounded-2xl border border-fd-border bg-fd-popover shadow-2xl"
 								>
+									<Dialog.Title className="sr-only">Search Documentation</Dialog.Title>
+									<Dialog.Description className="sr-only">
+										Search for guides, API references, and quickstarts.
+									</Dialog.Description>
+
 									{/* Search Input Area */}
 									<div className="flex items-center border-fd-border border-b px-4 py-3">
 										<Search className="mr-3 h-5 w-5 text-fd-muted-foreground" />
