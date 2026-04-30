@@ -22,7 +22,7 @@ export const EmptyState = ({ onCreateClick }: EmptyStateProps) => {
 				Organise contacts by interest so they only receive the messages they
 				care about.
 			</p>
-			<div className="flex items-center gap-3">
+			<div className="flex flex-col gap-3">
 				<Button.Root
 					variant="neutral"
 					mode="stroke"

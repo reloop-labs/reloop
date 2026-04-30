@@ -1,13 +1,13 @@
 "use client";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { Icon } from "@reloop/ui/icon";
-import { SubscriberPreview } from "./subscriber-preview";
+import { useRouter } from "next/navigation";
 
 import { useQueryState } from "nuqs";
 import { toast } from "sonner";
 import useSWR, { useSWRConfig } from "swr";
-import { useRouter } from "next/navigation";
 import { ChannelCards } from "./channel-cards";
+import { SubscriberPreview } from "./subscriber-preview";
 
 interface Channel {
 	id: string;
@@ -32,14 +32,11 @@ interface ChannelListResponse {
 export const ChannelList = () => {
 	const { activeOrganization } = useUserOrganization();
 	const { mutate } = useSWRConfig();
-	const router = useRouter();
 	const [, setModal] = useQueryState("modal", { history: "replace" });
 	const [, setId] = useQueryState("id", { history: "replace" });
 
 	const { data, error, isLoading } = useSWR<ChannelListResponse>(
-		activeOrganization?.id
-			? "/api/contacts/v1/channels/list?limit=100"
-			: null,
+		activeOrganization?.id ? "/api/contacts/v1/channels/list?limit=100" : null,
 		{
 			revalidateOnFocus: true,
 			revalidateOnReconnect: true,
@@ -62,7 +59,8 @@ export const ChannelList = () => {
 			toast.success(`Visibility set to ${newValue}`);
 			mutate(
 				(key: string) =>
-					typeof key === "string" && key.startsWith("/api/contacts/v1/channels"),
+					typeof key === "string" &&
+					key.startsWith("/api/contacts/v1/channels"),
 			);
 		} catch {
 			toast.error("Failed to update visibility");
@@ -108,10 +106,7 @@ export const ChannelList = () => {
 			{/* Right: Subscriber preview — always shows all public channels */}
 			<div className="w-[320px] flex-shrink-0">
 				<div className="sticky top-6">
-					<SubscriberPreview
-						channels={allChannels}
-						orgName={orgName}
-					/>
+					<SubscriberPreview channels={allChannels} orgName={orgName} />
 				</div>
 			</div>
 		</div>
