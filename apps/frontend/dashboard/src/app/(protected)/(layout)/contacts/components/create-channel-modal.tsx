@@ -147,8 +147,8 @@ export const CreateChannelModal = ({
 
 	const previewChannel = {
 		id: "new-channel",
-		name: name || "Channel Name",
-		description: description || null,
+		name: name.trim(),
+		description: description.trim() || null,
 		defaultSubscription,
 		visibility,
 	};
