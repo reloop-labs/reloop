@@ -45,7 +45,7 @@ export default function RootLayout({
 	return (
 		<html lang="en" suppressHydrationWarning className={openRunde.variable}>
 			<body
-				className="bg-bg-white-0 text-text-strong-950 antialiased"
+				className="bg-black text-white antialiased"
 				style={{ fontFamily: "var(--font-open-runde)" }}
 			>
 				<ThemeProvider
