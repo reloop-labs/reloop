@@ -1,5 +1,6 @@
 "use client";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
+import { SubscriberPreview } from "./subscriber-preview";
 
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
@@ -55,18 +56,14 @@ export const TopicList = () => {
 		},
 	);
 
-	const totalPages = data ? Math.ceil(data.total / pageSize) : 1;
-	const startIndex = (currentPage - 1) * pageSize + 1;
-	const endIndex = Math.min(currentPage * pageSize, data?.total || 0);
-
 	// Filter topics based on search query
 	const filteredTopics =
 		data?.topics?.filter((topic) => {
-			const matchesSearch =
+			return (
 				searchQuery === "" ||
 				topic.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-				topic.description?.toLowerCase().includes(searchQuery.toLowerCase());
-			return matchesSearch;
+				topic.description?.toLowerCase().includes(searchQuery.toLowerCase())
+			);
 		}) || [];
 
 	const handleToggleVisibility = async (
@@ -103,55 +100,71 @@ export const TopicList = () => {
 		);
 	}
 
+	const allTopics = data?.topics ?? [];
+	const orgName = activeOrganization?.name ?? "Your Organization";
+
 	return (
-		<div>
-			<div className="flex items-center gap-3">
-				<div className="flex-1">
-					<Input.Root size="xsmall" className="rounded-[10px]">
-						<Input.Wrapper>
-							<Input.Icon
-								as={Icon}
-								name="search"
-								size="xsmall"
-								className="h-3.5 w-3.5"
-							/>
-							<Input.Input
-								placeholder="Search topics..."
-								value={searchQuery}
-								onChange={(e) => {
-									setSearchQuery(e.target.value);
-									setCurrentPage(1);
-								}}
-							/>
-						</Input.Wrapper>
-					</Input.Root>
+		<div className="flex gap-6">
+			{/* Left: Topic table */}
+			<div className="min-w-0 flex-1">
+				<div className="flex items-center gap-3">
+					<div className="flex-1">
+						<Input.Root size="xsmall" className="rounded-[10px]">
+							<Input.Wrapper>
+								<Input.Icon
+									as={Icon}
+									name="search"
+									size="xsmall"
+									className="h-3.5 w-3.5"
+								/>
+								<Input.Input
+									placeholder="Search topics..."
+									value={searchQuery}
+									onChange={(e) => {
+										setSearchQuery(e.target.value);
+										setCurrentPage(1);
+									}}
+								/>
+							</Input.Wrapper>
+						</Input.Root>
+					</div>
+				</div>
+
+				<div className="mt-4">
+					<TopicTable
+						topics={filteredTopics}
+						total={data?.total || 0}
+						currentPage={currentPage}
+						pageSize={pageSize}
+						onPageChange={setCurrentPage}
+						onPageSizeChange={(size) => {
+							setPageSize(size);
+							setCurrentPage(1);
+						}}
+						isLoading={isLoading}
+						loadingRows={4}
+						onToggleVisibility={handleToggleVisibility}
+						onEdit={(topicId) => {
+							setModal("edit-topic");
+							setId(topicId);
+						}}
+						onDelete={(topicId) => {
+							setModal("delete-topic");
+							setId(topicId);
+						}}
+						onAddTopic={() => router.push("/contacts/topics/add")}
+					/>
 				</div>
 			</div>
 
-			<div className="mt-4">
-				<TopicTable
-					topics={filteredTopics}
-					total={data?.total || 0}
-					currentPage={currentPage}
-					pageSize={pageSize}
-					onPageChange={setCurrentPage}
-					onPageSizeChange={(size) => {
-						setPageSize(size);
-						setCurrentPage(1);
-					}}
-					isLoading={isLoading}
-					loadingRows={4}
-					onToggleVisibility={handleToggleVisibility}
-					onEdit={(topicId) => {
-						setModal("edit-topic");
-						setId(topicId);
-					}}
-					onDelete={(topicId) => {
-						setModal("delete-topic");
-						setId(topicId);
-					}}
-					onAddTopic={() => router.push("/contacts/topics/add")}
-				/>
+			{/* Right: Subscriber preview — always shows all public topics */}
+			<div className="w-[320px] flex-shrink-0">
+				<div className="sticky top-6">
+					<SubscriberPreview
+						topics={allTopics}
+						orgName={orgName}
+					/>
+				</div>
 			</div>
 		</div>
 	);

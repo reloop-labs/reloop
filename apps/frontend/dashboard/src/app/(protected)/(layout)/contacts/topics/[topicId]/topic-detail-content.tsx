@@ -1,4 +1,5 @@
 "use client";
+import { SubscriberPreview } from "@fe/dashboard/app/(protected)/(layout)/contacts/topics/[topicId]/components/subscriber-preview";
 import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
@@ -112,6 +113,14 @@ export const TopicDetailContent = () => {
 			onError: () => {},
 		},
 	);
+
+	// Fetch sibling public topics for realistic preview context
+	const { data: allTopicsData } = useSWR<{ topics: TopicData[] }>(
+		"/api/contacts/v1/topics/list?limit=10",
+		{ revalidateOnFocus: false },
+	);
+	const siblingTopics = allTopicsData?.topics ?? [];
+
 	const { data: subscriptionData, isLoading: subscriptionLoading } =
 		useSWR<SubscriptionListResponse>(
 			`/api/contacts/v1/subscriptions/list?topicId=${topicId}&limit=100`,
@@ -513,6 +522,16 @@ export const TopicDetailContent = () => {
 					</div>
 				)}
 			</div>
+
+			{/* Subscriber preview — visual representation of the end-user preferences page */}
+			{topicData && (
+				<SubscriberPreview
+					topic={topicData}
+					siblingTopics={siblingTopics as TopicData[]}
+					orgName="Your Organization"
+					contactEmail="subscriber@example.com"
+				/>
+			)}
 		</div>
 	);
 };
