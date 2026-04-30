@@ -4,7 +4,6 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
 import { Skeleton } from "@reloop/ui/skeleton";
-import * as Switch from "@reloop/ui/switch";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
@@ -22,6 +21,7 @@ interface CreateChannelPreviewProps {
 	siblingChannels?: Channel[];
 	orgName?: string;
 	contactEmail?: string;
+	badgeLabel?: string;
 }
 
 function Checkbox({
@@ -76,6 +76,7 @@ export function CreateChannelPreview({
 	siblingChannels = [],
 	orgName = "Your Organization",
 	contactEmail = "subscriber@example.com",
+	badgeLabel = "New",
 }: CreateChannelPreviewProps) {
 	const [isDarkMode, setIsDarkMode] = useState(true);
 
@@ -230,7 +231,7 @@ export function CreateChannelPreview({
 												)}
 												{isCurrent && (
 													<span className="rounded-full bg-primary-base px-2 py-0.5 font-semibold text-[10px] text-white">
-														New
+														{badgeLabel}
 													</span>
 												)}
 											</div>

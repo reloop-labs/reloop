@@ -253,7 +253,7 @@ export const EditChannelModal = ({
 								<div className="mt-2 space-y-3">
 									<label
 										htmlFor="default-subscription"
-										className="flex w-full cursor-pointer gap-2 rounded-xl border border-stroke-soft-100 p-3 transition-colors hover:bg-bg-weak-50/50 dark:border-stroke-soft-100/40"
+										className="flex w-full cursor-pointer gap-2 rounded-2xl border border-stroke-soft-100 p-3 transition-colors hover:bg-bg-weak-50/50 dark:border-stroke-soft-100/40"
 									>
 										<Checkbox.Root
 											id="default-subscription"
@@ -277,7 +277,7 @@ export const EditChannelModal = ({
 
 									<label
 										htmlFor="public-visibility"
-										className="flex w-full cursor-pointer gap-2 rounded-xl border border-stroke-soft-100 p-3 transition-colors hover:bg-bg-weak-50/50 dark:border-stroke-soft-100/40"
+										className="flex w-full cursor-pointer gap-2 rounded-2xl border border-stroke-soft-100 p-3 transition-colors hover:bg-bg-weak-50/50 dark:border-stroke-soft-100/40"
 									>
 										<Checkbox.Root
 											id="public-visibility"
@@ -343,6 +343,7 @@ export const EditChannelModal = ({
 									channel={previewChannel}
 									siblingChannels={channelsData?.channels}
 									orgName="Your Organization"
+									badgeLabel="Editing"
 								/>
 							</div>
 						</div>
