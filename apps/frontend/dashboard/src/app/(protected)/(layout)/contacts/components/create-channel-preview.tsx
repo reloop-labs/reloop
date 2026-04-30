@@ -3,6 +3,7 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
+import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
 interface Channel {
@@ -191,15 +192,28 @@ export function CreateChannelPreview({
 										)}
 									</div>
 								</button>
-								{isCurrent && isPrivate && (
-									<div className="flex gap-2 rounded-b-[15px] bg-primary-base px-4 py-2">
-										<Icon name="lock" className="h-3.5 w-3.5 text-white/90" />
-										<p className="font-medium text-[11px] text-white leading-tight">
-											Currently <strong>Private</strong>. Hidden from
-											subscribers until set to Public.
-										</p>
-									</div>
-								)}
+								<AnimatePresence initial={false}>
+									{isCurrent && isPrivate && (
+										<motion.div
+											initial={{ height: 0, opacity: 0 }}
+											animate={{ height: "auto", opacity: 1 }}
+											exit={{ height: 0, opacity: 0 }}
+											transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+											className="overflow-hidden"
+										>
+											<div className="flex gap-2 rounded-b-[15px] bg-primary-base px-4 py-2">
+												<Icon
+													name="lock"
+													className="h-3.5 w-3.5 text-white/90"
+												/>
+												<p className="font-medium text-[11px] text-white leading-tight">
+													Currently <strong>Private</strong>. Hidden from
+													subscribers until set to Public.
+												</p>
+											</div>
+										</motion.div>
+									)}
+								</AnimatePresence>
 							</div>
 						);
 					})}
