@@ -124,6 +124,39 @@ export async function listContactsController({
       );
     }
 
+    // Batch load topics and enrollments for all contacts in the list
+    const allOrgTopics = await db.query.topic.findMany({
+      where: and(
+        eq(schema.topic.organizationId, organizationId),
+        isNull(schema.topic.deletedAt),
+      ),
+    });
+
+    let enrollmentMap: Record<string, Record<string, "enrolled" | "unenrolled">> = {};
+    if (contactIds.length > 0) {
+      const allEnrollments = await db.query.topicEnrollment.findMany({
+        where: and(
+          inArray(schema.topicEnrollment.contactId, contactIds),
+          isNull(schema.topicEnrollment.deletedAt),
+        ),
+      });
+
+      enrollmentMap = allEnrollments.reduce(
+        (acc, curr) => {
+          const contactId = curr.contactId;
+          if (!acc[contactId]) {
+            acc[contactId] = {};
+          }
+          const contactEnrollments = acc[contactId];
+          if (contactEnrollments) {
+            contactEnrollments[curr.topicId] = curr.status;
+          }
+          return acc;
+        },
+        {} as Record<string, Record<string, "enrolled" | "unenrolled">>,
+      );
+    }
+
     const formattedContacts = contacts.map((contact) => ({
       object: "contact" as const,
       id: contact.id,
@@ -133,7 +166,18 @@ export async function listContactsController({
       status: contact.status,
       properties: propertyMap[contact.id] || {},
       groups: (contact as ContactTypes.ContactData).groups ?? [],
-      topics: (contact as ContactTypes.ContactData).topics ?? [],
+      topics: allOrgTopics.map((t) => {
+        const explicitStatus = enrollmentMap[contact.id]?.[t.id];
+        return {
+          id: t.id,
+          name: t.name,
+          subscription: (explicitStatus
+            ? explicitStatus === "enrolled"
+              ? "opt_in"
+              : "opt_out"
+            : t.defaultSubscription) as "opt_in" | "opt_out",
+        };
+      }),
       // Suppression is on the contact row itself — no extra query
       suppressionReason: contact.suppressionReason ?? null,
       suppressedAt: contact.suppressedAt ?? null,

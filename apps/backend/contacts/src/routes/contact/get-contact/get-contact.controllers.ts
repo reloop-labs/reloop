@@ -59,16 +59,37 @@ export async function getContactController({
       .filter((cg) => cg.group !== null)
       .map((cg) => ({ id: cg.group.id, name: cg.group.name }));
 
+    // Get all organization topics to merge with explicit enrollments
+    const allTopics = await db.query.topic.findMany({
+      where: and(
+        eq(schema.topic.organizationId, organizationId),
+        isNull(schema.topic.deletedAt),
+      ),
+    });
+
     // Map enrollments to { id, name, subscription }
-    const topics = contact.contactTopics
-      .filter((en) => en.topic !== null && en.topic.deletedAt === null)
-      .map((en) => ({
-        id: en.topic.id,
-        name: en.topic.name,
-        subscription: (en.status === "enrolled" ? "opt_in" : "opt_out") as
-          | "opt_in"
-          | "opt_out",
-      }));
+    const topics = allTopics.map((t) => {
+      const explicitEnrollment = contact.contactTopics.find(
+        (en) => en.topicId === t.id && en.deletedAt === null,
+      );
+
+      if (explicitEnrollment) {
+        return {
+          id: t.id,
+          name: t.name,
+          subscription: (explicitEnrollment.status === "enrolled"
+            ? "opt_in"
+            : "opt_out") as "opt_in" | "opt_out",
+        };
+      }
+
+      // Fallback to topic default if no explicit enrollment exists
+      return {
+        id: t.id,
+        name: t.name,
+        subscription: t.defaultSubscription as "opt_in" | "opt_out",
+      };
+    });
 
     // Suppression is flat on the contact row
     const suppressionReason = contact.suppressionReason ?? null;
