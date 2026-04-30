@@ -46,11 +46,14 @@ CodeBlock.displayName = "CodeBlock";
 export const Tabs = MintlifyTabs;
 export const Tab = (MintlifyTabs as any).Item;
 const Steps = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof MintlifySteps>>(
-	(props, ref) => (
-		<div ref={ref} suppressHydrationWarning>
-			<MintlifySteps {...props} />
-		</div>
-	),
+	({ children, ...props }, ref) => {
+		const validChildren = React.Children.toArray(children).filter(React.isValidElement);
+		return (
+			<div ref={ref} suppressHydrationWarning>
+				<MintlifySteps {...props}>{validChildren}</MintlifySteps>
+			</div>
+		);
+	},
 );
 Steps.displayName = "Steps";
 
