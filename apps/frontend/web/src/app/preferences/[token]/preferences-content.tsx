@@ -1,342 +1,327 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
+import { Logo } from "@reloop/ui/logo";
+import { useCallback, useEffect, useState } from "react";
 
 interface ChannelData {
-  id: string;
-  name: string;
-  description: string | null;
-  defaultSubscription: "opt_in" | "opt_out";
-  status: "enrolled" | "unenrolled" | "none";
+	id: string;
+	name: string;
+	description: string | null;
+	defaultSubscription: "opt_in" | "opt_out";
+	status: "enrolled" | "unenrolled" | "none";
 }
 
 interface Props {
-  token: string;
-  contact: {
-    email: string;
-    firstName: string | null;
-    lastName: string | null;
-  };
-  organization: {
-    name: string;
-  };
-  channels: ChannelData[];
+	token: string;
+	contact: {
+		email: string;
+		firstName: string | null;
+		lastName: string | null;
+	};
+	organization: {
+		name: string;
+	};
+	channels: ChannelData[];
 }
 
-type SaveState = "idle" | "saving" | "saved" | "error";
-
-function isSubscribed(status: ChannelData["status"], defaultSubscription: "opt_in" | "opt_out") {
-  if (status === "enrolled") return true;
-  if (status === "unenrolled") return false;
-  // "none" — fall back to default
-  return defaultSubscription === "opt_in";
+function isSubscribed(
+	status: ChannelData["status"],
+	defaultSubscription: "opt_in" | "opt_out",
+) {
+	if (status === "enrolled") return true;
+	if (status === "unenrolled") return false;
+	// "none" — fall back to default
+	return defaultSubscription === "opt_in";
 }
 
-function Toggle({
-  checked,
-  onChange,
-  saving,
-  id,
+function Checkbox({
+	checked,
+	onChange,
 }: {
-  checked: boolean;
-  onChange: (checked: boolean) => void;
-  saving: boolean;
-  id: string;
+	checked: boolean;
+	onChange: (v: boolean) => void;
 }) {
-  return (
-    <button
-      id={id}
-      type="button"
-      role="switch"
-      aria-checked={checked}
-      disabled={saving}
-      onClick={() => onChange(!checked)}
-      className={[
-        "relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60",
-        checked ? "bg-blue-600" : "bg-gray-200 dark:bg-gray-700",
-      ].join(" ")}
-    >
-      <span
-        aria-hidden="true"
-        className={[
-          "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out",
-          checked ? "translate-x-5" : "translate-x-0",
-        ].join(" ")}
-      />
-    </button>
-  );
+	return (
+		<button
+			type="button"
+			onClick={() => onChange(!checked)}
+			className={cn(
+				"flex h-4 w-4 flex-shrink-0 items-center justify-center rounded transition-all duration-150",
+				checked
+					? "bg-white"
+					: "border border-white/25 bg-transparent hover:border-white/50",
+			)}
+		>
+			{checked && (
+				<svg
+					className="h-2.5 w-2.5 text-black"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+					strokeWidth={3}
+				>
+					<path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+				</svg>
+			)}
+		</button>
+	);
 }
 
-function SaveIndicator({ state }: { state: SaveState }) {
-  if (state === "idle") return null;
-  if (state === "saving") {
-    return (
-      <svg
-        className="h-4 w-4 animate-spin text-gray-400"
-        fill="none"
-        viewBox="0 0 24 24"
-        aria-label="Saving"
-      >
-        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-      </svg>
-    );
-  }
-  if (state === "saved") {
-    return (
-      <svg className="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-label="Saved">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-      </svg>
-    );
-  }
-  if (state === "error") {
-    return (
-      <svg className="h-4 w-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-label="Error">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-      </svg>
-    );
-  }
-  return null;
-}
+export function PreferencesContent({
+	token,
+	contact,
+	organization,
+	channels,
+}: Props) {
+	// Local state for checkboxes
+	const [checked, setChecked] = useState<Record<string, boolean>>(() =>
+		Object.fromEntries(
+			channels.map((t) => [t.id, isSubscribed(t.status, t.defaultSubscription)]),
+		),
+	);
 
-export function PreferencesContent({ token, contact, organization, channels }: Props) {
-  const [channelStates, setChannelStates] = useState<
-    Record<string, { subscribed: boolean; saveState: SaveState }>
-  >(() =>
-    Object.fromEntries(
-      channels.map((t) => [
-        t.id,
-        {
-          subscribed: isSubscribed(t.status, t.defaultSubscription),
-          saveState: "idle" as SaveState,
-        },
-      ]),
-    ),
-  );
+	// Baseline state to track what's currently saved on the server
+	const [baseline, setBaseline] = useState<Record<string, boolean>>(() =>
+		Object.fromEntries(
+			channels.map((t) => [t.id, isSubscribed(t.status, t.defaultSubscription)]),
+		),
+	);
 
-  const [unsubscribeAllState, setUnsubscribeAllState] = useState<
-    "idle" | "confirming" | "loading" | "done"
-  >("idle");
+	const [saveState, setSaveState] = useState<
+		"idle" | "saving" | "saved" | "error"
+	>("idle");
+	const [unsubscribeAllState, setUnsubscribeAllState] = useState<
+		"idle" | "confirming" | "loading" | "done"
+	>("idle");
 
-  const handleToggle = useCallback(
-    async (channelId: string, subscribed: boolean) => {
-      // Optimistic update
-      setChannelStates((prev) => ({
-        ...prev,
-        [channelId]: { subscribed, saveState: "saving" },
-      }));
+	const handleUpdate = useCallback(async () => {
+		// Only update channels that have changed from the baseline
+		const changedChannels = channels.filter(
+			(c) => checked[c.id] !== baseline[c.id],
+		);
 
-      try {
-        const res = await fetch(`/api/contacts/v1/preferences/update/${token}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ channelId, subscribe: subscribed }),
-        });
+		if (changedChannels.length === 0) {
+			setSaveState("saved");
+			setTimeout(() => setSaveState("idle"), 2000);
+			return;
+		}
 
-        if (!res.ok) throw new Error("Failed to update");
+		setSaveState("saving");
+		try {
+			const updates = changedChannels.map(async (channel) => {
+				const targetSubscribed = checked[channel.id];
+				const res = await fetch(
+					`/api/contacts/v1/preferences/update/${token}`,
+					{
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({
+							channelId: channel.id,
+							subscribe: targetSubscribed,
+						}),
+					},
+				);
+				if (!res.ok) throw new Error("Failed to update " + channel.name);
+			});
 
-        setChannelStates((prev) => ({
-          ...prev,
-          [channelId]: { subscribed, saveState: "saved" },
-        }));
+			await Promise.all(updates);
 
-        // Reset to idle after 2s
-        setTimeout(() => {
-          setChannelStates((prev) => ({
-            ...prev,
-            [channelId]: { ...prev[channelId], saveState: "idle" },
-          }));
-        }, 2000);
-      } catch {
-        // Revert on error
-        setChannelStates((prev) => ({
-          ...prev,
-          [channelId]: { subscribed: !subscribed, saveState: "error" },
-        }));
-        setTimeout(() => {
-          setChannelStates((prev) => ({
-            ...prev,
-            [channelId]: { ...prev[channelId], saveState: "idle" },
-          }));
-        }, 3000);
-      }
-    },
-    [token],
-  );
+			// Update baseline after successful save
+			setBaseline({ ...checked });
+			setSaveState("saved");
+			setTimeout(() => setSaveState("idle"), 2000);
+		} catch (error) {
+			console.error(error);
+			setSaveState("error");
+			setTimeout(() => setSaveState("idle"), 3000);
+		}
+	}, [token, checked, channels, baseline]);
 
-  const handleUnsubscribeAll = useCallback(async () => {
-    if (unsubscribeAllState === "confirming") {
-      setUnsubscribeAllState("loading");
-      try {
-        const res = await fetch(`/api/contacts/v1/preferences/unsubscribe-all/${token}`, {
-          method: "POST",
-        });
-        if (!res.ok) throw new Error("Failed");
+	const handleUnsubscribeAll = useCallback(async () => {
+		if (unsubscribeAllState === "confirming") {
+			setUnsubscribeAllState("loading");
+			try {
+				const res = await fetch(
+					`/api/contacts/v1/preferences/unsubscribe-all/${token}`,
+					{
+						method: "POST",
+					},
+				);
+				if (!res.ok) throw new Error("Failed");
 
-        // Mark all as unsubscribed
-        setChannelStates((prev) =>
-          Object.fromEntries(
-            Object.entries(prev).map(([id, state]) => [
-              id,
-              { ...state, subscribed: false, saveState: "saved" as SaveState },
-            ]),
-          ),
-        );
-        setUnsubscribeAllState("done");
-      } catch {
-        setUnsubscribeAllState("idle");
-      }
-    } else {
-      setUnsubscribeAllState("confirming");
-      setTimeout(() => {
-        setUnsubscribeAllState((s) => (s === "confirming" ? "idle" : s));
-      }, 4000);
-    }
-  }, [token, unsubscribeAllState]);
+				// Update local state and baseline
+				const unsubscribedState = Object.fromEntries(
+					channels.map((t) => [t.id, false]),
+				);
+				setChecked(unsubscribedState);
+				setBaseline(unsubscribedState);
+				setUnsubscribeAllState("done");
+				setTimeout(() => setUnsubscribeAllState("idle"), 3000);
+			} catch {
+				setUnsubscribeAllState("idle");
+			}
+		} else {
+			setUnsubscribeAllState("confirming");
+			setTimeout(() => {
+				setUnsubscribeAllState((s) => (s === "confirming" ? "idle" : s));
+			}, 4000);
+		}
+	}, [token, unsubscribeAllState, channels]);
 
-  const displayName =
-    contact.firstName
-      ? `${contact.firstName}${contact.lastName ? ` ${contact.lastName}` : ""}`
-      : contact.email;
+	const displayName = contact.firstName
+		? `${contact.firstName}${contact.lastName ? ` ${contact.lastName}` : ""}`
+		: contact.email;
 
-  return (
-    <div className="min-h-screen bg-[#f8f9fb] dark:bg-[#0d0f14]">
-      {/* Header */}
-      <div className="border-b border-gray-200/80 bg-white/80 backdrop-blur-sm dark:border-white/8 dark:bg-white/4">
-        <div className="mx-auto flex h-14 max-w-2xl items-center justify-between px-4 sm:px-6">
-          <div className="flex items-center gap-2.5">
-            {/* Reloop logo mark */}
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#1a1d23] dark:bg-white/10">
-              <svg viewBox="0 0 24 24" className="h-4 w-4 fill-white" aria-hidden="true">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" />
-              </svg>
-            </div>
-            <span className="font-semibold text-sm text-text-strong-950">
-              {organization.name}
-            </span>
-          </div>
-          <span className="text-text-sub-600 text-xs">{contact.email}</span>
-        </div>
-      </div>
+	return (
+		<div className="flex min-h-screen items-center justify-center bg-[#0d0f14] px-4 py-12">
+			<div className="w-full max-w-[440px]">
+				{/* Phone-style dark card */}
+				<div className="relative overflow-hidden rounded-[32px] bg-[#111113] p-8 shadow-2xl ring-1 ring-white/10 lg:p-10">
+					{/* Logo Section */}
+					<div className="mb-8 flex justify-center">
+						<div className="flex h-12 w-12 items-center justify-center rounded-full border border-white/15 bg-white/5">
+							<Logo theme="dark" className="h-6 w-6" />
+						</div>
+					</div>
 
-      {/* Main content */}
-      <main className="mx-auto max-w-2xl px-4 py-10 sm:px-6">
-        {/* Title */}
-        <div className="mb-8">
-          <h1 className="font-semibold text-2xl text-text-strong-950">
-            Email Preferences
-          </h1>
-          <p className="mt-1.5 text-sm text-text-sub-600 leading-6">
-            Hi {displayName} — choose which emails you want to receive from{" "}
-            <span className="font-medium text-text-strong-950">{organization.name}</span>.
-            Your changes save automatically.
-          </p>
-        </div>
+					{/* Heading */}
+					<div className="mb-8 text-center">
+						<h1 className="font-bold text-2xl text-white leading-tight tracking-tight">
+							Do you want to
+							<br />
+							unsubscribe?
+						</h1>
+						<p className="mt-3 text-[15px] text-white/50">
+							Hi {contact.firstName || "there"} — confirm preferences for
+							<br />
+							<span className="font-medium text-white/80">
+								{organization.name}
+							</span>
+							:
+						</p>
+					</div>
 
-        {/* Channels */}
-        {channels.length === 0 ? (
-          <div className="rounded-2xl border border-gray-200 bg-white px-6 py-12 text-center dark:border-white/8 dark:bg-white/4">
-            <p className="text-text-sub-600 text-sm">
-              No subscription options are currently available.
-            </p>
-          </div>
-        ) : (
-          <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-white/8 dark:bg-white/4">
-            {channels.map((channel, idx) => {
-              const state = channelStates[channel.id];
-              const subscribed = state?.subscribed ?? false;
-              const saveState = state?.saveState ?? "idle";
+					{/* Channels List */}
+					{channels.length === 0 ? (
+						<div className="mb-8 flex flex-col items-center gap-2 rounded-2xl border border-white/10 border-dashed py-10 text-center">
+							<p className="text-sm text-white/30">
+								No subscription options available.
+							</p>
+						</div>
+					) : (
+						<div className="mb-8 space-y-1">
+							{channels.map((channel) => (
+								<button
+									key={channel.id}
+									type="button"
+									onClick={() =>
+										setChecked((prev) => ({
+											...prev,
+											[channel.id]: !prev[channel.id],
+										}))
+									}
+									className={cn(
+										"flex w-full items-center gap-4 rounded-2xl px-4 py-4 text-left transition-all duration-200",
+										"hover:bg-white/5 active:bg-white/10",
+									)}
+								>
+									<Checkbox
+										checked={checked[channel.id] ?? false}
+										onChange={(val) =>
+											setChecked((prev) => ({ ...prev, [channel.id]: val }))
+										}
+									/>
+									<div className="min-w-0 flex-1">
+										<p className="font-semibold text-[15px] text-white leading-5">
+											{channel.name}
+										</p>
+										{channel.description && (
+											<p className="mt-1 truncate text-xs text-white/40">
+												{channel.description}
+											</p>
+										)}
+									</div>
+								</button>
+							))}
+						</div>
+					)}
 
-              return (
-                <div
-                  key={channel.id}
-                  className={[
-                    "flex items-center gap-4 px-5 py-4 transition-colors",
-                    idx !== channels.length - 1
-                      ? "border-b border-gray-100 dark:border-white/6"
-                      : "",
-                    subscribed
-                      ? "bg-blue-50/40 dark:bg-blue-500/5"
-                      : "",
-                  ].join(" ")}
-                >
-                  {/* Info */}
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-sm text-text-strong-950">
-                        {channel.name}
-                      </span>
-                      <SaveIndicator state={saveState} />
-                    </div>
-                    {channel.description && (
-                      <p className="mt-0.5 text-text-sub-600 text-xs leading-5">
-                        {channel.description}
-                      </p>
-                    )}
-                  </div>
+					{/* Update Button */}
+					<button
+						type="button"
+						onClick={handleUpdate}
+						disabled={saveState === "saving"}
+						className={cn(
+							"flex w-full items-center justify-center gap-2 rounded-2xl py-4 font-bold text-[15px] transition-all duration-200 active:scale-[0.98]",
+							saveState === "saved"
+								? "bg-green-500/20 text-green-400"
+								: saveState === "error"
+									? "bg-red-500/20 text-red-400"
+									: "bg-white text-black hover:bg-white/90 disabled:opacity-50",
+						)}
+					>
+						{saveState === "saving" && (
+							<Icon name="spinner" className="h-4 w-4 animate-spin" />
+						)}
+						{saveState === "saved"
+							? "✓ Updated!"
+							: saveState === "error"
+								? "Failed to update"
+								: "Update Preferences"}
+					</button>
 
-                  {/* Toggle */}
-                  <div className="flex-shrink-0">
-                    <Toggle
-                      id={`channel-${channel.id}`}
-                      checked={subscribed}
-                      onChange={(val) => handleToggle(channel.id, val)}
-                      saving={saveState === "saving"}
-                    />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
+					{/* Or Divider */}
+					<div className="my-6 flex items-center gap-4">
+						<div className="h-px flex-1 bg-white/10" />
+						<span className="font-medium text-[11px] text-white/20 uppercase tracking-widest">
+							Or
+						</span>
+						<div className="h-px flex-1 bg-white/10" />
+					</div>
 
-        {/* Unsubscribe all */}
-        {channels.length > 0 && (
-          <div className="mt-8 text-center">
-            {unsubscribeAllState === "done" ? (
-              <p className="text-sm text-green-600 dark:text-green-400">
-                ✓ You've been unsubscribed from all channels.
-              </p>
-            ) : (
-              <button
-                type="button"
-                onClick={handleUnsubscribeAll}
-                disabled={unsubscribeAllState === "loading"}
-                className={[
-                  "text-sm transition-colors",
-                  unsubscribeAllState === "confirming"
-                    ? "font-medium text-red-600 dark:text-red-400"
-                    : "text-text-sub-600 underline underline-offset-2 hover:text-text-strong-950 dark:hover:text-white",
-                  unsubscribeAllState === "loading" ? "opacity-50 cursor-not-allowed" : "",
-                ].join(" ")}
-              >
-                {unsubscribeAllState === "confirming"
-                  ? "Click again to confirm — unsubscribe from all"
-                  : unsubscribeAllState === "loading"
-                    ? "Unsubscribing…"
-                    : "Unsubscribe from all emails"}
-              </button>
-            )}
-          </div>
-        )}
+					{/* Unsubscribe All Button */}
+					<button
+						type="button"
+						onClick={handleUnsubscribeAll}
+						disabled={unsubscribeAllState === "loading"}
+						className={cn(
+							"w-full rounded-2xl border border-white/10 py-4 font-bold text-[15px] text-white/70 transition-all duration-200",
+							"hover:bg-white/5 hover:text-white active:scale-[0.98] disabled:opacity-50",
+							unsubscribeAllState === "confirming"
+								? "border-red-500/30 bg-red-500/10 text-red-400"
+								: "",
+						)}
+					>
+						{unsubscribeAllState === "confirming"
+							? "Click again to confirm"
+							: unsubscribeAllState === "loading"
+								? "Unsubscribing..."
+								: unsubscribeAllState === "done"
+									? "✓ Unsubscribed from all"
+									: "Unsubscribe All"}
+					</button>
 
-        {/* Footer note */}
-        <p className="mt-10 text-center text-text-sub-600 text-xs leading-5">
-          You're managing preferences for{" "}
-          <span className="font-medium">{contact.email}</span>.{" "}
-          {/* Future: add a "not you?" link */}
-          Powered by{" "}
-          <a
-            href="https://reloop.sh"
-            className="font-medium text-text-strong-950 hover:underline"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Reloop
-          </a>
-          .
-        </p>
-      </main>
-    </div>
-  );
+					{/* Footer */}
+					<div className="mt-10 flex flex-col items-center gap-4">
+						<div className="flex items-center justify-center gap-2">
+							<span className="text-[11px] text-white/25">Powered by</span>
+							<div className="flex h-5 w-5 items-center justify-center rounded-lg bg-white/5 shadow-inner">
+								<Logo theme="dark" className="h-3 w-3" />
+							</div>
+							<span className="font-semibold text-[11px] text-white/40 tracking-tight">
+								Reloop
+							</span>
+						</div>
+						<p className="text-center text-[11px] text-white/20 leading-relaxed">
+							Managing preferences for
+							<br />
+							<span className="text-white/40">{contact.email}</span>
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
 }

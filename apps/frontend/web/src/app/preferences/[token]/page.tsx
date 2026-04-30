@@ -60,31 +60,33 @@ export default async function PreferencesPage({
 
   if (!data) {
     return (
-      <div className="flex min-h-screen items-center justify-center px-4">
-        <div className="max-w-md w-full text-center">
-          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-red-50 dark:bg-red-900/20">
-            <svg
-              className="h-8 w-8 text-red-500"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-                d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
-              />
-            </svg>
+      <div className="flex min-h-screen items-center justify-center bg-[#0d0f14] px-4 py-12">
+        <div className="w-full max-w-[440px]">
+          <div className="rounded-[32px] bg-[#111113] p-10 text-center shadow-2xl ring-1 ring-white/10">
+            <div className="mx-auto mb-8 flex h-16 w-16 items-center justify-center rounded-full bg-red-500/10 ring-1 ring-red-500/20">
+              <svg
+                className="h-8 w-8 text-red-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
+                />
+              </svg>
+            </div>
+            <h1 className="mb-4 font-bold text-2xl text-white tracking-tight">
+              Link expired or invalid
+            </h1>
+            <p className="text-[15px] text-white/50 leading-relaxed">
+              This preferences link has expired or is no longer valid. Please check your
+              email for a newer link, or contact the sender for an updated one.
+            </p>
           </div>
-          <h1 className="mb-3 font-semibold text-xl text-text-strong-950">
-            Link expired or invalid
-          </h1>
-          <p className="text-text-sub-600 text-sm leading-6">
-            This preferences link has expired or is no longer valid. Please check your
-            email for a newer link, or contact the sender to request an updated one.
-          </p>
         </div>
       </div>
     );

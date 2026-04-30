@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { IconsSprite } from "@reloop/ui/icon";
-import { Footer } from "@reloop/web/components/footer";
-import { Header } from "@reloop/web/components/header";
 import { ThemeProvider } from "@reloop/web/providers/theme-provider";
 import localFont from "next/font/local";
 
@@ -56,9 +54,7 @@ export default function RootLayout({
 					enableSystem
 					disableTransitionOnChange
 				>
-					<Header />
 					{children}
-					<Footer />
 					<IconsSprite />
 				</ThemeProvider>
 			</body>
