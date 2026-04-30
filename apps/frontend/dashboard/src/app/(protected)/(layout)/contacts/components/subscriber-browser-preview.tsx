@@ -28,8 +28,6 @@ function Checkbox({
 	return (
 		<button
 			type="button"
-			role="checkbox"
-			aria-checked={checked}
 			onClick={() => onChange(!checked)}
 			className={cn(
 				"flex h-4 w-4 flex-shrink-0 items-center justify-center rounded transition-all duration-150",
@@ -46,7 +44,11 @@ function Checkbox({
 					stroke="currentColor"
 					strokeWidth={3}
 				>
-					<path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+					<path
+						strokeLinecap="round"
+						strokeLinejoin="round"
+						d="M5 13l4 4L19 7"
+					/>
 				</svg>
 			)}
 		</button>
@@ -94,28 +96,12 @@ export function SubscriberBrowserPreview({
 
 	return (
 		<div className="w-full">
-			{/* Header */}
-			<div className="mb-3 flex items-center justify-between">
-				<div className="flex items-center gap-2">
-					<span className="font-medium text-xs text-text-strong-950">
-						Subscriber Preview
-					</span>
-					<span className="rounded-md border border-stroke-soft-200 bg-neutral-alpha-10 px-1.5 py-0.5 font-medium text-[10px] text-text-sub-600">
-						Interactive
-					</span>
-				</div>
-				<span className="text-[10px] text-text-sub-600">
-					{publicChannels.length} public channel
-					{publicChannels.length !== 1 ? "s" : ""}
-				</span>
-			</div>
-
 			{/* Phone-style dark card */}
 			<div className="relative overflow-hidden rounded-2xl bg-[#111113] p-6 shadow-lg lg:p-8">
 				{/* Customize page button */}
 				<button
 					type="button"
-					className="absolute right-4 top-4 flex items-center gap-1.5 rounded-lg bg-white/8 px-2.5 py-1.5 font-medium text-[10px] text-white/60 transition-colors hover:bg-white/12 hover:text-white/80"
+					className="absolute top-4 right-4 flex items-center gap-1.5 rounded-lg bg-white/8 px-2.5 py-1.5 font-medium text-[10px] text-white/60 transition-colors hover:bg-white/12 hover:text-white/80"
 				>
 					<svg
 						className="h-3 w-3"
@@ -134,7 +120,7 @@ export function SubscriberBrowserPreview({
 				</button>
 
 				{/* Check icon */}
-				<div className="mb-6 mt-4 flex justify-center">
+				<div className="mt-4 mb-6 flex justify-center">
 					<div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/15">
 						<svg
 							className="h-5 w-5 text-white"
@@ -143,14 +129,18 @@ export function SubscriberBrowserPreview({
 							stroke="currentColor"
 							strokeWidth={2.5}
 						>
-							<path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								d="M5 13l4 4L19 7"
+							/>
 						</svg>
 					</div>
 				</div>
 
 				{/* Heading */}
 				<div className="mb-6 text-center">
-					<h2 className="font-bold text-xl leading-tight text-white">
+					<h2 className="font-bold text-white text-xl leading-tight">
 						Do you want to
 						<br />
 						unsubscribe?
@@ -163,7 +153,7 @@ export function SubscriberBrowserPreview({
 
 				{/* Channels list */}
 				{publicChannels.length === 0 ? (
-					<div className="mb-6 flex flex-col items-center gap-2 rounded-xl border border-dashed border-white/10 py-8 text-center">
+					<div className="mb-6 flex flex-col items-center gap-2 rounded-xl border border-white/10 border-dashed py-8 text-center">
 						<p className="text-[11px] text-white/30">
 							This channel is currently private.
 							<br />
@@ -184,13 +174,15 @@ export function SubscriberBrowserPreview({
 									className={cn(
 										"flex w-full items-center gap-3 rounded-xl px-4 py-3.5 text-left transition-colors hover:bg-white/5",
 										isCurrent
-											? "bg-orange-500/10 ring-1 ring-inset ring-orange-500/20"
+											? "bg-orange-500/10 ring-1 ring-orange-500/20 ring-inset"
 											: "hover:bg-white/5",
 									)}
 								>
 									<Checkbox
 										checked={checked[t.id] ?? false}
-										onChange={(val) => setChecked((prev) => ({ ...prev, [t.id]: val }))}
+										onChange={(val) =>
+											setChecked((prev) => ({ ...prev, [t.id]: val }))
+										}
 									/>
 									<div className="min-w-0">
 										<div className="flex items-center gap-2">
@@ -198,7 +190,7 @@ export function SubscriberBrowserPreview({
 												{t.name}
 											</p>
 											{isCurrent && (
-												<span className="rounded bg-orange-500 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white shadow-sm shadow-orange-500/20">
+												<span className="rounded bg-orange-500 px-1.5 py-0.5 font-bold text-[9px] text-white uppercase tracking-wider shadow-orange-500/20 shadow-sm">
 													New
 												</span>
 											)}

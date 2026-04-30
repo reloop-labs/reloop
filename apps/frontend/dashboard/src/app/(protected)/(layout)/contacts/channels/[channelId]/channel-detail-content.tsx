@@ -98,10 +98,13 @@ export const ChannelDetailContent = () => {
 		data: channelData,
 		error: channelError,
 		isLoading: channelLoading,
-	} = useSWR<ChannelData>(channelId ? `/api/contacts/v1/channels/${channelId}` : null, {
-		revalidateOnFocus: false,
-		revalidateOnReconnect: true,
-	});
+	} = useSWR<ChannelData>(
+		channelId ? `/api/contacts/v1/channels/${channelId}` : null,
+		{
+			revalidateOnFocus: false,
+			revalidateOnReconnect: true,
+		},
+	);
 
 	// Fetch a sample preference URL for this channel (only when channel is public)
 	const { data: prefTokenData } = useSWR<{ url: string; token: string }>(
@@ -529,7 +532,6 @@ export const ChannelDetailContent = () => {
 					channel={channelData}
 					siblingChannels={siblingChannels as ChannelData[]}
 					orgName="Your Organization"
-					contactEmail="subscriber@example.com"
 				/>
 			)}
 		</div>
