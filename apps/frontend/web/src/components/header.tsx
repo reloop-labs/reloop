@@ -4,17 +4,10 @@ import { authClient } from "@reloop/auth/client";
 import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
 import Link from "next/link";
-import { useEffect } from "react";
 
 export const Header = () => {
 	const { useSession } = authClient;
 	const { data: session } = useSession();
-
-	useEffect(() => {
-		if (session) {
-			window.location.href = "/dashboard";
-		}
-	}, [session]);
 
 	return (
 		<header className="bg-[#05070b]">

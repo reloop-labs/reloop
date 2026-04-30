@@ -3,8 +3,8 @@ import "./globals.css";
 import { IconsSprite } from "@reloop/ui/icon";
 import { Footer } from "@reloop/web/components/footer";
 import { Header } from "@reloop/web/components/header";
-import localFont from "next/font/local";
 import { ThemeProvider } from "@reloop/web/providers/theme-provider";
+import localFont from "next/font/local";
 
 const openRunde = localFont({
 	src: [
