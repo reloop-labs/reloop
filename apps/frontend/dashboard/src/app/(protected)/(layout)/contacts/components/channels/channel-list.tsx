@@ -1,7 +1,6 @@
 "use client";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { Icon } from "@reloop/ui/icon";
-import { useRouter } from "next/navigation";
 
 import { useQueryState } from "nuqs";
 import { toast } from "sonner";

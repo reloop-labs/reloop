@@ -14,24 +14,18 @@ interface ChannelDropdownProps {
 	channelId: string;
 	channelName: string;
 	visibility?: "private" | "public";
-	onViewDetails: (id: string) => void;
-	onEdit?: (id: string) => void;
 	onDelete: (id: string) => void;
 	onToggleVisibility?: (id: string, currentValue: "private" | "public") => void;
 	onOpenChange?: (open: boolean) => void;
-	hideViewDetails?: boolean;
 }
 
 export const ChannelDropdown = ({
 	channelId,
 	channelName: _channelName,
 	visibility = "private",
-	onViewDetails,
-	onEdit,
 	onDelete,
 	onToggleVisibility,
 	onOpenChange,
-	hideViewDetails = false,
 }: ChannelDropdownProps) => {
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const [popoverOpen, setPopoverOpen] = useState(false);
@@ -45,18 +39,8 @@ export const ChannelDropdown = ({
 		onOpenChange?.(open);
 	};
 
-	const handleViewDetails = () => {
-		onViewDetails(channelId);
-		setPopoverOpen(false);
-	};
-
 	const handleDelete = () => {
 		onDelete(channelId);
-		setPopoverOpen(false);
-	};
-
-	const handleEdit = () => {
-		onEdit?.(channelId);
 		setPopoverOpen(false);
 	};
 
@@ -68,18 +52,6 @@ export const ChannelDropdown = ({
 	const visibilityIcon = visibility === "public" ? "lock" : "globe";
 
 	const menuItems = [
-		{
-			icon: "eye-outline" as const,
-			label: "View Details",
-			onClick: handleViewDetails,
-			hidden: hideViewDetails,
-		},
-		{
-			icon: "edit" as const,
-			label: "Edit Channel",
-			onClick: handleEdit,
-			hidden: !onEdit,
-		},
 		{
 			icon: visibilityIcon as "lock" | "globe",
 			label: visibility === "public" ? "Set Private" : "Set Public",

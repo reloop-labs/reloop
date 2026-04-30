@@ -60,8 +60,6 @@ export const ChannelCards = ({
 	onDelete,
 	onAddChannel,
 }: ChannelCardsProps) => {
-	const router = useRouter();
-
 	if (isLoading) {
 		return (
 			<div className="grid grid-cols-1 gap-4">
@@ -85,8 +83,7 @@ export const ChannelCards = ({
 				return (
 					<div
 						key={channel.id}
-						onClick={() => router.push(`/contacts/channels/${channel.id}`)}
-						className="group relative cursor-pointer rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-5 transition-all hover:border-stroke-soft-200 dark:border-stroke-soft-100/10 dark:bg-[#101010] dark:hover:border-stroke-soft-100/20"
+						className="group relative rounded-2xl border border-stroke-soft-100 bg-bg-white-0 px-5 pt-3 pb-2 transition-all hover:border-stroke-soft-200 dark:border-stroke-soft-100/10 dark:bg-[#101010] dark:hover:border-stroke-soft-100/20"
 					>
 						<div className="flex items-start justify-between">
 							<div className="flex flex-col">
@@ -94,16 +91,6 @@ export const ChannelCards = ({
 									<h3 className="font-medium text-sm text-text-strong-950">
 										{channel.name}
 									</h3>
-									<span
-										className={cn(
-											"inline-flex items-center rounded-md border px-2 py-0.5 font-medium text-[11px] transition-colors",
-											isPublic
-												? "border-success-base/20 bg-success-base/10 text-success-base"
-												: "border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600 dark:border-stroke-soft-100/20 dark:bg-neutral-alpha-10",
-										)}
-									>
-										{isPublic ? "Public" : "Hidden"}
-									</span>
 								</div>
 								<p className="mt-1 line-clamp-2 text-text-sub-600 text-xs">
 									{channel.description || "No description provided."}
@@ -117,56 +104,74 @@ export const ChannelCards = ({
 								<Button.Root
 									variant="neutral"
 									mode="stroke"
-									size="xsmall"
-									className="h-8 w-8 rounded-lg border-stroke-soft-200 p-0 dark:border-white/10"
+									size="xxsmall"
 									onClick={() => onEdit?.(channel.id)}
 								>
 									<Button.Icon>
-										<Icon name="edit" className="h-3.5 w-3.5" />
+										<Icon name="edit" className="h-3 w-3" />
 									</Button.Icon>
 								</Button.Root>
 								<ChannelDropdown
 									channelId={channel.id}
 									channelName={channel.name}
 									visibility={channel.visibility}
-									onViewDetails={() =>
-										router.push(`/contacts/channels/${channel.id}`)
-									}
-									onEdit={onEdit}
 									onDelete={(id) => onDelete?.(id)}
 									onToggleVisibility={onToggleVisibility}
 								/>
 							</div>
 						</div>
 
-						<div className="mt-3 space-y-4">
+						<div className="mt-3 space-y-2">
 							<div className="h-px w-full bg-stroke-soft-100 dark:bg-white/5" />
 							<div className="flex items-center justify-between">
 								<div className="flex items-center gap-1 text-sm text-text-sub-600">
-									<span className="font-semibold text-text-strong-950">
+									<span className="font-semibold text-text-strong-950 text-xl">
 										{subscriberCount.toLocaleString()}
 									</span>
-									<span className="text-text-soft-400">subscribers</span>
+									<span className="font-medium text-text-soft-400 text-xs">
+										subscribers
+									</span>
 								</div>
 
-								<div
-									className="flex items-center gap-3"
-									onClick={(e) => e.stopPropagation()}
-								>
-									<span className="font-medium text-sm text-text-sub-600">
-										{isPublic
-											? "Shown to subscribers"
-											: "Hidden from subscribers"}
-									</span>
-									<Switch.Root
-										checked={isPublic}
-										onCheckedChange={() =>
-											onToggleVisibility?.(
-												channel.id,
-												channel.visibility || "private",
-											)
-										}
-									/>
+								<div className="flex items-center gap-2">
+									<div
+										className={cn(
+											"flex items-center gap-1.5 rounded-full px-2.5 py-1 transition-colors",
+											isPublic
+												? "bg-primary-base/10 text-primary-base"
+												: "bg-bg-weak-50 text-text-sub-600 dark:bg-white/5",
+										)}
+									>
+										<Icon
+											name={isPublic ? "globe" : "lock"}
+											className="h-3 w-3"
+										/>
+										<span className="font-medium text-[10px] uppercase tracking-wider">
+											{isPublic ? "Public" : "Hidden"}
+										</span>
+									</div>
+									<div
+										className={cn(
+											"flex items-center gap-1.5 rounded-full px-2.5 py-1 transition-colors",
+											channel.defaultSubscription === "opt_in"
+												? "bg-primary-base/10 text-primary-base"
+												: "bg-bg-weak-50 text-text-sub-600 dark:bg-white/5",
+										)}
+									>
+										<Icon
+											name={
+												channel.defaultSubscription === "opt_in"
+													? "check-circle"
+													: "cross-circle"
+											}
+											className="h-3 w-3"
+										/>
+										<span className="font-medium text-[10px] uppercase tracking-wider">
+											{channel.defaultSubscription === "opt_in"
+												? "Subscribed"
+												: "Unsubscribed"}
+										</span>
+									</div>
 								</div>
 							</div>
 						</div>
