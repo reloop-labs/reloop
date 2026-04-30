@@ -5,7 +5,7 @@ import { groupRoutes } from "@be/contacts/routes/group/group.routes";
 import { landing } from "@be/contacts/routes/landing/landing.index";
 import { preferencesRoutes } from "@be/contacts/routes/preferences/preferences.route";
 import { propertyRoutes } from "@be/contacts/routes/property/property.routes";
-import { topicRoutes } from "@be/contacts/routes/topic/topic.routes";
+import { channelRoutes } from "@be/contacts/routes/channel/channel.routes";
 
 import { loader } from "@be/contacts/utils/loader";
 import { openapi } from "@elysiajs/openapi";
@@ -41,7 +41,7 @@ const contactsService = new Elysia({
 	.use(landing)
 	.use(contactRoutes)
 	.use(propertyRoutes)
-	.use(topicRoutes)
+	.use(channelRoutes)
 	.use(groupRoutes)
 	.use(preferencesRoutes)
 	.onStart(async () => {

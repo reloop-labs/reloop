@@ -167,7 +167,7 @@ export async function sendEmailController({
       cc: body.cc,
       bcc: body.bcc,
       scheduledAt: body.scheduledAt,
-      topicId: body.topicId,
+      channelId: body.channelId,
       attachments: body.attachments,
       tags: body.tags,
       template: body.template,

@@ -54,7 +54,7 @@ interface ContactHeaderProps {
 	contact: ContactData | undefined;
 	isLoading: boolean;
 	propertyValues: PropertyValueWithName[];
-	enrolledTopics?: { id: string; name: string }[];
+	enrolledChannels?: { id: string; name: string }[];
 }
 
 // Convert camelCase to Title Case (e.g., "firstName" -> "FIRST NAME")
@@ -80,7 +80,7 @@ export const ContactHeader = ({
 	contact,
 	isLoading,
 	propertyValues,
-	enrolledTopics = [],
+	enrolledChannels = [],
 }: ContactHeaderProps) => {
 	const { activeOrganization } = useUserOrganization();
 	const router = useRouter();
@@ -370,26 +370,26 @@ export const ContactHeader = ({
 								className="h-3.5 w-3.5 text-text-sub-600"
 							/>
 							<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
-								Topics
+								Channels
 							</span>
 						</div>
 						{isLoading ? (
 							<Skeleton className="h-5 w-32 rounded-lg" />
-						) : enrolledTopics.length > 0 ? (
+						) : enrolledChannels.length > 0 ? (
 							<div className="flex flex-wrap gap-2">
-								{enrolledTopics.map((topic) => (
+								{enrolledChannels.map((channel) => (
 									<Link
-										key={topic.id}
-										href={`/contacts/topics/${topic.id}`}
+										key={channel.id}
+										href={`/contacts/channels/${channel.id}`}
 										className="font-medium text-paragraph-sm text-text-strong-950 underline decoration-dashed underline-offset-2 transition-colors hover:text-primary-base"
 									>
-										{topic.name}
+										{channel.name}
 									</Link>
 								))}
 							</div>
 						) : (
 							<span className="font-medium text-paragraph-sm text-text-soft-400 italic">
-								No topics
+								No channels
 							</span>
 						)}
 					</div>

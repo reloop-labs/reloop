@@ -1,0 +1,190 @@
+import type { ContactModel } from "@be/contacts/model/contact.model";
+import { createLog } from "@be/contacts/utils/logger";
+import { db } from "@reloop/db/client";
+import * as schema from "@reloop/db/schema";
+import type { Logger } from "@reloop/logger";
+import { CONTACT_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
+import { and, eq, isNull } from "drizzle-orm";
+import { status } from "elysia";
+
+export interface AddContactToChannelResult {
+  contact: {
+    id: string;
+    email: string;
+    status: string;
+    organizationId: string;
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt: Date | null;
+  };
+  subscriptionId: string;
+  event: string;
+}
+
+export async function addContactToChannelController({
+  organizationId,
+  channelId,
+  body,
+  logger,
+  cookie,
+  requestDetails,
+}: {
+  organizationId: string;
+  channelId: string;
+  body: ContactModel.AddContactToChannelBody;
+  logger: Logger;
+  cookie?: string;
+  requestDetails?: {
+    endpoint?: string;
+    method?: string;
+    userAgent?: string;
+    ipAddress?: string;
+    statusCode?: number;
+  };
+}): Promise<AddContactToChannelResult> {
+  const { contact_id, email } = body;
+
+  if (!contact_id && !email) {
+    throw status(400, { message: "Either 'contact_id' or 'email' must be provided" });
+  }
+
+
+  try {
+    // Verify channel exists
+    const channel = await db.query.channel.findFirst({
+      where: and(
+        eq(schema.channel.id, channelId),
+        eq(schema.channel.organizationId, organizationId),
+        isNull(schema.channel.deletedAt),
+      ),
+    });
+
+    if (!channel) {
+      throw status(404, { message: "Channel not found" });
+    }
+
+    // Identify contact
+    let contact: typeof schema.contact.$inferSelect | undefined;
+
+    if (contact_id) {
+      contact = await db.query.contact.findFirst({
+        where: and(
+          eq(schema.contact.id, contact_id),
+          eq(schema.contact.organizationId, organizationId),
+          isNull(schema.contact.deletedAt),
+        ),
+      });
+    } else if (email) {
+      const emailLower = email.toLowerCase();
+      contact = await db.query.contact.findFirst({
+        where: and(
+          eq(schema.contact.email, emailLower),
+          eq(schema.contact.organizationId, organizationId),
+          isNull(schema.contact.deletedAt),
+        ),
+      });
+
+    }
+
+    if (!contact) {
+      logger.info({ contact_id, email }, "Contact not found");
+      throw status(404, { message: "Contact not found" });
+    }
+
+    logger.info({ contactId: contact.id, channelId }, "Checking if contact is already subscribed to channel");
+    const existingSubscription = await db.query.channelSubscription.findFirst({
+      where: and(
+        eq(schema.channelSubscription.contactId, contact.id),
+        eq(schema.channelSubscription.channelId, channelId),
+        isNull(schema.channelSubscription.deletedAt),
+      ),
+    });
+
+    const targetStatus = (body.subscription === "opt_out"
+      ? "unenrolled"
+      : "enrolled") as "enrolled" | "unenrolled";
+
+    if (existingSubscription) {
+      // If status is different, update it
+      if (existingSubscription.status !== targetStatus) {
+        await db
+          .update(schema.channelSubscription)
+          .set({ status: targetStatus, updatedAt: new Date() })
+          .where(eq(schema.channelSubscription.id, existingSubscription.id));
+
+        logger.info(
+          { subscriptionId: existingSubscription.id, status: targetStatus },
+          "Updated contact subscription status",
+        );
+
+        const result = {
+          contact,
+          subscriptionId: existingSubscription.id,
+          event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
+        };
+
+        await createLog({
+          event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
+          cookie,
+          metadata: result,
+          requestDetails: { ...(requestDetails || {}), statusCode: 200 },
+        });
+
+        return result;
+      }
+
+      throw status(409, {
+        message: `Contact is already ${existingSubscription.status} in this channel`,
+      });
+    }
+    // Create subscription
+    const [subscription] = await db
+      .insert(schema.channelSubscription)
+      .values({
+        contactId: contact.id,
+        channelId,
+        organizationId,
+        status: targetStatus,
+      })
+      .returning();
+
+    if (!subscription) {
+      throw new Error("Failed to create subscription");
+    }
+
+    logger.info(
+      {
+        contactId: contact.id,
+        subscriptionId: subscription.id,
+        status: targetStatus,
+      },
+      "Contact added to channel successfully",
+    );
+
+    const result = {
+      contact,
+      subscriptionId: subscription.id,
+      event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
+    };
+
+    await createLog({
+      event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
+      cookie,
+      metadata: result,
+      requestDetails: { ...(requestDetails || {}), statusCode: 200 },
+    });
+
+    return result;
+  } catch (error) {
+    logger.error(
+      {
+        contactId: contact_id,
+        email: email?.toLowerCase(),
+        channelId,
+        error: error instanceof Error ? error.message : String(error),
+      },
+      "Error adding contact to channel",
+    );
+    throw error;
+  }
+}

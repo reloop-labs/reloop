@@ -34,7 +34,7 @@ export namespace ContactTypes {
 		deletedAt: Date | null;
 		properties?: Record<string, string | number>;
 		groups?: { id: string; name: string }[];
-		topics?: { id: string; name: string; subscription: "opt_in" | "opt_out" }[];
+		channels?: { id: string; name: string; subscription: "opt_in" | "opt_out" }[];
 		suppressionReason: "hard_bounce" | "spam_complaint" | null;
 		suppressedAt: Date | null;
 	}
@@ -46,8 +46,8 @@ export namespace ContactTypes {
 		status?: "subscribed" | "unsubscribed" | "blocked";
 		properties?: Record<string, string | number>;
 		groupIds?: string[];
-		topics?: {
-			topicId: string;
+		channels?: {
+			channelId: string;
 			subscription: "opt_in" | "opt_out";
 		}[];
 	}

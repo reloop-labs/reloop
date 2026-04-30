@@ -9,7 +9,7 @@ export async function listSubscriptionsController({
   logger,
 }: {
   organizationId: string;
-  query: { topicId: string; limit?: number; page?: number };
+  query: { channelId: string; limit?: number; page?: number };
   logger: Logger;
 }) {
   logger.info({ ...query }, "Listing subscriptions");
@@ -19,20 +19,20 @@ export async function listSubscriptionsController({
     const offset = (page - 1) * limit;
 
     const whereConditions = [
-      eq(schema.topicEnrollment.organizationId, organizationId),
-      eq(schema.topicEnrollment.topicId, query.topicId),
-      isNull(schema.topicEnrollment.deletedAt),
+      eq(schema.channelSubscription.organizationId, organizationId),
+      eq(schema.channelSubscription.channelId, query.channelId),
+      isNull(schema.channelSubscription.deletedAt),
     ];
 
     const totalResult = await db
       .select({ count: count() })
-      .from(schema.topicEnrollment)
+      .from(schema.channelSubscription)
       .where(and(...whereConditions));
     const total = totalResult[0]?.count || 0;
 
-    const subscriptions = await db.query.topicEnrollment.findMany({
+    const subscriptions = await db.query.channelSubscription.findMany({
       where: and(...whereConditions),
-      orderBy: desc(schema.topicEnrollment.createdAt),
+      orderBy: desc(schema.channelSubscription.createdAt),
       limit,
       offset,
     });

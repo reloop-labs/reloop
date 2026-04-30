@@ -5,6 +5,6 @@ export * from "./domain";
 export * from "./email";
 export * from "./group";
 export * from "./template";
-export * from "./topic";
+export * from "./channel";
 export * from "./upload";
 export * from "./webhook";

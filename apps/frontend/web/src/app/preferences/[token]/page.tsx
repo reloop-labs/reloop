@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { PreferencesContent } from "./preferences-content";
 
-interface TopicData {
+interface ChannelData {
   id: string;
   name: string;
   description: string | null;
@@ -18,7 +18,7 @@ interface PreferencesData {
   organization: {
     name: string;
   };
-  topics: TopicData[];
+  channels: ChannelData[];
 }
 
 const API_BASE = process.env.INTERNAL_API_URL || "http://localhost:8014/api/contacts";
@@ -95,7 +95,7 @@ export default async function PreferencesPage({
       token={token}
       contact={data.contact}
       organization={data.organization}
-      topics={data.topics}
+      channels={data.channels}
     />
   );
 }

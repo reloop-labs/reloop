@@ -17,7 +17,7 @@ export interface SendEmailOptions {
 	bcc?: string | string[];
 	customHeaders?: Record<string, string>;
 	scheduledAt?: string;
-	topicId?: string;
+	channelId?: string;
 	attachments?: Array<{
 		content?: string | Buffer | import("stream").Readable;
 		filename?: string;

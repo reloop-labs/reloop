@@ -33,9 +33,9 @@ export async function getContactController({
           with: { group: true },
           where: isNull(schema.contactGroup.deletedAt),
         },
-        contactTopics: {
-          with: { topic: true },
-          where: isNull(schema.topicEnrollment.deletedAt),
+        contactChannels: {
+          with: { channel: true },
+          where: isNull(schema.channelSubscription.deletedAt),
         },
       },
     });
@@ -59,18 +59,18 @@ export async function getContactController({
       .filter((cg) => cg.group !== null)
       .map((cg) => ({ id: cg.group.id, name: cg.group.name }));
 
-    // Get all organization topics to merge with explicit enrollments
-    const allTopics = await db.query.topic.findMany({
+    // Get all organization channels to merge with explicit enrollments
+    const allChannels = await db.query.channel.findMany({
       where: and(
-        eq(schema.topic.organizationId, organizationId),
-        isNull(schema.topic.deletedAt),
+        eq(schema.channel.organizationId, organizationId),
+        isNull(schema.channel.deletedAt),
       ),
     });
 
     // Map enrollments to { id, name, subscription }
-    const topics = allTopics.map((t) => {
-      const explicitEnrollment = contact.contactTopics.find(
-        (en) => en.topicId === t.id && en.deletedAt === null,
+    const channels = allChannels.map((t) => {
+      const explicitEnrollment = contact.contactChannels.find(
+        (en) => en.channelId === t.id && en.deletedAt === null,
       );
 
       if (explicitEnrollment) {
@@ -83,7 +83,7 @@ export async function getContactController({
         };
       }
 
-      // Fallback to topic default if no explicit enrollment exists
+      // Fallback to channel default if no explicit enrollment exists
       return {
         id: t.id,
         name: t.name,
@@ -101,7 +101,7 @@ export async function getContactController({
         organizationId,
         propertyCount: contact.propertyValues.length,
         groupCount: groups.length,
-        topicCount: topics.length,
+        channelCount: channels.length,
         suppressed: suppressionReason !== null,
       },
       "Contact retrieved successfully",
@@ -116,7 +116,7 @@ export async function getContactController({
       status: contact.status,
       properties: properties ?? {},
       groups: groups ?? [],
-      topics: topics ?? [],
+      channels: channels ?? [],
       suppressionReason,
       suppressedAt,
       createdAt: contact.createdAt,

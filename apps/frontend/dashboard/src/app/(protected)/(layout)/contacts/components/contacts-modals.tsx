@@ -4,17 +4,17 @@ import { useQueryState } from "nuqs";
 import useSWR from "swr";
 import { AddContactModal } from "./add-contact-modal";
 import { AddContactToGroupModal } from "./add-contact-to-group";
-import { AddContactToTopicModal } from "./add-contact-to-topic-modal";
+import { AddContactToChannelModal } from "./add-contact-to-channel-modal";
 import { AddPropertyModal } from "./add-property-modal";
 import { CreateGroupModal } from "./create-group-modal";
-import { CreateTopicModal } from "./create-topic-modal";
+import { CreateChannelModal } from "./create-channel-modal";
 import { DeleteContactModal } from "./delete-contact-modal";
 import { DeleteGroupModal } from "./delete-group";
 import { DeletePropertyModal } from "./delete-property-modal";
-import { DeleteTopicModal } from "./delete-topic";
+import { DeleteChannelModal } from "./delete-channel";
 import { EditContactModal } from "./edit-contact-modal";
 import { EditPropertyModal } from "./edit-property-modal";
-import { EditTopicModal } from "./edit-topic-modal";
+import { EditChannelModal } from "./edit-channel-modal";
 
 interface Contact {
 	id: string;
@@ -29,7 +29,7 @@ interface Contact {
 	deletedAt: string | null;
 }
 
-interface Topic {
+interface Channel {
 	id: string;
 	name: string;
 	description: string | null;
@@ -58,15 +58,15 @@ interface Property {
 }
 
 interface ContactsModalsProps {
-	topicId?: string;
+	channelId?: string;
 }
 
-export const ContactsModals = ({ topicId }: ContactsModalsProps) => {
+export const ContactsModals = ({ channelId }: ContactsModalsProps) => {
 	const [modal, setModal] = useQueryState("modal", { history: "replace" });
 	const [id, setId] = useQueryState("id", { history: "replace" });
 
-	const { data: topicsData } = useSWR<{ topics: Topic[] }>(
-		modal?.includes("topic") ? "/api/contacts/v1/topics/list" : null,
+	const { data: channelsData } = useSWR<{ channels: Channel[] }>(
+		modal?.includes("channel") ? "/api/contacts/v1/channels/list" : null,
 	);
 	const { data: groupsData } = useSWR<{ groups: Group[] }>(
 		modal?.includes("group") ? "/api/contacts/v1/groups/list" : null,
@@ -91,22 +91,22 @@ export const ContactsModals = ({ topicId }: ContactsModalsProps) => {
 			<AddContactModal
 				open={modal === "add-contact"}
 				onOpenChange={handleOpenChange}
-				topicId={topicId}
+				channelId={channelId}
 			/>
 			<AddContactToGroupModal
 				open={modal === "add-contact-to-group"}
 				onOpenChange={handleOpenChange}
 			/>
-			<AddContactToTopicModal
-				open={modal === "add-contact-to-topic"}
+			<AddContactToChannelModal
+				open={modal === "add-contact-to-channel"}
 				onOpenChange={handleOpenChange}
 			/>
 			<AddPropertyModal
 				open={modal === "add-property"}
 				onOpenChange={handleOpenChange}
 			/>
-			<CreateTopicModal
-				open={modal === "create-topic"}
+			<CreateChannelModal
+				open={modal === "create-channel"}
 				onOpenChange={handleOpenChange}
 			/>
 			<CreateGroupModal
@@ -115,10 +115,10 @@ export const ContactsModals = ({ topicId }: ContactsModalsProps) => {
 			/>
 
 			{/* Edit Modals */}
-			<EditTopicModal
-				open={modal === "edit-topic"}
+			<EditChannelModal
+				open={modal === "edit-channel"}
 				onOpenChange={handleOpenChange}
-				topic={topicsData?.topics?.find((t) => t.id === id) || null}
+				channel={channelsData?.channels?.find((t) => t.id === id) || null}
 			/>
 			<EditPropertyModal
 				open={modal === "edit-property"}
@@ -132,7 +132,7 @@ export const ContactsModals = ({ topicId }: ContactsModalsProps) => {
 			/>
 
 			{/* Delete Modals */}
-			<DeleteTopicModal topics={topicsData?.topics || []} />
+			<DeleteChannelModal channels={channelsData?.channels || []} />
 			<DeleteGroupModal
 				open={modal === "delete-group"}
 				onOpenChange={handleOpenChange}

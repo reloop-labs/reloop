@@ -88,17 +88,17 @@ export async function createContactController({
           })),
         );
       }
-      if (body.topics && body.topics.length > 0) {
+      if (body.channels && body.channels.length > 0) {
         logger.info(
-          { contactId: newContact.id, topicCount: body.topics.length },
-          "Enrolling contact in topics",
+          { contactId: newContact.id, channelCount: body.channels.length },
+          "Enrolling contact in channels",
         );
-        await tx.insert(schema.topicEnrollment).values(
-          body.topics.map((topic) => ({
+        await tx.insert(schema.channelSubscription).values(
+          body.channels.map((channel) => ({
             contactId: newContact.id,
-            topicId: topic.topicId,
+            channelId: channel.channelId,
             organizationId,
-            status: (topic.subscription === "opt_in"
+            status: (channel.subscription === "opt_in"
               ? "enrolled"
               : "unenrolled") as "enrolled" | "unenrolled",
           })),
@@ -148,7 +148,7 @@ export async function createContactController({
         status: newContact.status,
         properties: propertiesRecord ?? {},
         groups: (newContact as ContactTypes.ContactData).groups ?? [],
-        topics: (newContact as ContactTypes.ContactData).topics ?? [],
+        channels: (newContact as ContactTypes.ContactData).channels ?? [],
         createdAt: newContact.createdAt,
         updatedAt: newContact.updatedAt,
         event: CONTACT_CREATE_WEBHOOK_EVENT.id,

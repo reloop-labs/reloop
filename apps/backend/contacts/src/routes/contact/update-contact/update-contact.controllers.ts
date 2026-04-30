@@ -150,7 +150,7 @@ export async function updateContactController({
         status: updatedContact.status,
         properties: propertiesRecord ?? {},
         groups: (updatedContact as ContactTypes.ContactData).groups ?? [],
-        topics: (updatedContact as ContactTypes.ContactData).topics ?? [],
+        channels: (updatedContact as ContactTypes.ContactData).channels ?? [],
         createdAt: updatedContact.createdAt,
         updatedAt: updatedContact.updatedAt,
         event: CONTACT_UPDATE_WEBHOOK_EVENT.id,

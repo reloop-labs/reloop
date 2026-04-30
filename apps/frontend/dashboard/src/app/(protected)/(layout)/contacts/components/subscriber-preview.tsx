@@ -3,7 +3,7 @@
 import { cn } from "@reloop/ui/cn";
 import { useEffect, useState } from "react";
 
-interface Topic {
+interface Channel {
 	id: string;
 	name: string;
 	description: string | null;
@@ -12,7 +12,7 @@ interface Topic {
 }
 
 interface SubscriberPreviewProps {
-	topics: Topic[];
+	channels: Channel[];
 	orgName?: string;
 }
 
@@ -52,26 +52,26 @@ function Checkbox({
 }
 
 export function SubscriberPreview({
-	topics,
+	channels,
 	orgName = "Your Organization",
 }: SubscriberPreviewProps) {
-	// Only show public topics in the preview
-	const publicTopics = topics.filter((t) => t.visibility === "public");
+	// Only show public channels in the preview
+	const publicChannels = channels.filter((t) => t.visibility === "public");
 
 	const buildInitialStates = () =>
 		Object.fromEntries(
-			publicTopics.map((t) => [t.id, t.defaultSubscription === "opt_in"]),
+			publicChannels.map((t) => [t.id, t.defaultSubscription === "opt_in"]),
 		);
 
 	const [checked, setChecked] = useState<Record<string, boolean>>(buildInitialStates);
 	const [saved, setSaved] = useState(false);
 
-	// Reset when topics change
+	// Reset when channels change
 	useEffect(() => {
 		setChecked(buildInitialStates());
 		setSaved(false);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [topics.map((t) => t.id).join(",")]);
+	}, [channels.map((t) => t.id).join(",")]);
 
 	const handleUpdate = () => {
 		setSaved(true);
@@ -79,7 +79,7 @@ export function SubscriberPreview({
 	};
 
 	const handleUnsubscribeAll = () => {
-		setChecked(Object.fromEntries(publicTopics.map((t) => [t.id, false])));
+		setChecked(Object.fromEntries(publicChannels.map((t) => [t.id, false])));
 	};
 
 	return (
@@ -95,7 +95,7 @@ export function SubscriberPreview({
 					</span>
 				</div>
 				<span className="text-[10px] text-text-sub-600">
-					{publicTopics.length} public topic{publicTopics.length !== 1 ? "s" : ""}
+					{publicChannels.length} public channel{publicChannels.length !== 1 ? "s" : ""}
 				</span>
 			</div>
 
@@ -142,37 +142,37 @@ export function SubscriberPreview({
 					<p className="mt-2 text-sm text-white/50">Confirm your email preferences:</p>
 				</div>
 
-				{/* Topics list */}
-				{publicTopics.length === 0 ? (
+				{/* Channels list */}
+				{publicChannels.length === 0 ? (
 					<div className="mb-5 flex flex-col items-center gap-2 rounded-xl border border-dashed border-white/10 py-6 text-center">
 						<p className="text-[11px] text-white/30">
-							No public topics yet.
+							No public channels yet.
 							<br />
-							Set a topic to Public to show it here.
+							Set a channel to Public to show it here.
 						</p>
 					</div>
 				) : (
 					<div className="mb-5 space-y-1">
-						{publicTopics.map((topic) => (
+						{publicChannels.map((channel) => (
 							<button
-								key={topic.id}
+								key={channel.id}
 								type="button"
 								onClick={() =>
-									setChecked((prev) => ({ ...prev, [topic.id]: !prev[topic.id] }))
+									setChecked((prev) => ({ ...prev, [channel.id]: !prev[channel.id] }))
 								}
 								className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-white/5"
 							>
 								<Checkbox
-									checked={checked[topic.id] ?? false}
+									checked={checked[channel.id] ?? false}
 									onChange={(val) =>
-										setChecked((prev) => ({ ...prev, [topic.id]: val }))
+										setChecked((prev) => ({ ...prev, [channel.id]: val }))
 									}
 								/>
 								<div className="min-w-0">
-									<p className="font-medium text-sm text-white leading-4">{topic.name}</p>
-									{topic.description && (
+									<p className="font-medium text-sm text-white leading-4">{channel.name}</p>
+									{channel.description && (
 										<p className="mt-0.5 truncate text-[11px] text-white/40">
-											{topic.description}
+											{channel.description}
 										</p>
 									)}
 								</div>

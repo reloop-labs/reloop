@@ -16,7 +16,7 @@ export const EmptyState = ({ onCreateClick }: EmptyStateProps) => {
 				/>
 			</div>
 			<h3 className="mb-2 font-semibold text-text-strong-950 text-xl">
-				No topics yet
+				No channels yet
 			</h3>
 			<p className="mx-auto mb-6 max-w-[300px] text-balance font-medium text-[12px] text-text-sub-600">
 				Organise contacts by interest so they only receive the messages they
@@ -31,7 +31,7 @@ export const EmptyState = ({ onCreateClick }: EmptyStateProps) => {
 					className="gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
 				>
 					<Icon name="plus" className="h-4 w-4" />
-					Create Topic
+					Create Channel
 					<span className="inline-flex items-center gap-0.5">
 						<Icon
 							name="command"
@@ -50,12 +50,12 @@ export const EmptyState = ({ onCreateClick }: EmptyStateProps) => {
 					className="gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
 				>
 					<a
-						href="https://reloop.sh/docs/topics"
+						href="https://reloop.sh/docs/channels"
 						target="_blank"
 						rel="noopener noreferrer"
 					>
 						<Icon name="file-text" className="h-3.5 w-3.5" />
-						Learn about topics
+						Learn about channels
 						<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-200 p-px font-medium text-[10px] uppercase">
 							D
 						</span>

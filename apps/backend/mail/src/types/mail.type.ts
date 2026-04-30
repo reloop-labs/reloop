@@ -24,7 +24,7 @@ export namespace MailTypes {
 		bcc?: string | string[];
 		scheduledAt?: string;
 		headers?: Record<string, string>;
-		topicId?: string;
+		channelId?: string;
 		attachments?: Array<{
 			content?: string | Buffer | import("stream").Readable;
 			filename?: string;

@@ -18,9 +18,9 @@ export const unsubscribeAllRoute = new Elysia().post(
     }),
     detail: {
       tags: ["Preferences"],
-      summary: "Unsubscribe from all topics",
+      summary: "Unsubscribe from all channels",
       description:
-        "Unenroll a contact from all their topic subscriptions. No auth required — token is self-contained.",
+        "Unenroll a contact from all their channel subscriptions. No auth required — token is self-contained.",
     },
   },
 );

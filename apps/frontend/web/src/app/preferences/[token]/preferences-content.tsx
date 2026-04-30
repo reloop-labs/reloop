@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from "react";
 
-interface TopicData {
+interface ChannelData {
   id: string;
   name: string;
   description: string | null;
@@ -20,12 +20,12 @@ interface Props {
   organization: {
     name: string;
   };
-  topics: TopicData[];
+  channels: ChannelData[];
 }
 
 type SaveState = "idle" | "saving" | "saved" | "error";
 
-function isSubscribed(status: TopicData["status"], defaultSubscription: "opt_in" | "opt_out") {
+function isSubscribed(status: ChannelData["status"], defaultSubscription: "opt_in" | "opt_out") {
   if (status === "enrolled") return true;
   if (status === "unenrolled") return false;
   // "none" — fall back to default
@@ -99,12 +99,12 @@ function SaveIndicator({ state }: { state: SaveState }) {
   return null;
 }
 
-export function PreferencesContent({ token, contact, organization, topics }: Props) {
-  const [topicStates, setTopicStates] = useState<
+export function PreferencesContent({ token, contact, organization, channels }: Props) {
+  const [channelStates, setChannelStates] = useState<
     Record<string, { subscribed: boolean; saveState: SaveState }>
   >(() =>
     Object.fromEntries(
-      topics.map((t) => [
+      channels.map((t) => [
         t.id,
         {
           subscribed: isSubscribed(t.status, t.defaultSubscription),
@@ -119,44 +119,44 @@ export function PreferencesContent({ token, contact, organization, topics }: Pro
   >("idle");
 
   const handleToggle = useCallback(
-    async (topicId: string, subscribed: boolean) => {
+    async (channelId: string, subscribed: boolean) => {
       // Optimistic update
-      setTopicStates((prev) => ({
+      setChannelStates((prev) => ({
         ...prev,
-        [topicId]: { subscribed, saveState: "saving" },
+        [channelId]: { subscribed, saveState: "saving" },
       }));
 
       try {
         const res = await fetch(`/api/contacts/v1/preferences/update/${token}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ topicId, subscribe: subscribed }),
+          body: JSON.stringify({ channelId, subscribe: subscribed }),
         });
 
         if (!res.ok) throw new Error("Failed to update");
 
-        setTopicStates((prev) => ({
+        setChannelStates((prev) => ({
           ...prev,
-          [topicId]: { subscribed, saveState: "saved" },
+          [channelId]: { subscribed, saveState: "saved" },
         }));
 
         // Reset to idle after 2s
         setTimeout(() => {
-          setTopicStates((prev) => ({
+          setChannelStates((prev) => ({
             ...prev,
-            [topicId]: { ...prev[topicId], saveState: "idle" },
+            [channelId]: { ...prev[channelId], saveState: "idle" },
           }));
         }, 2000);
       } catch {
         // Revert on error
-        setTopicStates((prev) => ({
+        setChannelStates((prev) => ({
           ...prev,
-          [topicId]: { subscribed: !subscribed, saveState: "error" },
+          [channelId]: { subscribed: !subscribed, saveState: "error" },
         }));
         setTimeout(() => {
-          setTopicStates((prev) => ({
+          setChannelStates((prev) => ({
             ...prev,
-            [topicId]: { ...prev[topicId], saveState: "idle" },
+            [channelId]: { ...prev[channelId], saveState: "idle" },
           }));
         }, 3000);
       }
@@ -174,7 +174,7 @@ export function PreferencesContent({ token, contact, organization, topics }: Pro
         if (!res.ok) throw new Error("Failed");
 
         // Mark all as unsubscribed
-        setTopicStates((prev) =>
+        setChannelStates((prev) =>
           Object.fromEntries(
             Object.entries(prev).map(([id, state]) => [
               id,
@@ -233,8 +233,8 @@ export function PreferencesContent({ token, contact, organization, topics }: Pro
           </p>
         </div>
 
-        {/* Topics */}
-        {topics.length === 0 ? (
+        {/* Channels */}
+        {channels.length === 0 ? (
           <div className="rounded-2xl border border-gray-200 bg-white px-6 py-12 text-center dark:border-white/8 dark:bg-white/4">
             <p className="text-text-sub-600 text-sm">
               No subscription options are currently available.
@@ -242,17 +242,17 @@ export function PreferencesContent({ token, contact, organization, topics }: Pro
           </div>
         ) : (
           <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-white/8 dark:bg-white/4">
-            {topics.map((topic, idx) => {
-              const state = topicStates[topic.id];
+            {channels.map((channel, idx) => {
+              const state = channelStates[channel.id];
               const subscribed = state?.subscribed ?? false;
               const saveState = state?.saveState ?? "idle";
 
               return (
                 <div
-                  key={topic.id}
+                  key={channel.id}
                   className={[
                     "flex items-center gap-4 px-5 py-4 transition-colors",
-                    idx !== topics.length - 1
+                    idx !== channels.length - 1
                       ? "border-b border-gray-100 dark:border-white/6"
                       : "",
                     subscribed
@@ -264,13 +264,13 @@ export function PreferencesContent({ token, contact, organization, topics }: Pro
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <span className="font-medium text-sm text-text-strong-950">
-                        {topic.name}
+                        {channel.name}
                       </span>
                       <SaveIndicator state={saveState} />
                     </div>
-                    {topic.description && (
+                    {channel.description && (
                       <p className="mt-0.5 text-text-sub-600 text-xs leading-5">
-                        {topic.description}
+                        {channel.description}
                       </p>
                     )}
                   </div>
@@ -278,9 +278,9 @@ export function PreferencesContent({ token, contact, organization, topics }: Pro
                   {/* Toggle */}
                   <div className="flex-shrink-0">
                     <Toggle
-                      id={`topic-${topic.id}`}
+                      id={`channel-${channel.id}`}
                       checked={subscribed}
-                      onChange={(val) => handleToggle(topic.id, val)}
+                      onChange={(val) => handleToggle(channel.id, val)}
                       saving={saveState === "saving"}
                     />
                   </div>
@@ -291,11 +291,11 @@ export function PreferencesContent({ token, contact, organization, topics }: Pro
         )}
 
         {/* Unsubscribe all */}
-        {topics.length > 0 && (
+        {channels.length > 0 && (
           <div className="mt-8 text-center">
             {unsubscribeAllState === "done" ? (
               <p className="text-sm text-green-600 dark:text-green-400">
-                ✓ You've been unsubscribed from all topics.
+                ✓ You've been unsubscribed from all channels.
               </p>
             ) : (
               <button

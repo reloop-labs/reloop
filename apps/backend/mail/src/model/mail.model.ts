@@ -64,9 +64,9 @@ export namespace MailModel {
 				description: "Custom headers to add to the email",
 			}),
 		),
-		topicId: t.Optional(
+		channelId: t.Optional(
 			t.String({
-				description: "The topic ID to receive the email",
+				description: "The channel ID to receive the email",
 			}),
 		),
 		attachments: t.Optional(

@@ -72,27 +72,27 @@ export const GROUP_UPDATE_WEBHOOK_EVENT = {
 	isActive: true,
 } as const satisfies WebhookEventDefinition;
 
-export const TOPIC_CREATE_WEBHOOK_EVENT = {
-	id: "contact.topic.create",
-	name: "contact.topic.create",
+export const CHANNEL_CREATE_WEBHOOK_EVENT = {
+	id: "contact.channel.create",
+	name: "contact.channel.create",
 	category: "contact",
-	description: "Triggered when a new topic is created",
+	description: "Triggered when a new channel is created",
 	isActive: true,
 } as const satisfies WebhookEventDefinition;
 
-export const TOPIC_DELETE_WEBHOOK_EVENT = {
-	id: "contact.topic.delete",
-	name: "contact.topic.delete",
+export const CHANNEL_DELETE_WEBHOOK_EVENT = {
+	id: "contact.channel.delete",
+	name: "contact.channel.delete",
 	category: "contact",
-	description: "Triggered when a topic is deleted",
+	description: "Triggered when a channel is deleted",
 	isActive: true,
 } as const satisfies WebhookEventDefinition;
 
-export const TOPIC_UPDATE_WEBHOOK_EVENT = {
-	id: "contact.topic.update",
-	name: "contact.topic.update",
+export const CHANNEL_UPDATE_WEBHOOK_EVENT = {
+	id: "contact.channel.update",
+	name: "contact.channel.update",
 	category: "contact",
-	description: "Triggered when a topic is updated",
+	description: "Triggered when a channel is updated",
 	isActive: true,
 } as const satisfies WebhookEventDefinition;
 
@@ -136,11 +136,11 @@ export const GROUP_LIST_WEBHOOK_EVENT = {
 	isActive: true,
 } as const satisfies WebhookEventDefinition;
 
-export const TOPIC_LIST_WEBHOOK_EVENT = {
-	id: "contact.topic.list",
-	name: "contact.topic.list",
+export const CHANNEL_LIST_WEBHOOK_EVENT = {
+	id: "contact.channel.list",
+	name: "contact.channel.list",
 	category: "contact",
-	description: "Triggered when topics are listed",
+	description: "Triggered when channels are listed",
 	isActive: true,
 } as const satisfies WebhookEventDefinition;
 
@@ -168,11 +168,11 @@ export const GROUP_GET_WEBHOOK_EVENT = {
 	isActive: true,
 } as const satisfies WebhookEventDefinition;
 
-export const TOPIC_GET_WEBHOOK_EVENT = {
-	id: "contact.topic.get",
-	name: "contact.topic.get",
+export const CHANNEL_GET_WEBHOOK_EVENT = {
+	id: "contact.channel.get",
+	name: "contact.channel.get",
 	category: "contact",
-	description: "Triggered when a topic is retrieved",
+	description: "Triggered when a channel is retrieved",
 	isActive: true,
 } as const satisfies WebhookEventDefinition;
 
@@ -186,17 +186,17 @@ export const CONTACT_WEBHOOK_EVENTS = [
 	GROUP_CREATE_WEBHOOK_EVENT,
 	GROUP_UPDATE_WEBHOOK_EVENT,
 	GROUP_DELETE_WEBHOOK_EVENT,
-	TOPIC_CREATE_WEBHOOK_EVENT,
-	TOPIC_UPDATE_WEBHOOK_EVENT,
-	TOPIC_DELETE_WEBHOOK_EVENT,
+	CHANNEL_CREATE_WEBHOOK_EVENT,
+	CHANNEL_UPDATE_WEBHOOK_EVENT,
+	CHANNEL_DELETE_WEBHOOK_EVENT,
 	PROPERTY_CREATE_WEBHOOK_EVENT,
 	PROPERTY_UPDATE_WEBHOOK_EVENT,
 	PROPERTY_DELETE_WEBHOOK_EVENT,
 	CONTACT_LIST_WEBHOOK_EVENT,
 	GROUP_LIST_WEBHOOK_EVENT,
-	TOPIC_LIST_WEBHOOK_EVENT,
+	CHANNEL_LIST_WEBHOOK_EVENT,
 	PROPERTY_LIST_WEBHOOK_EVENT,
 	CONTACT_GET_WEBHOOK_EVENT,
 	GROUP_GET_WEBHOOK_EVENT,
-	TOPIC_GET_WEBHOOK_EVENT,
+	CHANNEL_GET_WEBHOOK_EVENT,
 ] as const satisfies readonly WebhookEventDefinition[];

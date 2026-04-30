@@ -11,7 +11,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { organization, user } from "./auth";
 import { contactGroup } from "./group";
-import { topicEnrollment } from "./topic";
+import { channelSubscription } from "./channel";
 
 const createContactId = () => `con_${createId()}`;
 const createContactPropertyValueId = () => `cpv_${createId()}`;
@@ -146,7 +146,7 @@ export const contactRelations = relations(contact, ({ one, many }) => ({
 	}),
 	propertyValues: many(contactPropertyValue),
 	contactGroups: many(contactGroup),
-	contactTopics: many(topicEnrollment, { relationName: "contactTopics" }),
+	contactChannels: many(channelSubscription, { relationName: "contactChannels" }),
 }));
 
 export const contactPropertyValueRelations = relations(

@@ -12,7 +12,7 @@ import useSWR from "swr";
 import { ContactsModals } from "./components/contacts-modals";
 import { ContactsTabs } from "./components/contacts-tabs";
 
-interface Topic {
+interface Channel {
 	id: string;
 	name: string;
 }
@@ -25,21 +25,21 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 	const [, setModal] = useQueryState("modal");
 
 	const isPropertiesPage = pathname.includes("/contacts/properties");
-	const isTopicsPage = pathname.includes("/contacts/topics");
+	const isChannelsPage = pathname.includes("/contacts/channels");
 	const isGroupsPage = pathname.includes("/contacts/groups");
-	const isAddTopicPage = pathname.endsWith("/contacts/topics/add");
+	const isAddChannelPage = pathname.endsWith("/contacts/channels/add");
 	const isBulkImportPage = pathname.includes("/bulk-import");
 	const isContactDetailPage = pathname.includes("/contacts/detail/");
 	const isGroupDetailPage =
 		pathname.match(/\/contacts\/groups\/([^/]+)/) !== null;
-	const isTopicDetailPage =
-		pathname.match(/\/contacts\/topics\/([^/]+)$/) !== null;
+	const isChannelDetailPage =
+		pathname.match(/\/contacts\/channels\/([^/]+)$/) !== null;
 	const isDetailPage =
-		isContactDetailPage || isGroupDetailPage || isTopicDetailPage;
+		isContactDetailPage || isGroupDetailPage || isChannelDetailPage;
 
 	const handleAction = () => {
 		if (isPropertiesPage) setModal("add-property");
-		else if (isTopicsPage) router.push("/contacts/topics/add");
+		else if (isChannelsPage) router.push("/contacts/channels/add");
 		else if (isGroupsPage) setModal("create-group");
 		else setModal("add-contact");
 	};
@@ -53,7 +53,7 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 			}
 		},
 		{
-			enabled: !isAddTopicPage && !isBulkImportPage && !isDetailPage,
+			enabled: !isAddChannelPage && !isBulkImportPage && !isDetailPage,
 		},
 	);
 
@@ -64,25 +64,25 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 			setModal("create-group");
 		},
 		{
-			enabled: !isAddTopicPage && !isBulkImportPage && !isDetailPage,
+			enabled: !isAddChannelPage && !isBulkImportPage && !isDetailPage,
 		},
 	);
 
-	// Extract topicId if on a topic subpage
-	const topicIdMatch = pathname.match(/\/contacts\/topics\/([^/]+)/);
-	const topicId = topicIdMatch && !isAddTopicPage ? topicIdMatch[1] : null;
+	// Extract channelId if on a channel subpage
+	const channelIdMatch = pathname.match(/\/contacts\/channels\/([^/]+)/);
+	const channelId = channelIdMatch && !isAddChannelPage ? channelIdMatch[1] : null;
 
-	const { data: topicData } = useSWR<Topic>(
-		topicId ? `/api/contacts/v1/topics/${topicId}` : null,
+	const { data: channelData } = useSWR<Channel>(
+		channelId ? `/api/contacts/v1/channels/${channelId}` : null,
 	);
 
 	const getHeaderConfig = () => {
-		if (isAddTopicPage) return { title: "Create Topic", showBack: true };
+		if (isAddChannelPage) return { title: "Create Channel", showBack: true };
 		if (isBulkImportPage) return { title: "Bulk Import", showBack: true };
-		if (topicId)
-			return { title: topicData?.name || "Topic Details", showBack: true };
+		if (channelId)
+			return { title: channelData?.name || "Channel Details", showBack: true };
 		if (isPropertiesPage) return { title: "Properties", showBack: false };
-		if (isTopicsPage) return { title: "Topics", showBack: false };
+		if (isChannelsPage) return { title: "Channels", showBack: false };
 		if (isGroupsPage) return { title: "Groups", showBack: false };
 		return { title: "Contacts", showBack: false };
 	};
@@ -91,8 +91,8 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 
 	const actionLabel = isPropertiesPage
 		? "Add Property"
-		: isTopicsPage
-			? "Create Topic"
+		: isChannelsPage
+			? "Create Channel"
 			: isGroupsPage
 				? "Create Group"
 				: "Add Contact";
@@ -100,7 +100,7 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 	return (
 		<>
 			<div
-				className={`mx-auto sm:px-8 ${isAddTopicPage ? "max-w-5xl" : "max-w-3xl"}`}
+				className={`mx-auto sm:px-8 ${isAddChannelPage ? "max-w-5xl" : "max-w-3xl"}`}
 			>
 				{/* Unified Header */}
 				{!isDetailPage && (
@@ -122,7 +122,7 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 							)}
 							<h1 className="font-medium text-2xl">{title}</h1>
 						</div>
-						{!isAddTopicPage && !isBulkImportPage && (
+						{!isAddChannelPage && !isBulkImportPage && (
 							<div className="flex items-center gap-2 self-end">
 								<DocsButton slug="contacts" size="xsmall" />
 								<Button.Root
@@ -151,7 +151,7 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 					</div>
 				)}
 
-				{!isDetailPage && !isAddTopicPage && !isBulkImportPage && (
+				{!isDetailPage && !isAddChannelPage && !isBulkImportPage && (
 					<div className="mt-2">
 						<ContactsTabs />
 					</div>
@@ -160,7 +160,7 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 			</div>
 
 			{/* Global Contacts Modals */}
-			<ContactsModals topicId={topicId || undefined} />
+			<ContactsModals channelId={channelId || undefined} />
 		</>
 	);
 };

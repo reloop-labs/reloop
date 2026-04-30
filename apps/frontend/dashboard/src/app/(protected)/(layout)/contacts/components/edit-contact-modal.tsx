@@ -21,7 +21,7 @@ interface Contact {
 	status: AudienceStatus;
 	organizationId: string;
 	properties: Record<string, string | number>;
-	topics?: { id: string; name: string; subscription: "opt_in" | "opt_out" }[];
+	channels?: { id: string; name: string; subscription: "opt_in" | "opt_out" }[];
 	createdAt: string;
 	updatedAt: string;
 	deletedAt: string | null;
@@ -34,7 +34,7 @@ interface Property {
 	defaultValue: string | null;
 }
 
-interface Topic {
+interface Channel {
 	id: string;
 	name: string;
 	defaultSubscription: "opt_in" | "opt_out";
@@ -62,11 +62,11 @@ export const EditContactModal = ({
 	const [propertyValues, setPropertyValues] = useState<Record<string, string>>(
 		{},
 	);
-	// Topics state
-	const [selectedTopicIds, setSelectedTopicIds] = useState<string[]>([]);
-	const [topicInput, setTopicInput] = useState("");
-	const [showTopicDropdown, setShowTopicDropdown] = useState(false);
-	const topicInputRef = useRef<HTMLInputElement>(null);
+	// Channels state
+	const [selectedChannelIds, setSelectedChannelIds] = useState<string[]>([]);
+	const [channelInput, setChannelInput] = useState("");
+	const [showChannelDropdown, setShowChannelDropdown] = useState(false);
+	const channelInputRef = useRef<HTMLInputElement>(null);
 
 	// Fetch all custom properties for the organization
 	const { data: propertiesData } = useSWR<{
@@ -74,43 +74,43 @@ export const EditContactModal = ({
 		total: number;
 	}>(open ? "/api/contacts/v1/properties/list?limit=100" : null, fetcher);
 
-	// Fetch all topics for the organization
-	const { data: allTopicsData } = useSWR<{
-		topics: Topic[];
+	// Fetch all channels for the organization
+	const { data: allChannelsData } = useSWR<{
+		channels: Channel[];
 		total: number;
-	}>(open ? "/api/contacts/v1/topics/list?limit=100" : null, fetcher);
+	}>(open ? "/api/contacts/v1/channels/list?limit=100" : null, fetcher);
 
-	// All available topics
-	const allTopics = allTopicsData?.topics || [];
+	// All available channels
+	const allChannels = allChannelsData?.channels || [];
 
-	// Calculate enrolled topic IDs based on defaultSubscription logic
-	// Logic: A contact is enrolled in a topic if:
-	// 1. Topic has defaultSubscription="opt_in" AND there's no explicit "unenrolled" record
+	// Calculate enrolled channel IDs based on defaultSubscription logic
+	// Logic: A contact is enrolled in a channel if:
+	// 1. Channel has defaultSubscription="opt_in" AND there's no explicit "unenrolled" record
 	// 2. OR there's an explicit "enrolled" record
-	const enrolledTopicIds = (() => {
-		if (!allTopics.length) return [];
+	const enrolledChannelIds = (() => {
+		if (!allChannels.length) return [];
 
-		// Build a map of topicId -> enrollment status from explicit enrollments
-		const enrollmentMap = new Map<string, "opt_in" | "opt_out">();
-		if (contact?.topics) {
-			for (const t of contact.topics) {
-				enrollmentMap.set(t.id, t.subscription);
+		// Build a map of channelId -> subscription status from explicit subscriptions
+		const subscriptionMap = new Map<string, "opt_in" | "opt_out">();
+		if (contact?.channels) {
+			for (const t of contact.channels) {
+				subscriptionMap.set(t.id, t.subscription);
 			}
 		}
 
-		return allTopics
-			.filter((topic) => {
-				const explicitStatus = enrollmentMap.get(topic.id);
+		return allChannels
+			.filter((channel) => {
+				const explicitStatus = subscriptionMap.get(channel.id);
 
-				// If there's an explicit enrollment record
+				// If there's an explicit subscription record
 				if (explicitStatus) {
 					return explicitStatus === "opt_in";
 				}
 
-				// No explicit record - use topic's defaultSubscription setting
-				return topic.defaultSubscription === "opt_in";
+				// No explicit record - use channel's defaultSubscription setting
+				return channel.defaultSubscription === "opt_in";
 			})
-			.map((topic) => topic.id);
+			.map((channel) => channel.id);
 	})();
 
 	// Custom properties only (firstName/lastName are now system fields on the contact)
@@ -141,12 +141,12 @@ export const EditContactModal = ({
 		}
 	}, [contact, open, propertiesData?.properties]);
 
-	// Initialize selected topics from enrollments
+	// Initialize selected channels from subscriptions
 	useEffect(() => {
-		if (enrolledTopicIds.length > 0) {
-			setSelectedTopicIds(enrolledTopicIds);
+		if (enrolledChannelIds.length > 0) {
+			setSelectedChannelIds(enrolledChannelIds);
 		}
-	}, [enrolledTopicIds.join(",")]);
+	}, [enrolledChannelIds.join(",")]);
 
 	// Cmd/Ctrl + Enter to submit
 	useHotkeys(
@@ -167,42 +167,42 @@ export const EditContactModal = ({
 			setFirstName("");
 			setLastName("");
 			setPropertyValues({});
-			setSelectedTopicIds([]);
-			setTopicInput("");
-			setShowTopicDropdown(false);
+			setSelectedChannelIds([]);
+			setChannelInput("");
+			setShowChannelDropdown(false);
 		}
 		onOpenChange(isOpen);
 	};
 
-	// Topic management handlers
-	const addTopic = (topicId: string) => {
-		if (!selectedTopicIds.includes(topicId)) {
-			setSelectedTopicIds((prev) => [...prev, topicId]);
+	// Channel management handlers
+	const addChannel = (channelId: string) => {
+		if (!selectedChannelIds.includes(channelId)) {
+			setSelectedChannelIds((prev) => [...prev, channelId]);
 		}
-		setTopicInput("");
-		setShowTopicDropdown(false);
+		setChannelInput("");
+		setShowChannelDropdown(false);
 	};
 
-	const removeTopic = (topicId: string) => {
-		setSelectedTopicIds((prev) => prev.filter((id) => id !== topicId));
+	const removeChannel = (channelId: string) => {
+		setSelectedChannelIds((prev) => prev.filter((id) => id !== channelId));
 	};
 
-	// Get topic name by id
-	const getTopicName = (topicId: string) => {
-		return allTopics.find((t) => t.id === topicId)?.name || "";
+	// Get channel name by id
+	const getChannelName = (channelId: string) => {
+		return allChannels.find((t) => t.id === channelId)?.name || "";
 	};
 
-	// Filter available topics for dropdown (all topics not already selected)
-	const availableTopics = allTopics.filter(
-		(topic) => !selectedTopicIds.includes(topic.id),
+	// Filter available channels for dropdown (all channels not already selected)
+	const availableChannels = allChannels.filter(
+		(channel) => !selectedChannelIds.includes(channel.id),
 	);
 
 	// Filter by search input
-	const filteredTopics = topicInput
-		? availableTopics.filter((t) =>
-				t.name.toLowerCase().includes(topicInput.toLowerCase()),
+	const filteredChannels = channelInput
+		? availableChannels.filter((t) =>
+				t.name.toLowerCase().includes(channelInput.toLowerCase()),
 			)
-		: availableTopics;
+		: availableChannels;
 
 	const handlePropertyChange = (propertyId: string, value: string) => {
 		setPropertyValues((prev) => ({
@@ -253,49 +253,49 @@ export const EditContactModal = ({
 				throw new Error(data.message || "Failed to update contact");
 			}
 
-			// Handle topic enrollment changes
-			// Find topics that were added (in selectedTopicIds but not in enrolledTopicIds)
-			const topicsToAdd = selectedTopicIds.filter(
-				(id) => !enrolledTopicIds.includes(id),
+			// Handle channel subscription changes
+			// Find channels that were added (in selectedChannelIds but not in enrolledChannelIds)
+			const channelsToAdd = selectedChannelIds.filter(
+				(id) => !enrolledChannelIds.includes(id),
 			);
 
-			// Find topics that were removed (in enrolledTopicIds but not in selectedTopicIds)
-			const topicsToRemove = enrolledTopicIds.filter(
-				(id) => !selectedTopicIds.includes(id),
+			// Find channels that were removed (in enrolledChannelIds but not in selectedChannelIds)
+			const channelsToRemove = enrolledChannelIds.filter(
+				(id) => !selectedChannelIds.includes(id),
 			);
 
-			// Add new enrollments (backend now handles upsert)
-			for (const topicId of topicsToAdd) {
-				const enrollResponse = await fetch("/api/contacts/v1/enrollments/add", {
+			// Add new subscriptions (backend now handles upsert)
+			for (const channelId of channelsToAdd) {
+				const enrollResponse = await fetch("/api/contacts/v1/subscriptions/add", {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({
 						contactId: contact.id,
-						topicId,
+						channelId,
 						status: "enrolled",
 					}),
 				});
 				if (!enrollResponse.ok) {
-					console.error(`Failed to enroll contact in topic ${topicId}`);
+					console.error(`Failed to enroll contact in channel ${channelId}`);
 				}
 			}
 
-			// Remove/unenroll from topics (backend now handles upsert)
-			for (const topicId of topicsToRemove) {
+			// Remove/unenroll from channels (backend now handles upsert)
+			for (const channelId of channelsToRemove) {
 				const unenrollResponse = await fetch(
-					"/api/contacts/v1/enrollments/add",
+					"/api/contacts/v1/subscriptions/add",
 					{
 						method: "POST",
 						headers: { "Content-Type": "application/json" },
 						body: JSON.stringify({
 							contactId: contact.id,
-							topicId,
+							channelId,
 							status: "unenrolled",
 						}),
 					},
 				);
 				if (!unenrollResponse.ok) {
-					console.error(`Failed to unenroll contact from topic ${topicId}`);
+					console.error(`Failed to unenroll contact from channel ${channelId}`);
 				}
 			}
 
@@ -303,9 +303,9 @@ export const EditContactModal = ({
 			handleOpenChange(false);
 			// Invalidate the specific contact endpoint
 			await mutate(`/api/contacts/retrieve/${contact.id}`);
-			// Invalidate the specific enrollments cache for this contact
+			// Invalidate the specific subscriptions cache for this contact
 			await mutate(
-				`/api/contacts/v1/enrollments/list?contactId=${contact.id}&limit=100`,
+				`/api/contacts/v1/subscriptions/list?contactId=${contact.id}&limit=100`,
 			);
 			// Invalidate all contacts API cache
 			await mutate(
@@ -420,26 +420,26 @@ export const EditContactModal = ({
 									</button>
 								</div>
 
-								{/* Topics */}
+								{/* Channels */}
 								<div className="flex flex-col gap-1 border-stroke-soft-100 border-t pt-4">
-									<Label.Root htmlFor="topics">Topics</Label.Root>
+									<Label.Root htmlFor="channels">Channels</Label.Root>
 									<div className="relative">
 										<label className="group/chips flex min-h-[44px] cursor-text flex-wrap content-start gap-1.5 rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-3 py-2.5 shadow-regular-xs transition duration-200 ease-out focus-within:border-stroke-strong-950 focus-within:shadow-button-important-focus hover:[&:not(:focus-within)]:bg-bg-weak-50">
-											{selectedTopicIds.map((topicId) => {
-												const topicName = getTopicName(topicId);
-												if (!topicName) return null;
+											{selectedChannelIds.map((channelId) => {
+												const channelName = getChannelName(channelId);
+												if (!channelName) return null;
 												return (
 													<span
-														key={topicId}
+														key={channelId}
 														className="inline-flex items-center gap-1 rounded-md border border-stroke-soft-200 bg-bg-weak-50 px-2 py-0.5 text-paragraph-xs text-text-strong-950"
 													>
-														{topicName}
+														{channelName}
 														<button
 															type="button"
 															onClick={(e) => {
 																e.preventDefault();
 																e.stopPropagation();
-																removeTopic(topicId);
+																removeChannel(channelId);
 															}}
 															className="ml-0.5 text-text-sub-600 transition-colors hover:text-text-strong-950"
 															disabled={isSaving}
@@ -450,44 +450,44 @@ export const EditContactModal = ({
 												);
 											})}
 											<input
-												ref={topicInputRef}
+												ref={channelInputRef}
 												type="text"
-												value={topicInput}
+												value={channelInput}
 												onChange={(e) => {
-													setTopicInput(e.target.value);
-													setShowTopicDropdown(true);
+													setChannelInput(e.target.value);
+													setShowChannelDropdown(true);
 												}}
-												onFocus={() => setShowTopicDropdown(true)}
+												onFocus={() => setShowChannelDropdown(true)}
 												onBlur={(e) => {
 													// Close dropdown if focus leaves to outside the dropdown
 													const relatedTarget = e.relatedTarget as HTMLElement;
 													if (!relatedTarget?.closest(".absolute")) {
-														setShowTopicDropdown(false);
+														setShowChannelDropdown(false);
 													}
 												}}
 												placeholder={
-													selectedTopicIds.length === 0 ? "Add Topics..." : ""
+													selectedChannelIds.length === 0 ? "Add Channels..." : ""
 												}
 												className="min-w-[80px] flex-1 bg-transparent text-paragraph-sm text-text-sub-600 outline-none placeholder:text-text-soft-400"
 												disabled={isSaving}
 											/>
 										</label>
 										{/* Dropdown */}
-										{showTopicDropdown && filteredTopics.length > 0 && (
+										{showChannelDropdown && filteredChannels.length > 0 && (
 											<div className="absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-stroke-soft-200 bg-bg-white-0 p-1 shadow-lg">
-												{filteredTopics.map((topic) => (
+												{filteredChannels.map((channel) => (
 													<button
-														key={topic.id}
+														key={channel.id}
 														type="button"
-														onClick={() => addTopic(topic.id)}
+														onClick={() => addChannel(channel.id)}
 														className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-paragraph-sm text-text-strong-950 transition-colors hover:bg-bg-weak-50"
 													>
 														<Icon
 															name="hash"
 															className="h-3 w-3 text-text-sub-600"
 														/>
-														{topic.name}
-														{topic.defaultSubscription === "opt_out" && (
+														{channel.name}
+														{channel.defaultSubscription === "opt_out" && (
 															<span className="ml-auto text-paragraph-xs text-text-soft-400">
 																Opt-out
 															</span>
@@ -496,12 +496,12 @@ export const EditContactModal = ({
 												))}
 											</div>
 										)}
-										{showTopicDropdown &&
-											filteredTopics.length === 0 &&
-											topicInput && (
+										{showChannelDropdown &&
+											filteredChannels.length === 0 &&
+											channelInput && (
 												<div className="absolute z-10 mt-1 w-full rounded-lg border border-stroke-soft-200 bg-bg-white-0 p-3 shadow-lg">
 													<p className="text-paragraph-sm text-text-soft-400">
-														No topics found
+														No channels found
 													</p>
 												</div>
 											)}

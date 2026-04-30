@@ -78,7 +78,7 @@ export const landing = new Elysia()
 		name: "Contacts Service",
 		version: "1.0.0",
 		description:
-			"Service for managing contacts, properties, topics, and groups. Supports automated segmentation and personalized contact tracking.",
+			"Service for managing contacts, properties, channels, and groups. Supports automated segmentation and personalized contact tracking.",
 		url: "https://reloop.sh",
 		defaultInputModes: ["application/json"],
 		defaultOutputModes: ["application/json"],
@@ -229,7 +229,7 @@ export const landing = new Elysia()
 			},
 		],
 		usage_guidelines:
-			"1. Use the x-api-key header for API authentication or provide a session cookie.\n2. All contact operations are scoped to an activeOrganizationId.\n3. Valid contact statuses are subscribed, unsubscribed, and blocked.\n4. Properties must have keys matching the pattern ^[a-z0-9_]+$.\n5. Topics use opt_in and opt_out for subscription status.\n6. Pagination for /list uses page and limit query parameters.",
+			"1. Use the x-api-key header for API authentication or provide a session cookie.\n2. All contact operations are scoped to an activeOrganizationId.\n3. Valid contact statuses are subscribed, unsubscribed, and blocked.\n4. Properties must have keys matching the pattern ^[a-z0-9_]+$.\n5. Channels use opt_in and opt_out for subscription status.\n6. Pagination for /list uses page and limit query parameters.",
 		authentication: {
 			schemes: ["apiKey", "bearer"],
 			headerName: "x-api-key",

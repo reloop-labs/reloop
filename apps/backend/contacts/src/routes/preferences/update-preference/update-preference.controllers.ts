@@ -7,16 +7,16 @@ import { verifyToken } from "../token.utils";
 
 export async function updatePreferenceController({
   token,
-  topicId,
+  channelId,
   subscribe,
   logger,
 }: {
   token: string;
-  topicId: string;
+  channelId: string;
   subscribe: boolean;
   logger: Logger;
 }) {
-  logger.info({ topicId, subscribe }, "Updating preference");
+  logger.info({ channelId, subscribe }, "Updating preference");
 
   const payload = await verifyToken(token);
   if (!payload) {
@@ -25,49 +25,49 @@ export async function updatePreferenceController({
 
   const { contactId, organizationId } = payload;
 
-  // Verify the topic exists, is public, and belongs to this org
-  const topic = await db.query.topic.findFirst({
+  // Verify the channel exists, is public, and belongs to this org
+  const channel = await db.query.channel.findFirst({
     where: and(
-      eq(schema.topic.id, topicId),
-      eq(schema.topic.organizationId, organizationId),
-      eq(schema.topic.visibility, "public"),
-      isNull(schema.topic.deletedAt),
+      eq(schema.channel.id, channelId),
+      eq(schema.channel.organizationId, organizationId),
+      eq(schema.channel.visibility, "public"),
+      isNull(schema.channel.deletedAt),
     ),
   });
 
-  if (!topic) {
-    throw status(404, { message: "Topic not found or not accessible" });
+  if (!channel) {
+    throw status(404, { message: "Channel not found or not accessible" });
   }
 
   const targetStatus = subscribe ? "enrolled" : "unenrolled";
 
-  const existing = await db.query.topicEnrollment.findFirst({
+  const existing = await db.query.channelSubscription.findFirst({
     where: and(
-      eq(schema.topicEnrollment.contactId, contactId),
-      eq(schema.topicEnrollment.topicId, topicId),
-      isNull(schema.topicEnrollment.deletedAt),
+      eq(schema.channelSubscription.contactId, contactId),
+      eq(schema.channelSubscription.channelId, channelId),
+      isNull(schema.channelSubscription.deletedAt),
     ),
   });
 
   if (existing) {
     await db
-      .update(schema.topicEnrollment)
+      .update(schema.channelSubscription)
       .set({ status: targetStatus, updatedAt: new Date() })
-      .where(eq(schema.topicEnrollment.id, existing.id));
+      .where(eq(schema.channelSubscription.id, existing.id));
   } else {
-    await db.insert(schema.topicEnrollment).values({
+    await db.insert(schema.channelSubscription).values({
       contactId,
-      topicId,
+      channelId,
       organizationId,
       status: targetStatus,
     });
   }
 
-  logger.info({ contactId, topicId, status: targetStatus }, "Preference updated");
+  logger.info({ contactId, channelId, status: targetStatus }, "Preference updated");
 
   return {
     success: true,
-    topicId,
+    channelId,
     status: targetStatus,
   };
 }

@@ -124,20 +124,20 @@ export async function listContactsController({
       );
     }
 
-    // Batch load topics and enrollments for all contacts in the list
-    const allOrgTopics = await db.query.topic.findMany({
+    // Batch load channels and enrollments for all contacts in the list
+    const allOrgChannels = await db.query.channel.findMany({
       where: and(
-        eq(schema.topic.organizationId, organizationId),
-        isNull(schema.topic.deletedAt),
+        eq(schema.channel.organizationId, organizationId),
+        isNull(schema.channel.deletedAt),
       ),
     });
 
     let enrollmentMap: Record<string, Record<string, "enrolled" | "unenrolled">> = {};
     if (contactIds.length > 0) {
-      const allEnrollments = await db.query.topicEnrollment.findMany({
+      const allEnrollments = await db.query.channelSubscription.findMany({
         where: and(
-          inArray(schema.topicEnrollment.contactId, contactIds),
-          isNull(schema.topicEnrollment.deletedAt),
+          inArray(schema.channelSubscription.contactId, contactIds),
+          isNull(schema.channelSubscription.deletedAt),
         ),
       });
 
@@ -149,7 +149,7 @@ export async function listContactsController({
           }
           const contactEnrollments = acc[contactId];
           if (contactEnrollments) {
-            contactEnrollments[curr.topicId] = curr.status;
+            contactEnrollments[curr.channelId] = curr.status;
           }
           return acc;
         },
@@ -166,7 +166,7 @@ export async function listContactsController({
       status: contact.status,
       properties: propertyMap[contact.id] || {},
       groups: (contact as ContactTypes.ContactData).groups ?? [],
-      topics: allOrgTopics.map((t) => {
+      channels: allOrgChannels.map((t) => {
         const explicitStatus = enrollmentMap[contact.id]?.[t.id];
         return {
           id: t.id,

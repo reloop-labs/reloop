@@ -22,31 +22,31 @@ export async function unsubscribeAllController({
   const { contactId, organizationId } = payload;
 
   // Get all active enrollments for this contact in this org
-  const enrollments = await db.query.topicEnrollment.findMany({
+  const enrollments = await db.query.channelSubscription.findMany({
     where: and(
-      eq(schema.topicEnrollment.contactId, contactId),
-      eq(schema.topicEnrollment.organizationId, organizationId),
-      isNull(schema.topicEnrollment.deletedAt),
+      eq(schema.channelSubscription.contactId, contactId),
+      eq(schema.channelSubscription.organizationId, organizationId),
+      isNull(schema.channelSubscription.deletedAt),
     ),
   });
 
   // Batch update all to unenrolled
   if (enrollments.length > 0) {
     await db
-      .update(schema.topicEnrollment)
+      .update(schema.channelSubscription)
       .set({ status: "unenrolled", updatedAt: new Date() })
       .where(
         and(
-          eq(schema.topicEnrollment.contactId, contactId),
-          eq(schema.topicEnrollment.organizationId, organizationId),
-          isNull(schema.topicEnrollment.deletedAt),
+          eq(schema.channelSubscription.contactId, contactId),
+          eq(schema.channelSubscription.organizationId, organizationId),
+          isNull(schema.channelSubscription.deletedAt),
         ),
       );
   }
 
   logger.info(
     { contactId, updatedCount: enrollments.length },
-    "Unsubscribed from all topics",
+    "Unsubscribed from all channels",
   );
 
   return {

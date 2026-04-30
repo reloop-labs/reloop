@@ -43,28 +43,28 @@ export async function getPreferencesDataController({
     .limit(1);
 
 
-  // Fetch all PUBLIC topics for the org
-  const topics = await db.query.topic.findMany({
+  // Fetch all PUBLIC channels for the org
+  const channels = await db.query.channel.findMany({
     where: and(
-      eq(schema.topic.organizationId, organizationId),
-      eq(schema.topic.visibility, "public"),
-      isNull(schema.topic.deletedAt),
+      eq(schema.channel.organizationId, organizationId),
+      eq(schema.channel.visibility, "public"),
+      isNull(schema.channel.deletedAt),
     ),
   });
 
-  // Fetch contact's enrollments for those topics
-  const enrollments = await db.query.topicEnrollment.findMany({
+  // Fetch contact's enrollments for those channels
+  const enrollments = await db.query.channelSubscription.findMany({
     where: and(
-      eq(schema.topicEnrollment.contactId, contactId),
-      eq(schema.topicEnrollment.organizationId, organizationId),
-      isNull(schema.topicEnrollment.deletedAt),
+      eq(schema.channelSubscription.contactId, contactId),
+      eq(schema.channelSubscription.organizationId, organizationId),
+      isNull(schema.channelSubscription.deletedAt),
     ),
   });
 
-  const enrollmentMap = new Map(enrollments.map((e) => [e.topicId, e.status]));
+  const enrollmentMap = new Map(enrollments.map((e) => [e.channelId, e.status]));
 
   logger.info(
-    { contactId, topicsCount: topics.length },
+    { contactId, channelsCount: channels.length },
     "Preferences data fetched successfully",
   );
 
@@ -77,13 +77,13 @@ export async function getPreferencesDataController({
     organization: {
       name: org?.name ?? "Reloop",
     },
-    topics: topics.map((topic) => ({
-      id: topic.id,
-      name: topic.name,
-      description: topic.description,
-      defaultSubscription: topic.defaultSubscription,
+    channels: channels.map((channel) => ({
+      id: channel.id,
+      name: channel.name,
+      description: channel.description,
+      defaultSubscription: channel.defaultSubscription,
       // enrolled | unenrolled | none (never touched)
-      status: enrollmentMap.get(topic.id) ?? "none",
+      status: enrollmentMap.get(channel.id) ?? "none",
     })),
   };
 }

@@ -25,8 +25,8 @@ const items = [
 		iconName: "modules",
 	},
 	{
-		title: "Topics",
-		value: "topics",
+		title: "Channels",
+		value: "channels",
 		iconName: "notification-indicator",
 	},
 ];
@@ -37,12 +37,12 @@ export const ContactsTabs = () => {
 	const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
 
 	const isPropertiesPage = pathname.includes("/contacts/properties");
-	const isTopicsPage = pathname.includes("/contacts/topics");
+	const isChannelsPage = pathname.includes("/contacts/channels");
 	const isGroupsPage = pathname.includes("/contacts/groups");
 	const effectiveTabValue = isPropertiesPage
 		? "properties"
-		: isTopicsPage
-			? "topics"
+		: isChannelsPage
+			? "channels"
 			: isGroupsPage
 				? "groups"
 				: "contacts";
@@ -79,8 +79,8 @@ export const ContactsTabs = () => {
 						onClick={() => {
 							if (value === "properties") {
 								router.push("/contacts/properties");
-							} else if (value === "topics") {
-								router.push("/contacts/topics");
+							} else if (value === "channels") {
+								router.push("/contacts/channels");
 							} else if (value === "groups") {
 								router.push("/contacts/groups");
 							} else {

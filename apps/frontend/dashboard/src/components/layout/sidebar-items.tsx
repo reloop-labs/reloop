@@ -17,8 +17,8 @@ const contactsSubNav = [
 	{ label: "Properties", path: "/contacts/properties", iconName: "tag" },
 	{ label: "Groups", path: "/contacts/groups", iconName: "modules" },
 	{
-		label: "Topics",
-		path: "/contacts/topics",
+		label: "Channels",
+		path: "/contacts/channels",
 		iconName: "notification-indicator",
 	},
 ] as const;

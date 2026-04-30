@@ -20,7 +20,7 @@ export const getPreferencesDataRoute = new Elysia().get(
       tags: ["Preferences"],
       summary: "Get preference page data",
       description:
-        "Returns public topics and contact enrollment status for the preference management page. No auth required — token is self-contained.",
+        "Returns public channels and contact enrollment status for the preference management page. No auth required — token is self-contained.",
     },
   },
 );

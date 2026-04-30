@@ -46,19 +46,19 @@ export namespace ContactModel {
 				description: "Array of group IDs to add the contact to",
 			}),
 		),
-		topics: t.Optional(
+		channels: t.Optional(
 			t.Array(
 				t.Object({
-					topicId: t.String({ description: "Topic identifier" }),
+					channelId: t.String({ description: "Channel identifier" }),
 					subscription: t.Union(
 						[t.Literal("opt_in"), t.Literal("opt_out")],
 						{
-							description: "Subscription status for the topic",
+							description: "Subscription status for the channel",
 						},
 					),
 				}),
 				{
-					description: "Array of topics to enroll the contact in",
+					description: "Array of channels to enroll the contact in",
 				},
 			),
 		),
@@ -182,17 +182,17 @@ export namespace ContactModel {
 				default: [],
 			},
 		),
-		topics: t.Array(
+		channels: t.Array(
 			t.Object({
-				id: t.String({ description: "Topic ID" }),
-				name: t.String({ description: "Topic name" }),
+				id: t.String({ description: "Channel ID" }),
+				name: t.String({ description: "Channel name" }),
 				subscription: t.Union(
 					[t.Literal("opt_in"), t.Literal("opt_out")],
-					{ description: "Contact's subscription status for this topic" },
+					{ description: "Contact's subscription status for this channel" },
 				),
 			}),
 			{
-				description: "Topics this contact is enrolled in",
+				description: "Channels this contact is enrolled in",
 				default: [],
 			},
 		),
@@ -228,7 +228,7 @@ export namespace ContactModel {
 						role: "Developer",
 					},
 					groups: [{ id: "grp_123", name: "Beta Testers" }],
-					topics: [{ id: "tpc_123", name: "Newsletter", subscription: "opt_in" }],
+					channels: [{ id: "tpc_123", name: "Newsletter", subscription: "opt_in" }],
 					suppression: null,
 					createdAt: "2026-03-23T10:00:00Z",
 					updatedAt: "2026-03-23T10:00:00Z",
@@ -269,7 +269,7 @@ export namespace ContactModel {
 
 	export type ContactListResponse = typeof contactListResponse.static;
 
-	// Lean contact item for group contact list (no groups/topics)
+	// Lean contact item for group contact list (no groups/channels)
 	export const groupContactItem = t.Object(
 		{
 			id: t.String({ description: "Unique contact identifier" }),
@@ -434,9 +434,9 @@ export namespace ContactModel {
 
 	export type BulkImportResponse = typeof bulkImportResponse.static;
 
-	// Topic params
-	export const topicParams = t.Object({
-		topic_id: t.String({ description: "Topic ID" }),
+	// Channel params
+	export const channelParams = t.Object({
+		channel_id: t.String({ description: "Channel ID" }),
 	});
 
 	// Group params
@@ -444,8 +444,8 @@ export namespace ContactModel {
 		group_id: t.String({ description: "Group ID" }),
 	});
 
-	// Add Contact to Topic (combined operation)
-	export const addContactToTopicBody = t.Object({
+	// Add Contact to Channel (combined operation)
+	export const addContactToChannelBody = t.Object({
 		contact_id: t.Optional(t.String({ description: "Contact ID" })),
 		email: t.Optional(
 			t.String({
@@ -455,22 +455,22 @@ export namespace ContactModel {
 		),
 		subscription: t.Optional(
 			t.Union([t.Literal("opt_in"), t.Literal("opt_out")], {
-				description: "Subscription status for the topic",
+				description: "Subscription status for the channel",
 				default: "opt_in",
 			}),
 		),
 	});
 
-	export type AddContactToTopicBody = typeof addContactToTopicBody.static;
+	export type AddContactToChannelBody = typeof addContactToChannelBody.static;
 
-	export const addContactToTopicResponse = t.Object({
+	export const addContactToChannelResponse = t.Object({
 		contact: contactResponse,
 		subscriptionId: t.String({ description: "Created subscription ID" }),
 		event: t.String({ description: "Event ID for the mutation" }),
 	});
 
-	export type AddContactToTopicResponse =
-		typeof addContactToTopicResponse.static;
+	export type AddContactToChannelResponse =
+		typeof addContactToChannelResponse.static;
 
 	// Group Management
 	export const addContactToGroupBody = t.Object({
@@ -538,8 +538,8 @@ export namespace ContactModel {
 	export type RemoveContactFromGroupResponse =
 		typeof removeContactFromGroupResponse.static;
 
-	// Update Topic Status
-	export const updateContactTopicBody = t.Object({
+	// Update Channel Status
+	export const updateContactChannelBody = t.Object({
 		contact_id: t.Optional(t.String({ description: "Contact ID" })),
 		email: t.Optional(
 			t.String({
@@ -552,14 +552,14 @@ export namespace ContactModel {
 		}),
 	});
 
-	export type UpdateContactTopicBody = typeof updateContactTopicBody.static;
+	export type UpdateContactChannelBody = typeof updateContactChannelBody.static;
 
-	export const updateContactTopicResponse = t.Object({
+	export const updateContactChannelResponse = t.Object({
 		success: t.Boolean({ default: true }),
 		status: t.String(),
 		event: t.String({ description: "Event ID for the mutation" }),
 	});
 
-	export type UpdateContactTopicResponse =
-		typeof updateContactTopicResponse.static;
+	export type UpdateContactChannelResponse =
+		typeof updateContactChannelResponse.static;
 }
