@@ -1,0 +1,58 @@
+---
+title: Bolt.new Reloop Integration
+sidebarTitle: Bolt.new Integration
+description: How to integrate Reloop with Bolt.new to send emails from your AI-generated apps.
+---
+
+Integrate Reloop with [Bolt.new](https://bolt.new) to add email capabilities to your AI-generated full-stack applications.
+
+## Overview
+
+Bolt.new is an AI-powered development environment that lets you build, run, and deploy full-stack web applications directly in the browser. By adding Reloop, your Bolt apps can send transactional and marketing emails.
+
+## Setup
+
+<Steps>
+  <Step title="Get your Reloop API key">
+    Create an API key at [app.reloop.dev/api-keys](https://app.reloop.dev/api-keys).
+  </Step>
+  <Step title="Add Reloop to your project">
+    In Bolt.new, ask the AI to add Reloop:
+
+    ```
+    Add the reloop npm package to send emails from my application.
+    ```
+  </Step>
+  <Step title="Configure the API key">
+    Add your `RELOOP_API_KEY` to the environment variables in Bolt.new's settings.
+  </Step>
+  <Step title="Build email features">
+    Ask Bolt.new to create email functionality:
+
+    ```
+    Create an API route that sends a welcome email when a user registers. Use the reloop package.
+    ```
+  </Step>
+</Steps>
+
+## Example prompt
+
+```
+I want to add email notifications to my app using Reloop (reloop npm package).
+
+Please:
+1. Install the reloop package
+2. Create a utility function for sending emails
+3. Add email notifications for:
+   - User registration (welcome email)
+   - Password reset
+   - Order confirmation
+4. Use RELOOP_API_KEY from environment variables
+5. Send from notifications@mydomain.com
+```
+
+## Learn More
+
+- [Reloop SDK for Node.js](/sdk/nodejs)
+- [Sending Emails](/learn/sending)
+- [Bolt.new Documentation](https://docs.bolt.new)

@@ -1,0 +1,157 @@
+---
+title: OpenClaw Guide
+description: Learn how to give your AI agent an inbox to send and receive emails.
+---
+
+Learn how to give your AI agent a dedicated email inbox using Reloop, so it can send and receive emails autonomously.
+
+## Why should I give my agent an inbox?
+
+An AI agent with its own email address can:
+
+- Sign up for its own accounts to GitHub, hosting platforms, and more, so you don't need to share your own credentials.
+- Process attachments (like receipts, invoices, etc.) and act accordingly
+- Receive newsletters, parse them, and send the most important information to you
+- Send you daily reports and digests
+- Send and receive emails on your behalf
+
+## How to set up an inbox for OpenClaw
+
+### Step 1: Install the skill
+
+Tell your agent:
+
+```
+Let's get you set up with an email inbox! Install the reloop-skills from https://github.com/reloop-labs/reloop-skills and review them before continuing.
+```
+
+Alternatively, you can install the skills using the [Reloop CLI](/sdk/cli):
+
+```bash
+npx skills add reloop/reloop-skills
+```
+
+### Step 2: Get an API key
+
+1. Open the [API Keys](https://app.reloop.dev/api-keys) page
+2. Choose a name and permission scope
+3. Create the API key
+
+Store the key securely:
+
+1. SSH into your agent's machine and store the API key in an `.env` file.
+2. Store the API key in a password manager like 1Password, and give your agent access to its own vault. This can be done using a [1Password Service Account](https://developer.1password.com/docs/service-accounts/) on team plans.
+
+### Step 3: Verify a domain
+
+We [strongly recommend](/learn/domains) using a subdomain like `agent.example.com` rather than your root `example.com` domain. This keeps your agent's email reputation separate.
+
+You can set up a domain using the [Reloop CLI](/sdk/cli) or through the dashboard:
+
+1. Go to the [Domains tab](https://app.reloop.dev/domains) and add a domain
+2. Select a subdomain and region
+3. Configure DNS:
+    - **Auto Configure**: Automatically configure DNS records if your provider supports it.
+    - **Go to (provider)**: Open your provider's website to add records manually.
+    - **I've added the records**: Manually add DNS records via your DNS provider.
+4. Enable receiving on the domain
+5. Add the DNS records and wait for verification
+
+See our [guide on verifying a domain](/learn/domains) for detailed instructions.
+
+### Step 4: Use webhooks to receive emails
+
+**Ask your agent to set up a webhook server:**
+
+```
+I want you to be able to receive emails, too. Let's set up a webhook to receive emails at my domain using the agent email inbox agent skill.
+```
+
+**Set up a tunnel:**
+
+Use [Tailscale Funnel](https://tailscale.com/kb/1223/funnel) to expose your agent's webhook server:
+
+```bash
+tailscale funnel 3000
+```
+
+This gives you a public URL like `https://hostname.tailnet-name.ts.net`.
+
+**Give your agent access to secrets securely** (see [Step 2](#step-2-get-an-api-key)).
+
+**Add the webhook to Reloop:**
+
+```
+Let's add a webhook to Reloop using the server you just built. Use the email.received event, as instructed by the reloop-skills agent skill, and securely save the returned webhook signing secret.
+```
+
+**Test receiving an email:**
+
+<CodeBlock title="Webhook Handler Example">
+```typescript
+import { Reloop } from 'reloop';
+
+const reloop = new Reloop(process.env.RELOOP_API_KEY);
+
+// Security: strict allowlist
+const ALLOWED_SENDERS = ['your@email.com'];
+
+async function handler(req) {
+  const payload = await req.text();
+  const id = req.headers.get('svix-id');
+  const timestamp = req.headers.get('svix-timestamp');
+  const signature = req.headers.get('svix-signature');
+
+  if (!id || !timestamp || !signature) {
+    return new Response('Missing headers', { status: 400 });
+  }
+
+  const event = reloop.webhooks.verify({
+    payload,
+    headers: { id, timestamp, signature },
+    webhookSecret: process.env.RELOOP_WEBHOOK_SECRET,
+  });
+
+  if (event.type === 'email.received') {
+    // Security check
+    if (!ALLOWED_SENDERS.includes(event.data.from.toLowerCase())) {
+      return new Response('OK', { status: 200 });
+    }
+
+    // Get full email
+    const { data: email } = await reloop.emails.receiving.get(
+      event.data.email_id,
+    );
+
+    // Notify user instantly
+    await notifyUser(email);
+  }
+
+  return new Response('OK', { status: 200 });
+}
+```
+</CodeBlock>
+
+See our [guide on receiving emails with Reloop](/learn/receiving) for more details.
+
+### Step 5: Hook into OpenClaw's APIs for instant notifications
+
+**Ask your agent to hook into the Gateway API:**
+
+```
+Use the OpenClaw Gateway API to notify me instantly when you receive an email webhook call from Reloop. Use the reloop-skills agent skill for guidance.
+```
+
+**Test instant notifications** by sending an email to your agent's address and verifying it receives it.
+
+## Security considerations
+
+The [Agent Email Inbox skill](https://github.com/reloop-labs/reloop-skills/blob/main/skills/agent-email-inbox/SKILL.md#security-levels) includes security guidelines with five levels:
+
+1. **Strict Allowlist**: Only allow emails from specific senders. Recommended for most use cases.
+2. **Domain Allowlist**: Allow emails from any sender from a given domain (e.g. anyone from `example.com`).
+3. **Content Filtering with Sanitization**: Accept emails from anyone, but sanitize content to remove potential injection attempts.
+4. **Sandboxed Processing**: Process all emails but in a restricted context where the agent has limited capabilities.
+5. **Human-in-the-Loop**: Process all emails but require human approval for each email.
+
+Review the [Reloop Skill](https://github.com/reloop-labs/reloop-skills/blob/main/skills/agent-email-inbox/SKILL.md#security-levels) for detailed security guidance. If you have questions, [contact support](https://reloop.dev/help).

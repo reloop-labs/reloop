@@ -1,0 +1,131 @@
+---
+title: Reloop CLI for AI Agents
+sidebarTitle: Reloop CLI
+description: How to use the Reloop CLI in AI agent workflows.
+---
+
+The [Reloop CLI](/sdk/cli) is purpose-built for AI agent workflows — every command supports machine-readable JSON output, deterministic exit codes, and stdin piping. See the full [CLI reference](/sdk/cli) for all available commands.
+
+## Agent Skills
+
+Install the CLI agent skill so your agent knows how to use the Reloop CLI effectively:
+
+```bash
+npx skills add reloop/reloop-cli
+```
+
+## Non-interactive mode
+
+Every CLI command supports `--json` for machine-readable output:
+
+- **Output**: JSON to stdout, no progress indicators
+- **Exit codes**: `0` for success, `1` for errors
+- **Errors**: Always include `message` and `code` fields
+
+```json
+{
+  "error": {
+    "message": "No API key found",
+    "code": "auth_error"
+  }
+}
+```
+
+## Piping from stdin
+
+Use `-` as the value of any file flag to read from stdin:
+
+```bash
+echo "Your order has shipped." | reloop emails send \
+  --from "Acme <onboarding@example.com>" \
+  --to delivered@example.com \
+  --subject "Order update" \
+  --text-file -
+```
+
+This also works with `--html-file -` and `--file -` for [batch commands](#batch-sending).
+
+## Batch sending
+
+Use `emails batch` to send up to 100 emails in a single request:
+
+```bash
+cat emails.json | reloop emails batch --file -
+```
+
+## Safe retries
+
+Use `--idempotency-key` to safely retry failed sends without risking duplicates:
+
+```bash
+reloop emails send \
+  --from "Acme <onboarding@example.com>" \
+  --to delivered@example.com \
+  --subject "Welcome" \
+  --text "Hello!" \
+  --idempotency-key "welcome-user-123"
+```
+
+Idempotency keys are supported on both `emails send` and `emails batch` commands.
+
+## Scheduling
+
+Use `--scheduled-at` to schedule emails for future delivery:
+
+```bash
+reloop emails send \
+  --from "Acme <onboarding@example.com>" \
+  --to delivered@example.com \
+  --subject "Your trial ends soon" \
+  --text "Your free trial expires in 3 days." \
+  --scheduled-at "tomorrow at 9am ET"
+```
+
+You can cancel or reschedule with:
+```bash
+reloop emails cancel <id>
+reloop emails update <id> --scheduled-at <datetime>
+```
+
+## Reading inbound emails
+
+The `emails receiving listen` command starts a long-running process that watches for new inbound emails:
+
+```bash
+reloop emails receiving listen --json
+```
+
+To fetch a specific received email:
+```bash
+reloop emails receiving get <email-id>
+```
+
+<Note>
+Make sure you have a [verified domain](/learn/domains) with receiving enabled.
+</Note>
+
+## Closing the loop with webhooks
+
+The `webhooks listen` command subscribes to [webhook events](/learn/webhooks) and streams them to your terminal:
+
+```bash
+reloop webhooks listen \
+  --url https://hostname.tailnet-name.ts.net \
+  --events email.delivered email.bounced email.received
+```
+
+Press `Ctrl+C` to stop listening. The webhook is automatically removed when you disconnect.
+
+To forward webhooks to a local development server, use `--forward-to`:
+
+```bash
+reloop webhooks listen \
+  --url https://hostname.tailnet-name.ts.net \
+  --forward-to http://localhost:4321/api/webhook
+```
+
+<Tip>
+The `--url` flag requires a publicly reachable URL. We recommend [Tailscale Funnel](https://tailscale.com/kb/1223/funnel), [ngrok](https://ngrok.com/), or [localtunnel](https://theboringtech.io/) for local development.
+</Tip>
+
+If you prefer to set up webhooks manually, use `reloop webhooks create`.

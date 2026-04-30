@@ -1,8 +1,8 @@
 import "./global.css";
 import { IconsSprite } from "@reloop/ui/icon";
 import localFont from "next/font/local";
-import { ThemeProvider } from "next-themes";
 import type { ReactNode } from "react";
+import { ThemeProvider } from "../components/theme-provider";
 import { cn } from "../lib/cn";
 
 const openRunde = localFont({
@@ -47,12 +47,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 				className="flex min-h-screen flex-col overflow-x-hidden bg-fd-background text-fd-foreground"
 				suppressHydrationWarning
 			>
-				<ThemeProvider
-					attribute="class"
-					defaultTheme="system"
-					enableSystem
-					disableTransitionOnChange
-				>
+				<ThemeProvider>
 					{children}
 				</ThemeProvider>
 				<IconsSprite />

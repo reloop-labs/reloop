@@ -1,7 +1,143 @@
 ---
-title: Integration
-description: Integration
+title: AI Onboarding
+description: Everything you need to onboard your AI agent to Reloop.
 ---
 
-## Integration
+If you're developing with AI, Reloop offers several resources to improve your experience.
 
+- [Reloop MCP Server](/integrations/mcp-server)
+- [Reloop CLI](/integrations/cli-agents)
+- [Reloop Docs for Agents](#reloop-docs-for-agents)
+- [Email Skills for Agents](#email-skills-for-agents)
+- [Quick Start Guides](#quick-start-guides)
+- [OpenClaw Guide](#openclaw-guide)
+- [Chat SDK](#chat-sdk)
+- [AI Builder Integrations](#ai-builder-integrations)
+
+## Prerequisite: Create an API Key
+
+Before using any AI tool with Reloop, you'll need to [create an API key](https://app.reloop.dev/api-keys) and [verify a domain](https://app.reloop.dev/domains).
+
+If you don't have a domain yet, you can [create a domain](/learn/domains) and verify it by [adding your DNS records](/learn/domains).
+
+## Reloop MCP Server
+
+The fastest way to give your AI agent access to Reloop is through our [MCP server](https://github.com/reloop-labs/reloop-mcp). Add the following to your MCP client configuration:
+
+<CodeBlock title="MCP Configuration">
+```json
+{
+  "mcpServers": {
+    "reloop": {
+      "command": "npx",
+      "args": ["-y", "reloop-mcp"],
+      "env": {
+        "RELOOP_API_KEY": "rl_xxxxxxxxx"
+      }
+    }
+  }
+}
+```
+</CodeBlock>
+
+Learn more in the [MCP Server guide](/integrations/mcp-server).
+
+## Reloop CLI
+
+The [Reloop CLI](/integrations/cli-agents) is a command-line tool optimized for AI agent workflows.
+
+<CodeBlock title="CLI Quick Start">
+```bash
+# Authenticate
+reloop login
+
+# Send an email
+reloop emails send \
+  --from "you@example.com" \
+  --to hello@example.com \
+  --subject "Hello" \
+  --text "Sent from my terminal."
+```
+</CodeBlock>
+
+## Reloop Docs for Agents
+
+There are three ways to give your AI agent access to Reloop documentation:
+
+<Steps>
+  <Step title="Markdown docs">
+    Every doc includes a markdown version (append `.md` to any page).
+
+    ```
+    Docs for this page: https://docs.reloop.dev/integrations.md
+    ```
+  </Step>
+
+  <Step title="Full llms.txt">
+    Give your agent all our docs in a single file.
+
+    ```
+    Here are the Reloop docs: https://docs.reloop.dev/llms-full.txt
+    ```
+  </Step>
+
+  <Step title="MCP Docs server">
+    For a more structured approach using MCP tools, you can install our MCP docs server in any MCP client, like Cursor, Codex, or Claude Code.
+
+    ```bash
+    npx add-mcp https://docs.reloop.dev/mcp
+    ```
+  </Step>
+</Steps>
+
+## Email Skills for Agents
+
+Agent skills are markdown files that teach your AI agent how to use Reloop effectively.
+
+<CodeBlock title="Install Skills">
+```bash
+npx skills add reloop/reloop-skills
+```
+</CodeBlock>
+
+Available skills:
+
+- [Reloop](/integrations/reloop-skill) — Send emails through the Reloop API
+  ```bash
+  npx skills add reloop/reloop-skills
+  ```
+
+- [React Email](/integrations/react-email-skill) — Build HTML emails using React components
+  ```bash
+  npx skills add reloop/react-email
+  ```
+
+- [Email Best Practices](/integrations/email-best-practices) — Production-ready email guidelines
+  ```bash
+  npx skills add reloop/email-best-practices
+  ```
+
+## Quick Start Guides
+
+Example agent quick start guide for sending emails with Reloop.
+
+<PromptActions />
+
+## OpenClaw Guide
+
+[OpenClaw](https://openclaw.com) is an open-source AI agent framework. Our [OpenClaw Guide](/integrations/openclaw-guide) walks you through giving your agent a dedicated email inbox using Reloop, so it can send and receive emails autonomously.
+
+## Chat SDK
+
+The [Chat SDK](/integrations/chat-sdk) lets you build conversational email experiences using the Vercel Chat SDK and Reloop. Install the `@reloop/chat-sdk-adapter` package to get started.
+
+## AI Builder Integrations
+
+Connect Reloop with popular AI builder platforms:
+
+- [Lovable Integration](/integrations/lovable-integration)
+- [v0 Integration](/integrations/v0-integration)
+- [Bolt.new Integration](/integrations/bolt-new-integration)
+- [Replit Integration](/integrations/replit-integration)
+- [Base44 Integration](/integrations/base44-integration)
+- [Leap.new Integration](/integrations/leap-integration)

@@ -1,0 +1,58 @@
+---
+title: Leap Reloop Integration
+sidebarTitle: Leap Integration
+description: How to integrate Reloop with Leap.new to send emails from your AI-generated apps.
+---
+
+Integrate Reloop with [Leap.new](https://leap.new) to add email capabilities to your AI-generated applications.
+
+## Overview
+
+Leap.new is an AI app builder that creates full-stack applications from descriptions. Adding Reloop enables your Leap-built apps to send emails for notifications, user onboarding, and more.
+
+## Setup
+
+<Steps>
+  <Step title="Get your Reloop API key">
+    Create an API key at [app.reloop.dev/api-keys](https://app.reloop.dev/api-keys).
+  </Step>
+  <Step title="Add Reloop to your project">
+    Ask Leap's AI to install the Reloop SDK:
+
+    ```
+    Install the reloop package and add email sending functionality.
+    ```
+  </Step>
+  <Step title="Configure environment variables">
+    Add `RELOOP_API_KEY` to your project's environment variables.
+  </Step>
+  <Step title="Build email features">
+    Ask Leap to create email workflows:
+
+    ```
+    Create email notification functions using the reloop package for:
+    - Welcome emails
+    - Password reset emails
+    - Order confirmation emails
+    ```
+  </Step>
+</Steps>
+
+## Example prompt
+
+```
+I want to add email functionality using Reloop (reloop npm package).
+
+Please set up:
+1. Email sending utility using the Reloop SDK
+2. Welcome email on user registration
+3. Notification email when an action is completed
+4. Use RELOOP_API_KEY from environment variables
+5. Send from notifications@mydomain.com
+```
+
+## Learn More
+
+- [Reloop SDK for Node.js](/sdk/nodejs)
+- [Sending Emails](/learn/sending)
+- [Leap Documentation](https://docs.leap.new)

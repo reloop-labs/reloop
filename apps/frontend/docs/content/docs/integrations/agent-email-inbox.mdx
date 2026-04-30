@@ -1,0 +1,57 @@
+---
+title: Agent Email Inbox Skill
+sidebarTitle: Agent Email Inbox
+description: Give your AI agent a secure email inbox to receive and act on inbound emails.
+---
+
+Give your AI agent a secure email inbox to receive and act on inbound emails. This skill provides your agent with the knowledge to set up, secure, and manage an email inbox for receiving messages.
+
+## Installation
+
+The Agent Email Inbox skill is part of the [reloop-skills](https://github.com/reloop-labs/reloop-skills) collection:
+
+```bash
+npx skills add reloop/reloop-skills
+```
+
+## Features
+
+- **Webhook-based receiving**: Set up webhooks to receive inbound emails in real-time
+- **Email parsing**: Extract structured data from incoming emails (sender, subject, body, attachments)
+- **Attachment handling**: Download and process email attachments securely
+- **Security guidelines**: Built-in security levels from strict allowlists to sandboxed processing
+- **Event-driven architecture**: React to incoming emails with automated workflows
+
+## Security Levels
+
+The skill includes five security levels you can implement based on your needs:
+
+1. **Strict Allowlist** — Only process emails from pre-approved senders. Recommended for most use cases.
+2. **Domain Allowlist** — Allow emails from any sender at approved domains.
+3. **Content Filtering** — Accept all emails but sanitize content before processing.
+4. **Sandboxed Processing** — Process in a restricted context with limited agent capabilities.
+5. **Human-in-the-Loop** — Queue all emails for human approval before agent processing.
+
+## How it works
+
+<Steps>
+  <Step title="Set up a verified domain">
+    Your agent needs a verified domain with receiving enabled. See [Domains](/learn/domains).
+  </Step>
+  <Step title="Create a webhook endpoint">
+    Your agent creates an HTTP endpoint to receive webhook events from Reloop.
+  </Step>
+  <Step title="Register the webhook">
+    Subscribe to `email.received` events via the Reloop API or CLI.
+  </Step>
+  <Step title="Process inbound emails">
+    When an email arrives, Reloop sends a webhook to your endpoint. Your agent verifies the signature, fetches the full email, and processes it.
+  </Step>
+</Steps>
+
+## Learn More
+
+- [OpenClaw Guide](/integrations/openclaw-guide) — Step-by-step guide for setting up an agent inbox
+- [Receiving Emails](/learn/receiving) — General guide on receiving emails with Reloop
+- [Webhooks](/learn/webhooks) — Webhook setup and event types
+- [View on GitHub](https://github.com/reloop-labs/reloop-skills/tree/main/skills/agent-email-inbox)

@@ -1,0 +1,127 @@
+---
+title: Chat SDK
+sidebarTitle: Overview
+description: Build conversational email experiences using the Vercel Chat SDK and Reloop.
+---
+
+Build conversational email experiences using the Vercel Chat SDK and Reloop.
+
+Use this pre-built prompt with your AI agent to build with the Reloop Chat SDK adapter.
+
+<PromptActions />
+
+The `@reloop/chat-sdk-adapter` connects the [Vercel Chat SDK](https://github.com/nichochar/chat) to Reloop's email infrastructure. The adapter is [available on GitHub](https://github.com/reloop-labs/reloop-chat-sdk).
+
+## Prerequisites
+
+- [Create an API key](https://app.reloop.dev/api-keys)
+- [Verify your domain](https://app.reloop.dev/domains)
+- [Set up webhooks](/learn/webhooks) for `email.received` events
+- [Enable receiving](/learn/receiving) on your domain
+
+## 1. Install
+
+```bash
+npm install @reloop/chat-sdk-adapter chat @chat-adapter/state-memory
+```
+
+## 2. Configure the adapter
+
+<CodeBlock title="Setup">
+```typescript
+import { createReloopAdapter } from '@reloop/chat-sdk-adapter';
+import { MemoryStateAdapter } from '@chat-adapter/state-memory';
+import { Chat } from 'chat';
+
+const reloop = createReloopAdapter({
+  fromAddress: 'bot@example.com',
+  fromName: 'My Bot',
+});
+
+const chat = new Chat({
+  userName: 'email-bot',
+  adapters: { reloop },
+  state: new MemoryStateAdapter(),
+});
+```
+</CodeBlock>
+
+The adapter reads `RELOOP_API_KEY` and `RELOOP_WEBHOOK_SECRET` from environment variables by default. You can also pass `apiKey` and `webhookSecret` directly to the adapter options.
+
+### Configuration options
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `fromAddress` | `string` | **Required.** The sender email address (must be from a verified domain). |
+| `fromName` | `string` | Display name for the sender. |
+| `apiKey` | `string` | Reloop API key. Defaults to `RELOOP_API_KEY` env var. |
+| `webhookSecret` | `string` | Webhook signing secret. Defaults to `RELOOP_WEBHOOK_SECRET` env var. |
+
+## 3. Handle inbound emails
+
+Use `onNewMention` to handle new conversations and `onSubscribedMessage` to handle replies in existing threads:
+
+<CodeBlock title="Event Handlers">
+```typescript
+chat.onNewMention(async (thread, message) => {
+  console.log(`New email from ${message.author.userId}: ${message.text}`);
+
+  await thread.subscribe();
+  await thread.post(`Got your email: ${message.text}`);
+});
+
+chat.onSubscribedMessage(async (thread, message) => {
+  await thread.post(`Reply: ${message.text}`);
+});
+```
+</CodeBlock>
+
+## 4. Forward webhooks
+
+Create a `/webhook` endpoint that forwards Reloop webhook events to the Chat SDK:
+
+<CodeBlock title="Webhook Route">
+```typescript
+if (req.method === 'POST' && req.url === '/webhook') {
+  const result = await chat.webhooks.reloop(request);
+  res.writeHead(result.status);
+  res.end();
+}
+```
+</CodeBlock>
+
+<Note>
+The webhook handler expects a `Request` object. If you're using Node.js `http` module, convert the `IncomingMessage` to a `Request` first.
+</Note>
+
+See also:
+- [Managing Webhooks](/learn/webhooks)
+- [Basic example on GitHub](https://github.com/reloop-labs/reloop-chat-sdk/tree/main/examples/basic)
+
+## How threading works
+
+The adapter uses email headers (`Message-ID`, `In-Reply-To`, `References`) to maintain conversation threads. Replies to an email are automatically grouped into the same thread.
+
+<Warning>
+Email is a one-way medium — some operations throw `NotImplementedError`:
+- `editMessage` — Cannot edit sent emails
+- `deleteMessage` — Cannot unsend emails
+- `addReaction` / `removeReaction` — Not supported
+- `startTyping` — Not applicable
+</Warning>
+
+## Features
+
+- ✅ Send plain text and HTML emails
+- ✅ Receive and reply to inbound emails
+- ✅ Automatic email threading
+- ✅ Webhook signature verification
+- ✅ [Card emails](/integrations/chat-sdk-card-emails) (rich HTML)
+- ✅ [Attachments](/integrations/chat-sdk-attachments) (inbound)
+- ✅ [Proactive outreach](/integrations/chat-sdk-proactive-outreach)
+
+## Examples
+
+- [Basic example](https://github.com/reloop-labs/reloop-chat-sdk/tree/main/examples/basic) — Simple send/receive bot
+- [Card emails example](https://github.com/reloop-labs/reloop-chat-sdk/tree/main/examples/cards) — Rich HTML email cards
+- [Attachments example](https://github.com/reloop-labs/reloop-chat-sdk/tree/main/examples/attachments) — Handle inbound attachments

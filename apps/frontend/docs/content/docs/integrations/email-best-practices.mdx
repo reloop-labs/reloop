@@ -1,0 +1,70 @@
+---
+title: Email Best Practices Skill
+sidebarTitle: Email Best Practices
+description: Comprehensive guide for building production-ready email systems with AI agents.
+---
+
+A comprehensive skill that teaches your AI agent best practices for building production-ready email systems. This skill covers deliverability, authentication, content guidelines, and compliance.
+
+## Installation
+
+```bash
+npx skills add reloop/email-best-practices
+```
+
+## What's covered
+
+### Deliverability
+
+- SPF, DKIM, and DMARC authentication setup
+- Domain warmup strategies for new sending domains
+- Reputation management and monitoring
+- Bounce handling and suppression lists
+- Throttling and rate limiting best practices
+
+### Content Guidelines
+
+- Subject line optimization for engagement
+- Plain text vs HTML email best practices
+- Image-to-text ratio recommendations
+- Call-to-action (CTA) best practices
+- Mobile-responsive email design
+
+### Compliance
+
+- CAN-SPAM Act requirements
+- GDPR considerations for email
+- Unsubscribe link requirements
+- Physical address requirements
+- Consent management (opt-in/opt-out)
+
+### Transactional vs Marketing
+
+- When to use transactional emails vs marketing emails
+- Separate sending domains and IP pools
+- Appropriate content for each type
+- Legal distinctions and requirements
+
+### Error Handling
+
+- Retry strategies for failed sends
+- Handling bounces (hard vs soft)
+- Managing complaint feedback loops
+- Monitoring delivery rates and engagement metrics
+
+## Rules
+
+The skill provides your agent with actionable rules such as:
+
+- Always include a plain text version alongside HTML
+- Never use a no-reply sender address for marketing emails
+- Always verify your sending domain before sending at scale
+- Use dedicated subdomains for transactional and marketing email
+- Implement exponential backoff for API retries
+- Always include an unsubscribe mechanism in marketing emails
+
+## Learn More
+
+- [Sending Emails](/learn/sending) — Guide to sending emails with Reloop
+- [Domains](/learn/domains) — Domain verification and DNS configuration
+- [View on GitHub](https://github.com/reloop-labs/reloop-skills/tree/main/skills/email-best-practices)

@@ -1,0 +1,109 @@
+---
+title: Chat SDK Card Emails
+sidebarTitle: Card Emails
+description: Send rich HTML card emails using the Chat SDK and React Email.
+---
+
+Send rich HTML card emails using the Chat SDK and React Email. Card emails let your agent send beautiful, structured messages with images, buttons, and custom layouts.
+
+## Prerequisites
+
+- [Chat SDK setup](/integrations/chat-sdk) completed
+- [React Email](https://react.email) installed in your project
+
+## Installation
+
+Install React Email alongside the Chat SDK adapter:
+
+```bash
+npm install @react-email/components react-email
+```
+
+## Sending card emails
+
+Use the `html` option when posting a message to send rich HTML content:
+
+<CodeBlock title="Card Email">
+```typescript
+import { render } from '@react-email/render';
+import { Button, Html, Section, Text, Heading } from '@react-email/components';
+
+chat.onNewMention(async (thread, message) => {
+  const html = await render(
+    <Html>
+      <Section style={{ padding: '24px', backgroundColor: '#f9fafb' }}>
+        <Heading as="h2">Order Confirmed</Heading>
+        <Text>Your order #12345 has been confirmed and is being processed.</Text>
+        <Button
+          href="https://example.com/orders/12345"
+          style={{
+            backgroundColor: '#000',
+            color: '#fff',
+            padding: '12px 24px',
+            borderRadius: '6px',
+          }}
+        >
+          View Order
+        </Button>
+      </Section>
+    </Html>
+  );
+
+  await thread.post('Your order has been confirmed!', { html });
+});
+```
+</CodeBlock>
+
+## Template patterns
+
+### Notification card
+
+```typescript
+const notificationCard = await render(
+  <Html>
+    <Section style={{ padding: '20px' }}>
+      <Text style={{ fontSize: '14px', color: '#6b7280' }}>
+        New notification
+      </Text>
+      <Heading as="h3">You have a new message</Heading>
+      <Text>John Doe sent you a message regarding Project Alpha.</Text>
+      <Button href="https://app.example.com/messages/123">
+        View Message
+      </Button>
+    </Section>
+  </Html>
+);
+```
+
+### Status update card
+
+```typescript
+const statusCard = await render(
+  <Html>
+    <Section style={{ padding: '20px' }}>
+      <Heading as="h3">Deployment Status</Heading>
+      <Text>✅ Build completed successfully</Text>
+      <Text>✅ Tests passed (42/42)</Text>
+      <Text>✅ Deployed to production</Text>
+      <Button href="https://app.example.com/deployments/456">
+        View Deployment
+      </Button>
+    </Section>
+  </Html>
+);
+```
+
+## Best practices
+
+<Tip>
+- Always include a plain text fallback alongside HTML content
+- Keep card layouts simple — complex layouts may not render consistently across email clients
+- Use inline styles instead of CSS classes for maximum compatibility
+- Test your card emails across different email clients using React Email's preview feature
+</Tip>
+
+## Learn More
+
+- [Chat SDK Overview](/integrations/chat-sdk)
+- [React Email Components](https://react.email/components)
+- [Card emails example on GitHub](https://github.com/reloop-labs/reloop-chat-sdk/tree/main/examples/cards)

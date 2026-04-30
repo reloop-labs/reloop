@@ -1,0 +1,61 @@
+---
+title: Replit Reloop Integration
+sidebarTitle: Replit Integration
+description: How to integrate Reloop with Replit to send emails from your projects.
+---
+
+Integrate Reloop with [Replit](https://replit.com) to add email sending capabilities to your Replit-hosted applications.
+
+## Overview
+
+Replit is a collaborative development environment that lets you code, build, and deploy applications in the browser. With Reloop, you can add production-grade email functionality to any Replit project.
+
+## Setup
+
+<Steps>
+  <Step title="Get your Reloop API key">
+    Create an API key at [app.reloop.dev/api-keys](https://app.reloop.dev/api-keys).
+  </Step>
+  <Step title="Add Reloop to your Replit project">
+    Install the Reloop SDK in your Replit shell:
+
+    ```bash
+    npm install reloop
+    ```
+  </Step>
+  <Step title="Configure secrets">
+    Add your API key as a Replit Secret:
+    1. Open the **Secrets** tab in your Replit workspace
+    2. Add `RELOOP_API_KEY` with your API key value
+  </Step>
+  <Step title="Send emails">
+    Use the Reloop SDK in your application:
+
+    ```javascript
+    import { Reloop } from 'reloop';
+
+    const reloop = new Reloop(process.env.RELOOP_API_KEY);
+
+    await reloop.emails.send({
+      from: 'you@yourdomain.com',
+      to: 'user@example.com',
+      subject: 'Hello from Replit!',
+      text: 'This email was sent from my Replit app.',
+    });
+    ```
+  </Step>
+</Steps>
+
+## Example prompt for Replit AI
+
+```
+Add email functionality to my app using the Reloop SDK (reloop npm package).
+The RELOOP_API_KEY is stored in Replit Secrets.
+Create a function to send transactional emails and add it to the user signup flow.
+```
+
+## Learn More
+
+- [Reloop SDK for Node.js](/sdk/nodejs)
+- [Sending Emails](/learn/sending)
+- [Replit Documentation](https://docs.replit.com)

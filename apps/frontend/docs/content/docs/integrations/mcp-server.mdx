@@ -1,0 +1,316 @@
+---
+title: MCP Server
+description: Learn how to use the MCP Server to send emails with Reloop.
+---
+
+## What is an MCP Server?
+
+The Model Context Protocol (MCP) is an open standard that lets AI models connect to external tools and data sources. An MCP server acts as a bridge between your AI agent and the Reloop API, allowing the agent to send emails, manage contacts, handle domains, and more — all through natural language.
+
+## What can Reloop's MCP Server do?
+
+The [Reloop MCP Server](https://github.com/reloop-labs/reloop-mcp) exposes the full Reloop API as MCP tools:
+
+- **Emails** — Send, list, get, cancel, update, and batch send emails. Supports HTML, plain text, attachments (local file, URL, or base64), CC/BCC, reply-to, scheduling, tags, and topic-based sending.
+- **Received Emails** — List and read inbound emails. List and download received email attachments.
+- **Contacts** — Create, list, get, update, and remove contacts. Manage segment memberships and topic subscriptions. Supports custom contact properties.
+- **Broadcasts** — Create, send, list, get, update, and remove broadcast campaigns. Supports scheduling, personalization placeholders, and preview text.
+- **Domains** — Create, list, get, update, remove, and verify sender domains. Configure tracking, TLS, and sending/receiving capabilities.
+- **Segments** — Create, list, get, and remove audience segments.
+- **Topics** — Create, list, get, update, and remove subscription topics.
+- **Contact Properties** — Create, list, get, update, and remove custom contact attributes.
+- **API Keys** — Create, list, and remove API keys.
+- **Webhooks** — Create, list, get, update, and remove webhooks for event notifications.
+- **Templates** — Create, list, get, update, and remove email templates.
+
+## Prerequisites
+
+You'll need a supported MCP client and `npx` installed on your machine.
+
+- [Create an API key](https://app.reloop.dev/api-keys)
+- [Verify your domain](https://app.reloop.dev/domains)
+
+## How to use the MCP Server
+
+Replace `rl_xxxxxxxxx` with your actual Reloop API key.
+
+### Stdio Transport (Default)
+
+<Tabs>
+  <Tab title="Claude Code">
+    ```bash
+    claude mcp add reloop -e RELOOP_API_KEY=rl_xxxxxxxxx -- npx -y reloop-mcp
+    ```
+  </Tab>
+  <Tab title="Codex">
+    ```bash
+    codex mcp add reloop \
+      --env RELOOP_API_KEY=rl_xxxxxxxxx \
+      -- npx -y reloop-mcp
+    ```
+  </Tab>
+  <Tab title="Cursor">
+    ```json
+    {
+      "mcpServers": {
+        "reloop": {
+          "command": "npx",
+          "args": ["-y", "reloop-mcp"],
+          "env": {
+            "RELOOP_API_KEY": "rl_xxxxxxxxx"
+          }
+        }
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="Claude Desktop">
+    ```json
+    {
+      "mcpServers": {
+        "reloop": {
+          "command": "npx",
+          "args": ["-y", "reloop-mcp"],
+          "env": {
+            "RELOOP_API_KEY": "rl_xxxxxxxxx"
+          }
+        }
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="Copilot">
+    Add the following to your VS Code `settings.json`:
+
+    ```json
+    {
+      "mcp": {
+        "servers": {
+          "reloop": {
+            "command": "npx",
+            "args": ["-y", "reloop-mcp"],
+            "env": {
+              "RELOOP_API_KEY": "rl_xxxxxxxxx"
+            }
+          }
+        }
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="Gemini CLI">
+    ```json
+    {
+      "mcpServers": {
+        "reloop": {
+          "command": "npx",
+          "args": ["-y", "reloop-mcp"],
+          "env": {
+            "RELOOP_API_KEY": "rl_xxxxxxxxx"
+          }
+        }
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="OpenCode">
+    Add to your `opencode.json`:
+
+    ```json
+    {
+      "$schema": "https://opencode.ai/config.json",
+      "mcp": {
+        "reloop": {
+          "type": "local",
+          "command": ["npx", "-y", "reloop-mcp"],
+          "enabled": true,
+          "environment": {
+            "RELOOP_API_KEY": "rl_xxxxxxxxx"
+          }
+        }
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="Windsurf">
+    ```json
+    {
+      "mcpServers": {
+        "reloop": {
+          "command": "npx",
+          "args": ["-y", "reloop-mcp"],
+          "env": {
+            "RELOOP_API_KEY": "rl_xxxxxxxxx"
+          }
+        }
+      }
+    }
+    ```
+  </Tab>
+</Tabs>
+
+### HTTP Transport
+
+For HTTP transport, the API key is passed via the `Authorization` header instead of an environment variable.
+
+Start the server:
+
+```bash
+npx -y reloop-mcp --http --port 3000
+```
+
+The server will be available at `http://127.0.0.1:3000` with the MCP endpoint at `/mcp`.
+
+<Tabs>
+  <Tab title="Claude Code">
+    ```bash
+    claude mcp add reloop --transport http http://127.0.0.1:3000/mcp --header "Authorization: Bearer rl_xxxxxxxxx"
+    ```
+  </Tab>
+  <Tab title="Cursor">
+    ```json
+    {
+      "mcpServers": {
+        "reloop": {
+          "url": "http://127.0.0.1:3000/mcp",
+          "headers": {
+            "Authorization": "Bearer rl_xxxxxxxxx"
+          }
+        }
+      }
+    }
+    ```
+  </Tab>
+</Tabs>
+
+You can customize the port with the `MCP_PORT` environment variable:
+
+```bash
+MCP_PORT=3000 npx -y reloop-mcp --http
+```
+
+### Options
+
+**CLI flags:**
+- `--key`: Your Reloop API key (stdio mode only; HTTP mode uses the Bearer token from the client)
+- `--sender`: Default sender email address from a verified domain
+- `--reply-to`: Default reply-to email address (can be specified multiple times)
+- `--http`: Use HTTP transport instead of stdio (default: stdio)
+- `--port`: HTTP port when using `--http` (default: 3000, or `MCP_PORT` env var)
+
+**Environment variables:**
+- `RELOOP_API_KEY`: Your Reloop API key (required for stdio, optional for HTTP)
+- `SENDER_EMAIL_ADDRESS`: Default sender email address from a verified domain (optional)
+- `REPLY_TO_EMAIL_ADDRESSES`: Comma-separated reply-to email addresses (optional)
+- `MCP_PORT`: HTTP port when using `--http` (optional)
+
+## Local Development
+
+```bash
+git clone https://github.com/reloop-labs/reloop-mcp.git
+pnpm install
+pnpm run build
+```
+
+Replace `npx` commands above with direct `node` commands.
+
+### Stdio
+
+<Tabs>
+  <Tab title="Claude Code">
+    ```bash
+    claude mcp add reloop -e RELOOP_API_KEY=rl_xxxxxxxxx -- node ABSOLUTE_PATH_TO_PROJECT/dist/index.js
+    ```
+  </Tab>
+  <Tab title="Codex">
+    ```bash
+    codex mcp add reloop \
+      --env RELOOP_API_KEY=rl_xxxxxxxxx \
+      -- node ABSOLUTE_PATH_TO_PROJECT/dist/index.js
+    ```
+  </Tab>
+  <Tab title="Cursor / Claude Desktop / Gemini CLI">
+    ```json
+    {
+      "mcpServers": {
+        "reloop": {
+          "command": "node",
+          "args": ["ABSOLUTE_PATH_TO_PROJECT/dist/index.js"],
+          "env": {
+            "RELOOP_API_KEY": "rl_xxxxxxxxx"
+          }
+        }
+      }
+    }
+    ```
+  </Tab>
+</Tabs>
+
+### HTTP
+
+```bash
+node ABSOLUTE_PATH_TO_PROJECT/dist/index.js --http --port 3000
+```
+
+<Tabs>
+  <Tab title="Claude Code">
+    ```bash
+    claude mcp add reloop --transport http http://127.0.0.1:3000/mcp --header "Authorization: Bearer rl_xxxxxxxxx"
+    ```
+  </Tab>
+  <Tab title="Cursor">
+    ```json
+    {
+      "mcpServers": {
+        "reloop": {
+          "url": "http://127.0.0.1:3000/mcp",
+          "headers": {
+            "Authorization": "Bearer rl_xxxxxxxxx"
+          }
+        }
+      }
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Testing with MCP Inspector
+
+Follow the [Local Development](#local-development) steps above first.
+
+### Using Stdio Transport
+
+1. Set your API key:
+    ```bash
+    export RELOOP_API_KEY=rl_your_key_here
+    ```
+
+2. Start the inspector:
+    ```bash
+    pnpm inspector
+    ```
+
+3. Configure in the browser:
+    - Choose **stdio** (launch a process)
+    - Command: `node`
+    - Args: `dist/index.js` (or the full path to `dist/index.js`)
+    - Env: `RELOOP_API_KEY=rl_your_key_here`
+    - Click **Connect**, then use "List tools" to verify the server is working
+
+### Using HTTP Transport
+
+1. Start the HTTP server:
+    ```bash
+    node dist/index.js --http --port 3000
+    ```
+
+2. Start the inspector:
+    ```bash
+    pnpm inspector
+    ```
+
+3. Configure in the browser:
+    - Choose **Streamable HTTP** (connect to URL)
+    - URL: `http://127.0.0.1:3000/mcp`
+    - Add a custom header: `Authorization: Bearer rl_your_key_here` and activate the toggle
+    - Click **Connect**, then use "List tools" to verify the server is working

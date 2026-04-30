@@ -1,0 +1,59 @@
+---
+title: v0 Reloop Integration
+sidebarTitle: v0 Integration
+description: How to integrate Reloop with v0 to send emails from your AI-generated apps.
+---
+
+Integrate Reloop with [v0](https://v0.dev) by Vercel to add email sending to your AI-generated Next.js applications.
+
+## Overview
+
+v0 is Vercel's AI-powered UI generator that creates React and Next.js components from natural language. With Reloop, you can add email functionality to your v0-generated projects.
+
+## Setup
+
+<Steps>
+  <Step title="Get your Reloop API key">
+    Create an API key at [app.reloop.dev/api-keys](https://app.reloop.dev/api-keys).
+  </Step>
+  <Step title="Install the Reloop SDK">
+    In your v0 project, install the Reloop package:
+
+    ```bash
+    npm install reloop
+    ```
+  </Step>
+  <Step title="Configure environment variables">
+    Add `RELOOP_API_KEY` to your `.env.local` file:
+
+    ```bash
+    RELOOP_API_KEY=rl_xxxxxxxxx
+    ```
+  </Step>
+  <Step title="Create a server action">
+    Ask v0 to generate an email sending server action:
+
+    ```
+    Create a Next.js server action that sends emails using the Reloop SDK. Include a contact form component that uses this action.
+    ```
+  </Step>
+</Steps>
+
+## Example prompt
+
+```
+Build a contact form with email notification using Reloop.
+The form should:
+1. Collect name, email, and message
+2. Send a notification email to admin@mydomain.com using Reloop
+3. Send a confirmation email to the submitter
+4. Show success/error states
+
+Use the reloop npm package and RELOOP_API_KEY environment variable.
+```
+
+## Learn More
+
+- [Reloop SDK for Node.js](/sdk/nodejs)
+- [Next.js Quickstart](/sdk/nodejs)
+- [v0 Documentation](https://v0.dev/docs)

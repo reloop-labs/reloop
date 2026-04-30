@@ -1,0 +1,41 @@
+---
+title: Reloop Skill
+sidebarTitle: Reloop Skill
+description: Send emails through the Reloop API with AI agents.
+---
+
+Send emails through the Reloop API with AI agents. This skill gives your agent comprehensive knowledge of the Reloop API, including sending, receiving, and managing emails.
+
+## Installation
+
+The Reloop skill is part of the [reloop-skills](https://github.com/reloop-labs/reloop-skills) collection. It also includes the [Agent Email Inbox](/integrations/agent-email-inbox) skill.
+
+```bash
+npx skills add reloop/reloop-skills
+```
+
+## Advantages
+
+- **Single and batch email sending**: Send individual emails or batch up to 100 emails per request.
+- **Built-in error handling and retry logic**: Automatic retries with exponential backoff for transient failures.
+- **Idempotency key support**: Prevent duplicate sends with idempotency keys for safe retries.
+- **Multi-language SDK support**: Works with Node.js, Python, Ruby, Go, and other supported SDKs.
+- **Automatic activation for email tasks**: AI agents automatically use this skill when email sending is needed.
+
+## What's included
+
+The skill teaches your agent:
+
+- How to authenticate with the Reloop API
+- Sending emails (single and batch)
+- Managing contacts and audiences
+- Working with templates
+- Handling webhooks and events
+- Domain verification and configuration
+- Best practices for deliverability
+
+## Learn More
+
+- [Reloop API Reference](/api)
+- [SDKs](/sdk)
+- [View on GitHub](https://github.com/reloop-labs/reloop-skills/tree/main/skills/reloop)

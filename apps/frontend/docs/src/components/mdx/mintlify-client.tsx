@@ -4,7 +4,8 @@ import {
 	Accordion,
 	Callout,
 	Card,
-	CodeGroup,
+	CodeBlock as MintlifyCodeBlock,
+	CodeGroup as MintlifyCodeGroup,
 	Icon,
 	Info,
 	Steps as MintlifySteps,
@@ -13,8 +14,33 @@ import {
 	Tip,
 	Warning,
 } from "@mintlify/components";
+import React from "react";
 
-const CodeBlock = CodeGroup;
+/**
+ * Wrappers around Mintlify's code components that suppress hydration warnings.
+ *
+ * @mintlify/components sets `fontVariantLigatures: "none"` on the
+ * `code-block-root` element only on the client, causing a React 19
+ * hydration mismatch. The wrapper's `suppressHydrationWarning`
+ * tells React to tolerate the difference.
+ */
+const CodeGroup = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof MintlifyCodeGroup>>(
+	(props, ref) => (
+		<div ref={ref} suppressHydrationWarning>
+			<MintlifyCodeGroup {...props} />
+		</div>
+	),
+);
+CodeGroup.displayName = "CodeGroup";
+
+const CodeBlock = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof MintlifyCodeBlock>>(
+	(props, ref) => (
+		<div ref={ref} suppressHydrationWarning>
+			<MintlifyCodeBlock {...props} />
+		</div>
+	),
+);
+CodeBlock.displayName = "CodeBlock";
 
 // Mintlify components use sub-components for items
 export const Tabs = MintlifyTabs;
@@ -23,3 +49,4 @@ export const Steps = MintlifySteps;
 export const Step = (MintlifySteps as any).Item;
 
 export { Accordion, Callout, Card, CodeBlock, CodeGroup, Icon, Info, Note, Tip, Warning };
+

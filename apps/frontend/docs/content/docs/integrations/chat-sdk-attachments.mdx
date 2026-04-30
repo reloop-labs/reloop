@@ -1,0 +1,110 @@
+---
+title: Chat SDK Attachments
+sidebarTitle: Attachments
+description: Handle inbound email attachments with the Chat SDK adapter.
+---
+
+Handle inbound email attachments with the Chat SDK adapter. When someone sends an email with attachments to your agent, the adapter automatically parses and makes them available.
+
+## Prerequisites
+
+- [Chat SDK setup](/integrations/chat-sdk) completed
+- Inbound email receiving enabled on your domain
+
+## Accessing attachments
+
+Attachments are available on the `message` object in your event handlers:
+
+<CodeBlock title="Attachment Handler">
+```typescript
+chat.onNewMention(async (thread, message) => {
+  if (message.attachments && message.attachments.length > 0) {
+    for (const attachment of message.attachments) {
+      console.log(`Received: ${attachment.filename}`);
+      console.log(`Type: ${attachment.contentType}`);
+      console.log(`Size: ${attachment.size} bytes`);
+
+      // Download the attachment content
+      const content = await attachment.download();
+
+      // Process the attachment
+      await processAttachment(attachment.filename, content);
+    }
+
+    await thread.post(
+      `I received ${message.attachments.length} attachment(s) and processed them.`
+    );
+  } else {
+    await thread.post(`Got your email: ${message.text}`);
+  }
+});
+```
+</CodeBlock>
+
+## Attachment properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `filename` | `string` | Original filename of the attachment |
+| `contentType` | `string` | MIME type (e.g. `application/pdf`, `image/png`) |
+| `size` | `number` | File size in bytes |
+| `download()` | `Promise<Buffer>` | Downloads the attachment content |
+
+## Common patterns
+
+### Save attachments to disk
+
+```typescript
+import fs from 'fs/promises';
+import path from 'path';
+
+chat.onNewMention(async (thread, message) => {
+  for (const attachment of message.attachments || []) {
+    const content = await attachment.download();
+    const savePath = path.join('./attachments', attachment.filename);
+    await fs.writeFile(savePath, content);
+  }
+});
+```
+
+### Filter by file type
+
+```typescript
+chat.onNewMention(async (thread, message) => {
+  const pdfs = (message.attachments || []).filter(
+    (a) => a.contentType === 'application/pdf'
+  );
+
+  if (pdfs.length > 0) {
+    // Process PDF attachments
+    for (const pdf of pdfs) {
+      const content = await pdf.download();
+      await processPdf(pdf.filename, content);
+    }
+  }
+});
+```
+
+### Size limits
+
+<Warning>
+Be mindful of attachment sizes. Large attachments can consume significant memory when downloaded. Consider implementing size checks before processing.
+</Warning>
+
+```typescript
+const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+
+for (const attachment of message.attachments || []) {
+  if (attachment.size > MAX_SIZE) {
+    await thread.post(`Skipping ${attachment.filename} — too large (${attachment.size} bytes)`);
+    continue;
+  }
+  // Process attachment...
+}
+```
+
+## Learn More
+
+- [Chat SDK Overview](/integrations/chat-sdk)
+- [Receiving Emails](/learn/receiving)
+- [Attachments example on GitHub](https://github.com/reloop-labs/reloop-chat-sdk/tree/main/examples/attachments)
