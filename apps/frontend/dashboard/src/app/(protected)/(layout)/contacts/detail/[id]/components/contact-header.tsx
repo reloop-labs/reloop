@@ -329,7 +329,7 @@ export const ContactHeader = ({
 								{contact.groups.map((group) => (
 									<Link
 										key={group.id}
-										href={`/groups/${group.id}`}
+										href={`/contacts/groups/${group.id}`}
 										className="font-medium text-paragraph-sm text-text-strong-950 underline decoration-dashed underline-offset-2 transition-colors hover:text-primary-base"
 									>
 										{group.name}
@@ -359,7 +359,7 @@ export const ContactHeader = ({
 								{enrolledTopics.map((topic) => (
 									<Link
 										key={topic.id}
-										href={`/topics/${topic.id}`}
+										href={`/contacts/topics/${topic.id}`}
 										className="font-medium text-paragraph-sm text-text-strong-950 underline decoration-dashed underline-offset-2 transition-colors hover:text-primary-base"
 									>
 										{topic.name}
