@@ -1,5 +1,5 @@
 "use client";
-import { SubscriberBrowserPreview } from "@fe/dashboard/app/(protected)/(layout)/contacts/components/subscriber-browser-preview";
+import { SubscriberBrowserPreview } from "@fe/dashboard/app/(protected)/(layout)/contacts/components/channels/subscriber-browser-preview";
 import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";

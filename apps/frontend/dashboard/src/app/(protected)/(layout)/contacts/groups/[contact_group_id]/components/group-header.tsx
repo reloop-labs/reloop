@@ -1,6 +1,6 @@
 /** biome-ignore-all lint/a11y/noAutofocus: <explanation> */
 "use client";
-import { DeleteGroupModal } from "@fe/dashboard/app/(protected)/(layout)/contacts/components/delete-group";
+import { DeleteGroupModal } from "@fe/dashboard/app/(protected)/(layout)/contacts/components/groups/delete-group";
 import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";

@@ -1,5 +1,6 @@
 "use client";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
+import { Icon } from "@reloop/ui/icon";
 import { SubscriberPreview } from "./subscriber-preview";
 
 import { useQueryState } from "nuqs";

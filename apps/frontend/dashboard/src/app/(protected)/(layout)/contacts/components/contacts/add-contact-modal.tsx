@@ -9,7 +9,7 @@ import Spinner from "@reloop/ui/spinner";
 import { type KeyboardEvent, useCallback, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
-import { GroupSelect } from "./group-select";
+import { GroupSelect } from "../groups/group-select";
 
 interface EmailChip {
 	id: string;

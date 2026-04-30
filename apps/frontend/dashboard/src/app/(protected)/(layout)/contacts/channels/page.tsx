@@ -1,4 +1,4 @@
-import { ChannelList } from "@fe/dashboard/app/(protected)/(layout)/contacts/components/channel-list";
+import { ChannelList } from "@fe/dashboard/app/(protected)/(layout)/contacts/components/channels/channel-list";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {

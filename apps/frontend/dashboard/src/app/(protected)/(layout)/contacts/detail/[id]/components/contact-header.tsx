@@ -1,6 +1,6 @@
 "use client";
-import { DeleteContactModal } from "@fe/dashboard/app/(protected)/(layout)/contacts/components/delete-contact-modal";
-import { EditContactModal } from "@fe/dashboard/app/(protected)/(layout)/contacts/components/edit-contact-modal";
+import { DeleteContactModal } from "@fe/dashboard/app/(protected)/(layout)/contacts/components/contacts/delete-contact-modal";
+import { EditContactModal } from "@fe/dashboard/app/(protected)/(layout)/contacts/components/contacts/edit-contact-modal";
 import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";

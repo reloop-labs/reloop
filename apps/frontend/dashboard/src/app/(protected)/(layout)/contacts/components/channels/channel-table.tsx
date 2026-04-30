@@ -5,7 +5,7 @@ import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { EmptyState } from "./empty-state";
+import { EmptyState } from "../shared/empty-state";
 import { ChannelDropdown } from "./channel-dropdown";
 import { PageSizeDropdown } from "@fe/dashboard/components/page-size-dropdown";
 import { PaginationControls } from "@fe/dashboard/components/pagination-controls";

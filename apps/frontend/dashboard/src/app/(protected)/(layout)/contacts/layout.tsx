@@ -9,8 +9,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useHotkeys } from "react-hotkeys-hook";
 import useSWR from "swr";
-import { ContactsModals } from "./components/contacts-modals";
-import { ContactsTabs } from "./components/contacts-tabs";
+import { ContactsModals } from "./components/contacts/contacts-modals";
+import { ContactsTabs } from "./components/contacts/contacts-tabs";
 
 interface Channel {
 	id: string;

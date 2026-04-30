@@ -5,16 +5,16 @@ import useSWR from "swr";
 import { AddContactModal } from "./add-contact-modal";
 import { AddContactToGroupModal } from "./add-contact-to-group";
 import { AddContactToChannelModal } from "./add-contact-to-channel-modal";
-import { AddPropertyModal } from "./add-property-modal";
-import { CreateGroupModal } from "./create-group-modal";
-import { CreateChannelModal } from "./create-channel-modal";
+import { AddPropertyModal } from "../properties/add-property-modal";
+import { CreateGroupModal } from "../groups/create-group-modal";
+import { CreateChannelModal } from "../channels/create-channel-modal";
 import { DeleteContactModal } from "./delete-contact-modal";
-import { DeleteGroupModal } from "./delete-group";
-import { DeletePropertyModal } from "./delete-property-modal";
-import { DeleteChannelModal } from "./delete-channel";
+import { DeleteGroupModal } from "../groups/delete-group";
+import { DeletePropertyModal } from "../properties/delete-property-modal";
+import { DeleteChannelModal } from "../channels/delete-channel";
 import { EditContactModal } from "./edit-contact-modal";
-import { EditPropertyModal } from "./edit-property-modal";
-import { EditChannelModal } from "./edit-channel-modal";
+import { EditPropertyModal } from "../properties/edit-property-modal";
+import { EditChannelModal } from "../channels/edit-channel-modal";
 
 interface Contact {
 	id: string;

@@ -2,8 +2,8 @@
 import {
 	ContactFilterDropdown,
 	type ContactFilterOption,
-} from "@fe/dashboard/app/(protected)/(layout)/contacts/components/contact-filter-dropdown";
-import { ContactTable } from "@fe/dashboard/app/(protected)/(layout)/contacts/components/contact-table";
+} from "@fe/dashboard/app/(protected)/(layout)/contacts/components/contacts/contact-filter-dropdown";
+import { ContactTable } from "@fe/dashboard/app/(protected)/(layout)/contacts/components/contacts/contact-table";
 import type { AudienceStatus } from "@fe/dashboard/utils/audience";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";

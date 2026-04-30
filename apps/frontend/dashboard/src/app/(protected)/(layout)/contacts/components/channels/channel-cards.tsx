@@ -5,7 +5,7 @@ import { Skeleton } from "@reloop/ui/skeleton";
 import * as Switch from "@reloop/ui/switch";
 import { useRouter } from "next/navigation";
 import { ChannelDropdown } from "./channel-dropdown";
-import { EmptyState } from "./empty-state";
+import { EmptyState } from "../shared/empty-state";
 import * as Button from "@reloop/ui/button";
 
 interface Channel {
