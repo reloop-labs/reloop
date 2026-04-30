@@ -62,7 +62,11 @@ function Checkbox({
 					stroke="currentColor"
 					strokeWidth={3}
 				>
-					<path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+					<path
+						strokeLinecap="round"
+						strokeLinejoin="round"
+						d="M5 13l4 4L19 7"
+					/>
 				</svg>
 			)}
 		</button>
@@ -78,14 +82,20 @@ export function PreferencesContent({
 	// Local state for checkboxes
 	const [checked, setChecked] = useState<Record<string, boolean>>(() =>
 		Object.fromEntries(
-			channels.map((t) => [t.id, isSubscribed(t.status, t.defaultSubscription)]),
+			channels.map((t) => [
+				t.id,
+				isSubscribed(t.status, t.defaultSubscription),
+			]),
 		),
 	);
 
 	// Baseline state to track what's currently saved on the server
 	const [baseline, setBaseline] = useState<Record<string, boolean>>(() =>
 		Object.fromEntries(
-			channels.map((t) => [t.id, isSubscribed(t.status, t.defaultSubscription)]),
+			channels.map((t) => [
+				t.id,
+				isSubscribed(t.status, t.defaultSubscription),
+			]),
 		),
 	);
 
@@ -176,30 +186,23 @@ export function PreferencesContent({
 
 	return (
 		<div className="flex min-h-screen items-center justify-center bg-[#0d0f14] px-4 py-12">
-			<div className="w-full max-w-[440px]">
+			<div className="w-full max-w-[450px]">
 				{/* Phone-style dark card */}
-				<div className="relative overflow-hidden rounded-[32px] bg-[#111113] p-8 shadow-2xl ring-1 ring-white/10 lg:p-10">
+				<div className="relative overflow-hidden">
 					{/* Logo Section */}
 					<div className="mb-8 flex justify-center">
-						<div className="flex h-12 w-12 items-center justify-center rounded-full border border-white/15 bg-white/5">
-							<Logo theme="dark" className="h-6 w-6" />
-						</div>
+						<Logo theme="dark" className="h-20" />
 					</div>
-
 					{/* Heading */}
 					<div className="mb-8 text-center">
 						<h1 className="font-bold text-2xl text-white leading-tight tracking-tight">
-							Do you want to
-							<br />
-							unsubscribe?
+							Do you want to unsubscribe?
 						</h1>
 						<p className="mt-3 text-[15px] text-white/50">
-							Hi {contact.firstName || "there"} — confirm preferences for
-							<br />
+							Hi {contact.firstName || "there"} — confirm preferences for{" "}
 							<span className="font-medium text-white/80">
 								{organization.name}
 							</span>
-							:
 						</p>
 					</div>
 
@@ -223,7 +226,7 @@ export function PreferencesContent({
 										}))
 									}
 									className={cn(
-										"flex w-full items-center gap-4 rounded-2xl px-4 py-4 text-left transition-all duration-200",
+										"flex w-full gap-3 rounded-2xl px-4 py-4 text-left transition-all duration-200",
 										"hover:bg-white/5 active:bg-white/10",
 									)}
 								>
@@ -233,12 +236,12 @@ export function PreferencesContent({
 											setChecked((prev) => ({ ...prev, [channel.id]: val }))
 										}
 									/>
-									<div className="min-w-0 flex-1">
+									<div className="-mt-0.5 min-w-0 flex-1">
 										<p className="font-semibold text-[15px] text-white leading-5">
 											{channel.name}
 										</p>
 										{channel.description && (
-											<p className="mt-1 truncate text-xs text-white/40">
+											<p className="mt-1 truncate text-white/40 text-xs">
 												{channel.description}
 											</p>
 										)}

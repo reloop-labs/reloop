@@ -61,7 +61,7 @@ export default async function PreferencesPage({
   if (!data) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#0d0f14] px-4 py-12">
-        <div className="w-full max-w-[440px]">
+        <div className="w-full max-w-[600px]">
           <div className="rounded-[32px] bg-[#111113] p-10 text-center shadow-2xl ring-1 ring-white/10">
             <div className="mx-auto mb-8 flex h-16 w-16 items-center justify-center rounded-full bg-red-500/10 ring-1 ring-red-500/20">
               <svg
