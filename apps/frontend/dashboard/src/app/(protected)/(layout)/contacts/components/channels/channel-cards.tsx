@@ -34,20 +34,29 @@ interface ChannelCardsProps {
 }
 
 const CardSkeleton = () => (
-	<div className="rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-5 dark:border-stroke-soft-100/10 dark:bg-[#101010]">
+	<div className="rounded-2xl border border-stroke-soft-100 bg-bg-white-0 px-5 pt-3 pb-2 dark:border-stroke-soft-100/10 dark:bg-[#101010]">
 		<div className="flex items-start justify-between">
-			<div className="flex flex-col gap-2">
-				<Skeleton className="h-6 w-32 rounded-md" />
-				<Skeleton className="h-4 w-48 rounded-md" />
+			<div className="flex flex-col">
+				<Skeleton className="h-5 w-32 rounded-md" />
+				<Skeleton className="mt-2 h-3 w-48 rounded-md" />
 			</div>
 			<div className="flex gap-2">
-				<Skeleton className="h-8 w-8 rounded-lg" />
-				<Skeleton className="h-8 w-8 rounded-lg" />
+				<Skeleton className="h-6 w-6 rounded-lg" />
+				<Skeleton className="h-6 w-6 rounded-lg" />
 			</div>
 		</div>
-		<div className="mt-8 flex items-center justify-between border-stroke-soft-100 border-t pt-4 dark:border-stroke-soft-100/10">
-			<Skeleton className="h-4 w-24 rounded-md" />
-			<Skeleton className="h-5 w-10 rounded-full" />
+		<div className="mt-3 space-y-2">
+			<div className="h-px w-full bg-stroke-soft-100 dark:bg-white/5" />
+			<div className="flex items-center justify-between">
+				<div className="flex items-center gap-1">
+					<Skeleton className="h-7 w-12 rounded-md" />
+					<Skeleton className="h-4 w-16 rounded-md" />
+				</div>
+				<div className="flex items-center gap-2">
+					<Skeleton className="h-5 w-16 rounded-full" />
+					<Skeleton className="h-5 w-20 rounded-full" />
+				</div>
+			</div>
 		</div>
 	</div>
 );
@@ -75,7 +84,7 @@ export const ChannelCards = ({
 	}
 
 	return (
-		<div className="grid grid-cols-1 gap-4">
+		<div className="grid grid-cols-1 gap-2">
 			{channels.map((channel) => {
 				const isPublic = channel.visibility === "public";
 				const subscriberCount = channel.subscriberCount ?? 0;

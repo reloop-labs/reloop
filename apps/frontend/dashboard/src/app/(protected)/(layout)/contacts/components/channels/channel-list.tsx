@@ -81,7 +81,7 @@ export const ChannelList = () => {
 	const orgName = activeOrganization?.name ?? "Your Organization";
 
 	return (
-		<div className="flex gap-6">
+		<div className="flex gap-3">
 			{/* Left: Channel list */}
 			<div className="min-w-0 flex-1">
 				<div className="mt-0">
