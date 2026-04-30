@@ -281,18 +281,25 @@ export const ContactHeader = ({
 									)}
 								>
 									<Icon
-										name={getSharedStatusIcon(contact?.status as AudienceStatus)}
+										name={getSharedStatusIcon(
+											contact?.status as AudienceStatus,
+										)}
 										className="h-3.5 w-3.5"
 									/>
 									{getStatusLabel(contact?.status as AudienceStatus)}
 								</div>
 								{contact?.suppressionReason && (
-									<div className="flex items-center gap-1 rounded-md bg-error-alpha-10 px-2 py-0.5 w-fit">
-										<Icon name="alert-circle" className="h-3 w-3 text-error-base flex-shrink-0" />
+									<div className="flex w-fit items-center gap-1 rounded-md bg-red-alpha-10 px-2 py-0.5">
+										<Icon
+											name="alert-circle"
+											className="h-3 w-3 flex-shrink-0 text-error-base"
+										/>
 										<span className="font-medium text-[11px] text-error-base">
 											Suppressed
 											{" · "}
-											{contact.suppressionReason === "hard_bounce" ? "Hard Bounce" : "Spam Complaint"}
+											{contact.suppressionReason === "hard_bounce"
+												? "Hard Bounce"
+												: "Spam Complaint"}
 										</span>
 									</div>
 								)}
@@ -387,6 +394,25 @@ export const ContactHeader = ({
 						)}
 					</div>
 				</div>
+
+				{/* Suppression Banner */}
+				{!isLoading && contact?.suppressionReason && (
+					<div className="mt-8 flex items-start gap-3 rounded-2xl border border-error-base/30 bg-error-base/10 px-4 py-3">
+						<Icon
+							name="alert-octagon"
+							className="mt-0.5 h-5 w-5 flex-shrink-0 text-error-base"
+						/>
+						<div className="flex flex-col gap-0.5">
+							<h3 className="font-medium text-error-base text-sm">
+								Contact Suppressed
+							</h3>
+							<p className="text-error-base/80 text-sm">
+								This contact has been automatically excluded from all
+								communications due to a delivery issue or spam report.
+							</p>
+						</div>
+					</div>
+				)}
 
 				{/* Properties Section - All in one grid */}
 				<div className="mt-12">
