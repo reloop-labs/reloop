@@ -1,4 +1,3 @@
-/** biome-ignore-all lint/a11y/noLabelWithoutControl: <explanation> */
 "use client";
 
 import * as Button from "@reloop/ui/button";
@@ -56,26 +55,29 @@ export const CreateChannelModal = ({
 	const isDescriptionOverLimit = descriptionLength > MAX_DESCRIPTION_LENGTH;
 
 	// Reset state when modal closes
-	const handleOpenChange = (isOpen: boolean) => {
-		if (!isOpen) {
-			setName("");
-			setDescription("");
-			setNameError(null);
-			setDefaultSubscription("opt_in");
-			setVisibility("private");
-		}
-		onOpenChange(isOpen);
-	};
+	const handleOpenChange = useCallback(
+		(isOpen: boolean) => {
+			if (!isOpen) {
+				setName("");
+				setDescription("");
+				setNameError(null);
+				setDefaultSubscription("opt_in");
+				setVisibility("private");
+			}
+			onOpenChange(isOpen);
+		},
+		[onOpenChange],
+	);
 
 	// Validate form
-	const validateForm = (): boolean => {
+	const validateForm = useCallback((): boolean => {
 		if (!name.trim()) {
 			setNameError("Channel name is required");
 			return false;
 		}
 		setNameError(null);
 		return true;
-	};
+	}, [name]);
 
 	// Handle form submission
 	const handleSubmit = useCallback(
@@ -129,6 +131,7 @@ export const CreateChannelModal = ({
 			isDescriptionOverLimit,
 			mutate,
 			handleOpenChange,
+			validateForm,
 		],
 	);
 
@@ -240,15 +243,19 @@ export const CreateChannelModal = ({
 								</div>
 
 								<div className="mt-2 space-y-3">
-									<label className="flex w-full cursor-pointer items-center gap-3 rounded-xl border border-stroke-soft-100 p-3 transition-colors hover:bg-bg-weak-50/50 dark:border-stroke-soft-100/40">
+									<label
+										htmlFor="create-default-subscription"
+										className="flex w-full cursor-pointer gap-2 rounded-xl border border-stroke-soft-100 p-3 transition-colors hover:bg-bg-weak-50/50 dark:border-stroke-soft-100/40"
+									>
 										<Checkbox.Root
+											id="create-default-subscription"
 											checked={defaultSubscription === "opt_in"}
 											onCheckedChange={(checked) =>
 												setDefaultSubscription(checked ? "opt_in" : "opt_out")
 											}
 											disabled={isCreating}
 										/>
-										<div className="flex-1">
+										<div className="-mt-px flex-1">
 											<p className="font-medium text-paragraph-sm text-text-strong-950">
 												Default Subscription
 											</p>
@@ -260,15 +267,19 @@ export const CreateChannelModal = ({
 										</div>
 									</label>
 
-									<label className="flex w-full cursor-pointer items-center gap-3 rounded-xl border border-stroke-soft-100 p-3 transition-colors hover:bg-bg-weak-50/50 dark:border-stroke-soft-100/40">
+									<label
+										htmlFor="create-public-visibility"
+										className="flex w-full cursor-pointer gap-2 rounded-xl border border-stroke-soft-100 p-3 transition-colors hover:bg-bg-weak-50/50 dark:border-stroke-soft-100/40"
+									>
 										<Checkbox.Root
+											id="create-public-visibility"
 											checked={visibility === "public"}
 											onCheckedChange={(checked) =>
 												setVisibility(checked ? "public" : "private")
 											}
 											disabled={isCreating}
 										/>
-										<div className="flex-1">
+										<div className="-mt-px flex-1">
 											<p className="font-medium text-paragraph-sm text-text-strong-950">
 												Public Channel
 											</p>

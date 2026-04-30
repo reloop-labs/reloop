@@ -238,7 +238,7 @@ export function CreateChannelPreview({
 										{t.description ? (
 											<p
 												className={cn(
-													"mt-1 mb-2 truncate text-[11px]",
+													"mt-1 truncate text-[11px]",
 													"text-text-soft-400 dark:text-white/40",
 												)}
 											>
