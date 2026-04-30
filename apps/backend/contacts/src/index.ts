@@ -2,8 +2,8 @@ import "dotenv/config";
 import { contactsConfig } from "@be/contacts/contacts.config";
 import { contactRoutes } from "@be/contacts/routes/contact/contact.routes";
 import { groupRoutes } from "@be/contacts/routes/group/group.routes";
-
 import { landing } from "@be/contacts/routes/landing/landing.index";
+import { preferencesRoutes } from "@be/contacts/routes/preferences/preferences.route";
 import { propertyRoutes } from "@be/contacts/routes/property/property.routes";
 import { topicRoutes } from "@be/contacts/routes/topic/topic.routes";
 
@@ -43,6 +43,7 @@ const contactsService = new Elysia({
 	.use(propertyRoutes)
 	.use(topicRoutes)
 	.use(groupRoutes)
+	.use(preferencesRoutes)
 	.onStart(async () => {
 		await loader();
 	})

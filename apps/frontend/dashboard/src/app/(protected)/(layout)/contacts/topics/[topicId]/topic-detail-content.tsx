@@ -1,16 +1,10 @@
 "use client";
-import {
-	ContactFilterDropdown,
-	type ContactFilterOption,
-} from "@fe/dashboard/app/(protected)/(layout)/contacts/components/contact-filter-dropdown";
-import { ContactTable } from "@fe/dashboard/app/(protected)/(layout)/contacts/topics/[topicId]/components/contact-table";
 import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import * as Input from "@reloop/ui/input";
 import {
 	Content as PopoverContent,
 	Root as PopoverRoot,
@@ -19,7 +13,7 @@ import {
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useParams } from "next/navigation";
 import { useQueryState } from "nuqs";
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 
@@ -95,10 +89,9 @@ export const TopicDetailContent = () => {
 	const [, setModal] = useQueryState("modal", { history: "replace" });
 	const [, setId] = useQueryState("id", { history: "replace" });
 	const [copied, setCopied] = useState(false);
+	const [copiedPrefUrl, setCopiedPrefUrl] = useState(false);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
-	const [statusFilter, setStatusFilter] = useState<ContactFilterOption>(null);
-	const [searchQuery, setSearchQuery] = useState<string>("");
 
 	const {
 		data: topicData,
@@ -109,6 +102,16 @@ export const TopicDetailContent = () => {
 		revalidateOnReconnect: true,
 	});
 
+	// Fetch a sample preference URL for this topic (only when topic is public)
+	const { data: prefTokenData } = useSWR<{ url: string; token: string }>(
+		topicData?.visibility === "public" && topicId
+			? "/api/contacts/v1/preferences/generate?contactId=demo"
+			: null,
+		{
+			revalidateOnFocus: false,
+			onError: () => {},
+		},
+	);
 	const { data: subscriptionData, isLoading: subscriptionLoading } =
 		useSWR<SubscriptionListResponse>(
 			`/api/contacts/v1/subscriptions/list?topicId=${topicId}&limit=100`,
@@ -143,57 +146,20 @@ export const TopicDetailContent = () => {
 		setModal(itemId === "edit" ? "edit-topic" : "delete-topic");
 	};
 
-	const isLoading = topicLoading || subscriptionLoading;
-
-	const handleUnsubscribe = async (contactId: string) => {
-		toast.error("Not implemented");
-	};
-
-	const handleDownloadCSV = async () => {
+	const handleCopyPrefUrl = async () => {
+		const url = prefTokenData?.url;
+		if (!url) return;
 		try {
-			if (
-				!subscriptionData?.subscriptions ||
-				subscriptionData.subscriptions.length === 0
-			) {
-				toast.error("No contacts to export");
-				return;
-			}
-
-			const headers = ["Contact ID", "Status", "Subscribed At"];
-			const csvRows = subscriptionData.subscriptions.map((sub) => [
-				sub.contactId,
-				sub.status,
-				new Date(sub.createdAt).toISOString(),
-			]);
-
-			const csvContent = [
-				headers.join(","),
-				...csvRows.map((row) => row.map((cell) => `"${cell}"`).join(",")),
-			].join("\n");
-
-			const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-			const link = document.createElement("a");
-			link.href = URL.createObjectURL(blob);
-			link.download = `topic_contacts_${new Date().toISOString().split("T")[0]}.csv`;
-			link.click();
-			URL.revokeObjectURL(link.href);
-
-			toast.success("Contacts exported successfully");
-		} catch (error) {
-			console.error("Failed to download CSV:", error);
-			toast.error("Failed to export contacts");
+			await navigator.clipboard.writeText(url);
+			toast.success("Preference URL copied to clipboard");
+			setCopiedPrefUrl(true);
+			setTimeout(() => setCopiedPrefUrl(false), 2000);
+		} catch {
+			toast.error("Failed to copy URL");
 		}
 	};
 
-	const filteredSubscriptions =
-		subscriptionData?.subscriptions?.filter((sub) => {
-			const matchesStatus =
-				statusFilter === null || sub.status === statusFilter;
-			const matchesSearch =
-				searchQuery === "" ||
-				sub.contactId.toLowerCase().includes(searchQuery.toLowerCase());
-			return matchesStatus && matchesSearch;
-		}) || [];
+	const isLoading = topicLoading || subscriptionLoading;
 
 	if (topicError) {
 		return (
@@ -500,52 +466,52 @@ export const TopicDetailContent = () => {
 						</span>
 					)}
 				</div>
-			</div>
 
-			<div className="mt-12">
-				<div className="mb-4 flex items-center gap-3">
-					<div className="flex-1">
-						<Input.Root size="xsmall">
-							<Input.Wrapper>
-								<Input.Icon as={Icon} name="search" size="xsmall" />
-								<Input.Input
-									placeholder="Search by contact ID"
-									value={searchQuery}
-									onChange={(e) => setSearchQuery(e.target.value)}
-								/>
-							</Input.Wrapper>
-						</Input.Root>
+				{/* Preference page link — only shown for public topics */}
+				{topicData?.visibility === "public" && (
+					<div className="col-span-3 flex flex-col gap-1.5">
+						<div className="flex items-center gap-1.5">
+							<Icon name="globe" className="h-3.5 w-3.5 text-primary-base" />
+							<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
+								Preference Page
+							</span>
+							<span className="inline-flex items-center rounded-md border border-primary-base bg-primary-light/20 px-1.5 py-0.5 font-medium text-[9px] text-primary-base uppercase tracking-wider">
+								Public
+							</span>
+						</div>
+						{isLoading ? (
+							<Skeleton className="h-6 w-80 rounded-lg" />
+						) : (
+							<div className="flex items-center gap-2">
+								<code className="max-w-[400px] truncate rounded bg-neutral-alpha-10 px-2 py-1 font-medium font-mono text-text-sub-600 text-xs">
+									{prefTokenData?.url ??
+										"https://reloop.sh/preferences/{token}"}
+								</code>
+								<button
+									type="button"
+									onClick={handleCopyPrefUrl}
+									disabled={!prefTokenData?.url}
+									className="flex-shrink-0 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
+								>
+									<Icon
+										name={copiedPrefUrl ? "check" : "copy"}
+										className={cn(
+											"h-3 w-3 flex-shrink-0 transition-all",
+											copiedPrefUrl ? "text-success-base" : "text-text-sub-600",
+										)}
+									/>
+								</button>
+							</div>
+						)}
+						<p className="text-[10px] text-text-sub-600">
+							Embed a unique URL per contact in your email templates using the{" "}
+							<code className="rounded bg-neutral-alpha-10 px-1 font-mono text-[10px]">
+								GET /api/contacts/v1/preferences/generate
+							</code>{" "}
+							endpoint.
+						</p>
 					</div>
-
-					<ContactFilterDropdown
-						value={statusFilter}
-						onChange={setStatusFilter}
-					/>
-					<Button.Root
-						variant="neutral"
-						mode="stroke"
-						size="xsmall"
-						onClick={handleDownloadCSV}
-						disabled={
-							!subscriptionData?.subscriptions ||
-							subscriptionData.subscriptions.length === 0
-						}
-						title="Export CSV"
-					>
-						<Icon name="file-download" className="h-4 w-4" />
-					</Button.Root>
-				</div>
-
-				<ContactTable
-					subscriptions={filteredSubscriptions}
-					isLoading={subscriptionLoading}
-					loadingRows={5}
-					onUnsubscribe={handleUnsubscribe}
-					onAddContact={() => setModal("add-contact-to-topic")}
-					emptyStateTitle="No contacts yet"
-					emptyStateDescription="Add contacts to this topic to organize and start managing them."
-					emptyStateButtonText="Add First Contact"
-				/>
+				)}
 			</div>
 		</div>
 	);
