@@ -1,5 +1,5 @@
 "use client";
-import { SubscriberPreview } from "@fe/dashboard/app/(protected)/(layout)/contacts/channels/[channelId]/components/subscriber-preview";
+import { SubscriberBrowserPreview } from "@fe/dashboard/app/(protected)/(layout)/contacts/components/subscriber-browser-preview";
 import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
@@ -525,7 +525,7 @@ export const ChannelDetailContent = () => {
 
 			{/* Subscriber preview — visual representation of the end-user preferences page */}
 			{channelData && (
-				<SubscriberPreview
+				<SubscriberBrowserPreview
 					channel={channelData}
 					siblingChannels={siblingChannels as ChannelData[]}
 					orgName="Your Organization"

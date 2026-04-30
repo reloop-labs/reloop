@@ -99,7 +99,7 @@ export const ChannelList = () => {
 							setModal("delete-channel");
 							setId(channelId);
 						}}
-						onAddChannel={() => router.push("/contacts/channels/add")}
+						onAddChannel={() => setModal("create-channel")}
 					/>
 				</div>
 			</div>

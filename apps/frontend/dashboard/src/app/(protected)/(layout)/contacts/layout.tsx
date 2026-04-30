@@ -27,7 +27,6 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 	const isPropertiesPage = pathname.includes("/contacts/properties");
 	const isChannelsPage = pathname.includes("/contacts/channels");
 	const isGroupsPage = pathname.includes("/contacts/groups");
-	const isAddChannelPage = pathname.endsWith("/contacts/channels/add");
 	const isBulkImportPage = pathname.includes("/bulk-import");
 	const isContactDetailPage = pathname.includes("/contacts/detail/");
 	const isGroupDetailPage =
@@ -39,7 +38,7 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 
 	const handleAction = () => {
 		if (isPropertiesPage) setModal("add-property");
-		else if (isChannelsPage) router.push("/contacts/channels/add");
+		else if (isChannelsPage) setModal("create-channel");
 		else if (isGroupsPage) setModal("create-group");
 		else setModal("add-contact");
 	};
@@ -53,7 +52,7 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 			}
 		},
 		{
-			enabled: !isAddChannelPage && !isBulkImportPage && !isDetailPage,
+			enabled: !isBulkImportPage && !isDetailPage,
 		},
 	);
 
@@ -64,21 +63,19 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 			setModal("create-group");
 		},
 		{
-			enabled: !isAddChannelPage && !isBulkImportPage && !isDetailPage,
+			enabled: !isBulkImportPage && !isDetailPage,
 		},
 	);
 
 	// Extract channelId if on a channel subpage
 	const channelIdMatch = pathname.match(/\/contacts\/channels\/([^/]+)/);
-	const channelId =
-		channelIdMatch && !isAddChannelPage ? channelIdMatch[1] : null;
+	const channelId = channelIdMatch ? channelIdMatch[1] : null;
 
 	const { data: channelData } = useSWR<Channel>(
 		channelId ? `/api/contacts/v1/channels/${channelId}` : null,
 	);
 
 	const getHeaderConfig = () => {
-		if (isAddChannelPage) return { title: "Create Channel", showBack: true };
 		if (isBulkImportPage) return { title: "Bulk Import", showBack: true };
 		if (channelId)
 			return { title: channelData?.name || "Channel Details", showBack: true };
@@ -120,7 +117,7 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 							)}
 							<h1 className="font-medium text-2xl">{title}</h1>
 						</div>
-						{!isAddChannelPage && !isBulkImportPage && (
+						{!isBulkImportPage && (
 							<div className="flex items-center gap-2 self-end">
 								<DocsButton slug="contacts" size="xsmall" />
 								<Button.Root
@@ -149,7 +146,7 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 					</div>
 				)}
 
-				{!isDetailPage && !isAddChannelPage && !isBulkImportPage && (
+				{!isDetailPage && !isBulkImportPage && (
 					<div className="mt-2">
 						<ContactsTabs />
 					</div>
