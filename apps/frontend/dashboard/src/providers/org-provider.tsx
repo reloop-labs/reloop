@@ -1,6 +1,7 @@
 "use client";
 
 import { authClient } from "@reloop/auth/client";
+import { EditorProvider } from "@tiptap/react";
 import { useRouter } from "next/navigation";
 import {
 	createContext,

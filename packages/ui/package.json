@@ -128,10 +128,7 @@
 		"tailwindcss": "catalog:ui",
 		"@react-email/editor": "catalog:ui",
 		"@tiptap/react": "catalog:ui",
-		"@tiptap/core": "catalog:ui",
-		"@tiptap/starter-kit": "catalog:ui",
-		"@tiptap/extension-link": "catalog:ui",
-		"@tiptap/extension-image": "catalog:ui"
+		"@tiptap/starter-kit": "catalog:ui"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",

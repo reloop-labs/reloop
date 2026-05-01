@@ -28,6 +28,7 @@
 		"framer-motion": "catalog:ui",
 		"lucide-react": "catalog:ui",
 		"motion": "catalog:ui",
+		"@react-email/editor": "catalog:ui",
 		"next": "catalog:ui",
 		"next-themes": "catalog:ui",
 		"nuqs": "catalog:ui",
