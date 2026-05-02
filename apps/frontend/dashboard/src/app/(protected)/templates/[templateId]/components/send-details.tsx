@@ -41,7 +41,7 @@ export const SendDetails = () => {
 	const setSubject = useEditorStore((s) => s.setSubject);
 
 	return (
-		<div className="mx-auto w-full max-w-2xl px-6">
+		<div className="mx-auto w-full max-w-2xl">
 			{/* From Row */}
 			<FieldRow label="From">
 				<div className="flex flex-1 items-center gap-1 text-sm text-text-sub-600">
