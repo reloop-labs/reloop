@@ -1,21 +1,146 @@
 ---
 title: Webhook Ingester
-description: High-performance webhook processing for large scale applications.
+description: A self-hosted solution to store all your Reloop webhook events in your own database.
 ---
 
-For applications receiving a high volume of webhooks, Reloop offers a Webhook Ingester service to ensure low latency and high reliability.
+The Webhook Ingester is a self-hosted tool that allows you to store all your Reloop webhook events directly in your own database. This is ideal for long-term data retention, custom analytics, and building robust event-driven workflows without worrying about webhook delivery order or duplicate handling.
 
-## Why use an Ingester?
+## Why use the Webhook Ingester?
 
-If your application processes thousands of emails per minute, your web server might struggle to keep up with the volume of webhook requests. The Ingester provides a buffer between Reloop and your application.
+- **Signature Verification**: Built-in verification to ensure webhook authenticity.
+- **Idempotency**: Safely handles duplicate webhook deliveries using unique event IDs.
+- **Multiple Databases**: Support for PostgreSQL, MySQL, MongoDB, and data warehouses.
+- **Easy Deployment**: One-click deployment to Vercel, Railway, or Render.
 
-## Benefits
+## Deploy
 
-- **Decoupling**: Separate event reception from processing.
-- **Scalability**: Handle spikes in traffic without overloading your primary application.
-- **Durable Storage**: Events are safely stored before being processed.
-- **Fine-grained Retries**: More control over how and when events are re-delivered.
+You can run the ingester using our official Docker image:
 
-## Configuration
+```bash
+docker pull ghcr.io/reloop-labs/reloop-webhooks-ingester
+```
 
-Contact our [support team](mailto:support@reloop.dev) to enable the Webhook Ingester for your account.
+## Supported Databases
+
+We support a wide range of databases to store your webhook events:
+
+- **PostgreSQL** (including Supabase and Neon)
+- **MySQL** (including PlanetScale)
+- **MongoDB**
+- **Data Warehouses** (Snowflake, BigQuery, ClickHouse)
+
+## Quick Start
+
+<Steps>
+  <Step title="Clone and Install">
+    Clone the repository and install dependencies:
+    ```bash
+    git clone https://github.com/reloop-labs/reloop-webhooks-ingester.git
+    cd reloop-webhooks-ingester
+    pnpm install
+    ```
+  </Step>
+  <Step title="Configure Environment Variables">
+    Copy the example environment file and add your credentials:
+    ```bash
+    cp .env.example .env.local
+    ```
+    Required variables:
+    ```bash
+    # Your Reloop webhook signing secret from the dashboard
+    RELOOP_WEBHOOK_SECRET=whsec_xxxxxxxxxxxxxxxxxxxxx
+
+    # Database connection string
+    POSTGRESQL_URL=postgresql://user:password@host:5432/database
+    ```
+  </Step>
+  <Step title="Set up your Database">
+    Run the setup command to create the necessary tables/collections:
+    ```bash
+    pnpm db:setup --postgresql # or --mysql, --mongodb
+    ```
+  </Step>
+  <Step title="Deploy and Register Webhook">
+    Deploy your instance and add the endpoint in the [Reloop Dashboard](https://app.reloop.dev/webhooks).
+    Your endpoint URL will be: `https://your-app.com/postgresql` (or your chosen connector).
+  </Step>
+</Steps>
+
+## Database Schemas
+
+The ingester creates tables with a standardized schema for different event categories:
+
+- `reloop_wh_emails`: Stores all email-related events.
+- `reloop_wh_contacts`: Stores audience and contact events.
+- `reloop_wh_domains`: Stores domain verification events.
+
+### Core Fields
+
+Every event includes these essential fields:
+- `event_id`: Unique webhook event ID for idempotency.
+- `event_type`: The type of event (e.g., `email.delivered`).
+- `event_created_at`: When the event occurred in Reloop.
+- `webhook_received_at`: When the webhook was stored in your database.
+- `data`: JSON object containing the full event payload.
+
+## Idempotency
+
+The ingester uses the unique event ID provided by Reloop to ensure that even if a webhook is delivered multiple times, it is only stored once in your database.
+
+## Configuration Reference
+
+### Required Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `RELOOP_WEBHOOK_SECRET` | The signing secret used to verify webhook authenticity. |
+
+### Database-Specific Variables
+
+#### Supabase / PostgreSQL
+```bash
+POSTGRESQL_URL=postgresql://user:password@host:5432/database
+```
+
+#### MongoDB
+```bash
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/
+MONGODB_DATABASE=reloop_webhooks
+```
+
+## Example Queries
+
+Once your data is in your database, you can run powerful queries:
+
+**Count daily events by type:**
+```sql
+SELECT 
+  DATE(event_created_at) AS day, 
+  event_type, 
+  COUNT(*) AS count 
+FROM reloop_wh_emails 
+GROUP BY DATE(event_created_at), event_type 
+ORDER BY day DESC;
+```
+
+## Data Retention
+
+Since the data is in your own database, you have full control over retention. You can set up TTL indexes in MongoDB or use a cron job to purge old data:
+
+```sql
+DELETE FROM reloop_wh_emails 
+WHERE event_created_at < NOW() - INTERVAL '90 days';
+```
+
+## Troubleshooting
+
+- **Signature failing**: Ensure `RELOOP_WEBHOOK_SECRET` matches your dashboard secret.
+- **Connection errors**: Check your database firewall rules and connection string.
+- **Webhooks not received**: Verify your endpoint is publicly accessible and returning a 200 OK.
+
+---
+
+## Learn More
+
+- [Verifying Webhooks](/docs/webhooks/verify-webhooks-requests)
+- [Event Types Reference](/docs/webhooks/event-types)

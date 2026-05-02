@@ -84,7 +84,7 @@ export function DocsLayout({ children, tree }: DocsLayoutProps) {
 					id="nd-page"
 					className="relative min-h-0 flex-1 overflow-y-auto overflow-x-hidden bg-fd-background"
 				>
-					<div className="mx-auto min-h-full w-full transition-all duration-300 lg:max-w-[1250px]">
+					<div className="mx-auto min-h-full w-full transition-all duration-300">
 						{children}
 					</div>
 				</main>

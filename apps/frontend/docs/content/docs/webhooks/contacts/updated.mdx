@@ -1,34 +1,49 @@
 ---
 title: "contact.updated"
 sidebarTitle: "contact.updated"
-description: "Webhook event triggered when a contact is updated."
+description: "Webhook event triggered when a contact's details are updated."
 ---
 
-The `contact.updated` event is triggered when a contact is **updated** in your audience.
+<SideBySide>
+  <>
 
-## Payload
+    The `contact.updated` event is triggered when a contact's information or subscription status changes.
 
-```json
-{
-  "type": "contact.updated",
-  "created_at": "2023-01-01T12:00:00Z",
-  "data": {
-    "contact_id": "con_123456789",
-    "email": "user@example.com",
-    "first_name": "John",
-    "last_name": "Doe",
-    "unsubscribed": false
-  }
-}
-```
+    ## Event Details
+    All webhook payloads follow a consistent top-level structure with event-specific data nested within the `data` object.
 
-## Handling this event
+    ### type `string`
+    The event type that triggered the webhook (e.g., `contact.updated`).
 
-When your endpoint receives a `contact.updated` event, you might want to:
+    ### created_at `string`
+    ISO 8601 timestamp when the webhook event was created.
 
-- Synchronize contact details with your CRM or external database.
-- Trigger onboarding emails for new contacts.
-- Update subscription preferences in real-time.
+    ### data `object`
+    Contains the updated details of the contact.
+
+    ## Handling this event
+    When your endpoint receives a `contact.updated` event, you might want to:
+    - Update the contact's record in your system.
+    - Synchronize subscription preferences.
+    - Log the change for audit purposes.
+  </>
+
+  <>
+
+    ```json
+    {
+      "type": "contact.updated",
+      "created_at": "2023-01-01T12:00:00Z",
+      "data": {
+        "id": "con_123456789",
+        "email": "contact@example.com",
+        "status": "unsubscribed",
+        "timestamp": "2023-01-01T12:00:00Z"
+      }
+    }
+    ```
+  </>
+</SideBySide>
 
 ## Learn More
 

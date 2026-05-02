@@ -1,54 +1,91 @@
 ---
 title: Verify Webhooks Requests
-description: Secure your webhook endpoint by verifying that requests are coming from Reloop.
+description: Learn how to use the signing secret to verify your webhooks.
 ---
 
-To ensure that webhook requests are authentic and coming from Reloop, you should verify the signature included in the request headers.
+To ensure that webhook requests are authentic and coming from Reloop, you should verify the signature included in the request headers. This prevents unauthorized requests from reaching your application logic.
 
-## Signature Header
+## Using the SDK
 
-Every webhook request from Reloop includes a `reloop-signature` header. This header contains a timestamp and one or more signatures.
+The easiest way to verify webhooks is by using the official Reloop SDK. It provides a built-in method to validate the request signature and parse the payload.
 
-```
-reloop-signature: t=1672531200,v1=sha256_signature_here
-```
+```typescript
+import { NextRequest, NextResponse } from 'next/server';
+import { Reloop } from 'reloop';
 
-## Verification Steps
+const reloop = new Reloop(process.env.RELOOP_API_KEY);
 
-<Steps>
-  <Step title="Extract Timestamp and Signature">
-    Parse the `reloop-signature` header to get the timestamp (`t`) and the signature (`v1`).
-  </Step>
-  <Step title="Construct the Signed Payload">
-    Concatenate the timestamp, a dot `.`, and the raw JSON request body.
-  </Step>
-  <Step title="Compute HMAC">
-    Use your webhook's secret key to compute an HMAC with SHA256 hashing.
-  </Step>
-  <Step title="Compare Signatures">
-    Verify that the computed HMAC matches the signature from the header.
-  </Step>
-</Steps>
+export async function POST(req: NextRequest) {
+  try {
+    const payload = await req.text();
+    const signature = req.headers.get('reloop-signature');
 
-## Example Implementation (Node.js)
+    // Throws an error if the webhook is invalid
+    const event = reloop.webhooks.verify({
+      payload,
+      headers: {
+        'reloop-signature': signature,
+      },
+      webhookSecret: process.env.RELOOP_WEBHOOK_SECRET,
+    });
 
-```javascript
-const crypto = require('crypto');
-
-function verifyWebhook(payload, header, secret) {
-  const parts = header.split(',');
-  const timestamp = parts.find(p => p.startsWith('t=')).split('=')[1];
-  const signature = parts.find(p => p.startsWith('v1=')).split('=')[1];
-
-  const signedPayload = `${timestamp}.${payload}`;
-  const expectedSignature = crypto
-    .createHmac('sha256', secret)
-    .update(signedPayload)
-    .digest('hex');
-
-  return crypto.timingSafeEqual(
-    Buffer.from(signature),
-    Buffer.from(expectedSignature)
-  );
+    // Handle the verified event
+    console.log(event.type);
+    
+    return NextResponse.json({ received: true });
+  } catch (err) {
+    return new NextResponse('Invalid webhook signature', { status: 400 });
+  }
 }
 ```
+
+## Using Svix
+
+Reloop uses [Svix](https://www.svix.com/) to manage and sign webhook deliveries. You can use the `svix` library directly for verification in any language.
+
+First, install the library:
+
+```bash
+npm install svix
+```
+
+Then, use it to verify the raw payload and headers:
+
+```javascript
+import { Webhook } from 'svix';
+
+const secret = process.env.RELOOP_WEBHOOK_SECRET;
+
+export async function POST(req, res) {
+  const payload = await req.text();
+  const headers = {
+    'svix-id': req.headers['svix-id'],
+    'svix-timestamp': req.headers['svix-timestamp'],
+    'svix-signature': req.headers['svix-signature'],
+  };
+
+  const wh = new Webhook(secret);
+
+  try {
+    const verified = wh.verify(payload, headers);
+    // Success! Handle the event
+  } catch (err) {
+    return res.status(400).send('Verification failed');
+  }
+}
+```
+
+## Why should I verify webhooks?
+
+Verification is critical for security because it allows you to:
+1. **Confirm Identity**: Ensure the request actually originated from Reloop.
+2. **Prevent Tampering**: Verify that the payload hasn't been modified in transit.
+3. **Avoid Replay Attacks**: Signatures include a timestamp to prevent old requests from being re-submitted.
+
+---
+
+## Learn More
+
+- [Webhooks Introduction](/docs/webhooks)
+- [Event Types](/docs/webhooks/event-types)
+- [Webhook Ingester](/docs/webhooks/ingester)

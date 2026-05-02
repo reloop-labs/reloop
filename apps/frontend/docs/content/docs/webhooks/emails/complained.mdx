@@ -1,36 +1,48 @@
 ---
 title: "email.complained"
 sidebarTitle: "email.complained"
-description: "Webhook event triggered when an email is complained."
+description: "Webhook event triggered when a recipient marks an email as spam."
 ---
 
-The `email.complained` event is triggered when an email's status changes to **complained**.
+<SideBySide>
+  <>
 
-## Payload
+    The `email.complained` event is triggered when a recipient marks an email as spam or files a complaint.
 
-```json
-{
-  "type": "email.complained",
-  "created_at": "2023-01-01T12:00:00Z",
-  "data": {
-    "email_id": "em_123456789",
-    "from": "sender@example.com",
-    "to": ["recipient@example.com"],
-    "subject": "Hello World",
-    "status": "complained",
-    "timestamp": "2023-01-01T12:00:00Z"
-  }
-}
-```
+    ## Event Details
+    All webhook payloads follow a consistent top-level structure with event-specific data nested within the `data` object.
 
-## Handling this event
+    ### type `string`
+    The event type that triggered the webhook (e.g., `email.complained`).
 
-When your endpoint receives an `email.complained` event, you might want to:
+    ### created_at `string`
+    ISO 8601 timestamp when the webhook event was created.
 
-- Update the status in your internal database.
-- Trigger an automated follow-up workflow.
-- Log the event for analytics purposes.
-- Notify relevant team members if the event indicates an issue (e.g., bounce or failure).
+    ### data `object`
+    Contains the event-specific details such as email ID and recipient info.
+
+    ## Handling this event
+    When your endpoint receives an `email.complained` event, you might want to:
+    - **Immediately** remove the recipient from your mailing list.
+    - Log the complaint for reputation monitoring.
+    - Investigate the source of the complaint.
+  </>
+
+  <>
+
+    ```json
+    {
+      "type": "email.complained",
+      "created_at": "2023-01-01T12:00:00Z",
+      "data": {
+        "email_id": "em_123456789",
+        "to": ["recipient@example.com"],
+        "timestamp": "2023-01-01T12:00:00Z"
+      }
+    }
+    ```
+  </>
+</SideBySide>
 
 ## Learn More
 

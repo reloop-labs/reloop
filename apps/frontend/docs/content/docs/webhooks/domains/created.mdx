@@ -1,32 +1,49 @@
 ---
 title: "domain.created"
 sidebarTitle: "domain.created"
-description: "Webhook event triggered when a domain is created."
+description: "Webhook event triggered when a new domain is created."
 ---
 
-The `domain.created` event is triggered when a domain is **created** in your account.
+<SideBySide>
+  <>
 
-## Payload
+    The `domain.created` event is triggered when a new domain is successfully added to your Reloop account.
 
-```json
-{
-  "type": "domain.created",
-  "created_at": "2023-01-01T12:00:00Z",
-  "data": {
-    "domain_id": "dom_123456789",
-    "name": "example.com",
-    "status": "verified"
-  }
-}
-```
+    ## Event Details
+    All webhook payloads follow a consistent top-level structure with event-specific data nested within the `data` object.
 
-## Handling this event
+    ### type `string`
+    The event type that triggered the webhook (e.g., `domain.created`).
 
-When your endpoint receives a `domain.created` event, you might want to:
+    ### created_at `string`
+    ISO 8601 timestamp when the webhook event was created.
 
-- Sync the domain status with your internal configuration.
-- Trigger automated setup or cleanup tasks.
-- Notify administrators about changes to the domain infrastructure.
+    ### data `object`
+    Contains the details of the newly created domain.
+
+    ## Handling this event
+    When your endpoint receives a `domain.created` event, you might want to:
+    - Sync the domain status with your internal system.
+    - Trigger DNS verification workflows.
+    - Log the activity for auditing.
+  </>
+
+  <>
+
+    ```json
+    {
+      "type": "domain.created",
+      "created_at": "2023-01-01T12:00:00Z",
+      "data": {
+        "id": "dom_123456789",
+        "name": "example.com",
+        "status": "pending",
+        "timestamp": "2023-01-01T12:00:00Z"
+      }
+    }
+    ```
+  </>
+</SideBySide>
 
 ## Learn More
 

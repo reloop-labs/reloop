@@ -1,36 +1,49 @@
 ---
 title: "email.clicked"
 sidebarTitle: "email.clicked"
-description: "Webhook event triggered when an email is clicked."
+description: "Webhook event triggered when a link in an email is clicked."
 ---
 
-The `email.clicked` event is triggered when an email's status changes to **clicked**.
+<SideBySide>
+  <>
 
-## Payload
+    The `email.clicked` event is triggered when a recipient clicks a link within an email.
 
-```json
-{
-  "type": "email.clicked",
-  "created_at": "2023-01-01T12:00:00Z",
-  "data": {
-    "email_id": "em_123456789",
-    "from": "sender@example.com",
-    "to": ["recipient@example.com"],
-    "subject": "Hello World",
-    "status": "clicked",
-    "timestamp": "2023-01-01T12:00:00Z"
-  }
-}
-```
+    ## Event Details
+    All webhook payloads follow a consistent top-level structure with event-specific data nested within the `data` object.
 
-## Handling this event
+    ### type `string`
+    The event type that triggered the webhook (e.g., `email.clicked`).
 
-When your endpoint receives an `email.clicked` event, you might want to:
+    ### created_at `string`
+    ISO 8601 timestamp when the webhook event was created.
 
-- Update the status in your internal database.
-- Trigger an automated follow-up workflow.
-- Log the event for analytics purposes.
-- Notify relevant team members if the event indicates an issue (e.g., bounce or failure).
+    ### data `object`
+    Contains the event-specific details such as email ID, link URL, and recipient info.
+
+    ## Handling this event
+    When your endpoint receives an `email.clicked` event, you might want to:
+    - Track user engagement in your CRM.
+    - Trigger follow-up marketing actions.
+    - Analyze click-through rates.
+  </>
+
+  <>
+
+    ```json
+    {
+      "type": "email.clicked",
+      "created_at": "2023-01-01T12:00:00Z",
+      "data": {
+        "email_id": "em_123456789",
+        "to": ["recipient@example.com"],
+        "url": "https://example.com/promo",
+        "timestamp": "2023-01-01T12:00:00Z"
+      }
+    }
+    ```
+  </>
+</SideBySide>
 
 ## Learn More
 

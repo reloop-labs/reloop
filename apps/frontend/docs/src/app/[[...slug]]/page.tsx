@@ -72,7 +72,10 @@ export async function generateMetadata(props: {
 
 export async function generateStaticParams() {
 	const params = source.generateParams() as { slug: string[] }[];
-	return [{ slug: [] }, ...params.filter((param) => param.slug && param.slug.length > 0)];
+	return [
+		{ slug: [] },
+		...params.filter((param) => param.slug && param.slug.length > 0),
+	];
 }
 
 export default async function Page(props: {
@@ -80,12 +83,24 @@ export default async function Page(props: {
 }) {
 	const params = await props.params;
 
-	const page = source.getPage(params.slug?.length ? params.slug : ["introduction"]);
+	const page = source.getPage(
+		params.slug?.length ? params.slug : ["introduction"],
+	);
 	if (!page) notFound();
 	const MDXContent = page.data.body;
 	const isFullWidth = page.data.full === true;
 
 	const slugPath = params.slug?.join("/") || "index";
+
+	// Resend Logic:
+	// 1. General guides (slug depth <= 2) like /webhooks/introduction show TOC and use standard width.
+	// 2. Event references (slug depth > 2) like /webhooks/emails/sent hide TOC and use full width.
+	const isWebhookEvent =
+		params.slug?.[0] === "webhooks" && params.slug?.length > 2;
+
+	const hideToc = isFullWidth || isWebhookEvent;
+	const useFullWidth = isFullWidth || isWebhookEvent;
+
 	const breadcrumbs = getBreadcrumbs(
 		source.pageTree.children as PageTreeItem[],
 		slugPath,
@@ -93,10 +108,12 @@ export default async function Page(props: {
 
 	return (
 		<DocsLayout tree={source.pageTree.children as PageTreeItem[]}>
-			<div className={`mx-auto flex w-full flex-col ${isFullWidth ? 'max-w-none' : 'max-w-[1250px] xl:grid xl:grid-cols-[1fr_240px] xl:gap-8'}`}>
+			<div
+				className={`mx-auto flex w-full flex-col ${hideToc ? "max-w-none" : "max-w-[1100px] xl:grid xl:grid-cols-[1fr_240px] xl:gap-8"}`}
+			>
 				{/* Main content area */}
 				<div className="min-w-0 px-6 py-8 md:px-10">
-					<div className={isFullWidth ? '' : 'mx-auto max-w-[720px] xl:mx-0'}>
+					<div className={hideToc ? "" : "mx-auto max-w-[800px] xl:mx-0"}>
 						{/* Breadcrumb */}
 						{breadcrumbs.length > 0 ? (
 							<div className="mb-3 flex items-center gap-1.5 font-medium text-[12px] text-fd-muted-foreground/60 uppercase tracking-wider">
@@ -140,15 +157,20 @@ export default async function Page(props: {
 
 						{/* Content */}
 						<DocsBody>
-							<MDXContent components={getMDXComponents({ Icon: Icon, _apiData: page.data._apiData } as any)} />
+							<MDXContent
+								components={getMDXComponents({
+									Icon: Icon,
+									_apiData: page.data._apiData,
+								} as any)}
+							/>
 						</DocsBody>
 					</div>
 				</div>
 
 				{/* Right sidebar - Table of Contents (hidden on full-width API pages) */}
-				{!isFullWidth && (
+				{!hideToc && (
 					<aside className="hidden xl:block">
-						<div className="sticky top-0 h-[calc(100vh-3rem)] overflow-y-auto pt-8 pr-6">
+						<div className="sticky top-0 h-[calc(100vh-3rem)] overflow-y-auto pt-8 pr-16">
 							<TableOfContents items={page.data.toc as TOCItem[]} />
 						</div>
 					</aside>

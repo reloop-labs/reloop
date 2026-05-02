@@ -16,6 +16,7 @@ import {
 } from "@reloop/fe-docs/components/mdx/mintlify-client";
 import { PromptActions } from "@reloop/fe-docs/components/mdx/PromptActions";
 import { SimpleIcon } from "@reloop/fe-docs/components/mdx/SimpleIcon";
+import { SideBySide } from "./components/mdx/SideBySide";
 import type { MDXComponents } from "mdx/types";
 import React from "react";
 import { APIPage } from "./components/mdx/APIPage";
@@ -94,6 +95,7 @@ export function getMDXComponents(components?: MDXComponents & { _apiData?: any }
 		Cards: CardGroup,
 		SimpleIcon,
 		PromptActions,
+		SideBySide,
 		APIPage: (props: any) => {
 			// Inject frontmatter _apiData into APIPage when no operationData is provided inline
 			if (apiData && (!props.operationData || props.operationData.length === 0)) {

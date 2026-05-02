@@ -1,36 +1,51 @@
 ---
 title: "email.received"
 sidebarTitle: "email.received"
-description: "Webhook event triggered when an email is received."
+description: "Webhook event triggered when an inbound email is received."
 ---
 
-The `email.received` event is triggered when an email's status changes to **received**.
+<SideBySide>
+  <>
 
-## Payload
+    The `email.received` event is triggered when an inbound email is successfully received by Reloop.
 
-```json
-{
-  "type": "email.received",
-  "created_at": "2023-01-01T12:00:00Z",
-  "data": {
-    "email_id": "em_123456789",
-    "from": "sender@example.com",
-    "to": ["recipient@example.com"],
-    "subject": "Hello World",
-    "status": "received",
-    "timestamp": "2023-01-01T12:00:00Z"
-  }
-}
-```
+    ## Event Details
+    All webhook payloads follow a consistent top-level structure with event-specific data nested within the `data` object.
 
-## Handling this event
+    ### type `string`
+    The event type that triggered the webhook (e.g., `email.received`).
 
-When your endpoint receives an `email.received` event, you might want to:
+    ### created_at `string`
+    ISO 8601 timestamp when the webhook event was created.
 
-- Update the status in your internal database.
-- Trigger an automated follow-up workflow.
-- Log the event for analytics purposes.
-- Notify relevant team members if the event indicates an issue (e.g., bounce or failure).
+    ### data `object`
+    Contains the full inbound email content, including headers, body, and attachments.
+
+    ## Handling this event
+    When your endpoint receives an `email.received` event, you might want to:
+    - Process inbound messages for your application.
+    - Extract data from the email body.
+    - Store attachments in your cloud storage.
+  </>
+
+  <>
+
+    ```json
+    {
+      "type": "email.received",
+      "created_at": "2023-01-01T12:00:00Z",
+      "data": {
+        "email_id": "in_123456789",
+        "from": "sender@example.com",
+        "to": ["inbound@yourdomain.com"],
+        "subject": "Inbound Message",
+        "body": "Hello, this is an inbound email.",
+        "timestamp": "2023-01-01T12:00:00Z"
+      }
+    }
+    ```
+  </>
+</SideBySide>
 
 ## Learn More
 

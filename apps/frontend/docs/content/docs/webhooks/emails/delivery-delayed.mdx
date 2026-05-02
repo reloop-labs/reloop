@@ -1,36 +1,48 @@
 ---
-title: "email.delivery-delayed"
-sidebarTitle: "email.delivery-delayed"
-description: "Webhook event triggered when an email is delivery-delayed."
+title: "email.delivery_delayed"
+sidebarTitle: "email.delivery_delayed"
+description: "Webhook event triggered when an email delivery is delayed."
 ---
 
-The `email.delivery-delayed` event is triggered when an email's status changes to **delivery-delayed**.
+<SideBySide>
+  <>
 
-## Payload
+    The `email.delivery_delayed` event is triggered when an email delivery is temporarily delayed.
 
-```json
-{
-  "type": "email.delivery-delayed",
-  "created_at": "2023-01-01T12:00:00Z",
-  "data": {
-    "email_id": "em_123456789",
-    "from": "sender@example.com",
-    "to": ["recipient@example.com"],
-    "subject": "Hello World",
-    "status": "delivery-delayed",
-    "timestamp": "2023-01-01T12:00:00Z"
-  }
-}
-```
+    ## Event Details
+    All webhook payloads follow a consistent top-level structure with event-specific data nested within the `data` object.
 
-## Handling this event
+    ### type `string`
+    The event type that triggered the webhook (e.g., `email.delivery_delayed`).
 
-When your endpoint receives an `email.delivery-delayed` event, you might want to:
+    ### created_at `string`
+    ISO 8601 timestamp when the webhook event was created.
 
-- Update the status in your internal database.
-- Trigger an automated follow-up workflow.
-- Log the event for analytics purposes.
-- Notify relevant team members if the event indicates an issue (e.g., bounce or failure).
+    ### data `object`
+    Contains the event-specific details such as email ID and delay reason.
+
+    ## Handling this event
+    When your endpoint receives an `email.delivery_delayed` event, you might want to:
+    - Log the delay for monitoring purposes.
+    - Notify the user if the delay exceeds a certain threshold.
+  </>
+
+  <>
+
+    ```json
+    {
+      "type": "email.delivery_delayed",
+      "created_at": "2023-01-01T12:00:00Z",
+      "data": {
+        "email_id": "em_123456789",
+        "to": ["recipient@example.com"],
+        "reason": "Greylisted by recipient server",
+        "timestamp": "2023-01-01T12:00:00Z"
+      }
+    }
+    ```
+  </>
+</SideBySide>
 
 ## Learn More
 

@@ -4,29 +4,46 @@ sidebarTitle: "domain.deleted"
 description: "Webhook event triggered when a domain is deleted."
 ---
 
-The `domain.deleted` event is triggered when a domain is **deleted** in your account.
+<SideBySide>
+  <>
 
-## Payload
+    The `domain.deleted` event is triggered when a domain is removed from your Reloop account.
 
-```json
-{
-  "type": "domain.deleted",
-  "created_at": "2023-01-01T12:00:00Z",
-  "data": {
-    "domain_id": "dom_123456789",
-    "name": "example.com",
-    "status": "verified"
-  }
-}
-```
+    ## Event Details
+    All webhook payloads follow a consistent top-level structure with event-specific data nested within the `data` object.
 
-## Handling this event
+    ### type `string`
+    The event type that triggered the webhook (e.g., `domain.deleted`).
 
-When your endpoint receives a `domain.deleted` event, you might want to:
+    ### created_at `string`
+    ISO 8601 timestamp when the webhook event was created.
 
-- Sync the domain status with your internal configuration.
-- Trigger automated setup or cleanup tasks.
-- Notify administrators about changes to the domain infrastructure.
+    ### data `object`
+    Contains the ID of the deleted domain.
+
+    ## Handling this event
+    When your endpoint receives a `domain.deleted` event, you might want to:
+    - Remove the domain from your local database.
+    - Stop any scheduled campaigns for that domain.
+    - Log the deletion for auditing.
+  </>
+
+  <>
+
+    ```json
+    {
+      "type": "domain.deleted",
+      "created_at": "2023-01-01T12:00:00Z",
+      "data": {
+        "id": "dom_123456789",
+        "name": "example.com",
+        "status": "deleted",
+        "timestamp": "2023-01-01T12:00:00Z"
+      }
+    }
+    ```
+  </>
+</SideBySide>
 
 ## Learn More
 

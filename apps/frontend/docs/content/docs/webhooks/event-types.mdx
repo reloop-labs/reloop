@@ -6,37 +6,50 @@ description: List of all events you can subscribe to via webhooks.
 Reloop supports several event types that you can subscribe to. Each event has a specific payload structure.
 
 ## Email Events
-
 | Event | Description |
 |-------|-------------|
-| `email.sent` | Triggered when an email is successfully sent to the upstream provider. |
-| `email.delivered` | Triggered when an email is successfully delivered to the recipient. |
+| `email.sent` | Triggered when an email is successfully sent. |
+| `email.delivered` | Triggered when an email is successfully delivered. |
 | `email.bounced` | Triggered when an email bounces. |
 | `email.opened` | Triggered when a recipient opens an email. |
-| `email.clicked` | Triggered when a recipient clicks a link in an email. |
-| `email.complained` | Triggered when a recipient marks an email as spam. |
+| `email.clicked` | Triggered when a recipient clicks a link. |
+| `email.complained` | Triggered when a recipient marks as spam. |
 | `email.failed` | Triggered when an email fails to send. |
 | `email.received` | Triggered when an inbound email is received. |
 
-## Payload Structure
+## Domain Events
+| Event | Description |
+|-------|-------------|
+| `domain.created` | Triggered when a new domain is created. |
+| `domain.updated` | Triggered when a domain's status is updated. |
+| `domain.deleted` | Triggered when a domain is deleted. |
 
-All webhook payloads follow a consistent structure:
+## Contact Events
+| Event | Description |
+|-------|-------------|
+| `contact.created` | Triggered when a new contact is created. |
+| `contact.updated` | Triggered when a contact is updated. |
+| `contact.deleted` | Triggered when a contact is deleted. |
+
+### Generic Payload Structure
+Every webhook payload follows a consistent top-level structure:
 
 ```json
 {
-  "type": "email.delivered",
+  "type": "event.name",
   "created_at": "2023-01-01T12:00:00Z",
   "data": {
-    "email_id": "em_123456789",
-    "from": "sender@example.com",
-    "to": ["recipient@example.com"],
-    "subject": "Hello World",
-    "status": "delivered"
+    "id": "id_123456789",
+    "status": "active",
+    "timestamp": "2023-01-01T12:00:00Z"
   }
 }
 ```
 
+---
+
 ## Learn More
 
 - [Introduction](/docs/webhooks)
-- [Email Delivered Event](/docs/webhooks/emails/delivered)
+- [Webhook Ingester](/docs/webhooks/ingester)
+- [Verify Webhooks Requests](/docs/webhooks/verify-webhooks-requests)

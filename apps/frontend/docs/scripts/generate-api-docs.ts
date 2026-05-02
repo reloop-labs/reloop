@@ -458,7 +458,7 @@ _openapi:
       - content: "${escapeForMDX(description)}"
 _apiData:
   document: "${service.prodUrl}"
-  operationData: ${JSON.stringify([{path: routePath, method}])}
+  operationData: ${JSON.stringify([{ path: routePath, method }])}
   parameterList: ${JSON.stringify(enrichedParams)}
   responseMap: ${JSON.stringify(responses)}
   codeSamples: ${JSON.stringify(codeSamples)}
@@ -552,7 +552,7 @@ function generateMetaJson(allGenerated: Record<string, string[]>) {
 	};
 
 	fs.writeFileSync(metaPath, JSON.stringify(meta, null, "\t") + "\n");
-	console.log(`\n📝 Updated meta.json`);
+	console.log("\n📝 Updated meta.json");
 }
 
 async function main() {
