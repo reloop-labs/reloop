@@ -21,7 +21,10 @@ const Page = () => {
 						<FullEmailBuilder />
 					</main>
 				</div>
-				<EmailInspector />
+
+				<div className="w-72">
+					<EmailInspector />
+				</div>
 			</div>
 		</EditorProvider>
 	);

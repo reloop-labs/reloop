@@ -397,7 +397,7 @@ export const EmailInspector = () => {
 	const editor = useEditorHook();
 	if (!editor) return null;
 	return (
-		<aside className="flex w-72 shrink-0 flex-col overflow-y-auto">
+		<aside className="flex">
 			<Inspector.Root>
 				<Breadcrumb />
 				<Inspector.Node>
