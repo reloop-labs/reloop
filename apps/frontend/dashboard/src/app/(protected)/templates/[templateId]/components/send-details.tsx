@@ -13,7 +13,7 @@ const FieldRow = ({ label, children, hideBorder }: FieldRowProps) => {
 	return (
 		<div
 			className={cn(
-				"flex items-center border-stroke-soft-100 border-b py-3",
+				"flex items-center border-stroke-soft-200 border-b py-3",
 				hideBorder && "border-b-0",
 			)}
 		>
@@ -75,7 +75,7 @@ export const SendDetails = () => {
 			</FieldRow>
 
 			{/* Subject Row (No label) */}
-			<div className="flex items-center border-stroke-soft-100 border-b py-3">
+			<div className="flex items-center border-stroke-soft-200 border-b py-3">
 				<input
 					value={subject}
 					onChange={(e) => setSubject(e.target.value)}

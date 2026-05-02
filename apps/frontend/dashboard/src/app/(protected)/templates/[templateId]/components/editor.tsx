@@ -10,7 +10,7 @@ export function FullEmailBuilder() {
 	return (
 		<EditorContent
 			editor={editor}
-			className="mx-auto h-full rounded-md bg-white"
+			className="mx-auto h-full w-full max-w-2xl rounded-md bg-white px-6"
 		/>
 	);
 }
