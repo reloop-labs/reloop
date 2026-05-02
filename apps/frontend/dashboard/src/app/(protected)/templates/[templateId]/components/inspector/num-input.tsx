@@ -29,7 +29,9 @@ export function NumInput({
 					}}
 				/>
 				{unit && (
-					<InputPrimitive.InlineAffix>{unit}</InputPrimitive.InlineAffix>
+					<InputPrimitive.InlineAffix className="text-text-strong-950">
+						{unit}
+					</InputPrimitive.InlineAffix>
 				)}
 			</InputPrimitive.Wrapper>
 		</InputPrimitive.Root>

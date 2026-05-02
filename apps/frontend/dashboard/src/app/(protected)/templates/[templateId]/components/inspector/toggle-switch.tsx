@@ -10,9 +10,9 @@ export function ToggleSwitch({
 	label?: string;
 }) {
 	return (
-		<label className="flex cursor-pointer items-center gap-1.5">
+		<label htmlFor={label} className="flex cursor-pointer items-center gap-1.5">
 			<Switch.Root checked={checked} onCheckedChange={onChange} />
-			{label && <span className="text-(--re-text-muted) text-xs">{label}</span>}
+			{label && <span className="text-text-strong-950 text-xs">{label}</span>}
 		</label>
 	);
 }

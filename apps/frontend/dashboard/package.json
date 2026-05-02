@@ -24,6 +24,7 @@
 		"babel-plugin-react-compiler": "catalog:ui",
 		"better-auth": "catalog:",
 		"boring-avatars": "catalog:ui",
+		"react-colorful": "catalog:ui",
 		"dayjs": "catalog:ui",
 		"framer-motion": "catalog:ui",
 		"lucide-react": "catalog:ui",

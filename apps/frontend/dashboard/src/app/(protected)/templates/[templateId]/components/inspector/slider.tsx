@@ -16,7 +16,7 @@ export function Slider({
 	unit?: string;
 }) {
 	return (
-		<span className="flex items-center gap-2.5 w-full">
+		<span className="flex w-full items-center gap-2.5">
 			<SliderUI.Root
 				value={[value]}
 				onValueChange={([v]) => {
@@ -31,7 +31,7 @@ export function Slider({
 			>
 				<SliderUI.Thumb />
 			</SliderUI.Root>
-			<span className="w-8 text-right text-xs tabular-nums text-(--re-text-muted)">
+			<span className="w-8 text-right text-sm tabular-nums">
 				{value}
 				{unit}
 			</span>
