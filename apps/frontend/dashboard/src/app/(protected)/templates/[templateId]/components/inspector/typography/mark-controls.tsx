@@ -5,11 +5,14 @@ import {
 	Italic,
 	Strikethrough,
 	Underline,
+	type LucideIcon,
 } from "lucide-react";
 import React from "react";
 import { MarkButton } from "../mark-button";
 
-const MARK_OPTIONS = [
+export type Mark = "bold" | "italic" | "underline" | "strike" | "code" | "case";
+
+const MARK_OPTIONS: { mark: Mark; icon: LucideIcon; label: string }[] = [
 	{ mark: "bold", icon: Bold, label: "Bold" },
 	{ mark: "italic", icon: Italic, label: "Italic" },
 	{ mark: "underline", icon: Underline, label: "Underline" },
@@ -32,8 +35,8 @@ export function MarkControls({
 					key={mark}
 					icon={icon}
 					label={label}
-					active={(marks as any)[mark] ?? false}
-					onClick={() => toggleMark(mark as any)}
+					active={marks[mark] ?? false}
+					onClick={() => toggleMark(mark)}
 				/>
 			))}
 		</div>

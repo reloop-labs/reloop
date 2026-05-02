@@ -1,38 +1,48 @@
-import { AlignCenter, AlignLeft, AlignRight } from "lucide-react";
-import React from "react";
+import * as SegmentedControl from "@reloop/ui/segmented-control";
+import {
+	AlignCenter,
+	AlignLeft,
+	AlignRight,
+	type LucideIcon,
+} from "lucide-react";
 
-const ALIGN_OPTIONS = [
-	{ value: "left" as const, icon: AlignLeft, label: "Align left" },
-	{ value: "center" as const, icon: AlignCenter, label: "Align center" },
-	{ value: "right" as const, icon: AlignRight, label: "Align right" },
+export type Alignment = "left" | "center" | "right";
+
+const ALIGN_OPTIONS: { value: Alignment; icon: LucideIcon; label: string }[] = [
+	{ value: "left", icon: AlignLeft, label: "Align left" },
+	{ value: "center", icon: AlignCenter, label: "Align center" },
+	{ value: "right", icon: AlignRight, label: "Align right" },
 ];
 
 export function AlignControls({
 	alignment,
 	setAlignment,
 }: {
-	alignment: string;
-	setAlignment: (alignment: any) => void;
+	alignment: Alignment;
+	setAlignment: (alignment: Alignment) => void;
 }) {
 	return (
-		<div className="flex items-center gap-1 rounded-2xl bg-bg-weak-50 p-1">
-			{ALIGN_OPTIONS.map(({ value: a, icon: Icon, label }) => (
-				<button
-					key={a}
-					type="button"
-					title={label}
-					aria-label={label}
-					aria-pressed={alignment === a}
-					onClick={() => setAlignment(a)}
-					className={`flex h-8 flex-1 cursor-pointer items-center justify-center rounded-xl transition-all duration-150 ${
-						alignment === a
-							? "border border-stroke-soft-200 bg-bg-white-0 shadow-sm text-text-strong-950"
-							: "text-text-sub-600 hover:bg-bg-strong-950/5 hover:text-text-strong-950"
-					}`}
-				>
-					<Icon className="h-4 w-4" strokeWidth={2} />
-				</button>
-			))}
-		</div>
+		<SegmentedControl.Root
+			value={alignment}
+			onValueChange={(v) => setAlignment(v as Alignment)}
+			className="rounded-xl border border-stroke-sub-300 bg-bg-white-0"
+		>
+			<SegmentedControl.List
+				className="bg-transparent"
+				floatingBgClassName="shadow-none! border border-stroke-soft-200 bg-bg-weak-50"
+			>
+				{ALIGN_OPTIONS.map(({ value: a, icon: Icon, label }) => (
+					<SegmentedControl.Trigger
+						key={a}
+						value={a}
+						title={label}
+						aria-label={label}
+						className="rounded-2xl"
+					>
+						<Icon className="h-4 w-4" strokeWidth={2} />
+					</SegmentedControl.Trigger>
+				))}
+			</SegmentedControl.List>
+		</SegmentedControl.Root>
 	);
 }
