@@ -13,7 +13,7 @@ export const TemplateSidebar = () => {
 	const isDirty = useEditorStore((s) => s.isDirty);
 
 	return (
-		<div className="text-center">
+		<div className="">
 			<p>dsfsjfsllkdj</p>
 		</div>
 	);

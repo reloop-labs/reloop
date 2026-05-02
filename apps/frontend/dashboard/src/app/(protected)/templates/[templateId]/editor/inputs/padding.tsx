@@ -11,6 +11,8 @@ interface PaddingInputProps {
 	icon: string;
 	iconClassName?: string;
 	placeholder?: string;
+	value?: string | number;
+	onChange?: (value: number | "") => void;
 }
 
 const PaddingInput = ({
@@ -18,6 +20,8 @@ const PaddingInput = ({
 	icon,
 	iconClassName,
 	placeholder = "0",
+	value,
+	onChange,
 }: PaddingInputProps) => (
 	<Tooltip.Root>
 		<Tooltip.Trigger asChild>
@@ -33,6 +37,11 @@ const PaddingInput = ({
 							type="text"
 							placeholder={placeholder}
 							className="text-center"
+							value={value ?? ""}
+							onChange={(e) => {
+								const val = e.target.value;
+								onChange?.(val === "" ? "" : Number.parseFloat(val));
+							}}
 						/>
 					</Input.Wrapper>
 				</Input.Root>
@@ -49,7 +58,21 @@ const PaddingInput = ({
 	</Tooltip.Root>
 );
 
-export const InputPadding = () => {
+interface InputPaddingProps {
+	top?: string | number;
+	bottom?: string | number;
+	left?: string | number;
+	right?: string | number;
+	onChange?: (side: "top" | "bottom" | "left" | "right", value: number | "") => void;
+}
+
+export const InputPadding = ({
+	top,
+	bottom,
+	left,
+	right,
+	onChange,
+}: InputPaddingProps) => {
 	const [isExpanded, setIsExpanded] = useState(false);
 
 	return (
@@ -86,21 +109,33 @@ export const InputPadding = () => {
 			>
 				{isExpanded ? (
 					<>
-						<PaddingInput label="Top" icon="align-top-2" iconClassName="" />
+						<PaddingInput
+							label="Top"
+							icon="align-top-2"
+							iconClassName=""
+							value={top}
+							onChange={(v) => onChange?.("top", v)}
+						/>
 						<PaddingInput
 							label="Bottom"
 							icon="align-top-2"
 							iconClassName="rotate-180"
+							value={bottom}
+							onChange={(v) => onChange?.("bottom", v)}
 						/>
 						<PaddingInput
 							label="Right"
 							icon="align-top-2"
 							iconClassName="rotate-90"
+							value={right}
+							onChange={(v) => onChange?.("right", v)}
 						/>
 						<PaddingInput
 							label="Left"
 							icon="align-top-2"
 							iconClassName="-rotate-90"
+							value={left}
+							onChange={(v) => onChange?.("left", v)}
 						/>
 					</>
 				) : (
@@ -109,11 +144,21 @@ export const InputPadding = () => {
 							label="Vertical"
 							icon="padding-x"
 							iconClassName="rotate-90"
+							value={top}
+							onChange={(v) => {
+								onChange?.("top", v);
+								onChange?.("bottom", v);
+							}}
 						/>
 						<PaddingInput
 							label="Horizontal"
 							icon="padding-x"
 							iconClassName=""
+							value={left}
+							onChange={(v) => {
+								onChange?.("left", v);
+								onChange?.("right", v);
+							}}
 						/>
 					</>
 				)}

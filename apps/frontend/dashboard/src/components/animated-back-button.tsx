@@ -1,7 +1,7 @@
 "use client";
 
 import { KbdEsc } from "@reloop/ui/kbd-esc";
-import { animate, motion, useMotionValue, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";

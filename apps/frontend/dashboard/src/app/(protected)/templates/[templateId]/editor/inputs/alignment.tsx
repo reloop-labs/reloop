@@ -6,7 +6,12 @@ import * as SegmentedControl from "@reloop/ui/segmented-control";
 
 type Alignment = "left" | "center" | "right";
 
-export const InputAlignment = () => {
+interface InputAlignmentProps {
+	value?: Alignment;
+	onValueChange?: (value: Alignment) => void;
+}
+
+export const InputAlignment = ({ value, onValueChange }: InputAlignmentProps) => {
 	return (
 		<div className="flex flex-col gap-2">
 			<div className="flex items-center justify-between">
@@ -15,7 +20,10 @@ export const InputAlignment = () => {
 				</Label.Root>
 			</div>
 
-			<SegmentedControl.Root defaultValue="center">
+			<SegmentedControl.Root
+				value={value}
+				onValueChange={(v) => onValueChange?.(v as Alignment)}
+			>
 				<SegmentedControl.List>
 					<SegmentedControl.Trigger value="left">
 						<Icon name="align-left" className="h-4 w-4" />

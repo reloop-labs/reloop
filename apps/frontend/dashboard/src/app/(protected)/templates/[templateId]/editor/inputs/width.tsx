@@ -8,10 +8,19 @@ import { useState } from "react";
 
 type WidthUnit = "px" | "%";
 
-export const InputWidth = () => {
-	const [unit, setUnit] = useState<WidthUnit>("px");
-	const [value, setValue] = useState("600");
+interface InputWidthProps {
+	value?: string | number;
+	onChange?: (value: number | "") => void;
+	unit?: "px" | "%";
+	onUnitChange?: (unit: "px" | "%") => void;
+}
 
+export const InputWidth = ({
+	value,
+	onChange,
+	unit = "px",
+	onUnitChange,
+}: InputWidthProps) => {
 	return (
 		<div className="flex flex-col gap-2">
 			<div className="flex items-center justify-between">
@@ -30,8 +39,11 @@ export const InputWidth = () => {
 						/>
 						<Input.Input
 							type="text"
-							value={value}
-							onChange={(e) => setValue(e.target.value)}
+							value={value ?? ""}
+							onChange={(e) => {
+								const val = e.target.value;
+								onChange?.(val === "" ? "" : Number.parseFloat(val));
+							}}
 							placeholder="600"
 							className="text-center"
 						/>
@@ -42,7 +54,7 @@ export const InputWidth = () => {
 				<div className="flex rounded-lg border border-stroke-soft-200 bg-bg-white-0">
 					<button
 						type="button"
-						onClick={() => setUnit("px")}
+						onClick={() => onUnitChange?.("px")}
 						className={cn(
 							"rounded-l-[7px] px-2 py-1 font-medium text-xs transition-colors",
 							unit === "px"
@@ -54,7 +66,7 @@ export const InputWidth = () => {
 					</button>
 					<button
 						type="button"
-						onClick={() => setUnit("%")}
+						onClick={() => onUnitChange?.("%")}
 						className={cn(
 							"rounded-r-[7px] px-2 py-1 font-medium text-xs transition-colors",
 							unit === "%"

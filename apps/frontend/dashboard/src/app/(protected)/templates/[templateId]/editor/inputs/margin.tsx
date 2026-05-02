@@ -11,6 +11,8 @@ interface MarginInputProps {
 	icon: string;
 	iconClassName?: string;
 	placeholder?: string;
+	value?: string | number;
+	onChange?: (value: number | "") => void;
 }
 
 const MarginInput = ({
@@ -18,6 +20,8 @@ const MarginInput = ({
 	icon,
 	iconClassName,
 	placeholder = "0",
+	value,
+	onChange,
 }: MarginInputProps) => (
 	<Tooltip.Root>
 		<Tooltip.Trigger asChild>
@@ -33,6 +37,11 @@ const MarginInput = ({
 							type="text"
 							placeholder={placeholder}
 							className="text-center"
+							value={value ?? ""}
+							onChange={(e) => {
+								const val = e.target.value;
+								onChange?.(val === "" ? "" : Number.parseFloat(val));
+							}}
 						/>
 					</Input.Wrapper>
 				</Input.Root>
@@ -49,7 +58,21 @@ const MarginInput = ({
 	</Tooltip.Root>
 );
 
-export const InputMargin = () => {
+interface InputMarginProps {
+	top?: string | number;
+	bottom?: string | number;
+	left?: string | number;
+	right?: string | number;
+	onChange?: (side: "top" | "bottom" | "left" | "right", value: number | "") => void;
+}
+
+export const InputMargin = ({
+	top,
+	bottom,
+	left,
+	right,
+	onChange,
+}: InputMarginProps) => {
 	const [isExpanded, setIsExpanded] = useState(false);
 
 	return (
@@ -86,21 +109,33 @@ export const InputMargin = () => {
 			>
 				{isExpanded ? (
 					<>
-						<MarginInput label="Top" icon="align-top-2" iconClassName="" />
+						<MarginInput
+							label="Top"
+							icon="align-top-2"
+							iconClassName=""
+							value={top}
+							onChange={(v) => onChange?.("top", v)}
+						/>
 						<MarginInput
 							label="Bottom"
 							icon="align-top-2"
 							iconClassName="rotate-180"
+							value={bottom}
+							onChange={(v) => onChange?.("bottom", v)}
 						/>
 						<MarginInput
 							label="Right"
 							icon="align-top-2"
 							iconClassName="rotate-90"
+							value={right}
+							onChange={(v) => onChange?.("right", v)}
 						/>
 						<MarginInput
 							label="Left"
 							icon="align-top-2"
 							iconClassName="-rotate-90"
+							value={left}
+							onChange={(v) => onChange?.("left", v)}
 						/>
 					</>
 				) : (
@@ -109,8 +144,22 @@ export const InputMargin = () => {
 							label="Vertical"
 							icon="padding-x"
 							iconClassName="rotate-90"
+							value={top}
+							onChange={(v) => {
+								onChange?.("top", v);
+								onChange?.("bottom", v);
+							}}
 						/>
-						<MarginInput label="Horizontal" icon="padding-x" iconClassName="" />
+						<MarginInput
+							label="Horizontal"
+							icon="padding-x"
+							iconClassName=""
+							value={left}
+							onChange={(v) => {
+								onChange?.("left", v);
+								onChange?.("right", v);
+							}}
+						/>
 					</>
 				)}
 			</div>

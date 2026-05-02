@@ -28,20 +28,35 @@ const PRESET_COLORS = [
 	"#06B6D4",
 ];
 
-export const InputBackgroundColor = () => {
-	const [color, setColor] = useState(parseColor("#FFFFFF"));
+interface InputBackgroundColorProps {
+	value?: string;
+	onChange?: (value: string) => void;
+	label?: string;
+}
+
+export const InputBackgroundColor = ({
+	value = "#FFFFFF",
+	onChange,
+	label = "Background",
+}: InputBackgroundColorProps) => {
+	const safeColor = value || "#FFFFFF";
+	const colorValue = parseColor(safeColor.startsWith("#") ? safeColor : "#FFFFFF");
 	const [isOpen, setIsOpen] = useState(false);
+
+	const handleColorChange = (newColor: any) => {
+		onChange?.(newColor.toString("hex"));
+	};
 
 	return (
 		<div className="flex flex-col gap-2">
 			<div className="flex items-center justify-between">
 				<Label.Root className="font-medium text-text-sub-600 text-xs">
-					Background
+					{label}
 				</Label.Root>
 			</div>
 
 			<div className="flex gap-1.5">
-				<ColorPicker.Root value={color} onChange={setColor}>
+				<ColorPicker.Root value={colorValue} onChange={handleColorChange}>
 					<Popover.Root open={isOpen} onOpenChange={setIsOpen}>
 						<Popover.Trigger asChild>
 							<button
@@ -49,7 +64,7 @@ export const InputBackgroundColor = () => {
 								className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-stroke-soft-200/50 transition-all"
 							>
 								<ColorPicker.Swatch
-									color={color}
+									color={colorValue}
 									className="h-full w-full rounded-none"
 								/>
 							</button>
@@ -124,13 +139,9 @@ export const InputBackgroundColor = () => {
 					<Input.Wrapper>
 						<Input.Input
 							type="text"
-							value={color.toString("hex")}
+							value={value}
 							onChange={(e) => {
-								try {
-									setColor(parseColor(e.target.value));
-								} catch {
-									// Invalid color, ignore
-								}
+								onChange?.(e.target.value);
 							}}
 							placeholder="#FFFFFF"
 							className="font-mono text-xs"
@@ -143,7 +154,7 @@ export const InputBackgroundColor = () => {
 					size="xsmall"
 					mode="ghost"
 					className="h-8 w-8"
-					onClick={() => setColor(parseColor("#FFFFFF"))}
+					onClick={() => onChange?.("#FFFFFF")}
 				>
 					<Button.Icon as={Icon} name="refresh-cw-1" className="h-3.5 w-3.5" />
 				</Button.Root>

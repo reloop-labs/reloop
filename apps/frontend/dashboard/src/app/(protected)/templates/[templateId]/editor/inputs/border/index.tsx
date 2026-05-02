@@ -40,12 +40,16 @@ interface RadiusInputProps {
 	label: string;
 	corner: "tl" | "tr" | "bl" | "br";
 	placeholder?: string;
+	value?: string | number;
+	onChange?: (value: number | "") => void;
 }
 
 const RadiusInput = ({
 	label,
 	corner,
 	placeholder = "0",
+	value,
+	onChange,
 }: RadiusInputProps) => {
 	const cornerStyles = {
 		tl: "rounded-tl-lg border-t-1 border-l-1",
@@ -70,6 +74,11 @@ const RadiusInput = ({
 								type="text"
 								placeholder={placeholder}
 								className="text-center"
+								value={value ?? ""}
+								onChange={(e) => {
+									const val = e.target.value;
+									onChange?.(val === "" ? "" : Number.parseFloat(val));
+								}}
 							/>
 						</Input.Wrapper>
 					</Input.Root>
@@ -88,13 +97,34 @@ const RadiusInput = ({
 };
 
 // ============ Main Component ============
-export const InputBorder = () => {
-	const [style, setStyle] = useState<BorderStyle>("none");
-	const [color, setColor] = useState(parseColor("#000000"));
+interface InputBorderProps {
+	width?: string | number;
+	style?: BorderStyle;
+	color?: string;
+	radius?: string | number;
+	topLeftRadius?: string | number;
+	topRightRadius?: string | number;
+	bottomLeftRadius?: string | number;
+	bottomRightRadius?: string | number;
+	onChange?: (side: string, value: any) => void;
+}
+
+export const InputBorder = ({
+	width,
+	style = "none",
+	color = "#000000",
+	radius,
+	topLeftRadius,
+	topRightRadius,
+	bottomLeftRadius,
+	bottomRightRadius,
+	onChange,
+}: InputBorderProps) => {
 	const [isRadiusExpanded, setIsRadiusExpanded] = useState(false);
 	const [isColorOpen, setIsColorOpen] = useState(false);
 
 	const isDisabled = style === "none";
+	const colorValue = parseColor(color.startsWith("#") ? color : "#000000");
 
 	return (
 		<div className="flex flex-col gap-3">
@@ -120,6 +150,11 @@ export const InputBorder = () => {
 							placeholder="0"
 							className="text-center"
 							disabled={isDisabled}
+							value={width ?? ""}
+							onChange={(e) => {
+								const val = e.target.value;
+								onChange?.("width", val === "" ? "" : Number.parseFloat(val));
+							}}
 						/>
 					</Input.Wrapper>
 				</Input.Root>
@@ -127,7 +162,7 @@ export const InputBorder = () => {
 				{/* Border style segmented control */}
 				<SegmentedControl.Root
 					value={style}
-					onValueChange={(value) => setStyle(value as BorderStyle)}
+					onValueChange={(value) => onChange?.("style", value as BorderStyle)}
 					className="flex-1"
 				>
 					<SegmentedControl.List>
@@ -161,7 +196,10 @@ export const InputBorder = () => {
 					isDisabled && "pointer-events-none opacity-50",
 				)}
 			>
-				<ColorPicker.Root value={color} onChange={setColor}>
+				<ColorPicker.Root
+					value={colorValue}
+					onChange={(v) => onChange?.("color", v.toString("hex"))}
+				>
 					<Popover.Root open={isColorOpen} onOpenChange={setIsColorOpen}>
 						<Popover.Trigger asChild>
 							<button
@@ -170,7 +208,7 @@ export const InputBorder = () => {
 								disabled={isDisabled}
 							>
 								<ColorPicker.Swatch
-									color={color}
+									color={colorValue}
 									className="h-full w-full rounded-none"
 								/>
 							</button>
@@ -229,13 +267,9 @@ export const InputBorder = () => {
 					<Input.Wrapper>
 						<Input.Input
 							type="text"
-							value={color.toString("hex")}
+							value={color}
 							onChange={(e) => {
-								try {
-									setColor(parseColor(e.target.value));
-								} catch {
-									// Invalid color, ignore
-								}
+								onChange?.("color", e.target.value);
 							}}
 							placeholder="#000000"
 							className="font-mono text-xs"
@@ -275,10 +309,30 @@ export const InputBorder = () => {
 				>
 					{isRadiusExpanded ? (
 						<>
-							<RadiusInput label="Top Left" corner="tl" />
-							<RadiusInput label="Top Right" corner="tr" />
-							<RadiusInput label="Bottom Left" corner="bl" />
-							<RadiusInput label="Bottom Right" corner="br" />
+							<RadiusInput
+								label="Top Left"
+								corner="tl"
+								value={topLeftRadius}
+								onChange={(v) => onChange?.("topLeftRadius", v)}
+							/>
+							<RadiusInput
+								label="Top Right"
+								corner="tr"
+								value={topRightRadius}
+								onChange={(v) => onChange?.("topRightRadius", v)}
+							/>
+							<RadiusInput
+								label="Bottom Left"
+								corner="bl"
+								value={bottomLeftRadius}
+								onChange={(v) => onChange?.("bottomLeftRadius", v)}
+							/>
+							<RadiusInput
+								label="Bottom Right"
+								corner="br"
+								value={bottomRightRadius}
+								onChange={(v) => onChange?.("bottomRightRadius", v)}
+							/>
 						</>
 					) : (
 						<div className="flex-1">
@@ -293,6 +347,11 @@ export const InputBorder = () => {
 										type="text"
 										placeholder="0"
 										className="text-center"
+										value={radius ?? ""}
+										onChange={(e) => {
+											const val = e.target.value;
+											onChange?.("radius", val === "" ? "" : Number.parseFloat(val));
+										}}
 									/>
 								</Input.Wrapper>
 							</Input.Root>

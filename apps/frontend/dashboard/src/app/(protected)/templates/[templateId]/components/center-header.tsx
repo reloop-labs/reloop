@@ -165,7 +165,7 @@ export const CenterHeader = () => {
 	const [ref, bounds] = useMeasure();
 
 	return (
-		<div className="relative mx-auto mt-4 max-w-2xl rounded-2xl border border-stroke-soft-100/50">
+		<div className="relative mx-auto mt-4 w-full max-w-xl rounded-2xl border border-stroke-soft-100/50">
 			<Button.Root
 				onClick={() => setShowDetails(!showDetails)}
 				mode="ghost"
