@@ -1,21 +1,19 @@
 import * as ButtonGroup from "@reloop/ui/button-group";
 import {
 	Bold,
-	Code,
 	Italic,
 	type LucideIcon,
 	Strikethrough,
 	Underline,
 } from "lucide-react";
 
-export type Mark = "bold" | "italic" | "underline" | "strike" | "code" | "case";
+export type Mark = "bold" | "italic" | "underline" | "strike" | "case";
 
 const MARK_OPTIONS: { mark: Mark; icon: LucideIcon; label: string }[] = [
 	{ mark: "bold", icon: Bold, label: "Bold" },
 	{ mark: "italic", icon: Italic, label: "Italic" },
 	{ mark: "underline", icon: Underline, label: "Underline" },
 	{ mark: "strike", icon: Strikethrough, label: "Strikethrough" },
-	{ mark: "code", icon: Code, label: "Code" },
 ];
 
 export function MarkControls({
