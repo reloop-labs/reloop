@@ -20,7 +20,7 @@ export function NodeTypePills({
 					onClick={() => onChange(t)}
 					className={`flex flex-1 items-center justify-center rounded-md px-2 py-1.5 text-xs font-medium transition-all duration-150 ${
 						active === t
-							? "bg-white text-text-strong-950 shadow-regular-xs"
+							? "bg-white text-text-strong-950"
 							: "bg-transparent text-text-sub-600 hover:text-text-strong-950"
 					}`}
 				>

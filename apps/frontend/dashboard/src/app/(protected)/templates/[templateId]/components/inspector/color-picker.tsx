@@ -19,7 +19,7 @@ export function ColorPicker({
 					<button
 						type="button"
 						title="Pick colour"
-						className="h-5 w-5 shrink-0 cursor-pointer rounded-full border-2 border-stroke-soft-200 shadow-sm transition-all duration-150 hover:scale-110 hover:shadow-md"
+						className="h-5 w-5 shrink-0 cursor-pointer rounded-full border-2 border-stroke-soft-200 transition-all duration-150 hover:scale-110"
 						style={{ backgroundColor: value || "#000000" }}
 					/>
 				</Popover.Trigger>

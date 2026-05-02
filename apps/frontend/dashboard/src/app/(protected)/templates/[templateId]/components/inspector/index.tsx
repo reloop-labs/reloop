@@ -20,7 +20,7 @@ import { UrlInput } from "./url-input";
 /* ------------------------------------------------------------------ */
 function InspectorCard({ children }: { children: React.ReactNode }) {
 	return (
-		<div className="overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 shadow-regular-xs">
+		<div className="overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0">
 			{children}
 		</div>
 	);

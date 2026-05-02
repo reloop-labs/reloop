@@ -23,7 +23,7 @@ export function MarkButton({
 			aria-pressed={active}
 			className={`flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border transition-all duration-150 ${
 				active
-					? "border-stroke-soft-200 bg-bg-strong-950 text-white shadow-regular-xs"
+					? "border-stroke-soft-200 bg-bg-strong-950 text-white"
 					: "border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 hover:bg-bg-weak-50 hover:text-text-strong-950"
 			}`}
 		>

@@ -81,7 +81,7 @@ export function SpacingControl({
 					onClick={() => setLinked((v) => !v)}
 					className={`flex h-7 w-7 items-center justify-center rounded-full border transition-all duration-150 ${
 						linked
-							? "border-primary-base bg-primary-base text-white shadow-sm"
+							? "border-primary-base bg-primary-base text-white"
 							: "border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 hover:border-primary-base hover:text-primary-base"
 					}`}
 				>
