@@ -38,54 +38,56 @@ const getIcon = (type: string) => {
 
 const BreadCrumb = () => {
 	return (
-		<ol className="m-0 mb-4 flex list-none items-center gap-1 p-0">
-			<Inspector.Breadcrumb>
-				{(segments) =>
-					segments.map((segment, i) => {
-						const type = segment.node?.nodeType ?? "Layout";
-						const label = type;
-						const Icon = getIcon(type);
+		<div className="px-4 pb-3 pt-4">
+			<ol className="flex list-none items-center gap-1 rounded-lg bg-bg-weak-50 px-3 py-2">
+				<Inspector.Breadcrumb>
+					{(segments) =>
+						segments.map((segment, i) => {
+							const type = segment.node?.nodeType ?? "Layout";
+							const label = type;
+							const Icon = getIcon(type);
 
-						const isFirst = i === 0;
-						const isLast = i === segments.length - 1;
-						const showLabel = !isFirst || segments.length === 1;
+							const isFirst = i === 0;
+							const isLast = i === segments.length - 1;
+							const showLabel = !isFirst || segments.length === 1;
 
-						if (isLast) {
+							if (isLast) {
+								return (
+									<li key={i} className="flex items-center gap-1">
+										{i !== 0 && (
+											<span className="text-text-disabled-300 text-xs">/</span>
+										)}
+										<div className="flex items-center gap-1.5">
+											<Icon className="h-3.5 w-3.5 text-text-strong-950" strokeWidth={2} />
+											{showLabel && (
+												<span className="text-xs font-semibold capitalize text-text-strong-950">
+													{label}
+												</span>
+											)}
+										</div>
+									</li>
+								);
+							}
 							return (
 								<li key={i} className="flex items-center gap-1">
 									{i !== 0 && (
-										<span className="text-(--re-text-muted) text-sm">/</span>
+										<span className="text-text-disabled-300 text-xs">/</span>
 									)}
-									<div className="flex items-center gap-1.5 py-0.5">
-										<Icon className="h-4 w-4 text-text-sub-600" />
-										{showLabel && (
-											<span className="p-0 text-sm font-bold capitalize">
-												{label}
-											</span>
-										)}
-									</div>
+									<button
+										type="button"
+										className="flex cursor-pointer items-center gap-1.5 rounded px-1 py-0.5 text-xs capitalize text-text-sub-600 transition-colors hover:bg-bg-white-0 hover:text-text-strong-950"
+										onClick={() => segment.focus()}
+									>
+										<Icon className="h-3.5 w-3.5" strokeWidth={2} />
+										{showLabel && <span>{label}</span>}
+									</button>
 								</li>
 							);
-						}
-						return (
-							<li key={i} className="flex items-center gap-1">
-								{i !== 0 && (
-									<span className="text-(--re-text-muted) text-sm">/</span>
-								)}
-								<button
-									type="button"
-									className="flex cursor-pointer items-center gap-1.5 text-(--re-text-muted) text-sm capitalize"
-									onClick={() => segment.focus()}
-								>
-									<Icon className="h-4 w-4" />
-									{showLabel && <span>{label}</span>}
-								</button>
-							</li>
-						);
-					})
-				}
-			</Inspector.Breadcrumb>
-		</ol>
+						})
+					}
+				</Inspector.Breadcrumb>
+			</ol>
+		</div>
 	);
 };
 

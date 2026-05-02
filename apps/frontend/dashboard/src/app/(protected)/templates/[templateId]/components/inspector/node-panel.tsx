@@ -1,5 +1,5 @@
 import { Inspector } from "@react-email/editor/ui";
-import * as DividerPrimitive from "@reloop/ui/divider";
+import { Move } from "lucide-react";
 import { ColorRow } from "./color-row";
 import { ImageSrcControl } from "./image-src-control";
 import { PropRow } from "./prop-row";
@@ -15,37 +15,38 @@ export function NodePanel() {
 		<Inspector.Node>
 			{({ nodeType, getStyle, setStyle, batchSetStyle, getAttr, setAttr }) => (
 				<div>
-					<SectionHeader label="Spacing" />
-					<div className="pb-3">
-						{/* ── Background ── */}
-						<ColorRow
-							label="Background"
-							value={String(getStyle("backgroundColor") ?? "")}
-							onChange={(v) => setStyle("backgroundColor", v)}
+					<SectionHeader label="Spacing" icon={Move} />
+
+					{/* Background colour */}
+					<ColorRow
+						label="Background"
+						value={String(getStyle("backgroundColor") ?? "")}
+						onChange={(v) => setStyle("backgroundColor", v)}
+					/>
+
+					{/* Padding diamond */}
+					<PropRow label="Padding">
+						<SpacingControl
+							value={{
+								top: (getStyle("paddingTop") as number) ?? "",
+								right: (getStyle("paddingRight") as number) ?? "",
+								bottom: (getStyle("paddingBottom") as number) ?? "",
+								left: (getStyle("paddingLeft") as number) ?? "",
+							}}
+							onChange={({ top, right, bottom, left }) =>
+								batchSetStyle([
+									{ prop: "paddingTop", value: top as number },
+									{ prop: "paddingRight", value: right as number },
+									{ prop: "paddingBottom", value: bottom as number },
+									{ prop: "paddingLeft", value: left as number },
+								])
+							}
 						/>
+					</PropRow>
 
-						{/* ── Padding: 2×2 grid ── */}
-						<PropRow label="Padding">
-							<SpacingControl
-								value={{
-									top: (getStyle("paddingTop") as number) ?? "",
-									right: (getStyle("paddingRight") as number) ?? "",
-									bottom: (getStyle("paddingBottom") as number) ?? "",
-									left: (getStyle("paddingLeft") as number) ?? "",
-								}}
-								onChange={({ top, right, bottom, left }) =>
-									batchSetStyle([
-										{ prop: "paddingTop", value: top as number },
-										{ prop: "paddingRight", value: right as number },
-										{ prop: "paddingBottom", value: bottom as number },
-										{ prop: "paddingLeft", value: left as number },
-									])
-								}
-							/>
-						</PropRow>
-
-						{/* ── Image ── */}
-						{nodeType === "image" && (
+					{/* Image node */}
+					{nodeType === "image" && (
+						<div className="px-4 pb-3">
 							<ImageSrcControl
 								value={{
 									src: String(getAttr("src") ?? ""),
@@ -60,19 +61,18 @@ export function NodePanel() {
 									setAttr("height", height);
 								}}
 							/>
-						)}
+						</div>
+					)}
 
-						{/* ── Button ── */}
-						{nodeType === "button" && (
-							<PropRow label="Link">
-								<UrlInput
-									value={String(getAttr("href") ?? "")}
-									onChange={(v) => setAttr("href", v)}
-								/>
-							</PropRow>
-						)}
-					</div>
-					<DividerPrimitive.Root variant="line" />
+					{/* Button link */}
+					{nodeType === "button" && (
+						<PropRow label="Link">
+							<UrlInput
+								value={String(getAttr("href") ?? "")}
+								onChange={(v) => setAttr("href", v)}
+							/>
+						</PropRow>
+					)}
 				</div>
 			)}
 		</Inspector.Node>
