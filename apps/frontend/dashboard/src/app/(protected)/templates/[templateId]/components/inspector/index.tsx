@@ -364,8 +364,12 @@ function DocumentPanel() {
 						</PropRow>
 						<ColorRow
 							label="Container bg"
-							value={String(findStyleValue("container", "backgroundColor") ?? "")}
-							onChange={(v) => setGlobalStyle("container", "backgroundColor", v)}
+							value={String(
+								findStyleValue("container", "backgroundColor") ?? "",
+							)}
+							onChange={(v) =>
+								setGlobalStyle("container", "backgroundColor", v)
+							}
 						/>
 						<PropRow label="Line height">
 							<NumInput
@@ -418,9 +422,16 @@ export const EmailInspector = () => {
 				</div>
 
 				{/* ── Node type pills ── */}
-				<div className="border-stroke-soft-200 border-b px-4 py-3">
-					<NodeTypePills active={activeNodeType} onChange={setActiveNodeType} />
-				</div>
+				<Inspector.Node>
+					{() => (
+						<div className="border-stroke-soft-200 border-b px-4 py-3">
+							<NodeTypePills
+								active={activeNodeType}
+								onChange={setActiveNodeType}
+							/>
+						</div>
+					)}
+				</Inspector.Node>
 
 				{/* ── Sections ── */}
 				<div className="flex flex-col px-4">
