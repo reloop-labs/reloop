@@ -399,38 +399,22 @@ export const EmailInspector = () => {
 	return (
 		<aside className="flex w-72 shrink-0 flex-col overflow-y-auto">
 			<Inspector.Root>
-				{/* ── Header bar: breadcrumb + collapse icon ── */}
-				<div className="flex items-center justify-between border-stroke-soft-200 border-b px-4 py-3">
-					<Breadcrumb />
-					<CompactButton.Root variant="ghost" size="medium">
-						<CompactButton.Icon>
-							<svg
-								width="16"
-								height="16"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								strokeWidth="1.5"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-							>
-								<rect x="3" y="3" width="18" height="18" rx="2" />
-								<path d="M9 3v18" />
-							</svg>
-						</CompactButton.Icon>
-					</CompactButton.Root>
-				</div>
-
-				{/* ── Node type pills ── */}
+				<Breadcrumb />
 				<Inspector.Node>
-					{() => (
-						<div className="border-stroke-soft-200 border-b px-4 py-3">
-							<NodeTypePills
-								active={activeNodeType}
-								onChange={setActiveNodeType}
-							/>
-						</div>
-					)}
+					{({ nodeType }) => {
+						const isTextRelated = ["text", "paragraph", "heading"].includes(
+							nodeType,
+						);
+						if (!isTextRelated) return null;
+						return (
+							<div className="border-stroke-soft-200 border-b px-4 py-3">
+								<NodeTypePills
+									active={activeNodeType}
+									onChange={setActiveNodeType}
+								/>
+							</div>
+						);
+					}}
 				</Inspector.Node>
 
 				{/* ── Sections ── */}
