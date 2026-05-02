@@ -16,6 +16,7 @@ import {
 	useEditor,
 } from "@tiptap/react";
 import { useState } from "react";
+import "@react-email/editor/themes/default.css";
 
 type EditorTheme = "basic" | "minimal";
 
@@ -26,55 +27,6 @@ const content = `
   <p>Check out our latest post on <a href="https://react.email" target="_blank">React Email</a> for building better email templates.</p>
   <a class="button" data-id="react-email-button" href="https://react.email">Read More</a>
 `;
-
-function Sidebar() {
-	return (
-		<aside className="flex w-56 shrink-0 flex-col gap-3 overflow-y-auto border-(--re-border) border-l p-3 text-xs">
-			<Inspector.Root>
-				<nav>
-					<ol className="m-0 mb-4 flex list-none items-center gap-1 p-0">
-						<Inspector.Breadcrumb>
-							{(segments) =>
-								segments.map((segment, i) => {
-									const label = segment.node?.nodeType ?? "Layout";
-									if (i === segments.length - 1) {
-										return (
-											<li key={i} className="flex items-center gap-1">
-												{i !== 0 && (
-													<span className="text-(--re-text-muted)">/</span>
-												)}
-												<span className="p-0 text-(--re-text) text-xs capitalize">
-													{label}
-												</span>
-											</li>
-										);
-									}
-									return (
-										<li key={i} className="flex items-center gap-1">
-											{i !== 0 && (
-												<span className="text-(--re-text-muted)">/</span>
-											)}
-											<button
-												type="button"
-												className="cursor-pointer border-0 bg-transparent p-0 text-(--re-text-muted) text-xs capitalize hover:text-(--re-text)"
-												onClick={() => segment.focus()}
-											>
-												{label}
-											</button>
-										</li>
-									);
-								})
-							}
-						</Inspector.Breadcrumb>
-					</ol>
-				</nav>
-				<Inspector.Document />
-				<Inspector.Node />
-				<Inspector.Text />
-			</Inspector.Root>
-		</aside>
-	);
-}
 
 function ExportPanel() {
 	const { editor } = useCurrentEditor();
@@ -173,7 +125,50 @@ export function FullEmailBuilder() {
 						<SlashCommand items={defaultSlashCommands} />
 						<ExportPanel />
 					</div>
-					<Sidebar />
+					<aside className="flex w-56 shrink-0 flex-col gap-3 overflow-y-auto border-(--re-border) border-l p-3 text-xs">
+						<Inspector.Root>
+							<nav>
+								<ol className="m-0 mb-4 flex list-none items-center gap-1 p-0">
+									<Inspector.Breadcrumb>
+										{(segments) =>
+											segments.map((segment, i) => {
+												const label = segment.node?.nodeType ?? "Layout";
+												if (i === segments.length - 1) {
+													return (
+														<li key={i} className="flex items-center gap-1">
+															{i !== 0 && (
+																<span className="text-(--re-text-muted)">
+																	/
+																</span>
+															)}
+															<span className="p-0 text-(--re-text) text-xs capitalize">
+																{label}
+															</span>
+														</li>
+													);
+												}
+												return (
+													<li key={i} className="flex items-center gap-1">
+														{i !== 0 && (
+															<span className="text-(--re-text-muted)">/</span>
+														)}
+														<button
+															type="button"
+															className="cursor-pointer border-0 bg-transparent p-0 text-(--re-text-muted) text-xs capitalize hover:text-(--re-text)"
+															onClick={() => segment.focus()}
+														>
+															{label}
+														</button>
+													</li>
+												);
+											})
+										}
+									</Inspector.Breadcrumb>
+								</ol>
+							</nav>
+							<Inspector.Document />
+						</Inspector.Root>
+					</aside>
 				</div>
 			</EditorContext.Provider>
 		</div>

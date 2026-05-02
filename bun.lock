@@ -3,12 +3,6 @@
   "workspaces": {
     "": {
       "name": "reloop",
-      "dependencies": {
-        "@tiptap/core": "^3.22.5",
-        "@tiptap/pm": "^3.22.5",
-        "@tiptap/react": "^3.22.5",
-        "@tiptap/starter-kit": "^3.22.5",
-      },
       "devDependencies": {
         "@biomejs/biome": "2.2.6",
         "husky": "9.1.7",
@@ -697,9 +691,6 @@
         "@radix-ui/react-tabs": "catalog:ui",
         "@radix-ui/react-toast": "catalog:ui",
         "@radix-ui/react-tooltip": "catalog:ui",
-        "@react-email/editor": "catalog:ui",
-        "@tiptap/react": "catalog:ui",
-        "@tiptap/starter-kit": "catalog:ui",
         "class-variance-authority": "catalog:ui",
         "cmdk": "catalog:ui",
         "merge-refs": "catalog:ui",
@@ -835,6 +826,7 @@
       "@tailwindcss/postcss": "4.1.11",
       "@takumi-rs/image-response": "0.73.1",
       "@tanstack/react-table": "8.21.3",
+      "@tiptap/core": "^3.22.5",
       "@tiptap/pm": "^3.22.5",
       "@tiptap/react": "^3.22.5",
       "@tiptap/starter-kit": "^3.22.5",
