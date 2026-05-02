@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 /* ------------------------------------------------------------------ */
-/* Spacing control — diamond TRBL layout with centre link toggle       */
+/* Spacing control — single-row when linked, 2×2 grid when individual  */
 /* ------------------------------------------------------------------ */
 export interface SpacingValue {
 	top: number | "";
@@ -12,17 +12,97 @@ export interface SpacingValue {
 	left: number | "";
 }
 
-function SpinInput({
+/* Icon: horizontal stripes (top / bottom) */
+function IconTopBottom() {
+	return (
+		<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<rect x="1" y="1" width="12" height="2.5" rx="1" fill="currentColor" opacity="0.45" />
+			<rect x="1" y="10.5" width="12" height="2.5" rx="1" fill="currentColor" opacity="0.45" />
+			<rect x="3" y="5.25" width="8" height="3.5" rx="1" fill="currentColor" />
+		</svg>
+	);
+}
+
+/* Icon: vertical stripes (left / right) */
+function IconLeftRight() {
+	return (
+		<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<rect x="1" y="1" width="2.5" height="12" rx="1" fill="currentColor" opacity="0.45" />
+			<rect x="10.5" y="1" width="2.5" height="12" rx="1" fill="currentColor" opacity="0.45" />
+			<rect x="5.25" y="3" width="3.5" height="8" rx="1" fill="currentColor" />
+		</svg>
+	);
+}
+
+/* Icon: uniform solid box */
+function IconUniform() {
+	return (
+		<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<rect x="1.75" y="1.75" width="10.5" height="10.5" rx="2" stroke="currentColor" strokeWidth="1.5" fill="none" />
+		</svg>
+	);
+}
+
+/* Icon: individual dashed box */
+function IconIndividual() {
+	return (
+		<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<rect x="1.75" y="1.75" width="10.5" height="10.5" rx="2" stroke="currentColor" strokeWidth="1.5" strokeDasharray="3 2.2" fill="none" />
+		</svg>
+	);
+}
+
+/* SegmentedToggle for linked/individual */
+function ModeToggle({
+	linked,
+	onToggle,
+}: {
+	linked: boolean;
+	onToggle: (v: boolean) => void;
+}) {
+	return (
+		<div className="flex items-center gap-0.5 rounded-lg bg-bg-weak-50 p-0.5">
+			<button
+				type="button"
+				title="Uniform padding"
+				onClick={() => onToggle(true)}
+				className={`flex h-7 w-7 items-center justify-center rounded-md transition-all duration-150 ${
+					linked
+						? "bg-bg-white-0 text-text-strong-950 shadow-xs"
+						: "text-text-soft-400 hover:text-text-sub-600"
+				}`}
+			>
+				<IconUniform />
+			</button>
+			<button
+				type="button"
+				title="Individual sides"
+				onClick={() => onToggle(false)}
+				className={`flex h-7 w-7 items-center justify-center rounded-md transition-all duration-150 ${
+					!linked
+						? "bg-bg-white-0 text-text-strong-950 shadow-xs"
+						: "text-text-soft-400 hover:text-text-sub-600"
+				}`}
+			>
+				<IconIndividual />
+			</button>
+		</div>
+	);
+}
+
+/* Single pill input */
+function PillInput({
 	value,
 	onChange,
-	label,
+	icon,
 }: {
 	value: number | "";
 	onChange: (v: number | "") => void;
-	label: string;
+	icon?: React.ReactNode;
 }) {
 	return (
-		<div className="flex flex-col items-center gap-0.5">
+		<div className="flex flex-1 items-center gap-1.5 rounded-full bg-bg-weak-50 px-3 py-2 min-w-0">
+			{icon && <span className="shrink-0 text-text-sub-600">{icon}</span>}
 			<input
 				type="number"
 				value={value}
@@ -30,24 +110,24 @@ function SpinInput({
 					const raw = e.target.value;
 					onChange(raw === "" ? "" : Number.parseFloat(raw));
 				}}
-				className="w-10 rounded-md border border-stroke-soft-200 bg-bg-white-0 px-1 py-1 text-center text-xs text-text-strong-950 outline-none transition-colors focus:border-primary-base focus:ring-1 focus:ring-primary-base/20"
+				className="w-0 flex-1 bg-transparent text-xs font-medium text-text-strong-950 outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
 			/>
-			<span className="text-[9px] font-medium uppercase tracking-widest text-text-sub-600">
-				{label}
-			</span>
+			<span className="shrink-0 text-xs text-text-soft-400">px</span>
 		</div>
 	);
 }
 
 export function SpacingControl({
+	label = "Padding",
 	value,
 	onChange,
 }: {
+	label?: string;
 	value: SpacingValue;
 	onChange: (v: SpacingValue) => void;
 	unit?: string;
 }) {
-	const [linked, setLinked] = useState(false);
+	const [linked, setLinked] = useState(true);
 
 	const handleChange = (side: keyof SpacingValue, raw: number | "") => {
 		if (linked) {
@@ -57,76 +137,54 @@ export function SpacingControl({
 		}
 	};
 
+	/* ── Linked: single row ── */
+	if (linked) {
+		return (
+			<div className="flex min-h-9 items-center gap-3 px-4 py-1.5">
+				<span className="w-20 shrink-0 text-xs font-medium text-text-sub-600">{label}</span>
+				<div className="flex min-w-0 flex-1 items-center justify-end gap-2">
+					<PillInput
+						value={value.top}
+						onChange={(v) => handleChange("top", v)}
+					/>
+					<ModeToggle linked={linked} onToggle={setLinked} />
+				</div>
+			</div>
+		);
+	}
+
+	/* ── Individual: header row + 2×2 grid ── */
 	return (
-		<div className="flex flex-col items-center gap-1.5 py-1">
-			{/* Top */}
-			<SpinInput
-				value={value.top}
-				onChange={(v) => handleChange("top", v)}
-				label="T"
-			/>
-
-			{/* Middle row: Left — link button — Right */}
-			<div className="flex items-center gap-2">
-				<SpinInput
-					value={value.left}
-					onChange={(v) => handleChange("left", v)}
-					label="L"
-				/>
-
-				{/* Link / unlink button */}
-				<button
-					type="button"
-					title={linked ? "Unlink sides" : "Link all sides"}
-					onClick={() => setLinked((v) => !v)}
-					className={`flex h-7 w-7 items-center justify-center rounded-full border transition-all duration-150 ${
-						linked
-							? "border-primary-base bg-primary-base text-white"
-							: "border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 hover:border-primary-base hover:text-primary-base"
-					}`}
-				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						width="10"
-						height="10"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						strokeWidth="2.5"
-						strokeLinecap="round"
-						strokeLinejoin="round"
-					>
-						{linked ? (
-							<>
-								<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-								<path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-							</>
-						) : (
-							<>
-								<path d="M18.84 12.25l1.72-1.71h-.02a5.004 5.004 0 0 0-.12-7.07 5.004 5.004 0 0 0-7.07.12l-1.72 1.71" />
-								<path d="M5.17 11.75l-1.71 1.71a5.004 5.004 0 0 0 .12 7.07 5.004 5.004 0 0 0 7.07-.12l1.71-1.71" />
-								<line x1="8" y1="2" x2="8" y2="5" />
-								<line x1="2" y1="8" x2="5" y2="8" />
-								<line x1="16" y1="19" x2="16" y2="22" />
-								<line x1="19" y1="16" x2="22" y2="16" />
-							</>
-						)}
-					</svg>
-				</button>
-
-				<SpinInput
-					value={value.right}
-					onChange={(v) => handleChange("right", v)}
-					label="R"
-				/>
+		<div className="flex flex-col gap-2 px-4 py-2">
+			{/* Header row */}
+			<div className="flex items-center justify-between">
+				<span className="text-xs font-medium text-text-sub-600">{label}</span>
+				<ModeToggle linked={linked} onToggle={setLinked} />
 			</div>
 
-			{/* Bottom */}
-			<SpinInput
-				value={value.bottom}
-				onChange={(v) => handleChange("bottom", v)}
-				label="B"
-			/>
+			{/* 2×2 grid */}
+			<div className="grid grid-cols-2 gap-2">
+				<PillInput
+					value={value.top}
+					onChange={(v) => handleChange("top", v)}
+					icon={<IconTopBottom />}
+				/>
+				<PillInput
+					value={value.right}
+					onChange={(v) => handleChange("right", v)}
+					icon={<IconLeftRight />}
+				/>
+				<PillInput
+					value={value.bottom}
+					onChange={(v) => handleChange("bottom", v)}
+					icon={<IconTopBottom />}
+				/>
+				<PillInput
+					value={value.left}
+					onChange={(v) => handleChange("left", v)}
+					icon={<IconLeftRight />}
+				/>
+			</div>
 		</div>
 	);
 }

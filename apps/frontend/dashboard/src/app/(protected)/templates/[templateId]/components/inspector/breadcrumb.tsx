@@ -6,11 +6,13 @@ import {
 	Image as ImageIcon,
 	Layout,
 	MousePointer2,
+	Quote,
 	Rows,
 	Type,
 } from "lucide-react";
 
 const getIcon = (type: string) => {
+	console.log(type);
 	switch (type.toLowerCase()) {
 		case "text":
 		case "paragraph":
@@ -25,6 +27,8 @@ const getIcon = (type: string) => {
 			return Layout;
 		case "container":
 			return Box;
+		case "blockquote":
+			return Quote;
 		case "column":
 			return Columns;
 		case "row":
@@ -38,7 +42,7 @@ const getIcon = (type: string) => {
 
 const BreadCrumb = () => {
 	return (
-		<div className="px-4 pb-3 pt-4">
+		<div className="border-stroke-soft-200 border-b px-1.5 py-2">
 			<ol className="flex list-none items-center gap-1 rounded-lg bg-bg-weak-50 px-3 py-2">
 				<Inspector.Breadcrumb>
 					{(segments) =>
@@ -58,9 +62,12 @@ const BreadCrumb = () => {
 											<span className="text-text-disabled-300 text-xs">/</span>
 										)}
 										<div className="flex items-center gap-1.5">
-											<Icon className="h-3.5 w-3.5 text-text-strong-950" strokeWidth={2} />
+											<Icon
+												className="h-3.5 w-3.5 text-text-strong-950"
+												strokeWidth={2}
+											/>
 											{showLabel && (
-												<span className="text-xs font-semibold capitalize text-text-strong-950">
+												<span className="font-semibold text-text-strong-950 text-xs capitalize">
 													{label}
 												</span>
 											)}
@@ -75,7 +82,7 @@ const BreadCrumb = () => {
 									)}
 									<button
 										type="button"
-										className="flex cursor-pointer items-center gap-1.5 rounded px-1 py-0.5 text-xs capitalize text-text-sub-600 transition-colors hover:bg-bg-white-0 hover:text-text-strong-950"
+										className="flex cursor-pointer items-center gap-1.5 rounded px-1 py-0.5 text-text-sub-600 text-xs capitalize transition-colors hover:text-text-strong-950"
 										onClick={() => segment.focus()}
 									>
 										<Icon className="h-3.5 w-3.5" strokeWidth={2} />

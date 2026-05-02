@@ -29,14 +29,10 @@ import { type NodeTypePill, NodeTypePills } from "./node-type-pills";
 import { UrlInput } from "./url-input";
 
 /* ------------------------------------------------------------------ */
-/* Shared card wrapper                                                   */
+/* Shared section wrapper                                              */
 /* ------------------------------------------------------------------ */
-function InspectorCard({ children }: { children: React.ReactNode }) {
-	return (
-		<div className="overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0">
-			{children}
-		</div>
-	);
+function InspectorSection({ children }: { children: React.ReactNode }) {
+	return <div className="flex flex-col py-2">{children}</div>;
 }
 
 function ColorRow({
@@ -82,8 +78,7 @@ export const EmailInspector = () => {
 			<Breadcrumb />
 
 			{/* ── All sections in one flat scroll container ── */}
-			<div className="flex flex-col gap-3 px-4 pb-6">
-
+			<div className="flex flex-col divide-y divide-stroke-soft-200 px-4 pb-6">
 				{/* ── Text card ── */}
 				<Inspector.Text>
 					{({
@@ -97,11 +92,13 @@ export const EmailInspector = () => {
 						getStyle,
 						setStyle,
 					}) => (
-						<InspectorCard>
+						<InspectorSection>
 							{/* Node-type segmented pills — only for text nodes */}
 							<Inspector.Node>
 								{({ nodeType }) => {
-									const isTextRelated = ["text", "paragraph", "heading"].includes(nodeType);
+									const isTextRelated = ["text", "paragraph", "heading"].includes(
+										nodeType,
+									);
 									if (!isTextRelated) return null;
 									return (
 										<div className="px-4 pt-3 pb-2">
@@ -185,14 +182,14 @@ export const EmailInspector = () => {
 									onChange={setLinkColor}
 								/>
 							)}
-						</InspectorCard>
+						</InspectorSection>
 					)}
 				</Inspector.Text>
 
 				{/* ── Spacing + image + button node card ── */}
 				<Inspector.Node>
 					{({ nodeType, getStyle, setStyle, batchSetStyle, getAttr, setAttr }) => (
-						<InspectorCard>
+						<InspectorSection>
 							<SectionHeader label="Spacing" icon={Move} />
 
 							<ColorRow
@@ -201,24 +198,22 @@ export const EmailInspector = () => {
 								onChange={(v) => setStyle("backgroundColor", v)}
 							/>
 
-							<PropRow label="Padding">
-								<SpacingControl
-									value={{
-										top: (getStyle("paddingTop") as number) ?? "",
-										right: (getStyle("paddingRight") as number) ?? "",
-										bottom: (getStyle("paddingBottom") as number) ?? "",
-										left: (getStyle("paddingLeft") as number) ?? "",
-									}}
-									onChange={({ top, right, bottom, left }) =>
-										batchSetStyle([
-											{ prop: "paddingTop", value: top as number },
-											{ prop: "paddingRight", value: right as number },
-											{ prop: "paddingBottom", value: bottom as number },
-											{ prop: "paddingLeft", value: left as number },
-										])
-									}
-								/>
-							</PropRow>
+							<SpacingControl
+								value={{
+									top: (getStyle("paddingTop") as number) ?? "",
+									right: (getStyle("paddingRight") as number) ?? "",
+									bottom: (getStyle("paddingBottom") as number) ?? "",
+									left: (getStyle("paddingLeft") as number) ?? "",
+								}}
+								onChange={({ top, right, bottom, left }) =>
+									batchSetStyle([
+										{ prop: "paddingTop", value: top as number },
+										{ prop: "paddingRight", value: right as number },
+										{ prop: "paddingBottom", value: bottom as number },
+										{ prop: "paddingLeft", value: left as number },
+									])
+								}
+							/>
 
 							{nodeType === "image" && (
 								<div className="px-4 pb-3">
@@ -247,14 +242,14 @@ export const EmailInspector = () => {
 									/>
 								</PropRow>
 							)}
-						</InspectorCard>
+						</InspectorSection>
 					)}
 				</Inspector.Node>
 
 				{/* ── Background card ── */}
 				<Inspector.Node>
 					{({ getStyle, setStyle }) => (
-						<InspectorCard>
+						<InspectorSection>
 							<SectionHeader label="Background" icon={Paintbrush} />
 							<ColorRow
 								label="Color"
@@ -262,14 +257,14 @@ export const EmailInspector = () => {
 								onChange={(v) => setStyle("backgroundColor", v)}
 							/>
 							<div className="h-2" />
-						</InspectorCard>
+						</InspectorSection>
 					)}
 				</Inspector.Node>
 
 				{/* ── Border card ── */}
 				<Inspector.Node>
 					{({ getStyle, setStyle }) => (
-						<InspectorCard>
+						<InspectorSection>
 							<SectionHeader label="Border" icon={Square} />
 							<ColorRow
 								label="Color"
@@ -284,14 +279,14 @@ export const EmailInspector = () => {
 								/>
 							</PropRow>
 							<div className="h-2" />
-						</InspectorCard>
+						</InspectorSection>
 					)}
 				</Inspector.Node>
 
 				{/* ── Document card ── */}
 				<Inspector.Document>
 					{({ findStyleValue, setGlobalStyle }) => (
-						<InspectorCard>
+						<InspectorSection>
 							<SectionHeader label="Document" icon={FileText} />
 							<ColorRow
 								label="Background"
@@ -314,7 +309,9 @@ export const EmailInspector = () => {
 							</PropRow>
 							<ColorRow
 								label="Container bg"
-								value={String(findStyleValue("container", "backgroundColor") ?? "")}
+								value={String(
+									findStyleValue("container", "backgroundColor") ?? "",
+								)}
 								onChange={(v) => setGlobalStyle("container", "backgroundColor", v)}
 							/>
 							<PropRow label="Line height">
@@ -329,7 +326,7 @@ export const EmailInspector = () => {
 								onChange={(v) => setGlobalStyle("body", "color", v)}
 							/>
 							<div className="h-2" />
-						</InspectorCard>
+						</InspectorSection>
 					)}
 				</Inspector.Document>
 			</div>
