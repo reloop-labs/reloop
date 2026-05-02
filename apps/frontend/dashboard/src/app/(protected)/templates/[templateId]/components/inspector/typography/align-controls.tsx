@@ -1,4 +1,4 @@
-import * as SegmentedControl from "@reloop/ui/segmented-control";
+import * as ButtonGroup from "@reloop/ui/button-group";
 import {
 	AlignCenter,
 	AlignLeft,
@@ -22,27 +22,19 @@ export function AlignControls({
 	setAlignment: (alignment: Alignment) => void;
 }) {
 	return (
-		<SegmentedControl.Root
-			value={alignment}
-			onValueChange={(v) => setAlignment(v as Alignment)}
-			className="rounded-xl border border-stroke-sub-300 bg-bg-white-0"
-		>
-			<SegmentedControl.List
-				className="bg-transparent"
-				floatingBgClassName="shadow-none! border border-stroke-soft-200 bg-bg-weak-50"
-			>
-				{ALIGN_OPTIONS.map(({ value: a, icon: Icon, label }) => (
-					<SegmentedControl.Trigger
-						key={a}
-						value={a}
-						title={label}
-						aria-label={label}
-						className="rounded-2xl"
-					>
-						<Icon className="h-4 w-4" strokeWidth={2} />
-					</SegmentedControl.Trigger>
-				))}
-			</SegmentedControl.List>
-		</SegmentedControl.Root>
+		<ButtonGroup.Root className="w-full">
+			{ALIGN_OPTIONS.map(({ value: a, icon: Icon, label }) => (
+				<ButtonGroup.Item
+					key={a}
+					title={label}
+					aria-label={label}
+					data-state={alignment === a ? "on" : "off"}
+					onClick={() => setAlignment(a as Alignment)}
+					className="flex-1 first:rounded-l-xl last:rounded-r-xl"
+				>
+					<Icon className="h-4 w-4" strokeWidth={2} />
+				</ButtonGroup.Item>
+			))}
+		</ButtonGroup.Root>
 	);
 }

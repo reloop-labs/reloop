@@ -1,14 +1,12 @@
+import * as ButtonGroup from "@reloop/ui/button-group";
 import {
 	Bold,
-	CaseSensitive,
 	Code,
 	Italic,
+	type LucideIcon,
 	Strikethrough,
 	Underline,
-	type LucideIcon,
 } from "lucide-react";
-import React from "react";
-import { MarkButton } from "../mark-button";
 
 export type Mark = "bold" | "italic" | "underline" | "strike" | "code" | "case";
 
@@ -18,7 +16,6 @@ const MARK_OPTIONS: { mark: Mark; icon: LucideIcon; label: string }[] = [
 	{ mark: "underline", icon: Underline, label: "Underline" },
 	{ mark: "strike", icon: Strikethrough, label: "Strikethrough" },
 	{ mark: "code", icon: Code, label: "Code" },
-	{ mark: "case", icon: CaseSensitive, label: "Case" },
 ];
 
 export function MarkControls({
@@ -29,16 +26,19 @@ export function MarkControls({
 	toggleMark: (mark: string) => void;
 }) {
 	return (
-		<div className="flex items-center justify-between rounded-2xl bg-bg-weak-50 p-1">
-			{MARK_OPTIONS.map(({ mark, icon, label }) => (
-				<MarkButton
+		<ButtonGroup.Root className="w-full">
+			{MARK_OPTIONS.map(({ mark, icon: Icon, label }) => (
+				<ButtonGroup.Item
 					key={mark}
-					icon={icon}
-					label={label}
-					active={marks[mark] ?? false}
+					title={label}
+					aria-label={label}
+					data-state={marks[mark] ? "on" : "off"}
 					onClick={() => toggleMark(mark)}
-				/>
+					className="flex-1 first:rounded-l-xl last:rounded-r-xl"
+				>
+					<Icon className="h-4 w-4" />
+				</ButtonGroup.Item>
 			))}
-		</div>
+		</ButtonGroup.Root>
 	);
 }
