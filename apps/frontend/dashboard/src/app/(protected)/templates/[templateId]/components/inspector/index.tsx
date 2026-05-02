@@ -1,5 +1,5 @@
 import { Inspector } from "@react-email/editor/ui";
-
+import { useEditorHook } from "../use-editor-hooks";
 import { AlignButtons } from "./align-buttons";
 import { ColorPicker } from "./color-picker";
 import { Divider } from "./divider";
@@ -25,7 +25,7 @@ function Section({
 }) {
 	return (
 		<div className="flex flex-col gap-0">
-			<span className="mb-1 px-0.5 text-[10px] font-semibold uppercase tracking-widest text-(--re-text-muted)">
+			<span className="mb-1 px-0.5 font-semibold text-(--re-text-muted) text-[10px] uppercase tracking-widest">
 				{title}
 			</span>
 			{children}
@@ -294,6 +294,8 @@ function TextPanel() {
 /* Root inspector                                                        */
 /* ------------------------------------------------------------------ */
 export const EmailInspector = () => {
+	const editor = useEditorHook();
+	if (!editor) return null;
 	return (
 		<aside className="flex w-72 shrink-0 flex-col gap-4 overflow-y-auto p-3 text-xs">
 			<Inspector.Root>
