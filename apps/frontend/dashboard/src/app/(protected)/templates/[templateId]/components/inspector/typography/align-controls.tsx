@@ -18,8 +18,8 @@ export function AlignControls({
 	alignment,
 	setAlignment,
 }: {
-	alignment: Alignment;
-	setAlignment: (alignment: Alignment) => void;
+	alignment: string;
+	setAlignment: (alignment: string) => void;
 }) {
 	return (
 		<ButtonGroup.Root className="w-full">

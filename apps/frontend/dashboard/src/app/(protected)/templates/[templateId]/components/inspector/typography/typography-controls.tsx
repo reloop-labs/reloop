@@ -1,4 +1,4 @@
-import { AlignControls, type Alignment } from "./align-controls";
+import { AlignControls } from "./align-controls";
 import { ListControls } from "./list-controls";
 import { MarkControls } from "./mark-controls";
 
@@ -14,8 +14,8 @@ export function TypographyControls({
 }: {
 	marks: Record<string, boolean | undefined>;
 	toggleMark: (mark: string) => void;
-	alignment: Alignment;
-	setAlignment: (alignment: Alignment) => void;
+	alignment: string;
+	setAlignment: (alignment: string) => void;
 }) {
 	return (
 		<div className="flex flex-col gap-3 px-4 pt-2 pb-4">
