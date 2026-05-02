@@ -1,5 +1,6 @@
 "use client";
 
+import * as Input from "@reloop/ui/input";
 import { useState } from "react";
 
 /* ------------------------------------------------------------------ */
@@ -15,9 +16,31 @@ export interface SpacingValue {
 /* Icon: horizontal stripes (top / bottom) */
 function IconTopBottom() {
 	return (
-		<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-			<rect x="1" y="1" width="12" height="2.5" rx="1" fill="currentColor" opacity="0.45" />
-			<rect x="1" y="10.5" width="12" height="2.5" rx="1" fill="currentColor" opacity="0.45" />
+		<svg
+			width="14"
+			height="14"
+			viewBox="0 0 14 14"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+		>
+			<rect
+				x="1"
+				y="1"
+				width="12"
+				height="2.5"
+				rx="1"
+				fill="currentColor"
+				opacity="0.45"
+			/>
+			<rect
+				x="1"
+				y="10.5"
+				width="12"
+				height="2.5"
+				rx="1"
+				fill="currentColor"
+				opacity="0.45"
+			/>
 			<rect x="3" y="5.25" width="8" height="3.5" rx="1" fill="currentColor" />
 		</svg>
 	);
@@ -26,9 +49,31 @@ function IconTopBottom() {
 /* Icon: vertical stripes (left / right) */
 function IconLeftRight() {
 	return (
-		<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-			<rect x="1" y="1" width="2.5" height="12" rx="1" fill="currentColor" opacity="0.45" />
-			<rect x="10.5" y="1" width="2.5" height="12" rx="1" fill="currentColor" opacity="0.45" />
+		<svg
+			width="14"
+			height="14"
+			viewBox="0 0 14 14"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+		>
+			<rect
+				x="1"
+				y="1"
+				width="2.5"
+				height="12"
+				rx="1"
+				fill="currentColor"
+				opacity="0.45"
+			/>
+			<rect
+				x="10.5"
+				y="1"
+				width="2.5"
+				height="12"
+				rx="1"
+				fill="currentColor"
+				opacity="0.45"
+			/>
 			<rect x="5.25" y="3" width="3.5" height="8" rx="1" fill="currentColor" />
 		</svg>
 	);
@@ -37,8 +82,23 @@ function IconLeftRight() {
 /* Icon: uniform solid box */
 function IconUniform() {
 	return (
-		<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-			<rect x="1.75" y="1.75" width="10.5" height="10.5" rx="2" stroke="currentColor" strokeWidth="1.5" fill="none" />
+		<svg
+			width="14"
+			height="14"
+			viewBox="0 0 14 14"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+		>
+			<rect
+				x="1.75"
+				y="1.75"
+				width="10.5"
+				height="10.5"
+				rx="2"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				fill="none"
+			/>
 		</svg>
 	);
 }
@@ -46,8 +106,24 @@ function IconUniform() {
 /* Icon: individual dashed box */
 function IconIndividual() {
 	return (
-		<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-			<rect x="1.75" y="1.75" width="10.5" height="10.5" rx="2" stroke="currentColor" strokeWidth="1.5" strokeDasharray="3 2.2" fill="none" />
+		<svg
+			width="14"
+			height="14"
+			viewBox="0 0 14 14"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+		>
+			<rect
+				x="1.75"
+				y="1.75"
+				width="10.5"
+				height="10.5"
+				rx="2"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeDasharray="3 2.2"
+				fill="none"
+			/>
 		</svg>
 	);
 }
@@ -101,19 +177,24 @@ function PillInput({
 	icon?: React.ReactNode;
 }) {
 	return (
-		<div className="flex flex-1 items-center gap-1.5 rounded-full bg-bg-weak-50 px-3 py-2 min-w-0">
-			{icon && <span className="shrink-0 text-text-sub-600">{icon}</span>}
-			<input
-				type="number"
-				value={value}
-				onChange={(e) => {
-					const raw = e.target.value;
-					onChange(raw === "" ? "" : Number.parseFloat(raw));
-				}}
-				className="w-0 flex-1 bg-transparent text-xs font-medium text-text-strong-950 outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-			/>
-			<span className="shrink-0 text-xs text-text-soft-400">px</span>
-		</div>
+		<Input.Root
+			size="xsmall"
+			className="flex-1 rounded-xl border border-stroke-sub-300 shadow-none before:hidden"
+		>
+			<Input.Wrapper>
+				{icon && <span className="shrink-0 text-text-sub-600">{icon}</span>}
+				<Input.Input
+					type="number"
+					value={value}
+					onChange={(e) => {
+						const raw = e.target.value;
+						onChange(raw === "" ? "" : Number.parseFloat(raw));
+					}}
+					className="[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+				/>
+				<Input.InlineAffix className="text-text-soft-400">px</Input.InlineAffix>
+			</Input.Wrapper>
+		</Input.Root>
 	);
 }
 
@@ -141,8 +222,8 @@ export function SpacingControl({
 	if (linked) {
 		return (
 			<div className="flex min-h-9 items-center gap-3 px-4 py-1.5">
-				<span className="w-20 shrink-0 text-xs font-medium text-text-sub-600">{label}</span>
-				<div className="flex min-w-0 flex-1 items-center justify-end gap-2">
+				<span className="w-1/3 min-w-0 shrink-0 text-sm">{label}</span>
+				<div className="flex w-2/3 min-w-0 items-center justify-end gap-2">
 					<PillInput
 						value={value.top}
 						onChange={(v) => handleChange("top", v)}
@@ -158,7 +239,7 @@ export function SpacingControl({
 		<div className="flex flex-col gap-2 px-4 py-2">
 			{/* Header row */}
 			<div className="flex items-center justify-between">
-				<span className="text-xs font-medium text-text-sub-600">{label}</span>
+				<span className="text-sm">{label}</span>
 				<ModeToggle linked={linked} onToggle={setLinked} />
 			</div>
 

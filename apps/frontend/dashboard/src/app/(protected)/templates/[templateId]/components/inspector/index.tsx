@@ -2,27 +2,17 @@
 
 import { Inspector } from "@react-email/editor/ui";
 import { useCurrentEditor } from "@tiptap/react";
-import {
-	AlignCenter,
-	AlignLeft,
-	AlignRight,
-	Bold,
-	Italic,
-	Strikethrough,
-	Underline,
-} from "lucide-react";
 import { useState } from "react";
 import Breadcrumb from "./breadcrumb";
 import { ColorPicker } from "./color-picker";
 import { ImageSrcControl } from "./image-src-control";
-import { MarkButton } from "./mark-button";
 import { type NodeTypePill, NodeTypePills } from "./node-type-pills";
 import { NumInput } from "./num-input";
 import { PropRow } from "./prop-row";
 import { SectionHeader } from "./section-header";
 import { SpacingControl } from "./spacing-control";
-import { UrlInput } from "./url-input";
 import { TypographyControls } from "./typography/typography-controls";
+import { UrlInput } from "./url-input";
 
 /* ------------------------------------------------------------------ */
 /* Shared section wrapper                                              */
@@ -47,7 +37,99 @@ function ColorRow({
 	);
 }
 
+type InspectorStyleProperty =
+	| "color"
+	| "fontSize"
+	| "lineHeight"
+	| "letterSpacing"
+	| "align"
+	| "backgroundColor"
+	| "borderColor"
+	| "borderWidth"
+	| "paddingTop"
+	| "paddingRight"
+	| "paddingBottom"
+	| "paddingLeft";
 
+interface TextSectionProps {
+	getStyle: (name: InspectorStyleProperty) => string | number | undefined;
+	setStyle: (name: InspectorStyleProperty, value: string | number) => void;
+	marks: Record<string, boolean | undefined>;
+	toggleMark: (mark: string) => void;
+	alignment: string;
+	setAlignment: (align: string) => void;
+	isLinkActive: boolean;
+	linkColor: string;
+	setLinkColor: (color: string) => void;
+	activeNodeType: NodeTypePill;
+	setActiveNodeType: (type: NodeTypePill) => void;
+}
+
+function TextSection({
+	getStyle,
+	setStyle,
+	marks,
+	toggleMark,
+	alignment,
+	setAlignment,
+	isLinkActive,
+	linkColor,
+	setLinkColor,
+	activeNodeType,
+	setActiveNodeType,
+}: TextSectionProps) {
+	return (
+		<InspectorSection>
+			<div className="px-4 pt-3 pb-2">
+				<NodeTypePills active={activeNodeType} onChange={setActiveNodeType} />
+			</div>
+
+			<SectionHeader label="Text" />
+
+			<ColorRow
+				label="Color"
+				value={String(getStyle("color") ?? "")}
+				onChange={(v) => setStyle("color", v)}
+			/>
+			<PropRow label="Font size">
+				<NumInput
+					value={getStyle("fontSize")}
+					onChange={(v) => setStyle("fontSize", v as number)}
+					unit="px"
+				/>
+			</PropRow>
+			<PropRow label="Line height">
+				<NumInput
+					value={getStyle("lineHeight")}
+					onChange={(v) => setStyle("lineHeight", v as number)}
+					unit="%"
+				/>
+			</PropRow>
+			<PropRow label="Tracking">
+				<NumInput
+					value={getStyle("letterSpacing")}
+					onChange={(v) => setStyle("letterSpacing", v as number)}
+					unit="px"
+				/>
+			</PropRow>
+
+			<TypographyControls
+				marks={marks}
+				toggleMark={toggleMark}
+				alignment={alignment}
+				setAlignment={setAlignment}
+			/>
+
+			{isLinkActive && (
+				<ColorRow
+					label="Link color"
+					value={linkColor}
+					onChange={setLinkColor}
+				/>
+			)}
+		</InspectorSection>
+	);
+}
 
 /* ------------------------------------------------------------------ */
 /* Root inspector                                                       */
@@ -64,106 +146,75 @@ export const EmailInspector = () => {
 
 			{/* ── All sections in one flat scroll container ── */}
 			<div className="flex flex-col divide-y divide-stroke-soft-200 pb-6">
-				{/* ── Text card ── */}
+				{/* ── Text card (Handles both text selection and node selection) ── */}
 				<Inspector.Text>
-					{({
-						marks,
-						toggleMark,
-						alignment,
-						setAlignment,
-						linkColor,
-						setLinkColor,
-						isLinkActive,
-						getStyle,
-						setStyle,
-					}) => (
-						<InspectorSection>
-							{/* Node-type segmented pills — only for text nodes */}
-							<Inspector.Node>
-								{({ nodeType }) => {
-									const isTextRelated = [
-										"text",
-										"paragraph",
-										"heading",
-									].includes(nodeType);
-									if (!isTextRelated) return null;
-									return (
-										<div className="px-4 pt-3 pb-2">
-											<NodeTypePills
-												active={activeNodeType}
-												onChange={setActiveNodeType}
-											/>
-										</div>
-									);
-								}}
-							</Inspector.Node>
+					{(textProps) => (
+						<TextSection
+							{...textProps}
+							activeNodeType={activeNodeType}
+							setActiveNodeType={setActiveNodeType}
+						/>
+					)}
+				</Inspector.Text>
 
-							<SectionHeader label="Text" />
+				<Inspector.Node>
+					{(nodeProps) => {
+						const isTextRelated = ["paragraph", "heading"].includes(
+							nodeProps.nodeType,
+						);
+						if (!isTextRelated) return null;
 
-							<ColorRow
-								label="Color"
-								value={String(getStyle("color") ?? "")}
-								onChange={(v) => setStyle("color", v)}
-							/>
-							<PropRow label="Font size">
-								<NumInput
-									value={getStyle("fontSize")}
-									onChange={(v) => setStyle("fontSize", v as number)}
-									unit="px"
-								/>
-							</PropRow>
-							<PropRow label="Line height">
-								<NumInput
-									value={getStyle("lineHeight")}
-									onChange={(v) => setStyle("lineHeight", v as number)}
-									unit="%"
-								/>
-							</PropRow>
-							<PropRow label="Tracking">
-								<NumInput
-									value={getStyle("letterSpacing")}
-									onChange={(v) => setStyle("letterSpacing", v as number)}
-									unit="px"
-								/>
-							</PropRow>
+						// Calculate props for node selection since Inspector.Node doesn't provide them
+						const marks = {
+							bold: editor.isActive("bold"),
+							italic: editor.isActive("italic"),
+							underline: editor.isActive("underline"),
+							strike: editor.isActive("strike"),
+							uppercase: editor.isActive("uppercase"),
+							lowercase: editor.isActive("lowercase"),
+						};
 
-							{/* Marks + alignment */}
-							<TypographyControls
+						const toggleMark = (mark: string) => {
+							editor.chain().focus().toggleMark(mark).run();
+						};
+
+						const alignment = (nodeProps.getStyle("align") as string) || "left";
+						const setAlignment = (align: string) =>
+							nodeProps.setStyle("align", align);
+
+						const isLinkActive = editor.isActive("link");
+						const linkColor =
+							(editor.getAttributes("link").color as string) || "";
+						const setLinkColor = (color: string) =>
+							editor
+								.chain()
+								.focus()
+								.extendMarkRange("link")
+								.updateAttributes("link", { color })
+								.run();
+
+						return (
+							<TextSection
+								{...nodeProps}
 								marks={marks}
 								toggleMark={toggleMark}
 								alignment={alignment}
 								setAlignment={setAlignment}
+								isLinkActive={isLinkActive}
+								linkColor={linkColor}
+								setLinkColor={setLinkColor}
+								activeNodeType={activeNodeType}
+								setActiveNodeType={setActiveNodeType}
 							/>
-
-							{isLinkActive && (
-								<ColorRow
-									label="Link color"
-									value={linkColor}
-									onChange={setLinkColor}
-								/>
-							)}
-						</InspectorSection>
-					)}
-				</Inspector.Text>
+						);
+					}}
+				</Inspector.Node>
 
 				{/* ── Spacing + image + button node card ── */}
 				<Inspector.Node>
-					{({
-						nodeType,
-						getStyle,
-						setStyle,
-						batchSetStyle,
-						getAttr,
-						setAttr,
-					}) => (
+					{({ nodeType, getStyle, batchSetStyle, getAttr, setAttr }) => (
 						<InspectorSection>
 							<SectionHeader label="Spacing" />
-
-							<ColorRow
-								label="Background"
-								value={String(getStyle("backgroundColor") ?? "")}
-								onChange={(v) => setStyle("backgroundColor", v)}
-							/>
 
 							<SpacingControl
 								value={{
