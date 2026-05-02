@@ -72,7 +72,7 @@ export function MarkControls({
 				}}
 				className="h-10 flex-1 first:rounded-l-xl last:rounded-r-xl"
 			>
-				<CaseUpper className="h-4 w-4" />
+				<CaseUpper className="h-5 w-5" />
 			</ButtonGroup.Item>
 		</ButtonGroup.Root>
 	);
