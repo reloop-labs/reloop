@@ -1,6 +1,9 @@
 "use client";
 
-import { defaultSlashCommands } from "@react-email/editor/ui";
+import {
+	defaultSlashCommands,
+	type SlashCommandItem,
+} from "@react-email/editor/ui";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { useCurrentEditor } from "@tiptap/react";
 import React from "react";
@@ -14,7 +17,7 @@ export function FloatingMenu() {
 		<Tooltip.Provider>
 			<div className="-translate-x-1/2 absolute bottom-6 left-1/2 z-10">
 				<div className="flex items-center gap-1 rounded-full border border-white/10 bg-bg-strong-950 p-1.5 text-white shadow-2xl backdrop-blur-md">
-					{defaultSlashCommands.map((item, index) => {
+					{(defaultSlashCommands as SlashCommandItem[]).map((item, index) => {
 						return (
 							<Tooltip.Root key={index}>
 								<Tooltip.Trigger asChild>
@@ -29,31 +32,24 @@ export function FloatingMenu() {
 											editor.commands.focus();
 
 											const { from, to } = editor.state.selection;
+											const range = { from, to };
 
-											// Try executing the command with various patterns
+											// Try executing the command
 											if (typeof item.command === "function") {
 												try {
-													// Standard Tiptap suggestion pattern
-													item.command({ editor, range: { from, to } });
+													item.command({ editor, range });
 												} catch (error) {
-													try {
-														// Fallback without range
-														item.command({ editor });
-													} catch (innerError) {
-														// Fallback with editor and range as separate args
-														(item.command as any)(editor, { from, to });
-													}
+													// Fallback if the command signature is different
+													console.error("Failed to execute command", error);
 												}
 											}
 										}}
 										className="flex items-center justify-center rounded-full p-2 transition-all duration-200 hover:scale-110 hover:bg-white/15 active:scale-95"
 									>
 										<div className="flex size-5 items-center justify-center">
-											{typeof item.icon === "function" ? (
-												<item.icon size={20} />
-											) : (
-												item.icon
-											)}
+											{typeof item.icon === "function"
+												? React.createElement(item.icon, { size: 20 })
+												: (item.icon as React.ReactNode)}
 										</div>
 									</button>
 								</Tooltip.Trigger>
