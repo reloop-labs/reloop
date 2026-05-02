@@ -2,15 +2,12 @@
 
 import { FullEmailBuilder } from "./components/editor";
 import { EditorProvider } from "./components/editor-provider";
+import { FloatingMenu } from "./components/floating-menu";
 import { EmailInspector } from "./components/inspector";
 import { SendDetails } from "./components/send-details";
 import { useEditorHook } from "./components/use-editor-hooks";
 
 const Page = () => {
-	const editor = useEditorHook();
-
-	if (!editor) return null;
-
 	return (
 		<EditorProvider>
 			<div className="flex h-screen overflow-hidden bg-bg-weak-50 dark:bg-black">
@@ -21,6 +18,7 @@ const Page = () => {
 					<main className="hide-scrollbar relative flex flex-1 flex-col overflow-y-auto rounded-xl">
 						<SendDetails />
 						<FullEmailBuilder />
+						<FloatingMenu />
 					</main>
 				</div>
 

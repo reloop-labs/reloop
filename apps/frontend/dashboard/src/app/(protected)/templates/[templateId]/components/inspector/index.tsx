@@ -5,8 +5,8 @@ import * as Button from "@reloop/ui/button";
 import * as CompactButton from "@reloop/ui/compact-button";
 import * as DividerPrimitive from "@reloop/ui/divider";
 import * as InputPrimitive from "@reloop/ui/input";
+import { useCurrentEditor } from "@tiptap/react";
 import { useState } from "react";
-import { useEditorHook } from "../use-editor-hooks";
 import Breadcrumb from "./breadcrumb";
 import { ColorPicker } from "./color-picker";
 import { ImageSrcControl } from "./image-src-control";
@@ -394,7 +394,7 @@ function DocumentPanel() {
 /* ------------------------------------------------------------------ */
 export const EmailInspector = () => {
 	const [activeNodeType, setActiveNodeType] = useState<NodeTypePill>("Body");
-	const editor = useEditorHook();
+	const { editor } = useCurrentEditor();
 	if (!editor) return null;
 	return (
 		<aside className="flex">
