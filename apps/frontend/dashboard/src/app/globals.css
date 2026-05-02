@@ -29,3 +29,12 @@ body {
 	-webkit-text-stroke: 1.5px var(--color-gray-300);
 	-webkit-text-fill-color: transparent;
 }
+
+/* Tiptap Placeholder */
+.tiptap p.is-empty::before {
+	color: var(--color-text-soft-400);
+	content: attr(data-placeholder);
+	float: left;
+	height: 0;
+	pointer-events: none;
+}

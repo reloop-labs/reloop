@@ -10,7 +10,6 @@ export function FullEmailBuilder() {
 	return (
 		<EditorContent
 			editor={editor}
-			placeholder="Press '/' for commands..."
 			className="mx-auto h-full rounded-md bg-white"
 		/>
 	);
