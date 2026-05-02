@@ -1,14 +1,14 @@
 import { authMiddleware } from "@be/template/middleware/auth";
-import { getTemplate } from "@be/template/routes/template/controllers";
 import { Elysia, t } from "elysia";
+import { deleteTemplate } from "./delete-template.controllers";
 
-export const getTemplateRoute = new Elysia().use(authMiddleware).get(
+export const deleteTemplateRoute = new Elysia().use(authMiddleware).delete(
 	"/:id",
 	async ({ params, user }) => {
 		const { activeOrganizationId: organizationId } = user;
 		const { id } = params;
 
-		const result = await getTemplate({
+		const result = await deleteTemplate({
 			id,
 			organizationId,
 		});
@@ -22,8 +22,8 @@ export const getTemplateRoute = new Elysia().use(authMiddleware).get(
 		}),
 		detail: {
 			tags: ["Templates"],
-			summary: "Get template by ID",
-			description: "Retrieves a single template by its ID",
+			summary: "Delete template",
+			description: "Soft deletes a template",
 		},
 	},
 );

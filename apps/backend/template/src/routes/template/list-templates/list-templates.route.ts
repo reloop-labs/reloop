@@ -1,6 +1,6 @@
 import { authMiddleware } from "@be/template/middleware/auth";
-import { listTemplates } from "@be/template/routes/template/controllers";
 import { Elysia, t } from "elysia";
+import { listTemplates } from "./list-templates.controllers";
 
 export const listTemplatesRoute = new Elysia().use(authMiddleware).get(
 	"/list",

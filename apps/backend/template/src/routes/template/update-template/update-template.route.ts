@@ -1,6 +1,6 @@
 import { authMiddleware } from "@be/template/middleware/auth";
-import { updateTemplate } from "@be/template/routes/template/controllers";
 import { Elysia, t } from "elysia";
+import { updateTemplate } from "./update-template.controllers";
 
 export const updateTemplateRoute = new Elysia().use(authMiddleware).put(
 	"/:id",

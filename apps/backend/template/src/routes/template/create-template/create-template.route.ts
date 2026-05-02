@@ -1,6 +1,6 @@
 import { authMiddleware } from "@be/template/middleware/auth";
-import { createTemplate } from "@be/template/routes/template/controllers";
 import { Elysia, t } from "elysia";
+import { createTemplate } from "./create-template.controllers";
 
 export const createTemplateRoute = new Elysia().use(authMiddleware).post(
 	"/create",
