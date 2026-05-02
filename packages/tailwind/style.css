@@ -1057,3 +1057,12 @@
 .animate-spinnerFade {
 	animation: spinnerFade 1.2s linear infinite;
 }
+
+.hide-scrollbar {
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+	display: none;
+}
