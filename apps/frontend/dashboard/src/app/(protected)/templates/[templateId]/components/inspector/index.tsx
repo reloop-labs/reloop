@@ -7,13 +7,8 @@ import {
 	AlignLeft,
 	AlignRight,
 	Bold,
-	FileText,
 	Italic,
-	Move,
-	Paintbrush,
-	Square,
 	Strikethrough,
-	Type,
 	Underline,
 } from "lucide-react";
 import { useState } from "react";
@@ -21,11 +16,11 @@ import Breadcrumb from "./breadcrumb";
 import { ColorPicker } from "./color-picker";
 import { ImageSrcControl } from "./image-src-control";
 import { MarkButton } from "./mark-button";
+import { type NodeTypePill, NodeTypePills } from "./node-type-pills";
 import { NumInput } from "./num-input";
 import { PropRow } from "./prop-row";
 import { SectionHeader } from "./section-header";
 import { SpacingControl } from "./spacing-control";
-import { type NodeTypePill, NodeTypePills } from "./node-type-pills";
 import { UrlInput } from "./url-input";
 
 /* ------------------------------------------------------------------ */
@@ -78,7 +73,7 @@ export const EmailInspector = () => {
 			<Breadcrumb />
 
 			{/* ── All sections in one flat scroll container ── */}
-			<div className="flex flex-col divide-y divide-stroke-soft-200 px-4 pb-6">
+			<div className="flex flex-col divide-y divide-stroke-soft-200 pb-6">
 				{/* ── Text card ── */}
 				<Inspector.Text>
 					{({
@@ -96,9 +91,11 @@ export const EmailInspector = () => {
 							{/* Node-type segmented pills — only for text nodes */}
 							<Inspector.Node>
 								{({ nodeType }) => {
-									const isTextRelated = ["text", "paragraph", "heading"].includes(
-										nodeType,
-									);
+									const isTextRelated = [
+										"text",
+										"paragraph",
+										"heading",
+									].includes(nodeType);
 									if (!isTextRelated) return null;
 									return (
 										<div className="px-4 pt-3 pb-2">
@@ -111,7 +108,7 @@ export const EmailInspector = () => {
 								}}
 							</Inspector.Node>
 
-							<SectionHeader label="Text" icon={Type} />
+							<SectionHeader label="Text" />
 
 							<ColorRow
 								label="Color"
@@ -141,7 +138,7 @@ export const EmailInspector = () => {
 							</PropRow>
 
 							{/* Marks + alignment row */}
-							<div className="flex items-center gap-2 px-4 pb-3 pt-1">
+							<div className="flex items-center gap-2 px-4 pt-1 pb-3">
 								<div className="flex items-center gap-1">
 									{MARK_OPTIONS.map(({ mark, icon, label }) => (
 										<MarkButton
@@ -188,9 +185,16 @@ export const EmailInspector = () => {
 
 				{/* ── Spacing + image + button node card ── */}
 				<Inspector.Node>
-					{({ nodeType, getStyle, setStyle, batchSetStyle, getAttr, setAttr }) => (
+					{({
+						nodeType,
+						getStyle,
+						setStyle,
+						batchSetStyle,
+						getAttr,
+						setAttr,
+					}) => (
 						<InspectorSection>
-							<SectionHeader label="Spacing" icon={Move} />
+							<SectionHeader label="Spacing" />
 
 							<ColorRow
 								label="Background"
@@ -250,7 +254,7 @@ export const EmailInspector = () => {
 				<Inspector.Node>
 					{({ getStyle, setStyle }) => (
 						<InspectorSection>
-							<SectionHeader label="Background" icon={Paintbrush} />
+							<SectionHeader label="Background" />
 							<ColorRow
 								label="Color"
 								value={String(getStyle("backgroundColor") ?? "")}
@@ -265,7 +269,7 @@ export const EmailInspector = () => {
 				<Inspector.Node>
 					{({ getStyle, setStyle }) => (
 						<InspectorSection>
-							<SectionHeader label="Border" icon={Square} />
+							<SectionHeader label="Border" />
 							<ColorRow
 								label="Color"
 								value={String(getStyle("borderColor") ?? "")}
@@ -287,7 +291,7 @@ export const EmailInspector = () => {
 				<Inspector.Document>
 					{({ findStyleValue, setGlobalStyle }) => (
 						<InspectorSection>
-							<SectionHeader label="Document" icon={FileText} />
+							<SectionHeader label="Body" />
 							<ColorRow
 								label="Background"
 								value={String(findStyleValue("body", "backgroundColor") ?? "")}
@@ -303,7 +307,9 @@ export const EmailInspector = () => {
 							<PropRow label="Border radius">
 								<NumInput
 									value={findStyleValue("container", "borderRadius")}
-									onChange={(v) => setGlobalStyle("container", "borderRadius", v)}
+									onChange={(v) =>
+										setGlobalStyle("container", "borderRadius", v)
+									}
 									unit="px"
 								/>
 							</PropRow>
@@ -312,7 +318,9 @@ export const EmailInspector = () => {
 								value={String(
 									findStyleValue("container", "backgroundColor") ?? "",
 								)}
-								onChange={(v) => setGlobalStyle("container", "backgroundColor", v)}
+								onChange={(v) =>
+									setGlobalStyle("container", "backgroundColor", v)
+								}
 							/>
 							<PropRow label="Line height">
 								<NumInput
