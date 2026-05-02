@@ -195,4 +195,26 @@ export const source = {
 		};
 		return getSlugs(docsDir);
 	},
+	findNeighbor: (url: string) => {
+		const tree = buildTree(docsDir);
+		const pages: PageNode[] = [];
+
+		const flatten = (items: PageTreeItem[]) => {
+			for (const item of items) {
+				if (item.type === "page") {
+					pages.push(item);
+				} else if (item.type === "folder") {
+					flatten(item.children);
+				}
+			}
+		};
+
+		flatten(tree);
+		const index = pages.findIndex((p) => p.url === url);
+
+		return {
+			previous: index > 0 ? pages[index - 1] : undefined,
+			next: index < pages.length - 1 ? pages[index + 1] : undefined,
+		};
+	},
 };

@@ -5,8 +5,7 @@ description: "Webhook event triggered when a contact is deleted."
 ---
 
 <SideBySide>
-  <>
-
+  <Side>
     The `contact.deleted` event is triggered when a contact is permanently removed from one of your audiences.
 
     ## Event Details
@@ -26,10 +25,9 @@ description: "Webhook event triggered when a contact is deleted."
     - Purge the contact from your local cache or database.
     - Stop any active communication threads.
     - Update your audience metrics.
-  </>
+  </Side>
 
-  <>
-
+  <Side>
     ```json
     {
       "type": "contact.deleted",
@@ -41,7 +39,7 @@ description: "Webhook event triggered when a contact is deleted."
       }
     }
     ```
-  </>
+  </Side>
 </SideBySide>
 
 ## Learn More
