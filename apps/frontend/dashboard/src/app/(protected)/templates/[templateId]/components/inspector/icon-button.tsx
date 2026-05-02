@@ -1,3 +1,4 @@
+import * as Button from "@reloop/ui/button";
 import React from "react";
 
 export interface IconButtonProps {
@@ -18,18 +19,19 @@ export function IconButton({
 	className = "",
 }: IconButtonProps) {
 	return (
-		<button
+		<Button.Root
 			type="button"
 			title={title}
 			disabled={disabled}
 			onClick={onClick}
-			className={`flex h-6 w-6 items-center justify-center rounded border transition-colors disabled:pointer-events-none disabled:opacity-40 ${
-				active
-					? "border-(--re-text) bg-(--re-text) text-(--re-bg)"
-					: "border-(--re-border) bg-transparent text-(--re-text)"
-			} ${className}`}
+			size="xxsmall"
+			variant="neutral"
+			mode={active ? "filled" : "stroke"}
+			className={`h-6 w-6 p-0 ${className}`}
 		>
-			{children}
-		</button>
+			<Button.Icon asChild className="size-3.5">
+				{children}
+			</Button.Icon>
+		</Button.Root>
 	);
 }

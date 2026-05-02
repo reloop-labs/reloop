@@ -1,3 +1,5 @@
+import * as Input from "@reloop/ui/input";
+
 export function NumberField({
 	value,
 	onChange,
@@ -9,15 +11,18 @@ export function NumberField({
 }) {
 	return (
 		<span className="flex items-center gap-1">
-			<input
-				type="number"
-				value={value ?? ""}
-				onChange={(e) => {
-					const raw = e.target.value;
-					onChange(raw === "" ? "" : Number.parseFloat(raw));
-				}}
-				className="w-14 rounded border border-(--re-border) bg-transparent px-1 py-0.5 text-xs"
-			/>
+			<Input.Root size="xsmall" className="w-16">
+				<Input.Wrapper>
+					<Input.Input
+						type="number"
+						value={value ?? ""}
+						onChange={(e) => {
+							const raw = e.target.value;
+							onChange(raw === "" ? "" : Number.parseFloat(raw));
+						}}
+					/>
+				</Input.Wrapper>
+			</Input.Root>
 			{unit && <span className="text-(--re-text-muted)">{unit}</span>}
 		</span>
 	);

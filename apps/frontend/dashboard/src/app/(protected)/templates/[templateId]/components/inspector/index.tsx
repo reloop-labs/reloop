@@ -7,6 +7,7 @@ import * as DividerPrimitive from "@reloop/ui/divider";
 import * as InputPrimitive from "@reloop/ui/input";
 import { useState } from "react";
 import { useEditorHook } from "../use-editor-hooks";
+import Breadcrumb from "./breadcrumb";
 import { ColorPicker } from "./color-picker";
 import { ImageSrcControl } from "./image-src-control";
 import { MarkButton } from "./mark-button";
@@ -426,11 +427,11 @@ export const EmailInspector = () => {
 	const editor = useEditorHook();
 	if (!editor) return null;
 	return (
-		<aside className="flex w-72 shrink-0 flex-col overflow-y-auto bg-bg-white-0 text-xs">
+		<aside className="flex w-72 shrink-0 flex-col overflow-y-auto">
 			<Inspector.Root>
 				{/* ── Header bar: breadcrumb + collapse icon ── */}
 				<div className="flex items-center justify-between border-stroke-soft-200 border-b px-4 py-3">
-					<Inspector.Breadcrumb />
+					<Breadcrumb />
 					<CompactButton.Root variant="ghost" size="medium">
 						<CompactButton.Icon>
 							<svg

@@ -1,3 +1,5 @@
+import * as Input from "@reloop/ui/input";
+
 export function TextInput({
 	value,
 	onChange,
@@ -10,13 +12,16 @@ export function TextInput({
 	disabled?: boolean;
 }) {
 	return (
-		<input
-			type="text"
-			value={value}
-			onChange={(e) => onChange(e.target.value)}
-			placeholder={placeholder}
-			disabled={disabled}
-			className="w-full rounded border border-(--re-border) bg-transparent px-1.5 py-1 text-xs placeholder:text-(--re-text-muted) disabled:opacity-50"
-		/>
+		<Input.Root size="xsmall">
+			<Input.Wrapper>
+				<Input.Input
+					type="text"
+					value={value}
+					onChange={(e) => onChange(e.target.value)}
+					placeholder={placeholder}
+					disabled={disabled}
+				/>
+			</Input.Wrapper>
+		</Input.Root>
 	);
 }

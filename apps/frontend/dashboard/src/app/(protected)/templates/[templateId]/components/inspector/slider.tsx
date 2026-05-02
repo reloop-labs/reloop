@@ -1,3 +1,5 @@
+import * as SliderUI from "@reloop/ui/slider";
+
 export function Slider({
 	value,
 	onChange,
@@ -14,16 +16,21 @@ export function Slider({
 	unit?: string;
 }) {
 	return (
-		<span className="flex items-center gap-1.5 w-full">
-			<input
-				type="range"
+		<span className="flex items-center gap-2.5 w-full">
+			<SliderUI.Root
+				value={[value]}
+				onValueChange={([v]) => {
+					if (v !== undefined) {
+						onChange(v);
+					}
+				}}
 				min={min}
 				max={max}
 				step={step}
-				value={value}
-				onChange={(e) => onChange(Number(e.target.value))}
-				className="h-1 flex-1 cursor-pointer accent-(--re-text)"
-			/>
+				className="flex-1"
+			>
+				<SliderUI.Thumb />
+			</SliderUI.Root>
 			<span className="w-8 text-right text-xs tabular-nums text-(--re-text-muted)">
 				{value}
 				{unit}

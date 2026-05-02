@@ -1,3 +1,5 @@
+import * as Select from "@reloop/ui/select";
+
 export interface SelectOption {
 	label: string;
 	value: string;
@@ -15,21 +17,17 @@ export function SelectField({
 	placeholder?: string;
 }) {
 	return (
-		<select
-			value={value}
-			onChange={(e) => onChange(e.target.value)}
-			className="w-full rounded border border-(--re-border) bg-transparent px-1 py-0.5 text-xs text-(--re-text) cursor-pointer"
-		>
-			{placeholder && (
-				<option value="" disabled>
-					{placeholder}
-				</option>
-			)}
-			{options.map((opt) => (
-				<option key={opt.value} value={opt.value}>
-					{opt.label}
-				</option>
-			))}
-		</select>
+		<Select.Root size="xsmall" value={value} onValueChange={onChange}>
+			<Select.Trigger className="w-full">
+				<Select.Value placeholder={placeholder} />
+			</Select.Trigger>
+			<Select.Content>
+				{options.map((opt) => (
+					<Select.Item key={opt.value} value={opt.value}>
+						{opt.label}
+					</Select.Item>
+				))}
+			</Select.Content>
+		</Select.Root>
 	);
 }
