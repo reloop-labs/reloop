@@ -146,7 +146,7 @@ const DomainDropdown = ({ value, onChange }: DomainDropdownProps) => {
 	);
 };
 
-export const CenterHeader = () => {
+export const SendDetails = () => {
 	const senderName = useEditorStore((s) => s.senderName);
 	const setSenderName = useEditorStore((s) => s.setSenderName);
 	const fromEmail = useEditorStore((s) => s.fromEmail);
@@ -165,7 +165,7 @@ export const CenterHeader = () => {
 	const [ref, bounds] = useMeasure();
 
 	return (
-		<div className="relative mx-auto mt-4 w-full max-w-xl rounded-2xl border border-stroke-soft-100/50">
+		<div className="relative mx-auto mt-4 w-full max-w-2xl rounded-2xl border border-stroke-soft-100/50">
 			<Button.Root
 				onClick={() => setShowDetails(!showDetails)}
 				mode="ghost"
