@@ -31,7 +31,7 @@ export function LanguageBadges({
 							"inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1.5 text-label-xs transition-all duration-150",
 							isActive
 								? "border-stroke-strong-950 bg-bg-strong-950 text-text-white-0"
-								: "border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 hover:border-stroke-soft-300 hover:text-text-strong-950 dark:border-stroke-soft-100/40",
+								: "border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 hover:border-stroke-sub-300 hover:text-text-strong-950 dark:border-stroke-soft-100/40",
 						)}
 					>
 						<svg

@@ -11,7 +11,10 @@ export function NumberField({
 }) {
 	return (
 		<span className="flex items-center gap-1">
-			<Input.Root size="xsmall" className="w-16">
+			<Input.Root
+				size="xsmall"
+				className="w-16 border border-stroke-sub-300 shadow-none before:hidden"
+			>
 				<Input.Wrapper>
 					<Input.Input
 						type="number"

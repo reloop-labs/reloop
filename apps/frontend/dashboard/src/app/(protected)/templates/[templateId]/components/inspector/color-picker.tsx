@@ -49,7 +49,10 @@ export function ColorPicker({
 							</ColorPickerUI.Slider>
 							<div className="flex items-center gap-2">
 								<ColorPickerUI.Swatch color={value} />
-								<Input.Root size="xsmall" className="flex-1">
+								<Input.Root
+									size="xsmall"
+									className="flex-1 border border-stroke-sub-300 shadow-none before:hidden"
+								>
 									<Input.Wrapper>
 										<Input.Input
 											value={value}
@@ -62,7 +65,10 @@ export function ColorPicker({
 					</ColorPickerUI.Root>
 				</Popover.Content>
 			</Popover.Root>
-			<Input.Root size="xsmall" className="w-24">
+			<Input.Root
+				size="xsmall"
+				className="w-24 border border-stroke-sub-300 shadow-none before:hidden"
+			>
 				<Input.Wrapper>
 					<Input.Input
 						value={value}

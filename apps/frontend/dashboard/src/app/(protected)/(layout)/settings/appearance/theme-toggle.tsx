@@ -83,7 +83,7 @@ export function ThemeToggleAppearance() {
 									"flex h-3.5 w-3.5 items-center justify-center rounded-full border-[1.5px]",
 									theme === option.value
 										? "border-text-main-900 dark:border-white"
-										: "border-stroke-soft-300 dark:border-stroke-soft-500",
+										: "border-stroke-sub-300 dark:border-stroke-soft-500",
 								)}
 							>
 								{theme === option.value && (

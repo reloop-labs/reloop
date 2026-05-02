@@ -15,10 +15,12 @@ export function NumInput({
 	unit?: string;
 }) {
 	return (
-		<InputPrimitive.Root size="xsmall" className="flex-1">
+		<InputPrimitive.Root
+			size="xsmall"
+			className="flex-1 rounded-xl border border-stroke-sub-300 shadow-none before:hidden"
+		>
 			<InputPrimitive.Wrapper>
 				<InputPrimitive.Input
-					type="number"
 					placeholder={placeholder ?? "0"}
 					value={value ?? ""}
 					onChange={(e) => {

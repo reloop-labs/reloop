@@ -12,7 +12,10 @@ export function TextInput({
 	disabled?: boolean;
 }) {
 	return (
-		<Input.Root size="xsmall">
+		<Input.Root
+			size="xsmall"
+			className="border border-stroke-sub-300 shadow-none before:hidden"
+		>
 			<Input.Wrapper>
 				<Input.Input
 					type="text"

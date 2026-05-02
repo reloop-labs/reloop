@@ -1,3 +1,5 @@
+import * as InputPrimitive from "@reloop/ui/input";
+
 export function UrlInput({
 	value,
 	onChange,
@@ -11,20 +13,26 @@ export function UrlInput({
 
 	return (
 		<span className="flex w-full items-center gap-1">
-			<input
-				type="url"
-				value={value}
-				onChange={(e) => onChange(e.target.value)}
-				placeholder={placeholder}
-				className="min-w-0 flex-1 rounded border border-(--re-border) bg-transparent px-1.5 py-1 text-xs placeholder:text-(--re-text-muted)"
-			/>
+			<InputPrimitive.Root
+				size="xsmall"
+				className="flex-1 rounded-2xl border border-stroke-sub-300 shadow-none before:hidden"
+			>
+				<InputPrimitive.Wrapper>
+					<InputPrimitive.Input
+						type="url"
+						value={value}
+						onChange={(e) => onChange(e.target.value)}
+						placeholder={placeholder}
+					/>
+				</InputPrimitive.Wrapper>
+			</InputPrimitive.Root>
 			{isValid && (
 				<a
 					href={value}
 					target="_blank"
 					rel="noopener noreferrer"
 					title="Open link"
-					className="shrink-0 text-(--re-text-muted) hover:text-(--re-text) transition-colors"
+					className="shrink-0 text-(--re-text-muted) transition-colors hover:text-(--re-text)"
 				>
 					{/* external-link icon via SVG */}
 					<svg
