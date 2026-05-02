@@ -30,7 +30,7 @@ export function AlignControls({
 					aria-label={label}
 					data-state={alignment === a ? "on" : "off"}
 					onClick={() => setAlignment(a as Alignment)}
-					className="flex-1 first:rounded-l-xl last:rounded-r-xl"
+					className="h-10 flex-1 first:rounded-l-xl last:rounded-r-xl"
 				>
 					<Icon className="h-4 w-4" strokeWidth={2} />
 				</ButtonGroup.Item>

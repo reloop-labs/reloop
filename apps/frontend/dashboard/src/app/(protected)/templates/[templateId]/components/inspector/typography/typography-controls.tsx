@@ -18,7 +18,7 @@ export function TypographyControls({
 	setAlignment: (alignment: Alignment) => void;
 }) {
 	return (
-		<div className="flex flex-col gap-2 px-4 pt-2 pb-4">
+		<div className="flex flex-col gap-3 px-4 pt-2 pb-4">
 			<MarkControls marks={marks} toggleMark={toggleMark} />
 			<ListControls />
 			<AlignControls alignment={alignment} setAlignment={setAlignment} />
