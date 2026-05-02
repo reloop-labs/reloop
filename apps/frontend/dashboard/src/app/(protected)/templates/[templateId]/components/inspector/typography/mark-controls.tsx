@@ -1,6 +1,8 @@
 import * as ButtonGroup from "@reloop/ui/button-group";
 import {
 	Bold,
+	CaseLower,
+	CaseUpper,
 	Italic,
 	Strikethrough,
 	Type,
@@ -53,15 +55,25 @@ export function MarkControls({
 				<Strikethrough className="h-4 w-4" />
 			</ButtonGroup.Item>
 			<ButtonGroup.Item
-				title="Capitalize"
-				aria-label="Capitalize"
-				data-state={marks.case ? "on" : "off"}
-				onClick={() => toggleMark("case")}
+				title={
+					marks.uppercase ? "Uppercase" : marks.lowercase ? "Lowercase" : "Case"
+				}
+				aria-label="Toggle Case"
+				data-state={marks.uppercase || marks.lowercase ? "on" : "off"}
+				onClick={() => {
+					if (marks.uppercase) {
+						toggleMark("uppercase");
+						toggleMark("lowercase");
+					} else if (marks.lowercase) {
+						toggleMark("lowercase");
+					} else {
+						toggleMark("uppercase");
+					}
+				}}
 				className="h-10 flex-1 first:rounded-l-xl last:rounded-r-xl"
 			>
-				<Type className="h-4 w-4" />
+				<CaseUpper className="h-4 w-4" />
 			</ButtonGroup.Item>
 		</ButtonGroup.Root>
 	);
 }
-
