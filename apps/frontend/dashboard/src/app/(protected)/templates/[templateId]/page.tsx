@@ -1,12 +1,4 @@
 "use client";
-import dynamic from "next/dynamic";
-
-const InspectorCustom = dynamic(
-	() => import("./editor/aa").then((mod) => mod.StandaloneEditorFull),
-	{
-		ssr: false,
-	},
-);
 
 import { CenterHeader } from "./components/center-header";
 import { TemplateInspector } from "./components/template-inspector";
@@ -26,7 +18,7 @@ const Page = () => {
 					<div className="flex-1 overflow-y-auto p-8">
 						{/* Editor content will go here */}
 						<div className="mx-auto max-w-2xl text-text-soft-400">
-							<InspectorCustom />
+							<p>sddsdklj</p>
 						</div>
 					</div>
 				</main>
