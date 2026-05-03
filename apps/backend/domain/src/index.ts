@@ -32,7 +32,7 @@ createBullBoard({
 	},
 });
 
-const emailService = new Elysia({
+const domainService = new Elysia({
 	prefix: "/api/domain",
 	name: "Domain Service",
 })
@@ -71,4 +71,4 @@ const emailService = new Elysia({
 		);
 	});
 
-export type EmailService = typeof emailService;
+export type DomainService = typeof domainService;

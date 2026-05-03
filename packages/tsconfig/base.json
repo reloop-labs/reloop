@@ -24,7 +24,6 @@
 			"@reloop/webhook-events/*": ["../../packages/webhook-events/src/*"],
 			"@reloop/apikey": ["../../packages/apikey/src/index.ts"],
 			"@reloop/template": ["../../apps/backend/template/src/*"],
-			"@be/domain": ["../../apps/backend/domain/src/*"],
 			"@be/workflow": ["../../apps/backend/workflow/src/*"],
 			"@reloop/webhook": ["../../apps/backend/webhook/src/*"],
 			"@reloop/audience": ["../../apps/backend/audience/src/*"],
