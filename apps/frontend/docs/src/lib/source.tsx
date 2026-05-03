@@ -3,7 +3,7 @@ import path from "node:path";
 import matter from "gray-matter";
 import type { MDXComponents } from "mdx/types";
 import { MDXRemote } from "next-mdx-remote/rsc";
-import type { PageTreeItem, TOCItem } from "./types";
+import type { PageTreeItem, TOCItem, PageNode } from "./types";
 
 const docsDir = path.join(process.cwd(), "content/docs");
 
