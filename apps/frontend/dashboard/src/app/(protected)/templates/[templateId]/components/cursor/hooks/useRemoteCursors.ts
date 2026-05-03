@@ -7,6 +7,7 @@ export interface RemoteCursor {
   clientId: number;
   name: string;
   color: string;
+  avatar?: string;
   x: number; // percentage
   y: number; // percentage
 }
@@ -31,6 +32,7 @@ export function useRemoteCursors(
           clientId,
           name: state.user.name,
           color: state.user.color,
+          avatar: state.user.avatar,
           x,
           y,
         });

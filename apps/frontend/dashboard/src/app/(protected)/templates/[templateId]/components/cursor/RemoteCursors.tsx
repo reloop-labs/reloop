@@ -9,7 +9,11 @@ interface RemoteCursorsProps {
 
 // Memoized so only the specific cursor that moved re-renders,
 // not the whole list on every awareness update.
-const CursorDot = memo(function CursorDot({ cursor }: { cursor: RemoteCursor }) {
+const CursorDot = memo(function CursorDot({
+	cursor,
+}: {
+	cursor: RemoteCursor;
+}) {
 	return (
 		<div
 			className="pointer-events-none absolute z-50"
@@ -37,7 +41,7 @@ const CursorDot = memo(function CursorDot({ cursor }: { cursor: RemoteCursor }) 
 				/>
 			</svg>
 			<div
-				className="absolute top-4 left-4 whitespace-nowrap rounded-full px-2 py-0.5 font-medium text-white text-[10px] shadow-sm"
+				className="absolute top-4 left-4 whitespace-nowrap rounded-full px-2 py-0.5 font-medium text-[10px] text-white shadow-sm"
 				style={{ backgroundColor: cursor.color }}
 			>
 				{cursor.name}
