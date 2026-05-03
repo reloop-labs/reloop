@@ -1,0 +1,98 @@
+import * as encoding from "lib0/encoding";
+import * as map from "lib0/map";
+import * as awarenessProtocol from "y-protocols/awareness";
+import * as Y from "yjs";
+
+// ── Message type constants (y-websocket protocol) ──────────────────────────
+export const MESSAGE_SYNC = 0;
+export const MESSAGE_AWARENESS = 1;
+
+export interface CollabClient {
+  readyState: number;
+  raw: {
+    send(message: Uint8Array): void;
+  };
+}
+
+// ── Room type ──────────────────────────────────────────────────────────────
+export interface Room {
+  doc: Y.Doc;
+  awareness: awarenessProtocol.Awareness;
+  clients: Set<CollabClient>;
+  lastActivity: number;
+}
+
+// ── In-memory room registry ────────────────────────────────────────────────
+export const rooms = new Map<string, Room>();
+
+export const getRoom = (roomName: string): Room => {
+  return map.setIfUndefined(rooms, roomName, () => {
+    const doc = new Y.Doc();
+    const awareness = new awarenessProtocol.Awareness(doc);
+
+    // When any client's awareness changes (cursor, presence),
+    // broadcast the update to every other client in the room
+    awareness.on(
+      "update",
+      ({
+        added,
+        updated,
+        removed,
+      }: {
+        added: number[];
+        updated: number[];
+        removed: number[];
+      }) => {
+        const changedClients = [...added, ...updated, ...removed];
+        const room = rooms.get(roomName);
+        if (!room) return;
+
+        const encoder = encoding.createEncoder();
+        encoding.writeVarUint(encoder, MESSAGE_AWARENESS);
+        encoding.writeVarUint8Array(
+          encoder,
+          awarenessProtocol.encodeAwarenessUpdate(awareness, changedClients),
+        );
+        const message = encoding.toUint8Array(encoder);
+
+        room.clients.forEach((client) => {
+          if (client.readyState === 1) {
+            client.raw.send(message);
+          }
+        });
+      },
+    );
+
+    return {
+      doc,
+      awareness,
+      clients: new Set(),
+      lastActivity: Date.now(),
+    };
+  });
+};
+
+export const getAllRooms = () => rooms;
+
+/** Reverse-lookup room name from room object */
+export function getRoomName(room: Room): string | undefined {
+  for (const [name, r] of rooms.entries()) {
+    if (r === room) return name;
+  }
+  return undefined;
+}
+
+/** Schedule room cleanup after inactivity */
+export function scheduleRoomCleanup(roomName: string) {
+  setTimeout(
+    () => {
+      const room = rooms.get(roomName);
+      if (room && room.clients.size === 0) {
+        room.doc.destroy();
+        rooms.delete(roomName);
+        console.log(`[collab] Room "${roomName}" destroyed (inactive)`);
+      }
+    },
+    5 * 60 * 1000, // 5 minutes
+  );
+}

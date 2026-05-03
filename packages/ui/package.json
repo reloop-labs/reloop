@@ -51,7 +51,6 @@
 		"./kbd-command": "./src/components/kbd-command.tsx",
 		"./kbd-key": "./src/components/kbd-key.tsx",
 		"./form": "./src/components/form.tsx",
-		"./editor": "./src/components/editor/index.tsx",
 		"./globals.css": "./src/globals.css",
 		"./hover-card": "./src/components/hover-card.tsx",
 		"./icons": "./src/components/icons.tsx",
@@ -125,10 +124,7 @@
 		"sonner": "catalog:ui",
 		"tailwind-merge": "catalog:ui",
 		"tailwind-variants": "catalog:ui",
-		"tailwindcss": "catalog:ui",
-		"@react-email/editor": "catalog:ui",
-		"@tiptap/react": "catalog:ui",
-		"@tiptap/starter-kit": "catalog:ui"
+		"tailwindcss": "catalog:ui"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",

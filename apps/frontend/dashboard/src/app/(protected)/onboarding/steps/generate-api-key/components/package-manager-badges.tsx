@@ -29,7 +29,7 @@ export function PackageManagerBadges({
 						"inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-label-xs transition-all duration-150",
 						value === m.id
 							? "border-stroke-strong-950 bg-bg-strong-950 text-text-white-0"
-							: "border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 hover:border-stroke-soft-300 hover:text-text-strong-950",
+							: "border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 hover:border-stroke-sub-300 hover:text-text-strong-950",
 					)}
 				>
 					<svg
