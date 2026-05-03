@@ -13,9 +13,9 @@
 		"jsx": "react-jsx",
 		"declaration": false,
 		"declarationMap": false,
-		"baseUrl": ".",
+		"baseUrl": "./src",
 		"paths": {
-			"@be/domain/*": ["./src/*"]
+			"@be/domain/*": ["./*"]
 		}
 	}
 }
