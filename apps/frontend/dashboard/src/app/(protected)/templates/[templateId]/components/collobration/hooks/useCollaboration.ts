@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { IndexeddbPersistence } from "y-indexeddb";
 import { WebsocketProvider } from "y-websocket";
 import * as Y from "yjs";
 
@@ -38,7 +37,6 @@ export interface UseCollaborationReturn {
   isSynced: boolean;
   awarenessUsers: AwarenessUser[];
   connectionStatus: ConnectionStatus;
-  /** Flush debounce and call onUpdate immediately */
   save: () => void;
 }
 
@@ -78,10 +76,8 @@ export function useCollaboration({
     useState<ConnectionStatus>("connecting");
   const [awarenessUsers, setAwarenessUsers] = useState<AwarenessUser[]>([]);
 
-  // Refs so we can return stable references and clean up properly
   const ydocRef = useRef<Y.Doc | null>(null);
   const providerRef = useRef<WebsocketProvider | null>(null);
-  const idbRef = useRef<IndexeddbPersistence | null>(null);
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onUpdateRef = useRef(onUpdate);
   onUpdateRef.current = onUpdate;
@@ -100,14 +96,9 @@ export function useCollaboration({
     const ydoc = new Y.Doc();
     ydocRef.current = ydoc;
 
-    // ── IndexedDB (offline support) ───────────────────────────────────
-    const idb = new IndexeddbPersistence(`email-collab-${roomName}`, ydoc);
-    idbRef.current = idb;
-    idb.on("synced", () => {
-      console.log("[collab] IndexedDB synced");
-    });
-
     // ── WebSocket provider ────────────────────────────────────────────
+    // Durability is handled by the backend Redis persistence —
+    // no need for IndexedDB here.
     const provider = new WebsocketProvider(serverUrl, roomName, ydoc, {
       connect: true,
     });
@@ -133,7 +124,7 @@ export function useCollaboration({
       setConnectionStatus("error");
     });
 
-    // ── Awareness (presence / cursors) ────────────────────────────────
+    // ── Awareness (presence) ──────────────────────────────────────────
     provider.awareness.setLocalStateField("user", {
       name: user.name,
       color: user.color,
@@ -177,11 +168,9 @@ export function useCollaboration({
       ydoc.off("update", handleUpdate);
       provider.awareness.off("change", updateAwareness);
       provider.destroy();
-      idb.destroy();
       ydoc.destroy();
       ydocRef.current = null;
       providerRef.current = null;
-      idbRef.current = null;
     };
   }, [roomName, serverUrl, user.name, user.color, user.avatar, updateDebounce]);
 

@@ -25,7 +25,6 @@
 		"better-auth": "catalog:",
 		"boring-avatars": "catalog:ui",
 		"react-colorful": "catalog:ui",
-		"y-indexeddb": "catalog:ui",
 		"yjs": "catalog:ui",
 		"@tiptap/extension-collaboration": "catalog:ui",
 		"dayjs": "catalog:ui",
