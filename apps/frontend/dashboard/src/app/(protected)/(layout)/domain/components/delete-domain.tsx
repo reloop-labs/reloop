@@ -1,5 +1,5 @@
 "use client";
-import type { Domain } from "@reloop/api/types";
+import type { Domain } from "@fe/dashboard/types/api.types";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";

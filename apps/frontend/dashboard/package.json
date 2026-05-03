@@ -15,7 +15,6 @@
 		"@hookform/resolvers": "catalog:ui",
 		"@number-flow/react": "catalog:ui",
 		"@react-email/editor": "catalog:ui",
-		"@reloop/api": "workspace:*",
 		"@reloop/auth": "workspace:*",
 		"@reloop/tailwind": "workspace:*",
 		"@reloop/ui": "workspace:*",

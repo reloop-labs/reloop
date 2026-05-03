@@ -2,7 +2,7 @@
 
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
-import type { DomainListResponse } from "@reloop/api";
+import type { DomainListResponse } from "@fe/dashboard/types/api.types";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";

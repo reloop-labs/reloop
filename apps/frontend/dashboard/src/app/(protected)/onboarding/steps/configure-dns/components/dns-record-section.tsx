@@ -1,6 +1,6 @@
 "use client";
 
-import type { DNSRecord } from "@reloop/api/types";
+import type { DNSRecord } from "@fe/dashboard/types/api.types";
 import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
 import { DNSRecordTableMinimal } from "./dns-table-minimal";

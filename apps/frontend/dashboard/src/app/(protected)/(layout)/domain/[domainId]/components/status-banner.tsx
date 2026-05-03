@@ -1,6 +1,6 @@
 "use client";
 
-import type { DomainStatus } from "@reloop/api/types";
+import type { DomainStatus } from "@fe/dashboard/types/api.types";
 import * as Alert from "@reloop/ui/alert";
 import { Skeleton } from "@reloop/ui/skeleton";
 

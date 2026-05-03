@@ -1,5 +1,5 @@
 "use client";
-import type { DomainResponse } from "@reloop/api";
+import type { DomainResponse } from "@fe/dashboard/types/api.types";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as TabMenu from "@reloop/ui/tab-menu-horizontal";

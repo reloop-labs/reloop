@@ -1,6 +1,6 @@
 "use client";
 
-import type { DomainResponse } from "@reloop/api";
+import type { DomainResponse } from "@fe/dashboard/types/api.types";
 import * as Checkbox from "@reloop/ui/checkbox";
 import { useParams } from "next/navigation";
 import { useDomainActions } from "../hooks/use-domain-actions";

@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
-import type { Domain } from "@reloop/api/types";
+import type { Domain } from "@fe/dashboard/types/api.types";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";

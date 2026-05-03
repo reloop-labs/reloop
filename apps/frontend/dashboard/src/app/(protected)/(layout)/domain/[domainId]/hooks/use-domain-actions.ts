@@ -1,4 +1,4 @@
-import type { DomainResponse } from "@reloop/api";
+import type { DomainResponse } from "@fe/dashboard/types/api.types";
 import axios from "axios";
 import * as React from "react";
 import { toast } from "sonner";

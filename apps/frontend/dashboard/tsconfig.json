@@ -3,9 +3,7 @@
 	"compilerOptions": {
 		"baseUrl": ".",
 		"paths": {
-			"@fe/dashboard/*": ["./src/*"],
-			"@be/domain/*": ["../../backend/domain/src/*"],
-			"@be/workflow/*": ["../../backend/workflow/src/*"]
+			"@fe/dashboard/*": ["./src/*"]
 		}
 	},
 	"include": [

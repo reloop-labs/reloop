@@ -1,5 +1,5 @@
 "use client";
-import type { DomainListResponse } from "@reloop/api";
+import type { DomainListResponse } from "@fe/dashboard/types/api.types";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useRouter } from "next/navigation";

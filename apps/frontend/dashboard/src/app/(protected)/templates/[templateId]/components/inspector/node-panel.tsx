@@ -15,7 +15,7 @@ export function NodePanel() {
 		<Inspector.Node>
 			{({ nodeType, getStyle, setStyle, batchSetStyle, getAttr, setAttr }) => (
 				<div>
-					<SectionHeader label="Spacing" icon={Move} />
+					<SectionHeader label="Spacing" />
 
 					{/* Background colour */}
 					<ColorRow

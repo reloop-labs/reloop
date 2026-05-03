@@ -1,7 +1,7 @@
 "use client";
 
 import { valibotResolver } from "@hookform/resolvers/valibot";
-import type { DomainResponse } from "@reloop/api";
+import type { DomainResponse } from "@fe/dashboard/types/api.types";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";

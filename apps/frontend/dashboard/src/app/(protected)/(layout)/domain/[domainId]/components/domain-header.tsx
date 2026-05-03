@@ -4,7 +4,7 @@ import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-butto
 import { AnimatedClock } from "@fe/dashboard/components/animated-clock";
 import { getStatusColorClass, getStatusIcon } from "@fe/dashboard/utils/domain";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
-import type { Domain } from "@reloop/api/types";
+import type { Domain } from "@fe/dashboard/types/api.types";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";

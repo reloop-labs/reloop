@@ -1,7 +1,7 @@
 "use client";
 
-import type { DomainResponse } from "@reloop/api";
-import type { DNSRecord } from "@reloop/api/types";
+import type { DomainResponse } from "@fe/dashboard/types/api.types";
+import type { DNSRecord } from "@fe/dashboard/types/api.types";
 import { Icon } from "@reloop/ui/icon";
 import { DNSAutoConnectBanner } from "./dns-auto-connect-banner";
 import { groupDomainDnsRecords } from "./dns-record-groups";

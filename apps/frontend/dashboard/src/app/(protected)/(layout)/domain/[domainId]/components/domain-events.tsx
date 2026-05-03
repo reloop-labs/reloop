@@ -1,6 +1,6 @@
 "use client";
 
-import type { DomainResponse } from "@reloop/api";
+import type { DomainResponse } from "@fe/dashboard/types/api.types";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { StatusTimeline, StatusTimelineSkeleton } from "./status-timeline";

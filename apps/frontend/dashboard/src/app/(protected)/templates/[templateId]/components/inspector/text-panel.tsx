@@ -20,7 +20,6 @@ import { TypographyControls } from "./typography/typography-controls";
 /* Text panel                                                           */
 /* ------------------------------------------------------------------ */
 
-
 export function TextPanel() {
 	return (
 		<Inspector.Text>
@@ -36,7 +35,7 @@ export function TextPanel() {
 				setStyle,
 			}) => (
 				<div>
-					<SectionHeader label="Text" icon={Type} />
+					<SectionHeader label="Text" />
 
 					{/* Color */}
 					<ColorRow

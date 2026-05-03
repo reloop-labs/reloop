@@ -1,6 +1,6 @@
 "use client";
 
-import type { DomainNameserversResponse } from "@reloop/api";
+import type { DomainNameserversResponse } from "@fe/dashboard/types/api.types";
 import useSWR from "swr";
 
 import { DnsDeliverabilityTips } from "./dns-deliverability-tips";

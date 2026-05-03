@@ -1,5 +1,54 @@
 import type { DomainModel } from "@be/domain/model/domain.model";
-import type { Domain, DomainStatus } from "@reloop/api/types";
+
+export type DomainStatus =
+	| "start-verify"
+	| "verifying"
+	| "active"
+	| "suspended"
+	| "failed";
+
+export interface DNSRecord {
+	id: string;
+	domainId: string;
+	organizationId: string;
+	userId: string;
+	recordType: string;
+	recordTypeName: string;
+	domain: string;
+	name: string;
+	fqdn: string;
+	value: string;
+	ttl: string;
+	priority: number | null;
+	verificationError: string | null;
+	status: string;
+	createdAt: Date;
+	updatedAt: Date;
+	deletedAt: Date | null;
+}
+
+export interface Domain {
+	id: string;
+	domain: string;
+	organizationId: string;
+	userId: string;
+	domainType: "custom" | "subdomain" | "system";
+	status: DomainStatus;
+	userVerified: boolean;
+	systemVerified: boolean;
+	customReturnPath: string;
+	clickTracking: boolean;
+	openTracking: boolean;
+	tls: "opportunistic" | "enforced";
+	trackingDomain: boolean;
+	sendingEmail: boolean;
+	receivingEmail: boolean;
+	verificationFailedReason: string | null;
+	deletedAt: Date | null;
+	lastVerifiedAt: Date | null;
+	createdAt: Date;
+	updatedAt: Date;
+}
 
 export namespace DomainTypes {
 	export type DomainResponse = typeof DomainModel.domainResponse.static;
@@ -14,16 +63,9 @@ export namespace DomainTypes {
 	export type InvalidDomain = typeof DomainModel.invalidDomain.static;
 	export type Unauthorized = typeof DomainModel.unauthorized.static;
 
-	// Use centralized Domain type but with Date types for backend
-	export interface DomainData
-		extends Omit<
-			Domain,
-			"createdAt" | "updatedAt" | "deletedAt" | "lastVerifiedAt"
-		> {
-		deletedAt: Date | null;
-		lastVerifiedAt: Date | null;
-		createdAt: Date;
-		updatedAt: Date;
+	// Database entity type
+	export interface DomainData extends Domain {
+		dnsRecords?: DNSRecord[];
 	}
 
 	export interface CreateDomainRequest {

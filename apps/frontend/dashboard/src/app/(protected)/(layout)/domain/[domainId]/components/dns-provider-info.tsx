@@ -1,4 +1,4 @@
-import type { DomainNameserversResponse, DomainResponse } from "@reloop/api";
+import type { DomainNameserversResponse, DomainResponse } from "@fe/dashboard/types/api.types";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useParams } from "next/navigation";
