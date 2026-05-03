@@ -20,6 +20,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { SearchDialog } from "./search-dialog";
+import { isActive as checkIsActive } from "../../lib/is-active";
 
 interface SidebarProps {
 	tree: PageTreeItem[];
@@ -107,9 +108,12 @@ export function Sidebar({ tree, isMobile, onLinkClick }: SidebarProps) {
 	useEffect(() => {
 		const updateActiveRect = () => {
 			if (navRef.current) {
-				const activeEl = navRef.current.querySelector(
-					'[data-active="true"]',
-				) as HTMLElement;
+				const activeEls = navRef.current.querySelectorAll(
+					".is-active-item",
+				);
+				// Prefer the last one (most specific)
+				const activeEl = activeEls[activeEls.length - 1] as HTMLElement;
+
 				if (activeEl) {
 					const navBox = navRef.current.getBoundingClientRect();
 					const activeBox = activeEl.getBoundingClientRect();
@@ -126,7 +130,7 @@ export function Sidebar({ tree, isMobile, onLinkClick }: SidebarProps) {
 		};
 
 		// Small delay to ensure the DOM has updated
-		const timer = setTimeout(updateActiveRect, 0);
+		const timer = setTimeout(updateActiveRect, 100);
 		return () => clearTimeout(timer);
 	}, [pathname, tree]);
 
@@ -180,7 +184,7 @@ export function Sidebar({ tree, isMobile, onLinkClick }: SidebarProps) {
 								"pointer-events-none absolute z-0 rounded-lg",
 								hoveredRect
 									? "bg-fd-foreground/[0.04]"
-									: "bg-fd-foreground/5 shadow-sm",
+									: "bg-fd-foreground/[0.1] shadow-sm border border-fd-foreground/5",
 							)}
 							initial={false}
 							animate={{
@@ -398,12 +402,19 @@ function SidebarFolder({
 	const ref = useRef<HTMLButtonElement>(null);
 
 	const isChildActive = (item: PageTreeItem): boolean => {
-		if (item.type === "page") return item.url === pathname;
-		if (item.type === "folder") return item.children.some(isChildActive);
+		if (item.type === "page") return checkIsActive(item.url, pathname, false);
+		if (item.type === "folder") {
+			return (
+				checkIsActive(item.url, pathname, false) ||
+				item.children.some(isChildActive)
+			);
+		}
 		return false;
 	};
 
-	const isActive = node.children.some(isChildActive);
+	const isDirectlyActive = checkIsActive(node.url, pathname, false);
+	const isParentActive = node.children.some(isChildActive);
+	const isActive = isDirectlyActive || isParentActive;
 	const [isOpen, setIsOpen] = useState(isActive);
 	const router = useRouter();
 
@@ -425,9 +436,8 @@ function SidebarFolder({
 				ref={ref}
 				type="button"
 				onClick={handleToggle}
-				data-active={isActive}
 				onPointerEnter={() => {
-					if (ref.current && ref.current.parentElement?.parentElement) {
+					if (ref.current) {
 						const navEl = ref.current.closest("nav");
 						if (navEl) {
 							const navBox = navEl.getBoundingClientRect();
@@ -443,9 +453,11 @@ function SidebarFolder({
 				}}
 				className={cn(
 					"group flex h-9 w-full items-center justify-between rounded-lg px-2 font-medium text-sm transition-all",
-					isActive
-						? "border-1.5 border-fd-foreground text-fd-foreground shadow-sm"
-						: "text-fd-muted-foreground hover:text-fd-foreground",
+					isDirectlyActive
+						? "is-active-item border-1.5 border-fd-foreground text-fd-foreground shadow-sm bg-fd-foreground/[0.08]"
+						: isParentActive
+							? "text-fd-foreground"
+							: "text-fd-muted-foreground hover:text-fd-foreground",
 				)}
 			>
 				<div className="relative z-10 flex w-full items-center gap-2 text-left">
@@ -515,14 +527,13 @@ function SidebarLink({
 	}
 
 	const linkId = node.url;
-	const isActive = pathname === linkId || (linkId === "/" && pathname === "");
+	const isActive = checkIsActive(linkId, pathname, false);
 
 	return (
 		<Link
 			ref={ref}
 			href={linkId}
 			onClick={onLinkClick}
-			data-active={isActive}
 			onPointerEnter={() => {
 				if (ref.current) {
 					const navEl = ref.current.closest("nav");
@@ -541,7 +552,7 @@ function SidebarLink({
 			className={cn(
 				"group flex h-8 items-center gap-2 rounded-lg px-2 font-medium text-sm transition-colors",
 				isActive
-					? "text-fd-foreground"
+					? "is-active-item text-fd-foreground bg-fd-foreground/[0.08] shadow-sm border border-fd-foreground/5"
 					: "text-fd-muted-foreground hover:text-fd-foreground",
 			)}
 		>

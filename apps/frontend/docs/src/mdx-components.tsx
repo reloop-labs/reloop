@@ -48,7 +48,7 @@ export function getMDXComponents(components?: MDXComponents & { _apiData?: any }
 			</h3>
 		),
 		...restComponents,
-		Card: ({ icon, ...props }: any) => {
+		Card: ({ icon, href, ...props }: any) => {
 			const processedIcon =
 				typeof icon === "string" &&
 				(icon.startsWith("si") || icon.startsWith("Si")) ? (
@@ -56,7 +56,20 @@ export function getMDXComponents(components?: MDXComponents & { _apiData?: any }
 				) : (
 					icon
 				);
-			return <Card {...props} icon={processedIcon} className="no-underline" />;
+
+			const finalHref =
+				href?.startsWith("/") && !href.startsWith("/docs")
+					? `/docs${href}`
+					: href;
+
+			return (
+				<Card
+					{...props}
+					href={finalHref}
+					icon={processedIcon}
+					className="no-underline"
+				/>
+			);
 		},
 		table: (props) => (
 			<div className="my-6 w-full overflow-y-auto">

@@ -5,9 +5,17 @@ export function isActive(
 ): boolean {
 	let tempUrl = url;
 	let tempPathname = pathname;
-	if (tempUrl.endsWith("/")) tempUrl = tempUrl.slice(0, -1);
-	if (tempPathname.endsWith("/")) tempPathname = tempPathname.slice(0, -1);
+
+	// Strip /docs prefix if present for comparison
+	if (tempPathname.startsWith("/docs")) tempPathname = tempPathname.slice(5) || "/";
+	if (tempUrl.startsWith("/docs")) tempUrl = tempUrl.slice(5) || "/";
+
+	if (tempUrl.endsWith("/") && tempUrl !== "/") tempUrl = tempUrl.slice(0, -1);
+	if (tempPathname.endsWith("/") && tempPathname !== "/")
+		tempPathname = tempPathname.slice(0, -1);
+
 	return (
-		tempUrl === tempPathname || (nested && tempPathname.startsWith(`${url}/`))
+		tempUrl === tempPathname ||
+		(nested && tempPathname.startsWith(`${tempUrl}/`))
 	);
 }
