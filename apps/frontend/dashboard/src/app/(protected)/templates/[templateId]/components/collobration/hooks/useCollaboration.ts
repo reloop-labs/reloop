@@ -67,7 +67,7 @@ export function getRandomColor(seed = ""): string {
 
 export function useCollaboration({
   roomName,
-  serverUrl = process.env.NEXT_PUBLIC_COLLAB_WS_URL || "ws://localhost:1234",
+  serverUrl = process.env.NEXT_PUBLIC_COLLAB_WS_URL || "ws://localhost:8019/api/template",
   user,
   onUpdate,
   updateDebounce = 1000,
