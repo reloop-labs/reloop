@@ -323,10 +323,11 @@
         "drizzle-orm": "catalog:db",
         "drizzle-typebox": "catalog:db",
         "elysia": "catalog:backend",
+        "lib0": "catalog:backend",
         "pg": "catalog:db",
         "redis": "catalog:db",
         "y-protocols": "catalog:backend",
-        "yjs": "catalog:ui",
+        "yjs": "catalog:backend",
         "zod": "catalog:ui",
       },
       "devDependencies": {
