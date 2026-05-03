@@ -70,8 +70,6 @@ interface TextSectionProps {
 	isLinkActive: boolean;
 	linkColor: string;
 	setLinkColor: (color: string) => void;
-	activeNodeType: NodeTypePill;
-	setActiveNodeType: (type: NodeTypePill) => void;
 }
 
 function TextSection({
@@ -84,13 +82,11 @@ function TextSection({
 	isLinkActive,
 	linkColor,
 	setLinkColor,
-	activeNodeType,
-	setActiveNodeType,
 }: TextSectionProps) {
 	return (
 		<InspectorSection>
 			<div className="px-4 pt-3 pb-2">
-				<NodeTypePills active={activeNodeType} onChange={setActiveNodeType} />
+				<NodeTypePills />
 			</div>
 
 			<SectionHeader label="Text" />
@@ -144,7 +140,6 @@ function TextSection({
 /* Root inspector                                                       */
 /* ------------------------------------------------------------------ */
 export const EmailInspector = () => {
-	const [activeNodeType, setActiveNodeType] = useState<NodeTypePill>("Body");
 	const { editor } = useCurrentEditor();
 	if (!editor) return null;
 
@@ -160,8 +155,6 @@ export const EmailInspector = () => {
 					{(textProps) => (
 						<TextSection
 							{...textProps}
-							activeNodeType={activeNodeType}
-							setActiveNodeType={setActiveNodeType}
 						/>
 					)}
 				</Inspector.Text>
@@ -212,8 +205,6 @@ export const EmailInspector = () => {
 								isLinkActive={isLinkActive}
 								linkColor={linkColor}
 								setLinkColor={setLinkColor}
-								activeNodeType={activeNodeType}
-								setActiveNodeType={setActiveNodeType}
 							/>
 						);
 					}}
