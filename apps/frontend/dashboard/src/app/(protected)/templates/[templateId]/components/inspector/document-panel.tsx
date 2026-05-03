@@ -13,7 +13,7 @@ export function DocumentPanel() {
 		<Inspector.Document>
 			{({ findStyleValue, setGlobalStyle }) => (
 				<div>
-					<SectionHeader label="Document" icon={FileText} />
+					<SectionHeader label="Document" />
 					<ColorRow
 						label="Background"
 						value={String(findStyleValue("body", "backgroundColor") ?? "")}
@@ -50,7 +50,6 @@ export function DocumentPanel() {
 						onChange={(v) => setGlobalStyle("body", "color", v)}
 					/>
 					{/* Bottom spacing inside card */}
-					<div className="h-2" />
 				</div>
 			)}
 		</Inspector.Document>

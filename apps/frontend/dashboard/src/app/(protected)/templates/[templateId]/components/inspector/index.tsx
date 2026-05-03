@@ -50,6 +50,11 @@ type InspectorStyleProperty =
 	| "borderRightWidth"
 	| "borderBottomWidth"
 	| "borderLeftWidth"
+	| "borderRadius"
+	| "borderTopLeftRadius"
+	| "borderTopRightRadius"
+	| "borderBottomRightRadius"
+	| "borderBottomLeftRadius"
 	| "paddingTop"
 	| "paddingRight"
 	| "paddingBottom"
@@ -278,7 +283,6 @@ export const EmailInspector = () => {
 								value={String(getStyle("backgroundColor") ?? "")}
 								onChange={(v) => setStyle("backgroundColor", v)}
 							/>
-							<div className="h-2" />
 						</InspectorSection>
 					)}
 				</Inspector.Node>
@@ -317,12 +321,44 @@ export const EmailInspector = () => {
 									])
 								}
 							/>
+							<SpacingControl
+								label="Radius"
+								variant="corners"
+								value={{
+									top:
+										(getStyle("borderTopLeftRadius") as number) ??
+										(getStyle("borderRadius") as number) ??
+										"",
+									right:
+										(getStyle("borderTopRightRadius") as number) ??
+										(getStyle("borderRadius") as number) ??
+										"",
+									bottom:
+										(getStyle("borderBottomRightRadius") as number) ??
+										(getStyle("borderRadius") as number) ??
+										"",
+									left:
+										(getStyle("borderBottomLeftRadius") as number) ??
+										(getStyle("borderRadius") as number) ??
+										"",
+								}}
+								onChange={({ top, right, bottom, left }) =>
+									batchSetStyle([
+										{ prop: "borderTopLeftRadius", value: top as number },
+										{ prop: "borderTopRightRadius", value: right as number },
+										{
+											prop: "borderBottomRightRadius",
+											value: bottom as number,
+										},
+										{ prop: "borderBottomLeftRadius", value: left as number },
+									])
+								}
+							/>
 							<ColorRow
 								label="Color"
 								value={String(getStyle("borderColor") ?? "")}
 								onChange={(v) => setStyle("borderColor", v)}
 							/>
-							<div className="h-2" />
 						</InspectorSection>
 					)}
 				</Inspector.Node>
@@ -373,7 +409,6 @@ export const EmailInspector = () => {
 								value={String(findStyleValue("body", "color") ?? "")}
 								onChange={(v) => setGlobalStyle("body", "color", v)}
 							/>
-							<div className="h-2" />
 						</InspectorSection>
 					)}
 				</Inspector.Document>

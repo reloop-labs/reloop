@@ -8,6 +8,7 @@ import {
 	PanelRight,
 	PanelTop,
 	Square,
+	SquareRoundCorner,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -79,13 +80,14 @@ function PillInput({
 				<Input.Input
 					type="number"
 					value={value}
+					placeholder="0"
 					onChange={(e) => {
 						const raw = e.target.value;
 						onChange(raw === "" ? "" : Number.parseFloat(raw));
 					}}
 					className="[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
 				/>
-				<Input.InlineAffix className="text-stroke-strong-950">
+				<Input.InlineAffix className="text-text-strong-950!">
 					px
 				</Input.InlineAffix>
 			</Input.Wrapper>
@@ -97,11 +99,13 @@ export function SpacingControl({
 	label = "Padding",
 	value,
 	onChange,
+	variant = "sides",
 }: {
 	label?: string;
 	value: SpacingValue;
 	onChange: (v: SpacingValue) => void;
 	unit?: string;
+	variant?: "sides" | "corners";
 }) {
 	const [linked, setLinked] = useState(() => {
 		return (
@@ -149,22 +153,46 @@ export function SpacingControl({
 				<PillInput
 					value={value.top}
 					onChange={(v) => handleChange("top", v)}
-					icon={<PanelTop className="h-3.5 w-3.5" />}
+					icon={
+						variant === "sides" ? (
+							<PanelTop className="h-3.5 w-3.5" />
+						) : (
+							<SquareRoundCorner className="h-3.5 w-3.5" />
+						)
+					}
 				/>
 				<PillInput
 					value={value.right}
 					onChange={(v) => handleChange("right", v)}
-					icon={<PanelRight className="h-3.5 w-3.5" />}
+					icon={
+						variant === "sides" ? (
+							<PanelRight className="h-3.5 w-3.5" />
+						) : (
+							<SquareRoundCorner className="h-3.5 w-3.5 rotate-90" />
+						)
+					}
 				/>
 				<PillInput
 					value={value.bottom}
 					onChange={(v) => handleChange("bottom", v)}
-					icon={<PanelBottom className="h-3.5 w-3.5" />}
+					icon={
+						variant === "sides" ? (
+							<PanelBottom className="h-3.5 w-3.5" />
+						) : (
+							<SquareRoundCorner className="h-3.5 w-3.5 rotate-180" />
+						)
+					}
 				/>
 				<PillInput
 					value={value.left}
 					onChange={(v) => handleChange("left", v)}
-					icon={<PanelLeft className="h-3.5 w-3.5" />}
+					icon={
+						variant === "sides" ? (
+							<PanelLeft className="h-3.5 w-3.5" />
+						) : (
+							<SquareRoundCorner className="-rotate-90 h-3.5 w-3.5" />
+						)
+					}
 				/>
 			</div>
 		</div>
