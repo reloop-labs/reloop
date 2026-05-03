@@ -102,7 +102,7 @@ export function useCollaboration({
     // idb.on("synced", () => console.log("[collab] IndexedDB synced"));
 
     // ── WebSocket provider ────────────────────────────────────────────
-    const newProvider = new WebsocketProvider(`wss://${process.env.NEXT_PUBLIC_WS_URL}/api/template/collab`, roomName, newYdoc, {
+    const newProvider = new WebsocketProvider(`${process.env.NEXT_PUBLIC_WS_URL}/api/template/collab`, roomName, newYdoc, {
       connect: true,
     });
     providerRef.current = newProvider;

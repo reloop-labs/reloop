@@ -13,6 +13,9 @@ ENV NEXT_TELEMETRY_DISABLED=1
 # Use ARG for build-time variables that can be overridden
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
+ARG NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL:-wss://reloop.sh}
+ENV NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL}
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN bun run --filter=dashboard build
