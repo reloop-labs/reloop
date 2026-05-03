@@ -7,6 +7,9 @@ import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
+import { collaborationPlugin } from "./plugins/collaboration";
+import { persistencePlugin } from "./plugins/persistence";
+import { roomsPlugin } from "./routes/rooms";
 
 const port = templateConfig.port;
 const templateService = new Elysia({
@@ -35,6 +38,9 @@ const templateService = new Elysia({
 	.use(serverTiming())
 	.use(landing)
 	.use(templateRoutes)
+	.use(roomsPlugin)
+	.use(persistencePlugin)
+	.use(collaborationPlugin)
 	.onStart(async () => {
 		await loader();
 	})
