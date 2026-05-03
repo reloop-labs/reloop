@@ -38,6 +38,7 @@
 		"nuqs": "catalog:ui",
 		"perfect-cursors": "catalog:ui",
 		"react": "catalog:ui",
+		"y-websocket": "catalog:ui",
 		"react-colorful": "catalog:ui",
 		"react-dom": "catalog:ui",
 		"react-dropzone": "catalog:ui",
