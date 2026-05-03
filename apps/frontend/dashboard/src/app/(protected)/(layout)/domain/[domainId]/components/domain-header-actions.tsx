@@ -45,7 +45,7 @@ export const DomainHeaderActions = ({
 		});
 
 		return items;
-	}, [domain?.nameservers, domain?.status]);
+	}, [domain?.status]);
 
 	const currentTab = buttonRefs.current[hoverIdx ?? -1];
 	const currentRect = currentTab?.getBoundingClientRect();
