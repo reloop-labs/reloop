@@ -14,5 +14,8 @@
 		"declaration": false,
 		"declarationMap": false,
 		"baseUrl": ".",
+		"paths": {
+			"@be/domain/*": ["./src/*"]
+		}
 	}
 }
