@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 
 const getIcon = (type: string) => {
-	console.log(type);
 	switch (type.toLowerCase()) {
 		case "text":
 		case "paragraph":
