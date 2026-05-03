@@ -76,6 +76,9 @@ export function useCollaboration({
   const [connectionStatus, setConnectionStatus] =
     useState<ConnectionStatus>("connecting");
   const [awarenessUsers, setAwarenessUsers] = useState<AwarenessUser[]>([]);
+  // Use reactive state so consumers re-render when ydoc/provider are ready
+  const [ydoc, setYdoc] = useState<Y.Doc | null>(null);
+  const [provider, setProvider] = useState<WebsocketProvider | null>(null);
 
   const ydocRef = useRef<Y.Doc | null>(null);
   const providerRef = useRef<WebsocketProvider | null>(null);
@@ -94,21 +97,26 @@ export function useCollaboration({
     if (!roomName) return;
 
     // ── Yjs document ──────────────────────────────────────────────────
-    const ydoc = new Y.Doc();
-    ydocRef.current = ydoc;
+    const newYdoc = new Y.Doc();
+    ydocRef.current = newYdoc;
 
     // ── IndexedDB — offline persistence & faster first-load ───────────
     // const idb = new IndexeddbPersistence(`email-collab-${roomName}`, ydoc);
     // idb.on("synced", () => console.log("[collab] IndexedDB synced"));
 
     // ── WebSocket provider ────────────────────────────────────────────
-    const provider = new WebsocketProvider(serverUrl, roomName, ydoc, {
+    const newProvider = new WebsocketProvider(serverUrl, roomName, newYdoc, {
       connect: true,
     });
-    providerRef.current = provider;
+    providerRef.current = newProvider;
+
+    // Expose via reactive state so consumers (cursor hooks, editor hook)
+    // re-render once the instances are available
+    setYdoc(newYdoc);
+    setProvider(newProvider);
 
     // ── Connection status ─────────────────────────────────────────────
-    provider.on("status", ({ status }: { status: string }) => {
+    newProvider.on("status", ({ status }: { status: string }) => {
       setIsConnected(status === "connected");
       setConnectionStatus(
         status === "connected"
@@ -119,16 +127,16 @@ export function useCollaboration({
       );
     });
 
-    provider.on("sync", (synced: boolean) => {
+    newProvider.on("sync", (synced: boolean) => {
       setIsSynced(synced);
     });
 
-    provider.on("connection-error", () => {
+    newProvider.on("connection-error", () => {
       setConnectionStatus("error");
     });
 
     // ── Awareness (presence) ──────────────────────────────────────────
-    provider.awareness.setLocalStateField("user", {
+    newProvider.awareness.setLocalStateField("user", {
       name: user.name,
       color: user.color,
       avatar: user.avatar,
@@ -136,7 +144,7 @@ export function useCollaboration({
 
     const updateAwareness = () => {
       const users: AwarenessUser[] = Array.from(
-        provider.awareness.getStates().entries(),
+        newProvider.awareness.getStates().entries(),
       )
         .filter(([, state]) => state.user)
         .map(([clientId, state]) => ({
@@ -148,7 +156,7 @@ export function useCollaboration({
       setAwarenessUsers(users);
     };
 
-    provider.awareness.on("change", updateAwareness);
+    newProvider.awareness.on("change", updateAwareness);
     updateAwareness();
 
     // ── Autosave ──────────────────────────────────────────────────────
@@ -162,24 +170,32 @@ export function useCollaboration({
       }, updateDebounce);
     };
 
-    ydoc.on("update", handleUpdate);
+    newYdoc.on("update", handleUpdate);
 
     // ── Cleanup ───────────────────────────────────────────────────────
     return () => {
       if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
-      ydoc.off("update", handleUpdate);
-      provider.awareness.off("change", updateAwareness);
-      provider.destroy();
+      newYdoc.off("update", handleUpdate);
+      newProvider.awareness.off("change", updateAwareness);
+      // Clear local awareness state BEFORE destroying the provider.
+      // The CollaborationCaret cursor plugin calls createRelativePositionFromJSON
+      // during editor unmount; if the Yjs doc is already torn down the shared type
+      // is undefined, causing a crash. Nulling the state first lets the plugin
+      // skip serialization gracefully.
+      newProvider.awareness.setLocalState(null);
+      newProvider.destroy();
       // idb.destroy();
-      ydoc.destroy();
+      newYdoc.destroy();
       ydocRef.current = null;
       providerRef.current = null;
+      setYdoc(null);
+      setProvider(null);
     };
   }, [roomName, serverUrl, user.name, user.color, user.avatar, updateDebounce]);
 
   return {
-    ydoc: ydocRef.current,
-    provider: providerRef.current,
+    ydoc,
+    provider,
     isConnected,
     isSynced,
     awarenessUsers,

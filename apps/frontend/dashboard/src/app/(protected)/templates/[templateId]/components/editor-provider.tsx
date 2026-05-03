@@ -42,7 +42,6 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 
 	useMousePresence(provider, containerRef);
 	const remoteCursors = useRemoteCursors(provider);
-
 	const editor = useEditorHook(
 		ydoc && provider ? { ydoc, provider, user: collabUser } : undefined,
 	);
@@ -50,14 +49,17 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 	return (
 		<PresenceProvider awareness={provider?.awareness ?? null}>
 			<EditorContext.Provider value={{ editor }}>
-				<div ref={containerRef} className="relative h-full">
+				{/* containerRef must cover the full editor area so mouse % coords are correct */}
+				<div ref={containerRef} className="relative h-full w-full">
 					{/* ── Collab header bar ──────────────────────────────────────── */}
 					<div className="flex items-center justify-between border-stroke-soft-200 border-b bg-bg-white-0 px-4 py-2 dark:bg-[#0a0a0a]">
 						<CollabPresence />
 						<ConnectionStatus status={connectionStatus} isSynced={isSynced} />
 					</div>
-					<RemoteCursors cursors={remoteCursors} />
 					{children}
+
+					{/* Remote cursors overlay — rendered inside containerRef so positions align */}
+					<RemoteCursors cursors={remoteCursors} />
 
 					<BubbleMenu
 						hideWhenActiveNodes={["button"]}

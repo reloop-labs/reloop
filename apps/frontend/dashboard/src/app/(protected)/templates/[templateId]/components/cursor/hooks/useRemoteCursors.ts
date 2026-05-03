@@ -23,17 +23,16 @@ export function useRemoteCursors(
       const remote: RemoteCursor[] = [];
 
       provider.awareness.getStates().forEach((state, clientId) => {
-        // Skip our own cursor
         if (clientId === provider.awareness.clientID) return;
-        // Skip if no cursor position or no user info
-        if (!state.cursor || !state.user) return;
+        if (!state.user || !state.mouseCursor) return;
 
+        const { x, y } = state.mouseCursor as { x: number; y: number };
         remote.push({
           clientId,
           name: state.user.name,
           color: state.user.color,
-          x: state.cursor.x,
-          y: state.cursor.y,
+          x,
+          y,
         });
       });
 

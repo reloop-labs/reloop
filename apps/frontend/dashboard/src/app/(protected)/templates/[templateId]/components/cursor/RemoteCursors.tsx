@@ -7,7 +7,6 @@ interface RemoteCursorsProps {
 }
 
 export function RemoteCursors({ cursors }: RemoteCursorsProps) {
-	console.log(cursors);
 	return (
 		<>
 			{cursors.map((cursor) => (
