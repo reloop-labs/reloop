@@ -55,12 +55,12 @@ const USER_COLORS = [
   "#8777D9",
 ];
 
-export function getRandomColor(seed: string): string {
+export function getRandomColor(seed = ""): string {
   let hash = 0;
   for (let i = 0; i < seed.length; i++) {
     hash = seed.charCodeAt(i) + ((hash << 5) - hash);
   }
-  return USER_COLORS[Math.abs(hash) % USER_COLORS.length];
+  return USER_COLORS[Math.abs(hash) % USER_COLORS.length]!;
 }
 
 // ── Hook ───────────────────────────────────────────────────────────────────
