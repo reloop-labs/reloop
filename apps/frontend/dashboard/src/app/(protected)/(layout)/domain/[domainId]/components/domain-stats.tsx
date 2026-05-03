@@ -1,5 +1,5 @@
-import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import type { DomainResponse } from "@fe/dashboard/types/api.types";
+import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
@@ -57,7 +57,7 @@ export const DomainStats: React.FC<DomainStatsProps> = ({
 				)}
 			</div>
 
-			<DNSProviderInfo domain={domain} isLoading={isLoading} />
+			<DNSProviderInfo isLoading={isLoading} />
 		</div>
 	);
 };
