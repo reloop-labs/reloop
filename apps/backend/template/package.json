@@ -28,6 +28,7 @@
 		"drizzle-orm": "catalog:db",
 		"drizzle-typebox": "catalog:db",
 		"elysia": "catalog:backend",
+		"yjs": "catalog:ui",
 		"pg": "catalog:db",
 		"redis": "catalog:db",
 		"zod": "catalog:ui",
