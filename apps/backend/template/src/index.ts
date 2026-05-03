@@ -1,15 +1,15 @@
 import "dotenv/config";
 import { landing } from "@be/template/routes/landing/landing.index";
-import { roomsPlugin } from "@be/template/routes/template/room/room";
+import { roomRoutes } from "@be/template/routes/template/room/room.routes";
 import { templateRoutes } from "@be/template/routes/template/template.routes";
 import { templateConfig } from "@be/template/template.config";
 import { loader } from "@be/template/utils/loader";
+import { persistencePlugin } from "@be/template/utils/persistence";
 import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
-import { collaborationPlugin } from "./plugins/collaboration";
-import { persistencePlugin } from "./plugins/persistence";
+import { collaborationRoute } from "@be/template/routes/template/collaboration/collaboration.route";
 
 const port = templateConfig.port;
 const templateService = new Elysia({
@@ -38,9 +38,9 @@ const templateService = new Elysia({
 	.use(serverTiming())
 	.use(landing)
 	.use(templateRoutes)
-	.use(roomsPlugin)
+	.use(roomRoutes)
 	.use(persistencePlugin)
-	.use(collaborationPlugin)
+	.use(collaborationRoute)
 	.onStart(async () => {
 		await loader();
 	})
