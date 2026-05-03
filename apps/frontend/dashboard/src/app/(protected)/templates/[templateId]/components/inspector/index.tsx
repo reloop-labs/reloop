@@ -288,13 +288,8 @@ export const EmailInspector = () => {
 					{({ getStyle, setStyle, batchSetStyle }) => (
 						<InspectorSection>
 							<SectionHeader label="Border" />
-							<ColorRow
-								label="Color"
-								value={String(getStyle("borderColor") ?? "")}
-								onChange={(v) => setStyle("borderColor", v)}
-							/>
 							<SpacingControl
-								label="Width"
+								label="Border"
 								value={{
 									top:
 										(getStyle("borderTopWidth") as number) ??
@@ -321,6 +316,11 @@ export const EmailInspector = () => {
 										{ prop: "borderLeftWidth", value: left as number },
 									])
 								}
+							/>
+							<ColorRow
+								label="Color"
+								value={String(getStyle("borderColor") ?? "")}
+								onChange={(v) => setStyle("borderColor", v)}
 							/>
 							<div className="h-2" />
 						</InspectorSection>

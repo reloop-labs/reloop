@@ -1,6 +1,14 @@
 "use client";
 
 import * as Input from "@reloop/ui/input";
+import {
+	Grid2X2,
+	PanelBottom,
+	PanelLeft,
+	PanelRight,
+	PanelTop,
+	Square,
+} from "lucide-react";
 import { useState } from "react";
 
 /* ------------------------------------------------------------------ */
@@ -13,121 +21,6 @@ export interface SpacingValue {
 	left: number | "";
 }
 
-/* Icon: horizontal stripes (top / bottom) */
-function IconTopBottom() {
-	return (
-		<svg
-			width="14"
-			height="14"
-			viewBox="0 0 14 14"
-			fill="none"
-			xmlns="http://www.w3.org/2000/svg"
-		>
-			<rect
-				x="1"
-				y="1"
-				width="12"
-				height="2.5"
-				rx="1"
-				fill="currentColor"
-				opacity="0.45"
-			/>
-			<rect
-				x="1"
-				y="10.5"
-				width="12"
-				height="2.5"
-				rx="1"
-				fill="currentColor"
-				opacity="0.45"
-			/>
-			<rect x="3" y="5.25" width="8" height="3.5" rx="1" fill="currentColor" />
-		</svg>
-	);
-}
-
-/* Icon: vertical stripes (left / right) */
-function IconLeftRight() {
-	return (
-		<svg
-			width="14"
-			height="14"
-			viewBox="0 0 14 14"
-			fill="none"
-			xmlns="http://www.w3.org/2000/svg"
-		>
-			<rect
-				x="1"
-				y="1"
-				width="2.5"
-				height="12"
-				rx="1"
-				fill="currentColor"
-				opacity="0.45"
-			/>
-			<rect
-				x="10.5"
-				y="1"
-				width="2.5"
-				height="12"
-				rx="1"
-				fill="currentColor"
-				opacity="0.45"
-			/>
-			<rect x="5.25" y="3" width="3.5" height="8" rx="1" fill="currentColor" />
-		</svg>
-	);
-}
-
-/* Icon: uniform solid box */
-function IconUniform() {
-	return (
-		<svg
-			width="14"
-			height="14"
-			viewBox="0 0 14 14"
-			fill="none"
-			xmlns="http://www.w3.org/2000/svg"
-		>
-			<rect
-				x="1.75"
-				y="1.75"
-				width="10.5"
-				height="10.5"
-				rx="2"
-				stroke="currentColor"
-				strokeWidth="1.5"
-				fill="none"
-			/>
-		</svg>
-	);
-}
-
-/* Icon: individual dashed box */
-function IconIndividual() {
-	return (
-		<svg
-			width="14"
-			height="14"
-			viewBox="0 0 14 14"
-			fill="none"
-			xmlns="http://www.w3.org/2000/svg"
-		>
-			<rect
-				x="1.75"
-				y="1.75"
-				width="10.5"
-				height="10.5"
-				rx="2"
-				stroke="currentColor"
-				strokeWidth="1.5"
-				strokeDasharray="3 2.2"
-				fill="none"
-			/>
-		</svg>
-	);
-}
-
 /* SegmentedToggle for linked/individual */
 function ModeToggle({
 	linked,
@@ -137,30 +30,30 @@ function ModeToggle({
 	onToggle: (v: boolean) => void;
 }) {
 	return (
-		<div className="flex items-center gap-0.5 rounded-lg bg-bg-weak-50 p-0.5">
+		<div className="flex items-center gap-0.5 rounded-xl border border-stroke-sub-300 bg-bg-white-0 p-0.5">
 			<button
 				type="button"
 				title="Uniform padding"
 				onClick={() => onToggle(true)}
-				className={`flex h-7 w-7 items-center justify-center rounded-md transition-all duration-150 ${
+				className={`flex h-7 w-7 items-center justify-center rounded-lg transition-all duration-150 ${
 					linked
-						? "bg-bg-white-0 text-text-strong-950 shadow-xs"
+						? "bg-bg-soft-200 text-text-strong-950 shadow-xs"
 						: "text-text-soft-400 hover:text-text-sub-600"
 				}`}
 			>
-				<IconUniform />
+				<Square className="h-3.5 w-3.5" />
 			</button>
 			<button
 				type="button"
 				title="Individual sides"
 				onClick={() => onToggle(false)}
-				className={`flex h-7 w-7 items-center justify-center rounded-md transition-all duration-150 ${
+				className={`flex h-7 w-7 items-center justify-center rounded-lg transition-all duration-150 ${
 					!linked
-						? "bg-bg-white-0 text-text-strong-950 shadow-xs"
+						? "bg-bg-soft-200 text-text-strong-950 shadow-xs"
 						: "text-text-soft-400 hover:text-text-sub-600"
 				}`}
 			>
-				<IconIndividual />
+				<Grid2X2 className="h-3.5 w-3.5" />
 			</button>
 		</div>
 	);
@@ -192,7 +85,9 @@ function PillInput({
 					}}
 					className="[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
 				/>
-				<Input.InlineAffix className="text-text-soft-400">px</Input.InlineAffix>
+				<Input.InlineAffix className="text-stroke-strong-950">
+					px
+				</Input.InlineAffix>
 			</Input.Wrapper>
 		</Input.Root>
 	);
@@ -254,22 +149,22 @@ export function SpacingControl({
 				<PillInput
 					value={value.top}
 					onChange={(v) => handleChange("top", v)}
-					icon={<IconTopBottom />}
+					icon={<PanelTop className="h-3.5 w-3.5" />}
 				/>
 				<PillInput
 					value={value.right}
 					onChange={(v) => handleChange("right", v)}
-					icon={<IconLeftRight />}
+					icon={<PanelRight className="h-3.5 w-3.5" />}
 				/>
 				<PillInput
 					value={value.bottom}
 					onChange={(v) => handleChange("bottom", v)}
-					icon={<IconTopBottom />}
+					icon={<PanelBottom className="h-3.5 w-3.5" />}
 				/>
 				<PillInput
 					value={value.left}
 					onChange={(v) => handleChange("left", v)}
-					icon={<IconLeftRight />}
+					icon={<PanelLeft className="h-3.5 w-3.5" />}
 				/>
 			</div>
 		</div>
