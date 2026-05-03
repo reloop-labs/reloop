@@ -19,7 +19,7 @@ export interface DNSRecord {
 	ttl: string;
 	priority: number | null;
 	verificationError: string | null;
-	status: string;
+	status: DomainStatus;
 	createdAt: string;
 	updatedAt: string;
 }

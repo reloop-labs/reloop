@@ -1,11 +1,11 @@
 "use client";
 
+import type { DNSRecord } from "@fe/dashboard/types/api.types";
 import {
 	getStatusColorClass,
 	getStatusIcon,
 	getStatusLabel,
 } from "@fe/dashboard/utils/domain";
-import type { DNSRecord } from "@fe/dashboard/types/api.types";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
