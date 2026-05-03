@@ -443,7 +443,7 @@
         "@reloop/webhook-events": "workspace:*",
         "@tanstack/react-table": "catalog:ui",
         "@tiptap/extension-collaboration": "catalog:ui",
-        "@tiptap/extension-collaboration-cursor": "catalog:ui",
+        "@tiptap/extension-collaboration-cursor": "^2.26.2",
         "axios": "catalog:",
         "babel-plugin-react-compiler": "catalog:ui",
         "better-auth": "catalog:",

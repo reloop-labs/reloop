@@ -1,6 +1,7 @@
 import { StarterKit } from "@react-email/editor/extensions";
 import { EmailTheming } from "@react-email/editor/plugins";
 import Collaboration from "@tiptap/extension-collaboration";
+
 import Placeholder from "@tiptap/extension-placeholder";
 import { useEditor } from "@tiptap/react";
 import type { WebsocketProvider } from "y-websocket";
