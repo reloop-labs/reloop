@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { IndexeddbPersistence } from "y-indexeddb";
 import { WebsocketProvider } from "y-websocket";
 import * as Y from "yjs";
 
@@ -96,9 +97,11 @@ export function useCollaboration({
     const ydoc = new Y.Doc();
     ydocRef.current = ydoc;
 
+    // ── IndexedDB — offline persistence & faster first-load ───────────
+    const idb = new IndexeddbPersistence(`email-collab-${roomName}`, ydoc);
+    idb.on("synced", () => console.log("[collab] IndexedDB synced"));
+
     // ── WebSocket provider ────────────────────────────────────────────
-    // Durability is handled by the backend Redis persistence —
-    // no need for IndexedDB here.
     const provider = new WebsocketProvider(serverUrl, roomName, ydoc, {
       connect: true,
     });
@@ -142,7 +145,6 @@ export function useCollaboration({
           color: state.user.color,
           avatar: state.user.avatar,
         }));
-
       setAwarenessUsers(users);
     };
 
@@ -168,6 +170,7 @@ export function useCollaboration({
       ydoc.off("update", handleUpdate);
       provider.awareness.off("change", updateAwareness);
       provider.destroy();
+      idb.destroy();
       ydoc.destroy();
       ydocRef.current = null;
       providerRef.current = null;

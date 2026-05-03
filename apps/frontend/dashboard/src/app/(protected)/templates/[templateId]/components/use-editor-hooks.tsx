@@ -1,6 +1,6 @@
-import Collaboration from "@tiptap/extension-collaboration";
 import { StarterKit } from "@react-email/editor/extensions";
 import { EmailTheming } from "@react-email/editor/plugins";
+import Collaboration from "@tiptap/extension-collaboration";
 import Placeholder from "@tiptap/extension-placeholder";
 import { useEditor } from "@tiptap/react";
 import type { WebsocketProvider } from "y-websocket";
@@ -41,6 +41,9 @@ export const useEditorHook = (collab?: CollabOptions) => {
 					: []),
 			],
 			immediatelyRender: false,
+			onContentError(e) {
+				console.log(e);
+			},
 		},
 		[collab?.ydoc, collab?.provider],
 	);
