@@ -7,8 +7,11 @@ import Placeholder from "@tiptap/extension-placeholder";
 import Underline from "@tiptap/extension-underline";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import type { Doc } from "yjs";
+import { useMousePresence } from "../cursor/hooks/useMousePresence";
+import { useRemoteCursors } from "../cursor/hooks/useRemoteCursors";
+import { RemoteCursors } from "../cursor/RemoteCursors";
 import { CollabPresence } from "./Collabpresence";
 import { CollabToolbar } from "./Collabtoolbar";
 import { ConnectionStatus } from "./ConnectionStatus";
@@ -17,7 +20,6 @@ import {
 	getRandomColor,
 	useCollaboration,
 } from "./hooks/useCollaboration";
-
 export interface CollaborativeEmailEditorProps {
 	/** Unique document identifier — users on same roomId share the doc */
 	roomId: string;
@@ -74,6 +76,9 @@ export function CollaborativeEmailEditor({
 		),
 	});
 
+	const containerRef = useRef<HTMLDivElement>(null);
+	useMousePresence(provider, containerRef);
+
 	const editor = useEditor(
 		{
 			extensions: [
@@ -122,6 +127,7 @@ export function CollaborativeEmailEditor({
 		// Re-initialize editor when ydoc/provider become available
 		[ydoc, provider],
 	);
+	const remoteCursors = useRemoteCursors(provider);
 
 	// Populate initial content if doc is empty and not yet synced
 	useEffect(() => {
@@ -145,14 +151,12 @@ export function CollaborativeEmailEditor({
 		<div className={`collab-email-editor flex h-full flex-col ${className}`}>
 			{/* Header: presence + connection status */}
 			<div className="flex items-center justify-between border-gray-200 border-b bg-white px-4 py-2">
-				<CollabPresence users={awarenessUsers} currentUserId={currentUser.id} />
+				<CollabPresence />
 				<ConnectionStatus status={connectionStatus} isSynced={isSynced} />
 			</div>
-
-			{/* Toolbar */}
+			<div ref={containerRef} className="relative h-full w-full" />
+			<RemoteCursors cursors={remoteCursors} />
 			{editor && <CollabToolbar editor={editor} />}
-
-			{/* Editor area */}
 			<div className="flex-1 overflow-auto bg-white">
 				<div className="mx-auto max-w-3xl px-8 py-10">
 					<EditorContent editor={editor} className="min-h-[500px]" />
