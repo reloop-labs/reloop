@@ -24,7 +24,6 @@ export type ConnectionStatus =
 
 export interface UseCollaborationOptions {
   roomName: string;
-  serverUrl?: string;
   user: CollabUser;
   onUpdate?: (doc: Y.Doc) => void;
   updateDebounce?: number;
@@ -65,7 +64,6 @@ export function getRandomColor(seed = ""): string {
 
 export function useCollaboration({
   roomName,
-  serverUrl = `wss://${process.env.NEXT_PUBLIC_WS_URL}/api/template/collab`,
   user,
   onUpdate,
   updateDebounce = 1000,
@@ -93,7 +91,7 @@ export function useCollaboration({
   }, []);
 
   useEffect(() => {
-    if (!roomName || !serverUrl) return;
+    if (!roomName) return;
 
     // ── Yjs document ──────────────────────────────────────────────────
     const newYdoc = new Y.Doc();
@@ -104,7 +102,7 @@ export function useCollaboration({
     // idb.on("synced", () => console.log("[collab] IndexedDB synced"));
 
     // ── WebSocket provider ────────────────────────────────────────────
-    const newProvider = new WebsocketProvider(serverUrl, roomName, newYdoc, {
+    const newProvider = new WebsocketProvider(`wss://${process.env.NEXT_PUBLIC_WS_URL}/api/template/collab`, roomName, newYdoc, {
       connect: true,
     });
     providerRef.current = newProvider;
@@ -190,7 +188,7 @@ export function useCollaboration({
       setYdoc(null);
       setProvider(null);
     };
-  }, [roomName, serverUrl, user.name, user.color, user.avatar, updateDebounce]);
+  }, [roomName, user.name, user.color, user.avatar, updateDebounce]);
 
   return {
     ydoc,
