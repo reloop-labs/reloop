@@ -54,7 +54,7 @@ export const getRoom = (roomName: string): Room => {
 
         room.clients.forEach((client) => {
           if (client.readyState === 1) {
-            client.send(message);
+            client.raw.send(message);
           }
         });
       },
@@ -94,7 +94,7 @@ function sendInitialSync(ws: any, room: Room) {
   const syncEncoder = encoding.createEncoder();
   encoding.writeVarUint(syncEncoder, MESSAGE_SYNC);
   syncProtocol.writeSyncStep1(syncEncoder, room.doc);
-  ws.send(encoding.toUint8Array(syncEncoder));
+  ws.raw.send(encoding.toUint8Array(syncEncoder));
 
   // Awareness: send all current user states (cursors, presence)
   const awarenessStates = room.awareness.getStates();
@@ -108,7 +108,7 @@ function sendInitialSync(ws: any, room: Room) {
         Array.from(awarenessStates.keys()),
       ),
     );
-    ws.send(encoding.toUint8Array(awarenessEncoder));
+    ws.raw.send(encoding.toUint8Array(awarenessEncoder));
   }
 }
 
@@ -147,7 +147,7 @@ function handleMessage(
 
       // If we produced a response (e.g. sync step 2 / update), send it back
       if (encoding.length(encoder) > 1) {
-        ws.send(encoding.toUint8Array(encoder));
+        ws.raw.send(encoding.toUint8Array(encoder));
       }
 
       // Sync step 2 means the client just sent us their full state —
@@ -161,7 +161,7 @@ function handleMessage(
 
         room.clients.forEach((client) => {
           if (client !== ws && client.readyState === 1) {
-            client.send(broadcastMessage);
+            client.raw.send(broadcastMessage);
           }
         });
 
