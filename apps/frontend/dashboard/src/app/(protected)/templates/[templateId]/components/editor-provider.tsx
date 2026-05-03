@@ -36,19 +36,14 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 		});
 
 	const editor = useEditorHook(
-		ydoc && provider
-			? { ydoc, provider, user: collabUser }
-			: undefined,
+		ydoc && provider ? { ydoc, provider, user: collabUser } : undefined,
 	);
 
 	return (
 		<EditorContext.Provider value={{ editor }}>
-			{/* ── Collab header bar ────────────────────────────────────────── */}
+			{/* ── Collab header bar ──────────────────────────────────────── */}
 			<div className="flex items-center justify-between border-stroke-soft-200 border-b bg-bg-white-0 px-4 py-2 dark:bg-[#0a0a0a]">
-				<CollabPresence
-					users={awarenessUsers}
-					currentUserId={user?.id}
-				/>
+				<CollabPresence users={awarenessUsers} currentUserId={user?.id} />
 				<ConnectionStatus status={connectionStatus} isSynced={isSynced} />
 			</div>
 
@@ -61,49 +56,6 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 			<BubbleMenu.LinkDefault />
 			<BubbleMenu.ButtonDefault />
 			<SlashCommand items={defaultSlashCommands} />
-
-			{/* ── Cursor styles ─────────────────────────────────────────────── */}
-			<style>{collabCursorStyles}</style>
 		</EditorContext.Provider>
 	);
 };
-
-const collabCursorStyles = `
-  .collab-cursor {
-    position: relative;
-    margin-left: -1px;
-    margin-right: -1px;
-    border-left: 2px solid var(--cursor-color);
-    word-break: normal;
-    pointer-events: none;
-  }
-
-  .collab-cursor__caret {
-    position: absolute;
-    top: 0;
-    left: -1px;
-    height: 100%;
-    border-left: 2px solid var(--cursor-color);
-  }
-
-  .collab-cursor__label {
-    position: absolute;
-    top: -1.5em;
-    left: -2px;
-    font-size: 11px;
-    font-weight: 600;
-    color: white;
-    padding: 1px 5px;
-    border-radius: 3px 3px 3px 0;
-    white-space: nowrap;
-    user-select: none;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.15s ease;
-  }
-
-  .collab-cursor:hover .collab-cursor__label,
-  .collab-cursor__label--visible {
-    opacity: 1;
-  }
-`;

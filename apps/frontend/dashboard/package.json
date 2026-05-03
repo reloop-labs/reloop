@@ -28,7 +28,6 @@
 		"y-indexeddb": "catalog:ui",
 		"yjs": "catalog:ui",
 		"@tiptap/extension-collaboration": "catalog:ui",
-		"@tiptap/extension-collaboration-cursor": "catalog:ui",
 		"dayjs": "catalog:ui",
 		"framer-motion": "catalog:ui",
 		"lucide-react": "catalog:ui",
