@@ -1,6 +1,9 @@
 "use client";
 
-import type { DomainNameserversResponse, DomainResponse } from "@fe/dashboard/types/api.types";
+import type {
+	DomainNameserversResponse,
+	DomainResponse,
+} from "@fe/dashboard/types/api.types";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
@@ -40,7 +43,7 @@ export const DNSAutoConnectBanner: React.FC<DNSAutoConnectBannerProps> = ({
 		domainId ? `/api/domain/v1/nameservers/${domainId}` : null,
 	);
 
-	const nameservers = nameserverData?.nameservers || domain?.nameservers;
+	const nameservers = nameserverData?.nameservers;
 
 	const provider = React.useMemo(
 		() => inferDnsProvider(nameservers),
@@ -50,10 +53,7 @@ export const DNSAutoConnectBanner: React.FC<DNSAutoConnectBannerProps> = ({
 	const status = domain?.status || "start-verify";
 
 	// Show only if domain status is "start-verify" or "failed" and DNS is not yet configured
-	if (
-		(status !== "start-verify" && status !== "failed") ||
-		domain?.dnsConfigured
-	) {
+	if (status !== "start-verify" && status !== "failed") {
 		return null;
 	}
 
