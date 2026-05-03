@@ -1,5 +1,5 @@
 {
-	"name": "domain",
+	"name": "@be/domain",
 	"main": "src/index.ts",
 	"type": "module",
 	"scripts": {

@@ -2,9 +2,9 @@
 
 import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
 import { AnimatedClock } from "@fe/dashboard/components/animated-clock";
+import type { Domain } from "@fe/dashboard/types/api.types";
 import { getStatusColorClass, getStatusIcon } from "@fe/dashboard/utils/domain";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
-import type { Domain } from "@fe/dashboard/types/api.types";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
@@ -138,10 +138,9 @@ export const DomainHeader = ({ domain, isLoading }: DomainHeaderProps) => {
 			<DeleteDomainModal
 				domains={[
 					{
+						object: "domain",
 						id: domainRecordId || (_domainId as string),
 						domain: domainName,
-						organizationId: "",
-						userId: "",
 						domainType: "custom" as const,
 						status: "active" as const,
 						userVerified: false,
@@ -150,17 +149,11 @@ export const DomainHeader = ({ domain, isLoading }: DomainHeaderProps) => {
 						clickTracking: false,
 						openTracking: false,
 						tls: "opportunistic" as const,
-						dnsConfigured: false,
-						nameservers: null,
-						spfRecord: null,
-						dkimRecord: null,
-						dkimSelector: "reloop",
-						dmarcRecord: null,
-						dmarcPolicy: "none",
 						trackingDomain: false,
 						sendingEmail: true,
 						receivingEmail: true,
 						verificationFailedReason: null,
+						dnsRecords: [],
 						deletedAt: null,
 						lastVerifiedAt: null,
 						createdAt: "",
