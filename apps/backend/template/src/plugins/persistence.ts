@@ -127,6 +127,11 @@ export class YjsPersistence {
       this.updateCache.delete(name),
     ]);
   }
+
+  /** Check if Redis is available */
+  async checkHealth(): Promise<void> {
+    await this.docCache.healthCheck();
+  }
 }
 
 // ── Elysia plugin ──────────────────────────────────────────────────────────
@@ -134,11 +139,11 @@ export class YjsPersistence {
 let persistence: YjsPersistence | null = null;
 
 export const persistencePlugin = new Elysia({ name: "persistence" })
-  .decorate("store", {} as { persistence: YjsPersistence | null })
+  .state("persistence", null as YjsPersistence | null)
   .onStart(async ({ store }) => {
     try {
       persistence = new YjsPersistence();
-      await persistence["docCache"].healthCheck();
+      await persistence.checkHealth();
       store.persistence = persistence;
       console.log("📦 Yjs persistence ready");
     } catch (err) {

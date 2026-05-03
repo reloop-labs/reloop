@@ -1,9 +1,9 @@
+import { getAllRooms } from "@be/template/plugins/collaboration";
+import type { YjsPersistence } from "@be/template/plugins/persistence";
 import { Elysia, t } from "elysia";
 import * as Y from "yjs";
-import { getAllRooms } from "../plugins/collaboration";
-import type { YjsPersistence } from "../plugins/persistence";
 
-export const roomsPlugin = new Elysia({ prefix: "/api" })
+export const roomsPlugin = new Elysia()
 
   // ── List all active in-memory rooms ───────────────────────────────────
   .get("/rooms", () => {
@@ -36,7 +36,7 @@ export const roomsPlugin = new Elysia({ prefix: "/api" })
     },
     {
       params: t.Object({ roomName: t.String() }),
-    }
+    },
   )
 
   // ── Force-save a live room to Redis ───────────────────────────────────
@@ -59,7 +59,7 @@ export const roomsPlugin = new Elysia({ prefix: "/api" })
     },
     {
       params: t.Object({ roomName: t.String() }),
-    }
+    },
   )
 
   // ── Export a room's Yjs state as base64 ───────────────────────────────
@@ -101,7 +101,7 @@ export const roomsPlugin = new Elysia({ prefix: "/api" })
     },
     {
       params: t.Object({ roomName: t.String() }),
-    }
+    },
   )
 
   // ── List all persisted doc names from Redis ────────────────────────────
@@ -131,5 +131,5 @@ export const roomsPlugin = new Elysia({ prefix: "/api" })
     },
     {
       params: t.Object({ roomName: t.String() }),
-    }
+    },
   );
