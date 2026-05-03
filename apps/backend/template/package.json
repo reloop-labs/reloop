@@ -29,6 +29,7 @@
 		"drizzle-typebox": "catalog:db",
 		"elysia": "catalog:backend",
 		"yjs": "catalog:ui",
+		"y-protocols": "catalog:backend",
 		"pg": "catalog:db",
 		"redis": "catalog:db",
 		"zod": "catalog:ui",

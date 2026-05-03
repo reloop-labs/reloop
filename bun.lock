@@ -325,6 +325,7 @@
         "elysia": "catalog:backend",
         "pg": "catalog:db",
         "redis": "catalog:db",
+        "y-protocols": "catalog:backend",
         "yjs": "catalog:ui",
         "zod": "catalog:ui",
       },
