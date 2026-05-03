@@ -65,7 +65,7 @@ export function getRandomColor(seed = ""): string {
 
 export function useCollaboration({
   roomName,
-  serverUrl = `wss//${process.env.NEXT_PUBLIC_WS_URL}/api/template/collab`,
+  serverUrl = `wss://${process.env.NEXT_PUBLIC_WS_URL}/api/template/collab`,
   user,
   onUpdate,
   updateDebounce = 1000,
