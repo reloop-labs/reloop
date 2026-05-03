@@ -1,7 +1,7 @@
 import { StarterKit } from "@react-email/editor/extensions";
 import { EmailTheming } from "@react-email/editor/plugins";
 import Collaboration from "@tiptap/extension-collaboration";
-
+import CollaborationCaret from "@tiptap/extension-collaboration-caret";
 import Placeholder from "@tiptap/extension-placeholder";
 import { useEditor } from "@tiptap/react";
 import type { WebsocketProvider } from "y-websocket";
@@ -31,12 +31,14 @@ export const useEditorHook = (collab?: CollabOptions) => {
 				...baseExtensions,
 				...(collab
 					? [
-							// Collaboration v3 accepts `provider` directly — no need for the
-							// v2 CollaborationCursor extension (incompatible plugin keys).
 							Collaboration.configure({
 								document: collab.ydoc,
 								field: "email-content",
 								provider: collab.provider,
+							}),
+							CollaborationCaret.configure({
+								provider: collab.provider,
+								user: collab.user,
 							}),
 						]
 					: []),

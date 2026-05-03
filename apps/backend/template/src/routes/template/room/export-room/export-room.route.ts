@@ -4,9 +4,10 @@ import { exportRoomController } from "./export-room.controllers";
 
 export const exportRoomRoute = new Elysia().get(
   "/rooms/:roomName/export",
-  async ({ params: { roomName }, error, ...ctx }) => {
+  async (ctx) => {
+    const { params: { roomName }, error } = ctx;
     const persistence =
-      (ctx as { persistence?: YjsPersistence | null }).persistence ?? null;
+      (ctx as unknown as { persistence?: YjsPersistence | null }).persistence ?? null;
 
     const result = await exportRoomController(roomName, persistence);
 

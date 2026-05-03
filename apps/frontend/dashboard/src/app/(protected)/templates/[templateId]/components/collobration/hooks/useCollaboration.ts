@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-// import { IndexeddbPersistence } from "y-indexeddb";
 import { WebsocketProvider } from "y-websocket";
 import * as Y from "yjs";
 
@@ -66,7 +65,8 @@ export function getRandomColor(seed = ""): string {
 
 export function useCollaboration({
   roomName,
-  serverUrl = process.env.NEXT_PUBLIC_COLLAB_WS_URL || "ws://localhost:8019/api/template/collab",
+  serverUrl = process.env.NEXT_PUBLIC_COLLAB_WS_URL ||
+  "ws://localhost:8019/api/template/collab",
   user,
   onUpdate,
   updateDebounce = 1000,

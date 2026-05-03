@@ -22,7 +22,7 @@
 		"@reloop/webhook-events": "workspace:*",
 		"@tanstack/react-table": "catalog:ui",
 		"@tiptap/extension-collaboration": "catalog:ui",
-		"@tiptap/extension-collaboration-cursor": "^2.26.2",
+		"@tiptap/extension-collaboration-caret": "catalog:ui",
 		"axios": "catalog:",
 		"babel-plugin-react-compiler": "catalog:ui",
 		"better-auth": "catalog:",

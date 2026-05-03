@@ -4,9 +4,10 @@ import { saveRoomController } from "./save-room.controllers";
 
 export const saveRoomRoute = new Elysia().post(
   "/rooms/:roomName/save",
-  async ({ params: { roomName }, error, ...ctx }) => {
+  async (ctx) => {
+    const { params: { roomName }, error } = ctx;
     const persistence =
-      (ctx as { persistence?: YjsPersistence | null }).persistence ?? null;
+      (ctx as unknown as { persistence?: YjsPersistence | null }).persistence ?? null;
 
     const result = await saveRoomController(roomName, persistence);
 
