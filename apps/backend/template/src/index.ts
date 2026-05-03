@@ -1,5 +1,6 @@
 import "dotenv/config";
 import { landing } from "@be/template/routes/landing/landing.index";
+import { roomsPlugin } from "@be/template/routes/template/room/room";
 import { templateRoutes } from "@be/template/routes/template/template.routes";
 import { templateConfig } from "@be/template/template.config";
 import { loader } from "@be/template/utils/loader";
@@ -9,7 +10,6 @@ import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
 import { collaborationPlugin } from "./plugins/collaboration";
 import { persistencePlugin } from "./plugins/persistence";
-import { roomsPlugin } from "./routes/rooms";
 
 const port = templateConfig.port;
 const templateService = new Elysia({
