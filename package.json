@@ -103,6 +103,7 @@
 				"@dnd-kit/sortable": "^10.0.0",
 				"@dnd-kit/utilities": "^3.2.2",
 				"y-webrtc": "^10.3.0",
+				"y-presence": "^0.2.3",
 				"@react-email/editor": "latest",
 				"@tiptap/core": "^3.22.5",
 				"@tiptap/pm": "^3.22.5",

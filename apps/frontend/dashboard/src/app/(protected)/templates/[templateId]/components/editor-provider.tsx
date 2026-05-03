@@ -7,6 +7,7 @@ import {
 } from "@react-email/editor/ui";
 import { EditorContext } from "@tiptap/react";
 import { CollabPresence } from "./collobration/Collabpresence";
+import { PresenceProvider } from "./collobration/PresenceProvider";
 import { ConnectionStatus } from "./collobration/ConnectionStatus";
 import {
 	getRandomColor,
@@ -29,7 +30,7 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 		avatar: user?.image ?? undefined,
 	};
 
-	const { ydoc, provider, awarenessUsers, connectionStatus, isSynced } =
+	const { ydoc, provider, connectionStatus, isSynced } =
 		useCollaboration({
 			roomName: roomId,
 			user: collabUser,
@@ -40,22 +41,24 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 	);
 
 	return (
-		<EditorContext.Provider value={{ editor }}>
-			{/* ── Collab header bar ──────────────────────────────────────── */}
-			<div className="flex items-center justify-between border-stroke-soft-200 border-b bg-bg-white-0 px-4 py-2 dark:bg-[#0a0a0a]">
-				<CollabPresence users={awarenessUsers} currentUserId={user?.id} />
-				<ConnectionStatus status={connectionStatus} isSynced={isSynced} />
-			</div>
+		<PresenceProvider awareness={provider?.awareness ?? null}>
+			<EditorContext.Provider value={{ editor }}>
+				{/* ── Collab header bar ──────────────────────────────────────── */}
+				<div className="flex items-center justify-between border-stroke-soft-200 border-b bg-bg-white-0 px-4 py-2 dark:bg-[#0a0a0a]">
+					<CollabPresence />
+					<ConnectionStatus status={connectionStatus} isSynced={isSynced} />
+				</div>
 
-			{children}
+				{children}
 
-			<BubbleMenu
-				hideWhenActiveNodes={["button"]}
-				hideWhenActiveMarks={["link"]}
-			/>
-			<BubbleMenu.LinkDefault />
-			<BubbleMenu.ButtonDefault />
-			<SlashCommand items={defaultSlashCommands} />
-		</EditorContext.Provider>
+				<BubbleMenu
+					hideWhenActiveNodes={["button"]}
+					hideWhenActiveMarks={["link"]}
+				/>
+				<BubbleMenu.LinkDefault />
+				<BubbleMenu.ButtonDefault />
+				<SlashCommand items={defaultSlashCommands} />
+			</EditorContext.Provider>
+		</PresenceProvider>
 	);
 };

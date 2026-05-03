@@ -29,6 +29,7 @@
 		"boring-avatars": "catalog:ui",
 		"calligraph": "catalog:ui",
 		"dayjs": "catalog:ui",
+		"y-protocols": "catalog:ui",
 		"framer-motion": "catalog:ui",
 		"lucide-react": "catalog:ui",
 		"motion": "catalog:ui",

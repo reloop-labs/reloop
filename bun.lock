@@ -3,6 +3,9 @@
   "workspaces": {
     "": {
       "name": "reloop",
+      "dependencies": {
+        "y-presence": "^0.2.3",
+      },
       "devDependencies": {
         "@biomejs/biome": "2.2.6",
         "husky": "9.1.7",
@@ -3597,6 +3600,8 @@
     "xtend": ["xtend@4.0.2", "", {}, "sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ=="],
 
     "y-indexeddb": ["y-indexeddb@9.0.12", "", { "dependencies": { "lib0": "^0.2.74" }, "peerDependencies": { "yjs": "^13.0.0" } }, "sha512-9oCFRSPPzBK7/w5vOkJBaVCQZKHXB/v6SIT+WYhnJxlEC61juqG0hBrAf+y3gmSMLFLwICNH9nQ53uscuse6Hg=="],
+
+    "y-presence": ["y-presence@0.2.3", "", { "dependencies": { "use-sync-external-store": "^1.2.0" }, "peerDependencies": { "react": ">=16.8" } }, "sha512-Sg826Xg0b1AJW1NRLox51/ZdgR77OAabgr9HxgEZI7R3ePibLTAU1wIeFgkqm/rAS9wvteCtFSyofcrgi82VVQ=="],
 
     "y-protocols": ["y-protocols@1.0.7", "", { "dependencies": { "lib0": "^0.2.85" }, "peerDependencies": { "yjs": "^13.0.0" } }, "sha512-YSVsLoXxO67J6eE/nV4AtFtT3QEotZf5sK5BHxFBXso7VDUT3Tx07IfA6hsu5Q5OmBdMkQVmFZ9QOA7fikWvnw=="],
 
