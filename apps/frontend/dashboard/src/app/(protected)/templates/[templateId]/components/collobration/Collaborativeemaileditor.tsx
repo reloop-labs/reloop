@@ -8,6 +8,7 @@ import Underline from "@tiptap/extension-underline";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { useCallback, useEffect } from "react";
+import type { Doc } from "yjs";
 import { CollabPresence } from "./Collabpresence";
 import { CollabToolbar } from "./Collabtoolbar";
 import { ConnectionStatus } from "./ConnectionStatus";
@@ -65,11 +66,9 @@ export function CollaborativeEmailEditor({
 		serverUrl: wsUrl,
 		user,
 		onUpdate: useCallback(
-			async (doc) => {
+			async (doc: Doc) => {
 				if (!onSave) return;
-				// Convert Yjs XML fragment → TipTap JSON
-				// The editor handles this internally via the Collaboration extension
-				// onSave receives the current editor JSON (set via editor.on('update'))
+				console.log("hello", doc);
 			},
 			[onSave],
 		),
@@ -102,7 +101,6 @@ export function CollaborativeEmailEditor({
 							CollaborationCursor.configure({
 								provider,
 								user: { name: user.name, color: user.color },
-								render: (user) => renderCursor(user),
 							}),
 						]
 					: []),
@@ -160,79 +158,6 @@ export function CollaborativeEmailEditor({
 					<EditorContent editor={editor} className="min-h-[500px]" />
 				</div>
 			</div>
-
-			{/* Cursor styles — injected once */}
-			<style>{cursorStyles}</style>
 		</div>
 	);
 }
-
-// ─── Custom cursor renderer ─────────────────────────────────────────────────
-
-function renderCursor(user: { name: string; color: string }) {
-	const cursorEl = document.createElement("span");
-	cursorEl.classList.add("collab-cursor");
-	cursorEl.setAttribute("data-user", user.name);
-	cursorEl.style.setProperty("--cursor-color", user.color);
-
-	const caretEl = document.createElement("span");
-	caretEl.classList.add("collab-cursor__caret");
-
-	const labelEl = document.createElement("span");
-	labelEl.classList.add("collab-cursor__label");
-	labelEl.textContent = user.name;
-	labelEl.style.backgroundColor = user.color;
-
-	cursorEl.appendChild(caretEl);
-	cursorEl.appendChild(labelEl);
-	return cursorEl;
-}
-
-const cursorStyles = `
-  .collab-cursor {
-    position: relative;
-    margin-left: -1px;
-    margin-right: -1px;
-    border-left: 2px solid var(--cursor-color);
-    word-break: normal;
-    pointer-events: none;
-  }
-
-  .collab-cursor__caret {
-    position: absolute;
-    top: 0;
-    left: -1px;
-    height: 100%;
-    border-left: 2px solid var(--cursor-color);
-  }
-
-  .collab-cursor__label {
-    position: absolute;
-    top: -1.5em;
-    left: -2px;
-    font-size: 11px;
-    font-weight: 600;
-    color: white;
-    padding: 1px 5px;
-    border-radius: 3px 3px 3px 0;
-    white-space: nowrap;
-    user-select: none;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.15s ease;
-  }
-
-  .collab-cursor:hover .collab-cursor__label,
-  .collab-cursor__label--visible {
-    opacity: 1;
-  }
-
-  /* ProseMirror placeholder */
-  .ProseMirror p.is-editor-empty:first-child::before {
-    content: attr(data-placeholder);
-    float: left;
-    color: #adb5bd;
-    pointer-events: none;
-    height: 0;
-  }
-`;
