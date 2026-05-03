@@ -65,8 +65,9 @@ export function getRandomColor(seed = ""): string {
 
 export function useCollaboration({
   roomName,
-  serverUrl = process.env.NEXT_PUBLIC_COLLAB_WS_URL ||
-  "ws://localhost:8019/api/template/collab",
+  serverUrl = (typeof window !== "undefined"
+    ? `${window.location.protocol === "https:" ? "wss:" : "ws:"}//${window.location.host}/api/template/collab`
+    : ""),
   user,
   onUpdate,
   updateDebounce = 1000,
@@ -94,7 +95,7 @@ export function useCollaboration({
   }, []);
 
   useEffect(() => {
-    if (!roomName) return;
+    if (!roomName || !serverUrl) return;
 
     // ── Yjs document ──────────────────────────────────────────────────
     const newYdoc = new Y.Doc();
