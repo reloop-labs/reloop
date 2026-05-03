@@ -208,7 +208,13 @@ export function SpacingControl({
 	onChange: (v: SpacingValue) => void;
 	unit?: string;
 }) {
-	const [linked, setLinked] = useState(true);
+	const [linked, setLinked] = useState(() => {
+		return (
+			value.top === value.right &&
+			value.top === value.bottom &&
+			value.top === value.left
+		);
+	});
 
 	const handleChange = (side: keyof SpacingValue, raw: number | "") => {
 		if (linked) {

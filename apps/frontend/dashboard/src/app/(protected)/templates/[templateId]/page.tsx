@@ -16,7 +16,7 @@ const Page = () => {
 						<SendDetails />
 						<FullEmailBuilder />
 					</main>
-					<div className="absolute right-2 bottom-2 h-[calc(100vh-34px)] w-72 rounded-[18px] border border-stroke-soft-200 bg-bg-weak-50 dark:border-stroke-soft-100 dark:bg-[#0a0a0a]">
+					<div className="absolute right-2 bottom-2 h-[calc(100vh-34px)] w-72 overflow-y-auto rounded-[18px] border border-stroke-soft-200 bg-bg-weak-50 dark:border-stroke-soft-100 dark:bg-[#0a0a0a]">
 						<EmailInspector />
 					</div>
 					<FloatingMenu />

@@ -46,6 +46,10 @@ type InspectorStyleProperty =
 	| "backgroundColor"
 	| "borderColor"
 	| "borderWidth"
+	| "borderTopWidth"
+	| "borderRightWidth"
+	| "borderBottomWidth"
+	| "borderLeftWidth"
 	| "paddingTop"
 	| "paddingRight"
 	| "paddingBottom"
@@ -281,7 +285,7 @@ export const EmailInspector = () => {
 
 				{/* ── Border card ── */}
 				<Inspector.Node>
-					{({ getStyle, setStyle }) => (
+					{({ getStyle, setStyle, batchSetStyle }) => (
 						<InspectorSection>
 							<SectionHeader label="Border" />
 							<ColorRow
@@ -289,13 +293,35 @@ export const EmailInspector = () => {
 								value={String(getStyle("borderColor") ?? "")}
 								onChange={(v) => setStyle("borderColor", v)}
 							/>
-							<PropRow label="Width">
-								<NumInput
-									value={getStyle("borderWidth")}
-									onChange={(v) => setStyle("borderWidth", v as number)}
-									unit="px"
-								/>
-							</PropRow>
+							<SpacingControl
+								label="Width"
+								value={{
+									top:
+										(getStyle("borderTopWidth") as number) ??
+										(getStyle("borderWidth") as number) ??
+										"",
+									right:
+										(getStyle("borderRightWidth") as number) ??
+										(getStyle("borderWidth") as number) ??
+										"",
+									bottom:
+										(getStyle("borderBottomWidth") as number) ??
+										(getStyle("borderWidth") as number) ??
+										"",
+									left:
+										(getStyle("borderLeftWidth") as number) ??
+										(getStyle("borderWidth") as number) ??
+										"",
+								}}
+								onChange={({ top, right, bottom, left }) =>
+									batchSetStyle([
+										{ prop: "borderTopWidth", value: top as number },
+										{ prop: "borderRightWidth", value: right as number },
+										{ prop: "borderBottomWidth", value: bottom as number },
+										{ prop: "borderLeftWidth", value: left as number },
+									])
+								}
+							/>
 							<div className="h-2" />
 						</InspectorSection>
 					)}

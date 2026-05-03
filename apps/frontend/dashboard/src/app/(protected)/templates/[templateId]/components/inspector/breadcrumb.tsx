@@ -42,7 +42,7 @@ const getIcon = (type: string) => {
 
 const BreadCrumb = () => {
 	return (
-		<div className="border-stroke-soft-200 border-b px-1.5 py-2">
+		<div className="sticky top-0 z-10 bg-bg-weak-50 dark:bg-[#0a0a0a] border-stroke-soft-200 border-b px-1.5 py-2">
 			<ol className="flex list-none items-center gap-1 rounded-lg bg-bg-weak-50 px-3 py-2">
 				<Inspector.Breadcrumb>
 					{(segments) =>
