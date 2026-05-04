@@ -82,6 +82,7 @@
 				"babel-plugin-react-compiler": "1.0.0",
 				"next": "16.2.1",
 				"react": "19.2.0",
+				"@tiptap/extension-drag-handle-react": "^3.22.5",
 				"y-indexeddb": "^9.0.12",
 				"calligraph": "^1.4.1",
 				"react-dom": "19.2.0",

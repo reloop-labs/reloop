@@ -22,6 +22,7 @@
 		"@tanstack/react-table": "catalog:ui",
 		"@tiptap/extension-collaboration": "catalog:ui",
 		"@tiptap/extension-collaboration-caret": "catalog:ui",
+		"@tiptap/extension-drag-handle-react": "catalog:ui",
 		"axios": "catalog:",
 		"babel-plugin-react-compiler": "catalog:ui",
 		"better-auth": "catalog:",
