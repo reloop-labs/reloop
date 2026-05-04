@@ -79,42 +79,9 @@ export function handleMessage(
         const encoder = encoding.createEncoder();
         encoding.writeVarUint(encoder, MESSAGE_SYNC);
 
-        const syncMessageType = syncProtocol.readSyncMessage(
-          decoder,
-          encoder,
-          room.doc,
-          ws,
-        );
-
-        // If we produced a response (e.g. sync step 2 / update), send it back
+        syncProtocol.readSyncMessage(decoder, encoder, room.doc, ws);
         if (encoding.length(encoder) > 1) {
           ws.send(encoding.toUint8Array(encoder));
-        }
-
-        // Sync step 2 means the client just sent us their full state —
-        // broadcast to all other clients and persist
-        if (syncMessageType === syncProtocol.messageYjsSyncStep2) {
-          const update = Y.encodeStateAsUpdate(room.doc);
-          const broadcastEncoder = encoding.createEncoder();
-          encoding.writeVarUint(broadcastEncoder, MESSAGE_SYNC);
-          syncProtocol.writeUpdate(broadcastEncoder, update);
-          const broadcastMessage = encoding.toUint8Array(broadcastEncoder);
-
-          room.clients.forEach((client) => {
-            if (client !== ws && client.readyState === 1) {
-              client.send(broadcastMessage);
-            }
-          });
-
-          // Persist asynchronously — don't block the message handler
-          if (persistence) {
-            const roomName = getRoomName(room);
-            if (roomName) {
-              persistence.writeState(roomName, room.doc).catch((err) => {
-                logger.error({ error: err }, "[collab] Persistence write failed");
-              });
-            }
-          }
         }
         break;
       }
