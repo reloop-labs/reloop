@@ -144,7 +144,7 @@ export const EmailInspector = () => {
 	if (!editor) return null;
 
 	return (
-		<Inspector.Root>
+		<Inspector.Root className="bg-bg-weak-50 dark:bg-[#0a0a0a]">
 			{/* ── Breadcrumb ── */}
 			<Breadcrumb />
 
@@ -152,11 +152,7 @@ export const EmailInspector = () => {
 			<div className="flex flex-col divide-y divide-stroke-soft-200 pb-6">
 				{/* ── Text card (Handles both text selection and node selection) ── */}
 				<Inspector.Text>
-					{(textProps) => (
-						<TextSection
-							{...textProps}
-						/>
-					)}
+					{(textProps) => <TextSection {...textProps} />}
 				</Inspector.Text>
 
 				<Inspector.Node>

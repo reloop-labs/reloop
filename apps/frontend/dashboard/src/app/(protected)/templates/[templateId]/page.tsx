@@ -13,14 +13,14 @@ const Page = () => {
 
 	return (
 		<EditorProvider roomId={templateId}>
-			<div className="flex h-screen overflow-hidden bg-bg-weak-50 dark:bg-black">
+			<div className="flex h-[calc(100vh-45px)] overflow-hidden">
 				<div className="w-12" />
 				<div className="relative m-2 flex flex-1 rounded-[24px] border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
 					<main className="hide-scrollbar relative flex flex-1 flex-col overflow-y-auto">
 						<SendDetails />
 						<FullEmailBuilder />
 					</main>
-					<div className="absolute right-2 bottom-2 h-[calc(100vh-34px)] w-72 overflow-y-auto rounded-[18px] border border-stroke-soft-200 bg-bg-weak-50 dark:border-stroke-soft-100 dark:bg-[#0a0a0a]">
+					<div className="absolute right-2 bottom-2 h-[calc(100vh-79px)] w-72 overflow-y-auto rounded-[18px] border border-stroke-soft-200 bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
 						<EmailInspector />
 					</div>
 					<FloatingMenu />
