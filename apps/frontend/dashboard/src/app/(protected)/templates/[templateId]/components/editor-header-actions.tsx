@@ -8,7 +8,6 @@ import * as Popover from "@reloop/ui/popover";
 import { useParams, useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { CollabPresence } from "./collobration/Collabpresence";
-import { ConnectionStatus } from "./collobration/ConnectionStatus";
 import type { ConnectionStatus as ConnectionStatusType } from "./collobration/hooks/useCollaboration";
 
 interface EditorHeaderActionsProps {
@@ -114,8 +113,7 @@ export const EditorHeaderActions = ({
 
 	return (
 		<div className="flex items-center gap-2">
-			<CollabPresence />
-			<ConnectionStatus status={connectionStatus} isSynced={isSynced} />
+			<CollabPresence status={connectionStatus} isSynced={isSynced} />
 			<Popover.Root open={popoverOpen} onOpenChange={setPopoverOpen}>
 				<Popover.Trigger asChild>
 					<Button.Root variant="neutral" mode="stroke" size="xsmall">
