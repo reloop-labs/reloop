@@ -7,6 +7,7 @@ import * as Y from "yjs";
 // ── Message type constants (y-websocket protocol) ──────────────────────────
 export const MESSAGE_SYNC = 0;
 export const MESSAGE_AWARENESS = 1;
+export const MESSAGE_USER_INFO = 2;
 
 export interface CollabClient {
   readyState: number;

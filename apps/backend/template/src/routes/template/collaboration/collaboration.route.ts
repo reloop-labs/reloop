@@ -1,8 +1,15 @@
 import { authMiddleware } from "@be/template/middleware/auth";
-import { clientIdsMap, getRoom, rooms, scheduleRoomCleanup } from "@be/template/plugins/room";
+import {
+  clientIdsMap,
+  getRoom,
+  MESSAGE_USER_INFO,
+  rooms,
+  scheduleRoomCleanup,
+} from "@be/template/plugins/room";
 import type { YjsPersistence } from "@be/template/utils/persistence";
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
+import * as encoding from "lib0/encoding";
 import * as awarenessProtocol from "y-protocols/awareness";
 import { handleMessage, sendInitialSync } from "./collaboration.controllers";
 
@@ -24,6 +31,15 @@ export const collaborationRoute = new Elysia({
       const init = () => {
         room.clients.add(ws.raw);
         sendInitialSync(ws.raw, room);
+
+        // Push verified user details from server to client
+        if (ws.data.user) {
+          const encoder = encoding.createEncoder();
+          encoding.writeVarUint(encoder, MESSAGE_USER_INFO);
+          encoding.writeVarString(encoder, JSON.stringify(ws.data.user));
+          ws.raw.send(encoding.toUint8Array(encoder));
+        }
+
         logger.info(
           { roomName, totalClients: room.clients.size },
           "[collab] Client joined",

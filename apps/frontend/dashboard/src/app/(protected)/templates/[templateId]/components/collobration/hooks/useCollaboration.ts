@@ -1,8 +1,11 @@
 "use client";
 
+import * as decoding from "lib0/decoding";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { WebsocketProvider } from "y-websocket";
 import * as Y from "yjs";
+
+const MESSAGE_USER_INFO = 2;
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -76,6 +79,7 @@ export function useCollaboration({
   // Use reactive state so consumers re-render when ydoc/provider are ready
   const [ydoc, setYdoc] = useState<Y.Doc | null>(null);
   const [provider, setProvider] = useState<WebsocketProvider | null>(null);
+  const [serverUser, setServerUser] = useState<CollabUser | null>(null);
 
   const ydocRef = useRef<Y.Doc | null>(null);
   const providerRef = useRef<WebsocketProvider | null>(null);
@@ -123,20 +127,44 @@ export function useCollaboration({
             : "disconnected",
       );
     });
-
     newProvider.on("sync", (synced: boolean) => {
       setIsSynced(synced);
     });
+
+    // Listen for verified user info from the server
+    const handleMessage = (event: MessageEvent) => {
+      try {
+        const data = event.data;
+        if (!(data instanceof ArrayBuffer)) return;
+        const decoder = decoding.createDecoder(new Uint8Array(data));
+        const messageType = decoding.readVarUint(decoder);
+
+        if (messageType === MESSAGE_USER_INFO) {
+          const json = decoding.readVarString(decoder);
+          const userData = JSON.parse(json);
+          setServerUser({
+            name: userData.name,
+            color: user.color, // keep local color
+            avatar: userData.image,
+          });
+        }
+      } catch (err) {
+        console.error("[collab] Failed to parse server message", err);
+      }
+    };
+
+    newProvider.ws?.addEventListener("message", handleMessage);
 
     newProvider.on("connection-error", () => {
       setConnectionStatus("error");
     });
 
-    // ── Awareness (presence) ──────────────────────────────────────────
+    // ── Awareness (presence) init ─────────────────────────────────────
+    const activeUser = serverUser || user;
     newProvider.awareness.setLocalStateField("user", {
-      name: user.name,
-      color: user.color,
-      avatar: user.avatar,
+      name: activeUser.name,
+      color: activeUser.color,
+      avatar: activeUser.avatar,
     });
 
     const updateAwareness = () => {
@@ -188,7 +216,19 @@ export function useCollaboration({
       setYdoc(null);
       setProvider(null);
     };
-  }, [roomName, user.name, user.color, user.avatar, updateDebounce]);
+  }, [roomName, updateDebounce]);
+
+  // Update user details in awareness without reconnecting
+  useEffect(() => {
+    if (provider) {
+      const activeUser = serverUser || user;
+      provider.awareness.setLocalStateField("user", {
+        name: activeUser.name,
+        color: activeUser.color,
+        avatar: activeUser.avatar,
+      });
+    }
+  }, [provider, user.name, user.color, user.avatar, serverUser]);
 
   return {
     ydoc,
