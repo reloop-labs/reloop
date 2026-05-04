@@ -5,6 +5,7 @@ import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import {
 	ArrowUp,
+	ChevronDown,
 	Code2,
 	Coffee,
 	GraduationCap,
@@ -36,11 +37,11 @@ export default function Home() {
 				>
 					Get Pro
 				</button>
-				<div className="mb-10 flex items-center gap-4 text-center">
+				<div className="mb-10 flex items-center gap-1 text-center">
 					<div className="p-1">
-						<Icon name="sparkling" className="h-10 w-10" strokeWidth={1.5} />
+						<Icon name="sparkling" className="h-8 w-8" strokeWidth={1.5} />
 					</div>
-					<h1 className="font-medium font-serif text-5xl text-text-strong-950 tracking-tight dark:text-white/90">
+					<h1 className="font-medium font-serif text-3xl text-text-strong-950 tracking-tight dark:text-white/90">
 						{greeting}, {firstName}
 					</h1>
 				</div>
@@ -71,19 +72,21 @@ export default function Home() {
 					</div>
 				</div>
 				<div className="flex flex-wrap justify-center gap-3">
-					<ActionButton icon={<Pencil className="h-4 w-4" />} label="Write" />
 					<ActionButton
-						icon={<GraduationCap className="h-4 w-4" />}
-						label="Learn"
-					/>
-					<ActionButton icon={<Code2 className="h-4 w-4" />} label="Code" />
-					<ActionButton
-						icon={<Coffee className="h-4 w-4" />}
-						label="Life stuff"
+						icon={<Icon name="mail-single" className="h-4 w-4" />}
+						label="Emails"
 					/>
 					<ActionButton
-						icon={<Lightbulb className="h-4 w-4" />}
-						label="Claude's choice"
+						icon={<Icon name="fat-row" className="h-4 w-4" />}
+						label="Metrics"
+					/>
+					<ActionButton
+						icon={<Icon name="users" className="h-4 w-4" />}
+						label="Contacts"
+					/>
+					<ActionButton
+						icon={<Icon name="file-text" className="h-4 w-4" />}
+						label="Logs"
 					/>
 				</div>
 			</div>
@@ -94,17 +97,27 @@ export default function Home() {
 function ActionButton({
 	icon,
 	label,
+	isSpecial,
 }: {
 	icon: React.ReactNode;
 	label: string;
+	isSpecial?: boolean;
 }) {
 	return (
 		<button
 			type="button"
-			className="flex items-center gap-2.5 rounded-2xl border border-stroke-soft-100 bg-white px-5 py-2.5 font-medium text-[15px] text-text-sub-600 transition-all hover:bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.03] dark:text-white/70 dark:hover:bg-white/10"
+			className="flex items-center gap-2.5 rounded-2xl border border-stroke-soft-100 bg-white px-5 py-2.5 font-medium text-[15px] transition-all hover:bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.03] dark:hover:bg-white/10"
 		>
 			<span className="text-text-soft-400 dark:text-white/40">{icon}</span>
-			<span>{label}</span>
+			<span
+				className={
+					isSpecial
+						? "bg-gradient-to-r from-[#A855F7] to-[#EC4899] bg-clip-text text-transparent"
+						: "text-text-sub-600 dark:text-white/70"
+				}
+			>
+				{label}
+			</span>
 		</button>
 	);
 }
