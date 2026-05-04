@@ -8,8 +8,6 @@ import {
 } from "@react-email/editor/ui";
 import { EditorContext } from "@tiptap/react";
 import { useRef } from "react";
-import { CollabPresence } from "./collobration/Collabpresence";
-import { ConnectionStatus } from "./collobration/ConnectionStatus";
 import {
 	getRandomColor,
 	useCollaboration,
@@ -18,6 +16,7 @@ import { PresenceProvider } from "./collobration/PresenceProvider";
 import { useMousePresence } from "./cursor/hooks/useMousePresence";
 import { useRemoteCursors } from "./cursor/hooks/useRemoteCursors";
 import { RemoteCursors } from "./cursor/RemoteCursors";
+import { EditorHeaderActions } from "./editor-header-actions";
 import { TemplateName } from "./template-name";
 import { useEditorHook } from "./use-editor-hooks";
 
@@ -51,14 +50,16 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 		<PresenceProvider awareness={provider?.awareness ?? null}>
 			<EditorContext.Provider value={{ editor }}>
 				<div ref={containerRef} className="bg-bg-weak-50 dark:bg-black">
-					<div className="grid grid-cols-3 items-center px-4 py-2">
+					<div className="grid grid-cols-3 items-center px-4 pt-2">
 						<div />
 						<div className="flex justify-center">
 							<TemplateName />
 						</div>
-						<div className="flex items-center justify-end gap-4">
-							<CollabPresence />
-							<ConnectionStatus status={connectionStatus} isSynced={isSynced} />
+						<div className="flex items-center justify-end">
+							<EditorHeaderActions
+								connectionStatus={connectionStatus}
+								isSynced={isSynced}
+							/>
 						</div>
 					</div>
 					{children}

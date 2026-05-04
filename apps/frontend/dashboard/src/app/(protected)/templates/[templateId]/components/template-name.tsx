@@ -4,7 +4,7 @@ import { Icon } from "@reloop/ui/icon";
 import * as StatusBadge from "@reloop/ui/status-badge";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import useSWR from "swr";
 import { useDebounceCallback } from "usehooks-ts";
 
@@ -99,7 +99,7 @@ export const TemplateName = () => {
 					className="rounded-md bg-transparent px-2 py-1 font-bold text-sm text-text-strong-950 outline-none transition-colors placeholder:text-text-soft-400 hover:bg-bg-weak-50 focus:ring-0 dark:text-white dark:hover:bg-white/5"
 				/>
 				{data?.status && (
-					<div className="flex items-center rounded-md border border-stroke-soft-200 bg-bg-weak-50/50 px-2 font-medium text-xs dark:bg-bg-weak-50/50">
+					<div className="flex items-center rounded-md bg-bg-soft-200 px-2 py-0.5 font-medium text-xs capitalize dark:bg-bg-weak-50/50">
 						{data.status}
 					</div>
 				)}
