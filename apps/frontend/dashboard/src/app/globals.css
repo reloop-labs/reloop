@@ -30,6 +30,10 @@ body {
 	-webkit-text-fill-color: transparent;
 }
 
+.node-container{
+	margin: auto;
+}
+
 /* Tiptap Placeholder */
 .tiptap p.is-empty::before {
 	color: var(--color-text-soft-400);
