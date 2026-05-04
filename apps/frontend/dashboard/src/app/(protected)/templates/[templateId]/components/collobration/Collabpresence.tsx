@@ -87,14 +87,6 @@ export function CollabPresence() {
 					</div>
 				)}
 			</div>
-
-			<span className="text-gray-400 text-xs">
-				{totalOthers === 0
-					? "Only you"
-					: totalOthers === 1
-						? "1 other editing"
-						: `${totalOthers} others editing`}
-			</span>
 		</div>
 	);
 }

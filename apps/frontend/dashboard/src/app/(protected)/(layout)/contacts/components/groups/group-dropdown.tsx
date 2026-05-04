@@ -41,7 +41,7 @@ export const GroupDropdown = ({
 		{
 			id: "view",
 			label: "View Details",
-			icon: "eye-outline" as const,
+			icon: "info-outline" as const,
 			isDanger: false,
 		},
 		{
