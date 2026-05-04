@@ -1,0 +1,222 @@
+# Reloop
+
+> Reloop is the email infrastructure for developers. Send transactional and marketing emails at scale with high deliverability, real-time webhooks, inbound email processing, and powerful analytics. Reloop provides SDKs for Node.js, Python, PHP, Ruby, Go, Rust, Elixir, Java, .NET, and a CLI tool.
+
+Important notes:
+
+- The Reloop API base URL is `https://api.reloop.sh`
+- Authentication uses the `x-api-key` header with API keys prefixed with `rl_`
+- All request and response bodies are JSON encoded
+- Reloop supports both transactional and marketing (broadcast) emails
+- Inbound email receiving is supported via webhook ingester
+- The MCP server package is `reloop-mcp` and can be installed via `npx -y reloop-mcp`
+
+## Documentation
+
+- [Full documentation](https://docs.reloop.dev/docs/llms-full.txt): Complete Reloop documentation in a single file
+- [Introduction](https://docs.reloop.dev/docs/introduction): Welcome to Reloop documentation
+- [API Reference](https://docs.reloop.dev/docs/api): REST API reference with authentication, response codes, and rate limits
+
+## Quickstart Guides
+
+- [Node.js](https://docs.reloop.dev/docs/quickstart/nodejs): Get started with Reloop using Node.js
+  - [Next.js](https://docs.reloop.dev/docs/quickstart/nodejs/nextjs): Next.js integration guide
+  - [Remix](https://docs.reloop.dev/docs/quickstart/nodejs/remix): Remix integration guide
+  - [Nuxt](https://docs.reloop.dev/docs/quickstart/nodejs/nuxt): Nuxt integration guide
+  - [Express](https://docs.reloop.dev/docs/quickstart/nodejs/express): Express.js integration guide
+  - [RedwoodJS](https://docs.reloop.dev/docs/quickstart/nodejs/redwoodjs): RedwoodJS integration guide
+  - [Hono](https://docs.reloop.dev/docs/quickstart/nodejs/hono): Hono integration guide
+  - [Bun](https://docs.reloop.dev/docs/quickstart/nodejs/bun): Bun integration guide
+  - [Astro](https://docs.reloop.dev/docs/quickstart/nodejs/astro): Astro integration guide
+- [Serverless](https://docs.reloop.dev/docs/quickstart/serverless): Deploy Reloop on serverless platforms
+  - [Vercel Functions](https://docs.reloop.dev/docs/quickstart/serverless/vercel-functions): Vercel Functions integration
+  - [Supabase Edge Functions](https://docs.reloop.dev/docs/quickstart/serverless/supabase-edge-functions): Supabase Edge Functions integration
+  - [Cloudflare Workers](https://docs.reloop.dev/docs/quickstart/serverless/cloudflare-workers): Cloudflare Workers integration
+  - [Deno Deploy](https://docs.reloop.dev/docs/quickstart/serverless/deno-deploy): Deno Deploy integration
+  - [AWS Lambda](https://docs.reloop.dev/docs/quickstart/serverless/aws-lambda): AWS Lambda integration
+- [PHP](https://docs.reloop.dev/docs/quickstart/php): PHP SDK quickstart
+  - [Symphony](https://docs.reloop.dev/docs/quickstart/php/symphony): Symphony framework integration
+  - [Laravel](https://docs.reloop.dev/docs/quickstart/php/laravel): Laravel integration guide
+- [Ruby](https://docs.reloop.dev/docs/quickstart/ruby): Ruby SDK quickstart
+  - [Rails](https://docs.reloop.dev/docs/quickstart/ruby/rails): Ruby on Rails integration
+  - [Sinatra](https://docs.reloop.dev/docs/quickstart/ruby/sinatra): Sinatra integration
+- [Python](https://docs.reloop.dev/docs/quickstart/python): Python SDK quickstart
+  - [Flask](https://docs.reloop.dev/docs/quickstart/python/flask): Flask integration guide
+  - [FastAPI](https://docs.reloop.dev/docs/quickstart/python/fastapi): FastAPI integration guide
+- [Go](https://docs.reloop.dev/docs/quickstart/go): Go SDK quickstart
+- [Rust](https://docs.reloop.dev/docs/quickstart/rust): Rust SDK quickstart
+  - [Axum](https://docs.reloop.dev/docs/quickstart/rust/axum): Axum framework integration
+- [Elixir](https://docs.reloop.dev/docs/quickstart/elixir): Elixir SDK quickstart
+  - [Phoenix](https://docs.reloop.dev/docs/quickstart/elixir/phoenix): Phoenix framework integration
+- [Java](https://docs.reloop.dev/docs/quickstart/java): Java SDK quickstart
+- [.NET](https://docs.reloop.dev/docs/quickstart/dotnet): .NET SDK quickstart
+- [CLI](https://docs.reloop.dev/docs/quickstart/cli): Command-line tool quickstart
+- [SMTP](https://docs.reloop.dev/docs/quickstart/smtp): Send emails via SMTP relay
+  - [Auth0](https://docs.reloop.dev/docs/quickstart/smtp/auth0): Auth0 SMTP integration
+  - [Customer.io](https://docs.reloop.dev/docs/quickstart/smtp/customer-io): Customer.io SMTP integration
+  - [Django](https://docs.reloop.dev/docs/quickstart/smtp/django): Django SMTP integration
+  - [Laravel](https://docs.reloop.dev/docs/quickstart/smtp/laravel): Laravel SMTP integration
+  - [Nodemailer](https://docs.reloop.dev/docs/quickstart/smtp/nodemailer): Nodemailer SMTP integration
+  - [PHPMailer](https://docs.reloop.dev/docs/quickstart/smtp/phpmailer): PHPMailer SMTP integration
+  - [Rails](https://docs.reloop.dev/docs/quickstart/smtp/rails): Rails SMTP integration
+  - [Supabase](https://docs.reloop.dev/docs/quickstart/smtp/supabase): Supabase SMTP integration
+  - [WordPress](https://docs.reloop.dev/docs/quickstart/smtp/wordpress): WordPress SMTP integration
+  - [NextAuth](https://docs.reloop.dev/docs/quickstart/smtp/nextauth): NextAuth SMTP integration
+
+## Learn
+
+- [Sending Emails](https://docs.reloop.dev/docs/learn/sending): Learn how to send transactional emails with Reloop
+- [Receiving Emails](https://docs.reloop.dev/docs/learn/receiving): Handle inbound emails with Reloop
+- [Broadcasts](https://docs.reloop.dev/docs/learn/broadcasts): Send marketing and bulk emails
+- [Automations](https://docs.reloop.dev/docs/learn/automations): Set up automated email workflows
+- [Templates](https://docs.reloop.dev/docs/learn/templates): Create and manage email templates
+- [Audience](https://docs.reloop.dev/docs/learn/audience): Manage contacts and audience segments
+- [Domains](https://docs.reloop.dev/docs/learn/domains): Configure and verify sending domains with DNS records
+- [Logs](https://docs.reloop.dev/docs/learn/logs): View email activity and delivery logs
+- [API Keys](https://docs.reloop.dev/docs/learn/api-keys): Create and manage API keys for authentication
+- [Webhooks](https://docs.reloop.dev/docs/learn/webhooks): Set up webhook endpoints for real-time event notifications
+- [Settings](https://docs.reloop.dev/docs/learn/settings): Configure your Reloop account settings
+
+## API Reference
+
+- [Introduction](https://docs.reloop.dev/docs/api): API overview, base URL, authentication, and response codes
+- [Pagination](https://docs.reloop.dev/docs/api/pagination): How pagination works in the API
+- [Usage Limits](https://docs.reloop.dev/docs/api/usage-limits): API rate limits and usage quotas
+- [Errors](https://docs.reloop.dev/docs/api/errors): Error response format and common error codes
+
+### Domain API
+- [Create Domain](https://docs.reloop.dev/docs/api/domain/post-api-domain-v1create): POST /api/domain/v1/create
+- [List Domains](https://docs.reloop.dev/docs/api/domain/get-api-domain-v1list): GET /api/domain/v1/list
+- [Get Domain](https://docs.reloop.dev/docs/api/domain/get-api-domain-v1by-domain_id): GET /api/domain/v1/:domain_id
+- [Update Domain](https://docs.reloop.dev/docs/api/domain/patch-api-domain-v1by-domain_id): PATCH /api/domain/v1/:domain_id
+- [Delete Domain](https://docs.reloop.dev/docs/api/domain/delete-api-domain-v1by-domain_id): DELETE /api/domain/v1/:domain_id
+- [Verify Domain](https://docs.reloop.dev/docs/api/domain/post-api-domain-v1verify-by-domain_id): POST /api/domain/v1/verify/:domain_id
+- [Get Nameservers](https://docs.reloop.dev/docs/api/domain/get-api-domain-v1nameservers-by-domain_id): GET /api/domain/v1/nameservers/:domain_id
+
+### API Key API
+- [Create API Key](https://docs.reloop.dev/docs/api/api-key/post-api-api-key-v1): POST /api/api-key/v1
+- [List API Keys](https://docs.reloop.dev/docs/api/api-key/get-api-api-key-v1): GET /api/api-key/v1
+- [Get API Key](https://docs.reloop.dev/docs/api/api-key/get-api-api-key-v1by-api_key_id): GET /api/api-key/v1/:api_key_id
+- [Update API Key](https://docs.reloop.dev/docs/api/api-key/patch-api-api-key-v1by-api_key_id): PATCH /api/api-key/v1/:api_key_id
+- [Delete API Key](https://docs.reloop.dev/docs/api/api-key/delete-api-api-key-v1by-api_key_id): DELETE /api/api-key/v1/:api_key_id
+- [Disable API Key](https://docs.reloop.dev/docs/api/api-key/post-api-api-key-v1disable-by-api_key_id): POST /api/api-key/v1/disable/:api_key_id
+- [Enable API Key](https://docs.reloop.dev/docs/api/api-key/post-api-api-key-v1enable-by-api_key_id): POST /api/api-key/v1/enable/:api_key_id
+- [Rotate API Key](https://docs.reloop.dev/docs/api/api-key/post-api-api-key-v1rotate-by-api_key_id): POST /api/api-key/v1/rotate/:api_key_id
+
+### Webhook API
+- [Create Webhook](https://docs.reloop.dev/docs/api/webhook/post-api-webhook-v1): POST /api/webhook/v1
+- [List Webhooks](https://docs.reloop.dev/docs/api/webhook/get-api-webhook-v1): GET /api/webhook/v1
+- [Get Webhook](https://docs.reloop.dev/docs/api/webhook/get-api-webhook-v1by-webhook_id): GET /api/webhook/v1/:webhook_id
+- [Update Webhook](https://docs.reloop.dev/docs/api/webhook/patch-api-webhook-v1by-webhook_id): PATCH /api/webhook/v1/:webhook_id
+- [Delete Webhook](https://docs.reloop.dev/docs/api/webhook/delete-api-webhook-v1by-id): DELETE /api/webhook/v1/:id
+- [Get Webhook Deliveries](https://docs.reloop.dev/docs/api/webhook/get-api-webhook-v1by-webhook_id-deliveries): GET /api/webhook/v1/:webhook_id/deliveries
+- [Trigger Test Webhook](https://docs.reloop.dev/docs/api/webhook/post-api-webhook-v1trigger): POST /api/webhook/v1/trigger
+
+### Contacts API
+- [Create Contact](https://docs.reloop.dev/docs/api/contacts/post-api-contacts-create): POST /api/contacts/create
+- [List Contacts](https://docs.reloop.dev/docs/api/contacts/get-api-contacts-list): GET /api/contacts/list
+- [Get Contact](https://docs.reloop.dev/docs/api/contacts/get-api-contacts-retrieve-by-contact_id): GET /api/contacts/retrieve/:contact_id
+- [Update Contact](https://docs.reloop.dev/docs/api/contacts/patch-api-contacts-by-contact_id): PATCH /api/contacts/:contact_id
+- [Delete Contact](https://docs.reloop.dev/docs/api/contacts/delete-api-contacts-by-contact_id): DELETE /api/contacts/:contact_id
+- [Create Contact Group](https://docs.reloop.dev/docs/api/contacts/post-api-contacts-v1groups-create): POST /api/contacts/v1/groups/create
+- [List Contact Groups](https://docs.reloop.dev/docs/api/contacts/get-api-contacts-v1groups-list): GET /api/contacts/v1/groups/list
+- [Get Contact Group](https://docs.reloop.dev/docs/api/contacts/get-api-contacts-v1groups-by-group_id): GET /api/contacts/v1/groups/:group_id
+- [Update Contact Group](https://docs.reloop.dev/docs/api/contacts/patch-api-contacts-v1groups-by-group_id): PATCH /api/contacts/v1/groups/:group_id
+- [Delete Contact Group](https://docs.reloop.dev/docs/api/contacts/delete-api-contacts-group-by-group_id): DELETE /api/contacts/group/:group_id
+- [List Contacts in Group](https://docs.reloop.dev/docs/api/contacts/get-api-contacts-v1groups-by-group_id-contacts): GET /api/contacts/v1/groups/:group_id/contacts
+- [Create Contact Property](https://docs.reloop.dev/docs/api/contacts/post-api-contacts-v1properties-create): POST /api/contacts/v1/properties/create
+- [List Contact Properties](https://docs.reloop.dev/docs/api/contacts/get-api-contacts-v1properties-list): GET /api/contacts/v1/properties/list
+- [Update Contact Property](https://docs.reloop.dev/docs/api/contacts/patch-api-contacts-v1properties-by-contact_property_id): PATCH /api/contacts/v1/properties/:contact_property_id
+- [Delete Contact Property](https://docs.reloop.dev/docs/api/contacts/delete-api-contacts-v1properties-by-contact_property_id): DELETE /api/contacts/v1/properties/:contact_property_id
+- [Create Contact Channel](https://docs.reloop.dev/docs/api/contacts/post-api-contacts-v1channels-create): POST /api/contacts/v1/channels/create
+- [List Contact Channels](https://docs.reloop.dev/docs/api/contacts/get-api-contacts-v1channels-list): GET /api/contacts/v1/channels/list
+- [Get Contact Channel](https://docs.reloop.dev/docs/api/contacts/get-api-contacts-v1channels-by-channel_id): GET /api/contacts/v1/channels/:channel_id
+- [Update Contact Channel](https://docs.reloop.dev/docs/api/contacts/patch-api-contacts-v1channels-by-channel_id): PATCH /api/contacts/v1/channels/:channel_id
+- [Delete Contact Channel](https://docs.reloop.dev/docs/api/contacts/delete-api-contacts-v1channels-by-channel_id): DELETE /api/contacts/v1/channels/:channel_id
+
+### Mail API
+- [Send Email](https://docs.reloop.dev/docs/api/mail/post-api-mail-v1send): POST /api/mail/v1/send
+- [Get Attachment](https://docs.reloop.dev/docs/api/mail/get-api-mail-v1by-email-id-attachments-by-id): GET /api/mail/v1/:email_id/attachments/:id
+- [Track Click](https://docs.reloop.dev/docs/api/mail/get-api-mail-v1track-click-by-email-log-id): GET /api/mail/v1/track/click/:email_log_id
+- [Track Open](https://docs.reloop.dev/docs/api/mail/get-api-mail-v1track-open-by-email-log-id): GET /api/mail/v1/track/open/:email_log_id
+
+### Logs API
+- [List Logs](https://docs.reloop.dev/docs/api/logs/get-api-logs-v1list): GET /api/logs/v1/list
+- [Get Log](https://docs.reloop.dev/docs/api/logs/get-api-logs-v1by-log_id): GET /api/logs/v1/:log_id
+- [List Email Logs](https://docs.reloop.dev/docs/api/logs/get-api-logs-v1emails): GET /api/logs/v1/emails
+- [Get Email Log](https://docs.reloop.dev/docs/api/logs/get-api-logs-v1emails-by-id): GET /api/logs/v1/emails/:id
+- [Get Email Stats](https://docs.reloop.dev/docs/api/logs/get-api-logs-v1emails-stats): GET /api/logs/v1/emails/stats
+- [Create Log](https://docs.reloop.dev/docs/api/logs/post-api-logs-v1create): POST /api/logs/v1/create
+
+### Upload API
+- [Upload File](https://docs.reloop.dev/docs/api/upload/post-api-upload-v1upload): POST /api/upload/v1/upload
+- [Delete File](https://docs.reloop.dev/docs/api/upload/delete-api-upload-v1files-by-file-id): DELETE /api/upload/v1/files/:file_id
+
+### Template API
+- [Create Template](https://docs.reloop.dev/docs/api/template/post-api-template-v1create): POST /api/template/v1/create
+- [List Templates](https://docs.reloop.dev/docs/api/template/get-api-template-v1list): GET /api/template/v1/list
+- [Get Template](https://docs.reloop.dev/docs/api/template/get-api-template-v1by-id): GET /api/template/v1/:id
+- [Update Template](https://docs.reloop.dev/docs/api/template/put-api-template-v1by-id): PUT /api/template/v1/:id
+- [Delete Template](https://docs.reloop.dev/docs/api/template/delete-api-template-v1by-id): DELETE /api/template/v1/:id
+- [Duplicate Template](https://docs.reloop.dev/docs/api/template/post-api-template-v1by-id-duplicate): POST /api/template/v1/:id/duplicate
+
+## Webhooks
+
+- [Introduction](https://docs.reloop.dev/docs/webhooks): How webhooks work, setup guide, retry schedule, and IP addresses
+- [Event Types](https://docs.reloop.dev/docs/webhooks/event-types): All supported webhook event types
+- [Retries and Replays](https://docs.reloop.dev/docs/webhooks/retries-and-replays): Retry schedule and manual replay
+- [Verify Webhook Requests](https://docs.reloop.dev/docs/webhooks/verify-webhooks-requests): Signature verification for webhook security
+- [Inbound Email Ingester](https://docs.reloop.dev/docs/webhooks/ingester): Receive incoming emails via webhooks
+
+### Email Events
+- [email.bounced](https://docs.reloop.dev/docs/webhooks/emails/bounced): Triggered when an email bounces
+- [email.clicked](https://docs.reloop.dev/docs/webhooks/emails/clicked): Triggered when a link in an email is clicked
+- [email.complained](https://docs.reloop.dev/docs/webhooks/emails/complained): Triggered when a recipient marks email as spam
+- [email.delivered](https://docs.reloop.dev/docs/webhooks/emails/delivered): Triggered when email is delivered
+- [email.delivery_delayed](https://docs.reloop.dev/docs/webhooks/emails/delivery-delayed): Triggered when delivery is delayed
+- [email.failed](https://docs.reloop.dev/docs/webhooks/emails/failed): Triggered when email delivery fails
+- [email.opened](https://docs.reloop.dev/docs/webhooks/emails/opened): Triggered when an email is opened
+- [email.received](https://docs.reloop.dev/docs/webhooks/emails/received): Triggered when an inbound email is received
+- [email.scheduled](https://docs.reloop.dev/docs/webhooks/emails/scheduled): Triggered when an email is scheduled
+- [email.sent](https://docs.reloop.dev/docs/webhooks/emails/sent): Triggered when an email is sent
+- [email.suppressed](https://docs.reloop.dev/docs/webhooks/emails/suppressed): Triggered when email is suppressed
+
+### Domain Events
+- [domain.created](https://docs.reloop.dev/docs/webhooks/domains/created): Triggered when a domain is created
+- [domain.updated](https://docs.reloop.dev/docs/webhooks/domains/updated): Triggered when a domain is updated
+- [domain.deleted](https://docs.reloop.dev/docs/webhooks/domains/deleted): Triggered when a domain is deleted
+
+### Contact Events
+- [contact.created](https://docs.reloop.dev/docs/webhooks/contacts/created): Triggered when a contact is created
+- [contact.updated](https://docs.reloop.dev/docs/webhooks/contacts/updated): Triggered when a contact is updated
+- [contact.deleted](https://docs.reloop.dev/docs/webhooks/contacts/deleted): Triggered when a contact is deleted
+
+## Build with AI
+
+- [AI Onboarding](https://docs.reloop.dev/docs/integrations): Everything you need to onboard your AI agent to Reloop
+- [MCP Server](https://docs.reloop.dev/docs/integrations/mcp-server): Give AI agents access to Reloop via Model Context Protocol
+- [CLI for Agents](https://docs.reloop.dev/docs/integrations/cli-agents): Command-line tool optimized for AI agent workflows
+- [OpenClaw Guide](https://docs.reloop.dev/docs/integrations/openclaw-guide): Build autonomous email agents with OpenClaw
+- [Reloop Skill](https://docs.reloop.dev/docs/integrations/reloop-skill): Agent skill for sending emails through Reloop
+- [React Email Skill](https://docs.reloop.dev/docs/integrations/react-email-skill): Agent skill for building HTML emails with React
+- [Email Best Practices Skill](https://docs.reloop.dev/docs/integrations/email-best-practices): Agent skill for production-ready email guidelines
+- [Agent Email Inbox](https://docs.reloop.dev/docs/integrations/agent-email-inbox): Give your AI agent its own email inbox
+- [Chat SDK](https://docs.reloop.dev/docs/integrations/chat-sdk): Build conversational email experiences with Vercel Chat SDK
+- [Lovable Integration](https://docs.reloop.dev/docs/integrations/lovable-integration): Use Reloop with Lovable
+- [v0 Integration](https://docs.reloop.dev/docs/integrations/v0-integration): Use Reloop with v0
+- [Bolt.new Integration](https://docs.reloop.dev/docs/integrations/bolt-new-integration): Use Reloop with Bolt.new
+- [Replit Integration](https://docs.reloop.dev/docs/integrations/replit-integration): Use Reloop with Replit
+- [Base44 Integration](https://docs.reloop.dev/docs/integrations/base44-integration): Use Reloop with Base44
+- [Leap.new Integration](https://docs.reloop.dev/docs/integrations/leap-integration): Use Reloop with Leap.new
+
+## Resources
+
+- [Examples](https://docs.reloop.dev/docs/resources/examples): Code examples and sample projects
+- [MCP Server](https://docs.reloop.dev/docs/resources/mcp-server): Model Context Protocol server for Reloop
+- [Security](https://docs.reloop.dev/docs/resources/security): Security best practices and guidelines
+- [Storing Webhooks Data](https://docs.reloop.dev/docs/resources/storing-webhooks-data): Best practices for storing webhook event data
+
+## Optional
+
+- [Knowledge Base](https://docs.reloop.dev/docs/knowledge-base): FAQs, troubleshooting guides, and how-to articles
+- [Dashboard](https://app.reloop.dev): Reloop Dashboard for managing your account

@@ -4,6 +4,19 @@ const config = {
   basePath: '/docs',
   output: 'standalone',
   allowedDevOrigins: ['local.reloop.sh', '*.local.reloop.sh'],
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Link',
+            value: '</docs/llms.txt>; rel="llms-txt"',
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default config;
