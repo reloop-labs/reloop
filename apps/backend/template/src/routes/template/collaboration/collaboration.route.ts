@@ -9,11 +9,61 @@ import {
 } from "@be/template/plugins/room";
 import { handleMessage, sendInitialSync } from "./collaboration.controllers";
 
+import { templateConfig } from "@be/template/template.config";
+import { logger } from "@reloop/logger";
+import type { Session } from "@reloop/auth/server";
+
 export const collaborationRoute = new Elysia({
   name: "collaboration",
-}).ws("/collab/:roomName", {
-  open(ws) {
-    const { roomName } = ws.data.params;
+})
+  .macro({
+    auth: {
+      async resolve({ request: { headers } }) {
+        try {
+          const cookie = headers.get("cookie");
+          if (!cookie) return { user: null, session: null };
+
+          const response = await fetch(
+            `${templateConfig.BASE_URL}/api/auth/v1/get-session`,
+            {
+              method: "GET",
+              headers: new Headers({
+                "Content-Type": "application/json",
+                Cookie: cookie,
+              }),
+            },
+          );
+          const session: Session | null = await response.json();
+
+          if (session && session.user?.activeOrganizationId) {
+            return {
+              user: session.user,
+              session: session.session,
+            };
+          }
+          return { user: null, session: null };
+        } catch (error) {
+          logger.error(
+            {
+              error: error instanceof Error ? error.message : "Unknown error",
+            },
+            "WebSocket Authentication error",
+          );
+          return { user: null, session: null };
+        }
+      },
+    },
+  })
+  .ws("/collab/:roomName", {
+    auth: true,
+    async open(ws) {
+      const { session } = ws.data as unknown as { session: any };
+
+      if (!session) {
+        return ws.close(1008, "Unauthorized");
+      }
+
+      const { roomName } = ws.data.params;
     const room = getRoom(roomName);
     const persistence: YjsPersistence | null =
       (ws.data as { persistence?: YjsPersistence | null }).persistence ?? null;
