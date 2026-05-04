@@ -33,7 +33,7 @@ export const getRoom = (roomName: string): Room => {
     const awareness = new awarenessProtocol.Awareness(doc);
 
     // Broadcast document updates to all connected clients
-    doc.on("update", (update: Uint8Array, origin: CollabClient) => {
+    doc.on("update", (update: Uint8Array, origin: any) => {
       const encoder = encoding.createEncoder();
       encoding.writeVarUint(encoder, MESSAGE_SYNC);
       syncProtocol.writeUpdate(encoder, update);
@@ -44,7 +44,7 @@ export const getRoom = (roomName: string): Room => {
 
       room.clients.forEach((client) => {
         // Don't send the update back to the client that originated it
-        if (client !== origin && client.readyState === MESSAGE_AWARENESS) {
+        if (client !== origin && client.readyState === 1) {
           client.send(message);
         }
       });
@@ -91,7 +91,7 @@ export const getRoom = (roomName: string): Room => {
         const message = encoding.toUint8Array(encoder);
 
         room.clients.forEach((client) => {
-          if (client.readyState === 1) {
+          if (client !== origin && client.readyState === 1) {
             client.send(message);
           }
         });
