@@ -273,7 +273,7 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
 	};
 
 	const handleCopyInviteLink = (inviteId: string) => {
-		const inviteLink = `${window.location.origin}/accept-invitation?id=${inviteId}`;
+		const inviteLink = `${window.location.origin}/dashboard/accept-invitation?id=${inviteId}`;
 		navigator.clipboard.writeText(inviteLink);
 		toast.success("Invite link copied to clipboard");
 	};

@@ -1,8 +1,8 @@
 "use client";
 
 import { FeedbackPopover } from "@fe/dashboard/components/feedback-popover";
+import { InvitationsPopover } from "@fe/dashboard/components/layout/invitations-popover";
 import { mainNavigation, userNavigation } from "@fe/dashboard/constants";
-import * as Button from "@reloop/ui/button";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -58,7 +58,8 @@ export const PageHeader = () => {
 					})}
 				</div>
 			</div>
-			<div className="flex items-center justify-end">
+			<div className="flex items-center justify-end gap-2">
+				<InvitationsPopover />
 				<FeedbackPopover />
 			</div>
 		</div>
