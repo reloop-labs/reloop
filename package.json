@@ -118,7 +118,8 @@
 				"framer-motion": "^12.38.0",
 				"next-mdx-remote": "^6.0.0",
 				"perfect-cursors": "^1.0.5",
-				"y-protocols": "^1.0.7"
+				"y-protocols": "^1.0.7",
+				"@tiptap/suggestion": "^3.22.5"
 			},
 			"db": {
 				"@types/pg": "8.15.4",
