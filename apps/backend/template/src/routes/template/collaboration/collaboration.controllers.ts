@@ -6,6 +6,7 @@ import {
   type Room,
 } from "@be/template/plugins/room";
 import type { YjsPersistence } from "@be/template/utils/persistence";
+import { logger } from "@reloop/logger";
 import * as decoding from "lib0/decoding";
 import * as encoding from "lib0/encoding";
 import * as awarenessProtocol from "y-protocols/awareness";
@@ -65,7 +66,7 @@ export function handleMessage(
   try {
     message = toUint8Array(raw);
   } catch (err) {
-    console.error("[collab] Failed to parse message:", err);
+    logger.error({ error: err }, "[collab] Failed to parse message");
     return;
   }
 
@@ -108,7 +109,9 @@ export function handleMessage(
         if (persistence) {
           const roomName = getRoomName(room);
           if (roomName) {
-            persistence.writeState(roomName, room.doc).catch(console.error);
+            persistence.writeState(roomName, room.doc).catch((err) => {
+              logger.error({ error: err }, "[collab] Persistence write failed");
+            });
           }
         }
       }
@@ -125,7 +128,7 @@ export function handleMessage(
     }
 
     default:
-      console.warn(`[collab] Unknown message type: ${messageType}`);
+      logger.warn({ messageType }, "[collab] Unknown message type");
   }
 
   room.lastActivity = Date.now();

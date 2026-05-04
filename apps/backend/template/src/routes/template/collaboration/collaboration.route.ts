@@ -1,12 +1,8 @@
 import { authMiddleware } from "@be/template/middleware/auth";
-import {
-  type CollabClient,
-  getRoom,
-  rooms,
-  scheduleRoomCleanup,
-} from "@be/template/plugins/room";
+import { getRoom, rooms, scheduleRoomCleanup } from "@be/template/plugins/room";
 import type { YjsPersistence } from "@be/template/utils/persistence";
-import { Elysia, t } from "elysia";
+import { logger } from "@reloop/logger";
+import { Elysia } from "elysia";
 import * as awarenessProtocol from "y-protocols/awareness";
 import { handleMessage, sendInitialSync } from "./collaboration.controllers";
 
@@ -17,8 +13,8 @@ export const collaborationRoute = new Elysia({
   .ws("/collab/:roomName", {
     auth: true,
     async open(ws) {
-      const { user } = ws.data
-      if (!user) return ws.close(1008, "Unauthorized")
+      const { user } = ws.data;
+      if (!user) return ws.close(1008, "Unauthorized");
       const { roomName } = ws.data.params;
       const room = getRoom(roomName);
       const persistence: YjsPersistence | null =
@@ -28,8 +24,9 @@ export const collaborationRoute = new Elysia({
       const init = () => {
         room.clients.add(ws.raw);
         sendInitialSync(ws.raw, room);
-        console.log(
-          `[collab] "${roomName}" — client joined (total: ${room.clients.size})`,
+        logger.info(
+          { roomName, totalClients: room.clients.size },
+          "[collab] Client joined",
         );
       };
 
@@ -38,7 +35,7 @@ export const collaborationRoute = new Elysia({
           .bindState(roomName, room.doc)
           .then(init)
           .catch((err) => {
-            console.error(`[collab] bindState failed for "${roomName}":`, err);
+            logger.error({ error: err, roomName }, "[collab] bindState failed");
             init(); // still connect the client, just without persisted state
           });
       } else {
@@ -71,8 +68,9 @@ export const collaborationRoute = new Elysia({
         "disconnect",
       );
 
-      console.log(
-        `[collab] "${roomName}" — client left (remaining: ${room.clients.size})`,
+      logger.info(
+        { roomName, remainingClients: room.clients.size },
+        "[collab] Client left",
       );
 
       if (room.clients.size === 0) {

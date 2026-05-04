@@ -1,3 +1,4 @@
+import { logger } from "@reloop/logger";
 import * as encoding from "lib0/encoding";
 import * as map from "lib0/map";
 import * as awarenessProtocol from "y-protocols/awareness";
@@ -88,9 +89,9 @@ export function scheduleRoomCleanup(roomName: string) {
       if (room && room.clients.size === 0) {
         room.doc.destroy();
         rooms.delete(roomName);
-        console.log(`[collab] Room "${roomName}" destroyed (inactive)`);
+        logger.info({ roomName }, "[collab] Room destroyed (inactive)");
       }
     },
-    5 * 60 * 1000, // 5 minutes
+    30 * 1000, // 30 seconds
   );
 }
