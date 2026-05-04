@@ -2,6 +2,7 @@ import { logger } from "@reloop/logger";
 import * as encoding from "lib0/encoding";
 import * as map from "lib0/map";
 import * as awarenessProtocol from "y-protocols/awareness";
+import * as syncProtocol from "y-protocols/sync";
 import * as Y from "yjs";
 
 // ── Message type constants (y-websocket protocol) ──────────────────────────
@@ -30,6 +31,24 @@ export const getRoom = (roomName: string): Room => {
   return map.setIfUndefined(rooms, roomName, () => {
     const doc = new Y.Doc();
     const awareness = new awarenessProtocol.Awareness(doc);
+
+    // Broadcast document updates to all connected clients
+    doc.on("update", (update: Uint8Array, origin: CollabClient) => {
+      const encoder = encoding.createEncoder();
+      encoding.writeVarUint(encoder, MESSAGE_SYNC);
+      syncProtocol.writeUpdate(encoder, update);
+      const message = encoding.toUint8Array(encoder);
+
+      const room = rooms.get(roomName);
+      if (!room) return;
+
+      room.clients.forEach((client) => {
+        // Don't send the update back to the client that originated it
+        if (client !== origin && client.readyState === MESSAGE_AWARENESS) {
+          client.send(message);
+        }
+      });
+    });
 
     // When any client's awareness changes (cursor, presence),
     // broadcast the update to every other client in the room
