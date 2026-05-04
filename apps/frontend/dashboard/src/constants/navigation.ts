@@ -4,6 +4,7 @@ export interface MainNavigationItem {
 	iconName: string;
 	variant?: "default" | "danger";
 	action?: "signout";
+	isSpecial?: boolean;
 }
 
 export const mainNavigation: MainNavigationItem[] = [
@@ -11,6 +12,7 @@ export const mainNavigation: MainNavigationItem[] = [
 		label: "Ask AI",
 		path: "/",
 		iconName: "sparkling",
+		isSpecial: true,
 	},
 	{
 		label: "Emails",

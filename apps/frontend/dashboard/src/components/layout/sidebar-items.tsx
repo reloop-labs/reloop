@@ -80,7 +80,7 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 	return (
 		// Single relative container — the animated pill lives here and nowhere else
 		<div className="relative">
-			{mainNavigation.map(({ path, label, iconName }, index) => {
+			{mainNavigation.map(({ path, label, iconName, isSpecial }, index) => {
 				const isContactsItem = path === "/contacts";
 
 				return (
@@ -107,14 +107,20 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 									name={iconName}
 									className={cn(
 										"h-3.5 w-3.5 shrink-0",
-										activeIndex !== index ? "text-text-sub-600 opacity-70" : "",
+										!isSpecial && activeIndex !== index
+											? "text-text-sub-600 opacity-70"
+											: "",
 									)}
 								/>
 								{!isCollapsed && (
 									<span
 										className={cn(
-											"font-medium text-sm",
-											activeIndex !== index && "text-text-sub-600",
+											"font-medium text-sm transition-colors",
+											isSpecial
+												? "bg-gradient-to-r from-[#A855F7] to-[#EC4899] bg-clip-text text-transparent"
+												: activeIndex !== index
+													? "text-text-sub-600"
+													: "text-foreground",
 										)}
 									>
 										{label}
