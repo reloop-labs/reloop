@@ -1,7 +1,6 @@
 "use client";
 
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
-import { motion } from "framer-motion";
 import {
 	AudioLines,
 	ChevronDown,
@@ -23,12 +22,7 @@ export default function Home() {
 
 	return (
 		<div className="flex min-h-full flex-1 flex-col items-center justify-center px-4 dark:bg-[#0a0a0a]">
-			<motion.div
-				initial={{ opacity: 0, y: 20 }}
-				animate={{ opacity: 1, y: 0 }}
-				transition={{ duration: 0.5, ease: "easeOut" }}
-				className="flex w-full max-w-3xl flex-col items-center"
-			>
+			<div className="flex w-full max-w-3xl flex-col items-center">
 				{/* Top Badge */}
 				<button
 					type="button"
@@ -101,7 +95,7 @@ export default function Home() {
 						label="Claude's choice"
 					/>
 				</div>
-			</motion.div>
+			</div>
 		</div>
 	);
 }

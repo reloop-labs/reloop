@@ -93,7 +93,7 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 							onPointerEnter={() => setHoveredEl(mainNavRefs.current[index])}
 							onPointerLeave={() => setHoveredEl(undefined)}
 							className={cn(
-								"relative z-10 flex h-7 items-center gap-2 rounded-lg px-2 text-left",
+								"relative z-10 flex h-8 items-center gap-2 rounded-lg px-2 text-left",
 								isContactsItem && !isCollapsed
 									? "justify-between"
 									: isCollapsed
