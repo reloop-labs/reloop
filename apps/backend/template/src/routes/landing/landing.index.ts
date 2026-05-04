@@ -4,20 +4,51 @@ export const landing = new Elysia({ name: "Landing" })
 	.get(
 		"/",
 		() => {
-			return {
-				status: "ok",
-				service: "Template Service",
-				version: "1.0.0",
-				timestamp: new Date().toISOString(),
-			};
+			return `
+╔══════════════════════════════════════════════════════════════════════╗
+║                        TEMPLATE SERVICE                              ║
+╠══════════════════════════════════════════════════════════════════════╣
+║                                                                      ║
+║████████╗███████╗███╗   ███╗██████╗ ██╗      █████╗ ████████╗███████╗ ║
+║╚══██╔══╝██╔════╝████╗ ████║██╔══██╗██║     ██╔══██╗╚══██╔══╝██╔════╝ ║
+║   ██║   █████╗  ██╔████╔██║██████╔╝██║     ███████║   ██║   █████╗   ║
+║   ██║   ██╔══╝  ██║╚██╔╝██║██╔═══╝ ██║     ██╔══██║   ██║   ██╔══╝   ║
+║   ██║   ███████╗██║ ╚═╝ ██║██║     ███████╗██║  ██║   ██║   ███████╗ ║
+║   ╚═╝   ╚══════╝╚═╝     ╚═╝╚═╝     ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝ ║
+║                                                                      ║
+║                          ONLINE & READY                              ║
+║                         Version: v1.0.0                              ║
+║                                                                      ║
+╠══════════════════════════════════════════════════════════════════════╣
+║                                                                      ║
+║ 📚 Docs: https://reloop.sh/docs/template                             ║
+║ 🤖 Discovery: https://reloop.sh/api/template/agent-card.json         ║
+║ 📖 OpenAPI: https://reloop.sh/api/template/openapi                   ║
+║ 🐙 GitHub: https://github.com/reloop-labs/reloop                     ║
+║ 🆘 Support: https://reloop.sh/support                                ║
+║ 💬 Discord: https://discord.gg/reloop                                ║
+║ 🐦 Twitter: https://x.com/reloophq                               ║
+║ 🛠️ Setup: https://reloop.sh/docs/setup/template                      ║
+║                                                                      ║
+╠══════════════════════════════════════════════════════════════════════╣
+║                                                                      ║
+║  "Templates ready for deployment."                                   ║
+║               - Your Reloop Team                                     ║
+║                                                                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+
+    Powered by ☕ Coffee, 🍕 Pizza & 💻 Late Night Coding
+
+                Made with ❤️ for developers
+
+`;
 		},
 		{
 			detail: {
-				tags: ["Health"],
-				summary: "Health check",
-				description: "Returns the health status of the Template Service",
-			},
-		},
+				hide: true
+			}
+		}
 	)
 	.get("/agent-card.json", () => ({
 		name: "Template Service",
