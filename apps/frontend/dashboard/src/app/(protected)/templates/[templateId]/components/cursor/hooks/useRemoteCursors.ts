@@ -13,12 +13,11 @@ export interface RemoteCursor {
 }
 
 export function useRemoteCursors(
-  provider: WebsocketProvider | null,
+  provider: WebsocketProvider,
 ): RemoteCursor[] {
   const [cursors, setCursors] = useState<RemoteCursor[]>([]);
 
   useEffect(() => {
-    if (!provider) return;
 
     const update = () => {
       const remote: RemoteCursor[] = [];

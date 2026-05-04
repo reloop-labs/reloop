@@ -42,12 +42,10 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 
 	useMousePresence(provider, containerRef);
 	const remoteCursors = useRemoteCursors(provider);
-	const editor = useEditorHook(
-		ydoc && provider ? { ydoc, provider, user: collabUser } : undefined,
-	);
+	const editor = useEditorHook({ ydoc, provider, user: collabUser });
 
 	return (
-		<PresenceProvider awareness={provider?.awareness ?? null}>
+		<PresenceProvider awareness={provider.awareness}>
 			<EditorContext.Provider value={{ editor }}>
 				<div ref={containerRef} className="bg-bg-weak-50 dark:bg-black">
 					<div className="grid grid-cols-3 items-center px-4 pt-2">

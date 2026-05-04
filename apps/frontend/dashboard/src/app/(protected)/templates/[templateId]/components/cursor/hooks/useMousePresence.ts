@@ -10,14 +10,13 @@ import type { WebsocketProvider } from "y-websocket";
  * CollaborationCaret's own awareness field.
  */
 export function useMousePresence(
-  provider: WebsocketProvider | null,
+  provider: WebsocketProvider,
   containerRef: React.RefObject<HTMLDivElement | null>,
   throttleMs = 30,
 ) {
   const lastEmitRef = useRef(0);
 
   useEffect(() => {
-    if (!provider) return;
 
     const handleMouseMove = (e: MouseEvent) => {
       const now = Date.now();
