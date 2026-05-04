@@ -45,7 +45,9 @@ function makeSafeAwarenessProxy(provider: WebsocketProvider) {
 					return safe;
 				};
 			}
-			const val = (target as unknown as Record<string | symbol, unknown>)[prop as string];
+			const val = (target as unknown as Record<string | symbol, unknown>)[
+				prop as string
+			];
 			return typeof val === "function" ? val.bind(target) : val;
 		},
 	});
@@ -69,7 +71,9 @@ export const useEditorHook = (collab?: CollabOptions) => {
 							// Use a safe awareness proxy to prevent CollaborationCaret from
 							// crashing on null states that appear during provider teardown.
 							CollaborationCaret.configure({
-								provider: { awareness: makeSafeAwarenessProxy(collab.provider) },
+								provider: {
+									awareness: makeSafeAwarenessProxy(collab.provider),
+								},
 								user: collab.user,
 							}),
 						]

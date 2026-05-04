@@ -1,24 +1,28 @@
 "use client";
+
+import { DragHandle } from "@tiptap/extension-drag-handle-react";
 import { EditorContent } from "@tiptap/react";
-import DragHandle from "@tiptap/extension-drag-handle-react";
-import { GripVertical } from "lucide-react";
 
 import "@react-email/editor/themes/default.css";
 import { useCurrentEditor } from "@tiptap/react";
+import { GripVertical } from "lucide-react";
 
 export function FullEmailBuilder() {
 	const { editor } = useCurrentEditor();
 
+	if (!editor) return null;
+
 	return (
-		<>
+		<div className="relative">
+			<DragHandle
+				editor={editor}
+				nested={{ edgeDetection: { threshold: -16, edges: ["left"] } }}
+			>
+				<div className="p-2" title="Drag to reorder">
+					<GripVertical size={16} />
+				</div>
+			</DragHandle>
 			<EditorContent editor={editor} />
-			{editor && (
-				<DragHandle editor={editor}>
-					<div className="flex items-center justify-center cursor-grab active:cursor-grabbing hover:bg-muted/50 p-1 rounded-md text-muted-foreground transition-colors">
-						<GripVertical className="h-4 w-4" />
-					</div>
-				</DragHandle>
-			)}
-		</>
+		</div>
 	);
 }
