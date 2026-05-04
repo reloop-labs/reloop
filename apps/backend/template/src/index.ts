@@ -1,5 +1,6 @@
 import "dotenv/config";
 import { landing } from "@be/template/routes/landing/landing.index";
+import { collaborationRoute } from "@be/template/routes/template/collaboration/collaboration.route";
 import { roomRoutes } from "@be/template/routes/template/room/room.routes";
 import { templateRoutes } from "@be/template/routes/template/template.routes";
 import { templateConfig } from "@be/template/template.config";
@@ -9,7 +10,6 @@ import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
-import { collaborationRoute } from "@be/template/routes/template/collaboration/collaboration.route";
 
 const port = templateConfig.port;
 const templateService = new Elysia({
