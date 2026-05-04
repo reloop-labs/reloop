@@ -1,5 +1,5 @@
 import { authMiddleware } from "@be/template/middleware/auth";
-import { getRoom, rooms, scheduleRoomCleanup } from "@be/template/plugins/room";
+import { clientIdsMap, getRoom, rooms, scheduleRoomCleanup } from "@be/template/plugins/room";
 import type { YjsPersistence } from "@be/template/utils/persistence";
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
@@ -61,12 +61,14 @@ export const collaborationRoute = new Elysia({
 
       room.clients.delete(ws.raw);
 
-      // Remove this client from awareness so their cursor disappears
-      awarenessProtocol.removeAwarenessStates(
-        room.awareness,
-        [room.doc.clientID],
-        "disconnect",
-      );
+      const clientIds = clientIdsMap.get(ws.raw);
+      if (clientIds) {
+        awarenessProtocol.removeAwarenessStates(
+          room.awareness,
+          Array.from(clientIds),
+          "disconnect",
+        );
+      }
 
       logger.info(
         { roomName, remainingClients: room.clients.size },

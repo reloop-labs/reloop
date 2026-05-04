@@ -23,6 +23,7 @@ export interface Room {
 
 // ── In-memory room registry ────────────────────────────────────────────────
 export const rooms = new Map<string, Room>();
+export const clientIdsMap = new WeakMap<CollabClient, Set<number>>();
 
 export const getRoom = (roomName: string): Room => {
   return map.setIfUndefined(rooms, roomName, () => {
@@ -33,15 +34,30 @@ export const getRoom = (roomName: string): Room => {
     // broadcast the update to every other client in the room
     awareness.on(
       "update",
-      ({
-        added,
-        updated,
-        removed,
-      }: {
-        added: number[];
-        updated: number[];
-        removed: number[];
-      }) => {
+      (
+        {
+          added,
+          updated,
+          removed,
+        }: {
+          added: number[];
+          updated: number[];
+          removed: number[];
+        },
+        origin: unknown,
+      ) => {
+        if (origin && typeof origin === "object" && "send" in origin) {
+          const client = origin as CollabClient;
+          let cids = clientIdsMap.get(client);
+          if (!cids) {
+            cids = new Set();
+            clientIdsMap.set(client, cids);
+          }
+          for (const id of added) {
+            cids.add(id);
+          }
+        }
+
         const changedClients = [...added, ...updated, ...removed];
         const room = rooms.get(roomName);
         if (!room) return;
