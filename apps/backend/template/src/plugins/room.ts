@@ -9,9 +9,7 @@ export const MESSAGE_AWARENESS = 1;
 
 export interface CollabClient {
   readyState: number;
-  raw: {
-    send(message: Uint8Array): void;
-  };
+  send(message: Uint8Array): void | number;
 }
 
 // ── Room type ──────────────────────────────────────────────────────────────
@@ -57,7 +55,7 @@ export const getRoom = (roomName: string): Room => {
 
         room.clients.forEach((client) => {
           if (client.readyState === 1) {
-            client.raw.send(message);
+            client.send(message);
           }
         });
       },

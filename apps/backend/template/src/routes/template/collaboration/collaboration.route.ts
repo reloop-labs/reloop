@@ -26,8 +26,8 @@ export const collaborationRoute = new Elysia({
         null;
 
       const init = () => {
-        room.clients.add(ws as unknown as CollabClient);
-        sendInitialSync(ws as unknown as CollabClient, room);
+        room.clients.add(ws.raw);
+        sendInitialSync(ws.raw, room);
         console.log(
           `[collab] "${roomName}" — client joined (total: ${room.clients.size})`,
         );
@@ -54,7 +54,7 @@ export const collaborationRoute = new Elysia({
       const persistence: YjsPersistence | null =
         (ws.data as { persistence?: YjsPersistence | null }).persistence ??
         null;
-      handleMessage(ws as unknown as CollabClient, raw, room, persistence);
+      handleMessage(ws.raw, raw, room, persistence);
     },
 
     close(ws) {
@@ -62,7 +62,7 @@ export const collaborationRoute = new Elysia({
       const room = rooms.get(roomName);
       if (!room) return;
 
-      room.clients.delete(ws as unknown as CollabClient);
+      room.clients.delete(ws.raw);
 
       // Remove this client from awareness so their cursor disappears
       awarenessProtocol.removeAwarenessStates(

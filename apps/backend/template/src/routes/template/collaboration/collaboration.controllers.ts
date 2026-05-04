@@ -33,7 +33,7 @@ export function sendInitialSync(ws: CollabClient, room: Room) {
   const syncEncoder = encoding.createEncoder();
   encoding.writeVarUint(syncEncoder, MESSAGE_SYNC);
   syncProtocol.writeSyncStep1(syncEncoder, room.doc);
-  ws.raw.send(encoding.toUint8Array(syncEncoder));
+  ws.send(encoding.toUint8Array(syncEncoder));
 
   // Awareness: send all current user states (cursors, presence)
   const awarenessStates = room.awareness.getStates();
@@ -47,7 +47,7 @@ export function sendInitialSync(ws: CollabClient, room: Room) {
         Array.from(awarenessStates.keys()),
       ),
     );
-    ws.raw.send(encoding.toUint8Array(awarenessEncoder));
+    ws.send(encoding.toUint8Array(awarenessEncoder));
   }
 }
 
@@ -86,7 +86,7 @@ export function handleMessage(
 
       // If we produced a response (e.g. sync step 2 / update), send it back
       if (encoding.length(encoder) > 1) {
-        ws.raw.send(encoding.toUint8Array(encoder));
+        ws.send(encoding.toUint8Array(encoder));
       }
 
       // Sync step 2 means the client just sent us their full state —
@@ -100,7 +100,7 @@ export function handleMessage(
 
         room.clients.forEach((client) => {
           if (client !== ws && client.readyState === 1) {
-            client.raw.send(broadcastMessage);
+            client.send(broadcastMessage);
           }
         });
 
