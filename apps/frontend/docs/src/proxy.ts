@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
 	// Exclude our internal API routes and static assets from being intercepted again
 	if (
 		request.nextUrl.pathname.startsWith("/api/") ||
