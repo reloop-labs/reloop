@@ -4,11 +4,9 @@ interface FooterProps {
 	baseUrl?: string;
 }
 
-export const Footer = ({
-	baseUrl = "https://reloop.sh",
-}: FooterProps) => {
+export const Footer = ({ baseUrl = "https://reloop.sh" }: FooterProps) => {
 	return (
-		<Section className="mt-12 text-[#707070]">
+		<Section className="mt-6 text-[#707070]">
 			<Text className="m-0 text-[12px] leading-[24px]">
 				If you'd like to report an issue, reach out to{" "}
 				<Link
@@ -27,7 +25,7 @@ export const Footer = ({
 					Manage your notification settings
 				</Link>
 			</Text>
-			<Text className="mt-4 m-0 text-[12px] leading-[24px]">
+			<Text className="m-0 mt-4 text-[12px] leading-[24px]">
 				Copyright © 2026 Reloop Inc. All rights reserved.
 				<br />
 				440 N Barranca Ave #4133 Covina, CA 91723
@@ -37,4 +35,3 @@ export const Footer = ({
 };
 
 export default Footer;
-
