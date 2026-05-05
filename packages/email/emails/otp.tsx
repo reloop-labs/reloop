@@ -14,6 +14,8 @@ import {
 	Text,
 } from "react-email";
 import * as React from "react";
+import { Footer } from "../components/footer";
+
 
 interface OTPTokenEmailProps {
 	otp: string;
@@ -98,26 +100,7 @@ export const OTPTokenEmail = ({
 							The Reloop Team
 						</Text>
 
-						{/* Footer */}
-						<Section className="mt-12 text-[#404040]">
-							<Text className="m-0 text-[11px] leading-[1.6]">
-								You're receiving this because you signed up at reloop.sh
-								<br />
-								<Link
-									href={`${baseUrl}/unsubscribe`}
-									className="text-[#404040] underline"
-								>
-									Unsubscribe
-								</Link>
-								{" · "}
-								<Link
-									href={`${baseUrl}/view-in-browser`}
-									className="text-[#404040] underline"
-								>
-									View in browser
-								</Link>
-							</Text>
-						</Section>
+						<Footer baseUrl={baseUrl} />
 					</Section>
 				</Body>
 			</Tailwind>
@@ -126,4 +109,6 @@ export const OTPTokenEmail = ({
 };
 
 export default OTPTokenEmail;
+
+
 
