@@ -114,7 +114,7 @@ export const auth = betterAuth({
 				logger.info(`📧 Sending OTP (${type}) to:`, email);
 
 				try {
-					await sendOTPTokenEmail(email, otp);
+					await sendOTPTokenEmail(email, otp, authConfig.BASE_URL);
 					logger.info(`✅ OTP email sent to ${email}`);
 				} catch (error) {
 					logger.error("❌ Failed to send OTP email:", error);

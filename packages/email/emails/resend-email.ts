@@ -78,9 +78,9 @@ export const sendOrganizationInviteEmail = async ({
 export const sendOTPTokenEmail = async (
 	email: string,
 	otp: string,
-	url?: string,
+	baseUrl: string = "https://reloop.sh",
 ) => {
-	const html = await render(OTPTokenEmail({ email, otp, url }));
+	const html = await render(OTPTokenEmail({ email, otp, baseUrl }));
 
 	return sendEmail({
 		to: email,
