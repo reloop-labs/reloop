@@ -1,10 +1,9 @@
 // AlignUI DigitInput v0.0.0
 
 import { cn } from "@reloop/ui/cn";
-import * as React from "react";
-import OtpInput, { type OTPInputProps } from "react-otp-input";
+import { OTPInput, type OTPInputProps, type SlotProps } from "input-otp";
 
-type OtpOptions = Omit<OTPInputProps, "renderInput">;
+type OtpOptions = Omit<OTPInputProps, "render" | "children">;
 
 type DigitInputProps = {
 	className?: string;
@@ -19,15 +18,18 @@ function DigitInput({
 	...rest
 }: DigitInputProps) {
 	return (
-		<OtpInput
-			containerStyle={cn("flex w-full items-center gap-2.5", className)}
-			skipDefaultStyles
-			renderInput={(inputProps) => (
-				<DigitInputSlot
-					disabled={disabled}
-					hasError={hasError}
-					{...inputProps}
-				/>
+		<OTPInput
+			containerClassName={cn(
+				"group flex items-center justify-center has-[:disabled]:opacity-30",
+				className,
+			)}
+			disabled={disabled}
+			render={({ slots }) => (
+				<div className="flex">
+					{slots.map((slot, idx) => (
+						<Slot key={idx} {...slot} hasError={hasError} />
+					))}
+				</div>
 			)}
 			{...rest}
 		/>
@@ -35,36 +37,33 @@ function DigitInput({
 }
 DigitInput.displayName = "DigitInput";
 
-const DigitInputSlot = React.forwardRef<
-	React.ComponentRef<"input">,
-	React.ComponentPropsWithoutRef<"input"> & {
-		hasError?: boolean;
-	}
->(({ className, hasError, ...rest }, forwardedRef) => {
+type OTPInputSlotProps = { hasError?: boolean } & SlotProps;
+
+function Slot(props: OTPInputSlotProps) {
 	return (
-		<input
-			ref={forwardedRef}
+		<div
 			className={cn(
-				"h-16 w-full min-w-0 rounded-10 bg-bg-white-0 text-center text-text-strong-950 text-title-h5 shadow-regular-xs outline-none ring-1 ring-stroke-soft-200 ring-inset",
-				"transition duration-200 ease-out",
-				// hover
-				"hover:bg-bg-weak-50 hover:shadow-none hover:ring-transparent",
-				// focus
-				"focus:shadow-button-important-focus focus:outline-none focus:ring-stroke-strong-950",
-				// selection
-				"selection:bg-none",
-				// disabled
-				"disabled:bg-bg-weak-50 disabled:text-text-disabled-300 disabled:shadow-none disabled:ring-transparent",
-				{
-					"ring-error-base hover:ring-error-base focus:shadow-button-error-focus focus:ring-error-base":
-						hasError,
-				},
-				className,
+				"relative flex h-13 w-12 items-center justify-center text-[2rem]",
+				"font-semibold transition-all duration-300",
+				"border-stroke-soft-200 border-y border-r first:rounded-l-2xl first:border-l last:rounded-r-2xl",
+				"group-focus-within:border-stroke-strong-950/20 group-hover:border-stroke-strong-950/20",
+				"outline outline-stroke-strong-950/20",
+				{ "outline-3 outline-stroke-strong-950": props.isActive },
+				{ "outline-2 outline-stroke-error": props.hasError },
 			)}
-			{...rest}
-		/>
+		>
+			{props.char !== null && <div>{props.char}</div>}
+			{props.hasFakeCaret && <FakeCaret />}
+		</div>
 	);
-});
-DigitInputSlot.displayName = "DigitInputSlot";
+}
+
+function FakeCaret() {
+	return (
+		<div className="pointer-events-none absolute inset-0 flex animate-caret-blink items-center justify-center">
+			<div className="h-8 w-px bg-text-strong-950" />
+		</div>
+	);
+}
 
 export { DigitInput as Root };

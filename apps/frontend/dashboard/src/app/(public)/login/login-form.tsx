@@ -24,6 +24,7 @@ type LoginFormData = v.InferInput<typeof loginSchema>;
 
 export const LoginForm = () => {
 	const { changeStatus, status } = useLoading();
+	const [, setOtpSentEmail] = useQueryState("otpSent");
 	const {
 		register,
 		handleSubmit,
@@ -42,7 +43,7 @@ export const LoginForm = () => {
 			});
 			if (success) {
 				toast.success("OTP sent to your email!");
-				// For now, just a placeholder success
+				setOtpSentEmail(data.email);
 				changeStatus("idle");
 			}
 		} catch (e) {

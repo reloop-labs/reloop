@@ -55,7 +55,6 @@
 		"./hover-card": "./src/components/hover-card.tsx",
 		"./icons": "./src/components/icons.tsx",
 		"./input": "./src/components/input.tsx",
-		"./input-otp": "./src/components/input-otp.tsx",
 		"./label": "./src/components/label.tsx",
 		"./navigation-menu": "./src/components/navigation-menu.tsx",
 		"./popover": "./src/components/popover.tsx",
@@ -91,7 +90,7 @@
 		"./divider": "./src/components/divider.tsx",
 		"./use-loading": "./src/hooks/use-loading.ts",
 		"./horizontal-stepper": "./src/components/horizontal-stepper.tsx",
-		"./email-editor": "./src/components/email-editor.tsx"
+		"./digit-input": "./src/components/digit-input.tsx"
 	},
 	"dependencies": {
 		"@radix-ui/react-accordion": "catalog:ui",
@@ -104,6 +103,7 @@
 		"@radix-ui/react-popover": "catalog:ui",
 		"@radix-ui/react-radio-group": "catalog:ui",
 		"@radix-ui/react-scroll-area": "catalog:ui",
+		"input-otp": "catalog:ui",
 		"@radix-ui/react-select": "catalog:ui",
 		"@radix-ui/react-slider": "catalog:ui",
 		"@radix-ui/react-slot": "catalog:ui",

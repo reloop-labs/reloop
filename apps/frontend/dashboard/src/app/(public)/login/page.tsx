@@ -2,13 +2,14 @@
 import { authClient } from "@reloop/auth/client";
 import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
+import * as DigitInput from "@reloop/ui/digit-input";
 import { Icon } from "@reloop/ui/icon";
 import * as LinkButton from "@reloop/ui/link-button";
 import { Logo } from "@reloop/ui/logo";
 import Spinner from "@reloop/ui/spinner";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { parseAsBoolean, useQueryState } from "nuqs";
+import { parseAsBoolean, parseAsString, useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
 import { LoginForm } from "./login-form";
 
@@ -17,6 +18,14 @@ const Page = () => {
 	const { data: session, isPending } = authClient.useSession();
 	const [showEmail, setShowEmail] = useQueryState(
 		"email",
+		parseAsBoolean.withDefault(false),
+	);
+	const [otpSentEmail, setOtpSentEmail] = useQueryState(
+		"otpSent",
+		parseAsString.withDefault(""),
+	);
+	const [enterCode, setEnterCode] = useQueryState(
+		"enterCode",
 		parseAsBoolean.withDefault(false),
 	);
 	const lastLoggedIn = authClient.getLastUsedLoginMethod();
@@ -52,11 +61,94 @@ const Page = () => {
 							<Logo className="h-16" />
 						</div>
 						<h2 className="font-medium text-label-lg text-text-strong-950">
-							{showEmail ? "What’s your email address?" : "Login in to Reloop"}
+							{otpSentEmail
+								? "Check your email"
+								: showEmail
+									? "What’s your email address?"
+									: "Login in to Reloop"}
 						</h2>
+						{otpSentEmail && (
+							<p className="mt-2 text-center text-[13px] text-text-sub-600">
+								We’ve sent you a temporary login otp.
+								<br />
+								Please check your inbox at
+								<br />
+								<span className="font-medium text-text-strong-950">
+									{otpSentEmail}
+								</span>
+								.
+							</p>
+						)}
 					</div>
 				</div>
-				{!showEmail ? (
+				{otpSentEmail ? (
+					<div className="flex flex-col gap-4">
+						{!enterCode ? (
+							<Button.Root
+								variant="neutral"
+								className="h-11 w-full rounded-2xl!"
+								mode="lighter"
+								onClick={() => setEnterCode(true)}
+							>
+								Enter code manually
+							</Button.Root>
+						) : (
+							<form
+								className="flex flex-col gap-8 py-4"
+								onSubmit={(e) => {
+									e.preventDefault();
+								}}
+							>
+								<DigitInput.Root
+									onComplete={async (otp) => {
+										try {
+											const response =
+												await authClient.emailOtp.checkVerificationOtp({
+													otp: otp,
+													email: otpSentEmail,
+													type: "sign-in",
+												});
+
+											if (response.data?.success) {
+												router.push("/dashboard");
+											} else {
+												setError({
+													name: "email",
+													error: "Failed to login with email",
+												});
+											}
+										} catch (e) {
+											setError({
+												name: "email",
+												error: "Failed to login with email",
+											});
+										}
+									}}
+									inputMode="numeric"
+									maxLength={6}
+									autoFocus
+								/>
+								<Button.Root
+									type="submit"
+									variant="neutral"
+									className="h-11 w-full rounded-2xl!"
+								>
+									Continue with login code
+								</Button.Root>
+							</form>
+						)}
+						<button
+							type="button"
+							onClick={() => {
+								setOtpSentEmail(null);
+								setEnterCode(null);
+							}}
+							className="text-center font-medium text-[13px] text-text-sub-600 transition-colors hover:text-text-strong-950"
+						>
+							Back to login
+						</button>
+					</div>
+				) : !showEmail ? (
 					<>
 						<div className="grid grid-cols-1 gap-2">
 							<Button.Root
