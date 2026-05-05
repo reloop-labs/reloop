@@ -1,14 +1,11 @@
-import * as React from "react";
 import {
 	Body,
 	Button,
-	Container,
 	Head,
 	Heading,
 	Hr,
 	Html,
 	Img,
-	Link,
 	Preview,
 	Section,
 	Tailwind,
@@ -20,23 +17,56 @@ interface OTPTokenEmailProps {
 	otp: string;
 	email: string;
 	baseUrl: string;
+	theme?: "light" | "dark";
 }
 
 export const OTPTokenEmail = ({
 	otp = "888888",
 	email = "user@example.com",
 	baseUrl = "https://reloop.sh",
+	theme = "light",
 }: OTPTokenEmailProps) => {
 	const url = `${baseUrl}/dashboard/login/verify?email=${encodeURIComponent(
 		email,
 	)}&otp=${otp}`;
 
+	const isDark = theme === "dark";
+
+	// Full class strings — must be static so Tailwind JIT can detect them
+	const cls = {
+		body: isDark
+			? "m-0 p-0 bg-[#0e0e0e] text-white font-sans"
+			: "m-0 p-0 bg-white text-[#0e0e0e] font-sans",
+		logo: isDark ? "invert" : "",
+		label: "font-medium text-[#707070] text-[10px] uppercase tracking-[0.2em]",
+		heading: isDark
+			? "mt-6 mb-8 p-0 font-normal text-[32px] text-white leading-[1.2]"
+			: "mt-6 mb-8 p-0 font-normal text-[32px] text-[#0e0e0e] leading-[1.2]",
+		hr: isDark ? "my-8 border-[#222222]" : "my-8 border-[#e0e0e0]",
+		bodyText: isDark
+			? "text-[#b0b0b0] text-[15px] leading-[1.6]"
+			: "text-[#555555] text-[15px] leading-[1.6]",
+		otpBox: isDark
+			? "mt-8 rounded-2xl border border-[#222222] border-solid py-10 text-center"
+			: "mt-8 rounded-2xl border border-[#e0e0e0] border-solid py-10 text-center",
+		otpText: isDark
+			? "m-0 font-medium font-mono text-5xl text-white tracking-[0.2em]"
+			: "m-0 font-medium font-mono text-5xl text-[#0e0e0e] tracking-[0.2em]",
+		btn: isDark
+			? "rounded-xl bg-[#edece1] px-6 py-3 text-center font-bold text-[12px] text-black uppercase tracking-wider"
+			: "rounded-xl bg-[#0e0e0e] px-6 py-3 text-center font-bold text-[12px] text-white uppercase tracking-wider",
+		footerText: isDark
+			? "mt-8 text-[#707070] text-[13px] leading-[1.6]"
+			: "mt-8 text-[#888888] text-[13px] leading-[1.6]",
+		footerHr: isDark ? "my-10 border-[#222222]" : "my-10 border-[#e0e0e0]",
+	};
+
 	return (
 		<Html>
 			<Head />
-			<Preview>Your login code for Reloop</Preview>
+			<Preview>Your login code for Reloop is {otp}</Preview>
 			<Tailwind>
-				<Body className="m-0 bg-[#0e0e0e] p-0 font-sans text-white">
+				<Body className={cls.body}>
 					<Section className="mx-auto mt-[40px] mb-[40px] max-w-[560px] px-6">
 						{/* Logo */}
 						<Section className="mb-2">
@@ -45,53 +75,46 @@ export const OTPTokenEmail = ({
 								width="52"
 								height="52"
 								alt="Reloop Logo"
-								style={{ filter: "invert(1)" }}
+								className={cls.logo}
 							/>
 						</Section>
 
 						{/* Small Label */}
-						<Text className="font-medium text-[#707070] text-[10px] uppercase tracking-[0.2em]">
-							Login Verification
-						</Text>
+						<Text className={cls.label}>Login Verification</Text>
 
 						{/* Main Headline */}
 						<Heading
-							className="mt-6 mb-8 p-0 font-normal font-serif text-[32px] text-white leading-[1.2]"
+							className={cls.heading}
 							style={{ fontFamily: "Georgia, serif" }}
 						>
 							Your login code for Reloop.
 						</Heading>
 
-						<Hr className="my-8 border-[#222222]" />
+						<Hr className={cls.hr} />
 
-						<Text className="text-[#b0b0b0] text-[15px] leading-[1.6]">
+						<Text className={cls.bodyText}>
 							This link and code will only be valid for the next 5 minutes. If
 							the link does not work, you can use the login verification code
 							directly:
 						</Text>
 
 						{/* OTP Block */}
-						<Section className="mt-8 rounded-2xl border border-[#222222] border-solid py-10 text-center">
-							<Text className="m-0 font-medium font-mono text-5xl text-white tracking-[0.2em]">
-								{otp}
-							</Text>
+						<Section className={cls.otpBox}>
+							<Text className={cls.otpText}>{otp}</Text>
 						</Section>
 
 						{/* CTA Button */}
 						<Section className="mt-10">
-							<Button
-								className="rounded-xl bg-[#edece1] px-6 py-3 text-center font-bold text-[12px] text-black uppercase tracking-wider"
-								href={url}
-							>
+							<Button className={cls.btn} href={url}>
 								Login to Reloop
 							</Button>
 						</Section>
 
-						<Text className="mt-8 text-[#707070] text-[13px] leading-[1.6]">
+						<Text className={cls.footerText}>
 							If you didn't request this code, you can safely ignore this email.
 						</Text>
 
-						<Hr className="my-10 border-[#222222]" />
+						<Hr className={cls.footerHr} />
 
 						<Footer baseUrl={baseUrl} />
 					</Section>
