@@ -1,12 +1,14 @@
 import { Link, Section, Text } from "react-email";
+import { SocialLinks } from "./social-links";
 
 interface FooterProps {
 	baseUrl?: string;
+	theme?: "light" | "dark";
 }
 
 export const Footer = ({ baseUrl = "https://reloop.sh" }: FooterProps) => {
 	return (
-		<Section className="mt-6 text-[#707070]">
+		<Section className="text-[#707070]">
 			<Text className="m-0 text-[12px] leading-[24px]">
 				If you'd like to report an issue, reach out to{" "}
 				<Link
@@ -25,6 +27,7 @@ export const Footer = ({ baseUrl = "https://reloop.sh" }: FooterProps) => {
 					Manage your notification settings
 				</Link>
 			</Text>
+
 			<Text className="m-0 mt-4 text-[12px] leading-[24px]">
 				Copyright © 2026 Reloop Inc. All rights reserved.
 				<br />

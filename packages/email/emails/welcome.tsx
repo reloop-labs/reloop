@@ -12,6 +12,7 @@ import {
 	Text,
 } from "react-email";
 import { Footer } from "../components/footer";
+import SocialLinks from "../components/social-links";
 
 interface WelcomeEmailProps {
 	fullName: string;
@@ -30,7 +31,7 @@ export const WelcomeEmail = ({
 }: WelcomeEmailProps) => {
 	const firstName = fullName ? fullName.split(" ").at(0) : "";
 	const previewText =
-		"Open-source email infrastructure — built for deliverability, control, and scale.";
+		"Open-source email infrastructure. Deliverability is on us.";
 
 	const isDark = theme === "dark";
 
@@ -71,11 +72,11 @@ export const WelcomeEmail = ({
 		tdBorderDark: "1px solid #222222",
 		tdBorderLight: "1px solid #e0e0e0",
 		btn: isDark
-			? "rounded bg-[#edece1] px-6 py-3 text-center font-bold font-mono text-[12px] text-black uppercase tracking-wider no-underline"
-			: "rounded bg-[#0e0e0e] px-6 py-3 text-center font-bold font-mono text-[12px] text-white uppercase tracking-wider no-underline",
+			? "rounded-xl bg-[#edece1] px-6 py-3 text-center font-bold font-mono text-[12px] text-black uppercase tracking-wider no-underline"
+			: "rounded-xl bg-[#0e0e0e] px-6 py-3 text-center font-bold font-mono text-[12px] text-white uppercase tracking-wider no-underline",
 		closingText: isDark
-			? "mt-10 text-[#b0b0b0] text-[15px] leading-[1.6]"
-			: "mt-10 text-[#555555] text-[15px] leading-[1.6]",
+			? "mt-10 mb-8 text-[#b0b0b0] text-[15px] leading-[1.6]"
+			: "mt-10 mb-8 text-[#555555] text-[15px] leading-[1.6]",
 		footerHr: isDark
 			? "mt-10 mb-8 border-[#222222]"
 			: "mt-10 mb-8 border-[#e0e0e0]",
@@ -124,7 +125,7 @@ export const WelcomeEmail = ({
 
 						{/* Salutation & Intro */}
 						<Text className={cls.bodyText}>
-							Welcome aboard. We're genuinely glad you're here.
+							Hey, welcome! Really glad you're here.
 						</Text>
 						<Text className={cls.bodyText}>
 							A new era of software is being built — AI agents that run
@@ -133,7 +134,7 @@ export const WelcomeEmail = ({
 							full speed. The builders are getting faster. The tools around
 							email haven't changed much.
 						</Text>
-						<Text className={cls.bodyText}> Thats why we Reloop exist.</Text>
+						<Text className={cls.bodyText}>That's why Reloop exists.</Text>
 
 						{/* Mission Section */}
 						<Section className={cls.missionBox}>
@@ -153,7 +154,7 @@ export const WelcomeEmail = ({
 						</Text>
 						<Text className={cls.bodyText}>
 							Reloop gives them the email layer they deserve: reliable,
-							composable, and transparent and self-hostable.
+							composable, and transparent, and self-hostable.
 						</Text>
 
 						{/* Capabilities Box */}
@@ -239,13 +240,15 @@ export const WelcomeEmail = ({
 						</Section>
 
 						<Text className={cls.closingText}>
-							We're building Reloop in the open. That means you get a voice in
-							what gets built next. If you have questions, feedback, or just
-							want to say hi — reply to this email. We read everything.
+							Honestly? We'll probably get things wrong. But that's exactly why
+							I'm writing to you. Every critique, every 'this feels off', every
+							'why doesn't it do this' — that's what shapes Reloop into
+							something worth using. You're not just a user here. You're the
+							reason it gets better. Hit reply. I read everything personally.
 						</Text>
-
+						<SocialLinks theme={theme} />
 						<Hr className={cls.footerHr} />
-						<Footer baseUrl={baseUrl} />
+						<Footer baseUrl={baseUrl} theme={theme} />
 					</Section>
 				</Body>
 			</Tailwind>
