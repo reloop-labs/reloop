@@ -1,7 +1,6 @@
 import { render } from "@react-email/render";
 import ConfirmEmail from "./confirm-email";
 import OrganizationInviteEmail from "./organization-invite";
-import PasswordResetEmail from "./password-reset";
 import OTPTokenEmail from "./otp";
 import WelcomeEmail from "./welcome";
 
@@ -25,19 +24,6 @@ export const sendConfirmEmail = async (email: string, confirmLink: string) => {
 	return sendEmail({
 		to: email,
 		subject: "Confirm your email address for Reloop",
-		html,
-	});
-};
-
-export const sendPasswordResetEmail = async (
-	email: string,
-	resetUrl: string,
-) => {
-	const html = await render(PasswordResetEmail({ resetUrl }));
-
-	return sendEmail({
-		to: email,
-		subject: "Reset Your Reloop Password",
 		html,
 	});
 };
@@ -79,7 +65,7 @@ export const sendOrganizationInviteEmail = async ({
 export const sendOTPTokenEmail = async (
 	email: string,
 	otp: string,
-	baseUrl: string = "https://reloop.sh",
+	baseUrl = "https://reloop.sh",
 ) => {
 	const html = await render(OTPTokenEmail({ email, otp, baseUrl }));
 
@@ -93,7 +79,7 @@ export const sendOTPTokenEmail = async (
 export const sendWelcomeEmail = async (
 	email: string,
 	fullName: string,
-	baseUrl: string = "https://reloop.sh",
+	baseUrl = "https://reloop.sh",
 ) => {
 	const html = await render(WelcomeEmail({ fullName, baseUrl }));
 
