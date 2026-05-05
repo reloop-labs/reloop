@@ -13,6 +13,7 @@ import {
 } from "react-email";
 import { Footer } from "../components/footer";
 import SocialLinks from "../components/social-links";
+import { Wrapper } from "../components/wrapper";
 
 interface WelcomeEmailProps {
 	fullName: string;
@@ -94,17 +95,7 @@ export const WelcomeEmail = ({
 			<Preview>{previewText}</Preview>
 			<Tailwind>
 				<Body className={cls.body}>
-					<Section className="mx-auto mt-[40px] mb-[40px] max-w-[560px] px-6">
-						{/* Logo */}
-						<Section className="mb-8">
-							<Img
-								src={`${baseUrl}/web-app-manifest-192x192.png`}
-								width="32"
-								height="32"
-								alt="Reloop Logo"
-								className={cls.logo}
-							/>
-						</Section>
+					<Wrapper baseUrl={baseUrl} theme={theme}>
 
 						{/* Small Label */}
 						<Text className={cls.label}>Welcome to Reloop</Text>
@@ -249,7 +240,7 @@ export const WelcomeEmail = ({
 						<SocialLinks theme={theme} />
 						<Hr className={cls.footerHr} />
 						<Footer baseUrl={baseUrl} theme={theme} />
-					</Section>
+					</Wrapper>
 				</Body>
 			</Tailwind>
 		</Html>
