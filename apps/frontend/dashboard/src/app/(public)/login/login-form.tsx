@@ -1,11 +1,12 @@
 "use client";
 
 import { valibotResolver } from "@hookform/resolvers/valibot";
+import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
 import * as Input from "@reloop/ui/input";
 import Spinner from "@reloop/ui/spinner";
 import { useLoading } from "@reloop/ui/use-loading";
-import { useRouter } from "next/navigation";
+import { useQueryState } from "nuqs";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -23,7 +24,6 @@ type LoginFormData = v.InferInput<typeof loginSchema>;
 
 export const LoginForm = () => {
 	const { changeStatus, status } = useLoading();
-
 	const {
 		register,
 		handleSubmit,
@@ -36,10 +36,15 @@ export const LoginForm = () => {
 	const onSubmit = async (data: LoginFormData) => {
 		try {
 			changeStatus("loading");
-			// TODO: Implement OTP sending logic
-			toast.success("OTP sent to your email!");
-			// For now, just a placeholder success
-			changeStatus("idle");
+			const success = await authClient.emailOtp.sendVerificationOtp({
+				email: data.email,
+				type: "sign-in",
+			});
+			if (success) {
+				toast.success("OTP sent to your email!");
+				// For now, just a placeholder success
+				changeStatus("idle");
+			}
 		} catch (e) {
 			changeStatus("idle");
 			if (e instanceof Error && e.message) {
@@ -53,8 +58,8 @@ export const LoginForm = () => {
 	return (
 		<form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
 			<div className="flex flex-col gap-1">
-				<Input.Root hasError={!!errors.email}>
-					<Input.Wrapper className="rounded-2xl!">
+				<Input.Root hasError={!!errors.email} className="rounded-2xl!">
+					<Input.Wrapper>
 						<Input.Input
 							className="h-12 font-medium"
 							id="email"

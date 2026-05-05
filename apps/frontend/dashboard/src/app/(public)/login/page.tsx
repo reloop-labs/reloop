@@ -1,20 +1,25 @@
 "use client";
 import { authClient } from "@reloop/auth/client";
+import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as LinkButton from "@reloop/ui/link-button";
 import { Logo } from "@reloop/ui/logo";
 import Spinner from "@reloop/ui/spinner";
-import { AnimatePresence } from "motion/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { parseAsBoolean, useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
 import { LoginForm } from "./login-form";
 
 const Page = () => {
 	const router = useRouter();
 	const { data: session, isPending } = authClient.useSession();
-	const [showEmail, setShowEmail] = useState(false);
+	const [showEmail, setShowEmail] = useQueryState(
+		"email",
+		parseAsBoolean.withDefault(false),
+	);
+	const lastLoggedIn = authClient.getLastUsedLoginMethod();
 	const [loading, setLoading] = useState<{
 		name: "google" | "github" | "email";
 		loading: boolean;
@@ -57,7 +62,7 @@ const Page = () => {
 							<Button.Root
 								disabled={loading.loading}
 								variant="neutral"
-								className="h-11 w-full rounded-2xl!"
+								className="relative h-11 w-full rounded-2xl!"
 								onClick={async () => {
 									try {
 										setLoading({ name: "google", loading: true });
@@ -101,12 +106,17 @@ const Page = () => {
 									</svg>
 								)}
 								Continue with Google
+								{lastLoggedIn === "google" && (
+									<p className="-top-[10px] -right-0 absolute rounded-full bg-primary-base px-2 py-0.5 font-medium text-background-base text-xs">
+										Last used
+									</p>
+								)}
 							</Button.Root>
 							<Button.Root
 								disabled={loading.loading}
 								mode="lighter"
 								variant="neutral"
-								className="h-11 w-full rounded-2xl!"
+								className="relative h-11 w-full rounded-2xl!"
 								onClick={async () => {
 									try {
 										setLoading({ name: "github", loading: true });
@@ -129,16 +139,30 @@ const Page = () => {
 									<Icon name="github" className="h-5 w-5" />
 								)}
 								Continue with GitHub
+								{lastLoggedIn === "github" && (
+									<div className="-translate-y-1/2 absolute top-1/2 right-3">
+										<Badge.Root variant="lighter" color="gray">
+											Last used
+										</Badge.Root>
+									</div>
+								)}
 							</Button.Root>
 							<Button.Root
 								disabled={loading.loading}
 								mode="lighter"
 								variant="neutral"
-								className="h-11 w-full rounded-2xl!"
+								className="relative h-11 w-full rounded-2xl!"
 								onClick={() => setShowEmail(true)}
 							>
 								<Icon name="social-mail" className="h-[17.5px] w-[17.5px]" />
 								Continue with Email
+								{lastLoggedIn === "email" && (
+									<div className="-translate-y-1/2 absolute top-1/2 right-3">
+										<Badge.Root variant="lighter" color="gray">
+											Last used
+										</Badge.Root>
+									</div>
+								)}
 							</Button.Root>
 						</div>
 						<p className="pt-5 text-center font-medium text-[13px] text-text-sub-600">
@@ -155,9 +179,7 @@ const Page = () => {
 					</>
 				) : (
 					<div className="flex flex-col gap-4">
-						<AnimatePresence mode="wait">
-							<LoginForm />
-						</AnimatePresence>
+						<LoginForm />
 						<button
 							type="button"
 							onClick={() => setShowEmail(false)}
