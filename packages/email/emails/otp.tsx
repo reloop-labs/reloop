@@ -5,13 +5,13 @@ import {
 	Heading,
 	Hr,
 	Html,
-	Img,
 	Preview,
 	Section,
 	Tailwind,
 	Text,
 } from "react-email";
 import { Footer } from "../components/footer";
+import { Wrapper } from "../components/wrapper";
 
 interface OTPTokenEmailProps {
 	otp: string;
@@ -37,8 +37,8 @@ export const OTPTokenEmail = ({
 		body: isDark
 			? "m-0 p-0 bg-[#0e0e0e] text-white font-sans"
 			: "m-0 p-0 bg-white text-[#0e0e0e] font-sans",
-		logo: isDark ? "invert" : "",
-		label: "font-medium text-[#707070] text-[10px] uppercase tracking-[0.2em]",
+		label:
+			"m-0 font-mono font-medium text-[#707070] text-[12px] uppercase tracking-[0.2em]",
 		heading: isDark
 			? "mt-6 mb-8 p-0 font-normal text-[32px] text-white leading-[1.2]"
 			: "mt-6 mb-8 p-0 font-normal text-[32px] text-[#0e0e0e] leading-[1.2]",
@@ -67,18 +67,7 @@ export const OTPTokenEmail = ({
 			<Preview>Your login code for Reloop is {otp}</Preview>
 			<Tailwind>
 				<Body className={cls.body}>
-					<Section className="mx-auto mt-[40px] mb-[40px] max-w-[560px] px-6">
-						{/* Logo */}
-						<Section className="mb-2">
-							<Img
-								src={`${baseUrl}/web-app-manifest-192x192.png`}
-								width="52"
-								height="52"
-								alt="Reloop Logo"
-								className={cls.logo}
-							/>
-						</Section>
-
+					<Wrapper baseUrl={baseUrl} theme={theme}>
 						{/* Small Label */}
 						<Text className={cls.label}>Login Verification</Text>
 
@@ -116,8 +105,8 @@ export const OTPTokenEmail = ({
 
 						<Hr className={cls.footerHr} />
 
-						<Footer baseUrl={baseUrl} />
-					</Section>
+						<Footer baseUrl={baseUrl} theme={theme} />
+					</Wrapper>
 				</Body>
 			</Tailwind>
 		</Html>

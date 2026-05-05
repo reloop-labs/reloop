@@ -15,7 +15,7 @@ export const Wrapper = ({
 	const isDark = theme === "dark";
 
 	return (
-		<Section className="mx-auto mt-[40px] mb-[40px] max-w-[560px] px-6">
+		<Section className="mx-auto mt-[40px] mb-[40px] max-w-[600px] px-6">
 			{/* Logo */}
 			<Section className="mb-6">
 				<Img
