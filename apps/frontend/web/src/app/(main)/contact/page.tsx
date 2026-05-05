@@ -113,7 +113,7 @@ const ContactPage = () => {
 											id="email"
 											name="email"
 											type="email"
-											placeholder="Enter your email"
+											placeholder="steve@apple.com"
 										/>
 									</Input.Wrapper>
 								</Input.Root>

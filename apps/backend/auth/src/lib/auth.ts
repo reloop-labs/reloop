@@ -12,6 +12,7 @@ import {
 	admin,
 	apiKey,
 	bearer,
+	emailOTP,
 	jwt,
 	openAPI,
 	organization,
@@ -103,6 +104,17 @@ export const auth = betterAuth({
 		bearer(),
 		admin(),
 		apiKey({ defaultPrefix: "rl" }),
+		emailOTP({
+			async sendVerificationOTP({ email, otp, type }) {
+				if (type === "sign-in") {
+					// Send the OTP for sign in
+				} else if (type === "email-verification") {
+					// Send the OTP for email verification
+				} else {
+					// Send the OTP for password reset
+				}
+			},
+		}),
 		organization({
 			sendInvitationEmail: async (data) => {
 				const inviteLink = `${authConfig.BASE_URL}/dashboard/accept-invitation?id=${data.id}`;
