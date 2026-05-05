@@ -14,6 +14,7 @@ import {
 	bearer,
 	emailOTP,
 	jwt,
+	lastLoginMethod,
 	openAPI,
 	organization,
 } from "better-auth/plugins";
@@ -64,7 +65,7 @@ export const auth = betterAuth({
 	telemetry: { enabled: false },
 	emailAndPassword: {
 		autoSignIn: true,
-		enabled: true,
+		enabled: authConfig.DISABLE_SIGNUP !== "true",
 		sendResetPassword: async ({ user, url, token }, request) => {
 			logger.info("🔐 Password reset requested for:", user.email);
 
@@ -104,8 +105,10 @@ export const auth = betterAuth({
 		bearer(),
 		admin(),
 		apiKey({ defaultPrefix: "rl" }),
+		lastLoginMethod(),
 		emailOTP({
 			async sendVerificationOTP({ email, otp, type }) {
+				if (authConfig.DEFAULT_OTP) return
 				if (type === "sign-in") {
 					// Send the OTP for sign in
 				} else if (type === "email-verification") {
@@ -113,6 +116,10 @@ export const auth = betterAuth({
 				} else {
 					// Send the OTP for password reset
 				}
+			},
+			generateOTP() {
+				if (authConfig.DEFAULT_OTP) return authConfig.DEFAULT_OTP
+				return Math.floor(100000 + Math.random() * 900000).toString();
 			},
 		}),
 		organization({
@@ -149,16 +156,17 @@ export const auth = betterAuth({
 				}
 			},
 		}),
-		openAPI({ path: "/docs" }),
+		openAPI({
+			path: "/docs",
+		}),
 	],
 	advanced: {
 		cookiePrefix: "reloop",
 		ipAddress: {
 			ipAddressHeaders: ["x-client-ip", "x-forwarded-for"],
-			disableIpTracking: false,
 		},
 	},
-});
+})
 
 let _schema: ReturnType<typeof auth.api.generateOpenAPISchema> | null = null;
 

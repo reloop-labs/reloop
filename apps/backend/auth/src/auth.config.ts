@@ -37,4 +37,6 @@ export const authConfig = {
 	GITHUB_CLIENT_SECRET:
 		process.env.GITHUB_CLIENT_SECRET || defaults.GITHUB_CLIENT_SECRET,
 	LOGS_API_KEY: process.env.LOGS_API_KEY || "reloop-log-api-key",
+	DEFAULT_OTP: process.env.DEFAULT_OTP,
+	DISABLE_SIGNUP: process.env.DISABLE_SIGNUP || "false"
 };
