@@ -108,9 +108,13 @@ const Page = () => {
 													email: otpSentEmail,
 													type: "sign-in",
 												});
+											const { data, error } = await authClient.signIn.emailOtp({
+												email: otpSentEmail, // required
+												otp: otp, // required
+											});
 
 											if (response.data?.success) {
-												router.push("/dashboard");
+												router.push("/");
 											} else {
 												setError({
 													name: "email",

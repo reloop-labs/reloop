@@ -62,22 +62,6 @@ export const auth = betterAuth({
 	emailAndPassword: {
 		autoSignIn: true,
 		enabled: authConfig.DISABLE_SIGNUP !== "true",
-		sendResetPassword: async ({ user, url, token }, request) => {
-			logger.info("🔐 Password reset requested for:", user.email);
-
-			// Log reset URL and token only in development for easy testing
-			if (authConfig.NODE_ENV === "development") {
-				logger.info("🔗 Reset URL (DEV):", url);
-				logger.info("🔑 Token (DEV):", token);
-			}
-
-			try {
-				logger.info(`✅ Password reset email sent to ${user.email}`);
-			} catch (error) {
-				logger.error("❌ Failed to send password reset email:", error);
-				throw new Error("Failed to send password reset email");
-			}
-		},
 	},
 	socialProviders: {
 		google: {
@@ -103,6 +87,8 @@ export const auth = betterAuth({
 		lastLoginMethod(),
 		emailOTP({
 			async sendVerificationOTP({ email, otp, type }) {
+				logger.info(`📧 Sending OTP (${type}) to:${email} and otp: ${otp}`);
+
 				if (authConfig.DEFAULT_OTP) return;
 
 				logger.info(`📧 Sending OTP (${type}) to:`, email);
