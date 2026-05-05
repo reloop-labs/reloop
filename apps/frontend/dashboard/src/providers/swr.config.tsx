@@ -3,8 +3,14 @@
 import axios from "axios";
 import { SWRConfig } from "swr";
 
-const fetcher = async (url: string) => {
-	const response = await axios.get(url, {
+const fetcher = async (key: string | any[]) => {
+	// Third-party hooks like Vercel AI SDK use array keys and handle their own fetching.
+	// We should ignore them to prevent SWR from sending malformed GET requests.
+	if (Array.isArray(key)) return null;
+	if (typeof key !== "string") return null;
+	if (key.includes("/api/ai/generate-template")) return null;
+
+	const response = await axios.get(key, {
 		headers: { credentials: "include" },
 	});
 	return response.data;

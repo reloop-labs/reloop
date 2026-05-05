@@ -6,6 +6,7 @@ import { EditorProvider } from "./components/editor-provider";
 import { FloatingMenu } from "./components/floating-menu";
 import { EmailInspector } from "./components/inspector";
 import { SendDetails } from "./components/send-details";
+import { AIAssistant } from "./components/ai-assistant";
 
 const Page = () => {
 	const params = useParams<{ templateId: string }>();
@@ -24,6 +25,7 @@ const Page = () => {
 						<EmailInspector />
 					</div>
 					<FloatingMenu />
+					<AIAssistant />
 				</div>
 			</div>
 		</EditorProvider>
