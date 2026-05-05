@@ -3,6 +3,7 @@ import ConfirmEmail from "./confirm-email";
 import OrganizationInviteEmail from "./organization-invite";
 import PasswordResetEmail from "./password-reset";
 import OTPTokenEmail from "./otp";
+import WelcomeEmail from "./welcome";
 
 export interface EmailOptions {
 	to: string;
@@ -85,6 +86,20 @@ export const sendOTPTokenEmail = async (
 	return sendEmail({
 		to: email,
 		subject: `${otp} is your Reloop verification code`,
+		html,
+	});
+};
+
+export const sendWelcomeEmail = async (
+	email: string,
+	fullName: string,
+	baseUrl: string = "https://reloop.sh",
+) => {
+	const html = await render(WelcomeEmail({ fullName, baseUrl }));
+
+	return sendEmail({
+		to: email,
+		subject: "Welcome to Reloop!",
 		html,
 	});
 };
