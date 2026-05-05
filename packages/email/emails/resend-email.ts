@@ -2,6 +2,7 @@ import { render } from "@react-email/render";
 import ConfirmEmail from "./confirm-email";
 import OrganizationInviteEmail from "./organization-invite";
 import PasswordResetEmail from "./password-reset";
+import OTPTokenEmail from "./otp";
 
 export interface EmailOptions {
 	to: string;
@@ -70,6 +71,20 @@ export const sendOrganizationInviteEmail = async ({
 	return sendEmail({
 		to: email,
 		subject: `You've been invited to join ${organizationName} on Reloop`,
+		html,
+	});
+};
+
+export const sendOTPTokenEmail = async (
+	email: string,
+	otp: string,
+	url?: string,
+) => {
+	const html = await render(OTPTokenEmail({ email, otp, url }));
+
+	return sendEmail({
+		to: email,
+		subject: `${otp} is your Reloop verification code`,
 		html,
 	});
 };

@@ -2,6 +2,7 @@ import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
 import {
+	sendOTPTokenEmail,
 	sendOrganizationInviteEmail,
 	sendPasswordResetEmail,
 } from "@reloop/react-email";
@@ -108,13 +109,16 @@ export const auth = betterAuth({
 		lastLoginMethod(),
 		emailOTP({
 			async sendVerificationOTP({ email, otp, type }) {
-				if (authConfig.DEFAULT_OTP) return
-				if (type === "sign-in") {
-					// Send the OTP for sign in
-				} else if (type === "email-verification") {
-					// Send the OTP for email verification
-				} else {
-					// Send the OTP for password reset
+				if (authConfig.DEFAULT_OTP) return;
+
+				logger.info(`📧 Sending OTP (${type}) to:`, email);
+
+				try {
+					await sendOTPTokenEmail(email, otp);
+					logger.info(`✅ OTP email sent to ${email}`);
+				} catch (error) {
+					logger.error("❌ Failed to send OTP email:", error);
+					throw new Error("Failed to send OTP email");
 				}
 			},
 			generateOTP() {
