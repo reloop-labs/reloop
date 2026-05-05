@@ -1,11 +1,6 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
-import {
-	sendOTPTokenEmail,
-	sendOrganizationInviteEmail,
-	sendPasswordResetEmail,
-} from "@reloop/react-email";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { createAuthMiddleware } from "better-auth/api";
@@ -77,7 +72,6 @@ export const auth = betterAuth({
 			}
 
 			try {
-				await sendPasswordResetEmail(user.email, url);
 				logger.info(`✅ Password reset email sent to ${user.email}`);
 			} catch (error) {
 				logger.error("❌ Failed to send password reset email:", error);
@@ -114,8 +108,7 @@ export const auth = betterAuth({
 				logger.info(`📧 Sending OTP (${type}) to:`, email);
 
 				try {
-					await sendOTPTokenEmail(email, otp, authConfig.BASE_URL);
-					logger.info(`✅ OTP email sent to ${email}`);
+					logger.info(`✅ OTP email sent to ${email} ${otp}`);
 				} catch (error) {
 					logger.error("❌ Failed to send OTP email:", error);
 					throw new Error("Failed to send OTP email");
@@ -143,14 +136,7 @@ export const auth = betterAuth({
 				}
 
 				try {
-					await sendOrganizationInviteEmail({
-						email: data.email,
-						inviteLink,
-						organizationName: data.organization.name,
-						inviterName: data.inviter.user.name || data.inviter.user.email,
-						inviterEmail: data.inviter.user.email,
-						role: data.role,
-					});
+
 					logger.info(
 						`✅ Organization invite email sent to ${data.email} using ${inviteLink}`,
 					);

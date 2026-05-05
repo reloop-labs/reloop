@@ -5,7 +5,6 @@ import {
 	Heading,
 	Hr,
 	Html,
-	Img,
 	Preview,
 	Section,
 	Tailwind,
@@ -96,7 +95,6 @@ export const WelcomeEmail = ({
 			<Tailwind>
 				<Body className={cls.body}>
 					<Wrapper baseUrl={baseUrl} theme={theme}>
-
 						{/* Small Label */}
 						<Text className={cls.label}>Welcome to Reloop</Text>
 
