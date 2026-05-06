@@ -1,5 +1,5 @@
 {
-	"name": "@reloop.sh/email",
+	"name": "reloop-email",
 	"version": "1.0.2",
 	"description": "Official Reloop Node.js SDK for integrating with Reloop services",
 	"main": "dist/index.js",
