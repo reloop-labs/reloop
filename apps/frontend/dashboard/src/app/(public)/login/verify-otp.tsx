@@ -4,7 +4,7 @@ import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
 import * as DigitInput from "@reloop/ui/digit-input";
 import { useRouter } from "next/navigation";
-import { parseAsBoolean, useQueryState } from "nuqs";
+import { parseAsBoolean, parseAsString, useQueryState } from "nuqs";
 import { useState } from "react";
 
 export function VerifyOTP({
@@ -18,6 +18,10 @@ export function VerifyOTP({
 	const [enterCode, setEnterCode] = useQueryState(
 		"enterCode",
 		parseAsBoolean.withDefault(false),
+	);
+	const [otpValue, setOtpValue] = useQueryState(
+		"otp",
+		parseAsString.withDefault(""),
 	);
 	const [, setError] = useState<{
 		name: "google" | "github" | "email";
@@ -43,14 +47,17 @@ export function VerifyOTP({
 					}}
 				>
 					<DigitInput.Root
+						value={otpValue}
+						onChange={(val) => setOtpValue(val)}
 						onComplete={async (otp) => {
 							try {
-								const response =
-									await authClient.emailOtp.checkVerificationOtp({
+								const response = await authClient.emailOtp.checkVerificationOtp(
+									{
 										otp: otp,
 										email: email,
 										type: "sign-in",
-									});
+									},
+								);
 								const { data, error } = await authClient.signIn.emailOtp({
 									email: email, // required
 									otp: otp, // required
@@ -79,6 +86,7 @@ export function VerifyOTP({
 							<DigitInput.Slot index={0} />
 							<DigitInput.Slot index={1} />
 							<DigitInput.Slot index={2} />
+							<span className="mx-2 h-0.5 w-4 rounded-full bg-bg-sub-300" />
 							<DigitInput.Slot index={3} />
 							<DigitInput.Slot index={4} />
 							<DigitInput.Slot index={5} />
