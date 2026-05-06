@@ -91,16 +91,16 @@ const Page = () => {
 
 	return (
 		<div className="flex h-dvh flex-col items-center justify-center">
-			<div className="w-full max-w-sm p-5 md:p-8">
-				<motion.div
-					layout
-					className="flex flex-col items-center justify-center gap-2"
-				>
-					<div className="mb-2 flex items-center justify-center">
-						<Logo className="h-16" />
-					</div>
-				</motion.div>
-				<AnimatePresence mode="wait" custom={direction} initial={false}>
+			<AnimatePresence mode="wait" custom={direction}>
+				<div className="w-full max-w-sm p-5 md:p-8">
+					<motion.div
+						layout
+						className="flex flex-col items-center justify-center gap-2"
+					>
+						<div className="mb-2 flex items-center justify-center">
+							<Logo className="h-16" />
+						</div>
+					</motion.div>
 					{otpSentEmail ? (
 						<motion.div
 							key="verify-otp"
@@ -181,8 +181,8 @@ const Page = () => {
 							</div>
 						</motion.div>
 					)}
-				</AnimatePresence>
-			</div>
+				</div>
+			</AnimatePresence>
 		</div>
 	);
 };

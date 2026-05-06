@@ -51,7 +51,7 @@ export function VerifyOTP({
 					changeStatus("idle");
 					setTimeout(() => {
 						router.push("/");
-					}, 2000);
+					}, 3000);
 				} else {
 					changeStatus("idle");
 					setError({
