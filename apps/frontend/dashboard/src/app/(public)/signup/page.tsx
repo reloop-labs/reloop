@@ -1,13 +1,29 @@
 "use client";
 import { authClient } from "@reloop/auth/client";
 import { Logo } from "@reloop/ui/logo";
-import Spinner from "@reloop/ui/spinner";
+import { Skeleton } from "@reloop/ui/skeleton";
+import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { parseAsBoolean, parseAsString, useQueryState } from "nuqs";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { SignupForm } from "./signup-form";
 import { SocialSignup } from "./social-signup";
 import { VerifyOTP } from "./verify-otp";
+
+const variants = {
+	initial: (direction: number) => ({
+		opacity: 0,
+		x: direction > 0 ? 20 : -20,
+	}),
+	animate: {
+		opacity: 1,
+		x: 0,
+	},
+	exit: (direction: number) => ({
+		opacity: 0,
+		x: direction < 0 ? 20 : -20,
+	}),
+};
 
 const Page = () => {
 	const router = useRouter();
@@ -24,6 +40,19 @@ const Page = () => {
 		"enterCode",
 		parseAsBoolean.withDefault(false),
 	);
+	const [, setOtpValue] = useQueryState("otp", parseAsString.withDefault(""));
+
+	const currentLevel = otpSentEmail ? 2 : showEmail ? 1 : 0;
+	const prevLevel = useRef(currentLevel);
+	const prevDirection = useRef(1);
+	let direction = prevDirection.current;
+	if (currentLevel !== prevLevel.current) {
+		direction = currentLevel > prevLevel.current ? 1 : -1;
+	}
+	useEffect(() => {
+		prevLevel.current = currentLevel;
+		prevDirection.current = direction;
+	}, [currentLevel, direction]);
 
 	useEffect(() => {
 		if (session && !isPending) {
@@ -34,7 +63,28 @@ const Page = () => {
 	if (isPending) {
 		return (
 			<div className="flex h-dvh flex-col items-center justify-center">
-				<Spinner size={32} />
+				<div className="w-full max-w-sm p-5 md:p-8">
+					<div className="flex flex-col items-center justify-center gap-2">
+						<div className="mb-2 flex items-center justify-center">
+							<Logo className="h-16" />
+						</div>
+					</div>
+					<div>
+						<div className="space-y-1 pb-5 text-center">
+							<h2 className="font-medium text-label-lg text-text-strong-950">
+								We are getting things ready...
+							</h2>
+						</div>
+						<div className="w-full space-y-3">
+							<Skeleton className="h-11 w-full rounded-2xl!" />
+							<Skeleton className="h-11 w-full rounded-2xl!" />
+							<Skeleton className="h-11 w-full rounded-2xl!" />
+						</div>
+						<Skeleton className="mx-auto mt-6 h-3 w-2/3 rounded-2xl!" />
+						<Skeleton className="mx-auto mt-2 h-3 w-2/4 rounded-2xl!" />
+						<Skeleton className="mx-auto mt-5 h-3 w-2/3 rounded-2xl!" />
+					</div>
+				</div>
 			</div>
 		);
 	}
@@ -42,54 +92,96 @@ const Page = () => {
 	return (
 		<div className="flex h-dvh flex-col items-center justify-center">
 			<div className="w-full max-w-sm p-5 md:p-8">
-				<div className="flex flex-col items-center justify-center gap-2">
-					<div className="space-y-1 pb-6 text-center">
-						<div className="mb-2 flex items-center justify-center">
-							<Logo className="h-16" />
-						</div>
-						<h2 className="font-medium text-label-lg text-text-strong-950">
-							{otpSentEmail
-								? "Check your email"
-								: showEmail
-									? "What’s your email address?"
-									: "Create your workspace"}
-						</h2>
-						{otpSentEmail && (
-							<p className="mt-2 text-center text-[13px] text-text-sub-600">
-								We’ve sent you a temporary signup otp.
-								<br />
-								Please check your inbox at
-								<br />
-								<span className="font-medium text-text-strong-950">
-									{otpSentEmail}
-								</span>
-								.
-							</p>
-						)}
+				<motion.div
+					layout
+					className="flex flex-col items-center justify-center gap-2"
+				>
+					<div className="mb-2 flex items-center justify-center">
+						<Logo className="h-16" />
 					</div>
-				</div>
-				{otpSentEmail ? (
-					<VerifyOTP
-						email={otpSentEmail}
-						onBack={() => {
-							setOtpSentEmail(null);
-							setEnterCode(null);
-						}}
-					/>
-				) : !showEmail ? (
-					<SocialSignup onContinueWithEmail={() => setShowEmail(true)} />
-				) : (
-					<div className="flex flex-col gap-4">
-						<SignupForm />
-						<button
-							type="button"
-							onClick={() => setShowEmail(false)}
-							className="text-center font-medium text-[13px] text-text-sub-600 transition-colors hover:text-text-strong-950"
+				</motion.div>
+				<AnimatePresence mode="wait" custom={direction} initial={false}>
+					{otpSentEmail ? (
+						<motion.div
+							key="verify-otp"
+							custom={direction}
+							variants={variants}
+							initial="initial"
+							animate="animate"
+							exit="exit"
+							transition={{ duration: 0.2 }}
 						>
-							Back to signup
-						</button>
-					</div>
-				)}
+							<div className="space-y-1 pb-6 text-center">
+								<h2 className="font-medium text-label-lg text-text-strong-950">
+									Check your email
+								</h2>
+								<p className="mt-2 text-center text-[13px] text-text-sub-600">
+									We’ve sent you a temporary signup otp.
+									<br />
+									Please check your inbox at
+									<br />
+									<span className="font-medium text-text-strong-950">
+										{otpSentEmail}
+									</span>
+									.
+								</p>
+							</div>
+							<VerifyOTP
+								email={otpSentEmail}
+								onBack={() => {
+									setOtpSentEmail(null);
+									setEnterCode(null);
+									setOtpValue("");
+								}}
+							/>
+						</motion.div>
+					) : !showEmail ? (
+						<motion.div
+							key="social-signup"
+							custom={direction}
+							variants={variants}
+							initial="initial"
+							animate="animate"
+							exit="exit"
+							transition={{ duration: 0.2 }}
+						>
+							<div className="space-y-1 pb-6 text-center">
+								<h2 className="font-medium text-label-lg text-text-strong-950">
+									Create your workspace
+								</h2>
+							</div>
+							<SocialSignup onContinueWithEmail={() => setShowEmail(true)} />
+						</motion.div>
+					) : (
+						<motion.div
+							key="signup-form"
+							custom={direction}
+							variants={variants}
+							initial="initial"
+							animate="animate"
+							exit="exit"
+							transition={{ duration: 0.2 }}
+						>
+							<div className="space-y-1 pb-6 text-center">
+								<h2 className="font-medium text-label-lg text-text-strong-950">
+									What’s your email address?
+								</h2>
+							</div>
+							<div className="flex flex-col gap-4">
+								<SignupForm />
+								<div className="flex justify-center">
+									<button
+										type="button"
+										onClick={() => setShowEmail(false)}
+										className="cursor-pointer text-center font-medium text-[13px] text-text-sub-600 transition-colors hover:text-text-strong-950 hover:underline"
+									>
+										Back to signup
+									</button>
+								</div>
+							</div>
+						</motion.div>
+					)}
+				</AnimatePresence>
 			</div>
 		</div>
 	);
