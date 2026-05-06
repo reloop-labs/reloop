@@ -1,15 +1,10 @@
 "use client";
 import { authClient } from "@reloop/auth/client";
 import { Logo } from "@reloop/ui/logo";
-import Spinner from "@reloop/ui/spinner";
+import { Skeleton } from "@reloop/ui/skeleton";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import {
-	parseAsBoolean,
-	parseAsNumberLiteral,
-	parseAsString,
-	useQueryState,
-} from "nuqs";
+import { parseAsBoolean, parseAsString, useQueryState } from "nuqs";
 import { useEffect, useRef } from "react";
 import { LoginForm } from "./login-form";
 
@@ -69,7 +64,24 @@ const Page = () => {
 	if (isPending) {
 		return (
 			<div className="flex h-dvh flex-col items-center justify-center">
-				<Spinner size={32} />
+				<div className="w-full max-w-sm p-5 md:p-8">
+					<div className="flex flex-col items-center justify-center gap-2">
+						<div className="mb-2 flex items-center justify-center">
+							<Logo className="h-16" />
+						</div>
+					</div>
+					<div className="flex flex-col items-center gap-6 pt-6 text-center">
+						<div className="space-y-1">
+							<h2 className="font-medium text-label-lg text-text-strong-950">
+								We are trying to log you in...
+							</h2>
+						</div>
+						<div className="w-full space-y-3 pt-2">
+							<Skeleton className="h-11 w-full rounded-2xl!" />
+							<Skeleton className="h-11 w-full rounded-2xl!" />
+						</div>
+					</div>
+				</div>
 			</div>
 		);
 	}
