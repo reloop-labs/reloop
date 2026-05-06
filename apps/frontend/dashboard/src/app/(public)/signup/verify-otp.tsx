@@ -93,6 +93,7 @@ export function VerifyOTP({
 							inputMode="numeric"
 							maxLength={6}
 							autoFocus
+							hasError={!!error.error}
 						>
 							<DigitInput.Group>
 								<DigitInput.Slot index={0} />

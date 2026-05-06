@@ -4,25 +4,32 @@ import { cn } from "@reloop/ui/cn";
 
 import { OTPInput, OTPInputContext } from "input-otp";
 import { AnimatePresence, MotionConfig, motion } from "motion/react";
-import { useContext } from "react";
+import { createContext, useContext } from "react";
 
-type InputOTPProps = React.ComponentProps<typeof OTPInput>;
+const DigitInputContext = createContext<{ hasError?: boolean }>({});
+
+type InputOTPProps = React.ComponentProps<typeof OTPInput> & {
+	hasError?: boolean;
+};
 
 export function InputOTP({
 	containerClassName,
 	className,
+	hasError,
 	...props
 }: InputOTPProps) {
 	return (
-		<OTPInput
-			data-slot="input-otp"
-			containerClassName={cn(
-				"flex items-center gap-2 has-disabled:opacity-50",
-				containerClassName,
-			)}
-			className={cn("disabled:cursor-not-allowed", className)}
-			{...props}
-		/>
+		<DigitInputContext.Provider value={{ hasError }}>
+			<OTPInput
+				data-slot="input-otp"
+				containerClassName={cn(
+					"flex items-center gap-2 has-disabled:opacity-50",
+					containerClassName,
+				)}
+				className={cn("disabled:cursor-not-allowed", className)}
+				{...props}
+			/>
+		</DigitInputContext.Provider>
 	);
 }
 
@@ -75,6 +82,7 @@ export function InputOTPSlot({
 	...props
 }: InputOTPSlotProps) {
 	const inputOTPContext = useContext(OTPInputContext);
+	const { hasError } = useContext(DigitInputContext);
 	const { char, hasFakeCaret, isActive } = inputOTPContext?.slots[index] ?? {};
 
 	const activeSlots =
@@ -85,9 +93,10 @@ export function InputOTPSlot({
 		<MotionConfig reducedMotion="user">
 			<motion.div
 				data-slot="input-otp-slot"
+				aria-invalid={hasError}
 				className={cn(
 					"group relative flex h-11 w-10 items-center justify-center rounded-[10px] border border-stroke-soft-200 bg-bg-weak-50 font-medium text-base",
-					"aria-invalid:border-error-base data-[active=true]:aria-invalid:border-error-base data-[active=true]:aria-invalid:ring-2 data-[active=true]:aria-invalid:ring-error-base",
+					"aria-invalid:border-error-base aria-invalid:bg-error-lighter data-[active=true]:aria-invalid:border-error-base data-[active=true]:aria-invalid:ring-2 data-[active=true]:aria-invalid:ring-error-base",
 					className,
 				)}
 				{...props}

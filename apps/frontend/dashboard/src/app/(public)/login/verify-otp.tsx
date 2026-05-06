@@ -86,11 +86,15 @@ export function VerifyOTP({
 					<div>
 						<DigitInput.Root
 							value={otpValue}
-							onChange={(val) => setOtpValue(val)}
+							onChange={(val) => {
+								setError({ name: "email", error: null });
+								setOtpValue(val);
+							}}
 							onComplete={handleVerify}
 							inputMode="numeric"
 							maxLength={6}
 							autoFocus
+							hasError={!!error.error}
 						>
 							<DigitInput.Group>
 								<DigitInput.Slot index={0} />
