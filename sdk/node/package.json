@@ -32,6 +32,9 @@
 		"url": "https://github.com/reloop-labs/reloop.git",
 		"directory": "sdk/node"
 	},
+	"publishConfig": {
+		"access": "public"
+	},
 	"devDependencies": {
 		"@types/node": "^20.0.0",
 		"typescript": "^5.9.2"
