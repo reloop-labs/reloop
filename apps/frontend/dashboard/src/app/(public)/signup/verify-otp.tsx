@@ -28,6 +28,34 @@ export function VerifyOTP({
 		error: string | null;
 	}>({ name: "email", error: null });
 
+	const handleVerify = async (otpToVerify: string) => {
+		try {
+			const response = await authClient.emailOtp.checkVerificationOtp({
+				otp: otpToVerify,
+				email: email,
+				type: "sign-in",
+			});
+			const { data, error } = await authClient.signIn.emailOtp({
+				email: email, // required
+				otp: otpToVerify, // required
+			});
+
+			if (response.data?.success || data) {
+				router.push("/");
+			} else {
+				setError({
+					name: "email",
+					error: "Failed to signup with email",
+				});
+			}
+		} catch (e) {
+			setError({
+				name: "email",
+				error: "Failed to signup with email",
+			});
+		}
+	};
+
 	return (
 		<div className="flex flex-col gap-4">
 			{!enterCode ? (
@@ -40,44 +68,11 @@ export function VerifyOTP({
 					Enter code manually
 				</Button.Root>
 			) : (
-				<form
-					className="flex flex-col items-center gap-8 py-4"
-					onSubmit={(e) => {
-						e.preventDefault();
-					}}
-				>
+				<div className="flex flex-col items-center gap-8 py-4">
 					<DigitInput.Root
 						value={otpValue}
 						onChange={(val) => setOtpValue(val)}
-						onComplete={async (otp) => {
-							try {
-								const response = await authClient.emailOtp.checkVerificationOtp(
-									{
-										otp: otp,
-										email: email,
-										type: "sign-in",
-									},
-								);
-								const { data, error } = await authClient.signIn.emailOtp({
-									email: email, // required
-									otp: otp, // required
-								});
-
-								if (response.data?.success || data) {
-									router.push("/");
-								} else {
-									setError({
-										name: "email",
-										error: "Failed to signup with email",
-									});
-								}
-							} catch (e) {
-								setError({
-									name: "email",
-									error: "Failed to signup with email",
-								});
-							}
-						}}
+						onComplete={handleVerify}
 						inputMode="numeric"
 						maxLength={6}
 						autoFocus
@@ -93,13 +88,15 @@ export function VerifyOTP({
 						</DigitInput.Group>
 					</DigitInput.Root>
 					<Button.Root
-						type="submit"
+						type="button"
 						variant="neutral"
 						className="h-11 w-full rounded-2xl!"
+						onClick={() => handleVerify(otpValue)}
+						disabled={otpValue.length !== 6}
 					>
 						Continue with signup code
 					</Button.Root>
-				</form>
+				</div>
 			)}
 			<button
 				type="button"
