@@ -73,71 +73,68 @@ export function VerifyOTP({
 
 	return (
 		<div>
-			{!enterCode ? (
-				<motion.div
-					key="enter-code-btn"
-					initial={{ opacity: 0, y: -10 }}
-					animate={{ opacity: 1, y: 0 }}
-					exit={{ opacity: 0, y: -10 }}
-					transition={{ duration: 0.2 }}
-				>
-					<Button.Root
-						variant="neutral"
-						className="h-11 w-full rounded-2xl!"
-						mode="lighter"
-						onClick={() => setEnterCode(true)}
+			<AnimatePresence initial={false}>
+				{enterCode && (
+					<motion.div
+						key="otp-input"
+						initial={{ opacity: 0, height: 0 }}
+						animate={{ opacity: 1, height: "auto" }}
+						exit={{ opacity: 0, height: 0 }}
+						transition={{ duration: 0.2 }}
+						className="flex flex-col items-center overflow-hidden"
 					>
-						Enter code manually
-					</Button.Root>
-				</motion.div>
-			) : (
-				<motion.div
-					key="otp-input"
-					initial={{ opacity: 0, y: -10 }}
-					animate={{ opacity: 1, y: 0 }}
-					exit={{ opacity: 0, y: -10 }}
-					transition={{ duration: 0.2 }}
-					className="flex flex-col items-center gap-8 pt-4"
-				>
-					<div>
-						<DigitInput.Root
-							value={otpValue}
-							onChange={(val) => {
-								setError({ name: "email", error: null });
-								setOtpValue(val);
-							}}
-							onComplete={handleVerify}
-							inputMode="numeric"
-							maxLength={6}
-							autoFocus
-							hasError={!!error.error}
-						>
-							<DigitInput.Group>
-								<DigitInput.Slot index={0} />
-								<DigitInput.Slot index={1} />
-								<DigitInput.Slot index={2} />
-								<DigitInput.Separator />
-								<DigitInput.Slot index={3} />
-								<DigitInput.Slot index={4} />
-								<DigitInput.Slot index={5} />
-							</DigitInput.Group>
-						</DigitInput.Root>
-						{error.error && (
-							<p className="pt-2 text-error-base text-sm">{error.error}</p>
-						)}
-					</div>
-					<Button.Root
-						type="button"
-						variant="neutral"
-						className="h-11 w-full rounded-2xl!"
-						onClick={() => handleVerify(otpValue)}
-						disabled={otpValue.length !== 6 || status === "loading"}
-					>
-						{status === "loading" && <Spinner color="var(--text-strong-950)" />}
-						{status === "loading" ? "Verifying..." : "Continue with login code"}
-					</Button.Root>
-				</motion.div>
-			)}
+						<div className="pb-8">
+							<DigitInput.Root
+								value={otpValue}
+								onChange={(val) => {
+									setError({ name: "email", error: null });
+									setOtpValue(val);
+								}}
+								onComplete={handleVerify}
+								inputMode="numeric"
+								maxLength={6}
+								autoFocus
+								hasError={!!error.error}
+							>
+								<DigitInput.Group>
+									<DigitInput.Slot index={0} />
+									<DigitInput.Slot index={1} />
+									<DigitInput.Slot index={2} />
+									<DigitInput.Separator />
+									<DigitInput.Slot index={3} />
+									<DigitInput.Slot index={4} />
+									<DigitInput.Slot index={5} />
+								</DigitInput.Group>
+							</DigitInput.Root>
+							{error.error && (
+								<p className="pt-2 text-center text-error-base text-sm">{error.error}</p>
+							)}
+						</div>
+					</motion.div>
+				)}
+			</AnimatePresence>
+
+			<Button.Root
+				type="button"
+				variant="neutral"
+				className="h-11 w-full rounded-2xl!"
+				mode={!enterCode ? "lighter" : undefined}
+				onClick={() => {
+					if (!enterCode) {
+						setEnterCode(true);
+					} else {
+						handleVerify(otpValue);
+					}
+				}}
+				disabled={enterCode && (otpValue.length !== 6 || status === "loading")}
+			>
+				{status === "loading" && <Spinner color="var(--text-strong-950)" />}
+				{!enterCode
+					? "Enter code manually"
+					: status === "loading"
+						? "Verifying..."
+						: "Continue with login code"}
+			</Button.Root>
 			<div className="mt-4 flex justify-center">
 				<button
 					type="button"
