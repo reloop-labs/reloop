@@ -7,7 +7,7 @@ import {
 } from "./errors.js";
 
 export interface ReloopConfig {
-	url: string;
+	url?: string;
 	key: string;
 }
 
@@ -17,7 +17,8 @@ export class HTTPClient {
 
 	constructor(config: ReloopConfig) {
 		// Normalize base URL (remove trailing slash)
-		this.baseURL = config.url.replace(/\/+$/, "");
+		const url = config.url || "https://reloop.sh";
+		this.baseURL = url.replace(/\/+$/, "");
 		this.apiKey = config.key;
 
 		if (!this.baseURL) {

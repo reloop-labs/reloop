@@ -1,5 +1,5 @@
 {
-	"name": "reloop-email",
+	"name": "@reloop/email",
 	"version": "1.0.2",
 	"description": "Official Reloop Node.js SDK for integrating with Reloop services",
 	"main": "dist/index.js",
@@ -20,10 +20,7 @@
 		"sdk",
 		"node",
 		"email",
-		"mail",
-		"domain",
-		"webhook",
-		"audience"
+		"mail"
 	],
 	"author": "Reloop",
 	"license": "Apache-2.0",
