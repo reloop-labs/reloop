@@ -84,8 +84,7 @@ export const TrialEndingEmail = ({
 		<Html>
 			<Head />
 			<Preview>
-				Your Reloop trial ends in {daysLeft} day{daysLeft !== 1 ? "s" : ""} —
-				upgrade to keep access.
+				{`Your Reloop trial ends in ${daysLeft} day${daysLeft !== 1 ? "s" : ""} — upgrade to keep access.`}
 			</Preview>
 			<Tailwind>
 				<Body className={cls.body}>

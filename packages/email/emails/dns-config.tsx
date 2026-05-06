@@ -155,40 +155,112 @@ export const DnsConfigEmail = ({
 					borderBottom: isLast ? "none" : `1px solid ${color.separator}`,
 				}}
 			>
-				{/* Row index + type badge */}
-				<table width="100%" cellPadding="0" cellSpacing="0">
+				{/* Top metadata row: Type, TTL, Priority */}
+				<table
+					width="100%"
+					cellPadding="0"
+					cellSpacing="0"
+					style={{ marginBottom: "14px" }}
+				>
 					<tr>
-						<td style={{ verticalAlign: "middle" }}>
+						<td
+							style={{
+								verticalAlign: "top",
+								paddingRight: "24px",
+								width: "auto",
+							}}
+						>
+							<p
+								style={{
+									margin: "0 0 6px 0",
+									fontFamily: "monospace",
+									fontSize: "10px",
+									fontWeight: "600",
+									letterSpacing: "0.12em",
+									textTransform: "uppercase",
+									color: color.label,
+								}}
+							>
+								Type
+							</p>
 							<span
 								style={{
 									fontFamily: "monospace",
-									fontSize: "10px",
+									fontSize: "13px",
 									fontWeight: "700",
-									letterSpacing: "0.12em",
-									textTransform: "uppercase",
 									backgroundColor: color.badge,
-									color: color.badgeText,
-									borderRadius: "5px",
-									padding: "3px 8px",
+									color: color.text,
+									borderRadius: "6px",
+									padding: "4px 8px",
 									display: "inline-block",
 								}}
 							>
 								{record.recordType}
 							</span>
 						</td>
-						<td style={{ verticalAlign: "middle", textAlign: "right" }}>
+						<td
+							style={{
+								verticalAlign: "top",
+								paddingRight: "24px",
+								width: "auto",
+							}}
+						>
+							<p
+								style={{
+									margin: "0 0 6px 0",
+									fontFamily: "monospace",
+									fontSize: "10px",
+									fontWeight: "600",
+									letterSpacing: "0.12em",
+									textTransform: "uppercase",
+									color: color.label,
+								}}
+							>
+								TTL
+							</p>
 							<span
 								style={{
 									fontFamily: "monospace",
-									fontSize: "11px",
-									color: color.muted,
+									fontSize: "13px",
+									fontWeight: "600",
+									color: color.mono,
+									display: "inline-block",
+									padding: "4px 0",
 								}}
 							>
-								TTL: {record.ttl}
-								{record.priority !== null && record.priority !== undefined
-									? `  ·  Priority: ${record.priority}`
-									: ""}
+								{record.ttl}
 							</span>
+						</td>
+						<td style={{ verticalAlign: "top", width: "100%" }}>
+							{record.priority !== null && record.priority !== undefined && (
+								<>
+									<p
+										style={{
+											margin: "0 0 6px 0",
+											fontFamily: "monospace",
+											fontSize: "10px",
+											fontWeight: "600",
+											letterSpacing: "0.12em",
+											textTransform: "uppercase",
+											color: color.label,
+										}}
+									>
+										Priority
+									</p>
+									<span
+										style={{
+											fontFamily: "monospace",
+											fontSize: "13px",
+											fontWeight: "600",
+											color: color.mono,
+											display: "inline-block",
+											padding: "4px 0",
+										}}
+									>
+										{record.priority}
+									</span>
+								</>
+							)}
 						</td>
 					</tr>
 				</table>
@@ -278,12 +350,10 @@ export const DnsConfigEmail = ({
 	const RecordGroup = ({
 		stepNum,
 		title,
-		subtitle,
 		records,
 	}: {
 		stepNum: string;
 		title: string;
-		subtitle: string;
 		records: DNSRecord[];
 	}) => (
 		<Section style={{ marginTop: "32px" }}>
@@ -318,16 +388,6 @@ export const DnsConfigEmail = ({
 							}}
 						>
 							{title}
-						</p>
-						<p
-							style={{
-								margin: "3px 0 0 0",
-								fontSize: "13px",
-								color: color.muted,
-								lineHeight: "1.5",
-							}}
-						>
-							{subtitle}
 						</p>
 					</td>
 				</tr>
@@ -377,22 +437,11 @@ export const DnsConfigEmail = ({
 
 						<Hr className={cls.hr} />
 
-						<Text className={cls.salutation}>
-							Hey, <strong>{firstName}.</strong>
-						</Text>
-
-						<Text className={cls.bodyText}>
-							Add all three groups of records to your DNS provider. Each value
-							field below is on its own line — just click inside a box and
-							select all to copy it.
-						</Text>
-
 						{/* ── Record Groups ── */}
 						{dkimRecords.length > 0 && (
 							<RecordGroup
 								stepNum="01"
 								title="Domain Verification (DKIM)"
-								subtitle="Authenticates that Reloop is authorised to send email on behalf of your domain."
 								records={dkimRecords}
 							/>
 						)}
@@ -401,7 +450,6 @@ export const DnsConfigEmail = ({
 							<RecordGroup
 								stepNum="02"
 								title="Sending Email (SPF)"
-								subtitle="Tells receiving servers that Reloop's infrastructure is a permitted sender."
 								records={spfRecords}
 							/>
 						)}
@@ -410,7 +458,6 @@ export const DnsConfigEmail = ({
 							<RecordGroup
 								stepNum="03"
 								title="Reject Spoofed Emails (DMARC)"
-								subtitle="Sets a policy for how receivers should handle unauthenticated mail from your domain."
 								records={dmarcRecords}
 							/>
 						)}
