@@ -6,20 +6,25 @@ import { OTPInput, OTPInputContext } from "input-otp";
 import { AnimatePresence, MotionConfig, motion } from "motion/react";
 import { createContext, useContext } from "react";
 
-const DigitInputContext = createContext<{ hasError?: boolean }>({});
+const DigitInputContext = createContext<{
+	hasError?: boolean;
+	isSuccess?: boolean;
+}>({});
 
 type InputOTPProps = React.ComponentProps<typeof OTPInput> & {
 	hasError?: boolean;
+	isSuccess?: boolean;
 };
 
 export function InputOTP({
 	containerClassName,
 	className,
 	hasError,
+	isSuccess,
 	...props
 }: InputOTPProps) {
 	return (
-		<DigitInputContext.Provider value={{ hasError }}>
+		<DigitInputContext.Provider value={{ hasError, isSuccess }}>
 			<OTPInput
 				data-slot="input-otp"
 				containerClassName={cn(
@@ -82,7 +87,7 @@ export function InputOTPSlot({
 	...props
 }: InputOTPSlotProps) {
 	const inputOTPContext = useContext(OTPInputContext);
-	const { hasError } = useContext(DigitInputContext);
+	const { hasError, isSuccess } = useContext(DigitInputContext);
 	const { char, hasFakeCaret, isActive } = inputOTPContext?.slots[index] ?? {};
 
 	const activeSlots =
@@ -94,9 +99,11 @@ export function InputOTPSlot({
 			<motion.div
 				data-slot="input-otp-slot"
 				aria-invalid={hasError}
+				data-success={isSuccess}
 				className={cn(
 					"group relative flex h-11 w-10 items-center justify-center rounded-[10px] border border-stroke-soft-200 bg-bg-weak-50 font-medium text-base",
 					"aria-invalid:border-error-base aria-invalid:bg-error-lighter data-[active=true]:aria-invalid:border-error-base data-[active=true]:aria-invalid:ring-2 data-[active=true]:aria-invalid:ring-error-base",
+					"data-[success=true]:border-success-base data-[success=true]:bg-success-lighter",
 					className,
 				)}
 				{...props}

@@ -31,6 +31,7 @@ export function VerifyOTP({
 		name: "google" | "github" | "email";
 		error: string | null;
 	}>({ name: "email", error: null });
+	const [isSuccess, setIsSuccess] = useState(false);
 
 	const handleVerify = async (otpToVerify: string) => {
 		try {
@@ -46,8 +47,11 @@ export function VerifyOTP({
 					otp: otpToVerify,
 				});
 				if (data?.user.id) {
+					setIsSuccess(true);
 					changeStatus("idle");
-					router.push("/");
+					setTimeout(() => {
+						router.push("/");
+					}, 2000);
 				} else {
 					changeStatus("idle");
 					setError({
@@ -83,11 +87,12 @@ export function VerifyOTP({
 						transition={{ duration: 0.2 }}
 						className="flex flex-col items-center overflow-hidden"
 					>
-						<div className="pb-8">
+						<div className="pt-1 pb-5">
 							<DigitInput.Root
 								value={otpValue}
 								onChange={(val) => {
 									setError({ name: "email", error: null });
+									setIsSuccess(false);
 									setOtpValue(val);
 								}}
 								onComplete={handleVerify}
@@ -95,6 +100,7 @@ export function VerifyOTP({
 								maxLength={6}
 								autoFocus
 								hasError={!!error.error}
+								isSuccess={isSuccess}
 							>
 								<DigitInput.Group>
 									<DigitInput.Slot index={0} />
@@ -107,7 +113,9 @@ export function VerifyOTP({
 								</DigitInput.Group>
 							</DigitInput.Root>
 							{error.error && (
-								<p className="pt-2 text-center text-error-base text-sm">{error.error}</p>
+								<p className="pt-2 text-center text-error-base text-sm">
+									{error.error}
+								</p>
 							)}
 						</div>
 					</motion.div>
@@ -117,7 +125,7 @@ export function VerifyOTP({
 			<Button.Root
 				type="button"
 				variant="neutral"
-				className="h-11 w-full rounded-2xl!"
+				className={`h-11 w-full rounded-2xl! ${isSuccess ? "border-success-base bg-success-base text-white hover:bg-success-base" : ""}`}
 				mode={!enterCode ? "lighter" : undefined}
 				onClick={() => {
 					if (!enterCode) {
@@ -126,14 +134,19 @@ export function VerifyOTP({
 						handleVerify(otpValue);
 					}
 				}}
-				disabled={enterCode && (otpValue.length !== 6 || status === "loading")}
+				disabled={
+					enterCode &&
+					(otpValue.length !== 6 || status === "loading" || isSuccess)
+				}
 			>
 				{status === "loading" && <Spinner color="var(--text-strong-950)" />}
 				{!enterCode
 					? "Enter code manually"
-					: status === "loading"
-						? "Verifying..."
-						: "Continue with login code"}
+					: isSuccess
+						? "Verified successfully!"
+						: status === "loading"
+							? "Verifying..."
+							: "Continue with login code"}
 			</Button.Root>
 			<div className="mt-4 flex justify-center">
 				<button

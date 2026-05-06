@@ -76,7 +76,7 @@ const Page = () => {
 
 	return (
 		<div className="flex h-dvh flex-col items-center justify-center">
-			<AnimatePresence mode="wait" custom={direction}>
+			<AnimatePresence mode="wait" custom={direction} initial={false}>
 				<div className="w-full max-w-sm p-5 md:p-8">
 					<motion.div
 						layout
