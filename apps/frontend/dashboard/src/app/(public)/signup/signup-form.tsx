@@ -6,7 +6,7 @@ import * as Button from "@reloop/ui/button";
 import * as Input from "@reloop/ui/input";
 import Spinner from "@reloop/ui/spinner";
 import { useLoading } from "@reloop/ui/use-loading";
-import { useRouter } from "next/navigation";
+import { useQueryState } from "nuqs";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -24,8 +24,8 @@ type SignupFormData = v.InferInput<typeof signupSchema>;
 
 export const SignupForm = () => {
 	const { changeStatus, status } = useLoading();
+	const [, setOtpSentEmail] = useQueryState("otpSent");
 
-	const router = useRouter();
 	const {
 		register,
 		handleSubmit,
@@ -38,9 +38,15 @@ export const SignupForm = () => {
 	const onSubmit = async (data: SignupFormData) => {
 		try {
 			changeStatus("loading");
-			// TODO: Implement OTP/Magic Link signup logic
-			toast.success("OTP sent to your email!");
-			changeStatus("idle");
+			const success = await authClient.emailOtp.sendVerificationOtp({
+				email: data.email,
+				type: "sign-in",
+			});
+			if (success) {
+				toast.success("OTP sent to your email!");
+				setOtpSentEmail(data.email);
+				changeStatus("idle");
+			}
 		} catch (e) {
 			changeStatus("idle");
 			if (e instanceof Error && e.message) {
