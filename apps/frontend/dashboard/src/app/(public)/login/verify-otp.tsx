@@ -26,7 +26,7 @@ export function VerifyOTP({
 		parseAsString.withDefault(""),
 	);
 	const { changeStatus, status } = useLoading();
-	const [, setError] = useState<{
+	const [error, setError] = useState<{
 		name: "google" | "github" | "email";
 		error: string | null;
 	}>({ name: "email", error: null });
@@ -58,7 +58,7 @@ export function VerifyOTP({
 				changeStatus("idle");
 				setError({
 					name: "email",
-					error: "Failed to login with email",
+					error: "Invalid or expired OTP",
 				});
 			}
 		} catch (e) {
@@ -83,24 +83,29 @@ export function VerifyOTP({
 				</Button.Root>
 			) : (
 				<div className="flex flex-col items-center gap-8 py-4">
-					<DigitInput.Root
-						value={otpValue}
-						onChange={(val) => setOtpValue(val)}
-						onComplete={handleVerify}
-						inputMode="numeric"
-						maxLength={6}
-						autoFocus
-					>
-						<DigitInput.Group>
-							<DigitInput.Slot index={0} />
-							<DigitInput.Slot index={1} />
-							<DigitInput.Slot index={2} />
-							<span className="mx-2 h-0.5 w-4 rounded-full bg-bg-sub-300" />
-							<DigitInput.Slot index={3} />
-							<DigitInput.Slot index={4} />
-							<DigitInput.Slot index={5} />
-						</DigitInput.Group>
-					</DigitInput.Root>
+					<div>
+						<DigitInput.Root
+							value={otpValue}
+							onChange={(val) => setOtpValue(val)}
+							onComplete={handleVerify}
+							inputMode="numeric"
+							maxLength={6}
+							autoFocus
+						>
+							<DigitInput.Group>
+								<DigitInput.Slot index={0} />
+								<DigitInput.Slot index={1} />
+								<DigitInput.Slot index={2} />
+								<DigitInput.Separator />
+								<DigitInput.Slot index={3} />
+								<DigitInput.Slot index={4} />
+								<DigitInput.Slot index={5} />
+							</DigitInput.Group>
+						</DigitInput.Root>
+						{error.error && (
+							<p className="text-error-base text-sm">{error.error}</p>
+						)}
+					</div>
 					<Button.Root
 						type="button"
 						variant="neutral"

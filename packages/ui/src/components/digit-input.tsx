@@ -121,7 +121,7 @@ export function InputOTPSeparator({
 		<div
 			data-slot="input-otp-separator"
 			aria-hidden
-			className={cn("h-0.5 w-2 rounded-full bg-bg-weak-50", className)}
+			className={cn("h-0.5 w-2 rounded-full bg-bg-sub-300", className)}
 			{...props}
 		/>
 	);
