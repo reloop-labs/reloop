@@ -42,7 +42,6 @@ export const LoginForm = () => {
 				type: "sign-in",
 			});
 			if (success) {
-				toast.success("OTP sent to your email!");
 				setOtpSentEmail(data.email);
 				changeStatus("idle");
 			}
