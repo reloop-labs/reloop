@@ -70,7 +70,7 @@ export function VerifyOTP({
 		}
 	};
 	return (
-		<div className="flex flex-col gap-4">
+		<div className="flex flex-col">
 			{!enterCode ? (
 				<Button.Root
 					variant="neutral"

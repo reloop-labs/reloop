@@ -5,6 +5,7 @@ import * as Button from "@reloop/ui/button";
 import * as DigitInput from "@reloop/ui/digit-input";
 import Spinner from "@reloop/ui/spinner";
 import { useLoading } from "@reloop/ui/use-loading";
+import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { parseAsBoolean, parseAsString, useQueryState } from "nuqs";
 import { useState } from "react";
@@ -71,18 +72,33 @@ export function VerifyOTP({
 	};
 
 	return (
-		<div className="flex flex-col gap-4">
+		<div>
 			{!enterCode ? (
-				<Button.Root
-					variant="neutral"
-					className="h-11 w-full rounded-2xl!"
-					mode="lighter"
-					onClick={() => setEnterCode(true)}
+				<motion.div
+					key="enter-code-btn"
+					initial={{ opacity: 0, y: -10 }}
+					animate={{ opacity: 1, y: 0 }}
+					exit={{ opacity: 0, y: -10 }}
+					transition={{ duration: 0.2 }}
 				>
-					Enter code manually
-				</Button.Root>
+					<Button.Root
+						variant="neutral"
+						className="h-11 w-full rounded-2xl!"
+						mode="lighter"
+						onClick={() => setEnterCode(true)}
+					>
+						Enter code manually
+					</Button.Root>
+				</motion.div>
 			) : (
-				<div className="flex flex-col items-center gap-8 py-4">
+				<motion.div
+					key="otp-input"
+					initial={{ opacity: 0, y: -10 }}
+					animate={{ opacity: 1, y: 0 }}
+					exit={{ opacity: 0, y: -10 }}
+					transition={{ duration: 0.2 }}
+					className="flex flex-col items-center gap-8 pt-4"
+				>
 					<div>
 						<DigitInput.Root
 							value={otpValue}
@@ -107,7 +123,7 @@ export function VerifyOTP({
 							</DigitInput.Group>
 						</DigitInput.Root>
 						{error.error && (
-							<p className="text-error-base text-sm">{error.error}</p>
+							<p className="pt-2 text-error-base text-sm">{error.error}</p>
 						)}
 					</div>
 					<Button.Root
@@ -120,15 +136,17 @@ export function VerifyOTP({
 						{status === "loading" && <Spinner color="var(--text-strong-950)" />}
 						{status === "loading" ? "Verifying..." : "Continue with login code"}
 					</Button.Root>
-				</div>
+				</motion.div>
 			)}
-			<button
-				type="button"
-				onClick={onBack}
-				className="text-center font-medium text-[13px] text-text-sub-600 transition-colors hover:text-text-strong-950"
-			>
-				Back to login
-			</button>
+			<div className="mt-4 flex justify-center">
+				<button
+					type="button"
+					onClick={onBack}
+					className="cursor-pointer text-center font-medium text-[13px] text-text-sub-600 transition-colors hover:text-text-strong-950 hover:underline"
+				>
+					Back to login
+				</button>
+			</div>
 		</div>
 	);
 }
