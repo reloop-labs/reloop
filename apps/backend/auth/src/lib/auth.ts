@@ -84,7 +84,26 @@ export const auth = betterAuth({
 		bearer(),
 		admin(),
 		apiKey({ defaultPrefix: "rl" }),
-		lastLoginMethod(),
+		lastLoginMethod({
+			cookieName: "better-auth.last_used_login_method",
+			maxAge: 60 * 60 * 24 * 30,
+			customResolveMethod: (ctx) => {
+				if (ctx.path.includes("/oauth/callback/google")) {
+					return "google"
+				}
+				if (ctx.path.includes("/oauth/callback/github")) {
+					return "github"
+				}
+				if (ctx.path.includes("/sign-up/email")) {
+					return "email"
+				}
+				if (ctx.path.includes("/sign-in/email")) {
+					return "email"
+				}
+				return null
+			},
+
+		}),
 		emailOTP({
 			async sendVerificationOTP({ email, otp, type }) {
 				logger.info(`📧 Sending OTP (${type}) to:${email} and otp: ${otp}`);
