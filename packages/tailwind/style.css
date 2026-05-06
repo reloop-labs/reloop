@@ -477,11 +477,11 @@
 	--radius-10: 0.625rem;
 	--radius-20: 1.25rem;
 
-	--animate-accordion-down: accordion-down 0.2s ease-out;
-	--animate-accordion-up: accordion-up 0.2s ease-out;
-	--animate-caret-blink: caret-blink 1.2s ease-out infinite;
+	--animate-accordion-down: animate-accordion-down 0.2s ease-out;
+	--animate-accordion-up: animate-accordion-up 0.2s ease-out;
+	--animate-caret-blink: animate-caret-blink 1.2s ease-out infinite;
 
-	@keyframes caret-blink {
+	@keyframes animate-caret-blink {
 		0%,
 		70%,
 		100% {

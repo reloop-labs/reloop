@@ -94,7 +94,7 @@ const Page = () => {
 							</Button.Root>
 						) : (
 							<form
-								className="flex flex-col gap-8 py-4"
+								className="flex flex-col items-center gap-8 py-4"
 								onSubmit={(e) => {
 									e.preventDefault();
 								}}
@@ -131,7 +131,16 @@ const Page = () => {
 									inputMode="numeric"
 									maxLength={6}
 									autoFocus
-								/>
+								>
+									<DigitInput.Group>
+										<DigitInput.Slot index={0} />
+										<DigitInput.Slot index={1} />
+										<DigitInput.Slot index={2} />
+										<DigitInput.Slot index={3} />
+										<DigitInput.Slot index={4} />
+										<DigitInput.Slot index={5} />
+									</DigitInput.Group>
+								</DigitInput.Root>
 								<Button.Root
 									type="submit"
 									variant="neutral"
