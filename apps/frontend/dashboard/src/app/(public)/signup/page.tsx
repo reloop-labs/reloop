@@ -140,7 +140,9 @@ const Page = () => {
 							key="social-signup"
 							custom={direction}
 							variants={variants}
-							initial="initial"
+							initial={
+								currentLevel === 0 && direction === -1 ? "initial" : undefined
+							}
 							animate="animate"
 							exit="exit"
 							transition={{ duration: 0.2 }}

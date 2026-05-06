@@ -1,7 +1,6 @@
 "use client";
 
 import { authClient } from "@reloop/auth/client";
-import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as LinkButton from "@reloop/ui/link-button";
@@ -14,7 +13,6 @@ export function SocialSignup({
 }: {
 	onContinueWithEmail: () => void;
 }) {
-	const lastLoggedIn = authClient.getLastUsedLoginMethod();
 	const [loading, setLoading] = useState<{
 		name: "google" | "github" | "email";
 		loading: boolean;
@@ -74,11 +72,6 @@ export function SocialSignup({
 						</svg>
 					)}
 					Continue with Google
-					{lastLoggedIn === "google" && (
-						<p className="-top-[10px] -right-0 absolute rounded-full bg-primary-base px-2 py-0.5 font-medium text-background-base text-xs">
-							Last used
-						</p>
-					)}
 				</Button.Root>
 				<Button.Root
 					disabled={loading.loading}
@@ -107,13 +100,6 @@ export function SocialSignup({
 						<Icon name="github" className="h-5 w-5" />
 					)}
 					Continue with GitHub
-					{lastLoggedIn === "github" && (
-						<div className="-translate-y-1/2 absolute top-1/2 right-3">
-							<Badge.Root variant="lighter" color="gray">
-								Last used
-							</Badge.Root>
-						</div>
-					)}
 				</Button.Root>
 				<Button.Root
 					disabled={loading.loading}
@@ -124,13 +110,6 @@ export function SocialSignup({
 				>
 					<Icon name="social-mail" className="h-[17.5px] w-[17.5px]" />
 					Continue with Email
-					{lastLoggedIn === "email" && (
-						<div className="-translate-y-1/2 absolute top-1/2 right-3">
-							<Badge.Root variant="lighter" color="gray">
-								Last used
-							</Badge.Root>
-						</div>
-					)}
 				</Button.Root>
 			</div>
 			<p className="pt-5 text-center font-medium text-[13px] text-text-sub-600">
