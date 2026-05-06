@@ -3,6 +3,8 @@
 import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
 import * as DigitInput from "@reloop/ui/digit-input";
+import Spinner from "@reloop/ui/spinner";
+import { useLoading } from "@reloop/ui/use-loading";
 import { useRouter } from "next/navigation";
 import { parseAsBoolean, parseAsString, useQueryState } from "nuqs";
 import { useState } from "react";
@@ -23,6 +25,7 @@ export function VerifyOTP({
 		"otp",
 		parseAsString.withDefault(""),
 	);
+	const { changeStatus, status } = useLoading();
 	const [, setError] = useState<{
 		name: "google" | "github" | "email";
 		error: string | null;
@@ -30,6 +33,7 @@ export function VerifyOTP({
 
 	const handleVerify = async (otpToVerify: string) => {
 		try {
+			changeStatus("loading");
 			const response = await authClient.emailOtp.checkVerificationOtp({
 				otp: otpToVerify,
 				email: email,
@@ -41,20 +45,24 @@ export function VerifyOTP({
 					otp: otpToVerify,
 				});
 				if (data?.user.id) {
+					changeStatus("idle");
 					router.push("/");
 				} else {
+					changeStatus("idle");
 					setError({
 						name: "email",
 						error: "Failed to login with email",
 					});
 				}
 			} else {
+				changeStatus("idle");
 				setError({
 					name: "email",
 					error: "Failed to login with email",
 				});
 			}
 		} catch (e) {
+			changeStatus("idle");
 			setError({
 				name: "email",
 				error: "Failed to login with email",
@@ -98,9 +106,10 @@ export function VerifyOTP({
 						variant="neutral"
 						className="h-11 w-full rounded-2xl!"
 						onClick={() => handleVerify(otpValue)}
-						disabled={otpValue.length !== 6}
+						disabled={otpValue.length !== 6 || status === "loading"}
 					>
-						Continue with login code
+						{status === "loading" && <Spinner color="var(--text-strong-950)" />}
+						{status === "loading" ? "Verifying..." : "Continue with login code"}
 					</Button.Root>
 				</div>
 			)}
