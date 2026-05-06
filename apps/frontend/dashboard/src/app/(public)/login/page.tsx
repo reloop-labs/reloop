@@ -70,16 +70,18 @@ const Page = () => {
 							<Logo className="h-16" />
 						</div>
 					</div>
-					<div className="flex flex-col items-center gap-6 pt-6 text-center">
-						<div className="space-y-1">
+					<div>
+						<div className="space-y-1 pb-6 text-center">
 							<h2 className="font-medium text-label-lg text-text-strong-950">
 								We are trying to log you in...
 							</h2>
 						</div>
-						<div className="w-full space-y-3 pt-2">
+						<div className="w-full space-y-3">
+							<Skeleton className="h-11 w-full rounded-2xl!" />
 							<Skeleton className="h-11 w-full rounded-2xl!" />
 							<Skeleton className="h-11 w-full rounded-2xl!" />
 						</div>
+						<Skeleton className="mx-auto mt-5 h-3 w-2/3 rounded-2xl!" />
 					</div>
 				</div>
 			</div>
