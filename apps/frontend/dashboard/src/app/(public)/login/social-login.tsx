@@ -1,7 +1,6 @@
 "use client";
 
 import { authClient } from "@reloop/auth/client";
-import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as LinkButton from "@reloop/ui/link-button";

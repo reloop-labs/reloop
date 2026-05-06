@@ -77,51 +77,48 @@ export function VerifyOTP({
 
 	return (
 		<div>
-			<AnimatePresence initial={false}>
-				{enterCode && (
-					<motion.div
-						key="otp-input"
-						initial={{ opacity: 0, height: 0 }}
-						animate={{ opacity: 1, height: "auto" }}
-						exit={{ opacity: 0, height: 0 }}
-						transition={{ duration: 0.2 }}
-						className="flex flex-col items-center overflow-hidden"
-					>
-						<div className="pt-1 pb-5">
-							<DigitInput.Root
-								value={otpValue}
-								onChange={(val) => {
-									setError({ name: "email", error: null });
-									setIsSuccess(false);
-									setOtpValue(val);
-								}}
-								onComplete={handleVerify}
-								inputMode="numeric"
-								maxLength={6}
-								autoFocus
-								hasError={!!error.error}
-								isSuccess={isSuccess}
-							>
-								<DigitInput.Group>
-									<DigitInput.Slot index={0} />
-									<DigitInput.Slot index={1} />
-									<DigitInput.Slot index={2} />
-									<DigitInput.Separator />
-									<DigitInput.Slot index={3} />
-									<DigitInput.Slot index={4} />
-									<DigitInput.Slot index={5} />
-								</DigitInput.Group>
-							</DigitInput.Root>
-							{error.error && (
-								<p className="pt-2 text-center text-error-base text-sm">
-									{error.error}
-								</p>
-							)}
-						</div>
-					</motion.div>
-				)}
-			</AnimatePresence>
-
+			{enterCode && (
+				<motion.div
+					key="otp-input"
+					initial={{ opacity: 0, height: 0 }}
+					animate={{ opacity: 1, height: "auto" }}
+					exit={{ opacity: 0, height: 0 }}
+					transition={{ duration: 0.2 }}
+					className="flex flex-col items-center overflow-hidden"
+				>
+					<div className="pt-1 pb-5">
+						<DigitInput.Root
+							value={otpValue}
+							onChange={(val) => {
+								setError({ name: "email", error: null });
+								setIsSuccess(false);
+								setOtpValue(val);
+							}}
+							onComplete={handleVerify}
+							inputMode="numeric"
+							maxLength={6}
+							autoFocus
+							hasError={!!error.error}
+							isSuccess={isSuccess}
+						>
+							<DigitInput.Group>
+								<DigitInput.Slot index={0} />
+								<DigitInput.Slot index={1} />
+								<DigitInput.Slot index={2} />
+								<DigitInput.Separator />
+								<DigitInput.Slot index={3} />
+								<DigitInput.Slot index={4} />
+								<DigitInput.Slot index={5} />
+							</DigitInput.Group>
+						</DigitInput.Root>
+						{error.error && (
+							<p className="pt-2 text-center text-error-base text-sm">
+								{error.error}
+							</p>
+						)}
+					</div>
+				</motion.div>
+			)}
 			<Button.Root
 				type="button"
 				variant="neutral"

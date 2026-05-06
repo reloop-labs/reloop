@@ -87,7 +87,6 @@ const Page = () => {
 			</div>
 		);
 	}
-
 	return (
 		<div className="flex h-dvh flex-col items-center justify-center">
 			<AnimatePresence mode="wait" custom={direction}>
@@ -139,8 +138,10 @@ const Page = () => {
 							key="social-login"
 							custom={direction}
 							variants={variants}
-							initial="initial"
 							animate="animate"
+							initial={
+								currentLevel === 0 && direction === -1 ? "initial" : undefined
+							}
 							exit="exit"
 							transition={{ duration: 0.2 }}
 						>
