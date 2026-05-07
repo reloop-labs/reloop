@@ -1,9 +1,23 @@
 {
 	"extends": "@reloop/tsconfig/base.json",
-	"include": ["src/**/*", "emails/**/*", "components/**/*", "./**/*"],
-	"exclude": ["node_modules", "dist"],
 	"compilerOptions": {
-		"lib": ["dom", "ES2022"],
-		"jsx": "react-jsx"
-	}
+		"target": "ESNext",
+		"module": "ESNext",
+		"moduleResolution": "bundler",
+		"verbatimModuleSyntax": true,
+		"strict": true,
+		"skipLibCheck": true,
+		"outDir": "./dist",
+		"types": ["bun"],
+		"composite": false,
+		"jsx": "react-jsx",
+		"declaration": false,
+		"declarationMap": false,
+		"baseUrl": ".",
+		"paths": {
+			"email/*": ["./src/*"]
+		}
+	},
+	"include": ["src/**/*", "emails/**/*", "components/**/*", "./**/*"],
+	"exclude": ["node_modules", "dist"]
 }

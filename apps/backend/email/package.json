@@ -2,9 +2,10 @@
 	"name": "email",
 	"version": "1.0.0",
 	"private": true,
-	"main": "index.ts",
+	"main": "src/index.ts",
+	"type": "module",
 	"exports": {
-		".": "./index.ts",
+		".": "./src/index.ts",
 		"./emails/*": "./emails/*",
 		"./locales": "./locales/index.ts",
 		"./render": "./render.ts"
@@ -14,14 +15,20 @@
 		"lint": "biome check .",
 		"format": "biome format --write .",
 		"typecheck": "tsc --noEmit",
-		"dev": "email dev -p 3005",
-		"build": "email build",
-		"start": "email start"
+		"email:dev": "email dev -p 3005",
+		"email:build": "email build",
+		"email:start": "email start",
+		"dev": "bun run --hot src/index.ts",
+		"start": "bun run src/index.ts"
 	},
 	"dependencies": {
+		"@elysiajs/cors": "catalog:backend",
+		"@elysiajs/openapi": "catalog:backend",
 		"@react-email/render": "catalog:ui",
 		"@react-email/tailwind": "catalog:ui",
+		"@reloop/logger": "workspace:*",
 		"date-fns": "catalog:backend",
+		"elysia": "catalog:backend",
 		"react-email": "catalog:ui",
 		"react": "catalog:ui",
 		"react-dom": "catalog:ui",
