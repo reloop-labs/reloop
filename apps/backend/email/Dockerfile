@@ -4,21 +4,18 @@ FROM oven/bun:alpine AS base
 FROM base AS deps
 WORKDIR /app
 
-# Install Python and build dependencies for native modules
-RUN apk add --no-cache python3 make g++
-
 COPY . .
-RUN bun --filter=mailing install
+RUN bun --filter=email install
 
 # Stage 2: Build the application
 FROM base AS builder
 WORKDIR /app
-# Use ARG for build-time variables that can be overridden
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN bun run --filter=mailing build
+# Note: email build might need specific setup depending on react-email
+RUN bun run --filter=email build
 
 # Stage 3: Production server
 FROM base AS runner
@@ -27,12 +24,12 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV HOSTNAME=0.0.0.0
 
-# Copy standalone build
-COPY --from=builder /app/apps/backend/mailing/dist ./dist
+COPY --from=builder /app/apps/backend/email ./apps/backend/email
 COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/packages ./packages
 COPY --from=builder /app/package.json ./package.json
 
-EXPOSE 8015
+WORKDIR /app/apps/backend/email
 
-CMD ["bun", "run", "dist/index.js"]
+EXPOSE 3005
+
+CMD ["bun", "run", "start"]

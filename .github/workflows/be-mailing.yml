@@ -1,23 +1,23 @@
-name: BE Mail Docker
+name: BE Mailing Docker
 
 on:
   push:
     branches: [ main ]
     paths:
-      - 'apps/backend/mail/**'
+      - 'apps/backend/mailing/**'
       - 'docker-compose.setup.yml'
-      - '.github/workflows/be-mail.yml'
+      - '.github/workflows/be-mailing.yml'
   pull_request:
     branches: [ main ]
     paths:
-      - 'apps/backend/mail/**'
+      - 'apps/backend/mailing/**'
       - 'docker-compose.setup.yml'
-      - '.github/workflows/be-mail.yml'
+      - '.github/workflows/be-mailing.yml'
   workflow_dispatch:
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/be-mail
+  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/be-mailing
 
 jobs:
   build-and-push:
@@ -54,7 +54,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./apps/backend/mail/Dockerfile
+          file: ./apps/backend/mailing/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
