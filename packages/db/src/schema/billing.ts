@@ -5,7 +5,6 @@ import {
 	decimal,
 	index,
 	integer,
-	jsonb,
 	pgEnum,
 	pgTable,
 	text,
@@ -14,6 +13,7 @@ import {
 	varchar,
 } from "drizzle-orm/pg-core";
 import { organization, user } from "./auth";
+import { emailLog } from "./email";
 
 // ─── Enums ───────────────────────────────────────────────────────────────────
 
@@ -182,28 +182,6 @@ export const emailSend = pgTable(
 	]
 );
 
-export const emailEventV2 = pgTable(
-	"email_event_v2",
-	{
-		id: text("id").$defaultFn(() => `ee2_${createId()}`).primaryKey(),
-		organizationId: text("organization_id")
-			.notNull()
-			.references(() => organization.id),
-		sendId: text("send_id")
-			.notNull()
-			.references(() => emailSend.id, { onDelete: "cascade" }),
-		eventType: emailEventTypeEnum("event_type").notNull(),
-		providerId: varchar("provider_id", { length: 255 }),
-		metadata: jsonb("metadata"),
-		occurredAt: timestamp("occurred_at").notNull().defaultNow(),
-	},
-	(t) => [
-		index("events_organization_id_idx").on(t.organizationId),
-		index("events_send_id_idx").on(t.sendId),
-		index("events_type_occurred_idx").on(t.eventType, t.occurredAt),
-	]
-);
-
 export const billingInvoice = pgTable(
 	"billing_invoice",
 	{
@@ -262,12 +240,12 @@ export const emailSendRelations = relations(emailSend, ({ one, many }) => ({
 	organization: one(organization, { fields: [emailSend.organizationId], references: [organization.id] }),
 	subscription: one(subscription, { fields: [emailSend.subscriptionId], references: [subscription.id] }),
 	triggeredBy: one(user, { fields: [emailSend.triggeredByUserId], references: [user.id] }),
-	events: many(emailEventV2),
+	events: many(emailLog),
 }));
 
-export const emailEventV2Relations = relations(emailEventV2, ({ one }) => ({
-	organization: one(organization, { fields: [emailEventV2.organizationId], references: [organization.id] }),
-	send: one(emailSend, { fields: [emailEventV2.sendId], references: [emailSend.id] }),
+export const emailEventV2Relations = relations(emailLog, ({ one }) => ({
+	organization: one(organization, { fields: [emailLog.organizationId], references: [organization.id] }),
+	send: one(emailSend, { fields: [emailLog.id], references: [emailSend.id] }),
 }));
 
 export const billingInvoiceRelations = relations(billingInvoice, ({ one }) => ({
