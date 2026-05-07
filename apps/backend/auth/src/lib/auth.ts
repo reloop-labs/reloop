@@ -111,14 +111,17 @@ export const auth = betterAuth({
 		}),
 		emailOTP({
 			async sendVerificationOTP({ email, otp, type }) {
-				logger.info(`Sending OTP (${type}) to:${email} and otp: ${otp}`);
-				if (authConfig.DEFAULT_OTP) return;
+				logger.info(`Sending OTP (${type}) to: ${email} (OTP: ${otp})`);
+				if (authConfig.DEFAULT_OTP && authConfig.NODE_ENV !== "development") return;
 				try {
-					await bus.publish(BusEvent.OTP_REQUESTED, { email, otp, });
+					await bus.publish(BusEvent.OTP_REQUESTED, { email, otp });
 					logger.info(`OTP bus event published for ${email}`);
 				} catch (error) {
 					logger.error("Failed to publish OTP event:", error);
-					throw new Error("Failed to send OTP email");
+					// If we are not using a default OTP, we must throw to notify the user
+					if (!authConfig.DEFAULT_OTP) {
+						throw new Error("Failed to send OTP email");
+					}
 				}
 			},
 			generateOTP() {
