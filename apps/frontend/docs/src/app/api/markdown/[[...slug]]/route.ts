@@ -11,7 +11,20 @@ export async function GET(
 	const relativePath = slug.join("/");
 
 	// Determine the file path. Could be a direct .mdx file or an index.mdx inside a folder
-	const docsDir = join(process.cwd(), "content", "docs");
+	const getDocsDir = (): string => {
+		const paths = [
+			join(process.cwd(), "content/docs"),
+			join(process.cwd(), "apps/frontend/docs/content/docs"),
+			// More fallbacks
+			join(process.cwd(), "../content/docs"),
+		];
+		for (const p of paths) {
+			if (existsSync(p)) return p;
+		}
+		return paths[0]!; // Use ! to tell TS this is guaranteed to be a string
+	};
+
+	const docsDir = getDocsDir();
 	let filePath = join(docsDir, `${relativePath}.mdx`);
 
 	if (!existsSync(filePath)) {

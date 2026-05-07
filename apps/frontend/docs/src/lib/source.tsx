@@ -5,12 +5,37 @@ import type { MDXComponents } from "mdx/types";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import type { PageNode, PageTreeItem, TOCItem } from "./types";
 
-const docsDir = path.join(process.cwd(), "content/docs");
-
 import * as LucideIcons from "lucide-react";
+import React from "react";
+
+function getDocsDir(): string {
+	const paths = [
+		path.join(process.cwd(), "content/docs"),
+		path.join(process.cwd(), "apps/frontend/docs/content/docs"),
+		// In some Docker environments, the path might be different relative to the root
+		path.resolve("./content/docs"),
+		path.resolve("./apps/frontend/docs/content/docs"),
+	];
+
+	for (const p of paths) {
+		if (fs.existsSync(p)) {
+			return p;
+		}
+	}
+
+	console.error("Could not find docs directory in any of the following locations:", paths);
+	return paths[0]!; // Fallback to default
+}
+
+const docsDir = getDocsDir();
 
 function buildTree(dir: string, base = ""): PageTreeItem[] {
 	const metaPath = path.join(dir, "meta.json");
+	if (!fs.existsSync(dir)) {
+		console.warn(`Directory not found during buildTree: ${dir}`);
+		return [];
+	}
+
 	let pages: string[] = [];
 	let meta: any = {};
 
@@ -179,6 +204,10 @@ export const source = {
 			dir: string,
 			base: string[] = [],
 		): { slug: string[] }[] => {
+			if (!fs.existsSync(dir)) {
+				console.warn(`Directory not found during generateParams: ${dir}`);
+				return [];
+			}
 			const results: { slug: string[] }[] = [];
 			const items = fs.readdirSync(dir);
 			for (const item of items) {
