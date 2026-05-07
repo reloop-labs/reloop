@@ -34,7 +34,9 @@
 		"react-dom": "catalog:ui",
 		"react-email": "catalog:ui",
 		"reloop-email": "catalog:backend",
-		"@reloop/db": "workspace:*"
+		"@reloop/db": "workspace:*",
+		"nodemailer": "catalog:backend",
+		"@types/nodemailer": "catalog:backend"
 	},
 	"devDependencies": {
 		"@react-email/ui": "catalog:ui",
