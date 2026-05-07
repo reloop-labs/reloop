@@ -55,6 +55,11 @@ export const mainNavigation: MainNavigationItem[] = [
 		iconName: "webhook",
 	},
 	{
+		label: "Profile",
+		path: "/profile",
+		iconName: "user",
+	},
+	{
 		label: "Settings",
 		path: "/settings",
 		iconName: "gear",
