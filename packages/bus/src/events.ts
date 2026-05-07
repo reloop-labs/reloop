@@ -4,6 +4,8 @@ export enum BusEvent {
   USER_DELETED = "user.deleted",
   DOMAIN_VERIFIED = "domain.verified",
   WEBHOOK_TRIGGERED = "webhook.triggered",
+  EMAIL_SENT = "email.sent",
+  ORGANIZATION_CREATED = "organization.created",
 }
 
 export interface EventPayloads {
@@ -29,5 +31,16 @@ export interface EventPayloads {
     webhookId: string;
     eventType: string;
     payload: Record<string, any>;
+  };
+  [BusEvent.EMAIL_SENT]: {
+    organizationId: string;
+    emailLogId: string;
+    recipientCount: number;
+    timestamp: string;
+  };
+  [BusEvent.ORGANIZATION_CREATED]: {
+    id: string;
+    name: string;
+    slug: string;
   };
 }

@@ -1,4 +1,4 @@
-import { bus, BusEvent } from "@reloop/bus";
+import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
@@ -95,20 +95,19 @@ export const auth = betterAuth({
 			maxAge: 60 * 60 * 24 * 30,
 			customResolveMethod: (ctx) => {
 				if (ctx.path.includes("/oauth/callback/google")) {
-					return "google"
+					return "google";
 				}
 				if (ctx.path.includes("/oauth/callback/github")) {
-					return "github"
+					return "github";
 				}
 				if (ctx.path.includes("/sign-up/email")) {
-					return "email"
+					return "email";
 				}
 				if (ctx.path.includes("/sign-in/email")) {
-					return "email"
+					return "email";
 				}
-				return null
+				return null;
 			},
-
 		}),
 		emailOTP({
 			async sendVerificationOTP({ email, otp, type }) {
@@ -126,7 +125,7 @@ export const auth = betterAuth({
 				}
 			},
 			generateOTP() {
-				if (authConfig.DEFAULT_OTP) return authConfig.DEFAULT_OTP
+				if (authConfig.DEFAULT_OTP) return authConfig.DEFAULT_OTP;
 				return Math.floor(100000 + Math.random() * 900000).toString();
 			},
 		}),
@@ -147,7 +146,6 @@ export const auth = betterAuth({
 				}
 
 				try {
-
 					logger.info(
 						`✅ Organization invite email sent to ${data.email} using ${inviteLink}`,
 					);
@@ -167,7 +165,7 @@ export const auth = betterAuth({
 			ipAddressHeaders: ["x-client-ip", "x-forwarded-for"],
 		},
 	},
-})
+});
 
 let _schema: ReturnType<typeof auth.api.generateOpenAPISchema> | null = null;
 

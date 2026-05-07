@@ -1,4 +1,4 @@
-import { bus, BusEvent } from "./src";
+import { BusEvent, bus } from "./src";
 
 async function test() {
   console.log("Connecting to NATS...");

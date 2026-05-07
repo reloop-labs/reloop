@@ -8,3 +8,4 @@ export * from "./template";
 export * from "./channel";
 export * from "./upload";
 export * from "./webhook";
+export * from "./credits";
