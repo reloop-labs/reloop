@@ -109,17 +109,13 @@ local.reloop.sh {
             header_up X-Forwarded-For {remote}
         }
     }
-
-    # Mailpit Web UI (for viewing captured test emails)
-    handle /mail* {
-        uri strip_prefix /mail
-        reverse_proxy host.docker.internal:8025 {
+    handle /api/email* {
+        reverse_proxy host.docker.internal:8022 {
             header_up Host {host}
             header_up X-Forwarded-Proto {scheme}
             header_up X-Forwarded-For {remote}
         }
     }
-
     # Main app (catch-all - everything else)
     handle {
         reverse_proxy host.docker.internal:3000 {
