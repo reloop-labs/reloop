@@ -33,7 +33,8 @@
 		"react": "catalog:ui",
 		"react-dom": "catalog:ui",
 		"react-email": "catalog:ui",
-		"reloop-email": "catalog:backend"
+		"reloop-email": "catalog:backend",
+		"@reloop/db": "workspace:*"
 	},
 	"devDependencies": {
 		"@react-email/ui": "catalog:ui",
