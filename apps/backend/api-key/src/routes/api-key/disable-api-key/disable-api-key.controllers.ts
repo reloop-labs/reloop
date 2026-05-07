@@ -23,7 +23,7 @@ export async function disableApiKeyController({
 		method?: string;
 		userAgent?: string;
 		ipAddress?: string;
-    statusCode?: number;
+		statusCode?: number;
 	};
 }): Promise<ApiKeyTypes.ApiKeyResponse> {
 	logger.info({ id }, "Checking if API key exists");

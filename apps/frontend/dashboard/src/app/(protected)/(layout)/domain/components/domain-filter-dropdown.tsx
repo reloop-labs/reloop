@@ -1,8 +1,8 @@
 "use client";
 
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
-import { getStatusColorClass, getStatusIcon } from "@fe/dashboard/utils/domain";
 import type { DomainStatus } from "@fe/dashboard/types/api.types";
+import { getStatusColorClass, getStatusIcon } from "@fe/dashboard/utils/domain";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";

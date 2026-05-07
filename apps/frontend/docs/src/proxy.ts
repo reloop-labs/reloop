@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 
 export function proxy(request: NextRequest) {
 	// Exclude our internal API routes and static assets from being intercepted again
@@ -19,7 +19,7 @@ export function proxy(request: NextRequest) {
 	if (isMarkdownAccept || isMarkdownExtension) {
 		// Remove the .md extension if it exists to get the clean slug
 		const cleanPath = request.nextUrl.pathname.replace(/\.md$/, "");
-		
+
 		// Create the target API URL: /docs/api/markdown/[cleanPath]
 		// We explicitly include /docs because Next.js has basePath: '/docs' configured
 		const targetUrl = new URL(`/docs/api/markdown${cleanPath}`, request.url);

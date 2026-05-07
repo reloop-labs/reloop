@@ -1,9 +1,9 @@
 import {
-  type CollabClient,
-  getRoomName,
-  MESSAGE_AWARENESS,
-  MESSAGE_SYNC,
-  type Room,
+	type CollabClient,
+	getRoomName,
+	MESSAGE_AWARENESS,
+	MESSAGE_SYNC,
+	type Room,
 } from "@be/template/plugins/room";
 import type { YjsPersistence } from "@be/template/utils/persistence";
 import { logger } from "@reloop/logger";
@@ -15,14 +15,14 @@ import * as Y from "yjs";
 
 /** Normalize whatever Elysia gives us into a clean Uint8Array */
 export function toUint8Array(raw: unknown): Uint8Array {
-  if (raw instanceof Uint8Array) return raw;
-  if (raw instanceof ArrayBuffer) return new Uint8Array(raw);
-  if (Buffer.isBuffer(raw)) return new Uint8Array(raw);
-  // Elysia sometimes gives a plain object with numeric keys
-  if (typeof raw === "object" && raw !== null) {
-    return new Uint8Array(Object.values(raw) as number[]);
-  }
-  throw new Error(`Unexpected message type: ${typeof raw}`);
+	if (raw instanceof Uint8Array) return raw;
+	if (raw instanceof ArrayBuffer) return new Uint8Array(raw);
+	if (Buffer.isBuffer(raw)) return new Uint8Array(raw);
+	// Elysia sometimes gives a plain object with numeric keys
+	if (typeof raw === "object" && raw !== null) {
+		return new Uint8Array(Object.values(raw) as number[]);
+	}
+	throw new Error(`Unexpected message type: ${typeof raw}`);
 }
 
 /**
@@ -30,26 +30,26 @@ export function toUint8Array(raw: unknown): Uint8Array {
  * This bootstraps them with the full current document state.
  */
 export function sendInitialSync(ws: CollabClient, room: Room) {
-  // Sync step 1: send our state vector so client knows what we have
-  const syncEncoder = encoding.createEncoder();
-  encoding.writeVarUint(syncEncoder, MESSAGE_SYNC);
-  syncProtocol.writeSyncStep1(syncEncoder, room.doc);
-  ws.send(encoding.toUint8Array(syncEncoder));
+	// Sync step 1: send our state vector so client knows what we have
+	const syncEncoder = encoding.createEncoder();
+	encoding.writeVarUint(syncEncoder, MESSAGE_SYNC);
+	syncProtocol.writeSyncStep1(syncEncoder, room.doc);
+	ws.send(encoding.toUint8Array(syncEncoder));
 
-  // Awareness: send all current user states (cursors, presence)
-  const awarenessStates = room.awareness.getStates();
-  if (awarenessStates.size > 0) {
-    const awarenessEncoder = encoding.createEncoder();
-    encoding.writeVarUint(awarenessEncoder, MESSAGE_AWARENESS);
-    encoding.writeVarUint8Array(
-      awarenessEncoder,
-      awarenessProtocol.encodeAwarenessUpdate(
-        room.awareness,
-        Array.from(awarenessStates.keys()),
-      ),
-    );
-    ws.send(encoding.toUint8Array(awarenessEncoder));
-  }
+	// Awareness: send all current user states (cursors, presence)
+	const awarenessStates = room.awareness.getStates();
+	if (awarenessStates.size > 0) {
+		const awarenessEncoder = encoding.createEncoder();
+		encoding.writeVarUint(awarenessEncoder, MESSAGE_AWARENESS);
+		encoding.writeVarUint8Array(
+			awarenessEncoder,
+			awarenessProtocol.encodeAwarenessUpdate(
+				room.awareness,
+				Array.from(awarenessStates.keys()),
+			),
+		);
+		ws.send(encoding.toUint8Array(awarenessEncoder));
+	}
 }
 
 /**
@@ -57,50 +57,53 @@ export function sendInitialSync(ws: CollabClient, room: Room) {
  * Routes to sync or awareness handler based on the first byte.
  */
 export function handleMessage(
-  ws: CollabClient,
-  raw: unknown,
-  room: Room,
-  persistence: YjsPersistence | null,
+	ws: CollabClient,
+	raw: unknown,
+	room: Room,
+	persistence: YjsPersistence | null,
 ) {
-  let message: Uint8Array;
-  try {
-    message = toUint8Array(raw);
-  } catch (err) {
-    logger.error({ error: err }, "[collab] Failed to parse message");
-    return;
-  }
+	let message: Uint8Array;
+	try {
+		message = toUint8Array(raw);
+	} catch (err) {
+		logger.error({ error: err }, "[collab] Failed to parse message");
+		return;
+	}
 
-  const decoder = decoding.createDecoder(message);
-  const messageType = decoding.readVarUint(decoder);
+	const decoder = decoding.createDecoder(message);
+	const messageType = decoding.readVarUint(decoder);
 
-  try {
-    switch (messageType) {
-      case MESSAGE_SYNC: {
-        const encoder = encoding.createEncoder();
-        encoding.writeVarUint(encoder, MESSAGE_SYNC);
+	try {
+		switch (messageType) {
+			case MESSAGE_SYNC: {
+				const encoder = encoding.createEncoder();
+				encoding.writeVarUint(encoder, MESSAGE_SYNC);
 
-        syncProtocol.readSyncMessage(decoder, encoder, room.doc, ws);
-        if (encoding.length(encoder) > 1) {
-          ws.send(encoding.toUint8Array(encoder));
-        }
-        break;
-      }
+				syncProtocol.readSyncMessage(decoder, encoder, room.doc, ws);
+				if (encoding.length(encoder) > 1) {
+					ws.send(encoding.toUint8Array(encoder));
+				}
+				break;
+			}
 
-      case MESSAGE_AWARENESS: {
-        awarenessProtocol.applyAwarenessUpdate(
-          room.awareness,
-          decoding.readVarUint8Array(decoder),
-          ws,
-        );
-        break;
-      }
+			case MESSAGE_AWARENESS: {
+				awarenessProtocol.applyAwarenessUpdate(
+					room.awareness,
+					decoding.readVarUint8Array(decoder),
+					ws,
+				);
+				break;
+			}
 
-      default:
-        logger.warn({ messageType }, "[collab] Unknown message type");
-    }
-  } catch (err) {
-    logger.error({ error: err, messageType }, "[collab] Error handling message");
-  }
+			default:
+				logger.warn({ messageType }, "[collab] Unknown message type");
+		}
+	} catch (err) {
+		logger.error(
+			{ error: err, messageType },
+			"[collab] Error handling message",
+		);
+	}
 
-  room.lastActivity = Date.now();
+	room.lastActivity = Date.now();
 }

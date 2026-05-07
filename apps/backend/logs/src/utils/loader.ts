@@ -10,18 +10,21 @@ export const loader = async () => {
 		logger.info("Redis connected");
 		await ensureTableExists();
 		const client = getClickHouseClient();
-		await client.query({ query: "SELECT 1 as test", format: "JSON", });
+		await client.query({ query: "SELECT 1 as test", format: "JSON" });
 		logger.info("ClickHouse connection health check passed");
 	} catch (error) {
 		logger.error(
 			{
-				error: error instanceof Error ? {
-					message: error.message,
-					stack: error.stack,
-					name: error.name
-				} : error
+				error:
+					error instanceof Error
+						? {
+								message: error.message,
+								stack: error.stack,
+								name: error.name,
+							}
+						: error,
 			},
-			"Error during initialization"
+			"Error during initialization",
 		);
 	}
 };

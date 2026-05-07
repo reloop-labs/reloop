@@ -5,7 +5,14 @@ import { disableApiKeyController } from "./disable-api-key.controllers";
 
 export const disableApiKeyRoute = new Elysia().use(authMiddleware).post(
 	"/disable/:api_key_id",
-	async ({ params: { api_key_id }, activeOrganizationId, logger, path, request, headers }) => {
+	async ({
+		params: { api_key_id },
+		activeOrganizationId,
+		logger,
+		path,
+		request,
+		headers,
+	}) => {
 		const cookieString = headers["cookie"] || "";
 		return await disableApiKeyController({
 			id: api_key_id,
@@ -16,7 +23,9 @@ export const disableApiKeyRoute = new Elysia().use(authMiddleware).post(
 				endpoint: path,
 				method: request.method,
 				userAgent: headers["user-agent"],
-				ipAddress: (headers["x-forwarded-for"] as string) || (headers["x-real-ip"] as string),
+				ipAddress:
+					(headers["x-forwarded-for"] as string) ||
+					(headers["x-real-ip"] as string),
 			},
 		});
 	},

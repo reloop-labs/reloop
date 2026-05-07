@@ -1,11 +1,11 @@
 import { DocsBody } from "@reloop/fe-docs/components/docs/body";
-import { DocsLayout } from "@reloop/fe-docs/components/docs/layout";
-import { TableOfContents } from "@reloop/fe-docs/components/docs/toc";
 import {
 	CodeColumnProvider,
 	CodeDisplay,
 } from "@reloop/fe-docs/components/docs/code-column-context";
+import { DocsLayout } from "@reloop/fe-docs/components/docs/layout";
 import { PageFooter } from "@reloop/fe-docs/components/docs/page-footer";
+import { TableOfContents } from "@reloop/fe-docs/components/docs/toc";
 import { PageActions } from "@reloop/fe-docs/components/page-actions";
 import { source } from "@reloop/fe-docs/lib/source";
 import type { PageTreeItem, TOCItem } from "@reloop/fe-docs/lib/types";

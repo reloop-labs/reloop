@@ -60,7 +60,6 @@ function CopyButton({ value, label }: { value: string; label?: string }) {
 }
 
 export const LogDetail = ({ log, isLoading }: LogDetailProps) => {
-	
 	const metadataEntries = log ? Object.entries(log.metadata || {}) : [];
 
 	if (isLoading) {

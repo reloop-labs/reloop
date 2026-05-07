@@ -64,9 +64,7 @@ export const EmptyState = () => {
 						variant="neutral"
 						mode="stroke"
 						size="xsmall"
-						onClick={() =>
-							router.push(`/webhooks/create`)
-						}
+						onClick={() => router.push("/webhooks/create")}
 						className="gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
 					>
 						<Icon name="plus" className="h-4 w-4" />

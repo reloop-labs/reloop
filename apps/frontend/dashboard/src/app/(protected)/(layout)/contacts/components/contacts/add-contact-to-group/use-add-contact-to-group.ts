@@ -138,7 +138,9 @@ export const useAddContactToGroup = (
 
 	const isAllSelected = useMemo(() => {
 		if (pickableContacts.length === 0) return false;
-		return pickableContacts.every((contact) => selectedContactIds.has(contact.id));
+		return pickableContacts.every((contact) =>
+			selectedContactIds.has(contact.id),
+		);
 	}, [pickableContacts, selectedContactIds]);
 
 	const toggleContact = (contact: Contact) => {
@@ -159,9 +161,7 @@ export const useAddContactToGroup = (
 		if (isAllSelected) {
 			// Deselect all: remove everything from the full pickable pool
 			const pickableIds = new Set(pickableContacts.map((c) => c.id));
-			setSelectedContacts((prev) =>
-				prev.filter((c) => !pickableIds.has(c.id)),
-			);
+			setSelectedContacts((prev) => prev.filter((c) => !pickableIds.has(c.id)));
 		} else {
 			// Select all remaining (availableContacts = pickable minus already-selected)
 			setSelectedContacts((prev) => [...prev, ...availableContacts]);
@@ -222,7 +222,9 @@ export const useAddContactToGroup = (
 					),
 				]);
 			} else {
-				toast.error("No new contacts were added (they might already be in the group)");
+				toast.error(
+					"No new contacts were added (they might already be in the group)",
+				);
 			}
 		} catch (error) {
 			console.error("Failed to add contacts:", error);

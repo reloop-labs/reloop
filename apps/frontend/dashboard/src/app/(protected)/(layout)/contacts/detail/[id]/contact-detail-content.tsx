@@ -1,8 +1,8 @@
 "use client";
+import type { AudienceStatus } from "@fe/dashboard/utils/audience";
 import { useParams } from "next/navigation";
 import useSWR from "swr";
 import { ContactHeader } from "./components/contact-header";
-import type { AudienceStatus } from "@fe/dashboard/utils/audience";
 
 interface ContactData {
 	id: string;

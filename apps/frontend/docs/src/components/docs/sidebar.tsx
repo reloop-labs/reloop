@@ -19,8 +19,8 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { SearchDialog } from "./search-dialog";
 import { isActive as checkIsActive } from "../../lib/is-active";
+import { SearchDialog } from "./search-dialog";
 
 interface SidebarProps {
 	tree: PageTreeItem[];
@@ -108,9 +108,7 @@ export function Sidebar({ tree, isMobile, onLinkClick }: SidebarProps) {
 	useEffect(() => {
 		const updateActiveRect = () => {
 			if (navRef.current) {
-				const activeEls = navRef.current.querySelectorAll(
-					".is-active-item",
-				);
+				const activeEls = navRef.current.querySelectorAll(".is-active-item");
 				// Prefer the last one (most specific)
 				const activeEl = activeEls[activeEls.length - 1] as HTMLElement;
 
@@ -184,7 +182,7 @@ export function Sidebar({ tree, isMobile, onLinkClick }: SidebarProps) {
 								"pointer-events-none absolute z-0 rounded-lg",
 								hoveredRect
 									? "bg-fd-foreground/[0.04]"
-									: "bg-fd-foreground/[0.1] shadow-sm border border-fd-foreground/5",
+									: "border border-fd-foreground/5 bg-fd-foreground/[0.1] shadow-sm",
 							)}
 							initial={false}
 							animate={{
@@ -454,7 +452,7 @@ function SidebarFolder({
 				className={cn(
 					"group flex h-9 w-full items-center justify-between rounded-lg px-2 font-medium text-sm transition-all",
 					isDirectlyActive
-						? "is-active-item border-1.5 border-fd-foreground text-fd-foreground shadow-sm bg-fd-foreground/[0.08]"
+						? "is-active-item border-1.5 border-fd-foreground bg-fd-foreground/[0.08] text-fd-foreground shadow-sm"
 						: isParentActive
 							? "text-fd-foreground"
 							: "text-fd-muted-foreground hover:text-fd-foreground",
@@ -552,7 +550,7 @@ function SidebarLink({
 			className={cn(
 				"group flex h-8 items-center gap-2 rounded-lg px-2 font-medium text-sm transition-colors",
 				isActive
-					? "is-active-item text-fd-foreground bg-fd-foreground/[0.08] shadow-sm border border-fd-foreground/5"
+					? "is-active-item border border-fd-foreground/5 bg-fd-foreground/[0.08] text-fd-foreground shadow-sm"
 					: "text-fd-muted-foreground hover:text-fd-foreground",
 			)}
 		>

@@ -10,8 +10,8 @@ import {
 	varchar,
 } from "drizzle-orm/pg-core";
 import { organization, user } from "./auth";
-import { contactGroup } from "./group";
 import { channelSubscription } from "./channel";
+import { contactGroup } from "./group";
 
 const createContactId = () => `con_${createId()}`;
 const createContactPropertyValueId = () => `cpv_${createId()}`;
@@ -146,7 +146,9 @@ export const contactRelations = relations(contact, ({ one, many }) => ({
 	}),
 	propertyValues: many(contactPropertyValue),
 	contactGroups: many(contactGroup),
-	contactChannels: many(channelSubscription, { relationName: "contactChannels" }),
+	contactChannels: many(channelSubscription, {
+		relationName: "contactChannels",
+	}),
 }));
 
 export const contactPropertyValueRelations = relations(

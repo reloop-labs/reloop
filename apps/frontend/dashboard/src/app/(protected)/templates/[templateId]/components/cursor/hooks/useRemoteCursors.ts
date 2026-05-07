@@ -4,49 +4,46 @@ import { useEffect, useState } from "react";
 import type { WebsocketProvider } from "y-websocket";
 
 export interface RemoteCursor {
-  clientId: number;
-  name: string;
-  color: string;
-  avatar?: string;
-  x: number; // percentage
-  y: number; // percentage
+	clientId: number;
+	name: string;
+	color: string;
+	avatar?: string;
+	x: number; // percentage
+	y: number; // percentage
 }
 
-export function useRemoteCursors(
-  provider: WebsocketProvider,
-): RemoteCursor[] {
-  const [cursors, setCursors] = useState<RemoteCursor[]>([]);
+export function useRemoteCursors(provider: WebsocketProvider): RemoteCursor[] {
+	const [cursors, setCursors] = useState<RemoteCursor[]>([]);
 
-  useEffect(() => {
+	useEffect(() => {
+		const update = () => {
+			const remote: RemoteCursor[] = [];
 
-    const update = () => {
-      const remote: RemoteCursor[] = [];
+			provider.awareness.getStates().forEach((state, clientId) => {
+				if (clientId === provider.awareness.clientID) return;
+				if (!state.user || !state.mouseCursor) return;
 
-      provider.awareness.getStates().forEach((state, clientId) => {
-        if (clientId === provider.awareness.clientID) return;
-        if (!state.user || !state.mouseCursor) return;
+				const { x, y } = state.mouseCursor as { x: number; y: number };
+				remote.push({
+					clientId,
+					name: state.user.name,
+					color: state.user.color,
+					avatar: state.user.avatar,
+					x,
+					y,
+				});
+			});
 
-        const { x, y } = state.mouseCursor as { x: number; y: number };
-        remote.push({
-          clientId,
-          name: state.user.name,
-          color: state.user.color,
-          avatar: state.user.avatar,
-          x,
-          y,
-        });
-      });
+			setCursors(remote);
+		};
 
-      setCursors(remote);
-    };
+		provider.awareness.on("change", update);
+		update();
 
-    provider.awareness.on("change", update);
-    update();
+		return () => {
+			provider.awareness.off("change", update);
+		};
+	}, [provider]);
 
-    return () => {
-      provider.awareness.off("change", update);
-    };
-  }, [provider]);
-
-  return cursors;
+	return cursors;
 }

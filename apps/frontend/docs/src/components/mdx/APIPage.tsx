@@ -1,12 +1,9 @@
 "use client";
 
-import {
-	CodeGroup,
-	CodeBlock as MintlifyCodeBlock,
-} from "./mintlify-client";
 import { cn } from "@reloop/ui/cn";
 import { Check, ChevronDown, ChevronRight, Copy } from "lucide-react";
 import { useState } from "react";
+import { CodeGroup, CodeBlock as MintlifyCodeBlock } from "./mintlify-client";
 
 interface Parameter {
 	name: string;

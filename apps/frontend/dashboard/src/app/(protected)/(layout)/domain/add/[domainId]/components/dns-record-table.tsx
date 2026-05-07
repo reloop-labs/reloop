@@ -1,8 +1,8 @@
+import type { DNSRecord } from "@fe/dashboard/types/api.types";
 import {
 	getStatusColorClass,
 	getStatusLabel,
 } from "@fe/dashboard/utils/domain";
-import type { DNSRecord } from "@fe/dashboard/types/api.types";
 import { cn } from "@reloop/ui/cn";
 import { Skeleton } from "@reloop/ui/skeleton";
 import * as Tooltip from "@reloop/ui/tooltip";

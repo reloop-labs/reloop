@@ -34,7 +34,11 @@ export namespace ContactTypes {
 		deletedAt: Date | null;
 		properties?: Record<string, string | number>;
 		groups?: { id: string; name: string }[];
-		channels?: { id: string; name: string; subscription: "opt_in" | "opt_out" }[];
+		channels?: {
+			id: string;
+			name: string;
+			subscription: "opt_in" | "opt_out";
+		}[];
 		suppressionReason: "hard_bounce" | "spam_complaint" | null;
 		suppressedAt: Date | null;
 	}

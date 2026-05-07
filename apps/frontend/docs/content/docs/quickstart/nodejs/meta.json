@@ -1,14 +1,14 @@
 {
-  "title": "Node.js",
-  "pages": [
-    "index",
-    "nextjs",
-    "remix",
-    "nuxt",
-    "express",
-    "redwoodjs",
-    "hono",
-    "bun",
-    "astro"
-  ]
+	"title": "Node.js",
+	"pages": [
+		"index",
+		"nextjs",
+		"remix",
+		"nuxt",
+		"express",
+		"redwoodjs",
+		"hono",
+		"bun",
+		"astro"
+	]
 }

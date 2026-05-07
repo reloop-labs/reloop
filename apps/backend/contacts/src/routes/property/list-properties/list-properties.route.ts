@@ -5,27 +5,27 @@ import { listPropertiesController } from "./list-properties.controllers";
 import { listPropertiesXCodeSamples } from "./list-properties.x-codeSamples";
 
 export const listPropertiesRoute = new Elysia().use(authMiddleware).get(
-  "/list",
-  async ({ query, activeOrganizationId, logger }) => {
-    return listPropertiesController({
-      activeOrganizationId,
-      query,
-      logger,
-    });
-  },
-  {
-    auth: true,
-    query: PropertyModel.propertyQuery,
-    response: {
-      200: PropertyModel.propertyListResponse,
-      401: PropertyModel.unauthorized,
-    },
-    detail: {
-      tags: ["Contact Properties"],
-      summary: "List Contact Properties",
-      description:
-        "List all properties for the organization with pagination and filtering",
-      "x-codeSamples": listPropertiesXCodeSamples,
-    },
-  },
+	"/list",
+	async ({ query, activeOrganizationId, logger }) => {
+		return listPropertiesController({
+			activeOrganizationId,
+			query,
+			logger,
+		});
+	},
+	{
+		auth: true,
+		query: PropertyModel.propertyQuery,
+		response: {
+			200: PropertyModel.propertyListResponse,
+			401: PropertyModel.unauthorized,
+		},
+		detail: {
+			tags: ["Contact Properties"],
+			summary: "List Contact Properties",
+			description:
+				"List all properties for the organization with pagination and filtering",
+			"x-codeSamples": listPropertiesXCodeSamples,
+		},
+	},
 );

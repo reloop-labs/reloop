@@ -15,11 +15,12 @@ interface PropertyFilterDropdownProps {
 	onChange: (value: PropertyFilters) => void;
 }
 
-const filterOptions: { id: PropertyFilterOption; label: string; icon: any }[] = [
-	{ id: null, label: "All types", icon: "activity" },
-	{ id: "string", label: "String", icon: "file-text" },
-	{ id: "number", label: "Number", icon: "hash" },
-];
+const filterOptions: { id: PropertyFilterOption; label: string; icon: any }[] =
+	[
+		{ id: null, label: "All types", icon: "activity" },
+		{ id: "string", label: "String", icon: "file-text" },
+		{ id: "number", label: "Number", icon: "hash" },
+	];
 
 export const PropertyFilterDropdown = ({
 	value,
@@ -66,7 +67,8 @@ export const PropertyFilterDropdown = ({
 				{/* Filter Options */}
 				<div className="relative">
 					{filterOptions.map((option, idx) => {
-						const isChecked = option.id === null ? value === null : value === option.id;
+						const isChecked =
+							option.id === null ? value === null : value === option.id;
 						return (
 							<button
 								key={option.id ?? "all"}

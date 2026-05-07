@@ -1,9 +1,9 @@
 "use client";
 
 import {
+	type MainNavigationItem,
 	mainNavigation,
 	userNavigation,
-	type MainNavigationItem,
 } from "@fe/dashboard/constants";
 import { authClient } from "@reloop/auth/client";
 import { cn } from "@reloop/ui/cn";
@@ -427,16 +427,14 @@ export function CommandMenuGlobal() {
 					{/* Close hint */}
 					<div className="flex items-center gap-1.5">
 						<CommandMenu.FooterKeyBox>
-							<span className="text-[9px] font-medium">esc</span>
+							<span className="font-medium text-[9px]">esc</span>
 						</CommandMenu.FooterKeyBox>
 						<span className="text-[11px] text-text-soft-400">Close</span>
 					</div>
 				</div>
 
 				{/* Branding / shortcut hint */}
-				<div className="text-[11px] text-text-disabled-300">
-					Reloop Command
-				</div>
+				<div className="text-[11px] text-text-disabled-300">Reloop Command</div>
 			</CommandMenu.Footer>
 		</CommandMenu.Dialog>
 	);

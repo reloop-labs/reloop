@@ -12,7 +12,17 @@ export interface BackgroundValue {
 
 const BG_SIZES = ["auto", "cover", "contain"];
 const BG_REPEATS = ["no-repeat", "repeat", "repeat-x", "repeat-y"];
-const BG_POSITIONS = ["center", "top", "bottom", "left", "right", "top left", "top right", "bottom left", "bottom right"];
+const BG_POSITIONS = [
+	"center",
+	"top",
+	"bottom",
+	"left",
+	"right",
+	"top left",
+	"top right",
+	"bottom left",
+	"bottom right",
+];
 
 export function BackgroundControl({
 	value,
@@ -22,7 +32,7 @@ export function BackgroundControl({
 	onChange: (v: BackgroundValue) => void;
 }) {
 	return (
-		<div className="flex flex-col gap-1.5 w-full">
+		<div className="flex w-full flex-col gap-1.5">
 			<ColorPicker
 				value={value.color}
 				onChange={(c) => onChange({ ...value, color: c })}

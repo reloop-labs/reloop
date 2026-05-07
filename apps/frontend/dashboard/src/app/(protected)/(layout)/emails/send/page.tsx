@@ -9,7 +9,6 @@ import { ComposeHeader } from "./components/compose-header";
 export default function SendEmailPage() {
 	const [isLoading, setIsLoading] = useState(false);
 	const router = useRouter();
-	
 
 	const handleSend = async () => {
 		setIsLoading(true);
@@ -19,7 +18,7 @@ export default function SendEmailPage() {
 
 		setIsLoading(false);
 		toast.success("Email sent successfully!");
-		router.push(`/emails`);
+		router.push("/emails");
 	};
 
 	return (

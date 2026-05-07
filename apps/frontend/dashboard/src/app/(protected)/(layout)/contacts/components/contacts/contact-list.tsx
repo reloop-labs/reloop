@@ -1,9 +1,9 @@
 "use client";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
+import type { AudienceStatus } from "@fe/dashboard/utils/audience";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import type { AudienceStatus } from "@fe/dashboard/utils/audience";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useState } from "react";
 import { toast } from "sonner";

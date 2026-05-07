@@ -28,7 +28,12 @@ export function BorderRadiusControl({
 	const handleChange = (corner: keyof BorderRadiusValue, raw: string) => {
 		const num = raw === "" ? "" : Number.parseFloat(raw);
 		if (linked) {
-			onChange({ topLeft: num, topRight: num, bottomRight: num, bottomLeft: num });
+			onChange({
+				topLeft: num,
+				topRight: num,
+				bottomRight: num,
+				bottomLeft: num,
+			});
 		} else {
 			onChange({ ...value, [corner]: num });
 		}
@@ -45,7 +50,7 @@ export function BorderRadiusControl({
 						onChange={(e) => handleChange(key, e.target.value)}
 						className="w-10 rounded border border-(--re-border) bg-transparent px-1 py-0.5 text-center text-xs"
 					/>
-					<span className="text-[10px] text-(--re-text-muted)">{label}</span>
+					<span className="text-(--re-text-muted) text-[10px]">{label}</span>
 				</span>
 			))}
 			<button
@@ -58,7 +63,17 @@ export function BorderRadiusControl({
 						: "border-(--re-border) bg-transparent text-(--re-text-muted)"
 				}`}
 			>
-				<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					width="10"
+					height="10"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					strokeWidth="2.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				>
 					<rect x="3" y="3" width="18" height="18" rx="4" ry="4" />
 				</svg>
 			</button>

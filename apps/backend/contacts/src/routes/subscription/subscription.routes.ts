@@ -4,5 +4,4 @@ import { listSubscriptionsRoute } from "./list-subscriptions/list-subscriptions.
 export const subscriptionRoutes = new Elysia({
 	prefix: "/v1/subscriptions",
 	name: "SubscriptionRoutes",
-})
-	.use(listSubscriptionsRoute);
+}).use(listSubscriptionsRoute);

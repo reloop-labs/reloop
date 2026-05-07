@@ -5,27 +5,27 @@ import { listChannelsController } from "./list-channels.controllers";
 import { listChannelsXCodeSamples } from "./list-channels.x-codeSamples";
 
 export const listChannelsRoute = new Elysia().use(authMiddleware).get(
-  "/list",
-  async ({ query, activeOrganizationId, logger }) => {
-    return await listChannelsController({
-      activeOrganizationId,
-      page: query.page,
-      limit: query.limit,
-      logger,
-    });
-  },
-  {
-    auth: true,
-    query: ChannelModel.channelQuery,
-    response: {
-      200: ChannelModel.channelListResponse,
-      403: ChannelModel.unauthorized,
-    },
-    detail: {
-      tags: ["Channels"],
-      summary: "List Channels",
-      description: "Retrieves a paginated list of channels",
-      "x-codeSamples": listChannelsXCodeSamples,
-    },
-  },
+	"/list",
+	async ({ query, activeOrganizationId, logger }) => {
+		return await listChannelsController({
+			activeOrganizationId,
+			page: query.page,
+			limit: query.limit,
+			logger,
+		});
+	},
+	{
+		auth: true,
+		query: ChannelModel.channelQuery,
+		response: {
+			200: ChannelModel.channelListResponse,
+			403: ChannelModel.unauthorized,
+		},
+		detail: {
+			tags: ["Channels"],
+			summary: "List Channels",
+			description: "Retrieves a paginated list of channels",
+			"x-codeSamples": listChannelsXCodeSamples,
+		},
+	},
 );

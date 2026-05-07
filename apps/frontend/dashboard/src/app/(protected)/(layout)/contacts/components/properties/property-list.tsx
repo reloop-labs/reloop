@@ -2,7 +2,7 @@
 
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import { useQueryState, parseAsInteger } from "nuqs";
+import { parseAsInteger, useQueryState } from "nuqs";
 import { useState } from "react";
 import useSWR from "swr";
 import {

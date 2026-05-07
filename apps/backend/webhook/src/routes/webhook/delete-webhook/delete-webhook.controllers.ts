@@ -46,7 +46,10 @@ export async function deleteWebhookController({
 			message: "Webhook deleted successfully",
 		};
 	} catch (error) {
-		logger.error({ webhookId, organizationId, error }, "Error deleting webhook");
+		logger.error(
+			{ webhookId, organizationId, error },
+			"Error deleting webhook",
+		);
 		throw error;
 	}
 }

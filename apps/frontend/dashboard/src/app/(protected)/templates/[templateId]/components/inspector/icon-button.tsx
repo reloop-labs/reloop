@@ -1,5 +1,5 @@
 import * as Button from "@reloop/ui/button";
-import React from "react";
+import type React from "react";
 
 export interface IconButtonProps {
 	onClick: () => void;

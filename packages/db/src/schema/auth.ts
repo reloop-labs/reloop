@@ -1,11 +1,14 @@
 import { relations } from "drizzle-orm";
-import { boolean, index, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
-import { apikey } from "./api-key";
 import {
-	billingInvoice,
-	creditLedger,
-	subscription,
-} from "./billing";
+	boolean,
+	index,
+	pgEnum,
+	pgTable,
+	text,
+	timestamp,
+} from "drizzle-orm/pg-core";
+import { apikey } from "./api-key";
+import { billingInvoice, creditLedger, subscription } from "./billing";
 
 export const user = pgTable("user", {
 	id: text("id").primaryKey(),
@@ -74,7 +77,11 @@ export const jwks = pgTable("jwks", {
 	expiresAt: timestamp("expires_at"),
 });
 
-export const orgStatusEnum = pgEnum("org_status", ["active", "suspended", "deleted"]);
+export const orgStatusEnum = pgEnum("org_status", [
+	"active",
+	"suspended",
+	"deleted",
+]);
 
 export const organization = pgTable("organization", {
 	id: text("id").primaryKey(),

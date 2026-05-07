@@ -94,7 +94,12 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 						{ ...apiKeyResult },
 						"API key authentication successful",
 					);
-					return { ...apiKeyResult, traceId, logger: tenantLogger, user: { id: apiKeyResult.userId } };
+					return {
+						...apiKeyResult,
+						traceId,
+						logger: tenantLogger,
+						user: { id: apiKeyResult.userId },
+					};
 				}
 				const sessionResult = await validateSession(cookie);
 				if (sessionResult) {
@@ -107,7 +112,12 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 						{ ...sessionResult },
 						"Session authentication successful",
 					);
-					return { ...sessionResult, traceId, logger: tenantLogger, user: { id: sessionResult.userId } };
+					return {
+						...sessionResult,
+						traceId,
+						logger: tenantLogger,
+						user: { id: sessionResult.userId },
+					};
 				}
 				return status(401, { message: "Authentication required" });
 			} catch (e) {

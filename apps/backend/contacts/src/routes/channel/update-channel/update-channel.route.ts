@@ -5,41 +5,51 @@ import { updateChannelController } from "./update-channel.controllers";
 import { updateChannelXCodeSamples } from "./update-channel.x-codeSamples";
 
 export const updateChannelRoute = new Elysia().use(authMiddleware).patch(
-  "/:channel_id",
-  async ({ params, body, activeOrganizationId, logger, path, request, headers }) => {
-    const { name, description, visibility } = body;
-    const cookieString = headers["cookie"] || "";
-    return await updateChannelController({
-      activeOrganizationId,
-      channel_id: params.channel_id,
-      name,
-      description: description ?? undefined,
-      visibility,
-      logger,
-      cookie: cookieString,
-      requestDetails: {
-        endpoint: path,
-        method: request.method,
-        userAgent: headers["user-agent"],
-        ipAddress: (headers["x-forwarded-for"] as string) || (headers["x-real-ip"] as string),
-      },
-    });
-  },
-  {
-    auth: true,
-    params: t.Object({ channel_id: t.String({ description: "Channel ID" }) }),
-    body: ChannelModel.updateChannelBody,
-    response: {
-      200: ChannelModel.channelResponse,
-      404: ChannelModel.channelNotFound,
-      409: ChannelModel.channelAlreadyExists,
-      403: ChannelModel.unauthorized,
-    },
-    detail: {
-      tags: ["Channels"],
-      summary: "Update Channel",
-      description: "Updates an existing channel",
-      "x-codeSamples": updateChannelXCodeSamples,
-    },
-  },
+	"/:channel_id",
+	async ({
+		params,
+		body,
+		activeOrganizationId,
+		logger,
+		path,
+		request,
+		headers,
+	}) => {
+		const { name, description, visibility } = body;
+		const cookieString = headers["cookie"] || "";
+		return await updateChannelController({
+			activeOrganizationId,
+			channel_id: params.channel_id,
+			name,
+			description: description ?? undefined,
+			visibility,
+			logger,
+			cookie: cookieString,
+			requestDetails: {
+				endpoint: path,
+				method: request.method,
+				userAgent: headers["user-agent"],
+				ipAddress:
+					(headers["x-forwarded-for"] as string) ||
+					(headers["x-real-ip"] as string),
+			},
+		});
+	},
+	{
+		auth: true,
+		params: t.Object({ channel_id: t.String({ description: "Channel ID" }) }),
+		body: ChannelModel.updateChannelBody,
+		response: {
+			200: ChannelModel.channelResponse,
+			404: ChannelModel.channelNotFound,
+			409: ChannelModel.channelAlreadyExists,
+			403: ChannelModel.unauthorized,
+		},
+		detail: {
+			tags: ["Channels"],
+			summary: "Update Channel",
+			description: "Updates an existing channel",
+			"x-codeSamples": updateChannelXCodeSamples,
+		},
+	},
 );

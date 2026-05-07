@@ -2,45 +2,50 @@ import { t } from "elysia";
 
 export namespace GroupModel {
 	// Create Group
-	export const createGroupBody = t.Object({
-		name: t.String({
-			minLength: 1,
-			maxLength: 50,
-			description: "Group name",
-		}),
-	},
+	export const createGroupBody = t.Object(
+		{
+			name: t.String({
+				minLength: 1,
+				maxLength: 50,
+				description: "Group name",
+			}),
+		},
 		{
 			examples: [{ name: "Beta Testers" }],
-		});
+		},
+	);
 
 	export type CreateGroupBody = typeof createGroupBody.static;
 
 	// Update Group
-	export const updateGroupBody = t.Object({
-		name: t.String({
-			minLength: 1,
-			maxLength: 255,
-			description: "Group name",
-		}),
-	},
+	export const updateGroupBody = t.Object(
+		{
+			name: t.String({
+				minLength: 1,
+				maxLength: 255,
+				description: "Group name",
+			}),
+		},
 		{
 			examples: [
 				{
 					name: "Loyal Customers",
 				},
 			],
-		});
+		},
+	);
 
 	export type UpdateGroupBody = typeof updateGroupBody.static;
 
 	// Group Response
-	export const groupBaseResponse = t.Object({
-		object: t.Literal("contact_group", { default: "contact_group" }),
-		id: t.String({ description: "Unique group identifier" }),
-		name: t.String({ description: "Group name" }),
-		createdAt: t.Date(),
-		updatedAt: t.Date(),
-	},
+	export const groupBaseResponse = t.Object(
+		{
+			object: t.Literal("contact_group", { default: "contact_group" }),
+			id: t.String({ description: "Unique group identifier" }),
+			name: t.String({ description: "Group name" }),
+			createdAt: t.Date(),
+			updatedAt: t.Date(),
+		},
 		{
 			examples: [
 				{
@@ -51,7 +56,8 @@ export namespace GroupModel {
 					updatedAt: "2026-03-27T10:00:00Z",
 				},
 			],
-		});
+		},
+	);
 
 	export const groupResponse = t.Composite([
 		groupBaseResponse,

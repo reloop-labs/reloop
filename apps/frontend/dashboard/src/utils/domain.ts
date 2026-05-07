@@ -60,7 +60,6 @@ export const getStatusIcon = (status: DomainStatus): string => {
 	}
 };
 
-
 /**
  * Get animation properties for staggered animations
  */

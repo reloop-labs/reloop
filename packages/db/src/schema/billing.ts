@@ -69,12 +69,22 @@ export const invoiceStatusEnum = pgEnum("invoice_status", [
 // ─── Tables ──────────────────────────────────────────────────────────────────
 
 export const plan = pgTable("plan", {
-	id: text("id").$defaultFn(() => `pln_${createId()}`).primaryKey(),
+	id: text("id")
+		.$defaultFn(() => `pln_${createId()}`)
+		.primaryKey(),
 	name: varchar("name", { length: 100 }).notNull(),
 	monthlyCredits: integer("monthly_credits").notNull(),
 	overageLimit: integer("overage_limit").notNull().default(0),
-	basePriceUsd: decimal("base_price_usd", { precision: 10, scale: 2 }).notNull(),
-	overagePricePerEmail: decimal("overage_price_per_email", { precision: 10, scale: 4 }).notNull().default("0"),
+	basePriceUsd: decimal("base_price_usd", {
+		precision: 10,
+		scale: 2,
+	}).notNull(),
+	overagePricePerEmail: decimal("overage_price_per_email", {
+		precision: 10,
+		scale: 4,
+	})
+		.notNull()
+		.default("0"),
 	billingCycle: billingCycleEnum("billing_cycle").notNull().default("monthly"),
 	rolloverEnabled: boolean("rollover_enabled").notNull().default(false),
 	maxRolloverCredits: integer("max_rollover_credits"),
@@ -86,7 +96,9 @@ export const plan = pgTable("plan", {
 export const subscription = pgTable(
 	"subscription",
 	{
-		id: text("id").$defaultFn(() => `sub_${createId()}`).primaryKey(),
+		id: text("id")
+			.$defaultFn(() => `sub_${createId()}`)
+			.primaryKey(),
 		organizationId: text("organization_id")
 			.notNull()
 			.references(() => organization.id, { onDelete: "cascade" }),
@@ -106,7 +118,9 @@ export const subscription = pgTable(
 		currentPeriodEnd: timestamp("current_period_end").notNull(),
 
 		// External billing provider
-		externalSubscriptionId: varchar("external_subscription_id", { length: 255 }).unique(),
+		externalSubscriptionId: varchar("external_subscription_id", {
+			length: 255,
+		}).unique(),
 
 		cancelledAt: timestamp("cancelled_at"),
 		createdAt: timestamp("created_at").notNull().defaultNow(),
@@ -117,14 +131,19 @@ export const subscription = pgTable(
 			.on(t.organizationId)
 			.where(sql`status NOT IN ('cancelled')`),
 		index("subscription_organization_id_idx").on(t.organizationId),
-		index("subscription_period_idx").on(t.currentPeriodStart, t.currentPeriodEnd),
-	]
+		index("subscription_period_idx").on(
+			t.currentPeriodStart,
+			t.currentPeriodEnd,
+		),
+	],
 );
 
 export const creditLedger = pgTable(
 	"credit_ledger",
 	{
-		id: text("id").$defaultFn(() => `cld_${createId()}`).primaryKey(),
+		id: text("id")
+			.$defaultFn(() => `cld_${createId()}`)
+			.primaryKey(),
 		organizationId: text("organization_id")
 			.notNull()
 			.references(() => organization.id),
@@ -142,13 +161,15 @@ export const creditLedger = pgTable(
 		index("ledger_organization_id_idx").on(t.organizationId),
 		index("ledger_subscription_id_idx").on(t.subscriptionId),
 		index("ledger_org_created_idx").on(t.organizationId, t.createdAt),
-	]
+	],
 );
 
 export const billingInvoice = pgTable(
 	"billing_invoice",
 	{
-		id: text("id").$defaultFn(() => `inv_${createId()}`).primaryKey(),
+		id: text("id")
+			.$defaultFn(() => `inv_${createId()}`)
+			.primaryKey(),
 		organizationId: text("organization_id")
 			.notNull()
 			.references(() => organization.id),
@@ -160,8 +181,13 @@ export const billingInvoice = pgTable(
 		creditsUsed: integer("credits_used").notNull(),
 		overageCredits: integer("overage_credits").notNull().default(0),
 
-		baseAmountUsd: decimal("base_amount_usd", { precision: 10, scale: 2 }).notNull(),
-		overageAmountUsd: decimal("overage_amount_usd", { precision: 10, scale: 2 }).notNull().default("0"),
+		baseAmountUsd: decimal("base_amount_usd", {
+			precision: 10,
+			scale: 2,
+		}).notNull(),
+		overageAmountUsd: decimal("overage_amount_usd", { precision: 10, scale: 2 })
+			.notNull()
+			.default("0"),
 		totalUsd: decimal("total_usd", { precision: 10, scale: 2 }).notNull(),
 
 		status: invoiceStatusEnum("status").notNull().default("draft"),
@@ -177,7 +203,7 @@ export const billingInvoice = pgTable(
 		index("invoices_organization_id_idx").on(t.organizationId),
 		index("invoices_subscription_id_idx").on(t.subscriptionId),
 		index("invoices_status_idx").on(t.status),
-	]
+	],
 );
 
 // ─── Relations ────────────────────────────────────────────────────────────────
@@ -186,26 +212,47 @@ export const planRelations = relations(plan, ({ many }) => ({
 	subscriptions: many(subscription),
 }));
 
-export const subscriptionRelations = relations(subscription, ({ one, many }) => ({
-	organization: one(organization, { fields: [subscription.organizationId], references: [organization.id] }),
-	plan: one(plan, { fields: [subscription.planId], references: [plan.id] }),
-	creditLedger: many(creditLedger),
-	emailLog: many(emailLog),
-	billingInvoices: many(billingInvoice),
-}));
+export const subscriptionRelations = relations(
+	subscription,
+	({ one, many }) => ({
+		organization: one(organization, {
+			fields: [subscription.organizationId],
+			references: [organization.id],
+		}),
+		plan: one(plan, { fields: [subscription.planId], references: [plan.id] }),
+		creditLedger: many(creditLedger),
+		emailLog: many(emailLog),
+		billingInvoices: many(billingInvoice),
+	}),
+);
 
 export const creditLedgerRelations = relations(creditLedger, ({ one }) => ({
-	organization: one(organization, { fields: [creditLedger.organizationId], references: [organization.id] }),
-	subscription: one(subscription, { fields: [creditLedger.subscriptionId], references: [subscription.id] }),
+	organization: one(organization, {
+		fields: [creditLedger.organizationId],
+		references: [organization.id],
+	}),
+	subscription: one(subscription, {
+		fields: [creditLedger.subscriptionId],
+		references: [subscription.id],
+	}),
 }));
 
 export const emailSendRelations = relations(emailLog, ({ one, many }) => ({
-	organization: one(organization, { fields: [emailLog.organizationId], references: [organization.id] }),
+	organization: one(organization, {
+		fields: [emailLog.organizationId],
+		references: [organization.id],
+	}),
 	triggeredBy: one(user, { fields: [emailLog.userId], references: [user.id] }),
 	events: many(emailLog),
 }));
 
 export const billingInvoiceRelations = relations(billingInvoice, ({ one }) => ({
-	organization: one(organization, { fields: [billingInvoice.organizationId], references: [organization.id] }),
-	subscription: one(subscription, { fields: [billingInvoice.subscriptionId], references: [subscription.id] }),
+	organization: one(organization, {
+		fields: [billingInvoice.organizationId],
+		references: [organization.id],
+	}),
+	subscription: one(subscription, {
+		fields: [billingInvoice.subscriptionId],
+		references: [subscription.id],
+	}),
 }));

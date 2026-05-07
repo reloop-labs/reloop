@@ -34,4 +34,3 @@ const app = new Elysia({ prefix: "/api/auth", name: "Auth Service" })
 	});
 
 export type App = typeof app;
-

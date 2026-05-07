@@ -5,21 +5,22 @@ export namespace PropertyModel {
 	export const typeValues = ["string", "number"] as const;
 
 	// Property Models
-	export const createPropertyBody = t.Object({
-		name: t.String({
-			minLength: 1,
-			maxLength: 255,
-			description: "Property name (e.g., company_name, first_name)",
-		}),
-		type: t.Union([t.Literal("string"), t.Literal("number")], {
-			description: "Property type",
-		}),
-		fallbackValue: t.Optional(
-			t.String({
-				description: "Default value to use when property is empty",
+	export const createPropertyBody = t.Object(
+		{
+			name: t.String({
+				minLength: 1,
+				maxLength: 255,
+				description: "Property name (e.g., company_name, first_name)",
 			}),
-		),
-	},
+			type: t.Union([t.Literal("string"), t.Literal("number")], {
+				description: "Property type",
+			}),
+			fallbackValue: t.Optional(
+				t.String({
+					description: "Default value to use when property is empty",
+				}),
+			),
+		},
 		{
 			examples: [
 				{
@@ -33,29 +34,31 @@ export namespace PropertyModel {
 					fallbackValue: "0",
 				},
 			],
-		});
+		},
+	);
 
 	export type CreatePropertyBody = typeof createPropertyBody.static;
 
-	export const updatePropertyBody = t.Object({
-		name: t.Optional(
-			t.String({
-				minLength: 1,
-				maxLength: 255,
-				description: "Property name",
-			}),
-		),
-		type: t.Optional(
-			t.Union([t.Literal("string"), t.Literal("number")], {
-				description: "Property type",
-			}),
-		),
-		fallbackValue: t.Optional(
-			t.String({
-				description: "Default value to use when property is empty",
-			}),
-		),
-	},
+	export const updatePropertyBody = t.Object(
+		{
+			name: t.Optional(
+				t.String({
+					minLength: 1,
+					maxLength: 255,
+					description: "Property name",
+				}),
+			),
+			type: t.Optional(
+				t.Union([t.Literal("string"), t.Literal("number")], {
+					description: "Property type",
+				}),
+			),
+			fallbackValue: t.Optional(
+				t.String({
+					description: "Default value to use when property is empty",
+				}),
+			),
+		},
 		{
 			examples: [
 				{
@@ -64,21 +67,25 @@ export namespace PropertyModel {
 					fallbackValue: "N/A",
 				},
 			],
-		});
+		},
+	);
 
 	export type UpdatePropertyBody = typeof updatePropertyBody.static;
 
-	export const propertyBaseResponse = t.Object({
-		object: t.Literal("contact_property", { default: "contact_property" }),
-		id: t.String({ description: "Unique property identifier" }),
-		propertyName: t.String({ description: "Property name" }),
-		propertyType: t.String({ description: "Property type (string or number)" }),
-		defaultValue: t.Union([t.String(), t.Null()], {
-			description: "Fallback value",
-		}),
-		createdAt: t.Date(),
-		updatedAt: t.Date(),
-	},
+	export const propertyBaseResponse = t.Object(
+		{
+			object: t.Literal("contact_property", { default: "contact_property" }),
+			id: t.String({ description: "Unique property identifier" }),
+			propertyName: t.String({ description: "Property name" }),
+			propertyType: t.String({
+				description: "Property type (string or number)",
+			}),
+			defaultValue: t.Union([t.String(), t.Null()], {
+				description: "Fallback value",
+			}),
+			createdAt: t.Date(),
+			updatedAt: t.Date(),
+		},
 		{
 			examples: [
 				{
@@ -91,7 +98,8 @@ export namespace PropertyModel {
 					updatedAt: "2026-03-27T10:00:00Z",
 				},
 			],
-		});
+		},
+	);
 
 	export const propertyResponse = t.Composite([
 		propertyBaseResponse,

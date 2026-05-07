@@ -4,7 +4,8 @@ export namespace MailTypes {
 	export type SendEmailBody = typeof MailModel.sendEmailBody.static;
 	export type SendEmailResponse = typeof MailModel.sendEmailResponse.static;
 	export type GetAttachmentParams = typeof MailModel.getAttachmentParams.static;
-	export type GetAttachmentResponse = typeof MailModel.getAttachmentResponse.static;
+	export type GetAttachmentResponse =
+		typeof MailModel.getAttachmentResponse.static;
 	export type Unauthorized = typeof MailModel.unauthorized.static;
 	export type Forbidden = typeof MailModel.forbidden.static;
 	export type BadRequest = typeof MailModel.badRequest.static;

@@ -83,9 +83,7 @@ export function generateReceivingMXRecord(
 	return generateMXRecord(customReturnPath, rootDomain, hostDomain);
 }
 
-export async function generateAllDNSRecords(
-	domain: string,
-): Promise<{
+export async function generateAllDNSRecords(domain: string): Promise<{
 	mxRecord: DNSTypes.DNSRecord;
 	spfRecord: DNSTypes.DNSRecord;
 	dmarcRecord: DNSTypes.DNSRecord;

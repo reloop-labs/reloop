@@ -36,18 +36,12 @@ function isSubscribed(
 	return defaultSubscription === "opt_in";
 }
 
-function Checkbox({
-	checked,
-}: {
-	checked: boolean;
-}) {
+function Checkbox({ checked }: { checked: boolean }) {
 	return (
 		<div
 			className={cn(
 				"flex h-4 w-4 flex-shrink-0 items-center justify-center rounded transition-all duration-150",
-				checked
-					? "bg-white"
-					: "border border-white/25 bg-transparent",
+				checked ? "bg-white" : "border border-white/25 bg-transparent",
 			)}
 		>
 			{checked && (
@@ -58,7 +52,11 @@ function Checkbox({
 					stroke="currentColor"
 					strokeWidth={3}
 				>
-					<path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+					<path
+						strokeLinecap="round"
+						strokeLinejoin="round"
+						d="M5 13l4 4L19 7"
+					/>
 				</svg>
 			)}
 		</div>

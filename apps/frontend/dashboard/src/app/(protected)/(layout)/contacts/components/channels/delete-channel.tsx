@@ -108,7 +108,8 @@ export const DeleteChannelModal = ({ channels }: DeleteChannelModalProps) => {
 			} else {
 				mutate(
 					(key: string) =>
-						typeof key === "string" && key.startsWith("/api/contacts/v1/channels"),
+						typeof key === "string" &&
+						key.startsWith("/api/contacts/v1/channels"),
 				);
 			}
 		} catch (error) {
@@ -163,8 +164,8 @@ export const DeleteChannelModal = ({ channels }: DeleteChannelModalProps) => {
 									Delete channel?
 								</Modal.Title>
 								<Modal.Description className="mb-6 text-pretty text-sm text-text-sub-600 leading-relaxed">
-									This will permanently delete the channel. Any contacts enrolled
-									in this channel will be unlinked but{" "}
+									This will permanently delete the channel. Any contacts
+									enrolled in this channel will be unlinked but{" "}
 									<span className="font-semibold text-text-strong-950">
 										they will not be deleted
 									</span>
@@ -258,7 +259,9 @@ export const DeleteChannelModal = ({ channels }: DeleteChannelModalProps) => {
 								<Button.Root
 									type="submit"
 									variant="error"
-									disabled={isDeleting || confirmationText !== channelToDelete.name}
+									disabled={
+										isDeleting || confirmationText !== channelToDelete.name
+									}
 								>
 									{isDeleting ? (
 										"Deleting..."

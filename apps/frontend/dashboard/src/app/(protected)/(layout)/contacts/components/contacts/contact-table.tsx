@@ -2,6 +2,7 @@
 import { PageSizeDropdown } from "@fe/dashboard/components/page-size-dropdown";
 import { PaginationControls } from "@fe/dashboard/components/pagination-controls";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
+import type { AudienceStatus } from "@fe/dashboard/utils/audience";
 import {
 	getStatusColorClass,
 	getStatusIcon,
@@ -16,7 +17,6 @@ import { parseAsInteger, useQueryState } from "nuqs";
 import { useState } from "react";
 import { ContactDropdown } from "./contact-dropdown";
 import { ContactsEmptyState } from "./contacts-empty-state";
-import type { AudienceStatus } from "@fe/dashboard/utils/audience";
 
 interface Contact {
 	id: string;

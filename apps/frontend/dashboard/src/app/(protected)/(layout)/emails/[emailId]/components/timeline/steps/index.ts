@@ -4,8 +4,8 @@ import { OpenedStep } from "./opened";
 import { SentStep } from "./sent";
 
 export const TIMELINE_COMPONENTS = [
-  SentStep,
-  DeliveredStep,
-  OpenedStep,
-  ClickedStep,
+	SentStep,
+	DeliveredStep,
+	OpenedStep,
+	ClickedStep,
 ];

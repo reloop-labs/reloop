@@ -15,7 +15,10 @@ export const installCommands: Record<LanguageCode, string> = {
 	php: "composer require reloop/reloop-php",
 };
 
-export const sendEmailCode: Record<LanguageCode, { code: string; lang: string }> = {
+export const sendEmailCode: Record<
+	LanguageCode,
+	{ code: string; lang: string }
+> = {
 	nodejs: {
 		code: `import Reloop from 'reloop-email';
 

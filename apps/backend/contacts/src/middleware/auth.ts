@@ -79,7 +79,7 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 	auth: {
 		async resolve({ status, request: { headers } }) {
 			try {
-				const apiKey = headers.get("x-api-key")
+				const apiKey = headers.get("x-api-key");
 				const cookie = headers.get("cookie");
 				const traceId = crypto.randomUUID();
 				const currentLogger = logger.child({ traceId });

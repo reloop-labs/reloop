@@ -4,19 +4,19 @@ import { CodeBlock } from "@reloop/ui/code-block";
 import * as Drawer from "@reloop/ui/drawer";
 import { Icon } from "@reloop/ui/icon";
 import * as Tooltip from "@reloop/ui/tooltip";
-import {
-	siNodedotjs,
-	siRuby,
-	siPhp,
-	siPython,
-	siGo,
-	siRust,
-	siOpenjdk,
-	siDotnet,
-	siCurl,
-} from "simple-icons";
 import { useCallback, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
+import {
+	siCurl,
+	siDotnet,
+	siGo,
+	siNodedotjs,
+	siOpenjdk,
+	siPhp,
+	siPython,
+	siRuby,
+	siRust,
+} from "simple-icons";
 import { toast } from "sonner";
 
 const langIcons: Record<string, { svg: string }> = {
@@ -640,8 +640,7 @@ type ButtonProps = React.ComponentPropsWithoutRef<typeof Button.Root>;
 
 export const ContactsApiDetails = (props: ButtonProps) => {
 	const [isOpen, setIsOpen] = useState(false);
-	const [selectedLanguage, setSelectedLanguage] =
-		useState<Language>("nodejs");
+	const [selectedLanguage, setSelectedLanguage] = useState<Language>("nodejs");
 	const [baseCopied, setBaseCopied] = useState(false);
 	const [copiedOp, setCopiedOp] = useState<string | null>(null);
 
@@ -720,7 +719,10 @@ export const ContactsApiDetails = (props: ButtonProps) => {
 			</Tooltip.Provider>
 
 			<Drawer.Content className="max-w-[560px]">
-				<Drawer.Header className="border-stroke-soft-200 border-b" showCloseButton={false}>
+				<Drawer.Header
+					className="border-stroke-soft-200 border-b"
+					showCloseButton={false}
+				>
 					<div className="flex flex-1 flex-col gap-1">
 						<Drawer.Title>Contacts API</Drawer.Title>
 						<p className="text-paragraph-xs text-text-sub-600">
@@ -742,7 +744,7 @@ export const ContactsApiDetails = (props: ButtonProps) => {
 				<Drawer.Body className="flex flex-col gap-8 p-6">
 					{/* Base URL */}
 					<div className="flex items-center gap-3">
-						<span className="text-[11px] font-medium uppercase tracking-wider text-text-sub-400 flex-shrink-0">
+						<span className="flex-shrink-0 font-medium text-[11px] text-text-sub-400 uppercase tracking-wider">
 							Base URL
 						</span>
 						<code className="font-mono text-[13px] text-text-strong-950">
@@ -751,7 +753,7 @@ export const ContactsApiDetails = (props: ButtonProps) => {
 						<button
 							type="button"
 							onClick={copyBaseUrl}
-							className="p-1 rounded-md text-text-sub-400 hover:text-text-strong-950 hover:bg-bg-weak-50 transition-colors"
+							className="rounded-md p-1 text-text-sub-400 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950"
 							aria-label="Copy base URL"
 						>
 							<Icon
@@ -762,7 +764,10 @@ export const ContactsApiDetails = (props: ButtonProps) => {
 					</div>
 
 					{/* Language Pills */}
-					<div className="flex gap-2 overflow-x-auto scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+					<div
+						className="scrollbar-hide flex gap-2 overflow-x-auto"
+						style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+					>
 						{languages.map((lang) => {
 							const icon = langIcons[lang.id];
 							return (
@@ -771,7 +776,7 @@ export const ContactsApiDetails = (props: ButtonProps) => {
 									key={lang.id}
 									onClick={() => setSelectedLanguage(lang.id)}
 									className={cn(
-										"shrink-0 flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-[13px] font-medium transition-all duration-200",
+										"flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-1.5 font-medium text-[13px] transition-all duration-200",
 										selectedLanguage === lang.id
 											? "border-text-strong-950 bg-text-strong-950 text-static-white shadow-sm"
 											: "border-stroke-soft-200 text-text-sub-600 hover:border-stroke-strong-950 hover:text-text-strong-950",
@@ -781,7 +786,10 @@ export const ContactsApiDetails = (props: ButtonProps) => {
 										<span
 											className="flex h-4 w-4 items-center justify-center [&>svg]:h-3.5 [&>svg]:w-3.5"
 											dangerouslySetInnerHTML={{
-												__html: icon.svg.replace('<svg', '<svg fill="currentColor"'),
+												__html: icon.svg.replace(
+													"<svg",
+													'<svg fill="currentColor"',
+												),
 											}}
 										/>
 									)}
@@ -803,7 +811,7 @@ export const ContactsApiDetails = (props: ButtonProps) => {
 							<section key={op.id} className="flex flex-col gap-3">
 								{/* Section title */}
 								<div className="flex items-center gap-2">
-									<h3 className="text-[15px] font-semibold text-text-strong-950">
+									<h3 className="font-semibold text-[15px] text-text-strong-950">
 										{op.label}
 									</h3>
 									<button
@@ -814,7 +822,7 @@ export const ContactsApiDetails = (props: ButtonProps) => {
 												"_blank",
 											)
 										}
-										className="p-0.5 text-text-sub-400 hover:text-text-strong-950 transition-colors rounded"
+										className="rounded p-0.5 text-text-sub-400 transition-colors hover:text-text-strong-950"
 										aria-label="View documentation"
 									>
 										<Icon name="external-link" className="h-3.5 w-3.5" />
@@ -824,7 +832,7 @@ export const ContactsApiDetails = (props: ButtonProps) => {
 								{/* Code card */}
 								<div className="overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-weak-50">
 									{/* Filename + copy */}
-									<div className="flex items-center justify-between border-b border-stroke-soft-200 px-4 py-2">
+									<div className="flex items-center justify-between border-stroke-soft-200 border-b px-4 py-2">
 										<span className="font-mono text-[11px] text-text-sub-600">
 											{example.filename}
 										</span>
@@ -850,7 +858,7 @@ export const ContactsApiDetails = (props: ButtonProps) => {
 									<CodeBlock
 										code={example.code}
 										lang={currentLanguageConfig?.shikiLang || "javascript"}
-										className="text-[11px] leading-relaxed [&>pre]:!bg-transparent [&>pre]:!m-0 [&>pre]:!p-3 [&_.line]:!pl-0 [&_.line::before]:!hidden"
+										className="[&>pre]:!bg-transparent [&>pre]:!m-0 [&>pre]:!p-3 [&_.line]:!pl-0 [&_.line::before]:!hidden text-[11px] leading-relaxed"
 									/>
 								</div>
 							</section>

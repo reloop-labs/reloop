@@ -60,15 +60,11 @@ export async function listLogsController(
 		}
 
 		if (query.start_date) {
-			conditions.push(
-				`created_at >= '${toClickHouseDate(query.start_date)}'`,
-			);
+			conditions.push(`created_at >= '${toClickHouseDate(query.start_date)}'`);
 		}
 
 		if (query.end_date) {
-			conditions.push(
-				`created_at <= '${toClickHouseDate(query.end_date)}'`,
-			);
+			conditions.push(`created_at <= '${toClickHouseDate(query.end_date)}'`);
 		}
 
 		const whereClause =

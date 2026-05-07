@@ -38,7 +38,9 @@ export const LanguageTabs = ({
 	onValueChange,
 }: LanguageTabsProps) => {
 	const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
-	const [selectedLang, setSelectedLang] = useState<string>(value ?? defaultValue);
+	const [selectedLang, setSelectedLang] = useState<string>(
+		value ?? defaultValue,
+	);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 
 	// Keep internal state in sync with controlled value
@@ -57,7 +59,10 @@ export const LanguageTabs = ({
 	};
 
 	return (
-		<TabMenuHorizontal.Root defaultValue={defaultValue} value={value ?? selectedLang}>
+		<TabMenuHorizontal.Root
+			defaultValue={defaultValue}
+			value={value ?? selectedLang}
+		>
 			<TabMenuHorizontal.List className="relative h-10 gap-0 border-b! px-3 py-0">
 				{languages.map((lang, index) => (
 					<TabMenuHorizontal.Trigger

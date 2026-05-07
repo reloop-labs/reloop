@@ -10,7 +10,6 @@ import { useSWRConfig } from "swr";
 import { type WebhookFormValues, webhookSchema } from "./webhook-schema";
 
 export function useCreateWebhookForm() {
-	
 	const { activeOrganization } = useUserOrganization();
 	const { changeStatus, status } = useLoading();
 	const { mutate } = useSWRConfig();
@@ -49,7 +48,7 @@ export function useCreateWebhookForm() {
 			if (webhookId) {
 				router.push(`/webhooks/${webhookId}`);
 			} else {
-				router.push(`/webhooks`);
+				router.push("/webhooks");
 			}
 			toast.success("Webhook created successfully.");
 		} catch (error) {

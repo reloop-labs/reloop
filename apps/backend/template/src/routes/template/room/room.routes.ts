@@ -7,11 +7,11 @@ import { listRoomsRoute } from "./list-rooms/list-rooms.route";
 import { saveRoomRoute } from "./save-room/save-room.route";
 
 export const roomRoutes = new Elysia({
-  name: "RoomRoutes",
+	name: "RoomRoutes",
 })
-  .use(listRoomsRoute)
-  .use(getRoomRoute)
-  .use(saveRoomRoute)
-  .use(exportRoomRoute)
-  .use(listDocsRoute)
-  .use(deleteDocRoute);
+	.use(listRoomsRoute)
+	.use(getRoomRoute)
+	.use(saveRoomRoute)
+	.use(exportRoomRoute)
+	.use(listDocsRoute)
+	.use(deleteDocRoute);

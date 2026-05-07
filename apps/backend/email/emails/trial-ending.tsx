@@ -43,7 +43,8 @@ export const TrialEndingEmail = ({
 		body: isDark
 			? "m-0 p-0 bg-[#0e0e0e] text-white font-sans"
 			: "m-0 p-0 bg-white text-[#0e0e0e] font-sans",
-		label: "m-0 font-mono font-medium text-[#707070] text-[12px] uppercase tracking-[0.2em]",
+		label:
+			"m-0 font-mono font-medium text-[#707070] text-[12px] uppercase tracking-[0.2em]",
 		heading: isDark
 			? "mt-6 mb-8 p-0 font-normal text-[32px] text-white leading-[1.2]"
 			: "mt-6 mb-8 p-0 font-normal text-[32px] text-[#0e0e0e] leading-[1.2]",
@@ -96,7 +97,9 @@ export const TrialEndingEmail = ({
 							style={{ fontFamily: "Georgia, serif" }}
 						>
 							Your trial ends{" "}
-							<span className={cls.headingMuted}>in {daysLeft} day{daysLeft !== 1 ? "s" : ""}.</span>
+							<span className={cls.headingMuted}>
+								in {daysLeft} day{daysLeft !== 1 ? "s" : ""}.
+							</span>
 						</Heading>
 
 						<Hr className={cls.hr} />
@@ -122,7 +125,9 @@ export const TrialEndingEmail = ({
 
 						{/* What you'll lose */}
 						<Section className={cls.capBox}>
-							<Text className={cls.label}>What you&apos;ll lose after trial</Text>
+							<Text className={cls.label}>
+								What you&apos;ll lose after trial
+							</Text>
 
 							<table
 								width="100%"
@@ -143,8 +148,8 @@ export const TrialEndingEmail = ({
 									>
 										<Text className={cls.rowTitle}>Higher Sending Volume</Text>
 										<Text className={cls.rowDesc}>
-											Free plan is limited to 500 emails/month. Paid plans
-											start at 10,000.
+											Free plan is limited to 500 emails/month. Paid plans start
+											at 10,000.
 										</Text>
 									</td>
 								</tr>

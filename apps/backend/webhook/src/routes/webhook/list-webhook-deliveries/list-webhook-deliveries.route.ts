@@ -4,29 +4,29 @@ import { Elysia, t } from "elysia";
 import { listWebhookDeliveriesController } from "./list-webhook-deliveries.controllers";
 
 export const listWebhookDeliveriesRoute = new Elysia().use(authMiddleware).get(
-  "/:webhook_id/deliveries",
-  async ({ params: { webhook_id }, query, activeOrganizationId }) => {
-    return await listWebhookDeliveriesController({
-      webhookId: webhook_id,
-      organizationId: activeOrganizationId,
-      query: query as WebhookModel.WebhookDeliveryQuery,
-    });
-  },
-  {
-    auth: true,
-    params: t.Object({
-      webhook_id: WebhookModel.webhookIdParam,
-    }),
-    query: WebhookModel.webhookDeliveryQuery,
-    response: {
-      200: WebhookModel.webhookDeliveryListResponse,
-      401: WebhookModel.unauthorized,
-    },
-    detail: {
-      tags: ["Webhooks"],
-      summary: "List webhook deliveries",
-      description:
-        "Fetches a paginated list of delivery attempts for a specific webhook",
-    },
-  },
+	"/:webhook_id/deliveries",
+	async ({ params: { webhook_id }, query, activeOrganizationId }) => {
+		return await listWebhookDeliveriesController({
+			webhookId: webhook_id,
+			organizationId: activeOrganizationId,
+			query: query as WebhookModel.WebhookDeliveryQuery,
+		});
+	},
+	{
+		auth: true,
+		params: t.Object({
+			webhook_id: WebhookModel.webhookIdParam,
+		}),
+		query: WebhookModel.webhookDeliveryQuery,
+		response: {
+			200: WebhookModel.webhookDeliveryListResponse,
+			401: WebhookModel.unauthorized,
+		},
+		detail: {
+			tags: ["Webhooks"],
+			summary: "List webhook deliveries",
+			description:
+				"Fetches a paginated list of delivery attempts for a specific webhook",
+		},
+	},
 );

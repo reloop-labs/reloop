@@ -7,11 +7,36 @@ import * as Popover from "@reloop/ui/popover";
 import { useState } from "react";
 
 const LOG_LEVELS = [
-	{ value: "debug", label: "Debug", color: "text-text-sub-600", bgColor: "bg-neutral-alpha-10" },
-	{ value: "info", label: "Info", color: "text-primary-base", bgColor: "bg-primary-alpha-10" },
-	{ value: "warn", label: "Warning", color: "text-warning-base", bgColor: "bg-warning-alpha-10" },
-	{ value: "error", label: "Error", color: "text-error-base", bgColor: "bg-error-alpha-10" },
-	{ value: "fatal", label: "Fatal", color: "text-error-base", bgColor: "bg-error-alpha-10" },
+	{
+		value: "debug",
+		label: "Debug",
+		color: "text-text-sub-600",
+		bgColor: "bg-neutral-alpha-10",
+	},
+	{
+		value: "info",
+		label: "Info",
+		color: "text-primary-base",
+		bgColor: "bg-primary-alpha-10",
+	},
+	{
+		value: "warn",
+		label: "Warning",
+		color: "text-warning-base",
+		bgColor: "bg-warning-alpha-10",
+	},
+	{
+		value: "error",
+		label: "Error",
+		color: "text-error-base",
+		bgColor: "bg-error-alpha-10",
+	},
+	{
+		value: "fatal",
+		label: "Fatal",
+		color: "text-error-base",
+		bgColor: "bg-error-alpha-10",
+	},
 ] as const;
 
 interface LevelFilterProps {
@@ -107,7 +132,7 @@ export const LevelFilter = ({
 							<button
 								type="button"
 								onClick={handleClear}
-								className="flex items-center gap-2 rounded-lg px-3 py-2 text-left text-paragraph-sm text-error-base transition-colors hover:bg-error-alpha-10"
+								className="flex items-center gap-2 rounded-lg px-3 py-2 text-left text-error-base text-paragraph-sm transition-colors hover:bg-error-alpha-10"
 							>
 								<Icon name="cross" className="h-4 w-4" />
 								Clear filter

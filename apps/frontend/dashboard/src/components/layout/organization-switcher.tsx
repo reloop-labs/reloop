@@ -255,12 +255,13 @@ const OrganizationList: React.FC<OrganizationListProps> = ({
 								{organization.name}
 							</p>
 						</div>
-						{activeOrganization && organization.id === activeOrganization.id && (
-							<Icon
-								name="check"
-								className="h-4 w-4 flex-shrink-0 text-text-strong-950"
-							/>
-						)}
+						{activeOrganization &&
+							organization.id === activeOrganization.id && (
+								<Icon
+									name="check"
+									className="h-4 w-4 flex-shrink-0 text-text-strong-950"
+								/>
+							)}
 					</button>
 				))}
 

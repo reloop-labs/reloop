@@ -28,11 +28,20 @@ export const OnBoardingContent = () => {
 		parseAsString.withDefault(""),
 	);
 	const [logoUrl] = useQueryState("logoUrl", parseAsString.withDefault(""));
-	const [domain, setDomain] = useQueryState("domain", parseAsString.withDefault(""));
-	const [domainId, setDomainId] = useQueryState("domainId", parseAsString.withDefault(""));
+	const [domain, setDomain] = useQueryState(
+		"domain",
+		parseAsString.withDefault(""),
+	);
+	const [domainId, setDomainId] = useQueryState(
+		"domainId",
+		parseAsString.withDefault(""),
+	);
 	const [, setApiKey] = useQueryState("apiKey", parseAsString.withDefault(""));
 	const [, setLang] = useQueryState("lang", parseAsString.withDefault(""));
-	const [skippedDns, setSkippedDns] = useQueryState("skippedDns", parseAsString.withDefault(""));
+	const [skippedDns, setSkippedDns] = useQueryState(
+		"skippedDns",
+		parseAsString.withDefault(""),
+	);
 
 	useEffect(() => {
 		if (!isPending && !session) {

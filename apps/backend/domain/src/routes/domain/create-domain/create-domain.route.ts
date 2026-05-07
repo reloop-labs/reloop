@@ -6,49 +6,59 @@ import { createDomainController } from "./create-domain.controllers";
 import { createDomainXCodeSamples } from "./create-domain.x-codeSamples";
 
 export const createDomainRoute = new Elysia().use(authMiddleware).post(
-  "/create",
-  async ({ body, activeOrganizationId, userId, logger, request: { headers }, path, request }) => {
-    try {
-      const cookie = headers.get("cookie") || undefined;
-      return await createDomainController({
-        organizationId: activeOrganizationId,
-        domain: body.domain,
-        customReturnPath: body.customReturnPath,
-        clickTracking: body.clickTracking,
-        openTracking: body.openTracking,
-        tls: body.tls,
-        sendingEmail: body.sendingEmail,
-        receivingEmail: body.receivingEmail,
-        userId,
-        logger,
-        cookie,
-        requestDetails: {
-          endpoint: path,
-          method: request.method,
-          userAgent: headers.get("user-agent") || undefined,
-          ipAddress: (headers.get("x-forwarded-for") as string) || (headers.get("x-real-ip") as string),
-        },
-      });
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      domainErrorResponse(errorMessage);
-    }
-  },
-  {
-    auth: true,
-    body: DomainModel.createDomainBody,
-    response: {
-      201: DomainModel.domainResponse,
-      409: DomainModel.domainAlreadyExists,
-      400: DomainModel.invalidDomain,
-      403: DomainModel.unauthorized,
-    },
-    detail: {
-      tags: ["Domains"],
-      summary: "Create Domain",
-      description: "Creates a new domain",
-      "x-codeSamples": createDomainXCodeSamples,
-    },
-  },
+	"/create",
+	async ({
+		body,
+		activeOrganizationId,
+		userId,
+		logger,
+		request: { headers },
+		path,
+		request,
+	}) => {
+		try {
+			const cookie = headers.get("cookie") || undefined;
+			return await createDomainController({
+				organizationId: activeOrganizationId,
+				domain: body.domain,
+				customReturnPath: body.customReturnPath,
+				clickTracking: body.clickTracking,
+				openTracking: body.openTracking,
+				tls: body.tls,
+				sendingEmail: body.sendingEmail,
+				receivingEmail: body.receivingEmail,
+				userId,
+				logger,
+				cookie,
+				requestDetails: {
+					endpoint: path,
+					method: request.method,
+					userAgent: headers.get("user-agent") || undefined,
+					ipAddress:
+						(headers.get("x-forwarded-for") as string) ||
+						(headers.get("x-real-ip") as string),
+				},
+			});
+		} catch (error) {
+			const errorMessage =
+				error instanceof Error ? error.message : String(error);
+			domainErrorResponse(errorMessage);
+		}
+	},
+	{
+		auth: true,
+		body: DomainModel.createDomainBody,
+		response: {
+			201: DomainModel.domainResponse,
+			409: DomainModel.domainAlreadyExists,
+			400: DomainModel.invalidDomain,
+			403: DomainModel.unauthorized,
+		},
+		detail: {
+			tags: ["Domains"],
+			summary: "Create Domain",
+			description: "Creates a new domain",
+			"x-codeSamples": createDomainXCodeSamples,
+		},
+	},
 );

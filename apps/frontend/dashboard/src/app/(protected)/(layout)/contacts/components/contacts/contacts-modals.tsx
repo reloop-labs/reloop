@@ -2,19 +2,19 @@
 import type { AudienceStatus } from "@fe/dashboard/utils/audience";
 import { useQueryState } from "nuqs";
 import useSWR from "swr";
-import { AddContactModal } from "./add-contact-modal";
-import { AddContactToGroupModal } from "./add-contact-to-group";
-import { AddContactToChannelModal } from "./add-contact-to-channel-modal";
-import { AddPropertyModal } from "../properties/add-property-modal";
-import { CreateGroupModal } from "../groups/create-group-modal";
 import { CreateChannelModal } from "../channels/create-channel-modal";
-import { DeleteContactModal } from "./delete-contact-modal";
-import { DeleteGroupModal } from "../groups/delete-group";
-import { DeletePropertyModal } from "../properties/delete-property-modal";
 import { DeleteChannelModal } from "../channels/delete-channel";
-import { EditContactModal } from "./edit-contact-modal";
-import { EditPropertyModal } from "../properties/edit-property-modal";
 import { EditChannelModal } from "../channels/edit-channel-modal";
+import { CreateGroupModal } from "../groups/create-group-modal";
+import { DeleteGroupModal } from "../groups/delete-group";
+import { AddPropertyModal } from "../properties/add-property-modal";
+import { DeletePropertyModal } from "../properties/delete-property-modal";
+import { EditPropertyModal } from "../properties/edit-property-modal";
+import { AddContactModal } from "./add-contact-modal";
+import { AddContactToChannelModal } from "./add-contact-to-channel-modal";
+import { AddContactToGroupModal } from "./add-contact-to-group";
+import { DeleteContactModal } from "./delete-contact-modal";
+import { EditContactModal } from "./edit-contact-modal";
 
 interface Contact {
 	id: string;

@@ -5,7 +5,9 @@ export namespace WebhookModel {
 	const urlPattern = /^https?:\/\/.+/;
 	const maskedSecretExample = "***masked***";
 	const eventIds = WEBHOOK_EVENTS.map((event) => event.id);
-	const eventRegex = new RegExp(`^(${eventIds.join("|").replace(/\./g, "\\.")})$`);
+	const eventRegex = new RegExp(
+		`^(${eventIds.join("|").replace(/\./g, "\\.")})$`,
+	);
 
 	export const webhookIdParam = t.String({
 		minLength: 1,
@@ -48,7 +50,10 @@ export namespace WebhookModel {
 		},
 	);
 
-	export type CreateWebhookBody = Omit<typeof createWebhookBody.static, "events"> & {
+	export type CreateWebhookBody = Omit<
+		typeof createWebhookBody.static,
+		"events"
+	> & {
 		events: WebhookEventName[];
 	};
 
@@ -211,7 +216,10 @@ export namespace WebhookModel {
 		},
 	);
 
-	export type WebhookResponse = Omit<typeof webhookResponse.static, "events"> & {
+	export type WebhookResponse = Omit<
+		typeof webhookResponse.static,
+		"events"
+	> & {
 		events: WebhookEventName[];
 	};
 
@@ -283,32 +291,39 @@ export namespace WebhookModel {
 		},
 	);
 	export type DeleteWebhookResponse = typeof deleteWebhookResponse.static;
-	export const triggerWebhookBody = t.Object({
-		event: t.String({
-			pattern: eventRegex.source,
-			error: "Invalid event ID provided",
-		}),
-		payload: t.Record(t.String(), t.Any(), {
-			description: "Event payload",
-		}),
-		organizationId: t.Optional(t.String({
-			description: "Organization ID to trigger webhooks for",
-		})),
-		userId: t.Optional(t.String({
-			description: "User ID to trigger webhooks for",
-		})),
-	}, {
-		examples: [
-			{
-				event: "domain.created",
-				payload: {
-					id: "dom_123456789",
-					name: "example.com",
+	export const triggerWebhookBody = t.Object(
+		{
+			event: t.String({
+				pattern: eventRegex.source,
+				error: "Invalid event ID provided",
+			}),
+			payload: t.Record(t.String(), t.Any(), {
+				description: "Event payload",
+			}),
+			organizationId: t.Optional(
+				t.String({
+					description: "Organization ID to trigger webhooks for",
+				}),
+			),
+			userId: t.Optional(
+				t.String({
+					description: "User ID to trigger webhooks for",
+				}),
+			),
+		},
+		{
+			examples: [
+				{
+					event: "domain.created",
+					payload: {
+						id: "dom_123456789",
+						name: "example.com",
+					},
+					organizationId: "org_123456789",
 				},
-				organizationId: "org_123456789",
-			},
-		],
-	});
+			],
+		},
+	);
 
 	export type TriggerWebhookBody = typeof triggerWebhookBody.static;
 
@@ -322,15 +337,20 @@ export namespace WebhookModel {
 	export const webhookDeliveryResponse = t.Object({
 		id: t.String({ description: "Unique delivery identifier" }),
 		webhookId: t.String({ description: "Webhook identifier" }),
-		webhookEventId: t.Union([t.String(), t.Null()], { description: "Event identifier" }),
+		webhookEventId: t.Union([t.String(), t.Null()], {
+			description: "Event identifier",
+		}),
 		eventType: t.String({ description: "Event type" }),
 		eventData: t.Record(t.String(), t.Any(), { description: "Event payload" }),
-		status: t.Union([
-			t.Literal("pending"),
-			t.Literal("success"),
-			t.Literal("failed"),
-			t.Literal("retrying"),
-		], { description: "Delivery status" }),
+		status: t.Union(
+			[
+				t.Literal("pending"),
+				t.Literal("success"),
+				t.Literal("failed"),
+				t.Literal("retrying"),
+			],
+			{ description: "Delivery status" },
+		),
 		requestUrl: t.String({ description: "Request URL" }),
 		requestHeaders: t.Union([t.Record(t.String(), t.String()), t.Null()]),
 		requestBody: t.Union([t.Record(t.String(), t.Any()), t.Null()]),
@@ -357,7 +377,8 @@ export namespace WebhookModel {
 		limit: t.Number(),
 	});
 
-	export type WebhookDeliveryListResponse = typeof webhookDeliveryListResponse.static;
+	export type WebhookDeliveryListResponse =
+		typeof webhookDeliveryListResponse.static;
 
 	export const webhookDeliveryQuery = t.Object({
 		page: t.Optional(t.Numeric({ minimum: 1, default: 1 })),

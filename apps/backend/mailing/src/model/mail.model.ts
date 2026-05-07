@@ -91,10 +91,15 @@ export namespace MailModel {
 			),
 		),
 		template: t.Optional(
-			t.Object({
-				id: t.String({ description: "Template alias or ID" }),
-				variables: t.Optional(t.Record(t.String(), t.Union([t.String(), t.Number()]))),
-			}, { description: "Email template to use" }),
+			t.Object(
+				{
+					id: t.String({ description: "Template alias or ID" }),
+					variables: t.Optional(
+						t.Record(t.String(), t.Union([t.String(), t.Number()])),
+					),
+				},
+				{ description: "Email template to use" },
+			),
 		),
 	});
 

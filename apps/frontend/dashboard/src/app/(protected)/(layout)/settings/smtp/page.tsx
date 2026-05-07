@@ -145,7 +145,7 @@ const SMTPPage = () => {
 							) : (
 								<>
 									Save Changes
-									<span className="inline-flex items-center gap-0.5 ml-2">
+									<span className="ml-2 inline-flex items-center gap-0.5">
 										<Icon
 											name="command"
 											className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"

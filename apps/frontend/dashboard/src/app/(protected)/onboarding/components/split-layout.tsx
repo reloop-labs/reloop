@@ -4,13 +4,13 @@ import NumberFlow from "@number-flow/react";
 import { cn } from "@reloop/ui/cn";
 import { KbdEsc } from "@reloop/ui/kbd-esc";
 import { Logo } from "@reloop/ui/logo";
+import { Calligraph } from "calligraph";
 import type { Variants } from "motion/react";
 import { AnimatePresence, motion } from "motion/react";
 import { parseAsInteger, useQueryState } from "nuqs";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { Calligraph } from "calligraph";
 
 // Smoothly animates height changes using a ResizeObserver + CSS transition.
 // Deliberately avoids Framer Motion layout so it can't conflict with slide animations.
@@ -192,7 +192,8 @@ export const SplitLayout = ({
 							: previewSize === "small"
 								? "1.2fr 0.8fr"
 								: "1fr 1fr",
-						transition: "grid-template-columns 0.45s cubic-bezier(0.4, 0, 0.2, 1)",
+						transition:
+							"grid-template-columns 0.45s cubic-bezier(0.4, 0, 0.2, 1)",
 					}}
 				>
 					<div className="flex flex-col gap-4 overflow-hidden px-12 pt-9 pb-9">
@@ -228,8 +229,20 @@ export const SplitLayout = ({
 													transition={transition}
 												/>
 												{/* Chevron */}
-												<svg width={6} height={10} viewBox="0 0 6 10" fill="none" className="absolute left-0">
-													<path d="M5 1L1.5 5L5 9" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+												<svg
+													width={6}
+													height={10}
+													viewBox="0 0 6 10"
+													fill="none"
+													className="absolute left-0"
+												>
+													<path
+														d="M5 1L1.5 5L5 9"
+														stroke="currentColor"
+														strokeWidth={1.5}
+														strokeLinecap="round"
+														strokeLinejoin="round"
+													/>
 												</svg>
 											</div>
 										</motion.span>
@@ -238,9 +251,17 @@ export const SplitLayout = ({
 								{currentStep !== null && totalSteps !== null ? (
 									<span className="mr-2 ml-px inline-flex items-center gap-1">
 										Step
-										<NumberFlow value={currentStep} className="tabular-nums" transformTiming={{ duration: 400, easing: "ease-out" }} />
+										<NumberFlow
+											value={currentStep}
+											className="tabular-nums"
+											transformTiming={{ duration: 400, easing: "ease-out" }}
+										/>
 										of
-										<NumberFlow value={totalSteps} className="tabular-nums" transformTiming={{ duration: 400, easing: "ease-out" }} />
+										<NumberFlow
+											value={totalSteps}
+											className="tabular-nums"
+											transformTiming={{ duration: 400, easing: "ease-out" }}
+										/>
 									</span>
 								) : (
 									stepIndicator

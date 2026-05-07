@@ -118,7 +118,8 @@ export const landing = new Elysia()
 					lastName: { type: "string", description: "Contact last name" },
 					status: {
 						type: "string",
-						description: "Subscription status (subscribed, unsubscribed, blocked)",
+						description:
+							"Subscription status (subscribed, unsubscribed, blocked)",
 					},
 					properties: {
 						type: "object",
@@ -130,8 +131,8 @@ export const landing = new Elysia()
 					email: { type: "string", description: "Contact email" },
 				},
 				errorCodes: [
-					{ "status": 409, "meaning": "Contact already exists" },
-					{ "status": 400, "meaning": "Invalid input data" },
+					{ status: 409, meaning: "Contact already exists" },
+					{ status: 400, meaning: "Invalid input data" },
 				],
 				examples: [],
 			},
@@ -154,7 +155,7 @@ export const landing = new Elysia()
 					id: { type: "string", description: "Contact ID" },
 					email: { type: "string", description: "Contact email" },
 				},
-				errorCodes: [{ "status": 404, "meaning": "Contact not found" }],
+				errorCodes: [{ status: 404, meaning: "Contact not found" }],
 				examples: [],
 			},
 			{
@@ -203,7 +204,7 @@ export const landing = new Elysia()
 				outputSchema: {
 					id: { type: "string", description: "Updated contact ID" },
 				},
-				errorCodes: [{ "status": 404, "meaning": "Contact not found" }],
+				errorCodes: [{ status: 404, meaning: "Contact not found" }],
 				examples: [],
 			},
 			{
@@ -222,9 +223,12 @@ export const landing = new Elysia()
 					},
 				},
 				outputSchema: {
-					success: { type: "boolean", description: "True if deletion succeeded" },
+					success: {
+						type: "boolean",
+						description: "True if deletion succeeded",
+					},
 				},
-				errorCodes: [{ "status": 404, "meaning": "Contact not found" }],
+				errorCodes: [{ status: 404, meaning: "Contact not found" }],
 				examples: [],
 			},
 		],

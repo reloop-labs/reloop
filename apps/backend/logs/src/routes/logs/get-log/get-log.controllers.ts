@@ -47,7 +47,8 @@ export async function getLogController(
 		}
 
 		const metadata = safeJsonParse(row.metadata, {}) as any;
-		const emailId = metadata.emailId || metadata.email_id || metadata.email_log_id;
+		const emailId =
+			metadata.emailId || metadata.email_id || metadata.email_log_id;
 		let emailDetails = null;
 
 		if (emailId && typeof emailId === "string" && row.organization_id) {

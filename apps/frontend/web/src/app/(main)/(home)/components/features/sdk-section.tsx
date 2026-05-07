@@ -16,7 +16,11 @@ const sdkData: FeatureData = {
 	cards: [],
 };
 
-export function SDKSection({ index, forwardRef, isLast }: Omit<FeatureSectionProps, "feature">) {
+export function SDKSection({
+	index,
+	forwardRef,
+	isLast,
+}: Omit<FeatureSectionProps, "feature">) {
 	return (
 		<FeatureSection
 			feature={sdkData}

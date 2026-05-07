@@ -6,51 +6,51 @@ import { status } from "elysia";
 import { verifyToken } from "../token.utils";
 
 export async function unsubscribeAllController({
-  token,
-  logger,
+	token,
+	logger,
 }: {
-  token: string;
-  logger: Logger;
+	token: string;
+	logger: Logger;
 }) {
-  logger.info("Processing unsubscribe all request");
+	logger.info("Processing unsubscribe all request");
 
-  const payload = await verifyToken(token);
-  if (!payload) {
-    throw status(401, { message: "Invalid or expired preferences token" });
-  }
+	const payload = await verifyToken(token);
+	if (!payload) {
+		throw status(401, { message: "Invalid or expired preferences token" });
+	}
 
-  const { contactId, organizationId } = payload;
+	const { contactId, organizationId } = payload;
 
-  // Get all active enrollments for this contact in this org
-  const enrollments = await db.query.channelSubscription.findMany({
-    where: and(
-      eq(schema.channelSubscription.contactId, contactId),
-      eq(schema.channelSubscription.organizationId, organizationId),
-      isNull(schema.channelSubscription.deletedAt),
-    ),
-  });
+	// Get all active enrollments for this contact in this org
+	const enrollments = await db.query.channelSubscription.findMany({
+		where: and(
+			eq(schema.channelSubscription.contactId, contactId),
+			eq(schema.channelSubscription.organizationId, organizationId),
+			isNull(schema.channelSubscription.deletedAt),
+		),
+	});
 
-  // Batch update all to unenrolled
-  if (enrollments.length > 0) {
-    await db
-      .update(schema.channelSubscription)
-      .set({ status: "unenrolled", updatedAt: new Date() })
-      .where(
-        and(
-          eq(schema.channelSubscription.contactId, contactId),
-          eq(schema.channelSubscription.organizationId, organizationId),
-          isNull(schema.channelSubscription.deletedAt),
-        ),
-      );
-  }
+	// Batch update all to unenrolled
+	if (enrollments.length > 0) {
+		await db
+			.update(schema.channelSubscription)
+			.set({ status: "unenrolled", updatedAt: new Date() })
+			.where(
+				and(
+					eq(schema.channelSubscription.contactId, contactId),
+					eq(schema.channelSubscription.organizationId, organizationId),
+					isNull(schema.channelSubscription.deletedAt),
+				),
+			);
+	}
 
-  logger.info(
-    { contactId, updatedCount: enrollments.length },
-    "Unsubscribed from all channels",
-  );
+	logger.info(
+		{ contactId, updatedCount: enrollments.length },
+		"Unsubscribed from all channels",
+	);
 
-  return {
-    success: true,
-    updatedCount: enrollments.length,
-  };
+	return {
+		success: true,
+		updatedCount: enrollments.length,
+	};
 }

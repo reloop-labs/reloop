@@ -1,11 +1,11 @@
 import "dotenv/config";
 import { contactsConfig } from "@be/contacts/contacts.config";
+import { channelRoutes } from "@be/contacts/routes/channel/channel.routes";
 import { contactRoutes } from "@be/contacts/routes/contact/contact.routes";
 import { groupRoutes } from "@be/contacts/routes/group/group.routes";
 import { landing } from "@be/contacts/routes/landing/landing.index";
 import { preferencesRoutes } from "@be/contacts/routes/preferences/preferences.route";
 import { propertyRoutes } from "@be/contacts/routes/property/property.routes";
-import { channelRoutes } from "@be/contacts/routes/channel/channel.routes";
 
 import { loader } from "@be/contacts/utils/loader";
 import { openapi } from "@elysiajs/openapi";

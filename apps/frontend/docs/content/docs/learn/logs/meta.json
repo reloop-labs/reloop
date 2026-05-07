@@ -1,7 +1,5 @@
 {
 	"title": "Logs",
 	"icon": "List",
-	"pages": [
-		"index"
-	]
+	"pages": ["index"]
 }

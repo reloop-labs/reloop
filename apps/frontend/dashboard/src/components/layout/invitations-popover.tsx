@@ -187,7 +187,10 @@ export const InvitationsPopover = () => {
 													<div
 														className={cn(
 															"flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl font-bold text-sm text-white uppercase shadow-sm ring-2 ring-white dark:ring-[#0a0a0a]",
-															getAvatarGradient(invite.organizationName || invite.organizationId),
+															getAvatarGradient(
+																invite.organizationName ||
+																	invite.organizationId,
+															),
 														)}
 													>
 														{getAvatarInitial(

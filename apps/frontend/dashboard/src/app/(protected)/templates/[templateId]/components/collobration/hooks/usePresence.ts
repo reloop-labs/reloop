@@ -6,13 +6,13 @@ import type { Awareness } from "y-protocols/awareness";
 // ── Types ──────────────────────────────────────────────────────────────────
 
 export interface PresenceUser {
-  /** Yjs client id */
-  clientId: number;
-  name: string;
-  color: string;
-  avatar?: string;
-  /** Any extra fields callers set via awareness.setLocalStateField */
-  [key: string]: unknown;
+	/** Yjs client id */
+	clientId: number;
+	name: string;
+	color: string;
+	avatar?: string;
+	/** Any extra fields callers set via awareness.setLocalStateField */
+	[key: string]: unknown;
 }
 
 type AwarenessState = Map<number, { user?: Omit<PresenceUser, "clientId"> }>;
@@ -23,42 +23,43 @@ type Selector<T> = (state: AwarenessState) => T | null;
 // ── Internal helpers ────────────────────────────────────────────────────────
 
 function statesFromAwareness(awareness: Awareness): AwarenessState {
-  return awareness.getStates() as AwarenessState;
+	return awareness.getStates() as AwarenessState;
 }
 
 function useSyncedState<T>(
-  awareness: Awareness | null,
-  selector: Selector<T>,
-  equalityFn: (a: T, b: T) => boolean = Object.is,
+	awareness: Awareness | null,
+	selector: Selector<T>,
+	equalityFn: (a: T, b: T) => boolean = Object.is,
 ): T | null {
-  const selectorRef = useRef(selector);
-  const equalityRef = useRef(equalityFn);
-  selectorRef.current = selector;
-  equalityRef.current = equalityFn;
+	const selectorRef = useRef(selector);
+	const equalityRef = useRef(equalityFn);
+	selectorRef.current = selector;
+	equalityRef.current = equalityFn;
 
-  const [value, setValue] = useState<T | null>(() =>
-    awareness ? selectorRef.current(statesFromAwareness(awareness)) : null,
-  );
+	const [value, setValue] = useState<T | null>(() =>
+		awareness ? selectorRef.current(statesFromAwareness(awareness)) : null,
+	);
 
-  useEffect(() => {
-    if (!awareness) return;
+	useEffect(() => {
+		if (!awareness) return;
 
-    // Always re-evaluate immediately when awareness changes
-    setValue(selectorRef.current(statesFromAwareness(awareness)));
+		// Always re-evaluate immediately when awareness changes
+		setValue(selectorRef.current(statesFromAwareness(awareness)));
 
-    const handler = () => {
-      const next = selectorRef.current(statesFromAwareness(awareness));
-      setValue((prev) => {
-        if (prev !== null && next !== null && equalityRef.current(prev, next)) return prev;
-        return next;
-      });
-    };
+		const handler = () => {
+			const next = selectorRef.current(statesFromAwareness(awareness));
+			setValue((prev) => {
+				if (prev !== null && next !== null && equalityRef.current(prev, next))
+					return prev;
+				return next;
+			});
+		};
 
-    awareness.on("change", handler);
-    return () => awareness.off("change", handler);
-  }, [awareness]);
+		awareness.on("change", handler);
+		return () => awareness.off("change", handler);
+	}, [awareness]);
 
-  return value;
+	return value;
 }
 
 // ── Public hooks ────────────────────────────────────────────────────────────
@@ -76,32 +77,38 @@ function useSyncedState<T>(
  */
 export function useUsers(awareness: Awareness | null): PresenceUser[];
 export function useUsers<T>(
-  awareness: Awareness | null,
-  selector: (users: PresenceUser[]) => T,
-  equalityFn?: (a: T, b: T) => boolean,
+	awareness: Awareness | null,
+	selector: (users: PresenceUser[]) => T,
+	equalityFn?: (a: T, b: T) => boolean,
 ): T | null;
 export function useUsers<T = PresenceUser[]>(
-  awareness: Awareness | null,
-  selector?: (users: PresenceUser[]) => T,
-  equalityFn?: (a: T, b: T) => boolean,
+	awareness: Awareness | null,
+	selector?: (users: PresenceUser[]) => T,
+	equalityFn?: (a: T, b: T) => boolean,
 ): T | PresenceUser[] | null {
-  const toUsers = useCallback(
-    (state: AwarenessState): PresenceUser[] =>
-      Array.from(state.entries())
-        .filter(([, s]) => s.user)
-        .map(([clientId, s]) => ({ clientId, ...(s.user as object) } as PresenceUser)),
-    [],
-  );
+	const toUsers = useCallback(
+		(state: AwarenessState): PresenceUser[] =>
+			Array.from(state.entries())
+				.filter(([, s]) => s.user)
+				.map(
+					([clientId, s]) =>
+						({ clientId, ...(s.user as object) }) as PresenceUser,
+				),
+		[],
+	);
 
-  const mapSelector = useCallback(
-    (state: AwarenessState) => {
-      const users = toUsers(state);
-      return selector ? selector(users) : (users as unknown as T);
-    },
-    [selector, toUsers],
-  );
+	const mapSelector = useCallback(
+		(state: AwarenessState) => {
+			const users = toUsers(state);
+			return selector ? selector(users) : (users as unknown as T);
+		},
+		[selector, toUsers],
+	);
 
-  return useSyncedState(awareness, mapSelector, equalityFn) as T | PresenceUser[] | null;
+	return useSyncedState(awareness, mapSelector, equalityFn) as
+		| T
+		| PresenceUser[]
+		| null;
 }
 
 /**
@@ -115,29 +122,35 @@ export function useUsers<T = PresenceUser[]>(
  */
 export function useSelf(awareness: Awareness | null): PresenceUser | null;
 export function useSelf<T>(
-  awareness: Awareness | null,
-  selector: (self: PresenceUser | null) => T,
-  equalityFn?: (a: T, b: T) => boolean,
+	awareness: Awareness | null,
+	selector: (self: PresenceUser | null) => T,
+	equalityFn?: (a: T, b: T) => boolean,
 ): T | null;
 export function useSelf<T = PresenceUser | null>(
-  awareness: Awareness | null,
-  selector?: (self: PresenceUser | null) => T,
-  equalityFn?: (a: T, b: T) => boolean,
+	awareness: Awareness | null,
+	selector?: (self: PresenceUser | null) => T,
+	equalityFn?: (a: T, b: T) => boolean,
 ): T | PresenceUser | null {
-  const mapSelector = useCallback(
-    (state: AwarenessState) => {
-      if (!awareness) return null;
-      const entry = state.get(awareness.clientID);
-      const self = entry?.user
-        ? ({ clientId: awareness.clientID, ...(entry.user as object) } as PresenceUser)
-        : null;
-      return selector ? selector(self) : (self as unknown as T);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [awareness?.clientID, selector],
-  );
+	const mapSelector = useCallback(
+		(state: AwarenessState) => {
+			if (!awareness) return null;
+			const entry = state.get(awareness.clientID);
+			const self = entry?.user
+				? ({
+						clientId: awareness.clientID,
+						...(entry.user as object),
+					} as PresenceUser)
+				: null;
+			return selector ? selector(self) : (self as unknown as T);
+		},
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[awareness?.clientID, selector],
+	);
 
-  return useSyncedState(awareness, mapSelector, equalityFn) as T | PresenceUser | null;
+	return useSyncedState(awareness, mapSelector, equalityFn) as
+		| T
+		| PresenceUser
+		| null;
 }
 
 /**
@@ -149,26 +162,32 @@ export function useSelf<T = PresenceUser | null>(
  */
 export function useOthers(awareness: Awareness | null): PresenceUser[];
 export function useOthers<T>(
-  awareness: Awareness | null,
-  selector: (others: PresenceUser[]) => T,
-  equalityFn?: (a: T, b: T) => boolean,
+	awareness: Awareness | null,
+	selector: (others: PresenceUser[]) => T,
+	equalityFn?: (a: T, b: T) => boolean,
 ): T | null;
 export function useOthers<T = PresenceUser[]>(
-  awareness: Awareness | null,
-  selector?: (others: PresenceUser[]) => T,
-  equalityFn?: (a: T, b: T) => boolean,
+	awareness: Awareness | null,
+	selector?: (others: PresenceUser[]) => T,
+	equalityFn?: (a: T, b: T) => boolean,
 ): T | PresenceUser[] | null {
-  const mapSelector = useCallback(
-    (state: AwarenessState): T => {
-      const selfId = awareness?.clientID;
-      const others = Array.from(state.entries())
-        .filter(([id, s]) => id !== selfId && s.user)
-        .map(([clientId, s]) => ({ clientId, ...(s.user as object) } as PresenceUser));
-      return selector ? selector(others) : (others as unknown as T);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [awareness?.clientID, selector],
-  );
+	const mapSelector = useCallback(
+		(state: AwarenessState): T => {
+			const selfId = awareness?.clientID;
+			const others = Array.from(state.entries())
+				.filter(([id, s]) => id !== selfId && s.user)
+				.map(
+					([clientId, s]) =>
+						({ clientId, ...(s.user as object) }) as PresenceUser,
+				);
+			return selector ? selector(others) : (others as unknown as T);
+		},
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[awareness?.clientID, selector],
+	);
 
-  return useSyncedState(awareness, mapSelector, equalityFn) as T | PresenceUser[] | null;
+	return useSyncedState(awareness, mapSelector, equalityFn) as
+		| T
+		| PresenceUser[]
+		| null;
 }

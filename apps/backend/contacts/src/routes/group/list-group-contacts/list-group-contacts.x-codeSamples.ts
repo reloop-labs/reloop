@@ -1,9 +1,9 @@
 export const listGroupContactsXCodeSamples = [
-  {
-    id: "node",
-    lang: "js",
-    label: "Node.js",
-    source: `import Reloop from 'reloop-email';
+	{
+		id: "node",
+		lang: "js",
+		label: "Node.js",
+		source: `import Reloop from 'reloop-email';
 
 const reloop = new Reloop({
   url: 'https://reloop.sh',
@@ -15,19 +15,19 @@ const contacts = await reloop.audience.list({
   limit: 10,
   page: 1
 });`,
-  },
-  {
-    id: "curl",
-    lang: "bash",
-    label: "cURL",
-    source: `curl "https://reloop.sh/api/groups/v1/grp_123456789/contacts?limit=10&page=1" \\
+	},
+	{
+		id: "curl",
+		lang: "bash",
+		label: "cURL",
+		source: `curl "https://reloop.sh/api/groups/v1/grp_123456789/contacts?limit=10&page=1" \\
   -H "Authorization: Bearer re_123456789"`,
-  },
-  {
-    id: "php",
-    lang: "php",
-    label: "PHP",
-    source: `<?php
+	},
+	{
+		id: "php",
+		lang: "php",
+		label: "PHP",
+		source: `<?php
 $client = new \\GuzzleHttp\\Client();
 
 $response = $client->get('https://reloop.sh/api/groups/v1/grp_123456789/contacts', [
@@ -36,12 +36,12 @@ $response = $client->get('https://reloop.sh/api/groups/v1/grp_123456789/contacts
 ]);
 
 $contacts = json_decode($response->getBody(), true);`,
-  },
-  {
-    id: "python",
-    lang: "python",
-    label: "Python",
-    source: `import requests
+	},
+	{
+		id: "python",
+		lang: "python",
+		label: "Python",
+		source: `import requests
 
 response = requests.get(
     'https://reloop.sh/api/groups/v1/grp_123456789/contacts',
@@ -50,12 +50,12 @@ response = requests.get(
 )
 
 contacts = response.json()`,
-  },
-  {
-    id: "ruby",
-    lang: "ruby",
-    label: "Ruby",
-    source: `require 'net/http'
+	},
+	{
+		id: "ruby",
+		lang: "ruby",
+		label: "Ruby",
+		source: `require 'net/http'
 require 'json'
 
 uri = URI('https://reloop.sh/api/groups/v1/grp_123456789/contacts')
@@ -68,12 +68,12 @@ request['Authorization'] = 'Bearer re_123456789'
 
 response = http.request(request)
 contacts = JSON.parse(response.body)`,
-  },
-  {
-    id: "go",
-    lang: "go",
-    label: "Go",
-    source: `package main
+	},
+	{
+		id: "go",
+		lang: "go",
+		label: "Go",
+		source: `package main
 
 import "net/http"
 
@@ -85,12 +85,12 @@ func main() {
   resp, _ := client.Do(req)
   defer resp.Body.Close()
 }`,
-  },
-  {
-    id: "rust",
-    lang: "rust",
-    label: "Rust",
-    source: `use reqwest::Client;
+	},
+	{
+		id: "rust",
+		lang: "rust",
+		label: "Rust",
+		source: `use reqwest::Client;
 
 #[tokio::main]
 async fn main() -> Result<(), reqwest::Error> {
@@ -105,12 +105,12 @@ async fn main() -> Result<(), reqwest::Error> {
 
     Ok(())
 }`,
-  },
-  {
-    id: "java",
-    lang: "java",
-    label: "Java",
-    source: `import java.net.URI;
+	},
+	{
+		id: "java",
+		lang: "java",
+		label: "Java",
+		source: `import java.net.URI;
 import java.net.http.*;
 
 HttpClient client = HttpClient.newHttpClient();
@@ -122,12 +122,12 @@ HttpRequest request = HttpRequest.newBuilder()
     .build();
 
 HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());`,
-  },
-  {
-    id: "dotnet",
-    lang: "csharp",
-    label: ".NET",
-    source: `using System.Net.Http;
+	},
+	{
+		id: "dotnet",
+		lang: "csharp",
+		label: ".NET",
+		source: `using System.Net.Http;
 
 var client = new HttpClient();
 client.DefaultRequestHeaders.Add("Authorization", "Bearer re_123456789");
@@ -135,5 +135,5 @@ client.DefaultRequestHeaders.Add("Authorization", "Bearer re_123456789");
 var response = await client.GetAsync(
     "https://reloop.sh/api/groups/v1/grp_123456789/contacts?limit=10&page=1"
 );`,
-  },
+	},
 ];

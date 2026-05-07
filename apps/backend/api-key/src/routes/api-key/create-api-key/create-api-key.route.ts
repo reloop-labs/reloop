@@ -6,7 +6,15 @@ import { createApiKeyXCodeSamples } from "./create-api-key.x-codeSamples";
 
 export const createApiKeyRoute = new Elysia().use(authMiddleware).post(
 	"/",
-	async ({ body, activeOrganizationId, userId, logger, path, request, headers }) => {
+	async ({
+		body,
+		activeOrganizationId,
+		userId,
+		logger,
+		path,
+		request,
+		headers,
+	}) => {
 		const cookieString = headers["cookie"] || "";
 		return await createApiKeyController({
 			organizationId: activeOrganizationId,
@@ -18,7 +26,9 @@ export const createApiKeyRoute = new Elysia().use(authMiddleware).post(
 				endpoint: path,
 				method: request.method,
 				userAgent: headers["user-agent"],
-				ipAddress: (headers["x-forwarded-for"] as string) || (headers["x-real-ip"] as string),
+				ipAddress:
+					(headers["x-forwarded-for"] as string) ||
+					(headers["x-real-ip"] as string),
 			},
 		});
 	},

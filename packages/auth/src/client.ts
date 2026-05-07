@@ -19,6 +19,6 @@ export const authClient = createAuthClient({
 		organizationClient({}),
 		inferAdditionalFields<AuthInstance>({}),
 		emailOTPClient(),
-		lastLoginMethodClient()
+		lastLoginMethodClient(),
 	],
 });

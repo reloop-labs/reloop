@@ -10,49 +10,48 @@ import type { WebsocketProvider } from "y-websocket";
  * CollaborationCaret's own awareness field.
  */
 export function useMousePresence(
-  provider: WebsocketProvider,
-  containerRef: React.RefObject<HTMLDivElement | null>,
-  throttleMs = 30,
+	provider: WebsocketProvider,
+	containerRef: React.RefObject<HTMLDivElement | null>,
+	throttleMs = 30,
 ) {
-  const lastEmitRef = useRef(0);
+	const lastEmitRef = useRef(0);
 
-  useEffect(() => {
+	useEffect(() => {
+		const handleMouseMove = (e: MouseEvent) => {
+			const now = Date.now();
+			if (now - lastEmitRef.current < throttleMs) return;
+			lastEmitRef.current = now;
 
-    const handleMouseMove = (e: MouseEvent) => {
-      const now = Date.now();
-      if (now - lastEmitRef.current < throttleMs) return;
-      lastEmitRef.current = now;
+			const container = containerRef.current;
+			if (!container) return;
 
-      const container = containerRef.current;
-      if (!container) return;
+			const rect = container.getBoundingClientRect();
+			if (rect.width === 0 || rect.height === 0) return;
 
-      const rect = container.getBoundingClientRect();
-      if (rect.width === 0 || rect.height === 0) return;
+			const x = ((e.clientX - rect.left) / rect.width) * 100;
+			const y = ((e.clientY - rect.top) / rect.height) * 100;
 
-      const x = ((e.clientX - rect.left) / rect.width) * 100;
-      const y = ((e.clientY - rect.top) / rect.height) * 100;
+			if (x < 0 || y < 0 || x > 100 || y > 100) {
+				provider.awareness.setLocalStateField("mouseCursor", null);
+				return;
+			}
 
-      if (x < 0 || y < 0 || x > 100 || y > 100) {
-        provider.awareness.setLocalStateField("mouseCursor", null);
-        return;
-      }
+			provider.awareness.setLocalStateField("mouseCursor", { x, y });
+		};
 
-      provider.awareness.setLocalStateField("mouseCursor", { x, y });
-    };
+		const handleMouseLeave = (e: MouseEvent) => {
+			if (e.relatedTarget === null) {
+				provider.awareness.setLocalStateField("mouseCursor", null);
+			}
+		};
 
-    const handleMouseLeave = (e: MouseEvent) => {
-      if (e.relatedTarget === null) {
-        provider.awareness.setLocalStateField("mouseCursor", null);
-      }
-    };
+		document.addEventListener("mousemove", handleMouseMove);
+		document.addEventListener("mouseleave", handleMouseLeave);
 
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseleave", handleMouseLeave);
-
-    return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseleave", handleMouseLeave);
-      provider.awareness.setLocalStateField("mouseCursor", null);
-    };
-  }, [provider, containerRef, throttleMs]);
+		return () => {
+			document.removeEventListener("mousemove", handleMouseMove);
+			document.removeEventListener("mouseleave", handleMouseLeave);
+			provider.awareness.setLocalStateField("mouseCursor", null);
+		};
+	}, [provider, containerRef, throttleMs]);
 }

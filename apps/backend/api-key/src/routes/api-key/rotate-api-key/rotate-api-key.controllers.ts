@@ -24,7 +24,7 @@ export async function rotateApiKeyController({
 		method?: string;
 		userAgent?: string;
 		ipAddress?: string;
-    statusCode?: number;
+		statusCode?: number;
 	};
 }): Promise<ApiKeyTypes.ApiKeyWithKeyResponse> {
 	try {

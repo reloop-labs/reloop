@@ -50,7 +50,8 @@ export const SignInDetectedEmail = ({
 		body: isDark
 			? "m-0 p-0 bg-[#0e0e0e] text-white font-sans"
 			: "m-0 p-0 bg-white text-[#0e0e0e] font-sans",
-		label: "m-0 font-mono font-medium text-[#707070] text-[12px] uppercase tracking-[0.2em]",
+		label:
+			"m-0 font-mono font-medium text-[#707070] text-[12px] uppercase tracking-[0.2em]",
 		heading: isDark
 			? "mt-6 mb-8 p-0 font-normal text-[32px] text-white leading-[1.2]"
 			: "mt-6 mb-8 p-0 font-normal text-[32px] text-[#0e0e0e] leading-[1.2]",
@@ -79,9 +80,7 @@ export const SignInDetectedEmail = ({
 		alertText: isDark
 			? "mt-3 text-[#b0b0b0] text-[15px] leading-[1.6]"
 			: "mt-3 text-[#555555] text-[15px] leading-[1.6]",
-		link: isDark
-			? "text-[#edece1] underline"
-			: "text-[#0e0e0e] underline",
+		link: isDark ? "text-[#edece1] underline" : "text-[#0e0e0e] underline",
 		btn: isDark
 			? "rounded-xl bg-[#edece1] px-6 py-3 text-center font-bold font-mono text-[12px] text-black uppercase tracking-wider no-underline"
 			: "rounded-xl bg-[#0e0e0e] px-6 py-3 text-center font-bold font-mono text-[12px] text-white uppercase tracking-wider no-underline",
@@ -126,11 +125,7 @@ export const SignInDetectedEmail = ({
 
 						{/* Sign-in Details Box */}
 						<Section className={cls.detailsBox}>
-							<table
-								width="100%"
-								cellPadding="0"
-								cellSpacing="0"
-							>
+							<table width="100%" cellPadding="0" cellSpacing="0">
 								<tr>
 									<td
 										style={{
@@ -279,8 +274,8 @@ export const SignInDetectedEmail = ({
 						</Section>
 
 						<Text className={cls.footerText}>
-							If this was you, no action is needed — you can safely ignore
-							this email.
+							If this was you, no action is needed — you can safely ignore this
+							email.
 						</Text>
 
 						<Hr className={cls.footerHr} />

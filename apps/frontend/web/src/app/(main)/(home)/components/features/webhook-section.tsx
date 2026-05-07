@@ -31,7 +31,11 @@ const webhookData: FeatureData = {
 	],
 };
 
-export function WebhookSection({ index, forwardRef, isLast }: Omit<FeatureSectionProps, "feature">) {
+export function WebhookSection({
+	index,
+	forwardRef,
+	isLast,
+}: Omit<FeatureSectionProps, "feature">) {
 	return (
 		<FeatureSection
 			feature={webhookData}

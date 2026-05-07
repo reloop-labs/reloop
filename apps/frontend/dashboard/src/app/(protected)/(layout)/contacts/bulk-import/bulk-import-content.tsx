@@ -25,7 +25,6 @@ interface BulkImportResult {
 }
 
 export const BulkImportContent = () => {
-	
 	const router = useRouter();
 	const { changeStatus, status } = useLoading();
 	const { mutate } = useSWRConfig();
@@ -166,7 +165,7 @@ export const BulkImportContent = () => {
 	};
 
 	const handleBack = () => {
-		router.push(`/contacts`);
+		router.push("/contacts");
 	};
 
 	return (

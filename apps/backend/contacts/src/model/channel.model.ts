@@ -2,32 +2,33 @@ import { t } from "elysia";
 
 export namespace ChannelModel {
 	// Create Channel
-	export const createChannelBody = t.Object({
-		name: t.String({
-			minLength: 1,
-			maxLength: 255,
-			description: "Channel name",
-		}),
-		description: t.Optional(
-			t.String({
-				maxLength: 1000,
-				description: "Channel description",
+	export const createChannelBody = t.Object(
+		{
+			name: t.String({
+				minLength: 1,
+				maxLength: 255,
+				description: "Channel name",
 			}),
-		),
-		defaultSubscription: t.Optional(
-			t.Union([t.Literal("opt_in"), t.Literal("opt_out")], {
-				default: "opt_in",
-				description: "Default subscription setting",
-			}),
-		),
-		visibility: t.Optional(
-			t.Union([t.Literal("private"), t.Literal("public")], {
-				default: "private",
-				description:
-					"Visibility setting - whether the channel is visible to everyone or just the team",
-			}),
-		),
-	},
+			description: t.Optional(
+				t.String({
+					maxLength: 1000,
+					description: "Channel description",
+				}),
+			),
+			defaultSubscription: t.Optional(
+				t.Union([t.Literal("opt_in"), t.Literal("opt_out")], {
+					default: "opt_in",
+					description: "Default subscription setting",
+				}),
+			),
+			visibility: t.Optional(
+				t.Union([t.Literal("private"), t.Literal("public")], {
+					default: "private",
+					description:
+						"Visibility setting - whether the channel is visible to everyone or just the team",
+				}),
+			),
+		},
 		{
 			examples: [
 				{
@@ -37,35 +38,37 @@ export namespace ChannelModel {
 					visibility: "public",
 				},
 			],
-		});
+		},
+	);
 
 	export type CreateChannelBody = typeof createChannelBody.static;
 
 	// Update Channel
-	export const updateChannelBody = t.Object({
-		name: t.Optional(
-			t.String({
-				minLength: 1,
-				maxLength: 255,
-				description: "Channel name",
-			}),
-		),
-		description: t.Optional(
-			t.Union([
+	export const updateChannelBody = t.Object(
+		{
+			name: t.Optional(
 				t.String({
-					maxLength: 1000,
-					description: "Channel description",
+					minLength: 1,
+					maxLength: 255,
+					description: "Channel name",
 				}),
-				t.Null(),
-			]),
-		),
-		visibility: t.Optional(
-			t.Union([t.Literal("private"), t.Literal("public")], {
-				description:
-					"Visibility setting - whether the channel is visible to everyone or just the team",
-			}),
-		),
-	},
+			),
+			description: t.Optional(
+				t.Union([
+					t.String({
+						maxLength: 1000,
+						description: "Channel description",
+					}),
+					t.Null(),
+				]),
+			),
+			visibility: t.Optional(
+				t.Union([t.Literal("private"), t.Literal("public")], {
+					description:
+						"Visibility setting - whether the channel is visible to everyone or just the team",
+				}),
+			),
+		},
 		{
 			examples: [
 				{
@@ -74,28 +77,33 @@ export namespace ChannelModel {
 					visibility: "private",
 				},
 			],
-		});
+		},
+	);
 
 	export type UpdateChannelBody = typeof updateChannelBody.static;
 
 	// Channel Response
-	export const channelBaseResponse = t.Object({
-		object: t.Literal("channel", { default: "channel" }),
-		id: t.String({ description: "Unique channel identifier" }),
-		name: t.String({ description: "Channel name" }),
-		description: t.Union([t.String(), t.Null()], {
-			description: "Channel description",
-		}),
-		defaultSubscription: t.Union([t.Literal("opt_in"), t.Literal("opt_out")], {
-			description: "Default subscription setting",
-		}),
-		visibility: t.Union([t.Literal("private"), t.Literal("public")], {
-			description:
-				"Visibility setting - whether the channel is visible to everyone or just the team",
-		}),
-		createdAt: t.Date(),
-		updatedAt: t.Date(),
-	},
+	export const channelBaseResponse = t.Object(
+		{
+			object: t.Literal("channel", { default: "channel" }),
+			id: t.String({ description: "Unique channel identifier" }),
+			name: t.String({ description: "Channel name" }),
+			description: t.Union([t.String(), t.Null()], {
+				description: "Channel description",
+			}),
+			defaultSubscription: t.Union(
+				[t.Literal("opt_in"), t.Literal("opt_out")],
+				{
+					description: "Default subscription setting",
+				},
+			),
+			visibility: t.Union([t.Literal("private"), t.Literal("public")], {
+				description:
+					"Visibility setting - whether the channel is visible to everyone or just the team",
+			}),
+			createdAt: t.Date(),
+			updatedAt: t.Date(),
+		},
 		{
 			examples: [
 				{
@@ -109,7 +117,8 @@ export namespace ChannelModel {
 					updatedAt: "2026-03-27T10:00:00Z",
 				},
 			],
-		});
+		},
+	);
 
 	export const channelResponse = t.Composite([
 		channelBaseResponse,
@@ -123,7 +132,9 @@ export namespace ChannelModel {
 	export const channelListItem = t.Composite([
 		t.Omit(channelBaseResponse, ["object"]),
 		t.Object({
-			subscriberCount: t.Optional(t.Number({ description: "Number of subscribers" })),
+			subscriberCount: t.Optional(
+				t.Number({ description: "Number of subscribers" }),
+			),
 		}),
 	]);
 	export type ChannelListItem = typeof channelListItem.static;

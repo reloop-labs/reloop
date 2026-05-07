@@ -24,7 +24,8 @@ export const ExistingMembers = ({
 				onClick={() => setIsExpanded(!isExpanded)}
 				className={cn(
 					"flex items-center justify-between px-5 py-3 transition-colors hover:bg-bg-weak-50/50 dark:hover:bg-bg-strong-200/30",
-					isExpanded && "border-stroke-soft-100 border-b dark:border-stroke-soft-100/40",
+					isExpanded &&
+						"border-stroke-soft-100 border-b dark:border-stroke-soft-100/40",
 				)}
 			>
 				<div className="flex items-center gap-2">

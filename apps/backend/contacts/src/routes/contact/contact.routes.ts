@@ -1,6 +1,6 @@
 import { Elysia } from "elysia";
-import { addContactToGroupRoute } from "./add-contact-to-group/add-contact-to-group.route";
 import { addContactToChannelRoute } from "./add-contact-to-channel/add-contact-to-channel.route";
+import { addContactToGroupRoute } from "./add-contact-to-group/add-contact-to-group.route";
 import { createContactRoute } from "./create-contact/create-contact.route";
 import { deleteContactRoute } from "./delete-contact/delete-contact.route";
 import { getContactRoute } from "./get-contact/get-contact.route";

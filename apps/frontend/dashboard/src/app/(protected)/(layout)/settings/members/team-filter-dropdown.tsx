@@ -111,11 +111,18 @@ export const TeamFilterDropdown = ({
 									!currentRect && hoverIdx === idx && "bg-neutral-alpha-10",
 								)}
 							>
-								<span className={cn(isChecked && "font-medium text-text-strong-950")}>
+								<span
+									className={cn(
+										isChecked && "font-medium text-text-strong-950",
+									)}
+								>
 									{option.label}
 								</span>
 								{isChecked && (
-									<Icon name="check" className="h-3.5 w-3.5 text-text-strong-950" />
+									<Icon
+										name="check"
+										className="h-3.5 w-3.5 text-text-strong-950"
+									/>
 								)}
 							</button>
 						);

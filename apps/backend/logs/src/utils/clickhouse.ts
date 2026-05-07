@@ -108,10 +108,12 @@ export async function ensureTableExists(): Promise<void> {
 		}
 	} catch (error: unknown) {
 		// If table doesn't exist, DESCRIBE will throw. We can ignore this and proceed to CREATE.
-		if (error instanceof Error &&
+		if (
+			error instanceof Error &&
 			!error.message?.includes("Table default.logs doesn't exist") &&
 			!error.message?.includes("Table logs does not exist") &&
-			!error.message?.includes("not found")) {
+			!error.message?.includes("not found")
+		) {
 			console.error("Error checking ClickHouse table schema:", error);
 		}
 	}
@@ -136,9 +138,14 @@ export async function ensureTableExists(): Promise<void> {
 				PARTITION BY toYYYYMM(created_at)
 			`,
 		});
-		console.log(`Successfully ensured table \`${logsConfig.clickhouse.database}\`.logs exists`);
+		console.log(
+			`Successfully ensured table \`${logsConfig.clickhouse.database}\`.logs exists`,
+		);
 	} catch (error) {
-		console.error(`Error creating table \`${logsConfig.clickhouse.database}\`.logs:`, error);
+		console.error(
+			`Error creating table \`${logsConfig.clickhouse.database}\`.logs:`,
+			error,
+		);
 		throw error;
 	}
 }

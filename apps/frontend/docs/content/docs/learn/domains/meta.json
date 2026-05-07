@@ -1,11 +1,5 @@
 {
 	"title": "Domains",
 	"icon": "Globe",
-	"pages": [
-		"index",
-		"tracking",
-		"regions",
-		"dmarc",
-		"bimi"
-	]
+	"pages": ["index", "tracking", "regions", "dmarc", "bimi"]
 }

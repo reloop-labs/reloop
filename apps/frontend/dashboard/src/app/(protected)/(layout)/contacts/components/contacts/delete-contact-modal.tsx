@@ -1,4 +1,5 @@
 "use client";
+import type { AudienceStatus } from "@fe/dashboard/utils/audience";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
@@ -7,7 +8,6 @@ import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
-import type { AudienceStatus } from "@fe/dashboard/utils/audience";
 
 interface Contact {
 	id: string;

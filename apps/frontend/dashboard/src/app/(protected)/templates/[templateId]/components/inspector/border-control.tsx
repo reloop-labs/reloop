@@ -23,7 +23,7 @@ export function BorderControl({
 	onChange: (v: BorderValue) => void;
 }) {
 	return (
-		<div className="flex flex-col gap-1.5 w-full">
+		<div className="flex w-full flex-col gap-1.5">
 			<div className="flex items-center gap-1">
 				{/* Width */}
 				<span className="flex items-center gap-0.5">
@@ -40,7 +40,7 @@ export function BorderControl({
 						}}
 						className="w-12 rounded border border-(--re-border) bg-transparent px-1 py-0.5 text-xs"
 					/>
-					<span className="text-[10px] text-(--re-text-muted)">px</span>
+					<span className="text-(--re-text-muted) text-[10px]">px</span>
 				</span>
 				{/* Style */}
 				<div className="flex-1">

@@ -6,14 +6,14 @@ import { verifyRoute } from "./verify/verify.route";
 import { kumomtaWebhookRoute } from "./webhook/webhook.route";
 
 export const kumomtaRoutes = new Elysia({
-  prefix: "/v1",
-  name: "KumomtaRoutes",
+	prefix: "/v1",
+	name: "KumomtaRoutes",
 })
-  .use(authMiddleware)
-  .guard({ kumomtaAuth: true }, (app) =>
-    app
-      .use(verifyRoute)
-      .use(kumomtaWebhookRoute)
-      .use(logIncomingRoute)
-      .use(dkimKeyRoute),
-  );
+	.use(authMiddleware)
+	.guard({ kumomtaAuth: true }, (app) =>
+		app
+			.use(verifyRoute)
+			.use(kumomtaWebhookRoute)
+			.use(logIncomingRoute)
+			.use(dkimKeyRoute),
+	);

@@ -5,10 +5,10 @@ import { unsubscribeAllRoute } from "./unsubscribe-all/unsubscribe-all.route";
 import { updatePreferenceRoute } from "./update-preference/update-preference.route";
 
 export const preferencesRoutes = new Elysia({
-  prefix: "/v1/preferences",
-  name: "PreferencesRoutes",
+	prefix: "/v1/preferences",
+	name: "PreferencesRoutes",
 })
-  .use(generateTokenRoute)
-  .use(getPreferencesDataRoute)
-  .use(updatePreferenceRoute)
-  .use(unsubscribeAllRoute);
+	.use(generateTokenRoute)
+	.use(getPreferencesDataRoute)
+	.use(updatePreferenceRoute)
+	.use(unsubscribeAllRoute);

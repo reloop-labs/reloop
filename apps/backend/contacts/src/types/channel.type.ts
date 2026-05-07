@@ -3,7 +3,8 @@ import type { ChannelModel } from "@be/contacts/model/channel.model";
 export namespace ChannelTypes {
 	// Response Types
 	export type ChannelResponse = typeof ChannelModel.channelResponse.static;
-	export type ChannelListResponse = typeof ChannelModel.channelListResponse.static;
+	export type ChannelListResponse =
+		typeof ChannelModel.channelListResponse.static;
 
 	// Request Types
 	export type CreateChannelBody = typeof ChannelModel.createChannelBody.static;
@@ -12,7 +13,8 @@ export namespace ChannelTypes {
 
 	// Error Types
 	export type ChannelNotFound = typeof ChannelModel.channelNotFound.static;
-	export type ChannelAlreadyExists = typeof ChannelModel.channelAlreadyExists.static;
+	export type ChannelAlreadyExists =
+		typeof ChannelModel.channelAlreadyExists.static;
 	export type Unauthorized = typeof ChannelModel.unauthorized.static;
 	export type ValidationError = typeof ChannelModel.validationError.static;
 

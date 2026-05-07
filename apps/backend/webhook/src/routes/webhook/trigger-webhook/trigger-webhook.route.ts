@@ -4,26 +4,26 @@ import { Elysia } from "elysia";
 import { triggerWebhookController } from "./trigger-webhook.controllers";
 
 export const triggerWebhookRoute = new Elysia().use(authMiddleware).post(
-  "/trigger",
-  async ({ body, activeOrganizationId, userId }) => {
-    return await triggerWebhookController({
-      event: body.event,
-      payload: body.payload,
-      organizationId: body.organizationId || activeOrganizationId,
-      userId: body.userId || userId,
-    });
-  },
-  {
-    auth: true,
-    body: WebhookModel.triggerWebhookBody,
-    response: {
-      200: WebhookModel.triggerWebhookResponse,
-      401: WebhookModel.unauthorized,
-    },
-    detail: {
-      tags: ["Webhooks"],
-      summary: "Trigger webhooks",
-      description: "Triggers webhooks subscribed to a specific event",
-    },
-  },
+	"/trigger",
+	async ({ body, activeOrganizationId, userId }) => {
+		return await triggerWebhookController({
+			event: body.event,
+			payload: body.payload,
+			organizationId: body.organizationId || activeOrganizationId,
+			userId: body.userId || userId,
+		});
+	},
+	{
+		auth: true,
+		body: WebhookModel.triggerWebhookBody,
+		response: {
+			200: WebhookModel.triggerWebhookResponse,
+			401: WebhookModel.unauthorized,
+		},
+		detail: {
+			tags: ["Webhooks"],
+			summary: "Trigger webhooks",
+			description: "Triggers webhooks subscribed to a specific event",
+		},
+	},
 );

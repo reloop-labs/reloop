@@ -35,7 +35,9 @@ export const DeleteGroupModal = ({
 	const { data: contactsData, isLoading: isLoadingContacts } = useSWR<{
 		total: number;
 	}>(
-		group && open ? `/api/contacts/v1/groups/${group.id}/contacts?limit=1` : null,
+		group && open
+			? `/api/contacts/v1/groups/${group.id}/contacts?limit=1`
+			: null,
 	);
 
 	useEffect(() => {

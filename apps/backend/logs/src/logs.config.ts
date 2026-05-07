@@ -20,8 +20,6 @@ export const logsConfig = {
 		username: process.env.CLICKHOUSE_USER || "default",
 		password: process.env.CLICKHOUSE_PASSWORD || "reloop123",
 		database:
-			process.env.CLICKHOUSE_DATABASE ||
-			process.env.CLICKHOUSE_DB ||
-			"reloop",
+			process.env.CLICKHOUSE_DATABASE || process.env.CLICKHOUSE_DB || "reloop",
 	},
 } as const;

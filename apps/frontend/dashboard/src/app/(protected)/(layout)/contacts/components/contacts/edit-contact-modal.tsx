@@ -266,15 +266,18 @@ export const EditContactModal = ({
 
 			// Add new subscriptions (backend now handles upsert)
 			for (const channelId of channelsToAdd) {
-				const enrollResponse = await fetch("/api/contacts/v1/subscriptions/add", {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({
-						contactId: contact.id,
-						channelId,
-						status: "enrolled",
-					}),
-				});
+				const enrollResponse = await fetch(
+					"/api/contacts/v1/subscriptions/add",
+					{
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({
+							contactId: contact.id,
+							channelId,
+							status: "enrolled",
+						}),
+					},
+				);
 				if (!enrollResponse.ok) {
 					console.error(`Failed to enroll contact in channel ${channelId}`);
 				}
@@ -466,7 +469,9 @@ export const EditContactModal = ({
 													}
 												}}
 												placeholder={
-													selectedChannelIds.length === 0 ? "Add Channels..." : ""
+													selectedChannelIds.length === 0
+														? "Add Channels..."
+														: ""
 												}
 												className="min-w-[80px] flex-1 bg-transparent text-paragraph-sm text-text-sub-600 outline-none placeholder:text-text-soft-400"
 												disabled={isSaving}

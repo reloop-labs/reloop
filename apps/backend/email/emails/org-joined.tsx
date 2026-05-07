@@ -44,7 +44,8 @@ export const OrgJoinedEmail = ({
 		body: isDark
 			? "m-0 p-0 bg-[#0e0e0e] text-white font-sans"
 			: "m-0 p-0 bg-white text-[#0e0e0e] font-sans",
-		label: "m-0 font-mono font-medium text-[#707070] text-[12px] uppercase tracking-[0.2em]",
+		label:
+			"m-0 font-mono font-medium text-[#707070] text-[12px] uppercase tracking-[0.2em]",
 		heading: isDark
 			? "mt-6 mb-8 p-0 font-normal text-[32px] text-white leading-[1.2]"
 			: "mt-6 mb-8 p-0 font-normal text-[32px] text-[#0e0e0e] leading-[1.2]",
@@ -67,7 +68,8 @@ export const OrgJoinedEmail = ({
 		summaryBox: isDark
 			? "mt-8 rounded-xl bg-[#1a1a1a] border border-[#222222] border-solid p-6"
 			: "mt-8 rounded-xl bg-[#f5f5f5] border border-[#e0e0e0] border-solid p-6",
-		summaryLabel: "m-0 font-mono text-[#707070] text-[11px] uppercase tracking-[0.15em]",
+		summaryLabel:
+			"m-0 font-mono text-[#707070] text-[11px] uppercase tracking-[0.15em]",
 		summaryValue: isDark
 			? "m-0 mt-1 font-semibold text-white text-[15px]"
 			: "m-0 mt-1 font-semibold text-[#0e0e0e] text-[15px]",
@@ -99,8 +101,7 @@ export const OrgJoinedEmail = ({
 							className={cls.heading}
 							style={{ fontFamily: "Georgia, serif" }}
 						>
-							Welcome to{" "}
-							<span className={cls.headingMuted}>{orgName}.</span>
+							Welcome to <span className={cls.headingMuted}>{orgName}.</span>
 						</Heading>
 
 						<Hr className={cls.hr} />

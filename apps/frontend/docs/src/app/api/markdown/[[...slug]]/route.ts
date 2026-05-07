@@ -1,4 +1,4 @@
-import { readFileSync, existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { type NextRequest, NextResponse } from "next/server";
 
@@ -27,7 +27,7 @@ export async function GET(
 
 		// Clean up the frontmatter slightly (optional) to make it cleaner for AI
 		// We'll leave it as is for now since frontmatter often has useful metadata like 'title' and 'description'
-		
+
 		// Estimate tokens (roughly 4 characters per token)
 		const estimatedTokens = Math.ceil(rawContent.length / 4);
 

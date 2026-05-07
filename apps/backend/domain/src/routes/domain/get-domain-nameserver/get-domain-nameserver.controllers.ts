@@ -49,7 +49,10 @@ export async function getDomainDNSController({
 						dnsProvider = "cloudflare";
 					} else if (ns.includes("vercel-dns.com")) {
 						dnsProvider = "vercel";
-					} else if (ns.includes("godaddy.com") || ns.includes("domaincontrol.com")) {
+					} else if (
+						ns.includes("godaddy.com") ||
+						ns.includes("domaincontrol.com")
+					) {
 						dnsProvider = "godaddy";
 					}
 				}

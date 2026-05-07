@@ -1,6 +1,6 @@
-import { UrlInput } from "./url-input";
-import { TextInput } from "./text-input";
 import { NumberField } from "./number-field";
+import { TextInput } from "./text-input";
+import { UrlInput } from "./url-input";
 
 export interface ImageSrcValue {
 	src: string;
@@ -17,7 +17,7 @@ export function ImageSrcControl({
 	onChange: (v: ImageSrcValue) => void;
 }) {
 	return (
-		<div className="flex flex-col gap-1.5 w-full">
+		<div className="flex w-full flex-col gap-1.5">
 			{/* Preview */}
 			{value.src && (
 				<img
@@ -43,7 +43,7 @@ export function ImageSrcControl({
 						onChange={(width) => onChange({ ...value, width })}
 						unit="px"
 					/>
-					<span className="text-[10px] text-(--re-text-muted)">Width</span>
+					<span className="text-(--re-text-muted) text-[10px]">Width</span>
 				</span>
 				<span className="flex flex-col items-center gap-0.5">
 					<NumberField
@@ -51,7 +51,7 @@ export function ImageSrcControl({
 						onChange={(height) => onChange({ ...value, height })}
 						unit="px"
 					/>
-					<span className="text-[10px] text-(--re-text-muted)">Height</span>
+					<span className="text-(--re-text-muted) text-[10px]">Height</span>
 				</span>
 			</div>
 		</div>

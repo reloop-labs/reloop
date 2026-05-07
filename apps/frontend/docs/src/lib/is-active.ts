@@ -7,7 +7,8 @@ export function isActive(
 	let tempPathname = pathname;
 
 	// Strip /docs prefix if present for comparison
-	if (tempPathname.startsWith("/docs")) tempPathname = tempPathname.slice(5) || "/";
+	if (tempPathname.startsWith("/docs"))
+		tempPathname = tempPathname.slice(5) || "/";
 	if (tempUrl.startsWith("/docs")) tempUrl = tempUrl.slice(5) || "/";
 
 	if (tempUrl.endsWith("/") && tempUrl !== "/") tempUrl = tempUrl.slice(0, -1);

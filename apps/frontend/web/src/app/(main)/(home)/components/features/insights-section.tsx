@@ -31,7 +31,11 @@ const insightsData: FeatureData = {
 	],
 };
 
-export function InsightsSection({ index, forwardRef, isLast }: Omit<FeatureSectionProps, "feature">) {
+export function InsightsSection({
+	index,
+	forwardRef,
+	isLast,
+}: Omit<FeatureSectionProps, "feature">) {
 	return (
 		<FeatureSection
 			feature={insightsData}

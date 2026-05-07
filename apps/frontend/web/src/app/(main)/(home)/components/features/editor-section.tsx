@@ -31,7 +31,11 @@ const editorData: FeatureData = {
 	],
 };
 
-export function EditorSection({ index, forwardRef, isLast }: Omit<FeatureSectionProps, "feature">) {
+export function EditorSection({
+	index,
+	forwardRef,
+	isLast,
+}: Omit<FeatureSectionProps, "feature">) {
 	return (
 		<FeatureSection
 			feature={editorData}

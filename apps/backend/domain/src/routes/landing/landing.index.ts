@@ -77,7 +77,8 @@ export const landing = new Elysia()
 	.get("/agent-card.json", () => ({
 		name: "Domain Service",
 		version: "1.0.0",
-		description: "Service for managing and verifying sending domains for the Reloop platform.",
+		description:
+			"Service for managing and verifying sending domains for the Reloop platform.",
 		url: "https://reloop.sh",
 		defaultInputModes: ["application/json"],
 		defaultOutputModes: ["application/json"],
@@ -93,10 +94,10 @@ export const landing = new Elysia()
 				inputSchema: {},
 				outputSchema: {
 					status: { type: "string" },
-					success: { type: "boolean" }
+					success: { type: "boolean" },
 				},
 				errorCodes: [],
-				examples: []
+				examples: [],
 			},
 			{
 				id: "create_domain",
@@ -106,14 +107,21 @@ export const landing = new Elysia()
 				path: "/api/domain/v1/create",
 				tags: ["setup"],
 				inputSchema: {
-					domain: { type: "string", required: true, description: "e.g., example.com" }
+					domain: {
+						type: "string",
+						required: true,
+						description: "e.g., example.com",
+					},
 				},
 				outputSchema: {
 					id: { type: "string" },
-					verificationRecords: { type: "array", description: "DNS records required for verification" }
+					verificationRecords: {
+						type: "array",
+						description: "DNS records required for verification",
+					},
 				},
 				errorCodes: [],
-				examples: []
+				examples: [],
 			},
 			{
 				id: "verify_domain",
@@ -123,23 +131,24 @@ export const landing = new Elysia()
 				path: "/api/domain/v1/verify/:domain_id",
 				tags: ["setup"],
 				inputSchema: {
-					domain_id: { type: "string", required: true }
+					domain_id: { type: "string", required: true },
 				},
 				outputSchema: {
-					status: { type: "string", description: "Verified, Pending, etc." }
+					status: { type: "string", description: "Verified, Pending, etc." },
 				},
 				errorCodes: [],
-				examples: []
-			}
+				examples: [],
+			},
 		],
-		usage_guidelines: "1. Domains must be verified via DNS records (TXT/CNAME) before use.\n2. We support DKIM and SPF verification for enhanced deliverability.\n3. One domain can only be associated with one organization at a time.",
+		usage_guidelines:
+			"1. Domains must be verified via DNS records (TXT/CNAME) before use.\n2. We support DKIM and SPF verification for enhanced deliverability.\n3. One domain can only be associated with one organization at a time.",
 		authentication: {
 			schemes: ["bearer", "cookie"],
 			headerName: "Authorization",
-			notes: "Requires an active session."
+			notes: "Requires an active session.",
 		},
 		provider: {
 			organization: "Reloop labs",
-			contact: "https://reloop.sh/support"
-		}
+			contact: "https://reloop.sh/support",
+		},
 	}));

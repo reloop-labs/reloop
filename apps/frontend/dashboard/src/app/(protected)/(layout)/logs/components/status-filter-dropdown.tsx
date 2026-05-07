@@ -138,7 +138,9 @@ export const StatusFilterDropdown = ({
 							<div className="flex h-3.5 w-3.5 items-center justify-center">
 								<div className="h-2 w-2 rounded-full border-2 border-text-strong-950" />
 							</div>
-							<span className={cn(value.length === 0 && "font-medium")}>All Statuses</span>
+							<span className={cn(value.length === 0 && "font-medium")}>
+								All Statuses
+							</span>
 						</div>
 						{value.length === 0 && (
 							<Icon name="check" className="h-4 w-4 text-text-strong-950" />
@@ -174,7 +176,9 @@ export const StatusFilterDropdown = ({
 										/>
 									</div>
 									<span
-										className={cn(isChecked && "font-medium text-text-strong-950")}
+										className={cn(
+											isChecked && "font-medium text-text-strong-950",
+										)}
 									>
 										{option.label}
 									</span>
@@ -228,7 +232,10 @@ export const StatusFilterDropdown = ({
 										</span>
 									</div>
 									{isChecked && (
-										<Icon name="check" className="h-4 w-4 text-text-strong-950" />
+										<Icon
+											name="check"
+											className="h-4 w-4 text-text-strong-950"
+										/>
 									)}
 								</button>
 							);

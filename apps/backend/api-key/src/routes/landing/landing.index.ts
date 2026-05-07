@@ -77,7 +77,8 @@ export const landing = new Elysia()
 	.get("/agent-card.json", () => ({
 		name: "API Key Service",
 		version: "1.0.0",
-		description: "Service for managing and validating API keys for the Reloop platform.",
+		description:
+			"Service for managing and validating API keys for the Reloop platform.",
 		url: "https://reloop.sh",
 		defaultInputModes: ["application/json"],
 		defaultOutputModes: ["application/json"],
@@ -93,10 +94,10 @@ export const landing = new Elysia()
 				inputSchema: {},
 				outputSchema: {
 					status: { type: "string" },
-					success: { type: "boolean" }
+					success: { type: "boolean" },
 				},
 				errorCodes: [],
-				examples: []
+				examples: [],
 			},
 			{
 				id: "create_api_key",
@@ -106,15 +107,22 @@ export const landing = new Elysia()
 				path: "/api/api-key/v1/create",
 				tags: ["management"],
 				inputSchema: {
-					name: { type: "string", required: true, description: "Key name/description" },
-					organizationId: { type: "string", required: true }
+					name: {
+						type: "string",
+						required: true,
+						description: "Key name/description",
+					},
+					organizationId: { type: "string", required: true },
 				},
 				outputSchema: {
-					key: { type: "string", description: "The sensitive API key string (only shown once)" },
-					id: { type: "string" }
+					key: {
+						type: "string",
+						description: "The sensitive API key string (only shown once)",
+					},
+					id: { type: "string" },
 				},
 				errorCodes: [],
-				examples: []
+				examples: [],
 			},
 			{
 				id: "list_api_keys",
@@ -125,20 +133,21 @@ export const landing = new Elysia()
 				tags: ["management"],
 				inputSchema: {},
 				outputSchema: {
-					keys: { type: "array" }
+					keys: { type: "array" },
 				},
 				errorCodes: [],
-				examples: []
-			}
+				examples: [],
+			},
 		],
-		usage_guidelines: "1. API keys are sensitive; never share them or commit them to version control.\n2. Keys are prefixed with 'rl' by default.\n3. Revoking a key is immediate and permanent.",
+		usage_guidelines:
+			"1. API keys are sensitive; never share them or commit them to version control.\n2. Keys are prefixed with 'rl' by default.\n3. Revoking a key is immediate and permanent.",
 		authentication: {
 			schemes: ["bearer", "cookie"],
 			headerName: "Authorization",
-			notes: "Requires an active session."
+			notes: "Requires an active session.",
 		},
 		provider: {
 			organization: "Reloop labs",
-			contact: "https://reloop.sh/support"
-		}
+			contact: "https://reloop.sh/support",
+		},
 	}));

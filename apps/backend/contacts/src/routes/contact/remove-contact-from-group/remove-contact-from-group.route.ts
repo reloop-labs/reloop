@@ -5,39 +5,49 @@ import { removeContactFromGroupController } from "./remove-contact-from-group.co
 import { removeContactFromGroupXCodeSamples } from "./remove-contact-from-group.x-codeSamples";
 
 export const removeContactFromGroupRoute = new Elysia()
-  .use(authMiddleware)
-  .delete(
-    "/group/:group_id",
-    async ({ body, params, activeOrganizationId, logger, path, request, headers }) => {
-      const cookieString = headers["cookie"] || "";
-      return await removeContactFromGroupController({
-        organizationId: activeOrganizationId,
-        groupId: params.group_id,
-        body,
-        logger,
-        cookie: cookieString,
-        requestDetails: {
-          endpoint: path,
-          method: request.method,
-          userAgent: headers["user-agent"],
-          ipAddress: (headers["x-forwarded-for"] as string) || (headers["x-real-ip"] as string),
-        },
-      });
-    },
-    {
-      auth: true,
-      params: t.Object({ group_id: t.String() }),
-      body: ContactModel.removeContactFromGroupBody,
-      response: {
-        200: ContactModel.removeContactFromGroupResponse,
-        400: t.Object({ message: t.String() }),
-        404: t.Object({ message: t.String() }),
-      },
-      detail: {
-        tags: ["Contact"],
-        summary: "Delete Contact Group",
-        description: "Deletes a contact from a group by ID or email",
-        "x-codeSamples": removeContactFromGroupXCodeSamples,
-      },
-    },
-  );
+	.use(authMiddleware)
+	.delete(
+		"/group/:group_id",
+		async ({
+			body,
+			params,
+			activeOrganizationId,
+			logger,
+			path,
+			request,
+			headers,
+		}) => {
+			const cookieString = headers["cookie"] || "";
+			return await removeContactFromGroupController({
+				organizationId: activeOrganizationId,
+				groupId: params.group_id,
+				body,
+				logger,
+				cookie: cookieString,
+				requestDetails: {
+					endpoint: path,
+					method: request.method,
+					userAgent: headers["user-agent"],
+					ipAddress:
+						(headers["x-forwarded-for"] as string) ||
+						(headers["x-real-ip"] as string),
+				},
+			});
+		},
+		{
+			auth: true,
+			params: t.Object({ group_id: t.String() }),
+			body: ContactModel.removeContactFromGroupBody,
+			response: {
+				200: ContactModel.removeContactFromGroupResponse,
+				400: t.Object({ message: t.String() }),
+				404: t.Object({ message: t.String() }),
+			},
+			detail: {
+				tags: ["Contact"],
+				summary: "Delete Contact Group",
+				description: "Deletes a contact from a group by ID or email",
+				"x-codeSamples": removeContactFromGroupXCodeSamples,
+			},
+		},
+	);

@@ -1,11 +1,5 @@
 {
 	"title": "Automations",
 	"icon": "Zap",
-	"pages": [
-		"index",
-		"steps",
-		"custom-events",
-		"connections",
-		"runs"
-	]
+	"pages": ["index", "steps", "custom-events", "connections", "runs"]
 }

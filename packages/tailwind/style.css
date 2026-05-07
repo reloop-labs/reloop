@@ -888,12 +888,12 @@
 	--social-amazon: #353e47;
 	--social-zendesk: #16140d;
 
-	--primary-dark: #D97757;
-	--primary-darker: #D97757;
-	--primary-base: #D97757;
-	--primary-alpha-24: #D977573d;
-	--primary-alpha-16: #D9775729;
-	--primary-alpha-10: #D977571a;
+	--primary-dark: #d97757;
+	--primary-darker: #d97757;
+	--primary-base: #d97757;
+	--primary-alpha-24: #d977573d;
+	--primary-alpha-16: #d9775729;
+	--primary-alpha-10: #d977571a;
 
 	--static-black: var(--neutral-950);
 	--static-white: var(--neutral-0);
@@ -1080,34 +1080,33 @@
 	display: none;
 }
 
-.node-container{
+.node-container {
 	@apply mx-auto;
 }
 
-
 /* Give a remote user a caret */
 .tiptap .collaboration-carets__caret {
-  border-left: 1px solid #0d0d0d;
-  border-right: 1px solid #0d0d0d;
-  margin-left: -1px;
-  margin-right: -1px;
-  pointer-events: none;
-  position: relative;
-  word-break: normal;
+	border-left: 1px solid #0d0d0d;
+	border-right: 1px solid #0d0d0d;
+	margin-left: -1px;
+	margin-right: -1px;
+	pointer-events: none;
+	position: relative;
+	word-break: normal;
 }
 
 /* Render the username above the caret */
 .tiptap .collaboration-carets__label {
-  border-radius: 3px 3px 3px 0;
-  color: #0d0d0d;
-  font-size: 12px;
-  font-style: normal;
-  font-weight: 600;
-  left: -1px;
-  line-height: normal;
-  padding: 0.1rem 0.3rem;
-  position: absolute;
-  top: -1.4em;
-  user-select: none;
-  white-space: nowrap;
+	border-radius: 3px 3px 3px 0;
+	color: #0d0d0d;
+	font-size: 12px;
+	font-style: normal;
+	font-weight: 600;
+	left: -1px;
+	line-height: normal;
+	padding: 0.1rem 0.3rem;
+	position: absolute;
+	top: -1.4em;
+	user-select: none;
+	white-space: nowrap;
 }

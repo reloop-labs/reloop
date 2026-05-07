@@ -1,9 +1,9 @@
 export const createContactXCodeSamples = [
-  {
-    id: "node",
-    lang: "js",
-    label: "Node.js",
-    source: `import Reloop from 'reloop-email';
+	{
+		id: "node",
+		lang: "js",
+		label: "Node.js",
+		source: `import Reloop from 'reloop-email';
 
 const reloop = new Reloop({
   url: 'https://reloop.sh',
@@ -16,12 +16,12 @@ const contact = await reloop.audience.create({
   lastName: 'Doe',
   status: 'subscribed'
 });`,
-  },
-  {
-    id: "curl",
-    lang: "bash",
-    label: "cURL",
-    source: `curl -X POST https://reloop.sh/api/contacts/v1/create \\
+	},
+	{
+		id: "curl",
+		lang: "bash",
+		label: "cURL",
+		source: `curl -X POST https://reloop.sh/api/contacts/v1/create \\
   -H "Authorization: Bearer re_123456789" \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -30,12 +30,12 @@ const contact = await reloop.audience.create({
     "lastName": "Doe",
     "status": "subscribed"
   }'`,
-  },
-  {
-    id: "php",
-    lang: "php",
-    label: "PHP",
-    source: `<?php
+	},
+	{
+		id: "php",
+		lang: "php",
+		label: "PHP",
+		source: `<?php
 $client = new \\GuzzleHttp\\Client();
 
 $response = $client->post('https://reloop.sh/api/contacts/v1/create', [
@@ -52,12 +52,12 @@ $response = $client->post('https://reloop.sh/api/contacts/v1/create', [
 ]);
 
 $contact = json_decode($response->getBody(), true);`,
-  },
-  {
-    id: "python",
-    lang: "python",
-    label: "Python",
-    source: `import requests
+	},
+	{
+		id: "python",
+		lang: "python",
+		label: "Python",
+		source: `import requests
 
 response = requests.post(
     'https://reloop.sh/api/contacts/v1/create',
@@ -74,12 +74,12 @@ response = requests.post(
 )
 
 contact = response.json()`,
-  },
-  {
-    id: "ruby",
-    lang: "ruby",
-    label: "Ruby",
-    source: `require 'net/http'
+	},
+	{
+		id: "ruby",
+		lang: "ruby",
+		label: "Ruby",
+		source: `require 'net/http'
 require 'json'
 
 uri = URI('https://reloop.sh/api/contacts/v1/create')
@@ -98,12 +98,12 @@ request.body = {
 
 response = http.request(request)
 contact = JSON.parse(response.body)`,
-  },
-  {
-    id: "go",
-    lang: "go",
-    label: "Go",
-    source: `package main
+	},
+	{
+		id: "go",
+		lang: "go",
+		label: "Go",
+		source: `package main
 
 import (
   "bytes"
@@ -127,12 +127,12 @@ func main() {
   resp, _ := client.Do(req)
   defer resp.Body.Close()
 }`,
-  },
-  {
-    id: "rust",
-    lang: "rust",
-    label: "Rust",
-    source: `use reqwest::Client;
+	},
+	{
+		id: "rust",
+		lang: "rust",
+		label: "Rust",
+		source: `use reqwest::Client;
 use serde_json::json;
 
 #[tokio::main]
@@ -153,12 +153,12 @@ async fn main() -> Result<(), reqwest::Error> {
 
     Ok(())
 }`,
-  },
-  {
-    id: "java",
-    lang: "java",
-    label: "Java",
-    source: `import java.net.URI;
+	},
+	{
+		id: "java",
+		lang: "java",
+		label: "Java",
+		source: `import java.net.URI;
 import java.net.http.*;
 import java.net.http.HttpRequest.BodyPublishers;
 
@@ -181,12 +181,12 @@ HttpRequest request = HttpRequest.newBuilder()
     .build();
 
 HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());`,
-  },
-  {
-    id: "dotnet",
-    lang: "csharp",
-    label: ".NET",
-    source: `using System.Net.Http;
+	},
+	{
+		id: "dotnet",
+		lang: "csharp",
+		label: ".NET",
+		source: `using System.Net.Http;
 using System.Net.Http.Json;
 
 var client = new HttpClient();
@@ -203,5 +203,5 @@ var response = await client.PostAsJsonAsync(
     "https://reloop.sh/api/contacts/v1/create",
     contact
 );`,
-  },
+	},
 ];

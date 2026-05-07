@@ -1,12 +1,12 @@
 "use client";
 
 import { useParams } from "next/navigation";
+import { AIAssistant } from "./components/ai-assistant";
 import { FullEmailBuilder } from "./components/editor";
 import { EditorProvider } from "./components/editor-provider";
 import { FloatingMenu } from "./components/floating-menu";
 import { EmailInspector } from "./components/inspector";
 import { SendDetails } from "./components/send-details";
-import { AIAssistant } from "./components/ai-assistant";
 
 const Page = () => {
 	const params = useParams<{ templateId: string }>();

@@ -9,10 +9,9 @@ import { EmailList } from "./components/email-list";
 
 const EmailsPage = () => {
 	const router = useRouter();
-	
 
 	const handleSendEmail = () => {
-		router.push(`/emails/send`);
+		router.push("/emails/send");
 	};
 
 	useHotkeys("mod+a", (e) => {

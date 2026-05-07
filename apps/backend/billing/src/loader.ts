@@ -1,4 +1,4 @@
-import { bus, BusEvent } from "@reloop/bus";
+import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import {
 	billingInvoice,
@@ -16,7 +16,10 @@ export async function loader() {
 
 	// Handle Organization Created - Initialize subscription and credits
 	await bus.subscribe(BusEvent.ORGANIZATION_CREATED, async (payload) => {
-		logger.info({ organizationId: payload.id }, "Handling ORGANIZATION_CREATED");
+		logger.info(
+			{ organizationId: payload.id },
+			"Handling ORGANIZATION_CREATED",
+		);
 		try {
 			await db.transaction(async (tx) => {
 				// 1. Get or create a default "Free" plan
@@ -66,40 +69,56 @@ export async function loader() {
 					});
 				}
 			});
-			logger.info({ organizationId: payload.id }, "Initialized subscription for new organization");
+			logger.info(
+				{ organizationId: payload.id },
+				"Initialized subscription for new organization",
+			);
 		} catch (error) {
-			logger.error({ error, organizationId: payload.id }, "Failed to initialize subscription");
+			logger.error(
+				{ error, organizationId: payload.id },
+				"Failed to initialize subscription",
+			);
 		}
 	});
 
 	// Handle Email Sent - Deduct credits
 	await bus.subscribe(BusEvent.EMAIL_SENT, async (payload) => {
-		logger.info({ organizationId: payload.organizationId, count: payload.recipientCount }, "Handling EMAIL_SENT");
+		logger.info(
+			{ organizationId: payload.organizationId, count: payload.recipientCount },
+			"Handling EMAIL_SENT",
+		);
 		try {
 			await db.transaction(async (tx) => {
 				// 1. Find active subscription
 				const activeSub = await tx.query.subscription.findFirst({
-					where: (s, { and, eq }) => and(
-						eq(s.organizationId, payload.organizationId),
-						eq(s.status, "active")
-					),
+					where: (s, { and, eq }) =>
+						and(
+							eq(s.organizationId, payload.organizationId),
+							eq(s.status, "active"),
+						),
 				});
 
 				if (!activeSub) {
-					logger.warn({ organizationId: payload.organizationId }, "No active subscription found for credit deduction");
+					logger.warn(
+						{ organizationId: payload.organizationId },
+						"No active subscription found for credit deduction",
+					);
 					return;
 				}
 
 				// 2. Create email_send record for billing audit
-				const [sendRecord] = await tx.insert(emailSend).values({
-					organizationId: payload.organizationId,
-					subscriptionId: activeSub.id,
-					recipientEmail: "multiple@recipients.info", // simplified for batch events
-					countedInCredits: true,
-					creditsConsumed: payload.recipientCount,
-					status: "sent",
-					sentAt: new Date(),
-				}).returning();
+				const [sendRecord] = await tx
+					.insert(emailSend)
+					.values({
+						organizationId: payload.organizationId,
+						subscriptionId: activeSub.id,
+						recipientEmail: "multiple@recipients.info", // simplified for batch events
+						countedInCredits: true,
+						creditsConsumed: payload.recipientCount,
+						status: "sent",
+						sentAt: new Date(),
+					})
+					.returning();
 
 				// 3. Update subscription counters
 				await tx
@@ -122,9 +141,15 @@ export async function loader() {
 					referenceId: sendRecord.id,
 				});
 			});
-			logger.info({ organizationId: payload.organizationId }, "Deducted credits and updated ledger");
+			logger.info(
+				{ organizationId: payload.organizationId },
+				"Deducted credits and updated ledger",
+			);
 		} catch (error) {
-			logger.error({ error, organizationId: payload.organizationId }, "Failed to deduct credits");
+			logger.error(
+				{ error, organizationId: payload.organizationId },
+				"Failed to deduct credits",
+			);
 		}
 	});
 }

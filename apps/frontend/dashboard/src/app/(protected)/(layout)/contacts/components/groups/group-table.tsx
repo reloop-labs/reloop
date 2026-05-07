@@ -1,4 +1,6 @@
 "use client";
+import { PageSizeDropdown } from "@fe/dashboard/components/page-size-dropdown";
+import { PaginationControls } from "@fe/dashboard/components/pagination-controls";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -8,8 +10,6 @@ import { useState } from "react";
 import useSWR from "swr";
 import { GroupDropdown } from "./group-dropdown";
 import { GroupsEmptyState } from "./groups-empty-state";
-import { PageSizeDropdown } from "@fe/dashboard/components/page-size-dropdown";
-import { PaginationControls } from "@fe/dashboard/components/pagination-controls";
 
 interface Group {
 	id: string;

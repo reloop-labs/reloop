@@ -7,81 +7,81 @@ import { useSWRConfig } from "swr";
 import type { WebhookData } from "./types";
 
 export function useDeleteWebhook(
-  webhook: WebhookData | null | undefined,
-  onSuccess?: () => void,
+	webhook: WebhookData | null | undefined,
+	onSuccess?: () => void,
 ) {
-  const [deleteId, setDeleteId] = useQueryState("delete");
-  const [deletedWebhookName, setDeletedWebhookName] =
-    useQueryState("deleted_webhook");
-  const [lastDeletedWebhookName, setLastDeletedWebhookName] = useState<
-    string | null
-  >(deletedWebhookName);
+	const [deleteId, setDeleteId] = useQueryState("delete");
+	const [deletedWebhookName, setDeletedWebhookName] =
+		useQueryState("deleted_webhook");
+	const [lastDeletedWebhookName, setLastDeletedWebhookName] = useState<
+		string | null
+	>(deletedWebhookName);
 
-  useEffect(() => {
-    if (deletedWebhookName) {
-      setLastDeletedWebhookName(deletedWebhookName);
-    }
-  }, [deletedWebhookName]);
+	useEffect(() => {
+		if (deletedWebhookName) {
+			setLastDeletedWebhookName(deletedWebhookName);
+		}
+	}, [deletedWebhookName]);
 
-  const [confirmationName, setConfirmationName] = useState("");
-  const [isDeleting, setIsDeleting] = useState(false);
+	const [confirmationName, setConfirmationName] = useState("");
+	const [isDeleting, setIsDeleting] = useState(false);
 
-  const { activeOrganization } = useUserOrganization();
-  const { mutate } = useSWRConfig();
+	const { activeOrganization } = useUserOrganization();
+	const { mutate } = useSWRConfig();
 
-  const webhookToDelete = webhook?.id === deleteId ? webhook : null;
-  const validationPhrase = webhookToDelete?.name || webhookToDelete?.url || "";
+	const webhookToDelete = webhook?.id === deleteId ? webhook : null;
+	const validationPhrase = webhookToDelete?.name || webhookToDelete?.url || "";
 
-  const handleDelete = async () => {
-    if (!webhookToDelete || !activeOrganization) return;
+	const handleDelete = async () => {
+		if (!webhookToDelete || !activeOrganization) return;
 
-    if (confirmationName !== validationPhrase) {
-      toast.error("Please enter the correct webhook name to confirm deletion");
-      return;
-    }
+		if (confirmationName !== validationPhrase) {
+			toast.error("Please enter the correct webhook name to confirm deletion");
+			return;
+		}
 
-    try {
-      setIsDeleting(true);
-      await axios.delete(`/api/webhook/v1/${webhookToDelete.id}`, {
-        headers: { credentials: "include" },
-      });
+		try {
+			setIsDeleting(true);
+			await axios.delete(`/api/webhook/v1/${webhookToDelete.id}`, {
+				headers: { credentials: "include" },
+			});
 
-      toast.success("Webhook deleted successfully");
-      setDeletedWebhookName(validationPhrase);
-      setDeleteId(null);
-      setConfirmationName("");
-      mutate(
-        `/api/webhook/v1/?organizationId=${activeOrganization.id}&limit=100`,
-      );
-      if (onSuccess) {
-        onSuccess();
-      }
-    } catch (error) {
-      const errorMessage = axios.isAxiosError(error)
-        ? error.response?.data?.message || "Failed to delete webhook"
-        : "Failed to delete webhook";
-      toast.error(errorMessage);
-    } finally {
-      setIsDeleting(false);
-    }
-  };
+			toast.success("Webhook deleted successfully");
+			setDeletedWebhookName(validationPhrase);
+			setDeleteId(null);
+			setConfirmationName("");
+			mutate(
+				`/api/webhook/v1/?organizationId=${activeOrganization.id}&limit=100`,
+			);
+			if (onSuccess) {
+				onSuccess();
+			}
+		} catch (error) {
+			const errorMessage = axios.isAxiosError(error)
+				? error.response?.data?.message || "Failed to delete webhook"
+				: "Failed to delete webhook";
+			toast.error(errorMessage);
+		} finally {
+			setIsDeleting(false);
+		}
+	};
 
-  const handleCancel = () => {
-    setDeleteId(null);
-    setDeletedWebhookName(null);
-    setConfirmationName("");
-  };
+	const handleCancel = () => {
+		setDeleteId(null);
+		setDeletedWebhookName(null);
+		setConfirmationName("");
+	};
 
-  return {
-    deleteId,
-    deletedWebhookName,
-    lastDeletedWebhookName,
-    confirmationName,
-    setConfirmationName,
-    isDeleting,
-    validationPhrase,
-    webhookToDelete,
-    handleDelete,
-    handleCancel,
-  };
+	return {
+		deleteId,
+		deletedWebhookName,
+		lastDeletedWebhookName,
+		confirmationName,
+		setConfirmationName,
+		isDeleting,
+		validationPhrase,
+		webhookToDelete,
+		handleDelete,
+		handleCancel,
+	};
 }

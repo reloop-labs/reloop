@@ -8,38 +8,38 @@ import { landing } from "./routes/landing/landing.index";
 import { loader } from "./utils/loader";
 
 const app = new Elysia({
-  prefix: "/api/kumomta",
-  name: "Server",
+	prefix: "/api/kumomta",
+	name: "Server",
 })
-  .use(cors())
-  .use(
-    openapi({
-      documentation: {
-        info: {
-          title: "KumoMTA Service",
-          version: "1.0.0",
-        },
-        components: {
-          securitySchemes: {
-            apiKey: {
-              type: "apiKey",
-              name: "x-kumomta-key",
-              in: "header",
-            },
-          },
-        },
-      },
-    }),
-  )
-  .use(landing)
-  .use(kumomtaRoutes);
+	.use(cors())
+	.use(
+		openapi({
+			documentation: {
+				info: {
+					title: "KumoMTA Service",
+					version: "1.0.0",
+				},
+				components: {
+					securitySchemes: {
+						apiKey: {
+							type: "apiKey",
+							name: "x-kumomta-key",
+							in: "header",
+						},
+					},
+				},
+			},
+		}),
+	)
+	.use(landing)
+	.use(kumomtaRoutes);
 
 await loader();
 
 app.listen(kumomtaConfig.port, (server) => {
-  logger.info(
-    `🦊 KumoMTA Server is running at http://${server?.hostname}:${server?.port}`,
-  );
+	logger.info(
+		`🦊 KumoMTA Server is running at http://${server?.hostname}:${server?.port}`,
+	);
 });
 
 export type App = typeof app;

@@ -15,7 +15,8 @@ export interface GroupResponse
 	event: string;
 }
 
-export interface GroupListItem extends Omit<GroupResponse, "object" | "event"> { }
+export interface GroupListItem
+	extends Omit<GroupResponse, "object" | "event"> {}
 
 export interface GroupListResponse {
 	object: "contact_group";

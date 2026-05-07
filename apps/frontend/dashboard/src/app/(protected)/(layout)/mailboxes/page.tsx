@@ -68,7 +68,7 @@ const EmptyState = () => {
 				className={Button.buttonVariants({
 					variant: "neutral",
 				}).root()}
-				href={`/domain/add`}
+				href={"/domain/add"}
 			>
 				<Icon name="plus" className="h-4 w-4" />
 				Add your first mailbox

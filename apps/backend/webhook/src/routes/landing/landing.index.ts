@@ -74,7 +74,8 @@ export const landing = new Elysia()
 	.get("/agent-card.json", () => ({
 		name: "Webhook Service",
 		version: "1.0.0",
-		description: "Service for managing and triggering webhooks to notify external systems of events.",
+		description:
+			"Service for managing and triggering webhooks to notify external systems of events.",
 		url: "https://reloop.sh",
 		defaultInputModes: ["application/json"],
 		defaultOutputModes: ["application/json"],
@@ -83,47 +84,65 @@ export const landing = new Elysia()
 			{
 				id: "create_webhook",
 				name: "Create Webhook",
-				description: "Subscribe to specific events by providing a destination URL.",
+				description:
+					"Subscribe to specific events by providing a destination URL.",
 				method: "POST",
 				path: "/api/webhook/v1/create",
 				tags: ["webhook"],
 				inputSchema: {
-					url: { type: "string", required: true, description: "Destination URL" },
-					events: { type: "array", required: true, description: "List of event types to subscribe to" }
+					url: {
+						type: "string",
+						required: true,
+						description: "Destination URL",
+					},
+					events: {
+						type: "array",
+						required: true,
+						description: "List of event types to subscribe to",
+					},
 				},
 				outputSchema: {
 					id: { type: "string" },
-					secret: { type: "string", description: "Secret for signing requests" }
+					secret: {
+						type: "string",
+						description: "Secret for signing requests",
+					},
 				},
 				errorCodes: [],
-				examples: []
+				examples: [],
 			},
 			{
 				id: "trigger_webhook",
 				name: "Trigger Webhook",
-				description: "Manually trigger a webhook event for testing or retry purposes.",
+				description:
+					"Manually trigger a webhook event for testing or retry purposes.",
 				method: "POST",
 				path: "/api/webhook/v1/trigger",
 				tags: ["webhook"],
 				inputSchema: {
 					id: { type: "string", required: true, description: "Webhook ID" },
-					payload: { type: "object", required: true, description: "Event payload" }
+					payload: {
+						type: "object",
+						required: true,
+						description: "Event payload",
+					},
 				},
 				outputSchema: {
-					deliveryId: { type: "string" }
+					deliveryId: { type: "string" },
 				},
 				errorCodes: [{ status: 404, meaning: "Webhook not found" }],
-				examples: []
-			}
+				examples: [],
+			},
 		],
-		usage_guidelines: "1. Destination URLs must return a 2xx status code within 5 seconds.\n2. Requests are signed with an HMAC-SHA256 signature using the webhook secret.\n3. Automatic retries are performed for failed deliveries (exponential backoff).",
+		usage_guidelines:
+			"1. Destination URLs must return a 2xx status code within 5 seconds.\n2. Requests are signed with an HMAC-SHA256 signature using the webhook secret.\n3. Automatic retries are performed for failed deliveries (exponential backoff).",
 		authentication: {
 			schemes: ["bearer", "apiKey"],
 			headerName: "Authorization",
-			notes: "Bearer token or session cookie required."
+			notes: "Bearer token or session cookie required.",
 		},
 		provider: {
 			organization: "Reloop labs",
-			contact: "https://reloop.sh/support"
-		}
+			contact: "https://reloop.sh/support",
+		},
 	}));

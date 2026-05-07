@@ -46,4 +46,3 @@ const webhookService = new Elysia({
 	});
 
 export type WebhookService = typeof webhookService;
-

@@ -23,7 +23,7 @@ export async function enableApiKeyController({
 		method?: string;
 		userAgent?: string;
 		ipAddress?: string;
-    statusCode?: number;
+		statusCode?: number;
 	};
 }): Promise<ApiKeyTypes.ApiKeyResponse> {
 	try {

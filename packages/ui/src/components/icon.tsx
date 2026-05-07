@@ -18,11 +18,23 @@ export const IconsSprite = () => (
 		height="24"
 	>
 		<defs>
-			<linearGradient id="sparkle-gradient-1" x1="0%" y1="0%" x2="100%" y2="100%">
+			<linearGradient
+				id="sparkle-gradient-1"
+				x1="0%"
+				y1="0%"
+				x2="100%"
+				y2="100%"
+			>
 				<stop offset="0%" stopColor="#A855F7" />
 				<stop offset="100%" stopColor="#EC4899" />
 			</linearGradient>
-			<linearGradient id="sparkle-gradient-2" x1="0%" y1="0%" x2="100%" y2="100%">
+			<linearGradient
+				id="sparkle-gradient-2"
+				x1="0%"
+				y1="0%"
+				x2="100%"
+				y2="100%"
+			>
 				<stop offset="0%" stopColor="#3B82F6" />
 				<stop offset="100%" stopColor="#2DD4BF" />
 			</linearGradient>

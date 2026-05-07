@@ -1,6 +1,7 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import type React from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 interface CodeColumnContextType {
 	codeContent: React.ReactNode | null;
@@ -11,7 +12,11 @@ const CodeColumnContext = createContext<CodeColumnContextType | undefined>(
 	undefined,
 );
 
-export function CodeColumnProvider({ children }: { children: React.ReactNode }) {
+export function CodeColumnProvider({
+	children,
+}: {
+	children: React.ReactNode;
+}) {
 	const [codeContent, setCodeContent] = useState<React.ReactNode | null>(null);
 
 	return (

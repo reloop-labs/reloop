@@ -5,27 +5,27 @@ import { Elysia, t } from "elysia";
 import { getGroupXCodeSamples } from "./get-group.x-codeSamples";
 
 export const getGroupRoute = new Elysia().use(authMiddleware).get(
-  "/:group_id",
-  async ({ params, activeOrganizationId, logger }) => {
-    return await getGroupController({
-      activeOrganizationId,
-      group_id: params.group_id,
-      logger,
-    });
-  },
-  {
-    auth: true,
-    params: t.Object({ group_id: t.String() }),
-    response: {
-      200: GroupModel.groupBaseResponse,
-      404: GroupModel.groupNotFound,
-      403: GroupModel.unauthorized,
-    },
-    detail: {
-      tags: ["Groups"],
-      summary: "Retrieve Group",
-      description: "Returns group details based on group id",
-      "x-codeSamples": getGroupXCodeSamples,
-    },
-  },
+	"/:group_id",
+	async ({ params, activeOrganizationId, logger }) => {
+		return await getGroupController({
+			activeOrganizationId,
+			group_id: params.group_id,
+			logger,
+		});
+	},
+	{
+		auth: true,
+		params: t.Object({ group_id: t.String() }),
+		response: {
+			200: GroupModel.groupBaseResponse,
+			404: GroupModel.groupNotFound,
+			403: GroupModel.unauthorized,
+		},
+		detail: {
+			tags: ["Groups"],
+			summary: "Retrieve Group",
+			description: "Returns group details based on group id",
+			"x-codeSamples": getGroupXCodeSamples,
+		},
+	},
 );

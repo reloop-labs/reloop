@@ -39,7 +39,8 @@ export const DomainVerifiedEmail = ({
 		body: isDark
 			? "m-0 p-0 bg-[#0e0e0e] text-white font-sans"
 			: "m-0 p-0 bg-white text-[#0e0e0e] font-sans",
-		label: "m-0 font-mono font-medium text-[#707070] text-[12px] uppercase tracking-[0.2em]",
+		label:
+			"m-0 font-mono font-medium text-[#707070] text-[12px] uppercase tracking-[0.2em]",
 		heading: isDark
 			? "mt-6 mb-8 p-0 font-normal text-[32px] text-white leading-[1.2]"
 			: "mt-6 mb-8 p-0 font-normal text-[32px] text-[#0e0e0e] leading-[1.2]",
@@ -82,7 +83,9 @@ export const DomainVerifiedEmail = ({
 	return (
 		<Html>
 			<Head />
-			<Preview>{domain} is verified — you can now send emails through Reloop.</Preview>
+			<Preview>
+				{domain} is verified — you can now send emails through Reloop.
+			</Preview>
 			<Tailwind>
 				<Body className={cls.body}>
 					<Wrapper baseUrl={baseUrl} theme={theme}>
@@ -137,7 +140,9 @@ export const DomainVerifiedEmail = ({
 											verticalAlign: "top",
 										}}
 									>
-										<Text className={cls.rowTitle}>Send Transactional Email</Text>
+										<Text className={cls.rowTitle}>
+											Send Transactional Email
+										</Text>
 										<Text className={cls.rowDesc}>
 											Fire API calls and send from your own domain with full
 											deliverability — SPF, DKIM, and DMARC all configured.
@@ -164,8 +169,8 @@ export const DomainVerifiedEmail = ({
 									>
 										<Text className={cls.rowTitle}>Broadcast Campaigns</Text>
 										<Text className={cls.rowDesc}>
-											Send newsletters and bulk campaigns to your audience
-											under your own brand.
+											Send newsletters and bulk campaigns to your audience under
+											your own brand.
 										</Text>
 									</td>
 								</tr>
@@ -182,8 +187,8 @@ export const DomainVerifiedEmail = ({
 									<td style={{ paddingTop: "20px", verticalAlign: "top" }}>
 										<Text className={cls.rowTitle}>Track Reputation</Text>
 										<Text className={cls.rowDesc}>
-											Monitor bounce rates, spam complaints, and delivery
-											health per domain in your dashboard.
+											Monitor bounce rates, spam complaints, and delivery health
+											per domain in your dashboard.
 										</Text>
 									</td>
 								</tr>

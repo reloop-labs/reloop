@@ -64,11 +64,7 @@ export const ContactsEmptyState = ({
 					asChild
 					className="gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
 				>
-					<a
-						href={docsLink}
-						target="_blank"
-						rel="noopener noreferrer"
-					>
+					<a href={docsLink} target="_blank" rel="noopener noreferrer">
 						<Icon name="file-text" className="h-3.5 w-3.5" />
 						{docsText}
 						<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-200 p-px font-medium text-[10px] uppercase">

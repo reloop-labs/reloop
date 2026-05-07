@@ -3,13 +3,13 @@
 import { Icon } from "@reloop/ui/icon";
 import { useState } from "react";
 import {
-	siNodedotjs,
-	siServerless,
 	siGo,
+	siNodedotjs,
+	siPhp,
 	siPython,
 	siRuby,
-	siPhp,
 	siRust,
+	siServerless,
 } from "simple-icons";
 
 type SdkOption = {
@@ -300,8 +300,6 @@ export default function CodeSnippet() {
 	return (
 		<div className="w-full">
 			<div className="mx-auto max-w-5xl">
-
-
 				{/* Language Grid */}
 				<div className="mb-12 grid grid-cols-4 gap-4 sm:grid-cols-6 lg:grid-cols-8">
 					{sdks.map((sdk) => (
@@ -317,7 +315,7 @@ export default function CodeSnippet() {
 							className="group flex flex-col items-center gap-3"
 						>
 							<div
-								className={`flex size-[68px] items-center justify-center rounded-2xl border transition-all duration-300 shadow-[0_2px_8px_rgba(0,0,0,0.04)] ${
+								className={`flex size-[68px] items-center justify-center rounded-2xl border shadow-[0_2px_8px_rgba(0,0,0,0.04)] transition-all duration-300 ${
 									activeSdk.id === sdk.id
 										? "border-neutral-200 bg-white"
 										: "border-transparent bg-transparent hover:border-neutral-200 hover:bg-white"

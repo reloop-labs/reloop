@@ -46,14 +46,15 @@ export const landing = new Elysia({ name: "Landing" })
 		},
 		{
 			detail: {
-				hide: true
-			}
-		}
+				hide: true,
+			},
+		},
 	)
 	.get("/agent-card.json", () => ({
 		name: "Template Service",
 		version: "1.0.0",
-		description: "Service for managing email and message templates with support for variables and versioning.",
+		description:
+			"Service for managing email and message templates with support for variables and versioning.",
 		url: "https://reloop.sh",
 		defaultInputModes: ["application/json"],
 		defaultOutputModes: ["application/json"],
@@ -69,10 +70,10 @@ export const landing = new Elysia({ name: "Landing" })
 				inputSchema: {},
 				outputSchema: {
 					status: { type: "string" },
-					service: { type: "string" }
+					service: { type: "string" },
 				},
 				errorCodes: [],
-				examples: []
+				examples: [],
 			},
 			{
 				id: "create_template",
@@ -82,14 +83,22 @@ export const landing = new Elysia({ name: "Landing" })
 				path: "/api/template/v1/",
 				tags: ["template"],
 				inputSchema: {
-					name: { type: "string", required: true, description: "Name of the template" },
-					content: { type: "string", required: true, description: "Template content (Handlebars supported)" }
+					name: {
+						type: "string",
+						required: true,
+						description: "Name of the template",
+					},
+					content: {
+						type: "string",
+						required: true,
+						description: "Template content (Handlebars supported)",
+					},
 				},
 				outputSchema: {
-					id: { type: "string" }
+					id: { type: "string" },
 				},
 				errorCodes: [],
-				examples: []
+				examples: [],
 			},
 			{
 				id: "list_templates",
@@ -100,20 +109,21 @@ export const landing = new Elysia({ name: "Landing" })
 				tags: ["template"],
 				inputSchema: {},
 				outputSchema: {
-					templates: { type: "array" }
+					templates: { type: "array" },
 				},
 				errorCodes: [],
-				examples: []
-			}
+				examples: [],
+			},
 		],
-		usage_guidelines: "1. Templates support Handlebars syntax for dynamic variable injection.\n2. Templates can be duplicated to create new versions or variations.\n3. Deleting a template is permanent; ensure no active workflows rely on it.",
+		usage_guidelines:
+			"1. Templates support Handlebars syntax for dynamic variable injection.\n2. Templates can be duplicated to create new versions or variations.\n3. Deleting a template is permanent; ensure no active workflows rely on it.",
 		authentication: {
 			schemes: ["bearer", "cookie"],
 			headerName: "Authorization",
-			notes: "Bearer token or session cookie required."
+			notes: "Bearer token or session cookie required.",
 		},
 		provider: {
 			organization: "Reloop labs",
-			contact: "https://reloop.sh/support"
-		}
+			contact: "https://reloop.sh/support",
+		},
 	}));

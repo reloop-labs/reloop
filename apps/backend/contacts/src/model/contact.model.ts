@@ -12,57 +12,55 @@ export namespace ContactModel {
 	] as const;
 
 	// Contact Models
-	export const createContactBody = t.Object({
-		email: t.String({
-			pattern: emailPattern.source,
-			description: "Contact email address",
-		}),
-		firstName: t.Optional(t.String({ description: "Contact first name" })),
-		lastName: t.Optional(t.String({ description: "Contact last name" })),
-		status: t.Optional(
-			t.Union(
-				[
-					t.Literal("subscribed"),
-					t.Literal("unsubscribed"),
-					t.Literal("blocked"),
-				],
-				{
-					description: "Contact subscription status",
-					default: "subscribed",
-				},
-			),
-		),
-		properties: t.Optional(
-			t.Record(
-				t.String({ pattern: "^[a-z0-9_]+$" }),
-				t.Union([t.String(), t.Number()]),
-				{
-					description: "Contact properties as key-value pairs",
-				},
-			),
-		),
-		groupIds: t.Optional(
-			t.Array(t.String(), {
-				description: "Array of group IDs to add the contact to",
+	export const createContactBody = t.Object(
+		{
+			email: t.String({
+				pattern: emailPattern.source,
+				description: "Contact email address",
 			}),
-		),
-		channels: t.Optional(
-			t.Array(
-				t.Object({
-					channelId: t.String({ description: "Channel identifier" }),
-					subscription: t.Union(
-						[t.Literal("opt_in"), t.Literal("opt_out")],
-						{
-							description: "Subscription status for the channel",
-						},
-					),
-				}),
-				{
-					description: "Array of channels to enroll the contact in",
-				},
+			firstName: t.Optional(t.String({ description: "Contact first name" })),
+			lastName: t.Optional(t.String({ description: "Contact last name" })),
+			status: t.Optional(
+				t.Union(
+					[
+						t.Literal("subscribed"),
+						t.Literal("unsubscribed"),
+						t.Literal("blocked"),
+					],
+					{
+						description: "Contact subscription status",
+						default: "subscribed",
+					},
+				),
 			),
-		),
-	},
+			properties: t.Optional(
+				t.Record(
+					t.String({ pattern: "^[a-z0-9_]+$" }),
+					t.Union([t.String(), t.Number()]),
+					{
+						description: "Contact properties as key-value pairs",
+					},
+				),
+			),
+			groupIds: t.Optional(
+				t.Array(t.String(), {
+					description: "Array of group IDs to add the contact to",
+				}),
+			),
+			channels: t.Optional(
+				t.Array(
+					t.Object({
+						channelId: t.String({ description: "Channel identifier" }),
+						subscription: t.Union([t.Literal("opt_in"), t.Literal("opt_out")], {
+							description: "Subscription status for the channel",
+						}),
+					}),
+					{
+						description: "Array of channels to enroll the contact in",
+					},
+				),
+			),
+		},
 		{
 			examples: [
 				{
@@ -76,7 +74,8 @@ export namespace ContactModel {
 					},
 				},
 			],
-		});
+		},
+	);
 
 	export type CreateContactBody = typeof createContactBody.static;
 
@@ -96,37 +95,38 @@ export namespace ContactModel {
 
 	export type CreateContactsBody = typeof createContactsBody.static;
 
-	export const updateContactBody = t.Object({
-		email: t.Optional(
-			t.String({
-				pattern: emailPattern.source,
-				description: "Contact email address",
-			}),
-		),
-		firstName: t.Optional(t.String({ description: "Contact first name" })),
-		lastName: t.Optional(t.String({ description: "Contact last name" })),
-		status: t.Optional(
-			t.Union(
-				[
-					t.Literal("subscribed"),
-					t.Literal("unsubscribed"),
-					t.Literal("blocked"),
-				],
-				{
-					description: "Contact subscription status",
-				},
+	export const updateContactBody = t.Object(
+		{
+			email: t.Optional(
+				t.String({
+					pattern: emailPattern.source,
+					description: "Contact email address",
+				}),
 			),
-		),
-		properties: t.Optional(
-			t.Record(
-				t.String({ pattern: "^[a-z_]+$" }),
-				t.Union([t.String(), t.Number()]),
-				{
-					description: "Contact properties as key-value pairs to update",
-				},
+			firstName: t.Optional(t.String({ description: "Contact first name" })),
+			lastName: t.Optional(t.String({ description: "Contact last name" })),
+			status: t.Optional(
+				t.Union(
+					[
+						t.Literal("subscribed"),
+						t.Literal("unsubscribed"),
+						t.Literal("blocked"),
+					],
+					{
+						description: "Contact subscription status",
+					},
+				),
 			),
-		),
-	},
+			properties: t.Optional(
+				t.Record(
+					t.String({ pattern: "^[a-z_]+$" }),
+					t.Union([t.String(), t.Number()]),
+					{
+						description: "Contact properties as key-value pairs to update",
+					},
+				),
+			),
+		},
 		{
 			examples: [
 				{
@@ -140,80 +140,77 @@ export namespace ContactModel {
 					},
 				},
 			],
-		});
+		},
+	);
 
 	export type UpdateContactBody = typeof updateContactBody.static;
 
-	export const contactBaseResponse = t.Object({
-		object: t.Literal("contact", { default: "contact" }),
-		id: t.String({ description: "Unique contact identifier" }),
-		email: t.String({ description: "Contact email address" }),
-		firstName: t.Union([t.String(), t.Null()], {
-			description: "Contact first name",
-		}),
-		lastName: t.Union([t.String(), t.Null()], {
-			description: "Contact last name",
-		}),
-		status: t.Union(
-			[
-				t.Literal("subscribed"),
-				t.Literal("unsubscribed"),
-				t.Literal("blocked"),
-			],
-			{
-				description: "Contact subscription status",
-			},
-		),
-		properties: t.Record(
-			t.String({ pattern: "^[a-z_]+$" }),
-			t.Union([t.String(), t.Number()]),
-			{
-				description: "Contact properties as key-value pairs",
-				default: {},
-			},
-		),
-		groups: t.Array(
-			t.Object({
-				id: t.String({ description: "Group ID" }),
-				name: t.String({ description: "Group name" }),
+	export const contactBaseResponse = t.Object(
+		{
+			object: t.Literal("contact", { default: "contact" }),
+			id: t.String({ description: "Unique contact identifier" }),
+			email: t.String({ description: "Contact email address" }),
+			firstName: t.Union([t.String(), t.Null()], {
+				description: "Contact first name",
 			}),
-			{
-				description: "Groups this contact belongs to",
-				default: [],
-			},
-		),
-		channels: t.Array(
-			t.Object({
-				id: t.String({ description: "Channel ID" }),
-				name: t.String({ description: "Channel name" }),
-				subscription: t.Union(
-					[t.Literal("opt_in"), t.Literal("opt_out")],
-					{ description: "Contact's subscription status for this channel" },
-				),
+			lastName: t.Union([t.String(), t.Null()], {
+				description: "Contact last name",
 			}),
-			{
-				description: "Channels this contact is enrolled in",
-				default: [],
-			},
-		),
-		suppressionReason: t.Union(
-			[
-				t.Literal("hard_bounce"),
-				t.Literal("spam_complaint"),
-				t.Null(),
-			],
-			{
-				description: "Suppression reason, or null if not suppressed",
+			status: t.Union(
+				[
+					t.Literal("subscribed"),
+					t.Literal("unsubscribed"),
+					t.Literal("blocked"),
+				],
+				{
+					description: "Contact subscription status",
+				},
+			),
+			properties: t.Record(
+				t.String({ pattern: "^[a-z_]+$" }),
+				t.Union([t.String(), t.Number()]),
+				{
+					description: "Contact properties as key-value pairs",
+					default: {},
+				},
+			),
+			groups: t.Array(
+				t.Object({
+					id: t.String({ description: "Group ID" }),
+					name: t.String({ description: "Group name" }),
+				}),
+				{
+					description: "Groups this contact belongs to",
+					default: [],
+				},
+			),
+			channels: t.Array(
+				t.Object({
+					id: t.String({ description: "Channel ID" }),
+					name: t.String({ description: "Channel name" }),
+					subscription: t.Union([t.Literal("opt_in"), t.Literal("opt_out")], {
+						description: "Contact's subscription status for this channel",
+					}),
+				}),
+				{
+					description: "Channels this contact is enrolled in",
+					default: [],
+				},
+			),
+			suppressionReason: t.Union(
+				[t.Literal("hard_bounce"), t.Literal("spam_complaint"), t.Null()],
+				{
+					description: "Suppression reason, or null if not suppressed",
+					default: null,
+				},
+			),
+			suppressedAt: t.Union([t.Date(), t.Null()], {
+				description: "When the contact was suppressed, or null",
 				default: null,
-			},
-		),
-		suppressedAt: t.Union([t.Date(), t.Null()], {
-			description: "When the contact was suppressed, or null",
-			default: null,
-		}),
-		createdAt: t.Date(),
-		updatedAt: t.Date(),
-	},
+			}),
+			createdAt: t.Date(),
+			updatedAt: t.Date(),
+		},
 		{
 			examples: [
 				{
@@ -228,14 +225,16 @@ export namespace ContactModel {
 						role: "Developer",
 					},
 					groups: [{ id: "grp_123", name: "Beta Testers" }],
-					channels: [{ id: "tpc_123", name: "Newsletter", subscription: "opt_in" }],
+					channels: [
+						{ id: "tpc_123", name: "Newsletter", subscription: "opt_in" },
+					],
 					suppression: null,
 					createdAt: "2026-03-23T10:00:00Z",
 					updatedAt: "2026-03-23T10:00:00Z",
 				},
 			],
-		});
-
+		},
+	);
 
 	export const contactResponse = t.Composite([
 		contactBaseResponse,
@@ -274,8 +273,12 @@ export namespace ContactModel {
 		{
 			id: t.String({ description: "Unique contact identifier" }),
 			email: t.String({ description: "Contact email address" }),
-			firstName: t.Union([t.String(), t.Null()], { description: "Contact first name" }),
-			lastName: t.Union([t.String(), t.Null()], { description: "Contact last name" }),
+			firstName: t.Union([t.String(), t.Null()], {
+				description: "Contact first name",
+			}),
+			lastName: t.Union([t.String(), t.Null()], {
+				description: "Contact last name",
+			}),
 			status: t.Union(
 				[
 					t.Literal("subscribed"),
@@ -503,7 +506,8 @@ export namespace ContactModel {
 		},
 	);
 
-	export type AddContactToGroupResponse = typeof addContactToGroupResponse.static;
+	export type AddContactToGroupResponse =
+		typeof addContactToGroupResponse.static;
 
 	export const removeContactFromGroupBody = t.Object({
 		contact_id: t.Optional(t.String({ description: "Contact ID" })),
@@ -515,7 +519,8 @@ export namespace ContactModel {
 		),
 	});
 
-	export type RemoveContactFromGroupBody = typeof removeContactFromGroupBody.static;
+	export type RemoveContactFromGroupBody =
+		typeof removeContactFromGroupBody.static;
 
 	export const removeContactFromGroupResponse = t.Object(
 		{

@@ -1,6 +1,9 @@
 "use client";
 
+import type { SVGProps } from "react";
+import type { SimpleIcon as SimpleIconType } from "simple-icons";
 import {
+	siCursor,
 	siDotnet,
 	siElixir,
 	siExpress,
@@ -11,14 +14,11 @@ import {
 	siOpenjdk,
 	siPhp,
 	siPython,
+	siReadthedocs,
 	siRuby,
 	siRubyonrails,
 	siRust,
-	siCursor,
-	siReadthedocs,
 } from "simple-icons";
-import type { SimpleIcon as SimpleIconType } from "simple-icons";
-import type { SVGProps } from "react";
 
 const Icons: Record<string, SimpleIconType> = {
 	siNodedotjs,
@@ -77,7 +77,7 @@ export function SimpleIcon({
 						justifyContent: "center",
 						fontSize: "10px",
 						color: "red",
-						overflow: "hidden"
+						overflow: "hidden",
 					}}
 				>
 					?

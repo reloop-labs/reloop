@@ -1,13 +1,13 @@
 "use client";
 import { PageSizeDropdown } from "@fe/dashboard/components/page-size-dropdown";
 import { PaginationControls } from "@fe/dashboard/components/pagination-controls";
+import type { Domain } from "@fe/dashboard/types/api.types";
 import {
 	getStatusColorClass,
 	getStatusIcon,
 	getStatusLabel,
 } from "@fe/dashboard/utils/domain";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
-import type { Domain } from "@fe/dashboard/types/api.types";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { useParams, useRouter } from "next/navigation";

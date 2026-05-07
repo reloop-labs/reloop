@@ -46,7 +46,7 @@ export const landing = new Elysia()
 
 `;
 		},
-		{ detail: { hide: true } }
+		{ detail: { hide: true } },
 	)
 	.get(
 		"/health",
@@ -77,7 +77,8 @@ export const landing = new Elysia()
 	.get("/agent-card.json", () => ({
 		name: "Mail Service",
 		version: "1.0.0",
-		description: "Service for composing and sending transactional and marketing emails with support for templates and attachments.",
+		description:
+			"Service for composing and sending transactional and marketing emails with support for templates and attachments.",
 		url: "https://reloop.sh",
 		defaultInputModes: ["application/json"],
 		defaultOutputModes: ["application/json"],
@@ -86,52 +87,67 @@ export const landing = new Elysia()
 			{
 				id: "health_check",
 				name: "Health Check",
-				description: "Verify the health of the mail service and its dependencies.",
+				description:
+					"Verify the health of the mail service and its dependencies.",
 				method: "GET",
 				path: "/api/mail/health",
 				tags: ["monitoring"],
 				inputSchema: {},
 				outputSchema: {
 					status: { type: "string" },
-					success: { type: "boolean" }
+					success: { type: "boolean" },
 				},
 				errorCodes: [],
-				examples: []
+				examples: [],
 			},
 			{
 				id: "send_email",
 				name: "Send Email",
-				description: "Send an email to one or more recipients. Supports HTML, Plain Text, and Templates.",
+				description:
+					"Send an email to one or more recipients. Supports HTML, Plain Text, and Templates.",
 				method: "POST",
 				path: "/api/mail/v1/send",
 				tags: ["mail"],
 				inputSchema: {
-					from: { type: "string", required: true, description: "Sender address" },
-					to: { type: "array", required: true, description: "Recipient addresses" },
-					subject: { type: "string", required: true, description: "Email subject" },
+					from: {
+						type: "string",
+						required: true,
+						description: "Sender address",
+					},
+					to: {
+						type: "array",
+						required: true,
+						description: "Recipient addresses",
+					},
+					subject: {
+						type: "string",
+						required: true,
+						description: "Email subject",
+					},
 					html: { type: "string", description: "HTML body" },
 					text: { type: "string", description: "Plain text body" },
-					templateId: { type: "string", description: "Optional template ID" }
+					templateId: { type: "string", description: "Optional template ID" },
 				},
 				outputSchema: {
 					id: { type: "string", description: "Unique message identifier" },
-					status: { type: "string", description: "Initial delivery status" }
+					status: { type: "string", description: "Initial delivery status" },
 				},
 				errorCodes: [
 					{ status: 400, meaning: "Bad request / Validation error" },
-					{ status: 401, meaning: "Unauthorized" }
+					{ status: 401, meaning: "Unauthorized" },
 				],
-				examples: []
-			}
+				examples: [],
+			},
 		],
-		usage_guidelines: "1. Senders must use a verified domain.\n2. Attachments should be uploaded via the upload service first.\n3. Rate limits apply based on organization tier.",
+		usage_guidelines:
+			"1. Senders must use a verified domain.\n2. Attachments should be uploaded via the upload service first.\n3. Rate limits apply based on organization tier.",
 		authentication: {
 			schemes: ["bearer", "apiKey"],
 			headerName: "Authorization",
-			notes: "Bearer token or session cookie required."
+			notes: "Bearer token or session cookie required.",
 		},
 		provider: {
 			organization: "Reloop labs",
-			contact: "https://reloop.sh/support"
-		}
+			contact: "https://reloop.sh/support",
+		},
 	}));

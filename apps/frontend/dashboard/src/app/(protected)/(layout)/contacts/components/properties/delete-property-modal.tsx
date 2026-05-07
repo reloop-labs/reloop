@@ -85,7 +85,8 @@ export const DeletePropertyModal = ({
 			setConfirmationName("");
 			await mutate(
 				(key: string) =>
-					typeof key === "string" && key.includes("/api/contacts/v1/properties"),
+					typeof key === "string" &&
+					key.includes("/api/contacts/v1/properties"),
 			);
 
 			onDeleteSuccess?.();

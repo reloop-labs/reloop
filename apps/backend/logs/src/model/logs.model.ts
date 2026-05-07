@@ -25,15 +25,17 @@ export namespace LogsModel {
 		}),
 		level: t.String(logLevel),
 		trace_id: t.String({ description: "Distributed trace identifier" }),
-		metadata:
-			t.Record(t.String(), structuredValue, {
-				description: "Additional structured metadata for debugging and querying",
+		metadata: t.Record(t.String(), structuredValue, {
+			description: "Additional structured metadata for debugging and querying",
+		}),
+		status_code: t.Optional(
+			t.Union([t.Number(), t.String()], {
+				description: "HTTP status code if applicable",
 			}),
-		status_code: t.Optional(t.Union([t.Number(), t.String()], { description: "HTTP status code if applicable" })),
-		requestDetails:
-			t.Record(t.String(), structuredValue, {
-				description: "Additional structured metadata for debugging and querying",
-			}),
+		),
+		requestDetails: t.Record(t.String(), structuredValue, {
+			description: "Additional structured metadata for debugging and querying",
+		}),
 	});
 
 	export type BaseLogBody = typeof baseLogBody.static;
@@ -47,7 +49,9 @@ export namespace LogsModel {
 		level: t.String({ description: "Stored log level" }),
 		trace_id: t.Union([t.String(), t.Null()]),
 		metadata: t.Any(),
-		status_code: t.Union([t.Number(), t.Null()], { description: "HTTP status code" }),
+		status_code: t.Union([t.Number(), t.Null()], {
+			description: "HTTP status code",
+		}),
 		created_at: t.String({ format: "date-time" }),
 		requestDetails: t.Any(),
 		email: t.Optional(t.Any()),
@@ -61,7 +65,9 @@ export namespace LogsModel {
 		level: t.String({ description: "Stored log level" }),
 		trace_id: t.String({ description: "Distributed trace identifier" }),
 		metadata: t.Any({ description: "Additional structured metadata" }),
-		status_code: t.Union([t.Number(), t.Null()], { description: "HTTP status code" }),
+		status_code: t.Union([t.Number(), t.Null()], {
+			description: "HTTP status code",
+		}),
 		created_at: t.String({ format: "date-time" }),
 		requestDetails: t.Any(),
 		email: t.Optional(t.Any()),
@@ -74,12 +80,30 @@ export namespace LogsModel {
 
 	export const listLogsQuery = t.Object({
 		level: t.Optional(logLevel),
-		event: t.Optional(t.String({ description: "Filter by event name (partial match)" })),
-		status_code: t.Optional(t.String({ description: "Filter by status code (number or 'success', 'error')" })),
-		search: t.Optional(t.String({ description: "Search across event name and metadata" })),
+		event: t.Optional(
+			t.String({ description: "Filter by event name (partial match)" }),
+		),
+		status_code: t.Optional(
+			t.String({
+				description: "Filter by status code (number or 'success', 'error')",
+			}),
+		),
+		search: t.Optional(
+			t.String({ description: "Search across event name and metadata" }),
+		),
 		organization_id: t.Optional(t.String()),
-		start_date: t.Optional(t.String({ format: "date-time", description: "Filter logs from this date (ISO 8601)" })),
-		end_date: t.Optional(t.String({ format: "date-time", description: "Filter logs until this date (ISO 8601)" })),
+		start_date: t.Optional(
+			t.String({
+				format: "date-time",
+				description: "Filter logs from this date (ISO 8601)",
+			}),
+		),
+		end_date: t.Optional(
+			t.String({
+				format: "date-time",
+				description: "Filter logs until this date (ISO 8601)",
+			}),
+		),
 		limit: t.Optional(
 			t.Numeric({
 				minimum: 1,
@@ -198,7 +222,9 @@ export namespace LogsModel {
 		domain_id: t.Optional(t.String()),
 		start_date: t.Optional(t.String({ format: "date-time" })),
 		end_date: t.Optional(t.String({ format: "date-time" })),
-		interval: t.Optional(t.Union([t.Literal("day"), t.Literal("hour")], { default: "day" })),
+		interval: t.Optional(
+			t.Union([t.Literal("day"), t.Literal("hour")], { default: "day" }),
+		),
 	});
 	export type EmailStatsQuery = typeof emailStatsQuery.static;
 
