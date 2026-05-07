@@ -33,9 +33,9 @@ export async function createLog(body: {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
-				"x-log-api-key": contactsConfig.LOGS_API_KEY,
 				...(cookie && { cookie }),
 			},
+
 			body: JSON.stringify({
 				event,
 				level,

@@ -34,9 +34,9 @@ export async function createLog(body: {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
-				"x-log-api-key": apiKeyConfig.LOGS_API_KEY || "reloop-log-api-key",
 				...(cookie && { cookie }),
 			},
+
 			body: JSON.stringify({
 				event,
 				level,

@@ -7,19 +7,12 @@ if (logsConfig.NODE_ENV !== "production") {
 	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 }
 
-function validateLogApiKeyHeader(headers: Headers) {
-	const logApiKey = headers.get("x-log-api-key");
-	return logApiKey === logsConfig.LOGS_API_KEY;
-}
-
 export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 	insertAuth: {
 		async resolve({ status, request: { headers } }) {
 			try {
-				if (!validateLogApiKeyHeader(headers)) {
-					return status(403, { message: "Invalid log service key" });
-				}
 				const apiKey =
+
 					headers.get("x-api-key") ||
 					headers.get("authorization")?.replace("Bearer ", "");
 				const cookie = headers.get("cookie");

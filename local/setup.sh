@@ -40,7 +40,19 @@ populate_env() {
 cd "$(dirname "$0")/.." || exit
 
 # List of services to populate
+populate_env "apps/backend/api-key"
 populate_env "apps/backend/auth"
+populate_env "apps/backend/billing"
+populate_env "apps/backend/contacts"
+populate_env "apps/backend/domain"
+populate_env "apps/backend/email"
+populate_env "apps/backend/kumomta"
+populate_env "apps/backend/logs"
+populate_env "apps/backend/mailing"
+populate_env "apps/backend/template"
+populate_env "apps/backend/upload"
+populate_env "apps/backend/webhook"
+
 
 echo "--------------------------------------------------"
 echo "Setup complete!"

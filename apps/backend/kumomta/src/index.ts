@@ -1,4 +1,6 @@
+import "dotenv/config";
 import { cors } from "@elysiajs/cors";
+
 import { openapi } from "@elysiajs/openapi";
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";

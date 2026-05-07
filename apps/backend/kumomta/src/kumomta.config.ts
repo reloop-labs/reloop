@@ -1,5 +1,5 @@
 export const kumomtaConfig = {
-	port: Number(process.env.PORT || 8021),
+	port: Number(process.env.PORT || "8021"),
 	PG_URL:
 		process.env.PG_URL || "postgresql://reloop:reloop123@localhost:5432/reloop",
 	REDIS_URL: process.env.REDIS_URL || "redis://:reloop123@localhost:6379",
@@ -7,3 +7,4 @@ export const kumomtaConfig = {
 	X_KUMOMTA_KEY: process.env.X_KUMOMTA_KEY || "reloop",
 	NATS_URL: process.env.NATS_URL || "nats://localhost:4222",
 };
+
