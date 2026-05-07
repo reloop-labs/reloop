@@ -1,0 +1,16 @@
+{
+	"name": "@reloop/bus",
+	"version": "0.0.1",
+	"private": true,
+	"exports": {
+		".": "./src/index.ts",
+		"./events": "./src/events.ts"
+	},
+	"dependencies": {
+		"@nats-io/jetstream": "catalog:backend",
+		"@nats-io/kv": "catalog:backend",
+		"@nats-io/obj": "catalog:backend",
+		"@nats-io/services": "catalog:backend",
+		"@nats-io/transport-node": "catalog:backend"
+	}
+}

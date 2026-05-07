@@ -1,3 +1,4 @@
+import { bus, BusEvent } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
@@ -54,6 +55,11 @@ export const auth = betterAuth({
 			const newSession = ctx.context.newSession;
 			if (newSession) {
 				logger.info("🔐 User registered:", newSession.user);
+				await bus.publish(BusEvent.USER_CREATED, {
+					id: newSession.user.id,
+					email: newSession.user.email,
+					name: newSession.user.name,
+				});
 			}
 		}
 	}),

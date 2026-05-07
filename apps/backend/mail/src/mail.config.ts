@@ -12,4 +12,5 @@ export const mailConfig = {
   BASE_URL: process.env.BASE_URL,
   KUMOMTA_HTTP_URL: process.env.KUMOMTA_HTTP_URL || "http://localhost:8020",
   NODE_ENV: process.env.NODE_ENV || "development",
+  NATS_URL: process.env.NATS_URL || "nats://localhost:4222",
 };

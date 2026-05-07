@@ -37,6 +37,7 @@
 		"@reloop/cache": "workspace:*",
 		"@reloop/logger": "workspace:*",
 		"@reloop/auth": "workspace:*",
+		"@reloop/bus": "workspace:*",
 		"@reloop/react-email": "workspace:*",
 		"@elysiajs/eden": "catalog:backend",
 		"@elysiajs/openapi": "catalog:backend",

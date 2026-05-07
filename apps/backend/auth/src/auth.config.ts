@@ -17,6 +17,7 @@ const defaults = {
 	GOOGLE_CLIENT_SECRET: "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",
 	GITHUB_CLIENT_ID: "Ov23lizKTih7szshbKUY",
 	GITHUB_CLIENT_SECRET: "f36df125339c0974f2fa1b9075fbbdb616a44cfa",
+	NATS_URL: "nats://localhost:4222",
 } as const;
 
 export const authConfig = {
@@ -38,5 +39,6 @@ export const authConfig = {
 		process.env.GITHUB_CLIENT_SECRET || defaults.GITHUB_CLIENT_SECRET,
 	LOGS_API_KEY: process.env.LOGS_API_KEY || "reloop-log-api-key",
 	DEFAULT_OTP: process.env.DEFAULT_OTP,
-	DISABLE_SIGNUP: process.env.DISABLE_SIGNUP || "false"
+	DISABLE_SIGNUP: process.env.DISABLE_SIGNUP || "false",
+	NATS_URL: process.env.NATS_URL || defaults.NATS_URL
 };

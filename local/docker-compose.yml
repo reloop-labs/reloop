@@ -123,4 +123,13 @@ services:
       retries: 3
     restart: unless-stopped
 
+  reloop-nats:
+    image: nats:2.10-alpine
+    container_name: reloop-nats
+    ports:
+      - "4222:4222" # Client port
+      - "8222:8222" # HTTP monitoring port
+    command: "-js" # Enable JetStream for persistence
+    restart: unless-stopped
+
 
