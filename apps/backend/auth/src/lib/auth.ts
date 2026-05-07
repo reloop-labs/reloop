@@ -111,16 +111,13 @@ export const auth = betterAuth({
 		}),
 		emailOTP({
 			async sendVerificationOTP({ email, otp, type }) {
-				logger.info(`📧 Sending OTP (${type}) to:${email} and otp: ${otp}`);
-
+				logger.info(`Sending OTP (${type}) to:${email} and otp: ${otp}`);
 				if (authConfig.DEFAULT_OTP) return;
-
-				logger.info(`📧 Sending OTP (${type}) to:`, email);
-
 				try {
-					logger.info(`✅ OTP email sent to ${email} ${otp}`);
+					await bus.publish(BusEvent.OTP_REQUESTED, { email, otp, });
+					logger.info(`OTP bus event published for ${email}`);
 				} catch (error) {
-					logger.error("❌ Failed to send OTP email:", error);
+					logger.error("Failed to publish OTP event:", error);
 					throw new Error("Failed to send OTP email");
 				}
 			},
@@ -146,12 +143,14 @@ export const auth = betterAuth({
 				}
 
 				try {
-					logger.info(
-						`✅ Organization invite email sent to ${data.email} using ${inviteLink}`,
-					);
+					await bus.publish(BusEvent.INVITE_CREATED, {
+						email: data.email,
+						organizationName: data.organization.name,
+						inviteLink,
+					});
+					logger.info(`✅ Organization invite bus event published for ${data.email}`);
 				} catch (error) {
-					logger.error("❌ Failed to send organization invite email:", error);
-					// Don't throw - invitation is still created, email just failed
+					logger.error("❌ Failed to publish organization invite event:", error);
 				}
 			},
 		}),
