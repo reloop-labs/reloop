@@ -1,33 +1,41 @@
 "use client";
 
 import * as Button from "@reloop/ui/button";
-import { Icon } from "@reloop/ui/icon";
-import { cn } from "@reloop/ui/cn";
+import type { SimpleIcon } from "simple-icons";
+import * as Icons from "simple-icons";
 
-const integrations = [
+interface Integration {
+	name: string;
+	description: string;
+	logo_url: string;
+	icon?: SimpleIcon;
+}
+
+const integrations: Integration[] = [
 	{
-		name: "Slack",
-		description: "Send notifications and alerts directly to your Slack channels.",
-		icon: "github", // Placeholder icon
-		connected: false,
+		name: "Zapier",
+		description:
+			"No-code automation platform connecting your email infrastructure to 5,000+ apps instantly.",
+		logo_url:
+			"https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/zapier.svg",
+		icon: Icons.siZapier,
+	},
+
+	{
+		name: "n8n",
+		description:
+			"Open-source workflow automation tool popular with self-hosting teams for email pipeline automation.",
+		logo_url:
+			"https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/n8n.svg",
+		icon: Icons.siN8n,
 	},
 	{
-		name: "Discord",
-		description: "Integrate with Discord to keep your team updated on events.",
-		icon: "github", // Placeholder icon
-		connected: true,
-	},
-	{
-		name: "Webhooks",
-		description: "Configure custom webhooks to send data to any service.",
-		icon: "webhook",
-		connected: true,
-	},
-	{
-		name: "GitHub",
-		description: "Connect your repositories to automate workflows.",
-		icon: "github",
-		connected: false,
+		name: "Shopify",
+		description:
+			"Leading e-commerce platform requiring transactional emails for orders, shipping, and receipts.",
+		logo_url:
+			"https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/shopify.svg",
+		icon: Icons.siShopify,
 	},
 ];
 
@@ -44,25 +52,36 @@ const IntegrationsPage = () => {
 					</p>
 				</div>
 
-				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
 					{integrations.map((integration) => (
 						<div
 							key={integration.name}
-							className="group relative rounded-xl border border-stroke-soft-200 bg-white p-4 transition-all hover:border-stroke-strong-950/20 hover:shadow-sm"
+							className="group relative flex cursor-pointer flex-col rounded-xl border border-stroke-soft-200 bg-white p-4 transition-all"
 						>
 							<div className="flex items-start justify-between">
-								<div className="flex h-10 w-10 items-center justify-center rounded-lg border border-stroke-soft-200 bg-neutral-alpha-5">
-									<Icon name={integration.icon} className="h-5 w-5" />
+								<div className="flex h-10 w-10 items-center justify-center rounded-lg border border-stroke-soft-200 bg-neutral-alpha-5 p-2">
+									{integration.icon ? (
+										<svg
+											role="img"
+											viewBox="0 0 24 24"
+											className="h-full w-full"
+											style={{ fill: `#${integration.icon.hex}` }}
+										>
+											<path d={integration.icon.path} />
+										</svg>
+									) : (
+										<img
+											src={integration.logo_url}
+											alt={integration.name}
+											className="h-full w-full object-contain"
+										/>
+									)}
 								</div>
-								<Button.Root
-									variant={integration.connected ? "neutral" : "neutral"}
-									mode={integration.connected ? "outline" : "filled"}
-									size="xsmall"
-								>
-									{integration.connected ? "Configure" : "Connect"}
-								</Button.Root>
+								<div className="rounded-full bg-warning-lighter px-2 py-0.5 font-medium text-warning-base text-xs">
+									Coming Soon
+								</div>
 							</div>
-							<div className="mt-4">
+							<div className="mt-4 flex-1">
 								<p className="font-medium text-label-sm text-text-strong-950">
 									{integration.name}
 								</p>
@@ -70,14 +89,6 @@ const IntegrationsPage = () => {
 									{integration.description}
 								</p>
 							</div>
-							{integration.connected && (
-								<div className="absolute top-4 right-4 flex items-center gap-1.5 rounded-full bg-green-50 px-2 py-0.5">
-									<div className="h-1.5 w-1.5 rounded-full bg-green-500" />
-									<span className="font-medium text-[10px] text-green-700 uppercase tracking-wider">
-										Connected
-									</span>
-								</div>
-							)}
 						</div>
 					))}
 				</div>
