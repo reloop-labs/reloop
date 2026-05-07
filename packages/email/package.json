@@ -24,7 +24,8 @@
 		"date-fns": "catalog:backend",
 		"react-email": "catalog:ui",
 		"react": "catalog:ui",
-		"react-dom": "catalog:ui"
+		"react-dom": "catalog:ui",
+		"reloop-email": "catalog:backend"
 	},
 	"devDependencies": {
 		"@react-email/ui": "catalog:ui",
