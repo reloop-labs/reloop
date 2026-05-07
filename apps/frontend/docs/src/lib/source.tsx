@@ -10,18 +10,15 @@ import React from "react";
 
 function getDocsDir(): string {
 	const paths = [
+		"/app/content/docs", // Verified path from debug route
 		path.join(process.cwd(), "content/docs"),
 		path.join(process.cwd(), "apps/frontend/docs/content/docs"),
 		path.resolve("./content/docs"),
 		path.resolve("./apps/frontend/docs/content/docs"),
-		// Direct absolute paths for standard Docker structures
-		"/app/content/docs",
-		"/app/apps/frontend/docs/content/docs",
 	];
 
 	for (const p of paths) {
 		if (fs.existsSync(p)) {
-			console.log(`Successfully found docs directory at: ${p}`);
 			return p;
 		}
 	}
