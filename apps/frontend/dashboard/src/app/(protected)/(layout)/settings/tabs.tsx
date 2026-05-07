@@ -8,29 +8,14 @@ import { useRef, useState } from "react";
 
 const list = [
 	{
-		title: "General",
+		title: "Wrokspace",
 		path: "/settings",
 		iconName: "gear",
-	},
-	{
-		title: "Account",
-		path: "/settings/account",
-		iconName: "user",
 	},
 	{
 		title: "Team",
 		path: "/settings/team",
 		iconName: "users",
-	},
-	{
-		title: "Security",
-		path: "/settings/security",
-		iconName: "shield-check",
-	},
-	{
-		title: "Appearance",
-		path: "/settings/appearance",
-		iconName: "swatch-book",
 	},
 ];
 
