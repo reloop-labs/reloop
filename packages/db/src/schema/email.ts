@@ -10,7 +10,8 @@ import {
 	timestamp,
 	varchar,
 } from "drizzle-orm/pg-core";
-import { organization } from "./auth";
+import { apikey } from "./api-key";
+import { organization, user } from "./auth";
 import { domain } from "./domain";
 
 // Custom ID generation function with prefix
@@ -59,6 +60,12 @@ export const emailLog = pgTable(
 		domainId: text("domain_id")
 			.notNull()
 			.references(() => domain.id, { onDelete: "cascade" }),
+		userId: text("user_id")
+			.notNull()
+			.references(() => user.id, { onDelete: "cascade" }),
+		apikeyId: text("apikey_id")
+			.notNull()
+			.references(() => apikey.id, { onDelete: "cascade" }),
 		fromEmail: varchar("from_email", { length: 255 }).notNull(),
 		fromName: varchar("from_name", { length: 255 }),
 		toEmails: jsonb("to_emails").$type<string[]>().notNull(),

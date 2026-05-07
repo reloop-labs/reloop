@@ -145,43 +145,6 @@ export const creditLedger = pgTable(
 	]
 );
 
-export const emailSend = pgTable(
-	"email_send",
-	{
-		id: text("id").$defaultFn(() => `esn_${createId()}`).primaryKey(),
-		organizationId: text("organization_id")
-			.notNull()
-			.references(() => organization.id),
-		subscriptionId: text("subscription_id")
-			.notNull()
-			.references(() => subscription.id),
-		triggeredByUserId: text("triggered_by_user_id")
-			.references(() => user.id, { onDelete: "set null" }),
-
-		recipientEmail: varchar("recipient_email", { length: 255 }).notNull(),
-		subject: varchar("subject", { length: 998 }),
-		status: emailSendStatusEnum("status").notNull().default("queued"),
-
-		countedInCredits: boolean("counted_in_credits").notNull().default(false),
-		creditsConsumed: integer("credits_consumed").notNull().default(0),
-
-		providerId: varchar("provider_id", { length: 255 }),
-		providerName: varchar("provider_name", { length: 100 }),
-
-		sentAt: timestamp("sent_at"),
-		skippedAt: timestamp("skipped_at"),
-		skipReason: skipReasonEnum("skip_reason"),
-		createdAt: timestamp("created_at").notNull().defaultNow(),
-	},
-	(t) => [
-		index("sends_organization_id_idx").on(t.organizationId),
-		index("sends_subscription_id_idx").on(t.subscriptionId),
-		index("sends_triggered_by_idx").on(t.triggeredByUserId),
-		index("sends_org_sent_at_idx").on(t.organizationId, t.sentAt),
-		index("sends_org_counted_idx").on(t.organizationId, t.countedInCredits),
-	]
-);
-
 export const billingInvoice = pgTable(
 	"billing_invoice",
 	{
@@ -227,7 +190,7 @@ export const subscriptionRelations = relations(subscription, ({ one, many }) => 
 	organization: one(organization, { fields: [subscription.organizationId], references: [organization.id] }),
 	plan: one(plan, { fields: [subscription.planId], references: [plan.id] }),
 	creditLedger: many(creditLedger),
-	emailSends: many(emailSend),
+	emailLog: many(emailLog),
 	billingInvoices: many(billingInvoice),
 }));
 
@@ -236,16 +199,10 @@ export const creditLedgerRelations = relations(creditLedger, ({ one }) => ({
 	subscription: one(subscription, { fields: [creditLedger.subscriptionId], references: [subscription.id] }),
 }));
 
-export const emailSendRelations = relations(emailSend, ({ one, many }) => ({
-	organization: one(organization, { fields: [emailSend.organizationId], references: [organization.id] }),
-	subscription: one(subscription, { fields: [emailSend.subscriptionId], references: [subscription.id] }),
-	triggeredBy: one(user, { fields: [emailSend.triggeredByUserId], references: [user.id] }),
-	events: many(emailLog),
-}));
-
-export const emailEventV2Relations = relations(emailLog, ({ one }) => ({
+export const emailSendRelations = relations(emailLog, ({ one, many }) => ({
 	organization: one(organization, { fields: [emailLog.organizationId], references: [organization.id] }),
-	send: one(emailSend, { fields: [emailLog.id], references: [emailSend.id] }),
+	triggeredBy: one(user, { fields: [emailLog.userId], references: [user.id] }),
+	events: many(emailLog),
 }));
 
 export const billingInvoiceRelations = relations(billingInvoice, ({ one }) => ({
