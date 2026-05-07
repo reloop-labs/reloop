@@ -3,6 +3,9 @@
   "workspaces": {
     "": {
       "name": "reloop",
+      "dependencies": {
+        "reloop-email": "^1.0.3",
+      },
       "devDependencies": {
         "@biomejs/biome": "2.2.6",
         "husky": "9.1.7",
@@ -826,6 +829,7 @@
       "nodemailer": "6.9.7",
       "pino": "10.0.0",
       "pino-pretty": "13.1.2",
+      "reloop-email": "^1.0.3",
       "tsdown": "0.12.9",
       "y-protocols": "^1.0.7",
       "yjs": "^13.6.30",
@@ -3382,6 +3386,8 @@
     "regexp-to-ast": ["regexp-to-ast@0.5.0", "", {}, "sha512-tlbJqcMHnPKI9zSrystikWKwHkBqu2a/Sgw01h3zFjvYrMxEDYHzzoMZnUrbIfpTFEsoRnnviOXNCzFiSc54Qw=="],
 
     "rehype-recma": ["rehype-recma@1.0.0", "", { "dependencies": { "@types/estree": "^1.0.0", "@types/hast": "^3.0.0", "hast-util-to-estree": "^3.0.0" } }, "sha512-lqA4rGUf1JmacCNWWZx0Wv1dHqMwxzsDWYMTowuplHF3xH0N/MmrZ/G3BDZnzAkRmxDadujCjaKM2hqYdCBOGw=="],
+
+    "reloop-email": ["reloop-email@1.0.3", "", {}, "sha512-xN8taSx0opWGUt7OlJQ8CtSW9gO46Rd3kPjUyi6UPJ51Cyqinab2S4HtMEEVLYI29NsWPNykVDwjg18YaKSpiQ=="],
 
     "remark-mdx": ["remark-mdx@3.1.1", "", { "dependencies": { "mdast-util-mdx": "^3.0.0", "micromark-extension-mdxjs": "^3.0.0" } }, "sha512-Pjj2IYlUY3+D8x00UJsIOg5BEvfMyeI+2uLPn9VO9Wg4MEtN/VTIq2NEJQfde9PnX15KgtHyl9S0BcTnWrIuWg=="],
 
