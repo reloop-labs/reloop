@@ -1,9 +1,10 @@
 "use client";
-
+import Image from "next/image";
 import { AnimatedAlternative } from "./animated-alternative";
 export default function Hero() {
 	return (
 		<div className="relative flex h-dvh items-center justify-center overflow-hidden bg-transparent text-white">
+			<LandingBackdrop />
 			<main className="relative z-10">
 				<section
 					id="product"
@@ -44,6 +45,19 @@ export default function Hero() {
 					</div>
 				</section>
 			</main>
+		</div>
+	);
+}
+
+function LandingBackdrop() {
+	return (
+		<div className="pointer-events-none absolute inset-0">
+			<Image
+				src="/images/landing-bg.jpg"
+				alt=""
+				fill
+				className="object-cover object-center"
+			/>
 		</div>
 	);
 }
