@@ -8,34 +8,19 @@ import { useRef, useState } from "react";
 
 const list = [
 	{
-		title: "Workspace",
-		path: "/settings",
-		iconName: "gear",
+		title: "Profile",
+		path: "/profile",
+		iconName: "user",
 	},
 	{
-		title: "Members",
-		path: "/settings/members",
-		iconName: "users",
+		title: "Security",
+		path: "/profile/security",
+		iconName: "shield-check",
 	},
 	{
-		title: "SMTP",
-		path: "/settings/smtp",
-		iconName: "mail-single",
-	},
-	{
-		title: "Integration",
-		path: "/settings/integrations",
-		iconName: "webhook",
-	},
-	{
-		title: "Billing",
-		path: "/settings/billing",
-		iconName: "invoice",
-	},
-	{
-		title: "Usage",
-		path: "/settings/usage",
-		iconName: "barchart",
+		title: "Appearance",
+		path: "/profile/appearance",
+		iconName: "swatch-book",
 	},
 ];
 

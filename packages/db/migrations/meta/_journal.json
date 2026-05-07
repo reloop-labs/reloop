@@ -15,6 +15,13 @@
       "when": 1777523948830,
       "tag": "0001_suppression_on_contact_table",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1778133925579,
+      "tag": "0002_clammy_leo",
+      "breakpoints": true
     }
   ]
 }

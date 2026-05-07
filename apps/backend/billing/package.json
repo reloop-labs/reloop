@@ -1,5 +1,5 @@
 {
-	"name": "credits",
+	"name": "billing",
 	"main": "src/index.ts",
 	"type": "module",
 	"scripts": {
