@@ -53,10 +53,10 @@ function LandingBackdrop() {
 	return (
 		<div className="pointer-events-none absolute inset-0">
 			<Image
-				src="/images/landing-bg.jpg"
-				alt=""
+				src="/landing-bg.jpg"
+				alt="bg image with nature seneary"
 				fill
-				className="object-cover object-center"
+				className="object-cover object-center opacity-70"
 			/>
 		</div>
 	);
