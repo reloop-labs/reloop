@@ -26,12 +26,13 @@
 		"@elysiajs/openapi": "catalog:backend",
 		"@react-email/render": "catalog:ui",
 		"@react-email/tailwind": "catalog:ui",
+		"@reloop/bus": "workspace:*",
 		"@reloop/logger": "workspace:*",
 		"date-fns": "catalog:backend",
 		"elysia": "catalog:backend",
-		"react-email": "catalog:ui",
 		"react": "catalog:ui",
 		"react-dom": "catalog:ui",
+		"react-email": "catalog:ui",
 		"reloop-email": "catalog:backend"
 	},
 	"devDependencies": {

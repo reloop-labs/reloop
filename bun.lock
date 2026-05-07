@@ -224,6 +224,7 @@
         "@elysiajs/openapi": "catalog:backend",
         "@react-email/render": "catalog:ui",
         "@react-email/tailwind": "catalog:ui",
+        "@reloop/bus": "workspace:*",
         "@reloop/logger": "workspace:*",
         "date-fns": "catalog:backend",
         "elysia": "catalog:backend",
