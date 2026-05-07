@@ -55,6 +55,65 @@ export interface LogCreatedPayload {
 	};
 	cookie?: string;
 }
+export interface OrganizationJoinedPayload {
+	organizationId: string;
+	userId: string;
+	userEmail: string;
+}
+
+export interface ApiKeyCreatedPayload {
+	id: string;
+	name: string;
+	organizationId: string;
+	userEmail: string;
+}
+
+export interface InviteCreatedPayload {
+	email: string;
+	organizationName: string;
+	inviteLink: string;
+}
+
+export interface OtpRequestedPayload {
+	email: string;
+	otp: string;
+}
+
+export interface PaymentFailedPayload {
+	email: string;
+	amount: string;
+	planName: string;
+}
+
+export interface QuotaWarningPayload {
+	email: string;
+	percentage: number;
+	resourceType: string;
+}
+
+export interface SigninDetectedPayload {
+	email: string;
+	browser: string;
+	os: string;
+	ip: string;
+	location: string;
+}
+
+export interface TrialEndingPayload {
+	email: string;
+	daysLeft: number;
+}
+
+export interface DnsConfigRequestedPayload {
+	email: string;
+	domain: string;
+	records: Array<{
+		type: string;
+		name: string;
+		value: string;
+		priority?: number;
+	}>;
+}
 
 export interface EventPayloads {
 	[BusEvent.USER_CREATED]: UserCreatedPayload;
@@ -64,6 +123,15 @@ export interface EventPayloads {
 	[BusEvent.WEBHOOK_TRIGGERED]: WebhookTriggeredPayload;
 	[BusEvent.EMAIL_SENT]: EmailSentPayload;
 	[BusEvent.ORGANIZATION_CREATED]: OrganizationCreatedPayload;
+	[BusEvent.ORGANIZATION_JOINED]: OrganizationJoinedPayload;
 	[BusEvent.LOG_CREATED]: LogCreatedPayload;
+	[BusEvent.API_KEY_CREATED]: ApiKeyCreatedPayload;
+	[BusEvent.INVITE_CREATED]: InviteCreatedPayload;
+	[BusEvent.OTP_REQUESTED]: OtpRequestedPayload;
+	[BusEvent.PAYMENT_FAILED]: PaymentFailedPayload;
+	[BusEvent.QUOTA_WARNING]: QuotaWarningPayload;
+	[BusEvent.SIGNIN_DETECTED]: SigninDetectedPayload;
+	[BusEvent.TRIAL_ENDING]: TrialEndingPayload;
+	[BusEvent.DNS_CONFIG_REQUESTED]: DnsConfigRequestedPayload;
 }
 

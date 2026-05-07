@@ -1,30 +1,21 @@
-import { BusEvent, bus } from "@reloop/bus";
 import { logger } from "@reloop/logger";
-import { sendEmail } from "../utils/email";
-import { emailConfig } from "../email.config";
+import { initAuthSubscribers } from "./auth.subscriber";
+import { initOrgSubscribers } from "./organization.subscriber";
+import { initBillingSubscribers } from "./billing.subscriber";
+import { initDomainSubscribers } from "./domain.subscriber";
+import { initApiKeySubscribers } from "./api-key.subscriber";
 
 export async function initSubscribers() {
 	try {
-		// Example subscription
-		await bus.subscribe(
-			BusEvent.USER_CREATED,
-			async (payload) => {
-				logger.info(
-					{ email: payload.email },
-					"Email service received USER_CREATED event",
-				);
-				
-				await sendEmail({
-					from: `Reloop <onboarding@${emailConfig.RELOOP_SENDER_DOMAIN || "reloop.dev"}>`,
-					to: payload.email,
-					subject: "Welcome to Reloop!",
-					html: `<strong>Hello ${payload.email}!</strong><p>Thanks for joining Reloop.</p>`,
-				});
-			},
-			{ queue: "email-service" },
-		);
+		await Promise.all([
+			initAuthSubscribers(),
+			initOrgSubscribers(),
+			initBillingSubscribers(),
+			initDomainSubscribers(),
+			initApiKeySubscribers(),
+		]);
 
-		logger.info("Email subscribers initialized");
+		logger.info("All email subscribers initialized");
 	} catch (error) {
 		logger.error(
 			{ error: error instanceof Error ? error.message : String(error) },
