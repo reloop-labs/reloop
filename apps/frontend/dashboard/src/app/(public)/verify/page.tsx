@@ -1,7 +1,8 @@
 "use client";
 
 import { authClient } from "@reloop/auth/client";
-import { Logo } from "@reloop/ui/logo";
+import * as Button from "@reloop/ui/button";
+import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
 import { useRouter } from "next/navigation";
 import { parseAsString, useQueryState } from "nuqs";
@@ -64,11 +65,6 @@ const AutoLoginPage = () => {
 	return (
 		<div className="flex h-dvh flex-col items-center justify-center bg-bg-white-0 antialiased">
 			<div className="w-full max-w-sm p-5 md:p-8">
-				<div className="flex flex-col items-center justify-center gap-2">
-					<div className="mb-2 flex items-center justify-center">
-						<Logo className="h-16" />
-					</div>
-				</div>
 				<div className="mt-8 text-center">
 					{isVerifying ? (
 						<div className="flex flex-col items-center gap-6">
@@ -85,19 +81,23 @@ const AutoLoginPage = () => {
 					) : (
 						<div className="space-y-6">
 							<div className="space-y-2">
-								<h2 className="font-medium text-error-base text-label-lg">
-									Verification failed
+								<Icon
+									name="cross-circle"
+									className="mx-auto h-10 w-10 text-error-base"
+								/>
+								<h2 className="text-balance font-semibold text-error-base text-label-lg">
+									Verification failed {error?.toLowerCase()}
 								</h2>
-								<p className="text-[13px] text-text-sub-600">{error}</p>
 							</div>
-							<div className="pt-2">
-								<button
+							<div>
+								<Button.Root
 									type="button"
-									onClick={() => router.push("/signup")}
-									className="cursor-pointer font-medium text-[13px] text-text-strong-950 underline transition-colors hover:text-text-sub-600"
+									variant="neutral"
+									className="h-11 w-full max-w-sm rounded-2xl!"
+									onClick={() => router.push("/login")}
 								>
 									Back to Login
-								</button>
+								</Button.Root>
 							</div>
 						</div>
 					)}
