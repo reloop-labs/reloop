@@ -56,7 +56,7 @@ function LandingBackdrop() {
 				src="/landing-bg.jpg"
 				alt="bg image with nature seneary"
 				fill
-				className="object-cover object-center opacity-70"
+				className="object-cover object-center opacity-50"
 			/>
 		</div>
 	);
