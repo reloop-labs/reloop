@@ -8,7 +8,7 @@ import { useRef, useState } from "react";
 
 const list = [
 	{
-		title: "Wrokspace",
+		title: "Workspace",
 		path: "/settings",
 		iconName: "gear",
 	},
@@ -16,6 +16,26 @@ const list = [
 		title: "Members",
 		path: "/settings/members",
 		iconName: "users",
+	},
+	{
+		title: "SMTP",
+		path: "/settings/smtp",
+		iconName: "mail-single",
+	},
+	{
+		title: "Integration",
+		path: "/settings/integrations",
+		iconName: "webhook",
+	},
+	{
+		title: "Billing",
+		path: "/settings/billing",
+		iconName: "invoice",
+	},
+	{
+		title: "Usage",
+		path: "/settings/usage",
+		iconName: "barchart",
 	},
 ];
 
