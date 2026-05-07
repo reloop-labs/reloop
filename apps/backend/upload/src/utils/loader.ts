@@ -5,6 +5,7 @@ import {
 } from "@aws-sdk/client-s3";
 import { s3Client } from "@be/upload/lib/s3";
 import { uploadConfig } from "@be/upload/upload.config";
+import { bus } from "@reloop/bus";
 import { RedisCache } from "@reloop/cache/redis-client";
 import { db } from "@reloop/db/client";
 import { logger } from "@reloop/logger";
@@ -18,6 +19,8 @@ export const loader = async () => {
 
 		await db.execute("SELECT 1 as test");
 		logger.info("Postgres connected");
+		await bus.connect(uploadConfig.NATS_URL);
+		logger.info("NATS connected");
 
 		// Check S3 accessibility and create bucket if it doesn't exist
 		try {

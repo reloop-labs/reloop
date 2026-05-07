@@ -15,6 +15,7 @@ export const templateConfig = {
 	NODE_ENV: process.env.NODE_ENV || "development",
 	NODE_TLS_REJECT_UNAUTHORIZED: process.env.NODE_TLS_REJECT_UNAUTHORIZED,
 	LOGS_API_KEY: process.env.LOGS_API_KEY || "reloop-log-api-key",
+	NATS_URL: process.env.NATS_URL || "nats://localhost:4222",
 
 	constants: {
 		maxTemplateNameLength: 255,

@@ -14,4 +14,5 @@ export const webhookConfig = {
 	BASE_URL: process.env.BASE_URL,
 	NODE_ENV: process.env.NODE_ENV || "development",
 	NODE_TLS_REJECT_UNAUTHORIZED: process.env.NODE_TLS_REJECT_UNAUTHORIZED,
+	NATS_URL: process.env.NATS_URL || "nats://localhost:4222",
 };

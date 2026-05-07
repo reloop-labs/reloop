@@ -1,6 +1,8 @@
+import { bus } from "@reloop/bus";
 import { RedisCache } from "@reloop/cache/redis-client";
 import { db } from "@reloop/db/client";
 import { logger } from "@reloop/logger";
+import { contactsConfig } from "../contacts.config";
 
 export const redis = new RedisCache("audience");
 
@@ -10,6 +12,8 @@ export const loader = async () => {
 		logger.info("Redis connected");
 		await db.execute("SELECT 1 as test");
 		logger.info("Postgres connected");
+		await bus.connect(contactsConfig.NATS_URL);
+		logger.info("NATS connected");
 	} catch (e) {
 		logger.error(
 			{ error: e instanceof Error ? e.message : String(e) },

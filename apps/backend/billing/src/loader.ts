@@ -14,6 +14,13 @@ import { billingConfig } from "./billing.config";
 export async function loader() {
 	logger.info("Initializing Billing Service Subscribers...");
 
+	try {
+		await bus.connect(billingConfig.NATS_URL);
+		logger.info("NATS connected in Billing Service");
+	} catch (error) {
+		logger.error({ error }, "Failed to connect to NATS in Billing Service");
+	}
+
 	// Handle Organization Created - Initialize subscription and credits
 	await bus.subscribe(BusEvent.ORGANIZATION_CREATED, async (payload) => {
 		logger.info(

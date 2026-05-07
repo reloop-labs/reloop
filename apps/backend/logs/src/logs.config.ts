@@ -12,6 +12,7 @@ export const logsConfig = {
 	REDIS_URL: process.env.REDIS_URL,
 	BASE_URL: process.env.BASE_URL,
 	LOGS_API_KEY: process.env.LOGS_API_KEY || "reloop-log-api-key",
+	NATS_URL: process.env.NATS_URL || "nats://localhost:4222",
 	clickhouse: {
 		url:
 			process.env.CLICKHOUSE_URL ||

@@ -12,4 +12,5 @@ export const apiKeyConfig = {
 	BASE_URL: process.env.BASE_URL,
 	LOGS_API_KEY: process.env.LOGS_API_KEY || "reloop-log-api-key",
 	NODE_ENV: process.env.NODE_ENV || "development",
+	NATS_URL: process.env.NATS_URL || "nats://localhost:4222",
 };

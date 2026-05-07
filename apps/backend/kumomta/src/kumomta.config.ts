@@ -5,4 +5,5 @@ export const kumomtaConfig = {
 	REDIS_URL: process.env.REDIS_URL || "redis://:reloop123@localhost:6379",
 	NODE_ENV: process.env.NODE_ENV || "development",
 	X_KUMOMTA_KEY: process.env.X_KUMOMTA_KEY || "reloop",
+	NATS_URL: process.env.NATS_URL || "nats://localhost:4222",
 };

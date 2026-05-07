@@ -1,3 +1,4 @@
+import { bus } from "@reloop/bus";
 import { domainConfig } from "@be/domain/domain.config";
 import { startDomainVerificationWorker } from "@be/domain/queues/domain-verification.worker";
 import { RedisCache } from "@reloop/cache/redis-client";
@@ -12,6 +13,8 @@ export const loader = async () => {
 		logger.info("Redis connected");
 		await db.execute("SELECT 1 as test");
 		logger.info("Postgres connected");
+		await bus.connect(domainConfig.NATS_URL);
+		logger.info("NATS connected");
 		startDomainVerificationWorker();
 	} catch (e) {
 		logger.error(

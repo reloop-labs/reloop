@@ -20,6 +20,7 @@ export const domainConfig = {
 	HOST_DOMAIN: process.env.HOST_DOMAIN,
 	DKIM_SELECTOR: process.env.DKIM_SELECTOR,
 	LOGS_API_KEY: process.env.LOGS_API_KEY || "reloop-log-api-key",
+	NATS_URL: process.env.NATS_URL || "nats://localhost:4222",
 
 	constants: {
 		keyLength: 2048,
