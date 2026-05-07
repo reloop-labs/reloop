@@ -13,8 +13,8 @@ const list = [
 		iconName: "gear",
 	},
 	{
-		title: "Team",
-		path: "/settings/team",
+		title: "Members",
+		path: "/settings/members",
 		iconName: "users",
 	},
 ];
