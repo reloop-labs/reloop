@@ -4,8 +4,6 @@ import { apikey } from "./api-key";
 import {
 	billingInvoice,
 	creditLedger,
-	emailEventV2,
-	emailSend,
 	subscription,
 } from "./billing";
 
@@ -146,7 +144,6 @@ export const userRelations = relations(user, ({ many }) => ({
 	apikeys: many(apikey),
 	members: many(member),
 	invitations: many(invitation),
-	triggeredSends: many(emailSend, { relationName: "triggeredBy" }),
 }));
 
 export const accountRelations = relations(account, ({ one }) => ({
@@ -161,8 +158,6 @@ export const organizationRelations = relations(organization, ({ many }) => ({
 	invitations: many(invitation),
 	subscriptions: many(subscription),
 	creditLedger: many(creditLedger),
-	emailSends: many(emailSend),
-	emailEventsV2: many(emailEventV2),
 	billingInvoices: many(billingInvoice),
 }));
 
