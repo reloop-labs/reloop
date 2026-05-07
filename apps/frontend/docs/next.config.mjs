@@ -5,6 +5,14 @@ const config = {
 	output: "standalone",
 	allowedDevOrigins: ["local.reloop.sh", "*.local.reloop.sh"],
 	serverExternalPackages: ["next-mdx-remote", "next-mdx-remote/rsc"],
+	async rewrites() {
+		return [
+			{
+				source: "/:path*.md",
+				destination: "/api/markdown/:path*",
+			},
+		];
+	},
 	async headers() {
 		return [
 			{

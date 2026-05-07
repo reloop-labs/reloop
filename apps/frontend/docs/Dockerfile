@@ -29,6 +29,7 @@ ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
 # Copy standalone build
+COPY --from=builder /app/apps/frontend/docs/content ./content
 COPY --from=builder /app/apps/frontend/docs/public ./public
 COPY --from=builder /app/apps/frontend/docs/.next/standalone ./
 COPY --from=builder /app/apps/frontend/docs/.next/standalone/apps/frontend/docs ./

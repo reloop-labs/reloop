@@ -19,7 +19,9 @@ export async function GET(
 	}
 
 	if (!existsSync(filePath)) {
-		return new NextResponse("Markdown content not found.", { status: 404 });
+		// Log the error internally to help debugging in production logs
+		console.error(`Markdown file not found: ${filePath}`);
+		return new NextResponse(`Markdown content not found for path: ${relativePath}`, { status: 404 });
 	}
 
 	try {
@@ -40,7 +42,8 @@ export async function GET(
 				"Cache-Control": "public, max-age=3600, s-maxage=86400",
 			},
 		});
-	} catch {
+	} catch (error) {
+		console.error(`Error reading markdown file at ${filePath}:`, error);
 		return new NextResponse("Error reading markdown file.", { status: 500 });
 	}
 }
