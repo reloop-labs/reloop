@@ -12,13 +12,16 @@ function getDocsDir(): string {
 	const paths = [
 		path.join(process.cwd(), "content/docs"),
 		path.join(process.cwd(), "apps/frontend/docs/content/docs"),
-		// In some Docker environments, the path might be different relative to the root
 		path.resolve("./content/docs"),
 		path.resolve("./apps/frontend/docs/content/docs"),
+		// Direct absolute paths for standard Docker structures
+		"/app/content/docs",
+		"/app/apps/frontend/docs/content/docs",
 	];
 
 	for (const p of paths) {
 		if (fs.existsSync(p)) {
+			console.log(`Successfully found docs directory at: ${p}`);
 			return p;
 		}
 	}
