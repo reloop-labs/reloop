@@ -35,8 +35,8 @@
 		"reloop-email": "catalog:backend"
 	},
 	"devDependencies": {
-		"@reloop/tsconfig": "workspace:*",
 		"@react-email/ui": "catalog:ui",
+		"@reloop/tsconfig": "workspace:*",
 		"@types/bun": "catalog:backend",
 		"tsdown": "catalog:backend",
 		"typescript": "catalog:"

@@ -33,6 +33,7 @@
         "@paralleldrive/cuid2": "catalog:backend",
         "@reloop/apikey": "workspace:*",
         "@reloop/auth": "workspace:*",
+        "@reloop/bus": "workspace:*",
         "@reloop/cache": "workspace:*",
         "@reloop/db": "workspace:*",
         "@reloop/logger": "workspace:*",
@@ -77,12 +78,12 @@
         "@reloop/cache": "workspace:*",
         "@reloop/db": "workspace:*",
         "@reloop/logger": "workspace:*",
-        "@reloop/react-email": "workspace:*",
         "better-auth": "catalog:",
         "dotenv": "catalog:backend",
         "drizzle-orm": "catalog:db",
         "drizzle-typebox": "catalog:db",
         "elysia": "catalog:backend",
+        "email": "workspace:*",
         "pg": "catalog:db",
         "redis": "catalog:db",
         "zod": "catalog:ui",
@@ -143,6 +144,7 @@
         "@paralleldrive/cuid2": "catalog:backend",
         "@reloop/apikey": "workspace:*",
         "@reloop/auth": "workspace:*",
+        "@reloop/bus": "workspace:*",
         "@reloop/cache": "workspace:*",
         "@reloop/db": "workspace:*",
         "@reloop/logger": "workspace:*",
@@ -189,6 +191,7 @@
         "@paralleldrive/cuid2": "catalog:backend",
         "@reloop/apikey": "workspace:*",
         "@reloop/auth": "workspace:*",
+        "@reloop/bus": "workspace:*",
         "@reloop/cache": "workspace:*",
         "@reloop/db": "workspace:*",
         "@reloop/logger": "workspace:*",
@@ -213,6 +216,30 @@
         "typescript": "catalog:",
       },
     },
+    "apps/backend/email": {
+      "name": "email",
+      "version": "1.0.0",
+      "dependencies": {
+        "@elysiajs/cors": "catalog:backend",
+        "@elysiajs/openapi": "catalog:backend",
+        "@react-email/render": "catalog:ui",
+        "@react-email/tailwind": "catalog:ui",
+        "@reloop/logger": "workspace:*",
+        "date-fns": "catalog:backend",
+        "elysia": "catalog:backend",
+        "react": "catalog:ui",
+        "react-dom": "catalog:ui",
+        "react-email": "catalog:ui",
+        "reloop-email": "catalog:backend",
+      },
+      "devDependencies": {
+        "@react-email/ui": "catalog:ui",
+        "@reloop/tsconfig": "workspace:*",
+        "@types/bun": "catalog:backend",
+        "tsdown": "catalog:backend",
+        "typescript": "catalog:",
+      },
+    },
     "apps/backend/kumomta": {
       "name": "kumomta",
       "dependencies": {
@@ -222,6 +249,7 @@
         "@elysiajs/server-timing": "catalog:backend",
         "@reloop/apikey": "workspace:*",
         "@reloop/auth": "workspace:*",
+        "@reloop/bus": "workspace:*",
         "@reloop/cache": "workspace:*",
         "@reloop/db": "workspace:*",
         "@reloop/logger": "workspace:*",
@@ -262,6 +290,7 @@
         "@opentelemetry/sdk-trace-node": "catalog:backend",
         "@opentelemetry/semantic-conventions": "catalog:backend",
         "@reloop/apikey": "workspace:*",
+        "@reloop/bus": "workspace:*",
         "@reloop/cache": "workspace:*",
         "@reloop/db": "workspace:*",
         "@reloop/logger": "workspace:*",
@@ -280,8 +309,8 @@
         "typescript": "catalog:",
       },
     },
-    "apps/backend/mail": {
-      "name": "mail",
+    "apps/backend/mailing": {
+      "name": "mailing",
       "dependencies": {
         "@elysiajs/cors": "catalog:backend",
         "@elysiajs/cron": "catalog:backend",
@@ -304,13 +333,13 @@
         "@reloop/cache": "workspace:*",
         "@reloop/db": "workspace:*",
         "@reloop/logger": "workspace:*",
-        "@reloop/react-email": "workspace:*",
         "@types/nodemailer": "catalog:backend",
         "better-auth": "catalog:",
         "dotenv": "catalog:backend",
         "drizzle-orm": "catalog:db",
         "drizzle-typebox": "catalog:db",
         "elysia": "catalog:backend",
+        "email": "workspace:*",
         "evlog": "catalog:backend",
         "nodemailer": "catalog:backend",
         "pg": "catalog:db",
@@ -346,6 +375,7 @@
         "@opentelemetry/semantic-conventions": "catalog:backend",
         "@paralleldrive/cuid2": "catalog:backend",
         "@reloop/auth": "workspace:*",
+        "@reloop/bus": "workspace:*",
         "@reloop/cache": "workspace:*",
         "@reloop/db": "workspace:*",
         "@reloop/logger": "workspace:*",
@@ -394,6 +424,7 @@
         "@paralleldrive/cuid2": "catalog:backend",
         "@reloop/apikey": "workspace:*",
         "@reloop/auth": "workspace:*",
+        "@reloop/bus": "workspace:*",
         "@reloop/cache": "workspace:*",
         "@reloop/db": "workspace:*",
         "@reloop/logger": "workspace:*",
@@ -436,6 +467,7 @@
         "@paralleldrive/cuid2": "catalog:backend",
         "@reloop/apikey": "workspace:*",
         "@reloop/auth": "workspace:*",
+        "@reloop/bus": "workspace:*",
         "@reloop/cache": "workspace:*",
         "@reloop/db": "workspace:*",
         "@reloop/logger": "workspace:*",
@@ -676,23 +708,6 @@
         "typescript": "catalog:",
       },
     },
-    "packages/email": {
-      "name": "@reloop/react-email",
-      "version": "1.0.0",
-      "dependencies": {
-        "@react-email/render": "catalog:ui",
-        "@react-email/tailwind": "catalog:ui",
-        "date-fns": "catalog:backend",
-        "react": "catalog:ui",
-        "react-dom": "catalog:ui",
-        "react-email": "catalog:ui",
-      },
-      "devDependencies": {
-        "@react-email/ui": "catalog:ui",
-        "@types/bun": "catalog:backend",
-        "typescript": "catalog:",
-      },
-    },
     "packages/logger": {
       "name": "@reloop/logger",
       "version": "0.0.0",
@@ -878,7 +893,7 @@
       "@react-email/editor": "latest",
       "@react-email/render": "1.2.3",
       "@react-email/tailwind": "1.2.2",
-      "@react-email/ui": "6.0.8",
+      "@react-email/ui": "v6.1.1",
       "@responsive-email/react-email": "0.0.4",
       "@tailwindcss/postcss": "4.1.11",
       "@takumi-rs/image-response": "0.73.1",
@@ -1745,7 +1760,7 @@
 
     "@react-email/tailwind": ["@react-email/tailwind@1.2.2", "", { "peerDependencies": { "react": "^18.0 || ^19.0 || ^19.0.0-rc" } }, "sha512-heO9Khaqxm6Ulm6p7HQ9h01oiiLRrZuuEQuYds/O7Iyp3c58sMVHZGIxiRXO/kSs857NZQycpjewEVKF3jhNTw=="],
 
-    "@react-email/ui": ["@react-email/ui@6.0.8", "", { "dependencies": { "esbuild": "0.28.0", "next": "16.2.3" } }, "sha512-IG4uGzgb3FTONfehfsaBOlvaWoxcDFvJujNZMIIHiuVXYizJFy4I9+wyewQuiYTi44RArX7xvTFgGOeyXqj/xQ=="],
+    "@react-email/ui": ["@react-email/ui@6.1.1", "", { "dependencies": { "esbuild": "0.28.0", "next": "16.2.3" } }, "sha512-lu6LHIl7qd/s2u6hIkRijD/Jo3A0Naf4LCy507Tuh5NM2iki7FHL59DiMQPuMxep3nxtV9TyQmBqQ+iRQt0Iyg=="],
 
     "@react-spectrum/button": ["@react-spectrum/button@3.18.0", "", { "dependencies": { "@adobe/react-spectrum": "3.47.0", "@swc/helpers": "^0.5.0" }, "peerDependencies": { "react": "^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1", "react-dom": "^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1" } }, "sha512-SmjsXt+mLK2cf8PGstNZvLBfjqE5TjHW15yPIATI6ddqMdcC9JZ3ldnBTdFji9P/B6Rlop4ajnAdDV6bpxLtXA=="],
 
@@ -1816,8 +1831,6 @@
     "@reloop/db": ["@reloop/db@workspace:packages/db"],
 
     "@reloop/logger": ["@reloop/logger@workspace:packages/logger"],
-
-    "@reloop/react-email": ["@reloop/react-email@workspace:packages/email"],
 
     "@reloop/tailwind": ["@reloop/tailwind@workspace:packages/tailwind"],
 
@@ -2601,6 +2614,8 @@
 
     "elysia": ["elysia@1.4.15", "", { "dependencies": { "cookie": "^1.0.2", "exact-mirror": "0.2.2", "fast-decode-uri-component": "^1.0.1", "memoirist": "^0.4.0" }, "peerDependencies": { "@sinclair/typebox": ">= 0.34.0 < 1", "@types/bun": ">= 1.2.0", "file-type": ">= 20.0.0", "openapi-types": ">= 12.0.0", "typescript": ">= 5.0.0" }, "optionalPeers": ["@types/bun", "typescript"] }, "sha512-RaDqqZdLuC4UJetfVRQ4Z5aVpGgEtQ+pZnsbI4ZzEaf3l/MzuHcqSVoL/Fue3d6qE4RV9HMB2rAZaHyPIxkyzg=="],
 
+    "email": ["email@workspace:apps/backend/email"],
+
     "emoji-regex": ["emoji-regex@10.6.0", "", {}, "sha512-toUI84YS5YmxW219erniWD0CIVOo46xGKColeNQRgOzDorgBi1v4D71/OFzgD9GO2UGKIv1C3Sp8DAn0+j5w7A=="],
 
     "empathic": ["empathic@2.0.0", "", {}, "sha512-i6UzDscO/XfAcNYD75CfICkmfLedpyPDdozrLMmQc5ORaQcdMoc21OnlEylMIqI7U8eniKrPMxxtj8k0vhmJhA=="],
@@ -2615,7 +2630,7 @@
 
     "enhanced-resolve": ["enhanced-resolve@5.21.0", "", { "dependencies": { "graceful-fs": "^4.2.4", "tapable": "^2.3.3" } }, "sha512-otxSQPw4lkOZWkHpB3zaEQs6gWYEsmX4xQF68ElXC/TWvGxGMSGOvoNbaLXm6/cS/fSfHtsEdw90y20PCd+sCA=="],
 
-    "entities": ["entities@4.5.0", "", {}, "sha512-V0hjH4dGPh9Ao5p0MoRY6BVqtwCjhz6vI5LT8AJ55H+4g9/4vbHx1I54fS0XuclLhDHArPQCiMjDxjaL8fPxhw=="],
+    "entities": ["entities@7.0.1", "", {}, "sha512-TWrgLOFUQTH994YUyl1yT4uyavY5nNB5muff+RtWaqNVCAK408b5ZnnbNAUEWLTCpum9w6arT70i1XdQ4UeOPA=="],
 
     "env-paths": ["env-paths@3.0.0", "", {}, "sha512-dtJUTepzMW3Lm/NPxRf3wP4642UWhjL2sQxc+ym2YMj1m/H2zDNQOlezafzkHwn6sMstjHTwG6iQQsctDW/b1A=="],
 
@@ -2971,7 +2986,7 @@
 
     "magic-string": ["magic-string@0.30.21", "", { "dependencies": { "@jridgewell/sourcemap-codec": "^1.5.5" } }, "sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ=="],
 
-    "mail": ["mail@workspace:apps/backend/mail"],
+    "mailing": ["mailing@workspace:apps/backend/mailing"],
 
     "mailparser": ["mailparser@3.9.8", "", { "dependencies": { "@zone-eu/mailsplit": "5.4.8", "encoding-japanese": "2.2.0", "he": "1.2.0", "html-to-text": "9.0.5", "iconv-lite": "0.7.2", "libmime": "5.3.8", "linkify-it": "5.0.0", "nodemailer": "8.0.5", "punycode.js": "2.3.1", "tlds": "1.261.0" } }, "sha512-7jSlFGXiianVnhnb6wdutJFloD34488nrHY7r6FNqwXAhZ7YiJDYrKKTxZJ0oSrXcAPHm8YoYnh97xyGtrBQ3w=="],
 
@@ -3613,7 +3628,7 @@
 
     "tweetnacl": ["tweetnacl@1.0.3", "", {}, "sha512-6rt+RN7aOi1nGMyC4Xa5DdYiukl2UWCbcJft7YhxReBGQD7OAM8Pbxw6YMo4r2diNEA8FEmu32YOn9rhaiE5yw=="],
 
-    "type-fest": ["type-fest@5.6.0", "", { "dependencies": { "tagged-tag": "^1.0.0" } }, "sha512-8ZiHFm91orbSAe2PSAiSVBVko18pbhbiB3U9GglSzF/zCGkR+rxpHx6sEMCUm4kxY4LjDIUGgCfUMtwfZfjfUA=="],
+    "type-fest": ["type-fest@4.41.0", "", {}, "sha512-TeTSQ6H5YHvpqVwBRcnLDCBnDOHWYu7IvGbHT6N8AOymcr9PJGjc1GTtiWZTYg0NCgYwvnYWEkVChQAr9bjfwA=="],
 
     "typescript": ["typescript@5.9.2", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-CWBzXQrc/qOkhidw1OzBTQuYRbfyxDXJMVJ1XNwUHGROVmuaeiEm3OslpZ1RV96d7SKKjZKrSJu3+t/xlw3R9A=="],
 
@@ -3985,6 +4000,10 @@
 
     "d3-sankey/d3-shape": ["d3-shape@1.3.7", "", { "dependencies": { "d3-path": "1" } }, "sha512-EUkvKjqPFUAZyOlhY5gzCxCeI0Aep04LwIRpsZ/mLFelJiUfnK56jo5JMDSE7yyP2kLSb6LtF+S5chMk7uqPqw=="],
 
+    "dom-serializer/entities": ["entities@4.5.0", "", {}, "sha512-V0hjH4dGPh9Ao5p0MoRY6BVqtwCjhz6vI5LT8AJ55H+4g9/4vbHx1I54fS0XuclLhDHArPQCiMjDxjaL8fPxhw=="],
+
+    "dot-prop/type-fest": ["type-fest@5.6.0", "", { "dependencies": { "tagged-tag": "^1.0.0" } }, "sha512-8ZiHFm91orbSAe2PSAiSVBVko18pbhbiB3U9GglSzF/zCGkR+rxpHx6sEMCUm4kxY4LjDIUGgCfUMtwfZfjfUA=="],
+
     "dotenv-cli/dotenv": ["dotenv@17.4.2", "", {}, "sha512-nI4U3TottKAcAD9LLud4Cb7b2QztQMUEfHbvhTH09bqXTxnSie8WnjPALV/WMCrJZ6UV/qHJ6L03OqO3LcdYZw=="],
 
     "engine.io/cookie": ["cookie@0.7.2", "", {}, "sha512-yki5XnKuf750l50uGTllt6kKILY4nQ1eNIQatoXEByZ5dWgnKqbnqmTrBE5B4N7lrMJKQ2ytWMiTO2o0v6Ew/w=="],
@@ -3995,7 +4014,7 @@
 
     "happy-dom/@types/ws": ["@types/ws@8.18.1", "", { "dependencies": { "@types/node": "*" } }, "sha512-ThVF6DCVhA8kUGy+aazFQ4kXQ7E1Ty7A3ypFOe0IcJV8O/M511G99AW24irKrW56Wt44yG9+ij8FaqoBGkuBXg=="],
 
-    "happy-dom/entities": ["entities@7.0.1", "", {}, "sha512-TWrgLOFUQTH994YUyl1yT4uyavY5nNB5muff+RtWaqNVCAK408b5ZnnbNAUEWLTCpum9w6arT70i1XdQ4UeOPA=="],
+    "htmlparser2/entities": ["entities@4.5.0", "", {}, "sha512-V0hjH4dGPh9Ao5p0MoRY6BVqtwCjhz6vI5LT8AJ55H+4g9/4vbHx1I54fS0XuclLhDHArPQCiMjDxjaL8fPxhw=="],
 
     "katex/commander": ["commander@8.3.0", "", {}, "sha512-OkTL9umf+He2DZkUq8f8J9of7yL6RJKI24dVITBmNfZBmri9zYZQrKkuXiKhyfPSu8tUhnVBB1iKXevvnlR4Ww=="],
 
@@ -4270,8 +4289,6 @@
     "@scalar/themes/@scalar/types/@scalar/openapi-types": ["@scalar/openapi-types@0.2.0", "", { "dependencies": { "zod": "^3.23.8" } }, "sha512-waiKk12cRCqyUCWTOX0K1WEVX46+hVUK+zRPzAahDJ7G0TApvbNkuy5wx7aoUyEk++HHde0XuQnshXnt8jsddA=="],
 
     "@scalar/themes/@scalar/types/nanoid": ["nanoid@5.1.9", "", { "bin": { "nanoid": "bin/nanoid.js" } }, "sha512-ZUvP7KeBLe3OZ1ypw6dI/TzYJuvHP77IM4Ry73waSQTLn8/g8rpdjfyVAh7t1/+FjBtG4lCP42MEbDxOsRpBMw=="],
-
-    "@scalar/themes/@scalar/types/type-fest": ["type-fest@4.41.0", "", {}, "sha512-TeTSQ6H5YHvpqVwBRcnLDCBnDOHWYu7IvGbHT6N8AOymcr9PJGjc1GTtiWZTYg0NCgYwvnYWEkVChQAr9bjfwA=="],
 
     "@tailwindcss/oxide-wasm32-wasi/@napi-rs/wasm-runtime/@tybys/wasm-util": ["@tybys/wasm-util@0.10.1", "", { "dependencies": { "tslib": "^2.4.0" } }, "sha512-9tTaPJLSiejZKx+Bmog4uSubteqTvFrVrURwkmHixBo0G4seD0zUxp98E1DzUBJxLQ3NPwXrGKDiVjwx/DpPsg=="],
 
