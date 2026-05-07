@@ -1,6 +1,13 @@
 import { relations } from "drizzle-orm";
-import { boolean, index, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, index, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { apikey } from "./api-key";
+import {
+	billingInvoice,
+	creditLedger,
+	emailEventV2,
+	emailSend,
+	subscription,
+} from "./billing";
 
 export const user = pgTable("user", {
 	id: text("id").primaryKey(),
@@ -69,12 +76,27 @@ export const jwks = pgTable("jwks", {
 	expiresAt: timestamp("expires_at"),
 });
 
+export const orgStatusEnum = pgEnum("org_status", ["active", "suspended", "deleted"]);
+
 export const organization = pgTable("organization", {
 	id: text("id").primaryKey(),
 	name: text("name").notNull(),
 	slug: text("slug").notNull().unique(),
 	logo: text("logo"),
+	status: orgStatusEnum("status").notNull().default("active"),
+
+	// Billing contact
+	billingEmail: text("billing_email"),
+	billingName: text("billing_name"),
+
+	// External billing provider (e.g. Stripe customer ID)
+	externalCustomerId: text("external_customer_id").unique(),
+
 	createdAt: timestamp("created_at").notNull(),
+	updatedAt: timestamp("updated_at")
+		.notNull()
+		.defaultNow()
+		.$onUpdate(() => new Date()),
 	metadata: text("metadata"),
 });
 
@@ -124,6 +146,7 @@ export const userRelations = relations(user, ({ many }) => ({
 	apikeys: many(apikey),
 	members: many(member),
 	invitations: many(invitation),
+	triggeredSends: many(emailSend, { relationName: "triggeredBy" }),
 }));
 
 export const accountRelations = relations(account, ({ one }) => ({
@@ -136,6 +159,11 @@ export const accountRelations = relations(account, ({ one }) => ({
 export const organizationRelations = relations(organization, ({ many }) => ({
 	members: many(member),
 	invitations: many(invitation),
+	subscriptions: many(subscription),
+	creditLedger: many(creditLedger),
+	emailSends: many(emailSend),
+	emailEventsV2: many(emailEventV2),
+	billingInvoices: many(billingInvoice),
 }));
 
 export const memberRelations = relations(member, ({ one }) => ({
