@@ -3,9 +3,11 @@ import {
 	type Msg,
 	type NatsConnection,
 } from "@nats-io/transport-node";
-import type { BusEvent, EventPayloads } from "./events";
+import type { BusEvent } from "./events";
+import type { EventPayloads } from "./types";
 
 export * from "./events";
+export * from "./types";
 
 class MessageBus {
 	private nc: NatsConnection | null = null;
