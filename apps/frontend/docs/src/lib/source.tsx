@@ -235,9 +235,17 @@ export const source = {
 				if (fs.statSync(full).isDirectory()) {
 					results.push(...getSlugs(full, [...base, item]));
 				} else if (item.endsWith(".mdx")) {
-					const slug = [...base, path.basename(item, ".mdx")];
-					if (!(slug.length === 1 && slug[0] === "index"))
-						results.push({ slug });
+					const name = path.basename(item, ".mdx");
+					if (name === "index") {
+						// index.mdx maps to the parent directory slug
+						// e.g., quickstart/dotnet/index.mdx → slug ["quickstart", "dotnet"]
+						if (base.length > 0) {
+							results.push({ slug: [...base] });
+						}
+						// Skip root-level index.mdx (handled by { slug: [] } in generateStaticParams)
+					} else {
+						results.push({ slug: [...base, name] });
+					}
 				}
 			}
 			return results;
