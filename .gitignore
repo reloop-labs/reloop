@@ -40,7 +40,9 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # local env files
-.env
+.env*
+!.env.prod
+!.env.dev
 .env*.local
 
 # vercel
@@ -92,4 +94,3 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-.env

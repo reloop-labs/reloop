@@ -37,10 +37,7 @@ export const authConfig = {
 	GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID || defaults.GITHUB_CLIENT_ID,
 	GITHUB_CLIENT_SECRET:
 		process.env.GITHUB_CLIENT_SECRET || defaults.GITHUB_CLIENT_SECRET,
-	LOGS_API_KEY: process.env.LOGS_API_KEY || "reloop-log-api-key",
 	DEFAULT_OTP: process.env.DEFAULT_OTP,
 	DISABLE_SIGNUP: process.env.DISABLE_SIGNUP || "false",
 	NATS_URL: process.env.NATS_URL || defaults.NATS_URL,
-	RELOOP_API_KEY: process.env.RELOOP_API_KEY || "",
-	RELOOP_SENDER_DOMAIN: process.env.RELOOP_SENDER_DOMAIN || "",
 };

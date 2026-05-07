@@ -3,4 +3,6 @@
 node_modules
 dist
 *.log
-.env
+.env*
+!.env.prod
+!.env.dev

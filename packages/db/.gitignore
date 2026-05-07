@@ -1,3 +1,5 @@
 dist
 .cache
-.env
+.env*
+!.env.prod
+!.env.dev
