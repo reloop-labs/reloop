@@ -1,12 +1,12 @@
 import { BusEvent, bus } from "@reloop/bus";
 import { logger } from "@reloop/logger";
+import React from "react";
+import OtpEmail from "../../emails/otp";
+import SigninDetectedEmail from "../../emails/signin-detected";
+import WelcomeEmail from "../../emails/welcome";
 import { render } from "../../render";
 import { emailConfig } from "../email.config";
 import { sendEmail } from "../utils/email";
-import WelcomeEmail from "../../emails/welcome";
-import OtpEmail from "../../emails/otp";
-import SigninDetectedEmail from "../../emails/signin-detected";
-import React from "react";
 
 export async function initAuthSubscribers() {
 	// Welcome Email / User Created
@@ -32,6 +32,7 @@ export async function initAuthSubscribers() {
 
 	// OTP Email
 	await bus.subscribe(BusEvent.OTP_REQUESTED, async (payload) => {
+		console.log(payload, "OTP PAYLOAD");
 		try {
 			const html = await render(
 				React.createElement(OtpEmail, {

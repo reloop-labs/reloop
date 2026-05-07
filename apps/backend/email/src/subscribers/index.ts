@@ -1,9 +1,9 @@
 import { logger } from "@reloop/logger";
+import { initApiKeySubscribers } from "./api-key.subscriber";
 import { initAuthSubscribers } from "./auth.subscriber";
-import { initOrgSubscribers } from "./organization.subscriber";
 import { initBillingSubscribers } from "./billing.subscriber";
 import { initDomainSubscribers } from "./domain.subscriber";
-import { initApiKeySubscribers } from "./api-key.subscriber";
+import { initOrgSubscribers } from "./organization.subscriber";
 
 export async function initSubscribers() {
 	try {
