@@ -1,5 +1,5 @@
-import { authMiddleware } from "@reloop/be-mail/middleware/auth";
-import { MailModel } from "@reloop/be-mail/model/mail.model.js";
+import { authMiddleware } from "@reloop/be-mailing/middleware/auth";
+import { MailModel } from "@reloop/be-mailing/model/mail.model.js";
 import { type Logger, logger } from "@reloop/logger";
 import { Elysia, status } from "elysia";
 import { getAttachmentController } from "./get-attachment.controllers";

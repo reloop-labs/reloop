@@ -1,5 +1,5 @@
 {
-	"name": "@reloop/react-email",
+	"name": "email",
 	"version": "1.0.0",
 	"private": true,
 	"main": "index.ts",

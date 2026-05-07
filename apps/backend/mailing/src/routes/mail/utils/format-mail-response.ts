@@ -1,4 +1,4 @@
-import type { MailTypes } from "@reloop/be-mail/types/mail.type.js";
+import type { MailTypes } from "@reloop/be-mailing/types/mail.type.js";
 
 export function formatSendEmailResponse(
 	data: MailTypes.SendEmailHandlerResponse,

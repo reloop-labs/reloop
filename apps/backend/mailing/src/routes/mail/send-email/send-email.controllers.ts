@@ -1,5 +1,5 @@
-import { kumomtaClient } from "@reloop/be-mail/lib/kumomta-client";
-import type { MailTypes } from "@reloop/be-mail/types/mail.type.js";
+import { kumomtaClient } from "@reloop/be-mailing/lib/kumomta-client";
+import type { MailTypes } from "@reloop/be-mailing/types/mail.type.js";
 import { db } from "@reloop/db/client";
 import {
   type dnsRecordTypeNameEnum,

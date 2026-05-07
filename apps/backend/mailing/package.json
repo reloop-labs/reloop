@@ -1,5 +1,5 @@
 {
-	"name": "mail",
+	"name": "mailing",
 	"main": "src/index.ts",
 	"type": "module",
 	"scripts": {

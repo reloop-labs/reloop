@@ -1,21 +1,21 @@
 import "dotenv/config";
 import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
-import { landing } from "@reloop/be-mail/routes/landing/landing.index.js";
-import { mailRoutes } from "@reloop/be-mail/routes/mail/mail.routes.js";
-import { loader } from "@reloop/be-mail/utils/loader.js";
+import { landing } from "@reloop/be-mailing/routes/landing/landing.index.js";
+import { mailRoutes } from "@reloop/be-mailing/routes/mail/mail.routes.js";
+import { loader } from "@reloop/be-mailing/utils/loader.js";
 import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
 import { initLogger } from "evlog";
 import { evlog } from "evlog/elysia";
 import { mailConfig } from "./mail.config";
 
-initLogger({ env: { service: "mail" } });
+initLogger({ env: { service: "mailing" } });
 
 const port = mailConfig.port;
 const mailService = new Elysia({
-	prefix: "/api/mail",
-	name: "Mail Service",
+	prefix: "/api/mailing",
+	name: "Mailing Service",
 })
 	.use(evlog())
 	.use(

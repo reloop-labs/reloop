@@ -15,7 +15,7 @@
 		"declarationMap": false,
 		"baseUrl": ".",
 		"paths": {
-			"@reloop/be-mail/*": ["./src/*"]
+			"@reloop/be-mailing/*": ["./src/*"]
 		}
 	}
 }

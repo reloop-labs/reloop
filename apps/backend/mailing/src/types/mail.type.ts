@@ -1,4 +1,4 @@
-import type { MailModel } from "@reloop/be-mail/model/mail.model.js";
+import type { MailModel } from "@reloop/be-mailing/model/mail.model.js";
 
 export namespace MailTypes {
 	export type SendEmailBody = typeof MailModel.sendEmailBody.static;

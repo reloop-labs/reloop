@@ -1,4 +1,4 @@
-import { authMiddleware } from "@reloop/be-mail/middleware/auth";
+import { authMiddleware } from "@reloop/be-mailing/middleware/auth";
 import { Elysia } from "elysia";
 import { trackRoute } from "../track/track.route";
 import { getAttachmentRoute } from "./get-attachment/get-attachment.route";

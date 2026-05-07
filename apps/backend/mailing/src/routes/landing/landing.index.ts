@@ -1,4 +1,4 @@
-import { redis } from "@reloop/be-mail/utils/loader";
+import { redis } from "@reloop/be-mailing/utils/loader";
 import { db } from "@reloop/db/client";
 import { Elysia } from "elysia";
 

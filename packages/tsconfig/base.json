@@ -28,7 +28,8 @@
 			"@reloop/webhook": ["../../apps/backend/webhook/src/*"],
 			"@reloop/audience": ["../../apps/backend/audience/src/*"],
 			"@reloop/web": ["../../apps/frontend/web/src/*"],
-			"@reloop/be-mail": ["../../apps/backend/mail/src/*"],
+			"@reloop/be-mailing": ["../../apps/backend/mailing/src/*"],
+			"@reloop/email": ["../../apps/backend/email/index.ts"],
 			"@reloop/logs": ["../../apps/backend/logs/src/*"]
 		}
 	}

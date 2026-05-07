@@ -1,4 +1,4 @@
-import type { MailTypes } from "@reloop/be-mail/types/mail.type.js";
+import type { MailTypes } from "@reloop/be-mailing/types/mail.type.js";
 import { db } from "@reloop/db/client";
 import { emailLog } from "@reloop/db/schema";
 import type { Logger } from "@reloop/logger";
