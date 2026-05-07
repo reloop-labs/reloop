@@ -94,6 +94,32 @@
         "typescript": "catalog:",
       },
     },
+    "apps/backend/billing": {
+      "name": "billing",
+      "dependencies": {
+        "@elysiajs/cors": "catalog:backend",
+        "@elysiajs/openapi": "catalog:backend",
+        "@elysiajs/opentelemetry": "catalog:backend",
+        "@elysiajs/server-timing": "catalog:backend",
+        "@elysiajs/swagger": "catalog:backend",
+        "@paralleldrive/cuid2": "catalog:backend",
+        "@reloop/auth": "workspace:*",
+        "@reloop/bus": "workspace:*",
+        "@reloop/db": "workspace:*",
+        "@reloop/logger": "workspace:*",
+        "dotenv": "catalog:backend",
+        "drizzle-orm": "catalog:db",
+        "elysia": "catalog:backend",
+        "pg": "catalog:db",
+        "zod": "catalog:ui",
+      },
+      "devDependencies": {
+        "@reloop/tsconfig": "workspace:*",
+        "@types/bun": "catalog:backend",
+        "tsdown": "catalog:backend",
+        "typescript": "catalog:",
+      },
+    },
     "apps/backend/contacts": {
       "name": "contacts",
       "dependencies": {
@@ -134,32 +160,6 @@
         "@types/pg": "catalog:db",
         "bun-types": "catalog:backend",
         "drizzle-kit": "catalog:db",
-        "tsdown": "catalog:backend",
-        "typescript": "catalog:",
-      },
-    },
-    "apps/backend/credits": {
-      "name": "credits",
-      "dependencies": {
-        "@elysiajs/cors": "catalog:backend",
-        "@elysiajs/openapi": "catalog:backend",
-        "@elysiajs/opentelemetry": "catalog:backend",
-        "@elysiajs/server-timing": "catalog:backend",
-        "@elysiajs/swagger": "catalog:backend",
-        "@paralleldrive/cuid2": "catalog:backend",
-        "@reloop/auth": "workspace:*",
-        "@reloop/bus": "workspace:*",
-        "@reloop/db": "workspace:*",
-        "@reloop/logger": "workspace:*",
-        "dotenv": "catalog:backend",
-        "drizzle-orm": "catalog:db",
-        "elysia": "catalog:backend",
-        "pg": "catalog:db",
-        "zod": "catalog:ui",
-      },
-      "devDependencies": {
-        "@reloop/tsconfig": "workspace:*",
-        "@types/bun": "catalog:backend",
         "tsdown": "catalog:backend",
         "typescript": "catalog:",
       },
@@ -2309,6 +2309,8 @@
 
     "better-sqlite3": ["better-sqlite3@12.9.0", "", { "dependencies": { "bindings": "^1.5.0", "prebuild-install": "^7.1.1" } }, "sha512-wqUv4Gm3toFpHDQmaKD4QhZm3g1DjUBI0yzS4UBl6lElUmXFYdTQmmEDpAFa5o8FiFiymURypEnfVHzILKaxqQ=="],
 
+    "billing": ["billing@workspace:apps/backend/billing"],
+
     "bindings": ["bindings@1.5.0", "", { "dependencies": { "file-uri-to-path": "1.0.0" } }, "sha512-p2q/t/mhvuOj/UeLlV6566GD/guowlr0hHxClI0W9m7MWYkL1F0hLo+0Aexs9HSPCtR1SXQ0TD3MMKrXZajbiQ=="],
 
     "birpc": ["birpc@2.9.0", "", {}, "sha512-KrayHS5pBi69Xi9JmvoqrIgYGDkD6mcSe/i6YKi3w5kekCLzrX4+nawcXqrj2tIp50Kw/mT/s3p+GVK0A0sKxw=="],
@@ -2418,8 +2420,6 @@
     "cors": ["cors@2.8.6", "", { "dependencies": { "object-assign": "^4", "vary": "^1" } }, "sha512-tJtZBBHA6vjIAaF6EnIaq6laBBP9aq/Y3ouVJjEfoHbRBcHBAHYcMh/w8LDrk2PvIMMq8gmopa5D4V8RmbrxGw=="],
 
     "cose-base": ["cose-base@1.0.3", "", { "dependencies": { "layout-base": "^1.0.0" } }, "sha512-s9whTXInMSgAp/NVXVNuVxVKzGH2qck3aQlVHxDCdAEPgtMKwc4Wq6/QKhgdEdgbLSi9rBTAcPoRa6JpiG4ksg=="],
-
-    "credits": ["credits@workspace:apps/backend/credits"],
 
     "cron-parser": ["cron-parser@4.9.0", "", { "dependencies": { "luxon": "^3.2.1" } }, "sha512-p0SaNjrHOnQeR8/VnfGbmg9te2kfyYSQ7Sc/j/6DtPL3JQvKxmjO9TSjNFpujqV3vEYYBvNNvXSxzyksBWAx1Q=="],
 
