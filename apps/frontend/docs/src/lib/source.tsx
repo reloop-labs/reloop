@@ -153,47 +153,67 @@ function buildTree(dir: string, base = ""): PageTreeItem[] {
 
 export const source = {
 	getPage: (slug?: string[]) => {
-		const slugPath = slug?.join("/") || "index";
-		let filePath = path.join(docsDir, `${slugPath}.mdx`);
+		try {
+			const slugPath = slug?.join("/") || "index";
+			let filePath = path.join(docsDir, `${slugPath}.mdx`);
 
-		if (!fs.existsSync(filePath)) {
-			// Try index.mdx if it's a directory
-			const indexPath = path.join(docsDir, slugPath, "index.mdx");
-			if (fs.existsSync(indexPath)) {
-				filePath = indexPath;
-			} else {
-				return null;
+			if (!fs.existsSync(filePath)) {
+				// Try index.mdx if it's a directory
+				const indexPath = path.join(docsDir, slugPath, "index.mdx");
+				if (fs.existsSync(indexPath)) {
+					filePath = indexPath;
+				} else {
+					return null;
+				}
 			}
-		}
 
-		const { data: frontmatter, content } = matter(
-			fs.readFileSync(filePath, "utf8"),
-		);
-		const toc: TOCItem[] = [];
-		const headingRegex = /^(##|###)\s+(.*)$/gm;
-		for (const match of content.matchAll(headingRegex)) {
-			if (!match[1] || !match[2]) continue;
-			const title = match[2].trim();
-			const url = `#${title
-				.toLowerCase()
-				.replace(/[^\w ]+/g, "")
-				.replace(/\s+/g, "-")}`;
-			toc.push({ title, url, depth: match[1].length });
-		}
+			const fileContent = fs.readFileSync(filePath, "utf-8");
+			const { data: frontmatter, content } = matter(fileContent);
+			const toc: TOCItem[] = [];
+			const headingRegex = /^(##|###)\s+(.*)$/gm;
+			for (const match of content.matchAll(headingRegex)) {
+				if (!match[1] || !match[2]) continue;
+				const title = match[2].trim();
+				const url = `#${title
+					.toLowerCase()
+					.replace(/[^\w ]+/g, "")
+					.replace(/\s+/g, "-")}`;
+				toc.push({ title, url, depth: match[1].length });
+			}
 
-		return {
-			data: {
-				title: frontmatter.title || "Docs",
-				description: frontmatter.description || "",
-				full: frontmatter.full === true,
-				body: (props: { components?: MDXComponents }) => (
-					<MDXRemote source={content} components={props.components} />
-				),
-				toc,
-				_apiData: frontmatter._apiData || null,
-			},
-			url: `/${slugPath === "index" ? "introduction" : slugPath}`,
-		};
+			return {
+				data: {
+					title: frontmatter.title || "Docs",
+					description: frontmatter.description || "",
+					full: frontmatter.full === true,
+					body: (props: { components?: MDXComponents }) => (
+						<MDXRemote source={content} components={props.components} />
+					),
+					toc,
+					_apiData: frontmatter._apiData || null,
+				},
+				url: `/${slugPath === "index" ? "introduction" : slugPath}`,
+			};
+		} catch (error: any) {
+			console.error(`FATAL ERROR in getPage for slug ${slug?.join("/")}:`, error);
+			return {
+				data: {
+					title: "Error Loading Content",
+					description: `We encountered an error while reading this documentation page: ${error.message}. Paths tried: ${docsDir}`,
+					full: false,
+					body: () => (
+						<div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-800">
+							<h2 className="font-bold">System Error</h2>
+							<p>Failed to read file from disk.</p>
+							<pre className="mt-2 overflow-auto text-xs">{error.stack}</pre>
+						</div>
+					),
+					toc: [],
+					_apiData: null,
+				},
+				url: "#",
+			};
+		}
 	},
 
 	get pageTree() {
