@@ -41,6 +41,21 @@ export interface OrganizationCreatedPayload {
 	slug: string;
 }
 
+export interface LogCreatedPayload {
+	event: string;
+	level: "debug" | "info" | "warn" | "error" | "fatal";
+	trace_id?: string;
+	metadata?: Record<string, unknown>;
+	requestDetails?: {
+		endpoint?: string;
+		method?: string;
+		userAgent?: string;
+		ipAddress?: string;
+		statusCode?: number;
+	};
+	cookie?: string;
+}
+
 export interface EventPayloads {
 	[BusEvent.USER_CREATED]: UserCreatedPayload;
 	[BusEvent.USER_UPDATED]: UserUpdatedPayload;
@@ -49,4 +64,6 @@ export interface EventPayloads {
 	[BusEvent.WEBHOOK_TRIGGERED]: WebhookTriggeredPayload;
 	[BusEvent.EMAIL_SENT]: EmailSentPayload;
 	[BusEvent.ORGANIZATION_CREATED]: OrganizationCreatedPayload;
+	[BusEvent.LOG_CREATED]: LogCreatedPayload;
 }
+

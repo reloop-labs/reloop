@@ -1,9 +1,9 @@
+import { bus, BusEvent } from "@reloop/bus";
 import logger from "@reloop/logger";
-import { apiKeyConfig } from "../api-key.config";
 
 /**
  * Creates a structured log entry in the centralized logs service.
- * This is a service-specific implementation that uses the API key configuration.
+ * This is a service-specific implementation that uses NATS for transport.
  */
 export async function createLog(body: {
 	event: string;
@@ -19,7 +19,6 @@ export async function createLog(body: {
 	};
 	cookie?: string;
 }) {
-	const url = `${apiKeyConfig.BASE_URL}/api/logs/v1/create`;
 	const {
 		event,
 		level = "info",
@@ -30,25 +29,18 @@ export async function createLog(body: {
 	} = body;
 
 	try {
-		await fetch(url, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-				...(cookie && { cookie }),
-			},
-
-			body: JSON.stringify({
-				event,
-				level,
-				trace_id:
-					trace_id ||
-					(typeof crypto !== "undefined" ? crypto.randomUUID() : undefined),
-				metadata,
-				status_code: requestDetails.statusCode,
-				requestDetails,
-			}),
+		await bus.publish(BusEvent.LOG_CREATED, {
+			event,
+			level,
+			trace_id:
+				trace_id ||
+				(typeof crypto !== "undefined" ? crypto.randomUUID() : undefined),
+			metadata,
+			requestDetails,
+			cookie,
 		});
 	} catch (error) {
-		logger.error({ error }, "Error calling logs service");
+		logger.error({ error }, "Error publishing log to NATS");
 	}
 }
+

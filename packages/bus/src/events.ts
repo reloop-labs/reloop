@@ -6,4 +6,6 @@ export enum BusEvent {
 	WEBHOOK_TRIGGERED = "webhook.triggered",
 	EMAIL_SENT = "email.sent",
 	ORGANIZATION_CREATED = "organization.created",
+	LOG_CREATED = "log.created",
 }
+
