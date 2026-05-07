@@ -30,6 +30,7 @@
 # Environment & local files
 .env*
 !.env.example
+!.env.dev
 .DS_Store
 *.pem
 *.local
