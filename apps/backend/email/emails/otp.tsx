@@ -26,9 +26,9 @@ export const OTPTokenEmail = ({
 	baseUrl = "https://reloop.sh",
 	theme = "light",
 }: OTPTokenEmailProps) => {
-	const url = `${baseUrl}/dashboard/login?email=true&otpSent=${encodeURIComponent(
+	const url = `${baseUrl}/dashboard/verify?otpSent=${encodeURIComponent(
 		email,
-	)}&enterCode=true&otp=${otp}`;
+	)}&otp=${otp}`;
 
 	const isDark = theme === "dark";
 

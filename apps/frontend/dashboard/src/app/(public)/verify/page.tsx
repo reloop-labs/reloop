@@ -1,0 +1,110 @@
+"use client";
+
+import { authClient } from "@reloop/auth/client";
+import { Logo } from "@reloop/ui/logo";
+import Spinner from "@reloop/ui/spinner";
+import { useRouter } from "next/navigation";
+import { parseAsString, useQueryState } from "nuqs";
+import { useEffect, useRef, useState } from "react";
+
+const AutoLoginPage = () => {
+	const router = useRouter();
+	const [otpSentEmail] = useQueryState(
+		"otpSent",
+		parseAsString.withDefault(""),
+	);
+	const [otpValue] = useQueryState("otp", parseAsString.withDefault(""));
+	const [isVerifying, setIsVerifying] = useState(true);
+	const [error, setError] = useState<string | null>(null);
+	const hasAttempted = useRef(false);
+
+	useEffect(() => {
+		const verify = async () => {
+			if (hasAttempted.current) return;
+
+			if (!otpSentEmail || !otpValue) {
+				setIsVerifying(false);
+				setError("Missing email or OTP in the link.");
+				return;
+			}
+
+			hasAttempted.current = true;
+			try {
+				const response = await authClient.emailOtp.checkVerificationOtp({
+					otp: otpValue,
+					email: otpSentEmail,
+					type: "sign-in",
+				});
+
+				if (response.data?.success) {
+					const { data } = await authClient.signIn.emailOtp({
+						email: otpSentEmail,
+						otp: otpValue,
+					});
+
+					if (data?.user.id) {
+						router.push("/");
+					} else {
+						setError("Failed to sign in. Please try manually.");
+						setIsVerifying(false);
+					}
+				} else {
+					setError("This link is invalid or has expired.");
+					setIsVerifying(false);
+				}
+			} catch (err) {
+				setError("An unexpected error occurred. Please try again.");
+				setIsVerifying(false);
+			}
+		};
+
+		verify();
+	}, [otpSentEmail, otpValue, router]);
+
+	return (
+		<div className="flex h-dvh flex-col items-center justify-center bg-bg-white-0 antialiased">
+			<div className="w-full max-w-sm p-5 md:p-8">
+				<div className="flex flex-col items-center justify-center gap-2">
+					<div className="mb-2 flex items-center justify-center">
+						<Logo className="h-16" />
+					</div>
+				</div>
+				<div className="mt-8 text-center">
+					{isVerifying ? (
+						<div className="flex flex-col items-center gap-6">
+							<Spinner size={32} color="var(--text-strong-950)" />
+							<div className="space-y-2">
+								<h2 className="font-medium text-label-lg text-text-strong-950">
+									Verifying your account
+								</h2>
+								<p className="text-[13px] text-text-sub-600">
+									Please wait while we complete your verification...
+								</p>
+							</div>
+						</div>
+					) : (
+						<div className="space-y-6">
+							<div className="space-y-2">
+								<h2 className="font-medium text-error-base text-label-lg">
+									Verification failed
+								</h2>
+								<p className="text-[13px] text-text-sub-600">{error}</p>
+							</div>
+							<div className="pt-2">
+								<button
+									type="button"
+									onClick={() => router.push("/signup")}
+									className="cursor-pointer font-medium text-[13px] text-text-strong-950 underline transition-colors hover:text-text-sub-600"
+								>
+									Back to Login
+								</button>
+							</div>
+						</div>
+					)}
+				</div>
+			</div>
+		</div>
+	);
+};
+
+export default AutoLoginPage;
