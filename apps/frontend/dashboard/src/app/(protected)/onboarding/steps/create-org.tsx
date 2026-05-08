@@ -169,7 +169,7 @@ export const CreateOrgStep = () => {
 	};
 
 	return (
-		<div className="fade-in animate-in duration-500">
+		<div>
 			<div>
 				<div className="flex items-center gap-4">
 					<input

@@ -97,7 +97,7 @@ export const AddDomainStep = () => {
 	);
 
 	return (
-		<div className="fade-in animate-in space-y-6 duration-500">
+		<div className="space-y-6">
 			<form onSubmit={handleSubmit(onSubmit)} className="flex w-full flex-col">
 				<DomainInputField
 					register={register}

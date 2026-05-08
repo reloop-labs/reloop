@@ -4,6 +4,7 @@ import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
 import Spinner from "@reloop/ui/spinner";
 import { CheckCircle2 } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import type React from "react";
@@ -126,7 +127,12 @@ export const OnBoardingContent = () => {
 	if (step === 5) {
 		return (
 			<div className="flex min-h-screen items-center justify-center bg-bg-white-0 p-4">
-				<div className="zoom-in max-w-md animate-in text-center duration-500">
+				<motion.div
+					initial={{ opacity: 0, transform: "scale(0.95)" }}
+					animate={{ opacity: 1, transform: "scale(1)" }}
+					transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
+					className="max-w-md text-center"
+				>
 					<div className="mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-full bg-success-lighter text-success-base">
 						<CheckCircle2 size={48} />
 					</div>
@@ -141,7 +147,7 @@ export const OnBoardingContent = () => {
 					<Button.Root variant="neutral" mode="filled" className="w-full">
 						Go to Dashboard
 					</Button.Root>
-				</div>
+				</motion.div>
 			</div>
 		);
 	}

@@ -41,7 +41,7 @@ export const GenerateApiKeyStep = () => {
 	};
 
 	return (
-		<div className="fade-in animate-in duration-500">
+		<div>
 			{!apiKey ? (
 				<PreGenerate loading={loading} onGenerate={generateKey} />
 			) : (

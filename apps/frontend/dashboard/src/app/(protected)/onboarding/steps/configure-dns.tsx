@@ -77,7 +77,7 @@ export const ConfigureDnsStep = () => {
 
 	if (!domainId && !isLoading) {
 		return (
-			<div className="fade-in animate-in duration-500">
+			<div>
 				<p className="text-text-sub-600 outline-none">
 					Please add a domain in the previous step.
 				</p>
@@ -86,7 +86,7 @@ export const ConfigureDnsStep = () => {
 	}
 
 	return (
-		<div className="fade-in animate-in pb-10 duration-500">
+		<div className="pb-10">
 			<div className="relative mx-auto mb-8">
 				<DomainAddedAlert domainName={domainData?.domain} />
 				<DNSAutoConnectBanner domain={domainData} domainId={domainId} />
