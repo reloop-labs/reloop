@@ -46,8 +46,16 @@ export const OnBoardingContent = () => {
 	);
 
 	useEffect(() => {
-		if (!isPending && !session) {
+		if (isPending) return;
+
+		if (!session) {
 			router.push("/login");
+			return;
+		}
+
+		// If user already has an active organization, redirect to dashboard
+		if (session.user.activeOrganizationId) {
+			router.push("/");
 		}
 	}, [session, isPending, router]);
 
