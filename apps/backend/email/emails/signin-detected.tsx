@@ -57,29 +57,29 @@ export const SignInDetectedEmail = ({
 			: "mt-6 mb-8 p-0 font-normal text-[32px] text-[#0e0e0e] leading-[1.2]",
 		hr: isDark ? "my-8 border-[#222222]" : "my-8 border-[#e0e0e0]",
 		salutation: isDark
-			? "text-[15px] text-white leading-[1.6]"
-			: "text-[15px] text-[#0e0e0e] leading-[1.6]",
+			? "m-0 text-[15px] text-white leading-[1.6]"
+			: "m-0 text-[15px] text-[#0e0e0e] leading-[1.6]",
 		bodyText: isDark
-			? "mt-4 text-[#b0b0b0] text-[15px] leading-[1.6]"
-			: "mt-4 text-[#555555] text-[15px] leading-[1.6]",
+			? "m-0 mt-4 text-[#b0b0b0] text-[15px] leading-[1.6]"
+			: "m-0 mt-4 text-[#555555] text-[15px] leading-[1.6]",
 		detailsBox: isDark
-			? "mt-8 rounded-2xl border border-[#222222] border-solid p-8"
-			: "mt-8 rounded-2xl border border-[#e0e0e0] border-solid p-8",
+			? "mt-8 rounded-2xl border border-[#222222] border-solid px-8 py-4"
+			: "mt-8 rounded-2xl border border-[#e0e0e0] border-solid px-8 py-4",
 		detailLabel: isDark
 			? "m-0 font-semibold text-white text-[15px]"
 			: "m-0 font-semibold text-[#0e0e0e] text-[15px]",
 		detailValue: isDark
-			? "text-[#b0b0b0] text-[15px]"
-			: "text-[#555555] text-[15px]",
+			? "m-0 text-[#b0b0b0] text-[15px]"
+			: "m-0 text-[#555555] text-[15px]",
 		alertBox: isDark
-			? "mt-8 rounded-2xl border border-[#333333] border-solid bg-[#1a1a1a] p-8"
-			: "mt-8 rounded-2xl border border-[#e0e0e0] border-solid bg-[#f9f9f9] p-8",
+			? "mt-8 rounded-2xl border border-[#333333] border-solid bg-[#1a1a1a] p-6"
+			: "mt-8 rounded-2xl border border-[#e0e0e0] border-solid bg-[#f9f9f9] p-6",
 		alertHeading: isDark
 			? "m-0 font-semibold text-white text-[16px]"
 			: "m-0 font-semibold text-[#0e0e0e] text-[16px]",
 		alertText: isDark
-			? "mt-3 text-[#b0b0b0] text-[15px] leading-[1.6]"
-			: "mt-3 text-[#555555] text-[15px] leading-[1.6]",
+			? "m-0 mt-3 text-[#b0b0b0] text-[15px] leading-[1.6]"
+			: "m-0 mt-3 text-[#555555] text-[15px] leading-[1.6]",
 		link: isDark ? "text-[#edece1] underline" : "text-[#0e0e0e] underline",
 		btn: isDark
 			? "rounded-xl bg-[#edece1] px-6 py-3 text-center font-bold font-mono text-[12px] text-black uppercase tracking-wider no-underline"
@@ -125,7 +125,13 @@ export const SignInDetectedEmail = ({
 
 						{/* Sign-in Details Box */}
 						<Section className={cls.detailsBox}>
-							<table width="100%" cellPadding="0" cellSpacing="0">
+							<table
+								width="100%"
+								cellPadding="0"
+								cellSpacing="0"
+								role="presentation"
+								border={0}
+							>
 								<tr>
 									<td
 										style={{
@@ -154,6 +160,7 @@ export const SignInDetectedEmail = ({
 											paddingTop: "16px",
 											paddingBottom: "16px",
 											verticalAlign: "top",
+											width: "110px",
 										}}
 									>
 										<Text className={cls.detailLabel}>Time</Text>
@@ -176,6 +183,7 @@ export const SignInDetectedEmail = ({
 											paddingTop: "16px",
 											paddingBottom: "16px",
 											verticalAlign: "top",
+											width: "110px",
 										}}
 									>
 										<Text className={cls.detailLabel}>Browser</Text>
@@ -198,6 +206,7 @@ export const SignInDetectedEmail = ({
 											paddingTop: "16px",
 											paddingBottom: "16px",
 											verticalAlign: "top",
+											width: "110px",
 										}}
 									>
 										<Text className={cls.detailLabel}>Device</Text>
@@ -218,6 +227,7 @@ export const SignInDetectedEmail = ({
 										style={{
 											paddingTop: "16px",
 											verticalAlign: "top",
+											width: "110px",
 										}}
 									>
 										<Text className={cls.detailLabel}>IP</Text>

@@ -75,6 +75,7 @@ export const auth = betterAuth({
 					logger.info("🔓 User signed in:", user.email);
 					await bus.publish(BusEvent.SIGNIN_DETECTED, {
 						email: user.email,
+						fullName: user.name || "User",
 						browser: session.userAgent || "Unknown Browser",
 						os: "Unknown OS",
 						ip: session.ipAddress || "0.0.0.0",

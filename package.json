@@ -179,7 +179,9 @@
 				"bullmq": "5.74.1",
 				"evlog": "2.10.0",
 				"@aws-sdk/client-s3": "3.1033.0",
-				"@aws-sdk/lib-storage": "3.1033.0"
+				"@aws-sdk/lib-storage": "3.1033.0",
+				"ua-parser-js": "2.0.9",
+				"@types/ua-parser-js": "0.7.39"
 			}
 		}
 	},

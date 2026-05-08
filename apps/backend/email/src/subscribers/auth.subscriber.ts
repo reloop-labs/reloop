@@ -7,6 +7,7 @@ import WelcomeEmail from "../../emails/welcome";
 import { render } from "../../render";
 import { emailConfig } from "../email.config";
 import { sendEmail } from "../utils/email";
+import { UAParser } from "ua-parser-js";
 
 export async function initAuthSubscribers() {
 	// Welcome Email / User Created
@@ -63,14 +64,25 @@ export async function initAuthSubscribers() {
 	// Signin Detected Email
 	await bus.subscribe(BusEvent.SIGNIN_DETECTED, async (payload) => {
 		try {
+			const parser = new UAParser(payload.browser);
+			const ua = parser.getResult();
+
+			const browserName = ua.browser.name || "Unknown Browser";
+			const browserVersion = ua.browser.version || "";
+			const osName = ua.os.name || "Unknown OS";
+			const osVersion = ua.os.version || "";
+
+			const formattedBrowser = `${browserName} ${browserVersion} on ${osName} ${osVersion}`.trim();
+			const formattedDevice = ua.device.model || ua.os.name || "Unknown Device";
+
 			const html = await render(
 				React.createElement(SigninDetectedEmail, {
-					fullName: "User",
+					fullName: payload.fullName,
 					email: payload.email,
 					location: payload.location,
 					time: new Date().toLocaleString(),
-					browser: payload.browser,
-					device: payload.os, // Using os as device for now
+					browser: formattedBrowser,
+					device: formattedDevice,
 					ipAddress: payload.ip,
 					baseUrl: emailConfig.BASE_URL,
 				}),

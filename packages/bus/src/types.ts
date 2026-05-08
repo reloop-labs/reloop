@@ -101,6 +101,7 @@ export interface QuotaWarningPayload {
 
 export interface SigninDetectedPayload {
 	email: string;
+	fullName: string;
 	browser: string;
 	os: string;
 	ip: string;
