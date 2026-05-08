@@ -73,7 +73,7 @@ export const WorkspaceSlugInput = ({
 				size="small"
 				className="mt-1 w-full"
 				hasError={slugStatus === "taken"}
-				hassuccess={slugStatus === "available"}
+				hasSuccess={slugStatus === "available"}
 			>
 				<Input.Wrapper className="gap-0">
 					<Input.InlineAffix>reloop.sh/dashboard/</Input.InlineAffix>

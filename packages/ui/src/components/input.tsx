@@ -125,7 +125,7 @@ export const inputVariants = tv({
 				],
 			},
 		},
-		hassuccess: {
+		hasSuccess: {
 			true: {
 				root: [
 					// base
@@ -166,7 +166,7 @@ function InputRoot({
 	children,
 	size,
 	hasError,
-	hassuccess,
+	hasSuccess,
 	asChild,
 	...rest
 }: React.HTMLAttributes<HTMLDivElement> &
@@ -179,13 +179,13 @@ function InputRoot({
 	const { root } = inputVariants({
 		size,
 		hasError,
-		hassuccess,
+		hasSuccess,
 	});
 
 	const sharedProps: InputSharedProps = {
 		size,
 		hasError,
-		hassuccess,
+		hasSuccess,
 	};
 
 	const extendedChildren = recursiveCloneChildren(
@@ -215,7 +215,7 @@ function InputWrapper({
 	children,
 	size,
 	hasError,
-	hassuccess,
+	hasSuccess,
 	asChild,
 	...rest
 }: React.HTMLAttributes<HTMLLabelElement> &
@@ -246,7 +246,7 @@ const Input = React.forwardRef<
 		}
 >(
 	(
-		{ className, type = "text", size, hasError, asChild, ...rest },
+		{ className, type = "text", size, hasError, hasSuccess, asChild, ...rest },
 		forwardedRef,
 	) => {
 		const Component = asChild ? Slot : "input";
@@ -254,6 +254,7 @@ const Input = React.forwardRef<
 		const { input } = inputVariants({
 			size,
 			hasError,
+			hasSuccess,
 		});
 
 		return (
@@ -271,12 +272,13 @@ Input.displayName = INPUT_EL_NAME;
 function InputIcon<T extends React.ElementType = "div">({
 	size,
 	hasError,
+	hasSuccess,
 	as,
 	className,
 	...rest
 }: PolymorphicComponentProps<T, InputSharedProps>) {
 	const Component = as || "div";
-	const { icon } = inputVariants({ size, hasError });
+	const { icon } = inputVariants({ size, hasError, hasSuccess });
 
 	return <Component className={icon({ class: className })} {...rest} />;
 }
@@ -287,12 +289,13 @@ function InputAffix({
 	children,
 	size,
 	hasError,
-	hassuccess,
+	hasSuccess,
 	...rest
 }: React.HTMLAttributes<HTMLDivElement> & InputSharedProps) {
 	const { affix } = inputVariants({
 		size,
 		hasError,
+		hasSuccess,
 	});
 
 	return (
@@ -308,12 +311,13 @@ function InputInlineAffix({
 	children,
 	size,
 	hasError,
-	hassuccess,
+	hasSuccess,
 	...rest
 }: React.HTMLAttributes<HTMLSpanElement> & InputSharedProps) {
 	const { inlineAffix } = inputVariants({
 		size,
 		hasError,
+		hasSuccess,
 	});
 
 	return (

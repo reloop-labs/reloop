@@ -260,7 +260,7 @@ export const CreateOrgStep = () => {
 					<Input.Root
 						size="small"
 						hasError={slugStatus === "taken"}
-						hassuccess={slugStatus === "available"}
+						hasSuccess={slugStatus === "available"}
 					>
 						<Input.Wrapper className="gap-0">
 							<Input.InlineAffix className="m">
