@@ -50,19 +50,44 @@ export const auth = betterAuth({
 			await redis.delete(key);
 		},
 	},
-	after: createAuthMiddleware(async (ctx) => {
-		if (ctx.path.startsWith("/sign-up")) {
-			const newSession = ctx.context.newSession;
-			if (newSession) {
-				logger.info("🔐 User registered:", newSession.user);
-				await bus.publish(BusEvent.USER_CREATED, {
-					id: newSession.user.id,
-					email: newSession.user.email,
-					name: newSession.user.name,
-				});
+	hooks: {
+		after: createAuthMiddleware(async (ctx) => {
+			const { path, context } = ctx;
+
+			// 🔐 User registered
+			if (path.startsWith("/sign-up")) {
+				const newSession = context.newSession;
+				if (newSession) {
+					logger.info("🔐 User registered:", newSession.user);
+					await context.runInBackgroundOrAwait(
+						bus.publish(BusEvent.USER_CREATED, {
+							id: newSession.user.id,
+							email: newSession.user.email,
+							name: newSession.user.name || undefined,
+						}),
+					);
+				}
 			}
-		}
-	}),
+
+			// 🔓 User signed in
+			if (path.startsWith("/sign-in")) {
+				const data = context.newSession;
+				if (data) {
+					const { session, user } = data;
+					logger.info("🔓 User signed in:", user.email);
+					await context.runInBackgroundOrAwait(
+						bus.publish(BusEvent.SIGNIN_DETECTED, {
+							email: user.email,
+							browser: session.userAgent || "Unknown Browser",
+							os: "Unknown OS",
+							ip: session.ipAddress || "0.0.0.0",
+							location: "Unknown Location",
+						}),
+					);
+				}
+			}
+		}),
+	},
 	basePath: "/api/auth/v1",
 	telemetry: { enabled: false },
 	emailAndPassword: {
@@ -114,8 +139,8 @@ export const auth = betterAuth({
 				logger.info(`Sending OTP (${type}) to: ${email} (OTP: ${otp})`);
 				if (authConfig.DEFAULT_OTP && authConfig.NODE_ENV !== "development") return;
 				try {
-					await bus.publish(BusEvent.OTP_REQUESTED, { email, otp });
-					logger.info(`OTP bus event published for ${email}`);
+					await bus.publish(BusEvent.OTP_REQUESTED, { email, otp, type });
+					logger.info(`OTP bus event published for ${email} (${type})`);
 				} catch (error) {
 					logger.error("Failed to publish OTP event:", error);
 					// If we are not using a default OTP, we must throw to notify the user
@@ -130,31 +155,51 @@ export const auth = betterAuth({
 			},
 		}),
 		organization({
-			sendInvitationEmail: async (data) => {
+			async sendInvitationEmail(data) {
 				const inviteLink = `${authConfig.BASE_URL}/dashboard/accept-invitation?id=${data.id}`;
-
-				logger.info("📧 Organization invitation requested:", {
+				logger.info("📧 Organization invitation email requested:", {
 					email: data.email,
 					organization: data.organization.name,
-					role: data.role,
-					inviter: data.inviter.user.email,
 				});
 
 				// Log invite URL in development for easy testing
 				if (authConfig.NODE_ENV === "development") {
 					logger.info("🔗 Invite URL (DEV):", inviteLink);
 				}
-
-				try {
-					await bus.publish(BusEvent.INVITE_CREATED, {
-						email: data.email,
-						organizationName: data.organization.name,
-						inviteLink,
-					});
-					logger.info(`✅ Organization invite bus event published for ${data.email}`);
-				} catch (error) {
-					logger.error("❌ Failed to publish organization invite event:", error);
-				}
+			},
+			organizationHooks: {
+				afterCreateInvitation: async ({ invitation, inviter, organization }) => {
+					const inviteLink = `${authConfig.BASE_URL}/dashboard/accept-invitation?id=${invitation.id}`;
+					try {
+						await bus.publish(BusEvent.INVITE_CREATED, {
+							email: invitation.email,
+							organizationName: organization.name,
+							inviteLink,
+							inviterName: inviter.user.name || inviter.user.email,
+							inviterEmail: inviter.user.email,
+							role: invitation.role || "member",
+						});
+						logger.info(`✅ Organization invite bus event published for ${invitation.email}`);
+					} catch (error) {
+						logger.error("❌ Failed to publish organization invite event:", error);
+					}
+				},
+				afterAcceptInvitation: async ({ member, user, organization }) => {
+					try {
+						await bus.publish(BusEvent.ORGANIZATION_JOINED, {
+							organizationId: organization.id,
+							orgName: organization.name,
+							userId: user.id,
+							userEmail: user.email,
+							memberName: user.name || user.email,
+							role: member.role,
+							inviterName: "Admin",
+						});
+						logger.info(`✅ Organization joined bus event published for ${user.email}`);
+					} catch (error) {
+						logger.error("❌ Failed to publish organization joined event:", error);
+					}
+				},
 			},
 		}),
 		openAPI({

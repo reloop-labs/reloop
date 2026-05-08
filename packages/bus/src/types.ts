@@ -57,8 +57,12 @@ export interface LogCreatedPayload {
 }
 export interface OrganizationJoinedPayload {
 	organizationId: string;
+	orgName: string;
 	userId: string;
 	userEmail: string;
+	memberName: string;
+	role: string;
+	inviterName: string;
 }
 
 export interface ApiKeyCreatedPayload {
@@ -72,11 +76,15 @@ export interface InviteCreatedPayload {
 	email: string;
 	organizationName: string;
 	inviteLink: string;
+	inviterName: string;
+	inviterEmail: string;
+	role: string;
 }
 
 export interface OtpRequestedPayload {
 	email: string;
 	otp: string;
+	type: "sign-in" | "email-verification" | "forget-password" | "change-email" | "two-factor";
 }
 
 export interface PaymentFailedPayload {

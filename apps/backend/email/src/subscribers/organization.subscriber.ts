@@ -13,11 +13,11 @@ export async function initOrgSubscribers() {
 		try {
 			const html = await render(
 				React.createElement(InviteEmail, {
-					inviteeName: "User",
-					inviterName: "Someone",
-					inviterEmail: "someone@example.com",
+					inviteeName: "User", // We don't have the invitee name yet, usually just email
+					inviterName: payload.inviterName,
+					inviterEmail: payload.inviterEmail,
 					teamName: payload.organizationName,
-					role: "Member",
+					role: payload.role,
 					inviteUrl: payload.inviteLink,
 				}),
 			);
@@ -38,10 +38,10 @@ export async function initOrgSubscribers() {
 		try {
 			const html = await render(
 				React.createElement(OrgJoinedEmail, {
-					memberName: "User",
-					orgName: "The Team",
-					role: "Member",
-					inviterName: "Admin",
+					memberName: payload.memberName,
+					orgName: payload.orgName,
+					role: payload.role,
+					inviterName: payload.inviterName,
 					dashboardUrl: `${emailConfig.BASE_URL}/dashboard`,
 				}),
 			);

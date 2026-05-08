@@ -42,10 +42,17 @@ export async function initAuthSubscribers() {
 				}),
 			);
 
+			const subject =
+				payload.type === "forget-password"
+					? `${payload.otp} is your password reset code`
+					: payload.type === "email-verification"
+						? `${payload.otp} is your email verification code`
+						: `${payload.otp} is your Reloop verification code`;
+ 
 			await sendEmail({
 				from: `Reloop <auth@${emailConfig.RELOOP_SENDER_DOMAIN || "reloop.dev"}>`,
 				to: payload.email,
-				subject: `${payload.otp} is your Reloop verification code`,
+				subject,
 				html,
 			});
 		} catch (error) {
