@@ -49,15 +49,6 @@ export const skipReasonEnum = pgEnum("skip_reason", [
 	"suppressed",
 	"dry_run",
 ]);
-export const emailEventTypeEnum = pgEnum("email_event_type", [
-	"delivered",
-	"opened",
-	"clicked",
-	"bounced",
-	"complained",
-	"unsubscribed",
-	"deferred",
-]);
 export const invoiceStatusEnum = pgEnum("invoice_status", [
 	"draft",
 	"open",
@@ -206,6 +197,34 @@ export const billingInvoice = pgTable(
 	],
 );
 
+export const emailSend = pgTable(
+	"email_send",
+	{
+		id: text("id")
+			.$defaultFn(() => `esn_${createId()}`)
+			.primaryKey(),
+		organizationId: text("organization_id")
+			.notNull()
+			.references(() => organization.id, { onDelete: "cascade" }),
+		subscriptionId: text("subscription_id")
+			.notNull()
+			.references(() => subscription.id, { onDelete: "cascade" }),
+		emailLogId: text("email_log_id").references(() => emailLog.id),
+		recipientEmail: varchar("recipient_email", { length: 255 }).notNull(),
+		countedInCredits: boolean("counted_in_credits").notNull().default(true),
+		creditsConsumed: integer("credits_consumed").notNull().default(1),
+		status: emailSendStatusEnum("status").notNull().default("queued"),
+		errorMessage: text("error_message"),
+		sentAt: timestamp("sent_at"),
+		createdAt: timestamp("created_at").notNull().defaultNow(),
+	},
+	(t) => [
+		index("email_send_organization_id_idx").on(t.organizationId),
+		index("email_send_subscription_id_idx").on(t.subscriptionId),
+		index("email_send_status_idx").on(t.status),
+	],
+);
+
 // ─── Relations ────────────────────────────────────────────────────────────────
 
 export const planRelations = relations(plan, ({ many }) => ({
@@ -221,7 +240,7 @@ export const subscriptionRelations = relations(
 		}),
 		plan: one(plan, { fields: [subscription.planId], references: [plan.id] }),
 		creditLedger: many(creditLedger),
-		emailLog: many(emailLog),
+		emailSends: many(emailSend),
 		billingInvoices: many(billingInvoice),
 	}),
 );
@@ -237,13 +256,19 @@ export const creditLedgerRelations = relations(creditLedger, ({ one }) => ({
 	}),
 }));
 
-export const emailSendRelations = relations(emailLog, ({ one, many }) => ({
+export const emailSendRelations = relations(emailSend, ({ one }) => ({
 	organization: one(organization, {
-		fields: [emailLog.organizationId],
+		fields: [emailSend.organizationId],
 		references: [organization.id],
 	}),
-	triggeredBy: one(user, { fields: [emailLog.userId], references: [user.id] }),
-	events: many(emailLog),
+	subscription: one(subscription, {
+		fields: [emailSend.subscriptionId],
+		references: [subscription.id],
+	}),
+	emailLog: one(emailLog, {
+		fields: [emailSend.emailLogId],
+		references: [emailLog.id],
+	}),
 }));
 
 export const billingInvoiceRelations = relations(billingInvoice, ({ one }) => ({

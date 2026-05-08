@@ -44,6 +44,8 @@ export const emailEventTypeEnum = pgEnum("email_event_type", [
 	"clicked",
 	"bounced",
 	"complaint",
+	"unsubscribed",
+	"deferred",
 ]);
 
 // Email sending log table

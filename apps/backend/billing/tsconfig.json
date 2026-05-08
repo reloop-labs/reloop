@@ -14,8 +14,11 @@
 		"declaration": false,
 		"declarationMap": false,
 		"baseUrl": ".",
+		"rootDir": "./src",
 		"paths": {
 			"@reloop/credits/*": ["./src/*"]
 		}
-	}
+	},
+	"include": ["src/**/*"],
+	"exclude": ["node_modules", "dist"]
 }

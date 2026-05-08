@@ -35,7 +35,7 @@ export async function loader() {
 				});
 
 				if (!defaultPlan) {
-					[defaultPlan] = await tx
+					const [insertedPlan] = await tx
 						.insert(plan)
 						.values({
 							name: "Free",
@@ -44,6 +44,11 @@ export async function loader() {
 							isActive: true,
 						})
 						.returning();
+
+					if (!insertedPlan) {
+						throw new Error("Failed to create default plan");
+					}
+					defaultPlan = insertedPlan;
 				}
 
 				// 2. Create subscription
@@ -138,15 +143,17 @@ export async function loader() {
 					.where(eq(subscription.id, activeSub.id));
 
 				// 4. Log in credit ledger
-				await tx.insert(creditLedger).values({
-					organizationId: payload.organizationId,
-					subscriptionId: activeSub.id,
-					entryType: "email_sent",
-					delta: -payload.recipientCount,
-					balanceAfter: activeSub.creditsRemaining - payload.recipientCount,
-					reason: `Sent email with ${payload.recipientCount} recipients`,
-					referenceId: sendRecord.id,
-				});
+				if (sendRecord) {
+					await tx.insert(creditLedger).values({
+						organizationId: payload.organizationId,
+						subscriptionId: activeSub.id,
+						entryType: "email_sent",
+						delta: -payload.recipientCount,
+						balanceAfter: activeSub.creditsRemaining - payload.recipientCount,
+						reason: `Sent email with ${payload.recipientCount} recipients`,
+						referenceId: sendRecord.id,
+					});
+				}
 			});
 			logger.info(
 				{ organizationId: payload.organizationId },
