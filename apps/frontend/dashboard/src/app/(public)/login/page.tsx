@@ -11,15 +11,15 @@ import { LoginForm } from "./login-form";
 const variants = {
 	initial: (direction: number) => ({
 		opacity: 0,
-		transform: `translateX(${direction > 0 ? 20 : -20}px) scale(0.98)`,
+		transform: `translateX(${direction > 0 ? 20 : -20}px)`,
 	}),
 	animate: {
 		opacity: 1,
-		transform: "translateX(0px) scale(1)",
+		transform: "translateX(0px)",
 	},
 	exit: (direction: number) => ({
 		opacity: 0,
-		transform: `translateX(${direction > 0 ? -20 : 20}px) scale(0.98)`,
+		transform: `translateX(${direction > 0 ? -20 : 20}px)`,
 	}),
 };
 

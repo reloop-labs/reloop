@@ -14,15 +14,15 @@ import { useEffect, useState } from "react";
 const variants = {
 	initial: {
 		opacity: 0,
-		transform: "translateY(10px) scale(0.98)",
+		transform: "translateY(10px)",
 	},
 	animate: {
 		opacity: 1,
-		transform: "translateY(0px) scale(1)",
+		transform: "translateY(0px)",
 	},
 	exit: {
 		opacity: 0,
-		transform: "translateY(-10px) scale(0.98)",
+		transform: "translateY(-10px)",
 	},
 };
 
