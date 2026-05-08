@@ -1,8 +1,7 @@
 "use client";
 
 import { authClient } from "@reloop/auth/client";
-import { EditorProvider } from "@tiptap/react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
 	createContext,
 	type ReactNode,
@@ -45,6 +44,7 @@ export const UserOrganizationProvider = ({
 	children: ReactNode;
 }) => {
 	const router = useRouter();
+	const pathname = usePathname();
 	const { data: session, isPending: sessionLoading } = authClient.useSession();
 	const {
 		data: organizations,
@@ -53,6 +53,10 @@ export const UserOrganizationProvider = ({
 	} = useSWR(
 		"organizations",
 		async () => (await authClient.organization.list()).data,
+	);
+	const { data: invitations, isLoading: invitationsLoading } = useSWR(
+		session ? "user-invitations" : null,
+		async () => (await authClient.organization.listUserInvitations()).data,
 	);
 	const [isSettingDefaultOrg, setIsSettingDefaultOrg] = useState(false);
 	const [hasInitialized, setHasInitialized] = useState(false);
@@ -65,21 +69,47 @@ export const UserOrganizationProvider = ({
 		null;
 
 	const isLoading =
-		sessionLoading || organizationsLoading || isSettingDefaultOrg;
+		sessionLoading ||
+		organizationsLoading ||
+		(session && invitationsLoading) ||
+		isSettingDefaultOrg;
 
 	useEffect(() => {
 		if (sessionLoading) return;
 
 		if (!session) {
+			if (pathname.startsWith("/invite")) return;
 			router.push("/login");
 			return;
 		}
 
-		if (!organizationsLoading && organizations && organizations.length === 0) {
+		if (
+			!organizationsLoading &&
+			organizations &&
+			organizations.length === 0 &&
+			!invitationsLoading
+		) {
+			if (pathname.startsWith("/invite") || pathname.startsWith("/onboarding"))
+				return;
+
+			if (invitations && invitations.length > 0 && invitations[0]) {
+				router.push(`/invite?id=${invitations[0].id}`);
+				return;
+			}
+
 			router.push("/onboarding");
 			return;
 		}
-	}, [session, sessionLoading, organizations, organizationsLoading, router]);
+	}, [
+		session,
+		sessionLoading,
+		organizations,
+		organizationsLoading,
+		invitations,
+		invitationsLoading,
+		router,
+		pathname,
+	]);
 
 	useEffect(() => {
 		const handleOrganizationRedirect = async () => {
