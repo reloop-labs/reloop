@@ -1,7 +1,6 @@
 "use client";
 
 import { FeedbackPopover } from "@fe/dashboard/components/feedback-popover";
-import { InvitationsPopover } from "@fe/dashboard/components/layout/invitations-popover";
 import { mainNavigation, userNavigation } from "@fe/dashboard/constants";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
