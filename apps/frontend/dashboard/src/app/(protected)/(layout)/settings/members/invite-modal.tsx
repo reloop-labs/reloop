@@ -305,9 +305,20 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
 							<p className="text-error-base text-paragraph-xs">{emailError}</p>
 						)}
 					</div>
-					<AnimatePresence initial={false} mode="popLayout">
+					<AnimatePresence initial={false}>
 						{pendingEmails.length > 0 && (
-							<div className="space-y-2">
+							<motion.div
+								key="pending-invites-section"
+								initial={{ opacity: 0, height: 0 }}
+								animate={{ opacity: 1, height: "auto" }}
+								exit={{ opacity: 0, height: 0 }}
+								transition={{
+									type: "spring",
+									bounce: 0,
+									duration: 0.3,
+								}}
+								className="space-y-2 overflow-hidden"
+							>
 								<div className="mt-4 flex items-center gap-2">
 									<span className="font-medium text-label-sm text-text-strong-950">
 										Pending invites
@@ -317,60 +328,71 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
 									</span>
 								</div>
 								<div className="divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/50">
-									{pendingEmails.map(({ email, role }) => (
-										<motion.div
-											key={email}
-											layout
-											initial={{ opacity: 0, height: 0 }}
-											animate={{ opacity: 1, height: "auto" }}
-											exit={{ opacity: 0, height: 0 }}
-											transition={{
-												type: "spring",
-												bounce: 0,
-												duration: 0.3,
-											}}
-											className="flex items-center gap-3 px-3 py-1.5"
-										>
-											{/* Avatar */}
-											<div
-												className={cn(
-													"flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full font-semibold text-white text-xs uppercase tracking-wide shadow-sm",
-													getAvatarGradient(email),
-												)}
+									<AnimatePresence initial={false} mode="popLayout">
+										{pendingEmails.map(({ email, role }) => (
+											<motion.div
+												key={email}
+												layout
+												initial={{ opacity: 0, height: 0 }}
+												animate={{ opacity: 1, height: "auto" }}
+												exit={{ opacity: 0, height: 0 }}
+												transition={{
+													type: "spring",
+													bounce: 0,
+													duration: 0.3,
+												}}
+												className="flex items-center gap-3 px-3 py-1.5"
 											>
-												{getAvatarInitial(null, email)}
-											</div>
+												{/* Avatar */}
+												<div
+													className={cn(
+														"flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full font-semibold text-white text-xs uppercase tracking-wide shadow-sm",
+														getAvatarGradient(email),
+													)}
+												>
+													{getAvatarInitial(null, email)}
+												</div>
 
-											{/* Email */}
-											<span className="flex-1 truncate font-medium text-paragraph-sm text-text-strong-950">
-												{email}
-											</span>
+												{/* Email */}
+												<span className="flex-1 truncate font-medium text-paragraph-sm text-text-strong-950">
+													{email}
+												</span>
 
-											{/* Role Badge */}
-											<div
-												className={cn(
-													"inline-flex rounded-full border px-2 py-0.5 font-medium text-[10px] capitalize transition-all",
-													getRoleBadgeStyles(role),
-												)}
-											>
-												{role}
-											</div>
+												{/* Role Selection */}
+												<div className="flex items-center gap-1">
+													{(["member", "admin"] as Role[]).map((r) => (
+														<button
+															key={r}
+															type="button"
+															onClick={() => handleRoleChange(email, r)}
+															className={cn(
+																"inline-flex rounded-full border px-2 py-0.5 font-medium text-[10px] capitalize transition-all active:scale-[0.97]",
+																role === r
+																	? getRoleBadgeStyles(r)
+																	: "border-transparent text-text-soft-400 hover:text-text-sub-600",
+															)}
+														>
+															{r}
+														</button>
+													))}
+												</div>
 
-											{/* Remove */}
-											<Button.Root
-												onClick={() => handleRemovePending(email)}
-												disabled={loading}
-												size="xxsmall"
-												variant="neutral"
-												mode="lighter"
-												className="h-6 w-6 rounded-md p-0"
-											>
-												<Icon name="cross" className="h-3 w-3" />
-											</Button.Root>
-										</motion.div>
-									))}
+												{/* Remove */}
+												<Button.Root
+													onClick={() => handleRemovePending(email)}
+													disabled={loading}
+													size="xxsmall"
+													variant="neutral"
+													mode="lighter"
+													className="h-6 w-6 rounded-md p-0"
+												>
+													<Icon name="cross" className="h-3 w-3" />
+												</Button.Root>
+											</motion.div>
+										))}
+									</AnimatePresence>
 								</div>
-							</div>
+							</motion.div>
 						)}
 					</AnimatePresence>
 					<span className="mt-4 font-medium text-label-sm text-text-strong-950">
