@@ -1,6 +1,8 @@
 import {
 	connect,
+	headers,
 	type Msg,
+	type MsgHdrs,
 	type NatsConnection,
 } from "@nats-io/transport-node";
 import type { BusEvent } from "./events";
@@ -24,9 +26,22 @@ class MessageBus {
 		}
 	}
 
-	async publish<T extends BusEvent>(event: T, payload: EventPayloads[T]) {
+	async publish<T extends BusEvent>(
+		event: T,
+		payload: EventPayloads[T],
+		options?: { msgId?: string },
+	) {
 		if (!this.nc) throw new Error("Bus not connected. Call connect() first.");
-		this.nc.publish(event, this.encoder.encode(JSON.stringify(payload)));
+
+		let h: MsgHdrs | undefined;
+		if (options?.msgId) {
+			h = headers();
+			h.append("Nats-Msg-Id", options.msgId);
+		}
+
+		this.nc.publish(event, this.encoder.encode(JSON.stringify(payload)), {
+			headers: h,
+		});
 	}
 
 	async subscribe<T extends BusEvent>(

@@ -53,34 +53,48 @@ export const auth = betterAuth({
 	hooks: {
 		after: createAuthMiddleware(async (ctx) => {
 			const { path, context } = ctx;
-
+			logger.info(ctx.path)
 			// 🔐 User registered
-			if (path.includes("/sign-up")) {
+			if (path === "/sign-up/email") {
 				const newSession = context.newSession;
 				if (newSession) {
 					logger.info("🔐 User registered:", newSession.user);
-					await bus.publish(BusEvent.USER_CREATED, {
-						id: newSession.user.id,
-						email: newSession.user.email,
-						name: newSession.user.name || undefined,
-					});
+					await bus.publish(
+						BusEvent.USER_CREATED,
+						{
+							id: newSession.user.id,
+							email: newSession.user.email,
+							name: newSession.user.name || undefined,
+						},
+						{ msgId: `user_created:${newSession.user.email}` },
+					);
 				}
 			}
 
 			// 🔓 User signed in
-			if (path.includes("/sign-in")) {
+			if (
+				path === "/sign-in/email-otp" ||
+				path === "/callback/google" ||
+				path === "/callback/github"
+			) {
 				const data = context.newSession;
 				if (data) {
 					const { session, user } = data;
 					logger.info("🔓 User signed in:", user.email);
-					await bus.publish(BusEvent.SIGNIN_DETECTED, {
-						email: user.email,
-						fullName: user.name || "User",
-						browser: session.userAgent || "Unknown Browser",
-						os: "Unknown OS",
-						ip: session.ipAddress || "0.0.0.0",
-						location: "Unknown Location",
-					});
+					// Use a 1-minute bucket for sign-in deduplication
+					const bucket = Math.floor(Date.now() / 60000);
+					await bus.publish(
+						BusEvent.SIGNIN_DETECTED,
+						{
+							email: user.email,
+							fullName: user.name || "User",
+							browser: session.userAgent || "Unknown Browser",
+							os: "Unknown OS",
+							ip: session.ipAddress || "0.0.0.0",
+							location: "Unknown Location",
+						},
+						{ msgId: `signin_detected:${user.email}:${bucket}` },
+					);
 				}
 			}
 		}),
@@ -136,7 +150,11 @@ export const auth = betterAuth({
 				logger.info(`Sending OTP (${type}) to: ${email} (OTP: ${otp})`);
 				if (authConfig.DEFAULT_OTP && authConfig.NODE_ENV !== "development") return;
 				try {
-					await bus.publish(BusEvent.OTP_REQUESTED, { email, otp, type });
+					await bus.publish(
+						BusEvent.OTP_REQUESTED,
+						{ email, otp, type },
+						{ msgId: `otp_requested:${email}:${otp}` },
+					);
 					logger.info(`OTP bus event published for ${email} (${type})`);
 				} catch (error) {
 					logger.error("Failed to publish OTP event:", error);

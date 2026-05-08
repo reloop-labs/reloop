@@ -5,5 +5,6 @@ export const emailConfig = {
 	RELOOP_API_KEY: process.env.RELOOP_API_KEY || "",
 	RELOOP_SENDER_DOMAIN: process.env.RELOOP_SENDER_DOMAIN || "",
 	BASE_URL: process.env.BASE_URL || "https://local.reloop.sh",
+	REDIS_URL: process.env.REDIS_URL || "redis://:reloop123@localhost:6379",
 };
 

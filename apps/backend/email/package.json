@@ -27,6 +27,7 @@
 		"@react-email/render": "catalog:ui",
 		"@react-email/tailwind": "catalog:ui",
 		"@reloop/bus": "workspace:*",
+		"@reloop/cache": "workspace:*",
 		"@reloop/db": "workspace:*",
 		"@reloop/logger": "workspace:*",
 		"@types/nodemailer": "catalog:backend",
