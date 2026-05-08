@@ -13,15 +13,15 @@ import { VerifyOTP } from "./verify-otp";
 const variants = {
 	initial: (direction: number) => ({
 		opacity: 0,
-		x: direction > 0 ? 20 : -20,
+		transform: `translateX(${direction > 0 ? 20 : -20}px) scale(0.98)`,
 	}),
 	animate: {
 		opacity: 1,
-		x: 0,
+		transform: "translateX(0px) scale(1)",
 	},
 	exit: (direction: number) => ({
 		opacity: 0,
-		x: direction < 0 ? 20 : -20,
+		transform: `translateX(${direction > 0 ? -20 : 20}px) scale(0.98)`,
 	}),
 };
 
@@ -114,7 +114,7 @@ const Page = () => {
 							initial="initial"
 							animate="animate"
 							exit="exit"
-							transition={{ duration: 0.2 }}
+							transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
 						>
 							<div className="space-y-1 pb-6 text-center">
 								<h2 className="font-medium text-label-lg text-text-strong-950">
@@ -150,7 +150,7 @@ const Page = () => {
 							}
 							animate="animate"
 							exit="exit"
-							transition={{ duration: 0.2 }}
+							transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
 						>
 							<div className="space-y-1 pb-6 text-center">
 								<h2 className="font-medium text-label-lg text-text-strong-950">
@@ -170,7 +170,7 @@ const Page = () => {
 							initial="initial"
 							animate="animate"
 							exit="exit"
-							transition={{ duration: 0.2 }}
+							transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
 						>
 							<div className="space-y-1 pb-6 text-center">
 								<h2 className="font-medium text-label-lg text-text-strong-950">
