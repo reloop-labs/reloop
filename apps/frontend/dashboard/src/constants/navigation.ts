@@ -57,7 +57,7 @@ export const mainNavigation: MainNavigationItem[] = [
 	{
 		label: "Profile",
 		path: "/profile",
-		iconName: "user",
+		iconName: "user-circle",
 	},
 	{
 		label: "Settings",
