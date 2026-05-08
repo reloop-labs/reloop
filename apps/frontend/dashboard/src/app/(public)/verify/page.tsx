@@ -31,26 +31,15 @@ const AutoLoginPage = () => {
 
 			hasAttempted.current = true;
 			try {
-				const response = await authClient.emailOtp.checkVerificationOtp({
-					otp: otpValue,
+				const { data, error } = await authClient.signIn.emailOtp({
 					email: otpSentEmail,
-					type: "sign-in",
+					otp: otpValue,
 				});
 
-				if (response.data?.success) {
-					const { data } = await authClient.signIn.emailOtp({
-						email: otpSentEmail,
-						otp: otpValue,
-					});
-
-					if (data?.user.id) {
-						router.push("/");
-					} else {
-						setError("Failed to sign in. Please try manually.");
-						setIsVerifying(false);
-					}
+				if (data?.user.id) {
+					router.push("/");
 				} else {
-					setError("This link is invalid or has expired.");
+					setError(error?.message || "Failed to sign in. Please try manually.");
 					setIsVerifying(false);
 				}
 			} catch (err) {

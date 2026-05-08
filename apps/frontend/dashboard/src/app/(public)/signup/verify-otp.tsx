@@ -36,34 +36,21 @@ export function VerifyOTP({
 	const handleVerify = async (otpToVerify: string) => {
 		try {
 			changeStatus("loading");
-			const response = await authClient.emailOtp.checkVerificationOtp({
-				otp: otpToVerify,
+			const { data } = await authClient.signIn.emailOtp({
 				email: email,
-				type: "sign-in",
+				otp: otpToVerify,
 			});
-			if (response.data?.success) {
-				const { data } = await authClient.signIn.emailOtp({
-					email: email,
-					otp: otpToVerify,
-				});
-				if (data?.user.id) {
-					setIsSuccess(true);
-					changeStatus("idle");
-					setTimeout(() => {
-						router.push("/");
-					}, 3000);
-				} else {
-					changeStatus("idle");
-					setError({
-						name: "email",
-						error: "Failed to signup with email",
-					});
-				}
+			if (data?.user.id) {
+				setIsSuccess(true);
+				changeStatus("idle");
+				setTimeout(() => {
+					router.push("/");
+				}, 3000);
 			} else {
 				changeStatus("idle");
 				setError({
 					name: "email",
-					error: "Invalid or expired OTP",
+					error: "Failed to signup with email",
 				});
 			}
 		} catch (e) {
