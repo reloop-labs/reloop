@@ -16,6 +16,7 @@ import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "motion/react";
 import { useRef, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import useSWR, { useSWRConfig } from "swr";
 
@@ -222,6 +223,23 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
 			setLoading(false);
 		}
 	};
+
+	useHotkeys(
+		"mod+enter",
+		(event) => {
+			event.preventDefault();
+			event.stopPropagation();
+			if (!loading && pendingEmails.length > 0) {
+				handleSubmit();
+			}
+		},
+		{
+			enableOnFormTags: true,
+			enabled: open,
+			preventDefault: true,
+		},
+		[loading, pendingEmails, handleSubmit, open],
+	);
 
 	return (
 		<Modal.Root open={open} onOpenChange={handleOpenChange}>
