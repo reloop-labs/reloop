@@ -75,8 +75,7 @@ export const UserOrganizationProvider = ({
 		isSettingDefaultOrg;
 
 	useEffect(() => {
-		if (sessionLoading || organizationsLoading || invitationsLoading || !hasInitialized)
-			return;
+		if (sessionLoading) return;
 
 		if (!session) {
 			if (pathname.startsWith("/invite")) return;
@@ -85,9 +84,10 @@ export const UserOrganizationProvider = ({
 		}
 
 		if (
+			!organizationsLoading &&
 			organizations &&
 			organizations.length === 0 &&
-			!session?.user?.activeOrganizationId
+			!invitationsLoading
 		) {
 			if (pathname.startsWith("/invite") || pathname.startsWith("/onboarding"))
 				return;
@@ -107,7 +107,6 @@ export const UserOrganizationProvider = ({
 		organizationsLoading,
 		invitations,
 		invitationsLoading,
-		hasInitialized,
 		router,
 		pathname,
 	]);
