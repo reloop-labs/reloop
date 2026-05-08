@@ -301,9 +301,18 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
 								Add
 							</Button.Root>
 						</div>
-						{emailError && (
-							<p className="text-error-base text-paragraph-xs">{emailError}</p>
-						)}
+						<AnimatePresence>
+							{emailError && (
+								<motion.p
+									initial={{ opacity: 0, height: 0 }}
+									animate={{ opacity: 1, height: "auto" }}
+									exit={{ opacity: 0, height: 0 }}
+									className="overflow-hidden text-error-base text-paragraph-xs"
+								>
+									{emailError}
+								</motion.p>
+							)}
+						</AnimatePresence>
 					</div>
 					<AnimatePresence initial={false}>
 						{pendingEmails.length > 0 && (
@@ -395,10 +404,10 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
 							</motion.div>
 						)}
 					</AnimatePresence>
-					<span className="mt-4 font-medium text-label-sm text-text-strong-950">
+					<p className="pt-3 font-medium text-label-sm text-text-strong-950">
 						Assign role
-					</span>
-					<div className="grid grid-cols-2 gap-2 pt-2">
+					</p>
+					<div className="grid grid-cols-2 gap-2">
 						{ROLE_CONFIG.map(({ value, label, description, dotColor }) => {
 							const isSelected = selectedRole === value;
 							const styles = getRoleCardStyles(value);
