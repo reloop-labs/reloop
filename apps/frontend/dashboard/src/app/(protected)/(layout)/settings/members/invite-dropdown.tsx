@@ -20,7 +20,7 @@ const inviteMenuItems = [
 	{
 		id: "resend",
 		label: "Resend invite",
-		icon: "mail" as const,
+		icon: "mail-single" as const,
 		isDanger: false,
 	},
 	{
@@ -32,7 +32,7 @@ const inviteMenuItems = [
 	{
 		id: "revoke",
 		label: "Revoke invite",
-		icon: "cross" as const,
+		icon: "cross-circle" as const,
 		isDanger: true,
 	},
 ];
@@ -69,8 +69,13 @@ export const InviteDropdown = ({
 	return (
 		<Dropdown.Root open={dropdownOpen} onOpenChange={setDropdownOpen}>
 			<Dropdown.Trigger asChild>
-				<Button.Root variant="neutral" mode="ghost" size="xxsmall">
-					<Icon name="more-vertical" className="h-3 w-3" />
+				<Button.Root
+					variant="neutral"
+					mode="ghost"
+					size="xxsmall"
+					className="transition-transform duration-100 ease-out active:scale-[0.95]"
+				>
+					<Icon name="more-horizontal" className="h-3.5 w-3.5" />
 				</Button.Root>
 			</Dropdown.Trigger>
 			<Dropdown.Content align="end" className="w-40 p-1.5">
@@ -87,7 +92,7 @@ export const InviteDropdown = ({
 							onClick={() => handleItemClick(item.id)}
 							disabled={item.id === "resend" && isResending}
 							className={cn(
-								"flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 font-normal text-xs transition-colors",
+								"flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 font-medium text-xs transition-all duration-100 ease-out active:scale-[0.97]",
 								item.isDanger ? "text-error-base" : "text-text-strong-950",
 								!currentRect &&
 									hoverIdx === idx &&
@@ -115,6 +120,7 @@ export const InviteDropdown = ({
 						rect={currentRect}
 						tabElement={currentTab}
 						isDanger={isDanger}
+						className="rounded-[10px]"
 					/>
 				</div>
 			</Dropdown.Content>
