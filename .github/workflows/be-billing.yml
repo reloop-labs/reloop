@@ -6,13 +6,14 @@ on:
     paths:
       - 'apps/backend/billing/**'
       - '.github/workflows/be-billing.yml'
+      - 'docker-compose.setup.yml'
   pull_request:
     branches: [ main ]
     paths:
       - 'apps/backend/billing/**'
       - '.github/workflows/be-billing.yml'
+      - 'docker-compose.setup.yml'
   workflow_dispatch:
-
 env:
   REGISTRY: docker.io
   IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/be-billing
@@ -65,4 +66,4 @@ jobs:
 
       - name: Deploy to Dokploy
         if: github.event_name != 'pull_request' && secrets.DOKPLOY_BILLING_TOKEN != ''
-        run: curl -X GET "https://dokploy.reloop.sh/api/deploy/${{ secrets.DOKPLOY_BILLING_TOKEN }}"
+        run: curl -X GET "https://dokploy.reloop.sh/api/deploy/KsY8kwg2JCjB6T9hINQC2"
