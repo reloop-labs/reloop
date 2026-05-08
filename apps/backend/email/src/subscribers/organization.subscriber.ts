@@ -16,7 +16,7 @@ export async function initOrgSubscribers() {
 			const dedupKey = `email:invite:${payload.email}:${payload.organizationName}`;
 			try {
 				const alreadySent = await redis.get(dedupKey);
-				if (alreadySent) {
+				if (alreadySent && !payload.isResend) {
 					logger.warn(
 						`Duplicate INVITE_CREATED for ${payload.email}, skipping`,
 					);

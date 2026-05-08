@@ -211,36 +211,36 @@ export const auth = betterAuth({
 				if (authConfig.NODE_ENV === "development") {
 					logger.info("🔗 Invite URL (DEV):", inviteLink);
 				}
+
+				const isResend =
+					Date.now() - new Date(data.invitation.createdAt).getTime() > 5000;
+
+				try {
+					await bus.publish(
+						BusEvent.INVITE_CREATED,
+						{
+							email: data.email,
+							organizationName: data.organization.name,
+							inviteLink,
+							inviterName:
+								data.inviter.user.name ||
+								data.inviter.user.email.split("@")[0] ||
+								"Someone",
+							inviterEmail: data.inviter.user.email,
+							isResend,
+						},
+						{ msgId: `invite_created:${data.id}:${Date.now()}` },
+					);
+					logger.info(
+						`✅ Organization invite bus event published for ${data.email} (resend: ${isResend})`,
+					);
+				} catch (error) {
+					logger.error(
+						`❌ Failed to publish organization invite event:${error}`,
+					);
+				}
 			},
 			organizationHooks: {
-				afterCreateInvitation: async ({
-					invitation,
-					inviter,
-					organization,
-				}) => {
-					const inviteLink = `${authConfig.BASE_URL}/dashboard/signup?inviteId=${invitation.id}`;
-					try {
-						await bus.publish(
-							BusEvent.INVITE_CREATED,
-							{
-								email: invitation.email,
-								organizationName: organization.name,
-								inviteLink,
-								inviterName:
-									inviter?.name || inviter.email.split("@")[0] || "Someone",
-								inviterEmail: inviter.email,
-							},
-							{ msgId: `invite_created:${invitation.id}` },
-						);
-						logger.info(
-							`✅ Organization invite bus event published for ${invitation.email}`,
-						);
-					} catch (error) {
-						logger.error(
-							`❌ Failed to publish organization invite event:${error}`,
-						);
-					}
-				},
 				afterAcceptInvitation: async ({ member, user, organization }) => {
 					try {
 						await bus.publish(
