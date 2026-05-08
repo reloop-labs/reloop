@@ -49,7 +49,7 @@ export const TeamFilterDropdown = ({
 					variant="neutral"
 					mode="stroke"
 					size="xsmall"
-					className="flex justify-between rounded-[10px]"
+					className="flex justify-between rounded-[10px] transition-transform duration-100 ease-out active:scale-[0.98]"
 				>
 					{displayLabel}
 					<Button.Icon>
@@ -72,7 +72,7 @@ export const TeamFilterDropdown = ({
 								onPointerLeave={() => setHoverIdx(undefined)}
 								onClick={() => handleSelect(option.id)}
 								className={cn(
-									"flex w-full cursor-pointer items-center justify-between gap-2 rounded-[12px] px-2 py-1.5 font-medium text-[13px] transition-colors",
+									"flex w-full cursor-pointer items-center justify-between gap-2 rounded-[12px] px-2 py-1.5 font-medium text-[13px] transition-all duration-100 ease-out active:scale-[0.97]",
 									"text-text-strong-950",
 									!currentRect && hoverIdx === idx && "bg-neutral-alpha-10",
 									option.id === value && "bg-neutral-alpha-10/50",

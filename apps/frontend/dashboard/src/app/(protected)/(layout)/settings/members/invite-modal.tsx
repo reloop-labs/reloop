@@ -14,6 +14,7 @@ import { KbdEnter } from "@reloop/ui/kbd-enter";
 import { KbdEsc } from "@reloop/ui/kbd-esc";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
+import { AnimatePresence, motion } from "motion/react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import useSWR, { useSWRConfig } from "swr";
@@ -241,7 +242,7 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
 					<button
 						type="button"
 						onClick={() => handleOpenChange(false)}
-						className="flex h-7 w-7 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50"
+						className="flex h-7 w-7 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 transition-all hover:bg-bg-weak-50 active:scale-[0.95]"
 					>
 						<Icon name="cross" className="h-3.5 w-3.5" />
 					</button>
@@ -302,7 +303,7 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
 					</div>
 					{pendingEmails.length > 0 && (
 						<div className="space-y-2">
-							<div className="flex items-center gap-2">
+							<div className="mt-4 flex items-center gap-2">
 								<span className="font-medium text-label-sm text-text-strong-950">
 									Pending invites
 								</span>
@@ -311,63 +312,74 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
 								</span>
 							</div>
 							<div className="divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/50">
-								{pendingEmails.map(({ email, role }) => (
-									<div
-										key={email}
-										className="flex items-center gap-3 px-3 py-2.5"
-									>
-										{/* Avatar */}
-										<div
-											className={cn(
-												"flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full font-semibold text-white text-xs uppercase tracking-wide shadow-sm",
-												getAvatarGradient(email),
-											)}
+								<AnimatePresence initial={false} mode="popLayout">
+									{pendingEmails.map(({ email, role }) => (
+										<motion.div
+											key={email}
+											layout
+											initial={{ opacity: 0, height: 0 }}
+											animate={{ opacity: 1, height: "auto" }}
+											exit={{ opacity: 0, height: 0 }}
+											transition={{
+												type: "spring",
+												bounce: 0,
+												duration: 0.3,
+											}}
+											className="flex items-center gap-3 px-3 py-2.5"
 										>
-											{getAvatarInitial(null, email)}
-										</div>
+											{/* Avatar */}
+											<div
+												className={cn(
+													"flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full font-semibold text-white text-xs uppercase tracking-wide shadow-sm",
+													getAvatarGradient(email),
+												)}
+											>
+												{getAvatarInitial(null, email)}
+											</div>
 
-										{/* Email */}
-										<span className="flex-1 truncate font-medium text-paragraph-sm text-text-strong-950">
-											{email}
-										</span>
+											{/* Email */}
+											<span className="flex-1 truncate font-medium text-paragraph-sm text-text-strong-950">
+												{email}
+											</span>
 
-										{/* Role badge toggle */}
-										<div className="flex items-center gap-1.5">
-											{(["member", "admin"] as Role[]).map((r) => (
-												<button
-													key={r}
-													type="button"
-													onClick={() => handleRoleChange(email, r)}
-													className={cn(
-														"inline-flex rounded-full border px-2.5 py-0.5 font-medium text-[11px] capitalize transition-colors",
-														role === r
-															? getRoleBadgeStyles(r)
-															: "border-transparent text-text-soft-400 hover:text-text-sub-600",
-													)}
-												>
-													{r.charAt(0).toUpperCase() + r.slice(1)}
-												</button>
-											))}
-										</div>
+											{/* Role badge toggle */}
+											<div className="flex items-center gap-1.5">
+												{(["member", "admin"] as Role[]).map((r) => (
+													<button
+														key={r}
+														type="button"
+														onClick={() => handleRoleChange(email, r)}
+														className={cn(
+															"inline-flex rounded-full border px-2.5 py-0.5 font-medium text-[11px] capitalize transition-all active:scale-[0.97]",
+															role === r
+																? getRoleBadgeStyles(r)
+																: "border-transparent text-text-soft-400 hover:text-text-sub-600",
+														)}
+													>
+														{r.charAt(0).toUpperCase() + r.slice(1)}
+													</button>
+												))}
+											</div>
 
-										{/* Remove */}
-										<Button.Root
-											onClick={() => handleRemovePending(email)}
-											disabled={loading}
-											size="xxsmall"
-											variant="neutral"
-											mode="lighter"
-											className="h-5 w-5 rounded-md p-0"
-										>
-											<Icon name="cross" className="h-3 w-3" />
-										</Button.Root>
-									</div>
-								))}
+											{/* Remove */}
+											<Button.Root
+												onClick={() => handleRemovePending(email)}
+												disabled={loading}
+												size="xxsmall"
+												variant="neutral"
+												mode="lighter"
+												className="h-5 w-5 rounded-md p-0"
+											>
+												<Icon name="cross" className="h-3 w-3" />
+											</Button.Root>
+										</motion.div>
+									))}
+								</AnimatePresence>
 							</div>
 						</div>
 					)}
 					<div className="space-y-2">
-						<span className="font-medium text-label-sm text-text-strong-950">
+						<span className="mt-4 font-medium text-label-sm text-text-strong-950">
 							Assign role
 						</span>
 						<div className="grid grid-cols-2 gap-2 pt-2">
@@ -386,7 +398,7 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
 											);
 										}}
 										className={cn(
-											"relative flex flex-col items-start gap-1 rounded-xl border px-3.5 pt-2 pb-3.5 text-left transition-all",
+											"relative flex flex-col items-start gap-1 rounded-xl border px-3.5 pt-2 pb-3.5 text-left transition-all active:scale-[0.98]",
 											isSelected
 												? styles.card
 												: "border-stroke-soft-100 bg-bg-white-0 hover:border-stroke-soft-200 hover:bg-bg-weak-50/50 dark:border-stroke-soft-100/50",

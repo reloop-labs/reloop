@@ -328,38 +328,6 @@ export const TeamList = ({ searchQuery, filters = "all" }: TeamListProps) => {
 	const noResults =
 		filteredData.members.length === 0 && filteredData.invites.length === 0;
 
-	if (noResults && searchQuery) {
-		return (
-			<div className="flex flex-col items-center justify-center py-16">
-				<div className="flex h-12 w-12 items-center justify-center rounded-full bg-bg-weak-50">
-					<Icon name="search" className="h-6 w-6 text-text-sub-600" />
-				</div>
-				<p className="mt-4 font-medium text-text-strong-950">
-					No results found
-				</p>
-				<p className="mt-1 text-sm text-text-sub-600">
-					Try a different search term
-				</p>
-			</div>
-		);
-	}
-
-	if (noResults) {
-		return (
-			<div className="flex flex-col items-center justify-center py-16">
-				<div className="flex h-12 w-12 items-center justify-center rounded-full bg-bg-weak-50">
-					<Icon name="users" className="h-6 w-6 text-text-sub-600" />
-				</div>
-				<p className="mt-4 font-medium text-text-strong-950">
-					No team members yet
-				</p>
-				<p className="mt-1 text-sm text-text-sub-600">
-					Invite members to get started
-				</p>
-			</div>
-		);
-	}
-
 	return (
 		<div>
 			<div
@@ -383,85 +351,33 @@ export const TeamList = ({ searchQuery, filters = "all" }: TeamListProps) => {
 					<div />
 				</div>
 
-				{/* Combined List */}
-				<div className={`divide-y ${DIVIDER}`}>
-					{/* Pending Invites */}
-					{filteredData.invites.map((invite, index) => (
-						<div
-							key={
-								invite.id && invite.id.length > 0
-									? `invite-${invite.id}`
-									: `invite-idx-${index}`
-							}
-							className={cn(
-								`group/row grid ${GRID} items-center px-4 py-2 transition-colors`,
-								"hover:bg-bg-weak-50/50",
-							)}
-						>
-							{/* User Column */}
-							<div className="flex items-center gap-3">
-								<div
-									className={cn(
-										"flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full font-semibold text-white text-xs uppercase tracking-wide shadow-sm",
-										getAvatarGradient(invite.email),
-									)}
-								>
-									{getAvatarInitial(null, invite.email)}
-								</div>
-								<div className="min-w-0">
-									<span className="block truncate font-medium text-label-sm text-text-strong-950">
-										{invite.email.split("@")[0]}
-									</span>
-									<span className="block truncate text-[11px] text-text-sub-600">
-										{invite.email}
-									</span>
-								</div>
-							</div>
-
-							{/* Role Column */}
-							<div className="flex items-center">
-								<span
-									className={cn(
-										"inline-flex rounded-full px-2.5 py-0.5 font-medium text-[11px]",
-										getRoleBadgeStyles(invite.role),
-									)}
-								>
-									{formatRoleLabel(invite.role)}
-								</span>
-							</div>
-
-							{/* Status Column */}
-							<div className="flex items-center gap-2">
-								<span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-amber-400" />
-								<span className="font-medium text-[12px] text-text-sub-600">
-									Invite Pending
-								</span>
-							</div>
-
-							{/* Actions Column */}
-							<div className="flex items-center justify-end">
-								<InviteDropdown
-									inviteId={invite.id}
-									onResendInvite={handleResendInvite}
-									onCopyInviteLink={handleCopyInviteLink}
-									onRevokeInvite={handleRevokeInviteClick}
-									isResending={resendingInvite === invite.id}
-								/>
-							</div>
+				{/* Combined List or Empty State */}
+				{noResults ? (
+					<div className="flex flex-col items-center justify-center py-16">
+						<div className="flex h-12 w-12 items-center justify-center rounded-full bg-bg-weak-50">
+							<Icon
+								name={searchQuery ? "search" : "users"}
+								className="h-6 w-6 text-text-sub-600"
+							/>
 						</div>
-					))}
-
-					{/* Members */}
-					{filteredData.members.map((member, index) => {
-						const isOwner = member.role.toLowerCase() === "owner";
-						const isCurrentUser = member.user.id === currentUserId;
-
-						return (
+						<p className="mt-4 font-medium text-text-strong-950">
+							{searchQuery ? "No results found" : "No team members yet"}
+						</p>
+						<p className="mt-1 text-sm text-text-sub-600">
+							{searchQuery
+								? "Try a different search term"
+								: "Invite members to get started"}
+						</p>
+					</div>
+				) : (
+					<div className={`divide-y ${DIVIDER}`}>
+						{/* Pending Invites */}
+						{filteredData.invites.map((invite, index) => (
 							<div
 								key={
-									member.id && member.id.length > 0
-										? `member-${member.id}`
-										: `member-idx-${index}`
+									invite.id && invite.id.length > 0
+										? `invite-${invite.id}`
+										: `invite-idx-${index}`
 								}
 								className={cn(
 									`group/row grid ${GRID} items-center px-4 py-2 transition-colors`,
@@ -470,41 +386,20 @@ export const TeamList = ({ searchQuery, filters = "all" }: TeamListProps) => {
 							>
 								{/* User Column */}
 								<div className="flex items-center gap-3">
-									<Avatar.Root size="24" color="gray" className="flex-shrink-0">
-										{member.user.image ? (
-											<Avatar.Image
-												src={member.user.image}
-												alt={member.user.name || member.user.email}
-											/>
-										) : (
-											<Avatar.Image asChild>
-												<div
-													className={cn(
-														"flex h-full w-full items-center justify-center rounded-full font-semibold text-white text-xs uppercase tracking-wide shadow-sm",
-														getAvatarGradient(member.user.email),
-													)}
-												>
-													{getAvatarInitial(
-														member.user.name,
-														member.user.email,
-													)}
-												</div>
-											</Avatar.Image>
+									<div
+										className={cn(
+											"flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full font-semibold text-white text-xs uppercase tracking-wide shadow-sm",
+											getAvatarGradient(invite.email),
 										)}
-									</Avatar.Root>
-									<div className="min-w-0 flex-1">
-										<div className="flex flex-wrap items-center gap-1.5">
-											<span className="truncate font-medium text-label-sm text-text-strong-950">
-												{member.user.name || member.user.email.split("@")[0]}
-											</span>
-											{isCurrentUser && (
-												<span className="inline-flex flex-shrink-0 rounded-full border border-stroke-soft-200 bg-neutral-alpha-10 px-[6px] font-medium text-[10px] text-text-sub-600">
-													You
-												</span>
-											)}
-										</div>
+									>
+										{getAvatarInitial(null, invite.email)}
+									</div>
+									<div className="min-w-0">
+										<span className="block truncate font-medium text-label-sm text-text-strong-950">
+											{invite.email.split("@")[0]}
+										</span>
 										<span className="block truncate text-[11px] text-text-sub-600">
-											{member.user.email}
+											{invite.email}
 										</span>
 									</div>
 								</div>
@@ -514,50 +409,142 @@ export const TeamList = ({ searchQuery, filters = "all" }: TeamListProps) => {
 									<span
 										className={cn(
 											"inline-flex rounded-full px-2.5 py-0.5 font-medium text-[11px]",
-											getRoleBadgeStyles(member.role),
+											getRoleBadgeStyles(invite.role),
 										)}
 									>
-										{formatRoleLabel(member.role)}
+										{formatRoleLabel(invite.role)}
 									</span>
 								</div>
 
 								{/* Status Column */}
 								<div className="flex items-center gap-2">
-									<span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-success-base" />
+									<span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-amber-400" />
 									<span className="font-medium text-[12px] text-text-sub-600">
-										Active
+										Invite Pending
 									</span>
 								</div>
 
 								{/* Actions Column */}
 								<div className="flex items-center justify-end">
-									{!isOwner && !isCurrentUser && (
-										<Dropdown.Root>
-											<Dropdown.Trigger asChild>
-												<Button.Root
-													variant="neutral"
-													mode="ghost"
-													size="xxsmall"
-												>
-													<Icon name="more-vertical" className="h-3 w-3" />
-												</Button.Root>
-											</Dropdown.Trigger>
-											<Dropdown.Content align="end" className="w-52 text-xs">
-												<Dropdown.Item
-													className="text-error-base"
-													onClick={() => handleRemoveMemberClick(member)}
-												>
-													<Icon name="user-minus" className="h-3 w-3" />
-													Remove from organization
-												</Dropdown.Item>
-											</Dropdown.Content>
-										</Dropdown.Root>
-									)}
+									<InviteDropdown
+										inviteId={invite.id}
+										onResendInvite={handleResendInvite}
+										onCopyInviteLink={handleCopyInviteLink}
+										onRevokeInvite={handleRevokeInviteClick}
+										isResending={resendingInvite === invite.id}
+									/>
 								</div>
 							</div>
-						);
-					})}
-				</div>
+						))}
+
+						{/* Members */}
+						{filteredData.members.map((member, index) => {
+							const isOwner = member.role.toLowerCase() === "owner";
+							const isCurrentUser = member.user.id === currentUserId;
+
+							return (
+								<div
+									key={
+										member.id && member.id.length > 0
+											? `member-${member.id}`
+											: `member-idx-${index}`
+									}
+									className={cn(
+										`group/row grid ${GRID} items-center px-4 py-2 transition-colors`,
+										"hover:bg-bg-weak-50/50",
+									)}
+								>
+									{/* User Column */}
+									<div className="flex items-center gap-3">
+										<Avatar.Root size="24" color="gray" className="flex-shrink-0">
+											{member.user.image ? (
+												<Avatar.Image
+													src={member.user.image}
+													alt={member.user.name || member.user.email}
+												/>
+											) : (
+												<Avatar.Image asChild>
+													<div
+														className={cn(
+															"flex h-full w-full items-center justify-center rounded-full font-semibold text-white text-xs uppercase tracking-wide shadow-sm",
+															getAvatarGradient(member.user.email),
+														)}
+													>
+														{getAvatarInitial(
+															member.user.name,
+															member.user.email,
+														)}
+													</div>
+												</Avatar.Image>
+											)}
+										</Avatar.Root>
+										<div className="min-w-0 flex-1">
+											<div className="flex flex-wrap items-center gap-1.5">
+												<span className="truncate font-medium text-label-sm text-text-strong-950">
+													{member.user.name || member.user.email.split("@")[0]}
+												</span>
+												{isCurrentUser && (
+													<span className="inline-flex flex-shrink-0 rounded-full border border-stroke-soft-200 bg-neutral-alpha-10 px-[6px] font-medium text-[10px] text-text-sub-600">
+														You
+													</span>
+												)}
+											</div>
+											<span className="block truncate text-[11px] text-text-sub-600">
+												{member.user.email}
+											</span>
+										</div>
+									</div>
+
+									{/* Role Column */}
+									<div className="flex items-center">
+										<span
+											className={cn(
+												"inline-flex rounded-full px-2.5 py-0.5 font-medium text-[11px]",
+												getRoleBadgeStyles(member.role),
+											)}
+										>
+											{formatRoleLabel(member.role)}
+										</span>
+									</div>
+
+									{/* Status Column */}
+									<div className="flex items-center gap-2">
+										<span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-success-base" />
+										<span className="font-medium text-[12px] text-text-sub-600">
+											Active
+										</span>
+									</div>
+
+									{/* Actions Column */}
+									<div className="flex items-center justify-end">
+										{!isOwner && !isCurrentUser && (
+											<Dropdown.Root>
+												<Dropdown.Trigger asChild>
+													<Button.Root
+														variant="neutral"
+														mode="ghost"
+														size="xxsmall"
+													>
+														<Icon name="more-vertical" className="h-3 w-3" />
+													</Button.Root>
+												</Dropdown.Trigger>
+												<Dropdown.Content align="end" className="w-52 text-xs">
+													<Dropdown.Item
+														className="text-error-base"
+														onClick={() => handleRemoveMemberClick(member)}
+													>
+														<Icon name="user-minus" className="h-3 w-3" />
+														Remove from organization
+													</Dropdown.Item>
+												</Dropdown.Content>
+											</Dropdown.Root>
+										)}
+									</div>
+								</div>
+							);
+						})}
+					</div>
+				)}
 			</div>
 			<RevokeInviteModal
 				open={modal === "revoke-invite"}

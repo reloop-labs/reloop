@@ -13,15 +13,13 @@ interface AnimatedHoverBackgroundProps {
 export const AnimatedHoverBackground: React.FC<
 	AnimatedHoverBackgroundProps
 > = ({ rect, tabElement, className, isDanger = false }) => {
-	if (!rect || !tabElement) return null;
-
 	// Use offsetTop/offsetLeft for position relative to parent container
-	const left = tabElement.offsetLeft;
-	const top = tabElement.offsetTop;
+	const left = tabElement?.offsetLeft ?? 0;
+	const top = tabElement?.offsetTop ?? 0;
 
 	return (
 		<AnimatePresence>
-			{rect && (
+			{rect && tabElement && (
 				<motion.div
 					className={cn(
 						"absolute top-0 left-0 rounded-lg",
@@ -52,7 +50,11 @@ export const AnimatedHoverBackground: React.FC<
 						left,
 						top,
 					}}
-					transition={{ duration: 0.14 }}
+					transition={{
+						type: "spring",
+						bounce: 0,
+						duration: 0.2,
+					}}
 				/>
 			)}
 		</AnimatePresence>
