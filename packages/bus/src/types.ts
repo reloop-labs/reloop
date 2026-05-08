@@ -78,7 +78,6 @@ export interface InviteCreatedPayload {
 	inviteLink: string;
 	inviterName: string;
 	inviterEmail: string;
-	role: string;
 }
 
 export interface OtpRequestedPayload {

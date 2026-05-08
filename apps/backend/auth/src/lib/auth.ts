@@ -186,30 +186,37 @@ export const auth = betterAuth({
 				afterCreateInvitation: async ({ invitation, inviter, organization }) => {
 					const inviteLink = `${authConfig.BASE_URL}/dashboard/accept-invitation?id=${invitation.id}`;
 					try {
-						await bus.publish(BusEvent.INVITE_CREATED, {
-							email: invitation.email,
-							organizationName: organization.name,
-							inviteLink,
-							inviterName: inviter.user.name || inviter.user.email,
-							inviterEmail: inviter.user.email,
-							role: invitation.role || "member",
-						});
+						await bus.publish(
+							BusEvent.INVITE_CREATED,
+							{
+								email: invitation.email,
+								organizationName: organization.name,
+								inviteLink,
+								inviterName: inviter?.name || inviter.email.split("@")[0] || 'Someone',
+								inviterEmail: inviter.email,
+							},
+							{ msgId: `invite_created:${invitation.id}` },
+						);
 						logger.info(`✅ Organization invite bus event published for ${invitation.email}`);
 					} catch (error) {
-						logger.error("❌ Failed to publish organization invite event:", error);
+						logger.error(`❌ Failed to publish organization invite event:${error}`);
 					}
 				},
 				afterAcceptInvitation: async ({ member, user, organization }) => {
 					try {
-						await bus.publish(BusEvent.ORGANIZATION_JOINED, {
-							organizationId: organization.id,
-							orgName: organization.name,
-							userId: user.id,
-							userEmail: user.email,
-							memberName: user.name || user.email,
-							role: member.role,
-							inviterName: "Admin",
-						});
+						await bus.publish(
+							BusEvent.ORGANIZATION_JOINED,
+							{
+								organizationId: organization.id,
+								orgName: organization.name,
+								userId: user.id,
+								userEmail: user.email,
+								memberName: user.name || user.email,
+								role: member.role,
+								inviterName: "Admin",
+							},
+							{ msgId: `org_joined:${organization.id}:${user.id}` },
+						);
 						logger.info(`✅ Organization joined bus event published for ${user.email}`);
 					} catch (error) {
 						logger.error("❌ Failed to publish organization joined event:", error);

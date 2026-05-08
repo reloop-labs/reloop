@@ -1,33 +1,43 @@
 import { BusEvent, bus } from "@reloop/bus";
 import { logger } from "@reloop/logger";
-import { render } from "../../render";
-import { emailConfig } from "../email.config";
-import { sendEmail } from "../utils/email";
+import React from "react";
 import InviteEmail from "../../emails/invite";
 import OrgJoinedEmail from "../../emails/org-joined";
-import React from "react";
+import { render } from "../../render";
+import { emailConfig } from "../email.config";
+import { redis } from "../lib/redis";
+import { sendEmail } from "../utils/email";
 
 export async function initOrgSubscribers() {
 	// Invite Email
 	await bus.subscribe(
 		BusEvent.INVITE_CREATED,
 		async (payload) => {
+			const dedupKey = `email:invite:${payload.email}:${payload.organizationName}`;
 			try {
+				const alreadySent = await redis.get(dedupKey);
+				if (alreadySent) {
+					logger.warn(
+						`Duplicate INVITE_CREATED for ${payload.email}, skipping`,
+					);
+					return;
+				}
+				await redis.set(dedupKey, "1", 60);
+
 				const html = await render(
 					React.createElement(InviteEmail, {
-						inviteeName: "User", // We don't have the invitee name yet, usually just email
+						inviteeName: payload.email.split("@")[0], // Fallback to email prefix if name is missing
 						inviterName: payload.inviterName,
 						inviterEmail: payload.inviterEmail,
 						teamName: payload.organizationName,
-						role: payload.role,
 						inviteUrl: payload.inviteLink,
 					}),
 				);
 
 				await sendEmail({
-					from: `Reloop <invites@${emailConfig.RELOOP_SENDER_DOMAIN || "reloop.dev"}>`,
+					from: `${payload.inviterName} via Reloop <invites@${emailConfig.RELOOP_SENDER_DOMAIN || "reloop.dev"}>`,
 					to: payload.email,
-					subject: `You've been invited to join ${payload.organizationName} on Reloop`,
+					subject: `Join ${payload.organizationName} on Reloop`,
 					html,
 				});
 			} catch (error) {
@@ -41,7 +51,17 @@ export async function initOrgSubscribers() {
 	await bus.subscribe(
 		BusEvent.ORGANIZATION_JOINED,
 		async (payload) => {
+			const dedupKey = `email:org_joined:${payload.userEmail}:${payload.orgName}`;
 			try {
+				const alreadySent = await redis.get(dedupKey);
+				if (alreadySent) {
+					logger.warn(
+						`Duplicate ORGANIZATION_JOINED for ${payload.userEmail}, skipping`,
+					);
+					return;
+				}
+				await redis.set(dedupKey, "1", 60);
+
 				const html = await render(
 					React.createElement(OrgJoinedEmail, {
 						memberName: payload.memberName,
@@ -53,16 +73,13 @@ export async function initOrgSubscribers() {
 				);
 
 				await sendEmail({
-					from: `Reloop <org@${emailConfig.RELOOP_SENDER_DOMAIN || "reloop.dev"}>`,
+					from: `${payload.orgName} via Reloop <org@${emailConfig.RELOOP_SENDER_DOMAIN || "reloop.dev"}>`,
 					to: payload.userEmail,
-					subject: "You've successfully joined the organization",
+					subject: `You're now part of the ${payload.orgName} team!`,
 					html,
 				});
 			} catch (error) {
-				logger.error(
-					{ error, payload },
-					"Failed to send org joined email",
-				);
+				logger.error({ error, payload }, "Failed to send org joined email");
 			}
 		},
 		{ queue: "org-email-worker" },
