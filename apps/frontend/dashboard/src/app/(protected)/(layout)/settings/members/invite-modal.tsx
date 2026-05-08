@@ -231,12 +231,12 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
 				{/* Header */}
 				<div className="flex items-start justify-between border-stroke-soft-100 border-b px-5 pt-5 pb-4 dark:border-stroke-soft-100/40">
 					<div>
-						<h2 className="font-semibold text-label-md text-text-strong-950">
+						<Modal.Title className="font-semibold text-label-md text-text-strong-950">
 							Invite team members
-						</h2>
-						<p className="-mt-0.5 text-paragraph-sm text-text-sub-600">
+						</Modal.Title>
+						<Modal.Description className="-mt-0.5 text-paragraph-sm text-text-sub-600">
 							Invitations will be sent via email
-						</p>
+						</Modal.Description>
 					</div>
 					<button
 						type="button"

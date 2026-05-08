@@ -8,17 +8,18 @@ import { Icon } from "@reloop/ui/icon";
 import { useRef, useState } from "react";
 
 export type TeamFilterOption = "invited" | "suspended" | "active";
-export type TeamFilters = TeamFilterOption[];
+export type TeamFilterValue = TeamFilterOption | "all";
 
 interface TeamFilterDropdownProps {
-	value: TeamFilters;
-	onChange: (value: TeamFilters) => void;
+	value: TeamFilterValue;
+	onChange: (value: TeamFilterValue) => void;
 }
 
-const filterOptions: { id: TeamFilterOption; label: string }[] = [
-	{ id: "invited", label: "Invited" },
-	{ id: "suspended", label: "Suspended" },
+const filterOptions: { id: TeamFilterValue; label: string }[] = [
+	{ id: "all", label: "All Statuses" },
 	{ id: "active", label: "Active" },
+	{ id: "suspended", label: "Suspended" },
+	{ id: "invited", label: "Invited" },
 ];
 
 export const TeamFilterDropdown = ({
@@ -32,69 +33,34 @@ export const TeamFilterDropdown = ({
 	const currentTab = buttonRefs.current[hoverIdx ?? -1];
 	const currentRect = currentTab?.getBoundingClientRect();
 
-	const activeFilterCount = value.length;
-	const hasActiveFilter = activeFilterCount > 0;
-
+	const selectedOption = filterOptions.find((o) => o.id === value);
 	const displayLabel =
-		activeFilterCount === 0
-			? "Status"
-			: activeFilterCount === 1
-				? filterOptions.find((o) => o.id === value[0])?.label || "Status"
-				: `${activeFilterCount} Statuses`;
+		selectedOption?.id === "all" ? "Status" : selectedOption?.label || "Status";
 
-	const handleReset = () => {
-		onChange([]);
-	};
-
-	const handleToggle = (optionId: TeamFilterOption) => {
-		if (value.includes(optionId)) {
-			onChange(value.filter((v) => v !== optionId));
-		} else {
-			onChange([...value, optionId]);
-		}
+	const handleSelect = (optionId: TeamFilterValue) => {
+		onChange(optionId);
+		setIsOpen(false);
 	};
 
 	return (
 		<Dropdown.Root open={isOpen} onOpenChange={setIsOpen}>
-			<Dropdown.Trigger asChild>
+			<Dropdown.Trigger asChild className="w-32">
 				<Button.Root
 					variant="neutral"
 					mode="stroke"
 					size="xsmall"
-					className={cn(
-						"gap-1.5 whitespace-nowrap",
-						hasActiveFilter &&
-							"border-stroke-soft-900 bg-neutral-alpha-10 text-text-strong-950",
-					)}
+					className="flex justify-between rounded-[10px]"
 				>
-					<Button.Icon>
-						<Icon name="filter" className="h-3.5 w-3.5" />
-					</Button.Icon>
 					{displayLabel}
 					<Button.Icon>
 						<Icon name="chevron-down" className="h-3.5 w-3.5" />
 					</Button.Icon>
 				</Button.Root>
 			</Dropdown.Trigger>
-			<Dropdown.Content align="start" className="w-44 p-3">
-				{/* Header */}
-				<div className="flex items-center justify-between border-stroke-soft-200 border-b px-1 pb-2">
-					<span className="font-medium text-text-sub-600 text-xs">
-						Filter by
-					</span>
-					<button
-						type="button"
-						onClick={handleReset}
-						className="rounded-lg border border-stroke-soft-200 px-2 py-1 text-text-sub-600 text-xs transition-colors hover:bg-bg-weak-50"
-					>
-						Reset filters
-					</button>
-				</div>
-
+			<Dropdown.Content align="start" className="w-32 p-1">
 				{/* Filter Options */}
 				<div className="relative">
 					{filterOptions.map((option, idx) => {
-						const isChecked = value.includes(option.id);
 						return (
 							<button
 								key={option.id}
@@ -104,21 +70,22 @@ export const TeamFilterDropdown = ({
 								type="button"
 								onPointerEnter={() => setHoverIdx(idx)}
 								onPointerLeave={() => setHoverIdx(undefined)}
-								onClick={() => handleToggle(option.id)}
+								onClick={() => handleSelect(option.id)}
 								className={cn(
-									"flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg px-2 py-1.5 font-normal text-xs transition-colors",
+									"flex w-full cursor-pointer items-center justify-between gap-2 rounded-[12px] px-2 py-1.5 font-medium text-[13px] transition-colors",
 									"text-text-strong-950",
 									!currentRect && hoverIdx === idx && "bg-neutral-alpha-10",
+									option.id === value && "bg-neutral-alpha-10/50",
 								)}
 							>
 								<span
 									className={cn(
-										isChecked && "font-medium text-text-strong-950",
+										option.id === value && "font-medium text-text-strong-950",
 									)}
 								>
 									{option.label}
 								</span>
-								{isChecked && (
+								{option.id === value && (
 									<Icon
 										name="check"
 										className="h-3.5 w-3.5 text-text-strong-950"
@@ -127,7 +94,11 @@ export const TeamFilterDropdown = ({
 							</button>
 						);
 					})}
-					<AnimatedHoverBackground rect={currentRect} tabElement={currentTab} />
+					<AnimatedHoverBackground
+						rect={currentRect}
+						tabElement={currentTab}
+						className="rounded-[12px]"
+					/>
 				</div>
 			</Dropdown.Content>
 		</Dropdown.Root>

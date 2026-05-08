@@ -40,7 +40,7 @@ interface Invite {
 
 interface TeamListProps {
 	searchQuery: string;
-	filters?: ("invited" | "suspended" | "active")[];
+	filters?: "invited" | "suspended" | "active" | "all";
 }
 
 const getRoleBadgeStyles = (role: string) => {
@@ -93,7 +93,7 @@ import { InviteDropdown } from "./invite-dropdown";
 import { RemoveMemberModal } from "./remove-member-modal";
 import { RevokeInviteModal } from "./revoke-invite-modal";
 
-export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
+export const TeamList = ({ searchQuery, filters = "all" }: TeamListProps) => {
 	const { activeOrganization } = useUserOrganization();
 	const [removingMember, setRemovingMember] = useState<string | null>(null);
 	const [cancellingInvite, setCancellingInvite] = useState<string | null>(null);
@@ -169,11 +169,11 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
 			);
 		}
 
-		// Apply type filter (multi-select)
-		if (filters.length > 0) {
-			const showInvited = filters.includes("invited");
-			const showSuspended = filters.includes("suspended");
-			const showActive = filters.includes("active");
+		// Apply type filter (single-select)
+		if (filters !== "all") {
+			const showInvited = filters === "invited";
+			const showSuspended = filters === "suspended";
+			const showActive = filters === "active";
 
 			// If only specific filters are selected, filter accordingly
 			if (!showInvited) {
@@ -292,7 +292,7 @@ export const TeamList = ({ searchQuery, filters = [] }: TeamListProps) => {
 		setInviteId(null);
 	};
 
-	const isLoading = membersLoading || invitesLoading;
+	const isLoading = membersLoading || invitesLoading || !membersData;
 
 	if (isLoading) {
 		return (

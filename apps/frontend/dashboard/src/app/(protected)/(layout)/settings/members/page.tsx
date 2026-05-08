@@ -7,12 +7,12 @@ import { useQueryState } from "nuqs";
 import { useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { InviteModal } from "./invite-modal";
-import { TeamFilterDropdown, type TeamFilters } from "./team-filter-dropdown";
+import { TeamFilterDropdown, type TeamFilterValue } from "./team-filter-dropdown";
 import { TeamList } from "./team-list";
 
 const Team = () => {
 	const [searchQuery, setSearchQuery] = useState("");
-	const [filters, setFilters] = useState<TeamFilters>([]);
+	const [filters, setFilters] = useState<TeamFilterValue>("all");
 	const [modal, setModal] = useQueryState("modal", { history: "replace" });
 
 	useHotkeys("mod+a", (e) => {
@@ -33,7 +33,7 @@ const Team = () => {
 			{/* Search, Filter, and Invite Button */}
 			<div className="flex items-center gap-3">
 				<div className="flex-1">
-					<Input.Root size="xsmall">
+					<Input.Root size="xsmall" className="rounded-[10px]!">
 						<Input.Wrapper>
 							<Input.Icon as={Icon} name="search" size="xsmall" />
 							<Input.Input
