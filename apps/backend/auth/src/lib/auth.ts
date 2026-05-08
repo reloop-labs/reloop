@@ -55,35 +55,31 @@ export const auth = betterAuth({
 			const { path, context } = ctx;
 
 			// 🔐 User registered
-			if (path.startsWith("/sign-up")) {
+			if (path.includes("/sign-up")) {
 				const newSession = context.newSession;
 				if (newSession) {
 					logger.info("🔐 User registered:", newSession.user);
-					await context.runInBackgroundOrAwait(
-						bus.publish(BusEvent.USER_CREATED, {
-							id: newSession.user.id,
-							email: newSession.user.email,
-							name: newSession.user.name || undefined,
-						}),
-					);
+					await bus.publish(BusEvent.USER_CREATED, {
+						id: newSession.user.id,
+						email: newSession.user.email,
+						name: newSession.user.name || undefined,
+					});
 				}
 			}
 
 			// 🔓 User signed in
-			if (path.startsWith("/sign-in")) {
+			if (path.includes("/sign-in")) {
 				const data = context.newSession;
 				if (data) {
 					const { session, user } = data;
 					logger.info("🔓 User signed in:", user.email);
-					await context.runInBackgroundOrAwait(
-						bus.publish(BusEvent.SIGNIN_DETECTED, {
-							email: user.email,
-							browser: session.userAgent || "Unknown Browser",
-							os: "Unknown OS",
-							ip: session.ipAddress || "0.0.0.0",
-							location: "Unknown Location",
-						}),
-					);
+					await bus.publish(BusEvent.SIGNIN_DETECTED, {
+						email: user.email,
+						browser: session.userAgent || "Unknown Browser",
+						os: "Unknown OS",
+						ip: session.ipAddress || "0.0.0.0",
+						location: "Unknown Location",
+					});
 				}
 			}
 		}),
