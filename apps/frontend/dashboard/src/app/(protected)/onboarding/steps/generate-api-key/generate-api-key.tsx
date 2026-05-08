@@ -53,7 +53,7 @@ export const GenerateApiKeyStep = () => {
 					onLanguageChange={(l) => setSelectedLang(l)}
 					onDone={async () => {
 						await authClient.getSession();
-						router.push("/");
+						window.location.href = "/dashboard";
 					}}
 				/>
 			)}
