@@ -53,10 +53,23 @@ export const OnBoardingContent = () => {
 			return;
 		}
 
-		// If user already has an active organization, redirect to dashboard
-		if (session.user.activeOrganizationId) {
-			router.push("/");
-		}
+		// Only redirect to dashboard if user has an active org AND that org actually exists.
+		// The activeOrganizationId can be stale while the user has 0 orgs,
+		// which would cause a redirect loop with org-provider.
+		const checkActiveOrg = async () => {
+			if (session.user.activeOrganizationId) {
+				try {
+					const orgs = await authClient.organization.list();
+					const hasOrgs = orgs.data && orgs.data.length > 0;
+					if (hasOrgs) {
+						router.push("/");
+					}
+				} catch {
+					// If org list fails, stay on onboarding
+				}
+			}
+		};
+		checkActiveOrg();
 	}, [session, isPending, router]);
 
 	if (isPending) {

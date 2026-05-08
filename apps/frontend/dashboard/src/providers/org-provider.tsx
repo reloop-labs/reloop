@@ -1,12 +1,14 @@
 "use client";
 
 import { authClient } from "@reloop/auth/client";
+import Spinner from "@reloop/ui/spinner";
 import { usePathname, useRouter } from "next/navigation";
 import {
 	createContext,
 	type ReactNode,
 	useContext,
 	useEffect,
+	useRef,
 	useState,
 } from "react";
 import useSWR from "swr";
@@ -74,11 +76,14 @@ export const UserOrganizationProvider = ({
 		(session && invitationsLoading) ||
 		isSettingDefaultOrg;
 
+	const hasRedirected = useRef(false);
+
 	useEffect(() => {
-		if (sessionLoading) return;
+		if (sessionLoading || hasRedirected.current) return;
 
 		if (!session) {
 			if (pathname.startsWith("/invite")) return;
+			hasRedirected.current = true;
 			router.push("/login");
 			return;
 		}
@@ -93,17 +98,19 @@ export const UserOrganizationProvider = ({
 				return;
 
 			if (invitations && invitations.length > 0 && invitations[0]) {
+				hasRedirected.current = true;
 				router.push(`/invite?id=${invitations[0].id}`);
 				return;
 			}
 
+			hasRedirected.current = true;
 			router.push("/onboarding");
 			return;
 		}
 	}, [
 		session,
 		sessionLoading,
-		organizations,
+		organizations?.length,
 		organizationsLoading,
 		invitations,
 		invitationsLoading,
@@ -120,39 +127,34 @@ export const UserOrganizationProvider = ({
 				!isSettingDefaultOrg &&
 				!hasInitialized
 			) {
-				if (session?.user?.activeOrganizationId) {
-					try {
-						await authClient.organization.setActive({
-							organizationId: session.user.activeOrganizationId,
-						});
-					} catch (error) {
-						console.log("Error setting active organization", { error });
-					}
+				// If user already has an active org that exists in the list, just mark as initialized
+				if (session?.user?.activeOrganizationId && activeOrganization) {
+					setHasInitialized(true);
+					return;
 				}
 
-				if (!activeOrganization) {
-					if (organizations.length > 0) {
-						setIsSettingDefaultOrg(true);
+				// No active org set — pick the first available one
+				if (!activeOrganization && organizations.length > 0) {
+					setIsSettingDefaultOrg(true);
 
-						const firstOrg = organizations[0];
-						if (firstOrg?.id) {
-							try {
-								await authClient.organization.setActive({
-									organizationId: firstOrg.id,
-								});
-								await authClient.updateUser({
-									activeOrganizationId: firstOrg.id,
-								});
-							} catch (error) {
-								console.log("Error setting active organization", { error });
-							} finally {
-								setIsSettingDefaultOrg(false);
-								setHasInitialized(true);
-							}
-						} else {
+					const firstOrg = organizations[0];
+					if (firstOrg?.id) {
+						try {
+							await authClient.organization.setActive({
+								organizationId: firstOrg.id,
+							});
+							await authClient.updateUser({
+								activeOrganizationId: firstOrg.id,
+							});
+						} catch (error) {
+							console.log("Error setting active organization", { error });
+						} finally {
 							setIsSettingDefaultOrg(false);
 							setHasInitialized(true);
 						}
+					} else {
+						setIsSettingDefaultOrg(false);
+						setHasInitialized(true);
 					}
 				} else {
 					setHasInitialized(true);
@@ -164,8 +166,8 @@ export const UserOrganizationProvider = ({
 	}, [
 		sessionLoading,
 		organizationsLoading,
-		organizations,
-		activeOrganization,
+		organizations?.length,
+		activeOrganization?.id,
 		isSettingDefaultOrg,
 		hasInitialized,
 		session?.user?.activeOrganizationId,
@@ -178,9 +180,30 @@ export const UserOrganizationProvider = ({
 		mutateOrganizations,
 	};
 
+	// Determine if we should show children or a loading state.
+	// This prevents the dashboard from flashing before redirecting to onboarding.
+	const shouldShowChildren = (() => {
+		// Still loading data — don't render children yet
+		if (sessionLoading || organizationsLoading) return false;
+		// No session — will redirect to login
+		if (!session) return false;
+		// Has organizations with an active one — safe to render
+		if (organizations && organizations.length > 0 && activeOrganization) return true;
+		// No organizations — will redirect to onboarding (or invite)
+		if (organizations && organizations.length === 0) return false;
+		// Default: still resolving
+		return false;
+	})();
+
 	return (
 		<UserOrganizationContext.Provider value={contextValue}>
-			{children}
+			{shouldShowChildren ? (
+				children
+			) : (
+				<div className="flex h-screen w-full items-center justify-center">
+					<Spinner size={24} />
+				</div>
+			)}
 		</UserOrganizationContext.Provider>
 	);
 };

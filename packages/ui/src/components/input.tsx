@@ -215,6 +215,7 @@ function InputWrapper({
 	children,
 	size,
 	hasError,
+	hassuccess,
 	asChild,
 	...rest
 }: React.HTMLAttributes<HTMLLabelElement> &
@@ -286,6 +287,7 @@ function InputAffix({
 	children,
 	size,
 	hasError,
+	hassuccess,
 	...rest
 }: React.HTMLAttributes<HTMLDivElement> & InputSharedProps) {
 	const { affix } = inputVariants({
@@ -306,6 +308,7 @@ function InputInlineAffix({
 	children,
 	size,
 	hasError,
+	hassuccess,
 	...rest
 }: React.HTMLAttributes<HTMLSpanElement> & InputSharedProps) {
 	const { inlineAffix } = inputVariants({
