@@ -145,7 +145,7 @@ export function SocialLogin({
 			<p className="pt-5 text-center font-medium text-[13px] text-text-sub-600">
 				Don’t have an account?{" "}
 				<Link
-					href="/signup"
+					href={inviteId ? `/signup?inviteId=${inviteId}` : "/signup"}
 					className={LinkButton.linkButtonVariants({
 						variant: "black",
 					}).root({ className: "text-[13px]!" })}
