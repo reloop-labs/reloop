@@ -1,6 +1,7 @@
 import { relations } from "drizzle-orm";
 import {
 	boolean,
+	index,
 	integer,
 	pgTable,
 	text,
@@ -37,11 +38,23 @@ export const apikey = pgTable("apikey", {
 	updatedAt: timestamp("updated_at").notNull(),
 	permissions: text("permissions"),
 	metadata: text("metadata"),
-});
+}, (table) => [
+	index("apikey_key_idx").on(table.key),
+	index("apikey_organizationId_idx").on(table.organizationId),
+	index("apikey_userId_idx").on(table.userId),
+]);
 
 export const apikeyRelations = relations(apikey, ({ one }) => ({
 	user: one(user, {
 		fields: [apikey.userId],
 		references: [user.id],
 	}),
+	organization: one(organization, {
+		fields: [apikey.organizationId],
+		references: [organization.id],
+	}),
+}));
+
+export const userApiKeyRelations = relations(user, ({ many }) => ({
+	apikeys: many(apikey),
 }));
