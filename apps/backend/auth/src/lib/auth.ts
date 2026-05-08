@@ -55,7 +55,7 @@ export const auth = betterAuth({
 			const { path, context } = ctx;
 			logger.info(ctx.path)
 			// 🔐 User registered
-			if (path === "/sign-up/email") {
+			if (path === "/sign-up/email-otp") {
 				const newSession = context.newSession;
 				if (newSession) {
 					logger.info("🔐 User registered:", newSession.user);
@@ -103,7 +103,8 @@ export const auth = betterAuth({
 	telemetry: { enabled: false },
 	emailAndPassword: {
 		autoSignIn: true,
-		enabled: authConfig.DISABLE_SIGNUP !== "true",
+		enabled: true,
+		disableSignUp: authConfig.DISABLE_SIGNUP === "true",
 	},
 	socialProviders: {
 		google: {
@@ -171,7 +172,7 @@ export const auth = betterAuth({
 		}),
 		organization({
 			async sendInvitationEmail(data) {
-				const inviteLink = `${authConfig.BASE_URL}/dashboard/login?inviteId=${data.id}`;
+				const inviteLink = `${authConfig.BASE_URL}/dashboard/signup?inviteId=${data.id}`;
 				logger.info("📧 Organization invitation email requested:", {
 					email: data.email,
 					organization: data.organization.name,
@@ -184,7 +185,7 @@ export const auth = betterAuth({
 			},
 			organizationHooks: {
 				afterCreateInvitation: async ({ invitation, inviter, organization }) => {
-					const inviteLink = `${authConfig.BASE_URL}/dashboard/login?inviteId=${invitation.id}`;
+					const inviteLink = `${authConfig.BASE_URL}/dashboard/signup?inviteId=${invitation.id}`;
 					try {
 						await bus.publish(
 							BusEvent.INVITE_CREATED,
