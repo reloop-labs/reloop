@@ -104,7 +104,6 @@ export const auth = betterAuth({
 	emailAndPassword: {
 		enabled: true,
 		autoSignIn: true,
-		autoSignInAfterVerification: true,
 		disableSignUp: authConfig.DISABLE_SIGNUP === "true",
 	},
 	socialProviders: {
@@ -148,6 +147,8 @@ export const auth = betterAuth({
 			},
 		}),
 		emailOTP({
+			expiresIn: 60 * 15,
+			allowedAttempts: 3,
 			async sendVerificationOTP({ email, otp, type }) {
 				logger.info(`Sending OTP (${type}) to: ${email} (OTP: ${otp})`);
 				if (authConfig.DEFAULT_OTP && authConfig.NODE_ENV !== "development")
