@@ -1,3 +1,4 @@
+import { apiKey } from "@better-auth/api-key";
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
@@ -7,7 +8,6 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { createAuthMiddleware } from "better-auth/api";
 import {
 	admin,
-	apiKey,
 	bearer,
 	emailOTP,
 	jwt,
@@ -53,7 +53,7 @@ export const auth = betterAuth({
 	hooks: {
 		after: createAuthMiddleware(async (ctx) => {
 			const { path, context } = ctx;
-			logger.info(ctx.path)
+			logger.info(ctx.path);
 			// 🔐 User registered
 			if (path === "/sign-up/email-otp") {
 				const newSession = context.newSession;
@@ -150,7 +150,8 @@ export const auth = betterAuth({
 		emailOTP({
 			async sendVerificationOTP({ email, otp, type }) {
 				logger.info(`Sending OTP (${type}) to: ${email} (OTP: ${otp})`);
-				if (authConfig.DEFAULT_OTP && authConfig.NODE_ENV !== "development") return;
+				if (authConfig.DEFAULT_OTP && authConfig.NODE_ENV !== "development")
+					return;
 				try {
 					await bus.publish(
 						BusEvent.OTP_REQUESTED,
@@ -172,6 +173,32 @@ export const auth = betterAuth({
 			},
 		}),
 		organization({
+			additionalFields: {
+				organization: {
+					billingEmail: {
+						type: "string",
+						required: false,
+						input: true,
+					},
+					billingName: {
+						type: "string",
+						required: false,
+						input: true,
+					},
+					externalCustomerId: {
+						type: "string",
+						required: false,
+						input: true,
+						unique: true,
+					},
+					status: {
+						type: "string",
+						required: false,
+						input: true,
+						defaultValue: "active",
+					},
+				},
+			},
 			async sendInvitationEmail(data) {
 				const inviteLink = `${authConfig.BASE_URL}/dashboard/signup?inviteId=${data.id}`;
 				logger.info("📧 Organization invitation email requested:", {
@@ -185,7 +212,11 @@ export const auth = betterAuth({
 				}
 			},
 			organizationHooks: {
-				afterCreateInvitation: async ({ invitation, inviter, organization }) => {
+				afterCreateInvitation: async ({
+					invitation,
+					inviter,
+					organization,
+				}) => {
 					const inviteLink = `${authConfig.BASE_URL}/dashboard/signup?inviteId=${invitation.id}`;
 					try {
 						await bus.publish(
@@ -194,14 +225,19 @@ export const auth = betterAuth({
 								email: invitation.email,
 								organizationName: organization.name,
 								inviteLink,
-								inviterName: inviter?.name || inviter.email.split("@")[0] || 'Someone',
+								inviterName:
+									inviter?.name || inviter.email.split("@")[0] || "Someone",
 								inviterEmail: inviter.email,
 							},
 							{ msgId: `invite_created:${invitation.id}` },
 						);
-						logger.info(`✅ Organization invite bus event published for ${invitation.email}`);
+						logger.info(
+							`✅ Organization invite bus event published for ${invitation.email}`,
+						);
 					} catch (error) {
-						logger.error(`❌ Failed to publish organization invite event:${error}`);
+						logger.error(
+							`❌ Failed to publish organization invite event:${error}`,
+						);
 					}
 				},
 				afterAcceptInvitation: async ({ member, user, organization }) => {
@@ -219,9 +255,14 @@ export const auth = betterAuth({
 							},
 							{ msgId: `org_joined:${organization.id}:${user.id}` },
 						);
-						logger.info(`✅ Organization joined bus event published for ${user.email}`);
+						logger.info(
+							`✅ Organization joined bus event published for ${user.email}`,
+						);
 					} catch (error) {
-						logger.error("❌ Failed to publish organization joined event:", error);
+						logger.error(
+							"❌ Failed to publish organization joined event:",
+							error,
+						);
 					}
 				},
 			},

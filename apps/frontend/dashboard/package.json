@@ -31,6 +31,7 @@
 		"axios": "catalog:",
 		"babel-plugin-react-compiler": "catalog:ui",
 		"better-auth": "catalog:",
+		"@better-auth/api-key": "catalog:",
 		"boring-avatars": "catalog:ui",
 		"calligraph": "catalog:ui",
 		"dayjs": "catalog:ui",

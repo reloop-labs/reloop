@@ -1,6 +1,6 @@
+import { apiKeyClient } from "@better-auth/api-key/client";
 import {
 	adminClient,
-	apiKeyClient,
 	emailOTPClient,
 	inferAdditionalFields,
 	jwtClient,
