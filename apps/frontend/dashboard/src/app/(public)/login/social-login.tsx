@@ -10,8 +10,10 @@ import { useState } from "react";
 
 export function SocialLogin({
 	onContinueWithEmail,
+	inviteId,
 }: {
 	onContinueWithEmail: () => void;
+	inviteId?: string;
 }) {
 	const lastLoggedIn = authClient.getLastUsedLoginMethod();
 	const [loading, setLoading] = useState<{
@@ -60,7 +62,7 @@ export function SocialLogin({
 					setLoading({ name: "google", loading: true });
 					await authClient.signIn.social({
 						provider: "google",
-						callbackURL: "/dashboard",
+						callbackURL: inviteId ? `/login?inviteId=${inviteId}` : "/dashboard",
 					});
 				} catch {
 					setLoading({ name: "google", loading: false });
@@ -86,7 +88,7 @@ export function SocialLogin({
 					setLoading({ name: "github", loading: true });
 					await authClient.signIn.social({
 						provider: "github",
-						callbackURL: "/dashboard",
+						callbackURL: inviteId ? `/login?inviteId=${inviteId}` : "/dashboard",
 					});
 				} catch {
 					setLoading({ name: "github", loading: false });

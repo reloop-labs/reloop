@@ -171,7 +171,7 @@ export const auth = betterAuth({
 		}),
 		organization({
 			async sendInvitationEmail(data) {
-				const inviteLink = `${authConfig.BASE_URL}/dashboard/accept-invitation?id=${data.id}`;
+				const inviteLink = `${authConfig.BASE_URL}/invite?id=${data.id}`;
 				logger.info("📧 Organization invitation email requested:", {
 					email: data.email,
 					organization: data.organization.name,
@@ -184,7 +184,7 @@ export const auth = betterAuth({
 			},
 			organizationHooks: {
 				afterCreateInvitation: async ({ invitation, inviter, organization }) => {
-					const inviteLink = `${authConfig.BASE_URL}/dashboard/accept-invitation?id=${invitation.id}`;
+					const inviteLink = `${authConfig.BASE_URL}/invite?id=${invitation.id}`;
 					try {
 						await bus.publish(
 							BusEvent.INVITE_CREATED,

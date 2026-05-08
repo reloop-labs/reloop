@@ -54,12 +54,17 @@ const Page = () => {
 		prevLevel.current = currentLevel;
 		prevDirection.current = direction;
 	}, [currentLevel, direction]);
+	const [inviteId] = useQueryState("inviteId", parseAsString.withDefault(""));
 
 	useEffect(() => {
 		if (session && !isPending) {
-			router.push("/");
+			if (inviteId) {
+				router.push(`/invite?id=${inviteId}`);
+			} else {
+				router.push("/");
+			}
 		}
-	}, [session, isPending, router]);
+	}, [session, isPending, router, inviteId]);
 
 	if (isPending) {
 		return (
@@ -150,7 +155,10 @@ const Page = () => {
 									Login in to Reloop
 								</h2>
 							</div>
-							<SocialLogin onContinueWithEmail={() => setShowEmail(true)} />
+							<SocialLogin
+								onContinueWithEmail={() => setShowEmail(true)}
+								inviteId={inviteId || undefined}
+							/>
 						</motion.div>
 					) : (
 						<motion.div
