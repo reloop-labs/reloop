@@ -275,6 +275,10 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
 										onKeyDown={handleKeyDown}
 										onFocus={() => setInputFocused(true)}
 										disabled={loading}
+										autoComplete="off"
+										spellCheck={false}
+										autoCorrect="off"
+										data-1p-ignore
 									/>
 									{inputFocused && inputValue.trim() && (
 										<div className="flex items-center gap-1 rounded-md border border-stroke-sub-300 bg-bg-white-0 px-1 py-[1px] text-[10px] text-text-sub-600">
@@ -301,18 +305,18 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
 							<p className="text-error-base text-paragraph-xs">{emailError}</p>
 						)}
 					</div>
-					{pendingEmails.length > 0 && (
-						<div className="space-y-2">
-							<div className="mt-4 flex items-center gap-2">
-								<span className="font-medium text-label-sm text-text-strong-950">
-									Pending invites
-								</span>
-								<span className="flex h-4 min-w-[20px] items-center justify-center rounded-full border border-stroke-soft-100 bg-neutral-alpha-10 px-1.5 font-medium text-[11px] text-text-sub-600 dark:border-stroke-soft-100/40">
-									{pendingEmails.length}
-								</span>
-							</div>
-							<div className="divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/50">
-								<AnimatePresence initial={false} mode="popLayout">
+					<AnimatePresence initial={false} mode="popLayout">
+						{pendingEmails.length > 0 && (
+							<div className="space-y-2">
+								<div className="mt-4 flex items-center gap-2">
+									<span className="font-medium text-label-sm text-text-strong-950">
+										Pending invites
+									</span>
+									<span className="flex h-4 min-w-[20px] items-center justify-center rounded-full border border-stroke-soft-100 bg-neutral-alpha-10 px-1.5 font-medium text-[11px] text-text-sub-600 dark:border-stroke-soft-100/40">
+										{pendingEmails.length}
+									</span>
+								</div>
+								<div className="divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/50">
 									{pendingEmails.map(({ email, role }) => (
 										<motion.div
 											key={email}
@@ -325,7 +329,7 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
 												bounce: 0,
 												duration: 0.3,
 											}}
-											className="flex items-center gap-3 px-3 py-2.5"
+											className="flex items-center gap-3 px-3 py-1.5"
 										>
 											{/* Avatar */}
 											<div
@@ -342,23 +346,14 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
 												{email}
 											</span>
 
-											{/* Role badge toggle */}
-											<div className="flex items-center gap-1.5">
-												{(["member", "admin"] as Role[]).map((r) => (
-													<button
-														key={r}
-														type="button"
-														onClick={() => handleRoleChange(email, r)}
-														className={cn(
-															"inline-flex rounded-full border px-2.5 py-0.5 font-medium text-[11px] capitalize transition-all active:scale-[0.97]",
-															role === r
-																? getRoleBadgeStyles(r)
-																: "border-transparent text-text-soft-400 hover:text-text-sub-600",
-														)}
-													>
-														{r.charAt(0).toUpperCase() + r.slice(1)}
-													</button>
-												))}
+											{/* Role Badge */}
+											<div
+												className={cn(
+													"inline-flex rounded-full border px-2 py-0.5 font-medium text-[10px] capitalize transition-all",
+													getRoleBadgeStyles(role),
+												)}
+											>
+												{role}
 											</div>
 
 											{/* Remove */}
@@ -368,90 +363,85 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
 												size="xxsmall"
 												variant="neutral"
 												mode="lighter"
-												className="h-5 w-5 rounded-md p-0"
+												className="h-6 w-6 rounded-md p-0"
 											>
 												<Icon name="cross" className="h-3 w-3" />
 											</Button.Root>
 										</motion.div>
 									))}
-								</AnimatePresence>
+								</div>
 							</div>
-						</div>
-					)}
-					<div className="space-y-2">
-						<span className="mt-4 font-medium text-label-sm text-text-strong-950">
-							Assign role
-						</span>
-						<div className="grid grid-cols-2 gap-2 pt-2">
-							{ROLE_CONFIG.map(({ value, label, description, dotColor }) => {
-								const isSelected = selectedRole === value;
-								const styles = getRoleCardStyles(value);
-								return (
-									<button
-										key={value}
-										type="button"
-										onClick={() => {
-											setSelectedRole(value);
-											// Apply selected role to all pending emails
-											setPendingEmails((prev) =>
-												prev.map((e) => ({ ...e, role: value })),
-											);
-										}}
+						)}
+					</AnimatePresence>
+					<span className="mt-4 font-medium text-label-sm text-text-strong-950">
+						Assign role
+					</span>
+					<div className="grid grid-cols-2 gap-2 pt-2">
+						{ROLE_CONFIG.map(({ value, label, description, dotColor }) => {
+							const isSelected = selectedRole === value;
+							const styles = getRoleCardStyles(value);
+							return (
+								<button
+									key={value}
+									type="button"
+									onClick={() => {
+										setSelectedRole(value);
+										// Apply selected role to all pending emails
+										setPendingEmails((prev) =>
+											prev.map((e) => ({ ...e, role: value })),
+										);
+									}}
+									className={cn(
+										"relative flex flex-col items-start gap-0.5 rounded-xl border px-3 pt-1.5 pb-2 text-left transition-all active:scale-[0.98]",
+										isSelected
+											? styles.card
+											: "border-stroke-soft-100 bg-bg-white-0 hover:border-stroke-soft-200 hover:bg-bg-weak-50/50 dark:border-stroke-soft-100/50",
+									)}
+								>
+									<div className="flex w-full items-center justify-between">
+										<div className="flex items-center gap-1.5">
+											<span
+												className={cn(
+													"h-2 w-2 flex-shrink-0 rounded-full",
+													dotColor,
+												)}
+											/>
+											<span
+												className={cn(
+													"font-medium text-label-xs",
+													isSelected ? styles.label : "text-text-strong-950",
+												)}
+											>
+												{label}
+											</span>
+										</div>
+										{isSelected && (
+											<span
+												className={cn(
+													"flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full",
+													styles.check,
+												)}
+											>
+												<Icon name="check" className="h-2.5 w-2.5 text-white" />
+											</span>
+										)}
+									</div>
+									<p
 										className={cn(
-											"relative flex flex-col items-start gap-1 rounded-xl border px-3.5 pt-2 pb-3.5 text-left transition-all active:scale-[0.98]",
-											isSelected
-												? styles.card
-												: "border-stroke-soft-100 bg-bg-white-0 hover:border-stroke-soft-200 hover:bg-bg-weak-50/50 dark:border-stroke-soft-100/50",
+											"text-balance font-medium text-[11px]",
+											isSelected ? styles.desc : "text-text-sub-600",
 										)}
 									>
-										<div className="flex w-full items-center justify-between">
-											<div className="flex items-center gap-1.5">
-												<span
-													className={cn(
-														"h-2 w-2 flex-shrink-0 rounded-full",
-														dotColor,
-													)}
-												/>
-												<span
-													className={cn(
-														"font-medium text-label-xs",
-														isSelected ? styles.label : "text-text-strong-950",
-													)}
-												>
-													{label}
-												</span>
-											</div>
-											{isSelected && (
-												<span
-													className={cn(
-														"flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full",
-														styles.check,
-													)}
-												>
-													<Icon
-														name="check"
-														className="h-2.5 w-2.5 text-white"
-													/>
-												</span>
-											)}
-										</div>
-										<p
-											className={cn(
-												"text-balance font-medium text-[11px]",
-												isSelected ? styles.desc : "text-text-sub-600",
-											)}
-										>
-											{description}
-										</p>
-									</button>
-								);
-							})}
-						</div>
-						<p className="ml-1 flex items-center gap-1.5 pt-2 text-[11px] text-text-sub-600">
-							<Icon name="info-outline" className="h-3.5 w-3.5 flex-shrink-0" />
-							Roles can be changed anytime after the member joins
-						</p>
+										{description}
+									</p>
+								</button>
+							);
+						})}
 					</div>
+					<p className="ml-1 flex items-center gap-1.5 pt-2 text-[11px] text-text-sub-600">
+						<Icon name="info-outline" className="h-3.5 w-3.5 flex-shrink-0" />
+						Roles can be changed anytime after the member joins
+					</p>
 				</div>
 
 				{/* Footer */}
