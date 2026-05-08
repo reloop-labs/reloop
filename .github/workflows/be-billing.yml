@@ -66,4 +66,4 @@ jobs:
 
       - name: Deploy to Dokploy
         if: github.event_name != 'pull_request' && secrets.DOKPLOY_BILLING_TOKEN != ''
-        run: curl -X GET "https://dokploy.reloop.sh/api/deploy/KsY8kwg2JCjB6T9hINQC2"
+        run: curl -X GET "https://dokploy.reloop.sh/api/deploy/j7nexuKeibDd-0xjNUdke"
