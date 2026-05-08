@@ -3,16 +3,7 @@
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
-import {
-	ArrowUp,
-	ChevronDown,
-	Code2,
-	Coffee,
-	GraduationCap,
-	Lightbulb,
-	Paperclip,
-	Pencil,
-} from "lucide-react";
+import { ArrowUp, Paperclip } from "lucide-react";
 import { useState } from "react";
 
 export default function Home() {
