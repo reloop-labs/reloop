@@ -102,8 +102,9 @@ export const auth = betterAuth({
 	basePath: "/api/auth/v1",
 	telemetry: { enabled: false },
 	emailAndPassword: {
-		autoSignIn: true,
 		enabled: true,
+		autoSignIn: true,
+		autoSignInAfterVerification: true,
 		disableSignUp: authConfig.DISABLE_SIGNUP === "true",
 	},
 	socialProviders: {
