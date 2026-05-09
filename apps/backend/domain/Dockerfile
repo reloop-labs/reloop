@@ -1,26 +1,23 @@
-FROM oven/bun:alpine AS base
+FROM oven/bun:1.3.0-alpine AS base
 
-# Stage 1: Install dependencies
 FROM base AS deps
 WORKDIR /app
 
-# Install Python and build dependencies for native modules
 RUN apk add --no-cache python3 make g++
 
 COPY . .
 RUN bun --filter=domain install
 
-# Stage 2: Build the application
 FROM base AS builder
 WORKDIR /app
-# Use ARG for build-time variables that can be overridden
+
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN bun run --filter=domain build
 
-# Stage 3: Production server
 FROM base AS runner
 WORKDIR /app
 
@@ -28,11 +25,24 @@ ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
-# Copy standalone build
+# Build-time arguments
+ARG APP_VERSION=0.1.0
+ARG BUILD_DATE
+
+# Set environment variables
+ENV APP_VERSION=${APP_VERSION}
+
 COPY --from=builder /app/apps/backend/domain/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/packages ./packages
-COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/apps/backend/domain/package.json ./package.json
+
+# Standard OCI labels
+LABEL org.opencontainers.image.title="reloop-domain" \
+      org.opencontainers.image.description="Reloop Domain Service" \
+      org.opencontainers.image.version=${APP_VERSION} \
+      org.opencontainers.image.created=${BUILD_DATE} \
+      org.opencontainers.image.source="https://github.com/reloop-labs/reloop"
 
 EXPOSE 8011
 

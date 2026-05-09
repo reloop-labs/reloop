@@ -13,6 +13,7 @@ import { serverTiming } from "@elysiajs/server-timing";
 import { Elysia } from "elysia";
 import { initLogger, log, parseError } from "evlog";
 import { evlog } from "evlog/elysia";
+import pkg from "../package.json";
 
 initLogger({ env: { service: "domain" } });
 
@@ -45,7 +46,7 @@ const domainService = new Elysia({
 			documentation: {
 				info: {
 					title: "Domain Service",
-					version: "1.0.0",
+					version: pkg.version,
 				},
 				components: {
 					securitySchemes: {
