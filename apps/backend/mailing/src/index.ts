@@ -4,7 +4,6 @@ import { serverTiming } from "@elysiajs/server-timing";
 import { landing } from "@reloop/be-mailing/routes/landing/landing.index.js";
 import { mailRoutes } from "@reloop/be-mailing/routes/mail/mail.routes.js";
 import { loader } from "@reloop/be-mailing/utils/loader.js";
-import { errorMiddleware } from "./middleware/error";
 
 import { Elysia } from "elysia";
 import { initLogger, log } from "evlog";
@@ -41,7 +40,6 @@ const mailService = new Elysia({
 	.use(serverTiming())
 	.use(landing)
 	.use(mailRoutes)
-	.use(errorMiddleware)
 	.onStart(async () => {
 		await loader();
 	})
