@@ -34,7 +34,10 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 
 	useEffect(() => {
 		mainNavigation.forEach((item) => {
-			if (pathWithoutSlug.startsWith(item.path)) {
+			const hasActiveSubItem = item.items?.some((sub) =>
+				pathWithoutSlug.startsWith(sub.path),
+			);
+			if (hasActiveSubItem) {
 				setExpandedItems((prev) => ({ ...prev, [item.path]: true }));
 			}
 		});
