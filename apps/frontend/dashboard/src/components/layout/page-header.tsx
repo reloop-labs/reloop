@@ -4,6 +4,7 @@ import { FeedbackPopover } from "@fe/dashboard/components/feedback-popover";
 import { mainNavigation, userNavigation } from "@fe/dashboard/constants";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { UserDropdown } from "./user-dropdown";
 
 export const PageHeader = () => {
 	const pathname = usePathname();
@@ -59,6 +60,7 @@ export const PageHeader = () => {
 			</div>
 			<div className="flex items-center justify-end gap-2">
 				<FeedbackPopover />
+				<UserDropdown />
 			</div>
 		</div>
 	);

@@ -76,13 +76,13 @@ export const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
 					variant="neutral"
 					mode="ghost"
 					className={cn(
-						"flex h-auto w-full cursor-pointer items-center gap-2.5 px-2 py-2",
+						"flex h-auto w-full cursor-pointer items-center gap-2.5 rounded-2xl! px-2 py-2",
 						isCollapsed ? "justify-center" : "justify-start",
 						isOpen && "bg-bg-weak-50",
 					)}
 				>
 					<div className="relative flex-shrink-0">
-						<Avatar.Root size="32" color="gray">
+						<Avatar.Root size="24" color="blue">
 							{user.image ? (
 								<Avatar.Image src={user.image} alt={user.name} />
 							) : (
@@ -98,15 +98,11 @@ export const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
 								</Avatar.Image>
 							)}
 						</Avatar.Root>
-						<span className="-right-0.5 -bottom-0.5 absolute block h-3 w-3 rounded-full border-2 border-white bg-success-base dark:border-[#101010]" />
 					</div>
 					{!isCollapsed && (
 						<div className="flex min-w-0 flex-1 flex-col items-start gap-px">
 							<p className="w-full truncate text-left font-medium text-sm text-text-strong-950">
 								{user.email}
-							</p>
-							<p className="w-full truncate text-left text-text-sub-600 text-xs">
-								Free plan
 							</p>
 						</div>
 					)}

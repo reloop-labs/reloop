@@ -87,7 +87,9 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 	const subActiveIndex = isOnContactsSubPage
 		? contactsSubNav.findIndex((item) => pathWithoutSlug.startsWith(item.path))
 		: isOnSettingsSubPage
-			? settingsSubNav.findIndex((item) => pathWithoutSlug.startsWith(item.path))
+			? settingsSubNav.findIndex((item) =>
+					pathWithoutSlug.startsWith(item.path),
+				)
 			: -1;
 
 	// The single "current" element: hovered takes priority, otherwise the active one
@@ -105,7 +107,13 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 		} else {
 			setRect(undefined);
 		}
-	}, [currentEl, isCollapsed, pathname, isContactsExpanded, isSettingsExpanded]);
+	}, [
+		currentEl,
+		isCollapsed,
+		pathname,
+		isContactsExpanded,
+		isSettingsExpanded,
+	]);
 
 	return (
 		// Single relative container — the animated pill lives here and nowhere else

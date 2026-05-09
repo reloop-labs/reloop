@@ -72,7 +72,9 @@ export const MainSidebar: React.FC = () => {
 			<div className="flex-1 overflow-y-auto p-2">
 				<SidebarItems isCollapsed={isSidebarCollapsed} />
 			</div>
-			<UserMenuDropdown user={user} isCollapsed={isSidebarCollapsed} />
+			<div className="mx-3 my-3">
+				<UserMenuDropdown user={user} isCollapsed={isSidebarCollapsed} />
+			</div>
 		</div>
 	);
 };
