@@ -1,5 +1,6 @@
 import { log } from "evlog";
 import { mailConfig } from "../mail.config";
+import { MailErrors } from "./errors";
 
 export interface KumomtaHttpConfig {
 	baseUrl: string;
@@ -113,9 +114,7 @@ export class KumomtaClient {
 
 			if (!response.ok) {
 				const errorBody = await response.text();
-				throw new Error(
-					`KumoMTA injection failed (${response.status}): ${errorBody}`,
-				);
+				throw MailErrors.kumoMtaError(response.status, errorBody);
 			}
 
 			const result = await response.json();

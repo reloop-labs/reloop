@@ -1,3 +1,4 @@
+import { MailErrors } from "@reloop/be-mailing/lib/errors";
 import { db } from "@reloop/db/client";
 import { emailLog } from "@reloop/db/schema";
 
@@ -35,7 +36,7 @@ export async function createEmailLog_step4({
 		.returning({ id: emailLog.id });
 
 	if (!logRecord) {
-		throw new Error("Failed to create email log record");
+		throw MailErrors.databaseError("Failed to create email log record");
 	}
 
 	return { emailLogId: logRecord.id };

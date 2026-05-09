@@ -81,3 +81,48 @@ export const AuthErrors = {
 			fix: fix ?? "Check your credentials and try again",
 		}),
 };
+
+export const MailErrors = {
+	domainNotFound: (domainName: string) =>
+		createError({
+			status: 404,
+			message: "Domain not found",
+			why: `The domain ${domainName} was not found or is not authorized for your organization`,
+			fix: "Ensure the domain is registered and verified in your dashboard",
+		}),
+	dnsHealthError: (domainName: string, missingRecords: string[]) =>
+		createError({
+			status: 400,
+			message: "DNS health check failed",
+			why: `Domain ${domainName} is missing required DNS records: ${missingRecords.join(", ")}`,
+			fix: "Update your DNS configuration with the required SPF, DKIM, and DMARC records",
+		}),
+	invalidFromAddress: (from: string) =>
+		createError({
+			status: 400,
+			message: "Invalid sender address",
+			why: `The address '${from}' is not a valid email format`,
+			fix: "Provide a valid email address in the 'from' field (e.g., user@example.com)",
+		}),
+	templateNotFound: (templateId: string) =>
+		createError({
+			status: 404,
+			message: "Template not found",
+			why: `The template with ID ${templateId} was not found or is not authorized for your organization`,
+			fix: "Verify the template ID and ensure it exists and is not deleted",
+		}),
+	kumoMtaError: (status: number, body: string) =>
+		createError({
+			status: 500,
+			message: "Failed to transmit email",
+			why: `KumoMTA server rejected the request with status ${status}: ${body}`,
+			fix: "Check the mailing service logs and ensure KumoMTA is healthy",
+		}),
+	databaseError: (message: string) =>
+		createError({
+			status: 500,
+			message: "Database operation failed",
+			why: message,
+			fix: "Please try again later or contact support if the issue persists",
+		}),
+};

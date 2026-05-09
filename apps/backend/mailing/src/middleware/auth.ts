@@ -1,7 +1,7 @@
 import { Elysia } from "elysia";
 import { parseError } from "evlog";
 import { evlog } from "evlog/elysia";
-import { AuthErrors, MailingError } from "../lib/errors";
+import { AuthErrors, MailingError } from "@reloop/be-mailing/lib/errors";
 import { mailConfig } from "../mail.config";
 import { validateApiKey } from "./api-key-auth";
 import { validateSession } from "./cookie-auth";

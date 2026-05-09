@@ -1,4 +1,4 @@
-import { DNSHealthError } from "@reloop/be-mailing/lib/errors";
+import { MailErrors } from "@reloop/be-mailing/lib/errors";
 import type { MailModel } from "@reloop/be-mailing/model/mail.model";
 import { useLogger } from "evlog/elysia";
 import {
@@ -46,7 +46,7 @@ export async function sendEmailController({
 	});
 
 	if (!dnsHealthCheck.isHealthy) {
-		throw new DNSHealthError(domainName, dnsHealthCheck.missingRecords);
+		throw MailErrors.dnsHealthError(domainName, dnsHealthCheck.missingRecords);
 	}
 
 	// Step 4: Create initial log

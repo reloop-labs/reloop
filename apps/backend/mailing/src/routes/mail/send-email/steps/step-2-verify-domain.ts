@@ -1,4 +1,4 @@
-import { DomainNotFoundError } from "@reloop/be-mailing/lib/errors";
+import { MailErrors } from "@reloop/be-mailing/lib/errors";
 import { db } from "@reloop/db/client";
 import { domain } from "@reloop/db/schema";
 import { and, eq } from "drizzle-orm";
@@ -25,7 +25,7 @@ export async function verifyDomainAuth_step2({
 		.limit(1);
 
 	if (domainRecord.length === 0 || !domainRecord[0]) {
-		throw new DomainNotFoundError(domainName);
+		throw MailErrors.domainNotFound(domainName);
 	}
 
 	return { currentDomain: domainRecord[0] };
