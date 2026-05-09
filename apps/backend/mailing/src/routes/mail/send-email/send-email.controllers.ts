@@ -5,6 +5,7 @@ import {
 	checkDnsHealth_step3,
 	createEmailLog_step4,
 	finalizeEmail_step7,
+	injectTracking_step5b,
 	parseFromAddress_step1,
 	resolveTemplate_step5,
 	sendEmail_step6,
@@ -64,10 +65,18 @@ export async function sendEmailController({
 	});
 
 
+	// Step 5b: Rewrite links and inject open pixel based on domain tracking flags
+	const trackedHtml = injectTracking_step5b({
+		html: finalHtml,
+		emailLogId,
+		clickTracking: currentDomain.clickTracking,
+		openTracking: currentDomain.openTracking,
+	});
+
 	const result = await sendEmail_step6({
 		body,
 		finalSubject,
-		finalHtml,
+		finalHtml: trackedHtml,
 		finalText,
 		organizationId,
 		domainId: currentDomain.id,
