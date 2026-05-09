@@ -190,8 +190,15 @@ export const TeamList = ({ searchQuery, filters = "all" }: TeamListProps) => {
 			}
 		}
 
-		return { members: filteredMembers, invites: filteredInvites };
-	}, [membersData, invites, searchQuery, filters]);
+		// Ensure current user is always at the top
+		const sortedMembers = [...filteredMembers].sort((a, b) => {
+			if (a.user.id === currentUserId) return -1;
+			if (b.user.id === currentUserId) return 1;
+			return 0;
+		});
+
+		return { members: sortedMembers, invites: filteredInvites };
+	}, [membersData, invites, searchQuery, filters, currentUserId]);
 
 	const handleRemoveMember = async (memberId: string) => {
 		setRemovingMember(memberId);
@@ -452,6 +459,7 @@ export const TeamList = ({ searchQuery, filters = "all" }: TeamListProps) => {
 									className={cn(
 										`group/row grid ${GRID} items-center px-4 py-2 transition-colors`,
 										"hover:bg-bg-weak-50/50",
+										isCurrentUser && "bg-bg-weak-50/40",
 									)}
 								>
 									{/* User Column */}
@@ -488,7 +496,7 @@ export const TeamList = ({ searchQuery, filters = "all" }: TeamListProps) => {
 													{member.user.name || member.user.email.split("@")[0]}
 												</span>
 												{isCurrentUser && (
-													<span className="inline-flex flex-shrink-0 rounded-full border border-stroke-soft-200 bg-neutral-alpha-10 px-[6px] font-medium text-[10px] text-text-sub-600">
+													<span className="inline-flex flex-shrink-0 items-center rounded-full bg-primary-base px-1.5 py-0.5 font-bold text-[9px] text-white uppercase leading-none tracking-wider">
 														You
 													</span>
 												)}
