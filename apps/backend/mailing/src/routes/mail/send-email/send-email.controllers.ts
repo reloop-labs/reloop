@@ -1,4 +1,5 @@
-import type { MailModel } from "@reloop/be-mailing/model/mail.model.js";
+import { DNSHealthError } from "@reloop/be-mailing/lib/errors";
+import type { MailModel } from "@reloop/be-mailing/model/mail.model";
 import { useLogger } from "evlog/elysia";
 import {
 	checkDnsHealth_step3,
@@ -22,11 +23,12 @@ export async function sendEmailController({
 	body: MailModel.SendEmailBody;
 }): Promise<MailModel.SendEmailResponse> {
 	const logger = useLogger();
-	logger.info("Initiating email send process", {
+	logger.set({
 		organizationId,
 		from: body.from,
 		to: body.to,
 	});
+	logger.info("Initiating email send process");
 
 	// Step 1: Parse 'from' address
 	const { domainName } = parseFromAddress_step1(body.from);
@@ -44,9 +46,7 @@ export async function sendEmailController({
 	});
 
 	if (!dnsHealthCheck.isHealthy) {
-		throw new Error(
-			`Domain ${domainName} has invalid DNS records: ${dnsHealthCheck.missingRecords.join(", ")}`,
-		);
+		throw new DNSHealthError(domainName, dnsHealthCheck.missingRecords);
 	}
 
 	// Step 4: Create initial log

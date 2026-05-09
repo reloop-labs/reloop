@@ -4,6 +4,7 @@ import { serverTiming } from "@elysiajs/server-timing";
 import { landing } from "@reloop/be-mailing/routes/landing/landing.index.js";
 import { mailRoutes } from "@reloop/be-mailing/routes/mail/mail.routes.js";
 import { loader } from "@reloop/be-mailing/utils/loader.js";
+import { errorMiddleware } from "./middleware/error";
 
 import { Elysia } from "elysia";
 import { initLogger, log } from "evlog";
@@ -40,33 +41,7 @@ const mailService = new Elysia({
 	.use(serverTiming())
 	.use(landing)
 	.use(mailRoutes)
-	.onError(({ code, error, set, log }) => {
-		const message = error instanceof Error ? error.message : String(error);
-
-		if (code === "VALIDATION") {
-			log?.warn("Validation error", {
-				message,
-				error: error.message,
-			});
-			set.status = 422;
-			return { message: error.message };
-		}
-
-		if (message.includes("not found") || message.includes("not authorized")) {
-			log?.warn("Resource not found or unauthorized", { message });
-			set.status = 404;
-			return { message };
-		}
-
-		log?.error("Unhandled error", {
-			code,
-			message,
-			stack: error instanceof Error ? error.stack : undefined,
-		});
-
-		set.status = 500;
-		return { message: "Internal server error" };
-	})
+	.use(errorMiddleware)
 	.onStart(async () => {
 		await loader();
 	})
