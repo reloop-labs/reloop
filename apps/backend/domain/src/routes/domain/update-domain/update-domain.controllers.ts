@@ -1,7 +1,8 @@
+import { DomainErrors } from "@be/domain/lib/errors";
 import type { DomainTypes } from "@be/domain/types/domain.type";
+import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { DomainErrors } from "@be/domain/lib/errors";
 import { DOMAIN_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
@@ -86,10 +87,10 @@ export async function updateDomainController({
 			event: DOMAIN_UPDATE_WEBHOOK_EVENT.id,
 		};
 
-		logger.info("Domain updated successfully", {
+		await bus.publish(BusEvent.DOMAIN_UPDATED, {
 			domainId,
 			domain: updatedDomain.domain,
-			event: DOMAIN_UPDATE_WEBHOOK_EVENT.id,
+			organizationId,
 		});
 
 		return finalDomain;

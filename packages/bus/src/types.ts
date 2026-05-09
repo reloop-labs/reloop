@@ -21,6 +21,26 @@ export interface DomainVerifiedPayload {
 	domain: string;
 	organizationId: string;
 }
+export interface DomainCreatedPayload {
+	domainId: string;
+	domain: string;
+	organizationId: string;
+}
+export interface DomainUpdatedPayload {
+	domainId: string;
+	domain: string;
+	organizationId: string;
+}
+export interface DomainDeletedPayload {
+	domainId: string;
+	domain: string;
+	organizationId: string;
+}
+export interface DomainUndeletedPayload {
+	domainId: string;
+	domain: string;
+	organizationId: string;
+}
 
 export interface WebhookTriggeredPayload {
 	webhookId: string;
@@ -137,6 +157,10 @@ export interface EventPayloads {
 	[BusEvent.USER_UPDATED]: UserUpdatedPayload;
 	[BusEvent.USER_DELETED]: UserDeletedPayload;
 	[BusEvent.DOMAIN_VERIFIED]: DomainVerifiedPayload;
+	[BusEvent.DOMAIN_CREATED]: DomainCreatedPayload;
+	[BusEvent.DOMAIN_UPDATED]: DomainUpdatedPayload;
+	[BusEvent.DOMAIN_DELETED]: DomainDeletedPayload;
+	[BusEvent.DOMAIN_UNDELETED]: DomainUndeletedPayload;
 	[BusEvent.DOMAIN_DNS_REVERIFICATION_REQUESTED]: DomainDnsReverificationRequestedPayload;
 	[BusEvent.WEBHOOK_TRIGGERED]: WebhookTriggeredPayload;
 	[BusEvent.EMAIL_SENT]: EmailSentPayload;

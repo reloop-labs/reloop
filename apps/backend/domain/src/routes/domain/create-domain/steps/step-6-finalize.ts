@@ -1,5 +1,6 @@
 import { DomainErrors } from "@be/domain/lib/errors";
 import type { DomainTypes } from "@be/domain/types/domain.type";
+import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { DOMAIN_CREATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -37,10 +38,10 @@ export async function finalizeDomainCreation_step6({
 		);
 	}
 
-	logger.info("Domain created successfully", {
-		domainWithDnsRecords,
-		event: DOMAIN_CREATE_WEBHOOK_EVENT.id,
-		metadata: { domain, domainId },
+	await bus.publish(BusEvent.DOMAIN_CREATED, {
+		domainId,
+		domain,
+		organizationId,
 	});
 
 	return {

@@ -6,6 +6,10 @@ export enum BusEvent {
 
 	// Domain Events
 	DOMAIN_VERIFIED = "domain.verified",
+	DOMAIN_CREATED = "domain.created",
+	DOMAIN_UPDATED = "domain.updated",
+	DOMAIN_DELETED = "domain.deleted",
+	DOMAIN_UNDELETED = "domain.undelete",
 	DOMAIN_DNS_REVERIFICATION_REQUESTED = "domain.dns_reverification.requested",
 
 	// Webhook Events

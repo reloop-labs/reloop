@@ -1,5 +1,6 @@
 import { DomainErrors } from "@be/domain/lib/errors";
 import type { DomainTypes } from "@be/domain/types/domain.type";
+import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { DOMAIN_UNDELETE_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -75,10 +76,10 @@ export async function handleUndelete_step2({
 		if (!undeletedDomain) {
 			throw DomainErrors.failedToUndelete(domain);
 		}
-		logger.info("Domain undeleted successfully", {
+		await bus.publish(BusEvent.DOMAIN_UNDELETED, {
 			domainId,
 			domain,
-			event: DOMAIN_UNDELETE_WEBHOOK_EVENT.id,
+			organizationId,
 		});
 
 		return {

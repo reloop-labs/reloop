@@ -1,3 +1,4 @@
+import { bus, BusEvent } from "@reloop/bus";
 import type { DomainTypes } from "@be/domain/types/domain.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
@@ -73,10 +74,10 @@ export async function deleteDomainController({
 			event: DOMAIN_DELETE_WEBHOOK_EVENT.id,
 		};
 
-		logger.info("Domain deleted successfully", {
+		await bus.publish(BusEvent.DOMAIN_DELETED, {
 			domainId,
 			domain: domainWithDnsRecords.domain,
-			event: DOMAIN_DELETE_WEBHOOK_EVENT.id,
+			organizationId,
 		});
 
 		return finalDomain;
