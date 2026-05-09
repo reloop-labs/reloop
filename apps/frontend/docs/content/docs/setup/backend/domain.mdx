@@ -1,187 +1,204 @@
 ---
-title: Domain
-description: Learn how to set up and run the Reloop Domain Service for managing domains, DNS records, and email authentication.
+title: Domain Service
+description: Configure custom domains, generate DNS records (SPF, DKIM, DMARC), and verify domain ownership for email sending through Reloop.
 ---
 
-# Domain Service
-
-> Manages domain configuration, DNS record generation (SPF, DKIM, DMARC), and domain verification for email sending. This service helps users configure their existing domains to send emails through Reloop.
-
-<Callout type="info" title="Prerequisite">
-Make sure you've completed the [local setup guide](/setup) first (clone repo, install Bun, and set up dependencies). You also need PostgreSQL and Redis running.
+<Callout type="info" title="Before you start">
+  Complete the [local setup guide](/setup) first — clone the repo, install Bun, and get PostgreSQL and Redis running.
 </Callout>
 
-## Service Info
+## Overview
 
-| Property      | Value                                                          |
-| ------------- | -------------------------------------------------------------- |
-| **API Base URL** | [https://local.reloop.sh/api/domain](https://local.reloop.sh/api/domain) |
-| **API Docs**  | [https://local.reloop.sh/api/domain/openapi](https://local.reloop.sh/api/domain/openapi) |
-| **Default Port** | `8011`                                                         |
-| **Location**  | `/apps/backend/domain`                                         |
-| **Dependency** | `auth`                                                         |
+The Domain Service handles everything needed to send email from a custom domain: DNS record generation, domain verification, and ongoing status tracking. When a user adds their domain, this service creates the MX, SPF, DKIM, and DMARC records they need to configure, then verifies those records are live.
 
+---
 
-### Environment Variables Reference
+## Quick reference
 
-All environment variables are accessed through `domainConfig` and have default values defined in `apps/backend/domain/src/domain.config.ts`.
+| Property | Value |
+|---|---|
+| `Port` | `8011` |
+| `API base URL` | <a href="https://local.reloop.sh/api/domain" target="_blank" rel="noopener noreferrer">`https://local.reloop.sh/api/domain`</a> |
+| `OpenAPI spec` | <a href="https://local.reloop.sh/api/domain/openapi" target="_blank" rel="noopener noreferrer">`https://local.reloop.sh/api/domain/openapi`</a> |
+| `Location` | `/apps/backend/domain` |
+| `Config` | `apps/backend/domain/src/domain.config.ts` |
 
-| Variable                      | Status      | Default                                                      |
-| ----------------------------- | ----------- | ------------------------------------------------------------ |
-| `PG_URL`                      | `optional`  | `postgresql://reloop:reloop123@localhost:5432/reloop`        |
-| `REDIS_URL`                   | `optional`  | `redis://:reloop123@localhost:6379`                          |
-| `BASE_URL`                    | `optional`  | `https://local.reloop.sh`                                       |
-| `NODE_ENV`                    | `optional`  | `development`                                                |
-| `PORT`                        | `optional`  | `8011`                                                       |
-| `NODE_TLS_REJECT_UNAUTHORIZED` | `optional` | `0` (automatically set to `0` in non-production environments) |
+---
 
-
-### Start the Service
+## Start the service
 
 ```bash
 bun run --filter=domain dev
 ```
 
-**Expected output:**
-```
-Domain Server is running on http://localhost:8011/api/domain
-Redis connected
-Postgres connected
-```
-### Verify Service is Running
+### Health checks
+
+Check the health status in your browser <a href="https://local.reloop.sh/api/domain/health" target="_blank" rel="noopener noreferrer">`https://local.reloop.sh/api/domain/health`</a>
 
 ```bash
-# Check health endpoint
-curl http://localhost:8011/api/domain/
-
-# Check Redis health
-curl http://localhost:8011/api/domain/health/redis
-
-# Check Postgres health
-curl http://localhost:8011/api/domain/health/postgres
+curl https://local.reloop.sh/api/domain/health
 ```
 
-**Expected response:** Service status with ASCII art showing database connections.
+```json
+{
+  "status": "CONNECTED",
+  "success": true,
+  "responseTime": "22ms",
+  "timestamp": "2026-05-09T18:21:07.995Z"
+}
+```
+
 
 ---
 
-## Database Schema
+## Environment variables
 
-The domain service uses two main tables to store domain and DNS record information. The schema is defined in `packages/db/src/schema/domain.ts`.
+All variables are optional and fall back to the defaults below. Access them through `domainConfig` defined in `domain.config.ts`.
+
+| Variable | Default |
+|---|---|
+| `PORT` | `8011` |
+| `NODE_ENV` | `development` |
+| `PG_URL` | `postgresql://reloop:reloop123@localhost:5432/reloop` |
+| `REDIS_URL` | `redis://:reloop123@localhost:6379` |
+| `BASE_URL` | `https://local.reloop.sh` |
+| `NODE_TLS_REJECT_UNAUTHORIZED` | `0` (auto-set in non-production) |
+| `HOST_DOMAIN` | `reloop.sh` |
+| `DKIM_SELECTOR` | `reloop` |
+| `NATS_URL` | `nats://localhost:4222` |
+
+---
+
+## Database schema
+
+Schema lives in `packages/db/src/schema/domain.ts`. Two tables: `domain` and `domain_dns_record`.
 
 ### Enums
 
-The schema defines four enums used across the domain tables:
+| Enum | Values |
+|---|---|
+| `domain_type` | `custom` · `subdomain` · `system` |
+| `domain_status` | `start-verify` · `verifying` · `active` · `suspended` · `failed` |
+| `dns_record_type` | `A` · `AAAA` · `CNAME` · `MX` · `TXT` |
+| `dns_record_type_name` | `MX` · `SPF` · `DKIM` · `DMARC` |
+| `tls_mode` | `opportunistic` · `enforced` |
 
-| Enum | Values | Description |
-|------|--------|-------------|
-| **Domain Type** (`domain_type`) | `custom`, `subdomain`, `system` | Type of domain: `custom` = user's own domain, `subdomain` = subdomain of user's domain, `system` = system-managed domain |
-| **Domain Status** (`domain_status`) | `start-verify`, `verifying`, `active`, `suspended`, `failed` | Verification and operational status of the domain |
-| **DNS Record Type** (`dns_record_type`) | `A`, `AAAA`, `CNAME`, `MX`, `TXT` | Standard DNS record types (RFC-compliant) |
-| **DNS Record Type Name** (`dns_record_type_name`) | `MX`, `SPF`, `DKIM`, `DMARC` | Semantic classification for email authentication records |
+**`domain_type`** — `custom` is a domain the user owns, `subdomain` is a subdomain of their domain, `system` is Reloop-managed.
 
-**DNS Record Type:**
-- `A`: IPv4 address record
-- `AAAA`: IPv6 address record
-- `CNAME`: Canonical name record (alias)
-- `MX`: Mail exchange record (email routing)
-- `TXT`: Text record (used for SPF, DKIM, DMARC)
+**`domain_status`** — tracks the full verification lifecycle from `start-verify` through `active` or `failed`.
 
-**DNS Record Type Name:**
-- `MX`: Mail exchange record
-- `SPF`: Sender Policy Framework record (stored as TXT)
-- `DKIM`: DomainKeys Identified Mail record (stored as TXT)
-- `DMARC`: Domain-based Message Authentication record (stored as TXT)
+**`dns_record_type_name`** — semantic classification for email auth records. SPF, DKIM, and DMARC are all stored as `TXT` records under the hood.
 
-### Domain Table
+**`tls_mode`** — `opportunistic` attempts TLS but falls back to plaintext; `enforced` requires TLS for all connections.
 
-The `domain` table stores domain information and verification status.
+### `domain` table
 
-| Column | Type | Constraints | Default |
-|--------|------|-------------|---------|
-| `id` | `text` | Primary Key | `domain_{cuid}` |
-| `domain` | `varchar(255)` | Not Null | - |
-| `organizationId` | `text` | Not Null, FK → `organization.id` | - |
-| `userId` | `text` | Not Null, FK → `user.id` | - |
-| `domainType` | `domain_type` enum | Not Null | `custom` |
-| `status` | `domain_status` enum | Not Null | `start-verify` |
-| `userVerified` | `boolean` | Not Null | `false` |
-| `systemVerified` | `boolean` | Not Null | `false` |
-| `trackingDomain` | `boolean` | Not Null | `false` |
-| `verificationFailedReason` | `text` | Nullable | - |
-| `deletedAt` | `timestamp` | Nullable | - |
-| `lastVerifiedAt` | `timestamp` | Nullable | - |
-| `createdAt` | `timestamp` | Not Null | `now()` |
-| `updatedAt` | `timestamp` | Not Null | `now()` |
+Stores domain configuration and verification state.
 
-**Key Constraints:**
-- Unique constraint on `(organizationId, domain)` - prevents duplicate domains per organization
-- Foreign keys cascade delete to `organization` and `user` tables
+| Column | Type | Default | Notes |
+|---|---|---|---|
+| `id` | `text` | `domain_{cuid}` | Primary key |
+| `domain` | `varchar(255)` | — | Required |
+| `organizationId` | `text` | — | FK → `organization.id` |
+| `userId` | `text` | — | FK → `user.id` |
+| `domainType` | `domain_type` | `custom` | |
+| `status` | `domain_status` | `start-verify` | |
+| `userVerified` | `boolean` | `false` | User confirmed DNS records are set |
+| `systemVerified` | `boolean` | `false` | Reloop confirmed DNS records are live |
+| `customReturnPath` | `varchar(255)` | `inbound` | Custom subdomain for bounce tracking |
+| `clickTracking` | `boolean` | `false` | Enable/disable link click tracking |
+| `openTracking` | `boolean` | `false` | Enable/disable email open tracking |
+| `tls` | `tls_mode` | `opportunistic` | Minimum TLS version for sending |
+| `sendingEmail` | `boolean` | `true` | Enable/disable outbound mail |
+| `receivingEmail` | `boolean` | `true` | Enable/disable inbound mail (forwarding) |
+| `verificationFailedReason` | `text` | `null` | Populated on failure |
+| `deletedAt` | `timestamp` | `null` | Soft delete |
+| `lastVerifiedAt` | `timestamp` | `null` | |
+| `createdAt` | `timestamp` | `now()` | |
+| `updatedAt` | `timestamp` | `now()` | |
 
-### Domain DNS Record Table
+**Constraints:**
+- Unique on `(organizationId, domain)` — no duplicate domains per org
+- Cascade delete from `organization` and `user`
 
-The `domain_dns_record` table stores individual DNS records associated with domains.
+### `domain_dns_record` table
 
-| Column | Type | Constraints | Default |
-|--------|------|-------------|---------|
-| `id` | `text` | Primary Key | `dns_{cuid}` |
-| `domainId` | `text` | Not Null, FK → `domain.id` | - |
-| `organizationId` | `text` | Not Null, FK → `organization.id` | - |
-| `userId` | `text` | Not Null, FK → `user.id` | - |
-| `recordType` | `dns_record_type` enum | Not Null | - |
-| `recordTypeName` | `dns_record_type_name` enum | Not Null | - |
-| `name` | `text` | Not Null | - |
-| `status` | `domain_status` enum | Not Null | `start-verify` |
-| `value` | `text` | Not Null | - |
-| `ttl` | `string` | Not Null | `Auto` |
-| `priority` | `integer` | Nullable | - |
-| `domain` | `text` | Not Null | - |
-| `privateKey` | `text` | Nullable | - |
-| `verificationError` | `text` | Nullable | - |
-| `deletedAt` | `timestamp` | Nullable | - |
-| `createdAt` | `timestamp` | Not Null | `now()` |
-| `updatedAt` | `timestamp` | Not Null | `now()` |
+One row per DNS record required for a domain. A domain typically gets four records: MX, SPF, DKIM, and DMARC.
 
-**Key Constraints:**
-- Unique constraint on `(domainId, recordType, name, value)` - prevents duplicate records
-- Foreign keys cascade delete to `domain`, `organization`, and `user` tables
+| Column | Type | Default | Notes |
+|---|---|---|---|
+| `id` | `text` | `dns_{cuid}` | Primary key |
+| `domainId` | `text` | — | FK → `domain.id` |
+| `organizationId` | `text` | — | FK → `organization.id` |
+| `userId` | `text` | — | FK → `user.id` |
+| `recordType` | `dns_record_type` | — | `A`, `CNAME`, `MX`, `TXT`, etc. |
+| `recordTypeName` | `dns_record_type_name` | — | `MX`, `SPF`, `DKIM`, or `DMARC` |
+| `name` | `text` | — | DNS record name / host |
+| `value` | `text` | — | DNS record value |
+| `status` | `domain_status` | `start-verify` | Per-record verification status |
+| `ttl` | `string` | `Auto` | |
+| `priority` | `integer` | `null` | MX records only |
+| `domain` | `text` | — | Parent domain string |
+| `fqdn` | `text` | — | Fully qualified domain name |
+| `privateKey` | `text` | `null` | DKIM only — 2048-bit RSA private key |
+| `verificationError` | `text` | `null` | Populated when a record check fails |
+| `deletedAt` | `timestamp` | `null` | Soft delete |
+| `createdAt` | `timestamp` | `now()` | |
+| `updatedAt` | `timestamp` | `now()` | |
+
+**Constraints:**
+- Unique on `(domainId, recordType, name, value)` — no duplicate records
+- Cascade delete from `domain`, `organization`, and `user`
 
 ### Relationships
 
-- **Domain → Organization**: Many-to-one (domain belongs to one organization)
-- **Domain → User**: Many-to-one (domain created by one user)
-- **Domain → DNS Records**: One-to-many (domain has many DNS records)
-- **DNS Record → Domain**: Many-to-one (DNS record belongs to one domain)
-- **DNS Record → Organization**: Many-to-one (DNS record belongs to one organization)
-- **DNS Record → User**: Many-to-one (DNS record created by one user)
+- **Organization ↔ Domain**: An organization can have multiple domains configured for email sending.
+- **Domain ↔ DNS Record**: Each domain generates a set of DNS records (MX, SPF, DKIM, DMARC) for verification.
+- **Direct Links**: Both tables carry `organizationId` and `userId` for simplified querying and clear audit trails.
 
 ---
 
-### DNS Related Details
+## DNS records
 
-**MX Record:**
-- Type: `MX`
-- Name: `send.example.com`
-- Value: `mail.reloop.sh`
-- Priority: `10`
-- **Purpose:** Tells email servers where to deliver incoming emails
+When a domain is added, the service generates four records the user must add to their DNS provider. All records use `send.example.com` as the sending subdomain.
 
-**SPF Record:**
-- Type: `TXT`
-- Name: `send.example.com`
-- Value: `v=spf1 include:mail.reloop.sh -all`
-- **Purpose:** Authorizes mail.reloop.sh to send emails on behalf of the domain
+### MX
 
-**DKIM Record:**
-- Type: `TXT`
-- Name: `reloop._domainkey.send.example.com`
-- Value: `v=DKIM1; k=rsa; p=[public key]`
-- **Purpose:** Provides public key for email signature verification
-- **How it's generated:** Creates 2048-bit RSA key pair, stores private key, publishes public key
+```
+Type:     MX
+Name:     send.example.com
+Value:    mail.reloop.sh
+Priority: 10
+```
 
-**DMARC Record:**
-- Type: `TXT`
-- Name: `_dmarc.send.example.com`
-- Value: `v=DMARC1; p=none;`
-- **Purpose:** Sets email authentication policy (monitor mode)
+Routes incoming email (bounces, replies) to Reloop's mail servers.
 
+### SPF
+
+```
+Type:  TXT
+Name:  send.example.com
+Value: v=spf1 include:mail.reloop.sh -all
+```
+
+Authorizes `mail.reloop.sh` to send on behalf of the domain. The `-all` means any other sender will fail.
+
+### DKIM
+
+```
+Type:  TXT
+Name:  reloop._domainkey.send.example.com
+Value: v=DKIM1; k=rsa; p=<public key>
+```
+
+A 2048-bit RSA key pair is generated on domain creation. The private key is stored in `domain_dns_record.privateKey`; the public key is published here so receiving servers can verify the signature on outbound mail.
+
+### DMARC
+
+```
+Type:  TXT
+Name:  _dmarc.send.example.com
+Value: v=DMARC1; p=none;
+```
+
+Sets the email authentication policy to monitor mode (`p=none`). No mail is rejected at this stage — useful while verifying alignment before moving to stricter policies.
