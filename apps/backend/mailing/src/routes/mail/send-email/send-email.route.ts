@@ -1,17 +1,15 @@
 import { authMiddleware } from "@reloop/be-mailing/middleware/auth";
 import { MailModel } from "@reloop/be-mailing/model/mail.model.js";
-import type { MailTypes } from "@reloop/be-mailing/types/mail.type.js";
-import { type Logger, logger } from "@reloop/logger";
 import { Elysia } from "elysia";
 import { sendEmailController } from "./send-email.controllers";
 
 export const sendEmailRoute = new Elysia().use(authMiddleware).post(
 	"/send",
-	async ({ body, activeOrganizationId, logger: contextLogger }) => {
+	async ({ body, activeOrganizationId, logger }) => {
 		return await sendEmailController({
 			organizationId: activeOrganizationId,
-			body: body as MailTypes.SendEmailRequest,
-			logger: (contextLogger as Logger) || logger,
+			body,
+			logger,
 		});
 	},
 	{
