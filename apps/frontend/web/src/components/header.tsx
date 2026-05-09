@@ -60,8 +60,9 @@ export const Header = () => {
 		return () => window.removeEventListener("scroll", handleScroll);
 	}, []);
 
-	// Light mode for /company/* pages (white top fold)
-	const isLight = pathname.startsWith("/company");
+	// Light mode for pages with white top fold
+	const isLight =
+		pathname.startsWith("/company") || pathname.startsWith("/philosophy");
 
 	return (
 		<header className="fixed top-0 right-0 left-0 z-50 flex justify-center p-4 transition-all duration-500">
