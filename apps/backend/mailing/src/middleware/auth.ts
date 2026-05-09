@@ -1,9 +1,7 @@
-import {
-	MailingError,
-	UnauthorizedError,
-} from "@reloop/be-mailing/lib/errors";
 import { Elysia } from "elysia";
+import { parseError } from "evlog";
 import { evlog } from "evlog/elysia";
+import { AuthErrors, MailingError } from "../lib/errors";
 import { mailConfig } from "../mail.config";
 import { validateApiKey } from "./api-key-auth";
 import { validateSession } from "./cookie-auth";
@@ -14,13 +12,24 @@ if (mailConfig.NODE_ENV !== "production") {
 
 export const authMiddleware = new Elysia({ name: "auth-middleware" })
 	.use(evlog())
+	.onError(({ error, set }) => {
+		const parsed = parseError(error);
+		set.status = parsed.status;
+		return {
+			message: parsed.message,
+			why: parsed.why,
+			fix: parsed.fix,
+			link: parsed.link,
+		};
+	})
 	.macro({
 		cookieAuth: {
-			async resolve({ status, request: { headers }, log }) {
+			async resolve({ request: { headers }, log }) {
+				const traceId = crypto.randomUUID();
+				log.set({ traceId });
+
 				try {
 					const cookie = headers.get("cookie");
-					const traceId = crypto.randomUUID();
-					log.set({ traceId });
 					const sessionResult = await validateSession(cookie);
 					if (sessionResult) {
 						log.set({
@@ -32,34 +41,34 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 						});
 						return { ...sessionResult, traceId, logger: log };
 					}
-					return status(401, {
-						error: "Unauthorized",
-						code: "UNAUTHORIZED",
-					});
 				} catch (e) {
 					if (e instanceof MailingError) {
-						return status(e.status, {
-							error: e.message,
-							code: e.code,
-						});
+						throw AuthErrors.authenticationFailed(
+							e.message,
+							"Authentication failed due to a mailing service error",
+						);
 					}
 					log.error("Authentication error", {
 						error: e instanceof Error ? e.message : "Unknown error",
 						stack: e instanceof Error ? e.stack : undefined,
 					});
-					return status(401, {
-						error: "Authentication failed",
-						code: "UNAUTHORIZED",
-					});
+					throw AuthErrors.authenticationFailed(
+						e instanceof Error
+							? e.message
+							: "Unknown error during authentication",
+					);
 				}
+
+				throw AuthErrors.unauthorized("No valid session cookie found");
 			},
 		},
 		apiKeyAuth: {
-			async resolve({ status, request: { headers }, log }) {
+			async resolve({ request: { headers }, log }) {
+				const traceId = crypto.randomUUID();
+				log.set({ traceId, service: "mailing" });
+
 				try {
 					const apiKey = headers.get("x-api-key");
-					const traceId = crypto.randomUUID();
-					log.set({ traceId, service: "mail" });
 					const apiKeyResult = await validateApiKey(apiKey);
 					if (apiKeyResult) {
 						log.set({
@@ -70,38 +79,40 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 						log.info("API key authentication successful");
 						return { ...apiKeyResult, traceId, logger: log };
 					}
-					return status(401, {
-						error: "Unauthorized",
-						code: "UNAUTHORIZED",
-					});
 				} catch (e) {
 					if (e instanceof MailingError) {
-						return status(e.status, {
-							error: e.message,
-							code: e.code,
-						});
+						throw AuthErrors.authenticationFailed(
+							e.message,
+							"API key validation failed due to a mailing service error",
+						);
 					}
 					log.error("Authentication error", {
 						error: e instanceof Error ? e.message : "Unknown error",
 						stack: e instanceof Error ? e.stack : undefined,
 					});
-					return status(401, {
-						error: "Authentication failed",
-						code: "UNAUTHORIZED",
-					});
+					throw AuthErrors.authenticationFailed(
+						e instanceof Error
+							? e.message
+							: "Unknown error during API key validation (Internal server error)",
+					);
 				}
+
+				throw AuthErrors.unauthorized(
+					"No valid API key found in x-api-key header",
+				);
 			},
 			detail: {
 				security: [{ apiKey: [] }],
 			},
 		},
 		auth: {
-			async resolve({ status, request: { headers }, log }) {
+			async resolve({ request: { headers }, log }) {
+				const traceId = crypto.randomUUID();
+				log.set({ traceId, service: "mail" });
+
 				try {
 					const apiKey = headers.get("x-api-key");
 					const cookie = headers.get("cookie");
-					const traceId = crypto.randomUUID();
-					log.set({ traceId, service: "mail" });
 					const apiKeyResult = await validateApiKey(apiKey);
 					if (apiKeyResult) {
 						log.set({
@@ -122,26 +133,26 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 						log.info("Session authentication successful");
 						return { ...sessionResult, traceId, logger: log };
 					}
-					return status(401, {
-						error: "Unauthorized",
-						code: "UNAUTHORIZED",
-					});
 				} catch (e) {
 					if (e instanceof MailingError) {
-						return status(e.status, {
-							error: e.message,
-							code: e.code,
-						});
+						throw AuthErrors.authenticationFailed(
+							e.message,
+							"Authentication failed due to a mailing service error",
+						);
 					}
 					log.error("Authentication error", {
 						error: e instanceof Error ? e.message : "Unknown error",
 						stack: e instanceof Error ? e.stack : undefined,
 					});
-					return status(401, {
-						error: "Authentication failed",
-						code: "UNAUTHORIZED",
-					});
+					throw AuthErrors.authenticationFailed(
+						e instanceof Error
+							? e.message
+							: "Unknown error during authentication (Internal server error)",
+					);
 				}
+				throw AuthErrors.unauthorized(
+					"Neither a valid API key nor a session cookie was found",
+				);
 			},
 			detail: {
 				security: [{ apiKey: [] }],

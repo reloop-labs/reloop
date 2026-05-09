@@ -6,7 +6,7 @@ import { mailRoutes } from "@reloop/be-mailing/routes/mail/mail.routes.js";
 import { loader } from "@reloop/be-mailing/utils/loader.js";
 
 import { Elysia } from "elysia";
-import { initLogger, log } from "evlog";
+import { initLogger, log, parseError } from "evlog";
 import { evlog } from "evlog/elysia";
 import { mailConfig } from "./mail.config";
 
@@ -38,6 +38,16 @@ const mailService = new Elysia({
 		}),
 	)
 	.use(serverTiming())
+	.onError(({ error, set }) => {
+		const parsed = parseError(error);
+		set.status = parsed.status;
+		return {
+			message: parsed.message,
+			why: parsed.why,
+			fix: parsed.fix,
+			link: parsed.link,
+		};
+	})
 	.use(landing)
 	.use(mailRoutes)
 	.onStart(async () => {

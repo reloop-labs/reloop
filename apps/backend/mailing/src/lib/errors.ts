@@ -1,3 +1,5 @@
+import { createError } from "evlog";
+
 export class MailingError extends Error {
 	constructor(
 		public status: number,
@@ -62,3 +64,20 @@ export class DNSHealthError extends MailingError {
 		this.name = "DNSHealthError";
 	}
 }
+
+export const AuthErrors = {
+	unauthorized: (why: string, fix?: string) =>
+		createError({
+			status: 401,
+			message: "Unauthorized",
+			why,
+			fix: fix ?? "Please provide valid credentials",
+		}),
+	authenticationFailed: (why: string, fix?: string) =>
+		createError({
+			status: 401,
+			message: "Authentication failed",
+			why,
+			fix: fix ?? "Check your credentials and try again",
+		}),
+};
