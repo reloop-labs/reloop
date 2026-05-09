@@ -37,20 +37,20 @@ export async function updateDomainController({
 			updatedAt: new Date(),
 		};
 
-		if (body.sendingEmail !== undefined) {
-			updateData.sendingEmail = body.sendingEmail;
+		if (body.sending_email !== undefined) {
+			updateData.sendingEmail = body.sending_email;
 		}
 
-		if (body.receivingEmail !== undefined) {
-			updateData.receivingEmail = body.receivingEmail;
+		if (body.receiving_email !== undefined) {
+			updateData.receivingEmail = body.receiving_email;
 		}
 
-		if (body.clickTracking !== undefined) {
-			updateData.clickTracking = body.clickTracking;
+		if (body.click_tracking !== undefined) {
+			updateData.clickTracking = body.click_tracking;
 		}
 
-		if (body.openTracking !== undefined) {
-			updateData.openTracking = body.openTracking;
+		if (body.open_tracking !== undefined) {
+			updateData.openTracking = body.open_tracking;
 		}
 
 		await db

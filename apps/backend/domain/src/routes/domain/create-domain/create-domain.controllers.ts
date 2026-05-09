@@ -13,12 +13,12 @@ export async function createDomainController({
 	organizationId,
 	userId,
 	domain,
-	customReturnPath,
-	clickTracking,
-	openTracking,
+	custom_return_path: customReturnPath,
+	click_tracking: clickTracking,
+	open_tracking: openTracking,
 	tls,
-	sendingEmail,
-	receivingEmail,
+	sending_email: sendingEmail,
+	receiving_email: receivingEmail,
 }: {
 	organizationId: string;
 	userId: string;

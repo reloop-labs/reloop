@@ -70,12 +70,12 @@ export namespace DomainTypes {
 
 	export interface CreateDomainRequest {
 		domain: string;
-		customReturnPath?: string;
-		clickTracking?: boolean;
-		openTracking?: boolean;
+		custom_return_path?: string;
+		click_tracking?: boolean;
+		open_tracking?: boolean;
 		tls?: "opportunistic" | "enforced";
-		sendingEmail?: boolean;
-		receivingEmail?: boolean;
+		sending_email?: boolean;
+		receiving_email?: boolean;
 	}
 
 	export interface DomainListQuery {
@@ -93,9 +93,9 @@ export namespace DomainTypes {
 	}
 
 	export interface UpdateDomainRequest {
-		clickTracking?: boolean;
-		openTracking?: boolean;
-		sendingEmail?: boolean;
-		receivingEmail?: boolean;
+		click_tracking?: boolean;
+		open_tracking?: boolean;
+		sending_email?: boolean;
+		receiving_email?: boolean;
 	}
 }

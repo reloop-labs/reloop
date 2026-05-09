@@ -12,7 +12,7 @@ export namespace DomainModel {
 				pattern: domainPattern.source,
 				description: "Domain name (e.g., send.reloop.com)",
 			}),
-			customReturnPath: t.Optional(
+			custom_return_path: t.Optional(
 				t.String({
 					minLength: 1,
 					maxLength: 255,
@@ -22,13 +22,13 @@ export namespace DomainModel {
 					description: "Custom return-path subdomain (e.g., inbound)",
 				}),
 			),
-			clickTracking: t.Optional(
+			click_tracking: t.Optional(
 				t.Boolean({
 					default: false,
 					description: "Whether click tracking is enabled",
 				}),
 			),
-			openTracking: t.Optional(
+			open_tracking: t.Optional(
 				t.Boolean({
 					default: false,
 					description: "Whether open tracking is enabled",
@@ -40,13 +40,13 @@ export namespace DomainModel {
 					description: "TLS mode for the domain",
 				}),
 			),
-			sendingEmail: t.Optional(
+			sending_email: t.Optional(
 				t.Boolean({
 					default: true,
 					description: "Whether sending email is enabled",
 				}),
 			),
-			receivingEmail: t.Optional(
+			receiving_email: t.Optional(
 				t.Boolean({
 					default: true,
 					description: "Whether receiving email is enabled",
@@ -57,12 +57,12 @@ export namespace DomainModel {
 			examples: [
 				{
 					domain: "send.example.com",
-					customReturnPath: "inbound",
-					clickTracking: true,
-					openTracking: true,
+					custom_return_path: "inbound",
+					click_tracking: true,
+					open_tracking: true,
 					tls: "opportunistic",
-					sendingEmail: true,
-					receivingEmail: true,
+					sending_email: true,
+					receiving_email: true,
 				},
 			],
 		},
@@ -267,22 +267,22 @@ export namespace DomainModel {
 
 	export const updateDomainBody = t.Object(
 		{
-			clickTracking: t.Optional(
+			click_tracking: t.Optional(
 				t.Boolean({
 					description: "Whether click tracking is enabled",
 				}),
 			),
-			openTracking: t.Optional(
+			open_tracking: t.Optional(
 				t.Boolean({
 					description: "Whether open tracking is enabled",
 				}),
 			),
-			sendingEmail: t.Optional(
+			sending_email: t.Optional(
 				t.Boolean({
 					description: "Whether sending email is enabled",
 				}),
 			),
-			receivingEmail: t.Optional(
+			receiving_email: t.Optional(
 				t.Boolean({
 					description: "Whether receiving email is enabled",
 				}),
@@ -291,10 +291,10 @@ export namespace DomainModel {
 		{
 			examples: [
 				{
-					clickTracking: true,
-					openTracking: true,
-					sendingEmail: true,
-					receivingEmail: true,
+					click_tracking: true,
+					open_tracking: true,
+					sending_email: true,
+					receiving_email: true,
 				},
 			],
 		},

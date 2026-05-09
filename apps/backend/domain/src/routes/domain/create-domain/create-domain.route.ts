@@ -10,12 +10,12 @@ export const createDomainRoute = new Elysia().use(authMiddleware).post(
 		return await createDomainController({
 			organizationId: activeOrganizationId,
 			domain: body.domain,
-			customReturnPath: body.customReturnPath,
-			clickTracking: body.clickTracking,
-			openTracking: body.openTracking,
+			custom_return_path: body.custom_return_path,
+			click_tracking: body.click_tracking,
+			open_tracking: body.open_tracking,
 			tls: body.tls,
-			sendingEmail: body.sendingEmail,
-			receivingEmail: body.receivingEmail,
+			sending_email: body.sending_email,
+			receiving_email: body.receiving_email,
 			userId,
 		});
 	},

@@ -48,16 +48,16 @@ export namespace DNSModel {
 	});
 
 	export const generateDNSBody = t.Object({
-		serverDomain: t.Optional(
+		server_domain: t.Optional(
 			t.String({ description: "Server domain name for DNS records" }),
 		),
-		dkimSelector: t.Optional(
+		dkim_selector: t.Optional(
 			t.String({ description: "DKIM selector (default: mail)" }),
 		),
 	});
 
 	export const verifyDNSBody = t.Object({
-		recordType: t.String(),
+		record_type: t.String(),
 		name: t.String(),
 	});
 
