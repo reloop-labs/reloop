@@ -1,5 +1,6 @@
 import { apiKey } from "@better-auth/api-key";
 import { BusEvent, bus } from "@reloop/bus";
+import { eq } from "drizzle-orm";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
@@ -259,9 +260,18 @@ export const auth = betterAuth({
 						logger.info(
 							`✅ Organization joined bus event published for ${user.email}`,
 						);
+
+						// Set active organization for the user
+						await db
+							.update(schema.user)
+							.set({ activeOrganizationId: organization.id })
+							.where(eq(schema.user.id, user.id));
+						logger.info(
+							`✅ Active organization set to ${organization.id} for user ${user.id}`,
+						);
 					} catch (error) {
 						logger.error(
-							"❌ Failed to publish organization joined event:",
+							"❌ Failed to publish organization joined event or update user:",
 							error,
 						);
 					}

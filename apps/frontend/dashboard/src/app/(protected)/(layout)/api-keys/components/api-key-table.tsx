@@ -303,7 +303,7 @@ export const ApiKeyTable = ({
 		<>
 			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/40">
 				{/* Table Header */}
-				<div className="grid grid-cols-[minmax(0,1fr)_140px_110px_110px_100px_32px] items-center border-stroke-soft-100 border-b bg-bg-weak-50/50 px-4 py-2.5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-bg-weak-50/40">
+				<div className="grid grid-cols-[minmax(0,1fr)_140px_110px_100px_32px] items-center border-stroke-soft-100 border-b bg-bg-weak-50/50 px-4 py-2.5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-bg-weak-50/40">
 					<div className="flex items-center gap-1">
 						<span className="text-xs">Name</span>
 					</div>
@@ -311,10 +311,7 @@ export const ApiKeyTable = ({
 						<Icon name="key-new" className="h-3 w-3" />
 						<span className="text-xs">Prefix</span>
 					</div>
-					<div className="flex items-center gap-1">
-						<Icon name="user" className="h-3 w-3" />
-						<span className="text-xs">Created By</span>
-					</div>
+
 					<div className="flex items-center gap-1">
 						<Icon name="history" className="h-3 w-3" />
 						<span className="text-xs">Last Used</span>
@@ -334,7 +331,7 @@ export const ApiKeyTable = ({
 						Array.from({ length: loadingRows }).map((_, index) => (
 							<div
 								key={`skeleton-${index}`}
-								className="grid grid-cols-[minmax(0,1fr)_140px_110px_110px_100px_32px] items-center px-4 py-2"
+								className="grid grid-cols-[minmax(0,1fr)_140px_110px_100px_32px] items-center px-4 py-2"
 							>
 								<div className="flex min-w-0 items-center gap-2">
 									<Skeleton className="h-4 w-24" />
@@ -342,10 +339,7 @@ export const ApiKeyTable = ({
 								<div className="flex min-w-0 items-center">
 									<Skeleton className="h-4 w-12" />
 								</div>
-								<div className="flex items-center gap-2">
-									<Skeleton className="h-5 w-5 rounded-full" />
-									<Skeleton className="h-4 w-20" />
-								</div>
+
 								<div className="flex items-center">
 									<Skeleton className="h-4 w-20" />
 								</div>
@@ -372,7 +366,7 @@ export const ApiKeyTable = ({
 								<div
 									key={`api-key-${index}`}
 									className={cn(
-										"group/row grid w-full cursor-pointer grid-cols-[minmax(0,1fr)_140px_110px_110px_100px_32px] items-center px-4 py-2 text-left transition-colors",
+										"group/row grid w-full cursor-pointer grid-cols-[minmax(0,1fr)_140px_110px_100px_32px] items-center px-4 py-2 text-left transition-colors",
 										"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-base focus-visible:ring-offset-1",
 										isRowActive && "bg-bg-weak-50/50",
 									)}
@@ -392,63 +386,7 @@ export const ApiKeyTable = ({
 											</span>
 										</div>
 
-										{/* Created By Column */}
-										<div className="flex min-w-0 items-center gap-1">
-											<Avatar.Root
-												size="20"
-												className="rounded-full bg-transparent"
-											>
-												{apiKey.createdBy?.image ? (
-													<Avatar.Image
-														src={apiKey.createdBy.image}
-														alt={apiKey.createdBy?.name || "User"}
-														className="rounded-full"
-													/>
-												) : null}
-											</Avatar.Root>
-											{apiKey.createdBy?.email ? (
-												<Tooltip.Root delayDuration={0}>
-													<Tooltip.Trigger asChild>
-														<span className="cursor-default truncate font-medium text-label-sm text-text-sub-600">
-															{apiKey.createdBy?.name?.split(" ")[0] ||
-																"Unknown"}
-														</span>
-													</Tooltip.Trigger>
-													<Tooltip.Content
-														sideOffset={-3}
-														variant="light"
-														className="rounded-xl"
-													>
-														<div className="flex items-start gap-2 p-1">
-															<Avatar.Root
-																size="20"
-																className="mt-0.5 shrink-0 rounded-full bg-transparent"
-															>
-																{apiKey.createdBy?.image ? (
-																	<Avatar.Image
-																		src={apiKey.createdBy.image}
-																		alt={apiKey.createdBy?.name || "User"}
-																		className="rounded-full"
-																	/>
-																) : null}
-															</Avatar.Root>
-															<div className="flex flex-col items-start justify-start">
-																<span className="font-sm">
-																	{apiKey.createdBy?.name || "Unknown"}
-																</span>
-																<span className="text-text-soft-400 text-xs">
-																	{apiKey.createdBy.email}
-																</span>
-															</div>
-														</div>
-													</Tooltip.Content>
-												</Tooltip.Root>
-											) : (
-												<span className="truncate text-label-sm text-text-sub-600">
-													{apiKey.createdBy?.name?.split(" ")[0] || "Unknown"}
-												</span>
-											)}
-										</div>
+
 
 										{/* Last Used Column */}
 										<div className="flex items-center">

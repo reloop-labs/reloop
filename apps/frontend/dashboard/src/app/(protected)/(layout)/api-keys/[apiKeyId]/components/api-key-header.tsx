@@ -209,307 +209,268 @@ export const ApiKeyHeader = ({
 	const displayPrefix = apiKey?.start || apiKey?.prefix || "---";
 
 	return (
-		<>
-			<div className="pt-10 pb-8">
-				<AnimatedBackButton onClick={() => push("/api-keys")} />
-				<div className="flex items-center justify-between pt-6">
-					<div>
-						{isLoading ? (
-							<div className="flex items-center gap-1.5">
-								<Skeleton className="h-4 w-12 rounded-full" />
-								<Skeleton className="h-1 w-1 rounded-full" />
-								<Skeleton className="h-4 w-20 rounded-full" />
-								<Skeleton className="h-1 w-1 rounded-full" />
-								<div className="flex items-center gap-1">
-									<Skeleton className="h-3.5 w-3.5 rounded-full" />
-									<Skeleton className="h-4 w-16 rounded-full" />
-								</div>
-							</div>
-						) : (
-							<div className="flex items-center gap-1.5">
-								<p className="font-medium text-paragraph-xs text-text-sub-600">
-									API Key{" "}
-								</p>
-								<p className="font-semibold text-paragraph-xs text-text-sub-600">
-									•
-								</p>
-								<p className="font-medium text-paragraph-xs text-text-sub-600">
-									{isFailed
-										? "---"
-										: apiKey?.createdAt
-											? formatRelativeTime(apiKey.createdAt)
-											: "---"}
-								</p>
-								<p className="font-semibold text-paragraph-xs text-text-sub-600">
-									•
-								</p>
-								<div
-									className={`flex items-center gap-1 ${getStatusColor(apiKey?.enabled || false)}`}
-								>
-									<Icon
-										name={getStatusIcon(apiKey?.enabled || false)}
-										className="h-3.5 w-3.5"
-									/>
-									<p className="font-medium text-paragraph-xs">
-										{apiKey?.enabled ? "Enabled" : "Disabled"}
-									</p>
-								</div>
-							</div>
-						)}
-						{isLoading ? (
-							<Skeleton className="mt-2 h-7 w-48 rounded-lg" />
-						) : (
-							<div className="flex items-center gap-1.5">
-								<div className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-[6px] bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-white text-xs uppercase tracking-wide shadow-sm">
-									<Icon name="key-new" className="h-3 w-3" />
-								</div>
-								<h1 className="font-medium text-title-h6 leading-8">
-									{displayName}
-								</h1>
-							</div>
-						)}
-					</div>
-
-					<div className="flex items-center gap-2">
-						{isLoading ? (
-							<>
-								<Skeleton className="h-9 w-32 rounded-lg" />
-								<Skeleton className="h-9 w-9 rounded-lg" />
-							</>
-						) : isFailed ? (
-							<Button.Root variant="error" size="small" mode="lighter">
-								Try Again
-							</Button.Root>
-						) : apiKey ? (
-							<>
-								<Button.Root
-									variant="neutral"
-									size="xsmall"
-									className="font-semibold"
-									onClick={handleToggleEnabled}
-									disabled={isToggling}
-								>
-									{isToggling ? (
-										<Icon name="loader-2" className="h-4 w-4 animate-spin" />
-									) : (
-										<Icon
-											name={apiKey.enabled ? "pause" : "play"}
-											className="h-4 w-4"
-										/>
-									)}
-									{apiKey.enabled ? "Disable" : "Enable"} API key
-								</Button.Root>
-								<PopoverRoot>
-									<PopoverTrigger asChild>
-										<Button.Root variant="neutral" mode="stroke" size="xsmall">
-											<Icon
-												name="more-horizontal"
-												className="h-3.5 w-3.5 text-text-sub-600"
-											/>
-										</Button.Root>
-									</PopoverTrigger>
-									<PopoverContent
-										align="end"
-										sideOffset={0}
-										className="w-44 rounded-xl p-1.5"
-										showArrow
-									>
-										<div className="relative">
-											{headerMenuItems.map((item, idx) => (
-												<button
-													key={item.id}
-													ref={(el) => {
-														if (el) buttonRefs.current[idx] = el;
-													}}
-													type="button"
-													onPointerEnter={() => setHoverIdx(idx)}
-													onPointerLeave={() => setHoverIdx(undefined)}
-													onClick={() => handleMenuItemClick(item.id)}
-													className={cn(
-														"flex w-full cursor-pointer items-center gap-2 rounded-lg py-1.5 pl-2 font-medium text-xs transition-colors",
-														item.isDanger
-															? "text-error-base"
-															: "text-text-strong-950",
-														!currentRect &&
-															hoverIdx === idx &&
-															(item.isDanger
-																? "bg-red-alpha-10"
-																: "bg-neutral-alpha-10"),
-													)}
-												>
-													<Icon
-														name={item.icon}
-														className={cn(
-															"h-4 w-4",
-															item.isDanger ? "" : "text-text-sub-600",
-														)}
-													/>
-													<span>{item.label}</span>
-												</button>
-											))}
-											<AnimatedHoverBackground
-												rect={currentRect}
-												tabElement={currentTab}
-												isDanger={isDanger}
-											/>
-										</div>
-									</PopoverContent>
-								</PopoverRoot>
-							</>
-						) : null}
-					</div>
-				</div>
-				<div className="mt-10 grid grid-cols-3 gap-x-12 gap-y-6">
-					{/* Token/Key */}
-					<div className="flex flex-col gap-1.5">
+		<div className="pt-10 pb-8">
+			<AnimatedBackButton onClick={() => push("/api-keys")} />
+			<div className="flex items-center justify-between pt-6">
+				<div>
+					{isLoading ? (
 						<div className="flex items-center gap-1.5">
-							<Icon name="key-new" className="h-3.5 w-3.5 text-text-sub-600" />
-							<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
-								Key Prefix
-							</span>
+							<Skeleton className="h-4 w-12 rounded-full" />
+							<Skeleton className="h-1 w-1 rounded-full" />
+							<Skeleton className="h-4 w-20 rounded-full" />
+							<Skeleton className="h-1 w-1 rounded-full" />
+							<div className="flex items-center gap-1">
+								<Skeleton className="h-3.5 w-3.5 rounded-full" />
+								<Skeleton className="h-4 w-16 rounded-full" />
+							</div>
 						</div>
-						{isLoading ? (
-							<Skeleton className="h-5 w-24 rounded-lg" />
-						) : (
-							<button
-								type="button"
-								key={apiKey?.id}
-								className="group/copy flex w-fit cursor-pointer items-center gap-1.5"
-								onClick={handleCopyPrefix}
-							>
-								<code className="max-w-[120px] truncate rounded bg-neutral-alpha-10 px-2 py-1 font-medium font-mono text-text-strong-950 text-xs">
-									{displayPrefix}...
-								</code>
-								<Icon
-									name={copied ? "check" : "copy"}
-									className={cn(
-										"h-3 w-3 flex-shrink-0 transition-all",
-										copied
-											? "text-success-base"
-											: "text-text-sub-600 opacity-0 group-hover/copy:opacity-100",
-									)}
-								/>
-							</button>
-						)}
-					</div>
-
-					{/* Total Requests */}
-					<div className="flex flex-col gap-1.5">
+					) : (
 						<div className="flex items-center gap-1.5">
-							<Icon
-								name="arrow-swap"
-								className="h-3.5 w-3.5 text-text-sub-600"
-							/>
-							<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
-								Requests
-							</span>
-						</div>
-						{isLoading ? (
-							<Skeleton className="h-5 w-24 rounded-lg" />
-						) : (
-							<span className="font-medium text-paragraph-sm text-text-strong-950">
-								{(apiKey?.requestCount || 0).toLocaleString()} times
-							</span>
-						)}
-					</div>
-
-					{/* Status */}
-					<div className="flex flex-col gap-1.5">
-						<div className="flex items-center gap-1.5">
-							<Icon
-								name="activity-2"
-								className="h-3.5 w-3.5 text-text-sub-600"
-							/>
-							<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
-								Status
-							</span>
-						</div>
-						{isLoading ? (
-							<Skeleton className="h-5 w-24 rounded-lg" />
-						) : (
+							<p className="font-medium text-paragraph-xs text-text-sub-600">
+								API Key{" "}
+							</p>
+							<p className="font-semibold text-paragraph-xs text-text-sub-600">
+								•
+							</p>
+							<p className="font-medium text-paragraph-xs text-text-sub-600">
+								{isFailed
+									? "---"
+									: apiKey?.createdAt
+										? formatRelativeTime(apiKey.createdAt)
+										: "---"}
+							</p>
+							<p className="font-semibold text-paragraph-xs text-text-sub-600">
+								•
+							</p>
 							<div
-								className={cn(
-									"flex w-fit items-center gap-1.5 font-medium text-sm capitalize",
-									apiKey?.enabled ? "text-success-base" : "text-error-base",
-								)}
+								className={`flex items-center gap-1 ${getStatusColor(apiKey?.enabled || false)}`}
 							>
 								<Icon
-									name={apiKey?.enabled ? "check-circle" : "cross-circle"}
+									name={getStatusIcon(apiKey?.enabled || false)}
 									className="h-3.5 w-3.5"
 								/>
-								{apiKey?.enabled ? "Active" : "Disabled"}
+								<p className="font-medium text-paragraph-xs">
+									{apiKey?.enabled ? "Enabled" : "Disabled"}
+								</p>
 							</div>
-						)}
-					</div>
-
-					{/* Created */}
-					<div className="flex flex-col gap-1.5">
-						<div className="flex items-center gap-1.5">
-							<Icon name="calendar" className="h-3.5 w-3.5 text-text-sub-600" />
-							<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
-								Created
-							</span>
 						</div>
-						{isLoading ? (
-							<Skeleton className="h-5 w-24 rounded-lg" />
-						) : (
-							<span className="font-medium text-paragraph-sm text-text-strong-950">
-								{apiKey?.createdAt
-									? formatRelativeTime(apiKey.createdAt)
-									: "---"}
-							</span>
-						)}
-					</div>
-
-					{/* Last Used */}
-					<div className="flex flex-col gap-1.5">
+					)}
+					{isLoading ? (
+						<Skeleton className="mt-2 h-7 w-48 rounded-lg" />
+					) : (
 						<div className="flex items-center gap-1.5">
-							<Icon name="history" className="h-3.5 w-3.5 text-text-sub-600" />
-							<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
-								Last Used
-							</span>
+							<div className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-[6px] bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-white text-xs uppercase tracking-wide shadow-sm">
+								<Icon name="key-new" className="h-3 w-3" />
+							</div>
+							<h1 className="font-medium text-title-h6 leading-8">
+								{displayName}
+							</h1>
 						</div>
-						{isLoading ? (
-							<Skeleton className="h-5 w-24 rounded-lg" />
-						) : (
-							<span className="font-medium text-paragraph-sm text-text-strong-950">
-								{apiKey?.lastRequest
-									? formatRelativeTime(apiKey.lastRequest)
-									: "No activity"}
-							</span>
-						)}
-					</div>
+					)}
+				</div>
 
-					{/* Created By */}
-					<div className="flex flex-col gap-1.5">
-						<div className="flex items-center gap-1.5">
-							<Icon name="user" className="h-3.5 w-3.5 text-text-sub-600" />
-							<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
-								Created By
-							</span>
-						</div>
-						{isLoading ? (
-							<Skeleton className="h-5 w-24 rounded-lg" />
-						) : (
-							<div className="flex items-center gap-2">
-								<Avatar.Root size="20">
-									{apiKey?.createdBy?.image ? (
-										<Avatar.Image
-											src={apiKey.createdBy.image}
-											alt={apiKey.createdBy.name || "User"}
+				<div className="flex items-center gap-2">
+					{isLoading ? (
+						<>
+							<Skeleton className="h-9 w-32 rounded-lg" />
+							<Skeleton className="h-9 w-9 rounded-lg" />
+						</>
+					) : isFailed ? (
+						<Button.Root variant="error" size="small" mode="lighter">
+							Try Again
+						</Button.Root>
+					) : apiKey ? (
+						<>
+							<Button.Root
+								variant="neutral"
+								size="xsmall"
+								className="font-semibold"
+								onClick={handleToggleEnabled}
+								disabled={isToggling}
+							>
+								{isToggling ? (
+									<Icon name="loader-2" className="h-4 w-4 animate-spin" />
+								) : (
+									<Icon
+										name={apiKey.enabled ? "pause" : "play"}
+										className="h-4 w-4"
+									/>
+								)}
+								{apiKey.enabled ? "Disable" : "Enable"} API key
+							</Button.Root>
+							<PopoverRoot>
+								<PopoverTrigger asChild>
+									<Button.Root variant="neutral" mode="stroke" size="xsmall">
+										<Icon
+											name="more-horizontal"
+											className="h-3.5 w-3.5 text-text-sub-600"
 										/>
-									) : null}
-								</Avatar.Root>
-								<span className="font-medium text-paragraph-sm text-text-strong-950">
-									{apiKey?.createdBy?.email ||
-										apiKey?.createdBy?.name ||
-										"Unknown"}
-								</span>
-							</div>
-						)}
-					</div>
+									</Button.Root>
+								</PopoverTrigger>
+								<PopoverContent
+									align="end"
+									sideOffset={0}
+									className="w-44 rounded-xl p-1.5"
+									showArrow
+								>
+									<div className="relative">
+										{headerMenuItems.map((item, idx) => (
+											<button
+												key={item.id}
+												ref={(el) => {
+													if (el) buttonRefs.current[idx] = el;
+												}}
+												type="button"
+												onPointerEnter={() => setHoverIdx(idx)}
+												onPointerLeave={() => setHoverIdx(undefined)}
+												onClick={() => handleMenuItemClick(item.id)}
+												className={cn(
+													"flex w-full cursor-pointer items-center gap-2 rounded-lg py-1.5 pl-2 font-medium text-xs transition-colors",
+													item.isDanger
+														? "text-error-base"
+														: "text-text-strong-950",
+													!currentRect &&
+														hoverIdx === idx &&
+														(item.isDanger
+															? "bg-red-alpha-10"
+															: "bg-neutral-alpha-10"),
+												)}
+											>
+												<Icon
+													name={item.icon}
+													className={cn(
+														"h-4 w-4",
+														item.isDanger ? "" : "text-text-sub-600",
+													)}
+												/>
+												<span>{item.label}</span>
+											</button>
+										))}
+										<AnimatedHoverBackground
+											rect={currentRect}
+											tabElement={currentTab}
+											isDanger={isDanger}
+										/>
+									</div>
+								</PopoverContent>
+							</PopoverRoot>
+						</>
+					) : null}
 				</div>
 			</div>
-		</>
+			<div className="mt-10 grid grid-cols-3 gap-x-12 gap-y-6">
+				{/* Token/Key */}
+				<div className="flex flex-col gap-1.5">
+					<div className="flex items-center gap-1.5">
+						<Icon name="key-new" className="h-3.5 w-3.5 text-text-sub-600" />
+						<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
+							Key Prefix
+						</span>
+					</div>
+					{isLoading ? (
+						<Skeleton className="h-5 w-24 rounded-lg" />
+					) : (
+						<button
+							type="button"
+							key={apiKey?.id}
+							className="group/copy flex w-fit cursor-pointer items-center gap-1.5"
+							onClick={handleCopyPrefix}
+						>
+							<code className="max-w-[120px] truncate rounded bg-neutral-alpha-10 px-2 py-1 font-medium font-mono text-text-strong-950 text-xs">
+								{displayPrefix}...
+							</code>
+							<Icon
+								name={copied ? "check" : "copy"}
+								className={cn(
+									"h-3 w-3 flex-shrink-0 transition-all",
+									copied
+										? "text-success-base"
+										: "text-text-sub-600 opacity-0 group-hover/copy:opacity-100",
+								)}
+							/>
+						</button>
+					)}
+				</div>
+
+				{/* Total Requests */}
+				<div className="flex flex-col gap-1.5">
+					<div className="flex items-center gap-1.5">
+						<Icon name="arrow-swap" className="h-3.5 w-3.5 text-text-sub-600" />
+						<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
+							Requests
+						</span>
+					</div>
+					{isLoading ? (
+						<Skeleton className="h-5 w-24 rounded-lg" />
+					) : (
+						<span className="font-medium text-paragraph-sm text-text-strong-950">
+							{(apiKey?.requestCount || 0).toLocaleString()} times
+						</span>
+					)}
+				</div>
+
+				{/* Status */}
+				<div className="flex flex-col gap-1.5">
+					<div className="flex items-center gap-1.5">
+						<Icon name="activity-2" className="h-3.5 w-3.5 text-text-sub-600" />
+						<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
+							Status
+						</span>
+					</div>
+					{isLoading ? (
+						<Skeleton className="h-5 w-24 rounded-lg" />
+					) : (
+						<div
+							className={cn(
+								"flex w-fit items-center gap-1.5 font-medium text-sm capitalize",
+								apiKey?.enabled ? "text-success-base" : "text-error-base",
+							)}
+						>
+							<Icon
+								name={apiKey?.enabled ? "check-circle" : "cross-circle"}
+								className="h-3.5 w-3.5"
+							/>
+							{apiKey?.enabled ? "Active" : "Disabled"}
+						</div>
+					)}
+				</div>
+
+				{/* Created */}
+				<div className="flex flex-col gap-1.5">
+					<div className="flex items-center gap-1.5">
+						<Icon name="calendar" className="h-3.5 w-3.5 text-text-sub-600" />
+						<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
+							Created
+						</span>
+					</div>
+					{isLoading ? (
+						<Skeleton className="h-5 w-24 rounded-lg" />
+					) : (
+						<span className="font-medium text-paragraph-sm text-text-strong-950">
+							{apiKey?.createdAt ? formatRelativeTime(apiKey.createdAt) : "---"}
+						</span>
+					)}
+				</div>
+
+				{/* Last Used */}
+				<div className="flex flex-col gap-1.5">
+					<div className="flex items-center gap-1.5">
+						<Icon name="history" className="h-3.5 w-3.5 text-text-sub-600" />
+						<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
+							Last Used
+						</span>
+					</div>
+					{isLoading ? (
+						<Skeleton className="h-5 w-24 rounded-lg" />
+					) : (
+						<span className="font-medium text-paragraph-sm text-text-strong-950">
+							{apiKey?.lastRequest
+								? formatRelativeTime(apiKey.lastRequest)
+								: "No activity"}
+						</span>
+					)}
+				</div>
+			</div>
+		</div>
 	);
 };

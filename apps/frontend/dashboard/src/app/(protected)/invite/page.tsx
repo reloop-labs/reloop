@@ -99,8 +99,15 @@ export default function InvitePage() {
 				await authClient.organization.setActive({
 					organizationId: data.invitation.organizationId,
 				});
+
+				// Update user profile with the new active organization
+				await authClient.updateUser({
+					activeOrganizationId: data.invitation.organizationId,
+				});
 			}
-			router.push("/");
+
+			// Force a full page reload to ensure the session and cookies are fresh
+			window.location.href = "/dashboard";
 		} catch (err) {
 			toast.error("An unexpected error occurred");
 		} finally {
