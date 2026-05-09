@@ -3,6 +3,7 @@ import path from "node:path";
 import matter from "gray-matter";
 import type { MDXComponents } from "mdx/types";
 import { MDXRemote } from "next-mdx-remote/rsc";
+import remarkGfm from "remark-gfm";
 import type { PageNode, PageTreeItem, TOCItem } from "./types";
 
 import * as LucideIcons from "lucide-react";
@@ -187,7 +188,15 @@ export const source = {
 					description: frontmatter.description || "",
 					full: frontmatter.full === true,
 					body: (props: { components?: MDXComponents }) => (
-						<MDXRemote source={content} components={props.components} />
+						<MDXRemote
+							source={content}
+							components={props.components}
+							options={{
+								mdxOptions: {
+									remarkPlugins: [remarkGfm],
+								},
+							}}
+						/>
 					),
 					toc,
 					_apiData: frontmatter._apiData || null,
