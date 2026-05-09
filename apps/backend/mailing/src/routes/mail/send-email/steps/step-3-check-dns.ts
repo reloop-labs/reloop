@@ -4,9 +4,8 @@ import {
 	domain,
 	domainDnsRecord,
 } from "@reloop/db/schema";
-import { useLogger } from "evlog/elysia";
 import { and, eq, inArray } from "drizzle-orm";
-
+import { useLogger } from "evlog/elysia";
 
 export async function checkDnsHealth_step3({
 	domainId,
