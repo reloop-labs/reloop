@@ -19,19 +19,9 @@ export async function createDomainController({
 	tls,
 	sendingEmail,
 	receivingEmail,
-	cookie,
-	requestDetails,
 }: {
 	organizationId: string;
 	userId: string;
-	cookie?: string;
-	requestDetails?: {
-		endpoint?: string;
-		method?: string;
-		userAgent?: string;
-		ipAddress?: string;
-		statusCode?: number;
-	};
 } & DomainTypes.CreateDomainRequest): Promise<DomainTypes.DomainResponse> {
 	const logger = useLogger();
 	try {
@@ -52,8 +42,6 @@ export async function createDomainController({
 			tls,
 			sendingEmail,
 			receivingEmail,
-			cookie,
-			requestDetails,
 		});
 
 		if (undeletedResponse) {
@@ -94,8 +82,6 @@ export async function createDomainController({
 			domainId,
 			organizationId,
 			domain,
-			cookie,
-			requestDetails,
 		});
 	} catch (error) {
 		logger.error("Error creating domain", { domain, error });

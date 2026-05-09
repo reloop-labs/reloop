@@ -1,6 +1,5 @@
 import { DomainErrors } from "@be/domain/lib/errors";
 import type { DomainTypes } from "@be/domain/types/domain.type";
-import { createLog } from "@be/domain/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { DOMAIN_CREATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -11,20 +10,10 @@ export async function finalizeDomainCreation_step6({
 	domainId,
 	organizationId,
 	domain,
-	cookie,
-	requestDetails,
 }: {
 	domainId: string;
 	organizationId: string;
 	domain: string;
-	cookie?: string;
-	requestDetails?: {
-		endpoint?: string;
-		method?: string;
-		userAgent?: string;
-		ipAddress?: string;
-		statusCode?: number;
-	};
 }): Promise<DomainTypes.DomainResponse> {
 	const logger = useLogger();
 	logger.info("Fetching domain with DNS records", { domainId });
@@ -48,13 +37,10 @@ export async function finalizeDomainCreation_step6({
 		);
 	}
 
-	logger.info("Domain created successfully", { domainWithDnsRecords });
-
-	await createLog({
+	logger.info("Domain created successfully", {
+		domainWithDnsRecords,
 		event: DOMAIN_CREATE_WEBHOOK_EVENT.id,
-		cookie,
 		metadata: { domain, domainId },
-		requestDetails: { ...(requestDetails || {}), statusCode: 201 },
 	});
 
 	return {

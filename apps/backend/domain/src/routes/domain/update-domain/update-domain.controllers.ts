@@ -1,5 +1,4 @@
 import type { DomainTypes } from "@be/domain/types/domain.type";
-import { createLog } from "@be/domain/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { DomainErrors } from "@be/domain/lib/errors";
@@ -11,20 +10,10 @@ export async function updateDomainController({
 	domainId,
 	organizationId,
 	body,
-	cookie,
-	requestDetails,
 }: {
 	domainId: string;
 	organizationId: string;
 	body: DomainTypes.UpdateDomainRequest;
-	cookie?: string;
-	requestDetails?: {
-		endpoint?: string;
-		method?: string;
-		userAgent?: string;
-		ipAddress?: string;
-		statusCode?: number;
-	};
 }): Promise<DomainTypes.DomainResponse> {
 	const logger = useLogger();
 	try {
@@ -97,11 +86,10 @@ export async function updateDomainController({
 			event: DOMAIN_UPDATE_WEBHOOK_EVENT.id,
 		};
 
-		await createLog({
+		logger.info("Domain updated successfully", {
+			domainId,
+			domain: updatedDomain.domain,
 			event: DOMAIN_UPDATE_WEBHOOK_EVENT.id,
-			cookie,
-			metadata: { domainId, domain: updatedDomain.domain },
-			requestDetails: { ...(requestDetails || {}), statusCode: 200 },
 		});
 
 		return finalDomain;

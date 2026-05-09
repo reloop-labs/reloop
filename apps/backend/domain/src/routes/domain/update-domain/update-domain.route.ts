@@ -6,28 +6,11 @@ import { updateDomainXCodeSamples } from "./update-domain.x-codeSamples";
 
 export const updateDomainRoute = new Elysia().use(authMiddleware).patch(
 	"/:domain_id",
-	async ({
-		params: { domain_id },
-		body,
-		activeOrganizationId,
-		request: { headers },
-		path,
-		request,
-	}) => {
-		const cookie = headers.get("cookie") || undefined;
+	async ({ params: { domain_id }, body, activeOrganizationId }) => {
 		return await updateDomainController({
 			domainId: domain_id,
 			organizationId: activeOrganizationId,
 			body,
-			cookie,
-			requestDetails: {
-				endpoint: path,
-				method: request.method,
-				userAgent: headers.get("user-agent") || undefined,
-				ipAddress:
-					(headers.get("x-forwarded-for") || headers.get("x-real-ip")) ??
-					undefined,
-			},
 		});
 	},
 	{

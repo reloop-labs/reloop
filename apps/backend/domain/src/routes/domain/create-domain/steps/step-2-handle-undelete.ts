@@ -1,6 +1,5 @@
 import { DomainErrors } from "@be/domain/lib/errors";
 import type { DomainTypes } from "@be/domain/types/domain.type";
-import { createLog } from "@be/domain/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { DOMAIN_UNDELETE_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -17,8 +16,6 @@ export async function handleUndelete_step2({
 	tls,
 	sendingEmail,
 	receivingEmail,
-	cookie,
-	requestDetails,
 }: {
 	deletedDomain: DomainTypes.DomainData | null | undefined;
 	organizationId: string;
@@ -29,14 +26,6 @@ export async function handleUndelete_step2({
 	tls?: "opportunistic" | "enforced";
 	sendingEmail?: boolean;
 	receivingEmail?: boolean;
-	cookie?: string;
-	requestDetails?: {
-		endpoint?: string;
-		method?: string;
-		userAgent?: string;
-		ipAddress?: string;
-		statusCode?: number;
-	};
 }): Promise<DomainTypes.DomainResponse | null> {
 	const logger = useLogger();
 
@@ -86,13 +75,10 @@ export async function handleUndelete_step2({
 		if (!undeletedDomain) {
 			throw DomainErrors.failedToUndelete(domain);
 		}
-		logger.info("Undeleted domain", { domainId });
-
-		await createLog({
+		logger.info("Domain undeleted successfully", {
+			domainId,
+			domain,
 			event: DOMAIN_UNDELETE_WEBHOOK_EVENT.id,
-			cookie,
-			metadata: { domain, domainId },
-			requestDetails: { ...(requestDetails || {}), statusCode: 201 },
 		});
 
 		return {

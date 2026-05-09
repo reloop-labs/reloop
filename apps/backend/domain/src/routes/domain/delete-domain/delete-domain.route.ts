@@ -6,26 +6,10 @@ import { deleteDomainXCodeSamples } from "./delete-domain.x-codeSamples";
 
 export const deleteDomainRoute = new Elysia().use(authMiddleware).delete(
 	"/:domain_id",
-	async ({
-		params: { domain_id },
-		activeOrganizationId,
-		request: { headers },
-		path,
-		request,
-	}) => {
-		const cookie = headers.get("cookie") || undefined;
+	async ({ params: { domain_id }, activeOrganizationId }) => {
 		return await deleteDomainController({
 			domainId: domain_id,
 			organizationId: activeOrganizationId,
-			cookie,
-			requestDetails: {
-				endpoint: path,
-				method: request.method,
-				userAgent: headers.get("user-agent") || undefined,
-				ipAddress:
-					(headers.get("x-forwarded-for") || headers.get("x-real-ip")) ??
-					undefined,
-			},
 		});
 	},
 	{
