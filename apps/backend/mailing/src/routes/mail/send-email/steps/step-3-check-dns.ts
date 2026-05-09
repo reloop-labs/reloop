@@ -1,3 +1,4 @@
+import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import {
 	type dnsRecordTypeNameEnum,
@@ -43,6 +44,22 @@ export async function checkDnsHealth_step3({
 	if (domainData.systemVerified && domainData.status === "active" && isRecent) {
 		return { isHealthy: true, missingRecords: [] };
 	}
+
+	// Cache is stale or domain is not fully verified — fire a reverification event
+	// so a background worker can re-check DNS records for the whole domain.
+	await bus
+		.publish(BusEvent.DOMAIN_DNS_REVERIFICATION_REQUESTED, {
+			domainId,
+			organizationId,
+			domain: domainData.domain,
+			triggeredAt: new Date().toISOString(),
+		})
+		.catch((err) => {
+			logger.warn("Failed to publish DNS reverification event", {
+				domainId,
+				error: err instanceof Error ? err.message : String(err),
+			});
+		});
 
 	const requiredRecordTypes = ["SPF", "DKIM", "DMARC"];
 	const dnsRecords = await db

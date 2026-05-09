@@ -124,11 +124,20 @@ export interface DnsConfigRequestedPayload {
 	}>;
 }
 
+export interface DomainDnsReverificationRequestedPayload {
+	domainId: string;
+	organizationId: string;
+	domain: string;
+	/** ISO timestamp of when the check that triggered this event ran */
+	triggeredAt: string;
+}
+
 export interface EventPayloads {
 	[BusEvent.USER_CREATED]: UserCreatedPayload;
 	[BusEvent.USER_UPDATED]: UserUpdatedPayload;
 	[BusEvent.USER_DELETED]: UserDeletedPayload;
 	[BusEvent.DOMAIN_VERIFIED]: DomainVerifiedPayload;
+	[BusEvent.DOMAIN_DNS_REVERIFICATION_REQUESTED]: DomainDnsReverificationRequestedPayload;
 	[BusEvent.WEBHOOK_TRIGGERED]: WebhookTriggeredPayload;
 	[BusEvent.EMAIL_SENT]: EmailSentPayload;
 	[BusEvent.ORGANIZATION_CREATED]: OrganizationCreatedPayload;
@@ -142,5 +151,6 @@ export interface EventPayloads {
 	[BusEvent.SIGNIN_DETECTED]: SigninDetectedPayload;
 	[BusEvent.TRIAL_ENDING]: TrialEndingPayload;
 	[BusEvent.DNS_CONFIG_REQUESTED]: DnsConfigRequestedPayload;
+	[BusEvent.DOMAIN_DNS_REVERIFICATION_REQUESTED]: DomainDnsReverificationRequestedPayload;
 }
 
