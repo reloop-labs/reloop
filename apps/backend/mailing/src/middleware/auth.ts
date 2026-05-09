@@ -32,19 +32,30 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 						});
 						return { ...sessionResult, traceId, logger: log };
 					}
-					throw new UnauthorizedError();
+					return status(401, {
+						error: "Unauthorized",
+						code: "UNAUTHORIZED",
+					});
 				} catch (e) {
-					if (e instanceof MailingError) throw e;
+					if (e instanceof MailingError) {
+						return status(e.status, {
+							error: e.message,
+							code: e.code,
+						});
+					}
 					log.error("Authentication error", {
 						error: e instanceof Error ? e.message : "Unknown error",
 						stack: e instanceof Error ? e.stack : undefined,
 					});
-					throw new UnauthorizedError("Authentication failed");
+					return status(401, {
+						error: "Authentication failed",
+						code: "UNAUTHORIZED",
+					});
 				}
 			},
 		},
 		apiKeyAuth: {
-			async resolve({ request: { headers }, log }) {
+			async resolve({ status, request: { headers }, log }) {
 				try {
 					const apiKey = headers.get("x-api-key");
 					const traceId = crypto.randomUUID();
@@ -59,14 +70,25 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 						log.info("API key authentication successful");
 						return { ...apiKeyResult, traceId, logger: log };
 					}
-					throw new UnauthorizedError();
+					return status(401, {
+						error: "Unauthorized",
+						code: "UNAUTHORIZED",
+					});
 				} catch (e) {
-					if (e instanceof MailingError) throw e;
+					if (e instanceof MailingError) {
+						return status(e.status, {
+							error: e.message,
+							code: e.code,
+						});
+					}
 					log.error("Authentication error", {
 						error: e instanceof Error ? e.message : "Unknown error",
 						stack: e instanceof Error ? e.stack : undefined,
 					});
-					throw new UnauthorizedError("Authentication failed");
+					return status(401, {
+						error: "Authentication failed",
+						code: "UNAUTHORIZED",
+					});
 				}
 			},
 			detail: {
@@ -74,7 +96,7 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 			},
 		},
 		auth: {
-			async resolve({ request: { headers }, log }) {
+			async resolve({ status, request: { headers }, log }) {
 				try {
 					const apiKey = headers.get("x-api-key");
 					const cookie = headers.get("cookie");
@@ -100,14 +122,25 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 						log.info("Session authentication successful");
 						return { ...sessionResult, traceId, logger: log };
 					}
-					throw new UnauthorizedError();
+					return status(401, {
+						error: "Unauthorized",
+						code: "UNAUTHORIZED",
+					});
 				} catch (e) {
-					if (e instanceof MailingError) throw e;
+					if (e instanceof MailingError) {
+						return status(e.status, {
+							error: e.message,
+							code: e.code,
+						});
+					}
 					log.error("Authentication error", {
 						error: e instanceof Error ? e.message : "Unknown error",
 						stack: e instanceof Error ? e.stack : undefined,
 					});
-					throw new UnauthorizedError("Authentication failed");
+					return status(401, {
+						error: "Authentication failed",
+						code: "UNAUTHORIZED",
+					});
 				}
 			},
 			detail: {
