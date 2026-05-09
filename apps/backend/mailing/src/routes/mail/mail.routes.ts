@@ -9,4 +9,4 @@ export const mailRoutes = new Elysia({
 })
 	.use(trackRoute)
 	.use(authMiddleware)
-	.use(sendEmailRoute)
+	.use(sendEmailRoute);
