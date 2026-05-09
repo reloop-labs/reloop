@@ -24,7 +24,7 @@ export default function WorkspaceLayout({
 	children: React.ReactNode;
 }) {
 	return (
-		<div className="mx-auto max-w-3xl px-6 pt-16">
+		<div className="mx-auto max-w-3xl px-6 pt-10">
 			<div className="pb-6">
 				<p className="font-medium text-2xl">Profile</p>
 				<p className="text-paragraph-sm text-text-sub-600">
