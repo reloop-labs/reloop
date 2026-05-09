@@ -59,7 +59,7 @@ export const DomainTable = ({
 	return (
 		<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/40">
 			{/* Table Header */}
-			<div className="grid grid-cols-[1fr_minmax(200px,auto)_140px_minmax(40px,auto)] items-center border-stroke-soft-100 border-b bg-bg-weak-50/50 px-4 py-2.5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-bg-weak-50/40">
+			<div className="grid grid-cols-[minmax(0,1fr)_120px_140px_32px] items-center border-stroke-soft-100 border-b bg-bg-weak-50/50 px-4 py-2.5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-bg-weak-50/40">
 				<div className="flex items-center gap-1">
 					<Icon name="globe" className="h-3 w-3" />
 					<span className="text-xs">Domain</span>
@@ -93,13 +93,13 @@ export const DomainTable = ({
 								key={domain.id}
 								onClick={() => handleRowClick(domain.id)}
 								className={cn(
-									"group/row grid cursor-pointer grid-cols-[1fr_minmax(200px,auto)_140px_minmax(40px,auto)] items-center px-4 py-2 text-left transition-colors",
+									"group/row grid cursor-pointer grid-cols-[minmax(0,1fr)_120px_140px_32px] items-center px-4 py-2 text-left transition-colors",
 									"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-base",
 									(isRowActive || isSelected) && "bg-bg-weak-50/50",
 								)}
 							>
 								{/* Name Column */}
-								<div className="flex items-center gap-2">
+								<div className="flex min-w-0 items-center gap-2">
 									<Icon
 										name="globe"
 										className={cn(
@@ -107,7 +107,7 @@ export const DomainTable = ({
 											getStatusColorClass(domain.status),
 										)}
 									/>
-									<span className="font-medium text-label-sm text-text-strong-950">
+									<span className="truncate font-medium text-label-sm text-text-strong-950">
 										{domain.domain}
 									</span>
 								</div>

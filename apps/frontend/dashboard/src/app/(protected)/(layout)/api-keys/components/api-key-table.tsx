@@ -303,7 +303,7 @@ export const ApiKeyTable = ({
 		<>
 			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/40">
 				{/* Table Header */}
-				<div className="grid grid-cols-[1fr_1.3fr_1.1fr_1fr_0.8fr_0.8fr_34px] items-center border-stroke-soft-100 border-b bg-bg-weak-50/50 px-4 py-2.5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-bg-weak-50/40">
+				<div className="grid grid-cols-[minmax(0,1fr)_100px_110px_100px_100px_100px_32px] items-center border-stroke-soft-100 border-b bg-bg-weak-50/50 px-4 py-2.5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-bg-weak-50/40">
 					<div className="flex items-center gap-1">
 						<span className="text-xs">Name</span>
 					</div>
@@ -337,12 +337,12 @@ export const ApiKeyTable = ({
 						Array.from({ length: loadingRows }).map((_, index) => (
 							<div
 								key={`skeleton-${index}`}
-								className="grid grid-cols-[1fr_1.3fr_1.1fr_1fr_0.8fr_0.8fr_34px] items-center px-4 py-2"
+								className="grid grid-cols-[minmax(0,1fr)_100px_110px_100px_100px_100px_32px] items-center px-4 py-2"
 							>
-								<div className="flex items-center gap-2">
+								<div className="flex min-w-0 items-center gap-2">
 									<Skeleton className="h-4 w-24" />
 								</div>
-								<div className="flex items-center">
+								<div className="flex min-w-0 items-center">
 									<Skeleton className="h-4 w-12" />
 								</div>
 								<div className="flex items-center gap-2">
@@ -377,14 +377,14 @@ export const ApiKeyTable = ({
 								<div
 									key={`api-key-${index}`}
 									className={cn(
-										"group/row grid w-full cursor-pointer grid-cols-[1fr_1.3fr_1.1fr_1fr_0.8fr_0.8fr_34px] items-center px-4 py-2 text-left transition-colors",
+										"group/row grid w-full cursor-pointer grid-cols-[minmax(0,1fr)_100px_110px_100px_100px_100px_32px] items-center px-4 py-2 text-left transition-colors",
 										"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-base focus-visible:ring-offset-1",
 										isRowActive && "bg-bg-weak-50/50",
 									)}
 								>
 									<Link href={`/api-keys/${apiKey.id}`} className="contents">
 										{/* Name Column */}
-										<div className="flex items-center gap-2">
+										<div className="flex min-w-0 items-center gap-2">
 											<div className="truncate font-medium text-label-sm text-text-strong-950">
 												{displayName}
 											</div>
@@ -398,7 +398,7 @@ export const ApiKeyTable = ({
 										</div>
 
 										{/* Created By Column */}
-										<div className="flex items-center gap-1">
+										<div className="flex min-w-0 items-center gap-1">
 											<Avatar.Root
 												size="20"
 												className="rounded-full bg-transparent"

@@ -67,7 +67,7 @@ const formatRoleLabel = (role: string) => {
 	}
 };
 
-const GRID = "grid-cols-[1fr_160px_200px_48px]";
+const GRID = "grid-cols-[minmax(0,1fr)_100px_130px_32px]";
 const BORDER = "border-stroke-soft-100 dark:border-stroke-soft-100/50";
 const DIVIDER = "divide-stroke-soft-100 dark:divide-stroke-soft-100/50";
 
@@ -385,7 +385,7 @@ export const TeamList = ({ searchQuery, filters = "all" }: TeamListProps) => {
 								)}
 							>
 								{/* User Column */}
-								<div className="flex items-center gap-3">
+								<div className="flex min-w-0 items-center gap-3">
 									<div
 										className={cn(
 											"flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full font-semibold text-white text-xs uppercase tracking-wide shadow-sm",
@@ -455,8 +455,12 @@ export const TeamList = ({ searchQuery, filters = "all" }: TeamListProps) => {
 									)}
 								>
 									{/* User Column */}
-									<div className="flex items-center gap-3">
-										<Avatar.Root size="24" color="gray" className="flex-shrink-0">
+									<div className="flex min-w-0 items-center gap-3">
+										<Avatar.Root
+											size="24"
+											color="gray"
+											className="flex-shrink-0"
+										>
 											{member.user.image ? (
 												<Avatar.Image
 													src={member.user.image}
@@ -479,7 +483,7 @@ export const TeamList = ({ searchQuery, filters = "all" }: TeamListProps) => {
 											)}
 										</Avatar.Root>
 										<div className="min-w-0 flex-1">
-											<div className="flex flex-wrap items-center gap-1.5">
+											<div className="flex min-w-0 items-center gap-1.5">
 												<span className="truncate font-medium text-label-sm text-text-strong-950">
 													{member.user.name || member.user.email.split("@")[0]}
 												</span>
@@ -525,7 +529,7 @@ export const TeamList = ({ searchQuery, filters = "all" }: TeamListProps) => {
 														mode="ghost"
 														size="xxsmall"
 													>
-														<Icon name="more-vertical" className="h-3 w-3" />
+														<Icon name="more-horizontal" className="h-3 w-3" />
 													</Button.Root>
 												</Dropdown.Trigger>
 												<Dropdown.Content align="end" className="w-52 text-xs">
