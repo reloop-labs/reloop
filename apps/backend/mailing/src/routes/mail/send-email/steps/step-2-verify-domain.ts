@@ -3,9 +3,7 @@ import { db } from "@reloop/db/client";
 import { domain } from "@reloop/db/schema";
 import { and, eq } from "drizzle-orm";
 
-/**
- * Step 2: Verify that the domain belongs to the organization and is authorized.
- */
+
 export async function verifyDomainAuth_step2({
 	organizationId,
 	domainName,

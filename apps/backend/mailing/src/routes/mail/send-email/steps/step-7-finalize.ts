@@ -3,9 +3,7 @@ import { db } from "@reloop/db/client";
 import { emailLog } from "@reloop/db/schema";
 import { eq } from "drizzle-orm";
 
-/**
- * Step 7: Finalize the log and publish event.
- */
+
 export async function finalizeEmail_step7({
 	emailLogId,
 	result,

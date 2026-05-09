@@ -31,6 +31,27 @@ const useCases = [
 		description: "Zero-latency technical and admin communications.",
 		items: ["Error logs", "Downtime alerts", "Reports", "Approvals"],
 	},
+	{
+		title: "AI Agent Inbox",
+		description:
+			"A dedicated inbox for AI agents to manage and respond to emails like a human.",
+		items: [
+			"Native agent inbox",
+			"Autonomous drafting",
+			"Human-in-the-loop",
+			"Contextual memory",
+		],
+	},
+	{
+		title: "Recive Email",
+		description: "Seamlessly process and route inbound mail to your systems.",
+		items: [
+			"Inbound webhooks",
+			"JSON parsing",
+			"Spam filtering",
+			"Attachment handling",
+		],
+	},
 ];
 
 const UseCase = () => {
@@ -41,9 +62,9 @@ const UseCase = () => {
 					Use cases
 				</p>
 				<h2 className="mt-4 font-semibold text-[2.6rem] leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem]">
-					Built for every <span className="text-white/40">sending need.</span>
+					Built for every Single Need
 				</h2>
-				<div className="mt-20 grid gap-px overflow-hidden rounded-2xl border border-white/5 bg-white/5 sm:grid-cols-2 lg:grid-cols-4">
+				<div className="mt-20 grid gap-px overflow-hidden rounded-2xl border border-white/5 bg-white/5 sm:grid-cols-2 lg:grid-cols-3">
 					{useCases.map((useCase, i) => (
 						<div
 							key={useCase.title}

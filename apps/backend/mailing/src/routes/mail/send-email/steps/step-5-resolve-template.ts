@@ -1,9 +1,7 @@
 import { MailErrors } from "@reloop/be-mailing/lib/errors";
 import { db } from "@reloop/db/client";
 
-/**
- * Step 5: Resolve template and substitute variables.
- */
+
 export async function resolveTemplate_step5({
 	organizationId,
 	template,

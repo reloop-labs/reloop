@@ -1,8 +1,6 @@
 import { kumomtaClient } from "@reloop/be-mailing/lib/kumomta-client";
 
-/**
- * Step 6: Execute the email send via KumoMTA.
- */
+
 export async function sendEmail_step6({
 	body,
 	finalSubject,

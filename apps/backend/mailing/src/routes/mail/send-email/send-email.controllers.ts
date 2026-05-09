@@ -11,10 +11,7 @@ import {
 	verifyDomainAuth_step2,
 } from "./steps";
 
-/**
- * Controller for sending an email.
- * Orchestrates the multi-step process from validation to transmission.
- */
+
 export async function sendEmailController({
 	organizationId,
 	body,
@@ -30,16 +27,16 @@ export async function sendEmailController({
 	});
 	logger.info("Initiating email send process");
 
-	// Step 1: Parse 'from' address
+
 	const { domainName } = parseFromAddress_step1(body.from);
 
-	// Step 2: Verify domain authorization
+
 	const { currentDomain } = await verifyDomainAuth_step2({
 		organizationId,
 		domainName,
 	});
 
-	// Step 3: Check DNS health
+
 	const dnsHealthCheck = await checkDnsHealth_step3({
 		domainId: currentDomain.id,
 		organizationId,
@@ -49,14 +46,14 @@ export async function sendEmailController({
 		throw MailErrors.dnsHealthError(domainName, dnsHealthCheck.missingRecords);
 	}
 
-	// Step 4: Create initial log
+
 	const { emailLogId } = await createEmailLog_step4({
 		organizationId,
 		domainId: currentDomain.id,
 		body,
 	});
 
-	// Step 5: Resolve template and substitute variables
+
 	const { finalSubject, finalHtml, finalText } = await resolveTemplate_step5({
 		organizationId,
 		template: body.template,
@@ -65,7 +62,7 @@ export async function sendEmailController({
 		text: body.text,
 	});
 
-	// Step 6: Send via KumoMTA
+
 	const result = await sendEmail_step6({
 		body,
 		finalSubject,
@@ -76,7 +73,7 @@ export async function sendEmailController({
 		emailLogId,
 	});
 
-	// Step 7: Finalize log and emit event
+
 	const response = await finalizeEmail_step7({
 		emailLogId,
 		result,

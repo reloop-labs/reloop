@@ -7,9 +7,7 @@ import {
 import { useLogger } from "evlog/elysia";
 import { and, eq, inArray } from "drizzle-orm";
 
-/**
- * Step 3: Check the DNS health (SPF, DKIM, DMARC) of the domain.
- */
+
 export async function checkDnsHealth_step3({
 	domainId,
 	organizationId,
