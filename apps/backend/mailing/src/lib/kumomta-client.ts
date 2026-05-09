@@ -1,10 +1,11 @@
 import { log } from "evlog";
+import MailComposer from "nodemailer/lib/mail-composer";
 import { mailConfig } from "../mail.config";
-import { signTrackingUrl } from "./crypto";
 import { MailErrors } from "./errors";
 
 export interface KumomtaHttpConfig {
 	baseUrl: string;
+	timeoutMs?: number;
 }
 
 export interface SendEmailOptions {
@@ -31,6 +32,14 @@ export interface SendEmailOptions {
 	template?: { id: string; variables?: Record<string, string | number> };
 }
 
+// KumoMTA /api/inject/v1 response shape (per official API schema)
+interface InjectResponse {
+	success_count: number;
+	fail_count: number;
+	failed_recipients: string[]; // array of email addresses that failed
+	errors: string[];
+}
+
 interface InjectRecipient {
 	email: string;
 }
@@ -43,9 +52,11 @@ interface InjectRequest {
 
 export class KumomtaClient {
 	private baseUrl: string;
+	private timeoutMs: number;
 
 	constructor(config: KumomtaHttpConfig) {
 		this.baseUrl = config.baseUrl.replace(/\/+$/, "");
+		this.timeoutMs = config.timeoutMs ?? 30_000;
 	}
 
 	async testConnection(): Promise<boolean> {
@@ -79,25 +90,26 @@ export class KumomtaClient {
 		const toList = Array.isArray(options.to) ? options.to : [options.to];
 		const content = await buildRfcMessage(options);
 
-		// Deduplicate recipients across To, CC, and BCC to avoid multiple deliveries to the same address
+		// Deduplicate recipients across To, CC, and BCC to avoid multiple
+		// deliveries to the same address
 		const recipientSet = new Set<string>();
 
-		toList.forEach((email) => {
+		for (const email of toList) {
 			recipientSet.add(email.toLowerCase().trim());
-		});
+		}
 
 		if (options.cc) {
 			const ccList = Array.isArray(options.cc) ? options.cc : [options.cc];
-			ccList.forEach((email) => {
+			for (const email of ccList) {
 				recipientSet.add(email.toLowerCase().trim());
-			});
+			}
 		}
 
 		if (options.bcc) {
 			const bccList = Array.isArray(options.bcc) ? options.bcc : [options.bcc];
-			bccList.forEach((email) => {
+			for (const email of bccList) {
 				recipientSet.add(email.toLowerCase().trim());
-			});
+			}
 		}
 
 		const payload: InjectRequest = {
@@ -106,42 +118,85 @@ export class KumomtaClient {
 			content,
 		};
 
+		let response: Response;
 		try {
-			const response = await fetch(`${this.baseUrl}/api/inject/v1`, {
+			response = await fetch(`${this.baseUrl}/api/inject/v1`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(payload),
+				signal: AbortSignal.timeout(this.timeoutMs),
 			});
-
-			if (!response.ok) {
-				const errorBody = await response.text();
-				throw MailErrors.kumoMtaError(response.status, errorBody);
-			}
-
-			const result = await response.json();
-
-			log.info({
-				message: "Email injected via KumoMTA HTTP API",
-				id: result.id,
-				from: options.from,
-				to: options.to,
-				subject: options.subject,
-			});
-
-			return {
-				id: result.id || "",
-				messageId: result.id || "",
-			};
 		} catch (error) {
 			log.error({
-				message: "Failed to inject email via KumoMTA HTTP API",
+				message: "Failed to reach KumoMTA HTTP API",
 				error: error instanceof Error ? error.message : String(error),
 				from: options.from,
 				to: options.to,
-				subject: options.subject,
 			});
 			throw error;
 		}
+
+		if (response.status === 422) {
+			const errorBody = await response.text().catch(() => "422 Unprocessable Entity");
+			log.error({
+				message: "KumoMTA rejected message: content syntax error (422)",
+				body: errorBody,
+				from: options.from,
+				to: options.to,
+			});
+			throw MailErrors.kumoMtaError(422, `Invalid message content: ${errorBody}`);
+		}
+
+		if (!response.ok) {
+			const errorBody = await response
+				.text()
+				.catch(() => `HTTP ${response.status}`);
+			log.error({
+				message: "KumoMTA HTTP API returned non-2xx",
+				status: response.status,
+				body: errorBody,
+				from: options.from,
+				to: options.to,
+			});
+			throw MailErrors.kumoMtaError(response.status, errorBody);
+		}
+
+		const result: InjectResponse = await response.json();
+
+		// Surface partial failures — KumoMTA returns 200 even when some
+		// recipients were rejected.
+		if (result.fail_count > 0 || result.errors.length > 0) {
+			const reason =
+				[
+					...result.failed_recipients.map((email) => `failed: ${email}`),
+					...result.errors,
+				].join("; ") || "unknown injection failure";
+			log.error({
+				message: "KumoMTA injection had failures",
+				fail_count: result.fail_count,
+				failed_recipients: result.failed_recipients,
+				errors: result.errors,
+				from: options.from,
+				to: options.to,
+			});
+			throw MailErrors.kumoMtaError(200, reason);
+		}
+
+		// KumoMTA inject/v1 does not return a per-message ID in its response.
+		// We use the X-Email-Log-ID custom header value we injected as the stable
+		// message identifier that ties the inject call back to our emailLog row.
+		const messageId = options.customHeaders?.["X-Email-Log-ID"] ?? "";
+
+		log.info({
+			message: "Email injected via KumoMTA HTTP API",
+			messageId,
+			from: options.from,
+			to: options.to,
+			subject: options.subject,
+			success_count: result.success_count,
+		});
+
+		return { id: messageId, messageId };
 	}
 
 	getConfig(): KumomtaHttpConfig {
@@ -149,42 +204,12 @@ export class KumomtaClient {
 	}
 }
 
-import MailComposer from "nodemailer/lib/mail-composer";
-
 /**
  * Build an RFC 5322 formatted message string with headers and body.
+ * Tracking injection is handled upstream in step-5b — this function
+ * only handles MIME composition.
  */
 async function buildRfcMessage(options: SendEmailOptions): Promise<string> {
-	const emailLogId = options.customHeaders?.["X-Email-Log-ID"];
-	const trackingBaseUrl = mailConfig.BASE_URL.replace(/\/+$/, "");
-	let html = options.html;
-
-	if (emailLogId && html) {
-		// 1. Inject open tracking pixel
-		const openSig = signTrackingUrl(emailLogId, mailConfig.TRACKING_SECRET);
-		const pixel = `<img src="${trackingBaseUrl}/api/mail/v1/track/open/${emailLogId}?sig=${openSig}" width="1" height="1" style="display:none" alt="" />`;
-		if (html.includes("</body>")) {
-			html = html.replace("</body>", `${pixel}</body>`);
-		} else {
-			html += pixel;
-		}
-
-		// 2. Rewrite links for click tracking
-		// Search for <a ... href="URL" ...> and replace URL
-		html = html.replace(
-			/<a\s+(?:[^>]*?\s+)?href=(["'])(.*?)\1/gi,
-			(match, _quote, url) => {
-				// Avoid rewriting existing tracking links or anchored links
-				if (url.startsWith("#") || url.includes("/api/mail/v1/track/click")) {
-					return match;
-				}
-				const sig = signTrackingUrl(url, mailConfig.TRACKING_SECRET);
-				const trackedUrl = `${trackingBaseUrl}/api/mail/v1/track/click/${emailLogId}?url=${encodeURIComponent(url)}&sig=${sig}`;
-				return match.replace(url, trackedUrl);
-			},
-		);
-	}
-
 	const mailOptions: import("nodemailer/lib/mailer").Options = {
 		from: options.fromName
 			? `${options.fromName} <${options.from}>`
@@ -192,7 +217,7 @@ async function buildRfcMessage(options: SendEmailOptions): Promise<string> {
 		to: options.to,
 		subject: options.subject,
 		text: options.text,
-		html: html,
+		html: options.html,
 		replyTo: options.reply_to,
 		cc: options.cc,
 		bcc: options.bcc,
@@ -208,12 +233,9 @@ async function buildRfcMessage(options: SendEmailOptions): Promise<string> {
 
 	const composer = new MailComposer(mailOptions);
 	const message = await composer.compile().build();
-
 	return message.toString();
 }
 
-// Create singleton instance
-const kumomtaUrl = mailConfig.KUMOMTA_HTTP_URL;
 export const kumomtaClient = new KumomtaClient({
-	baseUrl: kumomtaUrl,
+	baseUrl: mailConfig.KUMOMTA_HTTP_URL,
 });
