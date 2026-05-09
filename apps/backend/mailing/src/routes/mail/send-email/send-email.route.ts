@@ -24,7 +24,6 @@ export const sendEmailRoute = new Elysia()
 				500: MailModel.internalServerError,
 			},
 			detail: {
-				tags: ["Mailing"],
 				summary: "Send email",
 				description: "Send an email through the KumoMTA mail server",
 			},

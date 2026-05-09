@@ -1,4 +1,4 @@
-import { mailConfig } from "../mail.config";
+import { mailConfig } from "@reloop/be-mailing/mail.config";
 
 export async function validateSession(cookie: string | null) {
 	const response = await fetch(

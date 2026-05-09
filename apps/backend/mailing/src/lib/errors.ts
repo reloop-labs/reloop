@@ -125,4 +125,18 @@ export const MailErrors = {
 			why: message,
 			fix: "Please try again later or contact support if the issue persists",
 		}),
+	emailNotFound: (emailId: string) =>
+		createError({
+			status: 404,
+			message: "Email not found",
+			why: `The email with ID ${emailId} was not found or is not authorized for your organization`,
+			fix: "Verify the email ID and ensure it belongs to your organization",
+		}),
+	attachmentNotFound: (attachmentId: string) =>
+		createError({
+			status: 404,
+			message: "Attachment not found",
+			why: `The attachment with ID ${attachmentId} was not found`,
+			fix: "Verify the attachment ID and ensure it exists for the given email",
+		}),
 };
