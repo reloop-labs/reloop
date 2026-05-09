@@ -4,6 +4,8 @@ export namespace MailModel {
 	// Email validation pattern
 	const emailPattern = /^(?:.*<[^\s@]+@[^\s@]+\.[^\s@]+>|[^\s@]+@[^\s@]+\.[^\s@]+)$/;
 	const tagPattern = /^[a-zA-Z0-9_-]+$/;
+	const variableKeyPattern =
+		/^(?!FIRST_NAME$|LAST_NAME$|EMAIL$|UNSUBSCRIBE_URL$)[a-zA-Z0-9_]{1,50}$/;
 
 	export const sendEmailBody = t.Object({
 		from: t.String({
@@ -107,7 +109,33 @@ export namespace MailModel {
 				{
 					id: t.String({ description: "Template ID" }),
 					variables: t.Optional(
-						t.Record(t.String(), t.Union([t.String(), t.Number()])),
+						t.Record(
+							t.String({
+								pattern: variableKeyPattern.source,
+								maxLength: 50,
+								description: "The key of the variable.",
+								error:
+									"Variable key may only contain ASCII letters, numbers, and underscores, cannot be more than 50 characters, and cannot be a reserved name (FIRST_NAME, LAST_NAME, EMAIL, UNSUBSCRIBE_URL).",
+							}),
+							t.Union(
+								[
+									t.String({
+										maxLength: 2000,
+										description: "The value of the variable (string).",
+									}),
+									t.Number({
+										maximum: Number.MAX_SAFE_INTEGER,
+										description: "The value of the variable (number).",
+									}),
+								],
+								{
+									description: "The value of the variable.",
+									error:
+										"Variable value must be a string (max 2,000 characters) or a number (not greater than 2^53 - 1).",
+								},
+							),
+							{ description: "Variables to replace in the template" },
+						),
 					),
 				},
 				{ description: "Email template to use" },

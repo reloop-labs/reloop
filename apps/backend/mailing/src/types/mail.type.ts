@@ -36,6 +36,11 @@ export namespace MailTypes {
 		tags?: Array<{ name: string; value: string }>;
 		template?: {
 			id: string;
+			/**
+			 * Variables to replace in the template.
+			 * Key: ASCII letters, numbers, underscores. Max 50 chars. Not reserved.
+			 * Value: string (max 2000 chars) or number (max 2^53 - 1).
+			 */
 			variables?: Record<string, string | number>;
 		};
 	}
