@@ -40,6 +40,7 @@ export async function sendEmailController({
 	const dnsHealthCheck = await checkDnsHealth_step3({
 		domainId: currentDomain.id,
 		organizationId,
+		domainData: currentDomain,
 	});
 
 	if (!dnsHealthCheck.isHealthy) {

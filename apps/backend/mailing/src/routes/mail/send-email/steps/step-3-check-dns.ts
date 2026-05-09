@@ -2,37 +2,29 @@ import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import {
 	type dnsRecordTypeNameEnum,
-	domain,
 	domainDnsRecord,
 } from "@reloop/db/schema";
 import { and, eq, inArray } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
 
+type DomainRow = {
+	id: string;
+	domain: string;
+	systemVerified: boolean | null;
+	status: string;
+	lastVerifiedAt: Date | null;
+};
+
 export async function checkDnsHealth_step3({
 	domainId,
 	organizationId,
+	domainData,
 }: {
 	domainId: string;
 	organizationId: string;
+	domainData: DomainRow;
 }) {
 	const logger = useLogger();
-	const domainData = await db.query.domain.findFirst({
-		where: and(
-			eq(domain.id, domainId),
-			eq(domain.organizationId, organizationId),
-		),
-		columns: {
-			id: true,
-			domain: true,
-			systemVerified: true,
-			status: true,
-			lastVerifiedAt: true,
-		},
-	});
-
-	if (!domainData) {
-		throw new Error("Domain not found during DNS health check");
-	}
 
 	const STALE_THRESHOLD_HOURS = 6;
 	const lastVerified = domainData.lastVerifiedAt;

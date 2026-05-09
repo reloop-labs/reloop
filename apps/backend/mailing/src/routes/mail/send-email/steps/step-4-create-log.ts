@@ -3,6 +3,16 @@ import type { MailModel } from "@reloop/be-mailing/model/mail.model";
 import { db } from "@reloop/db/client";
 import { emailLog } from "@reloop/db/schema";
 
+function parseFromName(from: string): string {
+	// Handle "Display Name <email@domain.com>" format
+	const displayNameMatch = from.match(/^(.+?)\s*<[^>]+>$/);
+	if (displayNameMatch?.[1]) {
+		return displayNameMatch[1].trim();
+	}
+	// Fall back to local part of plain email
+	return from.split("@")[0] ?? from;
+}
+
 export async function createEmailLog_step4({
 	organizationId,
 	domainId,
@@ -19,7 +29,7 @@ export async function createEmailLog_step4({
 			organizationId,
 			domainId: domainId,
 			fromEmail: body.from,
-			fromName: body.from.split("@")[0],
+			fromName: parseFromName(body.from),
 			toEmails: Array.isArray(body.to) ? body.to : [body.to],
 			ccEmails: body.cc
 				? Array.isArray(body.cc)

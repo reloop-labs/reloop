@@ -153,6 +153,13 @@ export const MailErrors = {
 			why: "The tracking link has been tampered with or is invalid",
 			fix: "Ensure the tracking link has not been modified or corrupted",
 		}),
+	missingEmailBody: () =>
+		createError({
+			status: 400,
+			message: "Missing email body",
+			why: "Neither 'html' nor 'text' body was provided, and the referenced template has no rendered content",
+			fix: "Provide at least one of 'html' or 'text' in the request body, or ensure the template has rendered HTML",
+		}),
 };
 
 export const RateLimitErrors = {

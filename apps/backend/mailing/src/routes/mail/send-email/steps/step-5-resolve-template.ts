@@ -56,5 +56,9 @@ export async function resolveTemplate_step5({
 		}
 	}
 
+	if (!finalHtml && !finalText) {
+		throw MailErrors.missingEmailBody();
+	}
+
 	return { finalSubject, finalHtml, finalText };
 }
