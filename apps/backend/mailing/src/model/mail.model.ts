@@ -2,16 +2,17 @@ import { t } from "elysia";
 
 export namespace MailModel {
 	// Email validation pattern
-	const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+	const emailPattern = /^(?:.*<[^\s@]+@[^\s@]+\.[^\s@]+>|[^\s@]+@[^\s@]+\.[^\s@]+)$/;
+	const tagPattern = /^[a-zA-Z0-9_-]+$/;
 
 	export const sendEmailBody = t.Object({
 		from: t.String({
 			pattern: emailPattern.source,
 			description: "Sender email address",
-			examples: ["user@example.com"],
+			examples: ["user@example.com", "Your Name <user@example.com>"],
 		}),
-		to: t.Union([t.String(), t.Array(t.String())], {
-			description: "Recipient email address(es)",
+		to: t.Union([t.String(), t.Array(t.String(), { maxItems: 50 })], {
+			description: "Recipient email address(es) (max 50)",
 			examples: [
 				"recipient@example.com",
 				["user1@example.com", "user2@example.com"],
@@ -23,6 +24,18 @@ export namespace MailModel {
 			description: "Email subject",
 			examples: ["Test Email"],
 		}),
+		cc: t.Optional(
+			t.Union([t.String(), t.Array(t.String(), { maxItems: 50 })], {
+				description: "CC email address(es) (max 50)",
+				examples: ["cc@example.com"],
+			}),
+		),
+		bcc: t.Optional(
+			t.Union([t.String(), t.Array(t.String(), { maxItems: 50 })], {
+				description: "BCC email address(es) (max 50)",
+				examples: ["bcc@example.com"],
+			}),
+		),
 		text: t.Optional(
 			t.String({
 				description: "Plain text content",
@@ -32,31 +45,20 @@ export namespace MailModel {
 		html: t.Optional(
 			t.String({
 				description: "HTML content",
-				examples: ["<h1>Test Email</h1><p>This is a test email</p>"],
+				examples: ["<h1>Test Email</h1><p>This is a test email</p>", "If not provided, the HTML will be used to generate a plain text version. You can opt out of this behavior by setting value to an empty string."],
 			}),
 		),
-		replyTo: t.Optional(
+		reply_to: t.Optional(
 			t.Union([t.String(), t.Array(t.String())], {
 				description: "Reply-to email address",
 				examples: ["noreply@example.com"],
 			}),
 		),
-		cc: t.Optional(
-			t.Union([t.String(), t.Array(t.String())], {
-				description: "CC email address(es)",
-				examples: ["cc@example.com"],
-			}),
-		),
-		bcc: t.Optional(
-			t.Union([t.String(), t.Array(t.String())], {
-				description: "BCC email address(es)",
-				examples: ["bcc@example.com"],
-			}),
-		),
-		scheduledAt: t.Optional(
+		scheduled_at: t.Optional(
 			t.String({
-				description: "Schedule email to be sent later",
-				examples: ["in 1 min", "2026-08-05T11:52:01.858Z"],
+				format: "date-time",
+				description: "Schedule email to be sent later (ISO 8601)",
+				examples: ["2026-08-05T11:52:01.858Z"],
 			}),
 		),
 		headers: t.Optional(
@@ -64,7 +66,7 @@ export namespace MailModel {
 				description: "Custom headers to add to the email",
 			}),
 		),
-		channelId: t.Optional(
+		channel_id: t.Optional(
 			t.String({
 				description: "The channel ID to receive the email",
 			}),
@@ -75,8 +77,8 @@ export namespace MailModel {
 					content: t.Optional(t.Union([t.String(), t.Unknown()])),
 					filename: t.Optional(t.String()),
 					path: t.Optional(t.String()),
-					contentType: t.Optional(t.String()),
-					contentId: t.Optional(t.String()),
+					content_type: t.Optional(t.String()),
+					content_id: t.Optional(t.String()),
 				}),
 				{ description: "Email attachments" },
 			),
@@ -84,8 +86,18 @@ export namespace MailModel {
 		tags: t.Optional(
 			t.Array(
 				t.Object({
-					name: t.String(),
-					value: t.String(),
+					name: t.String({
+						pattern: tagPattern.source,
+						maxLength: 256,
+						description: "The name of the email tag.",
+						error: "The name of the email tag. It can only contain ASCII letters (a-z, A-Z), numbers (0-9), underscores (_), or dashes (-). It can contain no more than 256 characters.",
+					}),
+					value: t.String({
+						pattern: tagPattern.source,
+						maxLength: 256,
+						description: "The value of the email tag.",
+						error: "The value of the email tag. It can only contain ASCII letters (a-z, A-Z), numbers (0-9), underscores (_), or dashes (-). It can contain no more than 256 characters.",
+					}),
 				}),
 				{ description: "Custom tags passed in key/value pairs" },
 			),
@@ -93,7 +105,7 @@ export namespace MailModel {
 		template: t.Optional(
 			t.Object(
 				{
-					id: t.String({ description: "Template alias or ID" }),
+					id: t.String({ description: "Template ID" }),
 					variables: t.Optional(
 						t.Record(t.String(), t.Union([t.String(), t.Number()])),
 					),

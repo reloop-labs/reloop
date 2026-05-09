@@ -96,9 +96,9 @@ export async function sendEmailController({
 						? body.bcc
 						: [body.bcc]
 					: undefined,
-				replyTo: Array.isArray(body.replyTo)
-					? body.replyTo.join(", ")
-					: body.replyTo,
+				replyTo: Array.isArray(body.reply_to)
+					? body.reply_to.join(", ")
+					: body.reply_to,
 				subject: body.subject,
 				textBody: body.text,
 				htmlBody: body.html,
@@ -166,11 +166,11 @@ export async function sendEmailController({
 			subject: finalSubject,
 			text: finalText,
 			html: finalHtml,
-			replyTo: body.replyTo,
+			reply_to: body.reply_to,
 			cc: body.cc,
 			bcc: body.bcc,
-			scheduledAt: body.scheduledAt,
-			channelId: body.channelId,
+			scheduled_at: body.scheduled_at,
+			channel_id: body.channel_id,
 			attachments: body.attachments,
 			tags: body.tags,
 			template: body.template,

@@ -20,18 +20,18 @@ export namespace MailTypes {
 		subject: string;
 		text?: string;
 		html?: string;
-		replyTo?: string | string[];
+		reply_to?: string | string[];
 		cc?: string | string[];
 		bcc?: string | string[];
-		scheduledAt?: string;
+		scheduled_at?: string;
 		headers?: Record<string, string>;
-		channelId?: string;
+		channel_id?: string;
 		attachments?: Array<{
 			content?: string | Buffer | import("stream").Readable;
 			filename?: string;
 			path?: string;
-			contentType?: string;
-			contentId?: string;
+			content_type?: string;
+			content_id?: string;
 		}>;
 		tags?: Array<{ name: string; value: string }>;
 		template?: {

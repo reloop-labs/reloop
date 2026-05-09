@@ -12,18 +12,18 @@ export interface SendEmailOptions {
 	subject: string;
 	text?: string;
 	html?: string;
-	replyTo?: string | string[];
+	reply_to?: string | string[];
 	cc?: string | string[];
 	bcc?: string | string[];
 	customHeaders?: Record<string, string>;
-	scheduledAt?: string;
-	channelId?: string;
+	scheduled_at?: string;
+	channel_id?: string;
 	attachments?: Array<{
 		content?: string | Buffer | import("stream").Readable;
 		filename?: string;
 		path?: string;
-		contentType?: string;
-		contentId?: string;
+		content_type?: string;
+		content_id?: string;
 	}>;
 	tags?: Array<{ name: string; value: string }>;
 	template?: { id: string; variables?: Record<string, string | number> };
@@ -196,7 +196,7 @@ async function buildRfcMessage(options: SendEmailOptions): Promise<string> {
 		subject: options.subject,
 		text: options.text,
 		html: html,
-		replyTo: options.replyTo,
+		replyTo: options.reply_to,
 		cc: options.cc,
 		bcc: options.bcc,
 		headers: options.customHeaders,
@@ -204,8 +204,8 @@ async function buildRfcMessage(options: SendEmailOptions): Promise<string> {
 			filename: att.filename,
 			content: att.content,
 			path: att.path,
-			contentType: att.contentType,
-			cid: att.contentId,
+			contentType: att.content_type,
+			cid: att.content_id,
 		})),
 	};
 
