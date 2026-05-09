@@ -206,7 +206,7 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 										transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
 										style={{ overflow: "hidden" }}
 									>
-										<div className="my-0.5 ml-[14px] flex flex-col gap-0.5 border-neutral-alpha-10 border-l pb-0.5 pl-2">
+										<div className="my-0.5 ml-[14px] flex flex-col border-neutral-alpha-10 border-l pb-0.5 pl-2">
 											{contactsSubNav.map(
 												(
 													{ label: subLabel, path: subPath, iconName: subIcon },
@@ -229,7 +229,7 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 															}
 															onPointerLeave={() => setHoveredEl(undefined)}
 															className={cn(
-																"relative z-10 flex h-7 items-center gap-1.5 rounded-md px-2 font-medium text-xs",
+																"relative z-10 flex h-7 items-center gap-1.5 rounded-md px-2 font-medium text-[13px]",
 																isSubActive
 																	? "text-foreground"
 																	: "text-text-sub-600",
@@ -238,7 +238,7 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 															<Icon
 																name={subIcon}
 																className={cn(
-																	"h-3 w-3 shrink-0",
+																	"h-3.5 w-3.5 shrink-0",
 																	!isSubActive && "opacity-70",
 																)}
 															/>
@@ -264,7 +264,7 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 										transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
 										style={{ overflow: "hidden" }}
 									>
-										<div className="my-0.5 ml-[14px] flex flex-col gap-0.5 border-neutral-alpha-10 border-l pb-0.5 pl-2">
+										<div className="my-0.5 ml-[14px] flex flex-col border-neutral-alpha-10 border-l pb-0.5 pl-2">
 											{settingsSubNav.map(
 												(
 													{ label: subLabel, path: subPath, iconName: subIcon },
@@ -287,7 +287,7 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 															}
 															onPointerLeave={() => setHoveredEl(undefined)}
 															className={cn(
-																"relative z-10 flex h-7 items-center gap-1.5 rounded-md px-2 font-medium text-xs",
+																"relative z-10 flex h-7 items-center gap-1.5 rounded-md px-2 font-medium text-[13px]",
 																isSubActive
 																	? "text-foreground"
 																	: "text-text-sub-600",
@@ -296,7 +296,7 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 															<Icon
 																name={subIcon}
 																className={cn(
-																	"h-3 w-3 shrink-0",
+																	"h-3.5 w-3.5 shrink-0",
 																	!isSubActive && "opacity-70",
 																)}
 															/>
