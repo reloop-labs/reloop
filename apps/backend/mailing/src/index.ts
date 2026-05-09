@@ -40,6 +40,33 @@ const mailService = new Elysia({
 	.use(serverTiming())
 	.use(landing)
 	.use(mailRoutes)
+	.onError(({ code, error, set, log }) => {
+		const message = error instanceof Error ? error.message : String(error);
+
+		if (code === "VALIDATION") {
+			log?.warn("Validation error", {
+				message,
+				error: error.message,
+			});
+			set.status = 422;
+			return { message: error.message };
+		}
+
+		if (message.includes("not found") || message.includes("not authorized")) {
+			log?.warn("Resource not found or unauthorized", { message });
+			set.status = 404;
+			return { message };
+		}
+
+		log?.error("Unhandled error", {
+			code,
+			message,
+			stack: error instanceof Error ? error.stack : undefined,
+		});
+
+		set.status = 500;
+		return { message: "Internal server error" };
+	})
 	.onStart(async () => {
 		await loader();
 	})
