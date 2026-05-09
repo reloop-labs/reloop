@@ -3,7 +3,6 @@ import { RedisCache } from "@reloop/cache/redis-client";
 import { db } from "@reloop/db/client";
 import { log } from "evlog";
 import { mailConfig } from "../mail.config";
-import { initSubscribers } from "../subscribers/index";
 
 export const redis = new RedisCache("mail");
 
@@ -17,7 +16,6 @@ export async function loader() {
 		await bus.connect(mailConfig.NATS_URL);
 		log.info("nats", "NATS connected");
 
-		await initSubscribers();
 		log.info("subscribers", "Subscribers initialized");
 
 		log.info("loader", "Mail service loader initialized");
