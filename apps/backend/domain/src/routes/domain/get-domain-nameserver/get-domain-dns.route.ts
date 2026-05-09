@@ -6,11 +6,10 @@ import { getDomainNameserversXCodeSamples } from "./get-domain-nameserver.x-code
 
 export const getDomainNameserversRoute = new Elysia().use(authMiddleware).get(
 	"/nameservers/:domain_id",
-	async ({ params: { domain_id }, activeOrganizationId, logger }) => {
+	async ({ params: { domain_id }, activeOrganizationId }) => {
 		return await getDomainDNSController({
 			domainId: domain_id,
 			organizationId: activeOrganizationId,
-			logger,
 		});
 	},
 	{

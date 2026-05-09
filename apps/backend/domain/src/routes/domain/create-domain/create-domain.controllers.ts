@@ -10,13 +10,13 @@ import { createLog } from "@be/domain/utils/logger";
 import { createId } from "@paralleldrive/cuid2";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import type { Logger } from "@reloop/logger";
+import { useLogger } from "evlog/elysia";
+import { DomainErrors } from "@be/domain/lib/errors";
 import {
 	DOMAIN_CREATE_WEBHOOK_EVENT,
 	DOMAIN_UNDELETE_WEBHOOK_EVENT,
 } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
-import { status } from "elysia";
 
 export async function createDomainController({
 	organizationId,
@@ -28,13 +28,11 @@ export async function createDomainController({
 	tls,
 	sendingEmail,
 	receivingEmail,
-	logger,
 	cookie,
 	requestDetails,
 }: {
 	organizationId: string;
 	userId: string;
-	logger: Logger;
 	cookie?: string;
 	requestDetails?: {
 		endpoint?: string;
@@ -44,8 +42,9 @@ export async function createDomainController({
 		statusCode?: number;
 	};
 } & DomainTypes.CreateDomainRequest): Promise<DomainTypes.DomainResponse> {
+	const logger = useLogger();
 	try {
-		logger.info({ domain }, "Finding exsiting domain");
+		logger.info("Finding exsiting domain", { domain });
 		const activeDomain = await db.query.domain.findFirst({
 			where: and(
 				eq(schema.domain.domain, domain),
@@ -54,11 +53,11 @@ export async function createDomainController({
 			),
 		});
 		if (activeDomain) {
-			logger.info({ domain }, "Domain already exists");
-			throw new Error("Domain already exists");
+			logger.info("Domain already exists", { domain });
+			throw DomainErrors.domainAlreadyExists(domain);
 		}
 
-		logger.info({ domain }, "Finding deleted domain");
+		logger.info("Finding deleted domain", { domain });
 		const deletedDomain = await db.query.domain.findFirst({
 			where: and(
 				eq(schema.domain.domain, domain),
@@ -69,7 +68,7 @@ export async function createDomainController({
 		if (deletedDomain?.deletedAt) {
 			const now = new Date();
 			const domainId = deletedDomain.id;
-			logger.info({ domainId }, "Undeleting domain");
+			logger.info("Undeleting domain", { domainId });
 
 			await db
 				.update(schema.domain)
@@ -86,7 +85,7 @@ export async function createDomainController({
 					receivingEmail,
 				})
 				.where(eq(schema.domain.id, domainId));
-			logger.info({ domainId }, "Undeleting domain DNS records");
+			logger.info("Undeleting domain DNS records", { domainId });
 			await db
 				.update(schema.domainDnsRecord)
 				.set({
@@ -108,9 +107,9 @@ export async function createDomainController({
 			});
 
 			if (!undeletedDomain) {
-				throw new Error("Failed to undelete domain");
+				throw DomainErrors.failedToUndelete(domain);
 			}
-			logger.info({ domainId }, "Undeleted domain");
+			logger.info("Undeleted domain", { domainId });
 
 			await createLog({
 				event: DOMAIN_UNDELETE_WEBHOOK_EVENT.id,
@@ -126,7 +125,7 @@ export async function createDomainController({
 			};
 		}
 
-		logger.info({ domain }, "Generating DNS records");
+		logger.info("Generating DNS records", { domain });
 		const dnsRecords = await generateAllDNSRecords(domain);
 		const { dkimRecord, spfRecord, dmarcRecord, mxRecord } = dnsRecords;
 		const receivingMxRecord = generateReceivingMXRecord(
@@ -135,7 +134,7 @@ export async function createDomainController({
 			getCustomReturnPathSubString(domain, customReturnPath || "inbound"),
 		);
 		const domainId = `domain_${createId()}`;
-		logger.info({ domainId }, "Creating domain");
+		logger.info("Creating domain", { domainId });
 		await db.insert(schema.domain).values({
 			id: domainId,
 			userId: userId,
@@ -160,7 +159,7 @@ export async function createDomainController({
 			userId,
 			domain,
 		};
-		logger.info({ dnsRecordIds }, "Creating DNS records");
+		logger.info("Creating DNS records", { dnsRecordIds });
 		const recordsToInsert = [
 			{
 				...dnsRecordIds,
@@ -216,7 +215,7 @@ export async function createDomainController({
 			});
 		}
 		await db.insert(schema.domainDnsRecord).values(recordsToInsert);
-		logger.info({ domainId }, "Fetching domain with DNS records");
+		logger.info("Fetching domain with DNS records", { domainId });
 		const domainWithDnsRecords = await db.query.domain.findFirst({
 			where: and(
 				eq(schema.domain.domain, domain),
@@ -230,9 +229,9 @@ export async function createDomainController({
 			},
 		});
 		if (!domainWithDnsRecords) {
-			throw new Error("Failed to fetch domain with DNS records after creation");
+			throw DomainErrors.databaseError("Failed to fetch domain with DNS records after creation");
 		}
-		logger.info({ domainWithDnsRecords }, "Domain created successfully");
+		logger.info("Domain created successfully", { domainWithDnsRecords });
 
 		await createLog({
 			event: DOMAIN_CREATE_WEBHOOK_EVENT.id,
@@ -247,11 +246,7 @@ export async function createDomainController({
 			event: DOMAIN_CREATE_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
-		logger.error({ domain, error }, "Error creating domain");
-
-		if (error instanceof Error && error.message.includes("already exists")) {
-			throw status(409, { message: "Domain already exists" });
-		}
+		logger.error("Error creating domain", { domain, error });
 		throw error;
 	}
 }

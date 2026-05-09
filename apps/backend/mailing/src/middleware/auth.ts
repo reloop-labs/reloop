@@ -1,6 +1,5 @@
 import { AuthErrors, MailingError } from "@reloop/be-mailing/lib/errors";
 import { Elysia } from "elysia";
-import { parseError } from "evlog";
 import { evlog } from "evlog/elysia";
 import { mailConfig } from "../mail.config";
 import { validateApiKey } from "./api-key-auth";
@@ -12,16 +11,6 @@ if (mailConfig.NODE_ENV !== "production") {
 
 export const authMiddleware = new Elysia({ name: "auth-middleware" })
 	.use(evlog())
-	.onError(({ error, set }) => {
-		const parsed = parseError(error);
-		set.status = parsed.status;
-		return {
-			message: parsed.message,
-			why: parsed.why,
-			fix: parsed.fix,
-			link: parsed.link,
-		};
-	})
 	.macro({
 		cookieAuth: {
 			async resolve({ request: { headers }, log }) {

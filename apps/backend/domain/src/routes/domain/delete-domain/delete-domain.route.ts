@@ -9,7 +9,6 @@ export const deleteDomainRoute = new Elysia().use(authMiddleware).delete(
 	async ({
 		params: { domain_id },
 		activeOrganizationId,
-		logger,
 		request: { headers },
 		path,
 		request,
@@ -18,7 +17,6 @@ export const deleteDomainRoute = new Elysia().use(authMiddleware).delete(
 		return await deleteDomainController({
 			domainId: domain_id,
 			organizationId: activeOrganizationId,
-			logger,
 			cookie,
 			requestDetails: {
 				endpoint: path,

@@ -1,4 +1,3 @@
-import { domainErrorResponse } from "@be/domain/error/domain.error-response";
 import { authMiddleware } from "@be/domain/middleware/auth";
 import { DomainModel } from "@be/domain/model/domain.model";
 import { Elysia } from "elysia";
@@ -11,39 +10,31 @@ export const createDomainRoute = new Elysia().use(authMiddleware).post(
 		body,
 		activeOrganizationId,
 		userId,
-		logger,
 		request: { headers },
 		path,
 		request,
 	}) => {
-		try {
-			const cookie = headers.get("cookie") || undefined;
-			return await createDomainController({
-				organizationId: activeOrganizationId,
-				domain: body.domain,
-				customReturnPath: body.customReturnPath,
-				clickTracking: body.clickTracking,
-				openTracking: body.openTracking,
-				tls: body.tls,
-				sendingEmail: body.sendingEmail,
-				receivingEmail: body.receivingEmail,
-				userId,
-				logger,
-				cookie,
-				requestDetails: {
-					endpoint: path,
-					method: request.method,
-					userAgent: headers.get("user-agent") || undefined,
-					ipAddress:
-						(headers.get("x-forwarded-for") as string) ||
-						(headers.get("x-real-ip") as string),
-				},
-			});
-		} catch (error) {
-			const errorMessage =
-				error instanceof Error ? error.message : String(error);
-			domainErrorResponse(errorMessage);
-		}
+		const cookie = headers.get("cookie") || undefined;
+		return await createDomainController({
+			organizationId: activeOrganizationId,
+			domain: body.domain,
+			customReturnPath: body.customReturnPath,
+			clickTracking: body.clickTracking,
+			openTracking: body.openTracking,
+			tls: body.tls,
+			sendingEmail: body.sendingEmail,
+			receivingEmail: body.receivingEmail,
+			userId,
+			cookie,
+			requestDetails: {
+				endpoint: path,
+				method: request.method,
+				userAgent: headers.get("user-agent") || undefined,
+				ipAddress:
+					(headers.get("x-forwarded-for") as string) ||
+					(headers.get("x-real-ip") as string),
+			},
+		});
 	},
 	{
 		auth: true,

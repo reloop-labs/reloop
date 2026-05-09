@@ -1,20 +1,9 @@
 import { Elysia, t } from "elysia";
-import { parseError } from "evlog";
 import { evlog } from "evlog/elysia";
 import { handleOpenTracking } from "./open.controllers";
 
 export const openRoute = new Elysia()
 	.use(evlog())
-	.onError(({ error, set }) => {
-		const parsed = parseError(error);
-		set.status = parsed.status;
-		return {
-			message: parsed.message,
-			why: parsed.why,
-			fix: parsed.fix,
-			link: parsed.link,
-		};
-	})
 	.get(
 		"/open/:emailLogId",
 		({ params: { emailLogId }, query: { sig } }) =>

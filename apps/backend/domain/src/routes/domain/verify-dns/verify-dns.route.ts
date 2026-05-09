@@ -6,11 +6,10 @@ import { verifyDNSXCodeSamples } from "./verify-dns.x-codeSamples";
 
 export const verifyDNSRecordRoute = new Elysia().use(authMiddleware).post(
 	"/verify/:domain_id",
-	async ({ params: { domain_id }, activeOrganizationId, logger }) => {
+	async ({ params: { domain_id }, activeOrganizationId }) => {
 		return await verifyDNSRecordController({
 			domainId: domain_id,
 			organizationId: activeOrganizationId,
-			logger,
 		});
 	},
 	{

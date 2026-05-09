@@ -1,22 +1,21 @@
 import type { DomainTypes } from "@be/domain/types/domain.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import type { Logger } from "@reloop/logger";
+import { DomainErrors } from "@be/domain/lib/errors";
 import { DOMAIN_GET_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
-import { status } from "elysia";
+import { useLogger } from "evlog/elysia";
 
 export async function getDomainController({
 	organizationId,
-	logger,
 	domainId,
 }: {
 	organizationId: string;
-	logger: Logger;
 	domainId: string;
 }): Promise<DomainTypes.DomainResponse> {
+	const logger = useLogger();
 	try {
-		logger.info({ domainId }, "Fetching domain with DNS records");
+		logger.info("Fetching domain with DNS records", { domainId });
 		const result = await db.query.domain.findFirst({
 			where: and(
 				eq(schema.domain.id, domainId),
@@ -31,18 +30,18 @@ export async function getDomainController({
 		});
 
 		if (!result) {
-			logger.warn({ domainId }, "Domain not found");
-			throw status(404, { message: "Domain not found" });
+			logger.warn("Domain not found", { domainId });
+			throw DomainErrors.domainNotFound(domainId);
 		}
 
-		logger.info({ domainId }, "Domain fetched successfully");
+		logger.info("Domain fetched successfully", { domainId });
 		return {
 			object: "domain" as const,
 			...result,
 			event: DOMAIN_GET_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
-		logger.error({ domainId, error }, "Error getting domain");
+		logger.error("Error getting domain", { domainId, error });
 		throw error;
 	}
 }

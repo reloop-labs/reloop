@@ -10,7 +10,6 @@ export const updateDomainRoute = new Elysia().use(authMiddleware).patch(
 		params: { domain_id },
 		body,
 		activeOrganizationId,
-		logger,
 		request: { headers },
 		path,
 		request,
@@ -20,7 +19,6 @@ export const updateDomainRoute = new Elysia().use(authMiddleware).patch(
 			domainId: domain_id,
 			organizationId: activeOrganizationId,
 			body,
-			logger,
 			cookie,
 			requestDetails: {
 				endpoint: path,

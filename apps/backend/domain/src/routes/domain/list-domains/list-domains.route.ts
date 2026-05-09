@@ -6,11 +6,10 @@ import { listDomainsXCodeSamples } from "./list-domains.x-codeSamples";
 
 export const listDomainsRoute = new Elysia().use(authMiddleware).get(
 	"/list",
-	async ({ query, activeOrganizationId, logger }) => {
+	async ({ query, activeOrganizationId }) => {
 		return await listDomainsController({
 			query,
 			organizationId: activeOrganizationId,
-			logger,
 		});
 	},
 	{

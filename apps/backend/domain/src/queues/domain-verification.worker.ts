@@ -1,5 +1,6 @@
 import { domainConfig } from "@be/domain/domain.config";
 
+import { DomainErrors } from "@be/domain/lib/errors";
 import {
 	verifyDkimRecord,
 	verifyDmarcRecord,
@@ -8,9 +9,9 @@ import {
 } from "@be/domain/utils/verify-dns-records";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { logger } from "@reloop/logger";
 import { Worker } from "bullmq";
 import { and, eq, isNull } from "drizzle-orm";
+import { log } from "evlog";
 import {
 	DOMAIN_VERIFICATION_QUEUE,
 	type DomainVerificationJobData,
@@ -25,7 +26,7 @@ async function processDomainVerification(
 	organizationId: string,
 	isLastAttempt: boolean,
 ): Promise<void> {
-	logger.info({ domainId }, "Processing domain verification job");
+	log.info({ message: "Processing domain verification job", domainId });
 
 	// Fetch domain with DNS records
 	const domainWithRecords = await db.query.domain.findFirst({
@@ -42,12 +43,12 @@ async function processDomainVerification(
 	});
 
 	if (!domainWithRecords) {
-		throw new Error(`Domain ${domainId} not found`);
+		throw DomainErrors.domainNotFound(domainId);
 	}
 
 	const domainName = domainWithRecords.domain;
 	const records = domainWithRecords.dnsRecords;
-	logger.info({ domainId, records }, "Fetched DNS records from database");
+	log.info({ message: "Fetched DNS records from database", domainId, records });
 
 	// Find each record type
 	const mxRecord = records.find((r) => r.recordType === "MX");
@@ -62,10 +63,10 @@ async function processDomainVerification(
 	);
 
 	if (!mxRecord || !spfRecord || !dkimRecord || !dmarcRecord) {
-		logger.warn(
-			{ domainId },
-			"Missing one or more DNS records for verification",
-		);
+		log.warn({
+			message: "Missing one or more DNS records for verification",
+			domainId,
+		});
 		await db
 			.update(schema.domain)
 			.set({ status: "failed" })
@@ -88,10 +89,15 @@ async function processDomainVerification(
 		{ record: dmarcRecord, ok: dmarcOk },
 	];
 
-	logger.info(
-		{ domainId, domainName, mxOk, spfOk, dkimOk, dmarcOk },
-		"DNS verification results",
-	);
+	log.info({
+		message: "DNS verification results",
+		domainId,
+		domainName,
+		mxOk,
+		spfOk,
+		dkimOk,
+		dmarcOk,
+	});
 
 	// Update individual record statuses
 	await Promise.all(
@@ -119,15 +125,22 @@ async function processDomainVerification(
 	}
 
 	if (allPassed) {
-		logger.info({ domainId, domainName }, "Domain verified successfully");
+		log.info({ message: "Domain verified successfully", domainId, domainName });
 	} else {
-		logger.warn(
-			{ domainId, domainName, mxOk, spfOk, dkimOk, dmarcOk },
-			"Domain verification failed — one or more DNS records did not match",
-		);
+		log.warn({
+			message:
+				"Domain verification failed — one or more DNS records did not match",
+			domainId,
+			domainName,
+			mxOk,
+			spfOk,
+			dkimOk,
+			dmarcOk,
+		});
 		// Throw so BullMQ retries on failure
-		throw new Error(
-			`Domain ${domainName} verification failed: MX=${mxOk} SPF=${spfOk} DKIM=${dkimOk} DMARC=${dmarcOk}`,
+		throw DomainErrors.verificationFailed(
+			domainName,
+			`MX=${mxOk} SPF=${spfOk} DKIM=${dkimOk} DMARC=${dmarcOk}`,
 		);
 	}
 }
@@ -147,23 +160,29 @@ export function startDomainVerificationWorker(): Worker {
 	);
 
 	worker.on("completed", (job) => {
-		logger.info(
-			{ jobId: job.id, domainId: job.data.domainId },
-			"Domain verification job completed",
-		);
+		log.info({
+			message: "Domain verification job completed",
+			jobId: job.id,
+			domainId: job.data.domainId,
+		});
 	});
 
 	worker.on("failed", (job, err) => {
-		logger.error(
-			{ jobId: job?.id, domainId: job?.data.domainId, error: err.message },
-			"Domain verification job failed",
-		);
+		log.error({
+			message: "Domain verification job failed",
+			jobId: job?.id,
+			domainId: job?.data.domainId,
+			error: err.message,
+		});
 	});
 
 	worker.on("error", (err) => {
-		logger.error({ error: err.message }, "Domain verification worker error");
+		log.error({
+			message: "Domain verification worker error",
+			error: err.message,
+		});
 	});
 
-	logger.info("Domain verification worker started");
+	log.info("worker", "Domain verification worker started");
 	return worker;
 }

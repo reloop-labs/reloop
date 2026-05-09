@@ -10,8 +10,11 @@ import { BullMQAdapter } from "@bull-board/api/bullMQAdapter";
 import { ElysiaAdapter } from "@bull-board/elysia";
 import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
-import { logger } from "@reloop/logger";
 import { Elysia } from "elysia";
+import { initLogger, log, parseError } from "evlog";
+import { evlog } from "evlog/elysia";
+
+initLogger({ env: { service: "domain" } });
 
 const port = domainConfig.port;
 
@@ -36,6 +39,7 @@ const domainService = new Elysia({
 	prefix: "/api/domain",
 	name: "Domain Service",
 })
+	.use(evlog())
 	.use(
 		openapi({
 			documentation: {
@@ -56,6 +60,16 @@ const domainService = new Elysia({
 		}),
 	)
 	.use(serverTiming())
+	.onError(({ error, set }) => {
+		const parsed = parseError(error);
+		set.status = parsed.status;
+		return {
+			message: parsed.message,
+			why: parsed.why,
+			fix: parsed.fix,
+			link: parsed.link,
+		};
+	})
 	.use(await serverAdapter.registerPlugin())
 	.use(landing)
 	.use(domainRoutes)
@@ -63,10 +77,9 @@ const domainService = new Elysia({
 		await loader();
 	})
 	.listen(port, () => {
-		logger.info(
-			`Domain Server is running on http://localhost:${port}/api/domain`,
-		);
-		logger.info(
+		log.info("server", `Domain Server is running on http://localhost:${port}/api/domain`);
+		log.info(
+			"server",
 			`Bull Board is running on http://localhost:${port}/api/domain/bull-board`,
 		);
 	});

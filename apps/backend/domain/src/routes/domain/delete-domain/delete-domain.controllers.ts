@@ -2,21 +2,19 @@ import type { DomainTypes } from "@be/domain/types/domain.type";
 import { createLog } from "@be/domain/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import type { Logger } from "@reloop/logger";
+import { DomainErrors } from "@be/domain/lib/errors";
 import { DOMAIN_DELETE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
-import { status } from "elysia";
+import { useLogger } from "evlog/elysia";
 
 export async function deleteDomainController({
 	domainId,
 	organizationId,
-	logger,
 	cookie,
 	requestDetails,
 }: {
 	domainId: string;
 	organizationId: string;
-	logger: Logger;
 	cookie?: string;
 	requestDetails?: {
 		endpoint?: string;
@@ -26,8 +24,9 @@ export async function deleteDomainController({
 		statusCode?: number;
 	};
 }): Promise<DomainTypes.DomainResponse> {
+	const logger = useLogger();
 	try {
-		logger.info({ domainId }, "Fetching domain with DNS records");
+		logger.info("Fetching domain with DNS records", { domainId });
 		const domainWithDnsRecords = await db.query.domain.findFirst({
 			where: and(
 				eq(schema.domain.id, domainId),
@@ -42,13 +41,13 @@ export async function deleteDomainController({
 		});
 
 		if (!domainWithDnsRecords) {
-			logger.warn({ domainId }, "Domain not found for deletion");
-			throw status(404, { message: "Domain not found" });
+			logger.warn("Domain not found for deletion", { domainId });
+			throw DomainErrors.domainNotFound(domainId);
 		}
 
 		const now = new Date();
 
-		logger.info({ domainId }, "Soft deleting domain");
+		logger.info("Soft deleting domain", { domainId });
 		const domainUpdateResult = await db
 			.update(schema.domain)
 			.set({ deletedAt: now, updatedAt: now })
@@ -56,11 +55,11 @@ export async function deleteDomainController({
 			.returning();
 
 		if (domainUpdateResult.length === 0) {
-			logger.warn({ domainId }, "Failed to delete domain");
-			throw status(500, { message: "Failed to delete domain" });
+			logger.warn("Failed to delete domain", { domainId });
+			throw DomainErrors.databaseError("Failed to delete domain");
 		}
 
-		logger.info({ domainId }, "Soft deleting domain DNS records");
+		logger.info("Soft deleting domain DNS records", { domainId });
 		await db
 			.update(schema.domainDnsRecord)
 			.set({ deletedAt: now, updatedAt: now })
@@ -77,7 +76,7 @@ export async function deleteDomainController({
 			})),
 		};
 
-		logger.info({ domainId }, "Domain and DNS records deleted successfully");
+		logger.info("Domain and DNS records deleted successfully", { domainId });
 
 		const finalDomain = {
 			object: "domain" as const,
@@ -94,7 +93,7 @@ export async function deleteDomainController({
 
 		return finalDomain;
 	} catch (error) {
-		logger.error({ domainId, error }, "Error deleting domain");
+		logger.error("Error deleting domain", { domainId, error });
 		throw error;
 	}
 }

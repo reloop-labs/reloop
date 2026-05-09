@@ -6,11 +6,10 @@ import { getDomainXCodeSamples } from "./get-domain.x-codeSamples";
 
 export const getDomainRoute = new Elysia().use(authMiddleware).get(
 	"/:domain_id",
-	async ({ params: { domain_id }, activeOrganizationId, logger }) => {
+	async ({ params: { domain_id }, activeOrganizationId }) => {
 		return await getDomainController({
 			domainId: domain_id,
 			organizationId: activeOrganizationId,
-			logger,
 		});
 	},
 	{

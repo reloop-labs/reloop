@@ -2,23 +2,21 @@ import type { DomainTypes } from "@be/domain/types/domain.type";
 import { createLog } from "@be/domain/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import type { Logger } from "@reloop/logger";
+import { DomainErrors } from "@be/domain/lib/errors";
 import { DOMAIN_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
-import { status } from "elysia";
+import { useLogger } from "evlog/elysia";
 
 export async function updateDomainController({
 	domainId,
 	organizationId,
 	body,
-	logger,
 	cookie,
 	requestDetails,
 }: {
 	domainId: string;
 	organizationId: string;
 	body: DomainTypes.UpdateDomainRequest;
-	logger: Logger;
 	cookie?: string;
 	requestDetails?: {
 		endpoint?: string;
@@ -28,8 +26,9 @@ export async function updateDomainController({
 		statusCode?: number;
 	};
 }): Promise<DomainTypes.DomainResponse> {
+	const logger = useLogger();
 	try {
-		logger.info({ domainId, body }, "Updating domain");
+		logger.info("Updating domain", { domainId, body });
 
 		const existingDomain = await db.query.domain.findFirst({
 			where: and(
@@ -40,8 +39,8 @@ export async function updateDomainController({
 		});
 
 		if (!existingDomain) {
-			logger.warn({ domainId }, "Domain not found");
-			throw status(404, { message: "Domain not found" });
+			logger.warn("Domain not found", { domainId });
+			throw DomainErrors.domainNotFound(domainId);
 		}
 
 		const updateData: Partial<typeof schema.domain.$inferInsert> = {
@@ -89,7 +88,7 @@ export async function updateDomainController({
 		});
 
 		if (!updatedDomain) {
-			throw status(500, { message: "Failed to update domain" });
+			throw DomainErrors.databaseError("Failed to update domain");
 		}
 
 		const finalDomain = {
@@ -107,7 +106,7 @@ export async function updateDomainController({
 
 		return finalDomain;
 	} catch (error) {
-		logger.error({ domainId, error }, "Error updating domain settings");
+		logger.error("Error updating domain settings", { domainId, error });
 		throw error;
 	}
 }

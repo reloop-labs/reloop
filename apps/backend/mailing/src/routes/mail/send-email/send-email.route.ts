@@ -2,22 +2,11 @@ import { authMiddleware } from "@reloop/be-mailing/middleware/auth";
 import { checkRateLimit } from "@reloop/be-mailing/middleware/rate-limiter";
 import { MailModel } from "@reloop/be-mailing/model/mail.model.js";
 import { Elysia } from "elysia";
-import { parseError } from "evlog";
 import { evlog } from "evlog/elysia";
 import { sendEmailController } from "./send-email.controllers";
 
 export const sendEmailRoute = new Elysia()
 	.use(evlog())
-	.onError(({ error, set }) => {
-		const parsed = parseError(error);
-		set.status = parsed.status;
-		return {
-			message: parsed.message,
-			why: parsed.why,
-			fix: parsed.fix,
-			link: parsed.link,
-		};
-	})
 	.use(authMiddleware)
 	.post(
 		"/send",

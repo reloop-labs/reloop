@@ -1,22 +1,21 @@
 import { domainVerificationQueue } from "@be/domain/queues/domain-verification.queue";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import type { Logger } from "@reloop/logger";
+import { DomainErrors } from "@be/domain/lib/errors";
 import { DOMAIN_VERIFY_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
-import { status } from "elysia";
+import { useLogger } from "evlog/elysia";
 
 export async function verifyDNSRecordController({
 	domainId,
 	organizationId,
-	logger,
 }: {
 	domainId: string;
 	organizationId: string;
-	logger: Logger;
 }) {
+	const logger = useLogger();
 	try {
-		logger.info({ domainId }, "Fetching domain with DNS records");
+		logger.info("Fetching domain with DNS records", { domainId });
 		const domainWithRecords = await db.query.domain.findFirst({
 			where: and(
 				eq(schema.domain.id, domainId),
@@ -31,8 +30,8 @@ export async function verifyDNSRecordController({
 		});
 
 		if (!domainWithRecords) {
-			logger.warn({ domainId }, "Domain not found");
-			throw status(404, { message: "Domain not found" });
+			logger.warn("Domain not found", { domainId });
+			throw DomainErrors.domainNotFound(domainId);
 		}
 
 		const domainName = domainWithRecords.domain;
@@ -40,8 +39,8 @@ export async function verifyDNSRecordController({
 		// Already in-flight — don't queue again
 		if (domainWithRecords.status === "verifying") {
 			logger.info(
-				{ domainId },
 				"Domain is already in verifying status, skipping re-queue",
+				{ domainId },
 			);
 			return {
 				id: domainId,
@@ -51,13 +50,13 @@ export async function verifyDNSRecordController({
 		}
 
 		// Set status to "verifying"
-		logger.info({ domainId }, "Updating domain status to verifying");
+		logger.info("Updating domain status to verifying", { domainId });
 		await db
 			.update(schema.domain)
 			.set({ status: "verifying" })
 			.where(eq(schema.domain.id, domainId));
 
-		logger.info({ domainId }, "Updating DNS records status to verifying");
+		logger.info("Updating DNS records status to verifying", { domainId });
 		await db
 			.update(schema.domainDnsRecord)
 			.set({ status: "verifying" })
@@ -71,32 +70,30 @@ export async function verifyDNSRecordController({
 				{ jobId: domainId },
 			);
 			logger.info(
-				{ domain: domainName },
 				"Enqueued background domain verification job",
+				{ domain: domainName },
 			);
 		} catch (error) {
 			logger.error(
-				{ domain: domainName, error },
 				"Failed to enqueue domain verification job",
+				{ domain: domainName, error },
 			);
 			// Revert status if enqueue fails
 			await db
 				.update(schema.domain)
 				.set({ status: domainWithRecords.status })
 				.where(eq(schema.domain.id, domainWithRecords.id));
-			throw status(500, {
-				message: "Failed to start verification process",
-			});
+			throw DomainErrors.verificationFailed(domainName, error instanceof Error ? error.message : String(error));
 		}
 
-		logger.info({ domainId }, "Domain verification started successfully");
+		logger.info("Domain verification started successfully", { domainId });
 		return {
 			id: domainId,
 			status: "verifying" as const,
 			event: DOMAIN_VERIFY_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
-		logger.error({ domainId, error }, "Error verifying DNS records");
+		logger.error("Error verifying DNS records", { domainId, error });
 		throw error;
 	}
 }

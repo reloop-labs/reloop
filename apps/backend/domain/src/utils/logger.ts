@@ -1,5 +1,5 @@
 import { bus, BusEvent } from "@reloop/bus";
-import logger from "@reloop/logger";
+import { log } from "evlog";
 
 /**
  * Creates a structured log entry in the centralized logs service.
@@ -44,7 +44,10 @@ export async function createLog(body: {
 		});
 	} catch (error) {
 		// Log locally if remote logging fails
-		console.error("[Domain Service] Error publishing log to NATS:", error);
+		log.error({
+			message: "[Domain Service] Error publishing log to NATS",
+			error,
+		});
 	}
 }
 

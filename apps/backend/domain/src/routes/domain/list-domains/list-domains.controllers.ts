@@ -1,19 +1,18 @@
 import type { DomainTypes } from "@be/domain/types/domain.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import type { Logger } from "@reloop/logger";
+import { useLogger } from "evlog/elysia";
 import { DOMAIN_LIST_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, count, desc, eq, ilike, isNull } from "drizzle-orm";
 
 export async function listDomainsController({
 	query,
 	organizationId,
-	logger,
 }: {
 	query: DomainTypes.DomainQuery;
 	organizationId: string;
-	logger: Logger;
 }): Promise<DomainTypes.DomainListResponse> {
+	const logger = useLogger();
 	const { page = 1, limit = 10, status, q } = query;
 	const offset = (page - 1) * limit;
 
@@ -55,13 +54,10 @@ export async function listDomainsController({
 
 		return finalResponse;
 	} catch (error) {
-		logger.error(
-			{
-				query,
-				error: error instanceof Error ? error.message : String(error),
-			},
-			"Error listing domains",
-		);
+		logger.error("Error listing domains", {
+			query,
+			error: error instanceof Error ? error.message : String(error),
+		});
 		throw error;
 	}
 }

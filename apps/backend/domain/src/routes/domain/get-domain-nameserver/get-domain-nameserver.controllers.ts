@@ -1,21 +1,20 @@
 import { resolveNs } from "node:dns/promises";
+import { DomainErrors } from "@be/domain/lib/errors";
 import type { DNSTypes } from "@be/domain/types/dns.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import type { Logger } from "@reloop/logger";
 import { DOMAIN_GET_DNS_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
-import { status } from "elysia";
+import { useLogger } from "evlog/elysia";
 
 export async function getDomainDNSController({
 	domainId,
 	organizationId,
-	logger,
 }: {
 	domainId: string;
 	organizationId: string;
-	logger: Logger;
 }): Promise<DNSTypes.DomainNameserversResponse> {
+	const logger = useLogger();
 	try {
 		const foundDomain = await db.query.domain.findFirst({
 			where: and(
@@ -26,7 +25,7 @@ export async function getDomainDNSController({
 		});
 
 		if (!foundDomain) {
-			throw status(404, { message: "Domain not found" });
+			throw DomainErrors.domainNotFound(domainId);
 		}
 
 		let nameservers: string[] | null = null;
@@ -58,14 +57,11 @@ export async function getDomainDNSController({
 				}
 			}
 		} catch (error) {
-			logger.warn(
-				{
-					domainId,
-					domain: foundDomain.domain,
-					error: error instanceof Error ? error.message : String(error),
-				},
-				"Unable to resolve nameservers for domain",
-			);
+			logger.warn("Unable to resolve nameservers for domain", {
+				domainId,
+				domain: foundDomain.domain,
+				error: error instanceof Error ? error.message : String(error),
+			});
 		}
 
 		return {
@@ -77,7 +73,7 @@ export async function getDomainDNSController({
 			event: DOMAIN_GET_DNS_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
-		logger.error({ domainId, error }, "Error getting domain nameservers");
+		logger.error("Error getting domain nameservers", { domainId, error });
 		throw error;
 	}
 }
