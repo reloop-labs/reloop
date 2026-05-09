@@ -221,4 +221,21 @@ export namespace MailModel {
 			description: "Mailbox not found or not authorized",
 		}),
 	});
+
+	export const tooManyRequests = t.Object({
+		message: t.String({
+			description: "Rate limit exceeded",
+		}),
+		why: t.Optional(
+			t.String({
+				description: "Which rate limit layer was exceeded",
+			}),
+		),
+		fix: t.Optional(
+			t.String({
+				description: "How to resolve the rate limit",
+			}),
+		),
+	});
+	export type TooManyRequests = typeof tooManyRequests.static;
 }

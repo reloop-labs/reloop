@@ -149,4 +149,60 @@ export class RedisCache {
 			throw new Error(`Redis health check failed: ${error}`);
 		}
 	}
+
+	/**
+	 * Atomically increment a key's value by 1.
+	 * If the key does not exist, it is initialized to 0 before incrementing.
+	 * Uses the raw key (no prefix) — caller is responsible for namespacing.
+	 */
+	async increment(rawKey: string): Promise<number> {
+		try {
+			const redis = await this.getRedisClient();
+			return await redis.incr(rawKey);
+		} catch (error) {
+			console.error(
+				`Redis increment error for key "${rawKey}":`,
+				error,
+			);
+			this.redis = null;
+			throw error;
+		}
+	}
+
+	/**
+	 * Set a TTL (expiry) on a key, in seconds.
+	 * Uses the raw key (no prefix).
+	 */
+	async expire(rawKey: string, seconds: number): Promise<number> {
+		try {
+			const redis = await this.getRedisClient();
+			return await redis.expire(rawKey, seconds);
+		} catch (error) {
+			console.error(
+				`Redis expire error for key "${rawKey}":`,
+				error,
+			);
+			this.redis = null;
+			throw error;
+		}
+	}
+
+	/**
+	 * Get the remaining TTL of a key, in seconds.
+	 * Returns -1 if the key exists but has no expiry, -2 if the key does not exist.
+	 * Uses the raw key (no prefix).
+	 */
+	async ttl(rawKey: string): Promise<number> {
+		try {
+			const redis = await this.getRedisClient();
+			return await redis.ttl(rawKey);
+		} catch (error) {
+			console.error(
+				`Redis ttl error for key "${rawKey}":`,
+				error,
+			);
+			this.redis = null;
+			throw error;
+		}
+	}
 }
