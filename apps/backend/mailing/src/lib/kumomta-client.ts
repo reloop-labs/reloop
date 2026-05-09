@@ -1,5 +1,6 @@
 import { log } from "evlog";
 import { mailConfig } from "../mail.config";
+import { signTrackingUrl } from "./crypto";
 import { MailErrors } from "./errors";
 
 export interface KumomtaHttpConfig {
@@ -160,7 +161,8 @@ async function buildRfcMessage(options: SendEmailOptions): Promise<string> {
 
 	if (emailLogId && html) {
 		// 1. Inject open tracking pixel
-		const pixel = `<img src="${trackingBaseUrl}/api/mail/v1/track/open/${emailLogId}" width="1" height="1" style="display:none" alt="" />`;
+		const openSig = signTrackingUrl(emailLogId, mailConfig.TRACKING_SECRET);
+		const pixel = `<img src="${trackingBaseUrl}/api/mail/v1/track/open/${emailLogId}?sig=${openSig}" width="1" height="1" style="display:none" alt="" />`;
 		if (html.includes("</body>")) {
 			html = html.replace("</body>", `${pixel}</body>`);
 		} else {
@@ -176,7 +178,8 @@ async function buildRfcMessage(options: SendEmailOptions): Promise<string> {
 				if (url.startsWith("#") || url.includes("/api/mail/v1/track/click")) {
 					return match;
 				}
-				const trackedUrl = `${trackingBaseUrl}/api/mail/v1/track/click/${emailLogId}?url=${encodeURIComponent(url)}`;
+				const sig = signTrackingUrl(url, mailConfig.TRACKING_SECRET);
+				const trackedUrl = `${trackingBaseUrl}/api/mail/v1/track/click/${emailLogId}?url=${encodeURIComponent(url)}&sig=${sig}`;
 				return match.replace(url, trackedUrl);
 			},
 		);

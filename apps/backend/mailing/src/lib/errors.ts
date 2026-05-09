@@ -139,4 +139,18 @@ export const MailErrors = {
 			why: `The attachment with ID ${attachmentId} was not found`,
 			fix: "Verify the attachment ID and ensure it exists for the given email",
 		}),
+	invalidTrackingUrl: (url: string) =>
+		createError({
+			status: 400,
+			message: "Invalid tracking URL",
+			why: `The provided URL '${url}' is not valid or missing`,
+			fix: "Ensure the tracking link includes a valid destination URL",
+		}),
+	invalidTrackingSignature: () =>
+		createError({
+			status: 403,
+			message: "Invalid tracking signature",
+			why: "The tracking link has been tampered with or is invalid",
+			fix: "Ensure the tracking link has not been modified or corrupted",
+		}),
 };

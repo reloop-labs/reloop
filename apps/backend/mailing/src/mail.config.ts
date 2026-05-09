@@ -6,6 +6,7 @@ export const mailConfig = {
 	KUMOMTA_HTTP_URL: process.env.KUMOMTA_HTTP_URL || "http://localhost:8020",
 	NODE_ENV: process.env.NODE_ENV || "development",
 	NATS_URL: process.env.NATS_URL || "nats://localhost:4222",
+	TRACKING_SECRET: process.env.TRACKING_SECRET || "reloop_tracking_secret_default_123",
 };
 
 
