@@ -1,8 +1,8 @@
+import type { MailModel } from "@reloop/be-mailing/model/mail.model";
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import { emailLog } from "@reloop/db/schema";
 import { eq } from "drizzle-orm";
-
 
 export async function finalizeEmail_step7({
 	emailLogId,
@@ -11,9 +11,9 @@ export async function finalizeEmail_step7({
 	body,
 }: {
 	emailLogId: string;
-	result: any;
+	result: { id: string; messageId: string };
 	organizationId: string;
-	body: any;
+	body: MailModel.SendEmailBody;
 }) {
 	await db
 		.update(emailLog)

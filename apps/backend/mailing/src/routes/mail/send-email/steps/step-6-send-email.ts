@@ -1,4 +1,5 @@
 import { kumomtaClient } from "@reloop/be-mailing/lib/kumomta-client";
+import type { MailModel } from "@reloop/be-mailing/model/mail.model";
 
 
 export async function sendEmail_step6({
@@ -10,7 +11,7 @@ export async function sendEmail_step6({
 	domainId,
 	emailLogId,
 }: {
-	body: any;
+	body: MailModel.SendEmailBody;
 	finalSubject: string;
 	finalHtml?: string;
 	finalText?: string;
