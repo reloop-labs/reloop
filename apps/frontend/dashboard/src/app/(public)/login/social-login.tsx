@@ -62,7 +62,9 @@ export function SocialLogin({
 					setLoading({ name: "google", loading: true });
 					await authClient.signIn.social({
 						provider: "google",
-						callbackURL: inviteId ? `/login?inviteId=${inviteId}` : "/dashboard",
+						callbackURL: inviteId
+							? `/login?inviteId=${inviteId}`
+							: "/dashboard",
 					});
 				} catch {
 					setLoading({ name: "google", loading: false });
@@ -76,7 +78,7 @@ export function SocialLogin({
 		{
 			name: "github",
 			label: "Continue with GitHub",
-			defaultMode: "stroke",
+			defaultMode: "ghost",
 			icon:
 				loading.name === "github" && loading.loading ? (
 					<Spinner color="var(--text-white-0)" size={16} />
@@ -88,7 +90,9 @@ export function SocialLogin({
 					setLoading({ name: "github", loading: true });
 					await authClient.signIn.social({
 						provider: "github",
-						callbackURL: inviteId ? `/login?inviteId=${inviteId}` : "/dashboard",
+						callbackURL: inviteId
+							? `/login?inviteId=${inviteId}`
+							: "/dashboard",
 					});
 				} catch {
 					setLoading({ name: "github", loading: false });
@@ -100,7 +104,7 @@ export function SocialLogin({
 			},
 		},
 		{
-			defaultMode: "stroke",
+			defaultMode: "ghost",
 			name: "email",
 			label: "Continue with Email",
 			icon: <Icon name="social-mail" className="h-[17.5px] w-[17.5px]" />,
@@ -126,7 +130,7 @@ export function SocialLogin({
 							lastLoggedIn
 								? lastLoggedIn === method.name
 									? "filled"
-									: "stroke"
+									: "lighter"
 								: method?.defaultMode
 						}
 						className="relative h-11 w-full rounded-2xl!"

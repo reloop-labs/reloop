@@ -5,6 +5,7 @@ import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const navItems = [
@@ -49,6 +50,7 @@ export const Header = () => {
 	const { data: session } = useSession();
 	const [scrolled, setScrolled] = useState(false);
 	const [activeMega, setActiveMega] = useState<string | null>(null);
+	const pathname = usePathname();
 
 	useEffect(() => {
 		const handleScroll = () => {
@@ -58,19 +60,24 @@ export const Header = () => {
 		return () => window.removeEventListener("scroll", handleScroll);
 	}, []);
 
+	// Light mode for /company/* pages (white top fold)
+	const isLight = pathname.startsWith("/company");
+
 	return (
 		<header className="fixed top-0 right-0 left-0 z-50 flex justify-center p-4 transition-all duration-500">
 			<div
 				onMouseLeave={() => setActiveMega(null)}
 				className={`flex items-center justify-between rounded-[20px] pr-3 transition-all duration-500 ease-in-out ${
 					scrolled
-						? "h-15 w-full max-w-[1000px] border border-white/10 bg-black"
+						? isLight
+							? "h-15 w-full max-w-[1000px] border border-[#0a0d12]/10 bg-white shadow-sm shadow-[#0a0d12]/5"
+							: "h-15 w-full max-w-[1000px] border border-white/10 bg-black"
 						: "h-16 w-full max-w-[1100px] border-transparent bg-transparent shadow-none"
 				}`}
 			>
 				<Link href="/" className="flex items-center pl-2">
 					<Logo
-						theme="dark"
+						theme={isLight ? "light" : "dark"}
 						className={`transition-all duration-500 ${
 							scrolled ? "w-12" : "w-14"
 						}`}
@@ -82,18 +89,26 @@ export const Header = () => {
 						<div
 							key={item.title}
 							className="relative flex h-full items-center"
-							onMouseEnter={() => item.mega && setActiveMega(item.title)}
+							onMouseEnter={() =>
+								item.mega && setActiveMega(item.title)
+							}
 						>
 							<Link
 								href={item.href}
-								className="flex items-center gap-1 px-2 py-2 font-semibold text-[13px] text-white/70 transition-colors hover:text-white"
+								className={`flex items-center gap-1 px-2 py-2 font-semibold text-[13px] transition-colors ${
+									isLight
+										? "text-[#0a0d12]/60 hover:text-[#0a0d12]"
+										: "text-white/70 hover:text-white"
+								}`}
 							>
 								{item.title}
 								{item.hasDropdown && (
 									<Icon
 										name="chevron-down"
 										className={`size-3 transition-transform duration-300 ${
-											activeMega === item.title ? "rotate-180" : "opacity-50"
+											activeMega === item.title
+												? "rotate-180"
+												: "opacity-50"
 										}`}
 									/>
 								)}
@@ -108,43 +123,83 @@ export const Header = () => {
 										transition={{ duration: 0.2, ease: "easeOut" }}
 										className="-translate-x-1/2 absolute top-full left-1/2 pt-2"
 									>
-										<div className="flex w-[500px] overflow-hidden rounded-[24px] border border-white/10 bg-black/90 p-2 shadow-2xl backdrop-blur-xl">
-											<div className="flex w-1/3 flex-col gap-1 p-4">
-												{item.mega.links.map((link) => (
-													<Link
-														key={link.title}
-														href={link.href}
-														className="rounded-lg px-3 py-2 font-semibold text-[14px] text-white/50 transition-colors hover:bg-white/5 hover:text-white"
-													>
-														{link.title}
-													</Link>
-												))}
-											</div>
-											<div className="flex flex-1 flex-col gap-2 p-2">
-												{item.mega.featured.map((feat) => (
-													<Link
-														key={feat.title}
-														href={feat.href}
-														className="group flex items-center gap-4 rounded-xl border border-white/5 bg-white/[0.03] p-4 transition-all hover:border-white/10 hover:bg-white/[0.06]"
-													>
-														<div className="flex size-12 items-center justify-center rounded-lg bg-black shadow-inner">
-															<Icon
-																name={feat.icon as any}
-																className="size-6 text-white/70 transition-transform group-hover:scale-110"
-															/>
-														</div>
-														<div>
-															<div className="font-semibold text-[14px] text-white">
-																{feat.title}
+										{isLight ? (
+											<div className="flex w-[500px] overflow-hidden rounded-[24px] border border-[#0a0d12]/8 bg-white p-2 shadow-xl shadow-[#0a0d12]/8">
+												<div className="flex w-1/3 flex-col gap-1 p-4">
+													{item.mega.links.map((link) => (
+														<Link
+															key={link.title}
+															href={link.href}
+															className="rounded-lg px-3 py-2 font-semibold text-[14px] text-[#0a0d12]/50 transition-colors hover:bg-[#0a0d12]/4 hover:text-[#0a0d12]"
+														>
+															{link.title}
+														</Link>
+													))}
+												</div>
+												<div className="flex flex-1 flex-col gap-2 p-2">
+													{item.mega.featured.map((feat) => (
+														<Link
+															key={feat.title}
+															href={feat.href}
+															className="group flex items-center gap-4 rounded-xl border border-[#0a0d12]/5 bg-[#0a0d12]/[0.02] p-4 transition-all hover:border-[#0a0d12]/10 hover:bg-[#0a0d12]/[0.04]"
+														>
+															<div className="flex size-12 items-center justify-center rounded-lg border border-[#0a0d12]/8 bg-[#0a0d12]/4">
+																<Icon
+																	name={feat.icon as any}
+																	className="size-6 text-[#0a0d12]/60 transition-transform group-hover:scale-110"
+																/>
 															</div>
-															<div className="text-[12px] text-white/40">
-																{feat.description}
+															<div>
+																<div className="font-semibold text-[14px] text-[#0a0d12]">
+																	{feat.title}
+																</div>
+																<div className="text-[12px] text-[#0a0d12]/40">
+																	{feat.description}
+																</div>
 															</div>
-														</div>
-													</Link>
-												))}
+														</Link>
+													))}
+												</div>
 											</div>
-										</div>
+										) : (
+											<div className="flex w-[500px] overflow-hidden rounded-[24px] border border-white/10 bg-black/90 p-2 shadow-2xl backdrop-blur-xl">
+												<div className="flex w-1/3 flex-col gap-1 p-4">
+													{item.mega.links.map((link) => (
+														<Link
+															key={link.title}
+															href={link.href}
+															className="rounded-lg px-3 py-2 font-semibold text-[14px] text-white/50 transition-colors hover:bg-white/5 hover:text-white"
+														>
+															{link.title}
+														</Link>
+													))}
+												</div>
+												<div className="flex flex-1 flex-col gap-2 p-2">
+													{item.mega.featured.map((feat) => (
+														<Link
+															key={feat.title}
+															href={feat.href}
+															className="group flex items-center gap-4 rounded-xl border border-white/5 bg-white/[0.03] p-4 transition-all hover:border-white/10 hover:bg-white/[0.06]"
+														>
+															<div className="flex size-12 items-center justify-center rounded-lg bg-black shadow-inner">
+																<Icon
+																	name={feat.icon as any}
+																	className="size-6 text-white/70 transition-transform group-hover:scale-110"
+																/>
+															</div>
+															<div>
+																<div className="font-semibold text-[14px] text-white">
+																	{feat.title}
+																</div>
+																<div className="text-[12px] text-white/40">
+																	{feat.description}
+																</div>
+															</div>
+														</Link>
+													))}
+												</div>
+											</div>
+										)}
 									</motion.div>
 								)}
 							</AnimatePresence>
@@ -157,14 +212,22 @@ export const Header = () => {
 						href="https://github.com/reloop-labs/reloop"
 						target="_blank"
 						rel="noreferrer"
-						className="inline-flex items-center justify-center gap-2 rounded-[12px] border border-white/10 bg-white/5 px-4 py-2 font-semibold text-[13px] text-white backdrop-blur-sm transition-all hover:border-white/20 hover:bg-white/10"
+						className={`inline-flex items-center justify-center gap-2 rounded-[12px] border px-4 py-2 font-semibold text-[13px] transition-all ${
+							isLight
+								? "border-[#0a0d12]/10 bg-[#0a0d12]/4 text-[#0a0d12] hover:border-[#0a0d12]/20 hover:bg-[#0a0d12]/8"
+								: "border-white/10 bg-white/5 text-white backdrop-blur-sm hover:border-white/20 hover:bg-white/10"
+						}`}
 					>
 						<Icon name="social-github" className="size-3.5" />
 						<span className="hidden sm:inline">GitHub</span>
 					</a>
 					<a
 						href={session ? "/dashboard" : "/dashboard/login"}
-						className="inline-flex items-center justify-center gap-2 rounded-[12px] bg-white px-4 py-2 font-semibold text-[#0a0d12] text-[13px] transition-all hover:scale-[1.02] active:scale-[0.98]"
+						className={`inline-flex items-center justify-center gap-2 rounded-[12px] px-4 py-2 font-semibold text-[13px] transition-all hover:scale-[1.02] active:scale-[0.98] ${
+							isLight
+								? "bg-[#0a0d12] text-white"
+								: "bg-white text-[#0a0d12]"
+						}`}
 					>
 						{session ? "Dashboard" : "Login"}
 					</a>
