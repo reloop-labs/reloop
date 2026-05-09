@@ -54,9 +54,9 @@ export const UserDropdown = () => {
 						isOpen && "bg-bg-weak-50",
 					)}
 				>
-					<Avatar.Root size="24" color="gray">
+					<Avatar.Root size="24" color="blue">
 						{user.image ? (
-							<Avatar.Image src={user.image} alt={user.name} color="blue" />
+							<Avatar.Image src={user.image} alt={user.name} />
 						) : (
 							<Avatar.Image asChild>
 								<div
@@ -78,30 +78,45 @@ export const UserDropdown = () => {
 				side="bottom"
 				align="end"
 			>
-				<div className="px-3 py-2 pb-1.5">
+				<div className="px-2.5 py-2 pb-1.5">
 					<p className="truncate font-medium text-xs">{user.email}</p>
 				</div>
 				<div className="h-px bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
-				<div className="relative p-1">
-					<Dropdown.Group>
+				<div className="relative">
+					<Dropdown.Group className="gap-0">
 						<Dropdown.Item
 							ref={(el) => {
 								if (el) itemRefs.current[0] = el;
 							}}
-							className="gap-2.5 px-3 py-1.5 data-[highlighted]:bg-transparent!"
+							className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
 							onPointerEnter={() => setHoverIdx(0)}
 							onPointerLeave={() => setHoverIdx(undefined)}
 							onClick={() => router.push("/settings")}
 						>
-							<Icon name="user-circle" className="h-4 w-4 text-text-sub-600" />
-							<span className="flex-1 truncate">My profile</span>
+							<Avatar.Root size="20" color="blue" className="shrink-0">
+								{user.image ? (
+									<Avatar.Image src={user.image} alt={user.name} />
+								) : (
+									<Avatar.Image asChild>
+										<div
+											className={cn(
+												"flex h-full w-full items-center justify-center rounded-full font-medium text-[8px] text-white uppercase tracking-wide",
+												getAvatarGradient(user.email),
+											)}
+										>
+											{getAvatarInitial(user.name, user.email)}
+										</div>
+									</Avatar.Image>
+								)}
+							</Avatar.Root>
+							<span className="flex-1 truncate text-sm">My profile</span>
 						</Dropdown.Item>
 
 						<Dropdown.Item
 							ref={(el) => {
 								if (el) itemRefs.current[1] = el;
 							}}
-							className="gap-2.5 px-3 py-1.5 data-[highlighted]:bg-transparent!"
+							className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
 							onPointerEnter={() => setHoverIdx(1)}
 							onPointerLeave={() => setHoverIdx(undefined)}
 							onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
@@ -110,7 +125,7 @@ export const UserDropdown = () => {
 								name={theme === "dark" ? "sun" : "moon"}
 								className="h-4 w-4 text-text-sub-600"
 							/>
-							<span className="flex-1 truncate">Toggle theme</span>
+							<span className="flex-1 truncate text-sm">Toggle theme</span>
 							<span className="flex h-5 w-5 items-center justify-center rounded bg-bg-weak-50 font-medium text-[10px] text-text-soft-400">
 								M
 							</span>
@@ -119,18 +134,18 @@ export const UserDropdown = () => {
 
 					<div className="my-1 h-px bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
 
-					<Dropdown.Group>
+					<Dropdown.Group className="gap-0">
 						<Dropdown.Item
 							ref={(el) => {
 								if (el) itemRefs.current[2] = el;
 							}}
-							className="gap-2.5 px-3 py-1.5 data-[highlighted]:bg-transparent!"
+							className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
 							onPointerEnter={() => setHoverIdx(2)}
 							onPointerLeave={() => setHoverIdx(undefined)}
 							onClick={() => router.push("/settings")}
 						>
 							<Icon name="gear" className="h-4 w-4 text-text-sub-600" />
-							<span className="flex-1 truncate">Settings</span>
+							<span className="flex-1 truncate text-sm">Settings</span>
 							<span className="flex items-center gap-0.5 font-medium text-[10px] text-text-soft-400 opacity-60">
 								<span>⇧</span>
 								<span>⌘</span>
@@ -141,23 +156,23 @@ export const UserDropdown = () => {
 							ref={(el) => {
 								if (el) itemRefs.current[4] = el;
 							}}
-							className="gap-2.5 px-3 py-1.5 data-[highlighted]:bg-transparent!"
+							className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
 							onPointerEnter={() => setHoverIdx(4)}
 							onPointerLeave={() => setHoverIdx(undefined)}
 						>
-							<Icon name="info-outline" className="h-4 w-4 text-text-sub-600" />
-							<span className="flex-1 truncate">Get help</span>
+							<Icon name="question" className="h-4 w-4 text-text-sub-600" />
+							<span className="flex-1 truncate text-sm">Get help</span>
 						</Dropdown.Item>
 					</Dropdown.Group>
 
 					<div className="my-1 h-px bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
 
-					<Dropdown.Group>
+					<Dropdown.Group className="gap-0">
 						<Dropdown.Item
 							ref={(el) => {
 								if (el) itemRefs.current[5] = el;
 							}}
-							className="gap-2.5 px-3 py-1.5 data-[highlighted]:bg-transparent!"
+							className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
 							onPointerEnter={() => setHoverIdx(5)}
 							onPointerLeave={() => setHoverIdx(undefined)}
 							onClick={() => router.push("/settings/billing")}
@@ -166,19 +181,19 @@ export const UserDropdown = () => {
 								name="arrow-top-circle"
 								className="h-4 w-4 text-text-sub-600"
 							/>
-							<span className="flex-1 truncate">Upgrade plan</span>
+							<span className="flex-1 truncate text-sm">Upgrade plan</span>
 						</Dropdown.Item>
 
 						<Dropdown.Item
 							ref={(el) => {
 								if (el) itemRefs.current[7] = el;
 							}}
-							className="gap-2.5 px-3 py-1.5 data-[highlighted]:bg-transparent!"
+							className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
 							onPointerEnter={() => setHoverIdx(7)}
 							onPointerLeave={() => setHoverIdx(undefined)}
 						>
 							<Icon name="info-outline" className="h-4 w-4 text-text-sub-600" />
-							<span className="flex-1 truncate">Learn more</span>
+							<span className="flex-1 truncate text-sm">Learn more</span>
 							<Icon
 								name="right"
 								className="h-3 w-3 text-text-soft-400 opacity-40"
@@ -187,18 +202,21 @@ export const UserDropdown = () => {
 					</Dropdown.Group>
 					<div className="my-1 h-px bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
 
-					<Dropdown.Group>
+					<Dropdown.Group className="gap-0">
 						<Dropdown.Item
 							ref={(el) => {
 								if (el) itemRefs.current[10] = el;
 							}}
-							className="gap-2.5 px-3 py-1.5 text-red-500 data-[highlighted]:bg-transparent!"
+							className="gap-2 px-2 py-1.5 text-red-500 data-[highlighted]:bg-transparent!"
 							onPointerEnter={() => setHoverIdx(10)}
 							onPointerLeave={() => setHoverIdx(undefined)}
 							onClick={() => handleAction("", "signout")}
 						>
-							<Icon name="arrow-right-rec" className="h-4 w-4 text-red-500" />
-							<span className="flex-1 truncate">Log out</span>
+							<Icon
+								name="arrow-right-rec"
+								className="h-3.5 w-3.5 text-red-500"
+							/>
+							<span className="flex-1 truncate text-sm">Log out</span>
 						</Dropdown.Item>
 					</Dropdown.Group>
 
@@ -206,6 +224,7 @@ export const UserDropdown = () => {
 						rect={currentRect}
 						tabElement={currentTab}
 						isDanger={hoverIdx === 10}
+						className="rounded-[10px]"
 					/>
 				</div>
 			</Dropdown.Content>
