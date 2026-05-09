@@ -5,6 +5,7 @@ export interface MainNavigationItem {
 	variant?: "default" | "danger";
 	action?: "signout";
 	isSpecial?: boolean;
+	items?: MainNavigationItem[];
 }
 
 export const mainNavigation: MainNavigationItem[] = [
@@ -28,6 +29,15 @@ export const mainNavigation: MainNavigationItem[] = [
 		label: "Contacts",
 		path: "/contacts",
 		iconName: "users",
+		items: [
+			{ label: "Properties", path: "/contacts/properties", iconName: "tag" },
+			{ label: "Groups", path: "/contacts/groups", iconName: "modules" },
+			{
+				label: "Channels",
+				path: "/contacts/channels",
+				iconName: "notification-indicator",
+			},
+		],
 	},
 	{
 		label: "Templates",
@@ -58,6 +68,17 @@ export const mainNavigation: MainNavigationItem[] = [
 		label: "Settings",
 		path: "/settings",
 		iconName: "gear",
+		items: [
+			{ label: "Members", path: "/settings/members", iconName: "users" },
+			{ label: "SMTP", path: "/settings/smtp", iconName: "mail-single" },
+			{
+				label: "Integrations",
+				path: "/settings/integrations",
+				iconName: "webhook",
+			},
+			{ label: "Billing", path: "/settings/billing", iconName: "invoice" },
+			{ label: "Usage", path: "/settings/usage", iconName: "barchart" },
+		],
 	},
 ];
 

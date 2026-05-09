@@ -13,28 +13,6 @@ interface SidebarItemsProps {
 	isCollapsed?: boolean;
 }
 
-const contactsSubNav = [
-	{ label: "Properties", path: "/contacts/properties", iconName: "tag" },
-	{ label: "Groups", path: "/contacts/groups", iconName: "modules" },
-	{
-		label: "Channels",
-		path: "/contacts/channels",
-		iconName: "notification-indicator",
-	},
-] as const;
-
-const settingsSubNav = [
-	{ label: "Members", path: "/settings/members", iconName: "users" },
-	{ label: "SMTP", path: "/settings/smtp", iconName: "mail-single" },
-	{
-		label: "Integrations",
-		path: "/settings/integrations",
-		iconName: "webhook",
-	},
-	{ label: "Billing", path: "/settings/billing", iconName: "invoice" },
-	{ label: "Usage", path: "/settings/usage", iconName: "barchart" },
-] as const;
-
 export const SidebarItems: React.FC<SidebarItemsProps> = ({
 	isCollapsed = false,
 }) => {
@@ -45,59 +23,47 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 	const [rect, setRect] = useState<DOMRect | undefined>(undefined);
 
 	const mainNavRefs = useRef<HTMLAnchorElement[]>([]);
-	const contactsSubNavRefs = useRef<HTMLAnchorElement[]>([]);
-	const settingsSubNavRefs = useRef<HTMLAnchorElement[]>([]);
+	const subNavRefs = useRef<Record<string, HTMLAnchorElement[]>>({});
 
 	const pathname = usePathname();
 	const pathWithoutSlug = pathname;
 
-	const isOnContactsSubPage = contactsSubNav.some((item) =>
-		pathWithoutSlug.startsWith(item.path),
+	const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>(
+		{},
 	);
-	const isOnContacts = pathWithoutSlug.startsWith("/contacts");
-
-	const isOnSettingsSubPage = settingsSubNav.some((item) =>
-		pathWithoutSlug.startsWith(item.path),
-	);
-	const isOnSettings = pathWithoutSlug.startsWith("/settings");
-
-	const [isContactsExpanded, setIsContactsExpanded] = useState(isOnContacts);
-	const [isSettingsExpanded, setIsSettingsExpanded] = useState(isOnSettings);
 
 	useEffect(() => {
-		if (isOnContacts) {
-			setIsContactsExpanded(true);
+		mainNavigation.forEach((item) => {
+			if (pathWithoutSlug.startsWith(item.path)) {
+				setExpandedItems((prev) => ({ ...prev, [item.path]: true }));
+			}
+		});
+	}, [pathWithoutSlug]);
+
+	const activeMainIndex = mainNavigation.findIndex((item) => {
+		if (item.items?.some((sub) => pathWithoutSlug.startsWith(sub.path))) {
+			return false;
 		}
-	}, [isOnContacts]);
+		if (item.path === "/") return pathWithoutSlug === "/";
+		return pathWithoutSlug.startsWith(item.path);
+	});
 
-	useEffect(() => {
-		if (isOnSettings) {
-			setIsSettingsExpanded(true);
-		}
-	}, [isOnSettings]);
-
-	const activeIndex =
-		isOnContactsSubPage || isOnSettingsSubPage
-			? -1
-			: mainNavigation.findIndex((item) => {
-					if (item.path === "/") return pathWithoutSlug === "/";
-					return pathWithoutSlug.startsWith(item.path);
-				});
-
-	const subActiveIndex = isOnContactsSubPage
-		? contactsSubNav.findIndex((item) => pathWithoutSlug.startsWith(item.path))
-		: isOnSettingsSubPage
-			? settingsSubNav.findIndex((item) =>
-					pathWithoutSlug.startsWith(item.path),
-				)
-			: -1;
+	const activeSubInfo = mainNavigation
+		.map((item, mainIndex) => {
+			const subIndex = item.items?.findIndex((sub) =>
+				pathWithoutSlug.startsWith(sub.path),
+			);
+			if (subIndex !== undefined && subIndex !== -1) {
+				return { mainPath: item.path, subIndex };
+			}
+			return null;
+		})
+		.find((info) => info !== null);
 
 	// The single "current" element: hovered takes priority, otherwise the active one
-	const activeEl = isOnContactsSubPage
-		? contactsSubNavRefs.current[subActiveIndex]
-		: isOnSettingsSubPage
-			? settingsSubNavRefs.current[subActiveIndex]
-			: mainNavRefs.current[activeIndex];
+	const activeEl = activeSubInfo
+		? subNavRefs.current[activeSubInfo.mainPath]?.[activeSubInfo.subIndex]
+		: mainNavRefs.current[activeMainIndex];
 	const currentEl = hoveredEl ?? activeEl;
 
 	// Single useLayoutEffect that feeds rect for the ONE shared animated background
@@ -107,20 +73,14 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 		} else {
 			setRect(undefined);
 		}
-	}, [
-		currentEl,
-		isCollapsed,
-		pathname,
-		isContactsExpanded,
-		isSettingsExpanded,
-	]);
+	}, [currentEl, isCollapsed, pathname, expandedItems]);
 
 	return (
 		// Single relative container — the animated pill lives here and nowhere else
 		<div className="relative">
-			{mainNavigation.map(({ path, label, iconName, isSpecial }, index) => {
-				const isContactsItem = path === "/contacts";
-				const isSettingsItem = path === "/settings";
+			{mainNavigation.map(({ path, label, iconName, isSpecial, items }, index) => {
+				const hasSubNav = items && items.length > 0;
+				const isExpanded = expandedItems[path] && !isCollapsed;
 
 				return (
 					<div key={path + index}>
@@ -133,7 +93,7 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 							onPointerLeave={() => setHoveredEl(undefined)}
 							className={cn(
 								"relative z-10 flex h-8 items-center gap-2 rounded-lg px-2 text-left",
-								(isContactsItem || isSettingsItem) && !isCollapsed
+								hasSubNav && !isCollapsed
 									? "justify-between"
 									: isCollapsed
 										? "justify-center"
@@ -146,7 +106,7 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 									name={iconName}
 									className={cn(
 										"h-3.5 w-3.5 shrink-0",
-										!isSpecial && activeIndex !== index
+										!isSpecial && activeMainIndex !== index
 											? "text-text-sub-600 opacity-70"
 											: "",
 									)}
@@ -157,7 +117,7 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 											"font-medium text-sm transition-colors",
 											isSpecial
 												? "bg-gradient-to-r from-[#A855F7] to-[#EC4899] bg-clip-text text-transparent"
-												: activeIndex !== index
+												: activeMainIndex !== index
 													? "text-text-sub-600"
 													: "text-foreground",
 										)}
@@ -167,18 +127,17 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 								)}
 							</span>
 
-							{(isContactsItem || isSettingsItem) && !isCollapsed && (
+							{hasSubNav && !isCollapsed && (
 								<button
 									type="button"
 									tabIndex={0}
 									onClick={(e) => {
 										e.preventDefault();
 										e.stopPropagation();
-										if (isContactsItem) {
-											setIsContactsExpanded((prev) => !prev);
-										} else {
-											setIsSettingsExpanded((prev) => !prev);
-										}
+										setExpandedItems((prev) => ({
+											...prev,
+											[path]: !prev[path],
+										}));
 									}}
 									className="flex h-5 w-5 items-center justify-center rounded-md transition-colors hover:bg-neutral-alpha-10"
 								>
@@ -186,20 +145,18 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 										name="chevron-right"
 										className={cn(
 											"h-3 w-3 shrink-0 text-text-sub-600 opacity-60 transition-transform duration-200",
-											((isContactsItem && isContactsExpanded) ||
-												(isSettingsItem && isSettingsExpanded)) &&
-												"rotate-90",
+											isExpanded && "rotate-90",
 										)}
 									/>
 								</button>
 							)}
 						</Link>
 
-						{isContactsItem && !isCollapsed && (
+						{hasSubNav && !isCollapsed && (
 							<AnimatePresence initial={false}>
-								{isContactsExpanded && (
+								{isExpanded && (
 									<motion.div
-										key="contacts-subnav"
+										key={`${path}-subnav`}
 										initial={{ height: 0, opacity: 0 }}
 										animate={{ height: "auto", opacity: 1 }}
 										exit={{ height: 0, opacity: 0 }}
@@ -207,7 +164,7 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 										style={{ overflow: "hidden" }}
 									>
 										<div className="my-0.5 ml-[14px] flex flex-col border-neutral-alpha-10 border-l pb-0.5 pl-2">
-											{contactsSubNav.map(
+											{items.map(
 												(
 													{ label: subLabel, path: subPath, iconName: subIcon },
 													subIndex,
@@ -219,71 +176,15 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 															key={subPath}
 															href={subPath}
 															ref={(el) => {
-																if (el)
-																	contactsSubNavRefs.current[subIndex] = el;
+																if (el) {
+																	if (!subNavRefs.current[path]) {
+																		subNavRefs.current[path] = [];
+																	}
+																	subNavRefs.current[path][subIndex] = el;
+																}
 															}}
 															onPointerEnter={() =>
-																setHoveredEl(
-																	contactsSubNavRefs.current[subIndex],
-																)
-															}
-															onPointerLeave={() => setHoveredEl(undefined)}
-															className={cn(
-																"relative z-10 flex h-7 items-center gap-1.5 rounded-md px-2 font-medium text-[13px]",
-																isSubActive
-																	? "text-foreground"
-																	: "text-text-sub-600",
-															)}
-														>
-															<Icon
-																name={subIcon}
-																className={cn(
-																	"h-3.5 w-3.5 shrink-0",
-																	!isSubActive && "opacity-70",
-																)}
-															/>
-															{subLabel}
-														</Link>
-													);
-												},
-											)}
-										</div>
-									</motion.div>
-								)}
-							</AnimatePresence>
-						)}
-
-						{isSettingsItem && !isCollapsed && (
-							<AnimatePresence initial={false}>
-								{isSettingsExpanded && (
-									<motion.div
-										key="settings-subnav"
-										initial={{ height: 0, opacity: 0 }}
-										animate={{ height: "auto", opacity: 1 }}
-										exit={{ height: 0, opacity: 0 }}
-										transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
-										style={{ overflow: "hidden" }}
-									>
-										<div className="my-0.5 ml-[14px] flex flex-col border-neutral-alpha-10 border-l pb-0.5 pl-2">
-											{settingsSubNav.map(
-												(
-													{ label: subLabel, path: subPath, iconName: subIcon },
-													subIndex,
-												) => {
-													const isSubActive =
-														pathWithoutSlug.startsWith(subPath);
-													return (
-														<Link
-															key={subPath}
-															href={subPath}
-															ref={(el) => {
-																if (el)
-																	settingsSubNavRefs.current[subIndex] = el;
-															}}
-															onPointerEnter={() =>
-																setHoveredEl(
-																	settingsSubNavRefs.current[subIndex],
-																)
+																setHoveredEl(subNavRefs.current[path]?.[subIndex])
 															}
 															onPointerLeave={() => setHoveredEl(undefined)}
 															className={cn(
