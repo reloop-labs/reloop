@@ -1,6 +1,5 @@
 "use client";
 
-import { userNavigation } from "@fe/dashboard/constants";
 import {
 	getAvatarGradient,
 	getAvatarInitial,
@@ -12,6 +11,7 @@ import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import { useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
 import { useRef, useState } from "react";
 import { AnimatedHoverBackground } from "../animated-hover-background";
 
@@ -30,15 +30,14 @@ export const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
 	user,
 	isCollapsed = false,
 }) => {
+	const { theme, setTheme } = useTheme();
 	const [isOpen, setIsOpen] = useState(false);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
-	const buttonRefs = useRef<HTMLButtonElement[]>([]);
+	const itemRefs = useRef<(HTMLElement | null)[]>([]);
 	const router = useRouter();
 
-	const currentTab = buttonRefs.current[hoverIdx ?? -1];
+	const currentTab = itemRefs.current[hoverIdx ?? -1] || undefined;
 	const currentRect = currentTab?.getBoundingClientRect();
-	const hoveredItem = userNavigation[hoverIdx ?? -1];
-	const isDanger = hoveredItem?.variant === "danger";
 
 	const handleAction = async (path: string, action: string | undefined) => {
 		if (action === "signout") {
@@ -47,6 +46,7 @@ export const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
 		} else {
 			router.push(path);
 		}
+		setIsOpen(false);
 	};
 
 	if (!user) {
@@ -114,48 +114,153 @@ export const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
 				side="top"
 				align="start"
 			>
+				<div className="px-2.5 py-2 pb-1.5">
+					<p className="truncate font-medium text-xs">{user.email}</p>
+				</div>
+				<div className="h-px bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
 				<div className="relative">
-					{userNavigation.map(
-						({ path, label, iconName, variant, action }, navIdx) => {
-							const isItemDanger = variant === "danger";
-							return (
-								<button
-									key={path + label}
-									ref={(el) => {
-										if (el) {
-											buttonRefs.current[navIdx] = el;
-										}
-									}}
-									type="button"
-									onPointerEnter={() => setHoverIdx(navIdx)}
-									onPointerLeave={() => setHoverIdx(undefined)}
-									className={cn(
-										"flex w-full cursor-pointer items-center justify-start gap-2.5 rounded-lg px-3 py-2 font-normal",
-										isItemDanger ? "text-red-500" : "",
-										!currentRect &&
-											hoverIdx === navIdx &&
-											(isItemDanger
-												? "bg-red-alpha-10"
-												: "bg-neutral-alpha-10"),
-									)}
-									onClick={() => handleAction(path, action)}
-								>
-									<Icon
-										name={iconName}
-										className={cn(
-											"h-4 w-4",
-											isItemDanger ? "" : "text-text-sub-600",
-										)}
-									/>
-									<p className="text-sm">{label}</p>
-								</button>
-							);
-						},
-					)}
+					<Dropdown.Group className="gap-0">
+						<Dropdown.Item
+							ref={(el) => {
+								if (el) itemRefs.current[0] = el;
+							}}
+							className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
+							onPointerEnter={() => setHoverIdx(0)}
+							onPointerLeave={() => setHoverIdx(undefined)}
+							onClick={() => router.push("/settings")}
+						>
+							<Avatar.Root size="20" color="blue" className="shrink-0">
+								{user.image ? (
+									<Avatar.Image src={user.image} alt={user.name} />
+								) : (
+									<Avatar.Image asChild>
+										<div
+											className={cn(
+												"flex h-full w-full items-center justify-center rounded-full font-medium text-[8px] text-white uppercase tracking-wide",
+												getAvatarGradient(user.email),
+											)}
+										>
+											{getAvatarInitial(user.name, user.email)}
+										</div>
+									</Avatar.Image>
+								)}
+							</Avatar.Root>
+							<span className="flex-1 truncate text-sm">My profile</span>
+						</Dropdown.Item>
+
+						<Dropdown.Item
+							ref={(el) => {
+								if (el) itemRefs.current[1] = el;
+							}}
+							className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
+							onPointerEnter={() => setHoverIdx(1)}
+							onPointerLeave={() => setHoverIdx(undefined)}
+							onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+						>
+							<Icon
+								name={theme === "dark" ? "sun" : "moon"}
+								className="h-4 w-4 text-text-sub-600"
+							/>
+							<span className="flex-1 truncate text-sm">Toggle theme</span>
+							<span className="flex h-5 w-5 items-center justify-center rounded bg-bg-weak-50 font-medium text-[10px] text-text-soft-400">
+								M
+							</span>
+						</Dropdown.Item>
+					</Dropdown.Group>
+
+					<div className="my-1 h-px bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
+
+					<Dropdown.Group className="gap-0">
+						<Dropdown.Item
+							ref={(el) => {
+								if (el) itemRefs.current[2] = el;
+							}}
+							className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
+							onPointerEnter={() => setHoverIdx(2)}
+							onPointerLeave={() => setHoverIdx(undefined)}
+							onClick={() => router.push("/settings")}
+						>
+							<Icon name="gear" className="h-4 w-4 text-text-sub-600" />
+							<span className="flex-1 truncate text-sm">Settings</span>
+							<span className="flex items-center gap-0.5 font-medium text-[10px] text-text-soft-400 opacity-60">
+								<span>⇧</span>
+								<span>⌘</span>
+								<span>,</span>
+							</span>
+						</Dropdown.Item>
+						<Dropdown.Item
+							ref={(el) => {
+								if (el) itemRefs.current[4] = el;
+							}}
+							className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
+							onPointerEnter={() => setHoverIdx(4)}
+							onPointerLeave={() => setHoverIdx(undefined)}
+						>
+							<Icon name="question" className="h-4 w-4 text-text-sub-600" />
+							<span className="flex-1 truncate text-sm">Get help</span>
+						</Dropdown.Item>
+					</Dropdown.Group>
+
+					<div className="my-1 h-px bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
+
+					<Dropdown.Group className="gap-0">
+						<Dropdown.Item
+							ref={(el) => {
+								if (el) itemRefs.current[5] = el;
+							}}
+							className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
+							onPointerEnter={() => setHoverIdx(5)}
+							onPointerLeave={() => setHoverIdx(undefined)}
+							onClick={() => router.push("/settings/billing")}
+						>
+							<Icon
+								name="arrow-top-circle"
+								className="h-4 w-4 text-text-sub-600"
+							/>
+							<span className="flex-1 truncate text-sm">Upgrade plan</span>
+						</Dropdown.Item>
+
+						<Dropdown.Item
+							ref={(el) => {
+								if (el) itemRefs.current[7] = el;
+							}}
+							className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
+							onPointerEnter={() => setHoverIdx(7)}
+							onPointerLeave={() => setHoverIdx(undefined)}
+						>
+							<Icon name="info-outline" className="h-4 w-4 text-text-sub-600" />
+							<span className="flex-1 truncate text-sm">Learn more</span>
+							<Icon
+								name="right"
+								className="h-3 w-3 text-text-soft-400 opacity-40"
+							/>
+						</Dropdown.Item>
+					</Dropdown.Group>
+					<div className="my-1 h-px bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
+
+					<Dropdown.Group className="gap-0">
+						<Dropdown.Item
+							ref={(el) => {
+								if (el) itemRefs.current[10] = el;
+							}}
+							className="gap-2 px-2 py-1.5 text-red-500 data-[highlighted]:bg-transparent!"
+							onPointerEnter={() => setHoverIdx(10)}
+							onPointerLeave={() => setHoverIdx(undefined)}
+							onClick={() => handleAction("", "signout")}
+						>
+							<Icon
+								name="arrow-right-rec"
+								className="h-3.5 w-3.5 text-red-500"
+							/>
+							<span className="flex-1 truncate text-sm">Log out</span>
+						</Dropdown.Item>
+					</Dropdown.Group>
+
 					<AnimatedHoverBackground
 						rect={currentRect}
 						tabElement={currentTab}
-						isDanger={isDanger}
+						isDanger={hoverIdx === 10}
+						className="rounded-[10px]"
 					/>
 				</div>
 			</Dropdown.Content>
