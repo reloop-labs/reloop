@@ -30,7 +30,9 @@
 			"@reloop/web": ["../../apps/frontend/web/src/*"],
 			"@reloop/be-mailing": ["../../apps/backend/mailing/src/*"],
 			"@reloop/email": ["../../apps/backend/email/index.ts"],
-			"@reloop/logs": ["../../apps/backend/logs/src/*"]
+			"@reloop/logs": ["../../apps/backend/logs/src/*"],
+			"@be/domain": ["../../apps/backend/domain/src/*"],
+			"@be/domain/*": ["../../apps/backend/domain/src/*"]
 		}
 	}
 }

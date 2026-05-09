@@ -13,7 +13,8 @@
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
-		"better-auth": "catalog:"
+		"better-auth": "catalog:",
+		"@better-auth/api-key": "catalog:"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",

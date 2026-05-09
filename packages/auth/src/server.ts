@@ -1,12 +1,6 @@
+import { apiKey } from "@better-auth/api-key";
 import { betterAuth } from "better-auth";
-import {
-	admin,
-	apiKey,
-	bearer,
-	jwt,
-	openAPI,
-	organization,
-} from "better-auth/plugins";
+import { admin, bearer, jwt, openAPI, organization } from "better-auth/plugins";
 import { ac, dev, marketing, admin as orgAdmin } from "./permissions";
 
 export const auth = betterAuth({
@@ -45,7 +39,7 @@ export const auth = betterAuth({
 				dev,
 				marketing,
 			},
-			sendInvitationEmail: async () => {},
+			sendInvitationEmail: async () => { },
 		}),
 		openAPI({ path: "/docs" }),
 	],
