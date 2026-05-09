@@ -15,7 +15,7 @@ export async function createEmailLog_step4({
 	const [logRecord] = await db
 		.insert(emailLog)
 		.values({
-			messageId: `pending_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+			messageId: `msg_${Date.now()}_${Math.random().toString(36).slice(2)}`,
 			organizationId,
 			domainId: domainId,
 			fromEmail: body.from,
