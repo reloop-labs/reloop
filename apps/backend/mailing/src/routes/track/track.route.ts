@@ -1,4 +1,4 @@
-import { logger } from "@reloop/logger";
+
 import { Elysia, t } from "elysia";
 import { handleClickTracking, handleOpenTracking } from "./track.controllers";
 
@@ -8,7 +8,7 @@ export const trackRoute = new Elysia({
 })
 	.get(
 		"/open/:emailLogId",
-		({ params: { emailLogId } }) => handleOpenTracking({ emailLogId, logger }),
+		({ params: { emailLogId } }) => handleOpenTracking({ emailLogId }),
 		{
 			params: t.Object({
 				emailLogId: t.String(),
@@ -18,7 +18,7 @@ export const trackRoute = new Elysia({
 	.get(
 		"/click/:emailLogId",
 		({ params: { emailLogId }, query: { url } }) =>
-			handleClickTracking({ emailLogId, url: url as string, logger }),
+			handleClickTracking({ emailLogId, url: url as string }),
 		{
 			params: t.Object({
 				emailLogId: t.String(),

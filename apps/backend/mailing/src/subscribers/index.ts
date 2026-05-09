@@ -1,8 +1,8 @@
-import { logger } from "@reloop/logger";
+import { log } from "evlog";
 
 export async function initSubscribers() {
 	// Subscribe to user created event
 
 
-	logger.info("Auth subscribers initialized");
+	log.info("subscribers", "Auth subscribers initialized");
 }

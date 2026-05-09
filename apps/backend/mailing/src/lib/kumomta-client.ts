@@ -1,4 +1,4 @@
-import { logger } from "@reloop/logger";
+import { log } from "evlog";
 import { mailConfig } from "../mail.config";
 
 export interface KumomtaHttpConfig {
@@ -53,21 +53,20 @@ export class KumomtaClient {
 				signal: AbortSignal.timeout(5000),
 			});
 			const isAlive = response.ok;
-			logger.info(
-				{ baseUrl: this.baseUrl, status: response.status },
-				isAlive
+			log.info({
+				message: isAlive
 					? "KumoMTA HTTP connection verified"
 					: "KumoMTA HTTP connection check failed",
-			);
+				baseUrl: this.baseUrl,
+				status: response.status,
+			});
 			return isAlive;
 		} catch (error) {
-			logger.error(
-				{
-					error: error instanceof Error ? error.message : String(error),
-					baseUrl: this.baseUrl,
-				},
-				"KumoMTA HTTP connection failed",
-			);
+			log.error({
+				message: "KumoMTA HTTP connection failed",
+				error: error instanceof Error ? error.message : String(error),
+				baseUrl: this.baseUrl,
+			});
 			return false;
 		}
 	}
@@ -121,30 +120,26 @@ export class KumomtaClient {
 
 			const result = await response.json();
 
-			logger.info(
-				{
-					id: result.id,
-					from: options.from,
-					to: options.to,
-					subject: options.subject,
-				},
-				"Email injected via KumoMTA HTTP API",
-			);
+			log.info({
+				message: "Email injected via KumoMTA HTTP API",
+				id: result.id,
+				from: options.from,
+				to: options.to,
+				subject: options.subject,
+			});
 
 			return {
 				id: result.id || "",
 				messageId: result.id || "",
 			};
 		} catch (error) {
-			logger.error(
-				{
-					error: error instanceof Error ? error.message : String(error),
-					from: options.from,
-					to: options.to,
-					subject: options.subject,
-				},
-				"Failed to inject email via KumoMTA HTTP API",
-			);
+			log.error({
+				message: "Failed to inject email via KumoMTA HTTP API",
+				error: error instanceof Error ? error.message : String(error),
+				from: options.from,
+				to: options.to,
+				subject: options.subject,
+			});
 			throw error;
 		}
 	}

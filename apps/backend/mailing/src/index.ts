@@ -4,9 +4,9 @@ import { serverTiming } from "@elysiajs/server-timing";
 import { landing } from "@reloop/be-mailing/routes/landing/landing.index.js";
 import { mailRoutes } from "@reloop/be-mailing/routes/mail/mail.routes.js";
 import { loader } from "@reloop/be-mailing/utils/loader.js";
-import { logger } from "@reloop/logger";
+
 import { Elysia } from "elysia";
-import { initLogger } from "evlog";
+import { initLogger, log } from "evlog";
 import { evlog } from "evlog/elysia";
 import { mailConfig } from "./mail.config";
 
@@ -44,7 +44,7 @@ const mailService = new Elysia({
 		await loader();
 	})
 	.listen(port, () => {
-		logger.info(`Mail Server is running on http://localhost:${port}/api/mail`);
+		log.info("server", `Mail Server is running on http://localhost:${port}/api/mail`);
 	});
 
 export type MailService = typeof mailService;

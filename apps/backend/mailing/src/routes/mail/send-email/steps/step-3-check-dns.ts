@@ -1,10 +1,10 @@
 import { db } from "@reloop/db/client";
 import {
+	type dnsRecordTypeNameEnum,
 	domain,
 	domainDnsRecord,
-	type dnsRecordTypeNameEnum,
 } from "@reloop/db/schema";
-import type { Logger } from "@reloop/logger";
+import { useLogger } from "evlog/elysia";
 import { and, eq, inArray } from "drizzle-orm";
 
 /**
@@ -13,12 +13,11 @@ import { and, eq, inArray } from "drizzle-orm";
 export async function checkDnsHealth_step3({
 	domainId,
 	organizationId,
-	logger,
 }: {
 	domainId: string;
 	organizationId: string;
-	logger: Logger;
 }) {
+	const logger = useLogger();
 	const domainData = await db.query.domain.findFirst({
 		where: and(
 			eq(domain.id, domainId),
@@ -41,7 +40,7 @@ export async function checkDnsHealth_step3({
 	const lastVerified = domainData.lastVerifiedAt;
 	const isRecent = lastVerified
 		? Date.now() - new Date(lastVerified).getTime() <
-			STALE_THRESHOLD_HOURS * 60 * 60 * 1000
+		STALE_THRESHOLD_HOURS * 60 * 60 * 1000
 		: false;
 
 	if (domainData.systemVerified && domainData.status === "active" && isRecent) {
@@ -68,17 +67,21 @@ export async function checkDnsHealth_step3({
 		.limit(10);
 
 	const activeRecords = new Set(
-		dnsRecords.filter((r) => r.status === "active").map((r) => r.recordTypeName),
+		dnsRecords
+			.filter((r) => r.status === "active")
+			.map((r) => r.recordTypeName),
 	);
 
 	const missingRecords = requiredRecordTypes.filter(
 		(type) =>
-			!activeRecords.has(type as (typeof dnsRecordTypeNameEnum.enumValues)[number]),
+			!activeRecords.has(
+				type as (typeof dnsRecordTypeNameEnum.enumValues)[number],
+			),
 	);
 
 	const isHealthy = missingRecords.length === 0;
 	if (!isHealthy) {
-		logger.warn({ domainId, missingRecords }, "Domain DNS health check failed");
+		logger.warn("Domain DNS health check failed", { domainId, missingRecords });
 	}
 
 	return { isHealthy, missingRecords };

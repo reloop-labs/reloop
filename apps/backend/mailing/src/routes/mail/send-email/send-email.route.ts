@@ -5,11 +5,10 @@ import { sendEmailController } from "./send-email.controllers";
 
 export const sendEmailRoute = new Elysia().use(authMiddleware).post(
 	"/send",
-	async ({ body, activeOrganizationId, logger }) => {
+	async ({ body, activeOrganizationId }) => {
 		return await sendEmailController({
 			organizationId: activeOrganizationId,
 			body,
-			logger,
 		});
 	},
 	{

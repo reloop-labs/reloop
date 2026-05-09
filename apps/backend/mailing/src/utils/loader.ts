@@ -1,7 +1,7 @@
 import { bus } from "@reloop/bus";
 import { RedisCache } from "@reloop/cache/redis-client";
 import { db } from "@reloop/db/client";
-import { logger } from "@reloop/logger";
+import { log } from "evlog";
 import { mailConfig } from "../mail.config";
 import { initSubscribers } from "../subscribers/index";
 
@@ -10,21 +10,21 @@ export const redis = new RedisCache("mail");
 export async function loader() {
 	try {
 		await redis.healthCheck();
-		logger.info("Redis connected");
+		log.info("redis", "Redis connected");
 		await db.execute("SELECT 1 as test");
-		logger.info("Postgres connected");
+		log.info("postgres", "Postgres connected");
 
 		await bus.connect(mailConfig.NATS_URL);
-		logger.info("NATS connected");
+		log.info("nats", "NATS connected");
 
 		await initSubscribers();
-		logger.info("Subscribers initialized");
+		log.info("subscribers", "Subscribers initialized");
 
-		logger.info("Mail service loader initialized");
+		log.info("loader", "Mail service loader initialized");
 	} catch (e) {
-		logger.error(
-			{ error: e instanceof Error ? e.message : String(e) },
-			"Error during mail service initialization",
-		);
+		log.error({
+			message: "Error during mail service initialization",
+			error: e instanceof Error ? e.message : String(e),
+		});
 	}
 }

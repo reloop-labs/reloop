@@ -1,12 +1,11 @@
 import { authMiddleware } from "@reloop/be-mailing/middleware/auth";
 import { MailModel } from "@reloop/be-mailing/model/mail.model.js";
-import { type Logger, logger } from "@reloop/logger";
 import { Elysia, status } from "elysia";
 import { getAttachmentController } from "./get-attachment.controllers";
 
 export const getAttachmentRoute = new Elysia().use(authMiddleware).get(
 	"/:emailId/attachments/:id",
-	async ({ params, activeOrganizationId, logger: contextLogger }) => {
+	async ({ params, activeOrganizationId }) => {
 		if (!activeOrganizationId) {
 			throw status(403, {
 				message: "User is not a member of an organization",
@@ -16,7 +15,6 @@ export const getAttachmentRoute = new Elysia().use(authMiddleware).get(
 			organizationId: activeOrganizationId,
 			emailId: params.emailId,
 			attachmentId: params.id,
-			logger: (contextLogger as Logger) || logger,
 		});
 	},
 	{

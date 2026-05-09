@@ -1,5 +1,5 @@
-import { MailModel } from "@reloop/be-mailing/model/mail.model.js";
-import type { Logger } from "@reloop/logger";
+import type { MailModel } from "@reloop/be-mailing/model/mail.model.js";
+import { useLogger } from "evlog/elysia";
 import {
 	checkDnsHealth_step3,
 	createEmailLog_step4,
@@ -13,17 +13,17 @@ import {
 export async function sendEmailController({
 	organizationId,
 	body,
-	logger,
 }: {
 	organizationId: string;
 	body: MailModel.SendEmailBody;
-	logger: Logger;
 }): Promise<MailModel.SendEmailResponse> {
+	const logger = useLogger();
 	try {
-		logger.info(
-			{ from: body.from, to: body.to, organizationId },
-			"Initiating email send process",
-		);
+		logger.info("Initiating email send process", {
+			organizationId,
+			from: body.from,
+			to: body.to,
+		});
 
 		// Step 1: Parse 'from' address
 		const { domainName } = parseFromAddress_step1(body.from);
@@ -38,7 +38,6 @@ export async function sendEmailController({
 		const dnsHealthCheck = await checkDnsHealth_step3({
 			domainId: currentDomain.id,
 			organizationId,
-			logger,
 		});
 
 		if (!dnsHealthCheck.isHealthy) {
@@ -82,15 +81,20 @@ export async function sendEmailController({
 			body,
 		});
 
-		logger.info(
-			{ emailLogId, messageId: response.messageId, organizationId },
-			"Email process completed successfully",
-		);
+		logger.info("Email process completed successfully", {
+			emailLogId,
+			messageId: response.messageId,
+			organizationId,
+		});
 
 		return response;
 	} catch (error) {
-		const errorMessage = error instanceof Error ? error.message : "Unknown error";
-		logger.error({ error: errorMessage, organizationId }, "Email send process failed");
+		const errorMessage =
+			error instanceof Error ? error.message : "Unknown error";
+		logger.error("Email send process failed", {
+			error: errorMessage,
+			organizationId,
+		});
 		throw error;
 	}
 }

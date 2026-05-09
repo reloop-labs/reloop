@@ -1,6 +1,6 @@
 import { db } from "@reloop/db/client";
 import { emailEvent, emailLog } from "@reloop/db/schema";
-import type { Logger } from "@reloop/logger";
+import { useLogger } from "evlog/elysia";
 import { eq } from "drizzle-orm";
 
 const TRANSPARENT_PIXEL = Buffer.from(
@@ -10,11 +10,10 @@ const TRANSPARENT_PIXEL = Buffer.from(
 
 export async function handleOpenTracking({
 	emailLogId,
-	logger,
 }: {
 	emailLogId: string;
-	logger: Logger;
 }) {
+	const logger = useLogger();
 	try {
 		const logEntry = await db.query.emailLog.findFirst({
 			where: eq(emailLog.id, emailLogId),
@@ -27,10 +26,10 @@ export async function handleOpenTracking({
 					userAgent: "unknown", // Could be extracted from headers if needed
 				},
 			});
-			logger.info({ emailLogId }, "Email open tracked");
+			logger.info("Email open tracked", { emailLogId });
 		}
 	} catch (error) {
-		logger.error({ error, emailLogId }, "Failed to track email open");
+		logger.error("Failed to track email open", { error, emailLogId });
 	}
 	return new Response(TRANSPARENT_PIXEL, {
 		headers: {
@@ -43,12 +42,11 @@ export async function handleOpenTracking({
 export async function handleClickTracking({
 	emailLogId,
 	url,
-	logger,
 }: {
 	emailLogId: string;
 	url: string;
-	logger: Logger;
 }) {
+	const logger = useLogger();
 	try {
 		const logEntry = await db.query.emailLog.findFirst({
 			where: eq(emailLog.id, emailLogId),
@@ -62,10 +60,10 @@ export async function handleClickTracking({
 					url,
 				},
 			});
-			logger.info({ emailLogId, url }, "Email click tracked");
+			logger.info("Email click tracked", { emailLogId, url });
 		}
 	} catch (error) {
-		logger.error({ error, emailLogId, url }, "Failed to track email click");
+		logger.error("Failed to track email click", { error, emailLogId, url });
 	}
 
 	return Response.redirect(url, 302);
