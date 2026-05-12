@@ -3,7 +3,7 @@
 import { authClient } from "@reloop/auth/client";
 import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, type Variants } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -186,7 +186,7 @@ const navItems = [
 	{ title: "Pricing", href: "/pricing" },
 ];
 
-const containerVariants = {
+const containerVariants: Variants = {
 	hidden: { opacity: 0, height: 0, scale: 0.98 },
 	visible: {
 		opacity: 1,
@@ -194,7 +194,7 @@ const containerVariants = {
 		scale: 1,
 		transition: {
 			duration: 0.25,
-			ease: [0.23, 1, 0.32, 1],
+			ease: [0.23, 1, 0.32, 1] as const,
 			staggerChildren: 0.04,
 			delayChildren: 0.02,
 		},
@@ -205,24 +205,24 @@ const containerVariants = {
 		scale: 0.98,
 		transition: {
 			duration: 0.2,
-			ease: [0.23, 1, 0.32, 1],
+			ease: [0.23, 1, 0.32, 1] as const,
 		},
 	},
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
 	hidden: { opacity: 0, translateY: 4 },
 	visible: {
 		opacity: 1,
 		translateY: 0,
 		transition: {
 			duration: 0.2,
-			ease: [0.23, 1, 0.32, 1],
+			ease: [0.23, 1, 0.32, 1] as const,
 		},
 	},
 };
 
-const slideVariants = {
+const slideVariants: Variants = {
 	enter: (direction: number) => ({
 		x: direction > 0 ? 100 : direction < 0 ? -100 : 0,
 		opacity: 0,
@@ -234,7 +234,7 @@ const slideVariants = {
 		filter: "blur(0px)",
 		transition: {
 			duration: 0.4,
-			ease: [0.23, 1, 0.32, 1],
+			ease: [0.23, 1, 0.32, 1] as const,
 		},
 	},
 	exit: (direction: number) => ({
@@ -243,7 +243,7 @@ const slideVariants = {
 		filter: "blur(4px)",
 		transition: {
 			duration: 0.3,
-			ease: [0.23, 1, 0.32, 1],
+			ease: [0.23, 1, 0.32, 1] as const,
 		},
 	}),
 };
