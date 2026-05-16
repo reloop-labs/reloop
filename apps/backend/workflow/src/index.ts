@@ -1,0 +1,84 @@
+import "dotenv/config";
+import path from "node:path";
+import { workflowConfig } from "@be/workflow/workflow.config";
+import { workflowQueue } from "@be/workflow/queues/workflow.queue";
+import { loader } from "@be/workflow/utils/loader";
+import { createBullBoard } from "@bull-board/api";
+import { BullMQAdapter } from "@bull-board/api/bullMQAdapter";
+import { ElysiaAdapter } from "@bull-board/elysia";
+import { openapi } from "@elysiajs/openapi";
+import { serverTiming } from "@elysiajs/server-timing";
+import { Elysia } from "elysia";
+import { initLogger, log, parseError } from "evlog";
+import { evlog } from "evlog/elysia";
+import pkg from "../package.json";
+
+initLogger({ env: { service: "workflow" } });
+
+const port = workflowConfig.port;
+
+const serverAdapter = new ElysiaAdapter({
+	prefix: "/bull-board",
+	basePath: "/api/workflow/bull-board",
+});
+
+createBullBoard({
+	queues: [new BullMQAdapter(workflowQueue)],
+	serverAdapter,
+	options: {
+		uiBasePath:
+			process.env.NODE_ENV === "production"
+				? path.resolve(process.cwd(), "./node_modules/@bull-board/ui")
+				: path.resolve(process.cwd(), "../../../node_modules/@bull-board/ui"),
+	},
+});
+
+const workflowService = new Elysia({
+	prefix: "/api/workflow",
+	name: "Workflow Service",
+})
+	.use(evlog())
+	.use(
+		openapi({
+			documentation: {
+				info: {
+					title: "Workflow Service",
+					version: pkg.version,
+				},
+				components: {
+					securitySchemes: {
+						apiKey: {
+							type: "apiKey",
+							name: "x-api-key",
+							in: "header",
+						},
+					},
+				},
+			},
+		}),
+	)
+	.use(serverTiming())
+	.onError(({ error, set }) => {
+		const parsed = parseError(error);
+		set.status = parsed.status;
+		return {
+			message: parsed.message,
+			why: parsed.why,
+			fix: parsed.fix,
+			link: parsed.link,
+		};
+	})
+	.use(await serverAdapter.registerPlugin())
+	.get("/", () => ({ status: "Workflow Service is running" }))
+	.onStart(async () => {
+		await loader();
+	})
+	.listen(port, () => {
+		log.info("server", `Workflow Server is running on http://localhost:${port}/api/workflow`);
+		log.info(
+			"server",
+			`Bull Board is running on http://localhost:${port}/api/workflow/bull-board`,
+		);
+	});
+
+export type WorkflowService = typeof workflowService;
