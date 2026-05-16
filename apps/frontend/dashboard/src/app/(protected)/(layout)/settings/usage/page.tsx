@@ -1,9 +1,60 @@
 "use client";
 
+import { useBillingUsage } from "@fe/dashboard/hooks/useBillingUsage";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function formatNumber(n: number): string {
+	return n.toLocaleString("en-US");
+}
+
+function formatPeriod(start: string, end: string): string {
+	const fmt = (d: string) =>
+		new Date(d).toLocaleDateString("en-US", {
+			month: "short",
+			day: "numeric",
+			year: "numeric",
+		});
+	return `${fmt(start)} – ${fmt(end)}`;
+}
+
+function daysUntil(isoDate: string): number {
+	const end = new Date(isoDate).getTime();
+	const now = Date.now();
+	return Math.max(0, Math.ceil((end - now) / (1000 * 60 * 60 * 24)));
+}
+
+// ─── Skeleton ─────────────────────────────────────────────────────────────────
+
+const Skeleton = ({ className }: { className?: string }) => (
+	<div className={`animate-pulse rounded bg-bg-soft-200 ${className ?? ""}`} />
+);
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
 const UsagePage = () => {
+	const { data, isLoading, error, refetch } = useBillingUsage();
+
+	const usagePercent =
+		data && data.plan.monthlyCredits > 0
+			? (data.subscription.creditsUsed / data.plan.monthlyCredits) * 100
+			: 0;
+
+	const isNearLimit = usagePercent >= 80;
+	const isOverLimit = usagePercent >= 100;
+	const statusLabel = isOverLimit
+		? "Limit reached"
+		: isNearLimit
+			? "High usage"
+			: "On track";
+	const statusColor = isOverLimit
+		? "border-error-light bg-error-lighter text-error-base"
+		: isNearLimit
+			? "border-warning-light bg-warning-lighter text-warning-base"
+			: "border-success-light bg-success-lighter text-success-base";
+
 	return (
 		<div className="w-full space-y-5 pt-5">
 			{/* Header */}
@@ -16,23 +67,54 @@ const UsagePage = () => {
 						Email sends for your current billing period.
 					</p>
 				</div>
-				<button className="rounded-md p-1 text-text-sub-600 transition-colors hover:bg-bg-soft-200">
+				<button
+					type="button"
+					onClick={refetch}
+					className="rounded-md p-1 text-text-sub-600 transition-colors hover:bg-bg-soft-200"
+					title="Refresh usage"
+				>
 					<Icon name="more-horizontal" className="h-5 w-5" />
 				</button>
 			</div>
+
+			{/* Error state */}
+			{error && (
+				<div className="rounded-xl border border-error-light bg-error-lighter p-4 text-error-base text-paragraph-sm">
+					Failed to load usage data.{" "}
+					<button type="button" onClick={refetch} className="underline">
+						Retry
+					</button>
+				</div>
+			)}
 
 			{/* Billing Period Banner */}
 			<div className="flex items-center justify-between rounded-xl border border-stroke-soft-200 bg-bg-weak-50 p-4">
 				<div className="flex items-center gap-3">
 					<Icon name="calendar" className="h-5 w-5 text-text-sub-600" />
-					<p className="font-medium text-label-sm text-text-strong-950">
-						Billing period: May 1 – May 31, 2026
-					</p>
+					{isLoading ? (
+						<Skeleton className="h-4 w-52" />
+					) : (
+						<p className="font-medium text-label-sm text-text-strong-950">
+							Billing period:{" "}
+							{data
+								? formatPeriod(
+										data.subscription.currentPeriodStart,
+										data.subscription.currentPeriodEnd,
+									)
+								: "—"}
+						</p>
+					)}
 				</div>
-				<p className="font-medium text-paragraph-xs text-text-sub-600">
-					Resets in{" "}
-					<span className="font-semibold text-text-strong-950">24 days</span>
-				</p>
+				{isLoading ? (
+					<Skeleton className="h-4 w-24" />
+				) : (
+					<p className="font-medium text-paragraph-xs text-text-sub-600">
+						Resets in{" "}
+						<span className="font-semibold text-text-strong-950">
+							{data ? daysUntil(data.subscription.currentPeriodEnd) : "—"} days
+						</span>
+					</p>
+				)}
 			</div>
 
 			{/* Main Usage Card */}
@@ -46,78 +128,137 @@ const UsagePage = () => {
 							Total outbound sends this period
 						</p>
 					</div>
-					<div className="rounded-full border border-success-light bg-success-lighter px-2.5 py-0.5">
-						<span className="font-semibold text-[11px] text-success-base uppercase tracking-wider">
-							On track
-						</span>
-					</div>
+					{isLoading ? (
+						<Skeleton className="h-5 w-20 rounded-full" />
+					) : (
+						<div className={`rounded-full border px-2.5 py-0.5 ${statusColor}`}>
+							<span className="font-semibold text-[11px] uppercase tracking-wider">
+								{statusLabel}
+							</span>
+						</div>
+					)}
 				</div>
 
 				<div className="mb-6">
-					<div className="flex items-baseline gap-2">
-						<span className="font-bold text-text-strong-950 text-title-h3">
-							24,810
-						</span>
-						<span className="font-medium text-paragraph-sm text-text-sub-600">
-							of 100,000 included
-						</span>
-					</div>
+					{isLoading ? (
+						<Skeleton className="h-9 w-48" />
+					) : (
+						<div className="flex items-baseline gap-2">
+							<span className="font-bold text-text-strong-950 text-title-h3">
+								{data ? formatNumber(data.subscription.creditsUsed) : "—"}
+							</span>
+							<span className="font-medium text-paragraph-sm text-text-sub-600">
+								of {data ? formatNumber(data.plan.monthlyCredits) : "—"}{" "}
+								included
+							</span>
+						</div>
+					)}
 				</div>
 
+				{/* Progress bar */}
 				<div className="relative h-2 w-full overflow-hidden rounded-full bg-bg-soft-200">
 					<div
-						className="absolute top-0 left-0 h-full bg-blue-500 transition-all duration-500"
-						style={{ width: "24.8%" }}
+						className={`absolute top-0 left-0 h-full transition-all duration-500 ${
+							isOverLimit
+								? "bg-error-base"
+								: isNearLimit
+									? "bg-warning-base"
+									: "bg-blue-500"
+						}`}
+						style={{ width: `${Math.min(100, usagePercent)}%` }}
 					/>
 				</div>
 
 				<div className="mt-3 flex justify-between">
-					<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-tight">
-						24.8% used
-					</p>
-					<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-tight">
-						75,190 remaining
-					</p>
+					{isLoading ? (
+						<>
+							<Skeleton className="h-3 w-16" />
+							<Skeleton className="h-3 w-24" />
+						</>
+					) : (
+						<>
+							<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-tight">
+								{usagePercent.toFixed(1)}% used
+							</p>
+							<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-tight">
+								{data ? formatNumber(data.subscription.creditsRemaining) : "—"}{" "}
+								remaining
+							</p>
+						</>
+					)}
 				</div>
 			</div>
 
 			{/* Small Stats Cards */}
-			<div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-				{[
-					{
-						label: "This month",
-						value: "24,810",
-						trend: "↑ 8% vs last",
-						trendColor: "text-success-base",
-					},
-					{
-						label: "Yesterday",
-						value: "1,204",
-						trend: "avg 980/day",
-						trendColor: "text-text-sub-600",
-					},
-					{
-						label: "Delivery rate",
-						value: "98.7%",
-						trend: "↑ 0.4% vs last",
-						trendColor: "text-success-base",
-					},
-				].map((stat) => (
-					<div
-						key={stat.label}
-						className="rounded-xl border border-stroke-soft-200 bg-bg-weak-50 p-4 shadow-sm"
-					>
-						<p className="mb-1 font-medium text-paragraph-xs text-text-sub-600">
-							{stat.label}
-						</p>
-						<p className="font-bold text-label-xl text-text-strong-950">
-							{stat.value}
-						</p>
-						<p className={`mt-1 font-medium text-[11px] ${stat.trendColor}`}>
-							{stat.trend}
-						</p>
-					</div>
-				))}
+			<div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+				{isLoading
+					? Array.from({ length: 4 }).map((_, i) => (
+							<div
+								key={i}
+								className="rounded-xl border border-stroke-soft-200 bg-bg-weak-50 p-4 shadow-sm"
+							>
+								<Skeleton className="mb-2 h-3 w-20" />
+								<Skeleton className="h-7 w-28" />
+								<Skeleton className="mt-2 h-3 w-24" />
+							</div>
+						))
+					: [
+							{
+								label: "This month",
+								value: data
+									? formatNumber(data.stats.emailsSentThisMonth)
+									: "—",
+								trend: data
+									? `avg ${formatNumber(data.stats.dailyAverage)}/day`
+									: "—",
+								trendColor: "text-text-sub-600",
+							},
+							{
+								label: "Yesterday",
+								value: data
+									? formatNumber(data.stats.emailsSentYesterday)
+									: "—",
+								trend: data
+									? `avg ${formatNumber(data.stats.dailyAverage)}/day`
+									: "—",
+								trendColor: "text-text-sub-600",
+							},
+							{
+								label: "Delivery rate",
+								value: data ? `${data.stats.deliveryRate}%` : "—",
+								trend:
+									data && data.stats.deliveryRate >= 95
+										? "↑ healthy"
+										: "↓ check bounces",
+								trendColor:
+									data && data.stats.deliveryRate >= 95
+										? "text-success-base"
+										: "text-error-base",
+							},
+							{
+								label: "Team members",
+								value: data ? String(data.members.total) : "—",
+								trend: "active & non-banned",
+								trendColor: "text-text-sub-600",
+							},
+						].map((stat) => (
+							<div
+								key={stat.label}
+								className="rounded-xl border border-stroke-soft-200 bg-bg-weak-50 p-4 shadow-sm"
+							>
+								<p className="mb-1 font-medium text-paragraph-xs text-text-sub-600">
+									{stat.label}
+								</p>
+								<p className="font-bold text-label-xl text-text-strong-950">
+									{stat.value}
+								</p>
+								<p
+									className={`mt-1 font-medium text-[11px] ${stat.trendColor}`}
+								>
+									{stat.trend}
+								</p>
+							</div>
+						))}
 			</div>
 
 			{/* Rate Limits Card */}
@@ -127,41 +268,77 @@ const UsagePage = () => {
 						Rate limits
 					</p>
 					<p className="mt-0.5 text-paragraph-xs text-text-sub-600">
-						Current plan thresholds
+						{data
+							? `${data.plan.name} plan thresholds`
+							: "Current plan thresholds"}
 					</p>
 				</div>
 
 				<div className="space-y-4">
-					{[
-						{ label: "Per second", value: "50 emails / sec", icon: "clock" },
-						{ label: "Per minute", value: "2,000 emails / min", icon: "clock" },
-						{ label: "Per hour", value: "50,000 emails / hr", icon: "clock" },
-						{
-							label: "Monthly quota",
-							value: "100,000 emails",
-							icon: "calendar",
-						},
-						{ label: "Max attachment size", value: "10 MB", icon: "file-text" },
-					].map((limit) => (
-						<div
-							key={limit.label}
-							className="group flex items-center justify-between"
-						>
-							<div className="flex items-center gap-3 text-text-sub-600">
-								<Icon name={limit.icon} className="h-4 w-4" />
-								<span className="font-medium text-paragraph-sm">
-									{limit.label}
-								</span>
-							</div>
-							<span className="font-semibold text-paragraph-sm text-text-strong-950 tracking-tight">
-								{limit.value}
-							</span>
-						</div>
-					))}
+					{isLoading
+						? Array.from({ length: 5 }).map((_, i) => (
+								<div key={i} className="flex items-center justify-between">
+									<Skeleton className="h-4 w-32" />
+									<Skeleton className="h-4 w-28" />
+								</div>
+							))
+						: [
+								{
+									label: "Per second",
+									value: data
+										? `${formatNumber(data.plan.ratePerSecond)} emails / sec`
+										: "—",
+									icon: "clock",
+								},
+								{
+									label: "Per minute",
+									value: data
+										? `${formatNumber(data.plan.ratePerMinute)} emails / min`
+										: "—",
+									icon: "clock",
+								},
+								{
+									label: "Per hour",
+									value: data
+										? `${formatNumber(data.plan.ratePerHour)} emails / hr`
+										: "—",
+									icon: "clock",
+								},
+								{
+									label: "Monthly quota",
+									value: data
+										? `${formatNumber(data.plan.monthlyCredits)} emails`
+										: "—",
+									icon: "calendar",
+								},
+								{
+									label: "Max attachment size",
+									value: data ? `${data.plan.maxAttachmentSizeMb} MB` : "—",
+									icon: "file-text",
+								},
+							].map((limit) => (
+								<div
+									key={limit.label}
+									className="group flex items-center justify-between"
+								>
+									<div className="flex items-center gap-3 text-text-sub-600">
+										<Icon name={limit.icon} className="h-4 w-4" />
+										<span className="font-medium text-paragraph-sm">
+											{limit.label}
+										</span>
+									</div>
+									<span className="font-semibold text-paragraph-sm text-text-strong-950 tracking-tight">
+										{limit.value}
+									</span>
+								</div>
+							))}
 				</div>
 
 				<div className="mt-8 flex items-center justify-between border-stroke-soft-200/50 border-t pt-6">
-					<button className="mx-auto rounded-full p-2 text-text-sub-600 transition-colors hover:bg-bg-soft-200">
+					<button
+						type="button"
+						className="mx-auto rounded-full p-2 text-text-sub-600 transition-colors hover:bg-bg-soft-200"
+					>
 						<Icon name="chevron-down" className="h-5 w-5" />
 					</button>
 					<div className="absolute right-6 bottom-6">

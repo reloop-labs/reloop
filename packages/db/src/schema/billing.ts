@@ -79,6 +79,11 @@ export const plan = pgTable("plan", {
 	billingCycle: billingCycleEnum("billing_cycle").notNull().default("monthly"),
 	rolloverEnabled: boolean("rollover_enabled").notNull().default(false),
 	maxRolloverCredits: integer("max_rollover_credits"),
+	// Rate limits — per-plan thresholds shown on the Usage page
+	ratePerSecond: integer("rate_per_second").notNull().default(50),
+	ratePerMinute: integer("rate_per_minute").notNull().default(2000),
+	ratePerHour: integer("rate_per_hour").notNull().default(50000),
+	maxAttachmentSizeMb: integer("max_attachment_size_mb").notNull().default(10),
 	isActive: boolean("is_active").notNull().default(true),
 	createdAt: timestamp("created_at").notNull().defaultNow(),
 	updatedAt: timestamp("updated_at").notNull().defaultNow(),

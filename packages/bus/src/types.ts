@@ -152,6 +152,22 @@ export interface DomainDnsReverificationRequestedPayload {
 	triggeredAt: string;
 }
 
+export interface UsageUpdatedPayload {
+	organizationId: string;
+	creditsUsed: number;
+	creditsRemaining: number;
+	monthlyCredits: number;
+	periodStart: string; // ISO
+	periodEnd: string;   // ISO
+	emailsSentToday: number;
+}
+
+export interface QuotaExceededPayload {
+	organizationId: string;
+	creditsUsed: number;
+	monthlyCredits: number;
+}
+
 export interface EventPayloads {
 	[BusEvent.USER_CREATED]: UserCreatedPayload;
 	[BusEvent.USER_UPDATED]: UserUpdatedPayload;
@@ -176,5 +192,7 @@ export interface EventPayloads {
 	[BusEvent.TRIAL_ENDING]: TrialEndingPayload;
 	[BusEvent.DNS_CONFIG_REQUESTED]: DnsConfigRequestedPayload;
 	[BusEvent.DOMAIN_DNS_REVERIFICATION_REQUESTED]: DomainDnsReverificationRequestedPayload;
+	[BusEvent.USAGE_UPDATED]: UsageUpdatedPayload;
+	[BusEvent.QUOTA_EXCEEDED]: QuotaExceededPayload;
 }
 
