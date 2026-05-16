@@ -38,7 +38,7 @@ const UsagePage = () => {
 	const { data, isLoading, error, refetch } = useBillingUsage();
 
 	const usagePercent =
-		data && data.plan.monthlyCredits > 0
+		data && data.plan?.monthlyCredits > 0
 			? (data.subscription.creditsUsed / data.plan.monthlyCredits) * 100
 			: 0;
 

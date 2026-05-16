@@ -2,7 +2,7 @@
 
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
-import { useEffect, useState } from "react";
+import useSWR from "swr";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -32,9 +32,6 @@ interface Invoice {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const BILLING_BASE =
-	process.env.NEXT_PUBLIC_BILLING_URL ?? "http://localhost:8023/api/billing";
-
 function formatDate(iso: string): string {
 	return new Date(iso).toLocaleDateString("en-US", {
 		month: "long",
@@ -62,39 +59,11 @@ const statusStyles: Record<string, string> = {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 const BillingPage = () => {
-	const [planData, setPlanData] = useState<PlanData | null>(null);
-	const [invoices, setInvoices] = useState<Invoice[]>([]);
-	const [isLoading, setIsLoading] = useState(true);
-	const [error, setError] = useState<string | null>(null);
+	const { data: planData, isLoading: planLoading, error: planError } = useSWR<PlanData>("/api/billing/plan");
+	const { data: invoices, isLoading: invoicesLoading, error: invoicesError } = useSWR<Invoice[]>("/api/billing/invoices");
 
-	useEffect(() => {
-		const fetchAll = async () => {
-			try {
-				const [planRes, invoicesRes] = await Promise.all([
-					fetch(`${BILLING_BASE}/plan`, { credentials: "include" }),
-					fetch(`${BILLING_BASE}/invoices`, { credentials: "include" }),
-				]);
-
-				if (!planRes.ok) throw new Error(`Plan fetch failed: HTTP ${planRes.status}`);
-				if (!invoicesRes.ok) throw new Error(`Invoices fetch failed: HTTP ${invoicesRes.status}`);
-
-				const [planJson, invoicesJson] = await Promise.all([
-					planRes.json() as Promise<PlanData>,
-					invoicesRes.json() as Promise<Invoice[]>,
-				]);
-
-				setPlanData(planJson);
-				setInvoices(invoicesJson);
-				setError(null);
-			} catch (err) {
-				setError(err instanceof Error ? err.message : "Failed to load billing data");
-			} finally {
-				setIsLoading(false);
-			}
-		};
-
-		fetchAll();
-	}, []);
+	const isLoading = planLoading || invoicesLoading;
+	const error = planError || invoicesError;
 
 	return (
 		<div className="w-full space-y-8 pt-5">
@@ -200,7 +169,7 @@ const BillingPage = () => {
 											</td>
 										</tr>
 									))
-								) : invoices.length === 0 ? (
+								) : (invoices ?? []).length === 0 ? (
 									<tr>
 										<td
 											colSpan={4}
@@ -210,7 +179,7 @@ const BillingPage = () => {
 										</td>
 									</tr>
 								) : (
-									invoices.map((invoice) => (
+									(invoices ?? []).map((invoice) => (
 										<tr
 											key={invoice.id}
 											className="transition-colors hover:bg-neutral-alpha-5/5"
