@@ -1,6 +1,6 @@
 import { DomainErrors } from "@be/domain/lib/errors";
-import { domainVerificationQueue } from "@be/domain/queues/domain-verification.queue";
 import type { DomainStatus } from "@be/domain/types/domain.type";
+import { bus, BusEvent } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { eq } from "drizzle-orm";
@@ -19,22 +19,23 @@ export async function enqueueVerificationJob_step3({
 }) {
 	const logger = useLogger();
 
-	// Enqueue BullMQ job — jobId deduplicates concurrent requests for the same domain
 	try {
-		await domainVerificationQueue.add(
-			"verify",
-			{ domainId, organizationId },
-			{ jobId: domainId },
-		);
-		logger.info("Enqueued background domain verification job", {
+		await bus.publish(BusEvent.DOMAIN_DNS_REVERIFICATION_REQUESTED, {
+			domainId,
+			organizationId,
+			domain: domainName,
+			triggeredAt: new Date().toISOString(),
+		});
+		
+		logger.info("Published domain verification request via NATS", {
 			domain: domainName,
 		});
 	} catch (error) {
-		logger.error("Failed to enqueue domain verification job", {
+		logger.error("Failed to publish domain verification request", {
 			domain: domainName,
 			error,
 		});
-		// Revert status if enqueue fails
+		// Revert status if publish fails
 		await db
 			.update(schema.domain)
 			.set({ status: previousStatus })

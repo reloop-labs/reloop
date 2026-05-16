@@ -5,7 +5,7 @@ export interface WorkflowJobData {
 	workflowId: string;
 	organizationId: string;
 	type: string;
-	payload: any;
+	payload: Record<string, unknown>;
 }
 
 const connection = {

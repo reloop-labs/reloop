@@ -1,31 +1,23 @@
-import { domainConfig } from "@be/domain/domain.config";
-
-import { DomainErrors } from "@be/domain/lib/errors";
 import {
 	verifyDkimRecord,
 	verifyDmarcRecord,
 	verifyMxRecord,
 	verifySpfRecord,
-} from "@be/domain/utils/verify-dns-records";
+} from "@be/workflow/utils/verify-dns-records";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { Worker } from "bullmq";
 import { and, eq, isNull } from "drizzle-orm";
 import { log } from "evlog";
-import {
-	DOMAIN_VERIFICATION_QUEUE,
-	type DomainVerificationJobData,
-} from "./domain-verification.queue";
 
-const connection = {
-	url: domainConfig.REDIS_URL,
-};
-
-async function processDomainVerification(
-	domainId: string,
-	organizationId: string,
-	isLastAttempt: boolean,
-): Promise<void> {
+export async function processDomainVerification({
+	domainId,
+	organizationId,
+	isLastAttempt,
+}: {
+	domainId: string;
+	organizationId: string;
+	isLastAttempt: boolean;
+}): Promise<void> {
 	log.info({ message: "Processing domain verification job", domainId });
 
 	// Fetch domain with DNS records
@@ -43,7 +35,8 @@ async function processDomainVerification(
 	});
 
 	if (!domainWithRecords) {
-		throw DomainErrors.domainNotFound(domainId);
+		log.error({ message: "Domain not found", domainId });
+		return;
 	}
 
 	const domainName = domainWithRecords.domain;
@@ -74,7 +67,7 @@ async function processDomainVerification(
 		return;
 	}
 
-	// Run all verifications in parallel using FQDNs from database
+	// Run all verifications in parallel
 	const [mxOk, spfOk, dkimOk, dmarcOk] = await Promise.all([
 		verifyMxRecord(mxRecord.fqdn, mxRecord.value, mxRecord.priority ?? 10),
 		verifySpfRecord(spfRecord.fqdn, spfRecord.value),
@@ -102,7 +95,6 @@ async function processDomainVerification(
 	// Update individual record statuses
 	await Promise.all(
 		results.map(({ record, ok }) => {
-			// Only update to failed if it's the last attempt
 			if (!ok && !isLastAttempt) return Promise.resolve();
 
 			return db
@@ -114,7 +106,6 @@ async function processDomainVerification(
 
 	const allPassed = mxOk && spfOk && dkimOk && dmarcOk;
 
-	// Only update domain status to failed if it's the last attempt
 	if (allPassed || isLastAttempt) {
 		const newDomainStatus = allPassed ? "active" : "failed";
 
@@ -128,8 +119,7 @@ async function processDomainVerification(
 		log.info({ message: "Domain verified successfully", domainId, domainName });
 	} else {
 		log.warn({
-			message:
-				"Domain verification failed — one or more DNS records did not match",
+			message: "Domain verification failed — one or more DNS records did not match",
 			domainId,
 			domainName,
 			mxOk,
@@ -137,52 +127,9 @@ async function processDomainVerification(
 			dkimOk,
 			dmarcOk,
 		});
-		// Throw so BullMQ retries on failure
-		throw DomainErrors.verificationFailed(
-			domainName,
-			`MX=${mxOk} SPF=${spfOk} DKIM=${dkimOk} DMARC=${dmarcOk}`,
+		
+		throw new Error(
+			`Verification failed for ${domainName}: MX=${mxOk} SPF=${spfOk} DKIM=${dkimOk} DMARC=${dmarcOk}`,
 		);
 	}
-}
-
-export function startDomainVerificationWorker(): Worker {
-	const worker = new Worker<DomainVerificationJobData>(
-		DOMAIN_VERIFICATION_QUEUE,
-		async (job) => {
-			const { domainId, organizationId } = job.data;
-			const isLastAttempt = job.attemptsMade + 1 >= (job.opts.attempts ?? 1);
-			await processDomainVerification(domainId, organizationId, isLastAttempt);
-		},
-		{
-			connection,
-			concurrency: 5,
-		},
-	);
-
-	worker.on("completed", (job) => {
-		log.info({
-			message: "Domain verification job completed",
-			jobId: job.id,
-			domainId: job.data.domainId,
-		});
-	});
-
-	worker.on("failed", (job, err) => {
-		log.error({
-			message: "Domain verification job failed",
-			jobId: job?.id,
-			domainId: job?.data.domainId,
-			error: err.message,
-		});
-	});
-
-	worker.on("error", (err) => {
-		log.error({
-			message: "Domain verification worker error",
-			error: err.message,
-		});
-	});
-
-	log.info("worker", "Domain verification worker started");
-	return worker;
 }

@@ -1,6 +1,7 @@
-import { bus } from "@reloop/bus";
+import { bus, BusEvent } from "@reloop/bus";
 import { workflowConfig } from "@be/workflow/workflow.config";
 import { startWorkflowWorker } from "@be/workflow/queues/workflow.worker";
+import { workflowQueue } from "@be/workflow/queues/workflow.queue";
 import { RedisCache } from "@reloop/cache/redis-client";
 import { db } from "@reloop/db/client";
 import { log } from "evlog";
@@ -15,6 +16,22 @@ export const loader = async () => {
 		log.info("postgres", "Postgres connected");
 		await bus.connect(workflowConfig.NATS_URL);
 		log.info("nats", "NATS connected");
+		
+		// Subscribe to domain verification requests
+		await bus.subscribe(BusEvent.DOMAIN_DNS_REVERIFICATION_REQUESTED, async (payload) => {
+			log.info({ message: "Received domain verification request via NATS", domainId: payload.domainId });
+			await workflowQueue.add(
+				"verify-domain",
+				{
+					workflowId: payload.domainId,
+					organizationId: payload.organizationId,
+					type: "verify-domain",
+					payload: { domain: payload.domain },
+				},
+				{ jobId: `verify-domain-${payload.domainId}` },
+			);
+		});
+
 		startWorkflowWorker();
 	} catch (e) {
 		log.error({
