@@ -1,3 +1,4 @@
+import { db } from "@reloop/db/client";
 import { Elysia } from "elysia";
 
 export const landing = new Elysia({ name: "Landing" })
@@ -33,7 +34,7 @@ export const landing = new Elysia({ name: "Landing" })
 ╠══════════════════════════════════════════════════════════════════════╣
 ║                                                                      ║
 ║  "Templates ready for deployment."                                   ║
-║               - Your Reloop Team                                     ║
+║                - Your Reloop Team                                    ║
 ║                                                                      ║
 ╚══════════════════════════════════════════════════════════════════════╝
 
@@ -50,6 +51,31 @@ export const landing = new Elysia({ name: "Landing" })
 			},
 		},
 	)
+	.get(
+		"/health",
+		async () => {
+			try {
+				const startTime = Date.now();
+				await db.execute("SELECT 1 as test");
+				const responseTime = Date.now() - startTime;
+
+				return {
+					status: "CONNECTED",
+					success: true,
+					responseTime: `${responseTime}ms`,
+					timestamp: new Date().toISOString(),
+				};
+			} catch (error) {
+				return {
+					status: "DISCONNECTED",
+					success: false,
+					error: error instanceof Error ? error.message : String(error),
+					timestamp: new Date().toISOString(),
+				};
+			}
+		},
+		{ detail: { hide: true } },
+	)
 	.get("/agent-card.json", () => ({
 		name: "Template Service",
 		version: "1.0.0",
@@ -65,12 +91,12 @@ export const landing = new Elysia({ name: "Landing" })
 				name: "Health Check",
 				description: "Check the health of the template service.",
 				method: "GET",
-				path: "/api/template/",
+				path: "/api/template/health",
 				tags: ["monitoring"],
 				inputSchema: {},
 				outputSchema: {
 					status: { type: "string" },
-					service: { type: "string" },
+					success: { type: "boolean" },
 				},
 				errorCodes: [],
 				examples: [],

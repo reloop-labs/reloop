@@ -38,7 +38,7 @@ export const landing = new Elysia()
 ╠════════════════════════════════════════════════════════════════╣
 ║                                                                ║
 ║  "Store your images on S3, serve them globally."              ║
-		- Your Reloop Team                          ║
+║                - Your Reloop Team                                    ║
 ║                                                                ║
 ╚════════════════════════════════════════════════════════════════╝
 

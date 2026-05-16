@@ -1,4 +1,3 @@
-import { redis } from "@reloop/be-kumomta/utils/loader";
 import { db } from "@reloop/db/client";
 import { Elysia } from "elysia";
 
@@ -8,36 +7,35 @@ export const landing = new Elysia()
 		async () => {
 			return `
 ╔══════════════════════════════════════════════════════════════════════╗
-║                        KUMOMTA SERVICE                               ║
+║                        BILLING SERVICE                               ║
 ╠══════════════════════════════════════════════════════════════════════╣
 ║                                                                      ║
-║  ██╗  ██╗██╗   ██╗███╗   ███╗ ██████╗ ███╗   ███╗████████╗ █████╗    ║
-║  ██║ ██╔╝██║   ██║████╗ ████║██╔═══██╗████╗ ████║╚══██╔══╝██╔══██╗   ║
-║  █████╔╝ ██║   ██║██╔████╔██║██║   ██║██╔████╔██║   ██║   ███████║   ║
-║  ██╔═██╗ ██║   ██║██║╚██╔╝██║██║   ██║██║╚██╔╝██║   ██║   ██╔══██║   ║
-║  ██║  ██╗╚██████╔╝██║ ╚═╝ ██║╚██████╔╝██║ ╚═╝ ██║   ██║   ██║  ██║   ║
-║  ╚═╝  ╚═╝ ╚═════╝ ╚═╝     ╚═╝ ╚═════╝ ╚═╝     ╚═╝   ╚═╝   ╚═╝  ╚═╝   ║
+║    ██████╗ ██╗██╗     ██╗     ██╗███╗   ██╗ ██████╗                  ║
+║    ██╔══██╗██║██║     ██║     ██║████╗  ██║██╔════╝                  ║
+║    ██████╔╝██║██║     ██║     ██║██╔██╗ ██║██║  ███╗                 ║
+║    ██╔══██╗██║██║     ██║     ██║██║╚██╗██║██║   ██║                 ║
+║    ██████╔╝██║███████╗███████╗██║██║ ╚████║╚██████╔╝                 ║
+║    ╚══════╝ ╚═╝╚══════╝╚══════╝╚═╝╚═╝  ╚═══╝ ╚═════╝                 ║
 ║                                                                      ║
 ║                          ONLINE & READY                              ║
 ║                         Version: v1.0.0                              ║
 ║                                                                      ║
 ╠══════════════════════════════════════════════════════════════════════╣
 ║                                                                      ║
-║ 📚 Docs: https://reloop.sh/docs/kumomta                              ║
-║ 🤖 Discovery: https://reloop.sh/api/kumomta/agent-card.json          ║
-║ 📖 OpenAPI: https://reloop.sh/api/kumomta/openapi                    ║
+║ 📚 Docs: https://reloop.sh/docs/billing                              ║
+║ 🤖 Discovery: https://reloop.sh/api/billing/agent-card.json          ║
+║ 📖 OpenAPI: https://reloop.sh/api/billing/openapi                    ║
 ║ 🐙 GitHub: https://github.com/reloop-labs/reloop                     ║
 ║ 🆘 Support: https://reloop.sh/support                                ║
 ║ 💬 Discord: https://discord.gg/reloop                                ║
 ║ 🐦 Twitter: https://x.com/reloophq                               ║
-║ 🛠️ Setup: https://reloop.sh/docs/setup/kumomta                       ║
+║ 🛠️ Setup: https://reloop.sh/docs/setup/billing                      ║
 ║                                                                      ║
 ╠══════════════════════════════════════════════════════════════════════╣
 ║                                                                      ║
-║                                                                      ║
-║  "Fasten your seatbelts, KumoMTA handles the heavy lifting."         ║
+║  "Money makes the world go round, but clean code                    ║
+║   makes the service run."                                            ║
 ║                - Your Reloop Team                                    ║
-║                                                                      ║
 ║                                                                      ║
 ╚══════════════════════════════════════════════════════════════════════╝
 
@@ -55,7 +53,6 @@ export const landing = new Elysia()
 		async () => {
 			try {
 				const startTime = Date.now();
-				await redis.healthCheck();
 				await db.execute("SELECT 1 as test");
 				const responseTime = Date.now() - startTime;
 
@@ -77,69 +74,67 @@ export const landing = new Elysia()
 		{ detail: { hide: true } },
 	)
 	.get("/agent-card.json", () => ({
-		name: "KumoMTA Service",
+		name: "Billing Service",
 		version: "1.0.0",
 		description:
-			"High-performance Mail Transfer Agent (MTA) interface for sending and tracking emails.",
+			"Service for managing subscriptions, usage credits, and invoicing for the Reloop platform.",
 		url: "https://reloop.sh",
 		defaultInputModes: ["application/json"],
 		defaultOutputModes: ["application/json"],
-		supportsStreaming: false,
+		supportsStreaming: true,
 		skills: [
 			{
 				id: "health_check",
 				name: "Health Check",
-				description:
-					"Verify the connection status of KumoMTA and its database.",
+				description: "Check the health of the billing service.",
 				method: "GET",
-				path: "/api/kumomta/health",
+				path: "/api/billing/health",
 				tags: ["monitoring"],
 				inputSchema: {},
 				outputSchema: {
-					status: { type: "string", description: "Connection status" },
-					success: { type: "boolean", description: "Health status" },
+					status: { type: "string" },
+					success: { type: "boolean" },
 				},
 				errorCodes: [],
 				examples: [],
 			},
 			{
-				id: "verify_email",
-				name: "Internal Verify",
-				description:
-					"Validate an API key and domain for internal routing purposes.",
-				method: "POST",
-				path: "/api/kumomta/v1/verify",
-				tags: ["internal"],
-				inputSchema: {
-					key: {
-						type: "string",
-						required: true,
-						description: "API Key to verify",
-					},
-					domain: {
-						type: "string",
-						required: true,
-						description: "Domain to check",
-					},
-				},
+				id: "get_usage",
+				name: "Get Usage Summary",
+				description: "Get real-time usage statistics and credit status.",
+				method: "GET",
+				path: "/api/billing/usage",
+				tags: ["usage"],
+				inputSchema: {},
 				outputSchema: {
-					userId: { type: "string" },
-					organizationId: { type: "string" },
-					isVerified: { type: "boolean" },
+					plan: { type: "object" },
+					subscription: { type: "object" },
+					stats: { type: "object" },
 				},
-				errorCodes: [
-					{ status: 401, meaning: "Invalid API key" },
-					{ status: 404, meaning: "Domain not found" },
-				],
+				errorCodes: [],
+				examples: [],
+			},
+			{
+				id: "list_invoices",
+				name: "List Invoices",
+				description: "Retrieve all invoices for the organization.",
+				method: "GET",
+				path: "/api/billing/invoices",
+				tags: ["billing"],
+				inputSchema: {},
+				outputSchema: {
+					invoices: { type: "array" },
+				},
+				errorCodes: [],
 				examples: [],
 			},
 		],
 		usage_guidelines:
-			"1. This service is primarily used internally by the mail service to route requests.\n2. API keys used here should be valid 'rl' prefixed keys.\n3. Domains must be pre-verified in the domain service.",
+			"1. Usage data is updated in near real-time via NATS events.\n2. Credits are deducted based on email recipients sent.\n3. Subscriptions default to a Free plan upon organization creation.",
 		authentication: {
-			schemes: ["apiKey"],
-			headerName: "x-kumomta-key",
-			notes: "Internal authentication key required.",
+			schemes: ["cookie"],
+			headerName: "Cookie",
+			notes: "Requires an active session via better-auth.",
 		},
 		provider: {
 			organization: "Reloop labs",

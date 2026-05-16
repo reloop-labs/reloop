@@ -35,7 +35,7 @@ export const landing = new Elysia()
 ╠══════════════════════════════════════════════════════════════════════╣
 ║                                                                      ║
 ║  "We post so you don’t have to poll."                                ║
-		- Your Reloop Team                                ║
+║                - Your Reloop Team                                    ║
 ║                                                                      ║
 ╚══════════════════════════════════════════════════════════════════════╝
 

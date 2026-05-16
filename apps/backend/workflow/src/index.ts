@@ -11,6 +11,7 @@ import { serverTiming } from "@elysiajs/server-timing";
 import { Elysia } from "elysia";
 import { initLogger, log, parseError } from "evlog";
 import { evlog } from "evlog/elysia";
+import { landing } from "@be/workflow/routes/landing/landing.index";
 import pkg from "../package.json";
 
 initLogger({ env: { service: "workflow" } });
@@ -69,7 +70,7 @@ const workflowService = new Elysia({
 		};
 	})
 	.use(await serverAdapter.registerPlugin())
-	.get("/", () => ({ status: "Workflow Service is running" }))
+	.use(landing)
 	.onStart(async () => {
 		await loader();
 	})

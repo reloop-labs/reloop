@@ -35,7 +35,7 @@ export const landing = new Elysia()
 ╠══════════════════════════════════════════════════════════════════════╣
 ║                                                                      ║
 ║  "Give us your email — we’ll give you applause-worthy updates."      ║
-		- Your Reloop Team                                ║
+║                - Your Reloop Team                                    ║
 ║                                                                      ║
 ╚══════════════════════════════════════════════════════════════════════╝
 

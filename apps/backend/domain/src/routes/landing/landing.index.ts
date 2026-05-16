@@ -35,7 +35,7 @@ export const landing = new Elysia()
 ╠══════════════════════════════════════════════════════════════════════╣
 ║                                                                      ║
 ║  "Verified and ready to serve."                                      ║
-		- Your Reloop Team                                ║
+║                - Your Reloop Team                                    ║
 ║                                                                      ║
 ╚══════════════════════════════════════════════════════════════════════╝
 

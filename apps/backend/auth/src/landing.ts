@@ -33,7 +33,7 @@ export const landing = new Elysia()
 ╠══════════════════════════════════════════════════════════════════════╣
 ║                                                                      ║
 ║  "The best security is invisible security"                           ║
-		- Your Reloop Team                                ║
+║                - Your Reloop Team                                    ║
 ║                                                                      ║
 ╚══════════════════════════════════════════════════════════════════════╝
 

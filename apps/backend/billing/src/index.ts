@@ -17,6 +17,7 @@ import { Elysia, t } from "elysia";
 import { billingConfig } from "./billing.config";
 import { loader, usageEventEmitter } from "./loader";
 import { authMiddleware } from "./middleware/auth-middleware";
+import { landing } from "./routes/landing/landing.index";
 
 const port = billingConfig.port;
 
@@ -37,6 +38,7 @@ const app = new Elysia({ prefix: "/api/billing", name: "Billing Service" })
 			},
 		}),
 	)
+	.use(landing)
 	.use(authMiddleware)
 
 	// ─── Usage Summary ──────────────────────────────────────────────────────────
