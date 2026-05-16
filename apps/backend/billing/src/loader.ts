@@ -11,6 +11,7 @@ import { logger } from "@reloop/logger";
 import { and, count, eq, gte, sql } from "drizzle-orm";
 
 import { billingConfig } from "./billing.config";
+import { getOrProvisionSubscription } from "./utils/subscription";
 
 export async function loader() {
 	logger.info("Initializing Billing Service Subscribers...");
@@ -27,60 +28,7 @@ export async function loader() {
 		logger.info({ organizationId: payload.id }, "Handling ORGANIZATION_CREATED");
 		try {
 			await db.transaction(async (tx) => {
-				// 1. Get or create a default "Free" plan
-				let defaultPlan = await tx.query.plan.findFirst({
-					where: eq(plan.name, "Free"),
-				});
-
-				if (!defaultPlan) {
-					const [insertedPlan] = await tx
-						.insert(plan)
-						.values({
-							name: "Free",
-							monthlyCredits: billingConfig.initialCredits,
-							basePriceUsd: "0",
-							isActive: true,
-							// Free plan rate limits
-							ratePerSecond: 10,
-							ratePerMinute: 200,
-							ratePerHour: 5000,
-							maxAttachmentSizeMb: 5,
-						})
-						.returning();
-
-					if (!insertedPlan) throw new Error("Failed to create default plan");
-					defaultPlan = insertedPlan;
-				}
-
-				// 2. Create subscription
-				const now = new Date();
-				const nextMonth = new Date(now);
-				nextMonth.setMonth(nextMonth.getMonth() + 1);
-
-				const [newSub] = await tx
-					.insert(subscription)
-					.values({
-						organizationId: payload.id,
-						planId: defaultPlan.id,
-						status: "active",
-						creditsRemaining: defaultPlan.monthlyCredits,
-						currentPeriodStart: now,
-						currentPeriodEnd: nextMonth,
-					})
-					.onConflictDoNothing()
-					.returning();
-
-				if (newSub) {
-					// 3. Log initial credits in ledger
-					await tx.insert(creditLedger).values({
-						organizationId: payload.id,
-						subscriptionId: newSub.id,
-						entryType: "credit_purchased",
-						delta: defaultPlan.monthlyCredits,
-						balanceAfter: defaultPlan.monthlyCredits,
-						reason: "Initial free plan quota",
-					});
-				}
+				await getOrProvisionSubscription(payload.id, tx);
 			});
 
 			logger.info(
@@ -111,23 +59,8 @@ export async function loader() {
 			} | null = null;
 
 			await db.transaction(async (tx) => {
-				// 1. Find active subscription with plan
-				const activeSub = await tx.query.subscription.findFirst({
-					where: (s, { and, eq }) =>
-						and(
-							eq(s.organizationId, payload.organizationId),
-							eq(s.status, "active"),
-						),
-					with: { plan: true },
-				});
-
-				if (!activeSub) {
-					logger.warn(
-						{ organizationId: payload.organizationId },
-						"No active subscription found for credit deduction",
-					);
-					return;
-				}
+				// 1. Find active subscription with plan (provision if missing)
+				const activeSub = await getOrProvisionSubscription(payload.organizationId, tx);
 
 				// 2. Create email_send record for billing audit
 				const [sendRecord] = await tx
