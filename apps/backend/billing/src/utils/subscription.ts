@@ -5,6 +5,11 @@ import { and, asc, eq } from "drizzle-orm";
 import { billingConfig } from "../billing.config";
 
 export async function getOrProvisionSubscription(orgId: string, tx?: DatabaseInstance) {
+	if (!orgId) {
+		logger.error("getOrProvisionSubscription called with missing orgId");
+		throw new Error("organizationId is required for subscription provisioning");
+	}
+
 	const client = tx ?? db;
 	let activeSub = await client.query.subscription.findFirst({
 		where: (s, { and, eq }) =>
@@ -53,9 +58,19 @@ export async function getOrProvisionSubscription(orgId: string, tx?: DatabaseIns
 				currentPeriodStart: now,
 				currentPeriodEnd: periodEnd,
 			})
+			.onConflictDoNothing()
 			.returning();
 
-		if (!newSub) throw new Error("Failed to create subscription");
+		// If newSub is null (due to onConflictDoNothing), fetch the existing one
+		if (!newSub) {
+			activeSub = await client.query.subscription.findFirst({
+				where: (s, { and, eq }) =>
+					and(eq(s.organizationId, orgId), eq(s.status, "active")),
+				with: { plan: true },
+			});
+			if (!activeSub) throw new Error("Failed to retrieve existing subscription after conflict");
+			return activeSub;
+		}
 
 		// Log initial credits in ledger
 		await client.insert(creditLedger).values({
