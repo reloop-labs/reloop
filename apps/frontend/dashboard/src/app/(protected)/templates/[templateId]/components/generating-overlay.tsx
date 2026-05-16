@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useEditorStore } from "./use-editor-store";
 
 const CHARS = "abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?";
@@ -20,27 +20,27 @@ const StreamingSkeleton = () => {
 	}, []);
 
 	return (
-		<div className="mx-auto w-full max-w-[600px] px-8 py-10 animate-in fade-in duration-500">
+		<div className="fade-in mx-auto w-full max-w-[600px] animate-in px-8 py-10 duration-500">
 			<div className="space-y-4">
-				<div className="font-mono text-[10px] leading-[1.6] break-all text-fg-muted/30 select-none transition-all duration-75">
+				<div className="select-none break-all font-mono text-[10px] text-fg-muted/30 leading-[1.6] transition-all duration-75">
 					{text.substring(0, 150)}
 				</div>
-				<div className="font-mono text-[10px] leading-[1.6] break-all text-fg-muted/20 select-none transition-all duration-75">
+				<div className="select-none break-all font-mono text-[10px] text-fg-muted/20 leading-[1.6] transition-all duration-75">
 					{text.substring(150, 300)}
 				</div>
-				<div className="font-mono text-[10px] leading-[1.6] break-all text-fg-muted/10 select-none transition-all duration-75">
+				<div className="select-none break-all font-mono text-[10px] text-fg-muted/10 leading-[1.6] transition-all duration-75">
 					{text.substring(300, 400)}
 				</div>
 			</div>
-			
+
 			<div className="mt-8 flex items-center justify-center gap-3">
 				<div className="flex gap-1">
 					<div className="h-1 w-1 animate-bounce rounded-full bg-brand-default [animation-delay:-0.3s]" />
 					<div className="h-1 w-1 animate-bounce rounded-full bg-brand-default [animation-delay:-0.15s]" />
 					<div className="h-1 w-1 animate-bounce rounded-full bg-brand-default" />
 				</div>
-				<span className="text-[10px] font-bold tracking-widest text-fg-muted uppercase opacity-50">
-					Generating Content
+				<span className="font-bold text-[10px] text-fg-muted uppercase tracking-widest opacity-50">
+					Generating email template...
 				</span>
 			</div>
 		</div>
@@ -50,16 +50,25 @@ const StreamingSkeleton = () => {
 export const GeneratingOverlay = () => {
 	const { isGenerating, generatingContent } = useEditorStore();
 
+	const previewHtml = useMemo(() => {
+		if (!generatingContent) return "";
+		return generatingContent
+			.replace(/```(?:html)?/gi, "")
+			.replace(/```/g, "");
+	}, [generatingContent]);
+
 	if (!isGenerating) return null;
 
 	return (
-		<div className="mx-auto w-full max-w-[600px] px-8 py-10 animate-in fade-in duration-500">
-			{generatingContent && (
-				<div
-					className="prose prose-sm dark:prose-invert mb-10 max-w-none overflow-hidden opacity-40 transition-opacity duration-300"
-					dangerouslySetInnerHTML={{
-						__html: generatingContent.replace(/```(?:html)?/gi, "").replace(/```/g, ""),
-					}}
+		<div className="fade-in mx-auto w-full max-w-[600px] animate-in px-8 py-10 duration-500">
+			{previewHtml && (
+				<iframe
+					title="Template preview"
+					sandbox=""
+					srcDoc={previewHtml}
+					className="mb-10 h-[300px] w-full overflow-hidden border-none opacity-40 transition-opacity duration-300"
+					tabIndex={-1}
+					aria-hidden="true"
 				/>
 			)}
 			<StreamingSkeleton />
