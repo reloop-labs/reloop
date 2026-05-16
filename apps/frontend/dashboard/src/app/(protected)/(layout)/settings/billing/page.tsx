@@ -59,8 +59,8 @@ const statusStyles: Record<string, string> = {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 const BillingPage = () => {
-	const { data: planData, isLoading: planLoading, error: planError } = useSWR<PlanData>("/api/billing/plan");
-	const { data: invoices, isLoading: invoicesLoading, error: invoicesError } = useSWR<Invoice[]>("/api/billing/invoices");
+	const { data: planData, isLoading: planLoading, error: planError } = useSWR<PlanData>("/api/billing/v1/plan");
+	const { data: invoices, isLoading: invoicesLoading, error: invoicesError } = useSWR<Invoice[]>("/api/billing/v1/invoices");
 
 	const isLoading = planLoading || invoicesLoading;
 	const error = planError || invoicesError;
@@ -80,7 +80,7 @@ const BillingPage = () => {
 				{/* Error state */}
 				{error && (
 					<div className="mb-4 rounded-xl border border-error-light bg-error-lighter p-4 text-paragraph-sm text-error-base">
-						{error}
+						{error?.message ?? "Failed to load billing data."}
 					</div>
 				)}
 

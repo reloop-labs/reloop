@@ -1,0 +1,52 @@
+import { t } from "elysia";
+
+export namespace BillingModel {
+	export const usageResponse = t.Object({
+		plan: t.Object({
+			name: t.String(),
+			monthlyCredits: t.Number(),
+			basePriceUsd: t.String(),
+			billingCycle: t.String(),
+			ratePerSecond: t.Number(),
+			ratePerMinute: t.Number(),
+			ratePerHour: t.Number(),
+			maxAttachmentSizeMb: t.Number(),
+			overageLimit: t.Number(),
+		}),
+		subscription: t.Object({
+			status: t.String(),
+			creditsUsed: t.Number(),
+			creditsRemaining: t.Number(),
+			currentPeriodStart: t.String(),
+			currentPeriodEnd: t.String(),
+		}),
+		stats: t.Object({
+			emailsSentThisMonth: t.Number(),
+			emailsSentToday: t.Number(),
+			emailsSentYesterday: t.Number(),
+			dailyAverage: t.Number(),
+			deliveryRate: t.Number(),
+		}),
+		members: t.Object({
+			total: t.Number(),
+		}),
+	});
+
+	export const planResponse = t.Object({
+		plan: t.Any(),
+		subscription: t.Object({
+			status: t.String(),
+			currentPeriodStart: t.String(),
+			currentPeriodEnd: t.String(),
+			creditsUsed: t.Number(),
+			creditsRemaining: t.Number(),
+		}),
+	});
+
+	export const topupBody = t.Object({
+		organizationId: t.String(),
+		amount: t.Number(),
+		reason: t.Optional(t.String()),
+		metadata: t.Optional(t.Record(t.String(), t.Any())),
+	});
+}

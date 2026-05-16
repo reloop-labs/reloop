@@ -48,7 +48,7 @@ export interface UsageLiveUpdate {
 // ─── Hook ─────────────────────────────────────────────────────────────────────
 
 export function useBillingUsage() {
-	const { data, error, isLoading, mutate } = useSWR<BillingUsage>("/api/billing/usage");
+	const { data, error, isLoading, mutate } = useSWR<BillingUsage>("/api/billing/v1/usage");
 
 	// Apply a live USAGE_UPDATED patch without a full re-fetch
 	const applyLiveUpdate = (update: UsageLiveUpdate) => {

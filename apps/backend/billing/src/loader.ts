@@ -9,13 +9,8 @@ import {
 } from "@reloop/db/schema";
 import { logger } from "@reloop/logger";
 import { and, count, eq, gte, sql } from "drizzle-orm";
-import { EventEmitter } from "node:events";
-import { billingConfig } from "./billing.config";
 
-// ─── In-process emitter ────────────────────────────────────────────────────
-// The SSE endpoint listens on this emitter so it can push updates to connected
-// browser clients without needing a separate pub/sub mechanism in-process.
-export const usageEventEmitter = new EventEmitter();
+import { billingConfig } from "./billing.config";
 
 export async function loader() {
 	logger.info("Initializing Billing Service Subscribers...");
@@ -220,10 +215,7 @@ export async function loader() {
 				emailsSentToday: Number(todayRow?.total ?? 0),
 			};
 
-			// 6. Publish USAGE_UPDATED on NATS (for other services) and emit
-			//    in-process (for the SSE endpoint in index.ts)
 			await bus.publish(BusEvent.USAGE_UPDATED, usageUpdatedPayload);
-			usageEventEmitter.emit("usage:updated", usageUpdatedPayload);
 
 			// 7. Quota threshold alerts
 			const usageRatio = snap.creditsUsed / snap.monthlyCredits;

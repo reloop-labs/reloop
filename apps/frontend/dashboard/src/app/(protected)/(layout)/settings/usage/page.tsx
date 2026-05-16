@@ -55,6 +55,21 @@ const UsagePage = () => {
 			? "border-warning-light bg-warning-lighter text-warning-base"
 			: "border-success-light bg-success-lighter text-success-base";
 
+	if (isLoading) {
+		return (
+			<div className="w-full space-y-5 pt-5">
+				<Skeleton className="h-8 w-48" />
+				<Skeleton className="h-16 w-full rounded-xl" />
+				<Skeleton className="h-48 w-full rounded-2xl" />
+				<div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+					{Array.from({ length: 4 }).map((_, i) => (
+						<Skeleton key={i} className="h-24 rounded-xl" />
+					))}
+				</div>
+			</div>
+		);
+	}
+
 	return (
 		<div className="w-full space-y-5 pt-5">
 			{/* Header */}
