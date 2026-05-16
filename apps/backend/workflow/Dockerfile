@@ -22,7 +22,7 @@ FROM base AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
-ENV PORT=8013
+ENV PORT=8017
 ENV HOSTNAME=0.0.0.0
 
 # Build-time arguments
@@ -44,6 +44,6 @@ LABEL org.opencontainers.image.title="reloop-workflow" \
       org.opencontainers.image.created=${BUILD_DATE} \
       org.opencontainers.image.source="https://github.com/reloop-labs/reloop"
 
-EXPOSE 8013
+EXPOSE 8017
 
 CMD ["bun", "run", "dist/index.js"]

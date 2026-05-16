@@ -1,5 +1,5 @@
 export const workflowConfig = {
-	port: Number(process.env.PORT || "8013"),
+	port: Number(process.env.PORT || "8017"),
 	PG_URL: process.env.PG_URL || "postgresql://reloop:reloop123@localhost:5432/reloop",
 	REDIS_URL: process.env.REDIS_URL || "redis://:reloop123@localhost:6379",
 	BASE_URL: process.env.BASE_URL || "https://local.reloop.sh",

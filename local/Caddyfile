@@ -116,6 +116,13 @@ local.reloop.sh {
             header_up X-Forwarded-For {remote}
         }
     }
+    handle /api/billing* {
+        reverse_proxy host.docker.internal:8023 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
     # Main app (catch-all - everything else)
     handle {
         reverse_proxy host.docker.internal:3000 {
