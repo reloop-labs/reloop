@@ -1,5 +1,5 @@
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
-import { generateText } from "ai";
+import { streamText } from "ai";
 
 const google = createGoogleGenerativeAI({
 	apiKey:
@@ -10,8 +10,14 @@ export async function POST(req: Request) {
 	try {
 		const { prompt } = await req.json();
 
-		const { text } = await generateText({
-			model: google("gemini-2.5-flash"),
+		if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY && !process.env.GEMINI_API_KEY) {
+			throw new Error("Google API key is missing from environment variables.");
+		}
+
+		console.log("[AI Generate] Prompt received:", prompt);
+
+		const result = await streamText({
+			model: google("gemini-flash-latest"),
 			system: `You are an elite, world-class email template designer and front-end developer. Your task is to generate breathtaking, high-converting email templates based on the user's request.
 
 CRITICAL INSTRUCTIONS:
@@ -27,19 +33,14 @@ CRITICAL INSTRUCTIONS:
 			prompt,
 		});
 
-		if (!text) {
-			return new Response(
-				JSON.stringify({ error: "No content generated from AI" }),
-				{
-					status: 500,
-					headers: { "Content-Type": "application/json" },
-				},
-			);
-		}
-
-		return new Response(text, {
-			status: 200,
-			headers: { "Content-Type": "text/plain; charset=utf-8" },
+		return result.toTextStreamResponse({
+			headers: {
+				"Content-Type": "text/plain; charset=utf-8",
+				"X-Content-Type-Options": "nosniff",
+				"Cache-Control": "no-cache, no-transform",
+				"Connection": "keep-alive",
+				"X-Accel-Buffering": "no", // For Nginx/Caddy proxies
+			},
 		});
 	} catch (error) {
 		const errorMessage =

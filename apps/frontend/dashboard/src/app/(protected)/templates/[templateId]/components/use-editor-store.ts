@@ -11,6 +11,10 @@ interface EditorState {
 	setPreviewText: (text: string) => void;
 	subject: string;
 	setSubject: (subject: string) => void;
+	isGenerating: boolean;
+	setIsGenerating: (isGenerating: boolean) => void;
+	generatingContent: string;
+	setGeneratingContent: (content: string) => void;
 }
 
 export const useEditorStore = create<EditorState>((set) => ({
@@ -24,4 +28,8 @@ export const useEditorStore = create<EditorState>((set) => ({
 	setPreviewText: (previewText) => set({ previewText }),
 	subject: "",
 	setSubject: (subject) => set({ subject }),
+	isGenerating: false,
+	setIsGenerating: (isGenerating) => set({ isGenerating }),
+	generatingContent: "",
+	setGeneratingContent: (generatingContent) => set({ generatingContent }),
 }));

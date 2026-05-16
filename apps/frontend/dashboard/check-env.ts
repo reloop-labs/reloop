@@ -1,4 +1,3 @@
-import { createGoogleGenerativeAI } from "@ai-sdk/google";
 
 console.log(
 	"Key from env:",

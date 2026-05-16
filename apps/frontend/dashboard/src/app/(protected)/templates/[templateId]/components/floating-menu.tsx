@@ -7,11 +7,13 @@ import {
 import * as Tooltip from "@reloop/ui/tooltip";
 import { useCurrentEditor } from "@tiptap/react";
 import React from "react";
+import { useEditorStore } from "./use-editor-store";
 
 export function FloatingMenu() {
 	const { editor } = useCurrentEditor();
+	const { isGenerating } = useEditorStore();
 
-	if (!editor) return null;
+	if (!editor || isGenerating) return null;
 
 	return (
 		<Tooltip.Provider>
