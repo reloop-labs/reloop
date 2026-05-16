@@ -1,8 +1,9 @@
+import { log } from "evlog";
 import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
 import { createLog } from "@reloop/api-key/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import type { Logger } from "@reloop/logger";
+
 import { API_KEY_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq } from "drizzle-orm";
 import { status } from "elysia";
@@ -16,7 +17,7 @@ export async function disableApiKeyController({
 }: {
 	id: string;
 	organizationId: string;
-	logger: Logger;
+	logger?: any;
 	cookie?: string;
 	requestDetails?: {
 		endpoint?: string;
@@ -26,7 +27,7 @@ export async function disableApiKeyController({
 		statusCode?: number;
 	};
 }): Promise<ApiKeyTypes.ApiKeyResponse> {
-	logger.info({ id }, "Checking if API key exists");
+	log.info({ ...({ id }), message: "Checking if API key exists" });
 	try {
 		const existingKey = await db.query.apikey.findFirst({
 			where: and(
@@ -39,18 +40,18 @@ export async function disableApiKeyController({
 		});
 
 		if (!existingKey) {
-			logger.warn({ id }, "API key not found");
+			log.warn({ ...({ id }), message: "API key not found" });
 			throw status(404, { message: "API key not found" });
 		}
 
 		let updatedKeyData: typeof schema.apikey.$inferSelect;
 
 		if (!existingKey.enabled) {
-			logger.info({ id }, "API key is already disabled");
+			log.info({ ...({ id }), message: "API key is already disabled" });
 			updatedKeyData = existingKey;
 		} else {
 			const now = new Date();
-			logger.info({ id }, "Updating API key");
+			log.info({ ...({ id }), message: "Updating API key" });
 			const [updatedKey] = await db
 				.update(schema.apikey)
 				.set({
@@ -61,13 +62,13 @@ export async function disableApiKeyController({
 				.returning();
 
 			if (!updatedKey) {
-				logger.error({ id }, "Failed to disable API key");
+				log.error({ ...({ id }), message: "Failed to disable API key" });
 				throw status(500, { message: "Failed to disable API key" });
 			}
 			updatedKeyData = updatedKey;
 		}
 
-		logger.info({ id }, "API key disabled successfully");
+		log.info({ ...({ id }), message: "API key disabled successfully" });
 
 		const result = {
 			id: updatedKeyData.id,
@@ -110,7 +111,7 @@ export async function disableApiKeyController({
 
 		return result;
 	} catch (error) {
-		logger.error({ id, error }, "Error disabling API key");
+		log.error({ ...({ id, error }), message: "Error disabling API key" });
 		throw error;
 	}
 }

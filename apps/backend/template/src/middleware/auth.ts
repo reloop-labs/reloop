@@ -1,7 +1,8 @@
+import { log } from "evlog";
 import { templateConfig } from "@be/template/template.config";
 import { TEMPLATE_ERROR_CODES } from "@be/template/template.error-code";
 import type { Session } from "@reloop/auth/server";
-import { logger } from "@reloop/logger";
+
 import { Elysia } from "elysia";
 
 if (templateConfig.NODE_ENV !== "production") {
@@ -42,12 +43,9 @@ export const authMiddleware = new Elysia({ name: "better-auth" }).macro({
 					errorCode: TEMPLATE_ERROR_CODES.UNAUTHORIZED,
 				});
 			} catch (error) {
-				logger.error(
-					{
+				log.error({ ...({
 						error: error instanceof Error ? error.message : "Unknown error",
-					},
-					"Authentication error",
-				);
+					}), message: "Authentication error" });
 				return status(401, {
 					message: "Authentication failed",
 					errorCode: TEMPLATE_ERROR_CODES.UNAUTHORIZED,

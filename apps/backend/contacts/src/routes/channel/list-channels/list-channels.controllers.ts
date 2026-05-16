@@ -1,7 +1,8 @@
+import { log } from "evlog";
 import type { ChannelTypes } from "@be/contacts/types/channel.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import type { Logger } from "@reloop/logger";
+
 import { CHANNEL_LIST_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, desc, eq, isNull, sql } from "drizzle-orm";
 
@@ -14,13 +15,13 @@ export const listChannelsController = async ({
 	activeOrganizationId: string;
 	page?: number;
 	limit?: number;
-	logger: Logger;
+	logger?: any;
 }): Promise<ChannelTypes.ChannelListResponse> => {
 	const page = rawPage || 1;
 	const limit = Math.min(rawLimit || 100, 100);
 	const offset = (page - 1) * limit;
 
-	logger.info({ page, limit }, "Listing channels");
+	log.info({ ...({ page, limit }), message: "Listing channels" });
 
 	try {
 		const whereClause = and(
@@ -46,10 +47,7 @@ export const listChannelsController = async ({
 			.limit(limit)
 			.offset(offset);
 
-		logger.info(
-			{ total: rows[0]?.total ?? 0, page, limit },
-			"Channels listed successfully",
-		);
+		log.info({ ...({ total: rows[0]?.total ?? 0, page, limit }), message: "Channels listed successfully" });
 		return {
 			object: "channel",
 			channels: rows.map(({ channel, subscriberCount }) => ({
@@ -68,7 +66,7 @@ export const listChannelsController = async ({
 			event: CHANNEL_LIST_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
-		logger.error({ error }, "Debug listing channels");
+		log.error({ ...({ error }), message: "Debug listing channels" });
 		throw error;
 	}
 };

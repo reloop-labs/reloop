@@ -1,3 +1,4 @@
+import { log } from "evlog";
 import type { GroupModel } from "@be/contacts/model/group.model";
 import type {
 	GroupListItem,
@@ -5,7 +6,7 @@ import type {
 } from "@be/contacts/types/group.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import type { Logger } from "@reloop/logger";
+
 import { GROUP_LIST_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, desc, eq, ilike, isNull, sql } from "drizzle-orm";
 
@@ -20,13 +21,13 @@ export const listGroupsController = async ({
 	page?: number;
 	limit?: number;
 	search?: string;
-	logger: Logger;
+	logger?: any;
 }): Promise<GroupListResponse | GroupModel.Unauthorized> => {
 	const page = rawPage || 1;
 	const limit = Math.min(rawLimit || 100, 100);
 	const offset = (page - 1) * limit;
 
-	logger.info({ page, limit, search }, "Listing groups");
+	log.info({ ...({ page, limit, search }), message: "Listing groups" });
 
 	try {
 		const whereClause = and(
@@ -60,7 +61,7 @@ export const listGroupsController = async ({
 			event: GROUP_LIST_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
-		logger.error({ error }, "Debug listing groups");
+		log.error({ ...({ error }), message: "Debug listing groups" });
 		throw error;
 	}
 };

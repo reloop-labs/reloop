@@ -1,7 +1,8 @@
+import { log } from "evlog";
 import { TemplateError } from "@be/template/error/template.error";
 import { templateModel } from "@be/template/model/template.model";
 import type { TemplateBlock } from "@reloop/db/schema";
-import { logger } from "@reloop/logger";
+
 
 export async function updateTemplate(params: {
 	id: string;
@@ -29,8 +30,7 @@ export async function updateTemplate(params: {
 
 		return result;
 	} catch (error) {
-		logger.error(
-			{
+		log.error({
 				id,
 				error: error instanceof Error ? error.message : String(error),
 			},

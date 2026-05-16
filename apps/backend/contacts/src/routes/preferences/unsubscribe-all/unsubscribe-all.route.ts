@@ -1,4 +1,4 @@
-import { logger } from "@reloop/logger";
+
 import { Elysia, t } from "elysia";
 import { unsubscribeAllController } from "./unsubscribe-all.controllers";
 
@@ -6,7 +6,7 @@ export const unsubscribeAllRoute = new Elysia().post(
 	"/unsubscribe-all/:token",
 	async ({ params }) => {
 		const traceId = crypto.randomUUID();
-		const routeLogger = logger.child({ traceId, route: "unsubscribe-all" });
+		const routeLogger = log;
 		return await unsubscribeAllController({
 			token: params.token,
 			logger: routeLogger,

@@ -1,3 +1,4 @@
+import { log } from "evlog";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { and, eq, isNull } from "drizzle-orm";
@@ -12,7 +13,7 @@ export async function fetchDomain_step1({
 	organizationId: string;
 }) {
 	const logger = useLogger();
-	logger.info("Fetching domain with DNS records", { domainId });
+	log.info({ ...({ domainId }), message: "Fetching domain with DNS records" });
 	const domainWithRecords = await db.query.domain.findFirst({
 		where: and(
 			eq(schema.domain.id, domainId),
@@ -27,7 +28,7 @@ export async function fetchDomain_step1({
 	});
 
 	if (!domainWithRecords) {
-		logger.warn("Domain not found", { domainId });
+		log.warn({ ...({ domainId }), message: "Domain not found" });
 		throw DomainErrors.domainNotFound(domainId);
 	}
 

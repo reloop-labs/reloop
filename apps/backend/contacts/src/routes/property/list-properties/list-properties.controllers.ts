@@ -1,7 +1,8 @@
+import { log } from "evlog";
 import type { PropertyTypes } from "@be/contacts/types/property.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import type { Logger } from "@reloop/logger";
+
 import { PROPERTY_LIST_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, desc, eq, ilike, isNull, type SQL, sql } from "drizzle-orm";
 
@@ -12,13 +13,13 @@ export const listPropertiesController = async ({
 }: {
 	activeOrganizationId: string;
 	query: PropertyTypes.PropertyListQuery;
-	logger: Logger;
+	logger?: any;
 }): Promise<PropertyTypes.PropertyListResponse> => {
 	const page = query.page || 1;
 	const limit = Math.min(query.limit || 100, 100);
 	const offset = (page - 1) * limit;
 
-	logger.info({ page, limit }, "Listing properties");
+	log.info({ ...({ page, limit }), message: "Listing properties" });
 
 	try {
 		const whereConditions: Array<SQL<unknown>> = [
@@ -46,10 +47,7 @@ export const listPropertiesController = async ({
 			.limit(limit)
 			.offset(offset);
 
-		logger.info(
-			{ total: rows[0]?.total ?? 0, page, limit },
-			"Properties listed successfully",
-		);
+		log.info({ ...({ total: rows[0]?.total ?? 0, page, limit }), message: "Properties listed successfully" });
 		return {
 			object: "contact_property",
 			properties: rows.map((r) => ({
@@ -66,7 +64,7 @@ export const listPropertiesController = async ({
 			event: PROPERTY_LIST_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
-		logger.error({ error }, "Debug listing properties");
+		log.error({ ...({ error }), message: "Debug listing properties" });
 		throw error;
 	}
 };

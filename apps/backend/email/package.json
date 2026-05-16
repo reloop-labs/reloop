@@ -29,7 +29,6 @@
 		"@reloop/bus": "workspace:*",
 		"@reloop/cache": "workspace:*",
 		"@reloop/db": "workspace:*",
-		"@reloop/logger": "workspace:*",
 		"@types/nodemailer": "catalog:backend",
 		"date-fns": "catalog:backend",
 		"elysia": "catalog:backend",
@@ -38,7 +37,8 @@
 		"react-dom": "catalog:ui",
 		"react-email": "catalog:ui",
 		"reloop-email": "catalog:backend",
-		"ua-parser-js": "catalog:backend"
+		"ua-parser-js": "catalog:backend",
+		"evlog": "catalog:backend"
 	},
 	"devDependencies": {
 		"@react-email/ui": "catalog:ui",

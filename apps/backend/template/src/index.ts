@@ -1,3 +1,4 @@
+import { log } from "evlog";
 import "dotenv/config";
 import { landing } from "@be/template/routes/landing/landing.index";
 import { collaborationRoute } from "@be/template/routes/template/collaboration/collaboration.route";
@@ -8,7 +9,7 @@ import { loader } from "@be/template/utils/loader";
 import { persistencePlugin } from "@be/template/utils/persistence";
 import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
-import { logger } from "@reloop/logger";
+
 import { Elysia } from "elysia";
 
 const port = templateConfig.port;
@@ -45,9 +46,7 @@ const templateService = new Elysia({
 		await loader();
 	})
 	.listen(port, () => {
-		logger.info(
-			`Template Server is running on ${templateConfig.BASE_URL}/api/template`,
-		);
+		log.info("server", `Template Server is running on ${templateConfig.BASE_URL}/api/template`);
 	});
 
 export type TemplateService = typeof templateService;

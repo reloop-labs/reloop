@@ -1,6 +1,7 @@
+import { log } from "evlog";
 import { db } from "@reloop/db/client";
 import { emailLog } from "@reloop/db/schema";
-import type { Logger } from "@reloop/logger";
+
 import { eq } from "drizzle-orm";
 
 /**
@@ -71,7 +72,7 @@ export async function handleKumomtaWebhookController({
 	logger,
 }: {
 	events: KumomtaLogRecord[];
-	logger: Logger;
+	logger?: any;
 }): Promise<{ processed: number; errors: number }> {
 	let processed = 0;
 	let errors = 0;
@@ -91,14 +92,11 @@ export async function handleKumomtaWebhookController({
 			}
 
 			if (!emailLogId) {
-				logger.warn(
-					{
+				log.warn({ ...({
 						kumomtaId: event.id,
 						type: event.type,
 						recipient: event.recipient,
-					},
-					"KumoMTA event missing X-Email-Log-ID header and provider tracking ID, skipping",
-				);
+					}), message: "KumoMTA event missing X-Email-Log-ID header and provider tracking ID, skipping" });
 				continue;
 			}
 
@@ -106,13 +104,11 @@ export async function handleKumomtaWebhookController({
 
 			if (!newStatus) {
 				// Events like Reception, TransientFailure — log but don't update status
-				logger.debug(
-					{
+				log.debug({ ...({
 						type: event.type,
 						emailLogId,
 						kumomtaId: event.id,
-					},
-					`KumoMTA ${event.type} event received (no status update)`,
+					}), message: `KumoMTA ${event.type} event received (no status update })`,
 				);
 				processed++;
 				continue;
@@ -150,22 +146,18 @@ export async function handleKumomtaWebhookController({
 				.set(updateData)
 				.where(eq(emailLog.id, emailLogId));
 
-			logger.info(
-				{
+			log.info({ ...({
 					emailLogId,
 					type: event.type,
 					newStatus,
 					kumomtaId: event.id,
 					recipient: event.recipient,
-				},
-				`Email status updated to ${newStatus}`,
-			);
+				}), message: `Email status updated to ${newStatus}` });
 
 			processed++;
 		} catch (error) {
 			errors++;
-			logger.error(
-				{
+			log.error({
 					error: error instanceof Error ? error.message : String(error),
 					kumomtaId: event.id,
 					type: event.type,
@@ -175,10 +167,7 @@ export async function handleKumomtaWebhookController({
 		}
 	}
 
-	logger.info(
-		{ processed, errors, total: events.length },
-		"KumoMTA webhook batch processed",
-	);
+	log.info({ ...({ processed, errors, total: events.length }), message: "KumoMTA webhook batch processed" });
 
 	return { processed, errors };
 }

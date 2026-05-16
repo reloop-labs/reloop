@@ -1,4 +1,4 @@
-import { logger } from "@reloop/logger";
+
 import { Elysia, t } from "elysia";
 import { getPreferencesDataController } from "./get-preferences-data.controllers";
 
@@ -6,10 +6,7 @@ export const getPreferencesDataRoute = new Elysia().get(
 	"/data/:token",
 	async ({ params }) => {
 		const traceId = crypto.randomUUID();
-		const routeLogger = logger.child({
-			traceId,
-			route: "get-preferences-data",
-		});
+		const routeLogger = log;
 		return await getPreferencesDataController({
 			token: params.token,
 			logger: routeLogger,

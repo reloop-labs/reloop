@@ -1,7 +1,8 @@
+import { log } from "evlog";
 import type { ContactTypes } from "@be/contacts/types/contact.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import type { Logger } from "@reloop/logger";
+
 import { CONTACT_LIST_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import {
 	and,
@@ -21,9 +22,9 @@ export async function listContactsController({
 }: {
 	organizationId: string;
 	query: ContactTypes.ContactListQuery;
-	logger: Logger;
+	logger?: any;
 }): Promise<ContactTypes.ContactListResponse> {
-	logger.info({ ...query }, "Listing contacts");
+	log.info({ ...({ ...query }), message: "Listing contacts" });
 	try {
 		const page = query.page || 1;
 		const limit = Math.min(query.limit || 100, 100);
@@ -187,7 +188,7 @@ export async function listContactsController({
 			createdAt: contact.createdAt,
 			updatedAt: contact.updatedAt,
 		}));
-		logger.info({ total, page, limit }, "Contacts listed successfully");
+		log.info({ ...({ total, page, limit }), message: "Contacts listed successfully" });
 		return {
 			object: "contact",
 			contacts: formattedContacts,
@@ -200,8 +201,7 @@ export async function listContactsController({
 			event: CONTACT_LIST_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
-		logger.error(
-			{
+		log.error({
 				query,
 				error: error instanceof Error ? error.message : String(error),
 			},

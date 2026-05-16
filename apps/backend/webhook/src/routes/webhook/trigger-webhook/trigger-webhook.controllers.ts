@@ -1,7 +1,8 @@
+import { log } from "evlog";
 import { createId } from "@paralleldrive/cuid2";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { logger } from "@reloop/logger";
+
 import { webhookDeliveryQueue } from "@reloop/webhook/queues/webhook-delivery.queue";
 import type { WebhookTypes } from "../webhook.type";
 
@@ -14,7 +15,7 @@ export async function triggerWebhookController({
 	success: boolean;
 	message: string;
 }> {
-	logger.info({ event, organizationId, userId }, "Triggering webhooks");
+	log.info({ ...({ event, organizationId, userId }), message: "Triggering webhooks" });
 
 	try {
 		// 1. Find all active webhooks subscribed to this event
@@ -41,10 +42,7 @@ export async function triggerWebhookController({
 		);
 
 		if (subscribedWebhooks.length === 0) {
-			logger.info(
-				{ event, organizationId },
-				"No webhooks subscribed to this event",
-			);
+			log.info({ ...({ event, organizationId }), message: "No webhooks subscribed to this event" });
 			return {
 				success: true,
 				message: "No webhooks subscribed to this event",
@@ -107,10 +105,7 @@ export async function triggerWebhookController({
 				},
 			);
 
-			logger.info(
-				{ deliveryId, webhookId: webhook.id, event },
-				"Enqueued webhook delivery job",
-			);
+			log.info({ ...({ deliveryId, webhookId: webhook.id, event }), message: "Enqueued webhook delivery job" });
 		});
 
 		await Promise.all(deliverySetup);
@@ -120,7 +115,7 @@ export async function triggerWebhookController({
 			message: `Event triggered for ${subscribedWebhooks.length} webhooks`,
 		};
 	} catch (error) {
-		logger.error({ event, organizationId, error }, "Error triggering webhooks");
+		log.error({ ...({ event, organizationId, error }), message: "Error triggering webhooks" });
 		throw error;
 	}
 }

@@ -1,6 +1,7 @@
+import { log } from "evlog";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import type { Logger } from "@reloop/logger";
+
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 import { verifyToken } from "../token.utils";
@@ -10,9 +11,9 @@ export async function unsubscribeAllController({
 	logger,
 }: {
 	token: string;
-	logger: Logger;
+	logger?: any;
 }) {
-	logger.info("Processing unsubscribe all request");
+	log.info("server", "Processing unsubscribe all request");
 
 	const payload = await verifyToken(token);
 	if (!payload) {
@@ -44,10 +45,7 @@ export async function unsubscribeAllController({
 			);
 	}
 
-	logger.info(
-		{ contactId, updatedCount: enrollments.length },
-		"Unsubscribed from all channels",
-	);
+	log.info({ ...({ contactId, updatedCount: enrollments.length }), message: "Unsubscribed from all channels" });
 
 	return {
 		success: true,

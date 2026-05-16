@@ -1,3 +1,4 @@
+import { log } from "evlog";
 import { DomainErrors } from "@be/domain/lib/errors";
 import type { DomainTypes } from "@be/domain/types/domain.type";
 import { BusEvent, bus } from "@reloop/bus";
@@ -18,7 +19,7 @@ export async function updateDomainController({
 }): Promise<DomainTypes.DomainResponse> {
 	const logger = useLogger();
 	try {
-		logger.info("Updating domain", { domainId, body });
+		log.info({ ...({ domainId, body }), message: "Updating domain" });
 
 		const existingDomain = await db.query.domain.findFirst({
 			where: and(
@@ -29,7 +30,7 @@ export async function updateDomainController({
 		});
 
 		if (!existingDomain) {
-			logger.warn("Domain not found", { domainId });
+			log.warn({ ...({ domainId }), message: "Domain not found" });
 			throw DomainErrors.domainNotFound(domainId);
 		}
 
@@ -95,7 +96,7 @@ export async function updateDomainController({
 
 		return finalDomain;
 	} catch (error) {
-		logger.error("Error updating domain settings", { domainId, error });
+		log.error({ ...({ domainId, error }), message: "Error updating domain settings" });
 		throw error;
 	}
 }

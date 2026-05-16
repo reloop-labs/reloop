@@ -1,8 +1,9 @@
+import { log } from "evlog";
 import type { ContactModel } from "@be/contacts/model/contact.model";
 import { createLog } from "@be/contacts/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import type { Logger } from "@reloop/logger";
+
 import { CONTACT_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
@@ -18,7 +19,7 @@ export async function removeContactFromGroupController({
 	organizationId: string;
 	groupId: string;
 	body: ContactModel.RemoveContactFromGroupBody;
-	logger: Logger;
+	logger?: any;
 	cookie?: string;
 	requestDetails?: {
 		endpoint?: string;
@@ -36,8 +37,7 @@ export async function removeContactFromGroupController({
 		});
 	}
 
-	logger.info(
-		{
+	log.info({
 			contactId: contact_id,
 			email: email?.toLowerCase(),
 			groupId,
@@ -79,10 +79,7 @@ export async function removeContactFromGroupController({
 				),
 			);
 
-		logger.info(
-			{ contactId: contact.id, groupId },
-			"Contact removed from group",
-		);
+		log.info({ ...({ contactId: contact.id, groupId }), message: "Contact removed from group" });
 
 		const result = {
 			success: true,
@@ -100,8 +97,7 @@ export async function removeContactFromGroupController({
 
 		return result;
 	} catch (error) {
-		logger.error(
-			{
+		log.error({
 				contactId: contact_id,
 				email: email?.toLowerCase(),
 				groupId,

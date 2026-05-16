@@ -1,5 +1,6 @@
+import { log } from "evlog";
 import { BusEvent, bus } from "@reloop/bus";
-import { logger } from "@reloop/logger";
+
 import { render } from "../../render";
 import { emailConfig } from "../email.config";
 import { sendEmail } from "../utils/email";
@@ -28,10 +29,7 @@ export async function initDomainSubscribers() {
 					html,
 				});
 			} catch (error) {
-				logger.error(
-					{ error, payload },
-					"Failed to send domain verified email",
-				);
+				log.error({ ...({ error, payload }), message: "Failed to send domain verified email" });
 			}
 		},
 		{ queue: "domain-email-worker" },
@@ -95,7 +93,7 @@ export async function initDomainSubscribers() {
 					html,
 				});
 			} catch (error) {
-				logger.error({ error, payload }, "Failed to send DNS config email");
+				log.error({ ...({ error, payload }), message: "Failed to send DNS config email" });
 			}
 		},
 		{ queue: "domain-email-worker" },

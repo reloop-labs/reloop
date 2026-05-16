@@ -1,6 +1,7 @@
+import { log } from "evlog";
 import { db } from "@reloop/db/client";
 import { domain, domainDnsRecord } from "@reloop/db/schema";
-import logger from "@reloop/logger";
+
 import { and, eq, isNull } from "drizzle-orm";
 import { kumomtaConfig } from "../../kumomta.config";
 import { verifyApiKeyController } from "../verify/verify.controllers";
@@ -39,10 +40,7 @@ export async function dkimKeyController(
 				)
 			: and(eq(domain.domain, input.domainName), isNull(domain.deletedAt));
 
-		logger.info(
-			{ domain: input.domainName, organizationId },
-			"[DKIM-KEY] Querying domain",
-		);
+		log.info({ ...({ domain: input.domainName, organizationId }), message: "[DKIM-KEY] Querying domain" });
 
 		// Find the active domain for this org
 		const domainRecord = await db.query.domain.findFirst({
@@ -51,15 +49,12 @@ export async function dkimKeyController(
 		});
 
 		if (!domainRecord) {
-			logger.warn({ domain: input.domainName }, "[DKIM-KEY] Domain NOT FOUND");
+			log.warn({ ...({ domain: input.domainName }), message: "[DKIM-KEY] Domain NOT FOUND" });
 			return { error: "Domain not found", code: 404 };
 		}
 
 		if (domainRecord.status !== "active") {
-			logger.warn(
-				{ domain: input.domainName, status: domainRecord.status },
-				"[DKIM-KEY] Domain found but NOT ACTIVE",
-			);
+			log.warn({ ...({ domain: input.domainName, status: domainRecord.status }), message: "[DKIM-KEY] Domain found but NOT ACTIVE" });
 			return { error: "Domain not active", code: 404 };
 		}
 
@@ -82,8 +77,7 @@ export async function dkimKeyController(
 
 		return { selector, privateKey: dkimRecord.privateKey, code: 200 };
 	} catch (error) {
-		logger.error(
-			{
+		log.error({
 				error: error instanceof Error ? error.message : String(error),
 				domain: input.domainName,
 			},

@@ -1,7 +1,8 @@
+import { log } from "evlog";
 import "dotenv/config";
 import cors from "@elysiajs/cors";
 import { openapi } from "@elysiajs/openapi";
-import { logger } from "@reloop/logger";
+
 import { Elysia } from "elysia";
 import { authConfig } from "./auth.config";
 import { landing } from "./landing";
@@ -30,7 +31,7 @@ const app = new Elysia({ prefix: "/api/auth", name: "Auth Service" })
 		await loader();
 	})
 	.listen(port, () => {
-		logger.info(`Auth Server is running on http://localhost:${port}/api/auth`);
+		log.info("server", `Auth Server is running on http://localhost:${port}/api/auth`);
 	});
 
 export type App = typeof app;

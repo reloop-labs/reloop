@@ -1,3 +1,4 @@
+import { log } from "evlog";
 import { DomainErrors } from "@be/domain/lib/errors";
 import type { DomainTypes } from "@be/domain/types/domain.type";
 import { BusEvent, bus } from "@reloop/bus";
@@ -17,7 +18,7 @@ export async function finalizeDomainCreation_step6({
 	domain: string;
 }): Promise<DomainTypes.DomainResponse> {
 	const logger = useLogger();
-	logger.info("Fetching domain with DNS records", { domainId });
+	log.info({ ...({ domainId }), message: "Fetching domain with DNS records" });
 
 	const domainWithDnsRecords = await db.query.domain.findFirst({
 		where: and(

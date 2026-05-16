@@ -1,3 +1,4 @@
+import { log } from "evlog";
 import type { DomainTypes } from "@be/domain/types/domain.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
@@ -54,9 +55,9 @@ export async function listDomainsController({
 
 		return finalResponse;
 	} catch (error) {
-		logger.error("Error listing domains", {
+		log.error({ ...({
 			query,
-			error: error instanceof Error ? error.message : String(error),
+			error: error instanceof Error ? error.message : String(error), message: "Error listing domains" }),
 		});
 		throw error;
 	}

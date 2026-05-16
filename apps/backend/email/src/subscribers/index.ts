@@ -1,4 +1,5 @@
-import { logger } from "@reloop/logger";
+
+import { log } from "evlog";
 import { initApiKeySubscribers } from "./api-key.subscriber";
 import { initAuthSubscribers } from "./auth.subscriber";
 import { initBillingSubscribers } from "./billing.subscriber";
@@ -15,10 +16,9 @@ export async function initSubscribers() {
 			initApiKeySubscribers(),
 		]);
 
-		logger.info("All email subscribers initialized");
+		log.info("server", "All email subscribers initialized");
 	} catch (error) {
-		logger.error(
-			{ error: error instanceof Error ? error.message : String(error) },
+		log.error({ error: error instanceof Error ? error.message : String(error) },
 			"Failed to initialize email subscribers",
 		);
 	}

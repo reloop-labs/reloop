@@ -1,3 +1,4 @@
+import { log } from "evlog";
 import { DomainErrors } from "@be/domain/lib/errors";
 import type { DomainTypes } from "@be/domain/types/domain.type";
 import { BusEvent, bus } from "@reloop/bus";
@@ -33,7 +34,7 @@ export async function handleUndelete_step2({
 	if (deletedDomain?.deletedAt) {
 		const now = new Date();
 		const domainId = deletedDomain.id;
-		logger.info("Undeleting domain", { domainId });
+		log.info({ ...({ domainId }), message: "Undeleting domain" });
 
 		await db
 			.update(schema.domain)
@@ -51,7 +52,7 @@ export async function handleUndelete_step2({
 			})
 			.where(eq(schema.domain.id, domainId));
 
-		logger.info("Undeleting domain DNS records", { domainId });
+		log.info({ ...({ domainId }), message: "Undeleting domain DNS records" });
 		await db
 			.update(schema.domainDnsRecord)
 			.set({

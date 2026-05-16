@@ -1,8 +1,9 @@
+import { log } from "evlog";
 import type { ContactModel } from "@be/contacts/model/contact.model";
 import { createLog } from "@be/contacts/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import type { Logger } from "@reloop/logger";
+
 import { CONTACT_DELETE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq } from "drizzle-orm";
 
@@ -15,7 +16,7 @@ export async function deleteContactController({
 }: {
 	contactId: string;
 	organizationId: string;
-	logger: Logger;
+	logger?: any;
 	cookie?: string;
 	requestDetails?: {
 		endpoint?: string;
@@ -25,7 +26,7 @@ export async function deleteContactController({
 		statusCode?: number;
 	};
 }): Promise<ContactModel.DeleteResponse | ContactModel.ContactNotFound> {
-	logger.info({ contactId }, "Deleting contact");
+	log.info({ ...({ contactId }), message: "Deleting contact" });
 
 	try {
 		// Check if contact exists
@@ -37,7 +38,7 @@ export async function deleteContactController({
 		});
 
 		if (!existingContact) {
-			logger.warn({ contactId, organizationId }, "Contact not found");
+			log.warn({ ...({ contactId, organizationId }), message: "Contact not found" });
 			return { message: "Contact not found" };
 		}
 
@@ -51,7 +52,7 @@ export async function deleteContactController({
 				),
 			);
 
-		logger.info({ contactId }, "Contact deleted successfully");
+		log.info({ ...({ contactId }), message: "Contact deleted successfully" });
 
 		const result = {
 			success: true,
@@ -69,8 +70,7 @@ export async function deleteContactController({
 
 		return result;
 	} catch (error) {
-		logger.error(
-			{
+		log.error({
 				contactId,
 				error: error instanceof Error ? error.message : String(error),
 			},

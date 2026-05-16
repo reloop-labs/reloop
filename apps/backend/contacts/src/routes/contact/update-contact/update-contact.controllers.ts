@@ -1,9 +1,10 @@
+import { log } from "evlog";
 import { upsertContactProperties } from "@be/contacts/routes/contact/utils/upsert-contact-properties";
 import type { ContactTypes } from "@be/contacts/types/contact.type";
 import { createLog } from "@be/contacts/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import type { Logger } from "@reloop/logger";
+
 import { CONTACT_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
@@ -19,7 +20,7 @@ export async function updateContactController({
 	contactId: string;
 	organizationId: string;
 	body: ContactTypes.UpdateContactRequest;
-	logger: Logger;
+	logger?: any;
 	cookie?: string;
 	requestDetails?: {
 		endpoint?: string;
@@ -29,14 +30,11 @@ export async function updateContactController({
 		statusCode?: number;
 	};
 }): Promise<ContactTypes.ContactResponse> {
-	logger.info(
-		{
+	log.info({ ...({
 			contactId,
 			organizationId,
 			body,
-		},
-		"Updating contact",
-	);
+		}), message: "Updating contact" });
 
 	try {
 		return await db.transaction(async (tx) => {
@@ -50,7 +48,7 @@ export async function updateContactController({
 			});
 
 			if (!existingContact) {
-				logger.warn({ contactId, organizationId }, "Contact not found");
+				log.warn({ ...({ contactId, organizationId }), message: "Contact not found" });
 				throw status(404, { message: "Contact not found" });
 			}
 
@@ -84,10 +82,7 @@ export async function updateContactController({
 				.returning();
 
 			if (!updatedContact) {
-				logger.error(
-					{ contactId },
-					"Failed to update contact - no data returned",
-				);
+				log.error({ ...({ contactId }), message: "Failed to update contact - no data returned" });
 				throw status(500, { message: "Failed to update contact" });
 			}
 
@@ -103,13 +98,10 @@ export async function updateContactController({
 				});
 			}
 
-			logger.info(
-				{
+			log.info({ ...({
 					contactId,
 					organizationId,
-				},
-				"Contact updated successfully",
-			);
+				}), message: "Contact updated successfully" });
 
 			// Fetch current properties after update to return them in response
 			const updatedProperties = await tx
@@ -166,8 +158,7 @@ export async function updateContactController({
 			return finalContact;
 		});
 	} catch (error) {
-		logger.error(
-			{
+		log.error({
 				contactId,
 				organizationId,
 				error: error instanceof Error ? error.message : String(error),

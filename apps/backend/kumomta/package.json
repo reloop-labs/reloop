@@ -19,7 +19,6 @@
 		"@reloop/apikey": "workspace:*",
 		"@reloop/bus": "workspace:*",
 		"@reloop/db": "workspace:*",
-		"@reloop/logger": "workspace:*",
 		"dotenv": "catalog:backend",
 		"drizzle-orm": "catalog:db",
 		"elysia": "catalog:backend",

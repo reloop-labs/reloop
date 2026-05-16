@@ -1,12 +1,13 @@
+import { log } from "evlog";
 import { db, type DatabaseInstance } from "@reloop/db/client";
 import { creditLedger, plan, subscription } from "@reloop/db/schema";
-import { logger } from "@reloop/logger";
+
 import { and, asc, eq } from "drizzle-orm";
 import { billingConfig } from "../billing.config";
 
 export async function getOrProvisionSubscription(orgId: string, tx?: DatabaseInstance) {
 	if (!orgId) {
-		logger.error("getOrProvisionSubscription called with missing orgId");
+		log.error("server", "getOrProvisionSubscription called with missing orgId");
 		throw new Error("organizationId is required for subscription provisioning");
 	}
 
@@ -24,7 +25,7 @@ export async function getOrProvisionSubscription(orgId: string, tx?: DatabaseIns
 		});
 
 		if (!freePlan) {
-			logger.info("No plans found, creating default Free plan");
+			log.info("server", "No plans found, creating default Free plan");
 			const [insertedPlan] = await client
 				.insert(plan)
 				.values({
@@ -82,7 +83,7 @@ export async function getOrProvisionSubscription(orgId: string, tx?: DatabaseIns
 			reason: "Initial free plan quota",
 		});
 
-		logger.info({ orgId, planId: freePlan.id }, "Auto-provisioned free plan subscription");
+		log.info({ ...({ orgId, planId: freePlan.id }), message: "Auto-provisioned free plan subscription" });
 		activeSub = { ...newSub, plan: freePlan };
 	}
 

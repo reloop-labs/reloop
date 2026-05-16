@@ -1,3 +1,4 @@
+import { log } from "evlog";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { and, eq, isNull } from "drizzle-orm";
@@ -12,7 +13,7 @@ export async function checkExistingDomain_step1({
 	organizationId: string;
 }) {
 	const logger = useLogger();
-	logger.info("Finding existing domain", { domain });
+	log.info({ ...({ domain }), message: "Finding existing domain" });
 	const activeDomain = await db.query.domain.findFirst({
 		where: and(
 			eq(schema.domain.domain, domain),
@@ -22,11 +23,11 @@ export async function checkExistingDomain_step1({
 	});
 
 	if (activeDomain) {
-		logger.info("Domain already exists", { domain });
+		log.info({ ...({ domain }), message: "Domain already exists" });
 		throw DomainErrors.domainAlreadyExists(domain);
 	}
 
-	logger.info("Finding deleted domain", { domain });
+	log.info({ ...({ domain }), message: "Finding deleted domain" });
 	const deletedDomain = await db.query.domain.findFirst({
 		where: and(
 			eq(schema.domain.domain, domain),

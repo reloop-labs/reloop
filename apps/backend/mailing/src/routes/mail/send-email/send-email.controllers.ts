@@ -1,3 +1,4 @@
+import { log } from "evlog";
 import { MailErrors } from "@reloop/be-mailing/lib/errors";
 import type { MailModel } from "@reloop/be-mailing/model/mail.model";
 import { useLogger } from "evlog/elysia";
@@ -26,7 +27,7 @@ export async function sendEmailController({
 		from: body.from,
 		to: body.to,
 	});
-	logger.info("Initiating email send process");
+	log.info("server", "Initiating email send process");
 
 
 	const { domainName } = parseFromAddress_step1(body.from);
@@ -91,11 +92,11 @@ export async function sendEmailController({
 		body,
 	});
 
-	logger.info("Email process completed successfully", {
+	log.info({ ...({
 		emailLogId,
 		messageId: response.messageId,
 		organizationId,
-	});
+	}), message: "Email process completed successfully" });
 
 	return response;
 }

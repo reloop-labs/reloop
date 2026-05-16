@@ -1,5 +1,6 @@
+import { log } from "evlog";
 import { uploadConfig } from "@be/upload/upload.config";
-import { logger } from "@reloop/logger";
+
 import { Elysia } from "elysia";
 import { validateApiKey } from "./api-key-auth";
 import { validateSession } from "./cookie-auth";
@@ -14,7 +15,7 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 			try {
 				const cookie = headers.get("cookie");
 				const traceId = crypto.randomUUID();
-				const currentLogger = logger.child({ traceId });
+				const currentLogger = log;
 				const sessionResult = await validateSession(cookie);
 				if (sessionResult) {
 					const tenantLogger = currentLogger.child({
@@ -30,13 +31,10 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 				}
 				return status(401, { message: "Authentication required" });
 			} catch (e) {
-				logger.error(
-					{
+				log.error({ ...({
 						error: e instanceof Error ? e.message : "Unknown error",
 						stack: e instanceof Error ? e.stack : undefined,
-					},
-					"Authentication error",
-				);
+					}), message: "Authentication error" });
 				return status(401, { message: "Authentication failed" });
 			}
 		},
@@ -46,7 +44,7 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 			try {
 				const apiKey = headers.get("x-api-key");
 				const traceId = crypto.randomUUID();
-				const currentLogger = logger.child({ traceId });
+				const currentLogger = log;
 				const apiKeyResult = await validateApiKey(apiKey);
 				if (apiKeyResult) {
 					const tenantLogger = currentLogger.child({
@@ -62,13 +60,10 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 				}
 				return status(401, { message: "Authentication required" });
 			} catch (e) {
-				logger.error(
-					{
+				log.error({ ...({
 						error: e instanceof Error ? e.message : "Unknown error",
 						stack: e instanceof Error ? e.stack : undefined,
-					},
-					"Authentication error",
-				);
+					}), message: "Authentication error" });
 				return status(401, { message: "Authentication failed" });
 			}
 		},
@@ -82,7 +77,7 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 				const apiKey = headers.get("x-api-key");
 				const cookie = headers.get("cookie");
 				const traceId = crypto.randomUUID();
-				const currentLogger = logger.child({ traceId });
+				const currentLogger = log;
 				const apiKeyResult = await validateApiKey(apiKey);
 				if (apiKeyResult) {
 					const tenantLogger = currentLogger.child({
@@ -121,13 +116,10 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 				}
 				return status(401, { message: "Authentication required" });
 			} catch (e) {
-				logger.error(
-					{
+				log.error({ ...({
 						error: e instanceof Error ? e.message : "Unknown error",
 						stack: e instanceof Error ? e.stack : undefined,
-					},
-					"Authentication error",
-				);
+					}), message: "Authentication error" });
 				return status(401, { message: "Authentication failed" });
 			}
 		},

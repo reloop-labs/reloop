@@ -1,4 +1,5 @@
-import { logger } from "@reloop/logger";
+
+import { log } from "evlog";
 import nodemailer from "nodemailer";
 import Reloop from "reloop-email";
 import { emailConfig } from "../email.config";
@@ -36,10 +37,7 @@ export async function sendEmail(options: SendEmailOptions) {
 	try {
 		// Use Reloop SDK in Production
 		if (isProduction && reloop) {
-			logger.info(
-				{ to: options.to, subject: options.subject },
-				"Sending email via Reloop SDK",
-			);
+			log.info({ ...({ to: options.to, subject: options.subject }), message: "Sending email via Reloop SDK" });
 			const response = await reloop.mail.send({
 				from: options.from,
 				to: Array.isArray(options.to) ? options.to : [options.to],
@@ -52,9 +50,7 @@ export async function sendEmail(options: SendEmailOptions) {
 		}
 
 		// Fallback to SMTP (Mailpit) in Development
-		logger.info(
-			{ to: options.to, subject: options.subject },
-			"Sending email via SMTP (Mailpit)",
+		log.info({ ...({ to: options.to, subject: options.subject }), message: "Sending email via SMTP (Mailpit })",
 		);
 		const info = await transporter.sendMail({
 			from: options.from,
@@ -66,8 +62,7 @@ export async function sendEmail(options: SendEmailOptions) {
 
 		return info;
 	} catch (error) {
-		logger.error(
-			{
+		log.error({
 				error: error instanceof Error ? error.message : String(error),
 				to: options.to,
 			},

@@ -33,14 +33,14 @@
 		"zod": "catalog:ui",
 		"@reloop/db": "workspace:*",
 		"@reloop/cache": "workspace:*",
-		"@reloop/logger": "workspace:*",
 		"@reloop/auth": "workspace:*",
 		"@reloop/apikey": "workspace:*",
 		"@reloop/bus": "workspace:*",
 		"@reloop/webhook-events": "workspace:*",
 		"@elysiajs/eden": "catalog:backend",
 		"@elysiajs/openapi": "catalog:backend",
-		"bullmq": "catalog:backend"
+		"bullmq": "catalog:backend",
+		"evlog": "catalog:backend"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",

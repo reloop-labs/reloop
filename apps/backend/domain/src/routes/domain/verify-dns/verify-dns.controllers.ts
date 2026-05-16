@@ -1,3 +1,4 @@
+import { log } from "evlog";
 import { DOMAIN_VERIFY_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { useLogger } from "evlog/elysia";
 import {
@@ -23,9 +24,9 @@ export async function verifyDNSRecordController({
 
 		// Already in-flight — don't queue again
 		if (domainWithRecords.status === "verifying") {
-			logger.info("Domain is already in verifying status, skipping re-queue", {
+			log.info({ ...({
 				domainId,
-			});
+			}), message: "Domain is already in verifying status, skipping re-queue" });
 			return {
 				id: domainId,
 				status: "verifying" as const,
@@ -44,14 +45,14 @@ export async function verifyDNSRecordController({
 			previousStatus: domainWithRecords.status,
 		});
 
-		logger.info("Domain verification started successfully", { domainId });
+		log.info({ ...({ domainId }), message: "Domain verification started successfully" });
 		return {
 			id: domainId,
 			status: "verifying" as const,
 			event: DOMAIN_VERIFY_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
-		logger.error("Error verifying DNS records", { domainId, error });
+		log.error({ ...({ domainId, error }), message: "Error verifying DNS records" });
 		throw error;
 	}
 }

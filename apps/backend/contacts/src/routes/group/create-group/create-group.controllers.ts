@@ -1,10 +1,11 @@
+import { log } from "evlog";
 import type { GroupModel } from "@be/contacts/model/group.model";
 import type { GroupResponse } from "@be/contacts/types/group.type";
 import { createLog } from "@be/contacts/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { createGroupId } from "@reloop/db/schema";
-import type { Logger } from "@reloop/logger";
+
 import { GROUP_CREATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 
@@ -19,7 +20,7 @@ export const createGroupController = async ({
 	name: string;
 	activeOrganizationId: string;
 	userId: string;
-	logger: Logger;
+	logger?: any;
 	cookie?: string;
 	requestDetails?: {
 		endpoint?: string;
@@ -29,9 +30,9 @@ export const createGroupController = async ({
 		statusCode?: number;
 	};
 }): Promise<GroupResponse | GroupModel.Unauthorized> => {
-	logger.info({ name }, "Creating group");
+	log.info({ ...({ name }), message: "Creating group" });
 	try {
-		logger.info({ name }, "Checking if group already exists");
+		log.info({ ...({ name }), message: "Checking if group already exists" });
 		const existingGroup = await db.query.group.findFirst({
 			where: and(
 				eq(schema.group.name, name),
@@ -40,7 +41,7 @@ export const createGroupController = async ({
 			),
 		});
 		if (existingGroup) {
-			logger.warn({ name }, "Group already exists");
+			log.warn({ ...({ name }), message: "Group already exists" });
 			throw new Error("Group already exists");
 		}
 		const [newGroup] = await db
@@ -53,10 +54,10 @@ export const createGroupController = async ({
 			})
 			.returning();
 		if (!newGroup) {
-			logger.error({ name }, "Failed to create group - no data returned");
+			log.error({ ...({ name }), message: "Failed to create group - no data returned" });
 			throw new Error("Failed to create group");
 		}
-		logger.info({ name, id: newGroup.id }, "Group created successfully");
+		log.info({ ...({ name, id: newGroup.id }), message: "Group created successfully" });
 
 		const result = {
 			id: newGroup.id,
@@ -76,7 +77,7 @@ export const createGroupController = async ({
 
 		return result;
 	} catch (error) {
-		logger.error({ name, error }, "Debug creating group");
+		log.error({ ...({ name, error }), message: "Debug creating group" });
 		throw error;
 	}
 };

@@ -10,7 +10,6 @@ export const deleteApiKeyRoute = new Elysia().use(authMiddleware).delete(
 		params: { api_key_id },
 		activeOrganizationId,
 		userId,
-		logger,
 		path,
 		request,
 		headers,
@@ -19,7 +18,6 @@ export const deleteApiKeyRoute = new Elysia().use(authMiddleware).delete(
 		return await deleteApiKeyController({
 			apiKeyId: api_key_id,
 			organizationId: activeOrganizationId,
-			logger,
 			cookie: cookieString,
 			requestDetails: {
 				endpoint: path,

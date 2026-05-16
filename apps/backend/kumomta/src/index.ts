@@ -1,8 +1,9 @@
+import { log } from "evlog";
 import "dotenv/config";
 import { cors } from "@elysiajs/cors";
 
 import { openapi } from "@elysiajs/openapi";
-import { logger } from "@reloop/logger";
+
 import { Elysia } from "elysia";
 import { kumomtaConfig } from "./kumomta.config";
 import { kumomtaRoutes } from "./routes/kumomta.routes";
@@ -39,9 +40,7 @@ const app = new Elysia({
 await loader();
 
 app.listen(kumomtaConfig.port, (server) => {
-	logger.info(
-		`🦊 KumoMTA Server is running at http://${server?.hostname}:${server?.port}`,
-	);
+	log.info("server", `🦊 KumoMTA Server is running at http://${server?.hostname}:${server?.port}`);
 });
 
 export type App = typeof app;

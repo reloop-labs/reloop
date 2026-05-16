@@ -1,3 +1,4 @@
+import { log } from "evlog";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { eq } from "drizzle-orm";
@@ -11,13 +12,13 @@ export async function updateStatusToVerifying_step2({
 	const logger = useLogger();
 
 	// Set status to "verifying"
-	logger.info("Updating domain status to verifying", { domainId });
+	log.info({ ...({ domainId }), message: "Updating domain status to verifying" });
 	await db
 		.update(schema.domain)
 		.set({ status: "verifying" })
 		.where(eq(schema.domain.id, domainId));
 
-	logger.info("Updating DNS records status to verifying", { domainId });
+	log.info({ ...({ domainId }), message: "Updating DNS records status to verifying" });
 	await db
 		.update(schema.domainDnsRecord)
 		.set({ status: "verifying" })

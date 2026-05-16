@@ -1,6 +1,7 @@
+import { log } from "evlog";
 import { TemplateError } from "@be/template/error/template.error";
 import { templateModel } from "@be/template/model/template.model";
-import { logger } from "@reloop/logger";
+
 
 export async function deleteTemplate(params: {
 	id: string;
@@ -19,8 +20,7 @@ export async function deleteTemplate(params: {
 
 		return { success: true, id: result?.id };
 	} catch (error) {
-		logger.error(
-			{
+		log.error({
 				id,
 				error: error instanceof Error ? error.message : String(error),
 			},

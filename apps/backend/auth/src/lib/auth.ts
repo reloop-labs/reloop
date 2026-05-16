@@ -1,9 +1,10 @@
+import { log } from "evlog";
 import { apiKey } from "@better-auth/api-key";
 import { BusEvent, bus } from "@reloop/bus";
 import { eq } from "drizzle-orm";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { logger } from "@reloop/logger";
+
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { createAuthMiddleware } from "better-auth/api";
@@ -54,12 +55,12 @@ export const auth = betterAuth({
 	hooks: {
 		after: createAuthMiddleware(async (ctx) => {
 			const { path, context } = ctx;
-			logger.info(ctx.path);
+			log.info({ message: String(ctx.path) });
 			// 🔐 User registered
 			if (path === "/sign-up/email-otp") {
 				const newSession = context.newSession;
 				if (newSession) {
-					logger.info("🔐 User registered:", newSession.user);
+					log.info({ ...({ data: newSession.user }), message: "🔐 User registered:" });
 					await bus.publish(
 						BusEvent.USER_CREATED,
 						{
@@ -81,7 +82,7 @@ export const auth = betterAuth({
 				const data = context.newSession;
 				if (data) {
 					const { session, user } = data;
-					logger.info("🔓 User signed in:", user.email);
+					log.info({ ...({ data: user.email }), message: "🔓 User signed in:" });
 					// Use a 1-minute bucket for sign-in deduplication
 					const bucket = Math.floor(Date.now() / 60000);
 					await bus.publish(
@@ -151,7 +152,7 @@ export const auth = betterAuth({
 			expiresIn: 60 * 15,
 			allowedAttempts: 3,
 			async sendVerificationOTP({ email, otp, type }) {
-				logger.info(`Sending OTP (${type}) to: ${email} (OTP: ${otp})`);
+				log.info("server", `Sending OTP (${type}) to: ${email} (OTP: ${otp})`);
 				if (authConfig.DEFAULT_OTP && authConfig.NODE_ENV !== "development")
 					return;
 				try {
@@ -160,9 +161,9 @@ export const auth = betterAuth({
 						{ email, otp, type },
 						{ msgId: `otp_requested:${email}:${otp}` },
 					);
-					logger.info(`OTP bus event published for ${email} (${type})`);
+					log.info("server", `OTP bus event published for ${email} (${type})`);
 				} catch (error) {
-					logger.error("Failed to publish OTP event:", error);
+					log.error({ ...({ data: error }), message: "Failed to publish OTP event:" });
 					// If we are not using a default OTP, we must throw to notify the user
 					if (!authConfig.DEFAULT_OTP) {
 						throw new Error("Failed to send OTP email");
@@ -203,14 +204,14 @@ export const auth = betterAuth({
 			},
 			async sendInvitationEmail(data) {
 				const inviteLink = `${authConfig.BASE_URL}/dashboard/signup?inviteId=${data.id}`;
-				logger.info("📧 Organization invitation email requested:", {
+				log.info({ ...({
 					email: data.email,
 					organization: data.organization.name,
-				});
+				}), message: "📧 Organization invitation email requested:" });
 
 				// Log invite URL in development for easy testing
 				if (authConfig.NODE_ENV === "development") {
-					logger.info("🔗 Invite URL (DEV):", inviteLink);
+					log.info("server", "🔗 Invite URL (DEV):", inviteLink);
 				}
 
 				const isResend =
@@ -232,13 +233,10 @@ export const auth = betterAuth({
 						},
 						{ msgId: `invite_created:${data.id}:${Date.now()}` },
 					);
-					logger.info(
-						`✅ Organization invite bus event published for ${data.email} (resend: ${isResend})`,
+					log.info("server", `✅ Organization invite bus event published for ${data.email} (resend: ${isResend})`,
 					);
 				} catch (error) {
-					logger.error(
-						`❌ Failed to publish organization invite event:${error}`,
-					);
+					log.error("server", `❌ Failed to publish organization invite event:${error}`);
 				}
 			},
 			organizationHooks: {
@@ -257,23 +255,16 @@ export const auth = betterAuth({
 							},
 							{ msgId: `org_joined:${organization.id}:${user.id}` },
 						);
-						logger.info(
-							`✅ Organization joined bus event published for ${user.email}`,
-						);
+						log.info("server", `✅ Organization joined bus event published for ${user.email}`);
 
 						// Set active organization for the user
 						await db
 							.update(schema.user)
 							.set({ activeOrganizationId: organization.id })
 							.where(eq(schema.user.id, user.id));
-						logger.info(
-							`✅ Active organization set to ${organization.id} for user ${user.id}`,
-						);
+						log.info("server", `✅ Active organization set to ${organization.id} for user ${user.id}`);
 					} catch (error) {
-						logger.error(
-							"❌ Failed to publish organization joined event or update user:",
-							error,
-						);
+						log.error({ ...({ data: error }), message: "❌ Failed to publish organization joined event or update user:" });
 					}
 				},
 			},
@@ -322,7 +313,7 @@ export const OpenAPI = {
 
 			return reference;
 		} catch (error) {
-			logger.error("Failed to generate OpenAPI paths:", error);
+			log.error({ ...({ data: error }), message: "Failed to generate OpenAPI paths:" });
 			return {};
 		}
 	},
@@ -331,7 +322,7 @@ export const OpenAPI = {
 			const { components } = await getSchema();
 			return components;
 		} catch (error) {
-			logger.error("Failed to generate OpenAPI components:", error);
+			log.error({ ...({ data: error }), message: "Failed to generate OpenAPI components:" });
 			return {};
 		}
 	},

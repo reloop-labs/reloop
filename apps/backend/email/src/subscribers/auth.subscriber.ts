@@ -1,5 +1,6 @@
+import { log } from "evlog";
 import { BusEvent, bus } from "@reloop/bus";
-import { logger } from "@reloop/logger";
+
 import React from "react";
 import { UAParser } from "ua-parser-js";
 import OtpEmail from "../../emails/otp";
@@ -20,7 +21,7 @@ export async function initAuthSubscribers() {
 			try {
 				const alreadySent = await redis.get(dedupKey);
 				if (alreadySent) {
-					logger.warn(`Duplicate USER_CREATED for ${payload.email}, skipping`);
+					log.warn("server", `Duplicate USER_CREATED for ${payload.email}, skipping`);
 					return;
 				}
 				await redis.set(dedupKey, "1", 60);
@@ -39,7 +40,7 @@ export async function initAuthSubscribers() {
 					html,
 				});
 			} catch (error) {
-				logger.error({ error, payload }, "Failed to send welcome email");
+				log.error({ ...({ error, payload }), message: "Failed to send welcome email" });
 			}
 		},
 		{ queue: "auth-email-worker" },
@@ -54,7 +55,7 @@ export async function initAuthSubscribers() {
 			try {
 				const alreadySent = await redis.get(dedupKey);
 				if (alreadySent) {
-					logger.warn(`Duplicate OTP_REQUESTED for ${payload.email}, skipping`);
+					log.warn("server", `Duplicate OTP_REQUESTED for ${payload.email}, skipping`);
 					return;
 				}
 				await redis.set(dedupKey, "1", 60);
@@ -82,7 +83,7 @@ export async function initAuthSubscribers() {
 					html,
 				});
 			} catch (error) {
-				logger.error({ error, payload }, "Failed to send OTP email");
+				log.error({ ...({ error, payload }), message: "Failed to send OTP email" });
 			}
 		},
 		{ queue: "auth-email-worker" },
@@ -97,9 +98,7 @@ export async function initAuthSubscribers() {
 			try {
 				const alreadySent = await redis.get(dedupKey);
 				if (alreadySent) {
-					logger.warn(
-						`Duplicate SIGNIN_DETECTED for ${payload.email}, skipping`,
-					);
+					log.warn("server", `Duplicate SIGNIN_DETECTED for ${payload.email}, skipping`);
 					return;
 				}
 				await redis.set(dedupKey, "1", 60);
@@ -137,10 +136,7 @@ export async function initAuthSubscribers() {
 					html,
 				});
 			} catch (error) {
-				logger.error(
-					{ error, payload },
-					"Failed to send signin detected email",
-				);
+				log.error({ ...({ error, payload }), message: "Failed to send signin detected email" });
 			}
 		},
 		{ queue: "auth-email-worker" },

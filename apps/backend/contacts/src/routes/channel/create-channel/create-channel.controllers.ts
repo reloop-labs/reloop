@@ -1,8 +1,9 @@
+import { log } from "evlog";
 import type { ChannelTypes } from "@be/contacts/types/channel.type";
 import { createLog } from "@be/contacts/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import type { Logger } from "@reloop/logger";
+
 import { CHANNEL_CREATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
@@ -24,7 +25,7 @@ export const createChannelController = async ({
 	description?: string;
 	defaultSubscription?: "opt_in" | "opt_out";
 	visibility?: "private" | "public";
-	logger: Logger;
+	logger?: any;
 	cookie?: string;
 	requestDetails?: {
 		endpoint?: string;
@@ -34,7 +35,7 @@ export const createChannelController = async ({
 		statusCode?: number;
 	};
 }): Promise<ChannelTypes.ChannelResponse> => {
-	logger.info({ name }, "Creating channel");
+	log.info({ ...({ name }), message: "Creating channel" });
 	try {
 		const existingChannel = await db.query.channel.findFirst({
 			where: and(
@@ -45,7 +46,7 @@ export const createChannelController = async ({
 		});
 
 		if (existingChannel) {
-			logger.warn({ name }, "Channel already exists");
+			log.warn({ ...({ name }), message: "Channel already exists" });
 			throw status(409, { message: "Channel already exists" });
 		}
 
@@ -62,11 +63,11 @@ export const createChannelController = async ({
 			.returning();
 
 		if (!newChannel) {
-			logger.error({ name }, "Failed to create channel - no data returned");
+			log.error({ ...({ name }), message: "Failed to create channel - no data returned" });
 			throw new Error("Failed to create channel");
 		}
 
-		logger.info({ name, id: newChannel.id }, "Channel created successfully");
+		log.info({ ...({ name, id: newChannel.id }), message: "Channel created successfully" });
 
 		const result = {
 			id: newChannel.id,
@@ -89,7 +90,7 @@ export const createChannelController = async ({
 
 		return result;
 	} catch (error) {
-		logger.error({ name, error }, "Debug creating channel");
+		log.error({ ...({ name, error }), message: "Debug creating channel" });
 		throw error;
 	}
 };

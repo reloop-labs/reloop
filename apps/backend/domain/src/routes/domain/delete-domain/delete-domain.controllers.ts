@@ -1,3 +1,4 @@
+import { log } from "evlog";
 import { bus, BusEvent } from "@reloop/bus";
 import type { DomainTypes } from "@be/domain/types/domain.type";
 import { db } from "@reloop/db/client";
@@ -16,7 +17,7 @@ export async function deleteDomainController({
 }): Promise<DomainTypes.DomainResponse> {
 	const logger = useLogger();
 	try {
-		logger.info("Fetching domain with DNS records", { domainId });
+		log.info({ ...({ domainId }), message: "Fetching domain with DNS records" });
 		const domainWithDnsRecords = await db.query.domain.findFirst({
 			where: and(
 				eq(schema.domain.id, domainId),
@@ -31,13 +32,13 @@ export async function deleteDomainController({
 		});
 
 		if (!domainWithDnsRecords) {
-			logger.warn("Domain not found for deletion", { domainId });
+			log.warn({ ...({ domainId }), message: "Domain not found for deletion" });
 			throw DomainErrors.domainNotFound(domainId);
 		}
 
 		const now = new Date();
 
-		logger.info("Soft deleting domain", { domainId });
+		log.info({ ...({ domainId }), message: "Soft deleting domain" });
 		const domainUpdateResult = await db
 			.update(schema.domain)
 			.set({ deletedAt: now, updatedAt: now })
@@ -45,11 +46,11 @@ export async function deleteDomainController({
 			.returning();
 
 		if (domainUpdateResult.length === 0) {
-			logger.warn("Failed to delete domain", { domainId });
+			log.warn({ ...({ domainId }), message: "Failed to delete domain" });
 			throw DomainErrors.databaseError("Failed to delete domain");
 		}
 
-		logger.info("Soft deleting domain DNS records", { domainId });
+		log.info({ ...({ domainId }), message: "Soft deleting domain DNS records" });
 		await db
 			.update(schema.domainDnsRecord)
 			.set({ deletedAt: now, updatedAt: now })
@@ -66,7 +67,7 @@ export async function deleteDomainController({
 			})),
 		};
 
-		logger.info("Domain and DNS records deleted successfully", { domainId });
+		log.info({ ...({ domainId }), message: "Domain and DNS records deleted successfully" });
 
 		const finalDomain = {
 			object: "domain" as const,
@@ -82,7 +83,7 @@ export async function deleteDomainController({
 
 		return finalDomain;
 	} catch (error) {
-		logger.error("Error deleting domain", { domainId, error });
+		log.error({ ...({ domainId, error }), message: "Error deleting domain" });
 		throw error;
 	}
 }

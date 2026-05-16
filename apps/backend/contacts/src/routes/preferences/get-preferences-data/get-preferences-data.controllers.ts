@@ -1,6 +1,7 @@
+import { log } from "evlog";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import type { Logger } from "@reloop/logger";
+
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 import { verifyToken } from "../token.utils";
@@ -10,9 +11,9 @@ export async function getPreferencesDataController({
 	logger,
 }: {
 	token: string;
-	logger: Logger;
+	logger?: any;
 }) {
-	logger.info("Fetching preferences data");
+	log.info("server", "Fetching preferences data");
 
 	const payload = await verifyToken(token);
 	if (!payload) {
@@ -63,10 +64,7 @@ export async function getPreferencesDataController({
 		enrollments.map((e) => [e.channelId, e.status]),
 	);
 
-	logger.info(
-		{ contactId, channelsCount: channels.length },
-		"Preferences data fetched successfully",
-	);
+	log.info({ ...({ contactId, channelsCount: channels.length }), message: "Preferences data fetched successfully" });
 
 	return {
 		contact: {

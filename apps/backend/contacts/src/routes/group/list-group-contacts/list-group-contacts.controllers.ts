@@ -1,8 +1,9 @@
+import { log } from "evlog";
 import type { ContactModel } from "@be/contacts/model/contact.model";
 import type { GroupModel } from "@be/contacts/model/group.model";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import type { Logger } from "@reloop/logger";
+
 import { GROUP_LIST_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, asc, eq, isNull, sql } from "drizzle-orm";
 
@@ -18,7 +19,7 @@ export const listGroupContactsController = async ({
 		page?: number;
 		limit?: number;
 	};
-	logger: Logger;
+	logger?: any;
 }): Promise<
 	| ContactModel.GroupContactListResponse
 	| GroupModel.GroupNotFound
@@ -28,7 +29,7 @@ export const listGroupContactsController = async ({
 	const limit = Math.min(query.limit || 100, 100);
 	const offset = (page - 1) * limit;
 
-	logger.info({ group_id, page, limit }, "Listing group contacts");
+	log.info({ ...({ group_id, page, limit }), message: "Listing group contacts" });
 
 	try {
 		const memberWhere = and(
@@ -53,7 +54,7 @@ export const listGroupContactsController = async ({
 		]);
 
 		if (!group) {
-			logger.warn({ group_id }, "Group not found");
+			log.warn({ ...({ group_id }), message: "Group not found" });
 			return { message: "Group not found" };
 		}
 
@@ -100,10 +101,7 @@ export const listGroupContactsController = async ({
 				};
 			});
 
-		logger.info(
-			{ group_id, total, page, limit, returned: contactList.length },
-			"Group contacts listed",
-		);
+		log.info({ ...({ group_id, total, page, limit, returned: contactList.length }), message: "Group contacts listed" });
 
 		return {
 			object: "contact_group",
@@ -120,7 +118,7 @@ export const listGroupContactsController = async ({
 			event: GROUP_LIST_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
-		logger.error({ group_id, error }, "Error listing group contacts");
+		log.error({ ...({ group_id, error }), message: "Error listing group contacts" });
 		throw error;
 	}
 };

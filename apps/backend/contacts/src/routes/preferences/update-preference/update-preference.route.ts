@@ -1,4 +1,4 @@
-import { logger } from "@reloop/logger";
+
 import { Elysia, t } from "elysia";
 import { updatePreferenceController } from "./update-preference.controllers";
 
@@ -6,7 +6,7 @@ export const updatePreferenceRoute = new Elysia().post(
 	"/update/:token",
 	async ({ params, body }) => {
 		const traceId = crypto.randomUUID();
-		const routeLogger = logger.child({ traceId, route: "update-preference" });
+		const routeLogger = log;
 		return await updatePreferenceController({
 			token: params.token,
 			channelId: body.channelId,

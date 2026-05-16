@@ -1,10 +1,11 @@
+import { log } from "evlog";
 import "dotenv/config";
 import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 import { apiKeyRoutes } from "@reloop/api-key/routes/api-key/api-key.routes";
 import { landing } from "@reloop/api-key/routes/landing/landing.index";
 import { loader } from "@reloop/api-key/utils/loader";
-import { logger } from "@reloop/logger";
+
 import { Elysia } from "elysia";
 import { initLogger } from "evlog";
 import { evlog } from "evlog/elysia";
@@ -44,9 +45,7 @@ const apiKeyService = new Elysia({
 		await loader();
 	})
 	.listen(port, () => {
-		logger.info(
-			`API Key Server is running on http://localhost:${port}/api/api-key`,
-		);
+		log.info("server", `API Key Server is running on http://localhost:${port}/api/api-key`);
 	});
 
 export type ApiKeyService = typeof apiKeyService;

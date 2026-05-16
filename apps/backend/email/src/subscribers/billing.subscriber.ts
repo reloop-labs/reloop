@@ -1,5 +1,6 @@
+import { log } from "evlog";
 import { BusEvent, bus } from "@reloop/bus";
-import { logger } from "@reloop/logger";
+
 import { render } from "../../render";
 import { emailConfig } from "../email.config";
 import { sendEmail } from "../utils/email";
@@ -34,10 +35,7 @@ export async function initBillingSubscribers() {
 					html,
 				});
 			} catch (error) {
-				logger.error(
-					{ error, payload },
-					"Failed to send payment failed email",
-				);
+				log.error({ ...({ error, payload }), message: "Failed to send payment failed email" });
 			}
 		},
 		{ queue: "billing-email-worker" },
@@ -67,10 +65,7 @@ export async function initBillingSubscribers() {
 					html,
 				});
 			} catch (error) {
-				logger.error(
-					{ error, payload },
-					"Failed to send quota warning email",
-				);
+				log.error({ ...({ error, payload }), message: "Failed to send quota warning email" });
 			}
 		},
 		{ queue: "billing-email-worker" },
@@ -100,7 +95,7 @@ export async function initBillingSubscribers() {
 					html,
 				});
 			} catch (error) {
-				logger.error({ error, payload }, "Failed to send trial ending email");
+				log.error({ ...({ error, payload }), message: "Failed to send trial ending email" });
 			}
 		},
 		{ queue: "billing-email-worker" },

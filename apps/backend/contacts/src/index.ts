@@ -1,3 +1,4 @@
+import { log } from "evlog";
 import "dotenv/config";
 import { contactsConfig } from "@be/contacts/contacts.config";
 import { channelRoutes } from "@be/contacts/routes/channel/channel.routes";
@@ -10,7 +11,7 @@ import { propertyRoutes } from "@be/contacts/routes/property/property.routes";
 import { loader } from "@be/contacts/utils/loader";
 import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
-import { logger } from "@reloop/logger";
+
 import { Elysia } from "elysia";
 
 const port = contactsConfig.port;
@@ -48,9 +49,7 @@ const contactsService = new Elysia({
 		await loader();
 	})
 	.listen(port, () => {
-		logger.info(
-			`Contacts Server is running on http://localhost:${port}/api/contacts`,
-		);
+		log.info("server", `Contacts Server is running on http://localhost:${port}/api/contacts`);
 	});
 
 export type ContactsService = typeof contactsService;

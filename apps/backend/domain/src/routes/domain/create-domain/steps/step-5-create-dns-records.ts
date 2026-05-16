@@ -1,3 +1,4 @@
+import { log } from "evlog";
 import type { DNSTypes } from "@be/domain/types/dns.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
@@ -33,7 +34,7 @@ export async function createDnsRecords_step5({
 		domain,
 	};
 
-	logger.info("Creating DNS records", { dnsRecordIds });
+	log.info({ ...({ dnsRecordIds }), message: "Creating DNS records" });
 
 	const recordsToInsert: (typeof schema.domainDnsRecord.$inferInsert & {
 		recordTypeName: "DKIM" | "SPF" | "DMARC" | "MX";

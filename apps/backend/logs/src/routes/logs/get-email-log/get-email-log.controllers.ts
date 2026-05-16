@@ -1,6 +1,7 @@
+import { log } from "evlog";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { logger } from "@reloop/logger";
+
 import type { LogsModel } from "@reloop/logs/model/logs.model";
 import { and, eq } from "drizzle-orm";
 
@@ -41,8 +42,7 @@ export async function getEmailLogController({
 			})),
 		} as LogsModel.EmailLogFullEntry;
 	} catch (error) {
-		logger.error(
-			{
+		log.error({
 				id,
 				error: error instanceof Error ? error.message : String(error),
 			},

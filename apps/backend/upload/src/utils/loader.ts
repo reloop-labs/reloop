@@ -1,3 +1,4 @@
+import { log } from "evlog";
 import {
 	CreateBucketCommand,
 	HeadBucketCommand,
@@ -8,19 +9,19 @@ import { uploadConfig } from "@be/upload/upload.config";
 import { bus } from "@reloop/bus";
 import { RedisCache } from "@reloop/cache/redis-client";
 import { db } from "@reloop/db/client";
-import { logger } from "@reloop/logger";
+
 
 const redis = new RedisCache("upload");
 
 export const loader = async () => {
 	try {
 		await redis.healthCheck();
-		logger.info("Redis connected");
+		log.info("server", "Redis connected");
 
 		await db.execute("SELECT 1 as test");
-		logger.info("Postgres connected");
+		log.info("server", "Postgres connected");
 		await bus.connect(uploadConfig.NATS_URL);
-		logger.info("NATS connected");
+		log.info("server", "NATS connected");
 
 		// Check S3 accessibility and create bucket if it doesn't exist
 		try {
@@ -30,10 +31,7 @@ export const loader = async () => {
 				}),
 			);
 		} catch {
-			logger.info(
-				{ bucket: uploadConfig.S3.BUCKET },
-				"Bucket not found, creating it...",
-			);
+			log.info({ ...({ bucket: uploadConfig.S3.BUCKET }), message: "Bucket not found, creating it..." });
 			await s3Client.send(
 				new CreateBucketCommand({
 					Bucket: uploadConfig.S3.BUCKET,
@@ -62,13 +60,9 @@ export const loader = async () => {
 			}),
 		);
 
-		logger.info(
-			{ bucket: uploadConfig.S3.BUCKET },
-			"S3 bucket connected and set to public read",
-		);
+		log.info({ ...({ bucket: uploadConfig.S3.BUCKET }), message: "S3 bucket connected and set to public read" });
 	} catch (e) {
-		logger.error(
-			{ error: e instanceof Error ? e.message : String(e) },
+		log.error({ error: e instanceof Error ? e.message : String(e) },
 			"Error during service initialization",
 		);
 	}

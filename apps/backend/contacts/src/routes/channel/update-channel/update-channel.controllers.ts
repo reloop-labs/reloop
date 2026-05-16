@@ -1,8 +1,9 @@
+import { log } from "evlog";
 import type { ChannelTypes } from "@be/contacts/types/channel.type";
 import { createLog } from "@be/contacts/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import type { Logger } from "@reloop/logger";
+
 import { CHANNEL_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
@@ -22,7 +23,7 @@ export const updateChannelController = async ({
 	name?: string;
 	description?: string;
 	visibility?: "private" | "public";
-	logger: Logger;
+	logger?: any;
 	cookie?: string;
 	requestDetails?: {
 		endpoint?: string;
@@ -32,7 +33,7 @@ export const updateChannelController = async ({
 		statusCode?: number;
 	};
 }): Promise<ChannelTypes.ChannelResponse> => {
-	logger.info({ channel_id, name }, "Updating channel");
+	log.info({ ...({ channel_id, name }), message: "Updating channel" });
 
 	try {
 		const existingChannel = await db.query.channel.findFirst({
@@ -44,7 +45,7 @@ export const updateChannelController = async ({
 		});
 
 		if (!existingChannel) {
-			logger.warn({ channel_id }, "Channel not found");
+			log.warn({ ...({ channel_id }), message: "Channel not found" });
 			throw status(404, { message: "Channel not found" });
 		}
 
@@ -58,10 +59,7 @@ export const updateChannelController = async ({
 			});
 
 			if (duplicateName) {
-				logger.warn(
-					{ channel_id, name },
-					"Channel with this name already exists",
-				);
+				log.warn({ ...({ channel_id, name }), message: "Channel with this name already exists" });
 				throw status(409, { message: "Channel with this name already exists" });
 			}
 		}
@@ -78,14 +76,11 @@ export const updateChannelController = async ({
 			.returning();
 
 		if (!updatedChannel) {
-			logger.error(
-				{ channel_id },
-				"Failed to update channel - no data returned",
-			);
+			log.error({ ...({ channel_id }), message: "Failed to update channel - no data returned" });
 			throw new Error("Failed to update channel");
 		}
 
-		logger.info({ channel_id }, "Channel updated successfully");
+		log.info({ ...({ channel_id }), message: "Channel updated successfully" });
 
 		const result = {
 			...updatedChannel,
@@ -102,7 +97,7 @@ export const updateChannelController = async ({
 
 		return result;
 	} catch (error) {
-		logger.error({ channel_id, error }, "Debug updating channel");
+		log.error({ ...({ channel_id, error }), message: "Debug updating channel" });
 		throw error;
 	}
 };

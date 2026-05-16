@@ -1,3 +1,4 @@
+import { log } from "evlog";
 import { signTrackingUrl } from "@reloop/be-mailing/lib/crypto";
 import { mailConfig } from "@reloop/be-mailing/mail.config";
 import { db } from "@reloop/db/client";
@@ -20,11 +21,11 @@ export async function handleOpenTracking({
 	const logger = useLogger();
 	const expectedSig = signTrackingUrl(emailLogId, mailConfig.TRACKING_SECRET);
 	if (sig !== expectedSig) {
-		logger.warn("Open tracking rejected: Invalid signature", {
+		log.warn({ ...({
 			emailLogId,
 			sig,
 			expectedSig,
-		});
+		}), message: "Open tracking rejected: Invalid signature" });
 		return new Response(TRANSPARENT_PIXEL, {
 			headers: {
 				"Content-Type": "image/png",
@@ -44,15 +45,15 @@ export async function handleOpenTracking({
 					userAgent: "unknown",
 				},
 			});
-			logger.info("Email open tracked", { emailLogId });
+			log.info({ ...({ emailLogId }), message: "Email open tracked" });
 		} else {
-			logger.warn("Open tracking failed: Email log not found", { emailLogId });
+			log.warn({ ...({ emailLogId }), message: "Open tracking failed: Email log not found" });
 		}
 	} catch (error) {
-		logger.error("Failed to track email open", {
+		log.error({ ...({
 			error: error instanceof Error ? error.message : "Unknown error",
 			emailLogId,
-		});
+		}), message: "Failed to track email open" });
 	}
 
 	return new Response(TRANSPARENT_PIXEL, {

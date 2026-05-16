@@ -1,3 +1,4 @@
+import { log } from "evlog";
 import type { DomainTypes } from "@be/domain/types/domain.type";
 import { useLogger } from "evlog/elysia";
 import {
@@ -84,7 +85,7 @@ export async function createDomainController({
 			domain,
 		});
 	} catch (error) {
-		logger.error("Error creating domain", { domain, error });
+		log.error({ ...({ domain, error }), message: "Error creating domain" });
 		throw error;
 	}
 }

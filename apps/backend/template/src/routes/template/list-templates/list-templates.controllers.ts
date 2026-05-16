@@ -1,6 +1,7 @@
+import { log } from "evlog";
 import { templateModel } from "@be/template/model/template.model";
 import { templateConfig } from "@be/template/template.config";
-import { logger } from "@reloop/logger";
+
 
 export async function listTemplates(params: {
 	organizationId: string;
@@ -25,8 +26,7 @@ export async function listTemplates(params: {
 
 		return result;
 	} catch (error) {
-		logger.error(
-			{
+		log.error({
 				organizationId,
 				error: error instanceof Error ? error.message : String(error),
 			},

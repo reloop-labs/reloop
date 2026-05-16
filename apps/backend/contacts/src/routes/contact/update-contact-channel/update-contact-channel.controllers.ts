@@ -1,8 +1,9 @@
+import { log } from "evlog";
 import type { ContactModel } from "@be/contacts/model/contact.model";
 import { createLog } from "@be/contacts/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import type { Logger } from "@reloop/logger";
+
 import { CONTACT_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 
@@ -19,7 +20,7 @@ export async function updateContactChannelController({
 	organizationId: string;
 	channelId: string;
 	body: ContactModel.UpdateContactChannelBody;
-	logger: Logger;
+	logger?: any;
 	cookie?: string;
 	requestDetails?: {
 		endpoint?: string;
@@ -37,8 +38,7 @@ export async function updateContactChannelController({
 		});
 	}
 
-	logger.info(
-		{
+	log.info({
 			contactId: contact_id,
 			email: email?.toLowerCase(),
 			channelId,
@@ -70,7 +70,7 @@ export async function updateContactChannelController({
 		}
 
 		if (!contact) {
-			logger.info({ contact_id, email }, "Contact not found");
+			log.info({ ...({ contact_id, email }), message: "Contact not found" });
 			throw status(404, { message: "Contact not found" });
 		}
 
@@ -78,10 +78,7 @@ export async function updateContactChannelController({
 			subscription === "opt_out" ? "unenrolled" : "enrolled"
 		) as "enrolled" | "unenrolled";
 
-		logger.info(
-			{ contactId: contact.id, channelId },
-			"Checking existing channel enrollment",
-		);
+		log.info({ ...({ contactId: contact.id, channelId }), message: "Checking existing channel enrollment" });
 		const existing = await db.query.channelSubscription.findFirst({
 			where: and(
 				eq(schema.channelSubscription.contactId, contact.id),
@@ -98,10 +95,7 @@ export async function updateContactChannelController({
 					.set({ status: targetStatus, updatedAt: new Date() })
 					.where(eq(schema.channelSubscription.id, existing.id));
 
-				logger.info(
-					{ subscriptionId: existing.id, status: targetStatus },
-					"Updated contact subscription status",
-				);
+				log.info({ ...({ subscriptionId: existing.id, status: targetStatus }), message: "Updated contact subscription status" });
 			}
 		} else {
 			await db.insert(schema.channelSubscription).values({
@@ -111,10 +105,7 @@ export async function updateContactChannelController({
 				status: targetStatus,
 			});
 
-			logger.info(
-				{ contactId: contact.id, channelId, status: targetStatus },
-				"Created new contact subscription",
-			);
+			log.info({ ...({ contactId: contact.id, channelId, status: targetStatus }), message: "Created new contact subscription" });
 		}
 
 		const result = {
@@ -132,8 +123,7 @@ export async function updateContactChannelController({
 
 		return result;
 	} catch (error) {
-		logger.error(
-			{
+		log.error({
 				contactId: contact_id,
 				email: email?.toLowerCase(),
 				channelId,

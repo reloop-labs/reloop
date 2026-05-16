@@ -1,6 +1,7 @@
+import { log } from "evlog";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { logger } from "@reloop/logger";
+
 import type { LogsModel } from "@reloop/logs/model/logs.model";
 import { and, count, desc, eq, ilike, or, type SQL } from "drizzle-orm";
 
@@ -64,8 +65,7 @@ export async function listEmailLogsController({
 			limit,
 		};
 	} catch (error) {
-		logger.error(
-			{
+		log.error({
 				query,
 				error: error instanceof Error ? error.message : String(error),
 			},

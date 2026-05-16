@@ -1,3 +1,4 @@
+import { log } from "evlog";
 import { createId } from "@paralleldrive/cuid2";
 import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
 import { createLog } from "@reloop/api-key/utils/logger";
@@ -9,7 +10,7 @@ import {
 } from "@reloop/apikey";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import type { Logger } from "@reloop/logger";
+
 import { API_KEY_CREATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { status } from "elysia";
 
@@ -24,7 +25,7 @@ export async function createApiKeyController({
 	organizationId: string;
 	userId: string;
 	body: ApiKeyTypes.CreateApiKeyRequest;
-	logger: Logger;
+	logger?: any;
 	cookie?: string;
 	requestDetails?: {
 		endpoint?: string;
@@ -35,12 +36,12 @@ export async function createApiKeyController({
 	};
 }): Promise<ApiKeyTypes.ApiKeyWithKeyResponse> {
 	try {
-		logger.info({}, "Generating new api key");
+		log.info({ ...({}), message: "Generating new api key" });
 		const fullKey = generateApiKey();
 		const hashedKey = hashApiKey(fullKey);
 		const keyStart = getKeyStart(fullKey);
 		const keyId = createId();
-		logger.info({ hashedKey, keyStart, keyId }, "APi key Generated");
+		log.info({ ...({ hashedKey, keyStart, keyId }), message: "APi key Generated" });
 
 		const now = new Date();
 		const expiresAt = null;
@@ -50,10 +51,7 @@ export async function createApiKeyController({
 		const rateLimitMax = 100;
 		const remaining = rateLimitMax;
 
-		logger.info(
-			{ hashedKey, keyStart, keyId },
-			"Inserting API key in database",
-		);
+		log.info({ ...({ hashedKey, keyStart, keyId }), message: "Inserting API key in database" });
 		const newApiKey = await db
 			.insert(schema.apikey)
 			.values({
@@ -83,10 +81,10 @@ export async function createApiKeyController({
 			.returning();
 
 		if (!newApiKey[0]) {
-			logger.error({}, "Failed to create API key");
+			log.error({ ...({}), message: "Failed to create API key" });
 			throw status(500, { message: "Failed to create API key" });
 		}
-		logger.info("New Api key generated", { newApiKey });
+		log.info({ ...({ newApiKey }), message: "New Api key generated" });
 
 		const result = {
 			id: newApiKey[0].id,
@@ -109,7 +107,7 @@ export async function createApiKeyController({
 
 		return result;
 	} catch (error) {
-		logger.error({ error }, "Error creating API key");
+		log.error({ ...({ error }), message: "Error creating API key" });
 		throw error;
 	}
 }

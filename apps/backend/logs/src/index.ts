@@ -1,7 +1,8 @@
+import { log } from "evlog";
 import "dotenv/config";
 import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
-import { logger } from "@reloop/logger";
+
 import { logsConfig } from "@reloop/logs/logs.config";
 import { loader } from "@reloop/logs/utils/loader";
 import { Elysia } from "elysia";
@@ -41,7 +42,7 @@ const logsService = new Elysia({
 		await loader();
 	})
 	.listen(port, () => {
-		logger.info(`Logs Server is running on ${logsConfig.BASE_URL}/api/logs`);
+		log.info("server", `Logs Server is running on ${logsConfig.BASE_URL}/api/logs`);
 	});
 
 export type LogsService = typeof logsService;

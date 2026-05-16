@@ -1,7 +1,8 @@
+import { log } from "evlog";
 import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import type { Logger } from "@reloop/logger";
+
 import { API_KEY_GET_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq } from "drizzle-orm";
 import { status } from "elysia";
@@ -13,9 +14,9 @@ export async function getApiKeyController({
 }: {
 	apiKeyId: string;
 	organizationId: string;
-	logger: Logger;
+	logger?: any;
 }): Promise<ApiKeyTypes.ApiKeyResponse> {
-	logger.info({ apiKeyId }, "Getting API key");
+	log.info({ ...({ apiKeyId }), message: "Getting API key" });
 	try {
 		const result = await db.query.apikey.findFirst({
 			where: and(
@@ -26,12 +27,12 @@ export async function getApiKeyController({
 		});
 
 		if (!result) {
-			logger.warn({ apiKeyId }, "API key not found");
+			log.warn({ ...({ apiKeyId }), message: "API key not found" });
 			throw status(404, { message: "API key not found" });
 		}
 
 		const { user, ...apiKeyData } = result;
-		logger.info({ apiKeyId }, "API key retrieved successfully");
+		log.info({ ...({ apiKeyId }), message: "API key retrieved successfully" });
 		return {
 			id: apiKeyData.id,
 			name: apiKeyData.name,
@@ -64,7 +65,7 @@ export async function getApiKeyController({
 			event: API_KEY_GET_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
-		logger.error({ apiKeyId, error }, "Error getting API key");
+		log.error({ ...({ apiKeyId, error }), message: "Error getting API key" });
 		throw error;
 	}
 }

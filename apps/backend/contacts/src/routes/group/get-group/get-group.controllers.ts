@@ -1,8 +1,9 @@
+import { log } from "evlog";
 import type { GroupModel } from "@be/contacts/model/group.model";
 import type { GroupResponse } from "@be/contacts/types/group.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import type { Logger } from "@reloop/logger";
+
 import { GROUP_GET_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 
@@ -13,11 +14,11 @@ export const getGroupController = async ({
 }: {
 	activeOrganizationId: string;
 	group_id: string;
-	logger: Logger;
+	logger?: any;
 }): Promise<
 	GroupResponse | GroupModel.GroupNotFound | GroupModel.Unauthorized
 > => {
-	logger.info({ group_id }, "Getting group");
+	log.info({ ...({ group_id }), message: "Getting group" });
 	try {
 		const group = await db.query.group.findFirst({
 			where: and(
@@ -27,17 +28,17 @@ export const getGroupController = async ({
 			),
 		});
 		if (!group) {
-			logger.warn({ group_id }, "Group not found");
+			log.warn({ ...({ group_id }), message: "Group not found" });
 			return { message: "Group not found" };
 		}
-		logger.info({ group_id }, "Group retrieved successfully");
+		log.info({ ...({ group_id }), message: "Group retrieved successfully" });
 		return {
 			...group,
 			object: "contact_group",
 			event: GROUP_GET_WEBHOOK_EVENT.id,
 		} as GroupResponse;
 	} catch (error) {
-		logger.error({ group_id, error }, "Debug getting group");
+		log.error({ ...({ group_id, error }), message: "Debug getting group" });
 		throw error;
 	}
 };

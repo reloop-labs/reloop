@@ -1,3 +1,4 @@
+import { log } from "evlog";
 import { authMiddleware } from "@be/template/middleware/auth";
 import {
 	clientIdsMap,
@@ -7,7 +8,7 @@ import {
 	scheduleRoomCleanup,
 } from "@be/template/plugins/room";
 import type { YjsPersistence } from "@be/template/utils/persistence";
-import { logger } from "@reloop/logger";
+
 import { Elysia } from "elysia";
 import * as encoding from "lib0/encoding";
 import * as awarenessProtocol from "y-protocols/awareness";
@@ -40,10 +41,7 @@ export const collaborationRoute = new Elysia({
 					ws.raw.send(encoding.toUint8Array(encoder));
 				}
 
-				logger.info(
-					{ roomName, totalClients: room.clients.size },
-					"[collab] Client joined",
-				);
+				log.info({ ...({ roomName, totalClients: room.clients.size }), message: "[collab] Client joined" });
 			};
 
 			if (persistence) {
@@ -51,7 +49,7 @@ export const collaborationRoute = new Elysia({
 					.bindState(roomName, room.doc)
 					.then(init)
 					.catch((err) => {
-						logger.error({ error: err, roomName }, "[collab] bindState failed");
+						log.error({ ...({ error: err, roomName }), message: "[collab] bindState failed" });
 						init(); // still connect the client, just without persisted state
 					});
 			} else {
@@ -86,10 +84,7 @@ export const collaborationRoute = new Elysia({
 				);
 			}
 
-			logger.info(
-				{ roomName, remainingClients: room.clients.size },
-				"[collab] Client left",
-			);
+			log.info({ ...({ roomName, remainingClients: room.clients.size }), message: "[collab] Client left" });
 
 			if (room.clients.size === 0) {
 				scheduleRoomCleanup(roomName);

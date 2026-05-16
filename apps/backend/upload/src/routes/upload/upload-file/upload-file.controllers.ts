@@ -1,10 +1,11 @@
+import { log } from "evlog";
 import { storage } from "@be/upload/lib/storage";
 import type { UploadTypes } from "@be/upload/types/upload.type";
 import { uploadConfig } from "@be/upload/upload.config";
 import { createId } from "@paralleldrive/cuid2";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import logger from "@reloop/logger";
+
 import { status } from "elysia";
 
 function sanitizeFilename(filename: string): string {
@@ -35,16 +36,13 @@ export async function uploadFile(params: {
 	try {
 		// Validate file type
 		if (!uploadConfig.constants.allowedMimeTypes.includes(file.type)) {
-			logger.warn(
-				{ mimeType: file.type, fileName: file.name },
-				"Invalid file type",
-			);
+			log.warn({ ...({ mimeType: file.type, fileName: file.name }), message: "Invalid file type" });
 			throw new Error("Invalid file type. Only images are allowed");
 		}
 
 		// Validate file size
 		if (file.size > uploadConfig.constants.maxFileSize) {
-			logger.warn({ size: file.size, fileName: file.name }, "File too large");
+			log.warn({ ...({ size: file.size, fileName: file.name }), message: "File too large" });
 			throw new Error("File size exceeds maximum allowed size");
 		}
 
@@ -80,23 +78,17 @@ export async function uploadFile(params: {
 			.returning();
 
 		if (!newUpload[0]) {
-			logger.error(
-				{ fileName: file.name },
-				"Failed to create upload record - no data returned",
-			);
+			log.error({ ...({ fileName: file.name }), message: "Failed to create upload record - no data returned" });
 			throw new Error("Failed to save upload metadata");
 		}
 
 		const fileUrl = `${uploadConfig.S3.ENDPOINT}/${uploadConfig.S3.BUCKET}/${filePath}`;
 
-		logger.info(
-			{
+		log.info({ ...({
 				id: newUpload[0].id,
 				filename: filename,
 				userId,
-			},
-			"File uploaded successfully",
-		);
+			}), message: "File uploaded successfully" });
 
 		return {
 			id: newUpload[0].id,
@@ -111,8 +103,7 @@ export async function uploadFile(params: {
 			updatedAt: newUpload[0].updatedAt.toISOString(),
 		};
 	} catch (error) {
-		logger.error(
-			{
+		log.error({
 				fileName: file.name,
 				userId,
 				error: error instanceof Error ? error.message : String(error),

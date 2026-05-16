@@ -36,7 +36,7 @@
 		"@reloop/cache": "workspace:*",
 		"@reloop/apikey": "workspace:*",
 		"@reloop/bus": "workspace:*",
-		"@reloop/logger": "workspace:*"
+		"evlog": "catalog:backend"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",

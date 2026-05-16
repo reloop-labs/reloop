@@ -1,6 +1,7 @@
+import { log } from "evlog";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { logger } from "@reloop/logger";
+
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 import type { WebhookTypes } from "../webhook.type";
@@ -12,7 +13,7 @@ export async function deleteWebhookController({
 	webhookId: string;
 	organizationId: string;
 }): Promise<WebhookTypes.DeleteWebhookResponse> {
-	logger.info({ webhookId, organizationId }, "Deleting webhook");
+	log.info({ ...({ webhookId, organizationId }), message: "Deleting webhook" });
 
 	try {
 		const existingWebhook = await db.query.webhook.findFirst({
@@ -46,10 +47,7 @@ export async function deleteWebhookController({
 			message: "Webhook deleted successfully",
 		};
 	} catch (error) {
-		logger.error(
-			{ webhookId, organizationId, error },
-			"Error deleting webhook",
-		);
+		log.error({ ...({ webhookId, organizationId, error }), message: "Error deleting webhook" });
 		throw error;
 	}
 }

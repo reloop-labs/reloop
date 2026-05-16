@@ -1,3 +1,4 @@
+import { log } from "evlog";
 import { signTrackingUrl } from "@reloop/be-mailing/lib/crypto";
 import { MailErrors } from "@reloop/be-mailing/lib/errors";
 import { mailConfig } from "@reloop/be-mailing/mail.config";
@@ -24,12 +25,12 @@ export async function handleClickTracking({
 	// Verify signature to prevent Open Redirect
 	const expectedSig = signTrackingUrl(url, mailConfig.TRACKING_SECRET);
 	if (sig !== expectedSig) {
-		logger.warn("Click tracking rejected: Invalid signature", {
+		log.warn({ ...({
 			emailLogId,
 			url,
 			sig,
 			expectedSig,
-		});
+		}), message: "Click tracking rejected: Invalid signature" });
 		throw MailErrors.invalidTrackingSignature();
 	}
 
@@ -46,12 +47,12 @@ export async function handleClickTracking({
 					url,
 				},
 			});
-			logger.info("Email click tracked", { emailLogId, url });
+			log.info({ ...({ emailLogId, url }), message: "Email click tracked" });
 		} else {
-			logger.warn("Click tracking failed: Email log not found", {
+			log.warn({ ...({
 				emailLogId,
 				url,
-			});
+			}), message: "Click tracking failed: Email log not found" });
 		}
 	} catch (error) {
 		// Re-throw if it's already a structured error
@@ -59,11 +60,11 @@ export async function handleClickTracking({
 			throw error;
 		}
 
-		logger.error("Failed to track email click", {
+		log.error({ ...({
 			error: error instanceof Error ? error.message : "Unknown error",
 			emailLogId,
 			url,
-		});
+		}), message: "Failed to track email click" });
 	}
 
 	return Response.redirect(url, 302);

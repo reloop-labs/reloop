@@ -20,7 +20,6 @@
 	"devDependencies": {
 		"@reloop/cache": "workspace:*",
 		"@reloop/tsconfig": "workspace:*",
-		"@reloop/logger": "workspace:*",
 		"@types/node": "catalog:",
 		"typescript": "catalog:"
 	}

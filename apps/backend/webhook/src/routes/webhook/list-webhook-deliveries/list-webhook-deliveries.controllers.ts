@@ -1,6 +1,7 @@
+import { log } from "evlog";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { logger } from "@reloop/logger";
+
 import { and, count, desc, eq } from "drizzle-orm";
 import type { WebhookTypes } from "../webhook.type";
 
@@ -16,10 +17,7 @@ export async function listWebhookDeliveriesController({
 	const { page = 1, limit = 10, status } = query;
 	const offset = (page - 1) * limit;
 
-	logger.info(
-		{ webhookId, organizationId, page, limit, status },
-		"Listing webhook deliveries",
-	);
+	log.info({ ...({ webhookId, organizationId, page, limit, status }), message: "Listing webhook deliveries" });
 
 	try {
 		// 1. Verify webhook belongs to organization
@@ -32,10 +30,7 @@ export async function listWebhookDeliveriesController({
 		});
 
 		if (!webhook) {
-			logger.error(
-				{ webhookId, organizationId },
-				"Webhook not found or unauthorized",
-			);
+			log.error({ ...({ webhookId, organizationId }), message: "Webhook not found or unauthorized" });
 			throw new Error("Webhook not found");
 		}
 
@@ -90,10 +85,7 @@ export async function listWebhookDeliveriesController({
 			limit,
 		};
 	} catch (error) {
-		logger.error(
-			{ webhookId, organizationId, error },
-			"Error listing webhook deliveries",
-		);
+		log.error({ ...({ webhookId, organizationId, error }), message: "Error listing webhook deliveries" });
 		throw error;
 	}
 }

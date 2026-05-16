@@ -1,8 +1,9 @@
+import { log } from "evlog";
 import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
 import { createLog } from "@reloop/api-key/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import type { Logger } from "@reloop/logger";
+
 import { API_KEY_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq } from "drizzle-orm";
 import { status } from "elysia";
@@ -16,7 +17,7 @@ export async function enableApiKeyController({
 }: {
 	id: string;
 	organizationId: string;
-	logger: Logger;
+	logger?: any;
 	cookie?: string;
 	requestDetails?: {
 		endpoint?: string;
@@ -27,7 +28,7 @@ export async function enableApiKeyController({
 	};
 }): Promise<ApiKeyTypes.ApiKeyResponse> {
 	try {
-		logger.info({ id, organizationId }, "Search for api key");
+		log.info({ ...({ id, organizationId }), message: "Search for api key" });
 		const existingKey = await db.query.apikey.findFirst({
 			where: and(
 				eq(schema.apikey.id, id),
@@ -39,18 +40,18 @@ export async function enableApiKeyController({
 		});
 
 		if (!existingKey) {
-			logger.warn({ id }, "API key not found");
+			log.warn({ ...({ id }), message: "API key not found" });
 			throw status(404, { message: "API key not found" });
 		}
 
 		let updatedKeyData: typeof schema.apikey.$inferSelect;
 
 		if (existingKey.enabled) {
-			logger.info({ id }, "API key is already enabled");
+			log.info({ ...({ id }), message: "API key is already enabled" });
 			updatedKeyData = existingKey;
 		} else {
 			const now = new Date();
-			logger.info({ id, now }, "Updating API key");
+			log.info({ ...({ id, now }), message: "Updating API key" });
 			const [updatedKey] = await db
 				.update(schema.apikey)
 				.set({
@@ -61,13 +62,13 @@ export async function enableApiKeyController({
 				.returning();
 
 			if (!updatedKey) {
-				logger.error({ id }, "Failed to enable API key");
+				log.error({ ...({ id }), message: "Failed to enable API key" });
 				throw status(500, { message: "Failed to enable API key" });
 			}
 			updatedKeyData = updatedKey;
 		}
 
-		logger.info({ id }, "API key enabled successfully");
+		log.info({ ...({ id }), message: "API key enabled successfully" });
 
 		const result = {
 			id: updatedKeyData.id,
@@ -110,7 +111,7 @@ export async function enableApiKeyController({
 
 		return result;
 	} catch (error) {
-		logger.error({ id, error }, "Error enabling API key");
+		log.error({ ...({ id, error }), message: "Error enabling API key" });
 		throw error;
 	}
 }

@@ -1,3 +1,4 @@
+import { log } from "evlog";
 import { resolveNs } from "node:dns/promises";
 import { DomainErrors } from "@be/domain/lib/errors";
 import type { DNSTypes } from "@be/domain/types/dns.type";
@@ -57,10 +58,10 @@ export async function getDomainDNSController({
 				}
 			}
 		} catch (error) {
-			logger.warn("Unable to resolve nameservers for domain", {
+			log.warn({ ...({
 				domainId,
 				domain: foundDomain.domain,
-				error: error instanceof Error ? error.message : String(error),
+				error: error instanceof Error ? error.message : String(error), message: "Unable to resolve nameservers for domain" }),
 			});
 		}
 
@@ -73,7 +74,7 @@ export async function getDomainDNSController({
 			event: DOMAIN_GET_DNS_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
-		logger.error("Error getting domain nameservers", { domainId, error });
+		log.error({ ...({ domainId, error }), message: "Error getting domain nameservers" });
 		throw error;
 	}
 }

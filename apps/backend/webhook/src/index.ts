@@ -1,7 +1,8 @@
+import { log } from "evlog";
 import "dotenv/config";
 import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
-import { logger } from "@reloop/logger";
+
 import { landing } from "@reloop/webhook/routes/landing/landing.index";
 import { webhookRoutes } from "@reloop/webhook/routes/webhook/webhook.routes";
 import { loader } from "@reloop/webhook/utils/loader";
@@ -40,9 +41,7 @@ const webhookService = new Elysia({
 		await loader();
 	})
 	.listen(port, () => {
-		logger.info(
-			`Webhook Server is running on http://localhost:${port}/api/webhook`,
-		);
+		log.info("server", `Webhook Server is running on http://localhost:${port}/api/webhook`);
 	});
 
 export type WebhookService = typeof webhookService;

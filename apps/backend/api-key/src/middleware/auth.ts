@@ -1,4 +1,5 @@
-import { logger } from "@reloop/logger";
+
+import { log } from "evlog";
 import { Elysia } from "elysia";
 import { useLogger } from "evlog/elysia";
 import { validateApiKey } from "./api-key-auth";
@@ -23,13 +24,10 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 				}
 				return status(401, { message: "Authentication required" });
 			} catch (e) {
-				logger.error(
-					{
+				log.error({ ...({
 						error: e instanceof Error ? e.message : "Unknown error",
 						stack: e instanceof Error ? e.stack : undefined,
-					},
-					"Authentication error",
-				);
+					}), message: "Authentication error" });
 				return status(401, { message: "Authentication failed" });
 			}
 		},
@@ -47,13 +45,10 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 				}
 				return status(401, { message: "Authentication required" });
 			} catch (e) {
-				logger.error(
-					{
+				log.error({ ...({
 						error: e instanceof Error ? e.message : "Unknown error",
 						stack: e instanceof Error ? e.stack : undefined,
-					},
-					"Authentication error",
-				);
+					}), message: "Authentication error" });
 				return status(401, { message: "Authentication failed" });
 			}
 		},
@@ -69,42 +64,33 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 					headers.get("authorization")?.replace("Bearer ", "");
 				const cookie = headers.get("cookie");
 				const traceId = crypto.randomUUID();
-				const currentLogger = logger.child({ traceId });
+				const reqLog = useLogger();
 				const apiKeyResult = await validateApiKey(apiKey);
 				if (apiKeyResult) {
-					const tenantLogger = currentLogger.child({
+					reqLog.set({
 						traceId,
 						service: "api-key",
-						...currentLogger,
+						user: apiKeyResult
 					});
-					tenantLogger.info(
-						{ ...apiKeyResult },
-						"API key authentication successful",
-					);
-					return { ...apiKeyResult, traceId, logger: tenantLogger };
+					reqLog.info("API key authentication successful");
+					return { ...apiKeyResult, traceId, logger: reqLog };
 				}
 				const sessionResult = await validateSession(cookie);
 				if (sessionResult) {
-					const tenantLogger = currentLogger.child({
+					reqLog.set({
 						traceId,
 						service: "api-key",
-						...currentLogger,
+						user: sessionResult
 					});
-					tenantLogger.info(
-						{ ...sessionResult },
-						"Session authentication successful",
-					);
-					return { ...sessionResult, traceId, logger: tenantLogger };
+					reqLog.info("Session authentication successful");
+					return { ...sessionResult, traceId, logger: reqLog };
 				}
 				return status(401, { message: "Authentication required" });
 			} catch (e) {
-				logger.error(
-					{
+				log.error({ ...({
 						error: e instanceof Error ? e.message : "Unknown error",
 						stack: e instanceof Error ? e.stack : undefined,
-					},
-					"Authentication error",
-				);
+					}), message: "Authentication error" });
 				return status(401, { message: "Authentication failed" });
 			}
 		},

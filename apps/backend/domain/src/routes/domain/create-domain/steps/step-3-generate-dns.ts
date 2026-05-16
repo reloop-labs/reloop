@@ -1,3 +1,4 @@
+import { log } from "evlog";
 import { domainConfig } from "@be/domain/domain.config";
 import {
 	generateAllDNSRecords,
@@ -15,7 +16,7 @@ export async function generateDnsRecords_step3({
 	customReturnPath?: string;
 }) {
 	const logger = useLogger();
-	logger.info("Generating DNS records", { domain });
+	log.info({ ...({ domain }), message: "Generating DNS records" });
 
 	const dnsRecords = await generateAllDNSRecords(domain);
 	const receivingMxRecord = generateReceivingMXRecord(

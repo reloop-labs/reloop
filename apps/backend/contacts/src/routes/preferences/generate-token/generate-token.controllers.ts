@@ -1,6 +1,7 @@
+import { log } from "evlog";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import type { Logger } from "@reloop/logger";
+
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 import { signToken } from "../token.utils";
@@ -16,7 +17,7 @@ export async function generatePreferenceTokenController({
 	organizationId: string;
 	contactId?: string;
 	email?: string;
-	logger: Logger;
+	logger?: any;
 }) {
 	if (!contactId && !email) {
 		throw status(400, {
@@ -24,7 +25,7 @@ export async function generatePreferenceTokenController({
 		});
 	}
 
-	logger.info({ contactId, email }, "Generating preference token");
+	log.info({ ...({ contactId, email }), message: "Generating preference token" });
 
 	let contact: typeof schema.contact.$inferSelect | undefined;
 
@@ -58,10 +59,7 @@ export async function generatePreferenceTokenController({
 	});
 	const url = `${BASE_URL}/preferences/${token}`;
 
-	logger.info(
-		{ contactId: contact.id },
-		"Preference token generated successfully",
-	);
+	log.info({ ...({ contactId: contact.id }), message: "Preference token generated successfully" });
 
 	return {
 		token,

@@ -1,7 +1,8 @@
+import { log } from "evlog";
 import { createLog } from "@reloop/api-key/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import type { Logger } from "@reloop/logger";
+
 import { API_KEY_DELETE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq } from "drizzle-orm";
 import { status } from "elysia";
@@ -9,13 +10,11 @@ import { status } from "elysia";
 export async function deleteApiKeyController({
 	apiKeyId,
 	organizationId,
-	logger,
 	cookie,
 	requestDetails,
 }: {
 	apiKeyId: string;
 	organizationId: string;
-	logger: Logger;
 	cookie?: string;
 	requestDetails?: {
 		endpoint?: string;
@@ -25,7 +24,7 @@ export async function deleteApiKeyController({
 		statusCode?: number;
 	};
 }): Promise<{ id: string; message: string; object: "api_key"; event: string }> {
-	logger.info({ apiKeyId }, "Checking if api key exists");
+	log.info({ ...({ apiKeyId }), message: "Checking if api key exists" });
 	try {
 		const existing = await db.query.apikey.findFirst({
 			where: and(
@@ -35,11 +34,11 @@ export async function deleteApiKeyController({
 		});
 
 		if (!existing) {
-			logger.warn({ apiKeyId }, "API key not found");
+			log.warn({ ...({ apiKeyId }), message: "API key not found" });
 			throw status(404, { message: "API key not found" });
 		}
 
-		logger.info({ apiKeyId }, "Deleting API key");
+		log.info({ ...({ apiKeyId }), message: "Deleting API key" });
 		await db
 			.delete(schema.apikey)
 			.where(
@@ -49,7 +48,7 @@ export async function deleteApiKeyController({
 				),
 			);
 
-		logger.info({ apiKeyId }, "API key deleted successfully");
+		log.info({ ...({ apiKeyId }), message: "API key deleted successfully" });
 		const result = {
 			id: apiKeyId,
 			message: "API key deleted successfully",
@@ -66,13 +65,11 @@ export async function deleteApiKeyController({
 
 		return result;
 	} catch (error) {
-		logger.error(
-			{
-				apiKeyId,
-				error: error instanceof Error ? error.message : String(error),
-			},
-			"Error deleting API key",
-		);
+		log.error({
+			apiKeyId,
+			error: error instanceof Error ? error.message : String(error),
+			message: "Error deleting API key"
+		});
 		throw error;
 	}
 }

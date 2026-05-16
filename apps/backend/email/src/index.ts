@@ -1,9 +1,10 @@
+import { log } from "evlog";
 import "dotenv/config";
 import cors from "@elysiajs/cors";
 import { openapi } from "@elysiajs/openapi";
 import { landing } from "@reloop/email/routes/landing/landing.index";
 import { loader } from "@reloop/email/utils/loader";
-import { logger } from "@reloop/logger";
+
 import { Elysia } from "elysia";
 import { emailConfig } from "./email.config";
 
@@ -26,9 +27,7 @@ const app = new Elysia({ prefix: "/api/email", name: "Email Service" })
 		await loader();
 	})
 	.listen(port, () => {
-		logger.info(
-			`Email Server is running on http://localhost:${port}/api/email`,
-		);
+		log.info("server", `Email Server is running on http://localhost:${port}/api/email`);
 	});
 
 export type App = typeof app;

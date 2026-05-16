@@ -1,3 +1,4 @@
+import { log } from "evlog";
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import {
@@ -47,9 +48,9 @@ export async function checkDnsHealth_step3({
 			triggeredAt: new Date().toISOString(),
 		})
 		.catch((err) => {
-			logger.warn("Failed to publish DNS reverification event", {
+			log.warn({ ...({
 				domainId,
-				error: err instanceof Error ? err.message : String(err),
+				error: err instanceof Error ? err.message : String(err), message: "Failed to publish DNS reverification event" }),
 			});
 		});
 
@@ -87,7 +88,7 @@ export async function checkDnsHealth_step3({
 
 	const isHealthy = missingRecords.length === 0;
 	if (!isHealthy) {
-		logger.warn("Domain DNS health check failed", { domainId, missingRecords });
+		log.warn({ ...({ domainId, missingRecords }), message: "Domain DNS health check failed" });
 	}
 
 	return { isHealthy, missingRecords };

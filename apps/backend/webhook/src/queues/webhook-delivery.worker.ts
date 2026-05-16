@@ -1,7 +1,8 @@
+import { log } from "evlog";
 import { createHmac } from "node:crypto";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { logger } from "@reloop/logger";
+
 import { webhookConfig } from "@reloop/webhook/webhook.config";
 import { Worker } from "bullmq";
 import { eq, sql } from "drizzle-orm";
@@ -129,14 +130,11 @@ export function startWebhookDeliveryWorker(): Worker {
 	const worker = new Worker<WebhookDeliveryJobData>(
 		WEBHOOK_DELIVERY_QUEUE,
 		async (job) => {
-			logger.info(
-				{
+			log.info({ ...({
 					jobId: job.id,
 					deliveryId: job.data.deliveryId,
 					attempt: job.attemptsMade + 1,
-				},
-				"Processing webhook delivery job",
-			);
+				}), message: "Processing webhook delivery job" });
 			await dispatchWebhook(job.data);
 		},
 		{
@@ -146,15 +144,11 @@ export function startWebhookDeliveryWorker(): Worker {
 	);
 
 	worker.on("completed", (job) => {
-		logger.info(
-			{ jobId: job.id, deliveryId: job.data.deliveryId },
-			"Webhook delivery job completed",
-		);
+		log.info({ ...({ jobId: job.id, deliveryId: job.data.deliveryId }), message: "Webhook delivery job completed" });
 	});
 
 	worker.on("failed", (job, err) => {
-		logger.error(
-			{
+		log.error({
 				jobId: job?.id,
 				deliveryId: job?.data.deliveryId,
 				webhookId: job?.data.webhookId,
@@ -166,9 +160,9 @@ export function startWebhookDeliveryWorker(): Worker {
 	});
 
 	worker.on("error", (err) => {
-		logger.error({ error: err.message }, "Webhook delivery worker error");
+		log.error({ ...({ error: err.message }), message: "Webhook delivery worker error" });
 	});
 
-	logger.info("Webhook delivery worker started");
+	log.info("server", "Webhook delivery worker started");
 	return worker;
 }

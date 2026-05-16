@@ -1,7 +1,8 @@
+import { log } from "evlog";
 import { createLog } from "@be/contacts/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import type { Logger } from "@reloop/logger";
+
 import { CHANNEL_DELETE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
@@ -15,7 +16,7 @@ export const deleteChannelController = async ({
 }: {
 	activeOrganizationId: string;
 	channel_id: string;
-	logger: Logger;
+	logger?: any;
 	cookie?: string;
 	requestDetails?: {
 		endpoint?: string;
@@ -31,7 +32,7 @@ export const deleteChannelController = async ({
 	name: string;
 	event: string;
 }> => {
-	logger.info({ channel_id }, "Deleting channel");
+	log.info({ ...({ channel_id }), message: "Deleting channel" });
 	try {
 		const channel = await db.query.channel.findFirst({
 			where: and(
@@ -42,7 +43,7 @@ export const deleteChannelController = async ({
 		});
 
 		if (!channel) {
-			logger.warn({ channel_id }, "Channel not found or already deleted");
+			log.warn({ ...({ channel_id }), message: "Channel not found or already deleted" });
 			throw status(404, { message: "Channel not found" });
 		}
 
@@ -69,7 +70,7 @@ export const deleteChannelController = async ({
 				),
 			);
 
-		logger.info({ channel_id }, "Channel deleted successfully");
+		log.info({ ...({ channel_id }), message: "Channel deleted successfully" });
 
 		const result = {
 			object: "channel" as const,
@@ -88,7 +89,7 @@ export const deleteChannelController = async ({
 
 		return result;
 	} catch (error) {
-		logger.error({ channel_id, error }, "Debug deleting channel");
+		log.error({ ...({ channel_id, error }), message: "Debug deleting channel" });
 		throw error;
 	}
 };

@@ -1,7 +1,8 @@
+import { log } from "evlog";
 import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import type { Logger } from "@reloop/logger";
+
 import { API_KEY_LIST_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, count, desc, eq, ilike, or } from "drizzle-orm";
 
@@ -12,11 +13,11 @@ export async function listApiKeysController({
 }: {
 	query: ApiKeyTypes.ApiKeyListQuery;
 	organizationId: string;
-	logger: Logger;
+	logger?: any;
 }): Promise<ApiKeyTypes.ApiKeyListResponse> {
 	const { page = 1, limit = 10, enabled, userId, q } = query;
 	const offset = (page - 1) * limit;
-	logger.info({ query }, "Getting API keys");
+	log.info({ ...({ query }), message: "Getting API keys" });
 	try {
 		const conditions = [eq(schema.apikey.organizationId, organizationId)];
 		if (enabled !== undefined)
@@ -33,13 +34,13 @@ export async function listApiKeysController({
 			}
 		}
 		const whereClause = and(...conditions);
-		logger.info({ whereClause }, "Getting Total Count");
+		log.info({ ...({ whereClause }), message: "Getting Total Count" });
 		const totalResult = await db
 			.select({ count: count() })
 			.from(schema.apikey)
 			.where(whereClause);
 		const total = totalResult[0]?.count || 0;
-		logger.info({ total }, "Total Count");
+		log.info({ ...({ total }), message: "Total Count" });
 		const result = await db.query.apikey.findMany({
 			where: whereClause,
 			orderBy: desc(schema.apikey.createdAt),
@@ -47,7 +48,7 @@ export async function listApiKeysController({
 			offset: offset,
 			with: { user: true },
 		});
-		logger.info({ result }, "API keys");
+		log.info({ ...({ result }), message: "API keys" });
 		return {
 			apiKeys: result.map((apiKey) => {
 				const { user, ...apiKeyData } = apiKey;
@@ -90,7 +91,7 @@ export async function listApiKeysController({
 			event: API_KEY_LIST_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
-		logger.error({ query, error }, "Error listing API keys");
+		log.error({ ...({ query, error }), message: "Error listing API keys" });
 		throw error;
 	}
 }
