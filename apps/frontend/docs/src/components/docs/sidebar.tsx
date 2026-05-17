@@ -132,23 +132,31 @@ export function Sidebar({
 		return () => window.removeEventListener("keydown", handleKeyDown);
 	}, []);
 
-	const currentEl = hoveredEl || activeEl;
-
-	// Calculate and sync position rect relative to nav parent container
+	// Find the active element by DOM query after each navigation
 	useLayoutEffect(() => {
-		if (currentEl && navRef.current) {
-			const elRect = currentEl.getBoundingClientRect();
+		if (!navRef.current) return;
+		const el = navRef.current.querySelector<HTMLElement>(
+			'[data-sidebar-active="true"]',
+		);
+		setActiveEl(el ?? null);
+	}, [pathname, filteredTree]);
+
+	// Compute rect from hovered element, falling back to active element
+	useLayoutEffect(() => {
+		const target = hoveredEl || activeEl;
+		if (target && navRef.current) {
+			const elRect = target.getBoundingClientRect();
 			const navRect = navRef.current.getBoundingClientRect();
 			setRect({
-				width: currentEl.offsetWidth,
-				height: currentEl.offsetHeight,
+				width: target.offsetWidth,
+				height: target.offsetHeight,
 				top: elRect.top - navRect.top + navRef.current.scrollTop,
 				left: elRect.left - navRect.left,
 			});
 		} else {
 			setRect(null);
 		}
-	}, [currentEl, pathname, tree]);
+	}, [hoveredEl, activeEl]);
 
 	return (
 		<aside
@@ -388,7 +396,7 @@ function SidebarFolder({
 	onLinkClick?: () => void;
 }) {
 	const ref = useRef<HTMLButtonElement>(null);
-	const { activeEl, setActiveEl, setHoveredEl, pathname } = useSidebarContext();
+	const { setHoveredEl, pathname } = useSidebarContext();
 
 	const isChildActive = (item: PageTreeItem): boolean => {
 		if (item.type === "page") return checkIsActive(item.url, pathname, false);
@@ -412,17 +420,6 @@ function SidebarFolder({
 		}
 	}, [isActive]);
 
-	useLayoutEffect(() => {
-		if (isDirectlyActive && ref.current) {
-			setActiveEl(ref.current);
-		}
-		return () => {
-			if (isDirectlyActive) {
-				setActiveEl(null);
-			}
-		};
-	}, [isDirectlyActive, setActiveEl]);
-
 	const handleToggle = () => {
 		setIsOpen((prev) => !prev);
 	};
@@ -438,10 +435,11 @@ function SidebarFolder({
 						setHoveredEl(ref.current);
 					}
 				}}
+				data-sidebar-active={isDirectlyActive || undefined}
 				className={cn(
 					"group relative z-10 flex h-9 w-full items-center justify-between rounded-lg px-2 font-medium text-sm transition-all",
 					isDirectlyActive
-						? "bg-neutral-alpha-10 text-fd-foreground"
+						? "text-fd-foreground"
 						: isParentActive
 							? "text-fd-foreground"
 							: "text-text-sub-600 hover:text-fd-foreground",
@@ -508,7 +506,7 @@ function SidebarLink({
 	onLinkClick?: () => void;
 }) {
 	const ref = useRef<HTMLAnchorElement>(null);
-	const { activeEl, setActiveEl, setHoveredEl, pathname } = useSidebarContext();
+	const { setHoveredEl, pathname } = useSidebarContext();
 
 	if (node.type === "separator") return null;
 	if (node.type === "folder") {
@@ -517,17 +515,6 @@ function SidebarLink({
 
 	const linkId = node.url;
 	const isActive = checkIsActive(linkId, pathname, false);
-
-	useLayoutEffect(() => {
-		if (isActive && ref.current) {
-			setActiveEl(ref.current);
-		}
-		return () => {
-			if (isActive) {
-				setActiveEl(null);
-			}
-		};
-	}, [isActive, setActiveEl]);
 
 	return (
 		<Link
@@ -539,10 +526,11 @@ function SidebarLink({
 					setHoveredEl(ref.current);
 				}
 			}}
+			data-sidebar-active={isActive || undefined}
 			className={cn(
 				"group relative z-10 flex h-8 items-center gap-2 rounded-lg px-2 font-medium text-sm transition-colors",
 				isActive
-					? "bg-neutral-alpha-10 text-fd-foreground"
+					? "text-fd-foreground"
 					: "text-text-sub-600 hover:text-fd-foreground",
 			)}
 		>
