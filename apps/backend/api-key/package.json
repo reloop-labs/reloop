@@ -1,11 +1,11 @@
 {
 	"name": "api-key",
-	"version": "1.0.0",
+	"version": "1.2.0",
 	"main": "src/index.ts",
 	"type": "module",
 	"scripts": {
 		"build": "tsdown",
-		"check-types": "tsc --noEmit",
+		"lint": "biome check .",
 		"format": "biome format .",
 		"compile": "bun build --compile --minify --sourcemap --bytecode ./src/index.ts --outfile server",
 		"dev": "bun run --hot src/index.ts",

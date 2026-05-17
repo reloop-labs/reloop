@@ -10,8 +10,6 @@
 		"outDir": "./dist",
 		"types": ["bun"],
 		"composite": false,
-		"jsx": "react-jsx",
-		"declaration": false,
 		"declarationMap": false,
 		"baseUrl": "."
 	}

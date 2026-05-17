@@ -21,8 +21,7 @@
 			"@reloop/ui": ["../../packages/ui/src/*"],
 			"@reloop/auth": ["../../packages/auth/src/*"],
 			"@reloop/webhook-events": ["../../packages/webhook-events/src/index.ts"],
-			"@reloop/webhook-events/*": ["../../packages/webhook-events/src/*"],
-			"@reloop/apikey": ["../../packages/apikey/src/index.ts"]
+			"@reloop/webhook-events/*": ["../../packages/webhook-events/src/*"]
 		}
 	}
 }
