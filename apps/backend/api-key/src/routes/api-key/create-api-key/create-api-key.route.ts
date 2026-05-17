@@ -10,7 +10,8 @@ export const createApiKeyRoute = new Elysia()
 	.use(rateLimitPlugin({ max: 10, windowSeconds: 60, namespace: "create" }))
 	.post(
 		"/",
-		async ({ body: { name }, organizationId, userId }) => {
+		async ({ body: { name }, organizationId, userId, set }) => {
+			set.status = 201;
 			return await createApiKeyController({
 				organizationId,
 				userId,

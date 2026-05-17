@@ -1,8 +1,8 @@
 import { afterEach, beforeAll, describe, expect, it } from "bun:test";
 import { treaty } from "@elysiajs/eden";
-import { dbState, resetDbState } from "./helpers/mock-modules";
-import { makeApiKeyWithUser, noAuth, withAuth } from "./helpers/fixtures";
 import { createApp } from "../src/app";
+import { makeApiKeyWithUser, noAuth, withAuth } from "./helpers/fixtures";
+import { dbState, resetDbState } from "./helpers/mock-modules";
 
 const app = createApp();
 const api = treaty(app);
@@ -12,13 +12,21 @@ describe("GET /v1/ — List API Keys", () => {
 	afterEach(() => resetDbState());
 
 	it("200 — returns paginated list with defaults", async () => {
-		dbState.findMany = [makeApiKeyWithUser(), makeApiKeyWithUser({ id: "api_key_other" })];
+		dbState.findMany = [
+			makeApiKeyWithUser(),
+			makeApiKeyWithUser({ id: "api_key_other" }),
+		];
 		dbState.selectCount = [{ count: 2 }];
 
 		const { data, status } = await api.v1.get(withAuth);
 
 		expect(status).toBe(200);
-		const res = data as { apiKeys: unknown[]; total: number; page: number; limit: number };
+		const res = data as {
+			apiKeys: unknown[];
+			total: number;
+			page: number;
+			limit: number;
+		};
 		expect(res.apiKeys).toHaveLength(2);
 		expect(res.total).toBe(2);
 		expect(res.page).toBe(1);
@@ -29,7 +37,10 @@ describe("GET /v1/ — List API Keys", () => {
 		dbState.findMany = [];
 		dbState.selectCount = [{ count: 0 }];
 
-		const { data, status } = await api.v1.get({ ...withAuth, query: { page: 2, limit: 5 } });
+		const { data, status } = await api.v1.get({
+			...withAuth,
+			query: { page: 2, limit: 5 },
+		});
 
 		expect(status).toBe(200);
 		const res = data as { page: number; limit: number };
@@ -41,17 +52,25 @@ describe("GET /v1/ — List API Keys", () => {
 		dbState.findMany = [makeApiKeyWithUser({ enabled: true })];
 		dbState.selectCount = [{ count: 1 }];
 
-		const { data, status } = await api.v1.get({ ...withAuth, query: { enabled: true } });
+		const { data, status } = await api.v1.get({
+			...withAuth,
+			query: { enabled: true },
+		});
 
 		expect(status).toBe(200);
-		expect((data as { apiKeys: Array<{ enabled: boolean }> }).apiKeys[0]?.enabled).toBe(true);
+		expect(
+			(data as { apiKeys: Array<{ enabled: boolean }> }).apiKeys[0]?.enabled,
+		).toBe(true);
 	});
 
 	it("200 — search query accepted", async () => {
 		dbState.findMany = [];
 		dbState.selectCount = [{ count: 0 }];
 
-		const { data, status } = await api.v1.get({ ...withAuth, query: { q: "production" } });
+		const { data, status } = await api.v1.get({
+			...withAuth,
+			query: { q: "production" },
+		});
 
 		expect(status).toBe(200);
 		expect((data as { total: number }).total).toBe(0);

@@ -1,6 +1,6 @@
-import { parseError } from "evlog";
-import { Elysia } from "elysia";
 import { apiKeyRoutes } from "@reloop/api-key/routes/api-key/api-key.routes";
+import { Elysia } from "elysia";
+import { parseError } from "evlog";
 
 export function createApp() {
 	return new Elysia()

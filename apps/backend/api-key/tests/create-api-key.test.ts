@@ -15,13 +15,12 @@ describe("POST /v1/ — Create API Key", () => {
 		const keyRow = makeApiKeyRow();
 		dbState.insert = [keyRow];
 
-		const { data, status, error } = await api.v1.post(
+		const { data, status } = await api.v1.post(
 			{ name: "My Production Key" },
 			withAuth,
 		);
 
-		if (status !== 201) console.log("DEBUG create 201 failure:", status, error);
-		expect(status).toBe(200);
+		expect(status).toBe(201);
 		expect(data).toMatchObject({
 			id: keyRow.id,
 			name: keyRow.name,

@@ -58,30 +58,52 @@ mock.module("@reloop/api-key/middleware/auth", () => {
 	};
 	const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 		auth: {
-			resolve({ request, status }: { request: Request; status: Function }) {
+			resolve({
+				request,
+				status,
+			}: {
+				request: Request;
+				status: (code: number, response?: unknown) => unknown;
+			}) {
 				const key =
 					request.headers.get("x-api-key") ??
 					request.headers.get("authorization")?.replace("Bearer ", "");
 				if (key !== "test-api-key")
-					return (status as Function)(401, {
-						message: "Authentication required",
-					});
+					return (status as (code: number, response?: unknown) => unknown)(
+						401,
+						{
+							message: "Authentication required",
+						},
+					);
 				return session;
 			},
 		},
 		apiKeyAuth: {
-			resolve({ request, status }: { request: Request; status: Function }) {
+			resolve({
+				request,
+				status,
+			}: {
+				request: Request;
+				status: (code: number, response?: unknown) => unknown;
+			}) {
 				const key = request.headers.get("x-api-key");
 				if (key !== "test-api-key")
-					return (status as Function)(401, {
-						message: "Authentication required",
-					});
+					return (status as (code: number, response?: unknown) => unknown)(
+						401,
+						{
+							message: "Authentication required",
+						},
+					);
 				return session;
 			},
 		},
 		cookieAuth: {
-			resolve({ status }: { status: Function }) {
-				return (status as Function)(401, {
+			resolve({
+				status,
+			}: {
+				status: (code: number, response?: unknown) => unknown;
+			}) {
+				return (status as (code: number, response?: unknown) => unknown)(401, {
 					message: "Authentication required",
 				});
 			},
@@ -108,7 +130,7 @@ mock.module("drizzle-orm", () => ({
 
 // ─── Bus ──────────────────────────────────────────────────────────────────────
 mock.module("@reloop/bus", () => ({
-	bus: { publish: async () => { } },
+	bus: { publish: async () => {} },
 	BusEvent: {
 		API_KEY_CREATED: "api_key.created",
 		API_KEY_UPDATED: "api_key.updated",
@@ -134,17 +156,17 @@ mock.module("@reloop/webhook-events", () => WEBHOOK_EVENTS);
 mock.module("@reloop/cache/redis-client", () => ({
 	RedisCache: class {
 		get = async () => null;
-		set = async () => { };
+		set = async () => {};
 		healthCheck = async () => true;
 	},
 }));
 mock.module("@reloop/api-key/utils/loader", () => ({
 	redis: {
 		get: async () => null,
-		set: async () => { },
-		healthCheck: async () => { },
+		set: async () => {},
+		healthCheck: async () => {},
 	},
-	loader: async () => { },
+	loader: async () => {},
 }));
 
 // ─── @reloop/apikey ───────────────────────────────────────────────────────────

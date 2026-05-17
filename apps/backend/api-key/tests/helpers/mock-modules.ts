@@ -14,10 +14,14 @@ type DbState = {
  */
 export const dbState: DbState = new Proxy({} as DbState, {
 	get(_t, key) {
-		return ((globalThis as Record<string, unknown>).__testDbState as DbState)[key as keyof DbState];
+		return ((globalThis as Record<string, unknown>).__testDbState as DbState)[
+			key as keyof DbState
+		];
 	},
 	set(_t, key, value) {
-		((globalThis as Record<string, unknown>).__testDbState as DbState)[key as keyof DbState] = value;
+		((globalThis as Record<string, unknown>).__testDbState as DbState)[
+			key as keyof DbState
+		] = value;
 		return true;
 	},
 });
@@ -36,10 +40,13 @@ export function resetDbState() {
 export const MOCK_FULL_KEY = "rl_live_newkey_abc123def456ghi";
 
 export function buildMockDb() {
-	const g = () => (globalThis as Record<string, unknown>).__testDbState as DbState;
+	const g = () =>
+		(globalThis as Record<string, unknown>).__testDbState as DbState;
 	return {
 		insert: () => ({ values: () => ({ returning: async () => g().insert }) }),
-		update: () => ({ set: () => ({ where: () => ({ returning: async () => g().update }) }) }),
+		update: () => ({
+			set: () => ({ where: () => ({ returning: async () => g().update }) }),
+		}),
 		delete: () => ({ where: () => ({ returning: async () => g().deleteRow }) }),
 		select: () => ({ from: () => ({ where: async () => g().selectCount }) }),
 		query: {
@@ -53,7 +60,12 @@ export function buildMockDb() {
 }
 
 export function buildMockEvlog() {
-	const logger = { info: () => {}, error: () => {}, warn: () => {}, set: () => {} };
+	const logger = {
+		info: () => {},
+		error: () => {},
+		warn: () => {},
+		set: () => {},
+	};
 	return {
 		log: logger,
 		initLogger: () => {},
@@ -68,7 +80,12 @@ export function buildMockEvlog() {
 				link: "",
 			};
 		},
-		createError: (opts: { status: number; message: string; why?: string; fix?: string }) => {
+		createError: (opts: {
+			status: number;
+			message: string;
+			why?: string;
+			fix?: string;
+		}) => {
 			const err = new Error(opts.message) as Error & Record<string, unknown>;
 			err.status = opts.status;
 			err.why = opts.why ?? "";

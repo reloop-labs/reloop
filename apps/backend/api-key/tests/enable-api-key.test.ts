@@ -23,7 +23,7 @@ describe("POST /v1/enable/:api_key_id — Enable API Key", () => {
 
 		const { data, status } = await api.v1
 			.enable({ api_key_id: TEST_KEY_ID })
-			.post(undefined, withAuth);
+			.post({}, withAuth);
 
 		expect(status).toBe(200);
 		expect((data as { enabled: boolean }).enabled).toBe(true);
@@ -35,7 +35,7 @@ describe("POST /v1/enable/:api_key_id — Enable API Key", () => {
 
 		const { data, status } = await api.v1
 			.enable({ api_key_id: TEST_KEY_ID })
-			.post(undefined, withAuth);
+			.post({}, withAuth);
 
 		expect(status).toBe(200);
 		expect((data as { enabled: boolean }).enabled).toBe(true);
@@ -46,14 +46,14 @@ describe("POST /v1/enable/:api_key_id — Enable API Key", () => {
 		dbState.findFirst = undefined;
 		const { status } = await api.v1
 			.enable({ api_key_id: "bad_id" })
-			.post(undefined, withAuth);
+			.post({}, withAuth);
 		expect(status).toBe(404);
 	});
 
 	it("401 — no auth header", async () => {
 		const { status } = await api.v1
 			.enable({ api_key_id: TEST_KEY_ID })
-			.post(undefined, noAuth);
+			.post({}, noAuth);
 		expect(status).toBe(401);
 	});
 });

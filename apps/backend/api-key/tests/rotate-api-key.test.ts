@@ -23,7 +23,7 @@ describe("POST /v1/rotate/:api_key_id — Rotate API Key", () => {
 
 		const { data, status } = await api.v1
 			.rotate({ api_key_id: TEST_KEY_ID })
-			.post(undefined, withAuth);
+			.post({}, withAuth);
 
 		expect(status).toBe(200);
 		const res = data as { id: string; key: string };
@@ -38,7 +38,7 @@ describe("POST /v1/rotate/:api_key_id — Rotate API Key", () => {
 
 		const { data } = await api.v1
 			.rotate({ api_key_id: TEST_KEY_ID })
-			.post(undefined, withAuth);
+			.post({}, withAuth);
 
 		expect((data as { key: string }).key).toBe(MOCK_FULL_KEY);
 	});
@@ -47,14 +47,14 @@ describe("POST /v1/rotate/:api_key_id — Rotate API Key", () => {
 		dbState.findFirst = undefined;
 		const { status } = await api.v1
 			.rotate({ api_key_id: "bad_id" })
-			.post(undefined, withAuth);
+			.post({}, withAuth);
 		expect(status).toBe(404);
 	});
 
 	it("401 — no auth header", async () => {
 		const { status } = await api.v1
 			.rotate({ api_key_id: TEST_KEY_ID })
-			.post(undefined, noAuth);
+			.post({}, noAuth);
 		expect(status).toBe(401);
 	});
 });
