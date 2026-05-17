@@ -1,6 +1,91 @@
 ---
 title: Docs
-description: Introduction
+description: Learn how to set up and run the Reloop documentation service locally and in production.
 ---
 
-## Welcome to developer Docs
+# Documentation Service
+
+> Powers Reloop's public-facing documentation, API references, user tutorials, and local development guides. This Next.js application serves as the primary technical reference hub for developers and customers using Reloop.
+
+<Callout type="info" title="Prerequisite">
+Make sure you've completed the [local setup guide](/setup) first.
+</Callout>
+
+---
+
+## Quick Start
+
+```bash
+# One command to get started
+cd apps/frontend/docs && bun i && bun dev
+```
+
+Open [http://localhost:3003](http://localhost:3003) or [https://local.reloop.sh/docs](https://local.reloop.sh/docs) 🎉
+
+---
+
+## Service Info
+
+* **Location:** `/apps/frontend/docs`
+* **Port:** `3003` (configurable in `package.json` with `--port=3003`)
+* **Tech Stack:** Next.js (App Router), MDX, Tailwind CSS, Mintlify Components, Shiki (code syntax highlighting)
+* **Part of Monorepo:** Yes (run with filters or inside service dir)
+
+---
+
+## Environment Setup
+
+The documentation service doesn't require complex environment variables for local development, as it relies on statically compiled MDX files located under `content/docs/`. However, if you are integrating dynamic API endpoints or search:
+
+Create `.env` file inside `/apps/frontend/docs` if needed:
+```bash
+NEXT_PUBLIC_APP_URL="https://local.reloop.sh"
+```
+
+---
+
+## Development Commands
+
+```bash
+# Install dependencies
+bun i
+
+# Start dev server with hot reload
+bun dev
+# or from monorepo root
+bun run fe:docs:dev
+# or using turbo filter
+bun run --filter=docs dev
+
+# Build for production
+bun run build
+# or from monorepo root
+bun run fe:docs:build
+
+# Start production server locally
+bun run start
+# or from monorepo root
+bun run fe:docs:start
+```
+
+---
+
+## Content Organization
+
+* **MDX Content**: All documentation pages are located in `/apps/frontend/docs/content/docs/`
+* **Setup Section**: This set of setup documentation lives under `/apps/frontend/docs/content/docs/setup/`
+* **Sidebar Navigation**: Navigation headers and order are configured in the `meta.json` files within their respective content directories.
+
+---
+
+## Troubleshooting
+
+### Port Issues
+**Port already in use?**
+```bash
+# Check what's using port 3003
+lsof -i :3003
+
+# Kill the process
+kill -9 <PID>
+```

@@ -1,0 +1,98 @@
+---
+title: Mailing (Campaign Gateway)
+description: Learn how to set up and run the Reloop mailing service locally and in production.
+---
+
+# Mailing Service
+
+> Handles outbound email injection requests triggered by Reloop's customers. It performs core rate-limiting checks, fetches and compiles templates, inserts open/click tracking headers/pixels, signs or processes custom SPF/DKIM verification, and injects outbound jobs into the KumoMTA server.
+
+<Callout type="info" title="Prerequisite">
+Make sure you've completed the [local setup guide](/setup) first.
+</Callout>
+
+---
+
+## Quick Start
+
+```bash
+# One command to get started
+cd apps/backend/mailing && cp env.example .env && bun i && bun dev
+```
+
+The service will be available at [http://localhost:8015/api/mail](http://localhost:8015/api/mail) or [https://local.reloop.sh/api/mail](https://local.reloop.sh/api/mail) 🎉
+
+---
+
+## Service Info
+
+* **Location:** `/apps/backend/mailing`
+* **Port:** `8015` (configurable)
+* **Tech Stack:** Elysia.js, PostgreSQL, Redis, NATS, BullMQ, rate-limiter
+* **Part of Monorepo:** Yes (run with filters or inside service dir)
+* **API Base:** `/api/mail`
+
+---
+
+## Environment Setup
+
+Create `.env` file inside `/apps/backend/mailing`:
+
+```bash
+PORT=8015
+NODE_ENV=development
+PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
+REDIS_URL=redis://:reloop123@localhost:6379
+BASE_URL=https://local.reloop.sh
+KUMOMTA_HTTP_URL=http://localhost:8020
+TRACKING_SECRET=reloop_tracking_secret_default_123
+
+# Rate Limiting Controls
+RATE_LIMIT_IP_MAX=20
+RATE_LIMIT_IP_WINDOW_SECONDS=60
+RATE_LIMIT_ORG_MAX=100
+RATE_LIMIT_ORG_WINDOW_SECONDS=60
+RATE_LIMIT_ORG_DAILY_MAX=5000
+RATE_LIMIT_USER_MAX=50
+RATE_LIMIT_USER_WINDOW_SECONDS=60
+RATE_LIMIT_GLOBAL_MAX=500
+RATE_LIMIT_GLOBAL_WINDOW_SECONDS=60
+```
+
+| Variable | Required | Description |
+| :--- | :--- | :--- |
+| `PORT` | `YES` | Port the mailing gateway listens on (defaults to `8015`). |
+| `KUMOMTA_HTTP_URL` | `YES` | HTTP URL of the local KumoMTA SMTP engine (port `8020`). |
+| `TRACKING_SECRET` | `YES` | Secret string utilized to cryptographically sign open/click tracking URLs. |
+| `RATE_LIMIT_ORG_DAILY_MAX` | `YES` | Total maximum emails an organization is allowed to send per 24 hours. |
+
+---
+
+## Development Commands
+
+```bash
+# Install dependencies
+bun i
+
+# Start dev server with hot reload
+bun dev
+# or from monorepo root
+bun run be:mailing:dev
+# or using turbo filter
+bun run --filter=mailing dev
+
+# Build for production
+bun run build
+# or from monorepo root
+bun run be:mailing:build
+```
+
+---
+
+## Core Operational Flow
+
+1. **Authentication**: Incoming customer requests are authenticated using developer API keys verified against the `api-key` service.
+2. **Quota / Rate Limiting**: Redis is queried to verify global, IP, tenant, and daily email send quotas are respected.
+3. **Template Compilation**: If sending via template, the `template` service is called to compile custom fields (`{{ first_name }}`, etc.) inside the HTML.
+4. **Tracking Injection**: Tracking pixels are injected into HTML, and hyperlinks are wrapped in signed redirection targets (routing back to `https://local.reloop.sh/api/mail/click`).
+5. **SMTP Dispatch**: The compiled, tracked message is pushed to KumoMTA for physical delivery.

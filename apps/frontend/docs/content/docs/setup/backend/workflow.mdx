@@ -1,0 +1,86 @@
+---
+title: Workflow (Automation)
+description: Learn how to set up and run the Reloop workflow service locally and in production.
+---
+
+# Automation Workflow Service
+
+> Coordinates, schedules, and executes multi-step customer automation flows (such as drip campaigns, delayed follow-up emails, list segmentation transitions, and field updates). It is powered by BullMQ and exposes an administrative Bull Board UI.
+
+<Callout type="info" title="Prerequisite">
+Make sure you've completed the [local setup guide](/setup) first and have PostgreSQL and Redis running.
+</Callout>
+
+---
+
+## Quick Start
+
+```bash
+# One command to get started
+cd apps/backend/workflow && cp env.example .env && bun i && bun dev
+```
+
+* The service will be available at [http://localhost:8017/api/workflow](http://localhost:8017/api/workflow) 🎉
+* The Bull Board queue monitor is at [http://localhost:8017/api/workflow/bull-board](http://localhost:8017/api/workflow/bull-board) 📊
+
+---
+
+## Service Info
+
+* **Location:** `/apps/backend/workflow`
+* **Port:** `8017` (configurable)
+* **Tech Stack:** Elysia.js, BullMQ (delayed task scheduler), Bull Board (UI monitor), PostgreSQL, NATS
+* **Part of Monorepo:** Yes (run with filters or inside service dir)
+* **API Base:** `/api/workflow`
+
+---
+
+## Environment Setup
+
+Create `.env` file inside `/apps/backend/workflow`:
+
+```bash
+PORT=8017
+NODE_ENV=development
+PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
+REDIS_URL=redis://:reloop123@localhost:6379
+BASE_URL=https://local.reloop.sh
+NATS_URL=nats://localhost:4222
+```
+
+| Variable | Required | Description |
+| :--- | :--- | :--- |
+| `PORT` | `YES` | Port the workflow server listens on (defaults to `8017`). |
+| `REDIS_URL` | `YES` | Redis connection URL utilized by BullMQ to hold workflow delay states and job records. |
+| `PG_URL` | `YES` | PostgreSQL database connection string. |
+| `NATS_URL` | `YES` | NATS broker URL for reacting to workflow triggers (e.g., contact created, email sent). |
+
+---
+
+## Development Commands
+
+```bash
+# Install dependencies
+bun i
+
+# Start dev server with hot reload
+bun dev
+# or from monorepo root
+bun run be:workflow:dev
+# or using turbo filter
+bun run --filter=workflow dev
+
+# Build for production
+bun run build
+# or from monorepo root
+bun run be:workflow:build
+```
+
+---
+
+## Architecture details
+
+- **BullMQ Workers**: Executes background workers picking up automation node execution tasks (e.g. delay timer nodes, conditional check branches, email sending actions).
+- **Delayed Scheduling**: Relies on Redis to coordinate precise delay timings (e.g. "Wait 3 days before sending the next email").
+- **Queue Admin Console**: Mounts the **Bull Board** interface locally at `/api/workflow/bull-board` so developers can inspect failed workflow runs, force retries, and monitor throughput.
+- **NATS Integration**: Hooks into incoming platform streams to trigger flows dynamically based on real-time customer behavior (e.g. "Trigger Welcome Drip when a contact is added to the newsletter list").

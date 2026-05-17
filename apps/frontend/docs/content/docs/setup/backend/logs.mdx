@@ -1,0 +1,93 @@
+---
+title: Logs & Analytics
+description: Learn how to set up and run the Reloop logs and analytics service locally and in production.
+---
+
+# Logs & Analytics Service
+
+> Collects, stores, indexes, and queries transactional mail logs, email open/click tracking events, bounce statistics, and audit trails. It is powered by ClickHouse to enable high-throughput analytical query processing.
+
+<Callout type="info" title="Prerequisite">
+Make sure you've completed the [local setup guide](/setup) and have ClickHouse running inside your Docker environment.
+</Callout>
+
+---
+
+## Quick Start
+
+```bash
+# One command to get started
+cd apps/backend/logs && cp env.example .env && bun i && bun dev
+```
+
+The service will be available at [http://localhost:8016/api/logs](http://localhost:8016/api/logs) or [https://local.reloop.sh/api/logs](https://local.reloop.sh/api/logs) 🎉
+
+---
+
+## Service Info
+
+* **Location:** `/apps/backend/logs`
+* **Port:** `8016` (configurable)
+* **Tech Stack:** Elysia.js, ClickHouse, Redis, NATS
+* **Part of Monorepo:** Yes (run with filters or inside service dir)
+* **API Base:** `/api/logs`
+
+---
+
+## Environment Setup
+
+Create `.env` file inside `/apps/backend/logs`:
+
+```bash
+PORT=8016
+NODE_ENV=development
+REDIS_URL=redis://:reloop123@localhost:6379
+BASE_URL=https://local.reloop.sh
+NATS_URL=nats://localhost:4222
+
+# ClickHouse Configuration
+CLICKHOUSE_URL=http://localhost:8123
+CLICKHOUSE_USER=default
+CLICKHOUSE_PASSWORD=reloop123
+CLICKHOUSE_DB=reloop
+```
+
+| Variable | Required | Description |
+| :--- | :--- | :--- |
+| `PORT` | `YES` | Port the logging server listens on (defaults to `8016`). |
+| `CLICKHOUSE_URL` | `YES` | HTTP connection URL for ClickHouse analytical DB (defaults to `http://localhost:8123`). |
+| `CLICKHOUSE_USER` | `YES` | ClickHouse user (defaults to `default`). |
+| `CLICKHOUSE_PASSWORD`| `YES` | ClickHouse password (defaults to `reloop123`). |
+| `CLICKHOUSE_DB` | `YES` | ClickHouse database name (defaults to `reloop`). |
+
+---
+
+## Development Commands
+
+```bash
+# Install dependencies
+bun i
+
+# Start dev server with hot reload
+bun dev
+# or from monorepo root
+bun run --filter=logs dev
+
+# Start production server locally
+bun run start
+# or from monorepo root
+bun run be:logs:start
+```
+
+---
+
+## ClickHouse Schema & Events
+
+- **High-throughput Analytics**: The service listens to delivery streams via **NATS** (`kumomta.event.*` and `tracking.*`) and batches log insertions into ClickHouse tables to optimize performance.
+- **Tracked Events**:
+  - `sent`: Record of a successfully injected outbound email.
+  - `delivered`: KumoMTA delivery receipt confirmation.
+  - `bounce`: Record of hard/soft bounces.
+  - `complaint`: Spam complaints received via feedback loops.
+  - `open`/`click`: User tracking pixels and URL redirect clicks (tracked by the `mailing` gateway).
+- **Log Querying**: Exposes powerful endpoints queried by the user `dashboard` to display real-time campaign performance charts and searchable delivery records.

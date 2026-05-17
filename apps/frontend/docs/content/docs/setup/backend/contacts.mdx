@@ -1,0 +1,86 @@
+---
+title: Contacts
+description: Learn how to set up and run the Reloop contacts service locally and in production.
+---
+
+# Contacts & Audience Service
+
+> Manages contacts, subscriber lists, custom subscription attributes, segments, and unsubscribe configurations. It forms the backbone of recipient audience targeting within Reloop.
+
+<Callout type="info" title="Prerequisite">
+Make sure you've completed the [local setup guide](/setup) first.
+</Callout>
+
+---
+
+## Quick Start
+
+```bash
+# One command to get started
+cd apps/backend/contacts && cp env.example .env && bun i && bun dev
+```
+
+The service will be available at [http://localhost:8014/api/contacts](http://localhost:8014/api/contacts) or [https://local.reloop.sh/api/contacts](https://local.reloop.sh/api/contacts) 🎉
+
+---
+
+## Service Info
+
+* **Location:** `/apps/backend/contacts`
+* **Port:** `8014` (configurable)
+* **Tech Stack:** Elysia.js, PostgreSQL, Redis, NATS
+* **Part of Monorepo:** Yes (run with filters or inside service dir)
+* **API Base:** `/api/contacts`
+
+---
+
+## Environment Setup
+
+Create `.env` file inside `/apps/backend/contacts`:
+
+```bash
+PORT=8014
+NODE_ENV=development
+PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
+REDIS_URL=redis://:reloop123@localhost:6379
+BASE_URL=https://local.reloop.sh
+NATS_URL=nats://localhost:4222
+```
+
+| Variable | Required | Description |
+| :--- | :--- | :--- |
+| `PORT` | `YES` | Port the contacts server listens on (defaults to `8014`). |
+| `PG_URL` | `YES` | PostgreSQL connection string for querying contact data. |
+| `REDIS_URL` | `YES` | Redis URL for caching list count and audience metadata. |
+| `NATS_URL` | `YES` | NATS message broker URL for broadcasting contact import and lifecycle events. |
+| `BASE_URL` | `YES` | Reloop platform base URL. |
+
+---
+
+## Development Commands
+
+```bash
+# Install dependencies
+bun i
+
+# Start dev server with hot reload
+bun dev
+# or from monorepo root
+bun run be:contacts:dev
+# or using turbo filter
+bun run --filter=contacts dev
+
+# Build for production
+bun run build
+# or from monorepo root
+bun run be:contacts:build
+```
+
+---
+
+## Service Capabilities
+
+- **Subscriber List Management**: Creating, updating, and grouping subscribers into static lists or dynamic query-based segments.
+- **Custom Attributes & Schema**: Allows users to define custom database columns (such as `first_name`, `company`, `last_purchase_date`) on a per-contact basis.
+- **NATS Streaming**: Fires events on list imports, deletions, or subscription changes (e.g. opt-in/opt-out status), which can be consumed by mailing campaigns or analytics engines.
+- **Database Schema**: Leverages PostgreSQL tables under `@reloop/db` schema, primarily `contact`, `list`, `list_contact`, and `custom_field`.

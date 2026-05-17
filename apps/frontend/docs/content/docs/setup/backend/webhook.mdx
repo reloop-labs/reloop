@@ -1,6 +1,88 @@
 ---
-title:  Webhook
-description: Introduction
+title: Webhook
+description: Learn how to set up and run the Reloop webhook service locally and in production.
 ---
 
-## Welcome to developer Docs
+# Webhook Delivery Service
+
+> Manages the scheduling, formatting, signing, and dispatching of outbound event webhooks to developer callback URLs. It listens for system-wide events and processes delivery retries using BullMQ.
+
+<Callout type="info" title="Prerequisite">
+Make sure you've completed the [local setup guide](/setup) first and have PostgreSQL and Redis running.
+</Callout>
+
+---
+
+## Quick Start
+
+```bash
+# One command to get started
+cd apps/backend/webhook && cp env.example .env && bun i && bun dev
+```
+
+The service will be available at [http://localhost:8013/api/webhook](http://localhost:8013/api/webhook) or [https://local.reloop.sh/api/webhook](https://local.reloop.sh/api/webhook) 🎉
+
+---
+
+## Service Info
+
+* **Location:** `/apps/backend/webhook`
+* **Port:** `8013` (configurable)
+* **Tech Stack:** Elysia.js, BullMQ (job queuing), Redis (queue state), PostgreSQL, NATS (event broker)
+* **Part of Monorepo:** Yes (run with filters or inside service dir)
+* **API Base:** `/api/webhook`
+
+---
+
+## Environment Setup
+
+Create `.env` file inside `/apps/backend/webhook`:
+
+```bash
+PORT=8013
+NODE_ENV=development
+PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
+REDIS_URL=redis://:reloop123@localhost:6379
+BASE_URL=https://local.reloop.sh
+NATS_URL=nats://localhost:4222
+NODE_TLS_REJECT_UNAUTHORIZED=0
+```
+
+| Variable | Required | Description |
+| :--- | :--- | :--- |
+| `PORT` | `YES` | Port the webhook server listens on (defaults to `8013`). |
+| `REDIS_URL` | `YES` | Redis connection URL used by BullMQ to schedule webhook delivery jobs. |
+| `PG_URL` | `YES` | PostgreSQL database connection string. |
+| `NATS_URL` | `YES` | NATS message broker URL to subscribe to system event topics. |
+| `NODE_TLS_REJECT_UNAUTHORIZED` | `NO` | Allows self-signed certificates in dev mode (defaults to `0`). |
+
+---
+
+## Development Commands
+
+```bash
+# Install dependencies
+bun i
+
+# Start dev server with hot reload
+bun dev
+# or from monorepo root
+bun run be:webhook:dev
+# or using turbo filter
+bun run --filter=webhook dev
+
+# Build for production
+bun run build
+# or from monorepo root
+bun run be:webhook:build
+```
+
+---
+
+## Core Operational Mechanics
+
+1. **Event Capture**: The service subscribes to core event buses via **NATS** (e.g. `kumomta.event.*`, `tracking.*`).
+2. **Subscription Matcher**: For every captured event, the database is queried to find matching customer webhook configurations (`webhook_subscription` table).
+3. **Queue Scheduling**: If subscription endpoints are configured, a job is generated and dispatched to the **BullMQ** queue (`webhook-delivery-queue`).
+4. **Outbound Attempt**: A worker picks up the job, signs the payload using the customer's shared signing secret (`x-reloop-signature` header), and attempts HTTP POST injection.
+5. **Retry / Fallbacks**: Failed deliveries are retried automatically using exponential backoff throttling (configured inside `queues/webhook.queue.ts`).

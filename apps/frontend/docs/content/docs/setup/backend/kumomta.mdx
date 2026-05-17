@@ -1,0 +1,87 @@
+---
+title: KumoMTA (Webhook Service)
+description: Learn how to set up and run the Reloop KumoMTA webhook service locally and in production.
+---
+
+# KumoMTA Webhook Service
+
+> Processes status, bounce, and delivery callbacks emitted by the KumoMTA mail server. It indexes delivery receipts, hard bounces, soft bounces, spam complaints, and feedback loops, allowing Reloop to track real-time delivery statistics.
+
+<Callout type="info" title="Prerequisite">
+Make sure you've completed the [local setup guide](/setup) first and have Docker Compose running KumoMTA.
+</Callout>
+
+---
+
+## Quick Start
+
+```bash
+# One command to get started
+cd apps/backend/kumomta && cp env.example .env && bun i && bun dev
+```
+
+The service will be available at [http://localhost:8021/api/kumomta](http://localhost:8021/api/kumomta) or [https://local.reloop.sh/api/kumomta](https://local.reloop.sh/api/kumomta) 🎉
+
+---
+
+## Service Info
+
+* **Location:** `/apps/backend/kumomta`
+* **Port:** `8021` (configurable)
+* **Tech Stack:** Elysia.js, PostgreSQL, Redis, NATS
+* **Part of Monorepo:** Yes (run with filters or inside service dir)
+* **API Base:** `/api/kumomta`
+
+---
+
+## Environment Setup
+
+Create `.env` file inside `/apps/backend/kumomta`:
+
+```bash
+PORT=8021
+NODE_ENV=development
+PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
+REDIS_URL=redis://:reloop123@localhost:6379
+X_KUMOMTA_KEY=reloop
+NATS_URL=nats://localhost:4222
+```
+
+| Variable | Required | Description |
+| :--- | :--- | :--- |
+| `PORT` | `YES` | Port the KumoMTA callback server listens on (defaults to `8021`). |
+| `X_KUMOMTA_KEY` | `YES` | Security header key (`x-kumomta-key`) used to authorize webhook payloads coming from KumoMTA SMTP servers. |
+| `PG_URL` | `YES` | PostgreSQL connection string for updating domain/subscriber delivery statuses. |
+| `REDIS_URL` | `YES` | Redis URL for temporal tracking and deduplication. |
+| `NATS_URL` | `YES` | NATS broker URL for broadcasting bounce and delivery events system-wide. |
+
+---
+
+## Development Commands
+
+```bash
+# Install dependencies
+bun i
+
+# Start dev server with hot reload
+bun dev
+# or from monorepo root
+bun run be:kumomta:dev
+# or using turbo filter
+bun run --filter=kumomta dev
+
+# Build for production
+bun run build
+# or from monorepo root
+bun run be:kumomta:build
+```
+
+---
+
+## Integration with SMTP
+
+When KumoMTA dispatches or fails to dispatch an email:
+1. It executes webhook policies defined in the `kumomta-smtp` Lua scripts.
+2. It sends an HTTP POST request containing detailed event payloads (recipient, timestamp, status, bounce reason) to `https://local.reloop.sh/api/kumomta/webhook`.
+3. The KumoMTA Webhook Service verifies the `x-kumomta-key` header.
+4. Payload is parsed, saved to PostgreSQL/ClickHouse, and broadcasted over **NATS** on `kumomta.event.*` so logs and webhooks can reactive-trigger.

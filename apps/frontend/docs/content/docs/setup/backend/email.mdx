@@ -1,0 +1,91 @@
+---
+title: Email (System Transactional)
+description: Learn how to set up and run the Reloop system transactional email service locally and in production.
+---
+
+# System Transactional Email Service
+
+> Responsible for dispatching system-level transactional emails (such as verification links, password resets, billing alerts, and domain verification notifications) directly to Reloop's own platform users.
+
+<Callout type="warning" title="Distinction">
+Do not confuse this with **Mailing**!
+- **Email Service (`email`)**: Internal transactional service that listens to system NATS topics and emails Reloop users.
+- **Mailing Service (`mailing`)**: Public API that allows Reloop customers to send bulk campaigns or transaction messages to *their* audiences.
+</Callout>
+
+---
+
+## Quick Start
+
+```bash
+# One command to get started
+cd apps/backend/email && cp env.example .env && bun i && bun dev
+```
+
+The service will be available at [http://localhost:8022/api/email](http://localhost:8022/api/email) or [https://local.reloop.sh/api/email](https://local.reloop.sh/api/email) 🎉
+
+---
+
+## Service Info
+
+* **Location:** `/apps/backend/email`
+* **Port:** `8022` (configurable with `EMAIL_PORT` env variable)
+* **Tech Stack:** Elysia.js, NATS (event subscription), Redis
+* **Part of Monorepo:** Yes (run with filters or inside service dir)
+* **API Base:** `/api/email`
+
+---
+
+## Environment Setup
+
+Create `.env` file inside `/apps/backend/email`:
+
+```bash
+EMAIL_PORT=8022
+NODE_ENV=development
+NATS_URL=nats://localhost:4222
+REDIS_URL=redis://:reloop123@localhost:6379
+BASE_URL=https://local.reloop.sh
+RELOOP_API_KEY=your-system-reloop-api-key
+RELOOP_SENDER_DOMAIN=local.reloop.sh
+```
+
+| Variable | Required | Description |
+| :--- | :--- | :--- |
+| `EMAIL_PORT` | `YES` | Port the email server listens on (defaults to `8022`). |
+| `NATS_URL` | `YES` | NATS message broker URL to subscribe to system event topics. |
+| `RELOOP_API_KEY` | `YES` | Internal API key used to authorize transactional mail delivery requests. |
+| `RELOOP_SENDER_DOMAIN` | `YES` | Base domain used in the "From" header of system transactional emails. |
+
+---
+
+## Development Commands
+
+```bash
+# Install dependencies
+bun i
+
+# Start dev server with hot reload
+bun dev
+# or from monorepo root
+bun run be:email:dev
+# or using turbo filter
+bun run --filter=email dev
+
+# Build for production
+bun run build
+# or from monorepo root
+bun run be:email:build
+```
+
+---
+
+## NATS Event Subscriptions
+
+The service reactive-processes events by listening to the following NATS subjects:
+
+1. **`auth.*`**: Listens for authentication events, sending magic links and verification codes to users signing in.
+2. **`api-key.*`**: Sends notifications when new API keys are generated or revoked.
+3. **`domain.*`**: Triggers warnings when domain DNS checks fail, or confirmation notes once verified.
+4. **`billing.*`**: Dispatches system emails alerting administrators of failed top-ups or depleted credit balances.
+5. **`organization.*`**: Handles invitation emails when users are invited to join an organization.

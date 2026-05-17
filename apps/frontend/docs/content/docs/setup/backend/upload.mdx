@@ -1,0 +1,94 @@
+---
+title: Upload
+description: Learn how to set up and run the Reloop upload service locally and in production.
+---
+
+# Upload Service
+
+> Manages media uploads, attachments, campaign assets, organization logos, and user avatars. It validates payloads and streams files securely to an S3-compatible object storage repository (such as AWS S3 or MinIO).
+
+<Callout type="info" title="Prerequisite">
+Make sure you've completed the [local setup guide](/setup) first and have the local MinIO storage container running.
+</Callout>
+
+---
+
+## Quick Start
+
+```bash
+# One command to get started
+cd apps/backend/upload && cp env.example .env && bun i && bun dev
+```
+
+The service will be available at [http://localhost:8018/api/upload](http://localhost:8018/api/upload) or [https://local.reloop.sh/api/upload](https://local.reloop.sh/api/upload) 🎉
+
+---
+
+## Service Info
+
+* **Location:** `/apps/backend/upload`
+* **Port:** `8018` (configurable)
+* **Tech Stack:** Elysia.js, AWS SDK S3 (`@aws-sdk/client-s3`), PostgreSQL, Redis, NATS
+* **Part of Monorepo:** Yes (run with filters or inside service dir)
+* **API Base:** `/api/upload`
+
+---
+
+## Environment Setup
+
+Create `.env` file inside `/apps/backend/upload`:
+
+```bash
+PORT=8018
+NODE_ENV=development
+PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
+REDIS_URL=redis://:reloop123@localhost:6379
+BASE_URL=https://local.reloop.sh
+NATS_URL=nats://localhost:4222
+
+# MinIO / S3 Object Storage Configuration
+S3_ENDPOINT=http://localhost:9010
+S3_ACCESS_KEY=reloop
+S3_SECRET_KEY=reloop123
+S3_BUCKET=reloop-uploads
+S3_REGION=us-east-1
+S3_FORCE_PATH_STYLE=true
+```
+
+| Variable | Required | Description |
+| :--- | :--- | :--- |
+| `PORT` | `YES` | Port the upload server listens on (defaults to `8018`). |
+| `S3_ENDPOINT` | `YES` | Local MinIO API port `9010` (or production AWS S3 endpoint). |
+| `S3_ACCESS_KEY`| `YES` | Storage access key (defaults to `reloop`). |
+| `S3_SECRET_KEY`| `YES` | Storage secret key (defaults to `reloop123`). |
+| `S3_BUCKET` | `YES` | Target S3 bucket name (defaults to `reloop-uploads`). |
+
+---
+
+## Development Commands
+
+```bash
+# Install dependencies
+bun i
+
+# Start dev server with hot reload
+bun dev
+# or from monorepo root
+bun run be:upload:dev
+# or using turbo filter
+bun run --filter=upload dev
+
+# Build for production
+bun run build
+# or from monorepo root
+bun run be:upload:build
+```
+
+---
+
+## Safety Controls & Boundaries
+
+- **Size Threshold**: Enforces a strict file size limit of **10MB** per asset.
+- **Allowed MIME Types**: Only validates and permits image categories:
+  - `image/jpeg`, `image/jpg`, `image/png`, `image/gif`, `image/webp`, `image/svg+xml`
+- **Asset Indexing**: Successfully uploaded media details are logged to the PostgreSQL `asset` table, providing metadata tracking.

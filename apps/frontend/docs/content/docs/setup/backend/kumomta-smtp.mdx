@@ -1,0 +1,74 @@
+---
+title: KumoMTA SMTP Engine
+description: Learn how to configure and run the Reloop KumoMTA SMTP mail engine locally and in Docker.
+---
+
+# KumoMTA SMTP Engine
+
+> The high-performance ESMTP Mail Transfer Agent (MTA) used by Reloop to deliver outbound emails. Running inside a Docker container, it is configured with Lua policies to manage throttling, connection pools, and delivery webhook callbacks.
+
+<Callout type="info" title="Prerequisite">
+Make sure Docker Desktop is installed, running, and that you have started the local infrastructure containers.
+</Callout>
+
+---
+
+## Service Info
+
+* **Location:** `/apps/backend/kumomta-smtp`
+* **SMTP Port:** `25` (ESMTP inbound ingestion)
+* **HTTP Port:** `8020` (proxied from KumoMTA container port `8000`)
+* **Tech Stack:** KumoMTA (C++ SMTP Engine), Lua scripting configuration
+* **Part of Monorepo:** Yes (configured under `/local/docker-compose.yml`)
+
+---
+
+## How It Works
+
+1. **SMTP Ingestion**: The ESMTP listener on port `25` accepts incoming email delivery jobs (e.g. injected by the `mailing` service).
+2. **Spool Directory**: Messages are saved to Docker persistent volume spools (`/var/spool/kumomta/data` and `/var/spool/kumomta/meta`) to prevent data loss in the event of a crash.
+3. **Lua Policy Execution**: The `init.lua` and other Lua policies under `/apps/backend/kumomta-smtp/policy/` are executed to govern queueing, routing, DKIM signing, and webhook callback generation.
+4. **Outbound Dispatch**: The engine attempts to relay the message directly to receiving MX hosts, or locally logs the delivery inside Mailpit.
+
+---
+
+## Configuration Variables
+
+Configured in `local/docker-compose.yml` under the `kumomta-smtp` service:
+
+| Variable | Default | Description |
+| :--- | :--- | :--- |
+| `X_KUMOMTA_KEY` | `reloop` | The shared authorization key sent by KumoMTA to the webhook receiver. |
+| `BASE_URL` | `https://local.reloop.sh` | Reloop platform URL. |
+| `KUMOMTA_WEBHOOK_URL` | `http://host.docker.internal:8021` | HTTP address of the KumoMTA Webhook Service (`kumomta` on port `8021`) running on the host. |
+
+---
+
+## Policy Files Structure
+
+Located in `/apps/backend/kumomta-smtp/`:
+
+- **`init.lua`**: Main entrypoint initializing spool pathways, HTTP listeners, and ESMTP listeners.
+- **`policy/constants.lua`**: Centralized constant definitions (domains, limits).
+- **`policy/smtp.lua`**: Governing authentication, HELO/EHLO validation, and recipient rules.
+- **`policy/queue.lua`**: Throttling, retry intervals, and bounce handling rules.
+- **`policy/webhooks.lua`**: Defining how and when to dispatch callback payloads to the `kumomta` manager service.
+
+---
+
+## Development & Maintenance
+
+### Starting the Container
+```bash
+# Start just KumoMTA and its mail log dependencies
+cd local
+docker compose up -d kumomta-smtp reloop-mailpit
+```
+
+### Inspecting MTA Logs
+```bash
+docker logs -f kumomta-smtp
+```
+
+### Accessing KumoMTA HTTP Console
+Check HTTP details on [http://localhost:8020](http://localhost:8020).

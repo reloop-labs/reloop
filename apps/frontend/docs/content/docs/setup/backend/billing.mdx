@@ -1,0 +1,84 @@
+---
+title: Billing
+description: Learn how to set up and run the Reloop billing service locally and in production.
+---
+
+# Billing Service
+
+> Handles account plans, user credits, usage tracking, invoice creation, billing history, and credit top-ups. This service enforces platform quotas and ensures users remain within their sending plan limits.
+
+<Callout type="info" title="Prerequisite">
+Make sure you've completed the [local setup guide](/setup) first.
+</Callout>
+
+---
+
+## Quick Start
+
+```bash
+# One command to get started
+cd apps/backend/billing && cp env.example .env && bun i && bun dev
+```
+
+The service will be available at [http://localhost:8023/api/billing](http://localhost:8023/api/billing) or [https://local.reloop.sh/api/billing](https://local.reloop.sh/api/billing) 🎉
+
+---
+
+## Service Info
+
+* **Location:** `/apps/backend/billing`
+* **Port:** `8023` (configurable with `BILLING_PORT` env variable)
+* **Tech Stack:** Elysia.js, PostgreSQL, NATS, Redis
+* **Part of Monorepo:** Yes (run with filters or inside service dir)
+* **API Base:** `/api/billing`
+
+---
+
+## Environment Setup
+
+Create `.env` file inside `/apps/backend/billing`:
+
+```bash
+BILLING_PORT=8023
+NODE_ENV=development
+INITIAL_CREDITS=100
+NATS_URL=nats://localhost:4222
+BASE_URL=https://local.reloop.sh
+```
+
+| Variable | Required | Description |
+| :--- | :--- | :--- |
+| `BILLING_PORT` | `YES` | Port the billing server listens on (defaults to `8023`). |
+| `INITIAL_CREDITS` | `YES` | The number of free credits granted to a newly created organization (defaults to `100`). |
+| `NATS_URL` | `YES` | NATS message broker URL for receiving billing-trigger events. |
+| `BASE_URL` | `YES` | Reloop platform base URL. |
+
+---
+
+## Development Commands
+
+```bash
+# Install dependencies
+bun i
+
+# Start dev server with hot reload
+bun dev
+# or from monorepo root
+bun run be:billing:dev
+# or using turbo filter
+bun run --filter=billing dev
+
+# Build for production
+bun run build
+# or from monorepo root
+bun run be:billing:build
+```
+
+---
+
+## Core Features
+
+- **Credit Allocation & Management**: Automatically allocates initial credits to new accounts and tracks consumption as emails are sent.
+- **Quota Enforcements**: Communicates with the mail/sending services to block outbound emails if an organization's credit balance is depleted.
+- **NATS Integration**: Subscribes to subjects like `billing.*` and triggers notifications (via the transactional system email engine) when credit balances run low.
+- **Invoice & Transaction History**: Records credit purchases, plan upgrades, and monthly usages into PostgreSQL tables (`billing_invoice`, `billing_transaction`).
