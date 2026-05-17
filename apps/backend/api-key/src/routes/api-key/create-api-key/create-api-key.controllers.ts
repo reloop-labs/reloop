@@ -1,6 +1,6 @@
 import { createId } from "@paralleldrive/cuid2";
 import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
-import { createLog } from "@reloop/api-key/utils/logger";
+
 import {
 	API_KEY_PREFIX,
 	generateApiKey,
@@ -17,14 +17,10 @@ export async function createApiKeyController({
 	organizationId,
 	userId,
 	body,
-	logger,
-	cookie,
 }: {
 	organizationId: string;
 	userId: string;
 	body: ApiKeyTypes.CreateApiKeyRequest;
-	logger?: any;
-	cookie?: string;
 }): Promise<ApiKeyTypes.ApiKeyWithKeyResponse> {
 	try {
 		log.info({ ...{}, message: "Generating new api key" });
@@ -95,11 +91,7 @@ export async function createApiKeyController({
 			event: API_KEY_CREATE_WEBHOOK_EVENT.id,
 		};
 
-		await createLog({
-			event: API_KEY_CREATE_WEBHOOK_EVENT.id,
-			cookie,
-			metadata: result,
-		});
+
 
 		return result;
 	} catch (error) {

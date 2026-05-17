@@ -1,5 +1,5 @@
 import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
-import { createLog } from "@reloop/api-key/utils/logger";
+
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { API_KEY_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -11,13 +11,11 @@ export async function updateApiKeyController({
 	apiKeyId,
 	organizationId,
 	body,
-	logger,
 	cookie,
 }: {
 	apiKeyId: string;
 	organizationId: string;
 	body: ApiKeyTypes.UpdateApiKeyRequest;
-	logger?: any;
 	cookie?: string;
 }): Promise<ApiKeyTypes.ApiKeyResponse> {
 	log.info({ ...{ apiKeyId }, message: "Searching api key" });
@@ -86,11 +84,7 @@ export async function updateApiKeyController({
 			event: API_KEY_UPDATE_WEBHOOK_EVENT.id,
 		};
 
-		await createLog({
-			event: API_KEY_UPDATE_WEBHOOK_EVENT.id,
-			cookie,
-			metadata: result as Record<string, unknown>,
-		});
+
 
 		return result;
 	} catch (error) {

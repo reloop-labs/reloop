@@ -8,13 +8,10 @@ export const enableApiKeyRoute = new Elysia().use(authMiddleware).post(
 	async ({
 		params: { api_key_id },
 		activeOrganizationId,
-		headers,
 	}) => {
-		const cookieString = headers["cookie"] || "";
 		return await enableApiKeyController({
 			id: api_key_id,
 			organizationId: activeOrganizationId,
-			cookie: cookieString,
 		});
 	},
 	{

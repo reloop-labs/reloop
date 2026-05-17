@@ -1,5 +1,5 @@
 import { ApiKeyErrors } from "@reloop/api-key/error/api-key.error-response";
-import { createLog } from "@reloop/api-key/utils/logger";
+
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { API_KEY_DELETE_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -9,11 +9,9 @@ import { log } from "evlog";
 export async function deleteApiKeyController({
 	apiKeyId,
 	organizationId,
-	cookie,
 }: {
 	apiKeyId: string;
 	organizationId: string;
-	cookie?: string;
 }): Promise<{ id: string; message: string; object: "api_key"; event: string }> {
 	log.info({ ...{ apiKeyId }, message: "Checking if api key exists" });
 	try {
@@ -47,11 +45,7 @@ export async function deleteApiKeyController({
 			event: API_KEY_DELETE_WEBHOOK_EVENT.id,
 		};
 
-		await createLog({
-			event: API_KEY_DELETE_WEBHOOK_EVENT.id,
-			cookie,
-			metadata: result,
-		});
+
 
 		return result;
 	} catch (error) {

@@ -1,6 +1,6 @@
 import { ApiKeyErrors } from "@reloop/api-key/error/api-key.error-response";
 import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
-import { createLog } from "@reloop/api-key/utils/logger";
+
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { API_KEY_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -10,11 +10,9 @@ import { useLogger } from "evlog/elysia";
 export async function enableApiKeyController({
 	id,
 	organizationId,
-	cookie,
 }: {
 	id: string;
 	organizationId: string;
-	cookie?: string;
 }): Promise<ApiKeyTypes.ApiKeyResponse> {
 	const logger = useLogger();
 	try {
@@ -93,11 +91,7 @@ export async function enableApiKeyController({
 			event: API_KEY_UPDATE_WEBHOOK_EVENT.id,
 		};
 
-		await createLog({
-			event: API_KEY_UPDATE_WEBHOOK_EVENT.id,
-			cookie,
-			metadata: result as Record<string, unknown>,
-		});
+
 
 		return result;
 	} catch (error) {

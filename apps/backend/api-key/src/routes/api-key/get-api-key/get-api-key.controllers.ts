@@ -9,11 +9,9 @@ import { ApiKeyErrors } from "@reloop/api-key/error/api-key.error-response";
 export async function getApiKeyController({
 	apiKeyId,
 	organizationId,
-	logger,
 }: {
 	apiKeyId: string;
 	organizationId: string;
-	logger?: any;
 }): Promise<ApiKeyTypes.ApiKeyResponse> {
 	log.info({ ...{ apiKeyId }, message: "Getting API key" });
 	try {

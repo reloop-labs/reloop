@@ -6,11 +6,10 @@ import { listApiKeysXCodeSamples } from "./list-api-keys.x-codeSamples";
 
 export const listApiKeysRoute = new Elysia().use(authMiddleware).get(
 	"/",
-	async ({ query, activeOrganizationId, logger }) => {
+	async ({ query, activeOrganizationId }) => {
 		return await listApiKeysController({
 			query,
 			organizationId: activeOrganizationId,
-			logger,
 		});
 	},
 	{

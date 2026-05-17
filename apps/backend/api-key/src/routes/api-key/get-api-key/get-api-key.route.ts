@@ -6,11 +6,10 @@ import { getApiKeyXCodeSamples } from "./get-api-key.x-codeSamples";
 
 export const getApiKeyRoute = new Elysia().use(authMiddleware).get(
 	"/:api_key_id",
-	async ({ params: { api_key_id }, activeOrganizationId, logger }) => {
+	async ({ params: { api_key_id }, activeOrganizationId }) => {
 		return await getApiKeyController({
 			apiKeyId: api_key_id,
 			organizationId: activeOrganizationId,
-			logger,
 		});
 	},
 	{

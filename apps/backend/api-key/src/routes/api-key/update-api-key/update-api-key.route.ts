@@ -10,7 +10,6 @@ export const updateApiKeyRoute = new Elysia().use(authMiddleware).patch(
 		params: { api_key_id },
 		body,
 		activeOrganizationId,
-		logger,
 		headers,
 	}) => {
 		const cookieString = headers["cookie"] || "";
@@ -18,7 +17,6 @@ export const updateApiKeyRoute = new Elysia().use(authMiddleware).patch(
 			apiKeyId: api_key_id,
 			organizationId: activeOrganizationId,
 			body,
-			logger,
 			cookie: cookieString,
 		});
 	},

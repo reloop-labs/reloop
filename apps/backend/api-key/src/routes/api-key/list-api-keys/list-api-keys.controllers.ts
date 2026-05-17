@@ -8,11 +8,9 @@ import { log } from "evlog";
 export async function listApiKeysController({
 	query,
 	organizationId,
-	logger,
 }: {
 	query: ApiKeyTypes.ApiKeyListQuery;
 	organizationId: string;
-	logger?: any;
 }): Promise<ApiKeyTypes.ApiKeyListResponse> {
 	const { page = 1, limit = 10, enabled, userId, q } = query;
 	const offset = (page - 1) * limit;

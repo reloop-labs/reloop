@@ -10,16 +10,11 @@ export const createApiKeyRoute = new Elysia().use(authMiddleware).post(
 		body,
 		activeOrganizationId,
 		userId,
-		logger,
-		headers,
 	}) => {
-		const cookieString = headers["cookie"] || "";
 		return await createApiKeyController({
 			organizationId: activeOrganizationId,
 			userId,
 			body,
-			logger,
-			cookie: cookieString,
 		});
 	},
 	{
