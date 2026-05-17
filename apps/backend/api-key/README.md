@@ -5,9 +5,9 @@
 ## 🔗 Quick Links
 
 - 📚 **Documentation**: [Developer Docs](https://reloop.sh/dev/api-key-service)
-- 🌐 **Production API**: `https://api.reloop.sh/api/api-key`
-- 💻 **Local API**: `http://localhost:8012/api/api-key`
-- 📜 **OpenAPI Spec**: `http://localhost:8012/api/api-key/openapi`
+- 🌐 **Production API**: [https://api.reloop.sh/api/api-key](https://api.reloop.sh/api/api-key)
+- 💻 **Local API**: [https://local.reloop.sh/api/api-key](https://local.reloop.sh/api/api-key)
+- 📜 **OpenAPI Spec**: [https://local.reloop.sh/api/api-key/openapi](https://local.reloop.sh/api/api-key/openapi)
 
 ## 🚀 Setup
 
