@@ -10,8 +10,8 @@ import {
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { API_KEY_CREATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
-import { status } from "elysia";
 import { log } from "evlog";
+import { ApiKeyErrors } from "@reloop/api-key/lib/errors";
 
 export async function createApiKeyController({
 	organizationId,
@@ -87,7 +87,7 @@ export async function createApiKeyController({
 
 		if (!newApiKey[0]) {
 			log.error({ ...{}, message: "Failed to create API key" });
-			throw status(500, { message: "Failed to create API key" });
+			throw ApiKeyErrors.createFailed();
 		}
 		log.info({ ...{ newApiKey }, message: "New Api key generated" });
 

@@ -4,8 +4,8 @@ import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { API_KEY_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq } from "drizzle-orm";
-import { status } from "elysia";
 import { log } from "evlog";
+import { ApiKeyErrors } from "@reloop/api-key/lib/errors";
 
 export async function updateApiKeyController({
 	apiKeyId,
@@ -39,7 +39,7 @@ export async function updateApiKeyController({
 		});
 		if (!existing) {
 			log.warn({ ...{ apiKeyId }, message: "API key not found" });
-			throw status(404, { message: "API key not found" });
+			throw ApiKeyErrors.notFound(apiKeyId);
 		}
 
 		log.info({ ...{ apiKeyId }, message: "Updating api key" });
@@ -59,7 +59,7 @@ export async function updateApiKeyController({
 			.returning();
 		if (!updated[0]) {
 			log.error({ ...{ apiKeyId }, message: "Failed to update API key" });
-			throw status(500, { message: "Failed to update API key" });
+			throw ApiKeyErrors.updateFailed(apiKeyId);
 		}
 		log.info({ ...{ apiKeyId }, message: "API key updated successfully" });
 		const result = {

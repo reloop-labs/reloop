@@ -5,8 +5,8 @@ import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { API_KEY_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq } from "drizzle-orm";
-import { status } from "elysia";
 import { log } from "evlog";
+import { ApiKeyErrors } from "@reloop/api-key/lib/errors";
 
 export async function rotateApiKeyController({
 	id,
@@ -39,7 +39,7 @@ export async function rotateApiKeyController({
 
 		if (!existingKey) {
 			log.warn({ ...{ id }, message: "API key not found" });
-			throw status(404, { message: "API key not found" });
+			throw ApiKeyErrors.notFound(id);
 		}
 		log.info({ ...{ id }, message: "Generating new key" });
 		const fullKey = generateApiKey();
@@ -58,7 +58,7 @@ export async function rotateApiKeyController({
 			.returning();
 		if (!updatedKey) {
 			log.error({ ...{ id }, message: "Failed to rotate API key" });
-			throw status(500, { message: "Failed to rotate API key" });
+			throw ApiKeyErrors.rotateFailed(id);
 		}
 		log.info({ ...{ id }, message: "API key rotated successfully" });
 		const result = {

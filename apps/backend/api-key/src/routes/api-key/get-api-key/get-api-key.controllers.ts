@@ -3,8 +3,8 @@ import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { API_KEY_GET_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq } from "drizzle-orm";
-import { status } from "elysia";
 import { log } from "evlog";
+import { ApiKeyErrors } from "@reloop/api-key/lib/errors";
 
 export async function getApiKeyController({
 	apiKeyId,
@@ -27,7 +27,7 @@ export async function getApiKeyController({
 
 		if (!result) {
 			log.warn({ ...{ apiKeyId }, message: "API key not found" });
-			throw status(404, { message: "API key not found" });
+			throw ApiKeyErrors.notFound(apiKeyId);
 		}
 
 		const { user, ...apiKeyData } = result;

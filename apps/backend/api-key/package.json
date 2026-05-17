@@ -1,5 +1,6 @@
 {
 	"name": "api-key",
+	"version": "1.0.0",
 	"main": "src/index.ts",
 	"type": "module",
 	"scripts": {
@@ -37,7 +38,6 @@
 		"@reloop/auth": "workspace:*",
 		"@reloop/apikey": "workspace:*",
 		"@reloop/bus": "workspace:*",
-		"@elysiajs/eden": "catalog:backend",
 		"@elysiajs/openapi": "catalog:backend"
 	},
 	"devDependencies": {

@@ -4,8 +4,8 @@ import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { API_KEY_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq } from "drizzle-orm";
-import { status } from "elysia";
 import { log } from "evlog";
+import { ApiKeyErrors } from "@reloop/api-key/lib/errors";
 
 export async function disableApiKeyController({
 	id,
@@ -40,7 +40,7 @@ export async function disableApiKeyController({
 
 		if (!existingKey) {
 			log.warn({ ...{ id }, message: "API key not found" });
-			throw status(404, { message: "API key not found" });
+			throw ApiKeyErrors.notFound(id);
 		}
 
 		let updatedKeyData: typeof schema.apikey.$inferSelect;
@@ -62,7 +62,7 @@ export async function disableApiKeyController({
 
 			if (!updatedKey) {
 				log.error({ ...{ id }, message: "Failed to disable API key" });
-				throw status(500, { message: "Failed to disable API key" });
+				throw ApiKeyErrors.disableFailed(id);
 			}
 			updatedKeyData = updatedKey;
 		}

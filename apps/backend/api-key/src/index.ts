@@ -1,4 +1,4 @@
-import { log } from "evlog";
+import { log, parseError } from "evlog";
 import "dotenv/config";
 import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
@@ -9,7 +9,8 @@ import { loader } from "@reloop/api-key/utils/loader";
 import { Elysia } from "elysia";
 import { initLogger } from "evlog";
 import { evlog } from "evlog/elysia";
-import { apiKeyConfig } from "./api-key.config";
+import pkg from "api-key/package.json";
+import { apiKeyConfig } from "@reloop/api-key/api-key.config";
 
 initLogger({ env: { service: "api-key" } });
 
@@ -24,7 +25,7 @@ const apiKeyService = new Elysia({
 			documentation: {
 				info: {
 					title: "API KEY Service",
-					version: "1.0.0",
+					version: pkg.version,
 				},
 				components: {
 					securitySchemes: {
@@ -39,6 +40,16 @@ const apiKeyService = new Elysia({
 		}),
 	)
 	.use(serverTiming())
+	.onError(({ error, set }) => {
+		const parsed = parseError(error);
+		set.status = parsed.status;
+		return {
+			message: parsed.message,
+			why: parsed.why,
+			fix: parsed.fix,
+			link: parsed.link,
+		};
+	})
 	.use(landing)
 	.use(apiKeyRoutes)
 	.onStart(async () => {
