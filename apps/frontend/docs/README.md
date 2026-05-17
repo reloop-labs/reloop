@@ -1,49 +1,25 @@
-# Reloop Developer Documentation
+# Documentation
 
-Welcome to the Reloop developer documentation! This repository contains the source code for our comprehensive developer portal.
+## 🔗 Quick Links
 
-## 🚀 Quick Start
+- 📚 **Documentation**: [Documentation](https://reloop.sh/docs/setup/frontend/docs)
+- 🌐 **Live App**: [Live](https://dev.reloop.sh)
 
-Visit our live documentation at **[dev.reloop.sh](https://dev.reloop.sh)**
+## 🚀 Setup
 
-## 📚 What's Inside
+For detailed setup and development instructions, please refer to the [Setup Guide](https://reloop.sh/docs/setup/frontend/docs).
 
-- **SDK Documentation** - Integrate Reloop into your applications
-- **API Reference** - Complete REST API documentation
-- **Integrations** - Connect with your favorite tools and platforms
-- **Deployment Guides** - Learn how to deploy and host Reloop
-- **Setup Instructions** - Get started with Reloop configuration
+---
 
-## 🛠️ Development
 
-This documentation site is built with:
-- **Next.js** - React framework for the web
-- **Fumadocs** - Documentation framework
-- **Tailwind CSS** - Utility-first CSS framework
-- **TypeScript** - Type-safe JavaScript
+## 🔗 Resources & Community
 
-## 🏃‍♂️ Running Locally
-
-```bash
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-
-# Build for production
-npm run build
-```
-
-## 📝 Contributing
-
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
-
-## 🔗 Links
-
-- **Live Documentation**: [dev.reloop.sh](https://dev.reloop.sh)
-- **Product Website**: [reloop.com](https://reloop.sh)
-- **API Dashboard**: [app.reloop.com](https://app.reloop.com)
+- 📚 **Docs**: [Documentation](https://reloop.sh/docs/setup/frontend/docs)
+- 🐙 **GitHub**: [Source Code](https://github.com/reloop-labs/reloop)
+- 🆘 **Support**: [Get Help](https://reloop.sh/support)
+- 💬 **Discord**: [Join Chat](https://discord.gg/reloop)
+- 🐦 **Twitter**: [Follow Us](https://x.com/reloophq)
+- 🛠️ **Setup**: [Setup Guide](https://reloop.sh/docs/setup/frontend/docs)
 
 ---
 
