@@ -89,8 +89,6 @@ export async function disableApiKeyController({
 			event: API_KEY_UPDATE_WEBHOOK_EVENT.id,
 		};
 
-
-
 		return result;
 	} catch (error) {
 		log.error({ ...{ id, error }, message: "Error disabling API key" });

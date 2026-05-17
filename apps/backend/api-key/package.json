@@ -6,6 +6,7 @@
 	"scripts": {
 		"build": "tsdown",
 		"check-types": "tsc --noEmit",
+		"format": "biome format .",
 		"compile": "bun build --compile --minify --sourcemap --bytecode ./src/index.ts --outfile server",
 		"dev": "bun run --hot src/index.ts",
 		"start": "bun run dist/index.js"

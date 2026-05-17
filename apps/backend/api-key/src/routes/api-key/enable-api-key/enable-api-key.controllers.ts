@@ -91,8 +91,6 @@ export async function enableApiKeyController({
 			event: API_KEY_UPDATE_WEBHOOK_EVENT.id,
 		};
 
-
-
 		return result;
 	} catch (error) {
 		logger.error(error instanceof Error ? error : new Error(String(error)));

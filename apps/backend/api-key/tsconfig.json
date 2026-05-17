@@ -15,9 +15,7 @@
 		"declarationMap": false,
 		"baseUrl": ".",
 		"paths": {
-			"@reloop/api-key/*": ["./src/*"],
-			"@reloop/domain/*": ["../domain/src/*"],
-			"@reloop/domain": ["../domain/src/*"]
+			"@reloop/api-key/*": ["./src/*"]
 		}
 	}
 }

@@ -1,6 +1,6 @@
 import { createId } from "@paralleldrive/cuid2";
+import { ApiKeyErrors } from "@reloop/api-key/error/api-key.error-response";
 import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
-
 import {
 	API_KEY_PREFIX,
 	generateApiKey,
@@ -11,7 +11,6 @@ import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { API_KEY_CREATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { log } from "evlog";
-import { ApiKeyErrors } from "@reloop/api-key/error/api-key.error-response";
 
 export async function createApiKeyController({
 	organizationId,
@@ -90,8 +89,6 @@ export async function createApiKeyController({
 			object: "api_key" as const,
 			event: API_KEY_CREATE_WEBHOOK_EVENT.id,
 		};
-
-
 
 		return result;
 	} catch (error) {

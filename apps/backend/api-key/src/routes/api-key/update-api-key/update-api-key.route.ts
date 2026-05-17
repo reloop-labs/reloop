@@ -6,11 +6,7 @@ import { updateApiKeyXCodeSamples } from "./update-api-key.x-codeSamples";
 
 export const updateApiKeyRoute = new Elysia().use(authMiddleware).patch(
 	"/:api_key_id",
-	async ({
-		params: { api_key_id },
-		body: { name },
-		organizationId,
-	}) => {
+	async ({ params: { api_key_id }, body: { name }, organizationId }) => {
 		return await updateApiKeyController({
 			apiKeyId: api_key_id,
 			organizationId,

@@ -33,7 +33,6 @@ export namespace ApiKeyModel {
 				maxLength: 255,
 				description: "Name for the API key",
 			}),
-
 		},
 		{
 			examples: [

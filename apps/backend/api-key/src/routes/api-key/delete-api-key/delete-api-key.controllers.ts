@@ -45,8 +45,6 @@ export async function deleteApiKeyController({
 			event: API_KEY_DELETE_WEBHOOK_EVENT.id,
 		};
 
-
-
 		return result;
 	} catch (error) {
 		log.error({

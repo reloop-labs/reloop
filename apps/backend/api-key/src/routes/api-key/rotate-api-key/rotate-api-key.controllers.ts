@@ -63,8 +63,6 @@ export async function rotateApiKeyController({
 			event: API_KEY_UPDATE_WEBHOOK_EVENT.id,
 		};
 
-
-
 		return result;
 	} catch (error) {
 		log.error({

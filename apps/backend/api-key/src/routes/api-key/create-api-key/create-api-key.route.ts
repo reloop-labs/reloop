@@ -6,11 +6,7 @@ import { createApiKeyXCodeSamples } from "./create-api-key.x-codeSamples";
 
 export const createApiKeyRoute = new Elysia().use(authMiddleware).post(
 	"/",
-	async ({
-		body,
-		organizationId,
-		userId,
-	}) => {
+	async ({ body, organizationId, userId }) => {
 		return await createApiKeyController({
 			organizationId,
 			userId,
