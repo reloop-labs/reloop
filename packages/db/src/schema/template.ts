@@ -105,6 +105,7 @@ export const templateVersion = pgTable(
 			.references(() => template.id, { onDelete: "cascade" }),
 		version: integer("version").notNull(),
 		subject: varchar("subject", { length: 500 }),
+		description: text("description"),
 		content: jsonb("content").$type<TemplateBlock[]>().notNull(),
 		variables: jsonb("variables").$type<string[]>().default([]),
 		// Rendered HTML for quick access

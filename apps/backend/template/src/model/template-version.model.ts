@@ -7,6 +7,7 @@ export interface CreateVersionInput {
 	templateId: string;
 	version: number;
 	subject?: string;
+	description?: string;
 	content: TemplateBlock[];
 	variables?: string[];
 	renderedHtml?: string;
@@ -21,6 +22,7 @@ export const templateVersionModel = {
 				templateId: input.templateId,
 				version: input.version,
 				subject: input.subject,
+				description: input.description,
 				content: input.content,
 				variables: input.variables || [],
 				renderedHtml: input.renderedHtml,

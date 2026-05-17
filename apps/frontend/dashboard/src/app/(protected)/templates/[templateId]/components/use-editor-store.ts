@@ -15,6 +15,8 @@ interface EditorState {
 	setIsGenerating: (isGenerating: boolean) => void;
 	generatingContent: string;
 	setGeneratingContent: (content: string) => void;
+	lastAiPrompt: string;
+	setLastAiPrompt: (prompt: string) => void;
 }
 
 export const useEditorStore = create<EditorState>((set) => ({
@@ -32,4 +34,6 @@ export const useEditorStore = create<EditorState>((set) => ({
 	setIsGenerating: (isGenerating) => set({ isGenerating }),
 	generatingContent: "",
 	setGeneratingContent: (generatingContent) => set({ generatingContent }),
+	lastAiPrompt: "",
+	setLastAiPrompt: (lastAiPrompt) => set({ lastAiPrompt }),
 }));

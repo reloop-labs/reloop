@@ -10,7 +10,7 @@ import { useEditorStore } from "./use-editor-store";
 
 export function AIAssistant() {
 	const { editor } = useCurrentEditor();
-	const { isGenerating, setIsGenerating, setGeneratingContent } =
+	const { isGenerating, setIsGenerating, setGeneratingContent, setLastAiPrompt } =
 		useEditorStore();
 
 	const {
@@ -35,6 +35,7 @@ export function AIAssistant() {
 			}
 			setGeneratingContent("");
 			setIsGenerating(false);
+			setInput("");
 		},
 		onError: (err) => {
 			console.error("[AI Assistant Error]", err);
@@ -63,6 +64,7 @@ export function AIAssistant() {
 		setIsGenerating(true);
 		setGeneratingContent("");
 		editor.commands.setContent("");
+		setLastAiPrompt(input);
 		complete(input);
 	};
 
