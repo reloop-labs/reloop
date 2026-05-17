@@ -34,10 +34,7 @@ export async function listApiKeysController({
 		const whereClause = and(...conditions);
 		log.info("Getting API keys and total count in parallel");
 		const [totalResult, result] = await Promise.all([
-			db
-				.select({ count: count() })
-				.from(schema.apikey)
-				.where(whereClause),
+			db.select({ count: count() }).from(schema.apikey).where(whereClause),
 			db.query.apikey.findMany({
 				where: whereClause,
 				orderBy: desc(schema.apikey.createdAt),

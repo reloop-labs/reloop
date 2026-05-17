@@ -9,31 +9,31 @@ export const updateApiKeyRoute = new Elysia()
 	.use(authMiddleware)
 	.use(rateLimitPlugin({ max: 30, windowSeconds: 60, namespace: "update" }))
 	.patch(
-	"/:api_key_id",
-	async ({ params: { api_key_id }, body: { name }, organizationId }) => {
-		return await updateApiKeyController({
-			apiKeyId: api_key_id,
-			organizationId,
-			name,
-		});
-	},
-	{
-		auth: true,
-		rateLimit: true,
-		params: t.Object({
-			api_key_id: ApiKeyModel.apiKeyIdParam,
-		}),
-		body: ApiKeyModel.updateApiKeyBody,
-		response: {
-			200: ApiKeyModel.apiKeyResponse,
-			404: ApiKeyModel.apiKeyNotFound,
-			403: ApiKeyModel.unauthorized,
+		"/:api_key_id",
+		async ({ params: { api_key_id }, body: { name }, organizationId }) => {
+			return await updateApiKeyController({
+				apiKeyId: api_key_id,
+				organizationId,
+				name,
+			});
 		},
-		detail: {
-			tags: ["API Keys"],
-			summary: "Update API key",
-			description: "Updates an existing API key",
-			"x-codeSamples": updateApiKeyXCodeSamples,
+		{
+			auth: true,
+			rateLimit: true,
+			params: t.Object({
+				api_key_id: ApiKeyModel.apiKeyIdParam,
+			}),
+			body: ApiKeyModel.updateApiKeyBody,
+			response: {
+				200: ApiKeyModel.apiKeyResponse,
+				404: ApiKeyModel.apiKeyNotFound,
+				403: ApiKeyModel.unauthorized,
+			},
+			detail: {
+				tags: ["API Keys"],
+				summary: "Update API key",
+				description: "Updates an existing API key",
+				"x-codeSamples": updateApiKeyXCodeSamples,
+			},
 		},
-	},
-);
+	);

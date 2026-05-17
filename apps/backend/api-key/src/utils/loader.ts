@@ -10,8 +10,12 @@ export const loader = async () => {
 	try {
 		await Promise.all([
 			redis.healthCheck().then(() => log.info("Redis", "Connected")),
-			db.execute("SELECT 1 as test").then(() => log.info("Postgres", "Connected")),
-			bus.connect(apiKeyConfig.NATS_URL).then(() => log.info("NATS", "Connected")),
+			db
+				.execute("SELECT 1 as test")
+				.then(() => log.info("Postgres", "Connected")),
+			bus
+				.connect(apiKeyConfig.NATS_URL)
+				.then(() => log.info("NATS", "Connected")),
 		]);
 	} catch (e) {
 		log.error({

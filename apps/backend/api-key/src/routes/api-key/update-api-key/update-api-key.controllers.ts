@@ -73,11 +73,11 @@ export async function updateApiKeyController({
 			metadata: updated.metadata,
 			createdBy: keyWithUser?.user
 				? {
-					id: keyWithUser.user.id,
-					name: keyWithUser.user.name,
-					image: keyWithUser.user.image,
-					email: keyWithUser.user.email,
-				}
+						id: keyWithUser.user.id,
+						name: keyWithUser.user.name,
+						image: keyWithUser.user.image,
+						email: keyWithUser.user.email,
+					}
 				: undefined,
 			object: "api_key" as const,
 			event: API_KEY_UPDATE_WEBHOOK_EVENT.id,

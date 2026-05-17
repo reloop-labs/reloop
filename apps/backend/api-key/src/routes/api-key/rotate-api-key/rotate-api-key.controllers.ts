@@ -46,7 +46,12 @@ export async function rotateApiKeyController({
 				start: keyStart,
 				updatedAt: now,
 			})
-			.where(and(eq(schema.apikey.id, id), eq(schema.apikey.organizationId, organizationId)))
+			.where(
+				and(
+					eq(schema.apikey.id, id),
+					eq(schema.apikey.organizationId, organizationId),
+				),
+			)
 			.returning();
 		if (!updatedKey) {
 			log.error("Failed to rotate API key");

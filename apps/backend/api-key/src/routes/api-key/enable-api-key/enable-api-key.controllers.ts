@@ -77,7 +77,10 @@ export async function enableApiKeyController({
 		}
 
 		log.info("API key enabled successfully");
-		await bus.publish(BusEvent.API_KEY_ENABLED, { api_key_id: id, organizationId });
+		await bus.publish(BusEvent.API_KEY_ENABLED, {
+			api_key_id: id,
+			organizationId,
+		});
 		log.info("NATS event published");
 
 		const keyWithUser = await db.query.apikey.findFirst({
@@ -109,11 +112,11 @@ export async function enableApiKeyController({
 			metadata: updatedKey.metadata,
 			createdBy: keyWithUser?.user
 				? {
-					id: keyWithUser.user.id,
-					name: keyWithUser.user.name,
-					image: keyWithUser.user.image,
-					email: keyWithUser.user.email,
-				}
+						id: keyWithUser.user.id,
+						name: keyWithUser.user.name,
+						image: keyWithUser.user.image,
+						email: keyWithUser.user.email,
+					}
 				: undefined,
 			object: "api_key" as const,
 			event: API_KEY_UPDATE_WEBHOOK_EVENT.id,

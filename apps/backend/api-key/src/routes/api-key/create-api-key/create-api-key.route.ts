@@ -9,27 +9,27 @@ export const createApiKeyRoute = new Elysia()
 	.use(authMiddleware)
 	.use(rateLimitPlugin({ max: 10, windowSeconds: 60, namespace: "create" }))
 	.post(
-	"/",
-	async ({ body: { name }, organizationId, userId }) => {
-		return await createApiKeyController({
-			organizationId,
-			userId,
-			name,
-		});
-	},
-	{
-		auth: true,
-		rateLimit: true,
-		body: ApiKeyModel.createApiKeyBody,
-		response: {
-			201: ApiKeyModel.apiKeyWithKeyResponse,
-			403: ApiKeyModel.unauthorized,
+		"/",
+		async ({ body: { name }, organizationId, userId }) => {
+			return await createApiKeyController({
+				organizationId,
+				userId,
+				name,
+			});
 		},
-		detail: {
-			tags: ["API Keys"],
-			summary: "Create API Key",
-			description: "Creates a new API key",
-			"x-codeSamples": createApiKeyXCodeSamples,
+		{
+			auth: true,
+			rateLimit: true,
+			body: ApiKeyModel.createApiKeyBody,
+			response: {
+				201: ApiKeyModel.apiKeyWithKeyResponse,
+				403: ApiKeyModel.unauthorized,
+			},
+			detail: {
+				tags: ["API Keys"],
+				summary: "Create API Key",
+				description: "Creates a new API key",
+				"x-codeSamples": createApiKeyXCodeSamples,
+			},
 		},
-	},
-);
+	);

@@ -93,7 +93,7 @@ export async function createApiKeyController({
 		};
 
 		return result;
-	} catch (error) {
+	} catch (_error) {
 		log.error("Error creating API key");
 		throw ApiKeyErrors.createFailed();
 	}

@@ -27,7 +27,11 @@ async function checkRateLimit(
 
 		if (count > opts.max) {
 			const retryAfter = await redis.ttl(key);
-			return { limited: true, remaining: 0, retryAfter: Math.max(retryAfter, 1) };
+			return {
+				limited: true,
+				remaining: 0,
+				retryAfter: Math.max(retryAfter, 1),
+			};
 		}
 
 		return { limited: false, remaining, retryAfter: 0 };

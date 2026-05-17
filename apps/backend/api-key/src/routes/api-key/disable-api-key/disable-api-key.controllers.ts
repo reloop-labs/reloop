@@ -79,7 +79,10 @@ export async function disableApiKeyController({
 		}
 
 		log.info("API key disabled successfully");
-		await bus.publish(BusEvent.API_KEY_DISABLED, { api_key_id: id, organizationId });
+		await bus.publish(BusEvent.API_KEY_DISABLED, {
+			api_key_id: id,
+			organizationId,
+		});
 		log.info("NATS event published");
 
 		// Fetch user for response
