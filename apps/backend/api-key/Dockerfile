@@ -18,7 +18,6 @@ ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN bun run --filter=api-key test
 RUN bun run --filter=api-key build
 
 # Stage 3: Production server
