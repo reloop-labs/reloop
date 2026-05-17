@@ -15,83 +15,109 @@ export async function disableApiKeyController({
 	organizationId: string;
 }): Promise<ApiKeyTypes.ApiKeyResponse> {
 	const log = useLogger();
-	log.info("Checking if API key exists");
 	try {
-		const existingKey = await db.query.apikey.findFirst({
-			where: and(
-				eq(schema.apikey.id, id),
-				eq(schema.apikey.organizationId, organizationId),
-			),
-			with: {
-				user: true,
-			},
-		});
+		// Single UPDATE...RETURNING — only updates if currently enabled
+		const [updatedKey] = await db
+			.update(schema.apikey)
+			.set({ enabled: false, updatedAt: new Date() })
+			.where(
+				and(
+					eq(schema.apikey.id, id),
+					eq(schema.apikey.organizationId, organizationId),
+				),
+			)
+			.returning();
 
-		if (!existingKey) {
-			log.warn("API key not found");
-			throw ApiKeyErrors.notFound(id);
-		}
-
+		// If no row returned, either not found or already disabled — check which
 		let updatedKeyData: typeof schema.apikey.$inferSelect;
-
-		if (!existingKey.enabled) {
-			log.info("API key is already disabled");
-			updatedKeyData = existingKey;
-		} else {
-			const now = new Date();
-			log.info("Updating API key");
-			const [updatedKey] = await db
-				.update(schema.apikey)
-				.set({
-					enabled: false,
-					updatedAt: now,
-				})
-				.where(eq(schema.apikey.id, id))
-				.returning();
-
-			if (!updatedKey) {
-				log.error("Failed to disable API key");
-				throw ApiKeyErrors.disableFailed(id);
+		if (!updatedKey) {
+			const existing = await db.query.apikey.findFirst({
+				where: and(
+					eq(schema.apikey.id, id),
+					eq(schema.apikey.organizationId, organizationId),
+				),
+				with: { user: true },
+			});
+			if (!existing) {
+				log.warn("API key not found");
+				throw ApiKeyErrors.notFound(id);
 			}
-			updatedKeyData = updatedKey;
+			log.info("API key is already disabled");
+			updatedKeyData = existing;
+			const result = {
+				id: updatedKeyData.id,
+				name: updatedKeyData.name,
+				start: updatedKeyData.start,
+				prefix: updatedKeyData.prefix,
+				organizationId: updatedKeyData.organizationId,
+				userId: updatedKeyData.userId,
+				refillInterval: updatedKeyData.refillInterval,
+				refillAmount: updatedKeyData.refillAmount,
+				lastRefillAt: updatedKeyData.lastRefillAt?.toISOString() ?? null,
+				enabled: updatedKeyData.enabled,
+				rateLimitEnabled: updatedKeyData.rateLimitEnabled,
+				rateLimitTimeWindow: updatedKeyData.rateLimitTimeWindow,
+				rateLimitMax: updatedKeyData.rateLimitMax,
+				requestCount: updatedKeyData.requestCount,
+				remaining: updatedKeyData.remaining,
+				lastRequest: updatedKeyData.lastRequest?.toISOString() ?? null,
+				expiresAt: updatedKeyData.expiresAt?.toISOString() ?? null,
+				createdAt: updatedKeyData.createdAt.toISOString(),
+				updatedAt: updatedKeyData.updatedAt.toISOString(),
+				permissions: updatedKeyData.permissions,
+				metadata: updatedKeyData.metadata,
+				createdBy: {
+					id: existing.user.id,
+					name: existing.user.name,
+					image: existing.user.image,
+					email: existing.user.email,
+				},
+				object: "api_key" as const,
+				event: API_KEY_UPDATE_WEBHOOK_EVENT.id,
+			};
+			return result;
 		}
 
 		log.info("API key disabled successfully");
-
-		await bus.publish(BusEvent.API_KEY_DISABLED, {
-			api_key_id: id,
-			organizationId,
-		});
+		await bus.publish(BusEvent.API_KEY_DISABLED, { api_key_id: id, organizationId });
 		log.info("NATS event published");
 
+		// Fetch user for response
+		const keyWithUser = await db.query.apikey.findFirst({
+			where: eq(schema.apikey.id, id),
+			with: { user: true },
+		});
+
 		const result = {
-			id: updatedKeyData.id,
-			name: updatedKeyData.name,
-			start: updatedKeyData.start,
-			prefix: updatedKeyData.prefix,
-			organizationId: updatedKeyData.organizationId,
-			userId: updatedKeyData.userId,
-			refillInterval: updatedKeyData.refillInterval,
-			refillAmount: updatedKeyData.refillAmount,
-			lastRefillAt: updatedKeyData.lastRefillAt?.toISOString() ?? null,
-			enabled: updatedKeyData.enabled,
-			rateLimitEnabled: updatedKeyData.rateLimitEnabled,
-			rateLimitTimeWindow: updatedKeyData.rateLimitTimeWindow,
-			rateLimitMax: updatedKeyData.rateLimitMax,
-			requestCount: updatedKeyData.requestCount,
-			remaining: updatedKeyData.remaining,
-			lastRequest: updatedKeyData.lastRequest?.toISOString() ?? null,
-			expiresAt: updatedKeyData.expiresAt?.toISOString() ?? null,
-			createdAt: updatedKeyData.createdAt.toISOString(),
-			updatedAt: updatedKeyData.updatedAt.toISOString(),
-			permissions: updatedKeyData.permissions,
-			metadata: updatedKeyData.metadata,
-			createdBy: {
-				id: existingKey.user.id,
-				name: existingKey.user.name,
-				image: existingKey.user.image,
-				email: existingKey.user.email,
-			},
+			id: updatedKey.id,
+			name: updatedKey.name,
+			start: updatedKey.start,
+			prefix: updatedKey.prefix,
+			organizationId: updatedKey.organizationId,
+			userId: updatedKey.userId,
+			refillInterval: updatedKey.refillInterval,
+			refillAmount: updatedKey.refillAmount,
+			lastRefillAt: updatedKey.lastRefillAt?.toISOString() ?? null,
+			enabled: updatedKey.enabled,
+			rateLimitEnabled: updatedKey.rateLimitEnabled,
+			rateLimitTimeWindow: updatedKey.rateLimitTimeWindow,
+			rateLimitMax: updatedKey.rateLimitMax,
+			requestCount: updatedKey.requestCount,
+			remaining: updatedKey.remaining,
+			lastRequest: updatedKey.lastRequest?.toISOString() ?? null,
+			expiresAt: updatedKey.expiresAt?.toISOString() ?? null,
+			createdAt: updatedKey.createdAt.toISOString(),
+			updatedAt: updatedKey.updatedAt.toISOString(),
+			permissions: updatedKey.permissions,
+			metadata: updatedKey.metadata,
+			createdBy: keyWithUser?.user
+				? {
+						id: keyWithUser.user.id,
+						name: keyWithUser.user.name,
+						image: keyWithUser.user.image,
+						email: keyWithUser.user.email,
+					}
+				: undefined,
 			object: "api_key" as const,
 			event: API_KEY_UPDATE_WEBHOOK_EVENT.id,
 		};
