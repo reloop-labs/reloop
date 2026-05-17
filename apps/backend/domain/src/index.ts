@@ -56,10 +56,7 @@ const domainService = new Elysia({
 		await loader();
 	})
 	.listen(port, () => {
-		log.info(
-			"server",
-			`Domain Server is running on http://localhost:${port}/api/domain`,
-		);
+		console.log(`Domain Server is running on http://localhost:${port}/api/domain`);
 	});
 
 export type DomainService = typeof domainService;

@@ -3,10 +3,11 @@ import { getRoomController } from "./get-room.controllers";
 
 export const getRoomRoute = new Elysia().get(
 	"/rooms/:roomName",
-	({ params: { roomName }, error }) => {
+	({ params: { roomName }, set }) => {
 		const roomInfo = getRoomController(roomName);
 		if (!roomInfo) {
-			return error(404, { error: `Room "${roomName}" not found` });
+			set.status = 404;
+			return { error: `Room "${roomName}" not found` };
 		}
 		return roomInfo;
 	},

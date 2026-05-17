@@ -25,13 +25,7 @@ export async function listTemplates(params: {
 
 		return result;
 	} catch (error) {
-		log.error(
-			{
-				organizationId,
-				error: error instanceof Error ? error.message : String(error),
-			},
-			"Error listing templates",
-		);
+		console.error(`Error listing templates: ${error instanceof Error ? error.message : String(error)}`);
 		throw error;
 	}
 }

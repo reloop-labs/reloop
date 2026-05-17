@@ -126,7 +126,7 @@ export function scheduleRoomCleanup(roomName: string) {
 			if (room && room.clients.size === 0) {
 				room.doc.destroy();
 				rooms.delete(roomName);
-				log.info({ ...({ roomName }), message: "[collab] Room destroyed (inactive })");
+				log.info({ roomName, message: "[collab] Room destroyed (inactive)" });
 			}
 		},
 		30 * 1000, // 30 seconds

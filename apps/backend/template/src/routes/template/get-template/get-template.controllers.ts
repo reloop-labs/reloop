@@ -17,13 +17,7 @@ export async function getTemplate(params: {
 
 		return template;
 	} catch (error) {
-		log.error(
-			{
-				id,
-				error: error instanceof Error ? error.message : String(error),
-			},
-			"Error getting template",
-		);
+		console.error(`Error getting template: ${error instanceof Error ? error.message : String(error)}`);
 		throw error;
 	}
 }

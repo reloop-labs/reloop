@@ -7,7 +7,6 @@ export const saveRoomRoute = new Elysia().post(
 	async (ctx) => {
 		const {
 			params: { roomName },
-			error,
 		} = ctx;
 		const persistence =
 			(ctx as unknown as { persistence?: YjsPersistence | null }).persistence ??
@@ -16,11 +15,13 @@ export const saveRoomRoute = new Elysia().post(
 		const result = await saveRoomController(roomName, persistence);
 
 		if (result === "NOT_FOUND") {
-			return error(404, { error: `Room "${roomName}" not found` });
+			ctx.set.status = 404;
+			return { error: `Room "${roomName}" not found` };
 		}
 
 		if (result === "NO_PERSISTENCE") {
-			return error(503, { error: "Persistence unavailable" });
+			ctx.set.status = 503;
+			return { error: "Persistence unavailable" };
 		}
 
 		return { success: true, roomName };

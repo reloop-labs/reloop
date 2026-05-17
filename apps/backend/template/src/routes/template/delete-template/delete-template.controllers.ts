@@ -19,13 +19,7 @@ export async function deleteTemplate(params: {
 
 		return { success: true, id: result?.id };
 	} catch (error) {
-		log.error(
-			{
-				id,
-				error: error instanceof Error ? error.message : String(error),
-			},
-			"Error deleting template",
-		);
+		console.error(`Error deleting template: ${error instanceof Error ? error.message : String(error)}`);
 		throw error;
 	}
 }

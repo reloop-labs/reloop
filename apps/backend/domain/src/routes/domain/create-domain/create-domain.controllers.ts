@@ -84,7 +84,7 @@ export async function createDomainController({
 			domain,
 		});
 	} catch (error) {
-		logger.error({ ...{ domain, error }, message: "Error creating domain" });
+		console.error(`Error creating domain: ${error instanceof Error ? error.message : String(error)}`);
 		throw error;
 	}
 }

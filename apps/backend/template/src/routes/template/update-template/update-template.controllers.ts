@@ -29,13 +29,7 @@ export async function updateTemplate(params: {
 
 		return result;
 	} catch (error) {
-		log.error(
-			{
-				id,
-				error: error instanceof Error ? error.message : String(error),
-			},
-			"Error updating template",
-		);
+		console.error(`Error updating template: ${error instanceof Error ? error.message : String(error)}`);
 		throw error;
 	}
 }
