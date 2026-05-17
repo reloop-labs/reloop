@@ -3,8 +3,10 @@ import { rateLimitPlugin } from "@reloop/api-key/middleware/rate-limit";
 import { ApiKeyModel } from "@reloop/api-key/model/api-key.model";
 import { Elysia, t } from "elysia";
 import { rotateApiKeyController } from "./rotate-api-key.controllers";
+import { rotateApiKeyXCodeSamples } from "./rotate-api-key.x-codeSamples";
 
 export const rotateApiKeyRoute = new Elysia()
+
 	.use(authMiddleware)
 	.use(rateLimitPlugin({ max: 20, windowSeconds: 60, namespace: "rotate" }))
 	.post(
@@ -31,6 +33,7 @@ export const rotateApiKeyRoute = new Elysia()
 				summary: "Rotate API key",
 				description:
 					"Generates a new secret for the API key while keeping the same ID",
+				"x-codeSamples": rotateApiKeyXCodeSamples,
 			},
 		},
 	);

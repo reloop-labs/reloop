@@ -3,8 +3,10 @@ import { rateLimitPlugin } from "@reloop/api-key/middleware/rate-limit";
 import { ApiKeyModel } from "@reloop/api-key/model/api-key.model";
 import { Elysia, t } from "elysia";
 import { disableApiKeyController } from "./disable-api-key.controllers";
+import { disableApiKeyXCodeSamples } from "./disable-api-key.x-codeSamples";
 
 export const disableApiKeyRoute = new Elysia()
+
 	.use(authMiddleware)
 	.use(rateLimitPlugin({ max: 30, windowSeconds: 60, namespace: "disable" }))
 	.post(
@@ -30,6 +32,7 @@ export const disableApiKeyRoute = new Elysia()
 				tags: ["API Keys"],
 				summary: "Disable API key",
 				description: "Disables an API key without deleting it (soft revoke)",
+				"x-codeSamples": disableApiKeyXCodeSamples,
 			},
 		},
 	);

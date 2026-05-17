@@ -1,16 +1,13 @@
 export const deleteApiKeyXCodeSamples = [
 	{
 		id: "node",
-		lang: "js",
+		lang: "javascript",
 		label: "Node.js",
-		source: `const response = await fetch("https://api.reloop.sh/api-key/v1/key_123456789", {
-  method: "DELETE",
-  headers: {
-    "Authorization": "Bearer rl_123456789"
-  }
-});
+		source: `import { Reloop } from "@reloop/node";
 
-const result = await response.json();`,
+const reloop = new Reloop({ key: "rl_123456789" });
+
+const result = await reloop.apiKey.delete("key_123456789");`,
 	},
 	{
 		id: "curl",

@@ -1,15 +1,13 @@
 export const getApiKeyXCodeSamples = [
 	{
 		id: "node",
-		lang: "js",
+		lang: "javascript",
 		label: "Node.js",
-		source: `const response = await fetch("https://api.reloop.sh/api-key/v1/key_123456789", {
-  headers: {
-    "Authorization": "Bearer rl_123456789"
-  }
-});
+		source: `import { Reloop } from "@reloop/node";
 
-const apiKey = await response.json();`,
+const reloop = new Reloop({ key: "rl_123456789" });
+
+const apiKey = await reloop.apiKey.get("key_123456789");`,
 	},
 	{
 		id: "curl",

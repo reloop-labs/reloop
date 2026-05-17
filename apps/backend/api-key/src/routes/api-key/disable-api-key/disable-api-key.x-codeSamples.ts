@@ -1,4 +1,4 @@
-export const listApiKeysXCodeSamples = [
+export const disableApiKeyXCodeSamples = [
 	{
 		id: "node",
 		lang: "javascript",
@@ -7,16 +7,13 @@ export const listApiKeysXCodeSamples = [
 
 const reloop = new Reloop({ key: "rl_123456789" });
 
-const apiKeys = await reloop.apiKey.list({
-  page: 1,
-  limit: 10
-});`,
+const apiKey = await reloop.apiKey.disable("key_123456789");`,
 	},
 	{
 		id: "curl",
 		lang: "bash",
 		label: "cURL",
-		source: `curl "https://api.reloop.sh/api-key/v1/?page=1&limit=10" \\
+		source: `curl -X POST https://api.reloop.sh/api-key/v1/disable/key_123456789 \\
   -H "Authorization: Bearer rl_123456789"`,
 	},
 	{
@@ -25,18 +22,14 @@ const apiKeys = await reloop.apiKey.list({
 		label: "Python",
 		source: `import requests
 
-response = requests.get(
-    "https://api.reloop.sh/api-key/v1/",
+response = requests.post(
+    "https://api.reloop.sh/api-key/v1/disable/key_123456789",
     headers={
         "Authorization": "Bearer rl_123456789",
     },
-    params={
-        "page": 1,
-        "limit": 10,
-    },
 )
 
-api_keys = response.json()`,
+api_key = response.json()`,
 	},
 	{
 		id: "php",
@@ -45,17 +38,13 @@ api_keys = response.json()`,
 		source: `<?php
 $client = new \\GuzzleHttp\\Client();
 
-$response = $client->get('https://api.reloop.sh/api-key/v1/', [
+$response = $client->post('https://api.reloop.sh/api-key/v1/disable/key_123456789', [
     'headers' => [
         'Authorization' => 'Bearer rl_123456789',
     ],
-    'query' => [
-        'page' => 1,
-        'limit' => 10,
-    ],
 ]);
 
-$apiKeys = json_decode($response->getBody(), true);`,
+$apiKey = json_decode($response->getBody(), true);`,
 	},
 	{
 		id: "java",
@@ -63,13 +52,14 @@ $apiKeys = json_decode($response->getBody(), true);`,
 		label: "Java",
 		source: `import java.net.URI;
 import java.net.http.*;
+import java.net.http.HttpRequest.BodyPublishers;
 
 HttpClient client = HttpClient.newHttpClient();
 
 HttpRequest request = HttpRequest.newBuilder()
-    .uri(URI.create("https://api.reloop.sh/api-key/v1/?page=1&limit=10"))
+    .uri(URI.create("https://api.reloop.sh/api-key/v1/disable/key_123456789"))
     .header("Authorization", "Bearer rl_123456789")
-    .GET()
+    .POST(BodyPublishers.noBody())
     .build();
 
 HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());`,
@@ -83,8 +73,9 @@ HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.o
 var client = new HttpClient();
 client.DefaultRequestHeaders.Add("Authorization", "Bearer rl_123456789");
 
-var response = await client.GetAsync(
-    "https://api.reloop.sh/api-key/v1/?page=1&limit=10"
+var response = await client.PostAsync(
+    "https://api.reloop.sh/api-key/v1/disable/key_123456789",
+    null
 );`,
 	},
 ];

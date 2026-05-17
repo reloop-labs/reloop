@@ -44,3 +44,45 @@ export interface SendEmailResponse {
 	status: string;
 	timestamp: string;
 }
+
+// API Key Service Types
+export interface ApiKey {
+	id: string;
+	key?: string;
+	name: string;
+	userId?: string;
+	organizationId: string;
+	enabled: boolean;
+	rateLimitEnabled: boolean;
+	rateLimit?: {
+		max: number;
+		windowSeconds: number;
+	};
+	createdAt: string;
+	updatedAt: string;
+	lastUsedAt?: string;
+}
+
+export interface CreateApiKeyRequest {
+	name: string;
+	enabled?: boolean;
+	rateLimitEnabled?: boolean;
+}
+
+export interface UpdateApiKeyRequest {
+	name?: string;
+	enabled?: boolean;
+	rateLimitEnabled?: boolean;
+}
+
+export interface ListApiKeysQuery {
+	limit?: number;
+	offset?: number;
+	search?: string;
+}
+
+export interface ListApiKeysResponse {
+	keys: ApiKey[];
+	total: number;
+	hasMore: boolean;
+}
