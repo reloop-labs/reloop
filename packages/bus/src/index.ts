@@ -26,6 +26,14 @@ class MessageBus {
 		}
 	}
 
+	async healthCheck() {
+		if (!this.nc) {
+			throw new Error("Bus not connected");
+		}
+		await this.nc.flush();
+		return true;
+	}
+
 	async publish<T extends BusEvent>(
 		event: T,
 		payload: EventPayloads[T],

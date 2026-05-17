@@ -10,27 +10,25 @@ import {
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { API_KEY_CREATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
-import { log } from "evlog";
+import { useLogger } from "evlog/elysia";
 
 export async function createApiKeyController({
 	organizationId,
 	userId,
-	body,
+	name,
 }: {
 	organizationId: string;
 	userId: string;
-	body: ApiKeyTypes.CreateApiKeyRequest;
+	name: string;
 }): Promise<ApiKeyTypes.ApiKeyWithKeyResponse> {
+	const log = useLogger();
 	try {
-		log.info({ ...{}, message: "Generating new api key" });
+		log.info("Generating new api key");
 		const fullKey = generateApiKey();
 		const hashedKey = hashApiKey(fullKey);
 		const keyStart = getKeyStart(fullKey);
-		const keyId = createId();
-		log.info({
-			...{ hashedKey, keyStart, keyId },
-			message: "APi key Generated",
-		});
+		const keyId = `api_key_${createId()}`;
+		log.info("APi key Generated");
 
 		const now = new Date();
 		const expiresAt = null;
@@ -40,15 +38,12 @@ export async function createApiKeyController({
 		const rateLimitMax = 100;
 		const remaining = rateLimitMax;
 
-		log.info({
-			...{ hashedKey, keyStart, keyId },
-			message: "Inserting API key in database",
-		});
+		log.info("Inserting API key in database");
 		const newApiKey = await db
 			.insert(schema.apikey)
 			.values({
 				id: keyId,
-				name: body.name || null,
+				name,
 				start: keyStart,
 				prefix: API_KEY_PREFIX,
 				key: hashedKey,
@@ -73,10 +68,10 @@ export async function createApiKeyController({
 			.returning();
 
 		if (!newApiKey[0]) {
-			log.error({ ...{}, message: "Failed to create API key" });
+			log.error("Failed to create API key");
 			throw ApiKeyErrors.createFailed();
 		}
-		log.info({ ...{ newApiKey }, message: "New Api key generated" });
+		log.info("New Api key generated");
 
 		const result = {
 			id: newApiKey[0].id,
@@ -92,7 +87,7 @@ export async function createApiKeyController({
 
 		return result;
 	} catch (error) {
-		log.error({ ...{ error }, message: "Error creating API key" });
+		log.error("Error creating API key");
 		throw error;
 	}
 }

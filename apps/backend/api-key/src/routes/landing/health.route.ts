@@ -1,4 +1,5 @@
 import { redis } from "@reloop/api-key/utils/loader";
+import { bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import { Elysia } from "elysia";
 
@@ -9,6 +10,7 @@ export const healthRoute = new Elysia().get(
 			const startTime = Date.now();
 			await redis.healthCheck();
 			await db.execute("SELECT 1 as test");
+			await bus.healthCheck();
 			const responseTime = Date.now() - startTime;
 
 			return {

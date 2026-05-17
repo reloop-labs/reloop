@@ -1,9 +1,8 @@
+import { apiKeyConfig } from "@reloop/api-key/api-key.config";
 import { bus } from "@reloop/bus";
 import { RedisCache } from "@reloop/cache/redis-client";
 import { db } from "@reloop/db/client";
 import { log } from "evlog";
-
-import { apiKeyConfig } from "../api-key.config";
 
 export const redis = new RedisCache("api-key");
 export const loader = async () => {
