@@ -2,6 +2,12 @@
 
 A comprehensive audiences management service built with Elysia, providing full CRUD operations, bulk import, advanced search, and status management for audience groups and individual audiences.
 
+## 🔗 Quick Links
+
+- 📚 **Documentation**: [Developer Docs](https://reloop.sh/dev/contacts-service)
+- 🌐 **Production API**: [API Base](https://api.reloop.sh/api/contacts)
+- 📜 **OpenAPI Spec**: [OpenAPI](https://reloop.sh/api/contacts/openapi)
+
 ## Features
 
 ### Audience Groups
@@ -71,21 +77,9 @@ Uses the existing audience schema from `@reloop/db`:
 
 All endpoints require authentication via the auth middleware, which validates user sessions and organization membership.
 
-## Development
+## 🚀 Setup
 
-```bash
-# Install dependencies
-bun install
-
-# Run in development mode
-bun run dev
-
-# Build for production
-bun run build
-
-# Start production server
-bun run start
-```
+For detailed setup and development instructions, please refer to the [Setup Guide](https://reloop.sh/docs/setup/backend/contacts).
 
 ## Environment Variables
 
@@ -100,3 +94,16 @@ The service integrates with:
 - **Cache**: Redis for performance optimization
 - **Auth**: Better Auth for authentication
 - **Logging**: Structured logging with context
+
+---
+
+## 🔗 Resources & Community
+
+- 📚 **Docs**: [Documentation](https://reloop.sh/docs/setup/backend/contacts)
+- 🤖 **Discovery**: [Discovery Spec](https://reloop.sh/api/contacts/agent-card.json)
+- 📖 **OpenAPI**: [OpenAPI Spec](https://reloop.sh/api/contacts/openapi)
+- 🐙 **GitHub**: [Source Code](https://github.com/reloop-labs/reloop)
+- 🆘 **Support**: [Get Help](https://reloop.sh/support)
+- 💬 **Discord**: [Join Chat](https://discord.gg/reloop)
+- 🐦 **Twitter**: [Follow Us](https://x.com/reloophq)
+- 🛠️ **Setup**: [Setup Guide](https://reloop.sh/docs/setup/backend/contacts)

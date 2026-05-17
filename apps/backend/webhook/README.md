@@ -1,15 +1,26 @@
-# Elysia with Bun runtime
+# Webhook Service API
 
-## Getting Started
-To get started with this template, simply paste this command into your terminal:
-```bash
-bun create elysia ./elysia-example
-```
+[Read more about the service](https://reloop.sh/docs/setup/backend/webhook)
 
-## Development
-To start the development server run:
-```bash
-bun run dev
-```
+## 🔗 Quick Links
 
-Open http://localhost:3000/ with your browser to see the result.
+- 📚 **Documentation**: [Developer Docs](https://reloop.sh/dev/webhook-service)
+- 🌐 **Production API**: [API Base](https://api.reloop.sh/api/webhook)
+- 📜 **OpenAPI Spec**: [OpenAPI](https://reloop.sh/api/webhook/openapi)
+
+## 🚀 Setup
+
+For detailed setup and development instructions, please refer to the [Setup Guide](https://reloop.sh/docs/setup/backend/webhook).
+
+---
+
+## 🔗 Resources & Community
+
+- 📚 **Docs**: [Documentation](https://reloop.sh/docs/setup/backend/webhook)
+- 🤖 **Discovery**: [Discovery Spec](https://reloop.sh/api/webhook/agent-card.json)
+- 📖 **OpenAPI**: [OpenAPI Spec](https://reloop.sh/api/webhook/openapi)
+- 🐙 **GitHub**: [Source Code](https://github.com/reloop-labs/reloop)
+- 🆘 **Support**: [Get Help](https://reloop.sh/support)
+- 💬 **Discord**: [Join Chat](https://discord.gg/reloop)
+- 🐦 **Twitter**: [Follow Us](https://x.com/reloophq)
+- 🛠️ **Setup**: [Setup Guide](https://reloop.sh/docs/setup/backend/webhook)

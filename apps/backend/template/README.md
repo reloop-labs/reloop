@@ -2,6 +2,12 @@
 
 Backend service for managing email templates with drag-and-drop builder support.
 
+## 🔗 Quick Links
+
+- 📚 **Documentation**: [Developer Docs](https://reloop.sh/dev/template-service)
+- 🌐 **Production API**: [API Base](https://api.reloop.sh/api/template)
+- 📜 **OpenAPI Spec**: [OpenAPI](https://reloop.sh/api/template/openapi)
+
 ## API Endpoints
 
 - `GET /api/template/` - Health check
@@ -12,14 +18,19 @@ Backend service for managing email templates with drag-and-drop builder support.
 - `DELETE /api/template/v1/:id` - Delete template
 - `POST /api/template/v1/:id/duplicate` - Duplicate template
 
-## Development
+## 🚀 Setup
 
-```bash
-bun run dev
-```
+For detailed setup and development instructions, please refer to the [Setup Guide](https://reloop.sh/docs/setup/backend/template).
 
-## Build
+---
 
-```bash
-bun run build
-```
+## 🔗 Resources & Community
+
+- 📚 **Docs**: [Documentation](https://reloop.sh/docs/setup/backend/template)
+- 🤖 **Discovery**: [Discovery Spec](https://reloop.sh/api/template/agent-card.json)
+- 📖 **OpenAPI**: [OpenAPI Spec](https://reloop.sh/api/template/openapi)
+- 🐙 **GitHub**: [Source Code](https://github.com/reloop-labs/reloop)
+- 🆘 **Support**: [Get Help](https://reloop.sh/support)
+- 💬 **Discord**: [Join Chat](https://discord.gg/reloop)
+- 🐦 **Twitter**: [Follow Us](https://x.com/reloophq)
+- 🛠️ **Setup**: [Setup Guide](https://reloop.sh/docs/setup/backend/template)
