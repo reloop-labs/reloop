@@ -104,6 +104,77 @@ All workspace operations should be executed from the **monorepo root directory**
 
 ---
 
+## Database Schema & Relationships
+
+The relational authentication and tenancy schemas are defined in [packages/db/src/schema/auth.ts](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/auth.ts). Reloop manages access controls, workspaces, and multi-tenant hierarchies using seven interconnected tables.
+
+### Enums
+
+| Enum | Values | Description |
+| :--- | :--- | :--- |
+| `organization_status` | `active` · `suspended` · `deleted` | Reloop workspace subscription and operations state |
+
+---
+
+### `user` Table
+
+Stores core profile details, role hierarchies, ban/moderation metadata, and active developer modes.
+
+| Column | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | `text` | — | Primary Key |
+| `name` | `text` | — | User's full display name |
+| `email` | `text` | — | Unique, authenticated user email |
+| `emailVerified` | `boolean` | `false` | Email validation checkpoint |
+| `image` | `text` | `null` | Profile avatar URL |
+| `role` | `text` | `null` | Global role mapping |
+| `banned` | `boolean` | `false` | System ban status flag |
+| `banReason` | `text` | `null` | Moderation explanation context |
+| `banExpires` | `timestamp` | `null` | Banning duration constraint |
+| `activeOrganizationId` | `text` | `null` | Cached workspace context identifier |
+| `mode` | `text` | `dev` | Sandbox/Developer context toggler (`dev` or `prod`) |
+
+---
+
+### `organization` Table
+
+Represents a workspace or tenant. Organizations own API keys, domains, campaigns, and contacts.
+
+| Column | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | `text` | — | Primary Key |
+| `name` | `text` | — | Workspace/Company name |
+| `slug` | `text` | — | Unique routing segment (e.g. `acme-corp`) |
+| `logo` | `text` | `null` | Organization logo URL |
+| `metadata` | `text` | `null` | Dynamic serialized attributes |
+| `billingEmail` | `text` | `null` | Target inbox for Stripe receipting |
+| `billingName` | `text` | `null` | Company name on billing profiles |
+| `externalCustomerId` | `text` | `null` | Unique Stripe customer identifier |
+| `status` | `organization_status` | `active` | Workspace lifecycle operational state |
+
+---
+
+### `member` Table
+
+Maps users to organizations, granting role-based access to specific workspace entities.
+
+| Column | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | `text` | — | Primary Key |
+| `organizationId` | `text` | — | Foreign Key &rarr; [organization.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/auth.ts) |
+| `userId` | `text` | — | Foreign Key &rarr; [user.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/auth.ts) |
+| `role` | `text` | `member` | Workspace permission tier (`owner` · `admin` · `member`) |
+
+---
+
+### Other Better Auth Tables
+
+* **`account`**: Connects login methods (OAuth credentials, passwords) to [user](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/auth.ts) accounts.
+* **`verification`**: Holds secure confirmation codes for email validation and password resets.
+* **`jwks`**: Manages secure cryptographic JSON Web Key Sets for signing/validating stateless JWT tokens.
+
+---
+
 ## Interactive API Docs (Swagger)
 
 ElysiaJS generates beautiful, interactive Swagger documentation directly from your API routes. To test endpoints, inspect schemas, and query API hooks:

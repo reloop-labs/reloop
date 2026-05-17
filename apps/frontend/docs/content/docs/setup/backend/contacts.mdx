@@ -90,6 +90,59 @@ All workspace operations should be executed from the **monorepo root directory**
 
 ---
 
+## Database Schema & Relationships
+
+The relational contacts registry, custom dynamic properties, and user-group membership structures are split across three domain files: [packages/db/src/schema/contact.ts](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/contact.ts), [packages/db/src/schema/channel.ts](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/channel.ts), and [packages/db/src/schema/group.ts](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/group.ts).
+
+### Enums
+
+| Enum | Values | Description |
+| :--- | :--- | :--- |
+| `contact_status` | `subscribed` · `unsubscribed` · `blocked` | Contact general subscription operational state |
+| `suppression_reason` | `hard_bounce` · `spam_complaint` | Cause of automatic contact suppression |
+| `property_type` | `string` · `number` | Technical validation type for custom contact properties |
+| `visibility` | `private` · `public` | Opt-in preferences page channel visibility |
+| `enrollment_status` | `enrolled` · `unenrolled` | Specific channel enrollment status |
+| `default_subscription`| `opt_in` · `opt_out` | Default state for new contacts in public channels |
+
+---
+
+### `contact` Table
+
+Stores general recipient email profiles, subscription status, and automatic suppression details.
+
+| Column | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | `text` | `con_{cuid}` | Primary Key |
+| `email` | `varchar(255)` | — | Recipient email address |
+| `status` | `contact_status`| `subscribed` | Active subscription state |
+| `organizationId` | `text` | — | Foreign Key &rarr; [organization.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/auth.ts) |
+| `userId` | `text` | — | Foreign Key &rarr; [user.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/auth.ts) |
+| `firstName` | `varchar(255)` | `null` | Recipient given name |
+| `lastName` | `varchar(255)` | `null` | Recipient family name |
+| `suppressionReason` | `suppression_reason`| `null` | Populated automatically on hard bounces or spam flags |
+| `suppressedAt` | `timestamp` | `null` | Timestamp of suppression action |
+
+---
+
+### Custom Property Tables
+
+Enables workspaces to configure arbitrary custom profile metadata (e.g. `signup_date` or `score`).
+
+* **`contact_property`**: Defines the custom property keys (`propertyName`), types (`propertyType`), and defaults (`defaultValue`) scoped to an organization.
+* **`contact_property_value`**: Links custom keys directly to specific [contacts](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/contact.ts) with the compiled field `value`.
+
+---
+
+### List Channels & User Groups
+
+* **`channel`**: Represents a mailing subscription topic (e.g. `Product Updates`, `Newsletter`).
+* **`channel_subscription`**: Link table mapping [contacts](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/contact.ts) to active [channels](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/channel.ts).
+* **`group`**: Manual static segmentation grouping lists.
+* **`contact_group`**: Joins [contacts](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/contact.ts) to specific user [groups](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/group.ts).
+
+---
+
 ## Interactive API Docs (Swagger)
 
 The Contacts Service publishes dynamic Swagger documentation directly from ElysiaJS. To test endpoints and query API structures:

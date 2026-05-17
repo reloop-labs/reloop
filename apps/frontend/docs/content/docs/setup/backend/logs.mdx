@@ -108,6 +108,36 @@ The Logs Service publishes dynamic Swagger documentation directly from ElysiaJS.
 
 ## ClickHouse Schema & Events Processing
 
+Reloop utilizes **ClickHouse** as the primary columnar analytical store to handle billions of real-time logs and events with sub-second aggregate query times.
+
+### `logs` Table (ClickHouse MergeTree)
+
+The high-volume analytical event logs table is defined programmatically in [apps/backend/logs/src/utils/clickhouse.ts](file:///Users/pranavpatel/Downloads/reloop/apps/backend/logs/src/utils/clickhouse.ts).
+
+| Column | ClickHouse Type | Description |
+| :--- | :--- | :--- |
+| `id` | `String` | Unique event tracking identifier |
+| `event` | `String` | Event category (`sent` · `delivered` · `bounce` · `complaint` · `open` · `click`) |
+| `level` | `LowCardinality(String)` | Semantic severity level (`info` · `warn` · `error`) |
+| `trace_id` | `Nullable(String)` | System request trace ID for debugging |
+| `user_id` | `Nullable(String)` | Associated user profile index identifier |
+| `organization_id` | `Nullable(String)` | Workspace tenant owner identifier |
+| `metadata` | `String` | Serialized JSON string containing dynamic event context |
+| `request_details` | `String` | Serialized JSON string detailing system network environment attributes |
+| `status_code` | `Nullable(Int32)` | Network response code (e.g. `200` or `500`) |
+| `created_at` | `DateTime64(3)` | Chronological precision event millisecond timestamp |
+
+---
+
+### Storage Engine Details
+* **Engine**: `MergeTree()`
+* **Order By Index**: `(level, created_at, event, id)` (optimized for real-time dashboard analytics filtering)
+* **Partition By Key**: `toYYYYMM(created_at)` (automatically structures logs into monthly partitions for rapid truncation and high-performance querying)
+
+---
+
+### ClickHouse Event Lifecycle Processing
+
 * **Columnar Querying Architecture**: Built to handle billions of analytical rows, batching insertions from the event queues every 1-5 seconds to optimize disk writes.
 * **Tracked Event Types**:
   * `sent`: Confirms that an outbound campaign job was generated.

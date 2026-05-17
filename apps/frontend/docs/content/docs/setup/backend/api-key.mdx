@@ -89,6 +89,39 @@ All workspace operations should be executed from the **monorepo root directory**
 
 ---
 
+## Database Schema & Relationships
+
+The relational API key provisioning and rate-limiting schemas are defined inside [packages/db/src/schema/api-key.ts](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/api-key.ts).
+
+### `apikey` Table
+
+Stores provisioned credentials for programmatic API access, rate limiting state, token scopes, and request logs.
+
+| Column | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | `text` | — | Primary Key |
+| `name` | `text` | `null` | Custom label/name for the key (e.g. `GitHub CI`) |
+| `start` | `text` | `null` | The visible starting character chunk of the key |
+| `prefix` | `text` | `null` | Semantic header prefix (e.g. `reloop_`) |
+| `key` | `text` | — | Securely hashed/salted representation of the API key |
+| `organizationId` | `text` | — | Foreign Key &rarr; [organization.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/auth.ts) |
+| `userId` | `text` | — | Foreign Key &rarr; [user.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/auth.ts) |
+| `refillInterval` | `integer` | `null` | Auto-credits refill window duration (ms) |
+| `refillAmount` | `integer` | `null` | Quantity of credits granted on refill intervals |
+| `lastRefillAt` | `timestamp` | `null` | Timestamp of the last automatic refill action |
+| `enabled` | `boolean` | `true` | Activation state flag for programmatic authorization |
+| `rateLimitEnabled` | `boolean` | `true` | Enables system request throttling constraints |
+| `rateLimitTimeWindow`| `integer` | `86400000` (24hr) | Rate limit evaluation sliding window (ms) |
+| `rateLimitMax` | `integer` | `10` | Maximum request capacity allowed per window |
+| `requestCount` | `integer` | `0` | Requests sent in the current rolling timeframe |
+| `remaining` | `integer` | `null` | Available requests left before throttling |
+| `lastRequest` | `timestamp` | `null` | Timestamp of the last successful request |
+| `expiresAt` | `timestamp` | `null` | Key validation expiration constraint |
+| `permissions` | `text` | `null` | Serialized token permission scopes / policies |
+| `metadata` | `text` | `null` | Dynamic serialized customer attributes |
+
+---
+
 ## Interactive API Docs (Swagger)
 
 The API Key Service publishes dynamic Swagger documentation directly from ElysiaJS. To test endpoints and query API structures:

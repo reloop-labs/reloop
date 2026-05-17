@@ -95,6 +95,64 @@ All workspace operations should be executed from the **monorepo root directory**
 
 ---
 
+## Database Schema & Relationships
+
+The relational transactional sending logs and real-time delivery lifecycle events are defined inside [packages/db/src/schema/email.ts](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/email.ts).
+
+### Enums
+
+| Enum | Values | Description |
+| :--- | :--- | :--- |
+| `email_status` | `pending` · `sent` · `delivered` · `failed` · `bounced` · `spam` · `archived` | Email dispatch lifecycle status |
+| `email_priority` | `low` · `normal` · `high` · `urgent` | Delivery routing queue prioritization tier |
+| `email_event_type`| `sent` · `delivered` · `opened` · `clicked` · `bounced` · `complaint` · `unsubscribed` · `deferred` | ClickHouse tracked real-time customer event types |
+
+---
+
+### `email_log` Table
+
+Captures the precise metadata, content headers, physical sizing, and delivery checkpoints for every individual outbound dispatch.
+
+| Column | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | `text` | `eml_{cuid}` | Primary Key |
+| `messageId` | `varchar(500)` | — | Unique, cryptographically signed SMTP Message ID header |
+| `organizationId` | `text` | — | Foreign Key &rarr; [organization.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/auth.ts) |
+| `domainId` | `text` | — | Foreign Key &rarr; [domain.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/domain.ts) |
+| `userId` | `text` | `null` | Foreign Key &rarr; [user.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/auth.ts) |
+| `apikeyId` | `text` | `null` | Associated Foreign Key &rarr; [apikey.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/api-key.ts) |
+| `fromEmail` | `varchar(255)` | — | Validated sending sender email address |
+| `fromName` | `varchar(255)` | `null` | Friendly display name |
+| `toEmails` | `jsonb` | — | Recipient addresses list (`string[]`) |
+| `ccEmails` | `jsonb` | `null` | Carbon-Copy addresses list (`string[]`) |
+| `bccEmails` | `jsonb` | `null` | Blind Carbon-Copy addresses list (`string[]`) |
+| `replyTo` | `varchar(255)` | `null` | Overwritten routing destination for inbox responses |
+| `subject` | `text` | — | Target subject line string |
+| `textBody` | `text` | `null` | Plain text fallback rendering |
+| `htmlBody` | `text` | `null` | Rich Visual HTML message payload |
+| `status` | `email_status` | `pending` | Current delivery status checkpoint |
+| `priority` | `email_priority`| `normal` | Mailing queue priority weight |
+| `errorMessage` | `text` | `null` | Error detail dump if delivery fails |
+| `provider` | `varchar(100)` | `postfix` | Outbound mail gateway interface name |
+| `providerMessageId`| `varchar(500)` | `null` | MTA-assigned transaction receipting ID |
+| `size` | `bigint` | `0` | Physical body size in bytes |
+| `headers` | `jsonb` | `null` | Serialized custom key-value SMTP headers |
+
+---
+
+### `email_event` Table
+
+Drizzle tracking table archiving the chronological events log linked directly to individual email logs.
+
+| Column | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | `text` | `ev_{cuid}` | Primary Key |
+| `emailLogId` | `text` | — | Foreign Key &rarr; [email_log.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/email.ts) |
+| `type` | `email_event_type`| — | Categorical status of tracking event |
+| `metadata` | `jsonb` | `null` | Dynamic serialized context (e.g. User-Agent strings) |
+
+---
+
 ## Interactive API Docs (Swagger)
 
 The Email Service publishes dynamic Swagger documentation directly from ElysiaJS. To test endpoints and query API structures:

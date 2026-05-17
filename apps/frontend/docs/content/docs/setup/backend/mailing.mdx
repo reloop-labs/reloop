@@ -93,6 +93,29 @@ All workspace operations should be executed from the **monorepo root directory**
 
 ---
 
+## Database & Queue Schemas
+
+Mailing Service acts as the transactional sending pipeline, orchestrating relational tables from [packages/db/src/schema/email.ts](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/email.ts) alongside high-throughput Redis job queues.
+
+### Relational Tables Utilized
+
+* **`email_log`**: Records outbound mail logs, status checks, recipients, cc/bcc fields, priority constraints, and physical sizes (see [Email Service Schema](/setup/backend/email#database-schema--relationships)).
+* **`template`**: Reads visual HTML layout blueprints compiled by developers or customers (see [Template Service Schema](/setup/backend/template#database-schema--relationships)).
+
+---
+
+### Redis BullMQ Job Queues
+
+Background queue scheduling handles async dispatches, rate limiting, and retries.
+
+| Queue Name | Job Payload | Processing Behavior |
+| :--- | :--- | :--- |
+| `mail-queue` | `{ logId: string, recipient: string }` | Fetches [email_log](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/email.ts), compiles HTML templates, verifies domains, and delivers via MTA servers. |
+| `mail-retry-queue` | `{ logId: string, retryAttempt: number }` | Holds soft-bounced logs under exponential backoff waiting for retry periods. |
+| `analytics-queue` | `{ event: string, metadata: object }` | Buffers real-time delivery and click tracking events to ClickHouse. |
+
+---
+
 ## Interactive API Docs (Swagger)
 
 The Mailing Service publishes dynamic Swagger documentation directly from ElysiaJS. To test endpoints and query API structures:

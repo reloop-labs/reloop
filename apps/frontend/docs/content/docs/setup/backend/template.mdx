@@ -90,6 +90,57 @@ All workspace operations should be executed from the **monorepo root directory**
 
 ---
 
+## Database Schema & Relationships
+
+The relational visual layouts blueprint and revision rollback schemas are defined inside [packages/db/src/schema/template.ts](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/template.ts).
+
+### Enums
+
+| Enum | Values | Description |
+| :--- | :--- | :--- |
+| `template_status` | `draft` · `published` · `archived` | Template development lifecycle state |
+| `template_block_type` | `heading` · `text` · `button` · `image` · `divider` · `spacer` · `section` · `container` · `columns` · `html` | Semantic builder blocks for compiling visual content |
+
+---
+
+### `template` Table
+
+Holds active drag-and-drop Lexical compiler state blueprints, parsed merge variables, and active thumbnails.
+
+| Column | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | `text` | `tmpl_{cuid}` | Primary Key |
+| `name` | `varchar(255)` | — | Friendly design/label name |
+| `description` | `text` | `null` | Contextual developer explanation details |
+| `subject` | `varchar(500)`| `null` | Default email subject line |
+| `organizationId` | `text` | — | Foreign Key &rarr; [organization.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/auth.ts) |
+| `createdByUserId` | `text` | — | Foreign Key &rarr; [user.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/auth.ts) |
+| `status` | `template_status`| `draft` | Deployment state of template |
+| `content` | `jsonb` | `[]` | Serialized Lexical builder block array (`TemplateBlock[]`) |
+| `variables` | `jsonb` | `[]` | Dynamically parsed dynamic token names (`string[]`) |
+| `currentVersion` | `integer` | `1` | Increment counter representing current published edition |
+| `thumbnailUrl` | `text` | `null` | Image preview URL generated on save |
+| `isDefault` | `boolean` | `false` | System standard placeholder flag |
+
+---
+
+### `template_version` Table
+
+History ledger tracking every saved iteration, enabling single-click rollback capabilities.
+
+| Column | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | `text` | `tmpl_ver_{cuid}`| Primary Key |
+| `templateId` | `text` | — | Foreign Key &rarr; [template.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/template.ts) |
+| `version` | `integer` | — | Precise revision sequence number |
+| `subject` | `varchar(500)`| `null` | Subject line associated with version |
+| `content` | `jsonb` | — | Target block layout snapshot |
+| `variables` | `jsonb` | `[]` | Merge tags mapped for revision |
+| `renderedHtml` | `text` | `null` | Precompiled physical HTML rendering for high-performance sending |
+| `createdByUserId` | `text` | — | Foreign Key &rarr; [user.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/auth.ts) |
+
+---
+
 ## Interactive API Docs (Swagger)
 
 The Template Service publishes dynamic Swagger documentation directly from ElysiaJS. To test endpoints and query API structures:

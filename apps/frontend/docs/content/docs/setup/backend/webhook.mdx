@@ -91,6 +91,70 @@ All workspace operations should be executed from the **monorepo root directory**
 
 ---
 
+## Database Schema & Relationships
+
+The relational subscriber endpoints configuration, event subscriptions, payload archives, and dispatch delivery logs are defined inside [packages/db/src/schema/webhook.ts](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/webhook.ts).
+
+### Enums
+
+| Enum | Values | Description |
+| :--- | :--- | :--- |
+| `webhook_status` | `active` · `paused` · `disabled` · `failed` | Webhook subscription delivery status |
+| `webhook_delivery_status` | `pending` · `success` · `failed` · `retrying` | Specific event dispatch execution status |
+
+---
+
+### `webhook` Table
+
+Holds user-configured outbound endpoints, secret signing tokens, and execution aggregations.
+
+| Column | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | `text` | `wh_{cuid}` | Primary Key |
+| `name` | `varchar(255)` | — | Friendly name label for the endpoint |
+| `url` | `text` | — | Recipient HTTP target URL destination |
+| `secret` | `text` | — | Cryptographic HMAC-SHA256 signature signing token |
+| `organizationId` | `text` | — | Foreign Key &rarr; [organization.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/auth.ts) |
+| `userId` | `text` | — | Foreign Key &rarr; [user.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/auth.ts) |
+| `status` | `webhook_status`| `active` | Active subscription configuration state |
+| `customHeaders` | `jsonb` | `null` | Key-value dictionary of custom HTTP headers sent (`Record<string, string>`) |
+| `rateLimitEnabled` | `boolean` | `true` | Throttling toggle constraint |
+| `maxRequestsPerMinute`| `integer` | `60` | Request rate volume ceiling |
+| `maxRetries` | `integer` | `3` | Maximum retry attempts for failed dispatches |
+| `successCount` | `integer` | `0` | Cumulative successful deliveries count |
+| `failureCount` | `integer` | `0` | Cumulative failed delivery attempts count |
+| `consecutiveFailures` | `integer` | `0` | Current series of consecutive failures before auto-disabling |
+
+---
+
+### `webhook_delivery` Table
+
+High-fidelity transactional logs tracking the chronological attempts, network payloads, durations, and response status codes for every event dispatch.
+
+| Column | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | `text` | `whde_{cuid}` | Primary Key |
+| `webhookId` | `text` | — | Foreign Key &rarr; [webhook.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/webhook.ts) |
+| `webhookEventId` | `text` | `null` | Foreign Key &rarr; [webhook_event.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/webhook.ts) |
+| `eventType` | `text` | — | Semantic event type (e.g. `domain.verified`) |
+| `status` | `webhook_delivery_status`| `pending` | Dispatch attempt resolution state |
+| `requestUrl` | `text` | — | Dispatched network URL |
+| `requestHeaders` | `jsonb` | `null` | Sent headers including security signature |
+| `requestBody` | `jsonb` | — | Sent JSON body payload |
+| `responseStatus` | `integer` | `null` | Received HTTP response status code |
+| `responseBody` | `text` | `null` | Received body output stream |
+| `attemptNumber` | `integer` | `1` | Increment sequence of current attempt |
+| `durationMs` | `integer` | `null` | Request completion time (ms) |
+
+---
+
+### Other Webhook Tables
+
+* **`webhook_event_subscription`**: Link table mapping [webhooks](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/webhook.ts) to specific event filters.
+* **`webhook_event`**: Relational event log storing the canonical payload structure and workspace context representing an asynchronous event trigger.
+
+---
+
 ## Interactive API Docs (Swagger)
 
 The Webhook Service publishes dynamic Swagger documentation directly from ElysiaJS. To test endpoints and query API structures:

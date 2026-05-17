@@ -92,6 +92,33 @@ All workspace operations should be executed from the **monorepo root directory**
 
 ---
 
+## Database & Queue Schemas
+
+The Workflow Automation Service acts as a distributed orchestrator, utilizing high-volume Redis background message queues powered by **BullMQ** to process delayed actions, delays, and journey transitions.
+
+### Redis Queue Schema (`workflow-queue`)
+
+The workflow executor job payload is structured as `WorkflowJobData` inside [apps/backend/workflow/src/queues/workflow.queue.ts](file:///Users/pranavpatel/Downloads/reloop/apps/backend/workflow/src/queues/workflow.queue.ts).
+
+| Job Attribute | Type | Description |
+| :--- | :--- | :--- |
+| `workflowId` | `string` | Unique identifier of the triggered automation journey |
+| `organizationId` | `string` | Workspace tenant owner identifier |
+| `type` | `string` | Event catalyst category (e.g. `contacts.created` · `form.submitted`) |
+| `payload` | `Record<string, unknown>` | Serialized JSON containing dynamic event attributes |
+
+---
+
+### Executed Relational Data Mappings
+
+The workflow service interacts with several core relational schemas to evaluate campaign steps:
+
+* **`contact`**: Evaluates contact fields, status criteria, and custom suppression rules (see [Contacts Service Schema](/setup/backend/contacts#database-schema--relationships)).
+* **`email_log`**: Triggers outbound transactional dispatches resulting from drip steps (see [Email Service Schema](/setup/backend/email#database-schema--relationships)).
+* **`template`**: Merges Lexical content frames during drip execution steps (see [Template Service Schema](/setup/backend/template#database-schema--relationships)).
+
+---
+
 ## Interactive API Docs (Swagger)
 
 The Workflow Service publishes dynamic Swagger documentation directly from ElysiaJS. To test endpoints and query API structures:

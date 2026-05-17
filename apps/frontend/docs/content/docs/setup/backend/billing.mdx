@@ -87,6 +87,88 @@ Execute billing service operations from the **monorepo root directory** using Tu
 
 ---
 
+## Database Schema & Relationships
+
+The relational subscription packages, invoice schedules, credit balance ledgers, and usage tracking schemas are defined inside [packages/db/src/schema/billing.ts](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/billing.ts).
+
+### Enums
+
+| Enum | Values | Description |
+| :--- | :--- | :--- |
+| `billing_cycle` | `monthly` · `annual` | Charging occurrence frequency |
+| `subscription_status` | `active` · `past_due` · `cancelled` · `trialing` · `paused` | Workspace subscription lifecycle state |
+| `ledger_entry_type` | `credit_purchased` · `email_sent` · `rollover_applied` · `manual_adjustment` · `refund` · `plan_change` · `period_reset` | Transaction types in the credit ledger |
+| `email_send_status` | `queued` · `sent` · `skipped` · `failed` · `bounced` | Overage/credit tracking delivery state |
+| `skip_reason` | `over_limit` · `unsubscribed` · `duplicate` · `invalid_address` · `suppressed` · `dry_run` | Logical skips avoiding billing drops |
+| `invoice_status` | `draft` · `open` · `paid` · `void` · `uncollectible` | Invoice collection states |
+
+---
+
+### `plan` Table
+
+Defines base tiers, credits entitlements, and limits for the platform.
+
+| Column | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | `text` | `pln_{cuid}` | Primary Key |
+| `name` | `varchar(100)` | — | Tier display name (e.g. `Startup`) |
+| `monthlyCredits` | `integer` | — | Total default monthly volume capacity |
+| `overageLimit` | `integer` | `0` | Absolute ceiling allowed past base capacity |
+| `basePriceUsd` | `decimal` | — | Base charge rate for the package |
+| `overagePricePerEmail`| `decimal` | `0` | Unit charge per overage dispatch |
+| `billingCycle` | `billing_cycle` | `monthly` | Plan billing recurring frequency |
+| `rolloverEnabled` | `boolean` | `false` | Carries unused volume to next periods |
+| `maxRolloverCredits`| `integer` | `null` | Cap limit for rollovers |
+| `ratePerSecond` | `integer` | `50` | Concurrent throughput limit |
+| `maxAttachmentSizeMb`| `integer` | `10` | Size capacity for outbound uploads |
+| `isActive` | `boolean` | `true` | System offering visibility flag |
+
+---
+
+### `subscription` Table
+
+Links a workspace/organization to a chosen subscription tier with active usage counters.
+
+| Column | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | `text` | `sub_{cuid}` | Primary Key |
+| `organizationId` | `text` | — | Foreign Key &rarr; [organization.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/auth.ts) |
+| `planId` | `text` | — | Foreign Key &rarr; [plan.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/billing.ts) |
+| `status` | `subscription_status` | `active` | Active subscription state |
+| `creditsUsed` | `integer` | `0` | Base package credits spent |
+| `creditsRemaining` | `integer` | `0` | Unspent base credits remaining |
+| `rolloverCredits` | `integer` | `0` | Accumulated unspent credits carried over |
+| `overageCreditsUsed` | `integer` | `0` | Total overage consumed in period |
+| `currentPeriodStart` | `timestamp` | — | Current billing window lower bound |
+| `currentPeriodEnd` | `timestamp` | — | Current billing window upper bound |
+| `externalSubscriptionId`| `varchar` | `null` | Associated Stripe subscription ID |
+
+---
+
+### `credit_ledger` Table
+
+Audit ledger tracking every transactional shift in a workspace's credit balance.
+
+| Column | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | `text` | `cld_{cuid}` | Primary Key |
+| `organizationId` | `text` | — | Foreign Key &rarr; [organization.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/auth.ts) |
+| `subscriptionId` | `text` | — | Foreign Key &rarr; [subscription.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/billing.ts) |
+| `entryType` | `ledger_entry_type`| — | Type of transaction performed |
+| `delta` | `integer` | — | Change magnitude (+/- credits shift) |
+| `balanceAfter` | `integer` | — | Updated ledger total after change |
+| `reason` | `text` | `null` | Narrative descriptive context |
+| `referenceId` | `text` | `null` | External reference (e.g. `email_send.id`) |
+
+---
+
+### Other Billing Tables
+
+* **`billing_invoice`**: Captures invoice statements, credits included/used, overage totals, and payment confirmation statuses.
+* **`email_send`**: High-performance operational log mapping outbound messages to specific subscription balances for overage verification and credit deductions.
+
+---
+
 ## Interactive API Docs (Swagger)
 
 The Billing Service exposes dynamic OpenAPI specs. To run test queries and explore billing endpoints:
