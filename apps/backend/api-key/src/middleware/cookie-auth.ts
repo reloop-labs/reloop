@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { redis } from "@reloop/api-key/utils/loader";
 
 type SessionResult = {
@@ -11,7 +12,7 @@ export async function validateSession(
 ): Promise<SessionResult | null> {
 	if (!cookie) return null;
 
-	const cacheKey = `session:${Buffer.from(cookie).toString("base64url").slice(0, 96)}`;
+	const cacheKey = `session:${createHash("sha256").update(cookie).digest("hex")}`;
 
 	const cached = await redis.get<SessionResult>(cacheKey);
 	if (cached) return cached;

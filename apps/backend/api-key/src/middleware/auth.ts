@@ -21,7 +21,7 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 					log.set({
 						traceId,
 						user: sessionResult.userId,
-						organizationId: sessionResult.userId,
+						organizationId: sessionResult.organizationId,
 					});
 					return { ...sessionResult, traceId };
 				}
