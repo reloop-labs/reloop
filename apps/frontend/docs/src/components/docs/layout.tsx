@@ -12,9 +12,10 @@ import { Sidebar } from "./sidebar";
 interface DocsLayoutProps {
 	children: ReactNode;
 	tree: PageTreeItem[];
+	pathname?: string;
 }
 
-export function DocsLayout({ children, tree }: DocsLayoutProps) {
+export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 	const [open, setOpen] = useState(false);
 
 	return (
@@ -67,6 +68,7 @@ export function DocsLayout({ children, tree }: DocsLayoutProps) {
 										tree={tree}
 										isMobile
 										onLinkClick={() => setOpen(false)}
+										pathname={pathname}
 									/>
 								</div>
 							</motion.div>
@@ -76,7 +78,7 @@ export function DocsLayout({ children, tree }: DocsLayoutProps) {
 
 				{/* Desktop Sidebar - Only visible on LG+ */}
 				<aside className="hidden shrink-0 border-fd-border border-r lg:block lg:w-60">
-					<Sidebar tree={tree} />
+					<Sidebar tree={tree} pathname={pathname} />
 				</aside>
 
 				{/* Main Content Area - Seamless */}

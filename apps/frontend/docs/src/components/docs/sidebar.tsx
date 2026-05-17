@@ -26,14 +26,18 @@ interface SidebarProps {
 	tree: PageTreeItem[];
 	isMobile?: boolean;
 	onLinkClick?: () => void;
+	pathname?: string;
 }
 
-export function Sidebar({ tree, isMobile, onLinkClick }: SidebarProps) {
-	const pathname = usePathname();
+export function Sidebar({ tree, isMobile, onLinkClick, pathname: propPathname }: SidebarProps) {
+	const clientPathname = usePathname();
+	const pathname = propPathname ?? clientPathname;
 	const activeTab =
 		navigationTabs.find((tab) =>
 			tab.url === "/" ? pathname === "/" : pathname.startsWith(tab.url),
 		) ?? navigationTabs[0];
+
+	console.log("[Sidebar Debug] propPathname:", propPathname, "clientPathname:", clientPathname, "activeTab:", activeTab.title);
 
 	// Filter tree based on active section
 	const filteredTree = useMemo(() => {
@@ -171,7 +175,7 @@ export function Sidebar({ tree, isMobile, onLinkClick }: SidebarProps) {
 				{/* Mobile Product Switcher */}
 				{isMobile && (
 					<div className="mb-2 px-1">
-						<ProductSwitcher />
+						<ProductSwitcher pathname={pathname} />
 					</div>
 				)}
 
@@ -224,8 +228,9 @@ export function Sidebar({ tree, isMobile, onLinkClick }: SidebarProps) {
 	);
 }
 
-function ProductSwitcher() {
-	const pathname = usePathname();
+function ProductSwitcher({ pathname: propPathname }: { pathname?: string }) {
+	const clientPathname = usePathname();
+	const pathname = propPathname ?? clientPathname;
 	const activeTab =
 		navigationTabs.find((tab) =>
 			tab.url === "/" ? pathname === "/" : pathname.startsWith(tab.url),

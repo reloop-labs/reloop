@@ -112,9 +112,12 @@ export default async function Page(props: {
 
 	const { previous, next } = source.findNeighbor(page.url);
 
+	// Force RSC cache bust: 2026-05-17T03:30:00Z
+	const pathname = page.url;
+
 	return (
 		<CodeColumnProvider>
-			<DocsLayout tree={source.pageTree.children as PageTreeItem[]}>
+			<DocsLayout tree={source.pageTree.children as PageTreeItem[]} pathname={pathname}>
 				<div
 					className={`mx-auto flex w-full flex-col ${hideToc ? "max-w-none" : "max-w-[1100px] xl:grid xl:grid-cols-[1fr_240px] xl:gap-8"}`}
 				>

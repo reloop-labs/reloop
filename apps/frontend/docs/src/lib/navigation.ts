@@ -1,6 +1,5 @@
 export const navigationTabs = [
 	{ title: "Documentation", url: "/", iconName: "file-text" as const },
-	{ title: "Setup", url: "/setup", iconName: "laptop" as const },
 	{ title: "API Reference", url: "/api", iconName: "code" as const },
 	{ title: "Build with AI", url: "/integrations", iconName: "bulb" as const },
 	{
@@ -9,4 +8,5 @@ export const navigationTabs = [
 		iconName: "swatch-book" as const,
 	},
 	{ title: "Webhooks", url: "/webhooks", iconName: "webhook" as const },
+	{ title: "Setup", url: "/setup", iconName: "laptop" as const },
 ];
