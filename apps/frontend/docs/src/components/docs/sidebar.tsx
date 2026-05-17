@@ -165,7 +165,7 @@ export function Sidebar({
 				<button
 					type="button"
 					onClick={() => setIsSearchOpen(true)}
-					className="flex h-8.5 flex-1 items-center gap-2 rounded-lg border border-fd-border bg-fd-background px-2.5 text-fd-muted-foreground text-xs transition-all hover:border-fd-foreground/10 hover:shadow-sm"
+					className="flex h-8.5 flex-1 items-center gap-2 rounded-lg border border-fd-border bg-fd-background px-2.5 text-fd-muted-foreground text-xs transition-all hover:border-fd-foreground/10"
 				>
 					<Search className="h-3.5 w-3.5" />
 					<span className="flex-1 text-left">Search...</span>
@@ -175,7 +175,7 @@ export function Sidebar({
 				</button>
 				<button
 					type="button"
-					className="flex h-8.5 w-8.5 items-center justify-center rounded-lg border border-fd-border bg-fd-background text-fd-muted-foreground transition-all hover:border-fd-foreground/10 hover:text-fd-foreground hover:shadow-sm"
+					className="flex h-8.5 w-8.5 items-center justify-center rounded-lg border border-fd-border bg-fd-background text-fd-muted-foreground transition-all hover:border-fd-foreground/10 hover:text-fd-foreground"
 				>
 					<Sparkles className="h-3.5 w-3.5" />
 				</button>
@@ -239,7 +239,7 @@ function ProductSwitcher({ pathname: propPathname }: { pathname?: string }) {
 			<Popover.Trigger asChild>
 				<button
 					type="button"
-					className="flex w-full items-center justify-between gap-2 rounded-lg border border-fd-border bg-fd-background px-3 py-2 text-fd-foreground shadow-sm transition-all hover:bg-fd-foreground/[0.02]"
+					className="flex w-full items-center justify-between gap-2 rounded-lg border border-fd-border bg-fd-background px-3 py-2 text-fd-foreground transition-all hover:bg-fd-foreground/[0.02]"
 				>
 					<div className="flex items-center gap-2.5">
 						<Icon
@@ -255,7 +255,7 @@ function ProductSwitcher({ pathname: propPathname }: { pathname?: string }) {
 				<Popover.Content
 					sideOffset={0}
 					align="start"
-					className="fade-in zoom-in-95 z-50 w-[240px] animate-in overflow-hidden rounded-xl border border-fd-border bg-fd-background p-1 shadow-xl outline-none"
+					className="fade-in zoom-in-95 z-50 w-[240px] animate-in overflow-hidden rounded-xl border border-fd-border bg-fd-background p-1 outline-none"
 				>
 					<div className="flex flex-col gap-0.5">
 						{navigationTabs.map((tab) => {
@@ -321,7 +321,7 @@ function ThemeToggle() {
 	];
 
 	return (
-		<div className="flex w-fit items-center rounded-full border border-stroke-soft-200 bg-fd-background p-0.5 shadow-sm">
+		<div className="flex w-fit items-center rounded-full border border-stroke-soft-100 bg-fd-background p-0.5">
 			{themes.map((themeOption) => {
 				const isSelected = theme === themeOption.value;
 				return (
@@ -330,7 +330,7 @@ function ThemeToggle() {
 						onClick={() => setTheme(themeOption.value)}
 						className={cn(
 							"flex h-6 w-6 items-center justify-center rounded-full transition-all duration-200 text-text-sub-600 hover:text-fd-foreground",
-							isSelected && "border border-stroke-soft-200 bg-fd-muted text-fd-foreground shadow-sm",
+							isSelected && "border border-stroke-soft-100 bg-fd-muted text-fd-foreground",
 						)}
 						title={themeOption.label}
 						whileHover={{ scale: 1.05 }}

@@ -2,6 +2,8 @@
 @import "tailwindcss";
 @source "../../src/**/*.{ts,tsx}";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
 	--font-sans: var(--font-open-runde), ui-sans-serif, system-ui, sans-serif;
 	--radius-xl: 0.75rem;
@@ -10,7 +12,7 @@
 	/* Core theme colors - matching dashboard design tokens */
 	--color-fd-background: #ffffff;
 	--color-fd-foreground: #171717;
-	--color-fd-muted: #f5f5f5;
+	--color-fd-muted: #f7f7f7;
 	--color-fd-muted-foreground: #5c5c5c;
 	--color-fd-border: #f5f5f5;
 	--color-fd-primary: #171717;
@@ -22,6 +24,11 @@
 	--color-neutral-alpha-10: #a3a3a31a;
 	--color-stroke-soft-200: #e5e5e5;
 	--color-text-sub-600: #525252;
+
+	/* Dashboard background & layout design tokens */
+	--color-bg-weak-50: #f7f7f7;
+	--color-bg-white-0: #ffffff;
+	--color-stroke-soft-100: #f5f5f5;
 }
 
 :root {
@@ -30,7 +37,7 @@
 }
 
 .dark {
-	--color-fd-background: #000000;
+	--color-fd-background: #0a0a0a;
 	--color-fd-foreground: #ffffff;
 	--color-fd-muted: #1c1c1c;
 	--color-fd-muted-foreground: #a3a3a3;
@@ -43,6 +50,11 @@
 	/* Dark mode overrides */
 	--color-stroke-soft-200: #404040;
 	--color-text-sub-600: #a3a3a3;
+
+	/* Dashboard background & layout design tokens (dark mode) */
+	--color-bg-weak-50: #000000;
+	--color-bg-white-0: #000000;
+	--color-stroke-soft-100: #292929;
 }
 
 /* Base body */

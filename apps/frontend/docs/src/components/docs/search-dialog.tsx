@@ -114,7 +114,7 @@ export function SearchDialog({ open, onOpenChange, tree }: SearchDialogProps) {
 									animate={{ opacity: 1, scale: 1, y: 0 }}
 									exit={{ opacity: 0, scale: 0.95, y: -20 }}
 									transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-									className="relative w-full max-w-2xl overflow-hidden rounded-2xl border border-fd-border bg-fd-popover shadow-2xl"
+									className="relative w-full max-w-2xl overflow-hidden rounded-2xl border border-fd-border bg-fd-popover"
 								>
 									<Dialog.Title className="sr-only">
 										Search Documentation
@@ -180,7 +180,7 @@ export function SearchDialog({ open, onOpenChange, tree }: SearchDialogProps) {
 															className={cn(
 																"flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-fd-border bg-fd-background transition-colors",
 																index === selectedIndex
-																	? "border-fd-foreground/10 bg-fd-background shadow-sm"
+																	? "border-fd-foreground/10 bg-fd-background"
 																	: "",
 															)}
 														>

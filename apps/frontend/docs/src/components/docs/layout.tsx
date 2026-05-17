@@ -19,9 +19,9 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 	const [open, setOpen] = useState(false);
 
 	return (
-		<div className="flex h-[100dvh] w-full flex-col overflow-hidden bg-fd-background">
+		<div className="flex h-[100dvh] w-full flex-col overflow-hidden bg-bg-weak-50 dark:bg-black">
 			{/* Unified Header - Borderless */}
-			<header className="z-50 flex h-12 w-full shrink-0 bg-fd-background/80 backdrop-blur-md">
+			<header className="z-50 flex h-12 w-full shrink-0 bg-bg-weak-50/80 backdrop-blur-md dark:bg-black/80">
 				{/* Desktop Logo Area - Only visible on LG+ */}
 				<div className="hidden shrink-0 items-center px-4 pt-1 lg:flex lg:w-60">
 					<Link href="/" className="flex items-center">
@@ -34,7 +34,7 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 				</div>
 			</header>
 
-			<div className="flex flex-1 flex-row overflow-hidden bg-fd-muted/[0.08]">
+			<div className="flex flex-1 flex-row overflow-hidden bg-bg-weak-50 dark:bg-black">
 				{/* Mobile Drawer */}
 				<Dialog.Root open={open} onOpenChange={setOpen}>
 					<Dialog.Portal>
@@ -52,7 +52,7 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 								animate={{ x: 0 }}
 								exit={{ x: "-100%" }}
 								transition={{ type: "spring", damping: 25, stiffness: 200 }}
-								className="fixed inset-y-0 left-0 z-50 w-72 border-fd-border border-r bg-fd-background p-0 shadow-2xl focus:outline-none"
+								className="fixed inset-y-0 left-0 z-50 w-72 border-fd-border border-r bg-fd-background p-0 focus:outline-none"
 							>
 								<div className="flex h-12 items-center border-fd-border border-b px-4">
 									<Link
@@ -84,7 +84,7 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 				{/* Main Content Area - Seamless Card Layout */}
 				<main
 					id="nd-page"
-					className="relative mr-2 mb-2 ml-4 flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-stroke-soft-200 bg-fd-background shadow-sm"
+					className="relative mr-2 mb-2 ml-4 flex min-h-0 flex-1 flex-col overflow-hidden rounded-3xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]"
 				>
 					<div className="flex-1 overflow-y-auto overflow-x-hidden">
 						<div className="mx-auto min-h-full w-full transition-all duration-300">

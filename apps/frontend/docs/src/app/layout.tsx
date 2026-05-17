@@ -44,7 +44,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 			suppressHydrationWarning
 		>
 			<body
-				className="flex min-h-screen flex-col overflow-x-hidden bg-fd-background text-fd-foreground"
+				className="flex min-h-screen flex-col overflow-x-hidden bg-bg-weak-50 text-fd-foreground dark:bg-black"
 				suppressHydrationWarning
 			>
 				<ThemeProvider>{children}</ThemeProvider>
