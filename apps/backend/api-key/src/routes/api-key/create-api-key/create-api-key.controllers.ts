@@ -78,6 +78,7 @@ export async function createApiKeyController({
 			api_key_id: newApiKey[0].id,
 			organizationId,
 		});
+		log.info("NATS event published");
 
 		const result = {
 			id: newApiKey[0].id,

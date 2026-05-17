@@ -3,7 +3,7 @@ import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { API_KEY_LIST_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, count, desc, eq, ilike, or } from "drizzle-orm";
-import { log } from "evlog";
+import { useLogger } from "evlog/elysia";
 
 export async function listApiKeysController({
 	query,
@@ -14,7 +14,8 @@ export async function listApiKeysController({
 }): Promise<ApiKeyTypes.ApiKeyListResponse> {
 	const { page = 1, limit = 10, enabled, userId, q } = query;
 	const offset = (page - 1) * limit;
-	log.info({ ...{ query }, message: "Getting API keys" });
+	const log = useLogger();
+	log.info("Getting API keys");
 	try {
 		const conditions = [eq(schema.apikey.organizationId, organizationId)];
 		if (enabled !== undefined)
@@ -31,13 +32,13 @@ export async function listApiKeysController({
 			}
 		}
 		const whereClause = and(...conditions);
-		log.info({ ...{ whereClause }, message: "Getting Total Count" });
+		log.info("Getting Total Count");
 		const totalResult = await db
 			.select({ count: count() })
 			.from(schema.apikey)
 			.where(whereClause);
 		const total = totalResult[0]?.count || 0;
-		log.info({ ...{ total }, message: "Total Count" });
+		log.info("Total Count retrieved");
 		const result = await db.query.apikey.findMany({
 			where: whereClause,
 			orderBy: desc(schema.apikey.createdAt),
@@ -45,7 +46,7 @@ export async function listApiKeysController({
 			offset: offset,
 			with: { user: true },
 		});
-		log.info({ ...{ result }, message: "API keys" });
+		log.info("API keys retrieved");
 		return {
 			apiKeys: result.map((apiKey) => {
 				const { user, ...apiKeyData } = apiKey;
@@ -88,7 +89,7 @@ export async function listApiKeysController({
 			event: API_KEY_LIST_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
-		log.error({ ...{ query, error }, message: "Error listing API keys" });
+		log.error("Error listing API keys");
 		throw error;
 	}
 }

@@ -4,7 +4,7 @@ import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { API_KEY_GET_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq } from "drizzle-orm";
-import { log } from "evlog";
+import { useLogger } from "evlog/elysia";
 
 export async function getApiKeyController({
 	apiKeyId,
@@ -13,7 +13,8 @@ export async function getApiKeyController({
 	apiKeyId: string;
 	organizationId: string;
 }): Promise<ApiKeyTypes.ApiKeyResponse> {
-	log.info({ ...{ apiKeyId }, message: "Getting API key" });
+	const log = useLogger();
+	log.info("Getting API key");
 	try {
 		const result = await db.query.apikey.findFirst({
 			where: and(
@@ -24,12 +25,12 @@ export async function getApiKeyController({
 		});
 
 		if (!result) {
-			log.warn({ ...{ apiKeyId }, message: "API key not found" });
+			log.warn("API key not found");
 			throw ApiKeyErrors.notFound(apiKeyId);
 		}
 
 		const { user, ...apiKeyData } = result;
-		log.info({ ...{ apiKeyId }, message: "API key retrieved successfully" });
+		log.info("API key retrieved successfully");
 		return {
 			id: apiKeyData.id,
 			name: apiKeyData.name,
@@ -62,7 +63,7 @@ export async function getApiKeyController({
 			event: API_KEY_GET_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
-		log.error({ ...{ apiKeyId, error }, message: "Error getting API key" });
+		log.error("Error getting API key");
 		throw error;
 	}
 }

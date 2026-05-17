@@ -58,6 +58,7 @@ export async function rotateApiKeyController({
 			api_key_id: id,
 			organizationId,
 		});
+		log.info("NATS event published");
 
 		const result = {
 			id: updatedKey.id,

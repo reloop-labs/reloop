@@ -44,6 +44,7 @@ export async function deleteApiKeyController({
 			api_key_id: apiKeyId,
 			organizationId,
 		});
+		log.info("NATS event published");
 
 		const result = {
 			id: apiKeyId,
