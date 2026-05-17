@@ -19,6 +19,7 @@ import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import {
 	createContext,
+	useCallback,
 	useContext,
 	useEffect,
 	useLayoutEffect,
@@ -35,6 +36,8 @@ interface SidebarContextType {
 	setHoveredEl: (el: HTMLElement | null) => void;
 	activeEl: HTMLElement | null;
 	setActiveEl: (el: HTMLElement | null) => void;
+	openFolders: Set<string>;
+	toggleFolder: (url: string) => void;
 	pathname: string;
 }
 
@@ -120,6 +123,54 @@ export function Sidebar({
 	const [isSearchOpen, setIsSearchOpen] = useState(false);
 	const navRef = useRef<HTMLElement>(null);
 
+	// Collect URLs of all folders that contain the active page (at any depth)
+	const getActiveFolderUrls = useCallback(
+		(nodes: PageTreeItem[]): string[] => {
+			const result: string[] = [];
+			for (const node of nodes) {
+				if (node.type !== "folder") continue;
+				const directlyActive = checkIsActive(node.url, pathname, false);
+				const childActive = node.children.some((c) =>
+					c.type === "page"
+						? checkIsActive(c.url, pathname, false)
+						: false,
+				);
+				const deepActive =
+					getActiveFolderUrls(node.children).length > 0;
+				if (directlyActive || childActive || deepActive) {
+					result.push(node.url);
+				}
+				result.push(...getActiveFolderUrls(node.children));
+			}
+			return result;
+		},
+		[pathname],
+	);
+
+	// Folder open state lives here — only ever grows, never shrinks automatically
+	const [openFolders, setOpenFolders] = useState<Set<string>>(
+		() => new Set(getActiveFolderUrls(filteredTree)),
+	);
+
+	// On navigation: add newly-active folders but never remove any
+	useEffect(() => {
+		const urls = getActiveFolderUrls(filteredTree);
+		if (urls.length === 0) return;
+		setOpenFolders((prev) => {
+			if (urls.every((u) => prev.has(u))) return prev;
+			return new Set([...prev, ...urls]);
+		});
+	}, [pathname, filteredTree, getActiveFolderUrls]);
+
+	const toggleFolder = useCallback((url: string) => {
+		setOpenFolders((prev) => {
+			const next = new Set(prev);
+			if (next.has(url)) next.delete(url);
+			else next.add(url);
+			return next;
+		});
+	}, []);
+
 	// Keyboard shortcuts
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
@@ -202,6 +253,8 @@ export function Sidebar({
 						setHoveredEl,
 						activeEl,
 						setActiveEl,
+						openFolders,
+						toggleFolder,
 						pathname,
 					}}
 				>
@@ -396,7 +449,8 @@ function SidebarFolder({
 	onLinkClick?: () => void;
 }) {
 	const ref = useRef<HTMLButtonElement>(null);
-	const { setHoveredEl, pathname } = useSidebarContext();
+	const { setHoveredEl, pathname, openFolders, toggleFolder } =
+		useSidebarContext();
 
 	const isChildActive = (item: PageTreeItem): boolean => {
 		if (item.type === "page") return checkIsActive(item.url, pathname, false);
@@ -412,17 +466,10 @@ function SidebarFolder({
 	const isDirectlyActive = checkIsActive(node.url, pathname, false);
 	const isParentActive = node.children.some(isChildActive);
 	const isActive = isDirectlyActive || isParentActive;
-	const [isOpen, setIsOpen] = useState(isActive);
 
-	useEffect(() => {
-		if (isActive) {
-			setIsOpen(true);
-		}
-	}, [isActive]);
-
-	const handleToggle = () => {
-		setIsOpen((prev) => !prev);
-	};
+	// Open state comes from parent Sidebar — never auto-closes
+	const isOpen = openFolders.has(node.url);
+	const handleToggle = () => toggleFolder(node.url);
 
 	return (
 		<div className="space-y-px">
