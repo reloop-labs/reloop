@@ -6,7 +6,7 @@ import { deleteApiKeyXCodeSamples } from "./delete-api-key.x-codeSamples";
 
 export const deleteApiKeyRoute = new Elysia().use(authMiddleware).delete(
 	"/:api_key_id",
-	async ({ params: { api_key_id }, organizationId, userId }) => {
+	async ({ params: { api_key_id }, organizationId }) => {
 		return await deleteApiKeyController({
 			apiKeyId: api_key_id,
 			organizationId,

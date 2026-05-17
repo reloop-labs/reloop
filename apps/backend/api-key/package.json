@@ -6,6 +6,7 @@
 	"scripts": {
 		"build": "tsdown",
 		"lint": "biome check .",
+		"fix-lint": "biome check --fix .",
 		"format": "biome format .",
 		"compile": "bun build --compile --minify --sourcemap --bytecode ./src/index.ts --outfile server",
 		"dev": "bun run --hot src/index.ts",
