@@ -2,15 +2,13 @@ import { log, parseError } from "evlog";
 import "dotenv/config";
 import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
+import { apiKeyConfig } from "@reloop/api-key/api-key.config";
 import { apiKeyRoutes } from "@reloop/api-key/routes/api-key/api-key.routes";
 import { landing } from "@reloop/api-key/routes/landing/landing.index";
 import { loader } from "@reloop/api-key/utils/loader";
-
 import { Elysia } from "elysia";
 import { initLogger } from "evlog";
 import { evlog } from "evlog/elysia";
-import pkg from "api-key/package.json";
-import { apiKeyConfig } from "@reloop/api-key/api-key.config";
 
 initLogger({ env: { service: "api-key" } });
 
@@ -20,12 +18,13 @@ const apiKeyService = new Elysia({
 	name: "API Key Service",
 })
 	.use(evlog())
+	.use(serverTiming())
 	.use(
 		openapi({
 			documentation: {
 				info: {
 					title: "API KEY Service",
-					version: pkg.version,
+					version: "1.0.1",
 				},
 				components: {
 					securitySchemes: {
@@ -39,7 +38,6 @@ const apiKeyService = new Elysia({
 			},
 		}),
 	)
-	.use(serverTiming())
 	.onError(({ error, set }) => {
 		const parsed = parseError(error);
 		set.status = parsed.status;
@@ -58,7 +56,7 @@ const apiKeyService = new Elysia({
 	.listen(port, () => {
 		log.info(
 			"server",
-			`API Key Server is running on http://localhost:${port}/api/api-key`,
+			`API Key Server is running on:\n  - Local: http://localhost:${port}/api/api-key\n  - Base:  ${apiKeyConfig.BASE_URL}/api/api-key`,
 		);
 	});
 

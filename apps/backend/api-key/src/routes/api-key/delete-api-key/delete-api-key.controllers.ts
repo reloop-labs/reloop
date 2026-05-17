@@ -1,10 +1,10 @@
+import { ApiKeyErrors } from "@reloop/api-key/lib/errors";
 import { createLog } from "@reloop/api-key/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { API_KEY_DELETE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq } from "drizzle-orm";
 import { log } from "evlog";
-import { ApiKeyErrors } from "@reloop/api-key/lib/errors";
 
 export async function deleteApiKeyController({
 	apiKeyId,
