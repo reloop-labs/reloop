@@ -18,7 +18,7 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 				const sessionResult = await validateSession(cookie);
 
 				if (sessionResult) {
-					log.set({ traceId, user: sessionResult });
+					log.set({ traceId, user: sessionResult.userId, organizationId: sessionResult.userId });
 					return { ...sessionResult, traceId };
 				}
 				return status(401, { message: "Authentication required" });
@@ -42,7 +42,7 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 				const traceId = crypto.randomUUID();
 				const apiKeyResult = await validateApiKey(apiKey);
 				if (apiKeyResult) {
-					log.set({ traceId, user: apiKeyResult });
+					log.set({ traceId, user: apiKeyResult.userId, organizationId: apiKeyResult.organizationId });
 					return { ...apiKeyResult, traceId };
 				}
 				return status(401, { message: "Authentication required" });
@@ -69,26 +69,28 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 					headers.get("authorization")?.replace("Bearer ", "");
 				const cookie = headers.get("cookie");
 				const traceId = crypto.randomUUID();
-				const reqLog = useLogger();
+				const log = useLogger();
 				const apiKeyResult = await validateApiKey(apiKey);
 				if (apiKeyResult) {
-					reqLog.set({
+					log.set({
 						traceId,
 						service: "api-key",
-						user: apiKeyResult,
+						user: apiKeyResult.userId,
+						organizationId: apiKeyResult.organizationId,
 					});
-					reqLog.info("API key authentication successful");
-					return { ...apiKeyResult, traceId, logger: reqLog };
+					log.info("API key authentication successful");
+					return { ...apiKeyResult, traceId };
 				}
 				const sessionResult = await validateSession(cookie);
 				if (sessionResult) {
-					reqLog.set({
+					log.set({
 						traceId,
 						service: "api-key",
-						user: sessionResult,
+						user: sessionResult.userId,
+						organizationId: sessionResult.organizationId,
 					});
-					reqLog.info("Session authentication successful");
-					return { ...sessionResult, traceId, logger: reqLog };
+					log.info("Session authentication successful");
+					return { ...sessionResult, traceId };
 				}
 				return status(401, { message: "Authentication required" });
 			} catch (e) {
