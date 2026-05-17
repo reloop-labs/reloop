@@ -23,11 +23,12 @@ export async function createApiKeyController({
 }): Promise<ApiKeyTypes.ApiKeyWithKeyResponse> {
 	const log = useLogger();
 	try {
+		log.info("Generating new api key");
 		const fullKey = generateApiKey();
 		const hashedKey = hashApiKey(fullKey);
 		const keyStart = getKeyStart(fullKey);
 		const keyId = `api_key_${createId()}`;
-		log.info("Generating new api key", { keyId });
+		log.info("APi key Generated");
 
 		const now = new Date();
 		const expiresAt = null;
@@ -71,6 +72,7 @@ export async function createApiKeyController({
 			throw ApiKeyErrors.createFailed();
 		}
 		log.info("New Api key generated");
+
 		const result = {
 			id: newApiKey[0].id,
 			name: newApiKey[0].name,
@@ -82,6 +84,7 @@ export async function createApiKeyController({
 			object: "api_key" as const,
 			event: API_KEY_CREATE_WEBHOOK_EVENT.id,
 		};
+
 		return result;
 	} catch (error) {
 		log.error("Error creating API key");
