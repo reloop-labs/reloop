@@ -111,9 +111,12 @@ export function Sidebar({
 
 	const [hoveredEl, setHoveredEl] = useState<HTMLElement | null>(null);
 	const [activeEl, setActiveEl] = useState<HTMLElement | null>(null);
-	const [rect, setRect] = useState<{ width: number; height: number } | null>(
-		null,
-	);
+	const [rect, setRect] = useState<{
+		width: number;
+		height: number;
+		top: number;
+		left: number;
+	} | null>(null);
 	const [isSearchOpen, setIsSearchOpen] = useState(false);
 	const navRef = useRef<HTMLElement>(null);
 
@@ -133,10 +136,14 @@ export function Sidebar({
 
 	// Calculate and sync position rect relative to nav parent container
 	useLayoutEffect(() => {
-		if (currentEl) {
+		if (currentEl && navRef.current) {
+			const elRect = currentEl.getBoundingClientRect();
+			const navRect = navRef.current.getBoundingClientRect();
 			setRect({
 				width: currentEl.offsetWidth,
 				height: currentEl.offsetHeight,
+				top: elRect.top - navRect.top + navRef.current.scrollTop,
+				left: elRect.left - navRect.left,
 			});
 		} else {
 			setRect(null);
@@ -190,7 +197,7 @@ export function Sidebar({
 						pathname,
 					}}
 				>
-					<AnimatedHoverBackground rect={rect} tabElement={currentEl} />
+					<AnimatedHoverBackground rect={rect} />
 
 					<div className="z-10 flex flex-col gap-px">
 						{filteredTree.map((node, index) => (
@@ -434,7 +441,7 @@ function SidebarFolder({
 				className={cn(
 					"group relative z-10 flex h-9 w-full items-center justify-between rounded-lg px-2 font-medium text-sm transition-all",
 					isDirectlyActive
-						? "text-fd-foreground"
+						? "bg-neutral-alpha-10 text-fd-foreground"
 						: isParentActive
 							? "text-fd-foreground"
 							: "text-text-sub-600 hover:text-fd-foreground",
@@ -535,7 +542,7 @@ function SidebarLink({
 			className={cn(
 				"group relative z-10 flex h-8 items-center gap-2 rounded-lg px-2 font-medium text-sm transition-colors",
 				isActive
-					? "text-fd-foreground"
+					? "bg-neutral-alpha-10 text-fd-foreground"
 					: "text-text-sub-600 hover:text-fd-foreground",
 			)}
 		>

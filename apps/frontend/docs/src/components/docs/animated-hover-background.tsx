@@ -5,21 +5,16 @@ import { AnimatePresence, motion } from "framer-motion";
 import React from "react";
 
 interface AnimatedHoverBackgroundProps {
-	rect: { width: number; height: number } | null;
-	tabElement: HTMLElement | null;
+	rect: { width: number; height: number; top: number; left: number } | null;
 	className?: string;
 }
 
 export const AnimatedHoverBackground: React.FC<
 	AnimatedHoverBackgroundProps
-> = ({ rect, tabElement, className }) => {
-	// Use offsetTop/offsetLeft for position relative to parent container
-	const left = tabElement?.offsetLeft ?? 0;
-	const top = tabElement?.offsetTop ?? 0;
-
+> = ({ rect, className }) => {
 	return (
 		<AnimatePresence>
-			{rect && tabElement && (
+			{rect && (
 				<motion.div
 					className={cn(
 						"absolute rounded-lg bg-neutral-alpha-10 pointer-events-none z-0",
@@ -28,23 +23,23 @@ export const AnimatedHoverBackground: React.FC<
 					initial={{
 						width: rect.width,
 						height: rect.height,
-						left,
-						top,
+						left: rect.left,
+						top: rect.top,
 						opacity: 0,
 					}}
 					animate={{
 						width: rect.width,
 						height: rect.height,
-						left,
-						top,
+						left: rect.left,
+						top: rect.top,
 						opacity: 1,
 					}}
 					exit={{
 						opacity: 0,
 						width: rect.width,
 						height: rect.height,
-						left,
-						top,
+						left: rect.left,
+						top: rect.top,
 					}}
 					transition={{
 						type: "spring",
