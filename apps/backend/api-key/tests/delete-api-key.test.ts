@@ -49,7 +49,7 @@ describe("DELETE /v1/:api_key_id — Delete API Key", () => {
 	it("401 — no auth header", async () => {
 		const { status } = await api
 			.v1({ api_key_id: TEST_KEY_ID })
-			.delete(undefined, noAuth);
+			.delete({}, noAuth);
 		expect(status).toBe(401);
 	});
 });

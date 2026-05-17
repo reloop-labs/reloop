@@ -13,7 +13,14 @@ export const withAuth = { headers: AUTH_HEADERS, query: {} } as const;
 export const noAuth = { headers: {}, query: {} } as const;
 
 // ─── Factory: DB user row ─────────────────────────────────────────────────────
-export function makeUser(overrides: Partial<ReturnType<typeof makeUser>> = {}) {
+export function makeUser(
+	overrides: Partial<{
+		id: string;
+		name: string;
+		email: string;
+		image: string | null;
+	}> = {},
+) {
 	return {
 		id: TEST_USER_ID,
 		name: "Test User",
