@@ -18,7 +18,11 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 				const sessionResult = await validateSession(cookie);
 
 				if (sessionResult) {
-					log.set({ traceId, user: sessionResult.userId, organizationId: sessionResult.userId });
+					log.set({
+						traceId,
+						user: sessionResult.userId,
+						organizationId: sessionResult.userId,
+					});
 					return { ...sessionResult, traceId };
 				}
 				return status(401, { message: "Authentication required" });
@@ -42,7 +46,11 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 				const traceId = crypto.randomUUID();
 				const apiKeyResult = await validateApiKey(apiKey);
 				if (apiKeyResult) {
-					log.set({ traceId, user: apiKeyResult.userId, organizationId: apiKeyResult.organizationId });
+					log.set({
+						traceId,
+						user: apiKeyResult.userId,
+						organizationId: apiKeyResult.organizationId,
+					});
 					return { ...apiKeyResult, traceId };
 				}
 				return status(401, { message: "Authentication required" });
