@@ -8,11 +8,11 @@ export const createApiKeyRoute = new Elysia().use(authMiddleware).post(
 	"/",
 	async ({
 		body,
-		activeOrganizationId,
+		organizationId,
 		userId,
 	}) => {
 		return await createApiKeyController({
-			organizationId: activeOrganizationId,
+			organizationId,
 			userId,
 			body,
 		});
