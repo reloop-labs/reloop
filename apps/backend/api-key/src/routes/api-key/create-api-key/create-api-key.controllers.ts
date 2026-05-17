@@ -7,6 +7,7 @@ import {
 	getKeyStart,
 	hashApiKey,
 } from "@reloop/apikey";
+import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { API_KEY_CREATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -72,6 +73,11 @@ export async function createApiKeyController({
 			throw ApiKeyErrors.createFailed();
 		}
 		log.info("New Api key generated");
+
+		await bus.publish(BusEvent.API_KEY_CREATED, {
+			api_key_id: newApiKey[0].id,
+			organizationId
+		});
 
 		const result = {
 			id: newApiKey[0].id,

@@ -86,10 +86,8 @@ export interface OrganizationJoinedPayload {
 }
 
 export interface ApiKeyCreatedPayload {
-	id: string;
-	name: string;
+	api_key_id: string;
 	organizationId: string;
-	userEmail: string;
 }
 
 export interface InviteCreatedPayload {
@@ -105,11 +103,11 @@ export interface OtpRequestedPayload {
 	email: string;
 	otp: string;
 	type:
-		| "sign-in"
-		| "email-verification"
-		| "forget-password"
-		| "change-email"
-		| "two-factor";
+	| "sign-in"
+	| "email-verification"
+	| "forget-password"
+	| "change-email"
+	| "two-factor";
 }
 
 export interface PaymentFailedPayload {

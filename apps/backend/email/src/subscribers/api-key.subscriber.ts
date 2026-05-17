@@ -1,4 +1,7 @@
 import { BusEvent, bus } from "@reloop/bus";
+import { db } from "@reloop/db/client";
+import * as schema from "@reloop/db/schema";
+import { eq } from "drizzle-orm";
 import { log } from "evlog";
 import React from "react";
 import ApiKeyCreatedEmail from "../../emails/api-key-created";
@@ -12,12 +15,29 @@ export async function initApiKeySubscribers() {
 		BusEvent.API_KEY_CREATED,
 		async (payload) => {
 			try {
+				const apiKey = await db.query.apikey.findFirst({
+					where: eq(schema.apikey.id, payload.id),
+					with: {
+						user: true,
+					},
+				});
+
+				if (!apiKey) {
+					log.error(`API key not found for ID: ${payload.id}`);
+					return;
+				}
+
+				if (!apiKey.user) {
+					log.error(`User not found for API key: ${payload.id}`);
+					return;
+				}
+
 				const html = await render(
 					React.createElement(ApiKeyCreatedEmail, {
-						fullName: "User",
-						keyName: payload.name,
-						keyPrefix: "re_live_", // Fallback prefix
-						createdAt: new Date().toLocaleString(),
+						fullName: apiKey.user.name || "User",
+						keyName: apiKey.name || "Unnamed Key",
+						keyPrefix: apiKey.prefix || "re_live_",
+						createdAt: apiKey.createdAt.toLocaleString(),
 						ipAddress: "Unknown",
 						location: "Unknown",
 						manageKeysUrl: `${emailConfig.BASE_URL}/dashboard/api-keys`,
@@ -26,8 +46,8 @@ export async function initApiKeySubscribers() {
 
 				await sendEmail({
 					from: `Reloop <security@${emailConfig.RELOOP_SENDER_DOMAIN || "reloop.dev"}>`,
-					to: payload.userEmail,
-					subject: `A new API key "${payload.name}" was created`,
+					to: apiKey.user.email,
+					subject: `A new API key "${apiKey.name}" was created`,
 					html,
 				});
 			} catch (error) {
