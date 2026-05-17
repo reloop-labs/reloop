@@ -89,6 +89,17 @@ All workspace operations should be executed from the **monorepo root directory**
 
 ---
 
+## Database Schema & Relationships
+
+The KumoMTA Webhook Service listens to high-throughput HTTP logging callbacks from the SMTP MTA engine and persists real-time updates directly into PostgreSQL.
+
+### Relational Tables Mapped
+
+* **`email_log`**: Updates the active sending log's `status` (from `pending` to `delivered` or `bounced`) and records the `deliveredAt` or `failedAt` timestamps (see [Email Service Schema](/setup/backend/email#database-schema--relationships)).
+* **`email_event`**: Chronologically archives granular SMTP events (e.g. soft-bounce retry codes or hard-bounce details) linked directly to the main [email_log](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/email.ts) (see [Email Service Schema](/setup/backend/email#database-schema--relationships)).
+
+---
+
 ## Interactive API Docs (Swagger)
 
 The KumoMTA Webhook Service publishes dynamic Swagger documentation directly from ElysiaJS. To test endpoints and query API structures:
