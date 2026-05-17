@@ -15,7 +15,7 @@ import {
 	Sparkles,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import {
 	createContext,
@@ -72,23 +72,9 @@ export function Sidebar({
 			iconName: "file-text",
 		};
 
-	console.log(
-		"[Sidebar Debug] propPathname:",
-		propPathname,
-		"clientPathname:",
-		clientPathname,
-		"activeTab:",
-		activeTab?.title,
-	);
-
 	// Filter tree based on active section
 	const filteredTree = useMemo(() => {
 		if (!tree || !Array.isArray(tree)) return [];
-
-		// 1. Get all specialized section URLs (excluding root)
-		const sectionPaths = navigationTabs
-			.filter((tab) => tab.url !== "/")
-			.map((tab) => tab.url.replace("/", ""));
 
 		const currentPath = activeTab?.url?.replace("/", "") || "";
 
@@ -160,10 +146,8 @@ export function Sidebar({
 	return (
 		<aside
 			className={cn(
-				"z-30 h-full flex-col bg-transparent lg:py-2 lg:pr-4 lg:pl-4",
-				isMobile
-					? "flex w-full bg-fd-muted/[0.15]"
-					: "hidden w-72 shrink-0 lg:flex",
+				"z-30 flex h-full w-full flex-col overflow-hidden bg-transparent py-2 pr-4 pl-4",
+				isMobile && "bg-fd-muted/[0.15]",
 			)}
 		>
 			<div className="border-fd-border border-b px-3 py-3 pb-1 lg:hidden">
@@ -208,7 +192,7 @@ export function Sidebar({
 				>
 					<AnimatedHoverBackground rect={rect} tabElement={currentEl} />
 
-					<div className="relative z-10 flex flex-col gap-px">
+					<div className="z-10 flex flex-col gap-px">
 						{filteredTree.map((node, index) => (
 							<SidebarSection
 								key={index}
@@ -414,7 +398,6 @@ function SidebarFolder({
 	const isParentActive = node.children.some(isChildActive);
 	const isActive = isDirectlyActive || isParentActive;
 	const [isOpen, setIsOpen] = useState(isActive);
-	const router = useRouter();
 
 	useEffect(() => {
 		if (isActive) {
@@ -434,15 +417,7 @@ function SidebarFolder({
 	}, [isDirectlyActive, setActiveEl]);
 
 	const handleToggle = () => {
-		const nextIsOpen = !isOpen;
-		setIsOpen(nextIsOpen);
-
-		if (nextIsOpen) {
-			const firstPage = findFirstPage(node);
-			if (firstPage && firstPage !== pathname) {
-				router.push(firstPage);
-			}
-		}
+		setIsOpen((prev) => !prev);
 	};
 
 	return (
@@ -501,12 +476,7 @@ function SidebarFolder({
 						style={{ overflow: "hidden" }}
 					>
 						<div
-							className={cn(
-								"mt-px flex flex-col space-y-px pb-0.5",
-								isDirectlyActive
-									? "pl-0"
-									: "ml-[14px] border-fd-border/30 border-l pl-3",
-							)}
+							className="ml-3.5 mt-px flex flex-col space-y-px border-l border-fd-border/40 pb-0.5 pl-2.5"
 						>
 							{node.children.map((child: PageTreeItem, index: number) => (
 								<SidebarLink

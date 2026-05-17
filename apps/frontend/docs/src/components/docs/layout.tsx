@@ -77,9 +77,9 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 				</Dialog.Root>
 
 				{/* Desktop Sidebar - Only visible on LG+ */}
-				<aside className="hidden shrink-0 bg-transparent lg:block lg:w-72">
+				<div className="hidden shrink-0 lg:flex lg:w-72">
 					<Sidebar tree={tree} pathname={pathname} />
-				</aside>
+				</div>
 
 				{/* Main Content Area - Seamless Card Layout */}
 				<main
