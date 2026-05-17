@@ -45,8 +45,8 @@ export function Navbar({
 								className={cn(
 									"flex h-9 items-center gap-1 whitespace-nowrap rounded-lg px-2 font-medium text-[13px] transition-all md:px-4",
 									active
-										? "bg-fd-foreground/[0.03] text-fd-foreground"
-										: "text-fd-muted-foreground/70 hover:bg-fd-foreground/[0.03] hover:text-fd-foreground",
+										? "text-fd-foreground"
+										: "text-fd-muted-foreground/70 hover:text-fd-foreground",
 								)}
 							>
 								<Icon
