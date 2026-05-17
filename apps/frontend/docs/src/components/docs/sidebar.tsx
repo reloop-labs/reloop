@@ -242,7 +242,7 @@ export function Sidebar({
 	return (
 		<aside
 			className={cn(
-				"z-30 flex h-full w-full flex-col overflow-hidden bg-transparent py-2 pr-4 pl-4",
+				"z-30 flex h-full w-full flex-col overflow-hidden bg-transparent py-2 pr-2 pl-4",
 				isMobile && "bg-fd-muted/[0.15]",
 			)}
 		>
