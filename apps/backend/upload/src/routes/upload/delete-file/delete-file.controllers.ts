@@ -1,10 +1,9 @@
-import { log } from "evlog";
 import { storage } from "@be/upload/lib/storage";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
+import { log } from "evlog";
 
 export async function deleteFile(params: {
 	fileId: string;
@@ -19,7 +18,7 @@ export async function deleteFile(params: {
 			.limit(1);
 
 		if (fileRecord.length === 0 || !fileRecord[0]) {
-			log.warn({ ...({ fileId }), message: "File not found" });
+			log.warn({ ...{ fileId }, message: "File not found" });
 			throw new Error("File not found");
 		}
 
@@ -37,14 +36,18 @@ export async function deleteFile(params: {
 			})
 			.where(eq(schema.upload.id, fileId));
 
-		log.info({ ...({
+		log.info({
+			...{
 				fileId,
 				path: upload.path,
-			}), message: "File deleted successfully" });
+			},
+			message: "File deleted successfully",
+		});
 
 		return { message: "File deleted successfully" };
 	} catch (error) {
-		log.error({
+		log.error(
+			{
 				fileId,
 				error: error instanceof Error ? error.message : String(error),
 			},

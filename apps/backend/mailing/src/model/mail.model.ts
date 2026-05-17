@@ -2,7 +2,8 @@ import { t } from "elysia";
 
 export namespace MailModel {
 	// Email validation pattern
-	const emailPattern = /^(?:.*<[^\s@]+@[^\s@]+\.[^\s@]+>|[^\s@]+@[^\s@]+\.[^\s@]+)$/;
+	const emailPattern =
+		/^(?:.*<[^\s@]+@[^\s@]+\.[^\s@]+>|[^\s@]+@[^\s@]+\.[^\s@]+)$/;
 	const tagPattern = /^[a-zA-Z0-9_-]+$/;
 	const variableKeyPattern =
 		/^(?!FIRST_NAME$|LAST_NAME$|EMAIL$|UNSUBSCRIBE_URL$)[a-zA-Z0-9_]{1,50}$/;
@@ -47,7 +48,10 @@ export namespace MailModel {
 		html: t.Optional(
 			t.String({
 				description: "HTML content",
-				examples: ["<h1>Test Email</h1><p>This is a test email</p>", "If not provided, the HTML will be used to generate a plain text version. You can opt out of this behavior by setting value to an empty string."],
+				examples: [
+					"<h1>Test Email</h1><p>This is a test email</p>",
+					"If not provided, the HTML will be used to generate a plain text version. You can opt out of this behavior by setting value to an empty string.",
+				],
 			}),
 		),
 		reply_to: t.Optional(
@@ -92,13 +96,15 @@ export namespace MailModel {
 						pattern: tagPattern.source,
 						maxLength: 256,
 						description: "The name of the email tag.",
-						error: "The name of the email tag. It can only contain ASCII letters (a-z, A-Z), numbers (0-9), underscores (_), or dashes (-). It can contain no more than 256 characters.",
+						error:
+							"The name of the email tag. It can only contain ASCII letters (a-z, A-Z), numbers (0-9), underscores (_), or dashes (-). It can contain no more than 256 characters.",
 					}),
 					value: t.String({
 						pattern: tagPattern.source,
 						maxLength: 256,
 						description: "The value of the email tag.",
-						error: "The value of the email tag. It can only contain ASCII letters (a-z, A-Z), numbers (0-9), underscores (_), or dashes (-). It can contain no more than 256 characters.",
+						error:
+							"The value of the email tag. It can only contain ASCII letters (a-z, A-Z), numbers (0-9), underscores (_), or dashes (-). It can contain no more than 256 characters.",
 					}),
 				}),
 				{ description: "Custom tags passed in key/value pairs" },

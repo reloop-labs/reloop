@@ -1,6 +1,6 @@
-import { log } from "evlog";
 import { bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
+import { log } from "evlog";
 
 import { templateConfig } from "../template.config";
 
@@ -12,7 +12,7 @@ export const loader = async () => {
 		await bus.connect(templateConfig.NATS_URL);
 		log.info("server", "NATS connected");
 	} catch (error) {
-		log.error({ ...({ error }), message: "Failed to connect to database" });
+		log.error({ ...{ error }, message: "Failed to connect to database" });
 		throw error;
 	}
 

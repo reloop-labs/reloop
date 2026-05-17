@@ -1,7 +1,7 @@
-import { log } from "evlog";
 import { bus } from "@reloop/bus";
 import { RedisCache } from "@reloop/cache/redis-client";
 import { db } from "@reloop/db/client";
+import { log } from "evlog";
 
 import { apiKeyConfig } from "../api-key.config";
 
@@ -17,7 +17,7 @@ export const loader = async () => {
 	} catch (e) {
 		log.error({
 			error: e instanceof Error ? e.message : String(e),
-			message: "Error during service initialization"
+			message: "Error during service initialization",
 		});
 	}
 };

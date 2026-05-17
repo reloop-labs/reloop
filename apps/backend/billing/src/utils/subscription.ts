@@ -1,11 +1,13 @@
-import { log } from "evlog";
-import { db, type DatabaseInstance } from "@reloop/db/client";
+import { type DatabaseInstance, db } from "@reloop/db/client";
 import { creditLedger, plan, subscription } from "@reloop/db/schema";
-
 import { and, asc, eq } from "drizzle-orm";
+import { log } from "evlog";
 import { billingConfig } from "../billing.config";
 
-export async function getOrProvisionSubscription(orgId: string, tx?: DatabaseInstance) {
+export async function getOrProvisionSubscription(
+	orgId: string,
+	tx?: DatabaseInstance,
+) {
 	if (!orgId) {
 		log.error("server", "getOrProvisionSubscription called with missing orgId");
 		throw new Error("organizationId is required for subscription provisioning");
@@ -69,7 +71,10 @@ export async function getOrProvisionSubscription(orgId: string, tx?: DatabaseIns
 					and(eq(s.organizationId, orgId), eq(s.status, "active")),
 				with: { plan: true },
 			});
-			if (!activeSub) throw new Error("Failed to retrieve existing subscription after conflict");
+			if (!activeSub)
+				throw new Error(
+					"Failed to retrieve existing subscription after conflict",
+				);
 			return activeSub;
 		}
 
@@ -83,7 +88,10 @@ export async function getOrProvisionSubscription(orgId: string, tx?: DatabaseIns
 			reason: "Initial free plan quota",
 		});
 
-		log.info({ ...({ orgId, planId: freePlan.id }), message: "Auto-provisioned free plan subscription" });
+		log.info({
+			...{ orgId, planId: freePlan.id },
+			message: "Auto-provisioned free plan subscription",
+		});
 		activeSub = { ...newSub, plan: freePlan };
 	}
 

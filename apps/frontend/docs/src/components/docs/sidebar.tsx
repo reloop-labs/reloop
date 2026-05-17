@@ -29,15 +29,31 @@ interface SidebarProps {
 	pathname?: string;
 }
 
-export function Sidebar({ tree, isMobile, onLinkClick, pathname: propPathname }: SidebarProps) {
+export function Sidebar({
+	tree,
+	isMobile,
+	onLinkClick,
+	pathname: propPathname,
+}: SidebarProps) {
 	const clientPathname = usePathname();
-	const pathname = propPathname ?? clientPathname;
-	const activeTab =
-		navigationTabs.find((tab) =>
-			tab.url === "/" ? pathname === "/" : pathname.startsWith(tab.url),
-		) ?? navigationTabs[0];
+	const pathname = propPathname || clientPathname || "";
+	const activeTab = navigationTabs.find((tab) =>
+		tab.url === "/" ? pathname === "/" : pathname.startsWith(tab.url),
+	) ||
+		navigationTabs[0] || {
+			title: "Documentation",
+			url: "/",
+			iconName: "file-text",
+		};
 
-	console.log("[Sidebar Debug] propPathname:", propPathname, "clientPathname:", clientPathname, "activeTab:", activeTab.title);
+	console.log(
+		"[Sidebar Debug] propPathname:",
+		propPathname,
+		"clientPathname:",
+		clientPathname,
+		"activeTab:",
+		activeTab?.title,
+	);
 
 	// Filter tree based on active section
 	const filteredTree = useMemo(() => {
@@ -230,7 +246,7 @@ export function Sidebar({ tree, isMobile, onLinkClick, pathname: propPathname }:
 
 function ProductSwitcher({ pathname: propPathname }: { pathname?: string }) {
 	const clientPathname = usePathname();
-	const pathname = propPathname ?? clientPathname;
+	const pathname = propPathname || clientPathname || "";
 	const activeTab =
 		navigationTabs.find((tab) =>
 			tab.url === "/" ? pathname === "/" : pathname.startsWith(tab.url),
@@ -401,7 +417,8 @@ function SidebarFolder({
 	) => void;
 	onLinkClick?: () => void;
 }) {
-	const pathname = usePathname();
+	const clientPathname = usePathname();
+	const pathname = clientPathname || "";
 	const ref = useRef<HTMLButtonElement>(null);
 
 	const isChildActive = (item: PageTreeItem): boolean => {
@@ -519,7 +536,8 @@ function SidebarLink({
 	) => void;
 	onLinkClick?: () => void;
 }) {
-	const pathname = usePathname();
+	const clientPathname = usePathname();
+	const pathname = clientPathname || "";
 	const ref = useRef<HTMLAnchorElement>(null);
 
 	if (node.type === "separator") return null;

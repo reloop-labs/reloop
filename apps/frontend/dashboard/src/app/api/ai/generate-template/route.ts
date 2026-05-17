@@ -10,7 +10,10 @@ export async function POST(req: Request) {
 	try {
 		const { prompt } = await req.json();
 
-		if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY && !process.env.GEMINI_API_KEY) {
+		if (
+			!process.env.GOOGLE_GENERATIVE_AI_API_KEY &&
+			!process.env.GEMINI_API_KEY
+		) {
 			throw new Error("Google API key is missing from environment variables.");
 		}
 
@@ -38,7 +41,7 @@ CRITICAL INSTRUCTIONS:
 				"Content-Type": "text/plain; charset=utf-8",
 				"X-Content-Type-Options": "nosniff",
 				"Cache-Control": "no-cache, no-transform",
-				"Connection": "keep-alive",
+				Connection: "keep-alive",
 				"X-Accel-Buffering": "no", // For Nginx/Caddy proxies
 			},
 		});

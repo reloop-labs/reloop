@@ -1,9 +1,8 @@
-import { log } from "evlog";
 import { db } from "@reloop/db/client";
 import { emailLog } from "@reloop/db/schema";
-
 import type { LogsModel } from "@reloop/logs/model/logs.model";
 import { and, eq, gte, lte, sql } from "drizzle-orm";
+import { log } from "evlog";
 
 export async function getEmailStatsController({
 	query,
@@ -94,7 +93,8 @@ export async function getEmailStatsController({
 
 		return result;
 	} catch (error) {
-		log.error({
+		log.error(
+			{
 				query,
 				error: error instanceof Error ? error.message : String(error),
 			},

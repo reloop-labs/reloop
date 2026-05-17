@@ -1,6 +1,6 @@
-import { log } from "evlog";
 import { bus } from "@reloop/bus";
 import { RedisCache } from "@reloop/cache/redis-client";
+import { log } from "evlog";
 
 import { logsConfig } from "../logs.config";
 import { ensureTableExists, getClickHouseClient } from "./clickhouse";
@@ -18,7 +18,8 @@ export const loader = async () => {
 		await bus.connect(logsConfig.NATS_URL);
 		log.info("server", "NATS connected");
 	} catch (error) {
-		log.error({ ...({
+		log.error({
+			...{
 				error:
 					error instanceof Error
 						? {
@@ -27,6 +28,8 @@ export const loader = async () => {
 								name: error.name,
 							}
 						: error,
-			}), message: "Error during initialization" });
+			},
+			message: "Error during initialization",
+		});
 	}
 };

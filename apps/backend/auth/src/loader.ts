@@ -1,7 +1,7 @@
-import { log } from "evlog";
 import { bus } from "@reloop/bus";
 import { RedisCache } from "@reloop/cache/redis-client";
 import { db } from "@reloop/db/client";
+import { log } from "evlog";
 
 import { authConfig } from "./auth.config";
 

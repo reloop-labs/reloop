@@ -1,10 +1,10 @@
 export function isActive(
 	url: string,
-	pathname: string,
+	pathname: string | null | undefined,
 	nested = true,
 ): boolean {
-	let tempUrl = url;
-	let tempPathname = pathname;
+	let tempUrl = url || "";
+	let tempPathname = pathname || "";
 
 	// Strip /docs prefix if present for comparison
 	if (tempPathname.startsWith("/docs"))

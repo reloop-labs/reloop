@@ -7,4 +7,3 @@ export const kumomtaConfig = {
 	X_KUMOMTA_KEY: process.env.X_KUMOMTA_KEY || "reloop",
 	NATS_URL: process.env.NATS_URL || "nats://localhost:4222",
 };
-

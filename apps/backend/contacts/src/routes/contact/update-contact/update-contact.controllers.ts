@@ -1,13 +1,12 @@
-import { log } from "evlog";
 import { upsertContactProperties } from "@be/contacts/routes/contact/utils/upsert-contact-properties";
 import type { ContactTypes } from "@be/contacts/types/contact.type";
 import { createLog } from "@be/contacts/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-
 import { CONTACT_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
+import { log } from "evlog";
 
 export async function updateContactController({
 	contactId,
@@ -30,11 +29,14 @@ export async function updateContactController({
 		statusCode?: number;
 	};
 }): Promise<ContactTypes.ContactResponse> {
-	log.info({ ...({
+	log.info({
+		...{
 			contactId,
 			organizationId,
 			body,
-		}), message: "Updating contact" });
+		},
+		message: "Updating contact",
+	});
 
 	try {
 		return await db.transaction(async (tx) => {
@@ -48,7 +50,10 @@ export async function updateContactController({
 			});
 
 			if (!existingContact) {
-				log.warn({ ...({ contactId, organizationId }), message: "Contact not found" });
+				log.warn({
+					...{ contactId, organizationId },
+					message: "Contact not found",
+				});
 				throw status(404, { message: "Contact not found" });
 			}
 
@@ -82,7 +87,10 @@ export async function updateContactController({
 				.returning();
 
 			if (!updatedContact) {
-				log.error({ ...({ contactId }), message: "Failed to update contact - no data returned" });
+				log.error({
+					...{ contactId },
+					message: "Failed to update contact - no data returned",
+				});
 				throw status(500, { message: "Failed to update contact" });
 			}
 
@@ -98,10 +106,13 @@ export async function updateContactController({
 				});
 			}
 
-			log.info({ ...({
+			log.info({
+				...{
 					contactId,
 					organizationId,
-				}), message: "Contact updated successfully" });
+				},
+				message: "Contact updated successfully",
+			});
 
 			// Fetch current properties after update to return them in response
 			const updatedProperties = await tx
@@ -158,7 +169,8 @@ export async function updateContactController({
 			return finalContact;
 		});
 	} catch (error) {
-		log.error({
+		log.error(
+			{
 				contactId,
 				organizationId,
 				error: error instanceof Error ? error.message : String(error),

@@ -94,7 +94,10 @@ export async function checkRateLimit({
 	headers: Headers;
 	activeOrganizationId: string;
 	userId: string;
-	log: { warn: (msg: string, meta?: Record<string, unknown>) => void; error: (msg: string, meta?: Record<string, unknown>) => void };
+	log: {
+		warn: (msg: string, meta?: Record<string, unknown>) => void;
+		error: (msg: string, meta?: Record<string, unknown>) => void;
+	};
 }): Promise<Record<string, string>> {
 	const responseHeaders: Record<string, string> = {};
 
@@ -189,10 +192,7 @@ export async function checkRateLimit({
 					userId,
 				});
 
-				throw RateLimitErrors.rateLimitExceeded(
-					result.layer.name,
-					retryAfter,
-				);
+				throw RateLimitErrors.rateLimitExceeded(result.layer.name, retryAfter);
 			}
 		}
 	} catch (error) {

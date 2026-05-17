@@ -1,8 +1,7 @@
-import { log } from "evlog";
 import { db } from "@reloop/db/client";
 import { emailLog } from "@reloop/db/schema";
-
 import { eq } from "drizzle-orm";
+import { log } from "evlog";
 
 /**
  * KumoMTA log event types

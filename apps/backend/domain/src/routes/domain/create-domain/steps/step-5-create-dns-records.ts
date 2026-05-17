@@ -1,7 +1,7 @@
-import { log } from "evlog";
 import type { DNSTypes } from "@be/domain/types/dns.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
+import { log } from "evlog";
 import { useLogger } from "evlog/elysia";
 
 export async function createDnsRecords_step5({
@@ -34,47 +34,47 @@ export async function createDnsRecords_step5({
 		domain,
 	};
 
-	log.info({ ...({ dnsRecordIds }), message: "Creating DNS records" });
+	log.info({ ...{ dnsRecordIds }, message: "Creating DNS records" });
 
 	const recordsToInsert: (typeof schema.domainDnsRecord.$inferInsert & {
 		recordTypeName: "DKIM" | "SPF" | "DMARC" | "MX";
 	})[] = [
-			{
-				...dnsRecordIds,
-				recordType: dkimRecord.type,
-				name: dkimRecord.name,
-				fqdn: dkimRecord.fqdn,
-				value: dkimRecord.value,
-				priority: dkimRecord.priority,
-				privateKey: dkimRecord.privateKey,
-				recordTypeName: "DKIM" as const,
-			},
-			{
-				...dnsRecordIds,
-				recordType: spfRecord.type,
-				name: spfRecord.name,
-				fqdn: spfRecord.fqdn,
-				value: spfRecord.value,
-				recordTypeName: "SPF" as const,
-			},
-			{
-				...dnsRecordIds,
-				recordType: dmarcRecord.type,
-				name: dmarcRecord.name,
-				fqdn: dmarcRecord.fqdn,
-				value: dmarcRecord.value,
-				recordTypeName: "DMARC" as const,
-			},
-			{
-				...dnsRecordIds,
-				recordType: mxRecord.type,
-				name: mxRecord.name,
-				fqdn: mxRecord.fqdn,
-				value: mxRecord.value,
-				recordTypeName: "MX" as const,
-				priority: mxRecord.priority,
-			},
-		];
+		{
+			...dnsRecordIds,
+			recordType: dkimRecord.type,
+			name: dkimRecord.name,
+			fqdn: dkimRecord.fqdn,
+			value: dkimRecord.value,
+			priority: dkimRecord.priority,
+			privateKey: dkimRecord.privateKey,
+			recordTypeName: "DKIM" as const,
+		},
+		{
+			...dnsRecordIds,
+			recordType: spfRecord.type,
+			name: spfRecord.name,
+			fqdn: spfRecord.fqdn,
+			value: spfRecord.value,
+			recordTypeName: "SPF" as const,
+		},
+		{
+			...dnsRecordIds,
+			recordType: dmarcRecord.type,
+			name: dmarcRecord.name,
+			fqdn: dmarcRecord.fqdn,
+			value: dmarcRecord.value,
+			recordTypeName: "DMARC" as const,
+		},
+		{
+			...dnsRecordIds,
+			recordType: mxRecord.type,
+			name: mxRecord.name,
+			fqdn: mxRecord.fqdn,
+			value: mxRecord.value,
+			recordTypeName: "MX" as const,
+			priority: mxRecord.priority,
+		},
+	];
 
 	const hasDistinctReceivingMxRecord =
 		receivingMxRecord.name !== mxRecord.name ||

@@ -1,6 +1,10 @@
 import { getOrProvisionSubscription } from "../../../utils/subscription";
 
-export const getPlanController = async ({ activeOrganizationId }: { activeOrganizationId: string }) => {
+export const getPlanController = async ({
+	activeOrganizationId,
+}: {
+	activeOrganizationId: string;
+}) => {
 	const activeSub = await getOrProvisionSubscription(activeOrganizationId);
 
 	return {

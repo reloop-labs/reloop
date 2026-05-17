@@ -46,7 +46,10 @@ const templateService = new Elysia({
 		await loader();
 	})
 	.listen(port, () => {
-		log.info("server", `Template Server is running on ${templateConfig.BASE_URL}/api/template`);
+		log.info(
+			"server",
+			`Template Server is running on ${templateConfig.BASE_URL}/api/template`,
+		);
 	});
 
 export type TemplateService = typeof templateService;

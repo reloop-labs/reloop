@@ -7,7 +7,10 @@ import { useQueryState } from "nuqs";
 import { useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { InviteModal } from "./invite-modal";
-import { TeamFilterDropdown, type TeamFilterValue } from "./team-filter-dropdown";
+import {
+	TeamFilterDropdown,
+	type TeamFilterValue,
+} from "./team-filter-dropdown";
 import { TeamList } from "./team-list";
 
 const Team = () => {

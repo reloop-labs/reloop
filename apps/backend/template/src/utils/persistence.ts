@@ -1,7 +1,6 @@
-import { log } from "evlog";
 import { RedisCache } from "@reloop/cache/redis-client";
-
 import { Elysia } from "elysia";
+import { log } from "evlog";
 import * as Y from "yjs";
 
 const MAX_UPDATES_BEFORE_COMPACT = 100;
@@ -108,7 +107,10 @@ export const persistencePlugin = new Elysia({ name: "persistence" })
 			store.persistence = persistence;
 			log.info("server", "📦 Yjs persistence ready");
 		} catch (err) {
-			log.warn({ ...({ error: err }), message: "⚠️  Redis unavailable — running without persistence" });
+			log.warn({
+				...{ error: err },
+				message: "⚠️  Redis unavailable — running without persistence",
+			});
 			store.persistence = null;
 		}
 	})

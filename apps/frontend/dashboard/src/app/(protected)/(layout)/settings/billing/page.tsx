@@ -59,8 +59,16 @@ const statusStyles: Record<string, string> = {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 const BillingPage = () => {
-	const { data: planData, isLoading: planLoading, error: planError } = useSWR<PlanData>("/api/billing/v1/plan");
-	const { data: invoices, isLoading: invoicesLoading, error: invoicesError } = useSWR<Invoice[]>("/api/billing/v1/invoices");
+	const {
+		data: planData,
+		isLoading: planLoading,
+		error: planError,
+	} = useSWR<PlanData>("/api/billing/v1/plan");
+	const {
+		data: invoices,
+		isLoading: invoicesLoading,
+		error: invoicesError,
+	} = useSWR<Invoice[]>("/api/billing/v1/invoices");
 
 	const isLoading = planLoading || invoicesLoading;
 	const error = planError || invoicesError;
@@ -79,7 +87,7 @@ const BillingPage = () => {
 
 				{/* Error state */}
 				{error && (
-					<div className="mb-4 rounded-xl border border-error-light bg-error-lighter p-4 text-paragraph-sm text-error-base">
+					<div className="mb-4 rounded-xl border border-error-light bg-error-lighter p-4 text-error-base text-paragraph-sm">
 						{error?.message ?? "Failed to load billing data."}
 					</div>
 				)}
@@ -88,7 +96,9 @@ const BillingPage = () => {
 				<div className="rounded-xl border border-stroke-soft-200 bg-white p-6 shadow-sm">
 					<div className="flex items-start justify-between">
 						<div className="space-y-1">
-							<p className="font-medium text-label-sm text-text-sub-600">Current Plan</p>
+							<p className="font-medium text-label-sm text-text-sub-600">
+								Current Plan
+							</p>
 							{isLoading ? (
 								<Skeleton className="h-8 w-32" />
 							) : (
@@ -104,17 +114,23 @@ const BillingPage = () => {
 
 					<div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-3">
 						<div className="space-y-1">
-							<p className="text-paragraph-xs text-text-sub-600">Next billing date</p>
+							<p className="text-paragraph-xs text-text-sub-600">
+								Next billing date
+							</p>
 							{isLoading ? (
 								<Skeleton className="h-5 w-28" />
 							) : (
 								<p className="font-medium text-label-sm text-text-strong-950">
-									{planData ? formatDate(planData.subscription.currentPeriodEnd) : "—"}
+									{planData
+										? formatDate(planData.subscription.currentPeriodEnd)
+										: "—"}
 								</p>
 							)}
 						</div>
 						<div className="space-y-1">
-							<p className="text-paragraph-xs text-text-sub-600">Billing interval</p>
+							<p className="text-paragraph-xs text-text-sub-600">
+								Billing interval
+							</p>
 							{isLoading ? (
 								<Skeleton className="h-5 w-20" />
 							) : (
@@ -138,14 +154,22 @@ const BillingPage = () => {
 
 				{/* Billing History */}
 				<div className="mt-10">
-					<p className="font-medium text-label-sm text-text-strong-950">Billing History</p>
+					<p className="font-medium text-label-sm text-text-strong-950">
+						Billing History
+					</p>
 					<div className="mt-4 overflow-hidden rounded-xl border border-stroke-soft-200 bg-white">
 						<table className="w-full text-left text-sm">
 							<thead className="border-stroke-soft-200 border-b bg-neutral-alpha-5">
 								<tr>
-									<th className="px-4 py-3 font-medium text-text-sub-600">Date</th>
-									<th className="px-4 py-3 font-medium text-text-sub-600">Amount</th>
-									<th className="px-4 py-3 font-medium text-text-sub-600">Status</th>
+									<th className="px-4 py-3 font-medium text-text-sub-600">
+										Date
+									</th>
+									<th className="px-4 py-3 font-medium text-text-sub-600">
+										Amount
+									</th>
+									<th className="px-4 py-3 font-medium text-text-sub-600">
+										Status
+									</th>
 									<th className="px-4 py-3 text-right font-medium text-text-sub-600">
 										Invoice
 									</th>
@@ -198,7 +222,11 @@ const BillingPage = () => {
 												</span>
 											</td>
 											<td className="px-4 py-3 text-right">
-												<Button.Root variant="neutral" mode="ghost" size="xsmall">
+												<Button.Root
+													variant="neutral"
+													mode="ghost"
+													size="xsmall"
+												>
 													<Icon name="file-text" className="h-4 w-4" />
 												</Button.Root>
 											</td>

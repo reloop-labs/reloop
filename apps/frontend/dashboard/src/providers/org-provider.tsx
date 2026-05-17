@@ -188,7 +188,8 @@ export const UserOrganizationProvider = ({
 		// No session — will redirect to login
 		if (!session) return false;
 		// Has organizations with an active one — safe to render
-		if (organizations && organizations.length > 0 && activeOrganization) return true;
+		if (organizations && organizations.length > 0 && activeOrganization)
+			return true;
 		// No organizations — will redirect to onboarding (or invite)
 		if (organizations && organizations.length === 0) return false;
 		// Default: still resolving

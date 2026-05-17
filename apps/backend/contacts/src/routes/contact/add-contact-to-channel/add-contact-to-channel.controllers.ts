@@ -1,12 +1,11 @@
-import { log } from "evlog";
 import type { ContactModel } from "@be/contacts/model/contact.model";
 import { createLog } from "@be/contacts/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-
 import { CONTACT_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
+import { log } from "evlog";
 
 export interface AddContactToChannelResult {
 	contact: {
@@ -88,11 +87,14 @@ export async function addContactToChannelController({
 		}
 
 		if (!contact) {
-			log.info({ ...({ contact_id, email }), message: "Contact not found" });
+			log.info({ ...{ contact_id, email }, message: "Contact not found" });
 			throw status(404, { message: "Contact not found" });
 		}
 
-		log.info({ ...({ contactId: contact.id, channelId }), message: "Checking if contact is already subscribed to channel" });
+		log.info({
+			...{ contactId: contact.id, channelId },
+			message: "Checking if contact is already subscribed to channel",
+		});
 		const existingSubscription = await db.query.channelSubscription.findFirst({
 			where: and(
 				eq(schema.channelSubscription.contactId, contact.id),
@@ -113,7 +115,10 @@ export async function addContactToChannelController({
 					.set({ status: targetStatus, updatedAt: new Date() })
 					.where(eq(schema.channelSubscription.id, existingSubscription.id));
 
-				log.info({ ...({ subscriptionId: existingSubscription.id, status: targetStatus }), message: "Updated contact subscription status" });
+				log.info({
+					...{ subscriptionId: existingSubscription.id, status: targetStatus },
+					message: "Updated contact subscription status",
+				});
 
 				const result = {
 					contact,
@@ -150,11 +155,14 @@ export async function addContactToChannelController({
 			throw new Error("Failed to create subscription");
 		}
 
-		log.info({ ...({
+		log.info({
+			...{
 				contactId: contact.id,
 				subscriptionId: subscription.id,
 				status: targetStatus,
-			}), message: "Contact added to channel successfully" });
+			},
+			message: "Contact added to channel successfully",
+		});
 
 		const result = {
 			contact,
@@ -171,7 +179,8 @@ export async function addContactToChannelController({
 
 		return result;
 	} catch (error) {
-		log.error({
+		log.error(
+			{
 				contactId: contact_id,
 				email: email?.toLowerCase(),
 				channelId,

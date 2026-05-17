@@ -1,10 +1,10 @@
-import { log } from "evlog";
 import { DomainErrors } from "@be/domain/lib/errors";
 import type { DomainStatus } from "@be/domain/types/domain.type";
-import { bus, BusEvent } from "@reloop/bus";
+import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { eq } from "drizzle-orm";
+import { log } from "evlog";
 import { useLogger } from "evlog/elysia";
 
 export async function enqueueVerificationJob_step3({
@@ -27,15 +27,21 @@ export async function enqueueVerificationJob_step3({
 			domain: domainName,
 			triggeredAt: new Date().toISOString(),
 		});
-		
-		log.info({ ...({
-			domain: domainName,
-		}), message: "Published domain verification request via NATS" });
+
+		log.info({
+			...{
+				domain: domainName,
+			},
+			message: "Published domain verification request via NATS",
+		});
 	} catch (error) {
-		log.error({ ...({
-			domain: domainName,
-			error,
-		}), message: "Failed to publish domain verification request" });
+		log.error({
+			...{
+				domain: domainName,
+				error,
+			},
+			message: "Failed to publish domain verification request",
+		});
 		// Revert status if publish fails
 		await db
 			.update(schema.domain)

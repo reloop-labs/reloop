@@ -1,4 +1,3 @@
-
 import { Elysia, t } from "elysia";
 import { updatePreferenceController } from "./update-preference.controllers";
 

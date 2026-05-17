@@ -1,10 +1,9 @@
-import { log } from "evlog";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-
 import type { WebhookEventName } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
+import { log } from "evlog";
 import type { WebhookTypes } from "../webhook.type";
 
 export async function getWebhookController({
@@ -14,7 +13,7 @@ export async function getWebhookController({
 	webhookId: string;
 	organizationId: string;
 }): Promise<WebhookTypes.WebhookResponse> {
-	log.info({ ...({ webhookId, organizationId }), message: "Getting webhook" });
+	log.info({ ...{ webhookId, organizationId }, message: "Getting webhook" });
 
 	try {
 		const webhook = await db.query.webhook.findFirst({
@@ -55,7 +54,10 @@ export async function getWebhookController({
 			updatedAt: webhook.updatedAt.toISOString(),
 		};
 	} catch (error) {
-		log.error({ ...({ webhookId, organizationId, error }), message: "Error getting webhook" });
+		log.error({
+			...{ webhookId, organizationId, error },
+			message: "Error getting webhook",
+		});
 		throw error;
 	}
 }

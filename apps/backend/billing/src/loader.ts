@@ -1,4 +1,3 @@
-import { log } from "evlog";
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import {
@@ -8,8 +7,8 @@ import {
 	plan,
 	subscription,
 } from "@reloop/db/schema";
-
 import { and, count, eq, gte, sql } from "drizzle-orm";
+import { log } from "evlog";
 
 import { billingConfig } from "./billing.config";
 import { getOrProvisionSubscription } from "./utils/subscription";
@@ -21,26 +20,44 @@ export async function loader() {
 		await bus.connect(billingConfig.NATS_URL);
 		log.info("server", "NATS connected in Billing Service");
 	} catch (error) {
-		log.error({ ...({ error }), message: "Failed to connect to NATS in Billing Service" });
+		log.error({
+			...{ error },
+			message: "Failed to connect to NATS in Billing Service",
+		});
 	}
 
 	// ── ORGANIZATION_CREATED — Initialize subscription + credits ──────────────
 	await bus.subscribe(BusEvent.ORGANIZATION_CREATED, async (payload) => {
-		log.info({ ...({ organizationId: payload.id }), message: "Handling ORGANIZATION_CREATED" });
+		log.info({
+			...{ organizationId: payload.id },
+			message: "Handling ORGANIZATION_CREATED",
+		});
 		try {
 			await db.transaction(async (tx) => {
 				await getOrProvisionSubscription(payload.id, tx);
 			});
 
-			log.info({ ...({ organizationId: payload.id }), message: "Initialized subscription for new organization" });
+			log.info({
+				...{ organizationId: payload.id },
+				message: "Initialized subscription for new organization",
+			});
 		} catch (error) {
-			log.error({ ...({ error, organizationId: payload.id }), message: "Failed to initialize subscription" });
+			log.error({
+				...{ error, organizationId: payload.id },
+				message: "Failed to initialize subscription",
+			});
 		}
 	});
 
 	// ── EMAIL_SENT — Deduct credits + publish USAGE_UPDATED ───────────────────
 	await bus.subscribe(BusEvent.EMAIL_SENT, async (payload) => {
-		log.info({ ...({ organizationId: payload.organizationId, count: payload.recipientCount }), message: "Handling EMAIL_SENT" });
+		log.info({
+			...{
+				organizationId: payload.organizationId,
+				count: payload.recipientCount,
+			},
+			message: "Handling EMAIL_SENT",
+		});
 		try {
 			let usageSnapshot: {
 				creditsUsed: number;
@@ -52,7 +69,10 @@ export async function loader() {
 
 			await db.transaction(async (tx) => {
 				// 1. Find active subscription with plan (provision if missing)
-				const activeSub = await getOrProvisionSubscription(payload.organizationId, tx);
+				const activeSub = await getOrProvisionSubscription(
+					payload.organizationId,
+					tx,
+				);
 
 				// 2. Create email_send record for billing audit
 				const [sendRecord] = await tx
@@ -151,7 +171,10 @@ export async function loader() {
 					creditsUsed: snap.creditsUsed,
 					monthlyCredits: snap.monthlyCredits,
 				});
-				log.warn({ ...({ organizationId: payload.organizationId }), message: "Quota exceeded — published QUOTA_EXCEEDED" });
+				log.warn({
+					...{ organizationId: payload.organizationId },
+					message: "Quota exceeded — published QUOTA_EXCEEDED",
+				});
 			} else if (usageRatio >= 0.8) {
 				// Fire QUOTA_WARNING at 80% and again at 90%
 				await bus.publish(BusEvent.QUOTA_WARNING, {
@@ -159,12 +182,21 @@ export async function loader() {
 					percentage: Math.round(usageRatio * 100),
 					resourceType: "email_credits",
 				});
-				log.warn({ ...({ organizationId: payload.organizationId, usageRatio }), message: "Quota warning threshold reached" });
+				log.warn({
+					...{ organizationId: payload.organizationId, usageRatio },
+					message: "Quota warning threshold reached",
+				});
 			}
 
-			log.info({ ...({ organizationId: payload.organizationId }), message: "Deducted credits, published USAGE_UPDATED" });
+			log.info({
+				...{ organizationId: payload.organizationId },
+				message: "Deducted credits, published USAGE_UPDATED",
+			});
 		} catch (error) {
-			log.error({ ...({ error, organizationId: payload.organizationId }), message: "Failed to deduct credits" });
+			log.error({
+				...{ error, organizationId: payload.organizationId },
+				message: "Failed to deduct credits",
+			});
 		}
 	});
 }

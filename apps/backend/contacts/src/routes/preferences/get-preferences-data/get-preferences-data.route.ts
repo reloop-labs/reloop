@@ -1,4 +1,3 @@
-
 import { Elysia, t } from "elysia";
 import { getPreferencesDataController } from "./get-preferences-data.controllers";
 

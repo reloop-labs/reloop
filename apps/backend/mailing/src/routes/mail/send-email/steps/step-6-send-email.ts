@@ -4,7 +4,6 @@ import { db } from "@reloop/db/client";
 import { emailLog } from "@reloop/db/schema";
 import { eq } from "drizzle-orm";
 
-
 export async function sendEmail_step6({
 	body,
 	finalSubject,
@@ -50,8 +49,7 @@ export async function sendEmail_step6({
 			.update(emailLog)
 			.set({
 				status: "failed",
-				errorMessage:
-					error instanceof Error ? error.message : String(error),
+				errorMessage: error instanceof Error ? error.message : String(error),
 				failedAt: new Date(),
 			})
 			.where(eq(emailLog.id, emailLogId))

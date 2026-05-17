@@ -17,7 +17,8 @@ export const openRoute = new Elysia()
 			}),
 			detail: {
 				summary: "Track Email Open",
-				description: "Serves a transparent pixel to track when an email is opened",
+				description:
+					"Serves a transparent pixel to track when an email is opened",
 				tags: ["Tracking"],
 			},
 		},

@@ -104,7 +104,12 @@ export interface InviteCreatedPayload {
 export interface OtpRequestedPayload {
 	email: string;
 	otp: string;
-	type: "sign-in" | "email-verification" | "forget-password" | "change-email" | "two-factor";
+	type:
+		| "sign-in"
+		| "email-verification"
+		| "forget-password"
+		| "change-email"
+		| "two-factor";
 }
 
 export interface PaymentFailedPayload {
@@ -158,7 +163,7 @@ export interface UsageUpdatedPayload {
 	creditsRemaining: number;
 	monthlyCredits: number;
 	periodStart: string; // ISO
-	periodEnd: string;   // ISO
+	periodEnd: string; // ISO
 	emailsSentToday: number;
 }
 
@@ -195,4 +200,3 @@ export interface EventPayloads {
 	[BusEvent.USAGE_UPDATED]: UsageUpdatedPayload;
 	[BusEvent.QUOTA_EXCEEDED]: QuotaExceededPayload;
 }
-

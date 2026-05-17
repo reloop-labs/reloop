@@ -5,13 +5,16 @@ export async function validateSession(cookie: string | null): Promise<{
 	activeOrganizationId: string;
 	authType: "session";
 } | null> {
-	const response = await fetch(`${billingConfig.BASE_URL}/api/auth/v1/get-session`, {
-		method: "GET",
-		headers: new Headers({
-			"Content-Type": "application/json",
-			Cookie: cookie || "",
-		}),
-	});
+	const response = await fetch(
+		`${billingConfig.BASE_URL}/api/auth/v1/get-session`,
+		{
+			method: "GET",
+			headers: new Headers({
+				"Content-Type": "application/json",
+				Cookie: cookie || "",
+			}),
+		},
+	);
 
 	if (!response.ok) return null;
 

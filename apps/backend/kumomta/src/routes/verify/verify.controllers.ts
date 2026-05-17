@@ -1,10 +1,9 @@
-import { log } from "evlog";
 import { validateApiKey as validateApiKeyShared } from "@reloop/apikey";
 import { redis } from "@reloop/be-kumomta/utils/loader";
 import { db } from "@reloop/db/client";
 import { domain } from "@reloop/db/schema";
-
 import { and, eq, isNull } from "drizzle-orm";
+import { log } from "evlog";
 
 export async function verifyDomainController({
 	domainName,
@@ -25,7 +24,8 @@ export async function verifyDomainController({
 		if (!domainRecord) return null;
 		return { isVerified: domainRecord.status === "active" };
 	} catch (error) {
-		log.error({
+		log.error(
+			{
 				error: error instanceof Error ? error.message : String(error),
 				domain: domainName,
 			},
@@ -47,7 +47,8 @@ export async function verifyApiKeyController(
 				}
 			: null;
 	} catch (e) {
-		log.error({ error: e instanceof Error ? e.message : String(e) },
+		log.error(
+			{ error: e instanceof Error ? e.message : String(e) },
 			"Error authenticating API key",
 		);
 		return null;

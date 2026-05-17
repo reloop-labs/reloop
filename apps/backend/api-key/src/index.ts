@@ -45,7 +45,10 @@ const apiKeyService = new Elysia({
 		await loader();
 	})
 	.listen(port, () => {
-		log.info("server", `API Key Server is running on http://localhost:${port}/api/api-key`);
+		log.info(
+			"server",
+			`API Key Server is running on http://localhost:${port}/api/api-key`,
+		);
 	});
 
 export type ApiKeyService = typeof apiKeyService;

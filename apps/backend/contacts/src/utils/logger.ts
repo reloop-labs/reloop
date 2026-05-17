@@ -1,6 +1,5 @@
+import { BusEvent, bus } from "@reloop/bus";
 import { log } from "evlog";
-import { bus, BusEvent } from "@reloop/bus";
-
 
 /**
  * Creates a structured log entry in the centralized logs service.
@@ -41,7 +40,6 @@ export async function createLog(body: {
 			cookie,
 		});
 	} catch (error) {
-		log.error({ ...({ error }), message: "Error publishing log to NATS" });
+		log.error({ ...{ error }, message: "Error publishing log to NATS" });
 	}
 }
-

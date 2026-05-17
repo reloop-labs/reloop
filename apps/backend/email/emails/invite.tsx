@@ -92,8 +92,8 @@ export const InviteEmail = ({
 
 						{/* Body Text */}
 						<Text className={cls.bodyText}>
-							<strong>{inviterName}</strong> (<strong>{inviterEmail}</strong>) has
-							invited you to the <strong>{teamName}</strong> team on{" "}
+							<strong>{inviterName}</strong> (<strong>{inviterEmail}</strong>)
+							has invited you to the <strong>{teamName}</strong> team on{" "}
 							<strong>Reloop</strong>.
 						</Text>
 

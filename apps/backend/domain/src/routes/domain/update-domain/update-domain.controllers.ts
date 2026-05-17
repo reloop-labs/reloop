@@ -1,4 +1,3 @@
-import { log } from "evlog";
 import { DomainErrors } from "@be/domain/lib/errors";
 import type { DomainTypes } from "@be/domain/types/domain.type";
 import { BusEvent, bus } from "@reloop/bus";
@@ -6,6 +5,7 @@ import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { DOMAIN_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
+import { log } from "evlog";
 import { useLogger } from "evlog/elysia";
 
 export async function updateDomainController({
@@ -19,7 +19,7 @@ export async function updateDomainController({
 }): Promise<DomainTypes.DomainResponse> {
 	const logger = useLogger();
 	try {
-		log.info({ ...({ domainId, body }), message: "Updating domain" });
+		log.info({ ...{ domainId, body }, message: "Updating domain" });
 
 		const existingDomain = await db.query.domain.findFirst({
 			where: and(
@@ -30,7 +30,7 @@ export async function updateDomainController({
 		});
 
 		if (!existingDomain) {
-			log.warn({ ...({ domainId }), message: "Domain not found" });
+			log.warn({ ...{ domainId }, message: "Domain not found" });
 			throw DomainErrors.domainNotFound(domainId);
 		}
 
@@ -96,7 +96,10 @@ export async function updateDomainController({
 
 		return finalDomain;
 	} catch (error) {
-		log.error({ ...({ domainId, error }), message: "Error updating domain settings" });
+		log.error({
+			...{ domainId, error },
+			message: "Error updating domain settings",
+		});
 		throw error;
 	}
 }

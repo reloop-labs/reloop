@@ -62,10 +62,10 @@ export const emailLog = pgTable(
 		domainId: text("domain_id")
 			.notNull()
 			.references(() => domain.id, { onDelete: "cascade" }),
-		userId: text("user_id")
-			.references(() => user.id, { onDelete: "cascade" }),
-		apikeyId: text("apikey_id")
-			.references(() => apikey.id, { onDelete: "cascade" }),
+		userId: text("user_id").references(() => user.id, { onDelete: "cascade" }),
+		apikeyId: text("apikey_id").references(() => apikey.id, {
+			onDelete: "cascade",
+		}),
 		fromEmail: varchar("from_email", { length: 255 }).notNull(),
 		fromName: varchar("from_name", { length: 255 }),
 		toEmails: jsonb("to_emails").$type<string[]>().notNull(),

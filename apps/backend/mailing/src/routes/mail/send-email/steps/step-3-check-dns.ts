@@ -1,11 +1,8 @@
-import { log } from "evlog";
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
-import {
-	type dnsRecordTypeNameEnum,
-	domainDnsRecord,
-} from "@reloop/db/schema";
+import { type dnsRecordTypeNameEnum, domainDnsRecord } from "@reloop/db/schema";
 import { and, eq, inArray } from "drizzle-orm";
+import { log } from "evlog";
 import { useLogger } from "evlog/elysia";
 
 type DomainRow = {
@@ -31,7 +28,7 @@ export async function checkDnsHealth_step3({
 	const lastVerified = domainData.lastVerifiedAt;
 	const isRecent = lastVerified
 		? Date.now() - new Date(lastVerified).getTime() <
-		STALE_THRESHOLD_HOURS * 60 * 60 * 1000
+			STALE_THRESHOLD_HOURS * 60 * 60 * 1000
 		: false;
 
 	if (domainData.systemVerified && domainData.status === "active" && isRecent) {
@@ -48,9 +45,12 @@ export async function checkDnsHealth_step3({
 			triggeredAt: new Date().toISOString(),
 		})
 		.catch((err) => {
-			log.warn({ ...({
-				domainId,
-				error: err instanceof Error ? err.message : String(err), message: "Failed to publish DNS reverification event" }),
+			log.warn({
+				...{
+					domainId,
+					error: err instanceof Error ? err.message : String(err),
+					message: "Failed to publish DNS reverification event",
+				},
 			});
 		});
 
@@ -88,7 +88,10 @@ export async function checkDnsHealth_step3({
 
 	const isHealthy = missingRecords.length === 0;
 	if (!isHealthy) {
-		log.warn({ ...({ domainId, missingRecords }), message: "Domain DNS health check failed" });
+		log.warn({
+			...{ domainId, missingRecords },
+			message: "Domain DNS health check failed",
+		});
 	}
 
 	return { isHealthy, missingRecords };

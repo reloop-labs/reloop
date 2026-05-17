@@ -1,5 +1,5 @@
-import { log } from "evlog";
 import { bus } from "@reloop/bus";
+import { log } from "evlog";
 
 import { emailConfig } from "../email.config";
 import { initSubscribers } from "../subscribers";
@@ -11,7 +11,8 @@ export const loader = async () => {
 
 		await initSubscribers();
 	} catch (e) {
-		log.error({ error: e instanceof Error ? e.message : String(e) },
+		log.error(
+			{ error: e instanceof Error ? e.message : String(e) },
 			"Error during service initialization",
 		);
 	}

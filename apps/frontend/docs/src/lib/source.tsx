@@ -1,13 +1,18 @@
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
+import * as LucideIcons from "lucide-react";
 import type { MDXComponents } from "mdx/types";
 import { MDXRemote } from "next-mdx-remote/rsc";
+import type React from "react";
 import remarkGfm from "remark-gfm";
 import type { PageNode, PageTreeItem, TOCItem } from "./types";
+import { timestamp } from "./watcher-trigger";
 
-import * as LucideIcons from "lucide-react";
-import React from "react";
+// Log timestamp load to satisfy webpack/turbopack dependency tracing
+if (process.env.NODE_ENV === "development") {
+	console.log("[Reloop HMR] Active module revision timestamp:", timestamp);
+}
 
 function getDocsDir(): string {
 	const paths = [
@@ -24,11 +29,58 @@ function getDocsDir(): string {
 		}
 	}
 
-	console.error("Could not find docs directory in any of the following locations:", paths);
+	console.error(
+		"Could not find docs directory in any of the following locations:",
+		paths,
+	);
 	return paths[0]!; // Fallback to default
 }
 
 const docsDir = getDocsDir();
+
+// Bridge dynamic filesystem changes into Next.js's Fast Refresh dependency tree
+if (process.env.NODE_ENV === "development") {
+	setupDevWatcher();
+}
+
+function setupDevWatcher() {
+	if (typeof window !== "undefined" || (global as any).__reloop_watcher__)
+		return;
+	(global as any).__reloop_watcher__ = true;
+
+	const triggerFile = path.join(process.cwd(), "src/lib/watcher-trigger.ts");
+
+	let timeout: NodeJS.Timeout | null = null;
+	try {
+		fs.watch(docsDir, { recursive: true }, (eventType, filename) => {
+			if (
+				filename &&
+				(filename.endsWith(".mdx") || filename.endsWith(".json"))
+			) {
+				if (timeout) clearTimeout(timeout);
+				timeout = setTimeout(() => {
+					try {
+						fs.writeFileSync(
+							triggerFile,
+							`export const timestamp = ${Date.now()};\n`,
+							"utf8",
+						);
+					} catch (err) {
+						console.error(
+							"[Reloop HMR] Failed to update watcher trigger file:",
+							err,
+						);
+					}
+				}, 150);
+			}
+		});
+		console.log(
+			`[Reloop HMR Watcher] Successfully watching ${docsDir} for MDX changes.`,
+		);
+	} catch (err) {
+		console.error("[Reloop HMR Watcher] Failed to initialize watcher:", err);
+	}
+}
 
 function buildTree(dir: string, base = ""): PageTreeItem[] {
 	const metaPath = path.join(dir, "meta.json");
@@ -204,7 +256,10 @@ export const source = {
 				url: `/${slugPath === "index" ? "introduction" : slugPath}`,
 			};
 		} catch (error: any) {
-			console.error(`FATAL ERROR in getPage for slug ${slug?.join("/")}:`, error);
+			console.error(
+				`FATAL ERROR in getPage for slug ${slug?.join("/")}:`,
+				error,
+			);
 			return {
 				data: {
 					title: "Error Loading Content",

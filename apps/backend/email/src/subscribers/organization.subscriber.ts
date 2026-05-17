@@ -1,5 +1,5 @@
-import { log } from "evlog";
 import { BusEvent, bus } from "@reloop/bus";
+import { log } from "evlog";
 
 import React from "react";
 import InviteEmail from "../../emails/invite";
@@ -18,7 +18,10 @@ export async function initOrgSubscribers() {
 			try {
 				const alreadySent = await redis.get(dedupKey);
 				if (alreadySent && !payload.isResend) {
-					log.warn("server", `Duplicate INVITE_CREATED for ${payload.email}, skipping`);
+					log.warn(
+						"server",
+						`Duplicate INVITE_CREATED for ${payload.email}, skipping`,
+					);
 					return;
 				}
 				await redis.set(dedupKey, "1", 60);
@@ -40,7 +43,10 @@ export async function initOrgSubscribers() {
 					html,
 				});
 			} catch (error) {
-				log.error({ ...({ error, payload }), message: "Failed to send invite email" });
+				log.error({
+					...{ error, payload },
+					message: "Failed to send invite email",
+				});
 			}
 		},
 		{ queue: "org-email-worker" },
@@ -54,7 +60,10 @@ export async function initOrgSubscribers() {
 			try {
 				const alreadySent = await redis.get(dedupKey);
 				if (alreadySent) {
-					log.warn("server", `Duplicate ORGANIZATION_JOINED for ${payload.userEmail}, skipping`);
+					log.warn(
+						"server",
+						`Duplicate ORGANIZATION_JOINED for ${payload.userEmail}, skipping`,
+					);
 					return;
 				}
 				await redis.set(dedupKey, "1", 60);
@@ -76,7 +85,10 @@ export async function initOrgSubscribers() {
 					html,
 				});
 			} catch (error) {
-				log.error({ ...({ error, payload }), message: "Failed to send org joined email" });
+				log.error({
+					...{ error, payload },
+					message: "Failed to send org joined email",
+				});
 			}
 		},
 		{ queue: "org-email-worker" },

@@ -1,187 +1,213 @@
 ---
-title: Setup
-description: Setup Reloop locally for development.
+title: Local Development Setup
+description: Step-by-step guide to clone, install, and run Reloop services locally.
 ---
 
-<Callout>
-  **Prerequisite:** Make sure [Bun](https://bun.com/get) is installed before starting.
-</Callout>
+Welcome to the local development setup guide for Reloop. Reloop is a high-performance, type-safe email and campaign automation platform designed as a modern **monorepo**. 
 
+This document provides a clear, sequential path for both developers and automated agents to set up and run all services in a local environment.
 
-### Clone and Install
+---
 
-```sh
+## Prerequisites
+
+Before starting, ensure that you have the following installed on your machine:
+
+- **Bun**: The fast all-in-one JavaScript runtime (v1.3.0+) &rarr; [Install Bun](https://bun.sh/get)
+- **Docker & Docker Compose**: To run PostgreSQL, Redis, ClickHouse, etc. &rarr; [Install Docker Desktop](https://www.docker.com/products/docker-desktop/)
+- **Git**: For cloning the repository
+
+---
+
+## Interactive Walkthrough
+
+Follow these steps sequentially to set up and run Reloop locally.
+
+<Steps>
+<Step title="Clone and Install Dependencies">
+
+Clone the Reloop repository and install the dependencies from the root directory using Bun:
+
+```bash
 git clone git@github.com:reloop-labs/reloop.git
 cd reloop
 bun install
 ```
 
+</Step>
 
-### 4. Configure Hosts File
+<Step title="Configure Local Domain (Hosts File)">
 
-**Important:** This step is crucial for running multiple servers on the same network. Since Reloop consists of several services (backend, frontend, mail, etc.) that need to communicate with each other, you must add a local domain entry to your hosts file.
+To support secure local sessions and cookie-sharing across multiple microservices without running into CORS issues, you must map `local.reloop.sh` to your local machine (`127.0.0.1`).
 
-This allows all services to run on different ports but appear to be on the same domain, enabling proper communication between components.
+<CodeGroup>
+  <CodeBlock title="macOS & Linux">
+  ```bash
+  echo "127.0.0.1 local.reloop.sh" | sudo tee -a /etc/hosts
+  ```
+  </CodeBlock>
+  <CodeBlock title="Windows (PowerShell - Run as Administrator)">
+  ```powershell
+  Add-Content -Path $env:windir\System32\drivers\etc\hosts -Value "127.0.0.1`tlocal.reloop.sh"
+  ```
+  </CodeBlock>
+</CodeGroup>
 
-```sh
-echo "127.0.0.1 local.reloop.sh" | sudo tee -a /etc/hosts
+<Callout type="warn" title="System Privileges Required">
+  This command edits system configuration files. You may be prompted to enter your administrator or system password.
+</Callout>
+
+</Step>
+
+<Step title="Start Docker Infrastructure">
+
+Reloop relies on backing services (PostgreSQL, Redis, ClickHouse, Loki, Grafana, and Caddy). Ensure Docker is running, then boot the entire local stack from the root directory:
+
+```bash
+bun docker:up
 ```
 
-**What this does:**
-- Maps `local.reloop.sh` to your local machine (`127.0.0.1`)
-- Enables services to communicate using the same domain name
-- Prevents network conflicts when running multiple servers
-- Allows proper routing between frontend, backend, and other services
-
-**Note:** You may need to enter your system password when running this command with `sudo`.
-
-### 5. Start Docker Services
-
-**Prerequisite:** Make sure Docker is installed and running on your system.
-
-Navigate to the local configuration directory and start all required services:
-
-```sh
-cd local
-docker compose up
+*If you prefer to run Docker Compose manually, you can also run:*
+```bash
+cd local && docker compose up -d && cd ..
 ```
 
-This command will start all the necessary Docker containers for:
-- PostgreSQL database
-- Redis cache
-- ClickHouse analytics database
-- Grafana monitoring
-- Loki logging
-- Caddy reverse proxy
+This starts:
+- **PostgreSQL** (`5432`): Core database for users, authentication, and platform metadata.
+- **Redis** (`6379`): In-memory cache, background worker queue, and session store.
+- **ClickHouse** (`8123`): High-performance column-oriented analytics and event log database.
+- **Caddy** (`80` / `443`): Automatic SSL and reverse-proxy routing.
+- **Grafana & Loki** (`3000` / `3100`): Systems dashboards and centralized log aggregation.
 
-### 6. Setup the Database
+</Step>
 
-Navigate to the database package directory and run the database setup commands:
+<Step title="Initialize the Database">
 
-```sh
-cd packages/db
+With Docker services running, run the following commands from the **root directory** to apply the database schema (using Drizzle ORM) and seed the initial/default data:
+
+```bash
+# Push the schema changes directly to your local database
+bun db:push
+
+# Populate the database with required default and initial seeding data
+bun db:seed
 ```
 
-**Push database schema:**
-```sh
-bun run db:push
+<Callout type="tip" title="Drizzle Studio">
+  You can visually explore or edit your database tables anytime by opening Drizzle Studio:
+  ```bash
+  bun db:studio
+  ```
+</Callout>
+
+</Step>
+
+<Step title="Configure Environment Variables">
+
+Backend and frontend services look for `.env` files inside their respective subdirectories. For local development, copy the `.env.example` configurations.
+
+For the **Authentication Service** (as an example):
+```bash
+cp apps/backend/auth/env.example apps/backend/auth/.env
 ```
-*This creates the database tables and schema using Drizzle ORM.*
 
-**Open database studio (optional):**
-```sh
-bun run db:studio
-```
-*This opens a visual UI for the database using Drizzle Studio.*
+<Callout type="info" title="Specific Configurations">
+  Detailed environment guides for features like Stripe billing, Kumomta SMTP, workflows, and uploads are available under the respective backend/frontend setup files in the sidebar.
+</Callout>
 
-**Seed the database:**
-```sh
-bun run db:seed
-```
-*This populates the database with default/initial data.*
+</Step>
 
-### 7. Start Frontend Services
+<Step title="Start Reloop Services">
 
-Reloop includes multiple frontend applications. You can start them individually or all together:
+Reloop provides multiple options to start development servers. You can start all microservices together, run frontend or backend suites separately, or boot specific components individually.
 
-**Main Web Application (Public Website):**
-```sh
-bun run fe:web:dev
-```
-*Starts the public-facing website on http://localhost:3000*
+<CodeGroup>
+  <CodeBlock title="Option A: Start All (Standard)">
+  ```bash
+  # Concurrently starts all frontend & backend services via Turbo
+  bun dev
+  ```
+  </CodeBlock>
 
-**Admin Dashboard:**
-```sh
-bun run fe:admin:dev
-```
-*Starts the admin interface for managing users and system settings*
+  <CodeBlock title="Option B: Frontends Only">
+  ```bash
+  # Concurrently starts web app, user dashboard, admin dashboard, and docs
+  bun frontend:dev
+  ```
+  </CodeBlock>
 
-**User Dashboard:**
-```sh
-bun run fe:dashboard:dev
-```
-*Starts the main user dashboard for managing domains, audiences, and campaigns*
+  <CodeBlock title="Option C: Backends Only">
+  ```bash
+  # Concurrently starts all backend microservice API instances
+  bun backend:dev
+  ```
+  </CodeBlock>
+</CodeGroup>
 
-**Development Documentation:**
-```sh
-bun run fe:dev:dev
-```
-*Starts the development documentation site on http://localhost:3004*
+<Callout type="tip" title="Starting Individual Services">
+  If you are only working on one service and want to save system resources, you can target it directly using Bun filters:
+  - **Auth API**: `bun be:auth:dev`
+  - **Dashboard Front**: `bun fe:dashboard:dev`
+  - **Domain API**: `bun be:domain:dev`
+</Callout>
 
-**Public Documentation:**
-```sh
-bun run fe:docs:dev
-```
-*Starts the public documentation site*
+</Step>
+</Steps>
 
-### 8. Start Backend Services
+---
 
-Reloop's backend consists of several microservices. Start them as needed:
+## Service URLs and Ports Reference
 
-**Authentication Service:**
-```sh
-bun run be:auth:dev
-```
-*Handles user authentication, sessions, and permissions*
+Once the services are running, they are available on the following local ports and URLs:
 
-**Domain Management Service:**
-```sh
-bun run be:domain:dev
-```
-*Manages domain registration, DNS configuration, and domain validation*
+### Frontend Applications
 
-**Audience Management Service:**
-```sh
-bun run be:audience:dev
-```
-*Handles audience creation, management, and segmentation*
+| Application | URL | Port | Description |
+| :--- | :--- | :--- | :--- |
+| **Web App** | http://localhost:3000 | `3000` | Main public website and marketing pages |
+| **Admin Dashboard** | http://localhost:3001 | `3001` | System administrator dashboard for user/system management |
+| **User Dashboard** | http://localhost:3002 | `3002` | Main client app (workspaces, lists, campaigns) |
+| **Public Docs** | http://localhost:3003 | `3003` | This developer/public documentation portal |
+| **Dev Docs** | http://localhost:3004 | `3004` | Internal developer documentation reference site |
 
-**Webhook Service:**
-```sh
-bun run be:webhook:dev
-```
-*Manages webhook subscriptions, deliveries, and event processing*
-
-**Mail Service:**
-```sh
-bun run be:mail:dev
-```
-*Handles email sending, templates, and mail server integration*
-
-
-### 9. Service Ports and URLs
-
-When running locally, services will be available at:
+### Backend API Services
 
 | Service | URL | Port | Description |
-|---------|-----|------|-------------|
-| Web App | http://localhost:3000 | 3000 | Main public website |
-| Admin | http://localhost:3001 | 3001 | Admin dashboard |
-| Dashboard | http://localhost:3002 | 3002 | User dashboard |
-| Docs | http://localhost:3003 | 3003 | Public documentation |
-| Dev Docs | http://localhost:3004 | 3004 | Development documentation |
-| Auth API | http://localhost:4001 | 4001 | Authentication service |
-| Domain API | http://localhost:4002 | 4002 | Domain management |
-| Audience API | http://localhost:4003 | 4003 | Audience management |
-| Webhook API | http://localhost:4004 | 4004 | Webhook service |
-| Mail API | http://localhost:4005 | 4005 | Mail service |
+| :--- | :--- | :--- | :--- |
+| **Auth API** | http://localhost:4001 | `4001` | User signup, signin, permissions, and Better Auth |
+| **Domain API** | http://localhost:4002 | `4002` | Domain delegation, DKIM, and DNS verification service |
+| **Audience API** | http://localhost:4003 | `4003` | Recipient groups, segmentation, and list managers |
+| **Webhook API** | http://localhost:4004 | `4004` | Outgoing system notifications and HTTP POST triggers |
+| **Mail API** | http://localhost:4005 | `4005` | Dynamic HTML generation and SMTP queuing |
 
-### 10. Development Workflow
+---
 
-1. **Start Docker services** (PostgreSQL, Redis, etc.)
-2. **Setup database** (push schema, seed data)
-3. **Start backend services** (auth, domain, audience, etc.)
-4. **Start frontend services** (web, dashboard, admin, etc.)
-5. **Access applications** through their respective URLs
+## Quick Developer Cheat Sheet
 
-**Quick start command:**
-```sh
-# Terminal 1: Start Docker
-cd local && docker compose up
+Keep these core monorepo commands handy for routine tasks:
 
-# Terminal 2: Setup database
-cd packages/db && bun run db:push && bun run db:seed
+| Command | Action | Scope |
+| :--- | :--- | :--- |
+| `bun run check` | Run code quality checks, lints, and format checks | Full Monorepo |
+| `bun db:push` | Synchronize current schema changes to PostgreSQL | Database |
+| `bun db:seed` | Re-seed the local database with default data | Database |
+| `bun docker:down` | Stop and tear down all docker containers | Infrastructure |
+| `bun run --filter=<package-name> <script>` | Run a package script specifically | Target Package |
 
-# Terminal 3: Start all services
-bun run dev
-```
+---
+
+## Next Steps
+
+Now that your base local environment is running, explore the specialized setup instructions:
+
+<Cards>
+  <Card icon={<Icon name="element-5" />} title="Project Structure" href="/setup/project-structure">
+    Learn how apps, packages, and shared directories are organized.
+  </Card>
+  <Card icon={<Icon name="server" />} title="Backend Setup" href="/setup/backend/auth">
+    Configure auth keys, Stripe billing, Kumomta queues, webhooks, and mailing engines.
+  </Card>
+  <Card icon={<Icon name="home" />} title="Frontend Setup" href="/setup/frontend/dashboard">
+    Configure the web application, user dashboard, and custom components.
+  </Card>
+</Cards>

@@ -1,9 +1,8 @@
-import { log } from "evlog";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
+import { log } from "evlog";
 import { verifyToken } from "../token.utils";
 
 export async function updatePreferenceController({
@@ -17,7 +16,7 @@ export async function updatePreferenceController({
 	subscribe: boolean;
 	logger?: any;
 }) {
-	log.info({ ...({ channelId, subscribe }), message: "Updating preference" });
+	log.info({ ...{ channelId, subscribe }, message: "Updating preference" });
 
 	const payload = await verifyToken(token);
 	if (!payload) {
@@ -64,7 +63,10 @@ export async function updatePreferenceController({
 		});
 	}
 
-	log.info({ ...({ contactId, channelId, status: targetStatus }), message: "Preference updated" });
+	log.info({
+		...{ contactId, channelId, status: targetStatus },
+		message: "Preference updated",
+	});
 
 	return {
 		success: true,

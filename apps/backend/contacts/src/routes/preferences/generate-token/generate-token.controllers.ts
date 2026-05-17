@@ -1,9 +1,8 @@
-import { log } from "evlog";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
+import { log } from "evlog";
 import { signToken } from "../token.utils";
 
 const BASE_URL = process.env.BASE_URL || "https://local.reloop.sh";
@@ -25,7 +24,7 @@ export async function generatePreferenceTokenController({
 		});
 	}
 
-	log.info({ ...({ contactId, email }), message: "Generating preference token" });
+	log.info({ ...{ contactId, email }, message: "Generating preference token" });
 
 	let contact: typeof schema.contact.$inferSelect | undefined;
 
@@ -59,7 +58,10 @@ export async function generatePreferenceTokenController({
 	});
 	const url = `${BASE_URL}/preferences/${token}`;
 
-	log.info({ ...({ contactId: contact.id }), message: "Preference token generated successfully" });
+	log.info({
+		...{ contactId: contact.id },
+		message: "Preference token generated successfully",
+	});
 
 	return {
 		token,

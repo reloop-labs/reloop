@@ -117,7 +117,10 @@ export default async function Page(props: {
 
 	return (
 		<CodeColumnProvider>
-			<DocsLayout tree={source.pageTree.children as PageTreeItem[]} pathname={pathname}>
+			<DocsLayout
+				tree={source.pageTree.children as PageTreeItem[]}
+				pathname={pathname}
+			>
 				<div
 					className={`mx-auto flex w-full flex-col ${hideToc ? "max-w-none" : "max-w-[1100px] xl:grid xl:grid-cols-[1fr_240px] xl:gap-8"}`}
 				>
@@ -193,7 +196,7 @@ export default async function Page(props: {
 					{/* Right sidebar - Table of Contents (hidden on full-width API pages) */}
 					{!hideToc && (
 						<aside className="hidden xl:block">
-							<div className="sticky top-0 h-[calc(100vh-3rem)] overflow-y-auto pt-8 pr-16">
+							<div className="sticky top-0 h-[calc(100vh-3rem)] overflow-y-auto pt-8 pr-18">
 								<TableOfContents items={page.data.toc as TOCItem[]} />
 							</div>
 						</aside>

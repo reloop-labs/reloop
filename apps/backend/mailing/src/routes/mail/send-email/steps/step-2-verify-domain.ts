@@ -3,7 +3,6 @@ import { db } from "@reloop/db/client";
 import { domain } from "@reloop/db/schema";
 import { and, eq } from "drizzle-orm";
 
-
 export async function verifyDomainAuth_step2({
 	organizationId,
 	domainName,

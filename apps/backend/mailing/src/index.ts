@@ -54,7 +54,10 @@ const mailService = new Elysia({
 		await loader();
 	})
 	.listen(port, () => {
-		log.info("server", `Mail Server is running on http://localhost:${port}/api/mail`);
+		log.info(
+			"server",
+			`Mail Server is running on http://localhost:${port}/api/mail`,
+		);
 	});
 
 export type MailService = typeof mailService;

@@ -1,12 +1,11 @@
-import { log } from "evlog";
 import type { ContactModel } from "@be/contacts/model/contact.model";
 import { createLog } from "@be/contacts/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-
 import { CONTACT_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
+import { log } from "evlog";
 
 export async function addContactToGroupController({
 	organizationId,
@@ -32,14 +31,20 @@ export async function addContactToGroupController({
 	const { contact_id, email } = body;
 
 	if (!contact_id && !email) {
-		log.info({ ...({}), message: "Either 'contact_id' or 'email' must be provided" });
+		log.info({
+			...{},
+			message: "Either 'contact_id' or 'email' must be provided",
+		});
 		throw status(400, {
 			message: "Either 'contact_id' or 'email' must be provided",
 		});
 	}
 
 	try {
-		log.info({ ...({ contactId: contact_id, email, groupId }), message: "Verify group exists" });
+		log.info({
+			...{ contactId: contact_id, email, groupId },
+			message: "Verify group exists",
+		});
 		// Verify group exists
 		const group = await db.query.group.findFirst({
 			where: and(
@@ -50,14 +55,14 @@ export async function addContactToGroupController({
 		});
 
 		if (!group) {
-			log.info({ ...({ groupId }), message: "Group not found" });
+			log.info({ ...{ groupId }, message: "Group not found" });
 			throw status(404, { message: "Group not found" });
 		}
 
 		let contact: typeof schema.contact.$inferSelect | undefined;
 
 		if (contact_id) {
-			log.info({ ...({ contactId: contact_id }), message: "Find contact by id" });
+			log.info({ ...{ contactId: contact_id }, message: "Find contact by id" });
 			contact = await db.query.contact.findFirst({
 				where: and(
 					eq(schema.contact.id, contact_id),
@@ -66,7 +71,7 @@ export async function addContactToGroupController({
 				),
 			});
 		} else if (email) {
-			log.info({ ...({ email }), message: "Find contact by email" });
+			log.info({ ...{ email }, message: "Find contact by email" });
 			contact = await db.query.contact.findFirst({
 				where: and(
 					eq(schema.contact.email, email),
@@ -80,7 +85,10 @@ export async function addContactToGroupController({
 			throw status(404, { message: "Contact not found" });
 		}
 
-		log.info({ ...({ contactId: contact.id, groupId }), message: "Checking if contact is already in group" });
+		log.info({
+			...{ contactId: contact.id, groupId },
+			message: "Checking if contact is already in group",
+		});
 		const existing = await db.query.contactGroup.findFirst({
 			where: and(
 				eq(schema.contactGroup.contactId, contact.id),
@@ -98,7 +106,10 @@ export async function addContactToGroupController({
 			};
 		}
 
-		log.info({ ...({ contactId: contact.id, groupId }), message: "Adding contact to group" });
+		log.info({
+			...{ contactId: contact.id, groupId },
+			message: "Adding contact to group",
+		});
 		await db
 			.insert(schema.contactGroup)
 			.values({
@@ -115,7 +126,10 @@ export async function addContactToGroupController({
 				},
 			});
 
-		log.info({ ...({ contactId: contact.id, groupId }), message: "Contact added to group" });
+		log.info({
+			...{ contactId: contact.id, groupId },
+			message: "Contact added to group",
+		});
 
 		const result = {
 			success: true,
@@ -133,7 +147,8 @@ export async function addContactToGroupController({
 
 		return result;
 	} catch (error) {
-		log.error({
+		log.error(
+			{
 				contactId: contact_id,
 				email: email?.toLowerCase(),
 				groupId,

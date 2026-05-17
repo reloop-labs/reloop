@@ -36,7 +36,9 @@ export function SocialSignup({
 							setLoading({ name: "google", loading: true });
 							await authClient.signIn.social({
 								provider: "google",
-								callbackURL: inviteId ? `/signup?inviteId=${inviteId}` : "/dashboard",
+								callbackURL: inviteId
+									? `/signup?inviteId=${inviteId}`
+									: "/dashboard",
 							});
 						} catch {
 							setLoading({ name: "google", loading: false });
@@ -85,7 +87,9 @@ export function SocialSignup({
 							setLoading({ name: "github", loading: true });
 							await authClient.signIn.social({
 								provider: "github",
-								callbackURL: inviteId ? `/signup?inviteId=${inviteId}` : "/dashboard",
+								callbackURL: inviteId
+									? `/signup?inviteId=${inviteId}`
+									: "/dashboard",
 							});
 						} catch {
 							setLoading({ name: "github", loading: false });

@@ -10,7 +10,11 @@ interface TopupParams {
 	reason?: string;
 }
 
-export const topupCreditsController = async ({ organizationId, amount, reason }: TopupParams) => {
+export const topupCreditsController = async ({
+	organizationId,
+	amount,
+	reason,
+}: TopupParams) => {
 	await db.transaction(async (tx) => {
 		const activeSub = await getOrProvisionSubscription(organizationId, tx);
 

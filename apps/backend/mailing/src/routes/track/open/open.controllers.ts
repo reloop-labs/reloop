@@ -1,9 +1,9 @@
-import { log } from "evlog";
 import { signTrackingUrl } from "@reloop/be-mailing/lib/crypto";
 import { mailConfig } from "@reloop/be-mailing/mail.config";
 import { db } from "@reloop/db/client";
 import { emailEvent, emailLog } from "@reloop/db/schema";
 import { eq } from "drizzle-orm";
+import { log } from "evlog";
 import { useLogger } from "evlog/elysia";
 
 const TRANSPARENT_PIXEL = Buffer.from(
@@ -21,11 +21,14 @@ export async function handleOpenTracking({
 	const logger = useLogger();
 	const expectedSig = signTrackingUrl(emailLogId, mailConfig.TRACKING_SECRET);
 	if (sig !== expectedSig) {
-		log.warn({ ...({
-			emailLogId,
-			sig,
-			expectedSig,
-		}), message: "Open tracking rejected: Invalid signature" });
+		log.warn({
+			...{
+				emailLogId,
+				sig,
+				expectedSig,
+			},
+			message: "Open tracking rejected: Invalid signature",
+		});
 		return new Response(TRANSPARENT_PIXEL, {
 			headers: {
 				"Content-Type": "image/png",
@@ -35,7 +38,9 @@ export async function handleOpenTracking({
 	}
 
 	try {
-		const logEntry = await db.query.emailLog.findFirst({ where: eq(emailLog.id, emailLogId), });
+		const logEntry = await db.query.emailLog.findFirst({
+			where: eq(emailLog.id, emailLogId),
+		});
 
 		if (logEntry) {
 			await db.insert(emailEvent).values({
@@ -45,15 +50,21 @@ export async function handleOpenTracking({
 					userAgent: "unknown",
 				},
 			});
-			log.info({ ...({ emailLogId }), message: "Email open tracked" });
+			log.info({ ...{ emailLogId }, message: "Email open tracked" });
 		} else {
-			log.warn({ ...({ emailLogId }), message: "Open tracking failed: Email log not found" });
+			log.warn({
+				...{ emailLogId },
+				message: "Open tracking failed: Email log not found",
+			});
 		}
 	} catch (error) {
-		log.error({ ...({
-			error: error instanceof Error ? error.message : "Unknown error",
-			emailLogId,
-		}), message: "Failed to track email open" });
+		log.error({
+			...{
+				error: error instanceof Error ? error.message : "Unknown error",
+				emailLogId,
+			},
+			message: "Failed to track email open",
+		});
 	}
 
 	return new Response(TRANSPARENT_PIXEL, {

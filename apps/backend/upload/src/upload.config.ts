@@ -1,6 +1,7 @@
 export const uploadConfig = {
 	port: Number(process.env.PORT || "8018"),
-	PG_URL: process.env.PG_URL || "postgresql://reloop:reloop123@localhost:5432/reloop",
+	PG_URL:
+		process.env.PG_URL || "postgresql://reloop:reloop123@localhost:5432/reloop",
 	REDIS_URL: process.env.REDIS_URL || "redis://:reloop123@localhost:6379",
 	BASE_URL: process.env.BASE_URL || "https://local.reloop.sh",
 	NODE_ENV: process.env.NODE_ENV || "development",
@@ -28,4 +29,3 @@ export const uploadConfig = {
 		],
 	},
 };
-

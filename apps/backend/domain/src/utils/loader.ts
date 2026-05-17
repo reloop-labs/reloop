@@ -1,5 +1,5 @@
-import { bus } from "@reloop/bus";
 import { domainConfig } from "@be/domain/domain.config";
+import { bus } from "@reloop/bus";
 import { RedisCache } from "@reloop/cache/redis-client";
 import { db } from "@reloop/db/client";
 import { log } from "evlog";

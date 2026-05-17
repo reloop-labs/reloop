@@ -3,7 +3,11 @@ import { emailSend, member, user } from "@reloop/db/schema";
 import { and, count, eq, gte, lt, sql } from "drizzle-orm";
 import { getOrProvisionSubscription } from "../../../utils/subscription";
 
-export const getUsageController = async ({ activeOrganizationId }: { activeOrganizationId: string }) => {
+export const getUsageController = async ({
+	activeOrganizationId,
+}: {
+	activeOrganizationId: string;
+}) => {
 	const orgId = activeOrganizationId;
 
 	// 1. Get or provision subscription
@@ -43,9 +47,7 @@ export const getUsageController = async ({ activeOrganizationId }: { activeOrgan
 	// 4. Delivery rate: sent / (sent + failed + bounced) in this period
 	const [deliveryRow] = await db
 		.select({
-			sent: count(
-				sql`CASE WHEN ${emailSend.status} = 'sent' THEN 1 END`,
-			),
+			sent: count(sql`CASE WHEN ${emailSend.status} = 'sent' THEN 1 END`),
 			failed: count(
 				sql`CASE WHEN ${emailSend.status} IN ('failed', 'bounced') THEN 1 END`,
 			),
@@ -79,12 +81,7 @@ export const getUsageController = async ({ activeOrganizationId }: { activeOrgan
 		.select({ total: count() })
 		.from(member)
 		.innerJoin(user, eq(member.userId, user.id))
-		.where(
-			and(
-				eq(member.organizationId, orgId),
-				eq(user.banned, false),
-			),
-		);
+		.where(and(eq(member.organizationId, orgId), eq(user.banned, false)));
 
 	return {
 		plan: {

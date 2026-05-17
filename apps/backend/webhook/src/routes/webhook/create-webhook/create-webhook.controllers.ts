@@ -1,10 +1,9 @@
-import { log } from "evlog";
 import { createId } from "@paralleldrive/cuid2";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-
 import type { WebhookEventName } from "@reloop/webhook-events";
 import { status } from "elysia";
+import { log } from "evlog";
 import type { WebhookTypes } from "../webhook.type";
 
 export async function createWebhookController({
@@ -20,7 +19,7 @@ export async function createWebhookController({
 	url: string;
 	events: WebhookEventName[];
 }): Promise<WebhookTypes.WebhookResponse> {
-	log.info({ ...({ url, events, description }), message: "Creating webhook" });
+	log.info({ ...{ url, events, description }, message: "Creating webhook" });
 	try {
 		const [newWebhook] = await db
 			.insert(schema.webhook)
@@ -43,11 +42,14 @@ export async function createWebhookController({
 			.returning();
 
 		if (!newWebhook) {
-			log.error({ ...({ url, events }), message: "Failed to create webhook" });
+			log.error({ ...{ url, events }, message: "Failed to create webhook" });
 			throw status(500, { message: "Failed to create webhook" });
 		}
 
-		log.info({ ...({ webhookId: newWebhook.id }), message: "Creating webhook subscriptions" });
+		log.info({
+			...{ webhookId: newWebhook.id },
+			message: "Creating webhook subscriptions",
+		});
 		if (events.length > 0) {
 			await db.insert(schema.webhookEventSubscription).values(
 				events.map((eventId) => ({
@@ -79,7 +81,7 @@ export async function createWebhookController({
 			updatedAt: newWebhook.updatedAt.toISOString(),
 		};
 	} catch (error) {
-		log.error({ ...({ url, error }), message: "Error creating webhook" });
+		log.error({ ...{ url, error }, message: "Error creating webhook" });
 		throw error;
 	}
 }

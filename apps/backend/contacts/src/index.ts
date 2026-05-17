@@ -49,7 +49,10 @@ const contactsService = new Elysia({
 		await loader();
 	})
 	.listen(port, () => {
-		log.info("server", `Contacts Server is running on http://localhost:${port}/api/contacts`);
+		log.info(
+			"server",
+			`Contacts Server is running on http://localhost:${port}/api/contacts`,
+		);
 	});
 
 export type ContactsService = typeof contactsService;

@@ -1,10 +1,10 @@
-import { log } from "evlog";
 import type { DomainTypes } from "@be/domain/types/domain.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { useLogger } from "evlog/elysia";
 import { DOMAIN_LIST_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, count, desc, eq, ilike, isNull } from "drizzle-orm";
+import { log } from "evlog";
+import { useLogger } from "evlog/elysia";
 
 export async function listDomainsController({
 	query,
@@ -55,9 +55,12 @@ export async function listDomainsController({
 
 		return finalResponse;
 	} catch (error) {
-		log.error({ ...({
-			query,
-			error: error instanceof Error ? error.message : String(error), message: "Error listing domains" }),
+		log.error({
+			...{
+				query,
+				error: error instanceof Error ? error.message : String(error),
+				message: "Error listing domains",
+			},
 		});
 		throw error;
 	}

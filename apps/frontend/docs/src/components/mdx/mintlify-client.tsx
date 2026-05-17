@@ -35,7 +35,7 @@ const CodeGroup = React.forwardRef<
 
 	if (!mounted) {
 		return (
-			<div className="border border-fd-border rounded-lg p-4 bg-fd-muted space-y-4">
+			<div className="space-y-4 rounded-lg border border-fd-border bg-fd-muted p-4">
 				{props.children}
 			</div>
 		);
@@ -60,7 +60,10 @@ const CodeBlock = React.forwardRef<
 
 	if (!mounted) {
 		return (
-			<pre className="p-4 rounded-lg bg-fd-muted border border-fd-border font-mono text-sm overflow-x-auto" style={{ height: "auto" }}>
+			<pre
+				className="overflow-x-auto rounded-lg border border-fd-border bg-fd-muted p-4 font-mono text-sm"
+				style={{ height: "auto" }}
+			>
 				<code>{props.children}</code>
 			</pre>
 		);

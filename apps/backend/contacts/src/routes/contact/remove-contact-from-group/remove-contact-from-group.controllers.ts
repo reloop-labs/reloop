@@ -1,12 +1,11 @@
-import { log } from "evlog";
 import type { ContactModel } from "@be/contacts/model/contact.model";
 import { createLog } from "@be/contacts/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-
 import { CONTACT_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
+import { log } from "evlog";
 
 export async function removeContactFromGroupController({
 	organizationId,
@@ -37,7 +36,8 @@ export async function removeContactFromGroupController({
 		});
 	}
 
-	log.info({
+	log.info(
+		{
 			contactId: contact_id,
 			email: email?.toLowerCase(),
 			groupId,
@@ -79,7 +79,10 @@ export async function removeContactFromGroupController({
 				),
 			);
 
-		log.info({ ...({ contactId: contact.id, groupId }), message: "Contact removed from group" });
+		log.info({
+			...{ contactId: contact.id, groupId },
+			message: "Contact removed from group",
+		});
 
 		const result = {
 			success: true,
@@ -97,7 +100,8 @@ export async function removeContactFromGroupController({
 
 		return result;
 	} catch (error) {
-		log.error({
+		log.error(
+			{
 				contactId: contact_id,
 				email: email?.toLowerCase(),
 				groupId,

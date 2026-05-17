@@ -1,6 +1,5 @@
-
-import { log } from "evlog";
 import { Elysia } from "elysia";
+import { log } from "evlog";
 import { useLogger } from "evlog/elysia";
 import { validateApiKey } from "./api-key-auth";
 import { validateSession } from "./cookie-auth";
@@ -24,10 +23,13 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 				}
 				return status(401, { message: "Authentication required" });
 			} catch (e) {
-				log.error({ ...({
+				log.error({
+					...{
 						error: e instanceof Error ? e.message : "Unknown error",
 						stack: e instanceof Error ? e.stack : undefined,
-					}), message: "Authentication error" });
+					},
+					message: "Authentication error",
+				});
 				return status(401, { message: "Authentication failed" });
 			}
 		},
@@ -45,10 +47,13 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 				}
 				return status(401, { message: "Authentication required" });
 			} catch (e) {
-				log.error({ ...({
+				log.error({
+					...{
 						error: e instanceof Error ? e.message : "Unknown error",
 						stack: e instanceof Error ? e.stack : undefined,
-					}), message: "Authentication error" });
+					},
+					message: "Authentication error",
+				});
 				return status(401, { message: "Authentication failed" });
 			}
 		},
@@ -70,7 +75,7 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 					reqLog.set({
 						traceId,
 						service: "api-key",
-						user: apiKeyResult
+						user: apiKeyResult,
 					});
 					reqLog.info("API key authentication successful");
 					return { ...apiKeyResult, traceId, logger: reqLog };
@@ -80,17 +85,20 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 					reqLog.set({
 						traceId,
 						service: "api-key",
-						user: sessionResult
+						user: sessionResult,
 					});
 					reqLog.info("Session authentication successful");
 					return { ...sessionResult, traceId, logger: reqLog };
 				}
 				return status(401, { message: "Authentication required" });
 			} catch (e) {
-				log.error({ ...({
+				log.error({
+					...{
 						error: e instanceof Error ? e.message : "Unknown error",
 						stack: e instanceof Error ? e.stack : undefined,
-					}), message: "Authentication error" });
+					},
+					message: "Authentication error",
+				});
 				return status(401, { message: "Authentication failed" });
 			}
 		},

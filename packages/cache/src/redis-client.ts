@@ -160,10 +160,7 @@ export class RedisCache {
 			const redis = await this.getRedisClient();
 			return await redis.incr(rawKey);
 		} catch (error) {
-			console.error(
-				`Redis increment error for key "${rawKey}":`,
-				error,
-			);
+			console.error(`Redis increment error for key "${rawKey}":`, error);
 			this.redis = null;
 			throw error;
 		}
@@ -178,10 +175,7 @@ export class RedisCache {
 			const redis = await this.getRedisClient();
 			return await redis.expire(rawKey, seconds);
 		} catch (error) {
-			console.error(
-				`Redis expire error for key "${rawKey}":`,
-				error,
-			);
+			console.error(`Redis expire error for key "${rawKey}":`, error);
 			this.redis = null;
 			throw error;
 		}
@@ -197,10 +191,7 @@ export class RedisCache {
 			const redis = await this.getRedisClient();
 			return await redis.ttl(rawKey);
 		} catch (error) {
-			console.error(
-				`Redis ttl error for key "${rawKey}":`,
-				error,
-			);
+			console.error(`Redis ttl error for key "${rawKey}":`, error);
 			this.redis = null;
 			throw error;
 		}

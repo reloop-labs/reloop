@@ -1,4 +1,3 @@
-import { log } from "evlog";
 import {
 	type CollabClient,
 	getRoomName,
@@ -7,6 +6,7 @@ import {
 	type Room,
 } from "@be/template/plugins/room";
 import type { YjsPersistence } from "@be/template/utils/persistence";
+import { log } from "evlog";
 
 import * as decoding from "lib0/decoding";
 import * as encoding from "lib0/encoding";
@@ -67,7 +67,10 @@ export function handleMessage(
 	try {
 		message = toUint8Array(raw);
 	} catch (err) {
-		log.error({ ...({ error: err }), message: "[collab] Failed to parse message" });
+		log.error({
+			...{ error: err },
+			message: "[collab] Failed to parse message",
+		});
 		return;
 	}
 
@@ -97,10 +100,16 @@ export function handleMessage(
 			}
 
 			default:
-				log.warn({ ...({ messageType }), message: "[collab] Unknown message type" });
+				log.warn({
+					...{ messageType },
+					message: "[collab] Unknown message type",
+				});
 		}
 	} catch (err) {
-		log.error({ ...({ error: err, messageType }), message: "[collab] Error handling message" });
+		log.error({
+			...{ error: err, messageType },
+			message: "[collab] Error handling message",
+		});
 	}
 
 	room.lastActivity = Date.now();

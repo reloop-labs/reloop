@@ -42,7 +42,10 @@ const logsService = new Elysia({
 		await loader();
 	})
 	.listen(port, () => {
-		log.info("server", `Logs Server is running on ${logsConfig.BASE_URL}/api/logs`);
+		log.info(
+			"server",
+			`Logs Server is running on ${logsConfig.BASE_URL}/api/logs`,
+		);
 	});
 
 export type LogsService = typeof logsService;

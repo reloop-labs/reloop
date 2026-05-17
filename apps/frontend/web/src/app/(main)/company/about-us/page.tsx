@@ -82,10 +82,9 @@ const AboutUsPage = () => {
 						</span>
 					</h1>
 					<p className="mt-8 max-w-[560px] text-[#0a0d12]/60 text-[15px] leading-relaxed sm:text-[17px]">
-						Reloop is an open-source email platform built by
-						developers who were fed up with every alternative. Simple
-						to integrate, transparent by design, ready for the
-						agentic era.
+						Reloop is an open-source email platform built by developers who were
+						fed up with every alternative. Simple to integrate, transparent by
+						design, ready for the agentic era.
 					</p>
 					<div className="mt-10 flex flex-wrap items-center gap-4">
 						<Link
@@ -121,9 +120,9 @@ const AboutUsPage = () => {
 								we live by.
 							</h2>
 							<p className="mt-6 text-[#0a0d12]/60 text-[15px] leading-7">
-								These aren't slogans. They're the decisions we
-								make every time we write a line of code, answer
-								a support ticket, or ship a new feature.
+								These aren't slogans. They're the decisions we make every time
+								we write a line of code, answer a support ticket, or ship a new
+								feature.
 							</p>
 						</div>
 
@@ -131,11 +130,8 @@ const AboutUsPage = () => {
 						<div className="flex-1">
 							<div className="grid gap-px overflow-hidden rounded-2xl border border-[#0a0d12]/8 bg-[#0a0d12]/8 sm:grid-cols-2">
 								{pillars.map((pillar) => (
-									<div
-										key={pillar.number}
-										className="bg-white p-8 lg:p-10"
-									>
-										<span className="font-semibold text-sm text-[#0a0d12]/24 tabular-nums">
+									<div key={pillar.number} className="bg-white p-8 lg:p-10">
+										<span className="font-semibold text-[#0a0d12]/24 text-sm tabular-nums">
 											{pillar.number}
 										</span>
 										<h3 className="mt-3 font-semibold text-[#0a0d12] text-[17px] leading-snug">
@@ -187,18 +183,16 @@ const AboutUsPage = () => {
 					{/* Story prose below timeline */}
 					<div className="mt-20 grid gap-8 lg:grid-cols-2 lg:gap-16">
 						<p className="text-[#ffffff]/60 text-[16px] leading-[1.8]">
-							Email infrastructure shouldn't be a barrier to
-							innovation. Yet for years, developers have been
-							forced to choose between expensive proprietary
-							solutions, opaque self-hosted setups, or unreliable
+							Email infrastructure shouldn't be a barrier to innovation. Yet for
+							years, developers have been forced to choose between expensive
+							proprietary solutions, opaque self-hosted setups, or unreliable
 							free services. We knew there had to be a better way.
 						</p>
 						<p className="text-[#ffffff]/60 text-[16px] leading-[1.8]">
-							Founded in 2024, Reloop was built to solve real
-							problems with elegant solutions. We believe powerful
-							tools should be simple to use, transparent in their
-							operation, and accessible to teams of every size —
-							from solo founders to enterprise engineering orgs.
+							Founded in 2024, Reloop was built to solve real problems with
+							elegant solutions. We believe powerful tools should be simple to
+							use, transparent in their operation, and accessible to teams of
+							every size — from solo founders to enterprise engineering orgs.
 						</p>
 					</div>
 				</div>
@@ -217,10 +211,9 @@ const AboutUsPage = () => {
 							<span className="text-[#0a0d12]/40">for you here.</span>
 						</h2>
 						<p className="mx-auto mt-8 max-w-[560px] text-[#0a0d12]/60 text-[15px] leading-7 sm:text-[17px]">
-							Whether you want to contribute code, join our team,
-							or simply be part of our community — we're always
-							looking for passionate people to help shape the
-							future of email.
+							Whether you want to contribute code, join our team, or simply be
+							part of our community — we're always looking for passionate people
+							to help shape the future of email.
 						</p>
 						<div className="mt-10 flex flex-wrap items-center justify-center gap-4">
 							<Link

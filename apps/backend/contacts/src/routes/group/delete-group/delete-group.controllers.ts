@@ -1,11 +1,10 @@
-import { log } from "evlog";
 import type { GroupModel } from "@be/contacts/model/group.model";
 import { createLog } from "@be/contacts/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-
 import { GROUP_DELETE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
+import { log } from "evlog";
 
 export const deleteGroupController = async ({
 	activeOrganizationId,
@@ -36,7 +35,7 @@ export const deleteGroupController = async ({
 	| GroupModel.GroupNotFound
 	| GroupModel.Unauthorized
 > => {
-	log.info({ ...({ group_id }), message: "Deleting group" });
+	log.info({ ...{ group_id }, message: "Deleting group" });
 
 	try {
 		const group = await db.query.group.findFirst({
@@ -48,7 +47,7 @@ export const deleteGroupController = async ({
 		});
 
 		if (!group) {
-			log.warn({ ...({ group_id }), message: "Group not found for deletion" });
+			log.warn({ ...{ group_id }, message: "Group not found for deletion" });
 			return { message: "Group not found" };
 		}
 
@@ -65,7 +64,7 @@ export const deleteGroupController = async ({
 				),
 			);
 
-		log.info({ ...({ group_id }), message: "Group soft-deleted successfully" });
+		log.info({ ...{ group_id }, message: "Group soft-deleted successfully" });
 
 		const result = {
 			object: "contact_group" as const,
@@ -84,7 +83,7 @@ export const deleteGroupController = async ({
 
 		return result;
 	} catch (error) {
-		log.error({ ...({ group_id, error }), message: "Debug deleting group" });
+		log.error({ ...{ group_id, error }, message: "Debug deleting group" });
 		throw error;
 	}
 };

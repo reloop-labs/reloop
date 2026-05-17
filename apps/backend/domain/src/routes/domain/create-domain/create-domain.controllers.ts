@@ -1,5 +1,5 @@
-import { log } from "evlog";
 import type { DomainTypes } from "@be/domain/types/domain.type";
+import { log } from "evlog";
 import { useLogger } from "evlog/elysia";
 import {
 	checkExistingDomain_step1,
@@ -85,7 +85,7 @@ export async function createDomainController({
 			domain,
 		});
 	} catch (error) {
-		log.error({ ...({ domain, error }), message: "Error creating domain" });
+		log.error({ ...{ domain, error }, message: "Error creating domain" });
 		throw error;
 	}
 }

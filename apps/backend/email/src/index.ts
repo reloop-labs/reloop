@@ -27,7 +27,10 @@ const app = new Elysia({ prefix: "/api/email", name: "Email Service" })
 		await loader();
 	})
 	.listen(port, () => {
-		log.info("server", `Email Server is running on http://localhost:${port}/api/email`);
+		log.info(
+			"server",
+			`Email Server is running on http://localhost:${port}/api/email`,
+		);
 	});
 
 export type App = typeof app;

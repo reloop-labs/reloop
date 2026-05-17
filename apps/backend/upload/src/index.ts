@@ -40,7 +40,10 @@ const uploadService = new Elysia({
 		await loader();
 	})
 	.listen(port, () => {
-		log.info("server", `Upload Server is running on http://localhost:${port}/api/upload`);
+		log.info(
+			"server",
+			`Upload Server is running on http://localhost:${port}/api/upload`,
+		);
 	});
 
 export type UploadService = typeof uploadService;

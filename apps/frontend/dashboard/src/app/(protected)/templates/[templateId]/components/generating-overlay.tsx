@@ -52,9 +52,7 @@ export const GeneratingOverlay = () => {
 
 	const previewHtml = useMemo(() => {
 		if (!generatingContent) return "";
-		return generatingContent
-			.replace(/```(?:html)?/gi, "")
-			.replace(/```/g, "");
+		return generatingContent.replace(/```(?:html)?/gi, "").replace(/```/g, "");
 	}, [generatingContent]);
 
 	if (!isGenerating) return null;

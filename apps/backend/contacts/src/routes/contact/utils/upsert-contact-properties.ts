@@ -1,8 +1,8 @@
-import { log } from "evlog";
 import { type DatabaseInstance, db as defaultDb } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { logger as globalLogger, type Logger } from "@reloop/logger";
 import { and, eq, inArray, isNull } from "drizzle-orm";
+import { log } from "evlog";
 export async function upsertContactProperties({
 	contactId,
 	organizationId,

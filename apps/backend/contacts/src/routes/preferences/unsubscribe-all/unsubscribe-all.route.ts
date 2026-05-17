@@ -1,4 +1,3 @@
-
 import { Elysia, t } from "elysia";
 import { unsubscribeAllController } from "./unsubscribe-all.controllers";
 

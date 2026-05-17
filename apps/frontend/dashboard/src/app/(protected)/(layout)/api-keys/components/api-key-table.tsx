@@ -386,8 +386,6 @@ export const ApiKeyTable = ({
 											</span>
 										</div>
 
-
-
 										{/* Last Used Column */}
 										<div className="flex items-center">
 											<span className="whitespace-nowrap font-medium text-sm text-text-sub-600">

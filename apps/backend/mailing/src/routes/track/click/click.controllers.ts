@@ -1,10 +1,10 @@
-import { log } from "evlog";
 import { signTrackingUrl } from "@reloop/be-mailing/lib/crypto";
 import { MailErrors } from "@reloop/be-mailing/lib/errors";
 import { mailConfig } from "@reloop/be-mailing/mail.config";
 import { db } from "@reloop/db/client";
 import { emailEvent, emailLog } from "@reloop/db/schema";
 import { eq } from "drizzle-orm";
+import { log } from "evlog";
 import { useLogger } from "evlog/elysia";
 
 export async function handleClickTracking({
@@ -25,12 +25,15 @@ export async function handleClickTracking({
 	// Verify signature to prevent Open Redirect
 	const expectedSig = signTrackingUrl(url, mailConfig.TRACKING_SECRET);
 	if (sig !== expectedSig) {
-		log.warn({ ...({
-			emailLogId,
-			url,
-			sig,
-			expectedSig,
-		}), message: "Click tracking rejected: Invalid signature" });
+		log.warn({
+			...{
+				emailLogId,
+				url,
+				sig,
+				expectedSig,
+			},
+			message: "Click tracking rejected: Invalid signature",
+		});
 		throw MailErrors.invalidTrackingSignature();
 	}
 
@@ -47,12 +50,15 @@ export async function handleClickTracking({
 					url,
 				},
 			});
-			log.info({ ...({ emailLogId, url }), message: "Email click tracked" });
+			log.info({ ...{ emailLogId, url }, message: "Email click tracked" });
 		} else {
-			log.warn({ ...({
-				emailLogId,
-				url,
-			}), message: "Click tracking failed: Email log not found" });
+			log.warn({
+				...{
+					emailLogId,
+					url,
+				},
+				message: "Click tracking failed: Email log not found",
+			});
 		}
 	} catch (error) {
 		// Re-throw if it's already a structured error
@@ -60,11 +66,14 @@ export async function handleClickTracking({
 			throw error;
 		}
 
-		log.error({ ...({
-			error: error instanceof Error ? error.message : "Unknown error",
-			emailLogId,
-			url,
-		}), message: "Failed to track email click" });
+		log.error({
+			...{
+				error: error instanceof Error ? error.message : "Unknown error",
+				emailLogId,
+				url,
+			},
+			message: "Failed to track email click",
+		});
 	}
 
 	return Response.redirect(url, 302);

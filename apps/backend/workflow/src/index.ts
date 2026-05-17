@@ -1,8 +1,9 @@
 import "dotenv/config";
 import path from "node:path";
-import { workflowConfig } from "@be/workflow/workflow.config";
 import { workflowQueue } from "@be/workflow/queues/workflow.queue";
+import { landing } from "@be/workflow/routes/landing/landing.index";
 import { loader } from "@be/workflow/utils/loader";
+import { workflowConfig } from "@be/workflow/workflow.config";
 import { createBullBoard } from "@bull-board/api";
 import { BullMQAdapter } from "@bull-board/api/bullMQAdapter";
 import { ElysiaAdapter } from "@bull-board/elysia";
@@ -11,7 +12,6 @@ import { serverTiming } from "@elysiajs/server-timing";
 import { Elysia } from "elysia";
 import { initLogger, log, parseError } from "evlog";
 import { evlog } from "evlog/elysia";
-import { landing } from "@be/workflow/routes/landing/landing.index";
 import pkg from "../package.json";
 
 initLogger({ env: { service: "workflow" } });
@@ -75,7 +75,10 @@ const workflowService = new Elysia({
 		await loader();
 	})
 	.listen(port, () => {
-		log.info("server", `Workflow Server is running on http://localhost:${port}/api/workflow`);
+		log.info(
+			"server",
+			`Workflow Server is running on http://localhost:${port}/api/workflow`,
+		);
 		log.info(
 			"server",
 			`Bull Board is running on http://localhost:${port}/api/workflow/bull-board`,

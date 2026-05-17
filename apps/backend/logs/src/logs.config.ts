@@ -5,7 +5,6 @@ export const logsConfig = {
 	BASE_URL: process.env.BASE_URL || "https://local.reloop.sh",
 	NATS_URL: process.env.NATS_URL || "nats://localhost:4222",
 	clickhouse: {
-
 		url:
 			process.env.CLICKHOUSE_URL ||
 			process.env.CLICKHOUSE_HOST ||
@@ -16,4 +15,3 @@ export const logsConfig = {
 			process.env.CLICKHOUSE_DATABASE || process.env.CLICKHOUSE_DB || "reloop",
 	},
 } as const;
-

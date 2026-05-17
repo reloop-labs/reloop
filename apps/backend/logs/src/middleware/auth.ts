@@ -12,7 +12,6 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 		async resolve({ status, request: { headers } }) {
 			try {
 				const apiKey =
-
 					headers.get("x-api-key") ||
 					headers.get("authorization")?.replace("Bearer ", "");
 				const cookie = headers.get("cookie");

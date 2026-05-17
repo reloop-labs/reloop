@@ -40,7 +40,10 @@ const app = new Elysia({
 await loader();
 
 app.listen(kumomtaConfig.port, (server) => {
-	log.info("server", `🦊 KumoMTA Server is running at http://${server?.hostname}:${server?.port}`);
+	log.info(
+		"server",
+		`🦊 KumoMTA Server is running at http://${server?.hostname}:${server?.port}`,
+	);
 });
 
 export type App = typeof app;

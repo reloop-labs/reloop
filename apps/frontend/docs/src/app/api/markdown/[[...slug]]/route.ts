@@ -48,6 +48,8 @@ export async function GET(
 		});
 	} catch (error: any) {
 		console.error("Markdown API Error:", error);
-		return new NextResponse(`CRASH: ${error.message}\n${error.stack}`, { status: 500 });
+		return new NextResponse(`CRASH: ${error.message}\n${error.stack}`, {
+			status: 500,
+		});
 	}
 }

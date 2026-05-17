@@ -1,12 +1,11 @@
-import { log } from "evlog";
 import { BusEvent, bus } from "@reloop/bus";
-
+import { log } from "evlog";
+import React from "react";
+import DnsConfigEmail from "../../emails/dns-config";
+import DomainVerifiedEmail from "../../emails/domain-verified";
 import { render } from "../../render";
 import { emailConfig } from "../email.config";
 import { sendEmail } from "../utils/email";
-import DomainVerifiedEmail from "../../emails/domain-verified";
-import DnsConfigEmail from "../../emails/dns-config";
-import React from "react";
 
 export async function initDomainSubscribers() {
 	// Domain Verified
@@ -29,7 +28,10 @@ export async function initDomainSubscribers() {
 					html,
 				});
 			} catch (error) {
-				log.error({ ...({ error, payload }), message: "Failed to send domain verified email" });
+				log.error({
+					...{ error, payload },
+					message: "Failed to send domain verified email",
+				});
 			}
 		},
 		{ queue: "domain-email-worker" },
@@ -41,9 +43,7 @@ export async function initDomainSubscribers() {
 		async (payload) => {
 			try {
 				const dkimRecords = payload.records
-					.filter(
-						(r) => r.type === "CNAME" && r.name.includes("_domainkey"),
-					)
+					.filter((r) => r.type === "CNAME" && r.name.includes("_domainkey"))
 					.map((r) => ({
 						recordType: r.type,
 						recordTypeName: r.type,
@@ -93,7 +93,10 @@ export async function initDomainSubscribers() {
 					html,
 				});
 			} catch (error) {
-				log.error({ ...({ error, payload }), message: "Failed to send DNS config email" });
+				log.error({
+					...{ error, payload },
+					message: "Failed to send DNS config email",
+				});
 			}
 		},
 		{ queue: "domain-email-worker" },

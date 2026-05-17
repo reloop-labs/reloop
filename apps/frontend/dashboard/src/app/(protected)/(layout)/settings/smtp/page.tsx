@@ -63,7 +63,7 @@ function CredentialInput({
 						value={copied ? "Copied" : value}
 						readOnly
 						className={cn(
-							"h-9 font-medium transition-colors duration-200 cursor-pointer",
+							"h-9 cursor-pointer font-medium transition-colors duration-200",
 							isMono && !copied && "font-mono",
 							copied && "text-success-base",
 						)}

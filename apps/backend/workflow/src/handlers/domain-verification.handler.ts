@@ -119,7 +119,8 @@ export async function processDomainVerification({
 		log.info({ message: "Domain verified successfully", domainId, domainName });
 	} else {
 		log.warn({
-			message: "Domain verification failed — one or more DNS records did not match",
+			message:
+				"Domain verification failed — one or more DNS records did not match",
 			domainId,
 			domainName,
 			mxOk,
@@ -127,7 +128,7 @@ export async function processDomainVerification({
 			dkimOk,
 			dmarcOk,
 		});
-		
+
 		throw new Error(
 			`Verification failed for ${domainName}: MX=${mxOk} SPF=${spfOk} DKIM=${dkimOk} DMARC=${dmarcOk}`,
 		);

@@ -1,8 +1,7 @@
-import { log } from "evlog";
 import { type DatabaseInstance, db as defaultDb } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-
 import { and, eq, isNull } from "drizzle-orm";
+import { log } from "evlog";
 
 export async function getExistingContact({
 	email,
@@ -15,7 +14,7 @@ export async function getExistingContact({
 	logger?: any;
 	db?: DatabaseInstance;
 }) {
-	log.info({ ...({}), message: "Checking for existing contact" });
+	log.info({ ...{}, message: "Checking for existing contact" });
 	const results = await db
 		.select()
 		.from(schema.contact)

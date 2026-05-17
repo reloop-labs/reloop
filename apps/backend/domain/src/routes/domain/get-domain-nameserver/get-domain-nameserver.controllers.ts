@@ -1,4 +1,3 @@
-import { log } from "evlog";
 import { resolveNs } from "node:dns/promises";
 import { DomainErrors } from "@be/domain/lib/errors";
 import type { DNSTypes } from "@be/domain/types/dns.type";
@@ -6,6 +5,7 @@ import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { DOMAIN_GET_DNS_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
+import { log } from "evlog";
 import { useLogger } from "evlog/elysia";
 
 export async function getDomainDNSController({
@@ -58,10 +58,13 @@ export async function getDomainDNSController({
 				}
 			}
 		} catch (error) {
-			log.warn({ ...({
-				domainId,
-				domain: foundDomain.domain,
-				error: error instanceof Error ? error.message : String(error), message: "Unable to resolve nameservers for domain" }),
+			log.warn({
+				...{
+					domainId,
+					domain: foundDomain.domain,
+					error: error instanceof Error ? error.message : String(error),
+					message: "Unable to resolve nameservers for domain",
+				},
 			});
 		}
 
@@ -74,7 +77,10 @@ export async function getDomainDNSController({
 			event: DOMAIN_GET_DNS_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
-		log.error({ ...({ domainId, error }), message: "Error getting domain nameservers" });
+		log.error({
+			...{ domainId, error },
+			message: "Error getting domain nameservers",
+		});
 		throw error;
 	}
 }

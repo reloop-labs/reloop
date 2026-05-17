@@ -1,4 +1,3 @@
-import { log } from "evlog";
 import {
 	CreateBucketCommand,
 	HeadBucketCommand,
@@ -9,7 +8,7 @@ import { uploadConfig } from "@be/upload/upload.config";
 import { bus } from "@reloop/bus";
 import { RedisCache } from "@reloop/cache/redis-client";
 import { db } from "@reloop/db/client";
-
+import { log } from "evlog";
 
 const redis = new RedisCache("upload");
 
@@ -31,7 +30,10 @@ export const loader = async () => {
 				}),
 			);
 		} catch {
-			log.info({ ...({ bucket: uploadConfig.S3.BUCKET }), message: "Bucket not found, creating it..." });
+			log.info({
+				...{ bucket: uploadConfig.S3.BUCKET },
+				message: "Bucket not found, creating it...",
+			});
 			await s3Client.send(
 				new CreateBucketCommand({
 					Bucket: uploadConfig.S3.BUCKET,
@@ -60,9 +62,13 @@ export const loader = async () => {
 			}),
 		);
 
-		log.info({ ...({ bucket: uploadConfig.S3.BUCKET }), message: "S3 bucket connected and set to public read" });
+		log.info({
+			...{ bucket: uploadConfig.S3.BUCKET },
+			message: "S3 bucket connected and set to public read",
+		});
 	} catch (e) {
-		log.error({ error: e instanceof Error ? e.message : String(e) },
+		log.error(
+			{ error: e instanceof Error ? e.message : String(e) },
 			"Error during service initialization",
 		);
 	}

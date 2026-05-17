@@ -1,12 +1,11 @@
-import { log } from "evlog";
 import type { GroupModel } from "@be/contacts/model/group.model";
 import type { GroupResponse } from "@be/contacts/types/group.type";
 import { createLog } from "@be/contacts/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-
 import { GROUP_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull, ne } from "drizzle-orm";
+import { log } from "evlog";
 
 export const updateGroupController = async ({
 	activeOrganizationId,
@@ -36,7 +35,7 @@ export const updateGroupController = async ({
 > => {
 	const { name } = body;
 
-	log.info({ ...({ group_id, name }), message: "Updating group" });
+	log.info({ ...{ group_id, name }, message: "Updating group" });
 
 	try {
 		const existingGroup = await db.query.group.findFirst({
@@ -48,7 +47,7 @@ export const updateGroupController = async ({
 		});
 
 		if (!existingGroup) {
-			log.warn({ ...({ group_id }), message: "Group not found for update" });
+			log.warn({ ...{ group_id }, message: "Group not found for update" });
 			return { message: "Group not found" };
 		}
 
@@ -64,7 +63,10 @@ export const updateGroupController = async ({
 			});
 
 			if (nameConflict) {
-				log.warn({ ...({ name }), message: "Another group with this name already exists" });
+				log.warn({
+					...{ name },
+					message: "Another group with this name already exists",
+				});
 				return { message: "Group already exists" };
 			}
 		}
@@ -76,11 +78,14 @@ export const updateGroupController = async ({
 			.returning();
 
 		if (!updatedGroup) {
-			log.error({ ...({ group_id }), message: "Failed to update group - no data returned" });
+			log.error({
+				...{ group_id },
+				message: "Failed to update group - no data returned",
+			});
 			return { message: "Group not found" };
 		}
 
-		log.info({ ...({ group_id }), message: "Group updated successfully" });
+		log.info({ ...{ group_id }, message: "Group updated successfully" });
 
 		const result = {
 			id: updatedGroup.id,
@@ -100,7 +105,7 @@ export const updateGroupController = async ({
 
 		return result;
 	} catch (error) {
-		log.error({ ...({ group_id, error }), message: "Debug updating group" });
+		log.error({ ...{ group_id, error }, message: "Debug updating group" });
 		throw error;
 	}
 };

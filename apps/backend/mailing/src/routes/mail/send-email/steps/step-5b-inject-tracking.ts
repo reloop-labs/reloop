@@ -44,7 +44,11 @@ export function injectTracking_step5b({
  * Replaces every href in <a> tags with a tracking redirect URL.
  * Skips mailto:, tel:, #anchors, and already-rewritten tracking URLs.
  */
-function rewriteLinks(html: string, emailLogId: string, baseUrl: string): string {
+function rewriteLinks(
+	html: string,
+	emailLogId: string,
+	baseUrl: string,
+): string {
 	return html.replace(
 		/(<a\s[^>]*href=)(["'])([^"']+)\2/gi,
 		(match, prefix, quote, originalUrl) => {
@@ -72,7 +76,11 @@ function rewriteLinks(html: string, emailLogId: string, baseUrl: string): string
  * Appends a 1×1 transparent tracking pixel before </body>.
  * If </body> is not found, appends at the end of the string.
  */
-function injectOpenPixel(html: string, emailLogId: string, baseUrl: string): string {
+function injectOpenPixel(
+	html: string,
+	emailLogId: string,
+	baseUrl: string,
+): string {
 	const sig = signTrackingUrl(emailLogId, mailConfig.TRACKING_SECRET);
 	const pixelUrl = `${baseUrl}/track/open/${emailLogId}?sig=${sig}`;
 	const pixel = `<img src="${pixelUrl}" width="1" height="1" alt="" style="display:none;border:0;" />`;

@@ -1,11 +1,10 @@
-import { log } from "evlog";
 import type { ContactTypes } from "@be/contacts/types/contact.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-
 import { CONTACT_GET_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
+import { log } from "evlog";
 
 export async function getContactController({
 	contactId,
@@ -16,7 +15,7 @@ export async function getContactController({
 	organizationId: string;
 	logger?: any;
 }): Promise<ContactTypes.ContactResponse> {
-	log.info({ ...({ contactId, organizationId }), message: "Getting contact" });
+	log.info({ ...{ contactId, organizationId }, message: "Getting contact" });
 
 	try {
 		const contact = await db.query.contact.findFirst({
@@ -42,7 +41,10 @@ export async function getContactController({
 		});
 
 		if (!contact) {
-			log.warn({ ...({ contactId, organizationId }), message: "Contact not found" });
+			log.warn({
+				...{ contactId, organizationId },
+				message: "Contact not found",
+			});
 			throw status(404, { message: "Contact not found" });
 		}
 
@@ -96,14 +98,17 @@ export async function getContactController({
 		const suppressionReason = contact.suppressionReason ?? null;
 		const suppressedAt = contact.suppressedAt ?? null;
 
-		log.info({ ...({
+		log.info({
+			...{
 				contactId,
 				organizationId,
 				propertyCount: contact.propertyValues.length,
 				groupCount: groups.length,
 				channelCount: channels.length,
 				suppressed: suppressionReason !== null,
-			}), message: "Contact retrieved successfully" });
+			},
+			message: "Contact retrieved successfully",
+		});
 
 		return {
 			object: "contact",
@@ -122,7 +127,8 @@ export async function getContactController({
 			event: CONTACT_GET_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
-		log.error({
+		log.error(
+			{
 				contactId,
 				organizationId,
 				error: error instanceof Error ? error.message : String(error),

@@ -1,7 +1,6 @@
-import { log } from "evlog";
 import { templateModel } from "@be/template/model/template.model";
 import { templateConfig } from "@be/template/template.config";
-
+import { log } from "evlog";
 
 export async function listTemplates(params: {
 	organizationId: string;
@@ -26,7 +25,8 @@ export async function listTemplates(params: {
 
 		return result;
 	} catch (error) {
-		log.error({
+		log.error(
+			{
 				organizationId,
 				error: error instanceof Error ? error.message : String(error),
 			},

@@ -31,7 +31,10 @@ const app = new Elysia({ prefix: "/api/auth", name: "Auth Service" })
 		await loader();
 	})
 	.listen(port, () => {
-		log.info("server", `Auth Server is running on http://localhost:${port}/api/auth`);
+		log.info(
+			"server",
+			`Auth Server is running on http://localhost:${port}/api/auth`,
+		);
 	});
 
 export type App = typeof app;

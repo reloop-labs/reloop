@@ -1,7 +1,6 @@
-import { log } from "evlog";
 import { TemplateError } from "@be/template/error/template.error";
 import { templateModel } from "@be/template/model/template.model";
-
+import { log } from "evlog";
 
 export async function duplicateTemplate(params: {
 	id: string;
@@ -19,7 +18,8 @@ export async function duplicateTemplate(params: {
 
 		return result;
 	} catch (error) {
-		log.error({
+		log.error(
+			{
 				id,
 				error: error instanceof Error ? error.message : String(error),
 			},

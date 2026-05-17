@@ -137,14 +137,19 @@ export class KumomtaClient {
 		}
 
 		if (response.status === 422) {
-			const errorBody = await response.text().catch(() => "422 Unprocessable Entity");
+			const errorBody = await response
+				.text()
+				.catch(() => "422 Unprocessable Entity");
 			log.error({
 				message: "KumoMTA rejected message: content syntax error (422)",
 				body: errorBody,
 				from: options.from,
 				to: options.to,
 			});
-			throw MailErrors.kumoMtaError(422, `Invalid message content: ${errorBody}`);
+			throw MailErrors.kumoMtaError(
+				422,
+				`Invalid message content: ${errorBody}`,
+			);
 		}
 
 		if (!response.ok) {

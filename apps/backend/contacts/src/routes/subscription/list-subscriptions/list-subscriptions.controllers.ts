@@ -1,8 +1,7 @@
-import { log } from "evlog";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-
 import { and, count, desc, eq, isNull } from "drizzle-orm";
+import { log } from "evlog";
 
 export async function listSubscriptionsController({
 	organizationId,
@@ -13,7 +12,7 @@ export async function listSubscriptionsController({
 	query: { channelId: string; limit?: number; page?: number };
 	logger?: any;
 }) {
-	log.info({ ...({ ...query }), message: "Listing subscriptions" });
+	log.info({ ...{ ...query }, message: "Listing subscriptions" });
 	try {
 		const page = query.page || 1;
 		const limit = Math.min(query.limit || 100, 100);
@@ -38,7 +37,10 @@ export async function listSubscriptionsController({
 			offset,
 		});
 
-		log.info({ ...({ total, page, limit }), message: "Subscriptions listed successfully" });
+		log.info({
+			...{ total, page, limit },
+			message: "Subscriptions listed successfully",
+		});
 
 		return {
 			object: "subscription" as const,
@@ -48,7 +50,7 @@ export async function listSubscriptionsController({
 			limit,
 		};
 	} catch (error) {
-		log.error({ ...({ query, error }), message: "Error listing subscriptions" });
+		log.error({ ...{ query, error }, message: "Error listing subscriptions" });
 		throw error;
 	}
 }

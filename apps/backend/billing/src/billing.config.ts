@@ -5,4 +5,3 @@ export const billingConfig = {
 	NATS_URL: process.env.NATS_URL || "nats://localhost:4222",
 	BASE_URL: process.env.BASE_URL || "https://local.reloop.sh",
 };
-

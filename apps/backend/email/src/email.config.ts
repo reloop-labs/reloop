@@ -7,4 +7,3 @@ export const emailConfig = {
 	BASE_URL: process.env.BASE_URL || "https://local.reloop.sh",
 	REDIS_URL: process.env.REDIS_URL || "redis://:reloop123@localhost:6379",
 };
-

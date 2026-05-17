@@ -41,7 +41,10 @@ const webhookService = new Elysia({
 		await loader();
 	})
 	.listen(port, () => {
-		log.info("server", `Webhook Server is running on http://localhost:${port}/api/webhook`);
+		log.info(
+			"server",
+			`Webhook Server is running on http://localhost:${port}/api/webhook`,
+		);
 	});
 
 export type WebhookService = typeof webhookService;

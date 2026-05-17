@@ -1,22 +1,21 @@
-import { workflowConfig } from "@be/workflow/workflow.config";
-import { Worker, type Job } from "bullmq";
-import { log } from "evlog";
-import {
-	WORKFLOW_QUEUE,
-	type WorkflowJobData,
-} from "./workflow.queue";
 import { processDomainVerification } from "@be/workflow/handlers/domain-verification.handler";
+import { workflowConfig } from "@be/workflow/workflow.config";
+import { type Job, Worker } from "bullmq";
+import { log } from "evlog";
+import { WORKFLOW_QUEUE, type WorkflowJobData } from "./workflow.queue";
 
 const connection = {
 	url: workflowConfig.REDIS_URL,
 };
 
-async function processWorkflow(
-	job: Job<WorkflowJobData>,
-): Promise<void> {
+async function processWorkflow(job: Job<WorkflowJobData>): Promise<void> {
 	const jobData = job.data;
-	log.info({ message: "Processing workflow job", workflowId: jobData.workflowId, type: jobData.type });
-	
+	log.info({
+		message: "Processing workflow job",
+		workflowId: jobData.workflowId,
+		type: jobData.type,
+	});
+
 	const isLastAttempt = job.attemptsMade + 1 >= (job.opts.attempts ?? 1);
 
 	if (jobData.type === "verify-domain") {
@@ -26,8 +25,11 @@ async function processWorkflow(
 			isLastAttempt,
 		});
 	}
-	
-	log.info({ message: "Workflow job processed", workflowId: jobData.workflowId });
+
+	log.info({
+		message: "Workflow job processed",
+		workflowId: jobData.workflowId,
+	});
 }
 
 export function startWorkflowWorker(): Worker {

@@ -22,7 +22,11 @@ const app = new Elysia({ prefix: "/api/billing", name: "Billing Service" })
 				},
 				components: {
 					securitySchemes: {
-						cookieAuth: { type: "apiKey", in: "cookie", name: "better-auth.session_token" },
+						cookieAuth: {
+							type: "apiKey",
+							in: "cookie",
+							name: "better-auth.session_token",
+						},
 					},
 				},
 			},
@@ -34,7 +38,10 @@ const app = new Elysia({ prefix: "/api/billing", name: "Billing Service" })
 		await loader();
 	})
 	.listen(port, () => {
-		log.info("server", `Billing Server is running on http://localhost:${port}/api/billing`);
+		log.info(
+			"server",
+			`Billing Server is running on http://localhost:${port}/api/billing`,
+		);
 	});
 
 export type App = typeof app;

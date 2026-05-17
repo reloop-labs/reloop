@@ -1,8 +1,7 @@
-import { log } from "evlog";
 import { db } from "@reloop/db/client";
 import { domain, emailLog } from "@reloop/db/schema";
-
 import { and, eq, isNull } from "drizzle-orm";
+import { log } from "evlog";
 import { simpleParser } from "mailparser";
 import { kumomtaConfig } from "../../kumomta.config";
 import { verifyApiKeyController } from "../verify/verify.controllers";
@@ -41,16 +40,25 @@ export async function logIncomingController(
 		let subject = input.subject || "No Subject";
 
 		if (input.rawMessage) {
-			log.info({ ...({ rawLength: input.rawMessage.length }), message: "[LOG-INCOMING] Parsing rawMessage" });
+			log.info({
+				...{ rawLength: input.rawMessage.length },
+				message: "[LOG-INCOMING] Parsing rawMessage",
+			});
 			try {
 				const parsed = await simpleParser(input.rawMessage);
-				log.info({ ...({ hasText: !!parsed.text, hasHtml: !!parsed.html }), message: "[LOG-INCOMING] Parsed rawMessage" });
+				log.info({
+					...{ hasText: !!parsed.text, hasHtml: !!parsed.html },
+					message: "[LOG-INCOMING] Parsed rawMessage",
+				});
 				// Reset bodies to ensure we only use the high-fidelity parsed content
 				textBody = parsed.text || "";
 				htmlBody = (parsed.html as string) || "";
 				subject = parsed.subject || subject;
 			} catch (parseError) {
-				log.error({ ...({ parseError }), message: "[LOG-INCOMING] mailparser error" });
+				log.error({
+					...{ parseError },
+					message: "[LOG-INCOMING] mailparser error",
+				});
 			}
 		}
 
@@ -62,7 +70,10 @@ export async function logIncomingController(
 				)
 			: and(eq(domain.domain, input.domainName), isNull(domain.deletedAt));
 
-		log.info({ ...({ domain: input.domainName, organizationId }), message: "[LOG-INCOMING] Querying domain" });
+		log.info({
+			...{ domain: input.domainName, organizationId },
+			message: "[LOG-INCOMING] Querying domain",
+		});
 
 		const domainRecord = await db.query.domain.findFirst({
 			where: domainQuery,
@@ -70,12 +81,18 @@ export async function logIncomingController(
 		});
 
 		if (!domainRecord) {
-			log.warn({ ...({ domain: input.domainName }), message: "[LOG-INCOMING] Domain NOT FOUND" });
+			log.warn({
+				...{ domain: input.domainName },
+				message: "[LOG-INCOMING] Domain NOT FOUND",
+			});
 			return { error: "Domain not found", code: 404 };
 		}
 
 		if (domainRecord.status !== "active") {
-			log.warn({ ...({ domain: input.domainName, status: domainRecord.status }), message: "[LOG-INCOMING] Domain found but NOT ACTIVE" });
+			log.warn({
+				...{ domain: input.domainName, status: domainRecord.status },
+				message: "[LOG-INCOMING] Domain found but NOT ACTIVE",
+			});
 			return { error: "Domain not verified", code: 404 };
 		}
 
@@ -89,7 +106,10 @@ export async function logIncomingController(
 		});
 
 		if (existingLog) {
-			log.info({ ...({ messageId: input.messageId }), message: "[LOG-INCOMING] Message ID already exists" });
+			log.info({
+				...{ messageId: input.messageId },
+				message: "[LOG-INCOMING] Message ID already exists",
+			});
 			return { error: "Message ID already exists", code: 409 };
 		}
 
@@ -117,7 +137,8 @@ export async function logIncomingController(
 			return { error: "Failed to insert email log", code: 400 };
 		return { id: inserted[0]?.id, code: 200 };
 	} catch (error) {
-		log.error({
+		log.error(
+			{
 				error: error instanceof Error ? error.message : String(error),
 				domain: input.domainName,
 			},

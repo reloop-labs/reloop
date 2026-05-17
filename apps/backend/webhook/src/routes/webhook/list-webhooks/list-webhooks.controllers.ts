@@ -1,9 +1,8 @@
-import { log } from "evlog";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-
 import type { WebhookEventName } from "@reloop/webhook-events";
 import { and, count, desc, eq, isNull } from "drizzle-orm";
+import { log } from "evlog";
 import type { WebhookTypes } from "../webhook.type";
 
 export async function listWebhooksController({
@@ -16,7 +15,7 @@ export async function listWebhooksController({
 	const { page = 1, limit = 10, status } = query;
 	const offset = (page - 1) * limit;
 
-	log.info({ ...({ query, organizationId }), message: "Listing webhooks" });
+	log.info({ ...{ query, organizationId }, message: "Listing webhooks" });
 
 	try {
 		const conditions = [
@@ -72,7 +71,10 @@ export async function listWebhooksController({
 			limit,
 		};
 	} catch (error) {
-		log.error({ ...({ query, organizationId, error }), message: "Error listing webhooks" });
+		log.error({
+			...{ query, organizationId, error },
+			message: "Error listing webhooks",
+		});
 		throw error;
 	}
 }

@@ -1,9 +1,8 @@
-import { log } from "evlog";
 import { bus } from "@reloop/bus";
 import { RedisCache } from "@reloop/cache/redis-client";
 import { db } from "@reloop/db/client";
-
 import { startWebhookDeliveryWorker } from "@reloop/webhook/queues/webhook-delivery.worker";
+import { log } from "evlog";
 import { webhookConfig } from "../webhook.config";
 
 export const redis = new RedisCache("webhook");
@@ -18,7 +17,8 @@ export const loader = async () => {
 		log.info("server", "NATS connected");
 		startWebhookDeliveryWorker();
 	} catch (e) {
-		log.error({ error: e instanceof Error ? e.message : String(e) },
+		log.error(
+			{ error: e instanceof Error ? e.message : String(e) },
 			"Error during service initialization",
 		);
 	}
