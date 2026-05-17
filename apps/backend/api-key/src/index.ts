@@ -55,8 +55,8 @@ const apiKeyService = new Elysia({
 	})
 	.listen(port, () => {
 		log.info(
-			"server",
-			`API Key Server is running on:\n  - Local: http://localhost:${port}/api/api-key\n  - Base:  ${apiKeyConfig.BASE_URL}/api/api-key`,
+			"API Key Service",
+			`Running on:\n  - Local: http://localhost:${port}/api/api-key\n  - Base:  ${apiKeyConfig.BASE_URL}/api/api-key`,
 		);
 	});
 

@@ -11,7 +11,7 @@ import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { API_KEY_CREATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { log } from "evlog";
-import { ApiKeyErrors } from "@reloop/api-key/lib/errors";
+import { ApiKeyErrors } from "@reloop/api-key/error/api-key.error-response";
 
 export async function createApiKeyController({
 	organizationId,
@@ -19,20 +19,12 @@ export async function createApiKeyController({
 	body,
 	logger,
 	cookie,
-	requestDetails,
 }: {
 	organizationId: string;
 	userId: string;
 	body: ApiKeyTypes.CreateApiKeyRequest;
 	logger?: any;
 	cookie?: string;
-	requestDetails?: {
-		endpoint?: string;
-		method?: string;
-		userAgent?: string;
-		ipAddress?: string;
-		statusCode?: number;
-	};
 }): Promise<ApiKeyTypes.ApiKeyWithKeyResponse> {
 	try {
 		log.info({ ...{}, message: "Generating new api key" });
@@ -107,7 +99,6 @@ export async function createApiKeyController({
 			event: API_KEY_CREATE_WEBHOOK_EVENT.id,
 			cookie,
 			metadata: result,
-			requestDetails: { ...(requestDetails || {}), statusCode: 201 },
 		});
 
 		return result;

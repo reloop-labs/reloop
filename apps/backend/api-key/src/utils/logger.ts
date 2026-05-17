@@ -10,13 +10,6 @@ export async function createLog(body: {
 	level?: "debug" | "info" | "warn" | "error" | "fatal";
 	trace_id?: string;
 	metadata?: Record<string, unknown>;
-	requestDetails?: {
-		endpoint?: string;
-		method?: string;
-		userAgent?: string;
-		ipAddress?: string;
-		statusCode?: number;
-	};
 	cookie?: string;
 }) {
 	const {
@@ -24,7 +17,6 @@ export async function createLog(body: {
 		level = "info",
 		trace_id,
 		metadata = {},
-		requestDetails = {},
 		cookie,
 	} = body;
 
@@ -36,7 +28,6 @@ export async function createLog(body: {
 				trace_id ||
 				(typeof crypto !== "undefined" ? crypto.randomUUID() : undefined),
 			metadata,
-			requestDetails,
 			cookie,
 		});
 	} catch (error) {

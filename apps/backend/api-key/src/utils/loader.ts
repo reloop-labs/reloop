@@ -9,11 +9,11 @@ export const redis = new RedisCache("api-key");
 export const loader = async () => {
 	try {
 		await redis.healthCheck();
-		log.info("server", "Redis connected");
+		log.info("Redis", "Connected");
 		await db.execute("SELECT 1 as test");
-		log.info("server", "Postgres connected");
+		log.info("Postgres", "Connected");
 		await bus.connect(apiKeyConfig.NATS_URL);
-		log.info("server", "NATS connected");
+		log.info("NATS", "Connected");
 	} catch (e) {
 		log.error({
 			error: e instanceof Error ? e.message : String(e),

@@ -11,8 +11,6 @@ export const updateApiKeyRoute = new Elysia().use(authMiddleware).patch(
 		body,
 		activeOrganizationId,
 		logger,
-		path,
-		request,
 		headers,
 	}) => {
 		const cookieString = headers["cookie"] || "";
@@ -22,14 +20,6 @@ export const updateApiKeyRoute = new Elysia().use(authMiddleware).patch(
 			body,
 			logger,
 			cookie: cookieString,
-			requestDetails: {
-				endpoint: path,
-				method: request.method,
-				userAgent: headers["user-agent"],
-				ipAddress:
-					(headers["x-forwarded-for"] as string) ||
-					(headers["x-real-ip"] as string),
-			},
 		});
 	},
 	{

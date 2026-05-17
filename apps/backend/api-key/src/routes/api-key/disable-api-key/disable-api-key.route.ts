@@ -9,8 +9,6 @@ export const disableApiKeyRoute = new Elysia().use(authMiddleware).post(
 		params: { api_key_id },
 		activeOrganizationId,
 		logger,
-		path,
-		request,
 		headers,
 	}) => {
 		const cookieString = headers["cookie"] || "";
@@ -19,14 +17,6 @@ export const disableApiKeyRoute = new Elysia().use(authMiddleware).post(
 			organizationId: activeOrganizationId,
 			logger,
 			cookie: cookieString,
-			requestDetails: {
-				endpoint: path,
-				method: request.method,
-				userAgent: headers["user-agent"],
-				ipAddress:
-					(headers["x-forwarded-for"] as string) ||
-					(headers["x-real-ip"] as string),
-			},
 		});
 	},
 	{

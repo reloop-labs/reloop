@@ -9,8 +9,6 @@ export const rotateApiKeyRoute = new Elysia().use(authMiddleware).post(
 		params: { api_key_id },
 		activeOrganizationId,
 		logger,
-		path,
-		request,
 		headers,
 	}) => {
 		const cookieString = headers["cookie"] || "";
@@ -18,14 +16,6 @@ export const rotateApiKeyRoute = new Elysia().use(authMiddleware).post(
 			id: api_key_id,
 			organizationId: activeOrganizationId,
 			cookie: cookieString,
-			requestDetails: {
-				endpoint: path,
-				method: request.method,
-				userAgent: headers["user-agent"],
-				ipAddress:
-					(headers["x-forwarded-for"] as string) ||
-					(headers["x-real-ip"] as string),
-			},
 		});
 	},
 	{

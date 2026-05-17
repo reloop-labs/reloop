@@ -1,4 +1,4 @@
-import { ApiKeyErrors } from "@reloop/api-key/lib/errors";
+import { ApiKeyErrors } from "@reloop/api-key/error/api-key.error-response";
 import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
 import { createLog } from "@reloop/api-key/utils/logger";
 import { db } from "@reloop/db/client";
@@ -11,18 +11,10 @@ export async function enableApiKeyController({
 	id,
 	organizationId,
 	cookie,
-	requestDetails,
 }: {
 	id: string;
 	organizationId: string;
 	cookie?: string;
-	requestDetails?: {
-		endpoint?: string;
-		method?: string;
-		userAgent?: string;
-		ipAddress?: string;
-		statusCode?: number;
-	};
 }): Promise<ApiKeyTypes.ApiKeyResponse> {
 	const logger = useLogger();
 	try {
@@ -105,7 +97,6 @@ export async function enableApiKeyController({
 			event: API_KEY_UPDATE_WEBHOOK_EVENT.id,
 			cookie,
 			metadata: result as Record<string, unknown>,
-			requestDetails: { ...(requestDetails || {}), statusCode: 200 },
 		});
 
 		return result;

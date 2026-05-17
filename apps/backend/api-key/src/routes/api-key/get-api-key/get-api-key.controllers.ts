@@ -4,7 +4,7 @@ import * as schema from "@reloop/db/schema";
 import { API_KEY_GET_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq } from "drizzle-orm";
 import { log } from "evlog";
-import { ApiKeyErrors } from "@reloop/api-key/lib/errors";
+import { ApiKeyErrors } from "@reloop/api-key/error/api-key.error-response";
 
 export async function getApiKeyController({
 	apiKeyId,

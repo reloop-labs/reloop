@@ -1,3 +1,4 @@
+import { ApiKeyErrors } from "@reloop/api-key/error/api-key.error-response";
 import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
 import { createLog } from "@reloop/api-key/utils/logger";
 import { db } from "@reloop/db/client";
@@ -5,26 +6,17 @@ import * as schema from "@reloop/db/schema";
 import { API_KEY_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq } from "drizzle-orm";
 import { log } from "evlog";
-import { ApiKeyErrors } from "@reloop/api-key/lib/errors";
 
 export async function disableApiKeyController({
 	id,
 	organizationId,
 	logger,
 	cookie,
-	requestDetails,
 }: {
 	id: string;
 	organizationId: string;
 	logger?: any;
 	cookie?: string;
-	requestDetails?: {
-		endpoint?: string;
-		method?: string;
-		userAgent?: string;
-		ipAddress?: string;
-		statusCode?: number;
-	};
 }): Promise<ApiKeyTypes.ApiKeyResponse> {
 	log.info({ ...{ id }, message: "Checking if API key exists" });
 	try {
@@ -105,7 +97,6 @@ export async function disableApiKeyController({
 			event: API_KEY_UPDATE_WEBHOOK_EVENT.id,
 			cookie,
 			metadata: result as Record<string, unknown>,
-			requestDetails: { ...(requestDetails || {}), statusCode: 200 },
 		});
 
 		return result;

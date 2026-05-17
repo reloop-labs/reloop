@@ -6,24 +6,16 @@ import * as schema from "@reloop/db/schema";
 import { API_KEY_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq } from "drizzle-orm";
 import { log } from "evlog";
-import { ApiKeyErrors } from "@reloop/api-key/lib/errors";
+import { ApiKeyErrors } from "@reloop/api-key/error/api-key.error-response";
 
 export async function rotateApiKeyController({
 	id,
 	organizationId,
 	cookie,
-	requestDetails,
 }: {
 	id: string;
 	organizationId: string;
 	cookie?: string;
-	requestDetails?: {
-		endpoint?: string;
-		method?: string;
-		userAgent?: string;
-		ipAddress?: string;
-		statusCode?: number;
-	};
 }): Promise<ApiKeyTypes.ApiKeyWithKeyResponse> {
 	try {
 		log.info({ ...{ id, organizationId }, message: "Search for api key" });
@@ -77,7 +69,6 @@ export async function rotateApiKeyController({
 			event: API_KEY_UPDATE_WEBHOOK_EVENT.id,
 			cookie,
 			metadata: result,
-			requestDetails: { ...(requestDetails || {}), statusCode: 200 },
 		});
 
 		return result;
