@@ -1,9 +1,13 @@
 import { authMiddleware } from "@reloop/api-key/middleware/auth";
+import { rateLimitPlugin } from "@reloop/api-key/middleware/rate-limit";
 import { ApiKeyModel } from "@reloop/api-key/model/api-key.model";
 import { Elysia, t } from "elysia";
 import { rotateApiKeyController } from "./rotate-api-key.controllers";
 
-export const rotateApiKeyRoute = new Elysia().use(authMiddleware).post(
+export const rotateApiKeyRoute = new Elysia()
+	.use(authMiddleware)
+	.use(rateLimitPlugin({ max: 20, windowSeconds: 60, namespace: "rotate" }))
+	.post(
 	"/rotate/:api_key_id",
 	async ({ params: { api_key_id }, organizationId }) => {
 		return await rotateApiKeyController({
@@ -13,6 +17,7 @@ export const rotateApiKeyRoute = new Elysia().use(authMiddleware).post(
 	},
 	{
 		auth: true,
+		rateLimit: true,
 		params: t.Object({
 			api_key_id: ApiKeyModel.apiKeyIdParam,
 		}),

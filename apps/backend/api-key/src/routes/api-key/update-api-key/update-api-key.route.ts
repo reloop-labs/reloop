@@ -1,10 +1,14 @@
 import { authMiddleware } from "@reloop/api-key/middleware/auth";
+import { rateLimitPlugin } from "@reloop/api-key/middleware/rate-limit";
 import { ApiKeyModel } from "@reloop/api-key/model/api-key.model";
 import { Elysia, t } from "elysia";
 import { updateApiKeyController } from "./update-api-key.controllers";
 import { updateApiKeyXCodeSamples } from "./update-api-key.x-codeSamples";
 
-export const updateApiKeyRoute = new Elysia().use(authMiddleware).patch(
+export const updateApiKeyRoute = new Elysia()
+	.use(authMiddleware)
+	.use(rateLimitPlugin({ max: 30, windowSeconds: 60, namespace: "update" }))
+	.patch(
 	"/:api_key_id",
 	async ({ params: { api_key_id }, body: { name }, organizationId }) => {
 		return await updateApiKeyController({
@@ -15,6 +19,7 @@ export const updateApiKeyRoute = new Elysia().use(authMiddleware).patch(
 	},
 	{
 		auth: true,
+		rateLimit: true,
 		params: t.Object({
 			api_key_id: ApiKeyModel.apiKeyIdParam,
 		}),

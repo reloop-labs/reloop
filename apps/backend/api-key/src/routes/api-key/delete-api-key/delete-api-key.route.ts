@@ -1,10 +1,14 @@
 import { authMiddleware } from "@reloop/api-key/middleware/auth";
+import { rateLimitPlugin } from "@reloop/api-key/middleware/rate-limit";
 import { ApiKeyModel } from "@reloop/api-key/model/api-key.model";
 import { Elysia, t } from "elysia";
 import { deleteApiKeyController } from "./delete-api-key.controllers";
 import { deleteApiKeyXCodeSamples } from "./delete-api-key.x-codeSamples";
 
-export const deleteApiKeyRoute = new Elysia().use(authMiddleware).delete(
+export const deleteApiKeyRoute = new Elysia()
+	.use(authMiddleware)
+	.use(rateLimitPlugin({ max: 20, windowSeconds: 60, namespace: "delete" }))
+	.delete(
 	"/:api_key_id",
 	async ({ params: { api_key_id }, organizationId }) => {
 		return await deleteApiKeyController({
@@ -14,6 +18,7 @@ export const deleteApiKeyRoute = new Elysia().use(authMiddleware).delete(
 	},
 	{
 		auth: true,
+		rateLimit: true,
 		params: t.Object({
 			api_key_id: ApiKeyModel.apiKeyIdParam,
 		}),
