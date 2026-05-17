@@ -17,28 +17,11 @@ export async function updateApiKeyController({
 	name: string;
 }): Promise<ApiKeyTypes.ApiKeyResponse> {
 	const log = useLogger();
-	log.info("Searching api key");
+	log.info("Updating api key");
 	try {
-		const existing = await db.query.apikey.findFirst({
-			where: and(
-				eq(schema.apikey.id, apiKeyId),
-				eq(schema.apikey.organizationId, organizationId),
-			),
-			with: { user: true },
-		});
-		if (!existing) {
-			log.warn("API key not found");
-			throw ApiKeyErrors.notFound(apiKeyId);
-		}
-
-		log.info("Updating api key");
-		const updateData: Partial<typeof schema.apikey.$inferInsert> = {
-			updatedAt: new Date(),
-			name,
-		};
-		const updated = await db
+		const [updated] = await db
 			.update(schema.apikey)
-			.set(updateData)
+			.set({ name, updatedAt: new Date() })
 			.where(
 				and(
 					eq(schema.apikey.id, apiKeyId),
@@ -46,10 +29,12 @@ export async function updateApiKeyController({
 				),
 			)
 			.returning();
-		if (!updated[0]) {
-			log.error("Failed to update API key");
-			throw ApiKeyErrors.updateFailed(apiKeyId);
+
+		if (!updated) {
+			log.warn("API key not found");
+			throw ApiKeyErrors.notFound(apiKeyId);
 		}
+
 		log.info("API key updated successfully");
 
 		await bus.publish(BusEvent.API_KEY_UPDATED, {
@@ -58,34 +43,42 @@ export async function updateApiKeyController({
 		});
 		log.info("NATS event published");
 
+		// Fetch user separately (needed for createdBy in response)
+		const keyWithUser = await db.query.apikey.findFirst({
+			where: eq(schema.apikey.id, apiKeyId),
+			with: { user: true },
+		});
+
 		const result = {
-			id: updated[0].id,
-			name: updated[0].name,
-			start: updated[0].start,
-			prefix: updated[0].prefix,
-			organizationId: updated[0].organizationId,
-			userId: updated[0].userId,
-			refillInterval: updated[0].refillInterval,
-			refillAmount: updated[0].refillAmount,
-			lastRefillAt: updated[0].lastRefillAt?.toISOString() ?? null,
-			enabled: updated[0].enabled,
-			rateLimitEnabled: updated[0].rateLimitEnabled,
-			rateLimitTimeWindow: updated[0].rateLimitTimeWindow,
-			rateLimitMax: updated[0].rateLimitMax,
-			requestCount: updated[0].requestCount,
-			remaining: updated[0].remaining,
-			lastRequest: updated[0].lastRequest?.toISOString() ?? null,
-			expiresAt: updated[0].expiresAt?.toISOString() ?? null,
-			createdAt: updated[0].createdAt.toISOString(),
-			updatedAt: updated[0].updatedAt.toISOString(),
-			permissions: updated[0].permissions,
-			metadata: updated[0].metadata,
-			createdBy: {
-				id: existing.user.id,
-				name: existing.user.name,
-				image: existing.user.image,
-				email: existing.user.email,
-			},
+			id: updated.id,
+			name: updated.name,
+			start: updated.start,
+			prefix: updated.prefix,
+			organizationId: updated.organizationId,
+			userId: updated.userId,
+			refillInterval: updated.refillInterval,
+			refillAmount: updated.refillAmount,
+			lastRefillAt: updated.lastRefillAt?.toISOString() ?? null,
+			enabled: updated.enabled,
+			rateLimitEnabled: updated.rateLimitEnabled,
+			rateLimitTimeWindow: updated.rateLimitTimeWindow,
+			rateLimitMax: updated.rateLimitMax,
+			requestCount: updated.requestCount,
+			remaining: updated.remaining,
+			lastRequest: updated.lastRequest?.toISOString() ?? null,
+			expiresAt: updated.expiresAt?.toISOString() ?? null,
+			createdAt: updated.createdAt.toISOString(),
+			updatedAt: updated.updatedAt.toISOString(),
+			permissions: updated.permissions,
+			metadata: updated.metadata,
+			createdBy: keyWithUser?.user
+				? {
+					id: keyWithUser.user.id,
+					name: keyWithUser.user.name,
+					image: keyWithUser.user.image,
+					email: keyWithUser.user.email,
+				}
+				: undefined,
 			object: "api_key" as const,
 			event: API_KEY_UPDATE_WEBHOOK_EVENT.id,
 		};

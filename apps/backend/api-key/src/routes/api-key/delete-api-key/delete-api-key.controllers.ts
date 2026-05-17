@@ -14,29 +14,22 @@ export async function deleteApiKeyController({
 	organizationId: string;
 }): Promise<{ id: string; message: string; object: "api_key"; event: string }> {
 	const log = useLogger();
-	log.info("Checking if api key exists");
+	log.info("Deleting API key");
 	try {
-		const existing = await db.query.apikey.findFirst({
-			where: and(
-				eq(schema.apikey.id, apiKeyId),
-				eq(schema.apikey.organizationId, organizationId),
-			),
-		});
-
-		if (!existing) {
-			log.warn("API key not found");
-			throw ApiKeyErrors.notFound(apiKeyId);
-		}
-
-		log.info("Deleting API key");
-		await db
+		const [deleted] = await db
 			.delete(schema.apikey)
 			.where(
 				and(
 					eq(schema.apikey.id, apiKeyId),
 					eq(schema.apikey.organizationId, organizationId),
 				),
-			);
+			)
+			.returning({ id: schema.apikey.id });
+
+		if (!deleted) {
+			log.warn("API key not found");
+			throw ApiKeyErrors.notFound(apiKeyId);
+		}
 
 		log.info("API key deleted successfully");
 
