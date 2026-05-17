@@ -148,9 +148,31 @@ export function Sidebar({
 	);
 
 	// Folder open state lives here — only ever grows, never shrinks automatically
-	const [openFolders, setOpenFolders] = useState<Set<string>>(
-		() => new Set(getActiveFolderUrls(filteredTree)),
-	);
+	const [openFolders, setOpenFolders] = useState<Set<string>>(() => {
+		const activeUrls = getActiveFolderUrls(filteredTree);
+		if (typeof window !== "undefined") {
+			try {
+				const saved = sessionStorage.getItem("reloop-sidebar-open");
+				if (saved) {
+					const parsed = JSON.parse(saved);
+					return new Set([...parsed, ...activeUrls]);
+				}
+			} catch (e) {
+				// Ignore parse errors
+			}
+		}
+		return new Set(activeUrls);
+	});
+
+	// Persist to sessionStorage
+	useEffect(() => {
+		if (typeof window !== "undefined") {
+			sessionStorage.setItem(
+				"reloop-sidebar-open",
+				JSON.stringify(Array.from(openFolders)),
+			);
+		}
+	}, [openFolders]);
 
 	// On navigation: add newly-active folders but never remove any
 	useEffect(() => {
