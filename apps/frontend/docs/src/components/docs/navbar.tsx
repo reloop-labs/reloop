@@ -16,7 +16,7 @@ export function Navbar({
 	const tabs = navigationTabs;
 
 	return (
-		<div className="flex h-full w-full items-center justify-between px-4 pr-3">
+		<div className="flex h-full w-full items-center justify-between pr-3">
 			{/* Mobile Menu Placeholder / Logo on Mobile */}
 			<div className="flex items-center gap-4 lg:hidden">
 				<button

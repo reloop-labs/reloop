@@ -17,6 +17,11 @@
 	--color-fd-primary-foreground: #ffffff;
 	--color-fd-accent: #f5f5f5;
 	--color-fd-popover: #ffffff;
+
+	/* Additional dashboard matching tokens */
+	--color-neutral-alpha-10: #a3a3a31a;
+	--color-stroke-soft-200: #e5e5e5;
+	--color-text-sub-600: #525252;
 }
 
 :root {
@@ -34,6 +39,10 @@
 	--color-fd-primary-foreground: #000000;
 	--color-fd-accent: #1c1c1c;
 	--color-fd-popover: #1c1c1c;
+
+	/* Dark mode overrides */
+	--color-stroke-soft-200: #404040;
+	--color-text-sub-600: #a3a3a3;
 }
 
 /* Base body */

@@ -20,10 +20,10 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 
 	return (
 		<div className="flex h-[100dvh] w-full flex-col overflow-hidden bg-fd-background">
-			{/* Unified Header */}
-			<header className="z-50 flex h-12 w-full shrink-0 border-fd-border border-b bg-fd-background/80 backdrop-blur-md">
+			{/* Unified Header - Borderless */}
+			<header className="z-50 flex h-12 w-full shrink-0 bg-fd-background/80 backdrop-blur-md">
 				{/* Desktop Logo Area - Only visible on LG+ */}
-				<div className="hidden shrink-0 items-center border-fd-border border-r px-4 pt-1 lg:flex lg:w-60">
+				<div className="hidden shrink-0 items-center px-4 pt-1 lg:flex lg:w-60">
 					<Link href="/" className="flex items-center">
 						<Logo theme="light" className="w-12" />
 					</Link>
@@ -34,7 +34,7 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 				</div>
 			</header>
 
-			<div className="flex flex-1 flex-row overflow-hidden bg-fd-background">
+			<div className="flex flex-1 flex-row overflow-hidden bg-fd-muted/[0.08]">
 				{/* Mobile Drawer */}
 				<Dialog.Root open={open} onOpenChange={setOpen}>
 					<Dialog.Portal>
@@ -77,17 +77,19 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 				</Dialog.Root>
 
 				{/* Desktop Sidebar - Only visible on LG+ */}
-				<aside className="hidden shrink-0 border-fd-border border-r lg:block lg:w-60">
+				<aside className="hidden shrink-0 bg-transparent lg:block lg:w-60">
 					<Sidebar tree={tree} pathname={pathname} />
 				</aside>
 
-				{/* Main Content Area - Seamless */}
+				{/* Main Content Area - Seamless Card Layout */}
 				<main
 					id="nd-page"
-					className="relative min-h-0 flex-1 overflow-y-auto overflow-x-hidden bg-fd-background"
+					className="relative mr-2 mb-2 ml-4 flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-stroke-soft-200 bg-fd-background shadow-sm"
 				>
-					<div className="mx-auto min-h-full w-full transition-all duration-300">
-						{children}
+					<div className="flex-1 overflow-y-auto overflow-x-hidden">
+						<div className="mx-auto min-h-full w-full transition-all duration-300">
+							{children}
+						</div>
 					</div>
 				</main>
 			</div>
