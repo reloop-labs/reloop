@@ -8,16 +8,13 @@ export const updateApiKeyRoute = new Elysia().use(authMiddleware).patch(
 	"/:api_key_id",
 	async ({
 		params: { api_key_id },
-		body,
-		activeOrganizationId,
-		headers,
+		body: { name },
+		organizationId,
 	}) => {
-		const cookieString = headers["cookie"] || "";
 		return await updateApiKeyController({
 			apiKeyId: api_key_id,
-			organizationId: activeOrganizationId,
-			body,
-			cookie: cookieString,
+			organizationId,
+			name,
 		});
 	},
 	{

@@ -1,22 +1,19 @@
+import { ApiKeyErrors } from "@reloop/api-key/error/api-key.error-response";
 import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
-
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { API_KEY_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq } from "drizzle-orm";
 import { log } from "evlog";
-import { ApiKeyErrors } from "@reloop/api-key/error/api-key.error-response";
 
 export async function updateApiKeyController({
 	apiKeyId,
 	organizationId,
-	body,
-	cookie,
+	name,
 }: {
 	apiKeyId: string;
 	organizationId: string;
-	body: ApiKeyTypes.UpdateApiKeyRequest;
-	cookie?: string;
+	name: string;
 }): Promise<ApiKeyTypes.ApiKeyResponse> {
 	log.info({ ...{ apiKeyId }, message: "Searching api key" });
 	try {
@@ -35,7 +32,7 @@ export async function updateApiKeyController({
 		log.info({ ...{ apiKeyId }, message: "Updating api key" });
 		const updateData: Partial<typeof schema.apikey.$inferInsert> = {
 			updatedAt: new Date(),
-			name: body.name,
+			name,
 		};
 		const updated = await db
 			.update(schema.apikey)
@@ -83,8 +80,6 @@ export async function updateApiKeyController({
 			object: "api_key" as const,
 			event: API_KEY_UPDATE_WEBHOOK_EVENT.id,
 		};
-
-
 
 		return result;
 	} catch (error) {

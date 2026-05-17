@@ -7,11 +7,11 @@ export const rotateApiKeyRoute = new Elysia().use(authMiddleware).post(
 	"/rotate/:api_key_id",
 	async ({
 		params: { api_key_id },
-		activeOrganizationId,
+		organizationId,
 	}) => {
 		return await rotateApiKeyController({
 			id: api_key_id,
-			organizationId: activeOrganizationId,
+			organizationId,
 		});
 	},
 	{

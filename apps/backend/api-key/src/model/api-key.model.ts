@@ -28,13 +28,12 @@ export namespace ApiKeyModel {
 
 	export const updateApiKeyBody = t.Object(
 		{
-			name: t.Optional(
-				t.String({
-					minLength: 1,
-					maxLength: 255,
-					description: "Name for the API key",
-				}),
-			),
+			name: t.String({
+				minLength: 1,
+				maxLength: 255,
+				description: "Name for the API key",
+			}),
+
 		},
 		{
 			examples: [
