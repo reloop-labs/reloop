@@ -12,9 +12,7 @@
 
 		"lint": "biome check .",
 		"fix-lint": "biome check --fix .",
-		"format": "biome format .",
-		"test": "bun test tests/",
-		"test:watch": "bun test --watch tests/"
+		"format": "biome format ."
 	},
 	"dependencies": {
 		"@elysiajs/cors": "catalog:backend",
