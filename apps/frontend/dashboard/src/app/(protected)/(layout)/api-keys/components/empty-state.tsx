@@ -4,11 +4,61 @@ import { Icon } from "@reloop/ui/icon";
 
 interface EmptyStateProps {
 	onCreateApiKey: () => void;
+	isSearch?: boolean;
+	searchQuery?: string | null;
+	hasFilters?: boolean;
+	statusFilter?: string | null;
+	creatorFilter?: string | null;
 }
 
-export const EmptyState = ({ onCreateApiKey }: EmptyStateProps) => {
+export const EmptyState = ({
+	onCreateApiKey,
+	isSearch,
+	searchQuery,
+	hasFilters,
+	statusFilter,
+	creatorFilter,
+}: EmptyStateProps) => {
+	const filterLabels = [];
+	if (statusFilter) {
+		filterLabels.push(`Status: ${statusFilter}`);
+	}
+	if (creatorFilter) {
+		filterLabels.push("Creator");
+	}
+	const filtersText =
+		filterLabels.length > 0 ? ` (${filterLabels.join(", ")})` : "";
+
+	if (isSearch) {
+		return (
+			<div className="flex flex-col items-center border-stroke-soft-100 bg-bg-soft-200/10 px-6 py-12 text-center dark:border-stroke-soft-100/50 dark:bg-transparent">
+				<div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
+					<Icon name="search" className="h-5 w-5 text-text-sub-600" />
+				</div>
+				<h3 className="mb-2 font-semibold text-text-strong-950 text-xl">
+					No API keys found
+				</h3>
+				<p className="mx-auto max-w-[300px] text-balance font-medium text-[12px] text-text-sub-600">
+					{searchQuery ? (
+						<>
+							No API keys found for{" "}
+							<span className="font-semibold text-text-strong-950">
+								"{searchQuery}"
+							</span>
+							{hasFilters ? ` with the applied filters${filtersText}.` : "."}
+						</>
+					) : hasFilters ? (
+						`No API keys found for the applied filters${filtersText}. Try adjusting them.`
+					) : (
+						"Your search didn't match any API keys. Try adjusting your filters or search query."
+					)}
+				</p>
+			</div>
+		);
+	}
+
 	return (
-		<div className="flex flex-col items-center border-stroke-soft-100 bg-bg-soft-200/10 px-6 py-12 text-center dark:border-stroke-soft-100/50 dark:bg-bg-soft-200/15">
+		<div className="flex flex-col items-center border-stroke-soft-100 bg-bg-soft-200/10 px-6 py-12 text-center dark:border-stroke-soft-100/50 dark:bg-transparent">
 			<div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
 				<Icon name="key-new" className="h-5 w-5 text-text-sub-600" />
 			</div>

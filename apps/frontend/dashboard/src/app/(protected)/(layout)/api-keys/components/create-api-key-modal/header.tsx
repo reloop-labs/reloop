@@ -1,6 +1,7 @@
 "use client";
 
 import { Icon } from "@reloop/ui/icon";
+import * as Modal from "@reloop/ui/modal";
 
 interface ModalHeaderProps {
 	title: string;
@@ -27,9 +28,11 @@ export const ModalHeader = ({
 						{icon && (
 							<Icon name={icon} className={`h-4 w-4 ${iconClassName}`} />
 						)}
-						<h2 className="font-semibold text-label-md text-text-strong-950">
-							{title}
-						</h2>
+						<Modal.Title asChild>
+							<h2 className="font-semibold text-label-md text-text-strong-950">
+								{title}
+							</h2>
+						</Modal.Title>
 					</div>
 					{subtitle && (
 						<p className="text-paragraph-xs text-text-sub-600">{subtitle}</p>
