@@ -1,4 +1,4 @@
-import { errorCodes } from "@reloop/api-key/api-key.error-code";
+import { errorCodes } from "@reloop/api-key/error/api-key.error-code";
 import { status } from "elysia";
 import { createError } from "evlog";
 

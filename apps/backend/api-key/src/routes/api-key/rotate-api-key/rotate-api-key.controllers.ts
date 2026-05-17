@@ -1,3 +1,4 @@
+import { ApiKeyErrors } from "@reloop/api-key/error/api-key.error-response";
 import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
 import { createLog } from "@reloop/api-key/utils/logger";
 import { generateApiKey, getKeyStart, hashApiKey } from "@reloop/apikey";
@@ -6,7 +7,6 @@ import * as schema from "@reloop/db/schema";
 import { API_KEY_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq } from "drizzle-orm";
 import { log } from "evlog";
-import { ApiKeyErrors } from "@reloop/api-key/error/api-key.error-response";
 
 export async function rotateApiKeyController({
 	id,

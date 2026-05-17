@@ -4,7 +4,9 @@ import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 import { apiKeyConfig } from "@reloop/api-key/api-key.config";
 import { apiKeyRoutes } from "@reloop/api-key/routes/api-key/api-key.routes";
-import { landing } from "@reloop/api-key/routes/landing/landing.index";
+import { agentCardRoute } from "@reloop/api-key/routes/landing/agent-card.route";
+import { healthRoute } from "@reloop/api-key/routes/landing/health.route";
+import { landingRoute } from "@reloop/api-key/routes/landing/landing.route";
 import { loader } from "@reloop/api-key/utils/loader";
 import { Elysia } from "elysia";
 import { initLogger } from "evlog";
@@ -17,27 +19,20 @@ const apiKeyService = new Elysia({
 	prefix: "/api/api-key",
 	name: "API Key Service",
 })
-	.use(evlog())
-	.use(serverTiming())
 	.use(
 		openapi({
 			documentation: {
-				info: {
-					title: "API KEY Service",
-					version: "1.0.1",
-				},
+				info: { title: "API KEY Service", version: "1.0.1", },
 				components: {
 					securitySchemes: {
-						apiKey: {
-							type: "apiKey",
-							name: "x-api-key",
-							in: "header",
-						},
+						apiKey: { type: "apiKey", name: "x-api-key", in: "header", },
 					},
 				},
 			},
 		}),
 	)
+	.use(evlog())
+	.use(serverTiming())
 	.onError(({ error, set }) => {
 		const parsed = parseError(error);
 		set.status = parsed.status;
@@ -48,7 +43,9 @@ const apiKeyService = new Elysia({
 			link: parsed.link,
 		};
 	})
-	.use(landing)
+	.use(landingRoute)
+	.use(agentCardRoute)
+	.use(healthRoute)
 	.use(apiKeyRoutes)
 	.onStart(async () => {
 		await loader();
