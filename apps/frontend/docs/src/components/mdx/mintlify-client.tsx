@@ -27,21 +27,51 @@ import React from "react";
 const CodeGroup = React.forwardRef<
 	HTMLDivElement,
 	React.ComponentProps<typeof MintlifyCodeGroup>
->((props, ref) => (
-	<div ref={ref} suppressHydrationWarning>
-		<MintlifyCodeGroup {...props} />
-	</div>
-));
+>((props, ref) => {
+	const [mounted, setMounted] = React.useState(false);
+	React.useEffect(() => {
+		setMounted(true);
+	}, []);
+
+	if (!mounted) {
+		return (
+			<div className="border border-fd-border rounded-lg p-4 bg-fd-muted space-y-4">
+				{props.children}
+			</div>
+		);
+	}
+
+	return (
+		<div ref={ref} suppressHydrationWarning>
+			<MintlifyCodeGroup {...props} />
+		</div>
+	);
+});
 CodeGroup.displayName = "CodeGroup";
 
 const CodeBlock = React.forwardRef<
 	HTMLDivElement,
 	React.ComponentProps<typeof MintlifyCodeBlock>
->((props, ref) => (
-	<div ref={ref} suppressHydrationWarning>
-		<MintlifyCodeBlock {...props} />
-	</div>
-));
+>((props, ref) => {
+	const [mounted, setMounted] = React.useState(false);
+	React.useEffect(() => {
+		setMounted(true);
+	}, []);
+
+	if (!mounted) {
+		return (
+			<pre className="p-4 rounded-lg bg-fd-muted border border-fd-border font-mono text-sm overflow-x-auto" style={{ height: "auto" }}>
+				<code>{props.children}</code>
+			</pre>
+		);
+	}
+
+	return (
+		<div ref={ref} suppressHydrationWarning>
+			<MintlifyCodeBlock {...props} />
+		</div>
+	);
+});
 CodeBlock.displayName = "CodeBlock";
 
 // Mintlify components use sub-components for items
