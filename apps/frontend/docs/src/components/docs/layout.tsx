@@ -23,7 +23,7 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 			{/* Unified Header - Borderless */}
 			<header className="z-50 flex h-12 w-full shrink-0 bg-bg-weak-50/80 backdrop-blur-md dark:bg-black/80">
 				{/* Desktop Logo Area - Only visible on LG+ */}
-				<div className="hidden shrink-0 items-center px-4 pt-1 lg:flex lg:w-60">
+				<div className="hidden shrink-0 items-center px-4 pt-1 lg:flex lg:w-64">
 					<Link href="/" className="flex items-center">
 						<Logo theme="light" className="w-12" />
 					</Link>
@@ -77,7 +77,7 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 				</Dialog.Root>
 
 				{/* Desktop Sidebar - Only visible on LG+ */}
-				<aside className="hidden shrink-0 bg-transparent lg:block lg:w-60">
+				<aside className="hidden shrink-0 bg-transparent lg:block lg:w-72">
 					<Sidebar tree={tree} pathname={pathname} />
 				</aside>
 

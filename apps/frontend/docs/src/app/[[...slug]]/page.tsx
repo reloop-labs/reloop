@@ -122,13 +122,13 @@ export default async function Page(props: {
 				pathname={pathname}
 			>
 				<div
-					className={`mx-auto flex w-full flex-col ${hideToc ? "max-w-none" : "max-w-[1100px] xl:grid xl:grid-cols-[1fr_240px] xl:gap-8"}`}
+					className={`mx-auto flex w-full flex-col ${hideToc ? "max-w-none" : "max-w-[1040px] xl:grid xl:grid-cols-[1fr_240px] xl:gap-8"}`}
 				>
 					{/* Main content area */}
 					<div
 						className={`min-w-0 px-6 py-8 md:px-10 ${isWebhookEvent ? "lg:grid lg:grid-cols-[1fr_400px] lg:gap-16" : ""}`}
 					>
-						<div className={hideToc ? "" : "mx-auto max-w-[800px] xl:mx-0"}>
+						<div className={hideToc ? "" : "mx-auto max-w-[680px] xl:mx-0"}>
 							{/* Breadcrumb */}
 							{breadcrumbs.length > 0 ? (
 								<div className="mb-3 flex items-center gap-1.5 font-medium text-[12px] text-fd-muted-foreground/60 uppercase tracking-wider">

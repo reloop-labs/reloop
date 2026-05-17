@@ -17,10 +17,18 @@ import {
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
-import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import {
+	createContext,
+	useContext,
+	useEffect,
+	useLayoutEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import { isActive as checkIsActive } from "../../lib/is-active";
-import { SearchDialog } from "./search-dialog";
 import { AnimatedHoverBackground } from "./animated-hover-background";
+import { SearchDialog } from "./search-dialog";
 
 interface SidebarContextType {
 	hoveredEl: HTMLElement | null;
@@ -117,7 +125,9 @@ export function Sidebar({
 
 	const [hoveredEl, setHoveredEl] = useState<HTMLElement | null>(null);
 	const [activeEl, setActiveEl] = useState<HTMLElement | null>(null);
-	const [rect, setRect] = useState<{ width: number; height: number } | null>(null);
+	const [rect, setRect] = useState<{ width: number; height: number } | null>(
+		null,
+	);
 	const [isSearchOpen, setIsSearchOpen] = useState(false);
 	const navRef = useRef<HTMLElement>(null);
 
@@ -150,13 +160,13 @@ export function Sidebar({
 	return (
 		<aside
 			className={cn(
-				"z-30 h-full flex-col bg-transparent",
+				"z-30 h-full flex-col bg-transparent lg:py-2 lg:pr-4 lg:pl-4",
 				isMobile
 					? "flex w-full bg-fd-muted/[0.15]"
-					: "hidden w-60 shrink-0 lg:flex",
+					: "hidden w-72 shrink-0 lg:flex",
 			)}
 		>
-			<div className="lg:hidden px-3 py-3 pb-1 border-fd-border border-b">
+			<div className="border-fd-border border-b px-3 py-3 pb-1 lg:hidden">
 				<ProductSwitcher pathname={pathname} />
 			</div>
 
@@ -196,8 +206,6 @@ export function Sidebar({
 						pathname,
 					}}
 				>
-
-
 					<AnimatedHoverBackground rect={rect} tabElement={currentEl} />
 
 					<div className="relative z-10 flex flex-col gap-px">
@@ -329,14 +337,15 @@ function ThemeToggle() {
 						key={themeOption.value}
 						onClick={() => setTheme(themeOption.value)}
 						className={cn(
-							"flex h-6 w-6 items-center justify-center rounded-full transition-all duration-200 text-text-sub-600 hover:text-fd-foreground",
-							isSelected && "border border-stroke-soft-100 bg-fd-muted text-fd-foreground",
+							"flex h-6 w-6 items-center justify-center rounded-full text-text-sub-600 transition-all duration-200 hover:text-fd-foreground",
+							isSelected &&
+								"border border-stroke-soft-100 bg-fd-muted text-fd-foreground",
 						)}
 						title={themeOption.label}
 						whileHover={{ scale: 1.05 }}
 						whileTap={{ scale: 0.95 }}
 					>
-						<Icon name={themeOption.icon} className="w-3.5 h-3.5" />
+						<Icon name={themeOption.icon} className="h-3.5 w-3.5" />
 					</motion.button>
 				);
 			})}
@@ -354,7 +363,7 @@ function SidebarSection({
 	if (node.type === "separator") {
 		return (
 			<div className="mt-4 mb-1.5 px-2">
-				<h4 className="font-semibold text-[10px] text-text-sub-600 opacity-60 uppercase tracking-[0.05em]">
+				<h4 className="font-semibold text-[10px] text-text-sub-600 uppercase tracking-[0.05em] opacity-60">
 					{node.name as string}
 				</h4>
 			</div>
@@ -362,14 +371,10 @@ function SidebarSection({
 	}
 
 	if (node.type === "folder") {
-		return (
-			<SidebarFolder node={node} onLinkClick={onLinkClick} />
-		);
+		return <SidebarFolder node={node} onLinkClick={onLinkClick} />;
 	}
 
-	return (
-		<SidebarLink node={node} onLinkClick={onLinkClick} />
-	);
+	return <SidebarLink node={node} onLinkClick={onLinkClick} />;
 }
 
 function findFirstPage(node: PageTreeItem): string | null {
@@ -465,7 +470,9 @@ function SidebarFolder({
 						<span
 							className={cn(
 								"flex h-4 w-4 shrink-0 items-center justify-center transition-colors",
-								isActive ? "text-fd-foreground" : "text-text-sub-600 opacity-70",
+								isActive
+									? "text-fd-foreground"
+									: "text-text-sub-600 opacity-70",
 							)}
 						>
 							{node.icon}
@@ -496,7 +503,9 @@ function SidebarFolder({
 						<div
 							className={cn(
 								"mt-px flex flex-col space-y-px pb-0.5",
-								isDirectlyActive ? "pl-0" : "ml-[14px] border-fd-border/30 border-l pl-3",
+								isDirectlyActive
+									? "pl-0"
+									: "ml-[14px] border-fd-border/30 border-l pl-3",
 							)}
 						>
 							{node.children.map((child: PageTreeItem, index: number) => (
@@ -526,9 +535,7 @@ function SidebarLink({
 
 	if (node.type === "separator") return null;
 	if (node.type === "folder") {
-		return (
-			<SidebarFolder node={node} onLinkClick={onLinkClick} />
-		);
+		return <SidebarFolder node={node} onLinkClick={onLinkClick} />;
 	}
 
 	const linkId = node.url;
@@ -578,7 +585,7 @@ function SidebarLink({
 			{node.method && (
 				<span
 					className={cn(
-						"ml-auto rounded px-1.5 py-0.5 font-bold text-[9px] uppercase tracking-wider relative z-10",
+						"relative z-10 ml-auto rounded px-1.5 py-0.5 font-bold text-[9px] uppercase tracking-wider",
 						node.method === "GET" &&
 							"bg-green-500/10 text-green-600 dark:text-green-400",
 						node.method === "POST" &&
