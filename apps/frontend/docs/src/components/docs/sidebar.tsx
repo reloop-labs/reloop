@@ -131,12 +131,9 @@ export function Sidebar({
 				if (node.type !== "folder") continue;
 				const directlyActive = checkIsActive(node.url, pathname, false);
 				const childActive = node.children.some((c) =>
-					c.type === "page"
-						? checkIsActive(c.url, pathname, false)
-						: false,
+					c.type === "page" ? checkIsActive(c.url, pathname, false) : false,
 				);
-				const deepActive =
-					getActiveFolderUrls(node.children).length > 0;
+				const deepActive = getActiveFolderUrls(node.children).length > 0;
 				if (directlyActive || childActive || deepActive) {
 					result.push(node.url);
 				}
@@ -173,6 +170,17 @@ export function Sidebar({
 			);
 		}
 	}, [openFolders]);
+
+	// Restore scroll position on mount
+	useLayoutEffect(() => {
+		if (!navRef.current) return;
+		if (typeof window !== "undefined") {
+			const savedScroll = sessionStorage.getItem("reloop-sidebar-scroll");
+			if (savedScroll) {
+				navRef.current.scrollTop = Number.parseInt(savedScroll, 10);
+			}
+		}
+	}, []);
 
 	// On navigation: add newly-active folders but never remove any
 	useEffect(() => {
@@ -268,6 +276,14 @@ export function Sidebar({
 				ref={navRef}
 				className="relative flex-1 overflow-y-auto p-2 pt-1"
 				onPointerLeave={() => setHoveredEl(null)}
+				onScroll={() => {
+					if (navRef.current && typeof window !== "undefined") {
+						sessionStorage.setItem(
+							"reloop-sidebar-scroll",
+							navRef.current.scrollTop.toString(),
+						);
+					}
+				}}
 			>
 				<SidebarContext.Provider
 					value={{
@@ -549,9 +565,7 @@ function SidebarFolder({
 						transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
 						style={{ overflow: "hidden" }}
 					>
-						<div
-							className="ml-3.5 mt-px flex flex-col space-y-px border-l border-fd-border/40 pb-0.5 pl-2.5"
-						>
+						<div className="mt-px ml-3.5 flex flex-col space-y-px border-fd-border/40 border-l pb-0.5 pl-2.5">
 							{node.children.map((child: PageTreeItem, index: number) => (
 								<SidebarLink
 									key={index}
