@@ -1,15 +1,15 @@
-import { authMiddleware } from "@be/domain/middleware/auth";
-import { DomainModel } from "@be/domain/model/domain.model";
+import { authMiddleware } from "@reloop/domain/middleware/auth";
+import { DomainModel } from "@reloop/domain/model/domain.model";
 import { Elysia, t } from "elysia";
 import { getDomainController } from "./get-domain.controllers";
 import { getDomainXCodeSamples } from "./get-domain.x-codeSamples";
 
 export const getDomainRoute = new Elysia().use(authMiddleware).get(
 	"/:domain_id",
-	async ({ params: { domain_id }, activeOrganizationId }) => {
+	async ({ params: { domain_id }, organizationId }) => {
 		return await getDomainController({
 			domainId: domain_id,
-			organizationId: activeOrganizationId,
+			organizationId: organizationId,
 		});
 	},
 	{

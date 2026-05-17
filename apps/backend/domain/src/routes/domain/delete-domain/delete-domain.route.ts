@@ -1,15 +1,15 @@
-import { authMiddleware } from "@be/domain/middleware/auth";
-import { DomainModel } from "@be/domain/model/domain.model";
+import { authMiddleware } from "@reloop/domain/middleware/auth";
+import { DomainModel } from "@reloop/domain/model/domain.model";
 import { Elysia, t } from "elysia";
 import { deleteDomainController } from "./delete-domain.controllers";
 import { deleteDomainXCodeSamples } from "./delete-domain.x-codeSamples";
 
 export const deleteDomainRoute = new Elysia().use(authMiddleware).delete(
 	"/:domain_id",
-	async ({ params: { domain_id }, activeOrganizationId }) => {
+	async ({ params: { domain_id }, organizationId }) => {
 		return await deleteDomainController({
 			domainId: domain_id,
-			organizationId: activeOrganizationId,
+			organizationId: organizationId,
 		});
 	},
 	{

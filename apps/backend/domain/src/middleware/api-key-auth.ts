@@ -1,4 +1,4 @@
-import { redis } from "@be/domain/utils/loader";
+import { redis } from "@reloop/domain/utils/loader";
 import { validateApiKey as validateApiKeyShared } from "@reloop/apikey";
 
 export async function validateApiKey(apiKey: string | null | undefined) {

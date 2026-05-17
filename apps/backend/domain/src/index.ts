@@ -1,9 +1,9 @@
 import "dotenv/config";
 import path from "node:path";
-import { domainConfig } from "@be/domain/domain.config";
-import { domainRoutes } from "@be/domain/routes/domain/domain.routes";
-import { landing } from "@be/domain/routes/landing/landing.index";
-import { loader } from "@be/domain/utils/loader";
+import { domainConfig } from "@reloop/domain/domain.config";
+import { domainRoutes } from "@reloop/domain/routes/domain/domain.routes";
+import { landing } from "@reloop/domain/routes/landing/landing.index";
+import { loader } from "@reloop/domain/utils/loader";
 import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 import { Elysia } from "elysia";

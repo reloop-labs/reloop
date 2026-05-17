@@ -1,10 +1,10 @@
-export { generateDKIMKeyPair } from "@be/domain/utils/dkim-key-generator";
+export { generateDKIMKeyPair } from "@reloop/domain/utils/dkim-key-generator";
 export {
 	type DNSRecordData,
 	type GeneratedDNSData,
 	getExistingDNSRecords,
 	insertDNSRecords,
-} from "@be/domain/utils/dns-operations";
+} from "@reloop/domain/utils/dns-operations";
 export {
 	generateAllDNSRecords,
 	generateDKIMRecord,
@@ -12,9 +12,9 @@ export {
 	generateMXRecord,
 	generateReceivingMXRecord,
 	generateSPFRecord,
-} from "@be/domain/utils/dns-record-generator";
+} from "@reloop/domain/utils/dns-record-generator";
 export {
 	getCustomReturnPathSubString,
 	getDomainHost,
 	getDomainSubString,
-} from "@be/domain/utils/domain-formatter";
+} from "@reloop/domain/utils/domain-formatter";

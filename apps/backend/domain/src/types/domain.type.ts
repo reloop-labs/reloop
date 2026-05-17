@@ -1,4 +1,4 @@
-import type { DomainModel } from "@be/domain/model/domain.model";
+import type { DomainModel } from "@reloop/domain/model/domain.model";
 
 export type DomainStatus =
 	| "start-verify"

@@ -1,15 +1,15 @@
-import { authMiddleware } from "@be/domain/middleware/auth";
-import { DomainModel } from "@be/domain/model/domain.model";
+import { authMiddleware } from "@reloop/domain/middleware/auth";
+import { DomainModel } from "@reloop/domain/model/domain.model";
 import { Elysia, t } from "elysia";
 import { updateDomainController } from "./update-domain.controllers";
 import { updateDomainXCodeSamples } from "./update-domain.x-codeSamples";
 
 export const updateDomainRoute = new Elysia().use(authMiddleware).patch(
 	"/:domain_id",
-	async ({ params: { domain_id }, body, activeOrganizationId }) => {
+	async ({ params: { domain_id }, body, organizationId }) => {
 		return await updateDomainController({
 			domainId: domain_id,
-			organizationId: activeOrganizationId,
+			organizationId: organizationId,
 			body,
 		});
 	},

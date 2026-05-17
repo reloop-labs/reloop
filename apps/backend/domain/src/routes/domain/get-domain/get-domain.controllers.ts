@@ -1,5 +1,5 @@
-import { DomainErrors } from "@be/domain/lib/errors";
-import type { DomainTypes } from "@be/domain/types/domain.type";
+import { DomainErrors } from "@reloop/domain/lib/errors";
+import type { DomainTypes } from "@reloop/domain/types/domain.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { DOMAIN_GET_WEBHOOK_EVENT } from "@reloop/webhook-events";

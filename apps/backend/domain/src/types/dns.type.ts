@@ -1,4 +1,4 @@
-import type { DNSModel } from "@be/domain/model/dns.model";
+import type { DNSModel } from "@reloop/domain/model/dns.model";
 export namespace DNSTypes {
 	export type DomainNameserversResponse =
 		typeof DNSModel.domainNameserversResponse.static;

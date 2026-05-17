@@ -1,4 +1,4 @@
-import type { DomainTypes } from "@be/domain/types/domain.type";
+import type { DomainTypes } from "@reloop/domain/types/domain.type";
 import { useLogger } from "evlog/elysia";
 import {
 	checkExistingDomain_step1,

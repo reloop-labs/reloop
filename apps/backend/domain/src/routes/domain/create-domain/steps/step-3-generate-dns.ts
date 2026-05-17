@@ -1,10 +1,10 @@
-import { domainConfig } from "@be/domain/domain.config";
+import { domainConfig } from "@reloop/domain/domain.config";
 import {
 	generateAllDNSRecords,
 	generateReceivingMXRecord,
 	getCustomReturnPathSubString,
 	getDomainHost,
-} from "@be/domain/utils";
+} from "@reloop/domain/utils";
 import { log } from "evlog";
 import { useLogger } from "evlog/elysia";
 

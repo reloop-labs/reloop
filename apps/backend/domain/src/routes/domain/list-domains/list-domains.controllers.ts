@@ -1,4 +1,4 @@
-import type { DomainTypes } from "@be/domain/types/domain.type";
+import type { DomainTypes } from "@reloop/domain/types/domain.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { DOMAIN_LIST_WEBHOOK_EVENT } from "@reloop/webhook-events";

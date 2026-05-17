@@ -1,11 +1,11 @@
-import { authMiddleware } from "@be/domain/middleware/auth";
-import { createDomainRoute } from "@be/domain/routes/domain/create-domain/create-domain.route";
-import { deleteDomainRoute } from "@be/domain/routes/domain/delete-domain/delete-domain.route";
-import { getDomainRoute } from "@be/domain/routes/domain/get-domain/get-domain.route";
-import { getDomainNameserversRoute } from "@be/domain/routes/domain/get-domain-nameserver/get-domain-dns.route";
-import { listDomainsRoute } from "@be/domain/routes/domain/list-domains/list-domains.route";
-import { updateDomainRoute } from "@be/domain/routes/domain/update-domain/update-domain.route";
-import { verifyDNSRecordRoute } from "@be/domain/routes/domain/verify-dns/verify-dns.route";
+import { authMiddleware } from "@reloop/domain/middleware/auth";
+import { createDomainRoute } from "@reloop/domain/routes/domain/create-domain/create-domain.route";
+import { deleteDomainRoute } from "@reloop/domain/routes/domain/delete-domain/delete-domain.route";
+import { getDomainRoute } from "@reloop/domain/routes/domain/get-domain/get-domain.route";
+import { getDomainNameserversRoute } from "@reloop/domain/routes/domain/get-domain-nameserver/get-domain-dns.route";
+import { listDomainsRoute } from "@reloop/domain/routes/domain/list-domains/list-domains.route";
+import { updateDomainRoute } from "@reloop/domain/routes/domain/update-domain/update-domain.route";
+import { verifyDNSRecordRoute } from "@reloop/domain/routes/domain/verify-dns/verify-dns.route";
 import { Elysia } from "elysia";
 
 export const domainRoutes = new Elysia({ prefix: "/v1", name: "DomainRoutes" })

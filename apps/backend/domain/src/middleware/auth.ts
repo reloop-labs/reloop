@@ -1,4 +1,4 @@
-import { domainConfig } from "@be/domain/domain.config";
+import { domainConfig } from "@reloop/domain/domain.config";
 import { Elysia } from "elysia";
 import { evlog } from "evlog/elysia";
 import { validateApiKey } from "./api-key-auth";

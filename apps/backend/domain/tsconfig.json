@@ -15,7 +15,7 @@
 		"declarationMap": false,
 		"baseUrl": "./src",
 		"paths": {
-			"@be/domain/*": ["./*"]
+			"@reloop/domain/*": ["./*"]
 		}
 	}
 }

@@ -1,10 +1,10 @@
-import { domainConfig } from "@be/domain/domain.config";
-import { DNSTypes } from "@be/domain/types/dns.type";
-import { generateDKIMKeyPair } from "@be/domain/utils/dkim-key-generator";
+import { domainConfig } from "@reloop/domain/domain.config";
+import { DNSTypes } from "@reloop/domain/types/dns.type";
+import { generateDKIMKeyPair } from "@reloop/domain/utils/dkim-key-generator";
 import {
 	getDomainHost,
 	getDomainSubString,
-} from "@be/domain/utils/domain-formatter";
+} from "@reloop/domain/utils/domain-formatter";
 
 export async function generateDKIMRecord(
 	domain: string,

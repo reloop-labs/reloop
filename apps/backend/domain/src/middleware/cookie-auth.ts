@@ -1,4 +1,4 @@
-import { domainConfig } from "@be/domain/domain.config";
+import { domainConfig } from "@reloop/domain/domain.config";
 
 export async function validateSession(cookie: string | null) {
 	const response = await fetch(
@@ -22,7 +22,7 @@ export async function validateSession(cookie: string | null) {
 	if (session?.user?.activeOrganizationId) {
 		return {
 			userId: session.user.id,
-			activeOrganizationId: session.user.activeOrganizationId,
+			organizationId: session.user.activeOrganizationId,
 			authType: "auth" as const,
 		};
 	}

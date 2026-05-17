@@ -1,4 +1,4 @@
-import { DomainErrors } from "@be/domain/lib/errors";
+import { DomainErrors } from "@reloop/domain/lib/errors";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { and, eq, isNull } from "drizzle-orm";
