@@ -62,10 +62,10 @@ export const ApiKeyErrors = {
 			why: `The API key "${apiKeyId}" has exceeded its allowed request rate.`,
 			fix: "Wait before retrying, or contact support to adjust your rate limits.",
 		}),
-	createFailed: () =>
+	createFailed: (message?: string) =>
 		createError({
 			status: 500,
-			message: "Failed to create API key",
+			message: message || "Failed to create API key",
 			why: "An unexpected error occurred while inserting the API key into the database.",
 			fix: "Please try again later or contact support if the issue persists.",
 		}),
