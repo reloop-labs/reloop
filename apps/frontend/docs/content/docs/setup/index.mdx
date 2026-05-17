@@ -21,12 +21,22 @@ Before starting, ensure that you have the following installed on your machine:
 
 ## Interactive Walkthrough
 
-Follow these steps sequentially to set up and run Reloop locally.
+Follow these steps sequentially to set up and run the Reloop monorepo in your local environment.
+
+<Callout type="warn" title="Strict Sequential Order Required">
+  Please perform all steps in the exact order listed below to prevent database connectivity errors and routing issues.
+</Callout>
 
 <Steps>
 <Step title="Clone and Install Dependencies">
 
-Clone the Reloop repository and install the dependencies from the root directory using Bun:
+First, verify that your local environment has Bun v1.3.0+ installed:
+
+```bash
+bun --version
+```
+
+Next, clone the repository and install all node modules from the root directory:
 
 ```bash
 git clone git@github.com:reloop-labs/reloop.git
@@ -38,7 +48,7 @@ bun install
 
 <Step title="Configure Local Domain (Hosts File)">
 
-To support secure local sessions and cookie-sharing across multiple microservices without running into CORS issues, you must map `local.reloop.sh` to your local machine (`127.0.0.1`).
+Reloop uses a unified local domain (**`local.reloop.sh`**) and a Caddy reverse proxy to manage session cookies and authentication seamlessly across all microservices. To enable this, you must map `local.reloop.sh` to your loopback address (`127.0.0.1`).
 
 <CodeGroup>
   <CodeBlock title="macOS & Linux">
@@ -54,47 +64,48 @@ To support secure local sessions and cookie-sharing across multiple microservice
 </CodeGroup>
 
 <Callout type="warn" title="System Privileges Required">
-  This command edits system configuration files. You may be prompted to enter your administrator or system password.
+  Modifying your hosts file requires administrator or root privileges. You may be prompted to input your system password.
 </Callout>
 
 </Step>
 
 <Step title="Start Docker Infrastructure">
 
-Reloop relies on backing services (PostgreSQL, Redis, ClickHouse, Loki, Grafana, and Caddy). Ensure Docker is running, then boot the entire local stack from the root directory:
+Reloop relies on several high-performance backing services. Ensure Docker is running on your machine, then spin up the complete infrastructure suite:
 
 ```bash
 bun docker:up
 ```
 
-*If you prefer to run Docker Compose manually, you can also run:*
-```bash
-cd local && docker compose up -d && cd ..
-```
+This boots the following services in the background:
+- **PostgreSQL** (`5432`): Core database for transactional data and auth.
+- **Redis** (`6379`): Cache store, background workers, and session management.
+- **ClickHouse** (`8123`): High-speed analytics and logs database.
+- **Caddy** (`80` / `443`): Auto-SSL gateway and reverse-proxy routing.
+- **Grafana & Loki** (`3000` / `3100`): Log aggregation and service dashboards.
 
-This starts:
-- **PostgreSQL** (`5432`): Core database for users, authentication, and platform metadata.
-- **Redis** (`6379`): In-memory cache, background worker queue, and session store.
-- **ClickHouse** (`8123`): High-performance column-oriented analytics and event log database.
-- **Caddy** (`80` / `443`): Automatic SSL and reverse-proxy routing.
-- **Grafana & Loki** (`3000` / `3100`): Systems dashboards and centralized log aggregation.
+<Callout type="warn" title="Troubleshoot Port Conflicts">
+  Caddy, Postgres, and Redis bind to their standard ports on your host. If you have existing local instances of PostgreSQL (`5432`), Redis (`6379`), or web servers (Nginx/Apache on `80` or `443`) running directly on your host machine, you **must stop them** before starting the Docker container suite.
+</Callout>
 
 </Step>
 
 <Step title="Initialize the Database">
 
-With Docker services running, run the following commands from the **root directory** to apply the database schema (using Drizzle ORM) and seed the initial/default data:
+Before running migrations, wait **5–10 seconds** after starting Docker to ensure PostgreSQL is fully healthy and accepting connections.
+
+Then, apply the database schema (via Drizzle ORM) and seed the initial/default workspace metadata directly from the **root directory**:
 
 ```bash
 # Push the schema changes directly to your local database
 bun db:push
 
-# Populate the database with required default and initial seeding data
+# Populate the database with default workspace and seed data
 bun db:seed
 ```
 
-<Callout type="tip" title="Drizzle Studio">
-  You can visually explore or edit your database tables anytime by opening Drizzle Studio:
+<Callout type="tip" title="Explore Schema via Drizzle Studio">
+  You can inspect your local database tables visually at any time:
   ```bash
   bun db:studio
   ```
@@ -104,52 +115,51 @@ bun db:seed
 
 <Step title="Configure Environment Variables">
 
-Backend and frontend services look for `.env` files inside their respective subdirectories. For local development, copy the `.env.example` configurations.
+Reloop microservices seek `.env` files within their respective subdirectories. We provide two ways to configure them:
 
-For the **Authentication Service** (as an example):
-```bash
-cp apps/backend/auth/env.example apps/backend/auth/.env
-```
-
-<Callout type="info" title="Specific Configurations">
-  Detailed environment guides for features like Stripe billing, Kumomta SMTP, workflows, and uploads are available under the respective backend/frontend setup files in the sidebar.
-</Callout>
+<CodeGroup>
+  <CodeBlock title="Option A: Automatic Setup (Recommended)">
+  ```bash
+  # Automatically generates all service .env files from their .env.dev templates in 1 click
+  bun env:setup
+  ```
+  </CodeBlock>
+  
+  <CodeBlock title="Option B: Manual Copying">
+  If you prefer to copy them manually, duplicate the `.env.dev` templates to `.env` in the target directories. For example, for the Auth Service:
+  ```bash
+  cp apps/backend/auth/.env.dev apps/backend/auth/.env
+  ```
+  </CodeBlock>
+</CodeGroup>
 
 </Step>
 
 <Step title="Start Reloop Services">
 
-Reloop provides multiple options to start development servers. You can start all microservices together, run frontend or backend suites separately, or boot specific components individually.
+Run the development servers concurrently using Turborepo from the root directory:
+
+```bash
+bun dev
+```
+
+If you only wish to work on frontend or backend subsystems, you can run them separately:
 
 <CodeGroup>
-  <CodeBlock title="Option A: Start All (Standard)">
+  <CodeBlock title="Frontends Only">
   ```bash
-  # Concurrently starts all frontend & backend services via Turbo
-  bun dev
-  ```
-  </CodeBlock>
-
-  <CodeBlock title="Option B: Frontends Only">
-  ```bash
-  # Concurrently starts web app, user dashboard, admin dashboard, and docs
   bun frontend:dev
   ```
   </CodeBlock>
 
-  <CodeBlock title="Option C: Backends Only">
+  <CodeBlock title="Backends Only">
   ```bash
-  # Concurrently starts all backend microservice API instances
   bun backend:dev
   ```
   </CodeBlock>
 </CodeGroup>
 
-<Callout type="tip" title="Starting Individual Services">
-  If you are only working on one service and want to save system resources, you can target it directly using Bun filters:
-  - **Auth API**: `bun be:auth:dev`
-  - **Dashboard Front**: `bun fe:dashboard:dev`
-  - **Domain API**: `bun be:domain:dev`
-</Callout>
+Once running, your entire secure Reloop portal is unified and accessible at [https://local.reloop.sh](https://local.reloop.sh)!
 
 </Step>
 </Steps>
@@ -158,27 +168,68 @@ Reloop provides multiple options to start development servers. You can start all
 
 ## Service URLs and Ports Reference
 
-Once the services are running, they are available on the following local ports and URLs:
+Once your development servers are running, they are accessible through the unified gateway domain or via their direct localhost ports.
 
-### Frontend Applications
+### Unified Domain Routing (Recommended)
 
-| Application | URL | Port | Description |
+Thanks to the Caddy reverse proxy, you can access the entire unified platform securely under a single local domain ([https://local.reloop.sh](https://local.reloop.sh)). This is the recommended entrypoint as it manages cookie sharing and CORS seamlessly:
+
+| Route Path | Destination | Target Port | Description |
 | :--- | :--- | :--- | :--- |
-| **Web App** | http://localhost:3000 | `3000` | Main public website and marketing pages |
-| **Admin Dashboard** | http://localhost:3001 | `3001` | System administrator dashboard for user/system management |
-| **User Dashboard** | http://localhost:3002 | `3002` | Main client app (workspaces, lists, campaigns) |
-| **Public Docs** | http://localhost:3003 | `3003` | This developer/public documentation portal |
-| **Dev Docs** | http://localhost:3004 | `3004` | Internal developer documentation reference site |
+| [https://local.reloop.sh/](https://local.reloop.sh/) | **Web App** | `3000` | Main public marketing pages & landing site |
+| [https://local.reloop.sh/dashboard](https://local.reloop.sh/dashboard) | **User Dashboard** | `3001` | Core workspace, campaigns, and user dashboard app |
+| [https://local.reloop.sh/docs](https://local.reloop.sh/docs) | **Public Docs** | `3003` | This developer/public documentation portal |
+| [https://local.reloop.sh/api/auth](https://local.reloop.sh/api/auth) | **Auth API** | `8000` | User auth, sessions, Better Auth handler |
+| [https://local.reloop.sh/api/...](https://local.reloop.sh/api/...) | **Microservice APIs** | `8011` - `8023` | Dynamic routes to individual backend APIs |
 
-### Backend API Services
+---
 
-| Service | URL | Port | Description |
+### Direct Frontend Applications
+
+If you need to access frontend applications directly without the Caddy proxy:
+
+| Application | Direct URL | Port | Description |
 | :--- | :--- | :--- | :--- |
-| **Auth API** | http://localhost:4001 | `4001` | User signup, signin, permissions, and Better Auth |
-| **Domain API** | http://localhost:4002 | `4002` | Domain delegation, DKIM, and DNS verification service |
-| **Audience API** | http://localhost:4003 | `4003` | Recipient groups, segmentation, and list managers |
-| **Webhook API** | http://localhost:4004 | `4004` | Outgoing system notifications and HTTP POST triggers |
-| **Mail API** | http://localhost:4005 | `4005` | Dynamic HTML generation and SMTP queuing |
+| **Web App** | [http://localhost:3000](http://localhost:3000) | `3000` | Marketing website and public content |
+| **User Dashboard** | [http://localhost:3001](http://localhost:3001) | `3001` | Main client app (workspaces, lists, campaigns) |
+| **Public Docs** | [http://localhost:3003](http://localhost:3003) | `3003` | This developer/public documentation portal |
+
+---
+
+### Direct Backend API Services
+
+Backend microservices receive API requests from the frontend via the Caddy proxy at [https://local.reloop.sh/api/...](https://local.reloop.sh/api/...). However, you can also query them directly at their raw localhost ports:
+
+| Service Name | Caddy Route | Raw Port | Description |
+| :--- | :--- | :--- | :--- |
+| **Auth API** | `/api/auth` | `8000` | Better Auth handlers and user management |
+| **Domain API** | `/api/domain` | `8011` | Custom domain delegation & DKIM verification |
+| **API Key API** | `/api/api-key` | `8012` | External and internal API key provisioning |
+| **Webhook API** | `/api/webhook` | `8013` | Webhook ingress and dispatching handlers |
+| **Contacts API** | `/api/contacts` | `8014` | Recipient groups, segments, and contact listings |
+| **Mailing API** | `/api/mail` | `8015` | Campaign engine, SMTP queues, and sending pipeline |
+| **Logs API** | `/api/logs` | `8016` | Event logger and ClickHouse query service |
+| **Workflow API** | `/api/workflow` | `8017` | Automation workflows and state engines |
+| **Upload API** | `/api/upload` | `8018` | File upload storage manager and CDN endpoints |
+| **Template API** | `/api/template` | `8019` | Visual email builder & templates repository |
+| **Kumomta API** | `/api/kumomta` | `8021` | Kumomta mail server synchronization hook |
+| **Email API** | `/api/email` | `8022` | Direct transactional email handler |
+| **Billing API** | `/api/billing` | `8023` | Stripe subscriptions and billing integration |
+
+---
+
+### Backing Infrastructure Services
+
+These supporting systems are hosted inside Docker containers and run as your backend services' dependencies:
+
+| Service | Port | Description |
+| :--- | :--- | :--- |
+| **PostgreSQL** | `5432` | Primary relational database |
+| **Redis** | `6379` | Cache and BullMQ background task queue |
+| **ClickHouse** | `8123` | High-volume analytical tracking database |
+| **NATS** | `4222` | Core messaging bus / pub-sub broker |
+| **Loki** | `3100` | Log aggregation engine |
+| **Grafana** | `3000` (Direct) | Infrastructure metrics dashboards |
 
 ---
 
@@ -189,6 +240,7 @@ Keep these core monorepo commands handy for routine tasks:
 | Command | Action | Scope |
 | :--- | :--- | :--- |
 | `bun run check` | Run code quality checks, lints, and format checks | Full Monorepo |
+| `bun env:setup` | Automatically populate all backend microservice `.env` files | Environments |
 | `bun db:push` | Synchronize current schema changes to PostgreSQL | Database |
 | `bun db:seed` | Re-seed the local database with default data | Database |
 | `bun docker:down` | Stop and tear down all docker containers | Infrastructure |

@@ -238,6 +238,7 @@
 		"frontend:dev": "turbo dev --filter='dashboard' --filter='docs' --filter='web'",
 		"backend:dev": "turbo dev --filter='contacts' --filter='auth' --filter='domain' --filter='mailing' --filter='kumomta' --filter='webhook' --filter='api-key' --filter='logs' --filter='upload' --filter='template' --filter='mailing' --filter='billing' --filter='email' --filter='workflow'",
 		"dev": "turbo dev --filter='dashboard' --filter='docs' --filter='web' --filter='contacts' --filter='auth' --filter='domain' --filter='mailing' --filter='kumomta' --filter='webhook' --filter='api-key' --filter='logs' --filter='upload' --filter='template' --filter='mailing' --filter='billing' --filter='email' --filter='workflow'",
+		"env:setup": "bash local/setup.sh",
 		"docker:up": "docker compose -f local/docker-compose.yml up -d",
 		"docker:down": "docker compose -f local/docker-compose.yml down",
 		"db:push": "bun run --filter=@reloop/db push",

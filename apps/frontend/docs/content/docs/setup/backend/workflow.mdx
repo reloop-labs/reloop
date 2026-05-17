@@ -1,86 +1,109 @@
 ---
-title: Workflow
-description: Learn how to set up and run the Reloop workflow service locally and in production.
+title: Workflow Automation Setup
+description: Learn how to set up, configure, and run the Reloop workflow automation service locally.
 ---
 
-# Automation Workflow Service
+The **Workflow Automation Service** is an **ElysiaJS** microservice that coordinates, schedules, and executes multi-step marketing automation journeys (such as drip email campaigns, delay timers, segment shifts, and profile updates). It is powered by BullMQ and exposes an administrative Bull Board UI.
 
-> Coordinates, schedules, and executes multi-step customer automation flows (such as drip campaigns, delayed follow-up emails, list segmentation transitions, and field updates). It is powered by BullMQ and exposes an administrative Bull Board UI.
-
-<Callout type="info" title="Prerequisite">
-Make sure you've completed the [local setup guide](/setup) first and have PostgreSQL and Redis running.
+<Callout type="info" title="Prerequisite First">
+  Before starting the Workflow Service, make sure you've completed the base [Local Development Setup](/setup) (installed Bun, configured the hosts file, and started the Docker container stack).
 </Callout>
 
 ---
 
 ## Quick Start
 
-```bash
-# One command to get started
-cd apps/backend/workflow && cp env.example .env && bun i && bun dev
-```
+Dependencies are handled globally at the root directory. You can start the Workflow Service development server instantly:
 
-* The service will be available at [http://localhost:8017/api/workflow](http://localhost:8017/api/workflow) 🎉
-* The Bull Board queue monitor is at [http://localhost:8017/api/workflow/bull-board](http://localhost:8017/api/workflow/bull-board) 📊
+<CodeGroup>
+  <CodeBlock title="From Monorepo Root (Recommended)">
+  ```bash
+  # Start the dev server with hot reloading
+  bun be:workflow:dev
+  ```
+  </CodeBlock>
+
+  <CodeBlock title="From the Service Folder">
+  ```bash
+  cd apps/backend/workflow
+  bun dev
+  ```
+  </CodeBlock>
+</CodeGroup>
+
+Once running, the Workflow Service will listen locally on port `8017`. You can query it via Caddy at [https://local.reloop.sh/api/workflow](https://local.reloop.sh/api/workflow) 🎉
+
+* The administrative Bull Board dashboard will be active at [https://local.reloop.sh/api/workflow/bull-board](https://local.reloop.sh/api/workflow/bull-board) 📊
 
 ---
 
-## Service Info
+## Service Information
 
-* **Location:** `/apps/backend/workflow`
-* **Port:** `8017` (configurable)
-* **Tech Stack:** Elysia.js, BullMQ (delayed task scheduler), Bull Board (UI monitor), PostgreSQL, NATS
-* **Part of Monorepo:** Yes (run with filters or inside service dir)
-* **API Base:** `/api/workflow`
+* **Directory Location:** `apps/backend/workflow/`
+* **Local Listening Port:** `8017` (configurable with `PORT` env variable)
+* **Unified Access Route:** [https://local.reloop.sh/api/workflow](https://local.reloop.sh/api/workflow)
+* **Primary Tech Stack:** ElysiaJS, BullMQ, Redis, PostgreSQL, NATS
+* **Dependencies:** Relies on PostgreSQL (to query workflows and triggers) and Redis (to schedule BullMQ delayed jobs).
 
 ---
 
-## Environment Setup
+## Environment Configuration
 
-Create `.env` file inside `/apps/backend/workflow`:
+The Workflow Service environment variables are defined in `apps/backend/workflow/.env`. If you ran `bun env:setup` at the root, your `.env` is already configured:
 
 ```bash
-PORT=8017
-NODE_ENV=development
+# Database & Cache Configurations
 PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
 REDIS_URL=redis://:reloop123@localhost:6379
-BASE_URL=https://local.reloop.sh
+
+# Server Gateway Configuration
+PORT=8017
+BASE_URL="https://local.reloop.sh"
+NODE_ENV=development
+NODE_TLS_REJECT_UNAUTHORIZED=0
+
+# Event Bus Broker
 NATS_URL=nats://localhost:4222
 ```
 
-| Variable | Required | Description |
-| :--- | :--- | :--- |
-| `PORT` | `YES` | Port the workflow server listens on (defaults to `8017`). |
-| `REDIS_URL` | `YES` | Redis connection URL utilized by BullMQ to hold workflow delay states and job records. |
-| `PG_URL` | `YES` | PostgreSQL database connection string. |
-| `NATS_URL` | `YES` | NATS broker URL for reacting to workflow triggers (e.g., contact created, email sent). |
+### Reference Table
+
+| Variable | Required | Default Value | Description |
+| :--- | :--- | :--- | :--- |
+| `PG_URL` | **YES** | `postgresql://...` | PostgreSQL database connection string. |
+| `REDIS_URL` | **YES** | `redis://...` | Redis connection URL utilized by BullMQ to hold delay state timers. |
+| `PORT` | **YES** | `8017` | Local port number the Elysia app listens to on the host. |
+| `BASE_URL` | **YES** | `https://local.reloop.sh` | Main application domain (used for cookie validations). |
+| `NATS_URL` | **YES** | `nats://localhost:4222` | Connection URL for NATS event bus messaging. |
+| `NODE_ENV` | **YES** | `development` | Active environment scope (`development` or `production`). |
 
 ---
 
 ## Development Commands
 
-```bash
-# Install dependencies
-bun i
+All workspace operations should be executed from the **monorepo root directory** using Turborepo filters:
 
-# Start dev server with hot reload
-bun dev
-# or from monorepo root
-bun run be:workflow:dev
-# or using turbo filter
-bun run --filter=workflow dev
-
-# Build for production
-bun run build
-# or from monorepo root
-bun run be:workflow:build
-```
+| Command | Action | Scope |
+| :--- | :--- | :--- |
+| `bun be:workflow:dev` | Start the Workflow dev server with hot reloading | Development |
+| `bun run --filter=workflow build` | Compile the Workflow service for production | Production |
+| `bun run --filter=workflow start` | Run the compiled production build locally | Production |
+| `bun run --filter=workflow check-types` | Verify TypeScript type-safety | Code Quality |
 
 ---
 
-## Architecture details
+## Interactive API Docs (Swagger)
 
-- **BullMQ Workers**: Executes background workers picking up automation node execution tasks (e.g. delay timer nodes, conditional check branches, email sending actions).
-- **Delayed Scheduling**: Relies on Redis to coordinate precise delay timings (e.g. "Wait 3 days before sending the next email").
-- **Queue Admin Console**: Mounts the **Bull Board** interface locally at `/api/workflow/bull-board` so developers can inspect failed workflow runs, force retries, and monitor throughput.
-- **NATS Integration**: Hooks into incoming platform streams to trigger flows dynamically based on real-time customer behavior (e.g. "Trigger Welcome Drip when a contact is added to the newsletter list").
+The Workflow Service publishes dynamic Swagger documentation directly from ElysiaJS. To test endpoints and query API structures:
+
+1. Open your browser and navigate to the interactive Swagger playground at [https://local.reloop.sh/api/workflow/openapi](https://local.reloop.sh/api/workflow/openapi) (or [http://localhost:8017/api/workflow/openapi](http://localhost:8017/api/workflow/openapi) directly).
+2. Use the interactive Swagger UI playground to run queries and inspect request schemas.
+
+---
+
+## Architecture & Operational Details
+
+* **BullMQ Async Workers**: Executes workflow pipelines in the background. If a step requires actions (such as sending a newsletter or waiting for a delivery trigger), the worker splits and delegates.
+* **Accurate Delay Scheduling**: Relies on Redis delayed queues to run precise time loops (e.g. *"Wait 72 hours before executing the follow-up email node"*), ensuring high horizontal scalability without CPU blocking.
+* **Bull Board Administration**: Integrates **Bull Board** directly into Elysia, exposing it at `/api/workflow/bull-board`. Developers can inspect active, delayed, completed, or failed queue jobs, and trigger manual retries.
+* **Event Broker Reactive Triggers**: Hooks directly into NATS streams to start customer journeys reactively based on platform updates (e.g. `"Trigger Welcome Workflow when contact.created event is received"`).

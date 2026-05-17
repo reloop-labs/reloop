@@ -1,43 +1,55 @@
 ---
-title: Docs
-description: Learn how to set up and run the Reloop documentation service locally and in production.
+title: Documentation Portal Setup
+description: Learn how to set up, configure, and run the Reloop developer documentation service locally.
 ---
 
-# Documentation Service
+The **Documentation Service** is a high-performance **Next.js** application that serves Reloop's public-facing guides, API sandbox resources, developer onboarding flows, and technical references. It parses static MDX content structures dynamically and integrates beautifully with the platform routing.
 
-> Powers Reloop's public-facing documentation, API references, user tutorials, and local development guides. This Next.js application serves as the primary technical reference hub for developers and customers using Reloop.
-
-<Callout type="info" title="Prerequisite">
-Make sure you've completed the [local setup guide](/setup) first.
+<Callout type="info" title="Prerequisite First">
+  Before starting the Documentation app, make sure you've completed the base [Local Development Setup](/setup) and have the global Bun runtime installed.
 </Callout>
 
 ---
 
 ## Quick Start
 
-```bash
-# One command to get started
-cd apps/frontend/docs && bun i && bun dev
-```
+Dependencies are handled globally at the root directory. You can start the Documentation portal development server instantly:
 
-Open [http://localhost:3003](http://localhost:3003) or [https://local.reloop.sh/docs](https://local.reloop.sh/docs) 🎉
+<CodeGroup>
+  <CodeBlock title="From Monorepo Root (Recommended)">
+  ```bash
+  # Start the dev server with Next.js Turbo hot reloading
+  bun fe:docs:dev
+  ```
+  </CodeBlock>
+
+  <CodeBlock title="From the Service Folder">
+  ```bash
+  cd apps/frontend/docs
+  bun dev
+  ```
+  </CodeBlock>
+</CodeGroup>
+
+Once running, the Documentation service will listen on port `3003` locally. You can access the interface through the Caddy proxy at [https://local.reloop.sh/docs](https://local.reloop.sh/docs) (or directly at [http://localhost:3003](http://localhost:3003)) 🎉
 
 ---
 
-## Service Info
+## Service Information
 
-* **Location:** `/apps/frontend/docs`
-* **Port:** `3003` (configurable in `package.json` with `--port=3003`)
-* **Tech Stack:** Next.js (App Router), MDX, Tailwind CSS, Mintlify Components, Shiki (code syntax highlighting)
-* **Part of Monorepo:** Yes (run with filters or inside service dir)
+* **Directory Location:** `apps/frontend/docs/`
+* **Local Listening Port:** `3003` (configured via `--port=3003` in the dev script)
+* **Unified Access Route:** [https://local.reloop.sh/docs](https://local.reloop.sh/docs)
+* **Primary Tech Stack:** Next.js (App Router), MDX parsing engine, Tailwind CSS, Mintlify Components, Shiki
+* **Dependencies:** Self-contained static site generator; utilizes Caddy for seamless unified local domain integration.
 
 ---
 
 ## Environment Setup
 
-The documentation service doesn't require complex environment variables for local development, as it relies on statically compiled MDX files located under `content/docs/`. However, if you are integrating dynamic API endpoints or search:
+The Documentation service compiles MDX files locally from the workspace and does not strictly require active backend databases for basic reading. However, for complete path resolution:
 
-Create `.env` file inside `/apps/frontend/docs` if needed:
+Create a `.env` file inside `/apps/frontend/docs`:
 ```bash
 NEXT_PUBLIC_APP_URL="https://local.reloop.sh"
 ```
@@ -46,46 +58,40 @@ NEXT_PUBLIC_APP_URL="https://local.reloop.sh"
 
 ## Development Commands
 
-```bash
-# Install dependencies
-bun i
+All workspace operations should be executed from the **monorepo root directory** using Turborepo filters:
 
-# Start dev server with hot reload
-bun dev
-# or from monorepo root
-bun run fe:docs:dev
-# or using turbo filter
-bun run --filter=docs dev
-
-# Build for production
-bun run build
-# or from monorepo root
-bun run fe:docs:build
-
-# Start production server locally
-bun run start
-# or from monorepo root
-bun run fe:docs:start
-```
+| Command | Action | Scope |
+| :--- | :--- | :--- |
+| `bun fe:docs:dev` | Start the Docs Next.js app in Turbopack development mode | Development |
+| `bun run --filter=docs build` | Compile and validate the MDX files for production static delivery | Production |
+| `bun run --filter=docs start` | Run the compiled production build locally | Production |
+| `bun run --filter=docs generate:api-docs` | Regenerate API specification pages from OpenAPI schemas | Tools |
 
 ---
 
-## Content Organization
+## Documentation File & Folder Structure
 
-* **MDX Content**: All documentation pages are located in `/apps/frontend/docs/content/docs/`
-* **Setup Section**: This set of setup documentation lives under `/apps/frontend/docs/content/docs/setup/`
-* **Sidebar Navigation**: Navigation headers and order are configured in the `meta.json` files within their respective content directories.
+* **MDX Pages location**: All page contents are authored in `/apps/frontend/docs/content/docs/`.
+* **Local Setup Guides**: The step-by-step setup guides you are reading right now live in `/apps/frontend/docs/content/docs/setup/`.
+* **Sidebar Navigation Control**: The sidebar directory lists, titles, and ordering rules are managed directly within the local **`meta.json`** files inside each folder level.
 
 ---
 
-## Troubleshooting
+## Troubleshooting Guide
 
-### Port Issues
-**Port already in use?**
+### Port `3003` Conflict
+If the port is occupied, identify and clear the PID manually:
+
 ```bash
-# Check what's using port 3003
+# Locate the process listening on port 3003
 lsof -i :3003
 
-# Kill the process
+# Force terminate
 kill -9 <PID>
 ```
+
+### Navigation Sidebar Hydration Flicker
+If sidebar lists show flicker during page loads:
+* Check that your local browser cache is refreshed.
+* The sidebar navigation tree compiles recursively. Ensure all subfolders have valid `meta.json` files matching MDX filename keys.
+* Run `bun run --filter=docs build` to confirm there are no syntax or type compilation errors within any MDX page files.

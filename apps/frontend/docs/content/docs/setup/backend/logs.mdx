@@ -1,93 +1,119 @@
 ---
-title: Logs & Analytics
-description: Learn how to set up and run the Reloop logs and analytics service locally and in production.
+title: Logs & Analytics Service Setup
+description: Learn how to set up, configure, and run the Reloop logs and analytics service locally.
 ---
 
-# Logs & Analytics Service
+The **Logs & Analytics Service** is an **ElysiaJS** microservice that acts as the platform's high-performance analytical engine. It consumes delivery events, tracking signals, and system audits to structure them into **ClickHouse** for fast, low-latency aggregations.
 
-> Collects, stores, indexes, and queries transactional mail logs, email open/click tracking events, bounce statistics, and audit trails. It is powered by ClickHouse to enable high-throughput analytical query processing.
-
-<Callout type="info" title="Prerequisite">
-Make sure you've completed the [local setup guide](/setup) and have ClickHouse running inside your Docker environment.
+<Callout type="info" title="Prerequisite First">
+  Before starting the Logs Service, make sure you have completed the base [Local Development Setup](/setup) and have ClickHouse running inside your Docker container stack (`bun docker:up`).
 </Callout>
 
 ---
 
 ## Quick Start
 
-```bash
-# One command to get started
-cd apps/backend/logs && cp env.example .env && bun i && bun dev
-```
+Dependencies are handled globally at the root directory. You can start the Logs Service development server instantly:
 
-The service will be available at [http://localhost:8016/api/logs](http://localhost:8016/api/logs) or [https://local.reloop.sh/api/logs](https://local.reloop.sh/api/logs) 🎉
+<CodeGroup>
+  <CodeBlock title="From Monorepo Root (Recommended)">
+  ```bash
+  # Start the dev server with hot reloading
+  bun run --filter=logs dev
+  ```
+  </CodeBlock>
+
+  <CodeBlock title="From the Service Folder">
+  ```bash
+  cd apps/backend/logs
+  bun dev
+  ```
+  </CodeBlock>
+</CodeGroup>
+
+Once running, the Logs Service will listen locally on port `8016`. You can query it via Caddy at [https://local.reloop.sh/api/logs](https://local.reloop.sh/api/logs) 🎉
 
 ---
 
-## Service Info
+## Service Information
 
-* **Location:** `/apps/backend/logs`
-* **Port:** `8016` (configurable)
-* **Tech Stack:** Elysia.js, ClickHouse, Redis, NATS
-* **Part of Monorepo:** Yes (run with filters or inside service dir)
-* **API Base:** `/api/logs`
+* **Directory Location:** `apps/backend/logs/`
+* **Local Listening Port:** `8016` (configurable with `PORT` env variable)
+* **Unified Access Route:** [https://local.reloop.sh/api/logs](https://local.reloop.sh/api/logs)
+* **Primary Tech Stack:** ElysiaJS, ClickHouse, Redis, NATS
+* **Dependencies:** Relies on ClickHouse (as the primary columnar analytical store) and NATS (to subscribe to real-time delivery and click event buses).
 
 ---
 
-## Environment Setup
+## Environment Configuration
 
-Create `.env` file inside `/apps/backend/logs`:
+The Logs Service environment variables are defined in `apps/backend/logs/.env`. If you ran `bun env:setup` at the root, your `.env` is already configured:
 
 ```bash
-PORT=8016
-NODE_ENV=development
-REDIS_URL=redis://:reloop123@localhost:6379
-BASE_URL=https://local.reloop.sh
-NATS_URL=nats://localhost:4222
-
-# ClickHouse Configuration
+# Columnar Analytical DB Configurations
 CLICKHOUSE_URL=http://localhost:8123
 CLICKHOUSE_USER=default
 CLICKHOUSE_PASSWORD=reloop123
-CLICKHOUSE_DB=reloop
+CLICKHOUSE_DATABASE=reloop
+
+# Cache Configurations
+REDIS_URL=redis://:reloop123@localhost:6379
+
+# Server Gateway Configuration
+PORT=8016
+BASE_URL="https://local.reloop.sh"
+NODE_ENV=development
+
+# Event Bus Broker
+NATS_URL=nats://localhost:4222
 ```
 
-| Variable | Required | Description |
-| :--- | :--- | :--- |
-| `PORT` | `YES` | Port the logging server listens on (defaults to `8016`). |
-| `CLICKHOUSE_URL` | `YES` | HTTP connection URL for ClickHouse analytical DB (defaults to `http://localhost:8123`). |
-| `CLICKHOUSE_USER` | `YES` | ClickHouse user (defaults to `default`). |
-| `CLICKHOUSE_PASSWORD`| `YES` | ClickHouse password (defaults to `reloop123`). |
-| `CLICKHOUSE_DB` | `YES` | ClickHouse database name (defaults to `reloop`). |
+### Reference Table
+
+| Variable | Required | Default Value | Description |
+| :--- | :--- | :--- | :--- |
+| `CLICKHOUSE_URL` | **YES** | `http://localhost:8123` | ClickHouse server HTTP connection URL. |
+| `CLICKHOUSE_USER` | **YES** | `default` | ClickHouse authenticated database user. |
+| `CLICKHOUSE_PASSWORD`| **YES** | `reloop123` | ClickHouse authenticated user password. |
+| `CLICKHOUSE_DATABASE`| **YES** | `reloop` | The active ClickHouse database schema target. |
+| `REDIS_URL` | **YES** | `redis://...` | Redis connection URL for temporary log queues. |
+| `PORT` | **YES** | `8016` | Local port number the Elysia app listens to on the host. |
+| `BASE_URL` | **YES** | `https://local.reloop.sh` | Main application domain (used for cookie validations). |
+| `NATS_URL` | **YES** | `nats://localhost:4222` | Connection URL for NATS event bus messaging. |
+| `NODE_ENV` | **YES** | `development` | Active environment scope (`development` or `production`). |
 
 ---
 
 ## Development Commands
 
-```bash
-# Install dependencies
-bun i
+All workspace operations should be executed from the **monorepo root directory** using Turborepo filters:
 
-# Start dev server with hot reload
-bun dev
-# or from monorepo root
-bun run --filter=logs dev
-
-# Start production server locally
-bun run start
-# or from monorepo root
-bun run be:logs:start
-```
+| Command | Action | Scope |
+| :--- | :--- | :--- |
+| `bun run --filter=logs dev` | Start the Logs dev server with hot reloading | Development |
+| `bun run --filter=logs build` | Compile the Logs service for production | Production |
+| `bun run --filter=logs start` | Run the compiled production build locally | Production |
+| `bun run --filter=logs check-types` | Verify TypeScript type-safety | Code Quality |
 
 ---
 
-## ClickHouse Schema & Events
+## Interactive API Docs (Swagger)
 
-- **High-throughput Analytics**: The service listens to delivery streams via **NATS** (`kumomta.event.*` and `tracking.*`) and batches log insertions into ClickHouse tables to optimize performance.
-- **Tracked Events**:
-  - `sent`: Record of a successfully injected outbound email.
-  - `delivered`: KumoMTA delivery receipt confirmation.
-  - `bounce`: Record of hard/soft bounces.
-  - `complaint`: Spam complaints received via feedback loops.
-  - `open`/`click`: User tracking pixels and URL redirect clicks (tracked by the `mailing` gateway).
-- **Log Querying**: Exposes powerful endpoints queried by the user `dashboard` to display real-time campaign performance charts and searchable delivery records.
+The Logs Service publishes dynamic Swagger documentation directly from ElysiaJS. To test endpoints and query API structures:
+
+1. Open your browser and navigate to the interactive Swagger playground at [https://local.reloop.sh/api/logs/openapi](https://local.reloop.sh/api/logs/openapi) (or [http://localhost:8016/api/logs/openapi](http://localhost:8016/api/logs/openapi) directly).
+2. Use the interactive Swagger UI playground to run queries and inspect request schemas.
+
+---
+
+## ClickHouse Schema & Events Processing
+
+* **Columnar Querying Architecture**: Built to handle billions of analytical rows, batching insertions from the event queues every 1-5 seconds to optimize disk writes.
+* **Tracked Event Types**:
+  * `sent`: Confirms that an outbound campaign job was generated.
+  * `delivered`: Records MTA SMTP success handshakes.
+  * `bounce`: Logs soft bounces (temporary failures) or hard bounces (invalid addresses).
+  * `complaint`: Tracks user spam feedback loops.
+  * `open`: Recorded when the 1px transparent tracking gif is requested from Caddy.
+  * `click`: Fired when a customer interacts with signed tracking URLs redirection gateways.
+* **Dashboard Aggregations**: Exposes optimized SQL aggregation endpoints queried by the customer dashboard to construct charts, tracking stats, bounce ratios, and delivery ledger logs.

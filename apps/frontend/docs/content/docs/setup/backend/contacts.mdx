@@ -1,86 +1,107 @@
 ---
-title: Contacts
-description: Learn how to set up and run the Reloop contacts service locally and in production.
+title: Contacts Service Setup
+description: Learn how to set up, configure, and run the Reloop contacts service locally.
 ---
 
-# Contacts & Audience Service
+The **Contacts Service** is an **ElysiaJS** microservice that manages subscriber profiles, static lists, custom properties, dynamic segmentation, and opt-out/unsubscribe logs. It forms the core database for recipient audience targeting within the Reloop platform.
 
-> Manages contacts, subscriber lists, custom subscription attributes, segments, and unsubscribe configurations. It forms the backbone of recipient audience targeting within Reloop.
-
-<Callout type="info" title="Prerequisite">
-Make sure you've completed the [local setup guide](/setup) first.
+<Callout type="info" title="Prerequisite First">
+  Before starting the Contacts Service, make sure you've completed the base [Local Development Setup](/setup) (installed Bun, configured the hosts file, and started the Docker container stack).
 </Callout>
 
 ---
 
 ## Quick Start
 
-```bash
-# One command to get started
-cd apps/backend/contacts && cp env.example .env && bun i && bun dev
-```
+Dependencies are handled globally at the root directory. You can start the Contacts Service development server instantly:
 
-The service will be available at [http://localhost:8014/api/contacts](http://localhost:8014/api/contacts) or [https://local.reloop.sh/api/contacts](https://local.reloop.sh/api/contacts) 🎉
+<CodeGroup>
+  <CodeBlock title="From Monorepo Root (Recommended)">
+  ```bash
+  # Start the dev server with hot reloading
+  bun be:contacts:dev
+  ```
+  </CodeBlock>
+
+  <CodeBlock title="From the Service Folder">
+  ```bash
+  cd apps/backend/contacts
+  bun dev
+  ```
+  </CodeBlock>
+</CodeGroup>
+
+Once running, the Contacts Service will listen locally on port `8014`. You can query it via Caddy at [https://local.reloop.sh/api/contacts](https://local.reloop.sh/api/contacts) 🎉
 
 ---
 
-## Service Info
+## Service Information
 
-* **Location:** `/apps/backend/contacts`
-* **Port:** `8014` (configurable)
-* **Tech Stack:** Elysia.js, PostgreSQL, Redis, NATS
-* **Part of Monorepo:** Yes (run with filters or inside service dir)
-* **API Base:** `/api/contacts`
+* **Directory Location:** `apps/backend/contacts/`
+* **Local Listening Port:** `8014` (configurable with `PORT` env variable)
+* **Unified Access Route:** [https://local.reloop.sh/api/contacts](https://local.reloop.sh/api/contacts)
+* **Primary Tech Stack:** ElysiaJS, PostgreSQL, Redis, NATS
+* **Dependencies:** Relies on PostgreSQL (to store contact relational data) and Redis (to store segment cache and temporary list metadata).
 
 ---
 
-## Environment Setup
+## Environment Configuration
 
-Create `.env` file inside `/apps/backend/contacts`:
+The Contacts Service environment variables are defined in `apps/backend/contacts/.env`. If you ran `bun env:setup` at the root, your `.env` is already configured:
 
 ```bash
-PORT=8014
-NODE_ENV=development
+# Database & Cache Configurations
 PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
 REDIS_URL=redis://:reloop123@localhost:6379
-BASE_URL=https://local.reloop.sh
+
+# Server Gateway Configuration
+PORT=8014
+BASE_URL="https://local.reloop.sh"
+NODE_ENV=development
+NODE_TLS_REJECT_UNAUTHORIZED=0
+
+# Event Bus Broker
 NATS_URL=nats://localhost:4222
 ```
 
-| Variable | Required | Description |
-| :--- | :--- | :--- |
-| `PORT` | `YES` | Port the contacts server listens on (defaults to `8014`). |
-| `PG_URL` | `YES` | PostgreSQL connection string for querying contact data. |
-| `REDIS_URL` | `YES` | Redis URL for caching list count and audience metadata. |
-| `NATS_URL` | `YES` | NATS message broker URL for broadcasting contact import and lifecycle events. |
-| `BASE_URL` | `YES` | Reloop platform base URL. |
+### Reference Table
+
+| Variable | Required | Default Value | Description |
+| :--- | :--- | :--- | :--- |
+| `PG_URL` | **YES** | `postgresql://...` | PostgreSQL database connection string. |
+| `REDIS_URL` | **YES** | `redis://...` | Redis connection URL for segmentation cache queries. |
+| `PORT` | **YES** | `8014` | Local port number the Elysia app listens to on the host. |
+| `BASE_URL` | **YES** | `https://local.reloop.sh` | Main application domain (used for cookie validations). |
+| `NATS_URL` | **YES** | `nats://localhost:4222` | Connection URL for NATS event bus messaging. |
+| `NODE_ENV` | **YES** | `development` | Active environment scope (`development` or `production`). |
 
 ---
 
 ## Development Commands
 
-```bash
-# Install dependencies
-bun i
+All workspace operations should be executed from the **monorepo root directory** using Turborepo filters:
 
-# Start dev server with hot reload
-bun dev
-# or from monorepo root
-bun run be:contacts:dev
-# or using turbo filter
-bun run --filter=contacts dev
-
-# Build for production
-bun run build
-# or from monorepo root
-bun run be:contacts:build
-```
+| Command | Action | Scope |
+| :--- | :--- | :--- |
+| `bun be:contacts:dev` | Start the Contacts dev server with hot reloading | Development |
+| `bun run --filter=contacts build` | Compile the Contacts service for production | Production |
+| `bun run --filter=contacts start` | Run the compiled production build locally | Production |
+| `bun run --filter=contacts check-types` | Verify TypeScript type-safety | Code Quality |
 
 ---
 
-## Service Capabilities
+## Interactive API Docs (Swagger)
 
-- **Subscriber List Management**: Creating, updating, and grouping subscribers into static lists or dynamic query-based segments.
-- **Custom Attributes & Schema**: Allows users to define custom database columns (such as `first_name`, `company`, `last_purchase_date`) on a per-contact basis.
-- **NATS Streaming**: Fires events on list imports, deletions, or subscription changes (e.g. opt-in/opt-out status), which can be consumed by mailing campaigns or analytics engines.
-- **Database Schema**: Leverages PostgreSQL tables under `@reloop/db` schema, primarily `contact`, `list`, `list_contact`, and `custom_field`.
+The Contacts Service publishes dynamic Swagger documentation directly from ElysiaJS. To test endpoints and query API structures:
+
+1. Open your browser and navigate to the interactive Swagger playground at [https://local.reloop.sh/api/contacts/openapi](https://local.reloop.sh/api/contacts/openapi) (or [http://localhost:8014/api/contacts/openapi](http://localhost:8014/api/contacts/openapi) directly).
+2. Use the interactive Swagger UI playground to run queries and inspect request schemas.
+
+---
+
+## Service Capabilities Explained
+
+* **Subscriber List Management**: Creating, updating, and grouping subscribers into static lists or dynamic query-based segments (filtering by traits like active state, country, or custom tag parameters).
+* **Extensible Schema Attributes**: Allows users to define custom attribute fields (such as `first_name`, `company`, `last_purchase_date`) on a per-contact basis, mapping them correctly during bulk campaign compilation.
+* **NATS Broadcast Streaming**: Fires broker notifications on list uploads, contact deletions, or subscription changes (opt-in/opt-out status) to automatically notify downstream workflow and email engines.
+* **Database Models**: Interfaces with `@reloop/db` PostgreSQL tables, primarily manipulating metadata inside `contact`, `list`, `list_contact`, and `custom_field`.

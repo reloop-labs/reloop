@@ -1,88 +1,109 @@
 ---
-title: Webhook
-description: Learn how to set up and run the Reloop webhook service locally and in production.
+title: Webhook Service Setup
+description: Learn how to set up, configure, and run the Reloop webhook service locally.
 ---
 
-# Webhook Delivery Service
+The **Webhook Delivery Service** is an **ElysiaJS** microservice that manages the scheduling, formatting, cryptographical signing, and dispatching of outbound event webhooks to developer callback URLs. It listens for system-wide events and processes delivery retries using BullMQ.
 
-> Manages the scheduling, formatting, signing, and dispatching of outbound event webhooks to developer callback URLs. It listens for system-wide events and processes delivery retries using BullMQ.
-
-<Callout type="info" title="Prerequisite">
-Make sure you've completed the [local setup guide](/setup) first and have PostgreSQL and Redis running.
+<Callout type="info" title="Prerequisite First">
+  Before configuring the Webhook Service, make sure you've completed the base [Local Development Setup](/setup) (installed Bun, configured the hosts file, and started the Docker container stack).
 </Callout>
 
 ---
 
 ## Quick Start
 
-```bash
-# One command to get started
-cd apps/backend/webhook && cp env.example .env && bun i && bun dev
-```
+Dependencies are handled globally at the root directory. You can start the Webhook Service development server instantly:
 
-The service will be available at [http://localhost:8013/api/webhook](http://localhost:8013/api/webhook) or [https://local.reloop.sh/api/webhook](https://local.reloop.sh/api/webhook) 🎉
+<CodeGroup>
+  <CodeBlock title="From Monorepo Root (Recommended)">
+  ```bash
+  # Start the dev server with hot reloading
+  bun be:webhook:dev
+  ```
+  </CodeBlock>
+
+  <CodeBlock title="From the Service Folder">
+  ```bash
+  cd apps/backend/webhook
+  bun dev
+  ```
+  </CodeBlock>
+</CodeGroup>
+
+Once running, the Webhook Service will listen locally on port `8013`. You can query it via Caddy at [https://local.reloop.sh/api/webhook](https://local.reloop.sh/api/webhook) 🎉
 
 ---
 
-## Service Info
+## Service Information
 
-* **Location:** `/apps/backend/webhook`
-* **Port:** `8013` (configurable)
-* **Tech Stack:** Elysia.js, BullMQ (job queuing), Redis (queue state), PostgreSQL, NATS (event broker)
-* **Part of Monorepo:** Yes (run with filters or inside service dir)
-* **API Base:** `/api/webhook`
+* **Directory Location:** `apps/backend/webhook/`
+* **Local Listening Port:** `8013` (configurable with `PORT` env variable)
+* **Unified Access Route:** [https://local.reloop.sh/api/webhook](https://local.reloop.sh/api/webhook)
+* **Primary Tech Stack:** ElysiaJS, BullMQ, Redis, PostgreSQL, NATS
+* **Dependencies:** Relies on PostgreSQL (to query subscriber callback targets) and Redis (to schedule and process BullMQ delivery jobs).
 
 ---
 
-## Environment Setup
+## Environment Configuration
 
-Create `.env` file inside `/apps/backend/webhook`:
+The Webhook Service environment variables are defined in `apps/backend/webhook/.env`. If you ran `bun env:setup` at the root, your `.env` is already configured:
 
 ```bash
-PORT=8013
-NODE_ENV=development
+# Database & Cache Configurations
 PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
 REDIS_URL=redis://:reloop123@localhost:6379
-BASE_URL=https://local.reloop.sh
-NATS_URL=nats://localhost:4222
+
+# Server Gateway Configuration
+PORT=8013
+BASE_URL="https://local.reloop.sh"
+NODE_ENV=development
 NODE_TLS_REJECT_UNAUTHORIZED=0
+
+# Event Bus Broker
+NATS_URL=nats://localhost:4222
 ```
 
-| Variable | Required | Description |
-| :--- | :--- | :--- |
-| `PORT` | `YES` | Port the webhook server listens on (defaults to `8013`). |
-| `REDIS_URL` | `YES` | Redis connection URL used by BullMQ to schedule webhook delivery jobs. |
-| `PG_URL` | `YES` | PostgreSQL database connection string. |
-| `NATS_URL` | `YES` | NATS message broker URL to subscribe to system event topics. |
-| `NODE_TLS_REJECT_UNAUTHORIZED` | `NO` | Allows self-signed certificates in dev mode (defaults to `0`). |
+### Reference Table
+
+| Variable | Required | Default Value | Description |
+| :--- | :--- | :--- | :--- |
+| `PG_URL` | **YES** | `postgresql://...` | PostgreSQL database connection string. |
+| `REDIS_URL` | **YES** | `redis://...` | Redis connection URL used by BullMQ to schedule delivery jobs. |
+| `PORT` | **YES** | `8013` | Local port number the Elysia app listens to on the host. |
+| `BASE_URL` | **YES** | `https://local.reloop.sh` | Main application domain (used for cookie validations). |
+| `NATS_URL` | **YES** | `nats://localhost:4222` | Connection URL for NATS event bus messaging. |
+| `NODE_TLS_REJECT_UNAUTHORIZED` | **NO** | `0` | Allows self-signed certificates in local development mode. |
+| `NODE_ENV` | **YES** | `development` | Active environment scope (`development` or `production`). |
 
 ---
 
 ## Development Commands
 
-```bash
-# Install dependencies
-bun i
+All workspace operations should be executed from the **monorepo root directory** using Turborepo filters:
 
-# Start dev server with hot reload
-bun dev
-# or from monorepo root
-bun run be:webhook:dev
-# or using turbo filter
-bun run --filter=webhook dev
+| Command | Action | Scope |
+| :--- | :--- | :--- |
+| `bun be:webhook:dev` | Start the Webhook dev server with hot reloading | Development |
+| `bun run --filter=webhook build` | Compile the Webhook service for production | Production |
+| `bun run --filter=webhook start` | Run the compiled production build locally | Production |
+| `bun run --filter=webhook check-types` | Verify TypeScript type-safety | Code Quality |
 
-# Build for production
-bun run build
-# or from monorepo root
-bun run be:webhook:build
-```
+---
+
+## Interactive API Docs (Swagger)
+
+The Webhook Service publishes dynamic Swagger documentation directly from ElysiaJS. To test endpoints and query API structures:
+
+1. Open your browser and navigate to the interactive Swagger playground at [https://local.reloop.sh/api/webhook/openapi](https://local.reloop.sh/api/webhook/openapi) (or [http://localhost:8013/api/webhook/openapi](http://localhost:8013/api/webhook/openapi) directly).
+2. Use the interactive Swagger UI playground to run queries and inspect request schemas.
 
 ---
 
 ## Core Operational Mechanics
 
-1. **Event Capture**: The service subscribes to core event buses via **NATS** (e.g. `kumomta.event.*`, `tracking.*`).
-2. **Subscription Matcher**: For every captured event, the database is queried to find matching customer webhook configurations (`webhook_subscription` table).
-3. **Queue Scheduling**: If subscription endpoints are configured, a job is generated and dispatched to the **BullMQ** queue (`webhook-delivery-queue`).
-4. **Outbound Attempt**: A worker picks up the job, signs the payload using the customer's shared signing secret (`x-reloop-signature` header), and attempts HTTP POST injection.
-5. **Retry / Fallbacks**: Failed deliveries are retried automatically using exponential backoff throttling (configured inside `queues/webhook.queue.ts`).
+1. **Event Capture**: The service captures real-time campaign dispatches, click logs, and delivery notifications by subscribing to core NATS subjects (`kumomta.event.*`, `tracking.*`).
+2. **Subscription Matcher**: For every captured event, the PostgreSQL database is queried to find matching customer webhook configurations in the `webhook_subscription` table.
+3. **Queue Scheduling**: If an active subscriber matches the trigger event, a delivery payload is constructed and scheduled in BullMQ (`webhook-delivery-queue`) in Redis.
+4. **Signed Outbound Attempt**: A background BullMQ worker pulls the job, signs the payload string using the customer's shared subscription secret (`x-reloop-signature` header), and dispatches it over HTTP POST.
+5. **Robust Retry Loop**: If the destination server returns a non-2xx response, the worker registers a fail state, scheduling automated retries using exponential backoff (configured in `queues/webhook.queue.ts`).

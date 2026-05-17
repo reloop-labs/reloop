@@ -1,143 +1,103 @@
 ---
-title: Web
-description: Learn how to set up and run the Reloop frontend web service locally and in production.
+title: Marketing Web Setup
+description: Learn how to set up, configure, and run the Reloop frontend marketing web service locally.
 ---
 
-# Frontend Web Service
+The **Marketing Web Service** is a premium **Next.js** frontend application that powers Reloop's main landing pages, pricing grids, feature checklists, public-facing collateral, and SEO-optimized web layers.
 
-> Powers Reloop's landing pages, marketing sites, and public-facing web interfaces. This Next.js application serves as the primary entry point for users discovering and engaging with the Reloop platform.
-
-<Callout type="info" title="Prerequisite">
-Make sure you've completed the [local setup guide](/setup) first (clone repo, install Bun, and set up dependencies).
+<Callout type="info" title="Prerequisite First">
+  Before starting the Marketing Web app, make sure you've completed the base [Local Development Setup](/setup) and have the Bun package manager configured globally.
 </Callout>
 
 ---
-// integrate video how to run the service
+
 ## Quick Start
 
-```bash
-# One command to get started
-cd apps/frontend/web && cp .env.example .env && bun i && bun dev
-```
+Dependencies are handled globally at the root directory. You can start the Marketing Web development server instantly:
 
-Open [http://localhost:3000](http://localhost:3000) 🎉
+<CodeGroup>
+  <CodeBlock title="From Monorepo Root (Recommended)">
+  ```bash
+  # Start the dev server with Turbopack hot reloading
+  bun fe:web:dev
+  ```
+  </CodeBlock>
+
+  <CodeBlock title="From the Service Folder">
+  ```bash
+  cd apps/frontend/web
+  bun dev
+  ```
+  </CodeBlock>
+</CodeGroup>
+
+Once running, the Marketing Web service will listen on port `3000` locally. You can access it through the Caddy proxy at [https://local.reloop.sh](https://local.reloop.sh) (or directly at [http://localhost:3000](http://localhost:3000)) 🎉
 
 ---
 
-## Service Info
+## Service Information
 
-* **Location:** `/apps/frontend/web`
-* **Port:** `3000` (configurable in `package.json`)
-* **Tech Stack Guide:** [Frontend Technologies](/setup/tech-stack#frontend-technologies)
-* **Part of Monorepo:** Yes (run with filters or inside service dir)
+* **Directory Location:** `apps/frontend/web/`
+* **Local Listening Port:** `3000` (configured via `--port=3000` in the dev script)
+* **Unified Access Route:** [https://local.reloop.sh](https://local.reloop.sh)
+* **Primary Tech Stack:** Next.js (with Turbopack), React 19, Tailwind CSS, Framer Motion, Calligraph
+* **Dependencies:** Relies on Caddy to proxy OAuth and subscriber cookie validations smoothly with the backend microservices.
 
 ---
 
 ## Environment Setup
 
-Create `.env` file:
+The Marketing Web environment variables are defined inside `apps/frontend/web/.env`. A standard local development `.env` file looks as follows:
 
 ```bash
-# Development
-NEXT_PUBLIC_WEB_URL="http://localhost:3000"
-NEXT_PUBLIC_API_URL="http://localhost:3001"
+# Base URL targeting the client layer
+NEXT_PUBLIC_WEB_URL="https://local.reloop.sh"
 
-# Production
-NEXT_PUBLIC_WEB_URL="https://reloop.sh"
-NEXT_PUBLIC_API_URL="https://api.reloop.sh"
+# API Gateway Endpoint URL
+NEXT_PUBLIC_API_URL="https://local.reloop.sh/api"
 
-# Optional: Analytics & Monitoring
+# Optional: Analytics tracking
 NEXT_PUBLIC_ANALYTICS_ID=""
 ```
 
-| Variable                   | Required | Description                                          |
-| -------------------------- | -------- | ---------------------------------------------------- |
-| `NEXT_PUBLIC_WEB_URL`      | ✅        | Base URL for frontend, used in redirects & API calls |
-| `NEXT_PUBLIC_API_URL`      | ✅        | Backend API endpoint for data fetching               |
-| `NEXT_PUBLIC_ANALYTICS_ID` | ❌        | Analytics tracking ID (Google Analytics, etc.)      |
+### Reference Table
+
+| Variable | Required | Default Value | Description |
+| :--- | :--- | :--- | :--- |
+| `NEXT_PUBLIC_WEB_URL` | **YES** | `https://local.reloop.sh` | Core marketing site URL path. |
+| `NEXT_PUBLIC_API_URL` | **YES** | `https://local.reloop.sh/api` | API proxy endpoint routing to ElysiaJS microservices. |
+| `NEXT_PUBLIC_ANALYTICS_ID`| **NO** | `""` | Optional Google Analytics or tracking pixel identifier. |
 
 ---
 
 ## Development Commands
 
-```bash
-# Install dependencies
-bun i
+All workspace operations should be executed from the **monorepo root directory** using Turborepo filters:
 
-# Start dev server
-bun dev
-# or from monorepo root with filter
-bun run --filter=web dev
-
-# Build for production
-bun run build
-# or from monorepo root
-bun run --filter=web build
-
-# Start production server locally
-bun run start
-# or from monorepo root
-bun run --filter=web start
-
-# Run tests
-bun run test
-bun run test:watch  # Watch mode
-
-# Lint & format code
-bun run lint && bun run format
-
-# Type checking
-bun run type-check
-```
+| Command | Action | Scope |
+| :--- | :--- | :--- |
+| `bun fe:web:dev` | Start the Marketing Web Next.js app in Turbopack development mode | Development |
+| `bun run --filter=web build` | Compile the Marketing Web app for production static deployment | Production |
+| `bun run --filter=web start` | Run the compiled production build locally | Production |
+| `bun run --filter=web lint` | Run Next.js linting checks | Code Quality |
 
 ---
 
-## Troubleshooting
+## Troubleshooting Guide
 
-### Port Issues
-**Port already in use?**
+### Port `3000` Conflict
+If the terminal throws a port binding conflict, identify and clear the PID using port `3000`:
+
 ```bash
-# Check what's using the port
+# Inspect process listening on port 3000
 lsof -i :3000
 
-# Kill the process (replace PID)
+# Terminate process manually
 kill -9 <PID>
-
-# Or update port in package.json
 ```
 
-```json
-{
-  "scripts": {
-    "dev": "next dev -p 3003"
-  }
-}
-```
-
-### Build/Install Issues
-**Bun install fails?**
-```bash
-# Clear cache and reinstall
-rm -rf ~/.bun/install/cache
-rm -rf node_modules
-bun i
-
-# Check Bun version
-bun --version
-```
-
-## Notes
-
-* This service is part of the **Reloop monorepo** - changes here may affect other services
-* Commands can be run inside this directory or from the root using filters
-* Always set up `.env` before starting development
-* Keep the API service running when developing features that require data fetching
-
-
-## Contributing
-
-* Always run `bun lint && bun format` before committing
-* Keep environment files (`.env.example`) up to date if new vars are added
-* Test your changes across different screen sizes
-* Verify API integrations work with latest backend changes
-* Update this documentation when adding new features or workflows
+### Caddy Routing Issues
+If navigating to `https://local.reloop.sh` triggers bad gateway errors:
+1. Ensure the Caddy container stack is healthy (`bun docker:up`).
+2. Verify that your `/etc/hosts` file maps `local.reloop.sh` correctly to `127.0.0.1`.
+3. Check that the `web` server is active and running on port `3000`.

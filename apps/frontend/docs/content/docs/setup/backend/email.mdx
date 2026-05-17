@@ -1,91 +1,115 @@
 ---
-title: Email
-description: Learn how to set up and run the Reloop system transactional email service locally and in production.
+title: Email Service Setup
+description: Learn how to set up, configure, and run the Reloop system transactional email service locally.
 ---
 
-# System Transactional Email Service
+The **Email Service** is an **ElysiaJS** microservice responsible for dispatching platform transactional emails—such as organization invitations, password reset links, verification codes, and billing alerts—directly to Reloop's own platform users.
 
-> Responsible for dispatching system-level transactional emails (such as verification links, password resets, billing alerts, and domain verification notifications) directly to Reloop's own platform users.
+<Callout type="warning" title="Important Distinction">
+  Do not confuse this with the **Mailing Service**!
+  * **Email Service (`email`)**: Direct platform notification service that listens to system NATS topics to email Reloop customers.
+  * **Mailing Service (`mailing`)**: High-throughput public API that allows Reloop customers to send campaigns to *their* audiences.
+</Callout>
 
-<Callout type="warning" title="Distinction">
-Do not confuse this with **Mailing**!
-- **Email Service (`email`)**: Internal transactional service that listens to system NATS topics and emails Reloop users.
-- **Mailing Service (`mailing`)**: Public API that allows Reloop customers to send bulk campaigns or transaction messages to *their* audiences.
+<Callout type="info" title="Prerequisite First">
+  Before starting the Email Service, make sure you've completed the base [Local Development Setup](/setup) (installed Bun, configured the hosts file, and started the Docker container stack).
 </Callout>
 
 ---
 
 ## Quick Start
 
-```bash
-# One command to get started
-cd apps/backend/email && cp env.example .env && bun i && bun dev
-```
+Dependencies are handled globally at the root directory. You can start the Email Service development server instantly:
 
-The service will be available at [http://localhost:8022/api/email](http://localhost:8022/api/email) or [https://local.reloop.sh/api/email](https://local.reloop.sh/api/email) 🎉
+<CodeGroup>
+  <CodeBlock title="From Monorepo Root (Recommended)">
+  ```bash
+  # Start the dev server with hot reloading
+  bun be:email:dev
+  ```
+  </CodeBlock>
+
+  <CodeBlock title="From the Service Folder">
+  ```bash
+  cd apps/backend/email
+  bun dev
+  ```
+  </CodeBlock>
+</CodeGroup>
+
+Once running, the Email Service will listen locally on port `8022`. You can query it via Caddy at [https://local.reloop.sh/api/email](https://local.reloop.sh/api/email) 🎉
 
 ---
 
-## Service Info
+## Service Information
 
-* **Location:** `/apps/backend/email`
-* **Port:** `8022` (configurable with `EMAIL_PORT` env variable)
-* **Tech Stack:** Elysia.js, NATS (event subscription), Redis
-* **Part of Monorepo:** Yes (run with filters or inside service dir)
-* **API Base:** `/api/email`
+* **Directory Location:** `apps/backend/email/`
+* **Local Listening Port:** `8022` (configurable with `EMAIL_PORT` env variable)
+* **Unified Access Route:** [https://local.reloop.sh/api/email](https://local.reloop.sh/api/email)
+* **Primary Tech Stack:** ElysiaJS, NATS (for event subscriptions), Redis
+* **Dependencies:** Relies on Redis (for rate limiting system requests) and NATS (to subscribe to system trigger events).
 
 ---
 
-## Environment Setup
+## Environment Configuration
 
-Create `.env` file inside `/apps/backend/email`:
+The Email Service environment variables are defined in `apps/backend/email/.env`. If you ran `bun env:setup` at the root, your `.env` is already configured:
 
 ```bash
+# App Configuration
 EMAIL_PORT=8022
 NODE_ENV=development
+BASE_URL="https://local.reloop.sh"
+
+# Event Bus Broker
 NATS_URL=nats://localhost:4222
-REDIS_URL=redis://:reloop123@localhost:6379
-BASE_URL=https://local.reloop.sh
+
+# System Keys & Senders
 RELOOP_API_KEY=your-system-reloop-api-key
 RELOOP_SENDER_DOMAIN=local.reloop.sh
 ```
 
-| Variable | Required | Description |
-| :--- | :--- | :--- |
-| `EMAIL_PORT` | `YES` | Port the email server listens on (defaults to `8022`). |
-| `NATS_URL` | `YES` | NATS message broker URL to subscribe to system event topics. |
-| `RELOOP_API_KEY` | `YES` | Internal API key used to authorize transactional mail delivery requests. |
-| `RELOOP_SENDER_DOMAIN` | `YES` | Base domain used in the "From" header of system transactional emails. |
+### Reference Table
+
+| Variable | Required | Default Value | Description |
+| :--- | :--- | :--- | :--- |
+| `EMAIL_PORT` | **YES** | `8022` | Local port number the Elysia app listens to on the host. |
+| `BASE_URL` | **YES** | `https://local.reloop.sh` | Main application domain (used for cookie validations). |
+| `NATS_URL` | **YES** | `nats://localhost:4222` | Connection URL for NATS event bus messaging. |
+| `RELOOP_API_KEY` | **YES** | `(empty)` | Internal API key used to authorize transactional mail delivery requests. |
+| `RELOOP_SENDER_DOMAIN` | **YES** | `(empty)` | Base domain used in the "From" header of system transactional emails. |
+| `NODE_ENV` | **YES** | `development` | Active environment scope (`development` or `production`). |
 
 ---
 
 ## Development Commands
 
-```bash
-# Install dependencies
-bun i
+All workspace operations should be executed from the **monorepo root directory** using Turborepo filters:
 
-# Start dev server with hot reload
-bun dev
-# or from monorepo root
-bun run be:email:dev
-# or using turbo filter
-bun run --filter=email dev
+| Command | Action | Scope |
+| :--- | :--- | :--- |
+| `bun be:email:dev` | Start the Email dev server with hot reloading | Development |
+| `bun run --filter=email build` | Compile the Email service for production | Production |
+| `bun run --filter=email start` | Run the compiled production build locally | Production |
+| `bun run --filter=email check-types` | Verify TypeScript type-safety | Code Quality |
 
-# Build for production
-bun run build
-# or from monorepo root
-bun run be:email:build
-```
+---
+
+## Interactive API Docs (Swagger)
+
+The Email Service publishes dynamic Swagger documentation directly from ElysiaJS. To test endpoints and query API structures:
+
+1. Open your browser and navigate to the interactive Swagger playground at [https://local.reloop.sh/api/email/openapi](https://local.reloop.sh/api/email/openapi) (or [http://localhost:8022/api/email/openapi](http://localhost:8022/api/email/openapi) directly).
+2. Use the interactive Swagger UI playground to run queries and inspect request schemas.
 
 ---
 
 ## NATS Event Subscriptions
 
-The service reactive-processes events by listening to the following NATS subjects:
+The Email Service is strictly reactive. It listens to core subjects published by other microservices over the **NATS** broker to dispatch emails:
 
-1. **`auth.*`**: Listens for authentication events, sending magic links and verification codes to users signing in.
-2. **`api-key.*`**: Sends notifications when new API keys are generated or revoked.
-3. **`domain.*`**: Triggers warnings when domain DNS checks fail, or confirmation notes once verified.
-4. **`billing.*`**: Dispatches system emails alerting administrators of failed top-ups or depleted credit balances.
-5. **`organization.*`**: Handles invitation emails when users are invited to join an organization.
+* **`auth.*`**: Listens for authentication events, sending magic links and verification codes to users signing in.
+* **`api-key.*`**: Sends notifications when new API keys are generated or revoked.
+* **`domain.*`**: Triggers warnings when domain DNS checks fail, or confirmation notes once verified.
+* **`billing.*`**: Dispatches system emails alerting administrators of failed top-ups or depleted credit balances.
+* **`organization.*`**: Handles invitation emails when users are invited to join an organization.

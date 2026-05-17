@@ -1,98 +1,111 @@
 ---
-title: Mailing
-description: Learn how to set up and run the Reloop mailing service locally and in production.
+title: Mailing Service Setup
+description: Learn how to set up, configure, and run the Reloop mailing service locally.
 ---
 
-# Mailing Service
+The **Mailing Service** is an **ElysiaJS** microservice that handles bulk outbound campaign dispatching, job queuing, and campaign delivery logic. It authenticates sending requests, compiles custom templates with recipient metadata, injects tracking links, and feeds the outbound queues.
 
-> Handles outbound email injection requests triggered by Reloop's customers. It performs core rate-limiting checks, fetches and compiles templates, inserts open/click tracking headers/pixels, signs or processes custom SPF/DKIM verification, and injects outbound jobs into the KumoMTA server.
-
-<Callout type="info" title="Prerequisite">
-Make sure you've completed the [local setup guide](/setup) first.
+<Callout type="info" title="Prerequisite First">
+  Before starting the Mailing Service, make sure you've completed the base [Local Development Setup](/setup) (installed Bun, configured the hosts file, and started the Docker container stack).
 </Callout>
 
 ---
 
 ## Quick Start
 
-```bash
-# One command to get started
-cd apps/backend/mailing && cp env.example .env && bun i && bun dev
-```
+Dependencies are handled globally at the root directory. You can start the Mailing Service development server instantly:
 
-The service will be available at [http://localhost:8015/api/mail](http://localhost:8015/api/mail) or [https://local.reloop.sh/api/mail](https://local.reloop.sh/api/mail) 🎉
+<CodeGroup>
+  <CodeBlock title="From Monorepo Root (Recommended)">
+  ```bash
+  # Start the dev server with hot reloading
+  bun be:mailing:dev
+  ```
+  </CodeBlock>
+
+  <CodeBlock title="From the Service Folder">
+  ```bash
+  cd apps/backend/mailing
+  bun dev
+  ```
+  </CodeBlock>
+</CodeGroup>
+
+Once running, the Mailing Service will listen locally on port `8015`. You can query it via Caddy at [https://local.reloop.sh/api/mail](https://local.reloop.sh/api/mail) 🎉
 
 ---
 
-## Service Info
+## Service Information
 
-* **Location:** `/apps/backend/mailing`
-* **Port:** `8015` (configurable)
-* **Tech Stack:** Elysia.js, PostgreSQL, Redis, NATS, BullMQ, rate-limiter
-* **Part of Monorepo:** Yes (run with filters or inside service dir)
-* **API Base:** `/api/mail`
+* **Directory Location:** `apps/backend/mailing/`
+* **Local Listening Port:** `8015` (ElysiaJS gateway)
+* **Unified Access Route:** [https://local.reloop.sh/api/mail](https://local.reloop.sh/api/mail)
+* **Primary Tech Stack:** ElysiaJS, PostgreSQL, Redis, NATS, BullMQ
+* **Dependencies:** Relies on PostgreSQL (to fetch campaigns), Redis (for job queues & rate limiting), NATS (for event streams), and Kumomta (MTA engine at [http://localhost:8020](http://localhost:8020)).
 
 ---
 
-## Environment Setup
+## Environment Configuration
 
-Create `.env` file inside `/apps/backend/mailing`:
+The Mailing Service environment variables are defined in `apps/backend/mailing/.env`. If you ran `bun env:setup` at the root, your `.env` is already configured:
 
 ```bash
-PORT=8015
-NODE_ENV=development
+# Database & Cache Configurations
 PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
 REDIS_URL=redis://:reloop123@localhost:6379
-BASE_URL=https://local.reloop.sh
-KUMOMTA_HTTP_URL=http://localhost:8020
-TRACKING_SECRET=reloop_tracking_secret_default_123
 
-# Rate Limiting Controls
-RATE_LIMIT_IP_MAX=20
-RATE_LIMIT_IP_WINDOW_SECONDS=60
-RATE_LIMIT_ORG_MAX=100
-RATE_LIMIT_ORG_WINDOW_SECONDS=60
-RATE_LIMIT_ORG_DAILY_MAX=5000
-RATE_LIMIT_USER_MAX=50
-RATE_LIMIT_USER_WINDOW_SECONDS=60
-RATE_LIMIT_GLOBAL_MAX=500
-RATE_LIMIT_GLOBAL_WINDOW_SECONDS=60
+# Server Gateway Configuration
+PORT=8015
+BASE_URL="https://local.reloop.sh"
+NODE_ENV=development
+
+# Event Bus Broker
+NATS_URL=nats://localhost:4222
+
+# MTA Engine Connection
+KUMOMTA_HTTP_URL=http://localhost:8020
 ```
 
-| Variable | Required | Description |
-| :--- | :--- | :--- |
-| `PORT` | `YES` | Port the mailing gateway listens on (defaults to `8015`). |
-| `KUMOMTA_HTTP_URL` | `YES` | HTTP URL of the local KumoMTA SMTP engine (port `8020`). |
-| `TRACKING_SECRET` | `YES` | Secret string utilized to cryptographically sign open/click tracking URLs. |
-| `RATE_LIMIT_ORG_DAILY_MAX` | `YES` | Total maximum emails an organization is allowed to send per 24 hours. |
+### Reference Table
+
+| Variable | Required | Default Value | Description |
+| :--- | :--- | :--- | :--- |
+| `PG_URL` | **YES** | `postgresql://...` | PostgreSQL database connection string. |
+| `REDIS_URL` | **YES** | `redis://...` | Redis cache and queue manager connection URL. |
+| `PORT` | **YES** | `8015` | Local port number the Elysia app listens to on the host. |
+| `BASE_URL` | **YES** | `https://local.reloop.sh` | Main application domain (used for cookie validations). |
+| `NATS_URL` | **YES** | `nats://localhost:4222` | Connection URL for NATS event bus messaging. |
+| `KUMOMTA_HTTP_URL` | **YES** | `http://localhost:8020` | HTTP URL of the local Kumomta SMTP engine. |
+| `NODE_ENV` | **YES** | `development` | Active environment scope (`development` or `production`). |
 
 ---
 
 ## Development Commands
 
-```bash
-# Install dependencies
-bun i
+All workspace operations should be executed from the **monorepo root directory** using Turborepo filters:
 
-# Start dev server with hot reload
-bun dev
-# or from monorepo root
-bun run be:mailing:dev
-# or using turbo filter
-bun run --filter=mailing dev
+| Command | Action | Scope |
+| :--- | :--- | :--- |
+| `bun be:mailing:dev` | Start the Mailing dev server with hot reloading | Development |
+| `bun run --filter=mailing build` | Compile the Mailing service for production | Production |
+| `bun run --filter=mailing start` | Run the compiled production build locally | Production |
+| `bun run --filter=mailing check-types` | Verify TypeScript type-safety | Code Quality |
 
-# Build for production
-bun run build
-# or from monorepo root
-bun run be:mailing:build
-```
+---
+
+## Interactive API Docs (Swagger)
+
+The Mailing Service publishes dynamic Swagger documentation directly from ElysiaJS. To test endpoints and query API structures:
+
+1. Open your browser and navigate to the interactive Swagger playground at [https://local.reloop.sh/api/mail/openapi](https://local.reloop.sh/api/mail/openapi) (or [http://localhost:8015/api/mail/openapi](http://localhost:8015/api/mail/openapi) directly).
+2. Use the interactive Swagger UI playground to run queries and inspect request schemas.
 
 ---
 
 ## Core Operational Flow
 
-1. **Authentication**: Incoming customer requests are authenticated using developer API keys verified against the `api-key` service.
-2. **Quota / Rate Limiting**: Redis is queried to verify global, IP, tenant, and daily email send quotas are respected.
-3. **Template Compilation**: If sending via template, the `template` service is called to compile custom fields (`{{ first_name }}`, etc.) inside the HTML.
-4. **Tracking Injection**: Tracking pixels are injected into HTML, and hyperlinks are wrapped in signed redirection targets (routing back to `https://local.reloop.sh/api/mail/click`).
-5. **SMTP Dispatch**: The compiled, tracked message is pushed to KumoMTA for physical delivery.
+1. **Authentication**: Incoming requests to send campaign emails are validated using developer API keys or active dashboard user sessions.
+2. **Template Compilation**: Merges recipient custom tags (e.g. `{{ first_name }}`) with templates using the `@reloop/ui` layouts.
+3. **Link & Click Injection**: Outbound HTML is modified to inject tracking pixels and secure redirect links wrapping active hyperlinks (redirecting clicks back to `https://local.reloop.sh/api/mail/click`).
+4. **BullMQ Queue Management**: Outbound campaigns are segmented into individual jobs and pushed to BullMQ queues inside Redis to balance system load.
+5. **MTA Dispatch**: The job queue worker pops active mail targets and dispatches compiled tracked payloads to Kumomta (`http://localhost:8020`) for SMTP delivery.

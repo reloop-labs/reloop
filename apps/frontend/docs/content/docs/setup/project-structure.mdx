@@ -3,8 +3,6 @@ title: Project Structure
 description: Quick overview of the monorepo organization - apps, packages, and tools.
 ---
 
-# Project Structure
-
 A modern monorepo with clear separation between apps, shared packages, and development tools.
 
 <Callout type="info" title="Tech Stack">
@@ -16,98 +14,164 @@ A modern monorepo with clear separation between apps, shared packages, and devel
 ```
 reloop/
 ├── apps/
-│   ├── backend/
-│   │   ├── auth/      # Authentication service
-│   │   ├── mail/      # Email service
-│   │   ├── server/    # Main API server
-│   │   └── webhook/   # Webhook handler
-│   └── frontend/
-│       ├── admin/     # Admin dashboard
-│       ├── dev/       # Development docs
-│       ├── docs/      # Production docs
-│       ├── dashboard/      # Core app
-│       └── web/       # Marketing site
-├── packages/          # Shared libraries
-└── tools/            # Dev configs & utilities
+│   ├── backend/         # ElysiaJS microservices
+│   │   ├── api-key/     # API key management
+│   │   ├── auth/        # Better Auth service
+│   │   ├── billing/     # Stripe billing service
+│   │   ├── contacts/    # Contact segmentation
+│   │   ├── domain/      # Domain & DNS validations
+│   │   ├── email/       # Direct transactional mail
+│   │   ├── kumomta/     # Kumomta MTA logging
+│   │   ├── kumomta-smtp/# SMTP protocol service
+│   │   ├── logs/        # Clickhouse event logging
+│   │   ├── mailing/     # Campaign delivery queues
+│   │   ├── template/    # Visual template builder
+│   │   ├── upload/      # File & S3 upload manager
+│   │   ├── webhook/     # Webhook dispatching handlers
+│   │   └── workflow/    # Automation workflows
+│   └── frontend/        # Next.js applications
+│       ├── dashboard/   # Core customer dashboard
+│       ├── docs/        # Public MDX docs (this app)
+│       └── web/         # Public marketing website
+├── packages/            # Shared libraries (@reloop/ui, @reloop/db, etc.)
+└── package.json         # Workspace scripts & dependencies
 ```
 
-## Apps
+## Frontend Applications
 
-### Backend Services
-
-<Cards>
-<Card icon={<Icon name="server" />} title="Server" href="/apps/backend/server">
-  Main API server & business logic
-</Card>
-
-<Card icon={<Icon name="key-new" />} title="Auth" href="/apps/backend/auth">
-  Authentication service
-</Card>
-
-<Card icon={<Icon name="mail" />} title="Mail" href="/apps/backend/mail">
-  Email service & templates
-</Card>
-
-<Card icon={<Icon name="webhook" />} title="Webhook" href="/apps/backend/webhook">
-  Webhook handler service
-</Card>
-</Cards>
-
-### Frontend Applications
+We maintain three user-facing applications inside the monorepo:
 
 <Cards>
-<Card icon={<Icon name="home" />} title="Main" href="/apps/frontend/dashboard">
-  Core application dashboard
-</Card>
-
-<Card icon={<Icon name="shield-check" />} title="Admin" href="/apps/frontend/admin">
-  Internal admin interface
+<Card icon={<Icon name="home" />} title="Dashboard" href="/apps/frontend/dashboard">
+  **User Dashboard**: The main React/Next.js dashboard app. Includes workspaces, campaigns, templates, visual builders, and analytics views.
 </Card>
 
 <Card icon={<Icon name="globe" />} title="Web" href="/apps/frontend/web">
-  Marketing site & public content
+  **Marketing Site**: The public-facing website, product features page, and branding home built on Next.js.
 </Card>
 
 <Card icon={<Icon name="book-closed" />} title="Docs" href="/apps/frontend/docs">
-  Production documentation
-</Card>
-
-<Card icon={<Icon name="code" />} title="Dev" href="/apps/frontend/dev">
-  Development documentation
+  **Public Docs Portal**: This developer documentation portal, built using standard MDX and Next.js.
 </Card>
 </Cards>
 
-## Packages
+## Backend API Microservices
+
+Our modular backend architecture consists of 14 dedicated **ElysiaJS** microservices inside `apps/backend/`. These coordinate via a NATS pub-sub bus and BullMQ background queues:
+
+<Cards>
+<Card icon={<Icon name="key-new" />} title="Auth Service" href="/apps/backend/auth">
+  Manages signup, signin, permissions, organization memberships, and integrates **Better Auth**.
+</Card>
+
+<Card icon={<Icon name="server" />} title="Mailing Service" href="/apps/backend/mailing">
+  Handles high-throughput marketing email delivery queues and campaigns dispatching.
+</Card>
+
+<Card icon={<Icon name="globe" />} title="Domain Service" href="/apps/backend/domain">
+  Manages sending domains, DKIM signing keys, and automated DNS verification.
+</Card>
+
+<Card icon={<Icon name="webhook" />} title="Webhook Service" href="/apps/backend/webhook">
+  Processes system events, matches triggers, and dispatches external webhook payloads.
+</Card>
+
+<Card icon={<Icon name="element-5" />} title="Contacts Service" href="/apps/backend/contacts">
+  Maintains contact books, segments lists, and manages contact metadata.
+</Card>
+
+<Card icon={<Icon name="code" />} title="API Key Service" href="/apps/backend/api-key">
+  Authorizes and manages developers' external API tokens.
+</Card>
+
+<Card icon={<Icon name="database" />} title="Logs Service" href="/apps/backend/logs">
+  ClickHouse querying layer for tracking event histories, open/click counts, and bounces.
+</Card>
+
+<Card icon={<Icon name="inbox" />} title="Workflow Service" href="/apps/backend/workflow">
+  Runs the automation sequence triggers and marketing logic flows.
+</Card>
+
+<Card icon={<Icon name="share" />} title="Upload Service" href="/apps/backend/upload">
+  Asset storage provider orchestrating direct-to-S3 signed uploads and CDNs.
+</Card>
+
+<Card icon={<Icon name="document" />} title="Template Service" href="/apps/backend/template">
+  Manages visual email templates, drag-and-drop JSON blocks, and HTML rendering.
+</Card>
+
+<Card icon={<Icon name="server" />} title="Kumomta Service" href="/apps/backend/kumomta">
+  MTA bridge collecting logging signals, incoming bounces, and status receipts.
+</Card>
+
+<Card icon={<Icon name="mail" />} title="Email Service" href="/apps/backend/email">
+  Serves single transactional emails and notifications.
+</Card>
+
+<Card icon={<Icon name="card" />} title="Billing Service" href="/apps/backend/billing">
+  Stripe integration managing client invoices and pricing tiers.
+</Card>
+
+<Card icon={<Icon name="shield-check" />} title="Kumomta SMTP" href="/apps/backend/kumomta-smtp">
+  Handles low-level SMTP protocol setups for mail routing.
+</Card>
+</Cards>
+
+## Shared Packages
+
+Shared libraries inside `/packages` ensure consistent types, schemas, and logic across the entire repository:
 
 <Cards>
 <Card icon={<Icon name="element-5" />} title="@reloop/ui" href="/packages/ui">
-  Design system & components
+  Core shared UI design system and components package.
 </Card>
 
-<Card icon={<Icon name="database" />} title="@db" href="/packages/db">
-  Database schema & utilities
+<Card icon={<Icon name="database" />} title="@reloop/db" href="/packages/db">
+  Relational PostgreSQL Drizzle schema and query client.
 </Card>
 
-<Card icon={<Icon name="key-new" />} title="@auth" href="/packages/auth">
-  Authentication logic
+<Card icon={<Icon name="key-new" />} title="@reloop/auth" href="/packages/auth">
+  Shared authentication utility logic.
+</Card>
+
+<Card icon={<Icon name="share" />} title="@reloop/bus" href="/packages/bus">
+  NATS messaging bus wrapper library.
+</Card>
+
+<Card icon={<Icon name="element-5" />} title="@reloop/cache" href="/packages/cache">
+  Redis caching layer utility functions.
+</Card>
+
+<Card icon={<Icon name="document" />} title="@reloop/webhook-events" href="/packages/webhook-events">
+  Shared TypeScript models and typings for webhook event definitions.
+</Card>
+
+<Card icon={<Icon name="code" />} title="@reloop/apikey" href="/packages/apikey">
+  API key hashing and verification utilities.
+</Card>
+
+<Card icon={<Icon name="database" />} title="@reloop/analytics" href="/packages/analytics">
+  Analytical queries and ClickHouse schema helper client.
 </Card>
 </Cards>
 
-## Tools
+## Configuration Tooling
+
+Global settings and development pipelines are kept unified under dedicated directories:
 
 <Cards>
-<Card icon={<TailwindCSSIcon />} title="@tailwind" href="/tools/tailwind">
-  Tailwind CSS config
+<Card icon={<TailwindCSSIcon />} title="@reloop/tailwind" href="/packages/tailwind">
+  Shared Tailwind CSS themes and global rules.
 </Card>
 
-<Card icon={<TypeScriptIcon />} title="@reloop/tsconfig" href="/tools/typescript">
-  TypeScript configs
+<Card icon={<TypeScriptIcon />} title="@reloop/tsconfig" href="/packages/tsconfig">
+  Shared compiler specifications for apps and library environments.
 </Card>
 </Cards>
 
-## Key Benefits
+## Key Benefits of this Monorepo Structure
 
-- **Shared code**: Reusable packages across apps
-- **Consistent tooling**: Unified configs and build setup
-- **Clear boundaries**: Each app has a specific purpose
-- **Easy scaling**: Add new apps without affecting others
+- **Typesafe Contract (Zero-overhead APIs)**: Drizzle database schemas, UI components, and TypeScript interfaces are shared directly between frontend applications and backend microservices, ensuring absolute compile-time type safety.
+- **Fast Build Caching (Turborepo)**: Build and lint processes are optimized globally. Unchanged packages leverage fast local and cloud caches, reducing build times to near-instant.
+- **Unified Code Style**: A global Biome layout enforces extremely fast formatting, import sorting, and linting rules across all workspaces.
+- **Modular Abstraction**: Each backend feature functions as a decoupled microservice, allowing developer teams to scale and deploy distinct modules without interference.

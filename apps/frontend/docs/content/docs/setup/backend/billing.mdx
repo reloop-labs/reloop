@@ -1,84 +1,104 @@
 ---
-title: Billing
-description: Learn how to set up and run the Reloop billing service locally and in production.
+title: Billing Service Setup
+description: Learn how to set up, configure, and run the Reloop billing service locally.
 ---
 
-# Billing Service
+The **Billing Service** is an **ElysiaJS** microservice that handles user subscription tiers, credits tracking, billing transaction history, and Stripe portal integration. It acts as the platform's gatekeeper, enforcing sending limits and managing invoice history.
 
-> Handles account plans, user credits, usage tracking, invoice creation, billing history, and credit top-ups. This service enforces platform quotas and ensures users remain within their sending plan limits.
-
-<Callout type="info" title="Prerequisite">
-Make sure you've completed the [local setup guide](/setup) first.
+<Callout type="info" title="Prerequisite First">
+  Before configuring the Billing Service, ensure you have completed the base [Local Development Setup](/setup) (installed Bun, configured the hosts file, and started the Docker container stack).
 </Callout>
 
 ---
 
 ## Quick Start
 
-```bash
-# One command to get started
-cd apps/backend/billing && cp env.example .env && bun i && bun dev
-```
+You can boot the Billing Service development server instantly using workspace scripts from the root directory:
 
-The service will be available at [http://localhost:8023/api/billing](http://localhost:8023/api/billing) or [https://local.reloop.sh/api/billing](https://local.reloop.sh/api/billing) 🎉
+<CodeGroup>
+  <CodeBlock title="From Monorepo Root (Recommended)">
+  ```bash
+  # Start the dev server with hot reloading
+  bun be:billing:dev
+  ```
+  </CodeBlock>
+
+  <CodeBlock title="From the Service Folder">
+  ```bash
+  cd apps/backend/billing
+  bun dev
+  ```
+  </CodeBlock>
+</CodeGroup>
+
+Once running, the Billing API will listen locally on port `8023`. You can query it via Caddy at [https://local.reloop.sh/api/billing](https://local.reloop.sh/api/billing) 🎉
 
 ---
 
-## Service Info
+## Service Information
 
-* **Location:** `/apps/backend/billing`
-* **Port:** `8023` (configurable with `BILLING_PORT` env variable)
-* **Tech Stack:** Elysia.js, PostgreSQL, NATS, Redis
-* **Part of Monorepo:** Yes (run with filters or inside service dir)
-* **API Base:** `/api/billing`
+* **Directory Location:** `apps/backend/billing/`
+* **Local Listening Port:** `8023` (ElysiaJS gateway)
+* **Unified Access Route:** [https://local.reloop.sh/api/billing](https://local.reloop.sh/api/billing)
+* **Primary Tech Stack:** ElysiaJS, PostgreSQL, Redis, NATS
+* **Dependencies:** Relies on PostgreSQL (to record transactions/invoices) and NATS (to receive subscription & usage update triggers).
 
 ---
 
-## Environment Setup
+## Environment Configuration
 
-Create `.env` file inside `/apps/backend/billing`:
+The Billing Service environment variables are defined in `apps/backend/billing/.env`. Running `bun env:setup` at the root populates this file with defaults:
 
 ```bash
+# Server Port Configuration
 BILLING_PORT=8023
 NODE_ENV=development
+
+# Core Platform Settings
 INITIAL_CREDITS=100
+
+# Event Bus Broker
 NATS_URL=nats://localhost:4222
-BASE_URL=https://local.reloop.sh
 ```
 
-| Variable | Required | Description |
-| :--- | :--- | :--- |
-| `BILLING_PORT` | `YES` | Port the billing server listens on (defaults to `8023`). |
-| `INITIAL_CREDITS` | `YES` | The number of free credits granted to a newly created organization (defaults to `100`). |
-| `NATS_URL` | `YES` | NATS message broker URL for receiving billing-trigger events. |
-| `BASE_URL` | `YES` | Reloop platform base URL. |
+### Reference Table
+
+| Variable | Required | Default Value | Description |
+| :--- | :--- | :--- | :--- |
+| `BILLING_PORT` | **YES** | `8023` | Port number the Elysia app listens to on the host. |
+| `INITIAL_CREDITS` | **YES** | `100` | Free email credits allocated to a newly created organization. |
+| `NATS_URL` | **YES** | `nats://localhost:4222` | Connection URL for NATS event bus messaging. |
+| `NODE_ENV` | **YES** | `development` | Active environment scope (`development` or `production`). |
+
+*(Note: Shared database connections inherit `PG_URL` globally through root workspace parameters.)*
 
 ---
 
 ## Development Commands
 
-```bash
-# Install dependencies
-bun i
+Execute billing service operations from the **monorepo root directory** using Turborepo filters:
 
-# Start dev server with hot reload
-bun dev
-# or from monorepo root
-bun run be:billing:dev
-# or using turbo filter
-bun run --filter=billing dev
-
-# Build for production
-bun run build
-# or from monorepo root
-bun run be:billing:build
-```
+| Command | Action | Scope |
+| :--- | :--- | :--- |
+| `bun be:billing:dev` | Start the Billing dev server with hot reloading | Development |
+| `bun run --filter=billing build` | Compile the Billing service for production | Production |
+| `bun run --filter=billing start` | Run the compiled production build locally | Production |
+| `bun run --filter=billing check-types` | Verify TypeScript type-safety | Code Quality |
 
 ---
 
-## Core Features
+## Interactive API Docs (Swagger)
 
-- **Credit Allocation & Management**: Automatically allocates initial credits to new accounts and tracks consumption as emails are sent.
-- **Quota Enforcements**: Communicates with the mail/sending services to block outbound emails if an organization's credit balance is depleted.
-- **NATS Integration**: Subscribes to subjects like `billing.*` and triggers notifications (via the transactional system email engine) when credit balances run low.
-- **Invoice & Transaction History**: Records credit purchases, plan upgrades, and monthly usages into PostgreSQL tables (`billing_invoice`, `billing_transaction`).
+The Billing Service exposes dynamic OpenAPI specs. To run test queries and explore billing endpoints:
+
+1. Open your browser and navigate to the interactive Swagger playground at [https://local.reloop.sh/api/billing/openapi](https://local.reloop.sh/api/billing/openapi) (or [http://localhost:8023/api/billing/openapi](http://localhost:8023/api/billing/openapi) directly).
+2. Use the interactive Swagger UI playground to inspect schemas and execute test queries.
+
+---
+
+## Core Features Explained
+
+* **Credit Tracking & Balances**: Deducts outbound email credits in real time, communicating with mailing queues to block campaigns if a workspace's balance reaches `0`.
+* **NATS Pub-Sub Integration**: Subscribes to events like `billing.quota-warning` to trigger system emails when a workspace consumes 80% or 100% of its credit allocation.
+* **Stripe Subscriptions**: Interfaces with Stripe billing portals, handling webhook listeners for webhook payments, subscription renewals, cancellations, and invoicing records.
+* **Relational Billing Schemas**: Stores ledger data, monthly credits usage metrics, Stripe metadata, and transaction states inside the PostgreSQL `billing_invoice` and `billing_transaction` tables.

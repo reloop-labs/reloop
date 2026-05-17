@@ -1,216 +1,133 @@
 ---
-title: Auth
-description: Learn how to set up and run the Reloop authentication service locally and in production.
+title: Auth Service Setup
+description: Learn how to set up, configure, and run the Reloop authentication service locally.
 ---
 
-# Authentication Service
+The **Auth Service** is a high-performance **ElysiaJS** microservice that orchestrates user registrations, logins, organization structures, and session authorization across the platform using **Better Auth**.
 
-> Powers Reloop's user authentication, authorization, and session management. This Elysia.js service provides secure OAuth flows, JWT token handling, and user management for the entire Reloop platform.
-
-<Callout type="info" title="Prerequisite">
-Make sure you've completed the [local setup guide](/setup) first (clone repo, install Bun, and set up dependencies).
+<Callout type="info" title="Prerequisite First">
+  Before setting up the Auth Service individually, ensure you have completed the base [Local Development Setup](/setup) (installed Bun, configured the hosts file, and started the Docker container suite).
 </Callout>
 
 ---
-// integrate video how to run the service
+
 ## Quick Start
 
-```bash
-# One command to get started
-cd apps/backend/auth && cp env.example .env && bun i && bun dev
-```
+Since dependencies are managed globally at the monorepo root, you can boot the Auth Service development server instantly:
 
-The service will be available at [http://localhost:8000/api/auth](http://localhost:8000/api/auth) 🎉
+<CodeGroup>
+  <CodeBlock title="From Monorepo Root (Recommended)">
+  ```bash
+  # Start the dev server with hot reloading
+  bun be:auth:dev
+  ```
+  </CodeBlock>
+
+  <CodeBlock title="From the Service Folder">
+  ```bash
+  cd apps/backend/auth
+  bun dev
+  ```
+  </CodeBlock>
+</CodeGroup>
+
+Once running, the Auth Service API will be listening locally on port `8000`. You can test it via Caddy at [https://local.reloop.sh/api/auth](https://local.reloop.sh/api/auth) 🎉
 
 ---
 
-## Service Info
+## Service Information
 
-* **Location:** `/apps/backend/auth`
-* **Port:** `8000` (hardcoded)
-* **Tech Stack:** Elysia.js, Better Auth, PostgreSQL, Redis
-* **Part of Monorepo:** Yes (run with filters or inside service dir)
-* **API Base:** `/api/auth`
+* **Directory Location:** `apps/backend/auth/`
+* **Local Listening Port:** `8000` (ElysiaJS gateway)
+* **Unified Access Route:** [https://local.reloop.sh/api/auth](https://local.reloop.sh/api/auth)
+* **Primary Tech Stack:** ElysiaJS, Better Auth, PostgreSQL, Redis, NATS
+* **Dependencies:** Requires PostgreSQL (database) and Redis (caches & rate limits) to be healthy in Docker.
 
 ---
 
-## Environment Setup
+## Environment Configuration
 
-Create `.env` file:
+The Auth Service reads its environment variables from `apps/backend/auth/.env`. If you ran `bun env:setup` at the root, your `.env` has already been populated with the default configurations:
 
 ```bash
 # Database Configuration
-PG_URL=postgresql://user:password@localhost:5432/auth_db
+PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
+REDIS_URL=redis://:reloop123@localhost:6379
 
 # Better Auth Configuration
-BETTER_AUTH_SECRET=your-super-secret-key-here-make-it-long-and-random
+BETTER_AUTH_SECRET=tENkVU4GrhckuRw4Bcfh93EWgXOFcszn
+BASE_URL="https://local.reloop.sh"
+NODE_ENV=development
+PORT=8000
+NODE_TLS_REJECT_UNAUTHORIZED=0
 
-# Google OAuth (Optional)
+# Messaging Bus Broker
+NATS_URL=nats://localhost:4222
+
+# OAuth Credentials (Optional)
 GOOGLE_CLIENT_ID=your-google-client-id
 GOOGLE_CLIENT_SECRET=your-google-client-secret
-
-# GitHub OAuth (Optional)
 GITHUB_CLIENT_ID=your-github-client-id
 GITHUB_CLIENT_SECRET=your-github-client-secret
 
-# Server Configuration
-NODE_ENV=development
-HOSTNAME=0.0.0.0
+# Initial Self-Host Configuration
+DEFAULT_OTP=888888   # Default pass code for first login
+DISABLE_SIGNUP=false # Set to true to disable signups after creating your admin account
 ```
 
-| Variable                | Required | Description                                    |
-| ----------------------- | -------- | ---------------------------------------------- |
-| `PG_URL`                | `YES`       | PostgreSQL connection string for user data     |
-| `BETTER_AUTH_SECRET`    | `YES`        | Secret key for JWT tokens and encryption      |
-| `GOOGLE_CLIENT_ID`      | `NO`        | Google OAuth client ID for Google sign-in     |
-| `GOOGLE_CLIENT_SECRET`  | `NO`        | Google OAuth client secret                    |
-| `GITHUB_CLIENT_ID`      | `NO`        | GitHub OAuth client ID for GitHub sign-in     |
-| `GITHUB_CLIENT_SECRET`  | `NO`        | GitHub OAuth client secret                    |
-| `HOSTNAME`              | `NO`        | Server hostname (defaults to 0.0.0.0)        |
+### Reference Table
+
+| Variable | Required | Default Value | Description |
+| :--- | :--- | :--- | :--- |
+| `PG_URL` | **YES** | `postgresql://...` | PostgreSQL database connection string. |
+| `REDIS_URL` | **YES** | `redis://...` | Redis cache and session management connection URL. |
+| `BETTER_AUTH_SECRET` | **YES** | `string` | Encryption key for securing active user sessions. |
+| `BASE_URL` | **YES** | `https://local.reloop.sh` | Main application domain (used for cookie setting). |
+| `PORT` | **YES** | `8000` | Local port number the Elysia app listens to on the host. |
+| `NATS_URL` | **YES** | `nats://localhost:4222` | Connection URL for NATS event broker messaging. |
+| `DEFAULT_OTP` | **NO** | `888888` | Development OTP bypass for initial account setup. |
+| `DISABLE_SIGNUP` | **NO** | `false` | Restricts new user signups when set to `true`. |
 
 ---
 
 ## Development Commands
 
-```bash
-# Install dependencies
-bun i
+All workspace operations should be executed from the **monorepo root directory** using Turborepo filters:
 
-# Start dev server with hot reload
-bun dev
-# or from monorepo root with filter
-bun run --filter=auth dev
-
-# Build for production
-bun run build
-# or from monorepo root
-bun run --filter=auth build
-
-# Start production server locally
-bun run start
-# or from monorepo root
-bun run --filter=auth start
-
-# Type checking
-bun run check-types
-
-# Database operations
-bun run db:push      # Push schema changes to DB
-bun run db:studio    # Open Drizzle Studio
-bun run db:generate  # Generate migrations
-bun run db:migrate   # Run migrations
-
-# Auth schema generation
-bun run auth:generate # Generate Better Auth schema
-```
+| Command | Action | Scope |
+| :--- | :--- | :--- |
+| `bun be:auth:dev` | Start the Auth dev server with hot reloading | Development |
+| `bun run --filter=auth build` | Build the Auth service for production | Production |
+| `bun run --filter=auth start` | Run the compiled production build locally | Production |
+| `bun run --filter=auth check-types` | Verify TypeScript type-safety | Code Quality |
+| `bun run --filter=auth auth:generate` | Regenerate the Drizzle DB auth schemas | Better Auth |
 
 ---
 
-## Docker Development
+## Interactive API Docs (Swagger)
 
-### Using Docker Compose (Recommended)
+ElysiaJS generates beautiful, interactive Swagger documentation directly from your API routes. To test endpoints, inspect schemas, and query API hooks:
 
-```bash
-cd apps/backend/auth
-docker-compose up --build
-```
-
-This starts:
-- PostgreSQL database on port 5432
-- Auth service on port 8000
-
-### Direct Docker
-
-```bash
-# Build image
-docker build -f apps/backend/auth/Dockerfile -t auth-service .
-
-# Run container
-docker run -p 8000:8000 \
-  -e PG_URL="postgresql://user:password@host:5432/db" \
-  -e BETTER_AUTH_SECRET="your-secret-key" \
-  auth-service
-```
-
----
-
-## API Endpoints
-
-* **Health Check:** `GET /api/auth/status`
-* **API Docs:** `GET /api/auth/docs` (Swagger/OpenAPI)
-* **Auth Routes:** All authentication endpoints under `/api/auth/*`
-* **Landing Page:** Root `/` for service information
+1. Open your browser and navigate to the interactive Swagger playground at [https://local.reloop.sh/api/auth/openapi](https://local.reloop.sh/api/auth/openapi) (or [http://localhost:8000/api/auth/openapi](http://localhost:8000/api/auth/openapi) directly).
+2. Use the interactive Swagger playground to execute authentications, fetch session information, and inspect endpoints.
 
 ---
 
 ## Troubleshooting
 
-### Database Connection Issues
-**Can't connect to PostgreSQL?**
-```bash
-# Check if PostgreSQL is running
-docker ps | grep postgres
+### PostgreSQL / Redis Connection Issues
+* **Symptom:** Auth server prints database connection timeouts or Redis connection failures.
+* **Resolution:** Ensure the global Docker Compose containers are fully operational:
+  ```bash
+  # Check container status
+  docker ps
+  
+  # Boot them up if stopped
+  bun docker:up
+  ```
 
-# Verify connection string format
-PG_URL=postgresql://username:password@host:port/database_name
-
-# Test connection manually
-psql "postgresql://username:password@localhost:5432/auth_db"
-```
-
-### Port Issues
-**Port already in use?**
-```bash
-# Check what's using the port
-lsof -i :8000
-
-# Kill the process (replace PID)
-kill -9 <PID>
-
-# Port is hardcoded to 8000
-```
-
-### Build/Install Issues
-**Bun install fails?**
-```bash
-# Clear cache and reinstall
-rm -rf ~/.bun/install/cache
-rm -rf node_modules
-bun i
-
-# Check Bun version
-bun --version
-```
-
-### Auth Secret Issues
-**Invalid auth secret?**
-```bash
-# Generate a new secure secret
-openssl rand -base64 32
-
-# Update .env file
-BETTER_AUTH_SECRET=your-new-secret-here
-```
-
----
-
-## Notes
-
-* This service is part of the **Reloop monorepo** - changes here may affect other services
-* Commands can be run inside this directory or from the root using filters
-* Always set up `.env` before starting development
-* The service requires a running PostgreSQL database
-* Better Auth handles all authentication flows automatically
-* OAuth providers are optional - the service works without them
-
----
-
-## Contributing
-
-* Always run `bun run check-types` before committing
-* Keep environment files (`.env.example`) up to date if new vars are added
-* Test authentication flows with different OAuth providers
-* Verify database migrations work correctly
-* Update this documentation when adding new features or workflows
-* Follow the existing code style and patterns
-* Test both development and production builds
+### Key and Cookie Share Issues
+* **Symptom:** User cannot log in, or session cookies are rejected across subpages.
+* **Resolution:** 
+  1. Confirm your hosts file maps `local.reloop.sh` correctly (see [hosts setup](/setup#step-2-configure-local-domain-hosts-file)).
+  2. Ensure you are accessing the user dashboard via `https://local.reloop.sh/dashboard` instead of `http://localhost:3001` (browsers block secure cookie sharing across distinct localhost ports).

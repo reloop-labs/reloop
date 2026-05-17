@@ -1,86 +1,106 @@
 ---
-title: API Key
-description: Learn how to set up and run the Reloop API Key service locally and in production.
+title: API Key Service Setup
+description: Learn how to set up, configure, and run the Reloop API Key service locally.
 ---
 
-# API Key Service
+The **API Key Service** is an **ElysiaJS** microservice designed to handle the generation, hashing, storage, cryptographical validation, and revocation of external developer API keys. This enables secure machine-to-machine integrations with the Reloop platform.
 
-> Manages the lifecycle of developer API keys for the Reloop platform. It securely generates, hashes, stores, validates, and revokes API keys, enabling secure machine-to-machine interactions.
-
-<Callout type="info" title="Prerequisite">
-Make sure you've completed the [local setup guide](/setup) first.
+<Callout type="info" title="Prerequisite First">
+  Before starting the API Key Service, make sure you've completed the base [Local Development Setup](/setup) (installed Bun, configured the hosts file, and started the Docker container stack).
 </Callout>
 
 ---
 
 ## Quick Start
 
-```bash
-# One command to get started
-cd apps/backend/api-key && cp env.example .env && bun i && bun dev
-```
+Dependencies are handled globally at the root directory. You can start the API Key Service development server instantly:
 
-The service will be available at [http://localhost:8012/api/api-key](http://localhost:8012/api/api-key) or [https://local.reloop.sh/api/api-key](https://local.reloop.sh/api/api-key) 🎉
+<CodeGroup>
+  <CodeBlock title="From Monorepo Root (Recommended)">
+  ```bash
+  # Start the dev server with hot reloading
+  bun be:api-key:dev
+  ```
+  </CodeBlock>
+
+  <CodeBlock title="From the Service Folder">
+  ```bash
+  cd apps/backend/api-key
+  bun dev
+  ```
+  </CodeBlock>
+</CodeGroup>
+
+Once running, the API Key Service will listen locally on port `8012`. You can test it via Caddy at [https://local.reloop.sh/api/api-key](https://local.reloop.sh/api/api-key) 🎉
 
 ---
 
-## Service Info
+## Service Information
 
-* **Location:** `/apps/backend/api-key`
-* **Port:** `8012` (configurable)
-* **Tech Stack:** Elysia.js, Better Auth API Key Plugin, PostgreSQL, Redis, NATS
-* **Part of Monorepo:** Yes (run with filters or inside service dir)
-* **API Base:** `/api/api-key`
+* **Directory Location:** `apps/backend/api-key/`
+* **Local Listening Port:** `8012` (ElysiaJS gateway)
+* **Unified Access Route:** [https://local.reloop.sh/api/api-key](https://local.reloop.sh/api/api-key)
+* **Primary Tech Stack:** ElysiaJS, Better Auth API Key Plugin, PostgreSQL, Redis, NATS
+* **Dependencies:** Relies on PostgreSQL (to store and query keys) and Redis (to cache validated keys for high-performance API routing).
 
 ---
 
-## Environment Setup
+## Environment Configuration
 
-Create `.env` file inside `/apps/backend/api-key`:
+The API Key Service environment variables are defined in `apps/backend/api-key/.env`. If you ran `bun env:setup` at the root, your `.env` is already configured:
 
 ```bash
-PORT=8012
-NODE_ENV=development
+# Database Configuration
 PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
 REDIS_URL=redis://:reloop123@localhost:6379
-BASE_URL=https://local.reloop.sh
+
+# Server Gateway Configuration
+PORT=8012
+BASE_URL="https://local.reloop.sh"
+NODE_ENV=development
+
+# Event Bus Broker
 NATS_URL=nats://localhost:4222
 ```
 
-| Variable | Required | Description |
-| :--- | :--- | :--- |
-| `PORT` | `YES` | Port the service listens on (defaults to `8012`). |
-| `PG_URL` | `YES` | PostgreSQL connection string for querying keys. |
-| `REDIS_URL` | `YES` | Redis URL for caching api-key validations. |
-| `NATS_URL` | `YES` | NATS message broker URL for broadcasting api-key events. |
-| `BASE_URL` | `YES` | Reloop platform base URL. |
+### Reference Table
+
+| Variable | Required | Default Value | Description |
+| :--- | :--- | :--- | :--- |
+| `PG_URL` | **YES** | `postgresql://...` | PostgreSQL connection string. |
+| `REDIS_URL` | **YES** | `redis://...` | Redis connection URL for key validation caching. |
+| `PORT` | **YES** | `8012` | Local port number the Elysia app listens to on the host. |
+| `BASE_URL` | **YES** | `https://local.reloop.sh` | Main application domain (used for cookie validations). |
+| `NATS_URL` | **YES** | `nats://localhost:4222` | Connection URL for NATS event bus messaging. |
+| `NODE_ENV` | **YES** | `development` | Active environment scope (`development` or `production`). |
 
 ---
 
 ## Development Commands
 
-```bash
-# Install dependencies
-bun i
+All workspace operations should be executed from the **monorepo root directory** using Turborepo filters:
 
-# Start dev server with hot reload
-bun dev
-# or from monorepo root
-bun run be:api-key:dev
-# or using turbo filter
-bun run --filter=api-key dev
+| Command | Action | Scope |
+| :--- | :--- | :--- |
+| `bun be:api-key:dev` | Start the API Key dev server with hot reloading | Development |
+| `bun run --filter=api-key build` | Compile the API Key service for production | Production |
+| `bun run --filter=api-key start` | Run the compiled production build locally | Production |
+| `bun run --filter=api-key check-types` | Verify TypeScript type-safety | Code Quality |
 
-# Build for production
-bun run build
-# or from monorepo root
-bun run be:api-key:build
-```
+---
+
+## Interactive API Docs (Swagger)
+
+The API Key Service publishes dynamic Swagger documentation directly from ElysiaJS. To test endpoints and query API structures:
+
+1. Open your browser and navigate to the interactive Swagger playground at [https://local.reloop.sh/api/api-key/openapi](https://local.reloop.sh/api/api-key/openapi) (or [http://localhost:8012/api/api-key/openapi](http://localhost:8012/api/api-key/openapi) directly).
+2. Use the interactive Swagger UI playground to run queries and inspect request schemas.
 
 ---
 
 ## Architecture & Integration
 
-- **Better Auth Integration**: Leveraging the `@better-auth/api-key` plugin to handle robust key schemas, security, and hashing.
-- **Cache Layer**: Frequently verified API keys are cached in Redis to minimize PostgreSQL queries on critical request pathways.
-- **Events Broker**: Publishes validation and key creation/revocation events to **NATS** under the `api-key.*` subjects.
-- **Database Schema**: Utilizes `@reloop/db` schema with the `api_key` table, where keys are stored hashed.
+* **Better Auth API Key Plugin**: Integrates `@better-auth/api-key` to manage secure hashing algorithms (SHA-256) and key formatting schemas.
+* **Validation Cache Layer**: Frequently validated keys are cached in Redis to minimize relational DB lookups. Validation latency is kept under 5ms.
+* **Broadcasting Events**: Publishes real-time key generation and revocation events to NATS under the `api-key.*` subject hierarchy (notifying the analytics and log tracking modules).
+* **Database Models**: Integrates the database client from `@reloop/db`, referencing the Drizzle schemas inside the `api_key` tables. Keys are strictly hashed before persisting to PostgreSQL.

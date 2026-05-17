@@ -1,204 +1,201 @@
 ---
-title: Domain
-description: Configure custom domains, generate DNS records (SPF, DKIM, DMARC), and verify domain ownership for email sending through Reloop.
+title: Domain Service Setup
+description: Learn how to configure custom domains, generate DNS records (SPF, DKIM, DMARC), and verify domain ownership for email sending.
 ---
 
-<Callout type="info" title="Before you start">
-  Complete the [local setup guide](/setup) first — clone the repo, install Bun, and get PostgreSQL and Redis running.
+The **Domain Service** is an **ElysiaJS** microservice that handles custom email domain mapping, DKIM keys generation, DNS records validation, and domain verification status tracking.
+
+<Callout type="info" title="Prerequisite First">
+  Before setting up the Domain Service, make sure you've completed the base [Local Development Setup](/setup) (installed Bun, configured the hosts file, and started the Docker container stack).
 </Callout>
 
-## Overview
+---
 
-The Domain Service handles everything needed to send email from a custom domain: DNS record generation, domain verification, and ongoing status tracking. When a user adds their domain, this service creates the MX, SPF, DKIM, and DMARC records they need to configure, then verifies those records are live.
+## Quick Start
+
+Dependencies are handled globally at the root directory. You can start the Domain Service development server instantly:
+
+<CodeGroup>
+  <CodeBlock title="From Monorepo Root (Recommended)">
+  ```bash
+  # Start the dev server with hot reloading
+  bun be:domain:dev
+  ```
+  </CodeBlock>
+
+  <CodeBlock title="From the Service Folder">
+  ```bash
+  cd apps/backend/domain
+  bun dev
+  ```
+  </CodeBlock>
+</CodeGroup>
+
+Once running, the Domain Service will listen locally on port `8011`. You can query it via Caddy at [https://local.reloop.sh/api/domain](https://local.reloop.sh/api/domain) 🎉
 
 ---
 
-## Quick reference
+## Service Information
 
-| Property | Value |
-|---|---|
-| `Port` | `8011` |
-| `API base URL` | <a href="https://local.reloop.sh/api/domain" target="_blank" rel="noopener noreferrer">`https://local.reloop.sh/api/domain`</a> |
-| `OpenAPI spec` | <a href="https://local.reloop.sh/api/domain/openapi" target="_blank" rel="noopener noreferrer">`https://local.reloop.sh/api/domain/openapi`</a> |
-| `Location` | `/apps/backend/domain` |
-| `Config` | `apps/backend/domain/src/domain.config.ts` |
+* **Directory Location:** `apps/backend/domain/`
+* **Local Listening Port:** `8011` (configurable with `PORT` env variable)
+* **Unified Access Route:** [https://local.reloop.sh/api/domain](https://local.reloop.sh/api/domain)
+* **Primary Tech Stack:** ElysiaJS, PostgreSQL, Redis, NATS
+* **Dependencies:** Relies on PostgreSQL (to store domain ownership records) and NATS (to broadcast verification updates).
 
 ---
 
-## Start the service
+## Environment Configuration
+
+The Domain Service environment variables are defined in `apps/backend/domain/.env`. If you ran `bun env:setup` at the root, your `.env` is already configured:
 
 ```bash
-bun run --filter=domain dev
+# Database & Cache Configurations
+PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
+REDIS_URL=redis://:reloop123@localhost:6379
+
+# Server Gateway Configuration
+PORT=8011
+BASE_URL="https://local.reloop.sh"
+NODE_ENV=development
+NODE_TLS_REJECT_UNAUTHORIZED=0
+
+# Domain Verification Parameters
+HOST_DOMAIN=reloop.sh
+DKIM_SELECTOR=reloop
+
+# Event Bus Broker
+NATS_URL=nats://localhost:4222
 ```
 
-### Health checks
+### Reference Table
 
-Check the health status in your browser <a href="https://local.reloop.sh/api/domain/health" target="_blank" rel="noopener noreferrer">`https://local.reloop.sh/api/domain/health`</a>
-
-```bash
-curl https://local.reloop.sh/api/domain/health
-```
-
-```json
-{
-  "status": "CONNECTED",
-  "success": true,
-  "responseTime": "22ms",
-  "timestamp": "2026-05-09T18:21:07.995Z"
-}
-```
-
+| Variable | Required | Default Value | Description |
+| :--- | :--- | :--- | :--- |
+| `PG_URL` | **YES** | `postgresql://...` | PostgreSQL database connection string. |
+| `REDIS_URL` | **YES** | `redis://...` | Redis connection URL for temporary validation lookups. |
+| `PORT` | **YES** | `8011` | Local port number the Elysia app listens to on the host. |
+| `BASE_URL` | **YES** | `https://local.reloop.sh` | Main application domain (used for cookie validations). |
+| `HOST_DOMAIN` | **YES** | `reloop.sh` | Base sender domain routing for test mails. |
+| `DKIM_SELECTOR` | **YES** | `reloop` | The selector name used to query the active DKIM TXT record. |
+| `NATS_URL` | **YES** | `nats://localhost:4222` | Connection URL for NATS event bus messaging. |
+| `NODE_ENV` | **YES** | `development` | Active environment scope (`development` or `production`). |
 
 ---
 
-## Environment variables
+## Development Commands
 
-All variables are optional and fall back to the defaults below. Access them through `domainConfig` defined in `domain.config.ts`.
+All workspace operations should be executed from the **monorepo root directory** using Turborepo filters:
 
-| Variable | Default |
-|---|---|
-| `PORT` | `8011` |
-| `NODE_ENV` | `development` |
-| `PG_URL` | `postgresql://reloop:reloop123@localhost:5432/reloop` |
-| `REDIS_URL` | `redis://:reloop123@localhost:6379` |
-| `BASE_URL` | `https://local.reloop.sh` |
-| `NODE_TLS_REJECT_UNAUTHORIZED` | `0` (auto-set in non-production) |
-| `HOST_DOMAIN` | `reloop.sh` |
-| `DKIM_SELECTOR` | `reloop` |
-| `NATS_URL` | `nats://localhost:4222` |
+| Command | Action | Scope |
+| :--- | :--- | :--- |
+| `bun be:domain:dev` | Start the Domain dev server with hot reloading | Development |
+| `bun run --filter=domain build` | Compile the Domain service for production | Production |
+| `bun run --filter=domain start` | Run the compiled production build locally | Production |
+| `bun run --filter=domain check-types` | Verify TypeScript type-safety | Code Quality |
 
 ---
 
-## Database schema
+## Interactive API Docs (Swagger)
 
-Schema lives in `packages/db/src/schema/domain.ts`. Two tables: `domain` and `domain_dns_record`.
+The Domain Service publishes dynamic Swagger documentation directly from ElysiaJS. To test endpoints and query API structures:
+
+1. Open your browser and navigate to the interactive Swagger playground at [https://local.reloop.sh/api/domain/openapi](https://local.reloop.sh/api/domain/openapi) (or [http://localhost:8011/api/domain/openapi](http://localhost:8011/api/domain/openapi) directly).
+2. Use the interactive Swagger UI playground to run queries and inspect request schemas.
+
+---
+
+## Database Schema & Relationships
+
+The relational domain schema is defined inside `packages/db/src/schema/domain.ts`. It manages two core relational tables.
 
 ### Enums
 
-| Enum | Values |
-|---|---|
-| `domain_type` | `custom` · `subdomain` · `system` |
-| `domain_status` | `start-verify` · `verifying` · `active` · `suspended` · `failed` |
-| `dns_record_type` | `A` · `AAAA` · `CNAME` · `MX` · `TXT` |
-| `dns_record_type_name` | `MX` · `SPF` · `DKIM` · `DMARC` |
-| `tls_mode` | `opportunistic` · `enforced` |
-
-**`domain_type`** — `custom` is a domain the user owns, `subdomain` is a subdomain of their domain, `system` is Reloop-managed.
-
-**`domain_status`** — tracks the full verification lifecycle from `start-verify` through `active` or `failed`.
-
-**`dns_record_type_name`** — semantic classification for email auth records. SPF, DKIM, and DMARC are all stored as `TXT` records under the hood.
-
-**`tls_mode`** — `opportunistic` attempts TLS but falls back to plaintext; `enforced` requires TLS for all connections.
-
-### `domain` table
-
-Stores domain configuration and verification state.
-
-| Column | Type | Default | Notes |
-|---|---|---|---|
-| `id` | `text` | `domain_{cuid}` | Primary key |
-| `domain` | `varchar(255)` | — | Required |
-| `organizationId` | `text` | — | FK → `organization.id` |
-| `userId` | `text` | — | FK → `user.id` |
-| `domainType` | `domain_type` | `custom` | |
-| `status` | `domain_status` | `start-verify` | |
-| `userVerified` | `boolean` | `false` | User confirmed DNS records are set |
-| `systemVerified` | `boolean` | `false` | Reloop confirmed DNS records are live |
-| `customReturnPath` | `varchar(255)` | `inbound` | Custom subdomain for bounce tracking |
-| `clickTracking` | `boolean` | `false` | Enable/disable link click tracking |
-| `openTracking` | `boolean` | `false` | Enable/disable email open tracking |
-| `tls` | `tls_mode` | `opportunistic` | Minimum TLS version for sending |
-| `sendingEmail` | `boolean` | `true` | Enable/disable outbound mail |
-| `receivingEmail` | `boolean` | `true` | Enable/disable inbound mail (forwarding) |
-| `verificationFailedReason` | `text` | `null` | Populated on failure |
-| `deletedAt` | `timestamp` | `null` | Soft delete |
-| `lastVerifiedAt` | `timestamp` | `null` | |
-| `createdAt` | `timestamp` | `now()` | |
-| `updatedAt` | `timestamp` | `now()` | |
-
-**Constraints:**
-- Unique on `(organizationId, domain)` — no duplicate domains per org
-- Cascade delete from `organization` and `user`
-
-### `domain_dns_record` table
-
-One row per DNS record required for a domain. A domain typically gets four records: MX, SPF, DKIM, and DMARC.
-
-| Column | Type | Default | Notes |
-|---|---|---|---|
-| `id` | `text` | `dns_{cuid}` | Primary key |
-| `domainId` | `text` | — | FK → `domain.id` |
-| `organizationId` | `text` | — | FK → `organization.id` |
-| `userId` | `text` | — | FK → `user.id` |
-| `recordType` | `dns_record_type` | — | `A`, `CNAME`, `MX`, `TXT`, etc. |
-| `recordTypeName` | `dns_record_type_name` | — | `MX`, `SPF`, `DKIM`, or `DMARC` |
-| `name` | `text` | — | DNS record name / host |
-| `value` | `text` | — | DNS record value |
-| `status` | `domain_status` | `start-verify` | Per-record verification status |
-| `ttl` | `string` | `Auto` | |
-| `priority` | `integer` | `null` | MX records only |
-| `domain` | `text` | — | Parent domain string |
-| `fqdn` | `text` | — | Fully qualified domain name |
-| `privateKey` | `text` | `null` | DKIM only — 2048-bit RSA private key |
-| `verificationError` | `text` | `null` | Populated when a record check fails |
-| `deletedAt` | `timestamp` | `null` | Soft delete |
-| `createdAt` | `timestamp` | `now()` | |
-| `updatedAt` | `timestamp` | `now()` | |
-
-**Constraints:**
-- Unique on `(domainId, recordType, name, value)` — no duplicate records
-- Cascade delete from `domain`, `organization`, and `user`
-
-### Relationships
-
-- **Organization ↔ Domain**: An organization can have multiple domains configured for email sending.
-- **Domain ↔ DNS Record**: Each domain generates a set of DNS records (MX, SPF, DKIM, DMARC) for verification.
-- **Direct Links**: Both tables carry `organizationId` and `userId` for simplified querying and clear audit trails.
+| Enum | Values | Description |
+| :--- | :--- | :--- |
+| `domain_type` | `custom` · `subdomain` · `system` | Mapped sending domain categorization |
+| `domain_status` | `start-verify` · `verifying` · `active` · `suspended` · `failed` | Domain validation lifecycle states |
+| `dns_record_type` | `A` · `AAAA` · `CNAME` · `MX` · `TXT` | Technical DNS protocol record names |
+| `dns_record_type_name` | `MX` · `SPF` · `DKIM` · `DMARC` | Semantic classifications for email security |
+| `tls_mode` | `opportunistic` · `enforced` | TLS enforcement level for outbound routes |
 
 ---
 
-## DNS records
+### `domain` Table
 
-When a domain is added, the service generates four records the user must add to their DNS provider. All records use `send.example.com` as the sending subdomain.
+Stores general domain profiles, ownership mapping, and overall confirmation checkpoints.
 
-### MX
+| Column | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | `text` | `domain_{cuid}` | Primary Key |
+| `domain` | `varchar(255)` | — | Unique Domain string |
+| `organizationId` | `text` | — | Foreign Key &rarr; `organization.id` |
+| `userId` | `text` | — | Foreign Key &rarr; `user.id` |
+| `domainType` | `domain_type` | `custom` | Maps custom domain vs system routing |
+| `status` | `domain_status` | `start-verify` | Verification pipeline state |
+| `userVerified` | `boolean` | `false` | User confirmed records are manually added |
+| `systemVerified` | `boolean` | `false` | Reloop successfully validated records are live |
+| `customReturnPath` | `varchar(255)` | `inbound` | Custom subdomain routing for bounce logs |
+| `clickTracking` | `boolean` | `false` | Enables signed link click redirections |
+| `openTracking` | `boolean` | `false` | Enables tracking pixel injection |
+| `tls` | `tls_mode` | `opportunistic` | Minimum SSL/TLS standard for sending |
+| `sendingEmail` | `boolean` | `true` | Allows outgoing dispatches |
+| `receivingEmail` | `boolean` | `true` | Allows inbound mail forwarding logs |
+| `verificationFailedReason` | `text` | `null` | Populated when checks fail |
 
-```
+---
+
+### `domain_dns_record` Table
+
+Contains the precise record targets that must be validated to confirm sending authority.
+
+| Column | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | `text` | `dns_{cuid}` | Primary Key |
+| `domainId` | `text` | — | Foreign Key &rarr; `domain.id` |
+| `recordType` | `dns_record_type` | — | technical type (`MX`, `TXT`, etc.) |
+| `recordTypeName` | `dns_record_type_name` | — | Semantic authentication role |
+| `name` | `text` | — | Domain host name target |
+| `value` | `text` | — | Target DNS values |
+| `status` | `domain_status` | `start-verify` | Specific record check status |
+| `privateKey` | `text` | `null` | Secure 2048-bit RSA private key (DKIM only) |
+| `verificationError` | `text` | `null` | Specific error output on check failure |
+
+---
+
+## DNS Record Generation Standard
+
+When a customer maps a domain inside Reloop, the service generates four core DNS authentication records.
+
+### 1. MX Record (Mail Exchanger)
+```text
 Type:     MX
 Name:     send.example.com
 Value:    mail.reloop.sh
 Priority: 10
 ```
+Allows Reloop servers to intercept bounced messages or incoming contact replies.
 
-Routes incoming email (bounces, replies) to Reloop's mail servers.
-
-### SPF
-
-```
+### 2. SPF Record (Sender Policy Framework)
+```text
 Type:  TXT
 Name:  send.example.com
 Value: v=spf1 include:mail.reloop.sh -all
 ```
+Explicitly authorizes Reloop servers (`mail.reloop.sh`) to send email on behalf of the customer's domain, dropping unauthorized senders (`-all`).
 
-Authorizes `mail.reloop.sh` to send on behalf of the domain. The `-all` means any other sender will fail.
-
-### DKIM
-
-```
+### 3. DKIM Record (DomainKeys Identified Mail)
+```text
 Type:  TXT
 Name:  reloop._domainkey.send.example.com
 Value: v=DKIM1; k=rsa; p=<public key>
 ```
+Signs outbound headers with an RSA-2048 private key. The public key is published here to let receiving mailboxes cryptographically authenticate signatures.
 
-A 2048-bit RSA key pair is generated on domain creation. The private key is stored in `domain_dns_record.privateKey`; the public key is published here so receiving servers can verify the signature on outbound mail.
-
-### DMARC
-
-```
+### 4. DMARC Record (Domain-based Message Authentication)
+```text
 Type:  TXT
 Name:  _dmarc.send.example.com
 Value: v=DMARC1; p=none;
 ```
-
-Sets the email authentication policy to monitor mode (`p=none`). No mail is rejected at this stage — useful while verifying alignment before moving to stricter policies.
+Standardizes delivery alignment standards. Initially set to monitoring mode (`p=none`) for smooth integration.
