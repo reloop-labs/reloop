@@ -4,93 +4,105 @@ description: A comprehensive breakdown of our modern technology stack designed f
 ---
 
 <Callout type="tip" title="Want to contribute?">
-   All these technologies work together in our monorepo structure. Check out the **[Project Structure](/project-structure)** page to understand how everything is organized, then dive into the specific app or package you want to work on.
+   All these technologies work together in our monorepo structure. Check out the **[Project Structure](/setup/project-structure)** page to understand how everything is organized.
 </Callout>
+
+Our platform is powered by a modern, high-performance technology stack split into cohesive layers across our monorepo architecture.
 
 ## Frontend
 
-<Cards>
-  <Card icon={<NextjsIcon />} title="Next.js" href="https://nextjs.org/">
-    - **Used in**: Web, Main, Docs, Admin apps
+The user-facing interfaces and UI packages prioritize responsiveness, design aesthetics, and type safety.
+
+<CardGroup cols={3}>
+  <Card icon="browser" title="Next.js" href="https://nextjs.org/">
+    Powering the landing web, customer dashboard, admin portal, and documentation site.
   </Card>
 
-  <Card icon={<TailwindCSSIcon />} title="Tailwind CSS" href="https://tailwindcss.com/">
-    - **Used in**: All frontend applications
+  <Card icon="palette" title="Tailwind CSS" href="https://tailwindcss.com/">
+    Providing utility-first premium styling tokens across all frontend applications.
   </Card>
 
-  <Card icon={<RadixUIIcon />} title="Radix UI" href="https://www.radix-ui.com/">
-    - **Used in**: @reloop/ui package
+  <Card icon="shapes" title="Radix UI" href="https://www.radix-ui.com/">
+    Headless component primitives driving our unified design system in the `@reloop/ui` package.
   </Card>
 
-  <Card icon={<SWRIcon />} title="SWR" href="https://swr.vercel.app/">
-    - **Used in**: Frontend applications
+  <Card icon="rotate" title="SWR" href="https://swr.vercel.app/">
+    Client-side data fetching, caching, and optimistic mutations.
   </Card>
-
-  <Card icon={<Icon name="book-closed" />} title="Fumadocs" href="https://fumadocs.vercel.app/">
-    - **Used in**: Docs application
-  </Card>
-</Cards>
+</CardGroup>
 
 ## Backend & API
 
-<Cards>
-  <Card icon={<ElysiaJSIcon />} title="ElysiaJS" href="https://elysiajs.com/">
-    **Backend Framework** - Fast, modern, type-safe framework for building APIs and services.
-    - **Used in**: Server
+The decoupled backend layer runs on a high-throughput runtime and handles heavy outbound routing workloads.
+
+<CardGroup cols={3}>
+  <Card icon="zap" title="ElysiaJS" href="https://elysiajs.com/">
+    Fast, type-safe backend framework for all microservices.
   </Card>
 
-  <Card icon={<Icon name="mail-single" />} title="Postfix" href="http://www.postfix.org/">
-    **Mail Transfer Agent** - Trusted MTA for sending transactional and system emails.
-    - **Used in**: Email infrastructure
+  <Card icon="code" title="TypeScript" href="https://www.typescriptlang.org/">
+    Ensuring strict type contracts between microservices and frontend clients.
   </Card>
 
-  <Card icon={<Icon name="inbox" />} title="Dovecot" href="https://www.dovecot.org/">
-    **Email Server** - Works alongside Postfix to manage email delivery and storage.
-    - **Used in**: Email infrastructure
+  <Card icon="envelope" title="KumoMTA" href="https://kumomta.com/">
+    Lua-governed modern outbound ESMTP mail server engine.
+  </Card>
+</CardGroup>
+
+## Database & Queues
+
+We utilize separate database technologies matching specific transactional, caching, and analytical requirements.
+
+<CardGroup cols={3}>
+  <Card icon="database" title="PostgreSQL" href="https://www.postgresql.org/">
+    Source of truth relational database mapped using **Drizzle ORM**.
   </Card>
 
-  <Card icon={<Icon name="shield-check" />} title="Rspamd" href="https://rspamd.com/">
-    **Spam Filtering** - Advanced spam filtering system for email deliverability analysis.
-    - **Used in**: Email infrastructure
-  </Card>
-</Cards>
-
-## Database & Storage
-
-<Cards>
-  <Card icon={<PostgreSQLIcon />} title="PostgreSQL" href="https://www.postgresql.org/">
-    - **Used in**: Auth, Server, Email
+  <Card icon="server" title="Redis & BullMQ" href="https://redis.io/">
+    Caching, session states, and asynchronous background worker queues.
   </Card>
 
-  <Card icon={<RedisIcon />} title="Redis" href="https://redis.io/">
-    - **Used in**: Server and Auth
+  <Card icon="chart-bar" title="ClickHouse" href="https://clickhouse.com/">
+    Columnar analytics store tracking delivery logs, bounces, and click events.
   </Card>
-</Cards>
+</CardGroup>
 
 ## Infrastructure & Monorepo
 
-<Cards>
-  <Card icon={<BunIcon />} title="Bun" href="https://bun.sh/">
+Our DevOps and tooling pipelines ensure extremely fast builds, local setups, and deployments.
+
+<CardGroup cols={3}>
+  <Card icon="rocket" title="Bun" href="https://bun.sh/">
+    Modern JS runtime environment, script runner, and package manager.
   </Card>
 
-  <Card icon={<TurborepoIcon />} title="Turborepo" href="https://turbo.build/repo">
+  <Card icon="boxes" title="Turborepo" href="https://turbo.build/">
+    Parallel task executor and build system scheduler for the monorepo.
   </Card>
 
-  <Card icon={<KubernetesIcon />} title="Kubernetes (k8s)" href="https://kubernetes.io/">
+  <Card icon="cubes" title="Docker" href="https://www.docker.com/">
+    Containerized stack for local development services and databases.
   </Card>
 
-  <Card icon={<DockerIcon />} title="Docker" href="https://www.docker.com/">
-  </Card>
-</Cards>
-
-## Developer Experience
-
-<Cards>
-  <Card icon={<BiomejsIcon />} title="Biome" href="https://biomejs.dev/">
-    - Linting, formatting, import sorting
+  <Card icon="share-nodes" title="NATS" href="https://nats.io/">
+    Decentralized asynchronous real-time event broker.
   </Card>
 
-  <Card icon={<Icon name="share" />} title="Husky" href="https://typicode.github.io/husky">
-    - Pre-commit hooks, commit message validation
+  <Card icon="folder-open" title="MinIO / S3" href="https://min.io/">
+    Object storage holding campaign assets, organization logos, and attachments.
   </Card>
-</Cards>
+</CardGroup>
+
+## Developer Experience (DX)
+
+Tooling enforcing consistency and code quality boundaries across team workflows.
+
+<CardGroup cols={2}>
+  <Card icon="sparkles" title="Biome" href="https://biomejs.dev/">
+    Ultra-fast code formatter, linter, and import sorter.
+  </Card>
+
+  <Card icon="shield-check" title="Husky" href="https://typicode.github.io/husky">
+    Pre-commit git hooks enforcing code style and commit consistency.
+  </Card>
+</CardGroup>
