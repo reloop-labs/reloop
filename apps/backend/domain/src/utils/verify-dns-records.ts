@@ -124,7 +124,7 @@ export async function verifyDmarcRecord(
 					actualTag.toLowerCase() === expectedTag.toLowerCase() ||
 					actualTag
 						.toLowerCase()
-						.startsWith(expectedTag.toLowerCase().split("=")[0] + "="),
+						.startsWith(`${expectedTag.toLowerCase().split("=")[0]}=`),
 			);
 		});
 	} catch (e) {

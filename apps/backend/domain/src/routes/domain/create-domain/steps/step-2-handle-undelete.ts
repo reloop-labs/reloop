@@ -19,7 +19,7 @@ export async function handleUndelete_step2({
 	sendingEmail,
 	receivingEmail,
 }: {
-	deletedDomain: DomainTypes.DomainData | null | undefined;
+	deletedDomain: typeof schema.domain.$inferSelect | null | undefined;
 	organizationId: string;
 	domain: string;
 	customReturnPath?: string;
