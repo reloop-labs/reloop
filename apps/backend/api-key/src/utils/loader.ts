@@ -4,15 +4,15 @@ import { RedisCache } from "@reloop/cache/redis-client";
 import { db } from "@reloop/db/client";
 import { log } from "evlog";
 
-export const redis = new RedisCache("api-key");
+export const redis = new RedisCache("api-key", 86400);
+
 export const loader = async () => {
 	try {
-		await redis.healthCheck();
-		log.info("Redis", "Connected");
-		await db.execute("SELECT 1 as test");
-		log.info("Postgres", "Connected");
-		await bus.connect(apiKeyConfig.NATS_URL);
-		log.info("NATS", "Connected");
+		await Promise.all([
+			redis.healthCheck().then(() => log.info("Redis", "Connected")),
+			db.execute("SELECT 1 as test").then(() => log.info("Postgres", "Connected")),
+			bus.connect(apiKeyConfig.NATS_URL).then(() => log.info("NATS", "Connected")),
+		]);
 	} catch (e) {
 		log.error({
 			error: e instanceof Error ? e.message : String(e),

@@ -32,20 +32,21 @@ export async function listApiKeysController({
 			}
 		}
 		const whereClause = and(...conditions);
-		log.info("Getting Total Count");
-		const totalResult = await db
-			.select({ count: count() })
-			.from(schema.apikey)
-			.where(whereClause);
+		log.info("Getting API keys and total count in parallel");
+		const [totalResult, result] = await Promise.all([
+			db
+				.select({ count: count() })
+				.from(schema.apikey)
+				.where(whereClause),
+			db.query.apikey.findMany({
+				where: whereClause,
+				orderBy: desc(schema.apikey.createdAt),
+				limit: limit,
+				offset: offset,
+				with: { user: true },
+			}),
+		]);
 		const total = totalResult[0]?.count || 0;
-		log.info("Total Count retrieved");
-		const result = await db.query.apikey.findMany({
-			where: whereClause,
-			orderBy: desc(schema.apikey.createdAt),
-			limit: limit,
-			offset: offset,
-			with: { user: true },
-		});
 		log.info("API keys retrieved");
 		return {
 			apiKeys: result.map((apiKey) => {

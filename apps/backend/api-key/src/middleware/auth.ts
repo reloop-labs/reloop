@@ -14,10 +14,10 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 			try {
 				const log = useLogger();
 				const cookie = headers.get("cookie");
-				const traceId = crypto.randomUUID();
 				const sessionResult = await validateSession(cookie);
 
 				if (sessionResult) {
+					const traceId = crypto.randomUUID();
 					log.set({
 						traceId,
 						user: sessionResult.userId,
@@ -43,9 +43,9 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 			try {
 				const log = useLogger();
 				const apiKey = headers.get("x-api-key");
-				const traceId = crypto.randomUUID();
 				const apiKeyResult = await validateApiKey(apiKey);
 				if (apiKeyResult) {
+					const traceId = crypto.randomUUID();
 					log.set({
 						traceId,
 						user: apiKeyResult.userId,
@@ -76,10 +76,10 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 					headers.get("x-api-key") ||
 					headers.get("authorization")?.replace("Bearer ", "");
 				const cookie = headers.get("cookie");
-				const traceId = crypto.randomUUID();
 				const log = useLogger();
 				const apiKeyResult = await validateApiKey(apiKey);
 				if (apiKeyResult) {
+					const traceId = crypto.randomUUID();
 					log.set({
 						traceId,
 						service: "api-key",
@@ -91,6 +91,7 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 				}
 				const sessionResult = await validateSession(cookie);
 				if (sessionResult) {
+					const traceId = crypto.randomUUID();
 					log.set({
 						traceId,
 						service: "api-key",
