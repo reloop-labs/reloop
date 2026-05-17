@@ -1,10 +1,11 @@
 import { ApiKeyErrors } from "@reloop/api-key/error/api-key.error-response";
 import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
+import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { API_KEY_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq } from "drizzle-orm";
-import { log } from "evlog";
+import { useLogger } from "evlog/elysia";
 
 export async function updateApiKeyController({
 	apiKeyId,
@@ -15,7 +16,8 @@ export async function updateApiKeyController({
 	organizationId: string;
 	name: string;
 }): Promise<ApiKeyTypes.ApiKeyResponse> {
-	log.info({ ...{ apiKeyId }, message: "Searching api key" });
+	const log = useLogger();
+	log.info("Searching api key");
 	try {
 		const existing = await db.query.apikey.findFirst({
 			where: and(
@@ -25,11 +27,11 @@ export async function updateApiKeyController({
 			with: { user: true },
 		});
 		if (!existing) {
-			log.warn({ ...{ apiKeyId }, message: "API key not found" });
+			log.warn("API key not found");
 			throw ApiKeyErrors.notFound(apiKeyId);
 		}
 
-		log.info({ ...{ apiKeyId }, message: "Updating api key" });
+		log.info("Updating api key");
 		const updateData: Partial<typeof schema.apikey.$inferInsert> = {
 			updatedAt: new Date(),
 			name,
@@ -45,10 +47,16 @@ export async function updateApiKeyController({
 			)
 			.returning();
 		if (!updated[0]) {
-			log.error({ ...{ apiKeyId }, message: "Failed to update API key" });
+			log.error("Failed to update API key");
 			throw ApiKeyErrors.updateFailed(apiKeyId);
 		}
-		log.info({ ...{ apiKeyId }, message: "API key updated successfully" });
+		log.info("API key updated successfully");
+
+		await bus.publish(BusEvent.API_KEY_UPDATED, {
+			api_key_id: apiKeyId,
+			organizationId,
+		});
+
 		const result = {
 			id: updated[0].id,
 			name: updated[0].name,
@@ -83,7 +91,7 @@ export async function updateApiKeyController({
 
 		return result;
 	} catch (error) {
-		log.error({ ...{ apiKeyId, error }, message: "Error updating API key" });
+		log.error("Error updating API key");
 		throw error;
 	}
 }

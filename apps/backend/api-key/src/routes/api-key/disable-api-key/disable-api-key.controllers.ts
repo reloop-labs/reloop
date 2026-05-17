@@ -1,11 +1,11 @@
 import { ApiKeyErrors } from "@reloop/api-key/error/api-key.error-response";
 import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
-
+import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { API_KEY_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq } from "drizzle-orm";
-import { log } from "evlog";
+import { useLogger } from "evlog/elysia";
 
 export async function disableApiKeyController({
 	id,
@@ -14,7 +14,8 @@ export async function disableApiKeyController({
 	id: string;
 	organizationId: string;
 }): Promise<ApiKeyTypes.ApiKeyResponse> {
-	log.info({ ...{ id }, message: "Checking if API key exists" });
+	const log = useLogger();
+	log.info("Checking if API key exists");
 	try {
 		const existingKey = await db.query.apikey.findFirst({
 			where: and(
@@ -27,18 +28,18 @@ export async function disableApiKeyController({
 		});
 
 		if (!existingKey) {
-			log.warn({ ...{ id }, message: "API key not found" });
+			log.warn("API key not found");
 			throw ApiKeyErrors.notFound(id);
 		}
 
 		let updatedKeyData: typeof schema.apikey.$inferSelect;
 
 		if (!existingKey.enabled) {
-			log.info({ ...{ id }, message: "API key is already disabled" });
+			log.info("API key is already disabled");
 			updatedKeyData = existingKey;
 		} else {
 			const now = new Date();
-			log.info({ ...{ id }, message: "Updating API key" });
+			log.info("Updating API key");
 			const [updatedKey] = await db
 				.update(schema.apikey)
 				.set({
@@ -49,13 +50,18 @@ export async function disableApiKeyController({
 				.returning();
 
 			if (!updatedKey) {
-				log.error({ ...{ id }, message: "Failed to disable API key" });
+				log.error("Failed to disable API key");
 				throw ApiKeyErrors.disableFailed(id);
 			}
 			updatedKeyData = updatedKey;
 		}
 
-		log.info({ ...{ id }, message: "API key disabled successfully" });
+		log.info("API key disabled successfully");
+
+		await bus.publish(BusEvent.API_KEY_DISABLED, {
+			api_key_id: id,
+			organizationId,
+		});
 
 		const result = {
 			id: updatedKeyData.id,
@@ -91,7 +97,7 @@ export async function disableApiKeyController({
 
 		return result;
 	} catch (error) {
-		log.error({ ...{ id, error }, message: "Error disabling API key" });
+		log.error("Error disabling API key");
 		throw error;
 	}
 }

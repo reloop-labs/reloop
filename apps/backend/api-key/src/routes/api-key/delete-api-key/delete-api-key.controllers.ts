@@ -1,10 +1,10 @@
 import { ApiKeyErrors } from "@reloop/api-key/error/api-key.error-response";
-
+import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { API_KEY_DELETE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq } from "drizzle-orm";
-import { log } from "evlog";
+import { useLogger } from "evlog/elysia";
 
 export async function deleteApiKeyController({
 	apiKeyId,
@@ -13,7 +13,8 @@ export async function deleteApiKeyController({
 	apiKeyId: string;
 	organizationId: string;
 }): Promise<{ id: string; message: string; object: "api_key"; event: string }> {
-	log.info({ ...{ apiKeyId }, message: "Checking if api key exists" });
+	const log = useLogger();
+	log.info("Checking if api key exists");
 	try {
 		const existing = await db.query.apikey.findFirst({
 			where: and(
@@ -23,11 +24,11 @@ export async function deleteApiKeyController({
 		});
 
 		if (!existing) {
-			log.warn({ ...{ apiKeyId }, message: "API key not found" });
+			log.warn("API key not found");
 			throw ApiKeyErrors.notFound(apiKeyId);
 		}
 
-		log.info({ ...{ apiKeyId }, message: "Deleting API key" });
+		log.info("Deleting API key");
 		await db
 			.delete(schema.apikey)
 			.where(
@@ -37,7 +38,13 @@ export async function deleteApiKeyController({
 				),
 			);
 
-		log.info({ ...{ apiKeyId }, message: "API key deleted successfully" });
+		log.info("API key deleted successfully");
+
+		await bus.publish(BusEvent.API_KEY_DELETED, {
+			api_key_id: apiKeyId,
+			organizationId,
+		});
+
 		const result = {
 			id: apiKeyId,
 			message: "API key deleted successfully",
@@ -47,11 +54,7 @@ export async function deleteApiKeyController({
 
 		return result;
 	} catch (error) {
-		log.error({
-			apiKeyId,
-			error: error instanceof Error ? error.message : String(error),
-			message: "Error deleting API key",
-		});
+		log.error("Error deleting API key");
 		throw error;
 	}
 }

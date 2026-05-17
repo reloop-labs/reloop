@@ -90,6 +90,31 @@ export interface ApiKeyCreatedPayload {
 	organizationId: string;
 }
 
+export interface ApiKeyDeletedPayload {
+	api_key_id: string;
+	organizationId: string;
+}
+
+export interface ApiKeyDisabledPayload {
+	api_key_id: string;
+	organizationId: string;
+}
+
+export interface ApiKeyEnabledPayload {
+	api_key_id: string;
+	organizationId: string;
+}
+
+export interface ApiKeyRotatedPayload {
+	api_key_id: string;
+	organizationId: string;
+}
+
+export interface ApiKeyUpdatedPayload {
+	api_key_id: string;
+	organizationId: string;
+}
+
 export interface InviteCreatedPayload {
 	email: string;
 	organizationName: string;
@@ -187,6 +212,11 @@ export interface EventPayloads {
 	[BusEvent.ORGANIZATION_JOINED]: OrganizationJoinedPayload;
 	[BusEvent.LOG_CREATED]: LogCreatedPayload;
 	[BusEvent.API_KEY_CREATED]: ApiKeyCreatedPayload;
+	[BusEvent.API_KEY_DELETED]: ApiKeyDeletedPayload;
+	[BusEvent.API_KEY_DISABLED]: ApiKeyDisabledPayload;
+	[BusEvent.API_KEY_ENABLED]: ApiKeyEnabledPayload;
+	[BusEvent.API_KEY_ROTATED]: ApiKeyRotatedPayload;
+	[BusEvent.API_KEY_UPDATED]: ApiKeyUpdatedPayload;
 	[BusEvent.INVITE_CREATED]: InviteCreatedPayload;
 	[BusEvent.OTP_REQUESTED]: OtpRequestedPayload;
 	[BusEvent.PAYMENT_FAILED]: PaymentFailedPayload;

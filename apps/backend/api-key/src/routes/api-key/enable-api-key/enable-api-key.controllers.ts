@@ -1,6 +1,6 @@
 import { ApiKeyErrors } from "@reloop/api-key/error/api-key.error-response";
 import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
-
+import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { API_KEY_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -14,9 +14,9 @@ export async function enableApiKeyController({
 	id: string;
 	organizationId: string;
 }): Promise<ApiKeyTypes.ApiKeyResponse> {
-	const logger = useLogger();
+	const log = useLogger();
 	try {
-		logger.info("Search for api key");
+		log.info("Search for api key");
 		const existingKey = await db.query.apikey.findFirst({
 			where: and(
 				eq(schema.apikey.id, id),
@@ -28,19 +28,18 @@ export async function enableApiKeyController({
 		});
 
 		if (!existingKey) {
-			logger.warn("API key not found");
+			log.warn("API key not found");
 			throw ApiKeyErrors.notFound(id);
 		}
 
 		let updatedKeyData: typeof schema.apikey.$inferSelect;
 
 		if (existingKey.enabled) {
-			logger.info("API key is already enabled");
+			log.info("API key is already enabled");
 			updatedKeyData = existingKey;
 		} else {
 			const now = new Date();
-			logger.set({ now });
-			logger.info("Updating API key");
+			log.info("Updating API key");
 			const [updatedKey] = await db
 				.update(schema.apikey)
 				.set({
@@ -51,13 +50,18 @@ export async function enableApiKeyController({
 				.returning();
 
 			if (!updatedKey) {
-				logger.error("Failed to enable API key");
+				log.error("Failed to enable API key");
 				throw ApiKeyErrors.enableFailed(id);
 			}
 			updatedKeyData = updatedKey;
 		}
 
-		logger.info("API key enabled successfully");
+		log.info("API key enabled successfully");
+
+		await bus.publish(BusEvent.API_KEY_ENABLED, {
+			api_key_id: id,
+			organizationId,
+		});
 
 		const result = {
 			id: updatedKeyData.id,
@@ -93,7 +97,7 @@ export async function enableApiKeyController({
 
 		return result;
 	} catch (error) {
-		logger.error(error instanceof Error ? error : new Error(String(error)));
+		log.error("Error enabling API key");
 		throw error;
 	}
 }

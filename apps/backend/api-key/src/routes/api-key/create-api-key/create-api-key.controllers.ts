@@ -76,7 +76,7 @@ export async function createApiKeyController({
 
 		await bus.publish(BusEvent.API_KEY_CREATED, {
 			api_key_id: newApiKey[0].id,
-			organizationId
+			organizationId,
 		});
 
 		const result = {

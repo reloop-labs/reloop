@@ -17,7 +17,6 @@ export enum BusEvent {
 
 	// Email Events
 	EMAIL_SENT = "email.sent",
-	API_KEY_CREATED = "api_key.created",
 	INVITE_CREATED = "invite.created",
 	OTP_REQUESTED = "otp.requested",
 	PAYMENT_FAILED = "payment.failed",
@@ -36,4 +35,12 @@ export enum BusEvent {
 	// Billing / Usage Events
 	USAGE_UPDATED = "usage.updated",
 	QUOTA_EXCEEDED = "quota.exceeded",
+
+	// API Key Events
+	API_KEY_CREATED = "api_key.created",
+	API_KEY_DELETED = "api_key.deleted",
+	API_KEY_DISABLED = "api_key.disabled",
+	API_KEY_ENABLED = "api_key.enabled",
+	API_KEY_ROTATED = "api_key.rotated",
+	API_KEY_UPDATED = "api_key.updated",
 }
