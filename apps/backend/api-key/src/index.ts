@@ -1,5 +1,6 @@
 import { log, parseError } from "evlog";
 import "dotenv/config";
+import { opentelemetry } from "@elysia/opentelemetry";
 import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 import { apiKeyConfig } from "@reloop/api-key/api-key.config";
@@ -19,6 +20,7 @@ const apiKeyService = new Elysia({
 	prefix: "/api/api-key",
 	name: "API Key Service",
 })
+	.use(opentelemetry())
 	.use(
 		openapi({
 			documentation: {

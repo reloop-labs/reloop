@@ -12,7 +12,9 @@
 
 		"lint": "biome check .",
 		"fix-lint": "biome check --fix .",
-		"format": "biome format ."
+		"format": "biome format .",
+		"test": "bun test tests/",
+		"test:watch": "bun test --watch tests/"
 	},
 	"dependencies": {
 		"@elysiajs/cors": "catalog:backend",
@@ -37,6 +39,7 @@
 		"pg": "catalog:db",
 		"redis": "catalog:db",
 		"zod": "catalog:ui",
+		"@elysia/opentelemetry": "catalog:backend",
 		"@reloop/db": "workspace:*",
 		"@reloop/cache": "workspace:*",
 		"@reloop/auth": "workspace:*",
@@ -49,6 +52,7 @@
 		"tsdown": "catalog:backend",
 		"typescript": "catalog:",
 		"@types/bun": "catalog:backend",
+		"@elysiajs/eden": "catalog:backend",
 		"drizzle-kit": "catalog:db",
 		"@types/pg": "catalog:db",
 		"@better-auth/cli": "catalog:backend"

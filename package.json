@@ -167,6 +167,7 @@
 				"@opentelemetry/exporter-trace-otlp-proto": "0.203.0",
 				"@types/bun": "1.2.6",
 				"@better-auth/cli": "1.4.21",
+				"@elysia/opentelemetry": "^1.4.12",
 				"@bogeychan/elysia-logger": "0.1.10",
 				"nodemailer": "6.9.7",
 				"lib0": "^0.2.117",
