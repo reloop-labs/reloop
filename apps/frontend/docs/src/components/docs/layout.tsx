@@ -2,7 +2,7 @@
 
 import * as Dialog from "@radix-ui/react-dialog";
 import { Logo } from "@reloop/ui/logo";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import Link from "next/link";
 import { type ReactNode, useState } from "react";
 import type { PageTreeItem } from "../../lib/types";
@@ -23,7 +23,7 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 			{/* Unified Header - Borderless */}
 			<header className="z-50 flex h-12 w-full shrink-0 bg-bg-weak-50/80 backdrop-blur-md dark:bg-black/80">
 				{/* Desktop Logo Area - Only visible on LG+ */}
-				<div className="hidden shrink-0 items-center px-4 pt-1 lg:flex lg:w-64">
+				<div className="hidden shrink-0 items-center px-4 pt-1 lg:flex lg:w-74">
 					<Link href="/" className="flex items-center">
 						<Logo theme="light" className="w-12" />
 					</Link>
@@ -84,7 +84,7 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 				{/* Main Content Area - Seamless Card Layout */}
 				<main
 					id="nd-page"
-					className="relative mr-2 mb-2 ml-4 flex min-h-0 flex-1 flex-col overflow-hidden rounded-3xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]"
+					className="relative mr-2 mb-2 flex min-h-0 flex-1 flex-col overflow-hidden rounded-3xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]"
 				>
 					<div className="flex-1 overflow-y-auto overflow-x-hidden">
 						<div className="mx-auto min-h-full w-full transition-all duration-300">
