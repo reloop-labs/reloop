@@ -1,4 +1,15 @@
 # API Key Service API
 
-[Read more about the service](https://reloop.sh/dev/api-key-service)
+[Read more about the service](https://reloop.sh/docs/setup/backend/api-key)
+
+## 🔗 Quick Links
+
+- 📚 **Documentation**: [Developer Docs](https://reloop.sh/dev/api-key-service)
+- 🌐 **Production API**: `https://api.reloop.sh/api/api-key`
+- 💻 **Local API**: `http://localhost:8012/api/api-key`
+- 📜 **OpenAPI Spec**: `http://localhost:8012/api/api-key/openapi`
+
+## 🚀 Setup
+
+For detailed setup and development instructions, please refer to the [Setup Guide](https://reloop.sh/docs/setup/backend/api-key).
 
