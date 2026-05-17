@@ -6,6 +6,7 @@ import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import axios from "axios";
+import { useTheme } from "next-themes";
 import { useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -44,6 +45,10 @@ export const RotateApiKeyModal = ({ apiKeys }: RotateApiKeyModalProps) => {
 	const { mutate } = useSWRConfig();
 	const [html, setHtml] = useState("");
 
+	const { theme: currentTheme, systemTheme, resolvedTheme } = useTheme();
+	const effectiveTheme = resolvedTheme || systemTheme || currentTheme;
+	const shikiTheme = effectiveTheme === "dark" ? "one-dark-pro" : "github-light";
+
 	const apiKeyToRotate = apiKeys.find((apiKey) => apiKey.id === rotateId);
 	const displayName =
 		apiKeyToRotate?.name ||
@@ -79,7 +84,7 @@ export const RotateApiKeyModal = ({ apiKeys }: RotateApiKeyModalProps) => {
 				`RELOOP_API_KEY=${response.data.key}`,
 				{
 					lang: "bash",
-					theme: "github-light",
+					theme: shikiTheme,
 					transformers: [
 						{
 							pre(node) {

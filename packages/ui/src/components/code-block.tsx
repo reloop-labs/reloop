@@ -3,7 +3,7 @@
 
 import { cn } from "@reloop/ui/cn";
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { codeToHtml } from "shiki";
 
 interface Props {
@@ -46,8 +46,15 @@ export const CodeBlock = ({
 		themeOverride ||
 		(effectiveTheme === "dark" ? "one-dark-pro" : "github-light");
 
+	const isFirstRun = useRef(true);
+
 	useEffect(() => {
-		if (defaultHtml) return;
+		if (isFirstRun.current && defaultHtml) {
+			isFirstRun.current = false;
+			return;
+		}
+		isFirstRun.current = false;
+
 		codeToHtml(code, {
 			lang,
 			theme: shikiTheme,

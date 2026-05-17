@@ -7,6 +7,7 @@ import * as Modal from "@reloop/ui/modal";
 import { useLoading } from "@reloop/ui/use-loading";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
@@ -46,6 +47,11 @@ export const CreateApiKeyModal = ({
 	const [createdApiKey, setCreatedApiKey] =
 		useState<ApiKeyWithKeyResponse | null>(null);
 	const [html, setHtml] = useState("");
+
+	const { theme: currentTheme, systemTheme, resolvedTheme } = useTheme();
+	const effectiveTheme = resolvedTheme || systemTheme || currentTheme;
+	const shikiTheme =
+		effectiveTheme === "dark" ? "one-dark-pro" : "github-light";
 
 	const form = useForm<ApiKeyFormValues>({
 		resolver: valibotResolver(apiKeySchema) as Resolver<ApiKeyFormValues>,
@@ -87,7 +93,7 @@ export const CreateApiKeyModal = ({
 				`RELOOP_API_KEY=${response.data.key}`,
 				{
 					lang: "bash",
-					theme: "github-light",
+					theme: shikiTheme,
 					transformers: [
 						{
 							pre(node) {
