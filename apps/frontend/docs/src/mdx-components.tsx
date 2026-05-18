@@ -74,8 +74,8 @@ export function getMDXComponents(
 			);
 		},
 		table: (props) => (
-			<div className="my-6 w-full overflow-y-auto">
-				<table className="w-full border-collapse text-sm" {...props} />
+			<div className="my-6! w-full overflow-y-auto">
+				<table className="my-0! w-full border-collapse text-sm" {...props} />
 			</div>
 		),
 		thead: (props) => (

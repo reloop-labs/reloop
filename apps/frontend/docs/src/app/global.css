@@ -1,6 +1,5 @@
 @import "@mintlify/components/styles.css";
 @import "tailwindcss";
-@source "../../src/**/*.{ts,tsx}";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -92,6 +91,29 @@ body {
 	padding-top: 0;
 }
 
+/* Spacing fixes — prose container uses .prose, not article */
+.prose h2 {
+	margin-top: 2rem !important;
+	margin-bottom: 0.75rem !important;
+}
+
+.prose h3 {
+	margin-top: 1.5rem !important;
+	margin-bottom: 0.5rem !important;
+}
+
+/* Remove double-gap: h2 bottom + table-wrapper top = ~48px gap */
+.prose h2 + .my-6,
+.prose h3 + .my-6 {
+	margin-top: 0 !important;
+}
+
+/* Tighten general table wrapper margins */
+.prose .my-6 {
+	margin-top: 0.75rem !important;
+	margin-bottom: 0.75rem !important;
+}
+
 /* TOC styling */
 #nd-toc {
 	@apply pr-0;
@@ -133,3 +155,4 @@ aside::-webkit-scrollbar-thumb {
 aside::-webkit-scrollbar-thumb:hover {
 	background: var(--color-fd-muted-foreground);
 }
+

@@ -156,11 +156,11 @@ export default async function Page(props: {
 							{/* Title row */}
 							<div className="mb-8 flex items-start justify-between gap-4">
 								<div className="flex-1">
-									<h1 className="font-bold text-4xl text-fd-foreground tracking-[-0.03em] sm:text-[40px]">
+									<h1 className="font-semibold text-3xl text-fd-foreground tracking-[-0.03em]">
 										{page.data.title}
 									</h1>
 									{page.data.description && (
-										<p className="mt-3.5 text-[18px] text-fd-muted-foreground/90 leading-relaxed tracking-[-0.01em]">
+										<p className="mt-3.5 text-[16px] text-fd-muted-foreground/90 leading-relaxed tracking-[-0.01em]">
 											{page.data.description}
 										</p>
 									)}
