@@ -24,6 +24,7 @@
 		"lru-cache": "catalog:ui",
 		"lucide-react": "catalog:ui",
 		"next": "catalog:ui",
+		"@reloop/tailwind": "workspace:*",
 		"next-mdx-remote": "catalog:ui",
 		"next-themes": "catalog:ui",
 		"react": "catalog:ui",

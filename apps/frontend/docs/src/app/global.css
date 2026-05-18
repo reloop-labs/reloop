@@ -1,5 +1,6 @@
 @import "@mintlify/components/styles.css";
 @import "tailwindcss";
+@import "@reloop/tailwind/style.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 

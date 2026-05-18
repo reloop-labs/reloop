@@ -57,7 +57,7 @@ export function PageActions({
 	const [isOpen, setOpen] = useState(false);
 
 	return (
-		<div className="relative flex items-center rounded-xl border text-sm">
+		<div className="relative flex items-center rounded-xl border border-stroke-soft-100 bg-bg-soft-200 text-sm">
 			<button
 				type="button"
 				onClick={() => onCopy()}
