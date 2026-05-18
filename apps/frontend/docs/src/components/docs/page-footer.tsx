@@ -18,17 +18,17 @@ export function PageFooter({ previous, next }: PageFooterProps) {
 	return (
 		<footer className="mt-16 space-y-12">
 			{/* Feedback Section */}
-			<div className="flex flex-col items-center justify-between gap-4 border-fd-border border-t pt-12 sm:flex-row">
-				<p className="font-medium text-[15px] text-fd-muted-foreground">
+			<div className="flex flex-col items-center justify-between gap-4 border-stroke-soft-100 border-t pt-12 sm:flex-row">
+				<p className="font-medium text-[15px] text-text-sub-600">
 					Was this page helpful?
 				</p>
 				<div className="flex items-center gap-3">
 					<button
 						onClick={() => setFeedback("yes")}
 						className={cn(
-							"flex items-center gap-2 rounded-full border border-fd-border px-5 py-2 font-medium text-[14px] transition-all hover:bg-fd-muted/50",
+							"flex items-center gap-2 rounded-full border border-stroke-soft-100 px-5 py-2 font-medium text-[14px] transition-all hover:bg-bg-weak-50/50",
 							feedback === "yes" &&
-								"border-fd-primary bg-fd-primary/5 text-fd-primary",
+								"border-[#171717] dark:border-white bg-black/5 dark:bg-white/5 text-[#171717] dark:text-white",
 						)}
 					>
 						<ThumbsUp className="h-4 w-4" />
@@ -37,9 +37,9 @@ export function PageFooter({ previous, next }: PageFooterProps) {
 					<button
 						onClick={() => setFeedback("no")}
 						className={cn(
-							"flex items-center gap-2 rounded-full border border-fd-border px-5 py-2 font-medium text-[14px] transition-all hover:bg-fd-muted/50",
+							"flex items-center gap-2 rounded-full border border-stroke-soft-100 px-5 py-2 font-medium text-[14px] transition-all hover:bg-bg-weak-50/50",
 							feedback === "no" &&
-								"border-fd-primary bg-fd-primary/5 text-fd-primary",
+								"border-[#171717] dark:border-white bg-black/5 dark:bg-white/5 text-[#171717] dark:text-white",
 						)}
 					>
 						<ThumbsDown className="h-4 w-4" />
@@ -53,13 +53,13 @@ export function PageFooter({ previous, next }: PageFooterProps) {
 				{previous ? (
 					<Link
 						href={previous.url}
-						className="group relative flex flex-col items-start gap-2 rounded-2xl border border-fd-border p-6 transition-all hover:border-fd-primary/50 hover:bg-fd-primary/[0.02]"
+						className="group relative flex flex-col items-start gap-2 rounded-2xl border border-stroke-soft-100 p-6 transition-all hover:border-black/50 dark:hover:border-white/50 hover:bg-black/[0.02] dark:hover:bg-white/[0.02]"
 					>
-						<span className="flex items-center gap-1.5 font-semibold text-[12px] text-fd-muted-foreground uppercase tracking-wider">
+						<span className="flex items-center gap-1.5 font-semibold text-[12px] text-text-sub-600 uppercase tracking-wider">
 							<ChevronLeft className="group-hover:-translate-x-0.5 h-3 w-3 transition-transform" />
 							Previous
 						</span>
-						<span className="font-bold text-[17px] text-fd-foreground tracking-tight">
+						<span className="font-bold text-[17px] text-[#171717] dark:text-white tracking-tight">
 							{previous.name}
 						</span>
 					</Link>
@@ -70,13 +70,13 @@ export function PageFooter({ previous, next }: PageFooterProps) {
 				{next ? (
 					<Link
 						href={next.url}
-						className="group relative flex flex-col items-end gap-2 rounded-2xl border border-fd-border p-6 text-right transition-all hover:border-fd-primary/50 hover:bg-fd-primary/[0.02]"
+						className="group relative flex flex-col items-end gap-2 rounded-2xl border border-stroke-soft-100 p-6 text-right transition-all hover:border-black/50 dark:hover:border-white/50 hover:bg-black/[0.02] dark:hover:bg-white/[0.02]"
 					>
-						<span className="flex items-center gap-1.5 font-semibold text-[12px] text-fd-muted-foreground uppercase tracking-wider">
+						<span className="flex items-center gap-1.5 font-semibold text-[12px] text-text-sub-600 uppercase tracking-wider">
 							Next
 							<ChevronRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
 						</span>
-						<span className="font-bold text-[17px] text-fd-foreground tracking-tight">
+						<span className="font-bold text-[17px] text-[#171717] dark:text-white tracking-tight">
 							{next.name}
 						</span>
 					</Link>
@@ -86,10 +86,10 @@ export function PageFooter({ previous, next }: PageFooterProps) {
 			</div>
 
 			{/* Social Footer */}
-			<div className="flex items-center gap-6 border-fd-border border-t pt-12 pb-16">
+			<div className="flex items-center gap-6 border-stroke-soft-100 border-t pt-12 pb-16">
 				<Link
 					href="https://x.com/reloop"
-					className="text-fd-muted-foreground transition-colors hover:text-fd-foreground"
+					className="text-text-sub-600 transition-colors hover:text-[#171717] dark:hover:text-white"
 				>
 					<svg
 						role="img"
@@ -102,7 +102,7 @@ export function PageFooter({ previous, next }: PageFooterProps) {
 				</Link>
 				<Link
 					href="https://github.com/reloop"
-					className="text-fd-muted-foreground transition-colors hover:text-fd-foreground"
+					className="text-text-sub-600 transition-colors hover:text-[#171717] dark:hover:text-white"
 				>
 					<svg
 						role="img"
@@ -115,7 +115,7 @@ export function PageFooter({ previous, next }: PageFooterProps) {
 				</Link>
 				<Link
 					href="https://youtube.com/@reloop"
-					className="text-fd-muted-foreground transition-colors hover:text-fd-foreground"
+					className="text-text-sub-600 transition-colors hover:text-[#171717] dark:hover:text-white"
 				>
 					<svg
 						role="img"
@@ -128,7 +128,7 @@ export function PageFooter({ previous, next }: PageFooterProps) {
 				</Link>
 				<Link
 					href="https://reloop.dev"
-					className="text-fd-muted-foreground transition-colors hover:text-fd-foreground"
+					className="text-text-sub-600 transition-colors hover:text-[#171717] dark:hover:text-white"
 				>
 					<div className="rounded-full border border-current p-0.5">
 						<div className="h-3.5 w-3.5 rounded-full border border-current" />

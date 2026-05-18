@@ -243,10 +243,10 @@ export function Sidebar({
 		<aside
 			className={cn(
 				"z-30 flex h-full w-full flex-col overflow-hidden bg-transparent py-2 pr-2 pl-4",
-				isMobile && "bg-fd-muted/[0.15]",
+				isMobile && "bg-bg-weak-50/[0.15]",
 			)}
 		>
-			<div className="border-fd-border border-b px-3 py-3 pb-1 lg:hidden">
+			<div className="border-stroke-soft-100 border-b px-3 py-3 pb-1 lg:hidden">
 				<ProductSwitcher pathname={pathname} />
 			</div>
 
@@ -255,17 +255,17 @@ export function Sidebar({
 				<button
 					type="button"
 					onClick={() => setIsSearchOpen(true)}
-					className="flex h-8.5 flex-1 items-center gap-2 rounded-lg border border-fd-border bg-fd-background px-2.5 text-fd-muted-foreground text-xs transition-all hover:border-fd-foreground/10"
+					className="flex h-8.5 flex-1 items-center gap-2 rounded-lg border border-stroke-soft-100 bg-bg-white-0 px-2.5 text-text-sub-600 text-xs transition-all hover:border-black/10 dark:hover:border-white/10"
 				>
 					<Search className="h-3.5 w-3.5" />
 					<span className="flex-1 text-left">Search...</span>
-					<kbd className="pointer-events-none hidden h-5 select-none items-center gap-0.5 rounded border border-fd-border bg-fd-muted px-1.5 font-medium font-mono text-[10px] sm:inline-flex">
+					<kbd className="pointer-events-none hidden h-5 select-none items-center gap-0.5 rounded border border-stroke-soft-100 bg-bg-weak-50 px-1.5 font-medium font-mono text-[10px] sm:inline-flex">
 						<span className="text-xs">⌘</span>K
 					</kbd>
 				</button>
 				<button
 					type="button"
-					className="flex h-8.5 w-8.5 items-center justify-center rounded-lg border border-fd-border bg-fd-background text-fd-muted-foreground transition-all hover:border-fd-foreground/10 hover:text-fd-foreground"
+					className="flex h-8.5 w-8.5 items-center justify-center rounded-lg border border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 transition-all hover:border-black/10 dark:hover:border-white/10 hover:text-[#171717] dark:hover:text-white"
 				>
 					<Sparkles className="h-3.5 w-3.5" />
 				</button>
@@ -337,23 +337,23 @@ function ProductSwitcher({ pathname: propPathname }: { pathname?: string }) {
 			<Popover.Trigger asChild>
 				<button
 					type="button"
-					className="flex w-full items-center justify-between gap-2 rounded-lg border border-fd-border bg-fd-background px-3 py-2 text-fd-foreground transition-all hover:bg-fd-foreground/[0.02]"
+					className="flex w-full items-center justify-between gap-2 rounded-lg border border-stroke-soft-100 bg-bg-white-0 px-3 py-2 text-[#171717] dark:text-white transition-all hover:bg-black/[0.02] dark:hover:bg-white/[0.02]"
 				>
 					<div className="flex items-center gap-2.5">
 						<Icon
 							name={activeTab?.iconName || "file-text"}
-							className="h-4 w-4 text-fd-muted-foreground"
+							className="h-4 w-4 text-text-sub-600"
 						/>
 						<span className="font-medium text-[13px]">{activeTab?.title}</span>
 					</div>
-					<ChevronDown className="h-3.5 w-3.5 text-fd-muted-foreground/60" />
+					<ChevronDown className="h-3.5 w-3.5 text-text-sub-600" />
 				</button>
 			</Popover.Trigger>
 			<Popover.Portal>
 				<Popover.Content
 					sideOffset={0}
 					align="start"
-					className="fade-in zoom-in-95 z-50 w-[240px] animate-in overflow-hidden rounded-xl border border-fd-border bg-fd-background p-1 outline-none"
+					className="fade-in zoom-in-95 z-50 w-[240px] animate-in overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-1 outline-none"
 				>
 					<div className="flex flex-col gap-0.5">
 						{navigationTabs.map((tab) => {
@@ -365,8 +365,8 @@ function ProductSwitcher({ pathname: propPathname }: { pathname?: string }) {
 									className={cn(
 										"flex items-center justify-between rounded-lg px-2.5 py-2 text-sm transition-colors",
 										isActive
-											? "bg-fd-foreground/5 text-fd-foreground"
-											: "text-fd-muted-foreground hover:bg-fd-foreground/[0.03] hover:text-fd-foreground",
+											? "bg-black/5 dark:bg-white/5 text-[#171717] dark:text-white"
+											: "text-text-sub-600 hover:bg-black/[0.03] dark:hover:bg-white/[0.03] hover:text-[#171717] dark:hover:text-white",
 									)}
 								>
 									<div className="flex items-center gap-2.5">
@@ -375,21 +375,21 @@ function ProductSwitcher({ pathname: propPathname }: { pathname?: string }) {
 											className={cn(
 												"h-4 w-4 transition-colors",
 												isActive
-													? "text-fd-foreground"
-													: "text-fd-muted-foreground",
+													? "text-[#171717] dark:text-white"
+													: "text-text-sub-600",
 											)}
 										/>
 										<span
 											className={cn(
 												"font-medium",
-												isActive ? "text-fd-foreground" : "",
+												isActive ? "text-[#171717] dark:text-white" : "",
 											)}
 										>
 											{tab.title}
 										</span>
 									</div>
 									{isActive && (
-										<Check className="h-3.5 w-3.5 text-fd-foreground" />
+										<Check className="h-3.5 w-3.5 text-[#171717] dark:text-white" />
 									)}
 								</Link>
 							);
@@ -409,7 +409,7 @@ function ThemeToggle() {
 
 	if (!mounted)
 		return (
-			<div className="h-7 w-20 animate-pulse rounded-full bg-fd-background/50" />
+			<div className="h-7 w-20 animate-pulse rounded-full bg-bg-white-0/50" />
 		);
 
 	const themes = [
@@ -419,7 +419,7 @@ function ThemeToggle() {
 	];
 
 	return (
-		<div className="flex w-fit items-center rounded-full border border-stroke-soft-100 bg-fd-background p-0.5">
+		<div className="flex w-fit items-center rounded-full border border-stroke-soft-100 bg-bg-white-0 p-0.5">
 			{themes.map((themeOption) => {
 				const isSelected = theme === themeOption.value;
 				return (
@@ -427,9 +427,9 @@ function ThemeToggle() {
 						key={themeOption.value}
 						onClick={() => setTheme(themeOption.value)}
 						className={cn(
-							"flex h-6 w-6 items-center justify-center rounded-full text-text-sub-600 transition-all duration-200 hover:text-fd-foreground",
+							"flex h-6 w-6 items-center justify-center rounded-full text-text-sub-600 transition-all duration-200 hover:text-[#171717] dark:hover:text-white",
 							isSelected &&
-								"border border-stroke-soft-100 bg-fd-muted text-fd-foreground",
+								"border border-stroke-soft-100 bg-bg-weak-50 text-[#171717] dark:text-white",
 						)}
 						title={themeOption.label}
 						whileHover={{ scale: 1.05 }}
@@ -524,10 +524,10 @@ function SidebarFolder({
 				className={cn(
 					"group relative z-10 flex h-9 w-full items-center justify-between rounded-lg px-2 font-medium text-sm transition-all",
 					isDirectlyActive
-						? "text-fd-foreground"
+						? "text-[#171717] dark:text-white"
 						: isParentActive
-							? "text-fd-foreground"
-							: "text-text-sub-600 hover:text-fd-foreground",
+							? "text-[#171717] dark:text-white"
+							: "text-text-sub-600 hover:text-[#171717] dark:hover:text-white",
 				)}
 			>
 				<div className="relative z-10 flex w-full items-center gap-2 text-left">
@@ -536,7 +536,7 @@ function SidebarFolder({
 							className={cn(
 								"flex h-4 w-4 shrink-0 items-center justify-center transition-colors",
 								isActive
-									? "text-fd-foreground"
+									? "text-[#171717] dark:text-white"
 									: "text-text-sub-600 opacity-70",
 							)}
 						>
@@ -549,8 +549,8 @@ function SidebarFolder({
 					className={cn(
 						"relative z-10 h-3.5 w-3.5 transition-transform duration-200",
 						isActive
-							? "text-fd-foreground"
-							: "text-text-sub-600 opacity-50 group-hover:text-fd-foreground",
+							? "text-[#171717] dark:text-white"
+							: "text-text-sub-600 opacity-50 group-hover:text-[#171717] dark:group-hover:text-white",
 						isOpen && "rotate-90",
 					)}
 				/>
@@ -565,7 +565,7 @@ function SidebarFolder({
 						transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
 						style={{ overflow: "hidden" }}
 					>
-						<div className="mt-px ml-3.5 flex flex-col space-y-px border-fd-border/40 border-l pb-0.5 pl-2.5">
+						<div className="mt-px ml-3.5 flex flex-col space-y-px border-stroke-soft-100/40 border-l pb-0.5 pl-2.5">
 							{node.children.map((child: PageTreeItem, index: number) => (
 								<SidebarLink
 									key={index}
@@ -613,8 +613,8 @@ function SidebarLink({
 			className={cn(
 				"group relative z-10 flex h-8 items-center gap-2 rounded-lg px-2 font-medium text-sm transition-colors",
 				isActive
-					? "text-fd-foreground"
-					: "text-text-sub-600 hover:text-fd-foreground",
+					? "text-[#171717] dark:text-white"
+					: "text-text-sub-600 hover:text-[#171717] dark:hover:text-white",
 			)}
 		>
 			<div className="relative z-10 flex w-full items-center gap-2 text-left">
@@ -622,7 +622,7 @@ function SidebarLink({
 					<span
 						className={cn(
 							"flex h-3.5 w-3.5 shrink-0 items-center justify-center transition-colors",
-							isActive ? "text-fd-foreground" : "text-text-sub-600 opacity-70",
+							isActive ? "text-[#171717] dark:text-white" : "text-text-sub-600 opacity-70",
 						)}
 					>
 						{node.icon}

@@ -60,17 +60,17 @@ export function TableOfContents({ items }: TOCProps) {
 	if (items.length === 0) return null;
 
 	return (
-		<div id="nd-toc" className="hidden text-sm xl:block">
+		<div id="docs-toc" className="hidden text-sm xl:block">
 			<div className="sticky top-0">
 				<div
-					id="toc-title"
-					className="mb-3 flex items-center gap-1.5 font-medium text-[12px] text-fd-muted-foreground/60 uppercase tracking-wider"
+					id="docs-toc-title"
+					className="mb-3 flex items-center gap-1.5 font-medium text-[12px] text-text-sub-600 uppercase tracking-wider"
 				>
 					<Icon name="menu-2" className="h-4 w-4 opacity-70" />
 					On this page
 				</div>
 
-				<ul className="m-0 flex list-none flex-col gap-0.5 border-fd-border border-l pl-0">
+				<ul className="m-0 flex list-none flex-col gap-0.5 border-stroke-soft-100 border-l pl-0">
 					{items.map((item) => {
 						const isActive = activeId === item.url.slice(1);
 						return (
@@ -83,8 +83,8 @@ export function TableOfContents({ items }: TOCProps) {
 									className={cn(
 										"-ml-px inline-block border-l-2 py-1 pl-3 text-[13px] no-underline transition-colors",
 										isActive
-											? "border-fd-primary font-medium text-fd-foreground"
-											: "border-transparent text-fd-muted-foreground hover:border-fd-foreground/30 hover:text-fd-foreground",
+											? "border-[#171717] dark:border-white font-medium text-[#171717] dark:text-white"
+											: "border-transparent text-text-sub-600 hover:border-black/30 dark:hover:border-white/30 hover:text-[#171717] dark:hover:text-white",
 									)}
 								>
 									{item.title}
