@@ -6,19 +6,18 @@ import { CONTACT_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 import { log } from "evlog";
+import { useLogger } from "evlog/elysia";
 
 export async function addContactToGroupController({
 	organizationId,
 	groupId,
 	body,
-	logger,
 	cookie,
 	requestDetails,
 }: {
 	organizationId: string;
 	groupId: string;
 	body: ContactModel.AddContactToGroupBody;
-	logger?: any;
 	cookie?: string;
 	requestDetails?: {
 		endpoint?: string;
@@ -28,6 +27,7 @@ export async function addContactToGroupController({
 		statusCode?: number;
 	};
 }): Promise<ContactModel.AddContactToGroupResponse> {
+	const logger = useLogger();
 	const { contact_id, email } = body;
 
 	if (!contact_id && !email) {

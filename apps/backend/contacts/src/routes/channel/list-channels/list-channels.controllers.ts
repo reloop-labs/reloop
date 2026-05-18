@@ -3,18 +3,18 @@ import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { CHANNEL_LIST_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, desc, eq, isNull, sql } from "drizzle-orm";
+import { useLogger } from "evlog/elysia";
 
 export const listChannelsController = async ({
 	activeOrganizationId,
 	page: rawPage,
 	limit: rawLimit,
-	logger,
 }: {
 	activeOrganizationId: string;
 	page?: number;
 	limit?: number;
-	logger?: any;
 }): Promise<ChannelTypes.ChannelListResponse> => {
+	const logger = useLogger();
 	const page = rawPage || 1;
 	const limit = Math.min(rawLimit || 100, 100);
 	const offset = (page - 1) * limit;
@@ -64,7 +64,7 @@ export const listChannelsController = async ({
 			event: CHANNEL_LIST_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
-		logger?.error("Debug listing channels", { error });
+		logger?.error("Debug listing channels", { error: error instanceof Error ? error.message : String(error) });
 		throw error;
 	}
 };

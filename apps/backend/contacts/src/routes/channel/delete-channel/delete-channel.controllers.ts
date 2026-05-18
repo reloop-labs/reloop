@@ -4,17 +4,16 @@ import * as schema from "@reloop/db/schema";
 import { CHANNEL_DELETE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
+import { useLogger } from "evlog/elysia";
 
 export const deleteChannelController = async ({
 	activeOrganizationId,
 	channel_id,
-	logger,
 	cookie,
 	requestDetails,
 }: {
 	activeOrganizationId: string;
 	channel_id: string;
-	logger?: any;
 	cookie?: string;
 	requestDetails?: {
 		endpoint?: string;
@@ -30,6 +29,7 @@ export const deleteChannelController = async ({
 	name: string;
 	event: string;
 }> => {
+	const logger = useLogger();
 	logger?.info("Deleting channel", { channel_id });
 	try {
 		const channel = await db.query.channel.findFirst({
@@ -87,7 +87,7 @@ export const deleteChannelController = async ({
 
 		return result;
 	} catch (error) {
-		logger?.error("Debug deleting channel", { channel_id, error });
+		logger?.error("Debug deleting channel", { channel_id, error: error instanceof Error ? error.message : String(error) });
 		throw error;
 	}
 };

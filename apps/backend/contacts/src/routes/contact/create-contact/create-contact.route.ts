@@ -14,7 +14,6 @@ export const createContactRoute = new Elysia()
 			body,
 			activeOrganizationId,
 			userId,
-			logger,
 			path,
 			request,
 			headers,
@@ -24,7 +23,6 @@ export const createContactRoute = new Elysia()
 				organizationId: activeOrganizationId,
 				userId,
 				body,
-				logger,
 				cookie: cookieString,
 				requestDetails: {
 					endpoint: path,

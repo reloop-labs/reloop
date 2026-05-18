@@ -13,17 +13,17 @@ import {
 	type SQL,
 } from "drizzle-orm";
 import { log } from "evlog";
+import { useLogger } from "evlog/elysia";
 
 export async function listContactsController({
 	organizationId,
 	query,
-	logger,
 }: {
 	organizationId: string;
 	query: ContactTypes.ContactListQuery;
-	logger?: any;
 }): Promise<ContactTypes.ContactListResponse> {
-	logger?.info("Listing contacts", { ...query });
+	const logger = useLogger();
+	logger?.info("Listing contacts", { ...query, status: undefined, currentStatus: query.status });
 	try {
 		const page = query.page || 1;
 		const limit = Math.min(query.limit || 100, 100);

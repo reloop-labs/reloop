@@ -16,7 +16,6 @@ export const deletePropertyRoute = new Elysia()
 		return deletePropertyController({
 			activeOrganizationId,
 			property_id: params.contact_property_id,
-			logger,
 			cookie: cookieString,
 			requestDetails: {
 				endpoint: path,

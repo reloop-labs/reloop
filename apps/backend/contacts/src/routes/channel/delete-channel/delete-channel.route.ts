@@ -16,7 +16,6 @@ export const deleteChannelRoute = new Elysia()
 		return await deleteChannelController({
 			activeOrganizationId,
 			channel_id: params.channel_id,
-			logger,
 			cookie: cookieString,
 			requestDetails: {
 				endpoint: path,

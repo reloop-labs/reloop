@@ -15,7 +15,6 @@ export const getChannelRoute = new Elysia()
 		return await getChannelController({
 			activeOrganizationId,
 			channel_id: params.channel_id,
-			logger,
 		});
 	},
 	{

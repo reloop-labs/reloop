@@ -4,14 +4,14 @@ import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 import { log } from "evlog";
 import { verifyToken } from "../token.utils";
+import { useLogger } from "evlog/elysia";
 
 export async function unsubscribeAllController({
 	token,
-	logger,
 }: {
 	token: string;
-	logger?: any;
 }) {
+	const logger = useLogger();
 	log.info("server", "Processing unsubscribe all request");
 
 	const payload = await verifyToken(token);

@@ -5,16 +5,16 @@ import { CONTACT_GET_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 import { log } from "evlog";
+import { useLogger } from "evlog/elysia";
 
 export async function getContactController({
 	contactId,
 	organizationId,
-	logger,
 }: {
 	contactId: string;
 	organizationId: string;
-	logger?: any;
 }): Promise<ContactTypes.ContactResponse> {
+	const logger = useLogger();
 	logger?.info("Getting contact", { contactId, organizationId });
 
 	try {

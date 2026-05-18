@@ -15,7 +15,6 @@ export const getGroupRoute = new Elysia()
 		return await getGroupController({
 			activeOrganizationId,
 			group_id: params.group_id,
-			logger,
 		});
 	},
 	{

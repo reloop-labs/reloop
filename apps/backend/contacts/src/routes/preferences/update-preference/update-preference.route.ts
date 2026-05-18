@@ -10,12 +10,10 @@ export const updatePreferenceRoute = new Elysia()
 	"/update/:token",
 	async ({ params, body }) => {
 		const traceId = crypto.randomUUID();
-		const routeLogger = log;
 		return await updatePreferenceController({
 			token: params.token,
 			channelId: body.channelId,
 			subscribe: body.subscribe,
-			logger: routeLogger,
 		});
 	},
 	{

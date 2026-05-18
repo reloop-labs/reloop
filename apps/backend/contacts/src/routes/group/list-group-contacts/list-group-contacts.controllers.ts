@@ -4,12 +4,12 @@ import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { GROUP_LIST_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, asc, eq, isNull, sql } from "drizzle-orm";
+import { useLogger } from "evlog/elysia";
 
 export const listGroupContactsController = async ({
 	activeOrganizationId,
 	group_id,
 	query,
-	logger,
 }: {
 	activeOrganizationId: string;
 	group_id: string;
@@ -17,12 +17,12 @@ export const listGroupContactsController = async ({
 		page?: number;
 		limit?: number;
 	};
-	logger?: any;
 }): Promise<
 	| ContactModel.GroupContactListResponse
 	| GroupModel.GroupNotFound
 	| GroupModel.Unauthorized
 > => {
+	const logger = useLogger();
 	const page = query.page || 1;
 	const limit = Math.min(query.limit || 100, 100);
 	const offset = (page - 1) * limit;
@@ -116,7 +116,7 @@ export const listGroupContactsController = async ({
 			event: GROUP_LIST_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
-		logger?.error("Error listing group contacts", { group_id, error });
+		logger?.error("Error listing group contacts", { group_id, error: error instanceof Error ? error.message : String(error) });
 		throw error;
 	}
 };

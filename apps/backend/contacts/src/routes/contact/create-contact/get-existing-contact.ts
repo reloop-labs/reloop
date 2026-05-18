@@ -1,18 +1,18 @@
 import { type DatabaseInstance, db as defaultDb } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { and, eq, isNull } from "drizzle-orm";
+import { useLogger } from "evlog/elysia";
 
 export async function getExistingContact({
 	email,
 	organizationId,
-	logger,
 	db = defaultDb,
 }: {
 	email: string;
 	organizationId: string;
-	logger?: any;
 	db?: DatabaseInstance;
 }) {
+	const logger = useLogger();
 	logger?.info("Checking for existing contact", {  });
 	const results = await db
 		.select()

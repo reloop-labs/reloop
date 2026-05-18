@@ -15,7 +15,6 @@ export const updateGroupRoute = new Elysia()
 		params,
 		body,
 		activeOrganizationId,
-		logger,
 		path,
 		request,
 		headers,
@@ -25,7 +24,6 @@ export const updateGroupRoute = new Elysia()
 			activeOrganizationId,
 			group_id: params.group_id,
 			body,
-			logger,
 			cookie: cookieString,
 			requestDetails: {
 				endpoint: path,

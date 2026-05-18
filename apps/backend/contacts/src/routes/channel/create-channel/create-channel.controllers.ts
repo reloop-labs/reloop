@@ -5,6 +5,7 @@ import * as schema from "@reloop/db/schema";
 import { CHANNEL_CREATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
+import { useLogger } from "evlog/elysia";
 
 export const createChannelController = async ({
 	activeOrganizationId,
@@ -13,7 +14,6 @@ export const createChannelController = async ({
 	description,
 	defaultSubscription,
 	visibility,
-	logger,
 	cookie,
 	requestDetails,
 }: {
@@ -23,7 +23,6 @@ export const createChannelController = async ({
 	description?: string;
 	defaultSubscription?: "opt_in" | "opt_out";
 	visibility?: "private" | "public";
-	logger?: any;
 	cookie?: string;
 	requestDetails?: {
 		endpoint?: string;
@@ -33,6 +32,7 @@ export const createChannelController = async ({
 		statusCode?: number;
 	};
 }): Promise<ChannelTypes.ChannelResponse> => {
+	const logger = useLogger();
 	logger?.info("Creating channel", { name });
 	try {
 		const existingChannel = await db.query.channel.findFirst({
@@ -88,7 +88,7 @@ export const createChannelController = async ({
 
 		return result;
 	} catch (error) {
-		logger?.error("Debug creating channel", { name, error });
+		logger?.error("Debug creating channel", { name, error: error instanceof Error ? error.message : String(error) });
 		throw error;
 	}
 };

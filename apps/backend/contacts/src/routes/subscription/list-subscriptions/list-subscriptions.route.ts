@@ -17,7 +17,6 @@ export const listSubscriptionsRoute = new Elysia()
 				limit: query.limit as number | undefined,
 				page: query.page as number | undefined,
 			},
-			logger,
 		});
 	},
 	{

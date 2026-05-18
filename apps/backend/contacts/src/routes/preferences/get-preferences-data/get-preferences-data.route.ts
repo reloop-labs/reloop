@@ -10,10 +10,8 @@ export const getPreferencesDataRoute = new Elysia()
 	"/data/:token",
 	async ({ params }) => {
 		const traceId = crypto.randomUUID();
-		const routeLogger = log;
 		return await getPreferencesDataController({
 			token: params.token,
-			logger: routeLogger,
 		});
 	},
 	{

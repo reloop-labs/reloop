@@ -3,6 +3,7 @@ import * as schema from "@reloop/db/schema";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 import { signToken } from "../token.utils";
+import { useLogger } from "evlog/elysia";
 
 const BASE_URL = process.env.BASE_URL || "https://local.reloop.sh";
 
@@ -10,13 +11,12 @@ export async function generatePreferenceTokenController({
 	organizationId,
 	contactId,
 	email,
-	logger,
 }: {
 	organizationId: string;
 	contactId?: string;
 	email?: string;
-	logger?: any;
 }) {
+	const logger = useLogger();
 	if (!contactId && !email) {
 		throw status(400, {
 			message: "Either 'contactId' or 'email' must be provided",

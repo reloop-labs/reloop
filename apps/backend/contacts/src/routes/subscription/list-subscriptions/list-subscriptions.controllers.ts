@@ -1,16 +1,16 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { and, count, desc, eq, isNull } from "drizzle-orm";
+import { useLogger } from "evlog/elysia";
 
 export async function listSubscriptionsController({
 	organizationId,
 	query,
-	logger,
 }: {
 	organizationId: string;
 	query: { channelId: string; limit?: number; page?: number };
-	logger?: any;
 }) {
+	const logger = useLogger();
 	logger?.info("Listing subscriptions", { ...query });
 	try {
 		const page = query.page || 1;
@@ -46,7 +46,7 @@ export async function listSubscriptionsController({
 			limit,
 		};
 	} catch (error) {
-		logger?.error("Error listing subscriptions", { query, error });
+		logger?.error("Error listing subscriptions", { query, error: error instanceof Error ? error.message : String(error) });
 		throw error;
 	}
 }

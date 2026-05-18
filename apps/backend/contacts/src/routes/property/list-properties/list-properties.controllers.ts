@@ -3,16 +3,16 @@ import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { PROPERTY_LIST_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, desc, eq, ilike, isNull, type SQL, sql } from "drizzle-orm";
+import { useLogger } from "evlog/elysia";
 
 export const listPropertiesController = async ({
 	activeOrganizationId,
 	query,
-	logger,
 }: {
 	activeOrganizationId: string;
 	query: PropertyTypes.PropertyListQuery;
-	logger?: any;
 }): Promise<PropertyTypes.PropertyListResponse> => {
+	const logger = useLogger();
 	const page = query.page || 1;
 	const limit = Math.min(query.limit || 100, 100);
 	const offset = (page - 1) * limit;
@@ -62,7 +62,7 @@ export const listPropertiesController = async ({
 			event: PROPERTY_LIST_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
-		logger?.error("Debug listing properties", { error });
+		logger?.error("Debug listing properties", { error: error instanceof Error ? error.message : String(error) });
 		throw error;
 	}
 };

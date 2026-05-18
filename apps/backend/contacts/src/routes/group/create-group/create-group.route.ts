@@ -15,7 +15,6 @@ export const createGroupRoute = new Elysia()
 		body,
 		activeOrganizationId,
 		userId,
-		logger,
 		path,
 		request,
 		headers,
@@ -26,7 +25,6 @@ export const createGroupRoute = new Elysia()
 			activeOrganizationId,
 			userId,
 			name,
-			logger,
 			cookie: cookieString,
 			requestDetails: {
 				endpoint: path,

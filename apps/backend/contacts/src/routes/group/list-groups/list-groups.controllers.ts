@@ -7,20 +7,20 @@ import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { GROUP_LIST_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, desc, eq, ilike, isNull, sql } from "drizzle-orm";
+import { useLogger } from "evlog/elysia";
 
 export const listGroupsController = async ({
 	organizationId,
 	page: rawPage,
 	limit: rawLimit,
 	search,
-	logger,
 }: {
 	organizationId: string;
 	page?: number;
 	limit?: number;
 	search?: string;
-	logger?: any;
 }): Promise<GroupListResponse | GroupModel.Unauthorized> => {
+	const logger = useLogger();
 	const page = rawPage || 1;
 	const limit = Math.min(rawLimit || 100, 100);
 	const offset = (page - 1) * limit;
@@ -59,7 +59,7 @@ export const listGroupsController = async ({
 			event: GROUP_LIST_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
-		logger?.error("Debug listing groups", { error });
+		logger?.error("Debug listing groups", { error: error instanceof Error ? error.message : String(error) });
 		throw error;
 	}
 };

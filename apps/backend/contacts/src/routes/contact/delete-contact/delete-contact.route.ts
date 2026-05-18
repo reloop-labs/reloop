@@ -16,7 +16,6 @@ export const deleteContactRoute = new Elysia()
 		return await deleteContactController({
 			contactId: params.contact_id,
 			organizationId: activeOrganizationId,
-			logger,
 			cookie: cookieString,
 			requestDetails: {
 				endpoint: path,

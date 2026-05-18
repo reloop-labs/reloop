@@ -5,6 +5,7 @@ import * as schema from "@reloop/db/schema";
 import { CHANNEL_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
+import { useLogger } from "evlog/elysia";
 
 export const updateChannelController = async ({
 	activeOrganizationId,
@@ -12,7 +13,6 @@ export const updateChannelController = async ({
 	name,
 	description,
 	visibility,
-	logger,
 	cookie,
 	requestDetails,
 }: {
@@ -21,7 +21,6 @@ export const updateChannelController = async ({
 	name?: string;
 	description?: string;
 	visibility?: "private" | "public";
-	logger?: any;
 	cookie?: string;
 	requestDetails?: {
 		endpoint?: string;
@@ -31,6 +30,7 @@ export const updateChannelController = async ({
 		statusCode?: number;
 	};
 }): Promise<ChannelTypes.ChannelResponse> => {
+	const logger = useLogger();
 	logger?.info("Updating channel", { channel_id, name });
 
 	try {
@@ -95,7 +95,7 @@ export const updateChannelController = async ({
 
 		return result;
 	} catch (error) {
-		logger?.error("Debug updating channel", { channel_id, error });
+		logger?.error("Debug updating channel", { channel_id, error: error instanceof Error ? error.message : String(error) });
 		throw error;
 	}
 };

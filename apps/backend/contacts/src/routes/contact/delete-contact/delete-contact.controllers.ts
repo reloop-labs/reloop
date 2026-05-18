@@ -5,17 +5,16 @@ import * as schema from "@reloop/db/schema";
 import { CONTACT_DELETE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq } from "drizzle-orm";
 import { log } from "evlog";
+import { useLogger } from "evlog/elysia";
 
 export async function deleteContactController({
 	contactId,
 	organizationId,
-	logger,
 	cookie,
 	requestDetails,
 }: {
 	contactId: string;
 	organizationId: string;
-	logger?: any;
 	cookie?: string;
 	requestDetails?: {
 		endpoint?: string;
@@ -25,6 +24,7 @@ export async function deleteContactController({
 		statusCode?: number;
 	};
 }): Promise<ContactModel.DeleteResponse | ContactModel.ContactNotFound> {
+	const logger = useLogger();
 	logger?.info("Deleting contact", { contactId });
 
 	try {

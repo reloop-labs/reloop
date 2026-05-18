@@ -14,7 +14,6 @@ export const generateTokenRoute = new Elysia()
 			organizationId: activeOrganizationId,
 			contactId: query.contactId,
 			email: query.email,
-			logger,
 		});
 	},
 	{

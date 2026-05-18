@@ -6,6 +6,7 @@ import { CONTACT_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 import { log } from "evlog";
+import { useLogger } from "evlog/elysia";
 
 export interface AddContactToChannelResult {
 	contact: {
@@ -25,14 +26,12 @@ export async function addContactToChannelController({
 	organizationId,
 	channelId,
 	body,
-	logger,
 	cookie,
 	requestDetails,
 }: {
 	organizationId: string;
 	channelId: string;
 	body: ContactModel.AddContactToChannelBody;
-	logger?: any;
 	cookie?: string;
 	requestDetails?: {
 		endpoint?: string;
@@ -42,6 +41,7 @@ export async function addContactToChannelController({
 		statusCode?: number;
 	};
 }): Promise<AddContactToChannelResult> {
+	const logger = useLogger();
 	const { contact_id, email } = body;
 
 	if (!contact_id && !email) {
@@ -112,7 +112,7 @@ export async function addContactToChannelController({
 					.set({ status: targetStatus, updatedAt: new Date() })
 					.where(eq(schema.channelSubscription.id, existingSubscription.id));
 
-				logger?.info("Updated contact subscription status", { subscriptionId: existingSubscription.id, status: targetStatus });
+				logger?.info("Updated contact subscription status", { subscriptionId: existingSubscription.id, currentStatus: targetStatus });
 
 				const result = {
 					contact,
@@ -151,7 +151,7 @@ export async function addContactToChannelController({
 
 		logger?.info("Contact added to channel successfully", { contactId: contact.id,
 				subscriptionId: subscription.id,
-				status: targetStatus, });
+				currentStatus: targetStatus, });
 
 		const result = {
 			contact,

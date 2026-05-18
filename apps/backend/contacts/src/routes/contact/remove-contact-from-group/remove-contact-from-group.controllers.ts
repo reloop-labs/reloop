@@ -5,20 +5,19 @@ import * as schema from "@reloop/db/schema";
 import { CONTACT_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
+import { useLogger } from "evlog/elysia";
 
 
 export async function removeContactFromGroupController({
 	organizationId,
 	groupId,
 	body,
-	logger,
 	cookie,
 	requestDetails,
 }: {
 	organizationId: string;
 	groupId: string;
 	body: ContactModel.RemoveContactFromGroupBody;
-	logger?: any;
 	cookie?: string;
 	requestDetails?: {
 		endpoint?: string;
@@ -28,6 +27,7 @@ export async function removeContactFromGroupController({
 		statusCode?: number;
 	};
 }): Promise<ContactModel.RemoveContactFromGroupResponse> {
+	const logger = useLogger();
 	const { contact_id, email } = body;
 
 	if (!contact_id && !email) {

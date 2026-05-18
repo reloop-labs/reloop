@@ -7,19 +7,18 @@ import { CONTACT_CREATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 import { getExistingContact } from "./get-existing-contact";
+import { useLogger } from "evlog/elysia";
 
 export async function createContactController({
 	organizationId,
 	userId,
 	body,
-	logger,
 	cookie,
 	requestDetails,
 }: {
 	organizationId: string;
 	userId: string;
 	body: ContactTypes.CreateContactRequest;
-	logger?: any;
 	cookie?: string;
 	requestDetails?: {
 		endpoint?: string;
@@ -29,13 +28,13 @@ export async function createContactController({
 		statusCode?: number;
 	};
 }): Promise<ContactTypes.ContactResponse> {
+	const logger = useLogger();
 	const { email } = body;
 	try {
 		return await db.transaction(async (tx) => {
 			const existingContact = await getExistingContact({
 				email,
 				organizationId,
-				logger,
 				db: tx,
 			});
 			if (existingContact) {
@@ -62,14 +61,13 @@ export async function createContactController({
 				logger?.error("Failed to create contact - no data returned", { email });
 				throw status(500, { message: "Failed to create contact" });
 			}
-			logger?.info("Contact added", { ...newContact });
+			logger?.info("Contact added", { ...newContact, status: undefined, currentStatus: newContact.status });
 			if (body.properties && Object.keys(body.properties).length > 0) {
 				await upsertContactProperties({
 					contactId: newContact.id,
 					organizationId,
 					userId,
 					properties: body.properties,
-					logger,
 					db: tx,
 				});
 			}
@@ -156,7 +154,7 @@ export async function createContactController({
 			return result;
 		});
 	} catch (error) {
-		logger?.error("Debug creating contact", { email: body.email, error });
+		logger?.error("Debug creating contact", { email: body.email, error: error instanceof Error ? error.message : String(error) });
 		throw error;
 	}
 }

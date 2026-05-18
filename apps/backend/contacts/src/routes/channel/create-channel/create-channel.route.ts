@@ -15,7 +15,6 @@ export const createChannelRoute = new Elysia()
 		body,
 		activeOrganizationId,
 		userId,
-		logger,
 		path,
 		request,
 		headers,
@@ -29,7 +28,6 @@ export const createChannelRoute = new Elysia()
 			description,
 			defaultSubscription,
 			visibility,
-			logger,
 			cookie: cookieString,
 			requestDetails: {
 				endpoint: path,

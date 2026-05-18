@@ -4,17 +4,16 @@ import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { GROUP_DELETE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
+import { useLogger } from "evlog/elysia";
 
 export const deleteGroupController = async ({
 	activeOrganizationId,
 	group_id,
-	logger,
 	cookie,
 	requestDetails,
 }: {
 	activeOrganizationId: string;
 	group_id: string;
-	logger?: any;
 	cookie?: string;
 	requestDetails?: {
 		endpoint?: string;
@@ -34,6 +33,7 @@ export const deleteGroupController = async ({
 	| GroupModel.GroupNotFound
 	| GroupModel.Unauthorized
 > => {
+	const logger = useLogger();
 	logger?.info("Deleting group", { group_id });
 
 	try {
@@ -82,7 +82,7 @@ export const deleteGroupController = async ({
 
 		return result;
 	} catch (error) {
-		logger?.error("Debug deleting group", { group_id, error });
+		logger?.error("Debug deleting group", { group_id, error: error instanceof Error ? error.message : String(error) });
 		throw error;
 	}
 };

@@ -5,19 +5,18 @@ import * as schema from "@reloop/db/schema";
 import { PROPERTY_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
+import { useLogger } from "evlog/elysia";
 
 export const updatePropertyController = async ({
 	activeOrganizationId,
 	property_id,
 	body,
-	logger,
 	cookie,
 	requestDetails,
 }: {
 	activeOrganizationId: string;
 	property_id: string;
 	body: { fallbackValue: string | null };
-	logger?: any;
 	cookie?: string;
 	requestDetails?: {
 		endpoint?: string;
@@ -27,6 +26,7 @@ export const updatePropertyController = async ({
 		statusCode?: number;
 	};
 }): Promise<PropertyTypes.PropertyResponse> => {
+	const logger = useLogger();
 	logger?.info("Updating property", { property_id, fallbackValue: body.fallbackValue });
 
 	try {
@@ -75,7 +75,7 @@ export const updatePropertyController = async ({
 
 		return result;
 	} catch (error) {
-		logger?.error("Debug updating property", { property_id, error });
+		logger?.error("Debug updating property", { property_id, error: error instanceof Error ? error.message : String(error) });
 		throw error;
 	}
 };

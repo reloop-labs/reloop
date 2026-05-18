@@ -15,7 +15,6 @@ export const updateChannelRoute = new Elysia()
 		params,
 		body,
 		activeOrganizationId,
-		logger,
 		path,
 		request,
 		headers,
@@ -28,7 +27,6 @@ export const updateChannelRoute = new Elysia()
 			name,
 			description: description ?? undefined,
 			visibility,
-			logger,
 			cookie: cookieString,
 			requestDetails: {
 				endpoint: path,

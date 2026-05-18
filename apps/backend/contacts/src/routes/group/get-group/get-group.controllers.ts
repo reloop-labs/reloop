@@ -4,18 +4,18 @@ import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { GROUP_GET_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
+import { useLogger } from "evlog/elysia";
 
 export const getGroupController = async ({
 	activeOrganizationId,
 	group_id,
-	logger,
 }: {
 	activeOrganizationId: string;
 	group_id: string;
-	logger?: any;
 }): Promise<
 	GroupResponse | GroupModel.GroupNotFound | GroupModel.Unauthorized
 > => {
+	const logger = useLogger();
 	logger?.info("Getting group", { group_id });
 	try {
 		const group = await db.query.group.findFirst({
@@ -36,7 +36,7 @@ export const getGroupController = async ({
 			event: GROUP_GET_WEBHOOK_EVENT.id,
 		} as GroupResponse;
 	} catch (error) {
-		logger?.error("Debug getting group", { group_id, error });
+		logger?.error("Debug getting group", { group_id, error: error instanceof Error ? error.message : String(error) });
 		throw error;
 	}
 };

@@ -4,17 +4,16 @@ import * as schema from "@reloop/db/schema";
 import { PROPERTY_DELETE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
+import { useLogger } from "evlog/elysia";
 
 export const deletePropertyController = async ({
 	activeOrganizationId,
 	property_id,
-	logger,
 	cookie,
 	requestDetails,
 }: {
 	activeOrganizationId: string;
 	property_id: string;
-	logger?: any;
 	cookie?: string;
 	requestDetails?: {
 		endpoint?: string;
@@ -30,6 +29,7 @@ export const deletePropertyController = async ({
 	name: string;
 	event: string;
 }> => {
+	const logger = useLogger();
 	logger?.info("Deleting property", { property_id });
 
 	try {
@@ -75,7 +75,7 @@ export const deletePropertyController = async ({
 
 		return result;
 	} catch (error) {
-		logger?.error("Debug deleting property", { property_id, error });
+		logger?.error("Debug deleting property", { property_id, error: error instanceof Error ? error.message : String(error) });
 		throw error;
 	}
 };

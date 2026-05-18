@@ -1,6 +1,7 @@
 import { type DatabaseInstance, db as defaultDb } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { and, eq, inArray, isNull } from "drizzle-orm";
+import { useLogger } from "evlog/elysia";
 
 
 export async function upsertContactProperties({
@@ -8,16 +9,15 @@ export async function upsertContactProperties({
 	organizationId,
 	userId,
 	properties,
-	logger,
 	db = defaultDb,
 }: {
 	contactId: string;
 	organizationId: string;
 	userId: string;
 	properties: Record<string, string | number>;
-	logger?: any;
 	db?: DatabaseInstance;
 }): Promise<void> {
+	const logger = useLogger();
 	const propertyNames = Object.keys(properties);
 
 	// Validate property names

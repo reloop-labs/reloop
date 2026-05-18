@@ -5,19 +5,18 @@ import * as schema from "@reloop/db/schema";
 import { PROPERTY_CREATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq } from "drizzle-orm";
 import { status } from "elysia";
+import { useLogger } from "evlog/elysia";
 
 export const createPropertyController = async ({
 	activeOrganizationId,
 	userId,
 	body,
-	logger,
 	cookie,
 	requestDetails,
 }: {
 	activeOrganizationId: string;
 	userId: string;
 	body: PropertyTypes.CreatePropertyRequest;
-	logger?: any;
 	cookie?: string;
 	requestDetails?: {
 		endpoint?: string;
@@ -27,6 +26,7 @@ export const createPropertyController = async ({
 		statusCode?: number;
 	};
 }): Promise<PropertyTypes.PropertyResponse> => {
+	const logger = useLogger();
 	logger?.info("Creating property", { name: body.name, type: body.type });
 
 	try {
@@ -81,7 +81,7 @@ export const createPropertyController = async ({
 
 		return result;
 	} catch (error) {
-		logger?.error("Debug creating property", { name: body.name, error });
+		logger?.error("Debug creating property", { name: body.name, error: error instanceof Error ? error.message : String(error) });
 		throw error;
 	}
 };

@@ -16,7 +16,6 @@ export const addContactToChannelRoute = new Elysia()
 		body,
 		params,
 		activeOrganizationId,
-		logger,
 		path,
 		request,
 		headers,
@@ -26,7 +25,6 @@ export const addContactToChannelRoute = new Elysia()
 			organizationId: activeOrganizationId,
 			channelId: params.channel_id,
 			body,
-			logger,
 			cookie: cookieString,
 			requestDetails: {
 				endpoint: path,

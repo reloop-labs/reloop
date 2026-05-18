@@ -18,7 +18,6 @@ export const listGroupsRoute = new Elysia()
 			page,
 			limit,
 			search,
-			logger,
 		});
 	},
 	{

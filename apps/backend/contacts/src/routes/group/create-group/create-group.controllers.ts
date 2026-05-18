@@ -6,19 +6,18 @@ import * as schema from "@reloop/db/schema";
 import { createGroupId } from "@reloop/db/schema";
 import { GROUP_CREATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
+import { useLogger } from "evlog/elysia";
 
 export const createGroupController = async ({
 	name,
 	activeOrganizationId,
 	userId,
-	logger,
 	cookie,
 	requestDetails,
 }: {
 	name: string;
 	activeOrganizationId: string;
 	userId: string;
-	logger?: any;
 	cookie?: string;
 	requestDetails?: {
 		endpoint?: string;
@@ -28,6 +27,7 @@ export const createGroupController = async ({
 		statusCode?: number;
 	};
 }): Promise<GroupResponse | GroupModel.Unauthorized> => {
+	const logger = useLogger();
 	logger?.info("Creating group", { name });
 	try {
 		logger?.info("Checking if group already exists", { name });
@@ -75,7 +75,7 @@ export const createGroupController = async ({
 
 		return result;
 	} catch (error) {
-		logger?.error("Debug creating group", { name, error });
+		logger?.error("Debug creating group", { name, error: error instanceof Error ? error.message : String(error) });
 		throw error;
 	}
 };

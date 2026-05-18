@@ -5,20 +5,19 @@ import * as schema from "@reloop/db/schema";
 import { CONTACT_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
+import { useLogger } from "evlog/elysia";
 
 
 export async function updateContactChannelController({
 	organizationId,
 	channelId,
 	body,
-	logger,
 	cookie,
 	requestDetails,
 }: {
 	organizationId: string;
 	channelId: string;
 	body: ContactModel.UpdateContactChannelBody;
-	logger?: any;
 	cookie?: string;
 	requestDetails?: {
 		endpoint?: string;
@@ -28,6 +27,7 @@ export async function updateContactChannelController({
 		statusCode?: number;
 	};
 }): Promise<ContactModel.UpdateContactChannelResponse> {
+	const logger = useLogger();
 	const { contact_id, email, subscription } = body;
 
 	if (!contact_id && !email) {
@@ -91,7 +91,7 @@ export async function updateContactChannelController({
 					.set({ status: targetStatus, updatedAt: new Date() })
 					.where(eq(schema.channelSubscription.id, existing.id));
 
-				logger?.info("Updated contact subscription status", { subscriptionId: existing.id, status: targetStatus });
+				logger?.info("Updated contact subscription status", { subscriptionId: existing.id, currentStatus: targetStatus });
 			}
 		} else {
 			await db.insert(schema.channelSubscription).values({
@@ -101,7 +101,7 @@ export async function updateContactChannelController({
 				status: targetStatus,
 			});
 
-			logger?.info("Created new contact subscription", { contactId: contact.id, channelId, status: targetStatus });
+			logger?.info("Created new contact subscription", { contactId: contact.id, channelId, currentStatus: targetStatus });
 		}
 
 		const result = {

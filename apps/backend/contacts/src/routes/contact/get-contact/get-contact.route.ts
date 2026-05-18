@@ -15,7 +15,6 @@ export const getContactRoute = new Elysia()
 		return await getContactController({
 			contactId: params.contact_id,
 			organizationId: activeOrganizationId,
-			logger,
 		});
 	},
 	{

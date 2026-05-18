@@ -16,7 +16,6 @@ export const deleteGroupRoute = new Elysia()
 		return await deleteGroupController({
 			activeOrganizationId,
 			group_id: params.group_id,
-			logger,
 			cookie: cookieString,
 			requestDetails: {
 				endpoint: path,

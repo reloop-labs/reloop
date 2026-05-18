@@ -15,7 +15,6 @@ export const removeContactFromGroupRoute = new Elysia()
 			body,
 			params,
 			activeOrganizationId,
-			logger,
 			path,
 			request,
 			headers,
@@ -25,7 +24,6 @@ export const removeContactFromGroupRoute = new Elysia()
 				organizationId: activeOrganizationId,
 				groupId: params.group_id,
 				body,
-				logger,
 				cookie: cookieString,
 				requestDetails: {
 					endpoint: path,

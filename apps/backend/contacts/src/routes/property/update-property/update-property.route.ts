@@ -15,7 +15,6 @@ export const updatePropertyRoute = new Elysia()
 		params,
 		body,
 		activeOrganizationId,
-		logger,
 		path,
 		request,
 		headers,
@@ -25,7 +24,6 @@ export const updatePropertyRoute = new Elysia()
 			activeOrganizationId,
 			property_id: params.contact_property_id,
 			body,
-			logger,
 			cookie: cookieString,
 			requestDetails: {
 				endpoint: path,

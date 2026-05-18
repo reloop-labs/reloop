@@ -17,7 +17,6 @@ export const listGroupContactsRoute = new Elysia()
 			activeOrganizationId,
 			group_id: params.group_id,
 			query,
-			logger,
 		});
 	},
 	{

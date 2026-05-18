@@ -7,19 +7,18 @@ import { CONTACT_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 import { log } from "evlog";
+import { useLogger } from "evlog/elysia";
 
 export async function updateContactController({
 	contactId,
 	organizationId,
 	body,
-	logger,
 	cookie,
 	requestDetails,
 }: {
 	contactId: string;
 	organizationId: string;
 	body: ContactTypes.UpdateContactRequest;
-	logger?: any;
 	cookie?: string;
 	requestDetails?: {
 		endpoint?: string;
@@ -29,6 +28,7 @@ export async function updateContactController({
 		statusCode?: number;
 	};
 }): Promise<ContactTypes.ContactResponse> {
+	const logger = useLogger();
 	logger?.info("Updating contact", { contactId,
 			organizationId,
 			body, });
@@ -90,7 +90,6 @@ export async function updateContactController({
 					organizationId,
 					userId: existingContact.userId,
 					properties: body.properties,
-					logger,
 					db: tx,
 				});
 			}

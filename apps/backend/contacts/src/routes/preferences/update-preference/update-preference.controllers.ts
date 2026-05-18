@@ -3,18 +3,18 @@ import * as schema from "@reloop/db/schema";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 import { verifyToken } from "../token.utils";
+import { useLogger } from "evlog/elysia";
 
 export async function updatePreferenceController({
 	token,
 	channelId,
 	subscribe,
-	logger,
 }: {
 	token: string;
 	channelId: string;
 	subscribe: boolean;
-	logger?: any;
 }) {
+	const logger = useLogger();
 	logger?.info("Updating preference", { channelId, subscribe });
 
 	const payload = await verifyToken(token);
@@ -62,7 +62,7 @@ export async function updatePreferenceController({
 		});
 	}
 
-	logger?.info("Preference updated", { contactId, channelId, status: targetStatus });
+	logger?.info("Preference updated", { contactId, channelId, currentStatus: targetStatus });
 
 	return {
 		success: true,

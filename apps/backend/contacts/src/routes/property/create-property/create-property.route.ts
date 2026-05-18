@@ -15,7 +15,6 @@ export const createPropertyRoute = new Elysia()
 		body,
 		activeOrganizationId,
 		userId,
-		logger,
 		path,
 		request,
 		headers,
@@ -25,7 +24,6 @@ export const createPropertyRoute = new Elysia()
 			activeOrganizationId,
 			userId,
 			body,
-			logger,
 			cookie: cookieString,
 			requestDetails: {
 				endpoint: path,
