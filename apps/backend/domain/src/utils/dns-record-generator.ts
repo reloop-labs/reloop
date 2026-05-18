@@ -102,3 +102,16 @@ export async function generateAllDNSRecords(domain: string): Promise<{
 		dkimRecord,
 	};
 }
+
+export function generateTrackingCNAMERecord(
+	trackingSubdomain: string,
+	rootDomain: string,
+): DNSTypes.DNSRecord {
+	return {
+		type: DNSTypes.DNSRecordType.CNAME,
+		name: trackingSubdomain,
+		fqdn: `${trackingSubdomain}.${rootDomain}`,
+		value: domainConfig.HOST_DOMAIN,
+		ttl: "Auto",
+	};
+}

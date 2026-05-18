@@ -51,9 +51,10 @@ export async function createDomainController({
 		}
 
 		// Step 3: Generate DNS records
-		const { dnsRecords, receivingMxRecord } = await generateDnsRecords_step3({
+		const { dnsRecords, receivingMxRecord, trackingRecord } = await generateDnsRecords_step3({
 			domain,
 			customReturnPath,
+			trackingSubdomain: tracking,
 		});
 
 		// Step 4: Create new domain entry
@@ -78,6 +79,7 @@ export async function createDomainController({
 			domain,
 			dnsRecords,
 			receivingMxRecord,
+			trackingRecord,
 		});
 
 		// Step 6: Finalize creation and return response

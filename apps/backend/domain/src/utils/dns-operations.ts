@@ -71,11 +71,19 @@ export function getRecordTypeName(
 }
 
 export function getRecordPurpose(
-	recordTypeName: "MX" | "SPF" | "DKIM" | "DMARC" | "CNAME"
+	recordTypeName: "MX" | "SPF" | "DKIM" | "DMARC" | "CNAME",
+	name: string,
+	domain: string,
 ): "sending" | "receiving" | "tracking" {
 	switch (recordTypeName) {
-		case "MX":
+		case "MX": {
+			const cleanName = name.trim().toLowerCase();
+			const cleanDomain = domain.trim().toLowerCase();
+			if (cleanName === "@" || cleanName === "" || cleanName === cleanDomain) {
+				return "sending";
+			}
 			return "receiving";
+		}
 		case "SPF":
 		case "DKIM":
 		case "DMARC":
@@ -108,7 +116,7 @@ export async function insertDNSRecords(
 			priority: record.priority,
 			status: record.status,
 			recordTypeName,
-			purpose: getRecordPurpose(recordTypeName),
+			purpose: getRecordPurpose(recordTypeName, record.name, domain),
 			domain,
 		});
 	}

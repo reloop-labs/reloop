@@ -11,6 +11,7 @@ export async function createDnsRecords_step5({
 	domain,
 	dnsRecords,
 	receivingMxRecord,
+	trackingRecord,
 }: {
 	domainId: string;
 	organizationId: string;
@@ -23,6 +24,7 @@ export async function createDnsRecords_step5({
 		mxRecord: DNSTypes.DNSRecord;
 	};
 	receivingMxRecord: DNSTypes.DNSRecord;
+	trackingRecord?: DNSTypes.DNSRecord;
 }) {
 	const log = useLogger();
 	const { dkimRecord, spfRecord, dmarcRecord, mxRecord } = dnsRecords;
@@ -37,7 +39,7 @@ export async function createDnsRecords_step5({
 	log.info("Creating DNS records");
 
 	const recordsToInsert: (typeof schema.domainDnsRecord.$inferInsert & {
-		recordTypeName: "DKIM" | "SPF" | "DMARC" | "MX";
+		recordTypeName: "DKIM" | "SPF" | "DMARC" | "MX" | "CNAME";
 	})[] = [
 		{
 			...dnsRecordIds,
@@ -76,7 +78,7 @@ export async function createDnsRecords_step5({
 			value: mxRecord.value,
 			recordTypeName: "MX" as const,
 			priority: mxRecord.priority,
-			purpose: "receiving",
+			purpose: "sending",
 		},
 	];
 
@@ -95,6 +97,19 @@ export async function createDnsRecords_step5({
 			recordTypeName: "MX" as const,
 			priority: receivingMxRecord.priority,
 			purpose: "receiving",
+		});
+	}
+
+	if (trackingRecord) {
+		recordsToInsert.push({
+			...dnsRecordIds,
+			recordType: trackingRecord.type,
+			name: trackingRecord.name,
+			fqdn: trackingRecord.fqdn,
+			value: trackingRecord.value,
+			recordTypeName: "CNAME" as const,
+			priority: trackingRecord.priority,
+			purpose: "tracking",
 		});
 	}
 

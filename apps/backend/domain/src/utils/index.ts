@@ -12,6 +12,7 @@ export {
 	generateMXRecord,
 	generateReceivingMXRecord,
 	generateSPFRecord,
+	generateTrackingCNAMERecord,
 } from "@reloop/domain/utils/dns-record-generator";
 export {
 	getCustomReturnPathSubString,

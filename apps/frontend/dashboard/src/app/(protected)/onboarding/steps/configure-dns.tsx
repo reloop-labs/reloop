@@ -71,7 +71,7 @@ export const ConfigureDnsStep = () => {
 		setStep(4);
 	});
 
-	const { sendingRecords, dkimRecords, dmarcRecords } = groupDomainDnsRecords(
+	const { sendingRecords, receivingRecords, dkimRecords, dmarcRecords, trackingRecords } = groupDomainDnsRecords(
 		domainData?.dnsRecords,
 	);
 
@@ -87,33 +87,79 @@ export const ConfigureDnsStep = () => {
 
 	return (
 		<div className="pb-10">
-			<div className="relative mx-auto mb-8">
+			<div className="relative mx-auto mb-8 space-y-9">
 				<DomainAddedAlert domainName={domainData?.domain} />
 				<DNSAutoConnectBanner domain={domainData} domainId={domainId} />
-				<DNSRecordSection
-					title="Domain verification (DKIM)"
-					records={dkimRecords}
-					onCopyToClipboard={copyToClipboard}
-					isLoading={isLoading}
-					loadingRows={1}
-					docsUrl="https://reloop.sh/docs/dns/dkim"
-				/>
-				<DNSRecordSection
-					title="Sending Email (SPF)"
-					records={sendingRecords}
-					onCopyToClipboard={copyToClipboard}
-					isLoading={isLoading}
-					loadingRows={1}
-					docsUrl="https://reloop.sh/docs/dns/spf"
-				/>
-				<DNSRecordSection
-					loadingRows={2}
-					title="Reject spoofed emails (DMARC)"
-					records={dmarcRecords}
-					onCopyToClipboard={copyToClipboard}
-					isLoading={isLoading}
-					docsUrl="https://reloop.sh/docs/dns/dmarc"
-				/>
+				
+				{/* Domain Verification Group */}
+				<div className="space-y-4">
+					<h3 className="font-semibold text-lg text-text-strong-950">Domain Verification</h3>
+					{dkimRecords.length > 0 && (
+						<DNSRecordSection
+							title="DKIM"
+							records={dkimRecords}
+							onCopyToClipboard={copyToClipboard}
+							isLoading={isLoading}
+							loadingRows={1}
+							docsUrl="https://reloop.sh/docs/dns/dkim"
+						/>
+					)}
+				</div>
+
+				{/* Enable Sending Group */}
+				<div className="space-y-4 pt-4 border-t border-stroke-soft-100 dark:border-stroke-soft-100/10">
+					<h3 className="font-semibold text-lg text-text-strong-950">Enable Sending</h3>
+					<div className="space-y-6">
+						<DNSRecordSection
+							title="SPF"
+							records={sendingRecords}
+							onCopyToClipboard={copyToClipboard}
+							isLoading={isLoading}
+							loadingRows={1}
+							docsUrl="https://reloop.sh/docs/dns/spf"
+						/>
+						{dmarcRecords.length > 0 && (
+							<DNSRecordSection
+								loadingRows={2}
+								title="DMARC (Optional)"
+								records={dmarcRecords}
+								onCopyToClipboard={copyToClipboard}
+								isLoading={isLoading}
+								docsUrl="https://reloop.sh/docs/dns/dmarc"
+							/>
+						)}
+					</div>
+				</div>
+
+				{/* Enable Receiving Group */}
+				{receivingRecords.length > 0 && (
+					<div className="space-y-4 pt-4 border-t border-stroke-soft-100 dark:border-stroke-soft-100/10">
+						<h3 className="font-semibold text-lg text-text-strong-950">Enable Receiving</h3>
+						<DNSRecordSection
+							title="MX"
+							records={receivingRecords}
+							onCopyToClipboard={copyToClipboard}
+							isLoading={isLoading}
+							loadingRows={1}
+							docsUrl="https://reloop.sh/docs/dns/mx"
+						/>
+					</div>
+				)}
+
+				{/* Tracking Group */}
+				{trackingRecords.length > 0 && (
+					<div className="space-y-4 pt-4 border-t border-stroke-soft-100 dark:border-stroke-soft-100/10">
+						<h3 className="font-semibold text-lg text-text-strong-950">Tracking</h3>
+						<DNSRecordSection
+							title="CNAME"
+							records={trackingRecords}
+							onCopyToClipboard={copyToClipboard}
+							isLoading={isLoading}
+							loadingRows={1}
+							docsUrl="https://reloop.sh/docs/dns/cname"
+						/>
+					</div>
+				)}
 				<div className="mt-8 flex items-center gap-3">
 					<Button.Root
 						onClick={handleVerifyDNS}

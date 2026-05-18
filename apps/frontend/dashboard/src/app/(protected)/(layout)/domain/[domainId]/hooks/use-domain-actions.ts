@@ -60,9 +60,23 @@ export const useDomainActions = (
 			await mutate(cacheKey, optimisticData, false);
 
 			try {
+				const apiPayload: any = {};
+				if (payload.isSendingEmailEnabled !== undefined) {
+					apiPayload.sending_email = payload.isSendingEmailEnabled;
+				}
+				if (payload.isReceivingEmailEnabled !== undefined) {
+					apiPayload.receiving_email = payload.isReceivingEmailEnabled;
+				}
+				if (payload.isClickTrackingEnabled !== undefined) {
+					apiPayload.click_tracking = payload.isClickTrackingEnabled;
+				}
+				if (payload.isOpenTrackingEnabled !== undefined) {
+					apiPayload.open_tracking = payload.isOpenTrackingEnabled;
+				}
+
 				const { data } = await axios.patch<DomainResponse>(
 					`/api/domain/v1/${domainId}`,
-					payload,
+					apiPayload,
 					{ headers: { credentials: "include" } },
 				);
 

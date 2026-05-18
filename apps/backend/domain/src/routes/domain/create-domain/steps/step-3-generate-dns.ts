@@ -2,18 +2,22 @@ import { domainConfig } from "@reloop/domain/domain.config";
 import {
 	generateAllDNSRecords,
 	generateReceivingMXRecord,
+	generateTrackingCNAMERecord,
 	getCustomReturnPathSubString,
 	getDomainHost,
 } from "@reloop/domain/utils";
+import type { DNSTypes } from "@reloop/domain/types/dns.type";
 
 import { useLogger } from "evlog/elysia";
 
 export async function generateDnsRecords_step3({
 	domain,
 	customReturnPath,
+	trackingSubdomain,
 }: {
 	domain: string;
 	customReturnPath?: string;
+	trackingSubdomain?: string;
 }) {
 	const log = useLogger();
 	log.info("Generating DNS records");
@@ -25,5 +29,13 @@ export async function generateDnsRecords_step3({
 		getCustomReturnPathSubString(domain, customReturnPath || "inbound"),
 	);
 
-	return { dnsRecords, receivingMxRecord };
+	let trackingRecord: DNSTypes.DNSRecord | undefined;
+	if (trackingSubdomain) {
+		trackingRecord = generateTrackingCNAMERecord(
+			trackingSubdomain,
+			getDomainHost(domain),
+		);
+	}
+
+	return { dnsRecords, receivingMxRecord, trackingRecord };
 }

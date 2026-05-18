@@ -6,22 +6,20 @@ const normalizeLabel = (value: string) => value.trim().toLowerCase();
 const RECEIVING_MX_VALUE = "inbound.reloop.sh";
 
 const isDmarcRecord = (record: DNSRecord) =>
-	record.name.includes("_dmarc") ||
-	(record.recordType === "TXT" && record.value.includes("v=DMARC"));
+	record.purpose === "sending" && record.recordTypeName === "DMARC";
 
 const isDkimRecord = (record: DNSRecord) =>
-	record.name.includes("_domainkey") || record.value.includes("v=DKIM");
+	record.purpose === "sending" && record.recordTypeName === "DKIM";
 
 const isReceivingMxRecord = (record: DNSRecord) =>
-	record.recordType === "MX" &&
-	(normalizeLabel(record.value) === RECEIVING_MX_VALUE ||
-		record.name.includes("inbound"));
+	record.purpose === "receiving";
 
 const isTrackingRecord = (record: DNSRecord) =>
-	record.recordType === "CNAME" &&
-	(record.name.includes("reloop") ||
-		record.name.includes("email") ||
-		record.name.includes("click"));
+	record.purpose === "tracking";
+
+const isSendingRecord = (record: DNSRecord) =>
+	record.purpose === "sending" &&
+	(record.recordTypeName === "SPF" || record.recordTypeName === "MX");
 
 export const groupDomainDnsRecords = (records: DNSRecord[] | undefined) => {
 	const allRecords = records ?? [];
@@ -30,13 +28,7 @@ export const groupDomainDnsRecords = (records: DNSRecord[] | undefined) => {
 	const receivingRecords = allRecords.filter(isReceivingMxRecord);
 	const dkimRecords = allRecords.filter(isDkimRecord);
 	const trackingRecords = allRecords.filter(isTrackingRecord);
-	const sendingRecords = allRecords.filter((record) => {
-		if (isDmarcRecord(record)) return false;
-		if (isDkimRecord(record)) return false;
-		if (isTrackingRecord(record)) return false;
-		if (isReceivingMxRecord(record)) return false;
-		return true;
-	});
+	const sendingRecords = allRecords.filter(isSendingRecord);
 
 	return {
 		sendingRecords,
