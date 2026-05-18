@@ -24,7 +24,7 @@ const apiKeyService = new Elysia({
 	.use(
 		openapi({
 			documentation: {
-				info: { title: "API KEY Service", version: "1.0.1" },
+				info: { title: "API KEY Service", version: "1.2.0" },
 				components: {
 					securitySchemes: {
 						apiKey: { type: "apiKey", name: "x-api-key", in: "header" },

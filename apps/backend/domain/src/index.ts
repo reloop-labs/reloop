@@ -1,15 +1,14 @@
 import "dotenv/config";
-import path from "node:path";
+import { opentelemetry } from "@elysia/opentelemetry";
+import { openapi } from "@elysiajs/openapi";
+import { serverTiming } from "@elysiajs/server-timing";
 import { domainConfig } from "@reloop/domain/domain.config";
 import { domainRoutes } from "@reloop/domain/routes/domain/domain.routes";
 import { landing } from "@reloop/domain/routes/landing/landing.index";
 import { loader } from "@reloop/domain/utils/loader";
-import { openapi } from "@elysiajs/openapi";
-import { serverTiming } from "@elysiajs/server-timing";
 import { Elysia } from "elysia";
 import { initLogger, log, parseError } from "evlog";
 import { evlog } from "evlog/elysia";
-import pkg from "../package.json";
 
 initLogger({ env: { service: "domain" } });
 
@@ -19,13 +18,13 @@ const domainService = new Elysia({
 	prefix: "/api/domain",
 	name: "Domain Service",
 })
-	.use(evlog())
+	.use(opentelemetry())
 	.use(
 		openapi({
 			documentation: {
 				info: {
 					title: "Domain Service",
-					version: pkg.version,
+					version: "1.2.0",
 				},
 				components: {
 					securitySchemes: {
@@ -39,6 +38,7 @@ const domainService = new Elysia({
 			},
 		}),
 	)
+	.use(evlog())
 	.use(serverTiming())
 	.onError(({ error, set }) => {
 		const parsed = parseError(error);
@@ -56,7 +56,10 @@ const domainService = new Elysia({
 		await loader();
 	})
 	.listen(port, () => {
-		console.log(`Domain Server is running on http://localhost:${port}/api/domain`);
+		log.info(
+			"Domain Service",
+			`Running on:\n  - Local: http://localhost:${port}/api/domain\n  - Base:  ${domainConfig.BASE_URL}/api/domain`,
+		);
 	});
 
 export type DomainService = typeof domainService;

@@ -1,6 +1,6 @@
-import type { DNSTypes } from "@reloop/domain/types/dns.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
+import type { DNSTypes } from "@reloop/domain/types/dns.type";
 import { log } from "evlog";
 import { useLogger } from "evlog/elysia";
 

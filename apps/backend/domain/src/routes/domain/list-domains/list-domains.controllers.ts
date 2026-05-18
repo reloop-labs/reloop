@@ -1,6 +1,6 @@
-import type { DomainTypes } from "@reloop/domain/types/domain.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
+import type { DomainTypes } from "@reloop/domain/types/domain.type";
 import { DOMAIN_LIST_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, count, desc, eq, ilike, isNull } from "drizzle-orm";
 import { log } from "evlog";

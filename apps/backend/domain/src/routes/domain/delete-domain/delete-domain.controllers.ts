@@ -1,8 +1,8 @@
-import { DomainErrors } from "@reloop/domain/lib/errors";
-import type { DomainTypes } from "@reloop/domain/types/domain.type";
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
+import { DomainErrors } from "@reloop/domain/lib/errors";
+import type { DomainTypes } from "@reloop/domain/types/domain.type";
 import { DOMAIN_DELETE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { log } from "evlog";

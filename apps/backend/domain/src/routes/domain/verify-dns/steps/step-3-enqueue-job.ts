@@ -1,8 +1,8 @@
-import { DomainErrors } from "@reloop/domain/lib/errors";
-import type { DomainStatus } from "@reloop/domain/types/domain.type";
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
+import { DomainErrors } from "@reloop/domain/lib/errors";
+import type { DomainStatus } from "@reloop/domain/types/domain.type";
 import { eq } from "drizzle-orm";
 import { log } from "evlog";
 import { useLogger } from "evlog/elysia";

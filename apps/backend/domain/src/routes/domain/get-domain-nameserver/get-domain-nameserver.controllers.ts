@@ -1,8 +1,8 @@
 import { resolveNs } from "node:dns/promises";
-import { DomainErrors } from "@reloop/domain/lib/errors";
-import type { DNSTypes } from "@reloop/domain/types/dns.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
+import { DomainErrors } from "@reloop/domain/lib/errors";
+import type { DNSTypes } from "@reloop/domain/types/dns.type";
 import { DOMAIN_GET_DNS_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { log } from "evlog";

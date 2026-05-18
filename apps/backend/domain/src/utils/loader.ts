@@ -1,7 +1,7 @@
-import { domainConfig } from "@reloop/domain/domain.config";
 import { bus } from "@reloop/bus";
 import { RedisCache } from "@reloop/cache/redis-client";
 import { db } from "@reloop/db/client";
+import { domainConfig } from "@reloop/domain/domain.config";
 import { log } from "evlog";
 
 export const redis = new RedisCache("domain", 86400, domainConfig.REDIS_URL);
