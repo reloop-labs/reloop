@@ -229,7 +229,7 @@ export const source = {
 				const title = match[2].trim();
 				const url = `#${title
 					.toLowerCase()
-					.replace(/[^\w ]+/g, "")
+					.replace(/[^\w\- ]+/g, "")
 					.replace(/\s+/g, "-")}`;
 				toc.push({ title, url, depth: match[1].length });
 			}

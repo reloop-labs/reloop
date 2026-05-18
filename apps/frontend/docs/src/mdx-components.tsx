@@ -70,7 +70,9 @@ export function getMDXComponents(
 					href={finalHref}
 					icon={processedIcon}
 					className="no-underline"
-				/>
+				>
+					{children}
+				</Card>
 			);
 		},
 		table: (props) => (

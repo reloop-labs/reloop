@@ -83,10 +83,9 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 
 				{/* Main Content Area - Seamless Card Layout */}
 				<main
-					id="nd-page"
 					className="relative mr-2 mb-2 flex min-h-0 flex-1 flex-col overflow-hidden rounded-3xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]"
 				>
-					<div className="flex-1 overflow-y-auto overflow-x-hidden">
+					<div id="nd-page" className="flex-1 overflow-y-auto overflow-x-hidden">
 						<div className="mx-auto min-h-full w-full transition-all duration-300">
 							{children}
 						</div>
