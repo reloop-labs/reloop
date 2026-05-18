@@ -1,4 +1,5 @@
 import {
+	verifyCnameRecord,
 	verifyDkimRecord,
 	verifyDmarcRecord,
 	verifyMxRecord,
@@ -43,21 +44,14 @@ export async function processDomainVerification({
 	const records = domainWithRecords.dnsRecords;
 	log.info({ message: "Fetched DNS records from database", domainId, records });
 
-	// Find each record type
-	const mxRecord = records.find((r) => r.recordType === "MX");
-	const spfRecord = records.find(
-		(r) => r.recordType === "TXT" && r.value.startsWith("v=spf1"),
-	);
+	// Find mandatory DKIM verification record
 	const dkimRecord = records.find(
 		(r) => r.recordType === "TXT" && r.value.startsWith("v=DKIM1"),
 	);
-	const dmarcRecord = records.find(
-		(r) => r.recordType === "TXT" && r.value.startsWith("v=DMARC1"),
-	);
 
-	if (!mxRecord || !spfRecord || !dkimRecord || !dmarcRecord) {
+	if (!dkimRecord) {
 		log.warn({
-			message: "Missing one or more DNS records for verification",
+			message: "Missing mandatory DKIM record for verification",
 			domainId,
 		});
 		await db
@@ -67,29 +61,130 @@ export async function processDomainVerification({
 		return;
 	}
 
-	// Run all verifications in parallel
-	const [mxOk, spfOk, dkimOk, dmarcOk] = await Promise.all([
-		verifyMxRecord(mxRecord.fqdn, mxRecord.value, mxRecord.priority ?? 10),
-		verifySpfRecord(spfRecord.fqdn, spfRecord.value),
-		verifyDkimRecord(dkimRecord.fqdn, dkimRecord.value),
-		verifyDmarcRecord(dmarcRecord.fqdn, dmarcRecord.value),
-	]);
+	// Conditionally verify SPF and DMARC (Enable Sending)
+	const isSendingEnabled = domainWithRecords.isSendingEmailEnabled;
+	const spfRecord = isSendingEnabled
+		? records.find((r) => r.recordType === "TXT" && r.value.startsWith("v=spf1"))
+		: undefined;
+	const dmarcRecord = isSendingEnabled
+		? records.find((r) => r.recordType === "TXT" && r.value.startsWith("v=DMARC1"))
+		: undefined;
 
-	const results = [
-		{ record: mxRecord, ok: mxOk },
-		{ record: spfRecord, ok: spfOk },
-		{ record: dkimRecord, ok: dkimOk },
-		{ record: dmarcRecord, ok: dmarcOk },
-	];
+	if (isSendingEnabled && (!spfRecord || !dmarcRecord)) {
+		log.warn({
+			message: "Missing SPF or DMARC record when sending is enabled",
+			domainId,
+		});
+		await db
+			.update(schema.domain)
+			.set({ status: "failed" })
+			.where(eq(schema.domain.id, domainId));
+		return;
+	}
+
+	// Conditionally verify MX (Enable Receiving)
+	const isReceivingEnabled = domainWithRecords.isReceivingEmailEnabled;
+	const mxRecord = isReceivingEnabled
+		? records.find((r) => r.recordType === "MX")
+		: undefined;
+
+	if (isReceivingEnabled && !mxRecord) {
+		log.warn({
+			message: "Missing MX record when receiving is enabled",
+			domainId,
+		});
+		await db
+			.update(schema.domain)
+			.set({ status: "failed" })
+			.where(eq(schema.domain.id, domainId));
+		return;
+	}
+
+	// Conditionally verify CNAME (Tracking)
+	const isTrackingEnabled =
+		domainWithRecords.isClickTrackingEnabled || domainWithRecords.isOpenTrackingEnabled;
+	const cnameRecord = isTrackingEnabled
+		? records.find((r) => r.recordType === "CNAME")
+		: undefined;
+
+	if (isTrackingEnabled && !cnameRecord) {
+		log.warn({
+			message: "Missing CNAME record when tracking is enabled",
+			domainId,
+		});
+		await db
+			.update(schema.domain)
+			.set({ status: "failed" })
+			.where(eq(schema.domain.id, domainId));
+		return;
+	}
+
+	// Compile active verifications dynamically
+	const activeResults: { record: any; verifyFn: () => Promise<boolean> }[] = [];
+
+	activeResults.push({
+		record: dkimRecord,
+		verifyFn: () => verifyDkimRecord(dkimRecord.fqdn, dkimRecord.value),
+	});
+
+	if (isSendingEnabled && spfRecord && dmarcRecord) {
+		activeResults.push({
+			record: spfRecord,
+			verifyFn: () => verifySpfRecord(spfRecord.fqdn, spfRecord.value),
+		});
+		activeResults.push({
+			record: dmarcRecord,
+			verifyFn: () => verifyDmarcRecord(dmarcRecord.fqdn, dmarcRecord.value),
+		});
+	}
+
+	if (isReceivingEnabled && mxRecord) {
+		activeResults.push({
+			record: mxRecord,
+			verifyFn: () =>
+				verifyMxRecord(mxRecord.fqdn, mxRecord.value, mxRecord.priority ?? 10),
+		});
+	}
+
+	if (isTrackingEnabled && cnameRecord) {
+		activeResults.push({
+			record: cnameRecord,
+			verifyFn: () => verifyCnameRecord(cnameRecord.fqdn, cnameRecord.value),
+		});
+	}
+
+	const verificationResults = await Promise.all(
+		activeResults.map((item) => item.verifyFn()),
+	);
+
+	const results = activeResults.map((item, index) => ({
+		record: item.record,
+		ok: verificationResults[index],
+	}));
+
+	const dkimOk = results.find((r) => r.record.id === dkimRecord.id)?.ok ?? false;
+	const spfOk = spfRecord
+		? (results.find((r) => r.record.id === spfRecord.id)?.ok ?? false)
+		: true;
+	const dmarcOk = dmarcRecord
+		? (results.find((r) => r.record.id === dmarcRecord.id)?.ok ?? false)
+		: true;
+	const mxOk = mxRecord
+		? (results.find((r) => r.record.id === mxRecord.id)?.ok ?? false)
+		: true;
+	const cnameOk = cnameRecord
+		? (results.find((r) => r.record.id === cnameRecord.id)?.ok ?? false)
+		: true;
 
 	log.info({
 		message: "DNS verification results",
 		domainId,
 		domainName,
-		mxOk,
-		spfOk,
 		dkimOk,
+		spfOk,
 		dmarcOk,
+		mxOk,
+		cnameOk,
 	});
 
 	// Update individual record statuses
@@ -104,7 +199,7 @@ export async function processDomainVerification({
 		}),
 	);
 
-	const allPassed = mxOk && spfOk && dkimOk && dmarcOk;
+	const allPassed = dkimOk && spfOk && dmarcOk && mxOk && cnameOk;
 
 	if (allPassed || isLastAttempt) {
 		const newDomainStatus = allPassed ? "active" : "failed";
@@ -123,14 +218,15 @@ export async function processDomainVerification({
 				"Domain verification failed — one or more DNS records did not match",
 			domainId,
 			domainName,
-			mxOk,
-			spfOk,
 			dkimOk,
+			spfOk,
 			dmarcOk,
+			mxOk,
+			cnameOk,
 		});
 
 		throw new Error(
-			`Verification failed for ${domainName}: MX=${mxOk} SPF=${spfOk} DKIM=${dkimOk} DMARC=${dmarcOk}`,
+			`Verification failed for ${domainName}: DKIM=${dkimOk} SPF=${spfOk} DMARC=${dmarcOk} MX=${mxOk} CNAME=${cnameOk}`,
 		);
 	}
 }

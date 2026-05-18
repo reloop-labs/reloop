@@ -1,4 +1,4 @@
-import { resolveMx, resolveTxt } from "node:dns";
+import { resolveCname, resolveMx, resolveTxt } from "node:dns";
 import { promisify } from "node:util";
 
 export async function verifyMxRecord(
@@ -129,6 +129,31 @@ export async function verifyDmarcRecord(
 		});
 	} catch (e) {
 		console.error(`Error verifying DMARC record for ${name}:`, e);
+		return false;
+	}
+}
+
+export async function verifyCnameRecord(
+	name: string,
+	value: string,
+): Promise<boolean> {
+	try {
+		const resolveCnamePromise = promisify(resolveCname);
+
+		const records = await Promise.race([
+			resolveCnamePromise(name),
+			new Promise<never>((_, reject) =>
+				setTimeout(() => reject(new Error("DNS query timeout")), 10000),
+			),
+		]);
+
+		return records.some((cname) => {
+			const actual = cname.toLowerCase().replace(/\.$/, "");
+			const expected = value.toLowerCase().replace(/\.$/, "");
+			return actual === expected;
+		});
+	} catch (e) {
+		console.error(`Error verifying CNAME record for ${name}:`, e);
 		return false;
 	}
 }
