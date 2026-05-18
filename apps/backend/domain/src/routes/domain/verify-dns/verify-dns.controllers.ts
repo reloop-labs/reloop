@@ -16,13 +16,10 @@ export async function verifyDNSRecordController({
 }) {
 	const log = useLogger();
 	try {
-		// Step 1: Fetch domain and validate
 		const { domainWithRecords } = await fetchDomain_step1({
 			domainId,
 			organizationId,
 		});
-
-		// Already in-flight — don't queue again
 		if (domainWithRecords.status === "verifying") {
 			log.info("Domain is already in verifying status, skipping re-queue");
 			return {
@@ -31,11 +28,7 @@ export async function verifyDNSRecordController({
 				event: DOMAIN_VERIFY_WEBHOOK_EVENT.id,
 			};
 		}
-
-		// Step 2: Update status to "verifying"
 		await updateStatusToVerifying_step2({ domainId });
-
-		// Step 3: Enqueue background job
 		await enqueueVerificationJob_step3({
 			domainId,
 			organizationId,
