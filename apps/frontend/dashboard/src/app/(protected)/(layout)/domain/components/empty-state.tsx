@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export const EmptyState = () => {
 	return (
-		<div className="flex flex-col items-center bg-bg-soft-200/10 px-6 py-12 text-center dark:bg-bg-soft-200/15">
+		<div className="flex flex-col items-center bg-bg-soft-200/10 px-6 py-12 text-center dark:bg-transparent">
 			<div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
 				<Icon name="globe" className="h-5 w-5 text-text-sub-600" />
 			</div>

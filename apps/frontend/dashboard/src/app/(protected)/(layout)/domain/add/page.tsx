@@ -135,7 +135,7 @@ const AddDomain = () => {
 				</form>
 			</div>
 
-			<div className="sticky top-0 hidden h-[calc(100vh-64px)] items-start justify-center overflow-hidden bg-bg-weak-50/10 pt-12 lg:flex">
+			<div className="sticky top-0 hidden h-[calc(100vh-64px)] items-start justify-center overflow-hidden pt-12 lg:flex">
 				<div className="relative h-full w-full">
 					<DomainPreview domain={watch("domain")} variant="domain" />
 				</div>
