@@ -32,18 +32,18 @@ export interface Domain {
 	domain: string;
 	organizationId: string;
 	userId: string;
-	domainType: "custom" | "subdomain" | "system";
+
 	status: DomainStatus;
-	userVerified: boolean;
+	userVerifiedDomain: boolean;
 	systemVerified: boolean;
 	customReturnPath: string;
 	trackingSubdomain: string;
-	clickTracking: boolean;
-	openTracking: boolean;
+	isClickTrackingEnabled: boolean;
+	isOpenTrackingEnabled: boolean;
 	tls: "opportunistic" | "enforced";
-	trackingDomain: boolean;
-	sendingEmail: boolean;
-	receivingEmail: boolean;
+	isTrackingDomain: boolean;
+	isSendingEmailEnabled: boolean;
+	isReceivingEmailEnabled: boolean;
 	verificationFailedReason: string | null;
 	deletedAt: Date | null;
 	lastVerifiedAt: Date | null;

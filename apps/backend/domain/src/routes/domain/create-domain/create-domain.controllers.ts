@@ -42,8 +42,8 @@ export async function createDomainController({
 			clickTracking,
 			openTracking,
 			tls,
-			sendingEmail,
-			receivingEmail,
+			isSendingEmailEnabled: sendingEmail,
+			isReceivingEmailEnabled: receivingEmail,
 		});
 
 		if (undeletedResponse) {
@@ -66,8 +66,8 @@ export async function createDomainController({
 			clickTracking,
 			openTracking,
 			tls,
-			sendingEmail,
-			receivingEmail,
+			isSendingEmailEnabled: sendingEmail,
+			isReceivingEmailEnabled: receivingEmail,
 		});
 
 		// Step 5: Create DNS records in database

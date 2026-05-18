@@ -147,10 +147,7 @@ export namespace DomainModel {
 			object: t.Literal("domain", { default: "domain" }),
 			id: t.String({ description: "Unique domain identifier" }),
 			domain: t.String({ description: "Domain name (e.g., send.reloop.com)" }),
-			domainType: t.Union(
-				[t.Literal("custom"), t.Literal("subdomain"), t.Literal("system")],
-				{ description: "Type of domain" },
-			),
+
 			status: t.Union(
 				[
 					t.Literal("start-verify"),
@@ -161,7 +158,7 @@ export namespace DomainModel {
 				],
 				{ description: "Domain verification status" },
 			),
-			userVerified: t.Boolean({
+			userVerifiedDomain: t.Boolean({
 				description: "Whether user has verified the domain",
 			}),
 			systemVerified: t.Boolean({
@@ -175,22 +172,22 @@ export namespace DomainModel {
 				description: "Custom tracking subdomain for click/open tracking",
 				default: "tracking",
 			}),
-			clickTracking: t.Boolean({
+			isClickTrackingEnabled: t.Boolean({
 				description: "Whether click tracking is enabled for the domain",
 			}),
-			openTracking: t.Boolean({
+			isOpenTrackingEnabled: t.Boolean({
 				description: "Whether open tracking is enabled for the domain",
 			}),
 			tls: t.Union([t.Literal("opportunistic"), t.Literal("enforced")], {
 				description: "TLS mode for the domain",
 			}),
-			trackingDomain: t.Boolean({
+			isTrackingDomain: t.Boolean({
 				description: "Whether domain is used for tracking",
 			}),
-			sendingEmail: t.Boolean({
+			isSendingEmailEnabled: t.Boolean({
 				description: "Whether sending email is enabled for the domain",
 			}),
-			receivingEmail: t.Boolean({
+			isReceivingEmailEnabled: t.Boolean({
 				description: "Whether receiving email is enabled for the domain",
 			}),
 			verificationFailedReason: t.Union([t.String(), t.Null()], {
@@ -214,17 +211,17 @@ export namespace DomainModel {
 					object: "domain",
 					id: "domain_123456789",
 					domain: "send.example.com",
-					domainType: "custom",
+
 					status: "active",
-					userVerified: true,
+					userVerifiedDomain: true,
 					systemVerified: true,
 					customReturnPath: "inbound",
-					clickTracking: true,
-					openTracking: true,
+					isClickTrackingEnabled: true,
+					isOpenTrackingEnabled: true,
 					tls: "opportunistic",
-					trackingDomain: false,
-					sendingEmail: true,
-					receivingEmail: true,
+					isTrackingDomain: false,
+					isSendingEmailEnabled: true,
+					isReceivingEmailEnabled: true,
 					dnsRecords: [
 						{
 							id: "dns_123456789",

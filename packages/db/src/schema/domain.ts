@@ -17,11 +17,7 @@ import { organization, user } from "./auth";
 const createDomainId = () => `domain_${createId()}`;
 const createDnsRecordId = () => `dns_${createId()}`;
 
-export const domainTypeEnum = pgEnum("domain_type", [
-	"custom",
-	"subdomain",
-	"system",
-]);
+
 export const domainStatusEnum = pgEnum("domain_status", [
 	"start-verify",
 	"verifying",
@@ -58,9 +54,9 @@ export const domain = pgTable(
 		userId: text("user_id")
 			.notNull()
 			.references(() => user.id, { onDelete: "cascade" }),
-		domainType: domainTypeEnum("domain_type").notNull().default("custom"),
+
 		status: domainStatusEnum("status").notNull().default("start-verify"),
-		userVerified: boolean("user_verified").notNull().default(false),
+		userVerifiedDomain: boolean("user_verified_domain").notNull().default(false),
 		systemVerified: boolean("system_verified").notNull().default(false),
 		customReturnPath: varchar("custom_return_path", { length: 255 })
 			.notNull()
@@ -68,12 +64,12 @@ export const domain = pgTable(
 		trackingSubdomain: varchar("tracking_subdomain", { length: 255 })
 			.notNull()
 			.default("tracking"),
-		clickTracking: boolean("click_tracking").notNull().default(false),
-		openTracking: boolean("open_tracking").notNull().default(false),
+		isClickTrackingEnabled: boolean("is_click_tracking_enabled").notNull().default(false),
+		isOpenTrackingEnabled: boolean("is_open_tracking_enabled").notNull().default(false),
 		tls: tlsModeEnum("tls").notNull().default("opportunistic"),
-		trackingDomain: boolean("tracking_domain").notNull().default(false),
-		sendingEmail: boolean("sending_email").notNull().default(true),
-		receivingEmail: boolean("receiving_email").notNull().default(true),
+		isTrackingDomain: boolean("is_tracking_domain").notNull().default(false),
+		isSendingEmailEnabled: boolean("is_sending_email_enabled").notNull().default(true),
+		isReceivingEmailEnabled: boolean("is_receiving_email_enabled").notNull().default(true),
 		verificationFailedReason: text("verification_failed_reason"),
 		deletedAt: timestamp("deleted_at"),
 		lastVerifiedAt: timestamp("last_verified_at"),
@@ -88,7 +84,7 @@ export const domain = pgTable(
 		index("domain_idx_user_id").on(table.userId),
 		index("domain_idx_organization_id").on(table.organizationId),
 		index("domain_idx_status").on(table.status),
-		index("domain_idx_user_verified").on(table.userVerified),
+		index("domain_idx_user_verified").on(table.userVerifiedDomain),
 		index("domain_idx_system_verified").on(table.systemVerified),
 		index("domain_idx_created_at").on(table.createdAt),
 		index("domain_idx_deleted_at").on(table.deletedAt),
@@ -96,7 +92,7 @@ export const domain = pgTable(
 		index("domain_idx_org_status").on(table.organizationId, table.status),
 		index("domain_idx_org_deleted").on(table.organizationId, table.deletedAt),
 		index("domain_idx_user_status").on(table.userId, table.status),
-		index("domain_idx_status_verified").on(table.status, table.userVerified),
+		index("domain_idx_status_verified").on(table.status, table.userVerifiedDomain),
 		unique("domain_unique_org_domain").on(table.organizationId, table.domain),
 	],
 );

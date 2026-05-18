@@ -17,8 +17,8 @@ export async function handleUndelete_step2({
 	clickTracking,
 	openTracking,
 	tls,
-	sendingEmail,
-	receivingEmail,
+	isSendingEmailEnabled,
+	isReceivingEmailEnabled,
 }: {
 	deletedDomain: typeof schema.domain.$inferSelect | null | undefined;
 	organizationId: string;
@@ -28,8 +28,8 @@ export async function handleUndelete_step2({
 	clickTracking?: boolean;
 	openTracking?: boolean;
 	tls?: "opportunistic" | "enforced";
-	sendingEmail?: boolean;
-	receivingEmail?: boolean;
+	isSendingEmailEnabled?: boolean;
+	isReceivingEmailEnabled?: boolean;
 }): Promise<DomainTypes.DomainResponse | null> {
 	const log = useLogger();
 	const domainId = deletedDomain?.id;
@@ -47,11 +47,11 @@ export async function handleUndelete_step2({
 				status: "start-verify",
 				customReturnPath,
 				trackingSubdomain,
-				clickTracking,
-				openTracking,
+				isClickTrackingEnabled: clickTracking,
+				isOpenTrackingEnabled: openTracking,
 				tls,
-				sendingEmail,
-				receivingEmail,
+				isSendingEmailEnabled,
+				isReceivingEmailEnabled,
 			})
 			.where(eq(schema.domain.id, domainId));
 

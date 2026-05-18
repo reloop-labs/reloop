@@ -6,7 +6,7 @@ export type DomainStatus =
 	| "suspended"
 	| "failed";
 
-export type DomainType = "custom" | "subdomain" | "system";
+
 
 export interface DNSRecord {
 	id: string;
@@ -28,17 +28,17 @@ export interface Domain {
 	object: "domain";
 	id: string;
 	domain: string;
-	domainType: DomainType;
+
 	status: DomainStatus;
-	userVerified: boolean;
+	userVerifiedDomain: boolean;
 	systemVerified: boolean;
 	customReturnPath: string;
-	clickTracking: boolean;
-	openTracking: boolean;
+	isClickTrackingEnabled: boolean;
+	isOpenTrackingEnabled: boolean;
 	tls: "opportunistic" | "enforced";
-	trackingDomain: boolean;
-	sendingEmail: boolean;
-	receivingEmail: boolean;
+	isTrackingDomain: boolean;
+	isSendingEmailEnabled: boolean;
+	isReceivingEmailEnabled: boolean;
 	verificationFailedReason: string | null;
 	dnsRecords: DNSRecord[];
 	deletedAt: string | null;

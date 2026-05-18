@@ -13,8 +13,8 @@ export async function createDomainEntry_step4({
 	clickTracking,
 	openTracking,
 	tls,
-	sendingEmail,
-	receivingEmail,
+	isSendingEmailEnabled,
+	isReceivingEmailEnabled,
 }: {
 	userId: string;
 	organizationId: string;
@@ -24,8 +24,8 @@ export async function createDomainEntry_step4({
 	clickTracking?: boolean;
 	openTracking?: boolean;
 	tls?: "opportunistic" | "enforced";
-	sendingEmail?: boolean;
-	receivingEmail?: boolean;
+	isSendingEmailEnabled?: boolean;
+	isReceivingEmailEnabled?: boolean;
 }) {
 	const log = useLogger();
 	const domainId = `domain_${createId()}`;
@@ -36,17 +36,17 @@ export async function createDomainEntry_step4({
 		userId: userId,
 		organizationId: organizationId,
 		domain: domain,
-		domainType: "custom",
+
 		status: "start-verify",
-		userVerified: false,
+		userVerifiedDomain: false,
 		systemVerified: false,
 		customReturnPath,
 		trackingSubdomain,
-		clickTracking,
-		openTracking,
+		isClickTrackingEnabled: clickTracking,
+		isOpenTrackingEnabled: openTracking,
 		tls,
-		sendingEmail,
-		receivingEmail,
+		isSendingEmailEnabled,
+		isReceivingEmailEnabled,
 		createdAt: new Date(),
 		updatedAt: new Date(),
 	});

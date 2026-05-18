@@ -39,19 +39,19 @@ export async function updateDomainController({
 		};
 
 		if (body.sending_email !== undefined) {
-			updateData.sendingEmail = body.sending_email;
+			updateData.isSendingEmailEnabled = body.sending_email;
 		}
 
 		if (body.receiving_email !== undefined) {
-			updateData.receivingEmail = body.receiving_email;
+			updateData.isReceivingEmailEnabled = body.receiving_email;
 		}
 
 		if (body.click_tracking !== undefined) {
-			updateData.clickTracking = body.click_tracking;
+			updateData.isClickTrackingEnabled = body.click_tracking;
 		}
 
 		if (body.open_tracking !== undefined) {
-			updateData.openTracking = body.open_tracking;
+			updateData.isOpenTrackingEnabled = body.open_tracking;
 		}
 
 		await db
