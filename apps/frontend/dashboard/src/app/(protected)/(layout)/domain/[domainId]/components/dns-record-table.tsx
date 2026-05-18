@@ -58,15 +58,16 @@ const RecordSkeleton = ({
 		<div className="flex items-center gap-2">
 			<Skeleton className="h-4 w-32" />
 		</div>
+		{/* TTL Column */}
+		<div className="flex items-center">
+			<Skeleton className="h-4 w-8" />
+		</div>
 		{/* Priority Column - always render slot if status is shown for alignment */}
 		{(!hideStatus || showPriority) && (
 			<div className="flex items-center">
 				{showPriority && <Skeleton className="h-4 w-6" />}
 			</div>
 		)}
-		<div className="flex items-center">
-			<Skeleton className="h-4 w-8" />
-		</div>
 		{!hideStatus && (
 			<div className="flex items-center">
 				<Skeleton className="h-5 w-16 rounded-md" />

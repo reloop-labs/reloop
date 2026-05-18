@@ -32,11 +32,13 @@ const RecordSkeleton = ({ showPriority }: { showPriority?: boolean }) => (
 		<div className="flex items-center gap-2">
 			<Skeleton className="h-4 w-32" />
 		</div>
-		<div className="flex items-center">
-			{showPriority && <Skeleton className="h-4 w-6" />}
-		</div>
+		{/* TTL Column */}
 		<div className="flex items-center">
 			<Skeleton className="h-4 w-8" />
+		</div>
+		{/* Priority Column */}
+		<div className="flex items-center">
+			{showPriority && <Skeleton className="h-4 w-6" />}
 		</div>
 	</div>
 );

@@ -4,7 +4,7 @@ import type { DNSRecord } from "@fe/dashboard/types/api.types";
 import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
 import type * as React from "react";
-import { DNSRecordTableMinimal } from "./dns-record-table-minimal";
+import { DNSRecordTable } from "./dns-record-table";
 
 interface DNSRecordSectionProps {
 	title: string;
@@ -30,6 +30,10 @@ export const DNSRecordSection: React.FC<DNSRecordSectionProps> = ({
 	docsUrl,
 	loadingRows = 1,
 }) => {
+	const showPriorityColumn = records.some(
+		(r) => r.priority !== undefined && r.priority !== null,
+	);
+
 	return (
 		<div className="relative mt-7">
 			<div className="mb-3 flex items-start justify-between gap-4">
@@ -53,11 +57,12 @@ export const DNSRecordSection: React.FC<DNSRecordSectionProps> = ({
 				</Link>
 			</div>
 			<div className="w-full">
-				<DNSRecordTableMinimal
+				<DNSRecordTable
 					records={records}
 					onCopyToClipboard={onCopyToClipboard}
 					isLoading={isLoading}
 					loadingRows={loadingRows}
+					showPriorityColumn={showPriorityColumn}
 				/>
 			</div>
 		</div>
