@@ -79,21 +79,23 @@ export function getMDXComponents(
 			</div>
 		),
 		thead: (props) => (
-			<thead className="border-fd-border border-b text-left" {...props} />
+			<thead className="border-stroke-soft-100 border-b text-left" {...props} />
 		),
 		tbody: (props) => (
-			<tbody className="divide-y divide-fd-border" {...props} />
+			<tbody className="divide-y divide-stroke-soft-100" {...props} />
 		),
 		tr: (props) => (
-			<tr className="transition-colors hover:bg-fd-muted/50" {...props} />
+			<tr className="transition-colors hover:bg-stroke-soft-100" {...props} />
 		),
 		th: (props) => (
 			<th
-				className="px-4 py-3 font-semibold text-fd-muted-foreground"
+				className="px-4 py-3 font-semibold text-[#171717] dark:text-white"
 				{...props}
 			/>
 		),
-		td: (props) => <td className="px-4 py-3 text-fd-foreground" {...props} />,
+		td: (props) => (
+			<td className="px-4 py-3 text-[#171717] dark:text-white" {...props} />
+		),
 		Accordion,
 		Callout,
 		CodeBlock,
