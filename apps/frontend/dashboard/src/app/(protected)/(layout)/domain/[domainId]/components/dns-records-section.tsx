@@ -2,12 +2,12 @@
 
 import type { DNSRecord, DomainResponse } from "@fe/dashboard/types/api.types";
 import { Icon } from "@reloop/ui/icon";
+import * as Switch from "@reloop/ui/switch";
+import { AnimatePresence, motion } from "framer-motion";
+import { useDomainActions } from "../hooks/use-domain-actions";
 import { DNSAutoConnectBanner } from "./dns-auto-connect-banner";
 import { groupDomainDnsRecords } from "./dns-record-groups";
 import { DNSRecordTable } from "./dns-record-table";
-import { useDomainActions } from "../hooks/use-domain-actions";
-import * as Switch from "@reloop/ui/switch";
-import { motion, AnimatePresence } from "framer-motion";
 
 interface DNSRecordsSectionProps {
 	domain?: DomainResponse;
@@ -18,19 +18,26 @@ export const DNSRecordsSection = ({
 	domain,
 	isLoading,
 }: DNSRecordsSectionProps) => {
-	const { dkimRecords, sendingRecords, receivingRecords, trackingRecords, dmarcRecords } = groupDomainDnsRecords(
-		domain?.dnsRecords,
-	);
+	const {
+		dkimRecords,
+		sendingRecords,
+		receivingRecords,
+		trackingRecords,
+		dmarcRecords,
+	} = groupDomainDnsRecords(domain?.dnsRecords);
 
 	const { handleUpdateDomain } = useDomainActions(domain?.id, domain);
 
 	return (
-		<div className="mt-6 mb-24 space-y-4">
-			<DNSAutoConnectBanner domain={domain} />
-			
+		<div className="mt-6 mb-24 flex flex-col">
+			{domain?.status && <DNSAutoConnectBanner domain={domain} />}
+
 			{/* Domain Verification Group */}
-			<div className="space-y-3">
-				<h3 className="font-semibold text-base text-text-strong-950">Domain Verification</h3>
+			<div className="my-6">
+				<div className="mb-4 flex items-center gap-2 text-base text-text-strong-950">
+					<h3 className="font-semibold">Domain Verification</h3>
+					<Icon name="shield" className="h-4 w-4 text-text-sub-600" />
+				</div>
 				<DNSRecordSectionGroup
 					title="DKIM"
 					docsUrl="https://reloop.sh/docs/dns/dkim"
@@ -41,15 +48,20 @@ export const DNSRecordsSection = ({
 			</div>
 
 			{/* Enable Sending Group */}
-			<div className="space-y-3 pt-4 border-t border-stroke-soft-100 dark:border-stroke-soft-100/10">
+			<div className="mb-6 border-stroke-soft-100 border-t pt-6 dark:border-stroke-soft-100/10">
 				<div className="flex items-center justify-between">
-					<h3 className="font-semibold text-base text-text-strong-950">Enable Sending</h3>
+					<h3 className="flex items-center gap-2 font-semibold text-base text-text-strong-950">
+						<Icon name="send-1" className="h-4 w-4 text-text-sub-600" />
+						Enable Sending
+					</h3>
 					<Switch.Root
 						checked={domain?.isSendingEmailEnabled}
 						onCheckedChange={(checked) =>
 							handleUpdateDomain(
 								{ isSendingEmailEnabled: checked },
-								checked ? "Sending enabled successfully" : "Sending disabled successfully",
+								checked
+									? "Sending enabled successfully"
+									: "Sending disabled successfully",
 							)
 						}
 					/>
@@ -61,9 +73,9 @@ export const DNSRecordsSection = ({
 							animate={{ height: "auto", opacity: 1 }}
 							exit={{ height: 0, opacity: 0 }}
 							transition={{ duration: 0.2, ease: "easeInOut" }}
-							className="overflow-hidden"
+							className="mt-4 overflow-hidden"
 						>
-							<div className="space-y-4 pt-1">
+							<div>
 								<DNSRecordSectionGroup
 									title="SPF"
 									docsUrl="https://reloop.sh/docs/dns/spf"
@@ -78,6 +90,7 @@ export const DNSRecordsSection = ({
 									records={dmarcRecords}
 									isLoading={!!isLoading}
 									tableId="dmarc-"
+									className="mt-7"
 								/>
 							</div>
 						</motion.div>
@@ -87,15 +100,20 @@ export const DNSRecordsSection = ({
 
 			{/* Enable Receiving Group */}
 			{receivingRecords.length > 0 && (
-				<div className="space-y-3 pt-4 border-t border-stroke-soft-100 dark:border-stroke-soft-100/10">
+				<div className="mb-6 border-stroke-soft-100 border-t pt-6 dark:border-stroke-soft-100/10">
 					<div className="flex items-center justify-between">
-						<h3 className="font-semibold text-base text-text-strong-950">Enable Receiving</h3>
+						<h3 className="flex items-center gap-2 font-semibold text-base text-text-strong-950">
+							<Icon name="inbox" className="h-4 w-4 text-text-sub-600" />
+							Enable Receiving
+						</h3>
 						<Switch.Root
 							checked={domain?.isReceivingEmailEnabled}
 							onCheckedChange={(checked) =>
 								handleUpdateDomain(
 									{ isReceivingEmailEnabled: checked },
-									checked ? "Receiving enabled successfully" : "Receiving disabled successfully",
+									checked
+										? "Receiving enabled successfully"
+										: "Receiving disabled successfully",
 								)
 							}
 						/>
@@ -107,9 +125,9 @@ export const DNSRecordsSection = ({
 								animate={{ height: "auto", opacity: 1 }}
 								exit={{ height: 0, opacity: 0 }}
 								transition={{ duration: 0.2, ease: "easeInOut" }}
-								className="overflow-hidden"
+								className="mt-4 overflow-hidden"
 							>
-								<div className="pt-1">
+								<div>
 									<DNSRecordSectionGroup
 										title="MX"
 										docsUrl="https://reloop.sh/docs/dns/mx"
@@ -126,29 +144,40 @@ export const DNSRecordsSection = ({
 
 			{/* Tracking Group */}
 			{trackingRecords.length > 0 && (
-				<div className="space-y-3 pt-4 border-t border-stroke-soft-100 dark:border-stroke-soft-100/10">
+				<div className="border-stroke-soft-100 border-t pt-6 dark:border-stroke-soft-100/10">
 					<div className="flex items-center justify-between">
-						<h3 className="font-semibold text-base text-text-strong-950">Tracking</h3>
+						<h3 className="flex items-center gap-2 font-semibold text-base text-text-strong-950">
+							<Icon name="graph-up" className="h-4 w-4 text-text-sub-600" />
+							Tracking
+						</h3>
 						<Switch.Root
-							checked={domain?.isClickTrackingEnabled || domain?.isOpenTrackingEnabled}
+							checked={
+								domain?.isClickTrackingEnabled || domain?.isOpenTrackingEnabled
+							}
 							onCheckedChange={(checked) =>
 								handleUpdateDomain(
-									{ isClickTrackingEnabled: checked, isOpenTrackingEnabled: checked },
-									checked ? "Tracking enabled successfully" : "Tracking disabled successfully",
+									{
+										isClickTrackingEnabled: checked,
+										isOpenTrackingEnabled: checked,
+									},
+									checked
+										? "Tracking enabled successfully"
+										: "Tracking disabled successfully",
 								)
 							}
 						/>
 					</div>
 					<AnimatePresence initial={false}>
-						{(domain?.isClickTrackingEnabled || domain?.isOpenTrackingEnabled) && (
+						{(domain?.isClickTrackingEnabled ||
+							domain?.isOpenTrackingEnabled) && (
 							<motion.div
 								initial={{ height: 0, opacity: 0 }}
 								animate={{ height: "auto", opacity: 1 }}
 								exit={{ height: 0, opacity: 0 }}
 								transition={{ duration: 0.2, ease: "easeInOut" }}
-								className="overflow-hidden"
+								className="mt-4 overflow-hidden"
 							>
-								<div className="pt-1">
+								<div>
 									<DNSRecordSectionGroup
 										title="CNAME"
 										docsUrl="https://reloop.sh/docs/dns/cname"
@@ -172,6 +201,7 @@ interface DNSRecordSectionGroupProps {
 	records: DNSRecord[];
 	isLoading: boolean;
 	tableId: string;
+	className?: string;
 }
 
 const DNSRecordSectionGroup = ({
@@ -180,10 +210,11 @@ const DNSRecordSectionGroup = ({
 	records,
 	isLoading,
 	tableId,
+	className,
 }: DNSRecordSectionGroupProps) => {
 	return (
-		<div>
-			<div className="mb-2 flex items-start justify-between gap-4">
+		<div className={className}>
+			<div className="mb-3 flex items-start justify-between gap-4">
 				<div className="space-y-1">
 					<a
 						href={docsUrl}
