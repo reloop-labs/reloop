@@ -74,27 +74,31 @@ export function getMDXComponents(
 			);
 		},
 		table: (props) => (
-			<div className="my-6! w-full overflow-y-auto">
+			<div className="my-6! w-full overflow-y-auto rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/50">
 				<table className="my-0! w-full border-collapse text-sm" {...props} />
 			</div>
 		),
 		thead: (props) => (
-			<thead className="border-stroke-soft-100 border-b text-left" {...props} />
+			<thead className="bg-bg-soft-100 text-left dark:bg-white/5" {...props} />
 		),
-		tbody: (props) => (
-			<tbody className="divide-y divide-stroke-soft-100" {...props} />
-		),
+		tbody: (props) => <tbody {...props} />,
 		tr: (props) => (
-			<tr className="transition-colors hover:bg-stroke-soft-100" {...props} />
+			<tr
+				className="transition-colors hover:bg-bg-soft-100 dark:hover:bg-white/5"
+				{...props}
+			/>
 		),
 		th: (props) => (
 			<th
-				className="px-4 py-3 font-semibold text-[#171717] dark:text-white"
+				className="border-stroke-soft-100 border-b px-4 py-3 font-semibold text-[#171717] dark:border-stroke-soft-100/50 dark:text-white"
 				{...props}
 			/>
 		),
 		td: (props) => (
-			<td className="px-4 py-3 text-[#171717] dark:text-white" {...props} />
+			<td
+				className="border-stroke-soft-100 border-b px-4 py-3 text-[#171717] dark:border-stroke-soft-100/50 dark:text-white"
+				{...props}
+			/>
 		),
 		Accordion,
 		Callout,

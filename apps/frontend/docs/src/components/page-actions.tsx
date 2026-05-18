@@ -20,8 +20,10 @@ export function PageActions({
 	 * A URL to fetch the raw Markdown/MDX content of page
 	 */
 	markdownUrl,
+	rawContent,
 }: {
-	markdownUrl: string;
+	markdownUrl?: string;
+	rawContent?: string;
 }) {
 	const [isLoading, setLoading] = useState(false);
 
@@ -29,6 +31,13 @@ export function PageActions({
 	const [mcpChecked, setMcpChecked] = useState(false);
 
 	const onCopy = async () => {
+		if (rawContent) {
+			await navigator.clipboard.writeText(rawContent);
+			setChecked(true);
+			setTimeout(() => setChecked(false), 2000);
+			return;
+		}
+		if (!markdownUrl) return;
 		const cached = cache.get(markdownUrl);
 		if (cached) {
 			await navigator.clipboard.writeText(cached);
@@ -36,9 +45,15 @@ export function PageActions({
 			setLoading(true);
 			try {
 				const res = await fetch(markdownUrl);
+				if (!res.ok) {
+					throw new Error(`Failed to fetch markdown: ${res.status}`);
+				}
 				const content = await res.text();
 				cache.set(markdownUrl, content);
 				await navigator.clipboard.writeText(content);
+			} catch (error) {
+				console.error("Copy failed:", error);
+				return; // Don't show success if it failed
 			} finally {
 				setLoading(false);
 			}
