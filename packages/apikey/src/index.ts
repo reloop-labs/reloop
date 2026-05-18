@@ -3,7 +3,7 @@ import type { RedisCache } from "@reloop/cache/redis-client";
 import { db as defaultDb } from "@reloop/db/client";
 
 export const API_KEY_PREFIX = "rl_prod";
-export const API_KEY_LENGTH = 64;
+export const API_KEY_LENGTH = 20;
 
 export function hashApiKey(key: string): string {
 	return createHash("sha256").update(key).digest("hex");
