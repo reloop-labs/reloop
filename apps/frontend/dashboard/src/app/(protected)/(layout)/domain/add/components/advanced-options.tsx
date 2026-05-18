@@ -1,19 +1,25 @@
 import * as Checkbox from "@reloop/ui/checkbox";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
-import { type Control, Controller, type UseFormRegister } from "react-hook-form";
+import {
+	type Control,
+	Controller,
+	type UseFormRegister,
+} from "react-hook-form";
 import type { DomainFormValues } from "../schema";
 
 interface AdvancedOptionsProps {
 	control: Control<DomainFormValues>;
 	register: UseFormRegister<DomainFormValues>;
 	isLoading: boolean;
+	domain?: string;
 }
 
 export const AdvancedOptions = ({
 	control,
 	register,
 	isLoading,
+	domain,
 }: AdvancedOptionsProps) => {
 	return (
 		<div className="grid grid-cols-1 gap-4 pt-4">
@@ -22,7 +28,7 @@ export const AdvancedOptions = ({
 					htmlFor="customReturnPath"
 					className="block font-medium text-sm text-text-strong-950"
 				>
-					Custom Return-Path
+					Receiving email path
 				</Label.Root>
 				<Input.Root className="w-full" size="small">
 					<Input.Wrapper>
@@ -32,6 +38,11 @@ export const AdvancedOptions = ({
 							{...register("customReturnPath")}
 							disabled={isLoading}
 						/>
+						{domain && (
+							<span className="flex items-center pr-3 font-medium text-text-sub-600 text-xs">
+								.{domain}
+							</span>
+						)}
 					</Input.Wrapper>
 				</Input.Root>
 			</div>
@@ -51,6 +62,11 @@ export const AdvancedOptions = ({
 							{...register("trackingSubdomain")}
 							disabled={isLoading}
 						/>
+						{domain && (
+							<span className="flex items-center pr-3 font-medium text-text-sub-600 text-xs">
+								.{domain}
+							</span>
+						)}
 					</Input.Wrapper>
 				</Input.Root>
 			</div>
@@ -91,8 +107,8 @@ export const AdvancedOptions = ({
 						<p className="font-medium text-xs">Enable open tracking</p>
 					</div>
 					<p className="pl-7 text-text-sub-600 text-xs leading-relaxed">
-						Open tracking can produce inaccurate results. Learn more and consider
-						if open tracking is right for you.
+						Open tracking can produce inaccurate results. Learn more and
+						consider if open tracking is right for you.
 					</p>
 				</div>
 			</div>

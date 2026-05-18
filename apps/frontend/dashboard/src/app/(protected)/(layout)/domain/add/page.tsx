@@ -93,7 +93,7 @@ const AddDomain = () => {
 						domain={watch("domain")}
 					/>
 
-					<AdvancedOptions control={control} register={register} isLoading={status === "loading"} />
+					<AdvancedOptions control={control} register={register} domain={watch("domain")} isLoading={status === "loading"} />
 					<div className="mt-6 flex items-center gap-3">
 						<Button.Root
 							type="submit"
