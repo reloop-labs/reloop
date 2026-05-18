@@ -10,8 +10,6 @@ export async function updateStatusToVerifying_step2({
 	domainId: string;
 }) {
 	const log = useLogger();
-
-	// Set status to "verifying"
 	log.info("Updating domain status to verifying");
 	await db
 		.update(schema.domain)
