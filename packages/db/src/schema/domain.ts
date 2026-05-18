@@ -65,6 +65,9 @@ export const domain = pgTable(
 		customReturnPath: varchar("custom_return_path", { length: 255 })
 			.notNull()
 			.default("inbound"),
+		trackingSubdomain: varchar("tracking_subdomain", { length: 255 })
+			.notNull()
+			.default("tracking"),
 		clickTracking: boolean("click_tracking").notNull().default(false),
 		openTracking: boolean("open_tracking").notNull().default(false),
 		tls: tlsModeEnum("tls").notNull().default("opportunistic"),

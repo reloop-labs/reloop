@@ -11,6 +11,7 @@ export const createDomainRoute = new Elysia().use(authMiddleware).post(
 			organizationId: organizationId,
 			domain: body.domain,
 			custom_return_path: body.custom_return_path,
+			tracking: body.tracking,
 			click_tracking: body.click_tracking,
 			open_tracking: body.open_tracking,
 			tls: body.tls,

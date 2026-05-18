@@ -9,6 +9,7 @@ export async function createDomainEntry_step4({
 	organizationId,
 	domain,
 	customReturnPath,
+	trackingSubdomain,
 	clickTracking,
 	openTracking,
 	tls,
@@ -19,6 +20,7 @@ export async function createDomainEntry_step4({
 	organizationId: string;
 	domain: string;
 	customReturnPath?: string;
+	trackingSubdomain?: string;
 	clickTracking?: boolean;
 	openTracking?: boolean;
 	tls?: "opportunistic" | "enforced";
@@ -39,6 +41,7 @@ export async function createDomainEntry_step4({
 		userVerified: false,
 		systemVerified: false,
 		customReturnPath,
+		trackingSubdomain,
 		clickTracking,
 		openTracking,
 		tls,

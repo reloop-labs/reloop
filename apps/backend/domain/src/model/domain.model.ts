@@ -22,6 +22,16 @@ export namespace DomainModel {
 					description: "Custom return-path subdomain (e.g., inbound)",
 				}),
 			),
+			tracking: t.Optional(
+				t.String({
+					minLength: 1,
+					maxLength: 255,
+					pattern:
+						"^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$",
+					default: "tracking",
+					description: "Custom tracking subdomain (e.g., tracking)",
+				}),
+			),
 			click_tracking: t.Optional(
 				t.Boolean({
 					default: false,
@@ -160,6 +170,10 @@ export namespace DomainModel {
 			customReturnPath: t.String({
 				description: "Custom return path subdomain for SPF and bounce handling",
 				default: "inbound",
+			}),
+			trackingSubdomain: t.String({
+				description: "Custom tracking subdomain for click/open tracking",
+				default: "tracking",
 			}),
 			clickTracking: t.Boolean({
 				description: "Whether click tracking is enabled for the domain",

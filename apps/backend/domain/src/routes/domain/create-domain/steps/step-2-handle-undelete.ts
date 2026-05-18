@@ -13,6 +13,7 @@ export async function handleUndelete_step2({
 	organizationId,
 	domain,
 	customReturnPath,
+	trackingSubdomain,
 	clickTracking,
 	openTracking,
 	tls,
@@ -23,6 +24,7 @@ export async function handleUndelete_step2({
 	organizationId: string;
 	domain: string;
 	customReturnPath?: string;
+	trackingSubdomain?: string;
 	clickTracking?: boolean;
 	openTracking?: boolean;
 	tls?: "opportunistic" | "enforced";
@@ -30,11 +32,11 @@ export async function handleUndelete_step2({
 	receivingEmail?: boolean;
 }): Promise<DomainTypes.DomainResponse | null> {
 	const log = useLogger();
+	const domainId = deletedDomain?.id;
 
-	if (deletedDomain?.deletedAt) {
+	if (deletedDomain && domainId) {
 		const now = new Date();
-		const domainId = deletedDomain.id;
-		log.info("Undeleting domain");
+		log.info("Undeleting existing domain");
 
 		await db
 			.update(schema.domain)
@@ -44,6 +46,7 @@ export async function handleUndelete_step2({
 				createdAt: now,
 				status: "start-verify",
 				customReturnPath,
+				trackingSubdomain,
 				clickTracking,
 				openTracking,
 				tls,
