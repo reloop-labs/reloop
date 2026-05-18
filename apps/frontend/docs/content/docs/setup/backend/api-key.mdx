@@ -1,48 +1,39 @@
 ---
-title: API Key Service Setup
+title: API Key
 description: Set up, configure, and run the Reloop API Key microservice locally.
 ---
 
 The **API Key Service** is an **ElysiaJS** microservice responsible for generation, hashing, validation, and revocation of external developer API keys — enabling secure machine-to-machine integrations with the Reloop platform.
 
 <Callout type="info" title="Complete Base Setup First" variant="note">
-  Ensure you've finished the [Local Development Setup](/docs/setup) — Bun installed, hosts file configured, and Docker stack running — before proceeding.
+  Ensure you've finished the [Local Development Setup](/docs/setup) — before proceeding.
 </Callout>
 
----
 
 ## Service Overview
 
 | Property | Value |
 | :--- | :--- |
-| **Directory** | `apps/backend/api-key/` |
+| **Directory** | `apps/backend/api-key` |
 | **Port** | `8012` |
-| **Local URL** | `https://local.reloop.sh/api/api-key` |
-| **Swagger UI** | `https://local.reloop.sh/api/api-key/openapi` |
-| **Stack** | ElysiaJS · Better Auth API Key Plugin · PostgreSQL · Redis · NATS |
+| **Local URL** | [https://local.reloop.sh/api/api-key](https://local.reloop.sh/api/api-key) |
+| **Swagger UI** | [https://local.reloop.sh/api/api-key/openapi](https://local.reloop.sh/api/api-key/openapi) |
+| **Stack** | `ElysiaJS`  `Better Auth API Key Plugin` `PostgreSQL` `Redis` `NATS` |
 
----
 
 ## Quick Start
-
-<CodeGroup>
-
+<Callout
+  icon="union"
+  variant="info"
+>
+Run the following command from the root of the monorepo:
+</Callout>
 ```bash
-# Monorepo Root (Recommended)
 bun be:api-key:dev
 ```
 
-```bash
-# Service Directory
-cd apps/backend/api-key
-bun dev
-```
-
-</CodeGroup>
-
 The service starts with hot reloading on port `8012`.
 
----
 
 ## Environment Configuration
 
@@ -73,7 +64,6 @@ NATS_URL=nats://localhost:4222
 | `NATS_URL` | **YES** | `nats://localhost:4222` | Connection URL for NATS event bus messaging. |
 | `NODE_ENV` | **YES** | `development` | Active environment scope (`development` or `production`). |
 
----
 
 ## Development Commands
 
@@ -85,8 +75,6 @@ All commands run from the **monorepo root**.
 | `bun run --filter=api-key build` | Compile production bundle |
 | `bun run --filter=api-key start` | Run compiled production build |
 | `bun run --filter=api-key check-types` | TypeScript type-check |
-
----
 
 ## Database Schema
 
@@ -118,8 +106,6 @@ Stores provisioned credentials, rate-limiting state, scopes, and request logs.
 | `expiresAt` | `timestamp` | `null` | Key expiration timestamp (`null` = no expiry) |
 | `permissions` | `text` | `null` | Serialized permission scopes |
 | `metadata` | `text` | `null` | Arbitrary serialized key attributes |
-
----
 
 ## Architecture
 
