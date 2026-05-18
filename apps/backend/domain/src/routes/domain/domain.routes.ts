@@ -1,4 +1,3 @@
-import { authMiddleware } from "@reloop/domain/middleware/auth";
 import { createDomainRoute } from "@reloop/domain/routes/domain/create-domain/create-domain.route";
 import { deleteDomainRoute } from "@reloop/domain/routes/domain/delete-domain/delete-domain.route";
 import { getDomainRoute } from "@reloop/domain/routes/domain/get-domain/get-domain.route";
@@ -9,7 +8,6 @@ import { verifyDNSRecordRoute } from "@reloop/domain/routes/domain/verify-dns/ve
 import { Elysia } from "elysia";
 
 export const domainRoutes = new Elysia({ prefix: "/v1", name: "DomainRoutes" })
-	.use(authMiddleware)
 	.use(createDomainRoute)
 	.use(getDomainNameserversRoute)
 	.use(getDomainRoute)

@@ -1,10 +1,14 @@
 import { authMiddleware } from "@reloop/domain/middleware/auth";
+import { rateLimitPlugin } from "@reloop/domain/middleware/rate-limit";
 import { DomainModel } from "@reloop/domain/model/domain.model";
 import { Elysia, t } from "elysia";
 import { verifyDNSRecordController } from "./verify-dns.controllers";
 import { verifyDNSXCodeSamples } from "./verify-dns.x-codeSamples";
 
-export const verifyDNSRecordRoute = new Elysia().use(authMiddleware).post(
+export const verifyDNSRecordRoute = new Elysia()
+	.use(authMiddleware)
+	.use(rateLimitPlugin({ max: 10, windowSeconds: 60, namespace: "verify" }))
+	.post(
 	"/verify/:domain_id",
 	async ({ params: { domain_id }, organizationId }) => {
 		return await verifyDNSRecordController({
@@ -14,6 +18,7 @@ export const verifyDNSRecordRoute = new Elysia().use(authMiddleware).post(
 	},
 	{
 		auth: true,
+		rateLimit: true,
 		params: t.Object({
 			domain_id: t.String(),
 		}),

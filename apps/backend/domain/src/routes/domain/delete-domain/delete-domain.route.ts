@@ -1,10 +1,14 @@
 import { authMiddleware } from "@reloop/domain/middleware/auth";
+import { rateLimitPlugin } from "@reloop/domain/middleware/rate-limit";
 import { DomainModel } from "@reloop/domain/model/domain.model";
 import { Elysia, t } from "elysia";
 import { deleteDomainController } from "./delete-domain.controllers";
 import { deleteDomainXCodeSamples } from "./delete-domain.x-codeSamples";
 
-export const deleteDomainRoute = new Elysia().use(authMiddleware).delete(
+export const deleteDomainRoute = new Elysia()
+	.use(authMiddleware)
+	.use(rateLimitPlugin({ max: 10, windowSeconds: 60, namespace: "delete" }))
+	.delete(
 	"/:domain_id",
 	async ({ params: { domain_id }, organizationId }) => {
 		return await deleteDomainController({
@@ -14,6 +18,7 @@ export const deleteDomainRoute = new Elysia().use(authMiddleware).delete(
 	},
 	{
 		auth: true,
+		rateLimit: true,
 		params: t.Object({
 			domain_id: t.String(),
 		}),
