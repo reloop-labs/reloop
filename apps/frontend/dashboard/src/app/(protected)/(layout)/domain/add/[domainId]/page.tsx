@@ -116,8 +116,8 @@ const NewDomainPage = () => {
 				{/* Domain Verification Group */}
 				<div className="mt-6">
 					<div className="mb-4 flex items-center gap-2 text-base text-text-strong-950">
-						<h3 className="font-semibold">Domain Verification</h3>
 						<Icon name="shield" className="h-4 w-4 text-text-sub-600" />
+						<h3 className="font-semibold">Domain Verification</h3>
 					</div>
 					{dkimRecords.length > 0 && (
 						<DNSRecordSection

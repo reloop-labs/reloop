@@ -76,9 +76,13 @@ export const ConfigureDnsStep = () => {
 		setStep(4);
 	});
 
-	const { sendingRecords, receivingRecords, dkimRecords, dmarcRecords, trackingRecords } = groupDomainDnsRecords(
-		domainData?.dnsRecords,
-	);
+	const {
+		sendingRecords,
+		receivingRecords,
+		dkimRecords,
+		dmarcRecords,
+		trackingRecords,
+	} = groupDomainDnsRecords(domainData?.dnsRecords);
 
 	if (!domainId && !isLoading) {
 		return (
@@ -97,12 +101,12 @@ export const ConfigureDnsStep = () => {
 				<div className="mt-6">
 					<DNSAutoConnectBanner domain={domainData} domainId={domainId} />
 				</div>
-				
+
 				{/* Domain Verification Group */}
 				<div className="mt-6">
 					<div className="mb-4 flex items-center gap-2 text-base text-text-strong-950">
-						<h3 className="font-semibold">Domain Verification</h3>
 						<Icon name="shield" className="h-4 w-4 text-text-sub-600" />
+						<h3 className="font-semibold">Domain Verification</h3>
 					</div>
 					{dkimRecords.length > 0 && (
 						<DNSRecordSection
@@ -117,7 +121,7 @@ export const ConfigureDnsStep = () => {
 				</div>
 
 				{/* Enable Sending Group */}
-				<div className="mt-6 pt-6 border-t border-stroke-soft-100 dark:border-stroke-soft-100/10">
+				<div className="mt-6 border-stroke-soft-100 border-t pt-6 dark:border-stroke-soft-100/10">
 					<div className="flex items-center justify-between">
 						<div className="flex items-center gap-2 text-base text-text-strong-950">
 							<Icon name="mail-single" className="h-4 w-4 text-text-sub-600" />
@@ -171,7 +175,7 @@ export const ConfigureDnsStep = () => {
 
 				{/* Enable Receiving Group */}
 				{receivingRecords.length > 0 && (
-					<div className="mt-6 pt-6 border-t border-stroke-soft-100 dark:border-stroke-soft-100/10">
+					<div className="mt-6 border-stroke-soft-100 border-t pt-6 dark:border-stroke-soft-100/10">
 						<div className="flex items-center justify-between">
 							<div className="flex items-center gap-2 text-base text-text-strong-950">
 								<Icon name="inbox" className="h-4 w-4 text-text-sub-600" />
@@ -214,7 +218,7 @@ export const ConfigureDnsStep = () => {
 
 				{/* Tracking Group */}
 				{trackingRecords.length > 0 && (
-					<div className="mt-6 pt-6 border-t border-stroke-soft-100 dark:border-stroke-soft-100/10">
+					<div className="mt-6 border-stroke-soft-100 border-t pt-6 dark:border-stroke-soft-100/10">
 						<div className="flex items-center justify-between">
 							<div className="flex items-center gap-2 text-base text-text-strong-950">
 								<Icon name="graph-up" className="h-4 w-4 text-text-sub-600" />
@@ -222,7 +226,8 @@ export const ConfigureDnsStep = () => {
 							</div>
 							<Switch.Root
 								checked={
-									domainData?.isClickTrackingEnabled || domainData?.isOpenTrackingEnabled
+									domainData?.isClickTrackingEnabled ||
+									domainData?.isOpenTrackingEnabled
 								}
 								onCheckedChange={(checked) =>
 									handleUpdateDomain(
