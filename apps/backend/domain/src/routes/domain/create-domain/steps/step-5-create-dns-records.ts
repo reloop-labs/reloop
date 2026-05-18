@@ -48,6 +48,7 @@ export async function createDnsRecords_step5({
 			priority: dkimRecord.priority,
 			privateKey: dkimRecord.privateKey,
 			recordTypeName: "DKIM" as const,
+			purpose: "sending",
 		},
 		{
 			...dnsRecordIds,
@@ -56,6 +57,7 @@ export async function createDnsRecords_step5({
 			fqdn: spfRecord.fqdn,
 			value: spfRecord.value,
 			recordTypeName: "SPF" as const,
+			purpose: "sending",
 		},
 		{
 			...dnsRecordIds,
@@ -64,6 +66,7 @@ export async function createDnsRecords_step5({
 			fqdn: dmarcRecord.fqdn,
 			value: dmarcRecord.value,
 			recordTypeName: "DMARC" as const,
+			purpose: "sending",
 		},
 		{
 			...dnsRecordIds,
@@ -73,6 +76,7 @@ export async function createDnsRecords_step5({
 			value: mxRecord.value,
 			recordTypeName: "MX" as const,
 			priority: mxRecord.priority,
+			purpose: "receiving",
 		},
 	];
 
@@ -90,6 +94,7 @@ export async function createDnsRecords_step5({
 			value: receivingMxRecord.value,
 			recordTypeName: "MX" as const,
 			priority: receivingMxRecord.priority,
+			purpose: "receiving",
 		});
 	}
 

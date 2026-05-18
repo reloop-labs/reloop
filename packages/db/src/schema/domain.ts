@@ -40,6 +40,12 @@ export const dnsRecordTypeNameEnum = pgEnum("dns_record_type_name", [
 	"DMARC",
 	"CNAME"
 ]);
+
+export const dnsRecordPurposeEnum = pgEnum("dns_record_purpose", [
+	"sending",
+	"receiving",
+	"tracking"
+]);
 export const tlsModeEnum = pgEnum("tls_mode", ["opportunistic", "enforced"]);
 
 export const domain = pgTable(
@@ -120,6 +126,7 @@ export const domainDnsRecord = pgTable(
 		ttl: text("ttl").notNull().default("Auto"),
 		priority: integer("priority"),
 		recordTypeName: dnsRecordTypeNameEnum("record_type_name").notNull(),
+		purpose: dnsRecordPurposeEnum("purpose").notNull().default('sending'),
 		domain: text("domain").notNull(),
 		fqdn: text("fqdn").notNull(),
 		privateKey: text("private_key"),

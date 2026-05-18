@@ -18,6 +18,7 @@ export interface DNSRecord {
 	value: string;
 	ttl: string;
 	priority: number | null;
+	purpose: "sending" | "receiving" | "tracking";
 	verificationError: string | null;
 	status: DomainStatus;
 	createdAt: string;
