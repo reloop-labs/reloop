@@ -70,13 +70,7 @@ export function getMDXComponents(
 					href={finalHref}
 					icon={processedIcon}
 					className="no-underline"
-				>
-					{children && (
-						<div className="text-[16px] text-text-sub-600/90 leading-relaxed tracking-[-0.01em]">
-							{children}
-						</div>
-					)}
-				</Card>
+				/>
 			);
 		},
 		table: (props) => (
@@ -102,7 +96,7 @@ export function getMDXComponents(
 		),
 		td: (props) => (
 			<td
-				className="border-stroke-soft-100 border-b px-4 py-3 text-[16px] text-text-sub-600/90 leading-relaxed tracking-[-0.01em] dark:border-stroke-soft-100/50"
+				className="border-stroke-soft-100 border-b px-4 py-3 text-[#171717] dark:border-stroke-soft-100/50 dark:text-white"
 				{...props}
 			/>
 		),
