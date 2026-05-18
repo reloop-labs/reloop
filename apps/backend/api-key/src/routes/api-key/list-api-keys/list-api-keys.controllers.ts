@@ -53,8 +53,6 @@ export async function listApiKeysController({
 					name: apiKeyData.name,
 					start: apiKeyData.start,
 					prefix: apiKeyData.prefix,
-					organizationId: apiKeyData.organizationId,
-					userId: apiKeyData.userId,
 					refillInterval: apiKeyData.refillInterval,
 					refillAmount: apiKeyData.refillAmount,
 					lastRefillAt: apiKeyData.lastRefillAt?.toISOString() ?? null,

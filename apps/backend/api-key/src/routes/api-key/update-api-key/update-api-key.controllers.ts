@@ -54,8 +54,6 @@ export async function updateApiKeyController({
 			name: updated.name,
 			start: updated.start,
 			prefix: updated.prefix,
-			organizationId: updated.organizationId,
-			userId: updated.userId,
 			refillInterval: updated.refillInterval,
 			refillAmount: updated.refillAmount,
 			lastRefillAt: updated.lastRefillAt?.toISOString() ?? null,

@@ -55,8 +55,6 @@ export namespace ApiKeyModel {
 			prefix: t.Union([t.String(), t.Null()], {
 				description: "API key prefix",
 			}),
-			organizationId: t.String({ description: "Organization identifier" }),
-			userId: t.String({ description: "User identifier" }),
 			refillInterval: t.Union([t.Number(), t.Null()], {
 				description: "Refill interval in milliseconds",
 			}),

@@ -200,9 +200,6 @@ export namespace DomainModel {
 			dnsRecords: t.Array(dnsRecordResponse, {
 				description: "DNS records for the domain",
 			}),
-			deletedAt: t.Union([t.Date(), t.Null()], {
-				description: "Soft delete timestamp",
-			}),
 			lastVerifiedAt: t.Union([t.Date(), t.Null()], {
 				description: "Last verification timestamp",
 			}),
