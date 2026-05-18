@@ -1,29 +1,38 @@
 ---
 title: API Key Service Setup
-description: Learn how to set up, configure, and run the Reloop API Key service locally.
+description: Set up, configure, and run the Reloop API Key microservice locally.
 ---
 
-The **API Key Service** is an **ElysiaJS** microservice designed to handle the generation, hashing, storage, cryptographical validation, and revocation of external developer API keys. This enables secure machine-to-machine integrations with the Reloop platform.
+The **API Key Service** is an **ElysiaJS** microservice responsible for generation, hashing, validation, and revocation of external developer API keys — enabling secure machine-to-machine integrations with the Reloop platform.
 
-<Callout type="info" title="Prerequisite First" variant="note">
-  Before starting the API Key Service, make sure you've completed the base [Local Development Setup](/docs/setup) (installed Bun, configured the hosts file, and started the Docker container stack).
+<Callout type="info" title="Complete Base Setup First" variant="note">
+  Ensure you've finished the [Local Development Setup](/docs/setup) — Bun installed, hosts file configured, and Docker stack running — before proceeding.
 </Callout>
+
+---
+
+## Service Overview
+
+| Property | Value |
+| :--- | :--- |
+| **Directory** | `apps/backend/api-key/` |
+| **Port** | `8012` |
+| **Local URL** | `https://local.reloop.sh/api/api-key` |
+| **Swagger UI** | `https://local.reloop.sh/api/api-key/openapi` |
+| **Stack** | ElysiaJS · Better Auth API Key Plugin · PostgreSQL · Redis · NATS |
 
 ---
 
 ## Quick Start
 
-Dependencies are handled globally at the root directory. You can start the API Key Service development server instantly:
-
 <CodeGroup>
-  <CodeBlock title="From Monorepo Root (Recommended)">
+  <CodeBlock title="Monorepo Root (Recommended)">
   ```bash
-  # Start the dev server with hot reloading
   bun be:api-key:dev
   ```
   </CodeBlock>
 
-  <CodeBlock title="From the Service Folder">
+  <CodeBlock title="Service Directory">
   ```bash
   cd apps/backend/api-key
   bun dev
@@ -31,35 +40,25 @@ Dependencies are handled globally at the root directory. You can start the API K
   </CodeBlock>
 </CodeGroup>
 
-Once running, the API Key Service will listen locally on port `8012`. You can test it via Caddy at [https://local.reloop.sh/api/api-key](https://local.reloop.sh/api/api-key) 🎉
-
----
-
-## Service Information
-
-* **Directory Location:** `apps/backend/api-key/`
-* **Local Listening Port:** `8012` (ElysiaJS gateway)
-* **Unified Access Route:** [https://local.reloop.sh/api/api-key](https://local.reloop.sh/api/api-key)
-* **Primary Tech Stack:** ElysiaJS, Better Auth API Key Plugin, PostgreSQL, Redis, NATS
-* **Dependencies:** Relies on PostgreSQL (to store and query keys) and Redis (to cache validated keys for high-performance API routing).
+The service starts with hot reloading on port `8012`.
 
 ---
 
 ## Environment Configuration
 
-The API Key Service environment variables are defined in `apps/backend/api-key/.env`. If you ran `bun env:setup` at the root, your `.env` is already configured:
+Variables live in `apps/backend/api-key/.env`. Running `bun env:setup` from the root auto-populates this file.
 
 ```bash
-# Database Configuration
+# Databases
 PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
 REDIS_URL=redis://:reloop123@localhost:6379
 
-# Server Gateway Configuration
+# Server
 PORT=8012
 BASE_URL="https://local.reloop.sh"
 NODE_ENV=development
 
-# Event Bus Broker
+# Event Bus
 NATS_URL=nats://localhost:4222
 ```
 
@@ -78,62 +77,55 @@ NATS_URL=nats://localhost:4222
 
 ## Development Commands
 
-All workspace operations should be executed from the **monorepo root directory** using Turborepo filters:
+All commands run from the **monorepo root**.
 
-| Command | Action | Scope |
-| :--- | :--- | :--- |
-| `bun be:api-key:dev` | Start the API Key dev server with hot reloading | Development |
-| `bun run --filter=api-key build` | Compile the API Key service for production | Production |
-| `bun run --filter=api-key start` | Run the compiled production build locally | Production |
-| `bun run --filter=api-key check-types` | Verify TypeScript type-safety | Code Quality |
+| Command | Description |
+| :--- | :--- |
+| `bun be:api-key:dev` | Start dev server with hot reloading |
+| `bun run --filter=api-key build` | Compile production bundle |
+| `bun run --filter=api-key start` | Run compiled production build |
+| `bun run --filter=api-key check-types` | TypeScript type-check |
 
 ---
 
-## Database Schema & Relationships
+## Database Schema
 
-The relational API key provisioning and rate-limiting schemas are defined inside [packages/db/src/schema/api-key.ts](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/api-key.ts).
+Schema defined in [`packages/db/src/schema/api-key.ts`](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/api-key.ts).
 
 ### `apikey` Table
 
-Stores provisioned credentials for programmatic API access, rate limiting state, token scopes, and request logs.
+Stores provisioned credentials, rate-limiting state, scopes, and request logs.
 
 | Column | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
 | `id` | `text` | — | Primary Key |
-| `name` | `text` | `null` | Custom label/name for the key (e.g. `GitHub CI`) |
-| `start` | `text` | `null` | The visible starting character chunk of the key |
-| `prefix` | `text` | `null` | Semantic header prefix (e.g. `reloop_`) |
-| `key` | `text` | — | Securely hashed/salted representation of the API key |
-| `organizationId` | `text` | — | Foreign Key &rarr; [organization.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/auth.ts) |
-| `userId` | `text` | — | Foreign Key &rarr; [user.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/auth.ts) |
-| `refillInterval` | `integer` | `null` | Auto-credits refill window duration (ms) |
-| `refillAmount` | `integer` | `null` | Quantity of credits granted on refill intervals |
-| `lastRefillAt` | `timestamp` | `null` | Timestamp of the last automatic refill action |
-| `enabled` | `boolean` | `true` | Activation state flag for programmatic authorization |
-| `rateLimitEnabled` | `boolean` | `true` | Enables system request throttling constraints |
-| `rateLimitTimeWindow`| `integer` | `86400000` (24hr) | Rate limit evaluation sliding window (ms) |
-| `rateLimitMax` | `integer` | `10` | Maximum request capacity allowed per window |
-| `requestCount` | `integer` | `0` | Requests sent in the current rolling timeframe |
-| `remaining` | `integer` | `null` | Available requests left before throttling |
-| `lastRequest` | `timestamp` | `null` | Timestamp of the last successful request |
-| `expiresAt` | `timestamp` | `null` | Key validation expiration constraint |
-| `permissions` | `text` | `null` | Serialized token permission scopes / policies |
-| `metadata` | `text` | `null` | Dynamic serialized customer attributes |
+| `name` | `text` | `null` | Human-readable label (e.g. `GitHub CI`) |
+| `start` | `text` | `null` | Visible key prefix shown in UI |
+| `prefix` | `text` | `null` | Semantic namespace prefix (e.g. `reloop_`) |
+| `key` | `text` | — | SHA-256 hashed key value |
+| `organizationId` | `text` | — | FK → `organization.id` |
+| `userId` | `text` | — | FK → `user.id` |
+| `refillInterval` | `integer` | `null` | Credit refill window in ms |
+| `refillAmount` | `integer` | `null` | Credits granted per refill |
+| `lastRefillAt` | `timestamp` | `null` | Last refill timestamp |
+| `enabled` | `boolean` | `true` | Whether the key is active |
+| `rateLimitEnabled` | `boolean` | `true` | Whether rate limiting is enforced |
+| `rateLimitTimeWindow` | `integer` | `86400000` | Rate limit sliding window in ms (default: 24h) |
+| `rateLimitMax` | `integer` | `10` | Max requests allowed per window |
+| `requestCount` | `integer` | `0` | Requests made in current window |
+| `remaining` | `integer` | `null` | Requests remaining before throttle |
+| `lastRequest` | `timestamp` | `null` | Timestamp of last request |
+| `expiresAt` | `timestamp` | `null` | Key expiration timestamp (`null` = no expiry) |
+| `permissions` | `text` | `null` | Serialized permission scopes |
+| `metadata` | `text` | `null` | Arbitrary serialized key attributes |
 
 ---
 
-## Interactive API Docs (Swagger)
+## Architecture
 
-The API Key Service publishes dynamic Swagger documentation directly from ElysiaJS. To test endpoints and query API structures:
-
-1. Open your browser and navigate to the interactive Swagger playground at [https://local.reloop.sh/api/api-key/openapi](https://local.reloop.sh/api/api-key/openapi) (or [http://localhost:8012/api/api-key/openapi](http://localhost:8012/api/api-key/openapi) directly).
-2. Use the interactive Swagger UI playground to run queries and inspect request schemas.
-
----
-
-## Architecture & Integration
-
-* **Better Auth API Key Plugin**: Integrates `@better-auth/api-key` to manage secure hashing algorithms (SHA-256) and key formatting schemas.
-* **Validation Cache Layer**: Frequently validated keys are cached in Redis to minimize relational DB lookups. Validation latency is kept under 5ms.
-* **Broadcasting Events**: Publishes real-time key generation and revocation events to NATS under the `api-key.*` subject hierarchy (notifying the analytics and log tracking modules).
-* **Database Models**: Integrates the database client from `@reloop/db`, referencing the Drizzle schemas inside the `api_key` tables. Keys are strictly hashed before persisting to PostgreSQL.
+| Layer | Detail |
+| :--- | :--- |
+| **Auth** | `@better-auth/api-key` handles SHA-256 hashing and key formatting |
+| **Caching** | Validated keys are cached in Redis — validation latency \< 5ms |
+| **Events** | Key lifecycle events published to NATS under `api-key.*` (consumed by analytics and log-tracking services) |
+| **DB Client** | Uses `@reloop/db` with Drizzle ORM — keys are hashed before any write to PostgreSQL |
