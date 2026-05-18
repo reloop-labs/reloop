@@ -167,7 +167,7 @@ export default async function Page(props: {
 									)}
 								</div>
 								<div className="mt-2 shrink-0">
-									<PageActions markdownUrl={`${page.url}.mdx`} />
+									<PageActions markdownUrl={`/api/markdown/${slugPath}`} />
 								</div>
 							</div>
 

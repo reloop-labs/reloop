@@ -65,13 +65,15 @@ export function PageActions({
 				disabled={isLoading}
 				className="flex h-8 items-center gap-2 rounded-l-xl px-3 transition-colors hover:bg-black/5 dark:hover:bg-white/5"
 			>
-				{checked ? (
+				{isLoading ? (
+					<div className="size-3.5 border-2 border-t-transparent border-current rounded-full animate-spin" />
+				) : checked ? (
 					<Check className="size-3.5" />
 				) : (
 					<Copy className="size-3.5" />
 				)}
 				<span className="font-medium text-[#171717] dark:text-white">
-					Copy page
+					{isLoading ? "Copying..." : checked ? "Copied!" : "Copy page"}
 				</span>
 			</button>
 			<div className="h-4 w-px border-stroke-soft-100 border-l" />
