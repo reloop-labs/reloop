@@ -11,7 +11,7 @@ import { source } from "@reloop/fe-docs/lib/source";
 import type { PageTreeItem, TOCItem } from "@reloop/fe-docs/lib/types";
 import { getMDXComponents } from "@reloop/fe-docs/mdx-components";
 import { Icon } from "@reloop/ui/icon";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Home } from "lucide-react";
 import { notFound, redirect } from "next/navigation";
 
 function getBreadcrumbs(
@@ -131,15 +131,16 @@ export default async function Page(props: {
 						<div className={hideToc ? "" : "mx-auto max-w-[680px] xl:mx-0"}>
 							{/* Breadcrumb */}
 							{breadcrumbs.length > 0 ? (
-								<div className="mb-3 flex items-center gap-1.5 font-medium text-[12px] text-fd-muted-foreground/60 uppercase tracking-wider">
+								<div className="mb-4 flex items-center gap-2 text-[13px] text-text-sub-600">
+									<Home className="h-3.5 w-3.5 opacity-70" />
 									{breadcrumbs.map((crumb, i) => (
-										<div key={i} className="flex items-center gap-1.5">
-											{i > 0 && <ChevronRight className="h-3 w-3 opacity-50" />}
+										<div key={i} className="flex items-center gap-2">
+											<span className="opacity-40">/</span>
 											<span
 												className={
 													i === breadcrumbs.length - 1
-														? "text-fd-foreground/80"
-														: ""
+														? "text-[#171717] dark:text-white font-medium"
+														: "text-text-sub-600"
 												}
 											>
 												{crumb}
