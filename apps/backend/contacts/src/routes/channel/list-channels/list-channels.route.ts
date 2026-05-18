@@ -4,7 +4,12 @@ import { Elysia } from "elysia";
 import { listChannelsController } from "./list-channels.controllers";
 import { listChannelsXCodeSamples } from "./list-channels.x-codeSamples";
 
-export const listChannelsRoute = new Elysia().use(authMiddleware).get(
+import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
+
+export const listChannelsRoute = new Elysia()
+	.use(authMiddleware)
+	.use(rateLimitPlugin({ max: 60, windowSeconds: 60, namespace: "list-channels" }))
+	.get(
 	"/list",
 	async ({ query, activeOrganizationId, logger }) => {
 		return await listChannelsController({
@@ -16,6 +21,7 @@ export const listChannelsRoute = new Elysia().use(authMiddleware).get(
 	},
 	{
 		auth: true,
+		rateLimit: true,
 		query: ChannelModel.channelQuery,
 		response: {
 			200: ChannelModel.channelListResponse,

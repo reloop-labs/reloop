@@ -25,7 +25,7 @@ export async function deleteContactController({
 		statusCode?: number;
 	};
 }): Promise<ContactModel.DeleteResponse | ContactModel.ContactNotFound> {
-	log.info({ ...{ contactId }, message: "Deleting contact" });
+	logger?.info("Deleting contact", { contactId });
 
 	try {
 		// Check if contact exists
@@ -37,10 +37,7 @@ export async function deleteContactController({
 		});
 
 		if (!existingContact) {
-			log.warn({
-				...{ contactId, organizationId },
-				message: "Contact not found",
-			});
+			logger?.warn("Contact not found", { contactId, organizationId });
 			return { message: "Contact not found" };
 		}
 
@@ -54,7 +51,7 @@ export async function deleteContactController({
 				),
 			);
 
-		log.info({ ...{ contactId }, message: "Contact deleted successfully" });
+		logger?.info("Contact deleted successfully", { contactId });
 
 		const result = {
 			success: true,
@@ -72,13 +69,11 @@ export async function deleteContactController({
 
 		return result;
 	} catch (error) {
-		log.error(
-			{
-				contactId,
-				error: error instanceof Error ? error.message : String(error),
-			},
-			"Error deleting contact",
-		);
+		log.error({
+			message: "Error deleting contact",
+			contactId,
+			error: error instanceof Error ? error.message : String(error),
+		});
 		throw error;
 	}
 }

@@ -5,7 +5,6 @@ import * as schema from "@reloop/db/schema";
 import { CHANNEL_CREATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
-import { log } from "evlog";
 
 export const createChannelController = async ({
 	activeOrganizationId,
@@ -34,7 +33,7 @@ export const createChannelController = async ({
 		statusCode?: number;
 	};
 }): Promise<ChannelTypes.ChannelResponse> => {
-	log.info({ ...{ name }, message: "Creating channel" });
+	logger?.info("Creating channel", { name });
 	try {
 		const existingChannel = await db.query.channel.findFirst({
 			where: and(
@@ -45,7 +44,7 @@ export const createChannelController = async ({
 		});
 
 		if (existingChannel) {
-			log.warn({ ...{ name }, message: "Channel already exists" });
+			logger?.warn("Channel already exists", { name });
 			throw status(409, { message: "Channel already exists" });
 		}
 
@@ -62,17 +61,11 @@ export const createChannelController = async ({
 			.returning();
 
 		if (!newChannel) {
-			log.error({
-				...{ name },
-				message: "Failed to create channel - no data returned",
-			});
+			logger?.error("Failed to create channel - no data returned", { name });
 			throw new Error("Failed to create channel");
 		}
 
-		log.info({
-			...{ name, id: newChannel.id },
-			message: "Channel created successfully",
-		});
+		logger?.info("Channel created successfully", { name, id: newChannel.id });
 
 		const result = {
 			id: newChannel.id,
@@ -95,7 +88,7 @@ export const createChannelController = async ({
 
 		return result;
 	} catch (error) {
-		log.error({ ...{ name, error }, message: "Debug creating channel" });
+		logger?.error("Debug creating channel", { name, error });
 		throw error;
 	}
 };

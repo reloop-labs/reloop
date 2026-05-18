@@ -5,7 +5,7 @@ import * as schema from "@reloop/db/schema";
 import { CONTACT_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
-import { log } from "evlog";
+
 
 export async function removeContactFromGroupController({
 	organizationId,
@@ -36,14 +36,11 @@ export async function removeContactFromGroupController({
 		});
 	}
 
-	log.info(
-		{
-			contactId: contact_id,
-			email: email?.toLowerCase(),
-			groupId,
-		},
-		"Removing contact from group",
-	);
+	logger?.info("Removing contact from group", {
+		contactId: contact_id,
+		email: email?.toLowerCase(),
+		groupId,
+	});
 
 	try {
 		// Identify contact
@@ -79,10 +76,7 @@ export async function removeContactFromGroupController({
 				),
 			);
 
-		log.info({
-			...{ contactId: contact.id, groupId },
-			message: "Contact removed from group",
-		});
+		logger?.info("Contact removed from group", { contactId: contact.id, groupId });
 
 		const result = {
 			success: true,
@@ -100,15 +94,12 @@ export async function removeContactFromGroupController({
 
 		return result;
 	} catch (error) {
-		log.error(
-			{
-				contactId: contact_id,
-				email: email?.toLowerCase(),
-				groupId,
-				error: error instanceof Error ? error.message : String(error),
-			},
-			"Error removing contact from group",
-		);
+		logger?.error("Error removing contact from group", {
+			contactId: contact_id,
+			email: email?.toLowerCase(),
+			groupId,
+			error: error instanceof Error ? error.message : String(error),
+		});
 		throw error;
 	}
 }

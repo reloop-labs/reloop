@@ -4,7 +4,12 @@ import { Elysia, t } from "elysia";
 import { updatePropertyController } from "./update-property.controllers";
 import { updatePropertyXCodeSamples } from "./update-property.x-codeSamples";
 
-export const updatePropertyRoute = new Elysia().use(authMiddleware).patch(
+import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
+
+export const updatePropertyRoute = new Elysia()
+	.use(authMiddleware)
+	.use(rateLimitPlugin({ max: 30, windowSeconds: 60, namespace: "update-property" }))
+	.patch(
 	"/:contact_property_id",
 	async ({
 		params,
@@ -34,6 +39,7 @@ export const updatePropertyRoute = new Elysia().use(authMiddleware).patch(
 	},
 	{
 		auth: true,
+		rateLimit: true,
 		params: t.Object({
 			contact_property_id: t.String({ description: "Property ID to update" }),
 		}),

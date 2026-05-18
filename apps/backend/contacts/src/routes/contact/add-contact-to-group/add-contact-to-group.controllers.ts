@@ -31,20 +31,14 @@ export async function addContactToGroupController({
 	const { contact_id, email } = body;
 
 	if (!contact_id && !email) {
-		log.info({
-			...{},
-			message: "Either 'contact_id' or 'email' must be provided",
-		});
+		logger?.info("Either 'contact_id' or 'email' must be provided", {  });
 		throw status(400, {
 			message: "Either 'contact_id' or 'email' must be provided",
 		});
 	}
 
 	try {
-		log.info({
-			...{ contactId: contact_id, email, groupId },
-			message: "Verify group exists",
-		});
+		logger?.info("Verify group exists", { contactId: contact_id, email, groupId });
 		// Verify group exists
 		const group = await db.query.group.findFirst({
 			where: and(
@@ -55,14 +49,14 @@ export async function addContactToGroupController({
 		});
 
 		if (!group) {
-			log.info({ ...{ groupId }, message: "Group not found" });
+			logger?.info("Group not found", { groupId });
 			throw status(404, { message: "Group not found" });
 		}
 
 		let contact: typeof schema.contact.$inferSelect | undefined;
 
 		if (contact_id) {
-			log.info({ ...{ contactId: contact_id }, message: "Find contact by id" });
+			logger?.info("Find contact by id", { contactId: contact_id });
 			contact = await db.query.contact.findFirst({
 				where: and(
 					eq(schema.contact.id, contact_id),
@@ -71,7 +65,7 @@ export async function addContactToGroupController({
 				),
 			});
 		} else if (email) {
-			log.info({ ...{ email }, message: "Find contact by email" });
+			logger?.info("Find contact by email", { email });
 			contact = await db.query.contact.findFirst({
 				where: and(
 					eq(schema.contact.email, email),
@@ -85,10 +79,7 @@ export async function addContactToGroupController({
 			throw status(404, { message: "Contact not found" });
 		}
 
-		log.info({
-			...{ contactId: contact.id, groupId },
-			message: "Checking if contact is already in group",
-		});
+		logger?.info("Checking if contact is already in group", { contactId: contact.id, groupId });
 		const existing = await db.query.contactGroup.findFirst({
 			where: and(
 				eq(schema.contactGroup.contactId, contact.id),
@@ -106,10 +97,7 @@ export async function addContactToGroupController({
 			};
 		}
 
-		log.info({
-			...{ contactId: contact.id, groupId },
-			message: "Adding contact to group",
-		});
+		logger?.info("Adding contact to group", { contactId: contact.id, groupId });
 		await db
 			.insert(schema.contactGroup)
 			.values({
@@ -126,10 +114,7 @@ export async function addContactToGroupController({
 				},
 			});
 
-		log.info({
-			...{ contactId: contact.id, groupId },
-			message: "Contact added to group",
-		});
+		logger?.info("Contact added to group", { contactId: contact.id, groupId });
 
 		const result = {
 			success: true,
@@ -147,15 +132,13 @@ export async function addContactToGroupController({
 
 		return result;
 	} catch (error) {
-		log.error(
-			{
-				contactId: contact_id,
-				email: email?.toLowerCase(),
-				groupId,
-				error: error instanceof Error ? error.message : String(error),
-			},
-			"Error adding contact to group",
-		);
+		log.error({
+			message: "Error adding contact to group",
+			contactId: contact_id,
+			email: email?.toLowerCase(),
+			groupId,
+			error: error instanceof Error ? error.message : String(error),
+		});
 		throw error;
 	}
 }

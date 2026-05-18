@@ -4,7 +4,12 @@ import { Elysia } from "elysia";
 import { createChannelController } from "./create-channel.controllers";
 import { createChannelXCodeSamples } from "./create-channel.x-codeSamples";
 
-export const createChannelRoute = new Elysia().use(authMiddleware).post(
+import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
+
+export const createChannelRoute = new Elysia()
+	.use(authMiddleware)
+	.use(rateLimitPlugin({ max: 30, windowSeconds: 60, namespace: "create-channel" }))
+	.post(
 	"/create",
 	async ({
 		body,
@@ -38,6 +43,7 @@ export const createChannelRoute = new Elysia().use(authMiddleware).post(
 	},
 	{
 		auth: true,
+		rateLimit: true,
 		body: ChannelModel.createChannelBody,
 		response: {
 			201: ChannelModel.channelResponse,

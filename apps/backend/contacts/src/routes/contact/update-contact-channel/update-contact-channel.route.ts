@@ -4,7 +4,12 @@ import { Elysia, t } from "elysia";
 import { updateContactChannelController } from "./update-contact-channel.controllers";
 import { updateContactChannelXCodeSamples } from "./update-contact-channel.x-codeSamples";
 
-export const updateContactChannelRoute = new Elysia().use(authMiddleware).patch(
+import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
+
+export const updateContactChannelRoute = new Elysia()
+	.use(authMiddleware)
+	.use(rateLimitPlugin({ max: 30, windowSeconds: 60, namespace: "update-channel" }))
+	.patch(
 	"/channel/:channel_id",
 	async ({
 		body,
@@ -34,6 +39,7 @@ export const updateContactChannelRoute = new Elysia().use(authMiddleware).patch(
 	},
 	{
 		auth: true,
+		rateLimit: true,
 		params: t.Object({ channel_id: t.String() }),
 		body: ContactModel.updateContactChannelBody,
 		response: {

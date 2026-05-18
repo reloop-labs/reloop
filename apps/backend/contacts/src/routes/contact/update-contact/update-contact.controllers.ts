@@ -29,14 +29,9 @@ export async function updateContactController({
 		statusCode?: number;
 	};
 }): Promise<ContactTypes.ContactResponse> {
-	log.info({
-		...{
-			contactId,
+	logger?.info("Updating contact", { contactId,
 			organizationId,
-			body,
-		},
-		message: "Updating contact",
-	});
+			body, });
 
 	try {
 		return await db.transaction(async (tx) => {
@@ -50,10 +45,7 @@ export async function updateContactController({
 			});
 
 			if (!existingContact) {
-				log.warn({
-					...{ contactId, organizationId },
-					message: "Contact not found",
-				});
+				logger?.warn("Contact not found", { contactId, organizationId });
 				throw status(404, { message: "Contact not found" });
 			}
 
@@ -87,10 +79,7 @@ export async function updateContactController({
 				.returning();
 
 			if (!updatedContact) {
-				log.error({
-					...{ contactId },
-					message: "Failed to update contact - no data returned",
-				});
+				logger?.error("Failed to update contact - no data returned", { contactId });
 				throw status(500, { message: "Failed to update contact" });
 			}
 
@@ -106,13 +95,8 @@ export async function updateContactController({
 				});
 			}
 
-			log.info({
-				...{
-					contactId,
-					organizationId,
-				},
-				message: "Contact updated successfully",
-			});
+			logger?.info("Contact updated successfully", { contactId,
+					organizationId, });
 
 			// Fetch current properties after update to return them in response
 			const updatedProperties = await tx
@@ -154,6 +138,8 @@ export async function updateContactController({
 				properties: propertiesRecord ?? {},
 				groups: (updatedContact as ContactTypes.ContactData).groups ?? [],
 				channels: (updatedContact as ContactTypes.ContactData).channels ?? [],
+				suppressionReason: updatedContact.suppressionReason ?? null,
+				suppressedAt: updatedContact.suppressedAt ?? null,
 				createdAt: updatedContact.createdAt,
 				updatedAt: updatedContact.updatedAt,
 				event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
@@ -169,14 +155,12 @@ export async function updateContactController({
 			return finalContact;
 		});
 	} catch (error) {
-		log.error(
-			{
-				contactId,
-				organizationId,
-				error: error instanceof Error ? error.message : String(error),
-			},
-			"Error updating contact",
-		);
+		log.error({
+			message: "Error updating contact",
+			contactId,
+			organizationId,
+			error: error instanceof Error ? error.message : String(error),
+		});
 		throw error;
 	}
 }

@@ -2,7 +2,12 @@ import { authMiddleware } from "@be/contacts/middleware/auth";
 import { Elysia, t } from "elysia";
 import { listSubscriptionsController } from "./list-subscriptions.controllers";
 
-export const listSubscriptionsRoute = new Elysia().use(authMiddleware).get(
+import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
+
+export const listSubscriptionsRoute = new Elysia()
+	.use(authMiddleware)
+	.use(rateLimitPlugin({ max: 60, windowSeconds: 60, namespace: "list-subscriptions" }))
+	.get(
 	"/list",
 	async ({ query, activeOrganizationId, logger }) => {
 		return await listSubscriptionsController({
@@ -17,6 +22,7 @@ export const listSubscriptionsRoute = new Elysia().use(authMiddleware).get(
 	},
 	{
 		auth: true,
+		rateLimit: true,
 		query: t.Object({
 			channelId: t.String({
 				description: "ID of the channel to list enrollments for",

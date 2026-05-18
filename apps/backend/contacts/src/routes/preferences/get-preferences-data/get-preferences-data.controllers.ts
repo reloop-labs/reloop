@@ -63,10 +63,7 @@ export async function getPreferencesDataController({
 		enrollments.map((e) => [e.channelId, e.status]),
 	);
 
-	log.info({
-		...{ contactId, channelsCount: channels.length },
-		message: "Preferences data fetched successfully",
-	});
+	logger?.info("Preferences data fetched successfully", { contactId, channelsCount: channels.length });
 
 	return {
 		contact: {

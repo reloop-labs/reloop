@@ -44,10 +44,7 @@ export async function unsubscribeAllController({
 			);
 	}
 
-	log.info({
-		...{ contactId, updatedCount: enrollments.length },
-		message: "Unsubscribed from all channels",
-	});
+	logger?.info("Unsubscribed from all channels", { contactId, updatedCount: enrollments.length });
 
 	return {
 		success: true,

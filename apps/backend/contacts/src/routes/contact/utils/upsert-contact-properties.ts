@@ -1,21 +1,21 @@
 import { type DatabaseInstance, db as defaultDb } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { logger as globalLogger, type Logger } from "@reloop/logger";
 import { and, eq, inArray, isNull } from "drizzle-orm";
-import { log } from "evlog";
+
+
 export async function upsertContactProperties({
 	contactId,
 	organizationId,
 	userId,
 	properties,
-	logger = globalLogger,
+	logger,
 	db = defaultDb,
 }: {
 	contactId: string;
 	organizationId: string;
 	userId: string;
 	properties: Record<string, string | number>;
-	logger?: Logger;
+	logger?: any;
 	db?: DatabaseInstance;
 }): Promise<void> {
 	const propertyNames = Object.keys(properties);
@@ -24,15 +24,14 @@ export async function upsertContactProperties({
 	const propertyNameRegex = /^[a-z0-9_]+$/;
 	for (const name of propertyNames) {
 		if (!propertyNameRegex.test(name)) {
-			log.warn({ ...({ name }), message: "Invalid property name" });
+			logger?.warn("Invalid property name", { name });
 			throw new Error(
 				`Invalid property name: '${name}'. Property names must be lowercase and contain only alphanumeric characters and underscores.`,
 			);
 		}
 	}
 
-	log.info({ ...({ contactId, organizationId, propertyCount: propertyNames.length }), message: "Upserting properties for contact (replacement mode })",
-	);
+	logger?.info("Upserting properties for contact (replacement mode)", { contactId, organizationId, propertyCount: propertyNames.length });
 
 	try {
 		// 1. Fetch all existing active property values for this contact
@@ -60,7 +59,7 @@ export async function upsertContactProperties({
 		);
 
 		if (propertiesToDelete.length > 0) {
-			log.info({ ...({ count: propertiesToDelete.length }), message: "Soft-deleting properties not in request" });
+			logger?.info("Soft-deleting properties not in request", { count: propertiesToDelete.length });
 			await db
 				.update(schema.contactPropertyValue)
 				.set({ deletedAt: new Date(), updatedAt: new Date() })
@@ -105,7 +104,7 @@ export async function upsertContactProperties({
 			const incomingType = typeof value === "number" ? "number" : "string";
 
 			if (!info) {
-				log.info({ ...({ name, incomingType }), message: "Creating new property definition" });
+				logger?.info("Creating new property definition", { name, incomingType });
 				const [newProp] = await db
 					.insert(schema.contactProperty)
 					.values({
@@ -130,7 +129,7 @@ export async function upsertContactProperties({
 			if (info) {
 				// Validate type compatibility
 				if (incomingType !== info.type) {
-					log.warn({ ...({ name, expected: info.type, received: incomingType }), message: "Property type mismatch" });
+					logger?.warn("Property type mismatch", { name, expected: info.type, received: incomingType });
 					throw new Error(
 						`Property '${name}' expected type '${info.type}' but received '${incomingType}'`,
 					);
@@ -149,7 +148,7 @@ export async function upsertContactProperties({
 				});
 
 				if (existingValue) {
-					log.info({ ...({ name, id: pid }), message: "Updating existing property value" });
+					logger?.info("Updating existing property value", { name, id: pid });
 					await db
 						.update(schema.contactPropertyValue)
 						.set({
@@ -159,7 +158,7 @@ export async function upsertContactProperties({
 						})
 						.where(eq(schema.contactPropertyValue.id, existingValue.id));
 				} else {
-					log.info({ ...({ name, id: pid }), message: "Inserting new property value" });
+					logger?.info("Inserting new property value", { name, id: pid });
 					await db.insert(schema.contactPropertyValue).values({
 						contactId,
 						propertyId: pid,
@@ -173,12 +172,10 @@ export async function upsertContactProperties({
 			}
 		}
 	} catch (error) {
-		log.error({
-				contactId,
-				error: error instanceof Error ? error.message : String(error),
-			},
-			"Error upserting contact properties",
-		);
+		logger?.error("Error upserting contact properties", {
+			contactId,
+			error: error instanceof Error ? error.message : String(error),
+		});
 		throw error;
 	}
 }

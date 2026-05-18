@@ -4,7 +4,6 @@ import * as schema from "@reloop/db/schema";
 import { CHANNEL_GET_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
-import { log } from "evlog";
 
 export const getChannelController = async ({
 	activeOrganizationId,
@@ -15,7 +14,7 @@ export const getChannelController = async ({
 	channel_id: string;
 	logger?: any;
 }): Promise<ChannelTypes.ChannelResponse> => {
-	log.info({ ...{ channel_id }, message: "Getting channel" });
+	logger?.info("Getting channel", { channel_id });
 	try {
 		const result = await db.query.channel.findFirst({
 			where: and(
@@ -26,18 +25,18 @@ export const getChannelController = async ({
 		});
 
 		if (!result) {
-			log.warn({ ...{ channel_id }, message: "Channel not found" });
+			logger?.warn("Channel not found", { channel_id });
 			throw status(404, { message: "Channel not found" });
 		}
 
-		log.info({ ...{ channel_id }, message: "Channel retrieved successfully" });
+		logger?.info("Channel retrieved successfully", { channel_id });
 		return {
 			...result,
 			object: "channel",
 			event: CHANNEL_GET_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
-		log.error({ ...{ channel_id, error }, message: "Debug getting channel" });
+		logger?.error("Debug getting channel", { channel_id, error });
 		throw error;
 	}
 };

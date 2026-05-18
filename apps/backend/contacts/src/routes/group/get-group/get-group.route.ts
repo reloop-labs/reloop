@@ -4,7 +4,12 @@ import { getGroupController } from "@be/contacts/routes/group/get-group/get-grou
 import { Elysia, t } from "elysia";
 import { getGroupXCodeSamples } from "./get-group.x-codeSamples";
 
-export const getGroupRoute = new Elysia().use(authMiddleware).get(
+import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
+
+export const getGroupRoute = new Elysia()
+	.use(authMiddleware)
+	.use(rateLimitPlugin({ max: 60, windowSeconds: 60, namespace: "get-group" }))
+	.get(
 	"/:group_id",
 	async ({ params, activeOrganizationId, logger }) => {
 		return await getGroupController({
@@ -15,6 +20,7 @@ export const getGroupRoute = new Elysia().use(authMiddleware).get(
 	},
 	{
 		auth: true,
+		rateLimit: true,
 		params: t.Object({ group_id: t.String() }),
 		response: {
 			200: GroupModel.groupBaseResponse,

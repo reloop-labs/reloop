@@ -67,6 +67,8 @@ export async function verifyToken(
 		if (parts.length !== 2) return null;
 
 		const [encodedPayload, encodedSig] = parts;
+		if (!encodedPayload || !encodedSig) return null;
+
 		const enc = new TextEncoder();
 		const key = await getKey(PREFERENCES_SECRET);
 
@@ -74,7 +76,7 @@ export async function verifyToken(
 		const isValid = await crypto.subtle.verify(
 			"HMAC",
 			key,
-			sigBytes,
+			sigBytes as any,
 			enc.encode(encodedPayload),
 		);
 

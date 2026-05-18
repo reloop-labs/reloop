@@ -4,7 +4,12 @@ import { updateGroupController } from "@be/contacts/routes/group/update-group/up
 import { Elysia, t } from "elysia";
 import { updateGroupXCodeSamples } from "./update-group.x-codeSamples";
 
-export const updateGroupRoute = new Elysia().use(authMiddleware).patch(
+import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
+
+export const updateGroupRoute = new Elysia()
+	.use(authMiddleware)
+	.use(rateLimitPlugin({ max: 30, windowSeconds: 60, namespace: "update-group" }))
+	.patch(
 	"/:group_id",
 	async ({
 		params,
@@ -34,6 +39,7 @@ export const updateGroupRoute = new Elysia().use(authMiddleware).patch(
 	},
 	{
 		auth: true,
+		rateLimit: true,
 		params: t.Object({
 			group_id: t.String(),
 		}),

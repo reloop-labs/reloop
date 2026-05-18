@@ -1,7 +1,12 @@
 import { Elysia, t } from "elysia";
+import { log } from "evlog";
 import { updatePreferenceController } from "./update-preference.controllers";
 
-export const updatePreferenceRoute = new Elysia().post(
+import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
+
+export const updatePreferenceRoute = new Elysia()
+	.use(rateLimitPlugin({ max: 30, windowSeconds: 60, namespace: "update-preference" }))
+	.post(
 	"/update/:token",
 	async ({ params, body }) => {
 		const traceId = crypto.randomUUID();
@@ -14,6 +19,7 @@ export const updatePreferenceRoute = new Elysia().post(
 		});
 	},
 	{
+		rateLimit: true,
 		params: t.Object({
 			token: t.String({ description: "Signed preference token" }),
 		}),

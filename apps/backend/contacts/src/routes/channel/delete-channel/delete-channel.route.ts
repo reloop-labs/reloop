@@ -4,7 +4,12 @@ import { Elysia, t } from "elysia";
 import { deleteChannelController } from "./delete-channel.controllers";
 import { deleteChannelXCodeSamples } from "./delete-channel.x-codeSamples";
 
-export const deleteChannelRoute = new Elysia().use(authMiddleware).delete(
+import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
+
+export const deleteChannelRoute = new Elysia()
+	.use(authMiddleware)
+	.use(rateLimitPlugin({ max: 30, windowSeconds: 60, namespace: "delete-channel" }))
+	.delete(
 	"/:channel_id",
 	async ({ params, activeOrganizationId, logger, path, request, headers }) => {
 		const cookieString = headers["cookie"] || "";
@@ -25,6 +30,7 @@ export const deleteChannelRoute = new Elysia().use(authMiddleware).delete(
 	},
 	{
 		auth: true,
+		rateLimit: true,
 		params: t.Object({ channel_id: t.String({ description: "Channel ID" }) }),
 		response: {
 			200: ChannelModel.deleteResponse,

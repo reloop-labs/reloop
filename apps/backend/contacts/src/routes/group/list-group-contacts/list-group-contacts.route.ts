@@ -5,7 +5,12 @@ import { listGroupContactsController } from "@be/contacts/routes/group/list-grou
 import { Elysia, t } from "elysia";
 import { listGroupContactsXCodeSamples } from "./list-group-contacts.x-codeSamples";
 
-export const listGroupContactsRoute = new Elysia().use(authMiddleware).get(
+import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
+
+export const listGroupContactsRoute = new Elysia()
+	.use(authMiddleware)
+	.use(rateLimitPlugin({ max: 60, windowSeconds: 60, namespace: "list-group-contacts" }))
+	.get(
 	"/:group_id/contacts",
 	async ({ params, query, activeOrganizationId, logger }) => {
 		return await listGroupContactsController({
@@ -17,6 +22,7 @@ export const listGroupContactsRoute = new Elysia().use(authMiddleware).get(
 	},
 	{
 		auth: true,
+		rateLimit: true,
 		params: t.Object({
 			group_id: t.String({ description: "ID of the group" }),
 		}),

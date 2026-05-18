@@ -4,7 +4,12 @@ import { Elysia, t } from "elysia";
 import { addContactToGroupController } from "./add-contact-to-group.controllers";
 import { addContactToGroupXCodeSamples } from "./add-contact-to-group.x-codeSamples";
 
-export const addContactToGroupRoute = new Elysia().use(authMiddleware).post(
+import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
+
+export const addContactToGroupRoute = new Elysia()
+	.use(authMiddleware)
+	.use(rateLimitPlugin({ max: 30, windowSeconds: 60, namespace: "add-group" }))
+	.post(
 	"/group/:group_id",
 	async ({
 		body,
@@ -34,6 +39,7 @@ export const addContactToGroupRoute = new Elysia().use(authMiddleware).post(
 	},
 	{
 		auth: true,
+		rateLimit: true,
 		params: t.Object({ group_id: t.String() }),
 		body: ContactModel.addContactToGroupBody,
 		response: {

@@ -4,8 +4,11 @@ import { Elysia, t } from "elysia";
 import { removeContactFromGroupController } from "./remove-contact-from-group.controllers";
 import { removeContactFromGroupXCodeSamples } from "./remove-contact-from-group.x-codeSamples";
 
+import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
+
 export const removeContactFromGroupRoute = new Elysia()
 	.use(authMiddleware)
+	.use(rateLimitPlugin({ max: 30, windowSeconds: 60, namespace: "remove-group" }))
 	.delete(
 		"/group/:group_id",
 		async ({
@@ -36,6 +39,7 @@ export const removeContactFromGroupRoute = new Elysia()
 		},
 		{
 			auth: true,
+			rateLimit: true,
 			params: t.Object({ group_id: t.String() }),
 			body: ContactModel.removeContactFromGroupBody,
 			response: {

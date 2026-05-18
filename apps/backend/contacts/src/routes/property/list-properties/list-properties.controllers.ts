@@ -3,7 +3,6 @@ import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { PROPERTY_LIST_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, desc, eq, ilike, isNull, type SQL, sql } from "drizzle-orm";
-import { log } from "evlog";
 
 export const listPropertiesController = async ({
 	activeOrganizationId,
@@ -18,7 +17,7 @@ export const listPropertiesController = async ({
 	const limit = Math.min(query.limit || 100, 100);
 	const offset = (page - 1) * limit;
 
-	log.info({ ...{ page, limit }, message: "Listing properties" });
+	logger?.info("Listing properties", { page, limit });
 
 	try {
 		const whereConditions: Array<SQL<unknown>> = [
@@ -46,10 +45,7 @@ export const listPropertiesController = async ({
 			.limit(limit)
 			.offset(offset);
 
-		log.info({
-			...{ total: rows[0]?.total ?? 0, page, limit },
-			message: "Properties listed successfully",
-		});
+		logger?.info("Properties listed successfully", { total: rows[0]?.total ?? 0, page, limit });
 		return {
 			object: "contact_property",
 			properties: rows.map((r) => ({
@@ -66,7 +62,7 @@ export const listPropertiesController = async ({
 			event: PROPERTY_LIST_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
-		log.error({ ...{ error }, message: "Debug listing properties" });
+		logger?.error("Debug listing properties", { error });
 		throw error;
 	}
 };

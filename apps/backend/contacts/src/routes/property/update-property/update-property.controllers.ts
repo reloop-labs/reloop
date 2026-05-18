@@ -5,7 +5,6 @@ import * as schema from "@reloop/db/schema";
 import { PROPERTY_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
-import { log } from "evlog";
 
 export const updatePropertyController = async ({
 	activeOrganizationId,
@@ -28,10 +27,7 @@ export const updatePropertyController = async ({
 		statusCode?: number;
 	};
 }): Promise<PropertyTypes.PropertyResponse> => {
-	log.info({
-		...{ property_id, fallbackValue: body.fallbackValue },
-		message: "Updating property",
-	});
+	logger?.info("Updating property", { property_id, fallbackValue: body.fallbackValue });
 
 	try {
 		const existingProperty = await db
@@ -47,7 +43,7 @@ export const updatePropertyController = async ({
 			.limit(1);
 
 		if (existingProperty.length === 0) {
-			log.warn({ ...{ property_id }, message: "Property not found" });
+			logger?.warn("Property not found", { property_id });
 			throw status(404, { message: "Property not found" });
 		}
 
@@ -58,14 +54,11 @@ export const updatePropertyController = async ({
 			.returning();
 
 		if (!updatedProperty) {
-			log.error({
-				...{ property_id },
-				message: "Failed to update property - no data returned",
-			});
+			logger?.error("Failed to update property - no data returned", { property_id });
 			throw status(500, { message: "Failed to update property" });
 		}
 
-		log.info({ ...{ property_id }, message: "Property updated successfully" });
+		logger?.info("Property updated successfully", { property_id });
 
 		const result = {
 			...updatedProperty,
@@ -82,10 +75,7 @@ export const updatePropertyController = async ({
 
 		return result;
 	} catch (error) {
-		log.error({
-			...{ property_id, error },
-			message: "Debug updating property",
-		});
+		logger?.error("Debug updating property", { property_id, error });
 		throw error;
 	}
 };

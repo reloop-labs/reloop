@@ -4,7 +4,12 @@ import { Elysia } from "elysia";
 import { createPropertyController } from "./create-property.controllers";
 import { createPropertyXCodeSamples } from "./create-property.x-codeSamples";
 
-export const createPropertyRoute = new Elysia().use(authMiddleware).post(
+import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
+
+export const createPropertyRoute = new Elysia()
+	.use(authMiddleware)
+	.use(rateLimitPlugin({ max: 30, windowSeconds: 60, namespace: "create-property" }))
+	.post(
 	"/create",
 	async ({
 		body,
@@ -34,6 +39,7 @@ export const createPropertyRoute = new Elysia().use(authMiddleware).post(
 	},
 	{
 		auth: true,
+		rateLimit: true,
 		body: PropertyModel.createPropertyBody,
 		response: {
 			200: PropertyModel.propertyResponse,

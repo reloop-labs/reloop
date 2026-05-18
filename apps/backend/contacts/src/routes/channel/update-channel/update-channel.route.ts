@@ -4,7 +4,12 @@ import { Elysia, t } from "elysia";
 import { updateChannelController } from "./update-channel.controllers";
 import { updateChannelXCodeSamples } from "./update-channel.x-codeSamples";
 
-export const updateChannelRoute = new Elysia().use(authMiddleware).patch(
+import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
+
+export const updateChannelRoute = new Elysia()
+	.use(authMiddleware)
+	.use(rateLimitPlugin({ max: 30, windowSeconds: 60, namespace: "update-channel" }))
+	.patch(
 	"/:channel_id",
 	async ({
 		params,
@@ -37,6 +42,7 @@ export const updateChannelRoute = new Elysia().use(authMiddleware).patch(
 	},
 	{
 		auth: true,
+		rateLimit: true,
 		params: t.Object({ channel_id: t.String({ description: "Channel ID" }) }),
 		body: ChannelModel.updateChannelBody,
 		response: {

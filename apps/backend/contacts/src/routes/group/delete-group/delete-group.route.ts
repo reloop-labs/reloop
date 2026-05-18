@@ -4,7 +4,12 @@ import { deleteGroupController } from "@be/contacts/routes/group/delete-group/de
 import { Elysia, t } from "elysia";
 import { deleteGroupXCodeSamples } from "./delete-group.x-codeSamples";
 
-export const deleteGroupRoute = new Elysia().use(authMiddleware).delete(
+import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
+
+export const deleteGroupRoute = new Elysia()
+	.use(authMiddleware)
+	.use(rateLimitPlugin({ max: 30, windowSeconds: 60, namespace: "delete-group" }))
+	.delete(
 	"/:group_id",
 	async ({ params, activeOrganizationId, logger, path, request, headers }) => {
 		const cookieString = headers["cookie"] || "";
@@ -25,6 +30,7 @@ export const deleteGroupRoute = new Elysia().use(authMiddleware).delete(
 	},
 	{
 		auth: true,
+		rateLimit: true,
 		params: t.Object({ group_id: t.String() }),
 		response: {
 			200: GroupModel.deleteResponse,

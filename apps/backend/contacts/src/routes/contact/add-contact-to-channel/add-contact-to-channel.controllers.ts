@@ -87,14 +87,11 @@ export async function addContactToChannelController({
 		}
 
 		if (!contact) {
-			log.info({ ...{ contact_id, email }, message: "Contact not found" });
+			logger?.info("Contact not found", { contact_id, email });
 			throw status(404, { message: "Contact not found" });
 		}
 
-		log.info({
-			...{ contactId: contact.id, channelId },
-			message: "Checking if contact is already subscribed to channel",
-		});
+		logger?.info("Checking if contact is already subscribed to channel", { contactId: contact.id, channelId });
 		const existingSubscription = await db.query.channelSubscription.findFirst({
 			where: and(
 				eq(schema.channelSubscription.contactId, contact.id),
@@ -115,10 +112,7 @@ export async function addContactToChannelController({
 					.set({ status: targetStatus, updatedAt: new Date() })
 					.where(eq(schema.channelSubscription.id, existingSubscription.id));
 
-				log.info({
-					...{ subscriptionId: existingSubscription.id, status: targetStatus },
-					message: "Updated contact subscription status",
-				});
+				logger?.info("Updated contact subscription status", { subscriptionId: existingSubscription.id, status: targetStatus });
 
 				const result = {
 					contact,
@@ -155,14 +149,9 @@ export async function addContactToChannelController({
 			throw new Error("Failed to create subscription");
 		}
 
-		log.info({
-			...{
-				contactId: contact.id,
+		logger?.info("Contact added to channel successfully", { contactId: contact.id,
 				subscriptionId: subscription.id,
-				status: targetStatus,
-			},
-			message: "Contact added to channel successfully",
-		});
+				status: targetStatus, });
 
 		const result = {
 			contact,
@@ -179,15 +168,13 @@ export async function addContactToChannelController({
 
 		return result;
 	} catch (error) {
-		log.error(
-			{
-				contactId: contact_id,
-				email: email?.toLowerCase(),
-				channelId,
-				error: error instanceof Error ? error.message : String(error),
-			},
-			"Error adding contact to channel",
-		);
+		log.error({
+			message: "Error adding contact to channel",
+			contactId: contact_id,
+			email: email?.toLowerCase(),
+			channelId,
+			error: error instanceof Error ? error.message : String(error),
+		});
 		throw error;
 	}
 }

@@ -5,7 +5,6 @@ import * as schema from "@reloop/db/schema";
 import { CHANNEL_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
-import { log } from "evlog";
 
 export const updateChannelController = async ({
 	activeOrganizationId,
@@ -32,7 +31,7 @@ export const updateChannelController = async ({
 		statusCode?: number;
 	};
 }): Promise<ChannelTypes.ChannelResponse> => {
-	log.info({ ...{ channel_id, name }, message: "Updating channel" });
+	logger?.info("Updating channel", { channel_id, name });
 
 	try {
 		const existingChannel = await db.query.channel.findFirst({
@@ -44,7 +43,7 @@ export const updateChannelController = async ({
 		});
 
 		if (!existingChannel) {
-			log.warn({ ...{ channel_id }, message: "Channel not found" });
+			logger?.warn("Channel not found", { channel_id });
 			throw status(404, { message: "Channel not found" });
 		}
 
@@ -58,10 +57,7 @@ export const updateChannelController = async ({
 			});
 
 			if (duplicateName) {
-				log.warn({
-					...{ channel_id, name },
-					message: "Channel with this name already exists",
-				});
+				logger?.warn("Channel with this name already exists", { channel_id, name });
 				throw status(409, { message: "Channel with this name already exists" });
 			}
 		}
@@ -78,14 +74,11 @@ export const updateChannelController = async ({
 			.returning();
 
 		if (!updatedChannel) {
-			log.error({
-				...{ channel_id },
-				message: "Failed to update channel - no data returned",
-			});
+			logger?.error("Failed to update channel - no data returned", { channel_id });
 			throw new Error("Failed to update channel");
 		}
 
-		log.info({ ...{ channel_id }, message: "Channel updated successfully" });
+		logger?.info("Channel updated successfully", { channel_id });
 
 		const result = {
 			...updatedChannel,
@@ -102,7 +95,7 @@ export const updateChannelController = async ({
 
 		return result;
 	} catch (error) {
-		log.error({ ...{ channel_id, error }, message: "Debug updating channel" });
+		logger?.error("Debug updating channel", { channel_id, error });
 		throw error;
 	}
 };

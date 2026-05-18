@@ -1,7 +1,12 @@
 import { Elysia, t } from "elysia";
+import { log } from "evlog";
 import { unsubscribeAllController } from "./unsubscribe-all.controllers";
 
-export const unsubscribeAllRoute = new Elysia().post(
+import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
+
+export const unsubscribeAllRoute = new Elysia()
+	.use(rateLimitPlugin({ max: 30, windowSeconds: 60, namespace: "unsubscribe-all" }))
+	.post(
 	"/unsubscribe-all/:token",
 	async ({ params }) => {
 		const traceId = crypto.randomUUID();
@@ -12,6 +17,7 @@ export const unsubscribeAllRoute = new Elysia().post(
 		});
 	},
 	{
+		rateLimit: true,
 		params: t.Object({
 			token: t.String({ description: "Signed preference token" }),
 		}),

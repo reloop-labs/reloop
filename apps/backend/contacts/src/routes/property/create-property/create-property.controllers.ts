@@ -5,7 +5,6 @@ import * as schema from "@reloop/db/schema";
 import { PROPERTY_CREATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq } from "drizzle-orm";
 import { status } from "elysia";
-import { log } from "evlog";
 
 export const createPropertyController = async ({
 	activeOrganizationId,
@@ -28,10 +27,7 @@ export const createPropertyController = async ({
 		statusCode?: number;
 	};
 }): Promise<PropertyTypes.PropertyResponse> => {
-	log.info({
-		...{ name: body.name, type: body.type },
-		message: "Creating property",
-	});
+	logger?.info("Creating property", { name: body.name, type: body.type });
 
 	try {
 		const existingProperty = await db
@@ -46,10 +42,7 @@ export const createPropertyController = async ({
 			.limit(1);
 
 		if (existingProperty.length > 0) {
-			log.warn({
-				...{ name: body.name },
-				message: "Property already exists in this organization",
-			});
+			logger?.warn("Property already exists in this organization", { name: body.name });
 			throw status(409, { message: "Property already exists" });
 		}
 
@@ -67,17 +60,11 @@ export const createPropertyController = async ({
 			.returning();
 
 		if (!newProperty) {
-			log.error({
-				...{ name: body.name },
-				message: "Failed to create property - no data returned",
-			});
+			logger?.error("Failed to create property - no data returned", { name: body.name });
 			throw status(500, { message: "Failed to create property" });
 		}
 
-		log.info({
-			...{ name: body.name, id: newProperty.id },
-			message: "Property created successfully",
-		});
+		logger?.info("Property created successfully", { name: body.name, id: newProperty.id });
 
 		const result = {
 			...newProperty,
@@ -94,10 +81,7 @@ export const createPropertyController = async ({
 
 		return result;
 	} catch (error) {
-		log.error({
-			...{ name: body.name, error },
-			message: "Debug creating property",
-		});
+		logger?.error("Debug creating property", { name: body.name, error });
 		throw error;
 	}
 };

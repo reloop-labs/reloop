@@ -4,7 +4,12 @@ import { Elysia, t } from "elysia";
 import { deleteContactController } from "./delete-contact.controllers";
 import { deleteContactXCodeSamples } from "./delete-contact.x-codeSamples";
 
-export const deleteContactRoute = new Elysia().use(authMiddleware).delete(
+import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
+
+export const deleteContactRoute = new Elysia()
+	.use(authMiddleware)
+	.use(rateLimitPlugin({ max: 30, windowSeconds: 60, namespace: "delete-contact" }))
+	.delete(
 	"/:contact_id",
 	async ({ params, activeOrganizationId, logger, path, request, headers }) => {
 		const cookieString = headers["cookie"] || "";
@@ -25,6 +30,7 @@ export const deleteContactRoute = new Elysia().use(authMiddleware).delete(
 	},
 	{
 		auth: true,
+		rateLimit: true,
 		params: t.Object({
 			contact_id: t.String(),
 		}),

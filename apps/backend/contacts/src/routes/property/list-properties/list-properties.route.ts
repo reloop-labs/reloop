@@ -4,7 +4,12 @@ import { Elysia } from "elysia";
 import { listPropertiesController } from "./list-properties.controllers";
 import { listPropertiesXCodeSamples } from "./list-properties.x-codeSamples";
 
-export const listPropertiesRoute = new Elysia().use(authMiddleware).get(
+import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
+
+export const listPropertiesRoute = new Elysia()
+	.use(authMiddleware)
+	.use(rateLimitPlugin({ max: 60, windowSeconds: 60, namespace: "list-properties" }))
+	.get(
 	"/list",
 	async ({ query, activeOrganizationId, logger }) => {
 		return listPropertiesController({
@@ -15,6 +20,7 @@ export const listPropertiesRoute = new Elysia().use(authMiddleware).get(
 	},
 	{
 		auth: true,
+		rateLimit: true,
 		query: PropertyModel.propertyQuery,
 		response: {
 			200: PropertyModel.propertyListResponse,

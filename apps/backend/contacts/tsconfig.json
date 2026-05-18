@@ -8,14 +8,15 @@
 		"strict": true,
 		"skipLibCheck": true,
 		"outDir": "./dist",
-		"types": ["bun-types"],
+		"types": ["bun"],
 		"composite": false,
-		"jsx": "react-jsx",
 		"declaration": false,
 		"declarationMap": false,
 		"baseUrl": "./src",
 		"paths": {
 			"@be/contacts/*": ["./*"]
 		}
-	}
+	},
+	"include": ["src/**/*"],
+	"exclude": ["node_modules", "dist"]
 }

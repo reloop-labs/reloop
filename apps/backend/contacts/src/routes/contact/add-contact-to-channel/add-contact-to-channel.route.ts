@@ -5,7 +5,12 @@ import { Elysia, t } from "elysia";
 import { addContactToChannelController } from "./add-contact-to-channel.controllers";
 import { addContactToChannelXCodeSamples } from "./add-contact-to-channel.x-codeSamples";
 
-export const addContactToChannelRoute = new Elysia().use(authMiddleware).post(
+import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
+
+export const addContactToChannelRoute = new Elysia()
+	.use(authMiddleware)
+	.use(rateLimitPlugin({ max: 30, windowSeconds: 60, namespace: "add-channel" }))
+	.post(
 	"/channel/:channel_id",
 	async ({
 		body,
@@ -35,6 +40,7 @@ export const addContactToChannelRoute = new Elysia().use(authMiddleware).post(
 	},
 	{
 		auth: true,
+		rateLimit: true,
 		params: t.Object({ channel_id: t.String() }),
 		body: ContactModel.addContactToChannelBody,
 		response: {

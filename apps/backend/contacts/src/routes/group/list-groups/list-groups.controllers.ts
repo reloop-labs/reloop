@@ -7,7 +7,6 @@ import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { GROUP_LIST_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, desc, eq, ilike, isNull, sql } from "drizzle-orm";
-import { log } from "evlog";
 
 export const listGroupsController = async ({
 	organizationId,
@@ -26,7 +25,7 @@ export const listGroupsController = async ({
 	const limit = Math.min(rawLimit || 100, 100);
 	const offset = (page - 1) * limit;
 
-	log.info({ ...{ page, limit, search }, message: "Listing groups" });
+	logger?.info("Listing groups", { page, limit, search });
 
 	try {
 		const whereClause = and(
@@ -60,7 +59,7 @@ export const listGroupsController = async ({
 			event: GROUP_LIST_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
-		log.error({ ...{ error }, message: "Debug listing groups" });
+		logger?.error("Debug listing groups", { error });
 		throw error;
 	}
 };

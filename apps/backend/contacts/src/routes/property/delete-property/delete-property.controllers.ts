@@ -4,7 +4,6 @@ import * as schema from "@reloop/db/schema";
 import { PROPERTY_DELETE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
-import { log } from "evlog";
 
 export const deletePropertyController = async ({
 	activeOrganizationId,
@@ -31,7 +30,7 @@ export const deletePropertyController = async ({
 	name: string;
 	event: string;
 }> => {
-	log.info({ ...{ property_id }, message: "Deleting property" });
+	logger?.info("Deleting property", { property_id });
 
 	try {
 		const property = await db.query.contactProperty.findFirst({
@@ -43,10 +42,7 @@ export const deletePropertyController = async ({
 		});
 
 		if (!property) {
-			log.warn({
-				...{ property_id },
-				message: "Property not found or already deleted",
-			});
+			logger?.warn("Property not found or already deleted", { property_id });
 			throw status(404, { message: "Property not found" });
 		}
 
@@ -60,7 +56,7 @@ export const deletePropertyController = async ({
 				),
 			);
 
-		log.info({ ...{ property_id }, message: "Property deleted successfully" });
+		logger?.info("Property deleted successfully", { property_id });
 
 		const result = {
 			object: "contact_property" as const,
@@ -79,10 +75,7 @@ export const deletePropertyController = async ({
 
 		return result;
 	} catch (error) {
-		log.error({
-			...{ property_id, error },
-			message: "Debug deleting property",
-		});
+		logger?.error("Debug deleting property", { property_id, error });
 		throw error;
 	}
 };

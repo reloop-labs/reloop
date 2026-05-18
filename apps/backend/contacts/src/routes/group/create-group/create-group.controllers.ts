@@ -6,7 +6,6 @@ import * as schema from "@reloop/db/schema";
 import { createGroupId } from "@reloop/db/schema";
 import { GROUP_CREATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
-import { log } from "evlog";
 
 export const createGroupController = async ({
 	name,
@@ -29,9 +28,9 @@ export const createGroupController = async ({
 		statusCode?: number;
 	};
 }): Promise<GroupResponse | GroupModel.Unauthorized> => {
-	log.info({ ...{ name }, message: "Creating group" });
+	logger?.info("Creating group", { name });
 	try {
-		log.info({ ...{ name }, message: "Checking if group already exists" });
+		logger?.info("Checking if group already exists", { name });
 		const existingGroup = await db.query.group.findFirst({
 			where: and(
 				eq(schema.group.name, name),
@@ -40,7 +39,7 @@ export const createGroupController = async ({
 			),
 		});
 		if (existingGroup) {
-			log.warn({ ...{ name }, message: "Group already exists" });
+			logger?.warn("Group already exists", { name });
 			throw new Error("Group already exists");
 		}
 		const [newGroup] = await db
@@ -53,16 +52,10 @@ export const createGroupController = async ({
 			})
 			.returning();
 		if (!newGroup) {
-			log.error({
-				...{ name },
-				message: "Failed to create group - no data returned",
-			});
+			logger?.error("Failed to create group - no data returned", { name });
 			throw new Error("Failed to create group");
 		}
-		log.info({
-			...{ name, id: newGroup.id },
-			message: "Group created successfully",
-		});
+		logger?.info("Group created successfully", { name, id: newGroup.id });
 
 		const result = {
 			id: newGroup.id,
@@ -82,7 +75,7 @@ export const createGroupController = async ({
 
 		return result;
 	} catch (error) {
-		log.error({ ...{ name, error }, message: "Debug creating group" });
+		logger?.error("Debug creating group", { name, error });
 		throw error;
 	}
 };

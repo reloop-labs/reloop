@@ -3,7 +3,6 @@ import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { CHANNEL_LIST_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, desc, eq, isNull, sql } from "drizzle-orm";
-import { log } from "evlog";
 
 export const listChannelsController = async ({
 	activeOrganizationId,
@@ -20,7 +19,7 @@ export const listChannelsController = async ({
 	const limit = Math.min(rawLimit || 100, 100);
 	const offset = (page - 1) * limit;
 
-	log.info({ ...{ page, limit }, message: "Listing channels" });
+	logger?.info("Listing channels", { page, limit });
 
 	try {
 		const whereClause = and(
@@ -46,10 +45,7 @@ export const listChannelsController = async ({
 			.limit(limit)
 			.offset(offset);
 
-		log.info({
-			...{ total: rows[0]?.total ?? 0, page, limit },
-			message: "Channels listed successfully",
-		});
+		logger?.info("Channels listed successfully", { total: rows[0]?.total ?? 0, page, limit });
 		return {
 			object: "channel",
 			channels: rows.map(({ channel, subscriberCount }) => ({
@@ -68,7 +64,7 @@ export const listChannelsController = async ({
 			event: CHANNEL_LIST_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
-		log.error({ ...{ error }, message: "Debug listing channels" });
+		logger?.error("Debug listing channels", { error });
 		throw error;
 	}
 };

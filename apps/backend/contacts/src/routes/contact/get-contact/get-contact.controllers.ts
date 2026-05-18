@@ -15,7 +15,7 @@ export async function getContactController({
 	organizationId: string;
 	logger?: any;
 }): Promise<ContactTypes.ContactResponse> {
-	log.info({ ...{ contactId, organizationId }, message: "Getting contact" });
+	logger?.info("Getting contact", { contactId, organizationId });
 
 	try {
 		const contact = await db.query.contact.findFirst({
@@ -41,10 +41,7 @@ export async function getContactController({
 		});
 
 		if (!contact) {
-			log.warn({
-				...{ contactId, organizationId },
-				message: "Contact not found",
-			});
+			logger?.warn("Contact not found", { contactId, organizationId });
 			throw status(404, { message: "Contact not found" });
 		}
 
@@ -98,17 +95,12 @@ export async function getContactController({
 		const suppressionReason = contact.suppressionReason ?? null;
 		const suppressedAt = contact.suppressedAt ?? null;
 
-		log.info({
-			...{
-				contactId,
+		logger?.info("Contact retrieved successfully", { contactId,
 				organizationId,
 				propertyCount: contact.propertyValues.length,
 				groupCount: groups.length,
 				channelCount: channels.length,
-				suppressed: suppressionReason !== null,
-			},
-			message: "Contact retrieved successfully",
-		});
+				suppressed: suppressionReason !== null, });
 
 		return {
 			object: "contact",
@@ -127,14 +119,12 @@ export async function getContactController({
 			event: CONTACT_GET_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
-		log.error(
-			{
-				contactId,
-				organizationId,
-				error: error instanceof Error ? error.message : String(error),
-			},
-			"Error getting contact",
-		);
+		log.error({
+			message: "Error getting contact",
+			contactId,
+			organizationId,
+			error: error instanceof Error ? error.message : String(error),
+		});
 		throw error;
 	}
 }

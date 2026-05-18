@@ -4,7 +4,12 @@ import { Elysia, t } from "elysia";
 import { getContactController } from "./get-contact.controllers";
 import { getContactXCodeSamples } from "./get-contact.x-codeSamples";
 
-export const getContactRoute = new Elysia().use(authMiddleware).get(
+import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
+
+export const getContactRoute = new Elysia()
+	.use(authMiddleware)
+	.use(rateLimitPlugin({ max: 60, windowSeconds: 60, namespace: "get-contact" }))
+	.get(
 	"/retrieve/:contact_id",
 	async ({ params, activeOrganizationId, logger }) => {
 		return await getContactController({
@@ -15,6 +20,7 @@ export const getContactRoute = new Elysia().use(authMiddleware).get(
 	},
 	{
 		auth: true,
+		rateLimit: true,
 		params: t.Object({ contact_id: t.String() }),
 		response: {
 			200: ContactModel.contactBaseResponse,

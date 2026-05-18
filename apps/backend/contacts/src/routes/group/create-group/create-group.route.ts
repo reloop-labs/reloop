@@ -4,7 +4,12 @@ import { createGroupController } from "@be/contacts/routes/group/create-group/cr
 import { Elysia } from "elysia";
 import { createGroupXCodeSamples } from "./create-group.x-codeSamples";
 
-export const createGroupRoute = new Elysia().use(authMiddleware).post(
+import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
+
+export const createGroupRoute = new Elysia()
+	.use(authMiddleware)
+	.use(rateLimitPlugin({ max: 30, windowSeconds: 60, namespace: "create-group" }))
+	.post(
 	"/create",
 	async ({
 		body,
@@ -35,6 +40,7 @@ export const createGroupRoute = new Elysia().use(authMiddleware).post(
 	},
 	{
 		auth: true,
+		rateLimit: true,
 		body: GroupModel.createGroupBody,
 		response: {
 			201: GroupModel.groupResponse,

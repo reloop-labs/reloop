@@ -4,7 +4,12 @@ import { Elysia, t } from "elysia";
 import { deletePropertyController } from "./delete-property.controllers";
 import { deletePropertyXCodeSamples } from "./delete-property.x-codeSamples";
 
-export const deletePropertyRoute = new Elysia().use(authMiddleware).delete(
+import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
+
+export const deletePropertyRoute = new Elysia()
+	.use(authMiddleware)
+	.use(rateLimitPlugin({ max: 30, windowSeconds: 60, namespace: "delete-property" }))
+	.delete(
 	"/:contact_property_id",
 	async ({ params, activeOrganizationId, logger, path, request, headers }) => {
 		const cookieString = headers["cookie"] || "";
@@ -25,6 +30,7 @@ export const deletePropertyRoute = new Elysia().use(authMiddleware).delete(
 	},
 	{
 		auth: true,
+		rateLimit: true,
 		params: t.Object({
 			contact_property_id: t.String({ description: "Property ID to delete" }),
 		}),
