@@ -4,7 +4,7 @@ import * as schema from "@reloop/db/schema";
 import { DomainErrors } from "@reloop/domain/lib/errors";
 import type { DomainStatus } from "@reloop/domain/types/domain.type";
 import { eq } from "drizzle-orm";
-import { log } from "evlog";
+
 import { useLogger } from "evlog/elysia";
 
 export async function enqueueVerificationJob_step3({
@@ -18,7 +18,7 @@ export async function enqueueVerificationJob_step3({
 	domainName: string;
 	previousStatus: DomainStatus;
 }) {
-	const logger = useLogger();
+	const log = useLogger();
 
 	try {
 		await bus.publish(BusEvent.DOMAIN_DNS_REVERIFICATION_REQUESTED, {
@@ -28,20 +28,9 @@ export async function enqueueVerificationJob_step3({
 			triggeredAt: new Date().toISOString(),
 		});
 
-		log.info({
-			...{
-				domain: domainName,
-			},
-			message: "Published domain verification request via NATS",
-		});
+		log.info("Published domain verification request via NATS");
 	} catch (error) {
-		log.error({
-			...{
-				domain: domainName,
-				error,
-			},
-			message: "Failed to publish domain verification request",
-		});
+		log.error("Failed to publish domain verification request");
 		// Revert status if publish fails
 		await db
 			.update(schema.domain)

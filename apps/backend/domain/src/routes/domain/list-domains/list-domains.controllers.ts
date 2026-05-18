@@ -3,7 +3,7 @@ import * as schema from "@reloop/db/schema";
 import type { DomainTypes } from "@reloop/domain/types/domain.type";
 import { DOMAIN_LIST_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, count, desc, eq, ilike, isNull } from "drizzle-orm";
-import { log } from "evlog";
+
 import { useLogger } from "evlog/elysia";
 
 export async function listDomainsController({
@@ -13,7 +13,7 @@ export async function listDomainsController({
 	query: DomainTypes.DomainQuery;
 	organizationId: string;
 }): Promise<DomainTypes.DomainListResponse> {
-	const logger = useLogger();
+	const log = useLogger();
 	const { page = 1, limit = 10, status, q } = query;
 	const offset = (page - 1) * limit;
 
@@ -55,13 +55,7 @@ export async function listDomainsController({
 
 		return finalResponse;
 	} catch (error) {
-		log.error({
-			...{
-				query,
-				error: error instanceof Error ? error.message : String(error),
-				message: "Error listing domains",
-			},
-		});
+		log.error("Error listing domains");
 		throw error;
 	}
 }

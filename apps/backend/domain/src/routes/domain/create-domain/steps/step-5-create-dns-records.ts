@@ -1,7 +1,7 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import type { DNSTypes } from "@reloop/domain/types/dns.type";
-import { log } from "evlog";
+
 import { useLogger } from "evlog/elysia";
 
 export async function createDnsRecords_step5({
@@ -24,7 +24,7 @@ export async function createDnsRecords_step5({
 	};
 	receivingMxRecord: DNSTypes.DNSRecord;
 }) {
-	const logger = useLogger();
+	const log = useLogger();
 	const { dkimRecord, spfRecord, dmarcRecord, mxRecord } = dnsRecords;
 
 	const dnsRecordIds = {
@@ -34,7 +34,7 @@ export async function createDnsRecords_step5({
 		domain,
 	};
 
-	log.info({ ...{ dnsRecordIds }, message: "Creating DNS records" });
+	log.info("Creating DNS records");
 
 	const recordsToInsert: (typeof schema.domainDnsRecord.$inferInsert & {
 		recordTypeName: "DKIM" | "SPF" | "DMARC" | "MX";

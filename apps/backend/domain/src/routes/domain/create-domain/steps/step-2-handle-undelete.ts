@@ -5,7 +5,7 @@ import { DomainErrors } from "@reloop/domain/lib/errors";
 import type { DomainTypes } from "@reloop/domain/types/domain.type";
 import { DOMAIN_UNDELETE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
-import { log } from "evlog";
+
 import { useLogger } from "evlog/elysia";
 
 export async function handleUndelete_step2({
@@ -29,12 +29,12 @@ export async function handleUndelete_step2({
 	sendingEmail?: boolean;
 	receivingEmail?: boolean;
 }): Promise<DomainTypes.DomainResponse | null> {
-	const logger = useLogger();
+	const log = useLogger();
 
 	if (deletedDomain?.deletedAt) {
 		const now = new Date();
 		const domainId = deletedDomain.id;
-		log.info({ ...{ domainId }, message: "Undeleting domain" });
+		log.info("Undeleting domain");
 
 		await db
 			.update(schema.domain)
@@ -52,7 +52,7 @@ export async function handleUndelete_step2({
 			})
 			.where(eq(schema.domain.id, domainId));
 
-		log.info({ ...{ domainId }, message: "Undeleting domain DNS records" });
+		log.info("Undeleting domain DNS records");
 		await db
 			.update(schema.domainDnsRecord)
 			.set({

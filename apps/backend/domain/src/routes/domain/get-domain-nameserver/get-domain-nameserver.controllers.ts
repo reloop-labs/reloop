@@ -5,7 +5,7 @@ import { DomainErrors } from "@reloop/domain/lib/errors";
 import type { DNSTypes } from "@reloop/domain/types/dns.type";
 import { DOMAIN_GET_DNS_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
-import { log } from "evlog";
+
 import { useLogger } from "evlog/elysia";
 
 export async function getDomainDNSController({
@@ -15,7 +15,7 @@ export async function getDomainDNSController({
 	domainId: string;
 	organizationId: string;
 }): Promise<DNSTypes.DomainNameserversResponse> {
-	const logger = useLogger();
+	const log = useLogger();
 	try {
 		const foundDomain = await db.query.domain.findFirst({
 			where: and(
@@ -57,15 +57,8 @@ export async function getDomainDNSController({
 					}
 				}
 			}
-		} catch (error) {
-			log.warn({
-				...{
-					domainId,
-					domain: foundDomain.domain,
-					error: error instanceof Error ? error.message : String(error),
-					message: "Unable to resolve nameservers for domain",
-				},
-			});
+		} catch (_error) {
+			log.warn("Unable to resolve nameservers for domain");
 		}
 
 		return {
@@ -77,10 +70,7 @@ export async function getDomainDNSController({
 			event: DOMAIN_GET_DNS_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
-		log.error({
-			...{ domainId, error },
-			message: "Error getting domain nameservers",
-		});
+		log.error("Error getting domain nameservers");
 		throw error;
 	}
 }

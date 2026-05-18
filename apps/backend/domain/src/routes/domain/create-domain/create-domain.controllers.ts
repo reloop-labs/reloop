@@ -23,7 +23,7 @@ export async function createDomainController({
 	organizationId: string;
 	userId: string;
 } & DomainTypes.CreateDomainRequest): Promise<DomainTypes.DomainResponse> {
-	const logger = useLogger();
+	const log = useLogger();
 	try {
 		// Step 1: Check if domain already exists
 		const { deletedDomain } = await checkExistingDomain_step1({
@@ -84,7 +84,7 @@ export async function createDomainController({
 			domain,
 		});
 	} catch (error) {
-		console.error(
+		log.error(
 			`Error creating domain: ${error instanceof Error ? error.message : String(error)}`,
 		);
 		throw error;

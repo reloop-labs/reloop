@@ -5,7 +5,7 @@ import { DomainErrors } from "@reloop/domain/lib/errors";
 import type { DomainTypes } from "@reloop/domain/types/domain.type";
 import { DOMAIN_CREATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
-import { log } from "evlog";
+
 import { useLogger } from "evlog/elysia";
 
 export async function finalizeDomainCreation_step6({
@@ -17,8 +17,8 @@ export async function finalizeDomainCreation_step6({
 	organizationId: string;
 	domain: string;
 }): Promise<DomainTypes.DomainResponse> {
-	const logger = useLogger();
-	log.info({ ...{ domainId }, message: "Fetching domain with DNS records" });
+	const log = useLogger();
+	log.info("Fetching domain with DNS records");
 
 	const domainWithDnsRecords = await db.query.domain.findFirst({
 		where: and(

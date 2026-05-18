@@ -4,7 +4,9 @@ import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 import { domainConfig } from "@reloop/domain/domain.config";
 import { domainRoutes } from "@reloop/domain/routes/domain/domain.routes";
-import { landing } from "@reloop/domain/routes/landing/landing.index";
+import { agentCardRoute } from "@reloop/domain/routes/landing/agent-card.route";
+import { healthRoute } from "@reloop/domain/routes/landing/health.route";
+import { landingRoute } from "@reloop/domain/routes/landing/landing.route";
 import { loader } from "@reloop/domain/utils/loader";
 import { Elysia } from "elysia";
 import { initLogger, log, parseError } from "evlog";
@@ -50,7 +52,9 @@ const domainService = new Elysia({
 			link: parsed.link,
 		};
 	})
-	.use(landing)
+	.use(landingRoute)
+	.use(healthRoute)
+	.use(agentCardRoute)
 	.use(domainRoutes)
 	.onStart(async () => {
 		await loader();

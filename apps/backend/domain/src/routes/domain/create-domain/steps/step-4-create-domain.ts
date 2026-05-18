@@ -1,7 +1,7 @@
 import { createId } from "@paralleldrive/cuid2";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { log } from "evlog";
+
 import { useLogger } from "evlog/elysia";
 
 export async function createDomainEntry_step4({
@@ -25,9 +25,9 @@ export async function createDomainEntry_step4({
 	sendingEmail?: boolean;
 	receivingEmail?: boolean;
 }) {
-	const logger = useLogger();
+	const log = useLogger();
 	const domainId = `domain_${createId()}`;
-	log.info({ ...{ domainId }, message: "Creating domain" });
+	log.info("Creating domain");
 
 	await db.insert(schema.domain).values({
 		id: domainId,

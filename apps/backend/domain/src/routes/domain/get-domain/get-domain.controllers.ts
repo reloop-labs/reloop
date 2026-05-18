@@ -4,7 +4,7 @@ import { DomainErrors } from "@reloop/domain/lib/errors";
 import type { DomainTypes } from "@reloop/domain/types/domain.type";
 import { DOMAIN_GET_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
-import { log } from "evlog";
+
 import { useLogger } from "evlog/elysia";
 
 export async function getDomainController({
@@ -14,9 +14,9 @@ export async function getDomainController({
 	organizationId: string;
 	domainId: string;
 }): Promise<DomainTypes.DomainResponse> {
-	const logger = useLogger();
+	const log = useLogger();
 	try {
-		log.info({ ...{ domainId }, message: "Fetching domain with DNS records" });
+		log.info("Fetching domain with DNS records");
 		const result = await db.query.domain.findFirst({
 			where: and(
 				eq(schema.domain.id, domainId),
@@ -31,18 +31,18 @@ export async function getDomainController({
 		});
 
 		if (!result) {
-			log.warn({ ...{ domainId }, message: "Domain not found" });
+			log.warn("Domain not found");
 			throw DomainErrors.domainNotFound(domainId);
 		}
 
-		log.info({ ...{ domainId }, message: "Domain fetched successfully" });
+		log.info("Domain fetched successfully");
 		return {
 			object: "domain" as const,
 			...result,
 			event: DOMAIN_GET_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
-		log.error({ ...{ domainId, error }, message: "Error getting domain" });
+		log.error("Error getting domain");
 		throw error;
 	}
 }
