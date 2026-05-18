@@ -20,7 +20,7 @@ export const DomainTrackingSection = ({
 		if (!handleUpdateDomain) return;
 
 		handleUpdateDomain(
-			{ clickTracking: value },
+			{ isClickTrackingEnabled: value },
 			`Click tracking ${value ? "enabled" : "disabled"}`,
 		);
 	};
@@ -29,7 +29,7 @@ export const DomainTrackingSection = ({
 		if (!handleUpdateDomain) return;
 
 		handleUpdateDomain(
-			{ openTracking: value },
+			{ isOpenTrackingEnabled: value },
 			`Open tracking ${value ? "enabled" : "disabled"}`,
 		);
 	};
@@ -41,7 +41,7 @@ export const DomainTrackingSection = ({
 				{/* Click Tracking */}
 				<div className="flex items-start gap-4">
 					<Checkbox.Root
-						checked={domain?.clickTracking ?? false}
+						checked={domain?.isClickTrackingEnabled ?? false}
 						onCheckedChange={onToggleClickTracking}
 						disabled={isLoading}
 					/>
@@ -58,7 +58,7 @@ export const DomainTrackingSection = ({
 				{/* Open Tracking */}
 				<div className="flex items-start gap-4">
 					<Checkbox.Root
-						checked={domain?.openTracking ?? false}
+						checked={domain?.isOpenTrackingEnabled ?? false}
 						onCheckedChange={onToggleOpenTracking}
 						disabled={isLoading}
 					/>

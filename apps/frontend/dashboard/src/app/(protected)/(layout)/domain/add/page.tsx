@@ -30,6 +30,8 @@ const AddDomain = () => {
 				domain: "",
 				clickTracking: false,
 				openTracking: false,
+				customReturnPath: "",
+				trackingSubdomain: "",
 			},
 		});
 
@@ -41,6 +43,8 @@ const AddDomain = () => {
 		domain,
 		clickTracking,
 		openTracking,
+		customReturnPath,
+		trackingSubdomain,
 	}: DomainFormValues) => {
 		try {
 			changeStatus("loading");
@@ -48,8 +52,10 @@ const AddDomain = () => {
 				"/api/domain/v1/create",
 				{
 					domain,
-					clickTracking,
-					openTracking,
+					click_tracking: clickTracking,
+					open_tracking: openTracking,
+					custom_return_path: customReturnPath,
+					tracking: trackingSubdomain,
 					tls: "opportunistic",
 				},
 				{ headers: { credentials: "include" } },
@@ -87,7 +93,7 @@ const AddDomain = () => {
 						domain={watch("domain")}
 					/>
 
-					<AdvancedOptions control={control} isLoading={status === "loading"} />
+					<AdvancedOptions control={control} register={register} isLoading={status === "loading"} />
 					<div className="mt-6 flex items-center gap-3">
 						<Button.Root
 							type="submit"
