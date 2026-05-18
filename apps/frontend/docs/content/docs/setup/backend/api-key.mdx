@@ -55,14 +55,14 @@ NATS_URL=nats://localhost:4222
 
 ### Reference Table
 
-| Variable | Required | Default Value | Description |
-| :--- | :--- | :--- | :--- |
-| `PG_URL` | **YES** | `postgresql://...` | PostgreSQL connection string. |
-| `REDIS_URL` | **YES** | `redis://...` | Redis connection URL for key validation caching. |
-| `PORT` | **YES** | `8012` | Local port number the Elysia app listens to on the host. |
-| `BASE_URL` | **YES** | `https://local.reloop.sh` | Main application domain (used for cookie validations). |
-| `NATS_URL` | **YES** | `nats://localhost:4222` | Connection URL for NATS event bus messaging. |
-| `NODE_ENV` | **YES** | `development` | Active environment scope (`development` or `production`). |
+| Variable | Required | Default Value |
+| :--- | :--- | :--- |
+| `PG_URL` | **YES** | `postgresql://reloop:reloop123@localhost:5432/reloop` |
+| `REDIS_URL` | **YES** | `redis://:reloop123@localhost:6379` |
+| `PORT` | **YES** | `8012` |
+| `BASE_URL` | **YES** | `https://local.reloop.sh` |
+| `NATS_URL` | **YES** | `nats://localhost:4222` |
+| `NODE_ENV` | **YES** | `development` |
 
 
 ## Development Commands

@@ -3,7 +3,8 @@
 import { cn } from "@reloop/fe-docs/lib/cn";
 import type { TOCItem } from "@reloop/fe-docs/lib/types";
 import { Icon } from "@reloop/ui/icon";
-import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { useEffect, useMemo, useState } from "react";
 
 interface TOCProps {
 	items: TOCItem[];
@@ -11,6 +12,29 @@ interface TOCProps {
 
 export function TableOfContents({ items }: TOCProps) {
 	const [activeId, setActiveId] = useState<string | null>(null);
+
+	const activeIds = useMemo(() => {
+		const ids = new Set<string>();
+		if (!activeId) return ids;
+
+		const activeIndex = items.findIndex(
+			(item) => item.url.slice(1) === activeId,
+		);
+		if (activeIndex !== -1) {
+			ids.add(activeId);
+			const activeItem = items[activeIndex];
+			if (activeItem && activeItem.depth > 2) {
+				for (let i = activeIndex - 1; i >= 0; i--) {
+					const item = items[i];
+					if (item && item.depth === 2) {
+						ids.add(item.url.slice(1));
+						break;
+					}
+				}
+			}
+		}
+		return ids;
+	}, [activeId, items]);
 
 	useEffect(() => {
 		const handleScroll = () => {
@@ -72,19 +96,28 @@ export function TableOfContents({ items }: TOCProps) {
 
 				<ul className="m-0 flex list-none flex-col gap-0.5 border-stroke-soft-100 border-l pl-0">
 					{items.map((item) => {
-						const isActive = activeId === item.url.slice(1);
+						const isPrimaryActive = item.url.slice(1) === activeId;
+						const isActive = activeIds.has(item.url.slice(1));
+						const isSubItem = item.depth > 2;
 						return (
-							<li
-								key={item.url}
-								className={cn("transition-colors", item.depth > 2 && "ml-3")}
-							>
+							<li key={item.url} className="relative transition-colors">
+								{isActive && (
+									<motion.div
+										layoutId={
+											isPrimaryActive ? "toc-active-indicator" : undefined
+										}
+										className="absolute top-0 bottom-0 left-[-1px] w-0.5 bg-[#171717] dark:bg-white"
+										transition={{ type: "spring", stiffness: 350, damping: 30 }}
+									/>
+								)}
 								<a
 									href={item.url}
 									className={cn(
-										"-ml-px inline-block border-l-2 py-1 pl-3 text-[13px] no-underline transition-colors",
+										"block truncate py-1 font-medium text-[13px] no-underline transition-colors",
+										isSubItem ? "pl-6" : "pl-3",
 										isActive
-											? "border-[#171717] dark:border-white font-medium text-[#171717] dark:text-white"
-											: "border-transparent text-text-sub-600 hover:border-black/30 dark:hover:border-white/30 hover:text-[#171717] dark:hover:text-white",
+											? "text-[#171717] dark:text-white"
+											: "text-text-sub-600 hover:text-[#171717] dark:hover:text-white",
 									)}
 								>
 									{item.title}

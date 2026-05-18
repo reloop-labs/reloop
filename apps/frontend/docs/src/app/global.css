@@ -33,7 +33,15 @@
 	--color-stroke-soft-100: #292929;
 }
 
-/* Base body */
+/* Base body and scrolling */
+html {
+	scroll-behavior: smooth;
+}
+
+#nd-page {
+	scroll-behavior: smooth;
+}
+
 body {
 	@apply bg-bg-white-0 text-[#171717] dark:text-white font-sans antialiased;
 }

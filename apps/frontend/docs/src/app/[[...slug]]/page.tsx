@@ -139,7 +139,7 @@ export default async function Page(props: {
 											<span
 												className={
 													i === breadcrumbs.length - 1
-														? "text-[#171717] dark:text-white font-medium"
+														? "font-medium text-[#171717] dark:text-white"
 														: "text-text-sub-600"
 												}
 											>
@@ -197,7 +197,7 @@ export default async function Page(props: {
 					{/* Right sidebar - Table of Contents (hidden on full-width API pages) */}
 					{!hideToc && (
 						<aside className="hidden xl:block">
-							<div className="sticky top-0 h-[calc(100vh-3rem)] overflow-y-auto pt-8 pr-18">
+							<div className="sticky top-0 h-[calc(100vh-3rem)] overflow-y-auto pt-8 pr-4">
 								<TableOfContents items={page.data.toc as TOCItem[]} />
 							</div>
 						</aside>
