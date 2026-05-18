@@ -9,7 +9,7 @@ export const getDomainNameserversRoute = new Elysia().use(authMiddleware).get(
 	async ({ params: { domain_id }, organizationId }) => {
 		return await getDomainDNSController({
 			domainId: domain_id,
-			organizationId: organizationId,
+			organizationId,
 		});
 	},
 	{

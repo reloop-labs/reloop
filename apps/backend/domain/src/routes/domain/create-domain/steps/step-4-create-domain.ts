@@ -34,7 +34,7 @@ export async function createDomainEntry_step4({
 	await db.insert(schema.domain).values({
 		id: domainId,
 		userId: userId,
-		organizationId: organizationId,
+		organizationId,
 		domain: domain,
 
 		status: "pending",

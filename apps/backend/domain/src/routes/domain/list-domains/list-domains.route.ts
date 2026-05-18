@@ -9,7 +9,7 @@ export const listDomainsRoute = new Elysia().use(authMiddleware).get(
 	async ({ query, organizationId }) => {
 		return await listDomainsController({
 			query,
-			organizationId: organizationId,
+			organizationId,
 		});
 	},
 	{
