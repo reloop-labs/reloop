@@ -50,10 +50,10 @@ export const DNSRecordsSection = ({
 			{/* Enable Sending Group */}
 			<div className="mb-6 border-stroke-soft-100 border-t pt-6 dark:border-stroke-soft-100/10">
 				<div className="flex items-center justify-between">
-					<h3 className="flex items-center gap-2 font-semibold text-base text-text-strong-950">
-						<Icon name="send-1" className="h-4 w-4 text-text-sub-600" />
-						Enable Sending
-					</h3>
+					<div className="flex items-center gap-2 text-base text-text-strong-950">
+						<Icon name="mail-single" className="h-4 w-4 text-text-sub-600" />
+						<h3 className="font-semibold">Enable Sending</h3>
+					</div>
 					<Switch.Root
 						checked={domain?.isSendingEmailEnabled}
 						onCheckedChange={(checked) =>
@@ -102,10 +102,10 @@ export const DNSRecordsSection = ({
 			{receivingRecords.length > 0 && (
 				<div className="mb-6 border-stroke-soft-100 border-t pt-6 dark:border-stroke-soft-100/10">
 					<div className="flex items-center justify-between">
-						<h3 className="flex items-center gap-2 font-semibold text-base text-text-strong-950">
+						<div className="flex items-center gap-2 text-base text-text-strong-950">
 							<Icon name="inbox" className="h-4 w-4 text-text-sub-600" />
-							Enable Receiving
-						</h3>
+							<h3 className="font-semibold">Enable Receiving</h3>
+						</div>
 						<Switch.Root
 							checked={domain?.isReceivingEmailEnabled}
 							onCheckedChange={(checked) =>
@@ -146,10 +146,10 @@ export const DNSRecordsSection = ({
 			{trackingRecords.length > 0 && (
 				<div className="border-stroke-soft-100 border-t pt-6 dark:border-stroke-soft-100/10">
 					<div className="flex items-center justify-between">
-						<h3 className="flex items-center gap-2 font-semibold text-base text-text-strong-950">
+						<div className="flex items-center gap-2 text-base text-text-strong-950">
 							<Icon name="graph-up" className="h-4 w-4 text-text-sub-600" />
-							Tracking
-						</h3>
+							<h3 className="font-semibold">Tracking</h3>
+						</div>
 						<Switch.Root
 							checked={
 								domain?.isClickTrackingEnabled || domain?.isOpenTrackingEnabled
