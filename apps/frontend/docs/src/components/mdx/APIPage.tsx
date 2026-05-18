@@ -102,7 +102,7 @@ export function APIPage(props: APIPageProps) {
 					>
 						{method}
 					</span>
-					<code className="font-mono text-[13px] text-fd-muted-foreground">
+					<code className="font-mono text-[13px] text-text-sub-600">
 						{shortenPath(path)}
 					</code>
 				</div>
@@ -177,11 +177,11 @@ function ParameterRow({ param }: { param: Parameter }) {
 				<span className="font-mono font-semibold text-[14px] text-fd-foreground">
 					{param.name}
 				</span>
-				<span className="font-mono text-[12px] text-fd-muted-foreground/70">
+				<span className="font-mono text-[12px] text-text-sub-600/70">
 					{param.type}
 				</span>
 				{param.defaultValue !== undefined && (
-					<span className="font-mono text-[12px] text-fd-muted-foreground/50">
+					<span className="font-mono text-[12px] text-text-sub-600/50">
 						default: {JSON.stringify(param.defaultValue)}
 					</span>
 				)}
@@ -194,7 +194,7 @@ function ParameterRow({ param }: { param: Parameter }) {
 
 			{/* Description */}
 			{param.description && (
-				<p className="mt-1.5 text-[14px] text-fd-muted-foreground leading-relaxed">
+				<p className="mt-1.5 text-[14px] text-text-sub-600 leading-relaxed">
 					{param.description}
 					{/* Append possible values inline like Resend */}
 					{param.enumValues && param.enumValues.length > 0 && (
@@ -207,7 +207,7 @@ function ParameterRow({ param }: { param: Parameter }) {
 										{v}
 									</code>
 									{i < (param.enumValues?.length ?? 0) - 1 && (
-										<span className="text-fd-muted-foreground/40">{" | "}</span>
+										<span className="text-text-sub-600/40">{" | "}</span>
 									)}
 								</span>
 							))}
@@ -220,7 +220,7 @@ function ParameterRow({ param }: { param: Parameter }) {
 			{!param.description &&
 				param.enumValues &&
 				param.enumValues.length > 0 && (
-					<p className="mt-1.5 text-[14px] text-fd-muted-foreground">
+					<p className="mt-1.5 text-[14px] text-text-sub-600">
 						Possible values:{" "}
 						{param.enumValues.map((v, i) => (
 							<span key={v}>
@@ -228,7 +228,7 @@ function ParameterRow({ param }: { param: Parameter }) {
 									{v}
 								</code>
 								{i < (param.enumValues?.length ?? 0) - 1 && (
-									<span className="text-fd-muted-foreground/40">{" | "}</span>
+									<span className="text-text-sub-600/40">{" | "}</span>
 								)}
 							</span>
 						))}
@@ -240,7 +240,7 @@ function ParameterRow({ param }: { param: Parameter }) {
 				param.maximum !== undefined ||
 				param.minLength !== undefined ||
 				param.maxLength !== undefined) && (
-				<ul className="mt-2 list-inside list-disc space-y-0.5 text-[13px] text-fd-muted-foreground marker:text-fd-muted-foreground/30">
+				<ul className="mt-2 list-inside list-disc space-y-0.5 text-[13px] text-text-sub-600 marker:text-text-sub-600/30">
 					{param.minimum !== undefined && (
 						<li>
 							Minimum value:{" "}
@@ -312,7 +312,7 @@ function ResponseCard({ responses }: { responses: Record<string, any> }) {
 									"rounded-md px-2 py-1 font-mono text-[11px] transition-colors",
 									activeStatus === code
 										? "bg-fd-muted font-semibold text-fd-foreground"
-										: "text-fd-muted-foreground/50 hover:text-fd-muted-foreground",
+										: "text-text-sub-600/50 hover:text-text-sub-600",
 								)}
 							>
 								{code}
@@ -467,7 +467,7 @@ function CopyButton({ content }: { content: string }) {
 		<button
 			type="button"
 			onClick={handleCopy}
-			className="flex h-6 w-6 items-center justify-center rounded text-fd-muted-foreground/50 transition hover:text-fd-foreground"
+			className="flex h-6 w-6 items-center justify-center rounded text-text-sub-600/50 transition hover:text-fd-foreground"
 			aria-label="Copy to clipboard"
 		>
 			{copied ? (

@@ -149,7 +149,7 @@ export default async function Page(props: {
 									))}
 								</div>
 							) : (
-								<div className="mb-3 font-medium text-[12px] text-fd-muted-foreground/60 uppercase tracking-wider">
+								<div className="mb-3 font-medium text-[12px] text-text-sub-600/60 uppercase tracking-wider">
 									Documentation
 								</div>
 							)}
@@ -161,7 +161,7 @@ export default async function Page(props: {
 										{page.data.title}
 									</h1>
 									{page.data.description && (
-										<p className="mt-3.5 text-[16px] text-fd-muted-foreground/90 leading-relaxed tracking-[-0.01em]">
+										<p className="mt-3.5 text-[16px] text-text-sub-600/90 leading-relaxed tracking-[-0.01em]">
 											{page.data.description}
 										</p>
 									)}

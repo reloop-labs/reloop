@@ -57,7 +57,7 @@ export function DocTabs() {
 						href={tab.url}
 						className={cn(
 							"flex items-center gap-2 rounded-md px-2 py-1.5 font-semibold text-sm hover:text-fd-accent-foreground",
-							active ? "text-fd-foreground" : "text-fd-muted-foreground",
+							active ? "text-fd-foreground" : "text-text-sub-600",
 						)}
 					>
 						<Icon name={tab.icon} className="h-4 w-4" />

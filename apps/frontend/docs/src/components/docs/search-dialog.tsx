@@ -125,14 +125,14 @@ export function SearchDialog({ open, onOpenChange, tree }: SearchDialogProps) {
 
 									{/* Search Input Area */}
 									<div className="flex items-center border-fd-border border-b px-4 py-3">
-										<Search className="mr-3 h-5 w-5 text-fd-muted-foreground" />
+										<Search className="mr-3 h-5 w-5 text-text-sub-600" />
 										<input
-											className="flex-1 bg-transparent text-fd-foreground placeholder:text-fd-muted-foreground focus:outline-none sm:text-sm"
+											className="flex-1 bg-transparent text-fd-foreground placeholder:text-text-sub-600 focus:outline-none sm:text-sm"
 											placeholder="Search documentation..."
 											value={query}
 											onChange={(e) => setQuery(e.target.value)}
 										/>
-										<div className="flex items-center gap-1.5 rounded-md border border-fd-border bg-fd-muted px-1.5 py-0.5 font-medium text-[10px] text-fd-muted-foreground">
+										<div className="flex items-center gap-1.5 rounded-md border border-fd-border bg-fd-muted px-1.5 py-0.5 font-medium text-[10px] text-text-sub-600">
 											<kbd>ESC</kbd>
 										</div>
 									</div>
@@ -142,18 +142,18 @@ export function SearchDialog({ open, onOpenChange, tree }: SearchDialogProps) {
 										{query === "" ? (
 											<div className="px-4 py-12 text-center">
 												<div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-fd-muted">
-													<Search className="h-6 w-6 text-fd-muted-foreground" />
+													<Search className="h-6 w-6 text-text-sub-600" />
 												</div>
 												<h3 className="mt-4 font-semibold text-fd-foreground">
 													Search Reloop Docs
 												</h3>
-												<p className="mt-1 text-fd-muted-foreground text-sm">
+												<p className="mt-1 text-text-sub-600 text-sm">
 													Search for guides, API references, and quickstarts.
 												</p>
 											</div>
 										) : results.length === 0 ? (
 											<div className="px-4 py-12 text-center">
-												<p className="text-fd-muted-foreground text-sm">
+												<p className="text-text-sub-600 text-sm">
 													No results found for "
 													<span className="font-medium text-fd-foreground">
 														{query}
@@ -189,7 +189,7 @@ export function SearchDialog({ open, onOpenChange, tree }: SearchDialogProps) {
 																	"h-4 w-4 transition-colors",
 																	index === selectedIndex
 																		? "text-fd-foreground"
-																		: "text-fd-muted-foreground",
+																		: "text-text-sub-600",
 																)}
 															/>
 														</div>
@@ -197,10 +197,10 @@ export function SearchDialog({ open, onOpenChange, tree }: SearchDialogProps) {
 															<div className="flex items-center gap-1.5">
 																{result.path.map((p, i) => (
 																	<React.Fragment key={i}>
-																		<span className="font-medium text-[11px] text-fd-muted-foreground/60 uppercase tracking-wider">
+																		<span className="font-medium text-[11px] text-text-sub-600/60 uppercase tracking-wider">
 																			{p}
 																		</span>
-																		<ChevronRight className="h-3 w-3 text-fd-muted-foreground/30" />
+																		<ChevronRight className="h-3 w-3 text-text-sub-600/30" />
 																	</React.Fragment>
 																))}
 															</div>
@@ -208,7 +208,7 @@ export function SearchDialog({ open, onOpenChange, tree }: SearchDialogProps) {
 																{result.title}
 															</div>
 														</div>
-														<div className="flex h-5 w-5 items-center justify-center rounded border border-fd-border bg-fd-muted font-medium text-[10px] text-fd-muted-foreground opacity-0 transition-opacity group-hover:opacity-100">
+														<div className="flex h-5 w-5 items-center justify-center rounded border border-fd-border bg-fd-muted font-medium text-[10px] text-text-sub-600 opacity-0 transition-opacity group-hover:opacity-100">
 															↵
 														</div>
 													</button>
@@ -218,7 +218,7 @@ export function SearchDialog({ open, onOpenChange, tree }: SearchDialogProps) {
 									</div>
 
 									{/* Footer */}
-									<div className="flex items-center justify-between border-fd-border border-t bg-fd-muted/30 px-4 py-2 font-semibold text-[10px] text-fd-muted-foreground uppercase tracking-wider">
+									<div className="flex items-center justify-between border-fd-border border-t bg-fd-muted/30 px-4 py-2 font-semibold text-[10px] text-text-sub-600 uppercase tracking-wider">
 										<div className="flex gap-4">
 											<span className="flex items-center gap-1">
 												<kbd className="font-sans">↑↓</kbd> Navigate

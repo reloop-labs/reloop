@@ -9,7 +9,7 @@ export function Footer() {
 						href="https://reloop.sh"
 						target="_blank"
 						rel="noreferrer noopener"
-						className="flex items-center gap-2 text-fd-muted-foreground text-sm transition-colors hover:text-fd-foreground"
+						className="flex items-center gap-2 text-text-sub-600 text-sm transition-colors hover:text-fd-foreground"
 					>
 						<Icon name="globe" className="h-4 w-4" />
 						reloop.sh
@@ -18,7 +18,7 @@ export function Footer() {
 						href="https://x.com/reloophq"
 						target="_blank"
 						rel="noreferrer noopener"
-						className="flex items-center gap-2 text-fd-muted-foreground text-sm transition-colors hover:text-fd-foreground"
+						className="flex items-center gap-2 text-text-sub-600 text-sm transition-colors hover:text-fd-foreground"
 					>
 						<Icon name="twitter" className="h-4 w-4" />
 						@reloophq
