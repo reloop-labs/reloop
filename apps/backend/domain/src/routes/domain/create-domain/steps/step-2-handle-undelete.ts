@@ -1,7 +1,7 @@
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { DomainErrors } from "@reloop/domain/lib/errors";
+import { DomainErrors } from "@reloop/domain/error/domain.error-response";
 import type { DomainTypes } from "@reloop/domain/types/domain.type";
 import { DOMAIN_UNDELETE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";

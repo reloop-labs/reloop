@@ -1,15 +1,6 @@
+import { errorCodes } from "@reloop/domain/error/domain.error-code";
+import { status } from "elysia";
 import { createError } from "evlog";
-
-export class DomainServiceError extends Error {
-	constructor(
-		public status: number,
-		public message: string,
-		public code?: string,
-	) {
-		super(message);
-		this.name = "DomainServiceError";
-	}
-}
 
 export const AuthErrors = {
 	unauthorized: (why: string, fix?: string) =>
@@ -71,4 +62,47 @@ export const DomainErrors = {
 			why: message,
 			fix: "Please try again later or contact support.",
 		}),
+};
+
+export const domainErrorResponse = (errorMessage: string) => {
+	if (errorMessage.includes("Domain already exists")) {
+		return status(409, {
+			message: "Domain already exists",
+			errorCode: errorCodes.DOMAIN_ALREADY_EXISTS,
+		});
+	}
+	if (errorMessage.includes("Domain not found")) {
+		return status(404, {
+			message: "Domain not found",
+			errorCode: errorCodes.DOMAIN_NOT_FOUND,
+		});
+	}
+	if (errorMessage.includes("Invalid domain")) {
+		return status(400, {
+			message: "Invalid domain",
+			errorCode: errorCodes.DOMAIN_INVALID,
+		});
+	}
+	if (errorMessage.includes("Failed to undelete domain")) {
+		return status(500, {
+			message: "Failed to undelete domain",
+			errorCode: errorCodes.DOMAIN_FAILED_TO_UNDELETE,
+		});
+	}
+	if (errorMessage.includes("Verification process failed")) {
+		return status(500, {
+			message: "Verification process failed",
+			errorCode: errorCodes.DOMAIN_VERIFICATION_FAILED,
+		});
+	}
+	if (errorMessage.includes("Database operation failed")) {
+		return status(500, {
+			message: "Database operation failed",
+			errorCode: errorCodes.DATABASE_ERROR,
+		});
+	}
+	return status(500, {
+		message: "Internal server error",
+		errorCode: errorCodes.INTERNAL_SERVER_ERROR,
+	});
 };

@@ -9,11 +9,11 @@ export const redis = new RedisCache("domain", 86400, domainConfig.REDIS_URL);
 export const loader = async () => {
 	try {
 		await redis.healthCheck();
-		log.info("redis", "Redis connected");
+		log.info("Redis", "Connected");
 		await db.execute("SELECT 1 as test");
-		log.info("postgres", "Postgres connected");
+		log.info("Postgres", "Connected");
 		await bus.connect(domainConfig.NATS_URL);
-		log.info("nats", "NATS connected");
+		log.info("NATS", "Connected");
 	} catch (e) {
 		log.error({
 			message: "Error during service initialization",

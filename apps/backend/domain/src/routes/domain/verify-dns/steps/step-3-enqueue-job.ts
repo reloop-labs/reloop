@@ -1,7 +1,7 @@
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { DomainErrors } from "@reloop/domain/lib/errors";
+import { DomainErrors } from "@reloop/domain/error/domain.error-response";
 import type { DomainStatus } from "@reloop/domain/types/domain.type";
 import { eq } from "drizzle-orm";
 
@@ -31,7 +31,6 @@ export async function enqueueVerificationJob_step3({
 		log.info("Published domain verification request via NATS");
 	} catch (error) {
 		log.error("Failed to publish domain verification request");
-		// Revert status if publish fails
 		await db
 			.update(schema.domain)
 			.set({ status: previousStatus })
