@@ -114,11 +114,11 @@ export namespace DomainModel {
 			verificationError: t.Union([t.String(), t.Null()], {
 				description: "Verification error message",
 			}),
-			purpose: t.Optional(t.Union([
+			purpose: t.Union([
 				t.Literal("sending"),
 				t.Literal("receiving"),
 				t.Literal("tracking"),
-			], { description: "Purpose of the record" })),
+			], { default: "sending", description: "Purpose of the record" }),
 			createdAt: t.Date(),
 			status: t.Union(
 				[

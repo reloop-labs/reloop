@@ -34,11 +34,15 @@ export interface DNSRecordData {
 export function getRecordTypeName(
 	recordType: string,
 	value: string,
-): "MX" | "SPF" | "DKIM" | "DMARC" {
+): "MX" | "SPF" | "DKIM" | "DMARC" | "CNAME" {
 	const upperRecordType = recordType.toUpperCase();
 
 	if (upperRecordType === "MX") {
 		return "MX";
+	}
+
+	if (upperRecordType === "CNAME") {
+		return "CNAME";
 	}
 
 	if (upperRecordType === "TXT") {
@@ -61,11 +65,26 @@ export function getRecordTypeName(
 	) {
 		return upperRecordType as "SPF" | "DKIM" | "DMARC";
 	}
-
-	// Default to SPF if we can't determine (shouldn't happen in practice)
 	throw new Error(
 		`Unable to determine recordTypeName for recordType: ${recordType}, value: ${value}`,
 	);
+}
+
+export function getRecordPurpose(
+	recordTypeName: "MX" | "SPF" | "DKIM" | "DMARC" | "CNAME"
+): "sending" | "receiving" | "tracking" {
+	switch (recordTypeName) {
+		case "MX":
+			return "receiving";
+		case "SPF":
+		case "DKIM":
+		case "DMARC":
+			return "sending";
+		case "CNAME":
+			return "tracking";
+		default:
+			return "sending";
+	}
 }
 
 export async function insertDNSRecords(
@@ -76,6 +95,7 @@ export async function insertDNSRecords(
 	domainId: string,
 ): Promise<void> {
 	for (const record of dnsRecordData) {
+		const recordTypeName = getRecordTypeName(record.recordType, record.value);
 		await db.insert(schema.domainDnsRecord).values({
 			domainId,
 			organizationId,
@@ -87,7 +107,8 @@ export async function insertDNSRecords(
 			ttl: record.ttl,
 			priority: record.priority,
 			status: record.status,
-			recordTypeName: getRecordTypeName(record.recordType, record.value),
+			recordTypeName,
+			purpose: getRecordPurpose(recordTypeName),
 			domain,
 		});
 	}
