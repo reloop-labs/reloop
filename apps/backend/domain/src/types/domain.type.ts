@@ -1,7 +1,7 @@
 import type { DomainModel } from "@reloop/domain/model/domain.model";
 
 export type DomainStatus =
-	| "start-verify"
+	| "pending"
 	| "verifying"
 	| "active"
 	| "suspended"

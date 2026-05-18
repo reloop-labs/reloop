@@ -21,7 +21,7 @@ export const DomainEvents = ({
 				return "You're all set! Your domain is ready to send emails.";
 			case "failed":
 				return "We couldn't verify your domain. Double-check your DNS records and try again.";
-			case "start-verify":
+			case "pending":
 				return "Almost there! Add the DNS records shown below, then click Verify — and you'll be ready to send.";
 			default:
 				return "Checking your domain authentication — this will just take a moment…";

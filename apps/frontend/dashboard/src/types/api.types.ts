@@ -1,6 +1,6 @@
 // Domain types
 export type DomainStatus =
-	| "start-verify"
+	| "pending"
 	| "verifying"
 	| "active"
 	| "suspended"

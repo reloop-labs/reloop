@@ -84,7 +84,24 @@ export async function updateDomainController({
 
 		const finalDomain = {
 			object: "domain" as const,
-			...updatedDomain,
+			id: updatedDomain.id,
+			domain: updatedDomain.domain,
+			status: updatedDomain.status,
+			userVerifiedDomain: updatedDomain.userVerifiedDomain,
+			systemVerified: updatedDomain.systemVerified,
+			customReturnPath: updatedDomain.customReturnPath,
+			trackingSubdomain: updatedDomain.trackingSubdomain,
+			isClickTrackingEnabled: updatedDomain.isClickTrackingEnabled,
+			isOpenTrackingEnabled: updatedDomain.isOpenTrackingEnabled,
+			tls: updatedDomain.tls,
+			isTrackingDomain: updatedDomain.isTrackingDomain,
+			isSendingEmailEnabled: updatedDomain.isSendingEmailEnabled,
+			isReceivingEmailEnabled: updatedDomain.isReceivingEmailEnabled,
+			verificationFailedReason: updatedDomain.verificationFailedReason,
+			lastVerifiedAt: updatedDomain.lastVerifiedAt,
+			createdAt: updatedDomain.createdAt,
+			updatedAt: updatedDomain.updatedAt,
+			dnsRecords: updatedDomain.dnsRecords,
 			event: DOMAIN_UPDATE_WEBHOOK_EVENT.id,
 		};
 

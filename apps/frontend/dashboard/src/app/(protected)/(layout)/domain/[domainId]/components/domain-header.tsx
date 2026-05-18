@@ -24,7 +24,7 @@ export const DomainHeader = ({ domain, isLoading }: DomainHeaderProps) => {
 	const { domainId: _domainId } = useParams();
 	const domainName = domain?.domain || (_domainId as string);
 	const domainRecordId = domain?.id || (_domainId as string);
-	const status = domain?.status || "start-verify";
+	const status = domain?.status || "pending";
 	const lastUpdated = domain?.createdAt;
 
 	const { handleVerifyDNS, isVerifying } = useDomainActions(
@@ -38,7 +38,7 @@ export const DomainHeader = ({ domain, isLoading }: DomainHeaderProps) => {
 		"mod+v",
 		(e) => {
 			e.preventDefault();
-			if (status === "start-verify" || status === "failed") {
+			if (status === "pending" || status === "failed") {
 				handleVerifyDNS();
 			}
 		},
@@ -107,7 +107,7 @@ export const DomainHeader = ({ domain, isLoading }: DomainHeaderProps) => {
 						<Skeleton className="h-9 w-32 rounded-lg" />
 					) : (
 						<>
-							{(status === "start-verify" || status === "failed") && (
+							{(status === "pending" || status === "failed") && (
 								<Button.Root
 									variant="neutral"
 									size="xsmall"

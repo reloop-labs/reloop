@@ -19,7 +19,7 @@ const createDnsRecordId = () => `dns_${createId()}`;
 
 
 export const domainStatusEnum = pgEnum("domain_status", [
-	"start-verify",
+	"pending",
 	"verifying",
 	"active",
 	"suspended",
@@ -30,7 +30,7 @@ export const dnsRecordTypeEnum = pgEnum("dns_record_type", [
 	"AAAA",
 	"CNAME",
 	"MX",
-	"TXT",
+	"TXT"
 ]);
 
 export const dnsRecordTypeNameEnum = pgEnum("dns_record_type_name", [
@@ -38,6 +38,7 @@ export const dnsRecordTypeNameEnum = pgEnum("dns_record_type_name", [
 	"SPF",
 	"DKIM",
 	"DMARC",
+	"CNAME"
 ]);
 export const tlsModeEnum = pgEnum("tls_mode", ["opportunistic", "enforced"]);
 
@@ -55,7 +56,7 @@ export const domain = pgTable(
 			.notNull()
 			.references(() => user.id, { onDelete: "cascade" }),
 
-		status: domainStatusEnum("status").notNull().default("start-verify"),
+		status: domainStatusEnum("status").notNull().default("pending"),
 		userVerifiedDomain: boolean("user_verified_domain").notNull().default(false),
 		systemVerified: boolean("system_verified").notNull().default(false),
 		customReturnPath: varchar("custom_return_path", { length: 255 })
@@ -114,7 +115,7 @@ export const domainDnsRecord = pgTable(
 			.references(() => user.id, { onDelete: "cascade" }),
 		recordType: dnsRecordTypeEnum("record_type").notNull(),
 		name: text("name").notNull(),
-		status: domainStatusEnum("status").notNull().default("start-verify"),
+		status: domainStatusEnum("status").notNull().default("pending"),
 		value: text("value").notNull(),
 		ttl: text("ttl").notNull().default("Auto"),
 		priority: integer("priority"),

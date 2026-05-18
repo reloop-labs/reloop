@@ -19,7 +19,7 @@ interface DomainFilterDropdownProps {
 
 const filterOptions: { id: DomainStatusFilterOption; label: string }[] = [
 	{ id: null, label: "All Status" },
-	{ id: "start-verify", label: "Not Started" },
+	{ id: "pending", label: "Not Started" },
 	{ id: "verifying", label: "Verifying" },
 	{ id: "active", label: "Active" },
 	{ id: "suspended", label: "Suspended" },

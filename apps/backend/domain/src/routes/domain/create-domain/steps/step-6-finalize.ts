@@ -46,7 +46,24 @@ export async function finalizeDomainCreation_step6({
 	});
 
 	return {
-		...domainWithDnsRecords,
+		id: domainWithDnsRecords.id,
+		domain: domainWithDnsRecords.domain,
+		status: domainWithDnsRecords.status,
+		userVerifiedDomain: domainWithDnsRecords.userVerifiedDomain,
+		systemVerified: domainWithDnsRecords.systemVerified,
+		customReturnPath: domainWithDnsRecords.customReturnPath,
+		trackingSubdomain: domainWithDnsRecords.trackingSubdomain,
+		isClickTrackingEnabled: domainWithDnsRecords.isClickTrackingEnabled,
+		isOpenTrackingEnabled: domainWithDnsRecords.isOpenTrackingEnabled,
+		tls: domainWithDnsRecords.tls,
+		isTrackingDomain: domainWithDnsRecords.isTrackingDomain,
+		isSendingEmailEnabled: domainWithDnsRecords.isSendingEmailEnabled,
+		isReceivingEmailEnabled: domainWithDnsRecords.isReceivingEmailEnabled,
+		verificationFailedReason: domainWithDnsRecords.verificationFailedReason,
+		lastVerifiedAt: domainWithDnsRecords.lastVerifiedAt,
+		createdAt: domainWithDnsRecords.createdAt,
+		updatedAt: domainWithDnsRecords.updatedAt,
+		dnsRecords: domainWithDnsRecords.dnsRecords,
 		object: "domain" as const,
 		event: DOMAIN_CREATE_WEBHOOK_EVENT.id,
 	};

@@ -49,10 +49,10 @@ export const DomainStats: React.FC<DomainStatsProps> = ({
 					<span
 						className={cn(
 							"inline-flex w-fit rounded-md border-[1px] px-[6px] py-0.5 font-medium text-[10px]",
-							getStatusBadgeStyles(domain?.status || "start-verify"),
+							getStatusBadgeStyles(domain?.status || "pending"),
 						)}
 					>
-						{domain?.status || "start-verify"}
+						{domain?.status || "pending"}
 					</span>
 				)}
 			</div>

@@ -12,7 +12,7 @@ interface StatusBannerProps {
 export const StatusBanner = ({ status, isLoading }: StatusBannerProps) => {
 	const getStatusVariant = () => {
 		switch (status) {
-			case "start-verify":
+			case "pending":
 				return "feature";
 			case "verifying":
 				return "warning";
@@ -27,7 +27,7 @@ export const StatusBanner = ({ status, isLoading }: StatusBannerProps) => {
 
 	const getStatusContent = () => {
 		switch (status) {
-			case "start-verify":
+			case "pending":
 				return {
 					title: "Start verifying your domain DNS records",
 					description:
@@ -67,7 +67,7 @@ export const StatusBanner = ({ status, isLoading }: StatusBannerProps) => {
 
 	const getBorderClass = () => {
 		switch (status) {
-			case "start-verify":
+			case "pending":
 				return "";
 			case "verifying":
 				return "border-warning-base";

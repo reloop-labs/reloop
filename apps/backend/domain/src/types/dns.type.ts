@@ -37,7 +37,7 @@ export namespace DNSTypes {
 	}
 
 	export type DNSRecordStatus =
-		| "start-verify"
+		| "pending"
 		| "verifying"
 		| "active"
 		| "suspended"

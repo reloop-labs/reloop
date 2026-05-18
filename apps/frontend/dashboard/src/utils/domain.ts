@@ -12,7 +12,7 @@ export const getStatusLabel = (status: DomainStatus): string => {
 			return "Active";
 		case "verifying":
 			return "Verifying";
-		case "start-verify":
+		case "pending":
 			return "Not Started";
 		case "suspended":
 			return "Suspended";
@@ -28,7 +28,7 @@ export const getStatusLabel = (status: DomainStatus): string => {
  */
 export const getStatusColorClass = (status: DomainStatus): string => {
 	switch (status) {
-		case "start-verify":
+		case "pending":
 			return "text-text-sub-600";
 		case "verifying":
 			return "text-warning-base";
@@ -47,7 +47,7 @@ export const getStatusColorClass = (status: DomainStatus): string => {
  */
 export const getStatusIcon = (status: DomainStatus): string => {
 	switch (status) {
-		case "start-verify":
+		case "pending":
 			return "minus-circle";
 		case "verifying":
 			return "time";

@@ -37,7 +37,7 @@ export async function createDomainEntry_step4({
 		organizationId: organizationId,
 		domain: domain,
 
-		status: "start-verify",
+		status: "pending",
 		userVerifiedDomain: false,
 		systemVerified: false,
 		customReturnPath,

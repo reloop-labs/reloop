@@ -12,7 +12,7 @@ export interface GeneratedDNSData {
 }
 
 export type DNSRecordStatus =
-	| "start-verify"
+	| "pending"
 	| "verifying"
 	| "active"
 	| "suspended"

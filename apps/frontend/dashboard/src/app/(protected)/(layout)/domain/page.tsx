@@ -24,7 +24,7 @@ const DomainPage = () => {
 	const [statusFilters] = useQueryState(
 		"status",
 		parseAsStringLiteral([
-			"start-verify",
+			"pending",
 			"verifying",
 			"active",
 			"suspended",

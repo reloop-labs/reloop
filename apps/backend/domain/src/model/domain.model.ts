@@ -88,6 +88,9 @@ export namespace DomainModel {
 					t.Literal("CNAME"),
 					t.Literal("MX"),
 					t.Literal("TXT"),
+					t.Literal("SPF"),
+					t.Literal("DKIM"),
+					t.Literal("DMARC"),
 				],
 				{ description: "DNS record type" },
 			),
@@ -97,6 +100,7 @@ export namespace DomainModel {
 					t.Literal("SPF"),
 					t.Literal("DKIM"),
 					t.Literal("DMARC"),
+					t.Literal("CNAME"),
 				],
 				{ description: "DNS record type name" },
 			),
@@ -113,7 +117,7 @@ export namespace DomainModel {
 			createdAt: t.Date(),
 			status: t.Union(
 				[
-					t.Literal("start-verify"),
+					t.Literal("pending"),
 					t.Literal("verifying"),
 					t.Literal("active"),
 					t.Literal("suspended"),
@@ -150,7 +154,7 @@ export namespace DomainModel {
 
 			status: t.Union(
 				[
-					t.Literal("start-verify"),
+					t.Literal("pending"),
 					t.Literal("verifying"),
 					t.Literal("active"),
 					t.Literal("suspended"),
@@ -256,7 +260,7 @@ export namespace DomainModel {
 			id: t.String({ description: "Unique domain identifier" }),
 			status: t.Union(
 				[
-					t.Literal("start-verify"),
+					t.Literal("pending"),
 					t.Literal("verifying"),
 					t.Literal("active"),
 					t.Literal("suspended"),
@@ -326,7 +330,7 @@ export namespace DomainModel {
 		q: t.Optional(t.String({ description: "Search query for domain name" })),
 		status: t.Optional(
 			t.Union([
-				t.Literal("start-verify"),
+				t.Literal("pending"),
 				t.Literal("verifying"),
 				t.Literal("active"),
 				t.Literal("suspended"),

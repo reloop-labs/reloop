@@ -14,7 +14,7 @@ export const DomainListToolbar = () => {
 	const [statusFilters, setStatusFilters] = useQueryState(
 		"status",
 		parseAsStringLiteral([
-			"start-verify",
+			"pending",
 			"verifying",
 			"active",
 			"suspended",
