@@ -10,8 +10,8 @@ export async function listSubscriptionsController({
 	organizationId: string;
 	query: { channelId: string; limit?: number; page?: number };
 }) {
-	const logger = useLogger();
-	logger?.info("Listing subscriptions", { ...query });
+	const log = useLogger();
+	log.info("Listing subscriptions", { ...query });
 	try {
 		const page = query.page || 1;
 		const limit = Math.min(query.limit || 100, 100);
@@ -36,7 +36,7 @@ export async function listSubscriptionsController({
 			offset,
 		});
 
-		logger?.info("Subscriptions listed successfully", { total, page, limit });
+		log.info("Subscriptions listed successfully", { total, page, limit });
 
 		return {
 			object: "subscription" as const,
@@ -46,7 +46,7 @@ export async function listSubscriptionsController({
 			limit,
 		};
 	} catch (error) {
-		logger?.error("Error listing subscriptions", {
+		log.error("Error listing subscriptions", {
 			query,
 			error: error instanceof Error ? error.message : String(error),
 		});

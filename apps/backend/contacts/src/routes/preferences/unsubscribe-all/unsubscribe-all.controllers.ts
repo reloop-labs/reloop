@@ -1,18 +1,18 @@
+import { AuthErrors } from "@be/contacts/error/contacts.error-response";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { and, eq, isNull } from "drizzle-orm";
-import { status } from "elysia";
 import { log } from "evlog";
 import { useLogger } from "evlog/elysia";
 import { verifyToken } from "../token.utils";
 
 export async function unsubscribeAllController({ token }: { token: string }) {
-	const logger = useLogger();
-	log.info("server", "Processing unsubscribe all request");
+	const log = useLogger();
+	log.info("Processing unsubscribe all request");
 
 	const payload = await verifyToken(token);
 	if (!payload) {
-		throw status(401, { message: "Invalid or expired preferences token" });
+		throw AuthErrors.unauthorized("Invalid or expired preferences token");
 	}
 
 	const { contactId, organizationId } = payload;
@@ -40,7 +40,7 @@ export async function unsubscribeAllController({ token }: { token: string }) {
 			);
 	}
 
-	logger?.info("Unsubscribed from all channels", {
+	log.info("Unsubscribed from all channels", {
 		contactId,
 		updatedCount: enrollments.length,
 	});

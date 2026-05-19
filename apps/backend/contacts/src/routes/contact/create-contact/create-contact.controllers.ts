@@ -1,10 +1,10 @@
 import { upsertContactProperties } from "@be/contacts/routes/contact/utils/upsert-contact-properties";
 import type { ContactTypes } from "@be/contacts/types/contact.type";
+import { ContactErrors } from "@be/contacts/error/contacts.error-response";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { CONTACT_CREATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
-import { status } from "elysia";
 import { useLogger } from "evlog/elysia";
 import { getExistingContact } from "./get-existing-contact";
 
@@ -22,7 +22,7 @@ export async function createContactController({
 	organizationId: string;
 	userId: string;
 } & ContactTypes.CreateContactRequest): Promise<ContactTypes.ContactResponse> {
-	const logger = useLogger();
+	const log = useLogger();
 	try {
 		return await db.transaction(async (tx) => {
 			const existingContact = await getExistingContact({
@@ -31,11 +31,11 @@ export async function createContactController({
 				db: tx,
 			});
 			if (existingContact) {
-				logger?.warn("Contact already exists in this organization", { email });
-				throw status(409, { message: "Contact already exists" });
+				log.warn("Contact already exists in this organization", { email });
+				throw ContactErrors.contactAlreadyExists(email);
 			}
 
-			logger?.warn("Contact not found, creating new contact", { email });
+			log.warn("Contact not found, creating new contact", { email });
 			const [newContact] = await tx
 				.insert(schema.contact)
 				.values({
@@ -51,10 +51,10 @@ export async function createContactController({
 				.returning();
 
 			if (!newContact) {
-				logger?.error("Failed to create contact - no data returned", { email });
-				throw status(500, { message: "Failed to create contact" });
+				log.error("Failed to create contact - no data returned", { email });
+				throw ContactErrors.createFailed();
 			}
-			logger?.info("Contact added", {
+			log.info("Contact added", {
 				...newContact,
 				status: undefined,
 				currentStatus: newContact.status,
@@ -69,7 +69,7 @@ export async function createContactController({
 				});
 			}
 			if (groupIds && groupIds.length > 0) {
-				logger?.info("Adding contact to groups", {
+				log.info("Adding contact to groups", {
 					contactId: newContact.id,
 					groupIds: groupIds,
 				});
@@ -83,7 +83,7 @@ export async function createContactController({
 				);
 			}
 			if (channels && channels.length > 0) {
-				logger?.info("Enrolling contact in channels", {
+				log.info("Enrolling contact in channels", {
 					contactId: newContact.id,
 					channelCount: channels.length,
 				});
@@ -98,7 +98,7 @@ export async function createContactController({
 					})),
 				);
 			}
-			logger?.info("Contact created successfully", {
+			log.info("Contact created successfully", {
 				email: email,
 				id: newContact.id,
 			});
@@ -153,7 +153,7 @@ export async function createContactController({
 			return result;
 		});
 	} catch (error) {
-		logger?.error("Debug creating contact", {
+		log.error("Debug creating contact", {
 			email: email,
 			error: error instanceof Error ? error.message : String(error),
 		});

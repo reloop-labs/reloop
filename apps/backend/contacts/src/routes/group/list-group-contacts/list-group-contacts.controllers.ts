@@ -1,5 +1,6 @@
 import type { ContactModel } from "@be/contacts/model/contact.model";
 import type { GroupModel } from "@be/contacts/model/group.model";
+import { GroupErrors, ContactErrors } from "@be/contacts/error/contacts.error-response";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { GROUP_LIST_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -22,12 +23,12 @@ export const listGroupContactsController = async ({
 	| GroupModel.GroupNotFound
 	| GroupModel.Unauthorized
 > => {
-	const logger = useLogger();
+	const log = useLogger();
 	const page = query.page || 1;
 	const limit = Math.min(query.limit || 100, 100);
 	const offset = (page - 1) * limit;
 
-	logger?.info("Listing group contacts", { group_id, page, limit });
+	log.info("Listing group contacts", { group_id, page, limit });
 
 	try {
 		const memberWhere = and(
@@ -52,8 +53,8 @@ export const listGroupContactsController = async ({
 		]);
 
 		if (!group) {
-			logger?.warn("Group not found", { group_id });
-			return { message: "Group not found" };
+			log.warn("Group not found", { group_id });
+			throw GroupErrors.notFound(group_id);
 		}
 
 		const total = Number(countResult[0]?.count ?? 0);
@@ -99,7 +100,7 @@ export const listGroupContactsController = async ({
 				};
 			});
 
-		logger?.info("Group contacts listed", {
+		log.info("Group contacts listed", {
 			group_id,
 			total,
 			page,
@@ -122,10 +123,13 @@ export const listGroupContactsController = async ({
 			event: GROUP_LIST_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
-		logger?.error("Error listing group contacts", {
+		log.error("Error listing group contacts", {
 			group_id,
 			error: error instanceof Error ? error.message : String(error),
 		});
-		throw error;
+		if (error && typeof error === "object" && "status" in error) {
+			throw error;
+		}
+		throw ContactErrors.databaseError(error instanceof Error ? error.message : String(error));
 	}
 };

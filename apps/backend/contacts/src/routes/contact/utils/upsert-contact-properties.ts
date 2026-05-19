@@ -1,4 +1,5 @@
 import { type DatabaseInstance, db as defaultDb } from "@reloop/db/client";
+import { PropertyErrors } from "@be/contacts/error/contacts.error-response";
 import * as schema from "@reloop/db/schema";
 import { and, eq, inArray, isNull } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
@@ -16,21 +17,22 @@ export async function upsertContactProperties({
 	properties: Record<string, string | number>;
 	db?: DatabaseInstance;
 }): Promise<void> {
-	const logger = useLogger();
+	const log = useLogger();
 	const propertyNames = Object.keys(properties);
 
 	// Validate property names
 	const propertyNameRegex = /^[a-z0-9_]+$/;
 	for (const name of propertyNames) {
 		if (!propertyNameRegex.test(name)) {
-			logger?.warn("Invalid property name", { name });
-			throw new Error(
+			log.warn("Invalid property name", { name });
+			throw PropertyErrors.invalidName(
+				name,
 				`Invalid property name: '${name}'. Property names must be lowercase and contain only alphanumeric characters and underscores.`,
 			);
 		}
 	}
 
-	logger?.info("Upserting properties for contact (replacement mode)", {
+	log.info("Upserting properties for contact (replacement mode)", {
 		contactId,
 		organizationId,
 		propertyCount: propertyNames.length,
@@ -62,7 +64,7 @@ export async function upsertContactProperties({
 		);
 
 		if (propertiesToDelete.length > 0) {
-			logger?.info("Soft-deleting properties not in request", {
+			log.info("Soft-deleting properties not in request", {
 				count: propertiesToDelete.length,
 			});
 			await db
@@ -109,7 +111,7 @@ export async function upsertContactProperties({
 			const incomingType = typeof value === "number" ? "number" : "string";
 
 			if (!info) {
-				logger?.info("Creating new property definition", {
+				log.info("Creating new property definition", {
 					name,
 					incomingType,
 				});
@@ -137,14 +139,12 @@ export async function upsertContactProperties({
 			if (info) {
 				// Validate type compatibility
 				if (incomingType !== info.type) {
-					logger?.warn("Property type mismatch", {
+					log.warn("Property type mismatch", {
 						name,
 						expected: info.type,
 						received: incomingType,
 					});
-					throw new Error(
-						`Property '${name}' expected type '${info.type}' but received '${incomingType}'`,
-					);
+					throw PropertyErrors.typeMismatch(name, info.type, incomingType);
 				}
 
 				const pid = info.id;
@@ -160,7 +160,7 @@ export async function upsertContactProperties({
 				});
 
 				if (existingValue) {
-					logger?.info("Updating existing property value", { name, id: pid });
+					log.info("Updating existing property value", { name, id: pid });
 					await db
 						.update(schema.contactPropertyValue)
 						.set({
@@ -170,7 +170,7 @@ export async function upsertContactProperties({
 						})
 						.where(eq(schema.contactPropertyValue.id, existingValue.id));
 				} else {
-					logger?.info("Inserting new property value", { name, id: pid });
+					log.info("Inserting new property value", { name, id: pid });
 					await db.insert(schema.contactPropertyValue).values({
 						contactId,
 						propertyId: pid,
@@ -184,7 +184,7 @@ export async function upsertContactProperties({
 			}
 		}
 	} catch (error) {
-		logger?.error("Error upserting contact properties", {
+		log.error("Error upserting contact properties", {
 			contactId,
 			error: error instanceof Error ? error.message : String(error),
 		});

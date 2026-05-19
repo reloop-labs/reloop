@@ -1,9 +1,9 @@
 import type { ContactModel } from "@be/contacts/model/contact.model";
+import { ContactErrors, ChannelErrors, SubscriptionErrors } from "@be/contacts/error/contacts.error-response";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { CONTACT_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
-import { status } from "elysia";
 import { log } from "evlog";
 import { useLogger } from "evlog/elysia";
 
@@ -31,12 +31,10 @@ export async function addContactToChannelController({
 	organizationId: string;
 	channelId: string;
 } & ContactModel.AddContactToChannelBody): Promise<AddContactToChannelResult> {
-	const logger = useLogger();
+	const log = useLogger();
 
 	if (!contact_id && !email) {
-		throw status(400, {
-			message: "Either 'contact_id' or 'email' must be provided",
-		});
+		throw ContactErrors.invalidEmail("", "Either 'contact_id' or 'email' must be provided");
 	}
 
 	try {
@@ -50,7 +48,7 @@ export async function addContactToChannelController({
 		});
 
 		if (!channel) {
-			throw status(404, { message: "Channel not found" });
+			throw ChannelErrors.notFound(channelId);
 		}
 
 		// Identify contact
@@ -76,11 +74,11 @@ export async function addContactToChannelController({
 		}
 
 		if (!contact) {
-			logger?.info("Contact not found", { contact_id, email });
-			throw status(404, { message: "Contact not found" });
+			log.info("Contact not found", { contact_id, email });
+			throw ContactErrors.contactNotFound(contact_id || email || "");
 		}
 
-		logger?.info("Checking if contact is already subscribed to channel", {
+		log.info("Checking if contact is already subscribed to channel", {
 			contactId: contact.id,
 			channelId,
 		});
@@ -104,7 +102,7 @@ export async function addContactToChannelController({
 					.set({ status: targetStatus, updatedAt: new Date() })
 					.where(eq(schema.channelSubscription.id, existingSubscription.id));
 
-				logger?.info("Updated contact subscription status", {
+				log.info("Updated contact subscription status", {
 					subscriptionId: existingSubscription.id,
 					currentStatus: targetStatus,
 				});
@@ -118,9 +116,7 @@ export async function addContactToChannelController({
 				return result;
 			}
 
-			throw status(409, {
-				message: `Contact is already ${existingSubscription.status} in this channel`,
-			});
+			throw SubscriptionErrors.alreadyExists();
 		}
 		// Create subscription
 		const [newSubscription] = await db
@@ -134,10 +130,10 @@ export async function addContactToChannelController({
 			.returning();
 
 		if (!newSubscription) {
-			throw new Error("Failed to create subscription");
+			throw ContactErrors.createFailed("Failed to create subscription");
 		}
 
-		logger?.info("Contact added to channel successfully", {
+		log.info("Contact added to channel successfully", {
 			contactId: contact.id,
 			subscriptionId: newSubscription.id,
 			currentStatus: targetStatus,
@@ -151,8 +147,7 @@ export async function addContactToChannelController({
 
 		return result;
 	} catch (error) {
-		log.error({
-			message: "Error adding contact to channel",
+		log.error("Error adding contact to channel", {
 			contactId: contact_id,
 			email: email?.toLowerCase(),
 			channelId,

@@ -1,9 +1,9 @@
 import type { ChannelTypes } from "@be/contacts/types/channel.type";
+import { ChannelErrors, ContactErrors } from "@be/contacts/error/contacts.error-response";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { CHANNEL_CREATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
-import { status } from "elysia";
 import { useLogger } from "evlog/elysia";
 
 export const createChannelController = async ({
@@ -21,8 +21,8 @@ export const createChannelController = async ({
 	defaultSubscription?: "opt_in" | "opt_out";
 	visibility?: "private" | "public";
 }): Promise<ChannelTypes.ChannelResponse> => {
-	const logger = useLogger();
-	logger?.info("Creating channel", { name });
+	const log = useLogger();
+	log.info("Creating channel", { name });
 	try {
 		const existingChannel = await db.query.channel.findFirst({
 			where: and(
@@ -33,8 +33,8 @@ export const createChannelController = async ({
 		});
 
 		if (existingChannel) {
-			logger?.warn("Channel already exists", { name });
-			throw status(409, { message: "Channel already exists" });
+			log.warn("Channel already exists", { name });
+			throw ChannelErrors.alreadyExists(name);
 		}
 
 		const [newChannel] = await db
@@ -50,11 +50,11 @@ export const createChannelController = async ({
 			.returning();
 
 		if (!newChannel) {
-			logger?.error("Failed to create channel - no data returned", { name });
-			throw new Error("Failed to create channel");
+			log.error("Failed to create channel - no data returned", { name });
+			throw ContactErrors.createFailed("Failed to create channel");
 		}
 
-		logger?.info("Channel created successfully", { name, id: newChannel.id });
+		log.info("Channel created successfully", { name, id: newChannel.id });
 
 		const result = {
 			id: newChannel.id,
@@ -70,7 +70,7 @@ export const createChannelController = async ({
 
 		return result;
 	} catch (error) {
-		logger?.error("Debug creating channel", {
+		log.error("Debug creating channel", {
 			name,
 			error: error instanceof Error ? error.message : String(error),
 		});

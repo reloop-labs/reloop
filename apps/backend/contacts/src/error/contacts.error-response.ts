@@ -1,5 +1,3 @@
-import { errorCodes } from "@be/contacts/error/contacts.error-code";
-import { status } from "elysia";
 import { createError } from "evlog";
 
 export const AuthErrors = {
@@ -48,95 +46,110 @@ export const ContactErrors = {
 			why: message,
 			fix: "Please try again later or contact support.",
 		}),
+	createFailed: (message?: string) =>
+		createError({
+			status: 500,
+			message: message || "Failed to create contact",
+			why: "An unexpected error occurred while inserting the contact into the database.",
+			fix: "Please try again later or contact support if the issue persists.",
+		}),
 };
 
-export const contactsErrorResponse = (errorMessage: string) => {
-	if (errorMessage.includes("Contact already exists")) {
-		return status(409, {
-			message: "Contact already exists",
-			errorCode: errorCodes.CONTACT_ALREADY_EXISTS,
-		});
-	}
-	if (errorMessage.includes("Contact not found")) {
-		return status(404, {
-			message: "Contact not found",
-			errorCode: errorCodes.CONTACT_NOT_FOUND,
-		});
-	}
-	if (errorMessage.includes("Invalid email")) {
-		return status(400, {
-			message: "Invalid email",
-			errorCode: errorCodes.INVALID_EMAIL,
-		});
-	}
-	if (errorMessage.includes("Group already exists")) {
-		return status(409, {
-			message: "Group already exists",
-			errorCode: errorCodes.GROUP_ALREADY_EXISTS,
-		});
-	}
-	if (errorMessage.includes("Group not found")) {
-		return status(404, {
+export const GroupErrors = {
+	notFound: (groupId: string) =>
+		createError({
+			status: 404,
 			message: "Group not found",
-			errorCode: errorCodes.GROUP_NOT_FOUND,
-		});
-	}
-	if (errorMessage.includes("Property already exists")) {
-		return status(409, {
-			message: "Property already exists",
-			errorCode: errorCodes.PROPERTY_ALREADY_EXISTS,
-		});
-	}
-	if (errorMessage.includes("Property not found")) {
-		return status(404, {
+			why: `The group with ID "${groupId}" was not found or you don't have permission to access it.`,
+			fix: "Verify the group ID and ensure it belongs to your organization.",
+		}),
+	alreadyExists: (name: string) =>
+		createError({
+			status: 409,
+			message: "Group already exists",
+			why: `A group with the name "${name}" is already registered in your organization.`,
+			fix: "Choose a different name or edit the existing group.",
+		}),
+};
+
+export const PropertyErrors = {
+	notFound: (propertyId: string) =>
+		createError({
+			status: 404,
 			message: "Property not found",
-			errorCode: errorCodes.PROPERTY_NOT_FOUND,
-		});
-	}
-	if (errorMessage.includes("Channel already exists")) {
-		return status(409, {
-			message: "Channel already exists",
-			errorCode: errorCodes.CHANNEL_ALREADY_EXISTS,
-		});
-	}
-	if (errorMessage.includes("Channel not found")) {
-		return status(404, {
+			why: `The property with ID "${propertyId}" was not found or you don't have permission to access it.`,
+			fix: "Verify the property ID and ensure it exists in your active organization.",
+		}),
+	alreadyExists: (name: string) =>
+		createError({
+			status: 409,
+			message: "Property already exists",
+			why: `A property with the name "${name}" already exists in your organization.`,
+			fix: "Use a different name or update the existing property.",
+		}),
+	invalidName: (name: string, reason: string) =>
+		createError({
+			status: 400,
+			message: "Invalid property name",
+			why: reason,
+			fix: "Ensure the property name is lowercase and contains only alphanumeric characters and underscores.",
+		}),
+	typeMismatch: (name: string, expected: string, received: string) =>
+		createError({
+			status: 400,
+			message: "Property type mismatch",
+			why: `Property '${name}' expected type '${expected}' but received '${received}'.`,
+			fix: "Provide a value matching the property's defined type.",
+		}),
+};
+
+export const ChannelErrors = {
+	notFound: (channelId: string) =>
+		createError({
+			status: 404,
 			message: "Channel not found",
-			errorCode: errorCodes.CHANNEL_NOT_FOUND,
-		});
-	}
-	if (errorMessage.includes("Subscription already exists")) {
-		return status(409, {
-			message: "Subscription already exists",
-			errorCode: errorCodes.SUBSCRIPTION_ALREADY_EXISTS,
-		});
-	}
-	if (errorMessage.includes("Subscription not found")) {
-		return status(404, {
+			why: `The channel with ID "${channelId}" was not found or you don't have permission to access it.`,
+			fix: "Verify the channel ID and ensure it exists in your organization.",
+		}),
+	alreadyExists: (name: string) =>
+		createError({
+			status: 409,
+			message: "Channel already exists",
+			why: `A channel with the name "${name}" is already registered in your organization.`,
+			fix: "Choose a different name or edit the existing channel.",
+		}),
+};
+
+export const SubscriptionErrors = {
+	notFound: (subscriptionId: string) =>
+		createError({
+			status: 404,
 			message: "Subscription not found",
-			errorCode: errorCodes.SUBSCRIPTION_NOT_FOUND,
-		});
-	}
-	if (errorMessage.includes("Preference already exists")) {
-		return status(409, {
-			message: "Preference already exists",
-			errorCode: errorCodes.PREFERENCE_ALREADY_EXISTS,
-		});
-	}
-	if (errorMessage.includes("Preference not found")) {
-		return status(404, {
+			why: `The subscription with ID "${subscriptionId}" was not found.`,
+			fix: "Verify the subscription ID and try again.",
+		}),
+	alreadyExists: () =>
+		createError({
+			status: 409,
+			message: "Subscription already exists",
+			why: "The contact is already subscribed to this channel.",
+			fix: "Check the subscription status and try again.",
+		}),
+};
+
+export const PreferenceErrors = {
+	notFound: (preferenceId: string) =>
+		createError({
+			status: 404,
 			message: "Preference not found",
-			errorCode: errorCodes.PREFERENCE_NOT_FOUND,
-		});
-	}
-	if (errorMessage.includes("Database operation failed")) {
-		return status(500, {
-			message: "Database operation failed",
-			errorCode: errorCodes.DATABASE_ERROR,
-		});
-	}
-	return status(500, {
-		message: "Internal server error",
-		errorCode: errorCodes.INTERNAL_SERVER_ERROR,
-	});
+			why: `The preference with ID "${preferenceId}" was not found.`,
+			fix: "Verify the preference ID and try again.",
+		}),
+	alreadyExists: () =>
+		createError({
+			status: 409,
+			message: "Preference already exists",
+			why: "A preference with this configuration already exists.",
+			fix: "Modify the existing preference configuration.",
+		}),
 };

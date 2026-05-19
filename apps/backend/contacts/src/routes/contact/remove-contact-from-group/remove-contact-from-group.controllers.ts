@@ -1,9 +1,9 @@
 import type { ContactModel } from "@be/contacts/model/contact.model";
+import { ContactErrors } from "@be/contacts/error/contacts.error-response";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { CONTACT_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
-import { status } from "elysia";
 import { useLogger } from "evlog/elysia";
 
 export async function removeContactFromGroupController({
@@ -15,15 +15,13 @@ export async function removeContactFromGroupController({
 	organizationId: string;
 	groupId: string;
 } & ContactModel.RemoveContactFromGroupBody): Promise<ContactModel.RemoveContactFromGroupResponse> {
-	const logger = useLogger();
+	const log = useLogger();
 
 	if (!contact_id && !email) {
-		throw status(400, {
-			message: "Either 'contact_id' or 'email' must be provided",
-		});
+		throw ContactErrors.invalidEmail("", "Either 'contact_id' or 'email' must be provided");
 	}
 
-	logger?.info("Removing contact from group", {
+	log.info("Removing contact from group", {
 		contactId: contact_id,
 		email: email?.toLowerCase(),
 		groupId,
@@ -47,7 +45,7 @@ export async function removeContactFromGroupController({
 		});
 
 		if (!contact) {
-			throw status(404, { message: "Contact not found" });
+			throw ContactErrors.contactNotFound(contact_id || email || "");
 		}
 
 		// Remove from group
@@ -63,7 +61,7 @@ export async function removeContactFromGroupController({
 				),
 			);
 
-		logger?.info("Contact removed from group", {
+		log.info("Contact removed from group", {
 			contactId: contact.id,
 			groupId,
 		});
@@ -77,7 +75,7 @@ export async function removeContactFromGroupController({
 
 		return result;
 	} catch (error) {
-		logger?.error("Error removing contact from group", {
+		log.error("Error removing contact from group", {
 			contactId: contact_id,
 			email: email?.toLowerCase(),
 			groupId,

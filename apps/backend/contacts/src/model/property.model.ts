@@ -152,21 +152,29 @@ export namespace PropertyModel {
 	// Error Responses
 	export const propertyNotFound = t.Object({
 		message: t.Literal("Property not found"),
+		why: t.String(),
+		fix: t.String(),
 	});
 	export type PropertyNotFound = typeof propertyNotFound.static;
 
 	export const propertyAlreadyExists = t.Object({
 		message: t.Literal("Property already exists"),
+		why: t.String(),
+		fix: t.String(),
 	});
 	export type PropertyAlreadyExists = typeof propertyAlreadyExists.static;
 
 	export const unauthorized = t.Object({
 		message: t.Literal("Unauthorized access"),
+		why: t.String(),
+		fix: t.String(),
 	});
 	export type Unauthorized = typeof unauthorized.static;
 
 	export const validationError = t.Object({
 		message: t.String(),
+		why: t.String(),
+		fix: t.String(),
 		errors: t.Array(
 			t.Object({
 				field: t.String(),

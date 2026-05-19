@@ -1,9 +1,9 @@
 import type { PropertyTypes } from "@be/contacts/types/property.type";
+import { PropertyErrors, ContactErrors } from "@be/contacts/error/contacts.error-response";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { PROPERTY_CREATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq } from "drizzle-orm";
-import { status } from "elysia";
 import { useLogger } from "evlog/elysia";
 
 export const createPropertyController = async ({
@@ -16,8 +16,8 @@ export const createPropertyController = async ({
 	organizationId: string;
 	userId: string;
 } & PropertyTypes.CreatePropertyRequest): Promise<PropertyTypes.PropertyResponse> => {
-	const logger = useLogger();
-	logger?.info("Creating property", { name: name, type: type });
+	const log = useLogger();
+	log.info("Creating property", { name: name, type: type });
 
 	try {
 		const existingProperty = await db
@@ -32,10 +32,10 @@ export const createPropertyController = async ({
 			.limit(1);
 
 		if (existingProperty.length > 0) {
-			logger?.warn("Property already exists in this organization", {
+			log.warn("Property already exists in this organization", {
 				name: name,
 			});
-			throw status(409, { message: "Property already exists" });
+			throw PropertyErrors.alreadyExists(name);
 		}
 
 		const [newProperty] = await db
@@ -52,13 +52,13 @@ export const createPropertyController = async ({
 			.returning();
 
 		if (!newProperty) {
-			logger?.error("Failed to create property - no data returned", {
+			log.error("Failed to create property - no data returned", {
 				name: name,
 			});
-			throw status(500, { message: "Failed to create property" });
+			throw ContactErrors.createFailed("Failed to create property");
 		}
 
-		logger?.info("Property created successfully", {
+		log.info("Property created successfully", {
 			name: name,
 			id: newProperty.id,
 		});
@@ -71,7 +71,7 @@ export const createPropertyController = async ({
 
 		return result;
 	} catch (error) {
-		logger?.error("Debug creating property", {
+		log.error("Debug creating property", {
 			name: name,
 			error: error instanceof Error ? error.message : String(error),
 		});

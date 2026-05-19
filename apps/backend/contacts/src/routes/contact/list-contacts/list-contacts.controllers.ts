@@ -22,8 +22,8 @@ export async function listContactsController({
 	organizationId: string;
 	query: ContactTypes.ContactListQuery;
 }): Promise<ContactTypes.ContactListResponse> {
-	const logger = useLogger();
-	logger?.info("Listing contacts", {
+	const log = useLogger();
+	log.info("Listing contacts", {
 		...query,
 		status: undefined,
 		currentStatus: query.status,
@@ -191,7 +191,7 @@ export async function listContactsController({
 			createdAt: contact.createdAt,
 			updatedAt: contact.updatedAt,
 		}));
-		logger?.info("Contacts listed successfully", { total, page, limit });
+		log.info("Contacts listed successfully", { total, page, limit });
 		return {
 			object: "contact",
 			contacts: formattedContacts,
@@ -204,8 +204,7 @@ export async function listContactsController({
 			event: CONTACT_LIST_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
-		log.error({
-			message: "Error listing contacts",
+		log.error("Error listing contacts", {
 			query,
 			error: error instanceof Error ? error.message : String(error),
 		});

@@ -106,16 +106,22 @@ export namespace GroupModel {
 	// Error Responses
 	export const groupNotFound = t.Object({
 		message: t.Literal("Group not found"),
+		why: t.String(),
+		fix: t.String(),
 	});
 	export type GroupNotFound = typeof groupNotFound.static;
 
 	export const groupAlreadyExists = t.Object({
 		message: t.Literal("Group already exists"),
+		why: t.String(),
+		fix: t.String(),
 	});
 	export type GroupAlreadyExists = typeof groupAlreadyExists.static;
 
 	export const unauthorized = t.Object({
 		message: t.Literal("Unauthorized access"),
+		why: t.String(),
+		fix: t.String(),
 	});
 	export type Unauthorized = typeof unauthorized.static;
 }

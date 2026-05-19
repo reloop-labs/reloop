@@ -12,12 +12,12 @@ export const listPropertiesController = async ({
 	organizationId: string;
 	query: PropertyTypes.PropertyListQuery;
 }): Promise<PropertyTypes.PropertyListResponse> => {
-	const logger = useLogger();
+	const log = useLogger();
 	const page = query.page || 1;
 	const limit = Math.min(query.limit || 100, 100);
 	const offset = (page - 1) * limit;
 
-	logger?.info("Listing properties", { page, limit });
+	log.info("Listing properties", { page, limit });
 
 	try {
 		const whereConditions: Array<SQL<unknown>> = [
@@ -45,7 +45,7 @@ export const listPropertiesController = async ({
 			.limit(limit)
 			.offset(offset);
 
-		logger?.info("Properties listed successfully", {
+		log.info("Properties listed successfully", {
 			total: rows[0]?.total ?? 0,
 			page,
 			limit,
@@ -66,7 +66,7 @@ export const listPropertiesController = async ({
 			event: PROPERTY_LIST_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
-		logger?.error("Debug listing properties", {
+		log.error("Debug listing properties", {
 			error: error instanceof Error ? error.message : String(error),
 		});
 		throw error;

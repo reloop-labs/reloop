@@ -12,8 +12,8 @@ export async function getExistingContact({
 	organizationId: string;
 	db?: DatabaseInstance;
 }) {
-	const logger = useLogger();
-	logger?.info("Checking for existing contact", {});
+	const log = useLogger();
+	log.info("Checking for existing contact", {});
 	const results = await db
 		.select()
 		.from(schema.contact)

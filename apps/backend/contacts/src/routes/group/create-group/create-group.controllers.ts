@@ -1,5 +1,6 @@
 import type { GroupModel } from "@be/contacts/model/group.model";
 import type { GroupResponse } from "@be/contacts/types/group.type";
+import { GroupErrors, ContactErrors } from "@be/contacts/error/contacts.error-response";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { createGroupId } from "@reloop/db/schema";
@@ -16,10 +17,10 @@ export const createGroupController = async ({
 	organizationId: string;
 	userId: string;
 }): Promise<GroupResponse | GroupModel.Unauthorized> => {
-	const logger = useLogger();
-	logger?.info("Creating group", { name });
+	const log = useLogger();
+	log.info("Creating group", { name });
 	try {
-		logger?.info("Checking if group already exists", { name });
+		log.info("Checking if group already exists", { name });
 		const existingGroup = await db.query.group.findFirst({
 			where: and(
 				eq(schema.group.name, name),
@@ -28,8 +29,8 @@ export const createGroupController = async ({
 			),
 		});
 		if (existingGroup) {
-			logger?.warn("Group already exists", { name });
-			throw new Error("Group already exists");
+			log.warn("Group already exists", { name });
+			throw GroupErrors.alreadyExists(name);
 		}
 		const [newGroup] = await db
 			.insert(schema.group)
@@ -41,10 +42,10 @@ export const createGroupController = async ({
 			})
 			.returning();
 		if (!newGroup) {
-			logger?.error("Failed to create group - no data returned", { name });
-			throw new Error("Failed to create group");
+			log.error("Failed to create group - no data returned", { name });
+			throw ContactErrors.createFailed("Failed to create group");
 		}
-		logger?.info("Group created successfully", { name, id: newGroup.id });
+		log.info("Group created successfully", { name, id: newGroup.id });
 
 		const result = {
 			id: newGroup.id,
@@ -57,7 +58,7 @@ export const createGroupController = async ({
 
 		return result;
 	} catch (error) {
-		logger?.error("Debug creating group", {
+		log.error("Debug creating group", {
 			name,
 			error: error instanceof Error ? error.message : String(error),
 		});

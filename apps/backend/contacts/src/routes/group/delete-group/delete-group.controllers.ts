@@ -1,4 +1,5 @@
 import type { GroupModel } from "@be/contacts/model/group.model";
+import { GroupErrors } from "@be/contacts/error/contacts.error-response";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { GROUP_DELETE_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -22,8 +23,8 @@ export const deleteGroupController = async ({
 	| GroupModel.GroupNotFound
 	| GroupModel.Unauthorized
 > => {
-	const logger = useLogger();
-	logger?.info("Deleting group", { group_id });
+	const log = useLogger();
+	log.info("Deleting group", { group_id });
 
 	try {
 		const group = await db.query.group.findFirst({
@@ -35,8 +36,8 @@ export const deleteGroupController = async ({
 		});
 
 		if (!group) {
-			logger?.warn("Group not found for deletion", { group_id });
-			return { message: "Group not found" };
+			log.warn("Group not found for deletion", { group_id });
+			throw GroupErrors.notFound(group_id);
 		}
 
 		await db
@@ -52,7 +53,7 @@ export const deleteGroupController = async ({
 				),
 			);
 
-		logger?.info("Group soft-deleted successfully", { group_id });
+		log.info("Group soft-deleted successfully", { group_id });
 
 		const result = {
 			object: "contact_group" as const,
@@ -64,7 +65,7 @@ export const deleteGroupController = async ({
 
 		return result;
 	} catch (error) {
-		logger?.error("Debug deleting group", {
+		log.error("Debug deleting group", {
 			group_id,
 			error: error instanceof Error ? error.message : String(error),
 		});

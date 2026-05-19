@@ -1,7 +1,7 @@
+import { AuthErrors, ContactErrors } from "@be/contacts/error/contacts.error-response";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { and, eq, isNull } from "drizzle-orm";
-import { status } from "elysia";
 import { log } from "evlog";
 import { useLogger } from "evlog/elysia";
 import { verifyToken } from "../token.utils";
@@ -11,12 +11,12 @@ export async function getPreferencesDataController({
 }: {
 	token: string;
 }) {
-	const logger = useLogger();
-	log.info("server", "Fetching preferences data");
+	const log = useLogger();
+	log.info("Fetching preferences data");
 
 	const payload = await verifyToken(token);
 	if (!payload) {
-		throw status(401, { message: "Invalid or expired preferences token" });
+		throw AuthErrors.unauthorized("Invalid or expired preferences token");
 	}
 
 	const { contactId, organizationId } = payload;
@@ -31,7 +31,7 @@ export async function getPreferencesDataController({
 	});
 
 	if (!contact) {
-		throw status(404, { message: "Contact not found" });
+		throw ContactErrors.contactNotFound(contactId);
 	}
 
 	// Fetch organization name
@@ -63,7 +63,7 @@ export async function getPreferencesDataController({
 		enrollments.map((e) => [e.channelId, e.status]),
 	);
 
-	logger?.info("Preferences data fetched successfully", {
+	log.info("Preferences data fetched successfully", {
 		contactId,
 		channelsCount: channels.length,
 	});

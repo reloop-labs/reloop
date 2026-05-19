@@ -9,7 +9,7 @@ export const createContactRoute = new Elysia()
 	.use(authMiddleware)
 	.use(
 		rateLimitPlugin({
-			max: 30,
+			max: 200,
 			windowSeconds: 60,
 			namespace: "contact-create",
 		}),
@@ -17,16 +17,17 @@ export const createContactRoute = new Elysia()
 	.post(
 		"/create",
 		async ({ body, organizationId, userId }) => {
+			const { email, firstName, lastName, status, properties, groupIds, channels } = body
 			return await createContactController({
 				organizationId,
 				userId,
-				email: body.email,
-				firstName: body.firstName,
-				lastName: body.lastName,
-				status: body.status,
-				properties: body.properties,
-				groupIds: body.groupIds,
-				channels: body.channels,
+				email,
+				firstName,
+				lastName,
+				status,
+				properties,
+				groupIds,
+				channels,
 			});
 		},
 		{

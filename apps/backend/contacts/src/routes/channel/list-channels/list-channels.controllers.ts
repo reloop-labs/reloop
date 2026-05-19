@@ -14,12 +14,12 @@ export const listChannelsController = async ({
 	page?: number;
 	limit?: number;
 }): Promise<ChannelTypes.ChannelListResponse> => {
-	const logger = useLogger();
+	const log = useLogger();
 	const page = rawPage || 1;
 	const limit = Math.min(rawLimit || 100, 100);
 	const offset = (page - 1) * limit;
 
-	logger?.info("Listing channels", { page, limit });
+	log.info("Listing channels", { page, limit });
 
 	try {
 		const whereClause = and(
@@ -45,7 +45,7 @@ export const listChannelsController = async ({
 			.limit(limit)
 			.offset(offset);
 
-		logger?.info("Channels listed successfully", {
+		log.info("Channels listed successfully", {
 			total: rows[0]?.total ?? 0,
 			page,
 			limit,
@@ -68,7 +68,7 @@ export const listChannelsController = async ({
 			event: CHANNEL_LIST_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
-		logger?.error("Debug listing channels", {
+		log.error("Debug listing channels", {
 			error: error instanceof Error ? error.message : String(error),
 		});
 		throw error;

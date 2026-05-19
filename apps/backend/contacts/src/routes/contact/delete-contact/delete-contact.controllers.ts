@@ -1,4 +1,5 @@
 import type { ContactModel } from "@be/contacts/model/contact.model";
+import { ContactErrors } from "@be/contacts/error/contacts.error-response";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { CONTACT_DELETE_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -13,8 +14,8 @@ export async function deleteContactController({
 	contactId: string;
 	organizationId: string;
 }): Promise<ContactModel.DeleteResponse | ContactModel.ContactNotFound> {
-	const logger = useLogger();
-	logger?.info("Deleting contact", { contactId });
+	const log = useLogger();
+	log.info("Deleting contact", { contactId });
 
 	try {
 		// Check if contact exists
@@ -26,8 +27,8 @@ export async function deleteContactController({
 		});
 
 		if (!existingContact) {
-			logger?.warn("Contact not found", { contactId, organizationId });
-			return { message: "Contact not found" };
+			log.warn("Contact not found", { contactId, organizationId });
+			throw ContactErrors.contactNotFound(contactId);
 		}
 
 		// Delete the contact (hard delete)
@@ -40,7 +41,7 @@ export async function deleteContactController({
 				),
 			);
 
-		logger?.info("Contact deleted successfully", { contactId });
+		log.info("Contact deleted successfully", { contactId });
 
 		const result = {
 			success: true,
@@ -51,8 +52,7 @@ export async function deleteContactController({
 
 		return result;
 	} catch (error) {
-		log.error({
-			message: "Error deleting contact",
+		log.error("Error deleting contact", {
 			contactId,
 			error: error instanceof Error ? error.message : String(error),
 		});

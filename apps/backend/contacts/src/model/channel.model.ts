@@ -173,21 +173,29 @@ export namespace ChannelModel {
 	// Error Responses
 	export const channelNotFound = t.Object({
 		message: t.Literal("Channel not found"),
+		why: t.String(),
+		fix: t.String(),
 	});
 	export type ChannelNotFound = typeof channelNotFound.static;
 
 	export const channelAlreadyExists = t.Object({
-		message: t.Literal("Channel already exists"),
+		message: t.Union([t.Literal("Channel already exists"), t.Literal("Channel with this name already exists")]),
+		why: t.String(),
+		fix: t.String(),
 	});
 	export type ChannelAlreadyExists = typeof channelAlreadyExists.static;
 
 	export const unauthorized = t.Object({
 		message: t.Literal("Unauthorized access"),
+		why: t.String(),
+		fix: t.String(),
 	});
 	export type Unauthorized = typeof unauthorized.static;
 
 	export const validationError = t.Object({
 		message: t.String(),
+		why: t.String(),
+		fix: t.String(),
 		errors: t.Array(
 			t.Object({
 				field: t.String(),

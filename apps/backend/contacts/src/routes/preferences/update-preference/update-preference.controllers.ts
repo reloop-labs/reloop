@@ -1,7 +1,7 @@
+import { AuthErrors, ChannelErrors } from "@be/contacts/error/contacts.error-response";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { and, eq, isNull } from "drizzle-orm";
-import { status } from "elysia";
 import { useLogger } from "evlog/elysia";
 import { verifyToken } from "../token.utils";
 
@@ -14,12 +14,12 @@ export async function updatePreferenceController({
 	channelId: string;
 	subscribe: boolean;
 }) {
-	const logger = useLogger();
-	logger?.info("Updating preference", { channelId, subscribe });
+	const log = useLogger();
+	log.info("Updating preference", { channelId, subscribe });
 
 	const payload = await verifyToken(token);
 	if (!payload) {
-		throw status(401, { message: "Invalid or expired preferences token" });
+		throw AuthErrors.unauthorized("Invalid or expired preferences token");
 	}
 
 	const { contactId, organizationId } = payload;
@@ -35,7 +35,7 @@ export async function updatePreferenceController({
 	});
 
 	if (!channel) {
-		throw status(404, { message: "Channel not found or not accessible" });
+		throw ChannelErrors.notFound(channelId);
 	}
 
 	const targetStatus = subscribe ? "enrolled" : "unenrolled";
@@ -62,7 +62,7 @@ export async function updatePreferenceController({
 		});
 	}
 
-	logger?.info("Preference updated", {
+	log.info("Preference updated", {
 		contactId,
 		channelId,
 		currentStatus: targetStatus,

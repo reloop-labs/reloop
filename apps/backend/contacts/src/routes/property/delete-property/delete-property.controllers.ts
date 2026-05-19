@@ -1,8 +1,8 @@
+import { PropertyErrors } from "@be/contacts/error/contacts.error-response";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { PROPERTY_DELETE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
-import { status } from "elysia";
 import { useLogger } from "evlog/elysia";
 
 export const deletePropertyController = async ({
@@ -18,8 +18,8 @@ export const deletePropertyController = async ({
 	name: string;
 	event: string;
 }> => {
-	const logger = useLogger();
-	logger?.info("Deleting property", { property_id });
+	const log = useLogger();
+	log.info("Deleting property", { property_id });
 
 	try {
 		const property = await db.query.contactProperty.findFirst({
@@ -31,8 +31,8 @@ export const deletePropertyController = async ({
 		});
 
 		if (!property) {
-			logger?.warn("Property not found or already deleted", { property_id });
-			throw status(404, { message: "Property not found" });
+			log.warn("Property not found or already deleted", { property_id });
+			throw PropertyErrors.notFound(property_id);
 		}
 
 		await db
@@ -45,7 +45,7 @@ export const deletePropertyController = async ({
 				),
 			);
 
-		logger?.info("Property deleted successfully", { property_id });
+		log.info("Property deleted successfully", { property_id });
 
 		const result = {
 			object: "contact_property" as const,
@@ -57,7 +57,7 @@ export const deletePropertyController = async ({
 
 		return result;
 	} catch (error) {
-		logger?.error("Debug deleting property", {
+		log.error("Debug deleting property", {
 			property_id,
 			error: error instanceof Error ? error.message : String(error),
 		});

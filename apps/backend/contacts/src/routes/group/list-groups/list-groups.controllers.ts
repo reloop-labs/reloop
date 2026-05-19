@@ -20,12 +20,12 @@ export const listGroupsController = async ({
 	limit?: number;
 	search?: string;
 }): Promise<GroupListResponse | GroupModel.Unauthorized> => {
-	const logger = useLogger();
+	const log = useLogger();
 	const page = rawPage || 1;
 	const limit = Math.min(rawLimit || 100, 100);
 	const offset = (page - 1) * limit;
 
-	logger?.info("Listing groups", { page, limit, search });
+	log.info("Listing groups", { page, limit, search });
 
 	try {
 		const whereClause = and(
@@ -59,7 +59,7 @@ export const listGroupsController = async ({
 			event: GROUP_LIST_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
-		logger?.error("Debug listing groups", {
+		log.error("Debug listing groups", {
 			error: error instanceof Error ? error.message : String(error),
 		});
 		throw error;

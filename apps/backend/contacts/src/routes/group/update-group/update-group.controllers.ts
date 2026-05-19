@@ -1,5 +1,6 @@
 import type { GroupModel } from "@be/contacts/model/group.model";
 import type { GroupResponse } from "@be/contacts/types/group.type";
+import { GroupErrors, ContactErrors } from "@be/contacts/error/contacts.error-response";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { GROUP_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -19,9 +20,9 @@ export const updateGroupController = async ({
 	| GroupModel.GroupAlreadyExists
 	| GroupModel.Unauthorized
 > => {
-	const logger = useLogger();
+	const log = useLogger();
 
-	logger?.info("Updating group", { group_id, name });
+	log.info("Updating group", { group_id, name });
 
 	try {
 		const existingGroup = await db.query.group.findFirst({
@@ -33,8 +34,8 @@ export const updateGroupController = async ({
 		});
 
 		if (!existingGroup) {
-			logger?.warn("Group not found for update", { group_id });
-			return { message: "Group not found" };
+			log.warn("Group not found for update", { group_id });
+			throw GroupErrors.notFound(group_id);
 		}
 
 		// Check name uniqueness if changed
@@ -49,8 +50,8 @@ export const updateGroupController = async ({
 			});
 
 			if (nameConflict) {
-				logger?.warn("Another group with this name already exists", { name });
-				return { message: "Group already exists" };
+				log.warn("Another group with this name already exists", { name });
+				throw GroupErrors.alreadyExists(name);
 			}
 		}
 
@@ -61,11 +62,11 @@ export const updateGroupController = async ({
 			.returning();
 
 		if (!updatedGroup) {
-			logger?.error("Failed to update group - no data returned", { group_id });
-			return { message: "Group not found" };
+			log.error("Failed to update group - no data returned", { group_id });
+			throw ContactErrors.databaseError("Failed to update group");
 		}
 
-		logger?.info("Group updated successfully", { group_id });
+		log.info("Group updated successfully", { group_id });
 
 		const result = {
 			id: updatedGroup.id,
@@ -78,7 +79,7 @@ export const updateGroupController = async ({
 
 		return result;
 	} catch (error) {
-		logger?.error("Debug updating group", {
+		log.error("Debug updating group", {
 			group_id,
 			error: error instanceof Error ? error.message : String(error),
 		});

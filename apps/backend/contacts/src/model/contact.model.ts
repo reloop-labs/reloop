@@ -375,21 +375,29 @@ export namespace ContactModel {
 	// Error Responses
 	export const contactNotFound = t.Object({
 		message: t.Literal("Contact not found"),
+		why: t.String(),
+		fix: t.String(),
 	});
 	export type ContactNotFound = typeof contactNotFound.static;
 
 	export const contactAlreadyExists = t.Object({
 		message: t.Literal("Contact already exists"),
+		why: t.String(),
+		fix: t.String(),
 	});
 	export type ContactAlreadyExists = typeof contactAlreadyExists.static;
 
 	export const invalidEmail = t.Object({
-		message: t.Literal("Invalid email format"),
+		message: t.Union([t.Literal("Invalid email format"), t.Literal("Invalid email")]),
+		why: t.String(),
+		fix: t.String(),
 	});
 	export type InvalidEmail = typeof invalidEmail.static;
 
 	export const unauthorized = t.Object({
-		message: t.Literal("Unauthorized access"),
+		message: t.Union([t.Literal("Unauthorized access"), t.Literal("Unauthorized")]),
+		why: t.String(),
+		fix: t.String(),
 	});
 	export type Unauthorized = typeof unauthorized.static;
 
