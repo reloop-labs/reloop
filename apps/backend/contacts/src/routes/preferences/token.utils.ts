@@ -1,6 +1,6 @@
-const PREFERENCES_SECRET =
-	process.env.PREFERENCES_SECRET ||
-	"reloop-preferences-secret-key-change-in-prod";
+import { contactsConfig } from "@be/contacts/contacts.config";
+
+const PREFERENCES_SECRET = contactsConfig.PREFERENCES_SECRET;
 
 const TOKEN_EXPIRY_DAYS = 30;
 

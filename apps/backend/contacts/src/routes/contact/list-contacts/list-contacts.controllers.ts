@@ -5,13 +5,13 @@ import * as schema from "@reloop/db/schema";
 import { CONTACT_LIST_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import {
 	and,
-	count,
 	desc,
 	eq,
 	ilike,
 	inArray,
 	isNull,
 	type SQL,
+	sql,
 } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
 
@@ -38,56 +38,43 @@ export async function listContactsController({
 			isNull(schema.contact.deletedAt),
 		];
 
+		const matchFilters: Array<SQL<unknown>> = [];
 		if (query.status) {
-			whereConditions.push(eq(schema.contact.status, query.status));
+			const condition = eq(schema.contact.status, query.status);
+			whereConditions.push(condition);
+			matchFilters.push(condition);
 		}
 		if (query.search) {
-			whereConditions.push(ilike(schema.contact.email, `%${query.search}%`));
+			const escapedSearch = query.search.replace(/[%_\\]/g, "\\$&");
+			const condition = ilike(schema.contact.email, `%${escapedSearch}%`);
+			whereConditions.push(condition);
+			matchFilters.push(condition);
 		}
-		const totalResult = await db
-			.select({ count: count() })
-			.from(schema.contact)
-			.where(and(...whereConditions));
-		const total = totalResult[0]?.count || 0;
-		const [
-			totalSummaryResult,
-			subscribedSummaryResult,
-			unsubscribedSummaryResult,
-		] = await Promise.all([
-			db
-				.select({ count: count() })
-				.from(schema.contact)
-				.where(
-					and(
-						eq(schema.contact.organizationId, organizationId),
-						isNull(schema.contact.deletedAt),
-					),
-				),
-			db
-				.select({ count: count() })
-				.from(schema.contact)
-				.where(
-					and(
-						eq(schema.contact.organizationId, organizationId),
-						eq(schema.contact.status, "subscribed"),
-						isNull(schema.contact.deletedAt),
-					),
-				),
-			db
-				.select({ count: count() })
-				.from(schema.contact)
-				.where(
-					and(
-						eq(schema.contact.organizationId, organizationId),
-						eq(schema.contact.status, "unsubscribed"),
-						isNull(schema.contact.deletedAt),
-					),
-				),
-		]);
 
-		const totalContacts = totalSummaryResult[0]?.count || 0;
-		const subscribedContacts = subscribedSummaryResult[0]?.count || 0;
-		const unsubscribedContacts = unsubscribedSummaryResult[0]?.count || 0;
+		const totalMatchingSql =
+			matchFilters.length > 0
+				? sql<number>`count(*) filter (where ${and(...matchFilters)})`
+				: sql<number>`count(*)`;
+
+		const [counts] = await db
+			.select({
+				totalMatching: totalMatchingSql,
+				totalContacts: sql<number>`count(*)`,
+				subscribed: sql<number>`count(*) filter (where ${schema.contact.status} = 'subscribed')`,
+				unsubscribed: sql<number>`count(*) filter (where ${schema.contact.status} = 'unsubscribed')`,
+			})
+			.from(schema.contact)
+			.where(
+				and(
+					eq(schema.contact.organizationId, organizationId),
+					isNull(schema.contact.deletedAt),
+				),
+			);
+
+		const total = Number(counts?.totalMatching || 0);
+		const totalContacts = Number(counts?.totalContacts || 0);
+		const subscribedContacts = Number(counts?.subscribed || 0);
+		const unsubscribedContacts = Number(counts?.unsubscribed || 0);
 
 		const contacts = await db.query.contact.findMany({
 			where: and(...whereConditions),

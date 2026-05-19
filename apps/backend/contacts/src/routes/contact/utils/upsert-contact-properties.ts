@@ -7,6 +7,12 @@ import * as schema from "@reloop/db/schema";
 import { and, eq, inArray, isNull } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
 
+function sanitizeText(val: string): string {
+	return val
+		.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
+		.replace(/<\/?[^>]+(>|$)/g, "");
+}
+
 export async function upsertContactProperties({
 	contactId,
 	organizationId,
@@ -151,7 +157,19 @@ export async function upsertContactProperties({
 				}
 
 				const pid = info.id;
-				const stringValue = String(value);
+				let stringValue = String(value);
+
+				if (info.type === "number") {
+					const numVal = Number(value);
+					if (Number.isNaN(numVal) || !Number.isFinite(numVal)) {
+						log.warn("Invalid numeric value", { name, value });
+						throw PropertyErrors.typeMismatch(name, "number", typeof value);
+					}
+					stringValue = String(numVal);
+				} else {
+					// Sanitize string type to prevent stored XSS
+					stringValue = sanitizeText(stringValue);
+				}
 
 				// Find existing value record (even if soft-deleted) to update/restore it
 				const existingValue = await db.query.contactPropertyValue.findFirst({

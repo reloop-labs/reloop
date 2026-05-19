@@ -7,4 +7,7 @@ export const contactsConfig = {
 	NODE_ENV: process.env.NODE_ENV || "development",
 	NODE_TLS_REJECT_UNAUTHORIZED: process.env.NODE_TLS_REJECT_UNAUTHORIZED || "0",
 	NATS_URL: process.env.NATS_URL || "nats://localhost:4222",
+	PREFERENCES_SECRET:
+		process.env.PREFERENCES_SECRET ||
+		"reloop-preferences-secret-key-change-in-prod",
 };
