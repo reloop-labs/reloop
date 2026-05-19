@@ -10,8 +10,12 @@ import { useEditorStore } from "./use-editor-store";
 
 export function AIAssistant() {
 	const { editor } = useCurrentEditor();
-	const { isGenerating, setIsGenerating, setGeneratingContent, setLastAiPrompt } =
-		useEditorStore();
+	const {
+		isGenerating,
+		setIsGenerating,
+		setGeneratingContent,
+		setLastAiPrompt,
+	} = useEditorStore();
 
 	const {
 		completion,

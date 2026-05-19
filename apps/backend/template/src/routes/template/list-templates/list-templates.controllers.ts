@@ -25,7 +25,9 @@ export async function listTemplates(params: {
 
 		return result;
 	} catch (error) {
-		console.error(`Error listing templates: ${error instanceof Error ? error.message : String(error)}`);
+		console.error(
+			`Error listing templates: ${error instanceof Error ? error.message : String(error)}`,
+		);
 		throw error;
 	}
 }

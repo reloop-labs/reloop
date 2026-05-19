@@ -31,7 +31,9 @@ export async function createTemplate(params: {
 
 		return result;
 	} catch (error) {
-		console.error(`Error creating template: ${error instanceof Error ? error.message : String(error)}`);
+		console.error(
+			`Error creating template: ${error instanceof Error ? error.message : String(error)}`,
+		);
 		throw error;
 	}
 }

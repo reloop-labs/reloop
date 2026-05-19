@@ -24,6 +24,8 @@ const BG_POSITIONS = [
 	"bottom right",
 ];
 
+import * as Button from "@reloop/ui/button";
+
 export function BackgroundControl({
 	value,
 	onChange,
@@ -45,36 +47,48 @@ export function BackgroundControl({
 			{value.imageUrl && (
 				<>
 					<div className="grid grid-cols-3 gap-1">
-						{BG_SIZES.map((s) => (
-							<button
-								key={s}
-								type="button"
-								onClick={() => onChange({ ...value, size: s })}
-								className={`rounded border px-1 py-0.5 text-[10px] transition-colors ${
-									value.size === s
-										? "border-(--re-text) bg-(--re-text) text-(--re-bg)"
-										: "border-(--re-border) bg-transparent text-(--re-text-muted)"
-								}`}
-							>
-								{s}
-							</button>
-						))}
+						{BG_SIZES.map((s) => {
+							const isActive = value.size === s;
+							return (
+								<Button.Root
+									key={s}
+									type="button"
+									variant="neutral"
+									mode={isActive ? "lighter" : "ghost"}
+									size="xxsmall"
+									onClick={() => onChange({ ...value, size: s })}
+									className={`rounded border px-1 py-0.5 text-[10px] outline-none ring-0 transition-colors ${
+										isActive
+											? "border-(--re-text) bg-(--re-text) text-(--re-bg)"
+											: "border-(--re-border) bg-transparent text-(--re-text-muted)"
+									}`}
+								>
+									{s}
+								</Button.Root>
+							);
+						})}
 					</div>
 					<div className="grid grid-cols-4 gap-1">
-						{BG_REPEATS.map((r) => (
-							<button
-								key={r}
-								type="button"
-								onClick={() => onChange({ ...value, repeat: r })}
-								className={`rounded border px-1 py-0.5 text-[10px] transition-colors ${
-									value.repeat === r
-										? "border-(--re-text) bg-(--re-text) text-(--re-bg)"
-										: "border-(--re-border) bg-transparent text-(--re-text-muted)"
-								}`}
-							>
-								{r.replace("repeat-", "")}
-							</button>
-						))}
+						{BG_REPEATS.map((r) => {
+							const isActive = value.repeat === r;
+							return (
+								<Button.Root
+									key={r}
+									type="button"
+									variant="neutral"
+									mode={isActive ? "lighter" : "ghost"}
+									size="xxsmall"
+									onClick={() => onChange({ ...value, repeat: r })}
+									className={`rounded border px-1 py-0.5 text-[10px] outline-none ring-0 transition-colors ${
+										isActive
+											? "border-(--re-text) bg-(--re-text) text-(--re-bg)"
+											: "border-(--re-border) bg-transparent text-(--re-text-muted)"
+									}`}
+								>
+									{r.replace("repeat-", "")}
+								</Button.Root>
+							);
+						})}
 					</div>
 				</>
 			)}

@@ -21,6 +21,7 @@ export interface UpdateTemplateInput {
 	content?: TemplateBlock[];
 	variables?: string[];
 	status?: "draft" | "published" | "archived";
+	currentVersion?: number;
 }
 
 export const templateModel = {
@@ -108,6 +109,8 @@ export const templateModel = {
 		if (input.content !== undefined) updateData.content = input.content;
 		if (input.variables !== undefined) updateData.variables = input.variables;
 		if (input.status !== undefined) updateData.status = input.status;
+		if (input.currentVersion !== undefined)
+			updateData.currentVersion = input.currentVersion;
 
 		const [result] = await db
 			.update(schema.template)

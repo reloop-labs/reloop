@@ -18,7 +18,9 @@ export function ListControls() {
 			<ButtonGroup.Root className="w-full">
 				<ButtonGroup.Item
 					data-state={isQuoteActive ? "on" : "off"}
-					onClick={() => editor?.chain().focus().toggleBlockquote().run()}
+					onClick={() =>
+						(editor?.chain().focus() as any).toggleBlockquote().run()
+					}
 					className="h-10 flex-1 first:rounded-l-xl last:rounded-r-xl"
 					title="Quote"
 				>
@@ -26,7 +28,7 @@ export function ListControls() {
 				</ButtonGroup.Item>
 				<ButtonGroup.Item
 					data-state={isCodeActive ? "on" : "off"}
-					onClick={() => editor?.chain().focus().toggleCode().run()}
+					onClick={() => (editor?.chain().focus() as any).toggleCode().run()}
 					className="h-10 flex-1 first:rounded-l-xl last:rounded-r-xl"
 					title="Code"
 				>
@@ -34,7 +36,9 @@ export function ListControls() {
 				</ButtonGroup.Item>
 				<ButtonGroup.Item
 					data-state={listType === "bullet" ? "on" : "off"}
-					onClick={() => editor?.chain().focus().toggleBulletList().run()}
+					onClick={() =>
+						(editor?.chain().focus() as any).toggleBulletList().run()
+					}
 					className="h-10 flex-1 first:rounded-l-xl last:rounded-r-xl"
 					title="Bullet List"
 				>
@@ -42,7 +46,9 @@ export function ListControls() {
 				</ButtonGroup.Item>
 				<ButtonGroup.Item
 					data-state={listType === "ordered" ? "on" : "off"}
-					onClick={() => editor?.chain().focus().toggleOrderedList().run()}
+					onClick={() =>
+						(editor?.chain().focus() as any).toggleOrderedList().run()
+					}
 					className="h-10 flex-1 first:rounded-l-xl last:rounded-r-xl"
 					title="Ordered List"
 				>

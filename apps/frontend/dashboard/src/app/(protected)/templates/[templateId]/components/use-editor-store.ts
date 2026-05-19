@@ -17,6 +17,17 @@ interface EditorState {
 	setGeneratingContent: (content: string) => void;
 	lastAiPrompt: string;
 	setLastAiPrompt: (prompt: string) => void;
+
+	// Draft/Publish save status tracking
+	lastSavedAt: Date | null;
+	lastSavedDraftNumber: number | null;
+	hasUnsavedChanges: boolean;
+	isSavingDraft: boolean;
+	isPublishing: boolean;
+	setLastSaved: (draftNumber: number | null, date: Date) => void;
+	setHasUnsavedChanges: (hasChanges: boolean) => void;
+	setIsSavingDraft: (saving: boolean) => void;
+	setIsPublishing: (publishing: boolean) => void;
 }
 
 export const useEditorStore = create<EditorState>((set) => ({
@@ -36,4 +47,20 @@ export const useEditorStore = create<EditorState>((set) => ({
 	setGeneratingContent: (generatingContent) => set({ generatingContent }),
 	lastAiPrompt: "",
 	setLastAiPrompt: (lastAiPrompt) => set({ lastAiPrompt }),
+
+	// Draft/Publish save status
+	lastSavedAt: null,
+	lastSavedDraftNumber: null,
+	hasUnsavedChanges: false,
+	isSavingDraft: false,
+	isPublishing: false,
+	setLastSaved: (draftNumber, date) =>
+		set({
+			lastSavedDraftNumber: draftNumber,
+			lastSavedAt: date,
+			hasUnsavedChanges: false,
+		}),
+	setHasUnsavedChanges: (hasUnsavedChanges) => set({ hasUnsavedChanges }),
+	setIsSavingDraft: (isSavingDraft) => set({ isSavingDraft }),
+	setIsPublishing: (isPublishing) => set({ isPublishing }),
 }));

@@ -17,7 +17,9 @@ export async function getTemplate(params: {
 
 		return template;
 	} catch (error) {
-		console.error(`Error getting template: ${error instanceof Error ? error.message : String(error)}`);
+		console.error(
+			`Error getting template: ${error instanceof Error ? error.message : String(error)}`,
+		);
 		throw error;
 	}
 }

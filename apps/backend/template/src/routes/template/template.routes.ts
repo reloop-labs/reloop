@@ -6,7 +6,9 @@ import { getTemplateRoute } from "@be/template/routes/template/get-template/get-
 import { listTemplatesRoute } from "@be/template/routes/template/list-templates/list-templates.route";
 import { updateTemplateRoute } from "@be/template/routes/template/update-template/update-template.route";
 import { createVersionRoute } from "@be/template/routes/template/version/create-version.route";
+import { deleteVersionRoute } from "@be/template/routes/template/version/delete-version.route";
 import { listVersionsRoute } from "@be/template/routes/template/version/list-versions.route";
+import { restoreVersionRoute } from "@be/template/routes/template/version/restore-version.route";
 import { Elysia } from "elysia";
 
 export const templateRoutes = new Elysia({
@@ -17,6 +19,8 @@ export const templateRoutes = new Elysia({
 	.use(createTemplateRoute)
 	.use(createVersionRoute)
 	.use(listVersionsRoute)
+	.use(deleteVersionRoute)
+	.use(restoreVersionRoute)
 	.use(getTemplateRoute)
 	.use(listTemplatesRoute)
 	.use(updateTemplateRoute)

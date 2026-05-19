@@ -18,7 +18,9 @@ export async function duplicateTemplate(params: {
 
 		return result;
 	} catch (error) {
-		console.error(`Error duplicating template: ${error instanceof Error ? error.message : String(error)}`);
+		console.error(
+			`Error duplicating template: ${error instanceof Error ? error.message : String(error)}`,
+		);
 		throw error;
 	}
 }

@@ -1,4 +1,3 @@
-
 import { log } from "evlog";
 import * as encoding from "lib0/encoding";
 import * as map from "lib0/map";

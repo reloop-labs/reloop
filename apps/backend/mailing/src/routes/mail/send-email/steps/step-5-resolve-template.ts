@@ -32,13 +32,14 @@ export async function resolveTemplate_step5({
 			throw MailErrors.templateNotFound(template.id);
 		}
 
-		const latestVersion = await db.query.templateVersion.findFirst({
-			where: (tv, { eq: dbEq }) => dbEq(tv.templateId, templateRecord.id),
+		const latestPublished = await db.query.templateVersion.findFirst({
+			where: (tv, { and: dbAnd, eq: dbEq }) =>
+				dbAnd(dbEq(tv.templateId, templateRecord.id), dbEq(tv.isMajor, true)),
 			orderBy: (tv, { desc: dbDesc }) => [dbDesc(tv.version)],
 		});
 
 		finalSubject = templateRecord.subject || finalSubject;
-		finalHtml = latestVersion?.renderedHtml || finalHtml;
+		finalHtml = latestPublished?.renderedHtml || finalHtml;
 
 		if (template.variables) {
 			const substitute = (str: string) => {

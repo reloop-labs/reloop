@@ -1,4 +1,5 @@
 import { Inspector } from "@react-email/editor/ui";
+import * as Button from "@reloop/ui/button";
 import {
 	Box,
 	Columns,
@@ -79,14 +80,17 @@ const BreadCrumb = () => {
 									{i !== 0 && (
 										<span className="text-text-disabled-300 text-xs">/</span>
 									)}
-									<button
+									<Button.Root
 										type="button"
-										className="flex cursor-pointer items-center gap-1.5 rounded px-1 py-0.5 text-text-sub-600 text-xs capitalize transition-colors hover:text-text-strong-950"
+										variant="neutral"
+										mode="ghost"
+										size="xxsmall"
+										className="flex cursor-pointer items-center gap-1.5 rounded px-1 py-0.5 text-text-sub-600 text-xs capitalize outline-none ring-0 transition-colors hover:text-text-strong-950"
 										onClick={() => segment.focus()}
 									>
 										<Icon className="h-3.5 w-3.5" strokeWidth={2} />
 										{showLabel && <span>{label}</span>}
-									</button>
+									</Button.Root>
 								</li>
 							);
 						})

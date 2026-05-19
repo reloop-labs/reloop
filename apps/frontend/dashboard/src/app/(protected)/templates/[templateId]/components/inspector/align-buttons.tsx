@@ -21,6 +21,8 @@ const ALIGN_OPTIONS = [
 	},
 ] as const;
 
+import * as Button from "@reloop/ui/button";
+
 export type AlignValue = "left" | "center" | "right" | "justify";
 
 export function AlignButtons({
@@ -36,21 +38,27 @@ export function AlignButtons({
 	const options = justify ? ALIGN_OPTIONS : ALIGN_OPTIONS.slice(0, 3);
 	return (
 		<span className="flex gap-0.5">
-			{options.map(({ value: v, label, title }) => (
-				<button
-					key={v}
-					type="button"
-					title={title}
-					onClick={() => onChange(v)}
-					className={`h-6 w-6 rounded border text-xs transition-colors ${
-						value === v
-							? "border-(--re-text) bg-(--re-text) text-(--re-bg)"
-							: "border-(--re-border) bg-transparent text-(--re-text)"
-					}`}
-				>
-					{label}
-				</button>
-			))}
+			{options.map(({ value: v, label, title }) => {
+				const isActive = value === v;
+				return (
+					<Button.Root
+						key={v}
+						type="button"
+						variant="neutral"
+						mode={isActive ? "lighter" : "ghost"}
+						size="xxsmall"
+						title={title}
+						onClick={() => onChange(v)}
+						className={`h-6 w-6 rounded border text-xs outline-none ring-0 transition-colors ${
+							isActive
+								? "border-(--re-text) bg-(--re-text) text-(--re-bg)"
+								: "border-(--re-border) bg-transparent text-(--re-text)"
+						}`}
+					>
+						{label}
+					</Button.Root>
+				);
+			})}
 		</span>
 	);
 }

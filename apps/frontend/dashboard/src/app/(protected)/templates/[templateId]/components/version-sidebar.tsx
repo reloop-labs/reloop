@@ -1,13 +1,27 @@
 "use client";
 
+import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
+import { KbdEsc } from "@reloop/ui/kbd-esc";
+import * as Modal from "@reloop/ui/modal";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { useCurrentEditor } from "@tiptap/react";
-import { ChevronLeft, Clock, Loader2, RotateCcw, Save } from "lucide-react";
+import {
+	CheckCircle2,
+	ChevronLeft,
+	Clock,
+	Eye,
+	History,
+	Loader2,
+	Trash2,
+} from "lucide-react";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { toast } from "sonner";
 import useSWR from "swr";
+import { PreviewModal } from "./preview-modal";
 import { useEditorStore } from "./use-editor-store";
 
 interface TemplateVersion {
@@ -16,11 +30,86 @@ interface TemplateVersion {
 	version: number;
 	subject: string | null;
 	description: string | null;
+	name: string | null;
+	isMajor: boolean;
 	content: unknown[];
 	variables: string[];
 	renderedHtml: string | null;
 	createdByUserId: string;
 	createdAt: string;
+	createdBy?: {
+		id: string;
+		name: string;
+		email: string;
+		image?: string;
+	};
+}
+
+/* ------------------------------------------------------------------ */
+/* Delete Version/Draft Confirmation Modal                           */
+/* ------------------------------------------------------------------ */
+interface DeleteVersionModalProps {
+	isOpen: boolean;
+	onClose: () => void;
+	onConfirm: () => void;
+	versionLabel: string;
+}
+
+function DeleteVersionModal({
+	isOpen,
+	onClose,
+	onConfirm,
+	versionLabel,
+}: DeleteVersionModalProps) {
+	return (
+		<Modal.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
+			<Modal.Content
+				className="rounded-2xl border border-stroke-soft-100/50 p-0.5 font-sans sm:max-w-[400px]"
+				showClose={true}
+			>
+				<div className="rounded-2xl border border-stroke-soft-100/50">
+					<Modal.Header className="before:border-stroke-soft-200/50">
+						<div className="flex items-center justify-center">
+							<Icon name="trash" className="h-4 w-4" />
+						</div>
+						<div className="flex-1">
+							<Modal.Title>Delete {versionLabel}</Modal.Title>
+						</div>
+					</Modal.Header>
+					<Modal.Body className="space-y-2">
+						<p className="text-paragraph-sm text-text-sub-600 leading-relaxed">
+							Are you sure you want to delete this version? This action cannot
+							be undone.
+						</p>
+					</Modal.Body>
+					<Modal.Footer className="mt-4 flex items-center justify-end gap-3 border-stroke-soft-100/50">
+						<Button.Root
+							type="button"
+							variant="neutral"
+							mode="stroke"
+							size="xsmall"
+							onClick={onClose}
+						>
+							Cancel
+							<KbdEsc />
+						</Button.Root>
+						<Button.Root
+							type="button"
+							variant="error"
+							mode="filled"
+							size="xsmall"
+							onClick={() => {
+								onConfirm();
+								onClose();
+							}}
+						>
+							Delete
+						</Button.Root>
+					</Modal.Footer>
+				</div>
+			</Modal.Content>
+		</Modal.Root>
+	);
 }
 
 const fetcher = (url: string) =>
@@ -47,19 +136,24 @@ export function VersionSidebar() {
 	const params = useParams<{ templateId: string }>();
 	const templateId = params?.templateId;
 	const { editor } = useCurrentEditor();
-	const { lastAiPrompt, setLastAiPrompt } = useEditorStore();
+	const { lastSavedAt, lastSavedDraftNumber, subject } = useEditorStore();
 
 	const [isExpanded, setIsExpanded] = useState(false);
-	const [isSaving, setIsSaving] = useState(false);
-	const [restoringId, setRestoringId] = useState<string | null>(null);
-	const [description, setDescription] = useState("");
+	const [activeTab, setActiveTab] = useState<"published" | "drafts">("drafts");
 
-	// Auto-fill description with the last AI prompt
-	useEffect(() => {
-		if (lastAiPrompt && !description) {
-			setDescription(lastAiPrompt);
-		}
-	}, [lastAiPrompt, description]);
+	// Modals & Triggers
+	const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+	const [selectedPreviewVersion, setSelectedPreviewVersion] =
+		useState<TemplateVersion | null>(null);
+
+	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+	const [versionToDelete, setVersionToDelete] = useState<{
+		id: string;
+		label: string;
+	} | null>(null);
+
+	const [restoringId, setRestoringId] = useState<string | null>(null);
+	const [deletingId, setDeletingId] = useState<string | null>(null);
 
 	const {
 		data: versions,
@@ -70,33 +164,6 @@ export function VersionSidebar() {
 		fetcher,
 	);
 
-	const handleSaveVersion = async () => {
-		if (!editor || !templateId || isSaving) return;
-		setIsSaving(true);
-
-		try {
-			const content = editor.getJSON().content ?? [];
-			await fetch(`/api/template/v1/${templateId}/versions`, {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					content,
-					description: description.trim() || undefined,
-				}),
-				credentials: "include",
-			});
-			await mutate();
-			setDescription("");
-			setLastAiPrompt("");
-			// Auto-expand to show the newly saved version
-			if (!isExpanded) setIsExpanded(true);
-		} catch (error) {
-			console.error("Failed to save version:", error);
-		} finally {
-			setIsSaving(false);
-		}
-	};
-
 	const handleRestore = async (version: TemplateVersion) => {
 		if (!editor) return;
 		setRestoringId(version.id);
@@ -106,56 +173,94 @@ export function VersionSidebar() {
 				type: "doc",
 				content: version.content as Record<string, unknown>[],
 			});
+			toast.success(
+				`Loaded ${version.name || `v${version.version}`} into editor`,
+			);
 		} catch (error) {
 			console.error("Failed to restore version:", error);
+			toast.error("Failed to load version.");
 		} finally {
-			// Brief delay so user sees the loading state
 			setTimeout(() => setRestoringId(null), 400);
 		}
+	};
+
+	const handleDeleteVersion = async (
+		versionId: string,
+		versionLabel: string,
+	) => {
+		if (!templateId) return;
+		setDeletingId(versionId);
+
+		try {
+			const response = await fetch(
+				`/api/template/v1/${templateId}/versions/${versionId}`,
+				{
+					method: "DELETE",
+					credentials: "include",
+				},
+			);
+
+			if (!response.ok) {
+				const errData = await response.json().catch(() => ({}));
+				throw new Error(errData.message || "Failed to delete.");
+			}
+
+			await mutate();
+			toast.success(`Deleted ${versionLabel}`);
+		} catch (error: any) {
+			console.error("Failed to delete version:", error);
+			toast.error(
+				error.message || "Cannot delete the active template version.",
+			);
+		} finally {
+			setDeletingId(null);
+		}
+	};
+
+	// Categorize versions
+	const published = versions?.filter((v) => v.isMajor) || [];
+	const drafts = versions?.filter((v) => !v.isMajor) || [];
+	const currentList = activeTab === "published" ? published : drafts;
+
+	// Build last saved status text
+	const getStatusText = () => {
+		if (lastSavedAt) {
+			const label = lastSavedDraftNumber
+				? `Draft ${lastSavedDraftNumber}`
+				: "Published";
+			return `Last saved: ${label}, ${formatRelativeTime(lastSavedAt.toISOString())}`;
+		}
+		return "No saves yet";
 	};
 
 	// --- Collapsed state: narrow icon strip ---
 	if (!isExpanded) {
 		return (
-			<div className="flex w-12 flex-col items-center gap-1 py-4">
+			<div className="flex w-12 flex-col items-center gap-1 border-stroke-soft-200 border-r py-4 dark:border-stroke-soft-100/40">
 				<Tooltip.Root>
 					<Tooltip.Trigger asChild>
-						<button
+						<Button.Root
 							type="button"
+							variant="neutral"
+							mode="ghost"
+							size="xxsmall"
 							onClick={() => setIsExpanded(true)}
-							className="flex size-8 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5"
+							className="size-8 rounded-lg text-text-sub-600 dark:hover:bg-white/5"
 						>
 							<Clock size={16} />
-						</button>
+						</Button.Root>
 					</Tooltip.Trigger>
 					<Tooltip.Content side="right" sideOffset={4}>
 						Version history
 					</Tooltip.Content>
 				</Tooltip.Root>
 
-				<Tooltip.Root>
-					<Tooltip.Trigger asChild>
-						<button
-							type="button"
-							onClick={handleSaveVersion}
-							disabled={isSaving}
-							className="flex size-8 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 disabled:opacity-50 dark:hover:bg-white/5"
-						>
-							{isSaving ? (
-								<Loader2 size={16} className="animate-spin" />
-							) : (
-								<Save size={16} />
-							)}
-						</button>
-					</Tooltip.Trigger>
-					<Tooltip.Content side="right" sideOffset={4}>
-						Save version
-					</Tooltip.Content>
-				</Tooltip.Root>
-
-				{versions && versions.length > 0 && (
-					<div className="mt-1 flex size-5 items-center justify-center rounded-full bg-bg-soft-200 font-medium text-[10px] text-text-sub-600 dark:bg-white/10">
-						{versions.length}
+				{(published.length > 0 || drafts.length > 0) && (
+					<div
+						className="mt-1 flex size-5 items-center justify-center rounded-full bg-bg-soft-200 font-medium text-[10px] text-text-sub-600 dark:bg-white/10"
+						title={`${published.length} Published, ${drafts.length} Drafts`}
+					>
+						{published.length + drafts.length}
 					</div>
 				)}
 			</div>
@@ -164,58 +269,62 @@ export function VersionSidebar() {
 
 	// --- Expanded state: full sidebar ---
 	return (
-		<div className="slide-in-from-left-2 flex w-64 animate-in flex-col border-stroke-soft-200 border-r duration-200 dark:border-stroke-soft-100/40">
+		<div className="slide-in-from-left-2 flex h-full w-72 animate-in flex-col overflow-hidden border-stroke-soft-200 border-r bg-bg-white-0 duration-200 dark:border-stroke-soft-100/40 dark:bg-zinc-950">
 			{/* Header */}
-			<div className="flex items-center justify-between border-stroke-soft-200 border-b px-3 py-3 dark:border-stroke-soft-100/40">
+			<div className="flex items-center justify-between border-stroke-soft-200 border-b px-4 py-3.5 dark:border-stroke-soft-100/40">
 				<div className="flex items-center gap-2">
-					<Clock size={14} className="text-text-sub-600" />
-					<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
-						Versions
+					<History size={16} className="text-text-sub-600 dark:text-zinc-400" />
+					<span className="font-bold text-sm text-text-strong-950 dark:text-white">
+						History
 					</span>
-					{versions && versions.length > 0 && (
-						<span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-bg-soft-200 px-1 font-medium text-[10px] text-text-sub-600 dark:bg-white/10">
-							{versions.length}
-						</span>
-					)}
 				</div>
-				<button
+				<Button.Root
 					type="button"
+					variant="neutral"
+					mode="ghost"
+					size="xxsmall"
 					onClick={() => setIsExpanded(false)}
-					className="flex size-6 items-center justify-center rounded-md text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5"
+					className="size-7 rounded-lg text-text-sub-600 dark:hover:bg-white/5"
 				>
-					<ChevronLeft size={14} />
-				</button>
+					<ChevronLeft size={16} />
+				</Button.Root>
 			</div>
 
-			{/* Save Section */}
-			<div className="border-stroke-soft-200 border-b p-3 dark:border-stroke-soft-100/40">
-				<input
-					type="text"
-					value={description}
-					onChange={(e) => setDescription(e.target.value)}
-					placeholder="Describe this version..."
-					onKeyDown={(e) => {
-						if (e.key === "Enter" && !e.shiftKey) {
-							e.preventDefault();
-							handleSaveVersion();
-						}
-					}}
-					className="mb-2 w-full rounded-lg border border-stroke-soft-200 bg-transparent px-2.5 py-1.5 text-text-strong-950 text-xs outline-none transition-colors placeholder:text-text-disabled-300 focus:border-brand-default dark:border-stroke-soft-100/30 dark:text-white dark:focus:border-brand-default"
-				/>
+			{/* Published / Drafts Tabs */}
+			<div className="flex shrink-0 border-stroke-soft-200 border-b bg-bg-weak-50 p-1 dark:border-stroke-soft-100/40 dark:bg-zinc-900/40">
 				<Button.Root
 					variant="neutral"
-					mode="stroke"
-					size="xsmall"
-					onClick={handleSaveVersion}
-					disabled={isSaving}
-					className="w-full gap-2"
-				>
-					{isSaving ? (
-						<Loader2 size={14} className="animate-spin" />
-					) : (
-						<Save size={14} />
+					mode={activeTab === "drafts" ? "lighter" : "ghost"}
+					size="xxsmall"
+					onClick={() => setActiveTab("drafts")}
+					className={cn(
+						"flex flex-1 items-center justify-center gap-1.5 rounded-lg py-1.5 font-semibold text-xs outline-none ring-0 transition-all",
+						activeTab === "drafts"
+							? "bg-white text-text-strong-950 shadow-sm dark:bg-zinc-800 dark:text-white"
+							: "text-text-sub-600 hover:text-text-strong-950 dark:text-zinc-400",
 					)}
-					{isSaving ? "Saving..." : "Save version"}
+				>
+					<span>Drafts</span>
+					<span className="rounded bg-bg-soft-200 px-1.5 py-0.5 font-bold text-[10px] dark:bg-zinc-900 dark:text-zinc-300">
+						{drafts.length}
+					</span>
+				</Button.Root>
+				<Button.Root
+					variant="neutral"
+					mode={activeTab === "published" ? "lighter" : "ghost"}
+					size="xxsmall"
+					onClick={() => setActiveTab("published")}
+					className={cn(
+						"flex flex-1 items-center justify-center gap-1.5 rounded-lg py-1.5 font-semibold text-xs outline-none ring-0 transition-all",
+						activeTab === "published"
+							? "bg-white text-text-strong-950 shadow-sm dark:bg-zinc-800 dark:text-white"
+							: "text-text-sub-600 hover:text-text-strong-950 dark:text-zinc-400",
+					)}
+				>
+					<span>Published</span>
+					<span className="rounded bg-bg-soft-200 px-1.5 py-0.5 font-bold text-[10px] dark:bg-zinc-900 dark:text-zinc-300">
+						{published.length}
+					</span>
 				</Button.Root>
 			</div>
 
@@ -228,83 +337,183 @@ export function VersionSidebar() {
 							className="animate-spin text-text-disabled-300"
 						/>
 					</div>
-				) : !versions || versions.length === 0 ? (
-					<div className="px-3 py-8 text-center">
-						<div className="mx-auto mb-3 flex size-10 items-center justify-center rounded-full bg-bg-soft-200 dark:bg-white/5">
-							<Clock size={18} className="text-text-disabled-300" />
+				) : currentList.length === 0 ? (
+					<div className="space-y-3 px-4 py-12 text-center">
+						<div className="mx-auto flex size-10 items-center justify-center rounded-full bg-bg-soft-200 dark:bg-zinc-900">
+							<Clock
+								size={18}
+								className="text-text-disabled-300 dark:text-zinc-500"
+							/>
 						</div>
-						<p className="font-medium text-text-sub-600 text-xs">
-							No versions yet
-						</p>
-						<p className="mt-1 text-[11px] text-text-disabled-300">
-							Save a version to create a snapshot
-						</p>
+						<div className="space-y-1">
+							<p className="font-semibold text-text-strong-950 text-xs dark:text-zinc-200">
+								No {activeTab === "published" ? "published versions" : "drafts"}{" "}
+								yet
+							</p>
+							<p className="mx-auto max-w-[180px] text-[11px] text-text-soft-400 leading-normal">
+								{activeTab === "published"
+									? 'Click "Publish" in the header to create your first published version.'
+									: 'Click "Save Draft" in the header to save your current progress.'}
+							</p>
+						</div>
 					</div>
 				) : (
-					<div className="py-1">
-						{versions.map((version, idx) => {
+					<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/20">
+						{currentList.map((version, index) => {
 							const isRestoring = restoringId === version.id;
-							const isLatest = idx === 0;
+							const isDeleting = deletingId === version.id;
+
+							// Compute display number from position (list is sorted newest-first)
+							const displayNumber = currentList.length - index;
+							const displayLabel = version.isMajor
+								? version.name || `v${displayNumber}`
+								: version.name || `Draft ${displayNumber}`;
 
 							return (
-								<button
-									type="button"
+								<div
 									key={version.id}
 									onClick={() => handleRestore(version)}
-									disabled={isRestoring}
-									className="group relative flex w-full cursor-pointer items-start gap-2 border-stroke-soft-200 border-b px-3 py-2.5 text-left transition-colors last:border-b-0 hover:bg-bg-weak-50 disabled:cursor-wait dark:border-stroke-soft-100/20 dark:hover:bg-white/[0.03]"
+									className="group relative flex w-full cursor-pointer flex-col border-stroke-soft-100 border-b px-4 py-3.5 transition-all hover:bg-bg-weak-50 dark:border-stroke-soft-100/10 dark:hover:bg-zinc-900/30"
 								>
-									<div className="min-w-0 flex-1">
+									{/* Top header: Version label & relative time */}
+									<div className="flex items-center justify-between">
 										<div className="flex items-center gap-1.5">
-											<span className="inline-flex h-[18px] items-center rounded bg-bg-soft-200 px-1.5 font-mono font-semibold text-[10px] text-text-sub-600 dark:bg-white/10">
-												v{version.version}
-											</span>
-											{isLatest && (
-												<span className="inline-flex h-[18px] items-center rounded bg-brand-default/10 px-1.5 font-medium text-[10px] text-brand-default">
-													latest
+											{version.isMajor ? (
+												<span className="flex items-center gap-1 rounded bg-emerald-50 px-2 py-0.5 font-bold font-mono text-[10px] text-emerald-600 leading-none dark:bg-emerald-950/30 dark:text-emerald-400">
+													<CheckCircle2 size={10} />
+													{displayLabel}
+												</span>
+											) : (
+												<span className="rounded bg-bg-soft-200 px-2 py-0.5 font-bold font-mono text-[10px] text-text-sub-600 leading-none dark:bg-zinc-800 dark:text-zinc-400">
+													{displayLabel}
 												</span>
 											)}
 										</div>
-										{version.description && (
-											<Tooltip.Root delayDuration={300}>
-												<Tooltip.Trigger asChild>
-													<p className="mt-1 truncate text-text-sub-600 text-xs dark:text-white/60">
-														{version.description}
-													</p>
-												</Tooltip.Trigger>
-												<Tooltip.Content
-													side="right"
-													variant="light"
-													className="max-w-[280px] break-words text-xs"
-												>
-													{version.description}
-												</Tooltip.Content>
-											</Tooltip.Root>
-										)}
-										<p
-											className={cn(
-												"text-[11px] text-text-disabled-300",
-												version.description ? "mt-0.5" : "mt-1",
-											)}
-										>
+										<span className="font-medium text-[10px] text-text-soft-400 dark:text-zinc-500">
 											{formatRelativeTime(version.createdAt)}
-										</p>
+										</span>
 									</div>
 
-									{/* Restore indicator */}
-									<div className="flex size-6 shrink-0 items-center justify-center rounded-md text-text-sub-600 opacity-0 transition-all group-hover:opacity-100">
-										{isRestoring ? (
-											<Loader2 size={12} className="animate-spin" />
-										) : (
-											<RotateCcw size={12} />
-										)}
+									{/* Description log */}
+									{version.description && (
+										<p className="mt-1.5 line-clamp-2 text-text-sub-600 text-xs leading-relaxed dark:text-zinc-400">
+											{version.description}
+										</p>
+									)}
+
+									{/* Author avatar & Quick actions strip */}
+									<div className="mt-3 flex items-center justify-between">
+										{/* Author metadata */}
+										<div className="flex items-center gap-1.5">
+											<Avatar.Root size="20" color="gray">
+												{version.createdBy?.image ? (
+													<Avatar.Image
+														src={version.createdBy.image}
+														alt={version.createdBy.name}
+													/>
+												) : (
+													<span className="font-bold text-[9px] text-text-strong-950 dark:text-zinc-300">
+														{version.createdBy?.name?.charAt(0) || "U"}
+													</span>
+												)}
+											</Avatar.Root>
+											<span className="max-w-[90px] truncate font-medium text-[10px] text-text-soft-400 dark:text-zinc-400">
+												{version.createdBy?.name || "Developer"}
+											</span>
+										</div>
+
+										{/* Interactive Actions (shown on hover/focus) */}
+										<div className="flex items-center gap-1.5 transition-all duration-200 md:opacity-0 md:group-hover:opacity-100">
+											{/* Preview action */}
+											<Tooltip.Root>
+												<Tooltip.Trigger asChild>
+													<Button.Root
+														variant="neutral"
+														mode="ghost"
+														size="xxsmall"
+														onClick={(e) => {
+															e.stopPropagation();
+															setSelectedPreviewVersion(version);
+															setIsPreviewOpen(true);
+														}}
+														className="size-6 rounded p-1 text-text-sub-600 ring-0 transition-colors hover:bg-bg-soft-200 dark:text-zinc-400 dark:hover:bg-zinc-800"
+													>
+														<Eye size={13} />
+													</Button.Root>
+												</Tooltip.Trigger>
+												<Tooltip.Content side="top">Preview</Tooltip.Content>
+											</Tooltip.Root>
+
+											{/* Delete action */}
+											<Tooltip.Root>
+												<Tooltip.Trigger asChild>
+													<Button.Root
+														variant="neutral"
+														mode="ghost"
+														size="xxsmall"
+														onClick={(e) => {
+															e.stopPropagation();
+															setVersionToDelete({
+																id: version.id,
+																label: displayLabel,
+															});
+															setIsDeleteModalOpen(true);
+														}}
+														disabled={isDeleting}
+														className="size-6 rounded p-1 text-text-sub-600 ring-0 transition-colors hover:bg-rose-50 hover:text-rose-600 disabled:opacity-50 dark:text-zinc-400 dark:hover:bg-rose-950/40"
+													>
+														{isDeleting ? (
+															<Loader2 size={13} className="animate-spin" />
+														) : (
+															<Trash2 size={13} />
+														)}
+													</Button.Root>
+												</Tooltip.Trigger>
+												<Tooltip.Content side="top">Delete</Tooltip.Content>
+											</Tooltip.Root>
+										</div>
 									</div>
-								</button>
+								</div>
 							);
 						})}
 					</div>
 				)}
 			</div>
+
+			{/* Bottom status indicator */}
+			<div className="flex shrink-0 items-center gap-1.5 border-stroke-soft-100 border-t bg-bg-weak-50 px-4 py-2 font-medium text-[9px] text-text-soft-400 dark:border-stroke-soft-100/10 dark:bg-zinc-900/10">
+				<Clock size={10} className="text-text-disabled-300" />
+				<span>{getStatusText()}</span>
+			</div>
+
+			{isPreviewOpen && selectedPreviewVersion && (
+				<PreviewModal
+					isOpen={isPreviewOpen}
+					onClose={() => {
+						setIsPreviewOpen(false);
+						setSelectedPreviewVersion(null);
+					}}
+					version={selectedPreviewVersion}
+					currentHtml={editor?.getHTML() || ""}
+					currentSubject={subject || ""}
+					onRestore={handleRestore}
+					isRestoring={restoringId !== null}
+				/>
+			)}
+
+			<DeleteVersionModal
+				isOpen={isDeleteModalOpen}
+				onClose={() => {
+					setIsDeleteModalOpen(false);
+					setVersionToDelete(null);
+				}}
+				onConfirm={() => {
+					if (versionToDelete) {
+						handleDeleteVersion(versionToDelete.id, versionToDelete.label);
+					}
+				}}
+				versionLabel={versionToDelete?.label || "Version"}
+			/>
 		</div>
 	);
 }

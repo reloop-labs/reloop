@@ -16,6 +16,8 @@ const CORNERS = [
 	{ key: "bottomLeft", label: "BL" },
 ] as const;
 
+import * as Button from "@reloop/ui/button";
+
 export function BorderRadiusControl({
 	value,
 	onChange,
@@ -53,11 +55,14 @@ export function BorderRadiusControl({
 					<span className="text-(--re-text-muted) text-[10px]">{label}</span>
 				</span>
 			))}
-			<button
+			<Button.Root
 				type="button"
+				variant="neutral"
+				mode={linked ? "lighter" : "ghost"}
+				size="xxsmall"
 				title={linked ? "Unlink corners" : "Link all corners"}
 				onClick={() => setLinked((v) => !v)}
-				className={`ml-0.5 rounded border p-0.5 transition-colors ${
+				className={`ml-0.5 rounded border p-0.5 outline-none ring-0 transition-colors ${
 					linked
 						? "border-(--re-text) bg-(--re-text) text-(--re-bg)"
 						: "border-(--re-border) bg-transparent text-(--re-text-muted)"
@@ -76,7 +81,7 @@ export function BorderRadiusControl({
 				>
 					<rect x="3" y="3" width="18" height="18" rx="4" ry="4" />
 				</svg>
-			</button>
+			</Button.Root>
 		</div>
 	);
 }

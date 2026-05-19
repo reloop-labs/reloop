@@ -1,5 +1,6 @@
 "use client";
 
+import * as Button from "@reloop/ui/button";
 import * as Input from "@reloop/ui/input";
 import {
 	Grid2X2,
@@ -32,30 +33,36 @@ function ModeToggle({
 }) {
 	return (
 		<div className="flex items-center gap-0.5 rounded-xl border border-stroke-sub-300 bg-bg-white-0 p-0.5">
-			<button
+			<Button.Root
 				type="button"
+				variant="neutral"
+				mode={linked ? "lighter" : "ghost"}
+				size="xxsmall"
 				title="Uniform padding"
 				onClick={() => onToggle(true)}
-				className={`flex h-7 w-7 items-center justify-center rounded-lg transition-all duration-150 ${
+				className={`flex h-7 w-7 items-center justify-center rounded-lg outline-none ring-0 transition-all duration-150 ${
 					linked
 						? "bg-bg-soft-200 text-text-strong-950 shadow-xs"
 						: "text-text-soft-400 hover:text-text-sub-600"
 				}`}
 			>
 				<Square className="h-3.5 w-3.5" />
-			</button>
-			<button
+			</Button.Root>
+			<Button.Root
 				type="button"
+				variant="neutral"
+				mode={!linked ? "lighter" : "ghost"}
+				size="xxsmall"
 				title="Individual sides"
 				onClick={() => onToggle(false)}
-				className={`flex h-7 w-7 items-center justify-center rounded-lg transition-all duration-150 ${
+				className={`flex h-7 w-7 items-center justify-center rounded-lg outline-none ring-0 transition-all duration-150 ${
 					!linked
 						? "bg-bg-soft-200 text-text-strong-950 shadow-xs"
 						: "text-text-soft-400 hover:text-text-sub-600"
 				}`}
 			>
 				<Grid2X2 className="h-3.5 w-3.5" />
-			</button>
+			</Button.Root>
 		</div>
 	);
 }

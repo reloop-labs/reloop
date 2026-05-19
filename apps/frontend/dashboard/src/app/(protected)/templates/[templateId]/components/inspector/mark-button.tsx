@@ -1,3 +1,4 @@
+import * as Button from "@reloop/ui/button";
 import type { LucideIcon } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
@@ -15,19 +16,20 @@ export function MarkButton({
 	onClick: () => void;
 }) {
 	return (
-		<button
+		<Button.Root
 			type="button"
 			onClick={onClick}
 			title={label}
 			aria-label={label}
 			aria-pressed={active}
-			className={`flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border transition-all duration-150 ${
-				active
-					? "border-stroke-soft-200 bg-bg-strong-950 text-white"
-					: "border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 hover:bg-bg-weak-50 hover:text-text-strong-950"
-			}`}
+			variant="neutral"
+			mode={active ? "filled" : "stroke"}
+			size="xxsmall"
+			className="h-8 w-8 rounded-lg"
 		>
-			<Icon className="h-3.5 w-3.5" strokeWidth={2.5} />
-		</button>
+			<Button.Icon asChild className="h-3.5 w-3.5">
+				<Icon strokeWidth={2.5} />
+			</Button.Icon>
+		</Button.Root>
 	);
 }
