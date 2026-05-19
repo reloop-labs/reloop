@@ -56,49 +56,96 @@ export async function listContactsController({
 				? sql<number>`count(*) filter (where ${and(...matchFilters)})`
 				: sql<number>`count(*)`;
 
-		const [counts] = await db
-			.select({
-				totalMatching: totalMatchingSql,
-				totalContacts: sql<number>`count(*)`,
-				subscribed: sql<number>`count(*) filter (where ${schema.contact.status} = 'subscribed')`,
-				unsubscribed: sql<number>`count(*) filter (where ${schema.contact.status} = 'unsubscribed')`,
-			})
-			.from(schema.contact)
-			.where(
-				and(
-					eq(schema.contact.organizationId, organizationId),
-					isNull(schema.contact.deletedAt),
+		// Run the counts aggregation and the paginated contacts fetch in parallel —
+		// they are completely independent of each other.
+		const [countsResult, contacts] = await Promise.all([
+			db
+				.select({
+					totalMatching: totalMatchingSql,
+					totalContacts: sql<number>`count(*)`,
+					subscribed: sql<number>`count(*) filter (where ${schema.contact.status} = 'subscribed')`,
+					unsubscribed: sql<number>`count(*) filter (where ${schema.contact.status} = 'unsubscribed')`,
+				})
+				.from(schema.contact)
+				.where(
+					and(
+						eq(schema.contact.organizationId, organizationId),
+						isNull(schema.contact.deletedAt),
+					),
 				),
-			);
+			db.query.contact.findMany({
+				where: and(...whereConditions),
+				orderBy: desc(schema.contact.createdAt),
+				limit,
+				offset,
+			}),
+		]);
 
+		const counts = countsResult[0];
 		const total = Number(counts?.totalMatching || 0);
 		const totalContacts = Number(counts?.totalContacts || 0);
 		const subscribedContacts = Number(counts?.subscribed || 0);
 		const unsubscribedContacts = Number(counts?.unsubscribed || 0);
 
-		const contacts = await db.query.contact.findMany({
-			where: and(...whereConditions),
-			orderBy: desc(schema.contact.createdAt),
-			limit,
-			offset,
-		});
 		const contactIds = contacts.map((c) => c.id);
 
-		// Batch load properties
+		// Batch-load all related data in parallel; skip entirely when the page is empty.
 		let propertyMap: Record<string, Record<string, string>> = {};
+		let allOrgChannels: {
+			id: string;
+			name: string;
+			defaultSubscription: string;
+		}[] = [];
+		let enrollmentMap: Record<
+			string,
+			Record<string, "enrolled" | "unenrolled">
+		> = {};
+
 		if (contactIds.length > 0) {
-			const allProperties = await db
-				.select({
-					contactId: schema.contactPropertyValue.contactId,
-					name: schema.contactProperty.propertyName,
-					value: schema.contactPropertyValue.value,
-				})
-				.from(schema.contactPropertyValue)
-				.innerJoin(
-					schema.contactProperty,
-					eq(schema.contactPropertyValue.propertyId, schema.contactProperty.id),
-				)
-				.where(inArray(schema.contactPropertyValue.contactId, contactIds));
+			const [allProperties, channelRows, allEnrollments] = await Promise.all([
+				// Batch load all property values for this page of contacts
+				db
+					.select({
+						contactId: schema.contactPropertyValue.contactId,
+						name: schema.contactProperty.propertyName,
+						value: schema.contactPropertyValue.value,
+					})
+					.from(schema.contactPropertyValue)
+					.innerJoin(
+						schema.contactProperty,
+						eq(
+							schema.contactPropertyValue.propertyId,
+							schema.contactProperty.id,
+						),
+					)
+					.where(inArray(schema.contactPropertyValue.contactId, contactIds)),
+
+				// Lean select — only the three columns actually used in the response mapping
+				db
+					.select({
+						id: schema.channel.id,
+						name: schema.channel.name,
+						defaultSubscription: schema.channel.defaultSubscription,
+					})
+					.from(schema.channel)
+					.where(
+						and(
+							eq(schema.channel.organizationId, organizationId),
+							isNull(schema.channel.deletedAt),
+						),
+					),
+
+				// Batch load all channel enrollments for this page of contacts
+				db.query.channelSubscription.findMany({
+					where: and(
+						inArray(schema.channelSubscription.contactId, contactIds),
+						isNull(schema.channelSubscription.deletedAt),
+					),
+				}),
+			]);
+
+			allOrgChannels = channelRows;
+
 			propertyMap = allProperties.reduce(
 				(acc, curr) => {
 					const contactId = curr.contactId;
@@ -113,27 +160,6 @@ export async function listContactsController({
 				},
 				{} as Record<string, Record<string, string>>,
 			);
-		}
-
-		// Batch load channels and enrollments for all contacts in the list
-		const allOrgChannels = await db.query.channel.findMany({
-			where: and(
-				eq(schema.channel.organizationId, organizationId),
-				isNull(schema.channel.deletedAt),
-			),
-		});
-
-		let enrollmentMap: Record<
-			string,
-			Record<string, "enrolled" | "unenrolled">
-		> = {};
-		if (contactIds.length > 0) {
-			const allEnrollments = await db.query.channelSubscription.findMany({
-				where: and(
-					inArray(schema.channelSubscription.contactId, contactIds),
-					isNull(schema.channelSubscription.deletedAt),
-				),
-			});
 
 			enrollmentMap = allEnrollments.reduce(
 				(acc, curr) => {

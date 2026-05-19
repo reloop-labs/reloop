@@ -17,39 +17,30 @@ export async function deleteContactController({
 	log.info("Deleting contact", { contactId });
 
 	try {
-		// Check if contact exists
-		const existingContact = await db.query.contact.findFirst({
-			where: and(
-				eq(schema.contact.id, contactId),
-				eq(schema.contact.organizationId, organizationId),
-			),
-		});
-
-		if (!existingContact) {
-			log.warn("Contact not found", { contactId, organizationId });
-			throw ContactErrors.contactNotFound(contactId);
-		}
-
-		// Delete the contact (hard delete)
-		await db
+		// Use DELETE...RETURNING to check existence and delete in a single round-trip.
+		const [deleted] = await db
 			.delete(schema.contact)
 			.where(
 				and(
 					eq(schema.contact.id, contactId),
 					eq(schema.contact.organizationId, organizationId),
 				),
-			);
+			)
+			.returning({ id: schema.contact.id });
+
+		if (!deleted) {
+			log.warn("Contact not found", { contactId, organizationId });
+			throw ContactErrors.contactNotFound(contactId);
+		}
 
 		log.info("Contact deleted successfully", { contactId });
 
-		const result = {
+		return {
 			success: true,
 			object: "contact" as const,
-			id: existingContact.id,
+			id: deleted.id,
 			event: CONTACT_DELETE_WEBHOOK_EVENT.id,
 		};
-
-		return result;
 	} catch (error) {
 		log.error("Error deleting contact", {
 			contactId,

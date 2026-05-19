@@ -29,7 +29,7 @@ export async function upsertContactProperties({
 	const log = useLogger();
 	const propertyNames = Object.keys(properties);
 
-	// Validate property names
+	// Validate all property names up-front before touching the DB.
 	const propertyNameRegex = /^[a-z0-9_]+$/;
 	for (const name of propertyNames) {
 		if (!propertyNameRegex.test(name)) {
@@ -48,26 +48,54 @@ export async function upsertContactProperties({
 	});
 
 	try {
-		// 1. Fetch all existing active property values for this contact
-		const currentValues = await db
-			.select({
-				id: schema.contactPropertyValue.id,
-				propertyName: schema.contactProperty.propertyName,
-			})
-			.from(schema.contactPropertyValue)
-			.innerJoin(
-				schema.contactProperty,
-				eq(schema.contactPropertyValue.propertyId, schema.contactProperty.id),
-			)
-			.where(
-				and(
-					eq(schema.contactPropertyValue.contactId, contactId),
-					eq(schema.contactPropertyValue.organizationId, organizationId),
-					isNull(schema.contactPropertyValue.deletedAt),
+		// ── Step A: Load current values & property definitions in parallel ──────────
+		const [currentValues, existingProperties] = await Promise.all([
+			// All active property values currently stored for this contact
+			db
+				.select({
+					id: schema.contactPropertyValue.id,
+					propertyName: schema.contactProperty.propertyName,
+					propertyId: schema.contactPropertyValue.propertyId,
+				})
+				.from(schema.contactPropertyValue)
+				.innerJoin(
+					schema.contactProperty,
+					eq(schema.contactPropertyValue.propertyId, schema.contactProperty.id),
+				)
+				.where(
+					and(
+						eq(schema.contactPropertyValue.contactId, contactId),
+						eq(schema.contactPropertyValue.organizationId, organizationId),
+						isNull(schema.contactPropertyValue.deletedAt),
+					),
 				),
-			);
 
-		// 2. Identify properties to delete (in DB but NOT in request)
+			// Property definitions for the names present in the request
+			propertyNames.length > 0
+				? db
+						.select({
+							id: schema.contactProperty.id,
+							propertyName: schema.contactProperty.propertyName,
+							propertyType: schema.contactProperty.propertyType,
+						})
+						.from(schema.contactProperty)
+						.where(
+							and(
+								inArray(schema.contactProperty.propertyName, propertyNames),
+								eq(schema.contactProperty.organizationId, organizationId),
+								isNull(schema.contactProperty.deletedAt),
+							),
+						)
+				: Promise.resolve(
+						[] as {
+							id: string;
+							propertyName: string;
+							propertyType: string;
+						}[],
+					),
+		]);
+
+		// ── Step B: Soft-delete values that are NOT in the incoming request ────────
 		const propertiesToDelete = currentValues.filter(
 			(cv) => !propertyNames.includes(cv.propertyName),
 		);
@@ -89,22 +117,7 @@ export async function upsertContactProperties({
 
 		if (propertyNames.length === 0) return;
 
-		// 3. Process incoming properties (update or insert)
-		const existingProperties = await db
-			.select({
-				id: schema.contactProperty.id,
-				propertyName: schema.contactProperty.propertyName,
-				propertyType: schema.contactProperty.propertyType,
-			})
-			.from(schema.contactProperty)
-			.where(
-				and(
-					inArray(schema.contactProperty.propertyName, propertyNames),
-					eq(schema.contactProperty.organizationId, organizationId),
-					isNull(schema.contactProperty.deletedAt),
-				),
-			);
-
+		// ── Step C: Build lookup maps from the batch-loaded data ──────────────────
 		const propertyInfo = new Map<
 			string,
 			{ id: string; type: "string" | "number" }
@@ -115,15 +128,19 @@ export async function upsertContactProperties({
 			]),
 		);
 
-		for (const [name, value] of Object.entries(properties)) {
-			let info = propertyInfo.get(name);
-			const incomingType = typeof value === "number" ? "number" : "string";
+		// currentValues indexed by propertyId for O(1) lookup during the upsert loop
+		const existingValueByPropertyId = new Map(
+			currentValues.map((cv) => [cv.propertyId, cv]),
+		);
 
-			if (!info) {
-				log.info("Creating new property definition", {
-					name,
-					incomingType,
-				});
+		// ── Step D: Resolve missing property definitions (auto-create) ────────────
+		// Any property that doesn't exist yet must be created individually (sequential
+		// is fine here — these are rare one-time registrations, not hot-path queries).
+		for (const name of propertyNames) {
+			if (!propertyInfo.has(name)) {
+				const incomingType =
+					typeof properties[name] === "number" ? "number" : "string";
+				log.info("Creating new property definition", { name, incomingType });
 				const [newProp] = await db
 					.insert(schema.contactProperty)
 					.values({
@@ -137,73 +154,79 @@ export async function upsertContactProperties({
 					.returning();
 
 				if (newProp) {
-					info = {
+					propertyInfo.set(name, {
 						id: newProp.id,
 						type: newProp.propertyType as "string" | "number",
-					};
-					propertyInfo.set(name, info);
-				}
-			}
-
-			if (info) {
-				// Validate type compatibility
-				if (incomingType !== info.type) {
-					log.warn("Property type mismatch", {
-						name,
-						expected: info.type,
-						received: incomingType,
-					});
-					throw PropertyErrors.typeMismatch(name, info.type, incomingType);
-				}
-
-				const pid = info.id;
-				let stringValue = String(value);
-
-				if (info.type === "number") {
-					const numVal = Number(value);
-					if (Number.isNaN(numVal) || !Number.isFinite(numVal)) {
-						log.warn("Invalid numeric value", { name, value });
-						throw PropertyErrors.typeMismatch(name, "number", typeof value);
-					}
-					stringValue = String(numVal);
-				} else {
-					// Sanitize string type to prevent stored XSS
-					stringValue = sanitizeText(stringValue);
-				}
-
-				// Find existing value record (even if soft-deleted) to update/restore it
-				const existingValue = await db.query.contactPropertyValue.findFirst({
-					where: and(
-						eq(schema.contactPropertyValue.contactId, contactId),
-						eq(schema.contactPropertyValue.propertyId, pid),
-						eq(schema.contactPropertyValue.organizationId, organizationId),
-					),
-				});
-
-				if (existingValue) {
-					log.info("Updating existing property value", { name, id: pid });
-					await db
-						.update(schema.contactPropertyValue)
-						.set({
-							value: stringValue,
-							updatedAt: new Date(),
-							deletedAt: null, // Restore if it was soft-deleted
-						})
-						.where(eq(schema.contactPropertyValue.id, existingValue.id));
-				} else {
-					log.info("Inserting new property value", { name, id: pid });
-					await db.insert(schema.contactPropertyValue).values({
-						contactId,
-						propertyId: pid,
-						value: stringValue,
-						organizationId,
-						userId,
-						createdAt: new Date(),
-						updatedAt: new Date(),
 					});
 				}
 			}
 		}
+
+		// ── Step E: Build insert / update lists and execute them in parallel ──────
+		const now = new Date();
+		const toInsert: (typeof schema.contactPropertyValue.$inferInsert)[] = [];
+		const updateOps: Promise<unknown>[] = [];
+
+		for (const [name, value] of Object.entries(properties)) {
+			const info = propertyInfo.get(name);
+			if (!info) continue; // should never happen after Step D
+
+			const incomingType = typeof value === "number" ? "number" : "string";
+
+			// Type-safety check
+			if (incomingType !== info.type) {
+				log.warn("Property type mismatch", {
+					name,
+					expected: info.type,
+					received: incomingType,
+				});
+				throw PropertyErrors.typeMismatch(name, info.type, incomingType);
+			}
+
+			// Coerce & sanitize value
+			let stringValue = String(value);
+			if (info.type === "number") {
+				const numVal = Number(value);
+				if (Number.isNaN(numVal) || !Number.isFinite(numVal)) {
+					log.warn("Invalid numeric value", { name, value });
+					throw PropertyErrors.typeMismatch(name, "number", typeof value);
+				}
+				stringValue = String(numVal);
+			} else {
+				stringValue = sanitizeText(stringValue);
+			}
+
+			const existingValue = existingValueByPropertyId.get(info.id);
+
+			if (existingValue) {
+				// Update (and restore if soft-deleted) — fire in parallel
+				updateOps.push(
+					db
+						.update(schema.contactPropertyValue)
+						.set({ value: stringValue, updatedAt: now, deletedAt: null })
+						.where(eq(schema.contactPropertyValue.id, existingValue.id)),
+				);
+			} else {
+				// Collect for batch insert
+				toInsert.push({
+					contactId,
+					propertyId: info.id,
+					value: stringValue,
+					organizationId,
+					userId,
+					createdAt: now,
+					updatedAt: now,
+				});
+			}
+		}
+
+		// Execute updates (parallel) and single batch insert concurrently
+		await Promise.all([
+			...updateOps,
+			toInsert.length > 0
+				? db.insert(schema.contactPropertyValue).values(toInsert)
+				: Promise.resolve(),
+		]);
 	} catch (error) {
 		log.error("Error upserting contact properties", {
 			contactId,

@@ -17,27 +17,37 @@ export async function getContactController({
 	log.info("Getting contact", { contactId, organizationId });
 
 	try {
-		const contact = await db.query.contact.findFirst({
-			where: and(
-				eq(schema.contact.id, contactId),
-				eq(schema.contact.organizationId, organizationId),
-				isNull(schema.contact.deletedAt),
-			),
-			with: {
-				propertyValues: {
-					with: { property: true },
-					where: isNull(schema.contactPropertyValue.deletedAt),
+		// Fetch the contact (with its relations) and the full channel list in parallel —
+		// allChannels only needs organizationId, so it doesn't depend on the contact result.
+		const [contact, allChannels] = await Promise.all([
+			db.query.contact.findFirst({
+				where: and(
+					eq(schema.contact.id, contactId),
+					eq(schema.contact.organizationId, organizationId),
+					isNull(schema.contact.deletedAt),
+				),
+				with: {
+					propertyValues: {
+						with: { property: true },
+						where: isNull(schema.contactPropertyValue.deletedAt),
+					},
+					contactGroups: {
+						with: { group: true },
+						where: isNull(schema.contactGroup.deletedAt),
+					},
+					contactChannels: {
+						with: { channel: true },
+						where: isNull(schema.channelSubscription.deletedAt),
+					},
 				},
-				contactGroups: {
-					with: { group: true },
-					where: isNull(schema.contactGroup.deletedAt),
-				},
-				contactChannels: {
-					with: { channel: true },
-					where: isNull(schema.channelSubscription.deletedAt),
-				},
-			},
-		});
+			}),
+			db.query.channel.findMany({
+				where: and(
+					eq(schema.channel.organizationId, organizationId),
+					isNull(schema.channel.deletedAt),
+				),
+			}),
+		]);
 
 		if (!contact) {
 			log.warn("Contact not found", { contactId, organizationId });
@@ -58,35 +68,24 @@ export async function getContactController({
 			.filter((cg) => cg.group !== null)
 			.map((cg) => ({ id: cg.group.id, name: cg.group.name }));
 
-		// Get all organization channels to merge with explicit enrollments
-		const allChannels = await db.query.channel.findMany({
-			where: and(
-				eq(schema.channel.organizationId, organizationId),
-				isNull(schema.channel.deletedAt),
-			),
-		});
+		// Build an O(1) lookup map from the contact's explicit enrollments.
+		const enrollmentByChannelId = new Map(
+			contact.contactChannels
+				.filter((en) => en.deletedAt === null)
+				.map((en) => [en.channelId, en.status]),
+		);
 
-		// Map enrollments to { id, name, subscription }
+		// Map enrollments to { id, name, subscription } — O(1) per channel lookup.
 		const channels = allChannels.map((t) => {
-			const explicitEnrollment = contact.contactChannels.find(
-				(en) => en.channelId === t.id && en.deletedAt === null,
-			);
-
-			if (explicitEnrollment) {
-				return {
-					id: t.id,
-					name: t.name,
-					subscription: (explicitEnrollment.status === "enrolled"
-						? "opt_in"
-						: "opt_out") as "opt_in" | "opt_out",
-				};
-			}
-
-			// Fallback to channel default if no explicit enrollment exists
+			const explicitStatus = enrollmentByChannelId.get(t.id);
 			return {
 				id: t.id,
 				name: t.name,
-				subscription: t.defaultSubscription as "opt_in" | "opt_out",
+				subscription: (explicitStatus !== undefined
+					? explicitStatus === "enrolled"
+						? "opt_in"
+						: "opt_out"
+					: t.defaultSubscription) as "opt_in" | "opt_out",
 			};
 		});
 
