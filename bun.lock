@@ -172,6 +172,7 @@
       "name": "domain",
       "version": "1.2.0",
       "dependencies": {
+        "@elysia/opentelemetry": "catalog:backend",
         "@elysiajs/cors": "catalog:backend",
         "@elysiajs/cron": "catalog:backend",
         "@elysiajs/eden": "catalog:backend",
