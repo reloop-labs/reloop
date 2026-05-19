@@ -23,7 +23,11 @@ export async function listContactsController({
 	query: ContactTypes.ContactListQuery;
 }): Promise<ContactTypes.ContactListResponse> {
 	const logger = useLogger();
-	logger?.info("Listing contacts", { ...query, status: undefined, currentStatus: query.status });
+	logger?.info("Listing contacts", {
+		...query,
+		status: undefined,
+		currentStatus: query.status,
+	});
 	try {
 		const page = query.page || 1;
 		const limit = Math.min(query.limit || 100, 100);

@@ -1,6 +1,5 @@
 import { upsertContactProperties } from "@be/contacts/routes/contact/utils/upsert-contact-properties";
 import type { ContactTypes } from "@be/contacts/types/contact.type";
-import { createLog } from "@be/contacts/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { CONTACT_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -12,26 +11,17 @@ import { useLogger } from "evlog/elysia";
 export async function updateContactController({
 	contactId,
 	organizationId,
-	body,
-	cookie,
-	requestDetails,
+	email,
+	firstName,
+	lastName,
+	status: contactStatus,
+	properties,
 }: {
 	contactId: string;
 	organizationId: string;
-	body: ContactTypes.UpdateContactRequest;
-	cookie?: string;
-	requestDetails?: {
-		endpoint?: string;
-		method?: string;
-		userAgent?: string;
-		ipAddress?: string;
-		statusCode?: number;
-	};
-}): Promise<ContactTypes.ContactResponse> {
+} & ContactTypes.UpdateContactRequest): Promise<ContactTypes.ContactResponse> {
 	const logger = useLogger();
-	logger?.info("Updating contact", { contactId,
-			organizationId,
-			body, });
+	logger?.info("Updating contact", { contactId, organizationId });
 
 	try {
 		return await db.transaction(async (tx) => {
@@ -54,17 +44,17 @@ export async function updateContactController({
 				updatedAt: new Date(),
 			};
 
-			if (body.email !== undefined) {
-				updateData.email = body.email;
+			if (email !== undefined) {
+				updateData.email = email;
 			}
-			if (body.firstName !== undefined) {
-				updateData.firstName = body.firstName;
+			if (firstName !== undefined) {
+				updateData.firstName = firstName;
 			}
-			if (body.lastName !== undefined) {
-				updateData.lastName = body.lastName;
+			if (lastName !== undefined) {
+				updateData.lastName = lastName;
 			}
-			if (body.status !== undefined) {
-				updateData.status = body.status;
+			if (contactStatus !== undefined) {
+				updateData.status = contactStatus;
 			}
 
 			const [updatedContact] = await tx
@@ -79,23 +69,27 @@ export async function updateContactController({
 				.returning();
 
 			if (!updatedContact) {
-				logger?.error("Failed to update contact - no data returned", { contactId });
+				logger?.error("Failed to update contact - no data returned", {
+					contactId,
+				});
 				throw status(500, { message: "Failed to update contact" });
 			}
 
 			// Handle property values if provided
-			if (body.properties !== undefined) {
+			if (properties !== undefined) {
 				await upsertContactProperties({
 					contactId,
 					organizationId,
 					userId: existingContact.userId,
-					properties: body.properties,
+					properties: properties,
 					db: tx,
 				});
 			}
 
-			logger?.info("Contact updated successfully", { contactId,
-					organizationId, });
+			logger?.info("Contact updated successfully", {
+				contactId,
+				organizationId,
+			});
 
 			// Fetch current properties after update to return them in response
 			const updatedProperties = await tx
@@ -143,13 +137,6 @@ export async function updateContactController({
 				updatedAt: updatedContact.updatedAt,
 				event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
 			};
-
-			await createLog({
-				event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
-				cookie,
-				metadata: finalContact,
-				requestDetails: { ...(requestDetails || {}), statusCode: 200 },
-			});
 
 			return finalContact;
 		});

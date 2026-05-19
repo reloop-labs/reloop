@@ -1,5 +1,4 @@
 import type { ContactModel } from "@be/contacts/model/contact.model";
-import { createLog } from "@be/contacts/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { CONTACT_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -25,24 +24,14 @@ export interface AddContactToChannelResult {
 export async function addContactToChannelController({
 	organizationId,
 	channelId,
-	body,
-	cookie,
-	requestDetails,
+	subscription,
+	contact_id,
+	email,
 }: {
 	organizationId: string;
 	channelId: string;
-	body: ContactModel.AddContactToChannelBody;
-	cookie?: string;
-	requestDetails?: {
-		endpoint?: string;
-		method?: string;
-		userAgent?: string;
-		ipAddress?: string;
-		statusCode?: number;
-	};
-}): Promise<AddContactToChannelResult> {
+} & ContactModel.AddContactToChannelBody): Promise<AddContactToChannelResult> {
 	const logger = useLogger();
-	const { contact_id, email } = body;
 
 	if (!contact_id && !email) {
 		throw status(400, {
@@ -91,7 +80,10 @@ export async function addContactToChannelController({
 			throw status(404, { message: "Contact not found" });
 		}
 
-		logger?.info("Checking if contact is already subscribed to channel", { contactId: contact.id, channelId });
+		logger?.info("Checking if contact is already subscribed to channel", {
+			contactId: contact.id,
+			channelId,
+		});
 		const existingSubscription = await db.query.channelSubscription.findFirst({
 			where: and(
 				eq(schema.channelSubscription.contactId, contact.id),
@@ -101,7 +93,7 @@ export async function addContactToChannelController({
 		});
 
 		const targetStatus = (
-			body.subscription === "opt_out" ? "unenrolled" : "enrolled"
+			subscription === "opt_out" ? "unenrolled" : "enrolled"
 		) as "enrolled" | "unenrolled";
 
 		if (existingSubscription) {
@@ -112,20 +104,16 @@ export async function addContactToChannelController({
 					.set({ status: targetStatus, updatedAt: new Date() })
 					.where(eq(schema.channelSubscription.id, existingSubscription.id));
 
-				logger?.info("Updated contact subscription status", { subscriptionId: existingSubscription.id, currentStatus: targetStatus });
+				logger?.info("Updated contact subscription status", {
+					subscriptionId: existingSubscription.id,
+					currentStatus: targetStatus,
+				});
 
 				const result = {
 					contact,
 					subscriptionId: existingSubscription.id,
 					event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
 				};
-
-				await createLog({
-					event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
-					cookie,
-					metadata: result,
-					requestDetails: { ...(requestDetails || {}), statusCode: 200 },
-				});
 
 				return result;
 			}
@@ -135,7 +123,7 @@ export async function addContactToChannelController({
 			});
 		}
 		// Create subscription
-		const [subscription] = await db
+		const [newSubscription] = await db
 			.insert(schema.channelSubscription)
 			.values({
 				contactId: contact.id,
@@ -145,26 +133,21 @@ export async function addContactToChannelController({
 			})
 			.returning();
 
-		if (!subscription) {
+		if (!newSubscription) {
 			throw new Error("Failed to create subscription");
 		}
 
-		logger?.info("Contact added to channel successfully", { contactId: contact.id,
-				subscriptionId: subscription.id,
-				currentStatus: targetStatus, });
+		logger?.info("Contact added to channel successfully", {
+			contactId: contact.id,
+			subscriptionId: newSubscription.id,
+			currentStatus: targetStatus,
+		});
 
 		const result = {
 			contact,
-			subscriptionId: subscription.id,
+			subscriptionId: newSubscription.id,
 			event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
 		};
-
-		await createLog({
-			event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
-			cookie,
-			metadata: result,
-			requestDetails: { ...(requestDetails || {}), statusCode: 200 },
-		});
 
 		return result;
 	} catch (error) {

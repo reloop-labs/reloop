@@ -99,7 +99,13 @@ export const listGroupContactsController = async ({
 				};
 			});
 
-		logger?.info("Group contacts listed", { group_id, total, page, limit, returned: contactList.length });
+		logger?.info("Group contacts listed", {
+			group_id,
+			total,
+			page,
+			limit,
+			returned: contactList.length,
+		});
 
 		return {
 			object: "contact_group",
@@ -116,7 +122,10 @@ export const listGroupContactsController = async ({
 			event: GROUP_LIST_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
-		logger?.error("Error listing group contacts", { group_id, error: error instanceof Error ? error.message : String(error) });
+		logger?.error("Error listing group contacts", {
+			group_id,
+			error: error instanceof Error ? error.message : String(error),
+		});
 		throw error;
 	}
 };

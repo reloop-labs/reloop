@@ -45,7 +45,11 @@ export const listChannelsController = async ({
 			.limit(limit)
 			.offset(offset);
 
-		logger?.info("Channels listed successfully", { total: rows[0]?.total ?? 0, page, limit });
+		logger?.info("Channels listed successfully", {
+			total: rows[0]?.total ?? 0,
+			page,
+			limit,
+		});
 		return {
 			object: "channel",
 			channels: rows.map(({ channel, subscriberCount }) => ({
@@ -64,7 +68,9 @@ export const listChannelsController = async ({
 			event: CHANNEL_LIST_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
-		logger?.error("Debug listing channels", { error: error instanceof Error ? error.message : String(error) });
+		logger?.error("Debug listing channels", {
+			error: error instanceof Error ? error.message : String(error),
+		});
 		throw error;
 	}
 };

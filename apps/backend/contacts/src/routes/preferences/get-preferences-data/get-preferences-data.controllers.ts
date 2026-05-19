@@ -3,8 +3,8 @@ import * as schema from "@reloop/db/schema";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 import { log } from "evlog";
-import { verifyToken } from "../token.utils";
 import { useLogger } from "evlog/elysia";
+import { verifyToken } from "../token.utils";
 
 export async function getPreferencesDataController({
 	token,
@@ -63,7 +63,10 @@ export async function getPreferencesDataController({
 		enrollments.map((e) => [e.channelId, e.status]),
 	);
 
-	logger?.info("Preferences data fetched successfully", { contactId, channelsCount: channels.length });
+	logger?.info("Preferences data fetched successfully", {
+		contactId,
+		channelsCount: channels.length,
+	});
 
 	return {
 		contact: {

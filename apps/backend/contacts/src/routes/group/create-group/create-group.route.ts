@@ -1,55 +1,39 @@
 import { authMiddleware } from "@be/contacts/middleware/auth";
+import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
 import { GroupModel } from "@be/contacts/model/group.model";
 import { createGroupController } from "@be/contacts/routes/group/create-group/create-group.controllers";
 import { Elysia } from "elysia";
 import { createGroupXCodeSamples } from "./create-group.x-codeSamples";
 
-import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
-
 export const createGroupRoute = new Elysia()
 	.use(authMiddleware)
-	.use(rateLimitPlugin({ max: 30, windowSeconds: 60, namespace: "create-group" }))
+	.use(
+		rateLimitPlugin({ max: 30, windowSeconds: 60, namespace: "create-group" }),
+	)
 	.post(
-	"/create",
-	async ({
-		body,
-		activeOrganizationId,
-		userId,
-		path,
-		request,
-		headers,
-	}) => {
-		const { name } = body;
-		const cookieString = headers["cookie"] || "";
-		return await createGroupController({
-			activeOrganizationId,
-			userId,
-			name,
-			cookie: cookieString,
-			requestDetails: {
-				endpoint: path,
-				method: request.method,
-				userAgent: headers["user-agent"],
-				ipAddress:
-					(headers["x-forwarded-for"] as string) ||
-					(headers["x-real-ip"] as string),
+		"/create",
+		async ({ body, activeOrganizationId, userId }) => {
+			const { name } = body;
+			return await createGroupController({
+				activeOrganizationId,
+				userId,
+				name,
+			});
+		},
+		{
+			auth: true,
+			rateLimit: true,
+			body: GroupModel.createGroupBody,
+			response: {
+				201: GroupModel.groupResponse,
+				409: GroupModel.groupAlreadyExists,
+				403: GroupModel.unauthorized,
 			},
-		});
-	},
-	{
-		auth: true,
-		rateLimit: true,
-		body: GroupModel.createGroupBody,
-		response: {
-			201: GroupModel.groupResponse,
-			409: GroupModel.groupAlreadyExists,
-			403: GroupModel.unauthorized,
+			detail: {
+				tags: ["Groups"],
+				summary: "Create Group",
+				description: "Creates a new group for the organization",
+				"x-codeSamples": createGroupXCodeSamples,
+			},
 		},
-		detail: {
-			tags: ["Groups"],
-			summary: "Create Group",
-			description: "Creates a new group for the organization",
-			"x-codeSamples": createGroupXCodeSamples,
-		},
-	},
-);
+	);

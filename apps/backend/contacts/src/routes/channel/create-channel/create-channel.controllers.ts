@@ -1,5 +1,4 @@
 import type { ChannelTypes } from "@be/contacts/types/channel.type";
-import { createLog } from "@be/contacts/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { CHANNEL_CREATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -14,8 +13,6 @@ export const createChannelController = async ({
 	description,
 	defaultSubscription,
 	visibility,
-	cookie,
-	requestDetails,
 }: {
 	activeOrganizationId: string;
 	userId: string;
@@ -23,14 +20,6 @@ export const createChannelController = async ({
 	description?: string;
 	defaultSubscription?: "opt_in" | "opt_out";
 	visibility?: "private" | "public";
-	cookie?: string;
-	requestDetails?: {
-		endpoint?: string;
-		method?: string;
-		userAgent?: string;
-		ipAddress?: string;
-		statusCode?: number;
-	};
 }): Promise<ChannelTypes.ChannelResponse> => {
 	const logger = useLogger();
 	logger?.info("Creating channel", { name });
@@ -79,16 +68,12 @@ export const createChannelController = async ({
 			event: CHANNEL_CREATE_WEBHOOK_EVENT.id,
 		};
 
-		await createLog({
-			event: CHANNEL_CREATE_WEBHOOK_EVENT.id,
-			cookie,
-			metadata: result,
-			requestDetails: { ...(requestDetails || {}), statusCode: 201 },
-		});
-
 		return result;
 	} catch (error) {
-		logger?.error("Debug creating channel", { name, error: error instanceof Error ? error.message : String(error) });
+		logger?.error("Debug creating channel", {
+			name,
+			error: error instanceof Error ? error.message : String(error),
+		});
 		throw error;
 	}
 };

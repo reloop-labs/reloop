@@ -1,6 +1,5 @@
 import type { GroupModel } from "@be/contacts/model/group.model";
 import type { GroupResponse } from "@be/contacts/types/group.type";
-import { createLog } from "@be/contacts/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { createGroupId } from "@reloop/db/schema";
@@ -12,20 +11,10 @@ export const createGroupController = async ({
 	name,
 	activeOrganizationId,
 	userId,
-	cookie,
-	requestDetails,
 }: {
 	name: string;
 	activeOrganizationId: string;
 	userId: string;
-	cookie?: string;
-	requestDetails?: {
-		endpoint?: string;
-		method?: string;
-		userAgent?: string;
-		ipAddress?: string;
-		statusCode?: number;
-	};
 }): Promise<GroupResponse | GroupModel.Unauthorized> => {
 	const logger = useLogger();
 	logger?.info("Creating group", { name });
@@ -66,16 +55,12 @@ export const createGroupController = async ({
 			event: GROUP_CREATE_WEBHOOK_EVENT.id,
 		};
 
-		await createLog({
-			event: GROUP_CREATE_WEBHOOK_EVENT.id,
-			cookie,
-			metadata: result,
-			requestDetails: { ...(requestDetails || {}), statusCode: 201 },
-		});
-
 		return result;
 	} catch (error) {
-		logger?.error("Debug creating group", { name, error: error instanceof Error ? error.message : String(error) });
+		logger?.error("Debug creating group", {
+			name,
+			error: error instanceof Error ? error.message : String(error),
+		});
 		throw error;
 	}
 };

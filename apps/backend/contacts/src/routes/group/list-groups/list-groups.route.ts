@@ -1,38 +1,39 @@
 import { authMiddleware } from "@be/contacts/middleware/auth";
+import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
 import { GroupModel } from "@be/contacts/model/group.model";
 import { listGroupsController } from "@be/contacts/routes/group/list-groups/list-groups.controllers";
 import { Elysia } from "elysia";
 import { listGroupsXCodeSamples } from "./list-groups.x-codeSamples";
 
-import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
-
 export const listGroupsRoute = new Elysia()
 	.use(authMiddleware)
-	.use(rateLimitPlugin({ max: 60, windowSeconds: 60, namespace: "list-groups" }))
+	.use(
+		rateLimitPlugin({ max: 60, windowSeconds: 60, namespace: "list-groups" }),
+	)
 	.get(
-	"/list",
-	async ({ query, activeOrganizationId, logger }) => {
-		const { page, limit, search } = query;
-		return await listGroupsController({
-			organizationId: activeOrganizationId as string,
-			page,
-			limit,
-			search,
-		});
-	},
-	{
-		auth: true,
-		rateLimit: true,
-		query: GroupModel.groupQuery,
-		response: {
-			200: GroupModel.groupListResponse,
-			403: GroupModel.unauthorized,
+		"/list",
+		async ({ query, activeOrganizationId, logger }) => {
+			const { page, limit, search } = query;
+			return await listGroupsController({
+				organizationId: activeOrganizationId as string,
+				page,
+				limit,
+				search,
+			});
 		},
-		detail: {
-			tags: ["Groups"],
-			summary: "List Groups",
-			description: "List all groups for the organization",
-			"x-codeSamples": listGroupsXCodeSamples,
+		{
+			auth: true,
+			rateLimit: true,
+			query: GroupModel.groupQuery,
+			response: {
+				200: GroupModel.groupListResponse,
+				403: GroupModel.unauthorized,
+			},
+			detail: {
+				tags: ["Groups"],
+				summary: "List Groups",
+				description: "List all groups for the organization",
+				"x-codeSamples": listGroupsXCodeSamples,
+			},
 		},
-	},
-);
+	);

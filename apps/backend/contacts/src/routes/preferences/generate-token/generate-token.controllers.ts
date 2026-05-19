@@ -2,8 +2,8 @@ import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
-import { signToken } from "../token.utils";
 import { useLogger } from "evlog/elysia";
+import { signToken } from "../token.utils";
 
 const BASE_URL = process.env.BASE_URL || "https://local.reloop.sh";
 
@@ -57,7 +57,9 @@ export async function generatePreferenceTokenController({
 	});
 	const url = `${BASE_URL}/preferences/${token}`;
 
-	logger?.info("Preference token generated successfully", { contactId: contact.id });
+	logger?.info("Preference token generated successfully", {
+		contactId: contact.id,
+	});
 
 	return {
 		token,

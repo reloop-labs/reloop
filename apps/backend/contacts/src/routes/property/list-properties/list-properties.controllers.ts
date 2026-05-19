@@ -45,7 +45,11 @@ export const listPropertiesController = async ({
 			.limit(limit)
 			.offset(offset);
 
-		logger?.info("Properties listed successfully", { total: rows[0]?.total ?? 0, page, limit });
+		logger?.info("Properties listed successfully", {
+			total: rows[0]?.total ?? 0,
+			page,
+			limit,
+		});
 		return {
 			object: "contact_property",
 			properties: rows.map((r) => ({
@@ -62,7 +66,9 @@ export const listPropertiesController = async ({
 			event: PROPERTY_LIST_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
-		logger?.error("Debug listing properties", { error: error instanceof Error ? error.message : String(error) });
+		logger?.error("Debug listing properties", {
+			error: error instanceof Error ? error.message : String(error),
+		});
 		throw error;
 	}
 };

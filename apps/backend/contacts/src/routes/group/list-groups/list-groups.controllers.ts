@@ -59,7 +59,9 @@ export const listGroupsController = async ({
 			event: GROUP_LIST_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
-		logger?.error("Debug listing groups", { error: error instanceof Error ? error.message : String(error) });
+		logger?.error("Debug listing groups", {
+			error: error instanceof Error ? error.message : String(error),
+		});
 		throw error;
 	}
 };

@@ -3,7 +3,6 @@ import * as schema from "@reloop/db/schema";
 import { and, eq, inArray, isNull } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
 
-
 export async function upsertContactProperties({
 	contactId,
 	organizationId,
@@ -31,7 +30,11 @@ export async function upsertContactProperties({
 		}
 	}
 
-	logger?.info("Upserting properties for contact (replacement mode)", { contactId, organizationId, propertyCount: propertyNames.length });
+	logger?.info("Upserting properties for contact (replacement mode)", {
+		contactId,
+		organizationId,
+		propertyCount: propertyNames.length,
+	});
 
 	try {
 		// 1. Fetch all existing active property values for this contact
@@ -59,7 +62,9 @@ export async function upsertContactProperties({
 		);
 
 		if (propertiesToDelete.length > 0) {
-			logger?.info("Soft-deleting properties not in request", { count: propertiesToDelete.length });
+			logger?.info("Soft-deleting properties not in request", {
+				count: propertiesToDelete.length,
+			});
 			await db
 				.update(schema.contactPropertyValue)
 				.set({ deletedAt: new Date(), updatedAt: new Date() })
@@ -104,7 +109,10 @@ export async function upsertContactProperties({
 			const incomingType = typeof value === "number" ? "number" : "string";
 
 			if (!info) {
-				logger?.info("Creating new property definition", { name, incomingType });
+				logger?.info("Creating new property definition", {
+					name,
+					incomingType,
+				});
 				const [newProp] = await db
 					.insert(schema.contactProperty)
 					.values({
@@ -129,7 +137,11 @@ export async function upsertContactProperties({
 			if (info) {
 				// Validate type compatibility
 				if (incomingType !== info.type) {
-					logger?.warn("Property type mismatch", { name, expected: info.type, received: incomingType });
+					logger?.warn("Property type mismatch", {
+						name,
+						expected: info.type,
+						received: incomingType,
+					});
 					throw new Error(
 						`Property '${name}' expected type '${info.type}' but received '${incomingType}'`,
 					);

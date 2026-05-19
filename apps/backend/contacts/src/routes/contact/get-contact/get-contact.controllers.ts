@@ -95,12 +95,14 @@ export async function getContactController({
 		const suppressionReason = contact.suppressionReason ?? null;
 		const suppressedAt = contact.suppressedAt ?? null;
 
-		logger?.info("Contact retrieved successfully", { contactId,
-				organizationId,
-				propertyCount: contact.propertyValues.length,
-				groupCount: groups.length,
-				channelCount: channels.length,
-				suppressed: suppressionReason !== null, });
+		logger?.info("Contact retrieved successfully", {
+			contactId,
+			organizationId,
+			propertyCount: contact.propertyValues.length,
+			groupCount: groups.length,
+			channelCount: channels.length,
+			suppressed: suppressionReason !== null,
+		});
 
 		return {
 			object: "contact",

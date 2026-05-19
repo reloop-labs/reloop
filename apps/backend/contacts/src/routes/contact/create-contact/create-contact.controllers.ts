@@ -1,35 +1,28 @@
 import { upsertContactProperties } from "@be/contacts/routes/contact/utils/upsert-contact-properties";
 import type { ContactTypes } from "@be/contacts/types/contact.type";
-import { createLog } from "@be/contacts/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { CONTACT_CREATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
-import { getExistingContact } from "./get-existing-contact";
 import { useLogger } from "evlog/elysia";
+import { getExistingContact } from "./get-existing-contact";
 
 export async function createContactController({
 	organizationId,
 	userId,
-	body,
-	cookie,
-	requestDetails,
+	email,
+	firstName,
+	lastName,
+	status: contactStatus,
+	properties,
+	groupIds,
+	channels,
 }: {
 	organizationId: string;
 	userId: string;
-	body: ContactTypes.CreateContactRequest;
-	cookie?: string;
-	requestDetails?: {
-		endpoint?: string;
-		method?: string;
-		userAgent?: string;
-		ipAddress?: string;
-		statusCode?: number;
-	};
-}): Promise<ContactTypes.ContactResponse> {
+} & ContactTypes.CreateContactRequest): Promise<ContactTypes.ContactResponse> {
 	const logger = useLogger();
-	const { email } = body;
 	try {
 		return await db.transaction(async (tx) => {
 			const existingContact = await getExistingContact({
@@ -46,10 +39,10 @@ export async function createContactController({
 			const [newContact] = await tx
 				.insert(schema.contact)
 				.values({
-					email: body.email,
-					firstName: body.firstName || null,
-					lastName: body.lastName || null,
-					status: body.status || "subscribed",
+					email: email,
+					firstName: firstName || null,
+					lastName: lastName || null,
+					status: contactStatus || "subscribed",
 					organizationId,
 					userId,
 					createdAt: new Date(),
@@ -61,20 +54,27 @@ export async function createContactController({
 				logger?.error("Failed to create contact - no data returned", { email });
 				throw status(500, { message: "Failed to create contact" });
 			}
-			logger?.info("Contact added", { ...newContact, status: undefined, currentStatus: newContact.status });
-			if (body.properties && Object.keys(body.properties).length > 0) {
+			logger?.info("Contact added", {
+				...newContact,
+				status: undefined,
+				currentStatus: newContact.status,
+			});
+			if (properties && Object.keys(properties).length > 0) {
 				await upsertContactProperties({
 					contactId: newContact.id,
 					organizationId,
 					userId,
-					properties: body.properties,
+					properties: properties,
 					db: tx,
 				});
 			}
-			if (body.groupIds && body.groupIds.length > 0) {
-				logger?.info("Adding contact to groups", { contactId: newContact.id, groupIds: body.groupIds });
+			if (groupIds && groupIds.length > 0) {
+				logger?.info("Adding contact to groups", {
+					contactId: newContact.id,
+					groupIds: groupIds,
+				});
 				await tx.insert(schema.contactGroup).values(
-					body.groupIds.map((groupId) => ({
+					groupIds.map((groupId) => ({
 						contactId: newContact.id,
 						groupId,
 						organizationId,
@@ -82,10 +82,13 @@ export async function createContactController({
 					})),
 				);
 			}
-			if (body.channels && body.channels.length > 0) {
-				logger?.info("Enrolling contact in channels", { contactId: newContact.id, channelCount: body.channels.length });
+			if (channels && channels.length > 0) {
+				logger?.info("Enrolling contact in channels", {
+					contactId: newContact.id,
+					channelCount: channels.length,
+				});
 				await tx.insert(schema.channelSubscription).values(
-					body.channels.map((channel) => ({
+					channels.map((channel) => ({
 						contactId: newContact.id,
 						channelId: channel.channelId,
 						organizationId,
@@ -95,7 +98,10 @@ export async function createContactController({
 					})),
 				);
 			}
-			logger?.info("Contact created successfully", { email: body.email, id: newContact.id });
+			logger?.info("Contact created successfully", {
+				email: email,
+				id: newContact.id,
+			});
 
 			// Fetch final properties to ensure types are correct in response
 			const updatedProperties = await tx
@@ -144,17 +150,13 @@ export async function createContactController({
 				event: CONTACT_CREATE_WEBHOOK_EVENT.id,
 			};
 
-			await createLog({
-				event: CONTACT_CREATE_WEBHOOK_EVENT.id,
-				cookie,
-				metadata: result,
-				requestDetails: { ...(requestDetails || {}), statusCode: 201 },
-			});
-
 			return result;
 		});
 	} catch (error) {
-		logger?.error("Debug creating contact", { email: body.email, error: error instanceof Error ? error.message : String(error) });
+		logger?.error("Debug creating contact", {
+			email: email,
+			error: error instanceof Error ? error.message : String(error),
+		});
 		throw error;
 	}
 }

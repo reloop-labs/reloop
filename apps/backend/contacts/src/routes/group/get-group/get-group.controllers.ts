@@ -36,7 +36,10 @@ export const getGroupController = async ({
 			event: GROUP_GET_WEBHOOK_EVENT.id,
 		} as GroupResponse;
 	} catch (error) {
-		logger?.error("Debug getting group", { group_id, error: error instanceof Error ? error.message : String(error) });
+		logger?.error("Debug getting group", {
+			group_id,
+			error: error instanceof Error ? error.message : String(error),
+		});
 		throw error;
 	}
 };

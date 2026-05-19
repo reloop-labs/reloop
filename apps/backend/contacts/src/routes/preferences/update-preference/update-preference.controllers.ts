@@ -2,8 +2,8 @@ import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
-import { verifyToken } from "../token.utils";
 import { useLogger } from "evlog/elysia";
+import { verifyToken } from "../token.utils";
 
 export async function updatePreferenceController({
 	token,
@@ -62,7 +62,11 @@ export async function updatePreferenceController({
 		});
 	}
 
-	logger?.info("Preference updated", { contactId, channelId, currentStatus: targetStatus });
+	logger?.info("Preference updated", {
+		contactId,
+		channelId,
+		currentStatus: targetStatus,
+	});
 
 	return {
 		success: true,

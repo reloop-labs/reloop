@@ -1,5 +1,4 @@
 import type { GroupModel } from "@be/contacts/model/group.model";
-import { createLog } from "@be/contacts/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { GROUP_DELETE_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -9,19 +8,9 @@ import { useLogger } from "evlog/elysia";
 export const deleteGroupController = async ({
 	activeOrganizationId,
 	group_id,
-	cookie,
-	requestDetails,
 }: {
 	activeOrganizationId: string;
 	group_id: string;
-	cookie?: string;
-	requestDetails?: {
-		endpoint?: string;
-		method?: string;
-		userAgent?: string;
-		ipAddress?: string;
-		statusCode?: number;
-	};
 }): Promise<
 	| {
 			object: "contact_group";
@@ -73,16 +62,12 @@ export const deleteGroupController = async ({
 			event: GROUP_DELETE_WEBHOOK_EVENT.id,
 		};
 
-		await createLog({
-			event: GROUP_DELETE_WEBHOOK_EVENT.id,
-			cookie,
-			metadata: result,
-			requestDetails: { ...(requestDetails || {}), statusCode: 200 },
-		});
-
 		return result;
 	} catch (error) {
-		logger?.error("Debug deleting group", { group_id, error: error instanceof Error ? error.message : String(error) });
+		logger?.error("Debug deleting group", {
+			group_id,
+			error: error instanceof Error ? error.message : String(error),
+		});
 		throw error;
 	}
 };

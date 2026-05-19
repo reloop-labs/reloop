@@ -7,31 +7,24 @@ import { updateContactXCodeSamples } from "./update-contact.x-codeSamples";
 
 export const updateContactRoute = new Elysia()
 	.use(authMiddleware)
-	.use(rateLimitPlugin({ max: 30, windowSeconds: 60, namespace: "contact-update" }))
+	.use(
+		rateLimitPlugin({
+			max: 30,
+			windowSeconds: 60,
+			namespace: "contact-update",
+		}),
+	)
 	.patch(
 		"/:contact_id",
-		async ({
-			params,
-			body,
-			activeOrganizationId,
-			path,
-			request,
-			headers,
-		}) => {
-			const cookieString = headers["cookie"] || "";
+		async ({ params, body, activeOrganizationId }) => {
 			return await updateContactController({
 				contactId: params.contact_id,
 				organizationId: activeOrganizationId,
-				body,
-				cookie: cookieString,
-				requestDetails: {
-					endpoint: path,
-					method: request.method,
-					userAgent: headers["user-agent"],
-					ipAddress:
-						(headers["x-forwarded-for"] as string) ||
-						(headers["x-real-ip"] as string),
-				},
+				email: body.email,
+				firstName: body.firstName,
+				lastName: body.lastName,
+				status: body.status,
+				properties: body.properties,
 			});
 		},
 		{

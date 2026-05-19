@@ -1,4 +1,3 @@
-import { createLog } from "@be/contacts/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { PROPERTY_DELETE_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -9,19 +8,9 @@ import { useLogger } from "evlog/elysia";
 export const deletePropertyController = async ({
 	activeOrganizationId,
 	property_id,
-	cookie,
-	requestDetails,
 }: {
 	activeOrganizationId: string;
 	property_id: string;
-	cookie?: string;
-	requestDetails?: {
-		endpoint?: string;
-		method?: string;
-		userAgent?: string;
-		ipAddress?: string;
-		statusCode?: number;
-	};
 }): Promise<{
 	object: "contact_property";
 	success: boolean;
@@ -66,16 +55,12 @@ export const deletePropertyController = async ({
 			event: PROPERTY_DELETE_WEBHOOK_EVENT.id,
 		};
 
-		await createLog({
-			event: PROPERTY_DELETE_WEBHOOK_EVENT.id,
-			cookie,
-			metadata: result,
-			requestDetails: { ...(requestDetails || {}), statusCode: 200 },
-		});
-
 		return result;
 	} catch (error) {
-		logger?.error("Debug deleting property", { property_id, error: error instanceof Error ? error.message : String(error) });
+		logger?.error("Debug deleting property", {
+			property_id,
+			error: error instanceof Error ? error.message : String(error),
+		});
 		throw error;
 	}
 };

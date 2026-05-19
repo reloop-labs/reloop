@@ -1,4 +1,3 @@
-import { createLog } from "@be/contacts/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { CHANNEL_DELETE_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -9,19 +8,9 @@ import { useLogger } from "evlog/elysia";
 export const deleteChannelController = async ({
 	activeOrganizationId,
 	channel_id,
-	cookie,
-	requestDetails,
 }: {
 	activeOrganizationId: string;
 	channel_id: string;
-	cookie?: string;
-	requestDetails?: {
-		endpoint?: string;
-		method?: string;
-		userAgent?: string;
-		ipAddress?: string;
-		statusCode?: number;
-	};
 }): Promise<{
 	object: "channel";
 	success: boolean;
@@ -78,16 +67,12 @@ export const deleteChannelController = async ({
 			event: CHANNEL_DELETE_WEBHOOK_EVENT.id,
 		};
 
-		await createLog({
-			event: CHANNEL_DELETE_WEBHOOK_EVENT.id,
-			cookie,
-			metadata: result,
-			requestDetails: { ...(requestDetails || {}), statusCode: 200 },
-		});
-
 		return result;
 	} catch (error) {
-		logger?.error("Debug deleting channel", { channel_id, error: error instanceof Error ? error.message : String(error) });
+		logger?.error("Debug deleting channel", {
+			channel_id,
+			error: error instanceof Error ? error.message : String(error),
+		});
 		throw error;
 	}
 };

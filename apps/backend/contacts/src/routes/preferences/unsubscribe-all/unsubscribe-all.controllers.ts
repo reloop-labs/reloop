@@ -3,14 +3,10 @@ import * as schema from "@reloop/db/schema";
 import { and, eq, isNull } from "drizzle-orm";
 import { status } from "elysia";
 import { log } from "evlog";
-import { verifyToken } from "../token.utils";
 import { useLogger } from "evlog/elysia";
+import { verifyToken } from "../token.utils";
 
-export async function unsubscribeAllController({
-	token,
-}: {
-	token: string;
-}) {
+export async function unsubscribeAllController({ token }: { token: string }) {
 	const logger = useLogger();
 	log.info("server", "Processing unsubscribe all request");
 
@@ -44,7 +40,10 @@ export async function unsubscribeAllController({
 			);
 	}
 
-	logger?.info("Unsubscribed from all channels", { contactId, updatedCount: enrollments.length });
+	logger?.info("Unsubscribed from all channels", {
+		contactId,
+		updatedCount: enrollments.length,
+	});
 
 	return {
 		success: true,

@@ -1,5 +1,4 @@
 import type { PropertyTypes } from "@be/contacts/types/property.type";
-import { createLog } from "@be/contacts/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { PROPERTY_CREATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -10,24 +9,15 @@ import { useLogger } from "evlog/elysia";
 export const createPropertyController = async ({
 	activeOrganizationId,
 	userId,
-	body,
-	cookie,
-	requestDetails,
+	name,
+	type,
+	fallbackValue,
 }: {
 	activeOrganizationId: string;
 	userId: string;
-	body: PropertyTypes.CreatePropertyRequest;
-	cookie?: string;
-	requestDetails?: {
-		endpoint?: string;
-		method?: string;
-		userAgent?: string;
-		ipAddress?: string;
-		statusCode?: number;
-	};
-}): Promise<PropertyTypes.PropertyResponse> => {
+} & PropertyTypes.CreatePropertyRequest): Promise<PropertyTypes.PropertyResponse> => {
 	const logger = useLogger();
-	logger?.info("Creating property", { name: body.name, type: body.type });
+	logger?.info("Creating property", { name: name, type: type });
 
 	try {
 		const existingProperty = await db
@@ -35,23 +25,25 @@ export const createPropertyController = async ({
 			.from(schema.contactProperty)
 			.where(
 				and(
-					eq(schema.contactProperty.propertyName, body.name),
+					eq(schema.contactProperty.propertyName, name),
 					eq(schema.contactProperty.organizationId, activeOrganizationId),
 				),
 			)
 			.limit(1);
 
 		if (existingProperty.length > 0) {
-			logger?.warn("Property already exists in this organization", { name: body.name });
+			logger?.warn("Property already exists in this organization", {
+				name: name,
+			});
 			throw status(409, { message: "Property already exists" });
 		}
 
 		const [newProperty] = await db
 			.insert(schema.contactProperty)
 			.values({
-				propertyName: body.name,
-				propertyType: body.type,
-				defaultValue: body.fallbackValue || null,
+				propertyName: name,
+				propertyType: type,
+				defaultValue: fallbackValue || null,
 				organizationId: activeOrganizationId,
 				userId,
 				createdAt: new Date(),
@@ -60,11 +52,16 @@ export const createPropertyController = async ({
 			.returning();
 
 		if (!newProperty) {
-			logger?.error("Failed to create property - no data returned", { name: body.name });
+			logger?.error("Failed to create property - no data returned", {
+				name: name,
+			});
 			throw status(500, { message: "Failed to create property" });
 		}
 
-		logger?.info("Property created successfully", { name: body.name, id: newProperty.id });
+		logger?.info("Property created successfully", {
+			name: name,
+			id: newProperty.id,
+		});
 
 		const result = {
 			...newProperty,
@@ -72,16 +69,12 @@ export const createPropertyController = async ({
 			event: PROPERTY_CREATE_WEBHOOK_EVENT.id,
 		};
 
-		await createLog({
-			event: PROPERTY_CREATE_WEBHOOK_EVENT.id,
-			cookie,
-			metadata: result,
-			requestDetails: { ...(requestDetails || {}), statusCode: 201 },
-		});
-
 		return result;
 	} catch (error) {
-		logger?.error("Debug creating property", { name: body.name, error: error instanceof Error ? error.message : String(error) });
+		logger?.error("Debug creating property", {
+			name: name,
+			error: error instanceof Error ? error.message : String(error),
+		});
 		throw error;
 	}
 };

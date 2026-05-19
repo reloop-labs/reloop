@@ -1,5 +1,4 @@
 import type { ChannelTypes } from "@be/contacts/types/channel.type";
-import { createLog } from "@be/contacts/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { CHANNEL_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -13,22 +12,12 @@ export const updateChannelController = async ({
 	name,
 	description,
 	visibility,
-	cookie,
-	requestDetails,
 }: {
 	activeOrganizationId: string;
 	channel_id: string;
 	name?: string;
 	description?: string;
 	visibility?: "private" | "public";
-	cookie?: string;
-	requestDetails?: {
-		endpoint?: string;
-		method?: string;
-		userAgent?: string;
-		ipAddress?: string;
-		statusCode?: number;
-	};
 }): Promise<ChannelTypes.ChannelResponse> => {
 	const logger = useLogger();
 	logger?.info("Updating channel", { channel_id, name });
@@ -57,7 +46,10 @@ export const updateChannelController = async ({
 			});
 
 			if (duplicateName) {
-				logger?.warn("Channel with this name already exists", { channel_id, name });
+				logger?.warn("Channel with this name already exists", {
+					channel_id,
+					name,
+				});
 				throw status(409, { message: "Channel with this name already exists" });
 			}
 		}
@@ -74,7 +66,9 @@ export const updateChannelController = async ({
 			.returning();
 
 		if (!updatedChannel) {
-			logger?.error("Failed to update channel - no data returned", { channel_id });
+			logger?.error("Failed to update channel - no data returned", {
+				channel_id,
+			});
 			throw new Error("Failed to update channel");
 		}
 
@@ -86,16 +80,12 @@ export const updateChannelController = async ({
 			event: CHANNEL_UPDATE_WEBHOOK_EVENT.id,
 		};
 
-		await createLog({
-			event: CHANNEL_UPDATE_WEBHOOK_EVENT.id,
-			cookie,
-			metadata: result,
-			requestDetails: { ...(requestDetails || {}), statusCode: 200 },
-		});
-
 		return result;
 	} catch (error) {
-		logger?.error("Debug updating channel", { channel_id, error: error instanceof Error ? error.message : String(error) });
+		logger?.error("Debug updating channel", {
+			channel_id,
+			error: error instanceof Error ? error.message : String(error),
+		});
 		throw error;
 	}
 };

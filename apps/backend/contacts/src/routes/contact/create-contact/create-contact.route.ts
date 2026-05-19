@@ -7,31 +7,26 @@ import { createContactXCodeSamples } from "./create-contact.x-codeSamples";
 
 export const createContactRoute = new Elysia()
 	.use(authMiddleware)
-	.use(rateLimitPlugin({ max: 30, windowSeconds: 60, namespace: "contact-create" }))
+	.use(
+		rateLimitPlugin({
+			max: 30,
+			windowSeconds: 60,
+			namespace: "contact-create",
+		}),
+	)
 	.post(
 		"/create",
-		async ({
-			body,
-			activeOrganizationId,
-			userId,
-			path,
-			request,
-			headers,
-		}) => {
-			const cookieString = headers["cookie"] || "";
+		async ({ body, organizationId, userId }) => {
 			return await createContactController({
-				organizationId: activeOrganizationId,
+				organizationId,
 				userId,
-				body,
-				cookie: cookieString,
-				requestDetails: {
-					endpoint: path,
-					method: request.method,
-					userAgent: headers["user-agent"],
-					ipAddress:
-						(headers["x-forwarded-for"] as string) ||
-						(headers["x-real-ip"] as string),
-				},
+				email: body.email,
+				firstName: body.firstName,
+				lastName: body.lastName,
+				status: body.status,
+				properties: body.properties,
+				groupIds: body.groupIds,
+				channels: body.channels,
 			});
 		},
 		{

@@ -1,6 +1,5 @@
 import type { GroupModel } from "@be/contacts/model/group.model";
 import type { GroupResponse } from "@be/contacts/types/group.type";
-import { createLog } from "@be/contacts/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { GROUP_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -10,29 +9,17 @@ import { useLogger } from "evlog/elysia";
 export const updateGroupController = async ({
 	activeOrganizationId,
 	group_id,
-	body,
-	cookie,
-	requestDetails,
+	name,
 }: {
 	activeOrganizationId: string;
 	group_id: string;
-	body: GroupModel.UpdateGroupBody;
-	cookie?: string;
-	requestDetails?: {
-		endpoint?: string;
-		method?: string;
-		userAgent?: string;
-		ipAddress?: string;
-		statusCode?: number;
-	};
-}): Promise<
+} & GroupModel.UpdateGroupBody): Promise<
 	| GroupResponse
 	| GroupModel.GroupNotFound
 	| GroupModel.GroupAlreadyExists
 	| GroupModel.Unauthorized
 > => {
 	const logger = useLogger();
-	const { name } = body;
 
 	logger?.info("Updating group", { group_id, name });
 
@@ -89,16 +76,12 @@ export const updateGroupController = async ({
 			event: GROUP_UPDATE_WEBHOOK_EVENT.id,
 		};
 
-		await createLog({
-			event: GROUP_UPDATE_WEBHOOK_EVENT.id,
-			cookie,
-			metadata: result,
-			requestDetails: { ...(requestDetails || {}), statusCode: 200 },
-		});
-
 		return result;
 	} catch (error) {
-		logger?.error("Debug updating group", { group_id, error: error instanceof Error ? error.message : String(error) });
+		logger?.error("Debug updating group", {
+			group_id,
+			error: error instanceof Error ? error.message : String(error),
+		});
 		throw error;
 	}
 };

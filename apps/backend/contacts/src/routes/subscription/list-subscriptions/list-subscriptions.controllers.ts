@@ -46,7 +46,10 @@ export async function listSubscriptionsController({
 			limit,
 		};
 	} catch (error) {
-		logger?.error("Error listing subscriptions", { query, error: error instanceof Error ? error.message : String(error) });
+		logger?.error("Error listing subscriptions", {
+			query,
+			error: error instanceof Error ? error.message : String(error),
+		});
 		throw error;
 	}
 }

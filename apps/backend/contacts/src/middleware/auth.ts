@@ -86,7 +86,6 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 						const result = {
 							userId: apiKeyResult.userId,
 							organizationId: apiKeyResult.organizationId,
-							activeOrganizationId: apiKeyResult.organizationId,
 							authType: "apikey" as const,
 						};
 						log.set({

@@ -1,5 +1,4 @@
 import type { ContactModel } from "@be/contacts/model/contact.model";
-import { createLog } from "@be/contacts/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { CONTACT_DELETE_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -10,19 +9,9 @@ import { useLogger } from "evlog/elysia";
 export async function deleteContactController({
 	contactId,
 	organizationId,
-	cookie,
-	requestDetails,
 }: {
 	contactId: string;
 	organizationId: string;
-	cookie?: string;
-	requestDetails?: {
-		endpoint?: string;
-		method?: string;
-		userAgent?: string;
-		ipAddress?: string;
-		statusCode?: number;
-	};
 }): Promise<ContactModel.DeleteResponse | ContactModel.ContactNotFound> {
 	const logger = useLogger();
 	logger?.info("Deleting contact", { contactId });
@@ -59,13 +48,6 @@ export async function deleteContactController({
 			id: existingContact.id,
 			event: CONTACT_DELETE_WEBHOOK_EVENT.id,
 		};
-
-		await createLog({
-			event: CONTACT_DELETE_WEBHOOK_EVENT.id,
-			cookie,
-			metadata: result,
-			requestDetails: { ...(requestDetails || {}), statusCode: 200 },
-		});
 
 		return result;
 	} catch (error) {

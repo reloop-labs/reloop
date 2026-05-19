@@ -13,7 +13,7 @@ export async function getExistingContact({
 	db?: DatabaseInstance;
 }) {
 	const logger = useLogger();
-	logger?.info("Checking for existing contact", {  });
+	logger?.info("Checking for existing contact", {});
 	const results = await db
 		.select()
 		.from(schema.contact)

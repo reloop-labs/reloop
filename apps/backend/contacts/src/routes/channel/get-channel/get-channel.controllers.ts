@@ -36,7 +36,10 @@ export const getChannelController = async ({
 			event: CHANNEL_GET_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
-		logger?.error("Debug getting channel", { channel_id, error: error instanceof Error ? error.message : String(error) });
+		logger?.error("Debug getting channel", {
+			channel_id,
+			error: error instanceof Error ? error.message : String(error),
+		});
 		throw error;
 	}
 };

@@ -1,5 +1,4 @@
 import type { PropertyTypes } from "@be/contacts/types/property.type";
-import { createLog } from "@be/contacts/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { PROPERTY_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -10,24 +9,14 @@ import { useLogger } from "evlog/elysia";
 export const updatePropertyController = async ({
 	activeOrganizationId,
 	property_id,
-	body,
-	cookie,
-	requestDetails,
+	fallbackValue,
 }: {
 	activeOrganizationId: string;
 	property_id: string;
-	body: { fallbackValue: string | null };
-	cookie?: string;
-	requestDetails?: {
-		endpoint?: string;
-		method?: string;
-		userAgent?: string;
-		ipAddress?: string;
-		statusCode?: number;
-	};
+	fallbackValue: string | null;
 }): Promise<PropertyTypes.PropertyResponse> => {
 	const logger = useLogger();
-	logger?.info("Updating property", { property_id, fallbackValue: body.fallbackValue });
+	logger?.info("Updating property", { property_id, fallbackValue });
 
 	try {
 		const existingProperty = await db
@@ -49,12 +38,14 @@ export const updatePropertyController = async ({
 
 		const [updatedProperty] = await db
 			.update(schema.contactProperty)
-			.set({ defaultValue: body.fallbackValue, updatedAt: new Date() })
+			.set({ defaultValue: fallbackValue, updatedAt: new Date() })
 			.where(eq(schema.contactProperty.id, property_id))
 			.returning();
 
 		if (!updatedProperty) {
-			logger?.error("Failed to update property - no data returned", { property_id });
+			logger?.error("Failed to update property - no data returned", {
+				property_id,
+			});
 			throw status(500, { message: "Failed to update property" });
 		}
 
@@ -66,16 +57,12 @@ export const updatePropertyController = async ({
 			event: PROPERTY_UPDATE_WEBHOOK_EVENT.id,
 		};
 
-		await createLog({
-			event: PROPERTY_UPDATE_WEBHOOK_EVENT.id,
-			cookie,
-			metadata: result,
-			requestDetails: { ...(requestDetails || {}), statusCode: 200 },
-		});
-
 		return result;
 	} catch (error) {
-		logger?.error("Debug updating property", { property_id, error: error instanceof Error ? error.message : String(error) });
+		logger?.error("Debug updating property", {
+			property_id,
+			error: error instanceof Error ? error.message : String(error),
+		});
 		throw error;
 	}
 };

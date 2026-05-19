@@ -1,5 +1,4 @@
 import type { ContactModel } from "@be/contacts/model/contact.model";
-import { createLog } from "@be/contacts/utils/logger";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { CONTACT_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -11,34 +10,27 @@ import { useLogger } from "evlog/elysia";
 export async function addContactToGroupController({
 	organizationId,
 	groupId,
-	body,
-	cookie,
-	requestDetails,
+	contact_id,
+	email,
 }: {
 	organizationId: string;
 	groupId: string;
-	body: ContactModel.AddContactToGroupBody;
-	cookie?: string;
-	requestDetails?: {
-		endpoint?: string;
-		method?: string;
-		userAgent?: string;
-		ipAddress?: string;
-		statusCode?: number;
-	};
-}): Promise<ContactModel.AddContactToGroupResponse> {
+} & ContactModel.AddContactToGroupBody): Promise<ContactModel.AddContactToGroupResponse> {
 	const logger = useLogger();
-	const { contact_id, email } = body;
 
 	if (!contact_id && !email) {
-		logger?.info("Either 'contact_id' or 'email' must be provided", {  });
+		logger?.info("Either 'contact_id' or 'email' must be provided", {});
 		throw status(400, {
 			message: "Either 'contact_id' or 'email' must be provided",
 		});
 	}
 
 	try {
-		logger?.info("Verify group exists", { contactId: contact_id, email, groupId });
+		logger?.info("Verify group exists", {
+			contactId: contact_id,
+			email,
+			groupId,
+		});
 		// Verify group exists
 		const group = await db.query.group.findFirst({
 			where: and(
@@ -79,7 +71,10 @@ export async function addContactToGroupController({
 			throw status(404, { message: "Contact not found" });
 		}
 
-		logger?.info("Checking if contact is already in group", { contactId: contact.id, groupId });
+		logger?.info("Checking if contact is already in group", {
+			contactId: contact.id,
+			groupId,
+		});
 		const existing = await db.query.contactGroup.findFirst({
 			where: and(
 				eq(schema.contactGroup.contactId, contact.id),
@@ -122,13 +117,6 @@ export async function addContactToGroupController({
 			id: contact.id,
 			event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
 		};
-
-		await createLog({
-			event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
-			cookie,
-			metadata: result,
-			requestDetails: { ...(requestDetails || {}), statusCode: 200 },
-		});
 
 		return result;
 	} catch (error) {
