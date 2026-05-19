@@ -15,6 +15,16 @@ export type StoredLogEntry = {
 	request_details: string;
 	status_code: number | null;
 	created_at: string;
+	// Audit-log fields
+	actor_type: string | null;
+	actor_id: string | null;
+	resource_type: string | null;
+	resource_id: string | null;
+	service: string | null;
+	action: string | null;
+	ip_address: string | null;
+	user_agent: string | null;
+	environment: string | null;
 };
 
 export function getClickHouseClient(): ClickHouseClient {
@@ -69,6 +79,16 @@ export async function ensureTableExists(): Promise<void> {
 		{ name: "request_details", type: "String" },
 		{ name: "status_code", type: "Nullable(Int32)" },
 		{ name: "created_at", type: "DateTime64(3)" },
+		// Audit-log fields
+		{ name: "actor_type", type: "LowCardinality(String)" },
+		{ name: "actor_id", type: "Nullable(String)" },
+		{ name: "resource_type", type: "LowCardinality(String)" },
+		{ name: "resource_id", type: "Nullable(String)" },
+		{ name: "service", type: "LowCardinality(String)" },
+		{ name: "action", type: "LowCardinality(String)" },
+		{ name: "ip_address", type: "Nullable(String)" },
+		{ name: "user_agent", type: "Nullable(String)" },
+		{ name: "environment", type: "LowCardinality(String)" },
 	];
 
 	try {
@@ -131,10 +151,20 @@ export async function ensureTableExists(): Promise<void> {
 					metadata String,
 					request_details String,
 					status_code Nullable(Int32),
-					created_at DateTime64(3)
+					created_at DateTime64(3),
+					-- Audit-log fields
+					actor_type LowCardinality(String) DEFAULT '',
+					actor_id Nullable(String),
+					resource_type LowCardinality(String) DEFAULT '',
+					resource_id Nullable(String),
+					service LowCardinality(String) DEFAULT '',
+					action LowCardinality(String) DEFAULT '',
+					ip_address Nullable(String),
+					user_agent Nullable(String),
+					environment LowCardinality(String) DEFAULT ''
 				)
 				ENGINE = MergeTree()
-				ORDER BY (level, created_at, event, id)
+				ORDER BY (organization_id, service, created_at, id)
 				PARTITION BY toYYYYMM(created_at)
 			`,
 		});

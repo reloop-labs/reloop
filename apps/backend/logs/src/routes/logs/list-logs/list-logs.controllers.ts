@@ -67,6 +67,29 @@ export async function listLogsController(
 			conditions.push(`created_at <= '${toClickHouseDate(query.end_date)}'`);
 		}
 
+		// Audit-log filters
+		if (query.service) {
+			conditions.push(`service = '${escapeString(query.service)}'`);
+		}
+		if (query.action) {
+			conditions.push(`action = '${escapeString(query.action)}'`);
+		}
+		if (query.resource_type) {
+			conditions.push(`resource_type = '${escapeString(query.resource_type)}'`);
+		}
+		if (query.resource_id) {
+			conditions.push(`resource_id = '${escapeString(query.resource_id)}'`);
+		}
+		if (query.actor_type) {
+			conditions.push(`actor_type = '${escapeString(query.actor_type)}'`);
+		}
+		if (query.actor_id) {
+			conditions.push(`actor_id = '${escapeString(query.actor_id)}'`);
+		}
+		if (query.environment) {
+			conditions.push(`environment = '${escapeString(query.environment)}'`);
+		}
+
 		const whereClause =
 			conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
 		const limit = Math.min(Math.max(Number(query.limit || 10), 1), 100);
@@ -91,7 +114,16 @@ export async function listLogsController(
 						metadata,
 						request_details,
 						status_code,
-						toString(created_at) AS created_at
+						toString(created_at) AS created_at,
+						actor_type,
+						actor_id,
+						resource_type,
+						resource_id,
+						service,
+						action,
+						ip_address,
+						user_agent,
+						environment
 					FROM logs
 					${whereClause}
 					ORDER BY created_at DESC
@@ -145,6 +177,16 @@ export async function listLogsController(
 			status_code: row.status_code,
 			created_at: formatClickHouseDate(row.created_at),
 			requestDetails: safeJsonParse(row.request_details, {}),
+			// Audit-log fields — normalise empty strings back to null for the API response
+			actor_type: row.actor_type || null,
+			actor_id: row.actor_id || null,
+			resource_type: row.resource_type || null,
+			resource_id: row.resource_id || null,
+			service: row.service || null,
+			action: row.action || null,
+			ip_address: row.ip_address || null,
+			user_agent: row.user_agent || null,
+			environment: row.environment || null,
 		}));
 
 		return {

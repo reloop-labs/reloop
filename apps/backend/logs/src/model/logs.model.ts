@@ -14,34 +14,7 @@ export namespace LogsModel {
 		},
 	);
 
-	export const structuredValue = t.Any({
-		description: "Any valid JSON-compatible structured value",
-	});
-
-	export const baseLogBody = t.Object({
-		event: t.String({
-			minLength: 1,
-			description: "Event or log name (e.g., 'user_signed_up', 'email_sent')",
-		}),
-		level: t.String(logLevel),
-		trace_id: t.String({ description: "Distributed trace identifier" }),
-		metadata: t.Record(t.String(), structuredValue, {
-			description: "Additional structured metadata for debugging and querying",
-		}),
-		status_code: t.Optional(
-			t.Union([t.Number(), t.String()], {
-				description: "HTTP status code if applicable",
-			}),
-		),
-		requestDetails: t.Record(t.String(), structuredValue, {
-			description: "Additional structured metadata for debugging and querying",
-		}),
-	});
-
-	export type BaseLogBody = typeof baseLogBody.static;
-
-	export const createLogBody = baseLogBody;
-	export type CreateLogBody = typeof createLogBody.static;
+	// ─── Read-side response models ─────────────────────────────────────
 
 	export const logEntryResponse = t.Object({
 		uuid: t.String({ description: "Unique log identifier" }),
@@ -55,6 +28,16 @@ export namespace LogsModel {
 		created_at: t.String({ format: "date-time" }),
 		requestDetails: t.Any(),
 		email: t.Optional(t.Any()),
+		// Audit-log fields
+		actor_type: t.Optional(t.Union([t.String(), t.Null()])),
+		actor_id: t.Optional(t.Union([t.String(), t.Null()])),
+		resource_type: t.Optional(t.Union([t.String(), t.Null()])),
+		resource_id: t.Optional(t.Union([t.String(), t.Null()])),
+		service: t.Optional(t.Union([t.String(), t.Null()])),
+		action: t.Optional(t.Union([t.String(), t.Null()])),
+		ip_address: t.Optional(t.Union([t.String(), t.Null()])),
+		user_agent: t.Optional(t.Union([t.String(), t.Null()])),
+		environment: t.Optional(t.Union([t.String(), t.Null()])),
 	});
 
 	export type LogEntryResponse = typeof logEntryResponse.static;
@@ -71,12 +54,19 @@ export namespace LogsModel {
 		created_at: t.String({ format: "date-time" }),
 		requestDetails: t.Any(),
 		email: t.Optional(t.Any()),
+		// Audit-log fields
+		actor_type: t.Optional(t.Union([t.String(), t.Null()])),
+		actor_id: t.Optional(t.Union([t.String(), t.Null()])),
+		resource_type: t.Optional(t.Union([t.String(), t.Null()])),
+		resource_id: t.Optional(t.Union([t.String(), t.Null()])),
+		service: t.Optional(t.Union([t.String(), t.Null()])),
+		action: t.Optional(t.Union([t.String(), t.Null()])),
+		ip_address: t.Optional(t.Union([t.String(), t.Null()])),
+		user_agent: t.Optional(t.Union([t.String(), t.Null()])),
+		environment: t.Optional(t.Union([t.String(), t.Null()])),
 	});
 
 	export type LogResponse = typeof logResponse.static;
-
-	export const createLogResponse = logResponse;
-	export type CreateLogResponse = typeof createLogResponse.static;
 
 	export const listLogsQuery = t.Object({
 		level: t.Optional(logLevel),
@@ -116,6 +106,38 @@ export namespace LogsModel {
 				minimum: 1,
 				description: "Page number for pagination",
 			}),
+		),
+		// Audit-log filters
+		service: t.Optional(
+			t.String({ description: "Filter by source service (api_key, domain, mailing…)" }),
+		),
+		action: t.Optional(
+			t.String({ description: "Filter by action verb (created, deleted, sent…)" }),
+		),
+		resource_type: t.Optional(
+			t.String({ description: "Filter by resource type (api_key, domain, email…)" }),
+		),
+		resource_id: t.Optional(
+			t.String({ description: "Filter by specific resource ID" }),
+		),
+		actor_type: t.Optional(
+			t.Union(
+				[t.Literal("user"), t.Literal("api_key"), t.Literal("system")],
+				{ description: "Filter by actor type" },
+			),
+		),
+		actor_id: t.Optional(
+			t.String({ description: "Filter by actor ID (user_id or api_key_id)" }),
+		),
+		environment: t.Optional(
+			t.Union(
+				[
+					t.Literal("production"),
+					t.Literal("development"),
+					t.Literal("test"),
+				],
+				{ description: "Filter by environment" },
+			),
 		),
 	});
 

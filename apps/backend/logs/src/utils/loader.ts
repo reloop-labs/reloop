@@ -2,8 +2,9 @@ import { bus } from "@reloop/bus";
 import { RedisCache } from "@reloop/cache/redis-client";
 import { log } from "evlog";
 
-import { logsConfig } from "../logs.config";
-import { ensureTableExists, getClickHouseClient } from "./clickhouse";
+import { logsConfig } from "@reloop/logs/logs.config";
+import { initSubscribers } from "@reloop/logs/subscribers";
+import { ensureTableExists, getClickHouseClient } from "@reloop/logs/utils/clickhouse";
 
 export const redis = new RedisCache("logs");
 
@@ -17,6 +18,7 @@ export const loader = async () => {
 		log.info("server", "ClickHouse connection health check passed");
 		await bus.connect(logsConfig.NATS_URL);
 		log.info("server", "NATS connected");
+		await initSubscribers();
 	} catch (error) {
 		log.error({
 			...{

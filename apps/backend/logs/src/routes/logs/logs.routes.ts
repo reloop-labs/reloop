@@ -1,5 +1,4 @@
 import { Elysia } from "elysia";
-import { createLogRoute } from "./create-log/create-log.route";
 import { getEmailLogRoute } from "./get-email-log/get-email-log.route";
 import { getEmailStatsRoute } from "./get-email-stats/get-email-stats.route";
 import { getLogRoute } from "./get-log/get-log.route";
@@ -10,7 +9,6 @@ export const logsRoutes = new Elysia({
 	prefix: "/v1",
 	name: "LogsRoutes",
 })
-	.use(createLogRoute)
 	.use(listLogsRoute)
 	.use(getLogRoute)
 	.use(listEmailLogsRoute)
