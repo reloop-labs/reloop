@@ -1,4 +1,7 @@
-import { ChannelErrors } from "@be/contacts/error/contacts.error-response";
+import {
+	ChannelErrors,
+	ContactErrors,
+} from "@be/contacts/error/contacts.error-response";
 import type { ChannelTypes } from "@be/contacts/types/channel.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
@@ -40,6 +43,11 @@ export const getChannelController = async ({
 			channel_id,
 			error: error instanceof Error ? error.message : String(error),
 		});
-		throw error;
+		if (error && typeof error === "object" && "status" in error) {
+			throw error;
+		}
+		throw ContactErrors.databaseError(
+			error instanceof Error ? error.message : String(error),
+		);
 	}
 };

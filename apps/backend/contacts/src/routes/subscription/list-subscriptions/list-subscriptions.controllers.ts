@@ -1,3 +1,4 @@
+import { ContactErrors } from "@be/contacts/error/contacts.error-response";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { and, count, desc, eq, isNull } from "drizzle-orm";
@@ -50,6 +51,11 @@ export async function listSubscriptionsController({
 			query,
 			error: error instanceof Error ? error.message : String(error),
 		});
-		throw error;
+		if (error && typeof error === "object" && "status" in error) {
+			throw error;
+		}
+		throw ContactErrors.databaseError(
+			error instanceof Error ? error.message : String(error),
+		);
 	}
 }

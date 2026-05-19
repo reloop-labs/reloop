@@ -1,4 +1,7 @@
-import { PropertyErrors } from "@be/contacts/error/contacts.error-response";
+import {
+	ContactErrors,
+	PropertyErrors,
+} from "@be/contacts/error/contacts.error-response";
 import { type DatabaseInstance, db as defaultDb } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { and, eq, inArray, isNull } from "drizzle-orm";
@@ -188,6 +191,11 @@ export async function upsertContactProperties({
 			contactId,
 			error: error instanceof Error ? error.message : String(error),
 		});
-		throw error;
+		if (error && typeof error === "object" && "status" in error) {
+			throw error;
+		}
+		throw ContactErrors.databaseError(
+			error instanceof Error ? error.message : String(error),
+		);
 	}
 }

@@ -45,6 +45,14 @@ const contactsService = new Elysia({
 	)
 	.use(evlog())
 	.use(serverTiming())
+	.use(landingRoute)
+	.use(healthRoute)
+	.use(agentCardRoute)
+	.use(contactRoutes)
+	.use(propertyRoutes)
+	.use(channelRoutes)
+	.use(groupRoutes)
+	.use(preferencesRoutes)
 	.onError(({ error, set }) => {
 		const parsed = parseError(error);
 		set.status = parsed.status;
@@ -55,14 +63,6 @@ const contactsService = new Elysia({
 			link: parsed.link,
 		};
 	})
-	.use(landingRoute)
-	.use(healthRoute)
-	.use(agentCardRoute)
-	.use(contactRoutes)
-	.use(propertyRoutes)
-	.use(channelRoutes)
-	.use(groupRoutes)
-	.use(preferencesRoutes)
 	.onStart(async () => {
 		await loader();
 	})

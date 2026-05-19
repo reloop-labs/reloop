@@ -1,4 +1,7 @@
-import { GroupErrors } from "@be/contacts/error/contacts.error-response";
+import {
+	ContactErrors,
+	GroupErrors,
+} from "@be/contacts/error/contacts.error-response";
 import type { GroupModel } from "@be/contacts/model/group.model";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
@@ -69,6 +72,11 @@ export const deleteGroupController = async ({
 			group_id,
 			error: error instanceof Error ? error.message : String(error),
 		});
-		throw error;
+		if (error && typeof error === "object" && "status" in error) {
+			throw error;
+		}
+		throw ContactErrors.databaseError(
+			error instanceof Error ? error.message : String(error),
+		);
 	}
 };

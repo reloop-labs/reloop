@@ -1,4 +1,7 @@
-import { PropertyErrors } from "@be/contacts/error/contacts.error-response";
+import {
+	ContactErrors,
+	PropertyErrors,
+} from "@be/contacts/error/contacts.error-response";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { PROPERTY_DELETE_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -61,6 +64,11 @@ export const deletePropertyController = async ({
 			property_id,
 			error: error instanceof Error ? error.message : String(error),
 		});
-		throw error;
+		if (error && typeof error === "object" && "status" in error) {
+			throw error;
+		}
+		throw ContactErrors.databaseError(
+			error instanceof Error ? error.message : String(error),
+		);
 	}
 };

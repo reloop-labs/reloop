@@ -1,12 +1,15 @@
 import { ContactErrors } from "@be/contacts/error/contacts.error-response";
-import { upsertContactProperties } from "@be/contacts/routes/contact/utils/upsert-contact-properties";
 import type { ContactTypes } from "@be/contacts/types/contact.type";
 import { db } from "@reloop/db/client";
-import * as schema from "@reloop/db/schema";
-import { CONTACT_CREATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
-import { and, eq, isNull } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
-import { getExistingContact } from "./get-existing-contact";
+import {
+	addToGroups_step4,
+	checkExistingContact_step1,
+	createContact_step2,
+	enrollChannels_step5,
+	finalizeContactCreation_step6,
+	upsertProperties_step3,
+} from "./steps";
 
 export async function createContactController({
 	organizationId,
@@ -25,138 +28,69 @@ export async function createContactController({
 	const log = useLogger();
 	try {
 		return await db.transaction(async (tx) => {
-			const existingContact = await getExistingContact({
+			// Step 1: Check if contact already exists in this organization
+			await checkExistingContact_step1({
 				email,
 				organizationId,
 				db: tx,
 			});
-			if (existingContact) {
-				log.warn("Contact already exists in this organization", { email });
-				throw ContactErrors.contactAlreadyExists(email);
-			}
 
-			log.warn("Contact not found, creating new contact", { email });
-			const [newContact] = await tx
-				.insert(schema.contact)
-				.values({
-					email: email,
-					firstName: firstName || null,
-					lastName: lastName || null,
-					status: contactStatus || "subscribed",
-					organizationId,
-					userId,
-					createdAt: new Date(),
-					updatedAt: new Date(),
-				})
-				.returning();
-
-			if (!newContact) {
-				log.error("Failed to create contact - no data returned", { email });
-				throw ContactErrors.createFailed();
-			}
-			log.info("Contact added", {
-				...newContact,
-				status: undefined,
-				currentStatus: newContact.status,
-			});
-			if (properties && Object.keys(properties).length > 0) {
-				await upsertContactProperties({
-					contactId: newContact.id,
-					organizationId,
-					userId,
-					properties: properties,
-					db: tx,
-				});
-			}
-			if (groupIds && groupIds.length > 0) {
-				log.info("Adding contact to groups", {
-					contactId: newContact.id,
-					groupIds: groupIds,
-				});
-				await tx.insert(schema.contactGroup).values(
-					groupIds.map((groupId) => ({
-						contactId: newContact.id,
-						groupId,
-						organizationId,
-						userId,
-					})),
-				);
-			}
-			if (channels && channels.length > 0) {
-				log.info("Enrolling contact in channels", {
-					contactId: newContact.id,
-					channelCount: channels.length,
-				});
-				await tx.insert(schema.channelSubscription).values(
-					channels.map((channel) => ({
-						contactId: newContact.id,
-						channelId: channel.channelId,
-						organizationId,
-						status: (channel.subscription === "opt_in"
-							? "enrolled"
-							: "unenrolled") as "enrolled" | "unenrolled",
-					})),
-				);
-			}
-			log.info("Contact created successfully", {
-				email: email,
-				id: newContact.id,
+			// Step 2: Create a new contact
+			const { newContact } = await createContact_step2({
+				email,
+				firstName,
+				lastName,
+				status: contactStatus,
+				organizationId,
+				userId,
+				db: tx,
 			});
 
-			// Fetch final properties to ensure types are correct in response
-			const updatedProperties = await tx
-				.select({
-					name: schema.contactProperty.propertyName,
-					value: schema.contactPropertyValue.value,
-					type: schema.contactProperty.propertyType,
-				})
-				.from(schema.contactPropertyValue)
-				.innerJoin(
-					schema.contactProperty,
-					eq(schema.contactPropertyValue.propertyId, schema.contactProperty.id),
-				)
-				.where(
-					and(
-						eq(schema.contactPropertyValue.contactId, newContact.id),
-						eq(schema.contactPropertyValue.organizationId, organizationId),
-						isNull(schema.contactProperty.deletedAt),
-						isNull(schema.contactPropertyValue.deletedAt),
-					),
-				);
+			// Step 3: Upsert custom contact properties if provided
+			await upsertProperties_step3({
+				contactId: newContact.id,
+				properties,
+				organizationId,
+				userId,
+				db: tx,
+			});
 
-			const propertiesRecord = updatedProperties.reduce(
-				(acc, curr) => {
-					acc[curr.name] =
-						curr.type === "number" ? Number(curr.value) : curr.value;
-					return acc;
-				},
-				{} as Record<string, string | number>,
-			);
+			// Step 4: Associate contact with groups
+			await addToGroups_step4({
+				contactId: newContact.id,
+				groupIds,
+				organizationId,
+				userId,
+				db: tx,
+			});
 
-			const result = {
-				object: "contact" as const,
-				id: newContact.id,
-				email: newContact.email,
-				firstName: newContact.firstName,
-				lastName: newContact.lastName,
-				status: newContact.status,
-				properties: propertiesRecord ?? {},
-				groups: (newContact as ContactTypes.ContactData).groups ?? [],
-				channels: (newContact as ContactTypes.ContactData).channels ?? [],
-				suppressionReason: newContact.suppressionReason ?? null,
-				suppressedAt: newContact.suppressedAt ?? null,
-				createdAt: newContact.createdAt,
-				updatedAt: newContact.updatedAt,
-				event: CONTACT_CREATE_WEBHOOK_EVENT.id,
-			};
+			// Step 5: Enroll contact in communication channels
+			await enrollChannels_step5({
+				contactId: newContact.id,
+				channels,
+				organizationId,
+				db: tx,
+			});
 
-			return result;
+			log.info("Contact created successfully");
+
+			// Step 6: Fetch final unified properties to construct the exact response
+			return await finalizeContactCreation_step6({
+				newContact,
+				organizationId,
+				db: tx,
+			});
 		});
 	} catch (error) {
 		log.error("Debug creating contact", {
 			email: email,
 			error: error instanceof Error ? error.message : String(error),
 		});
-		throw error;
+		if (error && typeof error === "object" && "status" in error) {
+			throw error;
+		}
+		throw ContactErrors.databaseError(
+			error instanceof Error ? error.message : String(error),
+		);
 	}
 }

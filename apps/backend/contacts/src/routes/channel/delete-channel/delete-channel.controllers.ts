@@ -1,4 +1,7 @@
-import { ChannelErrors } from "@be/contacts/error/contacts.error-response";
+import {
+	ChannelErrors,
+	ContactErrors,
+} from "@be/contacts/error/contacts.error-response";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { CHANNEL_DELETE_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -73,6 +76,11 @@ export const deleteChannelController = async ({
 			channel_id,
 			error: error instanceof Error ? error.message : String(error),
 		});
-		throw error;
+		if (error && typeof error === "object" && "status" in error) {
+			throw error;
+		}
+		throw ContactErrors.databaseError(
+			error instanceof Error ? error.message : String(error),
+		);
 	}
 };
