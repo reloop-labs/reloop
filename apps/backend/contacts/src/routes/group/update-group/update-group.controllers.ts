@@ -1,6 +1,7 @@
 import {
 	ContactErrors,
 	GroupErrors,
+	isAppError,
 } from "@be/contacts/error/contacts.error-response";
 import type { GroupModel } from "@be/contacts/model/group.model";
 import type { GroupResponse } from "@be/contacts/types/group.type";
@@ -86,7 +87,7 @@ export const updateGroupController = async ({
 			group_id,
 			error: error instanceof Error ? error.message : String(error),
 		});
-		if (error && typeof error === "object" && "status" in error) {
+		if (isAppError(error)) {
 			throw error;
 		}
 		throw ContactErrors.databaseError(

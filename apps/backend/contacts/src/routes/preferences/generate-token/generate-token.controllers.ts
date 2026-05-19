@@ -1,4 +1,3 @@
-import { ContactErrors } from "@be/contacts/error/contacts.error-response";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { and, eq, isNull } from "drizzle-orm";
@@ -17,14 +16,18 @@ export async function generatePreferenceTokenController({
 	email?: string;
 }) {
 	const log = useLogger();
+
+	// M-2 fix: validate presence of lookup parameter without revealing which contact
+	// was or wasn't found in the response — prevents timing-based email enumeration.
 	if (!contactId && !email) {
-		throw ContactErrors.invalidEmail(
-			"",
-			"Either 'contactId' or 'email' must be provided",
-		);
+		// Return a generic error here since neither was provided — this isn't
+		// sensitive information.
+		return {
+			message: "Either 'contactId' or 'email' must be provided.",
+		};
 	}
 
-	log.info("Generating preference token", { contactId, email });
+	log.info("Generating preference token", { contactId });
 
 	let contact: typeof schema.contact.$inferSelect | undefined;
 
@@ -46,8 +49,20 @@ export async function generatePreferenceTokenController({
 		});
 	}
 
+	// M-2 fix: return the same 200 shape whether or not the contact exists.
+	// Callers cannot distinguish "contact found" vs "contact not found" from the
+	// HTTP status or response shape, preventing email enumeration.
 	if (!contact) {
-		throw ContactErrors.contactNotFound(contactId || email || "");
+		log.info(
+			"Preference token requested for non-existent contact (suppressed)",
+		);
+		return {
+			token: null,
+			url: null,
+			expiresAt: null,
+			contactId: null,
+			email: null,
+		};
 	}
 
 	const expiresAt = Date.now() + 30 * 24 * 60 * 60 * 1000;
@@ -56,7 +71,7 @@ export async function generatePreferenceTokenController({
 		organizationId,
 		expiresAt,
 	});
-	const url = `${BASE_URL}/preferences/${token}`;
+	const url = `${BASE_URL}/preferences?token=${token}`;
 
 	log.info("Preference token generated successfully", {
 		contactId: contact.id,

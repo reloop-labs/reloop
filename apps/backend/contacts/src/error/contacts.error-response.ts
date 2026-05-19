@@ -1,5 +1,21 @@
 import { createError } from "evlog";
 
+/**
+ * Type guard for structured app errors created by `createError()`.
+ * Use this instead of the loose `"status" in error` check to avoid
+ * prototype-pollution bypass vectors.
+ */
+export function isAppError(
+	error: unknown,
+): error is { status: number; message: string } {
+	return (
+		error !== null &&
+		typeof error === "object" &&
+		Object.hasOwn(error, "status") &&
+		typeof (error as Record<string, unknown>).status === "number"
+	);
+}
+
 export const AuthErrors = {
 	unauthorized: (why: string, fix?: string) =>
 		createError({
@@ -18,39 +34,46 @@ export const AuthErrors = {
 };
 
 export const ContactErrors = {
-	contactAlreadyExists: (email: string) =>
+	contactAlreadyExists: (_email: string) =>
 		createError({
 			status: 409,
 			message: "Contact already exists",
-			why: `The contact with email ${email} is already registered in our system for your organization.`,
+			why: "A contact with this email is already registered in your organization.",
 			fix: "Try updating the existing contact or use a different email address.",
 		}),
-	contactNotFound: (contactId: string) =>
+	contactNotFound: (_contactId: string) =>
 		createError({
 			status: 404,
 			message: "Contact not found",
-			why: `The contact with ID ${contactId} was not found or you don't have permission to access it.`,
+			why: "The requested contact was not found or you don't have permission to access it.",
 			fix: "Verify the contact ID and ensure it belongs to your active organization.",
 		}),
-	invalidEmail: (email: string, reason?: string) =>
+	invalidEmail: (_email: string, reason?: string) =>
 		createError({
 			status: 400,
 			message: "Invalid email",
-			why: reason ?? `The email ${email} is invalid or cannot be processed.`,
+			why:
+				reason ??
+				"The provided email address is invalid or cannot be processed.",
 			fix: "Ensure you are providing a valid email address.",
 		}),
-	databaseError: (message: string) =>
+	/**
+	 * H-1 fix: raw DB error messages (constraint names, column names, etc.) are
+	 * logged internally by the controller before throwing — they must NEVER be
+	 * forwarded to the caller. This factory always returns a generic message.
+	 */
+	databaseError: (_internalMessage: string) =>
 		createError({
 			status: 500,
 			message: "Database operation failed",
-			why: message,
-			fix: "Please try again later or contact support.",
+			why: "An internal error occurred. Our team has been notified.",
+			fix: "Please try again later or contact support if the issue persists.",
 		}),
 	createFailed: (message?: string) =>
 		createError({
 			status: 500,
 			message: message || "Failed to create contact",
-			why: "An unexpected error occurred while inserting the contact into the database.",
+			why: "An unexpected error occurred while processing your request.",
 			fix: "Please try again later or contact support if the issue persists.",
 		}),
 };

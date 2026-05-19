@@ -17,11 +17,13 @@ export const healthRoute = new Elysia().get(
 				responseTime: `${responseTime}ms`,
 				timestamp: new Date().toISOString(),
 			};
-		} catch (error) {
+		} catch {
+			// M-3 fix: never expose raw infrastructure error strings (connection
+			// strings, hostnames, TLS details) in a public unauthenticated endpoint.
+			// The real error is captured by the OpenTelemetry layer.
 			return {
 				status: "DISCONNECTED",
 				success: false,
-				error: error instanceof Error ? error.message : String(error),
 				timestamp: new Date().toISOString(),
 			};
 		}

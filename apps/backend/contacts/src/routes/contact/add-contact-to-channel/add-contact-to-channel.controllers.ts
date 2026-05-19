@@ -1,6 +1,7 @@
 import {
 	ChannelErrors,
 	ContactErrors,
+	isAppError,
 	SubscriptionErrors,
 } from "@be/contacts/error/contacts.error-response";
 import type { ContactModel } from "@be/contacts/model/contact.model";
@@ -159,7 +160,7 @@ export async function addContactToChannelController({
 			channelId,
 			error: error instanceof Error ? error.message : String(error),
 		});
-		if (error && typeof error === "object" && "status" in error) {
+		if (isAppError(error)) {
 			throw error;
 		}
 		throw ContactErrors.databaseError(

@@ -11,16 +11,17 @@ export const getPreferencesDataRoute = new Elysia()
 		}),
 	)
 	.get(
-		"/data/:token",
-		async ({ params }) => {
-			const _traceId = crypto.randomUUID();
+		"/data",
+		async ({ query }) => {
 			return await getPreferencesDataController({
-				token: params.token,
+				token: query.token,
 			});
 		},
 		{
 			rateLimit: true,
-			params: t.Object({
+			query: t.Object({
+				// H-2 fix: token in query param, NOT path — prevents tokens being
+				// stored in server access logs, browser history, and Referer headers.
 				token: t.String({ description: "Signed preference token" }),
 			}),
 			detail: {

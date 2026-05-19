@@ -11,21 +11,19 @@ export const updatePreferenceRoute = new Elysia()
 		}),
 	)
 	.post(
-		"/update/:token",
-		async ({ params, body }) => {
-			const _traceId = crypto.randomUUID();
+		"/update",
+		async ({ body }) => {
 			return await updatePreferenceController({
-				token: params.token,
+				token: body.token,
 				channelId: body.channelId,
 				subscribe: body.subscribe,
 			});
 		},
 		{
 			rateLimit: true,
-			params: t.Object({
-				token: t.String({ description: "Signed preference token" }),
-			}),
 			body: t.Object({
+				// H-2 fix: token in POST body, not URL path.
+				token: t.String({ description: "Signed preference token" }),
 				channelId: t.String({ description: "ID of the channel to update" }),
 				subscribe: t.Boolean({
 					description: "true to subscribe, false to unsubscribe",

@@ -11,16 +11,16 @@ export const unsubscribeAllRoute = new Elysia()
 		}),
 	)
 	.post(
-		"/unsubscribe-all/:token",
-		async ({ params }) => {
-			const _traceId = crypto.randomUUID();
+		"/unsubscribe-all",
+		async ({ body }) => {
 			return await unsubscribeAllController({
-				token: params.token,
+				token: body.token,
 			});
 		},
 		{
 			rateLimit: true,
-			params: t.Object({
+			body: t.Object({
+				// H-2 fix: token in POST body, not URL path.
 				token: t.String({ description: "Signed preference token" }),
 			}),
 			detail: {

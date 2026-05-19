@@ -2,8 +2,10 @@ import { createHash } from "node:crypto";
 import { contactsConfig } from "@be/contacts/contacts.config";
 import { redis } from "@be/contacts/utils/loader";
 
-/** How long (seconds) a validated session result is cached in Redis. */
-const SESSION_CACHE_TTL = 30;
+/** How long (seconds) a validated session result is cached in Redis.
+ * M-4: Kept intentionally short (5 s) so that a revoked session (logout,
+ * password change, org switch) propagates to this service within 5 seconds. */
+const SESSION_CACHE_TTL = 5;
 
 type SessionResult = {
 	userId: string;

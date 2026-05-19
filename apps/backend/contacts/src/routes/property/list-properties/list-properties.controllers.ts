@@ -1,4 +1,7 @@
-import { ContactErrors } from "@be/contacts/error/contacts.error-response";
+import {
+	ContactErrors,
+	isAppError,
+} from "@be/contacts/error/contacts.error-response";
 import type { PropertyTypes } from "@be/contacts/types/property.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
@@ -70,7 +73,7 @@ export const listPropertiesController = async ({
 		log.error("Debug listing properties", {
 			error: error instanceof Error ? error.message : String(error),
 		});
-		if (error && typeof error === "object" && "status" in error) {
+		if (isAppError(error)) {
 			throw error;
 		}
 		throw ContactErrors.databaseError(

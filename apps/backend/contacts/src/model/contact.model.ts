@@ -346,7 +346,6 @@ export namespace ContactModel {
 				},
 			),
 		),
-		organizationId: t.Optional(t.String()),
 	});
 
 	export type ContactQuery = typeof contactQuery.static;

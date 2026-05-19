@@ -18,6 +18,20 @@ import { evlog } from "evlog/elysia";
 
 initLogger({ env: { service: "contacts" } });
 
+// L-1: Refuse to start in production with a known-public default secret.
+// Anyone with access to this source code can forge preference tokens if
+// PREFERENCES_SECRET is not changed.
+if (
+	contactsConfig.NODE_ENV === "production" &&
+	contactsConfig.PREFERENCES_SECRET ===
+		"reloop-preferences-secret-key-change-in-prod"
+) {
+	throw new Error(
+		"FATAL: PREFERENCES_SECRET must be set to a strong random value in production. " +
+			"Set the PREFERENCES_SECRET environment variable before starting the service.",
+	);
+}
+
 const port = contactsConfig.port;
 const contactsService = new Elysia({
 	prefix: "/api/contacts",

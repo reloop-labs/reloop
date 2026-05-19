@@ -1,5 +1,6 @@
 import {
 	ContactErrors,
+	isAppError,
 	PropertyErrors,
 } from "@be/contacts/error/contacts.error-response";
 import type { PropertyTypes } from "@be/contacts/types/property.type";
@@ -66,7 +67,7 @@ export const updatePropertyController = async ({
 			property_id,
 			error: error instanceof Error ? error.message : String(error),
 		});
-		if (error && typeof error === "object" && "status" in error) {
+		if (isAppError(error)) {
 			throw error;
 		}
 		throw ContactErrors.databaseError(

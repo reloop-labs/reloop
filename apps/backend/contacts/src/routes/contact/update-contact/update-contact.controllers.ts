@@ -1,4 +1,7 @@
-import { ContactErrors } from "@be/contacts/error/contacts.error-response";
+import {
+	ContactErrors,
+	isAppError,
+} from "@be/contacts/error/contacts.error-response";
 import { upsertContactProperties } from "@be/contacts/routes/contact/utils/upsert-contact-properties";
 import type { ContactTypes } from "@be/contacts/types/contact.type";
 import { db } from "@reloop/db/client";
@@ -145,7 +148,7 @@ export async function updateContactController({
 			organizationId,
 			error: error instanceof Error ? error.message : String(error),
 		});
-		if (error && typeof error === "object" && "status" in error) {
+		if (isAppError(error)) {
 			throw error;
 		}
 		throw ContactErrors.databaseError(

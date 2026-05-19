@@ -1,5 +1,6 @@
 import type { DatabaseInstance } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
+import { and, eq, inArray, isNull } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
 
 export async function enrollChannels_step5({
@@ -14,10 +15,41 @@ export async function enrollChannels_step5({
 	db: DatabaseInstance;
 }) {
 	const log = useLogger();
-	if (channels && channels.length > 0) {
+	if (!channels || channels.length === 0) return;
+
+	const requestedChannelIds = channels.map((c) => c.channelId);
+
+	// H-3 fix: validate that every channelId belongs to the caller's org before
+	// inserting. Prevents cross-tenant subscription pollution.
+	const validChannels = await db
+		.select({ id: schema.channel.id })
+		.from(schema.channel)
+		.where(
+			and(
+				inArray(schema.channel.id, requestedChannelIds),
+				eq(schema.channel.organizationId, organizationId),
+				isNull(schema.channel.deletedAt),
+			),
+		);
+
+	const validChannelIdSet = new Set(validChannels.map((c) => c.id));
+
+	const dropped = requestedChannelIds.length - validChannelIdSet.size;
+	if (dropped > 0) {
+		log.warn("Dropped channel IDs that do not belong to the organization", {
+			organizationId,
+			dropped,
+		});
+	}
+
+	const validEntries = channels.filter((c) =>
+		validChannelIdSet.has(c.channelId),
+	);
+
+	if (validEntries.length > 0) {
 		log.info("Enrolling contact in channels");
 		await db.insert(schema.channelSubscription).values(
-			channels.map((channel) => ({
+			validEntries.map((channel) => ({
 				contactId,
 				channelId: channel.channelId,
 				organizationId,

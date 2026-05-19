@@ -1,4 +1,7 @@
-import { ContactErrors } from "@be/contacts/error/contacts.error-response";
+import {
+	ContactErrors,
+	isAppError,
+} from "@be/contacts/error/contacts.error-response";
 import type { GroupModel } from "@be/contacts/model/group.model";
 import type { GroupListResponse } from "@be/contacts/types/group.type";
 import { db } from "@reloop/db/client";
@@ -60,7 +63,7 @@ export const listGroupsController = async ({
 		log.error("Debug listing groups", {
 			error: error instanceof Error ? error.message : String(error),
 		});
-		if (error && typeof error === "object" && "status" in error) {
+		if (isAppError(error)) {
 			throw error;
 		}
 		throw ContactErrors.databaseError(

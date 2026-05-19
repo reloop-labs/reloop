@@ -9,10 +9,10 @@ export interface RateLimitOptions {
 }
 
 async function checkRateLimit(
-	organizationId: string,
+	identifier: string,
 	opts: RateLimitOptions,
 ): Promise<{ limited: boolean; remaining: number; retryAfter: number }> {
-	const key = `rate-limit:mgmt:${opts.namespace}:${organizationId}`;
+	const key = `rate-limit:mgmt:${opts.namespace}:${identifier}`;
 
 	try {
 		const count = await redis.increment(key);
@@ -42,17 +42,49 @@ async function checkRateLimit(
 	}
 }
 
+/**
+ * Extracts the best available client identifier for rate limiting.
+ *
+ * Priority:
+ *  1. organizationId (authenticated requests — correct tenant scoping)
+ *  2. IP address from X-Forwarded-For / CF-Connecting-IP (unauthenticated
+ *     requests like the public preferences endpoints)
+ *
+ * L-4 fix: previously the middleware silently skipped rate limiting when
+ * organizationId was absent, meaning public endpoints had no effective limit.
+ */
+function getRateLimitIdentifier(
+	context: Record<string, unknown>,
+	request: Request,
+): string | undefined {
+	const organizationId = context.organizationId as string | undefined;
+	if (organizationId) return organizationId;
+
+	// Fallback to IP for unauthenticated callers (public preferences endpoints).
+	const headers = request.headers;
+	const ip =
+		headers.get("cf-connecting-ip") ??
+		headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+		headers.get("x-real-ip");
+
+	return ip ?? undefined;
+}
+
 export function rateLimitPlugin(opts: RateLimitOptions) {
 	return new Elysia({ name: `rate-limit-${opts.namespace}` }).macro({
 		rateLimit: {
 			async resolve(context) {
-				const organizationId = (context as Record<string, unknown>)
-					.organizationId as string | undefined;
+				const identifier = getRateLimitIdentifier(
+					context as Record<string, unknown>,
+					context.request,
+				);
 
-				if (!organizationId) return;
+				// If we cannot determine any identifier, fail open rather than
+				// blocking all traffic (e.g. local dev without X-Forwarded-For).
+				if (!identifier) return;
 
 				const { status, set } = context;
-				const result = await checkRateLimit(organizationId, opts);
+				const result = await checkRateLimit(identifier, opts);
 
 				set.headers["X-RateLimit-Limit"] = String(opts.max);
 				set.headers["X-RateLimit-Remaining"] = String(result.remaining);

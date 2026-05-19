@@ -1,4 +1,7 @@
-import { ContactErrors } from "@be/contacts/error/contacts.error-response";
+import {
+	ContactErrors,
+	isAppError,
+} from "@be/contacts/error/contacts.error-response";
 import type { ContactModel } from "@be/contacts/model/contact.model";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
@@ -117,7 +120,7 @@ export async function updateContactChannelController({
 			channelId,
 			error: error instanceof Error ? error.message : String(error),
 		});
-		if (error && typeof error === "object" && "status" in error) {
+		if (isAppError(error)) {
 			throw error;
 		}
 		throw ContactErrors.databaseError(

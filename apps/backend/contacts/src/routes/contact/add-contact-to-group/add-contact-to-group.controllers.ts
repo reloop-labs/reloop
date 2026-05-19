@@ -1,6 +1,7 @@
 import {
 	ContactErrors,
 	GroupErrors,
+	isAppError,
 } from "@be/contacts/error/contacts.error-response";
 import type { ContactModel } from "@be/contacts/model/contact.model";
 import { db } from "@reloop/db/client";
@@ -63,7 +64,7 @@ export async function addContactToGroupController({
 			log.info("Find contact by email", { email });
 			contact = await db.query.contact.findFirst({
 				where: and(
-					eq(schema.contact.email, email),
+					eq(schema.contact.email, email.toLowerCase()),
 					eq(schema.contact.organizationId, organizationId),
 					isNull(schema.contact.deletedAt),
 				),
@@ -129,7 +130,7 @@ export async function addContactToGroupController({
 			groupId,
 			error: error instanceof Error ? error.message : String(error),
 		});
-		if (error && typeof error === "object" && "status" in error) {
+		if (isAppError(error)) {
 			throw error;
 		}
 		throw ContactErrors.databaseError(

@@ -1,4 +1,7 @@
-import { ContactErrors } from "@be/contacts/error/contacts.error-response";
+import {
+	ContactErrors,
+	isAppError,
+} from "@be/contacts/error/contacts.error-response";
 import type { ContactTypes } from "@be/contacts/types/contact.type";
 import { db } from "@reloop/db/client";
 import { useLogger } from "evlog/elysia";
@@ -87,7 +90,7 @@ export async function createContactController({
 			email: email,
 			error: error instanceof Error ? error.message : String(error),
 		});
-		if (error && typeof error === "object" && "status" in error) {
+		if (isAppError(error)) {
 			throw error;
 		}
 		throw ContactErrors.databaseError(
