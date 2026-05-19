@@ -16,7 +16,7 @@ import { toast } from "sonner";
 import useSWR from "swr";
 import { CollabPresence } from "./collobration/Collabpresence";
 import type { ConnectionStatus as ConnectionStatusType } from "./collobration/hooks/useCollaboration";
-import { DiffViewer } from "./diff-viewer";
+import { DiffViewer } from "./diff-viewer"; // Cache bust
 import { useEditorStore } from "./use-editor-store";
 
 const fetcher = (url: string) =>
@@ -296,6 +296,7 @@ export const EditorHeaderActions = ({
 			const content = editor.getJSON().content ?? [];
 			const renderedHtml = editor.getHTML();
 
+			// 1. Create the version snapshot
 			const response = await fetch(`/api/template/v1/${templateId}/versions`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
@@ -307,6 +308,14 @@ export const EditorHeaderActions = ({
 				}),
 				credentials: "include",
 			});
+
+			// 2. Sync the template baseline so reopening always finds latest content
+			fetch(`/api/template/v1/${templateId}`, {
+				method: "PUT",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ content, subject }),
+				credentials: "include",
+			}).catch((err) => console.warn("[draft] Failed to sync template baseline:", err));
 
 			const result = await response.json();
 			const draftNum = result.draftNumber ?? null;
@@ -333,6 +342,7 @@ export const EditorHeaderActions = ({
 			const content = editor.getJSON().content ?? [];
 			const renderedHtml = editor.getHTML();
 
+			// 1. Create the published version snapshot
 			const response = await fetch(`/api/template/v1/${templateId}/versions`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
@@ -345,6 +355,16 @@ export const EditorHeaderActions = ({
 				}),
 				credentials: "include",
 			});
+
+			// 2. Sync the template baseline so reopening always finds latest content
+			// (The backend also updates status to "published" via createVersion,
+			//  but we also need to persist the content and subject on the template record)
+			fetch(`/api/template/v1/${templateId}`, {
+				method: "PUT",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ content, subject }),
+				credentials: "include",
+			}).catch((err) => console.warn("[publish] Failed to sync template baseline:", err));
 
 			const result = await response.json();
 			const pubNum = result.publishNumber ?? null;

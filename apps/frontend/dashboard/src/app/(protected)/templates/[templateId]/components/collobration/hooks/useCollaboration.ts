@@ -63,6 +63,17 @@ export function getRandomColor(seed = ""): string {
 	return USER_COLORS[Math.abs(hash) % USER_COLORS.length]!;
 }
 
+function getWsUrl(): string {
+	if (typeof process !== "undefined" && process.env.NEXT_PUBLIC_WS_URL) {
+		return process.env.NEXT_PUBLIC_WS_URL;
+	}
+	if (typeof window !== "undefined") {
+		const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+		return `${protocol}//${window.location.host}`;
+	}
+	return "ws://localhost:3000";
+}
+
 export function useCollaboration({
 	roomName,
 	user,
@@ -71,8 +82,9 @@ export function useCollaboration({
 }: UseCollaborationOptions): UseCollaborationReturn {
 	const { ydoc, provider } = useMemo(() => {
 		const y = new Y.Doc();
+		const wsUrl = getWsUrl();
 		const p = new WebsocketProvider(
-			`${process.env.NEXT_PUBLIC_WS_URL}/api/template/collab`,
+			`${wsUrl}/api/template/collab`,
 			roomName,
 			y,
 			{ connect: true },

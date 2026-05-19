@@ -9,8 +9,9 @@ import { useRouter } from "next/navigation";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useState } from "react";
 import useSWR from "swr";
+import { CreateTemplateModal } from "./create-template-modal";
 import { EmptyState } from "./empty-state";
-import { TemplateTable } from "./template-table";
+import { TemplateGrid } from "./template-grid";
 
 interface Template {
 	id: string;
@@ -143,10 +144,10 @@ export const TemplateList = () => {
 							</div>
 						</div>
 						<div className="mt-4">
-							<TemplateTable
+							<TemplateGrid
 								templates={filteredTemplates}
 								isLoading={isLoading}
-								loadingRows={4}
+								loadingRows={6}
 								onMutate={mutate}
 							/>
 						</div>
