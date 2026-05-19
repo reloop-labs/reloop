@@ -21,7 +21,7 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 					if (sessionResult) {
 						const result = {
 							userId: sessionResult.userId,
-							organizationId: sessionResult.activeOrganizationId,
+							organizationId: sessionResult.organizationId,
 							authType: "auth" as const,
 						};
 						log.set({
@@ -96,7 +96,7 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 					if (sessionResult) {
 						const result = {
 							userId: sessionResult.userId,
-							organizationId: sessionResult.activeOrganizationId,
+							organizationId: sessionResult.organizationId,
 							authType: "auth" as const,
 						};
 						log.set({
