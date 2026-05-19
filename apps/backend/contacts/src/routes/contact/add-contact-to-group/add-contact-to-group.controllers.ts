@@ -35,7 +35,7 @@ export async function addContactToGroupController({
 			email,
 			groupId,
 		});
-		// Verify group exists
+
 		const group = await db.query.group.findFirst({
 			where: and(
 				eq(schema.group.id, groupId),

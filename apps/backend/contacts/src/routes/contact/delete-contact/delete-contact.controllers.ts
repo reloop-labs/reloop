@@ -20,7 +20,6 @@ export async function deleteContactController({
 	log.info("Deleting contact", { contactId });
 
 	try {
-		// Use DELETE...RETURNING to check existence and delete in a single round-trip.
 		const [deleted] = await db
 			.delete(schema.contact)
 			.where(

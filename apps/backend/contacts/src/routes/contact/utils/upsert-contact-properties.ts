@@ -30,7 +30,6 @@ export async function upsertContactProperties({
 	const log = useLogger();
 	const propertyNames = Object.keys(properties);
 
-	// Validate all property names up-front before touching the DB.
 	const propertyNameRegex = /^[a-z0-9_]+$/;
 	for (const name of propertyNames) {
 		if (!propertyNameRegex.test(name)) {
@@ -49,9 +48,7 @@ export async function upsertContactProperties({
 	});
 
 	try {
-		// ── Step A: Load current values & property definitions in parallel ──────────
 		const [currentValues, existingProperties] = await Promise.all([
-			// All active property values currently stored for this contact
 			db
 				.select({
 					id: schema.contactPropertyValue.id,
@@ -71,7 +68,6 @@ export async function upsertContactProperties({
 					),
 				),
 
-			// Property definitions for the names present in the request
 			propertyNames.length > 0
 				? db
 						.select({
@@ -96,7 +92,6 @@ export async function upsertContactProperties({
 					),
 		]);
 
-		// ── Step B: Soft-delete values that are NOT in the incoming request ────────
 		const propertiesToDelete = currentValues.filter(
 			(cv) => !propertyNames.includes(cv.propertyName),
 		);
@@ -118,7 +113,6 @@ export async function upsertContactProperties({
 
 		if (propertyNames.length === 0) return;
 
-		// ── Step C: Build lookup maps from the batch-loaded data ──────────────────
 		const propertyInfo = new Map<
 			string,
 			{ id: string; type: "string" | "number" }
@@ -129,14 +123,10 @@ export async function upsertContactProperties({
 			]),
 		);
 
-		// currentValues indexed by propertyId for O(1) lookup during the upsert loop
 		const existingValueByPropertyId = new Map(
 			currentValues.map((cv) => [cv.propertyId, cv]),
 		);
 
-		// ── Step D: Resolve missing property definitions (auto-create) ────────────
-		// Any property that doesn't exist yet must be created individually (sequential
-		// is fine here — these are rare one-time registrations, not hot-path queries).
 		for (const name of propertyNames) {
 			if (!propertyInfo.has(name)) {
 				const incomingType =
@@ -163,18 +153,16 @@ export async function upsertContactProperties({
 			}
 		}
 
-		// ── Step E: Build insert / update lists and execute them in parallel ──────
 		const now = new Date();
 		const toInsert: (typeof schema.contactPropertyValue.$inferInsert)[] = [];
 		const updateOps: Promise<unknown>[] = [];
 
 		for (const [name, value] of Object.entries(properties)) {
 			const info = propertyInfo.get(name);
-			if (!info) continue; // should never happen after Step D
+			if (!info) continue;
 
 			const incomingType = typeof value === "number" ? "number" : "string";
 
-			// Type-safety check
 			if (incomingType !== info.type) {
 				log.warn("Property type mismatch", {
 					name,
@@ -184,7 +172,6 @@ export async function upsertContactProperties({
 				throw PropertyErrors.typeMismatch(name, info.type, incomingType);
 			}
 
-			// Coerce & sanitize value
 			let stringValue = String(value);
 			if (info.type === "number") {
 				const numVal = Number(value);
@@ -200,7 +187,6 @@ export async function upsertContactProperties({
 			const existingValue = existingValueByPropertyId.get(info.id);
 
 			if (existingValue) {
-				// Update (and restore if soft-deleted) — fire in parallel
 				updateOps.push(
 					db
 						.update(schema.contactPropertyValue)
@@ -208,7 +194,6 @@ export async function upsertContactProperties({
 						.where(eq(schema.contactPropertyValue.id, existingValue.id)),
 				);
 			} else {
-				// Collect for batch insert
 				toInsert.push({
 					contactId,
 					propertyId: info.id,
@@ -221,7 +206,6 @@ export async function upsertContactProperties({
 			}
 		}
 
-		// Execute updates (parallel) and single batch insert concurrently
 		await Promise.all([
 			...updateOps,
 			toInsert.length > 0

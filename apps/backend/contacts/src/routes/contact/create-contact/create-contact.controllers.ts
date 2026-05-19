@@ -31,14 +31,12 @@ export async function createContactController({
 	const log = useLogger();
 	try {
 		return await db.transaction(async (tx) => {
-			// Step 1: Check if contact already exists in this organization (active vs soft-deleted)
 			const { softDeletedContact } = await checkExistingContact_step1({
 				email,
 				organizationId,
 				db: tx,
 			});
 
-			// Step 2: Create a new contact (or restore soft-deleted contact if found)
 			const { newContact } = await createContact_step2({
 				email,
 				firstName,
@@ -50,7 +48,6 @@ export async function createContactController({
 				softDeletedContact,
 			});
 
-			// Step 3: Upsert custom contact properties if provided
 			await upsertProperties_step3({
 				contactId: newContact.id,
 				properties,
@@ -59,7 +56,6 @@ export async function createContactController({
 				db: tx,
 			});
 
-			// Step 4: Associate contact with groups
 			await addToGroups_step4({
 				contactId: newContact.id,
 				groupIds,
@@ -68,7 +64,6 @@ export async function createContactController({
 				db: tx,
 			});
 
-			// Step 5: Enroll contact in communication channels
 			await enrollChannels_step5({
 				contactId: newContact.id,
 				channels,
@@ -78,7 +73,6 @@ export async function createContactController({
 
 			log.info("Contact created successfully");
 
-			// Step 6: Fetch final unified properties to construct the exact response
 			return await finalizeContactCreation_step6({
 				newContact,
 				organizationId,

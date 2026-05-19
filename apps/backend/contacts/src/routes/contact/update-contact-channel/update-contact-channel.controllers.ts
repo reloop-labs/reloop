@@ -36,7 +36,6 @@ export async function updateContactChannelController({
 	});
 
 	try {
-		// Identify contact
 		let contact: typeof schema.contact.$inferSelect | undefined;
 
 		if (contact_id) {

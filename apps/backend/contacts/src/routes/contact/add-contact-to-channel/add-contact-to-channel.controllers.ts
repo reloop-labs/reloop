@@ -45,7 +45,6 @@ export async function addContactToChannelController({
 	}
 
 	try {
-		// Verify channel exists
 		const channel = await db.query.channel.findFirst({
 			where: and(
 				eq(schema.channel.id, channelId),
@@ -58,7 +57,6 @@ export async function addContactToChannelController({
 			throw ChannelErrors.notFound(channelId);
 		}
 
-		// Identify contact
 		let contact: typeof schema.contact.$inferSelect | undefined;
 
 		if (contact_id) {
@@ -102,7 +100,6 @@ export async function addContactToChannelController({
 		) as "enrolled" | "unenrolled";
 
 		if (existingSubscription) {
-			// If status is different, update it
 			if (existingSubscription.status !== targetStatus) {
 				await db
 					.update(schema.channelSubscription)
@@ -125,7 +122,7 @@ export async function addContactToChannelController({
 
 			throw SubscriptionErrors.alreadyExists();
 		}
-		// Create subscription
+
 		const [newSubscription] = await db
 			.insert(schema.channelSubscription)
 			.values({

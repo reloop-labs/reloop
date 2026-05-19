@@ -19,9 +19,6 @@ export async function addToGroups_step4({
 	const log = useLogger();
 	if (!groupIds || groupIds.length === 0) return;
 
-	// H-3 fix: validate that every supplied groupId belongs to the caller's org
-	// before inserting. Silently drops IDs that don't belong to prevent cross-tenant
-	// data pollution.
 	const validGroups = await db
 		.select({ id: schema.group.id })
 		.from(schema.group)

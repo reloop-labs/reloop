@@ -34,7 +34,6 @@ export async function removeContactFromGroupController({
 	});
 
 	try {
-		// Identify contact
 		const whereConditions = [
 			eq(schema.contact.organizationId, organizationId),
 			isNull(schema.contact.deletedAt),
@@ -54,7 +53,6 @@ export async function removeContactFromGroupController({
 			throw ContactErrors.contactNotFound(contact_id || email || "");
 		}
 
-		// Remove from group
 		await db
 			.update(schema.contactGroup)
 			.set({ deletedAt: new Date(), updatedAt: new Date() })

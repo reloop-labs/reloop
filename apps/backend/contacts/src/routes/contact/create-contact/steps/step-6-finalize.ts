@@ -13,7 +13,6 @@ export async function finalizeContactCreation_step6({
 	organizationId: string;
 	db: DatabaseInstance;
 }): Promise<ContactTypes.ContactResponse> {
-	// Fetch final properties to ensure types are correct in response
 	const updatedProperties = await db
 		.select({
 			name: schema.contactProperty.propertyName,

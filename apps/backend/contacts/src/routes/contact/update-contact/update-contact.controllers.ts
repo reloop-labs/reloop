@@ -27,7 +27,6 @@ export async function updateContactController({
 
 	try {
 		return await db.transaction(async (tx) => {
-			// Check if contact exists
 			const existingContact = await tx.query.contact.findFirst({
 				where: and(
 					eq(schema.contact.id, contactId),
@@ -41,7 +40,6 @@ export async function updateContactController({
 				throw ContactErrors.contactNotFound(contactId);
 			}
 
-			// Update the contact
 			const updateData: Partial<typeof schema.contact.$inferInsert> = {
 				updatedAt: new Date(),
 			};
@@ -77,7 +75,6 @@ export async function updateContactController({
 				throw ContactErrors.databaseError("Failed to update contact");
 			}
 
-			// Handle property values if provided
 			if (properties !== undefined) {
 				await upsertContactProperties({
 					contactId,
@@ -93,7 +90,6 @@ export async function updateContactController({
 				organizationId,
 			});
 
-			// Fetch current properties after update to return them in response
 			const updatedProperties = await tx
 				.select({
 					name: schema.contactProperty.propertyName,

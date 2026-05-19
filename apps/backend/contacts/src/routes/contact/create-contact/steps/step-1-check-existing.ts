@@ -15,8 +15,6 @@ export async function checkExistingContact_step1({
 }) {
 	const log = useLogger();
 
-	// Single query — fetch up to 2 rows (active + soft-deleted) matching this email.
-	// Partitioning in JS avoids the second round-trip.
 	const rows = await db
 		.select()
 		.from(schema.contact)

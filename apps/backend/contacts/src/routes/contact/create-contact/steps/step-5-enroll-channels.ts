@@ -19,8 +19,6 @@ export async function enrollChannels_step5({
 
 	const requestedChannelIds = channels.map((c) => c.channelId);
 
-	// H-3 fix: validate that every channelId belongs to the caller's org before
-	// inserting. Prevents cross-tenant subscription pollution.
 	const validChannels = await db
 		.select({ id: schema.channel.id })
 		.from(schema.channel)

@@ -59,8 +59,6 @@ export async function listContactsController({
 				? sql<number>`count(*) filter (where ${and(...matchFilters)})`
 				: sql<number>`count(*)`;
 
-		// Run the counts aggregation and the paginated contacts fetch in parallel —
-		// they are completely independent of each other.
 		const [countsResult, contacts] = await Promise.all([
 			db
 				.select({
@@ -92,7 +90,6 @@ export async function listContactsController({
 
 		const contactIds = contacts.map((c) => c.id);
 
-		// Batch-load all related data in parallel; skip entirely when the page is empty.
 		let propertyMap: Record<string, Record<string, string>> = {};
 		let allOrgChannels: {
 			id: string;
@@ -106,7 +103,6 @@ export async function listContactsController({
 
 		if (contactIds.length > 0) {
 			const [allProperties, channelRows, allEnrollments] = await Promise.all([
-				// Batch load all property values for this page of contacts
 				db
 					.select({
 						contactId: schema.contactPropertyValue.contactId,
@@ -123,7 +119,6 @@ export async function listContactsController({
 					)
 					.where(inArray(schema.contactPropertyValue.contactId, contactIds)),
 
-				// Lean select — only the three columns actually used in the response mapping
 				db
 					.select({
 						id: schema.channel.id,
@@ -138,7 +133,6 @@ export async function listContactsController({
 						),
 					),
 
-				// Batch load all channel enrollments for this page of contacts
 				db.query.channelSubscription.findMany({
 					where: and(
 						inArray(schema.channelSubscription.contactId, contactIds),
@@ -201,7 +195,7 @@ export async function listContactsController({
 						: t.defaultSubscription) as "opt_in" | "opt_out",
 				};
 			}),
-			// Suppression is on the contact row itself — no extra query
+
 			suppressionReason: contact.suppressionReason ?? null,
 			suppressedAt: contact.suppressedAt ?? null,
 			createdAt: contact.createdAt,

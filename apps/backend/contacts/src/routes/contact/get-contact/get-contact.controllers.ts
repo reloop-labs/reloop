@@ -20,8 +20,6 @@ export async function getContactController({
 	log.info("Getting contact", { contactId, organizationId });
 
 	try {
-		// Fetch the contact (with its relations) and the full channel list in parallel —
-		// allChannels only needs organizationId, so it doesn't depend on the contact result.
 		const [contact, allChannels] = await Promise.all([
 			db.query.contact.findFirst({
 				where: and(
@@ -57,7 +55,6 @@ export async function getContactController({
 			throw ContactErrors.contactNotFound(contactId);
 		}
 
-		// Map property values to Record<string, string>
 		const properties = contact.propertyValues.reduce(
 			(acc, pv) => {
 				acc[pv.property.propertyName] = pv.value;
@@ -66,19 +63,16 @@ export async function getContactController({
 			{} as Record<string, string>,
 		);
 
-		// Map contactGroups join rows to { id, name }
 		const groups = contact.contactGroups
 			.filter((cg) => cg.group !== null)
 			.map((cg) => ({ id: cg.group.id, name: cg.group.name }));
 
-		// Build an O(1) lookup map from the contact's explicit enrollments.
 		const enrollmentByChannelId = new Map(
 			contact.contactChannels
 				.filter((en) => en.deletedAt === null)
 				.map((en) => [en.channelId, en.status]),
 		);
 
-		// Map enrollments to { id, name, subscription } — O(1) per channel lookup.
 		const channels = allChannels.map((t) => {
 			const explicitStatus = enrollmentByChannelId.get(t.id);
 			return {
@@ -92,7 +86,6 @@ export async function getContactController({
 			};
 		});
 
-		// Suppression is flat on the contact row
 		const suppressionReason = contact.suppressionReason ?? null;
 		const suppressedAt = contact.suppressedAt ?? null;
 

@@ -10,16 +10,16 @@ import { updateContactRoute } from "./update-contact/update-contact.route";
 import { updateContactChannelRoute } from "./update-contact-channel/update-contact-channel.route";
 
 export const contactRoutes = new Elysia({ name: "ContactRoutes" })
-	// Contact Routes
+
 	.use(createContactRoute)
 	.use(getContactRoute)
 	.use(listContactsRoute)
 	.use(updateContactRoute)
 	.use(deleteContactRoute)
-	// Add to Channel
+
 	.use(addContactToChannelRoute)
-	// Group Management
+
 	.use(addContactToGroupRoute)
 	.use(removeContactFromGroupRoute)
-	// Channel Management
+
 	.use(updateContactChannelRoute);
