@@ -10,9 +10,9 @@ export const addContactToGroupRoute = new Elysia()
 	.use(rateLimitPlugin({ max: 30, windowSeconds: 60, namespace: "add-group" }))
 	.post(
 		"/group/:group_id",
-		async ({ body, params, activeOrganizationId }) => {
+		async ({ body, params, organizationId }) => {
 			return await addContactToGroupController({
-				organizationId: activeOrganizationId,
+				organizationId,
 				groupId: params.group_id,
 				contact_id: body.contact_id,
 				email: body.email,

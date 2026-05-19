@@ -16,9 +16,9 @@ export const deleteChannelRoute = new Elysia()
 	)
 	.delete(
 		"/:channel_id",
-		async ({ params, activeOrganizationId, logger }) => {
+		async ({ params, organizationId, logger }) => {
 			return await deleteChannelController({
-				activeOrganizationId,
+				organizationId,
 				channel_id: params.channel_id,
 			});
 		},

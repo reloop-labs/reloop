@@ -9,11 +9,11 @@ import { useLogger } from "evlog/elysia";
 
 export const createGroupController = async ({
 	name,
-	activeOrganizationId,
+	organizationId,
 	userId,
 }: {
 	name: string;
-	activeOrganizationId: string;
+	organizationId: string;
 	userId: string;
 }): Promise<GroupResponse | GroupModel.Unauthorized> => {
 	const logger = useLogger();
@@ -23,7 +23,7 @@ export const createGroupController = async ({
 		const existingGroup = await db.query.group.findFirst({
 			where: and(
 				eq(schema.group.name, name),
-				eq(schema.group.organizationId, activeOrganizationId),
+				eq(schema.group.organizationId, organizationId),
 				isNull(schema.group.deletedAt),
 			),
 		});
@@ -36,7 +36,7 @@ export const createGroupController = async ({
 			.values({
 				id: createGroupId(),
 				name,
-				organizationId: activeOrganizationId,
+				organizationId: organizationId,
 				userId,
 			})
 			.returning();

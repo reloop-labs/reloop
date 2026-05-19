@@ -6,10 +6,10 @@ import { and, desc, eq, ilike, isNull, type SQL, sql } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
 
 export const listPropertiesController = async ({
-	activeOrganizationId,
+	organizationId,
 	query,
 }: {
-	activeOrganizationId: string;
+	organizationId: string;
 	query: PropertyTypes.PropertyListQuery;
 }): Promise<PropertyTypes.PropertyListResponse> => {
 	const logger = useLogger();
@@ -21,7 +21,7 @@ export const listPropertiesController = async ({
 
 	try {
 		const whereConditions: Array<SQL<unknown>> = [
-			eq(schema.contactProperty.organizationId, activeOrganizationId),
+			eq(schema.contactProperty.organizationId, organizationId),
 			isNull(schema.contactProperty.deletedAt),
 		];
 

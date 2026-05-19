@@ -12,9 +12,9 @@ export const listChannelsRoute = new Elysia()
 	)
 	.get(
 		"/list",
-		async ({ query, activeOrganizationId, logger }) => {
+		async ({ query, organizationId, logger }) => {
 			return await listChannelsController({
-				activeOrganizationId,
+				organizationId,
 				page: query.page,
 				limit: query.limit,
 			});

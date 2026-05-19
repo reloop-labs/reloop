@@ -12,9 +12,9 @@ export const updateGroupRoute = new Elysia()
 	)
 	.patch(
 		"/:group_id",
-		async ({ params, body, activeOrganizationId }) => {
+		async ({ params, body, organizationId }) => {
 			return await updateGroupController({
-				activeOrganizationId,
+				organizationId,
 				group_id: params.group_id,
 				name: body.name,
 			});

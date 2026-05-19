@@ -12,10 +12,10 @@ export const getContactRoute = new Elysia()
 	)
 	.get(
 		"/retrieve/:contact_id",
-		async ({ params, activeOrganizationId, logger }) => {
+		async ({ params, organizationId, logger }) => {
 			return await getContactController({
 				contactId: params.contact_id,
-				organizationId: activeOrganizationId,
+				organizationId,
 			});
 		},
 		{

@@ -7,10 +7,10 @@ import { status } from "elysia";
 import { useLogger } from "evlog/elysia";
 
 export const getChannelController = async ({
-	activeOrganizationId,
+	organizationId,
 	channel_id,
 }: {
-	activeOrganizationId: string;
+	organizationId: string;
 	channel_id: string;
 }): Promise<ChannelTypes.ChannelResponse> => {
 	const logger = useLogger();
@@ -19,7 +19,7 @@ export const getChannelController = async ({
 		const result = await db.query.channel.findFirst({
 			where: and(
 				eq(schema.channel.id, channel_id),
-				eq(schema.channel.organizationId, activeOrganizationId),
+				eq(schema.channel.organizationId, organizationId),
 				isNull(schema.channel.deletedAt),
 			),
 		});

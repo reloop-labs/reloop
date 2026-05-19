@@ -7,11 +7,11 @@ import { and, asc, eq, isNull, sql } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
 
 export const listGroupContactsController = async ({
-	activeOrganizationId,
+	organizationId,
 	group_id,
 	query,
 }: {
-	activeOrganizationId: string;
+	organizationId: string;
 	group_id: string;
 	query: {
 		page?: number;
@@ -32,7 +32,7 @@ export const listGroupContactsController = async ({
 	try {
 		const memberWhere = and(
 			eq(schema.contactGroup.groupId, group_id),
-			eq(schema.contactGroup.organizationId, activeOrganizationId),
+			eq(schema.contactGroup.organizationId, organizationId),
 			isNull(schema.contactGroup.deletedAt),
 		);
 
@@ -41,7 +41,7 @@ export const listGroupContactsController = async ({
 			db.query.group.findFirst({
 				where: and(
 					eq(schema.group.id, group_id),
-					eq(schema.group.organizationId, activeOrganizationId),
+					eq(schema.group.organizationId, organizationId),
 					isNull(schema.group.deletedAt),
 				),
 			}),

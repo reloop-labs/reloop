@@ -7,11 +7,11 @@ import { and, eq, isNull, ne } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
 
 export const updateGroupController = async ({
-	activeOrganizationId,
+	organizationId,
 	group_id,
 	name,
 }: {
-	activeOrganizationId: string;
+	organizationId: string;
 	group_id: string;
 } & GroupModel.UpdateGroupBody): Promise<
 	| GroupResponse
@@ -27,7 +27,7 @@ export const updateGroupController = async ({
 		const existingGroup = await db.query.group.findFirst({
 			where: and(
 				eq(schema.group.id, group_id),
-				eq(schema.group.organizationId, activeOrganizationId),
+				eq(schema.group.organizationId, organizationId),
 				isNull(schema.group.deletedAt),
 			),
 		});
@@ -42,7 +42,7 @@ export const updateGroupController = async ({
 			const nameConflict = await db.query.group.findFirst({
 				where: and(
 					eq(schema.group.name, name),
-					eq(schema.group.organizationId, activeOrganizationId),
+					eq(schema.group.organizationId, organizationId),
 					ne(schema.group.id, group_id),
 					isNull(schema.group.deletedAt),
 				),

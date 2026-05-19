@@ -6,10 +6,10 @@ import { and, eq, isNull } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
 
 export const deleteGroupController = async ({
-	activeOrganizationId,
+	organizationId,
 	group_id,
 }: {
-	activeOrganizationId: string;
+	organizationId: string;
 	group_id: string;
 }): Promise<
 	| {
@@ -29,7 +29,7 @@ export const deleteGroupController = async ({
 		const group = await db.query.group.findFirst({
 			where: and(
 				eq(schema.group.id, group_id),
-				eq(schema.group.organizationId, activeOrganizationId),
+				eq(schema.group.organizationId, organizationId),
 				isNull(schema.group.deletedAt),
 			),
 		});
@@ -48,7 +48,7 @@ export const deleteGroupController = async ({
 			.where(
 				and(
 					eq(schema.group.id, group_id),
-					eq(schema.group.organizationId, activeOrganizationId),
+					eq(schema.group.organizationId, organizationId),
 				),
 			);
 

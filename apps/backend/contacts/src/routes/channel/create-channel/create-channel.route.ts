@@ -16,10 +16,10 @@ export const createChannelRoute = new Elysia()
 	)
 	.post(
 		"/create",
-		async ({ body, activeOrganizationId, userId }) => {
+		async ({ body, organizationId, userId }) => {
 			const { name, description, defaultSubscription, visibility } = body;
 			return await createChannelController({
-				activeOrganizationId,
+				organizationId,
 				userId,
 				name,
 				description,

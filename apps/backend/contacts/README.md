@@ -4,8 +4,8 @@ A comprehensive audiences management service built with Elysia, providing full C
 
 ## 🔗 Quick Links
 
-- 📚 **Documentation**: [Developer Docs](https://reloop.sh/dev/contacts-service)
-- 🌐 **Production API**: [API Base](https://api.reloop.sh/api/contacts)
+- 📚 **Documentation**: [Developer Docs](https://reloop.sh/)
+- 🌐 **Production API**: [API Base](https://reloop.sh/api/contacts)
 - 📜 **OpenAPI Spec**: [OpenAPI](https://reloop.sh/api/contacts/openapi)
 
 ## Features

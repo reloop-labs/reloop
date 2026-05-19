@@ -12,10 +12,10 @@ export const createGroupRoute = new Elysia()
 	)
 	.post(
 		"/create",
-		async ({ body, activeOrganizationId, userId }) => {
+		async ({ body, organizationId, userId }) => {
 			const { name } = body;
 			return await createGroupController({
-				activeOrganizationId,
+				organizationId,
 				userId,
 				name,
 			});

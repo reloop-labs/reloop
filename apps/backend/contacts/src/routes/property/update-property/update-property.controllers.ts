@@ -7,11 +7,11 @@ import { status } from "elysia";
 import { useLogger } from "evlog/elysia";
 
 export const updatePropertyController = async ({
-	activeOrganizationId,
+	organizationId,
 	property_id,
 	fallbackValue,
 }: {
-	activeOrganizationId: string;
+	organizationId: string;
 	property_id: string;
 	fallbackValue: string | null;
 }): Promise<PropertyTypes.PropertyResponse> => {
@@ -25,7 +25,7 @@ export const updatePropertyController = async ({
 			.where(
 				and(
 					eq(schema.contactProperty.id, property_id),
-					eq(schema.contactProperty.organizationId, activeOrganizationId),
+					eq(schema.contactProperty.organizationId, organizationId),
 					isNull(schema.contactProperty.deletedAt),
 				),
 			)

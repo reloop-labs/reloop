@@ -16,10 +16,10 @@ export const updateChannelRoute = new Elysia()
 	)
 	.patch(
 		"/:channel_id",
-		async ({ params, body, activeOrganizationId }) => {
+		async ({ params, body, organizationId }) => {
 			const { name, description, visibility } = body;
 			return await updateChannelController({
-				activeOrganizationId,
+				organizationId,
 				channel_id: params.channel_id,
 				name,
 				description: description ?? undefined,

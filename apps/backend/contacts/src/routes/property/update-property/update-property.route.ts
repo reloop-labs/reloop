@@ -16,9 +16,9 @@ export const updatePropertyRoute = new Elysia()
 	)
 	.patch(
 		"/:contact_property_id",
-		async ({ params, body, activeOrganizationId }) => {
+		async ({ params, body, organizationId }) => {
 			return updatePropertyController({
-				activeOrganizationId,
+				organizationId,
 				property_id: params.contact_property_id,
 				fallbackValue: body.fallbackValue,
 			});

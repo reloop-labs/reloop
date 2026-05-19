@@ -14,9 +14,9 @@ export const generateTokenRoute = new Elysia()
 	)
 	.get(
 		"/generate",
-		async ({ query, activeOrganizationId, logger }) => {
+		async ({ query, organizationId, logger }) => {
 			return await generatePreferenceTokenController({
-				organizationId: activeOrganizationId,
+				organizationId,
 				contactId: query.contactId,
 				email: query.email,
 			});

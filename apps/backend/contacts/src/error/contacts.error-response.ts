@@ -69,6 +69,66 @@ export const contactsErrorResponse = (errorMessage: string) => {
 			errorCode: errorCodes.INVALID_EMAIL,
 		});
 	}
+	if (errorMessage.includes("Group already exists")) {
+		return status(409, {
+			message: "Group already exists",
+			errorCode: errorCodes.GROUP_ALREADY_EXISTS,
+		});
+	}
+	if (errorMessage.includes("Group not found")) {
+		return status(404, {
+			message: "Group not found",
+			errorCode: errorCodes.GROUP_NOT_FOUND,
+		});
+	}
+	if (errorMessage.includes("Property already exists")) {
+		return status(409, {
+			message: "Property already exists",
+			errorCode: errorCodes.PROPERTY_ALREADY_EXISTS,
+		});
+	}
+	if (errorMessage.includes("Property not found")) {
+		return status(404, {
+			message: "Property not found",
+			errorCode: errorCodes.PROPERTY_NOT_FOUND,
+		});
+	}
+	if (errorMessage.includes("Channel already exists")) {
+		return status(409, {
+			message: "Channel already exists",
+			errorCode: errorCodes.CHANNEL_ALREADY_EXISTS,
+		});
+	}
+	if (errorMessage.includes("Channel not found")) {
+		return status(404, {
+			message: "Channel not found",
+			errorCode: errorCodes.CHANNEL_NOT_FOUND,
+		});
+	}
+	if (errorMessage.includes("Subscription already exists")) {
+		return status(409, {
+			message: "Subscription already exists",
+			errorCode: errorCodes.SUBSCRIPTION_ALREADY_EXISTS,
+		});
+	}
+	if (errorMessage.includes("Subscription not found")) {
+		return status(404, {
+			message: "Subscription not found",
+			errorCode: errorCodes.SUBSCRIPTION_NOT_FOUND,
+		});
+	}
+	if (errorMessage.includes("Preference already exists")) {
+		return status(409, {
+			message: "Preference already exists",
+			errorCode: errorCodes.PREFERENCE_ALREADY_EXISTS,
+		});
+	}
+	if (errorMessage.includes("Preference not found")) {
+		return status(404, {
+			message: "Preference not found",
+			errorCode: errorCodes.PREFERENCE_NOT_FOUND,
+		});
+	}
 	if (errorMessage.includes("Database operation failed")) {
 		return status(500, {
 			message: "Database operation failed",

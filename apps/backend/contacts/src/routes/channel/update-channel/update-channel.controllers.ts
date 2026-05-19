@@ -7,13 +7,13 @@ import { status } from "elysia";
 import { useLogger } from "evlog/elysia";
 
 export const updateChannelController = async ({
-	activeOrganizationId,
+	organizationId,
 	channel_id,
 	name,
 	description,
 	visibility,
 }: {
-	activeOrganizationId: string;
+	organizationId: string;
 	channel_id: string;
 	name?: string;
 	description?: string;
@@ -26,7 +26,7 @@ export const updateChannelController = async ({
 		const existingChannel = await db.query.channel.findFirst({
 			where: and(
 				eq(schema.channel.id, channel_id),
-				eq(schema.channel.organizationId, activeOrganizationId),
+				eq(schema.channel.organizationId, organizationId),
 				isNull(schema.channel.deletedAt),
 			),
 		});
@@ -40,7 +40,7 @@ export const updateChannelController = async ({
 			const duplicateName = await db.query.channel.findFirst({
 				where: and(
 					eq(schema.channel.name, name),
-					eq(schema.channel.organizationId, activeOrganizationId),
+					eq(schema.channel.organizationId, organizationId),
 					isNull(schema.channel.deletedAt),
 				),
 			});

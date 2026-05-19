@@ -13,9 +13,9 @@ export const addContactToChannelRoute = new Elysia()
 	)
 	.post(
 		"/channel/:channel_id",
-		async ({ body, params, activeOrganizationId }) => {
+		async ({ body, params, organizationId }) => {
 			return await addContactToChannelController({
-				organizationId: activeOrganizationId,
+				organizationId,
 				channelId: params.channel_id,
 				subscription: body.subscription,
 				contact_id: body.contact_id,

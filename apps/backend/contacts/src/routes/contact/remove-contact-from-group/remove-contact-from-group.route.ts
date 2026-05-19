@@ -12,9 +12,9 @@ export const removeContactFromGroupRoute = new Elysia()
 	)
 	.delete(
 		"/group/:group_id",
-		async ({ body, params, activeOrganizationId }) => {
+		async ({ body, params, organizationId }) => {
 			return await removeContactFromGroupController({
-				organizationId: activeOrganizationId,
+				organizationId,
 				groupId: params.group_id,
 				contact_id: body.contact_id,
 				email: body.email,

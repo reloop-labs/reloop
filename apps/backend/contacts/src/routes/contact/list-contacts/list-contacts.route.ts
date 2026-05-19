@@ -12,9 +12,9 @@ export const listContactsRoute = new Elysia()
 	)
 	.get(
 		"/list",
-		async ({ query, activeOrganizationId, logger }) => {
+		async ({ query, organizationId, logger }) => {
 			return await listContactsController({
-				organizationId: activeOrganizationId as string,
+				organizationId: organizationId as string,
 				query,
 			});
 		},

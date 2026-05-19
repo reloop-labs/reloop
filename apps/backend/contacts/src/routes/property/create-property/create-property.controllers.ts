@@ -7,13 +7,13 @@ import { status } from "elysia";
 import { useLogger } from "evlog/elysia";
 
 export const createPropertyController = async ({
-	activeOrganizationId,
+	organizationId,
 	userId,
 	name,
 	type,
 	fallbackValue,
 }: {
-	activeOrganizationId: string;
+	organizationId: string;
 	userId: string;
 } & PropertyTypes.CreatePropertyRequest): Promise<PropertyTypes.PropertyResponse> => {
 	const logger = useLogger();
@@ -26,7 +26,7 @@ export const createPropertyController = async ({
 			.where(
 				and(
 					eq(schema.contactProperty.propertyName, name),
-					eq(schema.contactProperty.organizationId, activeOrganizationId),
+					eq(schema.contactProperty.organizationId, organizationId),
 				),
 			)
 			.limit(1);
@@ -44,7 +44,7 @@ export const createPropertyController = async ({
 				propertyName: name,
 				propertyType: type,
 				defaultValue: fallbackValue || null,
-				organizationId: activeOrganizationId,
+				organizationId: organizationId,
 				userId,
 				createdAt: new Date(),
 				updatedAt: new Date(),

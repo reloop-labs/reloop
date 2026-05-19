@@ -7,10 +7,10 @@ import { and, eq, isNull } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
 
 export const getGroupController = async ({
-	activeOrganizationId,
+	organizationId,
 	group_id,
 }: {
-	activeOrganizationId: string;
+	organizationId: string;
 	group_id: string;
 }): Promise<
 	GroupResponse | GroupModel.GroupNotFound | GroupModel.Unauthorized
@@ -21,7 +21,7 @@ export const getGroupController = async ({
 		const group = await db.query.group.findFirst({
 			where: and(
 				eq(schema.group.id, group_id),
-				eq(schema.group.organizationId, activeOrganizationId),
+				eq(schema.group.organizationId, organizationId),
 				isNull(schema.group.deletedAt),
 			),
 		});

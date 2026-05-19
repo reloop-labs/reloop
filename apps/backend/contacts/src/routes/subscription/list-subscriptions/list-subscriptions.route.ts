@@ -14,9 +14,9 @@ export const listSubscriptionsRoute = new Elysia()
 	)
 	.get(
 		"/list",
-		async ({ query, activeOrganizationId, logger }) => {
+		async ({ query, organizationId, logger }) => {
 			return await listSubscriptionsController({
-				organizationId: activeOrganizationId as string,
+				organizationId: organizationId as string,
 				query: {
 					channelId: query.channelId,
 					limit: query.limit as number | undefined,

@@ -6,11 +6,11 @@ import { and, desc, eq, isNull, sql } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
 
 export const listChannelsController = async ({
-	activeOrganizationId,
+	organizationId,
 	page: rawPage,
 	limit: rawLimit,
 }: {
-	activeOrganizationId: string;
+	organizationId: string;
 	page?: number;
 	limit?: number;
 }): Promise<ChannelTypes.ChannelListResponse> => {
@@ -24,7 +24,7 @@ export const listChannelsController = async ({
 	try {
 		const whereClause = and(
 			isNull(schema.channel.deletedAt),
-			eq(schema.channel.organizationId, activeOrganizationId),
+			eq(schema.channel.organizationId, organizationId),
 		);
 
 		const rows = await db

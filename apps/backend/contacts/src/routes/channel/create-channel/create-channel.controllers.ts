@@ -7,14 +7,14 @@ import { status } from "elysia";
 import { useLogger } from "evlog/elysia";
 
 export const createChannelController = async ({
-	activeOrganizationId,
+	organizationId,
 	userId,
 	name,
 	description,
 	defaultSubscription,
 	visibility,
 }: {
-	activeOrganizationId: string;
+	organizationId: string;
 	userId: string;
 	name: string;
 	description?: string;
@@ -27,7 +27,7 @@ export const createChannelController = async ({
 		const existingChannel = await db.query.channel.findFirst({
 			where: and(
 				eq(schema.channel.name, name),
-				eq(schema.channel.organizationId, activeOrganizationId),
+				eq(schema.channel.organizationId, organizationId),
 				isNull(schema.channel.deletedAt),
 			),
 		});
@@ -42,7 +42,7 @@ export const createChannelController = async ({
 			.values({
 				name,
 				description: description ?? null,
-				organizationId: activeOrganizationId,
+				organizationId,
 				userId,
 				defaultSubscription: defaultSubscription ?? "opt_in",
 				visibility: visibility ?? "private",

@@ -16,10 +16,10 @@ export const updateContactRoute = new Elysia()
 	)
 	.patch(
 		"/:contact_id",
-		async ({ params, body, activeOrganizationId }) => {
+		async ({ params, body, organizationId }) => {
 			return await updateContactController({
 				contactId: params.contact_id,
-				organizationId: activeOrganizationId,
+				organizationId,
 				email: body.email,
 				firstName: body.firstName,
 				lastName: body.lastName,

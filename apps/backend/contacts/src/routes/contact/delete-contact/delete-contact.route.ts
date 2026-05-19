@@ -16,10 +16,10 @@ export const deleteContactRoute = new Elysia()
 	)
 	.delete(
 		"/:contact_id",
-		async ({ params, activeOrganizationId, logger }) => {
+		async ({ params, organizationId, logger }) => {
 			return await deleteContactController({
 				contactId: params.contact_id,
-				organizationId: activeOrganizationId,
+				organizationId,
 			});
 		},
 		{

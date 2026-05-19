@@ -6,10 +6,10 @@ import { status } from "elysia";
 import { useLogger } from "evlog/elysia";
 
 export const deleteChannelController = async ({
-	activeOrganizationId,
+	organizationId,
 	channel_id,
 }: {
-	activeOrganizationId: string;
+	organizationId: string;
 	channel_id: string;
 }): Promise<{
 	object: "channel";
@@ -24,7 +24,7 @@ export const deleteChannelController = async ({
 		const channel = await db.query.channel.findFirst({
 			where: and(
 				eq(schema.channel.id, channel_id),
-				eq(schema.channel.organizationId, activeOrganizationId),
+				eq(schema.channel.organizationId, organizationId),
 				isNull(schema.channel.deletedAt),
 			),
 		});
@@ -40,7 +40,7 @@ export const deleteChannelController = async ({
 			.where(
 				and(
 					eq(schema.channel.id, channel_id),
-					eq(schema.channel.organizationId, activeOrganizationId),
+					eq(schema.channel.organizationId, organizationId),
 					isNull(schema.channel.deletedAt),
 				),
 			);
@@ -52,7 +52,7 @@ export const deleteChannelController = async ({
 			.where(
 				and(
 					eq(schema.channelSubscription.channelId, channel_id),
-					eq(schema.channelSubscription.organizationId, activeOrganizationId),
+					eq(schema.channelSubscription.organizationId, organizationId),
 					isNull(schema.channelSubscription.deletedAt),
 				),
 			);

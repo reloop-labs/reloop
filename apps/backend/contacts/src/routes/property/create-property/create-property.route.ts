@@ -16,9 +16,9 @@ export const createPropertyRoute = new Elysia()
 	)
 	.post(
 		"/create",
-		async ({ body, activeOrganizationId, userId }) => {
+		async ({ body, organizationId, userId }) => {
 			return createPropertyController({
-				activeOrganizationId,
+				organizationId,
 				userId,
 				name: body.name,
 				type: body.type,

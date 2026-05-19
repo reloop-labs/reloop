@@ -6,10 +6,10 @@ import { status } from "elysia";
 import { useLogger } from "evlog/elysia";
 
 export const deletePropertyController = async ({
-	activeOrganizationId,
+	organizationId,
 	property_id,
 }: {
-	activeOrganizationId: string;
+	organizationId: string;
 	property_id: string;
 }): Promise<{
 	object: "contact_property";
@@ -25,7 +25,7 @@ export const deletePropertyController = async ({
 		const property = await db.query.contactProperty.findFirst({
 			where: and(
 				eq(schema.contactProperty.id, property_id),
-				eq(schema.contactProperty.organizationId, activeOrganizationId),
+				eq(schema.contactProperty.organizationId, organizationId),
 				isNull(schema.contactProperty.deletedAt),
 			),
 		});
@@ -41,7 +41,7 @@ export const deletePropertyController = async ({
 			.where(
 				and(
 					eq(schema.contactProperty.id, property_id),
-					eq(schema.contactProperty.organizationId, activeOrganizationId),
+					eq(schema.contactProperty.organizationId, organizationId),
 				),
 			);
 

@@ -16,9 +16,9 @@ export const listPropertiesRoute = new Elysia()
 	)
 	.get(
 		"/list",
-		async ({ query, activeOrganizationId, logger }) => {
+		async ({ query, organizationId, logger }) => {
 			return listPropertiesController({
-				activeOrganizationId,
+				organizationId,
 				query,
 			});
 		},
