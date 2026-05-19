@@ -1,5 +1,5 @@
-import type { ChannelTypes } from "@be/contacts/types/channel.type";
 import { ChannelErrors } from "@be/contacts/error/contacts.error-response";
+import type { ChannelTypes } from "@be/contacts/types/channel.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { CHANNEL_GET_WEBHOOK_EVENT } from "@reloop/webhook-events";

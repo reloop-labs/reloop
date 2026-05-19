@@ -1,10 +1,9 @@
-import type { ContactModel } from "@be/contacts/model/contact.model";
 import { ContactErrors } from "@be/contacts/error/contacts.error-response";
+import type { ContactModel } from "@be/contacts/model/contact.model";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { CONTACT_DELETE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq } from "drizzle-orm";
-import { log } from "evlog";
 import { useLogger } from "evlog/elysia";
 
 export async function deleteContactController({

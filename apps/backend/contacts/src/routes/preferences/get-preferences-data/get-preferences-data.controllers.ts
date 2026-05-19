@@ -1,8 +1,10 @@
-import { AuthErrors, ContactErrors } from "@be/contacts/error/contacts.error-response";
+import {
+	AuthErrors,
+	ContactErrors,
+} from "@be/contacts/error/contacts.error-response";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { and, eq, isNull } from "drizzle-orm";
-import { log } from "evlog";
 import { useLogger } from "evlog/elysia";
 import { verifyToken } from "../token.utils";
 

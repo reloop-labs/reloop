@@ -1,5 +1,5 @@
-import type { GroupModel } from "@be/contacts/model/group.model";
 import { GroupErrors } from "@be/contacts/error/contacts.error-response";
+import type { GroupModel } from "@be/contacts/model/group.model";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { GROUP_DELETE_WEBHOOK_EVENT } from "@reloop/webhook-events";

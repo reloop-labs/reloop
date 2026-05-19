@@ -87,7 +87,7 @@ export const PropertyErrors = {
 			why: `A property with the name "${name}" already exists in your organization.`,
 			fix: "Use a different name or update the existing property.",
 		}),
-	invalidName: (name: string, reason: string) =>
+	invalidName: (_name: string, reason: string) =>
 		createError({
 			status: 400,
 			message: "Invalid property name",

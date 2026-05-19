@@ -1,4 +1,7 @@
-import { AuthErrors, ChannelErrors } from "@be/contacts/error/contacts.error-response";
+import {
+	AuthErrors,
+	ChannelErrors,
+} from "@be/contacts/error/contacts.error-response";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { and, eq, isNull } from "drizzle-orm";

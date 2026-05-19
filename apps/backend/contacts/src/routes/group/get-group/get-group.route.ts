@@ -10,7 +10,7 @@ export const getGroupRoute = new Elysia()
 	.use(rateLimitPlugin({ max: 60, windowSeconds: 60, namespace: "get-group" }))
 	.get(
 		"/:group_id",
-		async ({ params, organizationId, logger }) => {
+		async ({ params, organizationId }) => {
 			return await getGroupController({
 				organizationId,
 				group_id: params.group_id,

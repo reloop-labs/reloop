@@ -1,5 +1,5 @@
-import { type DatabaseInstance, db as defaultDb } from "@reloop/db/client";
 import { PropertyErrors } from "@be/contacts/error/contacts.error-response";
+import { type DatabaseInstance, db as defaultDb } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { and, eq, inArray, isNull } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";

@@ -1,5 +1,5 @@
-import type { ContactModel } from "@be/contacts/model/contact.model";
 import { ContactErrors } from "@be/contacts/error/contacts.error-response";
+import type { ContactModel } from "@be/contacts/model/contact.model";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { CONTACT_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -18,7 +18,10 @@ export async function removeContactFromGroupController({
 	const log = useLogger();
 
 	if (!contact_id && !email) {
-		throw ContactErrors.invalidEmail("", "Either 'contact_id' or 'email' must be provided");
+		throw ContactErrors.invalidEmail(
+			"",
+			"Either 'contact_id' or 'email' must be provided",
+		);
 	}
 
 	log.info("Removing contact from group", {

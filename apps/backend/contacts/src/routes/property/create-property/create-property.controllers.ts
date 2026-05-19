@@ -1,5 +1,8 @@
+import {
+	ContactErrors,
+	PropertyErrors,
+} from "@be/contacts/error/contacts.error-response";
 import type { PropertyTypes } from "@be/contacts/types/property.type";
-import { PropertyErrors, ContactErrors } from "@be/contacts/error/contacts.error-response";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { PROPERTY_CREATE_WEBHOOK_EVENT } from "@reloop/webhook-events";

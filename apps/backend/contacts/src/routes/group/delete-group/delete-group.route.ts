@@ -12,7 +12,7 @@ export const deleteGroupRoute = new Elysia()
 	)
 	.delete(
 		"/:group_id",
-		async ({ params, organizationId, logger }) => {
+		async ({ params, organizationId }) => {
 			return await deleteGroupController({
 				organizationId,
 				group_id: params.group_id,

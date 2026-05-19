@@ -1,6 +1,5 @@
 import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
 import { Elysia, t } from "elysia";
-import { log } from "evlog";
 import { getPreferencesDataController } from "./get-preferences-data.controllers";
 
 export const getPreferencesDataRoute = new Elysia()
@@ -14,7 +13,7 @@ export const getPreferencesDataRoute = new Elysia()
 	.get(
 		"/data/:token",
 		async ({ params }) => {
-			const traceId = crypto.randomUUID();
+			const _traceId = crypto.randomUUID();
 			return await getPreferencesDataController({
 				token: params.token,
 			});

@@ -12,7 +12,6 @@ import {
 	isNull,
 	type SQL,
 } from "drizzle-orm";
-import { log } from "evlog";
 import { useLogger } from "evlog/elysia";
 
 export async function listContactsController({

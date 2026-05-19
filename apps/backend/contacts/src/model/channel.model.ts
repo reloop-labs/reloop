@@ -179,7 +179,10 @@ export namespace ChannelModel {
 	export type ChannelNotFound = typeof channelNotFound.static;
 
 	export const channelAlreadyExists = t.Object({
-		message: t.Union([t.Literal("Channel already exists"), t.Literal("Channel with this name already exists")]),
+		message: t.Union([
+			t.Literal("Channel already exists"),
+			t.Literal("Channel with this name already exists"),
+		]),
 		why: t.String(),
 		fix: t.String(),
 	});

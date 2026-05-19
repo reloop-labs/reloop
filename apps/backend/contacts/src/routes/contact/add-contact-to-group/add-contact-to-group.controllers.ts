@@ -1,10 +1,12 @@
+import {
+	ContactErrors,
+	GroupErrors,
+} from "@be/contacts/error/contacts.error-response";
 import type { ContactModel } from "@be/contacts/model/contact.model";
-import { ContactErrors, GroupErrors } from "@be/contacts/error/contacts.error-response";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { CONTACT_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
-import { log } from "evlog";
 import { useLogger } from "evlog/elysia";
 
 export async function addContactToGroupController({
@@ -20,7 +22,10 @@ export async function addContactToGroupController({
 
 	if (!contact_id && !email) {
 		log.info("Either 'contact_id' or 'email' must be provided", {});
-		throw ContactErrors.invalidEmail("", "Either 'contact_id' or 'email' must be provided");
+		throw ContactErrors.invalidEmail(
+			"",
+			"Either 'contact_id' or 'email' must be provided",
+		);
 	}
 
 	try {

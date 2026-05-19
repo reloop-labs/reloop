@@ -12,7 +12,7 @@ export const getChannelRoute = new Elysia()
 	)
 	.get(
 		"/:channel_id",
-		async ({ params, organizationId, logger }) => {
+		async ({ params, organizationId }) => {
 			return await getChannelController({
 				organizationId,
 				channel_id: params.channel_id,

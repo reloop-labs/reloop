@@ -1,6 +1,5 @@
 import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
 import { Elysia, t } from "elysia";
-import { log } from "evlog";
 import { updatePreferenceController } from "./update-preference.controllers";
 
 export const updatePreferenceRoute = new Elysia()
@@ -14,7 +13,7 @@ export const updatePreferenceRoute = new Elysia()
 	.post(
 		"/update/:token",
 		async ({ params, body }) => {
-			const traceId = crypto.randomUUID();
+			const _traceId = crypto.randomUUID();
 			return await updatePreferenceController({
 				token: params.token,
 				channelId: body.channelId,

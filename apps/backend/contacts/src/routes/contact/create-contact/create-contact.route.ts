@@ -17,7 +17,15 @@ export const createContactRoute = new Elysia()
 	.post(
 		"/create",
 		async ({ body, organizationId, userId }) => {
-			const { email, firstName, lastName, status, properties, groupIds, channels } = body
+			const {
+				email,
+				firstName,
+				lastName,
+				status,
+				properties,
+				groupIds,
+				channels,
+			} = body;
 			return await createContactController({
 				organizationId,
 				userId,

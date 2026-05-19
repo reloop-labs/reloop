@@ -1,11 +1,10 @@
+import { ContactErrors } from "@be/contacts/error/contacts.error-response";
 import { upsertContactProperties } from "@be/contacts/routes/contact/utils/upsert-contact-properties";
 import type { ContactTypes } from "@be/contacts/types/contact.type";
-import { ContactErrors } from "@be/contacts/error/contacts.error-response";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { CONTACT_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
-import { log } from "evlog";
 import { useLogger } from "evlog/elysia";
 
 export async function updateContactController({

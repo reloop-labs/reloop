@@ -16,7 +16,7 @@ export const deletePropertyRoute = new Elysia()
 	)
 	.delete(
 		"/:contact_property_id",
-		async ({ params, organizationId, logger }) => {
+		async ({ params, organizationId }) => {
 			return deletePropertyController({
 				organizationId,
 				property_id: params.contact_property_id,

@@ -1,10 +1,13 @@
+import {
+	ChannelErrors,
+	ContactErrors,
+	SubscriptionErrors,
+} from "@be/contacts/error/contacts.error-response";
 import type { ContactModel } from "@be/contacts/model/contact.model";
-import { ContactErrors, ChannelErrors, SubscriptionErrors } from "@be/contacts/error/contacts.error-response";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { CONTACT_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
-import { log } from "evlog";
 import { useLogger } from "evlog/elysia";
 
 export interface AddContactToChannelResult {
@@ -34,7 +37,10 @@ export async function addContactToChannelController({
 	const log = useLogger();
 
 	if (!contact_id && !email) {
-		throw ContactErrors.invalidEmail("", "Either 'contact_id' or 'email' must be provided");
+		throw ContactErrors.invalidEmail(
+			"",
+			"Either 'contact_id' or 'email' must be provided",
+		);
 	}
 
 	try {

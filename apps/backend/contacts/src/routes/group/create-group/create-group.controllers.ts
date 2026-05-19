@@ -1,6 +1,9 @@
+import {
+	ContactErrors,
+	GroupErrors,
+} from "@be/contacts/error/contacts.error-response";
 import type { GroupModel } from "@be/contacts/model/group.model";
 import type { GroupResponse } from "@be/contacts/types/group.type";
-import { GroupErrors, ContactErrors } from "@be/contacts/error/contacts.error-response";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { createGroupId } from "@reloop/db/schema";

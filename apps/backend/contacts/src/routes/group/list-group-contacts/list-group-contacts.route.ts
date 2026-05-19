@@ -17,7 +17,7 @@ export const listGroupContactsRoute = new Elysia()
 	)
 	.get(
 		"/:group_id/contacts",
-		async ({ params, query, organizationId, logger }) => {
+		async ({ params, query, organizationId }) => {
 			return await listGroupContactsController({
 				organizationId,
 				group_id: params.group_id,

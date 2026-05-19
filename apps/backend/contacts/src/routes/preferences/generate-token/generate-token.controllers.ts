@@ -18,7 +18,10 @@ export async function generatePreferenceTokenController({
 }) {
 	const log = useLogger();
 	if (!contactId && !email) {
-		throw ContactErrors.invalidEmail("", "Either 'contactId' or 'email' must be provided");
+		throw ContactErrors.invalidEmail(
+			"",
+			"Either 'contactId' or 'email' must be provided",
+		);
 	}
 
 	log.info("Generating preference token", { contactId, email });

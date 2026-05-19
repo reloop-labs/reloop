@@ -1,6 +1,9 @@
+import {
+	ContactErrors,
+	GroupErrors,
+} from "@be/contacts/error/contacts.error-response";
 import type { ContactModel } from "@be/contacts/model/contact.model";
 import type { GroupModel } from "@be/contacts/model/group.model";
-import { GroupErrors, ContactErrors } from "@be/contacts/error/contacts.error-response";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { GROUP_LIST_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -130,6 +133,8 @@ export const listGroupContactsController = async ({
 		if (error && typeof error === "object" && "status" in error) {
 			throw error;
 		}
-		throw ContactErrors.databaseError(error instanceof Error ? error.message : String(error));
+		throw ContactErrors.databaseError(
+			error instanceof Error ? error.message : String(error),
+		);
 	}
 };

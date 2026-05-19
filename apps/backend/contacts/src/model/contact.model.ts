@@ -388,14 +388,20 @@ export namespace ContactModel {
 	export type ContactAlreadyExists = typeof contactAlreadyExists.static;
 
 	export const invalidEmail = t.Object({
-		message: t.Union([t.Literal("Invalid email format"), t.Literal("Invalid email")]),
+		message: t.Union([
+			t.Literal("Invalid email format"),
+			t.Literal("Invalid email"),
+		]),
 		why: t.String(),
 		fix: t.String(),
 	});
 	export type InvalidEmail = typeof invalidEmail.static;
 
 	export const unauthorized = t.Object({
-		message: t.Union([t.Literal("Unauthorized access"), t.Literal("Unauthorized")]),
+		message: t.Union([
+			t.Literal("Unauthorized access"),
+			t.Literal("Unauthorized"),
+		]),
 		why: t.String(),
 		fix: t.String(),
 	});

@@ -125,14 +125,22 @@ export namespace ChannelSubscriptionModel {
 
 	// Error Responses
 	export const notFound = t.Object({
-		message: t.Union([t.Literal("Channel subscription not found"), t.Literal("Subscription not found"), t.Literal("Preference not found")]),
+		message: t.Union([
+			t.Literal("Channel subscription not found"),
+			t.Literal("Subscription not found"),
+			t.Literal("Preference not found"),
+		]),
 		why: t.String(),
 		fix: t.String(),
 	});
 	export type NotFound = typeof notFound.static;
 
 	export const subscriptionAlreadyExists = t.Object({
-		message: t.Union([t.Literal("Contact is already subscribed to this channel"), t.Literal("Subscription already exists"), t.Literal("Preference already exists")]),
+		message: t.Union([
+			t.Literal("Contact is already subscribed to this channel"),
+			t.Literal("Subscription already exists"),
+			t.Literal("Preference already exists"),
+		]),
 		why: t.String(),
 		fix: t.String(),
 	});
@@ -140,7 +148,10 @@ export namespace ChannelSubscriptionModel {
 		typeof subscriptionAlreadyExists.static;
 
 	export const unauthorized = t.Object({
-		message: t.Union([t.Literal("Unauthorized access"), t.Literal("Invalid or expired preferences token")]),
+		message: t.Union([
+			t.Literal("Unauthorized access"),
+			t.Literal("Invalid or expired preferences token"),
+		]),
 		why: t.String(),
 		fix: t.String(),
 	});
