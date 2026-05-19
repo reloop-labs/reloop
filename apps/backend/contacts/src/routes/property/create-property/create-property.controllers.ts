@@ -23,7 +23,7 @@ export const createPropertyController = async ({
 	log.info("Creating property", { name: name, type: type });
 
 	try {
-		const existingProperty = await db
+		const existingProperties = await db
 			.select()
 			.from(schema.contactProperty)
 			.where(
@@ -34,11 +34,48 @@ export const createPropertyController = async ({
 			)
 			.limit(1);
 
-		if (existingProperty.length > 0) {
-			log.warn("Property already exists in this organization", {
+		const existingProperty = existingProperties[0] || null;
+
+		if (existingProperty) {
+			if (existingProperty.deletedAt === null) {
+				log.warn("Property already exists in this organization", {
+					name: name,
+				});
+				throw PropertyErrors.alreadyExists(name);
+			}
+
+			// Soft-deleted property exists, restore/undelete it!
+			log.info("Soft-deleted property found, restoring it", { name });
+			const [restoredProperty] = await db
+				.update(schema.contactProperty)
+				.set({
+					deletedAt: null,
+					propertyType: type,
+					defaultValue: fallbackValue || null,
+					updatedAt: new Date(),
+				})
+				.where(eq(schema.contactProperty.id, existingProperty.id))
+				.returning();
+
+			if (!restoredProperty) {
+				log.error("Failed to restore property - no data returned", {
+					name: name,
+				});
+				throw ContactErrors.createFailed("Failed to restore property");
+			}
+
+			log.info("Property restored successfully", {
 				name: name,
+				id: restoredProperty.id,
 			});
-			throw PropertyErrors.alreadyExists(name);
+
+			const result = {
+				...restoredProperty,
+				object: "contact_property" as const,
+				event: PROPERTY_CREATE_WEBHOOK_EVENT.id,
+			};
+
+			return result;
 		}
 
 		const [newProperty] = await db

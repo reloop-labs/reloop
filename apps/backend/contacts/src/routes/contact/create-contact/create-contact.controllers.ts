@@ -28,14 +28,14 @@ export async function createContactController({
 	const log = useLogger();
 	try {
 		return await db.transaction(async (tx) => {
-			// Step 1: Check if contact already exists in this organization
-			await checkExistingContact_step1({
+			// Step 1: Check if contact already exists in this organization (active vs soft-deleted)
+			const { softDeletedContact } = await checkExistingContact_step1({
 				email,
 				organizationId,
 				db: tx,
 			});
 
-			// Step 2: Create a new contact
+			// Step 2: Create a new contact (or restore soft-deleted contact if found)
 			const { newContact } = await createContact_step2({
 				email,
 				firstName,
@@ -44,6 +44,7 @@ export async function createContactController({
 				organizationId,
 				userId,
 				db: tx,
+				softDeletedContact,
 			});
 
 			// Step 3: Upsert custom contact properties if provided
