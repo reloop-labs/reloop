@@ -65,7 +65,4 @@ jobs:
       - name: Image digest
         run: echo ${{ steps.build.outputs.digest }}
 
-      - name: Deploy to Dokploy
-        if: github.event_name != 'pull_request'
-        run: curl -X GET "https://dokploy.reloop.sh/api/deploy/ZxrFOkxpiRhEol5KzW4SI"
 
