@@ -1,53 +1,43 @@
 ---
 title: Contacts
-description: Learn how to set up, configure, and run the Reloop contacts service locally.
+description: Set up, configure, and run the Reloop Contacts microservice locally.
 ---
 
-The **Contacts Service** is an **ElysiaJS** microservice that manages subscriber profiles, static lists, custom properties, dynamic segmentation, and opt-out/unsubscribe logs. It forms the core database for recipient audience targeting within the Reloop platform.
-
-<Callout type="info" title="Prerequisite First">
-  Before starting the Contacts Service, make sure you've completed the base [Local Development Setup](/setup) (installed Bun, configured the hosts file, and started the Docker container stack).
+<Callout type="info" title="Complete Base Setup First" variant="note">
+  Ensure you've finished the [Local Development Setup](/docs/setup) — before proceeding.
 </Callout>
 
----
+
+## Service Overview
+
+Subscriber profiles, static lists, custom properties, dynamic segmentation, and opt-out/unsubscribe logs.
+
+| Property | Value |
+| :--- | :--- |
+| **Directory** | `apps/backend/contacts` |
+| **Port** | `8014` |
+| **Local URL** | [https://local.reloop.sh/api/contacts](https://local.reloop.sh/api/contacts) |
+| **Swagger UI** | [https://local.reloop.sh/api/contacts/openapi](https://local.reloop.sh/api/contacts/openapi) |
+| **Stack** | `ElysiaJS` `PostgreSQL` `Redis` `NATS` |
+
 
 ## Quick Start
+<Callout
+  icon="union"
+  variant="info"
+>
+Run the following command from the root of the monorepo:
+</Callout>
+```bash
+bun be:contacts:dev
+```
 
-Dependencies are handled globally at the root directory. You can start the Contacts Service development server instantly:
+The service starts with hot reloading on port `8014`.
 
-<CodeGroup>
-  <CodeBlock title="From Monorepo Root (Recommended)">
-  ```bash
-  # Start the dev server with hot reloading
-  bun be:contacts:dev
-  ```
-  </CodeBlock>
-
-  <CodeBlock title="From the Service Folder">
-  ```bash
-  cd apps/backend/contacts
-  bun dev
-  ```
-  </CodeBlock>
-</CodeGroup>
-
-Once running, the Contacts Service will listen locally on port `8014`. You can query it via Caddy at [https://local.reloop.sh/api/contacts](https://local.reloop.sh/api/contacts) 🎉
-
----
-
-## Service Information
-
-* **Directory Location:** `apps/backend/contacts/`
-* **Local Listening Port:** `8014` (configurable with `PORT` env variable)
-* **Unified Access Route:** [https://local.reloop.sh/api/contacts](https://local.reloop.sh/api/contacts)
-* **Primary Tech Stack:** ElysiaJS, PostgreSQL, Redis, NATS
-* **Dependencies:** Relies on PostgreSQL (to store contact relational data) and Redis (to store segment cache and temporary list metadata).
-
----
 
 ## Environment Configuration
 
-The Contacts Service environment variables are defined in `apps/backend/contacts/.env`. If you ran `bun env:setup` at the root, your `.env` is already configured:
+Variables live in `apps/backend/contacts/.env`. Running `bun env:setup` from the root auto-populates this file.
 
 ```bash
 # Database & Cache Configurations
@@ -58,7 +48,6 @@ REDIS_URL=redis://:reloop123@localhost:6379
 PORT=8014
 BASE_URL="https://local.reloop.sh"
 NODE_ENV=development
-NODE_TLS_REJECT_UNAUTHORIZED=0
 
 # Event Bus Broker
 NATS_URL=nats://localhost:4222
@@ -66,46 +55,31 @@ NATS_URL=nats://localhost:4222
 
 ### Reference Table
 
-| Variable | Required | Default Value | Description |
-| :--- | :--- | :--- | :--- |
-| `PG_URL` | **YES** | `postgresql://...` | PostgreSQL database connection string. |
-| `REDIS_URL` | **YES** | `redis://...` | Redis connection URL for segmentation cache queries. |
-| `PORT` | **YES** | `8014` | Local port number the Elysia app listens to on the host. |
-| `BASE_URL` | **YES** | `https://local.reloop.sh` | Main application domain (used for cookie validations). |
-| `NATS_URL` | **YES** | `nats://localhost:4222` | Connection URL for NATS event bus messaging. |
-| `NODE_ENV` | **YES** | `development` | Active environment scope (`development` or `production`). |
+| Variable | Required | Default Value |
+| :--- | :--- | :--- |
+| `PG_URL` | **YES** | `postgresql://reloop:reloop123@localhost:5432/reloop` |
+| `REDIS_URL` | **YES** | `redis://:reloop123@localhost:6379` |
+| `PORT` | **YES** | `8014` |
+| `BASE_URL` | **YES** | `https://local.reloop.sh` |
+| `NATS_URL` | **YES** | `nats://localhost:4222` |
+| `NODE_ENV` | **YES** | `development` |
 
----
 
 ## Development Commands
 
-All workspace operations should be executed from the **monorepo root directory** using Turborepo filters:
+All commands run from the **monorepo root**.
 
-| Command | Action | Scope |
-| :--- | :--- | :--- |
-| `bun be:contacts:dev` | Start the Contacts dev server with hot reloading | Development |
-| `bun run --filter=contacts build` | Compile the Contacts service for production | Production |
-| `bun run --filter=contacts start` | Run the compiled production build locally | Production |
-| `bun run --filter=contacts check-types` | Verify TypeScript type-safety | Code Quality |
+| Command | Description |
+| :--- | :--- |
+| `bun be:contacts:dev` | Start dev server with hot reloading |
+| `bun run --filter=contacts build` | Compile production bundle |
+| `bun run --filter=contacts start` | Run compiled production build |
+| `bun run --filter=contacts check-types` | TypeScript type-check |
 
----
 
-## Database Schema & Relationships
+## Database Schema
 
-The relational contacts registry, custom dynamic properties, and user-group membership structures are split across three domain files: [packages/db/src/schema/contact.ts](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/contact.ts), [packages/db/src/schema/channel.ts](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/channel.ts), and [packages/db/src/schema/group.ts](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/group.ts).
-
-### Enums
-
-| Enum | Values | Description |
-| :--- | :--- | :--- |
-| `contact_status` | `subscribed` · `unsubscribed` · `blocked` | Contact general subscription operational state |
-| `suppression_reason` | `hard_bounce` · `spam_complaint` | Cause of automatic contact suppression |
-| `property_type` | `string` · `number` | Technical validation type for custom contact properties |
-| `visibility` | `private` · `public` | Opt-in preferences page channel visibility |
-| `enrollment_status` | `enrolled` · `unenrolled` | Specific channel enrollment status |
-| `default_subscription`| `opt_in` · `opt_out` | Default state for new contacts in public channels |
-
----
+Schema defined in [`packages/db/src/schema/contact.ts`](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/contact.ts), [`packages/db/src/schema/channel.ts`](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/channel.ts), and [`packages/db/src/schema/group.ts`](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/group.ts).
 
 ### `contact` Table
 
@@ -115,46 +89,108 @@ Stores general recipient email profiles, subscription status, and automatic supp
 | :--- | :--- | :--- | :--- |
 | `id` | `text` | `con_{cuid}` | Primary Key |
 | `email` | `varchar(255)` | — | Recipient email address |
-| `status` | `contact_status`| `subscribed` | Active subscription state |
-| `organizationId` | `text` | — | Foreign Key &rarr; [organization.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/auth.ts) |
-| `userId` | `text` | — | Foreign Key &rarr; [user.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/auth.ts) |
+| `status` | `contact_status` | `'subscribed'` | Active subscription state |
+| `organizationId` | `text` | — | FK → `organization.id` |
+| `userId` | `text` | — | FK → `user.id` |
 | `firstName` | `varchar(255)` | `null` | Recipient given name |
 | `lastName` | `varchar(255)` | `null` | Recipient family name |
-| `suppressionReason` | `suppression_reason`| `null` | Populated automatically on hard bounces or spam flags |
+| `suppressionReason` | `suppression_reason` | `null` | Populated automatically on hard bounces or spam flags |
 | `suppressedAt` | `timestamp` | `null` | Timestamp of suppression action |
 
 ---
 
-### Custom Property Tables
+### `contact_property` Table
 
-Enables workspaces to configure arbitrary custom profile metadata (e.g. `signup_date` or `score`).
+Defines the custom property keys, types, and defaults scoped to an organization.
 
-* **`contact_property`**: Defines the custom property keys (`propertyName`), types (`propertyType`), and defaults (`defaultValue`) scoped to an organization.
-* **`contact_property_value`**: Links custom keys directly to specific [contacts](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/contact.ts) with the compiled field `value`.
-
----
-
-### List Channels & User Groups
-
-* **`channel`**: Represents a mailing subscription topic (e.g. `Product Updates`, `Newsletter`).
-* **`channel_subscription`**: Link table mapping [contacts](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/contact.ts) to active [channels](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/channel.ts).
-* **`group`**: Manual static segmentation grouping lists.
-* **`contact_group`**: Joins [contacts](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/contact.ts) to specific user [groups](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/group.ts).
+| Column | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | `text` | `cp_{cuid}` | Primary Key |
+| `propertyName` | `varchar(255)` | — | Name of the custom property |
+| `propertyType` | `property_type` | — | Data type (`string` or `number`) |
+| `defaultValue` | `varchar(255)` | `null` | Default value if not specified |
+| `organizationId` | `text` | — | FK → `organization.id` |
+| `userId` | `text` | — | FK → `user.id` |
 
 ---
 
-## Interactive API Docs (Swagger)
+### `contact_property_value` Table
 
-The Contacts Service publishes dynamic Swagger documentation directly from ElysiaJS. To test endpoints and query API structures:
+Links custom keys directly to specific contacts with the compiled field value.
 
-1. Open your browser and navigate to the interactive Swagger playground at [https://local.reloop.sh/api/contacts/openapi](https://local.reloop.sh/api/contacts/openapi) (or [http://localhost:8014/api/contacts/openapi](http://localhost:8014/api/contacts/openapi) directly).
-2. Use the interactive Swagger UI playground to run queries and inspect request schemas.
+| Column | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | `text` | `cpv_{cuid}` | Primary Key |
+| `contactId` | `text` | — | FK → `contact.id` |
+| `propertyId` | `text` | — | FK → `contact_property.id` |
+| `value` | `text` | — | Value of the property for the contact |
+| `organizationId` | `text` | — | FK → `organization.id` |
+| `userId` | `text` | — | FK → `user.id` |
 
 ---
 
-## Service Capabilities Explained
+### `channel` Table
 
-* **Subscriber List Management**: Creating, updating, and grouping subscribers into static lists or dynamic query-based segments (filtering by traits like active state, country, or custom tag parameters).
-* **Extensible Schema Attributes**: Allows users to define custom attribute fields (such as `first_name`, `company`, `last_purchase_date`) on a per-contact basis, mapping them correctly during bulk campaign compilation.
-* **NATS Broadcast Streaming**: Fires broker notifications on list uploads, contact deletions, or subscription changes (opt-in/opt-out status) to automatically notify downstream workflow and email engines.
-* **Database Models**: Interfaces with `@reloop/db` PostgreSQL tables, primarily manipulating metadata inside `contact`, `list`, `list_contact`, and `custom_field`.
+Represents a mailing subscription topic (e.g. Product Updates, Newsletter).
+
+| Column | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | `text` | `chn_{cuid}` | Primary Key |
+| `name` | `varchar(255)` | — | Name of the channel |
+| `description` | `text` | `null` | Detailed description of the channel |
+| `organizationId` | `text` | — | FK → `organization.id` |
+| `visibility` | `visibility` | `'private'` | Opt-in preferences page channel visibility (`private` or `public`) |
+| `defaultSubscription` | `default_subscription` | `'opt_in'` | Default subscription state (`opt_in` or `opt_out`) |
+| `userId` | `text` | — | FK → `user.id` |
+
+---
+
+### `channel_subscription` Table
+
+Link table mapping contacts to active channels.
+
+| Column | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | `text` | `sub_{cuid}` | Primary Key |
+| `contactId` | `text` | — | FK → `contact.id` |
+| `channelId` | `text` | — | FK → `channel.id` |
+| `organizationId` | `text` | — | FK → `organization.id` |
+| `status` | `enrollment_status` | `'enrolled'` | Enrollment status (`enrolled` or `unenrolled`) |
+
+---
+
+### `group` Table
+
+Manual static segmentation grouping lists.
+
+| Column | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | `text` | `grp_{cuid}` | Primary Key |
+| `name` | `varchar(255)` | — | Name of the group |
+| `organizationId` | `text` | — | FK → `organization.id` |
+| `userId` | `text` | — | FK → `user.id` |
+
+---
+
+### `contact_group` Table
+
+Joins contacts to specific user groups.
+
+| Column | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | `text` | `cgr_{cuid}` | Primary Key |
+| `contactId` | `text` | — | FK → `contact.id` |
+| `groupId` | `text` | — | FK → `group.id` |
+| `organizationId` | `text` | — | FK → `organization.id` |
+| `userId` | `text` | — | FK → `user.id` |
+
+
+## Architecture
+
+| Layer | Detail |
+| :--- | :--- |
+| **Audience Management** | Creates, updates, and groups contacts into static lists or dynamic query-based segments. |
+| **Custom Properties** | Extensible schema attributes (custom properties and values) defined on a per-organization basis. |
+| **Caching** | Redis is utilized to store segmentation cache and temporary list metadata. |
+| **Events** | Lifecycle events (contact creation, deletion, opt-in/opt-out status changes) are published to NATS under `contacts.*`. |
+| **DB Client** | Relational data is stored in PostgreSQL and accessed using `@reloop/db` with Drizzle ORM. |
