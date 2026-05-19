@@ -126,6 +126,7 @@
     "apps/backend/contacts": {
       "name": "contacts",
       "dependencies": {
+        "@elysia/opentelemetry": "catalog:backend",
         "@elysiajs/cors": "catalog:backend",
         "@elysiajs/cron": "catalog:backend",
         "@elysiajs/eden": "catalog:backend",

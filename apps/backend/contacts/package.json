@@ -25,6 +25,7 @@
 		"@opentelemetry/instrumentation-express": "catalog:backend",
 		"@opentelemetry/instrumentation-http": "catalog:backend",
 		"@opentelemetry/resources": "catalog:backend",
+		"@elysia/opentelemetry": "catalog:backend",
 		"@opentelemetry/sdk-trace-node": "catalog:backend",
 		"@opentelemetry/semantic-conventions": "catalog:backend",
 		"@paralleldrive/cuid2": "catalog:backend",
