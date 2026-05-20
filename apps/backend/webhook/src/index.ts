@@ -2,7 +2,9 @@ import "dotenv/config";
 import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 
-import { landing } from "@reloop/webhook/routes/landing/landing.index";
+import { agentCardRoute } from "@reloop/webhook/routes/landing/agent-card.route";
+import { healthRoute } from "@reloop/webhook/routes/landing/health.route";
+import { landingRoute } from "@reloop/webhook/routes/landing/landing.route";
 import { webhookRoutes } from "@reloop/webhook/routes/webhook/webhook.routes";
 import { loader } from "@reloop/webhook/utils/loader";
 import { Elysia } from "elysia";
@@ -49,7 +51,9 @@ const webhookService = new Elysia({
 			link: parsed.link,
 		};
 	})
-	.use(landing)
+	.use(landingRoute)
+	.use(healthRoute)
+	.use(agentCardRoute)
 	.use(webhookRoutes)
 	.onStart(async () => {
 		await loader();
