@@ -15,6 +15,7 @@
 		"@elysiajs/cors": "catalog:backend",
 		"@elysiajs/cron": "catalog:backend",
 		"@elysiajs/opentelemetry": "catalog:backend",
+		"@elysia/opentelemetry": "catalog:backend",
 		"@elysiajs/openapi": "catalog:backend",
 		"@elysiajs/server-timing": "catalog:backend",
 		"@elysiajs/swagger": "catalog:backend",

@@ -5,28 +5,21 @@ import { getEmailLogController } from "./get-email-log.controllers";
 
 export const getEmailLogRoute = new Elysia().use(authMiddleware).get(
 	"/emails/:id",
-	async ({ params: { id }, activeOrganizationId, set }) => {
-		const log = await getEmailLogController({
+	async ({ params: { id }, activeOrganizationId }) => {
+		return await getEmailLogController({
 			id,
 			organizationId: activeOrganizationId as string,
 		});
-
-		if (!log) {
-			set.status = 404;
-			return { message: "Email log not found" };
-		}
-
-		return log;
 	},
 	{
 		auth: true,
 		params: LogsModel.getEmailLogParams,
 		response: {
 			200: LogsModel.emailLogFullEntry,
-			401: LogsModel.errorResponse,
-			403: LogsModel.errorResponse,
-			404: LogsModel.errorResponse,
-			500: LogsModel.errorResponse,
+			401: LogsModel.unauthorized,
+			403: LogsModel.forbidden,
+			404: LogsModel.emailLogNotFound,
+			500: LogsModel.internalServerError,
 		},
 		detail: {
 			tags: ["Logs"],

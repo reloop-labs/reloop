@@ -1,3 +1,4 @@
+import { LogsErrors } from "@reloop/logs/error/logs.error-response";
 import type { LogsModel } from "@reloop/logs/model/logs.model";
 import {
 	getClickHouseClient,
@@ -8,12 +9,14 @@ import {
 	formatClickHouseDate,
 	safeJsonParse,
 } from "@reloop/logs/utils/format";
-import { status } from "elysia";
+import { useLogger } from "evlog/elysia";
 import { getEmailLogController } from "../get-email-log/get-email-log.controllers";
 
 export async function getLogController(
 	logId: string,
 ): Promise<LogsModel.LogEntryResponse> {
+	const log = useLogger();
+	log.info("Getting log entry", { logId });
 	try {
 		const client = getClickHouseClient();
 
@@ -50,12 +53,17 @@ export async function getLogController(
 		const row = rows[0];
 
 		if (!row) {
-			throw status(404, {
-				message: "Log not found",
-			});
+			log.warn("Log not found", { logId });
+			throw LogsErrors.notFound(logId);
 		}
 
-		const metadata = safeJsonParse(row.metadata, {}) as any;
+		interface LogMetadata {
+			emailId?: string;
+			email_id?: string;
+			email_log_id?: string;
+			[key: string]: unknown;
+		}
+		const metadata = safeJsonParse(row.metadata, {}) as LogMetadata;
 		const emailId =
 			metadata.emailId || metadata.email_id || metadata.email_log_id;
 		let emailDetails = null;
@@ -71,6 +79,7 @@ export async function getLogController(
 			}
 		}
 
+		log.info("Log entry retrieved successfully", { logId });
 		return {
 			uuid: row.id,
 			event: row.event,
@@ -93,13 +102,10 @@ export async function getLogController(
 			environment: row.environment || null,
 		};
 	} catch (error) {
-		if (error && typeof error === "object" && "status" in error) {
-			throw error;
-		}
-
-		throw status(500, {
-			message:
-				error instanceof Error ? error.message : "Failed to retrieve log",
+		log.error("Error getting log entry", {
+			logId,
+			error: error instanceof Error ? error.message : String(error),
 		});
+		throw error;
 	}
 }

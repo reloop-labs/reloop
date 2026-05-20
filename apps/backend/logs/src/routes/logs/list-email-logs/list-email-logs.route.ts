@@ -17,9 +17,9 @@ export const listEmailLogsRoute = new Elysia().use(authMiddleware).get(
 		query: LogsModel.listEmailLogsQuery,
 		response: {
 			200: LogsModel.listEmailLogsResponse,
-			401: LogsModel.errorResponse,
-			403: LogsModel.errorResponse,
-			500: LogsModel.errorResponse,
+			401: LogsModel.unauthorized,
+			403: LogsModel.forbidden,
+			500: LogsModel.internalServerError,
 		},
 		detail: {
 			tags: ["Logs"],

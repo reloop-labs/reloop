@@ -1,20 +1,26 @@
-import { log } from "evlog";
+import { initLogger, log, parseError } from "evlog";
 import "dotenv/config";
+import { opentelemetry } from "@elysia/opentelemetry";
 import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
-
 import { logsConfig } from "@reloop/logs/logs.config";
 import { loader } from "@reloop/logs/utils/loader";
 import { Elysia } from "elysia";
+import { evlog } from "evlog/elysia";
 import { logCleanupCron } from "./cron/cleanup-logs.cron";
-import { landing } from "./routes/landing/landing.index";
+import { agentCardRoute } from "./routes/landing/agent-card.route";
+import { healthRoute } from "./routes/landing/health.route";
+import { landingRoute } from "./routes/landing/landing.route";
 import { logsRoutes } from "./routes/logs/logs.routes";
+
+initLogger({ env: { service: "logs" } });
 
 const port = logsConfig.port;
 const logsService = new Elysia({
 	prefix: "/api/logs",
 	name: "Logs Service",
 })
+	.use(opentelemetry())
 	.use(
 		openapi({
 			documentation: {
@@ -34,8 +40,21 @@ const logsService = new Elysia({
 			},
 		}),
 	)
+	.use(evlog())
 	.use(serverTiming())
-	.use(landing)
+	.onError(({ error, set }) => {
+		const parsed = parseError(error);
+		set.status = parsed.status;
+		return {
+			message: parsed.message,
+			why: parsed.why,
+			fix: parsed.fix,
+			link: parsed.link,
+		};
+	})
+	.use(landingRoute)
+	.use(healthRoute)
+	.use(agentCardRoute)
 	.use(logsRoutes)
 	.use(logCleanupCron)
 	.onStart(async () => {
@@ -43,8 +62,8 @@ const logsService = new Elysia({
 	})
 	.listen(port, () => {
 		log.info(
-			"server",
-			`Logs Server is running on ${logsConfig.BASE_URL}/api/logs`,
+			"Logs Service",
+			`Running on:\n  - Local: http://localhost:${port}/api/logs\n  - Base:  ${logsConfig.BASE_URL}/api/logs`,
 		);
 	});
 

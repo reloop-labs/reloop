@@ -109,33 +109,34 @@ export namespace LogsModel {
 		),
 		// Audit-log filters
 		service: t.Optional(
-			t.String({ description: "Filter by source service (api_key, domain, mailing…)" }),
+			t.String({
+				description: "Filter by source service (api_key, domain, mailing…)",
+			}),
 		),
 		action: t.Optional(
-			t.String({ description: "Filter by action verb (created, deleted, sent…)" }),
+			t.String({
+				description: "Filter by action verb (created, deleted, sent…)",
+			}),
 		),
 		resource_type: t.Optional(
-			t.String({ description: "Filter by resource type (api_key, domain, email…)" }),
+			t.String({
+				description: "Filter by resource type (api_key, domain, email…)",
+			}),
 		),
 		resource_id: t.Optional(
 			t.String({ description: "Filter by specific resource ID" }),
 		),
 		actor_type: t.Optional(
-			t.Union(
-				[t.Literal("user"), t.Literal("api_key"), t.Literal("system")],
-				{ description: "Filter by actor type" },
-			),
+			t.Union([t.Literal("user"), t.Literal("api_key"), t.Literal("system")], {
+				description: "Filter by actor type",
+			}),
 		),
 		actor_id: t.Optional(
 			t.String({ description: "Filter by actor ID (user_id or api_key_id)" }),
 		),
 		environment: t.Optional(
 			t.Union(
-				[
-					t.Literal("production"),
-					t.Literal("development"),
-					t.Literal("test"),
-				],
+				[t.Literal("production"), t.Literal("development"), t.Literal("test")],
 				{ description: "Filter by environment" },
 			),
 		),
@@ -170,11 +171,35 @@ export namespace LogsModel {
 
 	export type ListLogsResponse = typeof listLogsResponse.static;
 
-	export const errorResponse = t.Object({
-		message: t.String({ description: "Error message" }),
+	export const logNotFound = t.Object({
+		message: t.Literal("Log not found"),
 	});
+	export type LogNotFound = typeof logNotFound.static;
 
-	export type ErrorResponse = typeof errorResponse.static;
+	export const emailLogNotFound = t.Object({
+		message: t.Literal("Email log not found"),
+	});
+	export type EmailLogNotFound = typeof emailLogNotFound.static;
+
+	export const unauthorized = t.Object({
+		message: t.Literal("Unauthorized access"),
+	});
+	export type Unauthorized = typeof unauthorized.static;
+
+	export const forbidden = t.Object({
+		message: t.Literal("Access forbidden"),
+	});
+	export type Forbidden = typeof forbidden.static;
+
+	export const badRequest = t.Object({
+		message: t.String({ description: "Bad request" }),
+	});
+	export type BadRequest = typeof badRequest.static;
+
+	export const internalServerError = t.Object({
+		message: t.Literal("Internal server error"),
+	});
+	export type InternalServerError = typeof internalServerError.static;
 
 	// Email Logs
 	export const listEmailLogsQuery = t.Object({

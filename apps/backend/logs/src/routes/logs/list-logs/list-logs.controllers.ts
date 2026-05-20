@@ -9,11 +9,13 @@ import {
 	safeJsonParse,
 	toClickHouseDate,
 } from "@reloop/logs/utils/format";
-import { status } from "elysia";
+import { useLogger } from "evlog/elysia";
 
 export async function listLogsController(
 	query: LogsTypes.ListLogsQuery,
 ): Promise<LogsTypes.ListLogsResponse> {
+	const log = useLogger();
+	log.info("Listing logs", { query });
 	try {
 		const client = getClickHouseClient();
 		const conditions: string[] = [];
@@ -189,14 +191,19 @@ export async function listLogsController(
 			environment: row.environment || null,
 		}));
 
+		log.info("Logs listed successfully", {
+			count: logs.length,
+			total: totalCount,
+		});
 		return {
 			logs,
 			count: totalCount,
 			stats,
 		};
 	} catch (error) {
-		throw status(500, {
-			message: error instanceof Error ? error.message : "Failed to list logs",
+		log.error("Error listing logs", {
+			error: error instanceof Error ? error.message : String(error),
 		});
+		throw error;
 	}
 }

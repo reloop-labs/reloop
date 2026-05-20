@@ -2,7 +2,7 @@ import { db } from "@reloop/db/client";
 import { emailLog } from "@reloop/db/schema";
 import type { LogsModel } from "@reloop/logs/model/logs.model";
 import { and, eq, gte, lte, sql } from "drizzle-orm";
-import { log } from "evlog";
+import { useLogger } from "evlog/elysia";
 
 export async function getEmailStatsController({
 	query,
@@ -11,8 +11,10 @@ export async function getEmailStatsController({
 	query: LogsModel.EmailStatsQuery;
 	organizationId: string;
 }): Promise<LogsModel.EmailStatsResponse> {
+	const log = useLogger();
 	const { start_date, end_date, domain_id, interval = "day" } = query;
 
+	log.info("Getting email stats", { query, organizationId });
 	try {
 		const conditions = [eq(emailLog.organizationId, organizationId)];
 
@@ -91,15 +93,15 @@ export async function getEmailStatsController({
 			result.rate.push(Math.round(rate * 100) / 100);
 		}
 
+		log.info("Email stats retrieved successfully", {
+			dataPoints: result.dates.length,
+		});
 		return result;
 	} catch (error) {
-		log.error(
-			{
-				query,
-				error: error instanceof Error ? error.message : String(error),
-			},
-			"Error getting email stats",
-		);
+		log.error("Error getting email stats", {
+			query,
+			error: error instanceof Error ? error.message : String(error),
+		});
 		throw error;
 	}
 }

@@ -27,10 +27,10 @@ export const loader = async () => {
 				error:
 					error instanceof Error
 						? {
-							message: error.message,
-							stack: error.stack,
-							name: error.name,
-						}
+								message: error.message,
+								stack: error.stack,
+								name: error.name,
+							}
 						: error,
 			},
 			message: "Error during initialization",

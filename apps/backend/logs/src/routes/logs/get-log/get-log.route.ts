@@ -14,10 +14,10 @@ export const getLogRoute = new Elysia().use(authMiddleware).get(
 		params: LogsModel.getLogParams,
 		response: {
 			200: LogsModel.logEntryResponse,
-			401: LogsModel.errorResponse,
-			403: LogsModel.errorResponse,
-			404: LogsModel.errorResponse,
-			500: LogsModel.errorResponse,
+			401: LogsModel.unauthorized,
+			403: LogsModel.forbidden,
+			404: LogsModel.logNotFound,
+			500: LogsModel.internalServerError,
 		},
 		detail: {
 			tags: ["Logs"],

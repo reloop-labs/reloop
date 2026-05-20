@@ -2,7 +2,7 @@ import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import type { LogsModel } from "@reloop/logs/model/logs.model";
 import { and, count, desc, eq, ilike, or, type SQL } from "drizzle-orm";
-import { log } from "evlog";
+import { useLogger } from "evlog/elysia";
 
 type EmailStatus = (typeof schema.emailStatusEnum.enumValues)[number];
 
@@ -13,9 +13,11 @@ export async function listEmailLogsController({
 	query: LogsModel.ListEmailLogsQuery;
 	organizationId: string;
 }): Promise<LogsModel.ListEmailLogsResponse> {
+	const log = useLogger();
 	const { page = 1, limit = 10, search, status } = query;
 	const offset = (page - 1) * limit;
 
+	log.info("Listing email logs", { query, organizationId });
 	try {
 		const conditions: SQL[] = [
 			eq(schema.emailLog.organizationId, organizationId),
@@ -53,6 +55,7 @@ export async function listEmailLogsController({
 			offset: offset,
 		});
 
+		log.info("Email logs listed successfully", { count: logs.length, total });
 		return {
 			object: "list",
 			data: logs.map((log) => ({
@@ -64,13 +67,10 @@ export async function listEmailLogsController({
 			limit,
 		};
 	} catch (error) {
-		log.error(
-			{
-				query,
-				error: error instanceof Error ? error.message : String(error),
-			},
-			"Error listing email logs",
-		);
+		log.error("Error listing email logs", {
+			query,
+			error: error instanceof Error ? error.message : String(error),
+		});
 		throw error;
 	}
 }

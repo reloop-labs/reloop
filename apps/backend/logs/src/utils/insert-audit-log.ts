@@ -1,7 +1,7 @@
-import { log } from "evlog";
 import { logsConfig } from "@reloop/logs/logs.config";
 import { getClickHouseClient } from "@reloop/logs/utils/clickhouse";
 import { toClickHouseDate } from "@reloop/logs/utils/format";
+import { log } from "evlog";
 
 export type AuditLogEntry = {
 	event: string;
@@ -22,7 +22,9 @@ export type AuditLogEntry = {
 };
 
 const ENV =
-	(logsConfig.NODE_ENV as string) === "production" ? "production" : "development";
+	(logsConfig.NODE_ENV as string) === "production"
+		? "production"
+		: "development";
 
 /**
  * Inserts a structured audit-log row into ClickHouse.
