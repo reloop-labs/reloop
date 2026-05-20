@@ -2,6 +2,7 @@
 
 import { CopyCodeBlock } from "@fe/dashboard/app/(protected)/onboarding/steps/generate-api-key/components/copy-code-block";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
+import * as Badge from "@reloop/ui/badge";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
@@ -67,12 +68,50 @@ const getLevelConfig = (level: string) => {
 	}
 };
 
-const getStatusBadge = (statusCode: number | null | undefined) => {
+/** Returns status label and badge color */
+const getStatusProps = (statusCode: number | null | undefined) => {
 	if (!statusCode) return null;
-	const ok = statusCode >= 200 && statusCode < 400;
-	return ok
-		? "bg-[#d1fae5] text-[#065f46] dark:bg-emerald-950/60 dark:text-emerald-400"
-		: "bg-[#fee2e2] text-[#991b1b] dark:bg-red-950/60 dark:text-red-400";
+
+	// Determine status label & color
+	let label = `${statusCode}`;
+	let color = "gray";
+
+	if (statusCode >= 200 && statusCode < 300) {
+		label = `${statusCode} OK`;
+		color = "gray";
+	} else if (statusCode >= 300 && statusCode < 400) {
+		label = `${statusCode} REDIRECT`;
+		color = "blue";
+	} else if (statusCode >= 400 && statusCode < 500) {
+		color = "orange";
+		switch (statusCode) {
+			case 400:
+				label = "400 BAD";
+				break;
+			case 401:
+				label = "401 UNAUTH";
+				break;
+			case 403:
+				label = "403 FORBID";
+				break;
+			case 404:
+				label = "404 NOT FOUND";
+				break;
+			case 422:
+				label = "422 UNPROC";
+				break;
+			case 429:
+				label = "429 LIMIT";
+				break;
+			default:
+				label = `${statusCode} ERR`;
+		}
+	} else if (statusCode >= 500) {
+		label = `${statusCode} ERROR`;
+		color = "red";
+	}
+
+	return { label, color };
 };
 
 const getMethodBadgeClasses = (method: string) => {
@@ -202,7 +241,7 @@ export const LogDetailPanel = ({ logId }: LogDetailPanelProps) => {
 	);
 
 	const levelConfig = log ? getLevelConfig(log.level) : null;
-	const statusBadgeClass = log ? getStatusBadge(log.status_code) : null;
+	const statusProps = log ? getStatusProps(log.status_code) : null;
 	const metadataEntries = log ? Object.entries(log.metadata || {}) : [];
 	const hasRequestDetails =
 		log?.requestDetails && Object.keys(log.requestDetails).length > 0;
@@ -270,15 +309,14 @@ export const LogDetailPanel = ({ logId }: LogDetailPanelProps) => {
 				<div className="rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/40">
 					<div className="divide-y divide-stroke-soft-100 px-4 dark:divide-stroke-soft-100/40">
 						<PropertyRow label="Status">
-							{log.status_code ? (
-								<span
-									className={cn(
-										"inline-flex items-center rounded-md px-2 py-0.5 font-semibold text-[11px]",
-										statusBadgeClass || "bg-neutral-alpha-10 text-text-sub-600",
-									)}
+							{statusProps ? (
+								<Badge.Root
+									variant="lighter"
+									color={statusProps.color as any}
+									className="h-[18px] rounded-md px-1.5 font-semibold text-[10px] tracking-normal"
 								>
-									{log.status_code}
-								</span>
+									{statusProps.label}
+								</Badge.Root>
 							) : (
 								<span className="text-text-soft-400 text-xs">—</span>
 							)}

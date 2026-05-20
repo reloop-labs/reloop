@@ -2,6 +2,7 @@
 
 import { PageSizeDropdown } from "@fe/dashboard/components/page-size-dropdown";
 import { PaginationControls } from "@fe/dashboard/components/pagination-controls";
+import * as Badge from "@reloop/ui/badge";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
@@ -32,18 +33,51 @@ interface LogTableProps {
 }
 
 /** Grid template used for the header and every row */
-const GRID_COLS = "grid-cols-[70px_50px_minmax(0,1fr)_90px]";
+const GRID_COLS = "grid-cols-[78px_50px_minmax(0,1fr)_90px]";
 
-/** Returns Stripe-style status badge classes */
-const getStatusBadge = (statusCode: number | null | undefined) => {
+/** Returns status label and badge color */
+const getStatusProps = (statusCode: number | null | undefined) => {
 	if (!statusCode) return null;
-	const isSuccess = statusCode >= 200 && statusCode < 400;
-	return {
-		label: `${statusCode}`,
-		className: isSuccess
-			? "text-[#065f46] dark:text-emerald-400"
-			: "text-[#991b1b] dark:text-red-400",
-	};
+	// Determine status label & color
+	let label = `${statusCode}`;
+	let color = "gray";
+
+	if (statusCode >= 200 && statusCode < 300) {
+		label = `${statusCode} OK`;
+		color = "gray";
+	} else if (statusCode >= 300 && statusCode < 400) {
+		label = `${statusCode} REDIRECT`;
+		color = "blue";
+	} else if (statusCode >= 400 && statusCode < 500) {
+		color = "orange";
+		switch (statusCode) {
+			case 400:
+				label = "400 BAD";
+				break;
+			case 401:
+				label = "401 UNAUTH";
+				break;
+			case 403:
+				label = "403 FORBID";
+				break;
+			case 404:
+				label = "404 NOT FOUND";
+				break;
+			case 422:
+				label = "422 UNPROC";
+				break;
+			case 429:
+				label = "429 LIMIT";
+				break;
+			default:
+				label = `${statusCode} ERR`;
+		}
+	} else if (statusCode >= 500) {
+		label = `${statusCode} ERROR`;
+		color = "red";
+	}
+
+	return { label, color };
 };
 
 /** Returns method badge color */
@@ -170,7 +204,7 @@ export const LogTable = ({
 								GRID_COLS,
 							)}
 						>
-							<Skeleton className="h-5 w-14 rounded-md" />
+							<Skeleton className="h-5 w-16 rounded-md" />
 							<Skeleton className="h-4 w-10 rounded" />
 							<Skeleton className="h-4 w-full max-w-[280px] rounded" />
 							<Skeleton className="ml-auto h-4 w-20 rounded" />
@@ -199,7 +233,7 @@ export const LogTable = ({
 								{group.logs.map((log) => {
 									const logAny = log as any;
 									const { method, endpoint } = getMethodAndEndpoint(logAny);
-									const statusBadge = getStatusBadge(log.status_code);
+									const statusProps = getStatusProps(log.status_code);
 									const isSelected = selectedLogId === log.uuid;
 
 									return (
@@ -218,16 +252,21 @@ export const LogTable = ({
 											)}
 										>
 											{/* Status */}
-											<span
-												className={cn(
-													"w-[52px] flex-shrink-0 font-semibold text-[11px] tabular-nums",
-													statusBadge
-														? statusBadge.className
-														: "text-text-soft-400",
+											<div className="flex w-[70px] flex-shrink-0 items-center justify-start">
+												{statusProps ? (
+													<Badge.Root
+														variant="lighter"
+														color={statusProps.color as any}
+														className="h-[18px] rounded-md px-1.5 font-semibold text-[10px] tracking-normal"
+													>
+														{statusProps.label}
+													</Badge.Root>
+												) : (
+													<span className="font-semibold text-[11px] text-text-soft-400">
+														—
+													</span>
 												)}
-											>
-												{statusBadge ? statusBadge.label : "—"}
-											</span>
+											</div>
 
 											{/* Method */}
 											<span
