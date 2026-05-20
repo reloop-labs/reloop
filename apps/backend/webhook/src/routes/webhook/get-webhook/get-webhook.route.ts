@@ -19,8 +19,8 @@ export const getWebhookRoute = new Elysia().use(authMiddleware).get(
 		}),
 		response: {
 			200: WebhookModel.webhookResponse,
-			404: WebhookModel.webhookNotFound,
-			403: WebhookModel.unauthorized,
+			404: WebhookModel.evlogError,
+			401: WebhookModel.evlogError,
 		},
 		detail: {
 			tags: ["Webhooks"],

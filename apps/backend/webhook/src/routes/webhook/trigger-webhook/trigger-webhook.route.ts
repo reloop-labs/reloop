@@ -18,7 +18,7 @@ export const triggerWebhookRoute = new Elysia().use(authMiddleware).post(
 		body: WebhookModel.triggerWebhookBody,
 		response: {
 			200: WebhookModel.triggerWebhookResponse,
-			401: WebhookModel.unauthorized,
+			401: WebhookModel.evlogError,
 		},
 		detail: {
 			tags: ["Webhooks"],

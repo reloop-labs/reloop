@@ -21,10 +21,10 @@ export const updateWebhookRoute = new Elysia().use(authMiddleware).patch(
 		body: WebhookModel.updateWebhookBody,
 		response: {
 			200: WebhookModel.webhookResponse,
-			404: WebhookModel.webhookNotFound,
-			409: WebhookModel.webhookAlreadyExists,
-			400: WebhookModel.invalidWebhookUrl,
-			403: WebhookModel.unauthorized,
+			404: WebhookModel.evlogError,
+			409: WebhookModel.evlogError,
+			400: WebhookModel.evlogError,
+			401: WebhookModel.evlogError,
 		},
 		detail: {
 			tags: ["Webhooks"],

@@ -249,32 +249,20 @@ export namespace WebhookModel {
 
 	export type WebhookQuery = typeof webhookQuery.static;
 
-	// Error responses
-	export const webhookNotFound = t.Object({
-		message: t.Literal("Webhook not found"),
-	});
-	export type WebhookNotFound = typeof webhookNotFound.static;
-
-	export const webhookAlreadyExists = t.Object({
-		message: t.Literal("Webhook name already exists"),
-	});
-	export type WebhookAlreadyExists = typeof webhookAlreadyExists.static;
-
-	export const invalidWebhookUrl = t.Object({
-		message: t.Literal("Invalid webhook URL format"),
-	});
-	export type InvalidWebhookUrl = typeof invalidWebhookUrl.static;
-
-	export const unauthorized = t.Object({
-		message: t.Literal("Unauthorized access"),
-	});
-	export type Unauthorized = typeof unauthorized.static;
-
-	export const validationError = t.Object({
+	// Shared error response shape — matches EvlogError.toJSON()
+	export const evlogError = t.Object({
+		name: t.String(),
 		message: t.String(),
-		errors: t.Array(t.String()),
+		status: t.Number(),
+		data: t.Optional(
+			t.Object({
+				why: t.Optional(t.String()),
+				fix: t.Optional(t.String()),
+				link: t.Optional(t.String()),
+			}),
+		),
 	});
-	export type ValidationError = typeof validationError.static;
+	export type EvlogError = typeof evlogError.static;
 
 	export const deleteWebhookResponse = t.Object(
 		{

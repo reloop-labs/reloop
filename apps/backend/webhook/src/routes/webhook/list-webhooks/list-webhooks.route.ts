@@ -17,7 +17,7 @@ export const listWebhooksRoute = new Elysia().use(authMiddleware).get(
 		query: WebhookModel.webhookQuery,
 		response: {
 			200: WebhookModel.webhookListResponse,
-			403: WebhookModel.unauthorized,
+			401: WebhookModel.evlogError,
 		},
 		detail: {
 			tags: ["Webhooks"],

@@ -19,8 +19,8 @@ export const deleteWebhookRoute = new Elysia().use(authMiddleware).delete(
 		}),
 		response: {
 			200: WebhookModel.deleteWebhookResponse,
-			404: WebhookModel.webhookNotFound,
-			403: WebhookModel.unauthorized,
+			404: WebhookModel.evlogError,
+			401: WebhookModel.evlogError,
 		},
 		detail: {
 			tags: ["Webhooks"],

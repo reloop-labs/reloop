@@ -21,9 +21,9 @@ export const createWebhookRoute = new Elysia().use(authMiddleware).post(
 		body: WebhookModel.createWebhookBody,
 		response: {
 			201: WebhookModel.webhookResponse,
-			409: WebhookModel.webhookAlreadyExists,
-			400: WebhookModel.invalidWebhookUrl,
-			403: WebhookModel.unauthorized,
+			400: WebhookModel.evlogError,
+			409: WebhookModel.evlogError,
+			401: WebhookModel.evlogError,
 		},
 		detail: {
 			tags: ["Webhooks"],
