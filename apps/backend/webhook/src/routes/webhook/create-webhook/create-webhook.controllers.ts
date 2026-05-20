@@ -1,8 +1,8 @@
 import { createId } from "@paralleldrive/cuid2";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
+import { WebhookErrors } from "@reloop/webhook/error/webhook.error-response";
 import type { WebhookEventName } from "@reloop/webhook-events";
-import { status } from "elysia";
 import { log } from "evlog";
 import type { WebhookTypes } from "../webhook.type";
 
@@ -43,7 +43,7 @@ export async function createWebhookController({
 
 		if (!newWebhook) {
 			log.error({ ...{ url, events }, message: "Failed to create webhook" });
-			throw status(500, { message: "Failed to create webhook" });
+			throw WebhookErrors.createFailed();
 		}
 
 		log.info({
@@ -82,6 +82,9 @@ export async function createWebhookController({
 		};
 	} catch (error) {
 		log.error({ ...{ url, error }, message: "Error creating webhook" });
-		throw error;
+		if (error && typeof error === "object" && "status" in error) {
+			throw error;
+		}
+		throw WebhookErrors.createFailed();
 	}
 }
