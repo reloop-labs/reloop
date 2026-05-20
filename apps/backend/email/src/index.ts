@@ -9,7 +9,7 @@ import { landingRoute } from "@reloop/email/routes/landing/landing.route";
 import { loader } from "@reloop/email/utils/loader";
 import { Elysia } from "elysia";
 
-const port = emailConfig.port;
+const port = emailConfig.PORT;
 
 const app = new Elysia({ prefix: "/api/email", name: "Email Service" })
 	.use(cors({ origin: "*" }))
@@ -31,8 +31,8 @@ const app = new Elysia({ prefix: "/api/email", name: "Email Service" })
 	})
 	.listen(port, () => {
 		log.info(
-			"server",
-			`Email Server is running on http://localhost:${port}/api/email`,
+			"Email Service",
+			`Running on:\n  - Local: http://localhost:${port}/api/email\n  - Base:  ${emailConfig.BASE_URL}/api/email`,
 		);
 	});
 
