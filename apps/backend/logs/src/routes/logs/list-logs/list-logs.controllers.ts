@@ -12,6 +12,7 @@ import { useLogger } from "evlog/elysia";
 
 export async function listLogsController(
 	query: LogsTypes.ListLogsQuery,
+	organizationId: string,
 ): Promise<LogsTypes.ListLogsResponse> {
 	const log = useLogger();
 	log.info("Listing logs", { query });
@@ -60,10 +61,8 @@ export async function listLogsController(
 			params.searchPattern = `%${query.search}%`;
 		}
 
-		if (query.organization_id) {
-			conditions.push("organization_id = {organizationId:String}");
-			params.organizationId = query.organization_id;
-		}
+		conditions.push("organization_id = {organizationId:String}");
+		params.organizationId = organizationId;
 
 		if (query.start_date) {
 			conditions.push("created_at >= {startDate:String}");
