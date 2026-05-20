@@ -1,6 +1,7 @@
 import { authMiddleware } from "@reloop/api-key/middleware/auth";
 import { rateLimitPlugin } from "@reloop/api-key/middleware/rate-limit";
 import { ApiKeyModel } from "@reloop/api-key/model/api-key.model";
+import { auditLogHook } from "@reloop/api-key/utils/audit-log";
 import { Elysia, t } from "elysia";
 import { updateApiKeyController } from "./update-api-key.controllers";
 import { updateApiKeyXCodeSamples } from "./update-api-key.x-codeSamples";
@@ -35,5 +36,6 @@ export const updateApiKeyRoute = new Elysia()
 				description: "Updates an existing API key",
 				"x-codeSamples": updateApiKeyXCodeSamples,
 			},
+			afterResponse: auditLogHook({ action: "updated" }),
 		},
 	);

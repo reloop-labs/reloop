@@ -1,6 +1,7 @@
 import { authMiddleware } from "@reloop/api-key/middleware/auth";
 import { rateLimitPlugin } from "@reloop/api-key/middleware/rate-limit";
 import { ApiKeyModel } from "@reloop/api-key/model/api-key.model";
+import { auditLogHook } from "@reloop/api-key/utils/audit-log";
 import { Elysia, t } from "elysia";
 import { deleteApiKeyController } from "./delete-api-key.controllers";
 import { deleteApiKeyXCodeSamples } from "./delete-api-key.x-codeSamples";
@@ -33,5 +34,6 @@ export const deleteApiKeyRoute = new Elysia()
 				description: "Deletes an API key",
 				"x-codeSamples": deleteApiKeyXCodeSamples,
 			},
+			afterResponse: auditLogHook({ action: "deleted" }),
 		},
 	);
