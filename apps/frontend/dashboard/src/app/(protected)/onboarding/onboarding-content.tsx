@@ -52,25 +52,16 @@ export const OnBoardingContent = () => {
 			router.push("/login");
 			return;
 		}
-
-		// Only redirect to dashboard if user has an active org AND that org actually exists.
-		// The activeOrganizationId can be stale while the user has 0 orgs,
-		// which would cause a redirect loop with org-provider.
-		const checkActiveOrg = async () => {
-			if (session.user.activeOrganizationId) {
-				try {
-					const orgs = await authClient.organization.list();
-					const hasOrgs = orgs.data && orgs.data.length > 0;
-					if (hasOrgs) {
-						router.push("/");
-					}
-				} catch {
-					// If org list fails, stay on onboarding
-				}
-			}
-		};
-		checkActiveOrg();
 	}, [session, isPending, router]);
+
+	useEffect(() => {
+		if (step === 5) {
+			const timer = setTimeout(() => {
+				router.push("/");
+			}, 3000);
+			return () => clearTimeout(timer);
+		}
+	}, [step, router]);
 
 	if (isPending) {
 		return (
@@ -198,7 +189,12 @@ export const OnBoardingContent = () => {
 						<span className="font-semibold text-text-strong-950">{name}</span>{" "}
 						is ready. Redirecting you to the dashboard...
 					</p>
-					<Button.Root variant="neutral" mode="filled" className="w-full">
+					<Button.Root
+						variant="neutral"
+						mode="filled"
+						className="w-full"
+						onClick={() => router.push("/")}
+					>
 						Go to Dashboard
 					</Button.Root>
 				</motion.div>
