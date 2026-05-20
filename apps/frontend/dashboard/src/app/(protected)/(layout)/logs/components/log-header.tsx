@@ -7,6 +7,13 @@ import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { useCallback, useState } from "react";
+import {
+	siApple,
+	siFirefox,
+	siGooglechrome,
+	siLinux,
+	siSafari,
+} from "simple-icons";
 import { toast } from "sonner";
 
 interface LogHeaderProps {
@@ -87,6 +94,181 @@ const getStatusIcon = (statusCode: number | null | undefined) => {
 	return "cross-circle";
 };
 
+const getMethodBadgeClasses = (method: string) => {
+	switch (method?.toUpperCase()) {
+		case "GET":
+			return "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-500/10";
+		case "POST":
+			return "bg-blue-500/10 text-blue-600 border border-blue-500/20 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-500/10";
+		case "PUT":
+		case "PATCH":
+			return "bg-amber-500/10 text-amber-600 border border-amber-500/20 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-500/10";
+		case "DELETE":
+			return "bg-rose-500/10 text-rose-600 border border-rose-500/20 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-500/10";
+		default:
+			return "bg-neutral-500/10 text-neutral-600 border border-neutral-500/20 dark:bg-neutral-950/40 dark:text-neutral-400 dark:border-neutral-500/10";
+	}
+};
+
+interface ParsedUA {
+	browser: string;
+	browserIcon: string;
+	os: string;
+	osIcon: string;
+	device: string;
+	deviceIcon: string;
+}
+
+const parseUserAgent = (uaString: string | null | undefined): ParsedUA => {
+	if (!uaString) {
+		return {
+			browser: "Unknown Browser",
+			browserIcon: "globe",
+			os: "Unknown OS",
+			osIcon: "laptop",
+			device: "Unknown Device",
+			deviceIcon: "laptop",
+		};
+	}
+
+	const ua = uaString.toLowerCase();
+
+	// Parse OS
+	let os = "Unknown OS";
+	let osIcon = "laptop";
+	if (ua.includes("win")) {
+		os = "Windows";
+		osIcon = "laptop";
+	} else if (ua.includes("macintosh") || ua.includes("mac os x")) {
+		os = "macOS";
+		osIcon = "laptop";
+	} else if (ua.includes("linux")) {
+		os = "Linux";
+		osIcon = "terminal";
+	} else if (ua.includes("android")) {
+		os = "Android";
+		osIcon = "smartphone";
+	} else if (
+		ua.includes("iphone") ||
+		ua.includes("ipad") ||
+		ua.includes("ipod")
+	) {
+		os = "iOS";
+		osIcon = "smartphone";
+	}
+
+	// Parse Browser
+	let browser = "Unknown Browser";
+	let browserIcon = "globe";
+	if (ua.includes("chrome") || ua.includes("crios")) {
+		browser = "Chrome";
+		browserIcon = "chrome";
+	} else if (
+		ua.includes("safari") &&
+		!ua.includes("chrome") &&
+		!ua.includes("crios") &&
+		!ua.includes("android")
+	) {
+		browser = "Safari";
+		browserIcon = "compass";
+	} else if (ua.includes("firefox") || ua.includes("fxios")) {
+		browser = "Firefox";
+		browserIcon = "globe";
+	} else if (ua.includes("edge") || ua.includes("edg")) {
+		browser = "Edge";
+		browserIcon = "globe";
+	} else if (ua.includes("opera") || ua.includes("opr")) {
+		browser = "Opera";
+		browserIcon = "globe";
+	}
+
+	// Parse Device
+	let device = "Desktop";
+	let deviceIcon = "laptop";
+	if (ua.includes("mobi") || ua.includes("phone")) {
+		device = "Mobile";
+		deviceIcon = "smartphone";
+	} else if (ua.includes("tablet") || ua.includes("ipad")) {
+		device = "Tablet";
+		deviceIcon = "tablet";
+	}
+
+	return { browser, browserIcon, os, osIcon, device, deviceIcon };
+};
+
+const WindowsIcon = () => (
+	<svg
+		role="img"
+		viewBox="0 0 24 24"
+		width="13"
+		height="13"
+		fill="currentColor"
+		className="inline-block shrink-0 align-middle"
+		xmlns="http://www.w3.org/2000/svg"
+		aria-label="Windows"
+	>
+		<path d="M0 3.449L9.75 2.1v9.45H0m0 1.101h9.75v9.451L0 20.699M10.949 1.949L24 0v11.4h-13.051M10.949 12.6H24V24l-13.051-1.949" />
+	</svg>
+);
+
+const getBrandIcon = (name: string) => {
+	if (name === "Windows") return <WindowsIcon />;
+
+	let siIcon = null;
+	switch (name) {
+		case "macOS":
+			siIcon = siApple;
+			break;
+		case "Linux":
+			siIcon = siLinux;
+			break;
+		case "Chrome":
+			siIcon = siGooglechrome;
+			break;
+		case "Safari":
+			siIcon = siSafari;
+			break;
+		case "Firefox":
+			siIcon = siFirefox;
+			break;
+	}
+
+	if (siIcon) {
+		return (
+			<svg
+				role="img"
+				viewBox="0 0 24 24"
+				width="13"
+				height="13"
+				fill="currentColor"
+				className="inline-block shrink-0 align-middle"
+				xmlns="http://www.w3.org/2000/svg"
+				aria-label={name}
+			>
+				<path d={siIcon.path} />
+			</svg>
+		);
+	}
+
+	return (
+		<svg
+			viewBox="0 0 24 24"
+			width="13"
+			height="13"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth="2.5"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+			className="inline-block shrink-0 align-middle"
+		>
+			<circle cx="12" cy="12" r="10" />
+			<line x1="2" y1="12" x2="22" y2="12" />
+			<path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+		</svg>
+	);
+};
+
 export const LogHeader = ({ log, isLoading }: LogHeaderProps) => {
 	const [copiedId, setCopiedId] = useState(false);
 	const [copiedTrace, setCopiedTrace] = useState(false);
@@ -107,7 +289,7 @@ export const LogHeader = ({ log, isLoading }: LogHeaderProps) => {
 
 	if (!log && !isLoading) {
 		return (
-			<div className="pt-10 pb-8">
+			<div className="pt-10 pb-4">
 				<AnimatedBackButton onClick={() => window.history.back()} />
 				<div className="flex items-center justify-between pt-6">
 					<div>
@@ -378,45 +560,98 @@ export const LogHeader = ({ log, isLoading }: LogHeaderProps) => {
 						</span>
 					)}
 				</div>
+
+				{/* User Agent */}
+				{log?.requestDetails?.userAgent &&
+					(() => {
+						const ua = parseUserAgent(log.requestDetails.userAgent);
+						return (
+							<div className="col-span-3 flex flex-col gap-1.5">
+								<div className="flex items-center gap-1.5">
+									<Icon
+										name="laptop"
+										className="h-3.5 w-3.5 text-text-sub-600"
+									/>
+									<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
+										User Agent / Device
+									</span>
+								</div>
+								{isLoading ? (
+									<Skeleton className="h-9 w-full rounded-lg" />
+								) : (
+									<div className="flex flex-wrap items-center gap-2">
+										{/* OS Badge */}
+										<div className="inline-flex items-center gap-1.5 rounded-lg border border-stroke-soft-100 bg-bg-weak-50 px-2.5 py-1 font-medium text-text-strong-950 text-xs dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/45">
+											<span className="text-text-sub-600">
+												{getBrandIcon(ua.os)}
+											</span>
+											<span>{ua.os}</span>
+										</div>
+										{/* Browser Badge */}
+										<div className="inline-flex items-center gap-1.5 rounded-lg border border-stroke-soft-100 bg-bg-weak-50 px-2.5 py-1 font-medium text-text-strong-950 text-xs dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/45">
+											<span className="text-text-sub-600">
+												{getBrandIcon(ua.browser)}
+											</span>
+											<span>{ua.browser}</span>
+										</div>
+										{/* Device Badge */}
+										<div className="inline-flex items-center gap-1.5 rounded-lg border border-stroke-soft-100 bg-bg-weak-50 px-2.5 py-1 font-medium text-text-strong-950 text-xs dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/45">
+											<Icon
+												name={ua.deviceIcon as any}
+												className="h-3 w-3 text-text-sub-600"
+											/>
+											<span>{ua.device}</span>
+										</div>
+
+										{/* Raw UA String hidden under tooltip */}
+										<Tooltip.Provider delayDuration={300}>
+											<Tooltip.Root>
+												<Tooltip.Trigger asChild>
+													<button
+														type="button"
+														className="cursor-help rounded-md p-1 text-text-soft-400 hover:bg-bg-weak-50 hover:text-text-strong-950"
+													>
+														<Icon name="info-outline" className="h-3.5 w-3.5" />
+													</button>
+												</Tooltip.Trigger>
+												<Tooltip.Content
+													side="top"
+													variant="light"
+													className="max-w-sm break-all font-mono text-xs"
+												>
+													{String(log.requestDetails.userAgent)}
+												</Tooltip.Content>
+											</Tooltip.Root>
+										</Tooltip.Provider>
+									</div>
+								)}
+							</div>
+						);
+					})()}
 			</div>
 
 			{/* Request Details Section */}
-			<div className="mt-12">
-				<h3 className="mb-4 font-medium text-paragraph-sm text-text-strong-950">
-					Request Details
-				</h3>
+			<div className="mt-5">
 				<div className="grid grid-cols-3 gap-x-8 gap-y-8">
 					{log?.requestDetails?.method && log?.requestDetails?.endpoint && (
-						<div className="flex flex-col gap-1">
+						<div className="col-span-3 flex flex-col gap-2">
 							<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
 								Endpoint
 							</span>
-							<span className="font-medium font-mono text-paragraph-sm text-text-strong-950">
-								{log.requestDetails.method} {log.requestDetails.endpoint}
-							</span>
-						</div>
-					)}
-					{log?.requestDetails?.userAgent && (
-						<div className="flex flex-col gap-1">
-							<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
-								User Agent
-							</span>
-							<Tooltip.Provider delayDuration={300}>
-								<Tooltip.Root>
-									<Tooltip.Trigger asChild>
-										<span className="max-w-[300px] cursor-default truncate font-medium text-paragraph-sm text-text-strong-950">
-											{String(log.requestDetails.userAgent)}
-										</span>
-									</Tooltip.Trigger>
-									<Tooltip.Content
-										side="top"
-										variant="light"
-										className="max-w-sm break-all font-mono text-xs"
-									>
-										{String(log.requestDetails.userAgent)}
-									</Tooltip.Content>
-								</Tooltip.Root>
-							</Tooltip.Provider>
+							<div className="flex w-full items-center gap-3.5 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/70 p-2.5 font-mono text-sm dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/45">
+								<span
+									className={cn(
+										"rounded-md px-2.5 py-0.5 font-semibold text-[11px] uppercase tracking-wider",
+										getMethodBadgeClasses(log.requestDetails.method),
+									)}
+								>
+									{log.requestDetails.method}
+								</span>
+								<div className="h-4 w-[1px] bg-stroke-soft-200 dark:bg-stroke-soft-200/30" />
+								<span className="select-all truncate text-text-sub-600 selection:bg-primary-base/20 dark:text-text-soft-400">
+									{log.requestDetails.endpoint}
+								</span>
+							</div>
 						</div>
 					)}
 				</div>
