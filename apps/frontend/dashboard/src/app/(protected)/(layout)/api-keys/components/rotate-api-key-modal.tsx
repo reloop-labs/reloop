@@ -47,7 +47,8 @@ export const RotateApiKeyModal = ({ apiKeys }: RotateApiKeyModalProps) => {
 
 	const { theme: currentTheme, systemTheme, resolvedTheme } = useTheme();
 	const effectiveTheme = resolvedTheme || systemTheme || currentTheme;
-	const shikiTheme = effectiveTheme === "dark" ? "one-dark-pro" : "github-light";
+	const shikiTheme =
+		effectiveTheme === "dark" ? "one-dark-pro" : "github-light";
 
 	const apiKeyToRotate = apiKeys.find((apiKey) => apiKey.id === rotateId);
 	const displayName =

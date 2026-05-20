@@ -44,7 +44,10 @@ export const useDomainActions = (
 			payload: Partial<
 				Pick<
 					DomainResponse,
-					"isSendingEmailEnabled" | "isReceivingEmailEnabled" | "isClickTrackingEnabled" | "isOpenTrackingEnabled"
+					| "isSendingEmailEnabled"
+					| "isReceivingEmailEnabled"
+					| "isClickTrackingEnabled"
+					| "isOpenTrackingEnabled"
 				>
 			>,
 			successMessage: string,

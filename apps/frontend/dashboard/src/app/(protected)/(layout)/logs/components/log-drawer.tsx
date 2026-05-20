@@ -10,6 +10,7 @@ import Link from "next/link";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
+import { DiagnosticCard } from "./diagnostic-card";
 
 interface LogDrawerProps {
 	logId: string | null;
@@ -324,6 +325,8 @@ export const LogDrawer = ({ logId, isOpen, onOpenChange }: LogDrawerProps) => {
 									</span>
 								)}
 							</div>
+
+							<DiagnosticCard log={log} />
 
 							{/* Event Info */}
 							<Section title="Event" icon="activity">

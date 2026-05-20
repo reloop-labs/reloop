@@ -5,6 +5,7 @@ import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
+import { DiagnosticCard } from "./diagnostic-card";
 
 interface LogDetailProps {
 	log?: {
@@ -28,7 +29,6 @@ interface LogDetailProps {
 }
 
 import Link from "next/link";
-import { useParams } from "next/navigation";
 
 function CopyButton({ value, label }: { value: string; label?: string }) {
 	const [copied, setCopied] = useState(false);
@@ -85,6 +85,8 @@ export const LogDetail = ({ log, isLoading }: LogDetailProps) => {
 
 	return (
 		<div className="space-y-12">
+			<DiagnosticCard log={log} />
+
 			{/* Metadata Section */}
 			<section>
 				<div className="mb-4 flex items-center justify-between">
