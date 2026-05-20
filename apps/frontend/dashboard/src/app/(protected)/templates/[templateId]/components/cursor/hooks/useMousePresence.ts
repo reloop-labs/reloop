@@ -10,13 +10,15 @@ import type { WebsocketProvider } from "y-websocket";
  * CollaborationCaret's own awareness field.
  */
 export function useMousePresence(
-	provider: WebsocketProvider,
+	provider: WebsocketProvider | null,
 	containerRef: React.RefObject<HTMLDivElement | null>,
 	throttleMs = 30,
 ) {
 	const lastEmitRef = useRef(0);
 
 	useEffect(() => {
+		if (!provider) return;
+
 		const handleMouseMove = (e: MouseEvent) => {
 			const now = Date.now();
 			if (now - lastEmitRef.current < throttleMs) return;
@@ -51,7 +53,7 @@ export function useMousePresence(
 		return () => {
 			document.removeEventListener("mousemove", handleMouseMove);
 			document.removeEventListener("mouseleave", handleMouseLeave);
-			provider.awareness.setLocalStateField("mouseCursor", null);
+			provider?.awareness?.setLocalStateField("mouseCursor", null);
 		};
 	}, [provider, containerRef, throttleMs]);
 }

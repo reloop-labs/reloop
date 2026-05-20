@@ -9,7 +9,7 @@ import type * as Y from "yjs";
 
 export interface CollabOptions {
 	ydoc: Y.Doc;
-	provider: WebsocketProvider;
+	provider: WebsocketProvider | null;
 	user: { name: string; color: string };
 }
 
@@ -45,27 +45,37 @@ function makeSafeAwarenessProxy(provider: WebsocketProvider) {
 }
 
 export const useEditorHook = (collab: CollabOptions) => {
-	const editor = useEditor({
-		extensions: [
-			StarterKit.configure({ UndoRedo: false }),
-			...baseExtensions,
-			Collaboration.configure({
-				document: collab.ydoc,
-				field: "email-content",
-				provider: collab.provider,
-			}),
-			CollaborationCaret.configure({
-				provider: {
-					awareness: makeSafeAwarenessProxy(collab.provider),
-				},
-				user: collab.user,
-			}),
-		],
-		immediatelyRender: false,
-		onContentError(e) {
-			console.error("[editor] content error", e);
+	const collabExtensions =
+		collab.provider && collab.ydoc
+			? [
+					Collaboration.configure({
+						document: collab.ydoc,
+						field: "email-content",
+						provider: collab.provider,
+					}),
+					CollaborationCaret.configure({
+						provider: {
+							awareness: makeSafeAwarenessProxy(collab.provider),
+						},
+						user: collab.user,
+					}),
+				]
+			: [];
+
+	const editor = useEditor(
+		{
+			extensions: [
+				StarterKit.configure({ UndoRedo: false }),
+				...baseExtensions,
+				...collabExtensions,
+			],
+			immediatelyRender: false,
+			onContentError(e) {
+				console.error("[editor] content error", e);
+			},
 		},
-	});
+		[collab.provider, collab.ydoc],
+	);
 
 	return editor;
 };

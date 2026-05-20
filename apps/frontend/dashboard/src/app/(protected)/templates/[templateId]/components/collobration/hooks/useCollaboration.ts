@@ -1,7 +1,7 @@
 "use client";
 
 import * as decoding from "lib0/decoding";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { WebsocketProvider } from "y-websocket";
 import * as Y from "yjs";
 
@@ -34,7 +34,7 @@ export interface UseCollaborationOptions {
 
 export interface UseCollaborationReturn {
 	ydoc: Y.Doc;
-	provider: WebsocketProvider;
+	provider: WebsocketProvider | null;
 	isConnected: boolean;
 	isSynced: boolean;
 	awarenessUsers: AwarenessUser[];
@@ -80,17 +80,10 @@ export function useCollaboration({
 	onUpdate,
 	updateDebounce = 1000,
 }: UseCollaborationOptions): UseCollaborationReturn {
-	const { ydoc, provider } = useMemo(() => {
-		const y = new Y.Doc();
-		const wsUrl = getWsUrl();
-		const p = new WebsocketProvider(
-			`${wsUrl}/api/template/collab`,
-			roomName,
-			y,
-			{ connect: true },
-		);
-		return { ydoc: y, provider: p };
-	}, [roomName]);
+	const [collab, setCollab] = useState<{
+		ydoc: Y.Doc;
+		provider: WebsocketProvider;
+	} | null>(null);
 
 	const [isConnected, setIsConnected] = useState(false);
 	const [isSynced, setIsSynced] = useState(false);
@@ -102,17 +95,39 @@ export function useCollaboration({
 	const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const onUpdateRef = useRef(onUpdate);
 	onUpdateRef.current = onUpdate;
+	const userRef = useRef(user);
+	userRef.current = user;
 
 	const save = useCallback(() => {
 		if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
-		if (ydoc && onUpdateRef.current) {
-			onUpdateRef.current(ydoc);
+		if (collab?.ydoc && onUpdateRef.current) {
+			onUpdateRef.current(collab.ydoc);
 		}
-	}, [ydoc]);
+	}, [collab?.ydoc]);
 
+	// ── Create and manage provider lifecycle inside useEffect ──────────
+	// This ensures fresh objects are created on each mount (including
+	// React 18 Strict Mode remounts) and properly cleaned up.
 	useEffect(() => {
 		if (!roomName) return;
-		provider.on("status", ({ status }: { status: string }) => {
+
+		const ydoc = new Y.Doc();
+		const wsUrl = getWsUrl();
+		const provider = new WebsocketProvider(
+			`${wsUrl}/api/template/collab`,
+			roomName,
+			ydoc,
+			{ connect: true },
+		);
+
+		// Expose to the rest of the component via state
+		setCollab({ ydoc, provider });
+		setConnectionStatus("connecting");
+		setIsConnected(false);
+		setIsSynced(false);
+
+		// ── Connection status ─────────────────────────────────────────
+		const handleStatus = ({ status }: { status: string }) => {
 			setIsConnected(status === "connected");
 			setConnectionStatus(
 				status === "connected"
@@ -121,12 +136,16 @@ export function useCollaboration({
 						? "connecting"
 						: "disconnected",
 			);
-		});
+		};
+		provider.on("status", handleStatus);
+
 		provider.on("sync", (synced: boolean) => {
 			setIsSynced(synced);
 		});
 
-		// Listen for verified user info from the server
+		// Listen for verified user info from the server.
+		// Attach the handler via the provider's status event so we catch
+		// the WebSocket even if it hasn't been created yet at this point.
 		const handleMessage = (event: MessageEvent) => {
 			try {
 				const data = event.data;
@@ -139,7 +158,7 @@ export function useCollaboration({
 					const userData = JSON.parse(json);
 					setServerUser({
 						name: userData.name,
-						color: user.color, // keep local color
+						color: userRef.current.color,
 						avatar: userData.image,
 					});
 				}
@@ -148,18 +167,29 @@ export function useCollaboration({
 			}
 		};
 
-		provider.ws?.addEventListener("message", handleMessage);
+		// Attach the native message listener once the WebSocket opens.
+		// provider.ws may be null until the connection is established.
+		const attachWsListener = ({ status }: { status: string }) => {
+			if (status === "connected" && provider.ws) {
+				provider.ws.addEventListener("message", handleMessage);
+			}
+		};
+		provider.on("status", attachWsListener);
+
+		// Also attach immediately if ws already exists
+		if (provider.ws) {
+			provider.ws.addEventListener("message", handleMessage);
+		}
 
 		provider.on("connection-error", () => {
 			setConnectionStatus("error");
 		});
 
-		// ── Awareness (presence) init ─────────────────────────────────────
-		const activeUser = serverUser || user;
+		// ── Awareness (presence) init ─────────────────────────────────
 		provider.awareness.setLocalStateField("user", {
-			name: activeUser.name,
-			color: activeUser.color,
-			avatar: activeUser.avatar,
+			name: userRef.current.name,
+			color: userRef.current.color,
+			avatar: userRef.current.avatar,
 		});
 
 		const updateAwareness = () => {
@@ -179,12 +209,12 @@ export function useCollaboration({
 		provider.awareness.on("change", updateAwareness);
 		updateAwareness();
 
-		// ── Autosave ──────────────────────────────────────────────────────
+		// ── Autosave ──────────────────────────────────────────────────
 		const handleUpdate = () => {
 			if (!onUpdateRef.current) return;
 			if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
 			debounceTimerRef.current = setTimeout(() => {
-				if (ydoc && onUpdateRef.current) {
+				if (onUpdateRef.current) {
 					onUpdateRef.current(ydoc);
 				}
 			}, updateDebounce);
@@ -192,33 +222,35 @@ export function useCollaboration({
 
 		ydoc.on("update", handleUpdate);
 
-		// ── Cleanup ───────────────────────────────────────────────────────
+		// ── Cleanup ───────────────────────────────────────────────────
 		return () => {
 			if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
 			ydoc.off("update", handleUpdate);
+			provider.off("status", handleStatus);
+			provider.off("status", attachWsListener);
 			provider.awareness.off("change", updateAwareness);
-			// Clear local awareness state BEFORE destroying the provider.
 			provider.awareness.setLocalState(null);
 			provider.destroy();
 			ydoc.destroy();
+			setCollab(null);
 		};
-	}, [roomName, updateDebounce, provider, ydoc]);
+	}, [roomName, updateDebounce]);
 
 	// Update user details in awareness without reconnecting
 	useEffect(() => {
-		if (provider) {
+		if (collab?.provider) {
 			const activeUser = serverUser || user;
-			provider.awareness.setLocalStateField("user", {
+			collab.provider.awareness.setLocalStateField("user", {
 				name: activeUser.name,
 				color: activeUser.color,
 				avatar: activeUser.avatar,
 			});
 		}
-	}, [provider, user.name, user.color, user.avatar, serverUser]);
+	}, [collab?.provider, user.name, user.color, user.avatar, serverUser]);
 
 	return {
-		ydoc,
-		provider,
+		ydoc: collab?.ydoc ?? null as any,
+		provider: collab?.provider ?? null,
 		isConnected,
 		isSynced,
 		awarenessUsers,

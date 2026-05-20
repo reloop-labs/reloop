@@ -323,7 +323,7 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 	}, [shouldInitialize, editor, templateData, versions, initializeEditor]);
 
 	return (
-		<PresenceProvider awareness={provider.awareness}>
+		<PresenceProvider awareness={provider?.awareness ?? null}>
 			<EditorContext.Provider value={{ editor }}>
 				<div ref={containerRef} className="bg-bg-weak-50 dark:bg-black">
 					<div className="grid grid-cols-3 items-center px-4 pt-2">

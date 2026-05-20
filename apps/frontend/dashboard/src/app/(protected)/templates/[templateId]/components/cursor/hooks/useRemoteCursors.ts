@@ -12,10 +12,12 @@ export interface RemoteCursor {
 	y: number; // percentage
 }
 
-export function useRemoteCursors(provider: WebsocketProvider): RemoteCursor[] {
+export function useRemoteCursors(provider: WebsocketProvider | null): RemoteCursor[] {
 	const [cursors, setCursors] = useState<RemoteCursor[]>([]);
 
 	useEffect(() => {
+		if (!provider) return;
+
 		const update = () => {
 			const remote: RemoteCursor[] = [];
 
