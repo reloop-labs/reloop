@@ -47,10 +47,10 @@ interface LogListResponse {
 /** Outcome tab type */
 type OutcomeTab = "all" | "succeeded" | "failed";
 
-const OUTCOME_TABS: { id: OutcomeTab; label: string }[] = [
-	{ id: "all", label: "All" },
-	{ id: "succeeded", label: "Succeeded" },
-	{ id: "failed", label: "Failed" },
+const OUTCOME_TABS: { id: OutcomeTab; label: string; emoji: string }[] = [
+	{ id: "all", label: "All", emoji: "📋" },
+	{ id: "succeeded", label: "Succeeded", emoji: "✅" },
+	{ id: "failed", label: "Failed", emoji: "❌" },
 ];
 
 export const LogList = () => {
@@ -208,8 +208,8 @@ export const LogList = () => {
 				</div>
 			</div>
 
-			{/* ── Outcome Tabs ── */}
-			<div className="flex border-b border-stroke-soft-100 dark:border-stroke-soft-100/40">
+			{/* ── Outcome Filter Buttons ── */}
+			<div className="flex items-center gap-2 py-3">
 				{OUTCOME_TABS.map((tab) => (
 					<button
 						key={tab.id}
@@ -219,16 +219,14 @@ export const LogList = () => {
 							setCurrentPage(1);
 						}}
 						className={cn(
-							"relative flex min-w-[120px] items-center justify-center px-6 py-3 text-sm font-medium transition-colors",
+							"inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-all",
 							outcomeTab === tab.id
-								? "text-text-strong-950"
-								: "text-text-sub-600 hover:text-text-strong-950",
+								? "bg-bg-weak-50 text-text-strong-950 shadow-sm ring-1 ring-stroke-soft-100 dark:bg-bg-weak-50/20 dark:ring-stroke-soft-100/40"
+								: "text-text-sub-600 hover:bg-bg-weak-50/60 hover:text-text-strong-950 dark:hover:bg-bg-weak-50/10",
 						)}
 					>
+						<span className="text-base leading-none">{tab.emoji}</span>
 						{tab.label}
-						{outcomeTab === tab.id && (
-							<span className="absolute bottom-0 left-0 right-0 h-[2px] rounded-t-full bg-primary-base" />
-						)}
 					</button>
 				))}
 			</div>
@@ -297,19 +295,9 @@ export const LogList = () => {
 			</div>
 
 			{/* ── Split Panel ── */}
-			<div
-				className={cn(
-					"mt-4 flex min-h-0 flex-1 gap-4",
-					selectedLogId ? "items-start" : "",
-				)}
-			>
+			<div className="mt-4 flex min-h-0 flex-1 items-start gap-4">
 				{/* LEFT — Log list */}
-				<div
-					className={cn(
-						"flex min-w-0 flex-col gap-4 transition-all duration-300",
-						selectedLogId ? "w-[480px] flex-shrink-0" : "flex-1",
-					)}
-				>
+				<div className="flex w-[480px] flex-shrink-0 flex-col gap-4">
 					<LogTable
 						logs={data?.logs || []}
 						isLoading={isLoading}
@@ -350,12 +338,24 @@ export const LogList = () => {
 					)}
 				</div>
 
-				{/* RIGHT — Inline detail panel */}
-				{selectedLogId && (
-					<div className="min-h-[500px] flex-1 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
+				{/* RIGHT — Inline detail panel (always visible) */}
+				<div className="min-h-[500px] flex-1 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
+					{selectedLogId ? (
 						<LogDetailPanel logId={selectedLogId} />
-					</div>
-				)}
+					) : (
+						<div className="flex h-full min-h-[500px] flex-col items-center justify-center gap-3 p-8 text-center">
+							<div className="flex h-12 w-12 items-center justify-center rounded-full bg-bg-weak-50 text-2xl dark:bg-bg-weak-50/20">
+								📄
+							</div>
+							<p className="font-medium text-paragraph-sm text-text-strong-950">
+								Select a log to view details
+							</p>
+							<p className="max-w-[200px] text-paragraph-xs text-text-soft-400">
+								Click any row on the left to inspect its full details here.
+							</p>
+						</div>
+					)}
+				</div>
 			</div>
 
 			{/* Mobile drawer (only visible on narrow screens) */}

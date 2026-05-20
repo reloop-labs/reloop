@@ -12,7 +12,7 @@ const LogsLayout = ({ children }: { children: React.ReactNode }) => {
 			{isLogDetailPage ? (
 				<div className="mx-auto max-w-3xl px-6 sm:px-8">{children}</div>
 			) : (
-				<div className="w-full px-6">{children}</div>
+				<div className="mx-auto w-full max-w-6xl px-6">{children}</div>
 			)}
 
 			<LogsModals />
