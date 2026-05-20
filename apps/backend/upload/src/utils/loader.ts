@@ -15,12 +15,12 @@ const redis = new RedisCache("upload");
 export const loader = async () => {
 	try {
 		await redis.healthCheck();
-		log.info("server", "Redis connected");
+		log.info("Redis", "Connected");
 
 		await db.execute("SELECT 1 as test");
-		log.info("server", "Postgres connected");
+		log.info("Postgres", "Connected");
 		await bus.connect(uploadConfig.NATS_URL);
-		log.info("server", "NATS connected");
+		log.info("NATS", "Connected");
 
 		// Check S3 accessibility and create bucket if it doesn't exist
 		try {
@@ -31,7 +31,7 @@ export const loader = async () => {
 			);
 		} catch {
 			log.info({
-				...{ bucket: uploadConfig.S3.BUCKET },
+				bucket: uploadConfig.S3.BUCKET,
 				message: "Bucket not found, creating it...",
 			});
 			await s3Client.send(
@@ -67,9 +67,9 @@ export const loader = async () => {
 			message: "S3 bucket connected and set to public read",
 		});
 	} catch (e) {
-		log.error(
-			{ error: e instanceof Error ? e.message : String(e) },
-			"Error during service initialization",
-		);
+		log.error({
+			message: "Error during service initialization",
+			error: e instanceof Error ? e.message : String(e),
+		});
 	}
 };

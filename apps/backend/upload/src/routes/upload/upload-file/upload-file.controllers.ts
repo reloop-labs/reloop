@@ -1,11 +1,11 @@
+import { UploadErrors } from "@be/upload/error/upload.error-response";
 import { storage } from "@be/upload/lib/storage";
 import type { UploadTypes } from "@be/upload/types/upload.type";
 import { uploadConfig } from "@be/upload/upload.config";
 import { createId } from "@paralleldrive/cuid2";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { status } from "elysia";
-import { log } from "evlog";
+import { useLogger } from "evlog/elysia";
 
 function sanitizeFilename(filename: string): string {
 	// Remove path separators and dangerous characters
@@ -32,23 +32,27 @@ export async function uploadFile(params: {
 	file: File;
 }): Promise<UploadTypes.UploadResponse> {
 	const { userId, file } = params;
+	const log = useLogger();
 	try {
 		// Validate file type
 		if (!uploadConfig.constants.allowedMimeTypes.includes(file.type)) {
-			log.warn({
-				...{ mimeType: file.type, fileName: file.name },
-				message: "Invalid file type",
+			log.warn("Invalid file type", {
+				mimeType: file.type,
+				fileName: file.name,
 			});
-			throw new Error("Invalid file type. Only images are allowed");
+			throw UploadErrors.invalidFileType(
+				file.type,
+				uploadConfig.constants.allowedMimeTypes,
+			);
 		}
 
 		// Validate file size
 		if (file.size > uploadConfig.constants.maxFileSize) {
-			log.warn({
-				...{ size: file.size, fileName: file.name },
-				message: "File too large",
-			});
-			throw new Error("File size exceeds maximum allowed size");
+			log.warn("File too large", { size: file.size, fileName: file.name });
+			throw UploadErrors.fileTooLarge(
+				file.size,
+				uploadConfig.constants.maxFileSize,
+			);
 		}
 
 		// Generate unique filename
@@ -83,22 +87,18 @@ export async function uploadFile(params: {
 			.returning();
 
 		if (!newUpload[0]) {
-			log.error({
-				...{ fileName: file.name },
-				message: "Failed to create upload record - no data returned",
+			log.error("Failed to create upload record - no data returned", {
+				fileName: file.name,
 			});
 			throw new Error("Failed to save upload metadata");
 		}
 
 		const fileUrl = `${uploadConfig.S3.ENDPOINT}/${uploadConfig.S3.BUCKET}/${filePath}`;
 
-		log.info({
-			...{
-				id: newUpload[0].id,
-				filename: filename,
-				userId,
-			},
-			message: "File uploaded successfully",
+		log.info("File uploaded successfully", {
+			id: newUpload[0].id,
+			filename: filename,
+			userId,
 		});
 
 		return {
@@ -114,21 +114,25 @@ export async function uploadFile(params: {
 			updatedAt: newUpload[0].updatedAt.toISOString(),
 		};
 	} catch (error) {
-		log.error(
-			{
-				fileName: file.name,
-				userId,
-				error: error instanceof Error ? error.message : String(error),
-			},
-			"Error uploading file",
-		);
-		if (error instanceof Error && error.message.includes("Invalid file type")) {
-			throw status(400, {
-				message: "Invalid file type. Only images are allowed",
-			});
+		log.error("Error uploading file", {
+			fileName: file.name,
+			userId,
+			error: error instanceof Error ? error.message : String(error),
+			stack: error instanceof Error ? error.stack : undefined,
+		});
+		if (
+			error &&
+			typeof error === "object" &&
+			"status" in error &&
+			(error as { status: number }).status === 400
+		) {
+			throw error;
 		}
-		if (error instanceof Error && error.message.includes("File size exceeds")) {
-			throw status(400, { message: "File size exceeds maximum allowed size" });
+		if (
+			error instanceof Error &&
+			error.message.includes("Failed to save upload metadata")
+		) {
+			throw UploadErrors.uploadFailed(error.message);
 		}
 		throw error;
 	}

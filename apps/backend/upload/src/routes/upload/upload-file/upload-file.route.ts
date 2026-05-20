@@ -1,4 +1,4 @@
-import { uploadErrorResponse } from "@be/upload/error/upload.error-code";
+import { UploadErrors } from "@be/upload/error/upload.error-response";
 import { authMiddleware } from "@be/upload/middleware/auth";
 import { UploadModel } from "@be/upload/model/upload.model";
 import { uploadFileHandler } from "@be/upload/routes/upload/upload-file/upload-file.controllers";
@@ -12,20 +12,13 @@ export const uploadFileRoute = new Elysia().use(authMiddleware).post(
 		const file = formData.get("file") as File | null;
 
 		if (!file) {
-			uploadErrorResponse("No file provided");
+			throw UploadErrors.noFileProvided();
 		}
 
-		try {
-			return await uploadFileHandler({
-				userId,
-				file: file as File,
-			});
-		} catch (error) {
-			const errorMessage =
-				error instanceof Error ? error.message : String(error);
-			uploadErrorResponse(errorMessage);
-			throw error; // This will never execute but satisfies TypeScript
-		}
+		return await uploadFileHandler({
+			userId,
+			file,
+		});
 	},
 	{
 		auth: true,

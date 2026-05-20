@@ -1,4 +1,3 @@
-import { uploadErrorResponse } from "@be/upload/error/upload.error-code";
 import { authMiddleware } from "@be/upload/middleware/auth";
 import { UploadModel } from "@be/upload/model/upload.model";
 import { deleteFileHandler } from "@be/upload/routes/upload/delete-file/delete-file.controllers";
@@ -8,16 +7,9 @@ export const deleteFileRoute = new Elysia().use(authMiddleware).delete(
 	"/files/:fileId",
 	async ({ params }) => {
 		const { fileId } = params;
-		try {
-			return await deleteFileHandler({
-				fileId,
-			});
-		} catch (error) {
-			const errorMessage =
-				error instanceof Error ? error.message : String(error);
-			uploadErrorResponse(errorMessage);
-			throw error; // This will never execute but satisfies TypeScript
-		}
+		return await deleteFileHandler({
+			fileId,
+		});
 	},
 	{
 		auth: true,

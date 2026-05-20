@@ -37,8 +37,7 @@ export const agentCardRoute = new Elysia().get(
 			{
 				id: "delete_file",
 				name: "Delete File",
-				description:
-					"Permanently delete a file from S3 storage and database.",
+				description: "Permanently delete a file from S3 storage and database.",
 				method: "DELETE",
 				path: "/api/upload/v1/files/:fileId",
 				tags: ["upload"],

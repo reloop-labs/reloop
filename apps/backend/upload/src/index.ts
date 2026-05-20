@@ -1,4 +1,3 @@
-import { log } from "evlog";
 import "dotenv/config";
 import { agentCardRoute } from "@be/upload/routes/landing/agent-card.route";
 import { healthRoute } from "@be/upload/routes/landing/health.route";
@@ -8,14 +7,18 @@ import { uploadConfig } from "@be/upload/upload.config";
 import { loader } from "@be/upload/utils/loader";
 import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
-
 import { Elysia } from "elysia";
+import { initLogger, log, parseError } from "evlog";
+import { evlog } from "evlog/elysia";
+
+initLogger({ env: { service: "upload" } });
 
 const port = uploadConfig.port;
 const uploadService = new Elysia({
 	prefix: "/api/upload",
 	name: "Upload Service",
 })
+	.use(evlog())
 	.use(
 		openapi({
 			documentation: {
@@ -36,6 +39,16 @@ const uploadService = new Elysia({
 		}),
 	)
 	.use(serverTiming())
+	.onError(({ error, set }) => {
+		const parsed = parseError(error);
+		set.status = parsed.status;
+		return {
+			message: parsed.message,
+			why: parsed.why,
+			fix: parsed.fix,
+			link: parsed.link,
+		};
+	})
 	.use(landingRoute)
 	.use(agentCardRoute)
 	.use(healthRoute)
@@ -45,7 +58,7 @@ const uploadService = new Elysia({
 	})
 	.listen(port, () => {
 		log.info(
-			"server",
+			"Upload Service",
 			`Upload Server is running on http://localhost:${port}/api/upload`,
 		);
 	});

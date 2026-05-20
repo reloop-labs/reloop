@@ -7,7 +7,10 @@
 		"check-types": "tsc --noEmit",
 		"compile": "bun build --compile --minify --sourcemap --bytecode ./src/index.ts --outfile server",
 		"dev": "bun run --hot src/index.ts",
-		"start": "bun run dist/index.js"
+		"start": "bun run dist/index.js",
+		"lint": "biome check .",
+		"fix-lint": "biome check --fix .",
+		"format": "biome format ."
 	},
 	"dependencies": {
 		"@aws-sdk/client-s3": "catalog:backend",
