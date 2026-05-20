@@ -1,18 +1,18 @@
 "use client";
 
+import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
-import { useMemo, useState } from "react";
+import { useRef, useState } from "react";
 import useSWR from "swr";
 import { DateRangeFilter } from "./date-range-filter";
 import { DocsButton } from "./docs-button";
 import { LogDetailPanel } from "./log-detail-panel";
 import { LogDrawer } from "./log-drawer";
-import { LogFilterDropdown, type LogFilters } from "./log-filter-dropdown";
 import { LogTable } from "./log-table";
 import { LogsApiDetails } from "./logs-api-details";
 import { StatusFilterDropdown } from "./status-filter-dropdown";
@@ -45,16 +45,33 @@ interface LogListResponse {
 /** Outcome tab type */
 type OutcomeTab = "all" | "succeeded" | "failed";
 
-const OUTCOME_TABS: { id: OutcomeTab; label: string; emoji: string }[] = [
-	{ id: "all", label: "All", emoji: "📋" },
-	{ id: "succeeded", label: "Succeeded", emoji: "✅" },
-	{ id: "failed", label: "Failed", emoji: "❌" },
+const OUTCOME_TABS: {
+	id: OutcomeTab;
+	label: string;
+	icon?: string;
+	iconColor?: string;
+}[] = [
+	{ id: "all", label: "All" },
+	{
+		id: "succeeded",
+		label: "Success",
+		icon: "check-circle",
+		iconColor: "text-green-500",
+	},
+	{
+		id: "failed",
+		label: "Failed",
+		icon: "cross-circle",
+		iconColor: "text-red-500",
+	},
 ];
 
 export const LogList = () => {
 	const { activeOrganization } = useUserOrganization();
+	const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
+	const buttonRefs = useRef<HTMLButtonElement[]>([]);
+
 	const [searchQuery, setSearchQuery] = useState<string>("");
-	const [filters, setFilters] = useState<LogFilters>([]);
 	const [outcomeTab, setOutcomeTab] = useState<OutcomeTab>("all");
 	const [currentPage, setCurrentPage] = useQueryState(
 		"page",
@@ -84,15 +101,14 @@ export const LogList = () => {
 	// Selected log for the inline detail panel
 	const [selectedLogId, setSelectedLogId] = useState<string | null>(null);
 
+	const activeIdx = OUTCOME_TABS.findIndex((tab) => tab.id === outcomeTab);
+	const activeEl = buttonRefs.current[activeIdx];
+	const currentEl =
+		hoveredIdx !== undefined ? buttonRefs.current[hoveredIdx] : activeEl;
+	const currentRect = currentEl?.getBoundingClientRect();
+
 	// Mobile drawer state (for narrow viewports)
 	const [drawerOpen, setDrawerOpen] = useState(false);
-
-	// Level filter string for API
-	const levelFilter = useMemo(() => {
-		if (filters.length === 0 || filters.length === 5) return "";
-		if (filters.length === 1) return filters[0];
-		return "";
-	}, [filters]);
 
 	// Build API URL
 	const buildApiUrl = () => {
@@ -103,7 +119,6 @@ export const LogList = () => {
 		params.set("page", String(currentPage));
 
 		if (searchQuery) params.set("event", searchQuery);
-		if (levelFilter) params.set("level", levelFilter);
 		if (startDate) params.set("start_date", startDate);
 		if (endDate) params.set("end_date", endDate);
 
@@ -142,7 +157,6 @@ export const LogList = () => {
 
 	const handleClearAll = () => {
 		setSearchQuery("");
-		setFilters([]);
 		setStatusCode("");
 		setStartDate("");
 		setEndDate("");
@@ -152,12 +166,7 @@ export const LogList = () => {
 	};
 
 	const hasAnyFilter =
-		searchQuery ||
-		filters.length > 0 ||
-		statusCode ||
-		startDate ||
-		endDate ||
-		outcomeTab !== "all";
+		searchQuery || statusCode || startDate || endDate || outcomeTab !== "all";
 
 	const handleDownloadCSV = async () => {
 		if (!data?.logs || data.logs.length === 0) return;
@@ -197,36 +206,41 @@ export const LogList = () => {
 
 	return (
 		<div className="flex min-h-0 flex-col">
-			{/* ── Page Header ── */}
-			<div className="flex items-center justify-between py-6">
-				<h1 className="font-semibold text-text-strong-950 text-xl">Logs</h1>
-				<div className="flex items-center gap-2">
-					<DocsButton size="xsmall" mode="stroke" />
-					<LogsApiDetails size="xsmall" mode="ghost" />
-				</div>
-			</div>
-
-			{/* ── Outcome Filter Buttons ── */}
-			<div className="flex items-center gap-2 py-3">
-				{OUTCOME_TABS.map((tab) => (
+			<div className="relative mt-6 flex items-center gap-2 py-3">
+				{OUTCOME_TABS.map((tab, idx) => (
 					<button
 						key={tab.id}
+						ref={(el) => {
+							if (el) buttonRefs.current[idx] = el;
+						}}
 						type="button"
+						onPointerEnter={() => setHoveredIdx(idx)}
+						onPointerLeave={() => setHoveredIdx(undefined)}
 						onClick={() => {
 							setOutcomeTab(tab.id);
 							setCurrentPage(1);
 						}}
 						className={cn(
-							"inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-medium text-sm transition-all",
+							"relative z-10 inline-flex items-center gap-1.5 rounded-lg px-3 py-1 font-medium text-sm transition-all",
 							outcomeTab === tab.id
-								? "bg-bg-weak-50 text-text-strong-950 shadow-sm ring-1 ring-stroke-soft-100 dark:bg-bg-weak-50/20 dark:ring-stroke-soft-100/40"
-								: "text-text-sub-600 hover:bg-bg-weak-50/60 hover:text-text-strong-950 dark:hover:bg-bg-weak-50/10",
+								? "text-text-strong-950"
+								: "text-text-sub-600 hover:text-text-strong-950",
 						)}
 					>
-						<span className="text-base leading-none">{tab.emoji}</span>
+						{tab.icon && (
+							<Icon
+								name={tab.icon as any}
+								className={cn("h-3.5 w-3.5", tab.iconColor)}
+							/>
+						)}
 						{tab.label}
 					</button>
 				))}
+				<AnimatedHoverBackground
+					rect={currentRect}
+					tabElement={currentEl}
+					className="bg-bg-weak-50 ring-1 ring-stroke-soft-100 dark:bg-bg-weak-50/20 dark:ring-stroke-soft-100/40"
+				/>
 			</div>
 
 			{/* ── Filter Bar ── */}
@@ -258,15 +272,12 @@ export const LogList = () => {
 
 				{/* Status */}
 				<StatusFilterDropdown
-					value={statusCode ? statusCode.split(",") : []}
-					onChange={(val: string[]) => {
-						setStatusCode(val.length > 0 ? val.join(",") : "");
+					value={statusCode || null}
+					onChange={(val) => {
+						setStatusCode(val || "");
 						setCurrentPage(1);
 					}}
 				/>
-
-				{/* Level */}
-				<LogFilterDropdown value={filters} onChange={setFilters} />
 
 				{/* Export CSV */}
 				<Button.Root
@@ -290,10 +301,14 @@ export const LogList = () => {
 						Clear all
 					</button>
 				)}
+				<div className="ml-auto flex items-center gap-2">
+					<DocsButton size="xsmall" mode="stroke" />
+					<LogsApiDetails size="xsmall" mode="ghost" />
+				</div>
 			</div>
 
 			{/* ── Split Panel ── */}
-			<div className="mt-4 flex items-start gap-4">
+			<div className="mt-3 flex items-start gap-4">
 				{/* LEFT — Log list */}
 				<div className="sticky top-4 flex max-h-[calc(100vh-100px)] w-[480px] flex-shrink-0 flex-col gap-4 self-start overflow-y-auto">
 					<LogTable
