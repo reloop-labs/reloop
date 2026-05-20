@@ -1,4 +1,5 @@
 import { domainConfig } from "@reloop/domain/domain.config";
+import type { DNSTypes } from "@reloop/domain/types/dns.type";
 import {
 	generateAllDNSRecords,
 	generateReceivingMXRecord,
@@ -6,7 +7,6 @@ import {
 	getCustomReturnPathSubString,
 	getDomainHost,
 } from "@reloop/domain/utils";
-import type { DNSTypes } from "@reloop/domain/types/dns.type";
 
 import { useLogger } from "evlog/elysia";
 

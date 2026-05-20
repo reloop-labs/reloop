@@ -1,6 +1,7 @@
 import { authMiddleware } from "@reloop/domain/middleware/auth";
 import { rateLimitPlugin } from "@reloop/domain/middleware/rate-limit";
 import { DomainModel } from "@reloop/domain/model/domain.model";
+import { auditLogHook } from "@reloop/domain/utils/audit-log";
 import { Elysia, t } from "elysia";
 import { updateDomainController } from "./update-domain.controllers";
 import { updateDomainXCodeSamples } from "./update-domain.x-codeSamples";
@@ -35,5 +36,6 @@ export const updateDomainRoute = new Elysia()
 				description: "Updates a domain",
 				"x-codeSamples": updateDomainXCodeSamples,
 			},
+			afterResponse: auditLogHook({ action: "updated", successStatus: 200 }),
 		},
 	);

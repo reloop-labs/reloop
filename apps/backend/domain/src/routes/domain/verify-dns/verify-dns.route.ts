@@ -1,6 +1,7 @@
 import { authMiddleware } from "@reloop/domain/middleware/auth";
 import { rateLimitPlugin } from "@reloop/domain/middleware/rate-limit";
 import { DomainModel } from "@reloop/domain/model/domain.model";
+import { auditLogHook } from "@reloop/domain/utils/audit-log";
 import { Elysia, t } from "elysia";
 import { verifyDNSRecordController } from "./verify-dns.controllers";
 import { verifyDNSXCodeSamples } from "./verify-dns.x-codeSamples";
@@ -36,5 +37,6 @@ export const verifyDNSRecordRoute = new Elysia()
 					"Verifies DNS records for a domain to check if they are properly configured",
 				"x-codeSamples": verifyDNSXCodeSamples,
 			},
+			afterResponse: auditLogHook({ action: "verified", successStatus: 200 }),
 		},
 	);
