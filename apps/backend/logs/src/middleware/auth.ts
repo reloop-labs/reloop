@@ -1,3 +1,4 @@
+import { createId } from "@paralleldrive/cuid2";
 import { logsConfig } from "@reloop/logs/logs.config";
 import { Elysia } from "elysia";
 import { evlog } from "evlog/elysia";
@@ -18,7 +19,7 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 						headers.get("x-api-key") ||
 						headers.get("authorization")?.replace("Bearer ", "");
 					const cookie = headers.get("cookie");
-					const traceId = crypto.randomUUID();
+					const traceId = `req_${createId()}`;
 					log.set({ traceId, service: "logs" });
 
 					const apiKeyResult = await validateApiKey(apiKey);
@@ -67,7 +68,7 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 						headers.get("x-api-key") ||
 						headers.get("authorization")?.replace("Bearer ", "");
 					const cookie = headers.get("cookie");
-					const traceId = crypto.randomUUID();
+					const traceId = `req_${createId()}`;
 					log.set({ traceId, service: "logs" });
 
 					const apiKeyResult = await validateApiKey(apiKey);

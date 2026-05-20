@@ -1,3 +1,4 @@
+import { createId } from "@paralleldrive/cuid2";
 import { Elysia } from "elysia";
 import { log } from "evlog";
 import { useLogger } from "evlog/elysia";
@@ -17,7 +18,7 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 				const sessionResult = await validateSession(cookie);
 
 				if (sessionResult) {
-					const traceId = crypto.randomUUID();
+					const traceId = `req_${createId()}`;
 					log.set({
 						traceId,
 						user: sessionResult.userId,
@@ -45,7 +46,7 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 				const apiKey = headers.get("x-api-key");
 				const apiKeyResult = await validateApiKey(apiKey);
 				if (apiKeyResult) {
-					const traceId = crypto.randomUUID();
+					const traceId = `req_${createId()}`;
 					log.set({
 						traceId,
 						user: apiKeyResult.userId,
@@ -79,7 +80,7 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 				const log = useLogger();
 				const apiKeyResult = await validateApiKey(apiKey);
 				if (apiKeyResult) {
-					const traceId = crypto.randomUUID();
+					const traceId = `req_${createId()}`;
 					log.set({
 						traceId,
 						service: "api-key",
@@ -91,7 +92,7 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" }).macro({
 				}
 				const sessionResult = await validateSession(cookie);
 				if (sessionResult) {
-					const traceId = crypto.randomUUID();
+					const traceId = `req_${createId()}`;
 					log.set({
 						traceId,
 						service: "api-key",

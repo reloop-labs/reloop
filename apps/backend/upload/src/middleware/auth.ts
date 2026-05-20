@@ -1,3 +1,4 @@
+import { createId } from "@paralleldrive/cuid2";
 import { uploadConfig } from "@be/upload/upload.config";
 import { Elysia } from "elysia";
 import { evlog } from "evlog/elysia";
@@ -15,7 +16,7 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 			async resolve({ status, request: { headers }, log }) {
 				try {
 					const cookie = headers.get("cookie");
-					const traceId = crypto.randomUUID();
+					const traceId = `req_${createId()}`;
 					log.set({ traceId, service: "upload" });
 					const sessionResult = await validateSession(cookie);
 					if (sessionResult) {
@@ -39,7 +40,7 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 			async resolve({ status, request: { headers }, log }) {
 				try {
 					const apiKey = headers.get("x-api-key");
-					const traceId = crypto.randomUUID();
+					const traceId = `req_${createId()}`;
 					log.set({ traceId, service: "upload" });
 					const apiKeyResult = await validateApiKey(apiKey);
 					if (apiKeyResult) {
@@ -67,7 +68,7 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 				try {
 					const apiKey = headers.get("x-api-key");
 					const cookie = headers.get("cookie");
-					const traceId = crypto.randomUUID();
+					const traceId = `req_${createId()}`;
 					log.set({ traceId, service: "upload" });
 					const apiKeyResult = await validateApiKey(apiKey);
 					if (apiKeyResult) {

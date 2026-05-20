@@ -127,8 +127,8 @@ export function CopyCodeBlock({
 				<CodeBlock
 					code={code}
 					lang={lang}
-					className="text-[10px]"
-					hideLineNumbers={true}
+					className="text-[13px]"
+					hideLineNumbers={false}
 					noScroll={true}
 				/>
 			</div>

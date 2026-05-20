@@ -1,7 +1,11 @@
+import { createId } from "@paralleldrive/cuid2";
 import { logsConfig } from "@reloop/logs/logs.config";
 import { getClickHouseClient } from "@reloop/logs/utils/clickhouse";
 import { toClickHouseDate } from "@reloop/logs/utils/format";
 import { log } from "evlog";
+
+/** Generate a lowercase prefixed request ID */
+export const createRequestId = () => `req_${createId()}`;
 
 export type AuditLogEntry = {
 	event: string;
@@ -45,7 +49,7 @@ export async function insertAuditLog(entry: AuditLogEntry): Promise<void> {
 			table: "logs",
 			values: [
 				{
-					id: crypto.randomUUID(),
+					id: entry.trace_id || createRequestId(),
 					event: entry.event,
 					level: entry.level,
 					trace_id: entry.trace_id ?? null,

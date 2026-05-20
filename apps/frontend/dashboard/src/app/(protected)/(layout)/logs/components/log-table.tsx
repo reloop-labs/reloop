@@ -41,8 +41,8 @@ const getStatusBadge = (statusCode: number | null | undefined) => {
 	return {
 		label: `${statusCode}`,
 		className: isSuccess
-			? "bg-[#d1fae5] text-[#065f46] dark:bg-emerald-950/60 dark:text-emerald-400"
-			: "bg-[#fee2e2] text-[#991b1b] dark:bg-red-950/60 dark:text-red-400",
+			? "text-[#065f46] dark:text-emerald-400"
+			: "text-[#991b1b] dark:text-red-400",
 	};
 };
 
@@ -132,9 +132,12 @@ const stripBasePath = (url: string) => {
 };
 
 /** Extract method and endpoint from a log event + requestDetails */
-const getMethodAndEndpoint = (log: LogData & { requestDetails?: Record<string, unknown> }) => {
+const getMethodAndEndpoint = (
+	log: LogData & { requestDetails?: Record<string, unknown> },
+) => {
 	const method = (log.requestDetails?.method as string) || "";
-	const rawEndpoint = (log.requestDetails?.endpoint as string) || log.event || "";
+	const rawEndpoint =
+		(log.requestDetails?.endpoint as string) || log.event || "";
 	const endpoint = stripBasePath(rawEndpoint);
 	return { method, endpoint };
 };
@@ -156,7 +159,6 @@ export const LogTable = ({
 }: LogTableProps) => {
 	return (
 		<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/40">
-
 			{/* Table Body */}
 			<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
 				{isLoading ? (
@@ -178,7 +180,7 @@ export const LogTable = ({
 					<div className="flex h-48 flex-col items-center justify-center gap-2 text-text-sub-600">
 						<Icon name="inbox" className="h-8 w-8 text-text-disabled-300" />
 						<p className="text-sm">No logs found</p>
-						<p className="text-xs text-text-soft-400">
+						<p className="text-text-soft-400 text-xs">
 							Try adjusting your filters or time range
 						</p>
 					</div>
@@ -186,8 +188,8 @@ export const LogTable = ({
 					groupLogsByDate(logs as any).map((group) => (
 						<div key={group.dateKey}>
 							{/* Date separator */}
-							<div className="flex items-center gap-3 border-b border-stroke-soft-100 bg-bg-weak-50/70 px-4 py-1.5 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/20">
-								<span className="font-medium text-[10px] tracking-widest text-text-soft-400 uppercase">
+							<div className="flex items-center gap-3 border-stroke-soft-100 border-b px-4 py-2.5 dark:border-stroke-soft-100/40">
+								<span className="font-medium text-text-soft-400 text-xs uppercase tracking-widest">
 									{group.dateLabel}
 								</span>
 							</div>
@@ -215,13 +217,13 @@ export const LogTable = ({
 												"focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-base focus-visible:ring-inset",
 											)}
 										>
-											{/* Status badge */}
+											{/* Status */}
 											<span
 												className={cn(
-													"inline-flex w-[52px] flex-shrink-0 items-center justify-center rounded-md px-2 py-0.5 font-semibold text-[11px] tabular-nums",
+													"w-[52px] flex-shrink-0 font-semibold text-[11px] tabular-nums",
 													statusBadge
 														? statusBadge.className
-														: "bg-neutral-alpha-10 text-text-sub-600",
+														: "text-text-soft-400",
 												)}
 											>
 												{statusBadge ? statusBadge.label : "—"}
@@ -240,12 +242,12 @@ export const LogTable = ({
 											</span>
 
 											{/* Endpoint / Event */}
-											<span className="truncate font-mono text-xs text-text-strong-950">
+											<span className="truncate font-mono text-text-strong-950 text-xs">
 												{endpoint || log.event}
 											</span>
 
 											{/* Time */}
-											<span className="text-right flex-shrink-0 text-xs text-text-sub-600 tabular-nums">
+											<span className="flex-shrink-0 text-right text-text-sub-600 text-xs tabular-nums">
 												{formatTime(log.created_at)}
 											</span>
 										</button>

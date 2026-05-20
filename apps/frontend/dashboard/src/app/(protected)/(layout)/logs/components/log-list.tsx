@@ -1,21 +1,21 @@
 "use client";
 
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
-import { cn } from "@reloop/ui/cn";
 import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
 import useSWR from "swr";
 import { DateRangeFilter } from "./date-range-filter";
+import { DocsButton } from "./docs-button";
 import { LogDetailPanel } from "./log-detail-panel";
 import { LogDrawer } from "./log-drawer";
 import { LogFilterDropdown, type LogFilters } from "./log-filter-dropdown";
 import { LogTable } from "./log-table";
-import { StatusFilterDropdown } from "./status-filter-dropdown";
-import { DocsButton } from "./docs-button";
 import { LogsApiDetails } from "./logs-api-details";
+import { StatusFilterDropdown } from "./status-filter-dropdown";
 
 interface LogData {
 	uuid: string;
@@ -199,7 +199,7 @@ export const LogList = () => {
 		<div className="flex min-h-0 flex-col">
 			{/* ── Page Header ── */}
 			<div className="flex items-center justify-between py-6">
-				<h1 className="font-semibold text-xl text-text-strong-950">Logs</h1>
+				<h1 className="font-semibold text-text-strong-950 text-xl">Logs</h1>
 				<div className="flex items-center gap-2">
 					<DocsButton size="xsmall" mode="stroke" />
 					<LogsApiDetails size="xsmall" mode="ghost" />
@@ -217,7 +217,7 @@ export const LogList = () => {
 							setCurrentPage(1);
 						}}
 						className={cn(
-							"inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-all",
+							"inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-medium text-sm transition-all",
 							outcomeTab === tab.id
 								? "bg-bg-weak-50 text-text-strong-950 shadow-sm ring-1 ring-stroke-soft-100 dark:bg-bg-weak-50/20 dark:ring-stroke-soft-100/40"
 								: "text-text-sub-600 hover:bg-bg-weak-50/60 hover:text-text-strong-950 dark:hover:bg-bg-weak-50/10",
@@ -230,7 +230,7 @@ export const LogList = () => {
 			</div>
 
 			{/* ── Filter Bar ── */}
-			<div className="flex flex-wrap items-center gap-2 border-b border-stroke-soft-100 px-0 py-3 dark:border-stroke-soft-100/40">
+			<div className="flex flex-wrap items-center gap-2 px-0 pt-3 pb-2 dark:border-stroke-soft-100/40">
 				{/* Search */}
 				<div className="w-48">
 					<Input.Root size="xsmall">
@@ -285,7 +285,7 @@ export const LogList = () => {
 					<button
 						type="button"
 						onClick={handleClearAll}
-						className="ml-auto text-xs text-text-sub-600 transition-colors hover:text-text-strong-950"
+						className="ml-auto text-text-sub-600 text-xs transition-colors hover:text-text-strong-950"
 					>
 						Clear all
 					</button>
@@ -293,9 +293,12 @@ export const LogList = () => {
 			</div>
 
 			{/* ── Split Panel ── */}
-			<div className="mt-4 flex min-h-0 flex-1 items-start gap-4">
+			<div
+				className="mt-4 flex min-h-0 items-start gap-4"
+				style={{ height: "calc(100vh - 220px)" }}
+			>
 				{/* LEFT — Log list */}
-				<div className="flex w-[480px] flex-shrink-0 flex-col gap-4">
+				<div className="flex h-full w-[480px] flex-shrink-0 flex-col gap-4 overflow-y-auto">
 					<LogTable
 						logs={data?.logs || []}
 						isLoading={isLoading}
@@ -322,8 +325,8 @@ export const LogList = () => {
 					/>
 				</div>
 
-				{/* RIGHT — Inline detail panel (always visible) */}
-				<div className="min-h-[500px] flex-1 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
+				{/* RIGHT — Inline detail panel (scrollable) */}
+				<div className="h-full flex-1 overflow-y-auto rounded-3xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
 					{selectedLogId ? (
 						<LogDetailPanel logId={selectedLogId} />
 					) : (

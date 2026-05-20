@@ -212,7 +212,7 @@ export const LogDetailPanel = ({ logId }: LogDetailPanelProps) => {
 		return (
 			<div className="flex h-full flex-col gap-4 p-5">
 				{/* Title skeleton */}
-				<div className="border-b border-stroke-soft-100 pb-4 dark:border-stroke-soft-100/40">
+				<div className="border-stroke-soft-100 border-b pb-4 dark:border-stroke-soft-100/40">
 					<Skeleton className="h-5 w-56 rounded" />
 					<Skeleton className="mt-2 h-3.5 w-36 rounded" />
 				</div>
@@ -235,17 +235,18 @@ export const LogDetailPanel = ({ logId }: LogDetailPanelProps) => {
 	const method = log.requestDetails?.method as string | undefined;
 	const endpoint = log.requestDetails?.endpoint as string | undefined;
 	const displayEndpoint = endpoint ? stripBasePath(endpoint) : undefined;
-	const title = method && displayEndpoint ? `${method} ${displayEndpoint}` : log.event;
+	const title =
+		method && displayEndpoint ? `${method} ${displayEndpoint}` : log.event;
 
 	return (
 		<div className="flex h-full flex-col overflow-y-auto">
 			{/* ── Panel Header ── */}
-			<div className="flex items-start justify-between gap-3 border-b border-stroke-soft-100 px-5 py-4 dark:border-stroke-soft-100/40">
+			<div className="flex items-start justify-between gap-3 px-5 pt-4">
 				<div className="min-w-0 flex-1">
 					<h2 className="truncate font-semibold text-sm text-text-strong-950">
 						{title}
 					</h2>
-					<div className="mt-1 flex items-center gap-2 text-xs text-text-sub-600">
+					<div className="mt-1 flex items-center gap-2 text-text-sub-600 text-xs">
 						<span>{new Date(log.created_at).toLocaleString()}</span>
 						<span className="text-text-disabled-300">·</span>
 						<span>{formatRelativeTime(log.created_at)}</span>
@@ -262,43 +263,6 @@ export const LogDetailPanel = ({ logId }: LogDetailPanelProps) => {
 
 			{/* ── Body ── */}
 			<div className="flex-1 space-y-4 p-5">
-				{/* Badge row */}
-				<div className="flex items-center gap-2">
-					{levelConfig && (
-						<span
-							className={cn(
-								"inline-flex items-center gap-1.5 rounded-md border px-2 py-1 font-medium text-[10px] capitalize",
-								levelConfig.color,
-								levelConfig.bg,
-								levelConfig.border,
-							)}
-						>
-							<Icon name={levelConfig.icon as "terminal"} className="h-3 w-3" />
-							{log.level}
-						</span>
-					)}
-					{log.status_code && statusBadgeClass && (
-						<span
-							className={cn(
-								"inline-flex items-center rounded-md px-2 py-1 font-semibold text-[11px]",
-								statusBadgeClass,
-							)}
-						>
-							{log.status_code}
-						</span>
-					)}
-					{method && (
-						<span
-							className={cn(
-								"inline-flex items-center rounded-md px-2 py-1 font-semibold text-[11px] uppercase",
-								getMethodBadgeClasses(method),
-							)}
-						>
-							{method}
-						</span>
-					)}
-				</div>
-
 				{/* Diagnostic card */}
 				<DiagnosticCard log={log} />
 
@@ -310,8 +274,7 @@ export const LogDetailPanel = ({ logId }: LogDetailPanelProps) => {
 								<span
 									className={cn(
 										"inline-flex items-center rounded-md px-2 py-0.5 font-semibold text-[11px]",
-										statusBadgeClass ||
-											"bg-neutral-alpha-10 text-text-sub-600",
+										statusBadgeClass || "bg-neutral-alpha-10 text-text-sub-600",
 									)}
 								>
 									{log.status_code}
@@ -321,7 +284,7 @@ export const LogDetailPanel = ({ logId }: LogDetailPanelProps) => {
 							)}
 						</PropertyRow>
 
-						<PropertyRow label="ID">
+						<PropertyRow label="Request ID">
 							<PropertyValue value={log.uuid} mono copyable maxLength={26} />
 						</PropertyRow>
 
@@ -343,7 +306,12 @@ export const LogDetailPanel = ({ logId }: LogDetailPanelProps) => {
 
 						{log.trace_id && (
 							<PropertyRow label="Trace ID">
-								<PropertyValue value={log.trace_id} mono copyable maxLength={26} />
+								<PropertyValue
+									value={log.trace_id}
+									mono
+									copyable
+									maxLength={26}
+								/>
 							</PropertyRow>
 						)}
 
@@ -356,15 +324,21 @@ export const LogDetailPanel = ({ logId }: LogDetailPanelProps) => {
 							</PropertyRow>
 						)}
 
-						{hasRequestDetails && log.requestDetails.endpoint && (
-							<PropertyRow label="Endpoint">
-								<PropertyValue
-									value={stripBasePath(log.requestDetails.endpoint as string)}
-									mono
-									maxLength={50}
-								/>
-							</PropertyRow>
-						)}
+						{hasRequestDetails &&
+							log.requestDetails.endpoint &&
+							(() => {
+								try {
+									const origin = new URL(log.requestDetails.endpoint as string)
+										.origin;
+									return (
+										<PropertyRow label="Origin">
+											<PropertyValue value={origin} mono maxLength={50} />
+										</PropertyRow>
+									);
+								} catch {
+									return null;
+								}
+							})()}
 					</div>
 				</div>
 
@@ -379,7 +353,7 @@ export const LogDetailPanel = ({ logId }: LogDetailPanelProps) => {
 					</div>
 				) : (
 					<div className="rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/40">
-						<div className="flex items-center gap-2 border-b border-stroke-soft-100 px-4 py-2.5 dark:border-stroke-soft-100/40">
+						<div className="flex items-center gap-2 border-stroke-soft-100 border-b px-4 py-2.5 dark:border-stroke-soft-100/40">
 							<Icon name="code" className="h-3.5 w-3.5 text-text-sub-600" />
 							<span className="font-medium text-[11px] text-text-sub-600 uppercase tracking-wider">
 								Response body

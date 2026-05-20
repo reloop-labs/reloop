@@ -281,6 +281,7 @@
       "name": "logs",
       "dependencies": {
         "@clickhouse/client": "catalog:backend",
+        "@elysia/opentelemetry": "catalog:backend",
         "@elysiajs/cors": "catalog:backend",
         "@elysiajs/cron": "catalog:backend",
         "@elysiajs/openapi": "catalog:backend",
@@ -294,6 +295,7 @@
         "@opentelemetry/resources": "catalog:backend",
         "@opentelemetry/sdk-trace-node": "catalog:backend",
         "@opentelemetry/semantic-conventions": "catalog:backend",
+        "@paralleldrive/cuid2": "catalog:backend",
         "@reloop/apikey": "workspace:*",
         "@reloop/bus": "workspace:*",
         "@reloop/cache": "workspace:*",
@@ -475,7 +477,6 @@
         "@reloop/db": "workspace:*",
         "@reloop/webhook-events": "workspace:*",
         "better-auth": "catalog:",
-        "bullmq": "catalog:backend",
         "dotenv": "catalog:backend",
         "drizzle-orm": "catalog:db",
         "drizzle-typebox": "catalog:db",

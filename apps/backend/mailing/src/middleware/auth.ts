@@ -1,3 +1,4 @@
+import { createId } from "@paralleldrive/cuid2";
 import { AuthErrors, MailingError } from "@reloop/be-mailing/lib/errors";
 import { Elysia } from "elysia";
 import { evlog } from "evlog/elysia";
@@ -14,7 +15,7 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 	.macro({
 		cookieAuth: {
 			async resolve({ request: { headers }, log }) {
-				const traceId = crypto.randomUUID();
+				const traceId = `req_${createId()}`;
 				log.set({ traceId });
 
 				try {
@@ -53,7 +54,7 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 		},
 		apiKeyAuth: {
 			async resolve({ request: { headers }, log }) {
-				const traceId = crypto.randomUUID();
+				const traceId = `req_${createId()}`;
 				log.set({ traceId, service: "mailing" });
 
 				try {
@@ -101,7 +102,7 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 		},
 		auth: {
 			async resolve({ request: { headers }, log }) {
-				const traceId = crypto.randomUUID();
+				const traceId = `req_${createId()}`;
 				log.set({ traceId, service: "mail" });
 
 				try {

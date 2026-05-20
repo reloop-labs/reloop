@@ -40,6 +40,7 @@
 		"@reloop/cache": "workspace:*",
 		"@reloop/apikey": "workspace:*",
 		"@reloop/bus": "workspace:*",
+		"@paralleldrive/cuid2": "catalog:backend",
 		"evlog": "catalog:backend"
 	},
 	"devDependencies": {
