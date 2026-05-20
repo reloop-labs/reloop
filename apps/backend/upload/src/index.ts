@@ -1,6 +1,8 @@
 import { log } from "evlog";
 import "dotenv/config";
-import { landing } from "@be/upload/routes/landing/landing.index";
+import { agentCardRoute } from "@be/upload/routes/landing/agent-card.route";
+import { healthRoute } from "@be/upload/routes/landing/health.route";
+import { landingRoute } from "@be/upload/routes/landing/landing.route";
 import { uploadRoutes } from "@be/upload/routes/upload/upload.routes";
 import { uploadConfig } from "@be/upload/upload.config";
 import { loader } from "@be/upload/utils/loader";
@@ -34,7 +36,9 @@ const uploadService = new Elysia({
 		}),
 	)
 	.use(serverTiming())
-	.use(landing)
+	.use(landingRoute)
+	.use(agentCardRoute)
+	.use(healthRoute)
 	.use(uploadRoutes)
 	.onStart(async () => {
 		await loader();
