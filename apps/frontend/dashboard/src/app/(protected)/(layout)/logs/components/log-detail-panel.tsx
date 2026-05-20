@@ -109,12 +109,20 @@ const getMethodColorClass = (method: string) => {
 	}
 };
 
-/** Strip protocol + host from a URL, keeping only the path */
+/** Strip protocol + host from a URL, keeping only the path and stripping trailing slash */
 const stripBasePath = (url: string) => {
 	try {
-		return new URL(url).pathname;
+		let path = new URL(url).pathname;
+		if (path.length > 1 && path.endsWith("/")) {
+			path = path.slice(0, -1);
+		}
+		return path;
 	} catch {
-		return url;
+		let path = url;
+		if (path.length > 1 && path.endsWith("/")) {
+			path = path.slice(0, -1);
+		}
+		return path;
 	}
 };
 
