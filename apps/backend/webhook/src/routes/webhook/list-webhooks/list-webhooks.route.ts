@@ -6,10 +6,10 @@ import { listWebhooksXCodeSamples } from "./list-webhooks.x-codeSamples";
 
 export const listWebhooksRoute = new Elysia().use(authMiddleware).get(
 	"/",
-	async ({ query, activeOrganizationId }) => {
+	async ({ query, organizationId }) => {
 		return await listWebhooksController({
 			query,
-			organizationId: activeOrganizationId,
+			organizationId,
 		});
 	},
 	{

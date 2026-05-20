@@ -7,9 +7,9 @@ import { createWebhookXCodeSamples } from "./create-webhook.x-codeSamples";
 
 export const createWebhookRoute = new Elysia().use(authMiddleware).post(
 	"/",
-	async ({ body, activeOrganizationId, userId }) => {
+	async ({ body, organizationId, userId }) => {
 		return await createWebhookController({
-			organizationId: activeOrganizationId,
+			organizationId,
 			userId,
 			description: body.description,
 			url: body.url,

@@ -20,10 +20,12 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 					const sessionResult = await validateSession(cookie);
 					if (sessionResult) {
 						log.set({
-							...sessionResult,
+							user: sessionResult.userId,
+							organizationId: sessionResult.organizationId,
+							authType: sessionResult.authType,
 						});
 						log.info("Session authentication successful");
-						return { ...sessionResult, traceId, logger: log };
+						return { ...sessionResult, traceId };
 					}
 					return status(401, { message: "Authentication required" });
 				} catch (e) {
@@ -44,10 +46,12 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 					const apiKeyResult = await validateApiKey(apiKey);
 					if (apiKeyResult) {
 						log.set({
-							...apiKeyResult,
+							user: apiKeyResult.userId,
+							organizationId: apiKeyResult.organizationId,
+							authType: apiKeyResult.authType,
 						});
 						log.info("API key authentication successful");
-						return { ...apiKeyResult, traceId, logger: log };
+						return { ...apiKeyResult, traceId };
 					}
 					return status(401, { message: "Authentication required" });
 				} catch (e) {
@@ -72,18 +76,22 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 					const apiKeyResult = await validateApiKey(apiKey);
 					if (apiKeyResult) {
 						log.set({
-							...apiKeyResult,
+							user: apiKeyResult.userId,
+							organizationId: apiKeyResult.organizationId,
+							authType: apiKeyResult.authType,
 						});
 						log.info("API key authentication successful");
-						return { ...apiKeyResult, traceId, logger: log };
+						return { ...apiKeyResult, traceId };
 					}
 					const sessionResult = await validateSession(cookie);
 					if (sessionResult) {
 						log.set({
-							...sessionResult,
+							user: sessionResult.userId,
+							organizationId: sessionResult.organizationId,
+							authType: sessionResult.authType,
 						});
 						log.info("Session authentication successful");
-						return { ...sessionResult, traceId, logger: log };
+						return { ...sessionResult, traceId };
 					}
 					return status(401, { message: "Authentication required" });
 				} catch (e) {

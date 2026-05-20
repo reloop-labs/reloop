@@ -1,21 +1,15 @@
 import { authMiddleware } from "@reloop/webhook/middleware/auth";
 import { WebhookModel } from "@reloop/webhook/routes/webhook/webhook.model";
-import { Elysia, status, t } from "elysia";
+import { Elysia, t } from "elysia";
 import { getWebhookController } from "./get-webhook.controllers";
 import { getWebhookXCodeSamples } from "./get-webhook.x-codeSamples";
 
 export const getWebhookRoute = new Elysia().use(authMiddleware).get(
 	"/:webhook_id",
-	async ({ params: { webhook_id }, activeOrganizationId }) => {
-		if (!activeOrganizationId) {
-			throw status(403, {
-				message: "Authentication required",
-			});
-		}
-
+	async ({ params: { webhook_id }, organizationId }) => {
 		return await getWebhookController({
 			webhookId: webhook_id,
-			organizationId: activeOrganizationId,
+			organizationId,
 		});
 	},
 	{

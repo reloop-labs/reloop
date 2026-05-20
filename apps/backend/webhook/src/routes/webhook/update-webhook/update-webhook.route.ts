@@ -6,10 +6,10 @@ import { updateWebhookXCodeSamples } from "./update-webhook.x-codeSamples";
 
 export const updateWebhookRoute = new Elysia().use(authMiddleware).patch(
 	"/:webhook_id",
-	async ({ params: { webhook_id }, body, activeOrganizationId }) => {
+	async ({ params: { webhook_id }, body, organizationId }) => {
 		return await updateWebhookController({
 			webhookId: webhook_id,
-			organizationId: activeOrganizationId,
+			organizationId,
 			body,
 		});
 	},

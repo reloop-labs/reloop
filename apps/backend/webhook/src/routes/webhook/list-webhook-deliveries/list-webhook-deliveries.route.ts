@@ -5,10 +5,10 @@ import { listWebhookDeliveriesController } from "./list-webhook-deliveries.contr
 
 export const listWebhookDeliveriesRoute = new Elysia().use(authMiddleware).get(
 	"/:webhook_id/deliveries",
-	async ({ params: { webhook_id }, query, activeOrganizationId }) => {
+	async ({ params: { webhook_id }, query, organizationId }) => {
 		return await listWebhookDeliveriesController({
 			webhookId: webhook_id,
-			organizationId: activeOrganizationId,
+			organizationId,
 			query: query as WebhookModel.WebhookDeliveryQuery,
 		});
 	},

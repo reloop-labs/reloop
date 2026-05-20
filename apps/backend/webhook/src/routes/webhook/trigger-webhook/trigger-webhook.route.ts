@@ -5,11 +5,11 @@ import { triggerWebhookController } from "./trigger-webhook.controllers";
 
 export const triggerWebhookRoute = new Elysia().use(authMiddleware).post(
 	"/trigger",
-	async ({ body, activeOrganizationId, userId }) => {
+	async ({ body, organizationId, userId }) => {
 		return await triggerWebhookController({
 			event: body.event,
 			payload: body.payload,
-			organizationId: body.organizationId || activeOrganizationId,
+			organizationId: body.organizationId || organizationId,
 			userId: body.userId || userId,
 		});
 	},

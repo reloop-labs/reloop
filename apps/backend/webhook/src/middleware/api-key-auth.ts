@@ -6,7 +6,7 @@ export async function validateApiKey(apiKey: string | null | undefined) {
 	if (!result) return null;
 	return {
 		userId: result.userId,
-		activeOrganizationId: result.organizationId,
+		organizationId: result.organizationId,
 		authType: result.authType,
 	};
 }

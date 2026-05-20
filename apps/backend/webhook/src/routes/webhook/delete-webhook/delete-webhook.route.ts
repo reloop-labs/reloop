@@ -1,21 +1,15 @@
 import { authMiddleware } from "@reloop/webhook/middleware/auth";
 import { WebhookModel } from "@reloop/webhook/routes/webhook/webhook.model";
-import { Elysia, status, t } from "elysia";
+import { Elysia, t } from "elysia";
 import { deleteWebhookController } from "./delete-webhook.controllers";
 import { deleteWebhookXCodeSamples } from "./delete-webhook.x-codeSamples";
 
 export const deleteWebhookRoute = new Elysia().use(authMiddleware).delete(
 	"/:id",
-	async ({ params: { id }, activeOrganizationId }) => {
-		if (!activeOrganizationId) {
-			throw status(403, {
-				message: "Authentication required",
-			});
-		}
-
+	async ({ params: { id }, organizationId }) => {
 		return await deleteWebhookController({
 			webhookId: id,
-			organizationId: activeOrganizationId,
+			organizationId,
 		});
 	},
 	{
