@@ -1,31 +1,30 @@
 import { createHmac } from "node:crypto";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { webhookConfig } from "@reloop/webhook/webhook.config";
-import { Worker } from "bullmq";
 import { eq, sql } from "drizzle-orm";
 import { log } from "evlog";
-import {
-	WEBHOOK_DELIVERY_QUEUE,
-	type WebhookDeliveryJobData,
-} from "./webhook-delivery.queue";
 
-const connection = {
-	url: webhookConfig.REDIS_URL,
-};
-
-async function dispatchWebhook(job: WebhookDeliveryJobData): Promise<void> {
-	const {
-		deliveryId,
-		webhookId,
-		webhookUrl,
-		webhookSecret,
-		customHeaders,
-		eventId,
-		eventType,
-		payload,
-	} = job;
-
+export async function processWebhookDelivery({
+	deliveryId,
+	webhookId,
+	webhookUrl,
+	webhookSecret,
+	customHeaders,
+	eventId,
+	eventType,
+	payload,
+	isLastAttempt,
+}: {
+	deliveryId: string;
+	webhookId: string;
+	webhookUrl: string;
+	webhookSecret: string;
+	customHeaders: Record<string, string> | null;
+	eventId: string;
+	eventType: string;
+	payload: Record<string, unknown>;
+	isLastAttempt: boolean;
+}): Promise<void> {
 	const timestamp = Math.floor(Date.now() / 1000);
 	const body = JSON.stringify({
 		id: eventId,
@@ -52,12 +51,18 @@ async function dispatchWebhook(job: WebhookDeliveryJobData): Promise<void> {
 	try {
 		response = await fetch(webhookUrl, { method: "POST", headers, body });
 	} catch (networkError) {
-		// Network-level failure — mark delivery failed and re-throw so BullMQ retries
 		const durationMs = Date.now() - startTime;
 		const errMsg =
 			networkError instanceof Error
 				? networkError.message
 				: String(networkError);
+
+		log.error({
+			message: "Webhook delivery network error",
+			deliveryId,
+			webhookId,
+			error: errMsg,
+		});
 
 		await db
 			.update(schema.webhookDelivery)
@@ -86,6 +91,13 @@ async function dispatchWebhook(job: WebhookDeliveryJobData): Promise<void> {
 	const durationMs = Date.now() - startTime;
 	const responseText = await response.text();
 	const succeeded = response.ok;
+
+	log.info({
+		message: "Webhook response received",
+		deliveryId,
+		status: response.status,
+		succeeded,
+	});
 
 	await db
 		.update(schema.webhookDelivery)
@@ -118,60 +130,8 @@ async function dispatchWebhook(job: WebhookDeliveryJobData): Promise<void> {
 		.where(eq(schema.webhook.id, webhookId));
 
 	if (!succeeded) {
-		// Non-2xx response — throw so BullMQ retries
 		throw new Error(
 			`Webhook endpoint returned HTTP ${response.status}: ${responseText.slice(0, 200)}`,
 		);
 	}
-}
-
-export function startWebhookDeliveryWorker(): Worker {
-	const worker = new Worker<WebhookDeliveryJobData>(
-		WEBHOOK_DELIVERY_QUEUE,
-		async (job) => {
-			log.info({
-				...{
-					jobId: job.id,
-					deliveryId: job.data.deliveryId,
-					attempt: job.attemptsMade + 1,
-				},
-				message: "Processing webhook delivery job",
-			});
-			await dispatchWebhook(job.data);
-		},
-		{
-			connection,
-			concurrency: 20,
-		},
-	);
-
-	worker.on("completed", (job) => {
-		log.info({
-			...{ jobId: job.id, deliveryId: job.data.deliveryId },
-			message: "Webhook delivery job completed",
-		});
-	});
-
-	worker.on("failed", (job, err) => {
-		log.error(
-			{
-				jobId: job?.id,
-				deliveryId: job?.data.deliveryId,
-				webhookId: job?.data.webhookId,
-				attempt: (job?.attemptsMade ?? 0) + 1,
-				error: err.message,
-			},
-			"Webhook delivery job failed",
-		);
-	});
-
-	worker.on("error", (err) => {
-		log.error({
-			...{ error: err.message },
-			message: "Webhook delivery worker error",
-		});
-	});
-
-	log.info("server", "Webhook delivery worker started");
-	return worker;
 }

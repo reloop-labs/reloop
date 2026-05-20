@@ -1,5 +1,6 @@
 import { workflowQueue } from "@be/workflow/queues/workflow.queue";
 import { startWorkflowWorker } from "@be/workflow/queues/workflow.worker";
+import { initWebhookSubscribers } from "@be/workflow/subscribers/webhook.subscriber";
 import { workflowConfig } from "@be/workflow/workflow.config";
 import { BusEvent, bus } from "@reloop/bus";
 import { RedisCache } from "@reloop/cache/redis-client";
@@ -41,6 +42,9 @@ export const loader = async () => {
 				);
 			},
 		);
+
+		// Initialize other NATS subscribers
+		await initWebhookSubscribers();
 
 		startWorkflowWorker();
 	} catch (e) {

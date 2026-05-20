@@ -43,9 +43,10 @@ export interface DomainUndeletedPayload {
 }
 
 export interface WebhookTriggeredPayload {
-	webhookId: string;
-	eventType: string;
+	event: string;
 	payload: Record<string, any>;
+	organizationId?: string;
+	userId?: string;
 }
 
 export interface EmailSentPayload {

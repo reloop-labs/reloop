@@ -7,7 +7,10 @@
 		"check-types": "tsc --noEmit",
 		"compile": "bun build --compile --minify --sourcemap --bytecode ./src/index.ts --outfile server",
 		"dev": "bun run --hot src/index.ts",
-		"start": "bun run dist/index.js"
+		"start": "bun run dist/index.js",
+		"lint": "biome check .",
+		"fix-lint": "biome check --fix .",
+		"format": "biome format ."
 	},
 	"dependencies": {
 		"@elysiajs/cors": "catalog:backend",
@@ -39,7 +42,6 @@
 		"@reloop/webhook-events": "workspace:*",
 		"@elysiajs/eden": "catalog:backend",
 		"@elysiajs/openapi": "catalog:backend",
-		"bullmq": "catalog:backend",
 		"evlog": "catalog:backend"
 	},
 	"devDependencies": {

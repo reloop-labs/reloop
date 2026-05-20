@@ -1,4 +1,5 @@
 import { processDomainVerification } from "@be/workflow/handlers/domain-verification.handler";
+import { processWebhookDelivery } from "@be/workflow/handlers/webhook-delivery.handler";
 import { workflowConfig } from "@be/workflow/workflow.config";
 import { type Job, Worker } from "bullmq";
 import { log } from "evlog";
@@ -22,6 +23,18 @@ async function processWorkflow(job: Job<WorkflowJobData>): Promise<void> {
 		await processDomainVerification({
 			domainId: jobData.workflowId,
 			organizationId: jobData.organizationId,
+			isLastAttempt,
+		});
+	} else if (jobData.type === "deliver-webhook") {
+		await processWebhookDelivery({
+			deliveryId: jobData.payload.deliveryId as string,
+			webhookId: jobData.payload.webhookId as string,
+			webhookUrl: jobData.payload.webhookUrl as string,
+			webhookSecret: jobData.payload.webhookSecret as string,
+			customHeaders: jobData.payload.customHeaders as Record<string, string> | null,
+			eventId: jobData.payload.eventId as string,
+			eventType: jobData.payload.eventType as string,
+			payload: jobData.payload.payload as Record<string, unknown>,
 			isLastAttempt,
 		});
 	}
