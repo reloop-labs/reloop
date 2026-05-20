@@ -80,34 +80,13 @@ const getStatusProps = (statusCode: number | null | undefined) => {
 		label = `${statusCode} OK`;
 		color = "gray";
 	} else if (statusCode >= 300 && statusCode < 400) {
-		label = `${statusCode} REDIRECT`;
+		label = `${statusCode} REDIR`;
 		color = "blue";
 	} else if (statusCode >= 400 && statusCode < 500) {
+		label = `${statusCode} ERR`;
 		color = "orange";
-		switch (statusCode) {
-			case 400:
-				label = "400 BAD";
-				break;
-			case 401:
-				label = "401 UNAUTH";
-				break;
-			case 403:
-				label = "403 FORBID";
-				break;
-			case 404:
-				label = "404 NOT FOUND";
-				break;
-			case 422:
-				label = "422 UNPROC";
-				break;
-			case 429:
-				label = "429 LIMIT";
-				break;
-			default:
-				label = `${statusCode} ERR`;
-		}
 	} else if (statusCode >= 500) {
-		label = `${statusCode} ERROR`;
+		label = `${statusCode} ERR`;
 		color = "red";
 	}
 

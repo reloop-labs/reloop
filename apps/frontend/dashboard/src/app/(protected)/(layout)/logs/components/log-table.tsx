@@ -33,11 +33,12 @@ interface LogTableProps {
 }
 
 /** Grid template used for the header and every row */
-const GRID_COLS = "grid-cols-[78px_50px_minmax(0,1fr)_90px]";
+const GRID_COLS = "grid-cols-[62px_44px_minmax(0,1fr)_90px]";
 
 /** Returns status label and badge color */
 const getStatusProps = (statusCode: number | null | undefined) => {
 	if (!statusCode) return null;
+
 	// Determine status label & color
 	let label = `${statusCode}`;
 	let color = "gray";
@@ -46,34 +47,13 @@ const getStatusProps = (statusCode: number | null | undefined) => {
 		label = `${statusCode} OK`;
 		color = "gray";
 	} else if (statusCode >= 300 && statusCode < 400) {
-		label = `${statusCode} REDIRECT`;
+		label = `${statusCode} REDIR`;
 		color = "blue";
 	} else if (statusCode >= 400 && statusCode < 500) {
+		label = `${statusCode} ERR`;
 		color = "orange";
-		switch (statusCode) {
-			case 400:
-				label = "400 BAD";
-				break;
-			case 401:
-				label = "401 UNAUTH";
-				break;
-			case 403:
-				label = "403 FORBID";
-				break;
-			case 404:
-				label = "404 NOT FOUND";
-				break;
-			case 422:
-				label = "422 UNPROC";
-				break;
-			case 429:
-				label = "429 LIMIT";
-				break;
-			default:
-				label = `${statusCode} ERR`;
-		}
 	} else if (statusCode >= 500) {
-		label = `${statusCode} ERROR`;
+		label = `${statusCode} ERR`;
 		color = "red";
 	}
 
@@ -252,7 +232,7 @@ export const LogTable = ({
 											)}
 										>
 											{/* Status */}
-											<div className="flex w-[70px] flex-shrink-0 items-center justify-start">
+											<div className="flex w-full flex-shrink-0 items-center justify-start">
 												{statusProps ? (
 													<Badge.Root
 														variant="lighter"
