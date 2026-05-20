@@ -1,6 +1,7 @@
 import { authMiddleware } from "@be/contacts/middleware/auth";
 import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
 import { ChannelModel } from "@be/contacts/model/channel.model";
+import { auditLogHook } from "@be/contacts/utils/audit-log";
 import { Elysia } from "elysia";
 import { createChannelController } from "./create-channel.controllers";
 import { createChannelXCodeSamples } from "./create-channel.x-codeSamples";
@@ -42,5 +43,10 @@ export const createChannelRoute = new Elysia()
 				description: "Creates a new channel for the organization",
 				"x-codeSamples": createChannelXCodeSamples,
 			},
+			afterResponse: auditLogHook({
+				resourceType: "channel",
+				action: "created",
+				successStatus: 201,
+			}),
 		},
 	);

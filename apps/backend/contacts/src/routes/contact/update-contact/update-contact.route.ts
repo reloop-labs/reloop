@@ -1,6 +1,7 @@
 import { authMiddleware } from "@be/contacts/middleware/auth";
 import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
 import { ContactModel } from "@be/contacts/model/contact.model";
+import { auditLogHook } from "@be/contacts/utils/audit-log";
 import { Elysia, t } from "elysia";
 import { updateContactController } from "./update-contact.controllers";
 import { updateContactXCodeSamples } from "./update-contact.x-codeSamples";
@@ -46,5 +47,10 @@ export const updateContactRoute = new Elysia()
 				description: "Updates an existing contact's information",
 				"x-codeSamples": updateContactXCodeSamples,
 			},
+			afterResponse: auditLogHook({
+				resourceType: "contact",
+				action: "updated",
+				successStatus: 200,
+			}),
 		},
 	);

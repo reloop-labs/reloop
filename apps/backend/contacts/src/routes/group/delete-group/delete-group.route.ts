@@ -2,6 +2,7 @@ import { authMiddleware } from "@be/contacts/middleware/auth";
 import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
 import { GroupModel } from "@be/contacts/model/group.model";
 import { deleteGroupController } from "@be/contacts/routes/group/delete-group/delete-group.controllers";
+import { auditLogHook } from "@be/contacts/utils/audit-log";
 import { Elysia, t } from "elysia";
 import { deleteGroupXCodeSamples } from "./delete-group.x-codeSamples";
 
@@ -33,5 +34,10 @@ export const deleteGroupRoute = new Elysia()
 				description: "Delete group based on group id",
 				"x-codeSamples": deleteGroupXCodeSamples,
 			},
+			afterResponse: auditLogHook({
+				resourceType: "group",
+				action: "deleted",
+				successStatus: 200,
+			}),
 		},
 	);

@@ -2,6 +2,7 @@ import { authMiddleware } from "@be/contacts/middleware/auth";
 import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
 import { ChannelSubscriptionModel } from "@be/contacts/model/channel-subscription.model";
 import { ContactModel } from "@be/contacts/model/contact.model";
+import { auditLogHook } from "@be/contacts/utils/audit-log";
 import { Elysia, t } from "elysia";
 import { addContactToChannelController } from "./add-contact-to-channel.controllers";
 import { addContactToChannelXCodeSamples } from "./add-contact-to-channel.x-codeSamples";
@@ -41,5 +42,10 @@ export const addContactToChannelRoute = new Elysia()
 					"Creates a contact (if not exists) and enrolls them in a channel in one operation",
 				"x-codeSamples": addContactToChannelXCodeSamples,
 			},
+			afterResponse: auditLogHook({
+				resourceType: "contact",
+				action: "added_to_channel",
+				successStatus: 201,
+			}),
 		},
 	);

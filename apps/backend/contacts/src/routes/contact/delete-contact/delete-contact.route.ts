@@ -1,6 +1,7 @@
 import { authMiddleware } from "@be/contacts/middleware/auth";
 import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
 import { ContactModel } from "@be/contacts/model/contact.model";
+import { auditLogHook } from "@be/contacts/utils/audit-log";
 import { Elysia, t } from "elysia";
 import { deleteContactController } from "./delete-contact.controllers";
 import { deleteContactXCodeSamples } from "./delete-contact.x-codeSamples";
@@ -39,5 +40,10 @@ export const deleteContactRoute = new Elysia()
 				description: "Removes a contact from the organization",
 				"x-codeSamples": deleteContactXCodeSamples,
 			},
+			afterResponse: auditLogHook({
+				resourceType: "contact",
+				action: "deleted",
+				successStatus: 200,
+			}),
 		},
 	);

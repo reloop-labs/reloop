@@ -1,6 +1,7 @@
 import { authMiddleware } from "@be/contacts/middleware/auth";
 import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
 import { ContactModel } from "@be/contacts/model/contact.model";
+import { auditLogHook } from "@be/contacts/utils/audit-log";
 import { Elysia, t } from "elysia";
 import { addContactToGroupController } from "./add-contact-to-group.controllers";
 import { addContactToGroupXCodeSamples } from "./add-contact-to-group.x-codeSamples";
@@ -34,5 +35,10 @@ export const addContactToGroupRoute = new Elysia()
 				description: "Adds a contact to a group by ID or email",
 				"x-codeSamples": addContactToGroupXCodeSamples,
 			},
+			afterResponse: auditLogHook({
+				resourceType: "contact",
+				action: "added_to_group",
+				successStatus: 200,
+			}),
 		},
 	);

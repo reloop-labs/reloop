@@ -2,6 +2,7 @@ import { authMiddleware } from "@be/contacts/middleware/auth";
 import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
 import { GroupModel } from "@be/contacts/model/group.model";
 import { updateGroupController } from "@be/contacts/routes/group/update-group/update-group.controllers";
+import { auditLogHook } from "@be/contacts/utils/audit-log";
 import { Elysia, t } from "elysia";
 import { updateGroupXCodeSamples } from "./update-group.x-codeSamples";
 
@@ -38,5 +39,10 @@ export const updateGroupRoute = new Elysia()
 				description: "Updates group name based on group id",
 				"x-codeSamples": updateGroupXCodeSamples,
 			},
+			afterResponse: auditLogHook({
+				resourceType: "group",
+				action: "updated",
+				successStatus: 200,
+			}),
 		},
 	);

@@ -1,6 +1,7 @@
 import { authMiddleware } from "@be/contacts/middleware/auth";
 import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
 import { ContactModel } from "@be/contacts/model/contact.model";
+import { auditLogHook } from "@be/contacts/utils/audit-log";
 import { Elysia } from "elysia";
 import { createContactController } from "./create-contact.controllers";
 import { createContactXCodeSamples } from "./create-contact.x-codeSamples";
@@ -54,5 +55,10 @@ export const createContactRoute = new Elysia()
 				description: "Creates contact",
 				"x-codeSamples": createContactXCodeSamples,
 			},
+			afterResponse: auditLogHook({
+				resourceType: "contact",
+				action: "created",
+				successStatus: 201,
+			}),
 		},
 	);

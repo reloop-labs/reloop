@@ -1,6 +1,7 @@
 import { authMiddleware } from "@be/contacts/middleware/auth";
 import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
 import { ContactModel } from "@be/contacts/model/contact.model";
+import { auditLogHook } from "@be/contacts/utils/audit-log";
 import { Elysia, t } from "elysia";
 import { updateContactChannelController } from "./update-contact-channel.controllers";
 import { updateContactChannelXCodeSamples } from "./update-contact-channel.x-codeSamples";
@@ -41,5 +42,10 @@ export const updateContactChannelRoute = new Elysia()
 				description: "Updates a contact's enrollment status in a channel",
 				"x-codeSamples": updateContactChannelXCodeSamples,
 			},
+			afterResponse: auditLogHook({
+				resourceType: "contact",
+				action: "updated_channel",
+				successStatus: 200,
+			}),
 		},
 	);

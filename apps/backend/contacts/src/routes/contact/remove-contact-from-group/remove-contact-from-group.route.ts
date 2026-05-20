@@ -1,6 +1,7 @@
 import { authMiddleware } from "@be/contacts/middleware/auth";
 import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
 import { ContactModel } from "@be/contacts/model/contact.model";
+import { auditLogHook } from "@be/contacts/utils/audit-log";
 import { Elysia, t } from "elysia";
 import { removeContactFromGroupController } from "./remove-contact-from-group.controllers";
 import { removeContactFromGroupXCodeSamples } from "./remove-contact-from-group.x-codeSamples";
@@ -36,5 +37,10 @@ export const removeContactFromGroupRoute = new Elysia()
 				description: "Deletes a contact from a group by ID or email",
 				"x-codeSamples": removeContactFromGroupXCodeSamples,
 			},
+			afterResponse: auditLogHook({
+				resourceType: "contact",
+				action: "removed_from_group",
+				successStatus: 200,
+			}),
 		},
 	);

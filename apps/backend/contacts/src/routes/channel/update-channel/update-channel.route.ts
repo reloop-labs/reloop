@@ -1,6 +1,7 @@
 import { authMiddleware } from "@be/contacts/middleware/auth";
 import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
 import { ChannelModel } from "@be/contacts/model/channel.model";
+import { auditLogHook } from "@be/contacts/utils/audit-log";
 import { Elysia, t } from "elysia";
 import { updateChannelController } from "./update-channel.controllers";
 import { updateChannelXCodeSamples } from "./update-channel.x-codeSamples";
@@ -43,5 +44,10 @@ export const updateChannelRoute = new Elysia()
 				description: "Updates an existing channel",
 				"x-codeSamples": updateChannelXCodeSamples,
 			},
+			afterResponse: auditLogHook({
+				resourceType: "channel",
+				action: "updated",
+				successStatus: 200,
+			}),
 		},
 	);

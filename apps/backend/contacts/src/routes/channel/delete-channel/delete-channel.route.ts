@@ -1,6 +1,7 @@
 import { authMiddleware } from "@be/contacts/middleware/auth";
 import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
 import { ChannelModel } from "@be/contacts/model/channel.model";
+import { auditLogHook } from "@be/contacts/utils/audit-log";
 import { Elysia, t } from "elysia";
 import { deleteChannelController } from "./delete-channel.controllers";
 import { deleteChannelXCodeSamples } from "./delete-channel.x-codeSamples";
@@ -37,5 +38,10 @@ export const deleteChannelRoute = new Elysia()
 				description: "Soft deletes a channel",
 				"x-codeSamples": deleteChannelXCodeSamples,
 			},
+			afterResponse: auditLogHook({
+				resourceType: "channel",
+				action: "deleted",
+				successStatus: 200,
+			}),
 		},
 	);
