@@ -16,19 +16,19 @@ export async function initApiKeySubscribers() {
 		async (payload) => {
 			try {
 				const apiKey = await db.query.apikey.findFirst({
-					where: eq(schema.apikey.id, payload.id),
+					where: eq(schema.apikey.id, payload.api_key_id),
 					with: {
 						user: true,
 					},
 				});
 
 				if (!apiKey) {
-					log.error(`API key not found for ID: ${payload.id}`);
+					log.error("subscriber", `API key not found for ID: ${payload.api_key_id}`);
 					return;
 				}
 
 				if (!apiKey.user) {
-					log.error(`User not found for API key: ${payload.id}`);
+					log.error("subscriber", `User not found for API key: ${payload.api_key_id}`);
 					return;
 				}
 

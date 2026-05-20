@@ -50,8 +50,7 @@ export async function sendEmail(options: SendEmailOptions) {
 		}
 
 		// Fallback to SMTP (Mailpit) in Development
-		log.info({ ...({ to: options.to, subject: options.subject }), message: "Sending email via SMTP (Mailpit })",
-		);
+		log.info({ ...({ to: options.to, subject: options.subject }), message: "Sending email via SMTP (Mailpit)" });
 		const info = await transporter.sendMail({
 			from: options.from,
 			to: options.to,
@@ -63,11 +62,10 @@ export async function sendEmail(options: SendEmailOptions) {
 		return info;
 	} catch (error) {
 		log.error({
-				error: error instanceof Error ? error.message : String(error),
-				to: options.to,
-			},
-			"Failed to send email",
-		);
+			error: error instanceof Error ? error.message : String(error),
+			to: options.to,
+			message: "Failed to send email",
+		});
 		throw error;
 	}
 }

@@ -11,9 +11,9 @@ export const loader = async () => {
 
 		await initSubscribers();
 	} catch (e) {
-		log.error(
-			{ error: e instanceof Error ? e.message : String(e) },
-			"Error during service initialization",
-		);
+		log.error({
+			error: e instanceof Error ? e.message : String(e),
+			message: "Error during service initialization",
+		});
 	}
 };

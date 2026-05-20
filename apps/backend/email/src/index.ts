@@ -2,7 +2,9 @@ import { log } from "evlog";
 import "dotenv/config";
 import cors from "@elysiajs/cors";
 import { openapi } from "@elysiajs/openapi";
-import { landing } from "@reloop/email/routes/landing/landing.index";
+import { agentCardRoute } from "@reloop/email/routes/landing/agent-card.route";
+import { healthRoute } from "@reloop/email/routes/landing/health.route";
+import { landingRoute } from "@reloop/email/routes/landing/landing.route";
 import { loader } from "@reloop/email/utils/loader";
 
 import { Elysia } from "elysia";
@@ -22,7 +24,9 @@ const app = new Elysia({ prefix: "/api/email", name: "Email Service" })
 			},
 		}),
 	)
-	.use(landing)
+	.use(landingRoute)
+	.use(healthRoute)
+	.use(agentCardRoute)
 	.onStart(async () => {
 		await loader();
 	})

@@ -17,9 +17,9 @@ export async function initSubscribers() {
 
 		log.info("server", "All email subscribers initialized");
 	} catch (error) {
-		log.error(
-			{ error: error instanceof Error ? error.message : String(error) },
-			"Failed to initialize email subscribers",
-		);
+		log.error({
+			error: error instanceof Error ? error.message : String(error),
+			message: "Failed to initialize email subscribers",
+		});
 	}
 }
