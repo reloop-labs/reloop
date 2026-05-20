@@ -7,6 +7,9 @@ export interface CreateTemplateInput {
 	name: string;
 	description?: string;
 	subject?: string;
+	fromEmail?: string;
+	replyTo?: string;
+	previewText?: string;
 	organizationId: string;
 	createdByUserId: string;
 	content?: TemplateBlock[];
@@ -18,6 +21,9 @@ export interface UpdateTemplateInput {
 	name?: string;
 	description?: string;
 	subject?: string;
+	fromEmail?: string;
+	replyTo?: string;
+	previewText?: string;
 	content?: TemplateBlock[];
 	variables?: string[];
 	status?: "draft" | "published" | "archived";
@@ -32,6 +38,9 @@ export const templateModel = {
 				name: input.name,
 				description: input.description,
 				subject: input.subject,
+				fromEmail: input.fromEmail,
+				replyTo: input.replyTo,
+				previewText: input.previewText,
 				organizationId: input.organizationId,
 				createdByUserId: input.createdByUserId,
 				content: input.content || [],
@@ -106,6 +115,10 @@ export const templateModel = {
 		if (input.description !== undefined)
 			updateData.description = input.description;
 		if (input.subject !== undefined) updateData.subject = input.subject;
+		if (input.fromEmail !== undefined) updateData.fromEmail = input.fromEmail;
+		if (input.replyTo !== undefined) updateData.replyTo = input.replyTo;
+		if (input.previewText !== undefined)
+			updateData.previewText = input.previewText;
 		if (input.content !== undefined) updateData.content = input.content;
 		if (input.variables !== undefined) updateData.variables = input.variables;
 		if (input.status !== undefined) updateData.status = input.status;

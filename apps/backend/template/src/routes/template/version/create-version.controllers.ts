@@ -9,6 +9,9 @@ export async function createVersion(params: {
 	userId: string;
 	content: TemplateBlock[];
 	subject?: string;
+	fromEmail?: string;
+	replyTo?: string;
+	previewText?: string;
 	description?: string;
 	name?: string;
 	isMajor?: boolean;
@@ -20,6 +23,9 @@ export async function createVersion(params: {
 		userId,
 		content,
 		subject,
+		fromEmail,
+		replyTo,
+		previewText,
 		description,
 		name,
 		isMajor,
@@ -65,6 +71,9 @@ export async function createVersion(params: {
 		templateId,
 		version: nextVersion,
 		subject: subject ?? existing.subject ?? undefined,
+		fromEmail: fromEmail ?? existing.fromEmail ?? undefined,
+		replyTo: replyTo ?? existing.replyTo ?? undefined,
+		previewText: previewText ?? existing.previewText ?? undefined,
 		description,
 		content,
 		createdByUserId: userId,

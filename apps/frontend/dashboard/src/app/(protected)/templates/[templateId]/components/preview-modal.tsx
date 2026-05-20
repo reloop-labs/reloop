@@ -1,17 +1,20 @@
 "use client";
 
-import { useState } from "react";
 import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
-import { cn } from "@reloop/ui/cn";
-import { Laptop, Tablet, Smartphone, ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Laptop, Smartphone, Tablet } from "lucide-react";
+import { useState } from "react";
 
 interface TemplateVersion {
 	id: string;
 	templateId: string;
 	version: number;
 	subject: string | null;
+	fromEmail: string | null;
+	replyTo: string | null;
+	previewText: string | null;
 	description: string | null;
 	name: string | null;
 	isMajor: boolean;
@@ -47,7 +50,9 @@ export function PreviewModal({
 	onRestore,
 	isRestoring,
 }: PreviewModalProps) {
-	const [viewport, setViewport] = useState<"desktop" | "tablet" | "mobile">("desktop");
+	const [viewport, setViewport] = useState<"desktop" | "tablet" | "mobile">(
+		"desktop",
+	);
 
 	const viewportWidths = {
 		desktop: "100%",
@@ -62,16 +67,16 @@ export function PreviewModal({
 	return (
 		<Modal.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
 			<Modal.Content
-				className="rounded-2xl border border-stroke-soft-100/50 p-0.5 font-sans transition-all max-w-[90vw] h-[90vh]"
+				className="h-[90vh] max-w-[90vw] rounded-2xl border border-stroke-soft-100/50 p-0.5 font-sans transition-all"
 				showClose={true}
 			>
 				<div className="flex h-full flex-col overflow-hidden rounded-2xl border border-stroke-soft-100/50 bg-bg-white-0 dark:bg-zinc-950">
 					{/* Modal Header */}
-					<Modal.Header className="before:border-stroke-soft-200/50 shrink-0">
-						<div className="flex-1 flex items-center justify-between">
+					<Modal.Header className="shrink-0 before:border-stroke-soft-200/50">
+						<div className="flex flex-1 items-center justify-between">
 							<div className="space-y-1">
 								<div className="flex items-center gap-2">
-									<Modal.Title className="text-sm font-bold">
+									<Modal.Title className="font-bold text-sm">
 										Previewing {displayLabel}
 									</Modal.Title>
 									{version.isMajor ? (
@@ -85,14 +90,14 @@ export function PreviewModal({
 									)}
 								</div>
 								{version.description && (
-									<p className="text-[11px] text-text-sub-600 dark:text-zinc-400 font-normal">
+									<p className="font-normal text-[11px] text-text-sub-600 dark:text-zinc-400">
 										{version.description}
 									</p>
 								)}
 							</div>
 
 							{/* Actions */}
-							<div className="flex items-center gap-4 mr-8">
+							<div className="mr-8 flex items-center gap-4">
 								{/* Viewport controls */}
 								<div className="flex items-center gap-1 rounded-lg bg-bg-weak-50 p-0.5 dark:bg-zinc-900">
 									<Button.Root
@@ -146,10 +151,10 @@ export function PreviewModal({
 					</Modal.Header>
 
 					{/* Modal Body / Sandbox Viewport */}
-					<Modal.Body className="flex-1 bg-neutral-100 p-6 flex justify-center items-center overflow-hidden dark:bg-zinc-900/30">
+					<Modal.Body className="flex flex-1 items-center justify-center overflow-hidden bg-neutral-100 p-6 dark:bg-zinc-900/30">
 						<div
 							style={{ width: viewportWidths[viewport] }}
-							className="h-full bg-white rounded-xl shadow-lg border border-stroke-soft-100 overflow-hidden relative transition-all duration-300"
+							className="relative h-full overflow-hidden rounded-xl border border-stroke-soft-100 bg-white shadow-lg transition-all duration-300"
 						>
 							{version.renderedHtml ? (
 								<iframe

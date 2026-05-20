@@ -59,6 +59,9 @@ export const template = pgTable(
 		name: varchar("name", { length: 255 }).notNull(),
 		description: text("description"),
 		subject: varchar("subject", { length: 500 }),
+		fromEmail: varchar("from_email", { length: 255 }),
+		replyTo: varchar("reply_to", { length: 255 }),
+		previewText: text("preview_text"),
 		organizationId: text("organization_id")
 			.notNull()
 			.references(() => organization.id, { onDelete: "cascade" }),
@@ -107,6 +110,9 @@ export const templateVersion = pgTable(
 		name: varchar("name", { length: 255 }),
 		isMajor: boolean("is_major").notNull().default(false),
 		subject: varchar("subject", { length: 500 }),
+		fromEmail: varchar("from_email", { length: 255 }),
+		replyTo: varchar("reply_to", { length: 255 }),
+		previewText: text("preview_text"),
 		description: text("description"),
 		content: jsonb("content").$type<TemplateBlock[]>().notNull(),
 		variables: jsonb("variables").$type<string[]>().default([]),

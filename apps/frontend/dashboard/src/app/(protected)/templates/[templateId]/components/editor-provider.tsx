@@ -63,7 +63,12 @@ function isEditorContentEmpty(
 		// A single empty element is also considered empty
 		if (fragment && fragment.length === 1) {
 			const firstChild = fragment.get(0);
-			if (firstChild && firstChild.length === 0 && (!firstChild.toString || firstChild.toString() === "<paragraph></paragraph>")) {
+			if (
+				firstChild &&
+				firstChild.length === 0 &&
+				(!firstChild.toString ||
+					firstChild.toString() === "<paragraph></paragraph>")
+			) {
 				return true;
 			}
 		}
@@ -124,13 +129,56 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 	 */
 	const resolveSubject = useCallback(
 		(template: any, versionList: any[]): string => {
-			// First, check the latest version (sorted newest-first from API)
 			if (versionList && versionList.length > 0) {
 				const latestVersion = versionList[0];
 				if (latestVersion?.subject) return latestVersion.subject;
 			}
-			// Fall back to template baseline
 			return template?.subject || "";
+		},
+		[],
+	);
+
+	const resolveFromEmail = useCallback(
+		(template: any, versionList: any[]): string => {
+			if (versionList && versionList.length > 0) {
+				const latestVersion = versionList[0];
+				if (
+					latestVersion?.fromEmail !== undefined &&
+					latestVersion.fromEmail !== null
+				)
+					return latestVersion.fromEmail;
+			}
+			return template?.fromEmail || "";
+		},
+		[],
+	);
+
+	const resolveReplyTo = useCallback(
+		(template: any, versionList: any[]): string => {
+			if (versionList && versionList.length > 0) {
+				const latestVersion = versionList[0];
+				if (
+					latestVersion?.replyTo !== undefined &&
+					latestVersion.replyTo !== null
+				)
+					return latestVersion.replyTo;
+			}
+			return template?.replyTo || "";
+		},
+		[],
+	);
+
+	const resolvePreviewText = useCallback(
+		(template: any, versionList: any[]): string => {
+			if (versionList && versionList.length > 0) {
+				const latestVersion = versionList[0];
+				if (
+					latestVersion?.previewText !== undefined &&
+					latestVersion.previewText !== null
+				)
+					return latestVersion.previewText;
+			}
+			return template?.previewText || "";
 		},
 		[],
 	);
@@ -163,12 +211,15 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 			// If Y.js synced with real content, preserve it — only load subject
 			if (isSynced && !isEditorContentEmpty(editor, ydoc)) {
 				console.log(
-					"[EditorProvider] Y.js cache has content, preserving editor state. Loading subject from DB.",
+					"[EditorProvider] Y.js cache has content, preserving editor state. Loading metadata from DB.",
 				);
 				const subjectToSet = resolveSubject(template, versionList);
 				if (subjectToSet) {
 					setSubject(subjectToSet);
 				}
+				setFromEmail(resolveFromEmail(template, versionList));
+				setReplyTo(resolveReplyTo(template, versionList));
+				setPreviewText(resolvePreviewText(template, versionList));
 				return;
 			}
 
@@ -215,14 +266,40 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 				});
 			}
 
-			// Load subject from the source, or resolve from the best available
+			// Load subject and details from the source, or resolve from the best available
 			const subjectToSet =
 				sourceToLoad?.subject || resolveSubject(template, versionList);
 			if (subjectToSet) {
 				setSubject(subjectToSet);
 			}
+
+			const fromEmailToSet =
+				sourceToLoad?.fromEmail || resolveFromEmail(template, versionList);
+			setFromEmail(fromEmailToSet);
+
+			const replyToToSet =
+				sourceToLoad?.replyTo || resolveReplyTo(template, versionList);
+			setReplyTo(replyToToSet);
+
+			const previewTextToSet =
+				sourceToLoad?.previewText || resolvePreviewText(template, versionList);
+			setPreviewText(previewTextToSet);
 		},
-		[editor, ydoc, isSynced, connectionStatus, timedOut, setSubject, resolveSubject],
+		[
+			editor,
+			ydoc,
+			isSynced,
+			connectionStatus,
+			timedOut,
+			setSubject,
+			setFromEmail,
+			setReplyTo,
+			setPreviewText,
+			resolveSubject,
+			resolveFromEmail,
+			resolveReplyTo,
+			resolvePreviewText,
+		],
 	);
 
 	useEffect(() => {
@@ -234,7 +311,14 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 			!hasInitializedRef.current
 		) {
 			hasInitializedRef.current = true;
-			initializeEditor(templateData as any, versions as any[]);
+
+			// Defer editor initialization to a macrotask to prevent the React warning:
+			// "flushSync was called from inside a lifecycle method."
+			const timer = setTimeout(() => {
+				initializeEditor(templateData as any, versions as any[]);
+			}, 0);
+
+			return () => clearTimeout(timer);
 		}
 	}, [shouldInitialize, editor, templateData, versions, initializeEditor]);
 

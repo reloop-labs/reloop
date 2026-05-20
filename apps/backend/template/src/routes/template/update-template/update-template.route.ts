@@ -25,6 +25,9 @@ export const updateTemplateRoute = new Elysia().use(authMiddleware).put(
 			name: t.Optional(t.String({ minLength: 1, maxLength: 255 })),
 			description: t.Optional(t.String()),
 			subject: t.Optional(t.String({ maxLength: 500 })),
+			fromEmail: t.Optional(t.String({ maxLength: 255 })),
+			replyTo: t.Optional(t.String({ maxLength: 255 })),
+			previewText: t.Optional(t.String()),
 			content: t.Optional(t.Array(t.Any())),
 			variables: t.Optional(t.Array(t.String())),
 			status: t.Optional(

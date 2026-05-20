@@ -16,8 +16,8 @@ const Page = () => {
 	return (
 		<EditorProvider key={templateId} roomId={templateId}>
 			<div className="flex h-[calc(100vh-45px)] overflow-hidden">
-				<VersionSidebar />
 				<div className="relative m-2 flex flex-1 overflow-hidden rounded-[24px] border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
+					<VersionSidebar />
 					<div className="relative flex flex-1 flex-col overflow-hidden">
 						<main className="hide-scrollbar flex-1 overflow-y-auto">
 							<SendDetails />

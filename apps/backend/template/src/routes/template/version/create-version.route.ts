@@ -7,7 +7,17 @@ export const createVersionRoute = new Elysia().use(authMiddleware).post(
 	async ({ params, body, user }) => {
 		const { id: userId, activeOrganizationId: organizationId } = user;
 		const { id: templateId } = params;
-		const { content, subject, description, name, isMajor, renderedHtml } = body;
+		const {
+			content,
+			subject,
+			fromEmail,
+			replyTo,
+			previewText,
+			description,
+			name,
+			isMajor,
+			renderedHtml,
+		} = body;
 
 		const result = await createVersion({
 			templateId,
@@ -15,6 +25,9 @@ export const createVersionRoute = new Elysia().use(authMiddleware).post(
 			userId,
 			content,
 			subject,
+			fromEmail,
+			replyTo,
+			previewText,
 			description,
 			name,
 			isMajor,
@@ -31,6 +44,9 @@ export const createVersionRoute = new Elysia().use(authMiddleware).post(
 		body: t.Object({
 			content: t.Array(t.Any()),
 			subject: t.Optional(t.String({ maxLength: 500 })),
+			fromEmail: t.Optional(t.String({ maxLength: 255 })),
+			replyTo: t.Optional(t.String({ maxLength: 255 })),
+			previewText: t.Optional(t.String()),
 			description: t.Optional(t.String({ maxLength: 500 })),
 			name: t.Optional(t.String({ maxLength: 255 })),
 			isMajor: t.Optional(t.Boolean()),

@@ -29,6 +29,9 @@ interface TemplateVersion {
 	templateId: string;
 	version: number;
 	subject: string | null;
+	fromEmail: string | null;
+	replyTo: string | null;
+	previewText: string | null;
 	description: string | null;
 	name: string | null;
 	isMajor: boolean;
@@ -136,7 +139,15 @@ export function VersionSidebar() {
 	const params = useParams<{ templateId: string }>();
 	const templateId = params?.templateId;
 	const { editor } = useCurrentEditor();
-	const { lastSavedAt, lastSavedDraftNumber, subject } = useEditorStore();
+	const {
+		setSubject,
+		setFromEmail,
+		setReplyTo,
+		setPreviewText,
+		lastSavedAt,
+		lastSavedDraftNumber,
+		subject,
+	} = useEditorStore();
 
 	const [isExpanded, setIsExpanded] = useState(false);
 	const [activeTab, setActiveTab] = useState<"published" | "drafts">("drafts");
@@ -173,6 +184,11 @@ export function VersionSidebar() {
 				type: "doc",
 				content: version.content as Record<string, unknown>[],
 			});
+			setSubject(version.subject || "");
+			setFromEmail(version.fromEmail || "");
+			setReplyTo(version.replyTo || "");
+			setPreviewText(version.previewText || "");
+
 			toast.success(
 				`Loaded ${version.name || `v${version.version}`} into editor`,
 			);
@@ -236,7 +252,7 @@ export function VersionSidebar() {
 	// --- Collapsed state: narrow icon strip ---
 	if (!isExpanded) {
 		return (
-			<div className="flex w-12 flex-col items-center gap-1 border-stroke-soft-200 border-r py-4 dark:border-stroke-soft-100/40">
+			<div className="m-2 flex h-[calc(100vh-79px)] w-12 shrink-0 flex-col items-center gap-1 rounded-[18px] border border-stroke-soft-200 bg-bg-weak-50 py-4 shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
 				<Tooltip.Root>
 					<Tooltip.Trigger asChild>
 						<Button.Root
@@ -245,33 +261,29 @@ export function VersionSidebar() {
 							mode="ghost"
 							size="xxsmall"
 							onClick={() => setIsExpanded(true)}
-							className="size-8 rounded-lg text-text-sub-600 dark:hover:bg-white/5"
+							className="relative size-8 rounded-xl text-text-sub-600 transition-all duration-200 hover:bg-bg-soft-200 dark:text-zinc-400 dark:hover:bg-zinc-800"
 						>
 							<Clock size={16} />
+							{(published.length > 0 || drafts.length > 0) && (
+								<span className="-top-1 -right-1 absolute flex h-4 min-w-4 items-center justify-center rounded-full bg-primary-base px-1 font-bold text-[8px] text-white shadow-sm">
+									{published.length + drafts.length}
+								</span>
+							)}
 						</Button.Root>
 					</Tooltip.Trigger>
-					<Tooltip.Content side="right" sideOffset={4}>
+					<Tooltip.Content side="right" sideOffset={8}>
 						Version history
 					</Tooltip.Content>
 				</Tooltip.Root>
-
-				{(published.length > 0 || drafts.length > 0) && (
-					<div
-						className="mt-1 flex size-5 items-center justify-center rounded-full bg-bg-soft-200 font-medium text-[10px] text-text-sub-600 dark:bg-white/10"
-						title={`${published.length} Published, ${drafts.length} Drafts`}
-					>
-						{published.length + drafts.length}
-					</div>
-				)}
 			</div>
 		);
 	}
 
 	// --- Expanded state: full sidebar ---
 	return (
-		<div className="slide-in-from-left-2 flex h-full w-72 animate-in flex-col overflow-hidden border-stroke-soft-200 border-r bg-bg-white-0 duration-200 dark:border-stroke-soft-100/40 dark:bg-zinc-950">
+		<div className="slide-in-from-left-2 m-2 flex h-[calc(100vh-79px)] w-72 shrink-0 animate-in flex-col overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-weak-50 shadow-[0_1px_2px_rgba(0,0,0,0.02)] duration-200 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
 			{/* Header */}
-			<div className="flex items-center justify-between border-stroke-soft-200 border-b px-4 py-3.5 dark:border-stroke-soft-100/40">
+			<div className="flex items-center justify-between border-stroke-soft-200 border-b bg-bg-weak-50 px-4 py-3.5 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
 				<div className="flex items-center gap-2">
 					<History size={16} className="text-text-sub-600 dark:text-zinc-400" />
 					<span className="font-bold text-sm text-text-strong-950 dark:text-white">
@@ -284,7 +296,7 @@ export function VersionSidebar() {
 					mode="ghost"
 					size="xxsmall"
 					onClick={() => setIsExpanded(false)}
-					className="size-7 rounded-lg text-text-sub-600 dark:hover:bg-white/5"
+					className="size-7 rounded-lg text-text-sub-600 transition-all duration-200 hover:bg-bg-soft-200 dark:text-zinc-400 dark:hover:bg-zinc-800"
 				>
 					<ChevronLeft size={16} />
 				</Button.Root>

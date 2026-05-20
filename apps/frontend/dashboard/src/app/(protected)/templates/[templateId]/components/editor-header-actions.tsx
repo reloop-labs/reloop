@@ -266,6 +266,9 @@ export const EditorHeaderActions = ({
 		setHasUnsavedChanges,
 		setLastAiPrompt,
 		subject,
+		fromEmail,
+		replyTo,
+		previewText,
 	} = useEditorStore();
 
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
@@ -305,6 +308,9 @@ export const EditorHeaderActions = ({
 					renderedHtml,
 					isMajor: false,
 					subject,
+					fromEmail,
+					replyTo,
+					previewText,
 				}),
 				credentials: "include",
 			});
@@ -313,9 +319,17 @@ export const EditorHeaderActions = ({
 			fetch(`/api/template/v1/${templateId}`, {
 				method: "PUT",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ content, subject }),
+				body: JSON.stringify({
+					content,
+					subject,
+					fromEmail,
+					replyTo,
+					previewText,
+				}),
 				credentials: "include",
-			}).catch((err) => console.warn("[draft] Failed to sync template baseline:", err));
+			}).catch((err) =>
+				console.warn("[draft] Failed to sync template baseline:", err),
+			);
 
 			const result = await response.json();
 			const draftNum = result.draftNumber ?? null;
@@ -352,6 +366,9 @@ export const EditorHeaderActions = ({
 					isMajor: true,
 					description,
 					subject,
+					fromEmail,
+					replyTo,
+					previewText,
 				}),
 				credentials: "include",
 			});
@@ -362,9 +379,17 @@ export const EditorHeaderActions = ({
 			fetch(`/api/template/v1/${templateId}`, {
 				method: "PUT",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ content, subject }),
+				body: JSON.stringify({
+					content,
+					subject,
+					fromEmail,
+					replyTo,
+					previewText,
+				}),
 				credentials: "include",
-			}).catch((err) => console.warn("[publish] Failed to sync template baseline:", err));
+			}).catch((err) =>
+				console.warn("[publish] Failed to sync template baseline:", err),
+			);
 
 			const result = await response.json();
 			const pubNum = result.publishNumber ?? null;

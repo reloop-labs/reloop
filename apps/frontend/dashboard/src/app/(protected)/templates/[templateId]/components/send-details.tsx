@@ -1,7 +1,14 @@
 "use client";
 
+import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { cn } from "@reloop/ui/cn";
+import * as Tooltip from "@reloop/ui/tooltip";
+import { XCircle } from "lucide-react";
+import useSWR from "swr";
 import { useEditorStore } from "./use-editor-store";
+
+const fetcher = (url: string) =>
+	fetch(url, { credentials: "include" }).then((res) => res.json());
 
 interface FieldRowProps {
 	label: string;
@@ -29,8 +36,6 @@ const FieldRow = ({ label, children, hideBorder }: FieldRowProps) => {
 };
 
 export const SendDetails = () => {
-	const senderName = useEditorStore((s) => s.senderName);
-	const setSenderName = useEditorStore((s) => s.setSenderName);
 	const fromEmail = useEditorStore((s) => s.fromEmail);
 	const setFromEmail = useEditorStore((s) => s.setFromEmail);
 	const replyTo = useEditorStore((s) => s.replyTo);
@@ -40,28 +45,100 @@ export const SendDetails = () => {
 	const subject = useEditorStore((s) => s.subject);
 	const setSubject = useEditorStore((s) => s.setSubject);
 
+	const { activeOrganization } = useUserOrganization();
+	const { data: domainData } = useSWR<any>(
+		activeOrganization?.id
+			? `/api/domain/v1/list?organizationId=${activeOrganization.id}`
+			: null,
+		fetcher,
+	);
+
+	const verifiedDomains = (domainData?.domains || [])
+		.filter(
+			(d: any) =>
+				d.status === "active" || d.systemVerified || d.userVerifiedDomain,
+		)
+		.map((d: any) => d.domain.toLowerCase());
+
+	const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+	const parseFromEmail = (input: string | null | undefined) => {
+		if (!input) return "";
+		const match = input.match(/<([^>]+)>/);
+		if (match && match[1]) return match[1].trim();
+		return input.trim();
+	};
+
+	const fromEmailAddress = parseFromEmail(fromEmail);
+	const fromDomain = fromEmailAddress.includes("@")
+		? fromEmailAddress.split("@")[1]?.toLowerCase() || ""
+		: "";
+
+	const isFromEmailValid = !fromEmail || emailRegex.test(fromEmailAddress);
+	const isFromDomainVerified =
+		!fromEmailAddress ||
+		!isFromEmailValid ||
+		verifiedDomains.includes(fromDomain);
+
+	let fromError: string | null = null;
+	if (fromEmail) {
+		if (!isFromEmailValid) {
+			fromError = "Invalid from email address.";
+		} else if (!isFromDomainVerified) {
+			fromError = "You can only use verified domains.";
+		}
+	}
+
+	const isReplyToValid = !replyTo || emailRegex.test(replyTo.trim());
+	let replyToError: string | null = null;
+	if (replyTo && !isReplyToValid) {
+		replyToError = "Invalid reply-to email address.";
+	}
+
 	return (
 		<div className="mx-auto w-full max-w-[600px]">
 			{/* From Row */}
 			<FieldRow label="From">
-				<div className="flex flex-1 items-center gap-1 text-sm text-text-sub-600">
+				<div className="relative flex w-full flex-1 items-center justify-between gap-2 text-sm text-text-sub-600">
 					<input
 						value={fromEmail}
 						onChange={(e) => setFromEmail(e.target.value)}
-						placeholder="Acme<acme@example.com>"
-						className="flex-1 bg-transparent outline-none placeholder:text-text-soft-400"
+						placeholder="Acme <acme@example.com>"
+						className="flex-1 bg-transparent text-text-strong-950 outline-none placeholder:text-text-soft-400"
 					/>
+					{fromError && (
+						<Tooltip.Root>
+							<Tooltip.Trigger asChild>
+								<div className="flex cursor-pointer items-center justify-center text-red-500 transition-transform hover:scale-105 dark:text-red-400">
+									<XCircle size={15} />
+								</div>
+							</Tooltip.Trigger>
+							<Tooltip.Content side="top">{fromError}</Tooltip.Content>
+						</Tooltip.Root>
+					)}
 				</div>
 			</FieldRow>
 
 			{/* Reply-To Row */}
 			<FieldRow label="Reply-To">
-				<input
-					value={replyTo}
-					onChange={(e) => setReplyTo(e.target.value)}
-					placeholder="replyto"
-					className="flex-1 bg-transparent text-sm text-text-strong-950 outline-none placeholder:text-text-soft-400"
-				/>
+				<div className="relative flex w-full flex-1 items-center justify-between gap-2 text-sm text-text-sub-600">
+					<input
+						value={replyTo}
+						onChange={(e) => setReplyTo(e.target.value)}
+						placeholder="replyto@example.com"
+						className="flex-1 bg-transparent text-sm text-text-strong-950 outline-none placeholder:text-text-soft-400"
+					/>
+					{replyToError && (
+						<Tooltip.Root>
+							<Tooltip.Trigger asChild>
+								<div className="flex cursor-pointer items-center justify-center text-red-500 transition-transform hover:scale-105 dark:text-red-400">
+									<XCircle size={15} />
+								</div>
+							</Tooltip.Trigger>
+							<Tooltip.Content side="top">{replyToError}</Tooltip.Content>
+						</Tooltip.Root>
+					)}
+				</div>
 			</FieldRow>
 
 			{/* Preview Row */}
@@ -69,7 +146,7 @@ export const SendDetails = () => {
 				<input
 					value={previewText}
 					onChange={(e) => setPreviewText(e.target.value)}
-					placeholder="dvdvdsvs"
+					placeholder="Preview text"
 					className="flex-1 bg-transparent text-sm text-text-strong-950 outline-none placeholder:text-text-soft-400"
 				/>
 			</FieldRow>

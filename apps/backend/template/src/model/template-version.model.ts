@@ -9,6 +9,9 @@ export interface CreateVersionInput {
 	name?: string;
 	isMajor?: boolean;
 	subject?: string;
+	fromEmail?: string;
+	replyTo?: string;
+	previewText?: string;
 	description?: string;
 	content: TemplateBlock[];
 	variables?: string[];
@@ -26,6 +29,9 @@ export const templateVersionModel = {
 				name: input.name,
 				isMajor: input.isMajor ?? false,
 				subject: input.subject,
+				fromEmail: input.fromEmail,
+				replyTo: input.replyTo,
+				previewText: input.previewText,
 				description: input.description,
 				content: input.content,
 				variables: input.variables || [],
