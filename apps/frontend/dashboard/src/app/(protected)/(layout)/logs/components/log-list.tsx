@@ -293,12 +293,9 @@ export const LogList = () => {
 			</div>
 
 			{/* ── Split Panel ── */}
-			<div
-				className="mt-4 flex min-h-0 items-start gap-4"
-				style={{ height: "calc(100vh - 220px)" }}
-			>
+			<div className="mt-4 flex items-start gap-4">
 				{/* LEFT — Log list */}
-				<div className="flex h-full w-[480px] flex-shrink-0 flex-col gap-4 overflow-y-auto">
+				<div className="sticky top-4 flex max-h-[calc(100vh-100px)] w-[480px] flex-shrink-0 flex-col gap-4 self-start overflow-y-auto">
 					<LogTable
 						logs={data?.logs || []}
 						isLoading={isLoading}
@@ -325,12 +322,12 @@ export const LogList = () => {
 					/>
 				</div>
 
-				{/* RIGHT — Inline detail panel (scrollable) */}
-				<div className="h-full flex-1 overflow-y-auto rounded-3xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
+				{/* RIGHT — Inline detail panel */}
+				<div className="flex-1 rounded-3xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
 					{selectedLogId ? (
 						<LogDetailPanel logId={selectedLogId} />
 					) : (
-						<div className="flex h-full min-h-[500px] flex-col items-center justify-center gap-3 p-8 text-center">
+						<div className="flex min-h-[500px] flex-col items-center justify-center gap-3 p-8 text-center">
 							<div className="flex h-12 w-12 items-center justify-center rounded-full bg-bg-weak-50 text-2xl dark:bg-bg-weak-50/20">
 								📄
 							</div>

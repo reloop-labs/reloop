@@ -210,7 +210,7 @@ export const LogDetailPanel = ({ logId }: LogDetailPanelProps) => {
 	/* ── Loading ── */
 	if (isLoading) {
 		return (
-			<div className="flex h-full flex-col gap-4 p-5">
+			<div className="flex flex-col gap-4 p-5">
 				{/* Title skeleton */}
 				<div className="border-stroke-soft-100 border-b pb-4 dark:border-stroke-soft-100/40">
 					<Skeleton className="h-5 w-56 rounded" />
@@ -239,7 +239,7 @@ export const LogDetailPanel = ({ logId }: LogDetailPanelProps) => {
 		method && displayEndpoint ? `${method} ${displayEndpoint}` : log.event;
 
 	return (
-		<div className="flex h-full flex-col overflow-y-auto">
+		<div className="flex flex-col">
 			{/* ── Panel Header ── */}
 			<div className="flex items-start justify-between gap-3 px-5 pt-4">
 				<div className="min-w-0 flex-1">

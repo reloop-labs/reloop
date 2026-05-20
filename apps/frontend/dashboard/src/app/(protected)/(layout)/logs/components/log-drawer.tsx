@@ -1,8 +1,8 @@
 "use client";
 
 import * as Drawer from "@reloop/ui/drawer";
-import Link from "next/link";
 import { Icon } from "@reloop/ui/icon";
+import Link from "next/link";
 import { LogDetailPanel } from "./log-detail-panel";
 
 interface LogDrawerProps {
@@ -22,7 +22,7 @@ export const LogDrawer = ({ logId, isOpen, onOpenChange }: LogDrawerProps) => {
 					{logId && (
 						<Link
 							href={`/logs/${logId}`}
-							className="flex items-center gap-1 text-xs text-text-sub-600 hover:text-text-strong-950"
+							className="flex items-center gap-1 text-text-sub-600 text-xs hover:text-text-strong-950"
 						>
 							<Icon name="arrows-expand-diagonal" className="h-3.5 w-3.5" />
 							View full
