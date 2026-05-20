@@ -130,8 +130,8 @@ export async function ensureTableExists(): Promise<void> {
 		// If table doesn't exist, DESCRIBE will throw. We can ignore this and proceed to CREATE.
 		if (
 			error instanceof Error &&
-			!error.message?.includes("Table default.logs doesn't exist") &&
-			!error.message?.includes("Table logs does not exist") &&
+			!error.message?.includes("doesn't exist") &&
+			!error.message?.includes("does not exist") &&
 			!error.message?.includes("not found")
 		) {
 			console.error("Error checking ClickHouse table schema:", error);
@@ -166,6 +166,7 @@ export async function ensureTableExists(): Promise<void> {
 				ENGINE = MergeTree()
 				ORDER BY (organization_id, service, created_at, id)
 				PARTITION BY toYYYYMM(created_at)
+				SETTINGS allow_nullable_key = 1
 			`,
 		});
 		console.log(
