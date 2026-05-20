@@ -31,9 +31,7 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 						return {
 							...apiKeyResult,
 							organizationId: apiKeyResult.organizationId,
-							activeOrganizationId: apiKeyResult.organizationId,
 							traceId,
-							logger: log,
 						};
 					}
 
@@ -47,7 +45,6 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 						return {
 							...sessionResult,
 							organizationId: sessionResult.organizationId,
-							activeOrganizationId: sessionResult.organizationId,
 							traceId,
 							logger: log,
 						};
@@ -83,7 +80,6 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 						return {
 							...apiKeyResult,
 							organizationId: apiKeyResult.organizationId,
-							activeOrganizationId: apiKeyResult.organizationId,
 							traceId,
 							logger: log,
 						};
@@ -99,9 +95,7 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 						return {
 							...sessionResult,
 							organizationId: sessionResult.organizationId,
-							activeOrganizationId: sessionResult.organizationId,
 							traceId,
-							logger: log,
 						};
 					}
 

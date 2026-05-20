@@ -5,10 +5,10 @@ import { getEmailStatsController } from "./get-email-stats.controllers";
 
 export const getEmailStatsRoute = new Elysia().use(authMiddleware).get(
 	"/emails/stats",
-	async ({ query, activeOrganizationId }) => {
+	async ({ query, organizationId }) => {
 		return await getEmailStatsController({
 			query: query as LogsModel.EmailStatsQuery,
-			organizationId: activeOrganizationId as string,
+			organizationId,
 		});
 	},
 	{

@@ -5,10 +5,10 @@ import { listEmailLogsController } from "./list-email-logs.controllers";
 
 export const listEmailLogsRoute = new Elysia().use(authMiddleware).get(
 	"/emails",
-	async ({ query, activeOrganizationId }) => {
+	async ({ query, organizationId }) => {
 		const result = await listEmailLogsController({
 			query,
-			organizationId: activeOrganizationId,
+			organizationId,
 		});
 		return result;
 	},
