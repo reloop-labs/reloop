@@ -3,7 +3,7 @@ import { log } from "evlog";
 import nodemailer from "nodemailer";
 import Reloop from "reloop-email";
 
-const isProduction = emailConfig.nodeEnv === "production";
+const isProduction = emailConfig.NODE_ENV === "production";
 
 let reloop: Reloop | null = null;
 if (isProduction && emailConfig.RELOOP_API_KEY) {
