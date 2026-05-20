@@ -91,16 +91,16 @@ export const CodeBlock = ({
 				}
 				.line-numbers .line {
 					position: relative;
-					padding-left: 2rem;
+					padding-left: 3.25rem;
 				}
 				.line-numbers .line::before {
 					content: counter(line);
 					counter-increment: line;
 					position: absolute;
 					left: 0;
-					width: 2rem;
+					width: 2.5rem;
 					text-align: right;
-					padding-right: 1rem;
+					padding-right: 0.75rem;
 					font-size: 0.75rem;
 					color: var(--color-text-soft-400);
 					user-select: none;
