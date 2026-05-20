@@ -27,7 +27,6 @@ export namespace LogsModel {
 		}),
 		created_at: t.String({ format: "date-time" }),
 		requestDetails: t.Any(),
-		email: t.Optional(t.Any()),
 		// Audit-log fields
 		actor_type: t.Optional(t.Union([t.String(), t.Null()])),
 		actor_id: t.Optional(t.Union([t.String(), t.Null()])),
@@ -42,18 +41,23 @@ export namespace LogsModel {
 
 	export type LogEntryResponse = typeof logEntryResponse.static;
 
-	export const logResponse = t.Object({
+	export const logDetailResponse = t.Object({
 		uuid: t.String({ description: "Unique event identifier" }),
 		event: t.String({ description: "Event name" }),
 		level: t.String({ description: "Stored log level" }),
-		trace_id: t.String({ description: "Distributed trace identifier" }),
+		trace_id: t.Union([t.String(), t.Null()], {
+			description: "Distributed trace identifier",
+		}),
 		metadata: t.Any({ description: "Additional structured metadata" }),
 		status_code: t.Union([t.Number(), t.Null()], {
 			description: "HTTP status code",
 		}),
 		created_at: t.String({ format: "date-time" }),
 		requestDetails: t.Any(),
-		email: t.Optional(t.Any()),
+		email: t.Optional(t.Any({
+			description:
+				"Enriched email log details. Only present when the log metadata contains an email ID.",
+		})),
 		// Audit-log fields
 		actor_type: t.Optional(t.Union([t.String(), t.Null()])),
 		actor_id: t.Optional(t.Union([t.String(), t.Null()])),
@@ -66,7 +70,7 @@ export namespace LogsModel {
 		environment: t.Optional(t.Union([t.String(), t.Null()])),
 	});
 
-	export type LogResponse = typeof logResponse.static;
+	export type LogDetailResponse = typeof logDetailResponse.static;
 
 	export const listLogsQuery = t.Object({
 		level: t.Optional(logLevel),

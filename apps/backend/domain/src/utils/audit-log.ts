@@ -88,14 +88,14 @@ export function auditLogHook(opts: AuditLogHookOptions) {
 			}
 		}
 
-		await bus.publish(BusEvent.LOG_CREATED, {
+		bus.publish(BusEvent.LOG_CREATED, {
 			event,
 			level,
-			trace_id: traceId as string,
+			trace_id: traceId,
 			actor_type: "user",
-			actor_id: userId as string,
-			organization_id: organizationId as string,
-			user_id: userId as string,
+			actor_id: userId,
+			organization_id: organizationId,
+			user_id: userId,
 			resource_type: resourceType,
 			resource_id: resourceId,
 			service: "domain",
@@ -112,6 +112,6 @@ export function auditLogHook(opts: AuditLogHookOptions) {
 				ipAddress,
 				statusCode: Number(status),
 			},
-		});
+		}).catch(console.error);
 	};
 }

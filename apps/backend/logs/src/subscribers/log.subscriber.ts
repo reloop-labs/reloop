@@ -25,6 +25,8 @@ export async function initLogSubscriber() {
 						payload.user_agent ?? payload.requestDetails?.userAgent ?? null,
 					environment: payload.environment,
 					metadata: payload.metadata ?? {},
+					request_details: payload.requestDetails ?? null,
+					status_code: payload.requestDetails?.statusCode ?? null,
 				});
 			} catch (error) {
 				log.error({

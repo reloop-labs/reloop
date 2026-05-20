@@ -19,6 +19,14 @@ export type AuditLogEntry = {
 	ip_address?: string | null;
 	user_agent?: string | null;
 	environment?: string;
+	request_details?: {
+		endpoint?: string;
+		method?: string;
+		userAgent?: string;
+		ipAddress?: string;
+		statusCode?: number;
+	} | null;
+	status_code?: number | null;
 };
 
 const ENV =
@@ -44,8 +52,8 @@ export async function insertAuditLog(entry: AuditLogEntry): Promise<void> {
 					user_id: entry.user_id ?? null,
 					organization_id: entry.organization_id ?? null,
 					metadata: JSON.stringify(entry.metadata),
-					request_details: "{}",
-					status_code: null,
+					request_details: JSON.stringify(entry.request_details ?? {}),
+					status_code: entry.status_code ?? null,
 					created_at: toClickHouseDate(new Date()),
 					// Audit-log fields — LowCardinality columns use '' as the "no value" sentinel
 					actor_type: entry.actor_type,

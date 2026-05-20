@@ -5,7 +5,6 @@ import {
 	type StoredLogEntry,
 } from "@reloop/logs/utils/clickhouse";
 import {
-	escapeString,
 	formatClickHouseDate,
 	safeJsonParse,
 } from "@reloop/logs/utils/format";
@@ -14,7 +13,8 @@ import { getEmailLogController } from "../get-email-log/get-email-log.controller
 
 export async function getLogController(
 	logId: string,
-): Promise<LogsModel.LogEntryResponse> {
+	organizationId: string,
+): Promise<LogsModel.LogDetailResponse> {
 	const log = useLogger();
 	log.info("Getting log entry", { logId });
 	try {
@@ -43,9 +43,10 @@ export async function getLogController(
 					user_agent,
 					environment
 				FROM logs
-				WHERE id = '${escapeString(logId)}'
+				WHERE id = {logId:String} AND organization_id = {organizationId:String}
 				LIMIT 1
 			`,
+			query_params: { logId, organizationId },
 			format: "JSONEachRow",
 		});
 

@@ -37,22 +37,23 @@ export function auditLogHook(opts: AuditLogHookOptions) {
 		let metadata: Record<string, unknown> = {};
 		let resourceId: string | undefined;
 
-		if (status === successStatus) {
+		const isSuccess =
+			status === successStatus ||
+			(Number(status) >= 200 && Number(status) < 300);
+
+		if (isSuccess) {
 			level = "info";
-			const result = response as { id?: string; name?: string } | undefined;
-			if (result && typeof result === "object" && "id" in result) {
-				resourceId = result.id;
-				metadata = {
-					id: result.id,
-					name: result.name,
-				};
-			} else {
-				const idMatch = request.url.match(/\/api_key_[a-zA-Z0-9]+/);
-				if (idMatch) {
-					resourceId = idMatch[0].replace("/", "");
+			const result = response as
+				| { id?: string; name?: string }
+				| undefined;
+			if (result && typeof result === "object" && result !== null) {
+				if ("id" in result) {
+					resourceId = result.id;
 				}
+				metadata = { ...result };
+			} else {
 				metadata = {
-					resourceId,
+					status,
 				};
 			}
 		} else if (status === 429) {
@@ -73,20 +74,24 @@ export function auditLogHook(opts: AuditLogHookOptions) {
 						? errResponse.message
 						: String(response),
 			};
+		}
+
+		// Fallback: extract resourceId from URL if not found in response body
+		if (!resourceId) {
 			const idMatch = request.url.match(/\/api_key_[a-zA-Z0-9]+/);
 			if (idMatch) {
 				resourceId = idMatch[0].replace("/", "");
 			}
 		}
 
-		await bus.publish(BusEvent.LOG_CREATED, {
+		bus.publish(BusEvent.LOG_CREATED, {
 			event,
 			level,
-			trace_id: traceId as string,
+			trace_id: traceId,
 			actor_type: "user",
-			actor_id: userId as string,
-			organization_id: organizationId as string,
-			user_id: userId as string,
+			actor_id: userId,
+			organization_id: organizationId,
+			user_id: userId,
 			resource_type: resourceType,
 			resource_id: resourceId,
 			service: "api-key",
@@ -103,6 +108,6 @@ export function auditLogHook(opts: AuditLogHookOptions) {
 				ipAddress,
 				statusCode: Number(status),
 			},
-		});
+		}).catch(console.error);
 	};
 }

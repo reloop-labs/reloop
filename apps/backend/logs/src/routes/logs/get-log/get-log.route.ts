@@ -6,14 +6,14 @@ import { getLogXCodeSamples } from "./get-log.x-codeSamples";
 
 export const getLogRoute = new Elysia().use(authMiddleware).get(
 	"/:log_id",
-	async ({ params }) => {
-		return await getLogController(params.log_id);
+	async ({ params, organizationId }) => {
+		return await getLogController(params.log_id, organizationId);
 	},
 	{
 		auth: true,
 		params: LogsModel.getLogParams,
 		response: {
-			200: LogsModel.logEntryResponse,
+			200: LogsModel.logDetailResponse,
 			401: LogsModel.unauthorized,
 			403: LogsModel.forbidden,
 			404: LogsModel.logNotFound,

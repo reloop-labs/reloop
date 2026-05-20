@@ -10,10 +10,11 @@ export async function cleanupOldLogs(days = 100): Promise<number> {
 	try {
 		// In ClickHouse, ALTER TABLE ... DELETE is asynchronous.
 		// We use it to remove rows based on the timestamp.
+		const safeDays = Math.max(1, Math.floor(Number(days)));
 		await client.exec({
 			query: `
 				ALTER TABLE logs
-				DELETE WHERE created_at < subtractDays(now(), ${days})
+				DELETE WHERE created_at < subtractDays(now(), ${safeDays})
 			`,
 		});
 

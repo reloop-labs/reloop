@@ -4,7 +4,6 @@ import {
 	type StoredLogEntry,
 } from "@reloop/logs/utils/clickhouse";
 import {
-	escapeString,
 	formatClickHouseDate,
 	safeJsonParse,
 	toClickHouseDate,
@@ -19,14 +18,17 @@ export async function listLogsController(
 	try {
 		const client = getClickHouseClient();
 		const conditions: string[] = [];
+		const params: Record<string, string | number> = {};
 
 		if (query.level) {
-			conditions.push(`level = '${escapeString(query.level)}'`);
+			conditions.push("level = {level:String}");
+			params.level = query.level;
 		}
 
 		if (query.status_code) {
 			const statuses = query.status_code.split(",");
 			const statusConditions: string[] = [];
+			let statusIdx = 0;
 			for (const status of statuses) {
 				if (status === "successes") {
 					statusConditions.push("(status_code >= 200 AND status_code < 400)");
@@ -35,7 +37,9 @@ export async function listLogsController(
 				} else {
 					const numericStatus = Number.parseInt(status, 10);
 					if (!Number.isNaN(numericStatus)) {
-						statusConditions.push(`status_code = ${numericStatus}`);
+						const paramName = `statusCode${statusIdx++}`;
+						statusConditions.push(`status_code = {${paramName}:Int32}`);
+						params[paramName] = numericStatus;
 					}
 				}
 			}
@@ -45,51 +49,60 @@ export async function listLogsController(
 		}
 
 		if (query.event) {
-			conditions.push(`event ILIKE '%${escapeString(query.event)}%'`);
+			conditions.push("event ILIKE {eventPattern:String}");
+			params.eventPattern = `%${query.event}%`;
 		}
 
 		if (query.search) {
-			const searchTerm = escapeString(query.search);
 			conditions.push(
-				`(event ILIKE '%${searchTerm}%' OR metadata ILIKE '%${searchTerm}%')`,
+				"(event ILIKE {searchPattern:String} OR metadata ILIKE {searchPattern:String})",
 			);
+			params.searchPattern = `%${query.search}%`;
 		}
 
 		if (query.organization_id) {
-			conditions.push(
-				`organization_id = '${escapeString(query.organization_id)}'`,
-			);
+			conditions.push("organization_id = {organizationId:String}");
+			params.organizationId = query.organization_id;
 		}
 
 		if (query.start_date) {
-			conditions.push(`created_at >= '${toClickHouseDate(query.start_date)}'`);
+			conditions.push("created_at >= {startDate:String}");
+			params.startDate = toClickHouseDate(query.start_date);
 		}
 
 		if (query.end_date) {
-			conditions.push(`created_at <= '${toClickHouseDate(query.end_date)}'`);
+			conditions.push("created_at <= {endDate:String}");
+			params.endDate = toClickHouseDate(query.end_date);
 		}
 
 		// Audit-log filters
 		if (query.service) {
-			conditions.push(`service = '${escapeString(query.service)}'`);
+			conditions.push("service = {service:String}");
+			params.service = query.service;
 		}
 		if (query.action) {
-			conditions.push(`action = '${escapeString(query.action)}'`);
+			conditions.push("action = {action:String}");
+			params.action = query.action;
 		}
 		if (query.resource_type) {
-			conditions.push(`resource_type = '${escapeString(query.resource_type)}'`);
+			conditions.push("resource_type = {resourceType:String}");
+			params.resourceType = query.resource_type;
 		}
 		if (query.resource_id) {
-			conditions.push(`resource_id = '${escapeString(query.resource_id)}'`);
+			conditions.push("resource_id = {resourceId:String}");
+			params.resourceId = query.resource_id;
 		}
 		if (query.actor_type) {
-			conditions.push(`actor_type = '${escapeString(query.actor_type)}'`);
+			conditions.push("actor_type = {actorType:String}");
+			params.actorType = query.actor_type;
 		}
 		if (query.actor_id) {
-			conditions.push(`actor_id = '${escapeString(query.actor_id)}'`);
+			conditions.push("actor_id = {actorId:String}");
+			params.actorId = query.actor_id;
 		}
 		if (query.environment) {
-			conditions.push(`environment = '${escapeString(query.environment)}'`);
+			conditions.push("environment = {environment:String}");
+			params.environment = query.environment;
 		}
 
 		const whereClause =
@@ -98,10 +111,13 @@ export async function listLogsController(
 		const page = Math.max(Number(query.page || 1), 1);
 		const offset = (page - 1) * limit;
 
+		const queryParams = { ...params, limit, offset };
+
 		// Run count, data, and stats queries in parallel
 		const [countResultSet, dataResultSet, statsResultSet] = await Promise.all([
 			client.query({
 				query: `SELECT count() as total FROM logs ${whereClause}`,
+				query_params: queryParams,
 				format: "JSONEachRow",
 			}),
 			client.query({
@@ -129,8 +145,9 @@ export async function listLogsController(
 					FROM logs
 					${whereClause}
 					ORDER BY created_at DESC
-					LIMIT ${limit} OFFSET ${offset}
+					LIMIT {limit:UInt32} OFFSET {offset:UInt32}
 				`,
+				query_params: queryParams,
 				format: "JSONEachRow",
 			}),
 			client.query({
@@ -142,6 +159,7 @@ export async function listLogsController(
 					${whereClause}
 					GROUP BY level
 				`,
+				query_params: queryParams,
 				format: "JSONEachRow",
 			}),
 		]);
