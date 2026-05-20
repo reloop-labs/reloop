@@ -2,12 +2,11 @@
 
 import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
-import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { KbdEsc } from "@reloop/ui/kbd-esc";
 import * as Modal from "@reloop/ui/modal";
-import * as Tooltip from "@reloop/ui/tooltip";
 import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
+import * as Tooltip from "@reloop/ui/tooltip";
 import { useCurrentEditor } from "@tiptap/react";
 import {
 	CheckCircle2,
@@ -253,7 +252,7 @@ export function VersionSidebar() {
 	// --- Collapsed state: narrow icon strip ---
 	if (!isExpanded) {
 		return (
-			<div className="m-2 h-[calc(100vh-79px)] w-12 shrink-0 flex-col items-center gap-1 rounded-[18px] border border-stroke-soft-200 bg-bg-weak-50 py-4 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a] flex">
+			<div className="m-2 flex h-[calc(100vh-79px)] w-12 shrink-0 flex-col items-center gap-1 rounded-[18px] border border-stroke-soft-200 bg-bg-weak-50 py-4 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
 				<Tooltip.Root>
 					<Tooltip.Trigger asChild>
 						<Button.Root
@@ -284,10 +283,10 @@ export function VersionSidebar() {
 	return (
 		<div className="slide-in-from-left-2 m-2 flex h-[calc(100vh-79px)] w-72 shrink-0 animate-in flex-col overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-weak-50 duration-200 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
 			{/* Header */}
-			<div className="flex items-center justify-between border-stroke-soft-200 border-b px-4 py-3.5">
-				<div className="flex items-center gap-2">
-					<History size={16} className="text-text-sub-600 dark:text-zinc-400" />
-					<span className="font-bold text-sm text-text-strong-950 dark:text-white">
+			<div className="flex h-10 items-center justify-between border-stroke-soft-200 border-b bg-bg-weak-50 px-3 dark:bg-[#0a0a0a]">
+				<div className="flex items-center gap-1.5 p-0">
+					<History size={14} className="text-text-strong-950" strokeWidth={2} />
+					<span className="font-semibold text-text-strong-950 text-xs capitalize">
 						History
 					</span>
 				</div>
@@ -299,7 +298,7 @@ export function VersionSidebar() {
 					onClick={() => setIsExpanded(false)}
 					className="size-7 rounded-lg text-text-sub-600 transition-all duration-200 hover:bg-bg-soft-200 dark:text-zinc-400 dark:hover:bg-zinc-800"
 				>
-					<ChevronLeft size={16} />
+					<ChevronLeft size={24} />
 				</Button.Root>
 			</div>
 
@@ -308,10 +307,10 @@ export function VersionSidebar() {
 				value={activeTab}
 				onValueChange={(val) => setActiveTab(val as "drafts" | "published")}
 			>
-				<TabMenuHorizontal.List className="h-10 gap-0 border-stroke-soft-200 border-b py-0 flex w-full bg-bg-weak-50/10 dark:border-stroke-soft-100/30">
+				<TabMenuHorizontal.List className="flex h-10 w-full gap-0 border-stroke-soft-200 border-b bg-bg-weak-50/10 py-0 dark:border-stroke-soft-100/30">
 					<TabMenuHorizontal.Trigger
 						value="drafts"
-						className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 px-2.5 py-0 font-semibold text-xs h-10 data-[state=active]:text-text-strong-950 dark:data-[state=active]:text-white transition-all outline-none"
+						className="flex h-10 flex-1 cursor-pointer items-center justify-center gap-1.5 px-2.5 py-0 font-semibold text-xs outline-none transition-all data-[state=active]:text-text-strong-950 dark:data-[state=active]:text-white"
 					>
 						<span>Drafts</span>
 						<span className="rounded bg-bg-soft-200 px-1.5 py-0.5 font-bold text-[10px] dark:bg-zinc-900 dark:text-zinc-300">
@@ -320,7 +319,7 @@ export function VersionSidebar() {
 					</TabMenuHorizontal.Trigger>
 					<TabMenuHorizontal.Trigger
 						value="published"
-						className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 px-2.5 py-0 font-semibold text-xs h-10 data-[state=active]:text-text-strong-950 dark:data-[state=active]:text-white transition-all outline-none"
+						className="flex h-10 flex-1 cursor-pointer items-center justify-center gap-1.5 px-2.5 py-0 font-semibold text-xs outline-none transition-all data-[state=active]:text-text-strong-950 dark:data-[state=active]:text-white"
 					>
 						<span>Published</span>
 						<span className="rounded bg-bg-soft-200 px-1.5 py-0.5 font-bold text-[10px] dark:bg-zinc-900 dark:text-zinc-300">

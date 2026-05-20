@@ -1,7 +1,7 @@
 "use client";
 
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import * as StatusBadge from "@reloop/ui/status-badge";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -49,6 +49,7 @@ export const TemplateName = () => {
 	const inputRef = useRef<HTMLInputElement>(null);
 	const measureRef = useRef<HTMLSpanElement>(null);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: name changes DOM width, which we need to measure
 	useEffect(() => {
 		if (measureRef.current && inputRef.current) {
 			// Add a small buffer to prevent jitter
@@ -99,9 +100,19 @@ export const TemplateName = () => {
 					className="rounded-md bg-transparent px-2 py-1 font-bold text-sm text-text-strong-950 outline-none transition-colors placeholder:text-text-soft-400 hover:bg-bg-weak-50 focus:ring-0 dark:text-white dark:hover:bg-white/5"
 				/>
 				{data?.status && (
-					<div className="flex items-center rounded-md bg-bg-soft-200 px-2 py-0.5 font-medium text-xs capitalize dark:bg-bg-weak-50/50">
+					<span
+						className={cn(
+							"ml-2 shrink-0 select-none rounded-md border px-1.5 py-0.5 font-semibold text-[10px] capitalize",
+							data.status === "published" &&
+								"border-success-base/20 bg-success-base/5 text-success-base",
+							data.status === "draft" &&
+								"border-amber-600/20 bg-amber-600/5 text-amber-600 dark:text-amber-500",
+							data.status === "archived" &&
+								"border-text-sub-600/20 bg-text-sub-600/5 text-text-sub-600",
+						)}
+					>
 						{data.status}
-					</div>
+					</span>
 				)}
 			</div>
 		</div>
