@@ -15,7 +15,9 @@
 		"declarationMap": false,
 		"baseUrl": ".",
 		"paths": {
-			"@reloop/email/*": ["./src/*"]
+			"@reloop/email/*": ["./src/*"],
+			"@reloop/email/emails/*": ["./emails/*"],
+			"@reloop/email/render": ["./render.ts"]
 		}
 	},
 	"include": ["src/**/*", "emails/**/*", "components/**/*", "./**/*"],

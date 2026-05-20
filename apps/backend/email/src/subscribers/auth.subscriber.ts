@@ -3,13 +3,13 @@ import { log } from "evlog";
 
 import React from "react";
 import { UAParser } from "ua-parser-js";
-import OtpEmail from "../../emails/otp";
-import SigninDetectedEmail from "../../emails/signin-detected";
-import WelcomeEmail from "../../emails/welcome";
-import { render } from "../../render";
-import { emailConfig } from "../email.config";
-import { redis } from "../lib/redis";
-import { sendEmail } from "../utils/email";
+import OtpEmail from "@reloop/email/emails/otp";
+import SigninDetectedEmail from "@reloop/email/emails/signin-detected";
+import WelcomeEmail from "@reloop/email/emails/welcome";
+import { render } from "@reloop/email/render";
+import { emailConfig } from "@reloop/email/email.config";
+import { redis } from "@reloop/email/lib/redis";
+import { sendEmail } from "@reloop/email/utils/email";
 
 export async function initAuthSubscribers() {
 	// Welcome Email / User Created

@@ -2,12 +2,12 @@ import { BusEvent, bus } from "@reloop/bus";
 import { log } from "evlog";
 
 import React from "react";
-import InviteEmail from "../../emails/invite";
-import OrgJoinedEmail from "../../emails/org-joined";
-import { render } from "../../render";
-import { emailConfig } from "../email.config";
-import { redis } from "../lib/redis";
-import { sendEmail } from "../utils/email";
+import InviteEmail from "@reloop/email/emails/invite";
+import OrgJoinedEmail from "@reloop/email/emails/org-joined";
+import { render } from "@reloop/email/render";
+import { emailConfig } from "@reloop/email/email.config";
+import { redis } from "@reloop/email/lib/redis";
+import { sendEmail } from "@reloop/email/utils/email";
 
 export async function initOrgSubscribers() {
 	// Invite Email

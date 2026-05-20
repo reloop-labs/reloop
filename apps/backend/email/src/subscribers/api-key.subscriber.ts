@@ -4,10 +4,10 @@ import * as schema from "@reloop/db/schema";
 import { eq } from "drizzle-orm";
 import { log } from "evlog";
 import React from "react";
-import ApiKeyCreatedEmail from "../../emails/api-key-created";
-import { render } from "../../render";
-import { emailConfig } from "../email.config";
-import { sendEmail } from "../utils/email";
+import ApiKeyCreatedEmail from "@reloop/email/emails/api-key-created";
+import { render } from "@reloop/email/render";
+import { emailConfig } from "@reloop/email/email.config";
+import { sendEmail } from "@reloop/email/utils/email";
 
 export async function initApiKeySubscribers() {
 	// API Key Created

@@ -8,7 +8,7 @@ import { landingRoute } from "@reloop/email/routes/landing/landing.route";
 import { loader } from "@reloop/email/utils/loader";
 
 import { Elysia } from "elysia";
-import { emailConfig } from "./email.config";
+import { emailConfig } from "@reloop/email/email.config";
 
 const port = emailConfig.port;
 
