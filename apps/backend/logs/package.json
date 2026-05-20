@@ -8,7 +8,10 @@
 		"compile": "bun build --compile --minify --sourcemap --bytecode ./src/index.ts --outfile server",
 		"dev": "bun run --hot src/index.ts",
 		"start": "bun run dist/index.js",
-		"cleanup": "bun run scripts/cleanup.ts"
+		"cleanup": "bun run scripts/cleanup.ts",
+		"lint": "biome check .",
+		"fix-lint": "biome check --fix .",
+		"format": "biome format ."
 	},
 	"dependencies": {
 		"@clickhouse/client": "catalog:backend",
