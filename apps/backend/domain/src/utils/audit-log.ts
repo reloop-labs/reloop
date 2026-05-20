@@ -88,30 +88,32 @@ export function auditLogHook(opts: AuditLogHookOptions) {
 			}
 		}
 
-		bus.publish(BusEvent.LOG_CREATED, {
-			event,
-			level,
-			trace_id: traceId,
-			actor_type: "user",
-			actor_id: userId,
-			organization_id: organizationId,
-			user_id: userId,
-			resource_type: resourceType,
-			resource_id: resourceId,
-			service: "domain",
-			action,
-			ip_address: ipAddress,
-			user_agent: userAgent,
-			environment:
-				process.env.NODE_ENV === "production" ? "production" : "development",
-			metadata,
-			requestDetails: {
-				endpoint: request.url,
-				method: request.method,
-				userAgent,
-				ipAddress,
-				statusCode: Number(status),
-			},
-		}).catch(console.error);
+		bus
+			.publish(BusEvent.LOG_CREATED, {
+				event,
+				level,
+				trace_id: traceId,
+				actor_type: "user",
+				actor_id: userId,
+				organization_id: organizationId,
+				user_id: userId,
+				resource_type: resourceType,
+				resource_id: resourceId,
+				service: "domain",
+				action,
+				ip_address: ipAddress,
+				user_agent: userAgent,
+				environment:
+					process.env.NODE_ENV === "production" ? "production" : "development",
+				metadata,
+				requestDetails: {
+					endpoint: request.url,
+					method: request.method,
+					userAgent,
+					ipAddress,
+					statusCode: Number(status),
+				},
+			})
+			.catch(console.error);
 	};
 }

@@ -28,7 +28,7 @@ export function PageFooter({ previous, next }: PageFooterProps) {
 						className={cn(
 							"flex items-center gap-2 rounded-full border border-stroke-soft-100 px-5 py-2 font-medium text-[14px] transition-all hover:bg-bg-weak-50/50",
 							feedback === "yes" &&
-								"border-[#171717] dark:border-white bg-black/5 dark:bg-white/5 text-[#171717] dark:text-white",
+								"border-[#171717] bg-black/5 text-[#171717] dark:border-white dark:bg-white/5 dark:text-white",
 						)}
 					>
 						<ThumbsUp className="h-4 w-4" />
@@ -39,7 +39,7 @@ export function PageFooter({ previous, next }: PageFooterProps) {
 						className={cn(
 							"flex items-center gap-2 rounded-full border border-stroke-soft-100 px-5 py-2 font-medium text-[14px] transition-all hover:bg-bg-weak-50/50",
 							feedback === "no" &&
-								"border-[#171717] dark:border-white bg-black/5 dark:bg-white/5 text-[#171717] dark:text-white",
+								"border-[#171717] bg-black/5 text-[#171717] dark:border-white dark:bg-white/5 dark:text-white",
 						)}
 					>
 						<ThumbsDown className="h-4 w-4" />
@@ -53,13 +53,13 @@ export function PageFooter({ previous, next }: PageFooterProps) {
 				{previous ? (
 					<Link
 						href={previous.url}
-						className="group relative flex flex-col items-start gap-2 rounded-2xl border border-stroke-soft-100 p-6 transition-all hover:border-black/50 dark:hover:border-white/50 hover:bg-black/[0.02] dark:hover:bg-white/[0.02]"
+						className="group relative flex flex-col items-start gap-2 rounded-2xl border border-stroke-soft-100 p-6 transition-all hover:border-black/50 hover:bg-black/[0.02] dark:hover:border-white/50 dark:hover:bg-white/[0.02]"
 					>
 						<span className="flex items-center gap-1.5 font-semibold text-[12px] text-text-sub-600 uppercase tracking-wider">
 							<ChevronLeft className="group-hover:-translate-x-0.5 h-3 w-3 transition-transform" />
 							Previous
 						</span>
-						<span className="font-bold text-[17px] text-[#171717] dark:text-white tracking-tight">
+						<span className="font-bold text-[#171717] text-[17px] tracking-tight dark:text-white">
 							{previous.name}
 						</span>
 					</Link>
@@ -70,13 +70,13 @@ export function PageFooter({ previous, next }: PageFooterProps) {
 				{next ? (
 					<Link
 						href={next.url}
-						className="group relative flex flex-col items-end gap-2 rounded-2xl border border-stroke-soft-100 p-6 text-right transition-all hover:border-black/50 dark:hover:border-white/50 hover:bg-black/[0.02] dark:hover:bg-white/[0.02]"
+						className="group relative flex flex-col items-end gap-2 rounded-2xl border border-stroke-soft-100 p-6 text-right transition-all hover:border-black/50 hover:bg-black/[0.02] dark:hover:border-white/50 dark:hover:bg-white/[0.02]"
 					>
 						<span className="flex items-center gap-1.5 font-semibold text-[12px] text-text-sub-600 uppercase tracking-wider">
 							Next
 							<ChevronRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
 						</span>
-						<span className="font-bold text-[17px] text-[#171717] dark:text-white tracking-tight">
+						<span className="font-bold text-[#171717] text-[17px] tracking-tight dark:text-white">
 							{next.name}
 						</span>
 					</Link>

@@ -249,7 +249,7 @@ export function useCollaboration({
 	}, [collab?.provider, user.name, user.color, user.avatar, serverUser]);
 
 	return {
-		ydoc: collab?.ydoc ?? null as any,
+		ydoc: collab?.ydoc ?? (null as any),
 		provider: collab?.provider ?? null,
 		isConnected,
 		isSynced,

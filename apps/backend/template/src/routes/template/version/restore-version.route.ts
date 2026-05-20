@@ -27,5 +27,5 @@ export const restoreVersionRoute = new Elysia().use(authMiddleware).post(
 			summary: "Restore template version",
 			description: "Restores a template to a specific historical version",
 		},
-	}
+	},
 );

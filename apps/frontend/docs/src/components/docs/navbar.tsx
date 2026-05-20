@@ -67,13 +67,13 @@ export function Navbar({
 				<div className="flex items-center gap-3">
 					<Link
 						href="https://dashboard.reloop.sh/login"
-						className="hidden font-medium text-text-sub-600 text-sm transition-colors hover:text-[#171717] dark:hover:text-white sm:block"
+						className="hidden font-medium text-sm text-text-sub-600 transition-colors hover:text-[#171717] sm:block dark:hover:text-white"
 					>
 						Sign In
 					</Link>
 					<Link
 						href="https://dashboard.reloop.sh/signup"
-						className="inline-flex h-9 items-center justify-center rounded-full bg-[#171717] dark:bg-white px-5 font-semibold text-white dark:text-black text-sm transition-all hover:opacity-90 active:scale-[0.98]"
+						className="inline-flex h-9 items-center justify-center rounded-full bg-[#171717] px-5 font-semibold text-sm text-white transition-all hover:opacity-90 active:scale-[0.98] dark:bg-white dark:text-black"
 					>
 						{/* Shorten text on very small screens */}
 						<span className="xs:inline hidden">Get Started</span>

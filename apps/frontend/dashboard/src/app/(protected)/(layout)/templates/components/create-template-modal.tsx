@@ -90,7 +90,9 @@ export const CreateTemplateModal = ({
 							<Icon name="file-text" className="h-4 w-4" />
 						</div>
 						<div className="flex-1">
-							<Modal.Title className="font-semibold">Create Template</Modal.Title>
+							<Modal.Title className="font-semibold">
+								Create Template
+							</Modal.Title>
 						</div>
 					</Modal.Header>
 					<form onSubmit={handleSubmit} className="flex flex-col">

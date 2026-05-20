@@ -25,7 +25,8 @@ export const deleteVersionRoute = new Elysia().use(authMiddleware).delete(
 		detail: {
 			tags: ["Template Versions"],
 			summary: "Delete template version",
-			description: "Deletes a specific version of a template if it is not the active version",
+			description:
+				"Deletes a specific version of a template if it is not the active version",
 		},
-	}
+	},
 );

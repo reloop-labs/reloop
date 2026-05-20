@@ -64,10 +64,14 @@ export async function processDomainVerification({
 	// Conditionally verify SPF and DMARC (Enable Sending)
 	const isSendingEnabled = domainWithRecords.isSendingEmailEnabled;
 	const spfRecord = isSendingEnabled
-		? records.find((r) => r.recordType === "TXT" && r.value.startsWith("v=spf1"))
+		? records.find(
+				(r) => r.recordType === "TXT" && r.value.startsWith("v=spf1"),
+			)
 		: undefined;
 	const dmarcRecord = isSendingEnabled
-		? records.find((r) => r.recordType === "TXT" && r.value.startsWith("v=DMARC1"))
+		? records.find(
+				(r) => r.recordType === "TXT" && r.value.startsWith("v=DMARC1"),
+			)
 		: undefined;
 
 	if (isSendingEnabled && (!spfRecord || !dmarcRecord)) {
@@ -102,7 +106,8 @@ export async function processDomainVerification({
 
 	// Conditionally verify CNAME (Tracking)
 	const isTrackingEnabled =
-		domainWithRecords.isClickTrackingEnabled || domainWithRecords.isOpenTrackingEnabled;
+		domainWithRecords.isClickTrackingEnabled ||
+		domainWithRecords.isOpenTrackingEnabled;
 	const cnameRecord = isTrackingEnabled
 		? records.find((r) => r.recordType === "CNAME")
 		: undefined;
@@ -162,7 +167,8 @@ export async function processDomainVerification({
 		ok: verificationResults[index],
 	}));
 
-	const dkimOk = results.find((r) => r.record.id === dkimRecord.id)?.ok ?? false;
+	const dkimOk =
+		results.find((r) => r.record.id === dkimRecord.id)?.ok ?? false;
 	const spfOk = spfRecord
 		? (results.find((r) => r.record.id === spfRecord.id)?.ok ?? false)
 		: true;

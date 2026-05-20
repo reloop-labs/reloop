@@ -17,7 +17,6 @@ import { organization, user } from "./auth";
 const createDomainId = () => `domain_${createId()}`;
 const createDnsRecordId = () => `dns_${createId()}`;
 
-
 export const domainStatusEnum = pgEnum("domain_status", [
 	"pending",
 	"verifying",
@@ -30,7 +29,7 @@ export const dnsRecordTypeEnum = pgEnum("dns_record_type", [
 	"AAAA",
 	"CNAME",
 	"MX",
-	"TXT"
+	"TXT",
 ]);
 
 export const dnsRecordTypeNameEnum = pgEnum("dns_record_type_name", [
@@ -38,13 +37,13 @@ export const dnsRecordTypeNameEnum = pgEnum("dns_record_type_name", [
 	"SPF",
 	"DKIM",
 	"DMARC",
-	"CNAME"
+	"CNAME",
 ]);
 
 export const dnsRecordPurposeEnum = pgEnum("dns_record_purpose", [
 	"sending",
 	"receiving",
-	"tracking"
+	"tracking",
 ]);
 export const tlsModeEnum = pgEnum("tls_mode", ["opportunistic", "enforced"]);
 
@@ -63,7 +62,9 @@ export const domain = pgTable(
 			.references(() => user.id, { onDelete: "cascade" }),
 
 		status: domainStatusEnum("status").notNull().default("pending"),
-		userVerifiedDomain: boolean("user_verified_domain").notNull().default(false),
+		userVerifiedDomain: boolean("user_verified_domain")
+			.notNull()
+			.default(false),
 		systemVerified: boolean("system_verified").notNull().default(false),
 		customReturnPath: varchar("custom_return_path", { length: 255 })
 			.notNull()
@@ -71,12 +72,20 @@ export const domain = pgTable(
 		trackingSubdomain: varchar("tracking_subdomain", { length: 255 })
 			.notNull()
 			.default("tracking"),
-		isClickTrackingEnabled: boolean("is_click_tracking_enabled").notNull().default(false),
-		isOpenTrackingEnabled: boolean("is_open_tracking_enabled").notNull().default(false),
+		isClickTrackingEnabled: boolean("is_click_tracking_enabled")
+			.notNull()
+			.default(false),
+		isOpenTrackingEnabled: boolean("is_open_tracking_enabled")
+			.notNull()
+			.default(false),
 		tls: tlsModeEnum("tls").notNull().default("opportunistic"),
 		isTrackingDomain: boolean("is_tracking_domain").notNull().default(false),
-		isSendingEmailEnabled: boolean("is_sending_email_enabled").notNull().default(true),
-		isReceivingEmailEnabled: boolean("is_receiving_email_enabled").notNull().default(true),
+		isSendingEmailEnabled: boolean("is_sending_email_enabled")
+			.notNull()
+			.default(true),
+		isReceivingEmailEnabled: boolean("is_receiving_email_enabled")
+			.notNull()
+			.default(true),
 		verificationFailedReason: text("verification_failed_reason"),
 		deletedAt: timestamp("deleted_at"),
 		lastVerifiedAt: timestamp("last_verified_at"),
@@ -99,7 +108,10 @@ export const domain = pgTable(
 		index("domain_idx_org_status").on(table.organizationId, table.status),
 		index("domain_idx_org_deleted").on(table.organizationId, table.deletedAt),
 		index("domain_idx_user_status").on(table.userId, table.status),
-		index("domain_idx_status_verified").on(table.status, table.userVerifiedDomain),
+		index("domain_idx_status_verified").on(
+			table.status,
+			table.userVerifiedDomain,
+		),
 		unique("domain_unique_org_domain").on(table.organizationId, table.domain),
 	],
 );
@@ -126,7 +138,7 @@ export const domainDnsRecord = pgTable(
 		ttl: text("ttl").notNull().default("Auto"),
 		priority: integer("priority"),
 		recordTypeName: dnsRecordTypeNameEnum("record_type_name").notNull(),
-		purpose: dnsRecordPurposeEnum("purpose").notNull().default('sending'),
+		purpose: dnsRecordPurposeEnum("purpose").notNull().default("sending"),
 		domain: text("domain").notNull(),
 		fqdn: text("fqdn").notNull(),
 		privateKey: text("private_key"),

@@ -11,7 +11,10 @@ export async function restoreVersion(params: {
 	const { templateId, versionId, organizationId } = params;
 
 	// Verify template exists and belongs to org
-	const template = await templateModel.findByIdAndOrg(templateId, organizationId);
+	const template = await templateModel.findByIdAndOrg(
+		templateId,
+		organizationId,
+	);
 	if (!template) {
 		throw TemplateError.notFound(templateId);
 	}
@@ -22,7 +25,7 @@ export async function restoreVersion(params: {
 		throw new TemplateError(
 			TEMPLATE_ERROR_CODES.TEMPLATE_VERSION_NOT_FOUND,
 			"Version not found",
-			404
+			404,
 		);
 	}
 

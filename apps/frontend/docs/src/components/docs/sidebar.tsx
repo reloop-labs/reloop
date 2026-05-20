@@ -265,7 +265,7 @@ export function Sidebar({
 				</button>
 				<button
 					type="button"
-					className="flex h-8.5 w-8.5 items-center justify-center rounded-lg border border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 transition-all hover:border-black/10 dark:hover:border-white/10 hover:text-[#171717] dark:hover:text-white"
+					className="flex h-8.5 w-8.5 items-center justify-center rounded-lg border border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 transition-all hover:border-black/10 hover:text-[#171717] dark:hover:border-white/10 dark:hover:text-white"
 				>
 					<Sparkles className="h-3.5 w-3.5" />
 				</button>
@@ -337,7 +337,7 @@ function ProductSwitcher({ pathname: propPathname }: { pathname?: string }) {
 			<Popover.Trigger asChild>
 				<button
 					type="button"
-					className="flex w-full items-center justify-between gap-2 rounded-lg border border-stroke-soft-100 bg-bg-white-0 px-3 py-2 text-[#171717] dark:text-white transition-all hover:bg-black/[0.02] dark:hover:bg-white/[0.02]"
+					className="flex w-full items-center justify-between gap-2 rounded-lg border border-stroke-soft-100 bg-bg-white-0 px-3 py-2 text-[#171717] transition-all hover:bg-black/[0.02] dark:text-white dark:hover:bg-white/[0.02]"
 				>
 					<div className="flex items-center gap-2.5">
 						<Icon
@@ -365,8 +365,8 @@ function ProductSwitcher({ pathname: propPathname }: { pathname?: string }) {
 									className={cn(
 										"flex items-center justify-between rounded-lg px-2.5 py-2 text-sm transition-colors",
 										isActive
-											? "bg-black/5 dark:bg-white/5 text-[#171717] dark:text-white"
-											: "text-text-sub-600 hover:bg-black/[0.03] dark:hover:bg-white/[0.03] hover:text-[#171717] dark:hover:text-white",
+											? "bg-black/5 text-[#171717] dark:bg-white/5 dark:text-white"
+											: "text-text-sub-600 hover:bg-black/[0.03] hover:text-[#171717] dark:hover:bg-white/[0.03] dark:hover:text-white",
 									)}
 								>
 									<div className="flex items-center gap-2.5">
@@ -622,7 +622,9 @@ function SidebarLink({
 					<span
 						className={cn(
 							"flex h-3.5 w-3.5 shrink-0 items-center justify-center transition-colors",
-							isActive ? "text-[#171717] dark:text-white" : "text-text-sub-600 opacity-70",
+							isActive
+								? "text-[#171717] dark:text-white"
+								: "text-text-sub-600 opacity-70",
 						)}
 					>
 						{node.icon}

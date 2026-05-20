@@ -4,10 +4,7 @@ import {
 	getClickHouseClient,
 	type StoredLogEntry,
 } from "@reloop/logs/utils/clickhouse";
-import {
-	formatClickHouseDate,
-	safeJsonParse,
-} from "@reloop/logs/utils/format";
+import { formatClickHouseDate, safeJsonParse } from "@reloop/logs/utils/format";
 import { useLogger } from "evlog/elysia";
 import { getEmailLogController } from "../get-email-log/get-email-log.controllers";
 

@@ -97,8 +97,10 @@ const TemplateDropdown = ({
 					mode="ghost"
 					size="xxsmall"
 					className={cn(
-						"h-8 w-8 rounded-lg border border-stroke-soft-100 dark:border-stroke-soft-100/50 bg-bg-white-0 shadow-sm p-1.5 transition-all",
-						popoverOpen ? "opacity-100" : "opacity-0 group-hover/card:opacity-100",
+						"h-8 w-8 rounded-lg border border-stroke-soft-100 bg-bg-white-0 p-1.5 shadow-sm transition-all dark:border-stroke-soft-100/50",
+						popoverOpen
+							? "opacity-100"
+							: "opacity-0 group-hover/card:opacity-100",
 					)}
 				>
 					<Icon name="more-horizontal" className="h-4 w-4" />
@@ -164,24 +166,22 @@ const extractTextFromContent = (content?: any[] | null): string => {
 };
 
 const TemplatePreviewThumbnail = ({ template }: { template: Template }) => {
-
-
 	const extractedText = extractTextFromContent(template.content).trim();
 
 	return (
-		<div className="flex flex-col gap-3 p-4 text-[10px] text-text-strong-950 dark:text-white font-sans h-full justify-center overflow-hidden">
-			<div className="font-bold text-[13px] leading-tight truncate pr-6">
+		<div className="flex h-full flex-col justify-center gap-3 overflow-hidden p-4 font-sans text-[10px] text-text-strong-950 dark:text-white">
+			<div className="truncate pr-6 font-bold text-[13px] leading-tight">
 				{template.subject || template.name}
 			</div>
 			{extractedText ? (
-				<div className="text-text-sub-600 dark:text-text-sub-600/80 leading-relaxed line-clamp-4 break-words">
+				<div className="line-clamp-4 break-words text-text-sub-600 leading-relaxed dark:text-text-sub-600/80">
 					{extractedText}
 				</div>
 			) : (
-				<div className="space-y-1.5 mt-1">
-					<div className="h-1.5 w-full bg-neutral-alpha-10 dark:bg-white/10 rounded" />
-					<div className="h-1.5 w-5/6 bg-neutral-alpha-10 dark:bg-white/10 rounded" />
-					<div className="h-1.5 w-4/6 bg-neutral-alpha-10 dark:bg-white/10 rounded" />
+				<div className="mt-1 space-y-1.5">
+					<div className="h-1.5 w-full rounded bg-neutral-alpha-10 dark:bg-white/10" />
+					<div className="h-1.5 w-5/6 rounded bg-neutral-alpha-10 dark:bg-white/10" />
+					<div className="h-1.5 w-4/6 rounded bg-neutral-alpha-10 dark:bg-white/10" />
 				</div>
 			)}
 		</div>
@@ -190,9 +190,9 @@ const TemplatePreviewThumbnail = ({ template }: { template: Template }) => {
 
 const TemplateSkeleton = () => (
 	<div className="group relative flex flex-col gap-3">
-		<div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-stroke-soft-100 dark:border-stroke-soft-100/20 bg-bg-weak-50/50 dark:bg-zinc-900/40 p-4" />
-		<div className="flex justify-between items-start px-0.5">
-			<div className="flex flex-col gap-1.5 flex-1 mr-4">
+		<div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4 dark:border-stroke-soft-100/20 dark:bg-zinc-900/40" />
+		<div className="flex items-start justify-between px-0.5">
+			<div className="mr-4 flex flex-1 flex-col gap-1.5">
 				<Skeleton className="h-4 w-3/4 rounded" />
 				<Skeleton className="h-3 w-1/2 rounded" />
 			</div>
@@ -256,7 +256,7 @@ export const TemplateGrid = ({
 							<TemplateSkeleton key={`skeleton-${i}`} />
 						))
 					) : templates.length === 0 ? (
-						<div className="col-span-full flex flex-col items-center justify-center p-12 text-center rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/40">
+						<div className="col-span-full flex flex-col items-center justify-center rounded-xl border border-stroke-soft-100 p-12 text-center dark:border-stroke-soft-100/40">
 							<p className="text-sm text-text-sub-600">No templates found</p>
 						</div>
 					) : (
@@ -271,16 +271,14 @@ export const TemplateGrid = ({
 									exit={{ opacity: 0, y: -15 }}
 									transition={{ delay: index * 0.05 }}
 								>
-									<div
-										className="group/card relative flex flex-col gap-3 transition-all duration-200 cursor-pointer"
-									>
+									<div className="group/card relative flex cursor-pointer flex-col gap-3 transition-all duration-200">
 										{/* Preview Canvas Container (The SINGLE border outline) */}
 										<div
 											className={cn(
-												"relative aspect-[4/3] w-full overflow-hidden rounded-2xl border transition-all duration-200 bg-bg-white-0 dark:bg-zinc-900 shadow-[0_1px_2px_rgba(0,0,0,0.02)]",
+												"relative aspect-[4/3] w-full overflow-hidden rounded-2xl border bg-bg-white-0 shadow-[0_1px_2px_rgba(0,0,0,0.02)] transition-all duration-200 dark:bg-zinc-900",
 												isCardActive
-													? "border-stroke-soft-200 dark:border-stroke-soft-100 shadow-[0_8px_24px_rgba(0,0,0,0.06)]"
-													: "border-stroke-soft-100 dark:border-stroke-soft-100/40 hover:border-stroke-soft-200 dark:hover:border-stroke-soft-100 hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)]",
+													? "border-stroke-soft-200 shadow-[0_8px_24px_rgba(0,0,0,0.06)] dark:border-stroke-soft-100"
+													: "border-stroke-soft-100 hover:border-stroke-soft-200 hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] dark:border-stroke-soft-100/40 dark:hover:border-stroke-soft-100",
 											)}
 										>
 											{/* Clean simulated email content directly on the canvas background */}
@@ -314,22 +312,29 @@ export const TemplateGrid = ({
 										</div>
 
 										{/* Bottom Info Row */}
-										<div className="flex justify-between items-start px-0.5">
-											<div className="flex flex-col gap-0.5 min-w-0 flex-1 mr-4">
-												<span className="font-semibold text-sm text-text-strong-950 dark:text-white truncate" title={template.name}>
+										<div className="flex items-start justify-between px-0.5">
+											<div className="mr-4 flex min-w-0 flex-1 flex-col gap-0.5">
+												<span
+													className="truncate font-semibold text-sm text-text-strong-950 dark:text-white"
+													title={template.name}
+												>
 													{template.name}
 												</span>
-												<span className="text-xs text-text-sub-600 dark:text-zinc-500 font-mono leading-none truncate">
-													{template.description || template.name.toLowerCase().replace(/\s+/g, "-")}
+												<span className="truncate font-mono text-text-sub-600 text-xs leading-none dark:text-zinc-500">
+													{template.description ||
+														template.name.toLowerCase().replace(/\s+/g, "-")}
 												</span>
 											</div>
 
 											<span
 												className={cn(
-													"rounded-md px-1.5 py-0.5 text-[10px] font-semibold capitalize border select-none shrink-0",
-													template.status === "published" && "bg-success-base/5 text-success-base border-success-base/20",
-													template.status === "draft" && "bg-amber-600/5 text-amber-600 dark:text-amber-500 border-amber-600/20",
-													template.status === "archived" && "bg-text-sub-600/5 text-text-sub-600 border-text-sub-600/20",
+													"shrink-0 select-none rounded-md border px-1.5 py-0.5 font-semibold text-[10px] capitalize",
+													template.status === "published" &&
+														"border-success-base/20 bg-success-base/5 text-success-base",
+													template.status === "draft" &&
+														"border-amber-600/20 bg-amber-600/5 text-amber-600 dark:text-amber-500",
+													template.status === "archived" &&
+														"border-text-sub-600/20 bg-text-sub-600/5 text-text-sub-600",
 												)}
 											>
 												{template.status}

@@ -6,8 +6,6 @@ export type DomainStatus =
 	| "suspended"
 	| "failed";
 
-
-
 export interface DNSRecord {
 	id: string;
 	recordType: string;

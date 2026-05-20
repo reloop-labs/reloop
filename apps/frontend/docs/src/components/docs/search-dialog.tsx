@@ -147,13 +147,13 @@ export function SearchDialog({ open, onOpenChange, tree }: SearchDialogProps) {
 												<h3 className="mt-4 font-semibold text-fd-foreground">
 													Search Reloop Docs
 												</h3>
-												<p className="mt-1 text-text-sub-600 text-sm">
+												<p className="mt-1 text-sm text-text-sub-600">
 													Search for guides, API references, and quickstarts.
 												</p>
 											</div>
 										) : results.length === 0 ? (
 											<div className="px-4 py-12 text-center">
-												<p className="text-text-sub-600 text-sm">
+												<p className="text-sm text-text-sub-600">
 													No results found for "
 													<span className="font-medium text-fd-foreground">
 														{query}

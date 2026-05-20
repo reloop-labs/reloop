@@ -54,10 +54,12 @@ export namespace LogsModel {
 		}),
 		created_at: t.String({ format: "date-time" }),
 		requestDetails: t.Any(),
-		email: t.Optional(t.Any({
-			description:
-				"Enriched email log details. Only present when the log metadata contains an email ID.",
-		})),
+		email: t.Optional(
+			t.Any({
+				description:
+					"Enriched email log details. Only present when the log metadata contains an email ID.",
+			}),
+		),
 		// Audit-log fields
 		actor_type: t.Optional(t.Union([t.String(), t.Null()])),
 		actor_id: t.Optional(t.Union([t.String(), t.Null()])),

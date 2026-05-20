@@ -11,7 +11,10 @@ export async function deleteVersion(params: {
 	const { templateId, versionId, organizationId } = params;
 
 	// Verify template exists and belongs to org
-	const template = await templateModel.findByIdAndOrg(templateId, organizationId);
+	const template = await templateModel.findByIdAndOrg(
+		templateId,
+		organizationId,
+	);
 	if (!template) {
 		throw TemplateError.notFound(templateId);
 	}
@@ -22,16 +25,19 @@ export async function deleteVersion(params: {
 		throw new TemplateError(
 			TEMPLATE_ERROR_CODES.TEMPLATE_VERSION_NOT_FOUND,
 			"Version not found",
-			404
+			404,
 		);
 	}
 
 	// Verify it's not the active version
-	if (template.currentVersion !== null && version.version === template.currentVersion) {
+	if (
+		template.currentVersion !== null &&
+		version.version === template.currentVersion
+	) {
 		throw new TemplateError(
 			TEMPLATE_ERROR_CODES.TEMPLATE_DELETE_FAILED,
 			"Cannot delete the active template version.",
-			400
+			400,
 		);
 	}
 

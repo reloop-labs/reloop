@@ -31,7 +31,10 @@ async function processWorkflow(job: Job<WorkflowJobData>): Promise<void> {
 			webhookId: jobData.payload.webhookId as string,
 			webhookUrl: jobData.payload.webhookUrl as string,
 			webhookSecret: jobData.payload.webhookSecret as string,
-			customHeaders: jobData.payload.customHeaders as Record<string, string> | null,
+			customHeaders: jobData.payload.customHeaders as Record<
+				string,
+				string
+			> | null,
 			eventId: jobData.payload.eventId as string,
 			eventType: jobData.payload.eventType as string,
 			payload: jobData.payload.payload as Record<string, unknown>,

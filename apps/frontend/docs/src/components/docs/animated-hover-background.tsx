@@ -2,7 +2,7 @@
 
 import { cn } from "@reloop/ui/cn";
 import { AnimatePresence, motion } from "framer-motion";
-import React from "react";
+import type React from "react";
 
 interface AnimatedHoverBackgroundProps {
 	rect: { width: number; height: number; top: number; left: number } | null;
@@ -17,7 +17,7 @@ export const AnimatedHoverBackground: React.FC<
 			{rect && (
 				<motion.div
 					className={cn(
-						"absolute rounded-lg bg-neutral-alpha-10 pointer-events-none z-0",
+						"pointer-events-none absolute z-0 rounded-lg bg-neutral-alpha-10",
 						className,
 					)}
 					initial={{

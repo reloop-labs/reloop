@@ -3,9 +3,8 @@
 import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
 import { Skeleton } from "@reloop/ui/skeleton";
-import Spinner from "@reloop/ui/spinner";
 import { CheckCircle2 } from "lucide-react";
-import { AnimatePresence, motion } from "motion/react";
+import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import type React from "react";
@@ -34,7 +33,7 @@ export const OnBoardingContent = () => {
 		"domain",
 		parseAsString.withDefault(""),
 	);
-	const [domainId, setDomainId] = useQueryState(
+	const [_domainId, setDomainId] = useQueryState(
 		"domainId",
 		parseAsString.withDefault(""),
 	);

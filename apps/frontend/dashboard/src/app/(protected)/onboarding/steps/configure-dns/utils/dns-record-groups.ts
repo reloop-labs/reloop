@@ -11,8 +11,7 @@ const isDkimRecord = (record: DNSRecord) =>
 const isReceivingMxRecord = (record: DNSRecord) =>
 	record.purpose === "receiving";
 
-const isTrackingRecord = (record: DNSRecord) =>
-	record.purpose === "tracking";
+const isTrackingRecord = (record: DNSRecord) => record.purpose === "tracking";
 
 const isSendingRecord = (record: DNSRecord) =>
 	record.purpose === "sending" &&

@@ -1,5 +1,6 @@
 "use client";
 
+import { AnimatePresence, motion } from "framer-motion";
 import {
 	Box,
 	Check,
@@ -10,8 +11,7 @@ import {
 	FileText,
 	Terminal,
 } from "lucide-react";
-import { useState, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useRef, useState } from "react";
 import { siAnthropic } from "simple-icons";
 
 const cache = new Map<string, string>();
@@ -90,7 +90,7 @@ export function PageActions({
 				className="flex h-8 items-center gap-2 rounded-l-xl px-3 transition-colors hover:bg-black/5 dark:hover:bg-white/5"
 			>
 				{isLoading ? (
-					<div className="size-3.5 border-2 border-t-transparent border-current rounded-full animate-spin" />
+					<div className="size-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" />
 				) : checked ? (
 					<Check className="size-3.5" />
 				) : (
@@ -159,7 +159,9 @@ export function PageActions({
 
 							<button
 								type="button"
-								ref={(el) => { itemRefs.current[0] = el; }}
+								ref={(el) => {
+									itemRefs.current[0] = el;
+								}}
 								onPointerEnter={() => setHoverIdx(0)}
 								onPointerLeave={() => setHoverIdx(undefined)}
 								onClick={() => {
@@ -185,7 +187,9 @@ export function PageActions({
 								href="https://chat.openai.com"
 								target="_blank"
 								rel="noreferrer noopener"
-								ref={(el) => { itemRefs.current[1] = el; }}
+								ref={(el) => {
+									itemRefs.current[1] = el;
+								}}
 								onPointerEnter={() => setHoverIdx(1)}
 								onPointerLeave={() => setHoverIdx(undefined)}
 								className="relative z-10 flex w-full items-center gap-3 rounded-xl px-2.5 py-2 text-left transition-colors"
@@ -215,7 +219,9 @@ export function PageActions({
 								href="https://claude.ai"
 								target="_blank"
 								rel="noreferrer noopener"
-								ref={(el) => { itemRefs.current[2] = el; }}
+								ref={(el) => {
+									itemRefs.current[2] = el;
+								}}
 								onPointerEnter={() => setHoverIdx(2)}
 								onPointerLeave={() => setHoverIdx(undefined)}
 								className="relative z-10 flex w-full items-center gap-3 rounded-xl px-2.5 py-2 text-left transition-colors"
@@ -243,7 +249,9 @@ export function PageActions({
 
 							<button
 								type="button"
-								ref={(el) => { itemRefs.current[3] = el; }}
+								ref={(el) => {
+									itemRefs.current[3] = el;
+								}}
 								onPointerEnter={() => setHoverIdx(3)}
 								onPointerLeave={() => setHoverIdx(undefined)}
 								onClick={() => {
@@ -269,7 +277,9 @@ export function PageActions({
 								href="https://cursor.com/mcp"
 								target="_blank"
 								rel="noreferrer noopener"
-								ref={(el) => { itemRefs.current[4] = el; }}
+								ref={(el) => {
+									itemRefs.current[4] = el;
+								}}
 								onPointerEnter={() => setHoverIdx(4)}
 								onPointerLeave={() => setHoverIdx(undefined)}
 								className="relative z-10 flex w-full items-center gap-3 rounded-xl px-2.5 py-2 text-left transition-colors"
@@ -292,7 +302,9 @@ export function PageActions({
 								href="vscode://reloop.mcp-server"
 								target="_blank"
 								rel="noreferrer noopener"
-								ref={(el) => { itemRefs.current[5] = el; }}
+								ref={(el) => {
+									itemRefs.current[5] = el;
+								}}
 								onPointerEnter={() => setHoverIdx(5)}
 								onPointerLeave={() => setHoverIdx(undefined)}
 								className="relative z-10 flex w-full items-center gap-3 rounded-xl px-2.5 py-2 text-left transition-colors"
