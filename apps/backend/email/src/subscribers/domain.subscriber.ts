@@ -1,11 +1,11 @@
 import { BusEvent, bus } from "@reloop/bus";
-import { log } from "evlog";
-import React from "react";
+import { emailConfig } from "@reloop/email/email.config";
 import DnsConfigEmail from "@reloop/email/emails/dns-config";
 import DomainVerifiedEmail from "@reloop/email/emails/domain-verified";
 import { render } from "@reloop/email/render";
-import { emailConfig } from "@reloop/email/email.config";
 import { sendEmail } from "@reloop/email/utils/email";
+import { log } from "evlog";
+import React from "react";
 
 export async function initDomainSubscribers() {
 	// Domain Verified

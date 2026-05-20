@@ -88,7 +88,7 @@ export const DnsConfigEmail = ({
 	baseUrl = defaultBaseUrl,
 	theme = "light",
 }: DnsConfigEmailProps) => {
-	const firstName = fullName ? fullName.split(" ").at(0) : "there";
+	const _firstName = fullName ? fullName.split(" ").at(0) : "there";
 	const isDark = theme === "dark";
 
 	// ── Design tokens ──────────────────────────────────────────────────────────

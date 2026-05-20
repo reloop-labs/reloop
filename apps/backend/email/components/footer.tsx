@@ -1,5 +1,4 @@
 import { Link, Section, Text } from "react-email";
-import { SocialLinks } from "./social-links";
 
 interface FooterProps {
 	baseUrl?: string;

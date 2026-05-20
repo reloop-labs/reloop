@@ -1,12 +1,12 @@
 import { BusEvent, bus } from "@reloop/bus";
-import { log } from "evlog";
-import React from "react";
+import { emailConfig } from "@reloop/email/email.config";
 import PaymentFailedEmail from "@reloop/email/emails/payment-failed";
 import QuotaWarningEmail from "@reloop/email/emails/quota-warning";
 import TrialEndingEmail from "@reloop/email/emails/trial-ending";
 import { render } from "@reloop/email/render";
-import { emailConfig } from "@reloop/email/email.config";
 import { sendEmail } from "@reloop/email/utils/email";
+import { log } from "evlog";
+import React from "react";
 
 export async function initBillingSubscribers() {
 	// Payment Failed

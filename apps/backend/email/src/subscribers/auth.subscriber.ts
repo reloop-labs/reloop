@@ -1,15 +1,14 @@
 import { BusEvent, bus } from "@reloop/bus";
-import { log } from "evlog";
-
-import React from "react";
-import { UAParser } from "ua-parser-js";
+import { emailConfig } from "@reloop/email/email.config";
 import OtpEmail from "@reloop/email/emails/otp";
 import SigninDetectedEmail from "@reloop/email/emails/signin-detected";
 import WelcomeEmail from "@reloop/email/emails/welcome";
-import { render } from "@reloop/email/render";
-import { emailConfig } from "@reloop/email/email.config";
 import { redis } from "@reloop/email/lib/redis";
+import { render } from "@reloop/email/render";
 import { sendEmail } from "@reloop/email/utils/email";
+import { log } from "evlog";
+import React from "react";
+import { UAParser } from "ua-parser-js";
 
 export async function initAuthSubscribers() {
 	// Welcome Email / User Created

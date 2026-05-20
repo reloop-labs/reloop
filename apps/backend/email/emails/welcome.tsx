@@ -29,7 +29,7 @@ export const WelcomeEmail = ({
 	baseUrl = defaultBaseUrl,
 	theme = "light",
 }: WelcomeEmailProps) => {
-	const firstName = fullName ? fullName.split(" ").at(0) : "";
+	const _firstName = fullName ? fullName.split(" ").at(0) : "";
 	const previewText =
 		"Open-source email infrastructure. Deliverability is on us.";
 

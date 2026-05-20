@@ -1,13 +1,13 @@
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
+import { emailConfig } from "@reloop/email/email.config";
+import ApiKeyCreatedEmail from "@reloop/email/emails/api-key-created";
+import { render } from "@reloop/email/render";
+import { sendEmail } from "@reloop/email/utils/email";
 import { eq } from "drizzle-orm";
 import { log } from "evlog";
 import React from "react";
-import ApiKeyCreatedEmail from "@reloop/email/emails/api-key-created";
-import { render } from "@reloop/email/render";
-import { emailConfig } from "@reloop/email/email.config";
-import { sendEmail } from "@reloop/email/utils/email";
 
 export async function initApiKeySubscribers() {
 	// API Key Created
@@ -23,12 +23,18 @@ export async function initApiKeySubscribers() {
 				});
 
 				if (!apiKey) {
-					log.error("subscriber", `API key not found for ID: ${payload.api_key_id}`);
+					log.error(
+						"subscriber",
+						`API key not found for ID: ${payload.api_key_id}`,
+					);
 					return;
 				}
 
 				if (!apiKey.user) {
-					log.error("subscriber", `User not found for API key: ${payload.api_key_id}`);
+					log.error(
+						"subscriber",
+						`User not found for API key: ${payload.api_key_id}`,
+					);
 					return;
 				}
 
