@@ -1,6 +1,5 @@
 const parseClickHouseUrl = () => {
-	const rawUrl =
-		process.env.CLICKHOUSE_URL || "http://localhost:8123";
+	const rawUrl = process.env.CLICKHOUSE_URL || "http://localhost:8123";
 
 	try {
 		const parsed = new URL(rawUrl);
@@ -14,10 +13,24 @@ const parseClickHouseUrl = () => {
 			parsed.pathname && parsed.pathname !== "/"
 				? decodeURIComponent(parsed.pathname.replace(/^\//, ""))
 				: process.env.CLICKHOUSE_DATABASE ||
-				process.env.CLICKHOUSE_DB ||
-				"reloop";
+					process.env.CLICKHOUSE_DB ||
+					"reloop";
 
-		const url = `${parsed.protocol}//${parsed.host}`;
+		let protocol = parsed.protocol;
+		if (protocol === "clickhouse:") {
+			protocol = "http:";
+		} else if (protocol === "clickhouses:") {
+			protocol = "https:";
+		}
+
+		let host = parsed.host;
+		if (parsed.port === "9000") {
+			host = host.replace(":9000", ":8123");
+		} else if (parsed.port === "9440") {
+			host = host.replace(":9440", ":8443");
+		}
+
+		const url = `${protocol}//${host}`;
 
 		return {
 			url,
