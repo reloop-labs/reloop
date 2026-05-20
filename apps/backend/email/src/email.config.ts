@@ -1,5 +1,5 @@
 export const emailConfig = {
-	PORT: Number(process.env.EMAIL_PORT || "8022"),
+	PORT: Number(process.env.PORT || "8022"),
 	NODE_ENV: process.env.NODE_ENV || "development",
 	NATS_URL: process.env.NATS_URL || "nats://localhost:4222",
 	RELOOP_API_KEY: process.env.RELOOP_API_KEY || "",
