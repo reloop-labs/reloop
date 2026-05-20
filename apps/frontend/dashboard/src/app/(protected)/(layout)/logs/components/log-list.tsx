@@ -291,17 +291,17 @@ export const LogList = () => {
 					<Icon name="file-download" className="h-4 w-4" />
 				</Button.Root>
 
-				{/* Clear all */}
-				{hasAnyFilter && (
-					<button
-						type="button"
-						onClick={handleClearAll}
-						className="ml-auto text-text-sub-600 text-xs transition-colors hover:text-text-strong-950"
-					>
-						Clear all
-					</button>
-				)}
 				<div className="ml-auto flex items-center gap-2">
+					{hasAnyFilter && (
+						<Button.Root
+							variant="neutral"
+							mode="stroke"
+							size="xsmall"
+							onClick={handleClearAll}
+						>
+							Clear all
+						</Button.Root>
+					)}
 					<DocsButton size="xsmall" mode="stroke" />
 					<LogsApiDetails size="xsmall" mode="ghost" />
 				</div>
