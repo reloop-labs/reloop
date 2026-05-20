@@ -3,12 +3,15 @@
 	"main": "src/index.ts",
 	"type": "module",
 	"scripts": {
+		"auth:generate": "npx @better-auth/cli@latest generate --output ../../../packages/db/src/schema/auth.ts",
 		"build": "tsdown",
 		"check-types": "tsc --noEmit",
 		"compile": "bun build --compile --minify --sourcemap --bytecode ./src/index.ts --outfile server",
 		"dev": "bun run --hot src/index.ts",
-		"start": "bun run dist/index.js",
-		"auth:generate": "npx @better-auth/cli@latest generate --output ../../../packages/db/src/schema/auth.ts"
+		"fix-lint": "biome check --fix .",
+		"format": "biome format .",
+		"lint": "biome check .",
+		"start": "bun run dist/index.js"
 	},
 	"dependencies": {
 		"@elysiajs/cors": "catalog:backend",

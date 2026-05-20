@@ -1,8 +1,7 @@
 import { bus } from "@reloop/bus";
+import { emailConfig } from "@reloop/email/email.config";
+import { initSubscribers } from "@reloop/email/subscribers";
 import { log } from "evlog";
-
-import { emailConfig } from "../email.config";
-import { initSubscribers } from "../subscribers";
 
 export const loader = async () => {
 	try {

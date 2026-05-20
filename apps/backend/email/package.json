@@ -13,13 +13,16 @@
 	"scripts": {
 		"build": "tsdown",
 		"check-types": "tsc --noEmit",
+		"clean": "rm -rf .turbo node_modules dist",
 		"compile": "bun build --compile --minify --sourcemap --bytecode ./src/index.ts --outfile server",
 		"dev": "bun run --hot src/index.ts",
-		"start": "bun run dist/index.js",
-		"email:dev": "email dev -p 3005",
 		"email:build": "email build",
+		"email:dev": "email dev -p 3005",
 		"email:start": "email start",
-		"clean": "rm -rf .turbo node_modules dist"
+		"fix-lint": "biome check --fix .",
+		"format": "biome format .",
+		"lint": "biome check .",
+		"start": "bun run dist/index.js"
 	},
 	"dependencies": {
 		"@elysiajs/cors": "catalog:backend",
