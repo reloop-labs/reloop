@@ -1,10 +1,12 @@
 import { bus } from "@reloop/bus";
 import { RedisCache } from "@reloop/cache/redis-client";
-import { log } from "evlog";
-
 import { logsConfig } from "@reloop/logs/logs.config";
 import { initSubscribers } from "@reloop/logs/subscribers";
-import { ensureTableExists, getClickHouseClient } from "@reloop/logs/utils/clickhouse";
+import {
+	ensureTableExists,
+	getClickHouseClient,
+} from "@reloop/logs/utils/clickhouse";
+import { log } from "evlog";
 
 export const redis = new RedisCache("logs");
 
@@ -25,10 +27,10 @@ export const loader = async () => {
 				error:
 					error instanceof Error
 						? {
-								message: error.message,
-								stack: error.stack,
-								name: error.name,
-							}
+							message: error.message,
+							stack: error.stack,
+							name: error.name,
+						}
 						: error,
 			},
 			message: "Error during initialization",

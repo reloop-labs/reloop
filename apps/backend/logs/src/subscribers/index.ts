@@ -1,24 +1,13 @@
 import { log } from "evlog";
-import { initApiKeySubscribers } from "./api-key.subscriber";
-import { initAuthSubscribers } from "./auth.subscriber";
-import { initBillingSubscribers } from "./billing.subscriber";
-import { initDomainSubscribers } from "./domain.subscriber";
-import { initEmailSubscribers } from "./email.subscriber";
+import { initLogSubscriber } from "./log.subscriber";
 
 export async function initSubscribers() {
 	try {
-		await Promise.all([
-			initApiKeySubscribers(),
-			initDomainSubscribers(),
-			initEmailSubscribers(),
-			initAuthSubscribers(),
-			initBillingSubscribers(),
-		]);
-
-		log.info("server", "All audit log subscribers initialized");
+		await initLogSubscriber();
+		log.info("server", "Audit log subscriber initialized");
 	} catch (error) {
 		log.error({
-			message: "Failed to initialize audit log subscribers",
+			message: "Failed to initialize audit log subscriber",
 			error: error instanceof Error ? error.message : String(error),
 		});
 	}

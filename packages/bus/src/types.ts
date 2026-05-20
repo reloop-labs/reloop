@@ -74,13 +74,17 @@ export interface LogCreatedPayload {
 		statusCode?: number;
 	};
 
-	// Actor — who triggered the event
+	// Who performed the action
 	actor_type?: "user" | "api_key" | "system";
 	actor_id?: string; // user_id or api_key_id
 
-	// Resource — what was acted on
+	// Tenant context — sent by the publisher
+	organization_id?: string;
+	user_id?: string;
+
+	// What was acted on
 	resource_type?: string; // 'api_key' | 'domain' | 'email' | 'organization' | etc.
-	resource_id?: string; // the specific resource ID
+	resource_id?: string;
 
 	// Context
 	service?: string; // source microservice: 'api_key' | 'domain' | 'mailing' | 'auth' | 'billing'
@@ -90,6 +94,7 @@ export interface LogCreatedPayload {
 	environment?: "production" | "development" | "test";
 	// NOTE: never add `cookie` here — session tokens must not be persisted in audit logs
 }
+
 export interface OrganizationJoinedPayload {
 	organizationId: string;
 	orgName: string;
