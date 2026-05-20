@@ -63,8 +63,8 @@ export async function sendEmailController({
 	const trackedHtml = injectTracking_step5b({
 		html: finalHtml,
 		emailLogId,
-		clickTracking: currentDomain.clickTracking,
-		openTracking: currentDomain.openTracking,
+		clickTracking: currentDomain.isClickTrackingEnabled,
+		openTracking: currentDomain.isOpenTrackingEnabled,
 	});
 
 	const result = await sendEmail_step6({

@@ -28,7 +28,7 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 							activeOrganizationId: sessionResult.activeOrganizationId,
 							userId: sessionResult.userId,
 						});
-						return { ...sessionResult, traceId, logger: log };
+						return { ...sessionResult, traceId };
 					}
 				} catch (e) {
 					if (e instanceof MailingError) {
@@ -62,11 +62,16 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 					if (apiKeyResult) {
 						log.set({
 							authType: "apiKey",
-							activeOrganizationId: apiKeyResult.activeOrganizationId,
+							activeOrganizationId: apiKeyResult.organizationId,
 							userId: apiKeyResult.userId,
 						});
 						log.info("API key authentication successful");
-						return { ...apiKeyResult, traceId, logger: log };
+						return {
+							userId: apiKeyResult.userId,
+							activeOrganizationId: apiKeyResult.organizationId,
+							authType: apiKeyResult.authType,
+							traceId,
+						};
 					}
 				} catch (e) {
 					if (e instanceof MailingError) {
@@ -106,11 +111,16 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 					if (apiKeyResult) {
 						log.set({
 							authType: "apiKey",
-							activeOrganizationId: apiKeyResult.activeOrganizationId,
+							activeOrganizationId: apiKeyResult.organizationId,
 							userId: apiKeyResult.userId,
 						});
 						log.info("API key authentication successful");
-						return { ...apiKeyResult, traceId, logger: log };
+						return {
+							userId: apiKeyResult.userId,
+							activeOrganizationId: apiKeyResult.organizationId,
+							authType: apiKeyResult.authType,
+							traceId,
+						};
 					}
 					const sessionResult = await validateSession(cookie);
 					if (sessionResult) {
@@ -120,7 +130,7 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 							userId: sessionResult.userId,
 						});
 						log.info("Session authentication successful");
-						return { ...sessionResult, traceId, logger: log };
+						return { ...sessionResult, traceId };
 					}
 				} catch (e) {
 					if (e instanceof MailingError) {

@@ -3,7 +3,6 @@ import { db } from "@reloop/db/client";
 import { type dnsRecordTypeNameEnum, domainDnsRecord } from "@reloop/db/schema";
 import { and, eq, inArray } from "drizzle-orm";
 import { log } from "evlog";
-import { useLogger } from "evlog/elysia";
 
 type DomainRow = {
 	id: string;
@@ -22,8 +21,6 @@ export async function checkDnsHealth_step3({
 	organizationId: string;
 	domainData: DomainRow;
 }) {
-	const logger = useLogger();
-
 	const STALE_THRESHOLD_HOURS = 6;
 	const lastVerified = domainData.lastVerifiedAt;
 	const isRecent = lastVerified
