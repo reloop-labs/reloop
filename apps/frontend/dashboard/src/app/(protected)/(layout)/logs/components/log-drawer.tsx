@@ -1,5 +1,6 @@
 "use client";
 
+import { CopyCodeBlock } from "@fe/dashboard/app/(protected)/onboarding/steps/generate-api-key/components/copy-code-block";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import { cn } from "@reloop/ui/cn";
 import * as Drawer from "@reloop/ui/drawer";
@@ -372,37 +373,21 @@ export const LogDrawer = ({ logId, isOpen, onOpenChange }: LogDrawerProps) => {
 							)}
 
 							{/* Metadata */}
-							<Section
-								title="Metadata"
-								icon="code"
-								actions={
-									metadataEntries.length > 0 ? (
-										<CopyButton
-											value={JSON.stringify(log.metadata, null, 2)}
-											label="Metadata"
-										/>
-									) : undefined
-								}
-							>
-								{metadataEntries.length > 0 ? (
-									metadataEntries.map(([key, value]) => (
-										<FieldRow key={key} label={key}>
-											<FieldValue
-												value={
-													typeof value === "object"
-														? JSON.stringify(value)
-														: String(value ?? "—")
-												}
-												mono
-											/>
-										</FieldRow>
-									))
-								) : (
+							{metadataEntries.length > 0 ? (
+								<div className="mt-2">
+									<CopyCodeBlock
+										code={JSON.stringify(log.metadata, null, 2)}
+										lang="json"
+										label="Metadata"
+									/>
+								</div>
+							) : (
+								<Section title="Metadata" icon="code">
 									<div className="py-3 text-center text-text-soft-400 text-xs">
 										No metadata
 									</div>
-								)}
-							</Section>
+								</Section>
+							)}
 						</>
 					) : null}
 				</Drawer.Body>
