@@ -1,7 +1,5 @@
 "use client";
 
-import { PageSizeDropdown } from "@fe/dashboard/components/page-size-dropdown";
-import { PaginationControls } from "@fe/dashboard/components/pagination-controls";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { cn } from "@reloop/ui/cn";
 import * as Button from "@reloop/ui/button";
@@ -310,32 +308,18 @@ export const LogList = () => {
 								setSelectedLogId(logId);
 							}
 						}}
+						total={totalLogs}
+						currentPage={currentPage}
+						pageSize={pageSize}
+						totalPages={totalPages}
+						startIndex={startIndex}
+						endIndex={endIndex}
+						onPageChange={setCurrentPage}
+						onPageSizeChange={(value) => {
+							setPageSize(value);
+							setCurrentPage(1);
+						}}
 					/>
-
-					{/* Pagination */}
-					{data && totalLogs > 0 && (
-						<div className="flex items-center justify-between pb-8 text-paragraph-sm text-text-sub-600">
-							<div className="flex items-center gap-3">
-								<span>
-									Showing {startIndex}–{endIndex} of {totalLogs} log
-									{totalLogs !== 1 ? "s" : ""}
-								</span>
-								<PageSizeDropdown
-									value={pageSize}
-									onValueChange={(value) => {
-										setPageSize(value);
-										setCurrentPage(1);
-									}}
-								/>
-							</div>
-							<PaginationControls
-								currentPage={currentPage}
-								totalPages={totalPages}
-								onPageChange={setCurrentPage}
-								isLoading={isLoading}
-							/>
-						</div>
-					)}
 				</div>
 
 				{/* RIGHT — Inline detail panel (always visible) */}

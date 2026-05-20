@@ -1,5 +1,7 @@
 "use client";
 
+import { PageSizeDropdown } from "@fe/dashboard/components/page-size-dropdown";
+import { PaginationControls } from "@fe/dashboard/components/pagination-controls";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
@@ -18,7 +20,19 @@ interface LogTableProps {
 	loadingRows?: number;
 	selectedLogId?: string | null;
 	onRowClick?: (logId: string) => void;
+	/** Pagination */
+	total?: number;
+	currentPage?: number;
+	pageSize?: number;
+	totalPages?: number;
+	startIndex?: number;
+	endIndex?: number;
+	onPageChange?: (page: number) => void;
+	onPageSizeChange?: (size: number) => void;
 }
+
+/** Grid template used for the header and every row */
+const GRID_COLS = "grid-cols-[70px_50px_minmax(0,1fr)_90px]";
 
 /** Returns Stripe-style status badge classes */
 const getStatusBadge = (statusCode: number | null | undefined) => {
@@ -93,8 +107,9 @@ const groupLogsByDate = (logs: LogData[]) => {
 
 	for (const log of logs) {
 		const key = getDateKey(log.created_at);
-		if (seen.has(key)) {
-			groups[seen.get(key)!].logs.push(log);
+		const existingIdx = seen.get(key);
+		if (existingIdx !== undefined) {
+			groups[existingIdx]?.logs.push(log);
 		} else {
 			seen.set(key, groups.length);
 			groups.push({
@@ -107,10 +122,20 @@ const groupLogsByDate = (logs: LogData[]) => {
 	return groups;
 };
 
+/** Strip protocol + host from a URL, keeping only the path */
+const stripBasePath = (url: string) => {
+	try {
+		return new URL(url).pathname;
+	} catch {
+		return url;
+	}
+};
+
 /** Extract method and endpoint from a log event + requestDetails */
 const getMethodAndEndpoint = (log: LogData & { requestDetails?: Record<string, unknown> }) => {
 	const method = (log.requestDetails?.method as string) || "";
-	const endpoint = (log.requestDetails?.endpoint as string) || log.event || "";
+	const rawEndpoint = (log.requestDetails?.endpoint as string) || log.event || "";
+	const endpoint = stripBasePath(rawEndpoint);
 	return { method, endpoint };
 };
 
@@ -120,111 +145,143 @@ export const LogTable = ({
 	loadingRows = 5,
 	selectedLogId,
 	onRowClick,
-}: LogTableProps & { selectedLogId?: string | null }) => {
-	if (isLoading) {
-		return (
-			<div className="w-full divide-y divide-stroke-soft-100 rounded-xl border border-stroke-soft-100 dark:divide-stroke-soft-100/40 dark:border-stroke-soft-100/40">
-				{Array.from({ length: loadingRows }).map((_, i) => (
-					<div
-						key={`skel-${i}`}
-						className="flex items-center gap-3 border-l-2 border-l-transparent px-4 py-2.5"
-					>
-						<Skeleton className="h-5 w-14 rounded-md flex-shrink-0" />
-						<Skeleton className="h-4 w-10 rounded flex-shrink-0" />
-						<Skeleton className="h-4 w-48 rounded flex-1" />
-						<Skeleton className="h-4 w-20 rounded ml-auto flex-shrink-0" />
-					</div>
-				))}
-			</div>
-		);
-	}
-
-	if (logs.length === 0) {
-		return (
-			<div className="flex h-48 flex-col items-center justify-center gap-2 rounded-xl border border-stroke-soft-100 text-text-sub-600 dark:border-stroke-soft-100/40">
-				<Icon name="inbox" className="h-8 w-8 text-text-disabled-300" />
-				<p className="text-sm">No logs found</p>
-				<p className="text-xs text-text-soft-400">
-					Try adjusting your filters or time range
-				</p>
-			</div>
-		);
-	}
-
-	const groups = groupLogsByDate(logs as any);
-
+	total = 0,
+	currentPage = 1,
+	pageSize = 25,
+	totalPages = 1,
+	startIndex = 1,
+	endIndex = 0,
+	onPageChange,
+	onPageSizeChange,
+}: LogTableProps) => {
 	return (
-		<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/40">
-			{groups.map((group) => (
-				<div key={group.dateKey}>
-					{/* Date separator */}
-					<div className="flex items-center gap-3 border-b border-stroke-soft-100 bg-bg-weak-50/70 px-4 py-1.5 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/20">
-						<span className="font-medium text-[10px] tracking-widest text-text-soft-400 uppercase">
-							{group.dateLabel}
-						</span>
+		<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/40">
+
+			{/* Table Body */}
+			<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
+				{isLoading ? (
+					Array.from({ length: loadingRows }).map((_, i) => (
+						<div
+							key={`skel-${i}`}
+							className={cn(
+								"grid items-center border-l-2 border-l-transparent px-4 py-2.5",
+								GRID_COLS,
+							)}
+						>
+							<Skeleton className="h-5 w-14 rounded-md" />
+							<Skeleton className="h-4 w-10 rounded" />
+							<Skeleton className="h-4 w-full max-w-[280px] rounded" />
+							<Skeleton className="ml-auto h-4 w-20 rounded" />
+						</div>
+					))
+				) : logs.length === 0 ? (
+					<div className="flex h-48 flex-col items-center justify-center gap-2 text-text-sub-600">
+						<Icon name="inbox" className="h-8 w-8 text-text-disabled-300" />
+						<p className="text-sm">No logs found</p>
+						<p className="text-xs text-text-soft-400">
+							Try adjusting your filters or time range
+						</p>
 					</div>
+				) : (
+					groupLogsByDate(logs as any).map((group) => (
+						<div key={group.dateKey}>
+							{/* Date separator */}
+							<div className="flex items-center gap-3 border-b border-stroke-soft-100 bg-bg-weak-50/70 px-4 py-1.5 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/20">
+								<span className="font-medium text-[10px] tracking-widest text-text-soft-400 uppercase">
+									{group.dateLabel}
+								</span>
+							</div>
 
-					{/* Log rows */}
-					<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/40">
-						{group.logs.map((log) => {
-							const logAny = log as any;
-							const { method, endpoint } = getMethodAndEndpoint(logAny);
-							const statusBadge = getStatusBadge(log.status_code);
-							const isSelected = selectedLogId === log.uuid;
+							{/* Log rows */}
+							<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/40">
+								{group.logs.map((log) => {
+									const logAny = log as any;
+									const { method, endpoint } = getMethodAndEndpoint(logAny);
+									const statusBadge = getStatusBadge(log.status_code);
+									const isSelected = selectedLogId === log.uuid;
 
-							return (
-								<button
-									key={log.uuid}
-									type="button"
-									onClick={() => onRowClick?.(log.uuid)}
-									className={cn(
-										"group flex w-full cursor-pointer items-center gap-3 px-4 py-2.5 text-left text-paragraph-sm transition-colors",
-										getSelectedBorderClass(log.status_code, isSelected),
-										isSelected
-											? "bg-bg-weak-50/80 dark:bg-bg-weak-50/30"
-											: "hover:bg-bg-weak-50/50 dark:hover:bg-bg-weak-50/10",
-										"focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-base focus-visible:ring-inset",
-									)}
-								>
-									{/* Status badge */}
-									<span
-										className={cn(
-											"inline-flex w-[70px] flex-shrink-0 items-center justify-center rounded-md px-2 py-0.5 font-semibold text-[11px] tabular-nums",
-											statusBadge
-												? statusBadge.className
-												: "bg-neutral-alpha-10 text-text-sub-600",
-										)}
-									>
-										{statusBadge ? statusBadge.label : "—"}
-									</span>
-
-									{/* Method */}
-									{method && (
-										<span
+									return (
+										<button
+											key={log.uuid}
+											type="button"
+											onClick={() => onRowClick?.(log.uuid)}
 											className={cn(
-												"w-12 flex-shrink-0 font-semibold text-[11px] uppercase tracking-wide",
-												getMethodBadgeClass(method),
+												"group/row grid w-full cursor-pointer items-center px-4 py-2 text-left transition-colors",
+												GRID_COLS,
+												getSelectedBorderClass(log.status_code, isSelected),
+												isSelected
+													? "bg-bg-weak-50/80 dark:bg-bg-weak-50/30"
+													: "hover:bg-bg-weak-50/50 dark:hover:bg-bg-weak-50/10",
+												"focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-base focus-visible:ring-inset",
 											)}
 										>
-											{method}
-										</span>
-									)}
+											{/* Status badge */}
+											<span
+												className={cn(
+													"inline-flex w-[52px] flex-shrink-0 items-center justify-center rounded-md px-2 py-0.5 font-semibold text-[11px] tabular-nums",
+													statusBadge
+														? statusBadge.className
+														: "bg-neutral-alpha-10 text-text-sub-600",
+												)}
+											>
+												{statusBadge ? statusBadge.label : "—"}
+											</span>
 
-									{/* Endpoint / Event */}
-									<span className="flex-1 truncate font-mono text-xs text-text-strong-950">
-										{endpoint || log.event}
-									</span>
+											{/* Method */}
+											<span
+												className={cn(
+													"flex-shrink-0 font-semibold text-[11px] uppercase tracking-wide",
+													method
+														? getMethodBadgeClass(method)
+														: "text-text-soft-400",
+												)}
+											>
+												{method || "—"}
+											</span>
 
-									{/* Time */}
-									<span className="ml-auto flex-shrink-0 text-xs text-text-sub-600 tabular-nums">
-										{formatTime(log.created_at)}
-									</span>
-								</button>
-							);
-						})}
+											{/* Endpoint / Event */}
+											<span className="truncate font-mono text-xs text-text-strong-950">
+												{endpoint || log.event}
+											</span>
+
+											{/* Time */}
+											<span className="text-right flex-shrink-0 text-xs text-text-sub-600 tabular-nums">
+												{formatTime(log.created_at)}
+											</span>
+										</button>
+									);
+								})}
+							</div>
+						</div>
+					))
+				)}
+			</div>
+
+			{/* Pagination — inside table card, matching domain-table */}
+			{total > 0 && (
+				<div className="flex items-center justify-between border-stroke-soft-100 border-t px-4 py-2 text-label-xs text-text-sub-600 dark:border-stroke-soft-100/40">
+					<div className="flex items-center">
+						<span>
+							Showing {startIndex}–{endIndex} of {total} log
+							{total !== 1 ? "s" : ""}
+						</span>
+						{onPageSizeChange && (
+							<PageSizeDropdown
+								value={pageSize}
+								onValueChange={(value) => onPageSizeChange(value)}
+							/>
+						)}
 					</div>
+					{onPageChange && (
+						<PaginationControls
+							currentPage={currentPage}
+							totalPages={totalPages}
+							onPageChange={onPageChange}
+							isLoading={isLoading}
+						/>
+					)}
 				</div>
-			))}
+			)}
 		</div>
 	);
 };

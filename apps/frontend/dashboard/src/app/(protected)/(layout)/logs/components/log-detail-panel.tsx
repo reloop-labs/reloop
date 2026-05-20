@@ -91,6 +91,15 @@ const getMethodBadgeClasses = (method: string) => {
 	}
 };
 
+/** Strip protocol + host from a URL, keeping only the path */
+const stripBasePath = (url: string) => {
+	try {
+		return new URL(url).pathname;
+	} catch {
+		return url;
+	}
+};
+
 function CopyButton({ value, label }: { value: string; label?: string }) {
 	const [copied, setCopied] = useState(false);
 
@@ -225,7 +234,8 @@ export const LogDetailPanel = ({ logId }: LogDetailPanelProps) => {
 
 	const method = log.requestDetails?.method as string | undefined;
 	const endpoint = log.requestDetails?.endpoint as string | undefined;
-	const title = method && endpoint ? `${method} ${endpoint}` : log.event;
+	const displayEndpoint = endpoint ? stripBasePath(endpoint) : undefined;
+	const title = method && displayEndpoint ? `${method} ${displayEndpoint}` : log.event;
 
 	return (
 		<div className="flex h-full flex-col overflow-y-auto">
@@ -349,7 +359,7 @@ export const LogDetailPanel = ({ logId }: LogDetailPanelProps) => {
 						{hasRequestDetails && log.requestDetails.endpoint && (
 							<PropertyRow label="Endpoint">
 								<PropertyValue
-									value={log.requestDetails.endpoint as string}
+									value={stripBasePath(log.requestDetails.endpoint as string)}
 									mono
 									maxLength={50}
 								/>
