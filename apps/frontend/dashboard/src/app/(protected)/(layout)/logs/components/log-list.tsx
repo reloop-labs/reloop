@@ -3,6 +3,7 @@
 import { PageSizeDropdown } from "@fe/dashboard/components/page-size-dropdown";
 import { PaginationControls } from "@fe/dashboard/components/pagination-controls";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
+import { cn } from "@reloop/ui/cn";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
@@ -10,15 +11,19 @@ import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
 import useSWR from "swr";
 import { DateRangeFilter } from "./date-range-filter";
+import { LogDetailPanel } from "./log-detail-panel";
 import { LogDrawer } from "./log-drawer";
 import { LogFilterDropdown, type LogFilters } from "./log-filter-dropdown";
 import { LogTable } from "./log-table";
 import { StatusFilterDropdown } from "./status-filter-dropdown";
+import { DocsButton } from "./docs-button";
+import { LogsApiDetails } from "./logs-api-details";
 
 interface LogData {
 	uuid: string;
 	event: string;
 	level: string;
+	status_code?: number | null;
 	created_at: string;
 	trace_id?: string | null;
 	metadata?: Record<string, unknown>;
@@ -39,45 +44,27 @@ interface LogListResponse {
 	stats?: LevelStats;
 }
 
-const SummaryCard = ({
-	label,
-	count,
-	icon,
-	isLoading,
-}: {
-	label: string;
-	count?: number;
-	icon: string;
-	isLoading: boolean;
-}) => (
-	<div className="flex items-center gap-3 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 py-3 dark:border-stroke-soft-100/50">
-		<div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-bg-weak-50">
-			<Icon name={icon as any} className="h-4 w-4 text-text-sub-600" />
-		</div>
-		<div className="flex flex-col">
-			<p className="text-text-sub-600 text-xs">{label}</p>
-			{isLoading ? (
-				<div className="mt-0.5 h-5 w-12 animate-pulse rounded bg-bg-weak-50" />
-			) : (
-				<p className="font-semibold text-sm text-text-strong-950">
-					{count?.toLocaleString() || 0}
-				</p>
-			)}
-		</div>
-	</div>
-);
+/** Outcome tab type */
+type OutcomeTab = "all" | "succeeded" | "failed";
+
+const OUTCOME_TABS: { id: OutcomeTab; label: string }[] = [
+	{ id: "all", label: "All" },
+	{ id: "succeeded", label: "Succeeded" },
+	{ id: "failed", label: "Failed" },
+];
 
 export const LogList = () => {
 	const { activeOrganization } = useUserOrganization();
 	const [searchQuery, setSearchQuery] = useState<string>("");
 	const [filters, setFilters] = useState<LogFilters>([]);
+	const [outcomeTab, setOutcomeTab] = useState<OutcomeTab>("all");
 	const [currentPage, setCurrentPage] = useQueryState(
 		"page",
 		parseAsInteger.withDefault(1),
 	);
 	const [pageSize, setPageSize] = useQueryState(
 		"limit",
-		parseAsInteger.withDefault(10),
+		parseAsInteger.withDefault(25),
 	);
 	const [startDate, setStartDate] = useQueryState(
 		"start_date",
@@ -96,18 +83,20 @@ export const LogList = () => {
 		parseAsString.withDefault(""),
 	);
 
-	// Drawer state
-	const [drawerLogId, setDrawerLogId] = useState<string | null>(null);
-	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+	// Selected log for the inline detail panel
+	const [selectedLogId, setSelectedLogId] = useState<string | null>(null);
 
-	// Convert filters array to level filter string for API
+	// Mobile drawer state (for narrow viewports)
+	const [drawerOpen, setDrawerOpen] = useState(false);
+
+	// Level filter string for API
 	const levelFilter = useMemo(() => {
 		if (filters.length === 0 || filters.length === 5) return "";
 		if (filters.length === 1) return filters[0];
 		return "";
 	}, [filters]);
 
-	// Build API URL with all filters
+	// Build API URL
 	const buildApiUrl = () => {
 		if (!activeOrganization?.id) return null;
 
@@ -119,7 +108,15 @@ export const LogList = () => {
 		if (levelFilter) params.set("level", levelFilter);
 		if (startDate) params.set("start_date", startDate);
 		if (endDate) params.set("end_date", endDate);
-		if (statusCode) params.set("status_code", statusCode);
+
+		// Map outcome tab → status code filter
+		if (outcomeTab === "succeeded" && !statusCode) {
+			params.set("status_code", "successes");
+		} else if (outcomeTab === "failed" && !statusCode) {
+			params.set("status_code", "errors");
+		} else if (statusCode) {
+			params.set("status_code", statusCode);
+		}
 
 		return `/api/logs/v1/list?${params.toString()}`;
 	};
@@ -145,37 +142,54 @@ export const LogList = () => {
 		setCurrentPage(1);
 	};
 
+	const handleClearAll = () => {
+		setSearchQuery("");
+		setFilters([]);
+		setStatusCode("");
+		setStartDate("");
+		setEndDate("");
+		setDatePreset("");
+		setOutcomeTab("all");
+		setCurrentPage(1);
+	};
+
+	const hasAnyFilter =
+		searchQuery ||
+		filters.length > 0 ||
+		statusCode ||
+		startDate ||
+		endDate ||
+		outcomeTab !== "all";
+
 	const handleDownloadCSV = async () => {
 		if (!data?.logs || data.logs.length === 0) return;
-
 		try {
-			const headers = ["Timestamp", "Event", "Level"];
+			const headers = ["Timestamp", "Event", "Level", "Status"];
 			const csvRows = data.logs.map((log) => [
 				new Date(log.created_at).toISOString(),
 				log.event,
 				log.level,
+				String(log.status_code || ""),
 			]);
-
 			const csvContent = [
 				headers.join(","),
 				...csvRows.map((row) => row.map((cell) => `"${cell}"`).join(",")),
 			].join("\n");
-
 			const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
 			const link = document.createElement("a");
 			link.href = URL.createObjectURL(blob);
 			link.download = `logs_${new Date().toISOString().split("T")[0]}.csv`;
 			link.click();
 			URL.revokeObjectURL(link.href);
-		} catch (error) {
-			console.error("Failed to download CSV:", error);
+		} catch (err) {
+			console.error("Failed to download CSV:", err);
 		}
 	};
 
 	if (error) {
 		return (
-			<div className="flex flex-col items-center justify-center gap-2 p-4">
-				<Icon name="alert-circle" className="h-8 w-8 text-red-500" />
+			<div className="flex flex-col items-center justify-center gap-2 p-8">
+				<Icon name="alert-circle" className="h-8 w-8 text-error-base" />
 				<p className="text-center text-sm text-text-sub-600">
 					Failed to load logs
 				</p>
@@ -184,37 +198,50 @@ export const LogList = () => {
 	}
 
 	return (
-		<div>
-			{/* Summary Cards */}
-			<div className="mb-4 grid grid-cols-3 gap-3">
-				<SummaryCard
-					label="Total Logs"
-					icon="file-text"
-					count={totalLogs}
-					isLoading={isLoading}
-				/>
-				<SummaryCard
-					label="Errors"
-					icon="alert-triangle"
-					count={(data?.stats?.error || 0) + (data?.stats?.fatal || 0)}
-					isLoading={isLoading}
-				/>
-				<SummaryCard
-					label="Warnings"
-					icon="info-outline"
-					count={data?.stats?.warn}
-					isLoading={isLoading}
-				/>
+		<div className="flex min-h-0 flex-col">
+			{/* ── Page Header ── */}
+			<div className="flex items-center justify-between py-6">
+				<h1 className="font-semibold text-xl text-text-strong-950">Logs</h1>
+				<div className="flex items-center gap-2">
+					<DocsButton size="xsmall" mode="stroke" />
+					<LogsApiDetails size="xsmall" mode="ghost" />
+				</div>
 			</div>
 
-			{/* Search + Filter + CSV toolbar */}
-			<div className="flex items-center gap-3">
-				<div className="flex-1">
+			{/* ── Outcome Tabs ── */}
+			<div className="flex border-b border-stroke-soft-100 dark:border-stroke-soft-100/40">
+				{OUTCOME_TABS.map((tab) => (
+					<button
+						key={tab.id}
+						type="button"
+						onClick={() => {
+							setOutcomeTab(tab.id);
+							setCurrentPage(1);
+						}}
+						className={cn(
+							"relative flex min-w-[120px] items-center justify-center px-6 py-3 text-sm font-medium transition-colors",
+							outcomeTab === tab.id
+								? "text-text-strong-950"
+								: "text-text-sub-600 hover:text-text-strong-950",
+						)}
+					>
+						{tab.label}
+						{outcomeTab === tab.id && (
+							<span className="absolute bottom-0 left-0 right-0 h-[2px] rounded-t-full bg-primary-base" />
+						)}
+					</button>
+				))}
+			</div>
+
+			{/* ── Filter Bar ── */}
+			<div className="flex flex-wrap items-center gap-2 border-b border-stroke-soft-100 px-0 py-3 dark:border-stroke-soft-100/40">
+				{/* Search */}
+				<div className="w-48">
 					<Input.Root size="xsmall">
 						<Input.Wrapper>
 							<Input.Icon as={Icon} name="search" size="xsmall" />
 							<Input.Input
-								placeholder="Search events..."
+								placeholder="Filter by resource ID..."
 								value={searchQuery}
 								onChange={(e) => {
 									setSearchQuery(e.target.value);
@@ -225,6 +252,7 @@ export const LogList = () => {
 					</Input.Root>
 				</div>
 
+				{/* Date */}
 				<DateRangeFilter
 					startDate={startDate || null}
 					endDate={endDate || null}
@@ -232,6 +260,7 @@ export const LogList = () => {
 					onDateChange={handleDateChange}
 				/>
 
+				{/* Status */}
 				<StatusFilterDropdown
 					value={statusCode ? statusCode.split(",") : []}
 					onChange={(val: string[]) => {
@@ -240,8 +269,10 @@ export const LogList = () => {
 					}}
 				/>
 
+				{/* Level */}
 				<LogFilterDropdown value={filters} onChange={setFilters} />
 
+				{/* Export CSV */}
 				<Button.Root
 					variant="neutral"
 					mode="stroke"
@@ -252,55 +283,90 @@ export const LogList = () => {
 				>
 					<Icon name="file-download" className="h-4 w-4" />
 				</Button.Root>
+
+				{/* Clear all */}
+				{hasAnyFilter && (
+					<button
+						type="button"
+						onClick={handleClearAll}
+						className="ml-auto text-xs text-text-sub-600 transition-colors hover:text-text-strong-950"
+					>
+						Clear all
+					</button>
+				)}
 			</div>
 
-			{/* Table */}
-			<div className="mt-4">
-				<LogTable
-					logs={data?.logs || []}
-					isLoading={isLoading}
-					loadingRows={pageSize}
-					onRowClick={(logId) => {
-						setDrawerLogId(logId);
-						setIsDrawerOpen(true);
-					}}
-				/>
+			{/* ── Split Panel ── */}
+			<div
+				className={cn(
+					"mt-4 flex min-h-0 flex-1 gap-4",
+					selectedLogId ? "items-start" : "",
+				)}
+			>
+				{/* LEFT — Log list */}
+				<div
+					className={cn(
+						"flex min-w-0 flex-col gap-4 transition-all duration-300",
+						selectedLogId ? "w-[480px] flex-shrink-0" : "flex-1",
+					)}
+				>
+					<LogTable
+						logs={data?.logs || []}
+						isLoading={isLoading}
+						loadingRows={pageSize}
+						selectedLogId={selectedLogId}
+						onRowClick={(logId) => {
+							if (selectedLogId === logId) {
+								setSelectedLogId(null);
+							} else {
+								setSelectedLogId(logId);
+							}
+						}}
+					/>
+
+					{/* Pagination */}
+					{data && totalLogs > 0 && (
+						<div className="flex items-center justify-between pb-8 text-paragraph-sm text-text-sub-600">
+							<div className="flex items-center gap-3">
+								<span>
+									Showing {startIndex}–{endIndex} of {totalLogs} log
+									{totalLogs !== 1 ? "s" : ""}
+								</span>
+								<PageSizeDropdown
+									value={pageSize}
+									onValueChange={(value) => {
+										setPageSize(value);
+										setCurrentPage(1);
+									}}
+								/>
+							</div>
+							<PaginationControls
+								currentPage={currentPage}
+								totalPages={totalPages}
+								onPageChange={setCurrentPage}
+								isLoading={isLoading}
+							/>
+						</div>
+					)}
+				</div>
+
+				{/* RIGHT — Inline detail panel */}
+				{selectedLogId && (
+					<div className="min-h-[500px] flex-1 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
+						<LogDetailPanel logId={selectedLogId} />
+					</div>
+				)}
 			</div>
 
-			{/* Log Drawer */}
+			{/* Mobile drawer (only visible on narrow screens) */}
 			<LogDrawer
-				logId={drawerLogId}
-				isOpen={isDrawerOpen}
+				logId={drawerOpen ? selectedLogId : null}
+				isOpen={drawerOpen}
 				onOpenChange={(open) => {
-					setIsDrawerOpen(open);
-					if (!open) setDrawerLogId(null);
+					setDrawerOpen(open);
+					if (!open) setSelectedLogId(null);
 				}}
 			/>
-
-			{/* Pagination */}
-			{data && totalLogs > 0 && (
-				<div className="mt-4 flex items-center justify-between pb-8 text-paragraph-sm text-text-sub-600">
-					<div className="flex items-center gap-3">
-						<span>
-							Showing {startIndex}–{endIndex} of {totalLogs} log
-							{totalLogs !== 1 ? "s" : ""}
-						</span>
-						<PageSizeDropdown
-							value={pageSize}
-							onValueChange={(value) => {
-								setPageSize(value);
-								setCurrentPage(1);
-							}}
-						/>
-					</div>
-					<PaginationControls
-						currentPage={currentPage}
-						totalPages={totalPages}
-						onPageChange={setCurrentPage}
-						isLoading={isLoading}
-					/>
-				</div>
-			)}
 		</div>
 	);
 };
