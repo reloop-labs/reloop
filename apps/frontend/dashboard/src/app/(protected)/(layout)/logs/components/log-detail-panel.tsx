@@ -93,19 +93,19 @@ const getStatusProps = (statusCode: number | null | undefined) => {
 	return { label, color };
 };
 
-const getMethodBadgeClasses = (method: string) => {
+const getMethodColorClass = (method: string) => {
 	switch (method?.toUpperCase()) {
 		case "GET":
-			return "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400";
+			return "text-emerald-700 dark:text-emerald-400";
 		case "POST":
-			return "bg-blue-500/10 text-blue-700 dark:text-blue-400";
+			return "text-blue-700 dark:text-blue-400";
 		case "PUT":
 		case "PATCH":
-			return "bg-amber-500/10 text-amber-700 dark:text-amber-400";
+			return "text-amber-700 dark:text-amber-400";
 		case "DELETE":
-			return "bg-rose-500/10 text-rose-700 dark:text-rose-400";
+			return "text-rose-700 dark:text-rose-400";
 		default:
-			return "bg-neutral-alpha-10 text-text-sub-600";
+			return "text-text-sub-600";
 	}
 };
 
@@ -253,8 +253,6 @@ export const LogDetailPanel = ({ logId }: LogDetailPanelProps) => {
 	const method = log.requestDetails?.method as string | undefined;
 	const endpoint = log.requestDetails?.endpoint as string | undefined;
 	const displayEndpoint = endpoint ? stripBasePath(endpoint) : undefined;
-	const title =
-		method && displayEndpoint ? `${method} ${displayEndpoint}` : log.event;
 
 	return (
 		<div className="flex flex-col">
@@ -262,7 +260,21 @@ export const LogDetailPanel = ({ logId }: LogDetailPanelProps) => {
 			<div className="flex items-start justify-between gap-3 px-5 pt-4">
 				<div className="min-w-0 flex-1">
 					<h2 className="truncate font-semibold text-sm text-text-strong-950">
-						{title}
+						{method && displayEndpoint ? (
+							<>
+								<span
+									className={cn(
+										"mr-1.5 font-bold uppercase",
+										getMethodColorClass(method),
+									)}
+								>
+									{method}
+								</span>
+								<span>{displayEndpoint}</span>
+							</>
+						) : (
+							log.event
+						)}
 					</h2>
 					<div className="mt-1 flex items-center gap-2 text-text-sub-600 text-xs">
 						<span>{new Date(log.created_at).toLocaleString()}</span>
