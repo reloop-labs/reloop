@@ -54,7 +54,11 @@ export const agentCardRoute = new Elysia().get("/agent-card.json", () => ({
 			path: "/api/webhook/v1/trigger",
 			tags: ["webhook"],
 			inputSchema: {
-				event: { type: "string", required: true, description: "Event type to trigger" },
+				event: {
+					type: "string",
+					required: true,
+					description: "Event type to trigger",
+				},
 				payload: {
 					type: "object",
 					required: true,

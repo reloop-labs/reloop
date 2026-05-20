@@ -1,8 +1,8 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
+import { WebhookErrors } from "@reloop/webhook/error/webhook.error-response";
 import type { WebhookEventName } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
-import { status } from "elysia";
 import { log } from "evlog";
 import type { WebhookTypes } from "../webhook.type";
 
@@ -30,7 +30,7 @@ export async function getWebhookController({
 		});
 
 		if (!webhook) {
-			throw status(404, { message: "Webhook not found" });
+			throw WebhookErrors.notFound(webhookId);
 		}
 
 		return {

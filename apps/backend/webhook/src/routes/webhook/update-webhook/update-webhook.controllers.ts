@@ -1,8 +1,8 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
+import { WebhookErrors } from "@reloop/webhook/error/webhook.error-response";
 import type { WebhookEventName } from "@reloop/webhook-events";
 import { and, eq, isNull, ne } from "drizzle-orm";
-import { status } from "elysia";
 import { log } from "evlog";
 import type { WebhookTypes } from "../webhook.type";
 
@@ -30,7 +30,7 @@ export async function updateWebhookController({
 		});
 
 		if (!existingWebhook) {
-			throw status(404, { message: "Webhook not found" });
+			throw WebhookErrors.notFound(webhookId);
 		}
 
 		const nameToUpdate = body.description ?? body.name;
@@ -49,7 +49,7 @@ export async function updateWebhookController({
 				.limit(1);
 
 			if (nameConflict[0]) {
-				throw status(409, { message: "Webhook name already exists" });
+				throw WebhookErrors.alreadyExists();
 			}
 		}
 
@@ -93,7 +93,7 @@ export async function updateWebhookController({
 			.returning();
 
 		if (!updatedWebhook) {
-			throw status(500, { message: "Failed to update webhook" });
+			throw WebhookErrors.updateFailed(webhookId);
 		}
 
 		const updatedWebhookWithSubs = await db.query.webhook.findFirst({
@@ -109,7 +109,7 @@ export async function updateWebhookController({
 		});
 
 		if (!updatedWebhookWithSubs) {
-			throw status(500, { message: "Failed to fetch updated webhook" });
+			throw WebhookErrors.updateFailed(webhookId);
 		}
 
 		return {

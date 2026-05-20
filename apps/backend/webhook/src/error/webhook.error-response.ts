@@ -1,5 +1,3 @@
-import { errorCodes } from "@reloop/webhook/error/webhook.error-code";
-import { status } from "elysia";
 import { createError } from "evlog";
 
 export const AuthErrors = {
@@ -69,35 +67,4 @@ export const WebhookErrors = {
 			why: message,
 			fix: "Please try again later or contact support.",
 		}),
-};
-
-export const webhookErrorResponse = (errorMessage: string) => {
-	if (errorMessage.includes("Webhook not found")) {
-		return status(404, {
-			message: "Webhook not found",
-			errorCode: errorCodes.WEBHOOK_NOT_FOUND,
-		});
-	}
-	if (errorMessage.includes("Webhook name already exists")) {
-		return status(409, {
-			message: "Webhook name already exists",
-			errorCode: errorCodes.WEBHOOK_ALREADY_EXISTS,
-		});
-	}
-	if (errorMessage.includes("Invalid webhook URL format")) {
-		return status(400, {
-			message: "Invalid webhook URL format",
-			errorCode: errorCodes.WEBHOOK_INVALID_URL,
-		});
-	}
-	if (errorMessage.includes("Unauthorized access") || errorMessage.includes("Unauthorized")) {
-		return status(401, {
-			message: "Unauthorized access",
-			errorCode: errorCodes.UNAUTHORIZED,
-		});
-	}
-	return status(500, {
-		message: "Internal server error",
-		errorCode: errorCodes.INTERNAL_SERVER_ERROR,
-	});
 };
