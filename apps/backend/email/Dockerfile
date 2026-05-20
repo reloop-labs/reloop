@@ -31,6 +31,6 @@ COPY --from=builder /app/package.json ./package.json
 
 WORKDIR /app/apps/backend/email
 
-EXPOSE 3005
+EXPOSE 8022
 
 CMD ["bun", "run", "start"]
