@@ -7,6 +7,7 @@ import { Icon } from "@reloop/ui/icon";
 import { KbdEsc } from "@reloop/ui/kbd-esc";
 import * as Modal from "@reloop/ui/modal";
 import * as Tooltip from "@reloop/ui/tooltip";
+import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
 import { useCurrentEditor } from "@tiptap/react";
 import {
 	CheckCircle2,
@@ -252,7 +253,7 @@ export function VersionSidebar() {
 	// --- Collapsed state: narrow icon strip ---
 	if (!isExpanded) {
 		return (
-			<div className="m-2 flex h-[calc(100vh-79px)] w-12 shrink-0 flex-col items-center gap-1 rounded-[18px] border border-stroke-soft-200 bg-bg-weak-50 py-4 shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
+			<div className="m-2 h-[calc(100vh-79px)] w-12 shrink-0 flex-col items-center gap-1 rounded-[18px] border border-stroke-soft-200 bg-bg-weak-50 py-4 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a] flex">
 				<Tooltip.Root>
 					<Tooltip.Trigger asChild>
 						<Button.Root
@@ -261,11 +262,11 @@ export function VersionSidebar() {
 							mode="ghost"
 							size="xxsmall"
 							onClick={() => setIsExpanded(true)}
-							className="relative size-8 rounded-xl text-text-sub-600 transition-all duration-200 hover:bg-bg-soft-200 dark:text-zinc-400 dark:hover:bg-zinc-800"
+							className="relative size-8 rounded-lg text-text-sub-600 transition-all duration-200 hover:bg-neutral-alpha-10 dark:text-zinc-400 dark:hover:bg-zinc-800"
 						>
 							<Clock size={16} />
 							{(published.length > 0 || drafts.length > 0) && (
-								<span className="-top-1 -right-1 absolute flex h-4 min-w-4 items-center justify-center rounded-full bg-primary-base px-1 font-bold text-[8px] text-white shadow-sm">
+								<span className="-top-0.5 -right-0.5 absolute flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-red-500 font-bold text-[8px] text-white shadow-sm ring-2 ring-white dark:ring-[#0a0a0a]">
 									{published.length + drafts.length}
 								</span>
 							)}
@@ -281,9 +282,9 @@ export function VersionSidebar() {
 
 	// --- Expanded state: full sidebar ---
 	return (
-		<div className="slide-in-from-left-2 m-2 flex h-[calc(100vh-79px)] w-72 shrink-0 animate-in flex-col overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-weak-50 shadow-[0_1px_2px_rgba(0,0,0,0.02)] duration-200 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
+		<div className="slide-in-from-left-2 m-2 flex h-[calc(100vh-79px)] w-72 shrink-0 animate-in flex-col overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-weak-50 duration-200 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
 			{/* Header */}
-			<div className="flex items-center justify-between border-stroke-soft-200 border-b bg-bg-weak-50 px-4 py-3.5 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
+			<div className="flex items-center justify-between border-stroke-soft-200 border-b px-4 py-3.5">
 				<div className="flex items-center gap-2">
 					<History size={16} className="text-text-sub-600 dark:text-zinc-400" />
 					<span className="font-bold text-sm text-text-strong-950 dark:text-white">
@@ -303,42 +304,31 @@ export function VersionSidebar() {
 			</div>
 
 			{/* Published / Drafts Tabs */}
-			<div className="flex shrink-0 border-stroke-soft-200 border-b bg-bg-weak-50 p-1 dark:border-stroke-soft-100/40 dark:bg-zinc-900/40">
-				<Button.Root
-					variant="neutral"
-					mode={activeTab === "drafts" ? "lighter" : "ghost"}
-					size="xxsmall"
-					onClick={() => setActiveTab("drafts")}
-					className={cn(
-						"flex flex-1 items-center justify-center gap-1.5 rounded-lg py-1.5 font-semibold text-xs outline-none ring-0 transition-all",
-						activeTab === "drafts"
-							? "bg-white text-text-strong-950 shadow-sm dark:bg-zinc-800 dark:text-white"
-							: "text-text-sub-600 hover:text-text-strong-950 dark:text-zinc-400",
-					)}
-				>
-					<span>Drafts</span>
-					<span className="rounded bg-bg-soft-200 px-1.5 py-0.5 font-bold text-[10px] dark:bg-zinc-900 dark:text-zinc-300">
-						{drafts.length}
-					</span>
-				</Button.Root>
-				<Button.Root
-					variant="neutral"
-					mode={activeTab === "published" ? "lighter" : "ghost"}
-					size="xxsmall"
-					onClick={() => setActiveTab("published")}
-					className={cn(
-						"flex flex-1 items-center justify-center gap-1.5 rounded-lg py-1.5 font-semibold text-xs outline-none ring-0 transition-all",
-						activeTab === "published"
-							? "bg-white text-text-strong-950 shadow-sm dark:bg-zinc-800 dark:text-white"
-							: "text-text-sub-600 hover:text-text-strong-950 dark:text-zinc-400",
-					)}
-				>
-					<span>Published</span>
-					<span className="rounded bg-bg-soft-200 px-1.5 py-0.5 font-bold text-[10px] dark:bg-zinc-900 dark:text-zinc-300">
-						{published.length}
-					</span>
-				</Button.Root>
-			</div>
+			<TabMenuHorizontal.Root
+				value={activeTab}
+				onValueChange={(val) => setActiveTab(val as "drafts" | "published")}
+			>
+				<TabMenuHorizontal.List className="h-10 gap-0 border-stroke-soft-200 border-b py-0 flex w-full bg-bg-weak-50/10 dark:border-stroke-soft-100/30">
+					<TabMenuHorizontal.Trigger
+						value="drafts"
+						className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 px-2.5 py-0 font-semibold text-xs h-10 data-[state=active]:text-text-strong-950 dark:data-[state=active]:text-white transition-all outline-none"
+					>
+						<span>Drafts</span>
+						<span className="rounded bg-bg-soft-200 px-1.5 py-0.5 font-bold text-[10px] dark:bg-zinc-900 dark:text-zinc-300">
+							{drafts.length}
+						</span>
+					</TabMenuHorizontal.Trigger>
+					<TabMenuHorizontal.Trigger
+						value="published"
+						className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 px-2.5 py-0 font-semibold text-xs h-10 data-[state=active]:text-text-strong-950 dark:data-[state=active]:text-white transition-all outline-none"
+					>
+						<span>Published</span>
+						<span className="rounded bg-bg-soft-200 px-1.5 py-0.5 font-bold text-[10px] dark:bg-zinc-900 dark:text-zinc-300">
+							{published.length}
+						</span>
+					</TabMenuHorizontal.Trigger>
+				</TabMenuHorizontal.List>
+			</TabMenuHorizontal.Root>
 
 			{/* Version List */}
 			<div className="hide-scrollbar flex-1 overflow-y-auto">
