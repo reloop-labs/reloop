@@ -26,6 +26,7 @@ ENV HOSTNAME=0.0.0.0
 
 COPY --from=builder /app/apps/backend/email ./apps/backend/email
 COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/packages ./packages
 COPY --from=builder /app/package.json ./package.json
 
 WORKDIR /app/apps/backend/email
