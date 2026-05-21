@@ -5,10 +5,7 @@ import { duplicateTemplateRoute } from "@be/template/routes/template/duplicate-t
 import { getTemplateRoute } from "@be/template/routes/template/get-template/get-template.route";
 import { listTemplatesRoute } from "@be/template/routes/template/list-templates/list-templates.route";
 import { updateTemplateRoute } from "@be/template/routes/template/update-template/update-template.route";
-import { createVersionRoute } from "@be/template/routes/template/version/create-version.route";
-import { deleteVersionRoute } from "@be/template/routes/template/version/delete-version.route";
-import { listVersionsRoute } from "@be/template/routes/template/version/list-versions.route";
-import { restoreVersionRoute } from "@be/template/routes/template/version/restore-version.route";
+import { versionRoutes } from "@be/template/routes/template/version/version.routes";
 import { Elysia } from "elysia";
 
 export const templateRoutes = new Elysia({
@@ -17,10 +14,7 @@ export const templateRoutes = new Elysia({
 })
 	.use(authMiddleware)
 	.use(createTemplateRoute)
-	.use(createVersionRoute)
-	.use(listVersionsRoute)
-	.use(deleteVersionRoute)
-	.use(restoreVersionRoute)
+	.use(versionRoutes)
 	.use(getTemplateRoute)
 	.use(listTemplatesRoute)
 	.use(updateTemplateRoute)

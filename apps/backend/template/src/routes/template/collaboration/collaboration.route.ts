@@ -87,10 +87,7 @@ export const collaborationRoute = new Elysia({
 			const room = rooms.get(roomName);
 			if (!room) return;
 
-			const persistence: YjsPersistence | null =
-				(ws.data as { persistence?: YjsPersistence | null }).persistence ??
-				null;
-			handleMessage(ws.raw, raw, room, persistence);
+			handleMessage(ws.raw, raw, room);
 		},
 
 		close(ws) {
