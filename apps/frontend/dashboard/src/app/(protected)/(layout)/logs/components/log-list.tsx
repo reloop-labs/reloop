@@ -256,7 +256,7 @@ export const LogList = () => {
 			<div className="flex flex-wrap items-center gap-2 px-0 pt-3 pb-2 dark:border-stroke-soft-100/40">
 				{/* Search */}
 				<div className="w-48">
-					<Input.Root size="xsmall">
+					<Input.Root size="xsmall" className="rounded-xl">
 						<Input.Wrapper>
 							<Input.Icon as={Icon} name="search" size="xsmall" />
 							<Input.Input
