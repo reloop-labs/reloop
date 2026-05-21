@@ -34,7 +34,7 @@ export const AdvancedOptions = ({
 					<Input.Wrapper>
 						<Input.Input
 							id="customReturnPath"
-							placeholder="send"
+							placeholder="recive"
 							{...register("customReturnPath")}
 							disabled={isLoading}
 						/>

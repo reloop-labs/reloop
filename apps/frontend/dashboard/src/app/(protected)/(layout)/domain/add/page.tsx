@@ -30,8 +30,8 @@ const AddDomain = () => {
 				domain: "",
 				clickTracking: false,
 				openTracking: false,
-				customReturnPath: "",
-				trackingSubdomain: "",
+				customReturnPath: "recive",
+				trackingSubdomain: "links",
 			},
 		});
 
