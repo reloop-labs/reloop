@@ -22,7 +22,7 @@ const statusFilterOptions: {
 }[] = [
 	{
 		id: null,
-		label: "All Statuses",
+		label: "All Status",
 		icon: "activity",
 		colorClass: "",
 	},

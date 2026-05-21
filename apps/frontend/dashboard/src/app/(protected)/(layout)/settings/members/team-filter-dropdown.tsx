@@ -16,7 +16,7 @@ interface TeamFilterDropdownProps {
 }
 
 const filterOptions: { id: TeamFilterValue; label: string }[] = [
-	{ id: "all", label: "All Statuses" },
+	{ id: "all", label: "All Status" },
 	{ id: "active", label: "Active" },
 	{ id: "suspended", label: "Suspended" },
 	{ id: "invited", label: "Invited" },

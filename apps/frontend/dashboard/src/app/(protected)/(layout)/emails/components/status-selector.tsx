@@ -108,7 +108,7 @@ export const StatusSelector = ({ value, onChange }: StatusSelectorProps) => {
 								<div className="h-1.5 w-1.5 rounded-full border border-text-strong-950" />
 							</div>
 							<span className={cn(value === "" && "font-medium")}>
-								All Statuses
+								All Status
 							</span>
 						</div>
 						{value === "" && (

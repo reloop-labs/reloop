@@ -71,8 +71,14 @@ export const LogList = () => {
 	const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 
-	const [searchQuery, setSearchQuery] = useState<string>("");
-	const [outcomeTab, setOutcomeTab] = useState<OutcomeTab>("all");
+	const [searchQuery, setSearchQuery] = useQueryState(
+		"search",
+		parseAsString.withDefault(""),
+	);
+	const [outcomeTab, setOutcomeTab] = useQueryState(
+		"outcome",
+		parseAsString.withDefault("all"),
+	);
 	const [currentPage, setCurrentPage] = useQueryState(
 		"page",
 		parseAsInteger.withDefault(1),
@@ -99,7 +105,10 @@ export const LogList = () => {
 	);
 
 	// Selected log for the inline detail panel
-	const [selectedLogId, setSelectedLogId] = useState<string | null>(null);
+	const [selectedLogId, setSelectedLogId] = useQueryState(
+		"log",
+		parseAsString.withDefault(""),
+	);
 
 	const activeIdx = OUTCOME_TABS.findIndex((tab) => tab.id === outcomeTab);
 	const activeEl = buttonRefs.current[activeIdx];
