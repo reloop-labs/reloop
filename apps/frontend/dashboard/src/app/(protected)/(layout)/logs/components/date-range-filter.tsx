@@ -145,7 +145,7 @@ export const DateRangeFilter = ({
 
 	const handleCalendarSelect = (range: DateRange | undefined) => {
 		setCalendarRange(range);
-		if (range?.from && range?.to) {
+		if (range?.from && range?.to && range.from.getTime() !== range.to.getTime()) {
 			const endOfDay = new Date(range.to);
 			endOfDay.setHours(23, 59, 59, 999);
 			onDateChange(range.from.toISOString(), endOfDay.toISOString(), null);

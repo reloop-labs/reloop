@@ -106,25 +106,15 @@ function LogsCalendar({
 				...classNames,
 			}}
 			components={{
-				Chevron: ({ orientation, ...chevronProps }) => {
+				Chevron: ({ orientation, size: _size }) => {
 					if (orientation === "left") {
-						return (
-							<Icon name="chevron-left" className="h-3 w-3" {...chevronProps} />
-						);
+						return <Icon name="chevron-left" className="h-4 w-4" />;
 					}
 					if (orientation === "right") {
-						return (
-							<Icon
-								name="chevron-right"
-								className="h-3 w-3"
-								{...chevronProps}
-							/>
-						);
+						return <Icon name="chevron-right" className="h-4 w-4" />;
 					}
 					// Down chevron for dropdowns
-					return (
-						<Icon name="chevron-down" className="h-3 w-3" {...chevronProps} />
-					);
+					return <Icon name="chevron-down" className="h-3 w-3" />;
 				},
 				DayButton: (buttonProps) => <LogsDayButton {...buttonProps} />,
 			}}
