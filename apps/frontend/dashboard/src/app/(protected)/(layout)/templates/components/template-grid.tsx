@@ -170,8 +170,13 @@ const TemplatePreviewThumbnail = ({ template }: { template: Template }) => {
 
 	return (
 		<div className="flex h-full flex-col justify-center gap-3 overflow-hidden p-4 font-sans text-[10px] text-text-strong-950 dark:text-white">
-			<div className="truncate pr-6 font-bold text-[13px] leading-tight">
-				{template.subject || template.name}
+			<div
+				className={cn(
+					"truncate pr-6 font-bold text-[13px] leading-tight",
+					!template.subject && "font-normal text-text-sub-600 italic",
+				)}
+			>
+				{template.subject || "(No subject)"}
 			</div>
 			{extractedText ? (
 				<div className="line-clamp-4 break-words text-text-sub-600 leading-relaxed dark:text-text-sub-600/80">
@@ -320,10 +325,11 @@ export const TemplateGrid = ({
 												>
 													{template.name}
 												</span>
-												<span className="truncate font-mono text-text-sub-600 text-xs leading-none dark:text-zinc-500">
-													{template.description ||
-														template.name.toLowerCase().replace(/\s+/g, "-")}
-												</span>
+												{template.description && (
+													<span className="truncate font-mono text-text-sub-600 text-xs leading-none dark:text-zinc-500">
+														{template.description}
+													</span>
+												)}
 											</div>
 
 											<span
