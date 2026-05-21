@@ -49,6 +49,7 @@
 		"react-dropzone": "catalog:ui",
 		"react-hook-form": "catalog:ui",
 		"react-hotkeys-hook": "catalog:ui",
+		"bright": "catalog:ui",
 		"react-use-measure": "catalog:ui",
 		"recharts": "catalog:ui",
 		"shiki": "catalog:ui",

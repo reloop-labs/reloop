@@ -25,9 +25,10 @@ export const CodeBlock = ({
 	noScroll = false,
 	defaultHtml,
 }: Props) => {
-	const { theme: currentTheme, systemTheme, resolvedTheme } = useTheme();
+	const { resolvedTheme, systemTheme, theme: currentTheme } = useTheme();
 	const [html, setHtml] = useState<string>(defaultHtml || "");
-	const [mounted, setMounted] = useState(!!defaultHtml);
+	const [mounted, setMounted] = useState(false);
+	const isFirstRun = useRef(true);
 
 	// Handle mounting to avoid hydration mismatch
 	useEffect(() => {
@@ -46,14 +47,19 @@ export const CodeBlock = ({
 		themeOverride ||
 		(effectiveTheme === "dark" ? "one-dark-pro" : "github-light");
 
-	const isFirstRun = useRef(true);
-
 	useEffect(() => {
+		// Don't run on the server or before mount
+		if (!mounted) return;
+
+		// Skip the very first run if we already have server-rendered HTML
 		if (isFirstRun.current && defaultHtml) {
 			isFirstRun.current = false;
 			return;
 		}
 		isFirstRun.current = false;
+
+		// Track whether this effect invocation is still current
+		let active = true;
 
 		codeToHtml(code, {
 			lang,
@@ -76,12 +82,28 @@ export const CodeBlock = ({
 					},
 				},
 			],
-		}).then(setHtml);
-	}, [code, lang, shikiTheme, hideLineNumbers, noScroll]);
+		})
+			.then((result) => {
+				if (active) setHtml(result);
+			})
+			.catch(() => {
+				// Silently ignore – fallback will remain visible
+			});
 
-	if (!html || !mounted) {
-		return null;
-	}
+		return () => {
+			active = false;
+		};
+	}, [mounted, code, lang, shikiTheme, hideLineNumbers, noScroll, defaultHtml]);
+
+	// ── Shared wrapper classes ──────────────────────────────────────────
+	const wrapperClassName = cn(
+		"[&>pre]:!bg-transparent text-sm leading-6 [&>pre]:p-4",
+		className,
+	);
+
+	// ── Render ──────────────────────────────────────────────────────────
+	// Show the highlighted HTML if available, otherwise show a plain-text
+	// fallback so the code is always visible (no flash of empty space).
 
 	return (
 		<>
@@ -107,13 +129,25 @@ export const CodeBlock = ({
 					border-right: 1px solid var(--color-border-soft-200);
 				}
 			`}</style>
-			<div
-				dangerouslySetInnerHTML={{ __html: html }}
-				className={cn(
-					"[&>pre]:!bg-transparent text-sm leading-6 [&>pre]:p-4",
-					className,
-				)}
-			/>
+
+			{html ? (
+				<div
+					dangerouslySetInnerHTML={{ __html: html }}
+					className={wrapperClassName}
+				/>
+			) : (
+				<div className={wrapperClassName}>
+					<pre
+						className={cn(
+							"p-4 !bg-transparent",
+							!noScroll && "overflow-x-auto",
+							noScroll && "whitespace-pre-wrap break-all",
+						)}
+					>
+						<code>{code}</code>
+					</pre>
+				</div>
+			)}
 		</>
 	);
 };

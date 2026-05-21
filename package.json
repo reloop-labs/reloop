@@ -72,6 +72,7 @@
 				"rehype-highlight": "7.0.2",
 				"shiki": "3.14.0",
 				"ajv": "8.17.1",
+				"bright": "^1.0.0",
 				"swr": "2.3.6",
 				"zustand": "5.0.8",
 				"nuqs": "2.6.0",
