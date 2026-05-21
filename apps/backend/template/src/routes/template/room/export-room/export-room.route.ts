@@ -1,32 +1,44 @@
+import { authMiddleware } from "@be/template/middleware/auth";
+import { templateModel } from "@be/template/model/template.model";
+import { persistencePlugin } from "@be/template/utils/persistence";
 import type { YjsPersistence } from "@be/template/utils/persistence";
 import { Elysia, t } from "elysia";
 import { exportRoomController } from "./export-room.controllers";
 
-export const exportRoomRoute = new Elysia().get(
-	"/rooms/:roomName/export",
-	async (ctx) => {
-		const {
-			params: { roomName },
-		} = ctx;
-		const persistence =
-			(ctx as unknown as { persistence?: YjsPersistence | null }).persistence ??
-			null;
+export const exportRoomRoute = new Elysia()
+	.use(authMiddleware)
+	.use(persistencePlugin)
+	.get(
+		"/rooms/:roomName/export",
+		async ({ params: { roomName }, user, store, set }) => {
+			const template = await templateModel.findByIdAndOrg(
+				roomName,
+				user.activeOrganizationId,
+			);
+			if (!template) {
+				set.status = 404;
+				return { error: `Room "${roomName}" not found` };
+			}
 
-		const result = await exportRoomController(roomName, persistence);
+			const result = await exportRoomController(
+				roomName,
+				store.persistence,
+			);
 
-		if (result === "NOT_FOUND") {
-			ctx.set.status = 404;
-			return { error: `Room "${roomName}" not found` };
-		}
+			if (result === "NOT_FOUND") {
+				set.status = 404;
+				return { error: `Room "${roomName}" not found` };
+			}
 
-		if (result === "NO_PERSISTENCE") {
-			ctx.set.status = 503;
-			return { error: "Persistence unavailable" };
-		}
+			if (result === "NO_PERSISTENCE") {
+				set.status = 503;
+				return { error: "Persistence unavailable" };
+			}
 
-		return result;
-	},
-	{
-		params: t.Object({ roomName: t.String() }),
-	},
-);
+			return result;
+		},
+		{
+			auth: true,
+			params: t.Object({ roomName: t.String() }),
+		},
+	);

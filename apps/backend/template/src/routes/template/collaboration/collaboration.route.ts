@@ -1,4 +1,5 @@
 import { authMiddleware } from "@be/template/middleware/auth";
+import { templateModel } from "@be/template/model/template.model";
 import {
 	clientIdsMap,
 	getRoom,
@@ -23,6 +24,20 @@ export const collaborationRoute = new Elysia({
 			const { user } = ws.data;
 			if (!user) return ws.close(1008, "Unauthorized");
 			const { roomName } = ws.data.params;
+
+			// Verify template exists and belongs to org
+			const template = await templateModel.findByIdAndOrg(
+				roomName,
+				user.activeOrganizationId,
+			);
+			if (!template) {
+				log.warn({
+					...{ roomName, userId: user.id, orgId: user.activeOrganizationId },
+					message: "[collab] Rejecting client: Template not found or unauthorized",
+				});
+				return ws.close(1008, "Unauthorized");
+			}
+
 			const room = getRoom(roomName);
 			const persistence: YjsPersistence | null =
 				(ws.data as { persistence?: YjsPersistence | null }).persistence ??
