@@ -1,3 +1,4 @@
+import { ErrorResponseSchema } from "@reloop/domain/error/domain.error-response";
 import { authMiddleware } from "@reloop/domain/middleware/auth";
 import { rateLimitPlugin } from "@reloop/domain/middleware/rate-limit";
 import { DomainModel } from "@reloop/domain/model/domain.model";
@@ -41,9 +42,9 @@ export const createDomainRoute = new Elysia()
 			body: DomainModel.createDomainBody,
 			response: {
 				201: DomainModel.domainResponse,
-				409: DomainModel.domainAlreadyExists,
-				400: DomainModel.invalidDomain,
-				403: DomainModel.unauthorized,
+				400: ErrorResponseSchema,
+				403: ErrorResponseSchema,
+				409: ErrorResponseSchema,
 			},
 			detail: {
 				tags: ["Domains"],
