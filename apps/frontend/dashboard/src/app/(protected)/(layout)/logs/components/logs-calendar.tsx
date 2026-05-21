@@ -36,6 +36,7 @@ function LogsCalendar({
 	return (
 		<DayPicker
 			showOutsideDays={showOutsideDays}
+			fixedWeeks
 			captionLayout={captionLayout}
 			startMonth={defaultStartMonth}
 			endMonth={defaultEndMonth}
