@@ -86,7 +86,6 @@ export const DateRangeFilter = ({
 	numberOfMonths = 1,
 }: DateRangeFilterProps) => {
 	const [isOpen, setIsOpen] = useState(false);
-	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 	const [calendarRange, setCalendarRange] = useState<DateRange | undefined>(
 		startDate && endDate
@@ -94,7 +93,13 @@ export const DateRangeFilter = ({
 			: undefined,
 	);
 
-	const currentTab = buttonRefs.current[hoverIdx ?? -1];
+	const activePresetIdx = DATE_PRESETS.findIndex((p) => p.value === activePreset);
+	const [hoverIdx, setHoverIdx] = useState<number | undefined>(
+		activePresetIdx >= 0 ? activePresetIdx : undefined,
+	);
+
+	const resolvedIdx = hoverIdx ?? (activePresetIdx >= 0 ? activePresetIdx : undefined);
+	const currentTab = buttonRefs.current[resolvedIdx ?? -1];
 	const currentRect = currentTab?.getBoundingClientRect();
 
 	const activePresetLabel =
@@ -148,11 +153,6 @@ export const DateRangeFilter = ({
 		}
 	};
 
-	const handleClear = () => {
-		onDateChange(null, null, null);
-		setCalendarRange(undefined);
-		setIsOpen(false);
-	};
 
 	return (
 		<Popover.Root open={isOpen} onOpenChange={setIsOpen}>
@@ -181,22 +181,6 @@ export const DateRangeFilter = ({
 				<div className="flex">
 					{/* Left panel — presets */}
 					<div className="w-44 border-stroke-soft-200 border-r p-3">
-						{/* Header */}
-						<div className="flex items-center justify-between border-stroke-soft-200 border-b px-1 pb-2">
-							<span className="font-medium text-text-sub-600 text-xs">
-								Time range
-							</span>
-							{hasActiveFilter && (
-								<button
-									type="button"
-									onClick={handleClear}
-									className="rounded-lg border border-stroke-soft-200 px-2 py-1 text-text-sub-600 text-xs transition-colors hover:bg-bg-weak-50"
-								>
-									Reset
-								</button>
-							)}
-						</div>
-
 						{/* Preset Options */}
 						<div className="relative">
 							{DATE_PRESETS.map((preset, idx) => {
@@ -209,14 +193,13 @@ export const DateRangeFilter = ({
 										}}
 										type="button"
 										onPointerEnter={() => setHoverIdx(idx)}
-										onPointerLeave={() => setHoverIdx(undefined)}
+										onPointerLeave={() => setHoverIdx(activePresetIdx >= 0 ? activePresetIdx : undefined)}
 										onClick={() => handlePresetSelect(preset)}
 										className={cn(
 											"flex w-full cursor-pointer items-center justify-between rounded-lg px-1 py-1.5 font-normal text-xs transition-colors",
 											isActive
 												? "font-medium text-text-strong-950"
 												: "text-text-strong-950",
-											!currentRect && hoverIdx === idx && "bg-neutral-alpha-10",
 										)}
 									>
 										<span>{preset.label}</span>

@@ -48,11 +48,11 @@ function LogsCalendar({
 					defaults.nav,
 				),
 				button_previous: cn(
-					"flex size-7 items-center justify-center rounded-md border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 shadow-sm transition hover:bg-bg-weak-50 hover:text-text-strong-950 disabled:opacity-50",
+					"flex size-6 items-center justify-center rounded-md border border-stroke-soft-200 p-0.5 text-text-sub-600 transition-all duration-200 hover:border-primary-base hover:bg-bg-weak-50/50 hover:text-text-strong-950 disabled:opacity-50",
 					defaults.button_previous,
 				),
 				button_next: cn(
-					"flex size-7 items-center justify-center rounded-md border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 shadow-sm transition hover:bg-bg-weak-50 hover:text-text-strong-950 disabled:opacity-50",
+					"flex size-6 items-center justify-center rounded-md border border-stroke-soft-200 p-0.5 text-text-sub-600 transition-all duration-200 hover:border-primary-base hover:bg-bg-weak-50/50 hover:text-text-strong-950 disabled:opacity-50",
 					defaults.button_next,
 				),
 				month_caption: cn(
@@ -109,25 +109,21 @@ function LogsCalendar({
 				Chevron: ({ orientation, ...chevronProps }) => {
 					if (orientation === "left") {
 						return (
-							<Icon name="chevron-left" className="h-4 w-4" {...chevronProps} />
+							<Icon name="chevron-left" className="h-3 w-3" {...chevronProps} />
 						);
 					}
 					if (orientation === "right") {
 						return (
 							<Icon
 								name="chevron-right"
-								className="h-4 w-4"
+								className="h-3 w-3"
 								{...chevronProps}
 							/>
 						);
 					}
 					// Down chevron for dropdowns
 					return (
-						<Icon
-							name="chevron-down"
-							className="h-3.5 w-3.5"
-							{...chevronProps}
-						/>
+						<Icon name="chevron-down" className="h-3 w-3" {...chevronProps} />
 					);
 				},
 				DayButton: (buttonProps) => <LogsDayButton {...buttonProps} />,
