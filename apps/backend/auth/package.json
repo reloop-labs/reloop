@@ -40,7 +40,6 @@
 		"@reloop/bus": "workspace:*",
 		"email": "workspace:*",
 		"@better-auth/api-key": "catalog:",
-		"@elysiajs/eden": "catalog:backend",
 		"evlog": "catalog:backend"
 	},
 	"devDependencies": {

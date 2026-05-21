@@ -17,7 +17,6 @@
 		"@aws-sdk/lib-storage": "catalog:backend",
 		"@elysiajs/cors": "catalog:backend",
 		"@elysiajs/cron": "catalog:backend",
-		"@elysiajs/eden": "catalog:backend",
 		"@elysiajs/openapi": "catalog:backend",
 		"@elysiajs/opentelemetry": "catalog:backend",
 		"@elysiajs/server-timing": "catalog:backend",

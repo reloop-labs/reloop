@@ -50,7 +50,6 @@
 		"tsdown": "catalog:backend",
 		"typescript": "catalog:",
 		"@types/bun": "catalog:backend",
-		"@elysiajs/eden": "catalog:backend",
 		"drizzle-kit": "catalog:db",
 		"@types/pg": "catalog:db",
 		"@better-auth/cli": "catalog:backend"

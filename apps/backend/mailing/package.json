@@ -40,7 +40,6 @@
 		"@reloop/cache": "workspace:*",
 		"@reloop/auth": "workspace:*",
 		"@reloop/bus": "workspace:*",
-		"@elysiajs/eden": "catalog:backend",
 		"@elysiajs/openapi": "catalog:backend",
 		"nodemailer": "catalog:backend",
 		"@types/nodemailer": "catalog:backend"
