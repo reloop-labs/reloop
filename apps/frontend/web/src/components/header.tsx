@@ -6,7 +6,7 @@ import { Logo } from "@reloop/ui/logo";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const navItems = [
 	{
@@ -256,6 +256,26 @@ export const Header = () => {
 	const [direction, setDirection] = useState(0);
 	const pathname = usePathname();
 
+	const [contentHeight, setContentHeight] = useState<number | "auto">("auto");
+	const resizeObserverRef = useRef<ResizeObserver | null>(null);
+
+	const contentRef = useCallback((node: HTMLDivElement | null) => {
+		if (resizeObserverRef.current) {
+			resizeObserverRef.current.disconnect();
+			resizeObserverRef.current = null;
+		}
+
+		if (node) {
+			const observer = new ResizeObserver((entries) => {
+				for (const entry of entries) {
+					setContentHeight(entry.contentRect.height);
+				}
+			});
+			observer.observe(node);
+			resizeObserverRef.current = observer;
+		}
+	}, []);
+
 	const handleMouseEnter = (title: string) => {
 		if (activeMega === title) return;
 
@@ -289,7 +309,6 @@ export const Header = () => {
 		<header className="fixed top-0 right-0 left-0 z-50 flex justify-center p-4 transition-all duration-500">
 			<motion.div
 				onMouseLeave={() => setActiveMega(null)}
-				layout
 				className={`flex flex-col overflow-hidden rounded-[24px] transition-all duration-500 ease-in-out ${
 					scrolled || activeMega
 						? isLight
@@ -385,125 +404,131 @@ export const Header = () => {
 										: "border-white/5 border-t"
 								}`}
 							>
-								<div className="relative w-full overflow-hidden">
-									<AnimatePresence custom={direction} mode="popLayout">
-										<motion.div
-											key={activeMega}
-											custom={direction}
-											variants={slideVariants}
-											initial="enter"
-											animate="center"
-											exit="exit"
-											className="w-full"
-										>
-											{isLight ? (
-												<div className="flex w-full gap-4 pt-4">
-													<div className="flex w-1/4 flex-col gap-1 border-[#0a0d12]/5 border-r pr-4">
-														{activeItem.mega.links.map((link) => (
-															<motion.div
-																key={link.title}
-																variants={itemVariants}
-															>
-																<Link
-																	href={link.href}
-																	className="block rounded-lg px-3 py-2 font-semibold text-[#0a0d12]/50 text-[14px] transition-colors hover:bg-[#0a0d12]/4 hover:text-[#0a0d12]"
+								<motion.div
+									animate={{ height: contentHeight }}
+									transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+									className="relative w-full overflow-hidden"
+								>
+									<div ref={contentRef}>
+										<AnimatePresence custom={direction} mode="popLayout">
+											<motion.div
+												key={activeMega}
+												custom={direction}
+												variants={slideVariants}
+												initial="enter"
+												animate="center"
+												exit="exit"
+												className="w-full"
+											>
+												{isLight ? (
+													<div className="flex w-full gap-4 pt-4">
+														<div className="flex w-1/4 flex-col gap-1 border-[#0a0d12]/5 border-r pr-4">
+															{activeItem.mega.links.map((link) => (
+																<motion.div
+																	key={link.title}
+																	variants={itemVariants}
 																>
-																	{link.title}
-																</Link>
-															</motion.div>
-														))}
-													</div>
-													<div className="grid flex-1 grid-cols-2 gap-3">
-														{activeItem.mega.featured.map((feat) => (
-															<motion.div
-																key={feat.title}
-																variants={itemVariants}
-																whileHover={{
-																	scale: 1.02,
-																}}
-																whileTap={{
-																	scale: 0.98,
-																}}
-															>
-																<Link
-																	href={feat.href}
-																	className="group flex items-center gap-4 rounded-xl border border-[#0a0d12]/5 bg-[#0a0d12]/[0.02] p-4 transition-all hover:border-[#0a0d12]/10 hover:bg-[#0a0d12]/[0.04]"
+																	<Link
+																		href={link.href}
+																		className="block rounded-lg px-3 py-2 font-semibold text-[#0a0d12]/50 text-[14px] transition-colors hover:bg-[#0a0d12]/4 hover:text-[#0a0d12]"
+																	>
+																		{link.title}
+																	</Link>
+																</motion.div>
+															))}
+														</div>
+														<div className="grid flex-1 grid-cols-2 gap-3">
+															{activeItem.mega.featured.map((feat) => (
+																<motion.div
+																	key={feat.title}
+																	variants={itemVariants}
+																	whileHover={{
+																		scale: 1.02,
+																	}}
+																	whileTap={{
+																		scale: 0.98,
+																	}}
 																>
-																	<div className="flex size-12 items-center justify-center rounded-lg border border-[#0a0d12]/8 bg-[#0a0d12]/4">
-																		<Icon
-																			name={feat.icon as any}
-																			className="size-6 text-[#0a0d12]/60 transition-transform group-hover:scale-110"
-																		/>
-																	</div>
-																	<div>
-																		<div className="font-semibold text-[#0a0d12] text-[14px]">
-																			{feat.title}
+																	<Link
+																		href={feat.href}
+																		className="group flex items-center gap-4 rounded-xl border border-[#0a0d12]/5 bg-[#0a0d12]/[0.02] p-4 transition-all hover:border-[#0a0d12]/10 hover:bg-[#0a0d12]/[0.04]"
+																	>
+																		<div className="flex size-12 items-center justify-center rounded-lg border border-[#0a0d12]/8 bg-[#0a0d12]/4">
+																			<Icon
+																				name={feat.icon as any}
+																				className="size-6 text-[#0a0d12]/60 transition-transform group-hover:scale-110"
+																			/>
 																		</div>
-																		<div className="text-[#0a0d12]/40 text-[12px]">
-																			{feat.description}
+																		<div>
+																			<div className="font-semibold text-[#0a0d12] text-[14px]">
+																				{feat.title}
+																			</div>
+																			<div className="text-[#0a0d12]/40 text-[12px]">
+																				{feat.description}
+																			</div>
 																		</div>
-																	</div>
-																</Link>
-															</motion.div>
-														))}
+																	</Link>
+																</motion.div>
+															))}
+														</div>
 													</div>
-												</div>
-											) : (
-												<div className="flex w-full gap-4 pt-4">
-													<div className="flex w-1/4 flex-col gap-1 border-white/5 border-r pr-4">
-														{activeItem.mega.links.map((link) => (
-															<motion.div
-																key={link.title}
-																variants={itemVariants}
-															>
-																<Link
-																	href={link.href}
-																	className="block rounded-lg px-3 py-2 font-semibold text-[14px] text-white/50 transition-colors hover:bg-white/5 hover:text-white"
+												) : (
+													<div className="flex w-full gap-4 pt-4">
+														<div className="flex w-1/4 flex-col gap-1 border-white/5 border-r pr-4">
+															{activeItem.mega.links.map((link) => (
+																<motion.div
+																	key={link.title}
+																	variants={itemVariants}
 																>
-																	{link.title}
-																</Link>
-															</motion.div>
-														))}
-													</div>
-													<div className="grid flex-1 grid-cols-2 gap-3">
-														{activeItem.mega.featured.map((feat) => (
-															<motion.div
-																key={feat.title}
-																variants={itemVariants}
-																whileHover={{
-																	scale: 1.02,
-																}}
-																whileTap={{
-																	scale: 0.98,
-																}}
-															>
-																<Link
-																	href={feat.href}
-																	className="group flex items-center gap-4 rounded-xl border border-white/5 bg-white/[0.03] p-4 transition-all hover:border-white/10 hover:bg-white/[0.06]"
+																	<Link
+																		href={link.href}
+																		className="block rounded-lg px-3 py-2 font-semibold text-[14px] text-white/50 transition-colors hover:bg-white/5 hover:text-white"
+																	>
+																		{link.title}
+																	</Link>
+																</motion.div>
+															))}
+														</div>
+														<div className="grid flex-1 grid-cols-2 gap-3">
+															{activeItem.mega.featured.map((feat) => (
+																<motion.div
+																	key={feat.title}
+																	variants={itemVariants}
+																	whileHover={{
+																		scale: 1.02,
+																	}}
+																	whileTap={{
+																		scale: 0.98,
+																	}}
 																>
-																	<div className="flex size-12 items-center justify-center rounded-lg bg-black shadow-inner">
-																		<Icon
-																			name={feat.icon as any}
-																			className="size-6 text-white/70 transition-transform group-hover:scale-110"
-																		/>
-																	</div>
-																	<div>
-																		<div className="font-semibold text-[14px] text-white">
-																			{feat.title}
+																	<Link
+																		href={feat.href}
+																		className="group flex items-center gap-4 rounded-xl border border-white/5 bg-white/[0.03] p-4 transition-all hover:border-white/10 hover:bg-white/[0.06]"
+																	>
+																		<div className="flex size-12 items-center justify-center rounded-lg bg-black shadow-inner">
+																			<Icon
+																				name={feat.icon as any}
+																				className="size-6 text-white/70 transition-transform group-hover:scale-110"
+																			/>
 																		</div>
-																		<div className="text-[12px] text-white/40">
-																			{feat.description}
+																		<div>
+																			<div className="font-semibold text-[14px] text-white">
+																				{feat.title}
+																			</div>
+																			<div className="text-[12px] text-white/40">
+																				{feat.description}
+																			</div>
 																		</div>
-																	</div>
-																</Link>
-															</motion.div>
-														))}
+																	</Link>
+																</motion.div>
+															))}
+														</div>
 													</div>
-												</div>
-											)}
-										</motion.div>
-									</AnimatePresence>
-								</div>
+												)}
+											</motion.div>
+										</AnimatePresence>
+									</div>
+								</motion.div>
 							</div>
 						</motion.div>
 					)}
