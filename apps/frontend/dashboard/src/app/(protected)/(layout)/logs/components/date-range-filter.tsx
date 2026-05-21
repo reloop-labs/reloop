@@ -86,7 +86,6 @@ export const DateRangeFilter = ({
 	numberOfMonths = 1,
 }: DateRangeFilterProps) => {
 	const [isOpen, setIsOpen] = useState(false);
-	const [showCalendar, setShowCalendar] = useState(false);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 	const [calendarRange, setCalendarRange] = useState<DateRange | undefined>(
@@ -113,14 +112,29 @@ export const DateRangeFilter = ({
 		return "All time";
 	};
 
+	/** Compute the visual range to highlight on the calendar */
+	const displayRange: DateRange | undefined = (() => {
+		if (activePreset) {
+			const preset = DATE_PRESETS.find((p) => p.value === activePreset);
+			if (preset) {
+				const range = preset.getRange();
+				return { from: range.from, to: range.to };
+			}
+		}
+		if (startDate && endDate) {
+			return { from: new Date(startDate), to: new Date(endDate) };
+		}
+		return calendarRange;
+	})();
+
 	const handlePresetSelect = (preset: DatePreset) => {
 		const range = preset.getRange();
+		setCalendarRange({ from: range.from, to: range.to });
 		onDateChange(
 			range.from.toISOString(),
 			range.to.toISOString(),
 			preset.value,
 		);
-		setShowCalendar(false);
 		setIsOpen(false);
 	};
 
@@ -137,7 +151,6 @@ export const DateRangeFilter = ({
 	const handleClear = () => {
 		onDateChange(null, null, null);
 		setCalendarRange(undefined);
-		setShowCalendar(false);
 		setIsOpen(false);
 	};
 
@@ -165,41 +178,9 @@ export const DateRangeFilter = ({
 			</Popover.Trigger>
 
 			<Popover.Content align="start" showArrow={false} className="w-auto p-0">
-				{showCalendar ? (
-					<div className="p-4">
-						<div className="mb-3 flex items-center justify-between">
-							<button
-								type="button"
-								onClick={() => setShowCalendar(false)}
-								className="flex items-center gap-1 text-text-sub-600 text-xs transition-colors hover:text-text-strong-950"
-							>
-								<Icon name="chevron-left" className="h-3.5 w-3.5" />
-								Back to presets
-							</button>
-							{calendarRange?.from && calendarRange?.to && (
-								<span className="text-text-sub-600 text-xs">
-									{calendarRange.from.toLocaleDateString("en-US", {
-										month: "short",
-										day: "numeric",
-									})}{" "}
-									–{" "}
-									{calendarRange.to.toLocaleDateString("en-US", {
-										month: "short",
-										day: "numeric",
-									})}
-								</span>
-							)}
-						</div>
-						<LogsCalendar
-							mode="range"
-							selected={calendarRange}
-							onSelect={handleCalendarSelect}
-							numberOfMonths={numberOfMonths}
-							disabled={{ after: new Date() }}
-						/>
-					</div>
-				) : (
-					<div className="w-44 p-3">
+				<div className="flex">
+					{/* Left panel — presets */}
+					<div className="w-44 border-stroke-soft-200 border-r p-3">
 						{/* Header */}
 						<div className="flex items-center justify-between border-stroke-soft-200 border-b px-1 pb-2">
 							<span className="font-medium text-text-sub-600 text-xs">
@@ -249,38 +230,26 @@ export const DateRangeFilter = ({
 								);
 							})}
 
-							{/* Custom range button */}
-							<div className="my-1 border-stroke-soft-200 border-t" />
-							<button
-								ref={(el) => {
-									if (el) buttonRefs.current[DATE_PRESETS.length] = el;
-								}}
-								type="button"
-								onPointerEnter={() => setHoverIdx(DATE_PRESETS.length)}
-								onPointerLeave={() => setHoverIdx(undefined)}
-								onClick={() => setShowCalendar(true)}
-								className={cn(
-									"flex w-full cursor-pointer items-center gap-2 rounded-lg px-1 py-1.5 font-normal text-xs transition-colors",
-									"text-text-strong-950",
-									!currentRect &&
-										hoverIdx === DATE_PRESETS.length &&
-										"bg-neutral-alpha-10",
-								)}
-							>
-								<Icon
-									name="calendar"
-									className="h-3.5 w-3.5 text-text-sub-600"
-								/>
-								<span>Custom range...</span>
-							</button>
-
 							<AnimatedHoverBackground
 								rect={currentRect}
 								tabElement={currentTab}
 							/>
 						</div>
 					</div>
-				)}
+
+					{/* Right panel — calendar + date summary */}
+					<div className="flex flex-col px-3 py-2">
+						{/* Calendar */}
+						<LogsCalendar
+							mode="range"
+							selected={displayRange}
+							onSelect={handleCalendarSelect}
+							numberOfMonths={numberOfMonths}
+							disabled={{ after: new Date() }}
+							defaultMonth={displayRange?.from ? displayRange.from : undefined}
+						/>
+					</div>
+				</div>
 			</Popover.Content>
 		</Popover.Root>
 	);
