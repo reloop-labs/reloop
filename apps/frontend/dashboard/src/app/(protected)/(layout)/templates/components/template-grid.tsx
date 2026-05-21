@@ -13,8 +13,13 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { DeleteTemplateModal } from "./delete-template-modal";
+
+import { StarterKit } from "@react-email/editor/extensions";
+import { EmailTheming } from "@react-email/editor/plugins";
+import { useEditor, EditorContent } from "@tiptap/react";
+import "@react-email/editor/themes/default.css";
 
 dayjs.extend(relativeTime);
 
@@ -151,44 +156,71 @@ const TemplateDropdown = ({
 	);
 };
 
-const extractTextFromContent = (content?: any[] | null): string => {
-	if (!content || !Array.isArray(content)) return "";
-	let text = "";
-	for (const node of content) {
-		if (node.type === "text" && node.text) {
-			text += node.text + " ";
-		}
-		if (node.content) {
-			text += extractTextFromContent(node.content);
-		}
-	}
-	return text;
-};
+const EMAIL_WIDTH = 600;
 
 const TemplatePreviewThumbnail = ({ template }: { template: Template }) => {
-	const extractedText = extractTextFromContent(template.content).trim();
+	const containerRef = useRef<HTMLDivElement>(null);
+	const [scale, setScale] = useState(0.5);
+	const PAPER_INSET = 12;
+
+	const editor = useEditor(
+		{
+			extensions: [StarterKit.configure({ UndoRedo: false }), EmailTheming],
+			content: { type: "doc", content: template.content || [] },
+			editable: false,
+			immediatelyRender: false,
+		},
+		[template.id],
+	);
+
+	useEffect(() => {
+		if (editor && template.content) {
+			editor.commands.setContent({
+				type: "doc",
+				content: template.content,
+			});
+		}
+	}, [editor, template.content]);
+
+	useEffect(() => {
+		if (!containerRef.current) return;
+		const el = containerRef.current;
+		const updateScale = () => {
+			const paperWidth = el.offsetWidth - PAPER_INSET * 2;
+			setScale(paperWidth / EMAIL_WIDTH);
+		};
+		updateScale();
+		const observer = new ResizeObserver(updateScale);
+		observer.observe(el);
+		return () => observer.disconnect();
+	}, []);
+
+	if (!editor) {
+		return null;
+	}
 
 	return (
-		<div className="flex h-full flex-col justify-center gap-3 overflow-hidden p-4 font-sans text-[10px] text-text-strong-950 dark:text-white">
-			<div
-				className={cn(
-					"truncate pr-6 font-bold text-[13px] leading-tight",
-					!template.subject && "font-normal text-text-sub-600 italic",
-				)}
-			>
-				{template.subject || "(No subject)"}
+		<div
+			ref={containerRef}
+			className="absolute inset-0 overflow-hidden pointer-events-none select-none bg-zinc-100 dark:bg-zinc-800/50"
+			style={{ padding: `${PAPER_INSET}px` }}
+		>
+			<div className="relative h-full w-full overflow-hidden rounded-md bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.05)] dark:bg-zinc-900 dark:shadow-[0_0_0_1px_rgba(255,255,255,0.06)]">
+				<div
+					className="[&_img]:!max-w-full [&_img]:h-auto [&_.tiptap]:!p-0 [&_.tiptap]:!m-0 [&_.tiptap]:!min-h-0 [&_.tiptap]:!w-full [&_.tiptap]:!overflow-hidden"
+					style={{
+						width: `${EMAIL_WIDTH}px`,
+						overflow: "hidden",
+						transform: `scale(${scale})`,
+						transformOrigin: "top left",
+					}}
+				>
+					<EditorContent editor={editor} />
+				</div>
+
+				{/* Bottom fade */}
+				<div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-white to-transparent dark:from-zinc-900" />
 			</div>
-			{extractedText ? (
-				<div className="line-clamp-4 break-words text-text-sub-600 leading-relaxed dark:text-text-sub-600/80">
-					{extractedText}
-				</div>
-			) : (
-				<div className="mt-1 space-y-1.5">
-					<div className="h-1.5 w-full rounded bg-neutral-alpha-10 dark:bg-white/10" />
-					<div className="h-1.5 w-5/6 rounded bg-neutral-alpha-10 dark:bg-white/10" />
-					<div className="h-1.5 w-4/6 rounded bg-neutral-alpha-10 dark:bg-white/10" />
-				</div>
-			)}
 		</div>
 	);
 };
