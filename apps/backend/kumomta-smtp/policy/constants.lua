@@ -20,11 +20,7 @@ if not hostname or hostname == "" or hostname:match("^%x+$") then
 end
 constants.hostname = hostname
 
-local raw_url = os.getenv("KUMOMTA_WEBHOOK_URL") or "http://host.docker.internal:8021"
--- Ensure it ends with /api/kumomta if it doesn't already
-if not raw_url:find("/api/kumomta$") and not raw_url:find("/api/kumomta/$") then
-  raw_url = raw_url:gsub("/+$", "") .. "/api/kumomta"
-end
+local raw_url = os.getenv("KUMOMTA_WEBHOOK_URL") or "http://host.docker.internal:8011/api/domain"
 constants.kumomta_url = raw_url
 
 print("[DEBUG] constants.hostname = " .. constants.hostname)

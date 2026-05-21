@@ -93,12 +93,15 @@ export const DateRangeFilter = ({
 			: undefined,
 	);
 
-	const activePresetIdx = DATE_PRESETS.findIndex((p) => p.value === activePreset);
+	const activePresetIdx = DATE_PRESETS.findIndex(
+		(p) => p.value === activePreset,
+	);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(
 		activePresetIdx >= 0 ? activePresetIdx : undefined,
 	);
 
-	const resolvedIdx = hoverIdx ?? (activePresetIdx >= 0 ? activePresetIdx : undefined);
+	const resolvedIdx =
+		hoverIdx ?? (activePresetIdx >= 0 ? activePresetIdx : undefined);
 	const currentTab = buttonRefs.current[resolvedIdx ?? -1];
 	const currentRect = currentTab?.getBoundingClientRect();
 
@@ -145,14 +148,17 @@ export const DateRangeFilter = ({
 
 	const handleCalendarSelect = (range: DateRange | undefined) => {
 		setCalendarRange(range);
-		if (range?.from && range?.to && range.from.getTime() !== range.to.getTime()) {
+		if (
+			range?.from &&
+			range?.to &&
+			range.from.getTime() !== range.to.getTime()
+		) {
 			const endOfDay = new Date(range.to);
 			endOfDay.setHours(23, 59, 59, 999);
 			onDateChange(range.from.toISOString(), endOfDay.toISOString(), null);
 			setIsOpen(false);
 		}
 	};
-
 
 	return (
 		<Popover.Root open={isOpen} onOpenChange={setIsOpen}>
@@ -193,7 +199,11 @@ export const DateRangeFilter = ({
 										}}
 										type="button"
 										onPointerEnter={() => setHoverIdx(idx)}
-										onPointerLeave={() => setHoverIdx(activePresetIdx >= 0 ? activePresetIdx : undefined)}
+										onPointerLeave={() =>
+											setHoverIdx(
+												activePresetIdx >= 0 ? activePresetIdx : undefined,
+											)
+										}
 										onClick={() => handlePresetSelect(preset)}
 										className={cn(
 											"flex w-full cursor-pointer items-center justify-between rounded-lg px-1 py-1.5 font-normal text-xs transition-colors",

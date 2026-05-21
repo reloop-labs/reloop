@@ -139,7 +139,7 @@ export const CodeBlock = ({
 				<div className={wrapperClassName}>
 					<pre
 						className={cn(
-							"p-4 !bg-transparent",
+							"!bg-transparent p-4",
 							!noScroll && "overflow-x-auto",
 							noScroll && "whitespace-pre-wrap break-all",
 						)}

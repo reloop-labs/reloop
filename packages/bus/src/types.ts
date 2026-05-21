@@ -218,6 +218,46 @@ export interface QuotaExceededPayload {
 	monthlyCredits: number;
 }
 
+export interface KumomtaLogRecordPayload {
+	type:
+		| "Reception"
+		| "Delivery"
+		| "Bounce"
+		| "TransientFailure"
+		| "Expiration"
+		| "OOB"
+		| "Feedback"
+		| "AdminBounce";
+	id: string;
+	sender: string;
+	recipient: string;
+	queue: string;
+	site: string;
+	size: number;
+	bounce_classification?: string;
+	response: {
+		code: number;
+		enhanced_code?: {
+			class: number;
+			subject: number;
+			detail: number;
+		} | null;
+		content: string;
+		command?: string | null;
+	};
+	headers: {
+		Subject?: string;
+		"X-Org-ID"?: string;
+		"X-Domain-ID"?: string;
+		"X-Email-Log-ID"?: string;
+	};
+	meta?: {
+		"X-Email-Log-ID"?: string;
+		[key: string]: unknown;
+	};
+	timestamp?: string | number;
+}
+
 export interface EventPayloads {
 	[BusEvent.USER_CREATED]: UserCreatedPayload;
 	[BusEvent.USER_UPDATED]: UserUpdatedPayload;
@@ -249,4 +289,5 @@ export interface EventPayloads {
 	[BusEvent.DOMAIN_DNS_REVERIFICATION_REQUESTED]: DomainDnsReverificationRequestedPayload;
 	[BusEvent.USAGE_UPDATED]: UsageUpdatedPayload;
 	[BusEvent.QUOTA_EXCEEDED]: QuotaExceededPayload;
+	[BusEvent.KUMOMTA_EVENT]: KumomtaLogRecordPayload;
 }

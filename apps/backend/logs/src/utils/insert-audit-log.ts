@@ -59,7 +59,9 @@ export async function insertAuditLog(entry: AuditLogEntry): Promise<void> {
 					organization_id: entry.organization_id ?? null,
 					metadata: JSON.stringify(entry.metadata),
 					request_details: JSON.stringify(entry.request_details ?? {}),
-					request_body: JSON.stringify(entry.request_body ?? entry.request_details?.requestBody ?? {}),
+					request_body: JSON.stringify(
+						entry.request_body ?? entry.request_details?.requestBody ?? {},
+					),
 					status_code: entry.status_code ?? null,
 					created_at: toClickHouseDate(new Date()),
 					// Audit-log fields — LowCardinality columns use '' as the "no value" sentinel

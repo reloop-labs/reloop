@@ -1,5 +1,5 @@
-import { createId } from "@paralleldrive/cuid2";
 import { contactsConfig } from "@be/contacts/contacts.config";
+import { createId } from "@paralleldrive/cuid2";
 import { Elysia } from "elysia";
 import { evlog } from "evlog/elysia";
 import { validateApiKey } from "./api-key-auth";

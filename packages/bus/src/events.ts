@@ -43,4 +43,7 @@ export enum BusEvent {
 	API_KEY_ENABLED = "api_key.enabled",
 	API_KEY_ROTATED = "api_key.rotated",
 	API_KEY_UPDATED = "api_key.updated",
+
+	// KumoMTA Events
+	KUMOMTA_EVENT = "kumomta.event",
 }

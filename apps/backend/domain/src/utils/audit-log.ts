@@ -130,4 +130,3 @@ export function auditLogHook(opts: AuditLogHookOptions) {
 			.catch(console.error);
 	};
 }
-

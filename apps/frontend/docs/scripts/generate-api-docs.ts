@@ -103,13 +103,7 @@ const SERVICES: ServiceConfig[] = [
 		specUrl: "http://localhost:8019/api/template/openapi/json",
 		prodUrl: "https://reloop.sh/api/template/openapi/json",
 	},
-	{
-		name: "kumomta",
-		prefix: "/api/kumomta",
-		port: 8021,
-		specUrl: "http://localhost:8021/api/kumomta/openapi/json",
-		prodUrl: "https://reloop.sh/api/kumomta/openapi/json",
-	},
+
 	{
 		name: "auth",
 		prefix: "/api/auth",
@@ -699,7 +693,6 @@ function generateMetaJson(allGenerated: Record<string, string[]>) {
 		template: "Templates",
 		upload: "Upload",
 		logs: "Logs",
-		kumomta: "KumoMTA (Internal)",
 		auth: "Auth",
 	};
 

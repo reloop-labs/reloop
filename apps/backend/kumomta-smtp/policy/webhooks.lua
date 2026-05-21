@@ -2,6 +2,17 @@ local kumo = require 'kumo'
 local log_hooks = require 'policy-extras.log_hooks'
 local constants = require 'policy.constants'
 
+local nats_client
+local function get_nats_client()
+  if not nats_client then
+    local nats_url = os.getenv("NATS_URL") or "reloop-nats:4222"
+    nats_client = kumo.nats.connect {
+      servers = { nats_url },
+    }
+  end
+  return nats_client
+end
+
 log_hooks:new {
   name = 'webhook',
   log_parameters = {
@@ -10,45 +21,32 @@ log_hooks:new {
   },
   constructor = function(domain, tenant, campaign)
     local connection = {}
-    local client = kumo.http.build_client {
-      danger_accept_invalid_certs = true,
-    }
 
     function connection:send(message)
-      local ok, response = pcall(function()
-        return client
-          :post(constants.kumomta_url .. '/api/kumomta/v1/webhook/kumomta')
-          :header('Content-Type', 'application/json')
-          :header('x-kumomta-key', constants.kumomta_key)
-          :body('[' .. message:get_data() .. ']')
-          :send()
+      local nc = get_nats_client()
+      local ok, err = pcall(function()
+        nc:publish {
+          subject = 'kumomta.event',
+          payload = message:get_data(),
+        }
       end)
 
       if not ok then
-        print("FAILED: " .. tostring(response))
-        kumo.reject(500, "Temporary failure contacting webhook endpoint: " .. tostring(response))
+        print("FAILED to publish to NATS: " .. tostring(err))
+        kumo.reject(500, "Temporary failure publishing to NATS: " .. tostring(err))
         return
       else
-        print("RESULT: SUCCESS")
+        print("RESULT: NATS SUCCESS")
       end
 
-      local disposition = string.format(
-        '%d %s: %s',
-        response:status_code(),
-        response:status_reason(),
-        response:text()
-      )
-
-      if response:status_is_success() then
-        return disposition
-      end
-      kumo.reject(500, disposition)
+      return "250 Published to NATS"
     end
 
     function connection:close()
-      client:close()
+      -- NATS connection is managed globally, no-op
     end
 
     return connection
   end,
 }
+

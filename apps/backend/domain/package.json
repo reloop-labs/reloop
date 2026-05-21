@@ -43,7 +43,8 @@
 		"@reloop/apikey": "workspace:*",
 		"@reloop/bus": "workspace:*",
 		"@reloop/webhook-events": "workspace:*",
-		"@elysiajs/openapi": "catalog:backend"
+		"@elysiajs/openapi": "catalog:backend",
+		"mailparser": "catalog:backend"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",
@@ -52,6 +53,7 @@
 		"@types/bun": "catalog:backend",
 		"drizzle-kit": "catalog:db",
 		"@types/pg": "catalog:db",
-		"@better-auth/cli": "catalog:backend"
+		"@better-auth/cli": "catalog:backend",
+		"@types/mailparser": "catalog:backend"
 	}
 }
