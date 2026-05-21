@@ -18,6 +18,7 @@ export function auditLogHook(opts: AuditLogHookOptions) {
 		organizationId,
 		userId,
 		traceId,
+		body,
 	}: {
 		response: unknown;
 		set: { status?: number | string };
@@ -25,6 +26,7 @@ export function auditLogHook(opts: AuditLogHookOptions) {
 		organizationId?: string;
 		userId?: string;
 		traceId?: string;
+		body?: unknown;
 	}) => {
 		const status = set.status ?? 200;
 		const userAgent = request.headers.get("user-agent") ?? undefined;
@@ -32,6 +34,16 @@ export function auditLogHook(opts: AuditLogHookOptions) {
 			request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
 			request.headers.get("x-real-ip") ||
 			undefined;
+
+		// Capture request body
+		let requestBody: Record<string, unknown> | null = null;
+		try {
+			if (body && typeof body === "object") {
+				requestBody = body as Record<string, unknown>;
+			}
+		} catch {
+			// Silently ignore body capture failures
+		}
 
 		let level: "info" | "warn" | "error" = "info";
 		let event = `${resourceType}.${action}`;
@@ -115,8 +127,10 @@ export function auditLogHook(opts: AuditLogHookOptions) {
 					userAgent,
 					ipAddress,
 					statusCode: Number(status),
+					requestBody,
 				},
 			})
 			.catch(console.error);
 	};
 }
+

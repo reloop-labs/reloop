@@ -26,6 +26,7 @@ export async function initLogSubscriber() {
 					environment: payload.environment,
 					metadata: payload.metadata ?? {},
 					request_details: payload.requestDetails ?? null,
+					request_body: payload.requestDetails?.requestBody ?? null,
 					status_code: payload.requestDetails?.statusCode ?? null,
 				});
 			} catch (error) {

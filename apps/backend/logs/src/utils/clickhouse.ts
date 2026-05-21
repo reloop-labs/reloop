@@ -13,6 +13,7 @@ export type StoredLogEntry = {
 	organization_id: string | null;
 	metadata: string;
 	request_details: string;
+	request_body: string;
 	status_code: number | null;
 	created_at: string;
 	// Audit-log fields
@@ -77,6 +78,7 @@ export async function ensureTableExists(): Promise<void> {
 		{ name: "organization_id", type: "Nullable(String)" },
 		{ name: "metadata", type: "String" },
 		{ name: "request_details", type: "String" },
+		{ name: "request_body", type: "String" },
 		{ name: "status_code", type: "Nullable(Int32)" },
 		{ name: "created_at", type: "DateTime64(3)" },
 		// Audit-log fields
@@ -150,6 +152,7 @@ export async function ensureTableExists(): Promise<void> {
 					organization_id Nullable(String),
 					metadata String,
 					request_details String,
+					request_body String DEFAULT '{}',
 					status_code Nullable(Int32),
 					created_at DateTime64(3),
 					-- Audit-log fields

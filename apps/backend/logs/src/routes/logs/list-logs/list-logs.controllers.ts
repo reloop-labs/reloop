@@ -130,6 +130,7 @@ export async function listLogsController(
 						organization_id,
 						metadata,
 						request_details,
+						request_body,
 						status_code,
 						toString(created_at) AS created_at,
 						actor_type,
@@ -196,6 +197,7 @@ export async function listLogsController(
 			status_code: row.status_code,
 			created_at: formatClickHouseDate(row.created_at),
 			requestDetails: safeJsonParse(row.request_details, {}),
+			request_body: safeJsonParse(row.request_body, {}),
 			// Audit-log fields — normalise empty strings back to null for the API response
 			actor_type: row.actor_type || null,
 			actor_id: row.actor_id || null,

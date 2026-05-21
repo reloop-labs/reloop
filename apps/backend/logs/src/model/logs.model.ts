@@ -27,6 +27,7 @@ export namespace LogsModel {
 		}),
 		created_at: t.String({ format: "date-time" }),
 		requestDetails: t.Any(),
+		request_body: t.Any({ description: "The request body sent by the user" }),
 		// Audit-log fields
 		actor_type: t.Optional(t.Union([t.String(), t.Null()])),
 		actor_id: t.Optional(t.Union([t.String(), t.Null()])),
@@ -54,6 +55,7 @@ export namespace LogsModel {
 		}),
 		created_at: t.String({ format: "date-time" }),
 		requestDetails: t.Any(),
+		request_body: t.Any({ description: "The request body sent by the user" }),
 		email: t.Optional(
 			t.Any({
 				description:

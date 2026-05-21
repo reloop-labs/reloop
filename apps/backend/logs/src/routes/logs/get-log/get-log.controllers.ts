@@ -28,6 +28,7 @@ export async function getLogController(
 					organization_id,
 					metadata,
 					request_details,
+					request_body,
 					status_code,
 					toString(created_at) AS created_at,
 					actor_type,
@@ -86,6 +87,7 @@ export async function getLogController(
 			metadata,
 			created_at: formatClickHouseDate(row.created_at),
 			requestDetails: safeJsonParse(row.request_details, {}),
+			request_body: safeJsonParse(row.request_body, {}),
 			status_code: row.status_code || null,
 			email: emailDetails || undefined,
 			// Audit-log fields — normalise empty strings back to null for the API response

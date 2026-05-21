@@ -73,6 +73,7 @@ export interface LogCreatedPayload {
 		userAgent?: string;
 		ipAddress?: string;
 		statusCode?: number;
+		requestBody?: Record<string, unknown> | null;
 	};
 
 	// Who performed the action
