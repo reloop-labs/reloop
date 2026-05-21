@@ -2,13 +2,13 @@ import { authMiddleware } from "@be/template/middleware/auth";
 import { templateModel } from "@be/template/model/template.model";
 import { persistencePlugin } from "@be/template/utils/persistence";
 import { Elysia, t } from "elysia";
-import { saveRoomController } from "./save-room.controllers";
+import { exportRoomController } from "./export-room.controllers";
 
-export const saveRoomRoute = new Elysia()
+export const exportRoomRoute = new Elysia()
 	.use(authMiddleware)
 	.use(persistencePlugin)
-	.post(
-		"/rooms/:roomName/save",
+	.get(
+		"/rooms/:roomName/export",
 		async ({ params: { roomName }, organizationId, store, set }) => {
 			const template = await templateModel.findByIdAndOrg(
 				roomName,
@@ -19,7 +19,7 @@ export const saveRoomRoute = new Elysia()
 				return { error: `Room "${roomName}" not found` };
 			}
 
-			const result = await saveRoomController(roomName, store.persistence);
+			const result = await exportRoomController(roomName, store.persistence);
 
 			if (result === "NOT_FOUND") {
 				set.status = 404;
@@ -31,10 +31,16 @@ export const saveRoomRoute = new Elysia()
 				return { error: "Persistence unavailable" };
 			}
 
-			return { success: true, roomName };
+			return result;
 		},
 		{
 			auth: true,
 			params: t.Object({ roomName: t.String() }),
+			detail: {
+				tags: ["Rooms"],
+				summary: "Export room content",
+				description:
+					"Exports the content/state of a specific collaboration room",
+			},
 		},
 	);

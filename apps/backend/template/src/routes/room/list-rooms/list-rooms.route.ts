@@ -9,5 +9,10 @@ export const listRoomsRoute = new Elysia().use(authMiddleware).get(
 	},
 	{
 		auth: true,
+		detail: {
+			tags: ["Rooms"],
+			summary: "List active rooms",
+			description: "Lists all active collaboration rooms",
+		},
 	},
 );

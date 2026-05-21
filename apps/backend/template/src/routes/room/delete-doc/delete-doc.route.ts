@@ -27,5 +27,10 @@ export const deleteDocRoute = new Elysia()
 		{
 			auth: true,
 			params: t.Object({ roomName: t.String() }),
+			detail: {
+				tags: ["Rooms"],
+				summary: "Delete document room",
+				description: "Deletes the persistent document for a specific room",
+			},
 		},
 	);

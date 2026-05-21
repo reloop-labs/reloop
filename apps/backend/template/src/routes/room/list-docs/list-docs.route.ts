@@ -13,5 +13,11 @@ export const listDocsRoute = new Elysia()
 		},
 		{
 			auth: true,
+			detail: {
+				tags: ["Rooms"],
+				summary: "List room documents",
+				description:
+					"Lists all persistent documents/state records for the rooms",
+			},
 		},
 	);
