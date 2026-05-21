@@ -70,7 +70,7 @@ export const createVersionRoute = new Elysia().use(authMiddleware).post(
 			500: ErrorResponseSchema,
 		},
 		detail: {
-			tags: ["Template Versions"],
+			tags: ["Template"],
 			summary: "Create a new template version",
 			description:
 				"Saves a snapshot of the current template content as a new version",

@@ -31,8 +31,8 @@ export const listVersionsRoute = new Elysia().use(authMiddleware).get(
 			500: ErrorResponseSchema,
 		},
 		detail: {
-			tags: ["Template Versions"],
-			summary: "List template versions",
+			tags: ["Template"],
+			summary: "List Template",
 			description:
 				"Returns all saved versions for a template, ordered newest first",
 			"x-codeSamples": listVersionsXCodeSamples,
