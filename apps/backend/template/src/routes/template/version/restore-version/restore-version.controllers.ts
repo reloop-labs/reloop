@@ -33,5 +33,9 @@ export async function restoreVersion(params: {
 		currentVersion: version.version,
 	});
 
+	if (!result) {
+		throw TemplateErrors.restoreFailed(templateId, versionId);
+	}
+
 	return result;
 }

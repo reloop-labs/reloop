@@ -1,4 +1,6 @@
+import { ErrorResponseSchema } from "@be/template/error/template.error";
 import { authMiddleware } from "@be/template/middleware/auth";
+import { templateResponseSchema } from "@be/template/model/template.model";
 import { Elysia, t } from "elysia";
 import { updateTemplate } from "./update-template.controllers";
 
@@ -37,10 +39,18 @@ export const updateTemplateRoute = new Elysia().use(authMiddleware).put(
 				]),
 			),
 		}),
+		response: {
+			200: templateResponseSchema,
+			400: ErrorResponseSchema,
+			401: ErrorResponseSchema,
+			403: ErrorResponseSchema,
+			404: ErrorResponseSchema,
+			500: ErrorResponseSchema,
+		},
 		detail: {
 			tags: ["Templates"],
 			summary: "Update template",
-			description: "Updates an existing template",
+			description: "Updates template properties or draft content",
 		},
 	},
 );

@@ -154,3 +154,48 @@ export const templateModel = {
 		return result;
 	},
 };
+
+import { t } from "elysia";
+
+export const templateResponseSchema = t.Object({
+	id: t.String(),
+	name: t.String(),
+	description: t.Union([t.String(), t.Null()]),
+	subject: t.Union([t.String(), t.Null()]),
+	fromEmail: t.Union([t.String(), t.Null()]),
+	replyTo: t.Union([t.String(), t.Null()]),
+	previewText: t.Union([t.String(), t.Null()]),
+	organizationId: t.String(),
+	createdByUserId: t.String(),
+	status: t.Union([
+		t.Literal("draft"),
+		t.Literal("published"),
+		t.Literal("archived"),
+	]),
+	content: t.Array(t.Any()),
+	variables: t.Union([t.Array(t.String()), t.Null()]),
+	currentVersion: t.Union([t.Number(), t.Null()]),
+	thumbnailUrl: t.Union([t.String(), t.Null()]),
+	isDefault: t.Boolean(),
+	deletedAt: t.Union([t.Date(), t.Null()]),
+	createdAt: t.Date(),
+	updatedAt: t.Date(),
+});
+
+export const templateVersionResponseSchema = t.Object({
+	id: t.String(),
+	templateId: t.String(),
+	version: t.Number(),
+	name: t.Union([t.String(), t.Null()]),
+	isMajor: t.Boolean(),
+	subject: t.Union([t.String(), t.Null()]),
+	fromEmail: t.Union([t.String(), t.Null()]),
+	replyTo: t.Union([t.String(), t.Null()]),
+	previewText: t.Union([t.String(), t.Null()]),
+	description: t.Union([t.String(), t.Null()]),
+	content: t.Array(t.Any()),
+	variables: t.Union([t.Array(t.String()), t.Null()]),
+	renderedHtml: t.Union([t.String(), t.Null()]),
+	createdByUserId: t.String(),
+	createdAt: t.Date(),
+});

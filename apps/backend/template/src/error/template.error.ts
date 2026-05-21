@@ -1,4 +1,17 @@
+import { t } from "elysia";
 import { createError } from "evlog";
+
+export const ErrorResponseSchema = t.Object(
+	{
+		message: t.String(),
+		why: t.Optional(t.String()),
+		fix: t.Optional(t.String()),
+		link: t.Optional(t.String()),
+	},
+	{
+		description: "Standard error response format",
+	},
+);
 
 export const AuthErrors = {
 	unauthorized: (why?: string, fix?: string) =>
@@ -68,5 +81,33 @@ export const TemplateErrors = {
 			message: "Cannot delete template version",
 			why: reason,
 			fix: "Ensure the version is not the active version of the template.",
+		}),
+	createFailed: (message?: string) =>
+		createError({
+			status: 500,
+			message: message || "Failed to create template",
+			why: "An unexpected error occurred while inserting the template into the database.",
+			fix: "Please try again later or contact support if the issue persists.",
+		}),
+	updateFailed: (id: string) =>
+		createError({
+			status: 500,
+			message: "Failed to update template",
+			why: `An unexpected error occurred while updating the template "${id}".`,
+			fix: "Please try again later or contact support if the issue persists.",
+		}),
+	duplicateFailed: (id: string) =>
+		createError({
+			status: 500,
+			message: "Failed to duplicate template",
+			why: `An unexpected error occurred while duplicating the template "${id}".`,
+			fix: "Please try again later or contact support if the issue persists.",
+		}),
+	restoreFailed: (id: string, versionId: string) =>
+		createError({
+			status: 500,
+			message: "Failed to restore template version",
+			why: `An unexpected error occurred while restoring template "${id}" to version "${versionId}".`,
+			fix: "Please try again later or contact support if the issue persists.",
 		}),
 };

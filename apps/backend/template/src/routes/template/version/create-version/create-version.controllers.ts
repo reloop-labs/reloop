@@ -82,6 +82,10 @@ export async function createVersion(params: {
 		renderedHtml,
 	});
 
+	if (!result) {
+		throw TemplateErrors.createFailed("Failed to create template version");
+	}
+
 	// When publishing, update the parent template status and version
 	if (isMajor) {
 		await templateModel.update({

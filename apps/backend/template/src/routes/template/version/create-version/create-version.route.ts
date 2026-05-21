@@ -1,4 +1,6 @@
+import { ErrorResponseSchema } from "@be/template/error/template.error";
 import { authMiddleware } from "@be/template/middleware/auth";
+import { templateVersionResponseSchema } from "@be/template/model/template.model";
 import { Elysia, t } from "elysia";
 import { createVersion } from "./create-version.controllers";
 
@@ -51,6 +53,20 @@ export const createVersionRoute = new Elysia().use(authMiddleware).post(
 			isMajor: t.Optional(t.Boolean()),
 			renderedHtml: t.Optional(t.String()),
 		}),
+		response: {
+			200: t.Composite([
+				templateVersionResponseSchema,
+				t.Object({
+					draftNumber: t.Optional(t.Number()),
+					publishNumber: t.Optional(t.Number()),
+				}),
+			]),
+			400: ErrorResponseSchema,
+			401: ErrorResponseSchema,
+			403: ErrorResponseSchema,
+			404: ErrorResponseSchema,
+			500: ErrorResponseSchema,
+		},
 		detail: {
 			tags: ["Template Versions"],
 			summary: "Create a new template version",

@@ -29,6 +29,10 @@ export async function createTemplate(params: {
 			variables: [],
 		});
 
+		if (!result) {
+			throw TemplateErrors.createFailed();
+		}
+
 		return result;
 	} catch (error) {
 		log.error({

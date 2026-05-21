@@ -36,5 +36,8 @@ export async function deleteVersion(params: {
 
 	// Perform the deletion
 	const result = await templateVersionModel.delete(versionId);
+	if (!result) {
+		throw TemplateErrors.deleteFailed("Failed to delete template version.");
+	}
 	return result;
 }

@@ -1,3 +1,4 @@
+import { ErrorResponseSchema } from "@be/template/error/template.error";
 import { authMiddleware } from "@be/template/middleware/auth";
 import { Elysia, t } from "elysia";
 import { deleteTemplate } from "./delete-template.controllers";
@@ -19,6 +20,17 @@ export const deleteTemplateRoute = new Elysia().use(authMiddleware).delete(
 		params: t.Object({
 			id: t.String(),
 		}),
+		response: {
+			200: t.Object({
+				success: t.Boolean(),
+				id: t.Optional(t.String()),
+			}),
+			400: ErrorResponseSchema,
+			401: ErrorResponseSchema,
+			403: ErrorResponseSchema,
+			404: ErrorResponseSchema,
+			500: ErrorResponseSchema,
+		},
 		detail: {
 			tags: ["Templates"],
 			summary: "Delete template",

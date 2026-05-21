@@ -27,6 +27,10 @@ export async function updateTemplate(params: {
 			...updateData,
 		});
 
+		if (!result) {
+			throw TemplateErrors.updateFailed(id);
+		}
+
 		return result;
 	} catch (error) {
 		log.error({
