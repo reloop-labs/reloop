@@ -351,16 +351,23 @@ export const LogList = () => {
 					{selectedLogId ? (
 						<LogDetailPanel logId={selectedLogId} />
 					) : (
-						<div className="flex min-h-[500px] flex-col items-center justify-center gap-3 p-8 text-center">
-							<div className="flex h-12 w-12 items-center justify-center rounded-full bg-bg-weak-50 text-2xl dark:bg-bg-weak-50/20">
-								📄
+						<div className="flex min-h-[500px] flex-col items-center justify-center gap-1 p-8 text-center">
+							<div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
+								<Icon name="search" className="h-5 w-5 text-text-sub-600" />
 							</div>
-							<p className="font-medium text-paragraph-sm text-text-strong-950">
-								Select a log to view details
+							<h3 className="font-semibold text-base text-text-strong-950">
+								Select a log to inspect
+							</h3>
+							<p className="mx-auto max-w-sm text-balance font-medium text-[12px] text-text-sub-600">
+								Click any row on the left to view its request details, status,
+								and response body.
 							</p>
-							<p className="max-w-[200px] text-paragraph-xs text-text-soft-400">
-								Click any row on the left to inspect its full details here.
-							</p>
+							<div className="mt-4 flex items-center gap-1.5 text-text-soft-400 text-xs">
+								<Icon name="arrow-left" className="h-3.5 w-3.5" />
+								<span className="font-medium">
+									Pick a log entry to get started
+								</span>
+							</div>
 						</div>
 					)}
 				</div>

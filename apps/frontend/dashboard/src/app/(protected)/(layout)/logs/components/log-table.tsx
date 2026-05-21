@@ -3,6 +3,7 @@
 import { PageSizeDropdown } from "@fe/dashboard/components/page-size-dropdown";
 import { PaginationControls } from "@fe/dashboard/components/pagination-controls";
 import * as Badge from "@reloop/ui/badge";
+import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
@@ -199,12 +200,35 @@ export const LogTable = ({
 						</div>
 					))
 				) : logs.length === 0 ? (
-					<div className="flex h-48 flex-col items-center justify-center gap-2 text-text-sub-600">
-						<Icon name="inbox" className="h-8 w-8 text-text-disabled-300" />
-						<p className="text-sm">No logs found</p>
-						<p className="text-text-soft-400 text-xs">
-							Try adjusting your filters or time range
+					<div className="flex flex-col items-center bg-bg-soft-200/10 px-6 py-12 text-center dark:bg-transparent">
+						<div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
+							<Icon name="activity" className="h-5 w-5 text-text-sub-600" />
+						</div>
+						<h3 className="mb-2 font-semibold text-text-strong-950 text-lg">
+							No logs yet
+						</h3>
+						<p className="mx-auto mb-5 max-w-[260px] text-balance font-medium text-[12px] text-text-sub-600">
+							Logs will appear here once API requests start flowing through your
+							project.
 						</p>
+						<div className="flex items-center gap-3">
+							<Button.Root
+								variant="neutral"
+								mode="stroke"
+								size="xsmall"
+								asChild
+								className="gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
+							>
+								<a
+									href="https://reloop.sh/docs/logs"
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									<Icon name="book-closed" className="h-3.5 w-3.5" />
+									Read the docs
+								</a>
+							</Button.Root>
+						</div>
 					</div>
 				) : (
 					groupLogsByDate(logs as any).map((group) => (
