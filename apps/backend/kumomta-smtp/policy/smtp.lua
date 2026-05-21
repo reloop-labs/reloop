@@ -43,11 +43,7 @@ local function apply_reloop_logic(msg, api_key)
   end
 
   local client = kumo.http.build_client({
-    danger_accept_invalid_certs = true,
-    headers = {
-      ["x-kumomta-key"] = constants.kumomta_key,
-      ["Content-Type"] = "application/json"
-    }
+    danger_accept_invalid_certs = true
   })
 
   -- Check if message was already logged by internal backend HTTP inject
@@ -59,7 +55,6 @@ local function apply_reloop_logic(msg, api_key)
 
     local status, response = pcall(function()
       local payload = {
-        key = api_key,
         domainName = domain,
         messageId = message_id,
         providerMessageId = msg_id,
@@ -76,7 +71,7 @@ local function apply_reloop_logic(msg, api_key)
 
       local req = client:post(target_url)
       return req
-        :header("x-kumomta-key", constants.kumomta_key)
+        :header("x-api-key", api_key)
         :header("Content-Type", "application/json")
         :body(payload_str)
         :send()
@@ -156,9 +151,9 @@ local function apply_reloop_logic(msg, api_key)
   local dkim_ok, dkim_resp = pcall(function()
     local req = client:post(dkim_target)
     return req
-      :header("x-kumomta-key", constants.kumomta_key)
+      :header("x-api-key", api_key)
       :header("Content-Type", "application/json")
-      :body(kumo.serde.json_encode({ key = api_key, domainName = domain }))
+      :body(kumo.serde.json_encode({ domainName = domain }))
       :send()
   end)
 
