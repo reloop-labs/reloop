@@ -1,11 +1,25 @@
 import { resolveCname, resolveMx, resolveTxt } from "node:dns";
 import { promisify } from "node:util";
 
+function isLocal(name: string): boolean {
+	if (process.env.NODE_ENV === "production") {
+		return false;
+	}
+	const clean = name.toLowerCase();
+	return (
+		clean.endsWith(".local") ||
+		clean.includes("local.reloop.sh") ||
+		clean.includes(".local.") ||
+		clean === "local"
+	);
+}
+
 export async function verifyMxRecord(
 	name: string,
 	value: string,
 	priority: number,
 ): Promise<boolean> {
+	if (isLocal(name)) return true;
 	try {
 		const resolveMxPromise = promisify(resolveMx);
 
@@ -34,6 +48,7 @@ export async function verifySpfRecord(
 	name: string,
 	value: string,
 ): Promise<boolean> {
+	if (isLocal(name)) return true;
 	try {
 		const resolveTxtPromise = promisify(resolveTxt);
 
@@ -62,6 +77,7 @@ export async function verifyDkimRecord(
 	name: string,
 	value: string,
 ): Promise<boolean> {
+	if (isLocal(name)) return true;
 	try {
 		const resolveTxtPromise = promisify(resolveTxt);
 		const records = await Promise.race([
@@ -98,6 +114,7 @@ export async function verifyDmarcRecord(
 	name: string,
 	value: string,
 ): Promise<boolean> {
+	if (isLocal(name)) return true;
 	try {
 		const resolveTxtPromise = promisify(resolveTxt);
 
@@ -137,6 +154,7 @@ export async function verifyCnameRecord(
 	name: string,
 	value: string,
 ): Promise<boolean> {
+	if (isLocal(name)) return true;
 	try {
 		const resolveCnamePromise = promisify(resolveCname);
 

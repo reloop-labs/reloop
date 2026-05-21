@@ -32,7 +32,7 @@ export async function generateDnsRecords_step3({
 	let trackingRecord: DNSTypes.DNSRecord | undefined;
 	if (trackingSubdomain) {
 		trackingRecord = generateTrackingCNAMERecord(
-			trackingSubdomain,
+			getCustomReturnPathSubString(domain, trackingSubdomain),
 			getDomainHost(domain),
 		);
 	}
