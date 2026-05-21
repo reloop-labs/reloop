@@ -332,6 +332,8 @@ export const LogList = () => {
 								setSelectedLogId(logId);
 							}
 						}}
+						hasFilters={!!hasAnyFilter}
+						onClearFilters={handleClearAll}
 						total={totalLogs}
 						currentPage={currentPage}
 						pageSize={pageSize}

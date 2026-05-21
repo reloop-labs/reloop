@@ -22,6 +22,10 @@ interface LogTableProps {
 	loadingRows?: number;
 	selectedLogId?: string | null;
 	onRowClick?: (logId: string) => void;
+	/** Whether any filters are currently active */
+	hasFilters?: boolean;
+	/** Callback to clear all active filters */
+	onClearFilters?: () => void;
 	/** Pagination */
 	total?: number;
 	currentPage?: number;
@@ -171,6 +175,8 @@ export const LogTable = ({
 	loadingRows = 5,
 	selectedLogId,
 	onRowClick,
+	hasFilters,
+	onClearFilters,
 	total = 0,
 	currentPage = 1,
 	pageSize = 25,
@@ -200,18 +206,42 @@ export const LogTable = ({
 						</div>
 					))
 				) : logs.length === 0 ? (
-					<div className="flex flex-col items-center bg-bg-soft-200/10 px-6 py-12 text-center dark:bg-transparent">
-						<div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
-							<Icon name="activity" className="h-5 w-5 text-text-sub-600" />
+					hasFilters ? (
+						<div className="flex flex-col items-center bg-bg-soft-200/10 px-6 py-12 text-center dark:bg-transparent">
+							<div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
+								<Icon name="search" className="h-5 w-5 text-text-sub-600" />
+							</div>
+							<h3 className="mb-2 font-semibold text-lg text-text-strong-950">
+								No results found
+							</h3>
+							<p className="mx-auto mb-5 max-w-sm text-balance font-medium text-[12px] text-text-sub-600">
+								No logs match your current filters. Try adjusting your search,
+								date range, or status filters.
+							</p>
+							{onClearFilters && (
+								<Button.Root
+									variant="neutral"
+									mode="stroke"
+									size="xsmall"
+									onClick={onClearFilters}
+									className="gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
+								>
+									Clear all filters
+								</Button.Root>
+							)}
 						</div>
-						<h3 className="mb-2 font-semibold text-text-strong-950 text-lg">
-							No logs yet
-						</h3>
-						<p className="mx-auto mb-5 max-w-[260px] text-balance font-medium text-[12px] text-text-sub-600">
-							Logs will appear here once API requests start flowing through your
-							project.
-						</p>
-						<div className="flex items-center gap-3">
+					) : (
+						<div className="flex flex-col items-center bg-bg-soft-200/10 px-6 py-12 text-center dark:bg-transparent">
+							<div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
+								<Icon name="activity" className="h-5 w-5 text-text-sub-600" />
+							</div>
+							<h3 className="mb-2 font-semibold text-lg text-text-strong-950">
+								No logs yet
+							</h3>
+							<p className="mx-auto mb-5 max-w-[260px] text-balance font-medium text-[12px] text-text-sub-600">
+								Logs will appear here once API requests start flowing through
+								your project.
+							</p>
 							<Button.Root
 								variant="neutral"
 								mode="stroke"
@@ -229,7 +259,7 @@ export const LogTable = ({
 								</a>
 							</Button.Root>
 						</div>
-					</div>
+					)
 				) : (
 					groupLogsByDate(logs as any).map((group) => (
 						<div key={group.dateKey}>
