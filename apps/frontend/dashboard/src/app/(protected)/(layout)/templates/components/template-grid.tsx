@@ -1,5 +1,7 @@
 "use client";
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
+import { StarterKit } from "@react-email/editor/extensions";
+import { EmailTheming } from "@react-email/editor/plugins";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -9,16 +11,13 @@ import {
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
+import { EditorContent, useEditor } from "@tiptap/react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { DeleteTemplateModal } from "./delete-template-modal";
-
-import { StarterKit } from "@react-email/editor/extensions";
-import { EmailTheming } from "@react-email/editor/plugins";
-import { useEditor, EditorContent } from "@tiptap/react";
 import "@react-email/editor/themes/default.css";
 
 dayjs.extend(relativeTime);
@@ -202,12 +201,12 @@ const TemplatePreviewThumbnail = ({ template }: { template: Template }) => {
 	return (
 		<div
 			ref={containerRef}
-			className="absolute inset-0 overflow-hidden pointer-events-none select-none bg-zinc-100 dark:bg-zinc-800/50"
+			className="pointer-events-none absolute inset-0 select-none overflow-hidden bg-zinc-100 dark:bg-zinc-800/50"
 			style={{ padding: `${PAPER_INSET}px` }}
 		>
 			<div className="relative h-full w-full overflow-hidden rounded-md bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.05)] dark:bg-zinc-900 dark:shadow-[0_0_0_1px_rgba(255,255,255,0.06)]">
 				<div
-					className="[&_img]:!max-w-full [&_img]:h-auto [&_.tiptap]:!p-0 [&_.tiptap]:!m-0 [&_.tiptap]:!min-h-0 [&_.tiptap]:!w-full [&_.tiptap]:!overflow-hidden"
+					className="[&_img]:!max-w-full [&_.tiptap]:!p-0 [&_.tiptap]:!m-0 [&_.tiptap]:!min-h-0 [&_.tiptap]:!w-full [&_.tiptap]:!overflow-hidden [&_img]:h-auto"
 					style={{
 						width: `${EMAIL_WIDTH}px`,
 						overflow: "hidden",

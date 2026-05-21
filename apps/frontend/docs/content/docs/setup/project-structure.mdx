@@ -21,7 +21,6 @@ reloop/
 │   │   ├── contacts/    # Contact segmentation
 │   │   ├── domain/      # Domain & DNS validations
 │   │   ├── email/       # Direct transactional mail
-│   │   ├── kumomta/     # Kumomta MTA logging
 │   │   ├── kumomta-smtp/# SMTP protocol service
 │   │   ├── logs/        # Clickhouse event logging
 │   │   ├── mailing/     # Campaign delivery queues
@@ -57,7 +56,7 @@ We maintain three user-facing applications inside the monorepo:
 
 ## Backend API Microservices
 
-Our modular backend architecture consists of 14 dedicated **ElysiaJS** microservices inside `apps/backend/`. These coordinate via a NATS pub-sub bus and BullMQ background queues:
+Our modular backend architecture consists of 13 dedicated **ElysiaJS** microservices inside `apps/backend/`. These coordinate via a NATS pub-sub bus and BullMQ background queues:
 
 <Cards>
 <Card icon={<Icon name="key-new" />} title="Auth Service" href="/apps/backend/auth">
@@ -100,9 +99,7 @@ Our modular backend architecture consists of 14 dedicated **ElysiaJS** microserv
   Manages visual email templates, drag-and-drop JSON blocks, and HTML rendering.
 </Card>
 
-<Card icon={<Icon name="server" />} title="Kumomta Service" href="/apps/backend/kumomta">
-  MTA bridge collecting logging signals, incoming bounces, and status receipts.
-</Card>
+
 
 <Card icon={<Icon name="mail" />} title="Email Service" href="/apps/backend/email">
   Serves single transactional emails and notifications.

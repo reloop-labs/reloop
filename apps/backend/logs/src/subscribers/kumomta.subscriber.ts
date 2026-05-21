@@ -1,4 +1,4 @@
-import { BusEvent, bus } from "@reloop/bus";
+import { BusEvent, bus, type KumomtaLogRecordPayload } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { eq } from "drizzle-orm";
@@ -27,7 +27,7 @@ const EVENT_STATUS_MAP: Partial<
 	Feedback: "spam",
 };
 
-function formatErrorMessage(event: any): string {
+function formatErrorMessage(event: KumomtaLogRecordPayload): string {
 	const parts: string[] = [];
 
 	if (event.bounce_classification) {
@@ -48,7 +48,7 @@ function formatErrorMessage(event: any): string {
 export async function initKumomtaSubscriber() {
 	await bus.subscribe(
 		BusEvent.KUMOMTA_EVENT,
-		async (event, msg) => {
+		async (event) => {
 			try {
 				let emailLogId =
 					event.headers?.["X-Email-Log-ID"] || event.meta?.["X-Email-Log-ID"];

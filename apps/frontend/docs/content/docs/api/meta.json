@@ -82,11 +82,7 @@
 		"template/post-api-template-v1by-id-duplicate",
 		"template/post-api-template-v1create",
 		"template/put-api-template-v1by-id",
-		"---KumoMTA (Internal)---",
-		"kumomta/post-api-kumomta-v1dkim-key",
-		"kumomta/post-api-kumomta-v1log-incoming",
-		"kumomta/post-api-kumomta-v1verify",
-		"kumomta/post-api-kumomta-v1webhook-kumomta",
+
 		"---Auth---",
 		"auth/ban-user",
 		"auth/change-email",

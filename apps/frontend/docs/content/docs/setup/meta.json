@@ -19,7 +19,6 @@
 		"backend/contacts",
 		"backend/email",
 		"backend/mailing",
-		"backend/kumomta",
 		"backend/kumomta-smtp",
 		"backend/logs",
 		"backend/template",
