@@ -341,18 +341,6 @@ export const LogDetailPanel = ({ logId }: LogDetailPanelProps) => {
 								/>
 							</PropertyRow>
 						)}
-
-						{log.trace_id && (
-							<PropertyRow label="Trace ID">
-								<PropertyValue
-									value={log.trace_id}
-									mono
-									copyable
-									maxLength={26}
-								/>
-							</PropertyRow>
-						)}
-
 						{hasRequestDetails && log.requestDetails.userAgent && (
 							<PropertyRow label="Source">
 								<PropertyValue
