@@ -21,6 +21,7 @@ interface LogData {
 	status_code?: number | null;
 	trace_id: string | null;
 	metadata: Record<string, unknown>;
+	request_body?: Record<string, unknown> | null;
 	requestDetails: {
 		endpoint?: string;
 		method?: string;
@@ -361,6 +362,17 @@ const LogDetailPage = () => {
 									})()}
 							</div>
 						</div>
+
+						{/* Request body */}
+						{logData.request_body && Object.keys(logData.request_body).length > 0 && (
+							<div>
+								<CopyCodeBlock
+									code={JSON.stringify(logData.request_body, null, 2)}
+									lang="json"
+									label="Request body"
+								/>
+							</div>
+						)}
 
 						{/* Response body */}
 						{metadataEntries.length > 0 ? (

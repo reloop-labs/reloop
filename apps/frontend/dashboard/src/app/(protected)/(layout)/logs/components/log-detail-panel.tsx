@@ -24,6 +24,7 @@ interface LogDetail {
 	status_code?: number | null;
 	trace_id: string | null;
 	metadata: Record<string, unknown>;
+	request_body?: Record<string, unknown> | null;
 	requestDetails: {
 		endpoint?: string;
 		method?: string;
@@ -378,6 +379,17 @@ export const LogDetailPanel = ({ logId }: LogDetailPanelProps) => {
 							})()}
 					</div>
 				</div>
+
+				{/* Request body */}
+				{log.request_body && Object.keys(log.request_body).length > 0 && (
+					<div>
+						<CopyCodeBlock
+							code={JSON.stringify(log.request_body, null, 2)}
+							lang="json"
+							label="Request body"
+						/>
+					</div>
+				)}
 
 				{/* Response body */}
 				{metadataEntries.length > 0 ? (
