@@ -1,6 +1,6 @@
 import { authMiddleware } from "@be/template/middleware/auth";
-import { persistencePlugin } from "@be/template/utils/persistence";
 import type { YjsPersistence } from "@be/template/utils/persistence";
+import { persistencePlugin } from "@be/template/utils/persistence";
 import { Elysia } from "elysia";
 import { listDocsController } from "./list-docs.controllers";
 

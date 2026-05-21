@@ -424,12 +424,34 @@ export const EditorHeaderActions = ({
 		}
 	};
 
+	const handleDuplicate = async () => {
+		if (!templateId) return;
+
+		try {
+			const response = await fetch(`/api/template/v1/${templateId}/duplicate`, {
+				method: "POST",
+				credentials: "include",
+			});
+
+			if (!response.ok) {
+				throw new Error("Failed to duplicate template");
+			}
+
+			const newTemplate = await response.json();
+			toast.success("Template duplicated successfully");
+			router.push(`/templates/${newTemplate.id}`);
+		} catch (error) {
+			console.error("Failed to duplicate template:", error);
+			toast.error("Failed to duplicate template");
+		}
+	};
+
 	const handleItemClick = (itemId: string) => {
 		setPopoverOpen(false);
 		if (itemId === "delete") {
 			setIsDeleteModalOpen(true);
 		} else if (itemId === "duplicate") {
-			/* Duplicate logic */
+			handleDuplicate();
 		}
 	};
 

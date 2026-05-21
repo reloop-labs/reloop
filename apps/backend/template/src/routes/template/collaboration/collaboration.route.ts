@@ -33,7 +33,8 @@ export const collaborationRoute = new Elysia({
 			if (!template) {
 				log.warn({
 					...{ roomName, userId: user.id, orgId: user.activeOrganizationId },
-					message: "[collab] Rejecting client: Template not found or unauthorized",
+					message:
+						"[collab] Rejecting client: Template not found or unauthorized",
 				});
 				return ws.close(1008, "Unauthorized");
 			}
