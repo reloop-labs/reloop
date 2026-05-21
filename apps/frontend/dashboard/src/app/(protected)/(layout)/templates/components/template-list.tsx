@@ -9,7 +9,6 @@ import { useRouter } from "next/navigation";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useState } from "react";
 import useSWR from "swr";
-import { CreateTemplateModal } from "./create-template-modal";
 import { EmptyState } from "./empty-state";
 import { TemplateGrid } from "./template-grid";
 
