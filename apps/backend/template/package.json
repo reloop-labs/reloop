@@ -5,6 +5,7 @@
 	"scripts": {
 		"build": "tsdown",
 		"check-types": "tsc --noEmit",
+		"clean": "rm -rf .turbo node_modules dist",
 		"compile": "bun build --compile --minify --sourcemap --bytecode ./src/index.ts --outfile server",
 		"dev": "bun run --hot src/index.ts",
 		"fix-lint": "biome check --fix .",
