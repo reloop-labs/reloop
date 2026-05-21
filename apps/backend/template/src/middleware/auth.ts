@@ -1,58 +1,124 @@
-import { templateConfig } from "@be/template/template.config";
-import { TEMPLATE_ERROR_CODES } from "@be/template/template.error-code";
-import type { Session } from "@reloop/auth/server";
+import { AuthErrors } from "@be/template/error/template.error";
+import { createId } from "@paralleldrive/cuid2";
 import { Elysia } from "elysia";
-import { log } from "evlog";
+import { log as staticLog } from "evlog";
+import { evlog } from "evlog/elysia";
+import { validateApiKey } from "./api-key-auth";
+import { validateSession } from "./cookie-auth";
 
-if (templateConfig.NODE_ENV !== "production") {
-	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-}
-
-export const authMiddleware = new Elysia({ name: "better-auth" }).macro({
-	auth: {
-		async resolve({ status, request: { headers } }) {
-			try {
-				const response = await fetch(
-					`${templateConfig.BASE_URL}/api/auth/v1/get-session`,
-					{
-						method: "GET",
-						headers: new Headers({
-							"Content-Type": "application/json",
-							Cookie: headers.get("cookie") || "",
-						}),
-					},
-				);
-				const session: Session | null = await response.json();
-				if (session) {
-					if (!session?.user?.activeOrganizationId) {
-						return status(401, {
-							message: "User is not a member of an organization",
-							code: TEMPLATE_ERROR_CODES.UNAUTHORIZED,
-						});
-					}
+export const authMiddleware = new Elysia({ name: "better-auth" })
+	.use(evlog())
+	.macro({
+		cookieAuth: {
+			async resolve({ request: { headers }, log }) {
+				const cookie = headers.get("cookie");
+				const sessionResult = await validateSession(cookie);
+				if (sessionResult) {
+					const traceId = `req_${createId()}`;
+					log.set({
+						traceId,
+						service: "template",
+						user: sessionResult.userId,
+						organizationId: sessionResult.organizationId,
+					});
+					log.info("Session authentication successful");
 					return {
-						user: session.user,
-						session: session.session,
-						authMethod: "cookie" as const,
+						userId: sessionResult.userId,
+						organizationId: sessionResult.organizationId,
+						authType: "auth" as const,
+						traceId,
 					};
 				}
-				return status(401, {
-					message: "Authentication required",
-					statusCodeText: "Unauthorized",
-					errorCode: TEMPLATE_ERROR_CODES.UNAUTHORIZED,
-				});
-			} catch (error) {
-				log.error({
-					...{
-						error: error instanceof Error ? error.message : "Unknown error",
-					},
-					message: "Authentication error",
-				});
-				return status(401, {
-					message: "Authentication failed",
-					errorCode: TEMPLATE_ERROR_CODES.UNAUTHORIZED,
-				});
-			}
+				throw AuthErrors.unauthorized();
+			},
 		},
-	},
-});
+		apiKeyAuth: {
+			async resolve({ request: { headers }, log }) {
+				const apiKey = headers.get("x-api-key");
+				const apiKeyResult = await validateApiKey(apiKey);
+				if (apiKeyResult) {
+					const traceId = `req_${createId()}`;
+					log.set({
+						traceId,
+						service: "template",
+						user: apiKeyResult.userId,
+						organizationId: apiKeyResult.organizationId,
+					});
+					log.info("API key authentication successful");
+					return {
+						userId: apiKeyResult.userId,
+						organizationId: apiKeyResult.organizationId,
+						authType: "apikey" as const,
+						traceId,
+					};
+				}
+				throw AuthErrors.unauthorized();
+			},
+			detail: {
+				security: [{ apiKey: [] }],
+			},
+		},
+		auth: {
+			async resolve({ request: { headers }, log }) {
+				const apiKey = headers.get("x-api-key");
+				const cookie = headers.get("cookie");
+
+				if (apiKey) {
+					try {
+						const apiKeyResult = await validateApiKey(apiKey);
+						if (apiKeyResult) {
+							const traceId = `req_${createId()}`;
+							log.set({
+								traceId,
+								service: "template",
+								user: apiKeyResult.userId,
+								organizationId: apiKeyResult.organizationId,
+							});
+							log.info("API key authentication successful");
+							return {
+								userId: apiKeyResult.userId,
+								organizationId: apiKeyResult.organizationId,
+								authType: "apikey" as const,
+								traceId,
+							};
+						}
+					} catch (error) {
+						log.error("API key validation error", {
+							error: error instanceof Error ? error.message : "Unknown error",
+						});
+					}
+				}
+
+				if (cookie) {
+					try {
+						const sessionResult = await validateSession(cookie);
+						if (sessionResult) {
+							const traceId = `req_${createId()}`;
+							log.set({
+								traceId,
+								service: "template",
+								user: sessionResult.userId,
+								organizationId: sessionResult.organizationId,
+							});
+							log.info("Session authentication successful");
+							return {
+								userId: sessionResult.userId,
+								organizationId: sessionResult.organizationId,
+								authType: "auth" as const,
+								traceId,
+							};
+						}
+					} catch (error) {
+						log.error("Session validation error", {
+							error: error instanceof Error ? error.message : "Unknown error",
+						});
+					}
+				}
+
+				throw AuthErrors.unauthorized();
+			},
+			detail: {
+				security: [{ apiKey: [] }],
+			},
+		},
+	});

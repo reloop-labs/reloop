@@ -1,5 +1,7 @@
 import "dotenv/config";
-import { landing } from "@be/template/routes/landing/landing.index";
+import { agentCardRoute } from "@be/template/routes/landing/agent-card.route";
+import { healthRoute } from "@be/template/routes/landing/health.route";
+import { landingRoute } from "@be/template/routes/landing/landing.route";
 import { collaborationRoute } from "@be/template/routes/template/collaboration/collaboration.route";
 import { roomRoutes } from "@be/template/routes/template/room/room.routes";
 import { templateRoutes } from "@be/template/routes/template/template.routes";
@@ -51,7 +53,9 @@ const templateService = new Elysia({
 			link: parsed.link,
 		};
 	})
-	.use(landing)
+	.use(landingRoute)
+	.use(healthRoute)
+	.use(agentCardRoute)
 	.use(templateRoutes)
 	.use(roomRoutes)
 	.use(persistencePlugin)
@@ -62,7 +66,7 @@ const templateService = new Elysia({
 	.listen(port, () => {
 		log.info(
 			"Template Service",
-			`Template Server is running on ${templateConfig.BASE_URL}/api/template`,
+			`Running on:\n  - Local: http://localhost:${port}/api/template\n  - Base:  ${templateConfig.BASE_URL}/api/template`,
 		);
 	});
 

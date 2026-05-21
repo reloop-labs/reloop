@@ -4,8 +4,7 @@ import { getTemplate } from "./get-template.controllers";
 
 export const getTemplateRoute = new Elysia().use(authMiddleware).get(
 	"/:id",
-	async ({ params, user }) => {
-		const { activeOrganizationId: organizationId } = user;
+	async ({ params, organizationId }) => {
 		const { id } = params;
 
 		const result = await getTemplate({

@@ -5,10 +5,10 @@ import { getRoomController } from "./get-room.controllers";
 
 export const getRoomRoute = new Elysia().use(authMiddleware).get(
 	"/rooms/:roomName",
-	async ({ params: { roomName }, user, set }) => {
+	async ({ params: { roomName }, organizationId, set }) => {
 		const template = await templateModel.findByIdAndOrg(
 			roomName,
-			user.activeOrganizationId,
+			organizationId,
 		);
 		if (!template) {
 			set.status = 404;

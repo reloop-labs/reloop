@@ -40,6 +40,7 @@
 		"@reloop/db": "workspace:*",
 		"@reloop/cache": "workspace:*",
 		"@reloop/auth": "workspace:*",
+		"@reloop/apikey": "workspace:*",
 		"@reloop/bus": "workspace:*",
 		"@elysiajs/eden": "catalog:backend",
 		"@elysiajs/openapi": "catalog:backend",

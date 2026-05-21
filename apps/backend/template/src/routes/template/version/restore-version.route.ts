@@ -4,8 +4,7 @@ import { restoreVersion } from "./restore-version.controllers";
 
 export const restoreVersionRoute = new Elysia().use(authMiddleware).post(
 	"/:id/versions/:versionId/restore",
-	async ({ params, user }) => {
-		const { activeOrganizationId: organizationId } = user;
+	async ({ params, organizationId }) => {
 		const { id: templateId, versionId } = params;
 
 		const result = await restoreVersion({

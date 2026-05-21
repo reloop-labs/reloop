@@ -21,18 +21,18 @@ export const collaborationRoute = new Elysia({
 	.ws("/collab/:roomName", {
 		auth: true,
 		async open(ws) {
-			const { user } = ws.data;
-			if (!user) return ws.close(1008, "Unauthorized");
+			const { userId, organizationId } = ws.data;
+			if (!userId) return ws.close(1008, "Unauthorized");
 			const { roomName } = ws.data.params;
 
 			// Verify template exists and belongs to org
 			const template = await templateModel.findByIdAndOrg(
 				roomName,
-				user.activeOrganizationId,
+				organizationId,
 			);
 			if (!template) {
 				log.warn({
-					...{ roomName, userId: user.id, orgId: user.activeOrganizationId },
+					...{ roomName, userId, orgId: organizationId },
 					message:
 						"[collab] Rejecting client: Template not found or unauthorized",
 				});
@@ -49,10 +49,14 @@ export const collaborationRoute = new Elysia({
 				sendInitialSync(ws.raw, room);
 
 				// Push verified user details from server to client
-				if (ws.data.user) {
+				if (userId) {
+					const userDetails = {
+						id: userId,
+						activeOrganizationId: organizationId,
+					};
 					const encoder = encoding.createEncoder();
 					encoding.writeVarUint(encoder, MESSAGE_USER_INFO);
-					encoding.writeVarString(encoder, JSON.stringify(ws.data.user));
+					encoding.writeVarString(encoder, JSON.stringify(userDetails));
 					ws.raw.send(encoding.toUint8Array(encoder));
 				}
 

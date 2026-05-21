@@ -9,11 +9,8 @@ export const listDocsRoute = new Elysia()
 	.use(persistencePlugin)
 	.get(
 		"/docs",
-		async ({ user, store }) => {
-			return await listDocsController(
-				store.persistence,
-				user.activeOrganizationId,
-			);
+		async ({ organizationId, store }) => {
+			return await listDocsController(store.persistence, organizationId);
 		},
 		{
 			auth: true,

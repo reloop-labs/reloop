@@ -8,8 +8,7 @@ export const duplicateTemplateRoute = new Elysia()
 	.use(persistencePlugin)
 	.post(
 		"/:id/duplicate",
-		async ({ params, user, store }) => {
-			const { id: userId, activeOrganizationId: organizationId } = user;
+		async ({ params, userId, organizationId, store }) => {
 			const { id } = params;
 
 			const result = await duplicateTemplate({

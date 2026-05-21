@@ -1,11 +1,9 @@
-import { db } from "@reloop/db/client";
 import { Elysia } from "elysia";
 
-export const landing = new Elysia({ name: "Landing" })
-	.get(
-		"/",
-		() => {
-			return `
+export const landingRoute = new Elysia().get(
+	"/",
+	() => {
+		return `
 ╔══════════════════════════════════════════════════════════════════════╗
 ║                        TEMPLATE SERVICE                              ║
 ╠══════════════════════════════════════════════════════════════════════╣
@@ -44,112 +42,10 @@ export const landing = new Elysia({ name: "Landing" })
                 Made with ❤️ for developers
 
 `;
+	},
+	{
+		detail: {
+			hide: true,
 		},
-		{
-			detail: {
-				hide: true,
-			},
-		},
-	)
-	.get(
-		"/health",
-		async () => {
-			try {
-				const startTime = Date.now();
-				await db.execute("SELECT 1 as test");
-				const responseTime = Date.now() - startTime;
-
-				return {
-					status: "CONNECTED",
-					success: true,
-					responseTime: `${responseTime}ms`,
-					timestamp: new Date().toISOString(),
-				};
-			} catch (error) {
-				return {
-					status: "DISCONNECTED",
-					success: false,
-					error: error instanceof Error ? error.message : String(error),
-					timestamp: new Date().toISOString(),
-				};
-			}
-		},
-		{ detail: { hide: true } },
-	)
-	.get("/agent-card.json", () => ({
-		name: "Template Service",
-		version: "1.0.0",
-		description:
-			"Service for managing email and message templates with support for variables and versioning.",
-		url: "https://reloop.sh",
-		defaultInputModes: ["application/json"],
-		defaultOutputModes: ["application/json"],
-		supportsStreaming: false,
-		skills: [
-			{
-				id: "health_check",
-				name: "Health Check",
-				description: "Check the health of the template service.",
-				method: "GET",
-				path: "/api/template/health",
-				tags: ["monitoring"],
-				inputSchema: {},
-				outputSchema: {
-					status: { type: "string" },
-					success: { type: "boolean" },
-				},
-				errorCodes: [],
-				examples: [],
-			},
-			{
-				id: "create_template",
-				name: "Create Template",
-				description: "Create a new message template.",
-				method: "POST",
-				path: "/api/template/v1/",
-				tags: ["template"],
-				inputSchema: {
-					name: {
-						type: "string",
-						required: true,
-						description: "Name of the template",
-					},
-					content: {
-						type: "string",
-						required: true,
-						description: "Template content (Handlebars supported)",
-					},
-				},
-				outputSchema: {
-					id: { type: "string" },
-				},
-				errorCodes: [],
-				examples: [],
-			},
-			{
-				id: "list_templates",
-				name: "List Templates",
-				description: "Retrieve all templates for the organization.",
-				method: "GET",
-				path: "/api/template/v1/list",
-				tags: ["template"],
-				inputSchema: {},
-				outputSchema: {
-					templates: { type: "array" },
-				},
-				errorCodes: [],
-				examples: [],
-			},
-		],
-		usage_guidelines:
-			"1. Templates support Handlebars syntax for dynamic variable injection.\n2. Templates can be duplicated to create new versions or variations.\n3. Deleting a template is permanent; ensure no active workflows rely on it.",
-		authentication: {
-			schemes: ["bearer", "cookie"],
-			headerName: "Authorization",
-			notes: "Bearer token or session cookie required.",
-		},
-		provider: {
-			organization: "Reloop labs",
-			contact: "https://reloop.sh/support",
-		},
-	}));
+	},
+);

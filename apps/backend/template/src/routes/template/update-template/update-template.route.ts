@@ -4,8 +4,7 @@ import { updateTemplate } from "./update-template.controllers";
 
 export const updateTemplateRoute = new Elysia().use(authMiddleware).put(
 	"/:id",
-	async ({ params, body, user }) => {
-		const { activeOrganizationId: organizationId } = user;
+	async ({ params, body, organizationId }) => {
 		const { id } = params;
 
 		const result = await updateTemplate({

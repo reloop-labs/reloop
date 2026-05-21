@@ -4,8 +4,7 @@ import { listVersions } from "./list-versions.controllers";
 
 export const listVersionsRoute = new Elysia().use(authMiddleware).get(
 	"/:id/versions",
-	async ({ params, user }) => {
-		const { activeOrganizationId: organizationId } = user;
+	async ({ params, organizationId }) => {
 		const { id: templateId } = params;
 
 		const result = await listVersions({

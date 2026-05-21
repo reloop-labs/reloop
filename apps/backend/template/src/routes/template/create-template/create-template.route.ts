@@ -4,8 +4,7 @@ import { createTemplate } from "./create-template.controllers";
 
 export const createTemplateRoute = new Elysia().use(authMiddleware).post(
 	"/create",
-	async ({ body, user }) => {
-		const { id: userId, activeOrganizationId: organizationId } = user;
+	async ({ body, userId, organizationId }) => {
 		const { name, description, subject, content } = body;
 
 		const result = await createTemplate({

@@ -4,8 +4,7 @@ import { deleteTemplate } from "./delete-template.controllers";
 
 export const deleteTemplateRoute = new Elysia().use(authMiddleware).delete(
 	"/:id",
-	async ({ params, user }) => {
-		const { activeOrganizationId: organizationId } = user;
+	async ({ params, organizationId }) => {
 		const { id } = params;
 
 		const result = await deleteTemplate({

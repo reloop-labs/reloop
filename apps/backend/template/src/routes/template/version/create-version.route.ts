@@ -4,8 +4,7 @@ import { createVersion } from "./create-version.controllers";
 
 export const createVersionRoute = new Elysia().use(authMiddleware).post(
 	"/:id/versions",
-	async ({ params, body, user }) => {
-		const { id: userId, activeOrganizationId: organizationId } = user;
+	async ({ params, body, userId, organizationId }) => {
 		const { id: templateId } = params;
 		const {
 			content,

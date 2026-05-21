@@ -10,10 +10,10 @@ export const saveRoomRoute = new Elysia()
 	.use(persistencePlugin)
 	.post(
 		"/rooms/:roomName/save",
-		async ({ params: { roomName }, user, store, set }) => {
+		async ({ params: { roomName }, organizationId, store, set }) => {
 			const template = await templateModel.findByIdAndOrg(
 				roomName,
-				user.activeOrganizationId,
+				organizationId,
 			);
 			if (!template) {
 				set.status = 404;

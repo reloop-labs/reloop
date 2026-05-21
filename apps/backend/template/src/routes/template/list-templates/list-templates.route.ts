@@ -4,8 +4,7 @@ import { listTemplates } from "./list-templates.controllers";
 
 export const listTemplatesRoute = new Elysia().use(authMiddleware).get(
 	"/list",
-	async ({ query, user }) => {
-		const { activeOrganizationId: organizationId } = user;
+	async ({ query, organizationId }) => {
 		const { page, limit } = query;
 
 		const result = await listTemplates({

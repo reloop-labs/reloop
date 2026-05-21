@@ -4,8 +4,7 @@ import { deleteVersion } from "./delete-version.controllers";
 
 export const deleteVersionRoute = new Elysia().use(authMiddleware).delete(
 	"/:id/versions/:versionId",
-	async ({ params, user }) => {
-		const { activeOrganizationId: organizationId } = user;
+	async ({ params, organizationId }) => {
 		const { id: templateId, versionId } = params;
 
 		const result = await deleteVersion({
