@@ -34,7 +34,8 @@ export const restoreVersionRoute = new Elysia().use(authMiddleware).post(
 			500: ErrorResponseSchema,
 		},
 		detail: {
-			tags: ["Template"],
+			tags: ["Templates"],
+
 			summary: "Restore template version",
 			description: "Restores a template to a specific historical version",
 			"x-codeSamples": restoreVersionXCodeSamples,

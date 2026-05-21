@@ -31,7 +31,8 @@ export const agentCardRoute = new Elysia().get("/agent-card.json", () => ({
 			description: "Create a new message template.",
 			method: "POST",
 			path: "/api/template/v1/",
-			tags: ["template"],
+			tags: ["Templates"],
+
 			inputSchema: {
 				name: {
 					type: "string",
@@ -56,7 +57,8 @@ export const agentCardRoute = new Elysia().get("/agent-card.json", () => ({
 			description: "Retrieve all templates for the organization.",
 			method: "GET",
 			path: "/api/template/v1/list",
-			tags: ["template"],
+			tags: ["Templates"],
+
 			inputSchema: {},
 			outputSchema: {
 				templates: { type: "array" },
