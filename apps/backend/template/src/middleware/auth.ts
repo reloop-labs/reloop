@@ -1,7 +1,6 @@
 import { AuthErrors } from "@be/template/error/template.error";
 import { createId } from "@paralleldrive/cuid2";
 import { Elysia } from "elysia";
-import { log as staticLog } from "evlog";
 import { evlog } from "evlog/elysia";
 import { validateApiKey } from "./api-key-auth";
 import { validateSession } from "./cookie-auth";

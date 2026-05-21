@@ -12,7 +12,7 @@ export const MESSAGE_USER_INFO = 2;
 
 export interface CollabClient {
 	readyState: number;
-	send(message: Uint8Array): void | number;
+	send(message: Uint8Array): void;
 }
 
 // ── Room type ──────────────────────────────────────────────────────────────
@@ -33,7 +33,7 @@ export const getRoom = (roomName: string): Room => {
 		const awareness = new awarenessProtocol.Awareness(doc);
 
 		// Broadcast document updates to all connected clients
-		doc.on("update", (update: Uint8Array, origin: any) => {
+		doc.on("update", (update: Uint8Array, origin: unknown) => {
 			const encoder = encoding.createEncoder();
 			encoding.writeVarUint(encoder, MESSAGE_SYNC);
 			syncProtocol.writeUpdate(encoder, update);

@@ -90,16 +90,6 @@ export const templateModel = {
 			.limit(limit)
 			.offset(offset);
 
-		const [countResult] = await db
-			.select({ count: schema.template.id })
-			.from(schema.template)
-			.where(
-				and(
-					eq(schema.template.organizationId, organizationId),
-					isNull(schema.template.deletedAt),
-				),
-			);
-
 		return {
 			templates,
 			total: templates.length,

@@ -1,6 +1,5 @@
 import { authMiddleware } from "@be/template/middleware/auth";
 import { templateModel } from "@be/template/model/template.model";
-import type { YjsPersistence } from "@be/template/utils/persistence";
 import { persistencePlugin } from "@be/template/utils/persistence";
 import { Elysia, t } from "elysia";
 import { exportRoomController } from "./export-room.controllers";

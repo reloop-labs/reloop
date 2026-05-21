@@ -1,18 +1,15 @@
 import {
 	type CollabClient,
-	getRoomName,
 	MESSAGE_AWARENESS,
 	MESSAGE_SYNC,
 	type Room,
 } from "@be/template/plugins/room";
-import type { YjsPersistence } from "@be/template/utils/persistence";
 import { log } from "evlog";
 
 import * as decoding from "lib0/decoding";
 import * as encoding from "lib0/encoding";
 import * as awarenessProtocol from "y-protocols/awareness";
 import * as syncProtocol from "y-protocols/sync";
-import * as Y from "yjs";
 
 /** Normalize whatever Elysia gives us into a clean Uint8Array */
 export function toUint8Array(raw: unknown): Uint8Array {
@@ -57,12 +54,7 @@ export function sendInitialSync(ws: CollabClient, room: Room) {
  * Handle an incoming binary message from a client.
  * Routes to sync or awareness handler based on the first byte.
  */
-export function handleMessage(
-	ws: CollabClient,
-	raw: unknown,
-	room: Room,
-	persistence: YjsPersistence | null,
-) {
+export function handleMessage(ws: CollabClient, raw: unknown, room: Room) {
 	let message: Uint8Array;
 	try {
 		message = toUint8Array(raw);
