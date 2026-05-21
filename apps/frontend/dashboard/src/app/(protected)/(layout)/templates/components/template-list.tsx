@@ -1,12 +1,10 @@
 "use client";
-import { PageSizeDropdown } from "@fe/dashboard/components/page-size-dropdown";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import Spinner from "@reloop/ui/spinner";
 import { useRouter } from "next/navigation";
-import { parseAsInteger, useQueryState } from "nuqs";
 import { useState } from "react";
 import useSWR from "swr";
 import { EmptyState } from "./empty-state";
@@ -34,14 +32,8 @@ export const TemplateList = () => {
 	const router = useRouter();
 	const [searchQuery, setSearchQuery] = useState<string>("");
 	const [isCreating, setIsCreating] = useState(false);
-	const [currentPage, setCurrentPage] = useQueryState(
-		"page",
-		parseAsInteger.withDefault(1),
-	);
-	const [pageSize, setPageSize] = useQueryState(
-		"limit",
-		parseAsInteger.withDefault(10),
-	);
+	const currentPage = 1;
+	const pageSize = 100;
 
 	const { data, error, isLoading, mutate } = useSWR<TemplateListResponse>(
 		activeOrganization?.id
@@ -76,10 +68,6 @@ export const TemplateList = () => {
 			setIsCreating(false);
 		}
 	};
-
-	const totalPages = data ? Math.ceil(data.total / pageSize) : 1;
-	const startIndex = (currentPage - 1) * pageSize + 1;
-	const endIndex = Math.min(currentPage * pageSize, data?.total || 0);
 
 	// Filter templates based on search query
 	const filteredTemplates =
@@ -150,54 +138,6 @@ export const TemplateList = () => {
 								onMutate={mutate}
 							/>
 						</div>
-
-						{/* Pagination */}
-						{data && data.total > 0 && (
-							<div className="mt-4 flex items-center justify-between pb-8 text-paragraph-sm text-text-sub-600">
-								<div className="flex items-center gap-3">
-									<span>
-										Showing {startIndex}–{endIndex} of {data.total} template
-										{data.total !== 1 ? "s" : ""}
-									</span>
-									<PageSizeDropdown
-										value={pageSize}
-										onValueChange={(value) => {
-											setPageSize(value);
-											setCurrentPage(1);
-										}}
-									/>
-								</div>
-								<div className="flex items-center gap-2">
-									<Button.Root
-										variant="neutral"
-										mode="stroke"
-										size="xxsmall"
-										onClick={() =>
-											setCurrentPage((prev) => Math.max(1, prev - 1))
-										}
-										disabled={currentPage === 1 || isLoading}
-										className="transition-all duration-200 hover:border-primary-base hover:bg-bg-weak-50/50"
-									>
-										<Icon name="chevron-left" className="h-4 w-4" />
-									</Button.Root>
-									<span className="px-2">
-										Page {currentPage} of {totalPages}
-									</span>
-									<Button.Root
-										variant="neutral"
-										mode="stroke"
-										size="xxsmall"
-										onClick={() =>
-											setCurrentPage((prev) => Math.min(totalPages, prev + 1))
-										}
-										disabled={currentPage === totalPages || isLoading}
-										className="transition-all duration-200 hover:border-primary-base hover:bg-bg-weak-50/50"
-									>
-										<Icon name="chevron-right" className="h-4 w-4" />
-									</Button.Root>
-								</div>
-							</div>
-						)}
 					</div>
 				)}
 			</div>
