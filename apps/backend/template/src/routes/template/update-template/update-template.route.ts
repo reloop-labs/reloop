@@ -3,6 +3,7 @@ import { authMiddleware } from "@be/template/middleware/auth";
 import { templateResponseSchema } from "@be/template/model/template.model";
 import { Elysia, t } from "elysia";
 import { updateTemplate } from "./update-template.controllers";
+import { updateTemplateXCodeSamples } from "./update-template.x-codeSamples";
 
 export const updateTemplateRoute = new Elysia().use(authMiddleware).put(
 	"/:id",
@@ -51,6 +52,7 @@ export const updateTemplateRoute = new Elysia().use(authMiddleware).put(
 			tags: ["Templates"],
 			summary: "Update template",
 			description: "Updates template properties or draft content",
+			"x-codeSamples": updateTemplateXCodeSamples,
 		},
 	},
 );

@@ -3,6 +3,7 @@ import { authMiddleware } from "@be/template/middleware/auth";
 import { templateResponseSchema } from "@be/template/model/template.model";
 import { Elysia, t } from "elysia";
 import { getTemplate } from "./get-template.controllers";
+import { getTemplateXCodeSamples } from "./get-template.x-codeSamples";
 
 export const getTemplateRoute = new Elysia().use(authMiddleware).get(
 	"/:id",
@@ -33,6 +34,7 @@ export const getTemplateRoute = new Elysia().use(authMiddleware).get(
 			tags: ["Templates"],
 			summary: "Get template by ID",
 			description: "Retrieves a single template by its ID",
+			"x-codeSamples": getTemplateXCodeSamples,
 		},
 	},
 );

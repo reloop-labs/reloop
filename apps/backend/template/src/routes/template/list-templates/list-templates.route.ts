@@ -3,6 +3,7 @@ import { authMiddleware } from "@be/template/middleware/auth";
 import { templateResponseSchema } from "@be/template/model/template.model";
 import { Elysia, t } from "elysia";
 import { listTemplates } from "./list-templates.controllers";
+import { listTemplatesXCodeSamples } from "./list-templates.x-codeSamples";
 
 export const listTemplatesRoute = new Elysia().use(authMiddleware).get(
 	"/list",
@@ -40,6 +41,7 @@ export const listTemplatesRoute = new Elysia().use(authMiddleware).get(
 			tags: ["Templates"],
 			summary: "List templates",
 			description: "Lists all templates for the organization with pagination",
+			"x-codeSamples": listTemplatesXCodeSamples,
 		},
 	},
 );

@@ -4,6 +4,7 @@ import { templateResponseSchema } from "@be/template/model/template.model";
 import { persistencePlugin } from "@be/template/utils/persistence";
 import { Elysia, t } from "elysia";
 import { duplicateTemplate } from "./duplicate-template.controllers";
+import { duplicateTemplateXCodeSamples } from "./duplicate-template.x-codeSamples";
 
 export const duplicateTemplateRoute = new Elysia()
 	.use(authMiddleware)
@@ -39,6 +40,7 @@ export const duplicateTemplateRoute = new Elysia()
 				tags: ["Templates"],
 				summary: "Duplicate template",
 				description: "Creates a copy of an existing template",
+				"x-codeSamples": duplicateTemplateXCodeSamples,
 			},
 		},
 	);

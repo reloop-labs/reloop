@@ -2,6 +2,7 @@ import { ErrorResponseSchema } from "@be/template/error/template.error";
 import { authMiddleware } from "@be/template/middleware/auth";
 import { Elysia, t } from "elysia";
 import { deleteTemplate } from "./delete-template.controllers";
+import { deleteTemplateXCodeSamples } from "./delete-template.x-codeSamples";
 
 export const deleteTemplateRoute = new Elysia().use(authMiddleware).delete(
 	"/:id",
@@ -35,6 +36,7 @@ export const deleteTemplateRoute = new Elysia().use(authMiddleware).delete(
 			tags: ["Templates"],
 			summary: "Delete template",
 			description: "Soft deletes a template",
+			"x-codeSamples": deleteTemplateXCodeSamples,
 		},
 	},
 );

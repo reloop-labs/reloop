@@ -3,6 +3,7 @@ import { authMiddleware } from "@be/template/middleware/auth";
 import { templateVersionResponseSchema } from "@be/template/model/template.model";
 import { Elysia, t } from "elysia";
 import { createVersion } from "./create-version.controllers";
+import { createVersionXCodeSamples } from "./create-version.x-codeSamples";
 
 export const createVersionRoute = new Elysia().use(authMiddleware).post(
 	"/:id/versions",
@@ -72,6 +73,7 @@ export const createVersionRoute = new Elysia().use(authMiddleware).post(
 			summary: "Create a new template version",
 			description:
 				"Saves a snapshot of the current template content as a new version",
+			"x-codeSamples": createVersionXCodeSamples,
 		},
 	},
 );

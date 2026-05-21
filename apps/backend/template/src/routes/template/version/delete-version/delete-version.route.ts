@@ -3,6 +3,7 @@ import { authMiddleware } from "@be/template/middleware/auth";
 import { templateVersionResponseSchema } from "@be/template/model/template.model";
 import { Elysia, t } from "elysia";
 import { deleteVersion } from "./delete-version.controllers";
+import { deleteVersionXCodeSamples } from "./delete-version.x-codeSamples";
 
 export const deleteVersionRoute = new Elysia().use(authMiddleware).delete(
 	"/:id/versions/:versionId",
@@ -36,6 +37,7 @@ export const deleteVersionRoute = new Elysia().use(authMiddleware).delete(
 			summary: "Delete template version",
 			description:
 				"Deletes a specific version of a template if it is not the active version",
+			"x-codeSamples": deleteVersionXCodeSamples,
 		},
 	},
 );
