@@ -1,6 +1,7 @@
 import { ErrorResponseSchema } from "@be/template/error/template.error";
 import { authMiddleware } from "@be/template/middleware/auth";
 import { templateVersionResponseSchema } from "@be/template/model/template.model";
+import { auditLogHook } from "@be/template/utils/audit-log";
 import { Elysia, t } from "elysia";
 import { createVersion } from "./create-version.controllers";
 import { createVersionXCodeSamples } from "./create-version.x-codeSamples";
@@ -75,5 +76,9 @@ export const createVersionRoute = new Elysia().use(authMiddleware).post(
 				"Saves a snapshot of the current template content as a new version",
 			"x-codeSamples": createVersionXCodeSamples,
 		},
+		afterResponse: auditLogHook({
+			resourceType: "template_version",
+			action: "created",
+		}),
 	},
 );

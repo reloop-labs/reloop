@@ -1,6 +1,7 @@
 import { ErrorResponseSchema } from "@be/template/error/template.error";
 import { authMiddleware } from "@be/template/middleware/auth";
 import { templateResponseSchema } from "@be/template/model/template.model";
+import { auditLogHook } from "@be/template/utils/audit-log";
 import { Elysia, t } from "elysia";
 import { createTemplate } from "./create-template.controllers";
 import { createTemplateXCodeSamples } from "./create-template.x-codeSamples";
@@ -43,5 +44,9 @@ export const createTemplateRoute = new Elysia().use(authMiddleware).post(
 			description: "Creates a new email template for the organization",
 			"x-codeSamples": createTemplateXCodeSamples,
 		},
+		afterResponse: auditLogHook({
+			resourceType: "template",
+			action: "created",
+		}),
 	},
 );

@@ -1,5 +1,6 @@
 import { ErrorResponseSchema } from "@be/template/error/template.error";
 import { authMiddleware } from "@be/template/middleware/auth";
+import { auditLogHook } from "@be/template/utils/audit-log";
 import { Elysia, t } from "elysia";
 import { deleteTemplate } from "./delete-template.controllers";
 import { deleteTemplateXCodeSamples } from "./delete-template.x-codeSamples";
@@ -38,5 +39,9 @@ export const deleteTemplateRoute = new Elysia().use(authMiddleware).delete(
 			description: "Soft deletes a template",
 			"x-codeSamples": deleteTemplateXCodeSamples,
 		},
+		afterResponse: auditLogHook({
+			resourceType: "template",
+			action: "deleted",
+		}),
 	},
 );

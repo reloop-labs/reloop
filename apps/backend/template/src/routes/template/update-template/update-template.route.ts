@@ -1,6 +1,7 @@
 import { ErrorResponseSchema } from "@be/template/error/template.error";
 import { authMiddleware } from "@be/template/middleware/auth";
 import { templateResponseSchema } from "@be/template/model/template.model";
+import { auditLogHook } from "@be/template/utils/audit-log";
 import { Elysia, t } from "elysia";
 import { updateTemplate } from "./update-template.controllers";
 import { updateTemplateXCodeSamples } from "./update-template.x-codeSamples";
@@ -54,5 +55,9 @@ export const updateTemplateRoute = new Elysia().use(authMiddleware).put(
 			description: "Updates template properties or draft content",
 			"x-codeSamples": updateTemplateXCodeSamples,
 		},
+		afterResponse: auditLogHook({
+			resourceType: "template",
+			action: "updated",
+		}),
 	},
 );
