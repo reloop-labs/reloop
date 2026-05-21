@@ -231,9 +231,9 @@ const OrganizationList: React.FC<OrganizationListProps> = ({
 							<div className="relative flex-shrink-0">
 								{organization.logo ? (
 									<Avatar.Root
-										size="32"
+										size="24"
 										placeholderType="company"
-										className="rounded-[8px]"
+										className="rounded-[6px]"
 									>
 										<Avatar.Image
 											src={organization.logo}
@@ -243,7 +243,7 @@ const OrganizationList: React.FC<OrganizationListProps> = ({
 								) : (
 									<div
 										className={cn(
-											"flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-[6px] font-semibold text-[11px] text-white",
+											"flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-[6px] font-semibold text-[11px] text-white",
 											getAvatarGradient(organization.name),
 										)}
 									>

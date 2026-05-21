@@ -115,7 +115,7 @@ export function PostGenerate({
 			<LanguageBadges value={lang} onChange={onLanguageChange} />
 
 			{/* 3-step integration guide */}
-			<div className="flex flex-col gap-5">
+			<div className="ml-0.5 flex flex-col gap-5">
 				<StepCard number={1} title="Install the Reloop SDK">
 					<CopyCodeBlock
 						code={installCode}
