@@ -1,4 +1,4 @@
-import { TemplateError } from "@be/template/error/template.error";
+import { TemplateErrors } from "@be/template/error/template.error";
 import { templateModel } from "@be/template/model/template.model";
 import { log } from "evlog";
 
@@ -12,14 +12,15 @@ export async function getTemplate(params: {
 		const template = await templateModel.findByIdAndOrg(id, organizationId);
 
 		if (!template) {
-			throw TemplateError.notFound(id);
+			throw TemplateErrors.notFound(id);
 		}
 
 		return template;
 	} catch (error) {
-		console.error(
-			`Error getting template: ${error instanceof Error ? error.message : String(error)}`,
-		);
+		log.error({
+			message: "Error getting template",
+			error: error instanceof Error ? error.message : String(error),
+		});
 		throw error;
 	}
 }

@@ -1,4 +1,4 @@
-import { TemplateError } from "@be/template/error/template.error";
+import { TemplateErrors } from "@be/template/error/template.error";
 import { templateModel } from "@be/template/model/template.model";
 import type { YjsPersistence } from "@be/template/utils/persistence";
 import { log } from "evlog";
@@ -15,7 +15,7 @@ export async function duplicateTemplate(params: {
 		const result = await templateModel.duplicate(id, organizationId, userId);
 
 		if (!result) {
-			throw TemplateError.notFound(id);
+			throw TemplateErrors.notFound(id);
 		}
 
 		// Duplicate Yjs collaborative document state if it exists
@@ -40,9 +40,10 @@ export async function duplicateTemplate(params: {
 
 		return result;
 	} catch (error) {
-		console.error(
-			`Error duplicating template: ${error instanceof Error ? error.message : String(error)}`,
-		);
+		log.error({
+			message: "Error duplicating template",
+			error: error instanceof Error ? error.message : String(error),
+		});
 		throw error;
 	}
 }

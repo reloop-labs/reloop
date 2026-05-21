@@ -1,4 +1,4 @@
-import { TemplateError } from "@be/template/error/template.error";
+import { TemplateErrors } from "@be/template/error/template.error";
 import { templateModel } from "@be/template/model/template.model";
 import { templateVersionModel } from "@be/template/model/template-version.model";
 import type { TemplateBlock } from "@reloop/db/schema";
@@ -38,7 +38,7 @@ export async function createVersion(params: {
 		organizationId,
 	);
 	if (!existing) {
-		throw TemplateError.notFound(templateId);
+		throw TemplateErrors.notFound(templateId);
 	}
 
 	const nextVersion =

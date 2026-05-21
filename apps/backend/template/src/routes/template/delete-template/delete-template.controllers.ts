@@ -1,4 +1,4 @@
-import { TemplateError } from "@be/template/error/template.error";
+import { TemplateErrors } from "@be/template/error/template.error";
 import { templateModel } from "@be/template/model/template.model";
 import { log } from "evlog";
 
@@ -12,16 +12,17 @@ export async function deleteTemplate(params: {
 		// Verify template exists and belongs to org
 		const existing = await templateModel.findByIdAndOrg(id, organizationId);
 		if (!existing) {
-			throw TemplateError.notFound(id);
+			throw TemplateErrors.notFound(id);
 		}
 
 		const result = await templateModel.softDelete(id);
 
 		return { success: true, id: result?.id };
 	} catch (error) {
-		console.error(
-			`Error deleting template: ${error instanceof Error ? error.message : String(error)}`,
-		);
+		log.error({
+			message: "Error deleting template",
+			error: error instanceof Error ? error.message : String(error),
+		});
 		throw error;
 	}
 }

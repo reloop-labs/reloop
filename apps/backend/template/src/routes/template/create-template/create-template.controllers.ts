@@ -1,4 +1,4 @@
-import { TemplateError } from "@be/template/error/template.error";
+import { TemplateErrors } from "@be/template/error/template.error";
 import { templateModel } from "@be/template/model/template.model";
 import type { TemplateBlock } from "@reloop/db/schema";
 import { log } from "evlog";
@@ -16,7 +16,7 @@ export async function createTemplate(params: {
 
 	try {
 		if (!name || name.trim().length === 0) {
-			throw TemplateError.nameRequired();
+			throw TemplateErrors.nameRequired();
 		}
 
 		const result = await templateModel.create({
@@ -31,9 +31,10 @@ export async function createTemplate(params: {
 
 		return result;
 	} catch (error) {
-		console.error(
-			`Error creating template: ${error instanceof Error ? error.message : String(error)}`,
-		);
+		log.error({
+			message: "Error creating template",
+			error: error instanceof Error ? error.message : String(error),
+		});
 		throw error;
 	}
 }

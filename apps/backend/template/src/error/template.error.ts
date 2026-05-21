@@ -1,72 +1,72 @@
-import {
-	TEMPLATE_ERROR_CODES,
-	type TemplateErrorCode,
-} from "../template.error-code";
+import { createError } from "evlog";
 
-export class TemplateError extends Error {
-	public readonly code: TemplateErrorCode;
-	public readonly statusCode: number;
+export const AuthErrors = {
+	unauthorized: (why?: string, fix?: string) =>
+		createError({
+			status: 401,
+			message: "Unauthorized",
+			why: why ?? "Authentication required",
+			fix: fix ?? "Please provide valid credentials or log in.",
+		}),
+	forbidden: (why?: string, fix?: string) =>
+		createError({
+			status: 403,
+			message: "Forbidden",
+			why: why ?? "You do not have permission to perform this action",
+			fix:
+				fix ??
+				"Verify that you are a member of the organization and have the required permissions.",
+		}),
+};
 
-	constructor(code: TemplateErrorCode, message: string, statusCode = 400) {
-		super(message);
-		this.name = "TemplateError";
-		this.code = code;
-		this.statusCode = statusCode;
-	}
-
-	static notFound(id: string): TemplateError {
-		return new TemplateError(
-			TEMPLATE_ERROR_CODES.TEMPLATE_NOT_FOUND,
-			`Template with id "${id}" not found`,
-			404,
-		);
-	}
-
-	static nameRequired(): TemplateError {
-		return new TemplateError(
-			TEMPLATE_ERROR_CODES.TEMPLATE_NAME_REQUIRED,
-			"Template name is required",
-			400,
-		);
-	}
-
-	static invalidContent(reason: string): TemplateError {
-		return new TemplateError(
-			TEMPLATE_ERROR_CODES.TEMPLATE_CONTENT_INVALID,
-			`Invalid template content: ${reason}`,
-			400,
-		);
-	}
-
-	static unauthorized(): TemplateError {
-		return new TemplateError(
-			TEMPLATE_ERROR_CODES.UNAUTHORIZED,
-			"Authentication required",
-			401,
-		);
-	}
-
-	static forbidden(): TemplateError {
-		return new TemplateError(
-			TEMPLATE_ERROR_CODES.FORBIDDEN,
-			"You do not have permission to perform this action",
-			403,
-		);
-	}
-
-	static renderFailed(reason: string): TemplateError {
-		return new TemplateError(
-			TEMPLATE_ERROR_CODES.TEMPLATE_RENDER_FAILED,
-			`Failed to render template: ${reason}`,
-			500,
-		);
-	}
-
-	static versionNotFound(templateId: string, version: number): TemplateError {
-		return new TemplateError(
-			TEMPLATE_ERROR_CODES.TEMPLATE_VERSION_NOT_FOUND,
-			`Version ${version} not found for template "${templateId}"`,
-			404,
-		);
-	}
-}
+export const TemplateErrors = {
+	notFound: (id: string) =>
+		createError({
+			status: 404,
+			message: "Template not found",
+			why: `Template with id "${id}" not found`,
+			fix: "Verify the template ID and ensure it exists and has not been deleted.",
+		}),
+	nameRequired: () =>
+		createError({
+			status: 400,
+			message: "Template name is required",
+			why: "The request did not contain a valid template name.",
+			fix: "Provide a non-empty name string in the request body.",
+		}),
+	invalidContent: (reason: string) =>
+		createError({
+			status: 400,
+			message: "Invalid template content",
+			why: `Invalid template content: ${reason}`,
+			fix: "Ensure the template content matches the required schema and contains valid blocks.",
+		}),
+	renderFailed: (reason: string) =>
+		createError({
+			status: 500,
+			message: "Failed to render template",
+			why: `Failed to render template: ${reason}`,
+			fix: "Check the template variables and components for syntax or rendering errors.",
+		}),
+	versionNotFound: (templateId: string, version: number) =>
+		createError({
+			status: 404,
+			message: "Version not found",
+			why: `Version ${version} not found for template "${templateId}"`,
+			fix: "Verify the version number and template ID.",
+		}),
+	versionNotFoundById: (versionId: string) =>
+		createError({
+			status: 404,
+			message: "Version not found",
+			why: `Version with ID "${versionId}" was not found or doesn't belong to this template.`,
+			fix: "Verify the version ID.",
+		}),
+	deleteFailed: (reason: string) =>
+		createError({
+			status: 400,
+			message: "Cannot delete template version",
+			why: reason,
+			fix: "Ensure the version is not the active version of the template.",
+		}),
+};

@@ -1,4 +1,4 @@
-import { TemplateError } from "@be/template/error/template.error";
+import { TemplateErrors } from "@be/template/error/template.error";
 import { templateModel } from "@be/template/model/template.model";
 import type { TemplateBlock } from "@reloop/db/schema";
 import { log } from "evlog";
@@ -19,7 +19,7 @@ export async function updateTemplate(params: {
 		// Verify template exists and belongs to org
 		const existing = await templateModel.findByIdAndOrg(id, organizationId);
 		if (!existing) {
-			throw TemplateError.notFound(id);
+			throw TemplateErrors.notFound(id);
 		}
 
 		const result = await templateModel.update({
@@ -29,9 +29,10 @@ export async function updateTemplate(params: {
 
 		return result;
 	} catch (error) {
-		console.error(
-			`Error updating template: ${error instanceof Error ? error.message : String(error)}`,
-		);
+		log.error({
+			message: "Error updating template",
+			error: error instanceof Error ? error.message : String(error),
+		});
 		throw error;
 	}
 }

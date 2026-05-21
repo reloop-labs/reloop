@@ -1,4 +1,3 @@
-import { log } from "evlog";
 import "dotenv/config";
 import { landing } from "@be/template/routes/landing/landing.index";
 import { collaborationRoute } from "@be/template/routes/template/collaboration/collaboration.route";
@@ -11,12 +10,17 @@ import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 
 import { Elysia } from "elysia";
+import { initLogger, log, parseError } from "evlog";
+import { evlog } from "evlog/elysia";
+
+initLogger({ env: { service: "template" } });
 
 const port = templateConfig.port;
 const templateService = new Elysia({
 	prefix: "/api/template",
 	name: "Template Service",
 })
+	.use(evlog())
 	.use(
 		openapi({
 			documentation: {
@@ -37,6 +41,16 @@ const templateService = new Elysia({
 		}),
 	)
 	.use(serverTiming())
+	.onError(({ error, set }) => {
+		const parsed = parseError(error);
+		set.status = parsed.status;
+		return {
+			message: parsed.message,
+			why: parsed.why,
+			fix: parsed.fix,
+			link: parsed.link,
+		};
+	})
 	.use(landing)
 	.use(templateRoutes)
 	.use(roomRoutes)
@@ -46,7 +60,8 @@ const templateService = new Elysia({
 		await loader();
 	})
 	.listen(port, () => {
-		console.log(
+		log.info(
+			"Template Service",
 			`Template Server is running on ${templateConfig.BASE_URL}/api/template`,
 		);
 	});
