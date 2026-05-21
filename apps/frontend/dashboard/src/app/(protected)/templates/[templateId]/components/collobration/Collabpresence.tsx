@@ -160,6 +160,7 @@ export function CollabPresence({ status, isSynced }: CollabPresenceProps) {
 }
 
 function getInitials(name: string): string {
+	if (!name) return "?";
 	return name
 		.split(" ")
 		.map((n) => n[0])
