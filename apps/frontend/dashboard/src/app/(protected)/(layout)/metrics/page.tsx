@@ -115,8 +115,9 @@ const MetricsPage = () => {
 		const paddedChartData = [...chartData];
 		if (paddedChartData.length < 5) {
 			let firstDate = new Date();
-			if (data.dates.length > 0) {
-				const parsed = new Date(data.dates[0]);
+			const firstDateStr = data.dates[0];
+			if (firstDateStr !== undefined) {
+				const parsed = new Date(firstDateStr);
 				if (!Number.isNaN(parsed.getTime())) {
 					firstDate = parsed;
 				}
