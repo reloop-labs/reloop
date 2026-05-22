@@ -79,6 +79,8 @@ services:
     ports:
       - "1025:1025"  # SMTP port for sending test emails
       - "8025:8025"  # Web UI port for viewing captured emails
+    environment:
+      MP_ENABLE_CHAOS: "true"
     restart: unless-stopped
 
   kumomta-smtp:
