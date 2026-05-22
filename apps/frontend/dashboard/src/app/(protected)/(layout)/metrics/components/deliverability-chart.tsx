@@ -5,8 +5,9 @@ import * as Select from "@reloop/ui/select";
 import { useMemo, useState } from "react";
 import {
 	Area,
-	AreaChart,
 	CartesianGrid,
+	ComposedChart,
+	Line,
 	ResponsiveContainer,
 	Tooltip,
 	XAxis,
@@ -111,9 +112,16 @@ export const DeliverabilityChart = ({
 	}
 
 	const totalEmails = data?.sent.reduce((a, b) => a + b, 0) || 0;
+	const totalBounced = data?.bounced.reduce((a, b) => a + b, 0) || 0;
 	const avgRate = data
 		? data.rate.reduce((a, b) => a + b, 0) / data.rate.length
 		: 0;
+
+	const maxSentValue = useMemo(() => {
+		if (!data || data.sent.length === 0) return 10;
+		const max = Math.max(...data.sent);
+		return max > 0 ? max : 10;
+	}, [data]);
 
 	return (
 		<div className="w-full overflow-hidden rounded-2xl border border-stroke-soft-100 bg-transparent p-6 dark:border-stroke-soft-100/50">
@@ -134,6 +142,14 @@ export const DeliverabilityChart = ({
 						</span>
 						<span className="font-medium text-4xl tracking-tight">
 							{totalEmails > 0 ? `${Math.round(avgRate)}%` : "0%"}
+						</span>
+					</div>
+					<div className="flex flex-col gap-1">
+						<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
+							Bounces
+						</span>
+						<span className="font-medium text-4xl tracking-tight">
+							{totalBounced.toLocaleString()}
 						</span>
 					</div>
 				</div>
@@ -161,7 +177,10 @@ export const DeliverabilityChart = ({
 			{/* Chart */}
 			<div className="h-[300px] w-full">
 				<ResponsiveContainer width="100%" height="100%">
-					<AreaChart data={chartData}>
+					<ComposedChart
+						data={chartData}
+						margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
+					>
 						<defs>
 							<linearGradient id="colorRate" x1="0" y1="0" x2="0" y2="1">
 								<stop offset="5%" stopColor="#888888" stopOpacity={0.15} />
@@ -181,7 +200,17 @@ export const DeliverabilityChart = ({
 							tick={{ fill: "#888888", opacity: 0.8, fontSize: 10 }}
 							dy={10}
 						/>
-						<YAxis hide />
+						<YAxis yAxisId="left" hide />
+						<YAxis
+							yAxisId="right"
+							orientation="right"
+							domain={[0, maxSentValue]}
+							ticks={[0, Math.round(maxSentValue / 2), maxSentValue]}
+							axisLine={false}
+							tickLine={false}
+							tick={{ fill: "#888888", opacity: 0.8, fontSize: 10 }}
+							width={35}
+						/>
 						<Tooltip
 							contentStyle={{
 								backgroundColor: "var(--bg-white-0)",
@@ -190,15 +219,28 @@ export const DeliverabilityChart = ({
 							}}
 						/>
 						<Area
+							yAxisId="left"
 							type="monotone"
 							dataKey="rate"
+							name="Deliverability Rate"
 							stroke="#888888"
 							strokeWidth={2}
 							fillOpacity={1}
 							fill="url(#colorRate)"
 							isAnimationActive={false}
 						/>
-					</AreaChart>
+						<Line
+							yAxisId="right"
+							type="monotone"
+							dataKey="bounced"
+							name="Bounces"
+							stroke="#F04438"
+							strokeWidth={2}
+							dot={{ r: 3, fill: "#F04438" }}
+							activeDot={{ r: 5 }}
+							isAnimationActive={false}
+						/>
+					</ComposedChart>
 				</ResponsiveContainer>
 			</div>
 		</div>
