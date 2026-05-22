@@ -67,7 +67,7 @@ const MetricsPage = () => {
 		if (!data) return null;
 
 		const totalSent = data.sent.reduce((a, b) => a + b, 0);
-		const totalBounced = data.bounced.reduce((a, b) => a + b, 0);
+		const _totalBounced = data.bounced.reduce((a, b) => a + b, 0);
 		const totalComplaint = data.complaint.reduce((a, b) => a + b, 0);
 
 		const totalPermanent = data.bounceBreakdown.permanent.reduce(
@@ -83,26 +83,63 @@ const MetricsPage = () => {
 			0,
 		);
 
-		const bounceRate = totalSent > 0 ? (totalBounced / totalSent) * 100 : 0;
+		const bounceRate =
+			totalSent > 0
+				? ((totalPermanent + totalTransient + totalUndetermined) / totalSent) *
+					100
+				: 0;
 		const complaintRate =
 			totalSent > 0 ? (totalComplaint / totalSent) * 100 : 0;
 
 		const chartData = data.dates.map((d: string, i: number) => {
-			const sentCount = data.sent[i] || 0;
-			const bouncedCount = data.bounced[i] || 0;
+			const _sentCount = data.sent[i] || 0;
+			const transientBounces = data.bounceBreakdown.transient[i] || 0;
+			const permanentBounces = data.bounceBreakdown.permanent[i] || 0;
+			const undeterminedBounces = data.bounceBreakdown.undetermined[i] || 0;
+			const bounceCount =
+				transientBounces + permanentBounces + undeterminedBounces;
 			const complaintCount = data.complaint[i] || 0;
 
+			const dateObj = new Date(d);
+			const formattedDate = Number.isNaN(dateObj.getTime())
+				? d
+				: `${dateObj.getDate()} ${dateObj.toLocaleDateString("en-US", { month: "short" }).toLowerCase()}`;
+
 			return {
-				date: d,
-				bounceRate: sentCount > 0 ? (bouncedCount / sentCount) * 100 : 0,
-				complaintRate: sentCount > 0 ? (complaintCount / sentCount) * 100 : 0,
+				date: formattedDate,
+				bounceRate: totalSent > 0 ? (bounceCount / totalSent) * 100 : 0,
+				complaintRate: totalSent > 0 ? (complaintCount / totalSent) * 100 : 0,
 			};
 		});
+
+		const paddedChartData = [...chartData];
+		if (paddedChartData.length < 5) {
+			let firstDate = new Date();
+			if (data.dates.length > 0) {
+				const parsed = new Date(data.dates[0]);
+				if (!Number.isNaN(parsed.getTime())) {
+					firstDate = parsed;
+				}
+			}
+			const needed = 5 - paddedChartData.length;
+			for (let i = needed; i > 0; i--) {
+				const padDate = new Date(firstDate);
+				padDate.setDate(firstDate.getDate() - i);
+				const formattedDate = `${padDate.getDate()} ${padDate.toLocaleDateString("en-US", { month: "short" }).toLowerCase()}`;
+				paddedChartData.unshift({
+					date: formattedDate,
+					bounceRate: 0,
+					complaintRate: 0,
+				});
+			}
+		}
+
+		const totalBouncedSum = totalPermanent + totalTransient + totalUndetermined;
 
 		return {
 			bounceRate: Math.round(bounceRate * 100) / 100,
 			complaintRate: Math.round(complaintRate * 100) / 100,
-			chartData,
+			chartData: paddedChartData,
 			breakdown: {
 				bounce: [
 					{
@@ -110,8 +147,9 @@ const MetricsPage = () => {
 						color: "#F04438",
 						count: totalTransient,
 						percentage:
-							totalSent > 0
-								? Math.round((totalTransient / totalSent) * 100)
+							totalBouncedSum > 0
+								? Math.round((totalTransient / totalBouncedSum) * 100 * 100) /
+									100
 								: 0,
 					},
 					{
@@ -119,8 +157,9 @@ const MetricsPage = () => {
 						color: "#F04438",
 						count: totalPermanent,
 						percentage:
-							totalSent > 0
-								? Math.round((totalPermanent / totalSent) * 100)
+							totalBouncedSum > 0
+								? Math.round((totalPermanent / totalBouncedSum) * 100 * 100) /
+									100
 								: 0,
 					},
 					{
@@ -128,8 +167,10 @@ const MetricsPage = () => {
 						color: "#F04438",
 						count: totalUndetermined,
 						percentage:
-							totalSent > 0
-								? Math.round((totalUndetermined / totalSent) * 100)
+							totalBouncedSum > 0
+								? Math.round(
+										(totalUndetermined / totalBouncedSum) * 100 * 100,
+									) / 100
 								: 0,
 					},
 				],
@@ -139,8 +180,9 @@ const MetricsPage = () => {
 						color: "#FDB022",
 						count: totalComplaint,
 						percentage:
-							totalSent > 0
-								? Math.round((totalComplaint / totalSent) * 100)
+							totalComplaint > 0
+								? Math.round((totalComplaint / totalComplaint) * 100 * 100) /
+									100
 								: 0,
 					},
 				],
@@ -190,6 +232,7 @@ const MetricsPage = () => {
 						}
 						breakdown={stats?.breakdown.bounce || []}
 						color="#F04438"
+						riskValue={4}
 					/>
 					<RateChart
 						title="Complain Rate"
@@ -203,6 +246,7 @@ const MetricsPage = () => {
 						breakdown={stats?.breakdown.complaint || []}
 						color="#FDB022"
 						yAxisDomain={[0, 0.2]}
+						riskValue={0.08}
 					/>
 				</div>
 			</div>

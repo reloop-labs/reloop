@@ -52,17 +52,47 @@ export const DeliverabilityChart = ({
 
 	const chartData = useMemo(() => {
 		if (!data) return [];
-		return data.dates.map((date, i) => ({
-			date: new Date(date).toLocaleDateString("en-US", {
-				month: "short",
-				day: "numeric",
-			}),
-			sent: data.sent[i],
-			delivered: data.delivered[i],
-			bounced: data.bounced[i],
-			complaint: data.complaint[i],
-			rate: data.rate[i],
-		}));
+		const baseData = data.dates.map((date, i) => {
+			const dateObj = new Date(date);
+			const formattedDate = Number.isNaN(dateObj.getTime())
+				? date
+				: `${dateObj.getDate()} ${dateObj.toLocaleDateString("en-US", { month: "short" }).toLowerCase()}`;
+
+			return {
+				date: formattedDate,
+				sent: data.sent[i],
+				delivered: data.delivered[i],
+				bounced: data.bounced[i],
+				complaint: data.complaint[i],
+				rate: data.rate[i],
+			};
+		});
+
+		const padded = [...baseData];
+		if (padded.length < 5) {
+			let firstDate = new Date();
+			if (data.dates.length > 0) {
+				const parsed = new Date(data.dates[0]);
+				if (!Number.isNaN(parsed.getTime())) {
+					firstDate = parsed;
+				}
+			}
+			const needed = 5 - padded.length;
+			for (let i = needed; i > 0; i--) {
+				const padDate = new Date(firstDate);
+				padDate.setDate(firstDate.getDate() - i);
+				const formattedDate = `${padDate.getDate()} ${padDate.toLocaleDateString("en-US", { month: "short" }).toLowerCase()}`;
+				padded.unshift({
+					date: formattedDate,
+					sent: 0,
+					delivered: 0,
+					bounced: 0,
+					complaint: 0,
+					rate: 0,
+				});
+			}
+		}
+		return padded;
 	}, [data]);
 
 	if (isLoading) {
@@ -166,6 +196,7 @@ export const DeliverabilityChart = ({
 							strokeWidth={2}
 							fillOpacity={1}
 							fill="url(#colorRate)"
+							isAnimationActive={false}
 						/>
 					</AreaChart>
 				</ResponsiveContainer>

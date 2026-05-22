@@ -2,8 +2,11 @@
 
 import { Icon } from "@reloop/ui/icon";
 import {
-	Area,
-	AreaChart,
+	Bar,
+	BarChart,
+	CartesianGrid,
+	LabelList,
+	ReferenceLine,
 	ResponsiveContainer,
 	Tooltip,
 	XAxis,
@@ -24,6 +27,7 @@ interface RateChartProps {
 	breakdown: BreakdownItem[];
 	color: string;
 	yAxisDomain?: [number, number];
+	riskValue?: number;
 }
 
 export const RateChart = ({
@@ -33,7 +37,15 @@ export const RateChart = ({
 	breakdown,
 	color,
 	yAxisDomain = [0, 10],
+	riskValue,
 }: RateChartProps) => {
+	let ticks: number[] | undefined;
+	if (riskValue === 4) {
+		ticks = [0, 2, 4, 6, 8, 10];
+	} else if (riskValue === 0.08) {
+		ticks = [0, 0.04, 0.08, 0.12, 0.16, 0.2];
+	}
+
 	return (
 		<div className="flex flex-col gap-6 rounded-2xl border border-stroke-soft-100 bg-transparent p-6 dark:border-stroke-soft-100/50">
 			{/* Header */}
@@ -55,22 +67,26 @@ export const RateChart = ({
 			{/* Chart */}
 			<div className="h-[200px] w-full">
 				<ResponsiveContainer width="100%" height="100%">
-					<AreaChart data={data}>
-						<defs>
-							<linearGradient
-								id={`gradient-${title}`}
-								x1="0"
-								y1="0"
-								x2="0"
-								y2="1"
-							>
-								<stop offset="5%" stopColor={color} stopOpacity={0.15} />
-								<stop offset="95%" stopColor={color} stopOpacity={0} />
-							</linearGradient>
-						</defs>
-						<XAxis hide dataKey="date" />
+					<BarChart
+						data={data}
+						margin={{ top: 20, right: 0, left: 0, bottom: 15 }}
+					>
+						<CartesianGrid
+							vertical={false}
+							stroke="currentColor"
+							strokeOpacity={0.06}
+							strokeDasharray="3 3"
+						/>
+						<XAxis
+							dataKey="date"
+							axisLine={false}
+							tickLine={false}
+							tick={{ fill: "#888888", opacity: 0.8, fontSize: 10 }}
+							dy={10}
+						/>
 						<YAxis
 							domain={yAxisDomain}
+							ticks={ticks}
 							orientation="right"
 							axisLine={false}
 							tickLine={false}
@@ -85,16 +101,47 @@ export const RateChart = ({
 								border: "1px solid var(--stroke-soft-100)",
 								borderRadius: "12px",
 							}}
+							cursor={{ fill: "rgba(0, 0, 0, 0.05)" }}
 						/>
-						<Area
-							type="monotone"
+						{riskValue !== undefined && (
+							<ReferenceLine
+								y={riskValue}
+								stroke="#FDB022"
+								strokeDasharray="3 3"
+								label={{
+									value: "RISK",
+									position: "insideBottomLeft",
+									fill: "#FDB022",
+									fontSize: 10,
+									fontWeight: 500,
+									offset: 6,
+								}}
+							/>
+						)}
+						<Bar
 							dataKey="rate"
-							stroke={color}
-							strokeWidth={2}
-							fillOpacity={1}
-							fill={`url(#gradient-${title})`}
-						/>
-					</AreaChart>
+							fill={color}
+							radius={[4, 4, 0, 0]}
+							maxBarSize={16}
+							isAnimationActive={false}
+						>
+							<LabelList
+								dataKey="rate"
+								position="top"
+								formatter={(val: unknown) => {
+									if (val === undefined || val === null) return "";
+									const num = Number(val);
+									return num === 0 ? "0%" : `${Number(num.toFixed(2))}%`;
+								}}
+								style={{
+									fill: "#888888",
+									opacity: 0.8,
+									fontSize: 9,
+									fontWeight: 500,
+								}}
+							/>
+						</Bar>
+					</BarChart>
 				</ResponsiveContainer>
 			</div>
 
