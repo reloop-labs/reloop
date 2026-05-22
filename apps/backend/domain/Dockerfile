@@ -6,7 +6,7 @@ WORKDIR /app
 RUN apk add --no-cache python3 make g++
 
 COPY . .
-RUN bun --filter=domain install
+RUN bun --filter=domain-service install
 
 FROM base AS builder
 WORKDIR /app
@@ -16,7 +16,7 @@ ENV NODE_ENV=${NODE_ENV}
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN bun run --filter=domain build
+RUN bun run --filter=domain-service build
 
 FROM base AS runner
 WORKDIR /app

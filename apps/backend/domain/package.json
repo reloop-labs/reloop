@@ -1,5 +1,5 @@
 {
-	"name": "@reloop/domain",
+	"name": "domain-service",
 	"version": "1.2.0",
 	"main": "src/index.ts",
 	"type": "module",
