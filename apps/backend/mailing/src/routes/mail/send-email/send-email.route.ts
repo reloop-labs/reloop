@@ -1,6 +1,7 @@
 import { authMiddleware } from "@reloop/be-mailing/middleware/auth";
 import { checkRateLimit } from "@reloop/be-mailing/middleware/rate-limiter";
 import { MailModel } from "@reloop/be-mailing/model/mail.model.js";
+import { auditLogHook } from "@reloop/be-mailing/utils/audit-log";
 import { Elysia } from "elysia";
 import { evlog } from "evlog/elysia";
 import { sendEmailController } from "./send-email.controllers";
@@ -40,6 +41,10 @@ export const sendEmailRoute = new Elysia()
 				429: MailModel.tooManyRequests,
 				500: MailModel.internalServerError,
 			},
+			afterResponse: auditLogHook({
+				resourceType: "email",
+				action: "sent",
+			}),
 			detail: {
 				summary: "Send email",
 				description: "Send an email through the KumoMTA mail server",

@@ -1,5 +1,6 @@
 import { authMiddleware } from "@reloop/webhook/middleware/auth";
 import { WebhookModel } from "@reloop/webhook/routes/webhook/webhook.model";
+import { auditLogHook } from "@reloop/webhook/utils/audit-log";
 import { Elysia, t } from "elysia";
 import { deleteWebhookController } from "./delete-webhook.controllers";
 import { deleteWebhookXCodeSamples } from "./delete-webhook.x-codeSamples";
@@ -22,6 +23,10 @@ export const deleteWebhookRoute = new Elysia().use(authMiddleware).delete(
 			404: WebhookModel.evlogError,
 			401: WebhookModel.evlogError,
 		},
+		afterResponse: auditLogHook({
+			resourceType: "webhook",
+			action: "deleted",
+		}),
 		detail: {
 			tags: ["Webhooks"],
 			summary: "Delete webhook",

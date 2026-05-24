@@ -1,5 +1,6 @@
 import { authMiddleware } from "@reloop/webhook/middleware/auth";
 import { WebhookModel } from "@reloop/webhook/routes/webhook/webhook.model";
+import { auditLogHook } from "@reloop/webhook/utils/audit-log";
 import type { WebhookEventName } from "@reloop/webhook-events";
 import { Elysia } from "elysia";
 import { createWebhookController } from "./create-webhook.controllers";
@@ -25,6 +26,11 @@ export const createWebhookRoute = new Elysia().use(authMiddleware).post(
 			409: WebhookModel.evlogError,
 			401: WebhookModel.evlogError,
 		},
+		afterResponse: auditLogHook({
+			resourceType: "webhook",
+			action: "created",
+			successStatus: 201,
+		}),
 		detail: {
 			tags: ["Webhooks"],
 			summary: "Create webhook",
