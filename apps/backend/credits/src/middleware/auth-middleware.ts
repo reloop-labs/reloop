@@ -1,7 +1,12 @@
 import { createId } from "@paralleldrive/cuid2";
+import { creditsConfig } from "@reloop/credits/credits.config";
 import { Elysia } from "elysia";
 import { evlog } from "evlog/elysia";
 import { validateSession } from "./cookie-auth";
+
+if (creditsConfig.NODE_ENV !== "production") {
+	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+}
 
 export const authMiddleware = new Elysia({
 	name: "billing-auth-middleware",
