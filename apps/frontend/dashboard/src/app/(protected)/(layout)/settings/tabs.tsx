@@ -29,7 +29,7 @@ const list = [
 	},
 	{
 		title: "Credits",
-		path: "/settings/billing",
+		path: "/settings/credits",
 		iconName: "invoice",
 	},
 	{

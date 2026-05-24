@@ -1,4 +1,4 @@
-import { billingConfig } from "../billing.config";
+import { creditsConfig } from "../credits.config";
 
 export async function validateSession(cookie: string | null): Promise<{
 	userId: string;
@@ -6,7 +6,7 @@ export async function validateSession(cookie: string | null): Promise<{
 	authType: "session";
 } | null> {
 	const response = await fetch(
-		`${billingConfig.BASE_URL}/api/auth/v1/get-session`,
+		`${creditsConfig.BASE_URL}/api/auth/v1/get-session`,
 		{
 			method: "GET",
 			headers: new Headers({

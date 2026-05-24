@@ -76,17 +76,17 @@ const entryTypeStyles: Record<string, string> = {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-const BillingPage = () => {
+const CreditsPage = () => {
 	const {
 		data: planData,
 		isLoading: planLoading,
 		error: planError,
-	} = useSWR<PlanData>("/api/billing/v1/plan");
+	} = useSWR<PlanData>("/api/credits/v1/plan");
 	const {
 		data: transactions,
 		isLoading: transactionsLoading,
 		error: transactionsError,
-	} = useSWR<Transaction[]>("/api/billing/v1/transactions");
+	} = useSWR<Transaction[]>("/api/credits/v1/transactions");
 
 	const isLoading = planLoading || transactionsLoading;
 	const error = planError || transactionsError;
@@ -268,5 +268,5 @@ const BillingPage = () => {
 	);
 };
 
-export default BillingPage;
+export default CreditsPage;
 

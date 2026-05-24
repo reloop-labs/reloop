@@ -1,6 +1,6 @@
 import { Elysia } from "elysia";
 import { authMiddleware } from "../../../middleware/auth-middleware";
-import { BillingModel } from "../../../model/billing.model";
+import { CreditsModel } from "../../../model/credits.model";
 import { getPlanController } from "./get-plan.controllers";
 
 export const getPlanRoute = new Elysia()
@@ -12,7 +12,7 @@ export const getPlanRoute = new Elysia()
 		},
 		{
 			cookieAuth: true,
-			response: BillingModel.planResponse,
+			response: CreditsModel.planResponse,
 			detail: { summary: "Get plan & subscription info" },
 		},
 	);

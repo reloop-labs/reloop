@@ -1,6 +1,6 @@
 import { t } from "elysia";
 
-export namespace BillingModel {
+export namespace CreditsModel {
 	export const usageResponse = t.Object({
 		plan: t.Object({
 			name: t.String(),

@@ -8,19 +8,19 @@ import {
 import { and, count, eq, gte, sql } from "drizzle-orm";
 import { log } from "evlog";
 
-import { billingConfig } from "./billing.config";
+import { creditsConfig } from "./credits.config";
 import { getOrProvisionCredits } from "./utils/credits";
 
 export async function loader() {
-	log.info("server", "Initializing Billing Service Subscribers...");
+	log.info("server", "Initializing Credits Service Subscribers...");
 
 	try {
-		await bus.connect(billingConfig.NATS_URL);
-		log.info("server", "NATS connected in Billing Service");
+		await bus.connect(creditsConfig.NATS_URL);
+		log.info("server", "NATS connected in Credits Service");
 	} catch (error) {
 		log.error({
 			...{ error },
-			message: "Failed to connect to NATS in Billing Service",
+			message: "Failed to connect to NATS in Credits Service",
 		});
 	}
 

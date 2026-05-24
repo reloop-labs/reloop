@@ -4,20 +4,20 @@ import cors from "@elysiajs/cors";
 import { openapi } from "@elysiajs/openapi";
 
 import { Elysia } from "elysia";
-import { billingConfig } from "./billing.config";
+import { creditsConfig } from "./credits.config";
 import { loader } from "./loader";
-import { billingRoutes } from "./routes/billing/billing.routes";
+import { creditsRoutes } from "./routes/credits/credits.routes";
 import { landing } from "./routes/landing/landing.index";
 
-const port = billingConfig.port;
+const port = creditsConfig.port;
 
-const app = new Elysia({ prefix: "/api/billing", name: "Billing Service" })
+const app = new Elysia({ prefix: "/api/credits", name: "Credits Service" })
 	.use(cors({ origin: "*", credentials: true }))
 	.use(
 		openapi({
 			documentation: {
 				info: {
-					title: "Billing Service",
+					title: "Credits Service",
 					version: "1.0.0",
 				},
 				components: {
@@ -33,15 +33,16 @@ const app = new Elysia({ prefix: "/api/billing", name: "Billing Service" })
 		}),
 	)
 	.use(landing)
-	.use(billingRoutes)
+	.use(creditsRoutes)
 	.onStart(async () => {
 		await loader();
 	})
 	.listen(port, () => {
 		log.info(
 			"server",
-			`Billing Server is running on http://localhost:${port}/api/billing`,
+			`Credits Server is running on http://localhost:${port}/api/credits`,
 		);
 	});
 
 export type App = typeof app;
+

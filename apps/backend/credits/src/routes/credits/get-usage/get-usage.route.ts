@@ -1,6 +1,6 @@
 import { Elysia } from "elysia";
 import { authMiddleware } from "../../../middleware/auth-middleware";
-import { BillingModel } from "../../../model/billing.model";
+import { CreditsModel } from "../../../model/credits.model";
 import { getUsageController } from "./get-usage.controllers";
 
 export const getUsageRoute = new Elysia()
@@ -12,7 +12,7 @@ export const getUsageRoute = new Elysia()
 		},
 		{
 			cookieAuth: true,
-			response: BillingModel.usageResponse,
+			response: CreditsModel.usageResponse,
 			detail: {
 				summary: "Get usage summary",
 				description:

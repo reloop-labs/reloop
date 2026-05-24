@@ -6,9 +6,9 @@ import { listInvoicesRoute } from "./list-invoices/list-invoices.route";
 import { listTransactionsRoute } from "./list-transactions/list-transactions.route";
 import { topupCreditsRoute } from "./topup-credits/topup-credits.route";
 
-export const billingRoutes = new Elysia({
+export const creditsRoutes = new Elysia({
 	prefix: "/v1",
-	name: "BillingRoutes",
+	name: "CreditsRoutes",
 })
 	.use(authMiddleware)
 	.use(getUsageRoute)

@@ -1,5 +1,5 @@
 import { Elysia, t } from "elysia";
-import { BillingModel } from "../../../model/billing.model";
+import { CreditsModel } from "../../../model/credits.model";
 import { topupCreditsController } from "./topup-credits.controllers";
 
 export const topupCreditsRoute = new Elysia().post(
@@ -9,7 +9,7 @@ export const topupCreditsRoute = new Elysia().post(
 		return await topupCreditsController({ organizationId, amount, reason });
 	},
 	{
-		body: BillingModel.topupBody,
+		body: CreditsModel.topupBody,
 		detail: { summary: "Manual credit top-up (admin)" },
 	},
 );

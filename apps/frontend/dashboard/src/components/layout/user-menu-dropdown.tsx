@@ -211,13 +211,13 @@ export const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
 							className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
 							onPointerEnter={() => setHoverIdx(5)}
 							onPointerLeave={() => setHoverIdx(undefined)}
-							onClick={() => router.push("/settings/billing")}
+							onClick={() => router.push("/settings/credits")}
 						>
 							<Icon
 								name="arrow-top-circle"
 								className="h-4 w-4 text-text-sub-600"
 							/>
-							<span className="flex-1 truncate text-sm">Upgrade plan</span>
+							<span className="flex-1 truncate text-sm">Manage credits</span>
 						</Dropdown.Item>
 
 						<Dropdown.Item

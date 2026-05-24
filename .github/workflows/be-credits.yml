@@ -1,22 +1,22 @@
-name: BE Billing Docker
+name: BE Credits Docker
 
 on:
   push:
     branches: [ main ]
     paths:
-      - 'apps/backend/billing/**'
-      - '.github/workflows/be-billing.yml'
+      - 'apps/backend/credits/**'
+      - '.github/workflows/be-credits.yml'
       - 'docker-compose.setup.yml'
   pull_request:
     branches: [ main ]
     paths:
-      - 'apps/backend/billing/**'
-      - '.github/workflows/be-billing.yml'
+      - 'apps/backend/credits/**'
+      - '.github/workflows/be-credits.yml'
       - 'docker-compose.setup.yml'
   workflow_dispatch:
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/be-billing
+  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/be-credits
 
 jobs:
   build-and-push:
@@ -53,7 +53,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./apps/backend/billing/Dockerfile
+          file: ./apps/backend/credits/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -63,4 +63,5 @@ jobs:
 
       - name: Image digest
         run: echo ${{ steps.build.outputs.digest }}
+
 
