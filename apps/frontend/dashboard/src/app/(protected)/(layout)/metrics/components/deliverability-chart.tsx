@@ -97,6 +97,12 @@ export const DeliverabilityChart = ({
 		return padded;
 	}, [data]);
 
+	const maxSentValue = useMemo(() => {
+		if (!data || data.sent.length === 0) return 10;
+		const max = Math.max(...data.sent);
+		return max > 0 ? max : 10;
+	}, [data]);
+
 	if (isLoading) {
 		return (
 			<div className="w-full animate-pulse rounded-2xl border border-stroke-soft-100 bg-transparent p-6 dark:border-stroke-soft-100/50">
@@ -117,12 +123,6 @@ export const DeliverabilityChart = ({
 	const avgRate = data
 		? data.rate.reduce((a, b) => a + b, 0) / data.rate.length
 		: 0;
-
-	const maxSentValue = useMemo(() => {
-		if (!data || data.sent.length === 0) return 10;
-		const max = Math.max(...data.sent);
-		return max > 0 ? max : 10;
-	}, [data]);
 
 	return (
 		<div className="w-full overflow-hidden rounded-2xl border border-stroke-soft-100 bg-transparent p-6 dark:border-stroke-soft-100/50">
