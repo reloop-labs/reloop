@@ -15,12 +15,9 @@ import type React from "react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
-type SlugStatus = "idle" | "checking" | "available" | "taken" | "error";
-
 export const CreateOrgStep = () => {
 	const [step, setStep] = useQueryState("step", parseAsInteger.withDefault(1));
 	const [name, setName] = useQueryState("name", parseAsString.withDefault(""));
-	const [slug, setSlug] = useQueryState("slug", parseAsString.withDefault(""));
 	const [orgId, setOrgId] = useQueryState(
 		"orgId",
 		parseAsString.withDefault(""),
@@ -36,39 +33,6 @@ export const CreateOrgStep = () => {
 		parseAsString.withDefault(""),
 	);
 	const fileInputRef = useRef<HTMLInputElement>(null);
-	const [slugStatus, setSlugStatus] = useState<SlugStatus>("checking");
-
-	useEffect(() => {
-		if (!slug || slug.length < 2) {
-			setSlugStatus("idle");
-			return;
-		}
-
-		setSlugStatus("checking");
-		const timeoutId = setTimeout(async () => {
-			try {
-				// If orgId exists, check if the slug belongs to that organization
-				if (orgId) {
-					const { data: organizations } = await authClient.organization.list();
-					const currentOrg = organizations?.find((org) => org.id === orgId);
-
-					// If slug matches current organization's slug, it's available
-					if (currentOrg?.slug === slug) {
-						setSlugStatus("available");
-						return;
-					}
-				}
-
-				// Otherwise, check slug availability normally
-				const { data } = await authClient.organization.checkSlug({ slug });
-				setSlugStatus(data?.status ? "available" : "taken");
-			} catch {
-				setSlugStatus("error");
-			}
-		}, 500);
-
-		return () => clearTimeout(timeoutId);
-	}, [slug, orgId]);
 
 	const handleLogoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
@@ -135,8 +99,6 @@ export const CreateOrgStep = () => {
 	};
 
 	const onNext = async () => {
-		const normalizedSlug = slug.toLowerCase().replace(/\s+/g, "-");
-		setSlug(normalizedSlug);
 		const logoToUse = logoUrl;
 
 		// If orgId exists, organization is already created, just proceed to next step
@@ -148,11 +110,17 @@ export const CreateOrgStep = () => {
 			return;
 		}
 
+		// Generate a random unique ID for the workspace handle/slug
+		const randomSlug =
+			typeof crypto !== "undefined" && crypto.randomUUID
+				? crypto.randomUUID().replace(/-/g, "").substring(0, 12)
+				: Math.random().toString(36).substring(2, 14);
+
 		// Create new organization
 		const { error, data: organization } = await authClient.organization.create({
 			name: name,
 			keepCurrentActiveOrganization: true,
-			slug: normalizedSlug,
+			slug: randomSlug,
 			logo: logoToUse,
 			metadata: { referral },
 		});
@@ -246,61 +214,12 @@ export const CreateOrgStep = () => {
 								value={name}
 								className="font-medium"
 								onChange={(e) => {
-									const newName = e.target.value;
-									setName(newName);
-									setSlug(newName.toLowerCase().replace(/\s+/g, "-"));
+									setName(e.target.value);
 								}}
 								placeholder="e.g. Acme Corp"
 							/>
 						</Input.Wrapper>
 					</Input.Root>
-				</div>
-				<div className="flex flex-col gap-1">
-					<Label.Root htmlFor="workspace-handle">Workspace handle</Label.Root>
-					<Input.Root
-						size="small"
-						hasError={slugStatus === "taken"}
-						hasSuccess={slugStatus === "available"}
-					>
-						<Input.Wrapper className="gap-0">
-							<Input.InlineAffix className="m">
-								reloop.sh/dashboard/
-							</Input.InlineAffix>
-							<Input.Input
-								id="workspace-handle"
-								type="text"
-								className="font-medium"
-								value={slug}
-								onChange={(e) =>
-									setSlug(e.target.value.toLowerCase().replace(/\s+/g, "-"))
-								}
-							/>
-							<Spinner size={16} />
-							{slugStatus === "checking" && (
-								<Input.InlineAffix>
-									<Spinner size={16} color="var(--text-strong-950)" />
-								</Input.InlineAffix>
-							)}
-							{slugStatus === "available" && (
-								<Input.InlineAffix>
-									<Icon
-										name="check-circle"
-										className="h-4 w-4 text-green-500"
-									/>
-								</Input.InlineAffix>
-							)}
-							{slugStatus === "taken" && (
-								<Input.InlineAffix>
-									<Icon name="x-circle" className="h-4 w-4 text-red-500" />
-								</Input.InlineAffix>
-							)}
-						</Input.Wrapper>
-					</Input.Root>
-					{slugStatus === "taken" && (
-						<p className="text-paragraph-xs text-red-500">
-							This workspace handle is already taken
-						</p>
-					)}
 				</div>
 				<div className="flex flex-col gap-1">
 					<Label.Root htmlFor="referral">How did you hear about us?</Label.Root>
@@ -337,12 +256,7 @@ export const CreateOrgStep = () => {
 				className="mt-6 w-full"
 				mode="filled"
 				onClick={onNext}
-				disabled={
-					slugStatus === "taken" ||
-					slugStatus === "checking" ||
-					!slug ||
-					isUploading
-				}
+				disabled={!name || isUploading}
 			>
 				{orgId ? "Update workspace" : "Create workspace"}
 			</Button.Root>

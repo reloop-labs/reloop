@@ -99,7 +99,8 @@ const CreditsPage = () => {
 						Credits &amp; Quota
 					</p>
 					<p className="text-paragraph-sm text-text-sub-600">
-						Manage your organization credit balance, track usage logs, and request quota adjustments.
+						Manage your organization credit balance, track usage logs, and
+						request quota adjustments.
 					</p>
 				</div>
 
@@ -121,7 +122,8 @@ const CreditsPage = () => {
 								<Skeleton className="h-8 w-32" />
 							) : (
 								<p className="font-semibold text-2xl text-text-strong-950">
-									{planData ? formatNumber(planData.plan.monthlyCredits) : "—"} credits / mo
+									{planData ? formatNumber(planData.plan.monthlyCredits) : "—"}{" "}
+									credits / mo
 								</p>
 							)}
 						</div>
@@ -158,12 +160,16 @@ const CreditsPage = () => {
 							)}
 						</div>
 						<div className="space-y-1">
-							<p className="text-paragraph-xs text-text-sub-600">Credits remaining</p>
+							<p className="text-paragraph-xs text-text-sub-600">
+								Credits remaining
+							</p>
 							{isLoading ? (
 								<Skeleton className="h-5 w-16" />
 							) : (
 								<p className="font-medium text-label-sm text-text-strong-950">
-									{planData ? formatNumber(planData.subscription.creditsRemaining) : "—"}
+									{planData
+										? formatNumber(planData.subscription.creditsRemaining)
+										: "—"}
 								</p>
 							)}
 						</div>
@@ -177,7 +183,7 @@ const CreditsPage = () => {
 					</p>
 					<div className="mt-4 overflow-hidden rounded-xl border border-stroke-soft-200 bg-white">
 						<table className="w-full text-left text-sm">
-						<thead className="border-stroke-soft-200 border-b bg-neutral-alpha-5">
+							<thead className="border-stroke-soft-200 border-b bg-neutral-alpha-5">
 								<tr>
 									<th className="px-4 py-3 font-medium text-text-sub-600">
 										Date
@@ -232,28 +238,30 @@ const CreditsPage = () => {
 											key={tx.id}
 											className="transition-colors hover:bg-neutral-alpha-5/5"
 										>
-											<td className="px-4 py-3 text-text-strong-950 whitespace-nowrap">
+											<td className="whitespace-nowrap px-4 py-3 text-text-strong-950">
 												{formatDate(tx.createdAt)}
 											</td>
-											<td className="px-4 py-3 whitespace-nowrap">
+											<td className="whitespace-nowrap px-4 py-3">
 												<span
 													className={`inline-flex items-center gap-1.5 rounded px-2 py-0.5 font-medium text-[10px] capitalize ${entryTypeStyles[tx.entryType] ?? "bg-neutral-100 text-neutral-600"}`}
 												>
 													{entryTypeLabels[tx.entryType] ?? tx.entryType}
 												</span>
 											</td>
-											<td className="px-4 py-3 text-text-sub-600 max-w-[240px] truncate">
+											<td className="max-w-[240px] truncate px-4 py-3 text-text-sub-600">
 												{tx.reason ?? "—"}
 											</td>
 											<td
-												className={`px-4 py-3 text-right font-medium whitespace-nowrap ${
-													tx.delta > 0 ? "text-green-600" : "text-text-strong-950"
+												className={`whitespace-nowrap px-4 py-3 text-right font-medium ${
+													tx.delta > 0
+														? "text-green-600"
+														: "text-text-strong-950"
 												}`}
 											>
 												{tx.delta > 0 ? "+" : ""}
 												{formatNumber(tx.delta)}
 											</td>
-											<td className="px-4 py-3 text-right font-medium text-text-strong-950 whitespace-nowrap">
+											<td className="whitespace-nowrap px-4 py-3 text-right font-medium text-text-strong-950">
 												{formatNumber(tx.balanceAfter)}
 											</td>
 										</tr>
@@ -269,4 +277,3 @@ const CreditsPage = () => {
 };
 
 export default CreditsPage;
-

@@ -71,7 +71,9 @@ export const organizationCredits = pgTable(
 		creditsUsed: integer("credits_used").notNull().default(0),
 		creditsRemaining: integer("credits_remaining").notNull().default(3000),
 		monthlyCredits: integer("monthly_credits").notNull().default(3000),
-		currentPeriodStart: timestamp("current_period_start").notNull().defaultNow(),
+		currentPeriodStart: timestamp("current_period_start")
+			.notNull()
+			.defaultNow(),
 		currentPeriodEnd: timestamp("current_period_end").notNull(),
 		status: varchar("status", { length: 50 }).notNull().default("active"),
 		createdAt: timestamp("created_at").notNull().defaultNow(),
@@ -179,4 +181,3 @@ export const emailSendRelations = relations(emailSend, ({ one }) => ({
 		references: [emailLog.id],
 	}),
 }));
-

@@ -1,13 +1,13 @@
 {
-  "version": "7",
-  "dialect": "postgresql",
-  "entries": [
-    {
-      "idx": 0,
-      "version": "7",
-      "when": 1779623368457,
-      "tag": "0000_reflective_tarantula",
-      "breakpoints": true
-    }
-  ]
+	"version": "7",
+	"dialect": "postgresql",
+	"entries": [
+		{
+			"idx": 0,
+			"version": "7",
+			"when": 1779623368457,
+			"tag": "0000_reflective_tarantula",
+			"breakpoints": true
+		}
+	]
 }
