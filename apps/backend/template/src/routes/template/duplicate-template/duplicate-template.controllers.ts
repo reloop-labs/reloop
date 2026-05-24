@@ -30,11 +30,11 @@ export async function duplicateTemplate(params: {
 					});
 				}
 			} catch (err) {
-				console.warn(
-					`[duplicate] Failed to duplicate Yjs document state from ${id} to ${result.id}: ${
-						err instanceof Error ? err.message : String(err)
-					}`,
-				);
+				log.warn({
+					templateId: result.id,
+					error: err instanceof Error ? err.message : String(err),
+					message: `[duplicate] Failed to duplicate Yjs document state from ${id} to ${result.id}`,
+				});
 			}
 		}
 

@@ -1,7 +1,11 @@
+import { log } from "evlog";
 import { webhookConfig } from "../webhook.config";
 
 export async function validateSession(cookie: string | null) {
-	console.log(`${webhookConfig.BASE_URL}/api/auth/v1/get-session`);
+	log.info({
+		url: `${webhookConfig.BASE_URL}/api/auth/v1/get-session`,
+		message: "Validating session via Auth service",
+	});
 	const response = await fetch(
 		`${webhookConfig.BASE_URL}/api/auth/v1/get-session`,
 		{
