@@ -49,4 +49,27 @@ export namespace CreditsModel {
 		reason: t.Optional(t.String()),
 		metadata: t.Optional(t.Record(t.String(), t.Any())),
 	});
+
+	export const topupResponse = t.Object({
+		success: t.Boolean(),
+	});
+
+	export const transactionItem = t.Object({
+		id: t.String(),
+		organizationId: t.String(),
+		organizationCreditsId: t.String(),
+		entryType: t.String(),
+		delta: t.Number(),
+		balanceAfter: t.Number(),
+		reason: t.Union([t.String(), t.Null()]),
+		createdAt: t.Date(),
+	});
+
+	export const transactionsResponse = t.Array(transactionItem);
+
+	export const unauthorized = t.Object({
+		message: t.Literal("Unauthorized access"),
+		why: t.String(),
+		fix: t.String(),
+	});
 }

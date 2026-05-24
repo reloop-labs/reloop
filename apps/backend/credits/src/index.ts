@@ -1,15 +1,17 @@
-import { log } from "evlog";
 import "dotenv/config";
 import cors from "@elysiajs/cors";
 import { openapi } from "@elysiajs/openapi";
-
 import { Elysia } from "elysia";
+import { initLogger, log, parseError } from "evlog";
+import { evlog } from "evlog/elysia";
 import { creditsConfig } from "./credits.config";
 import { loader } from "./loader";
 import { creditsRoutes } from "./routes/credits/credits.routes";
 import { agentCardRoute } from "./routes/landing/agent-card.route";
 import { healthRoute } from "./routes/landing/health.route";
 import { landingRoute } from "./routes/landing/landing.route";
+
+initLogger({ env: { service: "credits" } });
 
 const port = creditsConfig.PORT;
 
@@ -34,17 +36,28 @@ const app = new Elysia({ prefix: "/api/credits", name: "Credits Service" })
 			},
 		}),
 	)
+	.use(evlog())
 	.use(landingRoute)
 	.use(healthRoute)
 	.use(agentCardRoute)
 	.use(creditsRoutes)
+	.onError(({ error, set }) => {
+		const parsed = parseError(error);
+		set.status = parsed.status;
+		return {
+			message: parsed.message,
+			why: parsed.why,
+			fix: parsed.fix,
+			link: parsed.link,
+		};
+	})
 	.onStart(async () => {
 		await loader();
 	})
 	.listen(port, () => {
 		log.info(
-			"server",
-			`Credits Server is running on http://localhost:${port}/api/credits`,
+			"Credits Service",
+			`Running on:\n  - Local: http://localhost:${port}/api/credits\n  - Base:  ${creditsConfig.BASE_URL}/api/credits`,
 		);
 	});
 

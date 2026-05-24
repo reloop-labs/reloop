@@ -10,8 +10,12 @@ export const getUsageRoute = new Elysia().use(authMiddleware).get(
 	},
 	{
 		cookieAuth: true,
-		response: CreditsModel.usageResponse,
+		response: {
+			200: CreditsModel.usageResponse,
+			401: CreditsModel.unauthorized,
+		},
 		detail: {
+			tags: ["Credits"],
 			summary: "Get usage summary",
 			description:
 				"Returns full usage snapshot for the authenticated user's active organization",

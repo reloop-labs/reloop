@@ -10,7 +10,15 @@ export const getPlanRoute = new Elysia().use(authMiddleware).get(
 	},
 	{
 		cookieAuth: true,
-		response: CreditsModel.planResponse,
-		detail: { summary: "Get plan & subscription info" },
+		response: {
+			200: CreditsModel.planResponse,
+			401: CreditsModel.unauthorized,
+		},
+		detail: {
+			tags: ["Credits"],
+			summary: "Get plan & subscription info",
+			description:
+				"Returns the active plan and subscription details for the authenticated user's organization",
+		},
 	},
 );

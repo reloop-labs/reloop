@@ -1,20 +1,48 @@
+import { createId } from "@paralleldrive/cuid2";
 import { Elysia } from "elysia";
+import { evlog } from "evlog/elysia";
 import { validateSession } from "./cookie-auth";
 
 export const authMiddleware = new Elysia({
 	name: "billing-auth-middleware",
-}).macro({
-	cookieAuth: {
-		async resolve({ request: { headers } }) {
-			const cookie = headers.get("cookie");
-			const session = await validateSession(cookie);
-			if (!session) {
-				throw new Error("Unauthorized");
-			}
-			return {
-				userId: session.userId,
-				organizationId: session.organizationId,
-			};
+})
+	.use(evlog())
+	.macro({
+		cookieAuth: {
+			async resolve({ status, request: { headers }, log }) {
+				try {
+					const cookie = headers.get("cookie");
+					const traceId = `req_${createId()}`;
+					log.set({ traceId, service: "credits" });
+					const session = await validateSession(cookie);
+					if (session) {
+						const result = {
+							userId: session.userId,
+							organizationId: session.organizationId,
+							authType: "session" as const,
+						};
+						log.set({
+							...result,
+						});
+						log.info("Session authentication successful");
+						return { ...result, traceId, logger: log };
+					}
+					return status(401, {
+						message: "Unauthorized access",
+						why: "Session cookie is missing, expired, or invalid",
+						fix: "Authenticate by sending a valid session cookie",
+					});
+				} catch (e) {
+					log.error("Authentication error", {
+						error: e instanceof Error ? e.message : "Unknown error",
+						stack: e instanceof Error ? e.stack : undefined,
+					});
+					return status(401, {
+						message: "Unauthorized access",
+						why: e instanceof Error ? e.message : "Unknown auth error",
+						fix: "Verify credentials and retry",
+					});
+				}
+			},
 		},
-	},
-});
+	});

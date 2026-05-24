@@ -10,6 +10,15 @@ export const topupCreditsRoute = new Elysia().post(
 	},
 	{
 		body: CreditsModel.topupBody,
-		detail: { summary: "Manual credit top-up (admin)" },
+		response: {
+			200: CreditsModel.topupResponse,
+			401: CreditsModel.unauthorized,
+		},
+		detail: {
+			tags: ["Credits"],
+			summary: "Manual credit top-up (admin)",
+			description:
+				"Manually credit or top-up an organization's balance. Requires admin privileges.",
+		},
 	},
 );
