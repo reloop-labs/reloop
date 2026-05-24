@@ -229,7 +229,7 @@ export const DeliverabilityChart = ({
 						/>
 						<Area
 							yAxisId="left"
-							type="monotone"
+							type="linear"
 							dataKey="rate"
 							name="Deliverability Rate"
 							stroke="#888888"
@@ -240,7 +240,7 @@ export const DeliverabilityChart = ({
 						/>
 						<Line
 							yAxisId="right"
-							type="monotone"
+							type="linear"
 							dataKey="bounced"
 							name="Bounces"
 							stroke="#F04438"
