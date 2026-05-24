@@ -7,7 +7,9 @@ import { Elysia } from "elysia";
 import { creditsConfig } from "./credits.config";
 import { loader } from "./loader";
 import { creditsRoutes } from "./routes/credits/credits.routes";
-import { landing } from "./routes/landing/landing.index";
+import { agentCardRoute } from "./routes/landing/agent-card.route";
+import { healthRoute } from "./routes/landing/health.route";
+import { landingRoute } from "./routes/landing/landing.route";
 
 const port = creditsConfig.PORT;
 
@@ -32,7 +34,9 @@ const app = new Elysia({ prefix: "/api/credits", name: "Credits Service" })
 			},
 		}),
 	)
-	.use(landing)
+	.use(landingRoute)
+	.use(healthRoute)
+	.use(agentCardRoute)
 	.use(creditsRoutes)
 	.onStart(async () => {
 		await loader();
