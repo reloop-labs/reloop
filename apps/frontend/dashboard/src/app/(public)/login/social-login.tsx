@@ -78,7 +78,7 @@ export function SocialLogin({
 		{
 			name: "github",
 			label: "Continue with GitHub",
-			defaultMode: "ghost",
+			defaultMode: "lighter",
 			icon:
 				loading.name === "github" && loading.loading ? (
 					<Spinner color="var(--text-white-0)" size={16} />
@@ -104,7 +104,7 @@ export function SocialLogin({
 			},
 		},
 		{
-			defaultMode: "ghost",
+			defaultMode: "lighter",
 			name: "email",
 			label: "Continue with Email",
 			icon: <Icon name="social-mail" className="h-[17.5px] w-[17.5px]" />,
