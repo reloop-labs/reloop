@@ -1,17 +1,15 @@
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import {
-	billingInvoice,
 	creditLedger,
 	emailSend,
-	plan,
-	subscription,
+	organizationCredits,
 } from "@reloop/db/schema";
 import { and, count, eq, gte, sql } from "drizzle-orm";
 import { log } from "evlog";
 
 import { billingConfig } from "./billing.config";
-import { getOrProvisionSubscription } from "./utils/subscription";
+import { getOrProvisionCredits } from "./utils/credits";
 
 export async function loader() {
 	log.info("server", "Initializing Billing Service Subscribers...");
@@ -26,7 +24,7 @@ export async function loader() {
 		});
 	}
 
-	// ── ORGANIZATION_CREATED — Initialize subscription + credits ──────────────
+	// ── ORGANIZATION_CREATED — Initialize credits ──────────────────────────────
 	await bus.subscribe(BusEvent.ORGANIZATION_CREATED, async (payload) => {
 		log.info({
 			...{ organizationId: payload.id },
@@ -34,17 +32,17 @@ export async function loader() {
 		});
 		try {
 			await db.transaction(async (tx) => {
-				await getOrProvisionSubscription(payload.id, tx);
+				await getOrProvisionCredits(payload.id, tx);
 			});
 
 			log.info({
 				...{ organizationId: payload.id },
-				message: "Initialized subscription for new organization",
+				message: "Initialized credits for new organization",
 			});
 		} catch (error) {
 			log.error({
 				...{ error, organizationId: payload.id },
-				message: "Failed to initialize subscription",
+				message: "Failed to initialize credits",
 			});
 		}
 	});
@@ -68,8 +66,8 @@ export async function loader() {
 			} | null = null;
 
 			await db.transaction(async (tx) => {
-				// 1. Find active subscription with plan (provision if missing)
-				const activeSub = await getOrProvisionSubscription(
+				// 1. Find active credits (provision if missing)
+				const activeCredits = await getOrProvisionCredits(
 					payload.organizationId,
 					tx,
 				);
@@ -79,7 +77,7 @@ export async function loader() {
 					.insert(emailSend)
 					.values({
 						organizationId: payload.organizationId,
-						subscriptionId: activeSub.id,
+						organizationCreditsId: activeCredits.id,
 						recipientEmail: "multiple@recipients.info", // simplified for batch events
 						countedInCredits: true,
 						creditsConsumed: payload.recipientCount,
@@ -88,27 +86,27 @@ export async function loader() {
 					})
 					.returning();
 
-				// 3. Update subscription counters
-				const newCreditsUsed = activeSub.creditsUsed + payload.recipientCount;
+				// 3. Update credit counters
+				const newCreditsUsed = activeCredits.creditsUsed + payload.recipientCount;
 				const newCreditsRemaining = Math.max(
 					0,
-					activeSub.creditsRemaining - payload.recipientCount,
+					activeCredits.creditsRemaining - payload.recipientCount,
 				);
 
 				await tx
-					.update(subscription)
+					.update(organizationCredits)
 					.set({
-						creditsUsed: sql`${subscription.creditsUsed} + ${payload.recipientCount}`,
-						creditsRemaining: sql`GREATEST(0, ${subscription.creditsRemaining} - ${payload.recipientCount})`,
+						creditsUsed: sql`${organizationCredits.creditsUsed} + ${payload.recipientCount}`,
+						creditsRemaining: sql`GREATEST(0, ${organizationCredits.creditsRemaining} - ${payload.recipientCount})`,
 						updatedAt: new Date(),
 					})
-					.where(eq(subscription.id, activeSub.id));
+					.where(eq(organizationCredits.id, activeCredits.id));
 
 				// 4. Log in credit ledger
 				if (sendRecord) {
 					await tx.insert(creditLedger).values({
 						organizationId: payload.organizationId,
-						subscriptionId: activeSub.id,
+						organizationCreditsId: activeCredits.id,
 						entryType: "email_sent",
 						delta: -payload.recipientCount,
 						balanceAfter: newCreditsRemaining,
@@ -120,9 +118,9 @@ export async function loader() {
 				usageSnapshot = {
 					creditsUsed: newCreditsUsed,
 					creditsRemaining: newCreditsRemaining,
-					monthlyCredits: activeSub.plan.monthlyCredits,
-					periodStart: activeSub.currentPeriodStart,
-					periodEnd: activeSub.currentPeriodEnd,
+					monthlyCredits: activeCredits.monthlyCredits,
+					periodStart: activeCredits.currentPeriodStart,
+					periodEnd: activeCredits.currentPeriodEnd,
 				};
 			});
 
@@ -200,3 +198,4 @@ export async function loader() {
 		}
 	});
 }
+

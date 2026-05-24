@@ -1,7 +1,6 @@
 "use client";
 
 import * as Button from "@reloop/ui/button";
-import { Icon } from "@reloop/ui/icon";
 import useSWR from "swr";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -9,6 +8,7 @@ import useSWR from "swr";
 interface PlanData {
 	plan: {
 		name: string;
+		monthlyCredits: number;
 		basePriceUsd: string;
 		billingCycle: "monthly" | "annual";
 	};
@@ -21,39 +21,57 @@ interface PlanData {
 	};
 }
 
-interface Invoice {
+interface Transaction {
 	id: string;
+	entryType:
+		| "credit_purchased"
+		| "email_sent"
+		| "rollover_applied"
+		| "manual_adjustment"
+		| "refund"
+		| "plan_change"
+		| "period_reset";
+	delta: number;
+	balanceAfter: number;
+	reason: string | null;
 	createdAt: string;
-	totalUsd: string;
-	status: "draft" | "open" | "paid" | "void" | "uncollectible";
-	periodStart: string;
-	periodEnd: string;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function formatDate(iso: string): string {
 	return new Date(iso).toLocaleDateString("en-US", {
-		month: "long",
+		month: "short",
 		day: "numeric",
 		year: "numeric",
+		hour: "2-digit",
+		minute: "2-digit",
 	});
 }
 
-function formatCurrency(usd: string): string {
-	return `$${Number.parseFloat(usd).toFixed(2)}`;
+function formatNumber(num: number): string {
+	return num.toLocaleString();
 }
 
 const Skeleton = ({ className }: { className?: string }) => (
 	<div className={`animate-pulse rounded bg-bg-soft-200 ${className ?? ""}`} />
 );
 
-const statusStyles: Record<string, string> = {
-	paid: "bg-green-50 text-green-700",
-	open: "bg-blue-50 text-blue-700",
-	draft: "bg-neutral-100 text-neutral-600",
-	void: "bg-neutral-100 text-neutral-400",
-	uncollectible: "bg-red-50 text-red-700",
+const entryTypeLabels: Record<string, string> = {
+	credit_purchased: "Quota Purchased",
+	email_sent: "Email Delivery",
+	rollover_applied: "Rollover",
+	manual_adjustment: "Adjustment",
+	refund: "Refund",
+	plan_change: "Plan Change",
+	period_reset: "Monthly Reset",
+};
+
+const entryTypeStyles: Record<string, string> = {
+	credit_purchased: "bg-green-50 text-green-700 border border-green-100",
+	email_sent: "bg-neutral-50 text-neutral-600 border border-neutral-100",
+	manual_adjustment: "bg-blue-50 text-blue-700 border border-blue-100",
+	period_reset: "bg-amber-50 text-amber-700 border border-amber-100",
 };
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -65,30 +83,30 @@ const BillingPage = () => {
 		error: planError,
 	} = useSWR<PlanData>("/api/billing/v1/plan");
 	const {
-		data: invoices,
-		isLoading: invoicesLoading,
-		error: invoicesError,
-	} = useSWR<Invoice[]>("/api/billing/v1/invoices");
+		data: transactions,
+		isLoading: transactionsLoading,
+		error: transactionsError,
+	} = useSWR<Transaction[]>("/api/billing/v1/transactions");
 
-	const isLoading = planLoading || invoicesLoading;
-	const error = planError || invoicesError;
+	const isLoading = planLoading || transactionsLoading;
+	const error = planError || transactionsError;
 
 	return (
 		<div className="w-full space-y-8 pt-5">
 			<div>
 				<div className="mb-6">
 					<p className="font-medium text-label-md text-text-strong-950">
-						Billing &amp; Subscription
+						Credits &amp; Quota
 					</p>
 					<p className="text-paragraph-sm text-text-sub-600">
-						Manage your subscription plan, payment methods, and invoices.
+						Manage your organization credit balance, track usage logs, and request quota adjustments.
 					</p>
 				</div>
 
 				{/* Error state */}
 				{error && (
 					<div className="mb-4 rounded-xl border border-error-light bg-error-lighter p-4 text-error-base text-paragraph-sm">
-						{error?.message ?? "Failed to load billing data."}
+						{error?.message ?? "Failed to load credits data."}
 					</div>
 				)}
 
@@ -97,25 +115,25 @@ const BillingPage = () => {
 					<div className="flex items-start justify-between">
 						<div className="space-y-1">
 							<p className="font-medium text-label-sm text-text-sub-600">
-								Current Plan
+								Current Allocation
 							</p>
 							{isLoading ? (
 								<Skeleton className="h-8 w-32" />
 							) : (
 								<p className="font-semibold text-2xl text-text-strong-950">
-									{planData?.plan.name ?? "—"} Plan
+									{planData ? formatNumber(planData.plan.monthlyCredits) : "—"} credits / mo
 								</p>
 							)}
 						</div>
 						<Button.Root variant="neutral" size="xsmall">
-							Upgrade Plan
+							Request Custom Quota
 						</Button.Root>
 					</div>
 
 					<div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-3">
 						<div className="space-y-1">
 							<p className="text-paragraph-xs text-text-sub-600">
-								Next billing date
+								Next reset date
 							</p>
 							{isLoading ? (
 								<Skeleton className="h-5 w-28" />
@@ -129,7 +147,7 @@ const BillingPage = () => {
 						</div>
 						<div className="space-y-1">
 							<p className="text-paragraph-xs text-text-sub-600">
-								Billing interval
+								Reset frequency
 							</p>
 							{isLoading ? (
 								<Skeleton className="h-5 w-20" />
@@ -140,38 +158,41 @@ const BillingPage = () => {
 							)}
 						</div>
 						<div className="space-y-1">
-							<p className="text-paragraph-xs text-text-sub-600">Amount</p>
+							<p className="text-paragraph-xs text-text-sub-600">Credits remaining</p>
 							{isLoading ? (
 								<Skeleton className="h-5 w-16" />
 							) : (
 								<p className="font-medium text-label-sm text-text-strong-950">
-									{planData ? formatCurrency(planData.plan.basePriceUsd) : "—"}
+									{planData ? formatNumber(planData.subscription.creditsRemaining) : "—"}
 								</p>
 							)}
 						</div>
 					</div>
 				</div>
 
-				{/* Billing History */}
+				{/* Transactions History */}
 				<div className="mt-10">
 					<p className="font-medium text-label-sm text-text-strong-950">
-						Billing History
+						Credit Ledger &amp; Transactions
 					</p>
 					<div className="mt-4 overflow-hidden rounded-xl border border-stroke-soft-200 bg-white">
 						<table className="w-full text-left text-sm">
-							<thead className="border-stroke-soft-200 border-b bg-neutral-alpha-5">
+						<thead className="border-stroke-soft-200 border-b bg-neutral-alpha-5">
 								<tr>
 									<th className="px-4 py-3 font-medium text-text-sub-600">
 										Date
 									</th>
 									<th className="px-4 py-3 font-medium text-text-sub-600">
-										Amount
+										Type
 									</th>
 									<th className="px-4 py-3 font-medium text-text-sub-600">
-										Status
+										Description
 									</th>
 									<th className="px-4 py-3 text-right font-medium text-text-sub-600">
-										Invoice
+										Change
+									</th>
+									<th className="px-4 py-3 text-right font-medium text-text-sub-600">
+										Balance
 									</th>
 								</tr>
 							</thead>
@@ -183,52 +204,57 @@ const BillingPage = () => {
 												<Skeleton className="h-4 w-28" />
 											</td>
 											<td className="px-4 py-3">
-												<Skeleton className="h-4 w-16" />
+												<Skeleton className="h-4.5 w-20 rounded" />
 											</td>
 											<td className="px-4 py-3">
-												<Skeleton className="h-4 w-12 rounded-full" />
+												<Skeleton className="h-4 w-40" />
 											</td>
 											<td className="px-4 py-3 text-right">
-												<Skeleton className="ml-auto h-6 w-6" />
+												<Skeleton className="ml-auto h-4 w-12" />
+											</td>
+											<td className="px-4 py-3 text-right">
+												<Skeleton className="ml-auto h-4 w-16" />
 											</td>
 										</tr>
 									))
-								) : (invoices ?? []).length === 0 ? (
+								) : (transactions ?? []).length === 0 ? (
 									<tr>
 										<td
-											colSpan={4}
+											colSpan={5}
 											className="px-4 py-8 text-center text-paragraph-sm text-text-sub-600"
 										>
-											No invoices yet.
+											No credit transactions recorded yet.
 										</td>
 									</tr>
 								) : (
-									(invoices ?? []).map((invoice) => (
+									(transactions ?? []).map((tx) => (
 										<tr
-											key={invoice.id}
+											key={tx.id}
 											className="transition-colors hover:bg-neutral-alpha-5/5"
 										>
-											<td className="px-4 py-3 text-text-strong-950">
-												{formatDate(invoice.createdAt)}
+											<td className="px-4 py-3 text-text-strong-950 whitespace-nowrap">
+												{formatDate(tx.createdAt)}
 											</td>
-											<td className="px-4 py-3 text-text-strong-950">
-												{formatCurrency(invoice.totalUsd)}
-											</td>
-											<td className="px-4 py-3">
+											<td className="px-4 py-3 whitespace-nowrap">
 												<span
-													className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 font-medium text-[10px] capitalize ${statusStyles[invoice.status] ?? "bg-neutral-100 text-neutral-600"}`}
+													className={`inline-flex items-center gap-1.5 rounded px-2 py-0.5 font-medium text-[10px] capitalize ${entryTypeStyles[tx.entryType] ?? "bg-neutral-100 text-neutral-600"}`}
 												>
-													{invoice.status}
+													{entryTypeLabels[tx.entryType] ?? tx.entryType}
 												</span>
 											</td>
-											<td className="px-4 py-3 text-right">
-												<Button.Root
-													variant="neutral"
-													mode="ghost"
-													size="xsmall"
-												>
-													<Icon name="file-text" className="h-4 w-4" />
-												</Button.Root>
+											<td className="px-4 py-3 text-text-sub-600 max-w-[240px] truncate">
+												{tx.reason ?? "—"}
+											</td>
+											<td
+												className={`px-4 py-3 text-right font-medium whitespace-nowrap ${
+													tx.delta > 0 ? "text-green-600" : "text-text-strong-950"
+												}`}
+											>
+												{tx.delta > 0 ? "+" : ""}
+												{formatNumber(tx.delta)}
+											</td>
+											<td className="px-4 py-3 text-right font-medium text-text-strong-950 whitespace-nowrap">
+												{formatNumber(tx.balanceAfter)}
 											</td>
 										</tr>
 									))
@@ -243,3 +269,4 @@ const BillingPage = () => {
 };
 
 export default BillingPage;
+

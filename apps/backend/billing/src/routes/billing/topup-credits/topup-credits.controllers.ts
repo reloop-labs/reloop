@@ -1,8 +1,8 @@
 import { db } from "@reloop/db/client";
-import { creditLedger, subscription } from "@reloop/db/schema";
+import { creditLedger, organizationCredits } from "@reloop/db/schema";
 import { eq, sql } from "drizzle-orm";
 
-import { getOrProvisionSubscription } from "../../../utils/subscription";
+import { getOrProvisionCredits } from "../../../utils/credits";
 
 interface TopupParams {
 	organizationId: string;
@@ -16,25 +16,26 @@ export const topupCreditsController = async ({
 	reason,
 }: TopupParams) => {
 	await db.transaction(async (tx) => {
-		const activeSub = await getOrProvisionSubscription(organizationId, tx);
+		const activeCredits = await getOrProvisionCredits(organizationId, tx);
 
 		await tx
-			.update(subscription)
+			.update(organizationCredits)
 			.set({
-				creditsRemaining: sql`${subscription.creditsRemaining} + ${amount}`,
+				creditsRemaining: sql`${organizationCredits.creditsRemaining} + ${amount}`,
 				updatedAt: new Date(),
 			})
-			.where(eq(subscription.id, activeSub.id));
+			.where(eq(organizationCredits.id, activeCredits.id));
 
 		await tx.insert(creditLedger).values({
 			organizationId,
-			subscriptionId: activeSub.id,
+			organizationCreditsId: activeCredits.id,
 			entryType: "manual_adjustment",
 			delta: amount,
-			balanceAfter: activeSub.creditsRemaining + amount,
+			balanceAfter: activeCredits.creditsRemaining + amount,
 			reason: reason || "Manual top-up",
 		});
 	});
 
 	return { success: true };
 };
+

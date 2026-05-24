@@ -28,7 +28,7 @@ const list = [
 		iconName: "webhook",
 	},
 	{
-		title: "Billing",
+		title: "Credits",
 		path: "/settings/billing",
 		iconName: "invoice",
 	},

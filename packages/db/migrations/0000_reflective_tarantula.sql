@@ -11,6 +11,7 @@ CREATE TYPE "public"."visibility" AS ENUM('private', 'public');--> statement-bre
 CREATE TYPE "public"."contact_status" AS ENUM('subscribed', 'unsubscribed', 'blocked');--> statement-breakpoint
 CREATE TYPE "public"."property_type" AS ENUM('string', 'number');--> statement-breakpoint
 CREATE TYPE "public"."suppression_reason" AS ENUM('hard_bounce', 'spam_complaint');--> statement-breakpoint
+CREATE TYPE "public"."dns_record_purpose" AS ENUM('sending', 'receiving', 'tracking');--> statement-breakpoint
 CREATE TYPE "public"."dns_record_type" AS ENUM('A', 'AAAA', 'CNAME', 'MX', 'TXT');--> statement-breakpoint
 CREATE TYPE "public"."dns_record_type_name" AS ENUM('MX', 'SPF', 'DKIM', 'DMARC', 'CNAME');--> statement-breakpoint
 CREATE TYPE "public"."domain_status" AS ENUM('pending', 'verifying', 'active', 'suspended', 'failed');--> statement-breakpoint
@@ -131,29 +132,10 @@ CREATE TABLE "verification" (
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "billing_invoice" (
-	"id" text PRIMARY KEY NOT NULL,
-	"organization_id" text NOT NULL,
-	"subscription_id" text NOT NULL,
-	"credits_included" integer NOT NULL,
-	"credits_used" integer NOT NULL,
-	"overage_credits" integer DEFAULT 0 NOT NULL,
-	"base_amount_usd" numeric(10, 2) NOT NULL,
-	"overage_amount_usd" numeric(10, 2) DEFAULT '0' NOT NULL,
-	"total_usd" numeric(10, 2) NOT NULL,
-	"status" "invoice_status" DEFAULT 'draft' NOT NULL,
-	"external_invoice_id" varchar(255),
-	"period_start" timestamp NOT NULL,
-	"period_end" timestamp NOT NULL,
-	"paid_at" timestamp,
-	"created_at" timestamp DEFAULT now() NOT NULL,
-	"updated_at" timestamp DEFAULT now() NOT NULL
-);
---> statement-breakpoint
 CREATE TABLE "credit_ledger" (
 	"id" text PRIMARY KEY NOT NULL,
 	"organization_id" text NOT NULL,
-	"subscription_id" text NOT NULL,
+	"organization_credits_id" text NOT NULL,
 	"entry_type" "ledger_entry_type" NOT NULL,
 	"delta" integer NOT NULL,
 	"balance_after" integer NOT NULL,
@@ -165,7 +147,7 @@ CREATE TABLE "credit_ledger" (
 CREATE TABLE "email_send" (
 	"id" text PRIMARY KEY NOT NULL,
 	"organization_id" text NOT NULL,
-	"subscription_id" text NOT NULL,
+	"organization_credits_id" text NOT NULL,
 	"email_log_id" text,
 	"recipient_email" varchar(255) NOT NULL,
 	"counted_in_credits" boolean DEFAULT true NOT NULL,
@@ -176,41 +158,17 @@ CREATE TABLE "email_send" (
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "plan" (
-	"id" text PRIMARY KEY NOT NULL,
-	"name" varchar(100) NOT NULL,
-	"monthly_credits" integer NOT NULL,
-	"overage_limit" integer DEFAULT 0 NOT NULL,
-	"base_price_usd" numeric(10, 2) NOT NULL,
-	"overage_price_per_email" numeric(10, 4) DEFAULT '0' NOT NULL,
-	"billing_cycle" "billing_cycle" DEFAULT 'monthly' NOT NULL,
-	"rollover_enabled" boolean DEFAULT false NOT NULL,
-	"max_rollover_credits" integer,
-	"rate_per_second" integer DEFAULT 50 NOT NULL,
-	"rate_per_minute" integer DEFAULT 2000 NOT NULL,
-	"rate_per_hour" integer DEFAULT 50000 NOT NULL,
-	"max_attachment_size_mb" integer DEFAULT 10 NOT NULL,
-	"is_active" boolean DEFAULT true NOT NULL,
-	"created_at" timestamp DEFAULT now() NOT NULL,
-	"updated_at" timestamp DEFAULT now() NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE "subscription" (
+CREATE TABLE "organization_credits" (
 	"id" text PRIMARY KEY NOT NULL,
 	"organization_id" text NOT NULL,
-	"plan_id" text NOT NULL,
-	"status" "subscription_status" DEFAULT 'active' NOT NULL,
 	"credits_used" integer DEFAULT 0 NOT NULL,
-	"credits_remaining" integer DEFAULT 0 NOT NULL,
-	"rollover_credits" integer DEFAULT 0 NOT NULL,
-	"overage_credits_used" integer DEFAULT 0 NOT NULL,
-	"current_period_start" timestamp NOT NULL,
+	"credits_remaining" integer DEFAULT 3000 NOT NULL,
+	"monthly_credits" integer DEFAULT 3000 NOT NULL,
+	"current_period_start" timestamp DEFAULT now() NOT NULL,
 	"current_period_end" timestamp NOT NULL,
-	"external_subscription_id" varchar(255),
-	"cancelled_at" timestamp,
+	"status" varchar(50) DEFAULT 'active' NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
-	"updated_at" timestamp DEFAULT now() NOT NULL,
-	CONSTRAINT "subscription_external_subscription_id_unique" UNIQUE("external_subscription_id")
+	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "channel" (
@@ -316,6 +274,7 @@ CREATE TABLE "domain_dns_record" (
 	"ttl" text DEFAULT 'Auto' NOT NULL,
 	"priority" integer,
 	"record_type_name" "dns_record_type_name" NOT NULL,
+	"purpose" "dns_record_purpose" DEFAULT 'sending' NOT NULL,
 	"domain" text NOT NULL,
 	"fqdn" text NOT NULL,
 	"private_key" text,
@@ -392,6 +351,9 @@ CREATE TABLE "template" (
 	"name" varchar(255) NOT NULL,
 	"description" text,
 	"subject" varchar(500),
+	"from_email" varchar(255),
+	"reply_to" varchar(255),
+	"preview_text" text,
 	"organization_id" text NOT NULL,
 	"created_by_user_id" text NOT NULL,
 	"status" "template_status" DEFAULT 'draft' NOT NULL,
@@ -409,7 +371,12 @@ CREATE TABLE "template_version" (
 	"id" text PRIMARY KEY NOT NULL,
 	"template_id" text NOT NULL,
 	"version" integer NOT NULL,
+	"name" varchar(255),
+	"is_major" boolean DEFAULT false NOT NULL,
 	"subject" varchar(500),
+	"from_email" varchar(255),
+	"reply_to" varchar(255),
+	"preview_text" text,
 	"description" text,
 	"content" jsonb NOT NULL,
 	"variables" jsonb DEFAULT '[]'::jsonb,
@@ -504,15 +471,12 @@ ALTER TABLE "invitation" ADD CONSTRAINT "invitation_organization_id_organization
 ALTER TABLE "invitation" ADD CONSTRAINT "invitation_inviter_id_user_id_fk" FOREIGN KEY ("inviter_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "member" ADD CONSTRAINT "member_organization_id_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "member" ADD CONSTRAINT "member_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "billing_invoice" ADD CONSTRAINT "billing_invoice_organization_id_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organization"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "billing_invoice" ADD CONSTRAINT "billing_invoice_subscription_id_subscription_id_fk" FOREIGN KEY ("subscription_id") REFERENCES "public"."subscription"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "credit_ledger" ADD CONSTRAINT "credit_ledger_organization_id_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organization"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "credit_ledger" ADD CONSTRAINT "credit_ledger_subscription_id_subscription_id_fk" FOREIGN KEY ("subscription_id") REFERENCES "public"."subscription"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "credit_ledger" ADD CONSTRAINT "credit_ledger_organization_id_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "credit_ledger" ADD CONSTRAINT "credit_ledger_organization_credits_id_organization_credits_id_fk" FOREIGN KEY ("organization_credits_id") REFERENCES "public"."organization_credits"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "email_send" ADD CONSTRAINT "email_send_organization_id_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "email_send" ADD CONSTRAINT "email_send_subscription_id_subscription_id_fk" FOREIGN KEY ("subscription_id") REFERENCES "public"."subscription"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "email_send" ADD CONSTRAINT "email_send_organization_credits_id_organization_credits_id_fk" FOREIGN KEY ("organization_credits_id") REFERENCES "public"."organization_credits"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "email_send" ADD CONSTRAINT "email_send_email_log_id_email_log_id_fk" FOREIGN KEY ("email_log_id") REFERENCES "public"."email_log"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "subscription" ADD CONSTRAINT "subscription_organization_id_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "subscription" ADD CONSTRAINT "subscription_plan_id_plan_id_fk" FOREIGN KEY ("plan_id") REFERENCES "public"."plan"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "organization_credits" ADD CONSTRAINT "organization_credits_organization_id_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "channel" ADD CONSTRAINT "channel_organization_id_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "channel" ADD CONSTRAINT "channel_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "channel_subscription" ADD CONSTRAINT "channel_subscription_contact_id_contact_id_fk" FOREIGN KEY ("contact_id") REFERENCES "public"."contact"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -563,18 +527,14 @@ CREATE INDEX "invitation_email_idx" ON "invitation" USING btree ("email");--> st
 CREATE INDEX "member_organizationId_idx" ON "member" USING btree ("organization_id");--> statement-breakpoint
 CREATE INDEX "member_userId_idx" ON "member" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "verification_identifier_idx" ON "verification" USING btree ("identifier");--> statement-breakpoint
-CREATE INDEX "invoices_organization_id_idx" ON "billing_invoice" USING btree ("organization_id");--> statement-breakpoint
-CREATE INDEX "invoices_subscription_id_idx" ON "billing_invoice" USING btree ("subscription_id");--> statement-breakpoint
-CREATE INDEX "invoices_status_idx" ON "billing_invoice" USING btree ("status");--> statement-breakpoint
 CREATE INDEX "ledger_organization_id_idx" ON "credit_ledger" USING btree ("organization_id");--> statement-breakpoint
-CREATE INDEX "ledger_subscription_id_idx" ON "credit_ledger" USING btree ("subscription_id");--> statement-breakpoint
+CREATE INDEX "ledger_credits_id_idx" ON "credit_ledger" USING btree ("organization_credits_id");--> statement-breakpoint
 CREATE INDEX "ledger_org_created_idx" ON "credit_ledger" USING btree ("organization_id","created_at");--> statement-breakpoint
 CREATE INDEX "email_send_organization_id_idx" ON "email_send" USING btree ("organization_id");--> statement-breakpoint
-CREATE INDEX "email_send_subscription_id_idx" ON "email_send" USING btree ("subscription_id");--> statement-breakpoint
+CREATE INDEX "email_send_credits_id_idx" ON "email_send" USING btree ("organization_credits_id");--> statement-breakpoint
 CREATE INDEX "email_send_status_idx" ON "email_send" USING btree ("status");--> statement-breakpoint
-CREATE UNIQUE INDEX "subscription_org_active_idx" ON "subscription" USING btree ("organization_id") WHERE status NOT IN ('cancelled');--> statement-breakpoint
-CREATE INDEX "subscription_organization_id_idx" ON "subscription" USING btree ("organization_id");--> statement-breakpoint
-CREATE INDEX "subscription_period_idx" ON "subscription" USING btree ("current_period_start","current_period_end");--> statement-breakpoint
+CREATE UNIQUE INDEX "org_credits_organization_id_idx" ON "organization_credits" USING btree ("organization_id");--> statement-breakpoint
+CREATE INDEX "org_credits_period_idx" ON "organization_credits" USING btree ("current_period_start","current_period_end");--> statement-breakpoint
 CREATE INDEX "channel_idx_organization_id" ON "channel" USING btree ("organization_id");--> statement-breakpoint
 CREATE INDEX "channel_idx_name" ON "channel" USING btree ("name");--> statement-breakpoint
 CREATE INDEX "channel_idx_user_id" ON "channel" USING btree ("user_id");--> statement-breakpoint

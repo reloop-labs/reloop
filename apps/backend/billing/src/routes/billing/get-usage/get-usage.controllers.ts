@@ -1,7 +1,7 @@
 import { db } from "@reloop/db/client";
 import { emailSend, member, user } from "@reloop/db/schema";
 import { and, count, eq, gte, lt, sql } from "drizzle-orm";
-import { getOrProvisionSubscription } from "../../../utils/subscription";
+import { getOrProvisionCredits } from "../../../utils/credits";
 
 export const getUsageController = async ({
 	activeOrganizationId,
@@ -10,8 +10,8 @@ export const getUsageController = async ({
 }) => {
 	const orgId = activeOrganizationId;
 
-	// 1. Get or provision subscription
-	const activeSub = await getOrProvisionSubscription(orgId);
+	// 1. Get or provision credits
+	const activeCredits = await getOrProvisionCredits(orgId);
 
 	const now = new Date();
 	const todayStart = new Date(now);
@@ -26,7 +26,7 @@ export const getUsageController = async ({
 		.where(
 			and(
 				eq(emailSend.organizationId, orgId),
-				eq(emailSend.subscriptionId, activeSub.id),
+				eq(emailSend.organizationCreditsId, activeCredits.id),
 				gte(emailSend.sentAt, todayStart),
 			),
 		);
@@ -38,7 +38,7 @@ export const getUsageController = async ({
 		.where(
 			and(
 				eq(emailSend.organizationId, orgId),
-				eq(emailSend.subscriptionId, activeSub.id),
+				eq(emailSend.organizationCreditsId, activeCredits.id),
 				gte(emailSend.sentAt, yesterdayStart),
 				lt(emailSend.sentAt, todayStart),
 			),
@@ -56,7 +56,7 @@ export const getUsageController = async ({
 		.where(
 			and(
 				eq(emailSend.organizationId, orgId),
-				gte(emailSend.sentAt, activeSub.currentPeriodStart),
+				gte(emailSend.sentAt, activeCredits.currentPeriodStart),
 			),
 		);
 
@@ -69,12 +69,12 @@ export const getUsageController = async ({
 			: 100;
 
 	// 5. Daily average — spread creditsUsed over days elapsed in period
-	const periodStart = activeSub.currentPeriodStart;
+	const periodStart = activeCredits.currentPeriodStart;
 	const daysElapsed = Math.max(
 		1,
 		Math.ceil((now.getTime() - periodStart.getTime()) / (1000 * 60 * 60 * 24)),
 	);
-	const dailyAverage = Math.round(activeSub.creditsUsed / daysElapsed);
+	const dailyAverage = Math.round(activeCredits.creditsUsed / daysElapsed);
 
 	// 6. Member count — active and non-banned
 	const [memberRow] = await db
@@ -85,25 +85,25 @@ export const getUsageController = async ({
 
 	return {
 		plan: {
-			name: activeSub.plan.name,
-			monthlyCredits: activeSub.plan.monthlyCredits,
-			basePriceUsd: activeSub.plan.basePriceUsd,
-			billingCycle: activeSub.plan.billingCycle,
-			ratePerSecond: activeSub.plan.ratePerSecond,
-			ratePerMinute: activeSub.plan.ratePerMinute,
-			ratePerHour: activeSub.plan.ratePerHour,
-			maxAttachmentSizeMb: activeSub.plan.maxAttachmentSizeMb,
-			overageLimit: activeSub.plan.overageLimit,
+			name: "Free",
+			monthlyCredits: activeCredits.monthlyCredits,
+			basePriceUsd: "0.00",
+			billingCycle: "monthly",
+			ratePerSecond: 10,
+			ratePerMinute: 200,
+			ratePerHour: 5000,
+			maxAttachmentSizeMb: 5,
+			overageLimit: 0,
 		},
 		subscription: {
-			status: activeSub.status,
-			creditsUsed: activeSub.creditsUsed,
-			creditsRemaining: activeSub.creditsRemaining,
-			currentPeriodStart: activeSub.currentPeriodStart.toISOString(),
-			currentPeriodEnd: activeSub.currentPeriodEnd.toISOString(),
+			status: activeCredits.status,
+			creditsUsed: activeCredits.creditsUsed,
+			creditsRemaining: activeCredits.creditsRemaining,
+			currentPeriodStart: activeCredits.currentPeriodStart.toISOString(),
+			currentPeriodEnd: activeCredits.currentPeriodEnd.toISOString(),
 		},
 		stats: {
-			emailsSentThisMonth: activeSub.creditsUsed,
+			emailsSentThisMonth: activeCredits.creditsUsed,
 			emailsSentToday: Number(todayRow?.total ?? 0),
 			emailsSentYesterday: Number(yesterdayRow?.total ?? 0),
 			dailyAverage,
@@ -114,3 +114,4 @@ export const getUsageController = async ({
 		},
 	};
 };
+
