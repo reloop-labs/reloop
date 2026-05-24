@@ -77,14 +77,6 @@ const UsagePage = () => {
 						Email sends for your current billing period.
 					</p>
 				</div>
-				<button
-					type="button"
-					onClick={refetch}
-					className="rounded-md p-1 text-text-sub-600 transition-colors hover:bg-bg-soft-200"
-					title="Refresh usage"
-				>
-					<Icon name="more-horizontal" className="h-5 w-5" />
-				</button>
 			</div>
 
 			{/* Error state */}
