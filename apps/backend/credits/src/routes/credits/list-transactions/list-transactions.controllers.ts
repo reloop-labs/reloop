@@ -3,12 +3,12 @@ import { creditLedger } from "@reloop/db/schema";
 import { desc, eq } from "drizzle-orm";
 
 export const listTransactionsController = async ({
-	activeOrganizationId,
+	organizationId,
 }: {
-	activeOrganizationId: string;
+	organizationId: string;
 }) => {
 	return await db.query.creditLedger.findMany({
-		where: eq(creditLedger.organizationId, activeOrganizationId),
+		where: eq(creditLedger.organizationId, organizationId),
 		orderBy: [desc(creditLedger.createdAt)],
 		limit: 50,
 	});

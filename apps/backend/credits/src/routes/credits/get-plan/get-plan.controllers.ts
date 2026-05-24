@@ -1,11 +1,11 @@
 import { getOrProvisionCredits } from "@reloop/credits/utils/credits";
 
 export const getPlanController = async ({
-	activeOrganizationId,
+	organizationId,
 }: {
-	activeOrganizationId: string;
+	organizationId: string;
 }) => {
-	const activeCredits = await getOrProvisionCredits(activeOrganizationId);
+	const activeCredits = await getOrProvisionCredits(organizationId);
 
 	return {
 		plan: {

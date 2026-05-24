@@ -13,7 +13,7 @@ export const authMiddleware = new Elysia({
 			}
 			return {
 				userId: session.userId,
-				activeOrganizationId: session.activeOrganizationId,
+				organizationId: session.organizationId,
 			};
 		},
 	},

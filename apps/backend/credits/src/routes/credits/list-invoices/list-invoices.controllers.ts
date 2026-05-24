@@ -1,7 +1,7 @@
 export const listInvoicesController = async ({
-	activeOrganizationId,
+	organizationId,
 }: {
-	activeOrganizationId: string;
+	organizationId: string;
 }) => {
 	return [];
 };

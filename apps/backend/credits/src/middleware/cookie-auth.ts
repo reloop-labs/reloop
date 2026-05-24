@@ -2,7 +2,7 @@ import { creditsConfig } from "@reloop/credits/credits.config";
 
 export async function validateSession(cookie: string | null): Promise<{
 	userId: string;
-	activeOrganizationId: string;
+	organizationId: string;
 	authType: "session";
 } | null> {
 	const response = await fetch(
@@ -28,7 +28,7 @@ export async function validateSession(cookie: string | null): Promise<{
 	if (session?.user?.activeOrganizationId) {
 		return {
 			userId: session.user.id,
-			activeOrganizationId: session.user.activeOrganizationId,
+			organizationId: session.user.activeOrganizationId,
 			authType: "session",
 		};
 	}

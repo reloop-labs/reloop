@@ -4,8 +4,8 @@ import { listInvoicesController } from "./list-invoices.controllers";
 
 export const listInvoicesRoute = new Elysia().use(authMiddleware).get(
 	"/invoices",
-	async ({ activeOrganizationId }) => {
-		return await listInvoicesController({ activeOrganizationId });
+	async ({ organizationId }) => {
+		return await listInvoicesController({ organizationId });
 	},
 	{
 		cookieAuth: true,

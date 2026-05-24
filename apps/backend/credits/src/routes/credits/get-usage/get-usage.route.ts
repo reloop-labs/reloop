@@ -5,8 +5,8 @@ import { getUsageController } from "./get-usage.controllers";
 
 export const getUsageRoute = new Elysia().use(authMiddleware).get(
 	"/usage",
-	async ({ activeOrganizationId }) => {
-		return await getUsageController({ activeOrganizationId });
+	async ({ organizationId }) => {
+		return await getUsageController({ organizationId });
 	},
 	{
 		cookieAuth: true,

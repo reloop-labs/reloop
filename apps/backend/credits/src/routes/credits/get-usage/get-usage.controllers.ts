@@ -4,11 +4,11 @@ import { emailSend, member, user } from "@reloop/db/schema";
 import { and, count, eq, gte, lt, sql } from "drizzle-orm";
 
 export const getUsageController = async ({
-	activeOrganizationId,
+	organizationId,
 }: {
-	activeOrganizationId: string;
+	organizationId: string;
 }) => {
-	const orgId = activeOrganizationId;
+	const orgId = organizationId;
 
 	// 1. Get or provision credits
 	const activeCredits = await getOrProvisionCredits(orgId);

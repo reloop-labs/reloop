@@ -5,8 +5,8 @@ import { getPlanController } from "./get-plan.controllers";
 
 export const getPlanRoute = new Elysia().use(authMiddleware).get(
 	"/plan",
-	async ({ activeOrganizationId }) => {
-		return await getPlanController({ activeOrganizationId });
+	async ({ organizationId }) => {
+		return await getPlanController({ organizationId });
 	},
 	{
 		cookieAuth: true,
