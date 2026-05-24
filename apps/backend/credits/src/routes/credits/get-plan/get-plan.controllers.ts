@@ -1,4 +1,4 @@
-import { getOrProvisionCredits } from "../../../utils/credits";
+import { getOrProvisionCredits } from "@reloop/credits/utils/credits";
 
 export const getPlanController = async ({
 	activeOrganizationId,

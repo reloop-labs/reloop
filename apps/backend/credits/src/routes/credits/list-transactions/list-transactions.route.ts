@@ -1,5 +1,5 @@
+import { authMiddleware } from "@reloop/credits/middleware/auth-middleware";
 import { Elysia } from "elysia";
-import { authMiddleware } from "../../../middleware/auth-middleware";
 import { listTransactionsController } from "./list-transactions.controllers";
 
 export const listTransactionsRoute = new Elysia().use(authMiddleware).get(

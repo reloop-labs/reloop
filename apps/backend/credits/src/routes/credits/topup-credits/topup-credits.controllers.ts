@@ -1,8 +1,7 @@
+import { getOrProvisionCredits } from "@reloop/credits/utils/credits";
 import { db } from "@reloop/db/client";
 import { creditLedger, organizationCredits } from "@reloop/db/schema";
 import { eq, sql } from "drizzle-orm";
-
-import { getOrProvisionCredits } from "../../../utils/credits";
 
 interface TopupParams {
 	organizationId: string;

@@ -1,7 +1,7 @@
+import { getOrProvisionCredits } from "@reloop/credits/utils/credits";
 import { db } from "@reloop/db/client";
 import { emailSend, member, user } from "@reloop/db/schema";
 import { and, count, eq, gte, lt, sql } from "drizzle-orm";
-import { getOrProvisionCredits } from "../../../utils/credits";
 
 export const getUsageController = async ({
 	activeOrganizationId,

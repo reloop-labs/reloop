@@ -1,6 +1,6 @@
+import { authMiddleware } from "@reloop/credits/middleware/auth-middleware";
+import { CreditsModel } from "@reloop/credits/model/credits.model";
 import { Elysia } from "elysia";
-import { authMiddleware } from "../../../middleware/auth-middleware";
-import { CreditsModel } from "../../../model/credits.model";
 import { getUsageController } from "./get-usage.controllers";
 
 export const getUsageRoute = new Elysia().use(authMiddleware).get(

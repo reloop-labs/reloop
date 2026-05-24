@@ -1,4 +1,4 @@
-import { creditsConfig } from "../credits.config";
+import { creditsConfig } from "@reloop/credits/credits.config";
 
 export async function validateSession(cookie: string | null): Promise<{
 	userId: string;
