@@ -8,6 +8,13 @@ import { DomainSelector } from "../emails/components/domain-selector";
 import { DeliverabilityChart } from "./components/deliverability-chart";
 import { RateChart } from "./components/rate-chart";
 
+import {
+	formatDateLabel,
+	generateContinuousDateList,
+	getLocalKey,
+	getYearMonthDayKey,
+} from "./utils";
+
 interface EmailStatsResponse {
 	dates: string[];
 	sent: number[];
@@ -91,19 +98,44 @@ const MetricsPage = () => {
 		const complaintRate =
 			totalSent > 0 ? (totalComplaint / totalSent) * 100 : 0;
 
-		const chartData = data.dates.map((d: string, i: number) => {
-			const _sentCount = data.sent[i] || 0;
-			const transientBounces = data.bounceBreakdown.transient[i] || 0;
-			const permanentBounces = data.bounceBreakdown.permanent[i] || 0;
-			const undeterminedBounces = data.bounceBreakdown.undetermined[i] || 0;
-			const bounceCount =
-				transientBounces + permanentBounces + undeterminedBounces;
-			const complaintCount = data.complaint[i] || 0;
+		const statsMap = new Map<
+			string,
+			{
+				sent: number;
+				transient: number;
+				permanent: number;
+				undetermined: number;
+				complaint: number;
+			}
+		>();
 
-			const dateObj = new Date(d);
-			const formattedDate = Number.isNaN(dateObj.getTime())
-				? d
-				: `${dateObj.getDate()} ${dateObj.toLocaleDateString("en-US", { month: "short" }).toLowerCase()}`;
+		for (let i = 0; i < data.dates.length; i++) {
+			const dateStr = data.dates[i];
+			if (!dateStr) continue;
+			const key = getLocalKey(dateStr);
+			if (key) {
+				statsMap.set(key, {
+					sent: data.sent[i] ?? 0,
+					transient: data.bounceBreakdown.transient[i] ?? 0,
+					permanent: data.bounceBreakdown.permanent[i] ?? 0,
+					undetermined: data.bounceBreakdown.undetermined[i] ?? 0,
+					complaint: data.complaint[i] ?? 0,
+				});
+			}
+		}
+
+		const datesList = generateContinuousDateList(data, startDate, endDate);
+
+		const chartData = datesList.map((date) => {
+			const key = getYearMonthDayKey(date);
+			const formattedDate = formatDateLabel(date);
+			const existing = statsMap.get(key);
+
+			const bounceCount =
+				(existing?.transient ?? 0) +
+				(existing?.permanent ?? 0) +
+				(existing?.undetermined ?? 0);
+			const complaintCount = existing?.complaint ?? 0;
 
 			return {
 				date: formattedDate,
@@ -112,35 +144,12 @@ const MetricsPage = () => {
 			};
 		});
 
-		const paddedChartData = [...chartData];
-		if (paddedChartData.length < 5) {
-			let firstDate = new Date();
-			const firstDateStr = data.dates[0];
-			if (firstDateStr !== undefined) {
-				const parsed = new Date(firstDateStr);
-				if (!Number.isNaN(parsed.getTime())) {
-					firstDate = parsed;
-				}
-			}
-			const needed = 5 - paddedChartData.length;
-			for (let i = needed; i > 0; i--) {
-				const padDate = new Date(firstDate);
-				padDate.setDate(firstDate.getDate() - i);
-				const formattedDate = `${padDate.getDate()} ${padDate.toLocaleDateString("en-US", { month: "short" }).toLowerCase()}`;
-				paddedChartData.unshift({
-					date: formattedDate,
-					bounceRate: 0,
-					complaintRate: 0,
-				});
-			}
-		}
-
 		const totalBouncedSum = totalPermanent + totalTransient + totalUndetermined;
 
 		return {
 			bounceRate: Math.round(bounceRate * 100) / 100,
 			complaintRate: Math.round(complaintRate * 100) / 100,
-			chartData: paddedChartData,
+			chartData,
 			breakdown: {
 				bounce: [
 					{
@@ -189,7 +198,7 @@ const MetricsPage = () => {
 				],
 			},
 		};
-	}, [data]);
+	}, [data, startDate, endDate]);
 
 	return (
 		<div className="mx-auto max-w-4xl px-4 py-10 sm:px-8">

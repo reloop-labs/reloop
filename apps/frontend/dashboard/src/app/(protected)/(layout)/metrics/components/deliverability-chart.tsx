@@ -15,6 +15,13 @@ import {
 } from "recharts";
 import useSWR from "swr";
 
+import {
+	formatDateLabel,
+	generateContinuousDateList,
+	getLocalKey,
+	getYearMonthDayKey,
+} from "../utils";
+
 interface EmailStatsResponse {
 	dates: string[];
 	sent: number[];
@@ -53,49 +60,50 @@ export const DeliverabilityChart = ({
 
 	const chartData = useMemo(() => {
 		if (!data) return [];
-		const baseData = data.dates.map((date, i) => {
-			const dateObj = new Date(date);
-			const formattedDate = Number.isNaN(dateObj.getTime())
-				? date
-				: `${dateObj.getDate()} ${dateObj.toLocaleDateString("en-US", { month: "short" }).toLowerCase()}`;
 
-			return {
-				date: formattedDate,
-				sent: data.sent[i],
-				delivered: data.delivered[i],
-				bounced: data.bounced[i],
-				complaint: data.complaint[i],
-				rate: data.rate[i],
-			};
-		});
-
-		const padded = [...baseData];
-		if (padded.length < 5) {
-			let firstDate = new Date();
-			const firstDateStr = data.dates[0];
-			if (firstDateStr !== undefined) {
-				const parsed = new Date(firstDateStr);
-				if (!Number.isNaN(parsed.getTime())) {
-					firstDate = parsed;
-				}
+		const statsMap = new Map<
+			string,
+			{
+				sent: number;
+				delivered: number;
+				bounced: number;
+				complaint: number;
+				rate: number;
 			}
-			const needed = 5 - padded.length;
-			for (let i = needed; i > 0; i--) {
-				const padDate = new Date(firstDate);
-				padDate.setDate(firstDate.getDate() - i);
-				const formattedDate = `${padDate.getDate()} ${padDate.toLocaleDateString("en-US", { month: "short" }).toLowerCase()}`;
-				padded.unshift({
-					date: formattedDate,
-					sent: 0,
-					delivered: 0,
-					bounced: 0,
-					complaint: 0,
-					rate: 0,
+		>();
+
+		for (let i = 0; i < data.dates.length; i++) {
+			const dateStr = data.dates[i];
+			if (!dateStr) continue;
+			const key = getLocalKey(dateStr);
+			if (key) {
+				statsMap.set(key, {
+					sent: data.sent[i] ?? 0,
+					delivered: data.delivered[i] ?? 0,
+					bounced: data.bounced[i] ?? 0,
+					complaint: data.complaint[i] ?? 0,
+					rate: data.rate[i] ?? 0,
 				});
 			}
 		}
-		return padded;
-	}, [data]);
+
+		const datesList = generateContinuousDateList(data, startDate, endDate);
+
+		return datesList.map((date) => {
+			const key = getYearMonthDayKey(date);
+			const formattedDate = formatDateLabel(date);
+			const existing = statsMap.get(key);
+
+			return {
+				date: formattedDate,
+				sent: existing?.sent ?? 0,
+				delivered: existing?.delivered ?? 0,
+				bounced: existing?.bounced ?? 0,
+				complaint: existing?.complaint ?? 0,
+				rate: existing?.rate ?? 0,
+			};
+		});
+	}, [data, startDate, endDate]);
 
 	const maxSentValue = useMemo(() => {
 		if (!data || data.sent.length === 0) return 10;
