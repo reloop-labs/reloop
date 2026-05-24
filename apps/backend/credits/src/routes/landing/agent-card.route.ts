@@ -41,20 +41,6 @@ export const agentCardRoute = new Elysia().get("/agent-card.json", () => ({
 			errorCodes: [],
 			examples: [],
 		},
-		{
-			id: "list_invoices",
-			name: "List Invoices",
-			description: "Retrieve all invoices for the organization.",
-			method: "GET",
-			path: "/api/credits/v1/invoices",
-			tags: ["billing"],
-			inputSchema: {},
-			outputSchema: {
-				invoices: { type: "array" },
-			},
-			errorCodes: [],
-			examples: [],
-		},
 	],
 	usage_guidelines:
 		"1. Usage data is updated in near real-time via NATS events.\n2. Credits are deducted based on email recipients sent.\n3. Subscriptions default to a Free plan upon organization creation.",
