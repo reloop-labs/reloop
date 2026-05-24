@@ -87,7 +87,8 @@ export async function loader() {
 					.returning();
 
 				// 3. Update credit counters
-				const newCreditsUsed = activeCredits.creditsUsed + payload.recipientCount;
+				const newCreditsUsed =
+					activeCredits.creditsUsed + payload.recipientCount;
 				const newCreditsRemaining = Math.max(
 					0,
 					activeCredits.creditsRemaining - payload.recipientCount,
@@ -198,4 +199,3 @@ export async function loader() {
 		}
 	});
 }
-

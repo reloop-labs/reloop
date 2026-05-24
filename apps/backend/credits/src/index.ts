@@ -9,7 +9,7 @@ import { loader } from "./loader";
 import { creditsRoutes } from "./routes/credits/credits.routes";
 import { landing } from "./routes/landing/landing.index";
 
-const port = creditsConfig.port;
+const port = creditsConfig.PORT;
 
 const app = new Elysia({ prefix: "/api/credits", name: "Credits Service" })
 	.use(cors({ origin: "*", credentials: true }))
@@ -45,4 +45,3 @@ const app = new Elysia({ prefix: "/api/credits", name: "Credits Service" })
 	});
 
 export type App = typeof app;
-

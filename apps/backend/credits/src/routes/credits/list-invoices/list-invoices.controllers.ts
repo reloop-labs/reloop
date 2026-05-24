@@ -5,4 +5,3 @@ export const listInvoicesController = async ({
 }) => {
 	return [];
 };
-

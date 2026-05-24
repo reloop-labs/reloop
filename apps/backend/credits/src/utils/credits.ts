@@ -21,7 +21,10 @@ export async function getOrProvisionCredits(
 	const now = new Date();
 
 	if (!activeCredits) {
-		log.info("server", `No credits found for org ${orgId}, provisioning default monthly credits (3000)`);
+		log.info(
+			"server",
+			`No credits found for org ${orgId}, provisioning default monthly credits (3000)`,
+		);
 
 		const periodEnd = new Date(now);
 		periodEnd.setMonth(periodEnd.getMonth() + 1);
@@ -65,13 +68,16 @@ export async function getOrProvisionCredits(
 			...{ orgId, creditsId: newCredits.id },
 			message: "Auto-provisioned default monthly credits",
 		});
-		
+
 		return newCredits;
 	}
 
 	// Check if the current period has expired, if so reset credits (non-rollable)
 	if (now >= activeCredits.currentPeriodEnd) {
-		log.info("server", `Monthly credit period expired for org ${orgId}. Resetting credits (non-rollable).`);
+		log.info(
+			"server",
+			`Monthly credit period expired for org ${orgId}. Resetting credits (non-rollable).`,
+		);
 
 		const periodEnd = new Date(now);
 		periodEnd.setMonth(periodEnd.getMonth() + 1);
