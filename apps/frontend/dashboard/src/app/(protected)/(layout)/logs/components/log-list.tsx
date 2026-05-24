@@ -326,11 +326,7 @@ export const LogList = () => {
 						loadingRows={pageSize}
 						selectedLogId={selectedLogId}
 						onRowClick={(logId) => {
-							if (selectedLogId === logId) {
-								setSelectedLogId(null);
-							} else {
-								setSelectedLogId(logId);
-							}
+							setSelectedLogId(logId);
 						}}
 						hasFilters={!!hasAnyFilter}
 						onClearFilters={handleClearAll}
