@@ -16,6 +16,7 @@ export function auditLogHook(opts: AuditLogHookOptions) {
 		set,
 		request,
 		organizationId,
+		activeOrganizationId,
 		userId,
 		traceId,
 		body,
@@ -24,6 +25,7 @@ export function auditLogHook(opts: AuditLogHookOptions) {
 		set: { status?: number | string };
 		request: Request;
 		organizationId?: string;
+		activeOrganizationId?: string;
 		userId?: string;
 		traceId?: string;
 		body?: unknown;
@@ -34,6 +36,8 @@ export function auditLogHook(opts: AuditLogHookOptions) {
 			request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
 			request.headers.get("x-real-ip") ||
 			undefined;
+
+		const finalOrganizationId = organizationId ?? activeOrganizationId;
 
 		// Capture request body
 		let requestBody: Record<string, unknown> | null = null;
@@ -56,10 +60,14 @@ export function auditLogHook(opts: AuditLogHookOptions) {
 
 		if (isSuccess) {
 			level = "info";
-			const result = response as { id?: string; name?: string } | undefined;
+			const result = response as
+				| { id?: string; name?: string; roomName?: string }
+				| undefined;
 			if (result && typeof result === "object" && result !== null) {
 				if ("id" in result) {
 					resourceId = result.id;
+				} else if ("roomName" in result) {
+					resourceId = result.roomName;
 				}
 				metadata = { ...result };
 			} else {
@@ -102,7 +110,7 @@ export function auditLogHook(opts: AuditLogHookOptions) {
 				trace_id: traceId,
 				actor_type: "user",
 				actor_id: userId,
-				organization_id: organizationId,
+				organization_id: finalOrganizationId,
 				user_id: userId,
 				resource_type: resourceType,
 				resource_id: resourceId,

@@ -1,5 +1,6 @@
 import { authMiddleware } from "@be/template/middleware/auth";
 import { templateModel } from "@be/template/model/template.model";
+import { auditLogHook } from "@be/template/utils/audit-log";
 import { persistencePlugin } from "@be/template/utils/persistence";
 import { Elysia, t } from "elysia";
 import { saveRoomController } from "./save-room.controllers";
@@ -36,6 +37,10 @@ export const saveRoomRoute = new Elysia()
 		{
 			auth: true,
 			params: t.Object({ roomName: t.String() }),
+			afterResponse: auditLogHook({
+				resourceType: "template",
+				action: "saved",
+			}),
 			detail: {
 				tags: ["Rooms"],
 				summary: "Save room state",

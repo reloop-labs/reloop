@@ -1,5 +1,6 @@
 import { authMiddleware } from "@be/template/middleware/auth";
 import { templateModel } from "@be/template/model/template.model";
+import { auditLogHook } from "@be/template/utils/audit-log";
 import { persistencePlugin } from "@be/template/utils/persistence";
 import { Elysia, status, t } from "elysia";
 import { deleteDocController } from "./delete-doc.controllers";
@@ -27,6 +28,10 @@ export const deleteDocRoute = new Elysia()
 		{
 			auth: true,
 			params: t.Object({ roomName: t.String() }),
+			afterResponse: auditLogHook({
+				resourceType: "template",
+				action: "document_deleted",
+			}),
 			detail: {
 				tags: ["Rooms"],
 				summary: "Delete document room",
