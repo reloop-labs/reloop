@@ -4,6 +4,7 @@ import {
 	type Msg,
 	type MsgHdrs,
 	type NatsConnection,
+	type Subscription,
 } from "@nats-io/transport-node";
 import type { BusEvent } from "./events";
 import type { EventPayloads } from "./types";
@@ -14,6 +15,7 @@ export * from "./types";
 class MessageBus {
 	private nc: NatsConnection | null = null;
 	private encoder = new TextEncoder();
+	private subscriptions = new Map<string, Subscription>();
 
 	async connect(url = "nats://localhost:4222") {
 		if (this.nc) return;
@@ -59,7 +61,21 @@ class MessageBus {
 	) {
 		if (!this.nc) throw new Error("Bus not connected. Call connect() first.");
 
+		const key = `${event}:${options?.queue ?? ""}`;
+		const existing = this.subscriptions.get(key);
+		if (existing) {
+			try {
+				existing.unsubscribe();
+			} catch (err) {
+				console.error(
+					`Error unsubscribing existing subscription for ${key}:`,
+					err,
+				);
+			}
+		}
+
 		const sub = this.nc.subscribe(event, { queue: options?.queue });
+		this.subscriptions.set(key, sub);
 
 		(async () => {
 			for await (const m of sub) {

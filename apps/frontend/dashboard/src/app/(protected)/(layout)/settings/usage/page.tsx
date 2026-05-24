@@ -265,25 +265,15 @@ const UsagePage = () => {
 				</div>
 
 				<div className="mt-8 flex items-center justify-between border-stroke-soft-200/50 border-t pt-6">
-					<button
-						type="button"
-						className="mx-auto rounded-full p-2 text-text-sub-600 transition-colors hover:bg-bg-soft-200"
+					<div />
+					<Button.Root
+						variant="neutral"
+						size="xsmall"
+						className="font-semibold"
 					>
-						<Icon name="chevron-down" className="h-5 w-5" />
-					</button>
-					<div className="absolute right-6 bottom-6">
-						<Button.Root
-							variant="neutral"
-							size="xsmall"
-							className="font-semibold"
-						>
-							Upgrade plan
-							<Icon
-								name="arrow-swap"
-								className="ml-2 h-3.5 w-3.5 rotate-[135deg]"
-							/>
-						</Button.Root>
-					</div>
+						<Icon name="arrow-top-circle" className="h-3.5 w-3.5" />
+						Upgrade plan
+					</Button.Root>
 				</div>
 			</div>
 		</div>

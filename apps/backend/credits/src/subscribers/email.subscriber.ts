@@ -10,6 +10,7 @@ import { and, count, eq, gte, sql } from "drizzle-orm";
 import { log } from "evlog";
 
 export async function initEmailSubscriber() {
+	// Hot reload test comment
 	await bus.subscribe(
 		BusEvent.EMAIL_SENT,
 		async (payload) => {
@@ -30,6 +31,23 @@ export async function initEmailSubscriber() {
 				} | null = null;
 
 				await db.transaction(async (tx) => {
+					// 0. Check for duplicate processing (idempotency)
+					if (payload.emailLogId) {
+						const existingSend = await tx.query.emailSend.findFirst({
+							where: (e, { eq }) => eq(e.emailLogId, payload.emailLogId),
+						});
+						if (existingSend) {
+							log.info({
+								...{
+									organizationId: payload.organizationId,
+									emailLogId: payload.emailLogId,
+								},
+								message: "Email already processed, skipping credit deduction",
+							});
+							return;
+						}
+					}
+
 					// 1. Find active credits (provision if missing)
 					const activeCredits = await getOrProvisionCredits(
 						payload.organizationId,
@@ -42,6 +60,7 @@ export async function initEmailSubscriber() {
 						.values({
 							organizationId: payload.organizationId,
 							organizationCreditsId: activeCredits.id,
+							emailLogId: payload.emailLogId,
 							recipientEmail: "multiple@recipients.info", // simplified for batch events
 							countedInCredits: true,
 							creditsConsumed: payload.recipientCount,
