@@ -128,7 +128,7 @@ const UsagePage = () => {
 			</div>
 
 			{/* Main Usage Card */}
-			<div className="rounded-2xl border border-stroke-soft-200 bg-bg-weak-50 p-6 shadow-sm">
+			<div className="rounded-2xl border border-stroke-soft-200 bg-bg-weak-50 p-6">
 				<div className="mb-4 flex items-center justify-between">
 					<div>
 						<p className="font-semibold text-label-md text-text-strong-950">
@@ -200,7 +200,7 @@ const UsagePage = () => {
 			</div>
 
 			{/* Rate Limits Card */}
-			<div className="relative overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-weak-50 p-6 shadow-sm">
+			<div className="relative overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-weak-50 p-6">
 				<div className="mb-6">
 					<p className="font-semibold text-label-md text-text-strong-950">
 						Rate limits

@@ -1,3 +1,4 @@
+import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import { domain, emailLog } from "@reloop/db/schema";
 import { KumoMtaErrors } from "@reloop/domain/error/domain.error-response";
@@ -114,5 +115,13 @@ export async function logIncomingController({
 	if (!insertedId) {
 		throw KumoMtaErrors.failedToInsertLog();
 	}
+
+	await bus.publish(BusEvent.EMAIL_SENT, {
+		organizationId: finalOrgId,
+		emailLogId: insertedId,
+		recipientCount: body.toEmails.length,
+		timestamp: new Date().toISOString(),
+	});
+
 	return { id: insertedId };
 }
