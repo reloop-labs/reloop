@@ -61,11 +61,6 @@ const UsagePage = () => {
 				<Skeleton className="h-8 w-48" />
 				<Skeleton className="h-16 w-full rounded-xl" />
 				<Skeleton className="h-48 w-full rounded-2xl" />
-				<div className="grid grid-cols-1 gap-4 md:grid-cols-4">
-					{Array.from({ length: 4 }).map((_, i) => (
-						<Skeleton key={i} className="h-24 rounded-xl" />
-					))}
-				</div>
 			</div>
 		);
 	}
@@ -202,78 +197,6 @@ const UsagePage = () => {
 						</>
 					)}
 				</div>
-			</div>
-
-			{/* Small Stats Cards */}
-			<div className="grid grid-cols-1 gap-4 md:grid-cols-4">
-				{isLoading
-					? Array.from({ length: 4 }).map((_, i) => (
-							<div
-								key={i}
-								className="rounded-xl border border-stroke-soft-200 bg-bg-weak-50 p-4 shadow-sm"
-							>
-								<Skeleton className="mb-2 h-3 w-20" />
-								<Skeleton className="h-7 w-28" />
-								<Skeleton className="mt-2 h-3 w-24" />
-							</div>
-						))
-					: [
-							{
-								label: "This month",
-								value: data
-									? formatNumber(data.stats.emailsSentThisMonth)
-									: "—",
-								trend: data
-									? `avg ${formatNumber(data.stats.dailyAverage)}/day`
-									: "—",
-								trendColor: "text-text-sub-600",
-							},
-							{
-								label: "Yesterday",
-								value: data
-									? formatNumber(data.stats.emailsSentYesterday)
-									: "—",
-								trend: data
-									? `avg ${formatNumber(data.stats.dailyAverage)}/day`
-									: "—",
-								trendColor: "text-text-sub-600",
-							},
-							{
-								label: "Delivery rate",
-								value: data ? `${data.stats.deliveryRate}%` : "—",
-								trend:
-									data && data.stats.deliveryRate >= 95
-										? "↑ healthy"
-										: "↓ check bounces",
-								trendColor:
-									data && data.stats.deliveryRate >= 95
-										? "text-success-base"
-										: "text-error-base",
-							},
-							{
-								label: "Team members",
-								value: data ? String(data.members.total) : "—",
-								trend: "active & non-banned",
-								trendColor: "text-text-sub-600",
-							},
-						].map((stat) => (
-							<div
-								key={stat.label}
-								className="rounded-xl border border-stroke-soft-200 bg-bg-weak-50 p-4 shadow-sm"
-							>
-								<p className="mb-1 font-medium text-paragraph-xs text-text-sub-600">
-									{stat.label}
-								</p>
-								<p className="font-bold text-label-xl text-text-strong-950">
-									{stat.value}
-								</p>
-								<p
-									className={`mt-1 font-medium text-[11px] ${stat.trendColor}`}
-								>
-									{stat.trend}
-								</p>
-							</div>
-						))}
 			</div>
 
 			{/* Rate Limits Card */}

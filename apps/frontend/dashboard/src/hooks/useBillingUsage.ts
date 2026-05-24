@@ -23,16 +23,6 @@ export interface BillingUsage {
 		currentPeriodStart: string;
 		currentPeriodEnd: string;
 	};
-	stats: {
-		emailsSentThisMonth: number;
-		emailsSentToday: number;
-		emailsSentYesterday: number;
-		dailyAverage: number;
-		deliveryRate: number;
-	};
-	members: {
-		total: number;
-	};
 }
 
 export interface UsageLiveUpdate {
@@ -42,14 +32,13 @@ export interface UsageLiveUpdate {
 	monthlyCredits: number;
 	periodStart: string;
 	periodEnd: string;
-	emailsSentToday: number;
 }
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
 
 export function useBillingUsage() {
 	const { data, error, isLoading, mutate } = useSWR<BillingUsage>(
-		"/api/billing/v1/usage",
+		"/api/credits/v1/usage",
 	);
 
 	// Apply a live USAGE_UPDATED patch without a full re-fetch
@@ -64,11 +53,6 @@ export function useBillingUsage() {
 					creditsRemaining: update.creditsRemaining,
 					currentPeriodStart: update.periodStart,
 					currentPeriodEnd: update.periodEnd,
-				},
-				stats: {
-					...prev.stats,
-					emailsSentThisMonth: update.creditsUsed,
-					emailsSentToday: update.emailsSentToday,
 				},
 			};
 		}, false); // false = don't revalidate after optimistic update

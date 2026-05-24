@@ -17,16 +17,6 @@ export interface BillingUsageResponse {
 		currentPeriodStart: string;
 		currentPeriodEnd: string;
 	};
-	stats: {
-		emailsSentThisMonth: number;
-		emailsSentToday: number;
-		emailsSentYesterday: number;
-		dailyAverage: number;
-		deliveryRate: number;
-	};
-	members: {
-		total: number;
-	};
 }
 
 export interface PlanInfoResponse {

@@ -20,16 +20,6 @@ export namespace CreditsModel {
 			currentPeriodStart: t.String(),
 			currentPeriodEnd: t.String(),
 		}),
-		stats: t.Object({
-			emailsSentThisMonth: t.Number(),
-			emailsSentToday: t.Number(),
-			emailsSentYesterday: t.Number(),
-			dailyAverage: t.Number(),
-			deliveryRate: t.Number(),
-		}),
-		members: t.Object({
-			total: t.Number(),
-		}),
 	});
 
 	export const planResponse = t.Object({

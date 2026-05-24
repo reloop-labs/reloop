@@ -7,7 +7,7 @@ const transporter = nodemailer.createTransport({
 	secure: false,
 	auth: {
 		user: "reloop",
-		pass: "rl_prod_PsyTtywH1LAvYmcj3pSGLAtydpg", // Replace with your generated API key
+		pass: "rl_prod_XRxp0NReJCCKhtIXfzl1O0QgUlk", // Replace with your generated API key
 	},
 	tls: {
 		rejectUnauthorized: false,
