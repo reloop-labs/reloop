@@ -112,8 +112,13 @@ export class KumomtaClient {
 			}
 		}
 
+		// KumoMTA envelope_sender requires a bare email address, not
+		// RFC 5322 "Display Name <email>" format.
+		const angleMatch = options.from.match(/<([^>]+)>/);
+		const envelopeSender = angleMatch?.[1] ?? options.from;
+
 		const payload: InjectRequest = {
-			envelope_sender: options.from,
+			envelope_sender: envelopeSender,
 			recipients: Array.from(recipientSet).map((email) => ({ email })),
 			content,
 		};
