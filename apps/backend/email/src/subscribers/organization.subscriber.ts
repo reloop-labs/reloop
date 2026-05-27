@@ -3,7 +3,7 @@ import { emailConfig } from "@reloop/email/email.config";
 import InviteEmail from "@reloop/email/emails/invite";
 import OrgJoinedEmail from "@reloop/email/emails/org-joined";
 import { redis } from "@reloop/email/lib/redis";
-import { render } from "@reloop/email/render";
+import { render, toPlainText } from "@reloop/email/render";
 import { sendEmail } from "@reloop/email/utils/email";
 import { log } from "evlog";
 import React from "react";
@@ -35,11 +35,14 @@ export async function initOrgSubscribers() {
 					}),
 				);
 
+				const text = toPlainText(html);
+
 				await sendEmail({
 					from: `${payload.inviterName} via Reloop <invites@${emailConfig.RELOOP_SENDER_DOMAIN || "reloop.dev"}>`,
 					to: payload.email,
 					subject: `Join ${payload.organizationName} on Reloop`,
 					html,
+					text,
 				});
 			} catch (error) {
 				log.error({
@@ -77,11 +80,14 @@ export async function initOrgSubscribers() {
 					}),
 				);
 
+				const text = toPlainText(html);
+
 				await sendEmail({
 					from: `${payload.orgName} via Reloop <org@${emailConfig.RELOOP_SENDER_DOMAIN || "reloop.dev"}>`,
 					to: payload.userEmail,
 					subject: `You're now part of the ${payload.orgName} team!`,
 					html,
+					text,
 				});
 			} catch (error) {
 				log.error({

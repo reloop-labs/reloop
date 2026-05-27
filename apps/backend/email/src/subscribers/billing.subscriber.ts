@@ -3,7 +3,7 @@ import { emailConfig } from "@reloop/email/email.config";
 import PaymentFailedEmail from "@reloop/email/emails/payment-failed";
 import QuotaWarningEmail from "@reloop/email/emails/quota-warning";
 import TrialEndingEmail from "@reloop/email/emails/trial-ending";
-import { render } from "@reloop/email/render";
+import { render, toPlainText } from "@reloop/email/render";
 import { sendEmail } from "@reloop/email/utils/email";
 import { log } from "evlog";
 import React from "react";
@@ -27,11 +27,14 @@ export async function initBillingSubscribers() {
 					}),
 				);
 
+				const text = toPlainText(html);
+
 				await sendEmail({
 					from: `Reloop Billing <billing@${emailConfig.RELOOP_SENDER_DOMAIN || "reloop.dev"}>`,
 					to: payload.email,
 					subject: "Payment Failed - Action Required",
 					html,
+					text,
 				});
 			} catch (error) {
 				log.error({
@@ -60,11 +63,14 @@ export async function initBillingSubscribers() {
 					}),
 				);
 
+				const text = toPlainText(html);
+
 				await sendEmail({
 					from: `Reloop Support <support@${emailConfig.RELOOP_SENDER_DOMAIN || "reloop.dev"}>`,
 					to: payload.email,
 					subject: `Usage Alert: ${payload.percentage}% of your ${payload.resourceType} quota used`,
 					html,
+					text,
 				});
 			} catch (error) {
 				log.error({
@@ -93,11 +99,14 @@ export async function initBillingSubscribers() {
 					}),
 				);
 
+				const text = toPlainText(html);
+
 				await sendEmail({
 					from: `Reloop <hello@${emailConfig.RELOOP_SENDER_DOMAIN || "reloop.dev"}>`,
 					to: payload.email,
 					subject: `Your Reloop trial ends in ${payload.daysLeft} days`,
 					html,
+					text,
 				});
 			} catch (error) {
 				log.error({

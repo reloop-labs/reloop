@@ -1,1 +1,1 @@
-export { render } from "@react-email/render";
+export { render, toPlainText } from "@react-email/render";

@@ -4,7 +4,7 @@ import OtpEmail from "@reloop/email/emails/otp";
 import SigninDetectedEmail from "@reloop/email/emails/signin-detected";
 import WelcomeEmail from "@reloop/email/emails/welcome";
 import { redis } from "@reloop/email/lib/redis";
-import { render } from "@reloop/email/render";
+import { render, toPlainText } from "@reloop/email/render";
 import { sendEmail } from "@reloop/email/utils/email";
 import { log } from "evlog";
 import React from "react";
@@ -35,11 +35,14 @@ export async function initAuthSubscribers() {
 					}),
 				);
 
+				const text = toPlainText(html);
+
 				await sendEmail({
 					from: `Reloop <onboarding@${emailConfig.RELOOP_SENDER_DOMAIN || "reloop.dev"}>`,
 					to: payload.email,
 					subject: "Welcome to Reloop!",
 					html,
+					text,
 				});
 			} catch (error) {
 				log.error({
@@ -77,6 +80,8 @@ export async function initAuthSubscribers() {
 					}),
 				);
 
+				const text = toPlainText(html);
+
 				const subject =
 					payload.type === "forget-password"
 						? "Your password reset code"
@@ -89,6 +94,7 @@ export async function initAuthSubscribers() {
 					to: payload.email,
 					subject,
 					html,
+					text,
 				});
 			} catch (error) {
 				log.error({
@@ -143,11 +149,14 @@ export async function initAuthSubscribers() {
 					}),
 				);
 
+				const text = toPlainText(html);
+
 				await sendEmail({
 					from: `Security Alert <security@${emailConfig.RELOOP_SENDER_DOMAIN || "reloop.dev"}>`,
 					to: payload.email,
 					subject: "New sign-in detected on your account",
 					html,
+					text,
 				});
 			} catch (error) {
 				log.error({

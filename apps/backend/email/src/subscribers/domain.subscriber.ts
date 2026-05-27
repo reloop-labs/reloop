@@ -2,7 +2,7 @@ import { BusEvent, bus } from "@reloop/bus";
 import { emailConfig } from "@reloop/email/email.config";
 import DnsConfigEmail from "@reloop/email/emails/dns-config";
 import DomainVerifiedEmail from "@reloop/email/emails/domain-verified";
-import { render } from "@reloop/email/render";
+import { render, toPlainText } from "@reloop/email/render";
 import { sendEmail } from "@reloop/email/utils/email";
 import { log } from "evlog";
 import React from "react";
@@ -21,11 +21,14 @@ export async function initDomainSubscribers() {
 					}),
 				);
 
+				const text = toPlainText(html);
+
 				await sendEmail({
 					from: `Reloop <support@${emailConfig.RELOOP_SENDER_DOMAIN || "reloop.dev"}>`,
 					to: "admin@example.com", // This should probably come from organization/user
 					subject: `Domain ${payload.domain} has been verified`,
 					html,
+					text,
 				});
 			} catch (error) {
 				log.error({
@@ -86,11 +89,14 @@ export async function initDomainSubscribers() {
 					}),
 				);
 
+				const text = toPlainText(html);
+
 				await sendEmail({
 					from: `Reloop <support@${emailConfig.RELOOP_SENDER_DOMAIN || "reloop.dev"}>`,
 					to: payload.email,
 					subject: `DNS Configuration for ${payload.domain}`,
 					html,
+					text,
 				});
 			} catch (error) {
 				log.error({

@@ -3,7 +3,7 @@ import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { emailConfig } from "@reloop/email/email.config";
 import ApiKeyCreatedEmail from "@reloop/email/emails/api-key-created";
-import { render } from "@reloop/email/render";
+import { render, toPlainText } from "@reloop/email/render";
 import { sendEmail } from "@reloop/email/utils/email";
 import { eq } from "drizzle-orm";
 import { log } from "evlog";
@@ -50,11 +50,14 @@ export async function initApiKeySubscribers() {
 					}),
 				);
 
+				const text = toPlainText(html);
+
 				await sendEmail({
 					from: `Reloop <security@${emailConfig.RELOOP_SENDER_DOMAIN || "reloop.dev"}>`,
 					to: apiKey.user.email,
 					subject: `A new API key "${apiKey.name}" was created`,
 					html,
+					text,
 				});
 			} catch (error) {
 				log.error({
