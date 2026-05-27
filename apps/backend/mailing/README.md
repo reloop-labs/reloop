@@ -5,8 +5,8 @@
 ## 🔗 Quick Links
 
 - 📚 **Documentation**: [Developer Docs](https://reloop.sh/dev/mailing-service)
-- 🌐 **Production API**: [API Base](https://api.reloop.sh/api/mailing)
-- 📜 **OpenAPI Spec**: [OpenAPI](https://reloop.sh/api/mailing/openapi)
+- 🌐 **Production API**: [API Base](https://api.reloop.sh/api/mail)
+- 📜 **OpenAPI Spec**: [OpenAPI](https://reloop.sh/api/mail/openapi)
 
 ## 🚀 Setup
 
@@ -17,8 +17,8 @@ For detailed setup and development instructions, please refer to the [Setup Guid
 ## 🔗 Resources & Community
 
 - 📚 **Docs**: [Documentation](https://reloop.sh/docs/setup/backend/mailing)
-- 🤖 **Discovery**: [Discovery Spec](https://reloop.sh/api/mailing/agent-card.json)
-- 📖 **OpenAPI**: [OpenAPI Spec](https://reloop.sh/api/mailing/openapi)
+- 🤖 **Discovery**: [Discovery Spec](https://reloop.sh/api/mail/agent-card.json)
+- 📖 **OpenAPI**: [OpenAPI Spec](https://reloop.sh/api/mail/openapi)
 - 🐙 **GitHub**: [Source Code](https://github.com/reloop-labs/reloop)
 - 🆘 **Support**: [Get Help](https://reloop.sh/support)
 - 💬 **Discord**: [Join Chat](https://discord.gg/reloop)

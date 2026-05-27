@@ -14,7 +14,7 @@ initLogger({ env: { service: "mailing" } });
 
 const port = mailConfig.port;
 const mailService = new Elysia({
-	prefix: "/api/mailing",
+	prefix: "/api/mail",
 	name: "Mailing Service",
 })
 	.use(evlog())
