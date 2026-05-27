@@ -6,6 +6,7 @@ import {
 	type NatsConnection,
 	type Subscription,
 } from "@nats-io/transport-node";
+import { jetstream, jetstreamManager } from "@nats-io/jetstream";
 import type { BusEvent } from "./events";
 import type { EventPayloads } from "./types";
 
@@ -89,6 +90,29 @@ class MessageBus {
 		})();
 
 		return sub;
+	}
+
+	async ensureStream(name: string, subjects: string[]) {
+		if (!this.nc) throw new Error("Bus not connected. Call connect() first.");
+		const jsm = await jetstreamManager(this.nc);
+		try {
+			await jsm.streams.info(name);
+			console.log(`[bus] JetStream stream '${name}' already exists`);
+		} catch {
+			await jsm.streams.add({
+				name,
+				subjects,
+				retention: "interest" as const,
+				max_age: 24 * 60 * 60 * 1_000_000_000, // 24h in nanoseconds
+				storage: "file" as const,
+				num_replicas: 1,
+				discard: "old" as const,
+				duplicate_window: 2 * 60 * 1_000_000_000, // 2min in nanoseconds
+			});
+			console.log(
+				`[bus] JetStream stream '${name}' created for subjects: ${subjects.join(", ")}`,
+			);
+		}
 	}
 
 	async close() {

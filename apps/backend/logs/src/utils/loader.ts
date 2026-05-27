@@ -20,6 +20,7 @@ export const loader = async () => {
 		log.info("server", "ClickHouse connection health check passed");
 		await bus.connect(logsConfig.NATS_URL);
 		log.info("server", "NATS connected");
+		await bus.ensureStream("kumomta-events", ["kumomta.event"]);
 		await initSubscribers();
 	} catch (error) {
 		log.error({
