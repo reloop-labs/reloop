@@ -3,12 +3,13 @@ import { log } from "evlog";
 import nodemailer from "nodemailer";
 import Reloop from "reloop-email";
 
-const isProduction = emailConfig.NODE_ENV === "production";
+const isProduction = emailConfig.RELOOP_API_KEY && emailConfig.RELOOP_SENDER_DOMAIN;
 
 let reloop: Reloop | null = null;
-if (isProduction && emailConfig.RELOOP_API_KEY) {
+if (isProduction) {
 	reloop = new Reloop({
 		key: emailConfig.RELOOP_API_KEY,
+		url: emailConfig.BASE_URL
 	});
 }
 
