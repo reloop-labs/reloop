@@ -173,7 +173,7 @@ export const ApiKeyHeader = ({
 
 	if (!apiKey && !isLoading) {
 		return (
-			<div className="pt-10 pb-8">
+			<div className="pt-10 pb-2">
 				<AnimatedBackButton onClick={() => push("/api-keys")} />
 				<div className="flex items-center justify-between pt-6">
 					<div>
@@ -209,7 +209,7 @@ export const ApiKeyHeader = ({
 	const displayPrefix = apiKey?.start || apiKey?.prefix || "---";
 
 	return (
-		<div className="pt-10 pb-8">
+		<div className="pt-10 pb-2">
 			<AnimatedBackButton onClick={() => push("/api-keys")} />
 			<div className="flex items-center justify-between pt-6">
 				<div>
