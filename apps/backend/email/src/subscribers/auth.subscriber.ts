@@ -144,7 +144,7 @@ export async function initAuthSubscribers() {
 				);
 
 				await sendEmail({
-					from: `Reloop <security@${emailConfig.RELOOP_SENDER_DOMAIN || "reloop.dev"}>`,
+					from: `Security Alert <security@${emailConfig.RELOOP_SENDER_DOMAIN || "reloop.dev"}>`,
 					to: payload.email,
 					subject: "New sign-in detected on your account",
 					html,
