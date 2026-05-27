@@ -66,7 +66,7 @@ const OUTCOME_TABS: {
 	},
 ];
 
-export const LogList = ({ actorId }: { actorId?: string }) => {
+export const LogList = ({ actorId, hideDocs }: { actorId?: string; hideDocs?: boolean }) => {
 	const { activeOrganization } = useUserOrganization();
 	const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
@@ -312,8 +312,8 @@ export const LogList = ({ actorId }: { actorId?: string }) => {
 							Clear all
 						</Button.Root>
 					)}
-					<DocsButton size="xsmall" mode="stroke" />
-					<LogsApiDetails size="xsmall" mode="ghost" />
+					{!hideDocs && <DocsButton size="xsmall" mode="stroke" />}
+					{!hideDocs && <LogsApiDetails size="xsmall" mode="ghost" />}
 				</div>
 			</div>
 
@@ -342,6 +342,7 @@ export const LogList = ({ actorId }: { actorId?: string }) => {
 							setPageSize(value);
 							setCurrentPage(1);
 						}}
+						hideDocs={hideDocs}
 					/>
 				</div>
 

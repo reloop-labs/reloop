@@ -61,10 +61,12 @@ const ApiKeyDetailPage = () => {
 		}
 	};
 
+	const id = typeof apiKeyId === "string" ? apiKeyId : undefined;
+
 	if (error) {
 		return (
-			<div className="mx-auto max-w-3xl sm:px-8">
-				<p>ds</p>
+			<div className="mx-auto mt-10 max-w-5xl px-6 sm:px-8 pb-12">
+				<LogList actorId={id} hideDocs />
 			</div>
 		);
 	}
@@ -101,8 +103,6 @@ const ApiKeyDetailPage = () => {
 			]
 		: [];
 
-	const id = typeof apiKeyId === "string" ? apiKeyId : undefined;
-
 	return (
 		<>
 			<div className="mx-auto max-w-5xl px-6 pb-6 sm:px-8">
@@ -112,7 +112,7 @@ const ApiKeyDetailPage = () => {
 					isFailed={!!error}
 					onDeleteApiKey={handleDeleteApiKey}
 				/>
-				<LogList actorId={id} />
+				<LogList actorId={id} hideDocs />
 			</div>
 
 			<DeleteApiKeyModal

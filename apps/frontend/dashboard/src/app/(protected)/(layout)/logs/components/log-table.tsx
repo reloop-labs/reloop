@@ -35,6 +35,7 @@ interface LogTableProps {
 	endIndex?: number;
 	onPageChange?: (page: number) => void;
 	onPageSizeChange?: (size: number) => void;
+	hideDocs?: boolean;
 }
 
 /** Grid template used for the header and every row */
@@ -185,9 +186,10 @@ export const LogTable = ({
 	endIndex = 0,
 	onPageChange,
 	onPageSizeChange,
+	hideDocs,
 }: LogTableProps) => {
 	return (
-		<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/40">
+		<div className="w-full overflow-hidden rounded-3xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/40">
 			{/* Table Body */}
 			<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
 				{isLoading ? (
@@ -208,7 +210,7 @@ export const LogTable = ({
 				) : logs.length === 0 ? (
 					hasFilters ? (
 						<div className="flex flex-col items-center bg-bg-soft-200/10 px-6 py-12 text-center dark:bg-transparent">
-							<div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
+							<div className="mb-5 flex h-12 w-12 items-center justify-center rounded-3xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
 								<Icon name="search" className="h-5 w-5 text-text-sub-600" />
 							</div>
 							<h3 className="mb-2 font-semibold text-lg text-text-strong-950">
@@ -232,7 +234,7 @@ export const LogTable = ({
 						</div>
 					) : (
 						<div className="flex flex-col items-center bg-bg-soft-200/10 px-6 py-12 text-center dark:bg-transparent">
-							<div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
+							<div className="mb-5 flex h-12 w-12 items-center justify-center rounded-3xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
 								<Icon name="activity" className="h-5 w-5 text-text-sub-600" />
 							</div>
 							<h3 className="mb-2 font-semibold text-lg text-text-strong-950">
@@ -242,22 +244,24 @@ export const LogTable = ({
 								Logs will appear here once API requests start flowing through
 								your project.
 							</p>
-							<Button.Root
-								variant="neutral"
-								mode="stroke"
-								size="xsmall"
-								asChild
-								className="gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
-							>
-								<a
-									href="https://reloop.sh/docs/logs"
-									target="_blank"
-									rel="noopener noreferrer"
+							{!hideDocs && (
+								<Button.Root
+									variant="neutral"
+									mode="stroke"
+									size="xsmall"
+									asChild
+									className="gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
 								>
-									<Icon name="book-closed" className="h-3.5 w-3.5" />
-									Read the docs
-								</a>
-							</Button.Root>
+									<a
+										href="https://reloop.sh/docs/logs"
+										target="_blank"
+										rel="noopener noreferrer"
+									>
+										<Icon name="book-closed" className="h-3.5 w-3.5" />
+										Read the docs
+									</a>
+								</Button.Root>
+							)}
 						</div>
 					)
 				) : (
