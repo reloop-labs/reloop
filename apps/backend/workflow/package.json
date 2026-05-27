@@ -21,6 +21,7 @@
 		"@bull-board/api": "catalog:backend",
 		"@bull-board/elysia": "catalog:backend",
 		"@elysiajs/swagger": "catalog:backend",
+		"@elysiajs/openapi": "catalog:backend",
 		"@opentelemetry/exporter-trace-otlp-http": "catalog:backend",
 		"@opentelemetry/exporter-trace-otlp-proto": "catalog:backend",
 		"@opentelemetry/instrumentation-express": "catalog:backend",
