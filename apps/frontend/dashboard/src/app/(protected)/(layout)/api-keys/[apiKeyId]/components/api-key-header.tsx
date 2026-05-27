@@ -177,24 +177,6 @@ export const ApiKeyHeader = ({
 				<AnimatedBackButton onClick={() => push("/api-keys")} />
 				<div className="flex items-center justify-between pt-6">
 					<div>
-						<div className="flex items-center gap-1.5">
-							<p className="font-medium text-paragraph-xs text-text-sub-600">
-								API Key{" "}
-							</p>
-							<p className="font-semibold text-paragraph-xs text-text-sub-600">
-								•
-							</p>
-							<p className="font-medium text-paragraph-xs text-text-sub-600">
-								---
-							</p>
-							<p className="font-semibold text-paragraph-xs text-text-sub-600">
-								•
-							</p>
-							<div className="flex items-center gap-1 text-error-base">
-								<Icon name="alert-circle" className="h-3.5 w-3.5" />
-								<p className="font-medium text-paragraph-xs">Not found</p>
-							</div>
-						</div>
 						<h1 className="font-medium text-title-h6 leading-8">
 							API key not found
 						</h1>
@@ -213,48 +195,6 @@ export const ApiKeyHeader = ({
 			<AnimatedBackButton onClick={() => push("/api-keys")} />
 			<div className="flex items-center justify-between pt-6">
 				<div>
-					{isLoading ? (
-						<div className="flex items-center gap-1.5">
-							<Skeleton className="h-4 w-12 rounded-full" />
-							<Skeleton className="h-1 w-1 rounded-full" />
-							<Skeleton className="h-4 w-20 rounded-full" />
-							<Skeleton className="h-1 w-1 rounded-full" />
-							<div className="flex items-center gap-1">
-								<Skeleton className="h-3.5 w-3.5 rounded-full" />
-								<Skeleton className="h-4 w-16 rounded-full" />
-							</div>
-						</div>
-					) : (
-						<div className="flex items-center gap-1.5">
-							<p className="font-medium text-paragraph-xs text-text-sub-600">
-								API Key{" "}
-							</p>
-							<p className="font-semibold text-paragraph-xs text-text-sub-600">
-								•
-							</p>
-							<p className="font-medium text-paragraph-xs text-text-sub-600">
-								{isFailed
-									? "---"
-									: apiKey?.createdAt
-										? formatRelativeTime(apiKey.createdAt)
-										: "---"}
-							</p>
-							<p className="font-semibold text-paragraph-xs text-text-sub-600">
-								•
-							</p>
-							<div
-								className={`flex items-center gap-1 ${getStatusColor(apiKey?.enabled || false)}`}
-							>
-								<Icon
-									name={getStatusIcon(apiKey?.enabled || false)}
-									className="h-3.5 w-3.5"
-								/>
-								<p className="font-medium text-paragraph-xs">
-									{apiKey?.enabled ? "Enabled" : "Disabled"}
-								</p>
-							</div>
-						</div>
-					)}
 					{isLoading ? (
 						<Skeleton className="mt-2 h-7 w-48 rounded-lg" />
 					) : (
