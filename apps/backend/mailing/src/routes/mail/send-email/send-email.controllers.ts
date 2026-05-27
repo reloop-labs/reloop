@@ -17,10 +17,14 @@ export async function sendEmailController({
 	organizationId,
 	body,
 	apiKey,
+	apikeyId,
+	userId,
 }: {
 	organizationId: string;
 	body: MailModel.SendEmailBody;
 	apiKey: string;
+	apikeyId?: string;
+	userId?: string;
 }): Promise<MailModel.SendEmailResponse> {
 	const logger = useLogger();
 	logger.set({
@@ -51,6 +55,8 @@ export async function sendEmailController({
 		organizationId,
 		domainId: currentDomain.id,
 		body,
+		apikeyId,
+		userId,
 	});
 
 	const { finalSubject, finalHtml, finalText } = await resolveTemplate_step5({

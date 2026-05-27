@@ -11,7 +11,7 @@ export const sendEmailRoute = new Elysia()
 	.use(authMiddleware)
 	.post(
 		"/send",
-		async ({ body, activeOrganizationId, userId, request, set, log }) => {
+		async ({ body, activeOrganizationId, userId, apikeyId, request, set, log }) => {
 			// Rate limit check — runs after auth so we have org/user IDs
 			const rateLimitHeaders = await checkRateLimit({
 				headers: request.headers,
@@ -29,6 +29,8 @@ export const sendEmailRoute = new Elysia()
 				organizationId: activeOrganizationId,
 				body,
 				apiKey: request.headers.get("x-api-key") ?? "",
+				apikeyId,
+				userId,
 			});
 		},
 		{

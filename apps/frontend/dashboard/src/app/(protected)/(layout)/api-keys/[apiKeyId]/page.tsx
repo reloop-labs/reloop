@@ -3,6 +3,7 @@ import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { useParams, useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import useSWR from "swr";
+import { LogList } from "@fe/dashboard/app/(protected)/(layout)/logs/components/log-list";
 import { DeleteApiKeyModal } from "../components/delete-api-key-modal";
 import { EditApiKeyModal } from "../components/edit-api-key-modal";
 import { RotateApiKeyModal } from "../components/rotate-api-key-modal";
@@ -100,6 +101,8 @@ const ApiKeyDetailPage = () => {
 			]
 		: [];
 
+	const id = typeof apiKeyId === "string" ? apiKeyId : undefined;
+
 	return (
 		<>
 			<div className="mx-auto max-w-3xl sm:px-8">
@@ -110,6 +113,21 @@ const ApiKeyDetailPage = () => {
 					onDeleteApiKey={handleDeleteApiKey}
 				/>
 			</div>
+
+			<div className="mx-auto mt-10 max-w-5xl px-6 sm:px-8 pb-12">
+				<div className="mb-6 flex items-center justify-between border-b border-stroke-soft-100 pb-4 dark:border-stroke-soft-100/40">
+					<div>
+						<h3 className="font-semibold text-lg text-text-strong-950">
+							API Key Logs
+						</h3>
+						<p className="text-paragraph-xs text-text-sub-600 mt-1">
+							All API requests processed using this API key.
+						</p>
+					</div>
+				</div>
+				<LogList actorId={id} />
+			</div>
+
 			<DeleteApiKeyModal
 				apiKeys={apiKeysForModal}
 				onDeleteSuccess={handleDeleteSuccess}

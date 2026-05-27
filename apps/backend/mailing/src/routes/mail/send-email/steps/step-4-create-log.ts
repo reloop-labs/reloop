@@ -17,10 +17,14 @@ export async function createEmailLog_step4({
 	organizationId,
 	domainId,
 	body,
+	apikeyId,
+	userId,
 }: {
 	organizationId: string;
 	domainId: string;
 	body: MailModel.SendEmailBody;
+	apikeyId?: string;
+	userId?: string;
 }) {
 	const [logRecord] = await db
 		.insert(emailLog)
@@ -28,6 +32,8 @@ export async function createEmailLog_step4({
 			messageId: `msg_${Date.now()}_${Math.random().toString(36).slice(2)}`,
 			organizationId,
 			domainId: domainId,
+			userId,
+			apikeyId,
 			fromEmail: body.from,
 			fromName: parseFromName(body.from),
 			toEmails: Array.isArray(body.to) ? body.to : [body.to],

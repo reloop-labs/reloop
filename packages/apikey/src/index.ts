@@ -25,6 +25,7 @@ export function getApiKeyCacheKey(apiKey: string): string {
 export interface ApiKeyValidationResult {
 	userId: string;
 	organizationId: string;
+	apiKeyId: string;
 	authType: "apikey";
 }
 
@@ -46,12 +47,14 @@ export async function validateApiKey(
 	const cached = await redis.get<{
 		userId: string;
 		organizationId: string;
+		apiKeyId: string;
 	}>(cacheKey);
 
 	if (cached) {
 		return {
 			userId: cached.userId,
 			organizationId: cached.organizationId,
+			apiKeyId: cached.apiKeyId,
 			authType: "apikey",
 		};
 	}
@@ -65,6 +68,7 @@ export async function validateApiKey(
 		const result = {
 			userId: apiKeyRecord.userId,
 			organizationId: apiKeyRecord.organizationId,
+			apiKeyId: apiKeyRecord.id,
 		};
 		await redis.set(cacheKey, result, 30 * 24 * 60 * 60);
 		return {

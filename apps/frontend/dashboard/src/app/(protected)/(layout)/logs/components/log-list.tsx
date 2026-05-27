@@ -66,7 +66,7 @@ const OUTCOME_TABS: {
 	},
 ];
 
-export const LogList = () => {
+export const LogList = ({ actorId }: { actorId?: string }) => {
 	const { activeOrganization } = useUserOrganization();
 	const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
@@ -130,6 +130,7 @@ export const LogList = () => {
 		if (searchQuery) params.set("event", searchQuery);
 		if (startDate) params.set("start_date", startDate);
 		if (endDate) params.set("end_date", endDate);
+		if (actorId) params.set("actor_id", actorId);
 
 		// Map outcome tab → status code filter
 		if (outcomeTab === "succeeded" && !statusCode) {

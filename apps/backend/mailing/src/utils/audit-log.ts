@@ -20,6 +20,8 @@ export function auditLogHook(opts: AuditLogHookOptions) {
 		userId,
 		traceId,
 		body,
+		apikeyId,
+		authType,
 	}: {
 		response: unknown;
 		set: { status?: number | string };
@@ -29,6 +31,8 @@ export function auditLogHook(opts: AuditLogHookOptions) {
 		userId?: string;
 		traceId?: string;
 		body?: unknown;
+		apikeyId?: string;
+		authType?: string;
 	}) => {
 		const status = set.status ?? 200;
 		const userAgent = request.headers.get("user-agent") ?? undefined;
@@ -110,8 +114,8 @@ export function auditLogHook(opts: AuditLogHookOptions) {
 				event,
 				level,
 				trace_id: traceId,
-				actor_type: "user",
-				actor_id: userId,
+				actor_type: authType === "apiKey" ? "api_key" : "user",
+				actor_id: authType === "apiKey" ? (apikeyId ?? undefined) : (userId ?? undefined),
 				organization_id: finalOrganizationId,
 				user_id: userId,
 				resource_type: resourceType,
