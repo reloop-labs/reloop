@@ -11,6 +11,7 @@ export interface KumomtaHttpConfig {
 export interface SendEmailOptions {
 	from: string;
 	fromName?: string;
+	apiKey?: string;
 	to: string | string[];
 	subject: string;
 	text?: string;
@@ -123,11 +124,18 @@ export class KumomtaClient {
 			content,
 		};
 
+		const authHeaders: Record<string, string> = {
+			"Content-Type": "application/json",
+		};
+		if (options.apiKey) {
+			authHeaders.Authorization = `Basic ${btoa(`:${options.apiKey}`)}`;
+		}
+
 		let response: Response;
 		try {
 			response = await fetch(`${this.baseUrl}/api/inject/v1`, {
 				method: "POST",
-				headers: { "Content-Type": "application/json" },
+				headers: authHeaders,
 				body: JSON.stringify(payload),
 				signal: AbortSignal.timeout(this.timeoutMs),
 			});

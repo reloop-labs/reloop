@@ -12,6 +12,7 @@ export async function sendEmail_step6({
 	organizationId,
 	domainId,
 	emailLogId,
+	apiKey,
 }: {
 	body: MailModel.SendEmailBody;
 	finalSubject: string;
@@ -20,6 +21,7 @@ export async function sendEmail_step6({
 	organizationId: string;
 	domainId: string;
 	emailLogId: string;
+	apiKey: string;
 }) {
 	try {
 		return await kumomtaClient.sendEmail({
@@ -35,6 +37,7 @@ export async function sendEmail_step6({
 			channel_id: body.channel_id,
 			tags: body.tags,
 			template: body.template,
+			apiKey,
 			customHeaders: {
 				"X-Org-ID": organizationId,
 				"X-Domain-ID": domainId,

@@ -16,9 +16,11 @@ import {
 export async function sendEmailController({
 	organizationId,
 	body,
+	apiKey,
 }: {
 	organizationId: string;
 	body: MailModel.SendEmailBody;
+	apiKey: string;
 }): Promise<MailModel.SendEmailResponse> {
 	const logger = useLogger();
 	logger.set({
@@ -75,6 +77,7 @@ export async function sendEmailController({
 		organizationId,
 		domainId: currentDomain.id,
 		emailLogId,
+		apiKey,
 	});
 
 	const response = await finalizeEmail_step7({

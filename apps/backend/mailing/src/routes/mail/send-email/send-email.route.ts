@@ -28,6 +28,7 @@ export const sendEmailRoute = new Elysia()
 			return await sendEmailController({
 				organizationId: activeOrganizationId,
 				body,
+				apiKey: request.headers.get("x-api-key") ?? "",
 			});
 		},
 		{
