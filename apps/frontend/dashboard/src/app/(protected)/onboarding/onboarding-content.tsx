@@ -135,7 +135,7 @@ export const OnBoardingContent = () => {
 			stepIndicator: "Step 1 of 4",
 			title: "Create your workspace",
 			component: <CreateOrgStep />,
-			preview: <SidebarPreview name={name} logo={logoPreview || null} />,
+			preview: <SidebarPreview name={name} logo={logoUrl || logoPreview || null} />,
 			fullWidth: false,
 		},
 		2: {

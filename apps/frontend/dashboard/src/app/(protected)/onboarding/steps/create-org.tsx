@@ -24,7 +24,10 @@ export const CreateOrgStep = () => {
 		"orgId",
 		parseAsString.withDefault(""),
 	);
-	const [logoPreview, setLogoPreview] = useState("");
+	const [logoPreview, setLogoPreview] = useQueryState(
+		"logoPreview",
+		parseAsString.withDefault(""),
+	);
 	const [logoUrl, setLogoUrl] = useQueryState(
 		"logoUrl",
 		parseAsString.withDefault(""),
@@ -73,11 +76,8 @@ export const CreateOrgStep = () => {
 		}
 
 		// Show preview immediately
-		const reader = new FileReader();
-		reader.onloadend = () => {
-			setLogoPreview(reader.result as string);
-		};
-		reader.readAsDataURL(file);
+		const previewUrl = URL.createObjectURL(file);
+		setLogoPreview(previewUrl);
 
 		// Upload to upload service
 		setIsUploading(true);
@@ -175,7 +175,7 @@ export const CreateOrgStep = () => {
 						className={cn(
 							"flex h-[72px] w-[72px] items-center justify-center overflow-hidden rounded-xl",
 							logoUrl || logoPreview
-								? "border border-stroke-sub-300 border-solid p-0"
+								? "border-none p-0"
 								: "border border-stroke-sub-300 p-1",
 							isUploading && "cursor-wait opacity-50",
 							!isUploading && "cursor-pointer",
