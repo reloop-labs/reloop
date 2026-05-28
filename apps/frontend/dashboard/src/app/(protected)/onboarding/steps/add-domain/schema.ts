@@ -11,6 +11,8 @@ export const domainSchema = v.object({
 	),
 	clickTracking: v.boolean(),
 	openTracking: v.boolean(),
+	customReturnPath: v.optional(v.string()),
+	trackingSubdomain: v.optional(v.string()),
 });
 
 export type DomainFormValues = v.InferInput<typeof domainSchema>;

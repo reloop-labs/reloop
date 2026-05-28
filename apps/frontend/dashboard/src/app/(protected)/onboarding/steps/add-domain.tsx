@@ -13,6 +13,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { AdvancedOptions } from "./add-domain/components/advanced-options";
 import { DomainInputField } from "./add-domain/components/domain-input-field";
+import * as Accordion from "@reloop/ui/accordion";
 import { type DomainFormValues, domainSchema } from "./add-domain/schema";
 
 export const AddDomainStep = () => {
@@ -38,6 +39,8 @@ export const AddDomainStep = () => {
 				domain: domain || "",
 				clickTracking: false,
 				openTracking: false,
+				customReturnPath: "recive",
+				trackingSubdomain: "links",
 			},
 		});
 
@@ -54,7 +57,11 @@ export const AddDomainStep = () => {
 			const { data } = await axios.post<DomainResponse>(
 				"/api/domain/v1/create",
 				{
-					...values,
+					domain: values.domain,
+					click_tracking: values.clickTracking,
+					open_tracking: values.openTracking,
+					custom_return_path: values.customReturnPath,
+					tracking: values.trackingSubdomain,
 					tls: "opportunistic",
 				},
 				{ headers: { credentials: "include" } },
@@ -106,7 +113,31 @@ export const AddDomainStep = () => {
 					domain={watchedDomain}
 				/>
 
-				<AdvancedOptions control={control} isLoading={status === "loading"} />
+				<Accordion.Root type="single" collapsible className="w-full mt-4">
+					<Accordion.Item
+						value="advanced-options"
+						className="group rounded-none border-none bg-transparent p-0 ring-0"
+					>
+						<Accordion.Trigger className="flex w-full cursor-pointer items-center justify-between py-2 outline-none">
+							<span className="font-medium text-sm text-text-strong-950">
+								Advanced options
+							</span>
+							<Accordion.Arrow
+								openIcon="chevron-down"
+								closeIcon="chevron-down"
+								className="size-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180"
+							/>
+						</Accordion.Trigger>
+						<Accordion.Content className="pt-2">
+							<AdvancedOptions
+								control={control}
+								register={register}
+								domain={watchedDomain}
+								isLoading={status === "loading"}
+							/>
+						</Accordion.Content>
+					</Accordion.Item>
+				</Accordion.Root>
 
 				<div className="mt-8 flex items-center gap-3">
 					<Button.Root
