@@ -5,6 +5,13 @@ local utils = require 'policy.utils'
 -- Helper function to apply business logic to both SMTP and HTTP generated messages
 local function apply_reloop_logic(msg, api_key)
   local msg_id = msg:id()
+
+  local header_api_key = msg:get_first_named_header_value('X-Api-Key')
+  if header_api_key and header_api_key ~= "" then
+    api_key = header_api_key
+    print("[LOG-INCOMING] [" .. msg_id .. "] Found X-Api-Key header: using it as api_key")
+  end
+  msg:remove_all_named_headers('X-Api-Key')
   local sender = msg:sender()
   local domain = ""
   local from_email = ""
@@ -226,7 +233,7 @@ kumo.on('http_message_generated', function(msg)
   local api_key = ""
   if type(http_auth) == "table" and http_auth.password then
     api_key = http_auth.password
-  elseif type(http_auth) == "string" then
+  elseif type(http_auth) == "string" and string.match(http_auth, "^rl_") then
     api_key = http_auth
   end
   apply_reloop_logic(msg, api_key)

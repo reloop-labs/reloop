@@ -42,6 +42,7 @@ export async function sendEmail_step6({
 				"X-Org-ID": organizationId,
 				"X-Domain-ID": domainId,
 				"X-Email-Log-ID": emailLogId,
+				"X-Api-Key": apiKey,
 				...(body.headers || {}),
 			},
 		});

@@ -32,8 +32,8 @@ log_hooks:new {
 
       if not ok then
         print("FAILED to publish to NATS: " .. tostring(err))
-        kumo.reject(500, "Temporary failure publishing to NATS: " .. tostring(err))
-        return
+        nats_client = nil
+        return "250 Accepted (NATS publish failed)"
       else
         print("RESULT: NATS SUCCESS")
       end
