@@ -1,5 +1,6 @@
 "use client";
 import { DomainPreview } from "@fe/dashboard/app/(protected)/onboarding/components/domain-preview";
+import { cn } from "@reloop/ui/cn";
 import { useState } from "react";
 import type { DomainResponse } from "@fe/dashboard/types/api.types";
 import { valibotResolver } from "@hookform/resolvers/valibot";
@@ -24,7 +25,7 @@ const AddDomain = () => {
 	const router = useRouter();
 	const { changeStatus, status } = useLoading();
 	const { mutate } = useSWRConfig();
-	const [accordionValue, setAccordionValue] = useState("");
+	const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
 
 	const { register, handleSubmit, formState, setError, watch, control } =
 		useForm<DomainFormValues>({
@@ -96,37 +97,34 @@ const AddDomain = () => {
 						domain={watch("domain")}
 					/>
 
-					<Accordion.Root
-						type="single"
-						collapsible
-						value={accordionValue}
-						onValueChange={setAccordionValue}
-						className="w-full mt-4"
-					>
-						<Accordion.Item
-							value="advanced-options"
-							className="group/accordion border-none bg-transparent hover:bg-transparent data-[state=open]:bg-transparent has-[:focus-visible]:bg-transparent p-0 ring-0 hover:ring-0 focus:ring-0 data-[state=open]:ring-transparent"
+					<div className="w-full mt-4">
+						<button
+							type="button"
+							onClick={() => setIsAdvancedOpen(!isAdvancedOpen)}
+							className="flex w-full cursor-pointer items-center justify-between py-1 outline-none"
 						>
-							<Accordion.Trigger className="flex w-full cursor-pointer items-center justify-between py-1 outline-none">
-								<span className="font-medium text-sm text-text-strong-950">
-									Advanced options
-								</span>
-								<Accordion.Arrow
-									openIcon="chevron-down"
-									closeIcon="chevron-down"
-									className="size-4 shrink-0 transition-transform duration-200 group-data-[state=open]/accordion:rotate-180"
-								/>
-							</Accordion.Trigger>
-							<Accordion.Content className="pt-2">
+							<span className="font-medium text-sm text-text-strong-950">
+								Advanced options
+							</span>
+							<Icon
+								name="chevron-down"
+								className={cn(
+									"size-4 shrink-0 text-text-sub-600 transition-transform duration-200",
+									isAdvancedOpen && "rotate-180",
+								)}
+							/>
+						</button>
+						{isAdvancedOpen && (
+							<div className="pt-2">
 								<AdvancedOptions
 									control={control}
 									register={register}
 									domain={watch("domain")}
 									isLoading={status === "loading"}
 								/>
-							</Accordion.Content>
-						</Accordion.Item>
-					</Accordion.Root>
+							</div>
+						)}
+					</div>
 					<div className="mt-6 flex items-center gap-3">
 						<Button.Root
 							type="submit"

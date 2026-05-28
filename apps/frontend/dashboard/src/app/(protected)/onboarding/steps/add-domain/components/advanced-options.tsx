@@ -1,7 +1,11 @@
 import * as Checkbox from "@reloop/ui/checkbox";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
-import { type Control, Controller, type UseFormRegister } from "react-hook-form";
+import {
+	type Control,
+	Controller,
+	type UseFormRegister,
+} from "react-hook-form";
 import type { DomainFormValues } from "../schema";
 
 interface AdvancedOptionsProps {
@@ -18,7 +22,7 @@ export const AdvancedOptions = ({
 	domain,
 }: AdvancedOptionsProps) => {
 	return (
-		<div className="grid grid-cols-1 gap-4 pt-4">
+		<div className="grid grid-cols-1 gap-4">
 			<div className="space-y-1">
 				<Label.Root
 					htmlFor="customReturnPath"

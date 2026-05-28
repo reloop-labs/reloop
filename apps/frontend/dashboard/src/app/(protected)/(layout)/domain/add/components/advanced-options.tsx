@@ -22,7 +22,7 @@ export const AdvancedOptions = ({
 	domain,
 }: AdvancedOptionsProps) => {
 	return (
-		<div className="grid grid-cols-1 gap-4 pt-4">
+		<div className="grid grid-cols-1 gap-4">
 			<div className="space-y-1">
 				<Label.Root
 					htmlFor="customReturnPath"
