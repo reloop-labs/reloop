@@ -66,6 +66,7 @@ export const OnBoardingContent = () => {
 		return (
 			<SplitLayout
 				stepIndicator="Step 1 of 4"
+				title="Create your workspace"
 				previewContent={
 					<div className="flex h-full flex-col gap-4 p-8">
 						<Skeleton className="h-8 w-1/3 rounded-lg" />
@@ -74,7 +75,6 @@ export const OnBoardingContent = () => {
 				}
 			>
 				<div className="space-y-6">
-					<Skeleton className="h-9 w-2/3 rounded-lg" />
 					<div className="flex items-center gap-4">
 						<Skeleton className="h-[72px] w-[72px] rounded-xl" />
 						<div className="space-y-2">
@@ -82,17 +82,13 @@ export const OnBoardingContent = () => {
 							<Skeleton className="h-3 w-48 rounded" />
 						</div>
 					</div>
-					<div className="space-y-4 pt-4">
-						<div className="space-y-2">
+					<div className="space-y-3.5 pt-6">
+						<div className="flex flex-col gap-1">
 							<Skeleton className="h-4 w-24 rounded" />
 							<Skeleton className="h-10 w-full rounded-lg" />
 						</div>
-						<div className="space-y-2">
+						<div className="flex flex-col gap-1">
 							<Skeleton className="h-4 w-32 rounded" />
-							<Skeleton className="h-10 w-full rounded-lg" />
-						</div>
-						<div className="space-y-2">
-							<Skeleton className="h-4 w-40 rounded" />
 							<Skeleton className="h-10 w-full rounded-lg" />
 						</div>
 					</div>
