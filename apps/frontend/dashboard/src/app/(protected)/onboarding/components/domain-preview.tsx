@@ -54,7 +54,6 @@ export const DomainPreview = ({
 							: "relative bg-bg-white-0 p-6"
 					}
 				>
-
 					<div className="flex items-start gap-4">
 						{logoUrl ? (
 							<img
@@ -158,8 +157,6 @@ export const DomainPreview = ({
 												hour12: true,
 											})}
 										</div>
-
-
 
 										{/* Verification Fields */}
 										<div className="pr-3 text-right text-text-soft-400">

@@ -1,23 +1,23 @@
 "use client";
 import { DomainPreview } from "@fe/dashboard/app/(protected)/onboarding/components/domain-preview";
-import { cn } from "@reloop/ui/cn";
-import { useState } from "react";
 import type { DomainResponse } from "@fe/dashboard/types/api.types";
 import { valibotResolver } from "@hookform/resolvers/valibot";
+import * as Accordion from "@reloop/ui/accordion";
 import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
 import { useLoading } from "@reloop/ui/use-loading";
 import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { useSWRConfig } from "swr";
 import { AddDomainHeader } from "./components/add-domain-header";
 import { AdvancedOptions } from "./components/advanced-options";
 import { DomainInputField } from "./components/domain-input-field";
-import * as Accordion from "@reloop/ui/accordion";
 import type { DomainFormValues } from "./schema";
 import { domainSchema } from "./schema";
 
@@ -97,7 +97,7 @@ const AddDomain = () => {
 						domain={watch("domain")}
 					/>
 
-					<div className="w-full mt-4">
+					<div className="mt-4 w-full">
 						<button
 							type="button"
 							onClick={() => setIsAdvancedOpen(!isAdvancedOpen)}
@@ -115,7 +115,7 @@ const AddDomain = () => {
 							/>
 						</button>
 						{isAdvancedOpen && (
-							<div className="mt-2 bg-bg-weak-50/50 border border-stroke-soft-100 p-4 rounded-2xl">
+							<div className="mt-2 rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4">
 								<AdvancedOptions
 									control={control}
 									register={register}

@@ -145,7 +145,7 @@ export const CreateOrgStep = () => {
 			name: name,
 			keepCurrentActiveOrganization: true,
 			slug: randomSlug,
-			logo: logoToUse,
+			logo: logoToUse || undefined,
 			metadata: { referral: referral === "other" ? otherReferral : referral },
 		});
 		if (error) {

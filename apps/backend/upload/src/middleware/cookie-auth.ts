@@ -15,14 +15,12 @@ export async function validateSession(cookie: string | null) {
 	const session = (await response.json()) as {
 		user?: {
 			id: string;
-			activeOrganizationId?: string;
 		};
 	};
 
-	if (session?.user?.activeOrganizationId) {
+	if (session?.user) {
 		return {
 			userId: session.user.id,
-			activeOrganizationId: session.user.activeOrganizationId,
 			authType: "auth" as const,
 		};
 	}
