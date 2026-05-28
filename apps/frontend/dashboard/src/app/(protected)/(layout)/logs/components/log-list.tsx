@@ -66,7 +66,13 @@ const OUTCOME_TABS: {
 	},
 ];
 
-export const LogList = ({ actorId, hideDocs }: { actorId?: string; hideDocs?: boolean }) => {
+export const LogList = ({
+	actorId,
+	hideDocs,
+}: {
+	actorId?: string;
+	hideDocs?: boolean;
+}) => {
 	const { activeOrganization } = useUserOrganization();
 	const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);

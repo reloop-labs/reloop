@@ -65,7 +65,7 @@ const ApiKeyDetailPage = () => {
 
 	if (error) {
 		return (
-			<div className="mx-auto mt-10 max-w-5xl px-6 sm:px-8 pb-12">
+			<div className="mx-auto mt-10 max-w-5xl px-6 pb-12 sm:px-8">
 				<LogList actorId={id} hideDocs />
 			</div>
 		);

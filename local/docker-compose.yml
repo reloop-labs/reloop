@@ -97,7 +97,6 @@ services:
       - ../apps/backend/kumomta-smtp/init.lua:/opt/kumomta/etc/policy/init.lua
       - ../apps/backend/kumomta-smtp/policy:/opt/kumomta/etc/policy/policy
     environment:
-      - X_KUMOMTA_KEY=${X_KUMOMTA_KEY:-reloop}
       - BASE_URL=${BASE_URL:-https://local.reloop.sh}
       - KUMOMTA_WEBHOOK_URL=${KUMOMTA_WEBHOOK_URL:-http://host.docker.internal:8011/api/domain}
       - NATS_URL=${NATS_URL:-reloop-nats:4222}

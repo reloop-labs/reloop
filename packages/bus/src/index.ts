@@ -1,3 +1,4 @@
+import { jetstream, jetstreamManager } from "@nats-io/jetstream";
 import {
 	connect,
 	headers,
@@ -6,7 +7,6 @@ import {
 	type NatsConnection,
 	type Subscription,
 } from "@nats-io/transport-node";
-import { jetstream, jetstreamManager } from "@nats-io/jetstream";
 import type { BusEvent } from "./events";
 import type { EventPayloads } from "./types";
 
