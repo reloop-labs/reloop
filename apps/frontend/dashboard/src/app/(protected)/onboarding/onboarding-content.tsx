@@ -44,7 +44,7 @@ export const OnBoardingContent = () => {
 		parseAsString.withDefault(""),
 	);
 	useEffect(() => {
-		if (isPending && session === undefined) return;
+		if (isPending || session === undefined) return;
 		if (session === null) {
 			router.push("/login");
 			return;

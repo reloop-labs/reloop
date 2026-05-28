@@ -80,7 +80,8 @@ export const UserOrganizationProvider = ({
 	const hasRedirected = useRef(false);
 
 	useEffect(() => {
-		if (session === undefined || hasRedirected.current) return;
+		if (session === undefined || hasRedirected.current || sessionPending)
+			return;
 
 		if (session === null) {
 			if (pathname.startsWith("/invite")) return;
