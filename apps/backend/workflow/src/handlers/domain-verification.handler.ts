@@ -79,7 +79,8 @@ export async function processDomainVerification({
 
 	if (isSendingEnabled && (!spfRecord || !dmarcRecord || !sendingMxRecord)) {
 		log.warn({
-			message: "Missing SPF, DMARC, or sending MX record when sending is enabled",
+			message:
+				"Missing SPF, DMARC, or sending MX record when sending is enabled",
 			domainId,
 		});
 		await db
@@ -92,8 +93,10 @@ export async function processDomainVerification({
 	// Conditionally verify MX (Enable Receiving)
 	const isReceivingEnabled = domainWithRecords.isReceivingEmailEnabled;
 	const receivingMxRecord = isReceivingEnabled
-		? (records.find((r) => r.recordType === "MX" && r.purpose === "receiving") ??
-		   records.find((r) => r.recordType === "MX" && r.purpose === "sending"))
+		? (records.find(
+				(r) => r.recordType === "MX" && r.purpose === "receiving",
+			) ??
+			records.find((r) => r.recordType === "MX" && r.purpose === "sending"))
 		: undefined;
 
 	if (isReceivingEnabled && !receivingMxRecord) {

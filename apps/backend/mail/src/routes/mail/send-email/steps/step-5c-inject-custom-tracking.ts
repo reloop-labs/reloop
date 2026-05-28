@@ -10,7 +10,6 @@ export function injectCustomTracking_step5c({
 	emailLogId,
 	clickTracking,
 	openTracking,
-	isTrackingDomain,
 	trackingSubdomain,
 	domainName,
 }: {
@@ -18,14 +17,13 @@ export function injectCustomTracking_step5c({
 	emailLogId: string;
 	clickTracking: boolean;
 	openTracking: boolean;
-	isTrackingDomain: boolean;
 	trackingSubdomain: string;
 	domainName: string;
 }): string | undefined {
 	if (!html) return html;
 
 	// Use custom tracking domain if the toggle is enabled
-	if (!isTrackingDomain || !trackingSubdomain || !domainName) {
+	if (!trackingSubdomain || !domainName) {
 		return html;
 	}
 

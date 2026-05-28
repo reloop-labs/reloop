@@ -14,7 +14,9 @@ import { healthRoute } from "./routes/landing/health.route";
 import { landingRoute } from "./routes/landing/landing.route";
 import { logsRoutes } from "./routes/logs/logs.routes";
 
-const parseOtlpHeaders = (headersStr?: string): Record<string, string> | undefined => {
+const parseOtlpHeaders = (
+	headersStr?: string,
+): Record<string, string> | undefined => {
 	if (!headersStr) return undefined;
 	const headers: Record<string, string> = {};
 	const decoded = decodeURIComponent(headersStr);

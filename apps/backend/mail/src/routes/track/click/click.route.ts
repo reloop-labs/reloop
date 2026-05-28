@@ -12,7 +12,7 @@ export const clickRoute = new Elysia()
 			params: t.Object({ emailLogId: t.String() }),
 			query: t.Object({
 				url: t.String({ format: "uri" }),
-				sig: t.String(),
+				sig: t.Optional(t.String()),
 			}),
 			detail: {
 				summary: "Track Email Click",

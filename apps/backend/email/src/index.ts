@@ -5,7 +5,9 @@ import cors from "@elysiajs/cors";
 import { openapi } from "@elysiajs/openapi";
 import { emailConfig } from "@reloop/email/email.config";
 
-const parseOtlpHeaders = (headersStr?: string): Record<string, string> | undefined => {
+const parseOtlpHeaders = (
+	headersStr?: string,
+): Record<string, string> | undefined => {
 	if (!headersStr) return undefined;
 	const headers: Record<string, string> = {};
 	const decoded = decodeURIComponent(headersStr);
@@ -29,6 +31,7 @@ initLogger({
 			})
 		: undefined,
 });
+
 import { agentCardRoute } from "@reloop/email/routes/landing/agent-card.route";
 import { healthRoute } from "@reloop/email/routes/landing/health.route";
 import { landingRoute } from "@reloop/email/routes/landing/landing.route";

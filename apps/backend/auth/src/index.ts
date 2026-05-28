@@ -10,7 +10,9 @@ import { landing } from "./landing";
 import { auth, OpenAPI } from "./lib/auth";
 import { loader } from "./loader";
 
-const parseOtlpHeaders = (headersStr?: string): Record<string, string> | undefined => {
+const parseOtlpHeaders = (
+	headersStr?: string,
+): Record<string, string> | undefined => {
 	if (!headersStr) return undefined;
 	const headers: Record<string, string> = {};
 	const decoded = decodeURIComponent(headersStr);

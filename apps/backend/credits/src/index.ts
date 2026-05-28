@@ -3,8 +3,8 @@ import cors from "@elysiajs/cors";
 import { openapi } from "@elysiajs/openapi";
 import { Elysia } from "elysia";
 import { initLogger, log, parseError } from "evlog";
-import { createOTLPDrain } from "evlog/otlp";
 import { evlog } from "evlog/elysia";
+import { createOTLPDrain } from "evlog/otlp";
 import { creditsConfig } from "./credits.config";
 import { loader } from "./loader";
 import { creditsRoutes } from "./routes/credits/credits.routes";
@@ -12,7 +12,9 @@ import { agentCardRoute } from "./routes/landing/agent-card.route";
 import { healthRoute } from "./routes/landing/health.route";
 import { landingRoute } from "./routes/landing/landing.route";
 
-const parseOtlpHeaders = (headersStr?: string): Record<string, string> | undefined => {
+const parseOtlpHeaders = (
+	headersStr?: string,
+): Record<string, string> | undefined => {
 	if (!headersStr) return undefined;
 	const headers: Record<string, string> = {};
 	const decoded = decodeURIComponent(headersStr);

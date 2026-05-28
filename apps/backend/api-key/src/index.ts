@@ -11,10 +11,12 @@ import { landingRoute } from "@reloop/api-key/routes/landing/landing.route";
 import { loader } from "@reloop/api-key/utils/loader";
 import { Elysia } from "elysia";
 import { initLogger } from "evlog";
-import { createOTLPDrain } from "evlog/otlp";
 import { evlog } from "evlog/elysia";
+import { createOTLPDrain } from "evlog/otlp";
 
-const parseOtlpHeaders = (headersStr?: string): Record<string, string> | undefined => {
+const parseOtlpHeaders = (
+	headersStr?: string,
+): Record<string, string> | undefined => {
 	if (!headersStr) return undefined;
 	const headers: Record<string, string> = {};
 	const decoded = decodeURIComponent(headersStr);

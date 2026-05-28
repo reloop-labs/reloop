@@ -1,4 +1,4 @@
-local.reloop.sh {
+local.reloop.sh, *.local.reloop.sh {
     tls /etc/caddy/certs/local.reloop.sh.pem /etc/caddy/certs/local.reloop.sh-key.pem
 
     # Frontend routes (most specific first)

@@ -9,11 +9,13 @@ import { webhookRoutes } from "@reloop/webhook/routes/webhook/webhook.routes";
 import { loader } from "@reloop/webhook/utils/loader";
 import { Elysia } from "elysia";
 import { initLogger, log, parseError } from "evlog";
-import { createOTLPDrain } from "evlog/otlp";
 import { evlog } from "evlog/elysia";
+import { createOTLPDrain } from "evlog/otlp";
 import { webhookConfig } from "./webhook.config";
 
-const parseOtlpHeaders = (headersStr?: string): Record<string, string> | undefined => {
+const parseOtlpHeaders = (
+	headersStr?: string,
+): Record<string, string> | undefined => {
 	if (!headersStr) return undefined;
 	const headers: Record<string, string> = {};
 	const decoded = decodeURIComponent(headersStr);

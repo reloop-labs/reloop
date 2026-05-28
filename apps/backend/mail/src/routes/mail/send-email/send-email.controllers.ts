@@ -73,13 +73,18 @@ export async function sendEmailController({
 	const isDomainVerified =
 		currentDomain.systemVerified && currentDomain.status === "active";
 
-	if (currentDomain.isTrackingDomain && isDomainVerified) {
+	const hasCustomTracking =
+		isDomainVerified &&
+		currentDomain.trackingSubdomain &&
+		(currentDomain.isClickTrackingEnabled ||
+			currentDomain.isOpenTrackingEnabled);
+
+	if (hasCustomTracking) {
 		trackedHtml = injectCustomTracking_step5c({
 			html: finalHtml,
 			emailLogId,
 			clickTracking: currentDomain.isClickTrackingEnabled,
 			openTracking: currentDomain.isOpenTrackingEnabled,
-			isTrackingDomain: currentDomain.isTrackingDomain,
 			trackingSubdomain: currentDomain.trackingSubdomain,
 			domainName: currentDomain.domain,
 		});

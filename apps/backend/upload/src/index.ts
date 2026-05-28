@@ -9,10 +9,12 @@ import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 import { Elysia } from "elysia";
 import { initLogger, log, parseError } from "evlog";
-import { createOTLPDrain } from "evlog/otlp";
 import { evlog } from "evlog/elysia";
+import { createOTLPDrain } from "evlog/otlp";
 
-const parseOtlpHeaders = (headersStr?: string): Record<string, string> | undefined => {
+const parseOtlpHeaders = (
+	headersStr?: string,
+): Record<string, string> | undefined => {
 	if (!headersStr) return undefined;
 	const headers: Record<string, string> = {};
 	const decoded = decodeURIComponent(headersStr);
