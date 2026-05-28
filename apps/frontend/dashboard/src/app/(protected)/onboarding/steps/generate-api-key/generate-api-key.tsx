@@ -2,6 +2,7 @@
 
 import { authClient } from "@reloop/auth/client";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -10,7 +11,8 @@ import { PreGenerate } from "./components/pre-generate";
 import type { LanguageCode } from "./data";
 
 export const GenerateApiKeyStep = () => {
-	const [, setStep] = useQueryState("step", parseAsInteger.withDefault(1));
+	const router = useRouter();
+	const [, _setStep] = useQueryState("step", parseAsInteger.withDefault(1));
 	const [apiKey, setApiKey] = useQueryState(
 		"apiKey",
 		parseAsString.withDefault(""),
@@ -51,7 +53,7 @@ export const GenerateApiKeyStep = () => {
 					onLanguageChange={(l) => setSelectedLang(l)}
 					onDone={async () => {
 						await authClient.getSession();
-						setStep(5);
+						router.push("/");
 					}}
 				/>
 			)}

@@ -1,7 +1,6 @@
 "use client";
 
 import { authClient } from "@reloop/auth/client";
-import * as Button from "@reloop/ui/button";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useRouter } from "next/navigation";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
@@ -16,7 +15,6 @@ import { AddDomainStep } from "./steps/add-domain";
 import { ConfigureDnsStep } from "./steps/configure-dns";
 import { CreateOrgStep } from "./steps/create-org";
 import { GenerateApiKeyStep } from "./steps/generate-api-key/generate-api-key";
-import { SetupCompleteStep } from "./steps/setup-complete";
 
 export const OnBoardingContent = () => {
 	const { data: session, isPending } = authClient.useSession();
@@ -49,7 +47,6 @@ export const OnBoardingContent = () => {
 			return;
 		}
 	}, [session, isPending, router]);
-
 
 	if (isPending && session === undefined) {
 		return (
@@ -154,10 +151,6 @@ export const OnBoardingContent = () => {
 			maxWidth: "3xl",
 		},
 	};
-
-	if (step === 5) {
-		return <SetupCompleteStep />;
-	}
 
 	const currentConfig = stepsConfig[step as keyof typeof stepsConfig];
 
