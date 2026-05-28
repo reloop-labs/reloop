@@ -65,13 +65,13 @@ export async function processDomainVerification({
 	const isSendingEnabled = domainWithRecords.isSendingEmailEnabled;
 	const spfRecord = isSendingEnabled
 		? records.find(
-				(r) => r.recordType === "TXT" && r.value.startsWith("v=spf1"),
-			)
+			(r) => r.recordType === "TXT" && r.value.startsWith("v=spf1"),
+		)
 		: undefined;
 	const dmarcRecord = isSendingEnabled
 		? records.find(
-				(r) => r.recordType === "TXT" && r.value.startsWith("v=DMARC1"),
-			)
+			(r) => r.recordType === "TXT" && r.value.startsWith("v=DMARC1"),
+		)
 		: undefined;
 	const sendingMxRecord = isSendingEnabled
 		? records.find((r) => r.recordType === "MX" && r.purpose === "sending")
@@ -94,8 +94,8 @@ export async function processDomainVerification({
 	const isReceivingEnabled = domainWithRecords.isReceivingEmailEnabled;
 	const receivingMxRecord = isReceivingEnabled
 		? (records.find(
-				(r) => r.recordType === "MX" && r.purpose === "receiving",
-			) ??
+			(r) => r.recordType === "MX" && r.purpose === "receiving",
+		) ??
 			records.find((r) => r.recordType === "MX" && r.purpose === "sending"))
 		: undefined;
 
@@ -241,7 +241,11 @@ export async function processDomainVerification({
 
 		await db
 			.update(schema.domain)
-			.set({ status: newDomainStatus })
+			.set({
+				status: newDomainStatus,
+				systemVerified: allPassed,
+				isTrackingDomain: cnameOk && isTrackingEnabled,
+			})
 			.where(eq(schema.domain.id, domainId));
 	}
 
