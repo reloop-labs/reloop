@@ -12,7 +12,7 @@ export default async function ClickTrackingPage({
 	const { emailLogId } = await params;
 	const { url, sig } = await searchParams;
 
-	let shouldRedirect = false;
+	let redirectUrl: string | null = null;
 
 	if (url) {
 		const apiBaseUrl =
@@ -25,13 +25,14 @@ export default async function ClickTrackingPage({
 		}
 
 		try {
-			// Notify backend to track the click event
 			const res = await fetch(trackingEndpoint, {
 				method: "GET",
 				redirect: "manual",
 			});
-			if (res.ok) {
-				shouldRedirect = true;
+
+			const isRedirect = res.status >= 300 && res.status < 400;
+			if (res.ok || isRedirect) {
+				redirectUrl = res.headers.get("location") || url;
 			} else {
 				console.error("Tracking verification failed with status:", res.status);
 			}
@@ -40,8 +41,8 @@ export default async function ClickTrackingPage({
 		}
 	}
 
-	if (shouldRedirect && url) {
-		redirect(url);
+	if (redirectUrl) {
+		redirect(redirectUrl);
 	} else {
 		redirect("/");
 	}
