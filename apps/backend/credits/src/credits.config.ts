@@ -5,4 +5,6 @@ export const creditsConfig = {
 	NATS_URL: process.env.NATS_URL || "nats://localhost:4222",
 	BASE_URL: process.env.BASE_URL || "https://local.reloop.sh",
 	NODE_TLS_REJECT_UNAUTHORIZED: process.env.NODE_TLS_REJECT_UNAUTHORIZED || "0",
+	OTEL_EXPORTER_OTLP_ENDPOINT: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || "",
+	OTEL_EXPORTER_OTLP_HEADERS: process.env.OTEL_EXPORTER_OTLP_HEADERS || "",
 };

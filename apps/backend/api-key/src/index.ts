@@ -11,9 +11,33 @@ import { landingRoute } from "@reloop/api-key/routes/landing/landing.route";
 import { loader } from "@reloop/api-key/utils/loader";
 import { Elysia } from "elysia";
 import { initLogger } from "evlog";
+import { createOTLPDrain } from "evlog/otlp";
 import { evlog } from "evlog/elysia";
 
-initLogger({ env: { service: "api-key" } });
+const parseOtlpHeaders = (headersStr?: string): Record<string, string> | undefined => {
+	if (!headersStr) return undefined;
+	const headers: Record<string, string> = {};
+	const decoded = decodeURIComponent(headersStr);
+	for (const pair of decoded.split(",")) {
+		const eqIndex = pair.indexOf("=");
+		if (eqIndex > 0) {
+			const key = pair.slice(0, eqIndex).trim();
+			const value = pair.slice(eqIndex + 1).trim();
+			if (key && value) headers[key] = value;
+		}
+	}
+	return Object.keys(headers).length > 0 ? headers : undefined;
+};
+
+initLogger({
+	env: { service: "api-key" },
+	drain: apiKeyConfig.OTEL_EXPORTER_OTLP_ENDPOINT
+		? createOTLPDrain({
+				endpoint: apiKeyConfig.OTEL_EXPORTER_OTLP_ENDPOINT,
+				headers: parseOtlpHeaders(apiKeyConfig.OTEL_EXPORTER_OTLP_HEADERS),
+			})
+		: undefined,
+});
 
 const port = apiKeyConfig.port;
 const apiKeyService = new Elysia({

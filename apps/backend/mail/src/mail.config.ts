@@ -9,6 +9,8 @@ export const mailConfig = {
 	NATS_URL: process.env.NATS_URL || "nats://localhost:4222",
 	TRACKING_SECRET:
 		process.env.TRACKING_SECRET || "reloop_tracking_secret_default_123",
+	OTEL_EXPORTER_OTLP_ENDPOINT: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || "",
+	OTEL_EXPORTER_OTLP_HEADERS: process.env.OTEL_EXPORTER_OTLP_HEADERS || "",
 
 	// ── Rate Limiting ──────────────────────────────────────────────
 	// Per-IP: stops brute-force from a single source

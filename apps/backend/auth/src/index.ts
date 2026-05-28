@@ -1,4 +1,5 @@
-import { log } from "evlog";
+import { initLogger, log } from "evlog";
+import { createOTLPDrain } from "evlog/otlp";
 import "dotenv/config";
 import cors from "@elysiajs/cors";
 import { openapi } from "@elysiajs/openapi";
@@ -8,6 +9,31 @@ import { authConfig } from "./auth.config";
 import { landing } from "./landing";
 import { auth, OpenAPI } from "./lib/auth";
 import { loader } from "./loader";
+
+const parseOtlpHeaders = (headersStr?: string): Record<string, string> | undefined => {
+	if (!headersStr) return undefined;
+	const headers: Record<string, string> = {};
+	const decoded = decodeURIComponent(headersStr);
+	for (const pair of decoded.split(",")) {
+		const eqIndex = pair.indexOf("=");
+		if (eqIndex > 0) {
+			const key = pair.slice(0, eqIndex).trim();
+			const value = pair.slice(eqIndex + 1).trim();
+			if (key && value) headers[key] = value;
+		}
+	}
+	return Object.keys(headers).length > 0 ? headers : undefined;
+};
+
+initLogger({
+	env: { service: "auth" },
+	drain: authConfig.OTEL_EXPORTER_OTLP_ENDPOINT
+		? createOTLPDrain({
+				endpoint: authConfig.OTEL_EXPORTER_OTLP_ENDPOINT,
+				headers: parseOtlpHeaders(authConfig.OTEL_EXPORTER_OTLP_HEADERS),
+			})
+		: undefined,
+});
 
 const port = authConfig.port;
 

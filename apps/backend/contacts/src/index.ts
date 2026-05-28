@@ -14,9 +14,33 @@ import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 import { Elysia } from "elysia";
 import { initLogger, log, parseError } from "evlog";
+import { createOTLPDrain } from "evlog/otlp";
 import { evlog } from "evlog/elysia";
 
-initLogger({ env: { service: "contacts" } });
+const parseOtlpHeaders = (headersStr?: string): Record<string, string> | undefined => {
+	if (!headersStr) return undefined;
+	const headers: Record<string, string> = {};
+	const decoded = decodeURIComponent(headersStr);
+	for (const pair of decoded.split(",")) {
+		const eqIndex = pair.indexOf("=");
+		if (eqIndex > 0) {
+			const key = pair.slice(0, eqIndex).trim();
+			const value = pair.slice(eqIndex + 1).trim();
+			if (key && value) headers[key] = value;
+		}
+	}
+	return Object.keys(headers).length > 0 ? headers : undefined;
+};
+
+initLogger({
+	env: { service: "contacts" },
+	drain: contactsConfig.OTEL_EXPORTER_OTLP_ENDPOINT
+		? createOTLPDrain({
+				endpoint: contactsConfig.OTEL_EXPORTER_OTLP_ENDPOINT,
+				headers: parseOtlpHeaders(contactsConfig.OTEL_EXPORTER_OTLP_HEADERS),
+			})
+		: undefined,
+});
 
 // L-1: Refuse to start in production with a known-public default secret.
 // Anyone with access to this source code can forge preference tokens if

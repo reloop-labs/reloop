@@ -10,4 +10,6 @@ export const contactsConfig = {
 	PREFERENCES_SECRET:
 		process.env.PREFERENCES_SECRET ||
 		"reloop-preferences-secret-key-change-in-prod",
+	OTEL_EXPORTER_OTLP_ENDPOINT: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || "",
+	OTEL_EXPORTER_OTLP_HEADERS: process.env.OTEL_EXPORTER_OTLP_HEADERS || "",
 };

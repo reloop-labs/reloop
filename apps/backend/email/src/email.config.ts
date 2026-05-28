@@ -6,4 +6,6 @@ export const emailConfig = {
 	RELOOP_SENDER_DOMAIN: process.env.RELOOP_SENDER_DOMAIN || "",
 	BASE_URL: process.env.BASE_URL || "https://local.reloop.sh",
 	REDIS_URL: process.env.REDIS_URL || "redis://:reloop123@localhost:6379",
+	OTEL_EXPORTER_OTLP_ENDPOINT: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || "",
+	OTEL_EXPORTER_OTLP_HEADERS: process.env.OTEL_EXPORTER_OTLP_HEADERS || "",
 };

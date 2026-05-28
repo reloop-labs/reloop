@@ -3,6 +3,7 @@ import cors from "@elysiajs/cors";
 import { openapi } from "@elysiajs/openapi";
 import { Elysia } from "elysia";
 import { initLogger, log, parseError } from "evlog";
+import { createOTLPDrain } from "evlog/otlp";
 import { evlog } from "evlog/elysia";
 import { creditsConfig } from "./credits.config";
 import { loader } from "./loader";
@@ -11,7 +12,30 @@ import { agentCardRoute } from "./routes/landing/agent-card.route";
 import { healthRoute } from "./routes/landing/health.route";
 import { landingRoute } from "./routes/landing/landing.route";
 
-initLogger({ env: { service: "credits" } });
+const parseOtlpHeaders = (headersStr?: string): Record<string, string> | undefined => {
+	if (!headersStr) return undefined;
+	const headers: Record<string, string> = {};
+	const decoded = decodeURIComponent(headersStr);
+	for (const pair of decoded.split(",")) {
+		const eqIndex = pair.indexOf("=");
+		if (eqIndex > 0) {
+			const key = pair.slice(0, eqIndex).trim();
+			const value = pair.slice(eqIndex + 1).trim();
+			if (key && value) headers[key] = value;
+		}
+	}
+	return Object.keys(headers).length > 0 ? headers : undefined;
+};
+
+initLogger({
+	env: { service: "credits" },
+	drain: creditsConfig.OTEL_EXPORTER_OTLP_ENDPOINT
+		? createOTLPDrain({
+				endpoint: creditsConfig.OTEL_EXPORTER_OTLP_ENDPOINT,
+				headers: parseOtlpHeaders(creditsConfig.OTEL_EXPORTER_OTLP_HEADERS),
+			})
+		: undefined,
+});
 
 const port = creditsConfig.PORT;
 

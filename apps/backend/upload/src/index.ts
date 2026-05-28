@@ -9,9 +9,33 @@ import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 import { Elysia } from "elysia";
 import { initLogger, log, parseError } from "evlog";
+import { createOTLPDrain } from "evlog/otlp";
 import { evlog } from "evlog/elysia";
 
-initLogger({ env: { service: "upload" } });
+const parseOtlpHeaders = (headersStr?: string): Record<string, string> | undefined => {
+	if (!headersStr) return undefined;
+	const headers: Record<string, string> = {};
+	const decoded = decodeURIComponent(headersStr);
+	for (const pair of decoded.split(",")) {
+		const eqIndex = pair.indexOf("=");
+		if (eqIndex > 0) {
+			const key = pair.slice(0, eqIndex).trim();
+			const value = pair.slice(eqIndex + 1).trim();
+			if (key && value) headers[key] = value;
+		}
+	}
+	return Object.keys(headers).length > 0 ? headers : undefined;
+};
+
+initLogger({
+	env: { service: "upload" },
+	drain: uploadConfig.OTEL_EXPORTER_OTLP_ENDPOINT
+		? createOTLPDrain({
+				endpoint: uploadConfig.OTEL_EXPORTER_OTLP_ENDPOINT,
+				headers: parseOtlpHeaders(uploadConfig.OTEL_EXPORTER_OTLP_HEADERS),
+			})
+		: undefined,
+});
 
 const port = uploadConfig.port;
 const uploadService = new Elysia({

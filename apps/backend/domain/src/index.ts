@@ -10,9 +10,33 @@ import { landingRoute } from "@reloop/domain/routes/landing/landing.route";
 import { loader } from "@reloop/domain/utils/loader";
 import { Elysia } from "elysia";
 import { initLogger, log, parseError } from "evlog";
+import { createOTLPDrain } from "evlog/otlp";
 import { evlog } from "evlog/elysia";
 
-initLogger({ env: { service: "domain" } });
+const parseOtlpHeaders = (headersStr?: string): Record<string, string> | undefined => {
+	if (!headersStr) return undefined;
+	const headers: Record<string, string> = {};
+	const decoded = decodeURIComponent(headersStr);
+	for (const pair of decoded.split(",")) {
+		const eqIndex = pair.indexOf("=");
+		if (eqIndex > 0) {
+			const key = pair.slice(0, eqIndex).trim();
+			const value = pair.slice(eqIndex + 1).trim();
+			if (key && value) headers[key] = value;
+		}
+	}
+	return Object.keys(headers).length > 0 ? headers : undefined;
+};
+
+initLogger({
+	env: { service: "domain" },
+	drain: domainConfig.OTEL_EXPORTER_OTLP_ENDPOINT
+		? createOTLPDrain({
+				endpoint: domainConfig.OTEL_EXPORTER_OTLP_ENDPOINT,
+				headers: parseOtlpHeaders(domainConfig.OTEL_EXPORTER_OTLP_HEADERS),
+			})
+		: undefined,
+});
 
 const port = domainConfig.port;
 

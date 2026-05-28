@@ -1,4 +1,5 @@
 import { initLogger, log, parseError } from "evlog";
+import { createOTLPDrain } from "evlog/otlp";
 import "dotenv/config";
 import { opentelemetry } from "@elysia/opentelemetry";
 import { openapi } from "@elysiajs/openapi";
@@ -13,7 +14,30 @@ import { healthRoute } from "./routes/landing/health.route";
 import { landingRoute } from "./routes/landing/landing.route";
 import { logsRoutes } from "./routes/logs/logs.routes";
 
-initLogger({ env: { service: "logs" } });
+const parseOtlpHeaders = (headersStr?: string): Record<string, string> | undefined => {
+	if (!headersStr) return undefined;
+	const headers: Record<string, string> = {};
+	const decoded = decodeURIComponent(headersStr);
+	for (const pair of decoded.split(",")) {
+		const eqIndex = pair.indexOf("=");
+		if (eqIndex > 0) {
+			const key = pair.slice(0, eqIndex).trim();
+			const value = pair.slice(eqIndex + 1).trim();
+			if (key && value) headers[key] = value;
+		}
+	}
+	return Object.keys(headers).length > 0 ? headers : undefined;
+};
+
+initLogger({
+	env: { service: "logs" },
+	drain: logsConfig.OTEL_EXPORTER_OTLP_ENDPOINT
+		? createOTLPDrain({
+				endpoint: logsConfig.OTEL_EXPORTER_OTLP_ENDPOINT,
+				headers: parseOtlpHeaders(logsConfig.OTEL_EXPORTER_OTLP_HEADERS),
+			})
+		: undefined,
+});
 
 const port = logsConfig.port;
 const logsService = new Elysia({
