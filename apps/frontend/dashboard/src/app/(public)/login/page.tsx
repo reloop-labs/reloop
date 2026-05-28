@@ -57,16 +57,16 @@ const Page = () => {
 	const [inviteId] = useQueryState("inviteId", parseAsString.withDefault(""));
 
 	useEffect(() => {
-		if (session && !isPending) {
+		if (session) {
 			if (inviteId) {
 				router.push(`/invite?id=${inviteId}`);
 			} else {
 				router.push("/");
 			}
 		}
-	}, [session, isPending, router, inviteId]);
+	}, [session, router, inviteId]);
 
-	if (isPending) {
+	if (isPending && session === undefined) {
 		return (
 			<div className="flex h-dvh flex-col items-center justify-center">
 				<div className="w-full max-w-sm p-5 md:p-8">

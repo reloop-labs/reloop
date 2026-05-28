@@ -115,7 +115,7 @@ export default function InvitePage() {
 		}
 	};
 
-	if (isLoading || isSessionPending) {
+	if (isLoading || (isSessionPending && session === undefined)) {
 		return (
 			<div className="flex h-dvh flex-col items-center justify-center">
 				<div className="w-full max-w-sm p-5 md:p-8">

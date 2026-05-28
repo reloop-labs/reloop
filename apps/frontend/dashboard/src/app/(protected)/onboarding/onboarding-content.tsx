@@ -45,7 +45,7 @@ export const OnBoardingContent = () => {
 	);
 
 	useEffect(() => {
-		if (isPending) return;
+		if (isPending && session === undefined) return;
 
 		if (!session) {
 			router.push("/login");
@@ -62,7 +62,7 @@ export const OnBoardingContent = () => {
 		}
 	}, [step, router]);
 
-	if (isPending) {
+	if (isPending && session === undefined) {
 		return (
 			<SplitLayout
 				stepIndicator="Step 1 of 4"

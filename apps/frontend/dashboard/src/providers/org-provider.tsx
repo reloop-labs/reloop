@@ -47,7 +47,8 @@ export const UserOrganizationProvider = ({
 }) => {
 	const router = useRouter();
 	const pathname = usePathname();
-	const { data: session, isPending: sessionLoading } = authClient.useSession();
+	const { data: session, isPending: sessionPending } = authClient.useSession();
+	const sessionLoading = sessionPending && session === undefined;
 	const {
 		data: organizations,
 		isLoading: organizationsLoading,
