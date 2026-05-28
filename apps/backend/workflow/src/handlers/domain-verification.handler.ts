@@ -73,10 +73,13 @@ export async function processDomainVerification({
 				(r) => r.recordType === "TXT" && r.value.startsWith("v=DMARC1"),
 			)
 		: undefined;
+	const sendingMxRecord = isSendingEnabled
+		? records.find((r) => r.recordType === "MX" && r.purpose === "sending")
+		: undefined;
 
-	if (isSendingEnabled && (!spfRecord || !dmarcRecord)) {
+	if (isSendingEnabled && (!spfRecord || !dmarcRecord || !sendingMxRecord)) {
 		log.warn({
-			message: "Missing SPF or DMARC record when sending is enabled",
+			message: "Missing SPF, DMARC, or sending MX record when sending is enabled",
 			domainId,
 		});
 		await db
@@ -88,13 +91,14 @@ export async function processDomainVerification({
 
 	// Conditionally verify MX (Enable Receiving)
 	const isReceivingEnabled = domainWithRecords.isReceivingEmailEnabled;
-	const mxRecord = isReceivingEnabled
-		? records.find((r) => r.recordType === "MX")
+	const receivingMxRecord = isReceivingEnabled
+		? (records.find((r) => r.recordType === "MX" && r.purpose === "receiving") ??
+		   records.find((r) => r.recordType === "MX" && r.purpose === "sending"))
 		: undefined;
 
-	if (isReceivingEnabled && !mxRecord) {
+	if (isReceivingEnabled && !receivingMxRecord) {
 		log.warn({
-			message: "Missing MX record when receiving is enabled",
+			message: "Missing receiving MX record when receiving is enabled",
 			domainId,
 		});
 		await db
@@ -143,12 +147,30 @@ export async function processDomainVerification({
 		});
 	}
 
-	if (isReceivingEnabled && mxRecord) {
+	if (isSendingEnabled && sendingMxRecord) {
 		activeResults.push({
-			record: mxRecord,
+			record: sendingMxRecord,
 			verifyFn: () =>
-				verifyMxRecord(mxRecord.fqdn, mxRecord.value, mxRecord.priority ?? 10),
+				verifyMxRecord(
+					sendingMxRecord.fqdn,
+					sendingMxRecord.value,
+					sendingMxRecord.priority ?? 10,
+				),
 		});
+	}
+
+	if (isReceivingEnabled && receivingMxRecord) {
+		if (!sendingMxRecord || receivingMxRecord.id !== sendingMxRecord.id) {
+			activeResults.push({
+				record: receivingMxRecord,
+				verifyFn: () =>
+					verifyMxRecord(
+						receivingMxRecord.fqdn,
+						receivingMxRecord.value,
+						receivingMxRecord.priority ?? 10,
+					),
+			});
+		}
 	}
 
 	if (isTrackingEnabled && cnameRecord) {
@@ -175,9 +197,13 @@ export async function processDomainVerification({
 	const dmarcOk = dmarcRecord
 		? (results.find((r) => r.record.id === dmarcRecord.id)?.ok ?? false)
 		: true;
-	const mxOk = mxRecord
-		? (results.find((r) => r.record.id === mxRecord.id)?.ok ?? false)
+	const sendingMxOk = sendingMxRecord
+		? (results.find((r) => r.record.id === sendingMxRecord.id)?.ok ?? false)
 		: true;
+	const receivingMxOk = receivingMxRecord
+		? (results.find((r) => r.record.id === receivingMxRecord.id)?.ok ?? false)
+		: true;
+	const mxOk = sendingMxOk && receivingMxOk;
 	const cnameOk = cnameRecord
 		? (results.find((r) => r.record.id === cnameRecord.id)?.ok ?? false)
 		: true;

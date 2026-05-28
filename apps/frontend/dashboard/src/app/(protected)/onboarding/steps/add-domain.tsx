@@ -41,7 +41,7 @@ export const AddDomainStep = () => {
 				domain: domain || "",
 				clickTracking: false,
 				openTracking: false,
-				customReturnPath: "recive",
+				customReturnPath: "receive",
 				trackingSubdomain: "links",
 			},
 		});

@@ -43,7 +43,7 @@ const useCases = [
 		],
 	},
 	{
-		title: "Recive Email",
+		title: "Receive Email",
 		description: "Seamlessly process and route inbound mail to your systems.",
 		items: [
 			"Inbound webhooks",
