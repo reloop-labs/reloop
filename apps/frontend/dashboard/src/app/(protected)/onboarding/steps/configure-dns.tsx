@@ -265,7 +265,7 @@ export const ConfigureDnsStep = () => {
 						</AnimatePresence>
 					</div>
 				)}
-				<div className="mt-8 flex items-center gap-3">
+				<div className="mt-8 flex items-center justify-end gap-3">
 					<Button.Root
 						onClick={handleVerifyDNS}
 						size="xsmall"

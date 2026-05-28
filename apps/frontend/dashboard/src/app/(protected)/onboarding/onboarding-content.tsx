@@ -55,7 +55,7 @@ export const OnBoardingContent = () => {
 		if (step === 5) {
 			const timer = setTimeout(() => {
 				router.push("/");
-			}, 6000);
+			}, 699999000);
 			return () => clearTimeout(timer);
 		}
 	}, [step, router]);
@@ -135,7 +135,9 @@ export const OnBoardingContent = () => {
 			stepIndicator: "Step 1 of 4",
 			title: "Create your workspace",
 			component: <CreateOrgStep />,
-			preview: <SidebarPreview name={name} logo={logoUrl || logoPreview || null} />,
+			preview: (
+				<SidebarPreview name={name} logo={logoUrl || logoPreview || null} />
+			),
 			fullWidth: false,
 		},
 		2: {
