@@ -54,22 +54,7 @@ export const DomainPreview = ({
 							: "relative bg-bg-white-0 p-6"
 					}
 				>
-					{/* Subject Line */}
-					<div
-						className={
-							isDomainVariant
-								? "mb-2 ml-14 flex w-auto justify-start gap-3"
-								: "mb-3 ml-14 flex w-auto justify-start gap-3"
-						}
-					>
-						<span className="font-medium text-text-strong-800">
-							Black Friday is here. 55% off on all products.
-						</span>
-						<div className="flex items-center gap-1 rounded-md border border-stroke-soft-100 bg-bg-weak-50 px-1.5 py-0 dark:border-stroke-soft-100/40">
-							<span className="text-[11px] text-text-soft-400">Inbox</span>
-							<span className="text-[10px] text-text-soft-400">×</span>
-						</div>
-					</div>
+
 					<div className="flex items-start gap-4">
 						{logoUrl ? (
 							<img
@@ -174,12 +159,7 @@ export const DomainPreview = ({
 											})}
 										</div>
 
-										<div className="pr-3 text-right text-text-soft-400">
-											subject:
-										</div>
-										<div className="text-text-strong-950">
-											Black Friday is here. 55% off...
-										</div>
+
 
 										{/* Verification Fields */}
 										<div className="pr-3 text-right text-text-soft-400">
