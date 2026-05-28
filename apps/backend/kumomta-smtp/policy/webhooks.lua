@@ -5,9 +5,8 @@ local constants = require 'policy.constants'
 local nats_client
 local function get_nats_client()
   if not nats_client then
-    local nats_url = os.getenv("NATS_URL") or "reloop-nats:4222"
     nats_client = kumo.nats.connect {
-      servers = { nats_url },
+      servers = { constants.nats_url },
     }
   end
   return nats_client

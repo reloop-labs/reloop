@@ -8,8 +8,7 @@ kumo.on('get_queue_config', function(domain, tenant, campaign, routing_domain)
     }
   end
 
-  local env = os.getenv('NODE_ENV') or os.getenv('KUMOMTA_ENV') or 'production'
-  if env == 'development' then
+  if constants.env == 'development' then
     return kumo.make_queue_config {
       protocol = {
         smtp = {
