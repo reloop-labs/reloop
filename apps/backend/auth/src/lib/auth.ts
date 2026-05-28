@@ -219,7 +219,7 @@ export const auth = betterAuth({
 
 				// Log invite URL in development for easy testing
 				if (authConfig.NODE_ENV === "development") {
-					log.info("server", "🔗 Invite URL (DEV):", inviteLink);
+					log.info("server", `🔗 Invite URL (DEV): ${inviteLink}`);
 				}
 
 				const isResend =

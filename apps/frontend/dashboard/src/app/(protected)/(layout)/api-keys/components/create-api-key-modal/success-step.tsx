@@ -1,6 +1,7 @@
 "use client";
 
 import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
 import { CodeBlock } from "@reloop/ui/code-block";
 import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
@@ -20,10 +21,13 @@ export const SuccessStep = ({
 	defaultHtml,
 }: SuccessStepProps) => {
 	const [copied, setCopied] = useState(false);
+	const [activeTab, setActiveTab] = useState<"env" | "key">("env");
 
 	const handleCopy = async () => {
 		try {
-			await navigator.clipboard.writeText(`RELOOP_API_KEY=${apiKey}`);
+			const textToCopy =
+				activeTab === "env" ? `RELOOP_API_KEY=${apiKey}` : apiKey;
+			await navigator.clipboard.writeText(textToCopy);
 			setCopied(true);
 			setTimeout(() => setCopied(false), 2000);
 		} catch {
@@ -44,13 +48,44 @@ export const SuccessStep = ({
 			<Modal.Body className="space-y-4 px-5 py-3.5">
 				<div className="group relative overflow-hidden rounded-2xl border border-stroke-soft-100 dark:border-stroke-soft-100/40">
 					{/* Code Block Header */}
-					<div className="flex items-center justify-between px-4 py-2">
-						<p className="font-medium text-sm text-text-sub-600">.env</p>
+					<div className="flex items-center justify-between border-stroke-soft-100 border-b px-4 py-0 dark:border-stroke-soft-100/40">
+						<div className="flex items-center gap-4">
+							<button
+								type="button"
+								onClick={() => setActiveTab("env")}
+								className={cn(
+									"relative cursor-pointer py-2 font-medium text-xs transition-colors",
+									activeTab === "env"
+										? "font-semibold text-text-strong-950"
+										: "text-text-soft-400 hover:text-text-sub-600",
+								)}
+							>
+								.env
+								{activeTab === "env" && (
+									<span className="absolute right-0 bottom-0 left-0 h-[1.5px] rounded-full bg-text-strong-950" />
+								)}
+							</button>
+							<button
+								type="button"
+								onClick={() => setActiveTab("key")}
+								className={cn(
+									"relative cursor-pointer py-2 font-medium text-xs transition-colors",
+									activeTab === "key"
+										? "font-semibold text-text-strong-950"
+										: "text-text-soft-400 hover:text-text-sub-600",
+								)}
+							>
+								API Key
+								{activeTab === "key" && (
+									<span className="absolute right-0 bottom-0 left-0 h-[1.5px] rounded-full bg-text-strong-950" />
+								)}
+							</button>
+						</div>
 						<div className="flex items-center gap-2">
 							<button
 								type="button"
 								onClick={handleCopy}
-								className="cursor-pointer"
+								className="cursor-pointer text-text-sub-600 transition-colors hover:text-text-strong-950"
 							>
 								<Icon
 									name={copied ? "check" : "copy"}
@@ -61,12 +96,12 @@ export const SuccessStep = ({
 					</div>
 					<div className="rounded-t-[10px] rounded-b-2xl bg-bg-weak-50/70 dark:bg-bg-weak-50/45">
 						<CodeBlock
-							code={`RELOOP_API_KEY=${apiKey}`}
+							code={activeTab === "env" ? `RELOOP_API_KEY=${apiKey}` : apiKey}
 							lang="bash"
 							className="text-[10px]"
 							hideLineNumbers={true}
 							noScroll={true}
-							defaultHtml={defaultHtml}
+							defaultHtml={activeTab === "env" ? defaultHtml : undefined}
 						/>
 					</div>
 				</div>

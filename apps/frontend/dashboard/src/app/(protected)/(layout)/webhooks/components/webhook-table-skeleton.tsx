@@ -12,7 +12,7 @@ export const WebhookTableSkeleton = ({
 			{Array.from({ length: rows }).map((_, index) => (
 				<div
 					key={`skeleton-${index}`}
-					className="grid grid-cols-[2fr_1.5fr_1fr_1fr_96px] items-center px-6 py-4"
+					className="grid grid-cols-[minmax(0,2fr)_minmax(0,1.5fr)_120px_140px_32px] items-center px-4 py-2"
 				>
 					<div className="flex flex-col gap-1.5">
 						<Skeleton className="h-4 w-32 rounded" />

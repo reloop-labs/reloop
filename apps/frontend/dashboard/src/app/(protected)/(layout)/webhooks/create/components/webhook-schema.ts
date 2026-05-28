@@ -9,7 +9,10 @@ export const webhookSchema = v.object({
 			"Please enter a valid URL starting with http:// or https://",
 		),
 	),
-	description: v.optional(v.string()),
+	description: v.pipe(
+		v.string("Description is required"),
+		v.minLength(1, "Description is required"),
+	),
 	events: v.pipe(
 		v.array(v.string("Events are required")),
 		v.minLength(1, "At least one event is required"),

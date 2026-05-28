@@ -127,4 +127,179 @@ export async function initWebhookSubscribers() {
 
 		await Promise.all(deliverySetup);
 	});
+
+	// Subscribe to Domain Events
+	await bus.subscribe(BusEvent.DOMAIN_CREATED, async (payload) => {
+		log.info({
+			message: "Received Domain Created event from NATS, triggering webhooks",
+			domainId: payload.domainId,
+			organizationId: payload.organizationId,
+		});
+		await bus.publish(BusEvent.WEBHOOK_TRIGGERED, {
+			event: "domain.create",
+			payload: {
+				domainId: payload.domainId,
+				domain: payload.domain,
+			},
+			organizationId: payload.organizationId,
+		});
+	});
+
+	await bus.subscribe(BusEvent.DOMAIN_UPDATED, async (payload) => {
+		log.info({
+			message: "Received Domain Updated event from NATS, triggering webhooks",
+			domainId: payload.domainId,
+			organizationId: payload.organizationId,
+		});
+		await bus.publish(BusEvent.WEBHOOK_TRIGGERED, {
+			event: "domain.update",
+			payload: {
+				domainId: payload.domainId,
+				domain: payload.domain,
+			},
+			organizationId: payload.organizationId,
+		});
+	});
+
+	await bus.subscribe(BusEvent.DOMAIN_DELETED, async (payload) => {
+		log.info({
+			message: "Received Domain Deleted event from NATS, triggering webhooks",
+			domainId: payload.domainId,
+			organizationId: payload.organizationId,
+		});
+		await bus.publish(BusEvent.WEBHOOK_TRIGGERED, {
+			event: "domain.delete",
+			payload: {
+				domainId: payload.domainId,
+				domain: payload.domain,
+			},
+			organizationId: payload.organizationId,
+		});
+	});
+
+	await bus.subscribe(BusEvent.DOMAIN_UNDELETED, async (payload) => {
+		log.info({
+			message: "Received Domain Undeleted event from NATS, triggering webhooks",
+			domainId: payload.domainId,
+			organizationId: payload.organizationId,
+		});
+		await bus.publish(BusEvent.WEBHOOK_TRIGGERED, {
+			event: "domain.undelete",
+			payload: {
+				domainId: payload.domainId,
+				domain: payload.domain,
+			},
+			organizationId: payload.organizationId,
+		});
+	});
+
+	await bus.subscribe(BusEvent.DOMAIN_VERIFIED, async (payload) => {
+		log.info({
+			message: "Received Domain Verified event from NATS, triggering webhooks",
+			domainId: payload.domainId,
+			organizationId: payload.organizationId,
+		});
+		await bus.publish(BusEvent.WEBHOOK_TRIGGERED, {
+			event: "domain.verify",
+			payload: {
+				domainId: payload.domainId,
+				domain: payload.domain,
+			},
+			organizationId: payload.organizationId,
+		});
+	});
+
+	// Subscribe to API Key Events
+	await bus.subscribe(BusEvent.API_KEY_CREATED, async (payload) => {
+		log.info({
+			message: "Received API Key Created event from NATS, triggering webhooks",
+			api_key_id: payload.api_key_id,
+			organizationId: payload.organizationId,
+		});
+		await bus.publish(BusEvent.WEBHOOK_TRIGGERED, {
+			event: "api-key.create",
+			payload: {
+				api_key_id: payload.api_key_id,
+			},
+			organizationId: payload.organizationId,
+		});
+	});
+
+	await bus.subscribe(BusEvent.API_KEY_UPDATED, async (payload) => {
+		log.info({
+			message: "Received API Key Updated event from NATS, triggering webhooks",
+			api_key_id: payload.api_key_id,
+			organizationId: payload.organizationId,
+		});
+		await bus.publish(BusEvent.WEBHOOK_TRIGGERED, {
+			event: "api-key.update",
+			payload: {
+				api_key_id: payload.api_key_id,
+			},
+			organizationId: payload.organizationId,
+		});
+	});
+
+	await bus.subscribe(BusEvent.API_KEY_DELETED, async (payload) => {
+		log.info({
+			message: "Received API Key Deleted event from NATS, triggering webhooks",
+			api_key_id: payload.api_key_id,
+			organizationId: payload.organizationId,
+		});
+		await bus.publish(BusEvent.WEBHOOK_TRIGGERED, {
+			event: "api-key.delete",
+			payload: {
+				api_key_id: payload.api_key_id,
+			},
+			organizationId: payload.organizationId,
+		});
+	});
+
+	await bus.subscribe(BusEvent.API_KEY_DISABLED, async (payload) => {
+		log.info({
+			message: "Received API Key Disabled event from NATS, triggering webhooks",
+			api_key_id: payload.api_key_id,
+			organizationId: payload.organizationId,
+		});
+		await bus.publish(BusEvent.WEBHOOK_TRIGGERED, {
+			event: "api-key.update",
+			payload: {
+				api_key_id: payload.api_key_id,
+				status: "disabled",
+			},
+			organizationId: payload.organizationId,
+		});
+	});
+
+	await bus.subscribe(BusEvent.API_KEY_ENABLED, async (payload) => {
+		log.info({
+			message: "Received API Key Enabled event from NATS, triggering webhooks",
+			api_key_id: payload.api_key_id,
+			organizationId: payload.organizationId,
+		});
+		await bus.publish(BusEvent.WEBHOOK_TRIGGERED, {
+			event: "api-key.update",
+			payload: {
+				api_key_id: payload.api_key_id,
+				status: "enabled",
+			},
+			organizationId: payload.organizationId,
+		});
+	});
+
+	await bus.subscribe(BusEvent.API_KEY_ROTATED, async (payload) => {
+		log.info({
+			message: "Received API Key Rotated event from NATS, triggering webhooks",
+			api_key_id: payload.api_key_id,
+			organizationId: payload.organizationId,
+		});
+		await bus.publish(BusEvent.WEBHOOK_TRIGGERED, {
+			event: "api-key.update",
+			payload: {
+				api_key_id: payload.api_key_id,
+				action: "rotated",
+			},
+			organizationId: payload.organizationId,
+		});
+	});
 }

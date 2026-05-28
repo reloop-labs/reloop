@@ -57,12 +57,13 @@ export function CreateWebhookFormFields({
 					className="mb-2 block font-medium text-label-sm text-text-strong-950 text-xs uppercase"
 				>
 					Description
-					<span className="text-text-sub-600 text-xs capitalize">
-						{" "}
-						(optional)
-					</span>
+					<Label.Asterisk />
 				</Label.Root>
-				<Input.Root size="small" className="w-full">
+				<Input.Root
+					size="small"
+					className="w-full"
+					hasError={!!formState.errors.description?.message}
+				>
 					<Input.Wrapper>
 						<Input.Input
 							id="description"
@@ -71,6 +72,14 @@ export function CreateWebhookFormFields({
 						/>
 					</Input.Wrapper>
 				</Input.Root>
+				{formState.errors.description && (
+					<div className="mt-1.5 flex items-center gap-1">
+						<Icon name="alert-circle" className="h-3 w-3 text-error-base" />
+						<p className="text-error-base text-xs">
+							{formState.errors.description.message}
+						</p>
+					</div>
+				)}
 			</div>
 
 			<div>

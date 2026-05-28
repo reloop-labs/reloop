@@ -170,7 +170,7 @@ const WebhookActionsDropdown = ({
 	);
 };
 
-const GRID = "grid-cols-[2fr_1.5fr_1fr_1fr_96px]";
+const GRID = "grid-cols-[minmax(0,2fr)_minmax(0,1.5fr)_120px_140px_32px]";
 const BORDER = "border-stroke-soft-100 dark:border-stroke-soft-100/50";
 
 export const WebhookTable = ({
@@ -230,7 +230,7 @@ export const WebhookTable = ({
 									)}
 								>
 									<Link href={`/webhooks/${webhook.id}`} className="contents">
-										<div className="flex items-center gap-2">
+										<div className="flex min-w-0 items-center gap-2">
 											<Icon
 												name="link"
 												className="h-4 w-4 shrink-0 text-text-sub-600"
@@ -245,7 +245,7 @@ export const WebhookTable = ({
 											</div>
 										</div>
 
-										<div className="flex items-center pr-4">
+										<div className="flex min-w-0 items-center pr-4">
 											{!webhook.events || webhook.events.length === 0 ? (
 												<span className="truncate text-label-sm text-text-sub-600">
 													All events
@@ -256,7 +256,7 @@ export const WebhookTable = ({
 														<div className="flex flex-col items-start gap-1">
 															{webhook.events[0] &&
 																(() => {
-																	const firstId = webhook.events![0];
+																	const firstId = webhook.events?.[0];
 																	const event = WEBHOOK_EVENTS.find(
 																		(e) => e.id === firstId,
 																	);
@@ -279,7 +279,7 @@ export const WebhookTable = ({
 															{webhook.events.length > 1 && (
 																<div className="flex items-center gap-1">
 																	{(() => {
-																		const secondId = webhook.events![1];
+																		const secondId = webhook.events?.[1];
 																		const event = WEBHOOK_EVENTS.find(
 																			(e) => e.id === secondId,
 																		);

@@ -16,5 +16,6 @@
 		"paths": {
 			"@be/workflow/*": ["./*"]
 		}
-	}
+	},
+	"include": ["src"]
 }

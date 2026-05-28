@@ -42,6 +42,7 @@ export const RotateApiKeyModal = ({ apiKeys }: RotateApiKeyModalProps) => {
 	const [rotatedApiKey, setRotatedApiKey] =
 		useState<ApiKeyWithKeyResponse | null>(null);
 	const [keyCopied, setKeyCopied] = useState(false);
+	const [activeTab, setActiveTab] = useState<"env" | "key">("env");
 	const { mutate } = useSWRConfig();
 	const [html, setHtml] = useState("");
 
@@ -124,9 +125,11 @@ export const RotateApiKeyModal = ({ apiKeys }: RotateApiKeyModalProps) => {
 	const handleCopyKey = async () => {
 		if (rotatedApiKey?.key) {
 			try {
-				await navigator.clipboard.writeText(
-					`RELOOP_API_KEY=${rotatedApiKey.key}`,
-				);
+				const textToCopy =
+					activeTab === "env"
+						? `RELOOP_API_KEY=${rotatedApiKey.key}`
+						: rotatedApiKey.key;
+				await navigator.clipboard.writeText(textToCopy);
 				setKeyCopied(true);
 				setTimeout(() => setKeyCopied(false), 2000);
 			} catch {
@@ -151,6 +154,7 @@ export const RotateApiKeyModal = ({ apiKeys }: RotateApiKeyModalProps) => {
 			const timer = setTimeout(() => {
 				setRotatedApiKey(null);
 				setKeyCopied(false);
+				setActiveTab("env");
 				setHtml("");
 			}, 300); // Wait for transition
 			return () => clearTimeout(timer);
@@ -177,13 +181,44 @@ export const RotateApiKeyModal = ({ apiKeys }: RotateApiKeyModalProps) => {
 						<Modal.Body className="space-y-4 px-5 py-3.5">
 							<div className="group relative overflow-hidden rounded-2xl border border-stroke-soft-100 dark:border-stroke-soft-100/40">
 								{/* Code Block Header */}
-								<div className="flex items-center justify-between px-4 py-2">
-									<p className="font-medium text-sm text-text-sub-600">.env</p>
+								<div className="flex items-center justify-between border-stroke-soft-100 border-b px-4 py-0 dark:border-stroke-soft-100/40">
+									<div className="flex items-center gap-4">
+										<button
+											type="button"
+											onClick={() => setActiveTab("env")}
+											className={cn(
+												"relative cursor-pointer py-2 font-medium text-xs transition-colors",
+												activeTab === "env"
+													? "font-semibold text-text-strong-950"
+													: "text-text-soft-400 hover:text-text-sub-600",
+											)}
+										>
+											.env
+											{activeTab === "env" && (
+												<span className="absolute right-0 bottom-0 left-0 h-[1.5px] rounded-full bg-text-strong-950" />
+											)}
+										</button>
+										<button
+											type="button"
+											onClick={() => setActiveTab("key")}
+											className={cn(
+												"relative cursor-pointer py-2 font-medium text-xs transition-colors",
+												activeTab === "key"
+													? "font-semibold text-text-strong-950"
+													: "text-text-soft-400 hover:text-text-sub-600",
+											)}
+										>
+											API Key
+											{activeTab === "key" && (
+												<span className="absolute right-0 bottom-0 left-0 h-[1.5px] rounded-full bg-text-strong-950" />
+											)}
+										</button>
+									</div>
 									<div className="flex items-center gap-2">
 										<button
 											type="button"
 											onClick={handleCopyKey}
-											className="cursor-pointer"
+											className="cursor-pointer text-text-sub-600 transition-colors hover:text-text-strong-950"
 										>
 											<Icon
 												name={keyCopied ? "check" : "copy"}
@@ -194,12 +229,16 @@ export const RotateApiKeyModal = ({ apiKeys }: RotateApiKeyModalProps) => {
 								</div>
 								<div className="rounded-t-[10px] rounded-b-2xl bg-bg-weak-50/70 dark:bg-bg-weak-50/45">
 									<CodeBlock
-										code={`RELOOP_API_KEY=${rotatedApiKey.key}`}
+										code={
+											activeTab === "env"
+												? `RELOOP_API_KEY=${rotatedApiKey.key}`
+												: rotatedApiKey.key
+										}
 										lang="bash"
 										className="text-[10px]"
 										hideLineNumbers={true}
 										noScroll={true}
-										defaultHtml={html}
+										defaultHtml={activeTab === "env" ? html : undefined}
 									/>
 								</div>
 							</div>

@@ -8,12 +8,6 @@ export namespace WebhookTypes {
 	export type CreateWebhookBody = typeof WebhookModel.createWebhookBody.static;
 	export type UpdateWebhookBody = typeof WebhookModel.updateWebhookBody.static;
 	export type WebhookQuery = typeof WebhookModel.webhookQuery.static;
-	export type WebhookNotFound = typeof WebhookModel.webhookNotFound.static;
-	export type WebhookAlreadyExists =
-		typeof WebhookModel.webhookAlreadyExists.static;
-	export type InvalidWebhookUrl = typeof WebhookModel.invalidWebhookUrl.static;
-	export type Unauthorized = typeof WebhookModel.unauthorized.static;
-	export type ValidationError = typeof WebhookModel.validationError.static;
 	export type DeleteWebhookResponse =
 		typeof WebhookModel.deleteWebhookResponse.static;
 
