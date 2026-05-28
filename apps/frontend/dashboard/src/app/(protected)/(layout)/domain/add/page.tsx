@@ -115,7 +115,7 @@ const AddDomain = () => {
 							/>
 						</button>
 						{isAdvancedOpen && (
-							<div className="pt-2">
+							<div className="mt-2 bg-bg-weak-50/50 border border-stroke-soft-100 p-4 rounded-2xl">
 								<AdvancedOptions
 									control={control}
 									register={register}

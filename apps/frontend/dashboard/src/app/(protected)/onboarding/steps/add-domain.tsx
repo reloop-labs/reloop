@@ -119,7 +119,7 @@ export const AddDomainStep = () => {
 					<button
 						type="button"
 						onClick={() => setIsAdvancedOpen(!isAdvancedOpen)}
-						className="flex w-full cursor-pointer items-center justify-between py-1 outline-none"
+						className="flex w-full cursor-pointer items-center gap-2 py-1 outline-none"
 					>
 						<span className="font-medium text-sm text-text-strong-950">
 							Advanced options
@@ -133,7 +133,7 @@ export const AddDomainStep = () => {
 						/>
 					</button>
 					{isAdvancedOpen && (
-						<div className="pt-2">
+						<div className="mt-2 rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4">
 							<AdvancedOptions
 								control={control}
 								register={register}
@@ -144,7 +144,7 @@ export const AddDomainStep = () => {
 					)}
 				</div>
 
-				<div className="mt-8 flex items-center gap-3">
+				<div className="mt-5 flex items-center gap-3">
 					<Button.Root
 						type="submit"
 						variant="neutral"
