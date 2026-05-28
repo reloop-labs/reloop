@@ -6,8 +6,8 @@ import {
 	checkDnsHealth_step3,
 	createEmailLog_step4,
 	finalizeEmail_step7,
-	injectTracking_step5b,
 	injectCustomTracking_step5c,
+	injectTracking_step5b,
 	parseFromAddress_step1,
 	resolveTemplate_step5,
 	sendEmail_step6,
@@ -70,7 +70,8 @@ export async function sendEmailController({
 
 	// Step 5b/c: Rewrite links and inject open pixel based on domain tracking flags
 	let trackedHtml = finalHtml;
-	const isDomainVerified = currentDomain.systemVerified && currentDomain.status === "active";
+	const isDomainVerified =
+		currentDomain.systemVerified && currentDomain.status === "active";
 
 	if (currentDomain.isTrackingDomain && isDomainVerified) {
 		trackedHtml = injectCustomTracking_step5c({

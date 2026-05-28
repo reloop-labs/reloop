@@ -29,7 +29,9 @@ export function injectCustomTracking_step5c({
 		return html;
 	}
 
-	const protocol = mailConfig.BASE_URL.startsWith("https://") ? "https://" : "http://";
+	const protocol = mailConfig.BASE_URL.startsWith("https://")
+		? "https://"
+		: "http://";
 	const baseUrl = `${protocol}${trackingSubdomain}.${domainName}`;
 	let result = html;
 
