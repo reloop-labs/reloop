@@ -89,7 +89,7 @@ export interface LogCreatedPayload {
 	resource_id?: string;
 
 	// Context
-	service?: string; // source microservice: 'api_key' | 'domain' | 'mailing' | 'auth' | 'billing'
+	service?: string; // source microservice: 'api_key' | 'domain' | 'mail' | 'auth' | 'billing'
 	action?: string; // verb: 'created' | 'updated' | 'deleted' | 'sent' | 'verified' | etc.
 	ip_address?: string;
 	user_agent?: string;
