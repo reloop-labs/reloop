@@ -3,8 +3,6 @@
 import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { CheckCircle2 } from "lucide-react";
-import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import type React from "react";
@@ -18,6 +16,7 @@ import { AddDomainStep } from "./steps/add-domain";
 import { ConfigureDnsStep } from "./steps/configure-dns";
 import { CreateOrgStep } from "./steps/create-org";
 import { GenerateApiKeyStep } from "./steps/generate-api-key/generate-api-key";
+import { SetupCompleteStep } from "./steps/setup-complete";
 
 export const OnBoardingContent = () => {
 	const { data: session, isPending } = authClient.useSession();
@@ -51,14 +50,6 @@ export const OnBoardingContent = () => {
 		}
 	}, [session, isPending, router]);
 
-	useEffect(() => {
-		if (step === 5) {
-			const timer = setTimeout(() => {
-				router.push("/");
-			}, 699999000);
-			return () => clearTimeout(timer);
-		}
-	}, [step, router]);
 
 	if (isPending && session === undefined) {
 		return (
@@ -165,36 +156,7 @@ export const OnBoardingContent = () => {
 	};
 
 	if (step === 5) {
-		return (
-			<div className="flex min-h-screen items-center justify-center bg-bg-white-0 p-4">
-				<motion.div
-					initial={{ opacity: 0, transform: "scale(0.95)" }}
-					animate={{ opacity: 1, transform: "scale(1)" }}
-					transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
-					className="max-w-md text-center"
-				>
-					<div className="mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-full bg-success-lighter text-success-base">
-						<CheckCircle2 size={48} />
-					</div>
-					<h2 className="mb-4 font-bold text-3xl text-text-strong-950">
-						Setup Complete!
-					</h2>
-					<p className="mb-8 text-lg text-text-sub-600">
-						Your workspace{" "}
-						<span className="font-semibold text-text-strong-950">{name}</span>{" "}
-						is ready. Redirecting you to the dashboard...
-					</p>
-					<Button.Root
-						variant="neutral"
-						mode="filled"
-						className="w-full"
-						onClick={() => router.push("/")}
-					>
-						Go to Dashboard
-					</Button.Root>
-				</motion.div>
-			</div>
-		);
+		return <SetupCompleteStep />;
 	}
 
 	const currentConfig = stepsConfig[step as keyof typeof stepsConfig];
