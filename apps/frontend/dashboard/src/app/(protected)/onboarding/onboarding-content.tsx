@@ -43,18 +43,19 @@ export const OnBoardingContent = () => {
 		"skippedDns",
 		parseAsString.withDefault(""),
 	);
-
 	useEffect(() => {
+		if (isPending && session === undefined) return;
 		if (session === null) {
 			router.push("/login");
+			return;
 		}
-	}, [session, router]);
+	}, [session, isPending, router]);
 
 	useEffect(() => {
 		if (step === 5) {
 			const timer = setTimeout(() => {
 				router.push("/");
-			}, 3000);
+			}, 6000);
 			return () => clearTimeout(timer);
 		}
 	}, [step, router]);
