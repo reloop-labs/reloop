@@ -11,6 +11,7 @@ import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
 import Spinner from "@reloop/ui/spinner";
 import axios from "axios";
+import { AnimatePresence, motion } from "motion/react";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import type React from "react";
 import { useRef, useState } from "react";
@@ -226,8 +227,8 @@ export const CreateOrgStep = () => {
 					</div>
 				</div>
 			</div>
-			<div className="space-y-3.5 pt-6">
-				<div className="flex flex-col gap-1">
+			<motion.div layout className="space-y-3.5 pt-6">
+				<motion.div layout className="flex flex-col gap-1">
 					<Label.Root htmlFor="company-name">Company name</Label.Root>
 					<Input.Root size="small" className="rounded-xl">
 						<Input.Wrapper>
@@ -243,92 +244,116 @@ export const CreateOrgStep = () => {
 							/>
 						</Input.Wrapper>
 					</Input.Root>
-				</div>
-				<div className="flex flex-col gap-1">
-					<Label.Root htmlFor="referral">How did you hear about us?</Label.Root>
-					<Dropdown.Root open={isOpen} onOpenChange={setIsOpen}>
-						<Dropdown.Trigger asChild>
-							<Button.Root
-								variant="neutral"
-								mode="stroke"
-								size="small"
-								className="w-full justify-between gap-1.5 rounded-xl font-medium text-sm"
+				</motion.div>
+				<motion.div
+					layout
+					className={cn(
+						"flex flex-col transition-all duration-200",
+						referral === "other"
+							? "gap-3 rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4"
+							: "gap-1",
+					)}
+				>
+					<motion.div layout className="flex flex-col gap-1">
+						<Label.Root htmlFor="referral">
+							How did you hear about us?
+						</Label.Root>
+						<Dropdown.Root open={isOpen} onOpenChange={setIsOpen}>
+							<Dropdown.Trigger asChild>
+								<Button.Root
+									variant="neutral"
+									mode="stroke"
+									size="small"
+									className="w-full justify-between gap-1.5 rounded-xl font-medium text-sm"
+								>
+									<span>{displayLabel}</span>
+									<Icon name="chevron-down" className="h-4 w-4 shrink-0" />
+								</Button.Root>
+							</Dropdown.Trigger>
+							<Dropdown.Content
+								align="start"
+								style={{ width: "var(--radix-dropdown-menu-trigger-width)" }}
+								className="p-2"
 							>
-								<span>{displayLabel}</span>
-								<Icon name="chevron-down" className="h-4 w-4 shrink-0" />
-							</Button.Root>
-						</Dropdown.Trigger>
-						<Dropdown.Content
-							align="start"
-							style={{ width: "var(--radix-dropdown-menu-trigger-width)" }}
-							className="p-2"
-						>
-							<div className="relative flex flex-col gap-1">
-								{referralOptions.map((option, idx) => {
-									const isChecked = referral === option.id;
-									return (
-										<button
-											key={option.id}
-											ref={(el) => {
-												if (el) buttonRefs.current[idx] = el;
+								<div className="relative flex flex-col">
+									{referralOptions.map((option, idx) => {
+										const isChecked = referral === option.id;
+										return (
+											<button
+												key={option.id}
+												ref={(el) => {
+													if (el) buttonRefs.current[idx] = el;
+												}}
+												type="button"
+												onPointerEnter={() => setHoverIdx(idx)}
+												onPointerLeave={() => setHoverIdx(undefined)}
+												onClick={() => {
+													setReferral(option.id);
+													setIsOpen(false);
+												}}
+												className={cn(
+													"flex h-9 w-full cursor-pointer items-center justify-between gap-2 rounded-lg px-3 font-medium text-sm transition-colors",
+													"text-text-strong-950",
+													isChecked && "bg-neutral-alpha-10",
+												)}
+											>
+												<span>{option.label}</span>
+												{isChecked && (
+													<Icon
+														name="check"
+														className="h-4 w-4 text-text-strong-950"
+													/>
+												)}
+											</button>
+										);
+									})}
+									<AnimatedHoverBackground
+										rect={currentRect}
+										tabElement={currentTab}
+									/>
+								</div>
+							</Dropdown.Content>
+						</Dropdown.Root>
+					</motion.div>
+					<AnimatePresence initial={false}>
+						{referral === "other" && (
+							<motion.div
+								layout
+								initial={{ opacity: 0, height: 0 }}
+								animate={{ opacity: 1, height: "auto" }}
+								exit={{ opacity: 0, height: 0 }}
+								transition={{ type: "spring", stiffness: 300, damping: 30 }}
+								className="flex flex-col gap-1 overflow-hidden"
+							>
+								<Label.Root htmlFor="other-referral">Please specify</Label.Root>
+								<Input.Root size="small" className="rounded-xl bg-bg-white-0">
+									<Input.Wrapper>
+										<Input.Input
+											id="other-referral"
+											type="text"
+											value={otherReferral}
+											className="font-medium"
+											onChange={(e) => {
+												setOtherReferral(e.target.value);
 											}}
-											type="button"
-											onPointerEnter={() => setHoverIdx(idx)}
-											onPointerLeave={() => setHoverIdx(undefined)}
-											onClick={() => {
-												setReferral(option.id);
-												setIsOpen(false);
-											}}
-											className={cn(
-												"flex h-9 w-full cursor-pointer items-center justify-between gap-2 rounded-lg px-3 font-medium text-sm transition-colors",
-												"text-text-strong-950",
-												isChecked && "bg-neutral-alpha-10",
-											)}
-										>
-											<span>{option.label}</span>
-											{isChecked && (
-												<Icon
-													name="check"
-													className="h-4 w-4 text-text-strong-950"
-												/>
-											)}
-										</button>
-									);
-								})}
-								<AnimatedHoverBackground
-									rect={currentRect}
-									tabElement={currentTab}
-								/>
-							</div>
-						</Dropdown.Content>
-					</Dropdown.Root>
-				</div>
-				{referral === "other" && (
-					<div className="flex flex-col gap-1">
-						<Label.Root htmlFor="other-referral">Please specify</Label.Root>
-						<Input.Root size="small" className="rounded-xl">
-							<Input.Wrapper>
-								<Input.Input
-									id="other-referral"
-									type="text"
-									value={otherReferral}
-									className="font-medium"
-									onChange={(e) => {
-										setOtherReferral(e.target.value);
-									}}
-									placeholder="e.g. Product Hunt, Reddit, etc."
-								/>
-							</Input.Wrapper>
-						</Input.Root>
-					</div>
-				)}
-			</div>
+											placeholder="e.g. Product Hunt, Reddit, etc."
+										/>
+									</Input.Wrapper>
+								</Input.Root>
+							</motion.div>
+						)}
+					</AnimatePresence>
+				</motion.div>
+			</motion.div>
+
 			<Button.Root
 				variant="neutral"
 				className="mt-6 w-full"
 				mode="filled"
 				onClick={onNext}
-				disabled={!name || isUploading || (referral === "other" && !otherReferral)}
+				disabled={
+					!name || isUploading || (referral === "other" && !otherReferral)
+				}
 			>
 				{orgId ? "Update workspace" : "Create workspace"}
 			</Button.Root>
