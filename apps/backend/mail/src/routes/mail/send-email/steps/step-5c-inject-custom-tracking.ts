@@ -4,33 +4,32 @@ import { mailConfig } from "@reloop/be-mail/mail.config";
 /**
  * Rewrites HTML email content to inject custom tracking links and open tracking.
  * Used when a custom tracking domain is enabled (isTrackingDomain is true).
+ *
+ * @param trackingDomain - The FQDN of the tracking domain (e.g. "tracking.example.com")
  */
 export function injectCustomTracking_step5c({
 	html,
 	emailLogId,
 	clickTracking,
 	openTracking,
-	trackingSubdomain,
-	domainName,
+	trackingDomain,
 }: {
 	html: string | undefined;
 	emailLogId: string;
 	clickTracking: boolean;
 	openTracking: boolean;
-	trackingSubdomain: string;
-	domainName: string;
+	trackingDomain: string;
 }): string | undefined {
 	if (!html) return html;
 
-	// Use custom tracking domain if the toggle is enabled
-	if (!trackingSubdomain || !domainName) {
+	if (!trackingDomain) {
 		return html;
 	}
 
 	const protocol = mailConfig.BASE_URL.startsWith("https://")
 		? "https://"
 		: "http://";
-	const baseUrl = `${protocol}${trackingSubdomain}.${domainName}`;
+	const baseUrl = `${protocol}${trackingDomain}`;
 	let result = html;
 
 	if (clickTracking) {
