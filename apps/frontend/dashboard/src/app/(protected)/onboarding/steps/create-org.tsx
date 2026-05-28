@@ -12,7 +12,7 @@ import Spinner from "@reloop/ui/spinner";
 import axios from "axios";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import type React from "react";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 
 export const CreateOrgStep = () => {
