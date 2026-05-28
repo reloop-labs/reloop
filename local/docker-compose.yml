@@ -100,6 +100,7 @@ services:
       - BASE_URL=${BASE_URL:-https://local.reloop.sh}
       - NATS_URL=${NATS_URL:-reloop-nats:4222}
       - NODE_ENV=development
+      - KUMOMTA_TRUSTED_HOSTS=${KUMOMTA_TRUSTED_HOSTS:-127.0.0.1,::1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:

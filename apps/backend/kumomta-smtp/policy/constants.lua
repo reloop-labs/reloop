@@ -25,10 +25,32 @@ constants.kumomta_url = os.getenv("KUMOMTA_WEBHOOK_URL") or default_webhook_url
 -- 3. NATS connection URL
 constants.nats_url = os.getenv("NATS_URL") or "reloop-nats:4222"
 
+-- 4. Trusted hosts for HTTP listener
+local trusted_hosts = {}
+local trusted_hosts_env = os.getenv("KUMOMTA_TRUSTED_HOSTS")
+if trusted_hosts_env and trusted_hosts_env ~= "" then
+  for host in string.gmatch(trusted_hosts_env, "[^,]+") do
+    local trimmed = host:match("^%s*(.-)%s*$")
+    if trimmed ~= "" then
+      table.insert(trusted_hosts, trimmed)
+    end
+  end
+else
+  trusted_hosts = {
+    '127.0.0.1',
+    '::1',
+    '10.0.0.0/8',
+    '172.16.0.0/12',
+    '192.168.0.0/16',
+  }
+end
+constants.trusted_hosts = trusted_hosts
+
 print("[DEBUG] constants.env = " .. constants.env)
 print("[DEBUG] constants.hostname = " .. constants.hostname)
 print("[DEBUG] constants.base_url = " .. constants.base_url)
 print("[DEBUG] constants.kumomta_url = " .. constants.kumomta_url)
 print("[DEBUG] constants.nats_url = " .. constants.nats_url)
+print("[DEBUG] constants.trusted_hosts = " .. table.concat(constants.trusted_hosts, ", "))
 
 return constants

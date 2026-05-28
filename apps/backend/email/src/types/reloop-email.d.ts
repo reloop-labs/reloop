@@ -51,5 +51,10 @@ declare module "reloop-email" {
 		constructor(options: ReloopClientOptions);
 	}
 
-	export { ReloopClientOptions, SendMailParams, SendMailResponse, MailService };
+	export type {
+		ReloopClientOptions,
+		SendMailParams,
+		SendMailResponse,
+		MailService,
+	};
 }
