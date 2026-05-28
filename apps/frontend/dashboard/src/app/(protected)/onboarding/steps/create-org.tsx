@@ -33,6 +33,10 @@ export const CreateOrgStep = () => {
 		"referral",
 		parseAsString.withDefault(""),
 	);
+	const [otherReferral, setOtherReferral] = useQueryState(
+		"otherReferral",
+		parseAsString.withDefault(""),
+	);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	const [isOpen, setIsOpen] = useState(false);
@@ -141,7 +145,7 @@ export const CreateOrgStep = () => {
 			keepCurrentActiveOrganization: true,
 			slug: randomSlug,
 			logo: logoToUse,
-			metadata: { referral },
+			metadata: { referral: referral === "other" ? otherReferral : referral },
 		});
 		if (error) {
 			toast.error(error.message || "Failed to create organization");
@@ -259,7 +263,7 @@ export const CreateOrgStep = () => {
 							style={{ width: "var(--radix-dropdown-menu-trigger-width)" }}
 							className="p-2"
 						>
-							<div className="relative flex flex-col">
+							<div className="relative flex flex-col gap-1">
 								{referralOptions.map((option, idx) => {
 									const isChecked = referral === option.id;
 									return (
@@ -299,13 +303,32 @@ export const CreateOrgStep = () => {
 						</Dropdown.Content>
 					</Dropdown.Root>
 				</div>
+				{referral === "other" && (
+					<div className="flex flex-col gap-1">
+						<Label.Root htmlFor="other-referral">Please specify</Label.Root>
+						<Input.Root size="small" className="rounded-xl">
+							<Input.Wrapper>
+								<Input.Input
+									id="other-referral"
+									type="text"
+									value={otherReferral}
+									className="font-medium"
+									onChange={(e) => {
+										setOtherReferral(e.target.value);
+									}}
+									placeholder="e.g. Product Hunt, Reddit, etc."
+								/>
+							</Input.Wrapper>
+						</Input.Root>
+					</div>
+				)}
 			</div>
 			<Button.Root
 				variant="neutral"
 				className="mt-6 w-full"
 				mode="filled"
 				onClick={onNext}
-				disabled={!name || isUploading}
+				disabled={!name || isUploading || (referral === "other" && !otherReferral)}
 			>
 				{orgId ? "Update workspace" : "Create workspace"}
 			</Button.Root>
