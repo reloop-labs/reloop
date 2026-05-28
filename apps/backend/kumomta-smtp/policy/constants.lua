@@ -3,8 +3,11 @@ local constants = {}
 constants.env = os.getenv("NODE_ENV") or os.getenv("KUMOMTA_ENV") or "production"
 constants.base_url = os.getenv("BASE_URL") or "https://local.reloop.sh"
 
--- 1. Extract hostname from BASE_URL (fallback to local.reloop.sh if it fails)
-local hostname = constants.base_url:match("https?://([^/:]+)")
+-- 1. Get hostname from environment variable HOSTNAME (fallback to extracting from BASE_URL)
+local hostname = os.getenv("HOSTNAME")
+if not hostname or hostname == "" then
+  hostname = constants.base_url:match("https?://([^/:]+)")
+end
 if not hostname or hostname == "" or hostname:match("^%x+$") then
   hostname = "local.reloop.sh"
 end
