@@ -45,13 +45,10 @@ export const OnBoardingContent = () => {
 	);
 
 	useEffect(() => {
-		if (isPending && session === undefined) return;
-
-		if (!session) {
+		if (session === null) {
 			router.push("/login");
-			return;
 		}
-	}, [session, isPending, router]);
+	}, [session, router]);
 
 	useEffect(() => {
 		if (step === 5) {

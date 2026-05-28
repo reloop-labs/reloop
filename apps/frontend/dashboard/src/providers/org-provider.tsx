@@ -80,9 +80,9 @@ export const UserOrganizationProvider = ({
 	const hasRedirected = useRef(false);
 
 	useEffect(() => {
-		if (sessionLoading || hasRedirected.current) return;
+		if (session === undefined || hasRedirected.current) return;
 
-		if (!session) {
+		if (session === null) {
 			if (pathname.startsWith("/invite")) return;
 			hasRedirected.current = true;
 			router.push("/login");
@@ -110,8 +110,7 @@ export const UserOrganizationProvider = ({
 		}
 	}, [
 		session,
-		sessionLoading,
-		organizations?.length,
+		organizations,
 		organizationsLoading,
 		invitations,
 		invitationsLoading,
