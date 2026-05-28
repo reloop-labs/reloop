@@ -1,13 +1,14 @@
 "use client";
 
+import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
 import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import * as Dropdown from "@reloop/ui/dropdown";
 import * as FileUpload from "@reloop/ui/file-upload";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
-import * as Select from "@reloop/ui/select";
 import Spinner from "@reloop/ui/spinner";
 import axios from "axios";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
@@ -33,6 +34,24 @@ export const CreateOrgStep = () => {
 		parseAsString.withDefault(""),
 	);
 	const fileInputRef = useRef<HTMLInputElement>(null);
+
+	const [isOpen, setIsOpen] = useState(false);
+	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
+	const buttonRefs = useRef<HTMLButtonElement[]>([]);
+
+	const referralOptions = [
+		{ id: "social-media", label: "Social media" },
+		{ id: "friend-colleague", label: "Friend/Colleague" },
+		{ id: "search-engine", label: "Search engine" },
+		{ id: "advertisement", label: "Advertisement" },
+		{ id: "other", label: "Other" },
+	];
+
+	const currentTab = buttonRefs.current[hoverIdx ?? -1];
+	const currentRect = currentTab?.getBoundingClientRect();
+
+	const displayLabel =
+		referralOptions.find((o) => o.id === referral)?.label || "Select an option";
 
 	const handleLogoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
@@ -206,7 +225,7 @@ export const CreateOrgStep = () => {
 			<div className="space-y-3.5 pt-6">
 				<div className="flex flex-col gap-1">
 					<Label.Root htmlFor="company-name">Company name</Label.Root>
-					<Input.Root size="small">
+					<Input.Root size="small" className="rounded-xl">
 						<Input.Wrapper>
 							<Input.Input
 								id="company-name"
@@ -223,32 +242,62 @@ export const CreateOrgStep = () => {
 				</div>
 				<div className="flex flex-col gap-1">
 					<Label.Root htmlFor="referral">How did you hear about us?</Label.Root>
-					<Select.Root
-						size="small"
-						value={referral}
-						onValueChange={setReferral}
-					>
-						<Select.Trigger className="font-medium text-sm">
-							<Select.Value placeholder="Select an option" />
-						</Select.Trigger>
-						<Select.Content className="w-[524px]">
-							<Select.Item value="social-media" className="h-9 text-sm">
-								Social media
-							</Select.Item>
-							<Select.Item value="friend-colleague" className="h-9 p-2 text-sm">
-								Friend/Colleague
-							</Select.Item>
-							<Select.Item value="search-engine" className="h-9 p-2 text-sm">
-								Search engine
-							</Select.Item>
-							<Select.Item value="advertisement" className="h-9 p-2 text-sm">
-								Advertisement
-							</Select.Item>
-							<Select.Item value="other" className="h-9 p-2 text-sm">
-								Other
-							</Select.Item>
-						</Select.Content>
-					</Select.Root>
+					<Dropdown.Root open={isOpen} onOpenChange={setIsOpen}>
+						<Dropdown.Trigger asChild>
+							<Button.Root
+								variant="neutral"
+								mode="stroke"
+								size="small"
+								className="w-full justify-between gap-1.5 rounded-xl font-medium text-sm"
+							>
+								<span>{displayLabel}</span>
+								<Icon name="chevron-down" className="h-4 w-4 shrink-0" />
+							</Button.Root>
+						</Dropdown.Trigger>
+						<Dropdown.Content
+							align="start"
+							style={{ width: "var(--radix-dropdown-menu-trigger-width)" }}
+							className="p-2"
+						>
+							<div className="relative flex flex-col">
+								{referralOptions.map((option, idx) => {
+									const isChecked = referral === option.id;
+									return (
+										<button
+											key={option.id}
+											ref={(el) => {
+												if (el) buttonRefs.current[idx] = el;
+											}}
+											type="button"
+											onPointerEnter={() => setHoverIdx(idx)}
+											onPointerLeave={() => setHoverIdx(undefined)}
+											onClick={() => {
+												setReferral(option.id);
+												setIsOpen(false);
+											}}
+											className={cn(
+												"flex h-9 w-full cursor-pointer items-center justify-between gap-2 rounded-lg px-3 font-medium text-sm transition-colors",
+												"text-text-strong-950",
+												isChecked && "bg-neutral-alpha-10",
+											)}
+										>
+											<span>{option.label}</span>
+											{isChecked && (
+												<Icon
+													name="check"
+													className="h-4 w-4 text-text-strong-950"
+												/>
+											)}
+										</button>
+									);
+								})}
+								<AnimatedHoverBackground
+									rect={currentRect}
+									tabElement={currentTab}
+								/>
+							</div>
+						</Dropdown.Content>
+					</Dropdown.Root>
 				</div>
 			</div>
 			<Button.Root
