@@ -4,5 +4,6 @@ export * from "./step-3-check-dns";
 export * from "./step-4-create-log";
 export * from "./step-5-resolve-template";
 export * from "./step-5b-inject-tracking";
+export * from "./step-5c-inject-custom-tracking";
 export * from "./step-6-send-email";
 export * from "./step-7-finalize";
