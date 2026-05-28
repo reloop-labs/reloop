@@ -2,6 +2,7 @@
 
 import type { DomainResponse } from "@fe/dashboard/types/api.types";
 import { valibotResolver } from "@hookform/resolvers/valibot";
+import * as Accordion from "@reloop/ui/accordion";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
@@ -13,7 +14,6 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { AdvancedOptions } from "./add-domain/components/advanced-options";
 import { DomainInputField } from "./add-domain/components/domain-input-field";
-import * as Accordion from "@reloop/ui/accordion";
 import { type DomainFormValues, domainSchema } from "./add-domain/schema";
 
 export const AddDomainStep = () => {
@@ -31,6 +31,7 @@ export const AddDomainStep = () => {
 		parseAsString.withDefault(""),
 	);
 	const [status, setStatus] = React.useState<"idle" | "loading">("idle");
+	const [accordionValue, setAccordionValue] = React.useState<string>("");
 
 	const { register, handleSubmit, formState, setError, watch, control } =
 		useForm<DomainFormValues>({
@@ -113,19 +114,25 @@ export const AddDomainStep = () => {
 					domain={watchedDomain}
 				/>
 
-				<Accordion.Root type="single" collapsible className="w-full mt-4">
+				<Accordion.Root
+					type="single"
+					collapsible
+					value={accordionValue}
+					onValueChange={setAccordionValue}
+					className="w-full"
+				>
 					<Accordion.Item
 						value="advanced-options"
-						className="group rounded-none border-none bg-transparent p-0 ring-0"
+						className="group/accordion border-none bg-transparent p-0 ring-0 hover:bg-transparent hover:ring-0 focus:ring-0 has-[:focus-visible]:bg-transparent data-[state=open]:bg-transparent data-[state=open]:ring-transparent"
 					>
-						<Accordion.Trigger className="flex w-full cursor-pointer items-center justify-between py-2 outline-none">
+						<Accordion.Trigger className="flex w-full cursor-pointer items-center justify-between py-1 outline-none">
 							<span className="font-medium text-sm text-text-strong-950">
 								Advanced options
 							</span>
 							<Accordion.Arrow
 								openIcon="chevron-down"
 								closeIcon="chevron-down"
-								className="size-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180"
+								className="size-4 shrink-0 transition-transform duration-200 group-data-[state=open]/accordion:rotate-180"
 							/>
 						</Accordion.Trigger>
 						<Accordion.Content className="pt-2">

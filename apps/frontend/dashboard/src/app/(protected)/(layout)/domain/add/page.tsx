@@ -1,5 +1,6 @@
 "use client";
 import { DomainPreview } from "@fe/dashboard/app/(protected)/onboarding/components/domain-preview";
+import { useState } from "react";
 import type { DomainResponse } from "@fe/dashboard/types/api.types";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import * as Button from "@reloop/ui/button";
@@ -15,6 +16,7 @@ import { useSWRConfig } from "swr";
 import { AddDomainHeader } from "./components/add-domain-header";
 import { AdvancedOptions } from "./components/advanced-options";
 import { DomainInputField } from "./components/domain-input-field";
+import * as Accordion from "@reloop/ui/accordion";
 import type { DomainFormValues } from "./schema";
 import { domainSchema } from "./schema";
 
@@ -22,6 +24,7 @@ const AddDomain = () => {
 	const router = useRouter();
 	const { changeStatus, status } = useLoading();
 	const { mutate } = useSWRConfig();
+	const [accordionValue, setAccordionValue] = useState("");
 
 	const { register, handleSubmit, formState, setError, watch, control } =
 		useForm<DomainFormValues>({
@@ -93,12 +96,37 @@ const AddDomain = () => {
 						domain={watch("domain")}
 					/>
 
-					<AdvancedOptions
-						control={control}
-						register={register}
-						domain={watch("domain")}
-						isLoading={status === "loading"}
-					/>
+					<Accordion.Root
+						type="single"
+						collapsible
+						value={accordionValue}
+						onValueChange={setAccordionValue}
+						className="w-full mt-4"
+					>
+						<Accordion.Item
+							value="advanced-options"
+							className="group/accordion border-none bg-transparent hover:bg-transparent data-[state=open]:bg-transparent has-[:focus-visible]:bg-transparent p-0 ring-0 hover:ring-0 focus:ring-0 data-[state=open]:ring-transparent"
+						>
+							<Accordion.Trigger className="flex w-full cursor-pointer items-center justify-between py-1 outline-none">
+								<span className="font-medium text-sm text-text-strong-950">
+									Advanced options
+								</span>
+								<Accordion.Arrow
+									openIcon="chevron-down"
+									closeIcon="chevron-down"
+									className="size-4 shrink-0 transition-transform duration-200 group-data-[state=open]/accordion:rotate-180"
+								/>
+							</Accordion.Trigger>
+							<Accordion.Content className="pt-2">
+								<AdvancedOptions
+									control={control}
+									register={register}
+									domain={watch("domain")}
+									isLoading={status === "loading"}
+								/>
+							</Accordion.Content>
+						</Accordion.Item>
+					</Accordion.Root>
 					<div className="mt-6 flex items-center gap-3">
 						<Button.Root
 							type="submit"
