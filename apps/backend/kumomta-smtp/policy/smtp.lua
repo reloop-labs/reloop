@@ -102,10 +102,16 @@ local function apply_reloop_logic(msg, api_key)
         print("[LOG-INCOMING] [" .. msg_id .. "] stored log ID: " .. body.id)
 
         -- Apply tracking injection
-        local new_data = utils.inject_tracking(msg:get_data(), body.id)
+        local new_data = utils.inject_tracking(
+          msg:get_data(),
+          body.id,
+          body.trackingDomain,
+          body.clickTracking,
+          body.openTracking
+        )
         if new_data ~= msg:get_data() then
           msg:set_data(new_data)
-          print("[TRACKING] [" .. msg_id .. "] injected tracking into message")
+          print("[TRACKING] [" .. msg_id .. "] injected tracking into message (domain: " .. tostring(body.trackingDomain) .. ")")
         end
       else
         print("[LOG-INCOMING] [" .. msg_id .. "] ERROR: backend returned 200 but no ID found")

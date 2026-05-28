@@ -15,10 +15,11 @@ export default async function ClickTrackingPage({
 	let redirectUrl: string | null = null;
 
 	if (url) {
+		const cleanUrl = url.replace(/&amp;/gi, "&");
 		const apiBaseUrl =
 			process.env.NEXT_PUBLIC_API_URL || "https://local.reloop.sh/api";
 		let trackingEndpoint = `${apiBaseUrl}/mail/v1/track/click/${emailLogId}?url=${encodeURIComponent(
-			url,
+			cleanUrl,
 		)}`;
 		if (sig) {
 			trackingEndpoint += `&sig=${sig}`;
@@ -32,7 +33,7 @@ export default async function ClickTrackingPage({
 
 			const isRedirect = res.status >= 300 && res.status < 400;
 			if (res.ok || isRedirect) {
-				redirectUrl = res.headers.get("location") || url;
+				redirectUrl = res.headers.get("location") || cleanUrl;
 			} else {
 				console.error("Tracking verification failed with status:", res.status);
 			}

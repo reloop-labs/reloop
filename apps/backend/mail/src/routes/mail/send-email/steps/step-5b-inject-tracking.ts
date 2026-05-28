@@ -64,7 +64,7 @@ function rewriteLinks(
 			}
 
 			// Decode HTML entities — href attributes encode & as &amp;
-			const cleanUrl = originalUrl.replace(/&amp;/g, "&");
+			const cleanUrl = originalUrl.replace(/&amp;/gi, "&");
 			const encodedUrl = encodeURIComponent(cleanUrl);
 			const sig = signTrackingUrl(cleanUrl, mailConfig.TRACKING_SECRET);
 			const trackingUrl = `${baseUrl}/track/click/${emailLogId}?url=${encodedUrl}&sig=${sig}`;

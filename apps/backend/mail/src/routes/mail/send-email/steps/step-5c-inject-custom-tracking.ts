@@ -62,7 +62,7 @@ function rewriteLinks(
 			if (originalUrl.includes(`${baseUrl}/track/click/`)) {
 				return match;
 			}
-			const cleanUrl = originalUrl.replace(/&amp;/g, "&");
+			const cleanUrl = originalUrl.replace(/&amp;/gi, "&");
 			const encodedUrl = encodeURIComponent(cleanUrl);
 			const sig = signTrackingUrl(cleanUrl, mailConfig.TRACKING_SECRET);
 			const trackingUrl = `${baseUrl}/track/click/${emailLogId}?url=${encodedUrl}&sig=${sig}`;

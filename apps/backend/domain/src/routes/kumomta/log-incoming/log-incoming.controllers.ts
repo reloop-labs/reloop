@@ -25,7 +25,12 @@ export async function logIncomingController({
 }: {
 	body: LogIncomingParams;
 	organizationId: string;
-}): Promise<{ id: string }> {
+}): Promise<{
+	id: string;
+	trackingDomain: string | null;
+	clickTracking: boolean;
+	openTracking: boolean;
+}> {
 	const log = useLogger();
 	let textBody = body.textBody || "";
 	let htmlBody = body.htmlBody || "";
@@ -62,7 +67,17 @@ export async function logIncomingController({
 
 	const domainRecord = await db.query.domain.findFirst({
 		where: domainQuery,
-		columns: { id: true, status: true, organizationId: true },
+		columns: {
+			id: true,
+			status: true,
+			organizationId: true,
+			isClickTrackingEnabled: true,
+			isOpenTrackingEnabled: true,
+			isTrackingDomain: true,
+			trackingSubdomain: true,
+			domain: true,
+			systemVerified: true,
+		},
 	});
 
 	if (!domainRecord) {
@@ -123,5 +138,24 @@ export async function logIncomingController({
 		timestamp: new Date().toISOString(),
 	});
 
-	return { id: insertedId };
+	const isDomainVerified =
+		domainRecord.systemVerified && domainRecord.status === "active";
+
+	const hasCustomTracking =
+		isDomainVerified &&
+		domainRecord.isTrackingDomain &&
+		domainRecord.trackingSubdomain &&
+		(domainRecord.isClickTrackingEnabled ||
+			domainRecord.isOpenTrackingEnabled);
+
+	const trackingDomain = hasCustomTracking
+		? `${domainRecord.trackingSubdomain}.${domainRecord.domain}`
+		: null;
+
+	return {
+		id: insertedId,
+		trackingDomain,
+		clickTracking: domainRecord.isClickTrackingEnabled,
+		openTracking: domainRecord.isOpenTrackingEnabled,
+	};
 }

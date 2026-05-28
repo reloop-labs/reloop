@@ -16,6 +16,9 @@ export const logIncomingRoute = new Elysia().use(authMiddleware).post(
 		response: {
 			200: t.Object({
 				id: t.String(),
+				trackingDomain: t.Nullable(t.String()),
+				clickTracking: t.Boolean(),
+				openTracking: t.Boolean(),
 			}),
 			400: ErrorResponseSchema,
 			401: ErrorResponseSchema,

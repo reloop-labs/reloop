@@ -8,16 +8,19 @@ import { log } from "evlog";
 
 export async function handleClickTracking({
 	emailLogId,
-	url,
+	url: rawUrl,
 	sig,
 }: {
 	emailLogId: string;
 	url: string;
 	sig?: string;
 }) {
-	if (!url) {
+	if (!rawUrl) {
 		throw MailErrors.invalidTrackingUrl("missing");
 	}
+
+	// Clean the URL by decoding any HTML entity '&amp;' (case-insensitive)
+	const url = rawUrl.replace(/&amp;/gi, "&");
 
 	// Verify signature to prevent Open Redirect
 	let isSignatureValid = false;
