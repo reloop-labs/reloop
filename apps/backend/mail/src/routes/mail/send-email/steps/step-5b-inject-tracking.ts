@@ -1,16 +1,6 @@
 import { encodeTrackingToken } from "@reloop/be-mail/lib/crypto";
 import { mailConfig } from "@reloop/be-mail/mail.config";
 
-/**
- * Rewrites HTML email content to inject click and open tracking based on
- * the domain's clickTracking / openTracking flags.
- *
- * - Click tracking: each <a href="..."> is proxied through
- *   /redirect/:token  (base64url-encoded payload with embedded HMAC)
- * - Open tracking: a 1×1 transparent pixel is appended before </body>
- *
- * No DB query — flags come from the domain record already fetched in step-2.
- */
 export function injectTracking_step5b({
 	html,
 	emailLogId,
