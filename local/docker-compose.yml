@@ -101,6 +101,7 @@ services:
       - NATS_URL=${NATS_URL:-reloop-nats:4222}
       - NODE_ENV=development
       - KUMOMTA_TRUSTED_HOSTS=${KUMOMTA_TRUSTED_HOSTS:-127.0.0.1,::1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16}
+      - TRACKING_SECRET=${TRACKING_SECRET:-reloop_tracking_secret_default_123}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
