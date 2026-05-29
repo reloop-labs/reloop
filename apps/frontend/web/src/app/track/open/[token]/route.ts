@@ -13,7 +13,7 @@ export async function GET(request: NextRequest, context: OpenRouteContext) {
 	const { token } = await context.params;
 
 	const apiBaseUrl =
-		process.env.NEXT_PUBLIC_API_URL || "https://local.reloop.sh/api";
+		process.env.NEXT_PUBLIC_URL || "https://local.reloop.sh/api";
 	const trackingEndpoint = `${apiBaseUrl}/mail/v1/track/open/${token}`;
 
 	try {
