@@ -45,8 +45,7 @@ export function encodeTrackingToken(
 			? { id: payload.id, url: payload.url, s: sig }
 			: { id: payload.id, s: sig };
 
-	return Buffer.from(JSON.stringify(tokenObj))
-		.toString("base64url"); // base64url = URL-safe, no padding
+	return Buffer.from(JSON.stringify(tokenObj)).toString("base64url"); // base64url = URL-safe, no padding
 }
 
 /**

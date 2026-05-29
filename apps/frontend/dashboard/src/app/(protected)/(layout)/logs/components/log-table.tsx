@@ -189,7 +189,7 @@ export const LogTable = ({
 	hideDocs,
 }: LogTableProps) => {
 	return (
-		<div className="w-full overflow-hidden rounded-3xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/40">
+		<div className="w-full overflow-hidden rounded-[14px] border border-stroke-soft-100 bg-bg-white-0 text-paragraph-sm dark:border-stroke-soft-100/40">
 			{/* Table Body */}
 			<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
 				{isLoading ? (
@@ -342,33 +342,33 @@ export const LogTable = ({
 						</div>
 					))
 				)}
-			</div>
 
-			{/* Pagination — inside table card, matching domain-table */}
-			{total > 0 && (
-				<div className="flex items-center justify-between border-stroke-soft-100 border-t px-4 py-2 text-label-xs text-text-sub-600 dark:border-stroke-soft-100/40">
-					<div className="flex items-center">
-						<span>
-							Showing {startIndex}–{endIndex} of {total} log
-							{total !== 1 ? "s" : ""}
-						</span>
-						{onPageSizeChange && (
-							<PageSizeDropdown
-								value={pageSize}
-								onValueChange={(value) => onPageSizeChange(value)}
+				{/* Pagination — inside table card, matching domain-table */}
+				{total > 0 && (
+					<div className="flex items-center justify-between px-4 py-2 text-label-xs text-text-sub-600">
+						<div className="flex items-center">
+							<span>
+								Showing {startIndex}–{endIndex} of {total} log
+								{total !== 1 ? "s" : ""}
+							</span>
+							{onPageSizeChange && (
+								<PageSizeDropdown
+									value={pageSize}
+									onValueChange={(value) => onPageSizeChange(value)}
+								/>
+							)}
+						</div>
+						{onPageChange && (
+							<PaginationControls
+								currentPage={currentPage}
+								totalPages={totalPages}
+								onPageChange={onPageChange}
+								isLoading={isLoading}
 							/>
 						)}
 					</div>
-					{onPageChange && (
-						<PaginationControls
-							currentPage={currentPage}
-							totalPages={totalPages}
-							onPageChange={onPageChange}
-							isLoading={isLoading}
-						/>
-					)}
-				</div>
-			)}
+				)}
+			</div>
 		</div>
 	);
 };

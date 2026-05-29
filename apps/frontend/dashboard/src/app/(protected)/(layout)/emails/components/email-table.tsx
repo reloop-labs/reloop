@@ -218,12 +218,12 @@ export const EmailTable = ({
 		"grid grid-cols-[1.5fr_2fr_80px_80px_32px] items-center px-4 gap-4";
 
 	return (
-		<div className="w-full rounded-xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/50">
+		<div className="w-full overflow-hidden rounded-[14px] text-paragraph-sm">
 			{/* Table Header */}
 			<div
 				className={cn(
 					gridClass,
-					"sticky top-[1px] z-20 rounded-t-xl border-stroke-soft-100 border-b bg-bg-weak-50/50 px-4 py-2.5 text-text-sub-600 backdrop-blur-sm dark:border-stroke-soft-100/50 dark:bg-bg-weak-50/40",
+					"sticky top-0 z-20 rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 text-text-sub-600 backdrop-blur-sm dark:border-stroke-soft-100/50 dark:bg-bg-weak-50/40",
 				)}
 			>
 				<div className="flex items-center gap-1">
@@ -246,7 +246,7 @@ export const EmailTable = ({
 			</div>
 
 			{/* Table Body */}
-			<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
+			<div className="-mt-2.5 divide-y divide-stroke-soft-100 rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
 				{isLoading ? (
 					Array.from({ length: loadingRows }).map((_, index) => (
 						<div key={`skeleton-${index}`} className={cn(gridClass, "py-3")}>
@@ -353,29 +353,29 @@ export const EmailTable = ({
 						);
 					})
 				)}
-			</div>
 
-			{/* Table Footer / Pagination */}
-			{!isLoading && totalLogs > 0 && (
-				<div className="sticky bottom-0 z-20 flex items-center justify-between border-stroke-soft-100 border-t bg-white px-4 py-2.5 text-text-sub-600 dark:border-stroke-soft-100/50 dark:bg-bg-white-0">
-					<div className="flex items-center gap-3">
-						<span className="text-xs">
-							Showing {startIndex}–{endIndex} of {totalLogs} log
-							{totalLogs !== 1 ? "s" : ""}
-						</span>
-						<PageSizeDropdown
-							value={pageSize}
-							onValueChange={onPageSizeChange}
+				{/* Table Footer / Pagination */}
+				{!isLoading && totalLogs > 0 && (
+					<div className="sticky bottom-0 z-20 flex items-center justify-between bg-white px-4 py-2.5 text-text-sub-600 dark:bg-bg-white-0">
+						<div className="flex items-center gap-3">
+							<span className="text-xs">
+								Showing {startIndex}–{endIndex} of {totalLogs} log
+								{totalLogs !== 1 ? "s" : ""}
+							</span>
+							<PageSizeDropdown
+								value={pageSize}
+								onValueChange={onPageSizeChange}
+							/>
+						</div>
+						<PaginationControls
+							currentPage={currentPage}
+							totalPages={totalPages}
+							onPageChange={onPageChange}
+							isLoading={isLoading}
 						/>
 					</div>
-					<PaginationControls
-						currentPage={currentPage}
-						totalPages={totalPages}
-						onPageChange={onPageChange}
-						isLoading={isLoading}
-					/>
-				</div>
-			)}
+				)}
+			</div>
 		</div>
 	);
 };

@@ -61,11 +61,11 @@ export const DNSRecordTableMinimal = ({
 	};
 
 	return (
-		<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/50">
+		<div className="w-full overflow-hidden rounded-[14px] text-paragraph-sm">
 			{/* Table Header */}
 			<div
 				className={cn(
-					"grid items-center border-stroke-soft-100 border-b bg-bg-weak-50/50 px-4 py-2.5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-bg-weak-50/40",
+					"grid items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-bg-weak-50/40",
 					gridCols,
 				)}
 			>
@@ -87,7 +87,7 @@ export const DNSRecordTableMinimal = ({
 			</div>
 
 			{/* Table Body */}
-			<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
+			<div className="-mt-2.5 divide-y divide-stroke-soft-100 rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/50">
 				{isLoading
 					? Array.from({ length: loadingRows }).map((_, index) => (
 							<RecordSkeleton

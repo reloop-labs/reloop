@@ -112,9 +112,9 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 				)}
 			</div>
 
-			<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 text-paragraph-sm dark:border-stroke-soft-100/40">
+			<div className="w-full overflow-hidden rounded-[14px] text-paragraph-sm">
 				<div
-					className={`grid ${GRID_COLS} items-center border-stroke-soft-100 border-b bg-bg-weak-50/50 px-4 py-2.5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-bg-weak-50/40`}
+					className={`grid ${GRID_COLS} items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-bg-weak-50/40`}
 				>
 					<div className="flex items-center gap-1">
 						<Icon name="monitor" className="h-3 w-3" />
@@ -135,7 +135,7 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 					<div />
 				</div>
 
-				<div className={`divide-y ${DIVIDER}`}>
+				<div className={cn("-mt-2.5 divide-y rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40", DIVIDER)}>
 					{loading
 						? Array.from({ length: 3 }).map((_, i) => (
 								<div key={i} className={`grid ${GRID_COLS} px-4 py-2`}>
@@ -251,19 +251,18 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 							</p>
 						</div>
 					)}
+					{!loading && sessions.length === 0 && (
+						<div className="flex flex-col items-center justify-center py-12 text-center">
+							<Icon name="shield" className="mb-3 h-8 w-8 text-text-sub-600" />
+							<p className="font-medium text-text-strong-950">
+								No active sessions
+							</p>
+							<p className="text-sm text-text-sub-600">
+								Your sessions will appear here.
+							</p>
+						</div>
+					)}
 				</div>
-
-				{!loading && sessions.length === 0 && (
-					<div className="flex flex-col items-center justify-center py-12 text-center">
-						<Icon name="shield" className="mb-3 h-8 w-8 text-text-sub-600" />
-						<p className="font-medium text-text-strong-950">
-							No active sessions
-						</p>
-						<p className="text-sm text-text-sub-600">
-							Your sessions will appear here.
-						</p>
-					</div>
-				)}
 			</div>
 		</div>
 	);
