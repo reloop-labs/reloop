@@ -6,7 +6,7 @@ import { mailConfig } from "@reloop/be-mail/mail.config";
  * the domain's clickTracking / openTracking flags.
  *
  * - Click tracking: each <a href="..."> is proxied through
- *   /track/click/:token  (base64url-encoded payload with embedded HMAC)
+ *   /redirect/:token  (base64url-encoded payload with embedded HMAC)
  * - Open tracking: a 1×1 transparent pixel is appended before </body>
  *
  * No DB query — flags come from the domain record already fetched in step-2.
@@ -59,7 +59,7 @@ function rewriteLinks(
 			) {
 				return match;
 			}
-			if (originalUrl.includes(`${baseUrl}/track/click/`)) {
+			if (originalUrl.includes(`${baseUrl}/redirect/`)) {
 				return match;
 			}
 
@@ -69,7 +69,7 @@ function rewriteLinks(
 				{ id: emailLogId, url: cleanUrl },
 				mailConfig.TRACKING_SECRET,
 			);
-			const trackingUrl = `${baseUrl}/track/click/${token}`;
+			const trackingUrl = `${baseUrl}/redirect/${token}`;
 
 			return `${prefix}${quote}${trackingUrl}${quote}`;
 		},

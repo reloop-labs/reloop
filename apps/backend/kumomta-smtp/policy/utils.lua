@@ -88,13 +88,13 @@ function utils.inject_tracking(data, email_log_id, tracking_domain, click_tracki
     -- Rewrite href links in the now-joined content
     data = data:gsub('(href=3D?["\']?)(https?://[^"%s >]+)(["\']?)', function(prefix, url, suffix)
       -- Skip if already tracked
-      if url:find("/track/click") or url:find("/api/mail/v1/track/click") then
+      if url:find("/redirect/") then
         return nil
       end
       -- Clean &amp; entity and QP =3D artifacts before encoding
       local clean_url = url:gsub("&[aA][mM][pP];", "&"):gsub("=3D", "=")
       local click_token = utils.encode_tracking_token(email_log_id, clean_url)
-      local tracked_url = string.format("%s/api/mail/v1/track/click/%s", tracking_base_url, click_token)
+      local tracked_url = string.format("%s/redirect/%s", tracking_base_url, click_token)
       return prefix .. tracked_url .. suffix
     end)
   end

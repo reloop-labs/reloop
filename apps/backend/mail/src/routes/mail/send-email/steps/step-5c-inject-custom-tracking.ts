@@ -59,7 +59,7 @@ function rewriteLinks(
 			) {
 				return match;
 			}
-			if (originalUrl.includes(`${baseUrl}/track/click/`)) {
+			if (originalUrl.includes(`${baseUrl}/redirect/`)) {
 				return match;
 			}
 			const cleanUrl = originalUrl.replace(/&amp;/gi, "&");
@@ -67,7 +67,7 @@ function rewriteLinks(
 				{ id: emailLogId, url: cleanUrl },
 				mailConfig.TRACKING_SECRET,
 			);
-			const trackingUrl = `${baseUrl}/track/click/${token}`;
+			const trackingUrl = `${baseUrl}/redirect/${token}`;
 
 			return `${prefix}${quote}${trackingUrl}${quote}`;
 		},
