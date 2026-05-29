@@ -35,7 +35,8 @@ function utils.encode_tracking_token(email_log_id, url)
   end
 
   -- HMAC-SHA256, take first 16 hex chars (matches TS: .digest("hex").slice(0, 16))
-  local sig = _kumo.digest.hmac_sha256(constants.tracking_secret, signed_content).hex:sub(1, 16)
+  local key_source = { key_data = constants.tracking_secret }
+  local sig = _kumo.digest.hmac_sha256(key_source, signed_content).hex:sub(1, 16)
 
   local token_obj
   if url then
