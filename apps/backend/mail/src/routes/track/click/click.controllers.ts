@@ -47,11 +47,46 @@ export async function handleClickTracking({
 
 		if (!isSignatureValid) {
 			// Fallback: check if the URL exists in the email HTML or plain text body.
-			// In HTML, characters like '&' in URLs are often escaped as '&amp;'.
-			const urlInHtml =
-				logEntry.htmlBody?.includes(url) ||
-				logEntry.htmlBody?.includes(url.replace(/&/g, "&amp;"));
-			const urlInText = logEntry.textBody?.includes(url);
+			// Decode and normalize URLs to prevent encoding mismatches (like @ vs %40).
+			let decodedTarget = url;
+			try {
+				decodedTarget = decodeURIComponent(url);
+			} catch {}
+
+			// Extract and decode all links in HTML body
+			const getDecodedHtmlLinks = (htmlContent: string | null | undefined): string[] => {
+				if (!htmlContent) return [];
+				const links: string[] = [];
+				const regex = /href=(["'])(.*?)\1/gi;
+				for (const match of htmlContent.matchAll(regex)) {
+					const rawLink = match[2];
+					if (rawLink) {
+						try {
+							const cleaned = rawLink.replace(/&amp;/gi, "&");
+							links.push(decodeURIComponent(cleaned));
+						} catch {
+							links.push(rawLink.replace(/&amp;/gi, "&"));
+						}
+					}
+				}
+				return links;
+			};
+
+			let urlInHtml = false;
+			if (logEntry.htmlBody) {
+				const htmlLinks = getDecodedHtmlLinks(logEntry.htmlBody);
+				urlInHtml = htmlLinks.includes(decodedTarget);
+			}
+
+			let urlInText = false;
+			if (logEntry.textBody) {
+				try {
+					const decodedText = decodeURIComponent(logEntry.textBody);
+					urlInText = decodedText.includes(decodedTarget);
+				} catch {
+					urlInText = logEntry.textBody.includes(url) || logEntry.textBody.includes(decodedTarget);
+				}
+			}
 
 			if (!urlInHtml && !urlInText) {
 				log.warn({
