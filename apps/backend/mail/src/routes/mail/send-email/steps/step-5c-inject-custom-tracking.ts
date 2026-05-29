@@ -83,7 +83,7 @@ function injectOpenPixel(
 		{ id: emailLogId },
 		mailConfig.TRACKING_SECRET,
 	);
-	const pixelUrl = `${baseUrl}/track/open/${token}`;
+	const pixelUrl = `${baseUrl}/api/mail/v1/track/open/${token}`;
 	const pixel = `<img src="${pixelUrl}" width="1" height="1" alt="" style="display:none;border:0;" />`;
 
 	const bodyCloseIndex = html.lastIndexOf("</body>");
