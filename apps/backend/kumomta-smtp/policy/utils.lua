@@ -82,14 +82,17 @@ function utils.inject_tracking(data, email_log_id, tracking_domain, click_tracki
 
   -- 2. Rewrite links (if click tracking enabled)
   if click_tracking then
-    -- Aggressive approach for raw MIME/Quoted-Printable: href=3D"URL" or href="URL"
+    -- Join QP soft line breaks (=\r\n) so href URLs are not split across lines
+    data = data:gsub("=\r?\n", "")
+
+    -- Rewrite href links in the now-joined content
     data = data:gsub('(href=3D?["\']?)(https?://[^"%s >]+)(["\']?)', function(prefix, url, suffix)
       -- Skip if already tracked
       if url:find("/track/click") or url:find("/api/mail/v1/track/click") then
         return nil
       end
-      -- Clean &amp; entity before encoding
-      local clean_url = url:gsub("&[aA][mM][pP];", "&")
+      -- Clean &amp; entity and QP =3D artifacts before encoding
+      local clean_url = url:gsub("&[aA][mM][pP];", "&"):gsub("=3D", "=")
       local click_token = utils.encode_tracking_token(email_log_id, clean_url)
       local tracked_url = string.format("%s/api/mail/v1/track/click/%s", tracking_base_url, click_token)
       return prefix .. tracked_url .. suffix
