@@ -1,6 +1,7 @@
 local kumo = require 'kumo'
 local constants = require 'policy.constants'
 local utils = require 'policy.utils'
+utils.init(kumo)
 
 -- Helper function to apply business logic to both SMTP and HTTP generated messages
 local function apply_reloop_logic(msg, api_key)

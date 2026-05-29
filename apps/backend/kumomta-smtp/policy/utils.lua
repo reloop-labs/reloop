@@ -2,6 +2,12 @@ local constants = require 'policy.constants'
 
 local utils = {}
 
+-- kumo runtime reference, set via utils.init(kumo) from smtp.lua
+local _kumo
+
+function utils.init(kumo_ref)
+  _kumo = kumo_ref
+end
 
 function utils.url_encode(str)
   if str then
@@ -29,7 +35,7 @@ function utils.encode_tracking_token(email_log_id, url)
   end
 
   -- HMAC-SHA256, take first 16 hex chars (matches TS: .digest("hex").slice(0, 16))
-  local sig = kumo.digest.hmac_sha256(constants.tracking_secret, signed_content).hex:sub(1, 16)
+  local sig = _kumo.digest.hmac_sha256(constants.tracking_secret, signed_content).hex:sub(1, 16)
 
   local token_obj
   if url then
@@ -38,8 +44,8 @@ function utils.encode_tracking_token(email_log_id, url)
     token_obj = { id = email_log_id, s = sig }
   end
 
-  local json_str = kumo.serde.json_encode(token_obj)
-  return kumo.encode.base64url_nopad_encode(json_str)
+  local json_str = _kumo.serde.json_encode(token_obj)
+  return _kumo.encode.base64url_nopad_encode(json_str)
 end
 
 function utils.inject_tracking(data, email_log_id, tracking_domain, click_tracking, open_tracking)
