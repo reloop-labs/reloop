@@ -113,7 +113,7 @@ export const ContactTable = ({
 	};
 
 	return (
-		<div className="w-full overflow-hidden rounded-[14px] text-paragraph-sm">
+		<div className="w-full text-paragraph-sm">
 			{/* Table Header */}
 			<div className="grid grid-cols-[1fr_minmax(200px,auto)_140px_minmax(40px,auto)] items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-bg-weak-50/40">
 				<div className="flex items-center gap-1">
@@ -132,7 +132,7 @@ export const ContactTable = ({
 			</div>
 
 			{/* Table Body */}
-			<div className="-mt-2.5 divide-y divide-stroke-soft-100 rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
+			<div className="-mt-2.5 overflow-hidden divide-y divide-stroke-soft-100 rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
 				{isLoading ? (
 					Array.from({ length: loadingRows }).map((_, i) => (
 						<ContactSkeleton key={`skeleton-${i}`} />

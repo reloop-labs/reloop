@@ -112,7 +112,7 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 				)}
 			</div>
 
-			<div className="w-full overflow-hidden rounded-[14px] text-paragraph-sm">
+			<div className="w-full text-paragraph-sm">
 				<div
 					className={`grid ${GRID_COLS} items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-bg-weak-50/40`}
 				>
@@ -135,7 +135,7 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 					<div />
 				</div>
 
-				<div className={cn("-mt-2.5 divide-y rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40", DIVIDER)}>
+				<div className={cn("-mt-2.5 overflow-hidden divide-y rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40", DIVIDER)}>
 					{loading
 						? Array.from({ length: 3 }).map((_, i) => (
 								<div key={i} className={`grid ${GRID_COLS} px-4 py-2`}>

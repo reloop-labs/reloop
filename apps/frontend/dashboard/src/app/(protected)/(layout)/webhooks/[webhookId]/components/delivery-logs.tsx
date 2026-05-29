@@ -384,7 +384,7 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 				{/* LEFT — Delivery logs list */}
 				<div
 					className={cn(
-						"w-full overflow-hidden rounded-[14px] text-paragraph-sm",
+						"w-full text-paragraph-sm",
 						!isMobile &&
 							"sticky top-4 max-h-[calc(100vh-100px)] w-[480px] shrink-0 overflow-y-auto",
 					)}
@@ -424,7 +424,7 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 							<span className="font-medium">Code</span>
 						</div>
 					</div>
-					<div className="-mt-2.5 divide-y divide-stroke-soft-100 rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/50">
+					<div className="-mt-2.5 overflow-hidden divide-y divide-stroke-soft-100 rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/50">
 						{isLoading ? (
 							Array.from({ length: 5 }).map((_, i) => (
 								<DeliverySkeleton key={i} isMobile={isMobile} />
