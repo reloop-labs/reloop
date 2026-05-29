@@ -19,11 +19,10 @@ export default function RedirectPage() {
 				}
 			} catch {}
 
-			const apiBaseUrl =
-				process.env.NEXT_PUBLIC_URL || "https://local.reloop.sh/api";
+			const siteUrl = (process.env.NEXT_PUBLIC_URL || "https://local.reloop.sh").replace(/\/+$/, "");
 
 			try {
-				const res = await fetch(`${apiBaseUrl}/mail/v1/track/click/${token}`, {
+				const res = await fetch(`${siteUrl}/api/mail/v1/track/click/${token}`, {
 					method: "GET",
 					redirect: "manual",
 				});
