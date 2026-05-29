@@ -145,8 +145,7 @@ export async function logIncomingController({
 		isDomainVerified &&
 		domainRecord.isTrackingDomain &&
 		domainRecord.trackingSubdomain &&
-		(domainRecord.isClickTrackingEnabled ||
-			domainRecord.isOpenTrackingEnabled);
+		(domainRecord.isClickTrackingEnabled || domainRecord.isOpenTrackingEnabled);
 
 	const trackingDomain = hasCustomTracking
 		? `${domainRecord.trackingSubdomain}.${domainRecord.domain}`

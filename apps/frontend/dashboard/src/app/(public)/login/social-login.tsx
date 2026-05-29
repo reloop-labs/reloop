@@ -6,7 +6,7 @@ import { Icon } from "@reloop/ui/icon";
 import * as LinkButton from "@reloop/ui/link-button";
 import Spinner from "@reloop/ui/spinner";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export function SocialLogin({
 	onContinueWithEmail,
@@ -15,7 +15,14 @@ export function SocialLogin({
 	onContinueWithEmail: () => void;
 	inviteId?: string;
 }) {
-	const lastLoggedIn = authClient.getLastUsedLoginMethod();
+	const [lastLoggedIn, setLastLoggedIn] = useState<string | undefined>(
+		undefined,
+	);
+
+	useEffect(() => {
+		setLastLoggedIn(authClient.getLastUsedLoginMethod() || undefined);
+	}, []);
+
 	const [loading, setLoading] = useState<{
 		name: "google" | "github" | "email";
 		loading: boolean;
