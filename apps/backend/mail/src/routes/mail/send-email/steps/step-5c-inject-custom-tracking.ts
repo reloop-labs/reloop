@@ -1,4 +1,4 @@
-import { encodeTrackingToken } from "@reloop/be-mail/lib/crypto";
+import { type ClickTrackingPayload, decodeTrackingToken, encodeTrackingToken } from "@reloop/be-mail/lib/crypto";
 import { mailConfig } from "@reloop/be-mail/mail.config";
 
 /**
@@ -32,9 +32,8 @@ export function injectCustomTracking_step5c({
 	const baseUrl = `${protocol}${trackingDomain}`;
 	let result = html;
 
-	if (clickTracking) {
-		result = rewriteLinks(result, emailLogId, baseUrl);
-	}
+	// Always rewrite links to use /redirect/, passing clickTracking flag to helper
+	result = rewriteLinks(result, emailLogId, baseUrl, clickTracking);
 
 	if (openTracking) {
 		result = injectOpenPixel(result, emailLogId, baseUrl);
@@ -49,6 +48,7 @@ function rewriteLinks(
 	html: string,
 	emailLogId: string,
 	baseUrl: string,
+	clickTracking: boolean,
 ): string {
 	return html.replace(
 		/(<a\s[^>]*href=)(["'])([^"']+)\2/gi,
@@ -59,14 +59,44 @@ function rewriteLinks(
 			) {
 				return match;
 			}
-			if (originalUrl.includes(`${baseUrl}/redirect/`)) {
-				return match;
+
+			let cleanUrl = originalUrl.replace(/&amp;/gi, "&");
+
+			// Check if it is already a redirect URL
+			const redirectMatch = cleanUrl.match(/\/redirect\/([^/?#"]+)/);
+			if (redirectMatch) {
+				const existingToken = redirectMatch[1];
+				const decoded = decodeTrackingToken<ClickTrackingPayload>(
+					existingToken,
+					mailConfig.TRACKING_SECRET,
+				);
+				if (decoded?.url) {
+					cleanUrl = decoded.url;
+				} else {
+					// Fallback: decode without signature verification
+					try {
+						const json = Buffer.from(existingToken, "base64url").toString("utf-8");
+						const obj = JSON.parse(json) as { url?: string };
+						if (obj.url) {
+							cleanUrl = obj.url;
+						} else {
+							return match;
+						}
+					} catch {
+						return match;
+					}
+				}
 			}
-			const cleanUrl = originalUrl.replace(/&amp;/gi, "&");
-			const token = encodeTrackingToken(
-				{ id: emailLogId, url: cleanUrl },
-				mailConfig.TRACKING_SECRET,
-			);
+
+			let token: string;
+			if (clickTracking) {
+				token = encodeTrackingToken(
+					{ id: emailLogId, url: cleanUrl },
+					mailConfig.TRACKING_SECRET,
+				);
+			} else {
+				token = Buffer.from(JSON.stringify({ url: cleanUrl })).toString("base64url");
+			}
 			const trackingUrl = `${baseUrl}/redirect/${token}`;
 
 			return `${prefix}${quote}${trackingUrl}${quote}`;

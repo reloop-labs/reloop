@@ -15,7 +15,22 @@ export async function handleClickTracking({ token }: { token: string }) {
 		mailConfig.TRACKING_SECRET,
 	);
 
-	if (!payload || !payload.url) {
+	let isTracked = true;
+	let url = payload?.url;
+
+	if (!payload) {
+		// Fallback: decode without signature verification (untracked redirect when clickTracking is disabled)
+		try {
+			const json = Buffer.from(token, "base64url").toString("utf-8");
+			const obj = JSON.parse(json) as { url?: string };
+			if (obj.url) {
+				url = obj.url;
+				isTracked = false;
+			}
+		} catch {}
+	}
+
+	if (!url) {
 		log.warn({
 			...{ token },
 			message: "Click tracking rejected: Invalid or tampered token",
@@ -23,43 +38,45 @@ export async function handleClickTracking({ token }: { token: string }) {
 		throw MailErrors.invalidTrackingSignature();
 	}
 
-	const { id: emailLogId, url } = payload;
+	if (isTracked && payload) {
+		const { id: emailLogId } = payload;
 
-	try {
-		const logEntry = await db.query.emailLog.findFirst({
-			where: eq(emailLog.id, emailLogId),
-		});
-
-		if (!logEntry) {
-			log.warn({
-				...{ emailLogId, url },
-				message: "Click tracking failed: Email log not found",
+		try {
+			const logEntry = await db.query.emailLog.findFirst({
+				where: eq(emailLog.id, emailLogId),
 			});
-			throw MailErrors.invalidTrackingSignature();
-		}
 
-		await db.insert(emailEvent).values({
-			emailLogId,
-			type: "clicked",
-			metadata: {
-				url,
-			},
-		});
-		log.info({ ...{ emailLogId, url }, message: "Email click tracked" });
-	} catch (error) {
-		// Re-throw if it's already a structured error
-		if (error && typeof error === "object" && "status" in error) {
-			throw error;
-		}
+			if (!logEntry) {
+				log.warn({
+					...{ emailLogId, url },
+					message: "Click tracking failed: Email log not found",
+				});
+				throw MailErrors.invalidTrackingSignature();
+			}
 
-		log.error({
-			...{
-				error: error instanceof Error ? error.message : "Unknown error",
+			await db.insert(emailEvent).values({
 				emailLogId,
-				url,
-			},
-			message: "Failed to track email click",
-		});
+				type: "clicked",
+				metadata: {
+					url,
+				},
+			});
+			log.info({ ...{ emailLogId, url }, message: "Email click tracked" });
+		} catch (error) {
+			// Re-throw if it's already a structured error
+			if (error && typeof error === "object" && "status" in error) {
+				throw error;
+			}
+
+			log.error({
+				...{
+					error: error instanceof Error ? error.message : "Unknown error",
+					emailLogId,
+					url,
+				},
+				message: "Failed to track email click",
+			});
+		}
 	}
 
 	return Response.redirect(url, 302);

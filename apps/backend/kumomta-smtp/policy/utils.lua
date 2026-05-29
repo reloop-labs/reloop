@@ -26,27 +26,69 @@ end
 ---
 --- For open tracking  → encode_tracking_token(emailLogId, nil)
 --- For click tracking → encode_tracking_token(emailLogId, destinationUrl)
-function utils.encode_tracking_token(email_log_id, url)
-  local signed_content
-  if url then
-    signed_content = email_log_id .. ":" .. url
-  else
-    signed_content = email_log_id
-  end
-
-  -- HMAC-SHA256, take first 16 hex chars (matches TS: .digest("hex").slice(0, 16))
-  local key_source = { key_data = constants.tracking_secret }
-  local sig = _kumo.digest.hmac_sha256(key_source, signed_content).hex:sub(1, 16)
+function utils.encode_tracking_token(email_log_id, url, click_tracking)
+  if click_tracking == nil then click_tracking = true end
 
   local token_obj
-  if url then
-    token_obj = { id = email_log_id, url = url, s = sig }
+  if click_tracking then
+    local signed_content
+    if url then
+      signed_content = email_log_id .. ":" .. url
+    else
+      signed_content = email_log_id
+    end
+
+    -- HMAC-SHA256, take first 16 hex chars (matches TS: .digest("hex").slice(0, 16))
+    local key_source = { key_data = constants.tracking_secret }
+    local sig = _kumo.digest.hmac_sha256(key_source, signed_content).hex:sub(1, 16)
+
+    if url then
+      token_obj = { id = email_log_id, url = url, s = sig }
+    else
+      token_obj = { id = email_log_id, s = sig }
+    end
   else
-    token_obj = { id = email_log_id, s = sig }
+    if url then
+      token_obj = { url = url }
+    else
+      token_obj = {}
+    end
   end
 
   local json_str = _kumo.serde.json_encode(token_obj)
   return _kumo.encode.base64url_nopad_encode(json_str)
+end
+
+function utils.decode_tracking_token(token)
+  local status, json_str = pcall(function()
+    return _kumo.encode.base64url_nopad_decode(token)
+  end)
+  if not status or not json_str then
+    return nil
+  end
+
+  local parse_status, obj = pcall(function()
+    return _kumo.serde.json_parse(json_str)
+  end)
+  if not parse_status or not obj or not obj.id or not obj.s then
+    return nil
+  end
+
+  -- Verify signature
+  local signed_content
+  if obj.url then
+    signed_content = obj.id .. ":" .. obj.url
+  else
+    signed_content = obj.id
+  end
+
+  local key_source = { key_data = constants.tracking_secret }
+  local sig = _kumo.digest.hmac_sha256(key_source, signed_content).hex:sub(1, 16)
+
+  if sig == obj.s then
+    return obj
+  end
+  return nil
 end
 
 function utils.inject_tracking(data, email_log_id, tracking_domain, click_tracking, open_tracking)
@@ -80,27 +122,47 @@ function utils.inject_tracking(data, email_log_id, tracking_domain, click_tracki
     end
   end
 
-  -- 2. Rewrite links (if click tracking enabled)
-  if click_tracking then
-    -- Join QP soft line breaks (=\r\n) so href URLs are not split across lines
-    data = data:gsub("=\r?\n", "")
+  -- 2. Rewrite links (always, using click_tracking flag)
+  -- Join QP soft line breaks (=\r\n) so href URLs are not split across lines
+  data = data:gsub("=\r?\n", "")
 
-    -- Rewrite href links in the now-joined content
-    data = data:gsub('(href=3D?["\']?)(https?://[^"%s >]+)(["\']?)', function(prefix, url, suffix)
-      -- Skip if already tracked
-      if url:find("/redirect/") then
-        return nil
+  -- Rewrite href links in the now-joined content
+  data = data:gsub('(href=3D?["\']?)(https?://[^"%s >]+)(["\']?)', function(prefix, url, suffix)
+    -- Clean &amp; entity and QP =3D artifacts before encoding
+    local clean_url = url:gsub("&[aA][mM][pP];", "&"):gsub("=3D", "=")
+
+    -- Check if it is already a redirect URL
+    local existing_token = clean_url:match("/redirect/([%w%-_]+)")
+    if existing_token then
+      local decoded = utils.decode_tracking_token(existing_token)
+      if decoded and decoded.url then
+        clean_url = decoded.url
+      else
+        -- Fallback: decode without signature verification
+        local status, json_str = pcall(function()
+          return _kumo.encode.base64url_nopad_decode(existing_token)
+        end)
+        if status and json_str then
+          local parse_status, obj = pcall(function()
+            return _kumo.serde.json_parse(json_str)
+          end)
+          if parse_status and obj and obj.url then
+            clean_url = obj.url
+          else
+            return nil
+          end
+        else
+          return nil
+        end
       end
-      -- Clean &amp; entity and QP =3D artifacts before encoding
-      local clean_url = url:gsub("&[aA][mM][pP];", "&"):gsub("=3D", "=")
-      local click_token = utils.encode_tracking_token(email_log_id, clean_url)
-      local tracked_url = string.format("%s/redirect/%s", tracking_base_url, click_token)
-      return prefix .. tracked_url .. suffix
-    end)
-  end
+    end
+
+    local click_token = utils.encode_tracking_token(email_log_id, clean_url, click_tracking)
+    local tracked_url = string.format("%s/redirect/%s", tracking_base_url, click_token)
+    return prefix .. tracked_url .. suffix
+  end)
 
   return data
 end
 
 return utils
-
