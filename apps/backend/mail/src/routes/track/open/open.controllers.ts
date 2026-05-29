@@ -1,33 +1,28 @@
-import { signTrackingUrl } from "@reloop/be-mail/lib/crypto";
+import {
+	type OpenTrackingPayload,
+	decodeTrackingToken,
+} from "@reloop/be-mail/lib/crypto";
 import { mailConfig } from "@reloop/be-mail/mail.config";
 import { db } from "@reloop/db/client";
 import { emailEvent, emailLog } from "@reloop/db/schema";
 import { eq } from "drizzle-orm";
 import { log } from "evlog";
-import { useLogger } from "evlog/elysia";
 
 const TRANSPARENT_PIXEL = Buffer.from(
 	"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=",
 	"base64",
 );
 
-export async function handleOpenTracking({
-	emailLogId,
-	sig,
-}: {
-	emailLogId: string;
-	sig: string;
-}) {
-	const logger = useLogger();
-	const expectedSig = signTrackingUrl(emailLogId, mailConfig.TRACKING_SECRET);
-	if (sig !== expectedSig) {
+export async function handleOpenTracking({ token }: { token: string }) {
+	const payload = decodeTrackingToken<OpenTrackingPayload>(
+		token,
+		mailConfig.TRACKING_SECRET,
+	);
+
+	if (!payload) {
 		log.warn({
-			...{
-				emailLogId,
-				sig,
-				expectedSig,
-			},
-			message: "Open tracking rejected: Invalid signature",
+			...{ token },
+			message: "Open tracking rejected: Invalid or tampered token",
 		});
 		return new Response(TRANSPARENT_PIXEL, {
 			headers: {
@@ -36,6 +31,8 @@ export async function handleOpenTracking({
 			},
 		});
 	}
+
+	const { id: emailLogId } = payload;
 
 	try {
 		const logEntry = await db.query.emailLog.findFirst({

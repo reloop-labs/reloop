@@ -6,26 +6,15 @@ const TRANSPARENT_PIXEL = Buffer.from(
 );
 
 interface OpenRouteContext {
-	params: Promise<{ emailLogId: string }>;
+	params: Promise<{ token: string }>;
 }
 
 export async function GET(request: NextRequest, context: OpenRouteContext) {
-	const { emailLogId } = await context.params;
-	const { searchParams } = new URL(request.url);
-	const sig = searchParams.get("sig");
-
-	if (!sig) {
-		return new NextResponse(TRANSPARENT_PIXEL, {
-			headers: {
-				"Content-Type": "image/png",
-				"Cache-Control": "no-cache, no-store, must-revalidate",
-			},
-		});
-	}
+	const { token } = await context.params;
 
 	const apiBaseUrl =
 		process.env.NEXT_PUBLIC_API_URL || "https://local.reloop.sh/api";
-	const trackingEndpoint = `${apiBaseUrl}/mail/v1/track/open/${emailLogId}?sig=${sig}`;
+	const trackingEndpoint = `${apiBaseUrl}/mail/v1/track/open/${token}`;
 
 	try {
 		// Forward request to backend to register the open event

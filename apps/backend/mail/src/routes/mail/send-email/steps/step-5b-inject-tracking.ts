@@ -1,4 +1,4 @@
-import { signTrackingUrl } from "@reloop/be-mail/lib/crypto";
+import { encodeTrackingToken } from "@reloop/be-mail/lib/crypto";
 import { mailConfig } from "@reloop/be-mail/mail.config";
 
 /**
@@ -6,7 +6,7 @@ import { mailConfig } from "@reloop/be-mail/mail.config";
  * the domain's clickTracking / openTracking flags.
  *
  * - Click tracking: each <a href="..."> is proxied through
- *   /track/click/:emailLogId?url=<encoded>&sig=<hmac>
+ *   /track/click/:token  (base64url-encoded payload with embedded HMAC)
  * - Open tracking: a 1×1 transparent pixel is appended before </body>
  *
  * No DB query — flags come from the domain record already fetched in step-2.
@@ -65,9 +65,11 @@ function rewriteLinks(
 
 			// Decode HTML entities — href attributes encode & as &amp;
 			const cleanUrl = originalUrl.replace(/&amp;/gi, "&");
-			const encodedUrl = encodeURIComponent(cleanUrl);
-			const sig = signTrackingUrl(cleanUrl, mailConfig.TRACKING_SECRET);
-			const trackingUrl = `${baseUrl}/track/click/${emailLogId}?url=${encodedUrl}&sig=${sig}`;
+			const token = encodeTrackingToken(
+				{ id: emailLogId, url: cleanUrl },
+				mailConfig.TRACKING_SECRET,
+			);
+			const trackingUrl = `${baseUrl}/track/click/${token}`;
 
 			return `${prefix}${quote}${trackingUrl}${quote}`;
 		},
@@ -83,8 +85,8 @@ function injectOpenPixel(
 	emailLogId: string,
 	baseUrl: string,
 ): string {
-	const sig = signTrackingUrl(emailLogId, mailConfig.TRACKING_SECRET);
-	const pixelUrl = `${baseUrl}/track/open/${emailLogId}?sig=${sig}`;
+	const token = encodeTrackingToken({ id: emailLogId }, mailConfig.TRACKING_SECRET);
+	const pixelUrl = `${baseUrl}/track/open/${token}`;
 	const pixel = `<img src="${pixelUrl}" width="1" height="1" alt="" style="display:none;border:0;" />`;
 
 	const bodyCloseIndex = html.lastIndexOf("</body>");

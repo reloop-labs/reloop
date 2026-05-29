@@ -1,4 +1,4 @@
-import { signTrackingUrl } from "@reloop/be-mail/lib/crypto";
+import { encodeTrackingToken } from "@reloop/be-mail/lib/crypto";
 import { mailConfig } from "@reloop/be-mail/mail.config";
 
 /**
@@ -63,9 +63,11 @@ function rewriteLinks(
 				return match;
 			}
 			const cleanUrl = originalUrl.replace(/&amp;/gi, "&");
-			const encodedUrl = encodeURIComponent(cleanUrl);
-			const sig = signTrackingUrl(cleanUrl, mailConfig.TRACKING_SECRET);
-			const trackingUrl = `${baseUrl}/track/click/${emailLogId}?url=${encodedUrl}&sig=${sig}`;
+			const token = encodeTrackingToken(
+				{ id: emailLogId, url: cleanUrl },
+				mailConfig.TRACKING_SECRET,
+			);
+			const trackingUrl = `${baseUrl}/track/click/${token}`;
 
 			return `${prefix}${quote}${trackingUrl}${quote}`;
 		},
@@ -77,8 +79,8 @@ function injectOpenPixel(
 	emailLogId: string,
 	baseUrl: string,
 ): string {
-	const sig = signTrackingUrl(emailLogId, mailConfig.TRACKING_SECRET);
-	const pixelUrl = `${baseUrl}/track/open/${emailLogId}?sig=${sig}`;
+	const token = encodeTrackingToken({ id: emailLogId }, mailConfig.TRACKING_SECRET);
+	const pixelUrl = `${baseUrl}/track/open/${token}`;
 	const pixel = `<img src="${pixelUrl}" width="1" height="1" alt="" style="display:none;border:0;" />`;
 
 	const bodyCloseIndex = html.lastIndexOf("</body>");

@@ -5,15 +5,10 @@ import { handleClickTracking } from "./click.controllers";
 export const clickRoute = new Elysia()
 	.use(evlog())
 	.get(
-		"/click/:emailLogId",
-		({ params: { emailLogId }, query: { url, sig } }) =>
-			handleClickTracking({ emailLogId, url, sig }),
+		"/click/:token",
+		({ params: { token } }) => handleClickTracking({ token }),
 		{
-			params: t.Object({ emailLogId: t.String() }),
-			query: t.Object({
-				url: t.String({ format: "uri" }),
-				sig: t.Optional(t.String()),
-			}),
+			params: t.Object({ token: t.String() }),
 			detail: {
 				summary: "Track Email Click",
 				description:

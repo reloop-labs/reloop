@@ -1,4 +1,7 @@
-import { signTrackingUrl } from "@reloop/be-mail/lib/crypto";
+import {
+	type ClickTrackingPayload,
+	decodeTrackingToken,
+} from "@reloop/be-mail/lib/crypto";
 import { MailErrors } from "@reloop/be-mail/lib/errors";
 import { mailConfig } from "@reloop/be-mail/mail.config";
 import { db } from "@reloop/db/client";
@@ -6,28 +9,21 @@ import { emailEvent, emailLog } from "@reloop/db/schema";
 import { eq } from "drizzle-orm";
 import { log } from "evlog";
 
-export async function handleClickTracking({
-	emailLogId,
-	url: rawUrl,
-	sig,
-}: {
-	emailLogId: string;
-	url: string;
-	sig?: string;
-}) {
-	if (!rawUrl) {
-		throw MailErrors.invalidTrackingUrl("missing");
+export async function handleClickTracking({ token }: { token: string }) {
+	const payload = decodeTrackingToken<ClickTrackingPayload>(
+		token,
+		mailConfig.TRACKING_SECRET,
+	);
+
+	if (!payload || !payload.url) {
+		log.warn({
+			...{ token },
+			message: "Click tracking rejected: Invalid or tampered token",
+		});
+		throw MailErrors.invalidTrackingSignature();
 	}
 
-	// Clean the URL by decoding any HTML entity '&amp;' (case-insensitive)
-	const url = rawUrl.replace(/&amp;/gi, "&");
-
-	// Verify signature to prevent Open Redirect
-	let isSignatureValid = false;
-	if (sig) {
-		const expectedSig = signTrackingUrl(url, mailConfig.TRACKING_SECRET);
-		isSignatureValid = sig === expectedSig;
-	}
+	const { id: emailLogId, url } = payload;
 
 	try {
 		const logEntry = await db.query.emailLog.findFirst({
@@ -36,70 +32,10 @@ export async function handleClickTracking({
 
 		if (!logEntry) {
 			log.warn({
-				...{
-					emailLogId,
-					url,
-				},
+				...{ emailLogId, url },
 				message: "Click tracking failed: Email log not found",
 			});
 			throw MailErrors.invalidTrackingSignature();
-		}
-
-		if (!isSignatureValid) {
-			// Fallback: check if the URL exists in the email HTML or plain text body.
-			// Decode and normalize URLs to prevent encoding mismatches (like @ vs %40).
-			let decodedTarget = url;
-			try {
-				decodedTarget = decodeURIComponent(url);
-			} catch {}
-
-			// Extract and decode all links in HTML body
-			const getDecodedHtmlLinks = (htmlContent: string | null | undefined): string[] => {
-				if (!htmlContent) return [];
-				const links: string[] = [];
-				const regex = /href=(["'])(.*?)\1/gi;
-				for (const match of htmlContent.matchAll(regex)) {
-					const rawLink = match[2];
-					if (rawLink) {
-						try {
-							const cleaned = rawLink.replace(/&amp;/gi, "&");
-							links.push(decodeURIComponent(cleaned));
-						} catch {
-							links.push(rawLink.replace(/&amp;/gi, "&"));
-						}
-					}
-				}
-				return links;
-			};
-
-			let urlInHtml = false;
-			if (logEntry.htmlBody) {
-				const htmlLinks = getDecodedHtmlLinks(logEntry.htmlBody);
-				urlInHtml = htmlLinks.includes(decodedTarget);
-			}
-
-			let urlInText = false;
-			if (logEntry.textBody) {
-				try {
-					const decodedText = decodeURIComponent(logEntry.textBody);
-					urlInText = decodedText.includes(decodedTarget);
-				} catch {
-					urlInText = logEntry.textBody.includes(url) || logEntry.textBody.includes(decodedTarget);
-				}
-			}
-
-			if (!urlInHtml && !urlInText) {
-				log.warn({
-					...{
-						emailLogId,
-						url,
-						sig,
-					},
-					message:
-						"Click tracking rejected: Invalid signature and URL not found in email body",
-				});
-				throw MailErrors.invalidTrackingSignature();
-			}
 		}
 
 		await db.insert(emailEvent).values({

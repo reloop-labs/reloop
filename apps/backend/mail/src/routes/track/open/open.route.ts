@@ -5,15 +5,11 @@ import { handleOpenTracking } from "./open.controllers";
 export const openRoute = new Elysia()
 	.use(evlog())
 	.get(
-		"/open/:emailLogId",
-		({ params: { emailLogId }, query: { sig } }) =>
-			handleOpenTracking({ emailLogId, sig: sig as string }),
+		"/open/:token",
+		({ params: { token } }) => handleOpenTracking({ token }),
 		{
 			params: t.Object({
-				emailLogId: t.String(),
-			}),
-			query: t.Object({
-				sig: t.String(),
+				token: t.String(),
 			}),
 			detail: {
 				summary: "Track Email Open",
