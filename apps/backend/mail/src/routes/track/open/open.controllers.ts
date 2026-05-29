@@ -1,6 +1,6 @@
 import {
-	type OpenTrackingPayload,
 	decodeTrackingToken,
+	type OpenTrackingPayload,
 } from "@reloop/be-mail/lib/crypto";
 import { mailConfig } from "@reloop/be-mail/mail.config";
 import { db } from "@reloop/db/client";

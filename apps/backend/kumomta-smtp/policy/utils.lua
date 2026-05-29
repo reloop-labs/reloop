@@ -2,6 +2,7 @@ local constants = require 'policy.constants'
 
 local utils = {}
 
+
 function utils.url_encode(str)
   if str then
     str = str:gsub("\n", "\r\n")
@@ -11,6 +12,34 @@ function utils.url_encode(str)
     str = str:gsub(" ", "+")
   end
   return str
+end
+
+--- Build a single base64url token that mirrors the TypeScript `encodeTrackingToken`.
+--- Token layout: base64url( JSON { id, [url], s } )
+---   where s = first 16 hex chars of HMAC-SHA256( id [+ ":" + url] , TRACKING_SECRET )
+---
+--- For open tracking  → encode_tracking_token(emailLogId, nil)
+--- For click tracking → encode_tracking_token(emailLogId, destinationUrl)
+function utils.encode_tracking_token(email_log_id, url)
+  local signed_content
+  if url then
+    signed_content = email_log_id .. ":" .. url
+  else
+    signed_content = email_log_id
+  end
+
+  -- HMAC-SHA256, take first 16 hex chars (matches TS: .digest("hex").slice(0, 16))
+  local sig = kumo.digest.hmac_sha256(constants.tracking_secret, signed_content).hex:sub(1, 16)
+
+  local token_obj
+  if url then
+    token_obj = { id = email_log_id, url = url, s = sig }
+  else
+    token_obj = { id = email_log_id, s = sig }
+  end
+
+  local json_str = kumo.serde.json_encode(token_obj)
+  return kumo.encode.base64url_nopad_encode(json_str)
 end
 
 function utils.inject_tracking(data, email_log_id, tracking_domain, click_tracking, open_tracking)
@@ -34,7 +63,8 @@ function utils.inject_tracking(data, email_log_id, tracking_domain, click_tracki
 
   -- 1. Inject pixel before </body> (if open tracking enabled)
   if open_tracking then
-    local pixel = string.format('<img src="%s/api/mail/v1/track/open/%s" width="1" height="1" style="display:none" alt="" />', tracking_base_url, email_log_id)
+    local open_token = utils.encode_tracking_token(email_log_id, nil)
+    local pixel = string.format('<img src="%s/api/mail/v1/track/open/%s" width="1" height="1" style="display:none" alt="" />', tracking_base_url, open_token)
     if data:find("</body>") then
       data = data:gsub("</body>", pixel .. "</body>")
     else
@@ -53,7 +83,8 @@ function utils.inject_tracking(data, email_log_id, tracking_domain, click_tracki
       end
       -- Clean &amp; entity before encoding
       local clean_url = url:gsub("&[aA][mM][pP];", "&")
-      local tracked_url = string.format("%s/api/mail/v1/track/click/%s?url=%s", tracking_base_url, email_log_id, utils.url_encode(clean_url))
+      local click_token = utils.encode_tracking_token(email_log_id, clean_url)
+      local tracked_url = string.format("%s/api/mail/v1/track/click/%s", tracking_base_url, click_token)
       return prefix .. tracked_url .. suffix
     end)
   end
@@ -62,3 +93,4 @@ function utils.inject_tracking(data, email_log_id, tracking_domain, click_tracki
 end
 
 return utils
+

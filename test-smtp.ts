@@ -4,7 +4,6 @@ import { render } from "@react-email/render";
 import nodemailer from "nodemailer";
 import React from "react";
 import { OTPTokenEmail } from "./apps/backend/email/emails/otp";
-import { db } from "./packages/db/src/client";
 
 async function run() {
 	const fromEmail = "sender@local.reloop.sh";

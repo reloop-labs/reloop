@@ -2,6 +2,7 @@ local constants = {}
 
 constants.env = os.getenv("NODE_ENV") or os.getenv("KUMOMTA_ENV") or "production"
 constants.base_url = os.getenv("BASE_URL") or "https://local.reloop.sh"
+constants.tracking_secret = os.getenv("TRACKING_SECRET") or "reloop_tracking_secret_default_123"
 
 -- 1. Get hostname from environment variable HOSTNAME (fallback to extracting from BASE_URL)
 local hostname = os.getenv("HOSTNAME")
