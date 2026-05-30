@@ -2,13 +2,19 @@
 
 import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
+import { useEffect, useState } from "react";
 
 export const HeaderAction = () => {
 	const { useSession } = authClient;
 	const { data: session, isPending } = useSession();
+	const [mounted, setMounted] = useState(false);
 
-	if (isPending) {
-		return <></>;
+	useEffect(() => {
+		setMounted(true);
+	}, []);
+
+	if (!mounted || isPending) {
+		return null;
 	}
 
 	if (session) {

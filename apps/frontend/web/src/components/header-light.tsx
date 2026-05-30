@@ -49,6 +49,11 @@ export const HeaderLight = () => {
 	const { data: session } = useSession();
 	const [scrolled, setScrolled] = useState(false);
 	const [activeMega, setActiveMega] = useState<string | null>(null);
+	const [mounted, setMounted] = useState(false);
+
+	useEffect(() => {
+		setMounted(true);
+	}, []);
 
 	useEffect(() => {
 		const handleScroll = () => {
@@ -163,10 +168,10 @@ export const HeaderLight = () => {
 						<span className="hidden sm:inline">GitHub</span>
 					</a>
 					<a
-						href={session ? "/dashboard" : "/dashboard/login"}
+						href={mounted && session ? "/dashboard" : "/dashboard/login"}
 						className="inline-flex items-center justify-center gap-2 rounded-[12px] bg-[#0a0d12] px-4 py-2 font-semibold text-[13px] text-white transition-all hover:scale-[1.02] active:scale-[0.98]"
 					>
-						{session ? "Dashboard" : "Login"}
+						{mounted && session ? "Dashboard" : "Login"}
 					</a>
 				</div>
 			</div>
