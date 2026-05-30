@@ -63,7 +63,12 @@ export const useDomainActions = (
 			await mutate(cacheKey, optimisticData, false);
 
 			try {
-				const apiPayload: any = {};
+				const apiPayload: {
+					sending_email?: boolean;
+					receiving_email?: boolean;
+					click_tracking?: boolean;
+					open_tracking?: boolean;
+				} = {};
 				if (payload.isSendingEmailEnabled !== undefined) {
 					apiPayload.sending_email = payload.isSendingEmailEnabled;
 				}
