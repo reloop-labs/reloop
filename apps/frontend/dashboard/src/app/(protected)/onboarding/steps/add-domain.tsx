@@ -2,7 +2,6 @@
 
 import type { DomainResponse } from "@fe/dashboard/types/api.types";
 import { valibotResolver } from "@hookform/resolvers/valibot";
-import * as Accordion from "@reloop/ui/accordion";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -37,6 +36,7 @@ export const AddDomainStep = () => {
 	const { register, handleSubmit, formState, setError, watch, control } =
 		useForm<DomainFormValues>({
 			resolver: valibotResolver(domainSchema) as Resolver<DomainFormValues>,
+			mode: "onChange",
 			defaultValues: {
 				domain: domain || "",
 				clickTracking: false,
@@ -62,8 +62,8 @@ export const AddDomainStep = () => {
 					domain: values.domain,
 					click_tracking: values.clickTracking,
 					open_tracking: values.openTracking,
-					custom_return_path: values.customReturnPath,
-					tracking: values.trackingSubdomain,
+					custom_return_path: values.customReturnPath || "receive",
+					tracking: values.trackingSubdomain || "links",
 					tls: "opportunistic",
 				},
 				{ headers: { credentials: "include" } },
@@ -139,6 +139,7 @@ export const AddDomainStep = () => {
 								register={register}
 								domain={watchedDomain}
 								isLoading={status === "loading"}
+								errors={formState.errors}
 							/>
 						</div>
 					)}

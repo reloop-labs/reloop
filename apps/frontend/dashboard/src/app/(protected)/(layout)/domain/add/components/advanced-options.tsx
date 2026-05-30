@@ -4,6 +4,7 @@ import * as Label from "@reloop/ui/label";
 import {
 	type Control,
 	Controller,
+	type FieldErrors,
 	type UseFormRegister,
 } from "react-hook-form";
 import type { DomainFormValues } from "../schema";
@@ -13,6 +14,7 @@ interface AdvancedOptionsProps {
 	register: UseFormRegister<DomainFormValues>;
 	isLoading: boolean;
 	domain?: string;
+	errors?: FieldErrors<DomainFormValues>;
 }
 
 export const AdvancedOptions = ({
@@ -20,6 +22,7 @@ export const AdvancedOptions = ({
 	register,
 	isLoading,
 	domain,
+	errors,
 }: AdvancedOptionsProps) => {
 	return (
 		<div className="grid grid-cols-1 gap-4">
@@ -30,7 +33,7 @@ export const AdvancedOptions = ({
 				>
 					Receiving email path
 				</Label.Root>
-				<Input.Root className="w-full" size="small">
+				<Input.Root hasError={!!errors?.customReturnPath} className="w-full" size="small">
 					<Input.Wrapper>
 						<Input.Input
 							id="customReturnPath"
@@ -45,6 +48,9 @@ export const AdvancedOptions = ({
 						)}
 					</Input.Wrapper>
 				</Input.Root>
+				{errors?.customReturnPath?.message && (
+					<p className="text-error-base text-xs">{errors.customReturnPath.message}</p>
+				)}
 			</div>
 
 			<div className="space-y-1">
@@ -54,7 +60,7 @@ export const AdvancedOptions = ({
 				>
 					Tracking Subdomain
 				</Label.Root>
-				<Input.Root className="w-full" size="small">
+				<Input.Root hasError={!!errors?.trackingSubdomain} className="w-full" size="small">
 					<Input.Wrapper>
 						<Input.Input
 							id="trackingSubdomain"
@@ -69,6 +75,9 @@ export const AdvancedOptions = ({
 						)}
 					</Input.Wrapper>
 				</Input.Root>
+				{errors?.trackingSubdomain?.message && (
+					<p className="text-error-base text-xs">{errors.trackingSubdomain.message}</p>
+				)}
 			</div>
 
 			<div className="space-y-2">

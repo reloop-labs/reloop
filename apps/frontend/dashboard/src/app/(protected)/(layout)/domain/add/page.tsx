@@ -30,6 +30,7 @@ const AddDomain = () => {
 	const { register, handleSubmit, formState, setError, watch, control } =
 		useForm<DomainFormValues>({
 			resolver: valibotResolver(domainSchema) as Resolver<DomainFormValues>,
+			mode: "onChange",
 			defaultValues: {
 				domain: "",
 				clickTracking: false,
@@ -58,8 +59,8 @@ const AddDomain = () => {
 					domain,
 					click_tracking: clickTracking,
 					open_tracking: openTracking,
-					custom_return_path: customReturnPath,
-					tracking: trackingSubdomain,
+					custom_return_path: customReturnPath || "receive",
+					tracking: trackingSubdomain || "links",
 					tls: "opportunistic",
 				},
 				{ headers: { credentials: "include" } },
@@ -121,6 +122,7 @@ const AddDomain = () => {
 									register={register}
 									domain={watch("domain")}
 									isLoading={status === "loading"}
+									errors={formState.errors}
 								/>
 							</div>
 						)}

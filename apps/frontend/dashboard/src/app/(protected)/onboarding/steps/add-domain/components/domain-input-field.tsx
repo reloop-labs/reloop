@@ -23,13 +23,25 @@ export const DomainInputField = ({
 		return domain.split(".").filter(Boolean);
 	}, [domain]);
 
+	const domainRegex = React.useMemo(() => {
+		return /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/;
+	}, []);
+
 	const criteria = React.useMemo(() => {
+		if (!domain) {
+			return {
+				isSubdomain: false,
+				isNotRoot: false,
+				isValid: false,
+			};
+		}
+		const isValid = domainRegex.test(domain);
 		return {
-			isSubdomain: domainParts.length > 2,
-			isNotRoot: domainParts.length > 2,
-			isValid: domainParts.length >= 2 && !!domain?.includes("."),
+			isSubdomain: isValid && domainParts.length > 2,
+			isNotRoot: isValid && domainParts.length > 2,
+			isValid: isValid,
 		};
-	}, [domain, domainParts]);
+	}, [domain, domainParts, domainRegex]);
 
 	return (
 		<section className="space-y-1">
@@ -127,8 +139,8 @@ export const DomainInputField = ({
 
 				{errors.domain && (
 					<div className="mt-2 flex items-center gap-2">
-						<Icon name="alert-circle" className="h-4 w-4 text-red-500" />
-						<p className="text-red-600 text-xs">{errors.domain.message}</p>
+						<Icon name="alert-circle" className="h-4 w-4 text-error-base" />
+						<p className="text-error-base text-xs">{errors.domain.message}</p>
 					</div>
 				)}
 			</div>
