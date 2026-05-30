@@ -98,7 +98,7 @@ const AddDomain = () => {
 						domain={watch("domain")}
 					/>
 
-					<div className="mt-4 w-full">
+					<div className="mt-2 w-full">
 						<button
 							type="button"
 							onClick={() => setIsAdvancedOpen(!isAdvancedOpen)}
@@ -124,7 +124,7 @@ const AddDomain = () => {
 									transition={{ duration: 0.2, ease: "easeInOut" }}
 									className="overflow-hidden"
 								>
-									<div className="mt-2 rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4">
+									<div className="my-2 rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4">
 										<AdvancedOptions
 											control={control}
 											register={register}
@@ -137,7 +137,7 @@ const AddDomain = () => {
 							)}
 						</AnimatePresence>
 					</div>
-					<div className="mt-6 flex items-center gap-3">
+					<div className="mt-3 flex items-center gap-3">
 						<Button.Root
 							type="submit"
 							variant="neutral"
