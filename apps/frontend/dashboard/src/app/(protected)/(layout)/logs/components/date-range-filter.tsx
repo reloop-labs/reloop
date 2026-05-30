@@ -5,7 +5,7 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Popover from "@reloop/ui/popover";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { DateRange } from "react-day-picker";
 import { LogsCalendar } from "./logs-calendar";
 
@@ -83,26 +83,28 @@ export const DateRangeFilter = ({
 	endDate,
 	activePreset,
 	onDateChange,
-	numberOfMonths = 1,
+	numberOfMonths = 2,
 }: DateRangeFilterProps) => {
 	const [isOpen, setIsOpen] = useState(false);
+	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
+	// Sync internal range with props when they change
 	const [calendarRange, setCalendarRange] = useState<DateRange | undefined>(
 		startDate && endDate
 			? { from: new Date(startDate), to: new Date(endDate) }
 			: undefined,
 	);
 
-	const activePresetIdx = DATE_PRESETS.findIndex(
-		(p) => p.value === activePreset,
-	);
-	const [hoverIdx, setHoverIdx] = useState<number | undefined>(
-		activePresetIdx >= 0 ? activePresetIdx : undefined,
-	);
+	// Update internal state when props change (e.g. from presets)
+	useEffect(() => {
+		if (startDate && endDate) {
+			setCalendarRange({ from: new Date(startDate), to: new Date(endDate) });
+		} else {
+			setCalendarRange(undefined);
+		}
+	}, [startDate, endDate]);
 
-	const resolvedIdx =
-		hoverIdx ?? (activePresetIdx >= 0 ? activePresetIdx : undefined);
-	const currentTab = buttonRefs.current[resolvedIdx ?? -1];
+	const currentTab = buttonRefs.current[hoverIdx ?? -1];
 	const currentRect = currentTab?.getBoundingClientRect();
 
 	const activePresetLabel =
@@ -120,24 +122,8 @@ export const DateRangeFilter = ({
 		return "All time";
 	};
 
-	/** Compute the visual range to highlight on the calendar */
-	const displayRange: DateRange | undefined = (() => {
-		if (activePreset) {
-			const preset = DATE_PRESETS.find((p) => p.value === activePreset);
-			if (preset) {
-				const range = preset.getRange();
-				return { from: range.from, to: range.to };
-			}
-		}
-		if (startDate && endDate) {
-			return { from: new Date(startDate), to: new Date(endDate) };
-		}
-		return calendarRange;
-	})();
-
 	const handlePresetSelect = (preset: DatePreset) => {
 		const range = preset.getRange();
-		setCalendarRange({ from: range.from, to: range.to });
 		onDateChange(
 			range.from.toISOString(),
 			range.to.toISOString(),
@@ -148,16 +134,25 @@ export const DateRangeFilter = ({
 
 	const handleCalendarSelect = (range: DateRange | undefined) => {
 		setCalendarRange(range);
-		if (
-			range?.from &&
-			range?.to &&
-			range.from.getTime() !== range.to.getTime()
-		) {
-			const endOfDay = new Date(range.to);
+	};
+
+	const handleApply = () => {
+		if (calendarRange?.from && calendarRange?.to) {
+			const endOfDay = new Date(calendarRange.to);
 			endOfDay.setHours(23, 59, 59, 999);
-			onDateChange(range.from.toISOString(), endOfDay.toISOString(), null);
+			onDateChange(
+				calendarRange.from.toISOString(),
+				endOfDay.toISOString(),
+				null,
+			);
 			setIsOpen(false);
 		}
+	};
+
+	const handleClear = () => {
+		onDateChange(null, null, null);
+		setCalendarRange(undefined);
+		setIsOpen(false);
 	};
 
 	return (
@@ -184,11 +179,22 @@ export const DateRangeFilter = ({
 			</Popover.Trigger>
 
 			<Popover.Content align="start" showArrow={false} className="w-auto p-0">
-				<div className="flex">
-					{/* Left panel — presets */}
-					<div className="w-44 border-stroke-soft-200 border-r p-3">
-						{/* Preset Options */}
-						<div className="relative">
+				<div className="flex divide-x divide-stroke-soft-200">
+					{/* Left: Presets */}
+					<div className="w-44 px-2">
+						{hasActiveFilter && (
+							<div className="mb-2 flex items-center justify-end border-stroke-soft-200 border-b px-1 pb-2">
+								<button
+									type="button"
+									onClick={handleClear}
+									className="rounded-lg border border-stroke-soft-200 px-2 py-1 text-text-sub-600 text-xs transition-colors hover:bg-bg-weak-50"
+								>
+									Reset
+								</button>
+							</div>
+						)}
+
+						<div className="relative mt-2">
 							{DATE_PRESETS.map((preset, idx) => {
 								const isActive = activePreset === preset.value;
 								return (
@@ -199,17 +205,14 @@ export const DateRangeFilter = ({
 										}}
 										type="button"
 										onPointerEnter={() => setHoverIdx(idx)}
-										onPointerLeave={() =>
-											setHoverIdx(
-												activePresetIdx >= 0 ? activePresetIdx : undefined,
-											)
-										}
+										onPointerLeave={() => setHoverIdx(undefined)}
 										onClick={() => handlePresetSelect(preset)}
 										className={cn(
-											"flex w-full cursor-pointer items-center justify-between rounded-lg px-1 py-1.5 font-normal text-xs transition-colors",
+											"flex w-full cursor-pointer items-center justify-between rounded-lg px-2 py-1.5 font-medium text-xs transition-colors",
 											isActive
-												? "font-medium text-text-strong-950"
+												? "bg-neutral-alpha-10 font-medium text-text-strong-950"
 												: "text-text-strong-950",
+											!currentRect && hoverIdx === idx && "bg-neutral-alpha-10",
 										)}
 									>
 										<span>{preset.label}</span>
@@ -230,17 +233,39 @@ export const DateRangeFilter = ({
 						</div>
 					</div>
 
-					{/* Right panel — calendar + date summary */}
-					<div className="flex flex-col px-3 py-2">
-						{/* Calendar */}
+					{/* Right: Calendar */}
+					<div className="p-2">
 						<LogsCalendar
 							mode="range"
-							selected={displayRange}
+							selected={calendarRange}
 							onSelect={handleCalendarSelect}
 							numberOfMonths={numberOfMonths}
 							disabled={{ after: new Date() }}
-							defaultMonth={displayRange?.from ? displayRange.from : undefined}
 						/>
+						<div className="flex justify-end gap-2 border-stroke-soft-100 border-t pt-2">
+							{(hasActiveFilter ||
+								!!calendarRange?.from ||
+								!!calendarRange?.to) && (
+								<Button.Root
+									size="xsmall"
+									variant="neutral"
+									mode="stroke"
+									className="rounded-xl"
+									onClick={handleClear}
+								>
+									Reset
+								</Button.Root>
+							)}
+							<Button.Root
+								size="xsmall"
+								variant="neutral"
+								className="rounded-xl"
+								onClick={handleApply}
+								disabled={!calendarRange?.from || !calendarRange?.to}
+							>
+								Apply
+							</Button.Root>
+						</div>
 					</div>
 				</div>
 			</Popover.Content>
