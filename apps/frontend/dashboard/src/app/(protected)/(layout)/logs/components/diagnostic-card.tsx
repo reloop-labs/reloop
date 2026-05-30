@@ -1,5 +1,6 @@
 "use client";
 
+import * as Alert from "@reloop/ui/alert";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 
@@ -93,6 +94,7 @@ export function getLogDiagnostics(log: {
 		};
 	}
 
+	// Rate limit check
 	if (
 		status === 429 ||
 		eventName.includes("rate_limited") ||
@@ -108,7 +110,7 @@ export function getLogDiagnostics(log: {
 	if (status === 404 || eventName.includes("not_found")) {
 		return {
 			why: "The requested log, email log, or API key resource does not exist or has been deleted.",
-			fix: "Verify the resource ID is correct and ensure you have select the appropriate organization context.",
+			fix: "Verify the resource ID is correct and ensure you have selected the appropriate organization context.",
 		};
 	}
 
@@ -153,12 +155,15 @@ export const DiagnosticCard = ({ log }: DiagnosticCardProps) => {
 	const isWarn = log.level?.toLowerCase() === "warn" || log.status_code === 429;
 
 	return (
-		<div
+		<Alert.Root
+			variant="lighter"
+			status={isWarn ? "warning" : "error"}
+			size="large"
 			className={cn(
 				"relative overflow-hidden rounded-xl border p-4.5 shadow-sm transition-all duration-300",
 				isWarn
-					? "border-warning-soft-200 bg-warning-alpha-10/40 dark:border-warning-soft-200/30"
-					: "border-error-soft-200 bg-error-alpha-10/40 dark:border-error-soft-200/30",
+					? "border-warning-light text-text-strong-950"
+					: "border-error-light text-text-strong-950",
 			)}
 		>
 			{/* Diagonal background accent for premium touch */}
@@ -168,10 +173,10 @@ export const DiagnosticCard = ({ log }: DiagnosticCardProps) => {
 				<div className="flex-shrink-0">
 					<div
 						className={cn(
-							"flex h-8 w-8 items-center justify-center rounded-lg shadow-sm",
+							"flex h-8 w-8 items-center justify-center rounded-lg border shadow-sm",
 							isWarn
-								? "bg-warning-alpha-10 text-warning-base"
-								: "bg-error-alpha-10 text-error-base",
+								? "border-warning-light/30 bg-warning-base/10 text-warning-base"
+								: "border-error-light/30 bg-error-base/10 text-error-base",
 						)}
 					>
 						<Icon
@@ -223,8 +228,8 @@ export const DiagnosticCard = ({ log }: DiagnosticCardProps) => {
 								className={cn(
 									"inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 font-medium text-xs shadow-sm transition-all duration-200",
 									isWarn
-										? "border-warning-soft-200/50 bg-bg-white-0 text-warning-base hover:bg-warning-alpha-10/20"
-										: "border-error-soft-200/50 bg-bg-white-0 text-error-base hover:bg-error-alpha-10/20",
+										? "border-warning-light/50 bg-bg-white-0 text-warning-base hover:bg-warning-base/10"
+										: "border-error-light/50 bg-bg-white-0 text-error-base hover:bg-error-base/10",
 								)}
 							>
 								Troubleshooting Docs
@@ -234,6 +239,6 @@ export const DiagnosticCard = ({ log }: DiagnosticCardProps) => {
 					)}
 				</div>
 			</div>
-		</div>
+		</Alert.Root>
 	);
 };
