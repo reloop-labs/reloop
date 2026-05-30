@@ -92,45 +92,68 @@ export const AdvancedOptions = ({
 				)}
 			</div>
 
-			<div className="space-y-2">
-				<p className="font-medium text-sm">Tracking options</p>
-				<div className="flex flex-col gap-2">
-					<div className="flex items-center gap-2">
+			<div className="space-y-3">
+				<p className="font-medium text-sm text-text-strong-950">
+					Tracking options
+				</p>
+				<div className="flex flex-col gap-4">
+					<label
+						htmlFor="clickTracking"
+						className="flex cursor-pointer select-none items-start gap-2.5"
+					>
 						<Controller
 							name="clickTracking"
 							control={control}
 							render={({ field }) => (
 								<Checkbox.Root
+									id="clickTracking"
 									variant="black"
 									checked={field.value}
 									onCheckedChange={field.onChange}
 									disabled={isLoading}
+									className="mt-0.5"
 								/>
 							)}
 						/>
-						<p className="font-medium text-xs">Enable click tracking</p>
-					</div>
-				</div>
-				<div className="flex flex-col">
-					<div className="flex w-full items-center gap-2">
+						<div className="flex flex-col gap-0.5">
+							<span className="font-medium text-text-strong-950 text-xs">
+								Enable click tracking
+							</span>
+							<span className="text-text-sub-600 text-xs leading-relaxed">
+								Click tracking rewrites links in your emails to track when
+								recipients click them.
+							</span>
+						</div>
+					</label>
+
+					<label
+						htmlFor="openTracking"
+						className="flex cursor-pointer select-none items-start gap-2.5"
+					>
 						<Controller
 							name="openTracking"
 							control={control}
 							render={({ field }) => (
 								<Checkbox.Root
+									id="openTracking"
 									variant="black"
 									checked={field.value}
 									onCheckedChange={field.onChange}
 									disabled={isLoading}
+									className="mt-0.5"
 								/>
 							)}
 						/>
-						<p className="font-medium text-xs">Enable open tracking</p>
-					</div>
-					<p className="pl-7 text-text-sub-600 text-xs leading-relaxed">
-						Open tracking can produce inaccurate results. Learn more and
-						consider if open tracking is right for you.
-					</p>
+						<div className="flex flex-col gap-0.5">
+							<span className="font-medium text-text-strong-950 text-xs">
+								Enable open tracking
+							</span>
+							<span className="text-text-sub-600 text-xs leading-relaxed">
+								Open tracking can produce inaccurate results. Learn more and
+								consider if open tracking is right for you.
+							</span>
+						</div>
+					</label>
 				</div>
 			</div>
 		</div>
