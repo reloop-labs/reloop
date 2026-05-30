@@ -182,19 +182,7 @@ export const DateRangeFilter = ({
 				<div className="flex divide-x divide-stroke-soft-200">
 					{/* Left: Presets */}
 					<div className="w-44 px-2">
-						{hasActiveFilter && (
-							<div className="mb-2 flex items-center justify-end border-stroke-soft-200 border-b px-1 pb-2">
-								<button
-									type="button"
-									onClick={handleClear}
-									className="rounded-lg border border-stroke-soft-200 px-2 py-1 text-text-sub-600 text-xs transition-colors hover:bg-bg-weak-50"
-								>
-									Reset
-								</button>
-							</div>
-						)}
-
-						<div className="relative mt-2">
+						<div className="relative py-2">
 							{DATE_PRESETS.map((preset, idx) => {
 								const isActive = activePreset === preset.value;
 								return (
