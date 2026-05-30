@@ -54,7 +54,7 @@ export const DomainPreview = ({
 							: "relative bg-bg-white-0 p-6"
 					}
 				>
-					<div className="flex items-start gap-4">
+					<div className="mb-5 flex items-start gap-4">
 						{logoUrl ? (
 							<img
 								src={logoUrl}
