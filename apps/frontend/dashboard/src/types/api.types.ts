@@ -32,6 +32,7 @@ export interface Domain {
 	userVerifiedDomain: boolean;
 	systemVerified: boolean;
 	customReturnPath: string;
+	trackingSubdomain: string;
 	isClickTrackingEnabled: boolean;
 	isOpenTrackingEnabled: boolean;
 	tls: "opportunistic" | "enforced";

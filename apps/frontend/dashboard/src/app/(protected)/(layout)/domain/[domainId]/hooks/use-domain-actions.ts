@@ -48,6 +48,7 @@ export const useDomainActions = (
 					| "isReceivingEmailEnabled"
 					| "isClickTrackingEnabled"
 					| "isOpenTrackingEnabled"
+					| "tls"
 				>
 			>,
 			successMessage: string,
@@ -68,6 +69,7 @@ export const useDomainActions = (
 					receiving_email?: boolean;
 					click_tracking?: boolean;
 					open_tracking?: boolean;
+					tls?: "opportunistic" | "enforced";
 				} = {};
 				if (payload.isSendingEmailEnabled !== undefined) {
 					apiPayload.sending_email = payload.isSendingEmailEnabled;
@@ -80,6 +82,9 @@ export const useDomainActions = (
 				}
 				if (payload.isOpenTrackingEnabled !== undefined) {
 					apiPayload.open_tracking = payload.isOpenTrackingEnabled;
+				}
+				if (payload.tls !== undefined) {
+					apiPayload.tls = payload.tls;
 				}
 
 				const { data } = await axios.patch<DomainResponse>(

@@ -303,6 +303,11 @@ export namespace DomainModel {
 					description: "Whether receiving email is enabled",
 				}),
 			),
+			tls: t.Optional(
+				t.Union([t.Literal("opportunistic"), t.Literal("enforced")], {
+					description: "TLS mode for the domain",
+				}),
+			),
 		},
 		{
 			examples: [

@@ -146,6 +146,7 @@ export const DomainHeader = ({ domain, isLoading }: DomainHeaderProps) => {
 						userVerifiedDomain: false,
 						systemVerified: false,
 						customReturnPath: "send",
+						trackingSubdomain: "tracking",
 						isClickTrackingEnabled: false,
 						isOpenTrackingEnabled: false,
 						tls: "opportunistic" as const,

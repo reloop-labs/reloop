@@ -55,6 +55,10 @@ export async function updateDomainController({
 			updateData.isOpenTrackingEnabled = body.open_tracking;
 		}
 
+		if (body.tls !== undefined) {
+			updateData.tls = body.tls;
+		}
+
 		await db
 			.update(schema.domain)
 			.set(updateData)

@@ -99,5 +99,6 @@ export namespace DomainTypes {
 		open_tracking?: boolean;
 		sending_email?: boolean;
 		receiving_email?: boolean;
+		tls?: "opportunistic" | "enforced";
 	}
 }
