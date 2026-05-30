@@ -7,7 +7,6 @@ import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import * as Switch from "@reloop/ui/switch";
-import { AnimatePresence, motion } from "framer-motion";
 import { useParams } from "next/navigation";
 import { useRef, useState } from "react";
 import { useClipboard } from "../hooks/use-clipboard";
@@ -112,67 +111,57 @@ export const DomainConfigurationSection = ({
 			</div>
 
 			{/* Click Tracking Card */}
-			<div className="rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-4 dark:border-stroke-soft-100/10">
+			<div
+				onClick={() =>
+					!isLoading && onToggleClickTracking(!isClickTrackingEnabled)
+				}
+				className="cursor-pointer select-none rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-4 transition-colors hover:bg-bg-weak-50/10 dark:border-stroke-soft-100/10 dark:hover:bg-bg-weak-50/5"
+			>
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-2 text-base text-text-strong-950">
 						<Icon name="link" className="h-4 w-4 text-text-sub-600" />
 						<h3 className="font-semibold text-sm">Click Tracking</h3>
 					</div>
-					<Switch.Root
-						checked={isClickTrackingEnabled}
-						onCheckedChange={onToggleClickTracking}
-						disabled={isLoading}
-					/>
+					<div onClick={(e) => e.stopPropagation()}>
+						<Switch.Root
+							checked={isClickTrackingEnabled}
+							onCheckedChange={onToggleClickTracking}
+							disabled={isLoading}
+						/>
+					</div>
 				</div>
-				<AnimatePresence initial={false}>
-					{isClickTrackingEnabled && (
-						<motion.div
-							initial={{ height: 0, opacity: 0 }}
-							animate={{ height: "auto", opacity: 1 }}
-							exit={{ height: 0, opacity: 0 }}
-							transition={{ duration: 0.2, ease: "easeInOut" }}
-							className="mt-3 overflow-hidden"
-						>
-							<p className="max-w-2xl text-paragraph-xs text-text-sub-600 leading-relaxed">
-								To track clicks, Reloop rewrites each link in your email to pass
-								through our servers. When a recipient clicks a link, they are
-								immediately redirected to the original destination URL.
-							</p>
-						</motion.div>
-					)}
-				</AnimatePresence>
+				<p className="mt-3 max-w-2xl text-paragraph-xs text-text-sub-600 leading-relaxed">
+					To track clicks, Reloop rewrites each link in your email to pass
+					through our servers. When a recipient clicks a link, they are
+					immediately redirected to the original destination URL.
+				</p>
 			</div>
 
 			{/* Open Tracking Card */}
-			<div className="rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-4 dark:border-stroke-soft-100/10">
+			<div
+				onClick={() =>
+					!isLoading && onToggleOpenTracking(!isOpenTrackingEnabled)
+				}
+				className="cursor-pointer select-none rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-4 transition-colors hover:bg-bg-weak-50/10 dark:border-stroke-soft-100/10 dark:hover:bg-bg-weak-50/5"
+			>
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-2 text-base text-text-strong-950">
 						<Icon name="mail-single" className="h-4 w-4 text-text-sub-600" />
 						<h3 className="font-semibold text-sm">Open Tracking</h3>
 					</div>
-					<Switch.Root
-						checked={isOpenTrackingEnabled}
-						onCheckedChange={onToggleOpenTracking}
-						disabled={isLoading}
-					/>
+					<div onClick={(e) => e.stopPropagation()}>
+						<Switch.Root
+							checked={isOpenTrackingEnabled}
+							onCheckedChange={onToggleOpenTracking}
+							disabled={isLoading}
+						/>
+					</div>
 				</div>
-				<AnimatePresence initial={false}>
-					{isOpenTrackingEnabled && (
-						<motion.div
-							initial={{ height: 0, opacity: 0 }}
-							animate={{ height: "auto", opacity: 1 }}
-							exit={{ height: 0, opacity: 0 }}
-							transition={{ duration: 0.2, ease: "easeInOut" }}
-							className="mt-3 overflow-hidden"
-						>
-							<p className="max-w-2xl text-paragraph-xs text-text-sub-600 leading-relaxed">
-								A 1x1 pixel transparent GIF image is inserted in each email and
-								includes a unique reference. Open tracking can produce
-								inaccurate results.
-							</p>
-						</motion.div>
-					)}
-				</AnimatePresence>
+				<p className="mt-3 max-w-2xl text-paragraph-xs text-text-sub-600 leading-relaxed">
+					A 1x1 pixel transparent GIF image is inserted in each email and
+					includes a unique reference. Open tracking can produce inaccurate
+					results.
+				</p>
 			</div>
 
 			{/* TLS Mode Card */}
