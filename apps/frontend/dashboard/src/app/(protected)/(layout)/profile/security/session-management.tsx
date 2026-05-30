@@ -135,7 +135,12 @@ export const SessionManagement = ({ className }: SessionManagementProps) => {
 					<div />
 				</div>
 
-				<div className={cn("-mt-2.5 overflow-hidden divide-y rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40", DIVIDER)}>
+				<div
+					className={cn(
+						"-mt-2.5 divide-y overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40",
+						DIVIDER,
+					)}
+				>
 					{loading
 						? Array.from({ length: 3 }).map((_, i) => (
 								<div key={i} className={`grid ${GRID_COLS} px-4 py-2`}>

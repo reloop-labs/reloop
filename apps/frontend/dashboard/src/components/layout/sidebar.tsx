@@ -45,12 +45,19 @@ export const MainSidebar: React.FC = () => {
 		name: string;
 		slug: string;
 	}) => {
-		await authClient.updateUser({
-			activeOrganizationId: organization.id,
-		});
-		await refetch();
-		await mutate(() => true, undefined, { revalidate: true });
-		router.refresh();
+		try {
+			await authClient.organization.setActive({
+				organizationId: organization.id,
+			});
+			await authClient.updateUser({
+				activeOrganizationId: organization.id,
+			});
+			await refetch();
+			await mutate(() => true, undefined, { revalidate: true });
+			router.refresh();
+		} catch (error) {
+			console.error("Error switching organization:", error);
+		}
 	};
 
 	return (

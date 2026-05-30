@@ -115,7 +115,7 @@ export const DNSRecordTable = ({
 			</div>
 
 			{/* Table Body */}
-			<div className="-mt-2.5 overflow-hidden divide-y divide-stroke-soft-100 rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/50">
+			<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/50">
 				{isLoading
 					? Array.from({ length: loadingRows }).map((_, index) => (
 							<RecordSkeleton

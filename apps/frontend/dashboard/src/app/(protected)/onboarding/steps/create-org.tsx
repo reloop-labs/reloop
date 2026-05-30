@@ -155,6 +155,13 @@ export const CreateOrgStep = () => {
 		if (organization) {
 			// Set orgId in query state
 			setOrgId(organization.id);
+			try {
+				await authClient.organization.setActive({
+					organizationId: organization.id,
+				});
+			} catch (error) {
+				console.error("Error setting active organization:", error);
+			}
 			await authClient.updateUser({ activeOrganizationId: organization.id });
 		}
 		setStep(step + 1);

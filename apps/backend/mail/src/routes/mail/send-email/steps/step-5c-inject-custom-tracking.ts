@@ -1,4 +1,8 @@
-import { type ClickTrackingPayload, decodeTrackingToken, encodeTrackingToken } from "@reloop/be-mail/lib/crypto";
+import {
+	type ClickTrackingPayload,
+	decodeTrackingToken,
+	encodeTrackingToken,
+} from "@reloop/be-mail/lib/crypto";
 import { mailConfig } from "@reloop/be-mail/mail.config";
 
 /**
@@ -75,7 +79,9 @@ function rewriteLinks(
 				} else {
 					// Fallback: decode without signature verification
 					try {
-						const json = Buffer.from(existingToken, "base64url").toString("utf-8");
+						const json = Buffer.from(existingToken, "base64url").toString(
+							"utf-8",
+						);
 						const obj = JSON.parse(json) as { url?: string };
 						if (obj.url) {
 							cleanUrl = obj.url;
@@ -95,7 +101,9 @@ function rewriteLinks(
 					mailConfig.TRACKING_SECRET,
 				);
 			} else {
-				token = Buffer.from(JSON.stringify({ url: cleanUrl })).toString("base64url");
+				token = Buffer.from(JSON.stringify({ url: cleanUrl })).toString(
+					"base64url",
+				);
 			}
 			const trackingUrl = `${baseUrl}/redirect/${token}`;
 
