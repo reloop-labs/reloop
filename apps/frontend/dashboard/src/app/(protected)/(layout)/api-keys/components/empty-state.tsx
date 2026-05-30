@@ -139,4 +139,3 @@ export const EmptyState = ({ onCreateApiKey }: EmptyStateProps) => {
 		</div>
 	);
 };
-
