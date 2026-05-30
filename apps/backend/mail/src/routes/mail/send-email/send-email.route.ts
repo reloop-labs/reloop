@@ -15,7 +15,7 @@ export const sendEmailRoute = new Elysia()
 			body,
 			activeOrganizationId,
 			userId,
-			apikeyId,
+			apiKeyId,
 			request,
 			set,
 			log,
@@ -37,7 +37,7 @@ export const sendEmailRoute = new Elysia()
 				organizationId: activeOrganizationId,
 				body,
 				apiKey: request.headers.get("x-api-key") ?? "",
-				apikeyId,
+				apiKeyId,
 				userId,
 			});
 		},

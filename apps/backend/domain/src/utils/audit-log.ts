@@ -18,6 +18,8 @@ export function auditLogHook(opts: AuditLogHookOptions) {
 		userId,
 		traceId,
 		body,
+		apiKeyId,
+		authType,
 	}: {
 		response: unknown;
 		set: { status?: number | string };
@@ -26,6 +28,8 @@ export function auditLogHook(opts: AuditLogHookOptions) {
 		userId?: string;
 		traceId?: string;
 		body?: unknown;
+		apiKeyId?: string;
+		authType?: string;
 	}) => {
 		const status = set.status ?? 200;
 		const userAgent = request.headers.get("user-agent") ?? undefined;
@@ -100,13 +104,18 @@ export function auditLogHook(opts: AuditLogHookOptions) {
 			}
 		}
 
+		const isApiKey =
+			authType === "apiKey" || authType === "apikey" || !!apiKeyId;
+		const actorType = isApiKey ? "api_key" : "user";
+		const actorId = isApiKey ? apiKeyId : userId;
+
 		bus
 			.publish(BusEvent.LOG_CREATED, {
 				event,
 				level,
 				trace_id: traceId,
-				actor_type: "user",
-				actor_id: userId,
+				actor_type: actorType,
+				actor_id: actorId,
 				organization_id: organizationId,
 				user_id: userId,
 				resource_type: resourceType,

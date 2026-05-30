@@ -18,13 +18,13 @@ export async function sendEmailController({
 	organizationId,
 	body,
 	apiKey,
-	apikeyId,
+	apiKeyId,
 	userId,
 }: {
 	organizationId: string;
 	body: MailModel.SendEmailBody;
 	apiKey: string;
-	apikeyId?: string;
+	apiKeyId?: string;
 	userId?: string;
 }): Promise<MailModel.SendEmailResponse> {
 	const logger = useLogger();
@@ -56,7 +56,7 @@ export async function sendEmailController({
 		organizationId,
 		domainId: currentDomain.id,
 		body,
-		apikeyId,
+		apikeyId: apiKeyId,
 		userId,
 	});
 

@@ -42,5 +42,6 @@ export async function finalizeEmail_step7({
 		messageId: result.messageId || emailLogId,
 		status: "sent",
 		timestamp: new Date().toISOString(),
+		id: emailLogId,
 	};
 }

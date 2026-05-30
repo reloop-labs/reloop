@@ -164,6 +164,9 @@ export namespace MailModel {
 		timestamp: t.String({
 			description: "Timestamp when email was sent",
 		}),
+		id: t.String({
+			description: "Email log database ID",
+		}),
 	});
 
 	export type SendEmailResponse = typeof sendEmailResponse.static;

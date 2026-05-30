@@ -47,7 +47,8 @@ export const authMiddleware = new Elysia({ name: "better-auth" })
 					return {
 						userId: apiKeyResult.userId,
 						organizationId: apiKeyResult.organizationId,
-						authType: "apikey" as const,
+						authType: apiKeyResult.authType,
+						apiKeyId: apiKeyResult.apiKeyId,
 						traceId,
 					};
 				}
@@ -77,7 +78,8 @@ export const authMiddleware = new Elysia({ name: "better-auth" })
 							return {
 								userId: apiKeyResult.userId,
 								organizationId: apiKeyResult.organizationId,
-								authType: "apikey" as const,
+								authType: apiKeyResult.authType,
+								apiKeyId: apiKeyResult.apiKeyId,
 								traceId,
 							};
 						}

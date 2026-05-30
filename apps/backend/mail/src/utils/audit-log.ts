@@ -20,7 +20,7 @@ export function auditLogHook(opts: AuditLogHookOptions) {
 		userId,
 		traceId,
 		body,
-		apikeyId,
+		apiKeyId,
 		authType,
 	}: {
 		response: unknown;
@@ -31,7 +31,7 @@ export function auditLogHook(opts: AuditLogHookOptions) {
 		userId?: string;
 		traceId?: string;
 		body?: unknown;
-		apikeyId?: string;
+		apiKeyId?: string;
 		authType?: string;
 	}) => {
 		const status = set.status ?? 200;
@@ -76,6 +76,9 @@ export function auditLogHook(opts: AuditLogHookOptions) {
 				metadata = {
 					...result,
 				};
+				if (resourceId && resourceType === "email") {
+					metadata.email_log_id = resourceId;
+				}
 			} else {
 				metadata = {
 					status,
@@ -118,7 +121,7 @@ export function auditLogHook(opts: AuditLogHookOptions) {
 					authType === "apiKey" || authType === "apikey" ? "api_key" : "user",
 				actor_id:
 					authType === "apiKey" || authType === "apikey"
-						? (apikeyId ?? undefined)
+						? (apiKeyId ?? undefined)
 						: (userId ?? undefined),
 				organization_id: finalOrganizationId,
 				user_id: userId,
