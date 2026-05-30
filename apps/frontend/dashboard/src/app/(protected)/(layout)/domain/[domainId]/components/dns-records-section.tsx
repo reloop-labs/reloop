@@ -1,6 +1,7 @@
 "use client";
 
 import type { DNSRecord, DomainResponse } from "@fe/dashboard/types/api.types";
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Switch from "@reloop/ui/switch";
 import { AnimatePresence, motion } from "framer-motion";
@@ -29,7 +30,7 @@ export const DNSRecordsSection = ({
 	const { handleUpdateDomain } = useDomainActions(domain?.id, domain);
 
 	return (
-		<div className="mt-6 mb-24 flex flex-col">
+		<div className={cn("mb-24 flex flex-col", domain?.status ? "mt-6" : "")}>
 			{domain?.status && <DNSAutoConnectBanner domain={domain} />}
 
 			{/* Domain Verification Group */}

@@ -85,6 +85,16 @@ export const useDomainActions = (
 
 				await mutate(cacheKey, data, false);
 				toast.success(successMessage);
+
+				const isToggleOff =
+					payload.isSendingEmailEnabled === false ||
+					payload.isReceivingEmailEnabled === false ||
+					payload.isClickTrackingEnabled === false ||
+					payload.isOpenTrackingEnabled === false;
+
+				if (isToggleOff) {
+					await handleVerifyDNS();
+				}
 			} catch (error) {
 				await mutate(cacheKey);
 				const errorMessage = axios.isAxiosError(error)
@@ -93,7 +103,7 @@ export const useDomainActions = (
 				toast.error(errorMessage);
 			}
 		},
-		[domainId, domainData],
+		[domainId, domainData, handleVerifyDNS],
 	);
 
 	return {

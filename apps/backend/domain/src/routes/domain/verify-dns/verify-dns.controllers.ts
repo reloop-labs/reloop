@@ -28,7 +28,7 @@ export async function verifyDNSRecordController({
 				event: DOMAIN_VERIFY_WEBHOOK_EVENT.id,
 			};
 		}
-		await updateStatusToVerifying_step2({ domainId });
+		await updateStatusToVerifying_step2({ domainId, domain: domainWithRecords });
 		await enqueueVerificationJob_step3({
 			domainId,
 			organizationId,

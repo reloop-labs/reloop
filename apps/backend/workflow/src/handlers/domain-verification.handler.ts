@@ -222,9 +222,12 @@ export async function processDomainVerification({
 		cnameOk,
 	});
 
+	const activeRecordIds = new Set(activeResults.map((item) => item.record.id));
+	const inactiveRecords = records.filter((r) => !activeRecordIds.has(r.id));
+
 	// Update individual record statuses
-	await Promise.all(
-		results.map(({ record, ok }) => {
+	await Promise.all([
+		...results.map(({ record, ok }) => {
 			if (!ok && !isLastAttempt) return Promise.resolve();
 
 			return db
@@ -232,7 +235,13 @@ export async function processDomainVerification({
 				.set({ status: ok ? "active" : "failed" })
 				.where(eq(schema.domainDnsRecord.id, record.id));
 		}),
-	);
+		...inactiveRecords.map((record) =>
+			db
+				.update(schema.domainDnsRecord)
+				.set({ status: "pending", verificationError: null })
+				.where(eq(schema.domainDnsRecord.id, record.id)),
+		),
+	]);
 
 	const allPassed = dkimOk && spfOk && dmarcOk && mxOk && cnameOk;
 
