@@ -327,9 +327,7 @@ export const ApiKeyHeader = ({
 								name={copied ? "check" : "copy"}
 								className={cn(
 									"h-3 w-3 flex-shrink-0 transition-all",
-									copied
-										? "text-success-base"
-										: "text-text-sub-600 opacity-0 group-hover/copy:opacity-100",
+									copied ? "text-success-base" : "text-text-sub-600",
 								)}
 							/>
 						</button>
