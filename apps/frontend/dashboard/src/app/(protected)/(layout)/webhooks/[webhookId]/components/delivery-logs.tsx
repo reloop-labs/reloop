@@ -553,14 +553,16 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 				{/* LEFT — Delivery logs list */}
 				<div
 					className={cn(
-						"w-full text-paragraph-sm",
+						"w-full rounded-[14px] border border-stroke-soft-100 bg-bg-white-0 text-paragraph-sm dark:border-stroke-soft-100/40",
 						!isMobile &&
-							"sticky top-4 max-h-[calc(100vh-100px)] w-[480px] shrink-0 overflow-y-auto",
+							"sticky top-4 flex w-[480px] shrink-0 flex-col overflow-hidden",
 					)}
+					style={!isMobile ? { maxHeight: "calc(100vh - 220px)" } : undefined}
 				>
+					{/* Table Header */}
 					<div
 						className={cn(
-							"grid items-center gap-4 rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l px-4 pt-2.5 pb-5 text-text-sub-600 dark:border-stroke-soft-100/50",
+							"grid flex-shrink-0 items-center gap-4 border-stroke-soft-100 border-b px-4 py-2.5 text-text-sub-600 dark:border-stroke-soft-100/50",
 							isMobile ? GRID : SPLIT_GRID,
 						)}
 					>
@@ -593,7 +595,14 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 							<span className="font-medium">Code</span>
 						</div>
 					</div>
-					<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/50">
+
+					{/* Table Body (Scrollable) */}
+					<div
+						className={cn(
+							"divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50",
+							!isMobile && "flex-1 overflow-y-auto",
+						)}
+					>
 						{isLoading ? (
 							Array.from({ length: 5 }).map((_, i) => (
 								<DeliverySkeleton key={i} isMobile={isMobile} />
@@ -673,39 +682,39 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 								);
 							})
 						)}
+					</div>
 
-						{/* Pagination footer */}
-						{data && data.total > 0 && (
-							<div
-								className={cn(
-									"flex items-center justify-between bg-bg-white-0 px-4",
-									isMobile
-										? "py-3 text-paragraph-sm text-text-sub-600"
-										: "py-2 text-[11px] text-text-sub-600",
-								)}
-							>
-								<div className="flex items-center gap-3">
-									<span>
-										Showing {startIndex}–{endIndex} of {data.total} deliver
-										{data.total !== 1 ? "ies" : "y"}
-									</span>
-									<PageSizeDropdown
-										value={pageSize}
-										onValueChange={(value) => {
-											setPageSize(value);
-											setCurrentPage(1);
-										}}
-									/>
-								</div>
-								<PaginationControls
-									currentPage={currentPage}
-									totalPages={totalPages}
-									onPageChange={setCurrentPage}
-									isLoading={isLoading}
+					{/* Pagination footer (Static at bottom of card) */}
+					{data && data.total > 0 && (
+						<div
+							className={cn(
+								"flex flex-shrink-0 items-center justify-between rounded-b-[14px] border-stroke-soft-100 border-t bg-bg-white-0 px-4 dark:border-stroke-soft-100/50",
+								isMobile
+									? "py-3 text-paragraph-sm text-text-sub-600"
+									: "py-2 text-[11px] text-text-sub-600",
+							)}
+						>
+							<div className="flex items-center gap-3">
+								<span>
+									Showing {startIndex}–{endIndex} of {data.total} deliver
+									{data.total !== 1 ? "ies" : "y"}
+								</span>
+								<PageSizeDropdown
+									value={pageSize}
+									onValueChange={(value) => {
+										setPageSize(value);
+										setCurrentPage(1);
+									}}
 								/>
 							</div>
-						)}
-					</div>
+							<PaginationControls
+								currentPage={currentPage}
+								totalPages={totalPages}
+								onPageChange={setCurrentPage}
+								isLoading={isLoading}
+							/>
+						</div>
+					)}
 				</div>
 
 				{/* RIGHT — Inline detail panel (Desktop only) */}

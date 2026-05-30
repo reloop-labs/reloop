@@ -36,6 +36,7 @@ interface LogTableProps {
 	onPageChange?: (page: number) => void;
 	onPageSizeChange?: (size: number) => void;
 	hideDocs?: boolean;
+	isMobile?: boolean;
 }
 
 /** Grid template used for the header and every row */
@@ -187,11 +188,23 @@ export const LogTable = ({
 	onPageChange,
 	onPageSizeChange,
 	hideDocs,
+	isMobile,
 }: LogTableProps) => {
 	return (
-		<div className="w-full overflow-hidden rounded-[14px] border border-stroke-soft-100 bg-bg-white-0 text-paragraph-sm dark:border-stroke-soft-100/40">
-			{/* Table Body */}
-			<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
+		<div
+			className={cn(
+				"w-full rounded-[14px] border border-stroke-soft-100 bg-bg-white-0 text-paragraph-sm dark:border-stroke-soft-100/40",
+				!isMobile && "flex flex-col overflow-hidden",
+			)}
+			style={!isMobile ? { maxHeight: "calc(100vh - 220px)" } : undefined}
+		>
+			{/* Scrollable Table Body */}
+			<div
+				className={cn(
+					"divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50",
+					!isMobile && "flex-1 overflow-y-auto",
+				)}
+			>
 				{isLoading ? (
 					Array.from({ length: loadingRows }).map((_, i) => (
 						<div
@@ -268,7 +281,7 @@ export const LogTable = ({
 					groupLogsByDate(logs as any).map((group) => (
 						<div key={group.dateKey}>
 							{/* Date separator */}
-							<div className="flex items-center gap-3 border-stroke-soft-100 border-b px-4 py-2.5 dark:border-stroke-soft-100/40">
+							<div className="sticky top-0 z-10 flex items-center gap-3 border-stroke-soft-100 border-b bg-bg-white-0 px-4 py-2.5 dark:border-stroke-soft-100/40">
 								<span className="font-medium text-text-soft-400 text-xs uppercase tracking-widest">
 									{group.dateLabel}
 								</span>
@@ -342,33 +355,33 @@ export const LogTable = ({
 						</div>
 					))
 				)}
+			</div>
 
-				{/* Pagination — inside table card, matching domain-table */}
-				{total > 0 && (
-					<div className="flex items-center justify-between px-4 py-2 text-label-xs text-text-sub-600">
-						<div className="flex items-center">
-							<span>
-								Showing {startIndex}–{endIndex} of {total} log
-								{total !== 1 ? "s" : ""}
-							</span>
-							{onPageSizeChange && (
-								<PageSizeDropdown
-									value={pageSize}
-									onValueChange={(value) => onPageSizeChange(value)}
-								/>
-							)}
-						</div>
-						{onPageChange && (
-							<PaginationControls
-								currentPage={currentPage}
-								totalPages={totalPages}
-								onPageChange={onPageChange}
-								isLoading={isLoading}
+			{/* Pagination — outside scrollable body, static at bottom of card */}
+			{total > 0 && (
+				<div className="flex flex-shrink-0 items-center justify-between rounded-b-[14px] border-stroke-soft-100 border-t bg-bg-white-0 px-4 py-2 text-label-xs text-text-sub-600 dark:border-stroke-soft-100/40">
+					<div className="flex items-center">
+						<span>
+							Showing {startIndex}–{endIndex} of {total} log
+							{total !== 1 ? "s" : ""}
+						</span>
+						{onPageSizeChange && (
+							<PageSizeDropdown
+								value={pageSize}
+								onValueChange={(value) => onPageSizeChange(value)}
 							/>
 						)}
 					</div>
-				)}
-			</div>
+					{onPageChange && (
+						<PaginationControls
+							currentPage={currentPage}
+							totalPages={totalPages}
+							onPageChange={onPageChange}
+							isLoading={isLoading}
+						/>
+					)}
+				</div>
+			)}
 		</div>
 	);
 };

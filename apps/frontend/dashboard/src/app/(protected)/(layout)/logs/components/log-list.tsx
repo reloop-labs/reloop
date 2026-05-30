@@ -7,7 +7,7 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useSWR from "swr";
 import { DateRangeFilter } from "./date-range-filter";
 import { DocsButton } from "./docs-button";
@@ -65,6 +65,22 @@ const OUTCOME_TABS: {
 		iconColor: "text-red-500",
 	},
 ];
+
+const useMediaQuery = (query: string) => {
+	const [matches, setMatches] = useState(false);
+
+	useEffect(() => {
+		const media = window.matchMedia(query);
+		if (media.matches !== matches) {
+			setMatches(media.matches);
+		}
+		const listener = () => setMatches(media.matches);
+		media.addEventListener("change", listener);
+		return () => media.removeEventListener("change", listener);
+	}, [matches, query]);
+
+	return matches;
+};
 
 export const LogList = ({
 	actorId,
@@ -124,6 +140,13 @@ export const LogList = ({
 
 	// Mobile drawer state (for narrow viewports)
 	const [drawerOpen, setDrawerOpen] = useState(false);
+	const isMobile = useMediaQuery("(max-width: 1023px)");
+
+	useEffect(() => {
+		if (isMobile && selectedLogId) {
+			setDrawerOpen(true);
+		}
+	}, [isMobile, selectedLogId]);
 
 	// Build API URL
 	const buildApiUrl = () => {
@@ -324,9 +347,14 @@ export const LogList = ({
 			</div>
 
 			{/* ── Split Panel ── */}
-			<div className="mt-3 flex items-start gap-4">
+			<div className="mt-3 flex flex-col gap-4 lg:flex-row lg:items-start">
 				{/* LEFT — Log list */}
-				<div className="sticky top-4 flex max-h-[calc(100vh-100px)] w-[480px] flex-shrink-0 flex-col gap-4 self-start overflow-y-auto">
+				<div
+					className={cn(
+						"w-full text-paragraph-sm",
+						!isMobile && "sticky top-4 w-[480px] flex-shrink-0 self-start",
+					)}
+				>
 					<LogTable
 						logs={data?.logs || []}
 						isLoading={isLoading}
@@ -334,6 +362,9 @@ export const LogList = ({
 						selectedLogId={selectedLogId}
 						onRowClick={(logId) => {
 							setSelectedLogId(logId);
+							if (isMobile) {
+								setDrawerOpen(true);
+							}
 						}}
 						hasFilters={!!hasAnyFilter}
 						onClearFilters={handleClearAll}
@@ -349,34 +380,37 @@ export const LogList = ({
 							setCurrentPage(1);
 						}}
 						hideDocs={hideDocs}
+						isMobile={isMobile}
 					/>
 				</div>
 
 				{/* RIGHT — Inline detail panel */}
-				<div className="min-w-0 flex-1 rounded-3xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
-					{selectedLogId ? (
-						<LogDetailPanel logId={selectedLogId} />
-					) : (
-						<div className="flex min-h-[500px] flex-col items-center justify-center gap-1 p-8 text-center">
-							<div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
-								<Icon name="search" className="h-5 w-5 text-text-sub-600" />
+				{!isMobile && (
+					<div className="min-w-0 flex-1 rounded-3xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
+						{selectedLogId ? (
+							<LogDetailPanel logId={selectedLogId} />
+						) : (
+							<div className="flex min-h-[500px] flex-col items-center justify-center gap-1 p-8 text-center">
+								<div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
+									<Icon name="search" className="h-5 w-5 text-text-sub-600" />
+								</div>
+								<h3 className="font-semibold text-base text-text-strong-950">
+									Select a log to inspect
+								</h3>
+								<p className="mx-auto max-w-sm text-balance font-medium text-[12px] text-text-sub-600">
+									Click any row on the left to view its request details, status,
+									and response body.
+								</p>
+								<div className="mt-4 flex items-center gap-1.5 text-text-soft-400 text-xs">
+									<Icon name="arrow-left" className="h-3.5 w-3.5" />
+									<span className="font-medium">
+										Pick a log entry to get started
+									</span>
+								</div>
 							</div>
-							<h3 className="font-semibold text-base text-text-strong-950">
-								Select a log to inspect
-							</h3>
-							<p className="mx-auto max-w-sm text-balance font-medium text-[12px] text-text-sub-600">
-								Click any row on the left to view its request details, status,
-								and response body.
-							</p>
-							<div className="mt-4 flex items-center gap-1.5 text-text-soft-400 text-xs">
-								<Icon name="arrow-left" className="h-3.5 w-3.5" />
-								<span className="font-medium">
-									Pick a log entry to get started
-								</span>
-							</div>
-						</div>
-					)}
-				</div>
+						)}
+					</div>
+				)}
 			</div>
 
 			{/* Mobile drawer (only visible on narrow screens) */}
