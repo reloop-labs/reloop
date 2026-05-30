@@ -84,10 +84,10 @@ export const StatusFilterDropdown = ({
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 
-	const activeIdx = hoverIdx;
+	const selectedIdx = statusFilterOptions.findIndex((o) => o.id === value);
+	const activeIdx = hoverIdx !== undefined ? hoverIdx : selectedIdx;
 
-	const currentTab =
-		activeIdx !== undefined ? buttonRefs.current[activeIdx] : undefined;
+	const currentTab = buttonRefs.current[activeIdx];
 	const currentRect = currentTab?.getBoundingClientRect();
 
 	const selectedOption =

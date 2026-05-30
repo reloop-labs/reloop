@@ -29,8 +29,10 @@ export const TeamFilterDropdown = ({
 	const [isOpen, setIsOpen] = useState(false);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
+	const selectedIdx = filterOptions.findIndex((o) => o.id === value);
+	const activeIdx = hoverIdx !== undefined ? hoverIdx : selectedIdx;
 
-	const currentTab = buttonRefs.current[hoverIdx ?? -1];
+	const currentTab = buttonRefs.current[activeIdx];
 	const currentRect = currentTab?.getBoundingClientRect();
 
 	const selectedOption = filterOptions.find((o) => o.id === value);
