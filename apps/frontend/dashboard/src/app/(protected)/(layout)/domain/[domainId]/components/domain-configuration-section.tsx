@@ -68,7 +68,7 @@ export const DomainConfigurationSection = ({
 					</p>
 					{domain && (
 						<div className="flex items-center gap-2">
-							<div className="flex h-9 items-center rounded-lg border border-stroke-soft-100 bg-bg-weak-50/30 px-3 font-mono text-sm text-text-strong-950 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/50">
+							<div className="flex h-7 items-center rounded-lg border border-stroke-soft-100 bg-bg-weak-50/30 px-3 font-mono text-sm text-text-strong-950 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/50">
 								{domain.trackingSubdomain}.{domain.domain}
 							</div>
 							<button
@@ -79,13 +79,16 @@ export const DomainConfigurationSection = ({
 										"tracking-domain",
 									)
 								}
-								className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 shadow-sm transition-colors hover:bg-bg-weak-50/50 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/20"
+								className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50/50 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/20"
 								title="Copy domain to clipboard"
 							>
 								{copiedItems.has("tracking-domain") ? (
-									<Icon name="check" className="h-4 w-4 text-success-base" />
+									<Icon
+										name="check"
+										className="h-3.5 w-3.5 text-success-base"
+									/>
 								) : (
-									<Icon name="copy" className="h-4 w-4" />
+									<Icon name="copy" className="h-3.5 w-3.5" />
 								)}
 							</button>
 						</div>
