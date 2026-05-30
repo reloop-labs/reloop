@@ -40,7 +40,9 @@ const DomainPage = () => {
 		data: domainData,
 		error,
 		isLoading,
-	} = useSWR<DomainResponse>(domainId ? `/api/domain/v1/${domainId}` : null);
+	} = useSWR<DomainResponse>(domainId ? `/api/domain/v1/${domainId}` : null, {
+		refreshInterval: (data) => (data?.status === "verifying" ? 3000 : 0),
+	});
 
 	const { domainId: _domainId } = useParams();
 

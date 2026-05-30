@@ -26,6 +26,9 @@ export const ConfigureDnsStep = () => {
 
 	const { data: domainData, isLoading } = useSWR<DomainResponse>(
 		domainId ? `/api/domain/v1/${domainId}` : null,
+		{
+			refreshInterval: (data) => (data?.status === "verifying" ? 3000 : 0),
+		},
 	);
 
 	const { handleUpdateDomain } = useDomainActions(domainId, domainData);
