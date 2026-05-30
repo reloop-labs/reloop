@@ -1,6 +1,7 @@
 "use client";
 
 import type { DNSRecord } from "@fe/dashboard/types/api.types";
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
 import type * as React from "react";
@@ -19,6 +20,7 @@ interface DNSRecordSectionProps {
 	};
 	loadingRows?: number;
 	tableId?: string;
+	className?: string;
 }
 
 export const DNSRecordSection: React.FC<DNSRecordSectionProps> = ({
@@ -29,9 +31,10 @@ export const DNSRecordSection: React.FC<DNSRecordSectionProps> = ({
 	docsUrl,
 	loadingRows = 1,
 	tableId,
+	className,
 }) => {
 	return (
-		<div className="relative mt-7">
+		<div className={cn("relative", className)}>
 			<div className="mb-3 flex items-start justify-between gap-4">
 				<Link
 					href={docsUrl || "#"}

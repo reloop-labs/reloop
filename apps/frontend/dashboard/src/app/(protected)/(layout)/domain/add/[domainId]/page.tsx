@@ -152,7 +152,7 @@ const NewDomainPage = () => {
 								transition={{ duration: 0.2, ease: "easeInOut" }}
 								className="mt-4 overflow-hidden"
 							>
-								<div className="space-y-6">
+								<div>
 									<DNSRecordSection
 										title="SPF"
 										records={sendingRecords}
@@ -168,6 +168,7 @@ const NewDomainPage = () => {
 											isLoading={isLoading}
 											docsUrl="https://reloop.sh/docs/dns/dmarc"
 											tableId="dmarc-"
+											className="mt-7"
 										/>
 									)}
 								</div>
