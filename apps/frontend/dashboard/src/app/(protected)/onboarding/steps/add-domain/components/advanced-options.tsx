@@ -35,7 +35,7 @@ export const AdvancedOptions = ({
 				</Label.Root>
 				<Input.Root
 					hasError={!!errors?.customReturnPath}
-					className="w-full"
+					className="w-full rounded-xl"
 					size="small"
 				>
 					<Input.Wrapper>
@@ -68,7 +68,7 @@ export const AdvancedOptions = ({
 				</Label.Root>
 				<Input.Root
 					hasError={!!errors?.trackingSubdomain}
-					className="w-full"
+					className="w-full rounded-xl"
 					size="small"
 				>
 					<Input.Wrapper>
@@ -115,7 +115,7 @@ export const AdvancedOptions = ({
 								/>
 							)}
 						/>
-						<div className="flex flex-col gap-0.5">
+						<div className="mt-1 flex flex-col gap-0.5">
 							<span className="font-medium text-text-strong-950 text-xs">
 								Enable click tracking
 							</span>
@@ -144,7 +144,7 @@ export const AdvancedOptions = ({
 								/>
 							)}
 						/>
-						<div className="flex flex-col gap-0.5">
+						<div className="mt-1 flex flex-col gap-0.5">
 							<span className="font-medium text-text-strong-950 text-xs">
 								Enable open tracking
 							</span>

@@ -57,7 +57,7 @@ export const DomainInputField = ({
 			<div className="relative">
 				<Input.Root
 					hasError={!!errors?.domain?.message}
-					className="w-full"
+					className="w-full rounded-xl"
 					size="small"
 				>
 					<Input.Wrapper>
