@@ -20,7 +20,10 @@ export async function verifyDNSRecordController({
 			domainId,
 			organizationId,
 		});
-		await updateStatusToVerifying_step2({ domainId, domain: domainWithRecords });
+		await updateStatusToVerifying_step2({
+			domainId,
+			domain: domainWithRecords,
+		});
 		await enqueueVerificationJob_step3({
 			domainId,
 			organizationId,

@@ -1,6 +1,6 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { eq, and, inArray } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 
 import { useLogger } from "evlog/elysia";
 
@@ -9,7 +9,9 @@ export async function updateStatusToVerifying_step2({
 	domain,
 }: {
 	domainId: string;
-	domain: any;
+	domain: typeof schema.domain.$inferSelect & {
+		dnsRecords: (typeof schema.domainDnsRecord.$inferSelect)[];
+	};
 }) {
 	const log = useLogger();
 	log.info("Updating domain status to verifying");
@@ -18,13 +20,15 @@ export async function updateStatusToVerifying_step2({
 		.set({ status: "verifying" })
 		.where(eq(schema.domain.id, domainId));
 
-	log.info("Updating active DNS records status to verifying, and inactive to pending");
-	
+	log.info(
+		"Updating active DNS records status to verifying, and inactive to pending",
+	);
+
 	const activeRecordIds = new Set<string>();
 
 	// Find mandatory DKIM verification record
 	const dkimRecord = domain.dnsRecords.find(
-		(r: any) => r.recordType === "TXT" && r.value.startsWith("v=DKIM1"),
+		(r) => r.recordType === "TXT" && r.value.startsWith("v=DKIM1"),
 	);
 	if (dkimRecord) {
 		activeRecordIds.add(dkimRecord.id);
@@ -33,16 +37,18 @@ export async function updateStatusToVerifying_step2({
 	const isSendingEnabled = domain.isSendingEmailEnabled;
 	const spfRecord = isSendingEnabled
 		? domain.dnsRecords.find(
-				(r: any) => r.recordType === "TXT" && r.value.startsWith("v=spf1"),
+				(r) => r.recordType === "TXT" && r.value.startsWith("v=spf1"),
 			)
 		: undefined;
 	const dmarcRecord = isSendingEnabled
 		? domain.dnsRecords.find(
-				(r: any) => r.recordType === "TXT" && r.value.startsWith("v=DMARC1"),
+				(r) => r.recordType === "TXT" && r.value.startsWith("v=DMARC1"),
 			)
 		: undefined;
 	const sendingMxRecord = isSendingEnabled
-		? domain.dnsRecords.find((r: any) => r.recordType === "MX" && r.purpose === "sending")
+		? domain.dnsRecords.find(
+				(r) => r.recordType === "MX" && r.purpose === "sending",
+			)
 		: undefined;
 
 	if (isSendingEnabled && spfRecord && dmarcRecord) {
@@ -56,9 +62,11 @@ export async function updateStatusToVerifying_step2({
 	const isReceivingEnabled = domain.isReceivingEmailEnabled;
 	const receivingMxRecord = isReceivingEnabled
 		? (domain.dnsRecords.find(
-				(r: any) => r.recordType === "MX" && r.purpose === "receiving",
+				(r) => r.recordType === "MX" && r.purpose === "receiving",
 			) ??
-			domain.dnsRecords.find((r: any) => r.recordType === "MX" && r.purpose === "sending"))
+			domain.dnsRecords.find(
+				(r) => r.recordType === "MX" && r.purpose === "sending",
+			))
 		: undefined;
 
 	if (isReceivingEnabled && receivingMxRecord) {
@@ -66,10 +74,9 @@ export async function updateStatusToVerifying_step2({
 	}
 
 	const isTrackingEnabled =
-		domain.isClickTrackingEnabled ||
-		domain.isOpenTrackingEnabled;
+		domain.isClickTrackingEnabled || domain.isOpenTrackingEnabled;
 	const cnameRecord = isTrackingEnabled
-		? domain.dnsRecords.find((r: any) => r.recordType === "CNAME")
+		? domain.dnsRecords.find((r) => r.recordType === "CNAME")
 		: undefined;
 
 	if (isTrackingEnabled && cnameRecord) {
@@ -78,7 +85,7 @@ export async function updateStatusToVerifying_step2({
 
 	const activeIdsArray = Array.from(activeRecordIds);
 	const inactiveRecordIds = domain.dnsRecords
-		.map((r: any) => r.id)
+		.map((r) => r.id)
 		.filter((id: string) => !activeRecordIds.has(id));
 
 	if (activeIdsArray.length > 0) {
