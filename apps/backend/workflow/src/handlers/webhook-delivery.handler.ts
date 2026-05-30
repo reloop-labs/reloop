@@ -1,9 +1,9 @@
 import { createHmac } from "node:crypto";
 import dns from "node:dns";
 import net from "node:net";
+import { decryptSecret } from "@reloop/db";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { decryptSecret } from "@reloop/db";
 import { eq, sql } from "drizzle-orm";
 import { log } from "evlog";
 

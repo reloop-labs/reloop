@@ -37,18 +37,18 @@ export async function updateStatusToVerifying_step2({
 	const isSendingEnabled = domain.isSendingEmailEnabled;
 	const spfRecord = isSendingEnabled
 		? domain.dnsRecords.find(
-			(r) => r.recordType === "TXT" && r.value.startsWith("v=spf1"),
-		)
+				(r) => r.recordType === "TXT" && r.value.startsWith("v=spf1"),
+			)
 		: undefined;
 	const dmarcRecord = isSendingEnabled
 		? domain.dnsRecords.find(
-			(r) => r.recordType === "TXT" && r.value.startsWith("v=DMARC1"),
-		)
+				(r) => r.recordType === "TXT" && r.value.startsWith("v=DMARC1"),
+			)
 		: undefined;
 	const sendingMxRecord = isSendingEnabled
 		? domain.dnsRecords.find(
-			(r: any) => r.recordType === "MX" && r.purpose === "sending",
-		)
+				(r: any) => r.recordType === "MX" && r.purpose === "sending",
+			)
 		: undefined;
 
 	if (isSendingEnabled && spfRecord && dmarcRecord) {
@@ -62,8 +62,8 @@ export async function updateStatusToVerifying_step2({
 	const isReceivingEnabled = domain.isReceivingEmailEnabled;
 	const receivingMxRecord = isReceivingEnabled
 		? (domain.dnsRecords.find(
-			(r) => r.recordType === "MX" && r.purpose === "receiving",
-		) ??
+				(r) => r.recordType === "MX" && r.purpose === "receiving",
+			) ??
 			domain.dnsRecords.find(
 				(r: any) => r.recordType === "MX" && r.purpose === "sending",
 			))

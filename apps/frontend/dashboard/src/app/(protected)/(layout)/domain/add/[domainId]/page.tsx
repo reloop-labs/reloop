@@ -287,7 +287,7 @@ const NewDomainPage = () => {
 						onClick={() => router.push("/domain")}
 						className="gap-1.5"
 					>
-						Verify later
+						Skip
 						<KbdEsc />
 					</Button.Root>
 				</div>

@@ -5,6 +5,7 @@ import { valibotResolver } from "@hookform/resolvers/valibot";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
 import Spinner from "@reloop/ui/spinner";
 import axios from "axios";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
@@ -95,8 +96,9 @@ export const AddDomainStep = () => {
 	);
 
 	useHotkeys(
-		"a+l",
-		() => {
+		"alt+s",
+		(e) => {
+			e.preventDefault();
 			if (status !== "loading") {
 				setSkippedDns("true");
 				setStep(4);
@@ -185,14 +187,10 @@ export const AddDomainStep = () => {
 						}}
 						disabled={status === "loading"}
 					>
-						Add Later
+						Skip
 						<span className="inline-flex items-center gap-0.5">
-							<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-200 p-px font-medium text-[10px] uppercase">
-								A
-							</span>
-							<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-200 p-px font-medium text-[10px] uppercase">
-								L
-							</span>
+							<KbdKeyOutline>⌥</KbdKeyOutline>
+							<KbdKeyOutline>S</KbdKeyOutline>
 						</span>
 					</Button.Root>
 				</div>

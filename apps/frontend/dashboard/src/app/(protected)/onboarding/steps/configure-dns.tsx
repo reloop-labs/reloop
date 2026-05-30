@@ -5,7 +5,7 @@ import { useDomainActions } from "@fe/dashboard/app/(protected)/(layout)/domain/
 import type { DomainResponse } from "@fe/dashboard/types/api.types";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
-import { KbdEsc } from "@reloop/ui/kbd-esc";
+import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
 import Spinner from "@reloop/ui/spinner";
 import * as Switch from "@reloop/ui/switch";
 import axios from "axios";
@@ -75,7 +75,8 @@ export const ConfigureDnsStep = () => {
 		{ enableOnFormTags: true },
 	);
 
-	useHotkeys("v+l", () => {
+	useHotkeys("alt+s", (e) => {
+		e.preventDefault();
 		setStep(4);
 	});
 
@@ -303,8 +304,11 @@ export const ConfigureDnsStep = () => {
 						onClick={() => setStep(4)}
 						className="gap-1.5"
 					>
-						Verify later
-						<KbdEsc />
+						Skip
+						<span className="inline-flex items-center gap-0.5">
+							<KbdKeyOutline>⌥</KbdKeyOutline>
+							<KbdKeyOutline>S</KbdKeyOutline>
+						</span>
 					</Button.Root>
 				</div>
 			</div>
