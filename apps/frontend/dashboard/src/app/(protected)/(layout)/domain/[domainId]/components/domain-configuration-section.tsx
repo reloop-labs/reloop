@@ -199,7 +199,7 @@ export const DomainConfigurationSection = ({
 									mode="stroke"
 									size="small"
 									disabled={isLoading}
-									className="w-full justify-between gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-2"
+									className="w-full justify-between gap-1.5 whitespace-nowrap rounded-xl! px-2.5 py-2"
 								>
 									<div className="flex items-center gap-2 overflow-hidden">
 										<Icon
