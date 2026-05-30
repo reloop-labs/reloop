@@ -48,7 +48,7 @@ const DomainPage = () => {
 
 	if (error) {
 		return (
-			<div className="mx-auto max-w-3xl pt-10 pb-8 sm:px-8">
+			<div className="mx-auto flex min-h-[calc(100vh-200px)] max-w-3xl flex-col items-center justify-center sm:px-8">
 				<DomainNotFound />
 			</div>
 		);
