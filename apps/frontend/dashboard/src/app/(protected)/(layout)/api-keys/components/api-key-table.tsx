@@ -227,10 +227,6 @@ export const ApiKeyTable = ({
 		"limit",
 		parseAsInteger.withDefault(10),
 	);
-	const [searchQuery] = useQueryState("q");
-	const [statusFilter] = useQueryState("status");
-	const [creatorFilter] = useQueryState("creator");
-	const isSearch = !!searchQuery || !!statusFilter || !!creatorFilter;
 	const [togglingId, setTogglingId] = useState<string | null>(null);
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 
@@ -358,14 +354,7 @@ export const ApiKeyTable = ({
 						))
 					) : apiKeys.length === 0 ? (
 						<div className="w-full">
-							<EmptyState
-								onCreateApiKey={handleAddApiKey}
-								isSearch={isSearch}
-								searchQuery={searchQuery}
-								hasFilters={!!statusFilter || !!creatorFilter}
-								statusFilter={statusFilter}
-								creatorFilter={creatorFilter}
-							/>
+							<EmptyState onCreateApiKey={handleAddApiKey} />
 						</div>
 					) : (
 						apiKeys.map((apiKey, index) => {
