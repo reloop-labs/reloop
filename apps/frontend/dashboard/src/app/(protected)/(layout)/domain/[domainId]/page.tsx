@@ -10,10 +10,10 @@ import * as React from "react";
 import useSWR from "swr";
 import { DomainNotFound } from "../components/domain-not-found";
 import { DNSRecordsSection } from "./components/dns-records-section";
+import { DomainConfigurationSection } from "./components/domain-configuration-section";
 import { DomainEvents } from "./components/domain-events";
 import { DomainHeader } from "./components/domain-header";
 import { DomainStats } from "./components/domain-stats";
-import { DomainTrackingSection } from "./components/domain-tracking-section";
 
 const DomainPage = () => {
 	const { domainId } = useParams();
@@ -28,7 +28,7 @@ const DomainPage = () => {
 
 	const tabs = [
 		{ id: "dns", label: "DNS Records", icon: "file-text" },
-		{ id: "tracking", label: "Tracking", icon: "target" },
+		{ id: "configuration", label: "Configuration", icon: "sliders-horiz-2" },
 	];
 
 	const activeIndex = tabs.findIndex((t) => t.id === activeTab);
@@ -136,8 +136,11 @@ const DomainPage = () => {
 				<TabMenu.Content value="dns" className="outline-none">
 					<DNSRecordsSection domain={domainData} isLoading={isLoading} />
 				</TabMenu.Content>
-				<TabMenu.Content value="tracking">
-					<DomainTrackingSection domain={domainData} isLoading={isLoading} />
+				<TabMenu.Content value="configuration">
+					<DomainConfigurationSection
+						domain={domainData}
+						isLoading={isLoading}
+					/>
 				</TabMenu.Content>
 			</TabMenu.Root>
 		</div>

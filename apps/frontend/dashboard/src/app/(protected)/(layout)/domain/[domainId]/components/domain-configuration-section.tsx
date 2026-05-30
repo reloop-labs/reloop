@@ -1,7 +1,6 @@
 "use client";
 
 import type { DomainResponse } from "@fe/dashboard/types/api.types";
-import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Select from "@reloop/ui/select";
 import * as Switch from "@reloop/ui/switch";
@@ -10,15 +9,15 @@ import { useParams } from "next/navigation";
 import { useClipboard } from "../hooks/use-clipboard";
 import { useDomainActions } from "../hooks/use-domain-actions";
 
-interface DomainTrackingSectionProps {
+interface DomainConfigurationSectionProps {
 	domain?: DomainResponse;
 	isLoading?: boolean;
 }
 
-export const DomainTrackingSection = ({
+export const DomainConfigurationSection = ({
 	domain,
 	isLoading,
-}: DomainTrackingSectionProps) => {
+}: DomainConfigurationSectionProps) => {
 	const { domainId } = useParams();
 	const { handleUpdateDomain } = useDomainActions(domainId as string, domain);
 	const { copiedItems, copyToClipboard } = useClipboard();
