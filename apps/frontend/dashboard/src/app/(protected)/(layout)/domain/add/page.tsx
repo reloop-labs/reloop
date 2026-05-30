@@ -2,13 +2,13 @@
 import { DomainPreview } from "@fe/dashboard/app/(protected)/onboarding/components/domain-preview";
 import type { DomainResponse } from "@fe/dashboard/types/api.types";
 import { valibotResolver } from "@hookform/resolvers/valibot";
-import * as Accordion from "@reloop/ui/accordion";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
 import { useLoading } from "@reloop/ui/use-loading";
 import axios from "axios";
+import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -102,7 +102,7 @@ const AddDomain = () => {
 						<button
 							type="button"
 							onClick={() => setIsAdvancedOpen(!isAdvancedOpen)}
-							className="flex w-full cursor-pointer items-center justify-between py-1 outline-none"
+							className="flex w-full cursor-pointer items-center gap-1.5 py-1 outline-none"
 						>
 							<span className="font-medium text-sm text-text-strong-950">
 								Advanced options
@@ -115,17 +115,27 @@ const AddDomain = () => {
 								)}
 							/>
 						</button>
-						{isAdvancedOpen && (
-							<div className="mt-2 rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4">
-								<AdvancedOptions
-									control={control}
-									register={register}
-									domain={watch("domain")}
-									isLoading={status === "loading"}
-									errors={formState.errors}
-								/>
-							</div>
-						)}
+						<AnimatePresence initial={false}>
+							{isAdvancedOpen && (
+								<motion.div
+									initial={{ height: 0, opacity: 0 }}
+									animate={{ height: "auto", opacity: 1 }}
+									exit={{ height: 0, opacity: 0 }}
+									transition={{ duration: 0.2, ease: "easeInOut" }}
+									className="overflow-hidden"
+								>
+									<div className="mt-2 rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4">
+										<AdvancedOptions
+											control={control}
+											register={register}
+											domain={watch("domain")}
+											isLoading={status === "loading"}
+											errors={formState.errors}
+										/>
+									</div>
+								</motion.div>
+							)}
+						</AnimatePresence>
 					</div>
 					<div className="mt-6 flex items-center gap-3">
 						<Button.Root

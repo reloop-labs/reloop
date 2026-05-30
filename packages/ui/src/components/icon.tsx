@@ -2362,14 +2362,14 @@ export const IconsSprite = () => (
 				<path
 					d="M18 9L15 12"
 					stroke="currentColor"
-					strokeWidth="1.5"
+					strokeWidth="2"
 					strokeLinecap="round"
 					strokeLinejoin="round"
 				/>
 				<path
 					d="M6 9L12 15L15 12"
 					stroke="currentColor"
-					strokeWidth="1.5"
+					strokeWidth="2"
 					strokeLinecap="round"
 					strokeLinejoin="round"
 				/>
