@@ -70,13 +70,52 @@ export async function updateDomainController({
 				),
 			);
 
-		// Trigger DNS re-verification on domain settings update
-		try {
-			await verifyDNSRecordController({ domainId, organizationId });
-		} catch (verifyError) {
-			log.error(
-				`Failed to trigger DNS verification after domain settings update: ${verifyError instanceof Error ? verifyError.message : String(verifyError)}`,
-			);
+		// If both click and open tracking are disabled, reset the CNAME record status to pending and clear errors directly
+		const clickTracking =
+			body.click_tracking !== undefined
+				? body.click_tracking
+				: existingDomain.isClickTrackingEnabled;
+		const openTracking =
+			body.open_tracking !== undefined
+				? body.open_tracking
+				: existingDomain.isOpenTrackingEnabled;
+
+		if (!clickTracking && !openTracking) {
+			await db
+				.update(schema.domainDnsRecord)
+				.set({ status: "pending", verificationError: null })
+				.where(
+					and(
+						eq(schema.domainDnsRecord.domainId, domainId),
+						eq(schema.domainDnsRecord.recordType, "CNAME"),
+					),
+				);
+		} else {
+			await db
+				.update(schema.domainDnsRecord)
+				.set({ status: "verifying" })
+				.where(
+					and(
+						eq(schema.domainDnsRecord.domainId, domainId),
+						eq(schema.domainDnsRecord.recordType, "CNAME"),
+					),
+				);
+		}
+
+		// Trigger DNS re-verification only if sending or receiving email features are updated
+		if (
+			body.sending_email !== undefined ||
+			body.receiving_email !== undefined ||
+			body.click_tracking !== undefined ||
+			body.open_tracking !== undefined
+		) {
+			try {
+				await verifyDNSRecordController({ domainId, organizationId });
+			} catch (verifyError) {
+				log.error(
+					`Failed to trigger DNS verification after domain settings update: ${verifyError instanceof Error ? verifyError.message : String(verifyError)}`,
+				);
+			}
 		}
 
 		const updatedDomain = await db.query.domain.findFirst({
