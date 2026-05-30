@@ -1,5 +1,6 @@
 "use client";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
+import { authClient } from "@reloop/auth/client";
 import { Icon } from "@reloop/ui/icon";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useMemo } from "react";
@@ -8,6 +9,18 @@ import { ApiKeyListToolbar } from "./api-key-list-toolbar";
 import { ApiKeyTable } from "./api-key-table";
 import type { CreatedByUser } from "./api-key-user-filter-dropdown";
 import { CreateApiKeyModal } from "./create-api-key-modal/index";
+
+interface Member {
+	id: string;
+	role: string;
+	user: {
+		id: string;
+		name: string | null;
+		email: string;
+		image?: string | null;
+	};
+	createdAt: Date;
+}
 
 interface ApiKeyData {
 	id: string;
@@ -67,21 +80,30 @@ export const ApiKeyList = () => {
 		},
 	);
 
-	// Extract unique creators from API keys
+	// Fetch organization members to populate the creator filter dropdown
+	const { data: membersData } = useSWR<{ members: Member[] }>(
+		activeOrganization?.id
+			? `organization-member-${activeOrganization.id}`
+			: null,
+		async () => {
+			if (!activeOrganization?.id) return { members: [] };
+			const result = await authClient.organization.listMembers({
+				query: { organizationId: activeOrganization.id },
+			});
+			return result.data ?? { members: [] };
+		},
+	);
+
+	// Extract unique creators from organization members
 	const availableCreators = useMemo<CreatedByUser[]>(() => {
-		if (!data?.apiKeys) return [];
-		const creatorsMap = new Map<string, CreatedByUser>();
-		for (const apiKey of data.apiKeys) {
-			if (apiKey.createdBy?.id && !creatorsMap.has(apiKey.createdBy.id)) {
-				creatorsMap.set(apiKey.createdBy.id, {
-					id: apiKey.createdBy.id,
-					name: apiKey.createdBy.name,
-					image: apiKey.createdBy.image,
-				});
-			}
-		}
-		return Array.from(creatorsMap.values());
-	}, [data?.apiKeys]);
+		const members = membersData?.members ?? [];
+		return members.map((m) => ({
+			id: m.user.id,
+			name: m.user.name,
+			image: m.user.image ?? null,
+			email: m.user.email,
+		}));
+	}, [membersData]);
 
 	return (
 		<div className="pb-8">

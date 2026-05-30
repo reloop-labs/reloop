@@ -1,6 +1,10 @@
 "use client";
 
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
+import {
+	getAvatarGradient,
+	getAvatarInitial,
+} from "@fe/dashboard/utils/avatar";
 import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
@@ -12,6 +16,7 @@ export interface CreatedByUser {
 	id: string;
 	name: string | null;
 	image: string | null;
+	email?: string | null;
 }
 
 interface ApiKeyUserFilterDropdownProps {
@@ -38,7 +43,8 @@ export const ApiKeyUserFilterDropdown = ({
 	const selectedCreator = availableCreators.find((c) => c.id === value);
 
 	const displayLabel = selectedCreator
-		? selectedCreator.name || "Unknown"
+		? selectedCreator.name ||
+			(selectedCreator.email ? selectedCreator.email.split("@")[0] : "Unknown")
 		: "All Users";
 
 	const handleToggle = (userId: string | null) => {
@@ -57,13 +63,29 @@ export const ApiKeyUserFilterDropdown = ({
 				>
 					<div className="flex items-center gap-1.5 overflow-hidden">
 						{selectedCreator ? (
-							<Avatar.Root size="16">
+							<Avatar.Root size="16" color="blue">
 								{selectedCreator.image ? (
 									<Avatar.Image
 										src={selectedCreator.image}
 										alt={selectedCreator.name || "User"}
 									/>
-								) : null}
+								) : (
+									<Avatar.Image asChild>
+										<div
+											className={cn(
+												"flex h-full w-full items-center justify-center rounded-full font-medium text-[6px] text-white uppercase tracking-wide",
+												getAvatarGradient(
+													selectedCreator.email || "unknown@reloop.sh",
+												),
+											)}
+										>
+											{getAvatarInitial(
+												selectedCreator.name,
+												selectedCreator.email || "unknown@reloop.sh",
+											)}
+										</div>
+									</Avatar.Image>
+								)}
 							</Avatar.Root>
 						) : (
 							<Icon name="user" className="h-3.5 w-3.5 shrink-0" />
@@ -124,13 +146,29 @@ export const ApiKeyUserFilterDropdown = ({
 								)}
 							>
 								<div className="flex min-w-0 items-center gap-2">
-									<Avatar.Root size="16">
+									<Avatar.Root size="16" color="blue">
 										{creator.image ? (
 											<Avatar.Image
 												src={creator.image}
 												alt={creator.name || "User"}
 											/>
-										) : null}
+										) : (
+											<Avatar.Image asChild>
+												<div
+													className={cn(
+														"flex h-full w-full items-center justify-center rounded-full font-medium text-[6px] text-white uppercase tracking-wide",
+														getAvatarGradient(
+															creator.email || "unknown@reloop.sh",
+														),
+													)}
+												>
+													{getAvatarInitial(
+														creator.name,
+														creator.email || "unknown@reloop.sh",
+													)}
+												</div>
+											</Avatar.Image>
+										)}
 									</Avatar.Root>
 									<span
 										className={cn(
@@ -138,7 +176,7 @@ export const ApiKeyUserFilterDropdown = ({
 											isChecked && "font-medium text-text-strong-950",
 										)}
 									>
-										{creator.name || "Unknown"}
+										{creator.name || creator.email?.split("@")[0] || "Unknown"}
 									</span>
 								</div>
 								{isChecked && (
