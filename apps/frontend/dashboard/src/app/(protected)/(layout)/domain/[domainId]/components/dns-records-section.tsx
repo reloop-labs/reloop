@@ -30,7 +30,14 @@ export const DNSRecordsSection = ({
 	const { handleUpdateDomain } = useDomainActions(domain?.id, domain);
 
 	return (
-		<div className={cn("mb-24 flex flex-col", domain?.status ? "mt-6" : "")}>
+		<div
+			className={cn(
+				"mb-24 flex flex-col",
+				!(domain?.status !== "pending" && domain?.status !== "failed")
+					? "mt-6"
+					: "",
+			)}
+		>
 			{domain?.status && <DNSAutoConnectBanner domain={domain} />}
 
 			{/* Domain Verification Group */}
