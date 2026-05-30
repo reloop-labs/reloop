@@ -35,7 +35,7 @@ export const AdvancedOptions = ({
 				</Label.Root>
 				<Input.Root
 					hasError={!!errors?.customReturnPath}
-					className="w-full"
+					className="w-full rounded-xl"
 					size="small"
 				>
 					<Input.Wrapper>
@@ -68,7 +68,7 @@ export const AdvancedOptions = ({
 				</Label.Root>
 				<Input.Root
 					hasError={!!errors?.trackingSubdomain}
-					className="w-full"
+					className="w-full rounded-xl"
 					size="small"
 				>
 					<Input.Wrapper>
