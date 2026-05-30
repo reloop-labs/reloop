@@ -2,6 +2,7 @@ import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import { KbdEsc } from "@reloop/ui/kbd-esc";
+import * as Modal from "@reloop/ui/modal";
 import { useState } from "react";
 import { toast } from "sonner";
 import type { WebhookData } from "./types";
@@ -43,9 +44,9 @@ export function FormView({
 					<Icon name="trash" className="h-4 w-4 text-error-base" />
 				</div>
 
-				<h2 className="font-medium text-text-strong-950 text-title-h5">
+				<Modal.Title className="font-medium text-text-strong-950 text-title-h5">
 					Delete webhook?
-				</h2>
+				</Modal.Title>
 				<p className="mb-6 text-sm text-text-sub-600 leading-relaxed">
 					This will permanently delete the endpoint and all its delivery
 					history. This action cannot be undone.

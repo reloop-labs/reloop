@@ -86,7 +86,8 @@ export const TriggerWebhookModal = ({
 
 	return (
 		<Modal.Root open={isOpen} onOpenChange={onClose}>
-			<Modal.Content title="Trigger Test Event">
+			<Modal.Content>
+				<Modal.Title className="sr-only">Trigger Test Event</Modal.Title>
 				<div className="space-y-6 pt-4">
 					<div className="space-y-1.5">
 						<label

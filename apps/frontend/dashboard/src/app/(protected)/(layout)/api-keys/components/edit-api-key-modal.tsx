@@ -126,9 +126,9 @@ export const EditApiKeyModal = ({ apiKeys }: EditApiKeyModalProps) => {
 						<div className="p-6">
 							<div className="mb-4 flex items-center gap-2">
 								<Icon name="edit" className="h-4 w-4 text-text-strong-950" />
-								<h2 className="font-medium text-text-strong-950">
+								<Modal.Title className="font-medium text-text-strong-950">
 									Edit API key
-								</h2>
+								</Modal.Title>
 							</div>
 							<div className="flex flex-col gap-1.5">
 								<Label.Root htmlFor="name" className="text-text-strong-950">

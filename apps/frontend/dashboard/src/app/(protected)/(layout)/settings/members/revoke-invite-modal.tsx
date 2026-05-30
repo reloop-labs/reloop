@@ -63,9 +63,9 @@ export const RevokeInviteModal = ({
 					</div>
 
 					<div className="flex flex-col space-y-2 text-left">
-						<h2 className="font-semibold text-base text-text-strong-950">
+						<Modal.Title className="font-semibold text-base text-text-strong-950">
 							Revoke invite?
-						</h2>
+						</Modal.Title>
 						<p className="text-paragraph-sm text-text-sub-600 leading-relaxed">
 							This invite will be permanently invalidated. The recipient won't
 							be able to use the link to join, and you'll need to send a new

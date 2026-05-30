@@ -54,6 +54,9 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 								transition={{ type: "spring", damping: 25, stiffness: 200 }}
 								className="fixed inset-y-0 left-0 z-50 w-72 border-fd-border border-r bg-fd-background p-0 focus:outline-none"
 							>
+								<Dialog.Title className="sr-only">
+									Documentation Navigation
+								</Dialog.Title>
 								<div className="flex h-12 items-center border-fd-border border-b px-4">
 									<Link
 										href="/"

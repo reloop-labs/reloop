@@ -108,9 +108,9 @@ export const AddNewMailboxModal = ({
 					<div>
 						<Modal.Body className="flex w-full items-start gap-4">
 							<div className="space-y-1">
-								<div className="font-medium text-text-strong-950 text-xl">
+								<Modal.Title className="font-medium text-text-strong-950 text-xl">
 									Inbox Details
-								</div>
+								</Modal.Title>
 								<div className="text-paragraph-sm text-text-sub-600">
 									New Email Account create under{" "}
 									<span className="font-medium">xyz.com</span>
@@ -265,9 +265,9 @@ export const AddNewMailboxModal = ({
 					<form onSubmit={form.handleSubmit(onSubmit)}>
 						<Modal.Body className="flex w-full items-start gap-4">
 							<div className="w-full space-y-5">
-								<div className="font-medium text-label-md text-text-strong-950">
+								<Modal.Title className="font-medium text-label-md text-text-strong-950">
 									Add new mailbox
-								</div>
+								</Modal.Title>
 								<div>
 									<Label.Root htmlFor="name">
 										Name

@@ -112,9 +112,9 @@ export const EditWebhookModal = ({
 			<Modal.Content className="data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom-4 data-[state=open]:zoom-in-95 data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-bottom-4 data-[state=closed]:zoom-out-95 max-w-lg duration-200 data-[state=closed]:animate-out data-[state=open]:animate-in">
 				<form onSubmit={handleSubmit(onSubmit)}>
 					<Modal.Body>
-						<h2 className="mb-6 font-semibold text-gray-900 text-xl">
+						<Modal.Title className="mb-6 font-semibold text-gray-900 text-xl">
 							Edit Webhook
-						</h2>
+						</Modal.Title>
 						<div className="space-y-4">
 							<div>
 								<Label.Root htmlFor="name">Name</Label.Root>

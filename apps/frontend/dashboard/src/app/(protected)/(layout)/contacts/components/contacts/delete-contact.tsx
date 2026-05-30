@@ -69,9 +69,9 @@ export const DeleteContactModal = ({ contacts }: DeleteContactModalProps) => {
 							<Icon name="delete" className="h-6 w-6 text-error-base" />
 						</div>
 						<div className="text-center">
-							<h2 className="font-semibold text-gray-900 text-xl">
+							<Modal.Title className="font-semibold text-gray-900 text-xl">
 								Delete Contact
-							</h2>
+							</Modal.Title>
 							<p className="mt-2 text-paragraph-sm text-text-sub-600">
 								Are you sure you want to delete{" "}
 								<span className="font-medium text-text-strong-950">

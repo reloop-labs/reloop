@@ -26,9 +26,9 @@ export const RemoveMemberModal = ({
 		<Modal.Root open={open} onOpenChange={onOpenChange}>
 			<Modal.Content className="sm:max-w-[400px]" showClose={false}>
 				<div className="p-5">
-					<h2 className="mb-2 text-label-md text-text-strong-950">
+					<Modal.Title className="mb-2 text-label-md text-text-strong-950">
 						Remove member
-					</h2>
+					</Modal.Title>
 					<p className="text-paragraph-sm text-text-sub-600">
 						Are you sure you want to remove{" "}
 						<span className="font-medium text-text-strong-950">

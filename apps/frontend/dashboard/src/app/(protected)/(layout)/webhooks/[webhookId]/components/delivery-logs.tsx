@@ -755,6 +755,7 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 				onOpenChange={(open) => !open && setSelectedDeliveryId(null)}
 			>
 				<Drawer.Content className="w-[600px] max-w-[90vw]">
+					<Drawer.Title className="sr-only">Delivery Log Details</Drawer.Title>
 					{selectedDelivery ? (
 						<DeliveryDetail
 							delivery={selectedDelivery}
