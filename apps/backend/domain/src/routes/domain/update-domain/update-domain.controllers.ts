@@ -7,6 +7,7 @@ import { DOMAIN_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 
 import { useLogger } from "evlog/elysia";
+import { verifyDNSRecordController } from "../verify-dns/verify-dns.controllers";
 
 export async function updateDomainController({
 	domainId,
@@ -64,6 +65,15 @@ export async function updateDomainController({
 					isNull(schema.domain.deletedAt),
 				),
 			);
+
+		// Trigger DNS re-verification on domain settings update
+		try {
+			await verifyDNSRecordController({ domainId, organizationId });
+		} catch (verifyError) {
+			log.error(
+				`Failed to trigger DNS verification after domain settings update: ${verifyError instanceof Error ? verifyError.message : String(verifyError)}`,
+			);
+		}
 
 		const updatedDomain = await db.query.domain.findFirst({
 			where: and(
