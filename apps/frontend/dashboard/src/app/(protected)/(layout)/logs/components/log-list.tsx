@@ -10,7 +10,6 @@ import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";
 import useSWR from "swr";
 import { DateRangeFilter } from "./date-range-filter";
-import { DocsButton } from "./docs-button";
 import { LogDetailPanel } from "./log-detail-panel";
 import { LogDrawer } from "./log-drawer";
 import { LogTable } from "./log-table";
@@ -341,7 +340,6 @@ export const LogList = ({
 							Clear all
 						</Button.Root>
 					)}
-					{!hideDocs && <DocsButton size="xsmall" mode="stroke" />}
 					{!hideDocs && <LogsApiDetails size="xsmall" mode="ghost" />}
 				</div>
 			</div>
@@ -379,7 +377,6 @@ export const LogList = ({
 							setPageSize(value);
 							setCurrentPage(1);
 						}}
-						hideDocs={hideDocs}
 						isMobile={isMobile}
 					/>
 				</div>

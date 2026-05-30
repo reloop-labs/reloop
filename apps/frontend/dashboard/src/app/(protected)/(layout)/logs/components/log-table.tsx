@@ -35,7 +35,6 @@ interface LogTableProps {
 	endIndex?: number;
 	onPageChange?: (page: number) => void;
 	onPageSizeChange?: (size: number) => void;
-	hideDocs?: boolean;
 	isMobile?: boolean;
 }
 
@@ -187,7 +186,6 @@ export const LogTable = ({
 	endIndex = 0,
 	onPageChange,
 	onPageSizeChange,
-	hideDocs,
 	isMobile,
 }: LogTableProps) => {
 	return (
@@ -257,24 +255,6 @@ export const LogTable = ({
 								Logs will appear here once API requests start flowing through
 								your project.
 							</p>
-							{!hideDocs && (
-								<Button.Root
-									variant="neutral"
-									mode="stroke"
-									size="xsmall"
-									asChild
-									className="gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
-								>
-									<a
-										href="https://reloop.sh/docs/logs"
-										target="_blank"
-										rel="noopener noreferrer"
-									>
-										<Icon name="book-closed" className="h-3.5 w-3.5" />
-										Read the docs
-									</a>
-								</Button.Root>
-							)}
 						</div>
 					)
 				) : (
