@@ -340,7 +340,6 @@ export const LogList = ({
 							Clear all
 						</Button.Root>
 					)}
-					{!hideDocs && <LogsApiDetails size="xsmall" mode="ghost" />}
 				</div>
 			</div>
 
