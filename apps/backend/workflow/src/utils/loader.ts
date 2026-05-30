@@ -38,7 +38,7 @@ export const loader = async () => {
 						type: "verify-domain",
 						payload: { domain: payload.domain },
 					},
-					{ jobId: `verify-domain-${payload.domainId}` },
+					{ jobId: `verify-domain-${payload.domainId}-${Date.now()}` },
 				);
 			},
 		);
