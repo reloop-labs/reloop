@@ -58,7 +58,7 @@ export const EmptyState = () => {
 	}
 
 	return (
-		<div className="flex flex-col items-center px-6 py-12 text-center dark:bg-transparent">
+		<div className="flex flex-col items-center px-6 py-12 text-center dark:bg-bg-weak-50/30">
 			<div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
 				<Icon
 					name={isFiltered ? "search" : "globe"}
