@@ -261,8 +261,8 @@ export const LogTable = ({
 					groupLogsByDate(logs as any).map((group) => (
 						<div key={group.dateKey}>
 							{/* Date separator */}
-							<div className="sticky top-0 z-10 flex items-center gap-3 border-stroke-soft-100 border-b bg-bg-white-0 px-4 py-2.5 dark:border-stroke-soft-100/40">
-								<span className="font-medium text-text-soft-400 text-xs uppercase tracking-widest">
+							<div className="sticky top-0 z-10 flex items-center gap-3 border-stroke-soft-100 border-b bg-bg-weak-50 px-4 py-2.5 dark:border-stroke-soft-100/40">
+								<span className="font-medium text-xs uppercase tracking-widest">
 									{group.dateLabel}
 								</span>
 							</div>
