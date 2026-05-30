@@ -1,17 +1,23 @@
+"use client";
+
+import { useClipboard } from "@fe/dashboard/app/(protected)/(layout)/domain/[domainId]/hooks/use-clipboard";
 import type { DNSRecord } from "@fe/dashboard/types/api.types";
 import {
 	getStatusColorClass,
+	getStatusIcon,
 	getStatusLabel,
 } from "@fe/dashboard/utils/domain";
 import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import * as Tooltip from "@reloop/ui/tooltip";
+import * as React from "react";
 
 interface DNSRecordTableProps {
 	records?: DNSRecord[];
-	onCopyToClipboard?: (text: string) => void;
 	isLoading?: boolean;
 	loadingRows?: number;
+	tableId?: string;
 	hideStatus?: boolean;
 	showPriorityColumn?: boolean;
 }
@@ -72,12 +78,18 @@ const RecordSkeleton = ({
 
 export const DNSRecordTable = ({
 	records,
-	onCopyToClipboard,
 	isLoading,
 	loadingRows = 3,
+	tableId = "",
 	hideStatus = false,
-	showPriorityColumn = false,
+	showPriorityColumn: showPriorityColumnProp,
 }: DNSRecordTableProps) => {
+	const { copiedItems, copyToClipboard: onCopyToClipboard } = useClipboard();
+	const hasPriority = React.useMemo(
+		() => records?.some((r) => r.priority !== undefined && r.priority !== null),
+		[records],
+	);
+	const showPriorityColumn = !!(showPriorityColumnProp ?? hasPriority);
 	const gridCols = getGridCols(hideStatus, showPriorityColumn);
 
 	return (
@@ -128,41 +140,93 @@ export const DNSRecordTable = ({
 							<div
 								key={`record-${index}`}
 								className={cn(
-									"group/row grid items-center px-4 py-2 transition-colors",
+									"group/row grid items-center px-4 py-3 transition-colors",
 									"hover:bg-bg-weak-50/50",
 									gridCols,
 								)}
 							>
 								{/* Type Column */}
 								<div className="flex items-center">
-									<span className="inline-flex items-center rounded-md bg-neutral-alpha-10 px-2 py-0.5 font-semibold text-text-strong-950 text-xs dark:bg-neutral-alpha-16">
-										{record.recordType}
-									</span>
+									<button
+										type="button"
+										onClick={() =>
+											onCopyToClipboard?.(
+												record.recordType,
+												`${tableId}type-${index}`,
+											)
+										}
+										className={cn(
+											"inline-flex cursor-pointer items-center rounded-md px-2 py-0.5 font-semibold text-xs transition-colors",
+											copiedItems.has(`${tableId}type-${index}`)
+												? "bg-success-alpha-10 text-success-dark dark:bg-success-alpha-20"
+												: "bg-neutral-alpha-10 text-text-strong-950 hover:bg-neutral-alpha-20 dark:bg-neutral-alpha-16 hover:dark:bg-neutral-alpha-24",
+										)}
+									>
+										{copiedItems.has(`${tableId}type-${index}`)
+											? "Copied"
+											: record.recordType}
+									</button>
 								</div>
 
 								{/* Name Column */}
 								<button
 									type="button"
-									onClick={() => onCopyToClipboard?.(record.name)}
-									className="group/copy flex min-w-0 max-w-full cursor-pointer items-center overflow-hidden pr-2 text-left"
+									onClick={() =>
+										onCopyToClipboard?.(record.name, `${tableId}host-${index}`)
+									}
+									className="group/copy flex min-w-0 max-w-full cursor-pointer items-center gap-1.5 overflow-hidden pr-2 text-left"
 								>
 									<span className="truncate font-medium text-label-sm text-text-strong-950">
-										{record.name}
+										{copiedItems.has(`${tableId}host-${index}`)
+											? "Copied"
+											: record.name}
 									</span>
+									<Icon
+										name="copy"
+										className={cn(
+											"h-3.5 w-3.5 shrink-0 transition-colors",
+											copiedItems.has(`${tableId}host-${index}`)
+												? "hidden"
+												: "text-text-sub-600/50 group-hover/copy:text-text-strong-950",
+										)}
+									/>
 								</button>
 
 								{/* Value Column */}
-								<Tooltip.Provider delayDuration={300}>
+								<Tooltip.Provider delayDuration={0}>
 									<Tooltip.Root>
 										<Tooltip.Trigger asChild>
 											<button
 												type="button"
-												onClick={() => onCopyToClipboard?.(record.value)}
-												className="group/copy flex min-w-0 max-w-full cursor-pointer items-center overflow-hidden pr-2 text-left"
+												onClick={() =>
+													onCopyToClipboard?.(
+														record.value,
+														`${tableId}value-${index}`,
+													)
+												}
+												className="group/copy flex min-w-0 max-w-full cursor-pointer items-center gap-1.5 overflow-hidden pr-2 text-left"
 											>
-												<span className="truncate font-mono text-label-sm text-text-sub-600">
-													{record.value}
+												<span
+													className={cn(
+														"truncate font-mono text-label-sm",
+														copiedItems.has(`${tableId}value-${index}`)
+															? "font-medium text-text-strong-950"
+															: "text-text-sub-600",
+													)}
+												>
+													{copiedItems.has(`${tableId}value-${index}`)
+														? "Copied"
+														: record.value}
 												</span>
+												<Icon
+													name="copy"
+													className={cn(
+														"h-3.5 w-3.5 shrink-0 transition-colors",
+														copiedItems.has(`${tableId}value-${index}`)
+															? "hidden"
+															: "text-text-sub-600/50 group-hover/copy:opacity-100",
+													)}
+												/>
 											</button>
 										</Tooltip.Trigger>
 										<Tooltip.Content
@@ -181,10 +245,12 @@ export const DNSRecordTable = ({
 										{record.ttl}
 									</span>
 								</div>
+
 								{/* Priority Column - always render slot if status is shown for alignment */}
 								{(!hideStatus || showPriorityColumn) && (
 									<div className="flex items-center">
-										{record.priority ? (
+										{record.priority !== undefined &&
+										record.priority !== null ? (
 											<span className="inline-flex items-center rounded-md bg-neutral-alpha-10 px-2 py-0.5 font-semibold text-text-strong-950 text-xs dark:bg-neutral-alpha-16">
 												{record.priority}
 											</span>
@@ -199,10 +265,14 @@ export const DNSRecordTable = ({
 									<div className="flex items-center">
 										<div
 											className={cn(
-												"inline-flex items-center rounded-md py-0.5 pr-2 font-medium text-[13px] capitalize",
+												"inline-flex items-center gap-1.5 rounded-md py-0.5 pr-2 font-medium text-[13px] capitalize",
 												getStatusColorClass(record.status),
 											)}
 										>
+											<Icon
+												name={getStatusIcon(record.status)}
+												className="h-3.5 w-3.5"
+											/>
 											{getStatusLabel(record.status)}
 										</div>
 									</div>

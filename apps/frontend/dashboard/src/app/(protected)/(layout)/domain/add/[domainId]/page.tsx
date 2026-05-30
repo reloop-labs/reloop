@@ -43,12 +43,6 @@ const NewDomainPage = () => {
 		handleVerifyAndNavigate();
 	});
 
-	const copyToClipboard = async (text: string) => {
-		try {
-			await navigator.clipboard.writeText(text);
-		} catch {}
-	};
-
 	const handleVerifyAndNavigate = async () => {
 		if (!domainId) {
 			toast.error("Domain information not available");
@@ -114,7 +108,7 @@ const NewDomainPage = () => {
 				<DNSAutoConnectBanner domain={domainData} />
 
 				{/* Domain Verification Group */}
-				<div className="mt-6">
+				<div className="my-6 rounded-2xl border border-stroke-soft-100 p-4 dark:border-stroke-soft-100/10">
 					<div className="mb-4 flex items-center gap-2 text-base text-text-strong-950">
 						<Icon name="shield" className="h-4 w-4 text-text-sub-600" />
 						<h3 className="font-semibold">Domain Verification</h3>
@@ -123,15 +117,15 @@ const NewDomainPage = () => {
 						<DNSRecordSection
 							title="DKIM"
 							records={dkimRecords}
-							onCopyToClipboard={copyToClipboard}
 							isLoading={isLoading}
 							docsUrl="https://reloop.sh/docs/dns/dkim"
+							tableId="dkim-"
 						/>
 					)}
 				</div>
 
 				{/* Enable Sending Group */}
-				<div className="mt-6 border-stroke-soft-100 border-t pt-6 dark:border-stroke-soft-100/10">
+				<div className="mb-6 rounded-2xl border border-stroke-soft-100 p-4 dark:border-stroke-soft-100/10">
 					<div className="flex items-center justify-between">
 						<div className="flex items-center gap-2 text-base text-text-strong-950">
 							<Icon name="mail-single" className="h-4 w-4 text-text-sub-600" />
@@ -156,24 +150,24 @@ const NewDomainPage = () => {
 								animate={{ height: "auto", opacity: 1 }}
 								exit={{ height: 0, opacity: 0 }}
 								transition={{ duration: 0.2, ease: "easeInOut" }}
-								className="verflow-hidden"
+								className="mt-4 overflow-hidden"
 							>
 								<div className="space-y-6">
 									<DNSRecordSection
 										title="SPF"
 										records={sendingRecords}
-										onCopyToClipboard={copyToClipboard}
 										isLoading={isLoading}
 										docsUrl="https://reloop.sh/docs/dns/spf"
+										tableId="spf-"
 									/>
 									{dmarcRecords.length > 0 && (
 										<DNSRecordSection
 											loadingRows={2}
 											title="DMARC (Optional)"
 											records={dmarcRecords}
-											onCopyToClipboard={copyToClipboard}
 											isLoading={isLoading}
 											docsUrl="https://reloop.sh/docs/dns/dmarc"
+											tableId="dmarc-"
 										/>
 									)}
 								</div>
@@ -184,7 +178,7 @@ const NewDomainPage = () => {
 
 				{/* Enable Receiving Group */}
 				{receivingRecords.length > 0 && (
-					<div className="mt-6 border-stroke-soft-100 border-t pt-6 dark:border-stroke-soft-100/10">
+					<div className="mb-6 rounded-2xl border border-stroke-soft-100 p-4 dark:border-stroke-soft-100/10">
 						<div className="flex items-center justify-between">
 							<div className="flex items-center gap-2 text-base text-text-strong-950">
 								<Icon name="inbox" className="h-4 w-4 text-text-sub-600" />
@@ -209,14 +203,14 @@ const NewDomainPage = () => {
 									animate={{ height: "auto", opacity: 1 }}
 									exit={{ height: 0, opacity: 0 }}
 									transition={{ duration: 0.2, ease: "easeInOut" }}
-									className="overflow-hidden"
+									className="mt-4 overflow-hidden"
 								>
 									<DNSRecordSection
 										title="MX"
 										records={receivingRecords}
-										onCopyToClipboard={copyToClipboard}
 										isLoading={isLoading}
 										docsUrl="https://reloop.sh/docs/dns/mx"
+										tableId="mx-"
 									/>
 								</motion.div>
 							)}
@@ -226,7 +220,7 @@ const NewDomainPage = () => {
 
 				{/* Tracking Group */}
 				{trackingRecords.length > 0 && (
-					<div className="mt-6 border-stroke-soft-100 border-t pt-6 dark:border-stroke-soft-100/10">
+					<div className="rounded-2xl border border-stroke-soft-100 p-4 dark:border-stroke-soft-100/10">
 						<div className="flex items-center justify-between">
 							<div className="flex items-center gap-2 text-base text-text-strong-950">
 								<Icon name="graph-up" className="h-4 w-4 text-text-sub-600" />
@@ -258,14 +252,14 @@ const NewDomainPage = () => {
 									animate={{ height: "auto", opacity: 1 }}
 									exit={{ height: 0, opacity: 0 }}
 									transition={{ duration: 0.2, ease: "easeInOut" }}
-									className="overflow-hidden"
+									className="mt-4 overflow-hidden"
 								>
 									<DNSRecordSection
 										title="CNAME"
 										records={trackingRecords}
-										onCopyToClipboard={copyToClipboard}
 										isLoading={isLoading}
 										docsUrl="https://reloop.sh/docs/dns/cname"
+										tableId="cname-"
 									/>
 								</motion.div>
 							)}

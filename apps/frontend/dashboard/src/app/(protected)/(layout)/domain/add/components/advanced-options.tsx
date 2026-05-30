@@ -33,7 +33,11 @@ export const AdvancedOptions = ({
 				>
 					Receiving email path
 				</Label.Root>
-				<Input.Root hasError={!!errors?.customReturnPath} className="w-full" size="small">
+				<Input.Root
+					hasError={!!errors?.customReturnPath}
+					className="w-full"
+					size="small"
+				>
 					<Input.Wrapper>
 						<Input.Input
 							id="customReturnPath"
@@ -49,7 +53,9 @@ export const AdvancedOptions = ({
 					</Input.Wrapper>
 				</Input.Root>
 				{errors?.customReturnPath?.message && (
-					<p className="text-error-base text-xs">{errors.customReturnPath.message}</p>
+					<p className="text-error-base text-xs">
+						{errors.customReturnPath.message}
+					</p>
 				)}
 			</div>
 
@@ -60,7 +66,11 @@ export const AdvancedOptions = ({
 				>
 					Tracking Subdomain
 				</Label.Root>
-				<Input.Root hasError={!!errors?.trackingSubdomain} className="w-full" size="small">
+				<Input.Root
+					hasError={!!errors?.trackingSubdomain}
+					className="w-full"
+					size="small"
+				>
 					<Input.Wrapper>
 						<Input.Input
 							id="trackingSubdomain"
@@ -76,7 +86,9 @@ export const AdvancedOptions = ({
 					</Input.Wrapper>
 				</Input.Root>
 				{errors?.trackingSubdomain?.message && (
-					<p className="text-error-base text-xs">{errors.trackingSubdomain.message}</p>
+					<p className="text-error-base text-xs">
+						{errors.trackingSubdomain.message}
+					</p>
 				)}
 			</div>
 

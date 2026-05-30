@@ -10,7 +10,6 @@ interface DNSRecordSectionProps {
 	title: string;
 	statusText?: string;
 	records: DNSRecord[];
-	onCopyToClipboard: (text: string) => void;
 	isLoading: boolean;
 	docsUrl?: string;
 	switchProps?: {
@@ -19,21 +18,18 @@ interface DNSRecordSectionProps {
 		disabled: boolean;
 	};
 	loadingRows?: number;
+	tableId?: string;
 }
 
 export const DNSRecordSection: React.FC<DNSRecordSectionProps> = ({
 	title,
 	statusText,
 	records,
-	onCopyToClipboard,
 	isLoading,
 	docsUrl,
 	loadingRows = 1,
+	tableId,
 }) => {
-	const showPriorityColumn = records.some(
-		(r) => r.priority !== undefined && r.priority !== null,
-	);
-
 	return (
 		<div className="relative mt-7">
 			<div className="mb-3 flex items-start justify-between gap-4">
@@ -59,10 +55,9 @@ export const DNSRecordSection: React.FC<DNSRecordSectionProps> = ({
 			<div className="w-full">
 				<DNSRecordTable
 					records={records}
-					onCopyToClipboard={onCopyToClipboard}
 					isLoading={isLoading}
 					loadingRows={loadingRows}
-					showPriorityColumn={showPriorityColumn}
+					tableId={tableId}
 				/>
 			</div>
 		</div>
