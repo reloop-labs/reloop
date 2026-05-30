@@ -451,11 +451,11 @@ export const ApiKeyHeader = ({
 									</Avatar.Image>
 								)}
 							</Avatar.Root>
-							<span className="max-w-[150px] truncate font-medium text-paragraph-sm text-text-strong-950">
+							<p className="-mt-0.5 max-w-[150px] truncate font-medium text-paragraph-sm text-text-strong-950 leading-none">
 								{apiKey?.createdBy?.name ||
 									apiKey?.createdBy?.email ||
 									"Unknown"}
-							</span>
+							</p>
 						</div>
 					)}
 				</div>
