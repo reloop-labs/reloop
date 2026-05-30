@@ -2,6 +2,7 @@
 	"name": "@reloop/db",
 	"private": true,
 	"exports": {
+		".": "./src/index.ts",
 		"./client": "./src/client.ts",
 		"./schema": "./src/schema/index.ts",
 		"./index": "./src/index.ts",

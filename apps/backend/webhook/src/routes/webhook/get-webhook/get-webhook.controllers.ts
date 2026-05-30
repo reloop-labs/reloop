@@ -1,5 +1,6 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
+import { decryptSecret } from "@reloop/db";
 import { WebhookErrors } from "@reloop/webhook/error/webhook.error-response";
 import type { WebhookEventName } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
@@ -37,7 +38,7 @@ export async function getWebhookController({
 			id: webhook.id,
 			name: webhook.name,
 			url: webhook.url,
-			secret: webhook.secret,
+			secret: decryptSecret(webhook.secret),
 			status: webhook.status,
 			customHeaders: webhook.customHeaders,
 			rateLimitEnabled: webhook.rateLimitEnabled,

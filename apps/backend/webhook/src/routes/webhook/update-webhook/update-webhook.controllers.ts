@@ -1,5 +1,6 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
+import { encryptSecret, decryptSecret } from "@reloop/db";
 import { WebhookErrors } from "@reloop/webhook/error/webhook.error-response";
 import type { WebhookEventName } from "@reloop/webhook-events";
 import { and, eq, isNull, ne } from "drizzle-orm";
@@ -59,7 +60,8 @@ export async function updateWebhookController({
 
 		if (nameToUpdate !== undefined) updateValues.name = nameToUpdate;
 		if (body.url !== undefined) updateValues.url = body.url;
-		if (body.secret !== undefined) updateValues.secret = body.secret;
+		if (body.secret !== undefined)
+			updateValues.secret = encryptSecret(body.secret);
 		if (body.status !== undefined) updateValues.status = body.status;
 		if (body.customHeaders !== undefined) {
 			updateValues.customHeaders = body.customHeaders;
@@ -116,7 +118,7 @@ export async function updateWebhookController({
 			id: updatedWebhookWithSubs.id,
 			name: updatedWebhookWithSubs.name,
 			url: updatedWebhookWithSubs.url,
-			secret: updatedWebhookWithSubs.secret,
+			secret: decryptSecret(updatedWebhookWithSubs.secret),
 			status: updatedWebhookWithSubs.status,
 			customHeaders: updatedWebhookWithSubs.customHeaders,
 			rateLimitEnabled: updatedWebhookWithSubs.rateLimitEnabled,

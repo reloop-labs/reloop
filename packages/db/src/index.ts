@@ -23,4 +23,5 @@ export {
 	db,
 } from "./client";
 export * from "./schema/index";
+export * from "./utils/crypto";
 export * from "./webhook-events";

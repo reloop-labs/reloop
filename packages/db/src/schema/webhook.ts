@@ -17,6 +17,7 @@ const createWebhookId = () => `wh_${createId()}`;
 const createWebhookSubscriptionId = () => `whsub_${createId()}`;
 const createWebhookDeliveryId = () => `whde_${createId()}`;
 const createWebhookEventId = () => `evt_${createId()}`;
+const createWebhookDeliveryAttemptId = () => `whda_${createId()}`;
 
 export const webhookStatusEnum = pgEnum("webhook_status", [
 	"active",
@@ -189,6 +190,32 @@ export const webhookDelivery = pgTable(
 	],
 );
 
+export const webhookDeliveryAttempt = pgTable(
+	"webhook_delivery_attempt",
+	{
+		id: text("id")
+			.$defaultFn(() => createWebhookDeliveryAttemptId())
+			.primaryKey(),
+		webhookDeliveryId: text("webhook_delivery_id")
+			.notNull()
+			.references(() => webhookDelivery.id, { onDelete: "cascade" }),
+		attemptNumber: integer("attempt_number").notNull(),
+		status: webhookDeliveryStatusEnum("status").notNull(),
+		responseStatus: integer("response_status"),
+		responseBody: text("response_body"),
+		responseHeaders: jsonb("response_headers").$type<Record<string, string>>(),
+		durationMs: integer("duration_ms"),
+		errorMessage: text("error_message"),
+		createdAt: timestamp("created_at").notNull().defaultNow(),
+	},
+	(table) => [
+		index("webhook_delivery_attempt_idx_delivery_id").on(
+			table.webhookDeliveryId,
+		),
+		index("webhook_delivery_attempt_idx_created_at").on(table.createdAt),
+	],
+);
+
 export const webhookRelations = relations(webhook, ({ one, many }) => ({
 	organization: one(organization, {
 		fields: [webhook.organizationId],
@@ -233,7 +260,7 @@ export const webhookEventSubscriptionRelations = relations(
 
 export const webhookDeliveryRelations = relations(
 	webhookDelivery,
-	({ one }) => ({
+	({ one, many }) => ({
 		webhook: one(webhook, {
 			fields: [webhookDelivery.webhookId],
 			references: [webhook.id],
@@ -241,6 +268,17 @@ export const webhookDeliveryRelations = relations(
 		event: one(webhookEvent, {
 			fields: [webhookDelivery.webhookEventId],
 			references: [webhookEvent.id],
+		}),
+		attempts: many(webhookDeliveryAttempt),
+	}),
+);
+
+export const webhookDeliveryAttemptRelations = relations(
+	webhookDeliveryAttempt,
+	({ one }) => ({
+		delivery: one(webhookDelivery, {
+			fields: [webhookDeliveryAttempt.webhookDeliveryId],
+			references: [webhookDelivery.id],
 		}),
 	}),
 );
@@ -250,6 +288,7 @@ export const webhookTables = {
 	webhookEventSubscription,
 	webhookEvent,
 	webhookDelivery,
+	webhookDeliveryAttempt,
 } as const;
 
 export type WebhookTable = typeof webhookTables;

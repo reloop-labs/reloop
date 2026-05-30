@@ -39,6 +39,7 @@ async function processWorkflow(job: Job<WorkflowJobData>): Promise<void> {
 			eventType: jobData.payload.eventType as string,
 			payload: jobData.payload.payload as Record<string, unknown>,
 			isLastAttempt,
+			attemptNumber: job.attemptsMade + 1,
 		});
 	}
 

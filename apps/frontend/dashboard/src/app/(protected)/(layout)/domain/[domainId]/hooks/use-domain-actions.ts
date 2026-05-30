@@ -95,9 +95,6 @@ export const useDomainActions = (
 
 				await mutate(cacheKey, data, false);
 				toast.success(successMessage);
-
-
-
 			} catch (error) {
 				await mutate(cacheKey);
 				const errorMessage = axios.isAxiosError(error)

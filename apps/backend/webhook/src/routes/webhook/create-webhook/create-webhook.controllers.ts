@@ -1,6 +1,7 @@
 import { createId } from "@paralleldrive/cuid2";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
+import { encryptSecret, decryptSecret } from "@reloop/db";
 import { WebhookErrors } from "@reloop/webhook/error/webhook.error-response";
 import type { WebhookEventName } from "@reloop/webhook-events";
 import { log } from "evlog";
@@ -21,12 +22,15 @@ export async function createWebhookController({
 }): Promise<WebhookTypes.WebhookResponse> {
 	log.info({ ...{ url, events, description }, message: "Creating webhook" });
 	try {
+		const rawSecret = `whsec_${createId()}`;
+		const encryptedSecret = encryptSecret(rawSecret);
+
 		const [newWebhook] = await db
 			.insert(schema.webhook)
 			.values({
 				name: description,
 				url,
-				secret: `whsec_${createId()}`,
+				secret: encryptedSecret,
 				organizationId,
 				userId,
 				status: "active",
@@ -64,7 +68,7 @@ export async function createWebhookController({
 			id: newWebhook.id,
 			name: newWebhook.name,
 			url: newWebhook.url,
-			secret: newWebhook.secret,
+			secret: decryptSecret(newWebhook.secret),
 			status: newWebhook.status,
 			customHeaders: newWebhook.customHeaders,
 			rateLimitEnabled: newWebhook.rateLimitEnabled,

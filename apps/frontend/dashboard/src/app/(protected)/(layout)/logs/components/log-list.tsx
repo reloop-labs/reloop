@@ -353,7 +353,7 @@ export const LogList = ({
 				</div>
 
 				{/* RIGHT — Inline detail panel */}
-				<div className="flex-1 rounded-3xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
+				<div className="min-w-0 flex-1 rounded-3xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
 					{selectedLogId ? (
 						<LogDetailPanel logId={selectedLogId} />
 					) : (

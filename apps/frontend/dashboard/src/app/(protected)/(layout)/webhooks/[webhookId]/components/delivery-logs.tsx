@@ -1,16 +1,19 @@
+import { CopyCodeBlock } from "@fe/dashboard/app/(protected)/onboarding/steps/generate-api-key/components/copy-code-block";
 import { PageSizeDropdown } from "@fe/dashboard/components/page-size-dropdown";
 import { PaginationControls } from "@fe/dashboard/components/pagination-controls";
+import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Drawer from "@reloop/ui/drawer";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import { Skeleton } from "@reloop/ui/skeleton";
+import * as Tooltip from "@reloop/ui/tooltip";
 import axios from "axios";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { parseAsInteger, useQueryState } from "nuqs";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import useSWR, { mutate } from "swr";
 
@@ -112,32 +115,180 @@ interface DeliveryDetailProps {
 	onClose?: () => void;
 }
 
+const getStatusProps = (
+	statusCode: number | null,
+	deliveryStatus: string,
+): { label: string; color: "gray" | "blue" | "orange" | "red" } => {
+	if (statusCode) {
+		let label = `${statusCode}`;
+		let color: "gray" | "blue" | "orange" | "red" = "gray";
+
+		if (statusCode >= 200 && statusCode < 300) {
+			label = `${statusCode} OK`;
+			color = "gray";
+		} else if (statusCode >= 300 && statusCode < 400) {
+			label = `${statusCode} REDIR`;
+			color = "blue";
+		} else if (statusCode >= 400 && statusCode < 500) {
+			label = `${statusCode} ERR`;
+			color = "orange";
+		} else if (statusCode >= 500) {
+			label = `${statusCode} ERR`;
+			color = "red";
+		}
+
+		return { label, color };
+	}
+
+	switch (deliveryStatus) {
+		case "success":
+			return { label: "SUCCESS", color: "gray" };
+		case "failed":
+			return { label: "FAILED", color: "red" };
+		case "pending":
+			return { label: "PENDING", color: "orange" };
+		case "retrying":
+		case "retried":
+			return { label: "RETRYING", color: "orange" };
+		default:
+			return { label: deliveryStatus.toUpperCase(), color: "gray" };
+	}
+};
+
+function CopyButton({ value, label }: { value: string; label?: string }) {
+	const [copied, setCopied] = useState(false);
+
+	const handleCopy = useCallback(async () => {
+		try {
+			await navigator.clipboard.writeText(value);
+			setCopied(true);
+			toast.success(label ? `${label} copied` : "Copied");
+			setTimeout(() => setCopied(false), 2000);
+		} catch {
+			toast.error("Failed to copy");
+		}
+	}, [value, label]);
+
+	return (
+		<button
+			type="button"
+			onClick={handleCopy}
+			className="rounded p-0.5 text-text-soft-400 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950"
+			title={`Copy ${label || "value"}`}
+		>
+			<Icon
+				name={copied ? "check" : "copy"}
+				className={cn("h-3 w-3", copied && "text-success-base")}
+			/>
+		</button>
+	);
+}
+
+function PropertyRow({
+	label,
+	children,
+}: {
+	label: string;
+	children: React.ReactNode;
+}) {
+	return (
+		<div className="grid grid-cols-[120px_1fr] items-start gap-4 py-2.5">
+			<span className="text-text-sub-600 text-xs">{label}</span>
+			<div className="flex min-w-0 flex-1 items-center gap-1.5 text-right">
+				{children}
+			</div>
+		</div>
+	);
+}
+
+function PropertyValue({
+	value,
+	mono,
+	copyable,
+	maxLength,
+}: {
+	value: string | null | undefined;
+	mono?: boolean;
+	copyable?: boolean;
+	maxLength?: number;
+}) {
+	if (!value) return <span className="text-text-soft-400 text-xs">—</span>;
+
+	const isTruncated = maxLength && value.length > maxLength;
+	const display = isTruncated ? `${value.slice(0, maxLength)}…` : value;
+
+	const content = (
+		<span className={cn("text-text-strong-950 text-xs", mono && "font-mono")}>
+			{display}
+		</span>
+	);
+
+	return (
+		<>
+			{isTruncated ? (
+				<Tooltip.Provider delayDuration={300}>
+					<Tooltip.Root>
+						<Tooltip.Trigger asChild>{content}</Tooltip.Trigger>
+						<Tooltip.Content
+							side="top"
+							variant="light"
+							className="max-w-sm break-all font-mono text-xs"
+						>
+							{value}
+						</Tooltip.Content>
+					</Tooltip.Root>
+				</Tooltip.Provider>
+			) : (
+				content
+			)}
+			{copyable && <CopyButton value={value} label={mono ? "ID" : undefined} />}
+		</>
+	);
+}
+
 const DeliveryDetail = ({
 	delivery,
 	onRetry,
 	showCloseButton,
 	onClose,
 }: DeliveryDetailProps) => {
+	const statusProps = getStatusProps(delivery.responseStatus, delivery.status);
+	const duration = delivery.completedAt
+		? dayjs(delivery.completedAt).diff(dayjs(delivery.createdAt), "ms")
+		: null;
+
+	let formattedResponse = delivery.responseBody || "";
+	try {
+		if (
+			formattedResponse.trim().startsWith("{") ||
+			formattedResponse.trim().startsWith("[")
+		) {
+			formattedResponse = JSON.stringify(
+				JSON.parse(formattedResponse),
+				null,
+				2,
+			);
+		}
+	} catch {}
+
 	return (
 		<div className="flex h-full flex-col">
-			<div className="flex items-center justify-between border-stroke-soft-200 border-b p-6">
-				<div className="flex flex-col gap-1">
-					<div className="flex items-center gap-2">
-						<h3 className="font-semibold text-lg text-text-strong-950">
-							{delivery.eventType}
-						</h3>
-						<span
-							className={cn(
-								"inline-flex rounded-full px-2 py-0.5 font-medium text-xs capitalize",
-								getStatusColorClass(delivery.status),
-							)}
-						>
-							{delivery.status}
+			{/* ── Panel Header ── */}
+			<div className="flex items-start justify-between gap-3 border-stroke-soft-200 border-b p-6">
+				<div className="min-w-0 flex-1">
+					<h2 className="truncate font-semibold text-sm text-text-strong-950">
+						<span className="mr-1.5 font-bold text-blue-700 uppercase dark:text-blue-400">
+							POST
 						</span>
+						<span>{delivery.requestUrl}</span>
+					</h2>
+					<div className="mt-1 flex items-center gap-2 text-text-sub-600 text-xs">
+						<span>
+							{dayjs(delivery.createdAt).format("DD/MM/YYYY, HH:mm:ss")}
+						</span>
+						<span className="text-text-disabled-300">·</span>
+						<span>{dayjs(delivery.createdAt).fromNow()}</span>
 					</div>
-					<p className="text-sm text-text-sub-600">
-						{dayjs(delivery.createdAt).format("MMMM D, YYYY [at] h:mm:ss A")}
-					</p>
 				</div>
 				<div className="flex items-center gap-2">
 					<Button.Root
@@ -163,109 +314,127 @@ const DeliveryDetail = ({
 				</div>
 			</div>
 
-			<div className="flex-1 overflow-y-auto p-6">
-				<div className="grid grid-cols-1 gap-8">
-					<div className="grid grid-cols-2 gap-4 rounded-lg bg-bg-weak-25 p-4 md:grid-cols-4">
+			{/* ── Body ── */}
+			<div className="flex-1 space-y-4 overflow-y-auto p-6">
+				{/* Property table */}
+				<div className="rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/40">
+					<div className="divide-y divide-stroke-soft-100 px-4 dark:divide-stroke-soft-100/40">
+						<PropertyRow label="Status">
+							<Badge.Root
+								variant="lighter"
+								color={statusProps.color}
+								className="h-[18px] rounded-md px-1.5 font-semibold text-[10px] tracking-normal"
+							>
+								{statusProps.label}
+							</Badge.Root>
+						</PropertyRow>
+
+						<PropertyRow label="Delivery ID">
+							<PropertyValue value={delivery.id} mono copyable maxLength={26} />
+						</PropertyRow>
+
+						{delivery.webhookEventId && (
+							<PropertyRow label="Event ID">
+								<PropertyValue
+									value={delivery.webhookEventId}
+									mono
+									copyable
+									maxLength={26}
+								/>
+							</PropertyRow>
+						)}
+
+						<PropertyRow label="Event Type">
+							<PropertyValue value={delivery.eventType} />
+						</PropertyRow>
+
+						<PropertyRow label="Attempt">
+							<PropertyValue
+								value={`${delivery.attemptNumber} of ${delivery.maxAttempts}`}
+							/>
+						</PropertyRow>
+
+						<PropertyRow label="API Version">
+							<PropertyValue value="2026-04-03" />
+						</PropertyRow>
+
+						<PropertyRow label="Time">
+							<PropertyValue
+								value={dayjs(delivery.createdAt).format("DD/MM/YYYY, HH:mm:ss")}
+							/>
+						</PropertyRow>
+
+						{duration !== null && (
+							<PropertyRow label="Duration">
+								<PropertyValue value={`${duration}ms`} />
+							</PropertyRow>
+						)}
+					</div>
+				</div>
+
+				{/* Request Body */}
+				{delivery.requestBody &&
+					Object.keys(delivery.requestBody).length > 0 && (
 						<div>
-							<p className="text-text-sub-600 text-xs uppercase tracking-wider">
-								Delivery Status
-							</p>
-							<p className="mt-1 font-medium text-sm capitalize">
-								{delivery.status}
-							</p>
+							<CopyCodeBlock
+								code={JSON.stringify(delivery.requestBody, null, 2)}
+								lang="json"
+								label="Request body"
+							/>
 						</div>
+					)}
+
+				{/* Request Headers */}
+				{delivery.requestHeaders &&
+					Object.keys(delivery.requestHeaders).length > 0 && (
 						<div>
-							<p className="text-text-sub-600 text-xs uppercase tracking-wider">
-								Attempt
-							</p>
-							<p className="mt-1 font-medium text-sm">
-								{delivery.attemptNumber} of {delivery.maxAttempts}
-							</p>
+							<CopyCodeBlock
+								code={JSON.stringify(delivery.requestHeaders, null, 2)}
+								lang="json"
+								label="Request headers"
+							/>
 						</div>
-						<div>
-							<p className="text-text-sub-600 text-xs uppercase tracking-wider">
-								Event ID
-							</p>
-							<p className="mt-1 truncate font-mono text-xs">
-								{delivery.webhookEventId || "N/A"}
-							</p>
+					)}
+
+				{/* Response Body */}
+				{formattedResponse ? (
+					<div>
+						<CopyCodeBlock
+							code={formattedResponse}
+							lang={
+								formattedResponse.trim().startsWith("{") ||
+								formattedResponse.trim().startsWith("[")
+									? "json"
+									: "text"
+							}
+							label="Response body"
+						/>
+					</div>
+				) : (
+					<div className="rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/40">
+						<div className="flex items-center gap-2 border-stroke-soft-100 border-b px-4 py-2.5 dark:border-stroke-soft-100/40">
+							<Icon name="code" className="h-3.5 w-3.5 text-text-sub-600" />
+							<span className="font-medium text-[11px] text-text-sub-600 uppercase tracking-wider">
+								Response body
+							</span>
 						</div>
-						<div>
-							<p className="text-text-sub-600 text-xs uppercase tracking-wider">
-								API Version
-							</p>
-							<p className="mt-1 font-medium text-sm">2026-04-03</p>
+						<div className="py-4 text-center text-text-soft-400 text-xs">
+							No response body
 						</div>
 					</div>
+				)}
 
-					<section className="space-y-3">
-						<h4 className="font-semibold text-text-strong-950 text-xs uppercase tracking-wider">
-							Response
-						</h4>
-						<div className="overflow-hidden rounded-xl border border-stroke-soft-200">
-							<div className="flex items-center justify-between border-stroke-soft-200 border-b bg-bg-weak-25 px-4 py-3">
-								<span className="font-medium text-sm">
-									HTTP status code {delivery.responseStatus}
-								</span>
-							</div>
-							<div className="overflow-hidden bg-white p-4">
-								{delivery.responseBody ? (
-									<pre className="max-h-[300px] overflow-auto rounded-lg bg-slate-950 p-4 font-mono text-[13px] text-white leading-relaxed">
-										{delivery.responseBody.startsWith("{")
-											? JSON.stringify(
-													JSON.parse(delivery.responseBody),
-													null,
-													2,
-												)
-											: delivery.responseBody}
-									</pre>
-								) : (
-									<div className="py-8 text-center text-sm text-text-sub-600 italic">
-										No response body provided
-									</div>
-								)}
-							</div>
+				{/* Response Headers */}
+				{delivery.responseHeaders &&
+					Object.keys(delivery.responseHeaders).length > 0 && (
+						<div>
+							<CopyCodeBlock
+								code={JSON.stringify(delivery.responseHeaders, null, 2)}
+								lang="json"
+								label="Response headers"
+							/>
 						</div>
-					</section>
-
-					<section className="space-y-3">
-						<h4 className="font-semibold text-text-strong-950 text-xs uppercase tracking-wider">
-							Request
-						</h4>
-						<div className="overflow-hidden rounded-xl border border-stroke-soft-200">
-							<div className="border-stroke-soft-200 border-b bg-bg-weak-25 px-4 py-3">
-								<p className="mb-1 font-medium text-text-sub-600 text-xs">
-									URL
-								</p>
-								<code className="break-all font-medium text-sm">
-									{delivery.requestUrl}
-								</code>
-							</div>
-							<div className="space-y-4 bg-white p-4">
-								{delivery.requestHeaders && (
-									<div>
-										<p className="mb-2 font-medium text-text-sub-600 text-xs">
-											Headers
-										</p>
-										<pre className="overflow-x-auto rounded-lg bg-bg-weak-50 p-3 font-mono text-text-sub-600 text-xs">
-											{JSON.stringify(delivery.requestHeaders, null, 2)}
-										</pre>
-									</div>
-								)}
-								{delivery.requestBody && (
-									<div>
-										<p className="mb-2 font-medium text-text-sub-600 text-xs">
-											Body
-										</p>
-										<pre className="overflow-x-auto rounded-lg bg-bg-weak-50 p-3 font-mono text-text-sub-600 text-xs">
-											{JSON.stringify(delivery.requestBody, null, 2)}
-										</pre>
-									</div>
-								)}
-							</div>
-						</div>
-					</section>
-				</div>
+					)}
 			</div>
 		</div>
 	);
@@ -541,7 +710,7 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 
 				{/* RIGHT — Inline detail panel (Desktop only) */}
 				{!isMobile && (
-					<div className="min-h-[500px] flex-1 rounded-3xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
+					<div className="min-h-[500px] min-w-0 flex-1 rounded-3xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
 						{selectedDelivery ? (
 							<DeliveryDetail
 								delivery={selectedDelivery}
