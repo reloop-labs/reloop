@@ -31,6 +31,12 @@ interface ApiKeyData {
 	updatedAt: string;
 	permissions: string | null;
 	metadata: string | null;
+	createdBy?: {
+		id: string;
+		name: string | null;
+		image: string | null;
+		email: string | null;
+	};
 }
 
 const ApiKeyDetailPage = () => {

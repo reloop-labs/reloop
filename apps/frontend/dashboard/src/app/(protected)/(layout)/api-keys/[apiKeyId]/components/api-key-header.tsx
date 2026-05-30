@@ -3,6 +3,10 @@
 import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
+import {
+	getAvatarGradient,
+	getAvatarInitial,
+} from "@fe/dashboard/utils/avatar";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
@@ -408,6 +412,51 @@ export const ApiKeyHeader = ({
 								? formatRelativeTime(apiKey.lastRequest)
 								: "No activity"}
 						</span>
+					)}
+				</div>
+
+				{/* Created By */}
+				<div className="flex flex-col gap-1.5">
+					<div className="flex items-center gap-1.5">
+						<Icon name="user" className="h-3.5 w-3.5 text-text-sub-600" />
+						<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
+							Created By
+						</span>
+					</div>
+					{isLoading ? (
+						<Skeleton className="h-5 w-24 rounded-lg" />
+					) : (
+						<div className="flex items-center gap-2">
+							<Avatar.Root size="20" color="blue" className="shrink-0">
+								{apiKey?.createdBy?.image ? (
+									<Avatar.Image
+										src={apiKey.createdBy.image}
+										alt={apiKey.createdBy.name || "User"}
+									/>
+								) : (
+									<Avatar.Image asChild>
+										<div
+											className={cn(
+												"flex h-full w-full items-center justify-center rounded-full font-medium text-[8px] text-white uppercase tracking-wide",
+												getAvatarGradient(
+													apiKey?.createdBy?.email || "unknown@reloop.sh",
+												),
+											)}
+										>
+											{getAvatarInitial(
+												apiKey?.createdBy?.name || null,
+												apiKey?.createdBy?.email || "unknown@reloop.sh",
+											)}
+										</div>
+									</Avatar.Image>
+								)}
+							</Avatar.Root>
+							<span className="max-w-[150px] truncate font-medium text-paragraph-sm text-text-strong-950">
+								{apiKey?.createdBy?.name ||
+									apiKey?.createdBy?.email ||
+									"Unknown"}
+							</span>
+						</div>
 					)}
 				</div>
 			</div>
