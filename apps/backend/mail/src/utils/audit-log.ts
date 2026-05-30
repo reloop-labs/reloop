@@ -114,9 +114,10 @@ export function auditLogHook(opts: AuditLogHookOptions) {
 				event,
 				level,
 				trace_id: traceId,
-				actor_type: authType === "apiKey" ? "api_key" : "user",
+				actor_type:
+					authType === "apiKey" || authType === "apikey" ? "api_key" : "user",
 				actor_id:
-					authType === "apiKey"
+					authType === "apiKey" || authType === "apikey"
 						? (apikeyId ?? undefined)
 						: (userId ?? undefined),
 				organization_id: finalOrganizationId,

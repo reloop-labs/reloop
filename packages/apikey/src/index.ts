@@ -1,6 +1,8 @@
 import { createHash, randomBytes } from "node:crypto";
 import type { RedisCache } from "@reloop/cache/redis-client";
 import { db as defaultDb } from "@reloop/db/client";
+import { apikey } from "@reloop/db/schema";
+import { eq, sql } from "drizzle-orm";
 
 export const API_KEY_PREFIX = "rl_prod";
 export const API_KEY_LENGTH = 20;
@@ -51,6 +53,15 @@ export async function validateApiKey(
 	}>(cacheKey);
 
 	if (cached) {
+		// Update request stats in database asynchronously
+		db.update(apikey)
+			.set({
+				requestCount: sql`${apikey.requestCount} + 1`,
+				lastRequest: new Date(),
+			})
+			.where(eq(apikey.id, cached.apiKeyId))
+			.catch((err) => console.error("Failed to update API key stats:", err));
+
 		return {
 			userId: cached.userId,
 			organizationId: cached.organizationId,
@@ -71,6 +82,16 @@ export async function validateApiKey(
 			apiKeyId: apiKeyRecord.id,
 		};
 		await redis.set(cacheKey, result, 30 * 24 * 60 * 60);
+
+		// Update request stats in database asynchronously
+		db.update(apikey)
+			.set({
+				requestCount: sql`${apikey.requestCount} + 1`,
+				lastRequest: new Date(),
+			})
+			.where(eq(apikey.id, apiKeyRecord.id))
+			.catch((err) => console.error("Failed to update API key stats:", err));
+
 		return {
 			...result,
 			authType: "apikey",
