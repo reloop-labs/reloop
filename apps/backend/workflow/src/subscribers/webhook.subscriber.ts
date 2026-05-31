@@ -3,6 +3,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
+import { eq } from "drizzle-orm";
 import { log } from "evlog";
 
 export async function initWebhookSubscribers() {
@@ -300,6 +301,112 @@ export async function initWebhookSubscribers() {
 				action: "rotated",
 			},
 			organizationId: payload.organizationId,
+		});
+	});
+
+	// Subscribe to Email Webhook Events
+	await bus.subscribe(BusEvent.EMAIL_SENT, async (payload) => {
+		log.info({
+			message: "Received Email Sent event from NATS, triggering webhooks",
+			emailLogId: payload.emailLogId,
+			organizationId: payload.organizationId,
+		});
+
+		const email = await db.query.emailLog.findFirst({
+			where: eq(schema.emailLog.id, payload.emailLogId),
+		});
+
+		if (!email) {
+			log.warn({
+				message: "Email log not found for webhook dispatch",
+				emailLogId: payload.emailLogId,
+			});
+			return;
+		}
+
+		await bus.publish(BusEvent.WEBHOOK_TRIGGERED, {
+			event: "email.sent",
+			payload: {
+				id: email.id,
+				object: "email",
+				from: email.fromEmail,
+				to: email.toEmails,
+				subject: email.subject,
+				created_at: email.createdAt,
+				status: email.status,
+			},
+			organizationId: payload.organizationId,
+		});
+	});
+
+	await bus.subscribe(BusEvent.KUMOMTA_EVENT, async (event) => {
+		let webhookEventName: string | null = null;
+		if (event.type === "Delivery") {
+			webhookEventName = "email.delivered";
+		} else if (event.type === "Bounce" || event.type === "AdminBounce") {
+			webhookEventName = "email.bounced";
+		} else if (event.type === "TransientFailure") {
+			webhookEventName = "email.delivery_delayed";
+		} else if (event.type === "Feedback") {
+			webhookEventName = "email.complained";
+		}
+
+		if (!webhookEventName) return;
+
+		let emailLogId =
+			event.headers?.["X-Email-Log-ID"] || event.meta?.["X-Email-Log-ID"];
+
+		if (!emailLogId) {
+			// Fallback: look up by providerMessageId which corresponds to event.id
+			const logEntry = await db.query.emailLog.findFirst({
+				where: eq(schema.emailLog.providerMessageId, event.id),
+				columns: { id: true },
+			});
+			if (logEntry) emailLogId = logEntry.id;
+		}
+
+		if (!emailLogId) return;
+
+		const email = await db.query.emailLog.findFirst({
+			where: eq(schema.emailLog.id, emailLogId),
+		});
+
+		if (!email) return;
+
+		log.info({
+			message: `Received KumoMTA event (${event.type}), triggering ${webhookEventName} webhook`,
+			emailLogId,
+			organizationId: email.organizationId,
+		});
+
+		const webhookPayload: Record<string, unknown> = {
+			id: email.id,
+			object: "email",
+			from: email.fromEmail,
+			to: email.toEmails,
+			subject: email.subject,
+			created_at: email.createdAt,
+			status: email.status,
+		};
+
+		if (
+			webhookEventName === "email.bounced" ||
+			webhookEventName === "email.complained" ||
+			webhookEventName === "email.delivery_delayed"
+		) {
+			webhookPayload.error = {
+				code: event.response?.code,
+				message:
+					event.response?.content ||
+					event.bounce_classification ||
+					"Delivery failed",
+			};
+		}
+
+		await bus.publish(BusEvent.WEBHOOK_TRIGGERED, {
+			event: webhookEventName,
+			payload: webhookPayload,
+			organizationId: email.organizationId,
 		});
 	});
 }
