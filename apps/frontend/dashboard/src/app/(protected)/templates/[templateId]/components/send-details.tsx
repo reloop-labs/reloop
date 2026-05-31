@@ -1,6 +1,7 @@
 "use client";
 
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
+import type { DomainListResponse } from "@fe/dashboard/types/api.types";
 import { cn } from "@reloop/ui/cn";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { XCircle } from "lucide-react";
@@ -46,7 +47,7 @@ export const SendDetails = () => {
 	const setSubject = useEditorStore((s) => s.setSubject);
 
 	const { activeOrganization } = useUserOrganization();
-	const { data: domainData } = useSWR<any>(
+	const { data: domainData } = useSWR<DomainListResponse>(
 		activeOrganization?.id
 			? `/api/domain/v1/list?organizationId=${activeOrganization.id}`
 			: null,
@@ -55,10 +56,9 @@ export const SendDetails = () => {
 
 	const verifiedDomains = (domainData?.domains || [])
 		.filter(
-			(d: any) =>
-				d.status === "active" || d.systemVerified || d.userVerifiedDomain,
+			(d) => d.status === "active" || d.systemVerified || d.userVerifiedDomain,
 		)
-		.map((d: any) => d.domain.toLowerCase());
+		.map((d) => d.domain.toLowerCase());
 
 	const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -96,7 +96,7 @@ export const SendDetails = () => {
 	}
 
 	return (
-		<div className="mx-auto w-full max-w-[600px]">
+		<div className="mx-auto w-full max-w-[600px] overflow-hidden rounded-2xl border border-stroke-soft-200">
 			{/* From Row */}
 			<FieldRow label="From">
 				<div className="relative flex w-full flex-1 items-center justify-between gap-2 text-sm text-text-sub-600">
