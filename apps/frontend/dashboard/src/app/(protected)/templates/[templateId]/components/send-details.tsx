@@ -5,7 +5,8 @@ import type { DomainListResponse } from "@fe/dashboard/types/api.types";
 import { cn } from "@reloop/ui/cn";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { AnimatePresence, motion } from "framer-motion";
-import { XCircle } from "lucide-react";
+import { AlertCircle, ArrowRight, XCircle } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import useSWR from "swr";
 import { useEditorStore } from "./use-editor-store";
@@ -17,9 +18,10 @@ interface FieldRowProps {
 	label: string;
 	children: React.ReactNode;
 	hideBorder?: boolean;
+	required?: boolean;
 }
 
-const FieldRow = ({ label, children, hideBorder }: FieldRowProps) => {
+const FieldRow = ({ label, children, hideBorder, required }: FieldRowProps) => {
 	return (
 		<div
 			className={cn(
@@ -32,8 +34,52 @@ const FieldRow = ({ label, children, hideBorder }: FieldRowProps) => {
 				className="w-20 shrink-0 text-sm text-text-sub-600"
 			>
 				{label}
+				{required && <span className="ml-0.5 text-error-base text-xs">*</span>}
 			</label>
 			<div className="flex flex-1 items-center">{children}</div>
+		</div>
+	);
+};
+
+interface ErrorDetails {
+	title: string;
+	description: string;
+	actionText?: string;
+	actionLink?: string;
+}
+
+interface ErrorTooltipContentProps {
+	error: ErrorDetails;
+}
+
+const ErrorTooltipContent = ({ error }: ErrorTooltipContentProps) => {
+	return (
+		<div className="flex w-72 flex-col gap-2 p-0.5 text-left">
+			<div className="flex items-start gap-2.5">
+				<div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-red-50 dark:bg-red-950/30">
+					<AlertCircle size={13} className="text-red-500 dark:text-red-400" />
+				</div>
+				<div className="flex flex-col gap-0.5">
+					<h4 className="font-semibold text-text-strong-950 text-xs leading-snug">
+						{error.title}
+					</h4>
+					<p className="text-[11px] text-text-sub-600 leading-normal">
+						{error.description}
+					</p>
+				</div>
+			</div>
+
+			{error.actionLink && error.actionText && (
+				<div className="border-stroke-soft-200 border-t pt-2">
+					<Link
+						href={error.actionLink}
+						className="inline-flex items-center gap-1 font-semibold text-[11px] text-primary-base transition-colors hover:text-primary-hover hover:underline"
+					>
+						{error.actionText}
+						<ArrowRight size={11} />
+					</Link>
+				</div>
+			)}
 		</div>
 	);
 };
@@ -97,25 +143,39 @@ export const SendDetails = () => {
 		!isFromEmailValid ||
 		verifiedDomains.includes(fromDomain);
 
-	let fromError: string | null = null;
+	let fromError: ErrorDetails | null = null;
 	if (fromEmail) {
 		if (!isFromEmailValid) {
-			fromError = "Invalid from email address.";
+			fromError = {
+				title: "Invalid Email Format",
+				description:
+					"Please enter a valid email address (e.g., sender@example.com).",
+			};
 		} else if (!isFromDomainVerified) {
-			fromError = "You can only use verified domains.";
+			fromError = {
+				title: "Domain Verification Required",
+				description:
+					"You cannot send from unverified domains. Please verify this domain to use it.",
+				actionText: "Configure Domain Settings",
+				actionLink: "/domain",
+			};
 		}
 	}
 
 	const isReplyToValid = !replyTo || emailRegex.test(replyTo.trim());
-	let replyToError: string | null = null;
+	let replyToError: ErrorDetails | null = null;
 	if (replyTo && !isReplyToValid) {
-		replyToError = "Invalid reply-to email address.";
+		replyToError = {
+			title: "Invalid Reply-To Format",
+			description:
+				"Please enter a valid email address (e.g., replyto@example.com).",
+		};
 	}
 
 	return (
 		<div className="mx-auto mt-4 w-full max-w-[600px] overflow-hidden rounded-2xl border border-stroke-soft-200">
 			{/* From Row */}
-			<FieldRow label="From">
+			<FieldRow label="From" required>
 				<div className="relative flex w-full flex-1 items-center justify-between gap-2 text-sm text-text-sub-600">
 					<input
 						value={fromEmail}
@@ -125,14 +185,23 @@ export const SendDetails = () => {
 					/>
 					<div className="flex items-center gap-2">
 						{fromError && (
-							<Tooltip.Root delayDuration={0}>
-								<Tooltip.Trigger asChild>
-									<div className="flex cursor-pointer items-center justify-center text-red-500 transition-transform hover:scale-105 dark:text-red-400">
-										<XCircle size={15} />
-									</div>
-								</Tooltip.Trigger>
-								<Tooltip.Content side="top">{fromError}</Tooltip.Content>
-							</Tooltip.Root>
+							<Tooltip.Provider delayDuration={0}>
+								<Tooltip.Root>
+									<Tooltip.Trigger asChild>
+										<div className="flex cursor-pointer items-center justify-center text-red-500 transition-transform hover:scale-105 dark:text-red-400">
+											<XCircle size={15} />
+										</div>
+									</Tooltip.Trigger>
+									<Tooltip.Content
+										side="top"
+										variant="light"
+										size="medium"
+										className="max-w-[300px]"
+									>
+										<ErrorTooltipContent error={fromError} />
+									</Tooltip.Content>
+								</Tooltip.Root>
+							</Tooltip.Provider>
 						)}
 						{!showReplyTo && (
 							<button
@@ -172,14 +241,23 @@ export const SendDetails = () => {
 									className="flex-1 bg-transparent text-sm text-text-strong-950 outline-none placeholder:text-text-soft-400"
 								/>
 								{replyToError && (
-									<Tooltip.Root delayDuration={0}>
-										<Tooltip.Trigger asChild>
-											<div className="flex cursor-pointer items-center justify-center text-red-500 transition-transform hover:scale-105 dark:text-red-400">
-												<XCircle size={15} />
-											</div>
-										</Tooltip.Trigger>
-										<Tooltip.Content side="top">{replyToError}</Tooltip.Content>
-									</Tooltip.Root>
+									<Tooltip.Provider delayDuration={0}>
+										<Tooltip.Root>
+											<Tooltip.Trigger asChild>
+												<div className="flex cursor-pointer items-center justify-center text-red-500 transition-transform hover:scale-105 dark:text-red-400">
+													<XCircle size={15} />
+												</div>
+											</Tooltip.Trigger>
+											<Tooltip.Content
+												side="top"
+												variant="light"
+												size="medium"
+												className="max-w-[300px]"
+											>
+												<ErrorTooltipContent error={replyToError} />
+											</Tooltip.Content>
+										</Tooltip.Root>
+									</Tooltip.Provider>
 								)}
 							</div>
 						</FieldRow>
@@ -188,7 +266,7 @@ export const SendDetails = () => {
 			</AnimatePresence>
 
 			{/* Preview Row */}
-			<FieldRow label="Preview">
+			<FieldRow label="Preview" required>
 				<input
 					value={previewText}
 					onChange={(e) => setPreviewText(e.target.value)}
@@ -197,7 +275,7 @@ export const SendDetails = () => {
 				/>
 			</FieldRow>
 
-			<FieldRow label="Subject" hideBorder>
+			<FieldRow label="Subject" required hideBorder>
 				<input
 					value={subject}
 					onChange={(e) => setSubject(e.target.value)}
