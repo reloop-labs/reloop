@@ -7,6 +7,7 @@ import { Icon } from "@reloop/ui/icon";
 import * as Popover from "@reloop/ui/popover";
 import { useEffect, useRef, useState } from "react";
 import type { DateRange } from "react-day-picker";
+import { toast } from "sonner";
 import { LogsCalendar } from "../../logs/components/logs-calendar";
 
 export type DatePreset = {
@@ -103,7 +104,13 @@ export const DateRangeFilter = ({
 	// Sync internal range with props when they change
 	const [calendarRange, setCalendarRange] = useState<DateRange | undefined>(
 		startDate && endDate
-			? { from: new Date(startDate), to: new Date(endDate) }
+			? (() => {
+					const fromDate = new Date(startDate);
+					fromDate.setHours(0, 0, 0, 0);
+					const toDate = new Date(endDate);
+					toDate.setHours(0, 0, 0, 0);
+					return { from: fromDate, to: toDate };
+				})()
 			: undefined,
 	);
 
@@ -133,7 +140,11 @@ export const DateRangeFilter = ({
 	// Update internal state when props change (e.g. from presets)
 	useEffect(() => {
 		if (startDate && endDate) {
-			setCalendarRange({ from: new Date(startDate), to: new Date(endDate) });
+			const fromDate = new Date(startDate);
+			fromDate.setHours(0, 0, 0, 0);
+			const toDate = new Date(endDate);
+			toDate.setHours(0, 0, 0, 0);
+			setCalendarRange({ from: fromDate, to: toDate });
 		} else {
 			setCalendarRange(undefined);
 		}
@@ -168,6 +179,15 @@ export const DateRangeFilter = ({
 	};
 
 	const handleCalendarSelect = (range: DateRange | undefined) => {
+		if (range?.from && range?.to) {
+			const diffTime = Math.abs(range.to.getTime() - range.from.getTime());
+			const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+			if (maxDays && diffDays > maxDays) {
+				toast.error(`Maximum date range allowed is ${maxDays} days`);
+				setCalendarRange({ from: range.from, to: undefined });
+				return;
+			}
+		}
 		setCalendarRange(range);
 	};
 
@@ -176,6 +196,7 @@ export const DateRangeFilter = ({
 			const diffTime = Math.abs(calendarRange.to.getTime() - calendarRange.from.getTime());
 			const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 			if (maxDays && diffDays > maxDays) {
+				toast.error(`Maximum date range allowed is ${maxDays} days`);
 				return;
 			}
 			const endOfDay = new Date(calendarRange.to);

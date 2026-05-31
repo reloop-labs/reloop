@@ -101,14 +101,24 @@ export const DateRangeFilter = ({
 	// Sync internal range with props when they change
 	const [calendarRange, setCalendarRange] = useState<DateRange | undefined>(
 		startDate && endDate
-			? { from: new Date(startDate), to: new Date(endDate) }
+			? (() => {
+					const fromDate = new Date(startDate);
+					fromDate.setHours(0, 0, 0, 0);
+					const toDate = new Date(endDate);
+					toDate.setHours(0, 0, 0, 0);
+					return { from: fromDate, to: toDate };
+				})()
 			: undefined,
 	);
 
 	// Update internal state when props change (e.g. from presets)
 	useEffect(() => {
 		if (startDate && endDate) {
-			setCalendarRange({ from: new Date(startDate), to: new Date(endDate) });
+			const fromDate = new Date(startDate);
+			fromDate.setHours(0, 0, 0, 0);
+			const toDate = new Date(endDate);
+			toDate.setHours(0, 0, 0, 0);
+			setCalendarRange({ from: fromDate, to: toDate });
 		} else {
 			setCalendarRange(undefined);
 		}

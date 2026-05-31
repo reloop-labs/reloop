@@ -22,7 +22,7 @@ type LogsCalendarProps = React.ComponentProps<typeof DayPicker>;
 function LogsCalendar({
 	className,
 	classNames,
-	showOutsideDays = true,
+	showOutsideDays = false,
 	captionLayout = "label",
 	startMonth,
 	endMonth,
