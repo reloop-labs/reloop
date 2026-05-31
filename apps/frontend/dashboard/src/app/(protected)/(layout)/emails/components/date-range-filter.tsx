@@ -41,6 +41,14 @@ const DATE_PRESETS: DatePreset[] = [
 		}),
 	},
 	{
+		label: "Last 15 days",
+		value: "15d",
+		getRange: () => ({
+			from: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000),
+			to: new Date(),
+		}),
+	},
+	{
 		label: "Last 30 days",
 		value: "30d",
 		getRange: () => ({
@@ -76,6 +84,8 @@ interface DateRangeFilterProps {
 		preset: string | null,
 	) => void;
 	numberOfMonths?: number;
+	maxDays?: number;
+	align?: "start" | "end";
 }
 
 export const DateRangeFilter = ({
@@ -84,6 +94,8 @@ export const DateRangeFilter = ({
 	activePreset,
 	onDateChange,
 	numberOfMonths = 2,
+	maxDays,
+	align = "start",
 }: DateRangeFilterProps) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
@@ -94,6 +106,29 @@ export const DateRangeFilter = ({
 			? { from: new Date(startDate), to: new Date(endDate) }
 			: undefined,
 	);
+
+	const filteredPresets = DATE_PRESETS.filter((preset) => {
+		if (!maxDays) return true;
+		const range = preset.getRange();
+		const diffMs = range.to.getTime() - range.from.getTime();
+		const diffDays = diffMs / (24 * 60 * 60 * 1000);
+		return diffDays <= maxDays;
+	});
+
+	const getDisabledDays = () => {
+		const today = new Date();
+		const disabled: any[] = [{ after: today }];
+
+		if (maxDays && calendarRange?.from && !calendarRange?.to) {
+			const from = calendarRange.from;
+			const minDate = new Date(from.getTime() - (maxDays - 1) * 24 * 60 * 60 * 1000);
+			const maxDate = new Date(from.getTime() + (maxDays - 1) * 24 * 60 * 60 * 1000);
+			disabled.push({ before: minDate });
+			disabled.push({ after: maxDate > today ? today : maxDate });
+		}
+
+		return disabled;
+	};
 
 	// Update internal state when props change (e.g. from presets)
 	useEffect(() => {
@@ -138,6 +173,11 @@ export const DateRangeFilter = ({
 
 	const handleApply = () => {
 		if (calendarRange?.from && calendarRange?.to) {
+			const diffTime = Math.abs(calendarRange.to.getTime() - calendarRange.from.getTime());
+			const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+			if (maxDays && diffDays > maxDays) {
+				return;
+			}
 			const endOfDay = new Date(calendarRange.to);
 			endOfDay.setHours(23, 59, 59, 999);
 			onDateChange(
@@ -178,12 +218,12 @@ export const DateRangeFilter = ({
 				</Button.Root>
 			</Popover.Trigger>
 
-			<Popover.Content align="start" showArrow={false} className="w-auto p-0">
+			<Popover.Content align={align} showArrow={false} className="w-auto p-0">
 				<div className="flex divide-x divide-stroke-soft-200">
 					{/* Left: Presets */}
 					<div className="w-44 px-2">
 						<div className="relative py-2">
-							{DATE_PRESETS.map((preset, idx) => {
+							{filteredPresets.map((preset, idx) => {
 								const isActive = activePreset === preset.value;
 								return (
 									<button
@@ -228,7 +268,7 @@ export const DateRangeFilter = ({
 							selected={calendarRange}
 							onSelect={handleCalendarSelect}
 							numberOfMonths={numberOfMonths}
-							disabled={{ after: new Date() }}
+							disabled={getDisabledDays()}
 						/>
 						<div className="flex justify-end gap-2 border-stroke-soft-100 border-t pt-2">
 							{(hasActiveFilter ||

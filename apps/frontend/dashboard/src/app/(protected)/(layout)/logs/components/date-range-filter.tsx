@@ -41,6 +41,14 @@ const DATE_PRESETS: DatePreset[] = [
 		}),
 	},
 	{
+		label: "Last 15 days",
+		value: "15d",
+		getRange: () => ({
+			from: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000),
+			to: new Date(),
+		}),
+	},
+	{
 		label: "Last 30 days",
 		value: "30d",
 		getRange: () => ({
@@ -76,6 +84,7 @@ interface DateRangeFilterProps {
 		preset: string | null,
 	) => void;
 	numberOfMonths?: number;
+	align?: "start" | "end";
 }
 
 export const DateRangeFilter = ({
@@ -84,6 +93,7 @@ export const DateRangeFilter = ({
 	activePreset,
 	onDateChange,
 	numberOfMonths = 2,
+	align = "start",
 }: DateRangeFilterProps) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
@@ -178,7 +188,7 @@ export const DateRangeFilter = ({
 				</Button.Root>
 			</Popover.Trigger>
 
-			<Popover.Content align="start" showArrow={false} className="w-auto p-0">
+			<Popover.Content align={align} showArrow={false} className="w-auto p-0">
 				<div className="flex divide-x divide-stroke-soft-200">
 					{/* Left: Presets */}
 					<div className="w-44 px-2">

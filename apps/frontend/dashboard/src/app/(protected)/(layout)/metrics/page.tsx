@@ -48,6 +48,31 @@ const MetricsPage = () => {
 		parseAsString.withDefault(""),
 	);
 
+	const { effectiveStartDate, effectiveEndDate, effectivePreset } = useMemo(() => {
+		let start = startDate;
+		let end = endDate;
+		let preset = datePreset;
+
+		if (!start && !end) {
+			preset = datePreset || "15d";
+			const now = new Date();
+			const toDate = new Date(now);
+			toDate.setHours(23, 59, 59, 999);
+			const fromDate = new Date(now);
+			fromDate.setDate(now.getDate() - 14); // 15 days inclusive
+			fromDate.setHours(0, 0, 0, 0);
+
+			start = fromDate.toISOString();
+			end = toDate.toISOString();
+		}
+
+		return {
+			effectiveStartDate: start,
+			effectiveEndDate: end,
+			effectivePreset: preset,
+		};
+	}, [startDate, endDate, datePreset]);
+
 	const handleDateChange = (
 		newStartDate: string | null,
 		newEndDate: string | null,
@@ -61,8 +86,8 @@ const MetricsPage = () => {
 	const buildApiUrl = () => {
 		if (!activeOrganization?.id) return null;
 		const params = new URLSearchParams();
-		if (startDate) params.set("start_date", startDate);
-		if (endDate) params.set("end_date", endDate);
+		if (effectiveStartDate) params.set("start_date", effectiveStartDate);
+		if (effectiveEndDate) params.set("end_date", effectiveEndDate);
 		if (selectedDomain && selectedDomain !== "all")
 			params.set("domain_id", selectedDomain);
 		return `/api/logs/v1/emails/stats?${params.toString()}`;
@@ -126,7 +151,7 @@ const MetricsPage = () => {
 			}
 		}
 
-		const datesList = generateContinuousDateList(data, startDate, endDate);
+		const datesList = generateContinuousDateList(data, effectiveStartDate, effectiveEndDate);
 
 		const chartData = datesList.map((date) => {
 			const key = getYearMonthDayKey(date);
@@ -203,7 +228,7 @@ const MetricsPage = () => {
 				],
 			},
 		};
-	}, [data, startDate, endDate]);
+	}, [data, effectiveStartDate, effectiveEndDate]);
 
 	return (
 		<div className="mx-auto max-w-4xl px-4 py-10 sm:px-8">
@@ -213,11 +238,13 @@ const MetricsPage = () => {
 				</div>
 				<div className="flex items-center gap-2">
 					<DateRangeFilter
-						startDate={startDate || null}
-						endDate={endDate || null}
-						activePreset={datePreset || null}
+						startDate={effectiveStartDate || null}
+						endDate={effectiveEndDate || null}
+						activePreset={effectivePreset || null}
 						onDateChange={handleDateChange}
-						numberOfMonths={1}
+						numberOfMonths={2}
+						maxDays={30}
+						align="end"
 					/>
 					<DomainSelector
 						value={selectedDomain}
@@ -230,8 +257,8 @@ const MetricsPage = () => {
 
 			<div className="flex flex-col gap-6 pb-20">
 				<DeliverabilityChart
-					startDate={startDate}
-					endDate={endDate}
+					startDate={effectiveStartDate}
+					endDate={effectiveEndDate}
 					domain={selectedDomain}
 				/>
 
