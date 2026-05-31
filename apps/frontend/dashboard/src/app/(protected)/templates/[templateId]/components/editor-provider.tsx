@@ -1,5 +1,6 @@
 "use client";
 
+import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import {
 	BubbleMenu,
@@ -327,7 +328,9 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 			<EditorContext.Provider value={{ editor }}>
 				<div ref={containerRef} className="bg-bg-weak-50 dark:bg-black">
 					<div className="grid grid-cols-3 items-center px-4 pt-2">
-						<div />
+						<div className="flex items-center justify-start">
+							<AnimatedBackButton />
+						</div>
 						<div className="flex justify-center">
 							<TemplateName />
 						</div>
