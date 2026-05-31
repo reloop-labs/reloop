@@ -48,30 +48,31 @@ const MetricsPage = () => {
 		parseAsString.withDefault(""),
 	);
 
-	const { effectiveStartDate, effectiveEndDate, effectivePreset } = useMemo(() => {
-		let start = startDate;
-		let end = endDate;
-		let preset = datePreset;
+	const { effectiveStartDate, effectiveEndDate, effectivePreset } =
+		useMemo(() => {
+			let start = startDate;
+			let end = endDate;
+			let preset = datePreset;
 
-		if (!start && !end) {
-			preset = datePreset || "15d";
-			const now = new Date();
-			const toDate = new Date(now);
-			toDate.setHours(23, 59, 59, 999);
-			const fromDate = new Date(now);
-			fromDate.setDate(now.getDate() - 14); // 15 days inclusive
-			fromDate.setHours(0, 0, 0, 0);
+			if (!start && !end) {
+				preset = datePreset || "15d";
+				const now = new Date();
+				const toDate = new Date(now);
+				toDate.setHours(23, 59, 59, 999);
+				const fromDate = new Date(now);
+				fromDate.setDate(now.getDate() - 14); // 15 days inclusive
+				fromDate.setHours(0, 0, 0, 0);
 
-			start = fromDate.toISOString();
-			end = toDate.toISOString();
-		}
+				start = fromDate.toISOString();
+				end = toDate.toISOString();
+			}
 
-		return {
-			effectiveStartDate: start,
-			effectiveEndDate: end,
-			effectivePreset: preset,
-		};
-	}, [startDate, endDate, datePreset]);
+			return {
+				effectiveStartDate: start,
+				effectiveEndDate: end,
+				effectivePreset: preset,
+			};
+		}, [startDate, endDate, datePreset]);
 
 	const handleDateChange = (
 		newStartDate: string | null,
@@ -151,7 +152,11 @@ const MetricsPage = () => {
 			}
 		}
 
-		const datesList = generateContinuousDateList(data, effectiveStartDate, effectiveEndDate);
+		const datesList = generateContinuousDateList(
+			data,
+			effectiveStartDate,
+			effectiveEndDate,
+		);
 
 		const chartData = datesList.map((date) => {
 			const key = getYearMonthDayKey(date);
@@ -251,6 +256,7 @@ const MetricsPage = () => {
 						onChange={(val: string) => {
 							setSelectedDomain(val);
 						}}
+						align="end"
 					/>
 				</div>
 			</div>

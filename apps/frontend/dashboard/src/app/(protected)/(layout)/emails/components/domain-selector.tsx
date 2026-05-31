@@ -14,9 +14,14 @@ import useSWR from "swr";
 interface DomainSelectorProps {
 	value: string;
 	onChange: (value: string) => void;
+	align?: "start" | "end";
 }
 
-export const DomainSelector = ({ value, onChange }: DomainSelectorProps) => {
+export const DomainSelector = ({
+	value,
+	onChange,
+	align = "start",
+}: DomainSelectorProps) => {
 	const { activeOrganization } = useUserOrganization();
 	const [isOpen, setIsOpen] = useState(false);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
@@ -65,7 +70,7 @@ export const DomainSelector = ({ value, onChange }: DomainSelectorProps) => {
 					</Button.Icon>
 				</Button.Root>
 			</Dropdown.Trigger>
-			<Dropdown.Content align="start" className="w-64 p-2">
+			<Dropdown.Content align={align} className="w-64 p-2">
 				<div className="relative max-h-80 overflow-y-auto">
 					{/* All Domains option */}
 					<button

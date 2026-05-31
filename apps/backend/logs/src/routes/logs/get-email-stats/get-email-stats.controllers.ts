@@ -1,7 +1,7 @@
 import { db } from "@reloop/db/client";
-import { emailLog } from "@reloop/db/schema";
+import { domain, emailLog } from "@reloop/db/schema";
 import type { LogsModel } from "@reloop/logs/model/logs.model";
-import { and, eq, gte, lte, sql } from "drizzle-orm";
+import { and, eq, gte, lte, or, sql } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
 
 export async function getEmailStatsController({
@@ -18,8 +18,18 @@ export async function getEmailStatsController({
 	try {
 		const conditions = [eq(emailLog.organizationId, organizationId)];
 
-		if (domain_id) {
-			conditions.push(eq(emailLog.domainId, domain_id));
+		if (domain_id && domain_id !== "all") {
+			const domainRecord = await db.query.domain.findFirst({
+				where: and(
+					or(eq(domain.id, domain_id), eq(domain.domain, domain_id)),
+					eq(domain.organizationId, organizationId),
+				),
+			});
+			if (domainRecord) {
+				conditions.push(eq(emailLog.domainId, domainRecord.id));
+			} else {
+				conditions.push(eq(emailLog.domainId, "non-existent-domain-id"));
+			}
 		}
 
 		if (start_date) {
