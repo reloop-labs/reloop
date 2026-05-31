@@ -1,5 +1,6 @@
 "use client";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
+import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
@@ -92,6 +93,27 @@ export const EmailList = () => {
 		setCurrentPage(1);
 	};
 
+	const hasAnyFilter = !!(
+		searchQuery ||
+		selectedDomain ||
+		selectedApiKey ||
+		selectedStatus ||
+		startDate ||
+		endDate ||
+		datePreset
+	);
+
+	const handleClearAll = () => {
+		setSearchQuery("");
+		setSelectedDomain("");
+		setSelectedApiKey("");
+		setSelectedStatus("");
+		setStartDate("");
+		setEndDate("");
+		setDatePreset("");
+		setCurrentPage(1);
+	};
+
 	if (error) {
 		return (
 			<div className="flex flex-col items-center justify-center gap-2 p-4">
@@ -105,9 +127,9 @@ export const EmailList = () => {
 
 	return (
 		<div>
-			<div className="flex items-center gap-1">
+			<div className="flex items-center gap-2">
 				<div className="flex-1">
-					<Input.Root size="xsmall">
+					<Input.Root size="xsmall" className="rounded-[10px]">
 						<Input.Wrapper>
 							<Input.Icon as={Icon} name="search" size="xsmall" />
 							<Input.Input
@@ -149,6 +171,17 @@ export const EmailList = () => {
 						setCurrentPage(1);
 					}}
 				/>
+				{hasAnyFilter && (
+					<Button.Root
+						variant="neutral"
+						mode="stroke"
+						size="xsmall"
+						onClick={handleClearAll}
+						className="gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
+					>
+						Clear filters
+					</Button.Root>
+				)}
 			</div>
 
 			<div className="mt-4">
@@ -164,6 +197,8 @@ export const EmailList = () => {
 						setPageSize(value);
 						setCurrentPage(1);
 					}}
+					hasFilters={hasAnyFilter}
+					onClearFilters={handleClearAll}
 				/>
 			</div>
 		</div>
