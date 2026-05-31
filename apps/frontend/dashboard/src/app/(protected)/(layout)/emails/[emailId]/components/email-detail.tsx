@@ -581,7 +581,7 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 			)}
 
 			{/* Event Tracking Timeline */}
-			<section className="py-4">
+			<section>
 				<EmailTimeline
 					events={email.events || []}
 					sentAt={email.sentAt || email.createdAt}
