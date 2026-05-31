@@ -258,6 +258,29 @@ export interface KumomtaLogRecordPayload {
 	timestamp?: string | number;
 }
 
+export interface ContactAutoCreatedPayload {
+	/** Internal contact ID (con_...) */
+	contactId: string;
+	/** Recipient email address */
+	email: string;
+	organizationId: string;
+	/** emailLog ID that triggered creation */
+	emailLogId: string;
+	/** Whether this was a brand-new insert or a soft-delete restore */
+	created: boolean;
+}
+
+export interface ContactDeliverabilityUpdatedPayload {
+	contactId: string;
+	email: string;
+	organizationId: string;
+	emailLogId: string;
+	/** The deliverability verdict applied to the contact */
+	deliverability: "delivered" | "bounced" | "spam";
+	/** Whether the contact was also suppressed (blocked) as a result */
+	suppressed: boolean;
+}
+
 export interface EventPayloads {
 	[BusEvent.USER_CREATED]: UserCreatedPayload;
 	[BusEvent.USER_UPDATED]: UserUpdatedPayload;
@@ -290,4 +313,6 @@ export interface EventPayloads {
 	[BusEvent.USAGE_UPDATED]: UsageUpdatedPayload;
 	[BusEvent.QUOTA_EXCEEDED]: QuotaExceededPayload;
 	[BusEvent.KUMOMTA_EVENT]: KumomtaLogRecordPayload;
+	[BusEvent.CONTACT_AUTO_CREATED]: ContactAutoCreatedPayload;
+	[BusEvent.CONTACT_DELIVERABILITY_UPDATED]: ContactDeliverabilityUpdatedPayload;
 }

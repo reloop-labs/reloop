@@ -1,4 +1,5 @@
 import { contactsConfig } from "@be/contacts/contacts.config";
+import { initSubscribers } from "@be/contacts/subscribers";
 import { bus } from "@reloop/bus";
 import { RedisCache } from "@reloop/cache/redis-client";
 import { db } from "@reloop/db/client";
@@ -14,6 +15,13 @@ export const loader = async () => {
 		log.info("Postgres", "connected");
 		await bus.connect(contactsConfig.NATS_URL);
 		log.info("NATS", "connected");
+
+		// Ensure the kumomta JetStream exists (idempotent — logs service may have
+		// already created it, but calling ensureStream twice is safe)
+		await bus.ensureStream("kumomta-events", ["kumomta.event"]);
+		log.info("NATS", "kumomta-events JetStream ready");
+
+		await initSubscribers();
 	} catch (e) {
 		log.error({
 			message: "Error during service initialization",
