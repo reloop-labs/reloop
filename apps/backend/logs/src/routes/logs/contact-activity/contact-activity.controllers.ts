@@ -1,7 +1,7 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import type { LogsModel } from "@reloop/logs/model/logs.model";
-import { and, count, desc, eq, sql, type SQL } from "drizzle-orm";
+import { and, count, desc, eq, type SQL, sql } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
 
 export async function contactActivityController({

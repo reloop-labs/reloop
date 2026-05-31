@@ -222,8 +222,7 @@ export namespace LogsModel {
 		/** Filter logs where toEmails contains this exact address */
 		recipient: t.Optional(
 			t.String({
-				description:
-					"Return only emails sent to this recipient address",
+				description: "Return only emails sent to this recipient address",
 			}),
 		),
 	});
@@ -325,9 +324,7 @@ export namespace LogsModel {
 			description: "Recipient email address",
 		}),
 		page: t.Optional(t.Numeric({ default: 1, minimum: 1 })),
-		limit: t.Optional(
-			t.Numeric({ default: 10, minimum: 1, maximum: 50 }),
-		),
+		limit: t.Optional(t.Numeric({ default: 10, minimum: 1, maximum: 50 })),
 	});
 	export type ContactActivityQuery = typeof contactActivityQuery.static;
 
@@ -362,6 +359,5 @@ export namespace LogsModel {
 		page: t.Number(),
 		limit: t.Number(),
 	});
-	export type ContactActivityResponse =
-		typeof contactActivityResponse.static;
+	export type ContactActivityResponse = typeof contactActivityResponse.static;
 }

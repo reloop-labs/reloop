@@ -74,7 +74,10 @@ type EmailStatus =
 	| "archived";
 
 /** Status pill shown inline in the action text */
-const STATUS_PILL: Record<EmailStatus, { label: string; cls: string; dotCls: string }> = {
+const STATUS_PILL: Record<
+	EmailStatus,
+	{ label: string; cls: string; dotCls: string }
+> = {
 	delivered: {
 		label: "Delivered",
 		cls: "bg-success-base/10 text-success-base",
@@ -116,22 +119,42 @@ const STATUS_PILL: Record<EmailStatus, { label: string; cls: string; dotCls: str
 const EVENT_ICON: Record<string, { icon: string; bg: string; text: string }> = {
 	// Email-level
 	email_sent: { icon: "send-1", bg: "bg-blue-100", text: "text-blue-600" },
-	email_delivered: { icon: "check-circle", bg: "bg-emerald-100", text: "text-emerald-600" },
-	email_bounced: { icon: "alert-circle", bg: "bg-red-100", text: "text-red-600" },
+	email_delivered: {
+		icon: "check-circle",
+		bg: "bg-emerald-100",
+		text: "text-emerald-600",
+	},
+	email_bounced: {
+		icon: "alert-circle",
+		bg: "bg-red-100",
+		text: "text-red-600",
+	},
 	email_failed: { icon: "x-circle", bg: "bg-red-100", text: "text-red-600" },
 	email_pending: { icon: "clock", bg: "bg-amber-100", text: "text-amber-600" },
 	email_spam: { icon: "alert-octagon", bg: "bg-red-100", text: "text-red-600" },
 	// Event-level
 	sent: { icon: "send-1", bg: "bg-blue-100", text: "text-blue-600" },
-	delivered: { icon: "check-circle", bg: "bg-emerald-100", text: "text-emerald-600" },
+	delivered: {
+		icon: "check-circle",
+		bg: "bg-emerald-100",
+		text: "text-emerald-600",
+	},
 	opened: { icon: "mail-open", bg: "bg-purple-100", text: "text-purple-600" },
-	clicked: { icon: "mouse-pointer-outline", bg: "bg-indigo-100", text: "text-indigo-600" },
+	clicked: {
+		icon: "mouse-pointer-outline",
+		bg: "bg-indigo-100",
+		text: "text-indigo-600",
+	},
 	bounced: { icon: "alert-circle", bg: "bg-red-100", text: "text-red-600" },
 	failed: { icon: "x-circle", bg: "bg-red-100", text: "text-red-600" },
 	complaint: { icon: "alert-octagon", bg: "bg-red-100", text: "text-red-600" },
 	deferred: { icon: "clock", bg: "bg-amber-100", text: "text-amber-600" },
 	// Contact created
-	contact_created: { icon: "user-plus", bg: "bg-neutral-100", text: "text-text-sub-600" },
+	contact_created: {
+		icon: "user-plus",
+		bg: "bg-neutral-100",
+		text: "text-text-sub-600",
+	},
 };
 
 const EVENT_LABELS: Record<string, string> = {
@@ -198,7 +221,11 @@ function buildFlatTimeline(
 		const allEvents = [...entry.events];
 
 		// Synthesise a "failed" event from failedAt if not already in the event list
-		if (entry.failedAt && !eventTypes.has("failed") && !eventTypes.has("bounced")) {
+		if (
+			entry.failedAt &&
+			!eventTypes.has("failed") &&
+			!eventTypes.has("bounced")
+		) {
 			allEvents.push({
 				id: `synth-failed-${entry.id}`,
 				type: "failed",
@@ -213,7 +240,8 @@ function buildFlatTimeline(
 			(e) => e.type !== "sent" && e.type !== "delivered",
 		);
 		subsequentEvents.sort(
-			(a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+			(a, b) =>
+				new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
 		);
 
 		for (const ev of subsequentEvents) {
@@ -261,7 +289,10 @@ function AvatarNode({
 }) {
 	const cfg = getIconConfig(iconKey);
 	return (
-		<div className="relative flex flex-col items-center flex-shrink-0" style={{ width: 32 }}>
+		<div
+			className="relative flex flex-shrink-0 flex-col items-center"
+			style={{ width: 32 }}
+		>
 			{/* Avatar / icon circle */}
 			<div
 				className={cn(
@@ -270,7 +301,7 @@ function AvatarNode({
 				)}
 			>
 				{email ? (
-					<span className="font-semibold text-[13px] text-white select-none">
+					<span className="select-none font-semibold text-[13px] text-white">
 						{getInitials(email)}
 					</span>
 				) : (
@@ -282,7 +313,10 @@ function AvatarNode({
 			</div>
 			{/* Vertical connector */}
 			{!isLast && (
-				<div className="absolute top-8 left-1/2 w-px -translate-x-1/2 bg-stroke-soft-200" style={{ height: "calc(100% + 8px)" }} />
+				<div
+					className="-translate-x-1/2 absolute top-8 left-1/2 w-px bg-stroke-soft-200"
+					style={{ height: "calc(100% + 8px)" }}
+				/>
 			)}
 		</div>
 	);
@@ -291,8 +325,7 @@ function AvatarNode({
 // ─── Status pill ─────────────────────────────────────────────────────────────
 
 function StatusPill({ status }: { status: string }) {
-	const pill =
-		STATUS_PILL[status as EmailStatus] ?? STATUS_PILL.pending;
+	const pill = STATUS_PILL[status as EmailStatus] ?? STATUS_PILL.pending;
 	return (
 		<span
 			className={cn(
@@ -300,7 +333,9 @@ function StatusPill({ status }: { status: string }) {
 				pill.cls,
 			)}
 		>
-			<span className={cn("h-1.5 w-1.5 rounded-full flex-shrink-0", pill.dotCls)} />
+			<span
+				className={cn("h-1.5 w-1.5 flex-shrink-0 rounded-full", pill.dotCls)}
+			/>
 			{pill.label}
 		</span>
 	);
@@ -323,13 +358,15 @@ function DetailCard({
 			{subject && emailId && (
 				<Link
 					href={`/emails/${emailId}`}
-					className="block font-medium text-[12px] text-text-strong-950 transition-colors hover:text-primary-base truncate"
+					className="block truncate font-medium text-[12px] text-text-strong-950 transition-colors hover:text-primary-base"
 				>
 					{subject}
 				</Link>
 			)}
 			{errorMessage && (
-				<p className="mt-1 text-[12px] text-error-base leading-relaxed">{errorMessage}</p>
+				<p className="mt-1 text-[12px] text-error-base leading-relaxed">
+					{errorMessage}
+				</p>
 			)}
 		</div>
 	);
@@ -350,24 +387,33 @@ function EmailRow({
 
 	return (
 		<div className="relative flex gap-3 pb-6">
-			<AvatarNode iconKey={`email_${status}`} email={contactEmail} isLast={isLast} />
+			<AvatarNode
+				iconKey={`email_${status}`}
+				email={contactEmail}
+				isLast={isLast}
+			/>
 
 			<div className="min-w-0 flex-1 pt-0.5">
 				{/* Action line */}
 				<div className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
-					<span className="font-medium text-[13px] text-text-strong-950 truncate max-w-[160px]">
+					<span className="max-w-[160px] truncate font-medium text-[13px] text-text-strong-950">
 						{contactEmail}
 					</span>
-					<span className="text-[13px] text-text-sub-600">received an email</span>
+					<span className="text-[13px] text-text-sub-600">
+						received an email
+					</span>
 					<StatusPill status={status} />
 					<span className="text-[11px] text-text-soft-400">·</span>
-					<span className="text-[11px] text-text-soft-400 whitespace-nowrap">
+					<span className="whitespace-nowrap text-[11px] text-text-soft-400">
 						{formatRelativeTime(entry.createdAt)}
 					</span>
 				</div>
 
 				{/* Nested card with subject */}
-				<DetailCard subject={entry.subject || "(no subject)"} emailId={entry.id} />
+				<DetailCard
+					subject={entry.subject || "(no subject)"}
+					emailId={entry.id}
+				/>
 			</div>
 		</div>
 	);
@@ -414,12 +460,12 @@ function EventRow({
 			<div className="min-w-0 flex-1 pt-0.5">
 				{/* Action line */}
 				<div className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
-					<span className="font-medium text-[13px] text-text-strong-950 truncate max-w-[160px]">
+					<span className="max-w-[160px] truncate font-medium text-[13px] text-text-strong-950">
 						{contactEmail}
 					</span>
 					<span className="text-[13px] text-text-sub-600">{actionVerb}</span>
 					<span className="text-[11px] text-text-soft-400">·</span>
-					<span className="text-[11px] text-text-soft-400 whitespace-nowrap">
+					<span className="whitespace-nowrap text-[11px] text-text-soft-400">
 						{formatRelativeTime(timestamp)}
 					</span>
 				</div>
@@ -451,9 +497,11 @@ function ContactCreatedRow({
 			<AvatarNode iconKey="contact_created" isLast={isLast} />
 			<div className="min-w-0 flex-1 pt-0.5">
 				<div className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
-					<span className="font-medium text-[13px] text-text-strong-950">Contact created</span>
+					<span className="font-medium text-[13px] text-text-strong-950">
+						Contact created
+					</span>
 					<span className="text-[11px] text-text-soft-400">·</span>
-					<span className="text-[11px] text-text-soft-400 whitespace-nowrap">
+					<span className="whitespace-nowrap text-[11px] text-text-soft-400">
 						{formatRelativeTime(timestamp)}
 					</span>
 				</div>
@@ -470,10 +518,13 @@ function TimelineSkeleton() {
 			{Array.from({ length: 4 }).map((_, i) => (
 				// biome-ignore lint/suspicious/noArrayIndexKey: skeleton
 				<div key={i} className="relative flex gap-3 pb-6">
-					<div className="relative flex flex-col items-center flex-shrink-0" style={{ width: 32 }}>
+					<div
+						className="relative flex flex-shrink-0 flex-col items-center"
+						style={{ width: 32 }}
+					>
 						<Skeleton className="h-8 w-8 rounded-full" />
 						{i < 3 && (
-							<div className="absolute top-8 left-1/2 h-[calc(100%+8px)] w-px -translate-x-1/2 bg-stroke-soft-200" />
+							<div className="-translate-x-1/2 absolute top-8 left-1/2 h-[calc(100%+8px)] w-px bg-stroke-soft-200" />
 						)}
 					</div>
 					<div className="min-w-0 flex-1 space-y-2 pt-1">
@@ -520,7 +571,9 @@ export function ContactEmailHistory({
 		<div className="mt-12 pb-12">
 			{/* Section header */}
 			<div className="mb-6 flex items-center gap-2">
-				<h3 className="font-medium text-paragraph-sm text-text-strong-950">Activity</h3>
+				<h3 className="font-medium text-paragraph-sm text-text-strong-950">
+					Activity
+				</h3>
 				{!isLoading && total > 0 && (
 					<span className="rounded-full bg-neutral-alpha-10 px-2 py-0.5 font-medium text-[11px] text-text-sub-600">
 						{total}
@@ -539,11 +592,13 @@ export function ContactEmailHistory({
 					<div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-alpha-10">
 						<Icon name="mail" className="h-4 w-4 text-text-sub-600" />
 					</div>
-					<p className="font-medium text-paragraph-sm text-text-sub-600">No activity yet</p>
+					<p className="font-medium text-paragraph-sm text-text-sub-600">
+						No activity yet
+					</p>
 					<p className="max-w-xs text-[12px] text-text-soft-400">
 						Emails sent to{" "}
-						<span className="font-medium text-text-sub-600">{email}</span>{" "}
-						will appear here.
+						<span className="font-medium text-text-sub-600">{email}</span> will
+						appear here.
 					</p>
 				</div>
 			) : (

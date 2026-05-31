@@ -128,8 +128,12 @@ export const DateRangeFilter = ({
 
 		if (maxDays && calendarRange?.from && !calendarRange?.to) {
 			const from = calendarRange.from;
-			const minDate = new Date(from.getTime() - (maxDays - 1) * 24 * 60 * 60 * 1000);
-			const maxDate = new Date(from.getTime() + (maxDays - 1) * 24 * 60 * 60 * 1000);
+			const minDate = new Date(
+				from.getTime() - (maxDays - 1) * 24 * 60 * 60 * 1000,
+			);
+			const maxDate = new Date(
+				from.getTime() + (maxDays - 1) * 24 * 60 * 60 * 1000,
+			);
 			disabled.push({ before: minDate });
 			disabled.push({ after: maxDate > today ? today : maxDate });
 		}
@@ -193,7 +197,9 @@ export const DateRangeFilter = ({
 
 	const handleApply = () => {
 		if (calendarRange?.from && calendarRange?.to) {
-			const diffTime = Math.abs(calendarRange.to.getTime() - calendarRange.from.getTime());
+			const diffTime = Math.abs(
+				calendarRange.to.getTime() - calendarRange.from.getTime(),
+			);
 			const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 			if (maxDays && diffDays > maxDays) {
 				toast.error(`Maximum date range allowed is ${maxDays} days`);

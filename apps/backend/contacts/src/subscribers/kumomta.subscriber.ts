@@ -5,10 +5,10 @@
  * based on email deliverability outcomes.
  *
  * Lifecycle:
- *  • Delivery      → upsert contact (create if not exists), set email_deliverability=delivered
- *  • Bounce        → upsert contact, suppress with hard_bounce, set email_deliverability=bounced
+ *  • Delivery      → upsert contact (create if not exists)
+ *  • Bounce        → upsert contact, suppress with hard_bounce
  *  • AdminBounce   → same as Bounce
- *  • Feedback      → upsert contact, suppress with spam_complaint, set email_deliverability=spam
+ *  • Feedback      → upsert contact, suppress with spam_complaint
  *  • Reception / TransientFailure / Expiration / OOB → no-op (skip)
  *
  * Safety guarantees:
@@ -201,100 +201,6 @@ async function upsertContact(
 	return { contact: newContact, created: true };
 }
 
-// ─── Deliverability Property ──────────────────────────────────────────────────
-
-const DELIVERABILITY_PROPERTY_NAME = "email_deliverability";
-
-/**
- * Upserts the org-level property definition for `email_deliverability`
- * then writes/updates the value for the given contact.
- *
- * The property definition is created once per org and reused on subsequent calls.
- */
-async function setDeliverabilityProperty(
-	contactId: string,
-	organizationId: string,
-	userId: string,
-	value: Deliverability,
-): Promise<void> {
-	// ── 1. Ensure property definition exists for this org ──────────────────────
-	let property = await db.query.contactProperty.findFirst({
-		where: and(
-			eq(schema.contactProperty.propertyName, DELIVERABILITY_PROPERTY_NAME),
-			eq(schema.contactProperty.organizationId, organizationId),
-		),
-	});
-
-	if (!property) {
-		// Use onConflictDoNothing to handle race conditions gracefully
-		const inserted = await db
-			.insert(schema.contactProperty)
-			.values({
-				propertyName: DELIVERABILITY_PROPERTY_NAME,
-				propertyType: "string",
-				defaultValue: null,
-				organizationId,
-				userId,
-				createdAt: new Date(),
-				updatedAt: new Date(),
-			})
-			.onConflictDoNothing()
-			.returning();
-
-		property = inserted[0];
-
-		// Another worker may have inserted first — re-fetch
-		if (!property) {
-			property = await db.query.contactProperty.findFirst({
-				where: and(
-					eq(schema.contactProperty.propertyName, DELIVERABILITY_PROPERTY_NAME),
-					eq(schema.contactProperty.organizationId, organizationId),
-				),
-			});
-		}
-	}
-
-	if (!property) {
-		log.warn({
-			organizationId,
-			message:
-				"[auto-contact] Could not resolve email_deliverability property definition — skipping property write",
-		});
-		return;
-	}
-
-	// ── 2. Upsert the value for this specific contact ─────────────────────────
-	await db
-		.insert(schema.contactPropertyValue)
-		.values({
-			contactId,
-			propertyId: property.id,
-			value,
-			organizationId,
-			userId,
-			createdAt: new Date(),
-			updatedAt: new Date(),
-		})
-		.onConflictDoUpdate({
-			// unique constraint: cpv_unique_contact_property_value (contactId, propertyId)
-			target: [
-				schema.contactPropertyValue.contactId,
-				schema.contactPropertyValue.propertyId,
-			],
-			set: {
-				value,
-				updatedAt: new Date(),
-			},
-		});
-
-	log.info({
-		contactId,
-		property: DELIVERABILITY_PROPERTY_NAME,
-		value,
-		message: "[auto-contact] email_deliverability property updated",
-	});
-}
-
 // ─── Contact Suppression ──────────────────────────────────────────────────────
 
 /**
@@ -450,14 +356,6 @@ export async function initKumomtaContactSubscriber() {
 							email,
 							organizationId,
 							userId,
-						);
-
-						// 2. Write deliverability property
-						await setDeliverabilityProperty(
-							contact.id,
-							organizationId,
-							userId,
-							action.deliverability,
 						);
 
 						// 3. Suppress if this was a hard bounce or spam complaint
