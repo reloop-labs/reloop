@@ -1,4 +1,4 @@
-/** biome-ignore-all lint/a11y/useSemanticElements: <explanation> */
+/** biome-ignore-all lint/a11y/useSemanticElements: custom checkbox list item elements */
 "use client";
 
 import * as Checkbox from "@reloop/ui/checkbox";
@@ -6,7 +6,7 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { WEBHOOK_EVENTS } from "@reloop/webhook-events";
 import { AnimatePresence, LayoutGroup, motion } from "motion/react";
-import { memo, useCallback } from "react";
+import { memo, useCallback, useMemo } from "react";
 
 interface WebhookEventInlineSelectorProps {
 	value: string[];
@@ -17,6 +17,7 @@ const categoryBadgeColors: Record<string, { light: string; dark: string }> = {
 	domain: { light: "bg-[#0A438A]", dark: "dark:bg-[#1E57A8]" },
 	"api-key": { light: "bg-[#8A5A0A]", dark: "dark:bg-[#A87A1E]" },
 	contact: { light: "bg-[#0A6B3A]", dark: "dark:bg-[#1E8A4E]" },
+	email: { light: "bg-[#7C3AED]", dark: "dark:bg-[#8B5CF6]" },
 };
 
 const categoryCheckboxColors: Record<string, string> = {
@@ -26,17 +27,18 @@ const categoryCheckboxColors: Record<string, string> = {
 		"[&>[data-state=checked]>svg>rect:first-of-type]:fill-[#8A5A0A] dark:[&>[data-state=checked]>svg>rect:first-of-type]:fill-[#A87A1E]",
 	contact:
 		"[&>[data-state=checked]>svg>rect:first-of-type]:fill-[#0A6B3A] dark:[&>[data-state=checked]>svg>rect:first-of-type]:fill-[#1E8A4E]",
+	email:
+		"[&>[data-state=checked]>svg>rect:first-of-type]:fill-[#7C3AED] dark:[&>[data-state=checked]>svg>rect:first-of-type]:fill-[#8B5CF6]",
 };
 
 interface WebhookEventRowProps {
 	event: (typeof WEBHOOK_EVENTS)[number];
 	isChecked: boolean;
-	isLast: boolean;
 	onToggle: (id: string) => void;
 }
 
 const WebhookEventRow = memo<WebhookEventRowProps>(
-	({ event, isChecked, isLast, onToggle }) => (
+	({ event, isChecked, onToggle }) => (
 		<div
 			tabIndex={0}
 			role="button"
@@ -51,8 +53,6 @@ const WebhookEventRow = memo<WebhookEventRowProps>(
 			className={cn(
 				"flex w-full cursor-pointer items-center justify-between px-4 py-2.5 text-left transition-colors hover:bg-bg-weak-50/50",
 				isChecked && "bg-bg-weak-50/60",
-				!isLast &&
-					"border-stroke-soft-100 border-b dark:border-stroke-soft-100/40",
 			)}
 		>
 			<div className="flex min-w-0 flex-1 items-center gap-3">
@@ -105,18 +105,57 @@ export const WebhookEventInlineSelector = ({
 		WEBHOOK_EVENTS.map((e) => [e.id, e]),
 	);
 
+	const categoryLabels: Record<string, string> = {
+		domain: "Domains",
+		"api-key": "API Keys",
+		contact: "Contacts",
+		email: "Email",
+	};
+
+	const groupedEvents = useMemo(() => {
+		const groups: { category: string; events: (typeof WEBHOOK_EVENTS)[number][] }[] = [];
+		const seen = new Map<string, number>();
+
+		for (const event of WEBHOOK_EVENTS) {
+			const existingIdx = seen.get(event.category);
+			if (existingIdx !== undefined) {
+				groups[existingIdx]?.events.push(event);
+			} else {
+				seen.set(event.category, groups.length);
+				groups.push({
+					category: event.category,
+					events: [event],
+				});
+			}
+		}
+		return groups;
+	}, []);
+
 	return (
 		<LayoutGroup>
 			<div className="space-y-3">
-				<div className="h-96 overflow-y-auto rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/40">
-					{WEBHOOK_EVENTS.map((event, i) => (
-						<WebhookEventRow
-							key={event.id}
-							event={event}
-							isChecked={value.includes(event.id)}
-							isLast={i === WEBHOOK_EVENTS.length - 1}
-							onToggle={handleToggle}
-						/>
+				<div className="h-96 divide-y divide-stroke-soft-100 overflow-y-auto rounded-xl border border-stroke-soft-100 dark:divide-stroke-soft-100/40 dark:border-stroke-soft-100/40">
+					{groupedEvents.map((group) => (
+						<div key={group.category}>
+							{/* Category separator / header */}
+							<div className="sticky top-0 z-10 flex items-center gap-3 border-stroke-soft-100 border-b bg-bg-weak-50 px-4 py-2 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/90">
+								<span className="font-semibold text-[10px] text-text-sub-600 uppercase tracking-widest">
+									{categoryLabels[group.category] ?? group.category}
+								</span>
+							</div>
+
+							{/* Event rows */}
+							<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/40">
+								{group.events.map((event) => (
+									<WebhookEventRow
+										key={event.id}
+										event={event}
+										isChecked={value.includes(event.id)}
+										onToggle={handleToggle}
+									/>
+								))}
+							</div>
+						</div>
 					))}
 				</div>
 
