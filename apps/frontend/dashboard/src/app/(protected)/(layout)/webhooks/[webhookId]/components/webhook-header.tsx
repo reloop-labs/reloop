@@ -111,6 +111,7 @@ export const WebhookHeader = ({
 	const [isSecretVisible, setIsSecretVisible] = useState(false);
 	const [isRotatingSecret, setIsRotatingSecret] = useState(false);
 	const [isRotateModalOpen, setIsRotateModalOpen] = useState(false);
+	const [isTogglingStatus, setIsTogglingStatus] = useState(false);
 
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
@@ -157,6 +158,36 @@ export const WebhookHeader = ({
 		}
 	};
 
+	const handleToggleStatus = async () => {
+		if (!webhook || isTogglingStatus) return;
+
+		const nextStatus = webhook.status === "disabled" ? "active" : "disabled";
+
+		try {
+			setIsTogglingStatus(true);
+			await axios.patch(
+				`/api/webhook/v1/${webhook.id}`,
+				{
+					status: nextStatus,
+				},
+				{ headers: { credentials: "include" } },
+			);
+
+			await mutate(
+				(key) => typeof key === "string" && key.startsWith("/api/webhook/v1"),
+			);
+			toast.success(
+				`Webhook ${nextStatus === "active" ? "enabled" : "disabled"} successfully`,
+			);
+		} catch (error) {
+			toast.error(
+				`Failed to ${nextStatus === "active" ? "enable" : "disable"} webhook`,
+			);
+		} finally {
+			setIsTogglingStatus(false);
+		}
+	};
+
 	const getMenuItems = (status: string) => [
 		{
 			id: "docs",
@@ -187,10 +218,11 @@ export const WebhookHeader = ({
 	const handleMenuItemClick = (itemId: string) => {
 		if (itemId === "docs") {
 			window.open("https://reloop.sh/docs/webhooks", "_blank");
+		} else if (itemId === "toggle") {
+			handleToggleStatus();
 		} else if (itemId === "delete") {
 			onDeleteWebhook?.();
 		}
-		// Implement rotate and toggle as needed
 	};
 
 	if (!webhook && !isLoading) {

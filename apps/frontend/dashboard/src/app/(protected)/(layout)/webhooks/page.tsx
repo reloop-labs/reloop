@@ -22,6 +22,7 @@ const WebhooksPage = () => {
 		isLoading,
 		error,
 		isTotalEmpty,
+		mutate,
 	} = useWebhooks();
 	const router = useRouter();
 
@@ -88,6 +89,7 @@ const WebhooksPage = () => {
 						isLoading={isLoading}
 						loadingRows={4}
 						isTotalEmpty={isTotalEmpty}
+						onMutate={mutate}
 					/>
 				</div>
 			</div>

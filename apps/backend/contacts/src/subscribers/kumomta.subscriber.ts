@@ -17,11 +17,7 @@
  *  • Runs in a separate NATS queue group from the logs service so both receive every event
  */
 
-import {
-	BusEvent,
-	bus,
-	type KumomtaLogRecordPayload,
-} from "@reloop/bus";
+import { BusEvent, bus, type KumomtaLogRecordPayload } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { and, eq } from "drizzle-orm";
@@ -251,10 +247,7 @@ async function setDeliverabilityProperty(
 		if (!property) {
 			property = await db.query.contactProperty.findFirst({
 				where: and(
-					eq(
-						schema.contactProperty.propertyName,
-						DELIVERABILITY_PROPERTY_NAME,
-					),
+					eq(schema.contactProperty.propertyName, DELIVERABILITY_PROPERTY_NAME),
 					eq(schema.contactProperty.organizationId, organizationId),
 				),
 			});
@@ -435,12 +428,11 @@ export async function initKumomtaContactSubscriber() {
 				// exact address for this delivery attempt. Fall back to toEmails from
 				// the log if the recipient field is unexpectedly empty.
 				const { toEmails } = emailLog;
-				const recipientEmails: string[] =
-					event.recipient
-						? [event.recipient]
-						: Array.isArray(toEmails)
-							? (toEmails as string[])
-							: [];
+				const recipientEmails: string[] = event.recipient
+					? [event.recipient]
+					: Array.isArray(toEmails)
+						? (toEmails as string[])
+						: [];
 
 				if (recipientEmails.length === 0) {
 					log.warn({
@@ -526,8 +518,7 @@ export async function initKumomtaContactSubscriber() {
 				log.error({
 					kumomtaId: event.id,
 					type: event.type,
-					error:
-						error instanceof Error ? error.message : String(error),
+					error: error instanceof Error ? error.message : String(error),
 					message:
 						"[auto-contact] Unhandled error in KumoMTA contact subscriber",
 				});

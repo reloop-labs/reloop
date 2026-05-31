@@ -13,6 +13,7 @@
 		"format": "biome format ."
 	},
 	"dependencies": {
+		"bullmq": "catalog:backend",
 		"@elysiajs/cors": "catalog:backend",
 		"@elysiajs/cron": "catalog:backend",
 		"@elysiajs/opentelemetry": "catalog:backend",

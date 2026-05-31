@@ -11,10 +11,12 @@ import {
 } from "@reloop/ui/popover";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { WEBHOOK_EVENTS } from "@reloop/webhook-events";
+import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";
+import { toast } from "sonner";
 
 import { DeleteWebhookModal } from "./delete-webhook-modal";
 import { EmptyState } from "./empty-state";
@@ -43,10 +45,22 @@ interface WebhookTableProps {
 	isLoading?: boolean;
 	loadingRows?: number;
 	isTotalEmpty?: boolean;
+	onMutate?: () => void;
 }
 
-const getStatusBadgeColor = () => {
-	return "text-text-sub-600 border-stroke-soft-200 bg-neutral-alpha-10";
+const getStatusBadgeColor = (status: string) => {
+	switch (status) {
+		case "active":
+			return "font-medium border border-success-base bg-success-light/20 text-success-base";
+		case "paused":
+			return "font-medium border border-warning-base bg-warning-light/20 text-warning-base";
+		case "disabled":
+			return "font-medium border border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600";
+		case "failed":
+			return "font-medium border border-error-base bg-error-light/20 text-error-base";
+		default:
+			return "font-medium border border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600";
+	}
 };
 
 const getStatusIconColor = (status: string) => {
@@ -56,17 +70,18 @@ const getStatusIconColor = (status: string) => {
 		case "paused":
 			return "bg-warning-base";
 		case "disabled":
-			return "bg-warning-base";
+			return "bg-text-sub-600";
 		case "failed":
 			return "bg-error-base";
 		default:
-			return "bg-faded-base";
+			return "bg-text-sub-600";
 	}
 };
 
 interface WebhookActionsDropdownProps {
 	webhook: WebhookData;
 	onViewDetails: (id: string) => void;
+	onToggleStatus: (id: string, currentStatus: string) => void;
 	onDeleteKey: (id: string) => void;
 	onOpenChange?: (open: boolean) => void;
 }
@@ -74,6 +89,7 @@ interface WebhookActionsDropdownProps {
 const WebhookActionsDropdown = ({
 	webhook,
 	onViewDetails,
+	onToggleStatus,
 	onDeleteKey,
 	onOpenChange,
 }: WebhookActionsDropdownProps) => {
@@ -94,6 +110,13 @@ const WebhookActionsDropdown = ({
 			isDanger: false,
 		},
 		{
+			id: "toggle",
+			label:
+				webhook.status === "disabled" ? "Enable Webhook" : "Disable Webhook",
+			icon: (webhook.status === "disabled" ? "play" : "pause") as any,
+			isDanger: false,
+		},
+		{
 			id: "delete",
 			label: "Delete Webhook",
 			icon: "trash" as const,
@@ -109,6 +132,9 @@ const WebhookActionsDropdown = ({
 	const handleItemClick = (itemId: string) => {
 		if (itemId === "view") {
 			onViewDetails(webhook.id);
+			setPopoverOpen(false);
+		} else if (itemId === "toggle") {
+			onToggleStatus(webhook.id, webhook.status);
 			setPopoverOpen(false);
 		} else if (itemId === "delete") {
 			onDeleteKey(webhook.id);
@@ -171,17 +197,18 @@ const WebhookActionsDropdown = ({
 };
 
 const GRID = "grid-cols-[minmax(0,2fr)_minmax(0,1.5fr)_120px_140px_32px]";
-const BORDER = "border-stroke-soft-100 dark:border-stroke-soft-100/50";
 
 export const WebhookTable = ({
 	webhooks,
 	isLoading,
 	loadingRows = 3,
 	isTotalEmpty,
+	onMutate,
 }: WebhookTableProps) => {
 	const router = useRouter();
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 	const [deleteId, setDeleteId] = useQueryState("delete");
+	const [isTogglingStatus, setIsTogglingStatus] = useState<string | null>(null);
 
 	const handleViewDetails = (webhookId: string) => {
 		router.push(`/webhooks/${webhookId}`);
@@ -189,6 +216,37 @@ export const WebhookTable = ({
 
 	const handleDeleteWebhook = (webhookId: string) => {
 		setDeleteId(webhookId);
+	};
+
+	const handleToggleStatus = async (
+		webhookId: string,
+		currentStatus: string,
+	) => {
+		if (isTogglingStatus) return;
+
+		const nextStatus = currentStatus === "disabled" ? "active" : "disabled";
+
+		try {
+			setIsTogglingStatus(webhookId);
+			await axios.patch(
+				`/api/webhook/v1/${webhookId}`,
+				{
+					status: nextStatus,
+				},
+				{ headers: { credentials: "include" } },
+			);
+
+			toast.success(
+				`Webhook ${nextStatus === "active" ? "enabled" : "disabled"} successfully`,
+			);
+			onMutate?.();
+		} catch {
+			toast.error(
+				`Failed to ${nextStatus === "active" ? "enable" : "disable"} webhook`,
+			);
+		} finally {
+			setIsTogglingStatus(null);
+		}
 	};
 
 	return (
@@ -344,7 +402,7 @@ export const WebhookTable = ({
 											<span
 												className={cn(
 													"inline-flex items-center rounded-md border-[1px] px-[6px] py-0.5 font-medium text-[10px]",
-													getStatusBadgeColor(),
+													getStatusBadgeColor(webhook.status),
 												)}
 											>
 												<span
@@ -373,6 +431,7 @@ export const WebhookTable = ({
 										<WebhookActionsDropdown
 											webhook={webhook}
 											onViewDetails={handleViewDetails}
+											onToggleStatus={handleToggleStatus}
 											onDeleteKey={handleDeleteWebhook}
 											onOpenChange={(open) =>
 												setActiveDropdownId(open ? webhook.id : null)
