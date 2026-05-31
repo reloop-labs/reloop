@@ -5,6 +5,7 @@ import type { DomainListResponse } from "@fe/dashboard/types/api.types";
 import { cn } from "@reloop/ui/cn";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { XCircle } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import useSWR from "swr";
 import { useEditorStore } from "./use-editor-store";
 
@@ -45,6 +46,21 @@ export const SendDetails = () => {
 	const setPreviewText = useEditorStore((s) => s.setPreviewText);
 	const subject = useEditorStore((s) => s.subject);
 	const setSubject = useEditorStore((s) => s.setSubject);
+
+	const [showReplyTo, setShowReplyTo] = useState(false);
+	const replyToInputRef = useRef<HTMLInputElement>(null);
+
+	useEffect(() => {
+		if (replyTo) {
+			setShowReplyTo(true);
+		}
+	}, [replyTo]);
+
+	useEffect(() => {
+		if (showReplyTo) {
+			replyToInputRef.current?.focus();
+		}
+	}, [showReplyTo]);
 
 	const { activeOrganization } = useUserOrganization();
 	const { data: domainData } = useSWR<DomainListResponse>(
@@ -106,40 +122,59 @@ export const SendDetails = () => {
 						placeholder="Acme <acme@example.com>"
 						className="flex-1 bg-transparent text-text-strong-950 outline-none placeholder:text-text-soft-400"
 					/>
-					{fromError && (
-						<Tooltip.Root>
-							<Tooltip.Trigger asChild>
-								<div className="flex cursor-pointer items-center justify-center text-red-500 transition-transform hover:scale-105 dark:text-red-400">
-									<XCircle size={15} />
-								</div>
-							</Tooltip.Trigger>
-							<Tooltip.Content side="top">{fromError}</Tooltip.Content>
-						</Tooltip.Root>
-					)}
+					<div className="flex items-center gap-2">
+						{fromError && (
+							<Tooltip.Root>
+								<Tooltip.Trigger asChild>
+									<div className="flex cursor-pointer items-center justify-center text-red-500 transition-transform hover:scale-105 dark:text-red-400">
+										<XCircle size={15} />
+									</div>
+								</Tooltip.Trigger>
+								<Tooltip.Content side="top">{fromError}</Tooltip.Content>
+							</Tooltip.Root>
+						)}
+						{!showReplyTo && (
+							<button
+								type="button"
+								onClick={() => setShowReplyTo(true)}
+								className="font-medium text-[13px] text-text-soft-400 transition-colors hover:text-text-strong-950"
+							>
+								Reply-To
+							</button>
+						)}
+					</div>
 				</div>
 			</FieldRow>
 
 			{/* Reply-To Row */}
-			<FieldRow label="Reply-To">
-				<div className="relative flex w-full flex-1 items-center justify-between gap-2 text-sm text-text-sub-600">
-					<input
-						value={replyTo}
-						onChange={(e) => setReplyTo(e.target.value)}
-						placeholder="replyto@example.com"
-						className="flex-1 bg-transparent text-sm text-text-strong-950 outline-none placeholder:text-text-soft-400"
-					/>
-					{replyToError && (
-						<Tooltip.Root>
-							<Tooltip.Trigger asChild>
-								<div className="flex cursor-pointer items-center justify-center text-red-500 transition-transform hover:scale-105 dark:text-red-400">
-									<XCircle size={15} />
-								</div>
-							</Tooltip.Trigger>
-							<Tooltip.Content side="top">{replyToError}</Tooltip.Content>
-						</Tooltip.Root>
-					)}
-				</div>
-			</FieldRow>
+			{showReplyTo && (
+				<FieldRow label="Reply-To">
+					<div className="relative flex w-full flex-1 items-center justify-between gap-2 text-sm text-text-sub-600">
+						<input
+							ref={replyToInputRef}
+							value={replyTo}
+							onChange={(e) => setReplyTo(e.target.value)}
+							onBlur={() => {
+								if (!replyTo.trim()) {
+									setShowReplyTo(false);
+								}
+							}}
+							placeholder="replyto@example.com"
+							className="flex-1 bg-transparent text-sm text-text-strong-950 outline-none placeholder:text-text-soft-400"
+						/>
+						{replyToError && (
+							<Tooltip.Root>
+								<Tooltip.Trigger asChild>
+									<div className="flex cursor-pointer items-center justify-center text-red-500 transition-transform hover:scale-105 dark:text-red-400">
+										<XCircle size={15} />
+									</div>
+								</Tooltip.Trigger>
+								<Tooltip.Content side="top">{replyToError}</Tooltip.Content>
+							</Tooltip.Root>
+						)}
+					</div>
+				</FieldRow>
+			)}
 
 			{/* Preview Row */}
 			<FieldRow label="Preview">
